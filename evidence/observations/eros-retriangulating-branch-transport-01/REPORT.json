@@ -1,0 +1,787 @@
+{
+  "schema": "eros.retriangulating-branch-transport.report.v1",
+  "status": "accepted",
+  "question": "Can one exact local triangulation law remain consequential after its source lineage departs, act on later quadrilaterals in changed scale and chart, and expose the information lost by a cross-ratio-plus-endpoint quotient?",
+  "theory_to_structure": "The source declares one finite multiply-multiply-add-divide relation over five ordered local roles. That exact program and a matched cross-ratio-plus-endpoint quotient cross separate Soma worlds as regional incidence, rest after their source lineages end, and are recruited by later quadrilateral currents. A generic exact world transducer evaluates only a recovered program, returns its complete node path and alternate diagonal as genuinely later current, and asks Soma to compare that result with the independently declared receiver. Uniform scale, cyclic rechart, their composition, a rational receiver, and the e=0 seam are all held apart.",
+  "stopping_condition": "Stop after the complete carrier, quotient foil, no-standing control, four later closed paths, one e=0 open path, exact rest/remount, and exact returned-result comparisons have all been read. If the world must still interpret the recovered program, name that seam instead of claiming direct Eros enactment.",
+  "source_sha256": "dbe62b1d634e03c509c0857c6fa6349146ee5a5f8075fbbd81939f073a8bd436",
+  "physical_preflight": {
+    "executor": "bounded host",
+    "event_limit_seconds": 30,
+    "run_limit_seconds": 120,
+    "maximum_regional_arcs_per_event": 256,
+    "floating_point_causal_data": false,
+    "cuda": false
+  },
+  "carriers": {
+    "source_program_name": "ordered Ptolemy flip",
+    "source_relation": "e*f = a*c + b*d",
+    "source_domain": "the divisor carried at role e must be nonzero",
+    "source_chart": "a,b,c,d cyclic; e is the live diagonal; f is the alternate diagonal",
+    "source_values": [
+      "2",
+      "3",
+      "5",
+      "7",
+      "1"
+    ],
+    "source_path": [
+      "a*c = 10",
+      "b*d = 21",
+      "a*c + b*d = 31",
+      "(a*c + b*d)/e = 31"
+    ],
+    "source_output": "31",
+    "program_words": 25,
+    "program_returned_exactly": true,
+    "program_survived_exact_rest_remount": true,
+    "program_source_lineages_departed": true,
+    "program_event": {
+      "event": "complete-program-source",
+      "semantic_words": 25,
+      "regional_arcs": 26,
+      "wall_micros": 1588,
+      "returned_incidences": 26,
+      "returned_pins": 26
+    },
+    "program_rest_sha256": "e316375ce75355b3b55f61db71bde0e38cc63675f03beecdb3997bb231c55da7",
+    "quotient_retains": [
+      "chi = (a*c)/(b*d)",
+      "source output f"
+    ],
+    "quotient_chi": "10/21",
+    "quotient_source_output": "31",
+    "quotient_forgets": [
+      "the metric scale b*d",
+      "the old diagonal e as a divisor",
+      "the ordered multiply-add-divide path",
+      "the domain seam at e = 0"
+    ],
+    "quotient_words": 7,
+    "quotient_returned_exactly": true,
+    "quotient_survived_exact_rest_remount": true,
+    "quotient_source_lineages_departed": true,
+    "quotient_event": {
+      "event": "quotient-source",
+      "semantic_words": 7,
+      "regional_arcs": 8,
+      "wall_micros": 582,
+      "returned_incidences": 8,
+      "returned_pins": 8
+    },
+    "quotient_rest_sha256": "e5093273775ce264abf3ebd1367eac46bdf6207eb81b1e241dcab7ef0b4847e8"
+  },
+  "cases": [
+    {
+      "id": "uniform-scale-two",
+      "group": "heldout",
+      "chart": "same cyclic chart; every lambda length is rebased by scale two",
+      "source_role_order": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e"
+      ],
+      "input_values": [
+        "4",
+        "6",
+        "10",
+        "14",
+        "2"
+      ],
+      "expected_path": [
+        "a*c = 40",
+        "b*d = 84",
+        "a*c + b*d = 124",
+        "(a*c + b*d)/e = 62"
+      ],
+      "expected_output": "62",
+      "complete_carrier_recovered_from_standing": true,
+      "current_recovered_from_source": true,
+      "evaluation": {
+        "condition": "closed",
+        "complete_path": [
+          {
+            "node": 0,
+            "operation": "input:a",
+            "antecedents": [],
+            "value": "4"
+          },
+          {
+            "node": 1,
+            "operation": "input:b",
+            "antecedents": [],
+            "value": "6"
+          },
+          {
+            "node": 2,
+            "operation": "input:c",
+            "antecedents": [],
+            "value": "10"
+          },
+          {
+            "node": 3,
+            "operation": "input:d",
+            "antecedents": [],
+            "value": "14"
+          },
+          {
+            "node": 4,
+            "operation": "input:e",
+            "antecedents": [],
+            "value": "2"
+          },
+          {
+            "node": 5,
+            "operation": "multiply",
+            "antecedents": [
+              0,
+              2
+            ],
+            "value": "40"
+          },
+          {
+            "node": 6,
+            "operation": "multiply",
+            "antecedents": [
+              1,
+              3
+            ],
+            "value": "84"
+          },
+          {
+            "node": 7,
+            "operation": "add",
+            "antecedents": [
+              5,
+              6
+            ],
+            "value": "124"
+          },
+          {
+            "node": 8,
+            "operation": "divide",
+            "antecedents": [
+              7,
+              4
+            ],
+            "value": "62"
+          }
+        ],
+        "output": "62",
+        "open_at_node": null,
+        "open_reason": null
+      },
+      "result_returned_as_later_current": true,
+      "returned_result": "62",
+      "result_comparison": {
+        "capabilities": 4,
+        "rides": 4,
+        "opens": 0,
+        "founds": 0,
+        "exact_ride": true
+      },
+      "events": [
+        {
+          "event": "conduct-uniform-scale-two",
+          "semantic_words": 17,
+          "regional_arcs": 18,
+          "wall_micros": 2595,
+          "returned_incidences": 44,
+          "returned_pins": 44
+        },
+        {
+          "event": "return-uniform-scale-two",
+          "semantic_words": 4,
+          "regional_arcs": 4,
+          "wall_micros": 1247,
+          "returned_incidences": 4,
+          "returned_pins": 4
+        },
+        {
+          "event": "compare-uniform-scale-two",
+          "semantic_words": 4,
+          "regional_arcs": 4,
+          "wall_micros": 2059,
+          "returned_incidences": 12,
+          "returned_pins": 12
+        }
+      ]
+    },
+    {
+      "id": "cyclic-rechart",
+      "group": "heldout",
+      "chart": "local roles rotate from (a,b,c,d) to (b,c,d,a)",
+      "source_role_order": [
+        "b",
+        "c",
+        "d",
+        "a",
+        "e"
+      ],
+      "input_values": [
+        "3",
+        "5",
+        "7",
+        "2",
+        "1"
+      ],
+      "expected_path": [
+        "a*c = 21",
+        "b*d = 10",
+        "a*c + b*d = 31",
+        "(a*c + b*d)/e = 31"
+      ],
+      "expected_output": "31",
+      "complete_carrier_recovered_from_standing": true,
+      "current_recovered_from_source": true,
+      "evaluation": {
+        "condition": "closed",
+        "complete_path": [
+          {
+            "node": 0,
+            "operation": "input:a",
+            "antecedents": [],
+            "value": "3"
+          },
+          {
+            "node": 1,
+            "operation": "input:b",
+            "antecedents": [],
+            "value": "5"
+          },
+          {
+            "node": 2,
+            "operation": "input:c",
+            "antecedents": [],
+            "value": "7"
+          },
+          {
+            "node": 3,
+            "operation": "input:d",
+            "antecedents": [],
+            "value": "2"
+          },
+          {
+            "node": 4,
+            "operation": "input:e",
+            "antecedents": [],
+            "value": "1"
+          },
+          {
+            "node": 5,
+            "operation": "multiply",
+            "antecedents": [
+              0,
+              2
+            ],
+            "value": "21"
+          },
+          {
+            "node": 6,
+            "operation": "multiply",
+            "antecedents": [
+              1,
+              3
+            ],
+            "value": "10"
+          },
+          {
+            "node": 7,
+            "operation": "add",
+            "antecedents": [
+              5,
+              6
+            ],
+            "value": "31"
+          },
+          {
+            "node": 8,
+            "operation": "divide",
+            "antecedents": [
+              7,
+              4
+            ],
+            "value": "31"
+          }
+        ],
+        "output": "31",
+        "open_at_node": null,
+        "open_reason": null
+      },
+      "result_returned_as_later_current": true,
+      "returned_result": "31",
+      "result_comparison": {
+        "capabilities": 4,
+        "rides": 4,
+        "opens": 0,
+        "founds": 0,
+        "exact_ride": true
+      },
+      "events": [
+        {
+          "event": "conduct-cyclic-rechart",
+          "semantic_words": 17,
+          "regional_arcs": 18,
+          "wall_micros": 2565,
+          "returned_incidences": 44,
+          "returned_pins": 44
+        },
+        {
+          "event": "return-cyclic-rechart",
+          "semantic_words": 4,
+          "regional_arcs": 4,
+          "wall_micros": 1250,
+          "returned_incidences": 4,
+          "returned_pins": 4
+        },
+        {
+          "event": "compare-cyclic-rechart",
+          "semantic_words": 4,
+          "regional_arcs": 4,
+          "wall_micros": 2030,
+          "returned_incidences": 12,
+          "returned_pins": 12
+        }
+      ]
+    },
+    {
+      "id": "scaled-cyclic-rechart",
+      "group": "heldout",
+      "chart": "the cyclic rechart and scale-two rebase occur together",
+      "source_role_order": [
+        "b",
+        "c",
+        "d",
+        "a",
+        "e"
+      ],
+      "input_values": [
+        "6",
+        "10",
+        "14",
+        "4",
+        "2"
+      ],
+      "expected_path": [
+        "a*c = 84",
+        "b*d = 40",
+        "a*c + b*d = 124",
+        "(a*c + b*d)/e = 62"
+      ],
+      "expected_output": "62",
+      "complete_carrier_recovered_from_standing": true,
+      "current_recovered_from_source": true,
+      "evaluation": {
+        "condition": "closed",
+        "complete_path": [
+          {
+            "node": 0,
+            "operation": "input:a",
+            "antecedents": [],
+            "value": "6"
+          },
+          {
+            "node": 1,
+            "operation": "input:b",
+            "antecedents": [],
+            "value": "10"
+          },
+          {
+            "node": 2,
+            "operation": "input:c",
+            "antecedents": [],
+            "value": "14"
+          },
+          {
+            "node": 3,
+            "operation": "input:d",
+            "antecedents": [],
+            "value": "4"
+          },
+          {
+            "node": 4,
+            "operation": "input:e",
+            "antecedents": [],
+            "value": "2"
+          },
+          {
+            "node": 5,
+            "operation": "multiply",
+            "antecedents": [
+              0,
+              2
+            ],
+            "value": "84"
+          },
+          {
+            "node": 6,
+            "operation": "multiply",
+            "antecedents": [
+              1,
+              3
+            ],
+            "value": "40"
+          },
+          {
+            "node": 7,
+            "operation": "add",
+            "antecedents": [
+              5,
+              6
+            ],
+            "value": "124"
+          },
+          {
+            "node": 8,
+            "operation": "divide",
+            "antecedents": [
+              7,
+              4
+            ],
+            "value": "62"
+          }
+        ],
+        "output": "62",
+        "open_at_node": null,
+        "open_reason": null
+      },
+      "result_returned_as_later_current": true,
+      "returned_result": "62",
+      "result_comparison": {
+        "capabilities": 4,
+        "rides": 4,
+        "opens": 0,
+        "founds": 0,
+        "exact_ride": true
+      },
+      "events": [
+        {
+          "event": "conduct-scaled-cyclic-rechart",
+          "semantic_words": 17,
+          "regional_arcs": 18,
+          "wall_micros": 2521,
+          "returned_incidences": 44,
+          "returned_pins": 44
+        },
+        {
+          "event": "return-scaled-cyclic-rechart",
+          "semantic_words": 4,
+          "regional_arcs": 4,
+          "wall_micros": 1256,
+          "returned_incidences": 4,
+          "returned_pins": 4
+        },
+        {
+          "event": "compare-scaled-cyclic-rechart",
+          "semantic_words": 4,
+          "regional_arcs": 4,
+          "wall_micros": 2156,
+          "returned_incidences": 12,
+          "returned_pins": 12
+        }
+      ]
+    },
+    {
+      "id": "rational-alternate-diagonal",
+      "group": "heldout",
+      "chart": "same roles, nonintegral exact receiver",
+      "source_role_order": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e"
+      ],
+      "input_values": [
+        "2",
+        "3",
+        "4",
+        "5",
+        "7"
+      ],
+      "expected_path": [
+        "a*c = 8",
+        "b*d = 15",
+        "a*c + b*d = 23",
+        "(a*c + b*d)/e = 23/7"
+      ],
+      "expected_output": "23/7",
+      "complete_carrier_recovered_from_standing": true,
+      "current_recovered_from_source": true,
+      "evaluation": {
+        "condition": "closed",
+        "complete_path": [
+          {
+            "node": 0,
+            "operation": "input:a",
+            "antecedents": [],
+            "value": "2"
+          },
+          {
+            "node": 1,
+            "operation": "input:b",
+            "antecedents": [],
+            "value": "3"
+          },
+          {
+            "node": 2,
+            "operation": "input:c",
+            "antecedents": [],
+            "value": "4"
+          },
+          {
+            "node": 3,
+            "operation": "input:d",
+            "antecedents": [],
+            "value": "5"
+          },
+          {
+            "node": 4,
+            "operation": "input:e",
+            "antecedents": [],
+            "value": "7"
+          },
+          {
+            "node": 5,
+            "operation": "multiply",
+            "antecedents": [
+              0,
+              2
+            ],
+            "value": "8"
+          },
+          {
+            "node": 6,
+            "operation": "multiply",
+            "antecedents": [
+              1,
+              3
+            ],
+            "value": "15"
+          },
+          {
+            "node": 7,
+            "operation": "add",
+            "antecedents": [
+              5,
+              6
+            ],
+            "value": "23"
+          },
+          {
+            "node": 8,
+            "operation": "divide",
+            "antecedents": [
+              7,
+              4
+            ],
+            "value": "23/7"
+          }
+        ],
+        "output": "23/7",
+        "open_at_node": null,
+        "open_reason": null
+      },
+      "result_returned_as_later_current": true,
+      "returned_result": "23/7",
+      "result_comparison": {
+        "capabilities": 4,
+        "rides": 4,
+        "opens": 0,
+        "founds": 0,
+        "exact_ride": true
+      },
+      "events": [
+        {
+          "event": "conduct-rational-alternate-diagonal",
+          "semantic_words": 17,
+          "regional_arcs": 18,
+          "wall_micros": 2998,
+          "returned_incidences": 44,
+          "returned_pins": 44
+        },
+        {
+          "event": "return-rational-alternate-diagonal",
+          "semantic_words": 4,
+          "regional_arcs": 4,
+          "wall_micros": 1527,
+          "returned_incidences": 4,
+          "returned_pins": 4
+        },
+        {
+          "event": "compare-rational-alternate-diagonal",
+          "semantic_words": 4,
+          "regional_arcs": 4,
+          "wall_micros": 2133,
+          "returned_incidences": 12,
+          "returned_pins": 12
+        }
+      ]
+    },
+    {
+      "id": "zero-diagonal-seam",
+      "group": "boundary",
+      "chart": "the presented old diagonal collapses to the divisor seam",
+      "source_role_order": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e"
+      ],
+      "input_values": [
+        "2",
+        "3",
+        "5",
+        "7",
+        "0"
+      ],
+      "expected_path": [
+        "a*c = 10",
+        "b*d = 21",
+        "a*c + b*d = 31",
+        "division by e is OPEN"
+      ],
+      "expected_output": null,
+      "complete_carrier_recovered_from_standing": true,
+      "current_recovered_from_source": true,
+      "evaluation": {
+        "condition": "open",
+        "complete_path": [
+          {
+            "node": 0,
+            "operation": "input:a",
+            "antecedents": [],
+            "value": "2"
+          },
+          {
+            "node": 1,
+            "operation": "input:b",
+            "antecedents": [],
+            "value": "3"
+          },
+          {
+            "node": 2,
+            "operation": "input:c",
+            "antecedents": [],
+            "value": "5"
+          },
+          {
+            "node": 3,
+            "operation": "input:d",
+            "antecedents": [],
+            "value": "7"
+          },
+          {
+            "node": 4,
+            "operation": "input:e",
+            "antecedents": [],
+            "value": "0"
+          },
+          {
+            "node": 5,
+            "operation": "multiply",
+            "antecedents": [
+              0,
+              2
+            ],
+            "value": "10"
+          },
+          {
+            "node": 6,
+            "operation": "multiply",
+            "antecedents": [
+              1,
+              3
+            ],
+            "value": "21"
+          },
+          {
+            "node": 7,
+            "operation": "add",
+            "antecedents": [
+              5,
+              6
+            ],
+            "value": "31"
+          }
+        ],
+        "output": null,
+        "open_at_node": 8,
+        "open_reason": "division by the presented zero divisor is OPEN"
+      },
+      "result_returned_as_later_current": false,
+      "returned_result": null,
+      "result_comparison": null,
+      "events": [
+        {
+          "event": "conduct-zero-diagonal-seam",
+          "semantic_words": 17,
+          "regional_arcs": 18,
+          "wall_micros": 2625,
+          "returned_incidences": 44,
+          "returned_pins": 44
+        }
+      ]
+    }
+  ],
+  "quotient_control": {
+    "name": "cross-ratio-plus-source-endpoint quotient",
+    "complete_program_recovered": false,
+    "quotient_recovered": true,
+    "current_recovered": true,
+    "output_formed": false,
+    "reason": "The quotient supplies chi=10/21 and the old endpoint 31, but the scale-two current needs 62. It carries neither b*d, e, nor the multiply-add-divide path, so the generic transducer has no program to enact.",
+    "event": {
+      "event": "quotient-control",
+      "semantic_words": 17,
+      "regional_arcs": 18,
+      "wall_micros": 1914,
+      "returned_incidences": 26,
+      "returned_pins": 26
+    }
+  },
+  "no_standing_control": {
+    "name": "same scaled current without Standing",
+    "complete_program_recovered": false,
+    "quotient_recovered": false,
+    "current_recovered": true,
+    "output_formed": false,
+    "reason": "The current supplies values but no admitted composition. The absent program capability remains an open contact and no result is formed.",
+    "event": {
+      "event": "no-standing-control",
+      "semantic_words": 17,
+      "regional_arcs": 18,
+      "wall_micros": 1149,
+      "returned_incidences": 18,
+      "returned_pins": 18
+    }
+  },
+  "final_complete_machine": {
+    "standing_rank": 6,
+    "standing_cells": 15,
+    "standing_constituents": 1,
+    "constituent_cells": 5,
+    "constituent_incidences": 44,
+    "constituent_pins": 44,
+    "constituent_paths": 45,
+    "constituent_transport_terms": 89,
+    "live_lineages": 0
+  },
+  "acceptance": {
+    "source_validated": true,
+    "exact_program_stood_after_source_departure": true,
+    "exact_quotient_stood_after_source_departure": true,
+    "every_closed_case_carried_complete_path_and_exact_result": true,
+    "zero_diagonal_stayed_open_at_the_division_seam": true,
+    "quotient_foil_recovered_its_face_but_could_not_form_the_changed_scale_result": true,
+    "no_standing_control_could_not_form_output": true,
+    "every_returned_result_rode_against_its_exact_expected_face": true,
+    "world_side_interpreter_remains_explicit": true,
+    "no_floating_point_causal_data": true
+  },
+  "run_wall_micros": 79145,
+  "conclusion": "The complete carrier and its quotient are not interchangeable. The exact program survives source departure and supplies every later multiply-add-divide path across scale, cyclic rechart, and a rational receiver; e=0 remains an explicit OPEN seam. The quotient retains the original cross-ratio and endpoint but cannot form the scaled result because it discarded metric scale, divisor, and composition. The remaining boundary is equally exact: Soma carries and recruits the program, but the generic world transducer still interprets it and returns the consequence. This cell therefore establishes consequential carriage and isolates direct algorithmic enactment as the next engine question; it does not claim that enactment already exists."
+}

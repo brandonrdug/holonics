@@ -1,0 +1,10 @@
+name = "soma_rh_source_transport"
+defaultTargets = ["SomaRHSourceTransport"]
+
+[[lean_lib]]
+name = "SomaRHSourceTransport"
+
+[[require]]
+name = "mathlib"
+git = "https://github.com/leanprover-community/mathlib4"
+rev = "v4.27.0"

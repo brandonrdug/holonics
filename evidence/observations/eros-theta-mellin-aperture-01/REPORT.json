@@ -1,0 +1,210 @@
+{
+  "schema": "eros.theta-mellin-aperture.v1",
+  "status": "accepted",
+  "question": "Can one exact finite theta face grow by one reciprocal shell while the s <-> 1-s involution, its anti-invariant truncation residual, and an independently positive receiver pairing remain causal through replacement and rest?",
+  "theory_to_structure": "Each lattice shell carries direct exp(-pi*n^2*t) and reciprocal t^(-1/2)exp(-pi*n^2/t) arms, their exact Mellin affine coordinates s and 1-s, an explicit involution target, symmetric and anti-invariant coefficients, and equal positive n^2 metric weights. The endpoint shell uses weight one and remains typed apart from convergent positive-shell Mellin receipts.",
+  "stopping_condition": "Stop after aperture four grows to five, the raw finite truncation remains explicitly non-self-dual, the symmetric and residual faces transform exactly, the lattice-energy metric stays positive and covariant, predecessor interfaces depart, and the successor remounts. Do not identify this metric with Weil positivity or enter zero search, analytic continuation, CUDA, or RH.",
+  "logical_cores": 24,
+  "event_limit_seconds": 30,
+  "run_limit_seconds": 120,
+  "run_wall_micros": 11546,
+  "run_resource": {
+    "user_cpu_micros": 9149,
+    "system_cpu_micros": 3813,
+    "max_rss_before_kib": 2372,
+    "max_rss_after_kib": 8276
+  },
+  "lifecycle": {
+    "source_law": {
+      "event": "theta-mellin-source-law",
+      "semantic_atoms": 1,
+      "preflight": {
+        "currents": 2,
+        "regional_cells": 1,
+        "regional_arcs": 2,
+        "largest_cell_arcs": 2,
+        "regional_receiver_width": 1,
+        "executor_thread_ceiling": 2,
+        "legacy_quadratic_pair_visits": 3,
+        "indexed_rows": 2,
+        "hard_arc_limit": 1024
+      },
+      "wall_micros": 128,
+      "executor_micros": 103,
+      "machine_boundary_micros": 25,
+      "resource": {
+        "user_cpu_micros": 86,
+        "system_cpu_micros": 84,
+        "max_rss_before_kib": 3140,
+        "max_rss_after_kib": 3332
+      },
+      "returned_incidences": 2,
+      "returned_pins": 2
+    },
+    "predecessor_return": {
+      "event": "theta-mellin-aperture-four",
+      "semantic_atoms": 205,
+      "preflight": {
+        "currents": 2,
+        "regional_cells": 1,
+        "regional_arcs": 206,
+        "largest_cell_arcs": 206,
+        "regional_receiver_width": 1,
+        "executor_thread_ceiling": 2,
+        "legacy_quadratic_pair_visits": 63345,
+        "indexed_rows": 206,
+        "hard_arc_limit": 1024
+      },
+      "wall_micros": 1042,
+      "executor_micros": 608,
+      "machine_boundary_micros": 434,
+      "resource": {
+        "user_cpu_micros": 0,
+        "system_cpu_micros": 1085,
+        "max_rss_before_kib": 3716,
+        "max_rss_after_kib": 4484
+      },
+      "returned_incidences": 206,
+      "returned_pins": 206
+    },
+    "growth_meeting": {
+      "event": "theta-mellin-growth-meeting",
+      "semantic_atoms": 1,
+      "preflight": {
+        "currents": 2,
+        "regional_cells": 1,
+        "regional_arcs": 5,
+        "largest_cell_arcs": 5,
+        "regional_receiver_width": 1,
+        "executor_thread_ceiling": 2,
+        "legacy_quadratic_pair_visits": 30,
+        "indexed_rows": 5,
+        "hard_arc_limit": 1024
+      },
+      "wall_micros": 593,
+      "executor_micros": 106,
+      "machine_boundary_micros": 487,
+      "resource": {
+        "user_cpu_micros": 488,
+        "system_cpu_micros": 153,
+        "max_rss_before_kib": 4676,
+        "max_rss_after_kib": 4868
+      },
+      "returned_incidences": 213,
+      "returned_pins": 213
+    },
+    "successor_replacement": {
+      "event": "theta-mellin-successor-replacement",
+      "semantic_atoms": 451,
+      "preflight": {
+        "currents": 2,
+        "regional_cells": 1,
+        "regional_arcs": 453,
+        "largest_cell_arcs": 453,
+        "regional_receiver_width": 1,
+        "executor_thread_ceiling": 2,
+        "legacy_quadratic_pair_visits": 307134,
+        "indexed_rows": 453,
+        "hard_arc_limit": 1024
+      },
+      "wall_micros": 3416,
+      "executor_micros": 1258,
+      "machine_boundary_micros": 2158,
+      "resource": {
+        "user_cpu_micros": 3450,
+        "system_cpu_micros": 0,
+        "max_rss_before_kib": 4868,
+        "max_rss_after_kib": 7508
+      },
+      "returned_incidences": 873,
+      "returned_pins": 873
+    },
+    "predecessor_aperture": 4,
+    "successor_aperture": 5,
+    "predecessor_words": 205,
+    "successor_words": 245,
+    "lower_restriction_exact": true,
+    "exactly_one_shell_pair_added": true,
+    "law_recovered_from_standing": true,
+    "predecessor_recovered_from_standing": true,
+    "objective_recovered_from_current": true,
+    "predecessor_data_departed": true,
+    "predecessor_recruit_departed": true,
+    "objective_departed": true,
+    "source_lineages_departed": true,
+    "final_rest_remount_exact": true,
+    "final_machine": {
+      "standing_rank": 6,
+      "standing_cells": 26,
+      "standing_constituents": 1,
+      "constituent_cells": 14,
+      "constituent_incidences": 873,
+      "constituent_pins": 873,
+      "constituent_paths": 875,
+      "constituent_transport_terms": 1536,
+      "live_lineages": 0,
+      "rest_sha256": "214367f5bd5354222c98f62c75233a891a8578cf32196b44476661730feffb0b"
+    }
+  },
+  "involution": {
+    "fixed_axis": {
+      "numerator": "1",
+      "denominator": "2"
+    },
+    "arms": 12,
+    "involution_pairs": 6,
+    "j_squared_is_identity": true,
+    "symmetric_face_is_fixed": true,
+    "residual_face_reverses": true,
+    "raw_direct_and_reciprocal_reconstruct": true,
+    "raw_finite_partial_is_not_self_dual": true,
+    "anti_invariant_residual_is_retained": true
+  },
+  "mellin_receipt": {
+    "shell": 5,
+    "square": 25,
+    "direct_affine_coordinate": [
+      0,
+      1
+    ],
+    "reciprocal_affine_coordinate": [
+      1,
+      -1
+    ],
+    "reflection_is_exact": true,
+    "endpoint_excluded_from_shell_integral": true,
+    "direct_formal_receipt": "Gamma(s/2)*(pi*25)^(-s/2)",
+    "reciprocal_formal_receipt": "Gamma((1-s)/2)*(pi*25)^(-(1-s)/2)"
+  },
+  "metric": {
+    "species": "declared finite lattice-energy pairing; not the completed Weil form",
+    "every_weight_positive": true,
+    "involution_is_metric_isometry": true,
+    "predecessor_metric_is_exact_restriction": true,
+    "determinant": "207360000",
+    "symmetric_norm_squared": {
+      "numerator": "221",
+      "denominator": "2"
+    },
+    "residual_norm_squared": {
+      "numerator": "221",
+      "denominator": "2"
+    },
+    "symmetric_residual_pairing": {
+      "numerator": "0",
+      "denominator": "1"
+    },
+    "new_shell_weight": 25
+  },
+  "acceptance": {
+    "exact_shell_growth": true,
+    "involution_embodied_without_erasing_residual": true,
+    "mellin_reflection_exact": true,
+    "positive_metric_covariant": true,
+    "lifecycle_exact": true,
+    "every_event_within_limit": true,
+    "complete_run_within_limit": true,
+    "no_floating_point_causal_data": true
+  },
+  "conclusion": "The finite construction preserves a real theta/Mellin involution without falsely making a raw truncation self-dual: the symmetric face is fixed and the nonzero anti-invariant face remains carried. Its positive lattice-energy pairing is an exact receiver metric for this bounded shell ecology, not the completed arithmetic trace whose universal positivity would bear RH."
+}

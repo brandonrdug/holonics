@@ -1,0 +1,2482 @@
+{
+  "schema": "eros.conformal-rebase-atlas.v1",
+  "status": "accepted",
+  "question": "Can transformed-grid germs, completed Zeta symmetry, logarithmic rebase, and centered Smith incidence be carried as one exact receiver-relative atlas?",
+  "theory_to_structure": [
+    "one source point plus its first nonzero holomorphic term -> one typed local germ",
+    "R(s)=1-s and J(s)=1-conjugate(s) -> separate functional and fixed-locus hands",
+    "w=s-1/2 -> exact fixed and normal projectors",
+    "u=log(x/x0) -> exact log-polar scale/turn current",
+    "(w-a)/(w+a) -> exact unit-shell residual and reciprocal-conjugate partner",
+    "a rendered crossing or shell is downstream of these rows and cannot replace them"
+  ],
+  "workers": {
+    "host_parallelism_available": 24,
+    "independent_exact_workers": 4
+  },
+  "local_holomorphic_germs": [
+    {
+      "label": "regular affine scale-turn",
+      "chart": "F(z)=2/3-i/7+(2+3i)(z-(1/3+i/5))",
+      "source": {
+        "real": {
+          "numerator": "1",
+          "denominator": "3"
+        },
+        "imaginary": {
+          "numerator": "1",
+          "denominator": "5"
+        }
+      },
+      "target": {
+        "real": {
+          "numerator": "2",
+          "denominator": "3"
+        },
+        "imaginary": {
+          "numerator": "-1",
+          "denominator": "7"
+        }
+      },
+      "expansion": "F(z0+delta)=F(z0)+(2+3i)*delta^1",
+      "leading_coefficient": {
+        "real": {
+          "numerator": "2",
+          "denominator": "1"
+        },
+        "imaginary": {
+          "numerator": "3",
+          "denominator": "1"
+        }
+      },
+      "local_degree": 1,
+      "derivative_at_source": {
+        "real": {
+          "numerator": "2",
+          "denominator": "1"
+        },
+        "imaginary": {
+          "numerator": "3",
+          "denominator": "1"
+        }
+      },
+      "derivative_zero": false,
+      "zero_order": null,
+      "critical_order": null,
+      "species": "regular_conformal_germ",
+      "source_axis_angle_turns": {
+        "numerator": "1",
+        "denominator": "4"
+      },
+      "image_ray_angle_turns_unwrapped": {
+        "numerator": "1",
+        "denominator": "4"
+      },
+      "image_ray_angle_turns_mod_one": {
+        "numerator": "1",
+        "denominator": "4"
+      },
+      "horizontal_image_leader": {
+        "real": {
+          "numerator": "2",
+          "denominator": "1"
+        },
+        "imaginary": {
+          "numerator": "3",
+          "denominator": "1"
+        }
+      },
+      "vertical_image_leader": {
+        "real": {
+          "numerator": "-3",
+          "denominator": "1"
+        },
+        "imaginary": {
+          "numerator": "2",
+          "denominator": "1"
+        }
+      },
+      "regular_angle_preserved": true,
+      "potential_net": {
+        "species": "regular_orthogonal_log_amplitude_phase_net",
+        "law": "d(log F)=(399/205+1008/205i) dz; grad U=(Re,-Im), grad V=(Im,Re)",
+        "gradient_pair": {
+          "first": [
+            {
+              "numerator": "399",
+              "denominator": "205"
+            },
+            {
+              "numerator": "-1008",
+              "denominator": "205"
+            }
+          ],
+          "second": [
+            {
+              "numerator": "1008",
+              "denominator": "205"
+            },
+            {
+              "numerator": "399",
+              "denominator": "205"
+            }
+          ],
+          "dot_product": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "equal_norm_squared": true
+        },
+        "phase_winding": null,
+        "rays_per_level_family": null,
+        "exact_interpretation": "away from zeros and critical points, U and V are conjugate harmonic coordinates"
+      }
+    },
+    {
+      "label": "simple zero with nonzero derivative",
+      "chart": "F(z)=(1+i)z",
+      "source": {
+        "real": {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        "imaginary": {
+          "numerator": "0",
+          "denominator": "1"
+        }
+      },
+      "target": {
+        "real": {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        "imaginary": {
+          "numerator": "0",
+          "denominator": "1"
+        }
+      },
+      "expansion": "F(z0+delta)=F(z0)+(1+1i)*delta^1",
+      "leading_coefficient": {
+        "real": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "imaginary": {
+          "numerator": "1",
+          "denominator": "1"
+        }
+      },
+      "local_degree": 1,
+      "derivative_at_source": {
+        "real": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "imaginary": {
+          "numerator": "1",
+          "denominator": "1"
+        }
+      },
+      "derivative_zero": false,
+      "zero_order": 1,
+      "critical_order": null,
+      "species": "simple_zero_regular_germ",
+      "source_axis_angle_turns": {
+        "numerator": "1",
+        "denominator": "4"
+      },
+      "image_ray_angle_turns_unwrapped": {
+        "numerator": "1",
+        "denominator": "4"
+      },
+      "image_ray_angle_turns_mod_one": {
+        "numerator": "1",
+        "denominator": "4"
+      },
+      "horizontal_image_leader": {
+        "real": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "imaginary": {
+          "numerator": "1",
+          "denominator": "1"
+        }
+      },
+      "vertical_image_leader": {
+        "real": {
+          "numerator": "-1",
+          "denominator": "1"
+        },
+        "imaginary": {
+          "numerator": "1",
+          "denominator": "1"
+        }
+      },
+      "regular_angle_preserved": true,
+      "potential_net": {
+        "species": "log_amplitude_singularity_and_phase_vortex",
+        "law": "U=log|1+1i|+1*log|delta|; Delta V=1 full turns",
+        "gradient_pair": null,
+        "phase_winding": 1,
+        "rays_per_level_family": null,
+        "exact_interpretation": "radius collapses at the zero while phase retains the zero order"
+      }
+    },
+    {
+      "label": "nonzero critical branch",
+      "chart": "F(z)=1+z^2",
+      "source": {
+        "real": {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        "imaginary": {
+          "numerator": "0",
+          "denominator": "1"
+        }
+      },
+      "target": {
+        "real": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "imaginary": {
+          "numerator": "0",
+          "denominator": "1"
+        }
+      },
+      "expansion": "F(z0+delta)=F(z0)+(1+0i)*delta^2",
+      "leading_coefficient": {
+        "real": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "imaginary": {
+          "numerator": "0",
+          "denominator": "1"
+        }
+      },
+      "local_degree": 2,
+      "derivative_at_source": null,
+      "derivative_zero": true,
+      "zero_order": null,
+      "critical_order": 1,
+      "species": "nonzero_critical_branch",
+      "source_axis_angle_turns": {
+        "numerator": "1",
+        "denominator": "4"
+      },
+      "image_ray_angle_turns_unwrapped": {
+        "numerator": "1",
+        "denominator": "2"
+      },
+      "image_ray_angle_turns_mod_one": {
+        "numerator": "1",
+        "denominator": "2"
+      },
+      "horizontal_image_leader": {
+        "real": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "imaginary": {
+          "numerator": "0",
+          "denominator": "1"
+        }
+      },
+      "vertical_image_leader": {
+        "real": {
+          "numerator": "-1",
+          "denominator": "1"
+        },
+        "imaginary": {
+          "numerator": "0",
+          "denominator": "1"
+        }
+      },
+      "regular_angle_preserved": null,
+      "potential_net": {
+        "species": "critical_harmonic_level_net",
+        "law": "log F=log F(z0)+(1+0i/1+0i)*delta^2+higher terms",
+        "gradient_pair": null,
+        "phase_winding": null,
+        "rays_per_level_family": 4,
+        "exact_interpretation": "the first derivative vanishes; the first nonzero degree determines the alternating U/V rays"
+      }
+    },
+    {
+      "label": "multiple zero and critical branch",
+      "chart": "F(z)=z^3",
+      "source": {
+        "real": {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        "imaginary": {
+          "numerator": "0",
+          "denominator": "1"
+        }
+      },
+      "target": {
+        "real": {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        "imaginary": {
+          "numerator": "0",
+          "denominator": "1"
+        }
+      },
+      "expansion": "F(z0+delta)=F(z0)+(1+0i)*delta^3",
+      "leading_coefficient": {
+        "real": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "imaginary": {
+          "numerator": "0",
+          "denominator": "1"
+        }
+      },
+      "local_degree": 3,
+      "derivative_at_source": null,
+      "derivative_zero": true,
+      "zero_order": 3,
+      "critical_order": 2,
+      "species": "multiple_zero_critical_branch",
+      "source_axis_angle_turns": {
+        "numerator": "1",
+        "denominator": "4"
+      },
+      "image_ray_angle_turns_unwrapped": {
+        "numerator": "3",
+        "denominator": "4"
+      },
+      "image_ray_angle_turns_mod_one": {
+        "numerator": "3",
+        "denominator": "4"
+      },
+      "horizontal_image_leader": {
+        "real": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "imaginary": {
+          "numerator": "0",
+          "denominator": "1"
+        }
+      },
+      "vertical_image_leader": {
+        "real": {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        "imaginary": {
+          "numerator": "-1",
+          "denominator": "1"
+        }
+      },
+      "regular_angle_preserved": null,
+      "potential_net": {
+        "species": "log_amplitude_singularity_and_phase_vortex",
+        "law": "U=log|1+0i|+3*log|delta|; Delta V=3 full turns",
+        "gradient_pair": null,
+        "phase_winding": 3,
+        "rays_per_level_family": null,
+        "exact_interpretation": "radius collapses at the zero while phase retains the zero order"
+      }
+    }
+  ],
+  "distinct_source_output_coincidences": [
+    {
+      "label": "two source lineages meet one codomain value",
+      "function": "F(z)=z^2",
+      "branches": [
+        {
+          "source_lineage": "source:+1",
+          "source": {
+            "real": {
+              "numerator": "1",
+              "denominator": "1"
+            },
+            "imaginary": {
+              "numerator": "0",
+              "denominator": "1"
+            }
+          },
+          "output": {
+            "real": {
+              "numerator": "1",
+              "denominator": "1"
+            },
+            "imaginary": {
+              "numerator": "0",
+              "denominator": "1"
+            }
+          },
+          "derivative": {
+            "real": {
+              "numerator": "2",
+              "denominator": "1"
+            },
+            "imaginary": {
+              "numerator": "0",
+              "denominator": "1"
+            }
+          }
+        },
+        {
+          "source_lineage": "source:-1",
+          "source": {
+            "real": {
+              "numerator": "-1",
+              "denominator": "1"
+            },
+            "imaginary": {
+              "numerator": "0",
+              "denominator": "1"
+            }
+          },
+          "output": {
+            "real": {
+              "numerator": "1",
+              "denominator": "1"
+            },
+            "imaginary": {
+              "numerator": "0",
+              "denominator": "1"
+            }
+          },
+          "derivative": {
+            "real": {
+              "numerator": "-2",
+              "denominator": "1"
+            },
+            "imaginary": {
+              "numerator": "0",
+              "denominator": "1"
+            }
+          }
+        }
+      ],
+      "equal_output": true,
+      "distinct_sources": true,
+      "derivative_hands_differ": true,
+      "species": "distinct_source_output_coincidence",
+      "interpretation": "equal codomain placement does not merge source lineage or local hand"
+    }
+  ],
+  "zeta_xi_completion_atlas": {
+    "coordinate_laws": [
+      "R(s)=1-s is holomorphic and Xi(R(s))=Xi(s)",
+      "J(s)=1-conjugate(s) is antiholomorphic and Xi(J(s))=conjugate(Xi(s))",
+      "P_fix(s)=(s+J(s))/2=1/2+i Im(s)",
+      "P_normal(s)=(s-J(s))/2=Re(s)-1/2",
+      "s=P_fix(s)+P_normal(s)"
+    ],
+    "orbits": [
+      {
+        "label": "fixed seam",
+        "source_s": {
+          "real": {
+            "numerator": "1",
+            "denominator": "2"
+          },
+          "imaginary": {
+            "numerator": "3",
+            "denominator": "1"
+          }
+        },
+        "centered_w": {
+          "real": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "imaginary": {
+            "numerator": "3",
+            "denominator": "1"
+          }
+        },
+        "holomorphic_reflection_r": {
+          "real": {
+            "numerator": "1",
+            "denominator": "2"
+          },
+          "imaginary": {
+            "numerator": "-3",
+            "denominator": "1"
+          }
+        },
+        "antiholomorphic_reflection_j": {
+          "real": {
+            "numerator": "1",
+            "denominator": "2"
+          },
+          "imaginary": {
+            "numerator": "3",
+            "denominator": "1"
+          }
+        },
+        "fixed_projection": {
+          "real": {
+            "numerator": "1",
+            "denominator": "2"
+          },
+          "imaginary": {
+            "numerator": "3",
+            "denominator": "1"
+          }
+        },
+        "normal_projection": {
+          "real": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "imaginary": {
+            "numerator": "0",
+            "denominator": "1"
+          }
+        },
+        "fixed_locus": true,
+        "fixed_plus_normal_reconstructs_source": true,
+        "j_is_involution_at_source": true,
+        "r_is_involution_at_source": true,
+        "zeta_relation": "zeta(s)=chi(s)*zeta(1-s); the raw chart does not identify reflected values",
+        "completion_arrow": "xi(s)=1/2*s*(s-1)*pi^(-s/2)*Gamma(s/2)*zeta(s)",
+        "xi_r_relation": "xi(1-s)=xi(s)",
+        "xi_j_relation": "xi(1-conjugate(s))=conjugate(xi(s))",
+        "positivity_face": "on Fix(J), A(s)*conjugate(A(J(s)))=|A(s)|^2 is a self-pair"
+      },
+      {
+        "label": "right normal sheet",
+        "source_s": {
+          "real": {
+            "numerator": "3",
+            "denominator": "4"
+          },
+          "imaginary": {
+            "numerator": "3",
+            "denominator": "1"
+          }
+        },
+        "centered_w": {
+          "real": {
+            "numerator": "1",
+            "denominator": "4"
+          },
+          "imaginary": {
+            "numerator": "3",
+            "denominator": "1"
+          }
+        },
+        "holomorphic_reflection_r": {
+          "real": {
+            "numerator": "1",
+            "denominator": "4"
+          },
+          "imaginary": {
+            "numerator": "-3",
+            "denominator": "1"
+          }
+        },
+        "antiholomorphic_reflection_j": {
+          "real": {
+            "numerator": "1",
+            "denominator": "4"
+          },
+          "imaginary": {
+            "numerator": "3",
+            "denominator": "1"
+          }
+        },
+        "fixed_projection": {
+          "real": {
+            "numerator": "1",
+            "denominator": "2"
+          },
+          "imaginary": {
+            "numerator": "3",
+            "denominator": "1"
+          }
+        },
+        "normal_projection": {
+          "real": {
+            "numerator": "1",
+            "denominator": "4"
+          },
+          "imaginary": {
+            "numerator": "0",
+            "denominator": "1"
+          }
+        },
+        "fixed_locus": false,
+        "fixed_plus_normal_reconstructs_source": true,
+        "j_is_involution_at_source": true,
+        "r_is_involution_at_source": true,
+        "zeta_relation": "zeta(s)=chi(s)*zeta(1-s); the raw chart does not identify reflected values",
+        "completion_arrow": "xi(s)=1/2*s*(s-1)*pi^(-s/2)*Gamma(s/2)*zeta(s)",
+        "xi_r_relation": "xi(1-s)=xi(s)",
+        "xi_j_relation": "xi(1-conjugate(s))=conjugate(xi(s))",
+        "positivity_face": "off Fix(J), the partner product is a cross-pair and has no intrinsic positivity"
+      },
+      {
+        "label": "left normal sheet",
+        "source_s": {
+          "real": {
+            "numerator": "1",
+            "denominator": "4"
+          },
+          "imaginary": {
+            "numerator": "3",
+            "denominator": "1"
+          }
+        },
+        "centered_w": {
+          "real": {
+            "numerator": "-1",
+            "denominator": "4"
+          },
+          "imaginary": {
+            "numerator": "3",
+            "denominator": "1"
+          }
+        },
+        "holomorphic_reflection_r": {
+          "real": {
+            "numerator": "3",
+            "denominator": "4"
+          },
+          "imaginary": {
+            "numerator": "-3",
+            "denominator": "1"
+          }
+        },
+        "antiholomorphic_reflection_j": {
+          "real": {
+            "numerator": "3",
+            "denominator": "4"
+          },
+          "imaginary": {
+            "numerator": "3",
+            "denominator": "1"
+          }
+        },
+        "fixed_projection": {
+          "real": {
+            "numerator": "1",
+            "denominator": "2"
+          },
+          "imaginary": {
+            "numerator": "3",
+            "denominator": "1"
+          }
+        },
+        "normal_projection": {
+          "real": {
+            "numerator": "-1",
+            "denominator": "4"
+          },
+          "imaginary": {
+            "numerator": "0",
+            "denominator": "1"
+          }
+        },
+        "fixed_locus": false,
+        "fixed_plus_normal_reconstructs_source": true,
+        "j_is_involution_at_source": true,
+        "r_is_involution_at_source": true,
+        "zeta_relation": "zeta(s)=chi(s)*zeta(1-s); the raw chart does not identify reflected values",
+        "completion_arrow": "xi(s)=1/2*s*(s-1)*pi^(-s/2)*Gamma(s/2)*zeta(s)",
+        "xi_r_relation": "xi(1-s)=xi(s)",
+        "xi_j_relation": "xi(1-conjugate(s))=conjugate(xi(s))",
+        "positivity_face": "off Fix(J), the partner product is a cross-pair and has no intrinsic positivity"
+      },
+      {
+        "label": "real functional pair at two",
+        "source_s": {
+          "real": {
+            "numerator": "2",
+            "denominator": "1"
+          },
+          "imaginary": {
+            "numerator": "0",
+            "denominator": "1"
+          }
+        },
+        "centered_w": {
+          "real": {
+            "numerator": "3",
+            "denominator": "2"
+          },
+          "imaginary": {
+            "numerator": "0",
+            "denominator": "1"
+          }
+        },
+        "holomorphic_reflection_r": {
+          "real": {
+            "numerator": "-1",
+            "denominator": "1"
+          },
+          "imaginary": {
+            "numerator": "0",
+            "denominator": "1"
+          }
+        },
+        "antiholomorphic_reflection_j": {
+          "real": {
+            "numerator": "-1",
+            "denominator": "1"
+          },
+          "imaginary": {
+            "numerator": "0",
+            "denominator": "1"
+          }
+        },
+        "fixed_projection": {
+          "real": {
+            "numerator": "1",
+            "denominator": "2"
+          },
+          "imaginary": {
+            "numerator": "0",
+            "denominator": "1"
+          }
+        },
+        "normal_projection": {
+          "real": {
+            "numerator": "3",
+            "denominator": "2"
+          },
+          "imaginary": {
+            "numerator": "0",
+            "denominator": "1"
+          }
+        },
+        "fixed_locus": false,
+        "fixed_plus_normal_reconstructs_source": true,
+        "j_is_involution_at_source": true,
+        "r_is_involution_at_source": true,
+        "zeta_relation": "zeta(s)=chi(s)*zeta(1-s); the raw chart does not identify reflected values",
+        "completion_arrow": "xi(s)=1/2*s*(s-1)*pi^(-s/2)*Gamma(s/2)*zeta(s)",
+        "xi_r_relation": "xi(1-s)=xi(s)",
+        "xi_j_relation": "xi(1-conjugate(s))=conjugate(xi(s))",
+        "positivity_face": "off Fix(J), the partner product is a cross-pair and has no intrinsic positivity"
+      }
+    ],
+    "special_faces": [
+      {
+        "source": "s=2",
+        "zeta_face": "zeta(2)=pi^2/6",
+        "xi_face": "xi(2)=pi/6=xi(-1)",
+        "local_species": "regular completed functional pair",
+        "completion_consequence": "the completion changes pi^2/6 into pi/6 while relating s=2 to s=-1"
+      },
+      {
+        "source": "s=0 and s=1",
+        "zeta_face": "zeta(0)=-1/2; zeta has a simple pole at 1",
+        "xi_face": "xi(0)=xi(1)=1/2",
+        "local_species": "endpoint cancellation under completion",
+        "completion_consequence": "s(s-1), Gamma(s/2), and the zeta pole/continuation form a regular entire pair"
+      },
+      {
+        "source": "s=-2 and s=3",
+        "zeta_face": "zeta(-2)=0 is a simple trivial zero",
+        "xi_face": "xi(-2)=xi(3)=3*zeta(3)/(2*pi)",
+        "local_species": "trivial-zero cancellation under completion",
+        "completion_consequence": "the Gamma pole and the simple zeta zero cancel; a raw zeta axis hit is not an xi axis hit"
+      },
+      {
+        "source": "s=1/2+i*gamma with xi(s)=0",
+        "zeta_face": "raw zeta and its completion factor must both be carried",
+        "xi_face": "the zero lies on Fix(J) exactly when its normal coordinate epsilon is zero",
+        "local_species": "symbolic nontrivial zero mode",
+        "completion_consequence": "the source height remains a parameter; no decimal zero ordinate is required by this atlas"
+      }
+    ],
+    "revolution_chart": [
+      "C_sigma^F(t)=(t,Re F(sigma+i t),Im F(sigma+i t))",
+      "the first coordinate retains source chronology; radius is |F| and azimuth is arg F",
+      "F=0 is an axis hit; F'=0 is a critical branch; they coincide only at a multiple zero",
+      "zeta and xi are separate charts joined by the explicit completion arrow"
+    ]
+  },
+  "exact_rebase_orbits": [
+    {
+      "label": "unitary seam",
+      "epsilon": {
+        "numerator": "0",
+        "denominator": "1"
+      },
+      "gamma": {
+        "numerator": "3",
+        "denominator": "2"
+      },
+      "functional_partner_epsilon": {
+        "numerator": "0",
+        "denominator": "1"
+      },
+      "orbit_species": "constant_radius_circle",
+      "unitary": true,
+      "rebase_step": {
+        "numerator": "1",
+        "denominator": "1"
+      },
+      "rebase_multiplier": {
+        "real_exponent": {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        "imaginary_exponent": {
+          "numerator": "3",
+          "denominator": "2"
+        },
+        "word": "exp(0)*exp(i*3/2)"
+      },
+      "points": [
+        {
+          "source_u": {
+            "numerator": "-2",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "phase": {
+            "numerator": "-3",
+            "denominator": "1"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            "imaginary_exponent": {
+              "numerator": "-3",
+              "denominator": "1"
+            },
+            "word": "exp(0)*exp(i*-3)"
+          }
+        },
+        {
+          "source_u": {
+            "numerator": "-1",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "phase": {
+            "numerator": "-3",
+            "denominator": "2"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            "imaginary_exponent": {
+              "numerator": "-3",
+              "denominator": "2"
+            },
+            "word": "exp(0)*exp(i*-3/2)"
+          }
+        },
+        {
+          "source_u": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "phase": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            "imaginary_exponent": {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            "word": "exp(0)*exp(i*0)"
+          }
+        },
+        {
+          "source_u": {
+            "numerator": "1",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "phase": {
+            "numerator": "3",
+            "denominator": "2"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            "imaginary_exponent": {
+              "numerator": "3",
+              "denominator": "2"
+            },
+            "word": "exp(0)*exp(i*3/2)"
+          }
+        },
+        {
+          "source_u": {
+            "numerator": "2",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "phase": {
+            "numerator": "3",
+            "denominator": "1"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            "imaginary_exponent": {
+              "numerator": "3",
+              "denominator": "1"
+            },
+            "word": "exp(0)*exp(i*3)"
+          }
+        }
+      ],
+      "partner_points": [
+        {
+          "source_u": {
+            "numerator": "-2",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "phase": {
+            "numerator": "-3",
+            "denominator": "1"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            "imaginary_exponent": {
+              "numerator": "-3",
+              "denominator": "1"
+            },
+            "word": "exp(0)*exp(i*-3)"
+          }
+        },
+        {
+          "source_u": {
+            "numerator": "-1",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "phase": {
+            "numerator": "-3",
+            "denominator": "2"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            "imaginary_exponent": {
+              "numerator": "-3",
+              "denominator": "2"
+            },
+            "word": "exp(0)*exp(i*-3/2)"
+          }
+        },
+        {
+          "source_u": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "phase": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            "imaginary_exponent": {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            "word": "exp(0)*exp(i*0)"
+          }
+        },
+        {
+          "source_u": {
+            "numerator": "1",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "phase": {
+            "numerator": "3",
+            "denominator": "2"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            "imaginary_exponent": {
+              "numerator": "3",
+              "denominator": "2"
+            },
+            "word": "exp(0)*exp(i*3/2)"
+          }
+        },
+        {
+          "source_u": {
+            "numerator": "2",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "phase": {
+            "numerator": "3",
+            "denominator": "1"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            "imaginary_exponent": {
+              "numerator": "3",
+              "denominator": "1"
+            },
+            "word": "exp(0)*exp(i*3)"
+          }
+        }
+      ],
+      "reciprocal_amplitude_at_every_point": true,
+      "same_phase_at_every_point": true,
+      "exact_interpretation": "the primary row is (u,log radius,phase); circle or spiral is derived from the normal exponent without evaluating exp, sin, cos, or pi"
+    },
+    {
+      "label": "right reciprocal sheet",
+      "epsilon": {
+        "numerator": "1",
+        "denominator": "4"
+      },
+      "gamma": {
+        "numerator": "3",
+        "denominator": "2"
+      },
+      "functional_partner_epsilon": {
+        "numerator": "-1",
+        "denominator": "4"
+      },
+      "orbit_species": "outward_logarithmic_spiral",
+      "unitary": false,
+      "rebase_step": {
+        "numerator": "1",
+        "denominator": "1"
+      },
+      "rebase_multiplier": {
+        "real_exponent": {
+          "numerator": "1",
+          "denominator": "4"
+        },
+        "imaginary_exponent": {
+          "numerator": "3",
+          "denominator": "2"
+        },
+        "word": "exp(1/4)*exp(i*3/2)"
+      },
+      "points": [
+        {
+          "source_u": {
+            "numerator": "-2",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "-1",
+            "denominator": "2"
+          },
+          "phase": {
+            "numerator": "-3",
+            "denominator": "1"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "-1",
+              "denominator": "2"
+            },
+            "imaginary_exponent": {
+              "numerator": "-3",
+              "denominator": "1"
+            },
+            "word": "exp(-1/2)*exp(i*-3)"
+          }
+        },
+        {
+          "source_u": {
+            "numerator": "-1",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "-1",
+            "denominator": "4"
+          },
+          "phase": {
+            "numerator": "-3",
+            "denominator": "2"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "-1",
+              "denominator": "4"
+            },
+            "imaginary_exponent": {
+              "numerator": "-3",
+              "denominator": "2"
+            },
+            "word": "exp(-1/4)*exp(i*-3/2)"
+          }
+        },
+        {
+          "source_u": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "phase": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            "imaginary_exponent": {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            "word": "exp(0)*exp(i*0)"
+          }
+        },
+        {
+          "source_u": {
+            "numerator": "1",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "1",
+            "denominator": "4"
+          },
+          "phase": {
+            "numerator": "3",
+            "denominator": "2"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "1",
+              "denominator": "4"
+            },
+            "imaginary_exponent": {
+              "numerator": "3",
+              "denominator": "2"
+            },
+            "word": "exp(1/4)*exp(i*3/2)"
+          }
+        },
+        {
+          "source_u": {
+            "numerator": "2",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "1",
+            "denominator": "2"
+          },
+          "phase": {
+            "numerator": "3",
+            "denominator": "1"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "1",
+              "denominator": "2"
+            },
+            "imaginary_exponent": {
+              "numerator": "3",
+              "denominator": "1"
+            },
+            "word": "exp(1/2)*exp(i*3)"
+          }
+        }
+      ],
+      "partner_points": [
+        {
+          "source_u": {
+            "numerator": "-2",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "1",
+            "denominator": "2"
+          },
+          "phase": {
+            "numerator": "-3",
+            "denominator": "1"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "1",
+              "denominator": "2"
+            },
+            "imaginary_exponent": {
+              "numerator": "-3",
+              "denominator": "1"
+            },
+            "word": "exp(1/2)*exp(i*-3)"
+          }
+        },
+        {
+          "source_u": {
+            "numerator": "-1",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "1",
+            "denominator": "4"
+          },
+          "phase": {
+            "numerator": "-3",
+            "denominator": "2"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "1",
+              "denominator": "4"
+            },
+            "imaginary_exponent": {
+              "numerator": "-3",
+              "denominator": "2"
+            },
+            "word": "exp(1/4)*exp(i*-3/2)"
+          }
+        },
+        {
+          "source_u": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "phase": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            "imaginary_exponent": {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            "word": "exp(0)*exp(i*0)"
+          }
+        },
+        {
+          "source_u": {
+            "numerator": "1",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "-1",
+            "denominator": "4"
+          },
+          "phase": {
+            "numerator": "3",
+            "denominator": "2"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "-1",
+              "denominator": "4"
+            },
+            "imaginary_exponent": {
+              "numerator": "3",
+              "denominator": "2"
+            },
+            "word": "exp(-1/4)*exp(i*3/2)"
+          }
+        },
+        {
+          "source_u": {
+            "numerator": "2",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "-1",
+            "denominator": "2"
+          },
+          "phase": {
+            "numerator": "3",
+            "denominator": "1"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "-1",
+              "denominator": "2"
+            },
+            "imaginary_exponent": {
+              "numerator": "3",
+              "denominator": "1"
+            },
+            "word": "exp(-1/2)*exp(i*3)"
+          }
+        }
+      ],
+      "reciprocal_amplitude_at_every_point": true,
+      "same_phase_at_every_point": true,
+      "exact_interpretation": "the primary row is (u,log radius,phase); circle or spiral is derived from the normal exponent without evaluating exp, sin, cos, or pi"
+    },
+    {
+      "label": "left reciprocal sheet",
+      "epsilon": {
+        "numerator": "-1",
+        "denominator": "4"
+      },
+      "gamma": {
+        "numerator": "3",
+        "denominator": "2"
+      },
+      "functional_partner_epsilon": {
+        "numerator": "1",
+        "denominator": "4"
+      },
+      "orbit_species": "inward_logarithmic_spiral",
+      "unitary": false,
+      "rebase_step": {
+        "numerator": "1",
+        "denominator": "1"
+      },
+      "rebase_multiplier": {
+        "real_exponent": {
+          "numerator": "-1",
+          "denominator": "4"
+        },
+        "imaginary_exponent": {
+          "numerator": "3",
+          "denominator": "2"
+        },
+        "word": "exp(-1/4)*exp(i*3/2)"
+      },
+      "points": [
+        {
+          "source_u": {
+            "numerator": "-2",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "1",
+            "denominator": "2"
+          },
+          "phase": {
+            "numerator": "-3",
+            "denominator": "1"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "1",
+              "denominator": "2"
+            },
+            "imaginary_exponent": {
+              "numerator": "-3",
+              "denominator": "1"
+            },
+            "word": "exp(1/2)*exp(i*-3)"
+          }
+        },
+        {
+          "source_u": {
+            "numerator": "-1",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "1",
+            "denominator": "4"
+          },
+          "phase": {
+            "numerator": "-3",
+            "denominator": "2"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "1",
+              "denominator": "4"
+            },
+            "imaginary_exponent": {
+              "numerator": "-3",
+              "denominator": "2"
+            },
+            "word": "exp(1/4)*exp(i*-3/2)"
+          }
+        },
+        {
+          "source_u": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "phase": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            "imaginary_exponent": {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            "word": "exp(0)*exp(i*0)"
+          }
+        },
+        {
+          "source_u": {
+            "numerator": "1",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "-1",
+            "denominator": "4"
+          },
+          "phase": {
+            "numerator": "3",
+            "denominator": "2"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "-1",
+              "denominator": "4"
+            },
+            "imaginary_exponent": {
+              "numerator": "3",
+              "denominator": "2"
+            },
+            "word": "exp(-1/4)*exp(i*3/2)"
+          }
+        },
+        {
+          "source_u": {
+            "numerator": "2",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "-1",
+            "denominator": "2"
+          },
+          "phase": {
+            "numerator": "3",
+            "denominator": "1"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "-1",
+              "denominator": "2"
+            },
+            "imaginary_exponent": {
+              "numerator": "3",
+              "denominator": "1"
+            },
+            "word": "exp(-1/2)*exp(i*3)"
+          }
+        }
+      ],
+      "partner_points": [
+        {
+          "source_u": {
+            "numerator": "-2",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "-1",
+            "denominator": "2"
+          },
+          "phase": {
+            "numerator": "-3",
+            "denominator": "1"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "-1",
+              "denominator": "2"
+            },
+            "imaginary_exponent": {
+              "numerator": "-3",
+              "denominator": "1"
+            },
+            "word": "exp(-1/2)*exp(i*-3)"
+          }
+        },
+        {
+          "source_u": {
+            "numerator": "-1",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "-1",
+            "denominator": "4"
+          },
+          "phase": {
+            "numerator": "-3",
+            "denominator": "2"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "-1",
+              "denominator": "4"
+            },
+            "imaginary_exponent": {
+              "numerator": "-3",
+              "denominator": "2"
+            },
+            "word": "exp(-1/4)*exp(i*-3/2)"
+          }
+        },
+        {
+          "source_u": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "phase": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            "imaginary_exponent": {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            "word": "exp(0)*exp(i*0)"
+          }
+        },
+        {
+          "source_u": {
+            "numerator": "1",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "1",
+            "denominator": "4"
+          },
+          "phase": {
+            "numerator": "3",
+            "denominator": "2"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "1",
+              "denominator": "4"
+            },
+            "imaginary_exponent": {
+              "numerator": "3",
+              "denominator": "2"
+            },
+            "word": "exp(1/4)*exp(i*3/2)"
+          }
+        },
+        {
+          "source_u": {
+            "numerator": "2",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "1",
+            "denominator": "2"
+          },
+          "phase": {
+            "numerator": "3",
+            "denominator": "1"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "1",
+              "denominator": "2"
+            },
+            "imaginary_exponent": {
+              "numerator": "3",
+              "denominator": "1"
+            },
+            "word": "exp(1/2)*exp(i*3)"
+          }
+        }
+      ],
+      "reciprocal_amplitude_at_every_point": true,
+      "same_phase_at_every_point": true,
+      "exact_interpretation": "the primary row is (u,log radius,phase); circle or spiral is derived from the normal exponent without evaluating exp, sin, cos, or pi"
+    },
+    {
+      "label": "second unitary frequency",
+      "epsilon": {
+        "numerator": "0",
+        "denominator": "1"
+      },
+      "gamma": {
+        "numerator": "5",
+        "denominator": "3"
+      },
+      "functional_partner_epsilon": {
+        "numerator": "0",
+        "denominator": "1"
+      },
+      "orbit_species": "constant_radius_circle",
+      "unitary": true,
+      "rebase_step": {
+        "numerator": "1",
+        "denominator": "1"
+      },
+      "rebase_multiplier": {
+        "real_exponent": {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        "imaginary_exponent": {
+          "numerator": "5",
+          "denominator": "3"
+        },
+        "word": "exp(0)*exp(i*5/3)"
+      },
+      "points": [
+        {
+          "source_u": {
+            "numerator": "-2",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "phase": {
+            "numerator": "-10",
+            "denominator": "3"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            "imaginary_exponent": {
+              "numerator": "-10",
+              "denominator": "3"
+            },
+            "word": "exp(0)*exp(i*-10/3)"
+          }
+        },
+        {
+          "source_u": {
+            "numerator": "-1",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "phase": {
+            "numerator": "-5",
+            "denominator": "3"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            "imaginary_exponent": {
+              "numerator": "-5",
+              "denominator": "3"
+            },
+            "word": "exp(0)*exp(i*-5/3)"
+          }
+        },
+        {
+          "source_u": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "phase": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            "imaginary_exponent": {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            "word": "exp(0)*exp(i*0)"
+          }
+        },
+        {
+          "source_u": {
+            "numerator": "1",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "phase": {
+            "numerator": "5",
+            "denominator": "3"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            "imaginary_exponent": {
+              "numerator": "5",
+              "denominator": "3"
+            },
+            "word": "exp(0)*exp(i*5/3)"
+          }
+        },
+        {
+          "source_u": {
+            "numerator": "2",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "phase": {
+            "numerator": "10",
+            "denominator": "3"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            "imaginary_exponent": {
+              "numerator": "10",
+              "denominator": "3"
+            },
+            "word": "exp(0)*exp(i*10/3)"
+          }
+        }
+      ],
+      "partner_points": [
+        {
+          "source_u": {
+            "numerator": "-2",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "phase": {
+            "numerator": "-10",
+            "denominator": "3"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            "imaginary_exponent": {
+              "numerator": "-10",
+              "denominator": "3"
+            },
+            "word": "exp(0)*exp(i*-10/3)"
+          }
+        },
+        {
+          "source_u": {
+            "numerator": "-1",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "phase": {
+            "numerator": "-5",
+            "denominator": "3"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            "imaginary_exponent": {
+              "numerator": "-5",
+              "denominator": "3"
+            },
+            "word": "exp(0)*exp(i*-5/3)"
+          }
+        },
+        {
+          "source_u": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "phase": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            "imaginary_exponent": {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            "word": "exp(0)*exp(i*0)"
+          }
+        },
+        {
+          "source_u": {
+            "numerator": "1",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "phase": {
+            "numerator": "5",
+            "denominator": "3"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            "imaginary_exponent": {
+              "numerator": "5",
+              "denominator": "3"
+            },
+            "word": "exp(0)*exp(i*5/3)"
+          }
+        },
+        {
+          "source_u": {
+            "numerator": "2",
+            "denominator": "1"
+          },
+          "log_radius": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "phase": {
+            "numerator": "10",
+            "denominator": "3"
+          },
+          "character": {
+            "real_exponent": {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            "imaginary_exponent": {
+              "numerator": "10",
+              "denominator": "3"
+            },
+            "word": "exp(0)*exp(i*10/3)"
+          }
+        }
+      ],
+      "reciprocal_amplitude_at_every_point": true,
+      "same_phase_at_every_point": true,
+      "exact_interpretation": "the primary row is (u,log radius,phase); circle or spiral is derived from the normal exponent without evaluating exp, sin, cos, or pi"
+    }
+  ],
+  "centered_smith_atlas": {
+    "map": "W_a(z)=(z-a)/(z+a), z=epsilon+i*t, a>0",
+    "residual_law": "|W_a(z)|^2-1=-4*a*epsilon/|z+a|^2",
+    "rows": [
+      {
+        "label": "seam-height-3/2",
+        "centered_z": {
+          "real": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "imaginary": {
+            "numerator": "3",
+            "denominator": "2"
+          }
+        },
+        "cayley_scale": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "cayley_w": {
+          "real": {
+            "numerator": "5",
+            "denominator": "13"
+          },
+          "imaginary": {
+            "numerator": "12",
+            "denominator": "13"
+          }
+        },
+        "reflected_centered_z": {
+          "real": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "imaginary": {
+            "numerator": "3",
+            "denominator": "2"
+          }
+        },
+        "reflected_cayley_w": {
+          "real": {
+            "numerator": "5",
+            "denominator": "13"
+          },
+          "imaginary": {
+            "numerator": "12",
+            "denominator": "13"
+          }
+        },
+        "reciprocal_conjugate_w": {
+          "real": {
+            "numerator": "5",
+            "denominator": "13"
+          },
+          "imaginary": {
+            "numerator": "12",
+            "denominator": "13"
+          }
+        },
+        "norm_squared": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "unit_shell_residual": {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        "residual_formula": {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        "residual_formula_exact": true,
+        "functional_reciprocity_exact": true,
+        "sphere": {
+          "x": {
+            "numerator": "5",
+            "denominator": "13"
+          },
+          "y": {
+            "numerator": "12",
+            "denominator": "13"
+          },
+          "normal": {
+            "numerator": "0",
+            "denominator": "1"
+          }
+        },
+        "on_unit_shell": true,
+        "normal_displacement_zero": true,
+        "shell_iff_fixed_locus": true,
+        "revolution_license": "licensed: constant-radius rebase supplies the azimuth",
+        "revolution": {
+          "axis": "Cayley real axis with actual unitary rebase phase",
+          "points": [
+            [
+              {
+                "numerator": "5",
+                "denominator": "13"
+              },
+              {
+                "numerator": "12",
+                "denominator": "13"
+              },
+              {
+                "numerator": "0",
+                "denominator": "1"
+              }
+            ],
+            [
+              {
+                "numerator": "5",
+                "denominator": "13"
+              },
+              {
+                "numerator": "0",
+                "denominator": "1"
+              },
+              {
+                "numerator": "12",
+                "denominator": "13"
+              }
+            ],
+            [
+              {
+                "numerator": "5",
+                "denominator": "13"
+              },
+              {
+                "numerator": "-12",
+                "denominator": "13"
+              },
+              {
+                "numerator": "0",
+                "denominator": "1"
+              }
+            ],
+            [
+              {
+                "numerator": "5",
+                "denominator": "13"
+              },
+              {
+                "numerator": "0",
+                "denominator": "1"
+              },
+              {
+                "numerator": "-12",
+                "denominator": "13"
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "label": "right-height-3/2",
+        "centered_z": {
+          "real": {
+            "numerator": "1",
+            "denominator": "4"
+          },
+          "imaginary": {
+            "numerator": "3",
+            "denominator": "2"
+          }
+        },
+        "cayley_scale": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "cayley_w": {
+          "real": {
+            "numerator": "21",
+            "denominator": "61"
+          },
+          "imaginary": {
+            "numerator": "48",
+            "denominator": "61"
+          }
+        },
+        "reflected_centered_z": {
+          "real": {
+            "numerator": "-1",
+            "denominator": "4"
+          },
+          "imaginary": {
+            "numerator": "3",
+            "denominator": "2"
+          }
+        },
+        "reflected_cayley_w": {
+          "real": {
+            "numerator": "7",
+            "denominator": "15"
+          },
+          "imaginary": {
+            "numerator": "16",
+            "denominator": "15"
+          }
+        },
+        "reciprocal_conjugate_w": {
+          "real": {
+            "numerator": "7",
+            "denominator": "15"
+          },
+          "imaginary": {
+            "numerator": "16",
+            "denominator": "15"
+          }
+        },
+        "norm_squared": {
+          "numerator": "45",
+          "denominator": "61"
+        },
+        "unit_shell_residual": {
+          "numerator": "-16",
+          "denominator": "61"
+        },
+        "residual_formula": {
+          "numerator": "-16",
+          "denominator": "61"
+        },
+        "residual_formula_exact": true,
+        "functional_reciprocity_exact": true,
+        "sphere": {
+          "x": {
+            "numerator": "21",
+            "denominator": "53"
+          },
+          "y": {
+            "numerator": "48",
+            "denominator": "53"
+          },
+          "normal": {
+            "numerator": "-8",
+            "denominator": "53"
+          }
+        },
+        "on_unit_shell": false,
+        "normal_displacement_zero": false,
+        "shell_iff_fixed_locus": true,
+        "revolution_license": "refused: nonunitary rebase changes radius and cannot be duplicated into a shell",
+        "revolution": null
+      },
+      {
+        "label": "left-height-3/2",
+        "centered_z": {
+          "real": {
+            "numerator": "-1",
+            "denominator": "4"
+          },
+          "imaginary": {
+            "numerator": "3",
+            "denominator": "2"
+          }
+        },
+        "cayley_scale": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "cayley_w": {
+          "real": {
+            "numerator": "7",
+            "denominator": "15"
+          },
+          "imaginary": {
+            "numerator": "16",
+            "denominator": "15"
+          }
+        },
+        "reflected_centered_z": {
+          "real": {
+            "numerator": "1",
+            "denominator": "4"
+          },
+          "imaginary": {
+            "numerator": "3",
+            "denominator": "2"
+          }
+        },
+        "reflected_cayley_w": {
+          "real": {
+            "numerator": "21",
+            "denominator": "61"
+          },
+          "imaginary": {
+            "numerator": "48",
+            "denominator": "61"
+          }
+        },
+        "reciprocal_conjugate_w": {
+          "real": {
+            "numerator": "21",
+            "denominator": "61"
+          },
+          "imaginary": {
+            "numerator": "48",
+            "denominator": "61"
+          }
+        },
+        "norm_squared": {
+          "numerator": "61",
+          "denominator": "45"
+        },
+        "unit_shell_residual": {
+          "numerator": "16",
+          "denominator": "45"
+        },
+        "residual_formula": {
+          "numerator": "16",
+          "denominator": "45"
+        },
+        "residual_formula_exact": true,
+        "functional_reciprocity_exact": true,
+        "sphere": {
+          "x": {
+            "numerator": "21",
+            "denominator": "53"
+          },
+          "y": {
+            "numerator": "48",
+            "denominator": "53"
+          },
+          "normal": {
+            "numerator": "8",
+            "denominator": "53"
+          }
+        },
+        "on_unit_shell": false,
+        "normal_displacement_zero": false,
+        "shell_iff_fixed_locus": true,
+        "revolution_license": "refused: nonunitary rebase changes radius and cannot be duplicated into a shell",
+        "revolution": null
+      },
+      {
+        "label": "seam-height-2",
+        "centered_z": {
+          "real": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "imaginary": {
+            "numerator": "2",
+            "denominator": "1"
+          }
+        },
+        "cayley_scale": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "cayley_w": {
+          "real": {
+            "numerator": "3",
+            "denominator": "5"
+          },
+          "imaginary": {
+            "numerator": "4",
+            "denominator": "5"
+          }
+        },
+        "reflected_centered_z": {
+          "real": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "imaginary": {
+            "numerator": "2",
+            "denominator": "1"
+          }
+        },
+        "reflected_cayley_w": {
+          "real": {
+            "numerator": "3",
+            "denominator": "5"
+          },
+          "imaginary": {
+            "numerator": "4",
+            "denominator": "5"
+          }
+        },
+        "reciprocal_conjugate_w": {
+          "real": {
+            "numerator": "3",
+            "denominator": "5"
+          },
+          "imaginary": {
+            "numerator": "4",
+            "denominator": "5"
+          }
+        },
+        "norm_squared": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "unit_shell_residual": {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        "residual_formula": {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        "residual_formula_exact": true,
+        "functional_reciprocity_exact": true,
+        "sphere": {
+          "x": {
+            "numerator": "3",
+            "denominator": "5"
+          },
+          "y": {
+            "numerator": "4",
+            "denominator": "5"
+          },
+          "normal": {
+            "numerator": "0",
+            "denominator": "1"
+          }
+        },
+        "on_unit_shell": true,
+        "normal_displacement_zero": true,
+        "shell_iff_fixed_locus": true,
+        "revolution_license": "licensed: constant-radius rebase supplies the azimuth",
+        "revolution": {
+          "axis": "Cayley real axis with actual unitary rebase phase",
+          "points": [
+            [
+              {
+                "numerator": "3",
+                "denominator": "5"
+              },
+              {
+                "numerator": "4",
+                "denominator": "5"
+              },
+              {
+                "numerator": "0",
+                "denominator": "1"
+              }
+            ],
+            [
+              {
+                "numerator": "3",
+                "denominator": "5"
+              },
+              {
+                "numerator": "0",
+                "denominator": "1"
+              },
+              {
+                "numerator": "4",
+                "denominator": "5"
+              }
+            ],
+            [
+              {
+                "numerator": "3",
+                "denominator": "5"
+              },
+              {
+                "numerator": "-4",
+                "denominator": "5"
+              },
+              {
+                "numerator": "0",
+                "denominator": "1"
+              }
+            ],
+            [
+              {
+                "numerator": "3",
+                "denominator": "5"
+              },
+              {
+                "numerator": "0",
+                "denominator": "1"
+              },
+              {
+                "numerator": "-4",
+                "denominator": "5"
+              }
+            ]
+          ]
+        }
+      }
+    ],
+    "pairs": [
+      {
+        "label": "functional reciprocal pair at height 3/2",
+        "right_row": "right-height-3/2",
+        "left_row": "left-height-3/2",
+        "normal_sum": {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        "norm_product": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "reciprocal_norms": true,
+        "interpretation": "the two hemispheres are opposed normal hands; their Cayley magnitudes are reciprocal rather than equal"
+      }
+    ]
+  },
+  "acceptance": {
+    "every_regular_germ_preserves_the_source_right_angle": true,
+    "every_critical_germ_uses_local_degree_instead_of_a_false_tangent": true,
+    "zero_order_and_critical_order_remain_distinct": true,
+    "distinct_preimages_remain_distinct_at_equal_output": true,
+    "every_xi_orbit_projector_is_exact": true,
+    "circle_occurs_if_and_only_if_normal_exponent_is_zero": true,
+    "functional_rebase_partners_are_reciprocal_in_amplitude": true,
+    "every_smith_residual_is_exact": true,
+    "smith_unit_shell_occurs_if_and_only_if_normal_displacement_is_zero": true,
+    "smith_functional_partners_are_reciprocal_conjugates": true,
+    "no_floating_point_causal_data": true
+  },
+  "consequence": "The normal coordinate epsilon is now one carried hand across four formerly separated views: it is the displacement from the fixed Xi seam, the real exponent of rebase, the circle-versus-spiral discriminator, and the exact signed Smith shell residual. Local degree and source lineage remain separate, so a zero, a critical point, and a coincident output can no longer be mistaken for one visual kink.",
+  "construction_boundary": "This bounded atlas classifies and transports the exact local laws. It does not supply the missing global all-probe positivity or an operator whose complete spectrum is the nontrivial Xi zero set.",
+  "report_sha256_without_digest": "96357100562f90b0b4274a8339e97e7694ef44fae495eb8989ff2b06ed0d1514"
+}

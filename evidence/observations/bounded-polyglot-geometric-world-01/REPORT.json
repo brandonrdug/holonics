@@ -1,0 +1,6618 @@
+{
+  "schema": "soma-bounded-polyglot-geometric-world-report-v1",
+  "name": "bounded-polyglot-geometric-world-01",
+  "atom_lift": "world integer x -> canonical nonzero odd relation 2x+1",
+  "zero_relative": {
+    "origin": 0,
+    "succession_horizon": 509,
+    "founded_primes": [
+      2,
+      3,
+      5,
+      7,
+      11,
+      13,
+      17,
+      19,
+      23,
+      29,
+      31,
+      37,
+      41,
+      43,
+      47,
+      53,
+      59,
+      61,
+      67,
+      71,
+      73,
+      79,
+      83,
+      89,
+      97,
+      101,
+      103,
+      107,
+      109,
+      113,
+      127,
+      131,
+      137,
+      139,
+      149,
+      151,
+      157,
+      163,
+      167,
+      173,
+      179,
+      181,
+      191,
+      193,
+      197,
+      199,
+      211,
+      223,
+      227,
+      229,
+      233,
+      239,
+      241,
+      251,
+      257,
+      263,
+      269,
+      271,
+      277,
+      281,
+      283,
+      293,
+      307,
+      311,
+      313,
+      317,
+      331,
+      337,
+      347,
+      349,
+      353,
+      359,
+      367,
+      373,
+      379,
+      383,
+      389,
+      397,
+      401,
+      409,
+      419,
+      421,
+      431,
+      433,
+      439,
+      443,
+      449,
+      457,
+      461,
+      463,
+      467,
+      479,
+      487,
+      491,
+      499,
+      503,
+      509
+    ],
+    "composite_count": 411,
+    "wheel_steps": [
+      {
+        "founded_axis": 2,
+        "prior_modulus": 1,
+        "prior_survivors": 1,
+        "copies": 2,
+        "cuts": 1,
+        "joined_survivors": 1,
+        "successor_modulus": 2
+      },
+      {
+        "founded_axis": 3,
+        "prior_modulus": 2,
+        "prior_survivors": 1,
+        "copies": 3,
+        "cuts": 1,
+        "joined_survivors": 2,
+        "successor_modulus": 6
+      },
+      {
+        "founded_axis": 5,
+        "prior_modulus": 6,
+        "prior_survivors": 2,
+        "copies": 5,
+        "cuts": 2,
+        "joined_survivors": 8,
+        "successor_modulus": 30
+      },
+      {
+        "founded_axis": 7,
+        "prior_modulus": 30,
+        "prior_survivors": 8,
+        "copies": 7,
+        "cuts": 8,
+        "joined_survivors": 48,
+        "successor_modulus": 210
+      },
+      {
+        "founded_axis": 11,
+        "prior_modulus": 210,
+        "prior_survivors": 48,
+        "copies": 11,
+        "cuts": 48,
+        "joined_survivors": 480,
+        "successor_modulus": 2310
+      },
+      {
+        "founded_axis": 13,
+        "prior_modulus": 2310,
+        "prior_survivors": 480,
+        "copies": 13,
+        "cuts": 480,
+        "joined_survivors": 5760,
+        "successor_modulus": 30030
+      },
+      {
+        "founded_axis": 17,
+        "prior_modulus": 30030,
+        "prior_survivors": 5760,
+        "copies": 17,
+        "cuts": 5760,
+        "joined_survivors": 92160,
+        "successor_modulus": 510510
+      },
+      {
+        "founded_axis": 19,
+        "prior_modulus": 510510,
+        "prior_survivors": 92160,
+        "copies": 19,
+        "cuts": 92160,
+        "joined_survivors": 1658880,
+        "successor_modulus": 9699690
+      }
+    ],
+    "morphologies": [
+      {
+        "candidate": 7,
+        "prime": true,
+        "prior_axes": [
+          2
+        ],
+        "centered_residues": [
+          {
+            "axis": 2,
+            "residue": 1
+          }
+        ],
+        "pole_hits": [],
+        "left_survivor_arc": 2,
+        "right_survivor_arc": 2,
+        "radices": [
+          {
+            "radix": 2,
+            "digits": [
+              1,
+              1,
+              1
+            ],
+            "reconstructed": 7,
+            "modular_sections": [
+              {
+                "axis": 2,
+                "direct": 1,
+                "through_digits": 1
+              }
+            ]
+          },
+          {
+            "radix": 10,
+            "digits": [
+              7
+            ],
+            "reconstructed": 7,
+            "modular_sections": [
+              {
+                "axis": 2,
+                "direct": 1,
+                "through_digits": 1
+              }
+            ]
+          },
+          {
+            "radix": 16,
+            "digits": [
+              7
+            ],
+            "reconstructed": 7,
+            "modular_sections": [
+              {
+                "axis": 2,
+                "direct": 1,
+                "through_digits": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "candidate": 11,
+        "prime": true,
+        "prior_axes": [
+          2,
+          3
+        ],
+        "centered_residues": [
+          {
+            "axis": 2,
+            "residue": 1
+          },
+          {
+            "axis": 3,
+            "residue": -1
+          }
+        ],
+        "pole_hits": [],
+        "left_survivor_arc": 4,
+        "right_survivor_arc": 2,
+        "radices": [
+          {
+            "radix": 2,
+            "digits": [
+              1,
+              0,
+              1,
+              1
+            ],
+            "reconstructed": 11,
+            "modular_sections": [
+              {
+                "axis": 2,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 3,
+                "direct": 2,
+                "through_digits": 2
+              }
+            ]
+          },
+          {
+            "radix": 10,
+            "digits": [
+              1,
+              1
+            ],
+            "reconstructed": 11,
+            "modular_sections": [
+              {
+                "axis": 2,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 3,
+                "direct": 2,
+                "through_digits": 2
+              }
+            ]
+          },
+          {
+            "radix": 16,
+            "digits": [
+              11
+            ],
+            "reconstructed": 11,
+            "modular_sections": [
+              {
+                "axis": 2,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 3,
+                "direct": 2,
+                "through_digits": 2
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "candidate": 13,
+        "prime": true,
+        "prior_axes": [
+          2,
+          3
+        ],
+        "centered_residues": [
+          {
+            "axis": 2,
+            "residue": 1
+          },
+          {
+            "axis": 3,
+            "residue": 1
+          }
+        ],
+        "pole_hits": [],
+        "left_survivor_arc": 2,
+        "right_survivor_arc": 4,
+        "radices": [
+          {
+            "radix": 2,
+            "digits": [
+              1,
+              1,
+              0,
+              1
+            ],
+            "reconstructed": 13,
+            "modular_sections": [
+              {
+                "axis": 2,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 3,
+                "direct": 1,
+                "through_digits": 1
+              }
+            ]
+          },
+          {
+            "radix": 10,
+            "digits": [
+              1,
+              3
+            ],
+            "reconstructed": 13,
+            "modular_sections": [
+              {
+                "axis": 2,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 3,
+                "direct": 1,
+                "through_digits": 1
+              }
+            ]
+          },
+          {
+            "radix": 16,
+            "digits": [
+              13
+            ],
+            "reconstructed": 13,
+            "modular_sections": [
+              {
+                "axis": 2,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 3,
+                "direct": 1,
+                "through_digits": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "candidate": 23,
+        "prime": true,
+        "prior_axes": [
+          2,
+          3
+        ],
+        "centered_residues": [
+          {
+            "axis": 2,
+            "residue": 1
+          },
+          {
+            "axis": 3,
+            "residue": -1
+          }
+        ],
+        "pole_hits": [],
+        "left_survivor_arc": 4,
+        "right_survivor_arc": 2,
+        "radices": [
+          {
+            "radix": 2,
+            "digits": [
+              1,
+              0,
+              1,
+              1,
+              1
+            ],
+            "reconstructed": 23,
+            "modular_sections": [
+              {
+                "axis": 2,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 3,
+                "direct": 2,
+                "through_digits": 2
+              }
+            ]
+          },
+          {
+            "radix": 10,
+            "digits": [
+              2,
+              3
+            ],
+            "reconstructed": 23,
+            "modular_sections": [
+              {
+                "axis": 2,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 3,
+                "direct": 2,
+                "through_digits": 2
+              }
+            ]
+          },
+          {
+            "radix": 16,
+            "digits": [
+              1,
+              7
+            ],
+            "reconstructed": 23,
+            "modular_sections": [
+              {
+                "axis": 2,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 3,
+                "direct": 2,
+                "through_digits": 2
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "candidate": 29,
+        "prime": true,
+        "prior_axes": [
+          2,
+          3,
+          5
+        ],
+        "centered_residues": [
+          {
+            "axis": 2,
+            "residue": 1
+          },
+          {
+            "axis": 3,
+            "residue": -1
+          },
+          {
+            "axis": 5,
+            "residue": -1
+          }
+        ],
+        "pole_hits": [],
+        "left_survivor_arc": 6,
+        "right_survivor_arc": 2,
+        "radices": [
+          {
+            "radix": 2,
+            "digits": [
+              1,
+              1,
+              1,
+              0,
+              1
+            ],
+            "reconstructed": 29,
+            "modular_sections": [
+              {
+                "axis": 2,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 3,
+                "direct": 2,
+                "through_digits": 2
+              },
+              {
+                "axis": 5,
+                "direct": 4,
+                "through_digits": 4
+              }
+            ]
+          },
+          {
+            "radix": 10,
+            "digits": [
+              2,
+              9
+            ],
+            "reconstructed": 29,
+            "modular_sections": [
+              {
+                "axis": 2,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 3,
+                "direct": 2,
+                "through_digits": 2
+              },
+              {
+                "axis": 5,
+                "direct": 4,
+                "through_digits": 4
+              }
+            ]
+          },
+          {
+            "radix": 16,
+            "digits": [
+              1,
+              13
+            ],
+            "reconstructed": 29,
+            "modular_sections": [
+              {
+                "axis": 2,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 3,
+                "direct": 2,
+                "through_digits": 2
+              },
+              {
+                "axis": 5,
+                "direct": 4,
+                "through_digits": 4
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "candidate": 37,
+        "prime": true,
+        "prior_axes": [
+          2,
+          3,
+          5
+        ],
+        "centered_residues": [
+          {
+            "axis": 2,
+            "residue": 1
+          },
+          {
+            "axis": 3,
+            "residue": 1
+          },
+          {
+            "axis": 5,
+            "residue": 2
+          }
+        ],
+        "pole_hits": [],
+        "left_survivor_arc": 6,
+        "right_survivor_arc": 4,
+        "radices": [
+          {
+            "radix": 2,
+            "digits": [
+              1,
+              0,
+              0,
+              1,
+              0,
+              1
+            ],
+            "reconstructed": 37,
+            "modular_sections": [
+              {
+                "axis": 2,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 3,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 5,
+                "direct": 2,
+                "through_digits": 2
+              }
+            ]
+          },
+          {
+            "radix": 10,
+            "digits": [
+              3,
+              7
+            ],
+            "reconstructed": 37,
+            "modular_sections": [
+              {
+                "axis": 2,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 3,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 5,
+                "direct": 2,
+                "through_digits": 2
+              }
+            ]
+          },
+          {
+            "radix": 16,
+            "digits": [
+              2,
+              5
+            ],
+            "reconstructed": 37,
+            "modular_sections": [
+              {
+                "axis": 2,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 3,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 5,
+                "direct": 2,
+                "through_digits": 2
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "candidate": 43,
+        "prime": true,
+        "prior_axes": [
+          2,
+          3,
+          5
+        ],
+        "centered_residues": [
+          {
+            "axis": 2,
+            "residue": 1
+          },
+          {
+            "axis": 3,
+            "residue": 1
+          },
+          {
+            "axis": 5,
+            "residue": -2
+          }
+        ],
+        "pole_hits": [],
+        "left_survivor_arc": 2,
+        "right_survivor_arc": 4,
+        "radices": [
+          {
+            "radix": 2,
+            "digits": [
+              1,
+              0,
+              1,
+              0,
+              1,
+              1
+            ],
+            "reconstructed": 43,
+            "modular_sections": [
+              {
+                "axis": 2,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 3,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 5,
+                "direct": 3,
+                "through_digits": 3
+              }
+            ]
+          },
+          {
+            "radix": 10,
+            "digits": [
+              4,
+              3
+            ],
+            "reconstructed": 43,
+            "modular_sections": [
+              {
+                "axis": 2,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 3,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 5,
+                "direct": 3,
+                "through_digits": 3
+              }
+            ]
+          },
+          {
+            "radix": 16,
+            "digits": [
+              2,
+              11
+            ],
+            "reconstructed": 43,
+            "modular_sections": [
+              {
+                "axis": 2,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 3,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 5,
+                "direct": 3,
+                "through_digits": 3
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "candidate": 53,
+        "prime": true,
+        "prior_axes": [
+          2,
+          3,
+          5,
+          7
+        ],
+        "centered_residues": [
+          {
+            "axis": 2,
+            "residue": 1
+          },
+          {
+            "axis": 3,
+            "residue": -1
+          },
+          {
+            "axis": 5,
+            "residue": -2
+          },
+          {
+            "axis": 7,
+            "residue": -3
+          }
+        ],
+        "pole_hits": [],
+        "left_survivor_arc": 6,
+        "right_survivor_arc": 6,
+        "radices": [
+          {
+            "radix": 2,
+            "digits": [
+              1,
+              1,
+              0,
+              1,
+              0,
+              1
+            ],
+            "reconstructed": 53,
+            "modular_sections": [
+              {
+                "axis": 2,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 3,
+                "direct": 2,
+                "through_digits": 2
+              },
+              {
+                "axis": 5,
+                "direct": 3,
+                "through_digits": 3
+              },
+              {
+                "axis": 7,
+                "direct": 4,
+                "through_digits": 4
+              }
+            ]
+          },
+          {
+            "radix": 10,
+            "digits": [
+              5,
+              3
+            ],
+            "reconstructed": 53,
+            "modular_sections": [
+              {
+                "axis": 2,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 3,
+                "direct": 2,
+                "through_digits": 2
+              },
+              {
+                "axis": 5,
+                "direct": 3,
+                "through_digits": 3
+              },
+              {
+                "axis": 7,
+                "direct": 4,
+                "through_digits": 4
+              }
+            ]
+          },
+          {
+            "radix": 16,
+            "digits": [
+              3,
+              5
+            ],
+            "reconstructed": 53,
+            "modular_sections": [
+              {
+                "axis": 2,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 3,
+                "direct": 2,
+                "through_digits": 2
+              },
+              {
+                "axis": 5,
+                "direct": 3,
+                "through_digits": 3
+              },
+              {
+                "axis": 7,
+                "direct": 4,
+                "through_digits": 4
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "candidate": 193,
+        "prime": true,
+        "prior_axes": [
+          2,
+          3,
+          5,
+          7,
+          11,
+          13
+        ],
+        "centered_residues": [
+          {
+            "axis": 2,
+            "residue": 1
+          },
+          {
+            "axis": 3,
+            "residue": 1
+          },
+          {
+            "axis": 5,
+            "residue": -2
+          },
+          {
+            "axis": 7,
+            "residue": -3
+          },
+          {
+            "axis": 11,
+            "residue": -5
+          },
+          {
+            "axis": 13,
+            "residue": -2
+          }
+        ],
+        "pole_hits": [],
+        "left_survivor_arc": 2,
+        "right_survivor_arc": 4,
+        "radices": [
+          {
+            "radix": 2,
+            "digits": [
+              1,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            "reconstructed": 193,
+            "modular_sections": [
+              {
+                "axis": 2,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 3,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 5,
+                "direct": 3,
+                "through_digits": 3
+              },
+              {
+                "axis": 7,
+                "direct": 4,
+                "through_digits": 4
+              },
+              {
+                "axis": 11,
+                "direct": 6,
+                "through_digits": 6
+              },
+              {
+                "axis": 13,
+                "direct": 11,
+                "through_digits": 11
+              }
+            ]
+          },
+          {
+            "radix": 10,
+            "digits": [
+              1,
+              9,
+              3
+            ],
+            "reconstructed": 193,
+            "modular_sections": [
+              {
+                "axis": 2,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 3,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 5,
+                "direct": 3,
+                "through_digits": 3
+              },
+              {
+                "axis": 7,
+                "direct": 4,
+                "through_digits": 4
+              },
+              {
+                "axis": 11,
+                "direct": 6,
+                "through_digits": 6
+              },
+              {
+                "axis": 13,
+                "direct": 11,
+                "through_digits": 11
+              }
+            ]
+          },
+          {
+            "radix": 16,
+            "digits": [
+              12,
+              1
+            ],
+            "reconstructed": 193,
+            "modular_sections": [
+              {
+                "axis": 2,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 3,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 5,
+                "direct": 3,
+                "through_digits": 3
+              },
+              {
+                "axis": 7,
+                "direct": 4,
+                "through_digits": 4
+              },
+              {
+                "axis": 11,
+                "direct": 6,
+                "through_digits": 6
+              },
+              {
+                "axis": 13,
+                "direct": 11,
+                "through_digits": 11
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "candidate": 229,
+        "prime": true,
+        "prior_axes": [
+          2,
+          3,
+          5,
+          7,
+          11,
+          13
+        ],
+        "centered_residues": [
+          {
+            "axis": 2,
+            "residue": 1
+          },
+          {
+            "axis": 3,
+            "residue": 1
+          },
+          {
+            "axis": 5,
+            "residue": -1
+          },
+          {
+            "axis": 7,
+            "residue": -2
+          },
+          {
+            "axis": 11,
+            "residue": -2
+          },
+          {
+            "axis": 13,
+            "residue": -5
+          }
+        ],
+        "pole_hits": [],
+        "left_survivor_arc": 2,
+        "right_survivor_arc": 4,
+        "radices": [
+          {
+            "radix": 2,
+            "digits": [
+              1,
+              1,
+              1,
+              0,
+              0,
+              1,
+              0,
+              1
+            ],
+            "reconstructed": 229,
+            "modular_sections": [
+              {
+                "axis": 2,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 3,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 5,
+                "direct": 4,
+                "through_digits": 4
+              },
+              {
+                "axis": 7,
+                "direct": 5,
+                "through_digits": 5
+              },
+              {
+                "axis": 11,
+                "direct": 9,
+                "through_digits": 9
+              },
+              {
+                "axis": 13,
+                "direct": 8,
+                "through_digits": 8
+              }
+            ]
+          },
+          {
+            "radix": 10,
+            "digits": [
+              2,
+              2,
+              9
+            ],
+            "reconstructed": 229,
+            "modular_sections": [
+              {
+                "axis": 2,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 3,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 5,
+                "direct": 4,
+                "through_digits": 4
+              },
+              {
+                "axis": 7,
+                "direct": 5,
+                "through_digits": 5
+              },
+              {
+                "axis": 11,
+                "direct": 9,
+                "through_digits": 9
+              },
+              {
+                "axis": 13,
+                "direct": 8,
+                "through_digits": 8
+              }
+            ]
+          },
+          {
+            "radix": 16,
+            "digits": [
+              14,
+              5
+            ],
+            "reconstructed": 229,
+            "modular_sections": [
+              {
+                "axis": 2,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 3,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 5,
+                "direct": 4,
+                "through_digits": 4
+              },
+              {
+                "axis": 7,
+                "direct": 5,
+                "through_digits": 5
+              },
+              {
+                "axis": 11,
+                "direct": 9,
+                "through_digits": 9
+              },
+              {
+                "axis": 13,
+                "direct": 8,
+                "through_digits": 8
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "candidate": 509,
+        "prime": true,
+        "prior_axes": [
+          2,
+          3,
+          5,
+          7,
+          11,
+          13,
+          17,
+          19
+        ],
+        "centered_residues": [
+          {
+            "axis": 2,
+            "residue": 1
+          },
+          {
+            "axis": 3,
+            "residue": -1
+          },
+          {
+            "axis": 5,
+            "residue": -1
+          },
+          {
+            "axis": 7,
+            "residue": -2
+          },
+          {
+            "axis": 11,
+            "residue": 3
+          },
+          {
+            "axis": 13,
+            "residue": 2
+          },
+          {
+            "axis": 17,
+            "residue": -1
+          },
+          {
+            "axis": 19,
+            "residue": -4
+          }
+        ],
+        "pole_hits": [],
+        "left_survivor_arc": 6,
+        "right_survivor_arc": 12,
+        "radices": [
+          {
+            "radix": 2,
+            "digits": [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              0,
+              1
+            ],
+            "reconstructed": 509,
+            "modular_sections": [
+              {
+                "axis": 2,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 3,
+                "direct": 2,
+                "through_digits": 2
+              },
+              {
+                "axis": 5,
+                "direct": 4,
+                "through_digits": 4
+              },
+              {
+                "axis": 7,
+                "direct": 5,
+                "through_digits": 5
+              },
+              {
+                "axis": 11,
+                "direct": 3,
+                "through_digits": 3
+              },
+              {
+                "axis": 13,
+                "direct": 2,
+                "through_digits": 2
+              },
+              {
+                "axis": 17,
+                "direct": 16,
+                "through_digits": 16
+              },
+              {
+                "axis": 19,
+                "direct": 15,
+                "through_digits": 15
+              }
+            ]
+          },
+          {
+            "radix": 10,
+            "digits": [
+              5,
+              0,
+              9
+            ],
+            "reconstructed": 509,
+            "modular_sections": [
+              {
+                "axis": 2,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 3,
+                "direct": 2,
+                "through_digits": 2
+              },
+              {
+                "axis": 5,
+                "direct": 4,
+                "through_digits": 4
+              },
+              {
+                "axis": 7,
+                "direct": 5,
+                "through_digits": 5
+              },
+              {
+                "axis": 11,
+                "direct": 3,
+                "through_digits": 3
+              },
+              {
+                "axis": 13,
+                "direct": 2,
+                "through_digits": 2
+              },
+              {
+                "axis": 17,
+                "direct": 16,
+                "through_digits": 16
+              },
+              {
+                "axis": 19,
+                "direct": 15,
+                "through_digits": 15
+              }
+            ]
+          },
+          {
+            "radix": 16,
+            "digits": [
+              1,
+              15,
+              13
+            ],
+            "reconstructed": 509,
+            "modular_sections": [
+              {
+                "axis": 2,
+                "direct": 1,
+                "through_digits": 1
+              },
+              {
+                "axis": 3,
+                "direct": 2,
+                "through_digits": 2
+              },
+              {
+                "axis": 5,
+                "direct": 4,
+                "through_digits": 4
+              },
+              {
+                "axis": 7,
+                "direct": 5,
+                "through_digits": 5
+              },
+              {
+                "axis": 11,
+                "direct": 3,
+                "through_digits": 3
+              },
+              {
+                "axis": 13,
+                "direct": 2,
+                "through_digits": 2
+              },
+              {
+                "axis": 17,
+                "direct": 16,
+                "through_digits": 16
+              },
+              {
+                "axis": 19,
+                "direct": 15,
+                "through_digits": 15
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "zeta": {
+    "sigma": 2,
+    "axes": [
+      2,
+      3,
+      5,
+      7
+    ],
+    "multiplier": 60,
+    "multiplier_valuation": [
+      2,
+      1,
+      1,
+      0
+    ],
+    "divisibility_probability": {
+      "numerator": "1",
+      "denominator": "3600"
+    },
+    "cylinders": [
+      {
+        "exponents": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "original": {
+          "numerator": "768",
+          "denominator": "1225"
+        },
+        "conditioned_then_rebased": {
+          "numerator": "768",
+          "denominator": "1225"
+        },
+        "equal": true
+      },
+      {
+        "exponents": [
+          0,
+          1,
+          2,
+          0
+        ],
+        "original": {
+          "numerator": "256",
+          "denominator": "2296875"
+        },
+        "conditioned_then_rebased": {
+          "numerator": "256",
+          "denominator": "2296875"
+        },
+        "equal": true
+      },
+      {
+        "exponents": [
+          1,
+          3,
+          1,
+          3
+        ],
+        "original": {
+          "numerator": "64",
+          "denominator": "875529151875"
+        },
+        "conditioned_then_rebased": {
+          "numerator": "64",
+          "denominator": "875529151875"
+        },
+        "equal": true
+      }
+    ],
+    "paths": [
+      {
+        "factors": [
+          2,
+          2,
+          3,
+          5
+        ],
+        "endpoint": 60,
+        "valuation": [
+          2,
+          1,
+          1,
+          0
+        ]
+      },
+      {
+        "factors": [
+          5,
+          3,
+          2,
+          2
+        ],
+        "endpoint": 60,
+        "valuation": [
+          2,
+          1,
+          1,
+          0
+        ]
+      }
+    ],
+    "phase_lifts": [
+      {
+        "t": -2,
+        "probability_scale": {
+          "numerator": "1",
+          "denominator": "3600"
+        },
+        "amplitude_scale": "60^(-2/2)",
+        "phase": "exp(+i log 60)"
+      },
+      {
+        "t": 2,
+        "probability_scale": {
+          "numerator": "1",
+          "denominator": "3600"
+        },
+        "amplitude_scale": "60^(-2/2)",
+        "phase": "exp(-i log 60)"
+      }
+    ],
+    "normalization_boundary": {
+      "sigma": 1,
+      "normalizable": false,
+      "reason": "the harmonic series diverges, so no probability normalization exists"
+    }
+  },
+  "receivers": {
+    "s4": {
+      "name": "x^4+x+1",
+      "coefficients_ascending": [
+        1,
+        1,
+        0,
+        0,
+        1
+      ],
+      "discriminant": 229,
+      "species": [
+        {
+          "prime": 7,
+          "decimal_terminal_digit": 7,
+          "residue_mod_5": 2,
+          "unramified": true,
+          "factor_degrees": [
+            4
+          ],
+          "repeated_roots": [],
+          "species": "four-cycle-[4]"
+        },
+        {
+          "prime": 11,
+          "decimal_terminal_digit": 1,
+          "residue_mod_5": 1,
+          "unramified": true,
+          "factor_degrees": [
+            1,
+            3
+          ],
+          "repeated_roots": [],
+          "species": "three-cycle-[1,3]"
+        },
+        {
+          "prime": 13,
+          "decimal_terminal_digit": 3,
+          "residue_mod_5": 3,
+          "unramified": true,
+          "factor_degrees": [
+            4
+          ],
+          "repeated_roots": [],
+          "species": "four-cycle-[4]"
+        },
+        {
+          "prime": 23,
+          "decimal_terminal_digit": 3,
+          "residue_mod_5": 3,
+          "unramified": true,
+          "factor_degrees": [
+            1,
+            1,
+            2
+          ],
+          "repeated_roots": [],
+          "species": "transposition-[1,1,2]"
+        },
+        {
+          "prime": 29,
+          "decimal_terminal_digit": 9,
+          "residue_mod_5": 4,
+          "unramified": true,
+          "factor_degrees": [
+            1,
+            1,
+            2
+          ],
+          "repeated_roots": [],
+          "species": "transposition-[1,1,2]"
+        },
+        {
+          "prime": 37,
+          "decimal_terminal_digit": 7,
+          "residue_mod_5": 2,
+          "unramified": true,
+          "factor_degrees": [
+            2,
+            2
+          ],
+          "repeated_roots": [],
+          "species": "double-transposition-[2,2]"
+        },
+        {
+          "prime": 43,
+          "decimal_terminal_digit": 3,
+          "residue_mod_5": 3,
+          "unramified": true,
+          "factor_degrees": [
+            1,
+            3
+          ],
+          "repeated_roots": [],
+          "species": "three-cycle-[1,3]"
+        },
+        {
+          "prime": 53,
+          "decimal_terminal_digit": 3,
+          "residue_mod_5": 3,
+          "unramified": true,
+          "factor_degrees": [
+            2,
+            2
+          ],
+          "repeated_roots": [],
+          "species": "double-transposition-[2,2]"
+        },
+        {
+          "prime": 193,
+          "decimal_terminal_digit": 3,
+          "residue_mod_5": 3,
+          "unramified": true,
+          "factor_degrees": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "repeated_roots": [],
+          "species": "identity-[1,1,1,1]"
+        },
+        {
+          "prime": 229,
+          "decimal_terminal_digit": 9,
+          "residue_mod_5": 4,
+          "unramified": false,
+          "factor_degrees": [
+            1,
+            1,
+            2
+          ],
+          "repeated_roots": [
+            75
+          ],
+          "species": "ramified-boundary"
+        },
+        {
+          "prime": 509,
+          "decimal_terminal_digit": 9,
+          "residue_mod_5": 4,
+          "unramified": true,
+          "factor_degrees": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "repeated_roots": [],
+          "species": "identity-[1,1,1,1]"
+        }
+      ]
+    },
+    "cyclotomic": {
+      "name": "Phi_5=x^4+x^3+x^2+x+1",
+      "coefficients_ascending": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "discriminant": 125,
+      "species": [
+        {
+          "prime": 7,
+          "decimal_terminal_digit": 7,
+          "residue_mod_5": 2,
+          "unramified": true,
+          "factor_degrees": [
+            4
+          ],
+          "repeated_roots": [],
+          "species": "four-cycle-[4]"
+        },
+        {
+          "prime": 11,
+          "decimal_terminal_digit": 1,
+          "residue_mod_5": 1,
+          "unramified": true,
+          "factor_degrees": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "repeated_roots": [],
+          "species": "identity-[1,1,1,1]"
+        },
+        {
+          "prime": 13,
+          "decimal_terminal_digit": 3,
+          "residue_mod_5": 3,
+          "unramified": true,
+          "factor_degrees": [
+            4
+          ],
+          "repeated_roots": [],
+          "species": "four-cycle-[4]"
+        },
+        {
+          "prime": 23,
+          "decimal_terminal_digit": 3,
+          "residue_mod_5": 3,
+          "unramified": true,
+          "factor_degrees": [
+            4
+          ],
+          "repeated_roots": [],
+          "species": "four-cycle-[4]"
+        },
+        {
+          "prime": 29,
+          "decimal_terminal_digit": 9,
+          "residue_mod_5": 4,
+          "unramified": true,
+          "factor_degrees": [
+            2,
+            2
+          ],
+          "repeated_roots": [],
+          "species": "double-transposition-[2,2]"
+        },
+        {
+          "prime": 37,
+          "decimal_terminal_digit": 7,
+          "residue_mod_5": 2,
+          "unramified": true,
+          "factor_degrees": [
+            4
+          ],
+          "repeated_roots": [],
+          "species": "four-cycle-[4]"
+        },
+        {
+          "prime": 43,
+          "decimal_terminal_digit": 3,
+          "residue_mod_5": 3,
+          "unramified": true,
+          "factor_degrees": [
+            4
+          ],
+          "repeated_roots": [],
+          "species": "four-cycle-[4]"
+        },
+        {
+          "prime": 53,
+          "decimal_terminal_digit": 3,
+          "residue_mod_5": 3,
+          "unramified": true,
+          "factor_degrees": [
+            4
+          ],
+          "repeated_roots": [],
+          "species": "four-cycle-[4]"
+        },
+        {
+          "prime": 193,
+          "decimal_terminal_digit": 3,
+          "residue_mod_5": 3,
+          "unramified": true,
+          "factor_degrees": [
+            4
+          ],
+          "repeated_roots": [],
+          "species": "four-cycle-[4]"
+        },
+        {
+          "prime": 229,
+          "decimal_terminal_digit": 9,
+          "residue_mod_5": 4,
+          "unramified": true,
+          "factor_degrees": [
+            2,
+            2
+          ],
+          "repeated_roots": [],
+          "species": "double-transposition-[2,2]"
+        },
+        {
+          "prime": 509,
+          "decimal_terminal_digit": 9,
+          "residue_mod_5": 4,
+          "unramified": true,
+          "factor_degrees": [
+            2,
+            2
+          ],
+          "repeated_roots": [],
+          "species": "double-transposition-[2,2]"
+        }
+      ]
+    },
+    "rich_family": [
+      {
+        "prime": 13,
+        "s4_species": "four-cycle-[4]",
+        "cyclotomic_species": "four-cycle-[4]"
+      },
+      {
+        "prime": 23,
+        "s4_species": "transposition-[1,1,2]",
+        "cyclotomic_species": "four-cycle-[4]"
+      },
+      {
+        "prime": 43,
+        "s4_species": "three-cycle-[1,3]",
+        "cyclotomic_species": "four-cycle-[4]"
+      },
+      {
+        "prime": 53,
+        "s4_species": "double-transposition-[2,2]",
+        "cyclotomic_species": "four-cycle-[4]"
+      },
+      {
+        "prime": 193,
+        "s4_species": "identity-[1,1,1,1]",
+        "cyclotomic_species": "four-cycle-[4]"
+      }
+    ],
+    "held_out_recurrences": [
+      {
+        "held_out_prime": 7,
+        "recurs_with_rich_prime": 13,
+        "factor_degrees": [
+          4
+        ]
+      },
+      {
+        "held_out_prime": 29,
+        "recurs_with_rich_prime": 23,
+        "factor_degrees": [
+          1,
+          1,
+          2
+        ]
+      },
+      {
+        "held_out_prime": 11,
+        "recurs_with_rich_prime": 43,
+        "factor_degrees": [
+          1,
+          3
+        ]
+      },
+      {
+        "held_out_prime": 37,
+        "recurs_with_rich_prime": 53,
+        "factor_degrees": [
+          2,
+          2
+        ]
+      },
+      {
+        "held_out_prime": 509,
+        "recurs_with_rich_prime": 193,
+        "factor_degrees": [
+          1,
+          1,
+          1,
+          1
+        ]
+      }
+    ],
+    "ramification": {
+      "prime": 229,
+      "decimal_terminal_digit": 9,
+      "residue_mod_5": 4,
+      "unramified": false,
+      "factor_degrees": [
+        1,
+        1,
+        2
+      ],
+      "repeated_roots": [
+        75
+      ],
+      "species": "ramified-boundary"
+    }
+  },
+  "engine": {
+    "source_event_count": 12,
+    "source_current_count": 68,
+    "source_radiation": [
+      {
+        "sha256": "9a4055e620e93deb3b8f3679cd90afc9cac92b6796c508797b314aa8f96ee48a",
+        "before_rank": 6,
+        "after_rank": 6,
+        "before_cells": 0,
+        "after_cells": 0,
+        "currents": [
+          {
+            "lineage": 0,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": []
+          },
+          {
+            "lineage": 1,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": []
+          },
+          {
+            "lineage": 2,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": []
+          },
+          {
+            "lineage": 3,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": []
+          },
+          {
+            "lineage": 4,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": []
+          },
+          {
+            "lineage": 5,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": []
+          }
+        ]
+      },
+      {
+        "sha256": "9a4055e620e93deb3b8f3679cd90afc9cac92b6796c508797b314aa8f96ee48a",
+        "before_rank": 6,
+        "after_rank": 6,
+        "before_cells": 0,
+        "after_cells": 0,
+        "currents": [
+          {
+            "lineage": 0,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": []
+          },
+          {
+            "lineage": 1,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": []
+          },
+          {
+            "lineage": 2,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": []
+          },
+          {
+            "lineage": 3,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": []
+          },
+          {
+            "lineage": 4,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": []
+          },
+          {
+            "lineage": 5,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": []
+          }
+        ]
+      },
+      {
+        "sha256": "8edb93fe89596a4e4ef4ca4be5085e9f84fb22b6a6321d09ee1354dca0006d71",
+        "before_rank": 6,
+        "after_rank": 6,
+        "before_cells": 0,
+        "after_cells": 0,
+        "currents": [
+          {
+            "lineage": 0,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": []
+          },
+          {
+            "lineage": 1,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": []
+          },
+          {
+            "lineage": 2,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": []
+          },
+          {
+            "lineage": 3,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": []
+          },
+          {
+            "lineage": 4,
+            "ended": false,
+            "consequence": {
+              "sha256": "4f0069aa3fbd4dcfc88d582223ff2d352d27117c77c80bdebb0b8c1c570c6947",
+              "fold": {
+                "well": {
+                  "magnitude": 7245,
+                  "rank": {
+                    "magnitude": 0,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "place": {
+                  "real": {
+                    "magnitude": 4148170797,
+                    "rank": {
+                      "magnitude": 4,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 4220703679,
+                    "rank": {
+                      "magnitude": 9,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "length": 56
+              },
+              "perception_present": true,
+              "step_present": true
+            },
+            "emissions": []
+          },
+          {
+            "lineage": 5,
+            "ended": false,
+            "consequence": {
+              "sha256": "8ef29d6dc8273a273fcfa705555e4f57eb3a681ed3fb6734fac00cbe1181bf73",
+              "fold": {
+                "well": {
+                  "magnitude": 50301,
+                  "rank": {
+                    "magnitude": 0,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "place": {
+                  "real": {
+                    "magnitude": 4148178983,
+                    "rank": {
+                      "magnitude": 4,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 4220711742,
+                    "rank": {
+                      "magnitude": 9,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "length": 76
+              },
+              "perception_present": true,
+              "step_present": true
+            },
+            "emissions": []
+          }
+        ]
+      },
+      {
+        "sha256": "1a1f040e2b11309d0568e90133a431cfdb1cf093ad731f565297f7ae53ee7279",
+        "before_rank": 6,
+        "after_rank": 6,
+        "before_cells": 0,
+        "after_cells": 4,
+        "currents": [
+          {
+            "lineage": 0,
+            "ended": false,
+            "consequence": {
+              "sha256": "cefe71f268bc331e2135647367456daa0d18783669f46b7d2286695154035dfd",
+              "fold": {
+                "well": {
+                  "magnitude": 2132435124,
+                  "rank": {
+                    "magnitude": 11,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "place": {
+                  "real": {
+                    "magnitude": 4290777099,
+                    "rank": {
+                      "magnitude": 32,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 4228971455,
+                    "rank": {
+                      "magnitude": 37,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "length": 194
+              },
+              "perception_present": true,
+              "step_present": true
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 3467615987,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  },
+                  "imaginary": {
+                    "magnitude": 2646862805,
+                    "rank": {
+                      "magnitude": 3,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 2646862805,
+                  "rank": {
+                    "magnitude": 434,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "chi_same": {
+                  "magnitude": 3467615987,
+                  "rank": {
+                    "magnitude": 431,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "winding": "this_way",
+                "deed": "found_this",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          },
+          {
+            "lineage": 1,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 3463378817,
+                    "rank": {
+                      "magnitude": 14,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 3558373588,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 3558373588,
+                  "rank": {
+                    "magnitude": 535,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "chi_same": {
+                  "magnitude": 3463378817,
+                  "rank": {
+                    "magnitude": 549,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          },
+          {
+            "lineage": 2,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 1290015179,
+                    "rank": {
+                      "magnitude": 17,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 2273675672,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 2273675672,
+                  "rank": {
+                    "magnitude": 439,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "chi_same": {
+                  "magnitude": 1290015179,
+                  "rank": {
+                    "magnitude": 456,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          },
+          {
+            "lineage": 3,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 1289895120,
+                    "rank": {
+                      "magnitude": 16,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 2416054307,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 2416054307,
+                  "rank": {
+                    "magnitude": 422,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "chi_same": {
+                  "magnitude": 1289895120,
+                  "rank": {
+                    "magnitude": 438,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          },
+          {
+            "lineage": 4,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": []
+          },
+          {
+            "lineage": 5,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": []
+          }
+        ]
+      },
+      {
+        "sha256": "6e4c574965362b52668846e1554429e19a4a34f57033bd38e0ff8aff43cde21d",
+        "before_rank": 6,
+        "after_rank": 6,
+        "before_cells": 4,
+        "after_cells": 12,
+        "currents": [
+          {
+            "lineage": 0,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 3903155476,
+                    "rank": {
+                      "magnitude": 3,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 4122948692,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 4122948692,
+                  "rank": {
+                    "magnitude": 355,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "chi_same": {
+                  "magnitude": 3903155476,
+                  "rank": {
+                    "magnitude": 358,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          },
+          {
+            "lineage": 1,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 3462688352,
+                    "rank": {
+                      "magnitude": 13,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 852376049,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 852376049,
+                  "rank": {
+                    "magnitude": 816,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "chi_same": {
+                  "magnitude": 3462688352,
+                  "rank": {
+                    "magnitude": 829,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          },
+          {
+            "lineage": 2,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 1290109851,
+                    "rank": {
+                      "magnitude": 16,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  },
+                  "imaginary": {
+                    "magnitude": 809075472,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 809075472,
+                  "rank": {
+                    "magnitude": 674,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "chi_same": {
+                  "magnitude": 1290109851,
+                  "rank": {
+                    "magnitude": 690,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          },
+          {
+            "lineage": 3,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 1289888078,
+                    "rank": {
+                      "magnitude": 15,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 78151036,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 78151036,
+                  "rank": {
+                    "magnitude": 663,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "chi_same": {
+                  "magnitude": 1289888078,
+                  "rank": {
+                    "magnitude": 678,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          },
+          {
+            "lineage": 4,
+            "ended": false,
+            "consequence": {
+              "sha256": "0ee034e7932af084280203334af64911801fa707dd1dcdd0abb8a4aa41c30197",
+              "fold": {
+                "well": {
+                  "magnitude": 97135605,
+                  "rank": {
+                    "magnitude": 0,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "place": {
+                  "real": {
+                    "magnitude": 2216687626,
+                    "rank": {
+                      "magnitude": 5,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 4235134012,
+                    "rank": {
+                      "magnitude": 9,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "length": 114
+              },
+              "perception_present": true,
+              "step_present": true
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 2544313694,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 3882600321,
+                    "rank": {
+                      "magnitude": 2,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 3882600321,
+                  "rank": {
+                    "magnitude": 241,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "chi_same": {
+                  "magnitude": 2544313694,
+                  "rank": {
+                    "magnitude": 239,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "winding": "that_way",
+                "deed": "found_that",
+                "standing_read": null,
+                "hand_exact": true
+              },
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 4277561017,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 0,
+                    "rank": {
+                      "magnitude": 1,
+                      "rank": 0,
+                      "negative": true
+                    },
+                    "turn": 0
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 0,
+                  "rank": {
+                    "magnitude": 405,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "chi_same": {
+                  "magnitude": 4277561017,
+                  "rank": {
+                    "magnitude": 406,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          },
+          {
+            "lineage": 5,
+            "ended": false,
+            "consequence": {
+              "sha256": "fe9a67abf9ab9c69702140603cb79d560a900c6f0e69187945355dcf45096763",
+              "fold": {
+                "well": {
+                  "magnitude": 8325909,
+                  "rank": {
+                    "magnitude": 0,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "place": {
+                  "real": {
+                    "magnitude": 2216687626,
+                    "rank": {
+                      "magnitude": 5,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 4235134012,
+                    "rank": {
+                      "magnitude": 9,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "length": 94
+              },
+              "perception_present": true,
+              "step_present": true
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 4210867083,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  },
+                  "imaginary": {
+                    "magnitude": 3412434720,
+                    "rank": {
+                      "magnitude": 2,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 3412434720,
+                  "rank": {
+                    "magnitude": 189,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "chi_same": {
+                  "magnitude": 4210867083,
+                  "rank": {
+                    "magnitude": 187,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "winding": "that_way",
+                "deed": "found_that",
+                "standing_read": null,
+                "hand_exact": true
+              },
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 4271005002,
+                    "rank": {
+                      "magnitude": 1,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 1,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 1,
+                  "rank": {
+                    "magnitude": 365,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "chi_same": {
+                  "magnitude": 4271005002,
+                  "rank": {
+                    "magnitude": 366,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sha256": "2f279f0c83bf963194d398174cad78ce45bd992f254e511f91322551bd15ffb8",
+        "before_rank": 6,
+        "after_rank": 6,
+        "before_cells": 12,
+        "after_cells": 26,
+        "currents": [
+          {
+            "lineage": 0,
+            "ended": false,
+            "consequence": {
+              "sha256": "ed4a4e8cda2a809d7825cc2b312c3e031ce09d96ba1be663bd1f7a4a5b62aaf7",
+              "fold": {
+                "well": {
+                  "magnitude": 1702080699,
+                  "rank": {
+                    "magnitude": 16,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "place": {
+                  "real": {
+                    "magnitude": 4290777099,
+                    "rank": {
+                      "magnitude": 32,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 4228971455,
+                    "rank": {
+                      "magnitude": 37,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "length": 218
+              },
+              "perception_present": true,
+              "step_present": true
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 2545354534,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 3820660659,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 3820660659,
+                  "rank": {
+                    "magnitude": 507,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "chi_same": {
+                  "magnitude": 2545354534,
+                  "rank": {
+                    "magnitude": 507,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "winding": "that_way",
+                "deed": "found_that",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          },
+          {
+            "lineage": 1,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 1731279599,
+                    "rank": {
+                      "magnitude": 15,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  },
+                  "imaginary": {
+                    "magnitude": 3531280404,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 3531280404,
+                  "rank": {
+                    "magnitude": 1125,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "chi_same": {
+                  "magnitude": 1731279599,
+                  "rank": {
+                    "magnitude": 1140,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          },
+          {
+            "lineage": 2,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 1290105822,
+                    "rank": {
+                      "magnitude": 15,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 1191108616,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 1191108616,
+                  "rank": {
+                    "magnitude": 937,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "chi_same": {
+                  "magnitude": 1290105822,
+                  "rank": {
+                    "magnitude": 952,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          },
+          {
+            "lineage": 3,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 1289870816,
+                    "rank": {
+                      "magnitude": 15,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  },
+                  "imaginary": {
+                    "magnitude": 99101397,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 99101397,
+                  "rank": {
+                    "magnitude": 925,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "chi_same": {
+                  "magnitude": 1289870816,
+                  "rank": {
+                    "magnitude": 940,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          },
+          {
+            "lineage": 4,
+            "ended": false,
+            "consequence": {
+              "sha256": "223ccb008dbde980f67a4ff15727977664aade23c5c3f97f5075e250527072df",
+              "fold": {
+                "well": {
+                  "magnitude": 55755,
+                  "rank": {
+                    "magnitude": 0,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "place": {
+                  "real": {
+                    "magnitude": 3896504291,
+                    "rank": {
+                      "magnitude": 4,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 4235134007,
+                    "rank": {
+                      "magnitude": 9,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "length": 68
+              },
+              "perception_present": true,
+              "step_present": true
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 2587718306,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 3884588961,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 3884588961,
+                  "rank": {
+                    "magnitude": 183,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "chi_same": {
+                  "magnitude": 2587718306,
+                  "rank": {
+                    "magnitude": 183,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "winding": "that_way",
+                "deed": "found_that",
+                "standing_read": null,
+                "hand_exact": true
+              },
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 3128499127,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 3854594829,
+                    "rank": {
+                      "magnitude": 3,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 3854594829,
+                  "rank": {
+                    "magnitude": 407,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "chi_same": {
+                  "magnitude": 3128499127,
+                  "rank": {
+                    "magnitude": 404,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              },
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 383785220,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 3135594039,
+                    "rank": {
+                      "magnitude": 2,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 3135594039,
+                  "rank": {
+                    "magnitude": 407,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "chi_same": {
+                  "magnitude": 383785220,
+                  "rank": {
+                    "magnitude": 405,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              },
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 2332638090,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  },
+                  "imaginary": {
+                    "magnitude": 3403723748,
+                    "rank": {
+                      "magnitude": 2,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 3403723748,
+                  "rank": {
+                    "magnitude": 594,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "chi_same": {
+                  "magnitude": 2332638090,
+                  "rank": {
+                    "magnitude": 592,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "winding": "that_way",
+                "deed": "found_that",
+                "standing_read": null,
+                "hand_exact": true
+              },
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 498236453,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 4070681133,
+                    "rank": {
+                      "magnitude": 2,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 4070681133,
+                  "rank": {
+                    "magnitude": 815,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "chi_same": {
+                  "magnitude": 498236453,
+                  "rank": {
+                    "magnitude": 813,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "winding": "this_way",
+                "deed": "found_this",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          },
+          {
+            "lineage": 5,
+            "ended": false,
+            "consequence": {
+              "sha256": "c6f9779c6d456c0bd28b85ee7d5979296de9ed05193de1f3df8959470e53da35",
+              "fold": {
+                "well": {
+                  "magnitude": 22125,
+                  "rank": {
+                    "magnitude": 0,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "place": {
+                  "real": {
+                    "magnitude": 3896471573,
+                    "rank": {
+                      "magnitude": 4,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 4235101748,
+                    "rank": {
+                      "magnitude": 9,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "length": 56
+              },
+              "perception_present": true,
+              "step_present": true
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 482064774,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 2585540347,
+                    "rank": {
+                      "magnitude": 1,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 2585540347,
+                  "rank": {
+                    "magnitude": 144,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "chi_same": {
+                  "magnitude": 482064774,
+                  "rank": {
+                    "magnitude": 143,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "winding": "that_way",
+                "deed": "found_that",
+                "standing_read": null,
+                "hand_exact": true
+              },
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 3031528131,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 3846033671,
+                    "rank": {
+                      "magnitude": 3,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 3846033671,
+                  "rank": {
+                    "magnitude": 367,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "chi_same": {
+                  "magnitude": 3031528131,
+                  "rank": {
+                    "magnitude": 364,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              },
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 414581882,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 3129878696,
+                    "rank": {
+                      "magnitude": 2,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 3129878696,
+                  "rank": {
+                    "magnitude": 367,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "chi_same": {
+                  "magnitude": 414581882,
+                  "rank": {
+                    "magnitude": 365,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              },
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 2460829606,
+                    "rank": {
+                      "magnitude": 2,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 2009924661,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 2009924661,
+                  "rank": {
+                    "magnitude": 566,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "chi_same": {
+                  "magnitude": 2460829606,
+                  "rank": {
+                    "magnitude": 568,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              },
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 146667141,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 2214522063,
+                    "rank": {
+                      "magnitude": 1,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 2214522063,
+                  "rank": {
+                    "magnitude": 1043,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "chi_same": {
+                  "magnitude": 146667141,
+                  "rank": {
+                    "magnitude": 1042,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "winding": "this_way",
+                "deed": "found_this",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sha256": "441496d455f4633c2243584103849a49b771102736deef2cf44eb585f363df61",
+        "before_rank": 6,
+        "after_rank": 6,
+        "before_cells": 26,
+        "after_cells": 32,
+        "currents": [
+          {
+            "lineage": 0,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 3188715587,
+                    "rank": {
+                      "magnitude": 4,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 2579221075,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 2579221075,
+                  "rank": {
+                    "magnitude": 410,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "chi_same": {
+                  "magnitude": 3188715587,
+                  "rank": {
+                    "magnitude": 414,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          },
+          {
+            "lineage": 1,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 1731236167,
+                    "rank": {
+                      "magnitude": 16,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  },
+                  "imaginary": {
+                    "magnitude": 639262019,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 639262019,
+                  "rank": {
+                    "magnitude": 1444,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "chi_same": {
+                  "magnitude": 1731236167,
+                  "rank": {
+                    "magnitude": 1460,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          },
+          {
+            "lineage": 2,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 2580203667,
+                    "rank": {
+                      "magnitude": 13,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 17237913,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 17237913,
+                  "rank": {
+                    "magnitude": 1202,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "chi_same": {
+                  "magnitude": 2580203667,
+                  "rank": {
+                    "magnitude": 1215,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          },
+          {
+            "lineage": 3,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 1289858256,
+                    "rank": {
+                      "magnitude": 15,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  },
+                  "imaginary": {
+                    "magnitude": 96252827,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 96252827,
+                  "rank": {
+                    "magnitude": 1189,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "chi_same": {
+                  "magnitude": 1289858256,
+                  "rank": {
+                    "magnitude": 1204,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          },
+          {
+            "lineage": 4,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 2172073050,
+                    "rank": {
+                      "magnitude": 5,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 3532474053,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 3532474053,
+                  "rank": {
+                    "magnitude": 170,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "chi_same": {
+                  "magnitude": 2172073050,
+                  "rank": {
+                    "magnitude": 175,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          },
+          {
+            "lineage": 5,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 2894069751,
+                    "rank": {
+                      "magnitude": 1,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  },
+                  "imaginary": {
+                    "magnitude": 2684354554,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 2684354554,
+                  "rank": {
+                    "magnitude": 136,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "chi_same": {
+                  "magnitude": 2894069751,
+                  "rank": {
+                    "magnitude": 137,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sha256": "ff5661b1d914832c09d1d9fbb55eeb3170306a3ec03b04021163af6bdd39d4c4",
+        "before_rank": 6,
+        "after_rank": 6,
+        "before_cells": 32,
+        "after_cells": 38,
+        "currents": [
+          {
+            "lineage": 0,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 3744845930,
+                    "rank": {
+                      "magnitude": 1,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  },
+                  "imaginary": {
+                    "magnitude": 4150320955,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 4150320955,
+                  "rank": {
+                    "magnitude": 597,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "chi_same": {
+                  "magnitude": 3744845930,
+                  "rank": {
+                    "magnitude": 598,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          },
+          {
+            "lineage": 1,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 1731220557,
+                    "rank": {
+                      "magnitude": 16,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 2258659864,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 2258659864,
+                  "rank": {
+                    "magnitude": 1794,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "chi_same": {
+                  "magnitude": 1731220557,
+                  "rank": {
+                    "magnitude": 1810,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          },
+          {
+            "lineage": 2,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 2580200300,
+                    "rank": {
+                      "magnitude": 13,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  },
+                  "imaginary": {
+                    "magnitude": 233303340,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 233303340,
+                  "rank": {
+                    "magnitude": 1492,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "chi_same": {
+                  "magnitude": 2580200300,
+                  "rank": {
+                    "magnitude": 1505,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          },
+          {
+            "lineage": 3,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 1289853554,
+                    "rank": {
+                      "magnitude": 15,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 95103761,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 95103761,
+                  "rank": {
+                    "magnitude": 1483,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "chi_same": {
+                  "magnitude": 1289853554,
+                  "rank": {
+                    "magnitude": 1498,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          },
+          {
+            "lineage": 4,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 3750161697,
+                    "rank": {
+                      "magnitude": 1,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  },
+                  "imaginary": {
+                    "magnitude": 4155732720,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 4155732720,
+                  "rank": {
+                    "magnitude": 233,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "chi_same": {
+                  "magnitude": 3750161697,
+                  "rank": {
+                    "magnitude": 234,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          },
+          {
+            "lineage": 5,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 3801552817,
+                    "rank": {
+                      "magnitude": 1,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  },
+                  "imaginary": {
+                    "magnitude": 3501747674,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 3501747674,
+                  "rank": {
+                    "magnitude": 190,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "chi_same": {
+                  "magnitude": 3801552817,
+                  "rank": {
+                    "magnitude": 191,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sha256": "321bb036b9b71b03ca203a165607fdb083d9b7f6450a0fdf3bb8640900118ff2",
+        "before_rank": 6,
+        "after_rank": 6,
+        "before_cells": 38,
+        "after_cells": 44,
+        "currents": [
+          {
+            "lineage": 0,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 3057450323,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  },
+                  "imaginary": {
+                    "magnitude": 431838265,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 431838265,
+                  "rank": {
+                    "magnitude": 951,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "chi_same": {
+                  "magnitude": 3057450323,
+                  "rank": {
+                    "magnitude": 951,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          },
+          {
+            "lineage": 1,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 3462617492,
+                    "rank": {
+                      "magnitude": 14,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  },
+                  "imaginary": {
+                    "magnitude": 85475794,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 85475794,
+                  "rank": {
+                    "magnitude": 2245,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "chi_same": {
+                  "magnitude": 3462617492,
+                  "rank": {
+                    "magnitude": 2259,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          },
+          {
+            "lineage": 2,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 2580147516,
+                    "rank": {
+                      "magnitude": 14,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  },
+                  "imaginary": {
+                    "magnitude": 570552037,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 570552037,
+                  "rank": {
+                    "magnitude": 1879,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "chi_same": {
+                  "magnitude": 2580147516,
+                  "rank": {
+                    "magnitude": 1893,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          },
+          {
+            "lineage": 3,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 1289853557,
+                    "rank": {
+                      "magnitude": 15,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  },
+                  "imaginary": {
+                    "magnitude": 403033830,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 403033830,
+                  "rank": {
+                    "magnitude": 1861,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "chi_same": {
+                  "magnitude": 1289853557,
+                  "rank": {
+                    "magnitude": 1876,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          },
+          {
+            "lineage": 4,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 3059833659,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  },
+                  "imaginary": {
+                    "magnitude": 432960920,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 432960920,
+                  "rank": {
+                    "magnitude": 375,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "chi_same": {
+                  "magnitude": 3059833659,
+                  "rank": {
+                    "magnitude": 375,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          },
+          {
+            "lineage": 5,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 3465346775,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 770077062,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 770077062,
+                  "rank": {
+                    "magnitude": 293,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "chi_same": {
+                  "magnitude": 3465346775,
+                  "rank": {
+                    "magnitude": 293,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sha256": "d88dfae539dca4a1f1fe1f797b0e87abaf839cfbc0c6446c0964bfdacf24bf1e",
+        "before_rank": 6,
+        "after_rank": 6,
+        "before_cells": 44,
+        "after_cells": 50,
+        "currents": [
+          {
+            "lineage": 0,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 2452198960,
+                    "rank": {
+                      "magnitude": 1,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  },
+                  "imaginary": {
+                    "magnitude": 774769003,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 774769003,
+                  "rank": {
+                    "magnitude": 1354,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "chi_same": {
+                  "magnitude": 2452198960,
+                  "rank": {
+                    "magnitude": 1355,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          },
+          {
+            "lineage": 1,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 3462869806,
+                    "rank": {
+                      "magnitude": 14,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 86575047,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 86575047,
+                  "rank": {
+                    "magnitude": 2775,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "chi_same": {
+                  "magnitude": 3462869806,
+                  "rank": {
+                    "magnitude": 2789,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          },
+          {
+            "lineage": 2,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 2580084966,
+                    "rank": {
+                      "magnitude": 14,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  },
+                  "imaginary": {
+                    "magnitude": 145386,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 145386,
+                  "rank": {
+                    "magnitude": 2339,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "chi_same": {
+                  "magnitude": 2580084966,
+                  "rank": {
+                    "magnitude": 2353,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          },
+          {
+            "lineage": 3,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 1289858351,
+                    "rank": {
+                      "magnitude": 15,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  },
+                  "imaginary": {
+                    "magnitude": 19268962,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 19268962,
+                  "rank": {
+                    "magnitude": 2301,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "chi_same": {
+                  "magnitude": 1289858351,
+                  "rank": {
+                    "magnitude": 2316,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          },
+          {
+            "lineage": 4,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 2452124334,
+                    "rank": {
+                      "magnitude": 1,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 774716808,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 774716808,
+                  "rank": {
+                    "magnitude": 548,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "chi_same": {
+                  "magnitude": 2452124334,
+                  "rank": {
+                    "magnitude": 549,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          },
+          {
+            "lineage": 5,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 2337139335,
+                    "rank": {
+                      "magnitude": 1,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  },
+                  "imaginary": {
+                    "magnitude": 619691838,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 619691838,
+                  "rank": {
+                    "magnitude": 406,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "chi_same": {
+                  "magnitude": 2337139335,
+                  "rank": {
+                    "magnitude": 407,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sha256": "e6b8d662179fefdf2c3d6a9290177d01ea41b54301b7c6f98c83c3b20d96d5f6",
+        "before_rank": 6,
+        "after_rank": 6,
+        "before_cells": 50,
+        "after_cells": 65,
+        "currents": [
+          {
+            "lineage": 0,
+            "ended": false,
+            "consequence": {
+              "sha256": "cfb13b4eb9487bc5356fc0f13cc65c5b832716b621322b6b323a1e9e2e5a924b",
+              "fold": {
+                "well": {
+                  "magnitude": 1339295123,
+                  "rank": {
+                    "magnitude": 170,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "place": {
+                  "real": {
+                    "magnitude": 4290777099,
+                    "rank": {
+                      "magnitude": 32,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 4228971455,
+                    "rank": {
+                      "magnitude": 37,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "length": 810
+              },
+              "perception_present": true,
+              "step_present": true
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 657165988,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 3947334972,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 3947334972,
+                  "rank": {
+                    "magnitude": 1815,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "chi_same": {
+                  "magnitude": 657165988,
+                  "rank": {
+                    "magnitude": 1815,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "winding": "that_way",
+                "deed": "found_that",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          },
+          {
+            "lineage": 1,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 1731407945,
+                    "rank": {
+                      "magnitude": 15,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  },
+                  "imaginary": {
+                    "magnitude": 140431884,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 140431884,
+                  "rank": {
+                    "magnitude": 3385,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "chi_same": {
+                  "magnitude": 1731407945,
+                  "rank": {
+                    "magnitude": 3400,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          },
+          {
+            "lineage": 2,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 2580100384,
+                    "rank": {
+                      "magnitude": 14,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  },
+                  "imaginary": {
+                    "magnitude": 54947791,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 54947791,
+                  "rank": {
+                    "magnitude": 2859,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "chi_same": {
+                  "magnitude": 2580100384,
+                  "rank": {
+                    "magnitude": 2873,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          },
+          {
+            "lineage": 3,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 1289858085,
+                    "rank": {
+                      "magnitude": 15,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  },
+                  "imaginary": {
+                    "magnitude": 71717544,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 71717544,
+                  "rank": {
+                    "magnitude": 2821,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "chi_same": {
+                  "magnitude": 1289858085,
+                  "rank": {
+                    "magnitude": 2836,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          },
+          {
+            "lineage": 4,
+            "ended": false,
+            "consequence": {
+              "sha256": "b87f8b546c8e1b1a7dfc4d966db9149758c47d46ae6c2a0bb5e66b1f5722c3af",
+              "fold": {
+                "well": {
+                  "magnitude": 1956441606,
+                  "rank": {
+                    "magnitude": 58,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "place": {
+                  "real": {
+                    "magnitude": 4148178981,
+                    "rank": {
+                      "magnitude": 4,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 4264751937,
+                    "rank": {
+                      "magnitude": 9,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "length": 352
+              },
+              "perception_present": true,
+              "step_present": true
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 657122951,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  },
+                  "imaginary": {
+                    "magnitude": 3947215055,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 3947215055,
+                  "rank": {
+                    "magnitude": 725,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "chi_same": {
+                  "magnitude": 657122951,
+                  "rank": {
+                    "magnitude": 725,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "winding": "this_way",
+                "deed": "found_this",
+                "standing_read": null,
+                "hand_exact": true
+              },
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 3261523052,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  },
+                  "imaginary": {
+                    "magnitude": 3324956155,
+                    "rank": {
+                      "magnitude": 1,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 3324956155,
+                  "rank": {
+                    "magnitude": 69,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "chi_same": {
+                  "magnitude": 3261523052,
+                  "rank": {
+                    "magnitude": 68,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              },
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 3325026741,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 2495489442,
+                    "rank": {
+                      "magnitude": 1,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 2495489442,
+                  "rank": {
+                    "magnitude": 69,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "chi_same": {
+                  "magnitude": 3325026741,
+                  "rank": {
+                    "magnitude": 68,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              },
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 2473881308,
+                    "rank": {
+                      "magnitude": 1,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  },
+                  "imaginary": {
+                    "magnitude": 2241646045,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 2241646045,
+                  "rank": {
+                    "magnitude": 69,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "chi_same": {
+                  "magnitude": 2473881308,
+                  "rank": {
+                    "magnitude": 70,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              },
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 3388930324,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  },
+                  "imaginary": {
+                    "magnitude": 4113423573,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 4113423573,
+                  "rank": {
+                    "magnitude": 69,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "chi_same": {
+                  "magnitude": 3388930324,
+                  "rank": {
+                    "magnitude": 69,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "winding": "that_way",
+                "deed": "found_that",
+                "standing_read": null,
+                "hand_exact": true
+              },
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 1750249008,
+                    "rank": {
+                      "magnitude": 21,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 2638,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 2638,
+                  "rank": {
+                    "magnitude": 289,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "chi_same": {
+                  "magnitude": 1750249008,
+                  "rank": {
+                    "magnitude": 310,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              },
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 2547177552,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 0,
+                    "rank": {
+                      "magnitude": 2,
+                      "rank": 0,
+                      "negative": true
+                    },
+                    "turn": 0
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 0,
+                  "rank": {
+                    "magnitude": 104,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "chi_same": {
+                  "magnitude": 2547177552,
+                  "rank": {
+                    "magnitude": 106,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          },
+          {
+            "lineage": 5,
+            "ended": false,
+            "consequence": {
+              "sha256": "4a5c2dfad58ba2e109fde862a05b5785d3be12353c5cfd2656737cf9e9542931",
+              "fold": {
+                "well": {
+                  "magnitude": 1820788327,
+                  "rank": {
+                    "magnitude": 40,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "place": {
+                  "real": {
+                    "magnitude": 2216687626,
+                    "rank": {
+                      "magnitude": 5,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 4193190972,
+                    "rank": {
+                      "magnitude": 9,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "length": 266
+              },
+              "perception_present": true,
+              "step_present": true
+            },
+            "emissions": [
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 658057643,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 3946067492,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 3946067492,
+                  "rank": {
+                    "magnitude": 531,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "chi_same": {
+                  "magnitude": 658057643,
+                  "rank": {
+                    "magnitude": 531,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "winding": "that_way",
+                "deed": "found_that",
+                "standing_read": null,
+                "hand_exact": true
+              },
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 1123396053,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 2174204211,
+                    "rank": {
+                      "magnitude": 1,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 2174204211,
+                  "rank": {
+                    "magnitude": 68,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "chi_same": {
+                  "magnitude": 1123396053,
+                  "rank": {
+                    "magnitude": 67,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              },
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 2727670034,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  },
+                  "imaginary": {
+                    "magnitude": 3374058590,
+                    "rank": {
+                      "magnitude": 1,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 3374058590,
+                  "rank": {
+                    "magnitude": 67,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "chi_same": {
+                  "magnitude": 2727670034,
+                  "rank": {
+                    "magnitude": 66,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              },
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 3213863199,
+                    "rank": {
+                      "magnitude": 1,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 1435446943,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 1435446943,
+                  "rank": {
+                    "magnitude": 67,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "chi_same": {
+                  "magnitude": 3213863199,
+                  "rank": {
+                    "magnitude": 68,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              },
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 3977802942,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 2
+                  },
+                  "imaginary": {
+                    "magnitude": 2642094068,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 2642094068,
+                  "rank": {
+                    "magnitude": 67,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "chi_same": {
+                  "magnitude": 3977802942,
+                  "rank": {
+                    "magnitude": 67,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              },
+              {
+                "position": {
+                  "real": {
+                    "magnitude": 3391106923,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  },
+                  "imaginary": {
+                    "magnitude": 0,
+                    "rank": {
+                      "magnitude": 0,
+                      "rank": 0,
+                      "negative": false
+                    },
+                    "turn": 0
+                  }
+                },
+                "chi_other": {
+                  "magnitude": 0,
+                  "rank": {
+                    "magnitude": 715,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "chi_same": {
+                  "magnitude": 3391106923,
+                  "rank": {
+                    "magnitude": 715,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "winding": "none",
+                "deed": "ride",
+                "standing_read": null,
+                "hand_exact": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sha256": "93ef58ae6c51e55e92cf2851dd21f54bbac992ab2653b4d3f2831ff914fcb4e0",
+        "before_rank": 6,
+        "after_rank": 6,
+        "before_cells": 65,
+        "after_cells": 65,
+        "currents": [
+          {
+            "lineage": 6,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": []
+          },
+          {
+            "lineage": 7,
+            "ended": false,
+            "consequence": {
+              "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+              "fold": null,
+              "perception_present": false,
+              "step_present": false
+            },
+            "emissions": []
+          }
+        ]
+      }
+    ],
+    "world_return_relation": {
+      "magnitude": 2646862805,
+      "rank": {
+        "magnitude": 434,
+        "rank": 0,
+        "negative": false
+      },
+      "turn": 0
+    },
+    "return_radiation": {
+      "sha256": "18c8eb5aa1d5a2e94325836fe37c255e3c46835b7700e7d1815e07f6761b1bcf",
+      "before_rank": 6,
+      "after_rank": 6,
+      "before_cells": 65,
+      "after_cells": 67,
+      "currents": [
+        {
+          "lineage": 0,
+          "ended": false,
+          "consequence": {
+            "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+            "fold": null,
+            "perception_present": false,
+            "step_present": false
+          },
+          "emissions": [
+            {
+              "position": {
+                "real": {
+                  "magnitude": 3398209037,
+                  "rank": {
+                    "magnitude": 1,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "imaginary": {
+                  "magnitude": 2764404699,
+                  "rank": {
+                    "magnitude": 0,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                }
+              },
+              "chi_other": {
+                "magnitude": 2764404699,
+                "rank": {
+                  "magnitude": 1080,
+                  "rank": 0,
+                  "negative": false
+                },
+                "turn": 0
+              },
+              "chi_same": {
+                "magnitude": 3398209037,
+                "rank": {
+                  "magnitude": 1081,
+                  "rank": 0,
+                  "negative": false
+                },
+                "turn": 2
+              },
+              "winding": "none",
+              "deed": "ride",
+              "standing_read": null,
+              "hand_exact": true
+            }
+          ]
+        },
+        {
+          "lineage": 4,
+          "ended": false,
+          "consequence": {
+            "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+            "fold": null,
+            "perception_present": false,
+            "step_present": false
+          },
+          "emissions": [
+            {
+              "position": {
+                "real": {
+                  "magnitude": 3401856887,
+                  "rank": {
+                    "magnitude": 1,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "imaginary": {
+                  "magnitude": 2766370094,
+                  "rank": {
+                    "magnitude": 0,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                }
+              },
+              "chi_other": {
+                "magnitude": 2766370094,
+                "rank": {
+                  "magnitude": 420,
+                  "rank": 0,
+                  "negative": false
+                },
+                "turn": 0
+              },
+              "chi_same": {
+                "magnitude": 3401856887,
+                "rank": {
+                  "magnitude": 421,
+                  "rank": 0,
+                  "negative": false
+                },
+                "turn": 2
+              },
+              "winding": "none",
+              "deed": "ride",
+              "standing_read": null,
+              "hand_exact": true
+            }
+          ]
+        },
+        {
+          "lineage": 8,
+          "ended": false,
+          "consequence": {
+            "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+            "fold": null,
+            "perception_present": false,
+            "step_present": false
+          },
+          "emissions": []
+        }
+      ]
+    },
+    "probe_prime": 521,
+    "direct_probe": {
+      "sha256": "e0854ba906e0188f1632d10c129312980c91822e2483e687b361cd65cfd3fbb9",
+      "before_rank": 6,
+      "after_rank": 6,
+      "before_cells": 65,
+      "after_cells": 67,
+      "currents": [
+        {
+          "lineage": 0,
+          "ended": false,
+          "consequence": {
+            "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+            "fold": null,
+            "perception_present": false,
+            "step_present": false
+          },
+          "emissions": [
+            {
+              "position": {
+                "real": {
+                  "magnitude": 3452783025,
+                  "rank": {
+                    "magnitude": 0,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "imaginary": {
+                  "magnitude": 1276499151,
+                  "rank": {
+                    "magnitude": 0,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                }
+              },
+              "chi_other": {
+                "magnitude": 1276499151,
+                "rank": {
+                  "magnitude": 1271,
+                  "rank": 0,
+                  "negative": false
+                },
+                "turn": 0
+              },
+              "chi_same": {
+                "magnitude": 3452783025,
+                "rank": {
+                  "magnitude": 1271,
+                  "rank": 0,
+                  "negative": false
+                },
+                "turn": 2
+              },
+              "winding": "none",
+              "deed": "ride",
+              "standing_read": null,
+              "hand_exact": true
+            }
+          ]
+        },
+        {
+          "lineage": 4,
+          "ended": false,
+          "consequence": {
+            "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+            "fold": null,
+            "perception_present": false,
+            "step_present": false
+          },
+          "emissions": [
+            {
+              "position": {
+                "real": {
+                  "magnitude": 3505762629,
+                  "rank": {
+                    "magnitude": 0,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 2
+                },
+                "imaginary": {
+                  "magnitude": 1298075282,
+                  "rank": {
+                    "magnitude": 0,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                }
+              },
+              "chi_other": {
+                "magnitude": 1298075282,
+                "rank": {
+                  "magnitude": 427,
+                  "rank": 0,
+                  "negative": false
+                },
+                "turn": 0
+              },
+              "chi_same": {
+                "magnitude": 3505762629,
+                "rank": {
+                  "magnitude": 427,
+                  "rank": 0,
+                  "negative": false
+                },
+                "turn": 2
+              },
+              "winding": "none",
+              "deed": "ride",
+              "standing_read": null,
+              "hand_exact": true
+            }
+          ]
+        }
+      ]
+    },
+    "returned_probe": {
+      "sha256": "bc02624613706aa8f8316a3d42587227230c2c717604ca29a977478d6395d825",
+      "before_rank": 6,
+      "after_rank": 6,
+      "before_cells": 67,
+      "after_cells": 69,
+      "currents": [
+        {
+          "lineage": 0,
+          "ended": false,
+          "consequence": {
+            "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+            "fold": null,
+            "perception_present": false,
+            "step_present": false
+          },
+          "emissions": [
+            {
+              "position": {
+                "real": {
+                  "magnitude": 3310119666,
+                  "rank": {
+                    "magnitude": 0,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "imaginary": {
+                  "magnitude": 106588122,
+                  "rank": {
+                    "magnitude": 0,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                }
+              },
+              "chi_other": {
+                "magnitude": 106588122,
+                "rank": {
+                  "magnitude": 828,
+                  "rank": 0,
+                  "negative": false
+                },
+                "turn": 0
+              },
+              "chi_same": {
+                "magnitude": 3310119666,
+                "rank": {
+                  "magnitude": 828,
+                  "rank": 0,
+                  "negative": false
+                },
+                "turn": 0
+              },
+              "winding": "none",
+              "deed": "ride",
+              "standing_read": null,
+              "hand_exact": true
+            }
+          ]
+        },
+        {
+          "lineage": 4,
+          "ended": false,
+          "consequence": {
+            "sha256": "2418f2ed9a574c4a0a211740bb9e4ff7a65752a7fcd833814d0d33cb326ca0c1",
+            "fold": null,
+            "perception_present": false,
+            "step_present": false
+          },
+          "emissions": [
+            {
+              "position": {
+                "real": {
+                  "magnitude": 3365244909,
+                  "rank": {
+                    "magnitude": 0,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                },
+                "imaginary": {
+                  "magnitude": 106255938,
+                  "rank": {
+                    "magnitude": 0,
+                    "rank": 0,
+                    "negative": false
+                  },
+                  "turn": 0
+                }
+              },
+              "chi_other": {
+                "magnitude": 106255938,
+                "rank": {
+                  "magnitude": 240,
+                  "rank": 0,
+                  "negative": false
+                },
+                "turn": 0
+              },
+              "chi_same": {
+                "magnitude": 3365244909,
+                "rank": {
+                  "magnitude": 240,
+                  "rank": 0,
+                  "negative": false
+                },
+                "turn": 0
+              },
+              "winding": "none",
+              "deed": "ride",
+              "standing_read": null,
+              "hand_exact": true
+            }
+          ]
+        }
+      ]
+    },
+    "probes_equal": false,
+    "final_rest_images_equal": false,
+    "direct_memory": {
+      "standing_cells": 67,
+      "live_lineages": 8,
+      "carrier_words": 3014,
+      "overflow_nodes": 0
+    },
+    "returned_memory": {
+      "standing_cells": 69,
+      "live_lineages": 9,
+      "carrier_words": 3288,
+      "overflow_nodes": 0
+    }
+  },
+  "controls": {
+    "exact_prime_exclusion_through_horizon": true,
+    "every_radix_reconstructs_the_integer": true,
+    "same_endpoint_different_order": true,
+    "zeta_condition_rebase_exact": true,
+    "same_probability_different_phase": true,
+    "same_decimal_residue_all_s4_species": true,
+    "changed_receiver_merges_species": true,
+    "held_out_same_species_recurrence": true,
+    "ramification_refuses_unramified_class": true,
+    "every_engine_emission_read_with_exact_hand": true,
+    "actual_world_return_changes_later_probe": true
+  }
+}

@@ -1,0 +1,2616 @@
+{
+  "schema": "eros.formula-ecology.v1",
+  "status": "accepted",
+  "question": "can exact source-departed generators for e, pi, and the Euler/Zeta prime relation compose into a readable occurrence complex whose commuting and open faces are formed by actual later consequences?",
+  "theory_to_structure": "law definition -> oriented cellular Standing; explicit objective -> recruited local law population; generic exact world conduct -> returned formula value; parallel returned values -> commuting or OPEN comparison; returned comparisons -> higher relation complex",
+  "stopping_condition": "the full Euler triangle and e triangle commute exactly, the missing-prime-power foil remains open only on prime squares, the finite pi/Zeta comparison retains exact overlap and tails without claiming limit equality, every relation returns as Standing, and the whole complex remounts exactly",
+  "deposit": {
+    "source_laws": [
+      {
+        "name": "formal-exp",
+        "kind": "formal_exp",
+        "handle": {
+          "data_namespace": "0x30ab7361f284cc8b",
+          "recruit_namespace": "0x256c6659fa826db7",
+          "generation": 0
+        },
+        "encoded_bytes": 52,
+        "encoded_sha256": "21d9194449b3064bb66d62a24f2f03a4dd911340fe3db5454b119241ac42f894",
+        "constituent": {
+          "grain": 2,
+          "axes": 1,
+          "cells": 3,
+          "incidences": 417,
+          "pins": 417,
+          "boundaries": 417,
+          "exposed_pins": 417,
+          "open_pins": 0,
+          "found_pins": 0,
+          "native_sha256": "7725692dc805e2b760d1c0380683640e5c4a0850957f447d7429b800ef68c5b6"
+        }
+      },
+      {
+        "name": "euler-log",
+        "kind": "euler_log",
+        "handle": {
+          "data_namespace": "0xcedf8922594f6186",
+          "recruit_namespace": "0xf57974850a263f7f",
+          "generation": 0
+        },
+        "encoded_bytes": 51,
+        "encoded_sha256": "abcdbfe293c0c10b40d2837793738342c475d582873052756bdd08012112ca2d",
+        "constituent": {
+          "grain": 2,
+          "axes": 1,
+          "cells": 3,
+          "incidences": 409,
+          "pins": 409,
+          "boundaries": 409,
+          "exposed_pins": 409,
+          "open_pins": 0,
+          "found_pins": 0,
+          "native_sha256": "10cad54e6767b954596870541f612b5a90ee17ee6224b8142f1ba050a8f49408"
+        }
+      },
+      {
+        "name": "euler-product",
+        "kind": "euler_product",
+        "handle": {
+          "data_namespace": "0x540f52c3e19deb11",
+          "recruit_namespace": "0x6717c785ac671c02",
+          "generation": 0
+        },
+        "encoded_bytes": 55,
+        "encoded_sha256": "f250800e6c92c33413e35594ae5ef04426bf31f31a1ef0ca594eed2f1824951b",
+        "constituent": {
+          "grain": 2,
+          "axes": 1,
+          "cells": 3,
+          "incidences": 441,
+          "pins": 441,
+          "boundaries": 441,
+          "exposed_pins": 441,
+          "open_pins": 441,
+          "found_pins": 0,
+          "native_sha256": "5f8785feafd0a04e4132e31ebdc256ea8718430093a9defcfd3a6bcf9f2993d2"
+        }
+      },
+      {
+        "name": "factorial-recurrence",
+        "kind": "factorial_recurrence",
+        "handle": {
+          "data_namespace": "0x7e1095ae2ac90ec7",
+          "recruit_namespace": "0xe561a03d81a3dc7c",
+          "generation": 0
+        },
+        "encoded_bytes": 62,
+        "encoded_sha256": "9013d01dca8eae7a519bbb527aa0e2cfee45ea6e07b2d847d134c8cd9987ae87",
+        "constituent": {
+          "grain": 2,
+          "axes": 1,
+          "cells": 3,
+          "incidences": 497,
+          "pins": 497,
+          "boundaries": 497,
+          "exposed_pins": 497,
+          "open_pins": 0,
+          "found_pins": 0,
+          "native_sha256": "e31b900574e3df26fcffb583061f822424a40f8740edb5aa80cd82bba6429ae2"
+        }
+      },
+      {
+        "name": "machin-arctan",
+        "kind": "machin_arctan",
+        "handle": {
+          "data_namespace": "0x273b243a3093fd15",
+          "recruit_namespace": "0xa31c261bb5460cc7",
+          "generation": 0
+        },
+        "encoded_bytes": 55,
+        "encoded_sha256": "5dfdc6e8bd357dbbbd19a282fb3bcef082bd5f5057d3d7dd16be896dfc483263",
+        "constituent": {
+          "grain": 2,
+          "axes": 1,
+          "cells": 3,
+          "incidences": 441,
+          "pins": 441,
+          "boundaries": 441,
+          "exposed_pins": 441,
+          "open_pins": 441,
+          "found_pins": 0,
+          "native_sha256": "c12fdb4eba87e98172f78891a6cd329776d56e20a78ee960e7798b0bca85203f"
+        }
+      },
+      {
+        "name": "dirichlet-zeta2",
+        "kind": "dirichlet_zeta2",
+        "handle": {
+          "data_namespace": "0x04e90dec5900ea70",
+          "recruit_namespace": "0xdbcd8bf70febae30",
+          "generation": 0
+        },
+        "encoded_bytes": 57,
+        "encoded_sha256": "485aaa324082720ebf06832592cee9e9cf3cd3fee2a030d8d2f55565d914b5a8",
+        "constituent": {
+          "grain": 2,
+          "axes": 1,
+          "cells": 3,
+          "incidences": 457,
+          "pins": 457,
+          "boundaries": 457,
+          "exposed_pins": 457,
+          "open_pins": 457,
+          "found_pins": 0,
+          "native_sha256": "a9ec97bd6ff6f9e46cc83a50fad4d630b73e00156f2904472da788efb74de8f8"
+        }
+      },
+      {
+        "name": "exact-comparison",
+        "kind": "exact_comparison",
+        "handle": {
+          "data_namespace": "0x3445f410e9a05639",
+          "recruit_namespace": "0xb3dd214a73b4ecd3",
+          "generation": 0
+        },
+        "encoded_bytes": 58,
+        "encoded_sha256": "43503a443c2c0a77c66ef23e28d5cfab3fbc3e201e11e986765b311d25877119",
+        "constituent": {
+          "grain": 2,
+          "axes": 1,
+          "cells": 3,
+          "incidences": 465,
+          "pins": 465,
+          "boundaries": 465,
+          "exposed_pins": 465,
+          "open_pins": 465,
+          "found_pins": 0,
+          "native_sha256": "d84df4e169069ed5a30475e14151b7b39e7bdf8b94a6f5b320dfc023f9dfde99"
+        }
+      },
+      {
+        "name": "complex-assembly",
+        "kind": "complex_assembly",
+        "handle": {
+          "data_namespace": "0xf22bee3b108c62be",
+          "recruit_namespace": "0xbd945d1cf9c8aadd",
+          "generation": 0
+        },
+        "encoded_bytes": 58,
+        "encoded_sha256": "fe4ca615b673296ef34361e7534b6e6a563b828096e8077387f43694d51ce85f",
+        "constituent": {
+          "grain": 2,
+          "axes": 1,
+          "cells": 3,
+          "incidences": 465,
+          "pins": 465,
+          "boundaries": 465,
+          "exposed_pins": 465,
+          "open_pins": 465,
+          "found_pins": 0,
+          "native_sha256": "d6ccce7553f213272c5e44e69d7987c427f2f015b5e07823169c6374f1c21c8c"
+        }
+      }
+    ],
+    "source_lineages_after_event": 0,
+    "machine": {
+      "standing_rank": 6,
+      "standing_cells": 47,
+      "standing_constituents": 8,
+      "constituent_cells": 24,
+      "constituent_incidences": 3592,
+      "constituent_pins": 3592,
+      "constituent_paths": 3592,
+      "constituent_transport_terms": 4915,
+      "live_lineages": 0,
+      "rest_sha256": "8e7a8e475a1c9c483692795b2f34690bcacc796d37a8a8d0090ac11249a16408"
+    },
+    "no_law_control": {
+      "standing_rank": 6,
+      "standing_cells": 47,
+      "standing_constituents": 0,
+      "constituent_cells": 0,
+      "constituent_incidences": 0,
+      "constituent_pins": 0,
+      "constituent_paths": 0,
+      "constituent_transport_terms": 0,
+      "live_lineages": 0,
+      "rest_sha256": "455c5cbcd29d2669fed2b30958cf9e2d9672f02391fcdd521ac7f631ee737f87"
+    },
+    "rest_remount_exact": true
+  },
+  "controls": [
+    {
+      "role": "same interface and objective without law Standing",
+      "law_recovered": false,
+      "objective_recovered": true,
+      "constituent": {
+        "grain": 2,
+        "axes": 1,
+        "cells": 3,
+        "incidences": 338,
+        "pins": 338,
+        "boundaries": 338,
+        "exposed_pins": 338,
+        "open_pins": 338,
+        "found_pins": 0,
+        "native_sha256": "c3dc286daa769ff27933aaaecc555e8383f826fade33a2ae8b10c3d5e3ff3fb4"
+      }
+    },
+    {
+      "role": "law body present under a nonincident recruitment interface",
+      "law_recovered": false,
+      "objective_recovered": true,
+      "constituent": {
+        "grain": 2,
+        "axes": 1,
+        "cells": 3,
+        "incidences": 1546,
+        "pins": 1546,
+        "boundaries": 1546,
+        "exposed_pins": 1546,
+        "open_pins": 1546,
+        "found_pins": 0,
+        "native_sha256": "0b21a3739fc0d00993d98f35357b20e7d48482cfb01f429c4a29ddd1388dd113"
+      }
+    }
+  ],
+  "invocations": [
+    {
+      "event": "build-prime-log-full",
+      "law": "euler-log",
+      "recruited_artifacts": [],
+      "objective": {
+        "kind": "euler_log",
+        "primes": [
+          2,
+          3,
+          5
+        ],
+        "degree": 2,
+        "include_prime_power_repetitions": true
+      },
+      "law_recovered_from_standing": true,
+      "objective_recovered_from_current": true,
+      "result_artifact": "prime-log-full",
+      "result_handle": {
+        "data_namespace": "0x5fe508c04ed74f52",
+        "recruit_namespace": "0x74a0e5cc143f3fd1",
+        "generation": 0
+      },
+      "result": {
+        "kind": "polynomial",
+        "value": {
+          "axes": [
+            {
+              "kind": "prime",
+              "value": 2
+            },
+            {
+              "kind": "prime",
+              "value": 3
+            },
+            {
+              "kind": "prime",
+              "value": 5
+            }
+          ],
+          "degree": 2,
+          "terms": [
+            {
+              "monomial": [
+                0,
+                0,
+                1
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            },
+            {
+              "monomial": [
+                0,
+                0,
+                2
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "2"
+              }
+            },
+            {
+              "monomial": [
+                0,
+                1,
+                0
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            },
+            {
+              "monomial": [
+                0,
+                2,
+                0
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "2"
+              }
+            },
+            {
+              "monomial": [
+                1,
+                0,
+                0
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            },
+            {
+              "monomial": [
+                2,
+                0,
+                0
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "2"
+              }
+            }
+          ]
+        },
+        "evaluation_at_one": null
+      },
+      "meeting": {
+        "grain": 3,
+        "axes": 1,
+        "cells": 7,
+        "incidences": 1107,
+        "pins": 1107,
+        "boundaries": 1108,
+        "exposed_pins": 1105,
+        "open_pins": 698,
+        "found_pins": 0,
+        "native_sha256": "bae1bd3813b52559dcd313dabf323812a2a3b0162c7a90feda5a2f837f082bd6"
+      },
+      "returned_consequence": {
+        "grain": 2,
+        "axes": 1,
+        "cells": 3,
+        "incidences": 4745,
+        "pins": 4745,
+        "boundaries": 4745,
+        "exposed_pins": 4745,
+        "open_pins": 4745,
+        "found_pins": 0,
+        "native_sha256": "e3de720f52db68635fbdee96e473e5f7ff06a431aa3eea9127074b1a3ef281d1"
+      }
+    },
+    {
+      "event": "exp-prime-log-full",
+      "law": "formal-exp",
+      "recruited_artifacts": [
+        "prime-log-full"
+      ],
+      "objective": {
+        "kind": "formal_exp",
+        "degree": 2,
+        "input_namespace": "0x5fe508c04ed74f52",
+        "literal": null
+      },
+      "law_recovered_from_standing": true,
+      "objective_recovered_from_current": true,
+      "result_artifact": "prime-exp-full",
+      "result_handle": {
+        "data_namespace": "0xdeee8b413cdfd7d6",
+        "recruit_namespace": "0xa60e276a6dc549dd",
+        "generation": 0
+      },
+      "result": {
+        "kind": "polynomial",
+        "value": {
+          "axes": [
+            {
+              "kind": "prime",
+              "value": 2
+            },
+            {
+              "kind": "prime",
+              "value": 3
+            },
+            {
+              "kind": "prime",
+              "value": 5
+            }
+          ],
+          "degree": 2,
+          "terms": [
+            {
+              "monomial": [
+                0,
+                0,
+                0
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            },
+            {
+              "monomial": [
+                0,
+                0,
+                1
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            },
+            {
+              "monomial": [
+                0,
+                0,
+                2
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            },
+            {
+              "monomial": [
+                0,
+                1,
+                0
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            },
+            {
+              "monomial": [
+                0,
+                1,
+                1
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            },
+            {
+              "monomial": [
+                0,
+                2,
+                0
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            },
+            {
+              "monomial": [
+                1,
+                0,
+                0
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            },
+            {
+              "monomial": [
+                1,
+                0,
+                1
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            },
+            {
+              "monomial": [
+                1,
+                1,
+                0
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            },
+            {
+              "monomial": [
+                2,
+                0,
+                0
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            }
+          ]
+        },
+        "evaluation_at_one": null
+      },
+      "meeting": {
+        "grain": 3,
+        "axes": 1,
+        "cells": 10,
+        "incidences": 5854,
+        "pins": 5854,
+        "boundaries": 5856,
+        "exposed_pins": 5850,
+        "open_pins": 5437,
+        "found_pins": 0,
+        "native_sha256": "71e665a9c818efaf54fe4f9b2492b59b3fc269a84fc97ea272e41ac1d1c28acb"
+      },
+      "returned_consequence": {
+        "grain": 2,
+        "axes": 1,
+        "cells": 3,
+        "incidences": 7017,
+        "pins": 7017,
+        "boundaries": 7017,
+        "exposed_pins": 7017,
+        "open_pins": 7017,
+        "found_pins": 0,
+        "native_sha256": "edb55e41ed6b27a158dd4c3ef2a85657b12baf041f55abe6a5ac3797ab5bdc4a"
+      }
+    },
+    {
+      "event": "build-direct-euler-product",
+      "law": "euler-product",
+      "recruited_artifacts": [],
+      "objective": {
+        "kind": "euler_product",
+        "primes": [
+          2,
+          3,
+          5
+        ],
+        "degree": 2
+      },
+      "law_recovered_from_standing": true,
+      "objective_recovered_from_current": true,
+      "result_artifact": "prime-euler-direct",
+      "result_handle": {
+        "data_namespace": "0x61f35395b69a2355",
+        "recruit_namespace": "0x9aa2b9282d601366",
+        "generation": 0
+      },
+      "result": {
+        "kind": "polynomial",
+        "value": {
+          "axes": [
+            {
+              "kind": "prime",
+              "value": 2
+            },
+            {
+              "kind": "prime",
+              "value": 3
+            },
+            {
+              "kind": "prime",
+              "value": 5
+            }
+          ],
+          "degree": 2,
+          "terms": [
+            {
+              "monomial": [
+                0,
+                0,
+                0
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            },
+            {
+              "monomial": [
+                0,
+                0,
+                1
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            },
+            {
+              "monomial": [
+                0,
+                0,
+                2
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            },
+            {
+              "monomial": [
+                0,
+                1,
+                0
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            },
+            {
+              "monomial": [
+                0,
+                1,
+                1
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            },
+            {
+              "monomial": [
+                0,
+                2,
+                0
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            },
+            {
+              "monomial": [
+                1,
+                0,
+                0
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            },
+            {
+              "monomial": [
+                1,
+                0,
+                1
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            },
+            {
+              "monomial": [
+                1,
+                1,
+                0
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            },
+            {
+              "monomial": [
+                2,
+                0,
+                0
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            }
+          ]
+        },
+        "evaluation_at_one": null
+      },
+      "meeting": {
+        "grain": 3,
+        "axes": 1,
+        "cells": 7,
+        "incidences": 859,
+        "pins": 859,
+        "boundaries": 860,
+        "exposed_pins": 857,
+        "open_pins": 859,
+        "found_pins": 0,
+        "native_sha256": "eafb41bad63625672f8ad283323b480a2aa298ae2852ef4f0330098c2037fafd"
+      },
+      "returned_consequence": {
+        "grain": 2,
+        "axes": 1,
+        "cells": 3,
+        "incidences": 7017,
+        "pins": 7017,
+        "boundaries": 7017,
+        "exposed_pins": 7017,
+        "open_pins": 7017,
+        "found_pins": 0,
+        "native_sha256": "6850749fc37ac1e86ed1d8bae4c8847a3b332af7cfe05bb9a15e55338f006bf8"
+      }
+    },
+    {
+      "event": "compare-full-euler-routes",
+      "law": "exact-comparison",
+      "recruited_artifacts": [
+        "prime-exp-full",
+        "prime-euler-direct"
+      ],
+      "objective": {
+        "kind": "compare",
+        "mode": "exact_polynomial",
+        "left_namespace": "0xdeee8b413cdfd7d6",
+        "right_namespace": "0x61f35395b69a2355"
+      },
+      "law_recovered_from_standing": true,
+      "objective_recovered_from_current": true,
+      "result_artifact": "comparison-euler-full",
+      "result_handle": {
+        "data_namespace": "0x02202fa5b087fc02",
+        "recruit_namespace": "0xa423815c93966961",
+        "generation": 0
+      },
+      "result": {
+        "kind": "comparison",
+        "value": {
+          "mode": "exact_polynomial",
+          "status": "commutes",
+          "left_namespace": "0xdeee8b413cdfd7d6",
+          "right_namespace": "0x61f35395b69a2355",
+          "detail": {
+            "kind": "polynomial",
+            "residual_left_minus_right": {
+              "axes": [
+                {
+                  "kind": "prime",
+                  "value": 2
+                },
+                {
+                  "kind": "prime",
+                  "value": 3
+                },
+                {
+                  "kind": "prime",
+                  "value": 5
+                }
+              ],
+              "degree": 2,
+              "terms": []
+            },
+            "differing_terms": []
+          }
+        }
+      },
+      "meeting": {
+        "grain": 3,
+        "axes": 1,
+        "cells": 13,
+        "incidences": 15473,
+        "pins": 15473,
+        "boundaries": 15476,
+        "exposed_pins": 15467,
+        "open_pins": 15473,
+        "found_pins": 0,
+        "native_sha256": "f163cf87ce0ef4a136808ca4a1eafbf958a99ca36f52174ef4513eee46816e5c"
+      },
+      "returned_consequence": {
+        "grain": 2,
+        "axes": 1,
+        "cells": 3,
+        "incidences": 2785,
+        "pins": 2785,
+        "boundaries": 2785,
+        "exposed_pins": 2785,
+        "open_pins": 2785,
+        "found_pins": 0,
+        "native_sha256": "0bd09678277c3974562b68d8f42d6856cd58efa5134a550471d0457f4782a0c9"
+      }
+    },
+    {
+      "event": "build-prime-log-without-repetitions",
+      "law": "euler-log",
+      "recruited_artifacts": [],
+      "objective": {
+        "kind": "euler_log",
+        "primes": [
+          2,
+          3,
+          5
+        ],
+        "degree": 2,
+        "include_prime_power_repetitions": false
+      },
+      "law_recovered_from_standing": true,
+      "objective_recovered_from_current": true,
+      "result_artifact": "prime-log-foil",
+      "result_handle": {
+        "data_namespace": "0x82251db3c8b32164",
+        "recruit_namespace": "0x3a22a316ff18ba54",
+        "generation": 0
+      },
+      "result": {
+        "kind": "polynomial",
+        "value": {
+          "axes": [
+            {
+              "kind": "prime",
+              "value": 2
+            },
+            {
+              "kind": "prime",
+              "value": 3
+            },
+            {
+              "kind": "prime",
+              "value": 5
+            }
+          ],
+          "degree": 2,
+          "terms": [
+            {
+              "monomial": [
+                0,
+                0,
+                1
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            },
+            {
+              "monomial": [
+                0,
+                1,
+                0
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            },
+            {
+              "monomial": [
+                1,
+                0,
+                0
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            }
+          ]
+        },
+        "evaluation_at_one": null
+      },
+      "meeting": {
+        "grain": 4,
+        "axes": 1,
+        "cells": 11,
+        "incidences": 1813,
+        "pins": 1813,
+        "boundaries": 1815,
+        "exposed_pins": 1809,
+        "open_pins": 1404,
+        "found_pins": 0,
+        "native_sha256": "a656e2167a6a3c35563cd1915235511c3b9e472f3870bca0b45f4d7b438079cb"
+      },
+      "returned_consequence": {
+        "grain": 2,
+        "axes": 1,
+        "cells": 3,
+        "incidences": 3041,
+        "pins": 3041,
+        "boundaries": 3041,
+        "exposed_pins": 3041,
+        "open_pins": 3041,
+        "found_pins": 0,
+        "native_sha256": "f09849f7a32b6a036f3df19e5ca380df217e625ac165799e7607db622cb343ef"
+      }
+    },
+    {
+      "event": "exp-prime-log-without-repetitions",
+      "law": "formal-exp",
+      "recruited_artifacts": [
+        "prime-log-foil"
+      ],
+      "objective": {
+        "kind": "formal_exp",
+        "degree": 2,
+        "input_namespace": "0x82251db3c8b32164",
+        "literal": null
+      },
+      "law_recovered_from_standing": true,
+      "objective_recovered_from_current": true,
+      "result_artifact": "prime-exp-foil",
+      "result_handle": {
+        "data_namespace": "0x78c6f554870e59b8",
+        "recruit_namespace": "0x3257e406ff01ea14",
+        "generation": 0
+      },
+      "result": {
+        "kind": "polynomial",
+        "value": {
+          "axes": [
+            {
+              "kind": "prime",
+              "value": 2
+            },
+            {
+              "kind": "prime",
+              "value": 3
+            },
+            {
+              "kind": "prime",
+              "value": 5
+            }
+          ],
+          "degree": 2,
+          "terms": [
+            {
+              "monomial": [
+                0,
+                0,
+                0
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            },
+            {
+              "monomial": [
+                0,
+                0,
+                1
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            },
+            {
+              "monomial": [
+                0,
+                0,
+                2
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "2"
+              }
+            },
+            {
+              "monomial": [
+                0,
+                1,
+                0
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            },
+            {
+              "monomial": [
+                0,
+                1,
+                1
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            },
+            {
+              "monomial": [
+                0,
+                2,
+                0
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "2"
+              }
+            },
+            {
+              "monomial": [
+                1,
+                0,
+                0
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            },
+            {
+              "monomial": [
+                1,
+                0,
+                1
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            },
+            {
+              "monomial": [
+                1,
+                1,
+                0
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            },
+            {
+              "monomial": [
+                2,
+                0,
+                0
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "2"
+              }
+            }
+          ]
+        },
+        "evaluation_at_one": null
+      },
+      "meeting": {
+        "grain": 4,
+        "axes": 1,
+        "cells": 17,
+        "incidences": 9587,
+        "pins": 9587,
+        "boundaries": 9591,
+        "exposed_pins": 9579,
+        "open_pins": 9170,
+        "found_pins": 0,
+        "native_sha256": "12041de7a7a88afcbcc8f3107f3af6259203170e680862f0ea2e5ed9e032ce11"
+      },
+      "returned_consequence": {
+        "grain": 2,
+        "axes": 1,
+        "cells": 3,
+        "incidences": 7017,
+        "pins": 7017,
+        "boundaries": 7017,
+        "exposed_pins": 7017,
+        "open_pins": 7017,
+        "found_pins": 0,
+        "native_sha256": "1ea907bee12dcc178c3a11bb334054998fa0660f19cfd7e1e5f73c1fd9b74ead"
+      }
+    },
+    {
+      "event": "compare-missing-prime-power-route",
+      "law": "exact-comparison",
+      "recruited_artifacts": [
+        "prime-exp-foil",
+        "prime-euler-direct"
+      ],
+      "objective": {
+        "kind": "compare",
+        "mode": "exact_polynomial",
+        "left_namespace": "0x78c6f554870e59b8",
+        "right_namespace": "0x61f35395b69a2355"
+      },
+      "law_recovered_from_standing": true,
+      "objective_recovered_from_current": true,
+      "result_artifact": "comparison-euler-foil",
+      "result_handle": {
+        "data_namespace": "0xfcc80045e9adcdb3",
+        "recruit_namespace": "0x4c0f4dd326ad3b40",
+        "generation": 0
+      },
+      "result": {
+        "kind": "comparison",
+        "value": {
+          "mode": "exact_polynomial",
+          "status": "open",
+          "left_namespace": "0x78c6f554870e59b8",
+          "right_namespace": "0x61f35395b69a2355",
+          "detail": {
+            "kind": "polynomial",
+            "residual_left_minus_right": {
+              "axes": [
+                {
+                  "kind": "prime",
+                  "value": 2
+                },
+                {
+                  "kind": "prime",
+                  "value": 3
+                },
+                {
+                  "kind": "prime",
+                  "value": 5
+                }
+              ],
+              "degree": 2,
+              "terms": [
+                {
+                  "monomial": [
+                    0,
+                    0,
+                    2
+                  ],
+                  "coefficient": {
+                    "numerator": "-1",
+                    "denominator": "2"
+                  }
+                },
+                {
+                  "monomial": [
+                    0,
+                    2,
+                    0
+                  ],
+                  "coefficient": {
+                    "numerator": "-1",
+                    "denominator": "2"
+                  }
+                },
+                {
+                  "monomial": [
+                    2,
+                    0,
+                    0
+                  ],
+                  "coefficient": {
+                    "numerator": "-1",
+                    "denominator": "2"
+                  }
+                }
+              ]
+            },
+            "differing_terms": [
+              {
+                "monomial": [
+                  0,
+                  0,
+                  2
+                ],
+                "coefficient": {
+                  "numerator": "-1",
+                  "denominator": "2"
+                }
+              },
+              {
+                "monomial": [
+                  0,
+                  2,
+                  0
+                ],
+                "coefficient": {
+                  "numerator": "-1",
+                  "denominator": "2"
+                }
+              },
+              {
+                "monomial": [
+                  2,
+                  0,
+                  0
+                ],
+                "coefficient": {
+                  "numerator": "-1",
+                  "denominator": "2"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "meeting": {
+        "grain": 4,
+        "axes": 1,
+        "cells": 20,
+        "incidences": 23466,
+        "pins": 23466,
+        "boundaries": 23470,
+        "exposed_pins": 23452,
+        "open_pins": 23464,
+        "found_pins": 0,
+        "native_sha256": "2b881b48adafbd174c91f011bf031d22a87f1a7cf8104adeed2cb4c7ad8f8d30"
+      },
+      "returned_consequence": {
+        "grain": 2,
+        "axes": 1,
+        "cells": 3,
+        "incidences": 6193,
+        "pins": 6193,
+        "boundaries": 6193,
+        "exposed_pins": 6193,
+        "open_pins": 6193,
+        "found_pins": 0,
+        "native_sha256": "2e35a81d77a479dc8a5f11a7d3b62c6557750838858fbdbb79aebcae093a62de"
+      }
+    },
+    {
+      "event": "formal-exp-one-generator",
+      "law": "formal-exp",
+      "recruited_artifacts": [],
+      "objective": {
+        "kind": "formal_exp",
+        "degree": 8,
+        "input_namespace": null,
+        "literal": {
+          "axes": [
+            {
+              "kind": "symbol",
+              "name": "y"
+            }
+          ],
+          "degree": 8,
+          "terms": [
+            {
+              "monomial": [
+                1
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            }
+          ]
+        }
+      },
+      "law_recovered_from_standing": true,
+      "objective_recovered_from_current": true,
+      "result_artifact": "e-formal-exp",
+      "result_handle": {
+        "data_namespace": "0xd90d4460cc36796f",
+        "recruit_namespace": "0xb3090bae81c8a7bc",
+        "generation": 0
+      },
+      "result": {
+        "kind": "polynomial",
+        "value": {
+          "axes": [
+            {
+              "kind": "symbol",
+              "name": "y"
+            }
+          ],
+          "degree": 8,
+          "terms": [
+            {
+              "monomial": [
+                0
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            },
+            {
+              "monomial": [
+                1
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            },
+            {
+              "monomial": [
+                2
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "2"
+              }
+            },
+            {
+              "monomial": [
+                3
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "6"
+              }
+            },
+            {
+              "monomial": [
+                4
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "24"
+              }
+            },
+            {
+              "monomial": [
+                5
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "120"
+              }
+            },
+            {
+              "monomial": [
+                6
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "720"
+              }
+            },
+            {
+              "monomial": [
+                7
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "5040"
+              }
+            },
+            {
+              "monomial": [
+                8
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "40320"
+              }
+            }
+          ]
+        },
+        "evaluation_at_one": {
+          "numerator": "109601",
+          "denominator": "40320"
+        }
+      },
+      "meeting": {
+        "grain": 5,
+        "axes": 1,
+        "cells": 21,
+        "incidences": 11133,
+        "pins": 11133,
+        "boundaries": 11138,
+        "exposed_pins": 11123,
+        "open_pins": 10716,
+        "found_pins": 0,
+        "native_sha256": "97d8a11b1632f1e1661dc7c223e0815976251e5bde71b5c90e8089e7349ab4fe"
+      },
+      "returned_consequence": {
+        "grain": 2,
+        "axes": 1,
+        "cells": 3,
+        "incidences": 6161,
+        "pins": 6161,
+        "boundaries": 6161,
+        "exposed_pins": 6161,
+        "open_pins": 6161,
+        "found_pins": 0,
+        "native_sha256": "4dd596291908f3b1b3bc873e4fac3f3061325d5283451bb05c2c24ea1d7a30bf"
+      }
+    },
+    {
+      "event": "factorial-recurrence-one-generator",
+      "law": "factorial-recurrence",
+      "recruited_artifacts": [],
+      "objective": {
+        "kind": "factorial_recurrence",
+        "degree": 8
+      },
+      "law_recovered_from_standing": true,
+      "objective_recovered_from_current": true,
+      "result_artifact": "e-factorial",
+      "result_handle": {
+        "data_namespace": "0xd4859c8efba37210",
+        "recruit_namespace": "0x077b9a7a9f79267b",
+        "generation": 0
+      },
+      "result": {
+        "kind": "polynomial",
+        "value": {
+          "axes": [
+            {
+              "kind": "symbol",
+              "name": "y"
+            }
+          ],
+          "degree": 8,
+          "terms": [
+            {
+              "monomial": [
+                0
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            },
+            {
+              "monomial": [
+                1
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            },
+            {
+              "monomial": [
+                2
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "2"
+              }
+            },
+            {
+              "monomial": [
+                3
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "6"
+              }
+            },
+            {
+              "monomial": [
+                4
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "24"
+              }
+            },
+            {
+              "monomial": [
+                5
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "120"
+              }
+            },
+            {
+              "monomial": [
+                6
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "720"
+              }
+            },
+            {
+              "monomial": [
+                7
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "5040"
+              }
+            },
+            {
+              "monomial": [
+                8
+              ],
+              "coefficient": {
+                "numerator": "1",
+                "denominator": "40320"
+              }
+            }
+          ]
+        },
+        "evaluation_at_one": {
+          "numerator": "109601",
+          "denominator": "40320"
+        }
+      },
+      "meeting": {
+        "grain": 3,
+        "axes": 1,
+        "cells": 7,
+        "incidences": 835,
+        "pins": 835,
+        "boundaries": 836,
+        "exposed_pins": 833,
+        "open_pins": 338,
+        "found_pins": 0,
+        "native_sha256": "df3c1175cacc36e19581cc2a297c86eae1b9c41acd0a0bea8ef00b3523014478"
+      },
+      "returned_consequence": {
+        "grain": 2,
+        "axes": 1,
+        "cells": 3,
+        "incidences": 6161,
+        "pins": 6161,
+        "boundaries": 6161,
+        "exposed_pins": 6161,
+        "open_pins": 6161,
+        "found_pins": 0,
+        "native_sha256": "069940317e371d107526d824a7bc3d1ae77499ea768b1f3d834b0f98dd4ffb5d"
+      }
+    },
+    {
+      "event": "compare-e-routes",
+      "law": "exact-comparison",
+      "recruited_artifacts": [
+        "e-formal-exp",
+        "e-factorial"
+      ],
+      "objective": {
+        "kind": "compare",
+        "mode": "exact_polynomial",
+        "left_namespace": "0xd90d4460cc36796f",
+        "right_namespace": "0xd4859c8efba37210"
+      },
+      "law_recovered_from_standing": true,
+      "objective_recovered_from_current": true,
+      "result_artifact": "comparison-e",
+      "result_handle": {
+        "data_namespace": "0x220c3273e0fb22eb",
+        "recruit_namespace": "0x0036e06cc4e655bd",
+        "generation": 0
+      },
+      "result": {
+        "kind": "comparison",
+        "value": {
+          "mode": "exact_polynomial",
+          "status": "commutes",
+          "left_namespace": "0xd90d4460cc36796f",
+          "right_namespace": "0xd4859c8efba37210",
+          "detail": {
+            "kind": "polynomial",
+            "residual_left_minus_right": {
+              "axes": [
+                {
+                  "kind": "symbol",
+                  "name": "y"
+                }
+              ],
+              "degree": 8,
+              "terms": []
+            },
+            "differing_terms": []
+          }
+        }
+      },
+      "meeting": {
+        "grain": 5,
+        "axes": 1,
+        "cells": 30,
+        "incidences": 36762,
+        "pins": 36762,
+        "boundaries": 36769,
+        "exposed_pins": 36742,
+        "open_pins": 36760,
+        "found_pins": 0,
+        "native_sha256": "f9a27ec580b8291176710ca81029ad9395bfb19f91574574454bc1e5f8721d7e"
+      },
+      "returned_consequence": {
+        "grain": 2,
+        "axes": 1,
+        "cells": 3,
+        "incidences": 2369,
+        "pins": 2369,
+        "boundaries": 2369,
+        "exposed_pins": 2369,
+        "open_pins": 2369,
+        "found_pins": 0,
+        "native_sha256": "05c55b580b88a391c26c285a05ce6bc9cb32efad53f11255455ea660d9b0c0c0"
+      }
+    },
+    {
+      "event": "machin-rational-enclosure",
+      "law": "machin-arctan",
+      "recruited_artifacts": [],
+      "objective": {
+        "kind": "machin_arctan",
+        "terms": 5
+      },
+      "law_recovered_from_standing": true,
+      "objective_recovered_from_current": true,
+      "result_artifact": "pi-machin",
+      "result_handle": {
+        "data_namespace": "0x6e8c2a70c746f38c",
+        "recruit_namespace": "0xf88724404c7b7b01",
+        "generation": 0
+      },
+      "result": {
+        "kind": "pi_interval",
+        "terms": 5,
+        "value": {
+          "lower": {
+            "numerator": "90159814330711160623850657403076",
+            "denominator": "28698760246862382335602001953125"
+          },
+          "upper": {
+            "numerator": "206000752128714602309315467175106616",
+            "denominator": "65572075362441045655676878142578125"
+          }
+        }
+      },
+      "meeting": {
+        "grain": 3,
+        "axes": 1,
+        "cells": 7,
+        "incidences": 715,
+        "pins": 715,
+        "boundaries": 716,
+        "exposed_pins": 713,
+        "open_pins": 715,
+        "found_pins": 0,
+        "native_sha256": "2ebf1ef81b2bffe5a2a88f2282f7b4373659696078c45be980686a7380714744"
+      },
+      "returned_consequence": {
+        "grain": 2,
+        "axes": 1,
+        "cells": 3,
+        "incidences": 2089,
+        "pins": 2089,
+        "boundaries": 2089,
+        "exposed_pins": 2089,
+        "open_pins": 2089,
+        "found_pins": 0,
+        "native_sha256": "eb61249bfdf16462cc9441ac7001edf0fef2eba3eaec6fa4faedff453d902e20"
+      }
+    },
+    {
+      "event": "zeta2-dirichlet-and-euler",
+      "law": "dirichlet-zeta2",
+      "recruited_artifacts": [],
+      "objective": {
+        "kind": "dirichlet_zeta2",
+        "terms": 64,
+        "euler_primes": [
+          2,
+          3,
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          29,
+          31
+        ]
+      },
+      "law_recovered_from_standing": true,
+      "objective_recovered_from_current": true,
+      "result_artifact": "zeta2-bounded",
+      "result_handle": {
+        "data_namespace": "0xff61266a0d2206d5",
+        "recruit_namespace": "0xa5c515384510d79a",
+        "generation": 0
+      },
+      "result": {
+        "kind": "zeta2",
+        "terms": 64,
+        "dirichlet_enclosure": {
+          "lower": {
+            "numerator": "41409901935572392721815151397221689468404267553321859",
+            "denominator": "25413727004476294175336659010085214676345183380992000"
+          },
+          "upper": {
+            "numerator": "41806991420017334818304786694254270947722161043649859",
+            "denominator": "25413727004476294175336659010085214676345183380992000"
+          }
+        },
+        "finite_euler_product": {
+          "numerator": "82920037520482019",
+          "denominator": "50722704772300800"
+        },
+        "euler_primes": [
+          2,
+          3,
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          29,
+          31
+        ]
+      },
+      "meeting": {
+        "grain": 3,
+        "axes": 1,
+        "cells": 7,
+        "incidences": 1123,
+        "pins": 1123,
+        "boundaries": 1124,
+        "exposed_pins": 1121,
+        "open_pins": 1123,
+        "found_pins": 0,
+        "native_sha256": "dfca4da02e12dee86b7ff6d3d9b13c8463eaa99efc34ded22f04ea12b6efebd8"
+      },
+      "returned_consequence": {
+        "grain": 2,
+        "axes": 1,
+        "cells": 3,
+        "incidences": 3873,
+        "pins": 3873,
+        "boundaries": 3873,
+        "exposed_pins": 3873,
+        "open_pins": 3873,
+        "found_pins": 0,
+        "native_sha256": "01d906092ef2a6aa59b99f8bdb83187a8f2306a222e27a80b6ab30ef47191961"
+      }
+    },
+    {
+      "event": "compare-pi-squared-with-six-zeta2",
+      "law": "exact-comparison",
+      "recruited_artifacts": [
+        "pi-machin",
+        "zeta2-bounded"
+      ],
+      "objective": {
+        "kind": "compare",
+        "mode": "pi_squared_against_six_zeta2",
+        "left_namespace": "0x6e8c2a70c746f38c",
+        "right_namespace": "0xff61266a0d2206d5"
+      },
+      "law_recovered_from_standing": true,
+      "objective_recovered_from_current": true,
+      "result_artifact": "comparison-pi-zeta",
+      "result_handle": {
+        "data_namespace": "0x21acb1207b9b1e58",
+        "recruit_namespace": "0xfe0186cbda371cf1",
+        "generation": 0
+      },
+      "result": {
+        "kind": "comparison",
+        "value": {
+          "mode": "pi_squared_against_six_zeta2",
+          "status": "open",
+          "left_namespace": "0x6e8c2a70c746f38c",
+          "right_namespace": "0xff61266a0d2206d5",
+          "detail": {
+            "kind": "pi_zeta",
+            "pi_squared": {
+              "lower": {
+                "numerator": "8128792120148309568510870231652459917985345798570104004334261776",
+                "denominator": "823618839706888588296398431553474574862883402445316314697265625"
+              },
+              "upper": {
+                "numerator": "42436309877596113754767294534251795747802347005768122436321670966971456",
+                "denominator": "4299697067337647988988448434642438234298267769078493762516021728515625"
+              }
+            },
+            "six_zeta2": {
+              "lower": {
+                "numerator": "41409901935572392721815151397221689468404267553321859",
+                "denominator": "4235621167412715695889443168347535779390863896832000"
+              },
+              "upper": {
+                "numerator": "41806991420017334818304786694254270947722161043649859",
+                "denominator": "4235621167412715695889443168347535779390863896832000"
+              }
+            },
+            "overlap": {
+              "lower": {
+                "numerator": "8128792120148309568510870231652459917985345798570104004334261776",
+                "denominator": "823618839706888588296398431553474574862883402445316314697265625"
+              },
+              "upper": {
+                "numerator": "42436309877596113754767294534251795747802347005768122436321670966971456",
+                "denominator": "4299697067337647988988448434642438234298267769078493762516021728515625"
+              }
+            },
+            "finite_stage_identity_closed": false
+          }
+        }
+      },
+      "meeting": {
+        "grain": 6,
+        "axes": 1,
+        "cells": 40,
+        "incidences": 43794,
+        "pins": 43794,
+        "boundaries": 43804,
+        "exposed_pins": 43768,
+        "open_pins": 43792,
+        "found_pins": 0,
+        "native_sha256": "f23d97e0577796f0bde9299e2b58c1e6a2614580497409fb7724a66cc734703a"
+      },
+      "returned_consequence": {
+        "grain": 2,
+        "axes": 1,
+        "cells": 3,
+        "incidences": 10129,
+        "pins": 10129,
+        "boundaries": 10129,
+        "exposed_pins": 10129,
+        "open_pins": 10129,
+        "found_pins": 0,
+        "native_sha256": "c2b9b1b76c6387390d52ff8bbe2b5cd599edeb1c8475db4528b0c46036875170"
+      }
+    },
+    {
+      "event": "assemble-formula-relation-complex",
+      "law": "complex-assembly",
+      "recruited_artifacts": [
+        "comparison-euler-full",
+        "comparison-euler-foil",
+        "comparison-e",
+        "comparison-pi-zeta"
+      ],
+      "objective": {
+        "kind": "assemble",
+        "comparison_namespaces": [
+          "0x02202fa5b087fc02",
+          "0xfcc80045e9adcdb3",
+          "0x220c3273e0fb22eb",
+          "0x21acb1207b9b1e58"
+        ]
+      },
+      "law_recovered_from_standing": true,
+      "objective_recovered_from_current": true,
+      "result_artifact": "formula-relation-complex",
+      "result_handle": {
+        "data_namespace": "0x03c27be1632c549d",
+        "recruit_namespace": "0x7d5bbc44c75df6b8",
+        "generation": 0
+      },
+      "result": {
+        "kind": "complex",
+        "value": {
+          "comparisons": [
+            {
+              "namespace": "0x02202fa5b087fc02",
+              "mode": "exact_polynomial",
+              "status": "commutes"
+            },
+            {
+              "namespace": "0xfcc80045e9adcdb3",
+              "mode": "exact_polynomial",
+              "status": "open"
+            },
+            {
+              "namespace": "0x220c3273e0fb22eb",
+              "mode": "exact_polynomial",
+              "status": "commutes"
+            },
+            {
+              "namespace": "0x21acb1207b9b1e58",
+              "mode": "pi_squared_against_six_zeta2",
+              "status": "open"
+            }
+          ]
+        }
+      },
+      "meeting": {
+        "grain": 3,
+        "axes": 1,
+        "cells": 19,
+        "incidences": 22983,
+        "pins": 22983,
+        "boundaries": 22988,
+        "exposed_pins": 22973,
+        "open_pins": 22983,
+        "found_pins": 0,
+        "native_sha256": "4d08bb66edf9ba21228c487aa83b2c3006481028480d6cfdc1e8ac39fb2e5ded"
+      },
+      "returned_consequence": {
+        "grain": 2,
+        "axes": 1,
+        "cells": 3,
+        "incidences": 2977,
+        "pins": 2977,
+        "boundaries": 2977,
+        "exposed_pins": 2977,
+        "open_pins": 2977,
+        "found_pins": 0,
+        "native_sha256": "c41e8d7ccbaee48aef0dbc64f5d6562f83ec982bea60a922f67c3c8f8657df66"
+      }
+    }
+  ],
+  "relations": {
+    "prime_axes": [
+      2,
+      3,
+      5
+    ],
+    "degree_two_population": [
+      {
+        "monomial": "X_2",
+        "integer": 2,
+        "species": "prime",
+        "direct_euler_coefficient": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "exponential_coefficient": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "foil_coefficient": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "foil_residual": {
+          "numerator": "0",
+          "denominator": "1"
+        }
+      },
+      {
+        "monomial": "X_3",
+        "integer": 3,
+        "species": "prime",
+        "direct_euler_coefficient": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "exponential_coefficient": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "foil_coefficient": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "foil_residual": {
+          "numerator": "0",
+          "denominator": "1"
+        }
+      },
+      {
+        "monomial": "X_2^2",
+        "integer": 4,
+        "species": "semiprime",
+        "direct_euler_coefficient": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "exponential_coefficient": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "foil_coefficient": {
+          "numerator": "1",
+          "denominator": "2"
+        },
+        "foil_residual": {
+          "numerator": "-1",
+          "denominator": "2"
+        }
+      },
+      {
+        "monomial": "X_5",
+        "integer": 5,
+        "species": "prime",
+        "direct_euler_coefficient": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "exponential_coefficient": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "foil_coefficient": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "foil_residual": {
+          "numerator": "0",
+          "denominator": "1"
+        }
+      },
+      {
+        "monomial": "X_2 X_3",
+        "integer": 6,
+        "species": "semiprime",
+        "direct_euler_coefficient": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "exponential_coefficient": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "foil_coefficient": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "foil_residual": {
+          "numerator": "0",
+          "denominator": "1"
+        }
+      },
+      {
+        "monomial": "X_3^2",
+        "integer": 9,
+        "species": "semiprime",
+        "direct_euler_coefficient": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "exponential_coefficient": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "foil_coefficient": {
+          "numerator": "1",
+          "denominator": "2"
+        },
+        "foil_residual": {
+          "numerator": "-1",
+          "denominator": "2"
+        }
+      },
+      {
+        "monomial": "X_2 X_5",
+        "integer": 10,
+        "species": "semiprime",
+        "direct_euler_coefficient": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "exponential_coefficient": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "foil_coefficient": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "foil_residual": {
+          "numerator": "0",
+          "denominator": "1"
+        }
+      },
+      {
+        "monomial": "X_3 X_5",
+        "integer": 15,
+        "species": "semiprime",
+        "direct_euler_coefficient": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "exponential_coefficient": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "foil_coefficient": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "foil_residual": {
+          "numerator": "0",
+          "denominator": "1"
+        }
+      },
+      {
+        "monomial": "X_5^2",
+        "integer": 25,
+        "species": "semiprime",
+        "direct_euler_coefficient": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "exponential_coefficient": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "foil_coefficient": {
+          "numerator": "1",
+          "denominator": "2"
+        },
+        "foil_residual": {
+          "numerator": "-1",
+          "denominator": "2"
+        }
+      }
+    ],
+    "e_aperture": 8,
+    "e_partial": {
+      "numerator": "109601",
+      "denominator": "40320"
+    },
+    "machin_terms": 5,
+    "zeta_terms": 64,
+    "full_euler_comparison": {
+      "mode": "exact_polynomial",
+      "status": "commutes",
+      "left_namespace": "0xdeee8b413cdfd7d6",
+      "right_namespace": "0x61f35395b69a2355",
+      "detail": {
+        "kind": "polynomial",
+        "residual_left_minus_right": {
+          "axes": [
+            {
+              "kind": "prime",
+              "value": 2
+            },
+            {
+              "kind": "prime",
+              "value": 3
+            },
+            {
+              "kind": "prime",
+              "value": 5
+            }
+          ],
+          "degree": 2,
+          "terms": []
+        },
+        "differing_terms": []
+      }
+    },
+    "missing_prime_power_foil": {
+      "mode": "exact_polynomial",
+      "status": "open",
+      "left_namespace": "0x78c6f554870e59b8",
+      "right_namespace": "0x61f35395b69a2355",
+      "detail": {
+        "kind": "polynomial",
+        "residual_left_minus_right": {
+          "axes": [
+            {
+              "kind": "prime",
+              "value": 2
+            },
+            {
+              "kind": "prime",
+              "value": 3
+            },
+            {
+              "kind": "prime",
+              "value": 5
+            }
+          ],
+          "degree": 2,
+          "terms": [
+            {
+              "monomial": [
+                0,
+                0,
+                2
+              ],
+              "coefficient": {
+                "numerator": "-1",
+                "denominator": "2"
+              }
+            },
+            {
+              "monomial": [
+                0,
+                2,
+                0
+              ],
+              "coefficient": {
+                "numerator": "-1",
+                "denominator": "2"
+              }
+            },
+            {
+              "monomial": [
+                2,
+                0,
+                0
+              ],
+              "coefficient": {
+                "numerator": "-1",
+                "denominator": "2"
+              }
+            }
+          ]
+        },
+        "differing_terms": [
+          {
+            "monomial": [
+              0,
+              0,
+              2
+            ],
+            "coefficient": {
+              "numerator": "-1",
+              "denominator": "2"
+            }
+          },
+          {
+            "monomial": [
+              0,
+              2,
+              0
+            ],
+            "coefficient": {
+              "numerator": "-1",
+              "denominator": "2"
+            }
+          },
+          {
+            "monomial": [
+              2,
+              0,
+              0
+            ],
+            "coefficient": {
+              "numerator": "-1",
+              "denominator": "2"
+            }
+          }
+        ]
+      }
+    },
+    "e_comparison": {
+      "mode": "exact_polynomial",
+      "status": "commutes",
+      "left_namespace": "0xd90d4460cc36796f",
+      "right_namespace": "0xd4859c8efba37210",
+      "detail": {
+        "kind": "polynomial",
+        "residual_left_minus_right": {
+          "axes": [
+            {
+              "kind": "symbol",
+              "name": "y"
+            }
+          ],
+          "degree": 8,
+          "terms": []
+        },
+        "differing_terms": []
+      }
+    },
+    "pi_zeta_comparison": {
+      "mode": "pi_squared_against_six_zeta2",
+      "status": "open",
+      "left_namespace": "0x6e8c2a70c746f38c",
+      "right_namespace": "0xff61266a0d2206d5",
+      "detail": {
+        "kind": "pi_zeta",
+        "pi_squared": {
+          "lower": {
+            "numerator": "8128792120148309568510870231652459917985345798570104004334261776",
+            "denominator": "823618839706888588296398431553474574862883402445316314697265625"
+          },
+          "upper": {
+            "numerator": "42436309877596113754767294534251795747802347005768122436321670966971456",
+            "denominator": "4299697067337647988988448434642438234298267769078493762516021728515625"
+          }
+        },
+        "six_zeta2": {
+          "lower": {
+            "numerator": "41409901935572392721815151397221689468404267553321859",
+            "denominator": "4235621167412715695889443168347535779390863896832000"
+          },
+          "upper": {
+            "numerator": "41806991420017334818304786694254270947722161043649859",
+            "denominator": "4235621167412715695889443168347535779390863896832000"
+          }
+        },
+        "overlap": {
+          "lower": {
+            "numerator": "8128792120148309568510870231652459917985345798570104004334261776",
+            "denominator": "823618839706888588296398431553474574862883402445316314697265625"
+          },
+          "upper": {
+            "numerator": "42436309877596113754767294534251795747802347005768122436321670966971456",
+            "denominator": "4299697067337647988988448434642438234298267769078493762516021728515625"
+          }
+        },
+        "finite_stage_identity_closed": false
+      }
+    }
+  },
+  "occurrence_complex": {
+    "zero_cells": [
+      {
+        "artifact": "comparison-e",
+        "origin": "comparison_return",
+        "data_namespace": "0x220c3273e0fb22eb"
+      },
+      {
+        "artifact": "comparison-euler-foil",
+        "origin": "comparison_return",
+        "data_namespace": "0xfcc80045e9adcdb3"
+      },
+      {
+        "artifact": "comparison-euler-full",
+        "origin": "comparison_return",
+        "data_namespace": "0x02202fa5b087fc02"
+      },
+      {
+        "artifact": "comparison-pi-zeta",
+        "origin": "comparison_return",
+        "data_namespace": "0x21acb1207b9b1e58"
+      },
+      {
+        "artifact": "complex-assembly",
+        "origin": "source_law",
+        "data_namespace": "0xf22bee3b108c62be"
+      },
+      {
+        "artifact": "dirichlet-zeta2",
+        "origin": "source_law",
+        "data_namespace": "0x04e90dec5900ea70"
+      },
+      {
+        "artifact": "e-factorial",
+        "origin": "generative_consequence",
+        "data_namespace": "0xd4859c8efba37210"
+      },
+      {
+        "artifact": "e-formal-exp",
+        "origin": "generative_consequence",
+        "data_namespace": "0xd90d4460cc36796f"
+      },
+      {
+        "artifact": "euler-log",
+        "origin": "source_law",
+        "data_namespace": "0xcedf8922594f6186"
+      },
+      {
+        "artifact": "euler-product",
+        "origin": "source_law",
+        "data_namespace": "0x540f52c3e19deb11"
+      },
+      {
+        "artifact": "exact-comparison",
+        "origin": "source_law",
+        "data_namespace": "0x3445f410e9a05639"
+      },
+      {
+        "artifact": "factorial-recurrence",
+        "origin": "source_law",
+        "data_namespace": "0x7e1095ae2ac90ec7"
+      },
+      {
+        "artifact": "formal-exp",
+        "origin": "source_law",
+        "data_namespace": "0x30ab7361f284cc8b"
+      },
+      {
+        "artifact": "formula-relation-complex",
+        "origin": "higher_complex_return",
+        "data_namespace": "0x03c27be1632c549d"
+      },
+      {
+        "artifact": "machin-arctan",
+        "origin": "source_law",
+        "data_namespace": "0x273b243a3093fd15"
+      },
+      {
+        "artifact": "pi-machin",
+        "origin": "generative_consequence",
+        "data_namespace": "0x6e8c2a70c746f38c"
+      },
+      {
+        "artifact": "prime-euler-direct",
+        "origin": "generative_consequence",
+        "data_namespace": "0x61f35395b69a2355"
+      },
+      {
+        "artifact": "prime-exp-foil",
+        "origin": "generative_consequence",
+        "data_namespace": "0x78c6f554870e59b8"
+      },
+      {
+        "artifact": "prime-exp-full",
+        "origin": "generative_consequence",
+        "data_namespace": "0xdeee8b413cdfd7d6"
+      },
+      {
+        "artifact": "prime-log-foil",
+        "origin": "generative_consequence",
+        "data_namespace": "0x82251db3c8b32164"
+      },
+      {
+        "artifact": "prime-log-full",
+        "origin": "generative_consequence",
+        "data_namespace": "0x5fe508c04ed74f52"
+      },
+      {
+        "artifact": "zeta2-bounded",
+        "origin": "generative_consequence",
+        "data_namespace": "0xff61266a0d2206d5"
+      }
+    ],
+    "one_cells": [
+      {
+        "event": "build-prime-log-full",
+        "law": "euler-log",
+        "inputs": [],
+        "output": "prime-log-full"
+      },
+      {
+        "event": "exp-prime-log-full",
+        "law": "formal-exp",
+        "inputs": [
+          "prime-log-full"
+        ],
+        "output": "prime-exp-full"
+      },
+      {
+        "event": "build-direct-euler-product",
+        "law": "euler-product",
+        "inputs": [],
+        "output": "prime-euler-direct"
+      },
+      {
+        "event": "compare-full-euler-routes",
+        "law": "exact-comparison",
+        "inputs": [
+          "prime-exp-full",
+          "prime-euler-direct"
+        ],
+        "output": "comparison-euler-full"
+      },
+      {
+        "event": "build-prime-log-without-repetitions",
+        "law": "euler-log",
+        "inputs": [],
+        "output": "prime-log-foil"
+      },
+      {
+        "event": "exp-prime-log-without-repetitions",
+        "law": "formal-exp",
+        "inputs": [
+          "prime-log-foil"
+        ],
+        "output": "prime-exp-foil"
+      },
+      {
+        "event": "compare-missing-prime-power-route",
+        "law": "exact-comparison",
+        "inputs": [
+          "prime-exp-foil",
+          "prime-euler-direct"
+        ],
+        "output": "comparison-euler-foil"
+      },
+      {
+        "event": "formal-exp-one-generator",
+        "law": "formal-exp",
+        "inputs": [],
+        "output": "e-formal-exp"
+      },
+      {
+        "event": "factorial-recurrence-one-generator",
+        "law": "factorial-recurrence",
+        "inputs": [],
+        "output": "e-factorial"
+      },
+      {
+        "event": "compare-e-routes",
+        "law": "exact-comparison",
+        "inputs": [
+          "e-formal-exp",
+          "e-factorial"
+        ],
+        "output": "comparison-e"
+      },
+      {
+        "event": "machin-rational-enclosure",
+        "law": "machin-arctan",
+        "inputs": [],
+        "output": "pi-machin"
+      },
+      {
+        "event": "zeta2-dirichlet-and-euler",
+        "law": "dirichlet-zeta2",
+        "inputs": [],
+        "output": "zeta2-bounded"
+      },
+      {
+        "event": "compare-pi-squared-with-six-zeta2",
+        "law": "exact-comparison",
+        "inputs": [
+          "pi-machin",
+          "zeta2-bounded"
+        ],
+        "output": "comparison-pi-zeta"
+      },
+      {
+        "event": "assemble-formula-relation-complex",
+        "law": "complex-assembly",
+        "inputs": [
+          "comparison-euler-full",
+          "comparison-euler-foil",
+          "comparison-e",
+          "comparison-pi-zeta"
+        ],
+        "output": "formula-relation-complex"
+      }
+    ],
+    "two_cells": [
+      {
+        "namespace": "0x02202fa5b087fc02",
+        "mode": "exact_polynomial",
+        "status": "commutes"
+      },
+      {
+        "namespace": "0xfcc80045e9adcdb3",
+        "mode": "exact_polynomial",
+        "status": "open"
+      },
+      {
+        "namespace": "0x220c3273e0fb22eb",
+        "mode": "exact_polynomial",
+        "status": "commutes"
+      },
+      {
+        "namespace": "0x21acb1207b9b1e58",
+        "mode": "pi_squared_against_six_zeta2",
+        "status": "open"
+      }
+    ],
+    "final_complex_artifact": "formula-relation-complex",
+    "final_complex": {
+      "comparisons": [
+        {
+          "namespace": "0x02202fa5b087fc02",
+          "mode": "exact_polynomial",
+          "status": "commutes"
+        },
+        {
+          "namespace": "0xfcc80045e9adcdb3",
+          "mode": "exact_polynomial",
+          "status": "open"
+        },
+        {
+          "namespace": "0x220c3273e0fb22eb",
+          "mode": "exact_polynomial",
+          "status": "commutes"
+        },
+        {
+          "namespace": "0x21acb1207b9b1e58",
+          "mode": "pi_squared_against_six_zeta2",
+          "status": "open"
+        }
+      ]
+    },
+    "final_machine": {
+      "standing_rank": 6,
+      "standing_cells": 57,
+      "standing_constituents": 9,
+      "constituent_cells": 122,
+      "constituent_incidences": 86232,
+      "constituent_pins": 86232,
+      "constituent_paths": 86258,
+      "constituent_transport_terms": 87581,
+      "live_lineages": 0,
+      "rest_sha256": "62514a4055b2a40fe01f7b58127eb5d5058e0f021baa7b528303abeca39a3f9c"
+    },
+    "rest_remount_exact": true
+  },
+  "acceptance": {
+    "source_law_lineages_departed": true,
+    "source_laws_recovered_only_from_standing": true,
+    "no_law_and_wrong_interface_refused": true,
+    "full_euler_paths_commuted": true,
+    "missing_prime_power_path_open_only_on_prime_squares": true,
+    "same_formal_exp_law_served_prime_and_e_faces": true,
+    "e_paths_commuted_exactly": true,
+    "pi_zeta_finite_paths_remained_open_with_exact_overlap": true,
+    "every_derived_comparison_returned_as_later_standing": true,
+    "final_complex_survived_exact_rest_remount": true,
+    "no_floating_point_causal_data": true
+  },
+  "conclusion": "the world did not hand Soma a finished formula taxonomy. Eight finite generators crossed once and their source lineages ended. Explicit objectives recruited them from Standing; exact consequences returned; independent paths formed two commuting triangles and two scoped OPEN faces; the prime-power foil localized its residual to the repeated-prime diagonal; and the four comparisons became one remountable higher relation complex."
+}

@@ -1,0 +1,2933 @@
+{
+  "schema": "eros.pretrained-ecology-cultivation.report.v1",
+  "status": "accepted",
+  "question": "can a pretrained fixed-basis ecology supply only locally recruited constituents during cultivation, then leave those constituents to conduct changed-operation holdouts without further source retrieval?",
+  "theory_to_structure": "one source factor column on five declared receiver axes -> one cellular Standing constituent; one context activation population -> one transient current branch; OPEN receiver face -> one bounded co-present source return; frozen holdout -> source-absent conduct only",
+  "stopping_condition": "one fixed pass; at most 32 source factors per cultivation current; zero source factors on three operation-order holdouts",
+  "source": {
+    "observation_id": "eros-pretrained-ecology-cultivation-01",
+    "source_sha256": "38f52aecd3c19d79a1d3a41a65647e79ac39d81823c24b52ae7b5c0e411e784c",
+    "repository": "allenai/OLMo-2-0425-1B-Instruct",
+    "revision": "48d788eca847d4d7548f375ad03d3c9312f6139e",
+    "model_sha256": "36d044c73655bb904f822915e6294ba3dae8e6e1af5e703e9d452f2d6a3a294f",
+    "layer": 7,
+    "receiver_axes": [
+      76,
+      856,
+      954,
+      1326,
+      1476
+    ],
+    "source_factors": 8192,
+    "initial_factors": [
+      579,
+      1400,
+      1917,
+      2195,
+      3748,
+      4901
+    ],
+    "receiver_boundary": "exact orientation vector followed by exact descending signed-axis order",
+    "recruitment_law": "repair the first orientation mismatch with the greatest target-oriented unseen contribution; otherwise repair the first order mismatch with the greatest exact pairwise difference; factor ordinal breaks exact ties",
+    "full_source_contexts_verified": 12,
+    "full_source_faces_agree": 12,
+    "source_testimony": {
+      "events_artifact": {
+        "path": "experiments/informant-ecology/results/transformer-relational-field-01/events.jsonl",
+        "sha256": "3bd3da2ce17d017c862aabbf8c2203f3b8715f1f77e3bf367442ac68b9aea1d0"
+      },
+      "physical_mlp_words": 5572608,
+      "physical_mlp_words_exact": 5572608,
+      "seed_artifact": {
+        "path": "src/soma/observations/eros-transformer-contextual-hexis-01/SOURCE.json",
+        "sha256": "b84febb3fed8391a232898febf688b3baca1bab8a7f92cb1b9d501cb6f0decc4"
+      },
+      "source_commit": "1cc3631000bb35ad5afe1c8777eab36c3a948957",
+      "source_status": ""
+    },
+    "source_environment": {
+      "cublas_workspace_config": ":4096:8",
+      "cuda_capability": [
+        8,
+        9
+      ],
+      "cuda_device": "NVIDIA GeForce RTX 4080 SUPER",
+      "deterministic_algorithms": true,
+      "nvidia_smi": "NVIDIA GeForce RTX 4080 SUPER, 16376 MiB, 595.71.05",
+      "packages": {
+        "huggingface-hub": "1.15.0",
+        "safetensors": "0.7.0",
+        "torch": "2.10.0",
+        "transformers": "5.8.1"
+      },
+      "platform": "Linux-7.0.5-2-cachyos-x86_64-with-glibc2.43",
+      "python": "3.12.12 (main, Dec  9 2025, 19:02:36) [Clang 21.1.4 ]",
+      "tf32_matmul": false,
+      "torch_cuda": "12.8"
+    }
+  },
+  "initial_deposit": {
+    "factors": [
+      579,
+      1400,
+      1917,
+      2195,
+      3748,
+      4901
+    ],
+    "encoded_bits": 1968,
+    "returned_exact": true,
+    "source_lineages_departed": true,
+    "rest_remount_exact": true,
+    "standing_before": 0,
+    "standing_after": 6,
+    "machine": {
+      "standing_rank": 6,
+      "standing_cells": 25,
+      "standing_constituents": 6,
+      "constituent_cells": 18,
+      "constituent_incidences": 1974,
+      "constituent_pins": 1974,
+      "constituent_paths": 1974,
+      "constituent_transport_terms": 3948,
+      "live_lineages": 0,
+      "rest_sha256": "b8ab334f6fb04d4162ad2c8c3a7542a6e38da9e3878bc44c23da55176bb023cf"
+    }
+  },
+  "cultivation": [
+    {
+      "phase": "cultivation",
+      "current_id": "drop_then_reverse.conversation.absent",
+      "context": "conversation",
+      "condition": "absent",
+      "prompt_sha256": "c2c4299fddb15b178438da6b674e104acafdef30f464ce4945e57591141d5c94",
+      "prompt_extent": 136,
+      "receiver_position": 135,
+      "full_source_factors": 8192,
+      "standing_factors_before": 6,
+      "standing_factors_after": 6,
+      "initial_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1326,
+          1476,
+          76,
+          954,
+          856
+        ]
+      },
+      "target_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1326,
+          1476,
+          76,
+          954,
+          856
+        ]
+      },
+      "initial_residual": [
+        {
+          "coefficient": "-1125809",
+          "power_of_two": -23,
+          "exact_ratio": "-1125809/2^23",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-1862321",
+          "power_of_two": -21,
+          "exact_ratio": "-1862321/2^21",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-5823109",
+          "power_of_two": -25,
+          "exact_ratio": "-5823109/2^25",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "2128729",
+          "power_of_two": -24,
+          "exact_ratio": "2128729/2^24",
+          "orientation": "positive"
+        },
+        {
+          "coefficient": "1310067",
+          "power_of_two": -23,
+          "exact_ratio": "1310067/2^23",
+          "orientation": "positive"
+        }
+      ],
+      "recruitment": [],
+      "source_retrievals": 0,
+      "source_candidate_evaluations": 0,
+      "recruitment_stopped_without_candidate": false,
+      "deposit": null,
+      "final_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1326,
+          1476,
+          76,
+          954,
+          856
+        ]
+      },
+      "final_residual": [
+        {
+          "coefficient": "-1125809",
+          "power_of_two": -23,
+          "exact_ratio": "-1125809/2^23",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-1862321",
+          "power_of_two": -21,
+          "exact_ratio": "-1862321/2^21",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-5823109",
+          "power_of_two": -25,
+          "exact_ratio": "-5823109/2^25",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "2128729",
+          "power_of_two": -24,
+          "exact_ratio": "2128729/2^24",
+          "orientation": "positive"
+        },
+        {
+          "coefficient": "1310067",
+          "power_of_two": -23,
+          "exact_ratio": "1310067/2^23",
+          "orientation": "positive"
+        }
+      ],
+      "orientation_closed": true,
+      "signed_order_closed": true,
+      "complete_boundary_closed": true,
+      "exact_factorized_output_closed": false,
+      "exact_observed_output_closed": false,
+      "source_recruitment_permitted": true,
+      "source_recruitment_used": false,
+      "source_absent_probe_recovered_all_standing_factors": true,
+      "probe_constituent": {
+        "grain": 3,
+        "axes": 1,
+        "cells": 22,
+        "incidences": 2410,
+        "pins": 2410,
+        "paths": 2416,
+        "boundaries": 2416,
+        "exposed_pins": 2398,
+        "native_sha256": "bd652e55af67f558403a96915b74679d939fa79fdc20d8c075d6496f7a1260c9"
+      }
+    },
+    {
+      "phase": "cultivation",
+      "current_id": "drop_then_reverse.conversation.irrelevant_before",
+      "context": "conversation",
+      "condition": "irrelevant_before",
+      "prompt_sha256": "ddbefe18d8f48e555cc79cd32fed3aa556dc8c16b80b42d2a40a2cd2ace9b5d0",
+      "prompt_extent": 254,
+      "receiver_position": 253,
+      "full_source_factors": 8192,
+      "standing_factors_before": 6,
+      "standing_factors_after": 12,
+      "initial_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1326,
+          1476,
+          76,
+          954,
+          856
+        ]
+      },
+      "target_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "initial_residual": [
+        {
+          "coefficient": "-4609323",
+          "power_of_two": -25,
+          "exact_ratio": "-4609323/2^25",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-4030379",
+          "power_of_two": -22,
+          "exact_ratio": "-4030379/2^22",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-5708367",
+          "power_of_two": -25,
+          "exact_ratio": "-5708367/2^25",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "1713785",
+          "power_of_two": -24,
+          "exact_ratio": "1713785/2^24",
+          "orientation": "positive"
+        },
+        {
+          "coefficient": "12245239",
+          "power_of_two": -26,
+          "exact_ratio": "12245239/2^26",
+          "orientation": "positive"
+        }
+      ],
+      "recruitment": [
+        {
+          "ordinal": 1,
+          "factor": 5016,
+          "reason": {
+            "kind": "signed_order",
+            "desired_axis": 1476,
+            "displaced_axis": 1326
+          },
+          "contribution": [
+            {
+              "coefficient": "-4611",
+              "power_of_two": -21,
+              "exact_ratio": "-4611/2^21",
+              "orientation": "negative"
+            },
+            {
+              "coefficient": "-4611",
+              "power_of_two": -18,
+              "exact_ratio": "-4611/2^18",
+              "orientation": "negative"
+            },
+            {
+              "coefficient": "6873",
+              "power_of_two": -22,
+              "exact_ratio": "6873/2^22",
+              "orientation": "positive"
+            },
+            {
+              "coefficient": "-4089",
+              "power_of_two": -20,
+              "exact_ratio": "-4089/2^20",
+              "orientation": "negative"
+            },
+            {
+              "coefficient": "16095",
+              "power_of_two": -21,
+              "exact_ratio": "16095/2^21",
+              "orientation": "positive"
+            }
+          ],
+          "face_after": {
+            "orientation": [
+              "negative",
+              "negative",
+              "negative",
+              "positive",
+              "positive"
+            ],
+            "signed_axis_order": [
+              1326,
+              1476,
+              76,
+              954,
+              856
+            ]
+          }
+        },
+        {
+          "ordinal": 2,
+          "factor": 2063,
+          "reason": {
+            "kind": "signed_order",
+            "desired_axis": 1476,
+            "displaced_axis": 1326
+          },
+          "contribution": [
+            {
+              "coefficient": "11725",
+              "power_of_two": -25,
+              "exact_ratio": "11725/2^25",
+              "orientation": "positive"
+            },
+            {
+              "coefficient": "-11591",
+              "power_of_two": -16,
+              "exact_ratio": "-11591/2^16",
+              "orientation": "negative"
+            },
+            {
+              "coefficient": "-8911",
+              "power_of_two": -19,
+              "exact_ratio": "-8911/2^19",
+              "orientation": "negative"
+            },
+            {
+              "coefficient": "-12797",
+              "power_of_two": -21,
+              "exact_ratio": "-12797/2^21",
+              "orientation": "negative"
+            },
+            {
+              "coefficient": "10117",
+              "power_of_two": -21,
+              "exact_ratio": "10117/2^21",
+              "orientation": "positive"
+            }
+          ],
+          "face_after": {
+            "orientation": [
+              "negative",
+              "negative",
+              "negative",
+              "positive",
+              "positive"
+            ],
+            "signed_axis_order": [
+              1326,
+              1476,
+              76,
+              954,
+              856
+            ]
+          }
+        },
+        {
+          "ordinal": 3,
+          "factor": 1626,
+          "reason": {
+            "kind": "signed_order",
+            "desired_axis": 1476,
+            "displaced_axis": 1326
+          },
+          "contribution": [
+            {
+              "coefficient": "-17767",
+              "power_of_two": -22,
+              "exact_ratio": "-17767/2^22",
+              "orientation": "negative"
+            },
+            {
+              "coefficient": "-7957",
+              "power_of_two": -21,
+              "exact_ratio": "-7957/2^21",
+              "orientation": "negative"
+            },
+            {
+              "coefficient": "7521",
+              "power_of_two": -21,
+              "exact_ratio": "7521/2^21",
+              "orientation": "positive"
+            },
+            {
+              "coefficient": "-14497",
+              "power_of_two": -21,
+              "exact_ratio": "-14497/2^21",
+              "orientation": "negative"
+            },
+            {
+              "coefficient": "7085",
+              "power_of_two": -22,
+              "exact_ratio": "7085/2^22",
+              "orientation": "positive"
+            }
+          ],
+          "face_after": {
+            "orientation": [
+              "negative",
+              "negative",
+              "negative",
+              "positive",
+              "positive"
+            ],
+            "signed_axis_order": [
+              1326,
+              1476,
+              76,
+              954,
+              856
+            ]
+          }
+        },
+        {
+          "ordinal": 4,
+          "factor": 1892,
+          "reason": {
+            "kind": "signed_order",
+            "desired_axis": 1476,
+            "displaced_axis": 1326
+          },
+          "contribution": [
+            {
+              "coefficient": "27965",
+              "power_of_two": -27,
+              "exact_ratio": "27965/2^27",
+              "orientation": "positive"
+            },
+            {
+              "coefficient": "-12257",
+              "power_of_two": -20,
+              "exact_ratio": "-12257/2^20",
+              "orientation": "negative"
+            },
+            {
+              "coefficient": "15827",
+              "power_of_two": -23,
+              "exact_ratio": "15827/2^23",
+              "orientation": "positive"
+            },
+            {
+              "coefficient": "-7735",
+              "power_of_two": -21,
+              "exact_ratio": "-7735/2^21",
+              "orientation": "negative"
+            },
+            {
+              "coefficient": "17969",
+              "power_of_two": -22,
+              "exact_ratio": "17969/2^22",
+              "orientation": "positive"
+            }
+          ],
+          "face_after": {
+            "orientation": [
+              "negative",
+              "negative",
+              "negative",
+              "positive",
+              "positive"
+            ],
+            "signed_axis_order": [
+              1326,
+              1476,
+              76,
+              954,
+              856
+            ]
+          }
+        },
+        {
+          "ordinal": 5,
+          "factor": 696,
+          "reason": {
+            "kind": "signed_order",
+            "desired_axis": 1476,
+            "displaced_axis": 1326
+          },
+          "contribution": [
+            {
+              "coefficient": "-33839",
+              "power_of_two": -25,
+              "exact_ratio": "-33839/2^25",
+              "orientation": "negative"
+            },
+            {
+              "coefficient": "19591",
+              "power_of_two": -22,
+              "exact_ratio": "19591/2^22",
+              "orientation": "positive"
+            },
+            {
+              "coefficient": "11371",
+              "power_of_two": -24,
+              "exact_ratio": "11371/2^24",
+              "orientation": "positive"
+            },
+            {
+              "coefficient": "-11371",
+              "power_of_two": -23,
+              "exact_ratio": "-11371/2^23",
+              "orientation": "negative"
+            },
+            {
+              "coefficient": "25071",
+              "power_of_two": -22,
+              "exact_ratio": "25071/2^22",
+              "orientation": "positive"
+            }
+          ],
+          "face_after": {
+            "orientation": [
+              "negative",
+              "negative",
+              "negative",
+              "positive",
+              "positive"
+            ],
+            "signed_axis_order": [
+              1326,
+              1476,
+              76,
+              954,
+              856
+            ]
+          }
+        },
+        {
+          "ordinal": 6,
+          "factor": 348,
+          "reason": {
+            "kind": "signed_order",
+            "desired_axis": 1476,
+            "displaced_axis": 1326
+          },
+          "contribution": [
+            {
+              "coefficient": "-5335",
+              "power_of_two": -21,
+              "exact_ratio": "-5335/2^21",
+              "orientation": "negative"
+            },
+            {
+              "coefficient": "-8439",
+              "power_of_two": -19,
+              "exact_ratio": "-8439/2^19",
+              "orientation": "negative"
+            },
+            {
+              "coefficient": "16975",
+              "power_of_two": -24,
+              "exact_ratio": "16975/2^24",
+              "orientation": "positive"
+            },
+            {
+              "coefficient": "-13289",
+              "power_of_two": -24,
+              "exact_ratio": "-13289/2^24",
+              "orientation": "negative"
+            },
+            {
+              "coefficient": "13289",
+              "power_of_two": -21,
+              "exact_ratio": "13289/2^21",
+              "orientation": "positive"
+            }
+          ],
+          "face_after": {
+            "orientation": [
+              "negative",
+              "negative",
+              "negative",
+              "positive",
+              "positive"
+            ],
+            "signed_axis_order": [
+              1476,
+              1326,
+              76,
+              954,
+              856
+            ]
+          }
+        }
+      ],
+      "source_retrievals": 6,
+      "source_candidate_evaluations": 49101,
+      "recruitment_stopped_without_candidate": false,
+      "deposit": {
+        "factors": [
+          5016,
+          2063,
+          1626,
+          1892,
+          696,
+          348
+        ],
+        "encoded_bits": 1968,
+        "returned_exact": true,
+        "source_lineages_departed": true,
+        "rest_remount_exact": true,
+        "standing_before": 6,
+        "standing_after": 12,
+        "machine": {
+          "standing_rank": 6,
+          "standing_cells": 31,
+          "standing_constituents": 12,
+          "constituent_cells": 36,
+          "constituent_incidences": 3948,
+          "constituent_pins": 3948,
+          "constituent_paths": 3948,
+          "constituent_transport_terms": 5922,
+          "live_lineages": 0,
+          "rest_sha256": "7fb555df47312a1acc6fef594138bbd05bce8abf736658bd9b6ed0d516eab65f"
+        }
+      },
+      "final_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "final_residual": [
+        {
+          "coefficient": "-17171713",
+          "power_of_two": -27,
+          "exact_ratio": "-17171713/2^27",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-775479",
+          "power_of_two": -20,
+          "exact_ratio": "-775479/2^20",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-5433383",
+          "power_of_two": -25,
+          "exact_ratio": "-5433383/2^25",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "130967",
+          "power_of_two": -20,
+          "exact_ratio": "130967/2^20",
+          "orientation": "positive"
+        },
+        {
+          "coefficient": "10179207",
+          "power_of_two": -26,
+          "exact_ratio": "10179207/2^26",
+          "orientation": "positive"
+        }
+      ],
+      "orientation_closed": true,
+      "signed_order_closed": true,
+      "complete_boundary_closed": true,
+      "exact_factorized_output_closed": false,
+      "exact_observed_output_closed": false,
+      "source_recruitment_permitted": true,
+      "source_recruitment_used": true,
+      "source_absent_probe_recovered_all_standing_factors": true,
+      "probe_constituent": {
+        "grain": 3,
+        "axes": 1,
+        "cells": 40,
+        "incidences": 4684,
+        "pins": 4684,
+        "paths": 4696,
+        "boundaries": 4696,
+        "exposed_pins": 4660,
+        "native_sha256": "9b634299879f3abae047d059fb4ca2b4d9f818f497554a42b6a95e9e9b20dad0"
+      }
+    },
+    {
+      "phase": "cultivation",
+      "current_id": "drop_then_reverse.conversation.relevant_after",
+      "context": "conversation",
+      "condition": "relevant_after",
+      "prompt_sha256": "9166d999c4c3c6f7e5f93d444c133f900aacc2ef35d64eace111e3f53e88c4a3",
+      "prompt_extent": 253,
+      "receiver_position": 252,
+      "full_source_factors": 8192,
+      "standing_factors_before": 12,
+      "standing_factors_after": 13,
+      "initial_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1326,
+          1476,
+          76,
+          954,
+          856
+        ]
+      },
+      "target_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "initial_residual": [
+        {
+          "coefficient": "-17582809",
+          "power_of_two": -27,
+          "exact_ratio": "-17582809/2^27",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-5540351",
+          "power_of_two": -23,
+          "exact_ratio": "-5540351/2^23",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-684231",
+          "power_of_two": -22,
+          "exact_ratio": "-684231/2^22",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "4010973",
+          "power_of_two": -25,
+          "exact_ratio": "4010973/2^25",
+          "orientation": "positive"
+        },
+        {
+          "coefficient": "19193561",
+          "power_of_two": -27,
+          "exact_ratio": "19193561/2^27",
+          "orientation": "positive"
+        }
+      ],
+      "recruitment": [
+        {
+          "ordinal": 1,
+          "factor": 4019,
+          "reason": {
+            "kind": "signed_order",
+            "desired_axis": 1476,
+            "displaced_axis": 1326
+          },
+          "contribution": [
+            {
+              "coefficient": "1287",
+              "power_of_two": -19,
+              "exact_ratio": "1287/2^19",
+              "orientation": "positive"
+            },
+            {
+              "coefficient": "22451",
+              "power_of_two": -30,
+              "exact_ratio": "22451/2^30",
+              "orientation": "positive"
+            },
+            {
+              "coefficient": "-21021",
+              "power_of_two": -23,
+              "exact_ratio": "-21021/2^23",
+              "orientation": "negative"
+            },
+            {
+              "coefficient": "-21593",
+              "power_of_two": -23,
+              "exact_ratio": "-21593/2^23",
+              "orientation": "negative"
+            },
+            {
+              "coefficient": "21307",
+              "power_of_two": -22,
+              "exact_ratio": "21307/2^22",
+              "orientation": "positive"
+            }
+          ],
+          "face_after": {
+            "orientation": [
+              "negative",
+              "negative",
+              "negative",
+              "positive",
+              "positive"
+            ],
+            "signed_axis_order": [
+              1476,
+              1326,
+              76,
+              954,
+              856
+            ]
+          }
+        }
+      ],
+      "source_retrievals": 1,
+      "source_candidate_evaluations": 8180,
+      "recruitment_stopped_without_candidate": false,
+      "deposit": {
+        "factors": [
+          4019
+        ],
+        "encoded_bits": 328,
+        "returned_exact": true,
+        "source_lineages_departed": true,
+        "rest_remount_exact": true,
+        "standing_before": 12,
+        "standing_after": 13,
+        "machine": {
+          "standing_rank": 6,
+          "standing_cells": 37,
+          "standing_constituents": 13,
+          "constituent_cells": 39,
+          "constituent_incidences": 4277,
+          "constituent_pins": 4277,
+          "constituent_paths": 4277,
+          "constituent_transport_terms": 6580,
+          "live_lineages": 0,
+          "rest_sha256": "3ee39bab2df431a2d48f548cb95df8ea35054950d0113af5f6bca4fd7a467ffb"
+        }
+      },
+      "final_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "final_residual": [
+        {
+          "coefficient": "-17912281",
+          "power_of_two": -27,
+          "exact_ratio": "-17912281/2^27",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-709187379",
+          "power_of_two": -30,
+          "exact_ratio": "-709187379/2^30",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-1347441",
+          "power_of_two": -23,
+          "exact_ratio": "-1347441/2^23",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "4097345",
+          "power_of_two": -25,
+          "exact_ratio": "4097345/2^25",
+          "orientation": "positive"
+        },
+        {
+          "coefficient": "18511737",
+          "power_of_two": -27,
+          "exact_ratio": "18511737/2^27",
+          "orientation": "positive"
+        }
+      ],
+      "orientation_closed": true,
+      "signed_order_closed": true,
+      "complete_boundary_closed": true,
+      "exact_factorized_output_closed": false,
+      "exact_observed_output_closed": false,
+      "source_recruitment_permitted": true,
+      "source_recruitment_used": true,
+      "source_absent_probe_recovered_all_standing_factors": true,
+      "probe_constituent": {
+        "grain": 3,
+        "axes": 1,
+        "cells": 43,
+        "incidences": 5063,
+        "pins": 5063,
+        "paths": 5076,
+        "boundaries": 5076,
+        "exposed_pins": 5037,
+        "native_sha256": "184e0cc9bb158fcd79c85ae3630b6f9da2b181bfe9fcefa93ea62dd4eb87f16a"
+      }
+    },
+    {
+      "phase": "cultivation",
+      "current_id": "drop_then_reverse.prose.absent",
+      "context": "prose",
+      "condition": "absent",
+      "prompt_sha256": "b9e492315bf80db3afa257f2e62b12a641e873faad399e8352ba8da15c109117",
+      "prompt_extent": 142,
+      "receiver_position": 141,
+      "full_source_factors": 8192,
+      "standing_factors_before": 13,
+      "standing_factors_after": 14,
+      "initial_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "target_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1326,
+          1476,
+          76,
+          954,
+          856
+        ]
+      },
+      "initial_residual": [
+        {
+          "coefficient": "-17064541",
+          "power_of_two": -27,
+          "exact_ratio": "-17064541/2^27",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-78781255",
+          "power_of_two": -27,
+          "exact_ratio": "-78781255/2^27",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-174199",
+          "power_of_two": -20,
+          "exact_ratio": "-174199/2^20",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "4963443",
+          "power_of_two": -25,
+          "exact_ratio": "4963443/2^25",
+          "orientation": "positive"
+        },
+        {
+          "coefficient": "17358903",
+          "power_of_two": -27,
+          "exact_ratio": "17358903/2^27",
+          "orientation": "positive"
+        }
+      ],
+      "recruitment": [
+        {
+          "ordinal": 1,
+          "factor": 3121,
+          "reason": {
+            "kind": "signed_order",
+            "desired_axis": 1326,
+            "displaced_axis": 1476
+          },
+          "contribution": [
+            {
+              "coefficient": "-6993",
+              "power_of_two": -23,
+              "exact_ratio": "-6993/2^23",
+              "orientation": "negative"
+            },
+            {
+              "coefficient": "-2405",
+              "power_of_two": -17,
+              "exact_ratio": "-2405/2^17",
+              "orientation": "negative"
+            },
+            {
+              "coefficient": "481",
+              "power_of_two": -18,
+              "exact_ratio": "481/2^18",
+              "orientation": "positive"
+            },
+            {
+              "coefficient": "4033",
+              "power_of_two": -17,
+              "exact_ratio": "4033/2^17",
+              "orientation": "positive"
+            },
+            {
+              "coefficient": "407",
+              "power_of_two": -19,
+              "exact_ratio": "407/2^19",
+              "orientation": "positive"
+            }
+          ],
+          "face_after": {
+            "orientation": [
+              "negative",
+              "negative",
+              "negative",
+              "positive",
+              "positive"
+            ],
+            "signed_axis_order": [
+              1326,
+              1476,
+              76,
+              954,
+              856
+            ]
+          }
+        }
+      ],
+      "source_retrievals": 1,
+      "source_candidate_evaluations": 8179,
+      "recruitment_stopped_without_candidate": false,
+      "deposit": {
+        "factors": [
+          3121
+        ],
+        "encoded_bits": 328,
+        "returned_exact": true,
+        "source_lineages_departed": true,
+        "rest_remount_exact": true,
+        "standing_before": 13,
+        "standing_after": 14,
+        "machine": {
+          "standing_rank": 6,
+          "standing_cells": 42,
+          "standing_constituents": 14,
+          "constituent_cells": 42,
+          "constituent_incidences": 4606,
+          "constituent_pins": 4606,
+          "constituent_paths": 4606,
+          "constituent_transport_terms": 6909,
+          "live_lineages": 0,
+          "rest_sha256": "b89559e32d5828d351e3afb4123acafb86cbc28b3b214779187fcf0967ec492e"
+        }
+      },
+      "final_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1326,
+          1476,
+          76,
+          954,
+          856
+        ]
+      },
+      "final_residual": [
+        {
+          "coefficient": "-16952653",
+          "power_of_two": -27,
+          "exact_ratio": "-16952653/2^27",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-76318535",
+          "power_of_two": -27,
+          "exact_ratio": "-76318535/2^27",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-176123",
+          "power_of_two": -20,
+          "exact_ratio": "-176123/2^20",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "3930995",
+          "power_of_two": -25,
+          "exact_ratio": "3930995/2^25",
+          "orientation": "positive"
+        },
+        {
+          "coefficient": "17254711",
+          "power_of_two": -27,
+          "exact_ratio": "17254711/2^27",
+          "orientation": "positive"
+        }
+      ],
+      "orientation_closed": true,
+      "signed_order_closed": true,
+      "complete_boundary_closed": true,
+      "exact_factorized_output_closed": false,
+      "exact_observed_output_closed": false,
+      "source_recruitment_permitted": true,
+      "source_recruitment_used": true,
+      "source_absent_probe_recovered_all_standing_factors": true,
+      "probe_constituent": {
+        "grain": 3,
+        "axes": 1,
+        "cells": 46,
+        "incidences": 5442,
+        "pins": 5442,
+        "paths": 5456,
+        "boundaries": 5456,
+        "exposed_pins": 5414,
+        "native_sha256": "fd289bcdbbd0e95cacf456c228b43814bd3c92a7d39bf362fee18499c8cbed2f"
+      }
+    },
+    {
+      "phase": "cultivation",
+      "current_id": "drop_then_reverse.prose.irrelevant_before",
+      "context": "prose",
+      "condition": "irrelevant_before",
+      "prompt_sha256": "3831d5a5969d70bda7dee0a21284035b3d56f02793b5dffef672f85b27888e9a",
+      "prompt_extent": 260,
+      "receiver_position": 259,
+      "full_source_factors": 8192,
+      "standing_factors_before": 14,
+      "standing_factors_after": 19,
+      "initial_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1326,
+          1476,
+          76,
+          954,
+          856
+        ]
+      },
+      "target_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "initial_residual": [
+        {
+          "coefficient": "-18180773",
+          "power_of_two": -27,
+          "exact_ratio": "-18180773/2^27",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-165763359",
+          "power_of_two": -28,
+          "exact_ratio": "-165763359/2^28",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-338723",
+          "power_of_two": -21,
+          "exact_ratio": "-338723/2^21",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "352213",
+          "power_of_two": -22,
+          "exact_ratio": "352213/2^22",
+          "orientation": "positive"
+        },
+        {
+          "coefficient": "566865",
+          "power_of_two": -22,
+          "exact_ratio": "566865/2^22",
+          "orientation": "positive"
+        }
+      ],
+      "recruitment": [
+        {
+          "ordinal": 1,
+          "factor": 4200,
+          "reason": {
+            "kind": "signed_order",
+            "desired_axis": 1476,
+            "displaced_axis": 1326
+          },
+          "contribution": [
+            {
+              "coefficient": "8695",
+              "power_of_two": -22,
+              "exact_ratio": "8695/2^22",
+              "orientation": "positive"
+            },
+            {
+              "coefficient": "-1739",
+              "power_of_two": -19,
+              "exact_ratio": "-1739/2^19",
+              "orientation": "negative"
+            },
+            {
+              "coefficient": "-1665",
+              "power_of_two": -21,
+              "exact_ratio": "-1665/2^21",
+              "orientation": "negative"
+            },
+            {
+              "coefficient": "-5143",
+              "power_of_two": -21,
+              "exact_ratio": "-5143/2^21",
+              "orientation": "negative"
+            },
+            {
+              "coefficient": "6105",
+              "power_of_two": -21,
+              "exact_ratio": "6105/2^21",
+              "orientation": "positive"
+            }
+          ],
+          "face_after": {
+            "orientation": [
+              "negative",
+              "negative",
+              "negative",
+              "positive",
+              "positive"
+            ],
+            "signed_axis_order": [
+              1326,
+              1476,
+              76,
+              954,
+              856
+            ]
+          }
+        },
+        {
+          "ordinal": 2,
+          "factor": 3366,
+          "reason": {
+            "kind": "signed_order",
+            "desired_axis": 1476,
+            "displaced_axis": 1326
+          },
+          "contribution": [
+            {
+              "coefficient": "-6345",
+              "power_of_two": -24,
+              "exact_ratio": "-6345/2^24",
+              "orientation": "negative"
+            },
+            {
+              "coefficient": "-30645",
+              "power_of_two": -25,
+              "exact_ratio": "-30645/2^25",
+              "orientation": "negative"
+            },
+            {
+              "coefficient": "5805",
+              "power_of_two": -22,
+              "exact_ratio": "5805/2^22",
+              "orientation": "positive"
+            },
+            {
+              "coefficient": "-11745",
+              "power_of_two": -23,
+              "exact_ratio": "-11745/2^23",
+              "orientation": "negative"
+            },
+            {
+              "coefficient": "32535",
+              "power_of_two": -23,
+              "exact_ratio": "32535/2^23",
+              "orientation": "positive"
+            }
+          ],
+          "face_after": {
+            "orientation": [
+              "negative",
+              "negative",
+              "negative",
+              "positive",
+              "positive"
+            ],
+            "signed_axis_order": [
+              1326,
+              1476,
+              76,
+              954,
+              856
+            ]
+          }
+        },
+        {
+          "ordinal": 3,
+          "factor": 6208,
+          "reason": {
+            "kind": "signed_order",
+            "desired_axis": 1476,
+            "displaced_axis": 1326
+          },
+          "contribution": [
+            {
+              "coefficient": "-4131",
+              "power_of_two": -21,
+              "exact_ratio": "-4131/2^21",
+              "orientation": "negative"
+            },
+            {
+              "coefficient": "-4941",
+              "power_of_two": -18,
+              "exact_ratio": "-4941/2^18",
+              "orientation": "negative"
+            },
+            {
+              "coefficient": "-5805",
+              "power_of_two": -20,
+              "exact_ratio": "-5805/2^20",
+              "orientation": "negative"
+            },
+            {
+              "coefficient": "4941",
+              "power_of_two": -23,
+              "exact_ratio": "4941/2^23",
+              "orientation": "positive"
+            },
+            {
+              "coefficient": "6021",
+              "power_of_two": -20,
+              "exact_ratio": "6021/2^20",
+              "orientation": "positive"
+            }
+          ],
+          "face_after": {
+            "orientation": [
+              "negative",
+              "negative",
+              "negative",
+              "positive",
+              "positive"
+            ],
+            "signed_axis_order": [
+              1326,
+              1476,
+              76,
+              954,
+              856
+            ]
+          }
+        },
+        {
+          "ordinal": 4,
+          "factor": 4966,
+          "reason": {
+            "kind": "signed_order",
+            "desired_axis": 1476,
+            "displaced_axis": 1326
+          },
+          "contribution": [
+            {
+              "coefficient": "-5695",
+              "power_of_two": -21,
+              "exact_ratio": "-5695/2^21",
+              "orientation": "negative"
+            },
+            {
+              "coefficient": "-12155",
+              "power_of_two": -22,
+              "exact_ratio": "-12155/2^22",
+              "orientation": "negative"
+            },
+            {
+              "coefficient": "-9435",
+              "power_of_two": -24,
+              "exact_ratio": "-9435/2^24",
+              "orientation": "negative"
+            },
+            {
+              "coefficient": "-18955",
+              "power_of_two": -23,
+              "exact_ratio": "-18955/2^23",
+              "orientation": "negative"
+            },
+            {
+              "coefficient": "2975",
+              "power_of_two": -20,
+              "exact_ratio": "2975/2^20",
+              "orientation": "positive"
+            }
+          ],
+          "face_after": {
+            "orientation": [
+              "negative",
+              "negative",
+              "negative",
+              "positive",
+              "positive"
+            ],
+            "signed_axis_order": [
+              1326,
+              1476,
+              76,
+              954,
+              856
+            ]
+          }
+        },
+        {
+          "ordinal": 5,
+          "factor": 299,
+          "reason": {
+            "kind": "signed_order",
+            "desired_axis": 1476,
+            "displaced_axis": 1326
+          },
+          "contribution": [
+            {
+              "coefficient": "32375",
+              "power_of_two": -27,
+              "exact_ratio": "32375/2^27",
+              "orientation": "positive"
+            },
+            {
+              "coefficient": "15355",
+              "power_of_two": -24,
+              "exact_ratio": "15355/2^24",
+              "orientation": "positive"
+            },
+            {
+              "coefficient": "-25345",
+              "power_of_two": -25,
+              "exact_ratio": "-25345/2^25",
+              "orientation": "negative"
+            },
+            {
+              "coefficient": "-15355",
+              "power_of_two": -22,
+              "exact_ratio": "-15355/2^22",
+              "orientation": "negative"
+            },
+            {
+              "coefficient": "41995",
+              "power_of_two": -25,
+              "exact_ratio": "41995/2^25",
+              "orientation": "positive"
+            }
+          ],
+          "face_after": {
+            "orientation": [
+              "negative",
+              "negative",
+              "negative",
+              "positive",
+              "positive"
+            ],
+            "signed_axis_order": [
+              1476,
+              1326,
+              76,
+              954,
+              856
+            ]
+          }
+        }
+      ],
+      "source_retrievals": 5,
+      "source_candidate_evaluations": 40880,
+      "recruitment_stopped_without_candidate": false,
+      "deposit": {
+        "factors": [
+          4200,
+          3366,
+          6208,
+          4966,
+          299
+        ],
+        "encoded_bits": 1640,
+        "returned_exact": true,
+        "source_lineages_departed": true,
+        "rest_remount_exact": true,
+        "standing_before": 14,
+        "standing_after": 19,
+        "machine": {
+          "standing_rank": 6,
+          "standing_cells": 45,
+          "standing_constituents": 19,
+          "constituent_cells": 57,
+          "constituent_incidences": 6251,
+          "constituent_pins": 6251,
+          "constituent_paths": 6251,
+          "constituent_transport_terms": 8554,
+          "live_lineages": 0,
+          "rest_sha256": "b1ef603f7e360fc46806b12b524318ed29b52580fb9e9747bb0bf0cf54e72554"
+        }
+      },
+      "final_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "final_residual": [
+        {
+          "coefficient": "-4452941",
+          "power_of_two": -25,
+          "exact_ratio": "-4452941/2^25",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-159036007",
+          "power_of_two": -28,
+          "exact_ratio": "-159036007/2^28",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-5209393",
+          "power_of_two": -25,
+          "exact_ratio": "-5209393/2^25",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "781467",
+          "power_of_two": -23,
+          "exact_ratio": "781467/2^23",
+          "orientation": "positive"
+        },
+        {
+          "coefficient": "3977233",
+          "power_of_two": -25,
+          "exact_ratio": "3977233/2^25",
+          "orientation": "positive"
+        }
+      ],
+      "orientation_closed": true,
+      "signed_order_closed": true,
+      "complete_boundary_closed": true,
+      "exact_factorized_output_closed": false,
+      "exact_observed_output_closed": false,
+      "source_recruitment_permitted": true,
+      "source_recruitment_used": true,
+      "source_absent_probe_recovered_all_standing_factors": true,
+      "probe_constituent": {
+        "grain": 3,
+        "axes": 1,
+        "cells": 61,
+        "incidences": 7337,
+        "pins": 7337,
+        "paths": 7356,
+        "boundaries": 7356,
+        "exposed_pins": 7299,
+        "native_sha256": "cd63bc10d39f994205fbe4bdaaf0f1b10e98eccadf33aca8c988a608f582b531"
+      }
+    },
+    {
+      "phase": "cultivation",
+      "current_id": "drop_then_reverse.prose.relevant_after",
+      "context": "prose",
+      "condition": "relevant_after",
+      "prompt_sha256": "d9c07eda4b386bffb1f844a197587c9c8b100a2f02de2987655d673c37bd2cef",
+      "prompt_extent": 259,
+      "receiver_position": 258,
+      "full_source_factors": 8192,
+      "standing_factors_before": 19,
+      "standing_factors_after": 19,
+      "initial_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "target_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "initial_residual": [
+        {
+          "coefficient": "-36929129",
+          "power_of_two": -28,
+          "exact_ratio": "-36929129/2^28",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-643082795",
+          "power_of_two": -30,
+          "exact_ratio": "-643082795/2^30",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-5248919",
+          "power_of_two": -25,
+          "exact_ratio": "-5248919/2^25",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "7192665",
+          "power_of_two": -26,
+          "exact_ratio": "7192665/2^26",
+          "orientation": "positive"
+        },
+        {
+          "coefficient": "14256995",
+          "power_of_two": -27,
+          "exact_ratio": "14256995/2^27",
+          "orientation": "positive"
+        }
+      ],
+      "recruitment": [],
+      "source_retrievals": 0,
+      "source_candidate_evaluations": 0,
+      "recruitment_stopped_without_candidate": false,
+      "deposit": null,
+      "final_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "final_residual": [
+        {
+          "coefficient": "-36929129",
+          "power_of_two": -28,
+          "exact_ratio": "-36929129/2^28",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-643082795",
+          "power_of_two": -30,
+          "exact_ratio": "-643082795/2^30",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-5248919",
+          "power_of_two": -25,
+          "exact_ratio": "-5248919/2^25",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "7192665",
+          "power_of_two": -26,
+          "exact_ratio": "7192665/2^26",
+          "orientation": "positive"
+        },
+        {
+          "coefficient": "14256995",
+          "power_of_two": -27,
+          "exact_ratio": "14256995/2^27",
+          "orientation": "positive"
+        }
+      ],
+      "orientation_closed": true,
+      "signed_order_closed": true,
+      "complete_boundary_closed": true,
+      "exact_factorized_output_closed": false,
+      "exact_observed_output_closed": false,
+      "source_recruitment_permitted": true,
+      "source_recruitment_used": false,
+      "source_absent_probe_recovered_all_standing_factors": true,
+      "probe_constituent": {
+        "grain": 3,
+        "axes": 1,
+        "cells": 61,
+        "incidences": 7337,
+        "pins": 7337,
+        "paths": 7356,
+        "boundaries": 7356,
+        "exposed_pins": 7299,
+        "native_sha256": "4e38ef185ea5d37c994bf0d912349527ff09cd83bc4767c9f9de450905c45f97"
+      }
+    },
+    {
+      "phase": "cultivation",
+      "current_id": "drop_then_reverse.code_comment.absent",
+      "context": "code_comment",
+      "condition": "absent",
+      "prompt_sha256": "a360a3b2e478833bd7c85e8f95026653a31353ecfab7e32460f64973fc38106e",
+      "prompt_extent": 138,
+      "receiver_position": 137,
+      "full_source_factors": 8192,
+      "standing_factors_before": 19,
+      "standing_factors_after": 20,
+      "initial_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "target_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1326,
+          1476,
+          76,
+          954,
+          856
+        ]
+      },
+      "initial_residual": [
+        {
+          "coefficient": "-15333309",
+          "power_of_two": -27,
+          "exact_ratio": "-15333309/2^27",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-560034743",
+          "power_of_two": -30,
+          "exact_ratio": "-560034743/2^30",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-4768537",
+          "power_of_two": -25,
+          "exact_ratio": "-4768537/2^25",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "10287297",
+          "power_of_two": -26,
+          "exact_ratio": "10287297/2^26",
+          "orientation": "positive"
+        },
+        {
+          "coefficient": "2235611",
+          "power_of_two": -24,
+          "exact_ratio": "2235611/2^24",
+          "orientation": "positive"
+        }
+      ],
+      "recruitment": [
+        {
+          "ordinal": 1,
+          "factor": 2372,
+          "reason": {
+            "kind": "signed_order",
+            "desired_axis": 1326,
+            "displaced_axis": 1476
+          },
+          "contribution": [
+            {
+              "coefficient": "16665",
+              "power_of_two": -24,
+              "exact_ratio": "16665/2^24",
+              "orientation": "positive"
+            },
+            {
+              "coefficient": "16665",
+              "power_of_two": -23,
+              "exact_ratio": "16665/2^23",
+              "orientation": "positive"
+            },
+            {
+              "coefficient": "21715",
+              "power_of_two": -22,
+              "exact_ratio": "21715/2^22",
+              "orientation": "positive"
+            },
+            {
+              "coefficient": "12019",
+              "power_of_two": -20,
+              "exact_ratio": "12019/2^20",
+              "orientation": "positive"
+            },
+            {
+              "coefficient": "21311",
+              "power_of_two": -27,
+              "exact_ratio": "21311/2^27",
+              "orientation": "positive"
+            }
+          ],
+          "face_after": {
+            "orientation": [
+              "negative",
+              "negative",
+              "negative",
+              "positive",
+              "positive"
+            ],
+            "signed_axis_order": [
+              1326,
+              1476,
+              76,
+              954,
+              856
+            ]
+          }
+        }
+      ],
+      "source_retrievals": 1,
+      "source_candidate_evaluations": 8173,
+      "recruitment_stopped_without_candidate": false,
+      "deposit": {
+        "factors": [
+          2372
+        ],
+        "encoded_bits": 328,
+        "returned_exact": true,
+        "source_lineages_departed": true,
+        "rest_remount_exact": true,
+        "standing_before": 19,
+        "standing_after": 20,
+        "machine": {
+          "standing_rank": 6,
+          "standing_cells": 48,
+          "standing_constituents": 20,
+          "constituent_cells": 60,
+          "constituent_incidences": 6580,
+          "constituent_pins": 6580,
+          "constituent_paths": 6580,
+          "constituent_transport_terms": 8883,
+          "live_lineages": 0,
+          "rest_sha256": "efbdb798c6bf29aeb9488b9efc627b4deafd22bb6a43218c111bd86e3d8e7638"
+        }
+      },
+      "final_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1326,
+          1476,
+          76,
+          954,
+          856
+        ]
+      },
+      "final_residual": [
+        {
+          "coefficient": "-15466629",
+          "power_of_two": -27,
+          "exact_ratio": "-15466629/2^27",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-562167863",
+          "power_of_two": -30,
+          "exact_ratio": "-562167863/2^30",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-4942257",
+          "power_of_two": -25,
+          "exact_ratio": "-4942257/2^25",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "9518081",
+          "power_of_two": -26,
+          "exact_ratio": "9518081/2^26",
+          "orientation": "positive"
+        },
+        {
+          "coefficient": "17863577",
+          "power_of_two": -27,
+          "exact_ratio": "17863577/2^27",
+          "orientation": "positive"
+        }
+      ],
+      "orientation_closed": true,
+      "signed_order_closed": true,
+      "complete_boundary_closed": true,
+      "exact_factorized_output_closed": false,
+      "exact_observed_output_closed": false,
+      "source_recruitment_permitted": true,
+      "source_recruitment_used": true,
+      "source_absent_probe_recovered_all_standing_factors": true,
+      "probe_constituent": {
+        "grain": 3,
+        "axes": 1,
+        "cells": 64,
+        "incidences": 7716,
+        "pins": 7716,
+        "paths": 7736,
+        "boundaries": 7736,
+        "exposed_pins": 7676,
+        "native_sha256": "be9c70ec6fcbc9ae5dc4822d8a9e33278cc24203a739d2aebd0d19d9b1a5a45c"
+      }
+    },
+    {
+      "phase": "cultivation",
+      "current_id": "drop_then_reverse.code_comment.irrelevant_before",
+      "context": "code_comment",
+      "condition": "irrelevant_before",
+      "prompt_sha256": "6d985f7e79f9fc1dc099fd54ffea119a7d3df8de84ae73879e4006984cfcf99e",
+      "prompt_extent": 256,
+      "receiver_position": 255,
+      "full_source_factors": 8192,
+      "standing_factors_before": 20,
+      "standing_factors_after": 20,
+      "initial_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "target_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "initial_residual": [
+        {
+          "coefficient": "-15807367",
+          "power_of_two": -27,
+          "exact_ratio": "-15807367/2^27",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-314408733",
+          "power_of_two": -29,
+          "exact_ratio": "-314408733/2^29",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-1175865",
+          "power_of_two": -23,
+          "exact_ratio": "-1175865/2^23",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "7510617",
+          "power_of_two": -26,
+          "exact_ratio": "7510617/2^26",
+          "orientation": "positive"
+        },
+        {
+          "coefficient": "36500187",
+          "power_of_two": -28,
+          "exact_ratio": "36500187/2^28",
+          "orientation": "positive"
+        }
+      ],
+      "recruitment": [],
+      "source_retrievals": 0,
+      "source_candidate_evaluations": 0,
+      "recruitment_stopped_without_candidate": false,
+      "deposit": null,
+      "final_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "final_residual": [
+        {
+          "coefficient": "-15807367",
+          "power_of_two": -27,
+          "exact_ratio": "-15807367/2^27",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-314408733",
+          "power_of_two": -29,
+          "exact_ratio": "-314408733/2^29",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-1175865",
+          "power_of_two": -23,
+          "exact_ratio": "-1175865/2^23",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "7510617",
+          "power_of_two": -26,
+          "exact_ratio": "7510617/2^26",
+          "orientation": "positive"
+        },
+        {
+          "coefficient": "36500187",
+          "power_of_two": -28,
+          "exact_ratio": "36500187/2^28",
+          "orientation": "positive"
+        }
+      ],
+      "orientation_closed": true,
+      "signed_order_closed": true,
+      "complete_boundary_closed": true,
+      "exact_factorized_output_closed": false,
+      "exact_observed_output_closed": false,
+      "source_recruitment_permitted": true,
+      "source_recruitment_used": false,
+      "source_absent_probe_recovered_all_standing_factors": true,
+      "probe_constituent": {
+        "grain": 3,
+        "axes": 1,
+        "cells": 64,
+        "incidences": 7716,
+        "pins": 7716,
+        "paths": 7736,
+        "boundaries": 7736,
+        "exposed_pins": 7676,
+        "native_sha256": "c5e284f4db60e02bfd21a957e474c166f90ebdf8674c6613959319bd8c656429"
+      }
+    },
+    {
+      "phase": "cultivation",
+      "current_id": "drop_then_reverse.code_comment.relevant_after",
+      "context": "code_comment",
+      "condition": "relevant_after",
+      "prompt_sha256": "344675535eee2e2ebbf8c5e5998acbd2b8e44dfeff564007fe64c0959425b874",
+      "prompt_extent": 255,
+      "receiver_position": 254,
+      "full_source_factors": 8192,
+      "standing_factors_before": 20,
+      "standing_factors_after": 21,
+      "initial_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1326,
+          1476,
+          76,
+          954,
+          856
+        ]
+      },
+      "target_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "initial_residual": [
+        {
+          "coefficient": "-9388473",
+          "power_of_two": -26,
+          "exact_ratio": "-9388473/2^26",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-575124841",
+          "power_of_two": -30,
+          "exact_ratio": "-575124841/2^30",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-1337",
+          "power_of_two": -13,
+          "exact_ratio": "-1337/2^13",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "1789931",
+          "power_of_two": -24,
+          "exact_ratio": "1789931/2^24",
+          "orientation": "positive"
+        },
+        {
+          "coefficient": "16149815",
+          "power_of_two": -27,
+          "exact_ratio": "16149815/2^27",
+          "orientation": "positive"
+        }
+      ],
+      "recruitment": [
+        {
+          "ordinal": 1,
+          "factor": 3098,
+          "reason": {
+            "kind": "signed_order",
+            "desired_axis": 1476,
+            "displaced_axis": 1326
+          },
+          "contribution": [
+            {
+              "coefficient": "22425",
+              "power_of_two": -27,
+              "exact_ratio": "22425/2^27",
+              "orientation": "positive"
+            },
+            {
+              "coefficient": "22425",
+              "power_of_two": -28,
+              "exact_ratio": "22425/2^28",
+              "orientation": "positive"
+            },
+            {
+              "coefficient": "-29835",
+              "power_of_two": -27,
+              "exact_ratio": "-29835/2^27",
+              "orientation": "negative"
+            },
+            {
+              "coefficient": "-6045",
+              "power_of_two": -20,
+              "exact_ratio": "-6045/2^20",
+              "orientation": "negative"
+            },
+            {
+              "coefficient": "975",
+              "power_of_two": -23,
+              "exact_ratio": "975/2^23",
+              "orientation": "positive"
+            }
+          ],
+          "face_after": {
+            "orientation": [
+              "negative",
+              "negative",
+              "negative",
+              "positive",
+              "positive"
+            ],
+            "signed_axis_order": [
+              1476,
+              1326,
+              76,
+              954,
+              856
+            ]
+          }
+        }
+      ],
+      "source_retrievals": 1,
+      "source_candidate_evaluations": 8172,
+      "recruitment_stopped_without_candidate": false,
+      "deposit": {
+        "factors": [
+          3098
+        ],
+        "encoded_bits": 328,
+        "returned_exact": true,
+        "source_lineages_departed": true,
+        "rest_remount_exact": true,
+        "standing_before": 20,
+        "standing_after": 21,
+        "machine": {
+          "standing_rank": 6,
+          "standing_cells": 49,
+          "standing_constituents": 21,
+          "constituent_cells": 63,
+          "constituent_incidences": 6909,
+          "constituent_pins": 6909,
+          "constituent_paths": 6909,
+          "constituent_transport_terms": 9212,
+          "live_lineages": 0,
+          "rest_sha256": "093aa1f64b8a65aab5dd59483fffd4477e28b208cb10e02a310ab5c3476e1423"
+        }
+      },
+      "final_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "final_residual": [
+        {
+          "coefficient": "-18799371",
+          "power_of_two": -27,
+          "exact_ratio": "-18799371/2^27",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-575214541",
+          "power_of_two": -30,
+          "exact_ratio": "-575214541/2^30",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-21875573",
+          "power_of_two": -27,
+          "exact_ratio": "-21875573/2^27",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "1886651",
+          "power_of_two": -24,
+          "exact_ratio": "1886651/2^24",
+          "orientation": "positive"
+        },
+        {
+          "coefficient": "16134215",
+          "power_of_two": -27,
+          "exact_ratio": "16134215/2^27",
+          "orientation": "positive"
+        }
+      ],
+      "orientation_closed": true,
+      "signed_order_closed": true,
+      "complete_boundary_closed": true,
+      "exact_factorized_output_closed": false,
+      "exact_observed_output_closed": false,
+      "source_recruitment_permitted": true,
+      "source_recruitment_used": true,
+      "source_absent_probe_recovered_all_standing_factors": true,
+      "probe_constituent": {
+        "grain": 3,
+        "axes": 1,
+        "cells": 67,
+        "incidences": 8095,
+        "pins": 8095,
+        "paths": 8116,
+        "boundaries": 8116,
+        "exposed_pins": 8053,
+        "native_sha256": "df840a31d607fea0c4cfe57d395d27fb3f1c0049a8e957bb62a3440465af8c5c"
+      }
+    }
+  ],
+  "evaluation": [
+    {
+      "phase": "evaluation",
+      "current_id": "reverse_then_drop.conversation.relevant_before",
+      "context": "conversation",
+      "condition": "relevant_before",
+      "prompt_sha256": "4e561bb3898316f2739134d6756f786d938eb1561aa2281e85cbdacd8d9bd25a",
+      "prompt_extent": 253,
+      "receiver_position": 252,
+      "full_source_factors": 8192,
+      "standing_factors_before": 21,
+      "standing_factors_after": 21,
+      "initial_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1326,
+          1476,
+          76,
+          954,
+          856
+        ]
+      },
+      "target_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "initial_residual": [
+        {
+          "coefficient": "-10590109",
+          "power_of_two": -26,
+          "exact_ratio": "-10590109/2^26",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-733222561",
+          "power_of_two": -30,
+          "exact_ratio": "-733222561/2^30",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-5041067",
+          "power_of_two": -25,
+          "exact_ratio": "-5041067/2^25",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "6765545",
+          "power_of_two": -26,
+          "exact_ratio": "6765545/2^26",
+          "orientation": "positive"
+        },
+        {
+          "coefficient": "16693929",
+          "power_of_two": -27,
+          "exact_ratio": "16693929/2^27",
+          "orientation": "positive"
+        }
+      ],
+      "recruitment": [],
+      "source_retrievals": 0,
+      "source_candidate_evaluations": 0,
+      "recruitment_stopped_without_candidate": false,
+      "deposit": null,
+      "final_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1326,
+          1476,
+          76,
+          954,
+          856
+        ]
+      },
+      "final_residual": [
+        {
+          "coefficient": "-10590109",
+          "power_of_two": -26,
+          "exact_ratio": "-10590109/2^26",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-733222561",
+          "power_of_two": -30,
+          "exact_ratio": "-733222561/2^30",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-5041067",
+          "power_of_two": -25,
+          "exact_ratio": "-5041067/2^25",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "6765545",
+          "power_of_two": -26,
+          "exact_ratio": "6765545/2^26",
+          "orientation": "positive"
+        },
+        {
+          "coefficient": "16693929",
+          "power_of_two": -27,
+          "exact_ratio": "16693929/2^27",
+          "orientation": "positive"
+        }
+      ],
+      "orientation_closed": true,
+      "signed_order_closed": false,
+      "complete_boundary_closed": false,
+      "exact_factorized_output_closed": false,
+      "exact_observed_output_closed": false,
+      "source_recruitment_permitted": false,
+      "source_recruitment_used": false,
+      "source_absent_probe_recovered_all_standing_factors": true,
+      "probe_constituent": {
+        "grain": 3,
+        "axes": 1,
+        "cells": 67,
+        "incidences": 8095,
+        "pins": 8095,
+        "paths": 8116,
+        "boundaries": 8116,
+        "exposed_pins": 8053,
+        "native_sha256": "eb1852d721860c0ee7715aca01d76c02c04f2a8582a3a856aaab76937d74a216"
+      }
+    },
+    {
+      "phase": "evaluation",
+      "current_id": "reverse_then_drop.prose.relevant_before",
+      "context": "prose",
+      "condition": "relevant_before",
+      "prompt_sha256": "4889df6b1bae944074a8bd9620775f5dc82c53977dd98c4fa19a8566706d83c8",
+      "prompt_extent": 260,
+      "receiver_position": 259,
+      "full_source_factors": 8192,
+      "standing_factors_before": 21,
+      "standing_factors_after": 21,
+      "initial_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1326,
+          1476,
+          76,
+          954,
+          856
+        ]
+      },
+      "target_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "initial_residual": [
+        {
+          "coefficient": "-10840509",
+          "power_of_two": -26,
+          "exact_ratio": "-10840509/2^26",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-628315105",
+          "power_of_two": -30,
+          "exact_ratio": "-628315105/2^30",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-20611539",
+          "power_of_two": -27,
+          "exact_ratio": "-20611539/2^27",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "796221",
+          "power_of_two": -23,
+          "exact_ratio": "796221/2^23",
+          "orientation": "positive"
+        },
+        {
+          "coefficient": "8090963",
+          "power_of_two": -26,
+          "exact_ratio": "8090963/2^26",
+          "orientation": "positive"
+        }
+      ],
+      "recruitment": [],
+      "source_retrievals": 0,
+      "source_candidate_evaluations": 0,
+      "recruitment_stopped_without_candidate": false,
+      "deposit": null,
+      "final_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1326,
+          1476,
+          76,
+          954,
+          856
+        ]
+      },
+      "final_residual": [
+        {
+          "coefficient": "-10840509",
+          "power_of_two": -26,
+          "exact_ratio": "-10840509/2^26",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-628315105",
+          "power_of_two": -30,
+          "exact_ratio": "-628315105/2^30",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-20611539",
+          "power_of_two": -27,
+          "exact_ratio": "-20611539/2^27",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "796221",
+          "power_of_two": -23,
+          "exact_ratio": "796221/2^23",
+          "orientation": "positive"
+        },
+        {
+          "coefficient": "8090963",
+          "power_of_two": -26,
+          "exact_ratio": "8090963/2^26",
+          "orientation": "positive"
+        }
+      ],
+      "orientation_closed": true,
+      "signed_order_closed": false,
+      "complete_boundary_closed": false,
+      "exact_factorized_output_closed": false,
+      "exact_observed_output_closed": false,
+      "source_recruitment_permitted": false,
+      "source_recruitment_used": false,
+      "source_absent_probe_recovered_all_standing_factors": true,
+      "probe_constituent": {
+        "grain": 3,
+        "axes": 1,
+        "cells": 67,
+        "incidences": 8095,
+        "pins": 8095,
+        "paths": 8116,
+        "boundaries": 8116,
+        "exposed_pins": 8053,
+        "native_sha256": "da9874988e00a85b24c1518325b7d52aec7df7861250f423a1717c942a4ed1b0"
+      }
+    },
+    {
+      "phase": "evaluation",
+      "current_id": "reverse_then_drop.code_comment.relevant_before",
+      "context": "code_comment",
+      "condition": "relevant_before",
+      "prompt_sha256": "abd6ecdbcd16e846651644dd3c2b4f9456176eba068ab4b5d28cb201b713d16a",
+      "prompt_extent": 255,
+      "receiver_position": 254,
+      "full_source_factors": 8192,
+      "standing_factors_before": 21,
+      "standing_factors_after": 21,
+      "initial_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "target_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1326,
+          1476,
+          76,
+          954,
+          856
+        ]
+      },
+      "initial_residual": [
+        {
+          "coefficient": "-10909473",
+          "power_of_two": -26,
+          "exact_ratio": "-10909473/2^26",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-651831527",
+          "power_of_two": -30,
+          "exact_ratio": "-651831527/2^30",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-18904919",
+          "power_of_two": -27,
+          "exact_ratio": "-18904919/2^27",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "4351037",
+          "power_of_two": -25,
+          "exact_ratio": "4351037/2^25",
+          "orientation": "positive"
+        },
+        {
+          "coefficient": "32941423",
+          "power_of_two": -28,
+          "exact_ratio": "32941423/2^28",
+          "orientation": "positive"
+        }
+      ],
+      "recruitment": [],
+      "source_retrievals": 0,
+      "source_candidate_evaluations": 0,
+      "recruitment_stopped_without_candidate": false,
+      "deposit": null,
+      "final_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "final_residual": [
+        {
+          "coefficient": "-10909473",
+          "power_of_two": -26,
+          "exact_ratio": "-10909473/2^26",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-651831527",
+          "power_of_two": -30,
+          "exact_ratio": "-651831527/2^30",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "-18904919",
+          "power_of_two": -27,
+          "exact_ratio": "-18904919/2^27",
+          "orientation": "negative"
+        },
+        {
+          "coefficient": "4351037",
+          "power_of_two": -25,
+          "exact_ratio": "4351037/2^25",
+          "orientation": "positive"
+        },
+        {
+          "coefficient": "32941423",
+          "power_of_two": -28,
+          "exact_ratio": "32941423/2^28",
+          "orientation": "positive"
+        }
+      ],
+      "orientation_closed": true,
+      "signed_order_closed": false,
+      "complete_boundary_closed": false,
+      "exact_factorized_output_closed": false,
+      "exact_observed_output_closed": false,
+      "source_recruitment_permitted": false,
+      "source_recruitment_used": false,
+      "source_absent_probe_recovered_all_standing_factors": true,
+      "probe_constituent": {
+        "grain": 3,
+        "axes": 1,
+        "cells": 67,
+        "incidences": 8095,
+        "pins": 8095,
+        "paths": 8116,
+        "boundaries": 8116,
+        "exposed_pins": 8053,
+        "native_sha256": "b839aec0f90fd76992019cc6bab9de7da180d4dd8aa873128b267a0485899216"
+      }
+    }
+  ],
+  "no_ecology_control_refused": true,
+  "final_ecology": {
+    "factors": [
+      299,
+      348,
+      579,
+      696,
+      1400,
+      1626,
+      1892,
+      1917,
+      2063,
+      2195,
+      2372,
+      3098,
+      3121,
+      3366,
+      3748,
+      4019,
+      4200,
+      4901,
+      4966,
+      5016,
+      6208
+    ],
+    "factor_count": 21,
+    "active_factor_ratio": "21/8192",
+    "source_retrievals": 15,
+    "encoded_bits": 6888,
+    "machine": {
+      "standing_rank": 6,
+      "standing_cells": 49,
+      "standing_constituents": 21,
+      "constituent_cells": 63,
+      "constituent_incidences": 6909,
+      "constituent_pins": 6909,
+      "constituent_paths": 6909,
+      "constituent_transport_terms": 9212,
+      "live_lineages": 0,
+      "rest_sha256": "093aa1f64b8a65aab5dd59483fffd4477e28b208cb10e02a310ab5c3476e1423"
+    }
+  },
+  "acceptance": {
+    "source_factorizations_verified_exactly": true,
+    "source_observed_and_factorized_faces_agree": true,
+    "initial_factors_became_standing": true,
+    "every_returned_source_batch_became_exact_standing": true,
+    "every_source_lineage_departed": true,
+    "every_assisted_prediction_equaled_source_absent_conduct": true,
+    "holdouts_received_no_source_factor": true,
+    "all_rest_remounts_exact": true,
+    "no_float_operation_in_cultivation_or_conduct": true
+  },
+  "conclusion": "the one-pass ecology admitted 15 source factors beyond its six inherited factors; 9/9 cultivation currents and 0/3 source-absent changed-operation holdouts closed the complete declared receiver face. This grades local cultivation and transfer only; it does not establish a portable skill, architectural compression, or reduced physical cost."
+}

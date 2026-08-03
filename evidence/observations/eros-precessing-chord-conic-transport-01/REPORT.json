@@ -1,0 +1,2162 @@
+{
+  "schema": "eros.precessing-chord-conic-transport.v1",
+  "status": "accepted",
+  "question": "Can one reciprocal Smith chord become a parameterized two-sheeted pole carrier whose exact arc imbalance, sheet metric, conic phase, and triangular holonomy remain separately observable?",
+  "theory_to_structure": [
+    "one oriented chord -> plane intersection q, axis direction u, and two pole sheets",
+    "one discrete edge -> Delta P plus/minus = Delta q plus/minus r Delta u",
+    "pole-length sum -> common translation and precession activity",
+    "pole-length difference -> oriented cross-coupling Delta q dot Delta u",
+    "two parameter directions -> two induced sheet metrics and their common/coupling factors",
+    "direct versus composed face transport -> exact connection holonomy",
+    "one conic matrix pencil -> circle, ellipse, discriminant line-pair, and hyperbola phases"
+  ],
+  "workers": {
+    "host_parallelism_available": 24,
+    "independent_exact_workers": 4
+  },
+  "smith_chord_precession": {
+    "source_centered_pair": [
+      {
+        "real": {
+          "numerator": "1",
+          "denominator": "4"
+        },
+        "imaginary": {
+          "numerator": "3",
+          "denominator": "2"
+        }
+      },
+      {
+        "real": {
+          "numerator": "-1",
+          "denominator": "4"
+        },
+        "imaginary": {
+          "numerator": "3",
+          "denominator": "2"
+        }
+      }
+    ],
+    "source_cayley_pair": [
+      {
+        "real": {
+          "numerator": "21",
+          "denominator": "61"
+        },
+        "imaginary": {
+          "numerator": "48",
+          "denominator": "61"
+        }
+      },
+      {
+        "real": {
+          "numerator": "7",
+          "denominator": "15"
+        },
+        "imaginary": {
+          "numerator": "16",
+          "denominator": "15"
+        }
+      }
+    ],
+    "source_upper_pole": {
+      "x": {
+        "numerator": "21",
+        "denominator": "53"
+      },
+      "y": {
+        "numerator": "48",
+        "denominator": "53"
+      },
+      "z": {
+        "numerator": "8",
+        "denominator": "53"
+      }
+    },
+    "source_lower_pole": {
+      "x": {
+        "numerator": "21",
+        "denominator": "53"
+      },
+      "y": {
+        "numerator": "48",
+        "denominator": "53"
+      },
+      "z": {
+        "numerator": "-8",
+        "denominator": "53"
+      }
+    },
+    "source_plane_intersection": {
+      "x": {
+        "numerator": "21",
+        "denominator": "53"
+      },
+      "y": {
+        "numerator": "48",
+        "denominator": "53"
+      },
+      "z": {
+        "numerator": "0",
+        "denominator": "1"
+      }
+    },
+    "source_half_chord": {
+      "numerator": "8",
+      "denominator": "53"
+    },
+    "tilt_rotation": {
+      "rows": [
+        [
+          {
+            "numerator": "24",
+            "denominator": "25"
+          },
+          {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          {
+            "numerator": "7",
+            "denominator": "25"
+          }
+        ],
+        [
+          {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          {
+            "numerator": "1",
+            "denominator": "1"
+          },
+          {
+            "numerator": "0",
+            "denominator": "1"
+          }
+        ],
+        [
+          {
+            "numerator": "-7",
+            "denominator": "25"
+          },
+          {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          {
+            "numerator": "24",
+            "denominator": "25"
+          }
+        ]
+      ]
+    },
+    "tilted_upper_pole": {
+      "x": {
+        "numerator": "112",
+        "denominator": "265"
+      },
+      "y": {
+        "numerator": "48",
+        "denominator": "53"
+      },
+      "z": {
+        "numerator": "9",
+        "denominator": "265"
+      }
+    },
+    "tilted_lower_pole": {
+      "x": {
+        "numerator": "448",
+        "denominator": "1325"
+      },
+      "y": {
+        "numerator": "48",
+        "denominator": "53"
+      },
+      "z": {
+        "numerator": "-339",
+        "denominator": "1325"
+      }
+    },
+    "tilted_axis_direction": {
+      "x": {
+        "numerator": "7",
+        "denominator": "25"
+      },
+      "y": {
+        "numerator": "0",
+        "denominator": "1"
+      },
+      "z": {
+        "numerator": "24",
+        "denominator": "25"
+      }
+    },
+    "tilted_plane_intersection": {
+      "x": {
+        "numerator": "175",
+        "denominator": "424"
+      },
+      "y": {
+        "numerator": "48",
+        "denominator": "53"
+      },
+      "z": {
+        "numerator": "0",
+        "denominator": "1"
+      }
+    },
+    "tilted_upper_distance_from_plane": {
+      "numerator": "15",
+      "denominator": "424"
+    },
+    "tilted_lower_distance_from_plane": {
+      "numerator": "113",
+      "denominator": "424"
+    },
+    "precession_about_plane_normal": {
+      "rows": [
+        [
+          {
+            "numerator": "3",
+            "denominator": "5"
+          },
+          {
+            "numerator": "-4",
+            "denominator": "5"
+          },
+          {
+            "numerator": "0",
+            "denominator": "1"
+          }
+        ],
+        [
+          {
+            "numerator": "4",
+            "denominator": "5"
+          },
+          {
+            "numerator": "3",
+            "denominator": "5"
+          },
+          {
+            "numerator": "0",
+            "denominator": "1"
+          }
+        ],
+        [
+          {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          {
+            "numerator": "1",
+            "denominator": "1"
+          }
+        ]
+      ]
+    },
+    "precession_phase": {
+      "real": {
+        "numerator": "3",
+        "denominator": "5"
+      },
+      "imaginary": {
+        "numerator": "4",
+        "denominator": "5"
+      }
+    },
+    "precessed_upper_pole": {
+      "x": {
+        "numerator": "-624",
+        "denominator": "1325"
+      },
+      "y": {
+        "numerator": "1168",
+        "denominator": "1325"
+      },
+      "z": {
+        "numerator": "9",
+        "denominator": "265"
+      }
+    },
+    "precessed_lower_pole": {
+      "x": {
+        "numerator": "-3456",
+        "denominator": "6625"
+      },
+      "y": {
+        "numerator": "5392",
+        "denominator": "6625"
+      },
+      "z": {
+        "numerator": "-339",
+        "denominator": "1325"
+      }
+    },
+    "precessed_axis_direction": {
+      "x": {
+        "numerator": "21",
+        "denominator": "125"
+      },
+      "y": {
+        "numerator": "28",
+        "denominator": "125"
+      },
+      "z": {
+        "numerator": "24",
+        "denominator": "25"
+      }
+    },
+    "precessed_plane_intersection": {
+      "x": {
+        "numerator": "-1011",
+        "denominator": "2120"
+      },
+      "y": {
+        "numerator": "463",
+        "denominator": "530"
+      },
+      "z": {
+        "numerator": "0",
+        "denominator": "1"
+      }
+    },
+    "tilted_intersection_complex": {
+      "real": {
+        "numerator": "175",
+        "denominator": "424"
+      },
+      "imaginary": {
+        "numerator": "48",
+        "denominator": "53"
+      }
+    },
+    "precessed_intersection_complex": {
+      "real": {
+        "numerator": "-1011",
+        "denominator": "2120"
+      },
+      "imaginary": {
+        "numerator": "463",
+        "denominator": "530"
+      }
+    },
+    "tilted_direction_stereographic": {
+      "real": {
+        "numerator": "7",
+        "denominator": "1"
+      },
+      "imaginary": {
+        "numerator": "0",
+        "denominator": "1"
+      }
+    },
+    "precessed_direction_stereographic": {
+      "real": {
+        "numerator": "21",
+        "denominator": "5"
+      },
+      "imaginary": {
+        "numerator": "28",
+        "denominator": "5"
+      }
+    },
+    "intersection_obeys_complex_precession": true,
+    "direction_obeys_complex_precession": true,
+    "upper_pole_edge_length_squared": {
+      "numerator": "280576",
+      "denominator": "351125"
+    },
+    "lower_pole_edge_length_squared": {
+      "numerator": "6562816",
+      "denominator": "8778125"
+    },
+    "upper_spherical_arc_cosine": {
+      "numerator": "210837",
+      "denominator": "351125"
+    },
+    "lower_spherical_arc_cosine": {
+      "numerator": "5496717",
+      "denominator": "8778125"
+    },
+    "upper_spherical_arc_length": "arccos(210837/351125)",
+    "lower_spherical_arc_length": "arccos(5496717/8778125)",
+    "chordal_and_spherical_edge_reads_agree": true,
+    "chord_separation_squared": [
+      {
+        "numerator": "256",
+        "denominator": "2809"
+      },
+      {
+        "numerator": "256",
+        "denominator": "2809"
+      },
+      {
+        "numerator": "256",
+        "denominator": "2809"
+      }
+    ],
+    "chord_separation_preserved": true,
+    "every_pole_remains_on_unit_sphere": true,
+    "precession_moves_the_complex_intersection": true,
+    "exact_interpretation": "The prior reciprocal Smith points are the ends of one chord. A rational tilt makes the plane cut asymmetric; a later rational rotation about the plane normal precesses both the actual intersection and the stereographic direction by the same unit complex phase."
+  },
+  "symmetric_pole_edges": {
+    "common_axis_rotation": {
+      "rows": [
+        [
+          {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          {
+            "numerator": "-1",
+            "denominator": "1"
+          },
+          {
+            "numerator": "0",
+            "denominator": "1"
+          }
+        ],
+        [
+          {
+            "numerator": "1",
+            "denominator": "1"
+          },
+          {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          {
+            "numerator": "0",
+            "denominator": "1"
+          }
+        ],
+        [
+          {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          {
+            "numerator": "1",
+            "denominator": "1"
+          }
+        ]
+      ]
+    },
+    "edges": [
+      {
+        "label": "precession without translation",
+        "source_intersection": {
+          "x": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "y": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "z": {
+            "numerator": "0",
+            "denominator": "1"
+          }
+        },
+        "target_intersection": {
+          "x": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "y": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "z": {
+            "numerator": "0",
+            "denominator": "1"
+          }
+        },
+        "source_axis": {
+          "x": {
+            "numerator": "3",
+            "denominator": "5"
+          },
+          "y": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "z": {
+            "numerator": "4",
+            "denominator": "5"
+          }
+        },
+        "target_axis": {
+          "x": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "y": {
+            "numerator": "3",
+            "denominator": "5"
+          },
+          "z": {
+            "numerator": "4",
+            "denominator": "5"
+          }
+        },
+        "delta_intersection": {
+          "x": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "y": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "z": {
+            "numerator": "0",
+            "denominator": "1"
+          }
+        },
+        "delta_axis": {
+          "x": {
+            "numerator": "-3",
+            "denominator": "5"
+          },
+          "y": {
+            "numerator": "3",
+            "denominator": "5"
+          },
+          "z": {
+            "numerator": "0",
+            "denominator": "1"
+          }
+        },
+        "upper_displacement": {
+          "x": {
+            "numerator": "-3",
+            "denominator": "5"
+          },
+          "y": {
+            "numerator": "3",
+            "denominator": "5"
+          },
+          "z": {
+            "numerator": "0",
+            "denominator": "1"
+          }
+        },
+        "lower_displacement": {
+          "x": {
+            "numerator": "3",
+            "denominator": "5"
+          },
+          "y": {
+            "numerator": "-3",
+            "denominator": "5"
+          },
+          "z": {
+            "numerator": "0",
+            "denominator": "1"
+          }
+        },
+        "upper_length_squared": {
+          "numerator": "18",
+          "denominator": "25"
+        },
+        "lower_length_squared": {
+          "numerator": "18",
+          "denominator": "25"
+        },
+        "length_sum": {
+          "numerator": "36",
+          "denominator": "25"
+        },
+        "expected_length_sum": {
+          "numerator": "36",
+          "denominator": "25"
+        },
+        "length_difference": {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        "expected_length_difference": {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        "swing_chi": {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        "pole_swapped_swing_chi": {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        "cross_coupling": {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        "identities_exact": true,
+        "interpretation": "Both poles traverse equal elementary arcs; all activity is orientation change."
+      },
+      {
+        "label": "translation orthogonal to precession",
+        "source_intersection": {
+          "x": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "y": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "z": {
+            "numerator": "0",
+            "denominator": "1"
+          }
+        },
+        "target_intersection": {
+          "x": {
+            "numerator": "1",
+            "denominator": "1"
+          },
+          "y": {
+            "numerator": "1",
+            "denominator": "1"
+          },
+          "z": {
+            "numerator": "0",
+            "denominator": "1"
+          }
+        },
+        "source_axis": {
+          "x": {
+            "numerator": "3",
+            "denominator": "5"
+          },
+          "y": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "z": {
+            "numerator": "4",
+            "denominator": "5"
+          }
+        },
+        "target_axis": {
+          "x": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "y": {
+            "numerator": "3",
+            "denominator": "5"
+          },
+          "z": {
+            "numerator": "4",
+            "denominator": "5"
+          }
+        },
+        "delta_intersection": {
+          "x": {
+            "numerator": "1",
+            "denominator": "1"
+          },
+          "y": {
+            "numerator": "1",
+            "denominator": "1"
+          },
+          "z": {
+            "numerator": "0",
+            "denominator": "1"
+          }
+        },
+        "delta_axis": {
+          "x": {
+            "numerator": "-3",
+            "denominator": "5"
+          },
+          "y": {
+            "numerator": "3",
+            "denominator": "5"
+          },
+          "z": {
+            "numerator": "0",
+            "denominator": "1"
+          }
+        },
+        "upper_displacement": {
+          "x": {
+            "numerator": "2",
+            "denominator": "5"
+          },
+          "y": {
+            "numerator": "8",
+            "denominator": "5"
+          },
+          "z": {
+            "numerator": "0",
+            "denominator": "1"
+          }
+        },
+        "lower_displacement": {
+          "x": {
+            "numerator": "8",
+            "denominator": "5"
+          },
+          "y": {
+            "numerator": "2",
+            "denominator": "5"
+          },
+          "z": {
+            "numerator": "0",
+            "denominator": "1"
+          }
+        },
+        "upper_length_squared": {
+          "numerator": "68",
+          "denominator": "25"
+        },
+        "lower_length_squared": {
+          "numerator": "68",
+          "denominator": "25"
+        },
+        "length_sum": {
+          "numerator": "136",
+          "denominator": "25"
+        },
+        "expected_length_sum": {
+          "numerator": "136",
+          "denominator": "25"
+        },
+        "length_difference": {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        "expected_length_difference": {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        "swing_chi": {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        "pole_swapped_swing_chi": {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        "cross_coupling": {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        "identities_exact": true,
+        "interpretation": "Translation and axis change coexist but their exact cross-coupling vanishes."
+      },
+      {
+        "label": "translation coupled to precession",
+        "source_intersection": {
+          "x": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "y": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "z": {
+            "numerator": "0",
+            "denominator": "1"
+          }
+        },
+        "target_intersection": {
+          "x": {
+            "numerator": "1",
+            "denominator": "1"
+          },
+          "y": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "z": {
+            "numerator": "0",
+            "denominator": "1"
+          }
+        },
+        "source_axis": {
+          "x": {
+            "numerator": "3",
+            "denominator": "5"
+          },
+          "y": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "z": {
+            "numerator": "4",
+            "denominator": "5"
+          }
+        },
+        "target_axis": {
+          "x": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "y": {
+            "numerator": "3",
+            "denominator": "5"
+          },
+          "z": {
+            "numerator": "4",
+            "denominator": "5"
+          }
+        },
+        "delta_intersection": {
+          "x": {
+            "numerator": "1",
+            "denominator": "1"
+          },
+          "y": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "z": {
+            "numerator": "0",
+            "denominator": "1"
+          }
+        },
+        "delta_axis": {
+          "x": {
+            "numerator": "-3",
+            "denominator": "5"
+          },
+          "y": {
+            "numerator": "3",
+            "denominator": "5"
+          },
+          "z": {
+            "numerator": "0",
+            "denominator": "1"
+          }
+        },
+        "upper_displacement": {
+          "x": {
+            "numerator": "2",
+            "denominator": "5"
+          },
+          "y": {
+            "numerator": "3",
+            "denominator": "5"
+          },
+          "z": {
+            "numerator": "0",
+            "denominator": "1"
+          }
+        },
+        "lower_displacement": {
+          "x": {
+            "numerator": "8",
+            "denominator": "5"
+          },
+          "y": {
+            "numerator": "-3",
+            "denominator": "5"
+          },
+          "z": {
+            "numerator": "0",
+            "denominator": "1"
+          }
+        },
+        "upper_length_squared": {
+          "numerator": "13",
+          "denominator": "25"
+        },
+        "lower_length_squared": {
+          "numerator": "73",
+          "denominator": "25"
+        },
+        "length_sum": {
+          "numerator": "86",
+          "denominator": "25"
+        },
+        "expected_length_sum": {
+          "numerator": "86",
+          "denominator": "25"
+        },
+        "length_difference": {
+          "numerator": "-12",
+          "denominator": "5"
+        },
+        "expected_length_difference": {
+          "numerator": "-12",
+          "denominator": "5"
+        },
+        "swing_chi": {
+          "numerator": "-30",
+          "denominator": "43"
+        },
+        "pole_swapped_swing_chi": {
+          "numerator": "30",
+          "denominator": "43"
+        },
+        "cross_coupling": {
+          "numerator": "-3",
+          "denominator": "5"
+        },
+        "identities_exact": true,
+        "interpretation": "The cross-term makes the two pole arcs unequal; swapping pole hand reverses the swing."
+      }
+    ]
+  },
+  "two_parameter_sheet_metric": {
+    "base_axis": {
+      "x": {
+        "numerator": "0",
+        "denominator": "1"
+      },
+      "y": {
+        "numerator": "0",
+        "denominator": "1"
+      },
+      "z": {
+        "numerator": "1",
+        "denominator": "1"
+      }
+    },
+    "parameter_names": [
+      "alpha",
+      "beta"
+    ],
+    "intersection_tangents": [
+      {
+        "x": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "y": {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        "z": {
+          "numerator": "0",
+          "denominator": "1"
+        }
+      },
+      {
+        "x": {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        "y": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "z": {
+          "numerator": "0",
+          "denominator": "1"
+        }
+      }
+    ],
+    "axis_tangents": [
+      {
+        "x": {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        "y": {
+          "numerator": "1",
+          "denominator": "2"
+        },
+        "z": {
+          "numerator": "0",
+          "denominator": "1"
+        }
+      },
+      {
+        "x": {
+          "numerator": "1",
+          "denominator": "3"
+        },
+        "y": {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        "z": {
+          "numerator": "0",
+          "denominator": "1"
+        }
+      }
+    ],
+    "upper_sheet_metric": [
+      [
+        {
+          "numerator": "5",
+          "denominator": "4"
+        },
+        {
+          "numerator": "5",
+          "denominator": "6"
+        }
+      ],
+      [
+        {
+          "numerator": "5",
+          "denominator": "6"
+        },
+        {
+          "numerator": "10",
+          "denominator": "9"
+        }
+      ]
+    ],
+    "lower_sheet_metric": [
+      [
+        {
+          "numerator": "5",
+          "denominator": "4"
+        },
+        {
+          "numerator": "-5",
+          "denominator": "6"
+        }
+      ],
+      [
+        {
+          "numerator": "-5",
+          "denominator": "6"
+        },
+        {
+          "numerator": "10",
+          "denominator": "9"
+        }
+      ]
+    ],
+    "common_metric": [
+      [
+        {
+          "numerator": "5",
+          "denominator": "4"
+        },
+        {
+          "numerator": "0",
+          "denominator": "1"
+        }
+      ],
+      [
+        {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        {
+          "numerator": "10",
+          "denominator": "9"
+        }
+      ]
+    ],
+    "coupling_metric": [
+      [
+        {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        {
+          "numerator": "5",
+          "denominator": "6"
+        }
+      ],
+      [
+        {
+          "numerator": "5",
+          "denominator": "6"
+        },
+        {
+          "numerator": "0",
+          "denominator": "1"
+        }
+      ]
+    ],
+    "upper_determinant": {
+      "numerator": "25",
+      "denominator": "36"
+    },
+    "lower_determinant": {
+      "numerator": "25",
+      "denominator": "36"
+    },
+    "both_sheet_metrics_positive_definite": true,
+    "average_and_coupling_reconstruct_both_sheets": true,
+    "exact_interpretation": "The average metric retains common translation-plus-precession activity. The half-difference is an oriented mixed tensor; averaging the pole sheets alone would erase it."
+  },
+  "triangular_connection_faces": [
+    {
+      "label": "flat precession triangle",
+      "first_edge_transport": {
+        "rows": [
+          [
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "-1",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            }
+          ],
+          [
+            {
+              "numerator": "1",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            }
+          ],
+          [
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "1",
+              "denominator": "1"
+            }
+          ]
+        ]
+      },
+      "second_edge_transport": {
+        "rows": [
+          [
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "-1",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            }
+          ],
+          [
+            {
+              "numerator": "1",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            }
+          ],
+          [
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "1",
+              "denominator": "1"
+            }
+          ]
+        ]
+      },
+      "direct_transport": {
+        "rows": [
+          [
+            {
+              "numerator": "-1",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            }
+          ],
+          [
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "-1",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            }
+          ],
+          [
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "1",
+              "denominator": "1"
+            }
+          ]
+        ]
+      },
+      "composed_transport": {
+        "rows": [
+          [
+            {
+              "numerator": "-1",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            }
+          ],
+          [
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "-1",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            }
+          ],
+          [
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "1",
+              "denominator": "1"
+            }
+          ]
+        ]
+      },
+      "connection_residual": {
+        "rows": [
+          [
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            }
+          ],
+          [
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            }
+          ],
+          [
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            }
+          ]
+        ]
+      },
+      "holonomy": {
+        "rows": [
+          [
+            {
+              "numerator": "1",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            }
+          ],
+          [
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "1",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            }
+          ],
+          [
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "1",
+              "denominator": "1"
+            }
+          ]
+        ]
+      },
+      "holonomy_cosine_without_angle_evaluation": {
+        "numerator": "1",
+        "denominator": "1"
+      },
+      "every_transport_is_special_orthogonal": true,
+      "direct_and_composed_agree": true,
+      "initial_axis": {
+        "x": {
+          "numerator": "3",
+          "denominator": "5"
+        },
+        "y": {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        "z": {
+          "numerator": "4",
+          "denominator": "5"
+        }
+      },
+      "direct_axis_at_target": {
+        "x": {
+          "numerator": "-3",
+          "denominator": "5"
+        },
+        "y": {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        "z": {
+          "numerator": "4",
+          "denominator": "5"
+        }
+      },
+      "composed_axis_at_target": {
+        "x": {
+          "numerator": "-3",
+          "denominator": "5"
+        },
+        "y": {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        "z": {
+          "numerator": "4",
+          "denominator": "5"
+        }
+      },
+      "axis_discrepancy_squared": {
+        "numerator": "0",
+        "denominator": "1"
+      },
+      "upper_pole_discrepancy_squared": {
+        "numerator": "0",
+        "denominator": "1"
+      },
+      "lower_pole_discrepancy_squared": {
+        "numerator": "0",
+        "denominator": "1"
+      },
+      "species": "flat_connection_face",
+      "exact_interpretation": "The direct edge and the two-edge precession return the same target frame; the triangle carries no connection residual."
+    },
+    {
+      "label": "curved mixed-axis triangle",
+      "first_edge_transport": {
+        "rows": [
+          [
+            {
+              "numerator": "1",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            }
+          ],
+          [
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "-1",
+              "denominator": "1"
+            }
+          ],
+          [
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "1",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            }
+          ]
+        ]
+      },
+      "second_edge_transport": {
+        "rows": [
+          [
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "1",
+              "denominator": "1"
+            }
+          ],
+          [
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "1",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            }
+          ],
+          [
+            {
+              "numerator": "-1",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            }
+          ]
+        ]
+      },
+      "direct_transport": {
+        "rows": [
+          [
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "-1",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            }
+          ],
+          [
+            {
+              "numerator": "1",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            }
+          ],
+          [
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "1",
+              "denominator": "1"
+            }
+          ]
+        ]
+      },
+      "composed_transport": {
+        "rows": [
+          [
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "1",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            }
+          ],
+          [
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "-1",
+              "denominator": "1"
+            }
+          ],
+          [
+            {
+              "numerator": "-1",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            }
+          ]
+        ]
+      },
+      "connection_residual": {
+        "rows": [
+          [
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "2",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            }
+          ],
+          [
+            {
+              "numerator": "-1",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "-1",
+              "denominator": "1"
+            }
+          ],
+          [
+            {
+              "numerator": "-1",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "-1",
+              "denominator": "1"
+            }
+          ]
+        ]
+      },
+      "holonomy": {
+        "rows": [
+          [
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "-1",
+              "denominator": "1"
+            }
+          ],
+          [
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "-1",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            }
+          ],
+          [
+            {
+              "numerator": "-1",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            {
+              "numerator": "0",
+              "denominator": "1"
+            }
+          ]
+        ]
+      },
+      "holonomy_cosine_without_angle_evaluation": {
+        "numerator": "-1",
+        "denominator": "1"
+      },
+      "every_transport_is_special_orthogonal": true,
+      "direct_and_composed_agree": false,
+      "initial_axis": {
+        "x": {
+          "numerator": "3",
+          "denominator": "5"
+        },
+        "y": {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        "z": {
+          "numerator": "4",
+          "denominator": "5"
+        }
+      },
+      "direct_axis_at_target": {
+        "x": {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        "y": {
+          "numerator": "3",
+          "denominator": "5"
+        },
+        "z": {
+          "numerator": "4",
+          "denominator": "5"
+        }
+      },
+      "composed_axis_at_target": {
+        "x": {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        "y": {
+          "numerator": "-4",
+          "denominator": "5"
+        },
+        "z": {
+          "numerator": "-3",
+          "denominator": "5"
+        }
+      },
+      "axis_discrepancy_squared": {
+        "numerator": "98",
+        "denominator": "25"
+      },
+      "upper_pole_discrepancy_squared": {
+        "numerator": "98",
+        "denominator": "25"
+      },
+      "lower_pole_discrepancy_squared": {
+        "numerator": "98",
+        "denominator": "25"
+      },
+      "species": "curved_connection_face",
+      "exact_interpretation": "The direct and composed routes reach one base vertex with different frames and pole placements; their exact holonomy is the face curvature."
+    }
+  ],
+  "conic_phase_path": {
+    "pencil": "Q_mu(x,y)=x^2+mu*y^2-1",
+    "rows": [
+      {
+        "parameter_mu": {
+          "numerator": "4",
+          "denominator": "1"
+        },
+        "homogeneous_matrix": {
+          "rows": [
+            [
+              {
+                "numerator": "1",
+                "denominator": "1"
+              },
+              {
+                "numerator": "0",
+                "denominator": "1"
+              },
+              {
+                "numerator": "0",
+                "denominator": "1"
+              }
+            ],
+            [
+              {
+                "numerator": "0",
+                "denominator": "1"
+              },
+              {
+                "numerator": "4",
+                "denominator": "1"
+              },
+              {
+                "numerator": "0",
+                "denominator": "1"
+              }
+            ],
+            [
+              {
+                "numerator": "0",
+                "denominator": "1"
+              },
+              {
+                "numerator": "0",
+                "denominator": "1"
+              },
+              {
+                "numerator": "-1",
+                "denominator": "1"
+              }
+            ]
+          ]
+        },
+        "determinant": {
+          "numerator": "-4",
+          "denominator": "1"
+        },
+        "equation": "x^2+4*y^2-1=0",
+        "real_species": "ellipse",
+        "nonsingular_complex_projective_conic": true,
+        "discriminant": false,
+        "factorization": null,
+        "witnesses": [
+          {
+            "point": {
+              "real": {
+                "numerator": "1",
+                "denominator": "1"
+              },
+              "imaginary": {
+                "numerator": "0",
+                "denominator": "1"
+              }
+            },
+            "polynomial_value": {
+              "numerator": "0",
+              "denominator": "1"
+            }
+          },
+          {
+            "point": {
+              "real": {
+                "numerator": "0",
+                "denominator": "1"
+              },
+              "imaginary": {
+                "numerator": "1",
+                "denominator": "2"
+              }
+            },
+            "polynomial_value": {
+              "numerator": "0",
+              "denominator": "1"
+            }
+          }
+        ],
+        "every_witness_exact": true
+      },
+      {
+        "parameter_mu": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "homogeneous_matrix": {
+          "rows": [
+            [
+              {
+                "numerator": "1",
+                "denominator": "1"
+              },
+              {
+                "numerator": "0",
+                "denominator": "1"
+              },
+              {
+                "numerator": "0",
+                "denominator": "1"
+              }
+            ],
+            [
+              {
+                "numerator": "0",
+                "denominator": "1"
+              },
+              {
+                "numerator": "1",
+                "denominator": "1"
+              },
+              {
+                "numerator": "0",
+                "denominator": "1"
+              }
+            ],
+            [
+              {
+                "numerator": "0",
+                "denominator": "1"
+              },
+              {
+                "numerator": "0",
+                "denominator": "1"
+              },
+              {
+                "numerator": "-1",
+                "denominator": "1"
+              }
+            ]
+          ]
+        },
+        "determinant": {
+          "numerator": "-1",
+          "denominator": "1"
+        },
+        "equation": "x^2+1*y^2-1=0",
+        "real_species": "circle",
+        "nonsingular_complex_projective_conic": true,
+        "discriminant": false,
+        "factorization": null,
+        "witnesses": [
+          {
+            "point": {
+              "real": {
+                "numerator": "3",
+                "denominator": "5"
+              },
+              "imaginary": {
+                "numerator": "4",
+                "denominator": "5"
+              }
+            },
+            "polynomial_value": {
+              "numerator": "0",
+              "denominator": "1"
+            }
+          }
+        ],
+        "every_witness_exact": true
+      },
+      {
+        "parameter_mu": {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        "homogeneous_matrix": {
+          "rows": [
+            [
+              {
+                "numerator": "1",
+                "denominator": "1"
+              },
+              {
+                "numerator": "0",
+                "denominator": "1"
+              },
+              {
+                "numerator": "0",
+                "denominator": "1"
+              }
+            ],
+            [
+              {
+                "numerator": "0",
+                "denominator": "1"
+              },
+              {
+                "numerator": "0",
+                "denominator": "1"
+              },
+              {
+                "numerator": "0",
+                "denominator": "1"
+              }
+            ],
+            [
+              {
+                "numerator": "0",
+                "denominator": "1"
+              },
+              {
+                "numerator": "0",
+                "denominator": "1"
+              },
+              {
+                "numerator": "-1",
+                "denominator": "1"
+              }
+            ]
+          ]
+        },
+        "determinant": {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        "equation": "x^2+0*y^2-1=0",
+        "real_species": "degenerate_parallel_line_pair",
+        "nonsingular_complex_projective_conic": false,
+        "discriminant": true,
+        "factorization": "(x-1)(x+1)=0",
+        "witnesses": [
+          {
+            "point": {
+              "real": {
+                "numerator": "1",
+                "denominator": "1"
+              },
+              "imaginary": {
+                "numerator": "7",
+                "denominator": "3"
+              }
+            },
+            "polynomial_value": {
+              "numerator": "0",
+              "denominator": "1"
+            }
+          },
+          {
+            "point": {
+              "real": {
+                "numerator": "-1",
+                "denominator": "1"
+              },
+              "imaginary": {
+                "numerator": "-5",
+                "denominator": "2"
+              }
+            },
+            "polynomial_value": {
+              "numerator": "0",
+              "denominator": "1"
+            }
+          }
+        ],
+        "every_witness_exact": true
+      },
+      {
+        "parameter_mu": {
+          "numerator": "-1",
+          "denominator": "1"
+        },
+        "homogeneous_matrix": {
+          "rows": [
+            [
+              {
+                "numerator": "1",
+                "denominator": "1"
+              },
+              {
+                "numerator": "0",
+                "denominator": "1"
+              },
+              {
+                "numerator": "0",
+                "denominator": "1"
+              }
+            ],
+            [
+              {
+                "numerator": "0",
+                "denominator": "1"
+              },
+              {
+                "numerator": "-1",
+                "denominator": "1"
+              },
+              {
+                "numerator": "0",
+                "denominator": "1"
+              }
+            ],
+            [
+              {
+                "numerator": "0",
+                "denominator": "1"
+              },
+              {
+                "numerator": "0",
+                "denominator": "1"
+              },
+              {
+                "numerator": "-1",
+                "denominator": "1"
+              }
+            ]
+          ]
+        },
+        "determinant": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "equation": "x^2+-1*y^2-1=0",
+        "real_species": "hyperbola",
+        "nonsingular_complex_projective_conic": true,
+        "discriminant": false,
+        "factorization": null,
+        "witnesses": [
+          {
+            "point": {
+              "real": {
+                "numerator": "5",
+                "denominator": "3"
+              },
+              "imaginary": {
+                "numerator": "4",
+                "denominator": "3"
+              }
+            },
+            "polynomial_value": {
+              "numerator": "0",
+              "denominator": "1"
+            }
+          }
+        ],
+        "every_witness_exact": true
+      }
+    ],
+    "discriminant_parameter": {
+      "numerator": "0",
+      "denominator": "1"
+    },
+    "all_nonsingular_rows_share_one_complex_projective_species": true,
+    "discriminant_localized_exactly": true,
+    "exact_interpretation": "Circle, ellipse, and hyperbola are distinct real affine-chart faces of one nonsingular projective conic class. At mu=0 the matrix determinant vanishes and the conic becomes a pair of lines; that seam may supply simplicial edges but is not itself a triangle."
+  },
+  "acceptance": {
+    "smith_chord_precesses_with_exact_complex_phase": true,
+    "rigid_precession_preserves_poles_and_chord": true,
+    "plane_intersection_moves_without_becoming_an_outside_camera": true,
+    "every_symmetric_pole_edge_satisfies_sum_and_difference_laws": true,
+    "decoupled_motion_has_equal_pole_chordal_edges": true,
+    "coupled_swing_is_oriented_and_reverses_with_pole_hand": true,
+    "two_parameter_sheet_metrics_retain_common_and_coupling_parts": true,
+    "flat_triangle_closes_and_curved_triangle_retains_holonomy": true,
+    "conic_projective_class_breaks_only_at_the_declared_discriminant": true,
+    "no_floating_point_causal_data": true
+  },
+  "consequence": "The reciprocal Smith sheets now form an exact movable chord rather than two isolated plotted points. Their plane intersection and direction precess by the same rational complex phase, while the two pole paths expose translation, orientation change, and their cross-coupling without averaging. Triangular holonomy and conic discriminant remain independent typed seams.",
+  "construction_boundary": "This cell supplies the discrete geometric carrier needed by the proposed global response law. It does not yet identify the completed Weil response with the sheet metric, prove that every nontrivial Xi zero is a spectral mode of this connection, or exclude a nonzero normal chord.",
+  "report_sha256_without_digest": "aab1b77275675b49e144686bbf136b5bbc0fa898481f5f81b84447909cedb952"
+}

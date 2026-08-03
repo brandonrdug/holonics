@@ -1,0 +1,7048 @@
+{
+  "acceptance": {
+    "chronology_reversal_changed_at_least_one_complete_field": true,
+    "exact_rest_remount": true,
+    "held_out_consequence_returned_open_residual": true,
+    "later_actual_consequence_entered_same_receiver_field": true,
+    "multi_token_receiver_present": true,
+    "nested_exact_restriction_opened_to_shorter_recurrent_cut": true,
+    "no_floating_point_causal_data": true,
+    "ordinary_chronology_cultivated_without_semantic_roles": true,
+    "recurrent_copy_path_present": true,
+    "recurrent_plural_continuation_present": true,
+    "recurrent_single_continuation_present": true,
+    "source_utf8_round_trips_exactly": true,
+    "virgin_ecology_returned_no_paths": true
+  },
+  "boundary": "This ecology relates exact recurrent textual faces. It does not yet relate nonidentical contexts by a cultivated shared constituent, grammatical transformation, consequence in another world, or other cross-face topology. Exact suffix restriction is not approximate similarity. The tokenizer is a lawful reversible source boundary, not a vocabulary oracle. The report observes a bounded corpus cut and does not claim corpus-scale language closure.",
+  "capability": "A raw child-directed text stream now cultivates its own reversible token grains, relative chronological addresses, recurrent suffix receivers, exact continuation populations, and complete COPY/FOUND paths. A receiver may carry one continuation, several locally afforded continuations, or a residual outside its present field. Receiving that residual as a genuinely later utterance changes the field; source reversal changes it as well.",
+  "cultivated_topology": {
+    "by_horizon": [
+      {
+        "context_faces": 1,
+        "horizon": 0,
+        "plural_consequence_faces": 1,
+        "recurrent_faces": 1
+      },
+      {
+        "context_faces": 621,
+        "horizon": 1,
+        "plural_consequence_faces": 320,
+        "recurrent_faces": 395
+      },
+      {
+        "context_faces": 1785,
+        "horizon": 2,
+        "plural_consequence_faces": 358,
+        "recurrent_faces": 503
+      },
+      {
+        "context_faces": 1848,
+        "horizon": 3,
+        "plural_consequence_faces": 124,
+        "recurrent_faces": 240
+      },
+      {
+        "context_faces": 1463,
+        "horizon": 4,
+        "plural_consequence_faces": 41,
+        "recurrent_faces": 97
+      },
+      {
+        "context_faces": 1052,
+        "horizon": 5,
+        "plural_consequence_faces": 19,
+        "recurrent_faces": 43
+      }
+    ],
+    "context_fibers": 6770,
+    "generation": 5094,
+    "transduction_fibers": 10051
+  },
+  "lambda": {
+    "chronology": "utterance-local-relative-token-distance",
+    "floating_point": false,
+    "maximum_horizon": 5,
+    "maximum_templates_per_view": 4096,
+    "minimum_context_recurrence": 2,
+    "tokenizer": "utf8-whitespace-inclusive-v1"
+  },
+  "later_current": {
+    "actual_consequence": "lady ",
+    "actual_consequence_entered_field": true,
+    "after_receiving_utterance": {
+      "actual_relation": "OPEN_INCLUDED",
+      "complete_paths": [
+        {
+          "consequence": "bird ",
+          "steps": [
+            {
+              "kind": "FOUND",
+              "value": "bird "
+            }
+          ],
+          "support": [
+            {
+              "equal_receiver_axes": [
+                "carrier",
+                "horizon",
+                "suffix"
+              ],
+              "recurrence": 2
+            }
+          ]
+        },
+        {
+          "consequence": "bit ",
+          "steps": [
+            {
+              "kind": "FOUND",
+              "value": "bit "
+            }
+          ],
+          "support": [
+            {
+              "equal_receiver_axes": [
+                "carrier",
+                "horizon",
+                "suffix"
+              ],
+              "recurrence": 6
+            }
+          ]
+        },
+        {
+          "consequence": "boy ",
+          "steps": [
+            {
+              "kind": "FOUND",
+              "value": "boy "
+            }
+          ],
+          "support": [
+            {
+              "equal_receiver_axes": [
+                "carrier",
+                "horizon",
+                "suffix"
+              ],
+              "recurrence": 1
+            }
+          ]
+        },
+        {
+          "consequence": "catnap ",
+          "steps": [
+            {
+              "kind": "FOUND",
+              "value": "catnap "
+            }
+          ],
+          "support": [
+            {
+              "equal_receiver_axes": [
+                "carrier",
+                "horizon",
+                "suffix"
+              ],
+              "recurrence": 1
+            }
+          ]
+        },
+        {
+          "consequence": "corner ",
+          "steps": [
+            {
+              "kind": "FOUND",
+              "value": "corner "
+            }
+          ],
+          "support": [
+            {
+              "equal_receiver_axes": [
+                "carrier",
+                "horizon",
+                "suffix"
+              ],
+              "recurrence": 1
+            }
+          ]
+        },
+        {
+          "consequence": "friend ",
+          "steps": [
+            {
+              "kind": "FOUND",
+              "value": "friend "
+            }
+          ],
+          "support": [
+            {
+              "equal_receiver_axes": [
+                "carrier",
+                "horizon",
+                "suffix"
+              ],
+              "recurrence": 1
+            }
+          ]
+        },
+        {
+          "consequence": "hair ",
+          "steps": [
+            {
+              "kind": "FOUND",
+              "value": "hair "
+            }
+          ],
+          "support": [
+            {
+              "equal_receiver_axes": [
+                "carrier",
+                "horizon",
+                "suffix"
+              ],
+              "recurrence": 1
+            }
+          ]
+        },
+        {
+          "consequence": "lady ",
+          "steps": [
+            {
+              "kind": "FOUND",
+              "value": "lady "
+            }
+          ],
+          "support": [
+            {
+              "equal_receiver_axes": [
+                "carrier",
+                "horizon",
+                "suffix"
+              ],
+              "recurrence": 1
+            }
+          ]
+        },
+        {
+          "consequence": "pal ",
+          "steps": [
+            {
+              "kind": "FOUND",
+              "value": "pal "
+            }
+          ],
+          "support": [
+            {
+              "equal_receiver_axes": [
+                "carrier",
+                "horizon",
+                "suffix"
+              ],
+              "recurrence": 2
+            }
+          ]
+        },
+        {
+          "consequence": "silly ",
+          "steps": [
+            {
+              "kind": "FOUND",
+              "value": "silly "
+            }
+          ],
+          "support": [
+            {
+              "equal_receiver_axes": [
+                "carrier",
+                "horizon",
+                "suffix"
+              ],
+              "recurrence": 1
+            }
+          ]
+        },
+        {
+          "consequence": "suck ",
+          "steps": [
+            {
+              "kind": "FOUND",
+              "value": "suck "
+            }
+          ],
+          "support": [
+            {
+              "equal_receiver_axes": [
+                "carrier",
+                "horizon",
+                "suffix"
+              ],
+              "recurrence": 2
+            }
+          ]
+        }
+      ],
+      "occurrence_population": [
+        {
+          "consequence": "bird ",
+          "occurrences": 2,
+          "receiver_relative_share": {
+            "denominator": 19,
+            "numerator": 2
+          }
+        },
+        {
+          "consequence": "bit ",
+          "occurrences": 6,
+          "receiver_relative_share": {
+            "denominator": 19,
+            "numerator": 6
+          }
+        },
+        {
+          "consequence": "boy ",
+          "occurrences": 1,
+          "receiver_relative_share": {
+            "denominator": 19,
+            "numerator": 1
+          }
+        },
+        {
+          "consequence": "catnap ",
+          "occurrences": 1,
+          "receiver_relative_share": {
+            "denominator": 19,
+            "numerator": 1
+          }
+        },
+        {
+          "consequence": "corner ",
+          "occurrences": 1,
+          "receiver_relative_share": {
+            "denominator": 19,
+            "numerator": 1
+          }
+        },
+        {
+          "consequence": "friend ",
+          "occurrences": 1,
+          "receiver_relative_share": {
+            "denominator": 19,
+            "numerator": 1
+          }
+        },
+        {
+          "consequence": "hair ",
+          "occurrences": 1,
+          "receiver_relative_share": {
+            "denominator": 19,
+            "numerator": 1
+          }
+        },
+        {
+          "consequence": "lady ",
+          "occurrences": 1,
+          "receiver_relative_share": {
+            "denominator": 19,
+            "numerator": 1
+          }
+        },
+        {
+          "consequence": "pal ",
+          "occurrences": 2,
+          "receiver_relative_share": {
+            "denominator": 19,
+            "numerator": 2
+          }
+        },
+        {
+          "consequence": "silly ",
+          "occurrences": 1,
+          "receiver_relative_share": {
+            "denominator": 19,
+            "numerator": 1
+          }
+        },
+        {
+          "consequence": "suck ",
+          "occurrences": 2,
+          "receiver_relative_share": {
+            "denominator": 19,
+            "numerator": 2
+          }
+        }
+      ],
+      "selected_context": {
+        "horizon": 1,
+        "suffix": [
+          "little "
+        ]
+      }
+    },
+    "before_receiving_utterance": {
+      "actual_relation": "OPEN_RESIDUAL",
+      "complete_paths": [
+        {
+          "consequence": "bird ",
+          "steps": [
+            {
+              "kind": "FOUND",
+              "value": "bird "
+            }
+          ],
+          "support": [
+            {
+              "equal_receiver_axes": [
+                "carrier",
+                "horizon",
+                "suffix"
+              ],
+              "recurrence": 2
+            }
+          ]
+        },
+        {
+          "consequence": "bit ",
+          "steps": [
+            {
+              "kind": "FOUND",
+              "value": "bit "
+            }
+          ],
+          "support": [
+            {
+              "equal_receiver_axes": [
+                "carrier",
+                "horizon",
+                "suffix"
+              ],
+              "recurrence": 6
+            }
+          ]
+        },
+        {
+          "consequence": "boy ",
+          "steps": [
+            {
+              "kind": "FOUND",
+              "value": "boy "
+            }
+          ],
+          "support": [
+            {
+              "equal_receiver_axes": [
+                "carrier",
+                "horizon",
+                "suffix"
+              ],
+              "recurrence": 1
+            }
+          ]
+        },
+        {
+          "consequence": "catnap ",
+          "steps": [
+            {
+              "kind": "FOUND",
+              "value": "catnap "
+            }
+          ],
+          "support": [
+            {
+              "equal_receiver_axes": [
+                "carrier",
+                "horizon",
+                "suffix"
+              ],
+              "recurrence": 1
+            }
+          ]
+        },
+        {
+          "consequence": "corner ",
+          "steps": [
+            {
+              "kind": "FOUND",
+              "value": "corner "
+            }
+          ],
+          "support": [
+            {
+              "equal_receiver_axes": [
+                "carrier",
+                "horizon",
+                "suffix"
+              ],
+              "recurrence": 1
+            }
+          ]
+        },
+        {
+          "consequence": "friend ",
+          "steps": [
+            {
+              "kind": "FOUND",
+              "value": "friend "
+            }
+          ],
+          "support": [
+            {
+              "equal_receiver_axes": [
+                "carrier",
+                "horizon",
+                "suffix"
+              ],
+              "recurrence": 1
+            }
+          ]
+        },
+        {
+          "consequence": "hair ",
+          "steps": [
+            {
+              "kind": "FOUND",
+              "value": "hair "
+            }
+          ],
+          "support": [
+            {
+              "equal_receiver_axes": [
+                "carrier",
+                "horizon",
+                "suffix"
+              ],
+              "recurrence": 1
+            }
+          ]
+        },
+        {
+          "consequence": "pal ",
+          "steps": [
+            {
+              "kind": "FOUND",
+              "value": "pal "
+            }
+          ],
+          "support": [
+            {
+              "equal_receiver_axes": [
+                "carrier",
+                "horizon",
+                "suffix"
+              ],
+              "recurrence": 2
+            }
+          ]
+        },
+        {
+          "consequence": "silly ",
+          "steps": [
+            {
+              "kind": "FOUND",
+              "value": "silly "
+            }
+          ],
+          "support": [
+            {
+              "equal_receiver_axes": [
+                "carrier",
+                "horizon",
+                "suffix"
+              ],
+              "recurrence": 1
+            }
+          ]
+        },
+        {
+          "consequence": "suck ",
+          "steps": [
+            {
+              "kind": "FOUND",
+              "value": "suck "
+            }
+          ],
+          "support": [
+            {
+              "equal_receiver_axes": [
+                "carrier",
+                "horizon",
+                "suffix"
+              ],
+              "recurrence": 2
+            }
+          ]
+        }
+      ],
+      "occurrence_population": [
+        {
+          "consequence": "bird ",
+          "occurrences": 2,
+          "receiver_relative_share": {
+            "denominator": 18,
+            "numerator": 2
+          }
+        },
+        {
+          "consequence": "bit ",
+          "occurrences": 6,
+          "receiver_relative_share": {
+            "denominator": 18,
+            "numerator": 6
+          }
+        },
+        {
+          "consequence": "boy ",
+          "occurrences": 1,
+          "receiver_relative_share": {
+            "denominator": 18,
+            "numerator": 1
+          }
+        },
+        {
+          "consequence": "catnap ",
+          "occurrences": 1,
+          "receiver_relative_share": {
+            "denominator": 18,
+            "numerator": 1
+          }
+        },
+        {
+          "consequence": "corner ",
+          "occurrences": 1,
+          "receiver_relative_share": {
+            "denominator": 18,
+            "numerator": 1
+          }
+        },
+        {
+          "consequence": "friend ",
+          "occurrences": 1,
+          "receiver_relative_share": {
+            "denominator": 18,
+            "numerator": 1
+          }
+        },
+        {
+          "consequence": "hair ",
+          "occurrences": 1,
+          "receiver_relative_share": {
+            "denominator": 18,
+            "numerator": 1
+          }
+        },
+        {
+          "consequence": "pal ",
+          "occurrences": 2,
+          "receiver_relative_share": {
+            "denominator": 18,
+            "numerator": 2
+          }
+        },
+        {
+          "consequence": "silly ",
+          "occurrences": 1,
+          "receiver_relative_share": {
+            "denominator": 18,
+            "numerator": 1
+          }
+        },
+        {
+          "consequence": "suck ",
+          "occurrences": 2,
+          "receiver_relative_share": {
+            "denominator": 18,
+            "numerator": 2
+          }
+        }
+      ],
+      "selected_context": {
+        "horizon": 1,
+        "suffix": [
+          "little "
+        ]
+      }
+    },
+    "received": {
+      "prior_relations": {
+        "NONE": 0,
+        "OPEN_INCLUDED": 6,
+        "OPEN_RESIDUAL": 4,
+        "RIDE": 0
+      },
+      "simultaneous_receiver_views": 10,
+      "token_events": 4
+    },
+    "token_ordinal": 2,
+    "utterance": "hi little lady .\n",
+    "utterance_ordinal": 0
+  },
+  "observation_id": "eros-ordinary-text-ecology-01",
+  "order_controls": [
+    {
+      "category": "multi-token-cut",
+      "changed": true,
+      "forward": {
+        "actual_relation": "OPEN_RESIDUAL",
+        "complete_paths": [
+          {
+            "consequence": "balloon ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "balloon "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "shirt ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "shirt "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          }
+        ],
+        "occurrence_population": [
+          {
+            "consequence": "balloon ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 2,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "shirt ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 2,
+              "numerator": 1
+            }
+          }
+        ],
+        "selected_context": {
+          "horizon": 2,
+          "suffix": [
+            "that's ",
+            "your "
+          ]
+        }
+      },
+      "prefix": "that's your ",
+      "reversed_training": {
+        "actual_relation": "OPEN_RESIDUAL",
+        "complete_paths": [
+          {
+            "consequence": "are ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "are "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "be ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "be "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "bring ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "bring "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "brush ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "brush "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 3
+              }
+            ]
+          },
+          {
+            "consequence": "eat ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "eat "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "fit ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "fit "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "get ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "get "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 5
+              }
+            ]
+          },
+          {
+            "consequence": "hold ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "hold "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "in ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "in "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 12
+              }
+            ]
+          },
+          {
+            "consequence": "joseph ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "joseph "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "kiss ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "kiss "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "like ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "like "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 4
+              }
+            ]
+          },
+          {
+            "consequence": "of ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "of "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "on ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "on "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "op ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "op "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "open ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "open "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "opening ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "opening "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "or ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "or "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "out ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "out "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "put ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "put "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "read ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "read "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "switch ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "switch "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "take ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "take "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "that's ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "that's "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "there's ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "there's "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "to ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "to "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 3
+              }
+            ]
+          },
+          {
+            "consequence": "want ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "want "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "was ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "was "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "where ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "where "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "where's ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "where's "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "with ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "with "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 3
+              }
+            ]
+          }
+        ],
+        "occurrence_population": [
+          {
+            "consequence": "are ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "be ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "bring ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "brush ",
+            "occurrences": 3,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 3
+            }
+          },
+          {
+            "consequence": "eat ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "fit ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "get ",
+            "occurrences": 5,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 5
+            }
+          },
+          {
+            "consequence": "hold ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "in ",
+            "occurrences": 12,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 12
+            }
+          },
+          {
+            "consequence": "joseph ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "kiss ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "like ",
+            "occurrences": 4,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 4
+            }
+          },
+          {
+            "consequence": "of ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "on ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "op ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "open ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "opening ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "or ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "out ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "put ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "read ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "switch ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "take ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "that's ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "there's ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "to ",
+            "occurrences": 3,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 3
+            }
+          },
+          {
+            "consequence": "want ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "was ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "where ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "where's ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "with ",
+            "occurrences": 3,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 3
+            }
+          }
+        ],
+        "selected_context": {
+          "horizon": 1,
+          "suffix": [
+            "your "
+          ]
+        }
+      }
+    },
+    {
+      "category": "recurrent-copy",
+      "changed": true,
+      "forward": {
+        "actual_relation": "OPEN_RESIDUAL",
+        "complete_paths": [
+          {
+            "consequence": "yeah ",
+            "steps": [
+              {
+                "address": {
+                  "axis": "chronological-token",
+                  "ordinal": 1
+                },
+                "kind": "COPY",
+                "value": "yeah "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "!\n",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "!\n"
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 5
+              }
+            ]
+          },
+          {
+            "consequence": ".\n",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": ".\n"
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 11
+              }
+            ]
+          },
+          {
+            "consequence": "?\n",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "?\n"
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 3
+              }
+            ]
+          },
+          {
+            "consequence": "child ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "child "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "he ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "he "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "mhm ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "mhm "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "not ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "not "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "see ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "see "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "there ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "there "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "we ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "we "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "yeah ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "yeah "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "you ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "you "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 3
+              }
+            ]
+          },
+          {
+            "consequence": "you're ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "you're "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          }
+        ],
+        "occurrence_population": [
+          {
+            "consequence": "!\n",
+            "occurrences": 5,
+            "receiver_relative_share": {
+              "denominator": 32,
+              "numerator": 5
+            }
+          },
+          {
+            "consequence": ".\n",
+            "occurrences": 11,
+            "receiver_relative_share": {
+              "denominator": 32,
+              "numerator": 11
+            }
+          },
+          {
+            "consequence": "?\n",
+            "occurrences": 3,
+            "receiver_relative_share": {
+              "denominator": 32,
+              "numerator": 3
+            }
+          },
+          {
+            "consequence": "child ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 32,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "he ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 32,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "mhm ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 32,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "not ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 32,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "see ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 32,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "there ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 32,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "we ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 32,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "yeah ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 32,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "you ",
+            "occurrences": 3,
+            "receiver_relative_share": {
+              "denominator": 32,
+              "numerator": 3
+            }
+          },
+          {
+            "consequence": "you're ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 32,
+              "numerator": 2
+            }
+          }
+        ],
+        "selected_context": {
+          "horizon": 1,
+          "suffix": [
+            "yeah "
+          ]
+        }
+      },
+      "prefix": "yeah ",
+      "reversed_training": {
+        "actual_relation": "OPEN_RESIDUAL",
+        "complete_paths": [
+          {
+            "consequence": "yeah ",
+            "steps": [
+              {
+                "address": {
+                  "axis": "chronological-token",
+                  "ordinal": 1
+                },
+                "kind": "COPY",
+                "value": "yeah "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "oh ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "oh "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 3
+              }
+            ]
+          },
+          {
+            "consequence": "yeah ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "yeah "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          }
+        ],
+        "occurrence_population": [
+          {
+            "consequence": "oh ",
+            "occurrences": 3,
+            "receiver_relative_share": {
+              "denominator": 4,
+              "numerator": 3
+            }
+          },
+          {
+            "consequence": "yeah ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 4,
+              "numerator": 1
+            }
+          }
+        ],
+        "selected_context": {
+          "horizon": 1,
+          "suffix": [
+            "yeah "
+          ]
+        }
+      }
+    },
+    {
+      "category": "recurrent-plural",
+      "changed": true,
+      "forward": {
+        "actual_relation": "OPEN_INCLUDED",
+        "complete_paths": [
+          {
+            "consequence": "balloon ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "balloon "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "bath ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "bath "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "book ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "book "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 3
+              }
+            ]
+          },
+          {
+            "consequence": "clothes ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "clothes "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "crib ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "crib "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "face ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "face "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "favorite ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "favorite "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "fingers ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "fingers "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "hair ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "hair "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "hairdo ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "hairdo "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "hand ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "hand "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "home ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "home "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "idea ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "idea "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "jammies ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "jammies "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "mouth ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "mouth "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 12
+              }
+            ]
+          },
+          {
+            "consequence": "other ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "other "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "outfit ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "outfit "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "pants ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "pants "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "piggy ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "piggy "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "playing ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "playing "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "shirt ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "shirt "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 6
+              }
+            ]
+          },
+          {
+            "consequence": "sock ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "sock "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "socks ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "socks "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 4
+              }
+            ]
+          },
+          {
+            "consequence": "story ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "story "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "sucky ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "sucky "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "teeth ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "teeth "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 3
+              }
+            ]
+          },
+          {
+            "consequence": "the ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "the "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "things ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "things "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "toes ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "toes "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "toothbrush ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "toothbrush "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "towel ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "towel "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "toys ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "toys "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "tub ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "tub "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "turn ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "turn "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          }
+        ],
+        "occurrence_population": [
+          {
+            "consequence": "balloon ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "bath ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "book ",
+            "occurrences": 3,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 3
+            }
+          },
+          {
+            "consequence": "clothes ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "crib ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "face ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "favorite ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "fingers ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "hair ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "hairdo ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "hand ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "home ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "idea ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "jammies ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "mouth ",
+            "occurrences": 12,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 12
+            }
+          },
+          {
+            "consequence": "other ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "outfit ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "pants ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "piggy ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "playing ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "shirt ",
+            "occurrences": 6,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 6
+            }
+          },
+          {
+            "consequence": "sock ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "socks ",
+            "occurrences": 4,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 4
+            }
+          },
+          {
+            "consequence": "story ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "sucky ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "teeth ",
+            "occurrences": 3,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 3
+            }
+          },
+          {
+            "consequence": "the ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "things ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "toes ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "toothbrush ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "towel ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "toys ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "tub ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "turn ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          }
+        ],
+        "selected_context": {
+          "horizon": 1,
+          "suffix": [
+            "your "
+          ]
+        }
+      },
+      "prefix": "where is your ",
+      "reversed_training": {
+        "actual_relation": "OPEN_RESIDUAL",
+        "complete_paths": [
+          {
+            "consequence": "are ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "are "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "be ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "be "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "bring ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "bring "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "brush ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "brush "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 3
+              }
+            ]
+          },
+          {
+            "consequence": "eat ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "eat "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "fit ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "fit "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "get ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "get "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 5
+              }
+            ]
+          },
+          {
+            "consequence": "hold ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "hold "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "in ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "in "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 12
+              }
+            ]
+          },
+          {
+            "consequence": "joseph ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "joseph "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "kiss ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "kiss "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "like ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "like "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 4
+              }
+            ]
+          },
+          {
+            "consequence": "of ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "of "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "on ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "on "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "op ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "op "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "open ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "open "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "opening ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "opening "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "or ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "or "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "out ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "out "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "put ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "put "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "read ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "read "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "switch ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "switch "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "take ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "take "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "that's ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "that's "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "there's ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "there's "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "to ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "to "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 3
+              }
+            ]
+          },
+          {
+            "consequence": "want ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "want "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "was ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "was "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "where ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "where "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "where's ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "where's "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "with ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "with "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 3
+              }
+            ]
+          }
+        ],
+        "occurrence_population": [
+          {
+            "consequence": "are ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "be ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "bring ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "brush ",
+            "occurrences": 3,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 3
+            }
+          },
+          {
+            "consequence": "eat ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "fit ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "get ",
+            "occurrences": 5,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 5
+            }
+          },
+          {
+            "consequence": "hold ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "in ",
+            "occurrences": 12,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 12
+            }
+          },
+          {
+            "consequence": "joseph ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "kiss ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "like ",
+            "occurrences": 4,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 4
+            }
+          },
+          {
+            "consequence": "of ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "on ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "op ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "open ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "opening ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "or ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "out ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "put ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "read ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "switch ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "take ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "that's ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "there's ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "to ",
+            "occurrences": 3,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 3
+            }
+          },
+          {
+            "consequence": "want ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "was ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "where ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "where's ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "with ",
+            "occurrences": 3,
+            "receiver_relative_share": {
+              "denominator": 63,
+              "numerator": 3
+            }
+          }
+        ],
+        "selected_context": {
+          "horizon": 1,
+          "suffix": [
+            "your "
+          ]
+        }
+      }
+    },
+    {
+      "category": "recurrent-single",
+      "changed": true,
+      "forward": {
+        "actual_relation": "RIDE",
+        "complete_paths": [
+          {
+            "consequence": ".\n",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": ".\n"
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          }
+        ],
+        "occurrence_population": [
+          {
+            "consequence": ".\n",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 2,
+              "numerator": 2
+            }
+          }
+        ],
+        "selected_context": {
+          "horizon": 1,
+          "suffix": [
+            "neck "
+          ]
+        }
+      },
+      "prefix": "neck ",
+      "reversed_training": {
+        "actual_relation": "OPEN_RESIDUAL",
+        "complete_paths": [
+          {
+            "consequence": "father ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "father "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "his ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "his "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          }
+        ],
+        "occurrence_population": [
+          {
+            "consequence": "father ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 2,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "his ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 2,
+              "numerator": 1
+            }
+          }
+        ],
+        "selected_context": {
+          "horizon": 1,
+          "suffix": [
+            "neck "
+          ]
+        }
+      }
+    },
+    {
+      "category": "shorter-recurrent-cut",
+      "changed": true,
+      "forward": {
+        "actual_relation": "OPEN_RESIDUAL",
+        "complete_paths": [
+          {
+            "consequence": "bird ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "bird "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "bit ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "bit "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 6
+              }
+            ]
+          },
+          {
+            "consequence": "boy ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "boy "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "catnap ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "catnap "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "corner ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "corner "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "friend ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "friend "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "hair ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "hair "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "pal ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "pal "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "silly ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "silly "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "suck ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "suck "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          }
+        ],
+        "occurrence_population": [
+          {
+            "consequence": "bird ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "bit ",
+            "occurrences": 6,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 6
+            }
+          },
+          {
+            "consequence": "boy ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "catnap ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "corner ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "friend ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "hair ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "pal ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "silly ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "suck ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 2
+            }
+          }
+        ],
+        "selected_context": {
+          "horizon": 1,
+          "suffix": [
+            "little "
+          ]
+        }
+      },
+      "prefix": "hi little ",
+      "reversed_training": {
+        "actual_relation": "OPEN_RESIDUAL",
+        "complete_paths": [
+          {
+            "consequence": "a ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "a "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 11
+              }
+            ]
+          },
+          {
+            "consequence": "ah ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "ah "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "finger ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "finger "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "my ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "my "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "okay ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "okay "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "quick ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "quick "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          }
+        ],
+        "occurrence_population": [
+          {
+            "consequence": "a ",
+            "occurrences": 11,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 11
+            }
+          },
+          {
+            "consequence": "ah ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "finger ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "my ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "okay ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "quick ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 2
+            }
+          }
+        ],
+        "selected_context": {
+          "horizon": 1,
+          "suffix": [
+            "little "
+          ]
+        }
+      }
+    },
+    {
+      "category": "unseen-consequence",
+      "changed": true,
+      "forward": {
+        "actual_relation": "OPEN_RESIDUAL",
+        "complete_paths": [
+          {
+            "consequence": "bird ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "bird "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "bit ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "bit "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 6
+              }
+            ]
+          },
+          {
+            "consequence": "boy ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "boy "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "catnap ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "catnap "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "corner ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "corner "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "friend ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "friend "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "hair ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "hair "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "pal ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "pal "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "silly ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "silly "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "suck ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "suck "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          }
+        ],
+        "occurrence_population": [
+          {
+            "consequence": "bird ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "bit ",
+            "occurrences": 6,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 6
+            }
+          },
+          {
+            "consequence": "boy ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "catnap ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "corner ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "friend ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "hair ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "pal ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "silly ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "suck ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 2
+            }
+          }
+        ],
+        "selected_context": {
+          "horizon": 1,
+          "suffix": [
+            "little "
+          ]
+        }
+      },
+      "prefix": "hi little ",
+      "reversed_training": {
+        "actual_relation": "OPEN_RESIDUAL",
+        "complete_paths": [
+          {
+            "consequence": "a ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "a "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 11
+              }
+            ]
+          },
+          {
+            "consequence": "ah ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "ah "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "finger ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "finger "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "my ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "my "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "okay ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "okay "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "quick ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "quick "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          }
+        ],
+        "occurrence_population": [
+          {
+            "consequence": "a ",
+            "occurrences": 11,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 11
+            }
+          },
+          {
+            "consequence": "ah ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "finger ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "my ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "okay ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "quick ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 2
+            }
+          }
+        ],
+        "selected_context": {
+          "horizon": 1,
+          "suffix": [
+            "little "
+          ]
+        }
+      }
+    }
+  ],
+  "question": "Can bounded ordinary chronological UTF-8 cultivate exact local continuation fields, preserve plural consequences and complete causal paths, return an unseen consequence as residual, and let that later consequence change the same ecology?",
+  "representative_complete_fields": [
+    {
+      "actual_consequence": "nose ",
+      "category": "multi-token-cut",
+      "field": {
+        "actual_relation": "OPEN_RESIDUAL",
+        "complete_paths": [
+          {
+            "consequence": "balloon ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "balloon "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "shirt ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "shirt "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          }
+        ],
+        "occurrence_population": [
+          {
+            "consequence": "balloon ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 2,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "shirt ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 2,
+              "numerator": 1
+            }
+          }
+        ],
+        "selected_context": {
+          "horizon": 2,
+          "suffix": [
+            "that's ",
+            "your "
+          ]
+        }
+      },
+      "prefix": "that's your ",
+      "token_ordinal": 2,
+      "utterance": "that's your nose .\n",
+      "utterance_ordinal": 19
+    },
+    {
+      "actual_consequence": "that's ",
+      "category": "recurrent-copy",
+      "field": {
+        "actual_relation": "OPEN_RESIDUAL",
+        "complete_paths": [
+          {
+            "consequence": "yeah ",
+            "steps": [
+              {
+                "address": {
+                  "axis": "chronological-token",
+                  "ordinal": 1
+                },
+                "kind": "COPY",
+                "value": "yeah "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "!\n",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "!\n"
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 5
+              }
+            ]
+          },
+          {
+            "consequence": ".\n",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": ".\n"
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 11
+              }
+            ]
+          },
+          {
+            "consequence": "?\n",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "?\n"
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 3
+              }
+            ]
+          },
+          {
+            "consequence": "child ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "child "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "he ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "he "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "mhm ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "mhm "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "not ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "not "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "see ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "see "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "there ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "there "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "we ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "we "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "yeah ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "yeah "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "you ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "you "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 3
+              }
+            ]
+          },
+          {
+            "consequence": "you're ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "you're "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          }
+        ],
+        "occurrence_population": [
+          {
+            "consequence": "!\n",
+            "occurrences": 5,
+            "receiver_relative_share": {
+              "denominator": 32,
+              "numerator": 5
+            }
+          },
+          {
+            "consequence": ".\n",
+            "occurrences": 11,
+            "receiver_relative_share": {
+              "denominator": 32,
+              "numerator": 11
+            }
+          },
+          {
+            "consequence": "?\n",
+            "occurrences": 3,
+            "receiver_relative_share": {
+              "denominator": 32,
+              "numerator": 3
+            }
+          },
+          {
+            "consequence": "child ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 32,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "he ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 32,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "mhm ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 32,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "not ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 32,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "see ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 32,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "there ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 32,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "we ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 32,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "yeah ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 32,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "you ",
+            "occurrences": 3,
+            "receiver_relative_share": {
+              "denominator": 32,
+              "numerator": 3
+            }
+          },
+          {
+            "consequence": "you're ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 32,
+              "numerator": 2
+            }
+          }
+        ],
+        "selected_context": {
+          "horizon": 1,
+          "suffix": [
+            "yeah "
+          ]
+        }
+      },
+      "prefix": "yeah ",
+      "token_ordinal": 1,
+      "utterance": "yeah that's mommy's hair .\n",
+      "utterance_ordinal": 4
+    },
+    {
+      "actual_consequence": "hair ",
+      "category": "recurrent-plural",
+      "field": {
+        "actual_relation": "OPEN_INCLUDED",
+        "complete_paths": [
+          {
+            "consequence": "balloon ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "balloon "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "bath ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "bath "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "book ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "book "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 3
+              }
+            ]
+          },
+          {
+            "consequence": "clothes ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "clothes "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "crib ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "crib "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "face ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "face "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "favorite ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "favorite "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "fingers ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "fingers "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "hair ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "hair "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "hairdo ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "hairdo "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "hand ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "hand "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "home ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "home "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "idea ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "idea "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "jammies ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "jammies "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "mouth ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "mouth "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 12
+              }
+            ]
+          },
+          {
+            "consequence": "other ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "other "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "outfit ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "outfit "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "pants ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "pants "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "piggy ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "piggy "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "playing ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "playing "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "shirt ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "shirt "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 6
+              }
+            ]
+          },
+          {
+            "consequence": "sock ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "sock "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "socks ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "socks "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 4
+              }
+            ]
+          },
+          {
+            "consequence": "story ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "story "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "sucky ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "sucky "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "teeth ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "teeth "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 3
+              }
+            ]
+          },
+          {
+            "consequence": "the ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "the "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "things ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "things "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "toes ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "toes "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "toothbrush ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "toothbrush "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "towel ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "towel "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "toys ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "toys "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "tub ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "tub "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "turn ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "turn "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          }
+        ],
+        "occurrence_population": [
+          {
+            "consequence": "balloon ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "bath ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "book ",
+            "occurrences": 3,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 3
+            }
+          },
+          {
+            "consequence": "clothes ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "crib ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "face ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "favorite ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "fingers ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "hair ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "hairdo ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "hand ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "home ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "idea ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "jammies ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "mouth ",
+            "occurrences": 12,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 12
+            }
+          },
+          {
+            "consequence": "other ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "outfit ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "pants ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "piggy ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "playing ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "shirt ",
+            "occurrences": 6,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 6
+            }
+          },
+          {
+            "consequence": "sock ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "socks ",
+            "occurrences": 4,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 4
+            }
+          },
+          {
+            "consequence": "story ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "sucky ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "teeth ",
+            "occurrences": 3,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 3
+            }
+          },
+          {
+            "consequence": "the ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "things ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "toes ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "toothbrush ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "towel ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "toys ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "tub ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "turn ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 65,
+              "numerator": 1
+            }
+          }
+        ],
+        "selected_context": {
+          "horizon": 1,
+          "suffix": [
+            "your "
+          ]
+        }
+      },
+      "prefix": "where is your ",
+      "token_ordinal": 3,
+      "utterance": "where is your hair ?\n",
+      "utterance_ordinal": 2
+    },
+    {
+      "actual_consequence": ".\n",
+      "category": "recurrent-single",
+      "field": {
+        "actual_relation": "RIDE",
+        "complete_paths": [
+          {
+            "consequence": ".\n",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": ".\n"
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          }
+        ],
+        "occurrence_population": [
+          {
+            "consequence": ".\n",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 2,
+              "numerator": 2
+            }
+          }
+        ],
+        "selected_context": {
+          "horizon": 1,
+          "suffix": [
+            "neck "
+          ]
+        }
+      },
+      "prefix": "neck ",
+      "token_ordinal": 1,
+      "utterance": "neck .\n",
+      "utterance_ordinal": 21
+    },
+    {
+      "actual_consequence": "lady ",
+      "category": "shorter-recurrent-cut",
+      "field": {
+        "actual_relation": "OPEN_RESIDUAL",
+        "complete_paths": [
+          {
+            "consequence": "bird ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "bird "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "bit ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "bit "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 6
+              }
+            ]
+          },
+          {
+            "consequence": "boy ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "boy "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "catnap ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "catnap "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "corner ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "corner "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "friend ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "friend "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "hair ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "hair "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "pal ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "pal "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "silly ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "silly "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "suck ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "suck "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          }
+        ],
+        "occurrence_population": [
+          {
+            "consequence": "bird ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "bit ",
+            "occurrences": 6,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 6
+            }
+          },
+          {
+            "consequence": "boy ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "catnap ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "corner ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "friend ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "hair ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "pal ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "silly ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "suck ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 2
+            }
+          }
+        ],
+        "selected_context": {
+          "horizon": 1,
+          "suffix": [
+            "little "
+          ]
+        }
+      },
+      "prefix": "hi little ",
+      "token_ordinal": 2,
+      "utterance": "hi little lady .\n",
+      "utterance_ordinal": 0
+    },
+    {
+      "actual_consequence": "lady ",
+      "category": "unseen-consequence",
+      "field": {
+        "actual_relation": "OPEN_RESIDUAL",
+        "complete_paths": [
+          {
+            "consequence": "bird ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "bird "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "bit ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "bit "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 6
+              }
+            ]
+          },
+          {
+            "consequence": "boy ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "boy "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "catnap ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "catnap "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "corner ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "corner "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "friend ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "friend "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "hair ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "hair "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "pal ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "pal "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "silly ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "silly "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 1
+              }
+            ]
+          },
+          {
+            "consequence": "suck ",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "suck "
+              }
+            ],
+            "support": [
+              {
+                "equal_receiver_axes": [
+                  "carrier",
+                  "horizon",
+                  "suffix"
+                ],
+                "recurrence": 2
+              }
+            ]
+          }
+        ],
+        "occurrence_population": [
+          {
+            "consequence": "bird ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "bit ",
+            "occurrences": 6,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 6
+            }
+          },
+          {
+            "consequence": "boy ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "catnap ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "corner ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "friend ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "hair ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "pal ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 2
+            }
+          },
+          {
+            "consequence": "silly ",
+            "occurrences": 1,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 1
+            }
+          },
+          {
+            "consequence": "suck ",
+            "occurrences": 2,
+            "receiver_relative_share": {
+              "denominator": 18,
+              "numerator": 2
+            }
+          }
+        ],
+        "selected_context": {
+          "horizon": 1,
+          "suffix": [
+            "little "
+          ]
+        }
+      },
+      "prefix": "hi little ",
+      "token_ordinal": 2,
+      "utterance": "hi little lady .\n",
+      "utterance_ordinal": 0
+    }
+  ],
+  "rest": {
+    "exact": true,
+    "octets": 2304100,
+    "prediction_cache_entries_carried": 0,
+    "schema": "HTXT/1",
+    "sha256": "3792f241ff97a5cd8072fc69acb8443b1404fa6a22274754f40dbff324037701",
+    "source_utterances_carried": 0
+  },
+  "schema": "eros.ordinary-text-ecology.report.v1",
+  "source": {
+    "sha256": "91d9baa3bd379dc73292f14eb44ce0ab168eb0f43883e230bffba020ce0e3a1f",
+    "train": {
+      "path": "experiments/corpora/diet/child.train.txt",
+      "sha256": "dee0502fde77085b9fe051cca8609df0f01f53e20e4df008f8565f2ac1798904",
+      "utterances_received": 1024
+    },
+    "validation": {
+      "path": "experiments/corpora/diet/child.val.txt",
+      "sha256": "48a668563b96a6e394d02e1e8d6d1ca4d4f53a4496390596086a2023c367822a",
+      "utterances_observed": 256
+    }
+  },
+  "status": "ACCEPTED",
+  "stopping_condition": "Stop after the frozen real-text cut yields complete representative recurrent-single, recurrent-plural, recurrent-copy, multi-token, unseen-consequence, and shorter-recurrent-cut fields; exact rest/remount; a chronology-reversal foil; and the changed field after the held-out residual actually enters as later current. Refuse rather than truncate any causal path.",
+  "training": {
+    "prior_relations": {
+      "NONE": 48,
+      "OPEN_INCLUDED": 9356,
+      "OPEN_RESIDUAL": 7290,
+      "RIDE": 531
+    },
+    "simultaneous_receiver_views": 17225,
+    "token_events": 5094
+  },
+  "validation_census": {
+    "relations": {
+      "OPEN_INCLUDED": 716,
+      "OPEN_RESIDUAL": 593,
+      "RIDE": 14
+    },
+    "selected_context_horizons": {
+      "0": 515,
+      "1": 681,
+      "2": 122,
+      "3": 5
+    },
+    "selection_law": "first validation event in each qualitative relation class, plus the first COPY-bearing path, the first multi-token recurrent cut, and the first shorter exact restriction; every selected context has horizon >= 1 and its complete path field fits the declared observer aperture; observation does not alter the ecology",
+    "token_events": 1323
+  },
+  "virgin_controls": [
+    {
+      "accepted": true,
+      "category": "multi-token-cut",
+      "complete_paths": 0,
+      "consequence_population": [],
+      "context": null
+    },
+    {
+      "accepted": true,
+      "category": "recurrent-copy",
+      "complete_paths": 0,
+      "consequence_population": [],
+      "context": null
+    },
+    {
+      "accepted": true,
+      "category": "recurrent-plural",
+      "complete_paths": 0,
+      "consequence_population": [],
+      "context": null
+    },
+    {
+      "accepted": true,
+      "category": "recurrent-single",
+      "complete_paths": 0,
+      "consequence_population": [],
+      "context": null
+    },
+    {
+      "accepted": true,
+      "category": "shorter-recurrent-cut",
+      "complete_paths": 0,
+      "consequence_population": [],
+      "context": null
+    },
+    {
+      "accepted": true,
+      "category": "unseen-consequence",
+      "complete_paths": 0,
+      "consequence_population": [],
+      "context": null
+    }
+  ]
+}

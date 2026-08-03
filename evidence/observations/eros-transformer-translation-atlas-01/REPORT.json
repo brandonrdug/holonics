@@ -1,0 +1,3027 @@
+{
+  "schema": "eros.transformer-translation-atlas.report.v1",
+  "status": "accepted",
+  "question": "Can two exact contextual charts cultivate partial transformer-to-consequence maps which stand after source departure and lawfully commute or remain open in a third chart?",
+  "theory_to_structure": "Each site is an actual transformer carrier intervention keyed by family, direction, and typed residual boundary. Conversation and prose found a local map only where their downstream receiver face agrees. That map becomes cellular Standing; code-comment is later Current and is compared independently at lineage and world-affordance receivers.",
+  "stopping_condition": "One source-derived 102-site atlas; every two-chart overlap deposited once; one source-absent held-out query population; one no-ecology sibling; exact counts of maps, commutations, residuals, and absent maps.",
+  "source": {
+    "source_sha256": "f58e7149e77500bb56f141cc2a230553aff429e3b102bf289f275d00f9322320",
+    "source_observation": "transformer-relational-field-01",
+    "model": {
+      "repository": "allenai/OLMo-2-0425-1B-Instruct",
+      "revision": "48d788eca847d4d7548f375ad03d3c9312f6139e",
+      "role": "final_instruct"
+    },
+    "input_artifacts": {
+      "results/transformer-relational-field-01/events.jsonl": {
+        "bytes": 302542,
+        "sha256": "3bd3da2ce17d017c862aabbf8c2203f3b8715f1f77e3bf367442ac68b9aea1d0"
+      },
+      "results/transformer-relational-field-01/manifest.json": {
+        "bytes": 12678,
+        "sha256": "21a538c78976c92a4442014f426c92842e6a2a394f43bf5e5ad1a81516611702"
+      },
+      "results/transformer-relational-field-01/transports.jsonl": {
+        "bytes": 5900600,
+        "sha256": "29136849945b069bb55331e40b7975a4b82d6f010828a2699c8b8df7e57ba6a7"
+      }
+    },
+    "sites": 102,
+    "training_charts": [
+      "conversation",
+      "prose"
+    ],
+    "held_out_chart": "code_comment"
+  },
+  "deposit": {
+    "laws": 74,
+    "encoded_bits": 7104,
+    "returned_exact": true,
+    "source_lineages_departed": true,
+    "rest_remount_exact": true,
+    "standing_before": 0,
+    "standing_after": 74,
+    "machine": {
+      "standing_rank": 6,
+      "standing_cells": 25,
+      "standing_constituents": 74,
+      "constituent_cells": 222,
+      "constituent_incidences": 7178,
+      "constituent_pins": 7178,
+      "constituent_paths": 7178,
+      "constituent_transport_terms": 14356,
+      "live_lineages": 0,
+      "rest_sha256": "13dd6af6700da6787ed1dd70116cd71325c1fa90585457d96e319a64b290147e"
+    }
+  },
+  "held_out": {
+    "queries": 102,
+    "recovered_maps": 74,
+    "absent_maps": 28,
+    "query_carriers_exact": true,
+    "no_ecology_recovered_maps": 0,
+    "machine": {
+      "standing_rank": 6,
+      "standing_cells": 31,
+      "standing_constituents": 102,
+      "constituent_cells": 602,
+      "constituent_incidences": 15486,
+      "constituent_pins": 15486,
+      "constituent_paths": 15560,
+      "constituent_transport_terms": 22738,
+      "live_lineages": 0,
+      "rest_sha256": "cf7404dc1b0dea54444bb0a5f523b7704ff8881691335351ff085fd5efea7535"
+    },
+    "no_ecology_machine": {
+      "standing_rank": 6,
+      "standing_cells": 26,
+      "standing_constituents": 102,
+      "constituent_cells": 306,
+      "constituent_incidences": 8160,
+      "constituent_pins": 8160,
+      "constituent_paths": 8160,
+      "constituent_transport_terms": 16320,
+      "live_lineages": 0,
+      "rest_sha256": "a801f9095ece4591dffc20a0b50f724aaf8caecadb2e0e1acbe491ff3ac62238"
+    },
+    "comparison_machine": {
+      "standing_rank": 6,
+      "standing_cells": 32,
+      "standing_constituents": 74,
+      "constituent_cells": 518,
+      "constituent_incidences": 21386,
+      "constituent_pins": 21386,
+      "constituent_paths": 21386,
+      "constituent_transport_terms": 28564,
+      "live_lineages": 0,
+      "rest_sha256": "4427cbb6109ab8a548ef0c355b0f08f8650e2388a697959b87ca73875c399a9d"
+    }
+  },
+  "sites": [
+    {
+      "ordinal": 0,
+      "key": {
+        "family": "informant_absence",
+        "direction": "source_to_target",
+        "boundary": 0
+      },
+      "patch_surface": "layer_00.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "MAP",
+        "prediction": "target_expression",
+        "held_out_actual": "target_expression",
+        "held_out_relation": "RIDE"
+      },
+      "affordance": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": true,
+        "held_out_relation": "NO_MAP"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 1,
+      "key": {
+        "family": "informant_absence",
+        "direction": "source_to_target",
+        "boundary": 1
+      },
+      "patch_surface": "layer_01.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "MAP",
+        "prediction": "third_expression",
+        "held_out_actual": "third_expression",
+        "held_out_relation": "RIDE"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": false,
+        "held_out_actual": false,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 2,
+      "key": {
+        "family": "informant_absence",
+        "direction": "source_to_target",
+        "boundary": 2
+      },
+      "patch_surface": "layer_02.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "third_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": false,
+        "held_out_relation": "OPEN_RESIDUAL"
+      },
+      "comparison": {
+        "expected_open_bits": [
+          88,
+          89
+        ],
+        "carried_open_bits": [
+          88,
+          89
+        ],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 3,
+      "key": {
+        "family": "informant_absence",
+        "direction": "source_to_target",
+        "boundary": 3
+      },
+      "patch_surface": "layer_03.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "MAP",
+        "prediction": "third_expression",
+        "held_out_actual": "third_expression",
+        "held_out_relation": "RIDE"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": false,
+        "held_out_actual": false,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 4,
+      "key": {
+        "family": "informant_absence",
+        "direction": "source_to_target",
+        "boundary": 4
+      },
+      "patch_surface": "layer_04.input",
+      "recovered_map": false,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "third_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": false,
+        "held_out_relation": "NO_MAP"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 5,
+      "key": {
+        "family": "informant_absence",
+        "direction": "source_to_target",
+        "boundary": 5
+      },
+      "patch_surface": "layer_05.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "third_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": false,
+        "held_out_relation": "OPEN_RESIDUAL"
+      },
+      "comparison": {
+        "expected_open_bits": [
+          88,
+          89
+        ],
+        "carried_open_bits": [
+          88,
+          89
+        ],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 6,
+      "key": {
+        "family": "informant_absence",
+        "direction": "source_to_target",
+        "boundary": 6
+      },
+      "patch_surface": "layer_06.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "MAP",
+        "prediction": "third_expression",
+        "held_out_actual": "third_expression",
+        "held_out_relation": "RIDE"
+      },
+      "affordance": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": false,
+        "held_out_relation": "NO_MAP"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 7,
+      "key": {
+        "family": "informant_absence",
+        "direction": "source_to_target",
+        "boundary": 7
+      },
+      "patch_surface": "layer_07.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 8,
+      "key": {
+        "family": "informant_absence",
+        "direction": "source_to_target",
+        "boundary": 8
+      },
+      "patch_surface": "layer_08.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 9,
+      "key": {
+        "family": "informant_absence",
+        "direction": "source_to_target",
+        "boundary": 9
+      },
+      "patch_surface": "layer_09.input",
+      "recovered_map": false,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "third_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": false,
+        "held_out_relation": "NO_MAP"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 10,
+      "key": {
+        "family": "informant_absence",
+        "direction": "source_to_target",
+        "boundary": 10
+      },
+      "patch_surface": "layer_10.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "MAP",
+        "prediction": "source_expression",
+        "held_out_actual": "target_expression",
+        "held_out_relation": "OPEN_RESIDUAL"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [
+          80,
+          81
+        ],
+        "carried_open_bits": [
+          80,
+          81
+        ],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 11,
+      "key": {
+        "family": "informant_absence",
+        "direction": "source_to_target",
+        "boundary": 11
+      },
+      "patch_surface": "layer_11.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "MAP",
+        "prediction": "third_expression",
+        "held_out_actual": "third_expression",
+        "held_out_relation": "RIDE"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": false,
+        "held_out_actual": true,
+        "held_out_relation": "OPEN_RESIDUAL"
+      },
+      "comparison": {
+        "expected_open_bits": [
+          88,
+          89
+        ],
+        "carried_open_bits": [
+          88,
+          89
+        ],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 12,
+      "key": {
+        "family": "informant_absence",
+        "direction": "source_to_target",
+        "boundary": 12
+      },
+      "patch_surface": "layer_12.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "third_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 13,
+      "key": {
+        "family": "informant_absence",
+        "direction": "source_to_target",
+        "boundary": 13
+      },
+      "patch_surface": "layer_13.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "third_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 14,
+      "key": {
+        "family": "informant_absence",
+        "direction": "source_to_target",
+        "boundary": 14
+      },
+      "patch_surface": "layer_14.input",
+      "recovered_map": false,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "third_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": true,
+        "held_out_relation": "NO_MAP"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 15,
+      "key": {
+        "family": "informant_absence",
+        "direction": "source_to_target",
+        "boundary": 15
+      },
+      "patch_surface": "layer_15.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "third_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": false,
+        "held_out_actual": true,
+        "held_out_relation": "OPEN_RESIDUAL"
+      },
+      "comparison": {
+        "expected_open_bits": [
+          88,
+          89
+        ],
+        "carried_open_bits": [
+          88,
+          89
+        ],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 16,
+      "key": {
+        "family": "informant_absence",
+        "direction": "source_to_target",
+        "boundary": 16
+      },
+      "patch_surface": "final_norm.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "MAP",
+        "prediction": "target_expression",
+        "held_out_actual": "target_expression",
+        "held_out_relation": "RIDE"
+      },
+      "affordance": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": true,
+        "held_out_relation": "NO_MAP"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 17,
+      "key": {
+        "family": "informant_absence",
+        "direction": "target_to_source",
+        "boundary": 0
+      },
+      "patch_surface": "layer_00.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "MAP",
+        "prediction": "target_expression",
+        "held_out_actual": "target_expression",
+        "held_out_relation": "RIDE"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 18,
+      "key": {
+        "family": "informant_absence",
+        "direction": "target_to_source",
+        "boundary": 1
+      },
+      "patch_surface": "layer_01.input",
+      "recovered_map": false,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": true,
+        "held_out_relation": "NO_MAP"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 19,
+      "key": {
+        "family": "informant_absence",
+        "direction": "target_to_source",
+        "boundary": 2
+      },
+      "patch_surface": "layer_02.input",
+      "recovered_map": false,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": true,
+        "held_out_relation": "NO_MAP"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 20,
+      "key": {
+        "family": "informant_absence",
+        "direction": "target_to_source",
+        "boundary": 3
+      },
+      "patch_surface": "layer_03.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "MAP",
+        "prediction": "target_expression",
+        "held_out_actual": "target_expression",
+        "held_out_relation": "RIDE"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 21,
+      "key": {
+        "family": "informant_absence",
+        "direction": "target_to_source",
+        "boundary": 4
+      },
+      "patch_surface": "layer_04.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "MAP",
+        "prediction": "target_expression",
+        "held_out_actual": "target_expression",
+        "held_out_relation": "RIDE"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 22,
+      "key": {
+        "family": "informant_absence",
+        "direction": "target_to_source",
+        "boundary": 5
+      },
+      "patch_surface": "layer_05.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "MAP",
+        "prediction": "target_expression",
+        "held_out_actual": "target_expression",
+        "held_out_relation": "RIDE"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 23,
+      "key": {
+        "family": "informant_absence",
+        "direction": "target_to_source",
+        "boundary": 6
+      },
+      "patch_surface": "layer_06.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "MAP",
+        "prediction": "target_expression",
+        "held_out_actual": "target_expression",
+        "held_out_relation": "RIDE"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 24,
+      "key": {
+        "family": "informant_absence",
+        "direction": "target_to_source",
+        "boundary": 7
+      },
+      "patch_surface": "layer_07.input",
+      "recovered_map": false,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": true,
+        "held_out_relation": "NO_MAP"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 25,
+      "key": {
+        "family": "informant_absence",
+        "direction": "target_to_source",
+        "boundary": 8
+      },
+      "patch_surface": "layer_08.input",
+      "recovered_map": false,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": true,
+        "held_out_relation": "NO_MAP"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 26,
+      "key": {
+        "family": "informant_absence",
+        "direction": "target_to_source",
+        "boundary": 9
+      },
+      "patch_surface": "layer_09.input",
+      "recovered_map": false,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": true,
+        "held_out_relation": "NO_MAP"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 27,
+      "key": {
+        "family": "informant_absence",
+        "direction": "target_to_source",
+        "boundary": 10
+      },
+      "patch_surface": "layer_10.input",
+      "recovered_map": false,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": true,
+        "held_out_relation": "NO_MAP"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 28,
+      "key": {
+        "family": "informant_absence",
+        "direction": "target_to_source",
+        "boundary": 11
+      },
+      "patch_surface": "layer_11.input",
+      "recovered_map": false,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": true,
+        "held_out_relation": "NO_MAP"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 29,
+      "key": {
+        "family": "informant_absence",
+        "direction": "target_to_source",
+        "boundary": 12
+      },
+      "patch_surface": "layer_12.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "MAP",
+        "prediction": "target_expression",
+        "held_out_actual": "target_expression",
+        "held_out_relation": "RIDE"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 30,
+      "key": {
+        "family": "informant_absence",
+        "direction": "target_to_source",
+        "boundary": 13
+      },
+      "patch_surface": "layer_13.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "MAP",
+        "prediction": "target_expression",
+        "held_out_actual": "target_expression",
+        "held_out_relation": "RIDE"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 31,
+      "key": {
+        "family": "informant_absence",
+        "direction": "target_to_source",
+        "boundary": 14
+      },
+      "patch_surface": "layer_14.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "MAP",
+        "prediction": "target_expression",
+        "held_out_actual": "target_expression",
+        "held_out_relation": "RIDE"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 32,
+      "key": {
+        "family": "informant_absence",
+        "direction": "target_to_source",
+        "boundary": 15
+      },
+      "patch_surface": "layer_15.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "MAP",
+        "prediction": "target_expression",
+        "held_out_actual": "target_expression",
+        "held_out_relation": "RIDE"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 33,
+      "key": {
+        "family": "informant_absence",
+        "direction": "target_to_source",
+        "boundary": 16
+      },
+      "patch_surface": "final_norm.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "MAP",
+        "prediction": "target_expression",
+        "held_out_actual": "target_expression",
+        "held_out_relation": "RIDE"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 34,
+      "key": {
+        "family": "informant_reposition",
+        "direction": "source_to_target",
+        "boundary": 0
+      },
+      "patch_surface": "layer_00.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 35,
+      "key": {
+        "family": "informant_reposition",
+        "direction": "source_to_target",
+        "boundary": 1
+      },
+      "patch_surface": "layer_01.input",
+      "recovered_map": false,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": true,
+        "held_out_relation": "NO_MAP"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 36,
+      "key": {
+        "family": "informant_reposition",
+        "direction": "source_to_target",
+        "boundary": 2
+      },
+      "patch_surface": "layer_02.input",
+      "recovered_map": false,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": true,
+        "held_out_relation": "NO_MAP"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 37,
+      "key": {
+        "family": "informant_reposition",
+        "direction": "source_to_target",
+        "boundary": 3
+      },
+      "patch_surface": "layer_03.input",
+      "recovered_map": false,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": true,
+        "held_out_relation": "NO_MAP"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 38,
+      "key": {
+        "family": "informant_reposition",
+        "direction": "source_to_target",
+        "boundary": 4
+      },
+      "patch_surface": "layer_04.input",
+      "recovered_map": false,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": true,
+        "held_out_relation": "NO_MAP"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 39,
+      "key": {
+        "family": "informant_reposition",
+        "direction": "source_to_target",
+        "boundary": 5
+      },
+      "patch_surface": "layer_05.input",
+      "recovered_map": false,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": true,
+        "held_out_relation": "NO_MAP"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 40,
+      "key": {
+        "family": "informant_reposition",
+        "direction": "source_to_target",
+        "boundary": 6
+      },
+      "patch_surface": "layer_06.input",
+      "recovered_map": false,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": true,
+        "held_out_relation": "NO_MAP"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 41,
+      "key": {
+        "family": "informant_reposition",
+        "direction": "source_to_target",
+        "boundary": 7
+      },
+      "patch_surface": "layer_07.input",
+      "recovered_map": false,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": true,
+        "held_out_relation": "NO_MAP"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 42,
+      "key": {
+        "family": "informant_reposition",
+        "direction": "source_to_target",
+        "boundary": 8
+      },
+      "patch_surface": "layer_08.input",
+      "recovered_map": false,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": true,
+        "held_out_relation": "NO_MAP"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 43,
+      "key": {
+        "family": "informant_reposition",
+        "direction": "source_to_target",
+        "boundary": 9
+      },
+      "patch_surface": "layer_09.input",
+      "recovered_map": false,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": true,
+        "held_out_relation": "NO_MAP"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 44,
+      "key": {
+        "family": "informant_reposition",
+        "direction": "source_to_target",
+        "boundary": 10
+      },
+      "patch_surface": "layer_10.input",
+      "recovered_map": false,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": true,
+        "held_out_relation": "NO_MAP"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 45,
+      "key": {
+        "family": "informant_reposition",
+        "direction": "source_to_target",
+        "boundary": 11
+      },
+      "patch_surface": "layer_11.input",
+      "recovered_map": false,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": true,
+        "held_out_relation": "NO_MAP"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 46,
+      "key": {
+        "family": "informant_reposition",
+        "direction": "source_to_target",
+        "boundary": 12
+      },
+      "patch_surface": "layer_12.input",
+      "recovered_map": false,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": true,
+        "held_out_relation": "NO_MAP"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 47,
+      "key": {
+        "family": "informant_reposition",
+        "direction": "source_to_target",
+        "boundary": 13
+      },
+      "patch_surface": "layer_13.input",
+      "recovered_map": false,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": true,
+        "held_out_relation": "NO_MAP"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 48,
+      "key": {
+        "family": "informant_reposition",
+        "direction": "source_to_target",
+        "boundary": 14
+      },
+      "patch_surface": "layer_14.input",
+      "recovered_map": false,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": true,
+        "held_out_relation": "NO_MAP"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 49,
+      "key": {
+        "family": "informant_reposition",
+        "direction": "source_to_target",
+        "boundary": 15
+      },
+      "patch_surface": "layer_15.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 50,
+      "key": {
+        "family": "informant_reposition",
+        "direction": "source_to_target",
+        "boundary": 16
+      },
+      "patch_surface": "final_norm.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 51,
+      "key": {
+        "family": "informant_reposition",
+        "direction": "target_to_source",
+        "boundary": 0
+      },
+      "patch_surface": "layer_00.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 52,
+      "key": {
+        "family": "informant_reposition",
+        "direction": "target_to_source",
+        "boundary": 1
+      },
+      "patch_surface": "layer_01.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 53,
+      "key": {
+        "family": "informant_reposition",
+        "direction": "target_to_source",
+        "boundary": 2
+      },
+      "patch_surface": "layer_02.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 54,
+      "key": {
+        "family": "informant_reposition",
+        "direction": "target_to_source",
+        "boundary": 3
+      },
+      "patch_surface": "layer_03.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 55,
+      "key": {
+        "family": "informant_reposition",
+        "direction": "target_to_source",
+        "boundary": 4
+      },
+      "patch_surface": "layer_04.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 56,
+      "key": {
+        "family": "informant_reposition",
+        "direction": "target_to_source",
+        "boundary": 5
+      },
+      "patch_surface": "layer_05.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 57,
+      "key": {
+        "family": "informant_reposition",
+        "direction": "target_to_source",
+        "boundary": 6
+      },
+      "patch_surface": "layer_06.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 58,
+      "key": {
+        "family": "informant_reposition",
+        "direction": "target_to_source",
+        "boundary": 7
+      },
+      "patch_surface": "layer_07.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 59,
+      "key": {
+        "family": "informant_reposition",
+        "direction": "target_to_source",
+        "boundary": 8
+      },
+      "patch_surface": "layer_08.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 60,
+      "key": {
+        "family": "informant_reposition",
+        "direction": "target_to_source",
+        "boundary": 9
+      },
+      "patch_surface": "layer_09.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 61,
+      "key": {
+        "family": "informant_reposition",
+        "direction": "target_to_source",
+        "boundary": 10
+      },
+      "patch_surface": "layer_10.input",
+      "recovered_map": false,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": true,
+        "held_out_relation": "NO_MAP"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 62,
+      "key": {
+        "family": "informant_reposition",
+        "direction": "target_to_source",
+        "boundary": 11
+      },
+      "patch_surface": "layer_11.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "MAP",
+        "prediction": "third_expression",
+        "held_out_actual": "target_expression",
+        "held_out_relation": "OPEN_RESIDUAL"
+      },
+      "affordance": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": true,
+        "held_out_relation": "NO_MAP"
+      },
+      "comparison": {
+        "expected_open_bits": [
+          81,
+          82
+        ],
+        "carried_open_bits": [
+          81,
+          82
+        ],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 63,
+      "key": {
+        "family": "informant_reposition",
+        "direction": "target_to_source",
+        "boundary": 12
+      },
+      "patch_surface": "layer_12.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "MAP",
+        "prediction": "third_expression",
+        "held_out_actual": "target_expression",
+        "held_out_relation": "OPEN_RESIDUAL"
+      },
+      "affordance": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": true,
+        "held_out_relation": "NO_MAP"
+      },
+      "comparison": {
+        "expected_open_bits": [
+          81,
+          82
+        ],
+        "carried_open_bits": [
+          81,
+          82
+        ],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 64,
+      "key": {
+        "family": "informant_reposition",
+        "direction": "target_to_source",
+        "boundary": 13
+      },
+      "patch_surface": "layer_13.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 65,
+      "key": {
+        "family": "informant_reposition",
+        "direction": "target_to_source",
+        "boundary": 14
+      },
+      "patch_surface": "layer_14.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 66,
+      "key": {
+        "family": "informant_reposition",
+        "direction": "target_to_source",
+        "boundary": 15
+      },
+      "patch_surface": "layer_15.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 67,
+      "key": {
+        "family": "informant_reposition",
+        "direction": "target_to_source",
+        "boundary": 16
+      },
+      "patch_surface": "final_norm.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 68,
+      "key": {
+        "family": "informant_specificity",
+        "direction": "source_to_target",
+        "boundary": 0
+      },
+      "patch_surface": "layer_00.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "MAP",
+        "prediction": "target_expression",
+        "held_out_actual": "target_expression",
+        "held_out_relation": "RIDE"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": false,
+        "held_out_actual": false,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 69,
+      "key": {
+        "family": "informant_specificity",
+        "direction": "source_to_target",
+        "boundary": 1
+      },
+      "patch_surface": "layer_01.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "MAP",
+        "prediction": "target_expression",
+        "held_out_actual": "target_expression",
+        "held_out_relation": "RIDE"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": false,
+        "held_out_actual": false,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 70,
+      "key": {
+        "family": "informant_specificity",
+        "direction": "source_to_target",
+        "boundary": 2
+      },
+      "patch_surface": "layer_02.input",
+      "recovered_map": false,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": false,
+        "held_out_relation": "NO_MAP"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 71,
+      "key": {
+        "family": "informant_specificity",
+        "direction": "source_to_target",
+        "boundary": 3
+      },
+      "patch_surface": "layer_03.input",
+      "recovered_map": false,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "third_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": false,
+        "held_out_relation": "NO_MAP"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 72,
+      "key": {
+        "family": "informant_specificity",
+        "direction": "source_to_target",
+        "boundary": 4
+      },
+      "patch_surface": "layer_04.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "third_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": false,
+        "held_out_actual": false,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 73,
+      "key": {
+        "family": "informant_specificity",
+        "direction": "source_to_target",
+        "boundary": 5
+      },
+      "patch_surface": "layer_05.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "third_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": false,
+        "held_out_actual": false,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 74,
+      "key": {
+        "family": "informant_specificity",
+        "direction": "source_to_target",
+        "boundary": 6
+      },
+      "patch_surface": "layer_06.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "third_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": false,
+        "held_out_actual": false,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 75,
+      "key": {
+        "family": "informant_specificity",
+        "direction": "source_to_target",
+        "boundary": 7
+      },
+      "patch_surface": "layer_07.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "MAP",
+        "prediction": "third_expression",
+        "held_out_actual": "third_expression",
+        "held_out_relation": "RIDE"
+      },
+      "affordance": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": false,
+        "held_out_relation": "NO_MAP"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 76,
+      "key": {
+        "family": "informant_specificity",
+        "direction": "source_to_target",
+        "boundary": 8
+      },
+      "patch_surface": "layer_08.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "third_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": false,
+        "held_out_actual": false,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 77,
+      "key": {
+        "family": "informant_specificity",
+        "direction": "source_to_target",
+        "boundary": 9
+      },
+      "patch_surface": "layer_09.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "MAP",
+        "prediction": "third_expression",
+        "held_out_actual": "third_expression",
+        "held_out_relation": "RIDE"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": false,
+        "held_out_actual": false,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 78,
+      "key": {
+        "family": "informant_specificity",
+        "direction": "source_to_target",
+        "boundary": 10
+      },
+      "patch_surface": "layer_10.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "MAP",
+        "prediction": "third_expression",
+        "held_out_actual": "third_expression",
+        "held_out_relation": "RIDE"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": false,
+        "held_out_actual": false,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 79,
+      "key": {
+        "family": "informant_specificity",
+        "direction": "source_to_target",
+        "boundary": 11
+      },
+      "patch_surface": "layer_11.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "third_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": false,
+        "held_out_actual": false,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 80,
+      "key": {
+        "family": "informant_specificity",
+        "direction": "source_to_target",
+        "boundary": 12
+      },
+      "patch_surface": "layer_12.input",
+      "recovered_map": false,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "third_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": false,
+        "held_out_relation": "NO_MAP"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 81,
+      "key": {
+        "family": "informant_specificity",
+        "direction": "source_to_target",
+        "boundary": 13
+      },
+      "patch_surface": "layer_13.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": false,
+        "held_out_actual": false,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 82,
+      "key": {
+        "family": "informant_specificity",
+        "direction": "source_to_target",
+        "boundary": 14
+      },
+      "patch_surface": "layer_14.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "MAP",
+        "prediction": "target_expression",
+        "held_out_actual": "target_expression",
+        "held_out_relation": "RIDE"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": false,
+        "held_out_actual": false,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 83,
+      "key": {
+        "family": "informant_specificity",
+        "direction": "source_to_target",
+        "boundary": 15
+      },
+      "patch_surface": "layer_15.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "MAP",
+        "prediction": "target_expression",
+        "held_out_actual": "target_expression",
+        "held_out_relation": "RIDE"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": false,
+        "held_out_actual": false,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 84,
+      "key": {
+        "family": "informant_specificity",
+        "direction": "source_to_target",
+        "boundary": 16
+      },
+      "patch_surface": "final_norm.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "MAP",
+        "prediction": "target_expression",
+        "held_out_actual": "target_expression",
+        "held_out_relation": "RIDE"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": false,
+        "held_out_actual": false,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 85,
+      "key": {
+        "family": "informant_specificity",
+        "direction": "target_to_source",
+        "boundary": 0
+      },
+      "patch_surface": "layer_00.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "MAP",
+        "prediction": "target_expression",
+        "held_out_actual": "target_expression",
+        "held_out_relation": "RIDE"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 86,
+      "key": {
+        "family": "informant_specificity",
+        "direction": "target_to_source",
+        "boundary": 1
+      },
+      "patch_surface": "layer_01.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "MAP",
+        "prediction": "target_expression",
+        "held_out_actual": "target_expression",
+        "held_out_relation": "RIDE"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 87,
+      "key": {
+        "family": "informant_specificity",
+        "direction": "target_to_source",
+        "boundary": 2
+      },
+      "patch_surface": "layer_02.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "MAP",
+        "prediction": "target_expression",
+        "held_out_actual": "target_expression",
+        "held_out_relation": "RIDE"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 88,
+      "key": {
+        "family": "informant_specificity",
+        "direction": "target_to_source",
+        "boundary": 3
+      },
+      "patch_surface": "layer_03.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "MAP",
+        "prediction": "target_expression",
+        "held_out_actual": "target_expression",
+        "held_out_relation": "RIDE"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 89,
+      "key": {
+        "family": "informant_specificity",
+        "direction": "target_to_source",
+        "boundary": 4
+      },
+      "patch_surface": "layer_04.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "MAP",
+        "prediction": "target_expression",
+        "held_out_actual": "target_expression",
+        "held_out_relation": "RIDE"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 90,
+      "key": {
+        "family": "informant_specificity",
+        "direction": "target_to_source",
+        "boundary": 5
+      },
+      "patch_surface": "layer_05.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 91,
+      "key": {
+        "family": "informant_specificity",
+        "direction": "target_to_source",
+        "boundary": 6
+      },
+      "patch_surface": "layer_06.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 92,
+      "key": {
+        "family": "informant_specificity",
+        "direction": "target_to_source",
+        "boundary": 7
+      },
+      "patch_surface": "layer_07.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "MAP",
+        "prediction": "third_expression",
+        "held_out_actual": "third_expression",
+        "held_out_relation": "RIDE"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 93,
+      "key": {
+        "family": "informant_specificity",
+        "direction": "target_to_source",
+        "boundary": 8
+      },
+      "patch_surface": "layer_08.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "target_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 94,
+      "key": {
+        "family": "informant_specificity",
+        "direction": "target_to_source",
+        "boundary": 9
+      },
+      "patch_surface": "layer_09.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "MAP",
+        "prediction": "third_expression",
+        "held_out_actual": "target_expression",
+        "held_out_relation": "OPEN_RESIDUAL"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [
+          81,
+          82
+        ],
+        "carried_open_bits": [
+          81,
+          82
+        ],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 95,
+      "key": {
+        "family": "informant_specificity",
+        "direction": "target_to_source",
+        "boundary": 10
+      },
+      "patch_surface": "layer_10.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "third_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 96,
+      "key": {
+        "family": "informant_specificity",
+        "direction": "target_to_source",
+        "boundary": 11
+      },
+      "patch_surface": "layer_11.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "third_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 97,
+      "key": {
+        "family": "informant_specificity",
+        "direction": "target_to_source",
+        "boundary": 12
+      },
+      "patch_surface": "layer_12.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "OPEN",
+        "prediction": null,
+        "held_out_actual": "third_expression",
+        "held_out_relation": "NO_MAP"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 98,
+      "key": {
+        "family": "informant_specificity",
+        "direction": "target_to_source",
+        "boundary": 13
+      },
+      "patch_surface": "layer_13.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "MAP",
+        "prediction": "target_expression",
+        "held_out_actual": "target_expression",
+        "held_out_relation": "RIDE"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 99,
+      "key": {
+        "family": "informant_specificity",
+        "direction": "target_to_source",
+        "boundary": 14
+      },
+      "patch_surface": "layer_14.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "MAP",
+        "prediction": "target_expression",
+        "held_out_actual": "target_expression",
+        "held_out_relation": "RIDE"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 100,
+      "key": {
+        "family": "informant_specificity",
+        "direction": "target_to_source",
+        "boundary": 15
+      },
+      "patch_surface": "layer_15.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "MAP",
+        "prediction": "target_expression",
+        "held_out_actual": "target_expression",
+        "held_out_relation": "RIDE"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    },
+    {
+      "ordinal": 101,
+      "key": {
+        "family": "informant_specificity",
+        "direction": "target_to_source",
+        "boundary": 16
+      },
+      "patch_surface": "final_norm.input",
+      "recovered_map": true,
+      "lineage": {
+        "training_overlap": "MAP",
+        "prediction": "target_expression",
+        "held_out_actual": "target_expression",
+        "held_out_relation": "RIDE"
+      },
+      "affordance": {
+        "training_overlap": "MAP",
+        "prediction": true,
+        "held_out_actual": true,
+        "held_out_relation": "RIDE"
+      },
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      }
+    }
+  ],
+  "acceptance": {
+    "all_source_counts_exact": true,
+    "all_laws_returned_bit_exact": true,
+    "every_available_map_recovered": true,
+    "no_unavailable_map_invented": true,
+    "no_ecology_control_recovered_nothing": true,
+    "lineage_maps": 38,
+    "lineage_held_out_commutations": 34,
+    "lineage_held_out_residuals": 4,
+    "lineage_training_opens": 64,
+    "affordance_maps": 68,
+    "affordance_held_out_commutations": 64,
+    "affordance_held_out_residuals": 4,
+    "affordance_training_opens": 34,
+    "receiver_relative_outcome_differences": 3,
+    "comparison_commuting_sites": 66,
+    "comparison_residual_sites": 8,
+    "comparison_open_bits_exact": true,
+    "comparison_created_no_found_pins": true
+  },
+  "conclusion": "The atlas is a partial ecology of translations, not one universal coordinate map. The same inherited site can RIDE at one receiver and remain OPEN at another; disagreement between the training charts creates no map, and disagreement in the held-out chart preserves an oriented residual instead of rewriting the prior overlap."
+}

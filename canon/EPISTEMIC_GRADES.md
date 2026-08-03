@@ -1,0 +1,46 @@
+# Epistemic grades
+
+Every material claim receives exactly one truth-status grade and zero or more evidence tags. Truth
+status and evidence are orthogonal: a formal checker, implementation, or measurement does not by
+itself decide whether a claim is a definition, theorem, conjecture, or open obligation.
+
+## Truth-status grades
+
+| Grade | Meaning | Required boundary |
+|---|---|---|
+| `definition` | A declared term or construction. | Types, scope, and construction rule. |
+| `project-postulate` | A governing discipline adopted by this project. | Consistency boundary; never advertised as a theorem of all mathematics. |
+| `proved-standard` | A standard external theorem in its ordinary scope. | Primary source or named trusted library theorem. |
+| `proved-derived` | A theorem derived in the project. | Complete proof and dependencies. |
+| `established-bounded` | A factual capability/result established for a declared construction or receiver family. | Exact scope plus direct implementation, formal, computational, or measured evidence. |
+| `conditional` | A conclusion under named hypotheses. | Full hypothesis and dependency chain. |
+| `interpretation` | A proposed structure-preserving correspondence. | Explicit maps and limits; never an identity without proof. |
+| `conjecture` | A precise unproved claim. | Testable statement and known obstructions/counterevidence. |
+| `counterexample` | A construction refuting a stated stronger claim. | Exact refuted statement and witness. |
+| `open` | A named unresolved fiber or missing capability. | Concrete missing return, coupling, proof, or receiver distinction. |
+| `historical` | Preserved provenance that does not govern current construction. | Source and disposition. |
+
+## Evidence tags
+
+| Tag | Meaning | Required receipt |
+|---|---|---|
+| `formal-checked` | A named proof kernel accepted the declared formal statement. | Complete source, toolchain, imports, assumptions, and kernel receipt. |
+| `implemented-exact` | A bounded construction returned exact invariant/equality receipts. | Source, declared input family, receiver boundary, and exact grade. |
+| `measured` | A calibrated experiment returned receiver testimony. | Apparatus, aperture, calibration/bounds, inputs, and raw or summarized receipt. |
+| `computational-witness` | A finite computation witnesses a stated instance. | Reproducible construction and boundary; no silent generalization. |
+
+## Imported synopsis crosswalk
+
+- Synopsis `identity` is treated as `proved-derived` only when the displayed derivation and its
+  dependencies are complete; otherwise it is `conditional` or `historical` as declared locally.
+- Synopsis `historical-toy` maps to `historical`, optionally tagged `computational-witness` for its
+  bounded instance.
+- A synopsis entry's own grade remains authoritative for that entry; extraction does not upgrade
+  it.
+
+Wording follows the claim's single declared truth-status; dependency chains expose every
+`conditional`, `conjecture`, and `open` premise. There is no ordering that makes `formal-checked`,
+`implemented-exact`, or `measured` interchangeable. A finite numerical agreement remains evidence
+about its aperture; a renderer never upgrades it. A theorem can coexist with an open
+implementation, and an exact implementation can remain theoretically open beyond its declared
+receiver family.

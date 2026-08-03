@@ -1,0 +1,2500 @@
+{
+  "acceptance": {
+    "all_source_absent_probes_exact": true,
+    "ambiguous_surface_bindings_remained_plural": true,
+    "complete_typed_paths_not_answer_pairs_were_cultivated": true,
+    "ecology_survived_exact_rest_remount": true,
+    "empty_ecology_seed_stood_exactly": true,
+    "every_successor_was_one_complete_outgoing_factor": true,
+    "no_floating_point_causal_data": true,
+    "no_standing_control_returned_no_candidate": true,
+    "prior_constituent_ecology_preserved_as_exact_world_law": true,
+    "same_surface_under_concat_returned_exact_text_fourteen": true,
+    "source_and_lambda_validated": true,
+    "teacher_paths_replaced_ecologies_and_source_lineages_departed": true,
+    "unafforded_surface_returned_no_path": true,
+    "unseen_arithmetic_reinstantiated_add_path_and_returned_exact_five": true,
+    "withheld_objective_preserved_both_execution_paths": true
+  },
+  "boundary": "This establishes a bounded exact execution-hexis law over source-faced typed DAGs whose operations are supplied by the application world. It does not claim that arbitrary inscriptions reveal their own latent operations without returned paths, nor that ADD and CONCAT exhaust path species. The open construction is plural and nested DAG cultivation across further exact world operations, not a vocabulary or answer table.",
+  "conclusion": "After the six declared teacher paths departed, the remounted ecology received unseen 1+4. Under the arithmetic receiver it rebuilt Literal(1), Literal(4), Add(0,1), Return(2) and returned exact integer 5. Under the concatenate receiver it rebuilt the same causal shape with text literals and returned 14. With objective withheld it retained both. On 1+2+3 the two valid slot placements remained two distinct paths even though their returned text coincided. Thus the learned object is the receiver-relative transport law joining a surface to a complete executable path, not a stored strongest edge or a scalar answer.",
+  "control": {
+    "accepted": true,
+    "candidate_count": 0,
+    "event": {
+      "event": "no-standing-control",
+      "regional_arcs": 19,
+      "returned_incidences": 19,
+      "returned_pins": 19,
+      "semantic_words": 3,
+      "wall_micros": 1165
+    },
+    "input": "1+4",
+    "physical_after": {
+      "constituent_cells": 3,
+      "constituent_incidences": 19,
+      "constituent_paths": 19,
+      "constituent_pins": 19,
+      "constituent_transport_terms": 38,
+      "live_lineages": 0,
+      "standing_cells": 8,
+      "standing_constituents": 1,
+      "standing_rank": 6
+    }
+  },
+  "final_ecology": {
+    "active_templates": [
+      {
+        "parameters": [
+          [
+            "medium",
+            "symbolic"
+          ],
+          [
+            "objective",
+            "arithmetic"
+          ]
+        ],
+        "recurrence": 3,
+        "template": {
+          "nodes": [
+            {
+              "kind": "slot",
+              "node": 0,
+              "slot": 0,
+              "value_kind": "integer"
+            },
+            {
+              "kind": "slot",
+              "node": 1,
+              "slot": 1,
+              "value_kind": "integer"
+            },
+            {
+              "kind": "binary",
+              "left": 0,
+              "node": 2,
+              "operation": "add_integer",
+              "right": 1
+            },
+            {
+              "kind": "return",
+              "node": 3,
+              "source": 2
+            }
+          ],
+          "surface_segments": [
+            "",
+            "+",
+            ""
+          ]
+        }
+      },
+      {
+        "parameters": [
+          [
+            "medium",
+            "symbolic"
+          ],
+          [
+            "objective",
+            "concatenate"
+          ]
+        ],
+        "recurrence": 3,
+        "template": {
+          "nodes": [
+            {
+              "kind": "slot",
+              "node": 0,
+              "slot": 0,
+              "value_kind": "text"
+            },
+            {
+              "kind": "slot",
+              "node": 1,
+              "slot": 1,
+              "value_kind": "text"
+            },
+            {
+              "kind": "binary",
+              "left": 0,
+              "node": 2,
+              "operation": "concatenate_text",
+              "right": 1
+            },
+            {
+              "kind": "return",
+              "node": 3,
+              "source": 2
+            }
+          ],
+          "surface_segments": [
+            "",
+            "+",
+            ""
+          ]
+        }
+      }
+    ],
+    "summary": {
+      "active_execution_templates": 2,
+      "constituent_folds": 7,
+      "constituent_spans": 11,
+      "execution_fibers": 2,
+      "generation": 6,
+      "receiver_fibers": 6
+    }
+  },
+  "observation_id": "eros-holonic-execution-paths-01",
+  "online_trajectory": [
+    {
+      "actual_path": {
+        "nodes": [
+          {
+            "kind": "literal",
+            "node": 0,
+            "source_face": "1",
+            "value": {
+              "exact": "1",
+              "kind": "integer"
+            }
+          },
+          {
+            "kind": "literal",
+            "node": 1,
+            "source_face": "2",
+            "value": {
+              "exact": "2",
+              "kind": "integer"
+            }
+          },
+          {
+            "kind": "binary",
+            "left": 0,
+            "node": 2,
+            "operation": "add_integer",
+            "right": 1
+          },
+          {
+            "kind": "return",
+            "node": 3,
+            "source": 2
+          }
+        ],
+        "returned": {
+          "exact": "3",
+          "kind": "integer"
+        }
+      },
+      "derived_templates": [
+        {
+          "nodes": [
+            {
+              "kind": "slot",
+              "node": 0,
+              "slot": 0,
+              "value_kind": "integer"
+            },
+            {
+              "kind": "slot",
+              "node": 1,
+              "slot": 1,
+              "value_kind": "integer"
+            },
+            {
+              "kind": "binary",
+              "left": 0,
+              "node": 2,
+              "operation": "add_integer",
+              "right": 1
+            },
+            {
+              "kind": "return",
+              "node": 3,
+              "source": 2
+            }
+          ],
+          "surface_segments": [
+            "",
+            "+",
+            ""
+          ]
+        }
+      ],
+      "id": "arithmetic-1-plus-2",
+      "inscription": "1+2",
+      "membership_residual": {
+        "carried_open_path_species": [
+          "integer_add"
+        ],
+        "exact": true,
+        "expected_open_path_species": [
+          "integer_add"
+        ],
+        "found_pins": 0
+      },
+      "ordinal": 0,
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "arithmetic"
+      },
+      "physical_after": {
+        "constituent_cells": 3,
+        "constituent_incidences": 76,
+        "constituent_paths": 76,
+        "constituent_pins": 76,
+        "constituent_transport_terms": 76,
+        "live_lineages": 0,
+        "standing_cells": 30,
+        "standing_constituents": 1,
+        "standing_rank": 6
+      },
+      "physical_events": [
+        {
+          "event": "training-0-meeting",
+          "regional_arcs": 16,
+          "returned_incidences": 26,
+          "returned_pins": 26,
+          "semantic_words": 14,
+          "wall_micros": 1905
+        },
+        {
+          "event": "training-0-prediction",
+          "regional_arcs": 30,
+          "returned_incidences": 80,
+          "returned_pins": 80,
+          "semantic_words": 3,
+          "wall_micros": 3689
+        },
+        {
+          "event": "training-0-teacher-return",
+          "regional_arcs": 23,
+          "returned_incidences": 106,
+          "returned_pins": 106,
+          "semantic_words": 19,
+          "wall_micros": 4638
+        },
+        {
+          "event": "training-0-successor",
+          "regional_arcs": 100,
+          "returned_incidences": 76,
+          "returned_pins": 76,
+          "semantic_words": 75,
+          "wall_micros": 11544
+        }
+      ],
+      "prior_prediction": {
+        "agreement_rank": null,
+        "candidate_count": 0,
+        "candidates": []
+      },
+      "relation": "FOUND",
+      "successor": {
+        "active_execution_templates": 0,
+        "constituent_folds": 0,
+        "constituent_spans": 6,
+        "execution_fibers": 1,
+        "generation": 1,
+        "receiver_fibers": 1
+      },
+      "successor_exact": true,
+      "teacher_and_current_departed": true
+    },
+    {
+      "actual_path": {
+        "nodes": [
+          {
+            "kind": "literal",
+            "node": 0,
+            "source_face": "1",
+            "value": {
+              "exact": "1",
+              "kind": "integer"
+            }
+          },
+          {
+            "kind": "literal",
+            "node": 1,
+            "source_face": "3",
+            "value": {
+              "exact": "3",
+              "kind": "integer"
+            }
+          },
+          {
+            "kind": "binary",
+            "left": 0,
+            "node": 2,
+            "operation": "add_integer",
+            "right": 1
+          },
+          {
+            "kind": "return",
+            "node": 3,
+            "source": 2
+          }
+        ],
+        "returned": {
+          "exact": "4",
+          "kind": "integer"
+        }
+      },
+      "derived_templates": [
+        {
+          "nodes": [
+            {
+              "kind": "slot",
+              "node": 0,
+              "slot": 0,
+              "value_kind": "integer"
+            },
+            {
+              "kind": "slot",
+              "node": 1,
+              "slot": 1,
+              "value_kind": "integer"
+            },
+            {
+              "kind": "binary",
+              "left": 0,
+              "node": 2,
+              "operation": "add_integer",
+              "right": 1
+            },
+            {
+              "kind": "return",
+              "node": 3,
+              "source": 2
+            }
+          ],
+          "surface_segments": [
+            "",
+            "+",
+            ""
+          ]
+        }
+      ],
+      "id": "arithmetic-1-plus-3",
+      "inscription": "1+3",
+      "membership_residual": {
+        "carried_open_path_species": [
+          "integer_add"
+        ],
+        "exact": true,
+        "expected_open_path_species": [
+          "integer_add"
+        ],
+        "found_pins": 0
+      },
+      "ordinal": 1,
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "arithmetic"
+      },
+      "physical_after": {
+        "constituent_cells": 3,
+        "constituent_incidences": 111,
+        "constituent_paths": 111,
+        "constituent_pins": 111,
+        "constituent_transport_terms": 111,
+        "live_lineages": 0,
+        "standing_cells": 36,
+        "standing_constituents": 1,
+        "standing_rank": 6
+      },
+      "physical_events": [
+        {
+          "event": "training-1-meeting",
+          "regional_arcs": 16,
+          "returned_incidences": 92,
+          "returned_pins": 92,
+          "semantic_words": 14,
+          "wall_micros": 4415
+        },
+        {
+          "event": "training-1-prediction",
+          "regional_arcs": 96,
+          "returned_incidences": 278,
+          "returned_pins": 278,
+          "semantic_words": 3,
+          "wall_micros": 11697
+        },
+        {
+          "event": "training-1-teacher-return",
+          "regional_arcs": 23,
+          "returned_incidences": 304,
+          "returned_pins": 304,
+          "semantic_words": 19,
+          "wall_micros": 9945
+        },
+        {
+          "event": "training-1-successor",
+          "regional_arcs": 135,
+          "returned_incidences": 111,
+          "returned_pins": 111,
+          "semantic_words": 110,
+          "wall_micros": 19857
+        }
+      ],
+      "prior_prediction": {
+        "agreement_rank": null,
+        "candidate_count": 0,
+        "candidates": []
+      },
+      "relation": "FOUND",
+      "successor": {
+        "active_execution_templates": 1,
+        "constituent_folds": 1,
+        "constituent_spans": 9,
+        "execution_fibers": 1,
+        "generation": 2,
+        "receiver_fibers": 2
+      },
+      "successor_exact": true,
+      "teacher_and_current_departed": true
+    },
+    {
+      "actual_path": {
+        "nodes": [
+          {
+            "kind": "literal",
+            "node": 0,
+            "source_face": "2",
+            "value": {
+              "exact": "2",
+              "kind": "integer"
+            }
+          },
+          {
+            "kind": "literal",
+            "node": 1,
+            "source_face": "2",
+            "value": {
+              "exact": "2",
+              "kind": "integer"
+            }
+          },
+          {
+            "kind": "binary",
+            "left": 0,
+            "node": 2,
+            "operation": "add_integer",
+            "right": 1
+          },
+          {
+            "kind": "return",
+            "node": 3,
+            "source": 2
+          }
+        ],
+        "returned": {
+          "exact": "4",
+          "kind": "integer"
+        }
+      },
+      "derived_templates": [
+        {
+          "nodes": [
+            {
+              "kind": "slot",
+              "node": 0,
+              "slot": 0,
+              "value_kind": "integer"
+            },
+            {
+              "kind": "slot",
+              "node": 1,
+              "slot": 1,
+              "value_kind": "integer"
+            },
+            {
+              "kind": "binary",
+              "left": 0,
+              "node": 2,
+              "operation": "add_integer",
+              "right": 1
+            },
+            {
+              "kind": "return",
+              "node": 3,
+              "source": 2
+            }
+          ],
+          "surface_segments": [
+            "",
+            "+",
+            ""
+          ]
+        }
+      ],
+      "id": "arithmetic-2-plus-2",
+      "inscription": "2+2",
+      "membership_residual": {
+        "carried_open_path_species": [],
+        "exact": true,
+        "expected_open_path_species": [],
+        "found_pins": 0
+      },
+      "ordinal": 2,
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "arithmetic"
+      },
+      "physical_after": {
+        "constituent_cells": 3,
+        "constituent_incidences": 143,
+        "constituent_paths": 143,
+        "constituent_pins": 143,
+        "constituent_transport_terms": 143,
+        "live_lineages": 0,
+        "standing_cells": 36,
+        "standing_constituents": 1,
+        "standing_rank": 6
+      },
+      "physical_events": [
+        {
+          "event": "training-2-meeting",
+          "regional_arcs": 16,
+          "returned_incidences": 127,
+          "returned_pins": 127,
+          "semantic_words": 14,
+          "wall_micros": 6124
+        },
+        {
+          "event": "training-2-prediction",
+          "regional_arcs": 158,
+          "returned_incidences": 410,
+          "returned_pins": 410,
+          "semantic_words": 30,
+          "wall_micros": 17882
+        },
+        {
+          "event": "training-2-teacher-return",
+          "regional_arcs": 23,
+          "returned_incidences": 436,
+          "returned_pins": 436,
+          "semantic_words": 19,
+          "wall_micros": 14296
+        },
+        {
+          "event": "training-2-successor",
+          "regional_arcs": 193,
+          "returned_incidences": 143,
+          "returned_pins": 143,
+          "semantic_words": 142,
+          "wall_micros": 29011
+        }
+      ],
+      "prior_prediction": {
+        "agreement_rank": 2,
+        "candidate_count": 1,
+        "candidates": [
+          {
+            "bindings": [
+              "2",
+              "2"
+            ],
+            "output": {
+              "exact": "4",
+              "kind": "integer"
+            },
+            "path": {
+              "nodes": [
+                {
+                  "kind": "literal",
+                  "node": 0,
+                  "source_face": "2",
+                  "value": {
+                    "exact": "2",
+                    "kind": "integer"
+                  }
+                },
+                {
+                  "kind": "literal",
+                  "node": 1,
+                  "source_face": "2",
+                  "value": {
+                    "exact": "2",
+                    "kind": "integer"
+                  }
+                },
+                {
+                  "kind": "binary",
+                  "left": 0,
+                  "node": 2,
+                  "operation": "add_integer",
+                  "right": 1
+                },
+                {
+                  "kind": "return",
+                  "node": 3,
+                  "source": 2
+                }
+              ],
+              "returned": {
+                "exact": "4",
+                "kind": "integer"
+              }
+            },
+            "support": [
+              {
+                "equal_axes": [
+                  "medium",
+                  "objective"
+                ],
+                "parameters": [
+                  [
+                    "medium",
+                    "symbolic"
+                  ],
+                  [
+                    "objective",
+                    "arithmetic"
+                  ]
+                ],
+                "recurrence": 2
+              }
+            ],
+            "surface_template": {
+              "nodes": [
+                {
+                  "kind": "slot",
+                  "node": 0,
+                  "slot": 0,
+                  "value_kind": "integer"
+                },
+                {
+                  "kind": "slot",
+                  "node": 1,
+                  "slot": 1,
+                  "value_kind": "integer"
+                },
+                {
+                  "kind": "binary",
+                  "left": 0,
+                  "node": 2,
+                  "operation": "add_integer",
+                  "right": 1
+                },
+                {
+                  "kind": "return",
+                  "node": 3,
+                  "source": 2
+                }
+              ],
+              "surface_segments": [
+                "",
+                "+",
+                ""
+              ]
+            }
+          }
+        ]
+      },
+      "relation": "RIDE",
+      "successor": {
+        "active_execution_templates": 1,
+        "constituent_folds": 2,
+        "constituent_spans": 11,
+        "execution_fibers": 1,
+        "generation": 3,
+        "receiver_fibers": 3
+      },
+      "successor_exact": true,
+      "teacher_and_current_departed": true
+    },
+    {
+      "actual_path": {
+        "nodes": [
+          {
+            "kind": "literal",
+            "node": 0,
+            "source_face": "1",
+            "value": {
+              "exact": "1",
+              "kind": "text"
+            }
+          },
+          {
+            "kind": "literal",
+            "node": 1,
+            "source_face": "2",
+            "value": {
+              "exact": "2",
+              "kind": "text"
+            }
+          },
+          {
+            "kind": "binary",
+            "left": 0,
+            "node": 2,
+            "operation": "concatenate_text",
+            "right": 1
+          },
+          {
+            "kind": "return",
+            "node": 3,
+            "source": 2
+          }
+        ],
+        "returned": {
+          "exact": "12",
+          "kind": "text"
+        }
+      },
+      "derived_templates": [
+        {
+          "nodes": [
+            {
+              "kind": "slot",
+              "node": 0,
+              "slot": 0,
+              "value_kind": "text"
+            },
+            {
+              "kind": "slot",
+              "node": 1,
+              "slot": 1,
+              "value_kind": "text"
+            },
+            {
+              "kind": "binary",
+              "left": 0,
+              "node": 2,
+              "operation": "concatenate_text",
+              "right": 1
+            },
+            {
+              "kind": "return",
+              "node": 3,
+              "source": 2
+            }
+          ],
+          "surface_segments": [
+            "",
+            "+",
+            ""
+          ]
+        }
+      ],
+      "id": "concatenate-1-plus-2",
+      "inscription": "1+2",
+      "membership_residual": {
+        "carried_open_path_species": [
+          "integer_add",
+          "text_concat"
+        ],
+        "exact": true,
+        "expected_open_path_species": [
+          "integer_add",
+          "text_concat"
+        ],
+        "found_pins": 0
+      },
+      "ordinal": 3,
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "concatenate"
+      },
+      "physical_after": {
+        "constituent_cells": 3,
+        "constituent_incidences": 203,
+        "constituent_paths": 203,
+        "constituent_pins": 203,
+        "constituent_transport_terms": 203,
+        "live_lineages": 0,
+        "standing_cells": 36,
+        "standing_constituents": 1,
+        "standing_rank": 6
+      },
+      "physical_events": [
+        {
+          "event": "training-3-meeting",
+          "regional_arcs": 16,
+          "returned_incidences": 159,
+          "returned_pins": 159,
+          "semantic_words": 14,
+          "wall_micros": 7794
+        },
+        {
+          "event": "training-3-prediction",
+          "regional_arcs": 190,
+          "returned_incidences": 506,
+          "returned_pins": 506,
+          "semantic_words": 30,
+          "wall_micros": 22967
+        },
+        {
+          "event": "training-3-teacher-return",
+          "regional_arcs": 23,
+          "returned_incidences": 532,
+          "returned_pins": 532,
+          "semantic_words": 19,
+          "wall_micros": 17201
+        },
+        {
+          "event": "training-3-successor",
+          "regional_arcs": 255,
+          "returned_incidences": 203,
+          "returned_pins": 203,
+          "semantic_words": 202,
+          "wall_micros": 39278
+        }
+      ],
+      "prior_prediction": {
+        "agreement_rank": 1,
+        "candidate_count": 1,
+        "candidates": [
+          {
+            "bindings": [
+              "1",
+              "2"
+            ],
+            "output": {
+              "exact": "3",
+              "kind": "integer"
+            },
+            "path": {
+              "nodes": [
+                {
+                  "kind": "literal",
+                  "node": 0,
+                  "source_face": "1",
+                  "value": {
+                    "exact": "1",
+                    "kind": "integer"
+                  }
+                },
+                {
+                  "kind": "literal",
+                  "node": 1,
+                  "source_face": "2",
+                  "value": {
+                    "exact": "2",
+                    "kind": "integer"
+                  }
+                },
+                {
+                  "kind": "binary",
+                  "left": 0,
+                  "node": 2,
+                  "operation": "add_integer",
+                  "right": 1
+                },
+                {
+                  "kind": "return",
+                  "node": 3,
+                  "source": 2
+                }
+              ],
+              "returned": {
+                "exact": "3",
+                "kind": "integer"
+              }
+            },
+            "support": [
+              {
+                "equal_axes": [
+                  "medium"
+                ],
+                "parameters": [
+                  [
+                    "medium",
+                    "symbolic"
+                  ],
+                  [
+                    "objective",
+                    "arithmetic"
+                  ]
+                ],
+                "recurrence": 3
+              }
+            ],
+            "surface_template": {
+              "nodes": [
+                {
+                  "kind": "slot",
+                  "node": 0,
+                  "slot": 0,
+                  "value_kind": "integer"
+                },
+                {
+                  "kind": "slot",
+                  "node": 1,
+                  "slot": 1,
+                  "value_kind": "integer"
+                },
+                {
+                  "kind": "binary",
+                  "left": 0,
+                  "node": 2,
+                  "operation": "add_integer",
+                  "right": 1
+                },
+                {
+                  "kind": "return",
+                  "node": 3,
+                  "source": 2
+                }
+              ],
+              "surface_segments": [
+                "",
+                "+",
+                ""
+              ]
+            }
+          }
+        ]
+      },
+      "relation": "OPEN",
+      "successor": {
+        "active_execution_templates": 1,
+        "constituent_folds": 3,
+        "constituent_spans": 11,
+        "execution_fibers": 2,
+        "generation": 4,
+        "receiver_fibers": 4
+      },
+      "successor_exact": true,
+      "teacher_and_current_departed": true
+    },
+    {
+      "actual_path": {
+        "nodes": [
+          {
+            "kind": "literal",
+            "node": 0,
+            "source_face": "1",
+            "value": {
+              "exact": "1",
+              "kind": "text"
+            }
+          },
+          {
+            "kind": "literal",
+            "node": 1,
+            "source_face": "3",
+            "value": {
+              "exact": "3",
+              "kind": "text"
+            }
+          },
+          {
+            "kind": "binary",
+            "left": 0,
+            "node": 2,
+            "operation": "concatenate_text",
+            "right": 1
+          },
+          {
+            "kind": "return",
+            "node": 3,
+            "source": 2
+          }
+        ],
+        "returned": {
+          "exact": "13",
+          "kind": "text"
+        }
+      },
+      "derived_templates": [
+        {
+          "nodes": [
+            {
+              "kind": "slot",
+              "node": 0,
+              "slot": 0,
+              "value_kind": "text"
+            },
+            {
+              "kind": "slot",
+              "node": 1,
+              "slot": 1,
+              "value_kind": "text"
+            },
+            {
+              "kind": "binary",
+              "left": 0,
+              "node": 2,
+              "operation": "concatenate_text",
+              "right": 1
+            },
+            {
+              "kind": "return",
+              "node": 3,
+              "source": 2
+            }
+          ],
+          "surface_segments": [
+            "",
+            "+",
+            ""
+          ]
+        }
+      ],
+      "id": "concatenate-1-plus-3",
+      "inscription": "1+3",
+      "membership_residual": {
+        "carried_open_path_species": [
+          "integer_add",
+          "text_concat"
+        ],
+        "exact": true,
+        "expected_open_path_species": [
+          "integer_add",
+          "text_concat"
+        ],
+        "found_pins": 0
+      },
+      "ordinal": 4,
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "concatenate"
+      },
+      "physical_after": {
+        "constituent_cells": 3,
+        "constituent_incidences": 241,
+        "constituent_paths": 241,
+        "constituent_pins": 241,
+        "constituent_transport_terms": 241,
+        "live_lineages": 0,
+        "standing_cells": 36,
+        "standing_constituents": 1,
+        "standing_rank": 6
+      },
+      "physical_events": [
+        {
+          "event": "training-4-meeting",
+          "regional_arcs": 16,
+          "returned_incidences": 219,
+          "returned_pins": 219,
+          "semantic_words": 14,
+          "wall_micros": 11354
+        },
+        {
+          "event": "training-4-prediction",
+          "regional_arcs": 250,
+          "returned_incidences": 686,
+          "returned_pins": 686,
+          "semantic_words": 30,
+          "wall_micros": 35277
+        },
+        {
+          "event": "training-4-teacher-return",
+          "regional_arcs": 23,
+          "returned_incidences": 712,
+          "returned_pins": 712,
+          "semantic_words": 19,
+          "wall_micros": 23291
+        },
+        {
+          "event": "training-4-successor",
+          "regional_arcs": 293,
+          "returned_incidences": 241,
+          "returned_pins": 241,
+          "semantic_words": 240,
+          "wall_micros": 47377
+        }
+      ],
+      "prior_prediction": {
+        "agreement_rank": 1,
+        "candidate_count": 1,
+        "candidates": [
+          {
+            "bindings": [
+              "1",
+              "3"
+            ],
+            "output": {
+              "exact": "4",
+              "kind": "integer"
+            },
+            "path": {
+              "nodes": [
+                {
+                  "kind": "literal",
+                  "node": 0,
+                  "source_face": "1",
+                  "value": {
+                    "exact": "1",
+                    "kind": "integer"
+                  }
+                },
+                {
+                  "kind": "literal",
+                  "node": 1,
+                  "source_face": "3",
+                  "value": {
+                    "exact": "3",
+                    "kind": "integer"
+                  }
+                },
+                {
+                  "kind": "binary",
+                  "left": 0,
+                  "node": 2,
+                  "operation": "add_integer",
+                  "right": 1
+                },
+                {
+                  "kind": "return",
+                  "node": 3,
+                  "source": 2
+                }
+              ],
+              "returned": {
+                "exact": "4",
+                "kind": "integer"
+              }
+            },
+            "support": [
+              {
+                "equal_axes": [
+                  "medium"
+                ],
+                "parameters": [
+                  [
+                    "medium",
+                    "symbolic"
+                  ],
+                  [
+                    "objective",
+                    "arithmetic"
+                  ]
+                ],
+                "recurrence": 3
+              }
+            ],
+            "surface_template": {
+              "nodes": [
+                {
+                  "kind": "slot",
+                  "node": 0,
+                  "slot": 0,
+                  "value_kind": "integer"
+                },
+                {
+                  "kind": "slot",
+                  "node": 1,
+                  "slot": 1,
+                  "value_kind": "integer"
+                },
+                {
+                  "kind": "binary",
+                  "left": 0,
+                  "node": 2,
+                  "operation": "add_integer",
+                  "right": 1
+                },
+                {
+                  "kind": "return",
+                  "node": 3,
+                  "source": 2
+                }
+              ],
+              "surface_segments": [
+                "",
+                "+",
+                ""
+              ]
+            }
+          }
+        ]
+      },
+      "relation": "OPEN",
+      "successor": {
+        "active_execution_templates": 2,
+        "constituent_folds": 5,
+        "constituent_spans": 11,
+        "execution_fibers": 2,
+        "generation": 5,
+        "receiver_fibers": 5
+      },
+      "successor_exact": true,
+      "teacher_and_current_departed": true
+    },
+    {
+      "actual_path": {
+        "nodes": [
+          {
+            "kind": "literal",
+            "node": 0,
+            "source_face": "2",
+            "value": {
+              "exact": "2",
+              "kind": "text"
+            }
+          },
+          {
+            "kind": "literal",
+            "node": 1,
+            "source_face": "2",
+            "value": {
+              "exact": "2",
+              "kind": "text"
+            }
+          },
+          {
+            "kind": "binary",
+            "left": 0,
+            "node": 2,
+            "operation": "concatenate_text",
+            "right": 1
+          },
+          {
+            "kind": "return",
+            "node": 3,
+            "source": 2
+          }
+        ],
+        "returned": {
+          "exact": "22",
+          "kind": "text"
+        }
+      },
+      "derived_templates": [
+        {
+          "nodes": [
+            {
+              "kind": "slot",
+              "node": 0,
+              "slot": 0,
+              "value_kind": "text"
+            },
+            {
+              "kind": "slot",
+              "node": 1,
+              "slot": 1,
+              "value_kind": "text"
+            },
+            {
+              "kind": "binary",
+              "left": 0,
+              "node": 2,
+              "operation": "concatenate_text",
+              "right": 1
+            },
+            {
+              "kind": "return",
+              "node": 3,
+              "source": 2
+            }
+          ],
+          "surface_segments": [
+            "",
+            "+",
+            ""
+          ]
+        }
+      ],
+      "id": "concatenate-2-plus-2",
+      "inscription": "2+2",
+      "membership_residual": {
+        "carried_open_path_species": [],
+        "exact": true,
+        "expected_open_path_species": [],
+        "found_pins": 0
+      },
+      "ordinal": 5,
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "concatenate"
+      },
+      "physical_after": {
+        "constituent_cells": 3,
+        "constituent_incidences": 279,
+        "constituent_paths": 279,
+        "constituent_pins": 279,
+        "constituent_transport_terms": 279,
+        "live_lineages": 0,
+        "standing_cells": 36,
+        "standing_constituents": 1,
+        "standing_rank": 6
+      },
+      "physical_events": [
+        {
+          "event": "training-5-meeting",
+          "regional_arcs": 16,
+          "returned_incidences": 257,
+          "returned_pins": 257,
+          "semantic_words": 14,
+          "wall_micros": 12567
+        },
+        {
+          "event": "training-5-prediction",
+          "regional_arcs": 288,
+          "returned_incidences": 800,
+          "returned_pins": 800,
+          "semantic_words": 30,
+          "wall_micros": 36373
+        },
+        {
+          "event": "training-5-teacher-return",
+          "regional_arcs": 23,
+          "returned_incidences": 826,
+          "returned_pins": 826,
+          "semantic_words": 19,
+          "wall_micros": 24480
+        },
+        {
+          "event": "training-5-successor",
+          "regional_arcs": 329,
+          "returned_incidences": 279,
+          "returned_pins": 279,
+          "semantic_words": 278,
+          "wall_micros": 51806
+        }
+      ],
+      "prior_prediction": {
+        "agreement_rank": 2,
+        "candidate_count": 1,
+        "candidates": [
+          {
+            "bindings": [
+              "2",
+              "2"
+            ],
+            "output": {
+              "exact": "22",
+              "kind": "text"
+            },
+            "path": {
+              "nodes": [
+                {
+                  "kind": "literal",
+                  "node": 0,
+                  "source_face": "2",
+                  "value": {
+                    "exact": "2",
+                    "kind": "text"
+                  }
+                },
+                {
+                  "kind": "literal",
+                  "node": 1,
+                  "source_face": "2",
+                  "value": {
+                    "exact": "2",
+                    "kind": "text"
+                  }
+                },
+                {
+                  "kind": "binary",
+                  "left": 0,
+                  "node": 2,
+                  "operation": "concatenate_text",
+                  "right": 1
+                },
+                {
+                  "kind": "return",
+                  "node": 3,
+                  "source": 2
+                }
+              ],
+              "returned": {
+                "exact": "22",
+                "kind": "text"
+              }
+            },
+            "support": [
+              {
+                "equal_axes": [
+                  "medium",
+                  "objective"
+                ],
+                "parameters": [
+                  [
+                    "medium",
+                    "symbolic"
+                  ],
+                  [
+                    "objective",
+                    "concatenate"
+                  ]
+                ],
+                "recurrence": 2
+              }
+            ],
+            "surface_template": {
+              "nodes": [
+                {
+                  "kind": "slot",
+                  "node": 0,
+                  "slot": 0,
+                  "value_kind": "text"
+                },
+                {
+                  "kind": "slot",
+                  "node": 1,
+                  "slot": 1,
+                  "value_kind": "text"
+                },
+                {
+                  "kind": "binary",
+                  "left": 0,
+                  "node": 2,
+                  "operation": "concatenate_text",
+                  "right": 1
+                },
+                {
+                  "kind": "return",
+                  "node": 3,
+                  "source": 2
+                }
+              ],
+              "surface_segments": [
+                "",
+                "+",
+                ""
+              ]
+            }
+          }
+        ]
+      },
+      "relation": "RIDE",
+      "successor": {
+        "active_execution_templates": 2,
+        "constituent_folds": 7,
+        "constituent_spans": 11,
+        "execution_fibers": 2,
+        "generation": 6,
+        "receiver_fibers": 6
+      },
+      "successor_exact": true,
+      "teacher_and_current_departed": true
+    }
+  ],
+  "physical_execution": {
+    "accepted_report_writes": 1,
+    "cuda_launches": 0,
+    "developmental_stops_before_acceptance": 7,
+    "executor": "ParallelHostLiveCurrentExecutor",
+    "host_threads": 8,
+    "semantic_training_events": 6,
+    "source_absent_probe_events": 5,
+    "source_fixture_changes_after_first_physical_attempt": 1
+  },
+  "question": "Can recurrent complete execution paths become a receiver-relative exact ecology that re-instantiates an unseen path after every teacher path has departed?",
+  "rest": {
+    "exact": true,
+    "live_lineages": 0,
+    "sha256": "eb8453636f7fa738adb2eeb693db6efa537d22ccd44a106a21bc314f34c87a26"
+  },
+  "run_wall_micros": 1444927,
+  "schema": "eros.holonic-execution-paths.report.v1",
+  "seed": {
+    "event": {
+      "event": "seed-empty-execution-ecology",
+      "regional_arcs": 10,
+      "returned_incidences": 10,
+      "returned_pins": 10,
+      "semantic_words": 9,
+      "wall_micros": 734
+    },
+    "exact": true,
+    "physical_after": {
+      "constituent_cells": 3,
+      "constituent_incidences": 10,
+      "constituent_paths": 10,
+      "constituent_pins": 10,
+      "constituent_transport_terms": 20,
+      "live_lineages": 0,
+      "standing_cells": 8,
+      "standing_constituents": 1,
+      "standing_rank": 6
+    }
+  },
+  "source": {
+    "sha256": "d8fd2ce309357b298be51a9819f7149bbe69142844adff643a04a446e838fb73",
+    "source_absent_probes": 5,
+    "training_paths": 6
+  },
+  "source_absent_probes": [
+    {
+      "accepted": true,
+      "active_constituent_occurrences": [
+        {
+          "end": 2,
+          "expansion": "1+",
+          "presentations": [
+            "1|+"
+          ],
+          "start": 0
+        }
+      ],
+      "agreement_rank": 2,
+      "candidate_count": 1,
+      "candidates": [
+        {
+          "bindings": [
+            "1",
+            "4"
+          ],
+          "output": {
+            "exact": "5",
+            "kind": "integer"
+          },
+          "path": {
+            "nodes": [
+              {
+                "kind": "literal",
+                "node": 0,
+                "source_face": "1",
+                "value": {
+                  "exact": "1",
+                  "kind": "integer"
+                }
+              },
+              {
+                "kind": "literal",
+                "node": 1,
+                "source_face": "4",
+                "value": {
+                  "exact": "4",
+                  "kind": "integer"
+                }
+              },
+              {
+                "kind": "binary",
+                "left": 0,
+                "node": 2,
+                "operation": "add_integer",
+                "right": 1
+              },
+              {
+                "kind": "return",
+                "node": 3,
+                "source": 2
+              }
+            ],
+            "returned": {
+              "exact": "5",
+              "kind": "integer"
+            }
+          },
+          "support": [
+            {
+              "equal_axes": [
+                "medium",
+                "objective"
+              ],
+              "parameters": [
+                [
+                  "medium",
+                  "symbolic"
+                ],
+                [
+                  "objective",
+                  "arithmetic"
+                ]
+              ],
+              "recurrence": 3
+            }
+          ],
+          "surface_template": {
+            "nodes": [
+              {
+                "kind": "slot",
+                "node": 0,
+                "slot": 0,
+                "value_kind": "integer"
+              },
+              {
+                "kind": "slot",
+                "node": 1,
+                "slot": 1,
+                "value_kind": "integer"
+              },
+              {
+                "kind": "binary",
+                "left": 0,
+                "node": 2,
+                "operation": "add_integer",
+                "right": 1
+              },
+              {
+                "kind": "return",
+                "node": 3,
+                "source": 2
+              }
+            ],
+            "surface_segments": [
+              "",
+              "+",
+              ""
+            ]
+          }
+        }
+      ],
+      "carried_path_species": [
+        "integer_add"
+      ],
+      "complete_paths": true,
+      "ecology_and_input_departed": true,
+      "events": [
+        {
+          "event": "probe-unseen-arithmetic-meeting",
+          "regional_arcs": 16,
+          "returned_incidences": 295,
+          "returned_pins": 295,
+          "semantic_words": 14,
+          "wall_micros": 15210
+        },
+        {
+          "event": "probe-unseen-arithmetic-path-return",
+          "regional_arcs": 326,
+          "returned_incidences": 914,
+          "returned_pins": 914,
+          "semantic_words": 30,
+          "wall_micros": 44142
+        },
+        {
+          "event": "probe-unseen-arithmetic-successor",
+          "regional_arcs": 64,
+          "returned_incidences": 31,
+          "returned_pins": 31,
+          "semantic_words": 30,
+          "wall_micros": 28341
+        }
+      ],
+      "expected_outputs": [
+        {
+          "exact": "5",
+          "kind": "integer"
+        }
+      ],
+      "id": "unseen-arithmetic",
+      "inscription": "1+4",
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "arithmetic"
+      },
+      "physical_after": {
+        "constituent_cells": 3,
+        "constituent_incidences": 31,
+        "constituent_paths": 31,
+        "constituent_pins": 31,
+        "constituent_transport_terms": 31,
+        "live_lineages": 0,
+        "standing_cells": 36,
+        "standing_constituents": 1,
+        "standing_rank": 6
+      },
+      "required_fold_present": true
+    },
+    {
+      "accepted": true,
+      "active_constituent_occurrences": [
+        {
+          "end": 2,
+          "expansion": "1+",
+          "presentations": [
+            "1|+"
+          ],
+          "start": 0
+        }
+      ],
+      "agreement_rank": 2,
+      "candidate_count": 1,
+      "candidates": [
+        {
+          "bindings": [
+            "1",
+            "4"
+          ],
+          "output": {
+            "exact": "14",
+            "kind": "text"
+          },
+          "path": {
+            "nodes": [
+              {
+                "kind": "literal",
+                "node": 0,
+                "source_face": "1",
+                "value": {
+                  "exact": "1",
+                  "kind": "text"
+                }
+              },
+              {
+                "kind": "literal",
+                "node": 1,
+                "source_face": "4",
+                "value": {
+                  "exact": "4",
+                  "kind": "text"
+                }
+              },
+              {
+                "kind": "binary",
+                "left": 0,
+                "node": 2,
+                "operation": "concatenate_text",
+                "right": 1
+              },
+              {
+                "kind": "return",
+                "node": 3,
+                "source": 2
+              }
+            ],
+            "returned": {
+              "exact": "14",
+              "kind": "text"
+            }
+          },
+          "support": [
+            {
+              "equal_axes": [
+                "medium",
+                "objective"
+              ],
+              "parameters": [
+                [
+                  "medium",
+                  "symbolic"
+                ],
+                [
+                  "objective",
+                  "concatenate"
+                ]
+              ],
+              "recurrence": 3
+            }
+          ],
+          "surface_template": {
+            "nodes": [
+              {
+                "kind": "slot",
+                "node": 0,
+                "slot": 0,
+                "value_kind": "text"
+              },
+              {
+                "kind": "slot",
+                "node": 1,
+                "slot": 1,
+                "value_kind": "text"
+              },
+              {
+                "kind": "binary",
+                "left": 0,
+                "node": 2,
+                "operation": "concatenate_text",
+                "right": 1
+              },
+              {
+                "kind": "return",
+                "node": 3,
+                "source": 2
+              }
+            ],
+            "surface_segments": [
+              "",
+              "+",
+              ""
+            ]
+          }
+        }
+      ],
+      "carried_path_species": [
+        "text_concat"
+      ],
+      "complete_paths": true,
+      "ecology_and_input_departed": true,
+      "events": [
+        {
+          "event": "probe-unseen-concatenation-meeting",
+          "regional_arcs": 16,
+          "returned_incidences": 295,
+          "returned_pins": 295,
+          "semantic_words": 14,
+          "wall_micros": 14816
+        },
+        {
+          "event": "probe-unseen-concatenation-path-return",
+          "regional_arcs": 326,
+          "returned_incidences": 914,
+          "returned_pins": 914,
+          "semantic_words": 30,
+          "wall_micros": 43722
+        },
+        {
+          "event": "probe-unseen-concatenation-successor",
+          "regional_arcs": 64,
+          "returned_incidences": 31,
+          "returned_pins": 31,
+          "semantic_words": 30,
+          "wall_micros": 27982
+        }
+      ],
+      "expected_outputs": [
+        {
+          "exact": "14",
+          "kind": "text"
+        }
+      ],
+      "id": "unseen-concatenation",
+      "inscription": "1+4",
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "concatenate"
+      },
+      "physical_after": {
+        "constituent_cells": 3,
+        "constituent_incidences": 31,
+        "constituent_paths": 31,
+        "constituent_pins": 31,
+        "constituent_transport_terms": 31,
+        "live_lineages": 0,
+        "standing_cells": 36,
+        "standing_constituents": 1,
+        "standing_rank": 6
+      },
+      "required_fold_present": true
+    },
+    {
+      "accepted": true,
+      "active_constituent_occurrences": [
+        {
+          "end": 2,
+          "expansion": "1+",
+          "presentations": [
+            "1|+"
+          ],
+          "start": 0
+        }
+      ],
+      "agreement_rank": 1,
+      "candidate_count": 2,
+      "candidates": [
+        {
+          "bindings": [
+            "1",
+            "4"
+          ],
+          "output": {
+            "exact": "5",
+            "kind": "integer"
+          },
+          "path": {
+            "nodes": [
+              {
+                "kind": "literal",
+                "node": 0,
+                "source_face": "1",
+                "value": {
+                  "exact": "1",
+                  "kind": "integer"
+                }
+              },
+              {
+                "kind": "literal",
+                "node": 1,
+                "source_face": "4",
+                "value": {
+                  "exact": "4",
+                  "kind": "integer"
+                }
+              },
+              {
+                "kind": "binary",
+                "left": 0,
+                "node": 2,
+                "operation": "add_integer",
+                "right": 1
+              },
+              {
+                "kind": "return",
+                "node": 3,
+                "source": 2
+              }
+            ],
+            "returned": {
+              "exact": "5",
+              "kind": "integer"
+            }
+          },
+          "support": [
+            {
+              "equal_axes": [
+                "medium"
+              ],
+              "parameters": [
+                [
+                  "medium",
+                  "symbolic"
+                ],
+                [
+                  "objective",
+                  "arithmetic"
+                ]
+              ],
+              "recurrence": 3
+            }
+          ],
+          "surface_template": {
+            "nodes": [
+              {
+                "kind": "slot",
+                "node": 0,
+                "slot": 0,
+                "value_kind": "integer"
+              },
+              {
+                "kind": "slot",
+                "node": 1,
+                "slot": 1,
+                "value_kind": "integer"
+              },
+              {
+                "kind": "binary",
+                "left": 0,
+                "node": 2,
+                "operation": "add_integer",
+                "right": 1
+              },
+              {
+                "kind": "return",
+                "node": 3,
+                "source": 2
+              }
+            ],
+            "surface_segments": [
+              "",
+              "+",
+              ""
+            ]
+          }
+        },
+        {
+          "bindings": [
+            "1",
+            "4"
+          ],
+          "output": {
+            "exact": "14",
+            "kind": "text"
+          },
+          "path": {
+            "nodes": [
+              {
+                "kind": "literal",
+                "node": 0,
+                "source_face": "1",
+                "value": {
+                  "exact": "1",
+                  "kind": "text"
+                }
+              },
+              {
+                "kind": "literal",
+                "node": 1,
+                "source_face": "4",
+                "value": {
+                  "exact": "4",
+                  "kind": "text"
+                }
+              },
+              {
+                "kind": "binary",
+                "left": 0,
+                "node": 2,
+                "operation": "concatenate_text",
+                "right": 1
+              },
+              {
+                "kind": "return",
+                "node": 3,
+                "source": 2
+              }
+            ],
+            "returned": {
+              "exact": "14",
+              "kind": "text"
+            }
+          },
+          "support": [
+            {
+              "equal_axes": [
+                "medium"
+              ],
+              "parameters": [
+                [
+                  "medium",
+                  "symbolic"
+                ],
+                [
+                  "objective",
+                  "concatenate"
+                ]
+              ],
+              "recurrence": 3
+            }
+          ],
+          "surface_template": {
+            "nodes": [
+              {
+                "kind": "slot",
+                "node": 0,
+                "slot": 0,
+                "value_kind": "text"
+              },
+              {
+                "kind": "slot",
+                "node": 1,
+                "slot": 1,
+                "value_kind": "text"
+              },
+              {
+                "kind": "binary",
+                "left": 0,
+                "node": 2,
+                "operation": "concatenate_text",
+                "right": 1
+              },
+              {
+                "kind": "return",
+                "node": 3,
+                "source": 2
+              }
+            ],
+            "surface_segments": [
+              "",
+              "+",
+              ""
+            ]
+          }
+        }
+      ],
+      "carried_path_species": [
+        "integer_add",
+        "text_concat"
+      ],
+      "complete_paths": true,
+      "ecology_and_input_departed": true,
+      "events": [
+        {
+          "event": "probe-withheld-objective-meeting",
+          "regional_arcs": 10,
+          "returned_incidences": 289,
+          "returned_pins": 289,
+          "semantic_words": 8,
+          "wall_micros": 14519
+        },
+        {
+          "event": "probe-withheld-objective-path-return",
+          "regional_arcs": 347,
+          "returned_incidences": 923,
+          "returned_pins": 923,
+          "semantic_words": 57,
+          "wall_micros": 45515
+        },
+        {
+          "event": "probe-withheld-objective-successor",
+          "regional_arcs": 118,
+          "returned_incidences": 58,
+          "returned_pins": 58,
+          "semantic_words": 57,
+          "wall_micros": 35081
+        }
+      ],
+      "expected_outputs": [
+        {
+          "exact": "5",
+          "kind": "integer"
+        },
+        {
+          "exact": "14",
+          "kind": "text"
+        }
+      ],
+      "id": "withheld-objective",
+      "inscription": "1+4",
+      "parameters": {
+        "medium": "symbolic"
+      },
+      "physical_after": {
+        "constituent_cells": 3,
+        "constituent_incidences": 58,
+        "constituent_paths": 58,
+        "constituent_pins": 58,
+        "constituent_transport_terms": 58,
+        "live_lineages": 0,
+        "standing_cells": 36,
+        "standing_constituents": 1,
+        "standing_rank": 6
+      },
+      "required_fold_present": true
+    },
+    {
+      "accepted": true,
+      "active_constituent_occurrences": [
+        {
+          "end": 2,
+          "expansion": "1+",
+          "presentations": [
+            "1|+"
+          ],
+          "start": 0
+        },
+        {
+          "end": 3,
+          "expansion": "1+2",
+          "presentations": [
+            "1|+2",
+            "1+|2"
+          ],
+          "start": 0
+        },
+        {
+          "end": 3,
+          "expansion": "+2",
+          "presentations": [
+            "+|2"
+          ],
+          "start": 1
+        },
+        {
+          "end": 4,
+          "expansion": "2+",
+          "presentations": [
+            "2|+"
+          ],
+          "start": 2
+        },
+        {
+          "end": 5,
+          "expansion": "+3",
+          "presentations": [
+            "+|3"
+          ],
+          "start": 3
+        }
+      ],
+      "agreement_rank": 2,
+      "candidate_count": 2,
+      "candidates": [
+        {
+          "bindings": [
+            "1",
+            "2+3"
+          ],
+          "output": {
+            "exact": "12+3",
+            "kind": "text"
+          },
+          "path": {
+            "nodes": [
+              {
+                "kind": "literal",
+                "node": 0,
+                "source_face": "1",
+                "value": {
+                  "exact": "1",
+                  "kind": "text"
+                }
+              },
+              {
+                "kind": "literal",
+                "node": 1,
+                "source_face": "2+3",
+                "value": {
+                  "exact": "2+3",
+                  "kind": "text"
+                }
+              },
+              {
+                "kind": "binary",
+                "left": 0,
+                "node": 2,
+                "operation": "concatenate_text",
+                "right": 1
+              },
+              {
+                "kind": "return",
+                "node": 3,
+                "source": 2
+              }
+            ],
+            "returned": {
+              "exact": "12+3",
+              "kind": "text"
+            }
+          },
+          "support": [
+            {
+              "equal_axes": [
+                "medium",
+                "objective"
+              ],
+              "parameters": [
+                [
+                  "medium",
+                  "symbolic"
+                ],
+                [
+                  "objective",
+                  "concatenate"
+                ]
+              ],
+              "recurrence": 3
+            }
+          ],
+          "surface_template": {
+            "nodes": [
+              {
+                "kind": "slot",
+                "node": 0,
+                "slot": 0,
+                "value_kind": "text"
+              },
+              {
+                "kind": "slot",
+                "node": 1,
+                "slot": 1,
+                "value_kind": "text"
+              },
+              {
+                "kind": "binary",
+                "left": 0,
+                "node": 2,
+                "operation": "concatenate_text",
+                "right": 1
+              },
+              {
+                "kind": "return",
+                "node": 3,
+                "source": 2
+              }
+            ],
+            "surface_segments": [
+              "",
+              "+",
+              ""
+            ]
+          }
+        },
+        {
+          "bindings": [
+            "1+2",
+            "3"
+          ],
+          "output": {
+            "exact": "1+23",
+            "kind": "text"
+          },
+          "path": {
+            "nodes": [
+              {
+                "kind": "literal",
+                "node": 0,
+                "source_face": "1+2",
+                "value": {
+                  "exact": "1+2",
+                  "kind": "text"
+                }
+              },
+              {
+                "kind": "literal",
+                "node": 1,
+                "source_face": "3",
+                "value": {
+                  "exact": "3",
+                  "kind": "text"
+                }
+              },
+              {
+                "kind": "binary",
+                "left": 0,
+                "node": 2,
+                "operation": "concatenate_text",
+                "right": 1
+              },
+              {
+                "kind": "return",
+                "node": 3,
+                "source": 2
+              }
+            ],
+            "returned": {
+              "exact": "1+23",
+              "kind": "text"
+            }
+          },
+          "support": [
+            {
+              "equal_axes": [
+                "medium",
+                "objective"
+              ],
+              "parameters": [
+                [
+                  "medium",
+                  "symbolic"
+                ],
+                [
+                  "objective",
+                  "concatenate"
+                ]
+              ],
+              "recurrence": 3
+            }
+          ],
+          "surface_template": {
+            "nodes": [
+              {
+                "kind": "slot",
+                "node": 0,
+                "slot": 0,
+                "value_kind": "text"
+              },
+              {
+                "kind": "slot",
+                "node": 1,
+                "slot": 1,
+                "value_kind": "text"
+              },
+              {
+                "kind": "binary",
+                "left": 0,
+                "node": 2,
+                "operation": "concatenate_text",
+                "right": 1
+              },
+              {
+                "kind": "return",
+                "node": 3,
+                "source": 2
+              }
+            ],
+            "surface_segments": [
+              "",
+              "+",
+              ""
+            ]
+          }
+        }
+      ],
+      "carried_path_species": [
+        "text_concat"
+      ],
+      "complete_paths": true,
+      "ecology_and_input_departed": true,
+      "events": [
+        {
+          "event": "probe-plural-surface-bindings-meeting",
+          "regional_arcs": 16,
+          "returned_incidences": 295,
+          "returned_pins": 295,
+          "semantic_words": 14,
+          "wall_micros": 16288
+        },
+        {
+          "event": "probe-plural-surface-bindings-path-return",
+          "regional_arcs": 353,
+          "returned_incidences": 941,
+          "returned_pins": 941,
+          "semantic_words": 57,
+          "wall_micros": 46661
+        },
+        {
+          "event": "probe-plural-surface-bindings-successor",
+          "regional_arcs": 118,
+          "returned_incidences": 58,
+          "returned_pins": 58,
+          "semantic_words": 57,
+          "wall_micros": 35211
+        }
+      ],
+      "expected_outputs": [
+        {
+          "exact": "12+3",
+          "kind": "text"
+        },
+        {
+          "exact": "1+23",
+          "kind": "text"
+        }
+      ],
+      "id": "plural-surface-bindings",
+      "inscription": "1+2+3",
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "concatenate"
+      },
+      "physical_after": {
+        "constituent_cells": 3,
+        "constituent_incidences": 58,
+        "constituent_paths": 58,
+        "constituent_pins": 58,
+        "constituent_transport_terms": 58,
+        "live_lineages": 0,
+        "standing_cells": 36,
+        "standing_constituents": 1,
+        "standing_rank": 6
+      },
+      "required_fold_present": true
+    },
+    {
+      "accepted": true,
+      "active_constituent_occurrences": [],
+      "agreement_rank": null,
+      "candidate_count": 0,
+      "candidates": [],
+      "carried_path_species": [],
+      "complete_paths": true,
+      "ecology_and_input_departed": true,
+      "events": [
+        {
+          "event": "probe-unafforded-surface-meeting",
+          "regional_arcs": 16,
+          "returned_incidences": 295,
+          "returned_pins": 295,
+          "semantic_words": 14,
+          "wall_micros": 15773
+        },
+        {
+          "event": "probe-unafforded-surface-path-return",
+          "regional_arcs": 299,
+          "returned_incidences": 887,
+          "returned_pins": 887,
+          "semantic_words": 3,
+          "wall_micros": 41767
+        },
+        {
+          "event": "probe-unafforded-surface-successor",
+          "regional_arcs": 10,
+          "returned_incidences": 4,
+          "returned_pins": 4,
+          "semantic_words": 3,
+          "wall_micros": 23656
+        }
+      ],
+      "expected_outputs": [],
+      "id": "unafforded-surface",
+      "inscription": "1*4",
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "arithmetic"
+      },
+      "physical_after": {
+        "constituent_cells": 3,
+        "constituent_incidences": 4,
+        "constituent_paths": 4,
+        "constituent_pins": 4,
+        "constituent_transport_terms": 4,
+        "live_lineages": 0,
+        "standing_cells": 36,
+        "standing_constituents": 1,
+        "standing_rank": 6
+      },
+      "required_fold_present": true
+    }
+  ],
+  "status": "ACCEPTED",
+  "stopping_condition": "Stop when one source-absent remount re-instantiates the complete ADD path for unseen 1+4 and returns exact 5, the same surface under CONCAT returns text 14, withholding objective preserves both, ambiguous slot placement stays plural, an unafforded surface returns no path, all teacher and replaced carriers depart, and the complete ecology survives exact rest.",
+  "theory_to_structure": "The inscription fold supplies addressable constituent incidence; the returned typed DAG supplies the transported operation. Ordered literal faces divide each inscription into exact constant segments and open slots. Recurrence makes that surface/path relation addressable. A later receiver binds new exact faces, re-instantiates the entire DAG, and only then obtains its consequence. Objective is one local receiver axis: it selects ADD or CONCAT for the same glyph surface, while its absence preserves both."
+}

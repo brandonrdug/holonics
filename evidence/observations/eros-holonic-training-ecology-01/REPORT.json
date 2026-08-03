@@ -1,0 +1,2672 @@
+{
+  "acceptance": {
+    "all_source_absent_probe_fields_exact": true,
+    "contradicting_later_consequence_returned_open_residual": true,
+    "every_active_recurrent_path_rebinds_at_least_one_source_face": true,
+    "exact_rest_remount": true,
+    "no_floating_point_causal_data": true,
+    "no_standing_controls_returned_no_path": true,
+    "no_teacher_execution_dag_or_answer_table_entered": true,
+    "ordinary_antecedent_context_consequence_events_derived_their_own_paths": true,
+    "source_absent_text_to_code_composition_exact": true,
+    "training_events_retained_no_source_occurrence_log": true,
+    "withheld_context_preserved_complete_alternatives": true
+  },
+  "active_ecology": {
+    "active_paths": [
+      {
+        "parameters": [
+          [
+            "medium",
+            "mathematics"
+          ],
+          [
+            "objective",
+            "apply"
+          ]
+        ],
+        "path": [
+          {
+            "face": {
+              "axis": "operator",
+              "ordinal": 0
+            },
+            "kind": "COPY"
+          },
+          {
+            "kind": "FOUND",
+            "value": "("
+          },
+          {
+            "face": {
+              "axis": "argument",
+              "ordinal": 0
+            },
+            "kind": "COPY"
+          },
+          {
+            "kind": "FOUND",
+            "value": ")"
+          }
+        ],
+        "recurrence": 2
+      },
+      {
+        "parameters": [
+          [
+            "medium",
+            "text"
+          ],
+          [
+            "objective",
+            "name"
+          ]
+        ],
+        "path": [
+          {
+            "face": {
+              "axis": "subject",
+              "ordinal": 0
+            },
+            "kind": "COPY"
+          }
+        ],
+        "recurrence": 2
+      },
+      {
+        "parameters": [
+          [
+            "medium",
+            "text"
+          ],
+          [
+            "objective",
+            "greet"
+          ]
+        ],
+        "path": [
+          {
+            "kind": "FOUND",
+            "value": "Hello, "
+          },
+          {
+            "face": {
+              "axis": "subject",
+              "ordinal": 0
+            },
+            "kind": "COPY"
+          },
+          {
+            "kind": "FOUND",
+            "value": "!"
+          }
+        ],
+        "recurrence": 2
+      },
+      {
+        "parameters": [
+          [
+            "language",
+            "python"
+          ],
+          [
+            "medium",
+            "code"
+          ],
+          [
+            "objective",
+            "emit"
+          ]
+        ],
+        "path": [
+          {
+            "kind": "FOUND",
+            "value": "emit(\""
+          },
+          {
+            "face": {
+              "axis": "utterance",
+              "ordinal": 0
+            },
+            "kind": "COPY"
+          },
+          {
+            "kind": "FOUND",
+            "value": "\")"
+          }
+        ],
+        "recurrence": 2
+      },
+      {
+        "parameters": [
+          [
+            "language",
+            "rust"
+          ],
+          [
+            "medium",
+            "code"
+          ],
+          [
+            "objective",
+            "emit"
+          ]
+        ],
+        "path": [
+          {
+            "kind": "FOUND",
+            "value": "println!(\""
+          },
+          {
+            "face": {
+              "axis": "utterance",
+              "ordinal": 0
+            },
+            "kind": "COPY"
+          },
+          {
+            "kind": "FOUND",
+            "value": "\");"
+          }
+        ],
+        "recurrence": 2
+      }
+    ],
+    "generation": 10
+  },
+  "boundary": "This is a general exact transduction carrier, not yet a complete general model. It learns relations visible in antecedent/context/consequence events. Output alone cannot reveal an unobserved hidden implementation; parsers, compilers, runtimes, sensors, and other transducers may expose deeper causal faces. Route enumeration is exact but bounded by an explicit refusal aperture and is not yet the compact resident path-complex layout required for corpus scale. The ecology rest is application-owned in this cell; a later direct-membrane passage must make the same route population one self-emanated Soma constituent before device-resident scale.",
+  "capability": "The remounted ecology can take a new exact face, instantiate a recurrent text transformation, return that new consequence as a face, and immediately use it to instantiate either of two recurrent code transformations. Receiver axes divide the field; withholding one axis preserves both complete paths. An actual consequence outside the field returns OPEN_RESIDUAL rather than being relabeled incorrect.",
+  "lambda": {
+    "causal_carrier": "the complete finite consequence-boundary complex: exact COPY edges from co-present addressed faces plus exact elementary FOUND edges",
+    "floating_point": false,
+    "maximum_templates_per_occurrence": 4096,
+    "minimum_recurrence": 2,
+    "receiver_law": "retain every afforded complete path at maximal exact parameter-axis incidence; missing axes preserve alternatives",
+    "residual_law": "compare the actual later consequence with the complete afforded path population as NONE, RIDE, OPEN_INCLUDED, or OPEN_RESIDUAL"
+  },
+  "no_standing_controls": [
+    {
+      "accepted": true,
+      "candidate_paths": 0,
+      "id": "unseen-utterance"
+    },
+    {
+      "accepted": true,
+      "candidate_paths": 0,
+      "id": "withheld-objective"
+    },
+    {
+      "accepted": true,
+      "candidate_paths": 0,
+      "id": "unseen-math-application"
+    },
+    {
+      "accepted": true,
+      "candidate_paths": 0,
+      "id": "contradicting-return"
+    }
+  ],
+  "observation_id": "eros-holonic-training-ecology-01",
+  "question": "Can ordinary exact antecedent/context/consequence events cultivate a reusable mixed text/code path ecology, compose after the teachers depart, and retain plural receiver-relative alternatives without a teacher-authored execution DAG?",
+  "rest": {
+    "exact": true,
+    "octets": 2413,
+    "prediction_cache_entries_carried": 0,
+    "schema": "HTEC/1",
+    "sha256": "162c7a45a88f85bfba3963a91ffcd7bf30e2793216fbe3547c994d90b0c6a718",
+    "source_occurrences_carried": 0
+  },
+  "schema": "eros.holonic-training-ecology.report.v1",
+  "source": {
+    "probes": 4,
+    "sha256": "5148511cdaa28602c59cbf3057ffb51af24d23227050e31b47b4605d364a746d",
+    "training_occurrences": 10
+  },
+  "source_absent_composition": {
+    "accepted": true,
+    "first_source_absent_path": {
+      "agreement_rank": 2,
+      "complete_paths": [
+        {
+          "consequence": "Hello, Mira!",
+          "steps": [
+            {
+              "kind": "FOUND",
+              "value": "Hello, "
+            },
+            {
+              "face": {
+                "axis": "subject",
+                "ordinal": 0
+              },
+              "kind": "COPY",
+              "value": "Mira"
+            },
+            {
+              "kind": "FOUND",
+              "value": "!"
+            }
+          ],
+          "support": [
+            {
+              "equal_axes": [
+                "medium",
+                "objective"
+              ],
+              "parameters": [
+                [
+                  "medium",
+                  "text"
+                ],
+                [
+                  "objective",
+                  "greet"
+                ]
+              ],
+              "recurrence": 2
+            }
+          ]
+        }
+      ],
+      "consequence_population": [
+        {
+          "consequence": "Hello, Mira!",
+          "path_support": 2
+        }
+      ]
+    },
+    "python_receiver": {
+      "agreement_rank": 3,
+      "complete_paths": [
+        {
+          "consequence": "emit(\"Hello, Mira!\")",
+          "steps": [
+            {
+              "kind": "FOUND",
+              "value": "emit(\""
+            },
+            {
+              "face": {
+                "axis": "utterance",
+                "ordinal": 0
+              },
+              "kind": "COPY",
+              "value": "Hello, Mira!"
+            },
+            {
+              "kind": "FOUND",
+              "value": "\")"
+            }
+          ],
+          "support": [
+            {
+              "equal_axes": [
+                "language",
+                "medium",
+                "objective"
+              ],
+              "parameters": [
+                [
+                  "language",
+                  "python"
+                ],
+                [
+                  "medium",
+                  "code"
+                ],
+                [
+                  "objective",
+                  "emit"
+                ]
+              ],
+              "recurrence": 2
+            }
+          ]
+        }
+      ],
+      "consequence_population": [
+        {
+          "consequence": "emit(\"Hello, Mira!\")",
+          "path_support": 2
+        }
+      ]
+    },
+    "returned_face_reenters_as": {
+      "axis": "utterance",
+      "ordinal": 0,
+      "value": "Hello, Mira!"
+    },
+    "rust_receiver": {
+      "agreement_rank": 3,
+      "complete_paths": [
+        {
+          "consequence": "println!(\"Hello, Mira!\");",
+          "steps": [
+            {
+              "kind": "FOUND",
+              "value": "println!(\""
+            },
+            {
+              "face": {
+                "axis": "utterance",
+                "ordinal": 0
+              },
+              "kind": "COPY",
+              "value": "Hello, Mira!"
+            },
+            {
+              "kind": "FOUND",
+              "value": "\");"
+            }
+          ],
+          "support": [
+            {
+              "equal_axes": [
+                "language",
+                "medium",
+                "objective"
+              ],
+              "parameters": [
+                [
+                  "language",
+                  "rust"
+                ],
+                [
+                  "medium",
+                  "code"
+                ],
+                [
+                  "objective",
+                  "emit"
+                ]
+              ],
+              "recurrence": 2
+            }
+          ]
+        }
+      ],
+      "consequence_population": [
+        {
+          "consequence": "println!(\"Hello, Mira!\");",
+          "path_support": 2
+        }
+      ]
+    },
+    "withheld_language_receiver": {
+      "agreement_rank": 2,
+      "complete_paths": [
+        {
+          "consequence": "emit(\"Hello, Mira!\")",
+          "steps": [
+            {
+              "kind": "FOUND",
+              "value": "emit(\""
+            },
+            {
+              "face": {
+                "axis": "utterance",
+                "ordinal": 0
+              },
+              "kind": "COPY",
+              "value": "Hello, Mira!"
+            },
+            {
+              "kind": "FOUND",
+              "value": "\")"
+            }
+          ],
+          "support": [
+            {
+              "equal_axes": [
+                "medium",
+                "objective"
+              ],
+              "parameters": [
+                [
+                  "language",
+                  "python"
+                ],
+                [
+                  "medium",
+                  "code"
+                ],
+                [
+                  "objective",
+                  "emit"
+                ]
+              ],
+              "recurrence": 2
+            }
+          ]
+        },
+        {
+          "consequence": "println!(\"Hello, Mira!\");",
+          "steps": [
+            {
+              "kind": "FOUND",
+              "value": "println!(\""
+            },
+            {
+              "face": {
+                "axis": "utterance",
+                "ordinal": 0
+              },
+              "kind": "COPY",
+              "value": "Hello, Mira!"
+            },
+            {
+              "kind": "FOUND",
+              "value": "\");"
+            }
+          ],
+          "support": [
+            {
+              "equal_axes": [
+                "medium",
+                "objective"
+              ],
+              "parameters": [
+                [
+                  "language",
+                  "rust"
+                ],
+                [
+                  "medium",
+                  "code"
+                ],
+                [
+                  "objective",
+                  "emit"
+                ]
+              ],
+              "recurrence": 2
+            }
+          ]
+        }
+      ],
+      "consequence_population": [
+        {
+          "consequence": "emit(\"Hello, Mira!\")",
+          "path_support": 2
+        },
+        {
+          "consequence": "println!(\"Hello, Mira!\");",
+          "path_support": 2
+        }
+      ]
+    }
+  },
+  "source_absent_probes": [
+    {
+      "accepted": true,
+      "actual_consequence": "Hello, Mira!",
+      "actual_relation": "RIDE",
+      "expected_consequences": [
+        "Hello, Mira!"
+      ],
+      "faces": [
+        {
+          "address": {
+            "axis": "subject",
+            "ordinal": 0
+          },
+          "value": "Mira"
+        }
+      ],
+      "field": {
+        "agreement_rank": 2,
+        "complete_paths": [
+          {
+            "consequence": "Hello, Mira!",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "Hello, "
+              },
+              {
+                "face": {
+                  "axis": "subject",
+                  "ordinal": 0
+                },
+                "kind": "COPY",
+                "value": "Mira"
+              },
+              {
+                "kind": "FOUND",
+                "value": "!"
+              }
+            ],
+            "support": [
+              {
+                "equal_axes": [
+                  "medium",
+                  "objective"
+                ],
+                "parameters": [
+                  [
+                    "medium",
+                    "text"
+                  ],
+                  [
+                    "objective",
+                    "greet"
+                  ]
+                ],
+                "recurrence": 2
+              }
+            ]
+          }
+        ],
+        "consequence_population": [
+          {
+            "consequence": "Hello, Mira!",
+            "path_support": 2
+          }
+        ]
+      },
+      "id": "unseen-utterance",
+      "parameters": {
+        "medium": "text",
+        "objective": "greet"
+      }
+    },
+    {
+      "accepted": true,
+      "actual_consequence": "Mira",
+      "actual_relation": "OPEN_INCLUDED",
+      "expected_consequences": [
+        "Hello, Mira!",
+        "Mira"
+      ],
+      "faces": [
+        {
+          "address": {
+            "axis": "subject",
+            "ordinal": 0
+          },
+          "value": "Mira"
+        }
+      ],
+      "field": {
+        "agreement_rank": 1,
+        "complete_paths": [
+          {
+            "consequence": "Mira",
+            "steps": [
+              {
+                "face": {
+                  "axis": "subject",
+                  "ordinal": 0
+                },
+                "kind": "COPY",
+                "value": "Mira"
+              }
+            ],
+            "support": [
+              {
+                "equal_axes": [
+                  "medium"
+                ],
+                "parameters": [
+                  [
+                    "medium",
+                    "text"
+                  ],
+                  [
+                    "objective",
+                    "name"
+                  ]
+                ],
+                "recurrence": 2
+              }
+            ]
+          },
+          {
+            "consequence": "Hello, Mira!",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "Hello, "
+              },
+              {
+                "face": {
+                  "axis": "subject",
+                  "ordinal": 0
+                },
+                "kind": "COPY",
+                "value": "Mira"
+              },
+              {
+                "kind": "FOUND",
+                "value": "!"
+              }
+            ],
+            "support": [
+              {
+                "equal_axes": [
+                  "medium"
+                ],
+                "parameters": [
+                  [
+                    "medium",
+                    "text"
+                  ],
+                  [
+                    "objective",
+                    "greet"
+                  ]
+                ],
+                "recurrence": 2
+              }
+            ]
+          }
+        ],
+        "consequence_population": [
+          {
+            "consequence": "Hello, Mira!",
+            "path_support": 2
+          },
+          {
+            "consequence": "Mira",
+            "path_support": 2
+          }
+        ]
+      },
+      "id": "withheld-objective",
+      "parameters": {
+        "medium": "text"
+      }
+    },
+    {
+      "accepted": true,
+      "actual_consequence": "tan(z)",
+      "actual_relation": "RIDE",
+      "expected_consequences": [
+        "tan(z)"
+      ],
+      "faces": [
+        {
+          "address": {
+            "axis": "operator",
+            "ordinal": 0
+          },
+          "value": "tan"
+        },
+        {
+          "address": {
+            "axis": "argument",
+            "ordinal": 0
+          },
+          "value": "z"
+        }
+      ],
+      "field": {
+        "agreement_rank": 2,
+        "complete_paths": [
+          {
+            "consequence": "tan(z)",
+            "steps": [
+              {
+                "face": {
+                  "axis": "operator",
+                  "ordinal": 0
+                },
+                "kind": "COPY",
+                "value": "tan"
+              },
+              {
+                "kind": "FOUND",
+                "value": "("
+              },
+              {
+                "face": {
+                  "axis": "argument",
+                  "ordinal": 0
+                },
+                "kind": "COPY",
+                "value": "z"
+              },
+              {
+                "kind": "FOUND",
+                "value": ")"
+              }
+            ],
+            "support": [
+              {
+                "equal_axes": [
+                  "medium",
+                  "objective"
+                ],
+                "parameters": [
+                  [
+                    "medium",
+                    "mathematics"
+                  ],
+                  [
+                    "objective",
+                    "apply"
+                  ]
+                ],
+                "recurrence": 2
+              }
+            ]
+          }
+        ],
+        "consequence_population": [
+          {
+            "consequence": "tan(z)",
+            "path_support": 2
+          }
+        ]
+      },
+      "id": "unseen-math-application",
+      "parameters": {
+        "medium": "mathematics",
+        "objective": "apply"
+      }
+    },
+    {
+      "accepted": true,
+      "actual_consequence": "Greetings, Mira.",
+      "actual_relation": "OPEN_RESIDUAL",
+      "expected_consequences": [
+        "Hello, Mira!"
+      ],
+      "faces": [
+        {
+          "address": {
+            "axis": "subject",
+            "ordinal": 0
+          },
+          "value": "Mira"
+        }
+      ],
+      "field": {
+        "agreement_rank": 2,
+        "complete_paths": [
+          {
+            "consequence": "Hello, Mira!",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "Hello, "
+              },
+              {
+                "face": {
+                  "axis": "subject",
+                  "ordinal": 0
+                },
+                "kind": "COPY",
+                "value": "Mira"
+              },
+              {
+                "kind": "FOUND",
+                "value": "!"
+              }
+            ],
+            "support": [
+              {
+                "equal_axes": [
+                  "medium",
+                  "objective"
+                ],
+                "parameters": [
+                  [
+                    "medium",
+                    "text"
+                  ],
+                  [
+                    "objective",
+                    "greet"
+                  ]
+                ],
+                "recurrence": 2
+              }
+            ]
+          }
+        ],
+        "consequence_population": [
+          {
+            "consequence": "Hello, Mira!",
+            "path_support": 2
+          }
+        ]
+      },
+      "id": "contradicting-return",
+      "parameters": {
+        "medium": "text",
+        "objective": "greet"
+      }
+    }
+  ],
+  "status": "ACCEPTED",
+  "stopping_condition": "Stop after one exact mixed-medium ecology derives paths from ordinary consequences, survives source-free rest/remount, composes an unseen text consequence into two code paths, preserves alternatives under withheld context, and returns one honest contradiction residual.",
+  "training_trajectory": [
+    {
+      "consequence": "Hello, Ada!",
+      "derived_complete_paths": [
+        [
+          {
+            "kind": "FOUND",
+            "value": "Hello, "
+          },
+          {
+            "face": {
+              "axis": "subject",
+              "ordinal": 0
+            },
+            "kind": "COPY"
+          },
+          {
+            "kind": "FOUND",
+            "value": "!"
+          }
+        ],
+        [
+          {
+            "kind": "FOUND",
+            "value": "Hello, Ada!"
+          }
+        ]
+      ],
+      "derived_complex": {
+        "edges": [
+          {
+            "face": {
+              "axis": "subject",
+              "ordinal": 0
+            },
+            "from": 7,
+            "kind": "COPY",
+            "to": 10
+          },
+          {
+            "from": 0,
+            "kind": "FOUND",
+            "to": 1,
+            "value": "H"
+          },
+          {
+            "from": 1,
+            "kind": "FOUND",
+            "to": 2,
+            "value": "e"
+          },
+          {
+            "from": 2,
+            "kind": "FOUND",
+            "to": 3,
+            "value": "l"
+          },
+          {
+            "from": 3,
+            "kind": "FOUND",
+            "to": 4,
+            "value": "l"
+          },
+          {
+            "from": 4,
+            "kind": "FOUND",
+            "to": 5,
+            "value": "o"
+          },
+          {
+            "from": 5,
+            "kind": "FOUND",
+            "to": 6,
+            "value": ","
+          },
+          {
+            "from": 6,
+            "kind": "FOUND",
+            "to": 7,
+            "value": " "
+          },
+          {
+            "from": 7,
+            "kind": "FOUND",
+            "to": 8,
+            "value": "A"
+          },
+          {
+            "from": 8,
+            "kind": "FOUND",
+            "to": 9,
+            "value": "d"
+          },
+          {
+            "from": 9,
+            "kind": "FOUND",
+            "to": 10,
+            "value": "a"
+          },
+          {
+            "from": 10,
+            "kind": "FOUND",
+            "to": 11,
+            "value": "!"
+          }
+        ],
+        "vertices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11
+        ]
+      },
+      "faces": [
+        {
+          "address": {
+            "axis": "subject",
+            "ordinal": 0
+          },
+          "value": "Ada"
+        }
+      ],
+      "id": "utterance-ada",
+      "ordinal": 0,
+      "parameters": {
+        "medium": "text",
+        "objective": "greet"
+      },
+      "prior_field": {
+        "agreement_rank": null,
+        "complete_paths": [],
+        "consequence_population": []
+      },
+      "relation": "NONE",
+      "successor_generation": 1
+    },
+    {
+      "consequence": "Hello, Lin!",
+      "derived_complete_paths": [
+        [
+          {
+            "kind": "FOUND",
+            "value": "Hello, "
+          },
+          {
+            "face": {
+              "axis": "subject",
+              "ordinal": 0
+            },
+            "kind": "COPY"
+          },
+          {
+            "kind": "FOUND",
+            "value": "!"
+          }
+        ],
+        [
+          {
+            "kind": "FOUND",
+            "value": "Hello, Lin!"
+          }
+        ]
+      ],
+      "derived_complex": {
+        "edges": [
+          {
+            "face": {
+              "axis": "subject",
+              "ordinal": 0
+            },
+            "from": 7,
+            "kind": "COPY",
+            "to": 10
+          },
+          {
+            "from": 0,
+            "kind": "FOUND",
+            "to": 1,
+            "value": "H"
+          },
+          {
+            "from": 1,
+            "kind": "FOUND",
+            "to": 2,
+            "value": "e"
+          },
+          {
+            "from": 2,
+            "kind": "FOUND",
+            "to": 3,
+            "value": "l"
+          },
+          {
+            "from": 3,
+            "kind": "FOUND",
+            "to": 4,
+            "value": "l"
+          },
+          {
+            "from": 4,
+            "kind": "FOUND",
+            "to": 5,
+            "value": "o"
+          },
+          {
+            "from": 5,
+            "kind": "FOUND",
+            "to": 6,
+            "value": ","
+          },
+          {
+            "from": 6,
+            "kind": "FOUND",
+            "to": 7,
+            "value": " "
+          },
+          {
+            "from": 7,
+            "kind": "FOUND",
+            "to": 8,
+            "value": "L"
+          },
+          {
+            "from": 8,
+            "kind": "FOUND",
+            "to": 9,
+            "value": "i"
+          },
+          {
+            "from": 9,
+            "kind": "FOUND",
+            "to": 10,
+            "value": "n"
+          },
+          {
+            "from": 10,
+            "kind": "FOUND",
+            "to": 11,
+            "value": "!"
+          }
+        ],
+        "vertices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11
+        ]
+      },
+      "faces": [
+        {
+          "address": {
+            "axis": "subject",
+            "ordinal": 0
+          },
+          "value": "Lin"
+        }
+      ],
+      "id": "utterance-lin",
+      "ordinal": 1,
+      "parameters": {
+        "medium": "text",
+        "objective": "greet"
+      },
+      "prior_field": {
+        "agreement_rank": null,
+        "complete_paths": [],
+        "consequence_population": []
+      },
+      "relation": "NONE",
+      "successor_generation": 2
+    },
+    {
+      "consequence": "Ada",
+      "derived_complete_paths": [
+        [
+          {
+            "face": {
+              "axis": "subject",
+              "ordinal": 0
+            },
+            "kind": "COPY"
+          }
+        ],
+        [
+          {
+            "kind": "FOUND",
+            "value": "Ada"
+          }
+        ]
+      ],
+      "derived_complex": {
+        "edges": [
+          {
+            "face": {
+              "axis": "subject",
+              "ordinal": 0
+            },
+            "from": 0,
+            "kind": "COPY",
+            "to": 3
+          },
+          {
+            "from": 0,
+            "kind": "FOUND",
+            "to": 1,
+            "value": "A"
+          },
+          {
+            "from": 1,
+            "kind": "FOUND",
+            "to": 2,
+            "value": "d"
+          },
+          {
+            "from": 2,
+            "kind": "FOUND",
+            "to": 3,
+            "value": "a"
+          }
+        ],
+        "vertices": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "faces": [
+        {
+          "address": {
+            "axis": "subject",
+            "ordinal": 0
+          },
+          "value": "Ada"
+        }
+      ],
+      "id": "name-ada",
+      "ordinal": 2,
+      "parameters": {
+        "medium": "text",
+        "objective": "name"
+      },
+      "prior_field": {
+        "agreement_rank": 1,
+        "complete_paths": [
+          {
+            "consequence": "Hello, Ada!",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "Hello, "
+              },
+              {
+                "face": {
+                  "axis": "subject",
+                  "ordinal": 0
+                },
+                "kind": "COPY",
+                "value": "Ada"
+              },
+              {
+                "kind": "FOUND",
+                "value": "!"
+              }
+            ],
+            "support": [
+              {
+                "equal_axes": [
+                  "medium"
+                ],
+                "parameters": [
+                  [
+                    "medium",
+                    "text"
+                  ],
+                  [
+                    "objective",
+                    "greet"
+                  ]
+                ],
+                "recurrence": 2
+              }
+            ]
+          }
+        ],
+        "consequence_population": [
+          {
+            "consequence": "Hello, Ada!",
+            "path_support": 2
+          }
+        ]
+      },
+      "relation": "OPEN_RESIDUAL",
+      "successor_generation": 3
+    },
+    {
+      "consequence": "Lin",
+      "derived_complete_paths": [
+        [
+          {
+            "face": {
+              "axis": "subject",
+              "ordinal": 0
+            },
+            "kind": "COPY"
+          }
+        ],
+        [
+          {
+            "kind": "FOUND",
+            "value": "Lin"
+          }
+        ]
+      ],
+      "derived_complex": {
+        "edges": [
+          {
+            "face": {
+              "axis": "subject",
+              "ordinal": 0
+            },
+            "from": 0,
+            "kind": "COPY",
+            "to": 3
+          },
+          {
+            "from": 0,
+            "kind": "FOUND",
+            "to": 1,
+            "value": "L"
+          },
+          {
+            "from": 1,
+            "kind": "FOUND",
+            "to": 2,
+            "value": "i"
+          },
+          {
+            "from": 2,
+            "kind": "FOUND",
+            "to": 3,
+            "value": "n"
+          }
+        ],
+        "vertices": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "faces": [
+        {
+          "address": {
+            "axis": "subject",
+            "ordinal": 0
+          },
+          "value": "Lin"
+        }
+      ],
+      "id": "name-lin",
+      "ordinal": 3,
+      "parameters": {
+        "medium": "text",
+        "objective": "name"
+      },
+      "prior_field": {
+        "agreement_rank": 1,
+        "complete_paths": [
+          {
+            "consequence": "Hello, Lin!",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "Hello, "
+              },
+              {
+                "face": {
+                  "axis": "subject",
+                  "ordinal": 0
+                },
+                "kind": "COPY",
+                "value": "Lin"
+              },
+              {
+                "kind": "FOUND",
+                "value": "!"
+              }
+            ],
+            "support": [
+              {
+                "equal_axes": [
+                  "medium"
+                ],
+                "parameters": [
+                  [
+                    "medium",
+                    "text"
+                  ],
+                  [
+                    "objective",
+                    "greet"
+                  ]
+                ],
+                "recurrence": 2
+              }
+            ]
+          }
+        ],
+        "consequence_population": [
+          {
+            "consequence": "Hello, Lin!",
+            "path_support": 2
+          }
+        ]
+      },
+      "relation": "OPEN_RESIDUAL",
+      "successor_generation": 4
+    },
+    {
+      "consequence": "emit(\"Hello, Ada!\")",
+      "derived_complete_paths": [
+        [
+          {
+            "kind": "FOUND",
+            "value": "emit(\""
+          },
+          {
+            "face": {
+              "axis": "utterance",
+              "ordinal": 0
+            },
+            "kind": "COPY"
+          },
+          {
+            "kind": "FOUND",
+            "value": "\")"
+          }
+        ],
+        [
+          {
+            "kind": "FOUND",
+            "value": "emit(\"Hello, Ada!\")"
+          }
+        ]
+      ],
+      "derived_complex": {
+        "edges": [
+          {
+            "face": {
+              "axis": "utterance",
+              "ordinal": 0
+            },
+            "from": 6,
+            "kind": "COPY",
+            "to": 17
+          },
+          {
+            "from": 0,
+            "kind": "FOUND",
+            "to": 1,
+            "value": "e"
+          },
+          {
+            "from": 1,
+            "kind": "FOUND",
+            "to": 2,
+            "value": "m"
+          },
+          {
+            "from": 2,
+            "kind": "FOUND",
+            "to": 3,
+            "value": "i"
+          },
+          {
+            "from": 3,
+            "kind": "FOUND",
+            "to": 4,
+            "value": "t"
+          },
+          {
+            "from": 4,
+            "kind": "FOUND",
+            "to": 5,
+            "value": "("
+          },
+          {
+            "from": 5,
+            "kind": "FOUND",
+            "to": 6,
+            "value": "\""
+          },
+          {
+            "from": 6,
+            "kind": "FOUND",
+            "to": 7,
+            "value": "H"
+          },
+          {
+            "from": 7,
+            "kind": "FOUND",
+            "to": 8,
+            "value": "e"
+          },
+          {
+            "from": 8,
+            "kind": "FOUND",
+            "to": 9,
+            "value": "l"
+          },
+          {
+            "from": 9,
+            "kind": "FOUND",
+            "to": 10,
+            "value": "l"
+          },
+          {
+            "from": 10,
+            "kind": "FOUND",
+            "to": 11,
+            "value": "o"
+          },
+          {
+            "from": 11,
+            "kind": "FOUND",
+            "to": 12,
+            "value": ","
+          },
+          {
+            "from": 12,
+            "kind": "FOUND",
+            "to": 13,
+            "value": " "
+          },
+          {
+            "from": 13,
+            "kind": "FOUND",
+            "to": 14,
+            "value": "A"
+          },
+          {
+            "from": 14,
+            "kind": "FOUND",
+            "to": 15,
+            "value": "d"
+          },
+          {
+            "from": 15,
+            "kind": "FOUND",
+            "to": 16,
+            "value": "a"
+          },
+          {
+            "from": 16,
+            "kind": "FOUND",
+            "to": 17,
+            "value": "!"
+          },
+          {
+            "from": 17,
+            "kind": "FOUND",
+            "to": 18,
+            "value": "\""
+          },
+          {
+            "from": 18,
+            "kind": "FOUND",
+            "to": 19,
+            "value": ")"
+          }
+        ],
+        "vertices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ]
+      },
+      "faces": [
+        {
+          "address": {
+            "axis": "utterance",
+            "ordinal": 0
+          },
+          "value": "Hello, Ada!"
+        }
+      ],
+      "id": "python-emit-ada",
+      "ordinal": 4,
+      "parameters": {
+        "language": "python",
+        "medium": "code",
+        "objective": "emit"
+      },
+      "prior_field": {
+        "agreement_rank": null,
+        "complete_paths": [],
+        "consequence_population": []
+      },
+      "relation": "NONE",
+      "successor_generation": 5
+    },
+    {
+      "consequence": "emit(\"Hello, Lin!\")",
+      "derived_complete_paths": [
+        [
+          {
+            "kind": "FOUND",
+            "value": "emit(\""
+          },
+          {
+            "face": {
+              "axis": "utterance",
+              "ordinal": 0
+            },
+            "kind": "COPY"
+          },
+          {
+            "kind": "FOUND",
+            "value": "\")"
+          }
+        ],
+        [
+          {
+            "kind": "FOUND",
+            "value": "emit(\"Hello, Lin!\")"
+          }
+        ]
+      ],
+      "derived_complex": {
+        "edges": [
+          {
+            "face": {
+              "axis": "utterance",
+              "ordinal": 0
+            },
+            "from": 6,
+            "kind": "COPY",
+            "to": 17
+          },
+          {
+            "from": 0,
+            "kind": "FOUND",
+            "to": 1,
+            "value": "e"
+          },
+          {
+            "from": 1,
+            "kind": "FOUND",
+            "to": 2,
+            "value": "m"
+          },
+          {
+            "from": 2,
+            "kind": "FOUND",
+            "to": 3,
+            "value": "i"
+          },
+          {
+            "from": 3,
+            "kind": "FOUND",
+            "to": 4,
+            "value": "t"
+          },
+          {
+            "from": 4,
+            "kind": "FOUND",
+            "to": 5,
+            "value": "("
+          },
+          {
+            "from": 5,
+            "kind": "FOUND",
+            "to": 6,
+            "value": "\""
+          },
+          {
+            "from": 6,
+            "kind": "FOUND",
+            "to": 7,
+            "value": "H"
+          },
+          {
+            "from": 7,
+            "kind": "FOUND",
+            "to": 8,
+            "value": "e"
+          },
+          {
+            "from": 8,
+            "kind": "FOUND",
+            "to": 9,
+            "value": "l"
+          },
+          {
+            "from": 9,
+            "kind": "FOUND",
+            "to": 10,
+            "value": "l"
+          },
+          {
+            "from": 10,
+            "kind": "FOUND",
+            "to": 11,
+            "value": "o"
+          },
+          {
+            "from": 11,
+            "kind": "FOUND",
+            "to": 12,
+            "value": ","
+          },
+          {
+            "from": 12,
+            "kind": "FOUND",
+            "to": 13,
+            "value": " "
+          },
+          {
+            "from": 13,
+            "kind": "FOUND",
+            "to": 14,
+            "value": "L"
+          },
+          {
+            "from": 14,
+            "kind": "FOUND",
+            "to": 15,
+            "value": "i"
+          },
+          {
+            "from": 15,
+            "kind": "FOUND",
+            "to": 16,
+            "value": "n"
+          },
+          {
+            "from": 16,
+            "kind": "FOUND",
+            "to": 17,
+            "value": "!"
+          },
+          {
+            "from": 17,
+            "kind": "FOUND",
+            "to": 18,
+            "value": "\""
+          },
+          {
+            "from": 18,
+            "kind": "FOUND",
+            "to": 19,
+            "value": ")"
+          }
+        ],
+        "vertices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ]
+      },
+      "faces": [
+        {
+          "address": {
+            "axis": "utterance",
+            "ordinal": 0
+          },
+          "value": "Hello, Lin!"
+        }
+      ],
+      "id": "python-emit-lin",
+      "ordinal": 5,
+      "parameters": {
+        "language": "python",
+        "medium": "code",
+        "objective": "emit"
+      },
+      "prior_field": {
+        "agreement_rank": null,
+        "complete_paths": [],
+        "consequence_population": []
+      },
+      "relation": "NONE",
+      "successor_generation": 6
+    },
+    {
+      "consequence": "println!(\"Hello, Ada!\");",
+      "derived_complete_paths": [
+        [
+          {
+            "kind": "FOUND",
+            "value": "println!(\""
+          },
+          {
+            "face": {
+              "axis": "utterance",
+              "ordinal": 0
+            },
+            "kind": "COPY"
+          },
+          {
+            "kind": "FOUND",
+            "value": "\");"
+          }
+        ],
+        [
+          {
+            "kind": "FOUND",
+            "value": "println!(\"Hello, Ada!\");"
+          }
+        ]
+      ],
+      "derived_complex": {
+        "edges": [
+          {
+            "face": {
+              "axis": "utterance",
+              "ordinal": 0
+            },
+            "from": 10,
+            "kind": "COPY",
+            "to": 21
+          },
+          {
+            "from": 0,
+            "kind": "FOUND",
+            "to": 1,
+            "value": "p"
+          },
+          {
+            "from": 1,
+            "kind": "FOUND",
+            "to": 2,
+            "value": "r"
+          },
+          {
+            "from": 2,
+            "kind": "FOUND",
+            "to": 3,
+            "value": "i"
+          },
+          {
+            "from": 3,
+            "kind": "FOUND",
+            "to": 4,
+            "value": "n"
+          },
+          {
+            "from": 4,
+            "kind": "FOUND",
+            "to": 5,
+            "value": "t"
+          },
+          {
+            "from": 5,
+            "kind": "FOUND",
+            "to": 6,
+            "value": "l"
+          },
+          {
+            "from": 6,
+            "kind": "FOUND",
+            "to": 7,
+            "value": "n"
+          },
+          {
+            "from": 7,
+            "kind": "FOUND",
+            "to": 8,
+            "value": "!"
+          },
+          {
+            "from": 8,
+            "kind": "FOUND",
+            "to": 9,
+            "value": "("
+          },
+          {
+            "from": 9,
+            "kind": "FOUND",
+            "to": 10,
+            "value": "\""
+          },
+          {
+            "from": 10,
+            "kind": "FOUND",
+            "to": 11,
+            "value": "H"
+          },
+          {
+            "from": 11,
+            "kind": "FOUND",
+            "to": 12,
+            "value": "e"
+          },
+          {
+            "from": 12,
+            "kind": "FOUND",
+            "to": 13,
+            "value": "l"
+          },
+          {
+            "from": 13,
+            "kind": "FOUND",
+            "to": 14,
+            "value": "l"
+          },
+          {
+            "from": 14,
+            "kind": "FOUND",
+            "to": 15,
+            "value": "o"
+          },
+          {
+            "from": 15,
+            "kind": "FOUND",
+            "to": 16,
+            "value": ","
+          },
+          {
+            "from": 16,
+            "kind": "FOUND",
+            "to": 17,
+            "value": " "
+          },
+          {
+            "from": 17,
+            "kind": "FOUND",
+            "to": 18,
+            "value": "A"
+          },
+          {
+            "from": 18,
+            "kind": "FOUND",
+            "to": 19,
+            "value": "d"
+          },
+          {
+            "from": 19,
+            "kind": "FOUND",
+            "to": 20,
+            "value": "a"
+          },
+          {
+            "from": 20,
+            "kind": "FOUND",
+            "to": 21,
+            "value": "!"
+          },
+          {
+            "from": 21,
+            "kind": "FOUND",
+            "to": 22,
+            "value": "\""
+          },
+          {
+            "from": 22,
+            "kind": "FOUND",
+            "to": 23,
+            "value": ")"
+          },
+          {
+            "from": 23,
+            "kind": "FOUND",
+            "to": 24,
+            "value": ";"
+          }
+        ],
+        "vertices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ]
+      },
+      "faces": [
+        {
+          "address": {
+            "axis": "utterance",
+            "ordinal": 0
+          },
+          "value": "Hello, Ada!"
+        }
+      ],
+      "id": "rust-emit-ada",
+      "ordinal": 6,
+      "parameters": {
+        "language": "rust",
+        "medium": "code",
+        "objective": "emit"
+      },
+      "prior_field": {
+        "agreement_rank": 2,
+        "complete_paths": [
+          {
+            "consequence": "emit(\"Hello, Ada!\")",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "emit(\""
+              },
+              {
+                "face": {
+                  "axis": "utterance",
+                  "ordinal": 0
+                },
+                "kind": "COPY",
+                "value": "Hello, Ada!"
+              },
+              {
+                "kind": "FOUND",
+                "value": "\")"
+              }
+            ],
+            "support": [
+              {
+                "equal_axes": [
+                  "medium",
+                  "objective"
+                ],
+                "parameters": [
+                  [
+                    "language",
+                    "python"
+                  ],
+                  [
+                    "medium",
+                    "code"
+                  ],
+                  [
+                    "objective",
+                    "emit"
+                  ]
+                ],
+                "recurrence": 2
+              }
+            ]
+          }
+        ],
+        "consequence_population": [
+          {
+            "consequence": "emit(\"Hello, Ada!\")",
+            "path_support": 2
+          }
+        ]
+      },
+      "relation": "OPEN_RESIDUAL",
+      "successor_generation": 7
+    },
+    {
+      "consequence": "println!(\"Hello, Lin!\");",
+      "derived_complete_paths": [
+        [
+          {
+            "kind": "FOUND",
+            "value": "println!(\""
+          },
+          {
+            "face": {
+              "axis": "utterance",
+              "ordinal": 0
+            },
+            "kind": "COPY"
+          },
+          {
+            "kind": "FOUND",
+            "value": "\");"
+          }
+        ],
+        [
+          {
+            "kind": "FOUND",
+            "value": "println!(\"Hello, Lin!\");"
+          }
+        ]
+      ],
+      "derived_complex": {
+        "edges": [
+          {
+            "face": {
+              "axis": "utterance",
+              "ordinal": 0
+            },
+            "from": 10,
+            "kind": "COPY",
+            "to": 21
+          },
+          {
+            "from": 0,
+            "kind": "FOUND",
+            "to": 1,
+            "value": "p"
+          },
+          {
+            "from": 1,
+            "kind": "FOUND",
+            "to": 2,
+            "value": "r"
+          },
+          {
+            "from": 2,
+            "kind": "FOUND",
+            "to": 3,
+            "value": "i"
+          },
+          {
+            "from": 3,
+            "kind": "FOUND",
+            "to": 4,
+            "value": "n"
+          },
+          {
+            "from": 4,
+            "kind": "FOUND",
+            "to": 5,
+            "value": "t"
+          },
+          {
+            "from": 5,
+            "kind": "FOUND",
+            "to": 6,
+            "value": "l"
+          },
+          {
+            "from": 6,
+            "kind": "FOUND",
+            "to": 7,
+            "value": "n"
+          },
+          {
+            "from": 7,
+            "kind": "FOUND",
+            "to": 8,
+            "value": "!"
+          },
+          {
+            "from": 8,
+            "kind": "FOUND",
+            "to": 9,
+            "value": "("
+          },
+          {
+            "from": 9,
+            "kind": "FOUND",
+            "to": 10,
+            "value": "\""
+          },
+          {
+            "from": 10,
+            "kind": "FOUND",
+            "to": 11,
+            "value": "H"
+          },
+          {
+            "from": 11,
+            "kind": "FOUND",
+            "to": 12,
+            "value": "e"
+          },
+          {
+            "from": 12,
+            "kind": "FOUND",
+            "to": 13,
+            "value": "l"
+          },
+          {
+            "from": 13,
+            "kind": "FOUND",
+            "to": 14,
+            "value": "l"
+          },
+          {
+            "from": 14,
+            "kind": "FOUND",
+            "to": 15,
+            "value": "o"
+          },
+          {
+            "from": 15,
+            "kind": "FOUND",
+            "to": 16,
+            "value": ","
+          },
+          {
+            "from": 16,
+            "kind": "FOUND",
+            "to": 17,
+            "value": " "
+          },
+          {
+            "from": 17,
+            "kind": "FOUND",
+            "to": 18,
+            "value": "L"
+          },
+          {
+            "from": 18,
+            "kind": "FOUND",
+            "to": 19,
+            "value": "i"
+          },
+          {
+            "from": 19,
+            "kind": "FOUND",
+            "to": 20,
+            "value": "n"
+          },
+          {
+            "from": 20,
+            "kind": "FOUND",
+            "to": 21,
+            "value": "!"
+          },
+          {
+            "from": 21,
+            "kind": "FOUND",
+            "to": 22,
+            "value": "\""
+          },
+          {
+            "from": 22,
+            "kind": "FOUND",
+            "to": 23,
+            "value": ")"
+          },
+          {
+            "from": 23,
+            "kind": "FOUND",
+            "to": 24,
+            "value": ";"
+          }
+        ],
+        "vertices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ]
+      },
+      "faces": [
+        {
+          "address": {
+            "axis": "utterance",
+            "ordinal": 0
+          },
+          "value": "Hello, Lin!"
+        }
+      ],
+      "id": "rust-emit-lin",
+      "ordinal": 7,
+      "parameters": {
+        "language": "rust",
+        "medium": "code",
+        "objective": "emit"
+      },
+      "prior_field": {
+        "agreement_rank": 2,
+        "complete_paths": [
+          {
+            "consequence": "emit(\"Hello, Lin!\")",
+            "steps": [
+              {
+                "kind": "FOUND",
+                "value": "emit(\""
+              },
+              {
+                "face": {
+                  "axis": "utterance",
+                  "ordinal": 0
+                },
+                "kind": "COPY",
+                "value": "Hello, Lin!"
+              },
+              {
+                "kind": "FOUND",
+                "value": "\")"
+              }
+            ],
+            "support": [
+              {
+                "equal_axes": [
+                  "medium",
+                  "objective"
+                ],
+                "parameters": [
+                  [
+                    "language",
+                    "python"
+                  ],
+                  [
+                    "medium",
+                    "code"
+                  ],
+                  [
+                    "objective",
+                    "emit"
+                  ]
+                ],
+                "recurrence": 2
+              }
+            ]
+          }
+        ],
+        "consequence_population": [
+          {
+            "consequence": "emit(\"Hello, Lin!\")",
+            "path_support": 2
+          }
+        ]
+      },
+      "relation": "OPEN_RESIDUAL",
+      "successor_generation": 8
+    },
+    {
+      "consequence": "sin(x)",
+      "derived_complete_paths": [
+        [
+          {
+            "face": {
+              "axis": "operator",
+              "ordinal": 0
+            },
+            "kind": "COPY"
+          },
+          {
+            "kind": "FOUND",
+            "value": "("
+          },
+          {
+            "face": {
+              "axis": "argument",
+              "ordinal": 0
+            },
+            "kind": "COPY"
+          },
+          {
+            "kind": "FOUND",
+            "value": ")"
+          }
+        ],
+        [
+          {
+            "face": {
+              "axis": "operator",
+              "ordinal": 0
+            },
+            "kind": "COPY"
+          },
+          {
+            "kind": "FOUND",
+            "value": "(x)"
+          }
+        ],
+        [
+          {
+            "kind": "FOUND",
+            "value": "sin("
+          },
+          {
+            "face": {
+              "axis": "argument",
+              "ordinal": 0
+            },
+            "kind": "COPY"
+          },
+          {
+            "kind": "FOUND",
+            "value": ")"
+          }
+        ],
+        [
+          {
+            "kind": "FOUND",
+            "value": "sin(x)"
+          }
+        ]
+      ],
+      "derived_complex": {
+        "edges": [
+          {
+            "face": {
+              "axis": "operator",
+              "ordinal": 0
+            },
+            "from": 0,
+            "kind": "COPY",
+            "to": 3
+          },
+          {
+            "face": {
+              "axis": "argument",
+              "ordinal": 0
+            },
+            "from": 4,
+            "kind": "COPY",
+            "to": 5
+          },
+          {
+            "from": 0,
+            "kind": "FOUND",
+            "to": 1,
+            "value": "s"
+          },
+          {
+            "from": 1,
+            "kind": "FOUND",
+            "to": 2,
+            "value": "i"
+          },
+          {
+            "from": 2,
+            "kind": "FOUND",
+            "to": 3,
+            "value": "n"
+          },
+          {
+            "from": 3,
+            "kind": "FOUND",
+            "to": 4,
+            "value": "("
+          },
+          {
+            "from": 4,
+            "kind": "FOUND",
+            "to": 5,
+            "value": "x"
+          },
+          {
+            "from": 5,
+            "kind": "FOUND",
+            "to": 6,
+            "value": ")"
+          }
+        ],
+        "vertices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      "faces": [
+        {
+          "address": {
+            "axis": "operator",
+            "ordinal": 0
+          },
+          "value": "sin"
+        },
+        {
+          "address": {
+            "axis": "argument",
+            "ordinal": 0
+          },
+          "value": "x"
+        }
+      ],
+      "id": "application-sin-x",
+      "ordinal": 8,
+      "parameters": {
+        "medium": "mathematics",
+        "objective": "apply"
+      },
+      "prior_field": {
+        "agreement_rank": null,
+        "complete_paths": [],
+        "consequence_population": []
+      },
+      "relation": "NONE",
+      "successor_generation": 9
+    },
+    {
+      "consequence": "cos(y)",
+      "derived_complete_paths": [
+        [
+          {
+            "face": {
+              "axis": "operator",
+              "ordinal": 0
+            },
+            "kind": "COPY"
+          },
+          {
+            "kind": "FOUND",
+            "value": "("
+          },
+          {
+            "face": {
+              "axis": "argument",
+              "ordinal": 0
+            },
+            "kind": "COPY"
+          },
+          {
+            "kind": "FOUND",
+            "value": ")"
+          }
+        ],
+        [
+          {
+            "face": {
+              "axis": "operator",
+              "ordinal": 0
+            },
+            "kind": "COPY"
+          },
+          {
+            "kind": "FOUND",
+            "value": "(y)"
+          }
+        ],
+        [
+          {
+            "kind": "FOUND",
+            "value": "cos("
+          },
+          {
+            "face": {
+              "axis": "argument",
+              "ordinal": 0
+            },
+            "kind": "COPY"
+          },
+          {
+            "kind": "FOUND",
+            "value": ")"
+          }
+        ],
+        [
+          {
+            "kind": "FOUND",
+            "value": "cos(y)"
+          }
+        ]
+      ],
+      "derived_complex": {
+        "edges": [
+          {
+            "face": {
+              "axis": "operator",
+              "ordinal": 0
+            },
+            "from": 0,
+            "kind": "COPY",
+            "to": 3
+          },
+          {
+            "face": {
+              "axis": "argument",
+              "ordinal": 0
+            },
+            "from": 4,
+            "kind": "COPY",
+            "to": 5
+          },
+          {
+            "from": 0,
+            "kind": "FOUND",
+            "to": 1,
+            "value": "c"
+          },
+          {
+            "from": 1,
+            "kind": "FOUND",
+            "to": 2,
+            "value": "o"
+          },
+          {
+            "from": 2,
+            "kind": "FOUND",
+            "to": 3,
+            "value": "s"
+          },
+          {
+            "from": 3,
+            "kind": "FOUND",
+            "to": 4,
+            "value": "("
+          },
+          {
+            "from": 4,
+            "kind": "FOUND",
+            "to": 5,
+            "value": "y"
+          },
+          {
+            "from": 5,
+            "kind": "FOUND",
+            "to": 6,
+            "value": ")"
+          }
+        ],
+        "vertices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      "faces": [
+        {
+          "address": {
+            "axis": "operator",
+            "ordinal": 0
+          },
+          "value": "cos"
+        },
+        {
+          "address": {
+            "axis": "argument",
+            "ordinal": 0
+          },
+          "value": "y"
+        }
+      ],
+      "id": "application-cos-y",
+      "ordinal": 9,
+      "parameters": {
+        "medium": "mathematics",
+        "objective": "apply"
+      },
+      "prior_field": {
+        "agreement_rank": null,
+        "complete_paths": [],
+        "consequence_population": []
+      },
+      "relation": "NONE",
+      "successor_generation": 10
+    }
+  ]
+}

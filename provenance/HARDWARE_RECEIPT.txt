@@ -1,0 +1,28 @@
+grade: measured
+aperture: local command-line apparatus query
+observed_at: 2026-08-03 America/Los_Angeles
+
+command: nvidia-smi --query-gpu=name,driver_version,memory.total,compute_cap --format=csv,noheader
+output: NVIDIA GeForce RTX 4080 SUPER, 595.71.05, 16376 MiB, 8.9
+
+command: nvcc --version
+output:
+  Cuda compilation tools, release 13.2, V13.2.78
+  Build cuda_13.2.r13.2/compiler.37668154_0
+
+command: g++ --version
+output: g++ (GCC) 16.1.1 20260430
+
+command: clang++ --version
+output: clang version 22.1.5
+
+command: cmake --version; ninja --version
+output: cmake version 4.3.2; ninja 1.13.2
+
+sha256 /usr/local/cuda/bin/nvcc: df9974db233a0b7a6c6d59c0e5d74e011566104098bcb3553495ff1b95bdeaf6
+sha256 /usr/bin/g++: 4a12d04f0ea1294c3c11617032acdb83c042360010d0d314b283f968f56a615b
+sha256 /usr/lib/libstdc++.so.6: 9e4e018f08bf15a2eca390765d79f499738f8b899a563eddfa979756f5a8ff45
+sha256 /usr/bin/cmake: b40409e0ee2a7257d6399fba01f800e2aded3ad5d8db27f4efdd51c0ac01d7d3
+sha256 /usr/bin/ninja: f1c4d25e6f5719c2596c5996c37e838f9d0460b93f4d34baa1a61d90eaee14a2
+
+boundary: These are contemporary receiver readings, not semantic constants or energy measurements.

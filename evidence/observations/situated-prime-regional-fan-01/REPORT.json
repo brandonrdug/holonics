@@ -1,0 +1,526 @@
+{
+  "schema": "soma-situated-prime-regional-fan-v1",
+  "world": "bounded-polyglot-geometric-world-01",
+  "theory_to_structure": "one source occurrence -> one regional cell; five role-stable candidate-bearing restriction paths -> one boundary; later occurrence -> same interfaces against changed standing",
+  "source_fan": {
+    "joint_occurrence_owner": "one source-declared regional cell; not a repeated interface id or observer edge set",
+    "receiver_role": "zero_relative",
+    "candidate_lift_at_founding": {
+      "magnitude": 47,
+      "rank": {
+        "magnitude": 0,
+        "rank": 0,
+        "negative": false
+      },
+      "turn": 0
+    },
+    "boundary_slot": 0,
+    "boundary_hand": "against",
+    "arms": [
+      {
+        "source_role": "zero_relative",
+        "source_candidate_vertex": 0,
+        "source_candidate_hand": "against",
+        "source_port": "exposed:0",
+        "target_role": "radix_2",
+        "target_candidate_vertex": 1,
+        "target_candidate_hand": "with",
+        "target_port": "exposed:0",
+        "interface_namespace": "0x5052494d4546414e",
+        "interface_local": 1,
+        "boundary_slot": 0,
+        "arc_slot": 0,
+        "regional_hand": "against"
+      },
+      {
+        "source_role": "zero_relative",
+        "source_candidate_vertex": 0,
+        "source_candidate_hand": "against",
+        "source_port": "exposed:0",
+        "target_role": "radix_10",
+        "target_candidate_vertex": 1,
+        "target_candidate_hand": "with",
+        "target_port": "exposed:0",
+        "interface_namespace": "0x5052494d4546414e",
+        "interface_local": 2,
+        "boundary_slot": 0,
+        "arc_slot": 1,
+        "regional_hand": "against"
+      },
+      {
+        "source_role": "zero_relative",
+        "source_candidate_vertex": 0,
+        "source_candidate_hand": "against",
+        "source_port": "exposed:0",
+        "target_role": "radix_16",
+        "target_candidate_vertex": 1,
+        "target_candidate_hand": "with",
+        "target_port": "exposed:0",
+        "interface_namespace": "0x5052494d4546414e",
+        "interface_local": 3,
+        "boundary_slot": 0,
+        "arc_slot": 2,
+        "regional_hand": "against"
+      },
+      {
+        "source_role": "zero_relative",
+        "source_candidate_vertex": 0,
+        "source_candidate_hand": "against",
+        "source_port": "exposed:0",
+        "target_role": "s4_receiver",
+        "target_candidate_vertex": 0,
+        "target_candidate_hand": "against",
+        "target_port": "exposed:0",
+        "interface_namespace": "0x5052494d4546414e",
+        "interface_local": 4,
+        "boundary_slot": 0,
+        "arc_slot": 3,
+        "regional_hand": "against"
+      },
+      {
+        "source_role": "zero_relative",
+        "source_candidate_vertex": 0,
+        "source_candidate_hand": "against",
+        "source_port": "exposed:0",
+        "target_role": "cyclotomic_receiver",
+        "target_candidate_vertex": 0,
+        "target_candidate_hand": "against",
+        "target_port": "exposed:0",
+        "interface_namespace": "0x5052494d4546414e",
+        "interface_local": 5,
+        "boundary_slot": 0,
+        "arc_slot": 4,
+        "regional_hand": "against"
+      }
+    ]
+  },
+  "prelude": [
+    7,
+    11,
+    13
+  ],
+  "founding": {
+    "candidate": 23,
+    "experienced": {
+      "candidate": 23,
+      "regional_fan_supplied": true,
+      "before": {
+        "standing_sha256": "b1376cc9899076d7eaa9b20fc72495eea5e08db186ef4286678fac82836da706",
+        "rank": 6,
+        "scalar_cells": 23,
+        "constituents": 0,
+        "constituent_cells": 0,
+        "constituent_incidences": 0,
+        "constituent_pins": 0,
+        "constituent_paths": 0,
+        "live_lineages": 6
+      },
+      "after": {
+        "standing_sha256": "7149ea67cbf4db5cf8c6aa8502c0caf0d759f9f0b5176a97dee943a1d5b8c0d6",
+        "rank": 6,
+        "scalar_cells": 44,
+        "constituents": 1,
+        "constituent_cells": 19,
+        "constituent_incidences": 17,
+        "constituent_pins": 13,
+        "constituent_paths": 5,
+        "live_lineages": 6
+      },
+      "current_radiation_sha256": "a9d66702037e214b7fdeb3f195723e394e7ccb3db5099bfb83fdc03bde0c72d5",
+      "regional_radiation_sha256": "aa954f721091ca11c1d4c6534a5f3fd18d11cc81339211d44fa7ee343861d846",
+      "regional_cells": 1,
+      "constituent": {
+        "sha256": "8670adfc305395a5589aaeae81f53221324b2293b4f6ba4d7e3d89c432329dfd",
+        "grain": 3,
+        "axes": 14,
+        "cells": 19,
+        "incidences": 17,
+        "pins": 13,
+        "boundaries": 1,
+        "boundary_paths": 5,
+        "transport_terms": 112,
+        "folded_paths": 0,
+        "exposed": 5,
+        "open_pins": 0,
+        "found_pins": 13,
+        "interface_capabilities": [
+          {
+            "namespace": 5787769067348050254,
+            "local": 1
+          },
+          {
+            "namespace": 5787769067348050254,
+            "local": 2
+          },
+          {
+            "namespace": 5787769067348050254,
+            "local": 3
+          },
+          {
+            "namespace": 5787769067348050254,
+            "local": 4
+          },
+          {
+            "namespace": 5787769067348050254,
+            "local": 5
+          }
+        ],
+        "boundary_transitions": [
+          "found"
+        ]
+      }
+    },
+    "without_prime_23_founding": {
+      "candidate": 23,
+      "regional_fan_supplied": false,
+      "before": {
+        "standing_sha256": "b1376cc9899076d7eaa9b20fc72495eea5e08db186ef4286678fac82836da706",
+        "rank": 6,
+        "scalar_cells": 23,
+        "constituents": 0,
+        "constituent_cells": 0,
+        "constituent_incidences": 0,
+        "constituent_pins": 0,
+        "constituent_paths": 0,
+        "live_lineages": 6
+      },
+      "after": {
+        "standing_sha256": "11659cf9f4c45b0c4289494953772e4a9866feffb846eb5f474f1e7eb54f5839",
+        "rank": 6,
+        "scalar_cells": 44,
+        "constituents": 0,
+        "constituent_cells": 0,
+        "constituent_incidences": 0,
+        "constituent_pins": 0,
+        "constituent_paths": 0,
+        "live_lineages": 6
+      },
+      "current_radiation_sha256": "a9d66702037e214b7fdeb3f195723e394e7ccb3db5099bfb83fdc03bde0c72d5",
+      "regional_radiation_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "regional_cells": 0,
+      "constituent": null
+    }
+  },
+  "rest_remount": {
+    "experienced_exact": true,
+    "without_prime_23_founding_exact": true
+  },
+  "later_probe": {
+    "candidate": 29,
+    "experienced": {
+      "candidate": 29,
+      "regional_fan_supplied": true,
+      "before": {
+        "standing_sha256": "7149ea67cbf4db5cf8c6aa8502c0caf0d759f9f0b5176a97dee943a1d5b8c0d6",
+        "rank": 6,
+        "scalar_cells": 44,
+        "constituents": 1,
+        "constituent_cells": 19,
+        "constituent_incidences": 17,
+        "constituent_pins": 13,
+        "constituent_paths": 5,
+        "live_lineages": 6
+      },
+      "after": {
+        "standing_sha256": "ebced4c237f7a69b90d9eb373cedd23f17f7b9347ee1e57e833e6c49268fa848",
+        "rank": 6,
+        "scalar_cells": 68,
+        "constituents": 1,
+        "constituent_cells": 39,
+        "constituent_incidences": 39,
+        "constituent_pins": 31,
+        "constituent_paths": 15,
+        "live_lineages": 6
+      },
+      "current_radiation_sha256": "ab643893a0ce2818de5c8c103b21b86851e3cfab62ae7d707bd07792ab788e68",
+      "regional_radiation_sha256": "4d7b299968a1532b1a8477414655ee20b82baca316018a1a8db9ef8e29dd192a",
+      "regional_cells": 1,
+      "constituent": {
+        "sha256": "49188d04b693a7bdd6e3b58962d7a74fd2e13c63cb22730feb5bbceb505c9b79",
+        "grain": 4,
+        "axes": 27,
+        "cells": 39,
+        "incidences": 39,
+        "pins": 31,
+        "boundaries": 7,
+        "boundary_paths": 15,
+        "transport_terms": 229,
+        "folded_paths": 0,
+        "exposed": 0,
+        "open_pins": 0,
+        "found_pins": 26,
+        "interface_capabilities": [
+          {
+            "namespace": 5787769067348050254,
+            "local": 1
+          },
+          {
+            "namespace": 5787769067348050254,
+            "local": 2
+          },
+          {
+            "namespace": 5787769067348050254,
+            "local": 3
+          },
+          {
+            "namespace": 5787769067348050254,
+            "local": 4
+          },
+          {
+            "namespace": 5787769067348050254,
+            "local": 5
+          }
+        ],
+        "boundary_transitions": [
+          "found",
+          "found",
+          "ride",
+          "ride",
+          "ride",
+          "ride",
+          "ride"
+        ]
+      }
+    },
+    "without_prime_23_founding": {
+      "candidate": 29,
+      "regional_fan_supplied": true,
+      "before": {
+        "standing_sha256": "11659cf9f4c45b0c4289494953772e4a9866feffb846eb5f474f1e7eb54f5839",
+        "rank": 6,
+        "scalar_cells": 44,
+        "constituents": 0,
+        "constituent_cells": 0,
+        "constituent_incidences": 0,
+        "constituent_pins": 0,
+        "constituent_paths": 0,
+        "live_lineages": 6
+      },
+      "after": {
+        "standing_sha256": "3342dca4be35163352ed9805c1ba513a224ac5aae76ac5090d43391273a778ab",
+        "rank": 6,
+        "scalar_cells": 68,
+        "constituents": 1,
+        "constituent_cells": 19,
+        "constituent_incidences": 17,
+        "constituent_pins": 13,
+        "constituent_paths": 5,
+        "live_lineages": 6
+      },
+      "current_radiation_sha256": "ab643893a0ce2818de5c8c103b21b86851e3cfab62ae7d707bd07792ab788e68",
+      "regional_radiation_sha256": "dfae1a8ea4ec7992256d472aba1c15a284484d6e2e38a40ad8754cfa037a170d",
+      "regional_cells": 1,
+      "constituent": {
+        "sha256": "e700dbccb8acf2eb8c4bab91e7d9e5801ebbd6b5c927ca427a10d6d113768b08",
+        "grain": 3,
+        "axes": 14,
+        "cells": 19,
+        "incidences": 17,
+        "pins": 13,
+        "boundaries": 1,
+        "boundary_paths": 5,
+        "transport_terms": 112,
+        "folded_paths": 0,
+        "exposed": 5,
+        "open_pins": 0,
+        "found_pins": 13,
+        "interface_capabilities": [
+          {
+            "namespace": 5787769067348050254,
+            "local": 1
+          },
+          {
+            "namespace": 5787769067348050254,
+            "local": 2
+          },
+          {
+            "namespace": 5787769067348050254,
+            "local": 3
+          },
+          {
+            "namespace": 5787769067348050254,
+            "local": 4
+          },
+          {
+            "namespace": 5787769067348050254,
+            "local": 5
+          }
+        ],
+        "boundary_transitions": [
+          "found"
+        ]
+      }
+    }
+  },
+  "phase_return": {
+    "candidate": 37,
+    "experienced": {
+      "candidate": 37,
+      "regional_fan_supplied": true,
+      "before": {
+        "standing_sha256": "ebced4c237f7a69b90d9eb373cedd23f17f7b9347ee1e57e833e6c49268fa848",
+        "rank": 6,
+        "scalar_cells": 68,
+        "constituents": 1,
+        "constituent_cells": 39,
+        "constituent_incidences": 39,
+        "constituent_pins": 31,
+        "constituent_paths": 15,
+        "live_lineages": 6
+      },
+      "after": {
+        "standing_sha256": "1b51923e37b075cd52643e7116489c0ed725a0322850ed05ead2f0f6cc9789ef",
+        "rank": 6,
+        "scalar_cells": 95,
+        "constituents": 2,
+        "constituent_cells": 58,
+        "constituent_incidences": 56,
+        "constituent_pins": 44,
+        "constituent_paths": 20,
+        "live_lineages": 6
+      },
+      "current_radiation_sha256": "e20ca836a29cf5ef4603386424ead37518618c3dc80fa906ec6c029cec13d342",
+      "regional_radiation_sha256": "c4c6d5ff2ef0070fb0cbb5dec6fe654b8a04e23fe151bebdb1e7c249340e0a06",
+      "regional_cells": 1,
+      "constituent": {
+        "sha256": "a58e1ed7d2275ca649b4b5c659d9c59f7cd07376a5a0f274f6a7b6eada08ece3",
+        "grain": 3,
+        "axes": 14,
+        "cells": 19,
+        "incidences": 17,
+        "pins": 13,
+        "boundaries": 1,
+        "boundary_paths": 5,
+        "transport_terms": 112,
+        "folded_paths": 0,
+        "exposed": 5,
+        "open_pins": 0,
+        "found_pins": 13,
+        "interface_capabilities": [
+          {
+            "namespace": 5787769067348050254,
+            "local": 1
+          },
+          {
+            "namespace": 5787769067348050254,
+            "local": 2
+          },
+          {
+            "namespace": 5787769067348050254,
+            "local": 3
+          },
+          {
+            "namespace": 5787769067348050254,
+            "local": 4
+          },
+          {
+            "namespace": 5787769067348050254,
+            "local": 5
+          }
+        ],
+        "boundary_transitions": [
+          "found"
+        ]
+      }
+    },
+    "without_prime_23_founding": {
+      "candidate": 37,
+      "regional_fan_supplied": true,
+      "before": {
+        "standing_sha256": "3342dca4be35163352ed9805c1ba513a224ac5aae76ac5090d43391273a778ab",
+        "rank": 6,
+        "scalar_cells": 68,
+        "constituents": 1,
+        "constituent_cells": 19,
+        "constituent_incidences": 17,
+        "constituent_pins": 13,
+        "constituent_paths": 5,
+        "live_lineages": 6
+      },
+      "after": {
+        "standing_sha256": "295a13003af273eadf45ecf3bbfd61e91f63103abf7dd0090b40208a905a0f35",
+        "rank": 6,
+        "scalar_cells": 95,
+        "constituents": 1,
+        "constituent_cells": 39,
+        "constituent_incidences": 39,
+        "constituent_pins": 31,
+        "constituent_paths": 15,
+        "live_lineages": 6
+      },
+      "current_radiation_sha256": "e20ca836a29cf5ef4603386424ead37518618c3dc80fa906ec6c029cec13d342",
+      "regional_radiation_sha256": "89c1c6c1be5922918ed9ed17a79c70981541c71224bcfbb632b06712bda87118",
+      "regional_cells": 1,
+      "constituent": {
+        "sha256": "6aa0a056c769b6efb9e0040d2c0f6aa957ae55d1c1706c95bb0c030c2b86c453",
+        "grain": 4,
+        "axes": 27,
+        "cells": 39,
+        "incidences": 39,
+        "pins": 31,
+        "boundaries": 7,
+        "boundary_paths": 15,
+        "transport_terms": 229,
+        "folded_paths": 0,
+        "exposed": 0,
+        "open_pins": 0,
+        "found_pins": 26,
+        "interface_capabilities": [
+          {
+            "namespace": 5787769067348050254,
+            "local": 1
+          },
+          {
+            "namespace": 5787769067348050254,
+            "local": 2
+          },
+          {
+            "namespace": 5787769067348050254,
+            "local": 3
+          },
+          {
+            "namespace": 5787769067348050254,
+            "local": 4
+          },
+          {
+            "namespace": 5787769067348050254,
+            "local": 5
+          }
+        ],
+        "boundary_transitions": [
+          "found",
+          "found",
+          "ride",
+          "ride",
+          "ride",
+          "ride",
+          "ride"
+        ]
+      }
+    }
+  },
+  "comparison": {
+    "founding_current_radiation_equal": true,
+    "founding_scalar_standing_equal": true,
+    "founding_whole_standing_equal": false,
+    "later_input_current_radiation_equal": true,
+    "later_scalar_standing_equal": true,
+    "later_regional_radiation_equal": false,
+    "later_whole_standing_equal": false,
+    "experienced_later_grain": 4,
+    "without_prime_23_founding_later_grain": 3,
+    "prior_constituent_rebased": true,
+    "phase_return_current_radiation_equal": true,
+    "phase_return_scalar_standing_equal": true,
+    "phase_return_whole_standing_equal": false,
+    "experienced_phase_constituents": 2,
+    "without_prime_23_founding_phase_constituents": 1
+  },
+  "conclusion": {
+    "common_occurrence_formed_one_constituent": true,
+    "remount_preserved_the_experience": true,
+    "same_later_event_met_different_lived_standing": true,
+    "consumed_lower_aperture_returned_as_new_phase": true,
+    "result": "the same later prime event rebases through prior standing; after that lower interface closes, the next occurrence founds a new lower phase while the completed higher body remains standing"
+  }
+}

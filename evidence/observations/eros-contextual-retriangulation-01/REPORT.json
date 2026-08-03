@@ -1,0 +1,2203 @@
+{
+  "schema": "eros.contextual-retriangulation.report.v1",
+  "status": "accepted",
+  "question": "Can previously cultivated Soma Standing carry a useful context-dependent portion of inherited transformer ecology into later conduct while requiring less source participation, and does changed context reopen the relation?",
+  "theory_to_structure": "Six conversation/prose currents define one exact local chart. Exact elimination selects the first six independent source-activation columns and forms a 6x5 rational transformation. The six rows cross Soma, meet, and return as one higher law whose lower row carriers depart. Each later current contributes only its six pivot activations; the recovered law forms a receiver face which returns as Standing before the complete source face arrives for an exact RIDE/OPEN comparison.",
+  "stopping_condition": "one deterministic rank chart, one exact law, three related holdouts, three changed-operation holdouts, and one no-Standing control; no alternate pivot search, fixture tuning, model rerun, CUDA run, or larger model",
+  "source": {
+    "source_sha256": "d437eddf312cba5c8bea1506956d3606ab74f2ef16d20a2269e5532f0e1daf8d",
+    "upstream_observation": "eros-pretrained-ecology-cultivation-01",
+    "upstream_path": "src/soma/observations/eros-pretrained-ecology-cultivation-01/SOURCE.json",
+    "upstream_sha256": "38f52aecd3c19d79a1d3a41a65647e79ac39d81823c24b52ae7b5c0e411e784c",
+    "model": {
+      "model_path": "/home/b/.cache/huggingface/models--allenai--OLMo-2-0425-1B-Instruct/snapshots/48d788eca847d4d7548f375ad03d3c9312f6139e/model.safetensors",
+      "model_sha256": "36d044c73655bb904f822915e6294ba3dae8e6e1af5e703e9d452f2d6a3a294f",
+      "repository": "allenai/OLMo-2-0425-1B-Instruct",
+      "revision": "48d788eca847d4d7548f375ad03d3c9312f6139e"
+    },
+    "layer": 7,
+    "receiver_axes": [
+      76,
+      856,
+      954,
+      1326,
+      1476
+    ],
+    "numerical_law": "BF16 words are decoded exactly; pivot selection, elimination, law formation, prediction, comparison, and residuals use integers and rational numbers only",
+    "pivot_selection": "scan source-factor ordinals once from zero and retain a column exactly when it raises rational rank on the six conversation/prose training currents; stop at full rank; do not search alternate charts"
+  },
+  "cultivation": {
+    "training_currents": 6,
+    "source_rows_returned_exactly": true,
+    "rank": 6,
+    "pivot_factors": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "law_coefficients": 30,
+    "maximum_numerator_bits": 86,
+    "maximum_denominator_bits": 81,
+    "rust_law_equals_independent_source_derivation": true,
+    "rows_recovered_from_standing": true,
+    "objective_recovered_from_current": true,
+    "lower_row_data_departed": true,
+    "lower_row_recruitment_departed": true,
+    "law_survived_exact_rest_remount": true,
+    "source_lineages_departed": true,
+    "events": [
+      {
+        "event": "training-row-0",
+        "semantic_words": 56,
+        "regional_arcs": 57,
+        "wall_micros": 1725,
+        "returned_incidences": 57,
+        "returned_pins": 57
+      },
+      {
+        "event": "training-row-1",
+        "semantic_words": 56,
+        "regional_arcs": 57,
+        "wall_micros": 2660,
+        "returned_incidences": 57,
+        "returned_pins": 57
+      },
+      {
+        "event": "training-row-2",
+        "semantic_words": 56,
+        "regional_arcs": 57,
+        "wall_micros": 2475,
+        "returned_incidences": 57,
+        "returned_pins": 57
+      },
+      {
+        "event": "training-row-3",
+        "semantic_words": 56,
+        "regional_arcs": 57,
+        "wall_micros": 3065,
+        "returned_incidences": 57,
+        "returned_pins": 57
+      },
+      {
+        "event": "training-row-4",
+        "semantic_words": 56,
+        "regional_arcs": 57,
+        "wall_micros": 3297,
+        "returned_incidences": 57,
+        "returned_pins": 57
+      },
+      {
+        "event": "training-row-5",
+        "semantic_words": 56,
+        "regional_arcs": 57,
+        "wall_micros": 3765,
+        "returned_incidences": 57,
+        "returned_pins": 57
+      },
+      {
+        "event": "six-row-meeting",
+        "semantic_words": 1,
+        "regional_arcs": 13,
+        "wall_micros": 6118,
+        "returned_incidences": 355,
+        "returned_pins": 355
+      },
+      {
+        "event": "local-law-return",
+        "semantic_words": 314,
+        "regional_arcs": 658,
+        "wall_micros": 26013,
+        "returned_incidences": 1356,
+        "returned_pins": 1356
+      }
+    ],
+    "machine": {
+      "standing_rank": 6,
+      "standing_cells": 36,
+      "standing_constituents": 1,
+      "constituent_cells": 26,
+      "constituent_incidences": 1356,
+      "constituent_pins": 1356,
+      "constituent_paths": 1362,
+      "constituent_transport_terms": 1533,
+      "live_lineages": 0,
+      "rest_sha256": "c6d27ef245548e8f60e211b2c2eca3ba602da94a028796997f7842ccebc00624"
+    }
+  },
+  "control": {
+    "current_id": "drop_then_reverse.code_comment.absent",
+    "pivot_words_presented": 6,
+    "law_recovered": false,
+    "output_formed": false,
+    "event": {
+      "event": "no-standing-control",
+      "semantic_words": 15,
+      "regional_arcs": 17,
+      "wall_micros": 654,
+      "returned_incidences": 17,
+      "returned_pins": 17
+    }
+  },
+  "contexts": [
+    {
+      "current_id": "drop_then_reverse.conversation.absent",
+      "group": "training",
+      "context": "conversation",
+      "condition": "absent",
+      "source_activation_words": 8192,
+      "participating_activation_words": 6,
+      "law_recovered_from_standing": true,
+      "current_recovered_from_source": true,
+      "prediction": [
+        "-1240944236393/8796093022208",
+        "-7988787867389/4398046511104",
+        "-28142963623631/140737488355328",
+        "883502513491/4398046511104",
+        "3147079804039/17592186044416"
+      ],
+      "source_derived_prediction_exact": true,
+      "target_factorized": [
+        "-1240944236393/8796093022208",
+        "-7988787867389/4398046511104",
+        "-28142963623631/140737488355328",
+        "883502513491/4398046511104",
+        "3147079804039/17592186044416"
+      ],
+      "target_observed": [
+        "-9/64",
+        "-233/128",
+        "-205/1024",
+        "103/512",
+        "183/1024"
+      ],
+      "exact_factorized_output": true,
+      "factorized_face_rides": true,
+      "observed_face_rides": true,
+      "predicted_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1326,
+          1476,
+          76,
+          954,
+          856
+        ]
+      },
+      "factorized_residual": [
+        {
+          "axis": 76,
+          "prediction": "-1240944236393/8796093022208",
+          "target": "-1240944236393/8796093022208",
+          "target_minus_prediction": "0"
+        },
+        {
+          "axis": 856,
+          "prediction": "-7988787867389/4398046511104",
+          "target": "-7988787867389/4398046511104",
+          "target_minus_prediction": "0"
+        },
+        {
+          "axis": 954,
+          "prediction": "-28142963623631/140737488355328",
+          "target": "-28142963623631/140737488355328",
+          "target_minus_prediction": "0"
+        },
+        {
+          "axis": 1326,
+          "prediction": "883502513491/4398046511104",
+          "target": "883502513491/4398046511104",
+          "target_minus_prediction": "0"
+        },
+        {
+          "axis": 1476,
+          "prediction": "3147079804039/17592186044416",
+          "target": "3147079804039/17592186044416",
+          "target_minus_prediction": "0"
+        }
+      ],
+      "observed_residual": [
+        {
+          "axis": 76,
+          "prediction": "-1240944236393/8796093022208",
+          "target": "-9/64",
+          "target_minus_prediction": "3993655145/8796093022208"
+        },
+        {
+          "axis": 856,
+          "prediction": "-7988787867389/4398046511104",
+          "target": "-233/128",
+          "target_minus_prediction": "-17031172355/4398046511104"
+        },
+        {
+          "axis": 954,
+          "prediction": "-28142963623631/140737488355328",
+          "target": "-205/1024",
+          "target_minus_prediction": "-32021838129/140737488355328"
+        },
+        {
+          "axis": 1326,
+          "prediction": "883502513491/4398046511104",
+          "target": "103/512",
+          "target_minus_prediction": "1260749485/4398046511104"
+        },
+        {
+          "axis": 1476,
+          "prediction": "3147079804039/17592186044416",
+          "target": "183/1024",
+          "target_minus_prediction": "-3163743367/17592186044416"
+        }
+      ],
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      },
+      "events": [
+        {
+          "event": "conduct-drop_then_reverse.conversation.absent",
+          "semantic_words": 15,
+          "regional_arcs": 17,
+          "wall_micros": 15536,
+          "returned_incidences": 1373,
+          "returned_pins": 1373
+        },
+        {
+          "event": "return-drop_then_reverse.conversation.absent",
+          "semantic_words": 240,
+          "regional_arcs": 240,
+          "wall_micros": 15278,
+          "returned_incidences": 240,
+          "returned_pins": 240
+        },
+        {
+          "event": "compare-drop_then_reverse.conversation.absent",
+          "semantic_words": 240,
+          "regional_arcs": 240,
+          "wall_micros": 20916,
+          "returned_incidences": 720,
+          "returned_pins": 720
+        }
+      ]
+    },
+    {
+      "current_id": "drop_then_reverse.conversation.irrelevant_before",
+      "group": "training",
+      "context": "conversation",
+      "condition": "irrelevant_before",
+      "source_activation_words": 8192,
+      "participating_activation_words": 6,
+      "law_recovered_from_standing": true,
+      "current_recovered_from_source": true,
+      "prediction": [
+        "-638188489601/4398046511104",
+        "-4139192403693/2199023255552",
+        "-6777597405/34359738368",
+        "195569386353/1099511627776",
+        "913906245171/4398046511104"
+      ],
+      "source_derived_prediction_exact": true,
+      "target_factorized": [
+        "-638188489601/4398046511104",
+        "-4139192403693/2199023255552",
+        "-6777597405/34359738368",
+        "195569386353/1099511627776",
+        "913906245171/4398046511104"
+      ],
+      "target_observed": [
+        "-149/1024",
+        "-241/128",
+        "-101/512",
+        "91/512",
+        "213/1024"
+      ],
+      "exact_factorized_output": true,
+      "factorized_face_rides": true,
+      "observed_face_rides": true,
+      "predicted_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "factorized_residual": [
+        {
+          "axis": 76,
+          "prediction": "-638188489601/4398046511104",
+          "target": "-638188489601/4398046511104",
+          "target_minus_prediction": "0"
+        },
+        {
+          "axis": 856,
+          "prediction": "-4139192403693/2199023255552",
+          "target": "-4139192403693/2199023255552",
+          "target_minus_prediction": "0"
+        },
+        {
+          "axis": 954,
+          "prediction": "-6777597405/34359738368",
+          "target": "-6777597405/34359738368",
+          "target_minus_prediction": "0"
+        },
+        {
+          "axis": 1326,
+          "prediction": "195569386353/1099511627776",
+          "target": "195569386353/1099511627776",
+          "target_minus_prediction": "0"
+        },
+        {
+          "axis": 1476,
+          "prediction": "913906245171/4398046511104",
+          "target": "913906245171/4398046511104",
+          "target_minus_prediction": "0"
+        }
+      ],
+      "observed_residual": [
+        {
+          "axis": 76,
+          "prediction": "-638188489601/4398046511104",
+          "target": "-149/1024",
+          "target_minus_prediction": "-1761637503/4398046511104"
+        },
+        {
+          "axis": 856,
+          "prediction": "-4139192403693/2199023255552",
+          "target": "-241/128",
+          "target_minus_prediction": "-1156069651/2199023255552"
+        },
+        {
+          "axis": 954,
+          "prediction": "-6777597405/34359738368",
+          "target": "-101/512",
+          "target_minus_prediction": "-397859/34359738368"
+        },
+        {
+          "axis": 1326,
+          "prediction": "195569386353/1099511627776",
+          "target": "91/512",
+          "target_minus_prediction": "-148374385/1099511627776"
+        },
+        {
+          "axis": 1476,
+          "prediction": "913906245171/4398046511104",
+          "target": "213/1024",
+          "target_minus_prediction": "921788877/4398046511104"
+        }
+      ],
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      },
+      "events": [
+        {
+          "event": "conduct-drop_then_reverse.conversation.irrelevant_before",
+          "semantic_words": 15,
+          "regional_arcs": 17,
+          "wall_micros": 15765,
+          "returned_incidences": 1373,
+          "returned_pins": 1373
+        },
+        {
+          "event": "return-drop_then_reverse.conversation.irrelevant_before",
+          "semantic_words": 240,
+          "regional_arcs": 240,
+          "wall_micros": 15606,
+          "returned_incidences": 240,
+          "returned_pins": 240
+        },
+        {
+          "event": "compare-drop_then_reverse.conversation.irrelevant_before",
+          "semantic_words": 240,
+          "regional_arcs": 240,
+          "wall_micros": 20738,
+          "returned_incidences": 720,
+          "returned_pins": 720
+        }
+      ]
+    },
+    {
+      "current_id": "drop_then_reverse.conversation.relevant_after",
+      "group": "training",
+      "context": "conversation",
+      "condition": "relevant_after",
+      "source_activation_words": 8192,
+      "participating_activation_words": 6,
+      "law_recovered_from_standing": true,
+      "current_recovered_from_source": true,
+      "prediction": [
+        "-655120172113/4398046511104",
+        "-14831794213/8589934592",
+        "-14025334517759/70368744177664",
+        "191091504877/1099511627776",
+        "859453757325/4398046511104"
+      ],
+      "source_derived_prediction_exact": true,
+      "target_factorized": [
+        "-655120172113/4398046511104",
+        "-14831794213/8589934592",
+        "-14025334517759/70368744177664",
+        "191091504877/1099511627776",
+        "859453757325/4398046511104"
+      ],
+      "target_observed": [
+        "-19/128",
+        "-221/128",
+        "-51/256",
+        "89/512",
+        "25/128"
+      ],
+      "exact_factorized_output": true,
+      "factorized_face_rides": true,
+      "observed_face_rides": true,
+      "predicted_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "factorized_residual": [
+        {
+          "axis": 76,
+          "prediction": "-655120172113/4398046511104",
+          "target": "-655120172113/4398046511104",
+          "target_minus_prediction": "0"
+        },
+        {
+          "axis": 856,
+          "prediction": "-14831794213/8589934592",
+          "target": "-14831794213/8589934592",
+          "target_minus_prediction": "0"
+        },
+        {
+          "axis": 954,
+          "prediction": "-14025334517759/70368744177664",
+          "target": "-14025334517759/70368744177664",
+          "target_minus_prediction": "0"
+        },
+        {
+          "axis": 1326,
+          "prediction": "191091504877/1099511627776",
+          "target": "191091504877/1099511627776",
+          "target_minus_prediction": "0"
+        },
+        {
+          "axis": 1476,
+          "prediction": "859453757325/4398046511104",
+          "target": "859453757325/4398046511104",
+          "target_minus_prediction": "0"
+        }
+      ],
+      "observed_residual": [
+        {
+          "axis": 76,
+          "prediction": "-655120172113/4398046511104",
+          "target": "-19/128",
+          "target_minus_prediction": "2285143121/4398046511104"
+        },
+        {
+          "axis": 856,
+          "prediction": "-14831794213/8589934592",
+          "target": "-221/128",
+          "target_minus_prediction": "735269/8589934592"
+        },
+        {
+          "axis": 954,
+          "prediction": "-14025334517759/70368744177664",
+          "target": "-51/256",
+          "target_minus_prediction": "6561263615/70368744177664"
+        },
+        {
+          "axis": 1326,
+          "prediction": "191091504877/1099511627776",
+          "target": "89/512",
+          "target_minus_prediction": "34539795/1099511627776"
+        },
+        {
+          "axis": 1476,
+          "prediction": "859453757325/4398046511104",
+          "target": "25/128",
+          "target_minus_prediction": "-460298125/4398046511104"
+        }
+      ],
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      },
+      "events": [
+        {
+          "event": "conduct-drop_then_reverse.conversation.relevant_after",
+          "semantic_words": 15,
+          "regional_arcs": 17,
+          "wall_micros": 15279,
+          "returned_incidences": 1373,
+          "returned_pins": 1373
+        },
+        {
+          "event": "return-drop_then_reverse.conversation.relevant_after",
+          "semantic_words": 240,
+          "regional_arcs": 240,
+          "wall_micros": 15510,
+          "returned_incidences": 240,
+          "returned_pins": 240
+        },
+        {
+          "event": "compare-drop_then_reverse.conversation.relevant_after",
+          "semantic_words": 240,
+          "regional_arcs": 240,
+          "wall_micros": 21436,
+          "returned_incidences": 720,
+          "returned_pins": 720
+        }
+      ]
+    },
+    {
+      "current_id": "drop_then_reverse.prose.absent",
+      "group": "training",
+      "context": "prose",
+      "condition": "absent",
+      "source_activation_words": 8192,
+      "participating_activation_words": 6,
+      "law_recovered_from_standing": true,
+      "current_recovered_from_source": true,
+      "prediction": [
+        "-305162492095/2199023255552",
+        "-223933752651/137438953472",
+        "-897616483501/4398046511104",
+        "7045962874999/35184372088832",
+        "6406138111885/35184372088832"
+      ],
+      "source_derived_prediction_exact": true,
+      "target_factorized": [
+        "-305162492095/2199023255552",
+        "-223933752651/137438953472",
+        "-897616483501/4398046511104",
+        "7045962874999/35184372088832",
+        "6406138111885/35184372088832"
+      ],
+      "target_observed": [
+        "-71/512",
+        "-209/128",
+        "-209/1024",
+        "205/1024",
+        "93/512"
+      ],
+      "exact_factorized_output": true,
+      "factorized_face_rides": true,
+      "observed_face_rides": true,
+      "predicted_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1326,
+          1476,
+          76,
+          954,
+          856
+        ]
+      },
+      "factorized_residual": [
+        {
+          "axis": 76,
+          "prediction": "-305162492095/2199023255552",
+          "target": "-305162492095/2199023255552",
+          "target_minus_prediction": "0"
+        },
+        {
+          "axis": 856,
+          "prediction": "-223933752651/137438953472",
+          "target": "-223933752651/137438953472",
+          "target_minus_prediction": "0"
+        },
+        {
+          "axis": 954,
+          "prediction": "-897616483501/4398046511104",
+          "target": "-897616483501/4398046511104",
+          "target_minus_prediction": "0"
+        },
+        {
+          "axis": 1326,
+          "prediction": "7045962874999/35184372088832",
+          "target": "7045962874999/35184372088832",
+          "target_minus_prediction": "0"
+        },
+        {
+          "axis": 1476,
+          "prediction": "6406138111885/35184372088832",
+          "target": "6406138111885/35184372088832",
+          "target_minus_prediction": "0"
+        }
+      ],
+      "observed_residual": [
+        {
+          "axis": 76,
+          "prediction": "-305162492095/2199023255552",
+          "target": "-71/512",
+          "target_minus_prediction": "219814079/2199023255552"
+        },
+        {
+          "axis": 856,
+          "prediction": "-223933752651/137438953472",
+          "target": "-209/128",
+          "target_minus_prediction": "-478288565/137438953472"
+        },
+        {
+          "axis": 954,
+          "prediction": "-897616483501/4398046511104",
+          "target": "-209/1024",
+          "target_minus_prediction": "-31681363/4398046511104"
+        },
+        {
+          "axis": 1326,
+          "prediction": "7045962874999/35184372088832",
+          "target": "205/1024",
+          "target_minus_prediction": "-2216509559/35184372088832"
+        },
+        {
+          "axis": 1476,
+          "prediction": "6406138111885/35184372088832",
+          "target": "93/512",
+          "target_minus_prediction": "-15226775437/35184372088832"
+        }
+      ],
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      },
+      "events": [
+        {
+          "event": "conduct-drop_then_reverse.prose.absent",
+          "semantic_words": 15,
+          "regional_arcs": 17,
+          "wall_micros": 15096,
+          "returned_incidences": 1373,
+          "returned_pins": 1373
+        },
+        {
+          "event": "return-drop_then_reverse.prose.absent",
+          "semantic_words": 240,
+          "regional_arcs": 240,
+          "wall_micros": 15358,
+          "returned_incidences": 240,
+          "returned_pins": 240
+        },
+        {
+          "event": "compare-drop_then_reverse.prose.absent",
+          "semantic_words": 240,
+          "regional_arcs": 240,
+          "wall_micros": 20331,
+          "returned_incidences": 720,
+          "returned_pins": 720
+        }
+      ]
+    },
+    {
+      "current_id": "drop_then_reverse.prose.irrelevant_before",
+      "group": "training",
+      "context": "prose",
+      "condition": "irrelevant_before",
+      "source_activation_words": 8192,
+      "participating_activation_words": 6,
+      "law_recovered_from_standing": true,
+      "current_recovered_from_source": true,
+      "prediction": [
+        "-2646485945429/17592186044416",
+        "-1840138011625/1099511627776",
+        "-3503330741777/17592186044416",
+        "2917562810911/17592186044416",
+        "421547205385/2199023255552"
+      ],
+      "source_derived_prediction_exact": true,
+      "target_factorized": [
+        "-2646485945429/17592186044416",
+        "-1840138011625/1099511627776",
+        "-3503330741777/17592186044416",
+        "2917562810911/17592186044416",
+        "421547205385/2199023255552"
+      ],
+      "target_observed": [
+        "-77/512",
+        "-215/128",
+        "-51/256",
+        "85/512",
+        "197/1024"
+      ],
+      "exact_factorized_output": true,
+      "factorized_face_rides": true,
+      "observed_face_rides": true,
+      "predicted_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "factorized_residual": [
+        {
+          "axis": 76,
+          "prediction": "-2646485945429/17592186044416",
+          "target": "-2646485945429/17592186044416",
+          "target_minus_prediction": "0"
+        },
+        {
+          "axis": 856,
+          "prediction": "-1840138011625/1099511627776",
+          "target": "-1840138011625/1099511627776",
+          "target_minus_prediction": "0"
+        },
+        {
+          "axis": 954,
+          "prediction": "-3503330741777/17592186044416",
+          "target": "-3503330741777/17592186044416",
+          "target_minus_prediction": "0"
+        },
+        {
+          "axis": 1326,
+          "prediction": "2917562810911/17592186044416",
+          "target": "2917562810911/17592186044416",
+          "target_minus_prediction": "0"
+        },
+        {
+          "axis": 1476,
+          "prediction": "421547205385/2199023255552",
+          "target": "421547205385/2199023255552",
+          "target_minus_prediction": "0"
+        }
+      ],
+      "observed_residual": [
+        {
+          "axis": 76,
+          "prediction": "-2646485945429/17592186044416",
+          "target": "-77/512",
+          "target_minus_prediction": "786091093/17592186044416"
+        },
+        {
+          "axis": 856,
+          "prediction": "-1840138011625/1099511627776",
+          "target": "-215/128",
+          "target_minus_prediction": "-6697925655/1099511627776"
+        },
+        {
+          "axis": 954,
+          "prediction": "-3503330741777/17592186044416",
+          "target": "-51/256",
+          "target_minus_prediction": "-1362571759/17592186044416"
+        },
+        {
+          "axis": 1326,
+          "prediction": "2917562810911/17592186044416",
+          "target": "85/512",
+          "target_minus_prediction": "3014950369/17592186044416"
+        },
+        {
+          "axis": 1476,
+          "prediction": "421547205385/2199023255552",
+          "target": "197/1024",
+          "target_minus_prediction": "1507073271/2199023255552"
+        }
+      ],
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      },
+      "events": [
+        {
+          "event": "conduct-drop_then_reverse.prose.irrelevant_before",
+          "semantic_words": 15,
+          "regional_arcs": 17,
+          "wall_micros": 15321,
+          "returned_incidences": 1373,
+          "returned_pins": 1373
+        },
+        {
+          "event": "return-drop_then_reverse.prose.irrelevant_before",
+          "semantic_words": 240,
+          "regional_arcs": 240,
+          "wall_micros": 15359,
+          "returned_incidences": 240,
+          "returned_pins": 240
+        },
+        {
+          "event": "compare-drop_then_reverse.prose.irrelevant_before",
+          "semantic_words": 240,
+          "regional_arcs": 240,
+          "wall_micros": 20802,
+          "returned_incidences": 720,
+          "returned_pins": 720
+        }
+      ]
+    },
+    {
+      "current_id": "drop_then_reverse.prose.relevant_after",
+      "group": "training",
+      "context": "prose",
+      "condition": "relevant_after",
+      "source_activation_words": 8192,
+      "participating_activation_words": 6,
+      "law_recovered_from_standing": true,
+      "current_recovered_from_source": true,
+      "prediction": [
+        "-10834102540603/70368744177664",
+        "-29144474745615/17592186044416",
+        "-3523726433937/17592186044416",
+        "1559441248645/8796093022208",
+        "196259591323/1099511627776"
+      ],
+      "source_derived_prediction_exact": true,
+      "target_factorized": [
+        "-10834102540603/70368744177664",
+        "-29144474745615/17592186044416",
+        "-3523726433937/17592186044416",
+        "1559441248645/8796093022208",
+        "196259591323/1099511627776"
+      ],
+      "target_observed": [
+        "-157/1024",
+        "-53/32",
+        "-205/1024",
+        "91/512",
+        "183/1024"
+      ],
+      "exact_factorized_output": true,
+      "factorized_face_rides": true,
+      "observed_face_rides": true,
+      "predicted_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "factorized_residual": [
+        {
+          "axis": 76,
+          "prediction": "-10834102540603/70368744177664",
+          "target": "-10834102540603/70368744177664",
+          "target_minus_prediction": "0"
+        },
+        {
+          "axis": 856,
+          "prediction": "-29144474745615/17592186044416",
+          "target": "-29144474745615/17592186044416",
+          "target_minus_prediction": "0"
+        },
+        {
+          "axis": 954,
+          "prediction": "-3523726433937/17592186044416",
+          "target": "-3523726433937/17592186044416",
+          "target_minus_prediction": "0"
+        },
+        {
+          "axis": 1326,
+          "prediction": "1559441248645/8796093022208",
+          "target": "1559441248645/8796093022208",
+          "target_minus_prediction": "0"
+        },
+        {
+          "axis": 1476,
+          "prediction": "196259591323/1099511627776",
+          "target": "196259591323/1099511627776",
+          "target_minus_prediction": "0"
+        }
+      ],
+      "observed_residual": [
+        {
+          "axis": 76,
+          "prediction": "-10834102540603/70368744177664",
+          "target": "-157/1024",
+          "target_minus_prediction": "45144693051/70368744177664"
+        },
+        {
+          "axis": 856,
+          "prediction": "-29144474745615/17592186044416",
+          "target": "-53/32",
+          "target_minus_prediction": "7416609551/17592186044416"
+        },
+        {
+          "axis": 954,
+          "prediction": "-3523726433937/17592186044416",
+          "target": "-205/1024",
+          "target_minus_prediction": "1853251217/17592186044416"
+        },
+        {
+          "axis": 1326,
+          "prediction": "1559441248645/8796093022208",
+          "target": "91/512",
+          "target_minus_prediction": "3926847099/8796093022208"
+        },
+        {
+          "axis": 1476,
+          "prediction": "196259591323/1099511627776",
+          "target": "183/1024",
+          "target_minus_prediction": "235162469/1099511627776"
+        }
+      ],
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      },
+      "events": [
+        {
+          "event": "conduct-drop_then_reverse.prose.relevant_after",
+          "semantic_words": 15,
+          "regional_arcs": 17,
+          "wall_micros": 17092,
+          "returned_incidences": 1373,
+          "returned_pins": 1373
+        },
+        {
+          "event": "return-drop_then_reverse.prose.relevant_after",
+          "semantic_words": 240,
+          "regional_arcs": 240,
+          "wall_micros": 14929,
+          "returned_incidences": 240,
+          "returned_pins": 240
+        },
+        {
+          "event": "compare-drop_then_reverse.prose.relevant_after",
+          "semantic_words": 240,
+          "regional_arcs": 240,
+          "wall_micros": 20539,
+          "returned_incidences": 720,
+          "returned_pins": 720
+        }
+      ]
+    },
+    {
+      "current_id": "drop_then_reverse.code_comment.absent",
+      "group": "related_holdout",
+      "context": "code_comment",
+      "condition": "absent",
+      "source_activation_words": 8192,
+      "participating_activation_words": 6,
+      "law_recovered_from_standing": true,
+      "current_recovered_from_source": true,
+      "prediction": [
+        "113296190671658860627980961/1874130046882540292270981120",
+        "73251275279942283923706473/234266255860317536533872640",
+        "970260356767459005962155969/44979121125180967014503546880",
+        "69024529201984328762605331/1405597535161905219203235840",
+        "-17091219767855847065214001/5622390140647620876812943360"
+      ],
+      "source_derived_prediction_exact": true,
+      "target_factorized": [
+        "-2260171296121/17592186044416",
+        "-3722481860303/2199023255552",
+        "-3240577402145/17592186044416",
+        "1952872354289/8796093022208",
+        "14415631992359/70368744177664"
+      ],
+      "target_observed": [
+        "-33/256",
+        "-217/128",
+        "-189/1024",
+        "227/1024",
+        "105/512"
+      ],
+      "exact_factorized_output": false,
+      "factorized_face_rides": false,
+      "observed_face_rides": false,
+      "predicted_face": {
+        "orientation": [
+          "positive",
+          "positive",
+          "positive",
+          "positive",
+          "negative"
+        ],
+        "signed_axis_order": [
+          856,
+          76,
+          1326,
+          954,
+          1476
+        ]
+      },
+      "factorized_residual": [
+        {
+          "axis": 76,
+          "prediction": "113296190671658860627980961/1874130046882540292270981120",
+          "target": "-2260171296121/17592186044416",
+          "target_minus_prediction": "-354076667098369898520503931/1874130046882540292270981120"
+        },
+        {
+          "axis": 856,
+          "prediction": "73251275279942283923706473/234266255860317536533872640",
+          "target": "-3722481860303/2199023255552",
+          "target_minus_prediction": "-469814561147617414678041183/234266255860317536533872640"
+        },
+        {
+          "axis": 954,
+          "prediction": "970260356767459005962155969/44979121125180967014503546880",
+          "target": "-3240577402145/17592186044416",
+          "target_minus_prediction": "-9255661791165653597619419569/44979121125180967014503546880"
+        },
+        {
+          "axis": 1326,
+          "prediction": "69024529201984328762605331/1405597535161905219203235840",
+          "target": "1952872354289/8796093022208",
+          "target_minus_prediction": "60760111978188394327730191/351399383790476304800808960"
+        },
+        {
+          "axis": 1476,
+          "prediction": "-17091219767855847065214001/5622390140647620876812943360",
+          "target": "14415631992359/70368744177664",
+          "target_minus_prediction": "2337770719594008800494173947/11244780281295241753625886720"
+        }
+      ],
+      "observed_residual": [
+        {
+          "axis": 76,
+          "prediction": "113296190671658860627980961/1874130046882540292270981120",
+          "target": "-33/256",
+          "target_minus_prediction": "-354883267027611320178537121/1874130046882540292270981120"
+        },
+        {
+          "axis": 856,
+          "prediction": "73251275279942283923706473/234266255860317536533872640",
+          "target": "-217/128",
+          "target_minus_prediction": "-470405787168136857578787433/234266255860317536533872640"
+        },
+        {
+          "axis": 954,
+          "prediction": "970260356767459005962155969/44979121125180967014503546880",
+          "target": "-189/1024",
+          "target_minus_prediction": "-9272070798817461706881267649/44979121125180967014503546880"
+        },
+        {
+          "axis": 1326,
+          "prediction": "69024529201984328762605331/1405597535161905219203235840",
+          "target": "227/1024",
+          "target_minus_prediction": "242567893143477082134986989/1405597535161905219203235840"
+        },
+        {
+          "axis": 1476,
+          "prediction": "-17091219767855847065214001/5622390140647620876812943360",
+          "target": "105/512",
+          "target_minus_prediction": "1170120447830356222192868401/5622390140647620876812943360"
+        }
+      ],
+      "comparison": {
+        "expected_open_bits": [
+          41,
+          49,
+          57,
+          73,
+          81,
+          82,
+          84,
+          85,
+          86,
+          89,
+          90,
+          115,
+          119,
+          120,
+          122,
+          145,
+          149,
+          150,
+          152,
+          154,
+          210,
+          211,
+          212,
+          215,
+          217,
+          218
+        ],
+        "carried_open_bits": [
+          41,
+          49,
+          57,
+          73,
+          81,
+          82,
+          84,
+          85,
+          86,
+          89,
+          90,
+          115,
+          119,
+          120,
+          122,
+          145,
+          149,
+          150,
+          152,
+          154,
+          210,
+          211,
+          212,
+          215,
+          217,
+          218
+        ],
+        "open_bits_exact": true,
+        "found_pins": 0
+      },
+      "events": [
+        {
+          "event": "conduct-drop_then_reverse.code_comment.absent",
+          "semantic_words": 15,
+          "regional_arcs": 17,
+          "wall_micros": 15014,
+          "returned_incidences": 1373,
+          "returned_pins": 1373
+        },
+        {
+          "event": "return-drop_then_reverse.code_comment.absent",
+          "semantic_words": 240,
+          "regional_arcs": 240,
+          "wall_micros": 16054,
+          "returned_incidences": 240,
+          "returned_pins": 240
+        },
+        {
+          "event": "compare-drop_then_reverse.code_comment.absent",
+          "semantic_words": 240,
+          "regional_arcs": 240,
+          "wall_micros": 20763,
+          "returned_incidences": 720,
+          "returned_pins": 720
+        }
+      ]
+    },
+    {
+      "current_id": "drop_then_reverse.code_comment.irrelevant_before",
+      "group": "related_holdout",
+      "context": "code_comment",
+      "condition": "irrelevant_before",
+      "source_activation_words": 8192,
+      "participating_activation_words": 6,
+      "law_recovered_from_standing": true,
+      "current_recovered_from_source": true,
+      "prediction": [
+        "-98869319634069089018779559/937065023441270146135490560",
+        "-2525408906419163311396843287/1874130046882540292270981120",
+        "-14821724950488464436909350359/89958242250361934029007093760",
+        "8051383331119446768877892929/44979121125180967014503546880",
+        "6317533534091916970208212009/44979121125180967014503546880"
+      ],
+      "source_derived_prediction_exact": true,
+      "target_factorized": [
+        "-4702305929385/35184372088832",
+        "-3833038491651/2199023255552",
+        "-3159789128523/17592186044416",
+        "6605354602485/35184372088832",
+        "3776025199631/17592186044416"
+      ],
+      "target_observed": [
+        "-137/1024",
+        "-223/128",
+        "-23/128",
+        "193/1024",
+        "55/256"
+      ],
+      "exact_factorized_output": false,
+      "factorized_face_rides": false,
+      "observed_face_rides": false,
+      "predicted_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1326,
+          1476,
+          76,
+          954,
+          856
+        ]
+      },
+      "factorized_residual": [
+        {
+          "axis": 76,
+          "prediction": "-98869319634069089018779559/937065023441270146135490560",
+          "target": "-4702305929385/35184372088832",
+          "target_minus_prediction": "-52734292567744689791710607/1874130046882540292270981120"
+        },
+        {
+          "axis": 856,
+          "prediction": "-2525408906419163311396843287/1874130046882540292270981120",
+          "target": "-3833038491651/2199023255552",
+          "target_minus_prediction": "-741319896890938953631917273/1874130046882540292270981120"
+        },
+        {
+          "axis": 954,
+          "prediction": "-14821724950488464436909350359/89958242250361934029007093760",
+          "target": "-3159789128523/17592186044416",
+          "target_minus_prediction": "-1335964330768118843335454921/89958242250361934029007093760"
+        },
+        {
+          "axis": 1326,
+          "prediction": "8051383331119446768877892929/44979121125180967014503546880",
+          "target": "6605354602485/35184372088832",
+          "target_minus_prediction": "392793077367574502357384471/44979121125180967014503546880"
+        },
+        {
+          "axis": 1476,
+          "prediction": "6317533534091916970208212009/44979121125180967014503546880",
+          "target": "3776025199631/17592186044416",
+          "target_minus_prediction": "3336883170979744842569316071/44979121125180967014503546880"
+        }
+      ],
+      "observed_residual": [
+        {
+          "axis": 76,
+          "prediction": "-98869319634069089018779559/937065023441270146135490560",
+          "target": "-137/1024",
+          "target_minus_prediction": "-26499731353678967641925721/937065023441270146135490560"
+        },
+        {
+          "axis": 856,
+          "prediction": "-2525408906419163311396843287/1874130046882540292270981120",
+          "target": "-223/128",
+          "target_minus_prediction": "-739677034634012354044006633/1874130046882540292270981120"
+        },
+        {
+          "axis": 954,
+          "prediction": "-14821724950488464436909350359/89958242250361934029007093760",
+          "target": "-23/128",
+          "target_minus_prediction": "-1342646703873445583927861801/89958242250361934029007093760"
+        },
+        {
+          "axis": 1326,
+          "prediction": "8051383331119446768877892929/44979121125180967014503546880",
+          "target": "193/1024",
+          "target_minus_prediction": "426126802825794084441623231/44979121125180967014503546880"
+        },
+        {
+          "axis": 1476,
+          "prediction": "6317533534091916970208212009/44979121125180967014503546880",
+          "target": "55/256",
+          "target_minus_prediction": "3345949520146181411814034391/44979121125180967014503546880"
+        }
+      ],
+      "comparison": {
+        "expected_open_bits": [
+          81,
+          83,
+          85,
+          86,
+          87,
+          113,
+          115,
+          117,
+          118,
+          119
+        ],
+        "carried_open_bits": [
+          81,
+          83,
+          85,
+          86,
+          87,
+          113,
+          115,
+          117,
+          118,
+          119
+        ],
+        "open_bits_exact": true,
+        "found_pins": 0
+      },
+      "events": [
+        {
+          "event": "conduct-drop_then_reverse.code_comment.irrelevant_before",
+          "semantic_words": 15,
+          "regional_arcs": 17,
+          "wall_micros": 15064,
+          "returned_incidences": 1373,
+          "returned_pins": 1373
+        },
+        {
+          "event": "return-drop_then_reverse.code_comment.irrelevant_before",
+          "semantic_words": 240,
+          "regional_arcs": 240,
+          "wall_micros": 15697,
+          "returned_incidences": 240,
+          "returned_pins": 240
+        },
+        {
+          "event": "compare-drop_then_reverse.code_comment.irrelevant_before",
+          "semantic_words": 240,
+          "regional_arcs": 240,
+          "wall_micros": 20859,
+          "returned_incidences": 720,
+          "returned_pins": 720
+        }
+      ]
+    },
+    {
+      "current_id": "drop_then_reverse.code_comment.relevant_after",
+      "group": "related_holdout",
+      "context": "code_comment",
+      "condition": "relevant_after",
+      "source_activation_words": 8192,
+      "participating_activation_words": 6,
+      "law_recovered_from_standing": true,
+      "current_recovered_from_source": true,
+      "prediction": [
+        "-45127097534101546788040947/937065023441270146135490560",
+        "-164110575065763549577408177/234266255860317536533872640",
+        "-613909330409261892048461751/7496520187530161169083924480",
+        "302538446476275597975762851/3748260093765080584541962240",
+        "405933915537120826801656021/3748260093765080584541962240"
+      ],
+      "source_derived_prediction_exact": true,
+      "target_factorized": [
+        "-688286711021/4398046511104",
+        "-7265271901911/4398046511104",
+        "-1787661892741/8796093022208",
+        "13046332775693/70368744177664",
+        "6891195773849/35184372088832"
+      ],
+      "target_observed": [
+        "-5/32",
+        "-211/128",
+        "-13/64",
+        "95/512",
+        "25/128"
+      ],
+      "exact_factorized_output": false,
+      "factorized_face_rides": true,
+      "observed_face_rides": true,
+      "predicted_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "factorized_residual": [
+        {
+          "axis": 76,
+          "prediction": "-45127097534101546788040947/937065023441270146135490560",
+          "target": "-688286711021/4398046511104",
+          "target_minus_prediction": "-101521966173800789539190993/937065023441270146135490560"
+        },
+        {
+          "axis": 856,
+          "prediction": "-164110575065763549577408177/234266255860317536533872640",
+          "target": "-7265271901911/4398046511104",
+          "target_minus_prediction": "-111440625024056960640916729/117133127930158768266936320"
+        },
+        {
+          "axis": 954,
+          "prediction": "-613909330409261892048461751/7496520187530161169083924480",
+          "target": "-1787661892741/8796093022208",
+          "target_minus_prediction": "-909635660938191689184149209/7496520187530161169083924480"
+        },
+        {
+          "axis": 1326,
+          "prediction": "302538446476275597975762851/3748260093765080584541962240",
+          "target": "13046332775693/70368744177664",
+          "target_minus_prediction": "196193624682284152835910327/1874130046882540292270981120"
+        },
+        {
+          "axis": 1476,
+          "prediction": "405933915537120826801656021/3748260093765080584541962240",
+          "target": "6891195773849/35184372088832",
+          "target_minus_prediction": "328198671857825821538083909/3748260093765080584541962240"
+        }
+      ],
+      "observed_residual": [
+        {
+          "axis": 76,
+          "prediction": "-45127097534101546788040947/937065023441270146135490560",
+          "target": "-5/32",
+          "target_minus_prediction": "-101289312378596913545629453/937065023441270146135490560"
+        },
+        {
+          "axis": 856,
+          "prediction": "-164110575065763549577408177/234266255860317536533872640",
+          "target": "-211/128",
+          "target_minus_prediction": "-222062706078978639552647503/234266255860317536533872640"
+        },
+        {
+          "axis": 954,
+          "prediction": "-613909330409261892048461751/7496520187530161169083924480",
+          "target": "-13/64",
+          "target_minus_prediction": "-908821332682802095421710409/7496520187530161169083924480"
+        },
+        {
+          "axis": 1326,
+          "prediction": "302538446476275597975762851/3748260093765080584541962240",
+          "target": "95/512",
+          "target_minus_prediction": "392939500609042088609171549/3748260093765080584541962240"
+        },
+        {
+          "axis": 1476,
+          "prediction": "405933915537120826801656021/3748260093765080584541962240",
+          "target": "25/128",
+          "target_minus_prediction": "326148134026371474866695979/3748260093765080584541962240"
+        }
+      ],
+      "comparison": {
+        "expected_open_bits": [],
+        "carried_open_bits": [],
+        "open_bits_exact": true,
+        "found_pins": 0
+      },
+      "events": [
+        {
+          "event": "conduct-drop_then_reverse.code_comment.relevant_after",
+          "semantic_words": 15,
+          "regional_arcs": 17,
+          "wall_micros": 15330,
+          "returned_incidences": 1373,
+          "returned_pins": 1373
+        },
+        {
+          "event": "return-drop_then_reverse.code_comment.relevant_after",
+          "semantic_words": 240,
+          "regional_arcs": 240,
+          "wall_micros": 15404,
+          "returned_incidences": 240,
+          "returned_pins": 240
+        },
+        {
+          "event": "compare-drop_then_reverse.code_comment.relevant_after",
+          "semantic_words": 240,
+          "regional_arcs": 240,
+          "wall_micros": 20805,
+          "returned_incidences": 720,
+          "returned_pins": 720
+        }
+      ]
+    },
+    {
+      "current_id": "reverse_then_drop.conversation.relevant_before",
+      "group": "changed_operation_holdout",
+      "context": "conversation",
+      "condition": "relevant_before",
+      "source_activation_words": 8192,
+      "participating_activation_words": 6,
+      "law_recovered_from_standing": true,
+      "current_recovered_from_source": true,
+      "prediction": [
+        "71771629051637637200755085/1499304037506032233816784896",
+        "79049121249446651284418913/374826009376508058454196224",
+        "96991572771654188018858023/2998608075012064467633569792",
+        "-3933386748450250516451489/749652018753016116908392448",
+        "18301747497958204311100211/749652018753016116908392448"
+      ],
+      "source_derived_prediction_exact": true,
+      "target_factorized": [
+        "-3086783319821/17592186044416",
+        "-16332504087851/8796093022208",
+        "-837834152917/4398046511104",
+        "796054499127/4398046511104",
+        "1741220916283/8796093022208"
+      ],
+      "target_observed": [
+        "-45/256",
+        "-119/64",
+        "-195/1024",
+        "185/1024",
+        "203/1024"
+      ],
+      "exact_factorized_output": false,
+      "factorized_face_rides": false,
+      "observed_face_rides": false,
+      "predicted_face": {
+        "orientation": [
+          "positive",
+          "positive",
+          "positive",
+          "negative",
+          "positive"
+        ],
+        "signed_axis_order": [
+          856,
+          76,
+          954,
+          1476,
+          1326
+        ]
+      },
+      "factorized_residual": [
+        {
+          "axis": 76,
+          "prediction": "71771629051637637200755085/1499304037506032233816784896",
+          "target": "-3086783319821/17592186044416",
+          "target_minus_prediction": "-334844488935523308453420661/1499304037506032233816784896"
+        },
+        {
+          "axis": 856,
+          "prediction": "79049121249446651284418913/374826009376508058454196224",
+          "target": "-16332504087851/8796093022208",
+          "target_minus_prediction": "-775022585254262929585710541/374826009376508058454196224"
+        },
+        {
+          "axis": 954,
+          "prediction": "96991572771654188018858023/2998608075012064467633569792",
+          "target": "-837834152917/4398046511104",
+          "target_minus_prediction": "-668230701351756682169774439/2998608075012064467633569792"
+        },
+        {
+          "axis": 1326,
+          "prediction": "-3933386748450250516451489/749652018753016116908392448",
+          "target": "796054499127/4398046511104",
+          "target_minus_prediction": "139621779493113760333668113/749652018753016116908392448"
+        },
+        {
+          "axis": 1476,
+          "prediction": "18301747497958204311100211/749652018753016116908392448",
+          "target": "1741220916283/8796093022208",
+          "target_minus_prediction": "130094793067374273333030437/749652018753016116908392448"
+        }
+      ],
+      "observed_residual": [
+        {
+          "axis": 76,
+          "prediction": "71771629051637637200755085/1499304037506032233816784896",
+          "target": "-45/256",
+          "target_minus_prediction": "-335321166894494865801361805/1499304037506032233816784896"
+        },
+        {
+          "axis": 856,
+          "prediction": "79049121249446651284418913/374826009376508058454196224",
+          "target": "-119/64",
+          "target_minus_prediction": "-775991232433891322472690017/374826009376508058454196224"
+        },
+        {
+          "axis": 954,
+          "prediction": "96991572771654188018858023/2998608075012064467633569792",
+          "target": "-195/1024",
+          "target_minus_prediction": "-668015571431178183320172583/2998608075012064467633569792"
+        },
+        {
+          "axis": 1326,
+          "prediction": "-3933386748450250516451489/749652018753016116908392448",
+          "target": "185/1024",
+          "target_minus_prediction": "139368565917696326325096609/749652018753016116908392448"
+        },
+        {
+          "axis": 1476,
+          "prediction": "18301747497958204311100211/749652018753016116908392448",
+          "target": "203/1024",
+          "target_minus_prediction": "130310908563430732927575245/749652018753016116908392448"
+        }
+      ],
+      "comparison": {
+        "expected_open_bits": [
+          41,
+          49,
+          57,
+          65,
+          82,
+          83,
+          84,
+          87,
+          89,
+          90,
+          113,
+          117,
+          118,
+          120,
+          122,
+          145,
+          146,
+          148,
+          149,
+          150,
+          151,
+          152,
+          153,
+          177,
+          178,
+          179,
+          180,
+          181,
+          182,
+          185,
+          186,
+          209,
+          210,
+          212,
+          213,
+          214,
+          217,
+          218
+        ],
+        "carried_open_bits": [
+          41,
+          49,
+          57,
+          65,
+          82,
+          83,
+          84,
+          87,
+          89,
+          90,
+          113,
+          117,
+          118,
+          120,
+          122,
+          145,
+          146,
+          148,
+          149,
+          150,
+          151,
+          152,
+          153,
+          177,
+          178,
+          179,
+          180,
+          181,
+          182,
+          185,
+          186,
+          209,
+          210,
+          212,
+          213,
+          214,
+          217,
+          218
+        ],
+        "open_bits_exact": true,
+        "found_pins": 0
+      },
+      "events": [
+        {
+          "event": "conduct-reverse_then_drop.conversation.relevant_before",
+          "semantic_words": 15,
+          "regional_arcs": 17,
+          "wall_micros": 15448,
+          "returned_incidences": 1373,
+          "returned_pins": 1373
+        },
+        {
+          "event": "return-reverse_then_drop.conversation.relevant_before",
+          "semantic_words": 240,
+          "regional_arcs": 240,
+          "wall_micros": 15432,
+          "returned_incidences": 240,
+          "returned_pins": 240
+        },
+        {
+          "event": "compare-reverse_then_drop.conversation.relevant_before",
+          "semantic_words": 240,
+          "regional_arcs": 240,
+          "wall_micros": 21116,
+          "returned_incidences": 720,
+          "returned_pins": 720
+        }
+      ]
+    },
+    {
+      "current_id": "reverse_then_drop.prose.relevant_before",
+      "group": "changed_operation_holdout",
+      "context": "prose",
+      "condition": "relevant_before",
+      "source_activation_words": 8192,
+      "participating_activation_words": 6,
+      "law_recovered_from_standing": true,
+      "current_recovered_from_source": true,
+      "prediction": [
+        "-290269550499296316734659019/937065023441270146135490560",
+        "-373337057472829690448178967/117133127930158768266936320",
+        "-1429443453089950002500403851/3748260093765080584541962240",
+        "593262345460957313542432211/1874130046882540292270981120",
+        "585109461940461120365789511/1874130046882540292270981120"
+      ],
+      "source_derived_prediction_exact": true,
+      "target_factorized": [
+        "-1570133962029/8796093022208",
+        "-14541230250385/8796093022208",
+        "-6819457630801/35184372088832",
+        "3014456721961/17592186044416",
+        "424685319921/2199023255552"
+      ],
+      "target_observed": [
+        "-91/512",
+        "-53/32",
+        "-199/1024",
+        "175/1024",
+        "99/512"
+      ],
+      "exact_factorized_output": false,
+      "factorized_face_rides": false,
+      "observed_face_rides": false,
+      "predicted_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1326,
+          1476,
+          76,
+          954,
+          856
+        ]
+      },
+      "factorized_residual": [
+        {
+          "axis": 76,
+          "prediction": "-290269550499296316734659019/937065023441270146135490560",
+          "target": "-1570133962029/8796093022208",
+          "target_minus_prediction": "123000103232206329209936489/937065023441270146135490560"
+        },
+        {
+          "axis": 856,
+          "prediction": "-373337057472829690448178967/117133127930158768266936320",
+          "target": "-14541230250385/8796093022208",
+          "target_minus_prediction": "718795355618650992264961143/468532511720635073067745280"
+        },
+        {
+          "axis": 954,
+          "prediction": "-1429443453089950002500403851/3748260093765080584541962240",
+          "target": "-6819457630801/35184372088832",
+          "target_minus_prediction": "702953270627191404268393281/3748260093765080584541962240"
+        },
+        {
+          "axis": 1326,
+          "prediction": "593262345460957313542432211/1874130046882540292270981120",
+          "target": "3014456721961/17592186044416",
+          "target_minus_prediction": "-272126364782343414233820441/1874130046882540292270981120"
+        },
+        {
+          "axis": 1476,
+          "prediction": "585109461940461120365789511/1874130046882540292270981120",
+          "target": "424685319921/2199023255552",
+          "target_minus_prediction": "-223168988357757143315477751/1874130046882540292270981120"
+        }
+      ],
+      "observed_residual": [
+        {
+          "axis": 76,
+          "prediction": "-290269550499296316734659019/937065023441270146135490560",
+          "target": "-91/512",
+          "target_minus_prediction": "123720884223601818105108939/937065023441270146135490560"
+        },
+        {
+          "axis": 856,
+          "prediction": "-373337057472829690448178967/117133127930158768266936320",
+          "target": "-53/32",
+          "target_minus_prediction": "179335314338504230506065687/117133127930158768266936320"
+        },
+        {
+          "axis": 954,
+          "prediction": "-1429443453089950002500403851/3748260093765080584541962240",
+          "target": "-199/1024",
+          "target_minus_prediction": "701021813774275162340393611/3748260093765080584541962240"
+        },
+        {
+          "axis": 1326,
+          "prediction": "593262345460957313542432211/1874130046882540292270981120",
+          "target": "175/1024",
+          "target_minus_prediction": "-272976448776929431562528211/1874130046882540292270981120"
+        },
+        {
+          "axis": 1476,
+          "prediction": "585109461940461120365789511/1874130046882540292270981120",
+          "target": "99/512",
+          "target_minus_prediction": "-222728847406532431039955271/1874130046882540292270981120"
+        }
+      ],
+      "comparison": {
+        "expected_open_bits": [
+          81,
+          83,
+          85,
+          86,
+          87,
+          113,
+          115,
+          117,
+          118,
+          119
+        ],
+        "carried_open_bits": [
+          81,
+          83,
+          85,
+          86,
+          87,
+          113,
+          115,
+          117,
+          118,
+          119
+        ],
+        "open_bits_exact": true,
+        "found_pins": 0
+      },
+      "events": [
+        {
+          "event": "conduct-reverse_then_drop.prose.relevant_before",
+          "semantic_words": 15,
+          "regional_arcs": 17,
+          "wall_micros": 16588,
+          "returned_incidences": 1373,
+          "returned_pins": 1373
+        },
+        {
+          "event": "return-reverse_then_drop.prose.relevant_before",
+          "semantic_words": 240,
+          "regional_arcs": 240,
+          "wall_micros": 15168,
+          "returned_incidences": 240,
+          "returned_pins": 240
+        },
+        {
+          "event": "compare-reverse_then_drop.prose.relevant_before",
+          "semantic_words": 240,
+          "regional_arcs": 240,
+          "wall_micros": 21148,
+          "returned_incidences": 720,
+          "returned_pins": 720
+        }
+      ]
+    },
+    {
+      "current_id": "reverse_then_drop.code_comment.relevant_before",
+      "group": "changed_operation_holdout",
+      "context": "code_comment",
+      "condition": "relevant_before",
+      "source_activation_words": 8192,
+      "participating_activation_words": 6,
+      "law_recovered_from_standing": true,
+      "current_recovered_from_source": true,
+      "prediction": [
+        "256080193921665439452155693/1874130046882540292270981120",
+        "565445824667905851594162673/468532511720635073067745280",
+        "1412300536515227013856294073/11244780281295241753625886720",
+        "-156090807875628954977059369/2811195070323810438406471680",
+        "-216336154287437998043410489/2811195070323810438406471680"
+      ],
+      "source_derived_prediction_exact": true,
+      "target_factorized": [
+        "-783918398743/4398046511104",
+        "-241613498911/137438953472",
+        "-12462585841/68719476736",
+        "446266112495/2199023255552",
+        "1747615753761/8796093022208"
+      ],
+      "target_observed": [
+        "-183/1024",
+        "-225/128",
+        "-93/512",
+        "13/64",
+        "51/256"
+      ],
+      "exact_factorized_output": false,
+      "factorized_face_rides": false,
+      "observed_face_rides": false,
+      "predicted_face": {
+        "orientation": [
+          "positive",
+          "positive",
+          "positive",
+          "negative",
+          "negative"
+        ],
+        "signed_axis_order": [
+          856,
+          76,
+          954,
+          1326,
+          1476
+        ]
+      },
+      "factorized_residual": [
+        {
+          "axis": 76,
+          "prediction": "256080193921665439452155693/1874130046882540292270981120",
+          "target": "-783918398743/4398046511104",
+          "target_minus_prediction": "-590129645576853576672177733/1874130046882540292270981120"
+        },
+        {
+          "axis": 856,
+          "prediction": "565445824667905851594162673/468532511720635073067745280",
+          "target": "-241613498911/137438953472",
+          "target_minus_prediction": "-1389111726150809693730907313/468532511720635073067745280"
+        },
+        {
+          "axis": 954,
+          "prediction": "1412300536515227013856294073/11244780281295241753625886720",
+          "target": "-12462585841/68719476736",
+          "target_minus_prediction": "-3451591959777936256546910393/11244780281295241753625886720"
+        },
+        {
+          "axis": 1326,
+          "prediction": "-156090807875628954977059369/2811195070323810438406471680",
+          "target": "446266112495/2199023255552",
+          "target_minus_prediction": "726590047631781258531285169/2811195070323810438406471680"
+        },
+        {
+          "axis": 1476,
+          "prediction": "-216336154287437998043410489/2811195070323810438406471680",
+          "target": "1747615753761/8796093022208",
+          "target_minus_prediction": "774866945104372468745223799/2811195070323810438406471680"
+        }
+      ],
+      "observed_residual": [
+        {
+          "axis": 76,
+          "prediction": "256080193921665439452155693/1874130046882540292270981120",
+          "target": "-183/1024",
+          "target_minus_prediction": "-591007731596963167465426733/1874130046882540292270981120"
+        },
+        {
+          "axis": 856,
+          "prediction": "565445824667905851594162673/468532511720635073067745280",
+          "target": "-225/128",
+          "target_minus_prediction": "-1389038130426834690971058673/468532511720635073067745280"
+        },
+        {
+          "axis": 954,
+          "prediction": "1412300536515227013856294073/11244780281295241753625886720",
+          "target": "-93/512",
+          "target_minus_prediction": "-3454809454797370535510996153/11244780281295241753625886720"
+        },
+        {
+          "axis": 1326,
+          "prediction": "-156090807875628954977059369/2811195070323810438406471680",
+          "target": "13/64",
+          "target_minus_prediction": "727114806535152950278373929/2811195070323810438406471680"
+        },
+        {
+          "axis": 1476,
+          "prediction": "-216336154287437998043410489/2811195070323810438406471680",
+          "target": "51/256",
+          "target_minus_prediction": "776378922203509608819699769/2811195070323810438406471680"
+        }
+      ],
+      "comparison": {
+        "expected_open_bits": [
+          41,
+          49,
+          57,
+          65,
+          73,
+          81,
+          82,
+          84,
+          85,
+          86,
+          89,
+          90,
+          115,
+          119,
+          120,
+          122,
+          145,
+          146,
+          148,
+          149,
+          150,
+          151,
+          152,
+          153,
+          178,
+          180,
+          183,
+          185,
+          186,
+          210,
+          211,
+          212,
+          215,
+          217,
+          218
+        ],
+        "carried_open_bits": [
+          41,
+          49,
+          57,
+          65,
+          73,
+          81,
+          82,
+          84,
+          85,
+          86,
+          89,
+          90,
+          115,
+          119,
+          120,
+          122,
+          145,
+          146,
+          148,
+          149,
+          150,
+          151,
+          152,
+          153,
+          178,
+          180,
+          183,
+          185,
+          186,
+          210,
+          211,
+          212,
+          215,
+          217,
+          218
+        ],
+        "open_bits_exact": true,
+        "found_pins": 0
+      },
+      "events": [
+        {
+          "event": "conduct-reverse_then_drop.code_comment.relevant_before",
+          "semantic_words": 15,
+          "regional_arcs": 17,
+          "wall_micros": 15414,
+          "returned_incidences": 1373,
+          "returned_pins": 1373
+        },
+        {
+          "event": "return-reverse_then_drop.code_comment.relevant_before",
+          "semantic_words": 240,
+          "regional_arcs": 240,
+          "wall_micros": 15813,
+          "returned_incidences": 240,
+          "returned_pins": 240
+        },
+        {
+          "event": "compare-reverse_then_drop.code_comment.relevant_before",
+          "semantic_words": 240,
+          "regional_arcs": 240,
+          "wall_micros": 20743,
+          "returned_incidences": 720,
+          "returned_pins": 720
+        }
+      ]
+    }
+  ],
+  "groups": {
+    "changed_operation_holdout": {
+      "currents": 3,
+      "exact_factorized_outputs": 0,
+      "factorized_face_rides": 0,
+      "observed_face_rides": 0,
+      "open_comparisons": 3
+    },
+    "related_holdout": {
+      "currents": 3,
+      "exact_factorized_outputs": 0,
+      "factorized_face_rides": 1,
+      "observed_face_rides": 1,
+      "open_comparisons": 2
+    },
+    "training": {
+      "currents": 6,
+      "exact_factorized_outputs": 6,
+      "factorized_face_rides": 6,
+      "observed_face_rides": 6,
+      "open_comparisons": 0
+    }
+  },
+  "participation": {
+    "source_factors": 8192,
+    "later_activation_words_per_current": 6,
+    "boundary_fraction": "6/8192",
+    "law_coefficients": 30,
+    "upstream_field_was_already_physically_produced": true,
+    "scope": "reduced source participation at the Eros boundary only; no end-to-end transformer latency, energy, or model-size reduction"
+  },
+  "acceptance": {
+    "fixed_source_validated": true,
+    "exact_training_chart_closed": true,
+    "self_emanated_law_stood_after_rows_departed": true,
+    "no_standing_control_refused_output": true,
+    "every_later_current_recovered_law_and_current": true,
+    "every_prediction_matched_independent_source_derivation": true,
+    "every_comparison_carried_exact_open_bits": true,
+    "no_comparison_fabricated_found": true,
+    "all_contexts_measured_without_retuning": true,
+    "no_floating_point_causal_data": true
+  },
+  "run_wall_micros": 6956198,
+  "conclusion": "The inherited ecology is not a stored set of strongest edges. One exact local transformation can be re-expressed as a much smaller situated law, survive after its six training-row carriers depart, and conduct later currents from six participating activation words. Its boundary is contextual: one of three related code-comment faces RIDEs, while every changed-operation face remains OPEN. This is reduced participation at the Eros membrane, not yet a smaller or cheaper upstream transformer."
+}

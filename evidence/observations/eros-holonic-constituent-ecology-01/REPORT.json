@@ -1,0 +1,4637 @@
+{
+  "acceptance": {
+    "all_folds_expand_to_their_exact_source_octets": true,
+    "every_active_fold_was_recruited_by_exact_boundary_contact": true,
+    "every_machine_membership_residual_was_exact": true,
+    "every_successor_was_the_complete_outgoing_ecology_factor": true,
+    "every_training_relation_matched_the_fixed_prediction": true,
+    "final_ecology_survived_exact_rest_remount": true,
+    "no_floating_point_causal_data": true,
+    "no_standing_control_fabricated_no_ecology": true,
+    "overlapping_presentations_remained_plural": true,
+    "replaced_and_event_local_carriers_departed": true,
+    "same_consequence_related_nonidentical_inscriptions": true,
+    "source_absent_probes_recovered_receiver_relative_ecology": true,
+    "source_declared_base_carrier_and_lambda_validated": true,
+    "source_lineages_departed": true
+  },
+  "boundary": "The alphabet, parameter axes, recurrence aperture, chronology, and consequences are supplied by this bounded world. Soma owns contact, regional composition, outgoing-factor validation, atomic replacement, departure, and rest. This is an exact constituent-training ecology, not general linguistic competence or a hidden universal tokenizer.",
+  "conclusion": "The cultivated object is neither a vocabulary nor a dense embedding table. It is one exact receiver-relative incidence ecology. Repeated source paths become reversible higher constituents; 1+2 retains both (1+)|2 and 1|(+2); arithmetic, concatenation, code, and language occurrences remain distinct while returned consequences relate them; partial receivers retain plural continuation; and an unseen inscription can RIDE the known 1+ grain while honestly returning no consequence. The complete ecology then conducts after source and oracle departure.",
+  "control": {
+    "accepted": true,
+    "active_constituents": [],
+    "inscription": "1+2",
+    "prediction": [],
+    "source_current_recovered": true,
+    "standing_ecology_present": false,
+    "transition": {
+      "event": "no-standing-control",
+      "regional_arcs": 21,
+      "returned_incidences": 21,
+      "returned_pins": 21,
+      "semantic_words": 20,
+      "wall_micros": 1214
+    }
+  },
+  "final_ecology": {
+    "folds": [
+      {
+        "expansion": " p",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": " ",
+            "right": "p"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": " pl",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": " ",
+            "right": "pl"
+          },
+          {
+            "left": " p",
+            "right": "l"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": " plu",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": " ",
+            "right": "plu"
+          },
+          {
+            "left": " p",
+            "right": "lu"
+          },
+          {
+            "left": " pl",
+            "right": "u"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": " plus",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": " ",
+            "right": "plus"
+          },
+          {
+            "left": " p",
+            "right": "lus"
+          },
+          {
+            "left": " pl",
+            "right": "us"
+          },
+          {
+            "left": " plu",
+            "right": "s"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": " plus ",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": " ",
+            "right": "plus "
+          },
+          {
+            "left": " p",
+            "right": "lus "
+          },
+          {
+            "left": " pl",
+            "right": "us "
+          },
+          {
+            "left": " plu",
+            "right": "s "
+          },
+          {
+            "left": " plus",
+            "right": " "
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": " plus t",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": " ",
+            "right": "plus t"
+          },
+          {
+            "left": " p",
+            "right": "lus t"
+          },
+          {
+            "left": " pl",
+            "right": "us t"
+          },
+          {
+            "left": " plu",
+            "right": "s t"
+          },
+          {
+            "left": " plus",
+            "right": " t"
+          },
+          {
+            "left": " plus ",
+            "right": "t"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": " t",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": " ",
+            "right": "t"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "(1",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "(",
+            "right": "1"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "(1,",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "(",
+            "right": "1,"
+          },
+          {
+            "left": "(1",
+            "right": ","
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "+2",
+        "occurrences": 7,
+        "presentations": [
+          {
+            "left": "+",
+            "right": "2"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "+3",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "+",
+            "right": "3"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "1+",
+        "occurrences": 7,
+        "presentations": [
+          {
+            "left": "1",
+            "right": "+"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "1+2",
+        "occurrences": 5,
+        "presentations": [
+          {
+            "left": "1",
+            "right": "+2"
+          },
+          {
+            "left": "1+",
+            "right": "2"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "1+3",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "1",
+            "right": "+3"
+          },
+          {
+            "left": "1+",
+            "right": "3"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "1,",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "1",
+            "right": ","
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "2+",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "2",
+            "right": "+"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "2+2",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "2",
+            "right": "+2"
+          },
+          {
+            "left": "2+",
+            "right": "2"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "ad",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "a",
+            "right": "d"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "add",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "a",
+            "right": "dd"
+          },
+          {
+            "left": "ad",
+            "right": "d"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "add(",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "a",
+            "right": "dd("
+          },
+          {
+            "left": "ad",
+            "right": "d("
+          },
+          {
+            "left": "add",
+            "right": "("
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "add(1",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "a",
+            "right": "dd(1"
+          },
+          {
+            "left": "ad",
+            "right": "d(1"
+          },
+          {
+            "left": "add",
+            "right": "(1"
+          },
+          {
+            "left": "add(",
+            "right": "1"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "add(1,",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "a",
+            "right": "dd(1,"
+          },
+          {
+            "left": "ad",
+            "right": "d(1,"
+          },
+          {
+            "left": "add",
+            "right": "(1,"
+          },
+          {
+            "left": "add(",
+            "right": "1,"
+          },
+          {
+            "left": "add(1",
+            "right": ","
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "d(",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "d",
+            "right": "("
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "d(1",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "d",
+            "right": "(1"
+          },
+          {
+            "left": "d(",
+            "right": "1"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "d(1,",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "d",
+            "right": "(1,"
+          },
+          {
+            "left": "d(",
+            "right": "1,"
+          },
+          {
+            "left": "d(1",
+            "right": ","
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "dd",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "d",
+            "right": "d"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "dd(",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "d",
+            "right": "d("
+          },
+          {
+            "left": "dd",
+            "right": "("
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "dd(1",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "d",
+            "right": "d(1"
+          },
+          {
+            "left": "dd",
+            "right": "(1"
+          },
+          {
+            "left": "dd(",
+            "right": "1"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "dd(1,",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "d",
+            "right": "d(1,"
+          },
+          {
+            "left": "dd",
+            "right": "(1,"
+          },
+          {
+            "left": "dd(",
+            "right": "1,"
+          },
+          {
+            "left": "dd(1",
+            "right": ","
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "e ",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "e",
+            "right": " "
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "e p",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "e",
+            "right": " p"
+          },
+          {
+            "left": "e ",
+            "right": "p"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "e pl",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "e",
+            "right": " pl"
+          },
+          {
+            "left": "e ",
+            "right": "pl"
+          },
+          {
+            "left": "e p",
+            "right": "l"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "e plu",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "e",
+            "right": " plu"
+          },
+          {
+            "left": "e ",
+            "right": "plu"
+          },
+          {
+            "left": "e p",
+            "right": "lu"
+          },
+          {
+            "left": "e pl",
+            "right": "u"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "e plus",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "e",
+            "right": " plus"
+          },
+          {
+            "left": "e ",
+            "right": "plus"
+          },
+          {
+            "left": "e p",
+            "right": "lus"
+          },
+          {
+            "left": "e pl",
+            "right": "us"
+          },
+          {
+            "left": "e plu",
+            "right": "s"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "e plus ",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "e",
+            "right": " plus "
+          },
+          {
+            "left": "e ",
+            "right": "plus "
+          },
+          {
+            "left": "e p",
+            "right": "lus "
+          },
+          {
+            "left": "e pl",
+            "right": "us "
+          },
+          {
+            "left": "e plu",
+            "right": "s "
+          },
+          {
+            "left": "e plus",
+            "right": " "
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "e plus t",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "e",
+            "right": " plus t"
+          },
+          {
+            "left": "e ",
+            "right": "plus t"
+          },
+          {
+            "left": "e p",
+            "right": "lus t"
+          },
+          {
+            "left": "e pl",
+            "right": "us t"
+          },
+          {
+            "left": "e plu",
+            "right": "s t"
+          },
+          {
+            "left": "e plus",
+            "right": " t"
+          },
+          {
+            "left": "e plus ",
+            "right": "t"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "lu",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "l",
+            "right": "u"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "lus",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "l",
+            "right": "us"
+          },
+          {
+            "left": "lu",
+            "right": "s"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "lus ",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "l",
+            "right": "us "
+          },
+          {
+            "left": "lu",
+            "right": "s "
+          },
+          {
+            "left": "lus",
+            "right": " "
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "lus t",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "l",
+            "right": "us t"
+          },
+          {
+            "left": "lu",
+            "right": "s t"
+          },
+          {
+            "left": "lus",
+            "right": " t"
+          },
+          {
+            "left": "lus ",
+            "right": "t"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "ne",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "n",
+            "right": "e"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "ne ",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "n",
+            "right": "e "
+          },
+          {
+            "left": "ne",
+            "right": " "
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "ne p",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "n",
+            "right": "e p"
+          },
+          {
+            "left": "ne",
+            "right": " p"
+          },
+          {
+            "left": "ne ",
+            "right": "p"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "ne pl",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "n",
+            "right": "e pl"
+          },
+          {
+            "left": "ne",
+            "right": " pl"
+          },
+          {
+            "left": "ne ",
+            "right": "pl"
+          },
+          {
+            "left": "ne p",
+            "right": "l"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "ne plu",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "n",
+            "right": "e plu"
+          },
+          {
+            "left": "ne",
+            "right": " plu"
+          },
+          {
+            "left": "ne ",
+            "right": "plu"
+          },
+          {
+            "left": "ne p",
+            "right": "lu"
+          },
+          {
+            "left": "ne pl",
+            "right": "u"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "ne plus",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "n",
+            "right": "e plus"
+          },
+          {
+            "left": "ne",
+            "right": " plus"
+          },
+          {
+            "left": "ne ",
+            "right": "plus"
+          },
+          {
+            "left": "ne p",
+            "right": "lus"
+          },
+          {
+            "left": "ne pl",
+            "right": "us"
+          },
+          {
+            "left": "ne plu",
+            "right": "s"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "ne plus ",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "n",
+            "right": "e plus "
+          },
+          {
+            "left": "ne",
+            "right": " plus "
+          },
+          {
+            "left": "ne ",
+            "right": "plus "
+          },
+          {
+            "left": "ne p",
+            "right": "lus "
+          },
+          {
+            "left": "ne pl",
+            "right": "us "
+          },
+          {
+            "left": "ne plu",
+            "right": "s "
+          },
+          {
+            "left": "ne plus",
+            "right": " "
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "ne plus t",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "n",
+            "right": "e plus t"
+          },
+          {
+            "left": "ne",
+            "right": " plus t"
+          },
+          {
+            "left": "ne ",
+            "right": "plus t"
+          },
+          {
+            "left": "ne p",
+            "right": "lus t"
+          },
+          {
+            "left": "ne pl",
+            "right": "us t"
+          },
+          {
+            "left": "ne plu",
+            "right": "s t"
+          },
+          {
+            "left": "ne plus",
+            "right": " t"
+          },
+          {
+            "left": "ne plus ",
+            "right": "t"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "on",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "o",
+            "right": "n"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "one",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "o",
+            "right": "ne"
+          },
+          {
+            "left": "on",
+            "right": "e"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "one ",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "o",
+            "right": "ne "
+          },
+          {
+            "left": "on",
+            "right": "e "
+          },
+          {
+            "left": "one",
+            "right": " "
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "one p",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "o",
+            "right": "ne p"
+          },
+          {
+            "left": "on",
+            "right": "e p"
+          },
+          {
+            "left": "one",
+            "right": " p"
+          },
+          {
+            "left": "one ",
+            "right": "p"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "one pl",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "o",
+            "right": "ne pl"
+          },
+          {
+            "left": "on",
+            "right": "e pl"
+          },
+          {
+            "left": "one",
+            "right": " pl"
+          },
+          {
+            "left": "one ",
+            "right": "pl"
+          },
+          {
+            "left": "one p",
+            "right": "l"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "one plu",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "o",
+            "right": "ne plu"
+          },
+          {
+            "left": "on",
+            "right": "e plu"
+          },
+          {
+            "left": "one",
+            "right": " plu"
+          },
+          {
+            "left": "one ",
+            "right": "plu"
+          },
+          {
+            "left": "one p",
+            "right": "lu"
+          },
+          {
+            "left": "one pl",
+            "right": "u"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "one plus",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "o",
+            "right": "ne plus"
+          },
+          {
+            "left": "on",
+            "right": "e plus"
+          },
+          {
+            "left": "one",
+            "right": " plus"
+          },
+          {
+            "left": "one ",
+            "right": "plus"
+          },
+          {
+            "left": "one p",
+            "right": "lus"
+          },
+          {
+            "left": "one pl",
+            "right": "us"
+          },
+          {
+            "left": "one plu",
+            "right": "s"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "one plus ",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "o",
+            "right": "ne plus "
+          },
+          {
+            "left": "on",
+            "right": "e plus "
+          },
+          {
+            "left": "one",
+            "right": " plus "
+          },
+          {
+            "left": "one ",
+            "right": "plus "
+          },
+          {
+            "left": "one p",
+            "right": "lus "
+          },
+          {
+            "left": "one pl",
+            "right": "us "
+          },
+          {
+            "left": "one plu",
+            "right": "s "
+          },
+          {
+            "left": "one plus",
+            "right": " "
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "one plus t",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "o",
+            "right": "ne plus t"
+          },
+          {
+            "left": "on",
+            "right": "e plus t"
+          },
+          {
+            "left": "one",
+            "right": " plus t"
+          },
+          {
+            "left": "one ",
+            "right": "plus t"
+          },
+          {
+            "left": "one p",
+            "right": "lus t"
+          },
+          {
+            "left": "one pl",
+            "right": "us t"
+          },
+          {
+            "left": "one plu",
+            "right": "s t"
+          },
+          {
+            "left": "one plus",
+            "right": " t"
+          },
+          {
+            "left": "one plus ",
+            "right": "t"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "pl",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "p",
+            "right": "l"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "plu",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "p",
+            "right": "lu"
+          },
+          {
+            "left": "pl",
+            "right": "u"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "plus",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "p",
+            "right": "lus"
+          },
+          {
+            "left": "pl",
+            "right": "us"
+          },
+          {
+            "left": "plu",
+            "right": "s"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "plus ",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "p",
+            "right": "lus "
+          },
+          {
+            "left": "pl",
+            "right": "us "
+          },
+          {
+            "left": "plu",
+            "right": "s "
+          },
+          {
+            "left": "plus",
+            "right": " "
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "plus t",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "p",
+            "right": "lus t"
+          },
+          {
+            "left": "pl",
+            "right": "us t"
+          },
+          {
+            "left": "plu",
+            "right": "s t"
+          },
+          {
+            "left": "plus",
+            "right": " t"
+          },
+          {
+            "left": "plus ",
+            "right": "t"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "s ",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "s",
+            "right": " "
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "s t",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "s",
+            "right": " t"
+          },
+          {
+            "left": "s ",
+            "right": "t"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "us",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "u",
+            "right": "s"
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "us ",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "u",
+            "right": "s "
+          },
+          {
+            "left": "us",
+            "right": " "
+          }
+        ],
+        "round_trip": true
+      },
+      {
+        "expansion": "us t",
+        "occurrences": 2,
+        "presentations": [
+          {
+            "left": "u",
+            "right": "s t"
+          },
+          {
+            "left": "us",
+            "right": " t"
+          },
+          {
+            "left": "us ",
+            "right": "t"
+          }
+        ],
+        "round_trip": true
+      }
+    ],
+    "generation": 13,
+    "minimum_recurrence": 2,
+    "receiver_fibers": [
+      {
+        "distribution": [
+          {
+            "consequence": "number:3",
+            "count": 1,
+            "quotient": "1"
+          }
+        ],
+        "inscription": "1+2",
+        "parameters": {
+          "medium": "symbolic"
+        }
+      },
+      {
+        "distribution": [
+          {
+            "consequence": "number:3",
+            "count": 2,
+            "quotient": "1"
+          }
+        ],
+        "inscription": "1+2",
+        "parameters": {
+          "medium": "symbolic",
+          "objective": "arithmetic"
+        }
+      },
+      {
+        "distribution": [
+          {
+            "consequence": "text:12",
+            "count": 2,
+            "quotient": "1"
+          }
+        ],
+        "inscription": "1+2",
+        "parameters": {
+          "medium": "symbolic",
+          "objective": "concatenate"
+        }
+      },
+      {
+        "distribution": [
+          {
+            "consequence": "number:4",
+            "count": 1,
+            "quotient": "1"
+          }
+        ],
+        "inscription": "1+3",
+        "parameters": {
+          "medium": "symbolic",
+          "objective": "arithmetic"
+        }
+      },
+      {
+        "distribution": [
+          {
+            "consequence": "text:13",
+            "count": 1,
+            "quotient": "1"
+          }
+        ],
+        "inscription": "1+3",
+        "parameters": {
+          "medium": "symbolic",
+          "objective": "concatenate"
+        }
+      },
+      {
+        "distribution": [
+          {
+            "consequence": "number:4",
+            "count": 1,
+            "quotient": "1"
+          }
+        ],
+        "inscription": "2+2",
+        "parameters": {
+          "medium": "symbolic",
+          "objective": "arithmetic"
+        }
+      },
+      {
+        "distribution": [
+          {
+            "consequence": "text:22",
+            "count": 1,
+            "quotient": "1"
+          }
+        ],
+        "inscription": "2+2",
+        "parameters": {
+          "medium": "symbolic",
+          "objective": "concatenate"
+        }
+      },
+      {
+        "distribution": [
+          {
+            "consequence": "number:3",
+            "count": 1,
+            "quotient": "1"
+          }
+        ],
+        "inscription": "add(1,2)",
+        "parameters": {
+          "medium": "code",
+          "objective": "arithmetic"
+        }
+      },
+      {
+        "distribution": [
+          {
+            "consequence": "number:4",
+            "count": 1,
+            "quotient": "1"
+          }
+        ],
+        "inscription": "add(1,3)",
+        "parameters": {
+          "medium": "code",
+          "objective": "arithmetic"
+        }
+      },
+      {
+        "distribution": [
+          {
+            "consequence": "number:4",
+            "count": 1,
+            "quotient": "1"
+          }
+        ],
+        "inscription": "one plus three",
+        "parameters": {
+          "medium": "language",
+          "objective": "arithmetic"
+        }
+      },
+      {
+        "distribution": [
+          {
+            "consequence": "number:3",
+            "count": 1,
+            "quotient": "1"
+          }
+        ],
+        "inscription": "one plus two",
+        "parameters": {
+          "medium": "language",
+          "objective": "arithmetic"
+        }
+      }
+    ],
+    "spans": [
+      {
+        "addressable": true,
+        "occurrences": 4,
+        "span": " "
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": " p"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": " pl"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": " plu"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": " plus"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": " plus "
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": " plus t"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": " plus th"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": " plus thr"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": " plus thre"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": " plus three"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": " plus tw"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": " plus two"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": " t"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": " th"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": " thr"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": " thre"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": " three"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": " tw"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": " two"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "("
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "(1"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "(1,"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "(1,2"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "(1,2)"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "(1,3"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "(1,3)"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": ")"
+      },
+      {
+        "addressable": true,
+        "occurrences": 9,
+        "span": "+"
+      },
+      {
+        "addressable": true,
+        "occurrences": 7,
+        "span": "+2"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "+3"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": ","
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": ",2"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": ",2)"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": ",3"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": ",3)"
+      },
+      {
+        "addressable": true,
+        "occurrences": 9,
+        "span": "1"
+      },
+      {
+        "addressable": true,
+        "occurrences": 7,
+        "span": "1+"
+      },
+      {
+        "addressable": true,
+        "occurrences": 5,
+        "span": "1+2"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "1+3"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "1,"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "1,2"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "1,2)"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "1,3"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "1,3)"
+      },
+      {
+        "addressable": true,
+        "occurrences": 10,
+        "span": "2"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "2)"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "2+"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "2+2"
+      },
+      {
+        "addressable": true,
+        "occurrences": 3,
+        "span": "3"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "3)"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "a"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "ad"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "add"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "add("
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "add(1"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "add(1,"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "add(1,2"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "add(1,2)"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "add(1,3"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "add(1,3)"
+      },
+      {
+        "addressable": true,
+        "occurrences": 4,
+        "span": "d"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "d("
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "d(1"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "d(1,"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "d(1,2"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "d(1,2)"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "d(1,3"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "d(1,3)"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "dd"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "dd("
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "dd(1"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "dd(1,"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "dd(1,2"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "dd(1,2)"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "dd(1,3"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "dd(1,3)"
+      },
+      {
+        "addressable": true,
+        "occurrences": 4,
+        "span": "e"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "e "
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "e p"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "e pl"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "e plu"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "e plus"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "e plus "
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "e plus t"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "e plus th"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "e plus thr"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "e plus thre"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "e plus three"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "e plus tw"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "e plus two"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "ee"
+      },
+      {
+        "addressable": true,
+        "occurrences": 1,
+        "span": "h"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "hr"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "hre"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "hree"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "l"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "lu"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "lus"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "lus "
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "lus t"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "lus th"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "lus thr"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "lus thre"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "lus three"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "lus tw"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "lus two"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "n"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "ne"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "ne "
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "ne p"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "ne pl"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "ne plu"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "ne plus"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "ne plus "
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "ne plus t"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "ne plus th"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "ne plus thr"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "ne plus thre"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "ne plus three"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "ne plus tw"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "ne plus two"
+      },
+      {
+        "addressable": true,
+        "occurrences": 3,
+        "span": "o"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "on"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "one"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "one "
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "one p"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "one pl"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "one plu"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "one plus"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "one plus "
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "one plus t"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "one plus th"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "one plus thr"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "one plus thre"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "one plus three"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "one plus tw"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "one plus two"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "p"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "pl"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "plu"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "plus"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "plus "
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "plus t"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "plus th"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "plus thr"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "plus thre"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "plus three"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "plus tw"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "plus two"
+      },
+      {
+        "addressable": true,
+        "occurrences": 1,
+        "span": "r"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "re"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "ree"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "s"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "s "
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "s t"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "s th"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "s thr"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "s thre"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "s three"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "s tw"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "s two"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "t"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "th"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "thr"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "thre"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "three"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "tw"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "two"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "u"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "us"
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "us "
+      },
+      {
+        "addressable": true,
+        "occurrences": 2,
+        "span": "us t"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "us th"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "us thr"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "us thre"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "us three"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "us tw"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "us two"
+      },
+      {
+        "addressable": true,
+        "occurrences": 1,
+        "span": "w"
+      },
+      {
+        "addressable": false,
+        "occurrences": 1,
+        "span": "wo"
+      }
+    ]
+  },
+  "final_machine": {
+    "constituent_cells": 3,
+    "constituent_incidences": 1946,
+    "constituent_paths": 1946,
+    "constituent_pins": 1946,
+    "constituent_transport_terms": 1946,
+    "live_lineages": 0,
+    "rest_sha256": "13fce7aa6ec4a94d8b145776dbd031dc04ba074cecd983270b021f1274bf90b2",
+    "standing_cells": 36,
+    "standing_constituents": 1,
+    "standing_rank": 6
+  },
+  "observation_id": "eros-holonic-constituent-ecology-01",
+  "online_trajectory": [
+    {
+      "active_constituent_occurrences": [],
+      "active_fold_boundary_transitions": {},
+      "actual_consequence": "number:3",
+      "current_id": "symbolic-arithmetic-1-plus-2-a",
+      "event_ordinal": 0,
+      "expected_relation": "NONE",
+      "expected_relation_matched": true,
+      "inscription": "1+2",
+      "lower_carriers_departed": true,
+      "membership_residual": {
+        "carried_open_consequences": [
+          "number:3"
+        ],
+        "exact": true,
+        "expected_open_consequences": [
+          "number:3"
+        ],
+        "found_pins": 0
+      },
+      "outgoing_factor_exact": true,
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "arithmetic"
+      },
+      "physical_after": {
+        "constituent_cells": 3,
+        "constituent_incidences": 43,
+        "constituent_paths": 43,
+        "constituent_pins": 43,
+        "expected_outgoing_paths": 43,
+        "standing_constituents": 1
+      },
+      "prediction": {
+        "agreement_rank": null,
+        "distribution": [],
+        "support_faces": []
+      },
+      "relation": "NONE",
+      "successor": {
+        "addressable_higher_constituents": 0,
+        "consequence_species": 1,
+        "generation": 1,
+        "observed_spans": 6,
+        "receiver_fibers": 1
+      },
+      "transitions": [
+        {
+          "event": "meeting-0",
+          "regional_arcs": 21,
+          "returned_incidences": 21,
+          "returned_pins": 21,
+          "semantic_words": 20,
+          "wall_micros": 1091
+        },
+        {
+          "event": "prediction-0",
+          "regional_arcs": 29,
+          "returned_incidences": 71,
+          "returned_pins": 71,
+          "semantic_words": 2,
+          "wall_micros": 3309
+        },
+        {
+          "event": "actual-0",
+          "regional_arcs": 10,
+          "returned_incidences": 87,
+          "returned_pins": 87,
+          "semantic_words": 3,
+          "wall_micros": 3300
+        },
+        {
+          "event": "successor-0",
+          "regional_arcs": 50,
+          "returned_incidences": 43,
+          "returned_pins": 43,
+          "semantic_words": 41,
+          "wall_micros": 6778
+        }
+      ]
+    },
+    {
+      "active_constituent_occurrences": [],
+      "active_fold_boundary_transitions": {},
+      "actual_consequence": "text:12",
+      "current_id": "symbolic-concatenate-1-plus-2-a",
+      "event_ordinal": 1,
+      "expected_relation": "OPEN_RESIDUAL",
+      "expected_relation_matched": true,
+      "inscription": "1+2",
+      "lower_carriers_departed": true,
+      "membership_residual": {
+        "carried_open_consequences": [
+          "number:3",
+          "text:12"
+        ],
+        "exact": true,
+        "expected_open_consequences": [
+          "number:3",
+          "text:12"
+        ],
+        "found_pins": 0
+      },
+      "outgoing_factor_exact": true,
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "concatenate"
+      },
+      "physical_after": {
+        "constituent_cells": 3,
+        "constituent_incidences": 92,
+        "constituent_paths": 92,
+        "constituent_pins": 92,
+        "expected_outgoing_paths": 92,
+        "standing_constituents": 1
+      },
+      "prediction": {
+        "agreement_rank": 1,
+        "distribution": [
+          {
+            "consequence": "number:3",
+            "count": 1,
+            "quotient": "1"
+          }
+        ],
+        "support_faces": [
+          {
+            "distribution": [
+              {
+                "consequence": "number:3",
+                "count": 1,
+                "quotient": "1"
+              }
+            ],
+            "equal_axes": [
+              "medium"
+            ],
+            "parameters": {
+              "medium": "symbolic",
+              "objective": "arithmetic"
+            }
+          }
+        ]
+      },
+      "relation": "OPEN_RESIDUAL",
+      "successor": {
+        "addressable_higher_constituents": 3,
+        "consequence_species": 2,
+        "generation": 2,
+        "observed_spans": 6,
+        "receiver_fibers": 2
+      },
+      "transitions": [
+        {
+          "event": "meeting-1",
+          "regional_arcs": 22,
+          "returned_incidences": 65,
+          "returned_pins": 65,
+          "semantic_words": 20,
+          "wall_micros": 3327
+        },
+        {
+          "event": "prediction-1",
+          "regional_arcs": 74,
+          "returned_incidences": 202,
+          "returned_pins": 202,
+          "semantic_words": 5,
+          "wall_micros": 7911
+        },
+        {
+          "event": "actual-1",
+          "regional_arcs": 10,
+          "returned_incidences": 218,
+          "returned_pins": 218,
+          "semantic_words": 3,
+          "wall_micros": 7104
+        },
+        {
+          "event": "successor-1",
+          "regional_arcs": 103,
+          "returned_incidences": 92,
+          "returned_pins": 92,
+          "semantic_words": 86,
+          "wall_micros": 13467
+        }
+      ]
+    },
+    {
+      "active_constituent_occurrences": [],
+      "active_fold_boundary_transitions": {},
+      "actual_consequence": "number:3",
+      "current_id": "code-arithmetic-1-plus-2",
+      "event_ordinal": 2,
+      "expected_relation": "NONE",
+      "expected_relation_matched": true,
+      "inscription": "add(1,2)",
+      "lower_carriers_departed": true,
+      "membership_residual": {
+        "carried_open_consequences": [
+          "number:3"
+        ],
+        "exact": true,
+        "expected_open_consequences": [
+          "number:3"
+        ],
+        "found_pins": 0
+      },
+      "outgoing_factor_exact": true,
+      "parameters": {
+        "medium": "code",
+        "objective": "arithmetic"
+      },
+      "physical_after": {
+        "constituent_cells": 3,
+        "constituent_incidences": 208,
+        "constituent_paths": 208,
+        "constituent_pins": 208,
+        "expected_outgoing_paths": 208,
+        "standing_constituents": 1
+      },
+      "prediction": {
+        "agreement_rank": null,
+        "distribution": [],
+        "support_faces": []
+      },
+      "relation": "NONE",
+      "successor": {
+        "addressable_higher_constituents": 3,
+        "consequence_species": 2,
+        "generation": 3,
+        "observed_spans": 39,
+        "receiver_fibers": 3
+      },
+      "transitions": [
+        {
+          "event": "meeting-2",
+          "regional_arcs": 21,
+          "returned_incidences": 113,
+          "returned_pins": 113,
+          "semantic_words": 19,
+          "wall_micros": 5126
+        },
+        {
+          "event": "prediction-2",
+          "regional_arcs": 119,
+          "returned_incidences": 343,
+          "returned_pins": 343,
+          "semantic_words": 2,
+          "wall_micros": 13532
+        },
+        {
+          "event": "actual-2",
+          "regional_arcs": 10,
+          "returned_incidences": 359,
+          "returned_pins": 359,
+          "semantic_words": 3,
+          "wall_micros": 10852
+        },
+        {
+          "event": "successor-2",
+          "regional_arcs": 215,
+          "returned_incidences": 208,
+          "returned_pins": 208,
+          "semantic_words": 202,
+          "wall_micros": 27774
+        }
+      ]
+    },
+    {
+      "active_constituent_occurrences": [],
+      "active_fold_boundary_transitions": {},
+      "actual_consequence": "number:3",
+      "current_id": "language-arithmetic-1-plus-2",
+      "event_ordinal": 3,
+      "expected_relation": "NONE",
+      "expected_relation_matched": true,
+      "inscription": "one plus two",
+      "lower_carriers_departed": true,
+      "membership_residual": {
+        "carried_open_consequences": [
+          "number:3"
+        ],
+        "exact": true,
+        "expected_open_consequences": [
+          "number:3"
+        ],
+        "found_pins": 0
+      },
+      "outgoing_factor_exact": true,
+      "parameters": {
+        "medium": "language",
+        "objective": "arithmetic"
+      },
+      "physical_after": {
+        "constituent_cells": 3,
+        "constituent_incidences": 464,
+        "constituent_paths": 464,
+        "constituent_pins": 464,
+        "expected_outgoing_paths": 464,
+        "standing_constituents": 1
+      },
+      "prediction": {
+        "agreement_rank": null,
+        "distribution": [],
+        "support_faces": []
+      },
+      "relation": "NONE",
+      "successor": {
+        "addressable_higher_constituents": 3,
+        "consequence_species": 2,
+        "generation": 4,
+        "observed_spans": 115,
+        "receiver_fibers": 4
+      },
+      "transitions": [
+        {
+          "event": "meeting-3",
+          "regional_arcs": 23,
+          "returned_incidences": 231,
+          "returned_pins": 231,
+          "semantic_words": 21,
+          "wall_micros": 11517
+        },
+        {
+          "event": "prediction-3",
+          "regional_arcs": 237,
+          "returned_incidences": 697,
+          "returned_pins": 697,
+          "semantic_words": 2,
+          "wall_micros": 32521
+        },
+        {
+          "event": "actual-3",
+          "regional_arcs": 10,
+          "returned_incidences": 713,
+          "returned_pins": 713,
+          "semantic_words": 3,
+          "wall_micros": 20438
+        },
+        {
+          "event": "successor-3",
+          "regional_arcs": 471,
+          "returned_incidences": 464,
+          "returned_pins": 464,
+          "semantic_words": 458,
+          "wall_micros": 68058
+        }
+      ]
+    },
+    {
+      "active_constituent_occurrences": [
+        {
+          "expansion": "1+",
+          "presentations": [
+            {
+              "left": "1",
+              "right": "+"
+            }
+          ],
+          "source_interval": [
+            0,
+            2
+          ]
+        }
+      ],
+      "active_fold_boundary_transitions": {
+        "1+": {
+          "found": 0,
+          "open": 2,
+          "ride": 1
+        }
+      },
+      "actual_consequence": "number:4",
+      "current_id": "symbolic-arithmetic-1-plus-3",
+      "event_ordinal": 4,
+      "expected_relation": "NONE",
+      "expected_relation_matched": true,
+      "inscription": "1+3",
+      "lower_carriers_departed": true,
+      "membership_residual": {
+        "carried_open_consequences": [
+          "number:4"
+        ],
+        "exact": true,
+        "expected_open_consequences": [
+          "number:4"
+        ],
+        "found_pins": 0
+      },
+      "outgoing_factor_exact": true,
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "arithmetic"
+      },
+      "physical_after": {
+        "constituent_cells": 3,
+        "constituent_incidences": 491,
+        "constituent_paths": 491,
+        "constituent_pins": 491,
+        "expected_outgoing_paths": 491,
+        "standing_constituents": 1
+      },
+      "prediction": {
+        "agreement_rank": null,
+        "distribution": [],
+        "support_faces": []
+      },
+      "relation": "NONE",
+      "successor": {
+        "addressable_higher_constituents": 3,
+        "consequence_species": 3,
+        "generation": 5,
+        "observed_spans": 118,
+        "receiver_fibers": 5
+      },
+      "transitions": [
+        {
+          "event": "meeting-4",
+          "regional_arcs": 23,
+          "returned_incidences": 489,
+          "returned_pins": 489,
+          "semantic_words": 20,
+          "wall_micros": 30290
+        },
+        {
+          "event": "prediction-4",
+          "regional_arcs": 491,
+          "returned_incidences": 1463,
+          "returned_pins": 1463,
+          "semantic_words": 2,
+          "wall_micros": 81046
+        },
+        {
+          "event": "actual-4",
+          "regional_arcs": 10,
+          "returned_incidences": 1479,
+          "returned_pins": 1479,
+          "semantic_words": 3,
+          "wall_micros": 40607
+        },
+        {
+          "event": "successor-4",
+          "regional_arcs": 498,
+          "returned_incidences": 491,
+          "returned_pins": 491,
+          "semantic_words": 484,
+          "wall_micros": 99506
+        }
+      ]
+    },
+    {
+      "active_constituent_occurrences": [
+        {
+          "expansion": "1+",
+          "presentations": [
+            {
+              "left": "1",
+              "right": "+"
+            }
+          ],
+          "source_interval": [
+            0,
+            2
+          ]
+        }
+      ],
+      "active_fold_boundary_transitions": {
+        "1+": {
+          "found": 0,
+          "open": 2,
+          "ride": 1
+        }
+      },
+      "actual_consequence": "text:13",
+      "current_id": "symbolic-concatenate-1-plus-3",
+      "event_ordinal": 5,
+      "expected_relation": "OPEN_RESIDUAL",
+      "expected_relation_matched": true,
+      "inscription": "1+3",
+      "lower_carriers_departed": true,
+      "membership_residual": {
+        "carried_open_consequences": [
+          "number:4",
+          "text:13"
+        ],
+        "exact": true,
+        "expected_open_consequences": [
+          "number:4",
+          "text:13"
+        ],
+        "found_pins": 0
+      },
+      "outgoing_factor_exact": true,
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "concatenate"
+      },
+      "physical_after": {
+        "constituent_cells": 3,
+        "constituent_incidences": 531,
+        "constituent_paths": 531,
+        "constituent_pins": 531,
+        "expected_outgoing_paths": 531,
+        "standing_constituents": 1
+      },
+      "prediction": {
+        "agreement_rank": 1,
+        "distribution": [
+          {
+            "consequence": "number:4",
+            "count": 1,
+            "quotient": "1"
+          }
+        ],
+        "support_faces": [
+          {
+            "distribution": [
+              {
+                "consequence": "number:4",
+                "count": 1,
+                "quotient": "1"
+              }
+            ],
+            "equal_axes": [
+              "medium"
+            ],
+            "parameters": {
+              "medium": "symbolic",
+              "objective": "arithmetic"
+            }
+          }
+        ]
+      },
+      "relation": "OPEN_RESIDUAL",
+      "successor": {
+        "addressable_higher_constituents": 5,
+        "consequence_species": 4,
+        "generation": 6,
+        "observed_spans": 118,
+        "receiver_fibers": 6
+      },
+      "transitions": [
+        {
+          "event": "meeting-5",
+          "regional_arcs": 23,
+          "returned_incidences": 516,
+          "returned_pins": 516,
+          "semantic_words": 20,
+          "wall_micros": 32420
+        },
+        {
+          "event": "prediction-5",
+          "regional_arcs": 521,
+          "returned_incidences": 1547,
+          "returned_pins": 1547,
+          "semantic_words": 5,
+          "wall_micros": 89634
+        },
+        {
+          "event": "actual-5",
+          "regional_arcs": 10,
+          "returned_incidences": 1563,
+          "returned_pins": 1563,
+          "semantic_words": 3,
+          "wall_micros": 43522
+        },
+        {
+          "event": "successor-5",
+          "regional_arcs": 542,
+          "returned_incidences": 531,
+          "returned_pins": 531,
+          "semantic_words": 521,
+          "wall_micros": 107229
+        }
+      ]
+    },
+    {
+      "active_constituent_occurrences": [],
+      "active_fold_boundary_transitions": {},
+      "actual_consequence": "number:4",
+      "current_id": "code-arithmetic-1-plus-3",
+      "event_ordinal": 6,
+      "expected_relation": "NONE",
+      "expected_relation_matched": true,
+      "inscription": "add(1,3)",
+      "lower_carriers_departed": true,
+      "membership_residual": {
+        "carried_open_consequences": [
+          "number:4"
+        ],
+        "exact": true,
+        "expected_open_consequences": [
+          "number:4"
+        ],
+        "found_pins": 0
+      },
+      "outgoing_factor_exact": true,
+      "parameters": {
+        "medium": "code",
+        "objective": "arithmetic"
+      },
+      "physical_after": {
+        "constituent_cells": 3,
+        "constituent_incidences": 802,
+        "constituent_paths": 802,
+        "constituent_pins": 802,
+        "expected_outgoing_paths": 802,
+        "standing_constituents": 1
+      },
+      "prediction": {
+        "agreement_rank": null,
+        "distribution": [],
+        "support_faces": []
+      },
+      "relation": "NONE",
+      "successor": {
+        "addressable_higher_constituents": 20,
+        "consequence_species": 4,
+        "generation": 7,
+        "observed_spans": 131,
+        "receiver_fibers": 7
+      },
+      "transitions": [
+        {
+          "event": "meeting-6",
+          "regional_arcs": 21,
+          "returned_incidences": 552,
+          "returned_pins": 552,
+          "semantic_words": 19,
+          "wall_micros": 37372
+        },
+        {
+          "event": "prediction-6",
+          "regional_arcs": 558,
+          "returned_incidences": 1660,
+          "returned_pins": 1660,
+          "semantic_words": 2,
+          "wall_micros": 99034
+        },
+        {
+          "event": "actual-6",
+          "regional_arcs": 10,
+          "returned_incidences": 1676,
+          "returned_pins": 1676,
+          "semantic_words": 3,
+          "wall_micros": 46356
+        },
+        {
+          "event": "successor-6",
+          "regional_arcs": 809,
+          "returned_incidences": 802,
+          "returned_pins": 802,
+          "semantic_words": 777,
+          "wall_micros": 151430
+        }
+      ]
+    },
+    {
+      "active_constituent_occurrences": [],
+      "active_fold_boundary_transitions": {},
+      "actual_consequence": "number:4",
+      "current_id": "language-arithmetic-1-plus-3",
+      "event_ordinal": 7,
+      "expected_relation": "NONE",
+      "expected_relation_matched": true,
+      "inscription": "one plus three",
+      "lower_carriers_departed": true,
+      "membership_residual": {
+        "carried_open_consequences": [
+          "number:4"
+        ],
+        "exact": true,
+        "expected_open_consequences": [
+          "number:4"
+        ],
+        "found_pins": 0
+      },
+      "outgoing_factor_exact": true,
+      "parameters": {
+        "medium": "language",
+        "objective": "arithmetic"
+      },
+      "physical_after": {
+        "constituent_cells": 3,
+        "constituent_incidences": 1872,
+        "constituent_paths": 1872,
+        "constituent_pins": 1872,
+        "expected_outgoing_paths": 1872,
+        "standing_constituents": 1
+      },
+      "prediction": {
+        "agreement_rank": null,
+        "distribution": [],
+        "support_faces": []
+      },
+      "relation": "NONE",
+      "successor": {
+        "addressable_higher_constituents": 65,
+        "consequence_species": 4,
+        "generation": 8,
+        "observed_spans": 179,
+        "receiver_fibers": 8
+      },
+      "transitions": [
+        {
+          "event": "meeting-7",
+          "regional_arcs": 23,
+          "returned_incidences": 825,
+          "returned_pins": 825,
+          "semantic_words": 21,
+          "wall_micros": 66522
+        },
+        {
+          "event": "prediction-7",
+          "regional_arcs": 831,
+          "returned_incidences": 2479,
+          "returned_pins": 2479,
+          "semantic_words": 2,
+          "wall_micros": 176001
+        },
+        {
+          "event": "actual-7",
+          "regional_arcs": 10,
+          "returned_incidences": 2495,
+          "returned_pins": 2495,
+          "semantic_words": 3,
+          "wall_micros": 69442
+        },
+        {
+          "event": "successor-7",
+          "regional_arcs": 1879,
+          "returned_incidences": 1872,
+          "returned_pins": 1872,
+          "semantic_words": 1802,
+          "wall_micros": 457502
+        }
+      ]
+    },
+    {
+      "active_constituent_occurrences": [
+        {
+          "expansion": "+2",
+          "presentations": [
+            {
+              "left": "+",
+              "right": "2"
+            }
+          ],
+          "source_interval": [
+            1,
+            3
+          ]
+        }
+      ],
+      "active_fold_boundary_transitions": {
+        "+2": {
+          "found": 0,
+          "open": 2,
+          "ride": 1
+        }
+      },
+      "actual_consequence": "number:4",
+      "current_id": "symbolic-arithmetic-2-plus-2",
+      "event_ordinal": 8,
+      "expected_relation": "NONE",
+      "expected_relation_matched": true,
+      "inscription": "2+2",
+      "lower_carriers_departed": true,
+      "membership_residual": {
+        "carried_open_consequences": [
+          "number:4"
+        ],
+        "exact": true,
+        "expected_open_consequences": [
+          "number:4"
+        ],
+        "found_pins": 0
+      },
+      "outgoing_factor_exact": true,
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "arithmetic"
+      },
+      "physical_after": {
+        "constituent_cells": 3,
+        "constituent_incidences": 1895,
+        "constituent_paths": 1895,
+        "constituent_pins": 1895,
+        "expected_outgoing_paths": 1895,
+        "standing_constituents": 1
+      },
+      "prediction": {
+        "agreement_rank": null,
+        "distribution": [],
+        "support_faces": []
+      },
+      "relation": "NONE",
+      "successor": {
+        "addressable_higher_constituents": 65,
+        "consequence_species": 4,
+        "generation": 9,
+        "observed_spans": 181,
+        "receiver_fibers": 9
+      },
+      "transitions": [
+        {
+          "event": "meeting-8",
+          "regional_arcs": 23,
+          "returned_incidences": 1897,
+          "returned_pins": 1897,
+          "semantic_words": 20,
+          "wall_micros": 269131
+        },
+        {
+          "event": "prediction-8",
+          "regional_arcs": 1899,
+          "returned_incidences": 5687,
+          "returned_pins": 5687,
+          "semantic_words": 2,
+          "wall_micros": 697744
+        },
+        {
+          "event": "actual-8",
+          "regional_arcs": 10,
+          "returned_incidences": 5703,
+          "returned_pins": 5703,
+          "semantic_words": 3,
+          "wall_micros": 157439
+        },
+        {
+          "event": "successor-8",
+          "regional_arcs": 1902,
+          "returned_incidences": 1895,
+          "returned_pins": 1895,
+          "semantic_words": 1825,
+          "wall_micros": 652922
+        }
+      ]
+    },
+    {
+      "active_constituent_occurrences": [
+        {
+          "expansion": "+2",
+          "presentations": [
+            {
+              "left": "+",
+              "right": "2"
+            }
+          ],
+          "source_interval": [
+            1,
+            3
+          ]
+        }
+      ],
+      "active_fold_boundary_transitions": {
+        "+2": {
+          "found": 0,
+          "open": 2,
+          "ride": 1
+        }
+      },
+      "actual_consequence": "text:22",
+      "current_id": "symbolic-concatenate-2-plus-2",
+      "event_ordinal": 9,
+      "expected_relation": "OPEN_RESIDUAL",
+      "expected_relation_matched": true,
+      "inscription": "2+2",
+      "lower_carriers_departed": true,
+      "membership_residual": {
+        "carried_open_consequences": [
+          "number:4",
+          "text:22"
+        ],
+        "exact": true,
+        "expected_open_consequences": [
+          "number:4",
+          "text:22"
+        ],
+        "found_pins": 0
+      },
+      "outgoing_factor_exact": true,
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "concatenate"
+      },
+      "physical_after": {
+        "constituent_cells": 3,
+        "constituent_incidences": 1935,
+        "constituent_paths": 1935,
+        "constituent_pins": 1935,
+        "expected_outgoing_paths": 1935,
+        "standing_constituents": 1
+      },
+      "prediction": {
+        "agreement_rank": 1,
+        "distribution": [
+          {
+            "consequence": "number:4",
+            "count": 1,
+            "quotient": "1"
+          }
+        ],
+        "support_faces": [
+          {
+            "distribution": [
+              {
+                "consequence": "number:4",
+                "count": 1,
+                "quotient": "1"
+              }
+            ],
+            "equal_axes": [
+              "medium"
+            ],
+            "parameters": {
+              "medium": "symbolic",
+              "objective": "arithmetic"
+            }
+          }
+        ]
+      },
+      "relation": "OPEN_RESIDUAL",
+      "successor": {
+        "addressable_higher_constituents": 67,
+        "consequence_species": 5,
+        "generation": 10,
+        "observed_spans": 181,
+        "receiver_fibers": 10
+      },
+      "transitions": [
+        {
+          "event": "meeting-9",
+          "regional_arcs": 23,
+          "returned_incidences": 1920,
+          "returned_pins": 1920,
+          "semantic_words": 20,
+          "wall_micros": 275369
+        },
+        {
+          "event": "prediction-9",
+          "regional_arcs": 1925,
+          "returned_incidences": 5759,
+          "returned_pins": 5759,
+          "semantic_words": 5,
+          "wall_micros": 712815
+        },
+        {
+          "event": "actual-9",
+          "regional_arcs": 10,
+          "returned_incidences": 5775,
+          "returned_pins": 5775,
+          "semantic_words": 3,
+          "wall_micros": 157941
+        },
+        {
+          "event": "successor-9",
+          "regional_arcs": 1946,
+          "returned_incidences": 1935,
+          "returned_pins": 1935,
+          "semantic_words": 1862,
+          "wall_micros": 666684
+        }
+      ]
+    },
+    {
+      "active_constituent_occurrences": [
+        {
+          "expansion": "1+",
+          "presentations": [
+            {
+              "left": "1",
+              "right": "+"
+            }
+          ],
+          "source_interval": [
+            0,
+            2
+          ]
+        },
+        {
+          "expansion": "1+2",
+          "presentations": [
+            {
+              "left": "1",
+              "right": "+2"
+            },
+            {
+              "left": "1+",
+              "right": "2"
+            }
+          ],
+          "source_interval": [
+            0,
+            3
+          ]
+        },
+        {
+          "expansion": "+2",
+          "presentations": [
+            {
+              "left": "+",
+              "right": "2"
+            }
+          ],
+          "source_interval": [
+            1,
+            3
+          ]
+        }
+      ],
+      "active_fold_boundary_transitions": {
+        "+2": {
+          "found": 0,
+          "open": 2,
+          "ride": 1
+        },
+        "1+": {
+          "found": 0,
+          "open": 2,
+          "ride": 1
+        },
+        "1+2": {
+          "found": 0,
+          "open": 2,
+          "ride": 1
+        }
+      },
+      "actual_consequence": "number:3",
+      "current_id": "symbolic-arithmetic-1-plus-2-b",
+      "event_ordinal": 10,
+      "expected_relation": "RIDE",
+      "expected_relation_matched": true,
+      "inscription": "1+2",
+      "lower_carriers_departed": true,
+      "membership_residual": {
+        "carried_open_consequences": [],
+        "exact": true,
+        "expected_open_consequences": [],
+        "found_pins": 0
+      },
+      "outgoing_factor_exact": true,
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "arithmetic"
+      },
+      "physical_after": {
+        "constituent_cells": 3,
+        "constituent_incidences": 1935,
+        "constituent_paths": 1935,
+        "constituent_pins": 1935,
+        "expected_outgoing_paths": 1935,
+        "standing_constituents": 1
+      },
+      "prediction": {
+        "agreement_rank": 2,
+        "distribution": [
+          {
+            "consequence": "number:3",
+            "count": 1,
+            "quotient": "1"
+          }
+        ],
+        "support_faces": [
+          {
+            "distribution": [
+              {
+                "consequence": "number:3",
+                "count": 1,
+                "quotient": "1"
+              }
+            ],
+            "equal_axes": [
+              "medium",
+              "objective"
+            ],
+            "parameters": {
+              "medium": "symbolic",
+              "objective": "arithmetic"
+            }
+          }
+        ]
+      },
+      "relation": "RIDE",
+      "successor": {
+        "addressable_higher_constituents": 67,
+        "consequence_species": 5,
+        "generation": 11,
+        "observed_spans": 181,
+        "receiver_fibers": 10
+      },
+      "transitions": [
+        {
+          "event": "meeting-10",
+          "regional_arcs": 25,
+          "returned_incidences": 1964,
+          "returned_pins": 1964,
+          "semantic_words": 20,
+          "wall_micros": 291971
+        },
+        {
+          "event": "prediction-10",
+          "regional_arcs": 1963,
+          "returned_incidences": 5879,
+          "returned_pins": 5879,
+          "semantic_words": 5,
+          "wall_micros": 738087
+        },
+        {
+          "event": "actual-10",
+          "regional_arcs": 10,
+          "returned_incidences": 5895,
+          "returned_pins": 5895,
+          "semantic_words": 3,
+          "wall_micros": 162558
+        },
+        {
+          "event": "successor-10",
+          "regional_arcs": 1944,
+          "returned_incidences": 1935,
+          "returned_pins": 1935,
+          "semantic_words": 1862,
+          "wall_micros": 676470
+        }
+      ]
+    },
+    {
+      "active_constituent_occurrences": [
+        {
+          "expansion": "1+",
+          "presentations": [
+            {
+              "left": "1",
+              "right": "+"
+            }
+          ],
+          "source_interval": [
+            0,
+            2
+          ]
+        },
+        {
+          "expansion": "1+2",
+          "presentations": [
+            {
+              "left": "1",
+              "right": "+2"
+            },
+            {
+              "left": "1+",
+              "right": "2"
+            }
+          ],
+          "source_interval": [
+            0,
+            3
+          ]
+        },
+        {
+          "expansion": "+2",
+          "presentations": [
+            {
+              "left": "+",
+              "right": "2"
+            }
+          ],
+          "source_interval": [
+            1,
+            3
+          ]
+        }
+      ],
+      "active_fold_boundary_transitions": {
+        "+2": {
+          "found": 0,
+          "open": 2,
+          "ride": 1
+        },
+        "1+": {
+          "found": 0,
+          "open": 2,
+          "ride": 1
+        },
+        "1+2": {
+          "found": 0,
+          "open": 2,
+          "ride": 1
+        }
+      },
+      "actual_consequence": "text:12",
+      "current_id": "symbolic-concatenate-1-plus-2-b",
+      "event_ordinal": 11,
+      "expected_relation": "RIDE",
+      "expected_relation_matched": true,
+      "inscription": "1+2",
+      "lower_carriers_departed": true,
+      "membership_residual": {
+        "carried_open_consequences": [],
+        "exact": true,
+        "expected_open_consequences": [],
+        "found_pins": 0
+      },
+      "outgoing_factor_exact": true,
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "concatenate"
+      },
+      "physical_after": {
+        "constituent_cells": 3,
+        "constituent_incidences": 1935,
+        "constituent_paths": 1935,
+        "constituent_pins": 1935,
+        "expected_outgoing_paths": 1935,
+        "standing_constituents": 1
+      },
+      "prediction": {
+        "agreement_rank": 2,
+        "distribution": [
+          {
+            "consequence": "text:12",
+            "count": 1,
+            "quotient": "1"
+          }
+        ],
+        "support_faces": [
+          {
+            "distribution": [
+              {
+                "consequence": "text:12",
+                "count": 1,
+                "quotient": "1"
+              }
+            ],
+            "equal_axes": [
+              "medium",
+              "objective"
+            ],
+            "parameters": {
+              "medium": "symbolic",
+              "objective": "concatenate"
+            }
+          }
+        ]
+      },
+      "relation": "RIDE",
+      "successor": {
+        "addressable_higher_constituents": 67,
+        "consequence_species": 5,
+        "generation": 12,
+        "observed_spans": 181,
+        "receiver_fibers": 10
+      },
+      "transitions": [
+        {
+          "event": "meeting-11",
+          "regional_arcs": 25,
+          "returned_incidences": 1964,
+          "returned_pins": 1964,
+          "semantic_words": 20,
+          "wall_micros": 285945
+        },
+        {
+          "event": "prediction-11",
+          "regional_arcs": 1963,
+          "returned_incidences": 5879,
+          "returned_pins": 5879,
+          "semantic_words": 5,
+          "wall_micros": 744730
+        },
+        {
+          "event": "actual-11",
+          "regional_arcs": 10,
+          "returned_incidences": 5895,
+          "returned_pins": 5895,
+          "semantic_words": 3,
+          "wall_micros": 174539
+        },
+        {
+          "event": "successor-11",
+          "regional_arcs": 1944,
+          "returned_incidences": 1935,
+          "returned_pins": 1935,
+          "semantic_words": 1862,
+          "wall_micros": 683690
+        }
+      ]
+    },
+    {
+      "active_constituent_occurrences": [
+        {
+          "expansion": "1+",
+          "presentations": [
+            {
+              "left": "1",
+              "right": "+"
+            }
+          ],
+          "source_interval": [
+            0,
+            2
+          ]
+        },
+        {
+          "expansion": "1+2",
+          "presentations": [
+            {
+              "left": "1",
+              "right": "+2"
+            },
+            {
+              "left": "1+",
+              "right": "2"
+            }
+          ],
+          "source_interval": [
+            0,
+            3
+          ]
+        },
+        {
+          "expansion": "+2",
+          "presentations": [
+            {
+              "left": "+",
+              "right": "2"
+            }
+          ],
+          "source_interval": [
+            1,
+            3
+          ]
+        }
+      ],
+      "active_fold_boundary_transitions": {
+        "+2": {
+          "found": 0,
+          "open": 2,
+          "ride": 1
+        },
+        "1+": {
+          "found": 0,
+          "open": 2,
+          "ride": 1
+        },
+        "1+2": {
+          "found": 0,
+          "open": 2,
+          "ride": 1
+        }
+      },
+      "actual_consequence": "number:3",
+      "current_id": "symbolic-partial-1-plus-2",
+      "event_ordinal": 12,
+      "expected_relation": "OPEN_INCLUDED",
+      "expected_relation_matched": true,
+      "inscription": "1+2",
+      "lower_carriers_departed": true,
+      "membership_residual": {
+        "carried_open_consequences": [
+          "text:12"
+        ],
+        "exact": true,
+        "expected_open_consequences": [
+          "text:12"
+        ],
+        "found_pins": 0
+      },
+      "outgoing_factor_exact": true,
+      "parameters": {
+        "medium": "symbolic"
+      },
+      "physical_after": {
+        "constituent_cells": 3,
+        "constituent_incidences": 1946,
+        "constituent_paths": 1946,
+        "constituent_pins": 1946,
+        "expected_outgoing_paths": 1946,
+        "standing_constituents": 1
+      },
+      "prediction": {
+        "agreement_rank": 1,
+        "distribution": [
+          {
+            "consequence": "number:3",
+            "count": 2,
+            "quotient": "1/2"
+          },
+          {
+            "consequence": "text:12",
+            "count": 2,
+            "quotient": "1/2"
+          }
+        ],
+        "support_faces": [
+          {
+            "distribution": [
+              {
+                "consequence": "number:3",
+                "count": 2,
+                "quotient": "1"
+              }
+            ],
+            "equal_axes": [
+              "medium"
+            ],
+            "parameters": {
+              "medium": "symbolic",
+              "objective": "arithmetic"
+            }
+          },
+          {
+            "distribution": [
+              {
+                "consequence": "text:12",
+                "count": 2,
+                "quotient": "1"
+              }
+            ],
+            "equal_axes": [
+              "medium"
+            ],
+            "parameters": {
+              "medium": "symbolic",
+              "objective": "concatenate"
+            }
+          }
+        ]
+      },
+      "relation": "OPEN_INCLUDED",
+      "successor": {
+        "addressable_higher_constituents": 67,
+        "consequence_species": 5,
+        "generation": 13,
+        "observed_spans": 181,
+        "receiver_fibers": 11
+      },
+      "transitions": [
+        {
+          "event": "meeting-12",
+          "regional_arcs": 19,
+          "returned_incidences": 1958,
+          "returned_pins": 1958,
+          "semantic_words": 14,
+          "wall_micros": 282909
+        },
+        {
+          "event": "prediction-12",
+          "regional_arcs": 1960,
+          "returned_incidences": 5864,
+          "returned_pins": 5864,
+          "semantic_words": 8,
+          "wall_micros": 733303
+        },
+        {
+          "event": "actual-12",
+          "regional_arcs": 10,
+          "returned_incidences": 5880,
+          "returned_pins": 5880,
+          "semantic_words": 3,
+          "wall_micros": 163601
+        },
+        {
+          "event": "successor-12",
+          "regional_arcs": 1959,
+          "returned_incidences": 1946,
+          "returned_pins": 1946,
+          "semantic_words": 1873,
+          "wall_micros": 671910
+        }
+      ]
+    }
+  ],
+  "physical_execution": {
+    "accepted_report_writes": 1,
+    "cuda_launches": 0,
+    "developmental_stops_before_acceptance": 5,
+    "executor": "ParallelHostLiveCurrentExecutor",
+    "host_threads": 8,
+    "machine_transitions_per_training_event": 4,
+    "semantic_training_events": 13,
+    "source_fixture_changes_after_first_physical_attempt": 0
+  },
+  "question": "Can world-supplied exact base occurrences cultivate reversible higher-grain constituents, plural overlapping folds, receiver-relative consequence fibers, and source-absent later conduct without a transformer, vector embedding, scalar attention score, floating weight, or classical quantization?",
+  "relation_counts": {
+    "NONE": 7,
+    "OPEN_INCLUDED": 1,
+    "OPEN_RESIDUAL": 3,
+    "RIDE": 2
+  },
+  "required_overlap": {
+    "expansion": "1+2",
+    "presentations_carried": [
+      {
+        "left": "1",
+        "right": "+2"
+      },
+      {
+        "left": "1+",
+        "right": "2"
+      }
+    ],
+    "presentations_required": [
+      [
+        "1+",
+        "2"
+      ],
+      [
+        "1",
+        "+2"
+      ]
+    ],
+    "preserved": true
+  },
+  "run_wall_micros": 20847502,
+  "schema": "eros.holonic-constituent-ecology.report.v1",
+  "shared_consequence": {
+    "consequence": "number:3",
+    "crossed_nonidentical_inscriptions": true,
+    "faces": [
+      {
+        "inscription": "1+2",
+        "parameters": {
+          "medium": "symbolic"
+        },
+        "recurrence": 1
+      },
+      {
+        "inscription": "1+2",
+        "parameters": {
+          "medium": "symbolic",
+          "objective": "arithmetic"
+        },
+        "recurrence": 2
+      },
+      {
+        "inscription": "add(1,2)",
+        "parameters": {
+          "medium": "code",
+          "objective": "arithmetic"
+        },
+        "recurrence": 1
+      },
+      {
+        "inscription": "one plus two",
+        "parameters": {
+          "medium": "language",
+          "objective": "arithmetic"
+        },
+        "recurrence": 1
+      }
+    ],
+    "required_inscriptions": [
+      "1+2",
+      "add(1,2)",
+      "one plus two"
+    ]
+  },
+  "source": {
+    "base_carrier": {
+      "bounded_alphabet": "ASCII",
+      "identity": "exact octet value at an ordered source occurrence",
+      "species": "source-supplied UTF-8 octets"
+    },
+    "consequence_species": [
+      "number:3",
+      "number:4",
+      "text:12",
+      "text:13",
+      "text:22"
+    ],
+    "events": 13,
+    "lambda": {
+      "fold_law": "An adjacent binary composition becomes an addressable constituent after two exact occurrences. Every valid binary presentation remains plural.",
+      "minimum_recurrence": 2,
+      "parameter_axes": [
+        "medium",
+        "objective"
+      ],
+      "receiver_law": "Among prior faces of the identical inscription, retain every face with maximal exact parameter agreement. Returned consequence changes the successor afterward.",
+      "reduction_law": "Aggregate exact recurrence, share identical expansions, retain competing presentations and contextual consequence fibers, and emit only the future-contact boundary."
+    },
+    "sha256": "aa14a6256cab061863e7d1d404b22c4572e5528408409e7ac5b2b94e27d1b897"
+  },
+  "source_absent_probes": [
+    {
+      "accepted": true,
+      "active_constituent_occurrences": [
+        {
+          "expansion": "1+",
+          "presentations": [
+            {
+              "left": "1",
+              "right": "+"
+            }
+          ],
+          "source_interval": [
+            0,
+            2
+          ]
+        },
+        {
+          "expansion": "1+2",
+          "presentations": [
+            {
+              "left": "1",
+              "right": "+2"
+            },
+            {
+              "left": "1+",
+              "right": "2"
+            }
+          ],
+          "source_interval": [
+            0,
+            3
+          ]
+        },
+        {
+          "expansion": "+2",
+          "presentations": [
+            {
+              "left": "+",
+              "right": "2"
+            }
+          ],
+          "source_interval": [
+            1,
+            3
+          ]
+        }
+      ],
+      "active_fold_boundary_transitions": {
+        "+2": {
+          "found": 0,
+          "open": 2,
+          "ride": 1
+        },
+        "1+": {
+          "found": 0,
+          "open": 2,
+          "ride": 1
+        },
+        "1+2": {
+          "found": 0,
+          "open": 2,
+          "ride": 1
+        }
+      },
+      "id": "known-symbolic-arithmetic",
+      "inscription": "1+2",
+      "kind": "inscription",
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "arithmetic"
+      },
+      "prediction": {
+        "agreement_rank": 2,
+        "distribution": [
+          {
+            "consequence": "number:3",
+            "count": 2,
+            "quotient": "1"
+          }
+        ],
+        "support_faces": [
+          {
+            "distribution": [
+              {
+                "consequence": "number:3",
+                "count": 2,
+                "quotient": "1"
+              }
+            ],
+            "equal_axes": [
+              "medium",
+              "objective"
+            ],
+            "parameters": {
+              "medium": "symbolic",
+              "objective": "arithmetic"
+            }
+          }
+        ]
+      },
+      "required_active_folds": [
+        "+2",
+        "1+",
+        "1+2"
+      ],
+      "source_and_actual_consequence_absent": true,
+      "transition": {
+        "event": "probe-known-symbolic-arithmetic",
+        "regional_arcs": 25,
+        "returned_incidences": 1975,
+        "returned_pins": 1975,
+        "semantic_words": 20,
+        "wall_micros": 294837
+      }
+    },
+    {
+      "accepted": true,
+      "active_constituent_occurrences": [
+        {
+          "expansion": "1+",
+          "presentations": [
+            {
+              "left": "1",
+              "right": "+"
+            }
+          ],
+          "source_interval": [
+            0,
+            2
+          ]
+        },
+        {
+          "expansion": "1+2",
+          "presentations": [
+            {
+              "left": "1",
+              "right": "+2"
+            },
+            {
+              "left": "1+",
+              "right": "2"
+            }
+          ],
+          "source_interval": [
+            0,
+            3
+          ]
+        },
+        {
+          "expansion": "+2",
+          "presentations": [
+            {
+              "left": "+",
+              "right": "2"
+            }
+          ],
+          "source_interval": [
+            1,
+            3
+          ]
+        }
+      ],
+      "active_fold_boundary_transitions": {
+        "+2": {
+          "found": 0,
+          "open": 2,
+          "ride": 1
+        },
+        "1+": {
+          "found": 0,
+          "open": 2,
+          "ride": 1
+        },
+        "1+2": {
+          "found": 0,
+          "open": 2,
+          "ride": 1
+        }
+      },
+      "id": "known-symbolic-concatenate",
+      "inscription": "1+2",
+      "kind": "inscription",
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "concatenate"
+      },
+      "prediction": {
+        "agreement_rank": 2,
+        "distribution": [
+          {
+            "consequence": "text:12",
+            "count": 2,
+            "quotient": "1"
+          }
+        ],
+        "support_faces": [
+          {
+            "distribution": [
+              {
+                "consequence": "text:12",
+                "count": 2,
+                "quotient": "1"
+              }
+            ],
+            "equal_axes": [
+              "medium",
+              "objective"
+            ],
+            "parameters": {
+              "medium": "symbolic",
+              "objective": "concatenate"
+            }
+          }
+        ]
+      },
+      "required_active_folds": [
+        "+2",
+        "1+",
+        "1+2"
+      ],
+      "source_and_actual_consequence_absent": true,
+      "transition": {
+        "event": "probe-known-symbolic-concatenate",
+        "regional_arcs": 25,
+        "returned_incidences": 1975,
+        "returned_pins": 1975,
+        "semantic_words": 20,
+        "wall_micros": 290937
+      }
+    },
+    {
+      "accepted": true,
+      "active_constituent_occurrences": [
+        {
+          "expansion": "1+",
+          "presentations": [
+            {
+              "left": "1",
+              "right": "+"
+            }
+          ],
+          "source_interval": [
+            0,
+            2
+          ]
+        },
+        {
+          "expansion": "1+2",
+          "presentations": [
+            {
+              "left": "1",
+              "right": "+2"
+            },
+            {
+              "left": "1+",
+              "right": "2"
+            }
+          ],
+          "source_interval": [
+            0,
+            3
+          ]
+        },
+        {
+          "expansion": "+2",
+          "presentations": [
+            {
+              "left": "+",
+              "right": "2"
+            }
+          ],
+          "source_interval": [
+            1,
+            3
+          ]
+        }
+      ],
+      "active_fold_boundary_transitions": {
+        "+2": {
+          "found": 0,
+          "open": 2,
+          "ride": 1
+        },
+        "1+": {
+          "found": 0,
+          "open": 2,
+          "ride": 1
+        },
+        "1+2": {
+          "found": 0,
+          "open": 2,
+          "ride": 1
+        }
+      },
+      "id": "partial-symbolic-receiver",
+      "inscription": "1+2",
+      "kind": "inscription",
+      "parameters": {
+        "medium": "symbolic"
+      },
+      "prediction": {
+        "agreement_rank": 1,
+        "distribution": [
+          {
+            "consequence": "number:3",
+            "count": 3,
+            "quotient": "3/5"
+          },
+          {
+            "consequence": "text:12",
+            "count": 2,
+            "quotient": "2/5"
+          }
+        ],
+        "support_faces": [
+          {
+            "distribution": [
+              {
+                "consequence": "number:3",
+                "count": 1,
+                "quotient": "1"
+              }
+            ],
+            "equal_axes": [
+              "medium"
+            ],
+            "parameters": {
+              "medium": "symbolic"
+            }
+          },
+          {
+            "distribution": [
+              {
+                "consequence": "number:3",
+                "count": 2,
+                "quotient": "1"
+              }
+            ],
+            "equal_axes": [
+              "medium"
+            ],
+            "parameters": {
+              "medium": "symbolic",
+              "objective": "arithmetic"
+            }
+          },
+          {
+            "distribution": [
+              {
+                "consequence": "text:12",
+                "count": 2,
+                "quotient": "1"
+              }
+            ],
+            "equal_axes": [
+              "medium"
+            ],
+            "parameters": {
+              "medium": "symbolic",
+              "objective": "concatenate"
+            }
+          }
+        ]
+      },
+      "required_active_folds": [
+        "+2",
+        "1+",
+        "1+2"
+      ],
+      "source_and_actual_consequence_absent": true,
+      "transition": {
+        "event": "probe-partial-symbolic-receiver",
+        "regional_arcs": 19,
+        "returned_incidences": 1969,
+        "returned_pins": 1969,
+        "semantic_words": 14,
+        "wall_micros": 288677
+      }
+    },
+    {
+      "accepted": true,
+      "active_constituent_occurrences": [
+        {
+          "expansion": "1+",
+          "presentations": [
+            {
+              "left": "1",
+              "right": "+"
+            }
+          ],
+          "source_interval": [
+            0,
+            2
+          ]
+        },
+        {
+          "expansion": "1+2",
+          "presentations": [
+            {
+              "left": "1",
+              "right": "+2"
+            },
+            {
+              "left": "1+",
+              "right": "2"
+            }
+          ],
+          "source_interval": [
+            0,
+            3
+          ]
+        },
+        {
+          "expansion": "+2",
+          "presentations": [
+            {
+              "left": "+",
+              "right": "2"
+            }
+          ],
+          "source_interval": [
+            1,
+            3
+          ]
+        }
+      ],
+      "active_fold_boundary_transitions": {
+        "+2": {
+          "found": 0,
+          "open": 2,
+          "ride": 1
+        },
+        "1+": {
+          "found": 0,
+          "open": 2,
+          "ride": 1
+        },
+        "1+2": {
+          "found": 0,
+          "open": 2,
+          "ride": 1
+        }
+      },
+      "id": "unparameterized-path",
+      "inscription": "1+2",
+      "kind": "inscription",
+      "parameters": {},
+      "prediction": {
+        "agreement_rank": 0,
+        "distribution": [
+          {
+            "consequence": "number:3",
+            "count": 3,
+            "quotient": "3/5"
+          },
+          {
+            "consequence": "text:12",
+            "count": 2,
+            "quotient": "2/5"
+          }
+        ],
+        "support_faces": [
+          {
+            "distribution": [
+              {
+                "consequence": "number:3",
+                "count": 1,
+                "quotient": "1"
+              }
+            ],
+            "equal_axes": [],
+            "parameters": {
+              "medium": "symbolic"
+            }
+          },
+          {
+            "distribution": [
+              {
+                "consequence": "number:3",
+                "count": 2,
+                "quotient": "1"
+              }
+            ],
+            "equal_axes": [],
+            "parameters": {
+              "medium": "symbolic",
+              "objective": "arithmetic"
+            }
+          },
+          {
+            "distribution": [
+              {
+                "consequence": "text:12",
+                "count": 2,
+                "quotient": "1"
+              }
+            ],
+            "equal_axes": [],
+            "parameters": {
+              "medium": "symbolic",
+              "objective": "concatenate"
+            }
+          }
+        ]
+      },
+      "required_active_folds": [
+        "+2",
+        "1+",
+        "1+2"
+      ],
+      "source_and_actual_consequence_absent": true,
+      "transition": {
+        "event": "probe-unparameterized-path",
+        "regional_arcs": 15,
+        "returned_incidences": 1965,
+        "returned_pins": 1965,
+        "semantic_words": 10,
+        "wall_micros": 285057
+      }
+    },
+    {
+      "accepted": true,
+      "active_constituent_occurrences": [
+        {
+          "expansion": "1+",
+          "presentations": [
+            {
+              "left": "1",
+              "right": "+"
+            }
+          ],
+          "source_interval": [
+            0,
+            2
+          ]
+        }
+      ],
+      "active_fold_boundary_transitions": {
+        "1+": {
+          "found": 0,
+          "open": 2,
+          "ride": 1
+        }
+      },
+      "id": "known-grain-unknown-consequence",
+      "inscription": "1+4",
+      "kind": "inscription",
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "arithmetic"
+      },
+      "prediction": {
+        "agreement_rank": null,
+        "distribution": [],
+        "support_faces": []
+      },
+      "required_active_folds": [
+        "1+"
+      ],
+      "source_and_actual_consequence_absent": true,
+      "transition": {
+        "event": "probe-known-grain-unknown-consequence",
+        "regional_arcs": 24,
+        "returned_incidences": 1972,
+        "returned_pins": 1972,
+        "semantic_words": 21,
+        "wall_micros": 288931
+      }
+    },
+    {
+      "accepted": true,
+      "boundary_transition": {
+        "found": 0,
+        "open": 2,
+        "ride": 1
+      },
+      "consequence": "number:3",
+      "faces": [
+        {
+          "inscription": "1+2",
+          "parameters": {
+            "medium": "symbolic"
+          },
+          "recurrence": 1
+        },
+        {
+          "inscription": "1+2",
+          "parameters": {
+            "medium": "symbolic",
+            "objective": "arithmetic"
+          },
+          "recurrence": 2
+        },
+        {
+          "inscription": "add(1,2)",
+          "parameters": {
+            "medium": "code",
+            "objective": "arithmetic"
+          },
+          "recurrence": 1
+        },
+        {
+          "inscription": "one plus two",
+          "parameters": {
+            "medium": "language",
+            "objective": "arithmetic"
+          },
+          "recurrence": 1
+        }
+      ],
+      "id": "number-three-cross-inscription",
+      "kind": "consequence",
+      "source_inscriptions_absent": true,
+      "transition": {
+        "event": "probe-number-three-cross-inscription",
+        "regional_arcs": 3,
+        "returned_incidences": 1951,
+        "returned_pins": 1951,
+        "semantic_words": 1,
+        "wall_micros": 284907
+      }
+    }
+  ],
+  "status": "accepted",
+  "stopping_condition": "Stop after one bounded host passage closes reversible folding, plural overlap, receiver-relative consequence fibers, exact residual return, outgoing-factor replacement, source-absent local recruitment, inverse consequence recruitment, no-standing refusal, and exact rest/remount; otherwise stop at the first concrete carrier obstruction.",
+  "theory_to_structure": "Every inscription first crosses as ordered source octets. Adjacent spans accrue exact recurrence. A span is handed up only when its source-declared recurrence boundary is met and both sides are already addressable; every binary decomposition remains as a distinct presentation. Cultivated spans expose exact boundary capabilities, so a later inscription recruits only spans actually present. Prior receiver faces with maximal common parameter incidence return an exact consequence population. The actual consequence arrives later, exposes the complete membership residual, and only then returns one reduced ecology as the sole outgoing factor."
+}

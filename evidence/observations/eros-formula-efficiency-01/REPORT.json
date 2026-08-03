@@ -1,0 +1,450 @@
+{
+  "schema": "eros.formula-efficiency.v1",
+  "status": "accepted",
+  "question": "Can exact formula growth retain its causal lifecycle while typed algebraic words replace JSON bits and the host indexes validation, pin identity, and exposed-interface seams?",
+  "theory_to_structure": "Each algebraic field or exact integer limb is one source-declared interface word. Interface local carries the exact word; its namespace carries artifact-root plus typed route. Fixed hand is orientation, never payload. The predecessor, law, objective, successor, and departure still cross as actual current and Standing relations.",
+  "stopping_condition": "Stop after one exact degree-two to degree-three successor, one microscopic literal/compact equivalence, four bounded index probes through 512 atoms, exact rest, and the two-minute hard limit. Do not enter theta/Mellin.",
+  "logical_cores": 24,
+  "event_limit_seconds": 30,
+  "run_limit_seconds": 120,
+  "run_wall_micros": 31277,
+  "run_resource": {
+    "user_cpu_micros": 25626,
+    "system_cpu_micros": 10659,
+    "max_rss_before_kib": 2496,
+    "max_rss_after_kib": 9104
+  },
+  "algorithmic_cut": [
+    "regional boundary/arc validation uses ordered indexes instead of prefix scans",
+    "regional pin identity uses the exact canonical wire key instead of a growing linear scan",
+    "exposed arms are discovered in one path traversal instead of one traversal per exposed pin",
+    "temporal and co-present seams consult source-declared interface indexes instead of cross-products over unrelated arms"
+  ],
+  "microscopic_equivalence": {
+    "exact_octet": 165,
+    "literal_data_arcs": 8,
+    "compact_data_arcs": 1,
+    "literal_total_arcs": 9,
+    "compact_total_arcs": 2,
+    "literal_recovered_exactly": true,
+    "compact_recovered_exactly": true,
+    "literal_rest_exact": true,
+    "compact_rest_exact": true,
+    "literal_timing": {
+      "event": "micro-literal-octet",
+      "semantic_atoms": 1,
+      "preflight": {
+        "currents": 2,
+        "regional_cells": 1,
+        "regional_arcs": 9,
+        "largest_cell_arcs": 9,
+        "regional_receiver_width": 1,
+        "executor_thread_ceiling": 2,
+        "legacy_quadratic_pair_visits": 108,
+        "indexed_rows": 9,
+        "hard_arc_limit": 1024
+      },
+      "wall_micros": 159,
+      "executor_micros": 123,
+      "machine_boundary_micros": 36,
+      "resource": {
+        "user_cpu_micros": 0,
+        "system_cpu_micros": 197,
+        "max_rss_before_kib": 3264,
+        "max_rss_after_kib": 3456
+      },
+      "returned_incidences": 9,
+      "returned_pins": 9
+    },
+    "compact_timing": {
+      "event": "micro-compact-octet",
+      "semantic_atoms": 1,
+      "preflight": {
+        "currents": 2,
+        "regional_cells": 1,
+        "regional_arcs": 2,
+        "largest_cell_arcs": 2,
+        "regional_receiver_width": 1,
+        "executor_thread_ceiling": 2,
+        "legacy_quadratic_pair_visits": 3,
+        "indexed_rows": 2,
+        "hard_arc_limit": 1024
+      },
+      "wall_micros": 112,
+      "executor_micros": 99,
+      "machine_boundary_micros": 13,
+      "resource": {
+        "user_cpu_micros": 89,
+        "system_cpu_micros": 61,
+        "max_rss_before_kib": 3648,
+        "max_rss_after_kib": 3648
+      },
+      "returned_incidences": 2,
+      "returned_pins": 2
+    }
+  },
+  "compact_formula_transition": {
+    "source_law": {
+      "event": "compact-source-law",
+      "semantic_atoms": 1,
+      "preflight": {
+        "currents": 2,
+        "regional_cells": 1,
+        "regional_arcs": 2,
+        "largest_cell_arcs": 2,
+        "regional_receiver_width": 1,
+        "executor_thread_ceiling": 2,
+        "legacy_quadratic_pair_visits": 3,
+        "indexed_rows": 2,
+        "hard_arc_limit": 1024
+      },
+      "wall_micros": 116,
+      "executor_micros": 102,
+      "machine_boundary_micros": 14,
+      "resource": {
+        "user_cpu_micros": 77,
+        "system_cpu_micros": 77,
+        "max_rss_before_kib": 3648,
+        "max_rss_after_kib": 3648
+      },
+      "returned_incidences": 2,
+      "returned_pins": 2
+    },
+    "predecessor_return": {
+      "event": "compact-degree-two-predecessor",
+      "semantic_atoms": 100,
+      "preflight": {
+        "currents": 2,
+        "regional_cells": 1,
+        "regional_arcs": 101,
+        "largest_cell_arcs": 101,
+        "regional_receiver_width": 1,
+        "executor_thread_ceiling": 2,
+        "legacy_quadratic_pair_visits": 15150,
+        "indexed_rows": 101,
+        "hard_arc_limit": 1024
+      },
+      "wall_micros": 561,
+      "executor_micros": 339,
+      "machine_boundary_micros": 222,
+      "resource": {
+        "user_cpu_micros": 599,
+        "system_cpu_micros": 0,
+        "max_rss_before_kib": 3648,
+        "max_rss_after_kib": 3840
+      },
+      "returned_incidences": 101,
+      "returned_pins": 101
+    },
+    "growth_meeting": {
+      "event": "compact-growth-meeting",
+      "semantic_atoms": 1,
+      "preflight": {
+        "currents": 2,
+        "regional_cells": 1,
+        "regional_arcs": 5,
+        "largest_cell_arcs": 5,
+        "regional_receiver_width": 1,
+        "executor_thread_ceiling": 2,
+        "legacy_quadratic_pair_visits": 30,
+        "indexed_rows": 5,
+        "hard_arc_limit": 1024
+      },
+      "wall_micros": 353,
+      "executor_micros": 102,
+      "machine_boundary_micros": 251,
+      "resource": {
+        "user_cpu_micros": 252,
+        "system_cpu_micros": 150,
+        "max_rss_before_kib": 4032,
+        "max_rss_after_kib": 4032
+      },
+      "returned_incidences": 108,
+      "returned_pins": 108
+    },
+    "successor_replacement": {
+      "event": "compact-successor-replacement",
+      "semantic_atoms": 291,
+      "preflight": {
+        "currents": 2,
+        "regional_cells": 1,
+        "regional_arcs": 293,
+        "largest_cell_arcs": 293,
+        "regional_receiver_width": 1,
+        "executor_thread_ceiling": 2,
+        "legacy_quadratic_pair_visits": 128334,
+        "indexed_rows": 293,
+        "hard_arc_limit": 1024
+      },
+      "wall_micros": 2276,
+      "executor_micros": 1061,
+      "machine_boundary_micros": 1215,
+      "resource": {
+        "user_cpu_micros": 2250,
+        "system_cpu_micros": 45,
+        "max_rss_before_kib": 4032,
+        "max_rss_after_kib": 5568
+      },
+      "returned_incidences": 503,
+      "returned_pins": 503
+    },
+    "predecessor_atoms": 100,
+    "successor_atoms": 190,
+    "predecessor_terms": 10,
+    "successor_terms": 20,
+    "lower_restriction_exact": true,
+    "new_degree_three_terms": 10,
+    "every_new_coefficient_one": true,
+    "law_recovered_from_standing": true,
+    "predecessor_recovered_from_standing": true,
+    "objective_recovered_from_current": true,
+    "predecessor_data_departed": true,
+    "predecessor_recruit_departed": true,
+    "objective_departed": true,
+    "source_lineages_departed": true,
+    "final_rest_remount_exact": true,
+    "final_machine": {
+      "standing_rank": 6,
+      "standing_cells": 26,
+      "standing_constituents": 1,
+      "constituent_cells": 14,
+      "constituent_incidences": 503,
+      "constituent_pins": 503,
+      "constituent_paths": 505,
+      "constituent_transport_terms": 901,
+      "live_lineages": 0,
+      "rest_sha256": "edeb25eb6eef4cb6811f457e83d3a53ac9b8045fab16bdea37d4b61e0f622ca4"
+    }
+  },
+  "bounded_scaling": [
+    {
+      "semantic_atoms": 64,
+      "seed": {
+        "event": "scale-64-seed",
+        "semantic_atoms": 64,
+        "preflight": {
+          "currents": 2,
+          "regional_cells": 1,
+          "regional_arcs": 65,
+          "largest_cell_arcs": 65,
+          "regional_receiver_width": 1,
+          "executor_thread_ceiling": 2,
+          "legacy_quadratic_pair_visits": 6240,
+          "indexed_rows": 65,
+          "hard_arc_limit": 1024
+        },
+        "wall_micros": 327,
+        "executor_micros": 212,
+        "machine_boundary_micros": 115,
+        "resource": {
+          "user_cpu_micros": 364,
+          "system_cpu_micros": 0,
+          "max_rss_before_kib": 6144,
+          "max_rss_after_kib": 6144
+        },
+        "returned_incidences": 65,
+        "returned_pins": 65
+      },
+      "matching_close": {
+        "event": "scale-64-matching-close",
+        "semantic_atoms": 64,
+        "preflight": {
+          "currents": 2,
+          "regional_cells": 1,
+          "regional_arcs": 64,
+          "largest_cell_arcs": 64,
+          "regional_receiver_width": 1,
+          "executor_thread_ceiling": 2,
+          "legacy_quadratic_pair_visits": 6048,
+          "indexed_rows": 64,
+          "hard_arc_limit": 1024
+        },
+        "wall_micros": 520,
+        "executor_micros": 214,
+        "machine_boundary_micros": 306,
+        "resource": {
+          "user_cpu_micros": 579,
+          "system_cpu_micros": 0,
+          "max_rss_before_kib": 6144,
+          "max_rss_after_kib": 6144
+        },
+        "returned_incidences": 193,
+        "returned_pins": 193
+      }
+    },
+    {
+      "semantic_atoms": 128,
+      "seed": {
+        "event": "scale-128-seed",
+        "semantic_atoms": 128,
+        "preflight": {
+          "currents": 2,
+          "regional_cells": 1,
+          "regional_arcs": 129,
+          "largest_cell_arcs": 129,
+          "regional_receiver_width": 1,
+          "executor_thread_ceiling": 2,
+          "legacy_quadratic_pair_visits": 24768,
+          "indexed_rows": 129,
+          "hard_arc_limit": 1024
+        },
+        "wall_micros": 505,
+        "executor_micros": 347,
+        "machine_boundary_micros": 158,
+        "resource": {
+          "user_cpu_micros": 400,
+          "system_cpu_micros": 158,
+          "max_rss_before_kib": 6144,
+          "max_rss_after_kib": 6144
+        },
+        "returned_incidences": 129,
+        "returned_pins": 129
+      },
+      "matching_close": {
+        "event": "scale-128-matching-close",
+        "semantic_atoms": 128,
+        "preflight": {
+          "currents": 2,
+          "regional_cells": 1,
+          "regional_arcs": 128,
+          "largest_cell_arcs": 128,
+          "regional_receiver_width": 1,
+          "executor_thread_ceiling": 2,
+          "legacy_quadratic_pair_visits": 24384,
+          "indexed_rows": 128,
+          "hard_arc_limit": 1024
+        },
+        "wall_micros": 972,
+        "executor_micros": 381,
+        "machine_boundary_micros": 591,
+        "resource": {
+          "user_cpu_micros": 659,
+          "system_cpu_micros": 359,
+          "max_rss_before_kib": 6144,
+          "max_rss_after_kib": 6144
+        },
+        "returned_incidences": 385,
+        "returned_pins": 385
+      }
+    },
+    {
+      "semantic_atoms": 256,
+      "seed": {
+        "event": "scale-256-seed",
+        "semantic_atoms": 256,
+        "preflight": {
+          "currents": 2,
+          "regional_cells": 1,
+          "regional_arcs": 257,
+          "largest_cell_arcs": 257,
+          "regional_receiver_width": 1,
+          "executor_thread_ceiling": 2,
+          "legacy_quadratic_pair_visits": 98688,
+          "indexed_rows": 257,
+          "hard_arc_limit": 1024
+        },
+        "wall_micros": 1107,
+        "executor_micros": 741,
+        "machine_boundary_micros": 366,
+        "resource": {
+          "user_cpu_micros": 1150,
+          "system_cpu_micros": 0,
+          "max_rss_before_kib": 6144,
+          "max_rss_after_kib": 6144
+        },
+        "returned_incidences": 257,
+        "returned_pins": 257
+      },
+      "matching_close": {
+        "event": "scale-256-matching-close",
+        "semantic_atoms": 256,
+        "preflight": {
+          "currents": 2,
+          "regional_cells": 1,
+          "regional_arcs": 256,
+          "largest_cell_arcs": 256,
+          "regional_receiver_width": 1,
+          "executor_thread_ceiling": 2,
+          "legacy_quadratic_pair_visits": 97920,
+          "indexed_rows": 256,
+          "hard_arc_limit": 1024
+        },
+        "wall_micros": 1814,
+        "executor_micros": 673,
+        "machine_boundary_micros": 1141,
+        "resource": {
+          "user_cpu_micros": 1852,
+          "system_cpu_micros": 0,
+          "max_rss_before_kib": 6144,
+          "max_rss_after_kib": 6336
+        },
+        "returned_incidences": 769,
+        "returned_pins": 769
+      }
+    },
+    {
+      "semantic_atoms": 512,
+      "seed": {
+        "event": "scale-512-seed",
+        "semantic_atoms": 512,
+        "preflight": {
+          "currents": 2,
+          "regional_cells": 1,
+          "regional_arcs": 513,
+          "largest_cell_arcs": 513,
+          "regional_receiver_width": 1,
+          "executor_thread_ceiling": 2,
+          "legacy_quadratic_pair_visits": 393984,
+          "indexed_rows": 513,
+          "hard_arc_limit": 1024
+        },
+        "wall_micros": 1942,
+        "executor_micros": 1219,
+        "machine_boundary_micros": 723,
+        "resource": {
+          "user_cpu_micros": 1972,
+          "system_cpu_micros": 0,
+          "max_rss_before_kib": 6336,
+          "max_rss_after_kib": 6912
+        },
+        "returned_incidences": 513,
+        "returned_pins": 513
+      },
+      "matching_close": {
+        "event": "scale-512-matching-close",
+        "semantic_atoms": 512,
+        "preflight": {
+          "currents": 2,
+          "regional_cells": 1,
+          "regional_arcs": 512,
+          "largest_cell_arcs": 512,
+          "regional_receiver_width": 1,
+          "executor_thread_ceiling": 2,
+          "legacy_quadratic_pair_visits": 392448,
+          "indexed_rows": 512,
+          "hard_arc_limit": 1024
+        },
+        "wall_micros": 4305,
+        "executor_micros": 1242,
+        "machine_boundary_micros": 3063,
+        "resource": {
+          "user_cpu_micros": 3398,
+          "system_cpu_micros": 930,
+          "max_rss_before_kib": 6912,
+          "max_rss_after_kib": 9104
+        },
+        "returned_incidences": 1537,
+        "returned_pins": 1537
+      }
+    }
+  ],
+  "acceptance": {
+    "microscopic_carriers_agree": true,
+    "compact_formula_value_exact": true,
+    "lifecycle_signatures_exact": true,
+    "every_event_within_limit": true,
+    "complete_run_within_limit": true,
+    "no_floating_point_causal_data": true
+  },
+  "conclusion": "The measured cell asks Eros only about causal carriage, replacement, and later Standing. Exact sparse algebra remains ordinary world computation; report JSON remains observer testimony. The next mathematical derivation may now be bounded before another machine experiment."
+}

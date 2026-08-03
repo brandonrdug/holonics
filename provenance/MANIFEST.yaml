@@ -1,0 +1,214 @@
+schema: holonics.provenance/v1
+
+extraction:
+  source_repository: https://github.com/brandonrdug/laboratory.git
+  source_branch: agent/eros-production-owners
+  source_commit: 5cca1c5d910b922899c0296189a576aeb9a515af
+  source_dirty: true
+  extracted_at: 2026-08-03T15:05:08-07:00
+  destination_repository: https://github.com/brandonrdug/holonics
+  destination_visibility: private
+  destination_commit: resolved by Git history; not self-embedded
+
+licensing:
+  repository_grant: none-declared
+  notes: >-
+    The source Rust manifests state MIT OR Apache-2.0, but license texts and the scope covering
+    documentation, formal sources, and publications were absent. No public redistribution grant
+    is inferred by this private extraction.
+
+default_excludes:
+  - target/**
+  - runs/**
+  - output/**
+  - data/**
+  - tmp/**
+  - '**/.lake/**'
+  - '**/.venv/**'
+  - .claude/worktrees/**
+  - src/soma/life/**
+  - raw observation bodies/renders/populations
+
+artifacts:
+  - id: complete-research-record
+    kind: authored-source
+    source:
+      path: src/soma/RESEARCH
+      repository: https://github.com/brandonrdug/laboratory.git
+      commit: 5cca1c5d910b922899c0296189a576aeb9a515af
+      working_tree_overlay: true
+    destination: research/records
+    disposition: copy
+    authority: supporting
+    evidence_grade: mixed-explicit-in-record
+    files: 307
+
+  - id: complete-paper-source
+    kind: authored-source
+    source:
+      path: src/soma/PAPERS
+      repository: https://github.com/brandonrdug/laboratory.git
+      commit: 5cca1c5d910b922899c0296189a576aeb9a515af
+    destination: papers/source
+    disposition: copy
+    authority: mixed-canonical-supporting-historical
+    files: 172
+    notes: >-
+      Synopsis and registry are the mathematical spine; local entry grades govern. Ten clean-copy
+      transforms are enumerated with before/after hashes in provenance/PAPER_TRANSFORMS.tsv.
+
+  - id: rendered-papers
+    kind: generated-output
+    source:
+      path: extracted papers/source Typst corpus
+      repository: https://github.com/brandonrdug/laboratory.git
+      commit: 5cca1c5d910b922899c0296189a576aeb9a515af
+    destination: papers/rendered
+    disposition: regenerate
+    authority: generated
+    files: 10
+    notes: regenerated in the clean repository after syntax normalization; appearance is not proof.
+
+  - id: project-formal-source
+    kind: formal-source
+    source:
+      path: src/soma/formal
+      repository: https://github.com/brandonrdug/laboratory.git
+      commit: 5cca1c5d910b922899c0296189a576aeb9a515af
+    destination: formal
+    disposition: copy
+    authority: formal-source
+    source_files: 23
+    destination_files: 24
+    trust:
+      checker: Lean 4.27.0 with pinned Mathlib manifests
+      no_sorry: true
+      assumptions:
+        - ordinary Lean/Mathlib trusted computing base
+        - RH source transport proportional obstruction remains open
+
+  - id: observation-summaries
+    kind: receipt
+    source:
+      path: src/soma/observations
+      repository: https://github.com/brandonrdug/laboratory.git
+      commit: 5cca1c5d910b922899c0296189a576aeb9a515af
+    destination: evidence/observations
+    disposition: copy-supporting
+    authority: measured-and-computational
+    files: 190
+    notes: complete README.md, RESULTS.md, and REPORT.json set; 1,440 raw files remain laboratory-only.
+
+  - id: admitted-engine-reference
+    kind: library
+    source:
+      path: selected crates and ownership records
+      repository: https://github.com/brandonrdug/laboratory.git
+      commit: a07ff376f2b936749be20ba907ecd0e2f01d544a
+    destination: reference/engine-a07ff376
+    disposition: copy-supporting
+    authority: historical
+    files: 211
+    notes: not a build root; known generic standing Clone debt and superseded application instruments.
+
+  - id: early-pureholonics-seed
+    kind: authored-source
+    source:
+      path: src/pureholonics
+      repository: https://github.com/brandonrdug/laboratory.git
+      commit: d6d70076fe64467724efe5d8690f44c2c615abb7
+    destination: reference/pureholonics-seed
+    disposition: copy-supporting
+    authority: historical
+    files: 16
+
+  - id: compact-formula
+    kind: authored-source
+    source:
+      path: src/holobrochos/THE_FORMULA_REBUILT.md
+      repository: https://github.com/brandonrdug/laboratory.git
+      commit: 2a5dff815d0f0ba8f8e70d3cb4f0a70831834cb4
+    destination: reference/compact-formula-2a5dff8
+    disposition: copy-supporting
+    authority: historical
+    files: 1
+    notes: exact 149-line compact formula.
+
+  - id: first-soma-formula
+    kind: authored-source
+    source:
+      path: src/soma/FORMULA.md
+      repository: https://github.com/brandonrdug/laboratory.git
+      commit: 2695ca0f44606f3744e52934000a749a5cc4a268
+    destination: reference/soma-seed-2695ca0
+    disposition: copy-supporting
+    authority: historical
+    files: 1
+    notes: exact first 256-line Soma formula.
+
+  - id: minimum-mechanics-reference
+    kind: authored-source
+    source:
+      path: src/soma/ELEMENTARY_MECHANICS.md and src/soma/MATHEMATICAL_RESEARCH_NETWORK.md
+      repository: https://github.com/brandonrdug/laboratory.git
+      commit: a07ff376f2b936749be20ba907ecd0e2f01d544a
+    destination: reference/minimum-mechanics-a07ff376
+    disposition: copy-supporting
+    authority: historical
+    files: 2
+
+  - id: broader-theory-reference
+    kind: authored-source
+    source:
+      path: selected holobrochos and Soma theory sources
+      repository: https://github.com/brandonrdug/laboratory.git
+      commit: a07ff376f2b936749be20ba907ecd0e2f01d544a
+    destination: reference/holobrochos-a07ff376
+    disposition: copy-supporting
+    authority: historical
+    files: 110
+
+  - id: clean-normative-canon
+    kind: authored-source
+    source:
+      path: extraction synthesis from the artifacts above
+    destination: canon
+    disposition: authored-clean
+    authority: canonical
+    files: 11
+
+  - id: clean-reconstruction-blueprint
+    kind: authored-source
+    source:
+      path: extraction synthesis from the artifacts above
+    destination: blueprint
+    disposition: authored-clean
+    authority: canonical
+    files: 7
+
+  - id: external-resource-catalogue
+    kind: external-reference
+    source:
+      path: extracted paper bibliographies plus requested primary resources
+    destination: bibliography/EXTERNAL_RESOURCES.md
+    disposition: authored-clean
+    authority: supporting
+    files: 1
+
+  - id: repository-and-provenance-documents
+    kind: receipt
+    source:
+      path: extraction procedure and clean operating contract
+    destination: README.md, AGENTS.md, provenance, and directory READMEs
+    disposition: authored-clean
+    authority: canonical-and-supporting
+    notes: final file count and commit identity are fixed by SHA256SUMS and the initial Git commit.
+
+  - id: production-apparatus-receipt
+    kind: receipt
+    source:
+      path: local nvidia-smi, nvcc, g++, and clang++ queries
+    destination: provenance/HARDWARE_RECEIPT.txt
+    disposition: authored-clean
+    authority: measured
+    files: 1

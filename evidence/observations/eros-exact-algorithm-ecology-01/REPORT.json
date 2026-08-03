@@ -1,0 +1,2686 @@
+{
+  "acceptance": {
+    "algebra_receiver_proved_output_equivalence_without_sampling": true,
+    "candidate_storage_order_was_gauge": true,
+    "each_probe_returned_an_exact_oracle_consequence_and_machine_residual": true,
+    "every_successor_was_one_complete_outgoing_factor": true,
+    "final_boundary_survived_exact_rest_remount": true,
+    "later_source_absent_output_receiver_conducted_both_paths": true,
+    "later_source_absent_trace_receiver_conducted_one_path": true,
+    "no_floating_point_causal_data": true,
+    "no_standing_control_formed_no_output": true,
+    "output_receiver_preserved_the_nontrivial_fiber": true,
+    "same_division_path_retained_distinct_unit_faces": true,
+    "source_program_population_stood_after_source_lineages_departed": true,
+    "trace_receiver_refined_only_its_own_fiber": true,
+    "withholding_the_unit_receiver_left_the_numeric_face_ambiguous": true,
+    "world_side_typed_interpreter_remained_explicit": true,
+    "zero_division_remained_open": true
+  },
+  "algebra_receiver": {
+    "derivation": "Every node was normalized symbolically in (Z / 2^8 Z)[x]; no finite input census or fitted quotient was used.",
+    "programs": [
+      {
+        "program": "square_then_add",
+        "trace_shape": [
+          {
+            "antecedents": [],
+            "operation": "INPUT"
+          },
+          {
+            "antecedents": [
+              0,
+              0
+            ],
+            "operation": "MULTIPLY"
+          },
+          {
+            "antecedents": [
+              1,
+              0
+            ],
+            "operation": "ADD"
+          },
+          {
+            "antecedents": [
+              2
+            ],
+            "operation": "RETURN"
+          }
+        ],
+        "word_ring_polynomial_coefficients_low_to_high": [
+          0,
+          1,
+          1
+        ]
+      },
+      {
+        "program": "successor_product",
+        "trace_shape": [
+          {
+            "antecedents": [],
+            "operation": "INPUT"
+          },
+          {
+            "antecedents": [],
+            "operation": "CONST"
+          },
+          {
+            "antecedents": [
+              0,
+              1
+            ],
+            "operation": "ADD"
+          },
+          {
+            "antecedents": [
+              0,
+              2
+            ],
+            "operation": "MULTIPLY"
+          },
+          {
+            "antecedents": [
+              3
+            ],
+            "operation": "RETURN"
+          }
+        ],
+        "word_ring_polynomial_coefficients_low_to_high": [
+          0,
+          1,
+          1
+        ]
+      },
+      {
+        "program": "square_then_subtract",
+        "trace_shape": [
+          {
+            "antecedents": [],
+            "operation": "INPUT"
+          },
+          {
+            "antecedents": [
+              0,
+              0
+            ],
+            "operation": "MULTIPLY"
+          },
+          {
+            "antecedents": [
+              1,
+              0
+            ],
+            "operation": "SUBTRACT"
+          },
+          {
+            "antecedents": [
+              2
+            ],
+            "operation": "RETURN"
+          }
+        ],
+        "word_ring_polynomial_coefficients_low_to_high": [
+          0,
+          255,
+          1
+        ]
+      },
+      {
+        "program": "double_by_shift",
+        "trace_shape": [
+          {
+            "antecedents": [],
+            "operation": "INPUT"
+          },
+          {
+            "antecedents": [
+              0
+            ],
+            "operation": "SHIFT_LEFT"
+          },
+          {
+            "antecedents": [
+              1
+            ],
+            "operation": "RETURN"
+          }
+        ],
+        "word_ring_polynomial_coefficients_low_to_high": [
+          0,
+          2
+        ]
+      }
+    ],
+    "square_then_add_equals_successor_product": true
+  },
+  "conclusion": "The learned object is not one chosen formula or a scalar score. It is an exact receiver-indexed ecology: the output face lawfully retains two nonidentical causal paths; the algebra face proves that their word-ring consequences commute; the trace face distinguishes them; and both distinctions survive as one factor through rest. With source declarations and oracle absent, the output receiver recruits both paths and the trace receiver recruits one. The same typed DIVIDE graph carries the identical rational magnitude through electrical and kinematic charts while its unit consequence differs, and zero division remains an OPEN completed prefix. The remaining engine question is therefore not vocabulary from nothing: it is how broadly world ecologies can supply exact typed operations and consequences for this same cultivation law.",
+  "final_receiver_chart": {
+    "generation": 4,
+    "output_probes": 3,
+    "output_support": [
+      "square_then_add",
+      "successor_product"
+    ],
+    "output_support_mask": 3,
+    "retained_programs": [
+      {
+        "id": 0,
+        "name": "square_then_add",
+        "nodes": [
+          {
+            "antecedents": [],
+            "node": 0,
+            "operation": "INPUT"
+          },
+          {
+            "antecedents": [
+              0,
+              0
+            ],
+            "node": 1,
+            "operation": "MULTIPLY"
+          },
+          {
+            "antecedents": [
+              1,
+              0
+            ],
+            "node": 2,
+            "operation": "ADD"
+          },
+          {
+            "antecedents": [
+              2
+            ],
+            "node": 3,
+            "operation": "RETURN"
+          }
+        ]
+      },
+      {
+        "id": 1,
+        "name": "successor_product",
+        "nodes": [
+          {
+            "antecedents": [],
+            "node": 0,
+            "operation": "INPUT"
+          },
+          {
+            "antecedents": [],
+            "node": 1,
+            "operation": "CONST"
+          },
+          {
+            "antecedents": [
+              0,
+              1
+            ],
+            "node": 2,
+            "operation": "ADD"
+          },
+          {
+            "antecedents": [
+              0,
+              2
+            ],
+            "node": 3,
+            "operation": "MULTIPLY"
+          },
+          {
+            "antecedents": [
+              3
+            ],
+            "node": 4,
+            "operation": "RETURN"
+          }
+        ]
+      }
+    ],
+    "trace_support": [
+      "square_then_add"
+    ],
+    "trace_support_mask": 1
+  },
+  "later_source_absent_conduct": {
+    "chart_recovered_from_rest": true,
+    "conduct_event": {
+      "event": "later-source-absent-conduct",
+      "regional_arcs": 12,
+      "returned_incidences": 65,
+      "returned_pins": 65,
+      "semantic_words": 11,
+      "wall_micros": 2860
+    },
+    "input": {
+      "unit_exponents": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "value": "3:u8"
+    },
+    "output_receiver": {
+      "accepted": true,
+      "recruited_paths": [
+        {
+          "evaluation": {
+            "condition": "CLOSED",
+            "output": {
+              "unit_exponents": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "value": "12:u8"
+            },
+            "path": [
+              {
+                "antecedents": [],
+                "node": 0,
+                "operation": "INPUT",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "3:u8"
+                }
+              },
+              {
+                "antecedents": [
+                  0,
+                  0
+                ],
+                "node": 1,
+                "operation": "MULTIPLY",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "9:u8"
+                }
+              },
+              {
+                "antecedents": [
+                  1,
+                  0
+                ],
+                "node": 2,
+                "operation": "ADD",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "12:u8"
+                }
+              },
+              {
+                "antecedents": [
+                  2
+                ],
+                "node": 3,
+                "operation": "RETURN",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "12:u8"
+                }
+              }
+            ],
+            "path_shape": [
+              {
+                "antecedents": [],
+                "operation": "INPUT"
+              },
+              {
+                "antecedents": [
+                  0,
+                  0
+                ],
+                "operation": "MULTIPLY"
+              },
+              {
+                "antecedents": [
+                  1,
+                  0
+                ],
+                "operation": "ADD"
+              },
+              {
+                "antecedents": [
+                  2
+                ],
+                "operation": "RETURN"
+              }
+            ]
+          },
+          "program": "square_then_add"
+        },
+        {
+          "evaluation": {
+            "condition": "CLOSED",
+            "output": {
+              "unit_exponents": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "value": "12:u8"
+            },
+            "path": [
+              {
+                "antecedents": [],
+                "node": 0,
+                "operation": "INPUT",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "3:u8"
+                }
+              },
+              {
+                "antecedents": [],
+                "node": 1,
+                "operation": "CONST",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "1:u8"
+                }
+              },
+              {
+                "antecedents": [
+                  0,
+                  1
+                ],
+                "node": 2,
+                "operation": "ADD",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "4:u8"
+                }
+              },
+              {
+                "antecedents": [
+                  0,
+                  2
+                ],
+                "node": 3,
+                "operation": "MULTIPLY",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "12:u8"
+                }
+              },
+              {
+                "antecedents": [
+                  3
+                ],
+                "node": 4,
+                "operation": "RETURN",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "12:u8"
+                }
+              }
+            ],
+            "path_shape": [
+              {
+                "antecedents": [],
+                "operation": "INPUT"
+              },
+              {
+                "antecedents": [],
+                "operation": "CONST"
+              },
+              {
+                "antecedents": [
+                  0,
+                  1
+                ],
+                "operation": "ADD"
+              },
+              {
+                "antecedents": [
+                  0,
+                  2
+                ],
+                "operation": "MULTIPLY"
+              },
+              {
+                "antecedents": [
+                  3
+                ],
+                "operation": "RETURN"
+              }
+            ]
+          },
+          "program": "successor_product"
+        }
+      ],
+      "return_event": {
+        "event": "later-output-return",
+        "regional_arcs": 22,
+        "returned_incidences": 22,
+        "returned_pins": 22,
+        "semantic_words": 22,
+        "wall_micros": 2194
+      },
+      "returned_as_later_current": true,
+      "support_mask": 3
+    },
+    "source_oracle_present": false,
+    "source_program_population_present": false,
+    "trace_receiver": {
+      "accepted": true,
+      "recruited_paths": [
+        {
+          "evaluation": {
+            "condition": "CLOSED",
+            "output": {
+              "unit_exponents": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "value": "12:u8"
+            },
+            "path": [
+              {
+                "antecedents": [],
+                "node": 0,
+                "operation": "INPUT",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "3:u8"
+                }
+              },
+              {
+                "antecedents": [
+                  0,
+                  0
+                ],
+                "node": 1,
+                "operation": "MULTIPLY",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "9:u8"
+                }
+              },
+              {
+                "antecedents": [
+                  1,
+                  0
+                ],
+                "node": 2,
+                "operation": "ADD",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "12:u8"
+                }
+              },
+              {
+                "antecedents": [
+                  2
+                ],
+                "node": 3,
+                "operation": "RETURN",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "12:u8"
+                }
+              }
+            ],
+            "path_shape": [
+              {
+                "antecedents": [],
+                "operation": "INPUT"
+              },
+              {
+                "antecedents": [
+                  0,
+                  0
+                ],
+                "operation": "MULTIPLY"
+              },
+              {
+                "antecedents": [
+                  1,
+                  0
+                ],
+                "operation": "ADD"
+              },
+              {
+                "antecedents": [
+                  2
+                ],
+                "operation": "RETURN"
+              }
+            ]
+          },
+          "program": "square_then_add"
+        }
+      ],
+      "return_event": {
+        "event": "later-trace-return",
+        "regional_arcs": 11,
+        "returned_incidences": 11,
+        "returned_pins": 11,
+        "semantic_words": 11,
+        "wall_micros": 2121
+      },
+      "returned_as_later_current": true,
+      "support_mask": 1
+    }
+  },
+  "no_standing_control": {
+    "accepted": true,
+    "chart_recovered": false,
+    "current_recovered": true,
+    "event": {
+      "event": "no-standing-control",
+      "regional_arcs": 12,
+      "returned_incidences": 12,
+      "returned_pins": 12,
+      "semantic_words": 11,
+      "wall_micros": 745
+    },
+    "output_formed": false
+  },
+  "observation_id": "eros-exact-algorithm-ecology-01",
+  "order_gauge_control": {
+    "all_successor_factors_exact": true,
+    "exact": true,
+    "final_retained_storage_order": [
+      "successor_product",
+      "square_then_add"
+    ],
+    "output_support_mask": 3,
+    "source_storage_order": [
+      "double_by_shift",
+      "square_then_subtract",
+      "successor_product",
+      "square_then_add"
+    ],
+    "trace_support_mask": 1
+  },
+  "output_training": [
+    {
+      "accepted": true,
+      "candidate_paths": [
+        {
+          "candidate": "square_then_add",
+          "evaluation": {
+            "condition": "CLOSED",
+            "output": {
+              "unit_exponents": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "value": "0:u8"
+            },
+            "path": [
+              {
+                "antecedents": [],
+                "node": 0,
+                "operation": "INPUT",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "0:u8"
+                }
+              },
+              {
+                "antecedents": [
+                  0,
+                  0
+                ],
+                "node": 1,
+                "operation": "MULTIPLY",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "0:u8"
+                }
+              },
+              {
+                "antecedents": [
+                  1,
+                  0
+                ],
+                "node": 2,
+                "operation": "ADD",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "0:u8"
+                }
+              },
+              {
+                "antecedents": [
+                  2
+                ],
+                "node": 3,
+                "operation": "RETURN",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "0:u8"
+                }
+              }
+            ],
+            "path_shape": [
+              {
+                "antecedents": [],
+                "operation": "INPUT"
+              },
+              {
+                "antecedents": [
+                  0,
+                  0
+                ],
+                "operation": "MULTIPLY"
+              },
+              {
+                "antecedents": [
+                  1,
+                  0
+                ],
+                "operation": "ADD"
+              },
+              {
+                "antecedents": [
+                  2
+                ],
+                "operation": "RETURN"
+              }
+            ]
+          }
+        },
+        {
+          "candidate": "successor_product",
+          "evaluation": {
+            "condition": "CLOSED",
+            "output": {
+              "unit_exponents": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "value": "0:u8"
+            },
+            "path": [
+              {
+                "antecedents": [],
+                "node": 0,
+                "operation": "INPUT",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "0:u8"
+                }
+              },
+              {
+                "antecedents": [],
+                "node": 1,
+                "operation": "CONST",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "1:u8"
+                }
+              },
+              {
+                "antecedents": [
+                  0,
+                  1
+                ],
+                "node": 2,
+                "operation": "ADD",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "1:u8"
+                }
+              },
+              {
+                "antecedents": [
+                  0,
+                  2
+                ],
+                "node": 3,
+                "operation": "MULTIPLY",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "0:u8"
+                }
+              },
+              {
+                "antecedents": [
+                  3
+                ],
+                "node": 4,
+                "operation": "RETURN",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "0:u8"
+                }
+              }
+            ],
+            "path_shape": [
+              {
+                "antecedents": [],
+                "operation": "INPUT"
+              },
+              {
+                "antecedents": [],
+                "operation": "CONST"
+              },
+              {
+                "antecedents": [
+                  0,
+                  1
+                ],
+                "operation": "ADD"
+              },
+              {
+                "antecedents": [
+                  0,
+                  2
+                ],
+                "operation": "MULTIPLY"
+              },
+              {
+                "antecedents": [
+                  3
+                ],
+                "operation": "RETURN"
+              }
+            ]
+          }
+        },
+        {
+          "candidate": "square_then_subtract",
+          "evaluation": {
+            "condition": "CLOSED",
+            "output": {
+              "unit_exponents": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "value": "0:u8"
+            },
+            "path": [
+              {
+                "antecedents": [],
+                "node": 0,
+                "operation": "INPUT",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "0:u8"
+                }
+              },
+              {
+                "antecedents": [
+                  0,
+                  0
+                ],
+                "node": 1,
+                "operation": "MULTIPLY",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "0:u8"
+                }
+              },
+              {
+                "antecedents": [
+                  1,
+                  0
+                ],
+                "node": 2,
+                "operation": "SUBTRACT",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "0:u8"
+                }
+              },
+              {
+                "antecedents": [
+                  2
+                ],
+                "node": 3,
+                "operation": "RETURN",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "0:u8"
+                }
+              }
+            ],
+            "path_shape": [
+              {
+                "antecedents": [],
+                "operation": "INPUT"
+              },
+              {
+                "antecedents": [
+                  0,
+                  0
+                ],
+                "operation": "MULTIPLY"
+              },
+              {
+                "antecedents": [
+                  1,
+                  0
+                ],
+                "operation": "SUBTRACT"
+              },
+              {
+                "antecedents": [
+                  2
+                ],
+                "operation": "RETURN"
+              }
+            ]
+          }
+        },
+        {
+          "candidate": "double_by_shift",
+          "evaluation": {
+            "condition": "CLOSED",
+            "output": {
+              "unit_exponents": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "value": "0:u8"
+            },
+            "path": [
+              {
+                "antecedents": [],
+                "node": 0,
+                "operation": "INPUT",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "0:u8"
+                }
+              },
+              {
+                "antecedents": [
+                  0
+                ],
+                "node": 1,
+                "operation": "SHIFT_LEFT",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "0:u8"
+                }
+              },
+              {
+                "antecedents": [
+                  1
+                ],
+                "node": 2,
+                "operation": "RETURN",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "0:u8"
+                }
+              }
+            ],
+            "path_shape": [
+              {
+                "antecedents": [],
+                "operation": "INPUT"
+              },
+              {
+                "antecedents": [
+                  0
+                ],
+                "operation": "SHIFT_LEFT"
+              },
+              {
+                "antecedents": [
+                  1
+                ],
+                "operation": "RETURN"
+              }
+            ]
+          }
+        }
+      ],
+      "events": [
+        {
+          "event": "probe-0-conduct",
+          "regional_arcs": 13,
+          "returned_incidences": 100,
+          "returned_pins": 100,
+          "semantic_words": 11,
+          "wall_micros": 5705
+        },
+        {
+          "event": "probe-0-prediction-face",
+          "regional_arcs": 105,
+          "returned_incidences": 303,
+          "returned_pins": 303,
+          "semantic_words": 4,
+          "wall_micros": 14353
+        },
+        {
+          "event": "probe-0-oracle-return",
+          "regional_arcs": 17,
+          "returned_incidences": 325,
+          "returned_pins": 325,
+          "semantic_words": 11,
+          "wall_micros": 11525
+        }
+      ],
+      "factor": {
+        "chart": {
+          "generation": 1,
+          "output_probes": 1,
+          "output_support_mask": 15,
+          "program_ids": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "trace_support_mask": 15
+        },
+        "event": {
+          "event": "probe-0-successor",
+          "regional_arcs": 101,
+          "returned_incidences": 87,
+          "returned_pins": 87,
+          "semantic_words": 86,
+          "wall_micros": 17682
+        },
+        "outgoing_factor_exact": true,
+        "physical_after": {
+          "constituent_cells": 3,
+          "constituent_incidences": 87,
+          "constituent_paths": 87,
+          "constituent_pins": 87,
+          "constituent_transport_terms": 87,
+          "live_lineages": 0,
+          "standing_cells": 30,
+          "standing_constituents": 1,
+          "standing_rank": 6
+        },
+        "returned_exactly": true
+      },
+      "input": {
+        "unit_exponents": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "value": "0:u8"
+      },
+      "machine_residual": {
+        "carried_open_mask": 0,
+        "exact": true,
+        "expected_open_mask": 0,
+        "founds": 0,
+        "rides": 4
+      },
+      "next_output_support_mask": 15,
+      "oracle_matching_support_mask": 15,
+      "oracle_return": {
+        "unit_exponents": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "value": "0:u8"
+      },
+      "prior_output_support_mask": 15,
+      "probe_ordinal": 0
+    },
+    {
+      "accepted": true,
+      "candidate_paths": [
+        {
+          "candidate": "square_then_add",
+          "evaluation": {
+            "condition": "CLOSED",
+            "output": {
+              "unit_exponents": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "value": "2:u8"
+            },
+            "path": [
+              {
+                "antecedents": [],
+                "node": 0,
+                "operation": "INPUT",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "1:u8"
+                }
+              },
+              {
+                "antecedents": [
+                  0,
+                  0
+                ],
+                "node": 1,
+                "operation": "MULTIPLY",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "1:u8"
+                }
+              },
+              {
+                "antecedents": [
+                  1,
+                  0
+                ],
+                "node": 2,
+                "operation": "ADD",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "2:u8"
+                }
+              },
+              {
+                "antecedents": [
+                  2
+                ],
+                "node": 3,
+                "operation": "RETURN",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "2:u8"
+                }
+              }
+            ],
+            "path_shape": [
+              {
+                "antecedents": [],
+                "operation": "INPUT"
+              },
+              {
+                "antecedents": [
+                  0,
+                  0
+                ],
+                "operation": "MULTIPLY"
+              },
+              {
+                "antecedents": [
+                  1,
+                  0
+                ],
+                "operation": "ADD"
+              },
+              {
+                "antecedents": [
+                  2
+                ],
+                "operation": "RETURN"
+              }
+            ]
+          }
+        },
+        {
+          "candidate": "successor_product",
+          "evaluation": {
+            "condition": "CLOSED",
+            "output": {
+              "unit_exponents": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "value": "2:u8"
+            },
+            "path": [
+              {
+                "antecedents": [],
+                "node": 0,
+                "operation": "INPUT",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "1:u8"
+                }
+              },
+              {
+                "antecedents": [],
+                "node": 1,
+                "operation": "CONST",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "1:u8"
+                }
+              },
+              {
+                "antecedents": [
+                  0,
+                  1
+                ],
+                "node": 2,
+                "operation": "ADD",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "2:u8"
+                }
+              },
+              {
+                "antecedents": [
+                  0,
+                  2
+                ],
+                "node": 3,
+                "operation": "MULTIPLY",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "2:u8"
+                }
+              },
+              {
+                "antecedents": [
+                  3
+                ],
+                "node": 4,
+                "operation": "RETURN",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "2:u8"
+                }
+              }
+            ],
+            "path_shape": [
+              {
+                "antecedents": [],
+                "operation": "INPUT"
+              },
+              {
+                "antecedents": [],
+                "operation": "CONST"
+              },
+              {
+                "antecedents": [
+                  0,
+                  1
+                ],
+                "operation": "ADD"
+              },
+              {
+                "antecedents": [
+                  0,
+                  2
+                ],
+                "operation": "MULTIPLY"
+              },
+              {
+                "antecedents": [
+                  3
+                ],
+                "operation": "RETURN"
+              }
+            ]
+          }
+        },
+        {
+          "candidate": "square_then_subtract",
+          "evaluation": {
+            "condition": "CLOSED",
+            "output": {
+              "unit_exponents": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "value": "0:u8"
+            },
+            "path": [
+              {
+                "antecedents": [],
+                "node": 0,
+                "operation": "INPUT",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "1:u8"
+                }
+              },
+              {
+                "antecedents": [
+                  0,
+                  0
+                ],
+                "node": 1,
+                "operation": "MULTIPLY",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "1:u8"
+                }
+              },
+              {
+                "antecedents": [
+                  1,
+                  0
+                ],
+                "node": 2,
+                "operation": "SUBTRACT",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "0:u8"
+                }
+              },
+              {
+                "antecedents": [
+                  2
+                ],
+                "node": 3,
+                "operation": "RETURN",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "0:u8"
+                }
+              }
+            ],
+            "path_shape": [
+              {
+                "antecedents": [],
+                "operation": "INPUT"
+              },
+              {
+                "antecedents": [
+                  0,
+                  0
+                ],
+                "operation": "MULTIPLY"
+              },
+              {
+                "antecedents": [
+                  1,
+                  0
+                ],
+                "operation": "SUBTRACT"
+              },
+              {
+                "antecedents": [
+                  2
+                ],
+                "operation": "RETURN"
+              }
+            ]
+          }
+        },
+        {
+          "candidate": "double_by_shift",
+          "evaluation": {
+            "condition": "CLOSED",
+            "output": {
+              "unit_exponents": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "value": "2:u8"
+            },
+            "path": [
+              {
+                "antecedents": [],
+                "node": 0,
+                "operation": "INPUT",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "1:u8"
+                }
+              },
+              {
+                "antecedents": [
+                  0
+                ],
+                "node": 1,
+                "operation": "SHIFT_LEFT",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "2:u8"
+                }
+              },
+              {
+                "antecedents": [
+                  1
+                ],
+                "node": 2,
+                "operation": "RETURN",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "2:u8"
+                }
+              }
+            ],
+            "path_shape": [
+              {
+                "antecedents": [],
+                "operation": "INPUT"
+              },
+              {
+                "antecedents": [
+                  0
+                ],
+                "operation": "SHIFT_LEFT"
+              },
+              {
+                "antecedents": [
+                  1
+                ],
+                "operation": "RETURN"
+              }
+            ]
+          }
+        }
+      ],
+      "events": [
+        {
+          "event": "probe-1-conduct",
+          "regional_arcs": 13,
+          "returned_incidences": 100,
+          "returned_pins": 100,
+          "semantic_words": 11,
+          "wall_micros": 4422
+        },
+        {
+          "event": "probe-1-prediction-face",
+          "regional_arcs": 105,
+          "returned_incidences": 303,
+          "returned_pins": 303,
+          "semantic_words": 4,
+          "wall_micros": 11435
+        },
+        {
+          "event": "probe-1-oracle-return",
+          "regional_arcs": 17,
+          "returned_incidences": 325,
+          "returned_pins": 325,
+          "semantic_words": 11,
+          "wall_micros": 9523
+        }
+      ],
+      "factor": {
+        "chart": {
+          "generation": 2,
+          "output_probes": 2,
+          "output_support_mask": 11,
+          "program_ids": [
+            0,
+            1,
+            3
+          ],
+          "trace_support_mask": 11
+        },
+        "event": {
+          "event": "probe-1-successor",
+          "regional_arcs": 83,
+          "returned_incidences": 68,
+          "returned_pins": 68,
+          "semantic_words": 67,
+          "wall_micros": 14124
+        },
+        "outgoing_factor_exact": true,
+        "physical_after": {
+          "constituent_cells": 3,
+          "constituent_incidences": 68,
+          "constituent_paths": 68,
+          "constituent_pins": 68,
+          "constituent_transport_terms": 68,
+          "live_lineages": 0,
+          "standing_cells": 36,
+          "standing_constituents": 1,
+          "standing_rank": 6
+        },
+        "returned_exactly": true
+      },
+      "input": {
+        "unit_exponents": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "value": "1:u8"
+      },
+      "machine_residual": {
+        "carried_open_mask": 4,
+        "exact": true,
+        "expected_open_mask": 4,
+        "founds": 0,
+        "rides": 3
+      },
+      "next_output_support_mask": 11,
+      "oracle_matching_support_mask": 11,
+      "oracle_return": {
+        "unit_exponents": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "value": "2:u8"
+      },
+      "prior_output_support_mask": 15,
+      "probe_ordinal": 1
+    },
+    {
+      "accepted": true,
+      "candidate_paths": [
+        {
+          "candidate": "square_then_add",
+          "evaluation": {
+            "condition": "CLOSED",
+            "output": {
+              "unit_exponents": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "value": "6:u8"
+            },
+            "path": [
+              {
+                "antecedents": [],
+                "node": 0,
+                "operation": "INPUT",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "2:u8"
+                }
+              },
+              {
+                "antecedents": [
+                  0,
+                  0
+                ],
+                "node": 1,
+                "operation": "MULTIPLY",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "4:u8"
+                }
+              },
+              {
+                "antecedents": [
+                  1,
+                  0
+                ],
+                "node": 2,
+                "operation": "ADD",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "6:u8"
+                }
+              },
+              {
+                "antecedents": [
+                  2
+                ],
+                "node": 3,
+                "operation": "RETURN",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "6:u8"
+                }
+              }
+            ],
+            "path_shape": [
+              {
+                "antecedents": [],
+                "operation": "INPUT"
+              },
+              {
+                "antecedents": [
+                  0,
+                  0
+                ],
+                "operation": "MULTIPLY"
+              },
+              {
+                "antecedents": [
+                  1,
+                  0
+                ],
+                "operation": "ADD"
+              },
+              {
+                "antecedents": [
+                  2
+                ],
+                "operation": "RETURN"
+              }
+            ]
+          }
+        },
+        {
+          "candidate": "successor_product",
+          "evaluation": {
+            "condition": "CLOSED",
+            "output": {
+              "unit_exponents": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "value": "6:u8"
+            },
+            "path": [
+              {
+                "antecedents": [],
+                "node": 0,
+                "operation": "INPUT",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "2:u8"
+                }
+              },
+              {
+                "antecedents": [],
+                "node": 1,
+                "operation": "CONST",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "1:u8"
+                }
+              },
+              {
+                "antecedents": [
+                  0,
+                  1
+                ],
+                "node": 2,
+                "operation": "ADD",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "3:u8"
+                }
+              },
+              {
+                "antecedents": [
+                  0,
+                  2
+                ],
+                "node": 3,
+                "operation": "MULTIPLY",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "6:u8"
+                }
+              },
+              {
+                "antecedents": [
+                  3
+                ],
+                "node": 4,
+                "operation": "RETURN",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "6:u8"
+                }
+              }
+            ],
+            "path_shape": [
+              {
+                "antecedents": [],
+                "operation": "INPUT"
+              },
+              {
+                "antecedents": [],
+                "operation": "CONST"
+              },
+              {
+                "antecedents": [
+                  0,
+                  1
+                ],
+                "operation": "ADD"
+              },
+              {
+                "antecedents": [
+                  0,
+                  2
+                ],
+                "operation": "MULTIPLY"
+              },
+              {
+                "antecedents": [
+                  3
+                ],
+                "operation": "RETURN"
+              }
+            ]
+          }
+        },
+        {
+          "candidate": "double_by_shift",
+          "evaluation": {
+            "condition": "CLOSED",
+            "output": {
+              "unit_exponents": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "value": "4:u8"
+            },
+            "path": [
+              {
+                "antecedents": [],
+                "node": 0,
+                "operation": "INPUT",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "2:u8"
+                }
+              },
+              {
+                "antecedents": [
+                  0
+                ],
+                "node": 1,
+                "operation": "SHIFT_LEFT",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "4:u8"
+                }
+              },
+              {
+                "antecedents": [
+                  1
+                ],
+                "node": 2,
+                "operation": "RETURN",
+                "output": {
+                  "unit_exponents": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "value": "4:u8"
+                }
+              }
+            ],
+            "path_shape": [
+              {
+                "antecedents": [],
+                "operation": "INPUT"
+              },
+              {
+                "antecedents": [
+                  0
+                ],
+                "operation": "SHIFT_LEFT"
+              },
+              {
+                "antecedents": [
+                  1
+                ],
+                "operation": "RETURN"
+              }
+            ]
+          }
+        }
+      ],
+      "events": [
+        {
+          "event": "probe-2-conduct",
+          "regional_arcs": 13,
+          "returned_incidences": 81,
+          "returned_pins": 81,
+          "semantic_words": 11,
+          "wall_micros": 3558
+        },
+        {
+          "event": "probe-2-prediction-face",
+          "regional_arcs": 86,
+          "returned_incidences": 246,
+          "returned_pins": 246,
+          "semantic_words": 4,
+          "wall_micros": 9330
+        },
+        {
+          "event": "probe-2-oracle-return",
+          "regional_arcs": 17,
+          "returned_incidences": 268,
+          "returned_pins": 268,
+          "semantic_words": 11,
+          "wall_micros": 8367
+        }
+      ],
+      "factor": {
+        "chart": {
+          "generation": 3,
+          "output_probes": 3,
+          "output_support_mask": 3,
+          "program_ids": [
+            0,
+            1
+          ],
+          "trace_support_mask": 3
+        },
+        "event": {
+          "event": "probe-2-successor",
+          "regional_arcs": 68,
+          "returned_incidences": 53,
+          "returned_pins": 53,
+          "semantic_words": 52,
+          "wall_micros": 11811
+        },
+        "outgoing_factor_exact": true,
+        "physical_after": {
+          "constituent_cells": 3,
+          "constituent_incidences": 53,
+          "constituent_paths": 53,
+          "constituent_pins": 53,
+          "constituent_transport_terms": 53,
+          "live_lineages": 0,
+          "standing_cells": 36,
+          "standing_constituents": 1,
+          "standing_rank": 6
+        },
+        "returned_exactly": true
+      },
+      "input": {
+        "unit_exponents": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "value": "2:u8"
+      },
+      "machine_residual": {
+        "carried_open_mask": 8,
+        "exact": true,
+        "expected_open_mask": 8,
+        "founds": 0,
+        "rides": 3
+      },
+      "next_output_support_mask": 3,
+      "oracle_matching_support_mask": 3,
+      "oracle_return": {
+        "unit_exponents": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "value": "6:u8"
+      },
+      "prior_output_support_mask": 11,
+      "probe_ordinal": 2
+    }
+  ],
+  "physical_preflight": {
+    "cuda": false,
+    "event_limit_seconds": 30,
+    "executor": "bounded host",
+    "floating_point_causal_data": false,
+    "maximum_regional_arcs_per_event": 256,
+    "run_limit_seconds": 120
+  },
+  "question": "Can one exact receiver-coupled ecology carry typed algorithm paths, let output testimony preserve a plural hypothesis fiber, let a trace receiver refine that fiber without erasing output equivalence, and later conduct from the cultivated boundary after the source and oracle have departed?",
+  "rest_remount": {
+    "exact": true,
+    "rest_sha256": "65c55ea34f45a5a953c290813c3dd313187aadecf8b0ac8acff5f3fabe7c07d4"
+  },
+  "run_wall_micros": 588758,
+  "schema": "eros.exact-algorithm-ecology.report.v1",
+  "source_population": {
+    "chart_returned_exactly": true,
+    "event": {
+      "chart": {
+        "generation": 0,
+        "output_probes": 0,
+        "output_support_mask": 15,
+        "program_ids": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "trace_support_mask": 15
+      },
+      "event": {
+        "event": "source-program-population",
+        "regional_arcs": 87,
+        "returned_incidences": 87,
+        "returned_pins": 87,
+        "semantic_words": 86,
+        "wall_micros": 4799
+      },
+      "physical_after": {
+        "constituent_cells": 3,
+        "constituent_incidences": 87,
+        "constituent_paths": 87,
+        "constituent_pins": 87,
+        "constituent_transport_terms": 174,
+        "live_lineages": 0,
+        "standing_cells": 8,
+        "standing_constituents": 1,
+        "standing_rank": 6
+      },
+      "returned_exactly": true,
+      "source_boundary_exact": true
+    },
+    "rest_sha256": "bba98d3f986811cd27f77bb2be184db8ce5c22c99f521b7ea251ce259008b52d",
+    "source_lineages_departed": true
+  },
+  "source_sha256": "d381df96d21c9531a03ae3809e5449bed2f0cb296ae92bf49fea3ce44af4b413",
+  "status": "accepted",
+  "stopping_condition": "Stop after the source program population has departed into one exact outgoing chart factor; output probes leave exactly square_then_add and successor_product; a trace observation refines only the trace receiver to square_then_add; rest/remount preserves that distinction; later source-absent conduct returns 12 through the recruited path; the same exact DIVIDE graph returns numerically 4 under two nonidentical unit charts; zero division remains OPEN; and the no-Standing control cannot form a result.",
+  "theory_to_structure": "An algorithm is carried as an exact typed antecedent-to-consequent graph. A chart is the receiver-indexed support fiber plus the exact graphs still able to factor into later conduct. Output testimony changes output membership through RIDE/OPEN residuals; trace testimony crosses a different membership surface; the outgoing factor re-emits only the active chart boundary. The world organ interprets the recovered graph and returns consequences, while Soma owns co-presence, residual, replacement, rest, and later recruitment.",
+  "trace_receiver_refinement": {
+    "accepted": true,
+    "events": [
+      {
+        "event": "trace-chart-meeting",
+        "regional_arcs": 2,
+        "returned_incidences": 55,
+        "returned_pins": 55,
+        "semantic_words": 1,
+        "wall_micros": 2321
+      },
+      {
+        "event": "trace-prediction-face",
+        "regional_arcs": 60,
+        "returned_incidences": 167,
+        "returned_pins": 167,
+        "semantic_words": 4,
+        "wall_micros": 6065
+      },
+      {
+        "event": "trace-oracle-return",
+        "regional_arcs": 21,
+        "returned_incidences": 193,
+        "returned_pins": 193,
+        "semantic_words": 15,
+        "wall_micros": 5986
+      }
+    ],
+    "factor": {
+      "chart": {
+        "generation": 4,
+        "output_probes": 3,
+        "output_support_mask": 3,
+        "program_ids": [
+          0,
+          1
+        ],
+        "trace_support_mask": 1
+      },
+      "event": {
+        "event": "trace-successor",
+        "regional_arcs": 72,
+        "returned_incidences": 53,
+        "returned_pins": 53,
+        "semantic_words": 52,
+        "wall_micros": 9862
+      },
+      "outgoing_factor_exact": true,
+      "physical_after": {
+        "constituent_cells": 3,
+        "constituent_incidences": 53,
+        "constituent_paths": 53,
+        "constituent_pins": 53,
+        "constituent_transport_terms": 53,
+        "live_lineages": 0,
+        "standing_cells": 36,
+        "standing_constituents": 1,
+        "standing_rank": 6
+      },
+      "returned_exactly": true
+    },
+    "machine_residual": {
+      "carried_open_mask": 2,
+      "exact": true,
+      "expected_open_mask": 2,
+      "founds": 0,
+      "rides": 3
+    },
+    "next_trace_support_mask": 1,
+    "oracle_matching_support_mask": 1,
+    "oracle_program": "square_then_add",
+    "oracle_shape": [
+      {
+        "antecedents": [],
+        "operation": "INPUT"
+      },
+      {
+        "antecedents": [
+          0,
+          0
+        ],
+        "operation": "MULTIPLY"
+      },
+      {
+        "antecedents": [
+          1,
+          0
+        ],
+        "operation": "ADD"
+      },
+      {
+        "antecedents": [
+          2
+        ],
+        "operation": "RETURN"
+      }
+    ],
+    "output_support_unchanged": true,
+    "prior_trace_support_mask": 3
+  },
+  "typed_division_world": {
+    "cases": [
+      {
+        "evaluation": {
+          "condition": "CLOSED",
+          "output": {
+            "unit_exponents": [
+              0,
+              0,
+              1,
+              0
+            ],
+            "value": "4"
+          },
+          "path": [
+            {
+              "antecedents": [],
+              "node": 0,
+              "operation": "INPUT",
+              "output": {
+                "unit_exponents": [
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "value": "12"
+              }
+            },
+            {
+              "antecedents": [],
+              "node": 1,
+              "operation": "INPUT",
+              "output": {
+                "unit_exponents": [
+                  0,
+                  0,
+                  -1,
+                  1
+                ],
+                "value": "3"
+              }
+            },
+            {
+              "antecedents": [
+                0,
+                1
+              ],
+              "node": 2,
+              "operation": "DIVIDE",
+              "output": {
+                "unit_exponents": [
+                  0,
+                  0,
+                  1,
+                  0
+                ],
+                "value": "4"
+              }
+            },
+            {
+              "antecedents": [
+                2
+              ],
+              "node": 3,
+              "operation": "RETURN",
+              "output": {
+                "unit_exponents": [
+                  0,
+                  0,
+                  1,
+                  0
+                ],
+                "value": "4"
+              }
+            }
+          ],
+          "path_shape": [
+            {
+              "antecedents": [],
+              "operation": "INPUT"
+            },
+            {
+              "antecedents": [],
+              "operation": "INPUT"
+            },
+            {
+              "antecedents": [
+                0,
+                1
+              ],
+              "operation": "DIVIDE"
+            },
+            {
+              "antecedents": [
+                2
+              ],
+              "operation": "RETURN"
+            }
+          ]
+        },
+        "events": {
+          "conduct": {
+            "event": "division-electrical-conduct",
+            "regional_arcs": 21,
+            "returned_incidences": 45,
+            "returned_pins": 45,
+            "semantic_words": 20,
+            "wall_micros": 2643
+          },
+          "return": {
+            "event": "division-electrical-return",
+            "regional_arcs": 11,
+            "returned_incidences": 11,
+            "returned_pins": 11,
+            "semantic_words": 11,
+            "wall_micros": 1518
+          }
+        },
+        "exact": true,
+        "expected": {
+          "unit_exponents": [
+            0,
+            0,
+            1,
+            0
+          ],
+          "value": "4"
+        },
+        "id": "electrical",
+        "inputs": [
+          {
+            "unit_exponents": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "value": "12"
+          },
+          {
+            "unit_exponents": [
+              0,
+              0,
+              -1,
+              1
+            ],
+            "value": "3"
+          }
+        ],
+        "returned_as_later_current": true
+      },
+      {
+        "evaluation": {
+          "condition": "CLOSED",
+          "output": {
+            "unit_exponents": [
+              1,
+              -1,
+              0,
+              0
+            ],
+            "value": "4"
+          },
+          "path": [
+            {
+              "antecedents": [],
+              "node": 0,
+              "operation": "INPUT",
+              "output": {
+                "unit_exponents": [
+                  1,
+                  0,
+                  0,
+                  0
+                ],
+                "value": "12"
+              }
+            },
+            {
+              "antecedents": [],
+              "node": 1,
+              "operation": "INPUT",
+              "output": {
+                "unit_exponents": [
+                  0,
+                  1,
+                  0,
+                  0
+                ],
+                "value": "3"
+              }
+            },
+            {
+              "antecedents": [
+                0,
+                1
+              ],
+              "node": 2,
+              "operation": "DIVIDE",
+              "output": {
+                "unit_exponents": [
+                  1,
+                  -1,
+                  0,
+                  0
+                ],
+                "value": "4"
+              }
+            },
+            {
+              "antecedents": [
+                2
+              ],
+              "node": 3,
+              "operation": "RETURN",
+              "output": {
+                "unit_exponents": [
+                  1,
+                  -1,
+                  0,
+                  0
+                ],
+                "value": "4"
+              }
+            }
+          ],
+          "path_shape": [
+            {
+              "antecedents": [],
+              "operation": "INPUT"
+            },
+            {
+              "antecedents": [],
+              "operation": "INPUT"
+            },
+            {
+              "antecedents": [
+                0,
+                1
+              ],
+              "operation": "DIVIDE"
+            },
+            {
+              "antecedents": [
+                2
+              ],
+              "operation": "RETURN"
+            }
+          ]
+        },
+        "events": {
+          "conduct": {
+            "event": "division-kinematic-conduct",
+            "regional_arcs": 21,
+            "returned_incidences": 45,
+            "returned_pins": 45,
+            "semantic_words": 20,
+            "wall_micros": 2644
+          },
+          "return": {
+            "event": "division-kinematic-return",
+            "regional_arcs": 11,
+            "returned_incidences": 11,
+            "returned_pins": 11,
+            "semantic_words": 11,
+            "wall_micros": 1530
+          }
+        },
+        "exact": true,
+        "expected": {
+          "unit_exponents": [
+            1,
+            -1,
+            0,
+            0
+          ],
+          "value": "4"
+        },
+        "id": "kinematic",
+        "inputs": [
+          {
+            "unit_exponents": [
+              1,
+              0,
+              0,
+              0
+            ],
+            "value": "12"
+          },
+          {
+            "unit_exponents": [
+              0,
+              1,
+              0,
+              0
+            ],
+            "value": "3"
+          }
+        ],
+        "returned_as_later_current": true
+      },
+      {
+        "evaluation": {
+          "completed_prefix": [
+            {
+              "antecedents": [],
+              "node": 0,
+              "operation": "INPUT",
+              "output": {
+                "unit_exponents": [
+                  1,
+                  0,
+                  0,
+                  0
+                ],
+                "value": "12"
+              }
+            },
+            {
+              "antecedents": [],
+              "node": 1,
+              "operation": "INPUT",
+              "output": {
+                "unit_exponents": [
+                  0,
+                  1,
+                  0,
+                  0
+                ],
+                "value": "0"
+              }
+            }
+          ],
+          "condition": "OPEN",
+          "open_at_node": 2,
+          "output": null,
+          "path_shape": [
+            {
+              "antecedents": [],
+              "operation": "INPUT"
+            },
+            {
+              "antecedents": [],
+              "operation": "INPUT"
+            }
+          ],
+          "reason": "division by the presented zero divisor is OPEN"
+        },
+        "events": {
+          "conduct": {
+            "event": "division-zero-boundary-conduct",
+            "regional_arcs": 21,
+            "returned_incidences": 45,
+            "returned_pins": 45,
+            "semantic_words": 20,
+            "wall_micros": 2646
+          },
+          "return": null
+        },
+        "exact": true,
+        "expected": null,
+        "id": "zero-boundary",
+        "inputs": [
+          {
+            "unit_exponents": [
+              1,
+              0,
+              0,
+              0
+            ],
+            "value": "12"
+          },
+          {
+            "unit_exponents": [
+              0,
+              1,
+              0,
+              0
+            ],
+            "value": "0"
+          }
+        ],
+        "returned_as_later_current": false
+      }
+    ],
+    "dual_chart_exact": true,
+    "seed": {
+      "chart": {
+        "generation": 0,
+        "output_probes": 0,
+        "output_support_mask": 1,
+        "program_ids": [
+          100
+        ],
+        "trace_support_mask": 1
+      },
+      "event": {
+        "event": "typed-division-source",
+        "regional_arcs": 24,
+        "returned_incidences": 24,
+        "returned_pins": 24,
+        "semantic_words": 23,
+        "wall_micros": 1222
+      },
+      "physical_after": {
+        "constituent_cells": 3,
+        "constituent_incidences": 24,
+        "constituent_paths": 24,
+        "constituent_pins": 24,
+        "constituent_transport_terms": 48,
+        "live_lineages": 0,
+        "standing_cells": 8,
+        "standing_constituents": 1,
+        "standing_rank": 6
+      },
+      "returned_exactly": true,
+      "source_boundary_exact": true
+    },
+    "unit_erasure_ambiguous": true,
+    "zero_boundary_exact": true
+  }
+}

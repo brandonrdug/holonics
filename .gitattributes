@@ -1,0 +1,12 @@
+*.pdf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.body binary
+
+# Imported evidence preserves source whitespace exactly.
+research/records/** -whitespace
+evidence/observations/** -whitespace
+reference/** -whitespace
+formal/** -whitespace
+papers/source/** -whitespace

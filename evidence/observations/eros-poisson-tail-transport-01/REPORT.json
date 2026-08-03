@@ -1,0 +1,214 @@
+{
+  "schema": "eros.Poisson-tail-transport.v1",
+  "status": "accepted",
+  "question": "Can Soma carry the general finite-aperture/generative-remainder relation as one causal replacement when instantiated by two Gaussian charts joined by Poisson summation?",
+  "theory_to_structure": "The source supplies the exact Poisson transform identity. Each complete chart is factored into a finite theta aperture and one formal Gaussian tail generator. Growing the aperture transfers the same shell from each generator into its chart; the machine carries the predecessor, law, objective, replacement, constituent departure, and exact rest without materializing an infinite population.",
+  "stopping_condition": "Stop after one aperture-four to aperture-five host transition preserves both complete chart bodies, preserves their inherited transform identity, advances both tail generators to shell six, recovers aperture four by restriction, and remounts exactly. Do not search zeta zeros, claim RH, enlarge the aperture, render, tune, or enter CUDA.",
+  "inherited_fact": "Poisson summation for the Gaussian is source law, not a result rediscovered or proved by this run.",
+  "logical_cores": 24,
+  "event_limit_seconds": 30,
+  "run_limit_seconds": 120,
+  "run_wall_micros": 12308,
+  "run_resource": {
+    "user_cpu_micros": 7507,
+    "system_cpu_micros": 6120,
+    "max_rss_before_kib": 2420,
+    "max_rss_after_kib": 8576
+  },
+  "lifecycle": {
+    "source_law": {
+      "event": "Poisson-Gaussian-source-law",
+      "semantic_atoms": 2,
+      "preflight": {
+        "currents": 2,
+        "regional_cells": 1,
+        "regional_arcs": 3,
+        "largest_cell_arcs": 3,
+        "regional_receiver_width": 1,
+        "executor_thread_ceiling": 2,
+        "legacy_quadratic_pair_visits": 9,
+        "indexed_rows": 3,
+        "hard_arc_limit": 1024
+      },
+      "wall_micros": 138,
+      "executor_micros": 113,
+      "machine_boundary_micros": 25,
+      "resource": {
+        "user_cpu_micros": 198,
+        "system_cpu_micros": 0,
+        "max_rss_before_kib": 3188,
+        "max_rss_after_kib": 3188
+      },
+      "returned_incidences": 3,
+      "returned_pins": 3
+    },
+    "predecessor_return": {
+      "event": "Poisson-Gaussian-aperture-four",
+      "semantic_atoms": 220,
+      "preflight": {
+        "currents": 2,
+        "regional_cells": 1,
+        "regional_arcs": 221,
+        "largest_cell_arcs": 221,
+        "regional_receiver_width": 1,
+        "executor_thread_ceiling": 2,
+        "legacy_quadratic_pair_visits": 72930,
+        "indexed_rows": 221,
+        "hard_arc_limit": 1024
+      },
+      "wall_micros": 1135,
+      "executor_micros": 638,
+      "machine_boundary_micros": 497,
+      "resource": {
+        "user_cpu_micros": 0,
+        "system_cpu_micros": 1173,
+        "max_rss_before_kib": 3380,
+        "max_rss_after_kib": 4340
+      },
+      "returned_incidences": 221,
+      "returned_pins": 221
+    },
+    "growth_meeting": {
+      "event": "Poisson-Gaussian-growth-meeting",
+      "semantic_atoms": 1,
+      "preflight": {
+        "currents": 2,
+        "regional_cells": 1,
+        "regional_arcs": 5,
+        "largest_cell_arcs": 5,
+        "regional_receiver_width": 1,
+        "executor_thread_ceiling": 2,
+        "legacy_quadratic_pair_visits": 30,
+        "indexed_rows": 5,
+        "hard_arc_limit": 1024
+      },
+      "wall_micros": 612,
+      "executor_micros": 102,
+      "machine_boundary_micros": 510,
+      "resource": {
+        "user_cpu_micros": 530,
+        "system_cpu_micros": 124,
+        "max_rss_before_kib": 4724,
+        "max_rss_after_kib": 4916
+      },
+      "returned_incidences": 229,
+      "returned_pins": 229
+    },
+    "successor_replacement": {
+      "event": "Poisson-Gaussian-successor-replacement",
+      "semantic_atoms": 481,
+      "preflight": {
+        "currents": 2,
+        "regional_cells": 1,
+        "regional_arcs": 483,
+        "largest_cell_arcs": 483,
+        "regional_receiver_width": 1,
+        "executor_thread_ceiling": 2,
+        "legacy_quadratic_pair_visits": 349209,
+        "indexed_rows": 483,
+        "hard_arc_limit": 1024
+      },
+      "wall_micros": 3823,
+      "executor_micros": 1327,
+      "machine_boundary_micros": 2496,
+      "resource": {
+        "user_cpu_micros": 2935,
+        "system_cpu_micros": 918,
+        "max_rss_before_kib": 4916,
+        "max_rss_after_kib": 8100
+      },
+      "returned_incidences": 934,
+      "returned_pins": 934
+    },
+    "predecessor_aperture": 4,
+    "successor_aperture": 5,
+    "predecessor_words": 220,
+    "successor_words": 260,
+    "lower_restriction_exact": true,
+    "law_recovered_from_standing": true,
+    "predecessor_recovered_from_standing": true,
+    "objective_recovered_from_current": true,
+    "predecessor_data_departed": true,
+    "predecessor_recruit_departed": true,
+    "objective_departed": true,
+    "source_lineages_departed": true,
+    "final_rest_remount_exact": true,
+    "final_machine": {
+      "standing_rank": 6,
+      "standing_cells": 26,
+      "standing_constituents": 1,
+      "constituent_cells": 14,
+      "constituent_incidences": 934,
+      "constituent_pins": 934,
+      "constituent_paths": 936,
+      "constituent_transport_terms": 1643,
+      "live_lineages": 0,
+      "rest_sha256": "8c1315b8ed526703fd09f44951c535ca1a254a4a18554971ec43c74afd043a7a"
+    }
+  },
+  "boundary": {
+    "inherited_transform": "Poisson summation for the Gaussian: theta(t)=t^(-1/2)*theta(1/t), t>0",
+    "complete_identity": "0xe70d6acbbd6181b5",
+    "predecessor_boundary_equation": "P_d,4-P_r,4 = T_r,4-T_d,4",
+    "successor_boundary_equation": "P_d,5-P_r,5 = T_r,5-T_d,5",
+    "coefficient_basis": [
+      "direct shell d_5",
+      "reciprocal shell r_5"
+    ],
+    "partial_residual_delta": [
+      2,
+      -2
+    ],
+    "tail_boundary_delta": [
+      2,
+      -2
+    ],
+    "residual_transport_exact": true,
+    "direct_partial_gain_and_tail_loss": [
+      2,
+      -2
+    ],
+    "reciprocal_partial_gain_and_tail_loss": [
+      2,
+      -2
+    ],
+    "direct_complete_body_invariant": true,
+    "reciprocal_complete_body_invariant": true,
+    "inherited_transform_identity_preserved": true,
+    "tails": [
+      {
+        "hand": "direct",
+        "predecessor_start": 5,
+        "transferred_shell": 5,
+        "successor_start": 6,
+        "multiplicity": 2,
+        "exponent_gap": 11,
+        "generator": "T_d,4(t)=2*sum_(n=5)^infinity exp(-pi*n^2*t)",
+        "recurrence": "d_(n+1)=d_n*exp(-pi*t*(2*n+1)); gap at n=5 is 11",
+        "strictly_decreases_on_positive_domain": true
+      },
+      {
+        "hand": "reciprocal",
+        "predecessor_start": 5,
+        "transferred_shell": 5,
+        "successor_start": 6,
+        "multiplicity": 2,
+        "exponent_gap": 11,
+        "generator": "T_r,4(t)=2*t^(-1/2)*sum_(n=5)^infinity exp(-pi*n^2/t)",
+        "recurrence": "r_(n+1)=r_n*exp(-pi*(2*n+1)/t); gap at n=5 is 11",
+        "strictly_decreases_on_positive_domain": true
+      }
+    ]
+  },
+  "acceptance": {
+    "exact_boundary_transfer": true,
+    "complete_objects_invariant": true,
+    "transform_identity_preserved": true,
+    "generative_remainders_advanced": true,
+    "lifecycle_exact": true,
+    "every_event_within_limit": true,
+    "complete_run_within_limit": true,
+    "no_floating_point_causal_data": true
+  },
+  "conclusion": "The machine carries a moving finite boundary without confusing the active aperture with the complete object: shell five leaves each generative remainder, enters its corresponding chart, and preserves both completed charts and their transform relation. This supplies the missing causal tail transport for the bounded theta fixture; it does not derive Poisson summation, analytic continuation, a completed Weil form, or RH."
+}

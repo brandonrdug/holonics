@@ -1,0 +1,1471 @@
+{
+  "schema": "eros.self-emanated-law.v1",
+  "status": "accepted",
+  "question": "can an inherited transformation law become self-emanated Standing, survive removal of its source image, conduct a held-out current, and emit a changed successor which conducts after rest?",
+  "theory_to_structure": "law bytes -> ordered boundary hands; bit position -> interface-local identity; one separate exposed interface -> recruitment; contact -> consumed recruitment plus a newly emitted arm; returned hand -> exact basis rebase; successor bytes -> new exposed law topology",
+  "stopping_condition": "source-absent held-out conduct and source-absent successor conduct must both close for an exact calibration law and one real OLMo block constituent; no-Standing, wrong-interface, and retired-interface branches must refuse",
+  "source": {
+    "observation_id": "transformer-context-recomposition-01",
+    "model_repository": "allenai/OLMo-2-0425-1B-Instruct",
+    "model_revision": "48d788eca847d4d7548f375ad03d3c9312f6139e",
+    "weight_tensor": "model.layers.0.mlp.down_proj.weight",
+    "weight_coordinates": [
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        1,
+        1
+      ]
+    ],
+    "weight_bfloat16_words": [
+      "0x3d05",
+      "0x3cf3",
+      "0xbd0e",
+      "0x3c67"
+    ],
+    "exposure_input_tensor": "mlp.product",
+    "held_out_input_tensor": "mlp.product",
+    "input_coordinates": [
+      [
+        0,
+        252,
+        0
+      ],
+      [
+        0,
+        252,
+        1
+      ]
+    ],
+    "exposure_input_bfloat16_words": [
+      "0xb74f",
+      "0x391e"
+    ],
+    "held_out_input_bfloat16_words": [
+      "0xb6d9",
+      "0xb5d6"
+    ],
+    "model_artifact": {
+      "path": "/home/b/.cache/huggingface/models--allenai--OLMo-2-0425-1B-Instruct/snapshots/48d788eca847d4d7548f375ad03d3c9312f6139e/model.safetensors",
+      "bytes": 2969854224,
+      "sha256": "36d044c73655bb904f822915e6294ba3dae8e6e1af5e703e9d452f2d6a3a294f",
+      "verification": "source manifest identity plus exact file extent; selected tensor words read directly"
+    },
+    "exposure_artifact": {
+      "path": "experiments/informant-ecology/runs/transformer-block-atlas-01/captures/drop_then_reverse.conversation.relevant_before.safetensors",
+      "bytes": 33139024,
+      "sha256": "09c4e897b79f48097ebd5c9305475138e8bf5d1dd1d223aae51740d47c905005",
+      "verification": "exact extent and SHA-256 verified before extraction"
+    },
+    "held_out_artifact": {
+      "path": "experiments/informant-ecology/runs/transformer-block-atlas-01/captures/drop_then_reverse.conversation.relevant_after.safetensors",
+      "bytes": 33139024,
+      "sha256": "e8251263b3ffd6087bc0b75bc95e17c031930005f4a550435df1819d12cff06f",
+      "verification": "exact extent and SHA-256 verified before extraction"
+    },
+    "manifest_sha256": "9e36cbbbbf51453f582053356c6f82f9c7a547ce972f059b7cec2e256e61cf58"
+  },
+  "deposit": {
+    "source_lineages_after_event": 0,
+    "machine": {
+      "standing_rank": 6,
+      "standing_cells": 25,
+      "standing_constituents": 2,
+      "constituent_cells": 6,
+      "constituent_incidences": 810,
+      "constituent_pins": 810,
+      "constituent_paths": 810,
+      "constituent_transport_terms": 1620,
+      "live_lineages": 0,
+      "rest_sha256": "95e339c24c1a0fd85e0bc905d4815601a5aa8204ceff7001f8fa347ca409a4f4"
+    },
+    "no_standing_control": {
+      "standing_rank": 6,
+      "standing_cells": 25,
+      "standing_constituents": 0,
+      "constituent_cells": 0,
+      "constituent_incidences": 0,
+      "constituent_pins": 0,
+      "constituent_paths": 0,
+      "constituent_transport_terms": 0,
+      "live_lineages": 0,
+      "rest_sha256": "5979d661851c12e334a756b7f1df0588bee4425e0dc4102abe9a58713414a6ae"
+    },
+    "rest_remount_exact": true,
+    "laws": [
+      {
+        "law": "exact unimodular calibration",
+        "handle": {
+          "data_namespace": "0xbfbc7a717418e1a8",
+          "recruit_namespace": "0x54189553ad115452",
+          "generation": 0
+        },
+        "matrix": {
+          "rows": 2,
+          "columns": 2,
+          "values": [
+            {
+              "numerator": "1",
+              "power_of_two": 0,
+              "exact_ratio": "1"
+            },
+            {
+              "numerator": "1",
+              "power_of_two": 0,
+              "exact_ratio": "1"
+            },
+            {
+              "numerator": "1",
+              "power_of_two": 0,
+              "exact_ratio": "1"
+            },
+            {
+              "numerator": "1",
+              "power_of_two": 1,
+              "exact_ratio": "2"
+            }
+          ],
+          "encoded_sha256": "69772b7e45c6cccf92cc7ed4d64e569f001828a7d02d031c776687a6fb9ccc79"
+        },
+        "source_present_exposure_output": {
+          "rows": 2,
+          "columns": 1,
+          "values": [
+            {
+              "numerator": "5",
+              "power_of_two": 0,
+              "exact_ratio": "5"
+            },
+            {
+              "numerator": "1",
+              "power_of_two": 3,
+              "exact_ratio": "8"
+            }
+          ],
+          "encoded_sha256": "fa7e7d5c805ae46c4953e07079fd90ba5d88b3dd405a29454c6134b4b1de4555"
+        },
+        "source_present_held_out_output": {
+          "rows": 2,
+          "columns": 1,
+          "values": [
+            {
+              "numerator": "13",
+              "power_of_two": 0,
+              "exact_ratio": "13"
+            },
+            {
+              "numerator": "21",
+              "power_of_two": 0,
+              "exact_ratio": "21"
+            }
+          ],
+          "encoded_sha256": "122802de70248c216ac5f90c4fb914aafeecce42cac104686302294466ad11f7"
+        },
+        "encoded_bits": 392,
+        "constituent": {
+          "grain": 2,
+          "axes": 1,
+          "cells": 3,
+          "incidences": 393,
+          "pins": 393,
+          "boundaries": 393,
+          "exposed_pins": 393,
+          "native_sha256": "c884cc34f4b19ed19c7d877111bc0baea825ed5ae66a37a1808bec71f045246b"
+        }
+      },
+      {
+        "law": "OLMo layer-0 MLP down-projection 2x2 coordinate restriction",
+        "handle": {
+          "data_namespace": "0x3b566e4a62e6d514",
+          "recruit_namespace": "0x39a558aeb1876d61",
+          "generation": 0
+        },
+        "matrix": {
+          "rows": 2,
+          "columns": 2,
+          "values": [
+            {
+              "numerator": "133",
+              "power_of_two": -12,
+              "exact_ratio": "133/2^12"
+            },
+            {
+              "numerator": "243",
+              "power_of_two": -13,
+              "exact_ratio": "243/2^13"
+            },
+            {
+              "numerator": "-71",
+              "power_of_two": -11,
+              "exact_ratio": "-71/2^11"
+            },
+            {
+              "numerator": "231",
+              "power_of_two": -14,
+              "exact_ratio": "231/2^14"
+            }
+          ],
+          "encoded_sha256": "83f0fc02fc6236c71f0a42bc19f51e5b4f82c2023d12c6933bdfe33605b112de"
+        },
+        "source_present_exposure_output": {
+          "rows": 2,
+          "columns": 1,
+          "values": [
+            {
+              "numerator": "279621",
+              "power_of_two": -36,
+              "exact_ratio": "279621/2^36"
+            },
+            {
+              "numerator": "87693",
+              "power_of_two": -35,
+              "exact_ratio": "87693/2^35"
+            }
+          ],
+          "encoded_sha256": "b4f3f6649a2fd68b479d7e14015e13682566cc5749cbb49478f97001969a0afd"
+        },
+        "source_present_held_out_output": {
+          "rows": 2,
+          "columns": 1,
+          "values": [
+            {
+              "numerator": "-141445",
+              "power_of_two": -39,
+              "exact_ratio": "-141445/2^39"
+            },
+            {
+              "numerator": "221795",
+              "power_of_two": -40,
+              "exact_ratio": "221795/2^40"
+            }
+          ],
+          "encoded_sha256": "4e8fef071d2a2c6fb336ffb06777c70b28a80dd63d2456a37727d8e19d7c0fb8"
+        },
+        "encoded_bits": 416,
+        "constituent": {
+          "grain": 2,
+          "axes": 1,
+          "cells": 3,
+          "incidences": 417,
+          "pins": 417,
+          "boundaries": 417,
+          "exposed_pins": 417,
+          "native_sha256": "871ee43eac632d419a0e19411f172733631ff9024d1d548f4ffeb59eaaff7ac2"
+        }
+      }
+    ]
+  },
+  "calibration": {
+    "law": "exact unimodular calibration",
+    "source_absent_with_standing": {
+      "role": "source absent with Standing",
+      "incoming_handle": {
+        "data_namespace": "0xbfbc7a717418e1a8",
+        "recruit_namespace": "0x54189553ad115452",
+        "generation": 0
+      },
+      "outgoing_handle": {
+        "data_namespace": "0xbfbc7a717418e1a8",
+        "recruit_namespace": "0x359f30c8304e3e3d",
+        "generation": 1
+      },
+      "input_namespace": "0xb00b6dc2766250e9",
+      "input": {
+        "rows": 2,
+        "columns": 1,
+        "values": [
+          {
+            "numerator": "5",
+            "power_of_two": 0,
+            "exact_ratio": "5"
+          },
+          {
+            "numerator": "1",
+            "power_of_two": 3,
+            "exact_ratio": "8"
+          }
+        ],
+        "encoded_sha256": "fa7e7d5c805ae46c4953e07079fd90ba5d88b3dd405a29454c6134b4b1de4555"
+      },
+      "recovered_input": {
+        "rows": 2,
+        "columns": 1,
+        "values": [
+          {
+            "numerator": "5",
+            "power_of_two": 0,
+            "exact_ratio": "5"
+          },
+          {
+            "numerator": "1",
+            "power_of_two": 3,
+            "exact_ratio": "8"
+          }
+        ],
+        "encoded_sha256": "fa7e7d5c805ae46c4953e07079fd90ba5d88b3dd405a29454c6134b4b1de4555"
+      },
+      "recovered_law": {
+        "rows": 2,
+        "columns": 2,
+        "values": [
+          {
+            "numerator": "1",
+            "power_of_two": 0,
+            "exact_ratio": "1"
+          },
+          {
+            "numerator": "1",
+            "power_of_two": 0,
+            "exact_ratio": "1"
+          },
+          {
+            "numerator": "1",
+            "power_of_two": 0,
+            "exact_ratio": "1"
+          },
+          {
+            "numerator": "1",
+            "power_of_two": 1,
+            "exact_ratio": "2"
+          }
+        ],
+        "encoded_sha256": "69772b7e45c6cccf92cc7ed4d64e569f001828a7d02d031c776687a6fb9ccc79"
+      },
+      "output": {
+        "rows": 2,
+        "columns": 1,
+        "values": [
+          {
+            "numerator": "13",
+            "power_of_two": 0,
+            "exact_ratio": "13"
+          },
+          {
+            "numerator": "21",
+            "power_of_two": 0,
+            "exact_ratio": "21"
+          }
+        ],
+        "encoded_sha256": "122802de70248c216ac5f90c4fb914aafeecce42cac104686302294466ad11f7"
+      },
+      "constituent": {
+        "grain": 3,
+        "axes": 1,
+        "cells": 7,
+        "incidences": 643,
+        "pins": 643,
+        "boundaries": 644,
+        "exposed_pins": 641,
+        "native_sha256": "171c342866c5bd1ce1aa74835f754fe18f42c255c0e7586e04c76557c4916cfa"
+      },
+      "after": {
+        "standing_rank": 6,
+        "standing_cells": 31,
+        "standing_constituents": 2,
+        "constituent_cells": 10,
+        "constituent_incidences": 1060,
+        "constituent_pins": 1060,
+        "constituent_paths": 1061,
+        "constituent_transport_terms": 1871,
+        "live_lineages": 0,
+        "rest_sha256": "8f6c474c149ea8bc6fc5e678e444c7b44d024dd56688c91c7bb554d9d9ec6c25"
+      }
+    },
+    "no_standing": {
+      "role": "same current without law Standing",
+      "incoming_handle": {
+        "data_namespace": "0xbfbc7a717418e1a8",
+        "recruit_namespace": "0x54189553ad115452",
+        "generation": 0
+      },
+      "outgoing_handle": {
+        "data_namespace": "0xbfbc7a717418e1a8",
+        "recruit_namespace": "0xdbe47b1b7bc54f24",
+        "generation": 1
+      },
+      "input_namespace": "0x64ddaa415a3e2634",
+      "input": {
+        "rows": 2,
+        "columns": 1,
+        "values": [
+          {
+            "numerator": "5",
+            "power_of_two": 0,
+            "exact_ratio": "5"
+          },
+          {
+            "numerator": "1",
+            "power_of_two": 3,
+            "exact_ratio": "8"
+          }
+        ],
+        "encoded_sha256": "fa7e7d5c805ae46c4953e07079fd90ba5d88b3dd405a29454c6134b4b1de4555"
+      },
+      "recovered_input": {
+        "rows": 2,
+        "columns": 1,
+        "values": [
+          {
+            "numerator": "5",
+            "power_of_two": 0,
+            "exact_ratio": "5"
+          },
+          {
+            "numerator": "1",
+            "power_of_two": 3,
+            "exact_ratio": "8"
+          }
+        ],
+        "encoded_sha256": "fa7e7d5c805ae46c4953e07079fd90ba5d88b3dd405a29454c6134b4b1de4555"
+      },
+      "recovered_law": null,
+      "output": null,
+      "constituent": {
+        "grain": 2,
+        "axes": 1,
+        "cells": 3,
+        "incidences": 250,
+        "pins": 250,
+        "boundaries": 250,
+        "exposed_pins": 250,
+        "native_sha256": "d16720661cda2de11a94e133bc5a047d4e04a4fe19e149a1f8666231b19db6a2"
+      },
+      "after": {
+        "standing_rank": 6,
+        "standing_cells": 31,
+        "standing_constituents": 1,
+        "constituent_cells": 3,
+        "constituent_incidences": 250,
+        "constituent_pins": 250,
+        "constituent_paths": 250,
+        "constituent_transport_terms": 250,
+        "live_lineages": 0,
+        "rest_sha256": "52fc37db6de9e2d1c8a30c44e0e88794285a5fc419ea968fc2a9007ca278e44c"
+      }
+    },
+    "wrong_interface": {
+      "role": "same current under a nonincident interface",
+      "incoming_handle": {
+        "data_namespace": "0xbfbc7a717418e1a8",
+        "recruit_namespace": "0xf1bd30f608b4f1f7",
+        "generation": 0
+      },
+      "outgoing_handle": {
+        "data_namespace": "0xbfbc7a717418e1a8",
+        "recruit_namespace": "0xa3fbdc8c5fdd6864",
+        "generation": 1
+      },
+      "input_namespace": "0xc17e6f23c6739c7f",
+      "input": {
+        "rows": 2,
+        "columns": 1,
+        "values": [
+          {
+            "numerator": "5",
+            "power_of_two": 0,
+            "exact_ratio": "5"
+          },
+          {
+            "numerator": "1",
+            "power_of_two": 3,
+            "exact_ratio": "8"
+          }
+        ],
+        "encoded_sha256": "fa7e7d5c805ae46c4953e07079fd90ba5d88b3dd405a29454c6134b4b1de4555"
+      },
+      "recovered_input": {
+        "rows": 2,
+        "columns": 1,
+        "values": [
+          {
+            "numerator": "5",
+            "power_of_two": 0,
+            "exact_ratio": "5"
+          },
+          {
+            "numerator": "1",
+            "power_of_two": 3,
+            "exact_ratio": "8"
+          }
+        ],
+        "encoded_sha256": "fa7e7d5c805ae46c4953e07079fd90ba5d88b3dd405a29454c6134b4b1de4555"
+      },
+      "recovered_law": null,
+      "output": null,
+      "constituent": {
+        "grain": 2,
+        "axes": 1,
+        "cells": 3,
+        "incidences": 250,
+        "pins": 250,
+        "boundaries": 250,
+        "exposed_pins": 250,
+        "native_sha256": "a3d1c8a1f47df28692d75446026dbd59e3048808c212e088635fe2d71ef309a1"
+      },
+      "after": {
+        "standing_rank": 6,
+        "standing_cells": 31,
+        "standing_constituents": 3,
+        "constituent_cells": 9,
+        "constituent_incidences": 1060,
+        "constituent_pins": 1060,
+        "constituent_paths": 1060,
+        "constituent_transport_terms": 1870,
+        "live_lineages": 0,
+        "rest_sha256": "f14157636e467af4060818b9e6d68e20972ddf95a6a111d139b0140f50853f07"
+      }
+    },
+    "update": {
+      "hand": "WITH",
+      "before_handle": {
+        "data_namespace": "0xbfbc7a717418e1a8",
+        "recruit_namespace": "0x359f30c8304e3e3d",
+        "generation": 1
+      },
+      "after_handle": {
+        "data_namespace": "0xd07bfabef708d9fb",
+        "recruit_namespace": "0xc7235a18ff84a22c",
+        "generation": 2
+      },
+      "before_law": {
+        "rows": 2,
+        "columns": 2,
+        "values": [
+          {
+            "numerator": "1",
+            "power_of_two": 0,
+            "exact_ratio": "1"
+          },
+          {
+            "numerator": "1",
+            "power_of_two": 0,
+            "exact_ratio": "1"
+          },
+          {
+            "numerator": "1",
+            "power_of_two": 0,
+            "exact_ratio": "1"
+          },
+          {
+            "numerator": "1",
+            "power_of_two": 1,
+            "exact_ratio": "2"
+          }
+        ],
+        "encoded_sha256": "69772b7e45c6cccf92cc7ed4d64e569f001828a7d02d031c776687a6fb9ccc79"
+      },
+      "after_law": {
+        "rows": 2,
+        "columns": 2,
+        "values": [
+          {
+            "numerator": "1",
+            "power_of_two": 0,
+            "exact_ratio": "1"
+          },
+          {
+            "numerator": "1",
+            "power_of_two": 1,
+            "exact_ratio": "2"
+          },
+          {
+            "numerator": "1",
+            "power_of_two": 0,
+            "exact_ratio": "1"
+          },
+          {
+            "numerator": "3",
+            "power_of_two": 0,
+            "exact_ratio": "3"
+          }
+        ],
+        "encoded_sha256": "c799d33f6ccc38a6e92c76d8d7a43f2e7b9cf50c164fb72658a366b0e0546be7"
+      },
+      "before_output": {
+        "rows": 2,
+        "columns": 1,
+        "values": [
+          {
+            "numerator": "13",
+            "power_of_two": 0,
+            "exact_ratio": "13"
+          },
+          {
+            "numerator": "21",
+            "power_of_two": 0,
+            "exact_ratio": "21"
+          }
+        ],
+        "encoded_sha256": "122802de70248c216ac5f90c4fb914aafeecce42cac104686302294466ad11f7"
+      },
+      "after_output": {
+        "rows": 2,
+        "columns": 1,
+        "values": [
+          {
+            "numerator": "21",
+            "power_of_two": 0,
+            "exact_ratio": "21"
+          },
+          {
+            "numerator": "29",
+            "power_of_two": 0,
+            "exact_ratio": "29"
+          }
+        ],
+        "encoded_sha256": "1ec513db89ee945cd662d1c3094dd40893fc3e6ebb7d76ce37fa825cc9e3b151"
+      },
+      "oriented_output_change": {
+        "rows": 2,
+        "columns": 1,
+        "values": [
+          {
+            "numerator": "1",
+            "power_of_two": 3,
+            "exact_ratio": "8"
+          },
+          {
+            "numerator": "1",
+            "power_of_two": 3,
+            "exact_ratio": "8"
+          }
+        ],
+        "encoded_sha256": "a543257237f0bc699f010356a8588267b38e54029843594da0edf60cea5d5c5b"
+      },
+      "old_data_interfaces_departed": true,
+      "old_recruit_interface_departed": true,
+      "constituent": {
+        "grain": 4,
+        "axes": 1,
+        "cells": 11,
+        "incidences": 2318,
+        "pins": 2318,
+        "boundaries": 2319,
+        "exposed_pins": 393,
+        "native_sha256": "7ef15641cd45d3010e2124be39d0c10ac34b20f5ed0e98a8966dd1d10bf40b3f"
+      },
+      "after": {
+        "standing_rank": 6,
+        "standing_cells": 37,
+        "standing_constituents": 2,
+        "constituent_cells": 14,
+        "constituent_incidences": 2735,
+        "constituent_pins": 2735,
+        "constituent_paths": 2736,
+        "constituent_transport_terms": 4580,
+        "live_lineages": 0,
+        "rest_sha256": "d00f06f2038a5c5d59a04ce7a7e4f2598c659065bbe2876bb1cd0690b5a32a0f"
+      },
+      "rest_remount_exact": true
+    },
+    "later_probe": {
+      "role": "same held-out current after successor remount",
+      "incoming_handle": {
+        "data_namespace": "0xd07bfabef708d9fb",
+        "recruit_namespace": "0xc7235a18ff84a22c",
+        "generation": 2
+      },
+      "outgoing_handle": {
+        "data_namespace": "0xd07bfabef708d9fb",
+        "recruit_namespace": "0x7396557a0673c721",
+        "generation": 3
+      },
+      "input_namespace": "0x582a85a92eb5121a",
+      "input": {
+        "rows": 2,
+        "columns": 1,
+        "values": [
+          {
+            "numerator": "5",
+            "power_of_two": 0,
+            "exact_ratio": "5"
+          },
+          {
+            "numerator": "1",
+            "power_of_two": 3,
+            "exact_ratio": "8"
+          }
+        ],
+        "encoded_sha256": "fa7e7d5c805ae46c4953e07079fd90ba5d88b3dd405a29454c6134b4b1de4555"
+      },
+      "recovered_input": {
+        "rows": 2,
+        "columns": 1,
+        "values": [
+          {
+            "numerator": "5",
+            "power_of_two": 0,
+            "exact_ratio": "5"
+          },
+          {
+            "numerator": "1",
+            "power_of_two": 3,
+            "exact_ratio": "8"
+          }
+        ],
+        "encoded_sha256": "fa7e7d5c805ae46c4953e07079fd90ba5d88b3dd405a29454c6134b4b1de4555"
+      },
+      "recovered_law": {
+        "rows": 2,
+        "columns": 2,
+        "values": [
+          {
+            "numerator": "1",
+            "power_of_two": 0,
+            "exact_ratio": "1"
+          },
+          {
+            "numerator": "1",
+            "power_of_two": 1,
+            "exact_ratio": "2"
+          },
+          {
+            "numerator": "1",
+            "power_of_two": 0,
+            "exact_ratio": "1"
+          },
+          {
+            "numerator": "3",
+            "power_of_two": 0,
+            "exact_ratio": "3"
+          }
+        ],
+        "encoded_sha256": "c799d33f6ccc38a6e92c76d8d7a43f2e7b9cf50c164fb72658a366b0e0546be7"
+      },
+      "output": {
+        "rows": 2,
+        "columns": 1,
+        "values": [
+          {
+            "numerator": "21",
+            "power_of_two": 0,
+            "exact_ratio": "21"
+          },
+          {
+            "numerator": "29",
+            "power_of_two": 0,
+            "exact_ratio": "29"
+          }
+        ],
+        "encoded_sha256": "1ec513db89ee945cd662d1c3094dd40893fc3e6ebb7d76ce37fa825cc9e3b151"
+      },
+      "constituent": {
+        "grain": 5,
+        "axes": 2,
+        "cells": 15,
+        "incidences": 2569,
+        "pins": 2569,
+        "boundaries": 2570,
+        "exposed_pins": 642,
+        "native_sha256": "f09ce25e154649169644362198c297565a07f74bfae5b0f6777aa3bd4984cf2c"
+      },
+      "after": {
+        "standing_rank": 6,
+        "standing_cells": 42,
+        "standing_constituents": 2,
+        "constituent_cells": 18,
+        "constituent_incidences": 2986,
+        "constituent_pins": 2986,
+        "constituent_paths": 2987,
+        "constituent_transport_terms": 4831,
+        "live_lineages": 0,
+        "rest_sha256": "a211991d02532efb90b4bcaa7f3614438e725f411e669ff0d94e9662dea0c3ef"
+      }
+    },
+    "retired_interface_probe": {
+      "role": "same current under the retired pre-update interface",
+      "incoming_handle": {
+        "data_namespace": "0xbfbc7a717418e1a8",
+        "recruit_namespace": "0x359f30c8304e3e3d",
+        "generation": 1
+      },
+      "outgoing_handle": {
+        "data_namespace": "0xbfbc7a717418e1a8",
+        "recruit_namespace": "0x1c67b600a3c1b681",
+        "generation": 2
+      },
+      "input_namespace": "0x2af0512299382943",
+      "input": {
+        "rows": 2,
+        "columns": 1,
+        "values": [
+          {
+            "numerator": "5",
+            "power_of_two": 0,
+            "exact_ratio": "5"
+          },
+          {
+            "numerator": "1",
+            "power_of_two": 3,
+            "exact_ratio": "8"
+          }
+        ],
+        "encoded_sha256": "fa7e7d5c805ae46c4953e07079fd90ba5d88b3dd405a29454c6134b4b1de4555"
+      },
+      "recovered_input": {
+        "rows": 2,
+        "columns": 1,
+        "values": [
+          {
+            "numerator": "5",
+            "power_of_two": 0,
+            "exact_ratio": "5"
+          },
+          {
+            "numerator": "1",
+            "power_of_two": 3,
+            "exact_ratio": "8"
+          }
+        ],
+        "encoded_sha256": "fa7e7d5c805ae46c4953e07079fd90ba5d88b3dd405a29454c6134b4b1de4555"
+      },
+      "recovered_law": null,
+      "output": null,
+      "constituent": {
+        "grain": 2,
+        "axes": 1,
+        "cells": 3,
+        "incidences": 250,
+        "pins": 250,
+        "boundaries": 250,
+        "exposed_pins": 250,
+        "native_sha256": "27dbb1cc55b45313e3eba23121d23560a6d938bfd67549f07a258b0dbb26239a"
+      },
+      "after": {
+        "standing_rank": 6,
+        "standing_cells": 42,
+        "standing_constituents": 3,
+        "constituent_cells": 17,
+        "constituent_incidences": 2985,
+        "constituent_pins": 2985,
+        "constituent_paths": 2986,
+        "constituent_transport_terms": 4830,
+        "live_lineages": 0,
+        "rest_sha256": "7e3b796da99968d05b523e9b3192dd1efbb637c3486930475962521678506116"
+      }
+    },
+    "source_present_equals_source_absent": true,
+    "no_standing_refused": true,
+    "wrong_interface_refused": true,
+    "later_probe_used_successor": true,
+    "retired_interface_refused": true
+  },
+  "olmo_block_constituent": {
+    "law": "OLMo layer-0 MLP down-projection 2x2 coordinate restriction",
+    "source_absent_with_standing": {
+      "role": "source absent with Standing",
+      "incoming_handle": {
+        "data_namespace": "0x3b566e4a62e6d514",
+        "recruit_namespace": "0x39a558aeb1876d61",
+        "generation": 0
+      },
+      "outgoing_handle": {
+        "data_namespace": "0x3b566e4a62e6d514",
+        "recruit_namespace": "0x7f7ddcac07b4b12c",
+        "generation": 1
+      },
+      "input_namespace": "0x1f6b8cefa10a1a6e",
+      "input": {
+        "rows": 2,
+        "columns": 1,
+        "values": [
+          {
+            "numerator": "-217",
+            "power_of_two": -25,
+            "exact_ratio": "-217/2^25"
+          },
+          {
+            "numerator": "-107",
+            "power_of_two": -26,
+            "exact_ratio": "-107/2^26"
+          }
+        ],
+        "encoded_sha256": "753ab2dbd02166dc32b95f9fbfe31402fe1f2b3ce4a699589cdc3c517e9b86cc"
+      },
+      "recovered_input": {
+        "rows": 2,
+        "columns": 1,
+        "values": [
+          {
+            "numerator": "-217",
+            "power_of_two": -25,
+            "exact_ratio": "-217/2^25"
+          },
+          {
+            "numerator": "-107",
+            "power_of_two": -26,
+            "exact_ratio": "-107/2^26"
+          }
+        ],
+        "encoded_sha256": "753ab2dbd02166dc32b95f9fbfe31402fe1f2b3ce4a699589cdc3c517e9b86cc"
+      },
+      "recovered_law": {
+        "rows": 2,
+        "columns": 2,
+        "values": [
+          {
+            "numerator": "133",
+            "power_of_two": -12,
+            "exact_ratio": "133/2^12"
+          },
+          {
+            "numerator": "243",
+            "power_of_two": -13,
+            "exact_ratio": "243/2^13"
+          },
+          {
+            "numerator": "-71",
+            "power_of_two": -11,
+            "exact_ratio": "-71/2^11"
+          },
+          {
+            "numerator": "231",
+            "power_of_two": -14,
+            "exact_ratio": "231/2^14"
+          }
+        ],
+        "encoded_sha256": "83f0fc02fc6236c71f0a42bc19f51e5b4f82c2023d12c6933bdfe33605b112de"
+      },
+      "output": {
+        "rows": 2,
+        "columns": 1,
+        "values": [
+          {
+            "numerator": "-141445",
+            "power_of_two": -39,
+            "exact_ratio": "-141445/2^39"
+          },
+          {
+            "numerator": "221795",
+            "power_of_two": -40,
+            "exact_ratio": "221795/2^40"
+          }
+        ],
+        "encoded_sha256": "4e8fef071d2a2c6fb336ffb06777c70b28a80dd63d2456a37727d8e19d7c0fb8"
+      },
+      "constituent": {
+        "grain": 3,
+        "axes": 1,
+        "cells": 7,
+        "incidences": 675,
+        "pins": 675,
+        "boundaries": 676,
+        "exposed_pins": 673,
+        "native_sha256": "b71debb3f9fd8ed3625e4fda9d7355806e86dcd2262a03dc19e949c8affc1950"
+      },
+      "after": {
+        "standing_rank": 6,
+        "standing_cells": 31,
+        "standing_constituents": 2,
+        "constituent_cells": 10,
+        "constituent_incidences": 1068,
+        "constituent_pins": 1068,
+        "constituent_paths": 1069,
+        "constituent_transport_terms": 1879,
+        "live_lineages": 0,
+        "rest_sha256": "0b55f17c34bf59a109b7fb882df6042ab650ca586b24517c3dacb508cbb435ad"
+      }
+    },
+    "no_standing": {
+      "role": "same current without law Standing",
+      "incoming_handle": {
+        "data_namespace": "0x3b566e4a62e6d514",
+        "recruit_namespace": "0x39a558aeb1876d61",
+        "generation": 0
+      },
+      "outgoing_handle": {
+        "data_namespace": "0x3b566e4a62e6d514",
+        "recruit_namespace": "0x0036bed150392107",
+        "generation": 1
+      },
+      "input_namespace": "0xf6c677c9cb7e03d8",
+      "input": {
+        "rows": 2,
+        "columns": 1,
+        "values": [
+          {
+            "numerator": "-217",
+            "power_of_two": -25,
+            "exact_ratio": "-217/2^25"
+          },
+          {
+            "numerator": "-107",
+            "power_of_two": -26,
+            "exact_ratio": "-107/2^26"
+          }
+        ],
+        "encoded_sha256": "753ab2dbd02166dc32b95f9fbfe31402fe1f2b3ce4a699589cdc3c517e9b86cc"
+      },
+      "recovered_input": {
+        "rows": 2,
+        "columns": 1,
+        "values": [
+          {
+            "numerator": "-217",
+            "power_of_two": -25,
+            "exact_ratio": "-217/2^25"
+          },
+          {
+            "numerator": "-107",
+            "power_of_two": -26,
+            "exact_ratio": "-107/2^26"
+          }
+        ],
+        "encoded_sha256": "753ab2dbd02166dc32b95f9fbfe31402fe1f2b3ce4a699589cdc3c517e9b86cc"
+      },
+      "recovered_law": null,
+      "output": null,
+      "constituent": {
+        "grain": 2,
+        "axes": 1,
+        "cells": 3,
+        "incidences": 258,
+        "pins": 258,
+        "boundaries": 258,
+        "exposed_pins": 258,
+        "native_sha256": "b86987f098b7c6db51dd4b8769de9208069d51c1f6cd5da5cc88a20c3848de84"
+      },
+      "after": {
+        "standing_rank": 6,
+        "standing_cells": 31,
+        "standing_constituents": 1,
+        "constituent_cells": 3,
+        "constituent_incidences": 258,
+        "constituent_pins": 258,
+        "constituent_paths": 258,
+        "constituent_transport_terms": 258,
+        "live_lineages": 0,
+        "rest_sha256": "db0385b662375544c2f96eecac38abd6bc645f3a3af84697d0221cf31c1e8d5c"
+      }
+    },
+    "wrong_interface": {
+      "role": "same current under a nonincident interface",
+      "incoming_handle": {
+        "data_namespace": "0x3b566e4a62e6d514",
+        "recruit_namespace": "0x9c00fd0b1422c8c4",
+        "generation": 0
+      },
+      "outgoing_handle": {
+        "data_namespace": "0x3b566e4a62e6d514",
+        "recruit_namespace": "0x800be8ec63697da7",
+        "generation": 1
+      },
+      "input_namespace": "0xc7bcd7edb028e943",
+      "input": {
+        "rows": 2,
+        "columns": 1,
+        "values": [
+          {
+            "numerator": "-217",
+            "power_of_two": -25,
+            "exact_ratio": "-217/2^25"
+          },
+          {
+            "numerator": "-107",
+            "power_of_two": -26,
+            "exact_ratio": "-107/2^26"
+          }
+        ],
+        "encoded_sha256": "753ab2dbd02166dc32b95f9fbfe31402fe1f2b3ce4a699589cdc3c517e9b86cc"
+      },
+      "recovered_input": {
+        "rows": 2,
+        "columns": 1,
+        "values": [
+          {
+            "numerator": "-217",
+            "power_of_two": -25,
+            "exact_ratio": "-217/2^25"
+          },
+          {
+            "numerator": "-107",
+            "power_of_two": -26,
+            "exact_ratio": "-107/2^26"
+          }
+        ],
+        "encoded_sha256": "753ab2dbd02166dc32b95f9fbfe31402fe1f2b3ce4a699589cdc3c517e9b86cc"
+      },
+      "recovered_law": null,
+      "output": null,
+      "constituent": {
+        "grain": 2,
+        "axes": 1,
+        "cells": 3,
+        "incidences": 258,
+        "pins": 258,
+        "boundaries": 258,
+        "exposed_pins": 258,
+        "native_sha256": "58d282666d86d3afe10c77f05614b10ca996f1cc53c600f778fbe3e839c92e62"
+      },
+      "after": {
+        "standing_rank": 6,
+        "standing_cells": 31,
+        "standing_constituents": 3,
+        "constituent_cells": 9,
+        "constituent_incidences": 1068,
+        "constituent_pins": 1068,
+        "constituent_paths": 1068,
+        "constituent_transport_terms": 1878,
+        "live_lineages": 0,
+        "rest_sha256": "3c76473b93155f54966ab70e75530fb1f0eae90a68c41b055260e02b638afa07"
+      }
+    },
+    "update": {
+      "hand": "AGAINST",
+      "before_handle": {
+        "data_namespace": "0x3b566e4a62e6d514",
+        "recruit_namespace": "0x7f7ddcac07b4b12c",
+        "generation": 1
+      },
+      "after_handle": {
+        "data_namespace": "0xd7b64f48b1b8c95b",
+        "recruit_namespace": "0xccae47acb18975a9",
+        "generation": 2
+      },
+      "before_law": {
+        "rows": 2,
+        "columns": 2,
+        "values": [
+          {
+            "numerator": "133",
+            "power_of_two": -12,
+            "exact_ratio": "133/2^12"
+          },
+          {
+            "numerator": "243",
+            "power_of_two": -13,
+            "exact_ratio": "243/2^13"
+          },
+          {
+            "numerator": "-71",
+            "power_of_two": -11,
+            "exact_ratio": "-71/2^11"
+          },
+          {
+            "numerator": "231",
+            "power_of_two": -14,
+            "exact_ratio": "231/2^14"
+          }
+        ],
+        "encoded_sha256": "83f0fc02fc6236c71f0a42bc19f51e5b4f82c2023d12c6933bdfe33605b112de"
+      },
+      "after_law": {
+        "rows": 2,
+        "columns": 2,
+        "values": [
+          {
+            "numerator": "133",
+            "power_of_two": -12,
+            "exact_ratio": "133/2^12"
+          },
+          {
+            "numerator": "-23",
+            "power_of_two": -13,
+            "exact_ratio": "-23/2^13"
+          },
+          {
+            "numerator": "-71",
+            "power_of_two": -11,
+            "exact_ratio": "-71/2^11"
+          },
+          {
+            "numerator": "799",
+            "power_of_two": -14,
+            "exact_ratio": "799/2^14"
+          }
+        ],
+        "encoded_sha256": "bd7d61b9ad048b8cf233ace9d8772de2a0534741c39835bfed3d3a9b23215d59"
+      },
+      "before_output": {
+        "rows": 2,
+        "columns": 1,
+        "values": [
+          {
+            "numerator": "-141445",
+            "power_of_two": -39,
+            "exact_ratio": "-141445/2^39"
+          },
+          {
+            "numerator": "221795",
+            "power_of_two": -40,
+            "exact_ratio": "221795/2^40"
+          }
+        ],
+        "encoded_sha256": "4e8fef071d2a2c6fb336ffb06777c70b28a80dd63d2456a37727d8e19d7c0fb8"
+      },
+      "after_output": {
+        "rows": 2,
+        "columns": 1,
+        "values": [
+          {
+            "numerator": "-112983",
+            "power_of_two": -39,
+            "exact_ratio": "-112983/2^39"
+          },
+          {
+            "numerator": "161019",
+            "power_of_two": -40,
+            "exact_ratio": "161019/2^40"
+          }
+        ],
+        "encoded_sha256": "28022f88f863001f2069d1d84d63cff4b975f0e818f454368f7dea304ba659d4"
+      },
+      "oriented_output_change": {
+        "rows": 2,
+        "columns": 1,
+        "values": [
+          {
+            "numerator": "14231",
+            "power_of_two": -38,
+            "exact_ratio": "14231/2^38"
+          },
+          {
+            "numerator": "-7597",
+            "power_of_two": -37,
+            "exact_ratio": "-7597/2^37"
+          }
+        ],
+        "encoded_sha256": "3f4dd3851e585d527215d00acaecaa8e7e2190f854cf7b5fa67c816fbd77df03"
+      },
+      "old_data_interfaces_departed": true,
+      "old_recruit_interface_departed": true,
+      "constituent": {
+        "grain": 4,
+        "axes": 1,
+        "cells": 11,
+        "incidences": 2430,
+        "pins": 2430,
+        "boundaries": 2431,
+        "exposed_pins": 409,
+        "native_sha256": "12ab2ed7ed6adf8ad7ab7dfa6ad576ea7ea7c6193a3dfc58250a4be41e381be1"
+      },
+      "after": {
+        "standing_rank": 6,
+        "standing_cells": 37,
+        "standing_constituents": 2,
+        "constituent_cells": 14,
+        "constituent_incidences": 2823,
+        "constituent_pins": 2823,
+        "constituent_paths": 2824,
+        "constituent_transport_terms": 4716,
+        "live_lineages": 0,
+        "rest_sha256": "182c387a4c899010ad578a2bf018ffceab8d47c9d45b577c89b81559905409fb"
+      },
+      "rest_remount_exact": true
+    },
+    "later_probe": {
+      "role": "same held-out current after successor remount",
+      "incoming_handle": {
+        "data_namespace": "0xd7b64f48b1b8c95b",
+        "recruit_namespace": "0xccae47acb18975a9",
+        "generation": 2
+      },
+      "outgoing_handle": {
+        "data_namespace": "0xd7b64f48b1b8c95b",
+        "recruit_namespace": "0xb861c1c5dfee9086",
+        "generation": 3
+      },
+      "input_namespace": "0xbb3961d820f66e68",
+      "input": {
+        "rows": 2,
+        "columns": 1,
+        "values": [
+          {
+            "numerator": "-217",
+            "power_of_two": -25,
+            "exact_ratio": "-217/2^25"
+          },
+          {
+            "numerator": "-107",
+            "power_of_two": -26,
+            "exact_ratio": "-107/2^26"
+          }
+        ],
+        "encoded_sha256": "753ab2dbd02166dc32b95f9fbfe31402fe1f2b3ce4a699589cdc3c517e9b86cc"
+      },
+      "recovered_input": {
+        "rows": 2,
+        "columns": 1,
+        "values": [
+          {
+            "numerator": "-217",
+            "power_of_two": -25,
+            "exact_ratio": "-217/2^25"
+          },
+          {
+            "numerator": "-107",
+            "power_of_two": -26,
+            "exact_ratio": "-107/2^26"
+          }
+        ],
+        "encoded_sha256": "753ab2dbd02166dc32b95f9fbfe31402fe1f2b3ce4a699589cdc3c517e9b86cc"
+      },
+      "recovered_law": {
+        "rows": 2,
+        "columns": 2,
+        "values": [
+          {
+            "numerator": "133",
+            "power_of_two": -12,
+            "exact_ratio": "133/2^12"
+          },
+          {
+            "numerator": "-23",
+            "power_of_two": -13,
+            "exact_ratio": "-23/2^13"
+          },
+          {
+            "numerator": "-71",
+            "power_of_two": -11,
+            "exact_ratio": "-71/2^11"
+          },
+          {
+            "numerator": "799",
+            "power_of_two": -14,
+            "exact_ratio": "799/2^14"
+          }
+        ],
+        "encoded_sha256": "bd7d61b9ad048b8cf233ace9d8772de2a0534741c39835bfed3d3a9b23215d59"
+      },
+      "output": {
+        "rows": 2,
+        "columns": 1,
+        "values": [
+          {
+            "numerator": "-112983",
+            "power_of_two": -39,
+            "exact_ratio": "-112983/2^39"
+          },
+          {
+            "numerator": "161019",
+            "power_of_two": -40,
+            "exact_ratio": "161019/2^40"
+          }
+        ],
+        "encoded_sha256": "28022f88f863001f2069d1d84d63cff4b975f0e818f454368f7dea304ba659d4"
+      },
+      "constituent": {
+        "grain": 5,
+        "axes": 1,
+        "cells": 15,
+        "incidences": 2688,
+        "pins": 2688,
+        "boundaries": 2690,
+        "exposed_pins": 665,
+        "native_sha256": "7c56e8eb5a02f18a56a492b291ddfc754071371368f1b7b8f79a410ad95bb42e"
+      },
+      "after": {
+        "standing_rank": 6,
+        "standing_cells": 42,
+        "standing_constituents": 2,
+        "constituent_cells": 18,
+        "constituent_incidences": 3081,
+        "constituent_pins": 3081,
+        "constituent_paths": 3083,
+        "constituent_transport_terms": 4975,
+        "live_lineages": 0,
+        "rest_sha256": "b283c1a93b87ca2a40ae5f4a7155c2a423278fd782fd6f6a5728f3de21412add"
+      }
+    },
+    "retired_interface_probe": {
+      "role": "same current under the retired pre-update interface",
+      "incoming_handle": {
+        "data_namespace": "0x3b566e4a62e6d514",
+        "recruit_namespace": "0x7f7ddcac07b4b12c",
+        "generation": 1
+      },
+      "outgoing_handle": {
+        "data_namespace": "0x3b566e4a62e6d514",
+        "recruit_namespace": "0x8cb08c66a1782b6f",
+        "generation": 2
+      },
+      "input_namespace": "0x121a64d7f4c6f78e",
+      "input": {
+        "rows": 2,
+        "columns": 1,
+        "values": [
+          {
+            "numerator": "-217",
+            "power_of_two": -25,
+            "exact_ratio": "-217/2^25"
+          },
+          {
+            "numerator": "-107",
+            "power_of_two": -26,
+            "exact_ratio": "-107/2^26"
+          }
+        ],
+        "encoded_sha256": "753ab2dbd02166dc32b95f9fbfe31402fe1f2b3ce4a699589cdc3c517e9b86cc"
+      },
+      "recovered_input": {
+        "rows": 2,
+        "columns": 1,
+        "values": [
+          {
+            "numerator": "-217",
+            "power_of_two": -25,
+            "exact_ratio": "-217/2^25"
+          },
+          {
+            "numerator": "-107",
+            "power_of_two": -26,
+            "exact_ratio": "-107/2^26"
+          }
+        ],
+        "encoded_sha256": "753ab2dbd02166dc32b95f9fbfe31402fe1f2b3ce4a699589cdc3c517e9b86cc"
+      },
+      "recovered_law": null,
+      "output": null,
+      "constituent": {
+        "grain": 2,
+        "axes": 1,
+        "cells": 3,
+        "incidences": 258,
+        "pins": 258,
+        "boundaries": 258,
+        "exposed_pins": 258,
+        "native_sha256": "3ab01e5e8019153ff9872b63852b1a98594681b34bd940d4380ee8088641b5ca"
+      },
+      "after": {
+        "standing_rank": 6,
+        "standing_cells": 42,
+        "standing_constituents": 3,
+        "constituent_cells": 17,
+        "constituent_incidences": 3081,
+        "constituent_pins": 3081,
+        "constituent_paths": 3082,
+        "constituent_transport_terms": 4974,
+        "live_lineages": 0,
+        "rest_sha256": "10a1689f2c6ee8efd178d2a8eda0031bdfd76eac168f215c0cc7317590b82cc3"
+      }
+    },
+    "source_present_equals_source_absent": true,
+    "no_standing_refused": true,
+    "wrong_interface_refused": true,
+    "later_probe_used_successor": true,
+    "retired_interface_refused": true
+  },
+  "acceptance": {
+    "source_event_lineages_departed": true,
+    "deposit_rest_remount_exact": true,
+    "both_laws_conducted_source_absent": true,
+    "no_standing_and_wrong_interface_refused": true,
+    "both_updates_rebased_the_law_and_changed_conduct": true,
+    "both_successors_conducted_after_rest_remount": true,
+    "retired_interfaces_no_longer_recruited": true,
+    "real_olmo_words_crossed_as_exact_dyadic_topology": true,
+    "source_absent_functions_received_no_model_path_or_source_matrix": true,
+    "no_teacher_output_or_cached_result_entered_standing": true
+  },
+  "conclusion": "both laws crossed once as oriented cellular topology, not as outputs. After the source lineages and model reader departed, public returned constituents recovered and executed each law on held-out current. A returned hand rebased each law, retired its former interfaces, and the emitted successor conducted after exact rest/remount."
+}

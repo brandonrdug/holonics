@@ -1,0 +1,5 @@
+# Pinned nightly that exposes nvptx64-nvidia-cuda + the llvm-bitcode-linker component.
+# Same channel as kernel/ so the workspace carries one nightly, not two.
+[toolchain]
+channel = "nightly-2026-05-22"
+components = ["rust-src", "llvm-tools", "llvm-bitcode-linker"]

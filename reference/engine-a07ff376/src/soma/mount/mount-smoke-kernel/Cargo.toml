@@ -1,0 +1,18 @@
+# mount-smoke-kernel — the PTX payload for the CUDA mount smoke. NOT a workspace member;
+# built manually for the nvptx64-nvidia-cuda target on the pinned nightly (see build-ptx.sh).
+# It is the mount's boundary artifact, exactly as kernel/soma.spv is the Vulkan boundary.
+# Empty table detaches this from the soma workspace: it builds only for nvptx, on its own nightly.
+[workspace]
+
+[package]
+name = "mount-smoke-kernel"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[profile.release]
+panic = "abort"
+opt-level = 3

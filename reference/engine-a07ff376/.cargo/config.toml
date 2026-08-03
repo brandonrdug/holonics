@@ -1,0 +1,2 @@
+[alias]
+holonic-lint = "run --quiet -p holonic-architecture-lint --"

@@ -1,0 +1,992 @@
+{
+  "schema": "soma-situated-prime-higher-hand-up-v1",
+  "world": "bounded-polyglot-geometric-world-01",
+  "theory_to_structure": "five source-declared internal arms close one occurrence; a distinct source-declared outer arm remains with the completed body; one later event closes its lower pair and the outer parent component before the atomic successor commits",
+  "source": {
+    "internal_occurrence": {
+      "joint_occurrence_owner": "one source-declared regional cell; not a repeated interface id or observer edge set",
+      "receiver_role": "zero_relative",
+      "candidate_lift_at_founding": {
+        "magnitude": 47,
+        "rank": {
+          "magnitude": 0,
+          "rank": 0,
+          "negative": false
+        },
+        "turn": 0
+      },
+      "boundary_slot": 0,
+      "boundary_hand": "against",
+      "arms": [
+        {
+          "source_role": "zero_relative",
+          "source_candidate_vertex": 0,
+          "source_candidate_hand": "against",
+          "source_port": "exposed:0",
+          "target_role": "radix_2",
+          "target_candidate_vertex": 1,
+          "target_candidate_hand": "with",
+          "target_port": "exposed:0",
+          "interface_namespace": "0x5052494d4546414e",
+          "interface_local": 1,
+          "boundary_slot": 0,
+          "arc_slot": 0,
+          "regional_hand": "against"
+        },
+        {
+          "source_role": "zero_relative",
+          "source_candidate_vertex": 0,
+          "source_candidate_hand": "against",
+          "source_port": "exposed:0",
+          "target_role": "radix_10",
+          "target_candidate_vertex": 1,
+          "target_candidate_hand": "with",
+          "target_port": "exposed:0",
+          "interface_namespace": "0x5052494d4546414e",
+          "interface_local": 2,
+          "boundary_slot": 0,
+          "arc_slot": 1,
+          "regional_hand": "against"
+        },
+        {
+          "source_role": "zero_relative",
+          "source_candidate_vertex": 0,
+          "source_candidate_hand": "against",
+          "source_port": "exposed:0",
+          "target_role": "radix_16",
+          "target_candidate_vertex": 1,
+          "target_candidate_hand": "with",
+          "target_port": "exposed:0",
+          "interface_namespace": "0x5052494d4546414e",
+          "interface_local": 3,
+          "boundary_slot": 0,
+          "arc_slot": 2,
+          "regional_hand": "against"
+        },
+        {
+          "source_role": "zero_relative",
+          "source_candidate_vertex": 0,
+          "source_candidate_hand": "against",
+          "source_port": "exposed:0",
+          "target_role": "s4_receiver",
+          "target_candidate_vertex": 0,
+          "target_candidate_hand": "against",
+          "target_port": "exposed:0",
+          "interface_namespace": "0x5052494d4546414e",
+          "interface_local": 4,
+          "boundary_slot": 0,
+          "arc_slot": 3,
+          "regional_hand": "against"
+        },
+        {
+          "source_role": "zero_relative",
+          "source_candidate_vertex": 0,
+          "source_candidate_hand": "against",
+          "source_port": "exposed:0",
+          "target_role": "cyclotomic_receiver",
+          "target_candidate_vertex": 0,
+          "target_candidate_hand": "against",
+          "target_port": "exposed:0",
+          "interface_namespace": "0x5052494d4546414e",
+          "interface_local": 5,
+          "boundary_slot": 0,
+          "arc_slot": 4,
+          "regional_hand": "against"
+        }
+      ]
+    },
+    "outer_boundary": {
+      "from_role": "zero_relative",
+      "from_port": "ingress:0",
+      "to_role": "cyclotomic_receiver",
+      "to_port": "ingress:0",
+      "interface_namespace": "0x5052494d4f555445",
+      "interface_local": 1,
+      "boundary_slot": 1,
+      "arc_slot": 0,
+      "hand": "against"
+    },
+    "declaration_scope": "controlled occurrence grouping for this acceptance world; not a natural prime classification or an interface inferred by Soma"
+  },
+  "prelude": [
+    7,
+    11,
+    13
+  ],
+  "chronology_before_fork": [
+    {
+      "event": {
+        "candidate": 23,
+        "regional_fan_supplied": true,
+        "before": {
+          "standing_sha256": "b1376cc9899076d7eaa9b20fc72495eea5e08db186ef4286678fac82836da706",
+          "rank": 6,
+          "scalar_cells": 23,
+          "constituents": 0,
+          "constituent_cells": 0,
+          "constituent_incidences": 0,
+          "constituent_pins": 0,
+          "constituent_paths": 0,
+          "live_lineages": 6
+        },
+        "after": {
+          "standing_sha256": "7149ea67cbf4db5cf8c6aa8502c0caf0d759f9f0b5176a97dee943a1d5b8c0d6",
+          "rank": 6,
+          "scalar_cells": 44,
+          "constituents": 1,
+          "constituent_cells": 19,
+          "constituent_incidences": 17,
+          "constituent_pins": 13,
+          "constituent_paths": 5,
+          "live_lineages": 6
+        },
+        "current_radiation_sha256": "a9d66702037e214b7fdeb3f195723e394e7ccb3db5099bfb83fdc03bde0c72d5",
+        "regional_radiation_sha256": "aa954f721091ca11c1d4c6534a5f3fd18d11cc81339211d44fa7ee343861d846",
+        "regional_cells": 1,
+        "constituent": {
+          "sha256": "8670adfc305395a5589aaeae81f53221324b2293b4f6ba4d7e3d89c432329dfd",
+          "grain": 3,
+          "axes": 14,
+          "cells": 19,
+          "incidences": 17,
+          "pins": 13,
+          "boundaries": 1,
+          "boundary_paths": 5,
+          "transport_terms": 112,
+          "folded_paths": 0,
+          "exposed": 5,
+          "open_pins": 0,
+          "found_pins": 13,
+          "interface_capabilities": [
+            {
+              "namespace": 5787769067348050254,
+              "local": 1
+            },
+            {
+              "namespace": 5787769067348050254,
+              "local": 2
+            },
+            {
+              "namespace": 5787769067348050254,
+              "local": 3
+            },
+            {
+              "namespace": 5787769067348050254,
+              "local": 4
+            },
+            {
+              "namespace": 5787769067348050254,
+              "local": 5
+            }
+          ],
+          "boundary_transitions": [
+            "found"
+          ]
+        }
+      },
+      "outer_boundary": null,
+      "reverse_arc_storage": false
+    },
+    {
+      "event": {
+        "candidate": 29,
+        "regional_fan_supplied": true,
+        "before": {
+          "standing_sha256": "7149ea67cbf4db5cf8c6aa8502c0caf0d759f9f0b5176a97dee943a1d5b8c0d6",
+          "rank": 6,
+          "scalar_cells": 44,
+          "constituents": 1,
+          "constituent_cells": 19,
+          "constituent_incidences": 17,
+          "constituent_pins": 13,
+          "constituent_paths": 5,
+          "live_lineages": 6
+        },
+        "after": {
+          "standing_sha256": "1ac3d0ca06bc3020f2b3cbc4108c86590db7b7e0c8fa97f5917bddb9ba8d3c72",
+          "rank": 6,
+          "scalar_cells": 68,
+          "constituents": 1,
+          "constituent_cells": 39,
+          "constituent_incidences": 40,
+          "constituent_pins": 32,
+          "constituent_paths": 16,
+          "live_lineages": 6
+        },
+        "current_radiation_sha256": "ab643893a0ce2818de5c8c103b21b86851e3cfab62ae7d707bd07792ab788e68",
+        "regional_radiation_sha256": "e9247c917c02c771a794b270e0b1a6753c342e00dcebd7068869626f5e76e7a3",
+        "regional_cells": 1,
+        "constituent": {
+          "sha256": "9b9549b6191566326c71d2f8243a84abca8bc5385d48a5fd7aa445cb1295192b",
+          "grain": 4,
+          "axes": 28,
+          "cells": 39,
+          "incidences": 40,
+          "pins": 32,
+          "boundaries": 8,
+          "boundary_paths": 16,
+          "transport_terms": 231,
+          "folded_paths": 0,
+          "exposed": 1,
+          "open_pins": 0,
+          "found_pins": 27,
+          "interface_capabilities": [
+            {
+              "namespace": 5787769067348050254,
+              "local": 1
+            },
+            {
+              "namespace": 5787769067348050254,
+              "local": 2
+            },
+            {
+              "namespace": 5787769067348050254,
+              "local": 3
+            },
+            {
+              "namespace": 5787769067348050254,
+              "local": 4
+            },
+            {
+              "namespace": 5787769067348050254,
+              "local": 5
+            },
+            {
+              "namespace": 5787769067516810309,
+              "local": 1
+            }
+          ],
+          "boundary_transitions": [
+            "found",
+            "found",
+            "found",
+            "ride",
+            "ride",
+            "ride",
+            "ride",
+            "ride"
+          ]
+        }
+      },
+      "outer_boundary": {
+        "from_role": "zero_relative",
+        "from_port": "ingress:0",
+        "to_role": "cyclotomic_receiver",
+        "to_port": "ingress:0",
+        "interface_namespace": "0x5052494d4f555445",
+        "interface_local": 1,
+        "boundary_slot": 1,
+        "arc_slot": 0,
+        "hand": "against"
+      },
+      "reverse_arc_storage": false
+    },
+    {
+      "event": {
+        "candidate": 37,
+        "regional_fan_supplied": true,
+        "before": {
+          "standing_sha256": "1ac3d0ca06bc3020f2b3cbc4108c86590db7b7e0c8fa97f5917bddb9ba8d3c72",
+          "rank": 6,
+          "scalar_cells": 68,
+          "constituents": 1,
+          "constituent_cells": 39,
+          "constituent_incidences": 40,
+          "constituent_pins": 32,
+          "constituent_paths": 16,
+          "live_lineages": 6
+        },
+        "after": {
+          "standing_sha256": "e8a691d89e13ff1d8888a4e1a4e8acb97fce4b4d08c071a1fa7112c26662c3e5",
+          "rank": 6,
+          "scalar_cells": 95,
+          "constituents": 2,
+          "constituent_cells": 58,
+          "constituent_incidences": 57,
+          "constituent_pins": 45,
+          "constituent_paths": 21,
+          "live_lineages": 6
+        },
+        "current_radiation_sha256": "e20ca836a29cf5ef4603386424ead37518618c3dc80fa906ec6c029cec13d342",
+        "regional_radiation_sha256": "c4c6d5ff2ef0070fb0cbb5dec6fe654b8a04e23fe151bebdb1e7c249340e0a06",
+        "regional_cells": 1,
+        "constituent": {
+          "sha256": "a58e1ed7d2275ca649b4b5c659d9c59f7cd07376a5a0f274f6a7b6eada08ece3",
+          "grain": 3,
+          "axes": 14,
+          "cells": 19,
+          "incidences": 17,
+          "pins": 13,
+          "boundaries": 1,
+          "boundary_paths": 5,
+          "transport_terms": 112,
+          "folded_paths": 0,
+          "exposed": 5,
+          "open_pins": 0,
+          "found_pins": 13,
+          "interface_capabilities": [
+            {
+              "namespace": 5787769067348050254,
+              "local": 1
+            },
+            {
+              "namespace": 5787769067348050254,
+              "local": 2
+            },
+            {
+              "namespace": 5787769067348050254,
+              "local": 3
+            },
+            {
+              "namespace": 5787769067348050254,
+              "local": 4
+            },
+            {
+              "namespace": 5787769067348050254,
+              "local": 5
+            }
+          ],
+          "boundary_transitions": [
+            "found"
+          ]
+        }
+      },
+      "outer_boundary": null,
+      "reverse_arc_storage": false
+    }
+  ],
+  "fork_rest_exact": true,
+  "hand_up_event": {
+    "canonical": {
+      "event": {
+        "candidate": 43,
+        "regional_fan_supplied": true,
+        "before": {
+          "standing_sha256": "e8a691d89e13ff1d8888a4e1a4e8acb97fce4b4d08c071a1fa7112c26662c3e5",
+          "rank": 6,
+          "scalar_cells": 95,
+          "constituents": 2,
+          "constituent_cells": 58,
+          "constituent_incidences": 57,
+          "constituent_pins": 45,
+          "constituent_paths": 21,
+          "live_lineages": 6
+        },
+        "after": {
+          "standing_sha256": "1dbd2c1b7774e20f886732e2c417a3135dce9c4906d87e433097a4f89d66744e",
+          "rank": 6,
+          "scalar_cells": 128,
+          "constituents": 1,
+          "constituent_cells": 78,
+          "constituent_incidences": 80,
+          "constituent_pins": 64,
+          "constituent_paths": 33,
+          "live_lineages": 6
+        },
+        "current_radiation_sha256": "d111efe74884fdf153e168f5413203585cabc5e8ea73d46a1cf3a69af1c19c37",
+        "regional_radiation_sha256": "99b5e3fd85fb2f26d3c27b9c7110285309d911779940c620c71ada45af072c4b",
+        "regional_cells": 1,
+        "constituent": {
+          "sha256": "73b76dfc0c98990041ee59d9d726885d48d20b6c1aebd046c65d5dd452dae009",
+          "grain": 5,
+          "axes": 55,
+          "cells": 78,
+          "incidences": 80,
+          "pins": 64,
+          "boundaries": 17,
+          "boundary_paths": 33,
+          "transport_terms": 463,
+          "folded_paths": 1,
+          "exposed": 0,
+          "open_pins": 0,
+          "found_pins": 54,
+          "interface_capabilities": [
+            {
+              "namespace": 5787769067348050254,
+              "local": 1
+            },
+            {
+              "namespace": 5787769067348050254,
+              "local": 2
+            },
+            {
+              "namespace": 5787769067348050254,
+              "local": 3
+            },
+            {
+              "namespace": 5787769067348050254,
+              "local": 4
+            },
+            {
+              "namespace": 5787769067348050254,
+              "local": 5
+            },
+            {
+              "namespace": 5787769067516810309,
+              "local": 1
+            }
+          ],
+          "boundary_transitions": [
+            "found",
+            "found",
+            "found",
+            "found",
+            "found",
+            "found",
+            "ride",
+            "ride",
+            "ride",
+            "ride",
+            "ride",
+            "ride",
+            "ride",
+            "ride",
+            "ride",
+            "ride",
+            "ride"
+          ]
+        }
+      },
+      "outer_boundary": {
+        "from_role": "zero_relative",
+        "from_port": "ingress:0",
+        "to_role": "cyclotomic_receiver",
+        "to_port": "ingress:0",
+        "interface_namespace": "0x5052494d4f555445",
+        "interface_local": 1,
+        "boundary_slot": 1,
+        "arc_slot": 0,
+        "hand": "against"
+      },
+      "reverse_arc_storage": false
+    },
+    "changed_capability": {
+      "event": {
+        "candidate": 43,
+        "regional_fan_supplied": true,
+        "before": {
+          "standing_sha256": "e8a691d89e13ff1d8888a4e1a4e8acb97fce4b4d08c071a1fa7112c26662c3e5",
+          "rank": 6,
+          "scalar_cells": 95,
+          "constituents": 2,
+          "constituent_cells": 58,
+          "constituent_incidences": 57,
+          "constituent_pins": 45,
+          "constituent_paths": 21,
+          "live_lineages": 6
+        },
+        "after": {
+          "standing_sha256": "75a9e5345eaf653fd6cb4396ba05a2624c2177a4a15e51360d425a5627692974",
+          "rank": 6,
+          "scalar_cells": 128,
+          "constituents": 2,
+          "constituent_cells": 78,
+          "constituent_incidences": 80,
+          "constituent_pins": 64,
+          "constituent_paths": 32,
+          "live_lineages": 6
+        },
+        "current_radiation_sha256": "d111efe74884fdf153e168f5413203585cabc5e8ea73d46a1cf3a69af1c19c37",
+        "regional_radiation_sha256": "8a81aaab77d24733c6d9178ea2d2882372a97f81831f8d24fe58d5ceaaf97f7c",
+        "regional_cells": 1,
+        "constituent": {
+          "sha256": "778bf3986e3f1208d1ec7af6d355d743f25b11a0b8bc75ae4af7c01bb8bce4bf",
+          "grain": 4,
+          "axes": 28,
+          "cells": 39,
+          "incidences": 40,
+          "pins": 32,
+          "boundaries": 8,
+          "boundary_paths": 16,
+          "transport_terms": 231,
+          "folded_paths": 0,
+          "exposed": 1,
+          "open_pins": 0,
+          "found_pins": 27,
+          "interface_capabilities": [
+            {
+              "namespace": 5787769067348050254,
+              "local": 1
+            },
+            {
+              "namespace": 5787769067348050254,
+              "local": 2
+            },
+            {
+              "namespace": 5787769067348050254,
+              "local": 3
+            },
+            {
+              "namespace": 5787769067348050254,
+              "local": 4
+            },
+            {
+              "namespace": 5787769067348050254,
+              "local": 5
+            },
+            {
+              "namespace": 5787769067516810309,
+              "local": 2
+            }
+          ],
+          "boundary_transitions": [
+            "found",
+            "found",
+            "found",
+            "ride",
+            "ride",
+            "ride",
+            "ride",
+            "ride"
+          ]
+        }
+      },
+      "outer_boundary": {
+        "from_role": "zero_relative",
+        "from_port": "ingress:0",
+        "to_role": "cyclotomic_receiver",
+        "to_port": "ingress:0",
+        "interface_namespace": "0x5052494d4f555445",
+        "interface_local": 2,
+        "boundary_slot": 1,
+        "arc_slot": 0,
+        "hand": "against"
+      },
+      "reverse_arc_storage": false
+    },
+    "reversed_hand": {
+      "event": {
+        "candidate": 43,
+        "regional_fan_supplied": true,
+        "before": {
+          "standing_sha256": "e8a691d89e13ff1d8888a4e1a4e8acb97fce4b4d08c071a1fa7112c26662c3e5",
+          "rank": 6,
+          "scalar_cells": 95,
+          "constituents": 2,
+          "constituent_cells": 58,
+          "constituent_incidences": 57,
+          "constituent_pins": 45,
+          "constituent_paths": 21,
+          "live_lineages": 6
+        },
+        "after": {
+          "standing_sha256": "5c4828118ae6c302bf6f0df0fa0a852baa3ec334c701cbdf69c4ec67cf0348b2",
+          "rank": 6,
+          "scalar_cells": 128,
+          "constituents": 1,
+          "constituent_cells": 78,
+          "constituent_incidences": 81,
+          "constituent_pins": 65,
+          "constituent_paths": 33,
+          "live_lineages": 6
+        },
+        "current_radiation_sha256": "d111efe74884fdf153e168f5413203585cabc5e8ea73d46a1cf3a69af1c19c37",
+        "regional_radiation_sha256": "802738ebbbd395add74ef8ea30fb4e91d89adadb372e8b4ec76d6440d9793f08",
+        "regional_cells": 1,
+        "constituent": {
+          "sha256": "d00724511cbd895093bc445fc452a0a890db496288bc1ac842da360312c8088a",
+          "grain": 5,
+          "axes": 56,
+          "cells": 78,
+          "incidences": 81,
+          "pins": 65,
+          "boundaries": 17,
+          "boundary_paths": 33,
+          "transport_terms": 463,
+          "folded_paths": 0,
+          "exposed": 1,
+          "open_pins": 0,
+          "found_pins": 55,
+          "interface_capabilities": [
+            {
+              "namespace": 5787769067348050254,
+              "local": 1
+            },
+            {
+              "namespace": 5787769067348050254,
+              "local": 2
+            },
+            {
+              "namespace": 5787769067348050254,
+              "local": 3
+            },
+            {
+              "namespace": 5787769067348050254,
+              "local": 4
+            },
+            {
+              "namespace": 5787769067348050254,
+              "local": 5
+            },
+            {
+              "namespace": 5787769067516810309,
+              "local": 1
+            }
+          ],
+          "boundary_transitions": [
+            "found",
+            "found",
+            "found",
+            "found",
+            "found",
+            "found",
+            "ride",
+            "ride",
+            "ride",
+            "ride",
+            "ride",
+            "ride",
+            "ride",
+            "ride",
+            "ride",
+            "ride",
+            "found"
+          ]
+        }
+      },
+      "outer_boundary": {
+        "from_role": "zero_relative",
+        "from_port": "ingress:0",
+        "to_role": "cyclotomic_receiver",
+        "to_port": "ingress:0",
+        "interface_namespace": "0x5052494d4f555445",
+        "interface_local": 1,
+        "boundary_slot": 1,
+        "arc_slot": 0,
+        "hand": "with"
+      },
+      "reverse_arc_storage": false
+    },
+    "permuted_storage": {
+      "event": {
+        "candidate": 43,
+        "regional_fan_supplied": true,
+        "before": {
+          "standing_sha256": "e8a691d89e13ff1d8888a4e1a4e8acb97fce4b4d08c071a1fa7112c26662c3e5",
+          "rank": 6,
+          "scalar_cells": 95,
+          "constituents": 2,
+          "constituent_cells": 58,
+          "constituent_incidences": 57,
+          "constituent_pins": 45,
+          "constituent_paths": 21,
+          "live_lineages": 6
+        },
+        "after": {
+          "standing_sha256": "1dbd2c1b7774e20f886732e2c417a3135dce9c4906d87e433097a4f89d66744e",
+          "rank": 6,
+          "scalar_cells": 128,
+          "constituents": 1,
+          "constituent_cells": 78,
+          "constituent_incidences": 80,
+          "constituent_pins": 64,
+          "constituent_paths": 33,
+          "live_lineages": 6
+        },
+        "current_radiation_sha256": "d111efe74884fdf153e168f5413203585cabc5e8ea73d46a1cf3a69af1c19c37",
+        "regional_radiation_sha256": "99b5e3fd85fb2f26d3c27b9c7110285309d911779940c620c71ada45af072c4b",
+        "regional_cells": 1,
+        "constituent": {
+          "sha256": "73b76dfc0c98990041ee59d9d726885d48d20b6c1aebd046c65d5dd452dae009",
+          "grain": 5,
+          "axes": 55,
+          "cells": 78,
+          "incidences": 80,
+          "pins": 64,
+          "boundaries": 17,
+          "boundary_paths": 33,
+          "transport_terms": 463,
+          "folded_paths": 1,
+          "exposed": 0,
+          "open_pins": 0,
+          "found_pins": 54,
+          "interface_capabilities": [
+            {
+              "namespace": 5787769067348050254,
+              "local": 1
+            },
+            {
+              "namespace": 5787769067348050254,
+              "local": 2
+            },
+            {
+              "namespace": 5787769067348050254,
+              "local": 3
+            },
+            {
+              "namespace": 5787769067348050254,
+              "local": 4
+            },
+            {
+              "namespace": 5787769067348050254,
+              "local": 5
+            },
+            {
+              "namespace": 5787769067516810309,
+              "local": 1
+            }
+          ],
+          "boundary_transitions": [
+            "found",
+            "found",
+            "found",
+            "found",
+            "found",
+            "found",
+            "ride",
+            "ride",
+            "ride",
+            "ride",
+            "ride",
+            "ride",
+            "ride",
+            "ride",
+            "ride",
+            "ride",
+            "ride"
+          ]
+        }
+      },
+      "outer_boundary": {
+        "from_role": "zero_relative",
+        "from_port": "ingress:0",
+        "to_role": "cyclotomic_receiver",
+        "to_port": "ingress:0",
+        "interface_namespace": "0x5052494d4f555445",
+        "interface_local": 1,
+        "boundary_slot": 1,
+        "arc_slot": 0,
+        "hand": "against"
+      },
+      "reverse_arc_storage": true
+    }
+  },
+  "rest_remount": {
+    "canonical_exact": true,
+    "changed_capability_exact": true
+  },
+  "later_probe": {
+    "candidate": 47,
+    "after_canonical_hand_up": {
+      "event": {
+        "candidate": 47,
+        "regional_fan_supplied": true,
+        "before": {
+          "standing_sha256": "1dbd2c1b7774e20f886732e2c417a3135dce9c4906d87e433097a4f89d66744e",
+          "rank": 6,
+          "scalar_cells": 128,
+          "constituents": 1,
+          "constituent_cells": 78,
+          "constituent_incidences": 80,
+          "constituent_pins": 64,
+          "constituent_paths": 33,
+          "live_lineages": 6
+        },
+        "after": {
+          "standing_sha256": "53edad4f36ec3ac104d88a0e286bdad44d7f044ef7e827a5c5e30c8212422d75",
+          "rank": 6,
+          "scalar_cells": 162,
+          "constituents": 2,
+          "constituent_cells": 97,
+          "constituent_incidences": 98,
+          "constituent_pins": 78,
+          "constituent_paths": 39,
+          "live_lineages": 6
+        },
+        "current_radiation_sha256": "b42ab56a81eb1e753cb560149e4d7afc0f0b95679c16361f994c9b8f671f5350",
+        "regional_radiation_sha256": "01da49bb903657ec7830a986927cd0a4e5041508cd05d841460adda2e9c21989",
+        "regional_cells": 1,
+        "constituent": {
+          "sha256": "d2af92f40766bd4fed0c1877a29a838620ca32aae3dd47b87d25820d9f8cca98",
+          "grain": 3,
+          "axes": 15,
+          "cells": 19,
+          "incidences": 18,
+          "pins": 14,
+          "boundaries": 2,
+          "boundary_paths": 6,
+          "transport_terms": 114,
+          "folded_paths": 0,
+          "exposed": 6,
+          "open_pins": 0,
+          "found_pins": 14,
+          "interface_capabilities": [
+            {
+              "namespace": 5787769067348050254,
+              "local": 1
+            },
+            {
+              "namespace": 5787769067348050254,
+              "local": 2
+            },
+            {
+              "namespace": 5787769067348050254,
+              "local": 3
+            },
+            {
+              "namespace": 5787769067348050254,
+              "local": 4
+            },
+            {
+              "namespace": 5787769067348050254,
+              "local": 5
+            },
+            {
+              "namespace": 5787769067516810309,
+              "local": 1
+            }
+          ],
+          "boundary_transitions": [
+            "found",
+            "found"
+          ]
+        }
+      },
+      "outer_boundary": {
+        "from_role": "zero_relative",
+        "from_port": "ingress:0",
+        "to_role": "cyclotomic_receiver",
+        "to_port": "ingress:0",
+        "interface_namespace": "0x5052494d4f555445",
+        "interface_local": 1,
+        "boundary_slot": 1,
+        "arc_slot": 0,
+        "hand": "against"
+      },
+      "reverse_arc_storage": false
+    },
+    "after_changed_capability": {
+      "event": {
+        "candidate": 47,
+        "regional_fan_supplied": true,
+        "before": {
+          "standing_sha256": "75a9e5345eaf653fd6cb4396ba05a2624c2177a4a15e51360d425a5627692974",
+          "rank": 6,
+          "scalar_cells": 128,
+          "constituents": 2,
+          "constituent_cells": 78,
+          "constituent_incidences": 80,
+          "constituent_pins": 64,
+          "constituent_paths": 32,
+          "live_lineages": 6
+        },
+        "after": {
+          "standing_sha256": "63e7138e24b720e6857af1a8515cf078c022dbf9dde647e0df1bdb33101b255e",
+          "rank": 6,
+          "scalar_cells": 162,
+          "constituents": 2,
+          "constituent_cells": 98,
+          "constituent_incidences": 98,
+          "constituent_pins": 78,
+          "constituent_paths": 39,
+          "live_lineages": 6
+        },
+        "current_radiation_sha256": "b42ab56a81eb1e753cb560149e4d7afc0f0b95679c16361f994c9b8f671f5350",
+        "regional_radiation_sha256": "a1fcc8770830d1c698d9eee0ac71cb068a1ec4b274a86bb12e6b9f15b76cb81b",
+        "regional_cells": 1,
+        "constituent": {
+          "sha256": "0ca15e94a5d7236eb6810f3f14cc2fd192e5845a77a171056f14b9168bb341ec",
+          "grain": 5,
+          "axes": 42,
+          "cells": 59,
+          "incidences": 58,
+          "pins": 46,
+          "boundaries": 11,
+          "boundary_paths": 23,
+          "transport_terms": 346,
+          "folded_paths": 1,
+          "exposed": 5,
+          "open_pins": 0,
+          "found_pins": 41,
+          "interface_capabilities": [
+            {
+              "namespace": 5787769067348050254,
+              "local": 1
+            },
+            {
+              "namespace": 5787769067348050254,
+              "local": 2
+            },
+            {
+              "namespace": 5787769067348050254,
+              "local": 3
+            },
+            {
+              "namespace": 5787769067348050254,
+              "local": 4
+            },
+            {
+              "namespace": 5787769067348050254,
+              "local": 5
+            },
+            {
+              "namespace": 5787769067516810309,
+              "local": 1
+            }
+          ],
+          "boundary_transitions": [
+            "found",
+            "found",
+            "found",
+            "found",
+            "found",
+            "ride",
+            "ride",
+            "ride",
+            "ride",
+            "ride",
+            "ride"
+          ]
+        }
+      },
+      "outer_boundary": {
+        "from_role": "zero_relative",
+        "from_port": "ingress:0",
+        "to_role": "cyclotomic_receiver",
+        "to_port": "ingress:0",
+        "interface_namespace": "0x5052494d4f555445",
+        "interface_local": 1,
+        "boundary_slot": 1,
+        "arc_slot": 0,
+        "hand": "against"
+      },
+      "reverse_arc_storage": false
+    }
+  },
+  "comparison": {
+    "canonical_before_constituents": 2,
+    "canonical_after_constituents": 1,
+    "canonical_returned_grain": 5,
+    "canonical_returned_exposed": 0,
+    "changed_capability_after_constituents": 2,
+    "changed_capability_returned_grain": 4,
+    "reversed_hand_returned_grain": 5,
+    "canonical_and_changed_current_radiation_equal": true,
+    "canonical_and_changed_scalar_standing_equal": true,
+    "canonical_and_changed_regional_radiation_equal": false,
+    "canonical_and_changed_whole_standing_equal": false,
+    "canonical_and_reversed_current_radiation_equal": true,
+    "canonical_and_reversed_scalar_standing_equal": true,
+    "canonical_and_reversed_regional_radiation_equal": false,
+    "canonical_and_reversed_whole_standing_equal": false,
+    "storage_permutation_radiation_exact": true,
+    "storage_permutation_standing_exact": true,
+    "probe_current_radiation_equal": true,
+    "probe_scalar_standing_equal": true,
+    "probe_regional_radiation_equal": false,
+    "probe_whole_standing_equal": false,
+    "canonical_probe_returned_grain": 3,
+    "changed_capability_probe_returned_grain": 5
+  },
+  "conclusion": {
+    "existing_regional_carrier_was_sufficient": true,
+    "lower_pair_and_parent_closed_in_one_event": true,
+    "changed_capability_prevented_parent_closure": true,
+    "reversed_hand_changed_the_parent_successor": true,
+    "storage_order_was_gauge": true,
+    "rest_preserved_the_higher_standing": true,
+    "same_later_probe_met_different_higher_standing": true,
+    "soma_change_warranted": false,
+    "result": "the outer boundary already carried by the lower event becomes the completed body's higher-grain valence; at 43 the lower and parent seams close as one connected component, and no completion-port subsystem is required"
+  }
+}

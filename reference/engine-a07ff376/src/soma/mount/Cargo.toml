@@ -1,0 +1,43 @@
+# mount — the CUDA Driver API boundary scaffolding for soma's headless production mount.
+# NOT engine law: a minimal, safe host-side wrapper over libcuda + one smoke binary proving
+# the full path (Rust PTX -> load -> alloc -> memcpy -> launch -> sync -> readback -> exact assert).
+# Vulkan is convicted for production (headless Xid); the law stays in Rust (rustc nvptx64 + Driver API).
+[package]
+name = "mount"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+name = "mount"
+path = "src/lib.rs"
+
+# `body` is the no_std law crate. mount-link-gate stages the configuration-fold GATE DATA and the
+# host reference through the SAME law code the CUDA kernel compiles for nvptx — one mouth, both sides.
+[dependencies]
+body = { path = "../body" }
+soma-abi = { path = "../abi" }
+
+[[bin]]
+name = "mount-smoke"
+path = "src/bin/mount-smoke.rs"
+
+[[bin]]
+name = "mount-link-gate"
+path = "src/bin/mount-link-gate.rs"
+
+[[bin]]
+name = "mount-founded-gate"
+path = "src/bin/mount-founded-gate.rs"
+
+[[bin]]
+name = "mount-chart-gate"
+path = "src/bin/mount-chart-gate.rs"
+
+[[bin]]
+name = "mount-scope-gate"
+path = "src/bin/mount-scope-gate.rs"
+
+[[bin]]
+name = "mount-register-gate"
+path = "src/bin/mount-register-gate.rs"

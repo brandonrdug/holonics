@@ -1,0 +1,1295 @@
+{
+  "acceptance": {
+    "all_source_absent_recurrence_probes_matched": true,
+    "always_parent_foil_was_exact": true,
+    "always_parent_invocation_count_exact": true,
+    "derived_ecology_survived_exact_rest_remount": true,
+    "every_open_parent_return_carried_its_complete_residual": true,
+    "every_substitution_matched_the_parent_receiver_control": true,
+    "every_successor_was_the_complete_active_ecology_boundary": true,
+    "first_pass_substitution_count_exact": true,
+    "fixed_source_validated": true,
+    "no_ecology_control_could_not_substitute": true,
+    "no_floating_point_causal_data": true,
+    "one_nonidentical_current_substituted_before_parent_evaluation": true,
+    "selective_parent_invocation_count_exact": true,
+    "source_lineages_departed": true
+  },
+  "conclusion": "At this exact five-axis receiver, the derived ecology omitted one first-passage parent evaluation for a nonidentical context, invoked the parent only on five OPEN paths, retained every returned residual as new local support, and then conducted all six recurrence probes without parent evaluation. This is receiver-specific parent substitution, not full-block or end-to-end transformer replacement.",
+  "control": {
+    "same_current_without_ecology_recovered_ecology": false,
+    "substitution_available": false
+  },
+  "cut": {
+    "boundary": "exact five-axis orientation followed by exact descending signed-axis order; not the full 2,048-axis MLP return",
+    "layer": 7,
+    "local_products_per_receiver": 30,
+    "local_rank": 6,
+    "parent_factor_count": 8192,
+    "parent_products_per_receiver": 40960,
+    "pivot_factors": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "receiver_axes": [
+      76,
+      856,
+      954,
+      1326,
+      1476
+    ]
+  },
+  "events": [
+    {
+      "event": "initial-derived-ecology",
+      "regional_arcs": 450,
+      "returned_incidences": 450,
+      "returned_pins": 450,
+      "semantic_words": 449,
+      "wall_micros": 10977
+    },
+    {
+      "event": "query-drop_then_reverse.code_comment.absent",
+      "regional_arcs": 49,
+      "returned_incidences": 499,
+      "returned_pins": 499,
+      "semantic_words": 47,
+      "wall_micros": 5452
+    },
+    {
+      "event": "parent-return-drop_then_reverse.code_comment.absent",
+      "regional_arcs": 53,
+      "returned_incidences": 53,
+      "returned_pins": 53,
+      "semantic_words": 52,
+      "wall_micros": 3370
+    },
+    {
+      "event": "successor-drop_then_reverse.code_comment.absent",
+      "regional_arcs": 1051,
+      "returned_incidences": 501,
+      "returned_pins": 501,
+      "semantic_words": 500,
+      "wall_micros": 41153
+    },
+    {
+      "event": "query-drop_then_reverse.code_comment.irrelevant_before",
+      "regional_arcs": 60,
+      "returned_incidences": 561,
+      "returned_pins": 561,
+      "semantic_words": 58,
+      "wall_micros": 5798
+    },
+    {
+      "event": "parent-return-drop_then_reverse.code_comment.irrelevant_before",
+      "regional_arcs": 54,
+      "returned_incidences": 54,
+      "returned_pins": 54,
+      "semantic_words": 53,
+      "wall_micros": 3010
+    },
+    {
+      "event": "successor-drop_then_reverse.code_comment.irrelevant_before",
+      "regional_arcs": 1176,
+      "returned_incidences": 563,
+      "returned_pins": 563,
+      "semantic_words": 562,
+      "wall_micros": 44655
+    },
+    {
+      "event": "query-drop_then_reverse.code_comment.relevant_after",
+      "regional_arcs": 57,
+      "returned_incidences": 620,
+      "returned_pins": 620,
+      "semantic_words": 55,
+      "wall_micros": 6129
+    },
+    {
+      "event": "successor-drop_then_reverse.code_comment.relevant_after",
+      "regional_arcs": 1181,
+      "returned_incidences": 563,
+      "returned_pins": 563,
+      "semantic_words": 562,
+      "wall_micros": 44677
+    },
+    {
+      "event": "query-reverse_then_drop.conversation.relevant_before",
+      "regional_arcs": 58,
+      "returned_incidences": 621,
+      "returned_pins": 621,
+      "semantic_words": 56,
+      "wall_micros": 6216
+    },
+    {
+      "event": "parent-return-reverse_then_drop.conversation.relevant_before",
+      "regional_arcs": 53,
+      "returned_incidences": 53,
+      "returned_pins": 53,
+      "semantic_words": 52,
+      "wall_micros": 3172
+    },
+    {
+      "event": "successor-reverse_then_drop.conversation.relevant_before",
+      "regional_arcs": 1295,
+      "returned_incidences": 623,
+      "returned_pins": 623,
+      "semantic_words": 622,
+      "wall_micros": 48498
+    },
+    {
+      "event": "query-reverse_then_drop.prose.relevant_before",
+      "regional_arcs": 51,
+      "returned_incidences": 674,
+      "returned_pins": 674,
+      "semantic_words": 49,
+      "wall_micros": 6637
+    },
+    {
+      "event": "parent-return-reverse_then_drop.prose.relevant_before",
+      "regional_arcs": 53,
+      "returned_incidences": 53,
+      "returned_pins": 53,
+      "semantic_words": 52,
+      "wall_micros": 3811
+    },
+    {
+      "event": "successor-reverse_then_drop.prose.relevant_before",
+      "regional_arcs": 1401,
+      "returned_incidences": 676,
+      "returned_pins": 676,
+      "semantic_words": 675,
+      "wall_micros": 54315
+    },
+    {
+      "event": "query-reverse_then_drop.code_comment.relevant_before",
+      "regional_arcs": 58,
+      "returned_incidences": 734,
+      "returned_pins": 734,
+      "semantic_words": 56,
+      "wall_micros": 7445
+    },
+    {
+      "event": "parent-return-reverse_then_drop.code_comment.relevant_before",
+      "regional_arcs": 53,
+      "returned_incidences": 53,
+      "returned_pins": 53,
+      "semantic_words": 52,
+      "wall_micros": 3547
+    },
+    {
+      "event": "successor-reverse_then_drop.code_comment.relevant_before",
+      "regional_arcs": 1521,
+      "returned_incidences": 736,
+      "returned_pins": 736,
+      "semantic_words": 735,
+      "wall_micros": 57497
+    },
+    {
+      "event": "source-absent-drop_then_reverse.code_comment.absent",
+      "regional_arcs": 49,
+      "returned_incidences": 785,
+      "returned_pins": 785,
+      "semantic_words": 47,
+      "wall_micros": 7175
+    },
+    {
+      "event": "source-absent-drop_then_reverse.code_comment.irrelevant_before",
+      "regional_arcs": 60,
+      "returned_incidences": 796,
+      "returned_pins": 796,
+      "semantic_words": 58,
+      "wall_micros": 7964
+    },
+    {
+      "event": "source-absent-drop_then_reverse.code_comment.relevant_after",
+      "regional_arcs": 57,
+      "returned_incidences": 793,
+      "returned_pins": 793,
+      "semantic_words": 55,
+      "wall_micros": 7569
+    },
+    {
+      "event": "source-absent-reverse_then_drop.conversation.relevant_before",
+      "regional_arcs": 58,
+      "returned_incidences": 794,
+      "returned_pins": 794,
+      "semantic_words": 56,
+      "wall_micros": 7508
+    },
+    {
+      "event": "source-absent-reverse_then_drop.prose.relevant_before",
+      "regional_arcs": 51,
+      "returned_incidences": 787,
+      "returned_pins": 787,
+      "semantic_words": 49,
+      "wall_micros": 7736
+    },
+    {
+      "event": "source-absent-reverse_then_drop.code_comment.relevant_before",
+      "regional_arcs": 58,
+      "returned_incidences": 794,
+      "returned_pins": 794,
+      "semantic_words": 56,
+      "wall_micros": 8066
+    },
+    {
+      "event": "no-ecology-control",
+      "regional_arcs": 49,
+      "returned_incidences": 49,
+      "returned_pins": 49,
+      "semantic_words": 47,
+      "wall_micros": 1519
+    }
+  ],
+  "final_ecology": {
+    "generation": 6,
+    "law_coefficients": 30,
+    "pivot_factors": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "rank": 6,
+    "receiver_axes": [
+      76,
+      856,
+      954,
+      1326,
+      1476
+    ],
+    "support": [
+      {
+        "condition": "absent",
+        "context": null,
+        "faces": [
+          {
+            "count": 2,
+            "face": {
+              "orientation": [
+                "negative",
+                "negative",
+                "negative",
+                "positive",
+                "positive"
+              ],
+              "signed_axis_order": [
+                1326,
+                1476,
+                76,
+                954,
+                856
+              ]
+            }
+          }
+        ],
+        "operation": "drop_then_reverse"
+      },
+      {
+        "condition": "irrelevant_before",
+        "context": null,
+        "faces": [
+          {
+            "count": 2,
+            "face": {
+              "orientation": [
+                "negative",
+                "negative",
+                "negative",
+                "positive",
+                "positive"
+              ],
+              "signed_axis_order": [
+                1476,
+                1326,
+                76,
+                954,
+                856
+              ]
+            }
+          }
+        ],
+        "operation": "drop_then_reverse"
+      },
+      {
+        "condition": "relevant_after",
+        "context": null,
+        "faces": [
+          {
+            "count": 2,
+            "face": {
+              "orientation": [
+                "negative",
+                "negative",
+                "negative",
+                "positive",
+                "positive"
+              ],
+              "signed_axis_order": [
+                1476,
+                1326,
+                76,
+                954,
+                856
+              ]
+            }
+          }
+        ],
+        "operation": "drop_then_reverse"
+      },
+      {
+        "condition": "absent",
+        "context": "code_comment",
+        "faces": [
+          {
+            "count": 1,
+            "face": {
+              "orientation": [
+                "negative",
+                "negative",
+                "negative",
+                "positive",
+                "positive"
+              ],
+              "signed_axis_order": [
+                1326,
+                1476,
+                76,
+                954,
+                856
+              ]
+            }
+          }
+        ],
+        "operation": "drop_then_reverse"
+      },
+      {
+        "condition": "irrelevant_before",
+        "context": "code_comment",
+        "faces": [
+          {
+            "count": 1,
+            "face": {
+              "orientation": [
+                "negative",
+                "negative",
+                "negative",
+                "positive",
+                "positive"
+              ],
+              "signed_axis_order": [
+                1476,
+                1326,
+                76,
+                954,
+                856
+              ]
+            }
+          }
+        ],
+        "operation": "drop_then_reverse"
+      },
+      {
+        "condition": "relevant_before",
+        "context": "code_comment",
+        "faces": [
+          {
+            "count": 1,
+            "face": {
+              "orientation": [
+                "negative",
+                "negative",
+                "negative",
+                "positive",
+                "positive"
+              ],
+              "signed_axis_order": [
+                1326,
+                1476,
+                76,
+                954,
+                856
+              ]
+            }
+          }
+        ],
+        "operation": "reverse_then_drop"
+      },
+      {
+        "condition": "relevant_before",
+        "context": "conversation",
+        "faces": [
+          {
+            "count": 1,
+            "face": {
+              "orientation": [
+                "negative",
+                "negative",
+                "negative",
+                "positive",
+                "positive"
+              ],
+              "signed_axis_order": [
+                1476,
+                1326,
+                76,
+                954,
+                856
+              ]
+            }
+          }
+        ],
+        "operation": "reverse_then_drop"
+      },
+      {
+        "condition": "relevant_before",
+        "context": "prose",
+        "faces": [
+          {
+            "count": 1,
+            "face": {
+              "orientation": [
+                "negative",
+                "negative",
+                "negative",
+                "positive",
+                "positive"
+              ],
+              "signed_axis_order": [
+                1476,
+                1326,
+                76,
+                954,
+                856
+              ]
+            }
+          }
+        ],
+        "operation": "reverse_then_drop"
+      }
+    ]
+  },
+  "final_machine": {
+    "constituent_cells": 3,
+    "constituent_incidences": 736,
+    "constituent_paths": 736,
+    "constituent_pins": 736,
+    "constituent_transport_terms": 736,
+    "live_lineages": 0,
+    "rest_sha256": "b4ec74c799aaafb6135147d9b6405c5aa49aa324e25461d8e6a8b1c5ed1647bd",
+    "standing_cells": 0,
+    "standing_constituents": 1,
+    "standing_rank": 6
+  },
+  "first_pass": [
+    {
+      "condition": "absent",
+      "context": "code_comment",
+      "current_id": "drop_then_reverse.code_comment.absent",
+      "local_prediction": {
+        "exact_output": [
+          "113296190671658860627980961/1874130046882540292270981120",
+          "73251275279942283923706473/234266255860317536533872640",
+          "970260356767459005962155969/44979121125180967014503546880",
+          "69024529201984328762605331/1405597535161905219203235840",
+          "-17091219767855847065214001/5622390140647620876812943360"
+        ],
+        "face": {
+          "orientation": [
+            "positive",
+            "positive",
+            "positive",
+            "positive",
+            "negative"
+          ],
+          "signed_axis_order": [
+            856,
+            76,
+            1326,
+            954,
+            1476
+          ]
+        }
+      },
+      "machine_after": {
+        "constituent_cells": 3,
+        "constituent_incidences": 501,
+        "constituent_paths": 501,
+        "constituent_pins": 501,
+        "constituent_transport_terms": 501,
+        "live_lineages": 0,
+        "rest_sha256": "82123f3eca5e95643a48c4568b8f8c7b237b8f928a595159fb4d879dc63f3cdc",
+        "standing_cells": 0,
+        "standing_constituents": 1,
+        "standing_rank": 6
+      },
+      "operation": "drop_then_reverse",
+      "ordinal": 0,
+      "outgoing_factor_exact": true,
+      "parent_invoked": true,
+      "parent_output": [
+        "-2260171296121/17592186044416",
+        "-3722481860303/2199023255552",
+        "-3240577402145/17592186044416",
+        "1952872354289/8796093022208",
+        "14415631992359/70368744177664"
+      ],
+      "relation": "OPEN_PARENT_RETURN",
+      "residual": [
+        "-354076667098369898520503931/1874130046882540292270981120",
+        "-469814561147617414678041183/234266255860317536533872640",
+        "-9255661791165653597619419569/44979121125180967014503546880",
+        "60760111978188394327730191/351399383790476304800808960",
+        "2337770719594008800494173947/11244780281295241753625886720"
+      ],
+      "source_expected_parent_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1326,
+          1476,
+          76,
+          954,
+          856
+        ]
+      },
+      "substitution_face_exact_to_parent_control": false,
+      "supported_faces_before": [
+        {
+          "orientation": [
+            "negative",
+            "negative",
+            "negative",
+            "positive",
+            "positive"
+          ],
+          "signed_axis_order": [
+            1326,
+            1476,
+            76,
+            954,
+            856
+          ]
+        }
+      ]
+    },
+    {
+      "condition": "irrelevant_before",
+      "context": "code_comment",
+      "current_id": "drop_then_reverse.code_comment.irrelevant_before",
+      "local_prediction": {
+        "exact_output": [
+          "-98869319634069089018779559/937065023441270146135490560",
+          "-2525408906419163311396843287/1874130046882540292270981120",
+          "-14821724950488464436909350359/89958242250361934029007093760",
+          "8051383331119446768877892929/44979121125180967014503546880",
+          "6317533534091916970208212009/44979121125180967014503546880"
+        ],
+        "face": {
+          "orientation": [
+            "negative",
+            "negative",
+            "negative",
+            "positive",
+            "positive"
+          ],
+          "signed_axis_order": [
+            1326,
+            1476,
+            76,
+            954,
+            856
+          ]
+        }
+      },
+      "machine_after": {
+        "constituent_cells": 3,
+        "constituent_incidences": 563,
+        "constituent_paths": 563,
+        "constituent_pins": 563,
+        "constituent_transport_terms": 563,
+        "live_lineages": 0,
+        "rest_sha256": "e7f5685d6cbdb021694ed5b6b0a229ecf86913945635b358a40518f19d1c31bc",
+        "standing_cells": 0,
+        "standing_constituents": 1,
+        "standing_rank": 6
+      },
+      "operation": "drop_then_reverse",
+      "ordinal": 1,
+      "outgoing_factor_exact": true,
+      "parent_invoked": true,
+      "parent_output": [
+        "-4702305929385/35184372088832",
+        "-3833038491651/2199023255552",
+        "-3159789128523/17592186044416",
+        "6605354602485/35184372088832",
+        "3776025199631/17592186044416"
+      ],
+      "relation": "OPEN_PARENT_RETURN",
+      "residual": [
+        "-52734292567744689791710607/1874130046882540292270981120",
+        "-741319896890938953631917273/1874130046882540292270981120",
+        "-1335964330768118843335454921/89958242250361934029007093760",
+        "392793077367574502357384471/44979121125180967014503546880",
+        "3336883170979744842569316071/44979121125180967014503546880"
+      ],
+      "source_expected_parent_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "substitution_face_exact_to_parent_control": false,
+      "supported_faces_before": [
+        {
+          "orientation": [
+            "negative",
+            "negative",
+            "negative",
+            "positive",
+            "positive"
+          ],
+          "signed_axis_order": [
+            1476,
+            1326,
+            76,
+            954,
+            856
+          ]
+        }
+      ]
+    },
+    {
+      "condition": "relevant_after",
+      "context": "code_comment",
+      "current_id": "drop_then_reverse.code_comment.relevant_after",
+      "local_prediction": {
+        "exact_output": [
+          "-45127097534101546788040947/937065023441270146135490560",
+          "-164110575065763549577408177/234266255860317536533872640",
+          "-613909330409261892048461751/7496520187530161169083924480",
+          "302538446476275597975762851/3748260093765080584541962240",
+          "405933915537120826801656021/3748260093765080584541962240"
+        ],
+        "face": {
+          "orientation": [
+            "negative",
+            "negative",
+            "negative",
+            "positive",
+            "positive"
+          ],
+          "signed_axis_order": [
+            1476,
+            1326,
+            76,
+            954,
+            856
+          ]
+        }
+      },
+      "machine_after": {
+        "constituent_cells": 3,
+        "constituent_incidences": 563,
+        "constituent_paths": 563,
+        "constituent_pins": 563,
+        "constituent_transport_terms": 563,
+        "live_lineages": 0,
+        "rest_sha256": "ef2a46a2caeb71e30dc83f19749f083893c0a957d2486936c4b81082200b9cb2",
+        "standing_cells": 0,
+        "standing_constituents": 1,
+        "standing_rank": 6
+      },
+      "operation": "drop_then_reverse",
+      "ordinal": 2,
+      "outgoing_factor_exact": true,
+      "parent_invoked": false,
+      "parent_output": null,
+      "relation": "RIDE_SUBSTITUTE",
+      "residual": null,
+      "source_expected_parent_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "substitution_face_exact_to_parent_control": true,
+      "supported_faces_before": [
+        {
+          "orientation": [
+            "negative",
+            "negative",
+            "negative",
+            "positive",
+            "positive"
+          ],
+          "signed_axis_order": [
+            1476,
+            1326,
+            76,
+            954,
+            856
+          ]
+        }
+      ]
+    },
+    {
+      "condition": "relevant_before",
+      "context": "conversation",
+      "current_id": "reverse_then_drop.conversation.relevant_before",
+      "local_prediction": {
+        "exact_output": [
+          "71771629051637637200755085/1499304037506032233816784896",
+          "79049121249446651284418913/374826009376508058454196224",
+          "96991572771654188018858023/2998608075012064467633569792",
+          "-3933386748450250516451489/749652018753016116908392448",
+          "18301747497958204311100211/749652018753016116908392448"
+        ],
+        "face": {
+          "orientation": [
+            "positive",
+            "positive",
+            "positive",
+            "negative",
+            "positive"
+          ],
+          "signed_axis_order": [
+            856,
+            76,
+            954,
+            1476,
+            1326
+          ]
+        }
+      },
+      "machine_after": {
+        "constituent_cells": 3,
+        "constituent_incidences": 623,
+        "constituent_paths": 623,
+        "constituent_pins": 623,
+        "constituent_transport_terms": 623,
+        "live_lineages": 0,
+        "rest_sha256": "ad8eec4aeb827c6cc848f8c6afc7ca3934cde47cc907a015bf1fa8caf3d9b105",
+        "standing_cells": 0,
+        "standing_constituents": 1,
+        "standing_rank": 6
+      },
+      "operation": "reverse_then_drop",
+      "ordinal": 3,
+      "outgoing_factor_exact": true,
+      "parent_invoked": true,
+      "parent_output": [
+        "-3086783319821/17592186044416",
+        "-16332504087851/8796093022208",
+        "-837834152917/4398046511104",
+        "796054499127/4398046511104",
+        "1741220916283/8796093022208"
+      ],
+      "relation": "OPEN_PARENT_RETURN",
+      "residual": [
+        "-334844488935523308453420661/1499304037506032233816784896",
+        "-775022585254262929585710541/374826009376508058454196224",
+        "-668230701351756682169774439/2998608075012064467633569792",
+        "139621779493113760333668113/749652018753016116908392448",
+        "130094793067374273333030437/749652018753016116908392448"
+      ],
+      "source_expected_parent_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "substitution_face_exact_to_parent_control": false,
+      "supported_faces_before": []
+    },
+    {
+      "condition": "relevant_before",
+      "context": "prose",
+      "current_id": "reverse_then_drop.prose.relevant_before",
+      "local_prediction": {
+        "exact_output": [
+          "-290269550499296316734659019/937065023441270146135490560",
+          "-373337057472829690448178967/117133127930158768266936320",
+          "-1429443453089950002500403851/3748260093765080584541962240",
+          "593262345460957313542432211/1874130046882540292270981120",
+          "585109461940461120365789511/1874130046882540292270981120"
+        ],
+        "face": {
+          "orientation": [
+            "negative",
+            "negative",
+            "negative",
+            "positive",
+            "positive"
+          ],
+          "signed_axis_order": [
+            1326,
+            1476,
+            76,
+            954,
+            856
+          ]
+        }
+      },
+      "machine_after": {
+        "constituent_cells": 3,
+        "constituent_incidences": 676,
+        "constituent_paths": 676,
+        "constituent_pins": 676,
+        "constituent_transport_terms": 676,
+        "live_lineages": 0,
+        "rest_sha256": "a9c15413ae6f4ca1648756fd017f501c595c400096ae037aeae28eab5ec3d536",
+        "standing_cells": 0,
+        "standing_constituents": 1,
+        "standing_rank": 6
+      },
+      "operation": "reverse_then_drop",
+      "ordinal": 4,
+      "outgoing_factor_exact": true,
+      "parent_invoked": true,
+      "parent_output": [
+        "-1570133962029/8796093022208",
+        "-14541230250385/8796093022208",
+        "-6819457630801/35184372088832",
+        "3014456721961/17592186044416",
+        "424685319921/2199023255552"
+      ],
+      "relation": "OPEN_PARENT_RETURN",
+      "residual": [
+        "123000103232206329209936489/937065023441270146135490560",
+        "718795355618650992264961143/468532511720635073067745280",
+        "702953270627191404268393281/3748260093765080584541962240",
+        "-272126364782343414233820441/1874130046882540292270981120",
+        "-223168988357757143315477751/1874130046882540292270981120"
+      ],
+      "source_expected_parent_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "substitution_face_exact_to_parent_control": false,
+      "supported_faces_before": []
+    },
+    {
+      "condition": "relevant_before",
+      "context": "code_comment",
+      "current_id": "reverse_then_drop.code_comment.relevant_before",
+      "local_prediction": {
+        "exact_output": [
+          "256080193921665439452155693/1874130046882540292270981120",
+          "565445824667905851594162673/468532511720635073067745280",
+          "1412300536515227013856294073/11244780281295241753625886720",
+          "-156090807875628954977059369/2811195070323810438406471680",
+          "-216336154287437998043410489/2811195070323810438406471680"
+        ],
+        "face": {
+          "orientation": [
+            "positive",
+            "positive",
+            "positive",
+            "negative",
+            "negative"
+          ],
+          "signed_axis_order": [
+            856,
+            76,
+            954,
+            1326,
+            1476
+          ]
+        }
+      },
+      "machine_after": {
+        "constituent_cells": 3,
+        "constituent_incidences": 736,
+        "constituent_paths": 736,
+        "constituent_pins": 736,
+        "constituent_transport_terms": 736,
+        "live_lineages": 0,
+        "rest_sha256": "b4ec74c799aaafb6135147d9b6405c5aa49aa324e25461d8e6a8b1c5ed1647bd",
+        "standing_cells": 0,
+        "standing_constituents": 1,
+        "standing_rank": 6
+      },
+      "operation": "reverse_then_drop",
+      "ordinal": 5,
+      "outgoing_factor_exact": true,
+      "parent_invoked": true,
+      "parent_output": [
+        "-783918398743/4398046511104",
+        "-241613498911/137438953472",
+        "-12462585841/68719476736",
+        "446266112495/2199023255552",
+        "1747615753761/8796093022208"
+      ],
+      "relation": "OPEN_PARENT_RETURN",
+      "residual": [
+        "-590129645576853576672177733/1874130046882540292270981120",
+        "-1389111726150809693730907313/468532511720635073067745280",
+        "-3451591959777936256546910393/11244780281295241753625886720",
+        "726590047631781258531285169/2811195070323810438406471680",
+        "774866945104372468745223799/2811195070323810438406471680"
+      ],
+      "source_expected_parent_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1326,
+          1476,
+          76,
+          954,
+          856
+        ]
+      },
+      "substitution_face_exact_to_parent_control": false,
+      "supported_faces_before": []
+    }
+  ],
+  "numerical_law": "all retained BF16 words are decoded as exact dyadics; local and parent products, sums, comparisons, and residuals use integers and rational numbers only",
+  "observation_id": "eros-parent-on-open-substitution-01",
+  "physical_execution": {
+    "always_parent_foil": {
+      "exact_accumulations": 245760,
+      "exact_products": 245760,
+      "invocations": 6,
+      "wall_micros": 3017455
+    },
+    "executor": "ParallelHostLiveCurrentExecutor",
+    "feature_searches": 0,
+    "host_threads": 8,
+    "local_exact_accumulations": 180,
+    "local_exact_products": 180,
+    "model_reruns": 0,
+    "selective_parent": {
+      "exact_accumulations": 204800,
+      "exact_products": 204800,
+      "invocations": 5,
+      "wall_micros": 2514493
+    },
+    "semantic_evaluation_currents": 6,
+    "thresholds": 0
+  },
+  "question": "Can one inherited local transformer ecology substitute at its declared receiver before evaluating the parent, return to the parent only where OPEN, and retain those later faces for source-absent recurrence?",
+  "run_wall_micros": 6170371,
+  "schema": "eros.parent-on-open-substitution.report.v1",
+  "source": {
+    "observation_id": "eros-parent-on-open-substitution-01",
+    "path": "/home/b/Workspaces/laboratory/src/soma/observations/eros-parent-on-open-substitution-01/SOURCE.json",
+    "schema": "eros.parent-on-open-substitution.source.v1",
+    "sha256": "e1ac5c169ada255e0457d9458857cd89fb8b70a3c2fd4b94720619ee36a18ea3",
+    "sources": {
+      "local_law": {
+        "observation_id": "eros-contextual-retriangulation-01",
+        "path": "src/soma/observations/eros-contextual-retriangulation-01/SOURCE.json",
+        "sha256": "d437eddf312cba5c8bea1506956d3606ab74f2ef16d20a2269e5532f0e1daf8d"
+      },
+      "model": {
+        "model_path": "/home/b/.cache/huggingface/models--allenai--OLMo-2-0425-1B-Instruct/snapshots/48d788eca847d4d7548f375ad03d3c9312f6139e/model.safetensors",
+        "model_sha256": "36d044c73655bb904f822915e6294ba3dae8e6e1af5e703e9d452f2d6a3a294f",
+        "repository": "allenai/OLMo-2-0425-1B-Instruct",
+        "revision": "48d788eca847d4d7548f375ad03d3c9312f6139e"
+      },
+      "parent": {
+        "observation_id": "eros-pretrained-ecology-cultivation-01",
+        "path": "src/soma/observations/eros-pretrained-ecology-cultivation-01/SOURCE.json",
+        "sha256": "38f52aecd3c19d79a1d3a41a65647e79ac39d81823c24b52ae7b5c0e411e784c"
+      }
+    }
+  },
+  "source_absent_recurrence": [
+    {
+      "current_id": "drop_then_reverse.code_comment.absent",
+      "exact": true,
+      "expected_parent_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1326,
+          1476,
+          76,
+          954,
+          856
+        ]
+      },
+      "parent_invoked": false,
+      "supported_faces": [
+        {
+          "orientation": [
+            "negative",
+            "negative",
+            "negative",
+            "positive",
+            "positive"
+          ],
+          "signed_axis_order": [
+            1326,
+            1476,
+            76,
+            954,
+            856
+          ]
+        }
+      ]
+    },
+    {
+      "current_id": "drop_then_reverse.code_comment.irrelevant_before",
+      "exact": true,
+      "expected_parent_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "parent_invoked": false,
+      "supported_faces": [
+        {
+          "orientation": [
+            "negative",
+            "negative",
+            "negative",
+            "positive",
+            "positive"
+          ],
+          "signed_axis_order": [
+            1476,
+            1326,
+            76,
+            954,
+            856
+          ]
+        }
+      ]
+    },
+    {
+      "current_id": "drop_then_reverse.code_comment.relevant_after",
+      "exact": true,
+      "expected_parent_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "parent_invoked": false,
+      "supported_faces": [
+        {
+          "orientation": [
+            "negative",
+            "negative",
+            "negative",
+            "positive",
+            "positive"
+          ],
+          "signed_axis_order": [
+            1476,
+            1326,
+            76,
+            954,
+            856
+          ]
+        }
+      ]
+    },
+    {
+      "current_id": "reverse_then_drop.conversation.relevant_before",
+      "exact": true,
+      "expected_parent_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "parent_invoked": false,
+      "supported_faces": [
+        {
+          "orientation": [
+            "negative",
+            "negative",
+            "negative",
+            "positive",
+            "positive"
+          ],
+          "signed_axis_order": [
+            1476,
+            1326,
+            76,
+            954,
+            856
+          ]
+        }
+      ]
+    },
+    {
+      "current_id": "reverse_then_drop.prose.relevant_before",
+      "exact": true,
+      "expected_parent_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "parent_invoked": false,
+      "supported_faces": [
+        {
+          "orientation": [
+            "negative",
+            "negative",
+            "negative",
+            "positive",
+            "positive"
+          ],
+          "signed_axis_order": [
+            1476,
+            1326,
+            76,
+            954,
+            856
+          ]
+        }
+      ]
+    },
+    {
+      "current_id": "reverse_then_drop.code_comment.relevant_before",
+      "exact": true,
+      "expected_parent_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1326,
+          1476,
+          76,
+          954,
+          856
+        ]
+      },
+      "parent_invoked": false,
+      "supported_faces": [
+        {
+          "orientation": [
+            "negative",
+            "negative",
+            "negative",
+            "positive",
+            "positive"
+          ],
+          "signed_axis_order": [
+            1326,
+            1476,
+            76,
+            954,
+            856
+          ]
+        }
+      ]
+    }
+  ],
+  "status": "accepted",
+  "stopping_condition": "one fixed six-current evaluation, one always-parent foil, one exact rest/remount, and six source-absent recurrence probes; no model run, CUDA passage, alternate law, feature search, threshold, or scale",
+  "theory_to_structure": "The carried rank-six law forms a candidate five-axis face from six pivot words. The carried conditional chart admits substitution only for one singleton-supported face. OPEN paths alone evaluate the complete 8,192-factor parent relation; their exact residual and receiver face return later, and the event emits a factored successor ecology."
+}
