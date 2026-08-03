@@ -26,8 +26,15 @@ host:   -std=c++23 -O3 -Wall -Wextra -Wpedantic -Werror -Wconversion
         -Wsign-conversion -Wshadow -fno-exceptions -fno-rtti
         -fno-fast-math -ffp-contract=off -ffile-prefix-map=<source>=.
 device: --std=c++20 -O3 --gpu-architecture=sm_89 --fmad=false
-        -Xcompiler=<the host warning/ownership flags above>
+        --Werror=all-warnings
+        -Xcompiler=<the host warning/ownership flags above except -Wpedantic>
 ```
+
+The CUDA translation receives no forwarded `-Wpedantic`: with CUDA 13.2 and GCC 16.1.1 that flag
+rejects NVCC-generated line markers before project source is graded. Every public contract is also
+compiled directly by GCC with the complete host profile, including `-Wpedantic -Werror`; NVCC's
+own diagnostics remain errors through `--Werror=all-warnings`. This is a bounded apparatus-profile
+rule, not a source-warning allowance.
 
 Debug/conformance builds additionally use host address/undefined-behavior sanitizers and
 `compute-sanitizer`; those instruments are not production semantics. Every build deposits a
