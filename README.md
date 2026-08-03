@@ -21,32 +21,36 @@ have been declared.
 
 ## Reading order
 
-1. [`canon/00_PURE_HOLONICS.md`](canon/00_PURE_HOLONICS.md) — the compact doctrine and its terms.
-2. [`canon/01_CAUSAL_CALCULUS.md`](canon/01_CAUSAL_CALCULUS.md) — the exact event and composition law.
-3. [`canon/02_INFORMATION_PHYSICS.md`](canon/02_INFORMATION_PHYSICS.md) — information, current,
+1. [`CONSTRUCTION_STATE.md`](CONSTRUCTION_STATE.md) — the admitted position and next deed.
+2. [`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md) — the
+   complete ordered construction from the C++/CUDA foundation through the dependent two-theorem
+   Lean-mediated production deed.
+3. [`canon/00_PURE_HOLONICS.md`](canon/00_PURE_HOLONICS.md) — the compact doctrine and its terms.
+4. [`canon/01_CAUSAL_CALCULUS.md`](canon/01_CAUSAL_CALCULUS.md) — the exact event and composition law.
+5. [`canon/02_INFORMATION_PHYSICS.md`](canon/02_INFORMATION_PHYSICS.md) — information, current,
    storage, resource, and receiver testimony.
-4. [`canon/03_CONDITIONING_AND_LEARNING.md`](canon/03_CONDITIONING_AND_LEARNING.md) — arbitrary
+6. [`canon/03_CONDITIONING_AND_LEARNING.md`](canon/03_CONDITIONING_AND_LEARNING.md) — arbitrary
    conditioning without a privileged model species.
-5. [`canon/04_GEOMETRY_NAVIGATION_AND_WEAVE.md`](canon/04_GEOMETRY_NAVIGATION_AND_WEAVE.md) —
+7. [`canon/04_GEOMETRY_NAVIGATION_AND_WEAVE.md`](canon/04_GEOMETRY_NAVIGATION_AND_WEAVE.md) —
    charts, holonomy, projections, shadows, stress, knotting, and warp/weft.
-6. [`canon/05_ONTOLOGY.md`](canon/05_ONTOLOGY.md) — the ontological and philosophical commitments.
-7. [`canon/06_ESTABLISHED_CAPABILITIES.md`](canon/06_ESTABLISHED_CAPABILITIES.md) — what the prior
+8. [`canon/05_ONTOLOGY.md`](canon/05_ONTOLOGY.md) — the ontological and philosophical commitments.
+9. [`canon/06_ESTABLISHED_CAPABILITIES.md`](canon/06_ESTABLISHED_CAPABILITIES.md) — what the prior
    machine has actually done.
-8. [`canon/07_CAUSAL_ALGEBRAIC_GEOMETRY.md`](canon/07_CAUSAL_ALGEBRAIC_GEOMETRY.md) — exact
+10. [`canon/07_CAUSAL_ALGEBRAIC_GEOMETRY.md`](canon/07_CAUSAL_ALGEBRAIC_GEOMETRY.md) — exact
    algebraic-geometric realization of the causal calculus.
-9. [`canon/08_CORE_MATHEMATICAL_INSTRUMENTS.md`](canon/08_CORE_MATHEMATICAL_INSTRUMENTS.md) — swing,
+11. [`canon/08_CORE_MATHEMATICAL_INSTRUMENTS.md`](canon/08_CORE_MATHEMATICAL_INSTRUMENTS.md) — swing,
    soul/equivalence, bit purity, knots/strings, hypergeometric navigation, cycles, and the
    information-relativistic construction program.
-10. [`blueprint/PURE_HOLONIC_ENGINE.md`](blueprint/PURE_HOLONIC_ENGINE.md) — the implementation-neutral
+12. [`blueprint/PURE_HOLONIC_ENGINE.md`](blueprint/PURE_HOLONIC_ENGINE.md) — the implementation-neutral
    engine contract.
-11. [`blueprint/ARBITRARY_LEARNING_MACHINE.md`](blueprint/ARBITRARY_LEARNING_MACHINE.md) — the machine
+13. [`blueprint/ARBITRARY_LEARNING_MACHINE.md`](blueprint/ARBITRARY_LEARNING_MACHINE.md) — the machine
    construction.
-12. [`blueprint/CPP_GPU_FOUNDATION.md`](blueprint/CPP_GPU_FOUNDATION.md) — the ratified C++/CUDA,
+14. [`blueprint/CPP_GPU_FOUNDATION.md`](blueprint/CPP_GPU_FOUNDATION.md) — the ratified C++/CUDA,
     GPU-primary, bit-pure production realization.
-13. [`blueprint/REALIZATION_AND_HARDWARE.md`](blueprint/REALIZATION_AND_HARDWARE.md),
+15. [`blueprint/REALIZATION_AND_HARDWARE.md`](blueprint/REALIZATION_AND_HARDWARE.md),
     [`blueprint/ADAPTING_A_NEW_ECOLOGY.md`](blueprint/ADAPTING_A_NEW_ECOLOGY.md), and
     [`blueprint/BUILD_AND_GRADE.md`](blueprint/BUILD_AND_GRADE.md) — adaptation, realization, and
-    ordered grade.
+    grade index.
 
 ## Evidence map
 

@@ -3,10 +3,33 @@
 The latest direct user request governs. This repository is a clean construction, not a migration
 target for Soma application code.
 
+Do not use sub-agents unless Brandon explicitly permits them. Do not read or create a `CLAUDE.md`
+as a source of authority. Historical records, commit messages, and status prose are evidence only;
+they never schedule work.
+
+## Fresh-session pickup
+
+The sole current construction authority is
+`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`. The admitted position and next deed are in
+`CONSTRUCTION_STATE.md`; that file is the only current-position record and must be updated as gates
+pass. Do not substitute a Lean fixture, language experiment, CPU reference implementation,
+visualization, or isolated capability proof for its named next deed.
+
+Read only:
+
+1. this file;
+2. `CONSTRUCTION_STATE.md`;
+3. the complete roadmap;
+4. the canon and blueprint files named in its fresh-session pickup; and
+5. the smallest evidence paths required by the active phase.
+
+Do not reread the complete research archive by default. Update `CONSTRUCTION_STATE.md` only after a
+phase returns its required artifact and passes its grade.
+
 ## Authority and evidence
 
-`canon/` is normative doctrine. `blueprint/` is the normative reconstruction plan and contains the
-contracts which each construction must instantiate and grade.
+`canon/` is normative doctrine. `blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md` is the ordered
+construction authority; the other blueprint files contain contracts it composes.
 `research/`, `papers/`, `formal/`, and `evidence/` are evidence in their declared contexts.
 `reference/` is non-authoritative historical material. Status prose inside imported records never
 schedules work.
@@ -28,6 +51,10 @@ construction merely because its current implementation is being replaced.
   serialized file are codecs or apparatus faces. They do not determine internal topology.
 - The machine owns no semantic distinction between “data” and “program.” Both are caused structure
   crossing declared ports and capable of changing later conduct.
+- Algorithms are physically enacted causal geometries. Do not separate computer science from
+  information transport, resource/current physics, receiver locality, or apparatus. Conversely,
+  do not identify a software relation with a physical law unless its typed transport and receiver
+  hypotheses are explicit.
 - Do not introduce backwards compatibility. Rejected standing remains in Git history or the
   provenance archive; it does not receive a decoder, adapter, alias, fallback, or dual schema.
 - Do not preserve dead code. If a needed relation is absent, derive and build the smallest owner
@@ -46,6 +73,8 @@ construction merely because its current implementation is being replaced.
   not source equality.
 - A boundary condensation is lawful only for a declared future receiver family through which
   every requested consequence provably factors. Enlarging that family reopens the retained fiber.
+- A file store is an exterior serialized chart, never the runtime topology. Mount broad material
+  incrementally into native local incidence; preserve paths/bytes as lineage, not identity.
 
 ## Learning and information
 
@@ -59,6 +88,24 @@ construction merely because its current implementation is being replaced.
   lineage, transport, obstruction, morphology, and resource testimony. Entropy, loss, probability,
   accuracy, latency, and energy are declared receiver quotients, never replacements for that
   causal object.
+- An unrestricted learner is not obtained by adding a universal filler or scoring loop. New local
+  organs enter through existing typed ports; unknown interaction remains an obstruction until a
+  returned passage founds it.
+
+## Mathematical production boundary
+
+- Mathematics is exact local algebraic/categorical incidence carried by the same engine. It is not
+  an internal `Language` subsystem.
+- Lean is an exterior codec/checker port. The Lean executable may use CPU apparatus, but the engine
+  must perform mathematical navigation, constraint transport, proof/declaration formation, and
+  reusable conditioning on the resident GPU. Lean must never schedule the body or become its
+  internal ontology.
+- Kernel acceptance/rejection is a returned occurrence attached to one generated passage, not an
+  accepted-count gate. Rejection remains useful obstruction.
+- The terminal construction is R16: return two actual theorem/proof artifacts conversationally;
+  the first kernel return changes source-detached reusable morphology and the second proof depends
+  on that returned fiber under exact ablation. Counts, topology, hashes, diagnostics, or a single
+  familiar fixture cannot substitute for this deed.
 
 ## Apparatus
 
@@ -89,3 +136,19 @@ diagnostic topology is not a substitute.
 
 Keep implementation files small and owner-local. A new large subsystem is presumptively a missing
 abstraction or a hidden foreman. Stop and rederive before extending it.
+
+Every phase must:
+
+1. name the existing owners being composed and the new consequence emitted;
+2. run the architecture/no-float/ownership/build audits before and after construction (R0 begins
+   with direct inspection and creates the executable audit);
+3. for every executable phase, execute the real GPU-resident deed and inspect its actual returned
+   artifact; R0 instead returns its compile/audit artifacts;
+4. keep deterministic semantic receipts separate from physical telemetry;
+5. delete superseded implementation after evidence is committed;
+6. update the construction state only on a passing grade; and
+7. commit and push the coherent phase in bulk.
+
+If a phase fails, repair or rederive its owner. Do not increase a magic bound, add fallback,
+preserve a compatibility route, build a nearby toy, or extend another subsystem while the required
+return is absent.

@@ -184,7 +184,7 @@ artifacts:
     destination: blueprint
     disposition: authored-clean
     authority: canonical
-    files: 7
+    files: 8
 
   - id: external-resource-catalogue
     kind: external-reference
