@@ -62,6 +62,11 @@ set(R0_GENERATED_DIRECTORY "${PROJECT_BINARY_DIR}/generated")
 file(MAKE_DIRECTORY "${R0_GENERATED_DIRECTORY}")
 
 set(R0_DEVICE_SOURCE "${PROJECT_SOURCE_DIR}/tests/compile_contracts/valid_device.cu")
+file(
+  GLOB_RECURSE R0_DEVICE_HEADERS CONFIGURE_DEPENDS
+  "${PROJECT_SOURCE_DIR}/include/holonics/*.h"
+  "${PROJECT_SOURCE_DIR}/include/holonics/*.hpp"
+  "${PROJECT_SOURCE_DIR}/include/holonics/*.cuh")
 set(R0_DEVICE_COMMON_FLAGS
     --std=c++20
     -O3
@@ -76,7 +81,7 @@ add_custom_command(
   COMMAND
     "${CMAKE_CUDA_COMPILER}" ${R0_DEVICE_COMMON_FLAGS} --ptx
     "${R0_DEVICE_SOURCE}" -o "${R0_GENERATED_DIRECTORY}/r0_device_contract.ptx"
-  DEPENDS "${R0_DEVICE_SOURCE}"
+  DEPENDS "${R0_DEVICE_SOURCE}" ${R0_DEVICE_HEADERS}
   VERBATIM)
 
 add_custom_command(
@@ -84,7 +89,7 @@ add_custom_command(
   COMMAND
     "${CMAKE_CUDA_COMPILER}" ${R0_DEVICE_COMMON_FLAGS} --cubin
     "${R0_DEVICE_SOURCE}" -o "${R0_GENERATED_DIRECTORY}/r0_device_contract.cubin"
-  DEPENDS "${R0_DEVICE_SOURCE}"
+  DEPENDS "${R0_DEVICE_SOURCE}" ${R0_DEVICE_HEADERS}
   VERBATIM)
 
 add_custom_target(
@@ -93,35 +98,43 @@ add_custom_target(
     "${R0_GENERATED_DIRECTORY}/r0_device_contract.ptx"
     "${R0_GENERATED_DIRECTORY}/r0_device_contract.cubin")
 
+enable_testing()
+include(cmake/R1Exact.cmake)
+
 string(JOIN " " R0_DEVICE_FLAGS_RECEIPT ${R0_DEVICE_COMMON_FLAGS})
-set(R0_DECLARED_COMMANDS
+set(HOLONICS_DECLARED_COMMANDS
     "device_ptx=<CUDA_COMPILER> ${R0_DEVICE_FLAGS_RECEIPT} --ptx <SOURCE>/tests/compile_contracts/valid_device.cu -o <BUILD>/generated/r0_device_contract.ptx\n"
-    "device_cubin=<CUDA_COMPILER> ${R0_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/tests/compile_contracts/valid_device.cu -o <BUILD>/generated/r0_device_contract.cubin\n")
-string(JOIN "" R0_DECLARED_COMMANDS_CONTENT ${R0_DECLARED_COMMANDS})
+    "device_cubin=<CUDA_COMPILER> ${R0_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/tests/compile_contracts/valid_device.cu -o <BUILD>/generated/r0_device_contract.cubin\n"
+    ${R1_DECLARED_COMMANDS})
+string(JOIN "" HOLONICS_DECLARED_COMMANDS_CONTENT ${HOLONICS_DECLARED_COMMANDS})
 file(GENERATE
   OUTPUT "${R0_GENERATED_DIRECTORY}/declared_commands.txt"
-  CONTENT "${R0_DECLARED_COMMANDS_CONTENT}")
+  CONTENT "${HOLONICS_DECLARED_COMMANDS_CONTENT}")
 
-set(R0_MANIFEST "${PROJECT_BINARY_DIR}/receipts/R0_BUILD_MANIFEST.txt")
+set(HOLONICS_BUILD_MANIFEST "${PROJECT_BINARY_DIR}/receipts/BUILD_MANIFEST.txt")
 add_custom_target(
-  r0_build_manifest ALL
+  holonics_build_manifest ALL
   COMMAND
     "${CMAKE_COMMAND}"
     -DSOURCE_ROOT=${PROJECT_SOURCE_DIR}
     -DBUILD_ROOT=${PROJECT_BINARY_DIR}
-    -DOUTPUT=${R0_MANIFEST}
+    -DOUTPUT=${HOLONICS_BUILD_MANIFEST}
+    -DCONSTRUCTION_PHASE=R1
     -DHOST_BINARY=$<TARGET_FILE:r0_host_contract>
     -DDEVICE_OBJECT=$<TARGET_OBJECTS:r0_device_contract>
     -DDEVICE_PTX=${R0_GENERATED_DIRECTORY}/r0_device_contract.ptx
     -DDEVICE_CUBIN=${R0_GENERATED_DIRECTORY}/r0_device_contract.cubin
+    "-DEXTRA_ARTIFACTS=$<TARGET_FILE:r1_exact_device_deed>|${R1_DEVICE_PTX}|${R1_DEVICE_CUBIN}"
     -P "${PROJECT_SOURCE_DIR}/cmake/WriteBuildManifest.cmake"
   DEPENDS
     r0_host_contract
     r0_normalize_device_object
     r0_device_artifacts
+    r1_normalize_executable
+    r1_device_artifacts
     "${R0_GENERATED_DIRECTORY}/declared_commands.txt"
     "${PROJECT_SOURCE_DIR}/cmake/WriteBuildManifest.cmake"
-  BYPRODUCTS "${R0_MANIFEST}"
+  BYPRODUCTS "${HOLONICS_BUILD_MANIFEST}"
   COMMAND_EXPAND_LISTS
   VERBATIM)
 
@@ -131,14 +144,16 @@ add_custom_target(
     "${CMAKE_COMMAND}"
     -DSOURCE_ROOT=${PROJECT_SOURCE_DIR}
     -DBUILD_ROOT=${PROJECT_BINARY_DIR}
-    -DMANIFEST=${R0_MANIFEST}
+    -DMANIFEST=${HOLONICS_BUILD_MANIFEST}
     -DHOST_BINARY=$<TARGET_FILE:r0_host_contract>
     -DDEVICE_OBJECT=$<TARGET_OBJECTS:r0_device_contract>
     -DDEVICE_PTX=${R0_GENERATED_DIRECTORY}/r0_device_contract.ptx
     -DDEVICE_CUBIN=${R0_GENERATED_DIRECTORY}/r0_device_contract.cubin
+    "-DEXTRA_ARTIFACTS=$<TARGET_FILE:r1_exact_device_deed>|${R1_DEVICE_PTX}|${R1_DEVICE_CUBIN}"
+    -DEXTRA_DEVICE_PTX=${R1_DEVICE_PTX}
+    -DEXTRA_DEVICE_CUBIN=${R1_DEVICE_CUBIN}
     -P "${PROJECT_SOURCE_DIR}/cmake/HolonicAudit.cmake"
-  DEPENDS r0_build_manifest
+  DEPENDS holonics_build_manifest
   VERBATIM)
 
-enable_testing()
 include(cmake/HolonicContractTests.cmake)

@@ -57,6 +57,9 @@ file(GLOB_RECURSE implementation_files
      "${SOURCE_ROOT}/apparatus/*.cu"
      "${SOURCE_ROOT}/tests/compile_contracts/*.cpp"
      "${SOURCE_ROOT}/tests/compile_contracts/*.cu"
+     "${SOURCE_ROOT}/tests/conformance/*.cpp"
+     "${SOURCE_ROOT}/tests/model/*.hpp"
+     "${SOURCE_ROOT}/tests/model/*.cpp"
      "${SOURCE_ROOT}/tests/audit_fixtures/*.hpp")
 list(APPEND authority_files ${implementation_files})
 list(REMOVE_DUPLICATES authority_files)
@@ -92,6 +95,10 @@ set(artifact_paths
     "${DEVICE_OBJECT}"
     "${DEVICE_PTX}"
     "${DEVICE_CUBIN}")
+if(DEFINED EXTRA_ARTIFACTS AND NOT EXTRA_ARTIFACTS STREQUAL "")
+  string(REPLACE "|" ";" extra_artifact_paths "${EXTRA_ARTIFACTS}")
+  list(APPEND artifact_paths ${extra_artifact_paths})
+endif()
 set(artifact_entries "")
 foreach(path IN LISTS artifact_paths)
   if(NOT EXISTS "${path}")
@@ -147,7 +154,8 @@ file(MAKE_DIRECTORY "${output_directory}")
 file(WRITE "${OUTPUT}"
 "grade=established-bounded\n"
 "evidence=implemented-exact\n"
-"aperture=R0 compile-contract source and generated host/device artifacts\n"
+"construction_phase=${CONSTRUCTION_PHASE}\n"
+"aperture=current admitted source and generated host/device artifacts\n"
 "source_commit=${source_commit}\n"
 "source_status_begin\n${source_status}\nsource_status_end\n"
 "source_aperture_sha256=${source_aperture_sha256}\n"

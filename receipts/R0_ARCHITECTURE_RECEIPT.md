@@ -56,7 +56,7 @@ The graded source aperture SHA-256 is
 | CUDA contract PTX | `573ff1193e65bbe9abf4ebd0d80131ead668bc7682735ac670cce88ccaec5d97` |
 | CUDA contract cubin | `071674b9dd5b7d1813e5262e88dc9e6e11cf54915549b6ded796cea4848713c9` |
 
-The normalized build manifest is deposited as `build/r0/receipts/R0_BUILD_MANIFEST.txt` on every
+The normalized build manifest is deposited as `build/r0/receipts/BUILD_MANIFEST.txt` on every
 build. It contains the source commit/status, exact source hashes and aggregate, tool hashes,
 normalized compile commands, normalized complete Ninja commands, architecture, and artifact
 hashes. The generated PTX targets `sm_89`; inspected SASS for `r0_contract_probe` contains `MOV`,

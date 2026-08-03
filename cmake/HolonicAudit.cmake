@@ -129,6 +129,11 @@ if(DEFINED MANIFEST)
     message(FATAL_ERROR "build manifest audit failed: ${MANIFEST} is absent")
   endif()
   file(READ "${MANIFEST}" manifest_contents)
+  set(all_artifacts "${HOST_BINARY}" "${DEVICE_OBJECT}" "${DEVICE_PTX}" "${DEVICE_CUBIN}")
+  if(DEFINED EXTRA_ARTIFACTS AND NOT EXTRA_ARTIFACTS STREQUAL "")
+    string(REPLACE "|" ";" extra_artifact_paths "${EXTRA_ARTIFACTS}")
+    list(APPEND all_artifacts ${extra_artifact_paths})
+  endif()
   foreach(required_manifest_field
       IN ITEMS
         "grade=established-bounded"
@@ -144,8 +149,7 @@ if(DEFINED MANIFEST)
       message(FATAL_ERROR "build manifest omits ${required_manifest_field}")
     endif()
   endforeach()
-  foreach(artifact IN ITEMS
-      "${HOST_BINARY}" "${DEVICE_OBJECT}" "${DEVICE_PTX}" "${DEVICE_CUBIN}")
+  foreach(artifact IN LISTS all_artifacts)
     if(NOT EXISTS "${artifact}")
       message(FATAL_ERROR "binary audit artifact is absent: ${artifact}")
     endif()
@@ -156,28 +160,41 @@ if(DEFINED MANIFEST)
     endif()
   endforeach()
 
-  file(READ "${DEVICE_PTX}" ptx_contents)
-  if(ptx_contents MATCHES "\\.(f16|f16x2|f32|f64|bf16|bf16x2|tf32)([^A-Za-z0-9_]|$)")
-    message(FATAL_ERROR "PTX no-float audit failed: ${DEVICE_PTX}")
+  set(all_device_ptx "${DEVICE_PTX}")
+  if(DEFINED EXTRA_DEVICE_PTX AND NOT EXTRA_DEVICE_PTX STREQUAL "")
+    list(APPEND all_device_ptx "${EXTRA_DEVICE_PTX}")
   endif()
+  foreach(ptx IN LISTS all_device_ptx)
+    file(READ "${ptx}" ptx_contents)
+    if(ptx_contents MATCHES "\\.(f16|f16x2|f32|f64|bf16|bf16x2|tf32)([^A-Za-z0-9_]|$)")
+      message(FATAL_ERROR "PTX no-float audit failed: ${ptx}")
+    endif()
+  endforeach()
 
   find_program(NVDISASM nvdisasm HINTS /opt/cuda/bin REQUIRED NO_CACHE)
-  execute_process(
-    COMMAND "${NVDISASM}" "${DEVICE_CUBIN}"
-    RESULT_VARIABLE disassembly_result
-    OUTPUT_VARIABLE sass_contents
-    ERROR_VARIABLE disassembly_error)
-  if(NOT disassembly_result EQUAL 0)
-    message(FATAL_ERROR "device binary disassembly failed: ${disassembly_error}")
+  set(all_device_cubins "${DEVICE_CUBIN}")
+  if(DEFINED EXTRA_DEVICE_CUBIN AND NOT EXTRA_DEVICE_CUBIN STREQUAL "")
+    list(APPEND all_device_cubins "${EXTRA_DEVICE_CUBIN}")
   endif()
-  if(sass_contents MATCHES
-     "(^|[ \\t])(FADD|FADD32I|FMUL|FMUL32I|FFMA|FSET|FSETP|FSWZADD|F2F|F2FP|F2I|F2IP|I2F|I2FP|DADD|DMUL|DFMA|DSET|DSETP|D2I|I2D|HADD2|HMUL2|HFMA2|HSET2|HSETP2|HMMA|DMMA|MUFU|RRO)([^A-Za-z0-9_]|$)" OR
-     sass_contents MATCHES "\\.(F16|F16X2|F32|F64|BF16|BF16X2|TF32)([^A-Za-z0-9_]|$)")
-    message(FATAL_ERROR "SASS no-float audit failed: ${DEVICE_CUBIN}")
-  endif()
-  if(DEFINED BUILD_ROOT)
-    file(WRITE "${BUILD_ROOT}/generated/r0_device_contract.sass" "${sass_contents}")
-  endif()
+  foreach(cubin IN LISTS all_device_cubins)
+    execute_process(
+      COMMAND "${NVDISASM}" "${cubin}"
+      RESULT_VARIABLE disassembly_result
+      OUTPUT_VARIABLE sass_contents
+      ERROR_VARIABLE disassembly_error)
+    if(NOT disassembly_result EQUAL 0)
+      message(FATAL_ERROR "device binary disassembly failed: ${disassembly_error}")
+    endif()
+    if(sass_contents MATCHES
+       "(^|[ \\t])(FADD|FADD32I|FMUL|FMUL32I|FFMA|FSET|FSETP|FSWZADD|F2F|F2FP|F2I|F2IP|I2F|I2FP|DADD|DMUL|DFMA|DSET|DSETP|D2I|I2D|HADD2|HMUL2|HFMA2|HSET2|HSETP2|HMMA|DMMA|MUFU|RRO)([^A-Za-z0-9_]|$)" OR
+       sass_contents MATCHES "\\.(F16|F16X2|F32|F64|BF16|BF16X2|TF32)([^A-Za-z0-9_]|$)")
+      message(FATAL_ERROR "SASS no-float audit failed: ${cubin}")
+    endif()
+    if(DEFINED BUILD_ROOT)
+      get_filename_component(cubin_name "${cubin}" NAME_WE)
+      file(WRITE "${BUILD_ROOT}/generated/${cubin_name}.sass" "${sass_contents}")
+    endif()
+  endforeach()
 endif()
 
 message(STATUS "holonic-audit passed for ${SCAN_ROOT}")
