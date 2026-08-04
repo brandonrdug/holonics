@@ -32,14 +32,17 @@
   forms and commits a new reverse-rebase passage, then renders Lean and conversational faces with
   zero answer lookup, quotation, score, registry, global scan, or checker call.
   [Receipt](receipts/R12_GENERATIVE_MATHEMATICAL_CURRENT_RECEIPT.md).
+- R13: the same generated passage crosses one pinned exterior checker invocation while its GPU
+  body owns an explicit pending deed. Raw status/stdout/stderr/produced artifact return to the GPU,
+  normalize to kernel acceptance, preserve passage identity, and revise local mathematical,
+  codec, and body morphology. [Receipt](receipts/R13_LEAN_EXTERIOR_CHECKER_RECEIPT.md).
 
-No real Lean exterior process passage, raw checker byte return, typed acceptance/rejection
-normalization, generated-passage identity across that process, or checker-return morphology
-revision exists yet.
+No frozen nontrivial R14 theorem request, complete question-to-rest/remount production passage,
+source-exclusion/ablation receipt for that deed, or returned theorem artifact exists yet.
 
-**Next deed (`project-postulate`):** R13 — cross the R12 generated source through the real pinned
-Lean environment, return its raw and typed checker occurrence to the originating pending deed, and
-demonstrate a checker-return local morphology revision without host proof scheduling, as named in
+**Next deed (`project-postulate`):** R14 — freeze a nontrivial theorem request and return the full
+GPU generation, exterior checker return, morphology delta, source-detached rest/remount, held
+probe, theorem source, explanation, and exact exclusion/ablation receipts, as named in
 [`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md).
 
 **Terminal deed preserved (`project-postulate`):** R16 — return two real conversational

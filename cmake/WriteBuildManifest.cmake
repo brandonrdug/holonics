@@ -37,6 +37,9 @@ set(authority_files
     blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md
     formal/elementary-holonics/ElementaryHolonics/Algorithm/Transition.lean
     formal/elementary-holonics/ElementaryHolonics/Algorithm/Rebase.lean
+    formal/elementary-holonics/lakefile.toml
+    formal/elementary-holonics/lake-manifest.json
+    formal/elementary-holonics/lean-toolchain
     provenance/HARDWARE_RECEIPT.txt
     CMakeLists.txt)
 file(GLOB_RECURSE implementation_files
