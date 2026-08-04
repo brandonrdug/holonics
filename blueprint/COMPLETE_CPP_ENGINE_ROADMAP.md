@@ -839,6 +839,115 @@ a bounded declared family of regular-singular systems. It must derive each opera
 mounted differential equation and preserve analytic branch/aperture testimony. A coefficient
 list, numerical continuation, or named special function is not the deed.
 
+The frozen family is the Gauss `(a,b;c)=(1,1;2)` equation together with three local controls
+derived from that one equation: its zero, one, and infinity chambers. This family is deliberately
+small enough that every coefficient, residue, kernel/cokernel vector, recurrence, resonant source,
+basis change, and loop word can be returned exactly. It is large enough to separate three
+characteristic archetypes which R19's indicial polynomial alone cannot separate: an integral
+resonance whose source lies in the recurrence image, an integral resonance whose source has a
+nonzero cokernel component and therefore founds a logarithmic companion, and a repeated defective
+residue whose nilpotent direction returns unipotent monodromy.
+
+**Construction tuple:**
+
+- source owners: the one R19 continuing body and its five acquired fibers; exact integer,
+  rational, polynomial, rank-two-matrix, and formal logarithmic-period carriers; the mounted Gauss
+  differential-equation occurrence; new first-order-system, Frobenius-jet, resonance,
+  chamber-connection, and path-monodromy organs; mathematical/explanation codecs; pending checker
+  deed; and exterior checker/rest apparatus;
+- port types: the native R19 rest; one unlabelled regular-singular continuation question; the
+  mounted scalar operator coefficients; chart germs at `0`, `1`, and infinity; exact residues,
+  recurrence fronts, kernel/cokernel and obstruction receipts, ordered basis/path words, formal
+  period-polynomial matrices, atlas/proof/conversation faces, raw/typed checker return, and one
+  continuing native rest;
+- event occurrence: remount R19; derive the first-order Fuchsian presentation from the scalar
+  operator on the resident GPU; let independent chart and coefficient currents form the three
+  local fibers; close their resonance, basis-connection, and loop products on the card; form the
+  proof and explanation passages; receive one real checker occurrence; commit its returned
+  difference; rest and remount the same body;
+- predecessor identity: the admitted R19 head `14001010`, continuation `15001010`, morphology and
+  fibers recorded in `CONSTRUCTION_STATE.md` and the R19 receipt;
+- local constitutive law: exact coefficient comparison in the scalar equation; the declared state
+  `X=(y,z y')`; Laurent/Frobenius substitution by chart; at a resonant step, projection of the
+  caused recurrence source to the exact cokernel before any inverse is attempted; a formal log
+  generator whose positively oriented loop adds one lineaged period symbol `omega`; exact basis
+  changes on overlaps; and ordered multiplication of loop returns;
+- receiver question: which residues, eigenflags, recurrence images, resonance obstructions,
+  logarithmic companions, chamber transitions, and loop monodromies are forced by the equation
+  and chosen path/branch apertures, without a special-function lookup, numerical continuation,
+  expected logarithm, or expected eigenvector;
+- returned consequence: the actual regular-singular atlas, complete generated theorem/proof and
+  explanation, checker occurrence, acquired continuation fiber, native rest/remount, and exact
+  open alternatives; and
+- open alternatives: arbitrary Gauss parameters, nonintegral algebraic exponentiation, certified
+  analytic error bounds, generalized/confluent or irregular systems, higher-rank Stokes data,
+  physical constitutive calibration, the released-proof reconstructions, number-field incidence,
+  and RH-facing operators.
+
+**Construct:**
+
+- derive, rather than mount as an answer, the Fuchsian system
+  `X'=(A0/z + A1/(z-1))X` from
+  `z(1-z)y''+(2-3z)y'-y=0`, returning
+  `A0=[[0,1],[0,-1]]`, `A1=[[0,0],[-1,-1]]`, and
+  `Ainf=-A0-A1=[[0,-1],[1,2]]` with their exact trace, determinant,
+  characteristic discriminant, eigenvectors, generalized vectors, and chart/gauge lineage;
+- form bounded exact Frobenius fronts at zero and at `t=1-z`. At zero return
+  `(n+rho)(n+rho+1)a_n=(n+rho)^2 a_(n-1)`, the analytic coefficients
+  `a_n=1/(n+1)`, and the independent pole fiber `z^-1`. At one return
+  `(n+rho)^2(b_n-b_(n-1))=0`, `b_n=1`, and the derivative-in-exponent/logarithmic
+  companion, retaining the coefficient and formal-log components separately;
+- do not infer a logarithm from an integer exponent gap or a vanishing discriminant alone. At
+  zero the resonant source for the `-1` residue eigenvector lies in the relevant image and its
+  cokernel obstruction is zero. At one the corresponding first-order resonant source has exact
+  nonzero cokernel component `1`; return that vector, image, cokernel, and obstruction as the
+  causal reason a log channel is required. At infinity return the rank-one nilpotent part of the
+  repeated residue and its one-dimensional eigenflag;
+- fix the overlap path through the real `0<z<1` chamber and the ordered local bases
+  `B0=(-log(1-z)/z,1/z)` and `B1=(1/z,-log(1-z)/z)`. Return the exact swap connection
+  `C01`, its determinant/inverse, both source basis lineages, and the conjugated loop matrices;
+- represent the logarithmic increment by a formal period symbol `omega`, never a floating
+  approximation. In the common `B1` basis return `M0=I`,
+  `M1=[[1,-omega],[0,1]]`, and `Minf=[[1,omega],[0,1]]`; verify the ordered punctured-sphere
+  relation `M0*M1*Minf=I`, retain the three loop words, and expose their characteristic factors,
+  fixed eigenflags, nilpotent ranks, and unequal source paths. Classical specialization
+  `omega=2*pi*i` is standard analytic interpretation testimony, not a semantic floating value;
+- include exact controls proving that residue discriminant, scalar indicial discriminant,
+  integral eigenvalue gap, recurrence cokernel obstruction, and monodromy nilpotent rank are
+  distinct receivers. In particular, the one-chamber log is caused even though its chosen
+  first-order residue has distinct eigenvalues, while the zero-chamber resonance closes without a
+  log obstruction; and
+- generate one Lean passage proving the derived residue algebra, both named Frobenius steps, the
+  concrete resonance source/cokernel calculation, the chamber rechart conjugacy, and the formal
+  loop product. The analytic existence of logarithm branches remains standard testimony under the
+  declared punctured chambers; the generated finite algebra must not be reported as a new proof
+  of the general Frobenius theorem.
+
+**Return:** the actual GPU-formed atlas, complete generated proof source, checker result, and
+conversational characteristic analysis. The atlas must contain the mounted operator lineage,
+derived system coefficients, chart/gauge identity, every bounded recurrence coefficient, residue
+eigenflags, resonance source/image/cokernel/obstruction, regular and log coefficient channels,
+connection matrices, loop/path words, formal-period monodromy, characteristic/fixed-current data,
+controls, and open obstruction. A screen curve, a single familiar coefficient list, hard-coded
+connection table, or host replay does not satisfy the deed.
+
+**Acceptance:** the differential-to-first-order derivation, recurrence fronts, resonance
+projections, connections, and loop products occur on the resident GPU and agree with an
+independent exact offline audit; source terms are derived from the mounted equation rather than an
+answer table; the logarithmic channel appears exactly where the returned cokernel obstruction
+requires it; all basis and loop products preserve lineage and declared orientation; the proof
+really crosses the exterior checker; source-detached rest/remount preserves the new and prior
+fibers; and the complete architecture, ownership, no-float, determinism, device-sanitizer, and
+binary gates pass.
+
+**Grade:** `established-bounded` with `implemented-exact` and `computational-witness` for the
+returned finite operator/recurrence/connection atlas; `proved-derived` with `formal-checked` only
+for the emitted Lean statements; and `proved-standard` for the classical analytic
+Frobenius/continuation laws under their stated branch hypotheses. General hypergeometric
+continuation, convergence outside the declared germs, numerical values of periods, physical
+wave/crystal behavior, the OpenAI results, the unit-distance construction, and RH remain outside
+this phase.
+
 ### R21 — Blind characteristic reconstruction of released mathematics
 
 R21 begins only after R20. Its first two source-separated controls come from OpenAI's released

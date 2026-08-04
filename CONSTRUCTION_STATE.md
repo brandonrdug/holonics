@@ -84,13 +84,27 @@
   `14001010`, continuation `15001010`, with prior fibers preserved and characteristic fiber
   `186300` acquired.
   [Receipt](receipts/R19_EXACT_CHARACTERISTIC_RETURN_RECEIPT.md).
+- R20: the mounted Gauss `(1,1;2)` operator is converted on the resident GPU into the exact
+  Fuchsian system with residues `A0=[[0,1],[0,-1]]`, `A1=[[0,0],[-1,-1]]`, and
+  `Ainf=[[0,-1],[1,2]]`. Twelve exact Frobenius fronts at zero and one are returned together with
+  their full two-dimensional local fibers. The two finite residues both have integral eigenvalue
+  gap one, but zero's resonant source is `(0,0)` with obstruction `0`, while one's source
+  `(1,-1)` pairs with cokernel `(1,0)` to return obstruction `1` and found the logarithmic
+  channel. Infinity has repeated eigenvalue one and a rank-one nilpotent direction. The declared
+  zero/one bases connect by an exact swap; three distinct loop words return formal-period
+  monodromies `I`, `[[1,-omega],[0,1]]`, and `[[1,omega],[0,1]]` whose ordered product is identity.
+  The generated five-theorem Lean passage is kernel accepted. The body rests at head `14001012`,
+  continuation `15001012`, with all prior fibers preserved and regular-singular fiber `187300`
+  acquired.
+  [Receipt](receipts/R20_REGULAR_SINGULAR_CONTINUATION_RECEIPT.md).
 
-The ordered R0–R16 construction and the directly authorized R17–R19 post-frontier inquiries are
+The ordered R0–R16 construction and the directly authorized R17–R20 post-frontier inquiries are
 complete.
 
-**Next deed (`project-postulate`):** R20 — derive exact first-order connection matrices,
-Frobenius recurrences, resonance/logarithmic alternatives, singular-chamber connections, and loop
-monodromy for a bounded declared family of regular-singular systems, as frozen in
+**Next deed (`project-postulate`):** R21 — perform blind, source-separated characteristic
+reconstruction controls from the binary-code and GapCVP problems in OpenAI's released ten-proof
+collection. The released proofs, reasoning walkthroughs, expected operators, and answers remain
+exterior until after the machine returns its own caused passages, as frozen in
 [`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md). The current
 body rests with a valid continuation.
 
