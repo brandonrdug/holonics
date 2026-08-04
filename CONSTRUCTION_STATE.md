@@ -45,14 +45,20 @@ rest, one retains an explicit open current, and exact overflow preserves its pre
 card/oracle equality and the no-host-replay/device-unavailable gates pass. Its receipt is
 [`receipts/R5_CAUSAL_CURRENT_RECEIPT.md`](receipts/R5_CAUSAL_CURRENT_RECEIPT.md).
 
-No complete serial-gluing lineage, parallel `InterchangeCertificate`, shared-support equalizer,
-resource backreaction, placement adaptation, or higher coherence exists yet. R5's bounded
-pairwise-disjoint front premise is not the R6 parallel-composition deed.
+R6 has returned a non-copyable many-current resident weave with typed serial gluing, both
+parallel restagings, a canonical combined delta, complete `InterchangeCertificate`, six-path
+higher coherence, a declared shared-support equalizer, explicit repeated-support/non-recurrence,
+and ordered obstruction for undeclared overlap. Four completion orders and apparatus partitions
+return the same complete successor. A typed resource return changes placement/aperture in one
+body and remains explicitly open in the other, with zero unchanged retry and logical testimony
+separate from physical telemetry. Its receipt is
+[`receipts/R6_MANY_CURRENT_WEAVE_RECEIPT.md`](receipts/R6_MANY_CURRENT_WEAVE_RECEIPT.md).
 
-**Next deed (`project-postulate`):** R6 — compose `current + event + apparatus resource membrane`,
-return typed serial gluing and a many-current GPU weave with complete parallel-interchange
-certificates, shared-support interaction, logical reservation separated from telemetry, and
-resource returns which cause repartition/placement change or remain open, as named in
+No R7 projective, sameness, projection, connection, hypergeometric, extended-carrier, or
+information-relativistic grading deed exists yet.
+
+**Next deed (`project-postulate`):** R7 — compose `receiver + exact + current` as mounted grading
+organs and return all seven bounded core receiver-geometry deeds named in
 [`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md).
 
 **Terminal deed preserved (`project-postulate`):** R16 — two real conversational theorem/proof productions through the
