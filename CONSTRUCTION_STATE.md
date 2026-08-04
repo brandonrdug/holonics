@@ -21,15 +21,23 @@ empty, singular, disconnected, three-dimensional, multiplicity, success, obstruc
 capacity-refusal boundaries with zero independent-verifier failures. Its receipt is
 [`receipts/R2_OWNER_NATIVE_STRUCTURE_RECEIPT.md`](receipts/R2_OWNER_NATIVE_STRUCTURE_RECEIPT.md).
 
-No continuing body, event lifecycle, source topology mount, or chart navigation exists yet. R2's
-resident finite-complex deed is not a source codec/index and is not a substitute for R3's real
-selected-source mount.
+R3 has returned a real repository/paper/formal-source population as owner-minted byte occurrences,
+exact adjacency incidence, intrinsic cut/source lineage, and two alternate resident receiver
+charts. Chunk-local GPU transduction at four apertures and four ingestion orders, plus a physically
+relocated file-store branch, returns field-by-field identical semantic standing and zero direct
+bounded-oracle mismatches. A declared occurrence query returns its projective transition,
+projection preimage, overlap, local support, and empty-preimage obstruction after both host and
+device source environments depart. Its receipt is
+[`receipts/R3_SOURCE_TOPOLOGY_RECEIPT.md`](receipts/R3_SOURCE_TOPOLOGY_RECEIPT.md).
 
-**Next deed (`project-postulate`):** R3 — compose `codec + structure + receiver` without a live
-adaptive body, incrementally found byte/chunk occurrences and cross-chunk relations on the card,
-mount a real selected repository/paper/formal-source population into alternate navigable local
-charts, return exact transition/preimage/overlap/obstruction receipts, and prove source-detached
-receiver queries do not rescan the serialized store as named in
+No continuing body, unique continuation capability, pending deed, returned-event commit, or native
+rest image exists yet. R3's detached finite chart population is not a live adaptive body and is not
+a corpus index or learned morphology.
+
+**Next deed (`project-postulate`):** R4 — compose `structure + body + event`, return one move-only
+continuing body and unique linear continuation through a real exterior round trip, commit exactly
+one declared local region only after its typed return, and rest/remount without source replay as
+named in
 [`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md).
 
 **Terminal deed preserved (`project-postulate`):** R16 — two real conversational theorem/proof productions through the

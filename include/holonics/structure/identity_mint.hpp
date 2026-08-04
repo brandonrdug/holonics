@@ -8,6 +8,32 @@
 namespace holonics::structure {
 
 template<class Owner>
+class identity_reservation final {
+ public:
+  HOLONICS_CALLABLE constexpr identity_reservation() noexcept : first_{}, count_{} {}
+
+  [[nodiscard]] HOLONICS_CALLABLE constexpr std::size_t size() const noexcept {
+    return count_;
+  }
+
+  [[nodiscard]] HOLONICS_CALLABLE constexpr identity<Owner> at(
+      std::size_t offset) const noexcept {
+    return identity<Owner>{exact::word{first_ + static_cast<std::uint64_t>(offset)}};
+  }
+
+ private:
+  friend class identity_mint<Owner>;
+
+  HOLONICS_CALLABLE constexpr identity_reservation(
+      std::uint64_t first,
+      std::size_t count) noexcept
+      : first_(first), count_(count) {}
+
+  std::uint64_t first_{};
+  std::size_t count_{};
+};
+
+template<class Owner>
 class identity_mint final {
  public:
   identity_mint() = delete;
@@ -47,6 +73,24 @@ class identity_mint final {
       ++next_;
     }
     return result;
+  }
+
+  [[nodiscard]] HOLONICS_CALLABLE constexpr identity_reservation<Owner> reserve(
+      std::size_t count) noexcept {
+    if (!can_mint(count)) {
+      return {};
+    }
+    const std::uint64_t first = next_;
+    if (count != 0) {
+      const std::uint64_t advance = static_cast<std::uint64_t>(count - 1);
+      next_ += advance;
+      if (next_ == ~std::uint64_t{0}) {
+        exhausted_ = true;
+      } else {
+        ++next_;
+      }
+    }
+    return identity_reservation<Owner>{first, count};
   }
 
   [[nodiscard]] HOLONICS_CALLABLE constexpr exact::word next_serial() const noexcept {

@@ -9,6 +9,9 @@ template<class Owner>
 class identity_mint;
 
 template<class Owner>
+class identity_reservation;
+
+template<class Owner>
 class identity final {
  public:
   using owner_type = Owner;
@@ -31,6 +34,7 @@ class identity final {
  private:
   friend Owner;
   friend class identity_mint<Owner>;
+  friend class identity_reservation<Owner>;
 
   HOLONICS_CALLABLE explicit constexpr identity(exact::word serial) noexcept : serial_(serial) {}
 
