@@ -37,14 +37,22 @@ valid return; stale, foreign, double, second-open, capacity-refusal, and interru
 return exact predecessor/successor and capability testimony. Its receipt is
 [`receipts/R4_BODY_LIFECYCLE_RECEIPT.md`](receipts/R4_BODY_LIFECYCLE_RECEIPT.md).
 
-No GPU-resident causal current, concurrent frontier, reservation law, compositional quiescence, or
-resident scheduling topology exists yet. R4's single returned passage is not a reified program,
-processor phase, or adaptive learner.
+R5 has returned a reified, domain-neutral causal-program ABI and one non-copyable GPU-resident
+causal-current owner containing exact structural slabs, morphology, sparse current, pending deeds,
+reservations, complete deltas, and the continuing capability. Nine ordered fronts and 11 deltas
+advance entirely on-card after the mount source departs: two programs reach component-certified
+rest, one retains an explicit open current, and exact overflow preserves its predecessor. Decoded
+card/oracle equality and the no-host-replay/device-unavailable gates pass. Its receipt is
+[`receipts/R5_CAUSAL_CURRENT_RECEIPT.md`](receipts/R5_CAUSAL_CURRENT_RECEIPT.md).
 
-**Next deed (`project-postulate`):** R5 — compose `body + current + CUDA executor`, keep current,
-morphology, pending events, exact local state, and reservation/delta structure resident on the
-GPU; return a receiver-bounded concurrent frontier whose successful deeds advance entirely on the
-card and whose quiescence is compositional, as named in
+No complete serial-gluing lineage, parallel `InterchangeCertificate`, shared-support equalizer,
+resource backreaction, placement adaptation, or higher coherence exists yet. R5's bounded
+pairwise-disjoint front premise is not the R6 parallel-composition deed.
+
+**Next deed (`project-postulate`):** R6 — compose `current + event + apparatus resource membrane`,
+return typed serial gluing and a many-current GPU weave with complete parallel-interchange
+certificates, shared-support interaction, logical reservation separated from telemetry, and
+resource returns which cause repartition/placement change or remain open, as named in
 [`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md).
 
 **Terminal deed preserved (`project-postulate`):** R16 — two real conversational theorem/proof productions through the
