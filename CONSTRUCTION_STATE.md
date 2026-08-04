@@ -41,18 +41,20 @@
   checker return commits `Δm₁`, survives native source-detached rest/remount, enables the held
   dependent probe, and exact returned-fiber exclusion removes that consequence.
   [Receipt](receipts/R14_FIRST_THEOREM_PRODUCTION_RECEIPT.md).
+- R15: the same body mounts only its 200-byte native R14 rest, answers frozen dependent question
+  `q₂` through returned theorem fiber `181200`, and freezes the complete typed setup for Deed B.
+  Exact exclusion reverses `Δm₁` and removes the predicted consequence; the production handoff
+  remains byte-identical with zero source, corpus, index, or retrieval access.
+  [Receipt](receipts/R15_RETURN_CONDITIONED_THEOREM_MORPHOLOGY_RECEIPT.md).
 
-No R15 source-detached continuation mount, independently graded pre/post conduct receipt, or
-frozen complete Deed B setup exists yet.
+No R16 second theorem passage or terminal two-artifact return exists yet.
 
-**Next deed (`project-postulate`):** R15 — consume the exact R14 handoff as the same body, exclude
-developmental source/retrieval access, re-establish the predicted returned-fiber behavioral
-change and exact ablation, and freeze the dependent Deed B setup, as named in
-[`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md).
-
-**Terminal deed preserved (`project-postulate`):** R16 — return two real conversational
+**Next and terminal deed (`project-postulate`):** R16 — return two real conversational
 theorem/proof artifacts through the Lean exterior checker; the first kernel return changes
-source-detached reusable morphology and the second proof depends on that returned fiber.
+source-detached reusable morphology and the second proof depends on that returned fiber. Exact
+ablation must remove the second generated passage, while the final body remains a valid
+continuation, as named in
+[`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md).
 
 Update this file only after a phase's required artifact and receipts have returned and its grade
 has passed. Do not record intentions or partial work as admitted standing.
