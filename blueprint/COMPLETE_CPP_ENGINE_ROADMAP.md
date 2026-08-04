@@ -959,6 +959,124 @@ problem and the Hankel/discriminant root fiber in the lattice problem. Kernel-ac
 wrong but caused alternatives, and exact post-return comparison are all retained. The historical
 laboratory proof of Erdős problem 183 is not repeated as a capability gate.
 
+The source-separation aperture is physical as well as declarative. Before the return, production
+may read only two lineaged problem cards and the admitted R20 native rest. The binary card contains
+the ambient dimension and a parity-check incidence, but no codewords, distance distribution,
+two-point cells, quotient operator, characteristic factors, Krawtchouk values, or certificate. The
+moment card contains bounded power-sum sequences, declared degrees, and integer search apertures,
+but no roots, annihilating polynomials, Hankel determinants, discriminants, or expected mechanism.
+The released chapters, solutions, walkthroughs, and their extracted text are not process inputs and
+are first opened for comparison only after the device deed, proof sources, checker returns, atlas,
+and native rest have immutable hashes.
+
+**Construction tuple:**
+
+- source owners: the one R20 continuing body and its six accepted fibers; two exterior problem-card
+  occurrences with byte/path lineage; exact bit-cube, finite-incidence, integer-polynomial,
+  rank-bounded matrix, and moment carriers; new code-pair, orthogonal-radial, moment-pencil,
+  separable-root, candidate-obstruction, and comparison organs; two formal/explanation codec faces;
+  two pending checker deeds; and exterior checker/rest apparatus;
+- port types: the native R20 rest; raw and typed binary/moment cards; bit vertices, code membership,
+  pair-distance cells, oriented cell contacts, mass and quotient matrices, commuting Jacobi axes,
+  exact eigenvectors/factors, power sums, Hankel and shifted-Hankel matrices, determinant pencils,
+  Newton polynomials, root fibers, candidate and obstruction receipts, two proof/conversation faces,
+  two raw/typed checker returns, one post-return comparison receipt, and one continuing native rest;
+- event occurrence: remount R20; mount the two problem cards without released solution material;
+  derive the code population and pair-cell incidence on the resident GPU; form and test competing
+  characteristic transports; derive the moment pencils and their root fibers on independent GPU
+  currents; retain failed alternatives; form and externally check the code passage; commit its
+  return; form and check the moment passage from the resulting same body; commit its return; rest
+  and remount; seal all returned artifacts; then open the released chapters for comparison only;
+- predecessor identity: the admitted R20 head `14001012`, continuation `15001012`, morphology, and
+  six accepted fibers recorded in `CONSTRUCTION_STATE.md` and the R20 receipt;
+- local constitutive law: caused bit-flip incidence followed by exact equitable quotienting;
+  receiver-mass adjointness `WQ=Q^T W`; factorization of two-point cells into commuting radial
+  directions only when every oriented contact agrees; determinant recurrence and exact integer
+  eigenvector verification; fraction-free Hankel-pencil elimination; Newton transport from moments;
+  exact polynomial evaluation/factor removal inside the declared root aperture; and obstruction
+  when moment access or separability is absent;
+- receiver question: which characteristic geometry is forced by complete local incidence or by a
+  bounded moment stream, which superficially plausible alternatives fail an exact contact, lineage,
+  recurrence, or separability receiver, and which of the independently returned mechanisms occur in
+  the subsequently opened released proofs?;
+- returned consequence: an actual blind-reconstruction atlas, two complete generated theorem/proof
+  sources and explanations, two checker occurrences, two acquired continuation fibers, native
+  rest/remount, retained wrong alternatives, source-access audit, and exact post-return comparison;
+  and
+- open alternatives: the general asymptotic binary/spherical-code inequalities, arbitrary
+  association schemes and representation ranks, the full Reed–Solomon/rational-function encoding,
+  the polynomial-time 3SAT reduction and hardness exponent, unbounded root degree/aperture,
+  approximate/noisy moments, the other eight released advances, and RH-facing operators.
+
+**Construct:**
+
+- mount a binary card with ambient dimension `7` and the three parity-check row masks
+  `85,102,120`. Enumerate all `128` bit vertices and derive code membership, minimum distance,
+  distance distribution, dual Krawtchouk moments, and source lineage on the card. Neither the
+  sixteen codewords nor the expected weight enumerator may be stored as answer data;
+- for every nonzero code-distance stratum, choose the least lineaged ordered pair only as a
+  representative aperture and partition the entire cube by its two distances to that pair. Derive
+  the cell population and every oriented bit-flip contact. For the returned strata `3,4,7`, the
+  resulting cell complexes must be obtained from contact rather than mounted as the expected
+  `4x5`, `5x4`, and `8x1` shapes;
+- form the exact quotient `Q` and diagonal cell-mass carrier `W`, then test `WQ=Q^T W`. Attempt the
+  one-shell collapse, an unweighted unit grid, a lineage-reversed transpose, and a product of two
+  radial path actions as separate caused candidates. Retain each failed constraint vector. Admit a
+  factorization only if its two commuting directions reproduce every oriented source/receiver
+  contact. Derive, rather than mount, the integer Krawtchouk eigenvectors, eigenvalues, and
+  characteristic multiplicities; equal factors under the distance `3↔4` rechart must retain unequal
+  pair lineage;
+- mount five moment cases containing only `(degree, moment_count, integer aperture, moments)`:
+  `(3,6,-8,8; 3,7,21,73,273,1057)`,
+  `(3,6,-8,8; 3,2,14,20,98,212)`,
+  `(4,8,-8,8; 4,14,78,476,3042,19964,133338,901796)`,
+  `(3,6,-8,8; 3,6,18,66,258,1026)`, and
+  `(3,4,-8,8; 3,7,21,73)`. No root or polynomial appears in the card;
+- from each sufficient moment stream form `H0=(s_(i+j))` and `H1=(s_(i+j+1))`, derive the
+  generalized characteristic polynomial `det(xH0-H1)` by fraction-free exact elimination, and
+  independently derive the monic Newton polynomial. A distinct-root fiber returns only when the
+  normalized pencils agree, every returned integer root lies in the mounted aperture and removes
+  the polynomial exactly, and the nonzero Hankel determinant agrees with the polynomial
+  discriminant under the declared unit-mass hypothesis. The repeated-root case must retain its
+  zero determinant/discriminant obstruction; the short stream must retain its missing-moment
+  obstruction;
+- compare exact Hankel, Toeplitz, reversed-Hankel, and degree-collapsed candidates through their
+  complete recurrence, pencil-degree, source-order, and separability receivers. Do not select by a
+  scalar score and do not turn a singular candidate into a guessed root set;
+- generate two Lean passages from the returned values. The first proves the bounded two-point
+  detailed-balance and tensor-Jacobi eigenvector identities together with the code's exact
+  Krawtchouk-moment control. The second proves the returned Hankel-pencil factorization,
+  Vandermonde-square/discriminant identity, Newton agreement, and collision obstruction. Both must
+  cross the real pinned checker as distinct passages; and
+- after all return hashes are sealed, inspect the two corresponding released chapters and record
+  exact matches, mismatches, stronger/weaker passages, and terminology separately. Similarity is
+  comparison testimony, never retroactive evidence that the blind device return caused the
+  released theorem or proves its unbounded result.
+
+**Return:** the actual GPU-formed code-pair and moment-root atlas, both complete generated proof
+sources, both checker artifacts, both conversational explanations, source-access testimony, native
+handoff, and the post-return comparison. A prewritten Krawtchouk table, root list, expected
+operator, generated-text-only proof, accepted-count statistic, old Hankel recurrence demo, or
+released-proof summary does not satisfy the deed.
+
+**Acceptance:** the production process reads no released solution material before its own artifacts
+are sealed; changing either card changes the corresponding device return without recompilation;
+the cube/code enumeration, cell contacts, quotient/factorization, moment matrices, determinant
+pencils, Newton transport, and candidate obstructions occur on the resident GPU and agree with an
+independent exact offline audit; every characteristic factor and root retains source lineage;
+singular/short controls remain obstructions; both generated passages really cross the exterior
+checker in order; source-detached rest/remount preserves both new fibers and all prior fibers; the
+post-return comparison cannot change the sealed artifacts; and the complete architecture,
+ownership, no-float, determinism, device-sanitizer, and binary gates pass.
+
+**Grade:** `established-bounded` with `implemented-exact` and `computational-witness` for the finite
+incidence and moment atlases; `proved-derived` with `formal-checked` only for the two emitted Lean
+passages; `established-bounded` for the sealed post-return mechanism comparison supported by the
+released chapters; and `historical` for the laboratory's earlier generic Hankel/Cramer recurrence placement,
+polynomial-discriminant, finite-field-cycle, and Erdős-183 returns. The released asymptotic
+code/sphere-packing bounds, the GapCVP hardness theorem and exponent, autonomous reconstruction of
+their complete proofs, physical crystal laws, and RH remain outside R21.
+
 ### R22 — CM norm-one arithmetic-incidence spectrum
 
 R22 begins only after R21. It instantiates a tractable exact stage of the published unit-distance

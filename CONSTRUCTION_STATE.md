@@ -97,16 +97,28 @@
   continuation `15001012`, with all prior fibers preserved and regular-singular fiber `187300`
   acquired.
   [Receipt](receipts/R20_REGULAR_SINGULAR_CONTINUATION_RECEIPT.md).
+- R21: two source-separated cards return independent characteristic mechanisms before the
+  corresponding released chapters are opened. The binary card yields the length-seven code,
+  three two-point incidence shapes `4x5`, `5x4`, and `8x1`, exact mass adjointness
+  `WQ=Q^T W`, commuting radial factors, and characteristic roots/multiplicities. The five moment
+  streams yield three separable Hankel pencils with roots `(1,2,4)`, `(-2,1,3)`, and
+  `(0,2,5,7)`, plus distinct collision and insufficient-access obstructions; in every regular
+  unit-mass case the Hankel determinant equals the discriminant and squared Vandermonde product.
+  Two generated passages are kernel accepted, all pre-comparison artifact hashes survive the
+  subsequent Chapter 2/7 comparison, and card probes change both returns without recompilation.
+  The body rests at head `14001016`, continuation `15001016`, with all prior fibers preserved and
+  blind-reconstruction fibers `188300` and `188301` acquired.
+  [Receipt](receipts/R21_BLIND_CHARACTERISTIC_RECONSTRUCTION_RECEIPT.md).
 
-The ordered R0–R16 construction and the directly authorized R17–R20 post-frontier inquiries are
+The ordered R0–R16 construction and the directly authorized R17–R21 post-frontier inquiries are
 complete.
 
-**Next deed (`project-postulate`):** R21 — perform blind, source-separated characteristic
-reconstruction controls from the binary-code and GapCVP problems in OpenAI's released ten-proof
-collection. The released proofs, reasoning walkthroughs, expected operators, and answers remain
-exterior until after the machine returns its own caused passages, as frozen in
-[`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md). The current
-body rests with a valid continuation.
+**Next deed (`project-postulate`):** R22 — construct the bounded CM norm-one
+arithmetic-incidence spectrum frozen in
+[`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md): source
+factorization and expanded receiver incidence must agree before and after the declared planar
+aperture, while translation spectra distinguish periodic interior transport, window scattering,
+repeated-distance incidence, and receiver loss. The current body rests with a valid continuation.
 
 Update this file only after a phase's required artifact and receipts have returned and its grade
 has passed. Do not record intentions or partial work as admitted standing.
