@@ -13,14 +13,24 @@ with zero oracle disagreements and zero failures over 42 bounded algebraic ident
 sanitizer and PTX/SASS no-float gates pass. Its receipt is
 [`receipts/R1_EXACT_CARRIER_RECEIPT.md`](receipts/R1_EXACT_CARRIER_RECEIPT.md).
 
-No runtime causal ecology or owner-native structural population exists yet. The R1 batch executor
-is the exact-carrier apparatus deed and is not a substitute for R2 incidence/arena/traversal
-standing.
+R2 has returned move-only owner-native finite structural populations in persistent device arenas,
+with typed occurrence/event/port/region/lineage minting, bounded views, sparse oriented incidence,
+exact multiplicity and declared chain boundaries, receiver-bounded traversal/support certificates,
+parent-linked persistent paths, and local append/departure deltas. Ten real GPU cases cover the
+empty, singular, disconnected, three-dimensional, multiplicity, success, obstruction, and atomic
+capacity-refusal boundaries with zero independent-verifier failures. Its receipt is
+[`receipts/R2_OWNER_NATIVE_STRUCTURE_RECEIPT.md`](receipts/R2_OWNER_NATIVE_STRUCTURE_RECEIPT.md).
 
-**Next deed (`project-postulate`):** R2 — compose `exact -> structure` on the GPU from first
-admission and return finite causal complexes with exact declared chain boundaries, complete
-admission/departure receipts, certified receiver-bounded traversal, and structural deltas as named
-in [`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md).
+No continuing body, event lifecycle, source topology mount, or chart navigation exists yet. R2's
+resident finite-complex deed is not a source codec/index and is not a substitute for R3's real
+selected-source mount.
+
+**Next deed (`project-postulate`):** R3 — compose `codec + structure + receiver` without a live
+adaptive body, incrementally found byte/chunk occurrences and cross-chunk relations on the card,
+mount a real selected repository/paper/formal-source population into alternate navigable local
+charts, return exact transition/preimage/overlap/obstruction receipts, and prove source-detached
+receiver queries do not rescan the serialized store as named in
+[`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md).
 
 **Terminal deed preserved (`project-postulate`):** R16 — two real conversational theorem/proof productions through the
 Lean exterior checker, with the first kernel return changing source-detached reusable morphology

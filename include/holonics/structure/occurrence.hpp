@@ -7,9 +7,11 @@
 namespace holonics::structure {
 
 struct occurrence_identity_owner final {};
+struct event_identity_owner final {};
 struct source_identity_owner final {};
 struct event_cut_identity_owner final {};
 struct lineage_identity_owner final {};
+struct region_identity_owner final {};
 
 struct situated_occurrence_marker final {};
 
