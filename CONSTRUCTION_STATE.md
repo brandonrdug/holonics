@@ -1,80 +1,58 @@
 # Construction state
 
-**Current admitted standing (`established-bounded`, `implemented-exact`):** R0 has returned the
-pinned C++23/CUDA C++20 build, nine-owner acyclic dependency contract, restricted ownership/type
-law, deterministic build manifest, and executable architecture/no-float/ownership audit. Its
-receipt is [`receipts/R0_ARCHITECTURE_RECEIPT.md`](receipts/R0_ARCHITECTURE_RECEIPT.md).
+**Current admitted standing (`established-bounded`, `implemented-exact`):**
 
-R1 has returned the bit-pure exact carrier through 384 bits, including fixed tiers, a witnessed
-five-limb bounded-dynamic device path, explicit width/overflow refusal, signed magnitudes,
-rationals, residue/declared-prime field values, polynomials, projective pairs, hashing, and
-layout-independent representation maps. The real RTX 4080 SUPER deed returned 100 decoded cases
-with zero oracle disagreements and zero failures over 42 bounded algebraic identity checks;
-sanitizer and PTX/SASS no-float gates pass. Its receipt is
-[`receipts/R1_EXACT_CARRIER_RECEIPT.md`](receipts/R1_EXACT_CARRIER_RECEIPT.md).
+- R0 returned the pinned C++23/CUDA C++20 build, nine-owner acyclic dependency contract,
+  restricted ownership/type law, deterministic manifest, and executable
+  architecture/no-float/ownership audit. See
+  [`receipts/R0_ARCHITECTURE_RECEIPT.md`](receipts/R0_ARCHITECTURE_RECEIPT.md).
+- R1 returned the bit-pure exact carrier through 384 bits, including refusal boundaries and
+  representation maps. Its real GPU deed returned 100 decoded cases with zero oracle disagreement
+  and clean no-float PTX/SASS. See
+  [`receipts/R1_EXACT_CARRIER_RECEIPT.md`](receipts/R1_EXACT_CARRIER_RECEIPT.md).
+- R2 returned move-only owner-native finite structure, typed identities, sparse oriented
+  incidence, receiver-bounded traversal, persistent paths, and local append/departure deltas. Ten
+  GPU cases cover the declared success and obstruction boundaries. See
+  [`receipts/R2_OWNER_NATIVE_STRUCTURE_RECEIPT.md`](receipts/R2_OWNER_NATIVE_STRUCTURE_RECEIPT.md).
+- R3 returned real repository/paper/formal sources as owner-minted byte occurrences, exact
+  incidence and lineage, multiple apertures/orders, storage-relocation invariance, and a detached
+  projection/preimage query. See
+  [`receipts/R3_SOURCE_TOPOLOGY_RECEIPT.md`](receipts/R3_SOURCE_TOPOLOGY_RECEIPT.md).
+- R4 returned one move-only continuing body, unique linear continuation, typed pending deed and
+  exterior return, complete staged delta, atomic commit/refusal, and native rest/remount. See
+  [`receipts/R4_BODY_LIFECYCLE_RECEIPT.md`](receipts/R4_BODY_LIFECYCLE_RECEIPT.md).
+- R5 returned the domain-neutral causal-program ABI and one non-copyable resident causal current.
+  Nine ordered fronts and 11 deltas advance on-card after source departure, with exact rest, open
+  current, and overflow testimony. See
+  [`receipts/R5_CAUSAL_CURRENT_RECEIPT.md`](receipts/R5_CAUSAL_CURRENT_RECEIPT.md).
+- R6 returned the non-copyable many-current weave with typed serial gluing, complete parallel
+  interchange, six-path higher coherence, shared-support equalization, ordered obstruction, and
+  resource-driven placement/aperture change. See
+  [`receipts/R6_MANY_CURRENT_WEAVE_RECEIPT.md`](receipts/R6_MANY_CURRENT_WEAVE_RECEIPT.md).
+- R7 returned all seven mounted core receiver-geometry deeds: projective swing; eight distinct
+  sameness relations; projection with retained preimage; path-retaining connection return; exact
+  symbolic Gauss-fiber continuation; oriented extended carriers; and rational local
+  information-relativistic recurrence with explicit non-universality and fidelity obstructions.
+  See [`receipts/R7_CORE_RECEIVER_GEOMETRY_RECEIPT.md`](receipts/R7_CORE_RECEIVER_GEOMETRY_RECEIPT.md).
+- R8 returned one non-copyable stateful condensation owner over an eight-cell source fiber, two
+  versioned future receiver families, four input histories, and a smaller exact factor body. Every
+  direct/condensed history agrees on admitted language, testimony, obstruction, and complete
+  successor. Receiver-family growth consumes the same continuation, reopens the retained fiber,
+  and refines three factors to four before later conduct continues unchanged. See
+  [`receipts/R8_STATEFUL_BOUNDARY_CONDENSATION_RECEIPT.md`](receipts/R8_STATEFUL_BOUNDARY_CONDENSATION_RECEIPT.md).
 
-R2 has returned move-only owner-native finite structural populations in persistent device arenas,
-with typed occurrence/event/port/region/lineage minting, bounded views, sparse oriented incidence,
-exact multiplicity and declared chain boundaries, receiver-bounded traversal/support certificates,
-parent-linked persistent paths, and local append/departure deltas. Ten real GPU cases cover the
-empty, singular, disconnected, three-dimensional, multiplicity, success, obstruction, and atomic
-capacity-refusal boundaries with zero independent-verifier failures. Its receipt is
-[`receipts/R2_OWNER_NATIVE_STRUCTURE_RECEIPT.md`](receipts/R2_OWNER_NATIVE_STRUCTURE_RECEIPT.md).
+No typed codec face/program/environment/continuation separation, inherited codec mount, lineaged
+render/parse/transduce crossing, reflected pending continuation, or returned same-body codec
+revision exists yet.
 
-R3 has returned a real repository/paper/formal-source population as owner-minted byte occurrences,
-exact adjacency incidence, intrinsic cut/source lineage, and two alternate resident receiver
-charts. Chunk-local GPU transduction at four apertures and four ingestion orders, plus a physically
-relocated file-store branch, returns field-by-field identical semantic standing and zero direct
-bounded-oracle mismatches. A declared occurrence query returns its projective transition,
-projection preimage, overlap, local support, and empty-preimage obstruction after both host and
-device source environments depart. Its receipt is
-[`receipts/R3_SOURCE_TOPOLOGY_RECEIPT.md`](receipts/R3_SOURCE_TOPOLOGY_RECEIPT.md).
-
-R4 has returned one move-only continuing body with a unique linear continuation, typed pending
-deed and exterior return, complete staged delta, body-atomic commit/refusal, and current-schema
-native rest/remount. The real card deed changes exactly one declared local region only after the
-valid return; stale, foreign, double, second-open, capacity-refusal, and interruption boundaries
-return exact predecessor/successor and capability testimony. Its receipt is
-[`receipts/R4_BODY_LIFECYCLE_RECEIPT.md`](receipts/R4_BODY_LIFECYCLE_RECEIPT.md).
-
-R5 has returned a reified, domain-neutral causal-program ABI and one non-copyable GPU-resident
-causal-current owner containing exact structural slabs, morphology, sparse current, pending deeds,
-reservations, complete deltas, and the continuing capability. Nine ordered fronts and 11 deltas
-advance entirely on-card after the mount source departs: two programs reach component-certified
-rest, one retains an explicit open current, and exact overflow preserves its predecessor. Decoded
-card/oracle equality and the no-host-replay/device-unavailable gates pass. Its receipt is
-[`receipts/R5_CAUSAL_CURRENT_RECEIPT.md`](receipts/R5_CAUSAL_CURRENT_RECEIPT.md).
-
-R6 has returned a non-copyable many-current resident weave with typed serial gluing, both
-parallel restagings, a canonical combined delta, complete `InterchangeCertificate`, six-path
-higher coherence, a declared shared-support equalizer, explicit repeated-support/non-recurrence,
-and ordered obstruction for undeclared overlap. Four completion orders and apparatus partitions
-return the same complete successor. A typed resource return changes placement/aperture in one
-body and remains explicitly open in the other, with zero unchanged retry and logical testimony
-separate from physical telemetry. Its receipt is
-[`receipts/R6_MANY_CURRENT_WEAVE_RECEIPT.md`](receipts/R6_MANY_CURRENT_WEAVE_RECEIPT.md).
-
-R7 has returned all seven mounted core receiver-geometry deeds on the resident card: exact
-projective swing with degenerate/non-field alternatives; eight-way sameness distinctions;
-projection with retained source preimages and zero created incidence; path-retaining connection,
-finite holonomy, certified local curvature, and open global geometry; exact symbolic Gauss-fiber
-continuation; oriented line/sheet/higher-cell boundaries with distinct knot/diagram/braid faces;
-and a rational local metric/connection receipt distinguishing causal access, local clocks,
-transported current, stress, repeated support, complete state, domain-relative comparisons, and
-the missing obligations for General-Relativistic fidelity. Its receipt is
-[`receipts/R7_CORE_RECEIVER_GEOMETRY_RECEIPT.md`](receipts/R7_CORE_RECEIVER_GEOMETRY_RECEIPT.md).
-
-No versioned future receiver family, source reconstruction capability, stateful boundary
-bisimulation, factorized response, or refinement deed exists yet.
-
-**Next deed (`project-postulate`):** R8 — compose `receiver + body + event` and return a broad
-interior conducting through a smaller exact boundary body under a history-based stateful
-condensation certificate, as named in
+**Next deed (`project-postulate`):** R9 — compose `codec + event + body + apparatus exterior ports`
+and return a reflected codec revision which changes later conduct of the same remounted body while
+source storage relocation and renaming remain semantically inert, as named in
 [`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md).
 
-**Terminal deed preserved (`project-postulate`):** R16 — two real conversational theorem/proof productions through the
-Lean exterior checker, with the first kernel return changing source-detached reusable morphology
-and the second proof depending on that returned fiber.
+**Terminal deed preserved (`project-postulate`):** R16 — return two real conversational
+theorem/proof artifacts through the Lean exterior checker; the first kernel return changes
+source-detached reusable morphology and the second proof depends on that returned fiber.
 
 Update this file only after a phase's required artifact and receipts have returned and its grade
 has passed. Do not record intentions or partial work as admitted standing.
