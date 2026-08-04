@@ -46,15 +46,21 @@
   consumes that continuation and changes held behavior after source-detached GPU rest/remount.
   Physical source relocation/renaming changes path testimony but no semantic field. See
   [`receipts/R9_AGNOSTIC_CODECS_REFLECTION_RECEIPT.md`](receipts/R9_AGNOSTIC_CODECS_REFLECTION_RECEIPT.md).
+- R10 returned distinct mounting, exposure, training, and reference occurrences around one
+  inherited navigation organ and continuing body. Only the lineaged training return derives and
+  commits native response/incidence/transport/codec/obstruction morphology. Held-out conduct
+  changes from obstructed response `8` to unobstructed response `14`, survives source-detached
+  rest/remount with zero lookup or corpus retention, and returns to `8` under separately founded
+  exact excluding-fiber ablation. See
+  [`receipts/R10_CONDITIONING_NATIVE_MORPHOLOGY_RECEIPT.md`](receipts/R10_CONDITIONING_NATIVE_MORPHOLOGY_RECEIPT.md).
 
-No mounting/exposure/training/reference distinction, returned native conditioning delta,
-source-access exclusion, source-detached held-out behavioral change, or exact excluding-fiber
-ablation exists yet.
+No exact mathematical occurrence ecology, dependent declaration incidence, open goal fibers,
+local constraint intersection, proof-term closed section, or source-detached declaration-neighborhood
+reconstruction exists yet.
 
-**Next deed (`project-postulate`):** R10 — compose `organ + body + event + receiver` and return one
-production mathematical/navigation organ whose returned training passage changes later held-out
-conduct, survives source-detached rest/remount, and loses that consequence under exact fiber
-ablation, as named in
+**Next deed (`project-postulate`):** R11 — mount the inherited mathematical organs and return a
+source-detachable exact ecology in which held-out declaration/goal neighborhoods reconstruct from
+local incidence without a global declaration scan, as named in
 [`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md).
 
 **Terminal deed preserved (`project-postulate`):** R16 — return two real conversational
