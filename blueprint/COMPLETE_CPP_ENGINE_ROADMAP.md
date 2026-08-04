@@ -712,6 +712,42 @@ This phase begins only after R16 and is not allowed to delay it.
 No fixed number of domains proves universal learning. The engine is extensible because lawful new
 organs enter through existing ports without a new core scheduler or ontology.
 
+### R18 — Exact phase-crystal hypergeometry
+
+This directly frozen post-frontier deed composes the R17 body with an exact cyclic phase-product
+organ. The term *phase crystal* names this construction; it does not assert identity with a
+physical crystal.
+
+**Compose:** `continuing body + exact cyclic charts + product cells + diagonal current + receiver
+projection + exact series current + mathematical/explanation codecs + exterior checker return`.
+
+**Construct:**
+
+- an intrinsic product-cell complex over two finite cyclic phase charts, with exact rational
+  Cayley coordinates and no floating semantic dependency;
+- oriented local edges, two-cell boundaries, cancellable shared seams, and diagonal chronology
+  partitioned into exact tours;
+- exact cell-shape populations and ordered neighboring-shape transition populations before any
+  display projection;
+- a declared two-dimensional receiver projection and exact convex-hull quotient, kept distinct
+  from intrinsic incidence and contact;
+- prime-pair, composite-coprime, shared-factor, reversed-dominance, reversed-pair, exact-dilation,
+  and exact-rational-turn controls;
+- a bounded exact Gauss `₂F₁(1,1;2;z)` coefficient current whose recurrence is transported along
+  the same diagonal path; and
+- one generated Lean passage proving the general diagonal-return law, its coprime specialization,
+  product-cell population, and the mounted Gauss coefficient recurrence.
+
+**Return:** the actual exact phase-crystal atlas, generated proof source and checker occurrence,
+conversational interpretation, native rest/remount, and continuation fiber. The returned atlas
+must expose intrinsic side-length signatures, local shape multiplicities, chronological transition
+types, tour decomposition, shared-seam cancellation, receiver-hull corners, and control receipts.
+
+**Grade:** `established-bounded` with `implemented-exact` and `computational-witness` for the frozen
+finite atlas; `proved-derived` with `formal-checked` only for the named generated Lean statements.
+Renderer chords, covariance figures, physical-crystal behavior, arbitrary hypergeometric systems,
+and implications for the Riemann hypothesis remain outside this grade.
+
 ## 7. Resource and performance receipts
 
 Performance is graded at every executable phase, but never by a magic utilization threshold.

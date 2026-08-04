@@ -60,8 +60,20 @@
   affine theorem. The body rests at head `14001006`, continuation `15001006`, with both prior
   theorem fibers and geometry fiber `184300` preserved.
   [Receipt](receipts/R17_AGNOSTIC_GEOMETRY_INQUIRY_RECEIPT.md).
+- R18: an unlabelled exact phase-product inquiry remounts the R17 body and returns 16 GPU-formed
+  product-cell cases spanning seven historical prime pairs plus composite, shared-factor,
+  dominance, order, dilation, and rational-turn controls. The two-dimensional cell complex is
+  carried in four exact rational coordinates; every complete cellular boundary cancels, diagonal
+  chronology partitions into `gcd` tours of `lcm` length, cell-shape populations factor through
+  exact factor-side types, and ordered transition receipts retain their adjacency. The declared
+  two-dimensional receiver hull distinguishes literal corners from dominant-modulus contraction.
+  A bounded `₂F₁(1,1;2;z)` coefficient current returns `cₙ=1/(n+1)`, and the generated Lean
+  passage proves the general diagonal-return, coprime-tour, product-population, and Gauss-step
+  statements. The body rests at head `14001008`, continuation `15001008`, with the two theorem
+  fibers, geometry fiber `184300`, and phase-crystal fiber `185300` preserved.
+  [Receipt](receipts/R18_PHASE_CRYSTAL_HYPERGEOMETRY_RECEIPT.md).
 
-The ordered R0–R16 construction and the directly authorized R17 post-frontier inquiry are
+The ordered R0–R16 construction and the directly authorized R17–R18 post-frontier inquiries are
 complete.
 
 **Next deed:** none scheduled. A further post-frontier construction must begin from a new direct
