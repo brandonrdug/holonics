@@ -1088,6 +1088,107 @@ window and projection, distinguishing periodic interior modes, aperture scatteri
 distance incidence, and receiver loss. This is a bounded reconstruction and analysis of the
 published mechanism, not the asymptotic Erdős theorem and not an RH claim.
 
+The finite carrier is the cyclotomic CM order `Z[z]/(z^4+z^3+z^2+z+1)` with conjugation
+`z -> z^-1=z^4`. It is mounted by order, degree, aperture, periodic modulus, and translation
+count—not by an incidence graph, norm table, spectrum, characteristic polynomial, or factorization.
+The five translation constituents are derived as the reduced powers of `z`; every norm-one and
+unit-distance claim must be returned by exact quotient arithmetic. The chosen complex embedding is
+an exterior receiver over the exact field coordinates. No floating approximation of `z` enters the
+semantic cone.
+
+**Construction tuple:**
+
+- source owners: the one R21 continuing body and its eight accepted fibers; one lineaged CM problem
+  card; exact degree-four cyclotomic, conjugation, relative-norm, binary-periodic, bounded-window,
+  translation, adjacency, matrix-power, characteristic-polynomial, factor, candidate-obstruction,
+  proof-face, checker-return, and native-rest owners;
+- port types: the 592-byte R21 native rest; raw/typed CM card; four-coefficient field constituents;
+  derived norm-one translations; periodic residues and bounded lifts; factorized and expanded edge
+  receipts; exact adjacency matrices, commutators, traces, characteristic coefficients and factors;
+  symbolic planar-receiver points; candidate failures; proof/explanation faces; raw/typed checker
+  return; GPU card probe; and continuing native rest;
+- event occurrence: remount R21; mount the CM card; derive the quotient arithmetic and translations;
+  form the periodic source crystal and its character modes; lift through the bounded aperture; form
+  factorized translation incidence and independently enumerate all receiver pairs; compare them;
+  derive both characteristic returns and alternative failures; form/check/commit one proof passage;
+  rest/remount; and probe a changed translation count without constructing another body;
+- predecessor identity: the admitted R21 head `14001016`, continuation `15001016`, morphology, and
+  eight fibers recorded in `CONSTRUCTION_STATE.md` and the R21 receipt;
+- local constitutive law: cyclotomic convolution reduced by `1+z+z^2+z^3+z^4=0`; CM conjugation and
+  exact relative norm `u*c(u)`; translation by derived norm-one constituents; `F2^4` periodic
+  composition; aperture admission without modular wrap; exact all-pair norm incidence; field-basis
+  injectivity; matrix-power traces and Newton characteristic transport; integer-root removal and
+  bounded exact factor division; and complete commutator residuals;
+- receiver question: which translation modes survive the bounded planar receiver, which are lost at
+  its aperture rather than at its injective projection, and which new characteristic factors carry
+  the resulting boundary scattering?;
+- returned consequence: a complete arithmetic-incidence atlas, periodic/window/projection agreement
+  receipts, exact characteristic factorizations, failed collapse/wrap/projection candidates, one
+  generated and accepted proof passage with explanation, one acquired continuation fiber, native
+  rest/remount, source-access audit, and card-sensitivity receipt; and
+- open alternatives: growing CM towers, split-prime and ideal-class production, high-dimensional
+  polydiscs, asymptotic population estimates, arbitrary CM orders and embeddings, unbounded windows,
+  analytic eigenvalue placement, calibrated physical crystal behavior, and RH-facing operators.
+
+**Construct:**
+
+- mount only `(cyclotomic_order=5, degree=4, periodic_modulus=2, window=[0,1],
+  translation_count=5)`. On the resident GPU derive the power-basis reduction, multiplication,
+  conjugation, five powers, relative norms, and their reductions modulo two. A prewritten root,
+  translation mask, norm receipt, adjacency matrix, or expected count is forbidden;
+- form the periodic residue crystal on all `2^4` coefficient classes. Derive every translation
+  contact, prove the five translation permutations commute, derive all `F2^4` character vectors and
+  eigenvalues directly from contact, and independently recover the degree-16 characteristic
+  polynomial from exact matrix traces and Newton transport. Character multiplicities and polynomial
+  coefficients must agree without an answer table;
+- choose the sixteen coefficient lifts in `[0,1]^4`, retain their exact field identity, and form the
+  bounded factorized incidence by applying each derived translation without modular wrap. In a
+  separate device current, enumerate every unordered pair, subtract its field constituents, compute
+  `d*c(d)`, and admit exactly the unit-norm contacts. The complete adjacency and direction lineage of
+  these two receivers must agree. Power-basis uniqueness must establish that the chosen complex
+  embedding identifies no two bounded points;
+- distinguish the periodic-to-window loss from the field-to-plane crossing. Return every periodic
+  edge that fails the aperture, every bounded edge retained by the injective planar receiver, the
+  population carried by each of the five translation directions, and the zero projection-loss
+  receipt. Retain three alternatives: a four-direction collapse, modular wrap presented as bounded
+  contact, and coefficient-sum projection presented as injective;
+- derive the bounded adjacency characteristic polynomial by exact traces/Newton transport. Remove
+  all integer linear factors inside a declared search aperture, then discover any remaining monic
+  quadratic factor by bounded exact coefficient search and exact polynomial division. Retain the
+  quotient rather than mounting either factor. Return the complete commutators between each axis
+  action and the aperture-restricted fifth direction so that “scattering” names a caused failure of
+  interchange;
+- generate one Lean passage from the return. It defines the concrete four-coefficient CM arithmetic,
+  proves all five norm-one translations, proves bounded point injectivity and the exact unit-pair
+  count by finite decision, and proves both returned characteristic factorizations and the exact
+  aperture loss. The passage must cross the pinned checker; and
+- change only `translation_count` from five to four in a GPU probe. The returned periodic/window
+  incidences and characteristic data must change without recompilation, while no probe body or
+  continuation is created.
+
+**Return:** the actual GPU-formed field/translation table, periodic and bounded adjacency atlas,
+all-pair planar incidence receipt, lost-contact list, commutators, traces, characteristic
+coefficients/factors, alternatives, generated proof source, checker artifact, conversational
+analysis, native handoff, and probe. A rendered point cloud, mounted graph, expected polynomial,
+unit-edge count alone, old Erdős-183 proof, or summary of the published construction does not
+satisfy the deed.
+
+**Acceptance:** field reduction, conjugation, norms, translations, periodic characters, both
+adjacency matrices, expanded pair norms, commutators, traces, Newton coefficients, and factor search
+occur on the resident GPU and agree with an independent exact offline audit; factorized and expanded
+bounded incidence agree completely; every periodic loss is assigned to the aperture and the
+injective projection loses none; characteristic equality is checked coefficientwise; the changed
+card changes the device return; the generated passage crosses the real checker; source-detached
+rest/remount preserves the new and prior fibers; and all architecture, ownership, no-float,
+determinism, device-sanitizer, and binary gates pass.
+
+**Grade:** `established-bounded` with `implemented-exact` and `computational-witness` for the finite
+CM arithmetic, incidence, and characteristic atlas; `proved-derived` with `formal-checked` only for
+the emitted Lean statements; and `historical` for the prior laboratory receiver interpretation and
+Erdős-183 proof. The published infinite-tower construction, its superlinear exponent, a new
+unit-distance theorem, arbitrary CM arithmetic, physical-optical behavior, and RH remain outside
+R22.
+
 ## 7. Resource and performance receipts
 
 Performance is graded at every executable phase, but never by a magic utilization threshold.

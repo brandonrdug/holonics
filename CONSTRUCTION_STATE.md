@@ -109,16 +109,29 @@
   The body rests at head `14001016`, continuation `15001016`, with all prior fibers preserved and
   blind-reconstruction fibers `188300` and `188301` acquired.
   [Receipt](receipts/R21_BLIND_CHARACTERISTIC_RECONSTRUCTION_RECEIPT.md).
+- R22: the bounded cyclotomic order `Z[z]/(1+z+z^2+z^3+z^4)` derives five norm-one
+  translations on the GPU from a card containing no graph or spectrum. Modulo two they form the
+  strongly regular `(16,5,0,2)` folded-five-cube/Clebsch crystal with characteristic factor
+  `(X-5)(X-1)^10(X+3)^5`. The non-wrapping `[0,1]^4` lift is `Q4` plus one antipodal chord:
+  independent factorized and all-pair norm incidence agree on 33 contacts, seven periodic
+  contacts are assigned exactly to the aperture, and the injective planar receiver loses none.
+  Its characteristic return is
+  `X^5(X^2-4)^3(X^2+X-4)(X^3-X^2-16X+12)`; four axis/fifth-direction commutators expose the
+  caused scattering, and a four-translation probe returns the unchanged `Q4` characteristic in
+  both receivers. The generated concrete arithmetic/incidence passage is kernel accepted. The
+  body rests at head `14001018`, continuation `15001018`, with all prior fibers preserved and CM
+  incidence fiber `189300` acquired.
+  [Receipt](receipts/R22_CM_NORM_ONE_ARITHMETIC_INCIDENCE_RECEIPT.md).
 
-The ordered R0–R16 construction and the directly authorized R17–R21 post-frontier inquiries are
+The ordered R0–R16 construction and the directly authorized R17–R22 post-frontier inquiries are
 complete.
 
-**Next deed (`project-postulate`):** R22 — construct the bounded CM norm-one
-arithmetic-incidence spectrum frozen in
-[`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md): source
-factorization and expanded receiver incidence must agree before and after the declared planar
-aperture, while translation spectra distinguish periodic interior transport, window scattering,
-repeated-distance incidence, and receiver loss. The current body rests with a valid continuation.
+**Next deed (`open`):** none frozen. The ordered roadmap is complete through R22 and the current
+body rests with a valid continuation. Any R23 must first declare its construction tuple, actual
+returned artifact, falsification boundary, and grade in
+[`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md); open CM
+towers, larger phase distributions, hypergeometric connection operators, calibrated physical
+receivers, and RH-facing operators are not silently scheduled.
 
 Update this file only after a phase's required artifact and receipts have returned and its grade
 has passed. Do not record intentions or partial work as admitted standing.
