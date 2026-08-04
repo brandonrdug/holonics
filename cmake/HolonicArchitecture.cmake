@@ -15,7 +15,7 @@ set(HOLONICS_OWNER_DEPENDENCIES_body exact structure)
 set(HOLONICS_OWNER_DEPENDENCIES_receiver exact structure)
 set(HOLONICS_OWNER_DEPENDENCIES_organ exact structure)
 set(HOLONICS_OWNER_DEPENDENCIES_codec exact structure)
-set(HOLONICS_OWNER_DEPENDENCIES_event exact structure body receiver organ)
+set(HOLONICS_OWNER_DEPENDENCIES_event exact structure body receiver organ codec)
 set(HOLONICS_OWNER_DEPENDENCIES_current exact structure body event)
 set(HOLONICS_OWNER_DEPENDENCIES_apparatus
     exact structure body event current receiver organ codec)

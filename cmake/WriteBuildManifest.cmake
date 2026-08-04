@@ -58,6 +58,7 @@ file(GLOB_RECURSE implementation_files
      "${SOURCE_ROOT}/tests/compile_contracts/*.cpp"
      "${SOURCE_ROOT}/tests/compile_contracts/*.cu"
      "${SOURCE_ROOT}/tests/conformance/*.cpp"
+     "${SOURCE_ROOT}/tests/fixtures/*.hcodec"
      "${SOURCE_ROOT}/tests/model/*.hpp"
      "${SOURCE_ROOT}/tests/model/*.cpp"
      "${SOURCE_ROOT}/tests/audit_fixtures/*.hpp")

@@ -40,14 +40,21 @@
   successor. Receiver-family growth consumes the same continuation, reopens the retained fiber,
   and refines three factors to four before later conduct continues unchanged. See
   [`receipts/R8_STATEFUL_BOUNDARY_CONDENSATION_RECEIPT.md`](receipts/R8_STATEFUL_BOUNDARY_CONDENSATION_RECEIPT.md).
+- R9 returned distinct codec face/program/environment/continuation values, exact lineaged
+  parse/render/transduce crossings, and two unrelated exterior surface laws. Reflection reifies
+  the operative codec and pending continuation without cloning either owner; a returned revision
+  consumes that continuation and changes held behavior after source-detached GPU rest/remount.
+  Physical source relocation/renaming changes path testimony but no semantic field. See
+  [`receipts/R9_AGNOSTIC_CODECS_REFLECTION_RECEIPT.md`](receipts/R9_AGNOSTIC_CODECS_REFLECTION_RECEIPT.md).
 
-No typed codec face/program/environment/continuation separation, inherited codec mount, lineaged
-render/parse/transduce crossing, reflected pending continuation, or returned same-body codec
-revision exists yet.
+No mounting/exposure/training/reference distinction, returned native conditioning delta,
+source-access exclusion, source-detached held-out behavioral change, or exact excluding-fiber
+ablation exists yet.
 
-**Next deed (`project-postulate`):** R9 — compose `codec + event + body + apparatus exterior ports`
-and return a reflected codec revision which changes later conduct of the same remounted body while
-source storage relocation and renaming remain semantically inert, as named in
+**Next deed (`project-postulate`):** R10 — compose `organ + body + event + receiver` and return one
+production mathematical/navigation organ whose returned training passage changes later held-out
+conduct, survives source-detached rest/remount, and loses that consequence under exact fiber
+ablation, as named in
 [`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md).
 
 **Terminal deed preserved (`project-postulate`):** R16 — return two real conversational
