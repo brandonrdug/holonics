@@ -40,6 +40,13 @@ struct lean_process_configuration final {
   const char* source_root{};
 };
 
+struct lean_source_view final {
+  exact::word passage{};
+  exact::word generated_source{};
+  const char* bytes{};
+  std::uint32_t byte_count{};
+};
+
 struct lean_process_receipt final {
   lean_process_status state{lean_process_status::invalid_aperture};
   lean_environment_manifest environment{};
@@ -60,6 +67,12 @@ struct lean_process_receipt final {
 
 [[nodiscard]] lean_process_receipt run_lean_checker_process(
     const codec::formal_checker_face& face,
+    const event::checker_outbound_occurrence& outbound,
+    const lean_process_configuration& configuration,
+    event::checker_raw_return& returned) noexcept;
+
+[[nodiscard]] lean_process_receipt run_lean_checker_source(
+    const lean_source_view& source,
     const event::checker_outbound_occurrence& outbound,
     const lean_process_configuration& configuration,
     event::checker_raw_return& returned) noexcept;

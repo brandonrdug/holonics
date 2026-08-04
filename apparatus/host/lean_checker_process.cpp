@@ -94,10 +94,10 @@ template<std::size_t Capacity, std::size_t Pattern>
 }
 
 [[nodiscard]] bool write_source(
-    const char* path, const codec::formal_checker_face& face) noexcept {
+    const char* path, const char* bytes, std::size_t byte_count) noexcept {
   const int descriptor = ::open(path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
   if (descriptor < 0) { return false; }
-  const bool wrote = write_all(descriptor, face.bytes, face.byte_count);
+  const bool wrote = write_all(descriptor, bytes, byte_count);
   return ::close(descriptor) == 0 && wrote;
 }
 
@@ -139,13 +139,13 @@ template<std::size_t Capacity, std::size_t Pattern>
 
 }  // namespace
 
-lean_process_receipt run_lean_checker_process(const codec::formal_checker_face& face,
+lean_process_receipt run_lean_checker_source(const lean_source_view& source,
     const event::checker_outbound_occurrence& outbound,
     const lean_process_configuration& configuration,
     event::checker_raw_return& returned) noexcept {
   lean_process_receipt receipt{};
-  if (face.byte_count == 0 || face.byte_count > codec::formal_checker_face_capacity ||
-      face.passage != outbound.passage || face.generated_source != outbound.source ||
+  if (source.bytes == nullptr || source.byte_count == 0 ||
+      source.passage != outbound.passage || source.generated_source != outbound.source ||
       configuration.working_directory == nullptr || configuration.toolchain_path == nullptr ||
       configuration.lake_manifest_path == nullptr || configuration.source_path == nullptr ||
       configuration.produced_artifact_path == nullptr || configuration.stdout_path == nullptr ||
@@ -155,7 +155,7 @@ lean_process_receipt run_lean_checker_process(const codec::formal_checker_face& 
   if (!capture_environment(configuration, receipt.environment)) {
     receipt.state = lean_process_status::environment_refused; return receipt;
   }
-  if (!write_source(configuration.source_path, face)) {
+  if (!write_source(configuration.source_path, source.bytes, source.byte_count)) {
     receipt.state = lean_process_status::source_refused; return receipt;
   }
   returned = {outbound.predecessor, outbound.event, outbound.expected_return_port,
@@ -165,11 +165,11 @@ lean_process_receipt run_lean_checker_process(const codec::formal_checker_face& 
     receipt.state = lean_process_status::process_refused; return receipt;
   }
   returned.exited = true;
-  file_testimony source{};
+  file_testimony source_file{};
   file_testimony standard_output{};
   file_testimony standard_error{};
   file_testimony produced{};
-  if (!read_file(configuration.source_path, nullptr, 0, source) ||
+  if (!read_file(configuration.source_path, nullptr, 0, source_file) ||
       !read_file(configuration.stdout_path, returned.standard_output,
           event::checker_message_capacity, standard_output) ||
       !read_file(configuration.stderr_path, returned.standard_error,
@@ -186,11 +186,11 @@ lean_process_receipt run_lean_checker_process(const codec::formal_checker_face& 
   returned.stdout_bytes = static_cast<std::uint16_t>(standard_output.bytes);
   returned.stderr_bytes = static_cast<std::uint16_t>(standard_error.bytes);
   returned.produced_artifact_bytes = produced.bytes;
-  returned.source_fold = source.fold;
+  returned.source_fold = source_file.fold;
   returned.produced_artifact_fold = produced.fold;
   receipt.state = lean_process_status::returned;
   receipt.invocation = exact::word{160'105};
-  receipt.source_bytes = exact::word{source.bytes};
+  receipt.source_bytes = exact::word{source_file.bytes};
   receipt.stdout_bytes = exact::word{standard_output.bytes};
   receipt.stderr_bytes = exact::word{standard_error.bytes};
   receipt.produced_artifact_bytes = exact::word{produced.bytes};
@@ -199,6 +199,15 @@ lean_process_receipt run_lean_checker_process(const codec::formal_checker_face& 
   receipt.named_lake_env_lean = true;
   receipt.raw_bytes_returned = true;
   return receipt;
+}
+
+lean_process_receipt run_lean_checker_process(const codec::formal_checker_face& face,
+    const event::checker_outbound_occurrence& outbound,
+    const lean_process_configuration& configuration,
+    event::checker_raw_return& returned) noexcept {
+  if (face.byte_count > codec::formal_checker_face_capacity) { return {}; }
+  const lean_source_view source{face.passage, face.generated_source, face.bytes, face.byte_count};
+  return run_lean_checker_source(source, outbound, configuration, returned);
 }
 
 }  // namespace holonics::apparatus

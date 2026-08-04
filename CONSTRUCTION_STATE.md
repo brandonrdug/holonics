@@ -52,13 +52,20 @@
   and returns `returned_fiber_absent`. Both fibers survive final native remount at head `14001004`
   with continuation `15001004`.
   [Receipt](receipts/R16_TWO_THEOREM_CONVERSATIONAL_PRODUCTION_RECEIPT.md).
+- R17: an unlabelled geometry inquiry remounts the R16 body, forms 31 nonsingular and one singular
+  exact fractional-chart probes on 32 GPU threads, derives the determinant/denominator
+  factorization and four-point cancellation, and returns a kernel-accepted theory containing
+  affine common-square transport, full Möbius cross-ratio invariance, and a raw-coordinate
+  counterexample. The old formal neighbor is first inspected after return; it contains only the
+  affine theorem. The body rests at head `14001006`, continuation `15001006`, with both prior
+  theorem fibers and geometry fiber `184300` preserved.
+  [Receipt](receipts/R17_AGNOSTIC_GEOMETRY_INQUIRY_RECEIPT.md).
 
-The ordered R0–R16 construction is complete at the roadmap's named research frontier.
+The ordered R0–R16 construction and the directly authorized R17 post-frontier inquiry are
+complete.
 
-**Next deed:** none scheduled. R17 is explicitly post-frontier generalization in
-[`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md), not a
-remaining terminal acceptance gate. A further construction must begin from a new direct request
-and a frozen receiver deed; the current body already rests with a valid continuation.
+**Next deed:** none scheduled. A further post-frontier construction must begin from a new direct
+request and frozen receiver deed; the current body rests with a valid continuation.
 
 Update this file only after a phase's required artifact and receipts have returned and its grade
 has passed. Do not record intentions or partial work as admitted standing.
