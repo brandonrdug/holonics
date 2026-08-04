@@ -46,15 +46,19 @@
   Exact exclusion reverses `Δm₁` and removes the predicted consequence; the production handoff
   remains byte-identical with zero source, corpus, index, or retrieval access.
   [Receipt](receipts/R15_RETURN_CONDITIONED_THEOREM_MORPHOLOGY_RECEIPT.md).
+- R16: the terminal composition returns both complete theorem/proof sources and explanations
+  through two real kernel calls. After source-detached remount, Deed B's emitted proof invokes the
+  returned Deed A declaration through fiber `181200`; exact `Δm₁` exclusion emits zero B source
+  and returns `returned_fiber_absent`. Both fibers survive final native remount at head `14001004`
+  with continuation `15001004`.
+  [Receipt](receipts/R16_TWO_THEOREM_CONVERSATIONAL_PRODUCTION_RECEIPT.md).
 
-No R16 second theorem passage or terminal two-artifact return exists yet.
+The ordered R0–R16 construction is complete at the roadmap's named research frontier.
 
-**Next and terminal deed (`project-postulate`):** R16 — return two real conversational
-theorem/proof artifacts through the Lean exterior checker; the first kernel return changes
-source-detached reusable morphology and the second proof depends on that returned fiber. Exact
-ablation must remove the second generated passage, while the final body remains a valid
-continuation, as named in
-[`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md).
+**Next deed:** none scheduled. R17 is explicitly post-frontier generalization in
+[`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md), not a
+remaining terminal acceptance gate. A further construction must begin from a new direct request
+and a frozen receiver deed; the current body already rests with a valid continuation.
 
 Update this file only after a phase's required artifact and receipts have returned and its grade
 has passed. Do not record intentions or partial work as admitted standing.
