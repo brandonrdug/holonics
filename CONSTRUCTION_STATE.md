@@ -122,22 +122,29 @@
   body rests at head `14001018`, continuation `15001018`, with all prior fibers preserved and CM
   incidence fiber `189300` acquired.
   [Receipt](receipts/R22_CM_NORM_ONE_ARITHMETIC_INCIDENCE_RECEIPT.md).
+- R23: two unlabelled smooth complete fans derive their character quotients and intersection
+  forms on the resident GPU. Independent fan-local and Chow passages agree; exact congruence
+  returns signatures `(1,0)` and `(1,1)` without floating eigensolvers. Three receiver targets
+  return an integral class `(2,3)` with 42 retained representatives, a genuinely rational class
+  `(1/2,0)` with 72, and an incompatibility obstruction. The selected cone derives its own star
+  ray `(1,1)`, exceptional class of square `-1`, every strict/total transform, pullback,
+  pushforward, kernels/images, and the projection formula. The generated 51-line Lean passage is
+  kernel accepted. The body rests at head `14001020`, continuation `15001020`, with all prior
+  fibers preserved and toric-cycle fiber `190300` acquired.
+  [Receipt](receipts/R23_TORIC_CYCLE_CLASS_BLOWUP_RECEIPT.md).
 
-The ordered R0–R16 construction and the directly authorized R17–R22 post-frontier inquiries are
+The ordered R0–R16 construction and the directly authorized R17–R23 post-frontier inquiries are
 complete.
 
-**Next deed (`open`): R23 — toric cycle-class realization, intersection signature, and blow-up
-transport.** Its complete construction tuple, two unlabeled fan apertures, inverse class-receiver
-probes, star-subdivision event, required GPU artifact, falsification boundary, and intended grades
-are frozen in
-[`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md). R23 must
-start from the current head `14001018` and continuation `15001018`, derive rather than mount the
-divisor quotient, Chow/intersection form, realization fibers, signature, exceptional class, and
-pull/push transport, and return its actual proof/checker/native-rest bundle before any new standing
-is admitted. The RH/Hodge synthesis that selects this deed is recorded in
-[`2026-08-04_THE_SPECTRUM_RECEIVES_THE_INDEX_FORM_THE_CLASS_RETURNS_THROUGH_A_SUPPORTED_CYCLE.md`](research/records/2026-08-04_THE_SPECTRUM_RECEIVES_THE_INDEX_FORM_THE_CLASS_RETURNS_THROUGH_A_SUPPORTED_CYCLE.md).
-Variation-of-Hodge, Picard--Fuchs/Gauss--Manin, motives, completed Weil forms, and RH-facing trace
-operators remain open alternatives and are not silently scheduled.
+**Next deed (`open`): no R24 construction is frozen.** The live body now rests at head `14001020`
+and continuation `15001020`. R23 has closed the bounded toric bridge from characteristic quotient
+and intersection form back to supported realization fibers, and has transported both through one
+derived topology-changing subdivision. Variation-of-Hodge, Picard--Fuchs/Gauss--Manin, higher
+cycle realization, motives, completed Weil forms, and RH-facing trace operators remain open
+alternatives. A next phase must freeze its own construction tuple, exact aperture, required actual
+artifact, falsification boundary, and intended grades in
+[`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md) before work
+begins; none is silently scheduled.
 
 Update this file only after a phase's required artifact and receipts have returned and its grade
 has passed. Do not record intentions or partial work as admitted standing.
