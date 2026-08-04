@@ -30,14 +30,21 @@ projection preimage, overlap, local support, and empty-preimage obstruction afte
 device source environments depart. Its receipt is
 [`receipts/R3_SOURCE_TOPOLOGY_RECEIPT.md`](receipts/R3_SOURCE_TOPOLOGY_RECEIPT.md).
 
-No continuing body, unique continuation capability, pending deed, returned-event commit, or native
-rest image exists yet. R3's detached finite chart population is not a live adaptive body and is not
-a corpus index or learned morphology.
+R4 has returned one move-only continuing body with a unique linear continuation, typed pending
+deed and exterior return, complete staged delta, body-atomic commit/refusal, and current-schema
+native rest/remount. The real card deed changes exactly one declared local region only after the
+valid return; stale, foreign, double, second-open, capacity-refusal, and interruption boundaries
+return exact predecessor/successor and capability testimony. Its receipt is
+[`receipts/R4_BODY_LIFECYCLE_RECEIPT.md`](receipts/R4_BODY_LIFECYCLE_RECEIPT.md).
 
-**Next deed (`project-postulate`):** R4 — compose `structure + body + event`, return one move-only
-continuing body and unique linear continuation through a real exterior round trip, commit exactly
-one declared local region only after its typed return, and rest/remount without source replay as
-named in
+No GPU-resident causal current, concurrent frontier, reservation law, compositional quiescence, or
+resident scheduling topology exists yet. R4's single returned passage is not a reified program,
+processor phase, or adaptive learner.
+
+**Next deed (`project-postulate`):** R5 — compose `body + current + CUDA executor`, keep current,
+morphology, pending events, exact local state, and reservation/delta structure resident on the
+GPU; return a receiver-bounded concurrent frontier whose successful deeds advance entirely on the
+card and whose quiescence is compositional, as named in
 [`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md).
 
 **Terminal deed preserved (`project-postulate`):** R16 — two real conversational theorem/proof productions through the

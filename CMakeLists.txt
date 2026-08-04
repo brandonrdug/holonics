@@ -102,6 +102,7 @@ enable_testing()
 include(cmake/R1Exact.cmake)
 include(cmake/R2Structure.cmake)
 include(cmake/R3SourceTopology.cmake)
+include(cmake/R4BodyLifecycle.cmake)
 
 string(JOIN " " R0_DEVICE_FLAGS_RECEIPT ${R0_DEVICE_COMMON_FLAGS})
 set(HOLONICS_DECLARED_COMMANDS
@@ -109,7 +110,8 @@ set(HOLONICS_DECLARED_COMMANDS
     "device_cubin=<CUDA_COMPILER> ${R0_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/tests/compile_contracts/valid_device.cu -o <BUILD>/generated/r0_device_contract.cubin\n"
     ${R1_DECLARED_COMMANDS}
     ${R2_DECLARED_COMMANDS}
-    ${R3_DECLARED_COMMANDS})
+    ${R3_DECLARED_COMMANDS}
+    ${R4_DECLARED_COMMANDS})
 string(JOIN "" HOLONICS_DECLARED_COMMANDS_CONTENT ${HOLONICS_DECLARED_COMMANDS})
 file(GENERATE
   OUTPUT "${R0_GENERATED_DIRECTORY}/declared_commands.txt"
@@ -117,9 +119,9 @@ file(GENERATE
 
 set(HOLONICS_BUILD_MANIFEST "${PROJECT_BINARY_DIR}/receipts/BUILD_MANIFEST.txt")
 set(HOLONICS_EXTRA_ARTIFACTS
-    "$<TARGET_FILE:r1_exact_device_deed>|${R1_DEVICE_PTX}|${R1_DEVICE_CUBIN}|$<TARGET_FILE:r2_structure_device_deed>|${R2_DEVICE_PTX}|${R2_DEVICE_CUBIN}|${R3_EXTRA_ARTIFACTS}")
-set(HOLONICS_EXTRA_DEVICE_PTX "${R1_DEVICE_PTX}|${R2_DEVICE_PTX}|${R3_DEVICE_PTX}")
-set(HOLONICS_EXTRA_DEVICE_CUBIN "${R1_DEVICE_CUBIN}|${R2_DEVICE_CUBIN}|${R3_DEVICE_CUBIN}")
+    "$<TARGET_FILE:r1_exact_device_deed>|${R1_DEVICE_PTX}|${R1_DEVICE_CUBIN}|$<TARGET_FILE:r2_structure_device_deed>|${R2_DEVICE_PTX}|${R2_DEVICE_CUBIN}|${R3_EXTRA_ARTIFACTS}|${R4_EXTRA_ARTIFACTS}")
+set(HOLONICS_EXTRA_DEVICE_PTX "${R1_DEVICE_PTX}|${R2_DEVICE_PTX}|${R3_DEVICE_PTX}|${R4_DEVICE_PTX}")
+set(HOLONICS_EXTRA_DEVICE_CUBIN "${R1_DEVICE_CUBIN}|${R2_DEVICE_CUBIN}|${R3_DEVICE_CUBIN}|${R4_DEVICE_CUBIN}")
 add_custom_target(
   holonics_build_manifest ALL
   COMMAND
@@ -127,7 +129,7 @@ add_custom_target(
     -DSOURCE_ROOT=${PROJECT_SOURCE_DIR}
     -DBUILD_ROOT=${PROJECT_BINARY_DIR}
     -DOUTPUT=${HOLONICS_BUILD_MANIFEST}
-    -DCONSTRUCTION_PHASE=R3
+    -DCONSTRUCTION_PHASE=R4
     -DHOST_BINARY=$<TARGET_FILE:r0_host_contract>
     -DDEVICE_OBJECT=$<TARGET_OBJECTS:r0_device_contract>
     -DDEVICE_PTX=${R0_GENERATED_DIRECTORY}/r0_device_contract.ptx
@@ -144,6 +146,8 @@ add_custom_target(
     r2_device_artifacts
     r3_normalize_executable
     r3_device_artifacts
+    r4_normalize_executable
+    r4_device_artifacts
     "${R0_GENERATED_DIRECTORY}/declared_commands.txt"
     "${PROJECT_SOURCE_DIR}/cmake/WriteBuildManifest.cmake"
   BYPRODUCTS "${HOLONICS_BUILD_MANIFEST}"
