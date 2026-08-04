@@ -19,6 +19,20 @@ struct generated_math_surface final {
   std::uint8_t proof_form{};
 };
 
+enum class theorem_surface_form : std::uint8_t {
+  composed_trace_rebase = 1,
+  returned_fiber_extension = 2
+};
+
+struct theorem_production_surface final {
+  exact::word passage{};
+  exact::word statement{};
+  exact::word proof{};
+  theorem_surface_form form{theorem_surface_form::composed_trace_rebase};
+  bool closed{};
+  bool generated{};
+};
+
 struct formal_math_face final {
   exact::word identity{};
   exact::word passage{};

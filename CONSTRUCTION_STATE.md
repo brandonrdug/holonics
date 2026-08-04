@@ -36,13 +36,18 @@
   body owns an explicit pending deed. Raw status/stdout/stderr/produced artifact return to the GPU,
   normalize to kernel acceptance, preserve passage identity, and revise local mathematical,
   codec, and body morphology. [Receipt](receipts/R13_LEAN_EXTERIOR_CHECKER_RECEIPT.md).
+- R14: frozen request `q₁` expands two GPU-local proof geometries, selects the exact
+  three-dependency composition/rebase passage, and returns a real kernel-accepted theorem. The
+  checker return commits `Δm₁`, survives native source-detached rest/remount, enables the held
+  dependent probe, and exact returned-fiber exclusion removes that consequence.
+  [Receipt](receipts/R14_FIRST_THEOREM_PRODUCTION_RECEIPT.md).
 
-No frozen nontrivial R14 theorem request, complete question-to-rest/remount production passage,
-source-exclusion/ablation receipt for that deed, or returned theorem artifact exists yet.
+No R15 source-detached continuation mount, independently graded pre/post conduct receipt, or
+frozen complete Deed B setup exists yet.
 
-**Next deed (`project-postulate`):** R14 — freeze a nontrivial theorem request and return the full
-GPU generation, exterior checker return, morphology delta, source-detached rest/remount, held
-probe, theorem source, explanation, and exact exclusion/ablation receipts, as named in
+**Next deed (`project-postulate`):** R15 — consume the exact R14 handoff as the same body, exclude
+developmental source/retrieval access, re-establish the predicted returned-fiber behavioral
+change and exact ablation, and freeze the dependent Deed B setup, as named in
 [`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md).
 
 **Terminal deed preserved (`project-postulate`):** R16 — return two real conversational
