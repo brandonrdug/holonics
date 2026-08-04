@@ -126,12 +126,18 @@
 The ordered R0–R16 construction and the directly authorized R17–R22 post-frontier inquiries are
 complete.
 
-**Next deed (`open`):** none frozen. The ordered roadmap is complete through R22 and the current
-body rests with a valid continuation. Any R23 must first declare its construction tuple, actual
-returned artifact, falsification boundary, and grade in
-[`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md); open CM
-towers, larger phase distributions, hypergeometric connection operators, calibrated physical
-receivers, and RH-facing operators are not silently scheduled.
+**Next deed (`open`): R23 — toric cycle-class realization, intersection signature, and blow-up
+transport.** Its complete construction tuple, two unlabeled fan apertures, inverse class-receiver
+probes, star-subdivision event, required GPU artifact, falsification boundary, and intended grades
+are frozen in
+[`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md). R23 must
+start from the current head `14001018` and continuation `15001018`, derive rather than mount the
+divisor quotient, Chow/intersection form, realization fibers, signature, exceptional class, and
+pull/push transport, and return its actual proof/checker/native-rest bundle before any new standing
+is admitted. The RH/Hodge synthesis that selects this deed is recorded in
+[`2026-08-04_THE_SPECTRUM_RECEIVES_THE_INDEX_FORM_THE_CLASS_RETURNS_THROUGH_A_SUPPORTED_CYCLE.md`](research/records/2026-08-04_THE_SPECTRUM_RECEIVES_THE_INDEX_FORM_THE_CLASS_RETURNS_THROUGH_A_SUPPORTED_CYCLE.md).
+Variation-of-Hodge, Picard--Fuchs/Gauss--Manin, motives, completed Weil forms, and RH-facing trace
+operators remain open alternatives and are not silently scheduled.
 
 Update this file only after a phase's required artifact and receipts have returned and its grade
 has passed. Do not record intentions or partial work as admitted standing.

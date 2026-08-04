@@ -1189,6 +1189,147 @@ Erdős-183 proof. The published infinite-tower construction, its superlinear exp
 unit-distance theorem, arbitrary CM arithmetic, physical-optical behavior, and RH remain outside
 R22.
 
+### R23 — Toric cycle-class realization, intersection signature, and blow-up transport
+
+R23 begins only after R22. R18--R22 already supply exact characteristic modes, monodromy,
+source-separated reconstruction, and arithmetic-incidence spectra. The historical laboratory
+also already supplied finite Hodge Laplacians and diffusion on exact cellular sheaves. This phase
+does not repeat those mechanisms. It adds the absent geometry-to-class-to-form passage: actual
+algebraic cycles, their quotient by principal relations, exact intersection signature, inverse
+class realization, and transport across a lineaged birational modification.
+
+The bounded family consists of two smooth complete two-dimensional fans and one star subdivision.
+The fans are mounted only by cyclic primitive rays and maximal-cone incidence:
+
+```text
+Sigma_3 = [(1,0), (0,1), (-1,-1)]
+Sigma_4 = [(1,0), (0,1), (-1,0), (0,-1)].
+```
+
+The cone spanned by the first two rays of `Sigma_3` is the selected subdivision site. The input
+contains no variety name, class quotient, character relation, Picard basis, Chow product,
+intersection matrix, Hodge number, signature, polarization, cycle lift, subdivision ray,
+exceptional divisor, or expected theorem. Conventional names such as projective plane,
+`P1 x P1`, and one-point blow-up may be attached only after the exact return.
+
+**Construction tuple:**
+
+- source owners: the one R22 continuing body and its nine acquired fibers; one lineaged toric
+  problem card; exact signed-integer, rational, lattice, sparse polynomial, quotient-module,
+  symmetric-form, divisor-support, fan-incidence, star-subdivision, pull/push, candidate,
+  proof-face, checker-return, and native-rest owners;
+- port types: the R22 native rest; raw/typed fan card; primitive rays and cone incidence; fan
+  validation and character-relation receipts; Smith/fraction-free quotient data; divisor and Chow
+  classes; exact intersection responses and forms; rational/integral realization fibers;
+  incompatible-target obstruction; polarization and primitive-form receipts; subdivision,
+  exceptional, pullback, pushforward, and projection-formula receipts; proof/explanation faces;
+  raw/typed checker return; card probe; and one continuing native rest;
+- event occurrence: remount R22; mount the fan card; derive both fan and divisor ecologies on the
+  resident GPU; derive their quotient, Chow, form, signature, and inverse-realization returns;
+  star-subdivide the selected cone as a successor geometric occurrence; derive and compare the
+  old/new class and form transports; form/check/commit one proof passage; rest/remount; and probe a
+  changed ray or target without creating another body;
+- predecessor identity: the admitted R22 head `14001018`, continuation `15001018`, morphology and
+  nine fibers through `189300` recorded in `CONSTRUCTION_STATE.md` and the R22 receipt;
+- local constitutive law: exact primitive-ray and determinant arithmetic; cyclic fan incidence;
+  the character map `m -> sum_i <m,v_i>D_i`; fraction-free/Smith quotient closure; the
+  Stanley--Reisner noncone ideal and linear divisor relations; smooth toric-surface intersection
+  law `D_i D_j=1` for adjacent rays, `0` for distinct nonneighbors, and
+  `D_i^2=-a_i` when `v_(i-1)+v_(i+1)=a_i v_i`; exact symmetric elimination and inertia; inverse
+  rational/integral solve with full kernel; star subdivision by the primitive ray sum; and induced
+  divisor pullback/pushforward with exact projection comparison;
+- receiver question: which rational and integral class responses have actual supported
+  invariant-divisor realizers, what complete principal-relation fibers do those realizers inhabit,
+  which intersection directions are positive, null, or negative under a derived polarization,
+  and exactly what new class and form direction is caused by the selected blow-up?;
+- returned consequence: the complete fan/divisor/Chow atlas, exact class and intersection
+  quotients, rational/integral lift fibers and obstruction, form inertias and primitive negative
+  directions, the full star-subdivision and exceptional-class transport, one generated and
+  accepted proof passage with explanation, one acquired continuation fiber, native rest/remount,
+  source-access audit, and card-sensitivity receipt; and
+- open alternatives: arbitrary fan dimension, singular/noncomplete fans, general Chow and
+  cohomology comparison, higher-codimension cycle realization, non-toric varieties, intermediate
+  Jacobians, variations of Hodge structure, Picard--Fuchs/Gauss--Manin transport, motives,
+  Frobenius/trace-form ecologies, the completed Weil form, and RH.
+
+**Construct:**
+
+- mount only the two cyclic ray lists, their consecutive maximal cones, the selected cone index,
+  representative aperture `[-4,4]`, and the three `Sigma_4` intersection-response targets
+  `(3,2,3,2)`, `(0,1/2,0,1/2)`, and `(1,0,0,0)`. These targets are receiver questions, not
+  divisor representatives. The card may contain no quotient basis, expected lift, result label,
+  or standard variety name;
+- on the resident GPU prove every ray primitive, every maximal-cone determinant `+1`, cyclic
+  completeness in the declared two-dimensional aperture, and exact closure of the fan incidence.
+  A nonprimitive ray, reversed/omitted cone, or determinant other than `+1` remains a typed fan
+  obstruction rather than being normalized or reordered silently;
+- derive the complete character map from the rays and compute its Smith/fraction-free quotient.
+  Form the degree-one and degree-two Chow products from noncone and linear relations. Return the
+  torsion, free rank, basis/rebasis maps, every invariant divisor's class, and the complete
+  principal-divisor kernel. Under the separately declared standard smooth-complete-toric
+  comparison, return the corresponding bounded Betti/Hodge receiver ranks; do not report the
+  concrete arithmetic as a new proof of that comparison theorem;
+- derive the invariant-divisor intersection matrices independently from local cyclic fan
+  relations and from quotient Chow multiplication, and require coefficientwise agreement. Return
+  exact determinant, rank, radical, inertia, and all basis-congruence receipts. A matrix
+  eigenvalue list is not the invariant of a bilinear form under arbitrary rechart; this deed must
+  use exact congruence/inertia unless a separate metric and endomorphism are explicitly declared;
+- derive the anticanonical class from the sum of invariant divisors and its primitive ray
+  generator, check positive intersection with every invariant curve in all three returned fans,
+  and restrict the
+  intersection form to its exact orthogonal complement. The expected finite controls are rank one
+  with no primitive direction for `Sigma_3`; a hyperbolic rank-two class form with primitive
+  negative direction square `-2` for `Sigma_4`; and, after subdivision, a rank-two form congruent
+  to `diag(1,-1)` with an exceptional square `-1` and a primitive anticanonical-orthogonal
+  negative direction. These are bounded Hodge-index controls, not a proof of the general Hodge
+  index theorem;
+- invert the three mounted `Sigma_4` receiver responses. Return the full affine lattice/rational
+  fibers symbolically through their principal-relation kernel, together with every representative
+  inside the declared aperture. The first response must have integral realizers, the second must
+  have rational but no integral realizer, and the third must return its exact image-membership
+  obstruction. Distinct supports in one class fiber remain distinct occurrences;
+- derive the subdivision ray `(1,1)` from the selected adjacent rays rather than mounting it,
+  replace only the selected cone by its two caused successors, and rederive smoothness,
+  completeness, quotient, Chow products, and form from the new fan. Return the exceptional
+  divisor as the new ray's supported class, its square `-1`, every old-divisor strict/total
+  transform, exact pullback and pushforward matrices, their kernels/images, and the complete
+  projection-formula comparison. The new negative class must be assigned to this subdivision
+  occurrence rather than to generic noise or screen motion;
+- include exact foils separating a principal divisor from a zero supported cycle, a rational
+  cycle from an integral one, form congruence from operator conjugacy, a non-chain/fan map from a
+  lawful blow-up map, and equality of class receivers from equality of cycle supports. Retain
+  every failed relation vector; and
+- generate one Lean passage from the returned values. It proves the concrete ray determinants and
+  character relations, both quotient presentations, the returned Chow/intersection identities,
+  the three realization outcomes, the star-subdivision relations, exceptional square, pull/push
+  identities, and primitive negative-square controls. The passage must cross the pinned checker;
+  no theorem in it may rename a pre-labelled Boolean as “Hodge” or assert the general toric
+  comparison theorem without its actual library hypotheses.
+
+**Return:** the actual GPU-formed fan, quotient, Chow, intersection, realization, and subdivision
+atlas; complete generated proof source and checker artifact; conversational RH/Hodge boundary
+analysis; native handoff; and changed-card probe. A Smith rank alone, prewritten intersection
+table, generic discrete Hodge operator, screen polygon, old `App_Hodge.lean`, supplied cycle
+representative, or standard toric theorem summary does not satisfy the deed.
+
+**Acceptance:** ray/fan validation, character maps, quotient closure, Chow products, both
+intersection derivations, exact inertia, target inverse solves, star subdivision, pull/push maps,
+projection comparisons, and candidate obstructions occur on the resident GPU and agree with an
+independent exact offline audit; changing a ray or target changes the corresponding device return
+without recompilation; no expected quotient/form/lift is mounted; rational and integral fibers
+remain distinct; all supported representatives retain lineage; the generated passage crosses the
+real checker; source-detached rest/remount preserves the new and prior fibers; and all
+architecture, ownership, no-float, determinism, device-sanitizer, binary, and file-size gates pass.
+
+**Grade:** `established-bounded` with `implemented-exact` and `computational-witness` only after the
+finite fan, divisor, Chow, form, lift, and blow-up atlas actually returns; `proved-derived` with
+`formal-checked` only for the emitted concrete Lean statements; `proved-standard` for the ordinary
+smooth-complete-toric divisor/Chow/cohomology and Hodge-index laws under their stated hypotheses;
+and `historical` for the laboratory's earlier Hodge-label, sheaf-Laplacian, RH receiver, ten-proof,
+and Erdős mechanisms. General Hodge cycle realization, a variation of Hodge structure, an
+arithmetic cohomology for classical zeta, a completed explicit-formula trace/index carrier, Weil
+positivity, and RH remain outside R23.
+
 ## 7. Resource and performance receipts
 
 Performance is graded at every executable phase, but never by a magic utilization threshold.
