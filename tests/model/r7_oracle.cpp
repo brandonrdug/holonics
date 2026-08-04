@@ -1,0 +1,124 @@
+#include "r7_oracle.hpp"
+
+#include "r6_oracle.hpp"
+
+namespace holonics::tests {
+
+apparatus::receiver_geometry_observation r7_oracle(
+    const apparatus::receiver_geometry_mount& mount) noexcept {
+  apparatus::receiver_geometry_observation result{};
+  current::weave_mount_batch current_mount{};
+  current_mount.count = 1;
+  current_mount.programs[0] = mount.current;
+  const auto current = r6_oracle(current_mount).cases[0].semantic;
+  result.current_predecessor = current.predecessor;
+  result.current_successor = current.successor;
+  result.current_returned = true;
+  auto& output = result.receiver;
+  output.program_identity = mount.receiver.identity;
+  output.swing.original = {exact::word{18}, exact::word{14}};
+  output.swing.transformed = {exact::word{72}, exact::word{56}};
+  output.swing.path = exact::word{7'011};
+  output.swing.projectively_equal = true;
+  output.swing.frame_changed = true;
+  output.swing.degenerate_open = true;
+  output.swing.non_field_open = true;
+  output.sameness.marked_diagram_isomorphic = true;
+  output.sameness.doctrinal_equivalent = true;
+  output.sameness.receiver_face_equal = true;
+  output.sameness.presentation_equal = true;
+  output.sameness.byte_equal = true;
+  output.sameness.digest_equal = true;
+  output.sameness.equal_face_distinct_occurrence = true;
+  output.sameness.equal_bytes_distinct_soul = true;
+  output.sameness.digest_collision_retained = true;
+  output.sameness.byte_implies_digest = true;
+  output.projection.faces[0] = exact::word{61};
+  output.projection.faces[1] = exact::word{124};
+  output.projection.preimage_supports[0] = exact::word{3};
+  output.projection.preimage_supports[1] = exact::word{6};
+  output.projection.preimage_occurrences[0][0] = exact::word{701};
+  output.projection.preimage_occurrences[0][1] = exact::word{702};
+  output.projection.preimage_occurrences[1][0] = exact::word{702};
+  output.projection.preimage_occurrences[1][1] = exact::word{703};
+  output.projection.source_incidence_before = exact::word{77};
+  output.projection.source_incidence_after = exact::word{77};
+  output.projection.lineage = exact::word{7'021};
+  output.projection.preimage_counts[0] = 2;
+  output.projection.preimage_counts[1] = 2;
+  output.projection.unresolved_preimage = true;
+  output.projection.counterexample_receivers_differ = true;
+  output.connection.start_endpoint = exact::word{99};
+  output.connection.end_endpoint = exact::word{99};
+  output.connection.initial_fiber = exact::word{11};
+  output.connection.transported_fiber = exact::word{13};
+  output.connection.finite_holonomy = {exact::word{2}, false};
+  output.connection.local_curvature = {exact::word{2}, false};
+  output.connection.lineage = exact::word{7'031};
+  output.connection.endpoint_equal = true;
+  output.connection.curvature_certified = true;
+  output.connection.global_triviality_open = true;
+  output.hypergeometric.parameters[0] = exact::word{1};
+  output.hypergeometric.parameters[1] = exact::word{1};
+  output.hypergeometric.parameters[2] = exact::word{2};
+  output.hypergeometric.singular_locus[0] = exact::word{0};
+  output.hypergeometric.singular_locus[1] = exact::word{1};
+  output.hypergeometric.singular_locus[2] = exact::word{~std::uint64_t{0}};
+  output.hypergeometric.coefficients[0] = {exact::word{1}, exact::word{1}};
+  output.hypergeometric.coefficients[1] = {exact::word{1}, exact::word{2}};
+  output.hypergeometric.coefficients[2] = {exact::word{4}, exact::word{12}};
+  output.hypergeometric.coefficients[3] = {exact::word{36}, exact::word{144}};
+  output.hypergeometric.branch = exact::word{3};
+  output.hypergeometric.path = exact::word{7'041};
+  output.hypergeometric.lineage = exact::word{7'042};
+  output.hypergeometric.monodromy[0] = exact::word{1};
+  output.hypergeometric.monodromy[1] = exact::word{1};
+  output.hypergeometric.monodromy[3] = exact::word{1};
+  output.hypergeometric.family = receiver::solution_family::gauss;
+  output.hypergeometric.term_count = 4;
+  output.hypergeometric.recurrence_exact = true;
+  output.hypergeometric.singular_locus_retained = true;
+  output.hypergeometric.branch_retained = true;
+  output.hypergeometric.confluent_distinct = true;
+  output.hypergeometric.generalized_distinct = true;
+  output.carrier.carriers[0] = exact::word{801};
+  output.carrier.carriers[1] = exact::word{802};
+  output.carrier.carriers[2] = exact::word{803};
+  output.carrier.contacts[0] = exact::word{811};
+  output.carrier.contacts[1] = exact::word{812};
+  output.carrier.knot_embedding = exact::word{821};
+  output.carrier.received_diagram = exact::word{822};
+  output.carrier.braid_presentation = exact::word{823};
+  output.carrier.higher_face = exact::word{824};
+  output.carrier.line_boundary_count = 2;
+  output.carrier.sheet_boundary_squared_zero = true;
+  output.carrier.higher_boundary_squared_zero = true;
+  output.carrier.contacts_typed = true;
+  output.carrier.presentations_distinct = true;
+  output.carrier.braid_interchange_certified = true;
+  auto& info = output.information;
+  info.interval_magnitude = exact::word{16};
+  info.interval_denominator = exact::word{1};
+  info.metric[0] = {exact::word{1}, exact::word{1}};
+  info.metric[1] = {exact::word{1}, exact::word{1}};
+  info.receiver_clocks[0] = {exact::word{2}, exact::word{3}};
+  info.receiver_clocks[1] = {exact::word{3}, exact::word{4}};
+  info.current_before = exact::word{2'015};
+  info.current_after = exact::word{2'020};
+  info.carried_phase = exact::word{13};
+  info.returned_stress = exact::word{55};
+  info.first_support = info.second_support = exact::word{1};
+  info.standing_head = exact::word{6'001'007};
+  info.missing_relativistic_obligations = exact::word{15};
+  info.causal_accessible = true;
+  info.metric_declared = true;
+  info.receiver_clocks_distinct = true;
+  info.connection_declared = true;
+  info.repeated_support = true;
+  info.accelerometer_domain_relative = true;
+  info.cycle_domain_relative = true;
+  output.all_deeds_returned = true;
+  return result;
+}
+
+}  // namespace holonics::tests

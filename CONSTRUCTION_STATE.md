@@ -54,11 +54,22 @@ body and remains explicitly open in the other, with zero unchanged retry and log
 separate from physical telemetry. Its receipt is
 [`receipts/R6_MANY_CURRENT_WEAVE_RECEIPT.md`](receipts/R6_MANY_CURRENT_WEAVE_RECEIPT.md).
 
-No R7 projective, sameness, projection, connection, hypergeometric, extended-carrier, or
-information-relativistic grading deed exists yet.
+R7 has returned all seven mounted core receiver-geometry deeds on the resident card: exact
+projective swing with degenerate/non-field alternatives; eight-way sameness distinctions;
+projection with retained source preimages and zero created incidence; path-retaining connection,
+finite holonomy, certified local curvature, and open global geometry; exact symbolic Gauss-fiber
+continuation; oriented line/sheet/higher-cell boundaries with distinct knot/diagram/braid faces;
+and a rational local metric/connection receipt distinguishing causal access, local clocks,
+transported current, stress, repeated support, complete state, domain-relative comparisons, and
+the missing obligations for General-Relativistic fidelity. Its receipt is
+[`receipts/R7_CORE_RECEIVER_GEOMETRY_RECEIPT.md`](receipts/R7_CORE_RECEIVER_GEOMETRY_RECEIPT.md).
 
-**Next deed (`project-postulate`):** R7 — compose `receiver + exact + current` as mounted grading
-organs and return all seven bounded core receiver-geometry deeds named in
+No versioned future receiver family, source reconstruction capability, stateful boundary
+bisimulation, factorized response, or refinement deed exists yet.
+
+**Next deed (`project-postulate`):** R8 — compose `receiver + body + event` and return a broad
+interior conducting through a smaller exact boundary body under a history-based stateful
+condensation certificate, as named in
 [`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md).
 
 **Terminal deed preserved (`project-postulate`):** R16 — two real conversational theorem/proof productions through the
