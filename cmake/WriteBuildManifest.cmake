@@ -35,6 +35,8 @@ set(authority_files
     blueprint/PURE_HOLONIC_ENGINE.md
     blueprint/CPP_GPU_FOUNDATION.md
     blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md
+    formal/elementary-holonics/ElementaryHolonics/Algorithm/Transition.lean
+    formal/elementary-holonics/ElementaryHolonics/Algorithm/Rebase.lean
     provenance/HARDWARE_RECEIPT.txt
     CMakeLists.txt)
 file(GLOB_RECURSE implementation_files

@@ -53,14 +53,21 @@
   rest/remount with zero lookup or corpus retention, and returns to `8` under separately founded
   exact excluding-fiber ablation. See
   [`receipts/R10_CONDITIONING_NATIVE_MORPHOLOGY_RECEIPT.md`](receipts/R10_CONDITIONING_NATIVE_MORPHOLOGY_RECEIPT.md).
+- R11 mounted the real Transition/Rebase formal sources as a source-detachable mathematical
+  ecology of exact term, declaration, type, and dependency incidence. The GPU reconstructs the
+  held-out `semantics_rebase_iff` neighborhood identically across relocation, reversed/chunked
+  source charts, and reordered declaration storage, using direct local incidence with zero global
+  declaration scans. Unknown closure remains open and mismatch/unsolved returns remain explicit.
+  See
+  [`receipts/R11_MATHEMATICAL_OCCURRENCE_ECOLOGY_RECEIPT.md`](receipts/R11_MATHEMATICAL_OCCURRENCE_ECOLOGY_RECEIPT.md).
 
-No exact mathematical occurrence ecology, dependent declaration incidence, open goal fibers,
-local constraint intersection, proof-term closed section, or source-detached declaration-neighborhood
-reconstruction exists yet.
+No question-conditioned generative mathematical current, newly formed proof/declaration,
+source-provenance exclusion for generated answers, dual formal/conversational rendering, or
+causal-information receipt exists yet.
 
-**Next deed (`project-postulate`):** R11 — mount the inherited mathematical organs and return a
-source-detachable exact ecology in which held-out declaration/goal neighborhoods reconstruct from
-local incidence without a global declaration scan, as named in
+**Next deed (`project-postulate`):** R12 — compose mathematical organs, conditioning, current, and
+receiver to return an actual new statement/proof object with formal-source and conversational
+faces, absent from mounted answers and generated before exterior checking, as named in
 [`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md).
 
 **Terminal deed preserved (`project-postulate`):** R16 — return two real conversational
