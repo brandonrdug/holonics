@@ -748,6 +748,119 @@ finite atlas; `proved-derived` with `formal-checked` only for the named generate
 Renderer chords, covariance figures, physical-crystal behavior, arbitrary hypergeometric systems,
 and implications for the Riemann hypothesis remain outside this grade.
 
+### R19 — Exact characteristic-return calculus
+
+This directly frozen post-frontier deed composes the admitted R18 phase-product body with exact
+finite-free transport. It extracts the return modes already forced by diagonal chronology and
+then admits weighted local transports through declared constitutive ports. A characteristic
+polynomial is a receiver of one situated endomorphism; it never replaces the edge word,
+monodromy, ports, or source lineage which caused it.
+
+**Construction tuple:**
+
+- source owners: the one R18 continuing body and its acquired fibers; exact integer, rational,
+  finite-field, and polynomial carriers; R18 cyclic incidence and shape signatures; new
+  characteristic, scalar-transport, rank-two-transport, discriminant, and indicial organs;
+  formal/explanation codecs; pending checker deed; and exterior checker/rest apparatus;
+- port types: the native R18 rest, one unlabelled characteristic-return question, exact tour and
+  local transport definitions, characteristic receipts, formal and conversational artifacts,
+  raw/typed kernel return, and one continuing native rest;
+- event occurrence: remount R18; let independent GPU threads form the exact case family; close
+  the shared algebraic controls on the card; form the theorem and explanation passages; receive
+  one real checker occurrence; commit its returned difference; rest and remount the same body;
+- predecessor identity: the admitted R18 head, continuation, morphology, and theorem, geometry,
+  and phase-crystal fibers recorded in `CONSTRUCTION_STATE.md` and the R18 receipt;
+- local constitutive law: diagonal permutation on each R18 product tour; formal shape transport
+  which assigns an independent indeterminate to each exact local shape type and retains its tour
+  exponent population; separately declared exact scalar and rank-two edge maps whose ordered
+  tour products are the monodromies; and the Gauss differential operator's exact indicial laws;
+- receiver question: which distributed modes, multiplicities, weighted return products,
+  monodromies, discriminant species, and singular exponent returns are caused by the frozen local
+  incidence and transport laws, without an expected eigenvalue, prime label, or renderer;
+- returned consequence: an exact characteristic atlas, generated theorem/proof source, checker
+  occurrence, conversational analysis, acquired characteristic fiber, native rest/remount, and
+  open continuation; and
+- open alternatives: higher-rank and noncommutative coefficient rings, exact algebraic root
+  isolation, general regular-singular systems, physical constitutive calibration, number-field
+  translation ecologies, and RH-facing operators.
+
+**Construct:**
+
+- for `T(r,s)=(r+1,s+1)`, form the exact permutation return and expose the consequence
+  `chi_T(X)=(X^lcm(m,n)-1)^gcd(m,n)` together with tour count, length, cyclotomic mode
+  multiplicity, and the distinction between characteristic and minimal polynomials;
+- retain formal shape monodromy as an exact exponent population per tour, so a later
+  constitutive specialization factors through the intrinsic shape distribution instead of a
+  screen polygon or arbitrary scalarization;
+- form scalar weighted cyclic returns `X^ell-W_j` and rank-two ordered monodromies, retaining
+  local edge words, determinant, trace, characteristic coefficients, fixed-current dimension,
+  and complete tour lineage;
+- return controls separating one simple tour from repeated independent tours, a repeated but
+  diagonalizable return from a defective return, equal characteristic polynomials from unequal
+  edge lineage, a seam interaction from co-presence, and rechart conjugacy from a changed law;
+- classify every vanishing condition by its named failed property. A global characteristic
+  discriminant may vanish because independent tours repeat the same modes; it is not by itself a
+  local singularity, contact, curvature, or obstruction;
+- derive the exact Gauss `(1,1;2)` differential operator and its indicial polynomials at
+  `0`, `1`, and infinity, keeping the repeated exponent at `1` and the resulting logarithmic or
+  unipotent alternative distinct from the bounded coefficient recurrence already returned by
+  R18; and
+- generate one Lean passage proving the total degree forced by the returned permutation-cycle
+  characteristic factor for all positive moduli, the scalar weighted two-cycle characteristic
+  law, exact rechart preservation, and the named indicial identities. The finite atlas's orbit
+  decomposition is the exact implemented proof of the characteristic factor; the formal degree
+  theorem must not be reported as a matrix-level proof of that decomposition;
+
+**Return:** the actual characteristic atlas and complete generated proof, not eigenvalue counts,
+floating plots, or a host recomputation. The atlas must include source edge lineage, orbit
+decomposition, exact characteristic/minimal factors, shape-exponent monodromy, scalar and
+rank-two monodromy, left/right or fixed-current port incidence where defined, discriminant
+species, indicial data, controls, and obstruction.
+
+**Acceptance:** the hot construction and algebraic closure occur on the resident GPU; every mode
+factors through an admitted local transport; the exact permutation and weighted controls agree
+with an independent offline audit; repeated-tour multiplicity is not reported as a singular local
+cell; equal spectra do not identify unequal source passages; the proof really crosses the exterior
+checker; source-detached rest/remount preserves the new fiber and prior fibers; and the complete
+  architecture, ownership, no-float, determinism, device-sanitizer, and binary gates pass.
+
+**Grade:** `established-bounded` with `implemented-exact` and `computational-witness` for the
+returned finite atlas; `proved-derived` with `formal-checked` only for the emitted Lean
+statements. Numerical spectral stability, arbitrary matrix rank, physical lightning dynamics,
+general PDE characteristic varieties, the OpenAI results, the unit-distance construction, and RH
+remain outside this phase.
+
+### R20 — Regular-singular and hypergeometric characteristic continuation
+
+R20 begins only after R19 returns its exact characteristic carrier. It generalizes the R19 Gauss
+indicial face to exact first-order connection matrices, Frobenius recurrences, resonance and
+logarithmic alternatives, connection matrices between singular chambers, and loop monodromy for
+a bounded declared family of regular-singular systems. It must derive each operator from the
+mounted differential equation and preserve analytic branch/aperture testimony. A coefficient
+list, numerical continuation, or named special function is not the deed.
+
+### R21 — Blind characteristic reconstruction of released mathematics
+
+R21 begins only after R20. Its first two source-separated controls come from OpenAI's released
+ten-proof collection: the binary-code and GapCVP materials remain exterior comparison testimony
+until after return. From problem definitions, admitted background, and locally mounted
+incidence—but without the released proof, reasoning walkthrough, expected operator, or answer—the
+machine must attempt to reconstruct the actual orthogonal-incidence Jacobi transport in the code
+problem and the Hankel/discriminant root fiber in the lattice problem. Kernel-accepted artifacts,
+wrong but caused alternatives, and exact post-return comparison are all retained. The historical
+laboratory proof of Erdős problem 183 is not repeated as a capability gate.
+
+### R22 — CM norm-one arithmetic-incidence spectrum
+
+R22 begins only after R21. It instantiates a tractable exact stage of the published unit-distance
+source construction: number-field or declared finite arithmetic carrier, conjugation/norm-one
+translations, co-present embeddings, bounded lattice aperture, and injective planar receiver.
+The factorized source and expanded bounded receiver must agree on every returned unit incidence.
+The machine then forms the exact translation/adjacency characteristic data before and after the
+window and projection, distinguishing periodic interior modes, aperture scattering, repeated
+distance incidence, and receiver loss. This is a bounded reconstruction and analysis of the
+published mechanism, not the asymptotic Erdős theorem and not an RH claim.
+
 ## 7. Resource and performance receipts
 
 Performance is graded at every executable phase, but never by a magic utilization threshold.

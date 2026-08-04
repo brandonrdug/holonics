@@ -90,7 +90,7 @@ set(R3_DECLARED_COMMANDS
 
 set(R3_DEED_ARTIFACT "${PROJECT_BINARY_DIR}/receipts/R3_SOURCE_TOPOLOGY_DEED.txt")
 set(R3_SOURCE_PATHS
-    "${PROJECT_SOURCE_DIR}/CONSTRUCTION_STATE.md"
+    "${PROJECT_SOURCE_DIR}/tests/fixtures/R3_CONSTRUCTION_STATE.md"
     "${PROJECT_SOURCE_DIR}/papers/source/synopsis/README.md"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/ElementaryHolonics/Foundation/Receiver.lean")
 add_test(

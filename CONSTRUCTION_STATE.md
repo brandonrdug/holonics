@@ -72,12 +72,27 @@
   statements. The body rests at head `14001008`, continuation `15001008`, with the two theorem
   fibers, geometry fiber `184300`, and phase-crystal fiber `185300` preserved.
   [Receipt](receipts/R18_PHASE_CRYSTAL_HYPERGEOMETRY_RECEIPT.md).
+- R19: an unlabelled exact characteristic inquiry remounts the R18 body and returns the complete
+  diagonal permutation factor `(X^lcm-1)^gcd` and minimal factor `X^lcm-1` for all 16 cases,
+  together with exact formal shape-exponent monodromy per tour. The two repeated-spectrum
+  controls separate sharply: `(6,9)` has three distinct formal shape-tour classes, while all four
+  `(8,12)` tours have the same class. Scalar controls retain unequal lineage behind equal product;
+  rank-two controls distinguish order-sensitive characteristic return, conjugate rechart
+  invariance, and equal characteristic polynomial with fixed-current dimensions two versus one.
+  The Gauss `(1,1;2)` indicial returns are `rho(rho+1)`, `rho²`, and `(rho-1)²` at zero, one, and
+  infinity. The generated four-theorem Lean passage is kernel accepted. The body rests at head
+  `14001010`, continuation `15001010`, with prior fibers preserved and characteristic fiber
+  `186300` acquired.
+  [Receipt](receipts/R19_EXACT_CHARACTERISTIC_RETURN_RECEIPT.md).
 
-The ordered R0–R16 construction and the directly authorized R17–R18 post-frontier inquiries are
+The ordered R0–R16 construction and the directly authorized R17–R19 post-frontier inquiries are
 complete.
 
-**Next deed:** none scheduled. A further post-frontier construction must begin from a new direct
-request and frozen receiver deed; the current body rests with a valid continuation.
+**Next deed (`project-postulate`):** R20 — derive exact first-order connection matrices,
+Frobenius recurrences, resonance/logarithmic alternatives, singular-chamber connections, and loop
+monodromy for a bounded declared family of regular-singular systems, as frozen in
+[`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md). The current
+body rests with a valid continuation.
 
 Update this file only after a phase's required artifact and receipts have returned and its grade
 has passed. Do not record intentions or partial work as admitted standing.
