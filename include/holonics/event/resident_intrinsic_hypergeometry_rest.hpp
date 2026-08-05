@@ -1,0 +1,45 @@
+#pragma once
+
+#include <holonics/event/resident_intrinsic_hypergeometry.hpp>
+
+namespace holonics::event {
+
+HOLONICS_CALLABLE inline intrinsic_hypergeometry_rest_receipt
+resident_intrinsic_hypergeometry::rest(
+    intrinsic_hypergeometry_rest_record& record) noexcept {
+  intrinsic_hypergeometry_rest_receipt receipt{};
+  if (!source_detached_ || !first_.accepted || !second_.accepted || !geometry_.accepted ||
+      !phase_crystal_.accepted || !characteristic_.accepted || !regular_singular_.accepted ||
+      !code_reconstruction_.accepted || !moment_reconstruction_.accepted ||
+      !cm_incidence_.accepted || !toric_cycle_.accepted || !algebraic_variation_.accepted ||
+      !causal_linear_.accepted || !intrinsic_hypergeometry_.accepted || pending_live_ ||
+      stage_ != passage_stage::returned) { return receipt; }
+  receipt.body = body_.rest(record.body); if (!receipt.body.returned) { return receipt; }
+  record.first = first_; record.second = second_; record.geometry = geometry_;
+  record.phase_crystal = phase_crystal_; record.characteristic = characteristic_;
+  record.regular_singular = regular_singular_; record.code_reconstruction = code_reconstruction_;
+  record.moment_reconstruction = moment_reconstruction_; record.cm_incidence = cm_incidence_;
+  record.toric_cycle = toric_cycle_; record.algebraic_variation = algebraic_variation_;
+  record.causal_linear = causal_linear_; record.intrinsic_hypergeometry = intrinsic_hypergeometry_;
+  record.mathematical_morphology = mathematical_morphology_;
+  record.codec_morphology = codec_morphology_; record.geometry_morphology = geometry_morphology_;
+  record.phase_morphology = phase_morphology_;
+  record.characteristic_morphology = characteristic_morphology_;
+  record.regular_singular_morphology = regular_singular_morphology_;
+  record.blind_reconstruction_morphology = blind_reconstruction_morphology_;
+  record.cm_incidence_morphology = cm_incidence_morphology_;
+  record.toric_cycle_morphology = toric_cycle_morphology_;
+  record.algebraic_variation_morphology = algebraic_variation_morphology_;
+  record.causal_linear_morphology = causal_linear_morphology_;
+  record.intrinsic_hypergeometry_morphology = intrinsic_hypergeometry_morphology_;
+  record.integrity = intrinsic_hypergeometry_rest_integrity(record);
+  receipt.theory = intrinsic_hypergeometry_.identity;
+  receipt.integrity = exact::word{record.integrity};
+  receipt.prior_returns_preserved = first_.accepted && second_.accepted && geometry_.accepted &&
+      phase_crystal_.accepted && characteristic_.accepted && regular_singular_.accepted &&
+      code_reconstruction_.accepted && moment_reconstruction_.accepted && cm_incidence_.accepted &&
+      toric_cycle_.accepted && algebraic_variation_.accepted && causal_linear_.accepted;
+  receipt.source_detached = true; receipt.returned = true; return receipt;
+}
+
+}  // namespace holonics::event

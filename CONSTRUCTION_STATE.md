@@ -152,20 +152,31 @@
   kernel accepted, and the same body rests at head `14001024`, continuation `15001024`, with every
   prior fiber preserved and causal-linear fiber `192300` acquired.
   [Receipt](receipts/R25_EXACT_CAUSAL_LINEAR_CHAIN_CALCULUS_RECEIPT.md).
+- R26: ten phase presentations derive their complete product-cell incidence, flags, stars, links,
+  CRT tours, ordered seam distributions, projection fibers, and modular transported sections on
+  resident GPU currents. The mounted recurrence returns twenty exact terms; simultaneous seams
+  retain two unequal resolutions with commutator `[[13,8],[8,5]]`. All forty rebuilt CM squares
+  meet a filled phase face through the common `X^4-1` oriented-cycle port while retaining unequal
+  support, so the loop is supported on the CM graph and obstructed across the phase two-cell. Four
+  controls separate receiver hull, normalized local population, cycle spectrum, and rechart from
+  source geometry and ordered conduct. The `(5,8)` probe rebuilds changed incidence and transport
+  without replay. A coefficient-rendered Lean theorem is kernel accepted, and the same body rests
+  at head `14001026`, continuation `15001026`, with every prior fiber preserved and intrinsic-
+  hypergeometry fiber `193300` acquired.
+  [Receipt](receipts/R26_INTRINSIC_CAUSAL_HYPERGEOMETRY_RECEIPT.md).
 
-The ordered R0–R16 construction and the directly authorized R17–R25 post-frontier inquiries are
+The ordered R0–R16 construction and the directly authorized R17–R26 post-frontier inquiries are
 complete.
 
-**Next deed (`open`): no R26 construction is frozen.** The live body now rests at head `14001024`
-and continuation `15001024`. R25 has established one exact carrier through which phase cells, CM
-incidence, toric quotients, algebraic variation, characteristic placement, kernel/cokernel
-placement, transported forms, coefficient fields, and topology changes can be compared without
-collapsing them into a spectral summary or presentation name. R26's program gate is intrinsic
-causal hypergeometry and archetype distribution: derive operative faces, strings, cells, flags,
-links, seams, local systems, and characteristic strata from source incidence before projection,
-then test which packages predict changed transport across phase and non-phase geometries. A next
-phase must freeze its complete construction tuple, exact aperture, actual returned artifact,
-falsification boundary, and intended grades in
+**Next deed (`open`): no R27 construction is frozen.** The live body now rests at head `14001026`
+and continuation `15001026`. R26 has made operative faces, strings, cells, flags, links, seams,
+local systems, characteristic cycle ports, support distinctions, and projection fibers native
+without confusing them with the historical renderings. R27's program gate is exact expression-to-
+geometry and differential transport: algebraic and differential expressions must found the
+relevant incidence, singular strata, reduction, local transport, and characteristic geometry
+instead of arriving after a human has supplied a useful factorization, named hypergeometric
+family, or differential operator. A next phase must freeze its complete construction tuple, exact
+aperture, actual returned artifact, falsification boundary, and intended grades in
 [`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md) before domain
 code changes; Hodge realization, arithmetic Frobenius, Weil positivity, and RH-facing trace
 operators remain later open alternatives.

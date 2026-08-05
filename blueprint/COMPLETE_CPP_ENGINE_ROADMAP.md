@@ -1642,8 +1642,9 @@ finite signature is promoted into a universal shape identity.
 
 ### R25+ mathematical autogenesis program
 
-The phase names below are an ordered `project-postulate`. R25's directly frozen construction has
-passed its bounded grade; R26+ remain program gates rather than construction tuples.
+The phase names below are an ordered `project-postulate`. R25 and R26's directly frozen
+constructions have passed their bounded grades; R27+ remain program gates rather than construction
+tuples.
 Before any later named phase begins, its exact source owners, ports, event, predecessor, local
 law, receiver question, return, alternatives, aperture, falsifiers, artifacts, and grades must
 replace its program gate here. Reserving a phase name does not authorize nearby code or admit its
@@ -1825,40 +1826,133 @@ result and apparatus testimony are retained in
 
 ### R26 — Intrinsic causal hypergeometry and archetype distribution
 
-**Program gate (`open`):** make the operative geometry in the supplied prime images and later
-phase distributions mathematically accessible without treating the observer projection as the
-object. The machine must derive how exact faces, strings, cells, flags, local systems, and
-characteristic strata distribute about one another and which of those relations conduct a later
-current.
+**Frozen construction (`project-postulate`; admission passed):** make the operative geometry in
+the supplied prime images and later phase distributions mathematically accessible without treating
+an observer projection as the object. The deed uses an oriented four-edge cycle as a common typed
+port, not as a universal geometry: a phase product owns such a cycle as the boundary of a filled
+two-cell, a CM Cayley square owns the same boundary cycle without a two-cell, and the algebraic
+variation owns exact rank-two transport which may or may not extend across that support.
 
-The eventual frozen deed must:
+**Construction tuple:**
 
-- rebuild the historical phase-pair cases from their cyclic/Cayley/CRT generating law, without
-  importing hull corners, residue partitions, colors, side counts, or expected prime labels;
-- carry intrinsic product cells, higher-dimensional face posets, stars, links, flags, oriented
-  boundaries, shared seams, ordered chronology, local transition words, and complete projection
-  fibers before forming any two-dimensional receiver;
-- compose those phase sources with at least two non-phase geometries already resident in the
-  body, such as CM norm incidence, toric modification, and algebraic variation, through the R25
-  characteristic carrier rather than through a domain-name bridge;
-- derive receiver-relative archetype packages containing the exact invariants which predict a
-  declared continuation and the residual data which they do not predict;
-- return exact distributions of neighboring archetypes, face intersections, crossings,
-  transition words, braid/loop classes, singular strata, and chart-rebase conduct;
-- carry power-series, recurrence, or local differential sections on those paths so side length,
-  dimension, orientation, and seam structure can change what expansion remains lawful; and
-- generate theorems separating source geometry, intrinsic characteristic package, projection,
-  and later conduct.
+- source owners: the one R25 continuing body with its twelve accepted fibers; one R26 pair/chart/
+  receiver card; the lineaged R22 CM and R24 algebraic-variation cards; the existing cyclic Cayley,
+  CM-incidence, variation, and R25 exact matrix/characteristic organs; and new intrinsic face-poset,
+  flag, seam-word, projection-fiber, supported-cycle, local-section, archetype, control,
+  theorem-current, proof-face, checker-return, and native-rest owners;
+- port types: the admitted 816-byte R25 native rest; raw/typed cards; exact factor-chart,
+  vertex/edge/face/flag, star/link, oriented-boundary, shared-seam, chronology, transition-word,
+  projection-fiber, square-cycle, support, characteristic, singular-stratum, recurrence,
+  local-system, braid/loop, chart-rebase, archetype/control, theorem/proof/explanation, raw/typed
+  checker-return, changed-card, and continuing native-rest faces;
+- event occurrence: remount R25; mount the R26, CM, and variation cards; rebuild ten phase cases on
+  ten independent resident currents; after their complete barrier, rebuild the CM Cayley graph and
+  its complete induced square population on one current and the variation recurrence, form, and
+  loop transports on another; use the R25 carrier to form the common cycle characteristic and
+  supported controls; aggregate only complete returns into a transition atlas; form and check one
+  coefficient-rendered theorem passage; commit the checker return; rest/remount the same body; and
+  change only the `(5,7)` source case to `(5,8)` without creating another body;
+- predecessor identity: admitted R25 head `14001024`, continuation `15001024`, body morphology
+  `472`, mathematical morphology `146`, codec morphology `76`, causal-linear morphology `29`, and
+  twelve fibers through `192300` recorded in `CONSTRUCTION_STATE.md` and the R25 receipt;
+- local constitutive law: exact cyclic products and CRT diagonal succession; R18's rational Cayley
+  factor charts reconstructed from residues; complete graded product incidence with cellular
+  boundary, stars, links, and flags; exact seam-symbol and consecutive-symbol distributions;
+  receiver-fiber equality over rational coordinates; exact modular rank-two section transport in
+  the declared finite coefficient ring; R24's returned scalar recurrence and two noncommuting
+  form-preserving loop transports; CM Cayley-square enumeration from generated incidence; and
+  R25 characteristic calculation on the common oriented cycle;
+- receiver question: which intrinsic face/flag/seam and ordered-transition packages predict the
+  declared section continuation, which source distinctions remain in their residual fibers, which
+  phase and CM cycles have a compatible boundary port, and when does the variation transport
+  extend across, remain supported on, or obstruct that geometry?;
+- returned consequence: one complete intrinsic phase atlas and transition distribution; a CM/
+  variation supported-cycle atlas; predictive archetype packages with residuals; all four
+  separating controls; a changed-source return; one generated theorem/proof and conversational
+  explanation; acquired fiber `193300`; and a source-detached native continuation; and
+- open alternatives: arbitrary products and dimensions; learned rather than declared receiver
+  families; cyclotomic/algebraic-number completion of the Cayley chart; unbounded sparse face
+  posets; analytic convergence and certified continuation outside a local power-series aperture;
+  autonomous interaction/filler induction; expression-founded geometry; Hodge realization;
+  arithmetic Frobenius; and RH-facing trace carriers.
 
-The decisive controls are not “does the picture change?” They include equal projected hull with
-unequal intrinsic transport, equal local face populations with unequal ordered continuation,
-equal spectrum with unequal supported geometry, and different presentations which return one
-conjugate intrinsic passage. A convex hull, covariance ellipse, PCA axis, renderer mesh, or global
-graph embedding is only an exterior receiver.
+**Exact aperture:** the card contains no hull corners, residue partitions, colors, side counts,
+prime labels, characteristic coefficients, transition populations, theorem statements, or proof
+text. It supplies only ten situated presentations
+`(2,3),(3,5),(5,7),(7,11),(11,13),(13,17),(17,19),(6,9),(8,12),(7,5)`,
+with the last presentation declaring the exact axis/basis rechart; the historical rational
+receiver weights `1:1/3`; a seam-status plane receiver; local-series depth at most 20; and the
+finite section ring `Z/65521Z`. A phase case has at most 323 vertices, 646 oriented edges, 323
+faces, and 2,584 complete flags. Every vertex retains both rational factor coordinates, exact
+projection-fiber membership, local star/link, diagonal successor, tour position, seam symbol, and
+transported section. Every edge and face retains its full incidence, orientation, lineage, and
+shared support. The deed returns all forty induced CM squares. These bounds are compile-time
+apertures, not retry parameters.
 
-The new consequence is a characteristic archetype calculus and transition atlas, not another
-prime polygon. This is where the machine first begins to answer which shapes act like compatible
-teeth, which contacts obstruct, and which reconfigurations preserve a carried section.
+**Construct and return:**
+
+- derive the complete graded product face poset for every mounted phase pair, verify each face's
+  oriented boundary closes, every edge has exactly two incident faces, every vertex star has four
+  edges and four faces with a four-cycle link, and the eight vertex-edge flags of every face retain
+  their occurrence lineage;
+- partition CRT chronology into `gcd(m,n)` tours of length `lcm(m,n)`, classify each diagonal step
+  by no seam, first seam, second seam, or simultaneous seam, and return the complete symbol word,
+  `4x4` neighboring-symbol distribution, face-intersection distribution, crossing strata, complete
+  rational projection fibers, and complete seam-status receiver fibers;
+- rebuild the R24 scalar recurrence beyond its old six-step display through the requested local
+  aperture, then carry its two returned monodromies and their inverses along every oriented phase
+  word in `Z/65521Z`; store every local section state and complete tour return. A simultaneous seam
+  retains both ordered resolutions and their exact noncommuting residual rather than inventing an
+  interchange;
+- rebuild the R22 CM incidence from its coefficient card, derive all forty induced commuting
+  Cayley squares and their direction words, and pass the phase-face and CM-square boundary shifts
+  through one R25 characteristic calculation. Their equal `X^4-1` face is compatible at the
+  oriented-cycle port, while the phase cycle is a cellular boundary and the CM graph cycle has no
+  two-cell owner. The nontrivial variation commutator is therefore a supported loop on the latter
+  and an explicit extension obstruction across the former;
+- return receiver-relative archetype packages consisting of dimension, face/support incidence,
+  boundary characteristic, local star/link, seam/transition word, recurrence depth, section
+  return, singular/crossing stratum, projection fiber, and lineage. The package must separately
+  name the continuation it predicts and the support/projection fiber it leaves unresolved;
+- return the four decisive controls: all seam-status projections have the same four-corner hull
+  while `(5,7)` and `(7,11)` have unequal intrinsic words and section returns; their normalized
+  local star/link populations agree while their ordered continuations differ; a phase face and CM
+  square have equal boundary-cycle spectrum but unequal supported geometry; and `(5,7)` with
+  `(7,5)` returns one exact axis/basis-conjugate passage with presentation lineage retained; and
+- generate a Lean passage from returned coefficients and counts proving the product Euler and
+  flag identities for the returned cases, the seam-population partition, transition row-sum
+  identities, the common cycle characteristic, the unequal support control, the nonzero loop
+  commutator, and the exact changed-source inequalities. It must not invoke an imported theorem
+  which already states the returned conjunction.
+
+**Changed-card probe:** replace only case two's second modulus `7` by `8`. The device must derive
+the complete `(5,8)` face poset, four seam-status fibers, one diagonal tour of length 40, a changed
+transition distribution and section return, and the appropriate recurrence depth without
+replaying `(5,7)`, changing the compiled aperture, or mutating/duplicating the continuing body.
+
+**Acceptance:** all ten phase cases, the CM square population, variation section, common
+characteristic, controls, and changed case are derived on resident GPU currents and agree with an
+independent exact host audit; source currents aggregate only after complete barriers; the actual
+atlas retains complete bounded incidence and projection fibers rather than hashes alone; all four
+separating controls pass; the generated proof crosses the exterior checker; source-detached
+rest/remount preserves every earlier fiber and the new fiber; and the full architecture,
+ownership, no-float, determinism, device-sanitizer, binary, and file-size gates pass.
+
+**Grade:** `established-bounded` with `implemented-exact` and `computational-witness` only after
+the complete GPU return and all gates pass; `proved-derived` with `formal-checked` only for the
+emitted Lean statements; `proved-standard` for finite product-cell incidence, Cayley-square,
+characteristic-polynomial, modular local-system, and recurrence laws under their stated
+hypotheses; and `historical` for the old rendered atlas and arc-spectral controls. No convex hull,
+covariance ellipse, PCA axis, renderer mesh, global embedding, Hodge class, or RH consequence is
+promoted by this phase.
+
+**Admission return (`established-bounded`, `implemented-exact`, `computational-witness`):** all ten
+phase products, complete intrinsic incidence and projection fibers, ordered seam distributions,
+twenty-term recurrence, transported modular sections, forty CM squares, the common cycle port,
+support obstruction, four separating controls, changed `(5,8)` source, generated Lean theorem,
+checker return, and source-detached continuation returned and passed the full R26 grade. The exact
+result and apparatus testimony are retained in
+[`receipts/R26_INTRINSIC_CAUSAL_HYPERGEOMETRY_RECEIPT.md`](../receipts/R26_INTRINSIC_CAUSAL_HYPERGEOMETRY_RECEIPT.md).
 
 ### R27 — Exact expression-to-geometry and differential transport
 
@@ -2119,9 +2213,9 @@ At every phase boundary:
 
 ## 9. Fresh-session pickup
 
-Extraction/canon/provenance and R0–R25 are complete. R26 intrinsic causal hypergeometry and
-archetype distribution is the next program gate, but no R26 construction tuple is frozen. The live
-admitted head and current gate are named only in `CONSTRUCTION_STATE.md`. A fresh session must
+Extraction/canon/provenance and R0–R26 are complete. R27 exact expression-to-geometry and
+differential transport is the next open program gate, but no R27 construction tuple is frozen. The
+live admitted head and current gate are named only in `CONSTRUCTION_STATE.md`. A fresh session must
 read, in order:
 
 1. `AGENTS.md`;
@@ -2135,5 +2229,5 @@ read, in order:
 
 Do not reread the entire imported research archive, infer a continuation from historical status
 prose, restart R0, or repeat a proof/language/conditioning fixture. Preserve every admitted fiber,
-use the post-R24 convergence audit and the R25 receipt to exclude already-paid expectations, and
-freeze R26 into a complete construction tuple here before changing later domain code.
+use the post-R24 convergence audit and the R25–R26 receipts to exclude already-paid expectations,
+and freeze R27 into a complete construction tuple here before changing later domain code.
