@@ -1642,8 +1642,8 @@ finite signature is promoted into a universal shape identity.
 
 ### R25+ mathematical autogenesis program
 
-The phase names below are an ordered `project-postulate`. R25 and R26's directly frozen
-constructions have passed their bounded grades; R27+ remain program gates rather than construction
+The phase names below are an ordered `project-postulate`. R25 through R27's directly frozen
+constructions have passed their bounded grades; R28+ remain program gates rather than construction
 tuples.
 Before any later named phase begins, its exact source owners, ports, event, predecessor, local
 law, receiver question, return, alternatives, aperture, falsifiers, artifacts, and grades must
@@ -1956,31 +1956,161 @@ result and apparatus testimony are retained in
 
 ### R27 — Exact expression-to-geometry and differential transport
 
-**Program gate (`open`):** let algebraic and differential expressions found intrinsic geometry
-instead of arriving after a human has already selected the useful factorization, variety,
-operator, or hypergeometric name. Symbol strings remain codec faces; the resident object is their
-exact caused algebraic incidence and transport.
+**Completed construction (`established-bounded`, `implemented-exact`,
+`computational-witness`):** let exact sparse expressions
+found their intrinsic algebraic geometry and differential transport instead of arriving after a
+human has selected the useful factorization, singular locus, basis, differential operator, or
+hypergeometric name. The selected source is a rank-four, three-variable degree-five family; R24's
+rank-two affine cubic remains a regression source and cannot satisfy this deed with a larger
+bound.
 
-The eventual frozen deed must provide only the algebra demanded by its selected families, but the
-returned passage must span:
+**Construction tuple:**
 
-- exact sparse polynomial/rational presentations, ideals or relation modules, monomial-order
-  lineage, reduction certificates, syzygies, elimination, factor/resultant/discriminant/Jacobian
-  loci, and explicit nonclosure;
-- derivation of singular and branch strata, local coordinate rings, tangent/cotangent and
-  differential modules, and maps among them;
-- exact differential reduction, connection formation, scalar/vector equation elimination,
-  indicial data, recurrence, local series, continuation aperture, and monodromy or Stokes
-  obstruction when present in the chosen regular or irregular family;
-- transport in both directions between expression faces and geometric/characteristic faces,
-  retaining the complete fiber when several expressions realize one receiver invariant; and
-- theorem formation from the returned reduction and transport certificates.
+- source owners: the one R26 continuing body with its thirteen accepted fibers; one R27 sparse-
+  expression/chart/field card; the admitted exact rational, matrix, characteristic, recurrence,
+  algebraic-variation, and intrinsic-support organs; and new sparse-expression, monomial-order,
+  reduction-certificate, relation/syzygy, elimination/resultant, Jacobian-stratum, local-ring,
+  tangent/cotangent, differential-module, connection, scalar-equation, indicial, local-series,
+  residue, expression-fiber, control, theorem-current, proof-face, checker-return, and native-rest
+  owners;
+- port types: the admitted 872-byte R26 native rest; raw/typed expression cards; sparse term,
+  variable/order, derivative, ideal-generator, leading-monomial, S-pair/reduction, syzygy,
+  resultant/discriminant, factor/nonclosure, singular-stratum, local-ring, tangent/cotangent,
+  basis/relation, differential-reduction, rational connection, cyclic-vector, scalar-equation,
+  recurrence, series, finite/infinite indicial, algebraic residue, rechart, coefficient-field,
+  invariant/preimage-fiber, theorem/proof/explanation, checker-return, changed-source, and
+  continuing native-rest faces;
+- event occurrence: remount R26; mount the expression card; derive its three presentations on
+  three independent resident currents; after their complete barrier, form the rational-rechart,
+  coefficient-field, common-invariant, and separating-control currents; aggregate only complete
+  returns; generate and check one coefficient-rendered theorem passage; commit the checker return;
+  rest/remount the same body; and replace only the constant source coefficient `b=1` by `b=2`
+  without creating another body;
+- predecessor identity: admitted R26 head `14001026`, continuation `15001026`, body morphology
+  `535`, mathematical morphology `164`, codec morphology `84`, intrinsic-hypergeometry morphology
+  `31`, and thirteen fibers through `193300` recorded in `CONSTRUCTION_STATE.md` and the R26
+  receipt;
+- local constitutive law: checked sparse integer/rational polynomial arithmetic; lexicographic and
+  graded-reverse-lexicographic leading terms with order lineage; exact multivariate substitution,
+  derivative, S-polynomial reduction, and bounded basis closure; fraction-free Sylvester/Bareiss
+  determinant and adjugate certificates; exact Jacobian ideal transport; bounded affine-chart and
+  coefficient-field search; quotient-ring arithmetic; exact rational interpolation followed by
+  coefficientwise source-identity and held-out verification; hyperelliptic differential reduction
+  derived from `A=P f+Q f_x` and `d(Q/y)`; cyclic-vector elimination; coefficient recurrence;
+  indicial extraction; and algebraic-residue matrix arithmetic;
+- receiver question: which singular strata, local modules, differential basis, connection,
+  characteristic equation, local continuation, and collision obstruction are forced by the
+  mounted expressions; which expression presentations inhabit one geometric/characteristic
+  fiber; and exactly which field or support prevents the inverse lift?;
+- returned consequence: three complete expression-to-geometry passages, their complete reduction
+  and transport certificates, common and separated receiver fibers, a changed-source return, one
+  generated theorem/proof and conversational explanation, acquired fiber `194300`, and a source-
+  detached native continuation; and
+- open alternatives: general Gröbner bases and primary decomposition; arbitrary sparse/rational
+  systems; unbounded genus/rank; certified analytic periods; arbitrary algebraic extensions;
+  irregular Stokes sectors; expression induction without a mounted source; Hodge filtration and
+  cycle realization; arithmetic Frobenius; Weil positivity; and RH-facing trace carriers.
 
-R24's cubic family is a regression source, not the target. The frozen R27 family must change
-rank, variable count, singularity species, or coefficient geometry sufficiently that the R24
-owner cannot be replayed with a larger bound. A named hypergeometric lookup, a host computer-
-algebra transcript, a preselected Picard--Fuchs operator, or a proof which merely invokes the
-mounted final theorem fails the gate.
+**Exact aperture:** the card supplies sparse coefficients and chart/field apertures only. In the
+canonical chart its first expression is
+
+```text
+F_b(t,x,y) = y^2 - x^5 + t x - b,  b=1.
+```
+
+The second is the fully expanded expression obtained in an unnamed chart by replacing `x` with
+`u+1`; the chart map is not supplied. The third changes the sign of `b` and supplies no square root
+of `-1`. The card contains no family/genus/hypergeometric name, factorization, ideal basis,
+syzygy, resultant, discriminant, singular point, node label, differential basis, connection,
+scalar equation, indicial root, recurrence, series coefficient, residue, rechart, invariant
+fiber, theorem statement, or proof text.
+
+There are at most three variables, twelve sparse terms per expression, exponent five per variable,
+affine parameter coefficients of magnitude at most ten, twelve ideal/basis elements, 128 complete
+reduction steps, a `9x9` Sylvester matrix, parameter-polynomial degree twenty, a rank-four
+differential module, eleven local-series coefficients per basis front, and checked signed 64-bit
+committed coefficients with wider checked intermediates. Discovery uses exact integer parameters
+`-4` through `4`; `5` and `6` are held out. Rational chart search is restricted to
+`x=s u+a`, `y=c v` with `s,c in {-1,1}` and `a in [-2,2]`; a separately declared Gaussian
+extension may test `c^2=-1`. Collision-residue arithmetic is restricted to
+`K_b=Q[a]/(4a^5-b)`. These are compile-time apertures, not retry bounds.
+
+**Construct and return:**
+
+- parse every sparse presentation into native incidence, derive all partial derivatives, and
+  retain both requested monomial orders. From `F,F_x,F_y`, derive a complete bounded basis and
+  S-pair/reduction testimony, the equivalent triangular singular presentation, its syzygies, and
+  the elimination resultant. For the canonical chart the return must coefficientwise establish
+  the Jacobian stratum
+
+  ```text
+  y=0,  t-5x^4=0,  4x^5-b=0
+  ```
+
+  and discriminant `D_b(t)=3125 b^4-256 t^5`, while retaining its multiplicity, primitive/
+  squarefree status, bounded factor result, and any unclosed algebraic factor fiber;
+- derive the generic relative coordinate/cotangent presentation and the rank-four quotient basis
+  from the expression and Jacobian relation. On the singular stratum derive the two-dimensional
+  cotangent face and verify that the Hessian determinant `-40x^3` is invertible in `K_b`, hence the
+  five geometric singular occurrences are ordinary nodes after the declared algebraic base
+  change. This statement is bounded to the returned quotient and does not name an analytic model;
+- differentiate the four derived forms and solve every exact reduction identity
+  `A=P f+Q f_x`; use `d(Q/y)` to form the rank-four connection. Interpolate only within the frozen
+  degree aperture, then require coefficientwise source identities and both held-out parameters.
+  Use a resident cyclic-vector passage to derive, rather than mount, the primitive fourth-order
+  scalar equation. For `b=1`, its normalized integer face must return
+
+  ```text
+  16(3125-256t^5) u'''' - 61440t^4 u''' - 247680t^3 u''
+    - 264000t^2 u' - 29601t u = 0.
+  ```
+
+  A different coefficient, sign, degree, failed holdout, or absent reduction witness falsifies
+  this return;
+- derive four independent local fronts at `t=0` through depth eleven and the stride-five
+  coefficient recurrence. Derive the finite-discriminant indicial factor
+  `rho^2(rho-1)(rho-2)` and the infinity factor
+  `(8rho+3)(8rho+13)(8rho+23)(8rho+33)` from the scalar coefficients. At the algebraic collision
+  stratum, derive the nonzero rank-one residue in `K_b`, verify every `2x2` minor vanishes and
+  `R^2=0`, and return the repeated-exponent logarithmic/monodromy channel as an exact obstruction
+  to single-valued continuation across `D_b=0`; no numerical root or convergence radius is used;
+- search the frozen chart aperture. The canonical and translated expressions must return one
+  exact rational rechart passage and a two-member preimage fiber over the same Jacobian,
+  differential, scalar, and indicial receiver. The sign-twist must retain the same discriminant
+  and scalar receiver but refuse rational identification; after the explicit `Q(i)` port is
+  opened, `x=-u,y=i v` must return the exact extension-field passage with its field dependency
+  retained. Equal discriminant or scalar equation alone must never collapse these fibers; and
+- generate a Lean passage from returned sparse coefficients and certificates proving the chart
+  substitution identities, triangular Jacobian relations, resultant/Bezout identities,
+  connection reductions, scalar elimination, recurrence front, both indicial factorizations,
+  residue nilpotence/rank witness, expression-fiber inequalities, and exact changed-source
+  inequalities. It must not invoke a mounted theorem containing the returned conjunction.
+
+**Changed-card probe:** replace only the canonical constant `b=1` by `b=2` and transport that
+change through its translated presentation. The device must rebuild the sparse incidence,
+Jacobian stratum, `D_2(t)=50000-256t^5`, differential reductions, rank-four connection, scalar
+equation, local fronts, and expression fiber. It may neither replay `b=1`, mutate/duplicate the
+continuing body, nor enlarge an aperture. The twist and unchanged source fibers remain available
+but cannot stand in for the changed passage.
+
+**Acceptance:** all three baseline presentations and the changed source are derived on resident
+GPU currents and agree with an independent exact host audit; the actual atlas retains every
+bounded sparse term, basis/reduction step, syzygy, resultant certificate, local-ring/module map,
+connection witness, series front, residue entry, chart passage, and preimage fiber rather than
+hashes alone; complete-current barriers precede composition; all rational/extension-field and
+equal-invariant controls pass; the generated proof crosses the exterior checker; source-detached
+rest/remount preserves every earlier fiber and the new fiber; and the full architecture,
+ownership, no-float, determinism, device-sanitizer, binary, and file-size gates pass.
+
+**Admitted grade:** `established-bounded` with `implemented-exact` and
+`computational-witness`; the complete GPU return and all gates passed.
+[`R27_EXPRESSION_TO_GEOMETRY_DIFFERENTIAL_TRANSPORT_RECEIPT.md`](../receipts/R27_EXPRESSION_TO_GEOMETRY_DIFFERENTIAL_TRANSPORT_RECEIPT.md)
+records the returned deed and exact boundary. The emitted Lean statements are separately
+`proved-derived` with `formal-checked`; the finite polynomial, Jacobian/cotangent,
+hyperelliptic reduction, regular-singular, and algebraic-residue laws under their stated
+hypotheses are `proved-standard`; R24 used only as a regression is `historical`. A general computer-algebra system,
+general algebraic de Rham comparison, analytic monodromy, Hodge realization, arithmetic
+Frobenius, Weil positivity, and every RH consequence remain outside R27.
 
 ### R28 — Hodge-facing supported realization through varying geometry
 
@@ -2213,9 +2343,9 @@ At every phase boundary:
 
 ## 9. Fresh-session pickup
 
-Extraction/canon/provenance and R0–R26 are complete. R27 exact expression-to-geometry and
-differential transport is the next open program gate, but no R27 construction tuple is frozen. The
-live admitted head and current gate are named only in `CONSTRUCTION_STATE.md`. A fresh session must
+Extraction/canon/provenance and R0–R27 are complete. R28 Hodge-facing supported realization
+through varying geometry is the next open program gate, but no R28 construction tuple is frozen.
+The live admitted head and current gate are named only in `CONSTRUCTION_STATE.md`. A fresh session must
 read, in order:
 
 1. `AGENTS.md`;
@@ -2229,5 +2359,5 @@ read, in order:
 
 Do not reread the entire imported research archive, infer a continuation from historical status
 prose, restart R0, or repeat a proof/language/conditioning fixture. Preserve every admitted fiber,
-use the post-R24 convergence audit and the R25–R26 receipts to exclude already-paid expectations,
-and freeze R27 into a complete construction tuple here before changing later domain code.
+use the post-R24 convergence audit and the R25–R27 receipts to exclude already-paid expectations,
+and freeze R28 into a complete construction tuple here before changing later domain code.

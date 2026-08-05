@@ -164,22 +164,33 @@
   at head `14001026`, continuation `15001026`, with every prior fiber preserved and intrinsic-
   hypergeometry fiber `193300` acquired.
   [Receipt](receipts/R26_INTRINSIC_CAUSAL_HYPERGEOMETRY_RECEIPT.md).
+- R27: three unnamed sparse degree-five presentations and a changed-source pair derive their
+  Jacobian strata, exact discriminants and Bézout certificates, local modules, rank-four
+  differential reductions and connection, fourth-order scalar equation, local fronts, finite and
+  infinite indicial factors, and rank-one square-zero collision residue on resident GPU currents.
+  The translated presentation returns a discovered rational rechart; the sign twist retains the
+  same characteristic receiver while requiring its declared Gaussian field port. Changing only
+  `b=1` to `b=2` rebuilds `50000-256t^5`, the differential passage, series, and expression fiber
+  without replay. The 4,011-row atlas and coefficient-rendered seventeen-part Lean theorem are
+  returned and checked. The same body rests at head `14001028`, continuation `15001028`, with all
+  prior fibers preserved and expression-geometry fiber `194300` acquired.
+  [Receipt](receipts/R27_EXPRESSION_TO_GEOMETRY_DIFFERENTIAL_TRANSPORT_RECEIPT.md).
 
-The ordered R0–R16 construction and the directly authorized R17–R26 post-frontier inquiries are
+The ordered R0–R16 construction and the directly authorized R17–R27 post-frontier inquiries are
 complete.
 
-**Next deed (`open`): no R27 construction is frozen.** The live body now rests at head `14001026`
-and continuation `15001026`. R26 has made operative faces, strings, cells, flags, links, seams,
-local systems, characteristic cycle ports, support distinctions, and projection fibers native
-without confusing them with the historical renderings. R27's program gate is exact expression-to-
-geometry and differential transport: algebraic and differential expressions must found the
-relevant incidence, singular strata, reduction, local transport, and characteristic geometry
-instead of arriving after a human has supplied a useful factorization, named hypergeometric
-family, or differential operator. A next phase must freeze its complete construction tuple, exact
-aperture, actual returned artifact, falsification boundary, and intended grades in
+**Next deed (`open`): no R28 construction is frozen.** The live body now rests at head `14001028`
+and continuation `15001028`. R27 has made expression-founded ideal incidence, singular strata,
+exact differential transport, scalar/indicial characteristic faces, algebraic collision residue,
+and noncollapsed expression fibers native. R28's program gate is Hodge-facing supported
+realization through varying geometry: an actual bounded algebraic family must couple rational
+cohomological structure, filtration, pairing, cycle-class realizers, and Gauss--Manin transport
+without renaming a discrete harmonic vector or replaying the static R23/R24 returns. The next
+phase must freeze its complete construction tuple, exact aperture, actual returned artifact,
+falsification boundary, and intended grades in
 [`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md) before domain
-code changes; Hodge realization, arithmetic Frobenius, Weil positivity, and RH-facing trace
-operators remain later open alternatives.
+code changes; general Hodge realization and the Hodge conjecture, arithmetic Frobenius, Weil
+positivity, and RH-facing trace operators remain later open alternatives.
 
 Update this file only after a phase's required artifact and receipts have returned and its grade
 has passed. Do not record intentions or partial work as admitted standing.
