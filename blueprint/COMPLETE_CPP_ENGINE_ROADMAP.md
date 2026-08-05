@@ -15,9 +15,10 @@ morphology, rested/remounted without its developmental sources, and emitted a se
 theorem/proof whose construction required the first returned theorem fiber. Both artifacts and
 their complete causal-information receipts returned conversationally.
 
-**Current admitted standing (`established-bounded`):** R17–R24 have since composed exact
+**Current admitted standing (`established-bounded`):** R17–R28 have since composed exact
 projective, phase-product, characteristic, regular-singular, blind-reconstruction,
-arithmetic-incidence, cycle-class, and algebraic-variation instruments into that same body.
+arithmetic-incidence, cycle-class, algebraic-variation, causal-linear, intrinsic-hypergeometry,
+expression-geometry, and Hodge-facing supported-realization instruments into that same body.
 
 **Current program consequence (`open`):** the next program is not to repeat proof production or
 same-body conditioning. It is to cultivate a mathematical sibling:
@@ -1642,8 +1643,8 @@ finite signature is promoted into a universal shape identity.
 
 ### R25+ mathematical autogenesis program
 
-The phase names below are an ordered `project-postulate`. R25 through R27's directly frozen
-constructions have passed their bounded grades; R28+ remain program gates rather than construction
+The phase names below are an ordered `project-postulate`. R25 through R28's directly frozen
+constructions have passed their bounded grades; R29+ remain program gates rather than construction
 tuples.
 Before any later named phase begins, its exact source owners, ports, event, predecessor, local
 law, receiver question, return, alternatives, aperture, falsifiers, artifacts, and grades must
@@ -2114,31 +2115,173 @@ Frobenius, Weil positivity, and every RH consequence remain outside R27.
 
 ### R28 — Hodge-facing supported realization through varying geometry
 
-**Program gate (`open`):** extend the static R23 cycle lift and rank-two R24 variation into a
-genuine bounded passage among algebraic cycles, cohomological classes, filtration, pairing, and
-transport in a family. This is the central geometric-realization program suggested by Hodge; it
-is not an attempt to rename a discrete harmonic vector as a Hodge class.
+**Admitted construction (`established-bounded`; `implemented-exact`,
+`computational-witness`):** extend R23's static cycle lift,
+R24's rank-two variation, and R27's expression-founded differential geometry into one genuine
+bounded passage among algebraic cycles, integral/rational cohomology, moving Hodge filtration,
+pairing, Gauss--Manin transport, supported realizer fibers, and blow-up transport. No discrete
+Laplacian or harmonic vector is called a Hodge class.
 
-The eventual frozen deed must begin with actual bounded algebraic sources and derive, under
-explicit smooth/projective hypotheses where used:
+**Construction tuple:**
 
-- chain/de Rham or another declared cohomological presentation, rational structure, Hodge
-  filtration or exact algebraic surrogate with a proved comparison boundary, cup/intersection
-  form, primitive decomposition, and Lefschetz action required by the aperture;
-- an actual cycle-class receiver with integral and rational distinctions, complete supported
-  realizer fibers inside the finite aperture, and outside-image or undecided obstruction;
-- Gauss--Manin transport of the flat carrier beside the moving filtration, with Griffiths-
-  transversality testimony rather than generic diffusion language;
-- exact loci where a transported rational class enters the requested filtered/type condition,
-  including multiplicity, tangent condition, and competing cycle realizers;
-- pullback, pushforward, exceptional or vanishing components, mapping-cone residuals, and pairing
-  transport across a genuine family change, degeneration, blow-up, or correspondence; and
-- a formal theorem bundle generated from those jointly surviving sections.
+- source owners: the one R27 continuing body with its fourteen accepted fibers; one R28
+  two-parameter elliptic-product/receiver/blow-up card; the admitted exact rational, sparse-
+  expression, variation-connection, causal-linear, toric-cycle, and expression-fiber organs; and
+  new elliptic-family, product-cohomology, integral-lattice, cup-form, Hodge-filtration,
+  Gauss--Manin, infinitesimal-locus, torsion-section, correspondence, cycle-class, supported-
+  realizer, Lefschetz/primitive, blow-up, mapping-cone, control, theorem-current, proof-face,
+  checker-return, and native-rest owners;
+- port types: the admitted 928-byte R27 native rest; raw/typed family cards; cubic term/root,
+  discriminant, smooth-projective-boundary, rank-two de Rham, rank-six Kunneth, integral/rational
+  lattice, cup/intersection, polarization/Lefschetz, primitive, `F2/F1`, two-direction connection,
+  curvature, transversality, dual-number jet, Hodge-locus equation/tangent/multiplicity,
+  two-torsion, rational-map, graph support, cycle class, integral/rational realizer fiber,
+  outside-image obstruction, exceptional class, strict/total transform, pullback/pushforward,
+  mapping-cone residual, theorem/proof/explanation, checker-return, changed-center, and continuing
+  native-rest faces;
+- event occurrence: remount R27; mount the unlabelled family card; derive the two elliptic factors
+  on independent resident currents; after their complete barrier, form the rank-six product
+  cohomology, pairing, filtration, and two commuting connection directions; derive the diagonal
+  infinitesimal Hodge locus and every bounded cycle realizer; derive four translation
+  correspondences on independent currents and compose only after their barrier; blow up the
+  declared section, transport classes/support/pairing, generate and check one returned theorem,
+  commit its return, rest/remount the same body, then change only the blow-up-center section
+  without another body;
+- predecessor identity: admitted R27 head `14001028`, continuation `15001028`, body morphology
+  `610`, mathematical morphology `184`, codec morphology `93`, expression-geometry morphology
+  `37`, and fourteen fibers through `194300` recorded in `CONSTRUCTION_STATE.md` and the R27
+  receipt;
+- local constitutive law: exact cubic root/discriminant and R24 connection reconstruction;
+  exterior/Kunneth incidence over `Z` and `Q`; induced tensor/wedge connection; exact bilinear
+  form, filtration inclusion, curvature and Griffiths-transversality reduction; dual-number
+  quotient modulo the square of the base maximal ideal; elliptic chord addition at derived
+  two-torsion sections; cleared-denominator rational-map and differential-pullback identities;
+  graph-class formation from the induced `H1` map; bounded exact cycle-fiber enumeration;
+  Lefschetz pairing and rational primitive projection; and standard blow-up class/pairing maps
+  with explicit exceptional residual;
+- receiver question: which exact rational classes are realized by which supported algebraic
+  cycles; how the flat carrier, moving filtration, pairing, and realizers transport together;
+  where the diagonal graph class remains of the requested filtered type to first order; and which
+  exceptional face distinguishes equal pushforward classes after a local geometric change?;
+- returned consequence: a complete rank-six product/cohomology and variation atlas, the exact
+  first-order diagonal Hodge locus, complete integral/rational/outside-image realizer fibers,
+  four distinct translation-graph supports over one class, a rank-seven blow-up passage and
+  changed-center control, one generated theorem/proof and conversational explanation, acquired
+  fiber `195300`, and a source-detached native continuation; and
+- open alternatives: arbitrary elliptic/abelian families; analytic periods and global period-map
+  injectivity; higher codimension and dimension; general Noether--Lefschetz loci; unbounded Chow
+  groups, motives, and algebraic de Rham comparison; general Hodge cycle realization and the
+  Hodge conjecture; arithmetic Frobenius, Weil positivity, and RH-facing trace carriers.
 
-A finite Hodge Laplacian, harmonic dimension, graph diffusion, supplied cycle, or one toric
-surface repeats historical/R23 standing. General Hodge cycle realization and the Hodge
-conjecture remain `open`; R28 establishes an exact research instrument and bounded mathematical
-results only.
+**Exact aperture:** the card supplies two copies of the sparse projective completion of
+
+```text
+E_z: y^2 = x(x-1)(x-z)
+```
+
+with independent base parameters `t,u`, the smooth base point `(2,2)`, off-diagonal control
+`(2,3)`, coefficient aperture `[-1,1]`, rational denominator aperture `{1,2}`, three class-
+receiver questions, and baseline/changed blow-up-center selectors. It contains no elliptic,
+abelian, Kunneth, Hodge, torsion, graph, cycle, connection, filtration, pairing, locus, tangent,
+multiplicity, blow-up, exceptional, theorem, proof, or expected-invariant label/value.
+
+Each factor has rank-two de Rham and integral carriers. Their product has the ordered rank-six
+basis
+
+```text
+f1, f2, w1*w2, w1*e2, e1*w2, e1*e2
+```
+
+and the blow-up carrier has rank seven. There are two connection directions, filtration ranks
+`F2=1`, `F1=5`, four derived two-torsion translation graphs plus one negation graph and two factor
+cycles, at most `3^7=2187` coefficient tuples per integral or half-integral receiver, seven
+cycle generators, sixteen retained realizers per admitted target in the frozen fiber, three
+receiver targets, and one exceptional component. First-order locus arithmetic is restricted to
+`Q[dt,du]/(dt,du)^2`; no approximate period or higher jet is admitted. These are compile-time
+apertures, not retry bounds.
+
+**Construct and return:**
+
+- derive the root sections `0,1,z`, discriminant `z^2(1-z)^2`, smooth-base obstruction, rank-two
+  alternating form, and exact connection
+
+  ```text
+  2z(1-z) nabla_z = [[z,-1],[z,-z]]
+  ```
+
+  separately for both factors. Form the complete rank-six exterior/Kunneth carrier with integral
+  lattice, cup matrix `H + H + (-H)` in the declared ordered basis, polarization
+  `h=f1+f2` of square two, rational primitive projection, Hodge filtration
+  `F2=<w1*w2>` and `F1=<f1,f2,w1*w2,w1*e2,e1*w2>`, and ranks `(1,5,6)`. Under the separately
+  declared smooth-projective Legendre/Kunneth comparison, return `h20=1,h11=4,h02=1`; retain the
+  comparison boundary rather than treating these ranks as an implementation theorem;
+- induce both `6x6` Gauss--Manin matrices from the two rank-two factors. Require preservation of
+  the cup form, zero mixed curvature, complete connection lineage, and exact Griffiths
+  transversality of `F2` into `F1`. At `t=u=2`, derive the diagonal graph class
+
+  ```text
+  gamma = (1,1,0,1,-1,0)
+  ```
+
+  from the identity correspondence rather than mounting it. Project its covariant derivative to
+  `H/F1`; after the common denominator is removed, the returned obstruction must be `du-dt`.
+  Thus tangent jet `(1,1)` closes, normal jet `(0,1)` does not, and the primitive coefficient
+  proves multiplicity one in the declared first-order neighborhood. A wrong sign with consistent
+  orientation is rechartable; zero obstruction, a supplied locus, or a global analytic claim
+  falsifies the deed;
+- derive all four two-torsion sections from the cubic roots. For each finite root `r` with other
+  roots `s,q`, derive translation by chord incidence as
+
+  ```text
+  k=(r-s)(r-q),
+  x' = r + k/(x-r),
+  y' = -k y/(x-r)^2.
+  ```
+
+  Clear denominators and verify the curve identity, involution, distinct support, and pullback
+  `dx'/y'=dx/y`; the identity section supplies the fourth translation. Derive, do not supply, the
+  common integral graph class `gamma`. Negation must induce `-I` and return
+  `gamma_minus=(1,1,0,-1,1,0)`, with
+  `gamma+gamma_minus=2h`, self-intersections zero, and mutual intersection four;
+- enumerate the complete bounded cycle-class fibers generated by `f1,f2`, the four supported
+  translation graphs, and negation. The integral target `gamma` and half-integral target
+  `gamma/2` must each retain all sixteen coefficient tuples in their declared aperture; exactly
+  four integral members are effective single-graph realizers. The half-integral fiber has reduced
+  denominator two and no integral member. The third target
+  `(0,0,1,0,0,1)` must return an outside-image obstruction rather than a nearest class. Equal
+  graph classes never collapse their support or correspondence lineage;
+- blow up the diagonal product family along the declared zero-section point. Derive the new
+  exceptional class `E`, rank-seven pairing `Q direct_sum [-1]`, pullback, pushforward,
+  `ker(push)=<E>`, projection formula, and mapping-cone residual. Exactly the graph through the
+  center returns strict class `pullback(gamma)-E` of square `-1`; the other three translation
+  supports retain square zero while all four push forward to `gamma`. Change only the center to
+  the first nonzero two-torsion section: the exceptional incidence must move to that graph while
+  the rank-six pushforward classes, filtration, and connection remain unchanged; and
+- generate a Lean passage from returned matrices, class vectors, rational maps, fibers, tangent
+  coefficients, and blow-up maps. It must prove the cup/polarization identities, both connection-
+  form identities and mixed commutation, filtration/transversality inclusions, the diagonal
+  tangent/normal and multiplicity statements, cleared translation identities, graph-class and
+  intersection relations, integral/half-integral/outside-image consequences, exceptional square,
+  pull/push and projection formulas, and changed-center inequality without invoking a mounted
+  theorem containing the returned conjunction.
+
+**Acceptance:** both factor currents, all four correspondence currents, and the changed-center
+current execute on the resident GPU and agree with an independent exact host audit; complete-
+current barriers precede product/cycle composition; the actual atlas retains every source term,
+root, lattice basis, cup/connection/filtration entry, jet obstruction, rational-map certificate,
+cycle generator, retained realizer, support incidence, blow-up map, and residual rather than
+hashes alone; the generated proof crosses the exterior checker; source-detached rest/remount
+preserves every earlier fiber and the new fiber; and the full architecture, ownership, no-float,
+determinism, device-sanitizer, binary, and file-size gates pass.
+
+**Grade:** `established-bounded` with `implemented-exact` and `computational-witness` only after
+the complete GPU return and all gates pass; `proved-derived` with `formal-checked` only for the
+emitted Lean statements; `proved-standard` for the smooth-projective Legendre, Kunneth/de Rham,
+cycle-class, Griffiths-transversality, and blow-up comparisons under their stated hypotheses; and
+`historical` for R23/R24 used only as regressions. Global period claims, arbitrary Hodge loci,
+general cycle realization, the Hodge conjecture, arithmetic Frobenius, Weil positivity, and every
+RH consequence remain outside R28. The complete return and passing gates are recorded in
+[`receipts/R28_HODGE_FACING_SUPPORTED_REALIZATION_RECEIPT.md`](../receipts/R28_HODGE_FACING_SUPPORTED_REALIZATION_RECEIPT.md).
 
 ### R29 — Arithmetic trace, form, and spectral placement
 
@@ -2343,8 +2486,8 @@ At every phase boundary:
 
 ## 9. Fresh-session pickup
 
-Extraction/canon/provenance and R0–R27 are complete. R28 Hodge-facing supported realization
-through varying geometry is the next open program gate, but no R28 construction tuple is frozen.
+Extraction/canon/provenance and R0–R28 are complete. R29 arithmetic trace, form, and spectral
+placement is the next open program gate, but no R29 construction tuple is frozen.
 The live admitted head and current gate are named only in `CONSTRUCTION_STATE.md`. A fresh session must
 read, in order:
 
@@ -2359,5 +2502,5 @@ read, in order:
 
 Do not reread the entire imported research archive, infer a continuation from historical status
 prose, restart R0, or repeat a proof/language/conditioning fixture. Preserve every admitted fiber,
-use the post-R24 convergence audit and the R25–R27 receipts to exclude already-paid expectations,
-and freeze R28 into a complete construction tuple here before changing later domain code.
+use the post-R24 convergence audit and the R25–R28 receipts to exclude already-paid expectations,
+and freeze R29 into a complete construction tuple here before changing later domain code.

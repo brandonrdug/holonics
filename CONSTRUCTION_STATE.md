@@ -175,22 +175,34 @@
   returned and checked. The same body rests at head `14001028`, continuation `15001028`, with all
   prior fibers preserved and expression-geometry fiber `194300` acquired.
   [Receipt](receipts/R27_EXPRESSION_TO_GEOMETRY_DIFFERENTIAL_TRANSPORT_RECEIPT.md).
+- R28: a two-parameter Legendre-product family derives its rank-six integral/rational carrier,
+  cup form, moving filtration, two commuting Gauss--Manin directions, and the first-order
+  diagonal Hodge-locus obstruction `du-dt`. Four exact two-torsion translations retain distinct
+  graph supports over one class; complete bounded cycle enumeration separates integral,
+  half-integral, and outside-image fibers. Baseline and changed-center blow-ups move the unique
+  exceptional strict face while preserving pushforward class and variation data. The 932-row
+  atlas and coefficient-rendered ten-part Lean theorem are returned and checked. The same body
+  rests at head `14001030`, continuation `15001030`, with every prior fiber preserved and
+  Hodge-realization fiber `195300` acquired.
+  [Receipt](receipts/R28_HODGE_FACING_SUPPORTED_REALIZATION_RECEIPT.md).
 
-The ordered R0–R16 construction and the directly authorized R17–R27 post-frontier inquiries are
+The ordered R0–R16 construction and the directly authorized R17–R28 post-frontier inquiries are
 complete.
 
-**Next deed (`open`): no R28 construction is frozen.** The live body now rests at head `14001028`
-and continuation `15001028`. R27 has made expression-founded ideal incidence, singular strata,
-exact differential transport, scalar/indicial characteristic faces, algebraic collision residue,
-and noncollapsed expression fibers native. R28's program gate is Hodge-facing supported
-realization through varying geometry: an actual bounded algebraic family must couple rational
-cohomological structure, filtration, pairing, cycle-class realizers, and Gauss--Manin transport
-without renaming a discrete harmonic vector or replaying the static R23/R24 returns. The next
-phase must freeze its complete construction tuple, exact aperture, actual returned artifact,
-falsification boundary, and intended grades in
+**Next deed (`open`): no R29 construction is frozen.** The live body now rests at head `14001030`
+and continuation `15001030`, body morphology `693`, mathematical morphology `207`, codec
+morphology `103`, expression-geometry morphology `37`, Hodge-realization morphology `41`, and
+fifteen accepted fibers through `195300`. R28 has made a moving rank-six cohomological carrier,
+pairing, filtration, exact infinitesimal cycle locus, supported integral/rational class fibers,
+correspondence lineage, and changed-topology blow-up transport native. R29's program gate is
+arithmetic trace, form, and spectral placement: exact finite-field geometry must cause its own
+fixed-locus traces, genuine operator/pairing carrier, characteristic/local factor, duality,
+weight placement, and bounded explicit-formula receiver. A matrix fitted to supplied counts or
+known zeros is not the deed. The next phase must freeze its complete construction tuple, exact
+aperture, actual returned artifact, falsification boundary, and intended grades in
 [`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md) before domain
-code changes; general Hodge realization and the Hodge conjecture, arithmetic Frobenius, Weil
-positivity, and RH-facing trace operators remain later open alternatives.
+code changes; a noncircular positive carrier for the completed classical Riemann explicit
+formula, full Weil positivity, and RH remain later open alternatives.
 
 Update this file only after a phase's required artifact and receipts have returned and its grade
 has passed. Do not record intentions or partial work as admitted standing.
