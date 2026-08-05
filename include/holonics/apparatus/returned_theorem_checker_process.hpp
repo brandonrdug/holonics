@@ -10,4 +10,10 @@ namespace holonics::apparatus {
     const lean_process_configuration& configuration,
     event::checker_raw_return& returned) noexcept;
 
+[[nodiscard]] lean_process_receipt run_returned_theorem_checker_source(
+    const lean_source_view& source,
+    const event::checker_outbound_occurrence& outbound,
+    const lean_process_configuration& configuration,
+    event::checker_raw_return& returned) noexcept;
+
 }  // namespace holonics::apparatus

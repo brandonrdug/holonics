@@ -221,27 +221,42 @@
   `14001040`, continuation `15001040`, with all prior fibers preserved, cultivated organs `198300`
   through `198303`, and application fiber `198304` acquired.
   [Receipt](receipts/R31_ENDOGENOUS_CULTIVATED_MATHEMATICAL_ORGANS_RECEIPT.md).
+- R32: five source-separated anonymous numeric ecologies derive a connected exact calculus of
+  situated occurrence, oriented incidence, complete-successor composition, finite receiver fibers,
+  lawful factorization/reopening, non-flat local chart transport, and returned changed conduct.
+  The device retains all 31 identity masks, 2,187 conduct predicates, complete countermodels and
+  seven atlases containing 2,266 rows in total; an independent host implementation agrees
+  everywhere. The derived
+  closed-word trace cultivates primitive organ `[1,-3,1]`, which survives a sample-free 2,472-byte
+  rest and predicts seven hidden trace values on a different triangular local system before
+  comparison. Changed-source and exact organ-exclusion controls return their named obstructions.
+  Both generated Lean passages are accepted, pre-seal source access excludes canon and research,
+  the later canon comparison changes no sealed artifact, and the same body rests at head
+  `14001044`, continuation `15001044`, with calculus fibers `199300` through `199305` and held-out
+  fiber `199306` acquired.
+  [Receipt](receipts/R32_ELEMENTARY_HOLONICS_SELF_DERIVATION_RECEIPT.md).
 
-The ordered R0–R16 construction and the directly authorized R17–R31 post-frontier inquiries are
+The ordered R0–R16 construction and the directly authorized R17–R32 post-frontier inquiries are
 complete.
 
-**Next deed (`open`): no R32 construction is frozen.** The live body now rests at head `14001040`
-and continuation `15001040`, body morphology `999`, mathematical morphology `318`, codec
-morphology `147`, expression-geometry morphology `37`, Hodge-realization morphology `41`,
-arithmetic-spectral morphology `47`, rederivation morphology `56`, cultivation morphology `48`,
-organ morphology `64`, application morphology `32`, and twenty-five accepted fibers through
-`198304`. R31 has made exact developmental feature search, checker-founded reusable coefficient
-geometry, sample-free native rest, changed-topology source-detached transport, named refusal, and
-identity-exact ablation native. R32's program gate is source-separated self-derivation of
-elementary holonics: the cultivated body must return one connected exact calculus of occurrence,
-composition, receiver fibers, condensation/reopening, rechart transport, holonomy/curvature,
-obstruction, and reusable changed conduct while canon is withheld, then use at least one newly
-cultivated organ to improve a held-out mathematical derivation. The next phase must freeze its
-complete construction tuple, exact development and held-out apertures, canon withholding and
-post-seal comparison protocol, countermodels, organ improvement test, falsification boundary, and
-intended grades in
-[`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md) before domain
-code changes.
+**Next deed (`project-postulate`, frozen): R33 source-separated characteristic hypergeometry and
+trace transport.** The live body now rests at head `14001044` and continuation `15001044`, body
+morphology `1103`, mathematical morphology `370`, codec morphology `171`, expression-geometry
+morphology `37`, Hodge-realization morphology `41`, arithmetic-spectral morphology `47`,
+rederivation morphology `56`, cultivation morphology `48`, organ morphology `64`, application
+morphology `32`, calculus morphology `64`, self-organ morphology `32`, derivation morphology `24`,
+and thirty-two accepted fibers through `199306`. R32 has made bounded source-separated law-grammar
+selection, connected formal calculus production, self-holonomy organ cultivation, post-rest
+held-out mathematical extension, countermodel retention, exact ablation and post-seal doctrine
+comparison native. R33 must now construct complete exact transition-word populations on three
+independent GPU source ecologies, derive their open/product/closed characteristic faces and
+archetype distributions, select a common primitive trace law without supplied coefficients,
+generate its general symbolic proof and countermodels, rest the resulting organ without
+developmental rows, and use only its visible `(x,y,z)` face to predict the closed characteristic of
+a different held-out local system before comparison. The exact construction tuple, population,
+feature grammar, collision witnesses, held-out aperture, source/literature withholding protocol,
+falsifiers and intended grades are frozen in
+[`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md).
 
 Update this file only after a phase's required artifact and receipts have returned and its grade
 has passed. Do not record intentions or partial work as admitted standing.

@@ -1,0 +1,6 @@
+truth_status=established-bounded
+evidence=implemented-exact
+discovery_replay_exit=0
+application_replay_exit=0
+byte_identical_artifacts=18
+deterministic=1

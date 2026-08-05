@@ -5,8 +5,8 @@
 
 namespace holonics::apparatus {
 
-lean_process_receipt run_returned_theorem_checker_process(
-    const codec::formal_checker_face& face,
+lean_process_receipt run_returned_theorem_checker_source(
+    const lean_source_view& source,
     const event::checker_outbound_occurrence& outbound,
     const lean_process_configuration& configuration,
     event::checker_raw_return& returned) noexcept {
@@ -32,11 +32,21 @@ lean_process_receipt run_returned_theorem_checker_process(
     receipt.state = lean_process_status::environment_refused;
     return receipt;
   }
-  receipt = run_lean_checker_process(face, outbound, configuration, returned);
+  receipt = run_lean_checker_source(source, outbound, configuration, returned);
   const int restored = inherited == nullptr ? ::unsetenv("LEAN_PATH") :
       ::setenv("LEAN_PATH", prior, 1);
   if (restored != 0) { receipt.state = lean_process_status::environment_refused; }
   return receipt;
+}
+
+lean_process_receipt run_returned_theorem_checker_process(
+    const codec::formal_checker_face& face,
+    const event::checker_outbound_occurrence& outbound,
+    const lean_process_configuration& configuration,
+    event::checker_raw_return& returned) noexcept {
+  if (face.byte_count > codec::formal_checker_face_capacity) { return {}; }
+  const lean_source_view source{face.passage, face.generated_source, face.bytes, face.byte_count};
+  return run_returned_theorem_checker_source(source, outbound, configuration, returned);
 }
 
 }  // namespace holonics::apparatus

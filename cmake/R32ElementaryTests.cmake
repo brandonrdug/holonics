@@ -1,0 +1,90 @@
+set(R32_C0 "${PROJECT_SOURCE_DIR}/apparatus/cards/R32_OCCURRENCE_INCIDENCE.card")
+set(R32_C1 "${PROJECT_SOURCE_DIR}/apparatus/cards/R32_COMPOSITION.card")
+set(R32_C2 "${PROJECT_SOURCE_DIR}/apparatus/cards/R32_RECEIVER.card")
+set(R32_C3 "${PROJECT_SOURCE_DIR}/apparatus/cards/R32_LOCAL_CHART.card")
+set(R32_C4 "${PROJECT_SOURCE_DIR}/apparatus/cards/R32_RETURN_CONDUCT.card")
+set(R32_HELDOUT "${PROJECT_SOURCE_DIR}/apparatus/cards/R32_HELDOUT_TRIANGLE.card")
+set(R32_FORMAL_ROOT "${PROJECT_SOURCE_DIR}/formal/elementary-holonics")
+set(R32_TOOLCHAIN "${R32_FORMAL_ROOT}/lean-toolchain")
+set(R32_FORMAL_MANIFEST "${R32_FORMAL_ROOT}/lake-manifest.json")
+
+add_test(NAME r32.elementary_discovery_device_deed COMMAND r32_elementary_discovery_device_deed
+  "${R32_DISC_DEED}" "${R31_FINAL_REST}" "${R32_INTERMEDIATE_REST}"
+  "${R32_C0}" "${R32_C1}" "${R32_C2}" "${R32_C3}" "${R32_C4}"
+  "${R32_DISC_SOURCE}" "${R32_DISC_OLEAN}" "${R32_DISC_STDOUT}" "${R32_DISC_STDERR}"
+  "${R32_FORMAL_ROOT}" "${R32_TOOLCHAIN}" "${R32_FORMAL_MANIFEST}"
+  "${PROJECT_BINARY_DIR}/artifacts" "${R32_A0}" "${R32_A1}" "${R32_A2}"
+  "${R32_A3}" "${R32_A4}" "${R32_A5}")
+set_tests_properties(r32.elementary_discovery_device_deed PROPERTIES
+  DEPENDS "r31.cultivated_application_device_deed" TIMEOUT 300)
+add_test(NAME r32.heldout_holonomy_device_deed COMMAND r32_heldout_holonomy_device_deed
+  "${R32_APP_DEED}" "${R32_INTERMEDIATE_REST}" "${R32_FINAL_REST}" "${R32_HELDOUT}"
+  "${R32_APP_SOURCE}" "${R32_APP_OLEAN}" "${R32_APP_STDOUT}" "${R32_APP_STDERR}"
+  "${R32_FORMAL_ROOT}" "${R32_TOOLCHAIN}" "${R32_FORMAL_MANIFEST}"
+  "${PROJECT_BINARY_DIR}/artifacts" "${R32_DOSSIER}" "${R32_APP_ATLAS}")
+set_tests_properties(r32.heldout_holonomy_device_deed PROPERTIES
+  DEPENDS "r32.elementary_discovery_device_deed" TIMEOUT 300)
+
+add_test(NAME r32.elementary_host_conformance COMMAND r32_elementary_host_conformance
+  "${R32_C0}" "${R32_C1}" "${R32_C2}" "${R32_C3}" "${R32_C4}" "${R32_HELDOUT}"
+  "${R32_A0}" "${R32_A1}" "${R32_A2}" "${R32_A3}" "${R32_A4}" "${R32_A5}"
+  "${R32_APP_ATLAS}" "${R32_HOST_CONFORMANCE}")
+set_tests_properties(r32.elementary_host_conformance PROPERTIES
+  DEPENDS "r32.heldout_holonomy_device_deed")
+
+add_library(r32_open_probe SHARED tests/apparatus/r32_open_probe.cpp)
+target_link_libraries(r32_open_probe PRIVATE holonics_contract_options)
+set_target_properties(r32_open_probe PROPERTIES PREFIX "")
+set(R32_DISC_LOG "${PROJECT_BINARY_DIR}/artifacts/R32_DISCOVERY_OPEN_PATHS.txt")
+set(R32_APP_LOG "${PROJECT_BINARY_DIR}/artifacts/R32_APPLICATION_OPEN_PATHS.txt")
+add_test(NAME r32.source_access_audit COMMAND "${CMAKE_COMMAND}"
+  -DDISC_EXEC=$<TARGET_FILE:r32_elementary_discovery_device_deed>
+  -DAPP_EXEC=$<TARGET_FILE:r32_heldout_holonomy_device_deed> -DPROBE=$<TARGET_FILE:r32_open_probe>
+  -DDISC_LOG=${R32_DISC_LOG} -DAPP_LOG=${R32_APP_LOG} -DOUTPUT=${R32_SOURCE_AUDIT}
+  -DDISC_DEED=${R32_DISC_DEED} -DAPP_DEED=${R32_APP_DEED} -DR31_REST=${R31_FINAL_REST}
+  -DINTERMEDIATE=${R32_INTERMEDIATE_REST} -DFINAL_REST=${R32_FINAL_REST}
+  -DC0=${R32_C0} -DC1=${R32_C1} -DC2=${R32_C2} -DC3=${R32_C3} -DC4=${R32_C4}
+  -DHELDOUT=${R32_HELDOUT} -DDISC_SOURCE=${R32_DISC_SOURCE} -DDISC_OLEAN=${R32_DISC_OLEAN}
+  -DDISC_STDOUT=${R32_DISC_STDOUT} -DDISC_STDERR=${R32_DISC_STDERR}
+  -DA0=${R32_A0} -DA1=${R32_A1} -DA2=${R32_A2} -DA3=${R32_A3} -DA4=${R32_A4} -DA5=${R32_A5}
+  -DAPP_SOURCE=${R32_APP_SOURCE} -DAPP_OLEAN=${R32_APP_OLEAN} -DAPP_STDOUT=${R32_APP_STDOUT}
+  -DAPP_STDERR=${R32_APP_STDERR} -DDOSSIER=${R32_DOSSIER} -DAPP_ATLAS=${R32_APP_ATLAS}
+  -DFORMAL_ROOT=${R32_FORMAL_ROOT} -DTOOLCHAIN=${R32_TOOLCHAIN} -DMANIFEST=${R32_FORMAL_MANIFEST}
+  -DARTIFACT_ROOT=${PROJECT_BINARY_DIR}/artifacts -P "${PROJECT_SOURCE_DIR}/cmake/R32SourceAccessAudit.cmake")
+set_tests_properties(r32.source_access_audit PROPERTIES DEPENDS "r32.elementary_host_conformance" TIMEOUT 300)
+
+add_test(NAME r32.determinism COMMAND "${CMAKE_COMMAND}"
+  -DDISC_EXEC=$<TARGET_FILE:r32_elementary_discovery_device_deed>
+  -DAPP_EXEC=$<TARGET_FILE:r32_heldout_holonomy_device_deed>
+  -DTMP=${PROJECT_BINARY_DIR}/artifacts/r32-determinism -DR31_REST=${R31_FINAL_REST}
+  -DC0=${R32_C0} -DC1=${R32_C1} -DC2=${R32_C2} -DC3=${R32_C3} -DC4=${R32_C4}
+  -DHELDOUT=${R32_HELDOUT} -DFORMAL_ROOT=${R32_FORMAL_ROOT} -DTOOLCHAIN=${R32_TOOLCHAIN}
+  -DMANIFEST=${R32_FORMAL_MANIFEST} -DARTIFACT_ROOT=${PROJECT_BINARY_DIR}/artifacts
+  -DDISC_DEED=${R32_DISC_DEED} -DAPP_DEED=${R32_APP_DEED}
+  -DINTERMEDIATE=${R32_INTERMEDIATE_REST} -DFINAL_REST=${R32_FINAL_REST}
+  -DDISC_SOURCE=${R32_DISC_SOURCE} -DDISC_STDOUT=${R32_DISC_STDOUT} -DDISC_STDERR=${R32_DISC_STDERR}
+  -DA0=${R32_A0} -DA1=${R32_A1} -DA2=${R32_A2} -DA3=${R32_A3} -DA4=${R32_A4} -DA5=${R32_A5}
+  -DAPP_SOURCE=${R32_APP_SOURCE} -DAPP_STDOUT=${R32_APP_STDOUT} -DAPP_STDERR=${R32_APP_STDERR}
+  -DDOSSIER=${R32_DOSSIER} -DAPP_ATLAS=${R32_APP_ATLAS} -DOUTPUT=${R32_DETERMINISM}
+  -P "${PROJECT_SOURCE_DIR}/cmake/R32Determinism.cmake")
+set_tests_properties(r32.determinism PROPERTIES DEPENDS "r32.source_access_audit" TIMEOUT 300)
+add_test(NAME r32.seal COMMAND "${CMAKE_COMMAND}" -DOUTPUT=${R32_SEAL}
+  -DSOURCE_AUDIT=${R32_SOURCE_AUDIT} -DDISC_DEED=${R32_DISC_DEED} -DAPP_DEED=${R32_APP_DEED}
+  -DHOST_CONFORMANCE=${R32_HOST_CONFORMANCE}
+  -DINTERMEDIATE=${R32_INTERMEDIATE_REST} -DFINAL_REST=${R32_FINAL_REST}
+  -DDISC_SOURCE=${R32_DISC_SOURCE} -DDISC_OLEAN=${R32_DISC_OLEAN}
+  -DA0=${R32_A0} -DA1=${R32_A1} -DA2=${R32_A2} -DA3=${R32_A3} -DA4=${R32_A4} -DA5=${R32_A5}
+  -DAPP_SOURCE=${R32_APP_SOURCE} -DAPP_OLEAN=${R32_APP_OLEAN} -DDOSSIER=${R32_DOSSIER}
+  -DAPP_ATLAS=${R32_APP_ATLAS} -DDETERMINISM=${R32_DETERMINISM} -P "${PROJECT_SOURCE_DIR}/cmake/R32Seal.cmake")
+set_tests_properties(r32.seal PROPERTIES DEPENDS "r32.determinism")
+add_test(NAME r32.post_seal_canon_comparison COMMAND "${CMAKE_COMMAND}" -DSEAL=${R32_SEAL}
+  -DDOSSIER=${R32_DOSSIER} -DSOURCE=${R32_DISC_SOURCE}
+  -DC0=${PROJECT_SOURCE_DIR}/canon/00_PURE_HOLONICS.md -DC1=${PROJECT_SOURCE_DIR}/canon/01_CAUSAL_CALCULUS.md
+  -DC3=${PROJECT_SOURCE_DIR}/canon/03_CONDITIONING_AND_LEARNING.md
+  -DC4=${PROJECT_SOURCE_DIR}/canon/04_GEOMETRY_NAVIGATION_AND_WEAVE.md
+  -DOUTPUT=${R32_CANON_COMPARISON} -P "${PROJECT_SOURCE_DIR}/cmake/R32CanonComparison.cmake")
+set_tests_properties(r32.post_seal_canon_comparison PROPERTIES DEPENDS "r32.seal")
+add_test(NAME r32.forbidden_elementary_copy COMMAND "${CMAKE_COMMAND}"
+  -DCOMPILER=${CMAKE_CXX_COMPILER} -DSOURCE=${PROJECT_SOURCE_DIR}/tests/compile_contracts/forbidden_elementary_copy.cpp
+  -DINCLUDE_DIRECTORY=${PROJECT_SOURCE_DIR}/include "-DEXPECTED_TEXT=use of deleted function"
+  -P "${PROJECT_SOURCE_DIR}/cmake/ExpectCompileFailure.cmake")

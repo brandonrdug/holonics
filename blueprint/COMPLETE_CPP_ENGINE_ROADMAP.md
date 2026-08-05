@@ -1643,9 +1643,9 @@ finite signature is promoted into a universal shape identity.
 
 ### R25+ mathematical autogenesis program
 
-The phase names below are an ordered `project-postulate`. R25 through R28's directly frozen
-constructions have passed their bounded grades; R29+ remain program gates rather than construction
-tuples.
+The phase names below are an ordered `project-postulate`. R25 through R32's directly frozen
+constructions have passed their bounded grades; R33 is the next frozen construction and R34+
+remain program gates rather than construction tuples.
 Before any later named phase begins, its exact source owners, ports, event, predecessor, local
 law, receiver question, return, alternatives, aperture, falsifiers, artifacts, and grades must
 replace its program gate here. Reserving a phase name does not authorize nearby code or admit its
@@ -1662,7 +1662,8 @@ R25 exact causal linear/chain calculus
   -> R30 plural source-separated rederivation ecology
   -> R31 endogenous mathematical-organ cultivation
   -> R32 self-derivation of elementary holonics
-  -> R33+ open theorem production and Hodge/RH/hypergeometry campaigns.
+  -> R33 characteristic hypergeometry and self-proposed trace transport
+  -> R34+ open theorem production and Hodge/RH/hypergeometry campaigns.
 ```
 
 The stages are materially cumulative. None should be shrunk to a single familiar matrix, graph,
@@ -2823,12 +2824,197 @@ and passing gates are recorded in
 
 ### R32 — Source-separated self-derivation of elementary holonics
 
-**Program gate (`open`):** ask the cultivated mathematical body to derive a coherent elementary
-account of its own causal geometry. The canon is withheld until the return is sealed. The card
-supplies situated event ecologies, typed ports, local incidence and transport examples,
-composition demands, receiver observations, returned changes, and falsifying counterexamples; it
-does not supply the words *holon*, *receiver fiber*, *connection*, *curvature*, *interchange*, or
-the expected laws.
+**Completed construction (`established-bounded`, `implemented-exact`):** ask the cultivated
+mathematical body to derive one coherent elementary calculus of its own causal geometry before it
+can consult the canon. Five mutually inaccessible numerical cards supply occurrence/incidence, composition,
+projection, local-chart, and returned-conduct ecologies. A sixth held-out card supplies a different
+local-system topology only after the first checker-founded return has rested. No card supplies the
+words *holon*, *receiver fiber*, *connection*, *curvature*, *interchange*, *training*, or any
+expected law, coefficient vector, classifier label, theorem, or canon path.
+
+This is not a verbal conformance exercise. The GPU must search declared finite law grammars,
+retain every candidate and counterexample, connect the selected laws through shared typed
+occurrences, form a formal calculus and conversational account, cultivate one new exact organ from
+the derived closed-transport current, and use that organ to extend a source-separated held-out
+derivation beyond its exposed prefix. Only then may an exterior apparatus compare the sealed
+return with the canon.
+
+**Construction tuple:**
+
+- source owners: the one R31 continuing body with twenty-five accepted fibers and four cultivated
+  organs; five mutually inaccessible developmental occurrence cards; one held-out triangular
+  local-system card; admitted exact rational, matrix, incidence, feature-search, checker-return,
+  organ, source-audit, and rest owners; and new occurrence-key, oriented-boundary, composition-
+  signature, finite-projection, fiber, factorization, reopening, chart-transition, path-product,
+  holonomy, residual, return-conduct, elementary-law, countermodel, self-organ, prediction,
+  comparison, formal-face, dossier, atlas, seal, canon-comparison, and rest owners;
+- port types: the admitted 1,872-byte R31 native rest; five raw/typed numerical developmental
+  cards; situated occurrence row, identity-field mask, oriented incidence matrix, boundary
+  product, composition demand, complete successor, obstruction, contact, signature, source point,
+  receiver value, finite fiber, requested consequence, factorization, retained alternative,
+  rechart edge, exact `2x2` transition, path word/product, closed-word return, commutator residual,
+  conduct observation, boolean candidate, countermodel, exact trace stream, feature row, primitive
+  organ, checker return, sample-free elementary rest, held-out structure card, visible prefix,
+  hidden return, predicted tail, ablation, theorem/proof/dossier/atlas, source audit, seal,
+  post-seal comparison, and final native-rest faces;
+- event occurrence: remount R31; mount the five developmental cards through distinct ports and
+  derive their local returns on five independent resident currents; enumerate the five bounded law
+  grammars and retain every passing/failing candidate; weave the selected signatures only after
+  their complete local returns; derive the closed-word trace current and cultivate its least exact
+  primitive shift organ; render and check the elementary calculus; let that returned occurrence
+  commit six connected fibers including the organ; rest the same body without developmental rows
+  or traces; destroy all five card residencies; remount only the elementary rest in a second GPU
+  deed; open the held-out triangle; expose two trace terms to the organ current, predict the
+  remaining terms, then cross a barrier permitting comparison with independently formed matrix
+  powers; run exact organ exclusion; render/check the dependent held-out theorem and dossier;
+  commit the application fiber; rest/remount; audit source access and determinism; seal every
+  precomparison artifact; only then open the four named canon files, form an exterior comparison,
+  and verify that every sealed hash remains unchanged;
+- predecessor identity: admitted R31 head `14001040`, continuation `15001040`, body morphology
+  `999`, mathematical morphology `318`, codec morphology `147`, cultivation morphology `48`, organ
+  morphology `64`, application morphology `32`, and twenty-five fibers through `198304` recorded
+  in `CONSTRUCTION_STATE.md` and the R31 receipt;
+- local constitutive law: exhaustive identity-mask separation; exact signed incidence and matrix
+  multiplication; complete-successor formation over value, obstruction, lineage and logical
+  resource state; exact signature clustering rather than mounted labels; finite partition and
+  factor-through tests; exact unimodular `2x2` chart multiplication, inverse, alternative-path and
+  closed-word residuals; exhaustive conjunctive conduct-predicate search; exact rational feature
+  formation and row reduction; primitive kernel normalization; prefix-only recurrence transport;
+  delayed hidden-return comparison; and identity-exact organ ablation;
+- receiver question: can the cultivated body derive, connect, formalize and reuse a bounded causal
+  calculus which distinguishes occurrence, boundary, composition, observation, local transport,
+  obstruction and reusable returned conduct before being shown this project's doctrine?;
+- returned consequence: five complete discovery atlases; one connected elementary-law atlas;
+  formal definitions, theorems and countermodels; one conversational precomparison dossier; six
+  checker-founded calculus fibers `199300` through `199305`; a new closed-transport organ with
+  primitive coefficients `[1,-3,1]`; a source-detached rest containing laws/organs but no
+  developmental rows or traces; one held-out trace derivation extended from two terms through nine;
+  exact organ-exclusion loss; held-out fiber `199306`; two actual Lean/checker returns; source and
+  canon-open audits; precomparison seal and post-seal canon comparison; final continuation at head
+  `14001044`; and
+- open alternatives: unbounded or probabilistic law induction, arbitrary chain complexes and
+  categories, higher-rank or nonlinear local systems, sheaf/cohomology reconstruction, unrestricted
+  receiver families, autonomous ontology/curriculum, natural-language understanding, uniqueness of
+  the derived calculus, and unrestricted self-modeling or learning.
+
+**Occurrence and oriented-incidence aperture:** the first card carries six equal-payload rows built
+from five anonymous exact coordinates. One base row and five single-coordinate variations force
+the complete five-coordinate mask as the unique inclusion-minimal separating key. The device must
+enumerate all 31 nonempty masks; payload equality may not identify two occurrences. The same card
+carries the two oriented faces of a triangulated square. The signed vertex-edge and edge-face
+incidences must return `B1*B2=0`, cancellation of the internal diagonal, and unchanged cancellation
+under a coherent edge reorientation. Unsigned and incoherently reoriented candidates remain as
+nonzero countermodels in the atlas.
+
+**Composition aperture:** the second card carries five unlabelled demand ecologies. Their complete
+successors include value, obstruction, lineage and logical resource coordinates, not only a scalar
+output. Exhaustive signature formation must separate:
+
+- an ordered chain whose second predecessor is the first return and whose reverse is unavailable;
+- two complete orders with identical full successors and zero residual;
+- two contacting orders with unequal complete successors and a nonzero commutator residual;
+- a demand with no complete successor and a nonzero obstruction; and
+- two visible occurrences with no declared contact, no combined successor and no obstruction.
+
+These structural signatures are exteriorly rendered as serial composition, independent
+interchange, interaction, obstruction, and unresolved co-presence only after selection. Worker
+count, collection membership, equal scalar output, or co-visibility is not a candidate proof.
+
+**Receiver aperture:** the third card carries six distinct source occurrences and two exact maps.
+The coarse partition is `{0,1,2}|{3,4,5}` and the refinement is
+`{0,1}|{2}|{3}|{4,5}`. Consequence `[7,7,7,11,11,11]` factors through the coarse map. Consequence
+`[7,7,13,17,19,19]` does not: it returns explicit witnesses from both split coarse fibers, while it
+does factor through the refinement. The body must derive finite fibers and the factorization law
+“constant on every fiber” from complete pair tests, retain the uncollapsed alternatives, and show
+that adding the second receiver question reopens them. Equal coarse output with unequal occurrence
+keys is a required countermodel to source equality.
+
+**Local-chart and curvature aperture:** the fourth card supplies a square of charts and the two
+unimodular transitions
+
+```text
+A = [[1,1],[0,1]],  B = [[1,0],[1,1]].
+```
+
+The two path products are `AB=[[2,1],[1,1]]` and `BA=[[1,1],[1,2]]`; their exact residual is
+`[[1,0],[0,-1]]`. The closed word `A B A^-1 B^-1` returns
+`H=[[3,-1],[1,0]]`, determinant one and trace three. A flat rechart control returns equal path
+products, identity closed word and zero residual. The device must derive transition inverses,
+products, path dependence and closed return from edges; a mounted product or characteristic is
+forbidden.
+
+**Returned-conduct aperture:** the fifth card carries observed crossing, returned-passage,
+same-body delta, detached-remount behavior, source-access, lossless-retention, testimony-only, and
+held-out-conduct bits for one genuine returned-change case and exposure, mount, retained lookup,
+lossless encoding, testimony, and rejected-return controls. The device enumerates every conjunction
+of required-positive and required-negative fields and selects the least unique separator. The
+accepted predicate must require returned passage, committed same-body difference and detached
+held-out change while excluding source access, lossless corpus retention and testimony-only
+conduct. Every rejected case retains the first falsifying field. This bounded derivation does not
+rename all exposure as training and does not re-establish R10 as R32's mathematical result; it
+connects the already physical return mechanism to the other four newly derived laws.
+
+**Self-organ and held-out improvement:** powers of the derived closed return `H`, not a card sample
+array, produce the developmental trace
+`2,3,7,18,47,123,322,843`. The exact feature search over constant-coefficient shifts of order one
+through three must return `[1,-3,1]` as the least unique primitive kernel and retain every failed or
+nonunique candidate. The organ is committed only with the first checker return and rested without
+the trace.
+
+The held-out card is a three-edge chart loop with transitions `A`, `B^-1`, and `B^2`. Its product
+is `K=[[2,1],[1,1]]`, which shares trace three and determinant one with `H` but has different edge
+support and source lineage. The source current independently forms traces
+`2,3,7,18,47,123,322,843,2207`; only `2,3` cross to the organ current before it predicts the last
+seven. With organ `199305` excluded, no tail or dependent theorem may form; the independently
+formed hidden comparison stream remains unchanged. The improvement is the exact extension of the
+held-out mathematical passage under a fixed two-term access aperture, not a claim that the two
+source geometries are identical.
+
+**Formal, countermodel, and conversational return:** the first generated Lean source defines the
+bounded situated-occurrence, successor, finite-receiver, chart-transition, closed-return, and
+returned-conduct faces from the GPU return. It proves the selected identity mask, both signed
+boundary cancellations, the five composition signatures, coarse factorization and strict
+reopening, alternative path and holonomy products, the selected conduct predicate over every
+case, the developmental trace residuals, and a final theorem invoking the connected calculus. It
+also proves concrete countermodels for payload/source collapse, unsigned boundary, scalar-only
+interchange, co-presence-as-contact, coarse over-condensation, flatness of the curved square, and
+lookup-as-reusable-conduct. The held-out source proves every prediction and recurrence residual and
+depends on the returned organ face. The conversational dossier must explain the derived calculus
+in ordinary mathematical language, the shared causal thread among its parts, all countermodels,
+the held-out improvement and ablation, and what remains open. Counts, topology, a vocabulary match,
+or the post-seal comparison cannot substitute for these artifacts.
+
+**Canon withholding and comparison:** before seal, both executables and every checker crossing may
+open only the predecessor rest, declared cards, toolchain libraries and their own outputs. The
+source audit rejects any access to `canon/`, `blueprint/`, `research/`, `reference/`, `papers/`, or
+`evidence/`. The seal covers both deeds, native rests, both Lean sources/returns, all atlases, the
+dossier, source audit and determinism receipt. Only after that seal may the exterior comparison
+open `canon/00_PURE_HOLONICS.md`, `canon/01_CAUSAL_CALCULUS.md`,
+`canon/03_CONDITIONING_AND_LEARNING.md`, and `canon/04_GEOMETRY_NAVIGATION_AND_WEAVE.md`. The
+comparison maps exact returned laws and countermodels to canon statements, records agreement,
+strictly bounded alternatives and divergences, retains the earlier hashes, and has grade
+`interpretation`; it cannot cause the body or retroactively select a law.
+
+**Acceptance:** both executable deeds perform their hot mathematical work on resident GPU currents;
+the five developmental currents and held-out source/organ currents are genuinely independent;
+complete atlases demonstrate selection from declared grammars; the connected law weave consumes
+only returned local structures; first checker return precedes organ commit and sample-free rest;
+held-out prediction precedes hidden-tail access; exact changed-card, countermodel, remount and
+organ-ablation receipts pass; an independent host implementation agrees with every atlas row
+without owning continuation; both actual Lean sources/returns and the actual dossier are inspected;
+source-open, seal, post-seal comparison, and determinism protocols pass; and the complete
+architecture, ownership, no-float, sanitizer, PTX/SASS, binary and file-size gates pass.
+
+**Grade:** `established-bounded` with `implemented-exact` and `computational-witness` only after the
+complete frozen discovery/application ecology and every gate pass; `proved-derived` with
+`formal-checked` only for accepted generated declarations; `interpretation` for post-seal mapping
+to canon; `proved-standard` for boundary-of-boundary cancellation, finite fiber factorization, and
+Cayley--Hamilton recurrence under their declared hypotheses; and `outside-aperture` for a unique or
+universal ontology, arbitrary category/sheaf theory, unrestricted self-derivation, natural-language
+comprehension, and autonomous intelligence. A canon open before seal, a doctrine word or answer on
+a card, controller-selected law, classifier label, mounted matrix product/trace/kernel, stored
+developmental rows in rest, post-tail prediction, scalar-only successor comparison, text-similarity
+grade, or hardcoded topology-specific held-out predictor falsifies the deed.
 
 The required return is not one rediscovered identity. It is an internally connected calculus
 which, in the chosen exact aperture:
@@ -2851,11 +3037,189 @@ new equivalent presentation, a bounded alternative, or an exact obstruction. Nei
 similarity nor canon conformance alone passes the gate.
 
 R32 is the direct answer to “can the machine derive its own holonics?” It is a finite exact grade,
-not a claim that one experiment has discovered the unique ontology of intelligence.
+not a claim that one experiment has discovered the unique ontology of intelligence. Both GPU deeds,
+the two returned proof artifacts, 2,266-row independent conformance, source-separated held-out
+improvement, exact ablation, deterministic seal, post-seal canon comparison, complete `112/112`
+suite, architecture/device-binary audits, and four sanitizer returns passed. The body continues at
+head `14001044`, continuation `15001044`, with calculus fibers `199300` through `199305` and
+held-out fiber `199306`. The admitted return is recorded in
+[`R32_ELEMENTARY_HOLONICS_SELF_DERIVATION_RECEIPT.md`](../receipts/R32_ELEMENTARY_HOLONICS_SELF_DERIVATION_RECEIPT.md).
 
-### R33+ — Open mathematical production and research campaigns
+### R33 — Source-separated characteristic hypergeometry and trace transport
 
-**Program horizon (`open`):** once R25–R32 return, the machine is no longer used merely to check
+**Frozen construction (`project-postulate`; admission pending):** enter open mathematical
+production by asking the R32 body to characterize how exact local transition faces distribute
+into closed characteristic strata and to propose the governing trace law from data it constructs
+itself. The developmental sources provide bounded integral unimodular generators, word alphabets,
+and apertures; they do not provide a trace identity, named theorem, coefficient vector,
+classification label, proof, expected histogram, or held-out answer. The resident GPU forms every
+matrix, path, product, inverse, commutator, characteristic coordinate, collision witness and
+candidate law. A general symbolic theorem is rendered only from the selected returned
+coefficients. A second source-separated deed must then use the rested law organ to predict the
+closed characteristic of a different held-out transport ecology before its matrix return is
+opened.
+
+This phase operationalizes the user's “faces of shapes” question. A face is not a rendered
+polygon: it is an exact transition with incidence, orientation, lineage and a characteristic
+receiver. A shape archetype is the resulting package of open-face traces, product-face trace,
+closed commutator trace, discriminant strata, fixed-module data and residual. The census asks how
+often those packages occur in a declared finite ecology, which coordinates actually transport the
+closed return, and which visible coincidences fail to determine it. Frequencies remain bounded
+population counts, never probabilities or universal geometry.
+
+**Construction tuple:**
+
+- source owners: the one R32 continuing body with thirty-two accepted fibers and the elementary
+  calculus/self-holonomy organ; three mutually inaccessible developmental transition cards; one
+  held-out multi-edge local-system card; admitted exact integer, matrix, incidence, characteristic,
+  feature-search, proof-return, organ, source-audit and rest owners; and new reduced-word,
+  transition-face, ordered-pair, trace-coordinate, commutator, discriminant-stratum, fixed-module,
+  collision, distribution, polynomial-feature, trace-law, symbolic-proof, prediction, comparison,
+  obstruction, dossier, atlas, seal, literature-comparison and rest owners;
+- port types: the 2,472-byte R32 native rest; raw/typed generator cards; oriented letter and reduced
+  word; exact integral `2x2` transition and inverse; ordered word pair; open traces `x=tr(A)`,
+  `y=tr(B)`, product trace `z=tr(AB)`; closed word `ABA^-1B^-1`; closed trace `k`; determinant and
+  trace discriminant; kernel/fixed-module rank; lineage; monomial feature row; exact rank, pivot,
+  nullity, residual and primitive polynomial organ; archetype key and exact population; collision
+  witness; checker return; sample-free trace-law rest; held-out transition complex, visible
+  characteristic face, hidden matrix return, prediction, comparison, ablation, changed-determinant
+  obstruction, theorem/proof/dossier/atlas, source audit, seal, post-seal literature comparison,
+  and final native-rest faces;
+- event occurrence: remount R32; open the three developmental cards on independent source currents;
+  generate every reduced word within each declared aperture and every admitted ordered pair;
+  construct transitions by word order, then derive all open/product/closed characteristic faces;
+  partition the population by exact discriminant and fixed-module strata; retain exact counts and
+  every required collision; enumerate the declared polynomial grammar over `1,x,y,z,k` and select
+  the least primitive law which survives all three sources and the rank/nonuniqueness controls;
+  render a coefficient-driven general symbolic theorem and return it through Lean; commit the
+  trace-law organ and discovery fibers; rest with no developmental word, matrix, row or expected
+  answer; destroy all developmental residency; remount only that rest; open the held-out
+  local-system card; derive its visible `x,y,z` face independently; let the organ predict `k`, its
+  closed characteristic polynomial and stratum before a barrier opens the full matrix
+  commutator; compare, run organ exclusion and determinant-violation controls; render/check a
+  dependent theorem and conversational dossier; commit the application fiber; rest/remount;
+  audit, replay and seal; only then compare the sealed identity to external classical literature;
+- predecessor identity: admitted R32 head `14001044`, continuation `15001044`, body morphology
+  `1103`, mathematical morphology `370`, codec morphology `171`, calculus morphology `64`,
+  self-organ morphology `32`, derivation morphology `24`, and thirty-two fibers through `199306`
+  recorded in `CONSTRUCTION_STATE.md` and the R32 receipt;
+- local constitutive law: exact reduced-word generation with immediate inverse cancellation;
+  ordered integral matrix multiplication and determinant-one inverse; trace, determinant,
+  `X^2-trace*X+1`, exact kernel-rank and fixed-module formation; discriminant sign by integer
+  comparison; complete grouping and counting; exact pairwise collision search; exhaustive
+  polynomial features in `x,y,z` through total degree three plus `k`; exact rational row reduction,
+  denominator clearing, gcd/sign normalization and least-complexity selection; coefficient-driven
+  symbolic expansion; delayed hidden-return comparison; identity-exact organ ablation;
+- receiver question: which exact characteristic coordinates of two intersecting transition faces
+  determine their closed holonomy characteristic, how do the resulting archetypes distribute in
+  the declared source ecology, and can a law selected from those returns transport to a different
+  held-out topology without matrix lookup?;
+- returned consequence: complete per-pair and grouped archetype atlases; exact elliptic,
+  parabolic and hyperbolic characteristic strata where present and explicit absent-stratum
+  testimony where not; collision witnesses showing that individual face characteristics do not
+  determine the closed return, that equal full characteristic coordinates do not identify source
+  lineage, and that order reversal preserves the closed characteristic while changing the path;
+  one least primitive trace-law organ; a generated general theorem and concrete countermodels; a
+  sample-free rest; one held-out closed-characteristic prediction formed before comparison; exact
+  determinant and organ-exclusion obstructions; a dependent theorem and conversational account;
+  checker-founded discovery and application fibers `200300` onward; source/literature audits,
+  deterministic seal and final continuation at head `14001048`; and
+- open alternatives: unbounded word length or coefficient height; arbitrary rank; non-unimodular,
+  projective, symplectic or quantum character varieties; complete conjugacy classification;
+  geometric realization of every characteristic point; analytic continuation; probabilistic
+  shape distributions; autonomous theorem valuation; Hodge or RH consequences.
+
+**Developmental population:** the three cards declare distinct generator ecologies over
+`SL(2,Z)`: positive shear words, signed reduced words, and an exact simultaneous rechart of a
+signed population. The card format carries only generator matrices, inverse-letter relation,
+maximum reduced length and pair aperture. The device must materialize every admitted reduced word
+and ordered pair from these local laws. Recharted matrices are reconstructed by exact conjugation,
+not supplied as duplicate answers. Source identity and word lineage remain distinct even when all
+characteristic receivers agree.
+
+For every ordered pair `(A,B)`, the device forms
+
+```text
+x = tr(A),  y = tr(B),  z = tr(AB),
+C = A B A^-1 B^-1,  k = tr(C),  delta_C = k^2 - 4.
+```
+
+It also forms the characteristic polynomials and exact fixed-module ranks of `A`, `B`, `AB`, and
+`C`. The archetype key contains the signs of their discriminants, the closed fixed-module rank and
+the complete `(x,y,z,k)` receiver; population summaries may quotient this key only through a
+declared receiver. The atlas retains counts, not just representative shapes.
+
+**Law-discovery aperture:** feature columns are all monomials in `x,y,z` of total degree at most
+three together with `k`. Candidate supports are ordered first by total degree, then number of
+nonzero coefficients, coefficient height and lexicographic position. Exact elimination across
+each source separately and their joined rows must return a common one-dimensional primitive
+kernel. Constant, coordinate-deleted, degree-two, source-local and rank-deficient controls remain
+in the atlas. No coefficient may be installed in CUDA, renderer or held-out code before the
+selected organ returns.
+
+The expected post-return literature name is the Fricke--Vogt commutator trace identity, but this
+name and its coefficients are forbidden from every pre-seal card, executable argument, device
+constant, renderer template and checker premise. The generated Lean theorem must quantify the
+eight entries of two integral `2x2` matrices, assume exactly their determinant-one hypotheses,
+construct both inverses and the commutator, and prove the coefficient-rendered identity by exact
+algebra. A finite census or a theorem whose statement already contains controller-written
+coefficients does not pass.
+
+**Required countermodels and archetype witnesses:** the developmental return must include:
+
+- equal `tr(A)` and `tr(B)` with unequal `tr(AB)` and unequal closed characteristic;
+- equal individual and product characteristic coordinates with unequal word/source lineage;
+- `(A,B)` and `(B,A)` with inverse closed words, equal closed trace and unequal ordered path;
+- simultaneous conjugation preserving `(x,y,z,k)` while changing every admitted matrix face;
+- a noncommuting pair with parabolic-looking individual faces but non-parabolic closed return;
+- a determinant-violating foil on which the selected law is explicitly inapplicable; and
+- any characteristic stratum absent from the bounded population recorded as absent, not silently
+  manufactured by a fixture.
+
+These witnesses keep spectral placement distinct from geometric source identity. They also state
+exactly what the trace organ forgets: it transports one closed characteristic receiver, not the
+full word, embedding, orientation, incidence or continuation.
+
+**Held-out transport:** the held-out card describes a different multi-edge local system assembled
+from source-native transitions rather than a developmental word pair. Its source current forms
+the full matrices and closed commutator behind a comparison barrier. Before that barrier, only the
+three independently derived open coordinates `(x,y,z)` cross to the organ current. The organ must
+predict `k`, `X^2-kX+1`, discriminant stratum and fixed-module consequence, then form a theorem
+request whose proof depends on the returned law fiber. Exact organ exclusion forms no prediction
+or dependent proof. A changed transition with determinant other than one returns
+`unsupported_determinant` rather than applying the identity.
+
+**Formal, conversational and external return:** the first generated source contains the general
+symbolic identity, the selected coefficient vector, exact inverse hypotheses and finite
+countermodel declarations. The second imports that actual returned module and proves the held-out
+characteristic prediction. The dossier explains the discovered face coordinates, census,
+collisions, selected transport law, what the organ forgets, held-out use and remaining open fiber
+in ordinary mathematical language. Only after seal may an exterior literature audit name and
+compare the classical identity; agreement receives `proved-standard` only for the exact general
+identity, while the finite population and its distribution retain `established-bounded`.
+
+**Acceptance:** both executable deeds perform matrix formation, census, elimination, selection,
+prediction and ablation on resident GPU currents; all developmental and held-out currents are
+source separated; complete atlases retain every population member, group count, candidate law and
+countermodel; the first checker return precedes organ commit and sample-free rest; held-out
+prediction precedes hidden commutator access; an independent host implementation agrees with
+every atlas row without owning continuation; both actual theorem artifacts and dossier are
+inspected; source-open, determinism, seal and post-seal literature protocols pass; and the complete
+architecture, ownership, no-float, sanitizer, PTX/SASS, binary and file-size gates pass.
+
+**Grade:** `established-bounded` with `implemented-exact` and `computational-witness` only for the
+complete finite archetype ecology and passing apparatus gates; `proved-derived` with
+`formal-checked` for accepted generated declarations; `proved-standard` for the general identity
+only after independent formal and literature agreement; `interpretation` for geometric names and
+post-seal comparison; `outside-aperture` for universality, arbitrary character varieties,
+autonomous research judgment, Hodge realization or RH. Supplied coefficients, a named identity in
+pre-seal access, host-formed matrices or law selection, float-derived strata, hidden-tail access
+before prediction, a histogram without complete rows, or a held-out answer table falsifies the
+deed.
+
+### R34+ — Open mathematical production and research campaigns
+
+**Program horizon (`open`):** once R25–R33 return, the machine is no longer used merely to check
 whether a preselected mechanism works. The same body receives a real frontier ecology and must
 return a new theorem, lemma, counterexample, classification, construction, or exact obstruction
 which was not mounted as an answer and which materially narrows the question. Independent formal,
@@ -2934,8 +3298,8 @@ At every phase boundary:
 
 ## 9. Fresh-session pickup
 
-Extraction/canon/provenance and R0–R30 are complete. R31 endogenous cultivation of mathematical
-organs is the next open program gate, but no R31 construction tuple is frozen.
+Extraction/canon/provenance and R0–R32 are complete. R33 source-separated characteristic
+hypergeometry and trace transport is the frozen next program gate; its admission remains pending.
 The live admitted head and current gate are named only in `CONSTRUCTION_STATE.md`. A fresh session must
 read, in order:
 
@@ -2950,5 +3314,6 @@ read, in order:
 
 Do not reread the entire imported research archive, infer a continuation from historical status
 prose, restart R0, or repeat a proof/language/conditioning fixture. Preserve every admitted fiber,
-use the post-R24 convergence audit and the R25–R30 receipts to exclude already-paid expectations,
-and freeze R31 into a complete construction tuple here before changing later domain code.
+use the post-R24 convergence audit and the R25–R32 receipts to exclude already-paid expectations,
+and execute the complete frozen R33 tuple without narrowing it to a preinstalled identity, a
+histogram without complete source rows, or one familiar matrix fixture.
