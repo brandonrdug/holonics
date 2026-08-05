@@ -1642,11 +1642,12 @@ finite signature is promoted into a universal shape identity.
 
 ### R25+ mathematical autogenesis program
 
-The phase names below are an ordered `project-postulate`, not frozen construction tuples. R25 is
-still `open` in `CONSTRUCTION_STATE.md`. Before any named phase begins, its exact source owners,
-ports, event, predecessor, local law, receiver question, return, alternatives, aperture,
-falsifiers, artifacts, and grades must replace its program gate here. Reserving a phase name does
-not authorize nearby code or admit its result.
+The phase names below are an ordered `project-postulate`. R25's directly frozen construction has
+passed its bounded grade; R26+ remain program gates rather than construction tuples.
+Before any later named phase begins, its exact source owners, ports, event, predecessor, local
+law, receiver question, return, alternatives, aperture, falsifiers, artifacts, and grades must
+replace its program gate here. Reserving a phase name does not authorize nearby code or admit its
+result.
 
 The program has one trajectory:
 
@@ -1685,37 +1686,142 @@ but accumulating or paraphrasing material is not the primary deed.
 
 ### R25 — Exact causal linear, multilinear, and chain calculus
 
-**Program gate (`open`):** generalize the bounded rank-two and finite-matrix instruments into an
-owner-local exact carrier for the characteristic properties which later geometry will transport.
-This is not a request for a generic “tensor module” detached from incidence. Every operator is a
-situated map between typed finite modules or chain/cochain groups, with source bases, ports,
-forms, and lineage.
+R25 generalizes the bounded rank-two and domain-local matrix instruments into one owner-local exact
+carrier for the characteristic properties which later geometry will transport. This is not a
+generic “tensor module” detached from incidence. Every operator is a situated map between typed
+finite modules or chain/cochain groups, with source bases, ports, forms, and lineage.
 
-The eventual frozen deed must compose several of the R18, R22, R23, and R24 sources and return:
+The phase is deliberately one multi-source deed. It remounts the R24 body and mounts four
+source-separated mathematical occurrences without any expected invariant:
 
-- exact finite free and finitely presented modules over the admitted integer, rational,
-  finite-field, quotient-ring, and exact extension carriers required by the chosen aperture;
-- rank, kernel, cokernel, image, Smith/invariant factors, rational/Frobenius canonical data,
-  primary modules, generalized eigenspaces, and exact obstruction when a requested splitting is
-  unavailable in the mounted coefficient field;
-- determinants, characteristic and minimal factors, discriminants, resultants, signatures,
-  adjoints relative to a declared form, exterior powers, tensor contractions, and induced maps;
-- chain/cochain complexes, mapping cones, homology/cohomology, cup or intersection products where
-  caused by source incidence, and exact chain-homotopy/commutator residuals;
-- parameter-dependent operator pencils whose rank, discriminant, invariant-factor, or fixed-fiber
-  jumps define exact characteristic strata; and
-- generated formal artifacts which prove the returned identities from their coefficients rather
-  than asserting a general library theorem as the result.
+1. an unlabelled cyclic phase request with moduli `(2,3)`;
+2. the R22 cyclotomic-order card with order five, degree four, five translations, and the complete
+   binary coefficient window;
+3. the R23 two-fan/cycle card with its declared star-subdivision cone; and
+4. the R24 affine cubic coefficient card.
 
-Controls must include equal characteristic polynomial with unequal module or edge lineage, equal
-rank with unequal kernel placement, conjugate rechart with equal intrinsic conduct, a genuinely
-changed form or topology, and a coefficient field in which the requested eigenvalue does not yet
-exist. Floating eigensolvers, decimal root approximations, and “eigenvector” language without a
-typed endomorphism and coefficient field do not satisfy the gate.
+The R22–R24 cards are source occurrences, not imported result atlases. Their old GPU laws may be
+composed as existing organs, but no R18–R24 characteristic coefficient, rank, kernel, form,
+Betti number, Smith factor, theorem statement, or proof is mounted. The R25 question card supplies
+only the phase moduli and rational-eigenvalue search aperture `[-2,2]`.
 
-R25 is complete only when this calculus is used by multiple resident source species in one
-returned atlas and proof bundle. Merely templating the rank-two R19 calculation at a larger fixed
-dimension is a repeat.
+**Construction tuple:**
+
+- source owners: the one R24 continuing body with its eleven accepted fibers; the R25 phase/
+  coefficient-field question card; the lineaged R22 CM, R23 toric, and R24 algebraic-family
+  cards; existing phase, CM, toric, and variation source organs; new exact rectangular-matrix,
+  rational elimination, rank-two Smith, chain, characteristic, exterior/tensor, adjoint,
+  coefficient-extension, control, theorem-current, proof-face, checker-return, and native-rest
+  owners;
+- port types: the admitted 760-byte R24 native rest; raw/typed cards; phase vertex/edge/face and
+  boundary-map faces; CM translation, graph-incidence, adjacency, and polynomial faces; toric
+  character, quotient, intersection, and blow-up faces; variation connection, invariant-form,
+  loop, pencil, exterior, and tensor faces; matrix/module/chain/characteristic/control receipts;
+  theorem/proof/explanation faces; raw/typed checker return; changed-card probe; and one continuing
+  native rest;
+- event occurrence: remount R24; mount the four cards; derive the four source sections on four
+  independent resident GPU currents; apply the shared exact calculus to each section; after that
+  barrier, derive the spectral-fiber, kernel-placement, conjugacy, and coefficient-field controls
+  on four independent resident currents; aggregate their characteristic and chain consequences
+  only after every local return exists; retain the unequal controls and coefficient-field
+  obstruction; form and check one theorem passage from the jointly exact sections; commit the
+  checker return; rest/remount the same body; and probe phase moduli `(2,4)` without creating
+  another body;
+- predecessor identity: admitted R24 head `14001022`, continuation `15001022`, body morphology
+  `413`, mathematical morphology `130`, codec morphology `69`, and eleven fibers through
+  `191300` recorded in `CONSTRUCTION_STATE.md` and the R24 receipt;
+- local constitutive law: bounded exact signed-integer arithmetic with refusal; reduced-rational
+  Gaussian elimination for rank, pivot, kernel, and cokernel testimony; rank-at-most-two Smith
+  factors from determinantal divisors; exact matrix product, transpose, Kronecker product, exterior
+  square, trace-power characteristic recurrence, polynomial factor/removal, and fixed-fiber
+  calculation; oriented cellular/graph boundary formation with exact `d∘d`; form-adjoint
+  comparison; and parameter-pencil determinant/rank stratification;
+- receiver question: which module, chain, characteristic, fixed-fiber, pairing, and jump-stratum
+  properties are forced by these four different caused geometries, which properties survive
+  rechart or induced transport, and which equal receiver faces retain unequal source conduct?;
+- returned consequence: one actual multi-source module/chain/characteristic atlas; a generated
+  coefficient-driven theorem/proof and conversational explanation; one checker occurrence; an
+  acquired exact-calculus fiber; native rest/remount; an exact changed-phase return; and explicit
+  open alternatives; and
+- open alternatives: arbitrary matrix dimension and presentation rank; full Smith and primary
+  decomposition over general PIDs; algebraic root isolation and arbitrary extension fields;
+  sparse higher chain complexes; derived categories; certified analytic spectra; intrinsic
+  archetype induction; Hodge realization; arithmetic Frobenius; and RH-facing trace carriers.
+
+**Exact aperture:** rectangular integer matrices have at most 16 rows and 48 columns; square
+endomorphisms have degree at most 16; characteristic coefficients and all intermediate signed
+integers must remain in the checked 64-bit carrier or return overflow obstruction; rational
+elimination uses exact reduced `small_rational` values; Smith return is required only for
+rank-at-most-two presentations in this deed. The phase section has six vertices, twelve oriented
+edges, and six faces. The CM section has sixteen vertices and forty edges. The toric section uses
+the two mounted smooth fans and their one derived star subdivision. The variation section uses the
+returned rank-two connection numerator, alternating form, and three loop transports. The changed
+phase probe has eight vertices, sixteen edges, and eight faces and therefore remains inside the
+same compiled aperture.
+
+**Construct and return:**
+
+- form the complete oriented `(2,3)` product-cell boundary maps
+  `C2 -> C1 -> C0`, prove their composite is zero, and return exact ranks `(5,5)`, Betti numbers
+  `(1,2,1)`, diagonal permutation characteristic `X^6-1`, and complete vertex/edge/face lineage;
+- derive the R22 periodic CM graph again from the mounted cyclotomic source, then let the common
+  calculus independently return its `16x40` incidence rank `15`, graph homology ranks
+  `H0=1,H1=25`, adjacency characteristic polynomial/factors, and agreement with the existing
+  domain-local characteristic return;
+- pass both R23 character maps through the common rectangular carrier, returning rank, pivot and
+  cokernel placement and Smith factors `(1,1)`, then carry the selected star subdivision through
+  the same quotient/intersection receiver and expose the changed free rank and exceptional
+  negative direction as a topology change rather than a larger matrix alone;
+- derive the R24 source receipt from its coefficient card, carry its connection numerator pencil
+  `[[t,-1],[t,-t]]`, return determinant `t(1-t)` and exact rank-drop strata `{0,1}`, verify all
+  three loop adjoints through the returned alternating form, and form exterior-square and
+  Kronecker transports from the source matrices;
+- return four explicit controls: identity versus a nontrivial Jordan block with equal
+  characteristic `(X-1)^2` but fixed dimensions two versus one; two rank-one maps with kernels on
+  different source axes; conjugate endomorphisms with equal intrinsic characteristic data and
+  unequal presentation lineage; and `[[0,-1],[1,0]]`, whose `X^2+1` returns exact discriminant
+  `-4` and hence no rational eigenvalue, but has the exact eigenpair `(i,(1,-i))` after the
+  declared Gaussian extension;
+- retain all pivots, kernel bases, polynomial coefficients, source identities, lineages,
+  coefficient fields, failed splittings, and topology residuals. A characteristic polynomial or
+  Betti vector alone is not the returned module; and
+- generate a Lean passage from returned coefficients proving the bounded rank/nullity and chain
+  equalities, CM factor expansion, toric determinantal-divisor consequences, variation-pencil
+  determinant and loop-form identities, equal-characteristic/unequal-fixed control, and rational
+  nonexistence of a root of `X^2+1`. The proof must not call an imported theorem which already
+  states the complete returned conjunction.
+
+**Changed-card probe:** change only the second phase modulus from `3` to `4`. The device must
+return eight vertices, sixteen edges, eight faces, ranks `(7,7)`, Betti numbers `(1,2,1)`, and a
+diagonal return with two tours of length four. It must not replay the `(2,3)` result, raise a bound,
+or alter the continuing body.
+
+**Acceptance:** all four source derivations and the shared matrix/chain/characteristic operations
+occur on the resident GPU and agree with an independent exact offline audit; source sections are
+computed on distinct local currents, the four control relations have their own exact currents,
+and both populations aggregate only through complete returned-section barriers; the common
+carrier, not a host table or four domain-specific printers, returns every
+matrix consequence; every overflow or unavailable splitting remains explicit; the changed card
+changes the exact return without recompilation; the generated proof really crosses the exterior
+checker; source-detached rest/remount preserves all prior fibers and the new fiber; and the full
+architecture, ownership, no-float, determinism, device-sanitizer, binary, and file-size gates
+pass.
+
+**Grade:** `established-bounded` with `implemented-exact` and `computational-witness` only after
+the complete four-source atlas, control population, changed-card return, proof artifact, and
+native continuation actually return; `proved-derived` with `formal-checked` only for the emitted
+Lean statements; `proved-standard` for the ordinary finite-dimensional rank-nullity, cellular
+homology, Smith-determinantal-divisor, exterior-power, tensor, and adjoint laws under their stated
+coefficient hypotheses; and `historical` for the source-specific R18–R24 results used as regression
+and comparison. Arbitrary-rank exact linear algebra, a universal tensor calculus, analytic
+eigenvalues, intrinsic hypergeometric archetype discovery, Hodge realization, Weil positivity,
+and RH remain outside R25.
+
+**Admission return (`established-bounded`, `implemented-exact`, `computational-witness`):** the
+four-source GPU deed, changed `(2,4)` probe, common causal-linear atlas, generated Lean theorem,
+checker return, and native continuation all returned and passed the full R25 grade. The exact
+result and apparatus testimony are retained in
+[`receipts/R25_EXACT_CAUSAL_LINEAR_CHAIN_CALCULUS_RECEIPT.md`](../receipts/R25_EXACT_CAUSAL_LINEAR_CHAIN_CALCULUS_RECEIPT.md).
 
 ### R26 — Intrinsic causal hypergeometry and archetype distribution
 
@@ -2013,9 +2119,10 @@ At every phase boundary:
 
 ## 9. Fresh-session pickup
 
-Extraction/canon/provenance and R0–R24 are complete. The live admitted head and next deed are named
-only in `CONSTRUCTION_STATE.md`; at this revision no R25 construction tuple is frozen. A fresh
-session must read, in order:
+Extraction/canon/provenance and R0–R25 are complete. R26 intrinsic causal hypergeometry and
+archetype distribution is the next program gate, but no R26 construction tuple is frozen. The live
+admitted head and current gate are named only in `CONSTRUCTION_STATE.md`. A fresh session must
+read, in order:
 
 1. `AGENTS.md`;
 2. `CONSTRUCTION_STATE.md`;
@@ -2028,5 +2135,5 @@ session must read, in order:
 
 Do not reread the entire imported research archive, infer a continuation from historical status
 prose, restart R0, or repeat a proof/language/conditioning fixture. Preserve every admitted fiber,
-use the post-R24 convergence audit to exclude already-paid expectations, and freeze the selected
-R25+ program gate into a complete construction tuple here before changing domain code.
+use the post-R24 convergence audit and the R25 receipt to exclude already-paid expectations, and
+freeze R26 into a complete construction tuple here before changing later domain code.

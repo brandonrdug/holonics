@@ -142,20 +142,33 @@
   rests at head `14001022`, continuation `15001022`, with all prior fibers preserved and algebraic-
   variation fiber `191300` acquired.
   [Receipt](receipts/R24_ALGEBRAIC_VARIATION_GAUSS_MANIN_RECEIPT.md).
+- R25: four source-separated geometries pass through one exact GPU causal-linear carrier. Complete
+  phase and CM boundary maps return their ranks, homology, characteristic, and lineage; toric
+  character maps return determinantal divisors, cokernel placement, and the exceptional negative
+  direction; and the varying cubic returns its rank-jump pencil, form adjoints, exterior square,
+  and tensor transport. Four controls retain unequal fixed fibers, kernel placement, presentation
+  lineage, and coefficient-field obstruction behind equal quotient faces. The changed phase probe
+  returns the complete `(2,4)` chain without replay. A coefficient-rendered Lean conjunction is
+  kernel accepted, and the same body rests at head `14001024`, continuation `15001024`, with every
+  prior fiber preserved and causal-linear fiber `192300` acquired.
+  [Receipt](receipts/R25_EXACT_CAUSAL_LINEAR_CHAIN_CALCULUS_RECEIPT.md).
 
-The ordered R0–R16 construction and the directly authorized R17–R24 post-frontier inquiries are
+The ordered R0–R16 construction and the directly authorized R17–R25 post-frontier inquiries are
 complete.
 
-**Next deed (`open`): no R25 construction is frozen.** The live body now rests at head `14001022`
-and continuation `15001022`. R24 has closed the bounded dynamic bridge from a varying algebraic
-source through its singular divisor, exact differential transport, invariant pairing, scalar
-operator, recurrence, and collision monodromy to a theorem formed from the jointly surviving
-section. Higher-rank and multivariate variation, certified analytic periods, Noether--Lefschetz
-loci, higher cycle realization, motives, arithmetic Frobenius families, completed Weil forms, and
-RH-facing trace operators remain open alternatives. A next phase must freeze its own construction
-tuple, exact aperture, required actual artifact, falsification boundary, and intended grades in
-[`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md) before work
-begins; none is silently scheduled.
+**Next deed (`open`): no R26 construction is frozen.** The live body now rests at head `14001024`
+and continuation `15001024`. R25 has established one exact carrier through which phase cells, CM
+incidence, toric quotients, algebraic variation, characteristic placement, kernel/cokernel
+placement, transported forms, coefficient fields, and topology changes can be compared without
+collapsing them into a spectral summary or presentation name. R26's program gate is intrinsic
+causal hypergeometry and archetype distribution: derive operative faces, strings, cells, flags,
+links, seams, local systems, and characteristic strata from source incidence before projection,
+then test which packages predict changed transport across phase and non-phase geometries. A next
+phase must freeze its complete construction tuple, exact aperture, actual returned artifact,
+falsification boundary, and intended grades in
+[`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md) before domain
+code changes; Hodge realization, arithmetic Frobenius, Weil positivity, and RH-facing trace
+operators remain later open alternatives.
 
 Update this file only after a phase's required artifact and receipts have returned and its grade
 has passed. Do not record intentions or partial work as admitted standing.
