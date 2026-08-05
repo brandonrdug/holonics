@@ -62,8 +62,8 @@ struct checker_typed_return final {
   std::uint16_t produced_declarations{};
   std::uint16_t remaining_goal_count{};
   std::uint16_t message_bytes{};
-  std::uint16_t source_span_begin{};
-  std::uint16_t source_span_end{};
+  std::uint32_t source_span_begin{};
+  std::uint32_t source_span_end{};
   bool elaborator_boundary_crossed{};
   bool kernel_boundary_crossed{};
 };
@@ -89,4 +89,4 @@ struct checker_observation final {
   bool passage_preserved{};
 };
 
-}  // namespace holonics::event
+} // namespace holonics::event

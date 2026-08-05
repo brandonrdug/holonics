@@ -1,0 +1,10 @@
+truth_status=established-bounded
+evidence=implemented-exact
+instrument=LD_PRELOAD open/open64/openat/openat64 syscall witness
+instrumented_deed_exit=0
+opened_path_occurrences=2826
+opened_path_log_sha256=b7b73d25439d7ab05d4a53f5838ed0da0a3e608a8991ce78e8a7b1f2d139447c
+required_runtime_sources=R29_rest,three_R30_cards,foil_and_valid_checker_faces
+forbidden_repository_sources=absent
+released_pdf=absent
+laboratory_material=absent

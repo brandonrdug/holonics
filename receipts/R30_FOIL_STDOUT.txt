@@ -1,0 +1,6 @@
+/home/b/Workspaces/holonics/build-r30-proof/artifacts/R30_REJECTED_FOIL.lean:3:85: error: unsolved goals
+case left
+⊢ False
+
+case right
+⊢ False

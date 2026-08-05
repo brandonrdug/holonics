@@ -2474,39 +2474,192 @@ RH remain outside R29. The complete return and passing gates are recorded in
 
 ### R30 — Plural source-separated rederivation ecology
 
-**Program gate (`open`):** move from isolated blind reconstruction to sustained mathematical
-work. The body must independently derive substantial known results because their source
-structures force them, not because the exterior controller asserts that a familiar answer is
-correct.
+**Established completion (`established-bounded`, `implemented-exact`):** move from isolated blind
+reconstruction to one sustained mathematical ecology. Three physically source-separated problem
+cards open four exact passages: coefficient/Jacobian independence in a permanent family; lattice
+polygon enumeration and Ehrhart/Pick return; a Dirichlet-energy/eigenmode consequence formed from
+the returned lattice incidence; and a saturated-matrix/two-sided-coordinate-cover construction.
+The four passages must form one dependency-bearing conversational dossier before exterior
+comparison is admitted.
 
 OpenAI's released
 [*Ten Advances in Mathematics and Theoretical Computer Science*](https://cdn.openai.com/pdf/ten-proofs-oai.pdf)
 is an exterior benchmark for this gate. R21 has already paid for the bounded characteristic
 mechanisms corresponding to Chapters 2 and 7. The laboratory's direct Erdős-183 corollary and
-R22's bounded unit-distance/CM mechanism are also historical controls. R30 must not count any of
-those same returns as new successes.
+R22's bounded unit-distance/CM mechanism are also historical controls. R30 does not count any of
+those same returns as new successes. Chapter 5's matching-coefficient/Jacobian mechanism and
+Chapter 9's saturated-matrix/coordinate-cover mechanism remain physically absent from the body;
+the released text is withheld from the runtime and is opened only for a post-seal comparison.
 
-The frozen deed must instead:
+**Construction tuple:**
 
-- use physically source-separated problem/background cards for plural remaining released
-  mechanisms and for selected foundational theorem families in algebra, geometry, analysis, and
-  combinatorics;
-- withhold released solutions, reasoning walkthroughs, expected operators, proof terms, and
-  post-hoc comparisons until every candidate, proof artifact, obstruction, rest image, and source-
-  access audit is sealed;
-- allow the target statement when it is part of the problem, while requiring the mechanism,
-  dependency path, intermediate declarations, and proof to be independently caused;
-- retain failed but lawful alternatives and kernel rejection as mathematical information rather
-  than selecting by accepted count;
-- build dependencies across several theorems so later work can reuse, specialize, refute, or
-  rechart earlier returned fibers; and
-- compare the sealed returns with the released mathematics only afterward, identifying genuine
-  mechanism agreement, distinct valid proofs, weaker lemmas, hidden imported dependencies, and
-  unresolved gaps.
+- source owners: the one R29 continuing body with sixteen accepted fibers; three mutually
+  inaccessible R30 cards carrying a marked-matching aperture, ordered lattice polygons with one
+  boundary-value request, and a finite alphabet/word aperture; the admitted exact integer,
+  polynomial, matrix, causal-linear, geometric-incidence, characteristic, and proof-return organs;
+  and new coefficient-family, injection, Jacobian-factor, lattice-enumerator, polygon-boundary,
+  Ehrhart, Dirichlet, energy, saturated-code, coordinate-cover, alternative, dossier, proof-face,
+  checker-return, comparison-audit, atlas, and native-rest owners;
+- port types: the admitted 1,040-byte R29 native rest; three raw and typed problem cards; marked
+  entry, subset mask, injection, coefficient occurrence, recursive polynomial, evaluation entry,
+  factored determinant, Jacobian row, lattice vertex/edge/point, dilation, oriented double area,
+  boundary gcd, interior/boundary population, Ehrhart coefficient/count, graph incidence,
+  Dirichlet matrix/right-hand side/section, characteristic/eigenvector, energy form, code row,
+  column subset, exceptional word, coordinate-map value, pair witness, failed alternative,
+  dependency edge, theorem/proof/explanation/dossier, checker acceptance/rejection, sealed-source
+  audit, post-seal comparison, and continuing native-rest faces;
+- event occurrence: remount R29; mount all three problem cards through distinct ports; derive the
+  coefficient family, lattice passages, and bounded code rows on independent resident currents;
+  after the lattice barrier, mount its returned rectangle incidence into the Dirichlet current;
+  after the coefficient/code barriers, derive their factor and cover consequences; retain the
+  changed algebra and short-cover obstructions; compose four theorem declarations and a final
+  declaration which invokes all four; return one deliberately stronger foil to the checker and
+  retain its rejection; return the actual dossier passage and commit its acceptance; seal every
+  artifact and source-access audit; only then compare the sealed mechanisms with released
+  Chapters 5 and 9; rest/remount the same body;
+- predecessor identity: admitted R29 head `14001032`, continuation `15001032`, body morphology
+  `782`, mathematical morphology `232`, codec morphology `113`, expression-geometry morphology
+  `37`, Hodge-realization morphology `41`, arithmetic-spectral morphology `47`, and sixteen fibers
+  through `196300` recorded in `CONSTRUCTION_STATE.md` and the R29 receipt;
+- local constitutive law: permanent-coefficient extraction by marked matching; complete weighted
+  injection enumeration; forbidden-coordinate recursion; evaluation/Vandermonde and Kronecker
+  factorization; the characteristic-zero Jacobian criterion as a declared standard comparison;
+  exact oriented shoelace, boundary gcd and lattice-point incidence; bounded dilation enumeration,
+  second finite differences and Ehrhart/Pick/reciprocity comparison; graph boundary and Laplacian
+  formation; exact two-variable Dirichlet solve, Green/energy identity and characteristic return;
+  lexicographic binary-word rows, complete subset saturation, exceptional-word formation, and
+  exhaustive two-sided pair coverage;
+- receiver question: can one body sustain several source-separated mathematical inquiries, retain
+  their alternatives, cause a later theorem from an earlier returned geometric fiber, emit an
+  internally dependent proof dossier, and distinguish bounded agreement with known mechanisms
+  from claims about the full released frontier results?;
+- returned consequence: one 49-by-49 factored Jacobian passage certifying 49 algebraically
+  independent coefficient occurrences in the declared permanent specialization; four exact
+  lattice-polygon passages with Pick/Ehrhart/reciprocity returns; one downstream Dirichlet section,
+  energy minimum and two eigenmodes; one three-row saturated binary matrix, all two-sided cover
+  maps and witnesses; all lawful alternatives including one kernel rejection; a generated
+  dependency-bearing Lean passage and conversational dossier; sealed post-return comparison;
+  acquired fibers `197300` through `197303`; and one source-detached continuation; and
+- open alternatives: the asymptotic permanent circuit/formula bounds, full Chapter 9 Ramsey
+  recursion and asymptotics, arbitrary coefficient fields and matchings, general Jacobian
+  independence, arbitrary lattice polytopes and Ehrhart's volume conjecture, general Pick/Ehrhart
+  theory, continuous PDE or spectral convergence, unbounded alphabets/covers, automatic problem
+  selection, organ cultivation, self-derivation of holonics, and unrestricted research.
 
-One direct `exact existing_theorem`, one familiar algebra identity, or a fixed family of proof
-templates does not satisfy R30. The output is a conversational research dossier containing the
-actual mathematical artifacts and causal analysis, not a benchmark score.
+**Exact source separation and aperture:**
+
+- the algebra card supplies `n=13`, six marked diagonal positions divided into two three-member
+  sides, seven external rows/columns, and distinct integer parameter populations
+  `p=(1,2,3,4,5,6,7)`, `q=(8,9,10,11,12,13,14)`. It supplies no coefficient masks, injection sums,
+  recursive polynomials, Jacobian entry, rank, determinant factor, independence result, or proof;
+- the geometry card supplies the ordered polygons
+
+  ```text
+  [(0,0),(4,0),(0,3)]
+  [(0,0),(3,0),(3,2),(0,2)]
+  [(0,0),(3,0),(3,1),(1,1),(1,3),(0,3)]
+  [(0,0),(5,0),(0,3)]
+  ```
+
+  dilation degrees zero through four, and boundary values `u(x,y)=3x+2y` only on the second
+  polygon. It supplies no area, boundary/interior population, polynomial, reciprocity, graph,
+  Laplacian, solution, energy, eigenvalue, or proof; and
+- the cover card supplies alphabet size two, eight words, maximum width three, and subset size
+  four. It supplies no row, matrix, exceptional word, map, pair witness, coloring, or theorem.
+
+The three card owners expose no port to each other. No released PDF, laboratory solution,
+Mathlib theorem name, expected result, proof walkthrough, or comparison statement is mounted in
+the runtime. A path/open audit must show that production reads only the R29 rest, these cards,
+the generated proof/checker boundary, and its own output paths. Post-seal comparison is exterior
+testimony and cannot alter the deed, atlas, proof, rest, or acquired fibers.
+
+**Construct and return:**
+
+- from all `alpha,beta in [0,6]`, derive the binary subsets of each marked three-set, enumerate
+  every admissible injection avoiding one external coordinate, and recursively form the 49
+  selected coefficient rows. Return all `49^2=2401` Jacobian entries and derive their row-scaled
+  Kronecker factorization into two seven-by-seven evaluation matrices. Retain degrees `0,...,6`,
+  nonzero leading coefficients `(-1)^|P| |P|!`, both Vandermonde factors, every positive injection
+  factor, and the factored nonzero determinant rather than materializing an oversized scalar.
+  Under the declared standard Jacobian criterion this certifies 49 algebraically independent
+  coefficients. Replacing the last `q` by its predecessor must collapse a Vandermonde factor and
+  return dependence-undetermined obstruction, not a fabricated alternative proof;
+- enumerate every lattice point in each dilation box and determine membership by exact oriented
+  incidence. Independently return double area, edge gcd/boundary population, interior population,
+  all five dilation counts, second differences, and reciprocal interior counts. The four returns
+  must respectively be
+
+  ```text
+  area2: 12,12,10,15        boundary: 8,10,12,9       interior: 3,2,0,4
+  L(n):  [1,11,33,67,113]  [1,12,35,70,117]
+         [1,12,33,64,105]  [1,13,40,82,139]
+  ```
+
+  and must satisfy `2L(n)=area2*n^2+boundary*n+2`, Pick, and the corresponding negative-argument
+  interior reciprocity throughout the declared aperture. A self-crossing vertex-order foil must
+  remain a geometry obstruction;
+- mount only the returned `3x2` rectangle incidence into the downstream analysis current. Derive
+  the two interior sites, `L_II=[[4,-1],[-1,4]]`, boundary return `(12,27)`, unique section `(5,8)`,
+  characteristic `(X-3)(X-5)`, eigenvectors `(1,1)` and `(1,-1)`, and, for arbitrary exact
+  zero-boundary perturbation `(r,s)`,
+
+  ```text
+  E(u+(r,s))-E(u) = 4r^2-2rs+4s^2
+                   = 3r^2+3s^2+(r-s)^2 >= 0.
+  ```
+
+  Deleting every interior-to-boundary contact must return nonuniqueness rather than choose a
+  section. The lineage must show that the potential current depends on the geometry return, not
+  directly on the card bytes;
+- derive the least word width by testing the one- and two-row collision obstructions before the
+  three binary coordinate rows. Retain all `70` four-column saturation receipts. From the returned
+  matrix construct `g(x)` and every exceptional set `E_y`, derive `f(y)`, and retain one explicit
+  coordinate witness for all 64 ordered word pairs. The width-two/eight-word foil remains an
+  obstruction. This is the bounded exact core of the released saturated-matrix/two-sided-cover
+  mechanism, not the asymptotic Ramsey construction;
+- generate a Lean passage exclusively from returned coefficients, lattice values, matrices,
+  maps, and witnesses. Separate declarations must prove the Jacobian factor relations and
+  nonzero factors, every Pick/Ehrhart/reciprocity equality, the Dirichlet equations,
+  characteristic/eigenvector and symbolic energy-minimum identities, and total two-sided cover.
+  The final declaration must invoke all four preceding theorem families. It may use basic
+  arithmetic, finite enumeration, polynomial, matrix, and order infrastructure but may not close
+  a result with an existing theorem that contains the generated consequence; and
+- also emit the duplicate-parameter/width-two stronger conjunction as a separate foil passage.
+  Its real kernel rejection is returned to the body as obstruction before the valid passage is
+  checked. Accepted count is not the gate. The conversational dossier must include the actual
+  statements, generated mechanisms, dependency graph, failed alternatives, kernel returns,
+  source-access audit, and a post-seal comparison identifying bounded agreement with released
+  Chapter 5 §9 and Chapter 9 §2 while explicitly refusing their asymptotic main theorems.
+
+**Acceptance:** the algebra, geometry, and cover source currents execute independently on the
+resident GPU; the potential current begins only after a complete geometry-current barrier and
+reads the returned incidence fiber; an independent exact host audit agrees with every atlas row
+without owning continuation; the atlas retains every coefficient mask/injection/factor/Jacobian
+entry, lattice point and boundary receipt, Dirichlet incidence and form entry, code candidate,
+subset certificate, exceptional word, map value, pair witness, obstruction, dependency, and
+lineage; the actual foil rejection and valid proof return from the exterior checker; the actual
+conversational dossier is inspected; sealed hashes precede and survive exterior comparison;
+source-detached rest/remount preserves every earlier and new fiber; card perturbations change all
+four relevant passages without recompilation; and the full architecture, ownership, no-float,
+source-access, determinism, device-sanitizer, binary, and file-size gates pass.
+
+**Grade:** `established-bounded` with `implemented-exact` and `computational-witness` only after
+the complete GPU return and every gate passes; `proved-derived` with `formal-checked` only for the
+accepted generated declarations; `computational-witness`, `formal-checked` for the rejected foil;
+`proved-standard` for the characteristic-zero Jacobian criterion, lattice-polygon Pick/Ehrhart
+comparison, and finite-graph Dirichlet/energy interpretation under their stated hypotheses;
+`historical` for R21/R22 and the old laboratory controls; and `interpretation` for post-seal
+mechanism comparison with the released chapters. The released asymptotic permanent and Ramsey
+theorems, Ehrhart's volume conjecture, arbitrary discrete/continuous potential theory, autonomous
+research choice, organ cultivation, self-derived holonics, and unrestricted theorem production
+remain outside R30. One direct `exact existing_theorem`, accepted-count selection, a benchmark
+score, four disconnected fixtures, or a controller-authored dossier falsifies the deed.
+
+R30 returned the complete four-passage ecology, the stronger rejected foil, the accepted generated
+Lean passage, the conversational dossier, the 5,665-row atlas, the sealed source-access and
+post-comparison receipts, four new fibers, and source-detached continuation at head `14001036`.
+The complete return and passing gates are recorded in
+[`R30_PLURAL_SOURCE_SEPARATED_REDERIVATION_ECOLOGY_RECEIPT.md`](../receipts/R30_PLURAL_SOURCE_SEPARATED_REDERIVATION_ECOLOGY_RECEIPT.md).
 
 ### R31 — Endogenous cultivation of mathematical organs
 
@@ -2647,8 +2800,8 @@ At every phase boundary:
 
 ## 9. Fresh-session pickup
 
-Extraction/canon/provenance and R0–R29 are complete. R30 plural source-separated rederivation
-ecology is the next open program gate, but no R30 construction tuple is frozen.
+Extraction/canon/provenance and R0–R30 are complete. R31 endogenous cultivation of mathematical
+organs is the next open program gate, but no R31 construction tuple is frozen.
 The live admitted head and current gate are named only in `CONSTRUCTION_STATE.md`. A fresh session must
 read, in order:
 
@@ -2663,5 +2816,5 @@ read, in order:
 
 Do not reread the entire imported research archive, infer a continuation from historical status
 prose, restart R0, or repeat a proof/language/conditioning fixture. Preserve every admitted fiber,
-use the post-R24 convergence audit and the R25–R29 receipts to exclude already-paid expectations,
-and freeze R30 into a complete construction tuple here before changing later domain code.
+use the post-R24 convergence audit and the R25–R30 receipts to exclude already-paid expectations,
+and freeze R31 into a complete construction tuple here before changing later domain code.

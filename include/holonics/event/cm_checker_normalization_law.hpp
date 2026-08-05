@@ -20,7 +20,7 @@ template<std::size_t Capacity, class Count, std::size_t Pattern>
 }
 
 template<std::size_t Capacity, class Count, std::size_t Pattern>
-[[nodiscard]] HOLONICS_CALLABLE constexpr std::uint16_t first(
+[[nodiscard]] HOLONICS_CALLABLE constexpr std::uint32_t first(
     const char (&bytes)[Capacity], Count used, const char (&pattern)[Pattern]) noexcept {
   constexpr std::size_t payload = Pattern - 1U;
   for (std::size_t start = 0; payload != 0 && start + payload <= used; ++start) {
@@ -28,9 +28,9 @@ template<std::size_t Capacity, class Count, std::size_t Pattern>
     for (std::size_t slot = 0; slot < payload; ++slot) {
       same = same && bytes[start + slot] == pattern[slot];
     }
-    if (same) { return static_cast<std::uint16_t>(start); }
+    if (same) { return static_cast<std::uint32_t>(start); }
   }
-  return static_cast<std::uint16_t>(used);
+  return static_cast<std::uint32_t>(used);
 }
 
 template<std::size_t Capacity, std::size_t Declaration, std::size_t Source>
@@ -42,7 +42,7 @@ HOLONICS_CALLABLE constexpr void normalize(const checker_raw_return& raw,
   typed.remaining_goal_count = count(raw.standard_error, raw.stderr_bytes, unsolved);
   typed.message_bytes = static_cast<std::uint16_t>(raw.stdout_bytes + raw.stderr_bytes);
   typed.source_span_begin = first(face.bytes, face.byte_count, source);
-  typed.source_span_end = static_cast<std::uint16_t>(typed.source_span_begin + Source - 1U);
+  typed.source_span_end = static_cast<std::uint32_t>(typed.source_span_begin + Source - 1U);
   typed.elaborator_boundary_crossed = raw.launched && raw.exited;
   typed.kernel_boundary_crossed = raw.exit_status == 0 && typed.remaining_goal_count == 0 &&
       typed.produced_declarations == 1 && raw.produced_artifact_bytes != 0;

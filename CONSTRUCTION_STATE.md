@@ -196,23 +196,34 @@
   are returned and checked. The same body rests at head `14001032`, continuation `15001032`, with
   every prior fiber preserved and arithmetic-spectral fiber `196300` acquired.
   [Receipt](receipts/R29_ARITHMETIC_TRACE_FORM_SPECTRAL_PLACEMENT_RECEIPT.md).
+- R30: three physically source-separated cards open four dependent exact passages on resident GPU
+  currents: 49 permanent coefficient occurrences with a completely retained `49x49` factored
+  Jacobian; four lattice polygons with Pick/Ehrhart/reciprocity returns; a downstream exact
+  Dirichlet section, spectrum, and energy minimum formed only from the returned rectangle
+  incidence; and a saturated binary matrix with all 70 subset and 64 two-sided-coordinate
+  witnesses. The body returns a deliberately false stronger conjunction to Lean as obstruction,
+  then a generated five-declaration passage whose cover theorem quantifies every bounded pair and
+  retains every explicit coordinate certificate. The post-return dossier, 5,665-row atlas,
+  source-open audit, and exterior mechanism comparison are sealed in that order. The same body
+  rests at head `14001036`, continuation `15001036`, with every prior fiber preserved and matching,
+  lattice, potential, and cover fibers `197300` through `197303` acquired.
+  [Receipt](receipts/R30_PLURAL_SOURCE_SEPARATED_REDERIVATION_ECOLOGY_RECEIPT.md).
 
-The ordered R0–R16 construction and the directly authorized R17–R29 post-frontier inquiries are
+The ordered R0–R16 construction and the directly authorized R17–R30 post-frontier inquiries are
 complete.
 
-**Next deed (`open`): no R30 construction is frozen.** The live body now rests at head `14001032`
-and continuation `15001032`, body morphology `782`, mathematical morphology `232`, codec
-morphology `113`, expression-geometry morphology `37`, Hodge-realization morphology `41`,
-arithmetic-spectral morphology `47`, and sixteen accepted fibers through `196300`. R29 has made
-source-caused finite-field Frobenius, fixed-locus traces, exact form/spectral placement, closed
-places, local zeta duality, primary gluing, and bounded explicit currents native. R30's program
-gate is a plural source-separated rederivation ecology: several substantial known mechanisms must
-be independently caused, sealed with alternatives, dependencies, proof artifacts, returned
-checker occurrences, native rests, and source-access audits, and compared with their exterior
-references only afterward. R21's released Chapters 2/7 mechanisms and the laboratory's direct
-Erdős-183 and unit-distance/CM observations are already paid and cannot count again. The next
-phase must freeze its complete construction tuple, exact aperture, actual conversational dossier,
-falsification boundary, and intended grades in
+**Next deed (`open`): no R31 construction is frozen.** The live body now rests at head `14001036`
+and continuation `15001036`, body morphology `903`, mathematical morphology `270`, codec
+morphology `127`, expression-geometry morphology `37`, Hodge-realization morphology `41`,
+arithmetic-spectral morphology `47`, rederivation morphology `56`, and twenty accepted fibers
+through `197303`. R30 has made plural source-separated mathematical derivation, returned-fiber
+dependency, retained alternatives, universal bounded coordinate-cover proof, sealed comparison,
+and source-access audit native. R31's program gate is endogenous cultivation of mathematical
+organs: a returned exact passage must found reusable local constitutive morphology, act across
+changed notation and at least one changed topology without source lookup, retain its hypotheses
+and refusals, and pass exact ablation. The next phase must freeze its complete construction tuple,
+exact developmental and held-out apertures, returned organ representation, falsification boundary,
+and intended grades in
 [`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md) before domain
 code changes.
 
