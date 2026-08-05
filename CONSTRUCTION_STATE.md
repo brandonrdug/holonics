@@ -208,22 +208,38 @@
   rests at head `14001036`, continuation `15001036`, with every prior fiber preserved and matching,
   lattice, potential, and cover fibers `197300` through `197303` acquired.
   [Receipt](receipts/R30_PLURAL_SOURCE_SEPARATED_REDERIVATION_ECOLOGY_RECEIPT.md).
+- R31: four source-separated developmental passages derive their least unique primitive
+  polynomial-index shift kernels through complete exact GPU row-reduction atlases. The first
+  checker return commits four typed organs, then the same body rests in a 1,872-byte native image
+  containing no samples, source bytes, expected tails, or lookup keys. A second executable opens
+  only that organ image and four different structural cards; equal-branch conductance,
+  square-lattice incidence, signed matrix powers, and graded exponent incidence independently form
+  hidden streams while the organs predict from prefixes before comparison. Every tail agrees;
+  changed structures, shortened prefixes, and exact identity ablations return the declared
+  obstructions. Both generated Lean passages are kernel accepted, and the source audit excludes
+  developmental and repository testimony from application. The same body rests at head
+  `14001040`, continuation `15001040`, with all prior fibers preserved, cultivated organs `198300`
+  through `198303`, and application fiber `198304` acquired.
+  [Receipt](receipts/R31_ENDOGENOUS_CULTIVATED_MATHEMATICAL_ORGANS_RECEIPT.md).
 
-The ordered R0–R16 construction and the directly authorized R17–R30 post-frontier inquiries are
+The ordered R0–R16 construction and the directly authorized R17–R31 post-frontier inquiries are
 complete.
 
-**Next deed (`open`): no R31 construction is frozen.** The live body now rests at head `14001036`
-and continuation `15001036`, body morphology `903`, mathematical morphology `270`, codec
-morphology `127`, expression-geometry morphology `37`, Hodge-realization morphology `41`,
-arithmetic-spectral morphology `47`, rederivation morphology `56`, and twenty accepted fibers
-through `197303`. R30 has made plural source-separated mathematical derivation, returned-fiber
-dependency, retained alternatives, universal bounded coordinate-cover proof, sealed comparison,
-and source-access audit native. R31's program gate is endogenous cultivation of mathematical
-organs: a returned exact passage must found reusable local constitutive morphology, act across
-changed notation and at least one changed topology without source lookup, retain its hypotheses
-and refusals, and pass exact ablation. The next phase must freeze its complete construction tuple,
-exact developmental and held-out apertures, returned organ representation, falsification boundary,
-and intended grades in
+**Next deed (`open`): no R32 construction is frozen.** The live body now rests at head `14001040`
+and continuation `15001040`, body morphology `999`, mathematical morphology `318`, codec
+morphology `147`, expression-geometry morphology `37`, Hodge-realization morphology `41`,
+arithmetic-spectral morphology `47`, rederivation morphology `56`, cultivation morphology `48`,
+organ morphology `64`, application morphology `32`, and twenty-five accepted fibers through
+`198304`. R31 has made exact developmental feature search, checker-founded reusable coefficient
+geometry, sample-free native rest, changed-topology source-detached transport, named refusal, and
+identity-exact ablation native. R32's program gate is source-separated self-derivation of
+elementary holonics: the cultivated body must return one connected exact calculus of occurrence,
+composition, receiver fibers, condensation/reopening, rechart transport, holonomy/curvature,
+obstruction, and reusable changed conduct while canon is withheld, then use at least one newly
+cultivated organ to improve a held-out mathematical derivation. The next phase must freeze its
+complete construction tuple, exact development and held-out apertures, canon withholding and
+post-seal comparison protocol, countermodels, organ improvement test, falsification boundary, and
+intended grades in
 [`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md) before domain
 code changes.
 

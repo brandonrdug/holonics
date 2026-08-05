@@ -2663,29 +2663,163 @@ The complete return and passing gates are recorded in
 
 ### R31 — Endogenous cultivation of mathematical organs
 
-**Program gate (`open`):** turn successful derivations into the “little sibling” faculty which can
-help the exterior controller think on a larger scale. The acquired object is neither a text
-summary nor an opaque model weight. It is an exact local constitutive organ that can be mounted
-through existing ports and can found new passages under changed surface syntax and geometry.
+**Frozen construction (`project-postulate`; admission passed):** turn returned mathematics into
+the first “little sibling” faculty: four exact shift-operator organs cultivated from R18, R24, R29,
+and R30 passage excerpts, committed only after checker return, rested without their developmental
+samples, and then used on conductance, walk, signed-carrier, and graded-incidence sources which
+share the induced local laws but not the developmental topology or notation.
 
-Each cultivated organ must carry:
+The acquired objects are neither text summaries, result tables, opaque weights, nor a global
+recurrence solver. Each is a small normalized coefficient morphology with typed rational-stream
+ports, a bounded polynomial-in-index shift law, exact formation and application steps, minimum
+prefix and coefficient apertures, checker/residual lineage, and named refusals.
 
-- its typed input/output ports, admissible coefficient and incidence hypotheses, local state,
-  exact constitutive steps, resource aperture, proof or certificate obligations, and named
-  obstructions;
-- the returned passages and residuals from which it was induced, while excluding lossless source
-  storage, theorem-name lookup, final-answer tables, and inaccessible host scheduling;
-- a native source-detached rest image and exact lineage from the checker, counterexample,
-  geometric residual, or other returned occurrence which cultivated it;
-- held-out use across changed notation and at least one changed mathematical topology where the
-  same local law genuinely applies; and
-- exact ablation and foil receipts showing what consequence depends on the organ and where its
-  hypotheses refuse.
+**Construction tuple:**
 
-The engine may propose candidate organs by recurrence, factorization, or shared residual, but
-admission requires exact local consequence and falsification. No universal filler or global
-solver is added. R31 is the first phase whose primary result is reusable mathematical morphology;
-the R10/R16 learning mechanics are its inherited enforcement, not its discovery claim.
+- source owners: the one R30 continuing body with twenty accepted fibers; four mutually
+  inaccessible developmental occurrence cards carrying minimal excerpts from the accepted R18
+  hypergeometric, R24 period, R29 trace, and R30 lattice passages; four held-out structural cards
+  carrying an equal-branch conductance star, the square-lattice step incidence, one signed
+  two-vertex walk carrier, and a two-generator graded-monomial aperture; admitted exact rational,
+  matrix, recurrence, conditioning, proof-return, rest, and source-audit owners; and new stream,
+  feature-row, elimination, kernel-candidate, primitive-normalization, cultivated-organ,
+  prediction, comparison, refusal, ablation, proof-face, dossier, atlas, and rest owners;
+- port types: the admitted 1,240-byte R30 native rest; four raw/typed developmental cards; rational
+  sample occurrence, stream family, index-power/shift feature, exact elimination row, pivot/minor,
+  nullspace vector, normalized coefficient polynomial, organ hypothesis, candidate obstruction,
+  candidate theorem/proof/checker return, cultivated-organ rest, four raw/typed held-out structure
+  cards, structural incidence, hidden full stream, visible prefix, predicted sample, tail return,
+  exact comparison, changed-source refusal, organ-exclusion aperture, held-out theorem/proof/
+  checker return, conversational dossier, complete atlas, source audit, and final native-rest faces;
+- event occurrence: remount R30; mount the four development cards through distinct ports and form
+  their typed streams on independent resident currents; enumerate the bounded feature geometries,
+  retain every exact rank/nullity/residual outcome, and select only the least one-dimensional
+  primitive kernel for each family; generate and check a candidate-organ theorem; let that returned
+  occurrence commit four organs; rest the same body to an intermediate native image containing the
+  organ coefficients/hypotheses/lineage but no samples; destroy the developmental residency;
+  remount only that image in a second GPU deed; mount the four held-out structure cards; derive
+  their full streams on source currents while exposing only the declared prefixes to the organ
+  current; predict the tails, then cross a barrier which permits comparison with the hidden source
+  returns; apply four changed-source foils and exact organ-exclusion apertures; generate/check the
+  dependent held-out theorem and dossier; commit the application fiber; rest/remount the same body;
+- predecessor identity: admitted R30 head `14001036`, continuation `15001036`, body morphology
+  `903`, mathematical morphology `270`, codec morphology `127`, expression-geometry morphology
+  `37`, Hodge-realization morphology `41`, arithmetic-spectral morphology `47`, rederivation
+  morphology `56`, and twenty fibers through `197303` recorded in `CONSTRUCTION_STATE.md` and the
+  R30 receipt;
+- local constitutive law: exact rational feature formation
+  `n^p c_(n+s)` for shifts zero through three and index degree zero through two; bounded search in
+  increasing feature population; exact rational row reduction with complete pivot/residual
+  testimony; acceptance only at rank `features-1`; denominator clearing, gcd reduction and
+  first-nonzero-positive primitive normalization; forward recurrence application only where the
+  highest-shift coefficient is nonzero; exact conductance addition/division; square-lattice walk
+  dynamic programming; signed two-by-two matrix powers and traces; graded exponent-pair
+  enumeration; returned-tail comparison; and exact identity-indexed organ exclusion;
+- receiver question: can checker-returned residual structure found compact reusable morphology
+  which survives without its developmental passages, conducts exact prediction across genuinely
+  different source topologies and surface codecs, refuses nearby nonconforming sources, and loses
+  exactly those consequences under organ ablation?;
+- returned consequence: four primitive shift organs with coefficients fixed below; two actual
+  generated Lean passages and checker returns; an intermediate source-detached organ rest; four
+  held-out derived streams with exact predicted tails; all insufficient/nonunique/residual and
+  changed-source refusals; exact exclusion of each organ's consequence; cultivation fibers
+  `198300` through `198303`; held-out application fiber `198304`; a conversational dossier,
+  complete atlas, split source-access audits, final native rest, and continuation at head
+  `14001040`; and
+- open alternatives: unbounded operator order/degree or coefficient height, multivariate and
+  partial recurrences, differential/difference Ore algebra, analytic convergence, noisy or
+  probabilistic induction, autonomous source selection, organ composition/curriculum, natural-
+  language morphology, self-derived holonics, and unrestricted learning.
+
+**Developmental aperture:** each card carries occurrence/port/lineage metadata, rational samples,
+family boundaries, and the search aperture `order<=3`, `index_degree<=2`, coefficient magnitude
+within signed 64-bit exact arithmetic. It carries no recurrence coefficients, order, degree,
+feature rank, pivot, proof, theorem name, held-out structure, or expected prediction.
+
+- the R18 excerpt is `1,1/2,1/3,1/4,1/5,1/6,1/7,1/8`;
+- the R24 excerpt is
+  `1,1/4,9/64,25/256,1225/16384,3969/65536,53361/1048576`;
+- the R29 excerpt is the `(p,a)=(5,1)` trace stream
+  `2,2,-6,-22,-14,82,234`; and
+- the R30 excerpt comprises the four five-term polygon streams already returned in R30.
+
+The least unique primitive kernels must be derived as coefficient polynomials ordered by shift
+and increasing index power:
+
+```text
+R18: order 1, degree 1: [ 1, 1,  -2,-1 ]
+R24: order 1, degree 2: [ 1, 4, 4,  -4,-8,-4 ]
+R29: order 2, degree 0: [ 5, -2, 1 ]
+R30: order 3, degree 0: [ 1, -3, 3, -1 ]
+```
+
+These values are acceptance expectations for the exterior independent audit, not mounted runtime
+answers. Every lower-complexity, full-rank, multi-kernel, zero-highest-shift, or nonzero-residual
+candidate remains in the atlas with its obstruction. Constant and too-short developmental controls
+must respectively return `nonunique_kernel` and `insufficient_rows`.
+
+**Held-out aperture and changed topology:** the held-out executable can open only the intermediate
+organ rest and four structure cards; it has no path/port to a developmental card, prior atlas,
+generated candidate source, research record, or expected tail.
+
+- the star card supplies equal unit branches and branch counts one through ten. Its source current
+  derives response `1/(n+1)`, but only the first term crosses the prefix port before the R18 organ
+  predicts the remaining terms;
+- the walk card supplies the four oriented axis steps of the square lattice and even horizons through
+  sixteen. A local dynamic program derives normalized closed-walk returns; only the first term
+  crosses before the R24 organ predicts the remaining seven;
+- the signed-carrier card supplies `[[1,-2],[2,1]]` and horizons zero through eight. Matrix-power
+  incidence derives trace returns; only the first two cross before the R29 organ predicts the
+  remaining seven; and
+- the graded card supplies two generators and total-degree horizons zero through eight. Exponent
+  incidence derives the cumulative monomial populations; only the first three cross before the R30
+  organ predicts the remaining six.
+
+The held-out sources therefore do not express sequences in the developmental card grammar. Equal
+receiver streams remain lineaged to unequal mathematical topologies rather than being identified
+as sources. Changing one star conductance, deleting one lattice step, changing one signed edge,
+and admitting three graded generators must each return `heldout_residual` through the corresponding
+organ, not trigger recultivation or fallback. Prefixes shorter than the organ order return
+`insufficient_prefix`. Excluding exactly one organ identity returns `organ_absent`, zero predictions
+for its source, and unchanged consequences for the other three.
+
+**Formal and conversational return:** the candidate passage must prove every developmental
+residual, the returned nonzero pivot minors, primitive normalized coefficients, and the concrete
+shift equalities; checker acceptance is the returned event which founds the four organs. The
+held-out passage must be rendered only from the remounted organs and returned structural streams.
+It proves the star, walk, signed-trace and graded-incidence recurrence/prediction equalities and one
+final theorem invoking all four. The conversational dossier must show the organs as coefficient
+geometries, their developmental lineages, the topology changes, exact predictions, refusals,
+ablation outcomes, checker returns, and source-detachment audit; diagnostic counts or hashes cannot
+substitute for either artifact.
+
+**Acceptance:** both executable deeds run their hot mathematical work on the resident GPU; the four
+development currents and four held-out source currents are genuinely independent; candidate
+selection uses complete exact rank/residual receipts, not score; candidate checker return precedes
+organ commit and intermediate rest; the intermediate rest schema contains no sample array, source
+bytes, answer table, or lookup key; held-out predictions precede access to the hidden tails; an
+independent host implementation agrees with every atlas row without owning continuation; both
+actual Lean sources/checker returns and the actual dossier are inspected; the held-out source-open
+audit excludes all development paths after training; exact remount, foil, ablation, changed-card,
+and determinism receipts pass; and the complete architecture, ownership, no-float, sanitizer,
+PTX/SASS, binary, and file-size gates pass.
+
+**Grade:** `established-bounded` with `implemented-exact` and `computational-witness` only for the
+complete frozen cultivation/application ecology after all gates pass; `proved-derived` with
+`formal-checked` only for the accepted generated declarations; `historical` for the R18/R24/R29/
+R30 developmental passage origins; and `outside-aperture` for analytic continuation, general
+recurrence theory, arbitrary source topology, autonomous cultivation, self-derived holonics, and
+unrestricted learning. A stored sample stream, mounted coefficient vector, post-tail prediction,
+host-selected candidate, ordinary solver subsystem, lookup table, or four topology-specific
+hardcoded predictors falsifies the deed.
+
+R31 returned all four primitive coefficient geometries, both actual kernel-accepted Lean passages,
+the 1,872-byte sample-free organ rest, four changed-topology held-out transports, every declared
+foil and exact ablation, the conversational dossier, complete cultivation/application atlases,
+source-access and deterministic-replay audits, application fiber `198304`, four organ fibers
+`198300` through `198303`, and source-detached continuation at head `14001040`. The complete return
+and passing gates are recorded in
+[`R31_ENDOGENOUS_CULTIVATED_MATHEMATICAL_ORGANS_RECEIPT.md`](../receipts/R31_ENDOGENOUS_CULTIVATED_MATHEMATICAL_ORGANS_RECEIPT.md).
 
 ### R32 — Source-separated self-derivation of elementary holonics
 
