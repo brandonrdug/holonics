@@ -249,28 +249,44 @@
   pass. The same body rests at head `14001048`, continuation `15001048`, with discovery, organ and
   application fibers `200300` through `200302` acquired.
   [Receipt](receipts/R33_CHARACTERISTIC_HYPERGEOMETRY_TRACE_TRANSPORT_RECEIPT.md).
+- R34: three source-separated twelve-word ecologies generate all `5,184` ordered transition
+  triples and `2,072` exact lower-fiber archetypes on resident GPU currents. Independent degree-
+  three elimination derives the unique primitive sum and product laws for `tr(ABC)` and
+  `tr(ACB)` from the six single/pair traces, and their monic quadratic has zero residual on every
+  row. Its exact discriminant partitions the bounded ecology into `2,580` branch and `2,604`
+  two-sheet rows; five matrix-bearing witnesses retain orientation, source, rechart, branch, and
+  sheet distinctions. The two organs survive a sample-free 4,424-byte rest and, from held-out
+  lower face `(3,2,2,5,5,6)` plus oriented anchor `15`, predict companion trace `11` before the
+  hidden source returns `11`. Orientation exclusion retains the unordered roots but refuses an
+  assignment; organ and determinant controls return exact obstructions. The generated general
+  and dependent Lean modules are accepted, the later Goldman comparison matches the sealed
+  standard identities, and independent-host, source, replay, seal, sanitizer, architecture,
+  no-float and device-binary audits pass. The same body rests at head `14001052`, continuation
+  `15001052`, with discovery, sum-organ, product-organ and application fibers `201300` through
+  `201303` acquired.
+  [Receipt](receipts/R34_THREE_FACE_TRACE_FIBER_LIFTING_RECEIPT.md).
 
-The ordered R0–R16 construction and the directly authorized R17–R33 post-frontier inquiries are
+The ordered R0–R16 construction and the directly authorized R17–R34 post-frontier inquiries are
 complete.
 
-**Next deed (`project-postulate`, frozen): R34 three-face trace-fiber lifting and branch
-geometry.** The live body now rests at head `14001048` and continuation `15001048`, body
-morphology `1199`, mathematical morphology `418`, codec morphology `195`, expression-geometry
+**Next deed (`project-postulate`, frozen): R35 trace-character rebase atlas, tangent transport,
+and branch dynamics.** The live body now rests at head `14001052` and continuation `15001052`,
+body morphology `1295`, mathematical morphology `466`, codec morphology `219`, expression-geometry
 morphology `37`, Hodge-realization morphology `41`, arithmetic-spectral morphology `47`,
 rederivation morphology `56`, cultivation morphology `48`, organ morphology `64`, application
 morphology `32`, calculus morphology `64`, self-organ morphology `32`, derivation morphology `24`,
 characteristic morphology `64`, trace-organ morphology `32`, transport morphology `24`, and
-thirty-five accepted fibers through `200302`. R33 has made complete characteristic-population
-census, source-separated primitive trace-law discovery, coefficient-driven matrix proof
-formation, exact collision retention, sample-free organ rest, and precomparison transport to a
-changed local topology native. R34 must now construct complete ordered triples on three
-independent source ecologies, derive the six lower and two ordered triple trace faces, discover
-the sum and product laws without supplied coefficients, compose their exact quadratic fiber,
-measure branch and two-sheet strata, and use only the rested organs, a held-out six-coordinate
-face, and explicit orientation testimony to predict the hidden companion trace before comparison.
-The exact construction tuple, `5,184`-row population, feature grammar, collision/branch witnesses,
-held-out aperture, source/literature withholding protocol, falsifiers and intended grades are
-frozen in
+trace-fiber morphology `64`, lift-organ morphology `48`, triple-transport morphology `24`, and
+thirty-nine accepted fibers through `201303`. R34 has made exact rank-three trace-fiber lifting,
+branch/sheet separation, coefficient-driven proof formation, sample-free lift-organ rest, and
+precomparison orientation-conditioned transport native. R35 must now derive the coordinate maps
+caused by elementary generator rebases rather than installing them, form their exact Jacobians
+from the returned coefficients, transport the six-dimensional tangent fiber of the R34
+hypersurface across every rebase edge, identify the deck/branch vertical eigen-direction, measure
+how regular and ramified projection strata distribute between receiver charts, and use only the
+rested rebase organs on a changed held-out multi-step path before comparison. The exact source
+population, move grammar, feature aperture, tangent and eigenvector witnesses, held-out protocol,
+falsifiers and intended grades are frozen in
 [`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md).
 
 Update this file only after a phase's required artifact and receipts have returned and its grade

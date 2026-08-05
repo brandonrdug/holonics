@@ -1643,8 +1643,8 @@ finite signature is promoted into a universal shape identity.
 
 ### R25+ mathematical autogenesis program
 
-The phase names below are an ordered `project-postulate`. R25 through R33's directly frozen
-constructions have passed their bounded grades; R34 is the next frozen construction and R35+
+The phase names below are an ordered `project-postulate`. R25 through R34's directly frozen
+constructions have passed their bounded grades; R35 is the next frozen construction and R36+
 remain program gates rather than construction tuples.
 Before any later named phase begins, its exact source owners, ports, event, predecessor, local
 law, receiver question, return, alternatives, aperture, falsifiers, artifacts, and grades must
@@ -1664,7 +1664,8 @@ R25 exact causal linear/chain calculus
   -> R32 self-derivation of elementary holonics
   -> R33 characteristic hypergeometry and self-proposed trace transport
   -> R34 three-face trace-fiber lifting and branch geometry
-  -> R35+ open theorem production and Hodge/RH/hypergeometry campaigns.
+  -> R35 trace-character rebase atlas, tangent transport, and branch dynamics
+  -> R36+ open theorem production and Hodge/RH/hypergeometry campaigns.
 ```
 
 The stages are materially cumulative. None should be shrunk to a single familiar matrix, graph,
@@ -3048,7 +3049,7 @@ held-out fiber `199306`. The admitted return is recorded in
 
 ### R33 — Source-separated characteristic hypergeometry and trace transport
 
-**Frozen construction (`project-postulate`; admission pending):** enter open mathematical
+**Admitted construction (`established-bounded`, `implemented-exact`):** enter open mathematical
 production by asking the R32 body to characterize how exact local transition faces distribute
 into closed characteristic strata and to propose the governing trace law from data it constructs
 itself. The developmental sources provide bounded integral unimodular generators, word alphabets,
@@ -3231,7 +3232,7 @@ recorded in
 
 ### R34 — Three-face trace-fiber lifting and branch geometry
 
-**Frozen construction (`project-postulate`; admission pending):** lift R33 from the characteristic
+**Admitted construction (`established-bounded`, `implemented-exact`):** lift R33 from the characteristic
 of a two-face commutator to the exact two-sheeted fiber carried by three interacting transition
 faces. Six lower trace receivers are visible,
 
@@ -3411,9 +3412,226 @@ float-derived discriminants, a controller-chosen root, hidden companion access b
 stored developmental rows in rest, or a single fixture instead of the complete ecology falsifies
 the deed.
 
-### R35+ — Open mathematical production and research campaigns
+R34 has passed this grade. The two GPU deeds retain all `5,184` ordered triple returns and
+`2,072` lower-fiber archetypes, independently derive the unique primitive sum and product laws
+with zero residual, compose and verify the exact quadratic on every row, and return the bounded
+partition of `2,580` branch and `2,604` two-sheet rows. The first generated module proves both
+general determinant-one matrix identities, their quadratic/discriminant consequences, and five
+actual matrix-bearing witnesses. The two 85-coefficient organs survive a sample-free 4,424-byte
+rest and predict held-out companion trace `11` from lower face `(3,2,2,5,5,6)` and oriented anchor
+`15` before comparison; the dependent generated theorem invokes the returned discovery theorem.
+The independent 7,323-row host reconstruction, exact ablations, source audit, deterministic seal,
+post-seal literature comparison, four sanitizer returns, device-binary audits, and complete
+`128/128` suite pass. The body continues at head `14001052`, continuation `15001052`, with
+discovery, sum-organ, product-organ and application fibers `201300` through `201303`. The admitted
+return is recorded in
+[`R34_THREE_FACE_TRACE_FIBER_LIFTING_RECEIPT.md`](../receipts/R34_THREE_FACE_TRACE_FIBER_LIFTING_RECEIPT.md).
 
-**Program horizon (`open`):** once R25–R34 return, the machine is no longer used merely to check
+### R35 — Trace-character rebase atlas, tangent transport, and branch dynamics
+
+**Frozen construction (`project-postulate`; admission pending):** turn R34's static two-sheet
+trace fiber into an exact transported geometry. The R34 body already owns the two symmetric laws.
+R35 must not receive the formulas for a change of generator chart. It receives source-native
+matrix triples and elementary free-generator deeds, constructs the changed matrices and trace
+faces, and derives the polynomial coordinate map caused by each deed. Only after those maps return
+may it differentiate their coefficients, construct the tangent fiber of the returned
+hypersurface, and ask how chart change transports tangent, projection, branch, and deck faces.
+
+Use the seven-coordinate oriented chart
+
+```text
+X = (a,b,c,d,e,f,t)
+  = (tr(A),tr(B),tr(C),tr(AB),tr(AC),tr(BC),tr(ABC)).
+```
+
+The two R34 organs form `S(a,b,c,d,e,f)` and `R(a,b,c,d,e,f)` internally, and hence the resident
+hypersurface
+
+```text
+F(X) = t^2 - S(a,b,c,d,e,f)t + R(a,b,c,d,e,f) = 0.
+```
+
+No R35 card, renderer, or host path may spell `S`, `R`, a rebase coordinate formula, a Jacobian,
+a branch gradient, or an expected eigenvector. The R34 rest is the only source of the trace-fiber
+coefficients. A source deed acts on `(A,B,C)` itself; input and output charts are observations of
+that caused matrix transition, not an instruction-set ontology.
+
+**Construction tuple:**
+
+- source owners: the one admitted R34 body with thirty-nine accepted fibers and its two lift
+  organs; three mutually inaccessible rebase-development cards, each with four determinant-one
+  seed triples; one held-out multi-step local-system card; admitted exact matrix, rational-linear,
+  characteristic, proof-return, source-audit and rest owners; and new move-word, trace-chart,
+  polynomial-map, constraint-gradient, Jacobian, tangent-kernel, projection-fiber, deck,
+  branch-transition, fixed-direction, rebase-organ, path-prediction, atlas, dossier, obstruction,
+  seal and final-rest owners;
+- port types: the 4,424-byte R34 native rest; raw/typed seed triples; elementary generator deed;
+  reduced deed word and lineage; source and target matrices; source and target seven-coordinate
+  trace faces; degree-three feature row; exact multi-target rank, pivots, nullity, residual and
+  primitive coefficient faces; coefficient-owned polynomial rebase map; formal partial
+  derivative and `7x7` Jacobian; hypersurface gradient; six-dimensional tangent-kernel basis;
+  transported tangent basis and chain-rule residual; projection rank and vertical-fiber basis;
+  branch/regular transition; deck mate, fixed point, eigenvector and eigenvalue; sample-free rebase
+  organ rest; held-out move word, predicted trace/tangent/branch sequence, hidden source sequence,
+  comparison, ablation, theorem, dossier, complete atlases, audits and final native-rest faces;
+- event occurrence: remount R34; open the three developmental cards on independent currents;
+  generate every declared reduced deed path; for every elementary edge form the changed matrix
+  triple and both seven-coordinate faces on the GPU; retain the complete state and edge
+  populations; enumerate the declared feature grammar and jointly derive all seven output
+  coordinate laws for each deed; select the least common primitive maps under source holdout and
+  inverse/composition controls; form `F` only from the rested R34 organs; formally differentiate
+  the returned map coefficients and `F`; compute exact source/target tangent kernels and projection
+  vertical fibers; transport every tangent basis through the returned Jacobian and verify the
+  target constraint; form the deck map from the returned quadratic fiber and identify its fixed
+  branch direction; count every regular/branch chart transition and retain fixed, exchange,
+  rank-drop and source/rechart collisions; render/check coefficient-driven general declarations;
+  commit the map, tangent and deck organs; rest without developmental matrices, rows, expected
+  maps, tangent bases or held-out path; destroy developmental residency; remount only that rest;
+  open the held-out card; predict every seven-coordinate chart, tangent rank, vertical rank and
+  branch transition along its source-native deed word before the hidden matrix path opens; compare,
+  ablate, render/check the dependent return, commit and rest/remount; audit, replay and seal; only
+  then open exterior literature on trace-coordinate automorphisms and character-variety branch
+  geometry;
+- predecessor identity: admitted R34 head `14001052`, continuation `15001052`, body morphology
+  `1295`, mathematical morphology `466`, codec morphology `219`, trace-fiber morphology `64`,
+  lift-organ morphology `48`, triple-transport morphology `24`, and thirty-nine fibers through
+  `201303` recorded in `CONSTRUCTION_STATE.md` and the R34 receipt;
+- local constitutive law: exact determinant-one inverse and matrix multiplication; five
+  source-native generator deeds `swap12:(A,B,C)->(B,A,C)`,
+  `swap23:(A,B,C)->(A,C,B)`, `invert1:(A,B,C)->(A^-1,B,C)`,
+  `shear12+:(A,B,C)->(AB,B,C)`, and `shear12-:(A,B,C)->(AB^-1,B,C)`; immediate-inverse reduced
+  deed words; exact trace extraction; all seven-input monomials through total degree three plus
+  seven target columns; multi-target exact rational elimination and primitive normalization;
+  symbolic integer differentiation of returned coefficient maps; exact rational row reduction
+  for gradient kernels, images, projection fibers and eigenvectors; delayed source comparison and
+  identity-exact organ ablation;
+- receiver question: which polynomial trace-chart maps are caused by elementary generator rebases,
+  do their Jacobians carry the six-dimensional tangent fiber of the R34 hypersurface exactly,
+  where does the six-coordinate projection gain a vertical direction, how does the deck involution
+  act there, how do branch and regular projection strata redistribute under chart change, and can
+  the cultivated maps navigate a different multi-step source path without matrices or
+  developmental rows?;
+- returned consequence: complete state, edge, rebase-law, differential, tangent, branch-dynamics,
+  fixed-direction, control and held-out atlases; one least primitive seven-output map per deed;
+  exact Jacobians formed from those returned coefficients; complete source/target tangent and
+  projection-fiber transport receipts; bounded transition-archetype counts; a branch-fixed vertical
+  tangent with a proved deck eigenvalue; generated general and dependent theorem artifacts; a
+  sample-free rest containing only founded map/tangent/deck organs; a held-out multi-step chart and
+  tangent prediction formed before source comparison; exact map-, lift-organ-, orientation-,
+  aperture- and determinant-exclusion obstructions; source/literature audits, deterministic seal,
+  final continuation, and newly assigned R35 fibers; and
+- open alternatives: arbitrary automorphisms or word depth; unbounded coordinate degree/height;
+  arbitrary rank or character variety; analytic monodromy or probability; intrinsic singularity
+  classification beyond the declared hypersurface; Hodge or RH consequences; autonomous theorem
+  valuation or universal geometric intelligence.
+
+**Developmental population:** each of the three source cards supplies four small integral
+determinant-one seed triples but no trace coordinate, move formula, polynomial coefficient,
+Jacobian, tangent basis, branch label, expected count, or theorem name. From each of the twelve
+seeds, the GPU forms every immediate-inverse-reduced word in the five-deed alphabet through depth
+three: `1 + 5 + 20 + 80 = 106` states per seed, hence `1,272` source states. Every state emits all
+five elementary edges, giving `6,360` matrix-caused rebase rows before grouping. Self-inverse deeds
+are their own forbidden immediate successor; `shear12+` and `shear12-` exclude one another.
+Overflow or loss of determinant one is an obstruction, never a reason to shrink or silently
+replace the population.
+
+**Map-discovery aperture:** for each deed, one exact feature matrix contains every monomial in the
+seven source chart coordinates of total degree at most three and seven independently formed target
+coordinates. Joined elimination may reuse the common feature echelon, but each target owns its
+primitive returned coefficient vector and residual. Every selected map must survive all three
+source holdouts, exact inverse-pair composition, generator-relation controls, and the complete
+6,360-edge residual audit. Degree-two, coordinate-deleted, source-local, row-deficient,
+target-deleted and coefficient-height controls remain in the law atlas. CUDA, renderers, cards,
+formal templates and held-out code may enact matrix deeds or evaluate returned coefficients; they
+may not contain the expected coordinate maps.
+
+**Causal differential and branch geometry:** `F` is evaluated and differentiated from the two
+R34 coefficient organs, not rewritten from a controller formula. At each retained state the
+gradient row `dF` and its exact kernel are returned. Smooth states owe rank one and a
+six-dimensional tangent fiber; any rank-zero state is retained as a singular obstruction. For
+each rebase edge with returned Jacobian `J`, every source tangent basis vector must satisfy
+`dF_target Jv=0`, and the transported image must agree with an independently reduced target
+tangent fiber under the declared map aperture. The six-coordinate projection forgets `t`; its
+vertical tangent is computed, not labeled in advance. A regular projected fiber has vertical rank
+zero. At a branch-fixed point the vertical vector, if present, is carried through the exact deck
+Jacobian and its characteristic/eigen return is derived. Eigenvalue language is admitted only for
+an endomorphism of the same returned tangent fiber—never for a Jacobian between unrelated chart
+points without a declared identification.
+
+The branch divisor belongs to this receiver projection. A rebase may carry a point from branch to
+regular or regular to branch because it changes which six traces are forgotten. The complete
+edge atlas must therefore count `regular->regular`, `regular->branch`, `branch->regular`, and
+`branch->branch` for every deed and source, retaining zero strata explicitly. These bounded counts
+measure how geometric faces distribute under this chart ecology; they are not probabilities and
+do not make the projection branch an intrinsic singularity of the character source.
+
+**Required witnesses and controls:** the developmental return must include:
+
+- exact source/target matrices for every selected fixed or exchange witness, not coordinate-only
+  assertions;
+- one inverse-pair path whose composed returned map is the identity on every population row;
+- one noncommuting deed pair with an exact chart-commutator difference and its transported tangent
+  difference;
+- a simultaneous conjugation collision retaining equal trace-chart/rebase conduct with changed
+  matrix faces and lineage;
+- a branch-fixed point whose projection has a nonzero vertical tangent and whose deck return has
+  the derived antisymmetric eigen-direction, or exact complete-population testimony that the
+  required witness is absent, which fails the phase rather than manufacturing one;
+- branch-to-regular and regular-to-branch chart witnesses, or exact absent-stratum testimony for
+  each complete deed population;
+- a coordinate collision that retains unequal next conduct until the deed/orientation port is
+  supplied;
+- map-organ and R34 lift-organ exclusion, which form no downstream chart/tangent prediction;
+- a word beyond depth three returning `aperture_exceeded`; and
+- a determinant-violating foil returning `unsupported_determinant`.
+
+**Held-out transport:** the held-out card supplies a different determinant-one generator triple
+and a reduced deed word of length at least eight containing both swaps, inversion, and both shear
+orientations. The source current forms the actual matrix path behind a comparison barrier. Before
+that barrier, only the initial seven-coordinate face and deed tokens cross to the rested organs.
+They must predict every later chart, discriminant/branch face, tangent rank, projection vertical
+rank and declared transported tangent test. The hidden matrix path then opens for comparison.
+Removing a required map organ or either R34 lift organ must stop at the first dependent step;
+removing the deed orientation must retain any lawful unordered alternative but refuse a named
+successor.
+
+**Formal, conversational and external return:** the first generated source states the discovered
+coordinate maps from their returned coefficient vectors, proves them for arbitrary integral
+determinant-one matrices, proves the hypersurface/chain-rule consequences, and includes actual
+fixed, exchange, branch, inverse and noncommuting witnesses. The second imports those returned
+declarations and proves the held-out multi-step consequence. The dossier explains in ordinary
+mathematical language that R34's algebraic fiber has become a navigable chart ecology: the
+Jacobian is the local causal transport of a returned polynomial deed, the tangent kernel records
+admissible first differences, and the branch vertical direction is information invisible to the
+six-coordinate receiver but visible to the deck action. Only after sealing may an exterior audit
+name Nielsen/Fricke character-coordinate automorphisms or compare standard formulas.
+
+**Acceptance:** both executable deeds perform source matrix mutation, complete census,
+multi-target elimination, map selection, coefficient differentiation, exact tangent formation,
+Jacobian transport, branch/deck analysis, held-out path prediction and ablation on resident GPU
+currents; all source and held-out populations are separated; permanent atlases retain every state,
+edge, law, differential, tangent, transition, control and prediction row; the first checker return
+precedes organ commit and sample-free rest; every held-out prediction precedes matrix-path access;
+an independent host implementation agrees with every atlas row without owning continuation; both
+actual theorem artifacts and the dossier are inspected; source-open, determinism, seal and
+post-seal literature protocols pass; and the complete architecture, ownership, no-float,
+sanitizer, PTX/SASS, binary and file-size gates pass.
+
+**Grade:** `established-bounded` with `implemented-exact` and `computational-witness` only for the
+complete finite rebase ecology, exact differential/tangent atlas and passing apparatus gates;
+`proved-derived` with `formal-checked` for accepted generated declarations; `proved-standard`
+only for general maps or differential identities independently matched after seal;
+`interpretation` for chart, tangent, sheet, branch and causal-vector language; and
+`outside-aperture` for arbitrary character varieties, analytic/probabilistic dynamics, Hodge/RH
+consequences or autonomous research. Supplied coordinate formulas, controller-written
+Jacobians, a pre-seal named source, host-formed matrices or tangent selection, float-derived rank
+or eigen data, treating a between-point Jacobian as an eigen-operator, hidden matrix access before
+prediction, stored developmental rows in rest, or an isolated fixed point instead of the complete
+ecology falsifies the deed.
+
+### R36+ — Open mathematical production and research campaigns
+
+**Program horizon (`open`):** once R25–R35 return, the machine is no longer used merely to check
 whether a preselected mechanism works. The same body receives a real frontier ecology and must
 return a new theorem, lemma, counterexample, classification, construction, or exact obstruction
 which was not mounted as an answer and which materially narrows the question. Independent formal,
@@ -3492,8 +3710,8 @@ At every phase boundary:
 
 ## 9. Fresh-session pickup
 
-Extraction/canon/provenance and R0–R33 are complete. R34 three-face trace-fiber lifting and branch
-geometry is the frozen next program gate; its admission remains pending.
+Extraction/canon/provenance and R0–R34 are complete. R35 trace-character rebase atlas, tangent
+transport, and branch dynamics is the frozen next program gate; its admission remains pending.
 The live admitted head and current gate are named only in `CONSTRUCTION_STATE.md`. A fresh session must
 read, in order:
 
@@ -3508,6 +3726,7 @@ read, in order:
 
 Do not reread the entire imported research archive, infer a continuation from historical status
 prose, restart R0, or repeat a proof/language/conditioning fixture. Preserve every admitted fiber,
-use the post-R24 convergence audit and the R25–R33 receipts to exclude already-paid expectations,
-and execute the complete frozen R34 tuple without narrowing it to a preinstalled identity, a
-quadratic fitted without complete source rows, or one familiar matrix fixture.
+use the post-R24 convergence audit and the R25–R34 receipts to exclude already-paid expectations,
+and execute the complete frozen R35 tuple without narrowing it to a controller-written coordinate
+map, a differentiated formula that the machine did not first derive, one branch fixture, or a
+Jacobian computed outside the resident deed.
