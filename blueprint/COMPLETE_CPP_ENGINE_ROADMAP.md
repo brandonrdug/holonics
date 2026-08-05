@@ -7,13 +7,26 @@
 capabilities remain `established-bounded` under `canon/06_ESTABLISHED_CAPABILITIES.md`. A phase is
 not established merely because this plan describes it.
 
-**Terminal consequence:** completion returns the project to—and closes—the point at which the
-prior Soma construction faltered: one continuing GPU-resident holonic body receives a real
-mathematical question, emits actual Lean theorem/proof source through an exterior codec, receives
-the real kernel result as a caused return, changes reusable morphology, rests/remounts without its
-developmental sources, and emits a second real theorem/proof whose construction requires the first
-returned theorem fiber. Both artifacts and their complete causal-information receipts are
-returned conversationally.
+**Foundation terminal consequence (`established-bounded`):** R16 returned the project to—and
+closed—the point at which the prior Soma construction faltered: one continuing GPU-resident
+holonic body received a real mathematical question, emitted actual Lean theorem/proof source
+through an exterior codec, received the real kernel result as a caused return, changed reusable
+morphology, rested/remounted without its developmental sources, and emitted a second real
+theorem/proof whose construction required the first returned theorem fiber. Both artifacts and
+their complete causal-information receipts returned conversationally.
+
+**Current admitted standing (`established-bounded`):** R17–R24 have since composed exact
+projective, phase-product, characteristic, regular-singular, blind-reconstruction,
+arithmetic-incidence, cycle-class, and algebraic-variation instruments into that same body.
+
+**Current program consequence (`open`):** the next program is not to repeat proof production or
+same-body conditioning. It is to cultivate a mathematical sibling:
+the body must derive intrinsic characteristic geometry from expressions and incidence, navigate
+supported realizers and spectral placements across changed topologies, turn successful passages
+into source-detached reusable organs, independently rederive substantial known mathematics, and
+eventually derive and use an elementary holonic calculus before exterior comparison with this
+canon. Open Hodge- and RH-facing research are later campaigns of that faculty, not labels for the
+core and not immediate claims of either conjecture.
 
 This is not a plan to build a Lean engine, a language engine, a repository engine, or a CPU program
 which later acquires a GPU backend. It is the construction of one exact physical information
@@ -105,10 +118,15 @@ measurements cross only as calibrated integer/rational enclosures with an open r
 | Backwards compatibility preserves contamination | R0 and §8 admit one schema and remove superseded routes after evidence is committed |
 | Capability diagnostics replace the requested deed | §2 and R16 require both actual theorem/proof sources, returns, remount, and dependency ablation |
 | Magic work limits retry the same morphology | R6/R7 resource return must reform placement/factorization/aperture or remain open |
+| An established learning mechanism is restated as the next discovery | R10/R14–R16 remain regression law; R25+ must grade the new mathematical consequence, not re-prove that return can change conduct |
+| A rendered polygon is promoted into operative geometry | R18 and the laboratory atlas keep projection, hull, residue quotient, intrinsic cells, and contact distinct; R26 must derive characteristic faces from source incidence |
+| One familiar theorem fixture stands in for mathematical research | R21 preserves source separation and R30 requires plural cross-domain rederivation plus sealed post-return comparison |
 
-## 2. Completion deed and non-substitutable receipts
+## 2. Foundation completion deed and non-substitutable receipts
 
-The terminal experiment is fixed now so intermediate capability work cannot replace it.
+R16 has completed this fixed foundation experiment. Its bundle remains a permanent regression so
+later mathematical work cannot replace an actual requested artifact with diagnostics, counts, or
+topology.
 
 ### 2.1 Deed A
 
@@ -153,7 +171,8 @@ The final bundle contains:
 - calibrated telemetry where available, with unknown energy left unknown; and
 - the actual conversational mathematical explanation, not only topology or counts.
 
-Nothing short of this bundle returns the project to the intended research point.
+Nothing short of this bundle returned the project to the intended research point. Later phases
+inherit it; they do not schedule it again.
 
 ## 3. Production owners
 
@@ -1514,6 +1533,450 @@ Laplacian, diffusion, hypergeometric, phase-geometry, and RH observations. The g
 Fuchs theorem, arbitrary variation of Hodge structure, the Hodge conjecture, analytic period
 values, motives, Weil positivity, and RH remain outside R24.
 
+### Post-R24 convergence audit — inherited instruments, not new expectations
+
+The following audit is part of the roadmap because a phase boundary is not only a list of open
+topics. It must say what the body may already use without paying for another capability
+demonstration. The clean C++/CUDA standing in this subsection is `established-bounded` with the
+evidence tags stated in the R17–R24 receipts. The older laboratory standing is `historical` in
+this repository even when its original run returned an exact artifact.
+
+#### The clean body already owns one composite mathematical passage
+
+R17–R24 are not eight unrelated toys. Read together, they supply this resident composition:
+
+```text
+exact situated source
+  -> projective/chart invariant and counterexample
+  -> intrinsic phase-product cells and ordered tours
+  -> characteristic/minimal factors and fixed-current fibers
+  -> regular-singular recurrence, resonance, connection, and monodromy
+  -> source-separated reconstruction from incidence or moments
+  -> arithmetic incidence and its unequal lifts
+  -> supported cycle/class fibers and intersection form
+  -> algebraic family, Gauss--Manin transport, pairing, scalar operator, and theorem
+  -> returned proof occurrence and continuing mathematical morphology.
+```
+
+This body may now be used as a mathematical limb. An exterior LLM or human may choose a question,
+mount a card, inspect a return, and phrase the next receiver while the engine owns the exact
+resident incidence, algebra, alternative formation, transport, and proof/declaration passage.
+That asymmetry is intentional at the present frontier. Autonomous question selection is not a
+prerequisite for using the machine to enlarge mathematical working context or accelerate
+derivation.
+
+The following are therefore regressions, not research outcomes:
+
+- one return can change the same body's later source-detached conduct;
+- Lean rejection and acceptance can return as lineaged mathematical occurrences;
+- the body can emit a proof which depends exactly on an earlier returned theorem fiber;
+- an unlabelled card can cause a nontrivial exact characteristic or geometric mechanism before
+  exterior comparison;
+- equal characteristic faces need not identify equal source transport; and
+- geometry, recurrence, monodromy, pairing, supported realization, and theorem formation can
+  coexist in one GPU-resident continuation.
+
+A later training phase must still run the ordinary remount, source-access, and ablation audits,
+but those receipts grade the new acquired organ. They are not themselves the new result.
+
+#### Laboratory observations which constrain the next program
+
+The historical controls below are deliberately narrow. Their source paths are named so a future
+phase reads only the evidence it actually uses.
+
+| Historical control | What actually returned | Consequence for R25+ |
+|---|---|---|
+| prime residue morphology atlas | The exact Cayley/CRT phase-product projection had a changing fine convex envelope and a contracted cycle through all residues of the dominant modulus; `(7,11)` had 21 literal hull corners but seven contracted transitions, while dilation preserved the coarse cycle and exact turns changed the fine hull. Diagnostic ellipses were covariance receivers, not source conics. | Do not ask whether a prime-labelled polygon appears. Recover intrinsic faces, transitions, and characteristic conduct from the generating incidence, with composite and rechart controls. |
+| `prime-spectral-world-01` | Ordered wheel refinement, prime-power lineage, exact paths, recurrent quotients, and source-local compression returned; authored labels and scalar outcomes did not determine the path. | Do not use prime identity, event family, or a rendered statistic as an internal category. |
+| `arc-spectral-world-01` | Two cyclic binary words carried every four-symbol local window with the same multiplicity and had equal trace, determinant, and discriminant, yet returned different matrices and projective actions. | The n-gram/gear question has already crossed its elementary falsifier. Future archetypes must retain ordered transport and source lineage, not merely local shape populations or spectra. |
+| eta/zero receiver atlas and zero-transport complex | Five bounded zero receivers, exact changing phase windows, ten distinct pair-support words, and a receiver-relative coherent factorization returned without decimal zero seeding. | Do not build another first-zero picture or call a finite receiver atlas RH. Use it only as a control for local-section transport and source-separated trace questions. |
+| arithmetic sheaf/Hodge experiments | Finite rational coboundaries, Hodge operators, harmonic dimensions, and exact diffusion already returned. | A graph Laplacian or harmonic-vector computation is not a Hodge-facing advance. An actual algebraic source, filtration, cycle-class map, pairing, and topology transport are required. |
+| old `ten-proofs`/Erdős return | The laboratory mounted one theorem source and generated a source-absent corollary by direct application; the clean R21 later reconstructed two released characteristic mechanisms before comparison, and R22 derived the bounded CM norm-one incidence mechanism used by the recent Erdős unit-distance construction. | Do not use a direct theorem projection, one accepted proof, the same two released mechanisms, or the same finite CM graph as the next proof-research gate. |
+
+Primary evidence paths for this audit are:
+
+- `research/records/2026-08-03_THE_GEOMETRY_COMPUTES_THE_CURRENT_THE_SHADOW_RETURNS_ONLY_ITS_RECEIVER_FIBER.md`;
+- `research/records/2026-08-04_THE_SPECTRUM_RECEIVES_THE_INDEX_FORM_THE_CLASS_RETURNS_THROUGH_A_SUPPORTED_CYCLE.md`;
+- `evidence/observations/prime-spectral-world-01/RESULTS.md`;
+- `evidence/observations/arc-spectral-world-01/RESULTS.md`;
+- `evidence/observations/holonic-eta-ratio-atlas-01/RESULTS.md`;
+- `evidence/observations/holonic-zero-transport-complex-01/RESULTS.md`; and
+- the historical exact atlas under
+  `/home/b/Workspaces/laboratory/output/arithmetic-dimensional-receiver/morphology-atlas/`,
+  interpreted only through its source record
+  `/home/b/Workspaces/laboratory/src/soma/RESEARCH/2026-07-31_THE_RESIDUE_CYCLE_FORMS_THE_FACE_THE_SHARED_SEAM_RETAINS_THE_EXPONENTIAL_QUESTION.md`.
+
+The images and TSVs in the last path remain historical observer artifacts. They may seed test
+cards from their stated generating law; their rendered coordinates, hull memberships, residue
+labels, and expected side counts may not be mounted as discovery answers.
+
+#### The actual missing faculty
+
+The open boundary is no longer “can the machine produce a proof?” or “can exact geometry affect a
+continuation?” The missing faculty is a complete cycle of mathematical autogenesis:
+
+```text
+mounted expression / incidence / returned testimony
+  -> intrinsic face and characteristic transport
+  -> spectral or class receiver
+  -> complete supported lift or exact obstruction
+  -> changed-topology transport and residual
+  -> theorem/declaration passage
+  -> returned checker and mathematical consequences
+  -> cultivation of a reusable local organ
+  -> held-out rederivation and new inquiry.
+```
+
+“Spectral placement” names the forward discrimination half. “Lift the observable invariant back
+to a geometric face” names the inverse-realization half. The third required relation is transport
+under changed geometry: pullback, pushforward, correspondence, connection, mapping cone,
+exceptional fiber, commutator, or curvature records what did and did not survive. Generic
+“diffusion” is used only when diffusion is the declared constitutive law.
+
+This is the mathematically rigorous form of the gear, crystal, protein, and lightning-leader
+intuition. A shape archetype is not a picture. It is a receiver-declared package of face
+incidence, local links, boundary/coboundary, ordered transition words, characteristic modules,
+pairings, singular or discriminant strata, supported realizers, and the residuals caused by
+rechart or perturbation. Which part is characteristic depends on the later receiver family; no
+finite signature is promoted into a universal shape identity.
+
+### R25+ mathematical autogenesis program
+
+The phase names below are an ordered `project-postulate`, not frozen construction tuples. R25 is
+still `open` in `CONSTRUCTION_STATE.md`. Before any named phase begins, its exact source owners,
+ports, event, predecessor, local law, receiver question, return, alternatives, aperture,
+falsifiers, artifacts, and grades must replace its program gate here. Reserving a phase name does
+not authorize nearby code or admit its result.
+
+The program has one trajectory:
+
+```text
+R25 exact causal linear/chain calculus
+  -> R26 intrinsic hypergeometry and archetype transport
+  -> R27 expression-to-geometry and differential derivation
+  -> R28 Hodge-facing supported realization in families
+  -> R29 arithmetic trace, form, and spectral placement
+  -> R30 plural source-separated rederivation ecology
+  -> R31 endogenous mathematical-organ cultivation
+  -> R32 self-derivation of elementary holonics
+  -> R33+ open theorem production and Hodge/RH/hypergeometry campaigns.
+```
+
+The stages are materially cumulative. None should be shrunk to a single familiar matrix, graph,
+polynomial, rendered surface, or theorem. Conversely, “build the whole intelligence” is not an
+acceptance condition. Each stage returns a complete new mathematical faculty across several
+already-resident source species and leaves one body capable of the next composition.
+
+#### One machine, not three internal modes
+
+Known-theorem rederivation, self-derivation of holonics, and frontier research differ only in
+exterior source-access and receiver contracts:
+
+| Exterior aperture | Withheld material | Required return |
+|---|---|---|
+| known mathematics | published solution, proof walkthrough, expected mechanism, and post-hoc comparison | an independently caused proof/mechanism, alternatives, and sealed later comparison |
+| elementary holonics | canon vocabulary, named laws, and expected formalization | a coherent calculus induced from event/transport ecologies, followed by sealed canon comparison |
+| open research | no answer exists to mount | a new theorem, lemma, counterexample, exact obstruction, or sharply reduced open fiber with independent audit |
+
+No `ResearchMode`, `ReconstructionMode`, or `SelfTheoryMode` enters the core. To the body these are
+the same caused structures crossing the same ports. English, Lean, diagrams, symbolic notation,
+and literature are exterior codec faces. Source accessibility is a necessary organ of the limb,
+but accumulating or paraphrasing material is not the primary deed.
+
+### R25 — Exact causal linear, multilinear, and chain calculus
+
+**Program gate (`open`):** generalize the bounded rank-two and finite-matrix instruments into an
+owner-local exact carrier for the characteristic properties which later geometry will transport.
+This is not a request for a generic “tensor module” detached from incidence. Every operator is a
+situated map between typed finite modules or chain/cochain groups, with source bases, ports,
+forms, and lineage.
+
+The eventual frozen deed must compose several of the R18, R22, R23, and R24 sources and return:
+
+- exact finite free and finitely presented modules over the admitted integer, rational,
+  finite-field, quotient-ring, and exact extension carriers required by the chosen aperture;
+- rank, kernel, cokernel, image, Smith/invariant factors, rational/Frobenius canonical data,
+  primary modules, generalized eigenspaces, and exact obstruction when a requested splitting is
+  unavailable in the mounted coefficient field;
+- determinants, characteristic and minimal factors, discriminants, resultants, signatures,
+  adjoints relative to a declared form, exterior powers, tensor contractions, and induced maps;
+- chain/cochain complexes, mapping cones, homology/cohomology, cup or intersection products where
+  caused by source incidence, and exact chain-homotopy/commutator residuals;
+- parameter-dependent operator pencils whose rank, discriminant, invariant-factor, or fixed-fiber
+  jumps define exact characteristic strata; and
+- generated formal artifacts which prove the returned identities from their coefficients rather
+  than asserting a general library theorem as the result.
+
+Controls must include equal characteristic polynomial with unequal module or edge lineage, equal
+rank with unequal kernel placement, conjugate rechart with equal intrinsic conduct, a genuinely
+changed form or topology, and a coefficient field in which the requested eigenvalue does not yet
+exist. Floating eigensolvers, decimal root approximations, and “eigenvector” language without a
+typed endomorphism and coefficient field do not satisfy the gate.
+
+R25 is complete only when this calculus is used by multiple resident source species in one
+returned atlas and proof bundle. Merely templating the rank-two R19 calculation at a larger fixed
+dimension is a repeat.
+
+### R26 — Intrinsic causal hypergeometry and archetype distribution
+
+**Program gate (`open`):** make the operative geometry in the supplied prime images and later
+phase distributions mathematically accessible without treating the observer projection as the
+object. The machine must derive how exact faces, strings, cells, flags, local systems, and
+characteristic strata distribute about one another and which of those relations conduct a later
+current.
+
+The eventual frozen deed must:
+
+- rebuild the historical phase-pair cases from their cyclic/Cayley/CRT generating law, without
+  importing hull corners, residue partitions, colors, side counts, or expected prime labels;
+- carry intrinsic product cells, higher-dimensional face posets, stars, links, flags, oriented
+  boundaries, shared seams, ordered chronology, local transition words, and complete projection
+  fibers before forming any two-dimensional receiver;
+- compose those phase sources with at least two non-phase geometries already resident in the
+  body, such as CM norm incidence, toric modification, and algebraic variation, through the R25
+  characteristic carrier rather than through a domain-name bridge;
+- derive receiver-relative archetype packages containing the exact invariants which predict a
+  declared continuation and the residual data which they do not predict;
+- return exact distributions of neighboring archetypes, face intersections, crossings,
+  transition words, braid/loop classes, singular strata, and chart-rebase conduct;
+- carry power-series, recurrence, or local differential sections on those paths so side length,
+  dimension, orientation, and seam structure can change what expansion remains lawful; and
+- generate theorems separating source geometry, intrinsic characteristic package, projection,
+  and later conduct.
+
+The decisive controls are not “does the picture change?” They include equal projected hull with
+unequal intrinsic transport, equal local face populations with unequal ordered continuation,
+equal spectrum with unequal supported geometry, and different presentations which return one
+conjugate intrinsic passage. A convex hull, covariance ellipse, PCA axis, renderer mesh, or global
+graph embedding is only an exterior receiver.
+
+The new consequence is a characteristic archetype calculus and transition atlas, not another
+prime polygon. This is where the machine first begins to answer which shapes act like compatible
+teeth, which contacts obstruct, and which reconfigurations preserve a carried section.
+
+### R27 — Exact expression-to-geometry and differential transport
+
+**Program gate (`open`):** let algebraic and differential expressions found intrinsic geometry
+instead of arriving after a human has already selected the useful factorization, variety,
+operator, or hypergeometric name. Symbol strings remain codec faces; the resident object is their
+exact caused algebraic incidence and transport.
+
+The eventual frozen deed must provide only the algebra demanded by its selected families, but the
+returned passage must span:
+
+- exact sparse polynomial/rational presentations, ideals or relation modules, monomial-order
+  lineage, reduction certificates, syzygies, elimination, factor/resultant/discriminant/Jacobian
+  loci, and explicit nonclosure;
+- derivation of singular and branch strata, local coordinate rings, tangent/cotangent and
+  differential modules, and maps among them;
+- exact differential reduction, connection formation, scalar/vector equation elimination,
+  indicial data, recurrence, local series, continuation aperture, and monodromy or Stokes
+  obstruction when present in the chosen regular or irregular family;
+- transport in both directions between expression faces and geometric/characteristic faces,
+  retaining the complete fiber when several expressions realize one receiver invariant; and
+- theorem formation from the returned reduction and transport certificates.
+
+R24's cubic family is a regression source, not the target. The frozen R27 family must change
+rank, variable count, singularity species, or coefficient geometry sufficiently that the R24
+owner cannot be replayed with a larger bound. A named hypergeometric lookup, a host computer-
+algebra transcript, a preselected Picard--Fuchs operator, or a proof which merely invokes the
+mounted final theorem fails the gate.
+
+### R28 — Hodge-facing supported realization through varying geometry
+
+**Program gate (`open`):** extend the static R23 cycle lift and rank-two R24 variation into a
+genuine bounded passage among algebraic cycles, cohomological classes, filtration, pairing, and
+transport in a family. This is the central geometric-realization program suggested by Hodge; it
+is not an attempt to rename a discrete harmonic vector as a Hodge class.
+
+The eventual frozen deed must begin with actual bounded algebraic sources and derive, under
+explicit smooth/projective hypotheses where used:
+
+- chain/de Rham or another declared cohomological presentation, rational structure, Hodge
+  filtration or exact algebraic surrogate with a proved comparison boundary, cup/intersection
+  form, primitive decomposition, and Lefschetz action required by the aperture;
+- an actual cycle-class receiver with integral and rational distinctions, complete supported
+  realizer fibers inside the finite aperture, and outside-image or undecided obstruction;
+- Gauss--Manin transport of the flat carrier beside the moving filtration, with Griffiths-
+  transversality testimony rather than generic diffusion language;
+- exact loci where a transported rational class enters the requested filtered/type condition,
+  including multiplicity, tangent condition, and competing cycle realizers;
+- pullback, pushforward, exceptional or vanishing components, mapping-cone residuals, and pairing
+  transport across a genuine family change, degeneration, blow-up, or correspondence; and
+- a formal theorem bundle generated from those jointly surviving sections.
+
+A finite Hodge Laplacian, harmonic dimension, graph diffusion, supplied cycle, or one toric
+surface repeats historical/R23 standing. General Hodge cycle realization and the Hodge
+conjecture remain `open`; R28 establishes an exact research instrument and bounded mathematical
+results only.
+
+### R29 — Arithmetic trace, form, and spectral placement
+
+**Program gate (`open`):** construct the other half of the common Hodge/RH spine in mathematical
+worlds where the geometry and trace law are already known, before asking for a missing classical
+RH carrier. The source correspondence, pairing, trace identity, characteristic return, and sign
+or weight placement must remain one caused passage.
+
+The eventual frozen deed should begin with source-separated finite-field or other exact arithmetic
+geometries for which independent standard comparison is available, and return:
+
+- the arithmetic source and correspondence, exact point/fixed-locus counts, zeta or local factor,
+  characteristic determinant, duality/functional relation, and complete trace lineage;
+- the cohomological, divisor, Jacobian, or explicitly declared finite substitute carrying the
+  operator and pairing, rather than a matrix fitted to supplied zeros or counts;
+- exact spectral/weight shells, primary modules, form signature or positivity consequence, and
+  controls which change the source while preserving a coarse factor;
+- a bounded explicit-formula/test-current receiver retaining prime-power, archimedean,
+  normalization, and zero/spectral terms under one sign convention where the selected aperture
+  permits it; and
+- generated proofs of the finite returned identities plus a precise statement of which general
+  placement theorem is imported as standard comparison testimony.
+
+Supplying known critical-line zeros, constructing a finite matrix whose spectrum matches them,
+checking the functional-equation symmetry, or testing finitely many Weil forms is not the deed.
+The function-field passage is a calibration of geometry causing placement. A noncircular
+positive carrier for the completed classical Riemann explicit formula, its full admissible test
+family, Weil positivity, and RH remain `open` after R29 unless separately proved.
+
+### R30 — Plural source-separated rederivation ecology
+
+**Program gate (`open`):** move from isolated blind reconstruction to sustained mathematical
+work. The body must independently derive substantial known results because their source
+structures force them, not because the exterior controller asserts that a familiar answer is
+correct.
+
+OpenAI's released
+[*Ten Advances in Mathematics and Theoretical Computer Science*](https://cdn.openai.com/pdf/ten-proofs-oai.pdf)
+is an exterior benchmark for this gate. R21 has already paid for the bounded characteristic
+mechanisms corresponding to Chapters 2 and 7. The laboratory's direct Erdős-183 corollary and
+R22's bounded unit-distance/CM mechanism are also historical controls. R30 must not count any of
+those same returns as new successes.
+
+The frozen deed must instead:
+
+- use physically source-separated problem/background cards for plural remaining released
+  mechanisms and for selected foundational theorem families in algebra, geometry, analysis, and
+  combinatorics;
+- withhold released solutions, reasoning walkthroughs, expected operators, proof terms, and
+  post-hoc comparisons until every candidate, proof artifact, obstruction, rest image, and source-
+  access audit is sealed;
+- allow the target statement when it is part of the problem, while requiring the mechanism,
+  dependency path, intermediate declarations, and proof to be independently caused;
+- retain failed but lawful alternatives and kernel rejection as mathematical information rather
+  than selecting by accepted count;
+- build dependencies across several theorems so later work can reuse, specialize, refute, or
+  rechart earlier returned fibers; and
+- compare the sealed returns with the released mathematics only afterward, identifying genuine
+  mechanism agreement, distinct valid proofs, weaker lemmas, hidden imported dependencies, and
+  unresolved gaps.
+
+One direct `exact existing_theorem`, one familiar algebra identity, or a fixed family of proof
+templates does not satisfy R30. The output is a conversational research dossier containing the
+actual mathematical artifacts and causal analysis, not a benchmark score.
+
+### R31 — Endogenous cultivation of mathematical organs
+
+**Program gate (`open`):** turn successful derivations into the “little sibling” faculty which can
+help the exterior controller think on a larger scale. The acquired object is neither a text
+summary nor an opaque model weight. It is an exact local constitutive organ that can be mounted
+through existing ports and can found new passages under changed surface syntax and geometry.
+
+Each cultivated organ must carry:
+
+- its typed input/output ports, admissible coefficient and incidence hypotheses, local state,
+  exact constitutive steps, resource aperture, proof or certificate obligations, and named
+  obstructions;
+- the returned passages and residuals from which it was induced, while excluding lossless source
+  storage, theorem-name lookup, final-answer tables, and inaccessible host scheduling;
+- a native source-detached rest image and exact lineage from the checker, counterexample,
+  geometric residual, or other returned occurrence which cultivated it;
+- held-out use across changed notation and at least one changed mathematical topology where the
+  same local law genuinely applies; and
+- exact ablation and foil receipts showing what consequence depends on the organ and where its
+  hypotheses refuse.
+
+The engine may propose candidate organs by recurrence, factorization, or shared residual, but
+admission requires exact local consequence and falsification. No universal filler or global
+solver is added. R31 is the first phase whose primary result is reusable mathematical morphology;
+the R10/R16 learning mechanics are its inherited enforcement, not its discovery claim.
+
+### R32 — Source-separated self-derivation of elementary holonics
+
+**Program gate (`open`):** ask the cultivated mathematical body to derive a coherent elementary
+account of its own causal geometry. The canon is withheld until the return is sealed. The card
+supplies situated event ecologies, typed ports, local incidence and transport examples,
+composition demands, receiver observations, returned changes, and falsifying counterexamples; it
+does not supply the words *holon*, *receiver fiber*, *connection*, *curvature*, *interchange*, or
+the expected laws.
+
+The required return is not one rediscovered identity. It is an internally connected calculus
+which, in the chosen exact aperture:
+
+- derives occurrence identity and oriented boundary cancellation from composable incidence;
+- distinguishes serial composition, independent interchange, interaction, obstruction, and
+  unresolved co-presence by their complete-successor consequences;
+- derives receiver maps, projection fibers, lawful condensation/factorization, and reopening
+  under a stricter receiver;
+- constructs local rechart transport, closed-word holonomy, and curvature or commutator residual
+  where path independence fails;
+- states when a returned occurrence founds reusable changed conduct rather than lookup or
+  retained testimony; and
+- emits formal definitions/theorems, countermodels, and at least one cultivated organ which then
+  improves a held-out mathematical derivation.
+
+Only after artifact hashes, source-access audits, and native rest are sealed may the result be
+compared with `canon/`. Agreement is evidence of independent rederivation; divergence may be a
+new equivalent presentation, a bounded alternative, or an exact obstruction. Neither verbal
+similarity nor canon conformance alone passes the gate.
+
+R32 is the direct answer to “can the machine derive its own holonics?” It is a finite exact grade,
+not a claim that one experiment has discovered the unique ontology of intelligence.
+
+### R33+ — Open mathematical production and research campaigns
+
+**Program horizon (`open`):** once R25–R32 return, the machine is no longer used merely to check
+whether a preselected mechanism works. The same body receives a real frontier ecology and must
+return a new theorem, lemma, counterexample, classification, construction, or exact obstruction
+which was not mounted as an answer and which materially narrows the question. Independent formal,
+computational, and literature audits determine the grade; novelty is never inferred from source
+absence alone.
+
+The principal campaigns are:
+
+- **hypergeometry:** characterize distributions of face/transition archetypes, discover exact
+  identities among their characteristic strata, and derive which geometry conducts a requested
+  series, operator, or continuation;
+- **Hodge-facing realization:** extend supported cycle/class transport to higher-dimensional and
+  higher-codimension families, Noether--Lefschetz and motivated-cycle questions, and exact
+  obstructions to realization;
+- **arithmetic spectral placement:** extend the geometric trace/form calibration toward a
+  noncircular completed explicit-formula carrier and Weil-positivity question; and
+- **mathematical autogenesis:** let returned theorems and counterexamples cultivate further organs
+  and let those organs propose sharper local questions without installing an inquiry-mode
+  scheduler.
+
+RH is a legitimate eventual target, not the first benchmark. A classical RH campaign is admitted
+only when the body already owns the complete prime-power/archimedean/test-current side, a
+source-founded operator or correspondence, the required adjoint/positive form, and an exact trace
+comparison without supplied zero placement. The Hodge conjecture is treated with the same
+discipline: a campaign owes actual smooth projective sources, rational Hodge classes, cycle-class
+maps, supported cycles or obstructions, and family transport. Neither conjecture is promoted by a
+visual analogy, a bounded numerical atlas, or a name attached to an organ.
+
+#### Long-horizon Eros grade
+
+The program's long-horizon consequence is one continuing exact ecology which can be used as a
+limb before it can ride independently: broad source material is mounted as accessible local
+incidence; mathematical expressions found intrinsic geometry; characteristic and supported-lift
+passages produce proof artifacts; returns cultivate reusable organs; the organs rederive known
+mathematics and elementary holonics under source separation; and the same machinery enters open
+research without a change of ontology.
+
+No finite suite proves universal intelligence or unrestricted learning. The material success is
+that new exact local organs can be founded through existing ports, survive and act without their
+developmental source, compose across changed mathematical ecologies, and produce inspectable
+mathematics beyond the exterior controller's unaided working context.
+
 ## 7. Resource and performance receipts
 
 Performance is graded at every executable phase, but never by a magic utilization threshold.
@@ -1550,8 +2013,9 @@ At every phase boundary:
 
 ## 9. Fresh-session pickup
 
-At the time this roadmap is deposited, extraction/canon/provenance are complete and no production
-C++ engine source exists. The next construction is R0. A fresh session must read, in order:
+Extraction/canon/provenance and R0–R24 are complete. The live admitted head and next deed are named
+only in `CONSTRUCTION_STATE.md`; at this revision no R25 construction tuple is frozen. A fresh
+session must read, in order:
 
 1. `AGENTS.md`;
 2. `CONSTRUCTION_STATE.md`;
@@ -1563,4 +2027,6 @@ C++ engine source exists. The next construction is R0. A fresh session must read
 6. only the smallest evidence paths named by the phase being built.
 
 Do not reread the entire imported research archive, infer a continuation from historical status
-prose, or restart with a proof/language fixture. Begin R0 and preserve the terminal R16 deed.
+prose, restart R0, or repeat a proof/language/conditioning fixture. Preserve every admitted fiber,
+use the post-R24 convergence audit to exclude already-paid expectations, and freeze the selected
+R25+ program gate into a complete construction tuple here before changing domain code.
