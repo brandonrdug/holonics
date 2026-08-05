@@ -113,4 +113,33 @@ template<std::size_t Capacity>
   return word{hash};
 }
 
+struct word_division_result final {
+  std::uint64_t quotient{};
+  std::uint64_t remainder{};
+};
+
+[[nodiscard]] HOLONICS_CALLABLE inline word_division_result divide_unsigned(
+    std::uint64_t numerator, std::uint64_t denominator) noexcept {
+  word_division_result out{};
+  if (denominator == 0) { return out; }
+  for (std::uint8_t width = 64; width != 0; --width) {
+    const auto bit = static_cast<std::uint8_t>(width - 1U);
+    out.remainder = (out.remainder << 1U) | ((numerator >> bit) & 1U);
+    if (out.remainder >= denominator) {
+      out.remainder -= denominator;
+      out.quotient |= std::uint64_t{1} << bit;
+    }
+  }
+  return out;
+}
+
+[[nodiscard]] HOLONICS_CALLABLE inline std::uint64_t positive_remainder(
+    std::int64_t value, std::uint64_t modulus) noexcept {
+  if (modulus == 0) { return 0; }
+  const auto magnitude = value < 0 ?
+      static_cast<std::uint64_t>(-(value + 1)) + 1U : static_cast<std::uint64_t>(value);
+  const auto remainder = divide_unsigned(magnitude, modulus).remainder;
+  return value < 0 && remainder != 0 ? modulus - remainder : remainder;
+}
+
 }  // namespace holonics::exact

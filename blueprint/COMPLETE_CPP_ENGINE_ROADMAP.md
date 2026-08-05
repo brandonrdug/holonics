@@ -2285,31 +2285,192 @@ RH consequence remain outside R28. The complete return and passing gates are rec
 
 ### R29 — Arithmetic trace, form, and spectral placement
 
-**Program gate (`open`):** construct the other half of the common Hodge/RH spine in mathematical
-worlds where the geometry and trace law are already known, before asking for a missing classical
-RH carrier. The source correspondence, pairing, trace identity, characteristic return, and sign
-or weight placement must remain one caused passage.
+**Frozen construction (`project-postulate`; admission passed):** construct the other half of the
+common Hodge/RH spine in a bounded CM elliptic function-field world where the source geometry,
+Frobenius correspondence, form, trace law, and placement can all return exactly. Frobenius must be
+identified as an endomorphism by its geometric action before any characteristic matrix is formed;
+point counts are an independent fixed-locus return, not fitting data.
 
-The eventual frozen deed should begin with source-separated finite-field or other exact arithmetic
-geometries for which independent standard comparison is available, and return:
+**Construction tuple:**
 
-- the arithmetic source and correspondence, exact point/fixed-locus counts, zeta or local factor,
-  characteristic determinant, duality/functional relation, and complete trace lineage;
-- the cohomological, divisor, Jacobian, or explicitly declared finite substitute carrying the
-  operator and pairing, rather than a matrix fitted to supplied zeros or counts;
-- exact spectral/weight shells, primary modules, form signature or positivity consequence, and
-  controls which change the source while preserving a coarse factor;
-- a bounded explicit-formula/test-current receiver retaining prime-power, archimedean,
-  normalization, and zero/spectral terms under one sign convention where the selected aperture
-  permits it; and
-- generated proofs of the finite returned identities plus a precise statement of which general
-  placement theorem is imported as standard comparison testimony.
+- source owners: the one R28 continuing body with its fifteen accepted fibers; one R29
+  finite-field/elliptic-source/test-current card; the admitted exact integer, polynomial, matrix,
+  causal-linear, cycle/intersection, variation, and Hodge-facing organs; and new extension-field,
+  elliptic-incidence, group-law, Frobenius-correspondence, CM-carrier, fixed-locus, closed-place,
+  zeta, primary-module, form, explicit-formula, changed-source, theorem-current, proof-face,
+  checker-return, atlas, and native-rest owners;
+- port types: the admitted 984-byte R28 native rest; raw/typed arithmetic cards; prime-field,
+  lexicographic irreducible-modulus, extension-field element, curve term/discriminant, affine and
+  infinite point, group sum/scalar multiple, Frobenius and CM point-image, correspondence-candidate
+  residual, Gaussian integer, rank-two operator, alternating/positive form, fixed-locus
+  contribution, trace recurrence, closed-place count, zeta numerator/denominator, functional
+  relation, Gaussian primary line/gluing, homogeneous test current, trace-balance, source-rechart,
+  theorem/proof/explanation, checker-return, changed-source, and continuing native-rest faces;
+- event occurrence: remount R28; mount the unlabelled arithmetic card; derive the two base-field
+  towers on independent resident currents; after their barrier, derive six source curves and one
+  changed-source curve on independent currents; enumerate every degree-one-through-four fixed
+  locus; identify the unique bounded Gaussian correspondence by its action on every
+  `F_(p^2)`-point before forming the carrier; compose counts, operator, forms, local zeta,
+  closed-place inversion, primary modules, and test currents only after the curve barriers;
+  generate and check one returned theorem, commit its return, and rest/remount the same body;
+- predecessor identity: admitted R28 head `14001030`, continuation `15001030`, body morphology
+  `693`, mathematical morphology `207`, codec morphology `103`, expression-geometry morphology
+  `37`, Hodge-realization morphology `41`, and fifteen fibers through `195300` recorded in
+  `CONSTRUCTION_STATE.md` and the R28 receipt;
+- local constitutive law: exact modular polynomial arithmetic and exhaustive irreducibility in
+  degrees at most four; quotient-field addition, multiplication, powering, inversion, and
+  quadratic character; smooth short-Weierstrass incidence and exact chord/tangent group law;
+  coordinate Frobenius; the derived `j=1728` automorphism `i(x,y)=(-x,iy)`; bounded Gaussian
+  endomorphism search by complete pointwise action; degree/norm and kernel-cardinality comparison;
+  rank-two Gaussian multiplication, alternating similitude and Rosati norm forms; fixed-point
+  enumeration; Newton trace recurrence; orbit/Mobius inversion; rational zeta and functional
+  relation; Gaussian primary splitting; and exact norm-square test currents;
+- receiver question: which source correspondence causes each local factor and spectral shell;
+  how every closed-point/prime-power trace is carried into that factor; which form makes placement
+  structural rather than observed; how twists, CM phase, and an equal-factor rechart separate
+  source geometry behind coarse or equal spectral faces; and which part of the classical explicit
+  formula is absent from this function-field aperture?;
+- returned consequence: two exact field towers; seven complete elliptic/Frobenius passages; every
+  degree-one-through-four fixed-locus contribution; seven uniquely identified Gaussian
+  correspondences and their genuine rank-two carriers; exact symplectic/positive forms, primary
+  lines, local zeta factors, duality, weight shells, closed-place populations, bounded
+  explicit-formula and homogeneous positive-current atlases; changed-source and equal-factor
+  controls; one generated theorem/proof and explanation; acquired fiber `196300`; and a
+  source-detached native continuation; and
+- open alternatives: arbitrary primes, finite fields, elliptic curves, genera, and varieties;
+  general etale or crystalline cohomology; supersingular and ramified places; unbounded Euler
+  products and test families; number-field archimedean places; a natural classical Frobenius or
+  cohomology; a noncircular positive carrier for the completed Riemann explicit formula; full Weil
+  positivity; and RH.
 
-Supplying known critical-line zeros, constructing a finite matrix whose spectrum matches them,
-checking the functional-equation symmetry, or testing finitely many Weil forms is not the deed.
-The function-field passage is a calibration of geometry causing placement. A noncircular
-positive carrier for the completed classical Riemann explicit formula, its full admissible test
-family, Weil positivity, and RH remain `open` after R29 unless separately proved.
+**Exact aperture:** the card supplies the six coefficient pairs
+
+```text
+(p,c) = (5,1), (5,4), (13,1), (13,4), (13,2), (13,3)
+```
+
+for the unlabelled smooth cubic sources `y^2=x^3+cx`, the changed-source substitution
+`(13,2)->(13,7)`, extension degrees one through four, Gaussian-candidate coefficients `[-4,4]`,
+homogeneous test-current degree four with coefficients `[-1,1]`, and the source pair selected for
+rechart comparison. It contains no elliptic-curve, CM, Frobenius, field modulus, point count,
+trace, Gaussian integer, operator, pairing, characteristic, weight, zeta, place count, functional
+equation, rechart, theorem, proof, or expected-invariant label/value.
+
+The field organ searches all monic polynomials in coefficient order and proves the first
+irreducible modulus. The complete expected discovery is
+
+```text
+p=5:  X^2+2, X^3+X+1, X^4+2
+p=13: X^2+2, X^3+2,   X^4+2.
+```
+
+Degree one is the prime field itself. Across the six baseline sources there are exactly 125,320
+degree-one-through-four `x` contributions; the changed source adds 30,940. The complete bounded
+Gaussian search retains all `9^2=81` candidate residuals per curve. Every actual
+`E(F_(p^2))` point is retained for the selected correspondence. There are `3^4=81` four-moment
+trace-balance currents and `3^5=243` degree-four homogeneous norm currents per curve. These are
+compile-time scientific apertures, not retry bounds.
+
+**Construct and return:**
+
+- derive smoothness from the cubic discriminant, the least base-field square root `i` of `-1`,
+  and every field modulus/certificate without a supplied table. Enumerate each fixed locus as
+  `1 + sum_x(1+chi(x^3+cx))`, retaining the individual `x`, right-hand side, character, point
+  contribution, field-modulus lineage, and total. The baseline degree-one-through-four returns
+  must be
+
+  ```text
+  (5,1):  4,32,148,640       (5,4):  8,32,104,640
+  (13,1): 20,160,2180,28800  (13,4): 8,160,2216,28800
+  (13,2): 10,180,2290,28800  (13,3): 20,160,2180,28800
+  ```
+
+  and the changed `(13,7)` source must return `18,180,2106,28800`. A supplied count, a host
+  recount after each kernel, or a count reconstructed from the eventual matrix falsifies the
+  deed;
+- derive the coordinate Frobenius `(x,y)->(x^p,y^p)` and `i(x,y)=(-x,iy)` on every
+  `E(F_(p^2))` point. Search `a,b in [-4,4]` and retain every candidate mismatch count. The unique
+  norm-`p` pointwise matches, with the least `i`, must be
+
+  ```text
+  1+2i, -1-2i, -3-2i, 3+2i, 2-3i, -3-2i, -2+3i
+  ```
+
+  in baseline order followed by the changed source. Require `#E(F_(p^2))>4p`; together with the
+  standard elliptic degree-form bound this lifts pointwise equality to endomorphism equality.
+  This geometric correspondence certificate must precede the matrix. Form multiplication by
+  `pi=a+bi` only afterward as `F=[[a,-b],[b,a]]`;
+- return `F^T J F=pJ` for the alternating form and `F^T F=pI` for the positive Rosati chart,
+  with signature `(2,0)`, characteristic polynomial `X^2-2aX+p`, discriminant `-4b^2`, and exact
+  Gaussian roots `pi,conjugate(pi)` of norm `p`. After base change to `Z[i]`, retain the two
+  primary eigenlines generated by `(1,-i)` and `(1,i)`, their eigenvalues, and the determinant
+  `2i` of the eigenbasis. The index/norm-four gluing obstruction must remain present rather than
+  pretending the integral lattice is the direct sum of those lines;
+- independently form `s_0=2`, `s_1=2a`,
+  `s_n=2a s_(n-1)-p s_(n-2)` and require every geometric count to equal
+  `N_n=1+p^n-s_n`. Return
+
+  ```text
+  Z_E(T) = (1-2aT+pT^2)/((1-T)(1-pT))
+  ```
+
+  coefficientwise, its exact involution `Z_E(1/(pT))=Z_E(T)`, and the closed-place populations
+  `B_n=(1/n) sum_(d|n) mu(n/d)N_d` through degree four. The truncated Euler product must agree
+  with the rational zeta series through `T^4`. Trace, fixed-locus, recurrence, and place lineages
+  remain distinct even when their received integers agree;
+- for every four-moment coefficient word `c`, return the exact function-field explicit-formula
+  balance
+
+  ```text
+  sum_(n=1)^4 c_n(
+    sum_(d|n) d B_d - 1 - p^n + Tr(pi^n)) = 0.
+  ```
+
+  The sign convention therefore retains closed points, the `H0/H2` normalization poles, and the
+  `H1` spectral term in one current. This function-field source has no archimedean place; the
+  atlas must return that face as inapplicable, not zero or silently omit it. For every
+  `c_0,...,c_4 in [-1,1]`, also return
+
+  ```text
+  G_c(pi)=sum_(k=0)^4 c_k pi^k conjugate(pi)^(4-k),
+  G_c(pi) conjugate(G_c(pi)) = Re(G_c)^2+Im(G_c)^2 >= 0.
+  ```
+
+  This homogeneous norm current tests phase on the weight shell without taking `sqrt(p)` or using
+  a floating modulus. Its symbolic norm-square proof, not finite positivity sampling, carries the
+  sign;
+- retain three controls. The `(5,1)/(5,4)`, `(13,1)/(13,4)`, and `(13,2)/(13,7)` twist pairs
+  have the same determinant, weight shell, positive form, and even-degree counts while their
+  traces, odd fixed loci, and spectral hands reverse. The `(13,1)/(13,3)` pair has the same full
+  local factor but a derived scale rechart; preserve both source occurrences and the rechart
+  lineage. The `(13,2)` source supplies a different Gaussian phase at the same weight. No equal
+  receiver face identifies source geometry; and
+- generate a Lean passage from the returned primes, coefficients, Gaussian correspondences,
+  matrices, counts, place populations, and current forms. It must prove every norm, characteristic,
+  alternating/positive-form, recurrence/count, duality, primary-eigenvector, gluing,
+  closed-place, twist/even-count, equal-factor rechart, explicit-formula, and symbolic
+  norm-square consequence without invoking a mounted theorem containing the returned conjunction.
+
+**Acceptance:** both field-tower currents, all six baseline curve currents, and the changed-source
+current execute on the resident GPU and agree with an independent exact host audit; field and curve
+barriers precede composition; the actual atlas retains every field candidate/certificate, fixed-
+locus `x` contribution, correspondence candidate residual, selected-point image, matrix/form/
+primary entry, trace recurrence, place count, zeta coefficient, test-current value, control, and
+lineage rather than hashes alone; the generated proof crosses the exterior checker;
+source-detached rest/remount preserves every earlier fiber and the new fiber; and the full
+architecture, ownership, no-float, determinism, device-sanitizer, binary, and file-size gates pass.
+
+**Grade:** `established-bounded` with `implemented-exact` and `computational-witness` after
+the complete GPU return and all gates pass; `proved-derived` with `formal-checked` only for the
+emitted Lean statements; `proved-standard` for smooth short-Weierstrass group law, elliptic
+endomorphism degree/Rosati theory, the CM comparison, Lefschetz fixed-point/zeta comparison, and
+the function-field Euler/closed-point interpretation under their stated hypotheses; and
+`historical` for the old finite zero, finite Weil-form, duality, and arithmetic-monodromy worlds
+used only as falsifiers. General Weil bounds are not needed for the derived CM norm shell and are
+not claimed as an engine theorem. Arbitrary function-field RH, a number-field Frobenius carrier,
+the completed classical explicit formula with its archimedean face, all-test Weil positivity, and
+RH remain outside R29. The complete return and passing gates are recorded in
+[`receipts/R29_ARITHMETIC_TRACE_FORM_SPECTRAL_PLACEMENT_RECEIPT.md`](../receipts/R29_ARITHMETIC_TRACE_FORM_SPECTRAL_PLACEMENT_RECEIPT.md).
 
 ### R30 — Plural source-separated rederivation ecology
 
@@ -2486,8 +2647,8 @@ At every phase boundary:
 
 ## 9. Fresh-session pickup
 
-Extraction/canon/provenance and R0–R28 are complete. R29 arithmetic trace, form, and spectral
-placement is the next open program gate, but no R29 construction tuple is frozen.
+Extraction/canon/provenance and R0–R29 are complete. R30 plural source-separated rederivation
+ecology is the next open program gate, but no R30 construction tuple is frozen.
 The live admitted head and current gate are named only in `CONSTRUCTION_STATE.md`. A fresh session must
 read, in order:
 
@@ -2502,5 +2663,5 @@ read, in order:
 
 Do not reread the entire imported research archive, infer a continuation from historical status
 prose, restart R0, or repeat a proof/language/conditioning fixture. Preserve every admitted fiber,
-use the post-R24 convergence audit and the R25–R28 receipts to exclude already-paid expectations,
-and freeze R29 into a complete construction tuple here before changing later domain code.
+use the post-R24 convergence audit and the R25–R29 receipts to exclude already-paid expectations,
+and freeze R30 into a complete construction tuple here before changing later domain code.

@@ -185,24 +185,36 @@
   rests at head `14001030`, continuation `15001030`, with every prior fiber preserved and
   Hodge-realization fiber `195300` acquired.
   [Receipt](receipts/R28_HODGE_FACING_SUPPORTED_REALIZATION_RECEIPT.md).
+- R29: two finite-field towers and seven smooth CM elliptic sources derive every degree-one-through-
+  four fixed locus independently of spectral data, then identify coordinate Frobenius as a unique
+  Gaussian endomorphism by complete pointwise action before forming its rank-two carrier. Exact
+  alternating and positive forms place the characteristic roots on their norm shells; recurrence,
+  closed-place inversion, rational zeta duality, primary lines with norm-four gluing, 567 trace
+  currents, and 1,701 symbolic norm-square currents carry those correspondences into arithmetic
+  receiver faces. Twist, equal-factor rechart, phase, and changed-source controls preserve the
+  forgotten source distinctions. The 160,305-row atlas and coefficient-rendered Lean declarations
+  are returned and checked. The same body rests at head `14001032`, continuation `15001032`, with
+  every prior fiber preserved and arithmetic-spectral fiber `196300` acquired.
+  [Receipt](receipts/R29_ARITHMETIC_TRACE_FORM_SPECTRAL_PLACEMENT_RECEIPT.md).
 
-The ordered R0–R16 construction and the directly authorized R17–R28 post-frontier inquiries are
+The ordered R0–R16 construction and the directly authorized R17–R29 post-frontier inquiries are
 complete.
 
-**Next deed (`open`): no R29 construction is frozen.** The live body now rests at head `14001030`
-and continuation `15001030`, body morphology `693`, mathematical morphology `207`, codec
-morphology `103`, expression-geometry morphology `37`, Hodge-realization morphology `41`, and
-fifteen accepted fibers through `195300`. R28 has made a moving rank-six cohomological carrier,
-pairing, filtration, exact infinitesimal cycle locus, supported integral/rational class fibers,
-correspondence lineage, and changed-topology blow-up transport native. R29's program gate is
-arithmetic trace, form, and spectral placement: exact finite-field geometry must cause its own
-fixed-locus traces, genuine operator/pairing carrier, characteristic/local factor, duality,
-weight placement, and bounded explicit-formula receiver. A matrix fitted to supplied counts or
-known zeros is not the deed. The next phase must freeze its complete construction tuple, exact
-aperture, actual returned artifact, falsification boundary, and intended grades in
+**Next deed (`open`): no R30 construction is frozen.** The live body now rests at head `14001032`
+and continuation `15001032`, body morphology `782`, mathematical morphology `232`, codec
+morphology `113`, expression-geometry morphology `37`, Hodge-realization morphology `41`,
+arithmetic-spectral morphology `47`, and sixteen accepted fibers through `196300`. R29 has made
+source-caused finite-field Frobenius, fixed-locus traces, exact form/spectral placement, closed
+places, local zeta duality, primary gluing, and bounded explicit currents native. R30's program
+gate is a plural source-separated rederivation ecology: several substantial known mechanisms must
+be independently caused, sealed with alternatives, dependencies, proof artifacts, returned
+checker occurrences, native rests, and source-access audits, and compared with their exterior
+references only afterward. R21's released Chapters 2/7 mechanisms and the laboratory's direct
+Erdős-183 and unit-distance/CM observations are already paid and cannot count again. The next
+phase must freeze its complete construction tuple, exact aperture, actual conversational dossier,
+falsification boundary, and intended grades in
 [`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md) before domain
-code changes; a noncircular positive carrier for the completed classical Riemann explicit
-formula, full Weil positivity, and RH remain later open alternatives.
+code changes.
 
 Update this file only after a phase's required artifact and receipts have returned and its grade
 has passed. Do not record intentions or partial work as admitted standing.
