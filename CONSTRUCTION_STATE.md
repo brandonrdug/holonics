@@ -1,312 +1,159 @@
 # Construction state
 
-**Current admitted standing (`established-bounded`, `implemented-exact`):**
+## Current admitted body
 
-- R0: pinned C++23/CUDA C++20 build, nine-owner acyclic contract, restricted ownership/type law,
-  deterministic manifest, and executable audits. [Receipt](receipts/R0_ARCHITECTURE_RECEIPT.md).
-- R1: bit-pure exact carrier through 384 bits, refusal boundaries, representation maps, and 100
-  GPU cases with zero oracle disagreement. [Receipt](receipts/R1_EXACT_CARRIER_RECEIPT.md).
-- R2: move-only owner-native structure, typed identity, sparse incidence, receiver traversal,
-  persistent paths, and local deltas. [Receipt](receipts/R2_OWNER_NATIVE_STRUCTURE_RECEIPT.md).
-- R3: real source bytes with minted occurrences, incidence, lineage, apertures, relocation
-  invariance, and detached projection/preimage. [Receipt](receipts/R3_SOURCE_TOPOLOGY_RECEIPT.md).
-- R4: one continuing body, linear continuation, pending deed/exterior return, complete staged
-  delta, atomic commit/refusal, and rest/remount. [Receipt](receipts/R4_BODY_LIFECYCLE_RECEIPT.md).
-- R5: domain-neutral causal ABI and non-copyable GPU-resident current with ordered fronts, local
-  deltas, exact rest, open current, and overflow. [Receipt](receipts/R5_CAUSAL_CURRENT_RECEIPT.md).
-- R6: many-current weave with serial gluing, complete parallel interchange, higher coherence,
-  equalization, obstruction, and resource-driven rearrangement. [Receipt](receipts/R6_MANY_CURRENT_WEAVE_RECEIPT.md).
-- R7: seven receiver-geometry deeds covering swing, sameness, projection/preimage, connection,
-  Gauss fiber, extended carriers, and rational recurrence. [Receipt](receipts/R7_CORE_RECEIVER_GEOMETRY_RECEIPT.md).
-- R8: stateful lawful condensation, direct/factor agreement, receiver-family growth, retained-fiber
-  reopening, refinement, and continued conduct. [Receipt](receipts/R8_STATEFUL_BOUNDARY_CONDENSATION_RECEIPT.md).
-- R9: agnostic lineaged codec crossings and reflection; returned revision changes source-detached
-  held behavior while relocation changes only testimony. [Receipt](receipts/R9_AGNOSTIC_CODECS_REFLECTION_RECEIPT.md).
-- R10: distinct mount/exposure/training/reference; only training changes native morphology. Held
-  response `8→14`, survives detached remount, and exact ablation returns `8`, without lookup or
-  corpus retention. [Receipt](receipts/R10_CONDITIONING_NATIVE_MORPHOLOGY_RECEIPT.md).
-- R11: real Transition/Rebase sources form a detachable mathematical incidence ecology. GPU local
-  reconstruction is relocation/order invariant with zero global scans; mismatch, unsolved, and
-  unknown closure remain explicit. [Receipt](receipts/R11_MATHEMATICAL_OCCURRENCE_ECOLOGY_RECEIPT.md).
-- R12: a question-conditioned GPU current returns ambiguity, applies an exact receiver aperture,
-  forms and commits a new reverse-rebase passage, then renders Lean and conversational faces with
-  zero answer lookup, quotation, score, registry, global scan, or checker call.
-  [Receipt](receipts/R12_GENERATIVE_MATHEMATICAL_CURRENT_RECEIPT.md).
-- R13: the same generated passage crosses one pinned exterior checker invocation while its GPU
-  body owns an explicit pending deed. Raw status/stdout/stderr/produced artifact return to the GPU,
-  normalize to kernel acceptance, preserve passage identity, and revise local mathematical,
-  codec, and body morphology. [Receipt](receipts/R13_LEAN_EXTERIOR_CHECKER_RECEIPT.md).
-- R14: frozen request `q₁` expands two GPU-local proof geometries, selects the exact
-  three-dependency composition/rebase passage, and returns a real kernel-accepted theorem. The
-  checker return commits `Δm₁`, survives native source-detached rest/remount, enables the held
-  dependent probe, and exact returned-fiber exclusion removes that consequence.
-  [Receipt](receipts/R14_FIRST_THEOREM_PRODUCTION_RECEIPT.md).
-- R15: the same body mounts only its 200-byte native R14 rest, answers frozen dependent question
-  `q₂` through returned theorem fiber `181200`, and freezes the complete typed setup for Deed B.
-  Exact exclusion reverses `Δm₁` and removes the predicted consequence; the production handoff
-  remains byte-identical with zero source, corpus, index, or retrieval access.
-  [Receipt](receipts/R15_RETURN_CONDITIONED_THEOREM_MORPHOLOGY_RECEIPT.md).
-- R16: the terminal composition returns both complete theorem/proof sources and explanations
-  through two real kernel calls. After source-detached remount, Deed B's emitted proof invokes the
-  returned Deed A declaration through fiber `181200`; exact `Δm₁` exclusion emits zero B source
-  and returns `returned_fiber_absent`. Both fibers survive final native remount at head `14001004`
-  with continuation `15001004`.
-  [Receipt](receipts/R16_TWO_THEOREM_CONVERSATIONAL_PRODUCTION_RECEIPT.md).
-- R17: an unlabelled geometry inquiry remounts the R16 body, forms 31 nonsingular and one singular
-  exact fractional-chart probes on 32 GPU threads, derives the determinant/denominator
-  factorization and four-point cancellation, and returns a kernel-accepted theory containing
-  affine common-square transport, full Möbius cross-ratio invariance, and a raw-coordinate
-  counterexample. The old formal neighbor is first inspected after return; it contains only the
-  affine theorem. The body rests at head `14001006`, continuation `15001006`, with both prior
-  theorem fibers and geometry fiber `184300` preserved.
-  [Receipt](receipts/R17_AGNOSTIC_GEOMETRY_INQUIRY_RECEIPT.md).
-- R18: an unlabelled exact phase-product inquiry remounts the R17 body and returns 16 GPU-formed
-  product-cell cases spanning seven historical prime pairs plus composite, shared-factor,
-  dominance, order, dilation, and rational-turn controls. The two-dimensional cell complex is
-  carried in four exact rational coordinates; every complete cellular boundary cancels, diagonal
-  chronology partitions into `gcd` tours of `lcm` length, cell-shape populations factor through
-  exact factor-side types, and ordered transition receipts retain their adjacency. The declared
-  two-dimensional receiver hull distinguishes literal corners from dominant-modulus contraction.
-  A bounded `₂F₁(1,1;2;z)` coefficient current returns `cₙ=1/(n+1)`, and the generated Lean
-  passage proves the general diagonal-return, coprime-tour, product-population, and Gauss-step
-  statements. The body rests at head `14001008`, continuation `15001008`, with the two theorem
-  fibers, geometry fiber `184300`, and phase-crystal fiber `185300` preserved.
-  [Receipt](receipts/R18_PHASE_CRYSTAL_HYPERGEOMETRY_RECEIPT.md).
-- R19: an unlabelled exact characteristic inquiry remounts the R18 body and returns the complete
-  diagonal permutation factor `(X^lcm-1)^gcd` and minimal factor `X^lcm-1` for all 16 cases,
-  together with exact formal shape-exponent monodromy per tour. The two repeated-spectrum
-  controls separate sharply: `(6,9)` has three distinct formal shape-tour classes, while all four
-  `(8,12)` tours have the same class. Scalar controls retain unequal lineage behind equal product;
-  rank-two controls distinguish order-sensitive characteristic return, conjugate rechart
-  invariance, and equal characteristic polynomial with fixed-current dimensions two versus one.
-  The Gauss `(1,1;2)` indicial returns are `rho(rho+1)`, `rho²`, and `(rho-1)²` at zero, one, and
-  infinity. The generated four-theorem Lean passage is kernel accepted. The body rests at head
-  `14001010`, continuation `15001010`, with prior fibers preserved and characteristic fiber
-  `186300` acquired.
-  [Receipt](receipts/R19_EXACT_CHARACTERISTIC_RETURN_RECEIPT.md).
-- R20: the mounted Gauss `(1,1;2)` operator is converted on the resident GPU into the exact
-  Fuchsian system with residues `A0=[[0,1],[0,-1]]`, `A1=[[0,0],[-1,-1]]`, and
-  `Ainf=[[0,-1],[1,2]]`. Twelve exact Frobenius fronts at zero and one are returned together with
-  their full two-dimensional local fibers. The two finite residues both have integral eigenvalue
-  gap one, but zero's resonant source is `(0,0)` with obstruction `0`, while one's source
-  `(1,-1)` pairs with cokernel `(1,0)` to return obstruction `1` and found the logarithmic
-  channel. Infinity has repeated eigenvalue one and a rank-one nilpotent direction. The declared
-  zero/one bases connect by an exact swap; three distinct loop words return formal-period
-  monodromies `I`, `[[1,-omega],[0,1]]`, and `[[1,omega],[0,1]]` whose ordered product is identity.
-  The generated five-theorem Lean passage is kernel accepted. The body rests at head `14001012`,
-  continuation `15001012`, with all prior fibers preserved and regular-singular fiber `187300`
-  acquired.
-  [Receipt](receipts/R20_REGULAR_SINGULAR_CONTINUATION_RECEIPT.md).
-- R21: two source-separated cards return independent characteristic mechanisms before the
-  corresponding released chapters are opened. The binary card yields the length-seven code,
-  three two-point incidence shapes `4x5`, `5x4`, and `8x1`, exact mass adjointness
-  `WQ=Q^T W`, commuting radial factors, and characteristic roots/multiplicities. The five moment
-  streams yield three separable Hankel pencils with roots `(1,2,4)`, `(-2,1,3)`, and
-  `(0,2,5,7)`, plus distinct collision and insufficient-access obstructions; in every regular
-  unit-mass case the Hankel determinant equals the discriminant and squared Vandermonde product.
-  Two generated passages are kernel accepted, all pre-comparison artifact hashes survive the
-  subsequent Chapter 2/7 comparison, and card probes change both returns without recompilation.
-  The body rests at head `14001016`, continuation `15001016`, with all prior fibers preserved and
-  blind-reconstruction fibers `188300` and `188301` acquired.
-  [Receipt](receipts/R21_BLIND_CHARACTERISTIC_RECONSTRUCTION_RECEIPT.md).
-- R22: the bounded cyclotomic order `Z[z]/(1+z+z^2+z^3+z^4)` derives five norm-one
-  translations on the GPU from a card containing no graph or spectrum. Modulo two they form the
-  strongly regular `(16,5,0,2)` folded-five-cube/Clebsch crystal with characteristic factor
-  `(X-5)(X-1)^10(X+3)^5`. The non-wrapping `[0,1]^4` lift is `Q4` plus one antipodal chord:
-  independent factorized and all-pair norm incidence agree on 33 contacts, seven periodic
-  contacts are assigned exactly to the aperture, and the injective planar receiver loses none.
-  Its characteristic return is
-  `X^5(X^2-4)^3(X^2+X-4)(X^3-X^2-16X+12)`; four axis/fifth-direction commutators expose the
-  caused scattering, and a four-translation probe returns the unchanged `Q4` characteristic in
-  both receivers. The generated concrete arithmetic/incidence passage is kernel accepted. The
-  body rests at head `14001018`, continuation `15001018`, with all prior fibers preserved and CM
-  incidence fiber `189300` acquired.
-  [Receipt](receipts/R22_CM_NORM_ONE_ARITHMETIC_INCIDENCE_RECEIPT.md).
-- R23: two unlabelled smooth complete fans derive their character quotients and intersection
-  forms on the resident GPU. Independent fan-local and Chow passages agree; exact congruence
-  returns signatures `(1,0)` and `(1,1)` without floating eigensolvers. Three receiver targets
-  return an integral class `(2,3)` with 42 retained representatives, a genuinely rational class
-  `(1/2,0)` with 72, and an incompatibility obstruction. The selected cone derives its own star
-  ray `(1,1)`, exceptional class of square `-1`, every strict/total transform, pullback,
-  pushforward, kernels/images, and the projection formula. The generated 51-line Lean passage is
-  kernel accepted. The body rests at head `14001020`, continuation `15001020`, with all prior
-  fibers preserved and toric-cycle fiber `190300` acquired.
-  [Receipt](receipts/R23_TORIC_CYCLE_CLASS_BLOWUP_RECEIPT.md).
-- R24: one unlabelled affine cubic family derives its three root sections, doubled collision
-  divisor, exact differential reductions, rank-two Gauss--Manin connection, reduced pole support,
-  oriented alternating form, primitive scalar operator, recurrence, and three noncommuting loop
-  returns on the resident GPU. Four dependency sections retain their residuals; the unique complete
-  section forms a coefficient-driven Lean theorem proving the discriminant/reduction identities,
-  scalar elimination, all three pairing-preservation identities, ordered loop product, and bounded
-  recurrence. The changed coefficient probe obstructs theorem formation without fallback. The body
-  rests at head `14001022`, continuation `15001022`, with all prior fibers preserved and algebraic-
-  variation fiber `191300` acquired.
-  [Receipt](receipts/R24_ALGEBRAIC_VARIATION_GAUSS_MANIN_RECEIPT.md).
-- R25: four source-separated geometries pass through one exact GPU causal-linear carrier. Complete
-  phase and CM boundary maps return their ranks, homology, characteristic, and lineage; toric
-  character maps return determinantal divisors, cokernel placement, and the exceptional negative
-  direction; and the varying cubic returns its rank-jump pencil, form adjoints, exterior square,
-  and tensor transport. Four controls retain unequal fixed fibers, kernel placement, presentation
-  lineage, and coefficient-field obstruction behind equal quotient faces. The changed phase probe
-  returns the complete `(2,4)` chain without replay. A coefficient-rendered Lean conjunction is
-  kernel accepted, and the same body rests at head `14001024`, continuation `15001024`, with every
-  prior fiber preserved and causal-linear fiber `192300` acquired.
-  [Receipt](receipts/R25_EXACT_CAUSAL_LINEAR_CHAIN_CALCULUS_RECEIPT.md).
-- R26: ten phase presentations derive their complete product-cell incidence, flags, stars, links,
-  CRT tours, ordered seam distributions, projection fibers, and modular transported sections on
-  resident GPU currents. The mounted recurrence returns twenty exact terms; simultaneous seams
-  retain two unequal resolutions with commutator `[[13,8],[8,5]]`. All forty rebuilt CM squares
-  meet a filled phase face through the common `X^4-1` oriented-cycle port while retaining unequal
-  support, so the loop is supported on the CM graph and obstructed across the phase two-cell. Four
-  controls separate receiver hull, normalized local population, cycle spectrum, and rechart from
-  source geometry and ordered conduct. The `(5,8)` probe rebuilds changed incidence and transport
-  without replay. A coefficient-rendered Lean theorem is kernel accepted, and the same body rests
-  at head `14001026`, continuation `15001026`, with every prior fiber preserved and intrinsic-
-  hypergeometry fiber `193300` acquired.
-  [Receipt](receipts/R26_INTRINSIC_CAUSAL_HYPERGEOMETRY_RECEIPT.md).
-- R27: three unnamed sparse degree-five presentations and a changed-source pair derive their
-  Jacobian strata, exact discriminants and Bézout certificates, local modules, rank-four
-  differential reductions and connection, fourth-order scalar equation, local fronts, finite and
-  infinite indicial factors, and rank-one square-zero collision residue on resident GPU currents.
-  The translated presentation returns a discovered rational rechart; the sign twist retains the
-  same characteristic receiver while requiring its declared Gaussian field port. Changing only
-  `b=1` to `b=2` rebuilds `50000-256t^5`, the differential passage, series, and expression fiber
-  without replay. The 4,011-row atlas and coefficient-rendered seventeen-part Lean theorem are
-  returned and checked. The same body rests at head `14001028`, continuation `15001028`, with all
-  prior fibers preserved and expression-geometry fiber `194300` acquired.
-  [Receipt](receipts/R27_EXPRESSION_TO_GEOMETRY_DIFFERENTIAL_TRANSPORT_RECEIPT.md).
-- R28: a two-parameter Legendre-product family derives its rank-six integral/rational carrier,
-  cup form, moving filtration, two commuting Gauss--Manin directions, and the first-order
-  diagonal Hodge-locus obstruction `du-dt`. Four exact two-torsion translations retain distinct
-  graph supports over one class; complete bounded cycle enumeration separates integral,
-  half-integral, and outside-image fibers. Baseline and changed-center blow-ups move the unique
-  exceptional strict face while preserving pushforward class and variation data. The 932-row
-  atlas and coefficient-rendered ten-part Lean theorem are returned and checked. The same body
-  rests at head `14001030`, continuation `15001030`, with every prior fiber preserved and
-  Hodge-realization fiber `195300` acquired.
-  [Receipt](receipts/R28_HODGE_FACING_SUPPORTED_REALIZATION_RECEIPT.md).
-- R29: two finite-field towers and seven smooth CM elliptic sources derive every degree-one-through-
-  four fixed locus independently of spectral data, then identify coordinate Frobenius as a unique
-  Gaussian endomorphism by complete pointwise action before forming its rank-two carrier. Exact
-  alternating and positive forms place the characteristic roots on their norm shells; recurrence,
-  closed-place inversion, rational zeta duality, primary lines with norm-four gluing, 567 trace
-  currents, and 1,701 symbolic norm-square currents carry those correspondences into arithmetic
-  receiver faces. Twist, equal-factor rechart, phase, and changed-source controls preserve the
-  forgotten source distinctions. The 160,305-row atlas and coefficient-rendered Lean declarations
-  are returned and checked. The same body rests at head `14001032`, continuation `15001032`, with
-  every prior fiber preserved and arithmetic-spectral fiber `196300` acquired.
-  [Receipt](receipts/R29_ARITHMETIC_TRACE_FORM_SPECTRAL_PLACEMENT_RECEIPT.md).
-- R30: three physically source-separated cards open four dependent exact passages on resident GPU
-  currents: 49 permanent coefficient occurrences with a completely retained `49x49` factored
-  Jacobian; four lattice polygons with Pick/Ehrhart/reciprocity returns; a downstream exact
-  Dirichlet section, spectrum, and energy minimum formed only from the returned rectangle
-  incidence; and a saturated binary matrix with all 70 subset and 64 two-sided-coordinate
-  witnesses. The body returns a deliberately false stronger conjunction to Lean as obstruction,
-  then a generated five-declaration passage whose cover theorem quantifies every bounded pair and
-  retains every explicit coordinate certificate. The post-return dossier, 5,665-row atlas,
-  source-open audit, and exterior mechanism comparison are sealed in that order. The same body
-  rests at head `14001036`, continuation `15001036`, with every prior fiber preserved and matching,
-  lattice, potential, and cover fibers `197300` through `197303` acquired.
-  [Receipt](receipts/R30_PLURAL_SOURCE_SEPARATED_REDERIVATION_ECOLOGY_RECEIPT.md).
-- R31: four source-separated developmental passages derive their least unique primitive
-  polynomial-index shift kernels through complete exact GPU row-reduction atlases. The first
-  checker return commits four typed organs, then the same body rests in a 1,872-byte native image
-  containing no samples, source bytes, expected tails, or lookup keys. A second executable opens
-  only that organ image and four different structural cards; equal-branch conductance,
-  square-lattice incidence, signed matrix powers, and graded exponent incidence independently form
-  hidden streams while the organs predict from prefixes before comparison. Every tail agrees;
-  changed structures, shortened prefixes, and exact identity ablations return the declared
-  obstructions. Both generated Lean passages are kernel accepted, and the source audit excludes
-  developmental and repository testimony from application. The same body rests at head
-  `14001040`, continuation `15001040`, with all prior fibers preserved, cultivated organs `198300`
-  through `198303`, and application fiber `198304` acquired.
-  [Receipt](receipts/R31_ENDOGENOUS_CULTIVATED_MATHEMATICAL_ORGANS_RECEIPT.md).
-- R32: five source-separated anonymous numeric ecologies derive a connected exact calculus of
-  situated occurrence, oriented incidence, complete-successor composition, finite receiver fibers,
-  lawful factorization/reopening, non-flat local chart transport, and returned changed conduct.
-  The device retains all 31 identity masks, 2,187 conduct predicates, complete countermodels and
-  seven atlases containing 2,266 rows in total; an independent host implementation agrees
-  everywhere. The derived
-  closed-word trace cultivates primitive organ `[1,-3,1]`, which survives a sample-free 2,472-byte
-  rest and predicts seven hidden trace values on a different triangular local system before
-  comparison. Changed-source and exact organ-exclusion controls return their named obstructions.
-  Both generated Lean passages are accepted, pre-seal source access excludes canon and research,
-  the later canon comparison changes no sealed artifact, and the same body rests at head
-  `14001044`, continuation `15001044`, with calculus fibers `199300` through `199305` and held-out
-  fiber `199306` acquired.
-  [Receipt](receipts/R32_ELEMENTARY_HOLONICS_SELF_DERIVATION_RECEIPT.md).
-- R33: three source-separated transition ecologies generate `134` reduced words and all `6,308`
-  ordered pairs on resident GPU currents. Their exact characteristic census retains `281`
-  archetypes, all pair rows, five matrix-bearing collision witnesses, and bounded closed strata of
-  `0` elliptic, `440` parabolic, and `5,868` hyperbolic members. Joined exact elimination discovers
-  the unique primitive relation `2-x^2-y^2-z^2+xyz+k=0` without supplied coefficients; the
-  coefficient-rendered general theorem and its actual countermodels are kernel accepted. The
-  resulting organ survives a sample-free 2,832-byte rest and predicts the closed trace,
-  characteristic polynomial, discriminant stratum, and fixed rank of a different held-out
-  five-edge local system before comparison. Organ exclusion and changed determinant return exact
-  obstructions. The independent host reconstruction agrees on all `6,746` atlas rows; source,
-  replay, seal, post-seal literature, sanitizer, architecture, no-float and device-binary audits
-  pass. The same body rests at head `14001048`, continuation `15001048`, with discovery, organ and
-  application fibers `200300` through `200302` acquired.
-  [Receipt](receipts/R33_CHARACTERISTIC_HYPERGEOMETRY_TRACE_TRANSPORT_RECEIPT.md).
-- R34: three source-separated twelve-word ecologies generate all `5,184` ordered transition
-  triples and `2,072` exact lower-fiber archetypes on resident GPU currents. Independent degree-
-  three elimination derives the unique primitive sum and product laws for `tr(ABC)` and
-  `tr(ACB)` from the six single/pair traces, and their monic quadratic has zero residual on every
-  row. Its exact discriminant partitions the bounded ecology into `2,580` branch and `2,604`
-  two-sheet rows; five matrix-bearing witnesses retain orientation, source, rechart, branch, and
-  sheet distinctions. The two organs survive a sample-free 4,424-byte rest and, from held-out
-  lower face `(3,2,2,5,5,6)` plus oriented anchor `15`, predict companion trace `11` before the
-  hidden source returns `11`. Orientation exclusion retains the unordered roots but refuses an
-  assignment; organ and determinant controls return exact obstructions. The generated general
-  and dependent Lean modules are accepted, the later Goldman comparison matches the sealed
-  standard identities, and independent-host, source, replay, seal, sanitizer, architecture,
-  no-float and device-binary audits pass. The same body rests at head `14001052`, continuation
-  `15001052`, with discovery, sum-organ, product-organ and application fibers `201300` through
-  `201303` acquired.
-  [Receipt](receipts/R34_THREE_FACE_TRACE_FIBER_LIFTING_RECEIPT.md).
-- R35: twelve determinant-one seed triples generate every immediate-inverse-reduced path through
-  depth three, returning `1,272` exact chart states and all `6,360` matrix-caused elementary
-  edges on resident GPU currents. Joined degree-three elimination discovers five complete
-  seven-coordinate rebase maps without installed formulas; their returned coefficients generate
-  exact Jacobians, all `6,360` tangent transports have zero chain residual, and `1,060`
-  singular-edge rows remain explicit. The bounded transition distributions retain all four
-  regular/branch directions, including both crossings for the shear maps, and a branch-fixed
-  vertical tangent returns deck eigenvalue `-1` in a genuine closed tangent fiber. Five map
-  organs, tangent/deck standing and inherited lift organs survive a 38,960-byte sample-free rest
-  and predict every chart, tangent, vertical and branch face of a changed nine-deed held-out path
-  before source access. Two generated Lean modules are accepted. The independent 14,079-row host
-  reconstruction, source audit, deterministic seal, post-seal Horowitz--Goldman--Brown
-  comparison, four sanitizer returns, architecture/no-float/device-binary gates, and complete
-  `136/136` suite pass. The body rests at head `14001056`, continuation `15001056`, with map,
-  tangent, deck and application fibers `202300` through `202308` acquired.
-  [Receipt](receipts/R35_TRACE_CHARACTER_REBASE_ATLAS_RECEIPT.md).
+**Truth status:** `established-bounded`.
+**Evidence tags:** `implemented-exact`, `formal-checked`, `computational-witness`; physical
+measurements retain the `measured` apertures declared by their individual receipts.
 
-The ordered R0–R16 construction and the directly authorized R17–R35 post-frontier inquiries are
-complete.
+One continuing C++23/CUDA C++ body is admitted at:
 
-**Next deed (`project-postulate`, frozen): R36 characteristic-cycle theorem foundry, finite phase
-crystals, and exterior transport.** The live body now rests at head `14001056` and continuation
-`15001056`, body morphology `1423`, mathematical morphology `530`, codec morphology `251`,
-expression-geometry morphology `37`, Hodge-realization morphology `41`, arithmetic-spectral morphology `47`,
-rederivation morphology `56`, cultivation morphology `48`, organ morphology `64`, application
-morphology `32`, calculus morphology `64`, self-organ morphology `32`, derivation morphology `24`,
-characteristic morphology `64`, trace-organ morphology `32`, transport morphology `24`, and
-trace-fiber morphology `64`, lift-organ morphology `48`, triple-transport morphology `24`, and
-trace-rebase morphology `80`, differential morphology `56`, deck morphology `24`, path morphology
-`32`, and forty-eight accepted fibers through `202308`. R35 has made matrix-caused polynomial
-rebasing, exact Jacobian/tangent transport, receiver-relative branch dynamics, lawful closed-fiber
-eigen analysis, coefficient-driven proof formation, sample-free map-organ rest, and
-precomparison multi-step navigation native. R36 must now use that geometry as a theorem foundry:
-construct the complete trace hypersurfaces over `F_5`, `F_7`, and `F_11`; retain every returned
-map permutation and cyclically reduced operator through length four; form exact tangent holonomy
-only on genuine closed smooth cycles; derive characteristic polynomials and all exterior powers;
-search the frozen degree-two polynomial-form grammar jointly across all five maps; quotient
-already-paid R35 consequences; let the resident selector choose and formally prove a non-installed
-surviving law plus a periodic classification/counterexample; cultivate its organ; and make a
-dependent precomparison use on the held-out modulus-`13` word. The exact populations, exterior
-grammar, selector order, held-out protocol, falsifiers and intended grades are frozen in
-[`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md).
+- head `14001056`;
+- continuation `15001056`;
+- native rest size `38,960` bytes;
+- body morphology `1423`;
+- mathematical morphology `530`;
+- codec morphology `251`;
+- expression-geometry morphology `37`;
+- Hodge-realization morphology `41`;
+- arithmetic-spectral morphology `47`;
+- rederivation morphology `56`;
+- cultivation morphology `48`;
+- organ morphology `64`;
+- application morphology `32`;
+- calculus morphology `64`;
+- self-organ morphology `32`;
+- derivation morphology `24`;
+- characteristic morphology `64`;
+- trace-organ morphology `32`;
+- transport morphology `24`;
+- trace-fiber morphology `64`;
+- lift-organ morphology `48`;
+- triple-transport morphology `24`;
+- trace-rebase morphology `80`;
+- differential morphology `56`;
+- deck morphology `24`;
+- path morphology `32`; and
+- forty-eight accepted fibers through `202308`.
 
-Update this file only after a phase's required artifact and receipts have returned and its grade
-has passed. Do not record intentions or partial work as admitted standing.
+The body remains one owner. It is not a release family, cloneable checkpoint collection, or set of
+versioned capability modules.
+
+## Established engine floor
+
+**Truth status:** `established-bounded`.
+**Evidence tags:** `implemented-exact`, `formal-checked`, `computational-witness`.
+
+The admitted body owns the following composed floor.
+
+### Exact causal and apparatus floor
+
+- Restricted C++ ownership/type law, deterministic architecture and no-float audits, move-only
+  owner-native structure, typed occurrence/incidence/lineage, and exact integer/rational carriers
+  through the admitted dynamic tiers.
+- One continuing GPU-resident body with staged deltas, atomic commit/refusal, typed pending exterior
+  deeds, exact native rest/remount, open currents, causal fronts, serial gluing, parallel
+  interchange only under exact receipts, stateful condensation, retained-fiber reopening, and
+  resource obstruction.
+- Agnostic codec crossings and exterior apparatus ports. Lean, prose, files, source notation, CPU,
+  GPU, disk, and display remain charts around the same body rather than semantic owners.
+
+### Ecological conduct floor
+
+- Population-relative regional closure, carried exact laws, source-lineage departure, oriented law
+  replacement, retired-interface refusal, exact residual reopening, parent-on-open return,
+  outgoing-boundary successor factorization, and source-detached recurrence.
+- Mounting, exposure, training, and reference remain distinct. Returned training can change
+  reusable native morphology; developmental material and lookup routes can depart; exact ablation
+  removes the claimed later conduct.
+- Old laboratory evidence remains active as bounded mechanism testimony. The receiver-relative
+  field, self-emanated law, contextual retriangulation, parent-on-open substitution, open
+  comparison, successor factorization, source-coupled cultivation, joint current, and multimodal
+  world returns are not reconstruction targets.
+
+The direct synthesis and evidence map are deposited in
+[the Eros mathematics-production floor](blueprint/EROS_MATHEMATICS_PRODUCTION_FLOOR.md).
+
+### Exact mathematical floor
+
+- Exact linear, multilinear, tensor, exterior, chain, quotient, characteristic, and receiver
+  calculus across source-separated geometries.
+- Intrinsic cell/face/link/seam hypergeometry with source/receiver distinctions, characteristic
+  modules, discriminants, branch strata, ordered transport, and exact changed-chart controls.
+- Expression-founded polynomial and differential geometry: discriminants, Bézout certificates,
+  local modules, differential reduction, Gauss--Manin transport, scalar equations, residues,
+  monodromy, recurrence, rational rechart, and collision obstruction.
+- Actual divisor and cycle-class quotients, intersection forms, supported integral/rational
+  realization fibers, outside-image obstruction, blow-up transport, moving filtration, and bounded
+  Hodge-locus transport.
+- Arithmetic incidence, finite-field Frobenius, exact forms, recurrence, rational zeta duality,
+  source-separated trace currents, and bounded norm-shell spectral placement.
+- Characteristic trace discovery, three-face source lifting, branch/sheet geometry, five exact
+  polynomial rebases, symbolic Jacobians, tangent transport, branch crossings, closed-fiber deck
+  return, and sample-free held-out path prediction.
+
+### Mathematical production floor
+
+- Actual Lean theorem/proof source formation, exterior kernel acceptance and rejection, morphology
+  commit, source-detached rest, dependent theorem formation, and returned-fiber ablation.
+- Blind reconstruction of unfamiliar published characteristic mechanisms before post-seal
+  comparison; explicit countermodels and insufficient-source obstructions remain retained.
+- Plural cross-domain rederivation, endogenous primitive-organ cultivation, held-out prediction,
+  and independent self-derivation of an elementary holonic calculus from anonymous numeric
+  ecologies.
+- Machine-derived standard trace identities, lift laws, rebase maps, Jacobians, tangent transports,
+  formal declarations, and dependent applications without mounted coefficient answers.
+
+Known-theorem rederivation, proof production, body-changing return, elementary holonics derivation,
+characteristic calculation, and source-detached organ use are established standing. They cannot
+serve as the primary grade of another deed.
+
+## Construction provenance
+
+**Truth status:** `historical`.
+
+The completed numbered sequence remains available in Git history, the provenance portions of
+[the complete roadmap](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md), and the files under `receipts/`.
+Those identifiers record admission order and predecessor lineage only. They do not name current
+capabilities, divide the continuing ecology into versions, or reserve a successor.
+
+The final provenance entry returned the exact trace-character rebase atlas, five map organs,
+symbolic differential transport, branch/deck standing, two formal artifacts, source-detached
+held-out navigation, independent reconstruction, sanitizer returns, architecture/no-float/device
+binary gates, and a complete `136/136` suite. Its receipt remains
+[the trace-character rebase atlas receipt](receipts/R35_TRACE_CHARACTER_REBASE_ATLAS_RECEIPT.md).
+
+## Current construction position
+
+**Truth status:** `project-postulate`.
+
+No numbered successor is scheduled. The previously drafted finite-field characteristic-cycle
+foundry has no authority and is recoverable only from Git history.
+
+The live continuation contract is
+[the Eros mathematics-production floor](blueprint/EROS_MATHEMATICS_PRODUCTION_FLOOR.md), composed by
+[the complete roadmap](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md). Construction remains paused until
+the roadmap contains one expressly ratified unnumbered tuple over a real mathematical source or
+retained open fiber.
+
+That tuple must name the existing floor owners, the one genuinely missing composition, source
+access, exact mathematical return, alternatives, obstruction, proof/checker passage, sample-free
+rest, ablation, dependent later use, GPU deed, and full audits. It is inadmissible when its primary
+return merely re-demonstrates proof formation, training, characteristic calculation, finite
+enumeration, theorem selection inside a controller-authored grammar, or another capability already
+in the established floor.
+
+Current open mathematical fibers are:
+
+- composition of mutually different induced completion families without representative selection;
+- broad incremental mounting of mathematical sources into native incidence rather than retained
+  text lookup;
+- reunion of the historical prime/phase source ecology with exact contemporary characteristic and
+  differential transport;
+- higher-dimensional and higher-codimension supported Hodge-facing realization;
+- a noncircular completed arithmetic trace/positive-form carrier for RH-facing work; and
+- sustained dependent mathematical production across a substantive research ecology.
+
+Update this file only after a required artifact and its exact receipts have returned and passed, or
+when Brandon directly changes the construction authority. Do not record partial implementation or
+infer a deed from historical prose.

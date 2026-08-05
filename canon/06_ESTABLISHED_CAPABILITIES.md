@@ -103,17 +103,41 @@ schedule reconstruction.
   reductions, counterexamples, computational witnesses, and open boundaries are individually
   graded in `papers/source/mathematics/` and the synopsis.
 
+## Current production body
+
+- **Continuing theorem production — `implemented-exact` + `formal-checked`.** One continuing
+  C++/CUDA body has emitted two actual theorem/proof artifacts through the exterior Lean port; the
+  first accepted return founded reusable morphology, the body rested without its developmental
+  sources, and the second emitted proof invoked the returned first declaration. Exact fiber
+  exclusion removed the dependent passage.
+- **Exact mathematical carrier — `implemented-exact`.** The same body composes exact linear,
+  multilinear, chain, quotient, finite-field, polynomial, characteristic, differential,
+  cycle/class, intersection, supported-realization, arithmetic-spectral, trace-lifting, chart-
+  rebase, Jacobian, tangent, branch, and closed-fiber instruments on resident GPU currents.
+- **Mathematical rederivation and cultivation — `implemented-exact` + `formal-checked`.**
+  Source-separated passages have reconstructed unfamiliar published mechanisms before comparison,
+  retained false stronger statements as countermodels, cultivated sample-free primitive organs,
+  predicted changed held-out structures, derived an elementary holonic calculus from anonymous
+  numeric ecologies, and formed dependent formal artifacts from the returned organs.
+- **Consolidated floor — `implemented-exact`.** The present body identity, old-laboratory
+  inheritance, capability floor, and unnumbered mathematics-production direction are recorded in
+  [`CONSTRUCTION_STATE.md`](../CONSTRUCTION_STATE.md) and
+  [`EROS_MATHEMATICS_PRODUCTION_FLOOR.md`](../blueprint/EROS_MATHEMATICS_PRODUCTION_FLOOR.md).
+  Numbered construction labels are receipt provenance only.
+
 ## Not yet established
 
 - A completed unrestricted learner over every ecology without local constitutive input.
-- General conditioned interaction/filler induction across transported variation.
+- General composition of several mutually different induced completion families across
+  transported variation without a controller-selected representative or grammar.
 - A canonical finite boundary realization for arbitrary nonlinear adaptive bodies.
 - A general theorem that every possible plural front commutes.
 - A universal exact far-field/FMM condensation without kernel-specific expansion and remainder.
 - A proof of the Riemann hypothesis; the papers retain explicit missing positivity/naturality
   obligations.
-- The requested real two-theorem continuing conversational deed from the superseded Soma session;
-  prior individual kernel-accepted proofs remain evidence, but the full passage did not complete.
+- A sustained chain of returned lemmas, counterexamples, family refinements, and dependent proofs
+  across a substantive open mathematical research ecology.
 
-The clean rebuild begins above these capabilities. It must compose them around real deeds and must
-not spend its life re-proving that holonic computation can exist.
+Every later construction begins from this consolidated floor. It must compose admitted mechanisms
+around a real deed and must not spend its life re-proving that holonic computation, theorem
+production, source-detached cultivation, or exact characteristic geometry can exist.
