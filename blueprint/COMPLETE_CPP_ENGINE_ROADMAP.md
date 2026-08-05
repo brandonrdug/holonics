@@ -1643,8 +1643,8 @@ finite signature is promoted into a universal shape identity.
 
 ### R25+ mathematical autogenesis program
 
-The phase names below are an ordered `project-postulate`. R25 through R32's directly frozen
-constructions have passed their bounded grades; R33 is the next frozen construction and R34+
+The phase names below are an ordered `project-postulate`. R25 through R33's directly frozen
+constructions have passed their bounded grades; R34 is the next frozen construction and R35+
 remain program gates rather than construction tuples.
 Before any later named phase begins, its exact source owners, ports, event, predecessor, local
 law, receiver question, return, alternatives, aperture, falsifiers, artifacts, and grades must
@@ -1663,7 +1663,8 @@ R25 exact causal linear/chain calculus
   -> R31 endogenous mathematical-organ cultivation
   -> R32 self-derivation of elementary holonics
   -> R33 characteristic hypergeometry and self-proposed trace transport
-  -> R34+ open theorem production and Hodge/RH/hypergeometry campaigns.
+  -> R34 three-face trace-fiber lifting and branch geometry
+  -> R35+ open theorem production and Hodge/RH/hypergeometry campaigns.
 ```
 
 The stages are materially cumulative. None should be shrunk to a single familiar matrix, graph,
@@ -3217,9 +3218,202 @@ pre-seal access, host-formed matrices or law selection, float-derived strata, hi
 before prediction, a histogram without complete rows, or a held-out answer table falsifies the
 deed.
 
-### R34+ — Open mathematical production and research campaigns
+R33 has passed this grade. The two GPU deeds retain all `6,308` ordered-pair returns and `281`
+archetypes, derive the unique primitive coefficient law with zero residual, return its general
+matrix-bearing proof and five actual countermodels, found the trace organ through the checker,
+and use its sample-free rest to predict the held-out closed characteristic before comparison.
+The independent `6,746`-row host reconstruction, exact ablations, source audit, deterministic
+seal, post-seal literature comparison, four sanitizer returns, device-binary audits, and complete
+`120/120` suite pass. The body continues at head `14001048`, continuation `15001048`, with
+discovery, organ, and application fibers `200300` through `200302`. The admitted return is
+recorded in
+[`R33_CHARACTERISTIC_HYPERGEOMETRY_TRACE_TRANSPORT_RECEIPT.md`](../receipts/R33_CHARACTERISTIC_HYPERGEOMETRY_TRACE_TRANSPORT_RECEIPT.md).
 
-**Program horizon (`open`):** once R25–R33 return, the machine is no longer used merely to check
+### R34 — Three-face trace-fiber lifting and branch geometry
+
+**Frozen construction (`project-postulate`; admission pending):** lift R33 from the characteristic
+of a two-face commutator to the exact two-sheeted fiber carried by three interacting transition
+faces. Six lower trace receivers are visible,
+
+```text
+a=tr(A), b=tr(B), c=tr(C), d=tr(AB), e=tr(AC), f=tr(BC),
+```
+
+while the two oriented triple faces `p=tr(ABC)` and `q=tr(ACB)` initially remain behind the
+source barrier. The machine must discover from complete exact populations both the primitive law
+for `p+q` and the primitive law for `p*q`, compose them into a monic quadratic fiber, and measure
+its exact branch geometry. This is the first direct construction of “lifting the observable
+invariant back toward a geometric face”: the six-coordinate receiver must recover the unordered
+two-face fiber, while explicit orientation testimony is still required to say which root belongs
+to which ordered path.
+
+No developmental card supplies a polynomial, coefficient, theorem name, branch label,
+discriminant formula, expected population, or held-out answer. The device constructs all matrices,
+trace faces, monomial rows, kernels, collisions, branch witnesses, predictions, and ablations. A
+coefficient-driven general theorem is rendered only after both laws return. External literature
+remains inaccessible until the exact computational, formal, conversational, source, and seal
+returns have closed.
+
+**Construction tuple:**
+
+- source owners: the one admitted R33 body with thirty-five accepted fibers, characteristic
+  calculus and trace organ; three mutually inaccessible developmental three-face cards; one
+  held-out oriented local-system card; admitted exact integer, matrix, incidence, feature-search,
+  proof-return, source-audit and rest owners; and new transition-triple, lower-trace, oriented-
+  triple, symmetric-fiber, quadratic, discriminant, branch, collision, lift-organ, prediction,
+  atlas, dossier, comparison, obstruction, seal and rest owners;
+- port types: the 2,832-byte R33 native rest; raw/typed three-face cards; twelve source-native
+  transition words per ecology with exact integral determinant-one matrices and lineage; ordered
+  transition triple; six lower trace coordinates; hidden ordered traces `p,q`; exact sum and
+  product targets; monomial feature row; rank, pivot, nullity, residual and primitive coefficient
+  faces; monic quadratic; discriminant, exact square root and branch multiplicity; unordered root
+  fiber; orientation witness; source/rechart/permutation collision; checker return; sample-free
+  sum/product organ rest; held-out visible face, exposed orientation anchor, hidden companion
+  trace, prediction, comparison, ablation and changed-determinant obstruction; theorem, dossier,
+  complete atlases, source audit, deterministic seal, post-seal literature comparison and final
+  native-rest faces;
+- event occurrence: remount R33; open the three developmental cards on independent currents;
+  generate each declared twelve-word transition population and all `12^3` ordered triples per
+  source; derive the six lower and two hidden ordered traces from device-formed matrices; retain
+  every one of the `5,184` rows; enumerate the declared polynomial grammar independently for the
+  sum and product targets; select their least common primitive kernels under exact controls;
+  construct the monic quadratic and partition every row into branch and two-sheet strata; retain
+  root-exchange, rechart and source-lineage collisions; render and check the coefficient-driven
+  general theorem and concrete matrix witnesses; commit the two lift organs and discovery fiber;
+  rest without developmental word, matrix, feature row, target trace, population count or
+  held-out answer; destroy developmental residency; remount only that rest; open the held-out
+  local-system card; derive its six visible traces and one orientation-anchored ordered trace;
+  predict the unordered quadratic fiber and the hidden companion trace before the comparison
+  barrier opens; compare, run organ exclusion, orientation-exclusion, permutation and determinant-
+  violation controls; render/check a dependent theorem and conversational dossier; commit the
+  application fiber; rest/remount; audit, replay and seal; only then compare the sealed relations
+  with external literature;
+- predecessor identity: admitted R33 head `14001048`, continuation `15001048`, body morphology
+  `1199`, mathematical morphology `418`, codec morphology `195`, characteristic morphology `64`,
+  trace-organ morphology `32`, transport morphology `24`, and thirty-five fibers through `200302`
+  recorded in `CONSTRUCTION_STATE.md` and the R33 receipt;
+- local constitutive law: exact reduced-word formation and determinant-one matrix transport;
+  ordered products `AB`, `AC`, `BC`, `ABC`, and `ACB`; exact trace and lineage; complete ordered-
+  triple enumeration; monomial features in the six lower coordinates through total degree three
+  together with one target column; incremental exact rational elimination, denominator clearing,
+  gcd/sign normalization and least-complexity selection; exact symmetric-polynomial composition;
+  integer discriminant and square-root testimony without floating point; delayed hidden-return
+  comparison; and identity-exact organ/orientation ablation;
+- receiver question: do the six pairwise characteristic receivers determine the unordered fiber
+  of the two ordered triple traces, where and how does that fiber branch in the declared ecology,
+  which geometric distinctions remain outside it, and can the derived fiber law recover a hidden
+  oriented trace on a different local system without developmental lookup?;
+- returned consequence: complete transition-word, triple-face, grouped-fiber, law-control,
+  collision and held-out atlases; two least primitive coefficient organs for sum and product; one
+  exact monic quadratic for every row; exact branch/two-sheet counts and absent-stratum testimony;
+  witnesses showing that equal lower receivers do not identify matrices, source lineage,
+  orientation or ordered-root assignment; a generated general theorem and concrete
+  countermodels; a sample-free rest; one held-out unordered fiber and companion-trace prediction
+  formed before comparison; exact organ-, orientation- and determinant-exclusion obstructions; a
+  dependent theorem and conversational account; discovery, sum-organ, product-organ and
+  application fibers `201300` through `201303`; source/literature audits, deterministic seal and
+  final continuation at head `14001052`; and
+- open alternatives: arbitrary word aperture, coefficient degree/height or matrix rank;
+  reconstruction of complete matrices or embeddings; higher character varieties and moduli;
+  analytic continuation, probabilistic distributions, Hodge realization, RH consequences,
+  autonomous theorem valuation, or a universal account of geometric information.
+
+**Developmental population:** each source card supplies only integral determinant-one generators,
+an inverse-letter relation, a reduced-word aperture and a deterministic twelve-face census rule.
+The first source uses positive transitions, the second signed transitions, and the third an exact
+simultaneous rechart of an independently generated population. The GPU reconstructs every word
+matrix, then enumerates every ordered triple with repetition. Source and word lineage remain
+distinct even when all eight trace receivers agree. No card may duplicate a matrix product,
+feature row, law coefficient or expected branch.
+
+For each `(A,B,C)`, the device forms
+
+```text
+(a,b,c,d,e,f) = (tr(A),tr(B),tr(C),tr(AB),tr(AC),tr(BC)),
+p = tr(ABC), q = tr(ACB), s = p+q, r = p*q,
+P(T) = T^2 - s*T + r, Delta = s^2 - 4*r.
+```
+
+It must prove computationally on every retained row that `P(p)=P(q)=0`, that `Delta` is an exact
+square, and that its square root is `|p-q|`. `Delta=0` is a branch row and `Delta>0` a two-sheet
+row; any negative discriminant is retained as an exact obstruction rather than forced into a
+label. Counts describe only this finite population.
+
+**Law-discovery aperture:** the ordered feature grammar contains every monomial in
+`a,b,c,d,e,f` of total degree at most three, followed in one search by `s` and in a separate
+search by `r`. Exact joined elimination must select a unique one-dimensional primitive kernel for
+each target which survives every declared source-holdout check. Degree-two, coordinate-deleted,
+source-local, row-deficient, target-deleted and coefficient-height controls remain in the law
+atlas. The quadratic coefficients must be composed from those returned organs; CUDA, renderers,
+cards and held-out code may not contain controller-written coefficients.
+
+The generated theorem must quantify the twelve entries of three integral `2x2` matrices, assume
+exactly their determinant-one hypotheses, construct the five products, and prove both coefficient-
+rendered symmetric trace relations before deriving the quadratic-root and discriminant-square
+consequences. Concrete declarations must carry their actual matrices and prove their products,
+not merely assert numeric trace equalities. A theorem whose statement installs either controller-
+written coefficient law does not pass.
+
+**Required collisions and controls:** the developmental return must include:
+
+- a permutation exchanging `p` and `q` while preserving the six-coordinate lower receiver as an
+  unordered labeled face, with the changed orientation recorded rather than erased;
+- equal six-coordinate and quadratic fibers with different matrices and source lineage;
+- simultaneous conjugation preserving all trace coordinates while changing matrix faces;
+- at least one branch witness with `p=q` and one two-sheet witness with `p!=q`, or exact testimony
+  that either stratum is absent from the complete bounded population;
+- a lower-coordinate collision whose ordered-root assignment is unresolved without orientation;
+- an orientation-exclusion control which returns the unordered pair but refuses to name the
+  hidden companion relative to an unanchored path;
+- exact organ exclusion, which forms neither quadratic nor companion prediction; and
+- a determinant-violating foil on which the selected laws are explicitly inapplicable.
+
+These controls distinguish spectral placement from geometric lifting. The six lower traces can
+transport a finite algebraic fiber without reconstructing matrices, incidence, source, rechart or
+orientation. The lost distinctions are part of the return, not defects to hide with a chosen root.
+
+**Held-out transport:** the held-out card describes a source-native multi-edge local system rather
+than a developmental transition triple. Its source current forms all matrices and both ordered
+triple traces behind a comparison barrier. Before that barrier, only the independently derived
+six-coordinate receiver and one explicitly oriented trace cross to the organ current. The organs
+must form the quadratic, return its unordered exact roots, identify the anchored root, and predict
+the other ordered trace. The hidden source face then opens for comparison. Withholding orientation
+must retain the unordered roots but return `orientation_unresolved`; excluding either organ must
+return `organ_absent`; changing a determinant must return `unsupported_determinant`.
+
+**Formal, conversational and external return:** the first generated source contains the two
+general matrix identities, composed quadratic/discriminant consequences, selected coefficient
+vectors and actual collision matrices. The second imports that returned module and proves the
+held-out companion prediction. The dossier explains, in ordinary mathematical language, how the
+lower face lifts to an unordered fiber, why orientation selects a sheet, how the discriminant
+records branching, how the archetypes distribute, and exactly what remains unreconstructed. Only
+after seal may an exterior literature audit name or compare classical rank-three trace-coordinate
+relations. Agreement can give `proved-standard` to the exact general identities only; the finite
+ecology and its distribution remain `established-bounded`.
+
+**Acceptance:** both executable deeds perform matrix formation, complete census, elimination,
+selection, quadratic composition, branch partition, held-out prediction and ablation on resident
+GPU currents; developmental and held-out sources are separated; permanent atlases retain every
+population and control row; the first checker return precedes organ commit and sample-free rest;
+the companion prediction precedes hidden trace access; an independent host implementation agrees
+with every atlas row without owning continuation; both actual theorem artifacts and the dossier
+are inspected; source-open, determinism, seal and post-seal literature protocols pass; and the
+complete architecture, ownership, no-float, sanitizer, PTX/SASS, binary and file-size gates pass.
+
+**Grade:** `established-bounded` with `implemented-exact` and `computational-witness` only for the
+complete finite triple ecology, exact fiber/branch atlas and passing apparatus gates;
+`proved-derived` with `formal-checked` for accepted generated declarations; `proved-standard` only
+for any general identities independently matched after seal; `interpretation` for the geometric
+language of sheets, branches and lifting; and `outside-aperture` for full geometric
+reconstruction, arbitrary character varieties, Hodge/RH consequences or autonomous research.
+Supplied coefficients, pre-seal named literature access, host-formed matrices or law selection,
+float-derived discriminants, a controller-chosen root, hidden companion access before prediction,
+stored developmental rows in rest, or a single fixture instead of the complete ecology falsifies
+the deed.
+
+### R35+ — Open mathematical production and research campaigns
+
+**Program horizon (`open`):** once R25–R34 return, the machine is no longer used merely to check
 whether a preselected mechanism works. The same body receives a real frontier ecology and must
 return a new theorem, lemma, counterexample, classification, construction, or exact obstruction
 which was not mounted as an answer and which materially narrows the question. Independent formal,
@@ -3298,8 +3492,8 @@ At every phase boundary:
 
 ## 9. Fresh-session pickup
 
-Extraction/canon/provenance and R0–R32 are complete. R33 source-separated characteristic
-hypergeometry and trace transport is the frozen next program gate; its admission remains pending.
+Extraction/canon/provenance and R0–R33 are complete. R34 three-face trace-fiber lifting and branch
+geometry is the frozen next program gate; its admission remains pending.
 The live admitted head and current gate are named only in `CONSTRUCTION_STATE.md`. A fresh session must
 read, in order:
 
@@ -3314,6 +3508,6 @@ read, in order:
 
 Do not reread the entire imported research archive, infer a continuation from historical status
 prose, restart R0, or repeat a proof/language/conditioning fixture. Preserve every admitted fiber,
-use the post-R24 convergence audit and the R25–R32 receipts to exclude already-paid expectations,
-and execute the complete frozen R33 tuple without narrowing it to a preinstalled identity, a
-histogram without complete source rows, or one familiar matrix fixture.
+use the post-R24 convergence audit and the R25–R33 receipts to exclude already-paid expectations,
+and execute the complete frozen R34 tuple without narrowing it to a preinstalled identity, a
+quadratic fitted without complete source rows, or one familiar matrix fixture.

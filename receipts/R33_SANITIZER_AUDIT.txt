@@ -1,0 +1,11 @@
+truth_status=established-bounded
+evidence=implemented-exact,computational-witness
+discovery_memcheck_errors=0
+discovery_initcheck_errors=0
+application_memcheck_errors=0
+application_initcheck_errors=0
+sanitized_deed_verification_failures=0
+sanitized_checker_failures=0
+tool=compute-sanitizer
+device=sm_89
+physical_telemetry=engine_time:unknown,temperature:unknown,power:unknown,energy:unknown

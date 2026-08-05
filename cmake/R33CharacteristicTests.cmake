@@ -1,0 +1,95 @@
+set(R33_POSITIVE "${PROJECT_SOURCE_DIR}/apparatus/cards/R33_POSITIVE_TRANSITIONS.card")
+set(R33_SIGNED "${PROJECT_SOURCE_DIR}/apparatus/cards/R33_SIGNED_TRANSITIONS.card")
+set(R33_RECHARTED "${PROJECT_SOURCE_DIR}/apparatus/cards/R33_RECHARTED_TRANSITIONS.card")
+set(R33_HELDOUT "${PROJECT_SOURCE_DIR}/apparatus/cards/R33_HELDOUT_LOCAL_SYSTEM.card")
+set(R33_FORMAL_ROOT "${PROJECT_SOURCE_DIR}/formal/elementary-holonics")
+set(R33_TOOLCHAIN "${R33_FORMAL_ROOT}/lean-toolchain")
+set(R33_FORMAL_MANIFEST "${R33_FORMAL_ROOT}/lake-manifest.json")
+set(R33_LITERATURE_SOURCE
+  "${PROJECT_SOURCE_DIR}/reference/external/R33_FRICKE_VOGT_LITERATURE_SOURCE.md")
+
+add_test(NAME r33.characteristic_discovery_device_deed
+  COMMAND r33_characteristic_discovery_device_deed "${R33_DISC_DEED}" "${R32_FINAL_REST}"
+    "${R33_INTERMEDIATE_REST}" "${R33_POSITIVE}" "${R33_SIGNED}" "${R33_RECHARTED}"
+    "${R33_DISC_SOURCE}" "${R33_DISC_OLEAN}" "${R33_DISC_STDOUT}" "${R33_DISC_STDERR}"
+    "${R33_FORMAL_ROOT}" "${R33_TOOLCHAIN}" "${R33_FORMAL_MANIFEST}"
+    "${PROJECT_BINARY_DIR}/artifacts" "${R33_WORD_ATLAS}" "${R33_PAIR_ATLAS}"
+    "${R33_GROUP_ATLAS}" "${R33_LAW_ATLAS}")
+set_tests_properties(r33.characteristic_discovery_device_deed PROPERTIES
+  DEPENDS "r32.heldout_holonomy_device_deed" TIMEOUT 300)
+add_test(NAME r33.characteristic_application_device_deed
+  COMMAND r33_characteristic_application_device_deed "${R33_APP_DEED}"
+    "${R33_INTERMEDIATE_REST}" "${R33_FINAL_REST}" "${R33_HELDOUT}" "${R33_APP_SOURCE}"
+    "${R33_APP_OLEAN}" "${R33_APP_STDOUT}" "${R33_APP_STDERR}" "${R33_FORMAL_ROOT}"
+    "${R33_TOOLCHAIN}" "${R33_FORMAL_MANIFEST}" "${PROJECT_BINARY_DIR}/artifacts"
+    "${R33_DOSSIER}" "${R33_APP_ATLAS}")
+set_tests_properties(r33.characteristic_application_device_deed PROPERTIES
+  DEPENDS "r33.characteristic_discovery_device_deed" TIMEOUT 300)
+
+add_test(NAME r33.characteristic_host_conformance COMMAND r33_characteristic_host_conformance
+  "${R33_POSITIVE}" "${R33_SIGNED}" "${R33_RECHARTED}" "${R33_HELDOUT}"
+  "${R33_WORD_ATLAS}" "${R33_PAIR_ATLAS}" "${R33_GROUP_ATLAS}" "${R33_LAW_ATLAS}"
+  "${R33_APP_ATLAS}" "${R33_HOST_CONFORMANCE}")
+set_tests_properties(r33.characteristic_host_conformance PROPERTIES
+  DEPENDS "r33.characteristic_application_device_deed")
+
+add_library(r33_open_probe SHARED tests/apparatus/r33_open_probe.cpp)
+target_link_libraries(r33_open_probe PRIVATE holonics_contract_options)
+set_target_properties(r33_open_probe PROPERTIES PREFIX "")
+set(R33_DISC_LOG "${PROJECT_BINARY_DIR}/artifacts/R33_DISCOVERY_OPEN_PATHS.txt")
+set(R33_APP_LOG "${PROJECT_BINARY_DIR}/artifacts/R33_APPLICATION_OPEN_PATHS.txt")
+add_test(NAME r33.source_access_audit COMMAND "${CMAKE_COMMAND}"
+  -DDISC_EXEC=$<TARGET_FILE:r33_characteristic_discovery_device_deed>
+  -DAPP_EXEC=$<TARGET_FILE:r33_characteristic_application_device_deed>
+  -DPROBE=$<TARGET_FILE:r33_open_probe> -DDISC_LOG=${R33_DISC_LOG} -DAPP_LOG=${R33_APP_LOG}
+  -DOUTPUT=${R33_SOURCE_AUDIT} -DDISC_DEED=${R33_DISC_DEED} -DAPP_DEED=${R33_APP_DEED}
+  -DR32_REST=${R32_FINAL_REST} -DINTERMEDIATE=${R33_INTERMEDIATE_REST}
+  -DFINAL_REST=${R33_FINAL_REST} -DPOSITIVE=${R33_POSITIVE} -DSIGNED=${R33_SIGNED}
+  -DRECHARTED=${R33_RECHARTED} -DHELDOUT=${R33_HELDOUT} -DDISC_SOURCE=${R33_DISC_SOURCE}
+  -DDISC_OLEAN=${R33_DISC_OLEAN} -DDISC_STDOUT=${R33_DISC_STDOUT}
+  -DDISC_STDERR=${R33_DISC_STDERR} -DWORD_ATLAS=${R33_WORD_ATLAS}
+  -DPAIR_ATLAS=${R33_PAIR_ATLAS} -DGROUP_ATLAS=${R33_GROUP_ATLAS}
+  -DLAW_ATLAS=${R33_LAW_ATLAS} -DAPP_SOURCE=${R33_APP_SOURCE} -DAPP_OLEAN=${R33_APP_OLEAN}
+  -DAPP_STDOUT=${R33_APP_STDOUT} -DAPP_STDERR=${R33_APP_STDERR} -DDOSSIER=${R33_DOSSIER}
+  -DAPP_ATLAS=${R33_APP_ATLAS} -DFORMAL_ROOT=${R33_FORMAL_ROOT} -DTOOLCHAIN=${R33_TOOLCHAIN}
+  -DMANIFEST=${R33_FORMAL_MANIFEST} -DARTIFACT_ROOT=${PROJECT_BINARY_DIR}/artifacts
+  -P "${PROJECT_SOURCE_DIR}/cmake/R33SourceAccessAudit.cmake")
+set_tests_properties(r33.source_access_audit PROPERTIES
+  DEPENDS "r33.characteristic_host_conformance" TIMEOUT 300)
+
+add_test(NAME r33.determinism COMMAND "${CMAKE_COMMAND}"
+  -DDISC_EXEC=$<TARGET_FILE:r33_characteristic_discovery_device_deed>
+  -DAPP_EXEC=$<TARGET_FILE:r33_characteristic_application_device_deed>
+  -DTMP=${PROJECT_BINARY_DIR}/artifacts/r33-determinism -DR32_REST=${R32_FINAL_REST}
+  -DPOSITIVE=${R33_POSITIVE} -DSIGNED=${R33_SIGNED} -DRECHARTED=${R33_RECHARTED}
+  -DHELDOUT=${R33_HELDOUT} -DFORMAL_ROOT=${R33_FORMAL_ROOT} -DTOOLCHAIN=${R33_TOOLCHAIN}
+  -DMANIFEST=${R33_FORMAL_MANIFEST} -DARTIFACT_ROOT=${PROJECT_BINARY_DIR}/artifacts
+  -DDISC_DEED=${R33_DISC_DEED} -DAPP_DEED=${R33_APP_DEED}
+  -DINTERMEDIATE=${R33_INTERMEDIATE_REST} -DFINAL_REST=${R33_FINAL_REST}
+  -DDISC_SOURCE=${R33_DISC_SOURCE} -DDISC_STDOUT=${R33_DISC_STDOUT}
+  -DDISC_STDERR=${R33_DISC_STDERR} -DWORD_ATLAS=${R33_WORD_ATLAS}
+  -DPAIR_ATLAS=${R33_PAIR_ATLAS} -DGROUP_ATLAS=${R33_GROUP_ATLAS}
+  -DLAW_ATLAS=${R33_LAW_ATLAS} -DAPP_SOURCE=${R33_APP_SOURCE}
+  -DAPP_STDOUT=${R33_APP_STDOUT} -DAPP_STDERR=${R33_APP_STDERR} -DDOSSIER=${R33_DOSSIER}
+  -DAPP_ATLAS=${R33_APP_ATLAS} -DOUTPUT=${R33_DETERMINISM}
+  -P "${PROJECT_SOURCE_DIR}/cmake/R33Determinism.cmake")
+set_tests_properties(r33.determinism PROPERTIES DEPENDS "r33.source_access_audit" TIMEOUT 300)
+add_test(NAME r33.seal COMMAND "${CMAKE_COMMAND}" -DOUTPUT=${R33_SEAL}
+  -DSOURCE_AUDIT=${R33_SOURCE_AUDIT} -DDISC_DEED=${R33_DISC_DEED} -DAPP_DEED=${R33_APP_DEED}
+  -DHOST_CONFORMANCE=${R33_HOST_CONFORMANCE} -DINTERMEDIATE=${R33_INTERMEDIATE_REST}
+  -DFINAL_REST=${R33_FINAL_REST} -DDISC_SOURCE=${R33_DISC_SOURCE} -DDISC_OLEAN=${R33_DISC_OLEAN}
+  -DWORD_ATLAS=${R33_WORD_ATLAS} -DPAIR_ATLAS=${R33_PAIR_ATLAS} -DGROUP_ATLAS=${R33_GROUP_ATLAS}
+  -DLAW_ATLAS=${R33_LAW_ATLAS} -DAPP_SOURCE=${R33_APP_SOURCE} -DAPP_OLEAN=${R33_APP_OLEAN}
+  -DDOSSIER=${R33_DOSSIER} -DAPP_ATLAS=${R33_APP_ATLAS} -DDETERMINISM=${R33_DETERMINISM}
+  -P "${PROJECT_SOURCE_DIR}/cmake/R33Seal.cmake")
+set_tests_properties(r33.seal PROPERTIES DEPENDS "r33.determinism")
+add_test(NAME r33.post_seal_literature_comparison COMMAND "${CMAKE_COMMAND}"
+  -DSEAL=${R33_SEAL} -DSOURCE=${R33_DISC_SOURCE} -DLAW_ATLAS=${R33_LAW_ATLAS}
+  -DLITERATURE=${R33_LITERATURE_SOURCE} -DOUTPUT=${R33_LITERATURE_COMPARISON}
+  -P "${PROJECT_SOURCE_DIR}/cmake/R33LiteratureComparison.cmake")
+set_tests_properties(r33.post_seal_literature_comparison PROPERTIES DEPENDS "r33.seal")
+add_test(NAME r33.forbidden_characteristic_hypergeometry_copy COMMAND "${CMAKE_COMMAND}"
+  -DCOMPILER=${CMAKE_CXX_COMPILER}
+  -DSOURCE=${PROJECT_SOURCE_DIR}/tests/compile_contracts/forbidden_characteristic_hypergeometry_copy.cpp
+  -DINCLUDE_DIRECTORY=${PROJECT_SOURCE_DIR}/include "-DEXPECTED_TEXT=use of deleted function"
+  -P "${PROJECT_SOURCE_DIR}/cmake/ExpectCompileFailure.cmake")
