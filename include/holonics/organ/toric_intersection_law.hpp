@@ -10,7 +10,7 @@ namespace holonics::organ::toric_intersection_detail {
       toric_exact::next(right, count) == left);
 }
 
-[[nodiscard]] HOLONICS_CALLABLE constexpr toric_rational fan_self(
+[[nodiscard]] HOLONICS_CALLABLE constexpr exact::small_rational fan_self(
     const toric_fan_card& fan, std::uint8_t ray) noexcept {
   const auto previous = fan.rays[toric_exact::previous(ray, fan.ray_count)];
   const auto next = fan.rays[toric_exact::next(ray, fan.ray_count)];
@@ -21,7 +21,7 @@ namespace holonics::organ::toric_intersection_detail {
   return toric_exact::make(-(previous.y + next.y), current.y);
 }
 
-[[nodiscard]] HOLONICS_CALLABLE constexpr toric_rational chow_self(
+[[nodiscard]] HOLONICS_CALLABLE constexpr exact::small_rational chow_self(
     const toric_fan_card& fan, std::uint8_t ray) noexcept {
   const auto previous = fan.rays[toric_exact::previous(ray, fan.ray_count)];
   const auto next = fan.rays[toric_exact::next(ray, fan.ray_count)];
@@ -34,9 +34,9 @@ namespace holonics::organ::toric_intersection_detail {
   return toric_exact::make(-neighboring, coefficient);
 }
 
-[[nodiscard]] HOLONICS_CALLABLE constexpr toric_rational pair(
+[[nodiscard]] HOLONICS_CALLABLE constexpr exact::small_rational pair(
     const toric_intersection_receipt& intersection,
-    const toric_rational* left, const toric_rational* right,
+    const exact::small_rational* left, const exact::small_rational* right,
     std::uint8_t rank) noexcept;
 
 HOLONICS_CALLABLE constexpr void form_intersection(const toric_fan_receipt& fan,
@@ -103,7 +103,7 @@ HOLONICS_CALLABLE constexpr void form_intersection(const toric_fan_receipt& fan,
       out.congruence_basis[0][1] = toric_exact::make(1);
       out.congruence_basis[1][1] = toric_exact::make(-1);
     }
-    toric_rational directions[2][2]{{toric_exact::make(0), toric_exact::make(0)},
+    exact::small_rational directions[2][2]{{toric_exact::make(0), toric_exact::make(0)},
         {toric_exact::make(0), toric_exact::make(0)}};
     for (std::uint8_t direction = 0; direction < 2; ++direction) {
       for (std::uint8_t coordinate = 0; coordinate < 2; ++coordinate) {
@@ -138,9 +138,9 @@ HOLONICS_CALLABLE constexpr void form_comparison(const toric_fan_receipt& fan,
   out.ranks_returned = true;
 }
 
-[[nodiscard]] HOLONICS_CALLABLE constexpr toric_rational pair(
+[[nodiscard]] HOLONICS_CALLABLE constexpr exact::small_rational pair(
     const toric_intersection_receipt& intersection,
-    const toric_rational* left, const toric_rational* right,
+    const exact::small_rational* left, const exact::small_rational* right,
     std::uint8_t rank) noexcept {
   auto result = toric_exact::make(0);
   for (std::uint8_t row = 0; row < rank; ++row) {

@@ -1330,6 +1330,190 @@ and Erdős mechanisms. General Hodge cycle realization, a variation of Hodge str
 arithmetic cohomology for classical zeta, a completed explicit-formula trace/index carrier, Weil
 positivity, and RH remain outside R23.
 
+### R24 — Algebraic variation, Gauss--Manin transport, and endogenous theorem formation
+
+R24 begins only after R23. R18--R20 established exact recurrence, characteristic, residue,
+connection, and monodromy instruments for a mounted scalar operator; R23 established the static
+passage from supported geometry through quotient class and intersection form and back to complete
+realization fibers. R24 composes those instruments in the opposite causal order: an unlabelled
+algebraic family must itself cause its singular divisor, differential transport, invariant pairing,
+scalar operator, vanishing cycles, and loop returns. The theorem statement is then formed from the
+unique compatible returned sections which survive discovery, holdout, and foil receivers. No
+expected theorem or named special function is mounted.
+
+The bounded family is a degree-three polynomial in `x` whose four coefficients are affine in a
+parameter `t`. The mounted coefficient pairs, in increasing `x` degree, are
+
+```text
+(0,0), (0,1), (-1,-1), (1,0),
+```
+
+so the exterior card describes `f_t(x)=x^3-(1+t)x^2+t x` without supplying a factorization or
+geometric name. It also supplies cover degree two, discovery parameters
+`-3,-2,-1,1/2,2`, holdout parameters `3,4`, affine-root coefficient aperture `[-2,2]`, invariant-
+form aperture `[-2,2]`, and bounded series depth six. It supplies no root section, discriminant,
+singular parameter, differential form, cohomology basis, connection, scalar operator, recurrence,
+Hodge filtration, vanishing cycle, monodromy, invariant form, candidate theorem, Lean statement,
+or expected result. Conventional identification with the Legendre elliptic family and the Gauss
+`2F1(1/2,1/2;1;t)` equation is permitted only after the return.
+
+**Direction of construction:**
+
+```text
+mounted coefficient family
+    |
+    +--> affine root sections --> collision divisor --> vanishing cycles --> ordered loop return
+    |
+    +--> exact differential reductions --> Gauss--Manin connection --> invariant pairing
+                                                      |                    |
+                                                      +--> scalar operator-+
+                                                               |
+                                                               +--> exact recurrence
+
+complete compatible section
+    --> coefficient-formed theorem/proof --> exterior kernel return --> continuing morphology
+
+R24 bounded bridge
+    --> higher-rank/higher-cycle variation --> Hodge-locus and realization questions
+    --> arithmetic Frobenius/trace carriers --> completed Weil/RH-facing questions
+```
+
+The two lower continuations are open alternatives, not consequences of R24. The diagram records
+the intended causal order: geometry causes transport and characteristic testimony before a proof
+face is rendered; neither Hodge nor RH terminology schedules the resident body.
+
+**Construction tuple:**
+
+- source owners: the one R23 continuing body and its ten accepted fibers; one lineaged algebraic-
+  variation card; exact small-rational, affine/bivariate polynomial, fraction-free linear,
+  differential-reduction, rank-two connection, invariant-form, collision, ordered-root,
+  vanishing-cycle, monodromy, recurrence, candidate-section, theorem-current, proof-face,
+  checker-return, and native-rest owners;
+- port types: the 704-byte R23 rest; raw/typed coefficient-family card; affine coefficients and
+  parameter occurrences; polynomial, derivative, discriminant, factor, root-section, collision,
+  regular/singular-fiber, differential-reduction, connection, pairing, scalar-operator,
+  coefficient-front, vanishing-cycle, loop-word, candidate/residual, selected-theorem,
+  proof/explanation, raw/typed checker, changed-card probe, and continuing native-rest faces;
+- event occurrence: remount R23; mount only the coefficient-family card; derive the family,
+  discriminant, affine root sections, and singular fibers on the resident GPU; derive the
+  parameter connection by exact differential reduction modulo exact forms; discover compatible
+  invariant forms and eliminate to a scalar operator; generate discovery candidates, cross them
+  through held-out parameters and exact foils, and form one theorem only from the surviving
+  dependency section; derive collision/loop transport through the same pairing; form/check/commit
+  its proof passage; rest/remount; and probe a changed coefficient law without creating another
+  body;
+- predecessor identity: the admitted R23 head `14001020`, continuation `15001020`, body
+  morphology `366`, mathematical morphology `116`, codec morphology `63`, and ten fibers through
+  `190300` recorded in `CONSTRUCTION_STATE.md` and the R23 receipt;
+- local constitutive law: exact polynomial evaluation, multiplication, derivative, cubic
+  discriminant, bounded affine-factor division, and Vandermonde-square comparison; at each regular
+  parameter, fraction-free solution of
+  `-x^k partial_t(f)-2(a+b x)f-2g'f+g f'=0` for `k=0,1`; exact interpolation and coefficientwise
+  symbolic residual closure of the resulting rank-two connection; local constraint intersection
+  `A^T Q+QA=0` over bounded primitive forms; exact elimination of one connection component;
+  coefficient comparison for the derived series current; ordered-root collision and the standard
+  double-cover Picard--Lefschetz transport law with full loop lineage; and theorem formation by
+  dependency closure rather than scalar score;
+- receiver question: which singular faces, differential pathways, invariant pairings, scalar
+  recurrences, and loop transports are jointly forced by the varying algebraic source, which
+  candidate relations fail away from the discovery parameters or at a singular face, and what is
+  the strongest closed exact theorem passage supported by that complete causal section without a
+  supplied theorem target?;
+- returned consequence: the complete family/variation atlas; discovered singular divisor,
+  connection and pole divisor, invariant pairing, scalar operator and recurrence, collision and
+  monodromy transport; every candidate section and failed residual; one endogenously formed and
+  kernel-accepted theorem/proof with conversational analysis; one acquired continuation fiber;
+  native rest/remount; source-access audit; and changed-card obstruction; and
+- open alternatives: arbitrary hyperelliptic degree/genus, general algebraic de Rham reduction,
+  multivariate bases, higher-rank Gauss--Manin connections, certified analytic periods, arbitrary
+  variations of Hodge structure, Noether--Lefschetz loci, higher cycle-class realization,
+  motives, arithmetic Frobenius families, completed Weil forms, and RH-facing trace operators.
+
+**Construct:**
+
+- derive the complete parameter polynomial and its cubic discriminant from the four mounted affine
+  coefficients. Search bounded affine root sections `r(t)=a+b t`, verify each identity
+  coefficientwise rather than by samples alone, and require their squared pairwise differences to
+  reproduce the discriminant. Derive every collision parameter and multiplicity. For the frozen
+  family the expected controls are three lineaged sections `0,1,t`, discriminant
+  `t^2(t-1)^2`, and two double collisions at `0` and `1`; those expressions are grade targets, not
+  card fields;
+- separate five discovery parameters from two held-out parameters. At every regular occurrence,
+  derive the two differential-form reductions by fraction-free exact elimination, including the
+  complete exact-form witnesses and coefficient residuals. Interpolate only after the local
+  returns agree, then prove the resulting rational connection coefficientwise over the affine
+  family. The expected bounded return in the ordered form basis is
+  `2t(1-t) A(t)=[[t,-1],[t,-t]]`; the input contains neither this basis response nor its
+  denominator;
+- derive rather than assume that the connection pole divisor has the same reduced support as the
+  polynomial discriminant. Repeated discriminant multiplicity, reduced pole support, and local
+  residue rank remain distinct receivers. Singular samples must obstruct inversion while
+  retaining the polynomial fiber and collision data;
+- enumerate primitive rank-two bilinear forms inside the declared aperture and intersect the
+  exact constraints `A(t)^T Q+Q A(t)=0` over the discovery fibers. Retain plural sections until
+  the source orientation and held-out fibers distinguish them. Return the primitive alternating
+  pairing `J=[[0,1],[-1,0]]` up to its lineaged orientation, its zero residual at every holdout,
+  and complete residuals for Euclidean, symmetric-off-diagonal, parameter-local-only, and zero-
+  determinant foils. A characteristic polynomial or equal eigenvalue list cannot substitute for
+  this transported form;
+- eliminate the second connection component and derive the primitive scalar operator
+  `4t(1-t)u''+4(1-2t)u'-u=0`. Independently substitute a bounded formal power series at `t=0` and
+  derive the recurrence `4(n+1)^2 c_(n+1)=(2n+1)^2 c_n` and all coefficients through the mounted
+  depth. The operator, recurrence, and coefficient front must agree without a special-function
+  table or mounted answer;
+- under the separately declared standard smooth-double-cover and Picard--Lefschetz hypotheses,
+  use the ordered affine root sections to derive the two vanishing-cycle occurrences and their
+  pure-braid multiplicity. Form their exact transvections through the discovered `J`, require each
+  to preserve `J`, derive the infinity return from the ordered loop relation, and retain the
+  noncommuting loop words and unequal collision lineage. The bounded controls are
+  `M0=[[1,2],[0,1]]`, `M1=[[1,0],[-2,1]]`, and
+  `Minf=[[1,-2],[2,-3]]` with `M0 M1 Minf=I`; the general analytic monodromy theorem is standard
+  testimony rather than a new finite computation;
+- form candidate theorem sections only after their source dependencies exist. The eligible final
+  section must connect the discriminant identity, both differential-reduction identities, shared
+  pole support, discovered pairing, scalar elimination, and loop transport; it must pass every
+  held-out occurrence and foil. No score, expected theorem label, familiar-name lookup, or host
+  candidate list may select it. If several incomparable sections remain, return them plurally; if
+  none closes, return their exact obstructions rather than rendering a theorem;
+- generate the Lean statement and proof from the selected section's returned coefficients and
+  identities, not from a stored theorem source. The passage must prove the universal polynomial
+  discriminant and differential-reduction identities, derive the scalar operator algebraically
+  from the returned connection relations, prove the invariant-form and three loop-matrix
+  identities, and expose the bounded coefficient recurrence. It must cross the pinned checker as
+  one actual artifact; and
+- change only the affine `x` coefficient from `(0,1)` to `(0,2)` in a GPU probe. The discriminant,
+  affine-root fiber, connection section, and theorem-eligibility return must change without
+  recompilation. Failure of the original bounded grammar to close for the changed family remains
+  an informative obstruction and may not invoke the original result as fallback.
+
+**Return:** the actual GPU-formed polynomial, root, singular, differential-reduction, connection,
+pairing, operator, recurrence, collision, loop, and candidate-section atlas; complete generated
+proof source and checker artifact; conversational causal/Hodge boundary analysis; native handoff;
+and changed-card probe. A supplied Legendre factorization, prewritten Picard--Fuchs operator,
+named hypergeometric lookup, period plot, numerical continuation, fixed theorem template with
+mounted coefficients, accepted-count statistic, or summary of variation-of-Hodge theory does not
+satisfy the deed.
+
+**Acceptance:** polynomial/factor/discriminant closure, local differential reductions,
+interpolation, symbolic connection residual, invariant-form constraint intersection, scalar
+elimination, recurrence, collision and loop transport, candidate falsification, and theorem-
+section formation occur on the resident GPU and agree with an independent exact offline audit;
+holdout parameters are not read during discovery; no singular set, connection, form, operator,
+monodromy, theorem statement, or proof is mounted; every candidate and residual retains source
+lineage; the changed card changes or obstructs the device return; the selected proof really
+crosses the exterior checker; source-detached rest/remount preserves the new and prior fibers;
+and all architecture, ownership, no-float, determinism, device-sanitizer, binary, and file-size
+gates pass.
+
+**Grade:** `established-bounded` with `implemented-exact` and `computational-witness` only after
+the complete finite family/transport/candidate atlas and selected theorem artifact return;
+`proved-derived` with `formal-checked` only for the emitted Lean statements; `proved-standard` for
+the algebraic-de-Rham/Hodge-filtration and Picard--Lefschetz interpretations under their stated
+smoothness, branch, and comparison hypotheses; and `historical` for the earlier laboratory Hodge-
+Laplacian, diffusion, hypergeometric, phase-geometry, and RH observations. The general Picard--
+Fuchs theorem, arbitrary variation of Hodge structure, the Hodge conjecture, analytic period
+values, motives, Weil positivity, and RH remain outside R24.
+
 ## 7. Resource and performance receipts
 
 Performance is graded at every executable phase, but never by a magic utilization threshold.

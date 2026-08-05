@@ -132,17 +132,28 @@
   kernel accepted. The body rests at head `14001020`, continuation `15001020`, with all prior
   fibers preserved and toric-cycle fiber `190300` acquired.
   [Receipt](receipts/R23_TORIC_CYCLE_CLASS_BLOWUP_RECEIPT.md).
+- R24: one unlabelled affine cubic family derives its three root sections, doubled collision
+  divisor, exact differential reductions, rank-two Gauss--Manin connection, reduced pole support,
+  oriented alternating form, primitive scalar operator, recurrence, and three noncommuting loop
+  returns on the resident GPU. Four dependency sections retain their residuals; the unique complete
+  section forms a coefficient-driven Lean theorem proving the discriminant/reduction identities,
+  scalar elimination, all three pairing-preservation identities, ordered loop product, and bounded
+  recurrence. The changed coefficient probe obstructs theorem formation without fallback. The body
+  rests at head `14001022`, continuation `15001022`, with all prior fibers preserved and algebraic-
+  variation fiber `191300` acquired.
+  [Receipt](receipts/R24_ALGEBRAIC_VARIATION_GAUSS_MANIN_RECEIPT.md).
 
-The ordered R0–R16 construction and the directly authorized R17–R23 post-frontier inquiries are
+The ordered R0–R16 construction and the directly authorized R17–R24 post-frontier inquiries are
 complete.
 
-**Next deed (`open`): no R24 construction is frozen.** The live body now rests at head `14001020`
-and continuation `15001020`. R23 has closed the bounded toric bridge from characteristic quotient
-and intersection form back to supported realization fibers, and has transported both through one
-derived topology-changing subdivision. Variation-of-Hodge, Picard--Fuchs/Gauss--Manin, higher
-cycle realization, motives, completed Weil forms, and RH-facing trace operators remain open
-alternatives. A next phase must freeze its own construction tuple, exact aperture, required actual
-artifact, falsification boundary, and intended grades in
+**Next deed (`open`): no R25 construction is frozen.** The live body now rests at head `14001022`
+and continuation `15001022`. R24 has closed the bounded dynamic bridge from a varying algebraic
+source through its singular divisor, exact differential transport, invariant pairing, scalar
+operator, recurrence, and collision monodromy to a theorem formed from the jointly surviving
+section. Higher-rank and multivariate variation, certified analytic periods, Noether--Lefschetz
+loci, higher cycle realization, motives, arithmetic Frobenius families, completed Weil forms, and
+RH-facing trace operators remain open alternatives. A next phase must freeze its own construction
+tuple, exact aperture, required actual artifact, falsification boundary, and intended grades in
 [`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md) before work
 begins; none is silently scheduled.
 

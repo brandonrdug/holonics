@@ -5,12 +5,12 @@
 namespace holonics::tests {
 namespace {
 
-void rational(std::ostream& output, organ::toric_rational value) {
+void rational(std::ostream& output, exact::small_rational value) {
   output << value.numerator;
   if (value.denominator != 1) { output << '/' << value.denominator; }
 }
 
-void vector(std::ostream& output, const organ::toric_rational* values,
+void vector(std::ostream& output, const exact::small_rational* values,
     std::uint8_t count) {
   for (std::uint8_t slot = 0; slot < count; ++slot) {
     if (slot != 0) { output << ','; }
@@ -19,7 +19,7 @@ void vector(std::ostream& output, const organ::toric_rational* values,
 }
 
 void matrix(std::ostream& output,
-    const organ::toric_rational values[organ::toric_rank_capacity]
+    const exact::small_rational values[organ::toric_rank_capacity]
         [organ::toric_rank_capacity], std::uint8_t rank) {
   for (std::uint8_t row = 0; row < rank; ++row) {
     if (row != 0) { output << ';'; }

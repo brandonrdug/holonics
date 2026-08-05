@@ -4,10 +4,10 @@
 
 namespace holonics::organ::toric_realization_detail {
 
-[[nodiscard]] HOLONICS_CALLABLE constexpr toric_rational response_at(
+[[nodiscard]] HOLONICS_CALLABLE constexpr exact::small_rational response_at(
     const toric_quotient_receipt& quotient,
     const toric_intersection_receipt& intersection,
-    const toric_rational* coordinates, std::uint8_t ray) noexcept {
+    const exact::small_rational* coordinates, std::uint8_t ray) noexcept {
   return toric_intersection_detail::pair(intersection, coordinates,
       quotient.divisor_classes[ray], quotient.rank);
 }
@@ -135,7 +135,7 @@ HOLONICS_CALLABLE constexpr void form_polarization(const toric_fan_receipt& fan,
     out.response_positive = out.response_positive && out.response[ray].numerator > 0;
   }
   if (quotient.rank == 2) {
-    toric_rational covector[2]{toric_exact::make(0), toric_exact::make(0)};
+    exact::small_rational covector[2]{toric_exact::make(0), toric_exact::make(0)};
     for (std::uint8_t row = 0; row < 2; ++row) {
       for (std::uint8_t column = 0; column < 2; ++column) {
         covector[row] = toric_exact::add(covector[row], toric_exact::multiply(

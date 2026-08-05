@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <cstdint>
 
+#include <holonics/exact/small_rational.hpp>
 #include <holonics/exact/word.hpp>
 
 namespace holonics::organ {
@@ -15,13 +16,8 @@ inline constexpr std::size_t toric_representative_capacity = 192;
 
 struct toric_integer_pair final { std::int64_t x{}; std::int64_t y{}; };
 
-struct toric_rational final {
-  std::int64_t numerator{};
-  std::int64_t denominator{1};
-};
-
 struct toric_target final {
-  toric_rational response[toric_ray_capacity]{};
+  exact::small_rational response[toric_ray_capacity]{};
 };
 
 struct toric_fan_card final {

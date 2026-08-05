@@ -2,7 +2,7 @@
 
 namespace {
 
-[[nodiscard]] bool rational(holonics::organ::toric_rational value,
+[[nodiscard]] bool rational(holonics::exact::small_rational value,
     std::int64_t numerator, std::int64_t denominator = 1) noexcept {
   return value.numerator == numerator && value.denominator == denominator;
 }

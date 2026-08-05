@@ -3,7 +3,7 @@
 namespace holonics::tests {
 namespace {
 
-[[nodiscard]] bool rational(organ::toric_rational value,
+[[nodiscard]] bool rational(exact::small_rational value,
     std::int64_t numerator, std::int64_t denominator = 1) noexcept {
   return value.numerator == numerator && value.denominator == denominator;
 }
