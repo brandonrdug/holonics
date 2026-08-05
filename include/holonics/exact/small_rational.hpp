@@ -85,8 +85,11 @@ struct unsigned_division final {
 
 [[nodiscard]] HOLONICS_CALLABLE constexpr small_rational add(
     small_rational left, small_rational right) noexcept {
-  return make(left.numerator * right.denominator + right.numerator * left.denominator,
-      left.denominator * right.denominator);
+  const auto shared = gcd(left.denominator, right.denominator);
+  const auto left_scale = quotient(right.denominator, shared);
+  const auto right_scale = quotient(left.denominator, shared);
+  return make(left.numerator * left_scale + right.numerator * right_scale,
+              right_scale * right.denominator);
 }
 
 [[nodiscard]] HOLONICS_CALLABLE constexpr small_rational negate(
@@ -97,12 +100,19 @@ struct unsigned_division final {
 
 [[nodiscard]] HOLONICS_CALLABLE constexpr small_rational multiply(
     small_rational left, small_rational right) noexcept {
-  return make(left.numerator * right.numerator, left.denominator * right.denominator);
+  const auto left_cancel = gcd(left.numerator, right.denominator);
+  const auto right_cancel = gcd(right.numerator, left.denominator);
+  return make(quotient(left.numerator, left_cancel) *
+                  quotient(right.numerator, right_cancel),
+              quotient(left.denominator, right_cancel) *
+                  quotient(right.denominator, left_cancel));
 }
 
 [[nodiscard]] HOLONICS_CALLABLE constexpr small_rational divide(
     small_rational left, small_rational right) noexcept {
-  return make(left.numerator * right.denominator, left.denominator * right.numerator);
+  return right.numerator == 0
+             ? small_rational{0, 0}
+             : multiply(left, make(right.denominator, right.numerator));
 }
 
 }  // namespace small_rational_law

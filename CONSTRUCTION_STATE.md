@@ -265,28 +265,47 @@
   `15001052`, with discovery, sum-organ, product-organ and application fibers `201300` through
   `201303` acquired.
   [Receipt](receipts/R34_THREE_FACE_TRACE_FIBER_LIFTING_RECEIPT.md).
+- R35: twelve determinant-one seed triples generate every immediate-inverse-reduced path through
+  depth three, returning `1,272` exact chart states and all `6,360` matrix-caused elementary
+  edges on resident GPU currents. Joined degree-three elimination discovers five complete
+  seven-coordinate rebase maps without installed formulas; their returned coefficients generate
+  exact Jacobians, all `6,360` tangent transports have zero chain residual, and `1,060`
+  singular-edge rows remain explicit. The bounded transition distributions retain all four
+  regular/branch directions, including both crossings for the shear maps, and a branch-fixed
+  vertical tangent returns deck eigenvalue `-1` in a genuine closed tangent fiber. Five map
+  organs, tangent/deck standing and inherited lift organs survive a 38,960-byte sample-free rest
+  and predict every chart, tangent, vertical and branch face of a changed nine-deed held-out path
+  before source access. Two generated Lean modules are accepted. The independent 14,079-row host
+  reconstruction, source audit, deterministic seal, post-seal Horowitz--Goldman--Brown
+  comparison, four sanitizer returns, architecture/no-float/device-binary gates, and complete
+  `136/136` suite pass. The body rests at head `14001056`, continuation `15001056`, with map,
+  tangent, deck and application fibers `202300` through `202308` acquired.
+  [Receipt](receipts/R35_TRACE_CHARACTER_REBASE_ATLAS_RECEIPT.md).
 
-The ordered R0–R16 construction and the directly authorized R17–R34 post-frontier inquiries are
+The ordered R0–R16 construction and the directly authorized R17–R35 post-frontier inquiries are
 complete.
 
-**Next deed (`project-postulate`, frozen): R35 trace-character rebase atlas, tangent transport,
-and branch dynamics.** The live body now rests at head `14001052` and continuation `15001052`,
-body morphology `1295`, mathematical morphology `466`, codec morphology `219`, expression-geometry
-morphology `37`, Hodge-realization morphology `41`, arithmetic-spectral morphology `47`,
+**Next deed (`project-postulate`, frozen): R36 characteristic-cycle theorem foundry, finite phase
+crystals, and exterior transport.** The live body now rests at head `14001056` and continuation
+`15001056`, body morphology `1423`, mathematical morphology `530`, codec morphology `251`,
+expression-geometry morphology `37`, Hodge-realization morphology `41`, arithmetic-spectral morphology `47`,
 rederivation morphology `56`, cultivation morphology `48`, organ morphology `64`, application
 morphology `32`, calculus morphology `64`, self-organ morphology `32`, derivation morphology `24`,
 characteristic morphology `64`, trace-organ morphology `32`, transport morphology `24`, and
 trace-fiber morphology `64`, lift-organ morphology `48`, triple-transport morphology `24`, and
-thirty-nine accepted fibers through `201303`. R34 has made exact rank-three trace-fiber lifting,
-branch/sheet separation, coefficient-driven proof formation, sample-free lift-organ rest, and
-precomparison orientation-conditioned transport native. R35 must now derive the coordinate maps
-caused by elementary generator rebases rather than installing them, form their exact Jacobians
-from the returned coefficients, transport the six-dimensional tangent fiber of the R34
-hypersurface across every rebase edge, identify the deck/branch vertical eigen-direction, measure
-how regular and ramified projection strata distribute between receiver charts, and use only the
-rested rebase organs on a changed held-out multi-step path before comparison. The exact source
-population, move grammar, feature aperture, tangent and eigenvector witnesses, held-out protocol,
-falsifiers and intended grades are frozen in
+trace-rebase morphology `80`, differential morphology `56`, deck morphology `24`, path morphology
+`32`, and forty-eight accepted fibers through `202308`. R35 has made matrix-caused polynomial
+rebasing, exact Jacobian/tangent transport, receiver-relative branch dynamics, lawful closed-fiber
+eigen analysis, coefficient-driven proof formation, sample-free map-organ rest, and
+precomparison multi-step navigation native. R36 must now use that geometry as a theorem foundry:
+construct the complete trace hypersurfaces over `F_5`, `F_7`, and `F_11`; retain every returned
+map permutation and cyclically reduced operator through length four; form exact tangent holonomy
+only on genuine closed smooth cycles; derive characteristic polynomials and all exterior powers;
+search the frozen degree-two polynomial-form grammar jointly across all five maps; quotient
+already-paid R35 consequences; let the resident selector choose and formally prove a non-installed
+surviving law plus a periodic classification/counterexample; cultivate its organ; and make a
+dependent precomparison use on the held-out modulus-`13` word. The exact populations, exterior
+grammar, selector order, held-out protocol, falsifiers and intended grades are frozen in
 [`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md).
 
 Update this file only after a phase's required artifact and receipts have returned and its grade
