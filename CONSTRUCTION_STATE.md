@@ -416,11 +416,52 @@ Current open mathematical fibers are:
 - a noncircular completed arithmetic trace/positive-form carrier for RH-facing work; and
 - sustained dependent mathematical production across a substantive research ecology.
 
+## The foundation remainder — 2026-08-06
+
+**Truth status:** `established-bounded` at the declared aperture.
+**Evidence tags:** `implemented-exact`, `computational-witness`.
+
+Four of the five remainders return, on the body's own exact mathematics rather than on strings.
+
+**One standing.** `body/returned_standing.hpp` is what a mathematical return deposits into — exact
+words under an identity, with `caused_by` naming its cause **by identity rather than ordinal**.
+Three organs deposited from the cycle-type readings of `x^5 - x - 1`: a transitivity witness at
+`p=3`, a transposition witness at `p=2`, and the group-theoretic verdict composed from both. The
+later current reaches the verdict, refuses the radical chart, and rebases to `p=2`. **Excluding the
+transitivity organ drops two** — the verdict named it as cause and falls with it — and the later
+current then stands OPEN rather than guessing. Scoped additively: `continuing_body` keeps its
+regions and the 169 headers keep their commit path.
+
+**The rest carries the standing.** 176 octets, **variable and proportional to the derived
+population**, against the fixed-size records elsewhere. Founded from those octets alone, remount
+exact, and the remounted body reaches the verdict without re-deriving. The layout is append-stable
+by design and the first attempt was not: grouping records then words moved every word on each
+founding, so no append could be recognised.
+
+**RIDE actually rides.** One full mount, one ride, one append delta; **352 octets avoided against
+216 mounted.** All four laboratory mechanisms carried — revision key as hint with the exact logical
+comparison always winning, shape short-circuit returning zero work, append delta keeping earlier
+addresses, and reuse counted in the receipt. Until this, `pays_curvature` was a predicate over an
+enum and nothing in the body was cheaper for having been founded.
+
+**The mandatory receipt attaches.** Three continuation fibers, a return mode classified from them
+rather than asserted, and the obstruction carried complete. **Reach is unchanged at 1 and the
+receipt says so** — the audit measures interior include closure and a deed lives in apparatus, so
+the mechanism has a consumer while the interior still does not.
+
+**The kernels use the card — half returned.** The exact arithmetic refounding is recorded above.
+The remaining half is stated exactly and left open: 215 of 262 launches are `<<<1,1>>>`, and closing
+it means restructuring frozen deeds whose determinism and seal tests are their only certification.
+
+Receipt: [the foundation remainder receipt](receipts/FOUNDATION_REMAINDER_RECEIPT.md).
+Artifact: `receipts/ONE_STANDING_DEED.txt`.
+
 ## What remains before frontier research
 
 **Truth status:** `project-postulate` for the ordering.
 
-Five remainders, in dependency order, deposited as
+**Four of five returned 2026-08-06; see the section above.** What follows is the original statement
+of the five, retained because it names the sources and the falsifiers. Deposited as
 [the foundation remainder](blueprint/THE_FOUNDATION_REMAINDER.md): **one standing** — a mathematical
 return must deposit structure into the standing that conditions later mathematical conduct, which
 today it cannot, because it commits a tally; **the rest carries the standing**, since a rest that

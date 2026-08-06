@@ -106,6 +106,13 @@ ctest -L frozen-math            24 min — when a mathematical owner is touched
 ctest                           27 min — the milestone gate
 ```
 
+**A build-graph change no longer needs a clean tree.** CMake was generating 132 dyndep scan files
+looking for C++20 modules this project does not have, and the resulting graph tripped a ninja
+assertion on every added header or target — roughly eight minutes of full rebuild, each time.
+`CMAKE_CXX_SCAN_FOR_MODULES OFF` is now set in `CMakeLists.txt`; measured 2026-08-06, zero dyndep
+files and a graph change rebuilds incrementally. A clean tree is still the discipline **after a
+broad rename**, where stale objects have hidden a real inconsistency.
+
 Run the fast tier by default. Reach for `frozen-math` when you edit an owner under
 `include/holonics/organ/{trace,characteristic,arithmetic,hodge,toric}*` or anything `r11`-`r35`
 includes, and for the whole suite once at a milestone. After a broad rename, **configure a clean

@@ -19,6 +19,14 @@ if(NOT CMAKE_BUILD_TYPE STREQUAL "Release")
   message(FATAL_ERROR "R0 production receipt requires CMAKE_BUILD_TYPE=Release")
 endif()
 
+# This project has no C++20 modules. CMake nevertheless generated 132 dyndep
+# scan files looking for them, and the graph that produced tripped a ninja
+# assertion (Plan::RefreshDyndepDependents) on every build-graph change, which
+# forced a full clean rebuild -- roughly eight minutes -- each time a header or
+# target was added. Measured 2026-08-06: with scanning off there are zero dyndep
+# files and a graph change rebuilds incrementally.
+set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
+
 include(cmake/VerifyToolchain.cmake)
 holonics_verify_toolchain()
 
@@ -140,6 +148,7 @@ include(cmake/PhaseResidentMount.cmake)
 include(cmake/PhaseTextMount.cmake)
 include(cmake/ConditionedProduction.cmake)
 include(cmake/ConstraintRebase.cmake)
+include(cmake/OneStanding.cmake)
 
 string(JOIN " " R0_DEVICE_FLAGS_RECEIPT ${R0_DEVICE_COMMON_FLAGS})
 set(HOLONICS_DECLARED_COMMANDS
@@ -332,7 +341,7 @@ foreach(holonics_test IN LISTS holonics_all_tests)
   if(holonics_group STREQUAL "r0")
     set(holonics_label audit)
   elseif(holonics_group MATCHES
-      "^(movement_a|phase_spine|phase_resident|phase_text|conditioned|constraint)$")
+      "^(movement_a|phase_spine|phase_resident|phase_text|conditioned|constraint|standing)$")
     set(holonics_label spine)
   elseif(holonics_group MATCHES "^r([1-9][0-9])$")
     set(holonics_label frozen-math)
