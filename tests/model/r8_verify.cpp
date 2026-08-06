@@ -8,7 +8,7 @@ namespace {
 bool equal(const receiver::condensed_snapshot& left,
     const receiver::condensed_snapshot& right) noexcept {
   if (left.head != right.head || left.incidence != right.incidence ||
-      left.morphology != right.morphology || left.current != right.current ||
+      left.admitted_tally != right.admitted_tally || left.current != right.current ||
       left.lineage != right.lineage || left.logical_resource != right.logical_resource ||
       left.alternatives != right.alternatives || left.obstruction != right.obstruction ||
       left.source_count != right.source_count) {
@@ -52,14 +52,14 @@ std::size_t step_failures(const receiver::boundary_bisimulation_step& left,
       left.obstruction_equal != right.obstruction_equal ||
       left.incidence_equal != right.incidence_equal ||
       left.current_equal != right.current_equal ||
-      left.morphology_equal != right.morphology_equal ||
+      left.admitted_tally_equal != right.admitted_tally_equal ||
       left.alternatives_equal != right.alternatives_equal ||
       left.lineage_equal != right.lineage_equal ||
       left.logical_resource_equal != right.logical_resource_equal ||
       left.complete_successor_equal != right.complete_successor_equal;
   failures += !left.next_language_equal || !left.testimony_equal ||
       !left.obstruction_equal || !left.incidence_equal || !left.current_equal ||
-      !left.morphology_equal || !left.alternatives_equal || !left.lineage_equal ||
+      !left.admitted_tally_equal || !left.alternatives_equal || !left.lineage_equal ||
       !left.logical_resource_equal || !left.complete_successor_equal;
   return failures;
 }

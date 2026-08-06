@@ -91,13 +91,13 @@ class continuing_body final {
     if (predecessor != head_.serial()) { receipt.state = body_change_status::stale_predecessor; }
     else if (!capability.valid() || continuation_.valid()) { receipt.state = body_change_status::invalid_continuation; }
     else if (region_slot >= live_region_capacity) { receipt.state = body_change_status::invalid_region; }
-    else if (~std::uint64_t{0} - regions_[region_slot].morphology < admitted_tally_delta) {
+    else if (~std::uint64_t{0} - regions_[region_slot].admitted_tally < admitted_tally_delta) {
       receipt.state = body_change_status::capacity_refused;
     } else {
-      receipt.admitted_tally_before = regions_[region_slot].morphology;
-      regions_[region_slot].morphology += admitted_tally_delta;
+      receipt.admitted_tally_before = regions_[region_slot].admitted_tally;
+      regions_[region_slot].admitted_tally += admitted_tally_delta;
       regions_[region_slot].current = successor_current;
-      receipt.admitted_tally_after = regions_[region_slot].morphology;
+      receipt.admitted_tally_after = regions_[region_slot].admitted_tally;
       capability.consume();
       head_ = head_mint_.mint();
       continuation_ = linear_continuation{exact::word{next_continuation_++}};
@@ -107,7 +107,7 @@ class continuing_body final {
       receipt.continuation_after = continuation_.serial();
       return receipt;
     }
-    receipt.admitted_tally_before = region_slot < live_region_capacity ? regions_[region_slot].morphology : 0;
+    receipt.admitted_tally_before = region_slot < live_region_capacity ? regions_[region_slot].admitted_tally : 0;
     receipt.admitted_tally_after = receipt.admitted_tally_before;
     recover(static_cast<linear_continuation&&>(capability));
     return receipt;

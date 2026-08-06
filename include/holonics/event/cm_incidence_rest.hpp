@@ -74,11 +74,11 @@ struct cm_incidence_remount_receipt final {
       record.cm_incidence.lineage.value(), record.cm_incidence.admitted_tally_delta.value(),
       record.cm_incidence.accepted ? 1U : 0U};
   for (const auto value : fibers) { terminal_rest_detail::fold_value(fold, value); }
-  const std::uint64_t morphology[8]{record.mathematical_admitted_tally,
+  const std::uint64_t admitted_tallies[8]{record.mathematical_admitted_tally,
       record.codec_admitted_tally, record.geometry_admitted_tally, record.phase_admitted_tally,
       record.characteristic_admitted_tally, record.regular_singular_admitted_tally,
       record.blind_reconstruction_admitted_tally, record.cm_incidence_admitted_tally};
-  for (const auto value : morphology) { terminal_rest_detail::fold_value(fold, value); }
+  for (const auto value : admitted_tallies) { terminal_rest_detail::fold_value(fold, value); }
   return fold;
 }
 

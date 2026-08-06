@@ -301,3 +301,41 @@ add_custom_target(
   VERBATIM)
 
 include(cmake/HolonicContractTests.cmake)
+
+set(HOLONICS_REACH_RECEIPT "${PROJECT_BINARY_DIR}/receipts/REACH_AUDIT.txt")
+add_test(
+  NAME r0.reach_audit
+  COMMAND
+    "${CMAKE_COMMAND}" -DSCAN_ROOT=${PROJECT_SOURCE_DIR}
+    -DOUTPUT=${HOLONICS_REACH_RECEIPT}
+    -P "${PROJECT_SOURCE_DIR}/cmake/HolonicReach.cmake")
+
+# Test tiers.
+#
+# Measured 2026-08-06 across 146 tests and 1,612 serial seconds: the frozen
+# mathematical deeds R11-R35 are 93.7% of it, and the audits, spine, and
+# carriers that guard current construction are 101 seconds together.
+#
+# Nothing here is redundant within a run -- each expensive group runs its deed
+# three times because the three establish different facts: the deed itself, a
+# byte-identical replay, and a replay under a source-access probe. The waste is
+# temporal. Re-establishing a frozen owner's determinism after editing an
+# unrelated owner catches nothing.
+#
+#   ctest -L 'audit|spine'     what guards a change in progress
+#   ctest -L frozen-math       when a mathematical owner is touched
+#   ctest                      the milestone gate
+get_property(holonics_all_tests DIRECTORY PROPERTY TESTS)
+foreach(holonics_test IN LISTS holonics_all_tests)
+  string(REGEX REPLACE "\\..*$" "" holonics_group "${holonics_test}")
+  set(holonics_label carrier)
+  if(holonics_group STREQUAL "r0")
+    set(holonics_label audit)
+  elseif(holonics_group MATCHES
+      "^(movement_a|phase_spine|phase_resident|phase_text|conditioned|constraint)$")
+    set(holonics_label spine)
+  elseif(holonics_group MATCHES "^r([1-9][0-9])$")
+    set(holonics_label frozen-math)
+  endif()
+  set_tests_properties("${holonics_test}" PROPERTIES LABELS "${holonics_label}")
+endforeach()

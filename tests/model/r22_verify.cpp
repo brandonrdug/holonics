@@ -169,7 +169,7 @@ std::size_t r22_verification_failures(const apparatus::cm_store_receipt& card_lo
       !actual.final_can_continue || actual.final_head != exact::word{14'001'018} ||
       actual.final_continuation != exact::word{15'001'018};
   failures += handoff.integrity != event::cm_incidence_rest_integrity(handoff) ||
-      handoff.body.regions[0].morphology != 327 ||
+      handoff.body.regions[0].admitted_tally != 327 ||
       handoff.mathematical_admitted_tally != 104 || handoff.codec_admitted_tally != 58 ||
       handoff.cm_incidence_admitted_tally != 17 ||
       handoff.cm_incidence.identity != exact::word{189'300} ||

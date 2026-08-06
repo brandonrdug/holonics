@@ -21,7 +21,7 @@ struct local_slot final {
   if (left.head != right.head || left.continuation != right.continuation ||
       left.lineage != right.lineage) { return false; }
   for (std::size_t slot = 0; slot < body::live_region_capacity; ++slot) {
-    if (left.regions[slot].morphology != right.regions[slot].morphology ||
+    if (left.regions[slot].admitted_tally != right.regions[slot].admitted_tally ||
         left.regions[slot].current != right.regions[slot].current) { return false; }
   }
   return true;
@@ -62,7 +62,7 @@ __device__ void check_returns(event::lifecycle_adversarial_receipt& receipt) {
 
 __device__ void check_capacity(event::lifecycle_adversarial_receipt& receipt) {
   body::rest_region regions[body::live_region_capacity]{};
-  regions[2].morphology = ~std::uint64_t{0} - 2U;
+  regions[2].admitted_tally = ~std::uint64_t{0} - 2U;
   local_slot<body::continuing_body> body_storage{};
   local_slot<event::live_pending> pending_storage{};
   local_slot<event::live_delta> delta_storage{};
@@ -141,7 +141,7 @@ __device__ bool commit_successor_boundary(std::uint64_t seed) {
   static_cast<void>(event::resume(*pending_storage.get(), returned, delta_storage.get()));
   const auto committed = event::commit(*standing, *delta_storage.get());
   return committed.state == body::body_change_status::committed &&
-      standing->region(1).morphology == 7 && standing->can_open();
+      standing->region(1).admitted_tally == 7 && standing->can_open();
 }
 
 __global__ void adversarial_lifecycle(event::lifecycle_output* output) {

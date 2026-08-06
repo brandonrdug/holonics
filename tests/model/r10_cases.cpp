@@ -6,7 +6,7 @@ namespace holonics::tests {
 
 apparatus::conditioning_mount r10_case() noexcept {
   apparatus::conditioning_mount mount{};
-  mount.foundation.morphology = {exact::word{10'001}, exact::word{100'001},
+  mount.foundation.admitted_tally = {exact::word{10'001}, exact::word{100'001},
       exact::word{2}, exact::word{1}, exact::word{0}, exact::word{0}, exact::word{1}};
   mount.foundation.production_seed = 10'001'000U;
   mount.foundation.ablation_seed = 10'002'000U;

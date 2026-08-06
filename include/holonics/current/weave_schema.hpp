@@ -27,7 +27,7 @@ enum class weave_obstruction : std::uint8_t {
 struct weave_cell final {
   exact::word identity{};
   exact::word value{};
-  exact::word morphology{};
+  exact::word admitted_tally{};
   exact::word current{};
   exact::word lineage{};
   std::uint16_t placement{};

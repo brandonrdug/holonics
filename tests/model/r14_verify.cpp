@@ -108,7 +108,7 @@ std::size_t r14_verification_failures(
       !actual.ablation.production.available || actual.ablation.ablated.available ||
       !actual.ablation.exact_exclusion || !actual.ablation.consequence_lost;
   failures += handoff.integrity != event::theorem_production_rest_integrity(handoff) ||
-      handoff.body.head != 14'001'002 || handoff.body.regions[0].morphology != 140 ||
+      handoff.body.head != 14'001'002 || handoff.body.regions[0].admitted_tally != 140 ||
       handoff.acquired.identity != exact::word{181'200} || !handoff.acquired.accepted ||
       handoff.mathematical_admitted_tally != 46 || handoff.codec_admitted_tally != 34;
   return failures;

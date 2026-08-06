@@ -76,7 +76,7 @@ class resident_weave final {
     const weave_delta& value = deltas_[slot];
     weave_cell& cell = standing_.cells[value.cell];
     cell.value = exact::word{cell.value.value() + value.value_delta.value()};
-    cell.morphology = exact::word{cell.morphology.value() + value.admitted_tally_delta.value()};
+    cell.admitted_tally = exact::word{cell.admitted_tally.value() + value.admitted_tally_delta.value()};
     cell.current = value.successor_current;
     cell.lineage = value.lineage;
     standing_.emitted[slot] = value.consequence;

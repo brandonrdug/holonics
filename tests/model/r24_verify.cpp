@@ -89,7 +89,7 @@ std::size_t r24_verification_failures(
       !actual.final_can_continue || actual.final_head != exact::word{14'001'022} ||
       actual.final_continuation != exact::word{15'001'022};
   failures += handoff.integrity != event::algebraic_variation_rest_integrity(handoff) ||
-      handoff.body.regions[0].morphology != 413 || handoff.mathematical_admitted_tally != 130 ||
+      handoff.body.regions[0].admitted_tally != 413 || handoff.mathematical_admitted_tally != 130 ||
       handoff.codec_admitted_tally != 69 || handoff.toric_cycle_admitted_tally != 19 ||
       handoff.algebraic_variation_admitted_tally != 23 ||
       handoff.algebraic_variation.identity != exact::word{191'300} ||

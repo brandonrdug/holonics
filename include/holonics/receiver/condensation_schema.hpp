@@ -35,7 +35,7 @@ struct condensation_program final {
   exact::word predecessor{};
   exact::word incidence{};
   exact::word lineage{};
-  exact::word morphology{};
+  exact::word admitted_tally{};
   exact::word current{};
   exact::word logical_resource{};
   exact::word alternatives{};

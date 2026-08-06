@@ -77,7 +77,7 @@ int main(int argc, char **argv) {
       << "\nsource_currents=" << execution.source_currents.value() << "\nhost_semantic_events=0\n"
       << "development_card_arguments=0\npredictions_before_comparison=1\n"
       << "final_body=head:" << observation.final_head.value() << ",continuation:"
-      << observation.final_continuation.value() << ",morphology:" << handoff.standing.body.regions[0].morphology
+      << observation.final_continuation.value() << ",admitted_tally:" << handoff.standing.body.regions[0].admitted_tally
       << ",mathematical:" << handoff.standing.mathematical_admitted_tally << ",codec:"
       << handoff.standing.codec_admitted_tally << ",application:" << handoff.application_admitted_tally
       << "\nchecker_exit=" << observation.passage.raw.exit_status << "\nformal_begin\n";

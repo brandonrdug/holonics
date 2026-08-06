@@ -58,7 +58,7 @@ std::size_t r12_verification_failures(
       !information.obstruction_changed_passage || !information.receiver_indexed ||
       !information.committed;
   failures += value.final_head != exact::word{expected.successor} ||
-      value.final_region.morphology != expected.final_morphology ||
+      value.final_region.admitted_tally != expected.final_morphology ||
       value.final_region.current != expected.final_current || !value.source_detached ||
       !value.same_closed_passage || !value.continuation_valid;
   failures += !same_generated_bytes(value.formal.bytes, value.formal.byte_count,

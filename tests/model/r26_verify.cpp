@@ -154,7 +154,7 @@ std::size_t r26_verification_failures(bool sources_loaded,
       !actual.final_can_continue || actual.final_head != exact::word{14'001'026} ||
       actual.final_continuation != exact::word{15'001'026};
   failures += handoff.integrity != event::intrinsic_hypergeometry_rest_integrity(handoff) ||
-      handoff.body.regions[0].morphology != 535 || handoff.mathematical_admitted_tally != 164 ||
+      handoff.body.regions[0].admitted_tally != 535 || handoff.mathematical_admitted_tally != 164 ||
       handoff.codec_admitted_tally != 84 || handoff.causal_linear_admitted_tally != 29 ||
       handoff.intrinsic_hypergeometry_admitted_tally != 31 ||
       handoff.intrinsic_hypergeometry.identity != exact::word{193'300} ||

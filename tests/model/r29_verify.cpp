@@ -136,7 +136,7 @@ std::size_t r29_verification_failures(bool source_loaded,
       !observation.final_can_continue || observation.final_head != exact::word{14'001'032} ||
       observation.final_continuation != exact::word{15'001'032};
   failures += handoff.integrity != event::arithmetic_spectral_rest_integrity(handoff) ||
-      handoff.body.regions[0].morphology != 782 || handoff.mathematical_admitted_tally != 232 ||
+      handoff.body.regions[0].admitted_tally != 782 || handoff.mathematical_admitted_tally != 232 ||
       handoff.codec_admitted_tally != 113 || handoff.hodge_realization_admitted_tally != 41 ||
       handoff.arithmetic_spectral_admitted_tally != 47 ||
       handoff.arithmetic_spectral.identity != exact::word{196'300} ||

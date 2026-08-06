@@ -302,6 +302,47 @@ factor equal to the whole reduction agrees with itself.
 Receipt: [the constraint rebase receipt](receipts/CONSTRAINT_REBASE_RECEIPT.md).
 Artifact: `receipts/CONSTRAINT_REBASE_DEED.txt`.
 
+## The spine audit and the arithmetic refounding — 2026-08-06
+
+**Truth status:** `established-bounded`. **Evidence tags:** `computational-witness`,
+`implemented-exact`.
+
+**Reach entered the grade.** `cmake/HolonicReach.cmake`, registered as `r0.reach_audit`, computes
+over the actual include graph how much of the body each spine mechanism conducts through, records a
+floor, and fails on regression. Measured across 649 headers: `body/swing.hpp` **9**,
+`structure/chi_pair.hpp` **13**, `body/live_machine.hpp` **8**, `current/information_receipt.hpp`
+**1** — itself — against `body/continuing_body.hpp` **169** and `exact/small_rational.hpp` **256**.
+
+Two of those are the diagnosis. **The mandatory causal-information receipt reaches nothing**; the
+receipt attached to production deeds is a different type of the same name carrying two counts and a
+tally delta, which the roadmap declares inadmissible. And **the body is two machines** — the spine
+and the ecologies conduct through the one move, the 169-header mathematical library conducts
+through a carrier that predates it, and they share no head, continuation, or rest record. Deposited
+as [the spine](blueprint/THE_SPINE.md).
+
+**The exact arithmetic was refounded.** Every division on the device path was a sixty-four-iteration
+software loop and `gcd` was Euclidean over it — five gcds and ten divisions per elimination step.
+`gcd` became Stein's binary construction, which uses shifts, comparison and subtraction and
+**performs no division at all**, so nothing on that path can lower to a non-integer carrier; the
+division now enters at the operand's leading bit rather than at sixty-four. Verified across
+**691,324 cases** against the superseded implementation with **zero mismatches**. The trace-fiber
+discovery deed fell **274.27 s → 150.00 s** and the architecture and binary audit **84 s → 61 s**,
+because that one header reaches 39% of the tree.
+
+**The standing stopped misnaming itself.** `body/rest_record.hpp` carried
+`rest_region{ uint64_t morphology; uint64_t current; }`, and 169 headers committed through it: the
+2026-08-05 excision renamed the receipts and left the standing untouched. Renamed to
+`admitted_tally` with the law recorded at the declaration, together with the same counter under
+three further names. `morphology_cell{scale, offset, passages}` keeps its name — it is a per-site
+transport organization, which is the distinction the law draws.
+
+**Registered open.** 215 of 262 kernel launches are `<<<1,1>>>`; the trace-fiber `close_kernel`
+serially performs 5,184 group insertions, 14 exact eliminations and 10,368 residual evaluations on
+one thread. The conformance oracle computes the identical result in 0.189 s. The four
+reuse mechanisms the laboratory had — revision key with exact logical compare, shape short-circuit,
+append delta with stable base address, reuse counted in the receipt — are unported, and the rest
+carries a fixed-size summary rather than the derived population.
+
 ## Construction provenance
 
 **Truth status:** `historical`.

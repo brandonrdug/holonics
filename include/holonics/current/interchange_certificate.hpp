@@ -43,7 +43,7 @@ struct interchange_certificate final {
   bool identity_equal{};
   bool causal_order_equal{};
   bool incidence_equal{};
-  bool morphology_equal{};
+  bool admitted_tally_equal{};
   bool current_equal{};
   bool consequence_equal{};
   bool obstruction_equal{};

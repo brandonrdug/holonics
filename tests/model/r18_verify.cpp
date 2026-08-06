@@ -119,7 +119,7 @@ std::size_t r18_verification_failures(
       actual.final_continuation != exact::word{15'001'008};
   failures += handoff.integrity != event::phase_crystal_rest_integrity(handoff) ||
       handoff.body.head != 14'001'008 || handoff.body.continuation != 15'001'008 ||
-      handoff.body.regions[0].morphology != 192 ||
+      handoff.body.regions[0].admitted_tally != 192 ||
       handoff.first.identity != exact::word{181'200} || !handoff.first.accepted ||
       handoff.second.identity != exact::word{182'200} || !handoff.second.accepted ||
       handoff.geometry.identity != exact::word{184'300} || !handoff.geometry.accepted ||

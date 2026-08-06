@@ -12,7 +12,7 @@ apparatus::boundary_condensation_mount r8_case() noexcept {
   program.predecessor = exact::word{8'001'000};
   program.incidence = exact::word{8'001'001};
   program.lineage = exact::word{100};
-  program.morphology = exact::word{10};
+  program.admitted_tally = exact::word{10};
   program.logical_resource = exact::word{0};
   program.alternatives = exact::word{2};
   program.reconstruction_capability = exact::word{8'009'001};

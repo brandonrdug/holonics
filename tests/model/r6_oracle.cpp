@@ -25,7 +25,7 @@ void apply_event(current::weave_snapshot& standing,
     std::size_t slot) noexcept {
   auto& cell = standing.cells[event.cell];
   cell.value = exact::word{cell.value.value() + event.value_delta.value()};
-  cell.morphology = exact::word{cell.morphology.value() + event.admitted_tally_delta.value()};
+  cell.admitted_tally = exact::word{cell.admitted_tally.value() + event.admitted_tally_delta.value()};
   cell.current = event.successor_current;
   cell.lineage = event.lineage;
   standing.emitted[slot] = event.consequence;

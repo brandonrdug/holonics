@@ -139,7 +139,7 @@ std::size_t r16_verification_failures(
       actual.final_continuation != exact::word{15'001'004};
   failures += handoff.integrity != event::terminal_theorem_rest_integrity(handoff) ||
       handoff.body.head != 14'001'004 || handoff.body.continuation != 15'001'004 ||
-      handoff.body.regions[0].morphology != 152 ||
+      handoff.body.regions[0].admitted_tally != 152 ||
       handoff.first.identity != exact::word{181'200} || !handoff.first.accepted ||
       handoff.second.identity != exact::word{182'200} || !handoff.second.accepted ||
       handoff.mathematical_admitted_tally != 49 || handoff.codec_admitted_tally != 36;

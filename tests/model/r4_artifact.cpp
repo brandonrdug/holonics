@@ -28,7 +28,7 @@ void write_r4_artifact(
          << "delta_morphology=" << output.delta.admitted_tally_delta << '\n'
          << "successor_head=" << output.successor.head << '\n'
          << "successor_region_morphology="
-         << output.successor.regions[output.delta.region].morphology << '\n'
+         << output.successor.regions[output.delta.region].admitted_tally << '\n'
          << "rest_integrity=" << output.rest.integrity.value() << '\n'
          << "remount_equal=" << (output.successor.head == output.remounted.head) << '\n'
          << "source_replays=" << output.source_replays << '\n'

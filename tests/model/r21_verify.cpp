@@ -182,7 +182,7 @@ std::size_t r21_verification_failures(
       actual.final_head != exact::word{14'001'016} ||
       actual.final_continuation != exact::word{15'001'016};
   failures += handoff.integrity != event::blind_reconstruction_rest_integrity(handoff) ||
-      handoff.body.regions[0].morphology != 296 || handoff.mathematical_admitted_tally != 94 ||
+      handoff.body.regions[0].admitted_tally != 296 || handoff.mathematical_admitted_tally != 94 ||
       handoff.codec_admitted_tally != 54 || handoff.blind_reconstruction_admitted_tally != 24 ||
       handoff.code_reconstruction.identity != exact::word{188'300} ||
       !handoff.code_reconstruction.accepted ||

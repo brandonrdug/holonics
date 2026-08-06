@@ -8,14 +8,14 @@ namespace {
 receiver::condensed_snapshot snapshot(const receiver::condensation_program& program,
     const std::uint64_t* values,
     std::uint64_t head,
-    std::uint64_t morphology,
+    std::uint64_t admitted_tally,
     std::uint64_t current,
     std::uint64_t lineage,
     std::uint64_t resource) noexcept {
   receiver::condensed_snapshot result{};
   result.head = exact::word{head};
   result.incidence = program.incidence;
-  result.morphology = exact::word{morphology};
+  result.admitted_tally = exact::word{admitted_tally};
   result.current = exact::word{current};
   result.lineage = exact::word{lineage};
   result.logical_resource = exact::word{resource};
@@ -33,7 +33,7 @@ void fill_step(receiver::boundary_bisimulation_step& step,
     std::size_t history,
     const std::uint64_t* values,
     std::uint64_t predecessor,
-    std::uint64_t morphology,
+    std::uint64_t admitted_tally,
     std::uint64_t response,
     std::uint64_t lineage,
     std::uint64_t resource,
@@ -50,7 +50,7 @@ void fill_step(receiver::boundary_bisimulation_step& step,
       exact::word{response}, exact::word{response}, family.admitted_input_support,
       factors, true};
   const auto successor = snapshot(program, values, predecessor + 1U,
-      morphology, response, lineage, resource);
+      admitted_tally, response, lineage, resource);
   step.direct_successor = successor;
   step.condensed_successor = successor;
   step.next_language_equal = true;
@@ -58,7 +58,7 @@ void fill_step(receiver::boundary_bisimulation_step& step,
   step.obstruction_equal = true;
   step.incidence_equal = true;
   step.current_equal = true;
-  step.morphology_equal = true;
+  step.admitted_tally_equal = true;
   step.alternatives_equal = true;
   step.lineage_equal = true;
   step.logical_resource_equal = true;

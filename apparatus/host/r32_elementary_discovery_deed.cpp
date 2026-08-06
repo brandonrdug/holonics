@@ -99,7 +99,7 @@ int main(int argc,char**argv){if(argc!=23)return 2;holonics::apparatus::elementa
     <<"\nverification_failures="<<failed<<"\nkernel_launches="<<execution.kernel_launches.value()<<"\nsource_currents=5\n"
     <<"host_semantic_events=0\nidentity_candidates=31\nconduct_candidates=2187\nintermediate_rest_bytes="<<sizeof(handoff)
     <<"\ndevelopment_rows_in_rest=0\ntraces_in_rest=0\nfinal_body=head:"<<observation.final_head.value()<<",continuation:"
-    <<observation.final_continuation.value()<<",morphology:"<<handoff.standing.standing.body.regions[0].morphology
+    <<observation.final_continuation.value()<<",admitted_tally:"<<handoff.standing.standing.body.regions[0].admitted_tally
     <<",mathematical:"<<handoff.standing.standing.mathematical_admitted_tally<<",codec:"<<handoff.standing.standing.codec_admitted_tally
     <<",calculus:"<<handoff.calculus_admitted_tally<<",self_organ:"<<handoff.self_organ_admitted_tally
     <<"\nchecker_exit="<<observation.passage.raw.exit_status<<"\nformal_begin\n";

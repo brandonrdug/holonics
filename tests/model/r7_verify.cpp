@@ -11,7 +11,7 @@ bool equal(const receiver::word_pair& left, const receiver::word_pair& right) no
 
 bool equal(const current::weave_cell& left, const current::weave_cell& right) noexcept {
   return left.identity == right.identity && left.value == right.value &&
-      left.morphology == right.morphology && left.current == right.current &&
+      left.admitted_tally == right.admitted_tally && left.current == right.current &&
       left.lineage == right.lineage && left.placement == right.placement &&
       left.aperture == right.aperture;
 }

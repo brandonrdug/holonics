@@ -205,7 +205,7 @@ std::size_t r30_verification_failures(
        o.final_continuation != exact::word{15'001'036} ||
        !o.final_can_continue ||
        h.integrity != event::rederivation_rest_integrity(h) ||
-       h.body.regions[0].morphology != 903 ||
+       h.body.regions[0].admitted_tally != 903 ||
        h.mathematical_admitted_tally != 270 || h.codec_admitted_tally != 127 ||
        h.arithmetic_spectral_admitted_tally != 47 ||
        h.rederivation_admitted_tally != 56 || !h.matching_rederivation.accepted ||

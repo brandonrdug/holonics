@@ -21,12 +21,23 @@ struct unsigned_division final {
 [[nodiscard]] HOLONICS_CALLABLE constexpr std::int64_t absolute(
     std::int64_t value) noexcept { return value < 0 ? -value : value; }
 
+/// Restoring division, entered at the dividend's own leading bit.
+///
+/// A hardware `/` may not be used: on `sm_89` a sixty-four-bit divide lowers
+/// through a Newton iteration whose opening instruction converts to a
+/// non-integer carrier, and no such carrier may be reachable from a kernel. So
+/// the division is carried in bits — but it is entered at the operand's width
+/// rather than at sixty-four, because **the leading zeros of a small operand are
+/// terrain the value already paid for.** Exact, and identical in return.
 [[nodiscard]] HOLONICS_CALLABLE constexpr unsigned_division divide_unsigned(
     std::uint64_t dividend, std::uint64_t divisor) noexcept {
   unsigned_division result{};
   if (divisor == 0) { return result; }
-  for (std::uint8_t step = 64; step != 0; --step) {
-    const auto bit = static_cast<std::uint8_t>(step - 1U);
+  if (dividend < divisor) { result.remainder = dividend; return result; }
+  std::uint8_t top = 63;
+  while (((dividend >> top) & 1U) == 0) { --top; }
+  for (std::int16_t step = top; step >= 0; --step) {
+    const auto bit = static_cast<std::uint8_t>(step);
     result.remainder = (result.remainder << 1U) | ((dividend >> bit) & 1U);
     if (result.remainder >= divisor) {
       result.remainder -= divisor;
@@ -54,13 +65,37 @@ struct unsigned_division final {
       static_cast<std::uint64_t>(absolute(divisor))).remainder);
 }
 
+/// The common measure, taken by halving rather than by dividing.
+///
+/// Stein's construction: strip the shared twos, then repeatedly strip the odd
+/// side's twos and subtract the smaller from the larger. **No division occurs at
+/// all** — only shifts, comparison, and subtraction — so this path carries no
+/// divide to be lowered and no carrier to be converted. It is called five times
+/// per elimination step, which is why it is the one that had to stop dividing.
+///
+/// Returns exactly what the Euclidean form returned, including `1` for the
+/// doubly-zero argument.
 [[nodiscard]] HOLONICS_CALLABLE constexpr std::int64_t gcd(
     std::int64_t left, std::int64_t right) noexcept {
-  left = absolute(left); right = absolute(right);
-  while (right != 0) {
-    const auto residue = remainder(left, right); left = right; right = residue;
+  auto measured = static_cast<std::uint64_t>(absolute(left));
+  auto against = static_cast<std::uint64_t>(absolute(right));
+  if (measured == 0 || against == 0) {
+    const auto standing = measured | against;
+    return standing == 0 ? 1 : static_cast<std::int64_t>(standing);
   }
-  return left == 0 ? 1 : left;
+  std::uint8_t shared = 0;
+  while (((measured | against) & 1U) == 0) {
+    measured >>= 1U; against >>= 1U; ++shared;
+  }
+  while ((measured & 1U) == 0) { measured >>= 1U; }
+  do {
+    while ((against & 1U) == 0) { against >>= 1U; }
+    if (measured > against) {
+      const auto held = measured; measured = against; against = held;
+    }
+    against -= measured;
+  } while (against != 0);
+  return static_cast<std::int64_t>(measured << shared);
 }
 
 [[nodiscard]] HOLONICS_CALLABLE constexpr small_rational make(

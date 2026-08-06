@@ -61,8 +61,8 @@ void write_r28_artifact(std::ostream& out, bool source_loaded,
       << ",stderr_bytes:" << observation.passage.raw.stderr_bytes
       << ",produced_bytes:" << observation.passage.raw.produced_artifact_bytes
       << "\nfinal_body=head:" << observation.final_head.value() << ",continuation:"
-      << observation.final_continuation.value() << ",morphology:"
-      << handoff.body.regions[0].morphology << ",mathematical:"
+      << observation.final_continuation.value() << ",admitted_tally:"
+      << handoff.body.regions[0].admitted_tally << ",mathematical:"
       << handoff.mathematical_admitted_tally << ",codec:" << handoff.codec_admitted_tally
       << ",hodge:" << handoff.hodge_realization_admitted_tally
       << ",rest_bytes:" << rest_write.bytes.value() << ",integrity:" << handoff.integrity

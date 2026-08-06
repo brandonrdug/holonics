@@ -58,7 +58,7 @@ void write_r17_artifact(std::ostream& output,
          << ",coordinate_counterexample:" << inquiry.theory.coordinate_counterexample
          << ",singular_boundary:" << inquiry.theory.singular_boundary << '\n'
          << "formation_delta=head:" << value.theory_commit.predecessor.value() << ':'
-         << value.theory_commit.successor.value() << ",morphology:"
+         << value.theory_commit.successor.value() << ",admitted_tally:"
          << value.theory_commit.admitted_tally_before << ':'
          << value.theory_commit.admitted_tally_after << '\n'
          << "checker=exit:" << value.raw.exit_status
@@ -87,7 +87,7 @@ void write_r17_artifact(std::ostream& output,
          << ",fold:" << comparison.content_fold << '\n'
          << "final_body=head:" << handoff.body.head
          << ",continuation:" << handoff.body.continuation
-         << ",body_admitted_tally:" << handoff.body.regions[0].morphology
+         << ",body_admitted_tally:" << handoff.body.regions[0].admitted_tally
          << ",mathematical:" << handoff.mathematical_admitted_tally
          << ",codec:" << handoff.codec_admitted_tally
          << ",geometry:" << handoff.geometry_admitted_tally

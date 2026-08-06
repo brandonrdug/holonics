@@ -64,7 +64,7 @@ std::size_t r10_verification_failures(
       actual.ablation.ablated.consequence.obstruction != exact::word{expected.before_obstruction};
   failures += !actual.behavior_changed || !actual.final_continuation_valid ||
       actual.final_head != exact::word{expected.successor} ||
-      actual.final_region.morphology != expected.region_morphology ||
+      actual.final_region.admitted_tally != expected.region_morphology ||
       actual.final_region.current != expected.region_current;
   return failures;
 }

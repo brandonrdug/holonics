@@ -9,8 +9,21 @@ namespace holonics::body {
 
 inline constexpr std::size_t live_region_capacity = 4;
 
+/// One region of the continuing body's rest.
+///
+/// `admitted_tally` is **provenance: a count of admitted deeds.** It was named
+/// `morphology` until 2026-08-06, which made the standing of every mathematical
+/// deed misdescribe itself — the excision of 2026-08-05 renamed the receipts and
+/// left the standing untouched, so the convicted word survived in the one place
+/// it mattered most.
+///
+/// **A morphology is the contemporary causal organization by which a body
+/// receives, transforms, retains, and emits differences.** It is never a number.
+/// A field of this type may be carried, folded into an integrity word, and
+/// reported as provenance; it may never be read as evidence that anything was
+/// learned.
 struct rest_region final {
-  std::uint64_t morphology{};
+  std::uint64_t admitted_tally{};
   std::uint64_t current{};
 };
 
@@ -48,7 +61,7 @@ struct rest_receipt final {
     }
   }
   for (std::size_t region = 0; region < live_region_capacity; ++region) {
-    std::uint64_t values[2]{record.regions[region].morphology, record.regions[region].current};
+    std::uint64_t values[2]{record.regions[region].admitted_tally, record.regions[region].current};
     for (std::size_t field = 0; field < 2; ++field) {
       for (std::size_t octet = 0; octet < 8; ++octet) {
         fold ^= values[field] & 255U;

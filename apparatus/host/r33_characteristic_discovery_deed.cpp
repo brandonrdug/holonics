@@ -181,8 +181,8 @@ int main(int argc, char **argv) {
        << "\ndevelopmental_rows_in_rest=0\nmatrices_in_rest=0\nfinal_body=head:"
        << observation.final_head.value()
        << ",continuation:" << observation.final_continuation.value()
-       << ",morphology:"
-       << handoff.standing.standing.standing.body.regions[0].morphology
+       << ",admitted_tally:"
+       << handoff.standing.standing.standing.body.regions[0].admitted_tally
        << ",mathematical:"
        << handoff.standing.standing.standing.mathematical_admitted_tally
        << ",codec:" << handoff.standing.standing.standing.codec_admitted_tally

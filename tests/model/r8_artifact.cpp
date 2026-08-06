@@ -12,7 +12,7 @@ void write_snapshot(std::ostream& output,
     const receiver::condensed_snapshot& value) noexcept {
   output << label << '=' << history << ",head=" << value.head.value()
          << ",incidence=" << value.incidence.value()
-         << ",morphology=" << value.morphology.value()
+         << ",admitted_tally=" << value.admitted_tally.value()
          << ",current=" << value.current.value()
          << ",lineage=" << value.lineage.value()
          << ",resource=" << value.logical_resource.value()

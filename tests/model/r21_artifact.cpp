@@ -75,7 +75,7 @@ void write_r21_artifact(std::ostream& output,
       << value.moment.raw.source_fold << ",artifact_fold:"
       << value.moment.raw.produced_artifact_fold
       << "\nfinal_body=head:" << handoff.body.head << ",continuation:"
-      << handoff.body.continuation << ",morphology:" << handoff.body.regions[0].morphology
+      << handoff.body.continuation << ",admitted_tally:" << handoff.body.regions[0].admitted_tally
       << ",mathematical:" << handoff.mathematical_admitted_tally << ",codec:"
       << handoff.codec_admitted_tally << ",blind_reconstruction:"
       << handoff.blind_reconstruction_admitted_tally << ",rest_bytes:" << rest_write.bytes.value()

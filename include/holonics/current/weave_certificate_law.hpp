@@ -99,11 +99,11 @@ HOLONICS_CALLABLE constexpr void add_combined_event(
   }
   result.causal_order_equal = result.left_right.lineage_order == result.right_left.lineage_order;
   result.incidence_equal = result.left_right.incidence == result.right_left.incidence;
-  result.morphology_equal = true;
+  result.admitted_tally_equal = true;
   result.current_equal = true;
   for (std::size_t cell = 0; cell < program.cell_count; ++cell) {
-    result.morphology_equal &= result.left_right.cells[cell].morphology ==
-        result.right_left.cells[cell].morphology;
+    result.admitted_tally_equal &= result.left_right.cells[cell].admitted_tally ==
+        result.right_left.cells[cell].admitted_tally;
     result.current_equal &= result.left_right.cells[cell].current ==
         result.right_left.cells[cell].current;
   }

@@ -175,7 +175,7 @@ void write_r20_artifact(std::ostream& output,
       << ",calls:" << execution.process.exterior_process_calls.value() << '\n'
       << "final_body=head:" << handoff.body.head << ",continuation:"
       << handoff.body.continuation << ",body_admitted_tally:"
-      << handoff.body.regions[0].morphology << ",mathematical:"
+      << handoff.body.regions[0].admitted_tally << ",mathematical:"
       << handoff.mathematical_admitted_tally << ",codec:" << handoff.codec_admitted_tally
       << ",geometry:" << handoff.geometry_admitted_tally << ",phase:"
       << handoff.phase_admitted_tally << ",characteristic:"

@@ -78,7 +78,7 @@ void write_r30_artifact(std::ostream &out, bool loaded,
       << ",produced_bytes:" << o.passage.raw.produced_artifact_bytes
       << "\nfinal_body=head:" << o.final_head.value()
       << ",continuation:" << o.final_continuation.value()
-      << ",morphology:" << h.body.regions[0].morphology
+      << ",admitted_tally:" << h.body.regions[0].admitted_tally
       << ",mathematical:" << h.mathematical_admitted_tally
       << ",codec:" << h.codec_admitted_tally
       << ",arithmetic:" << h.arithmetic_spectral_admitted_tally

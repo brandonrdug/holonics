@@ -207,7 +207,7 @@ std::size_t r23_verification_failures(
       !actual.final_can_continue || actual.final_head != exact::word{14'001'020} ||
       actual.final_continuation != exact::word{15'001'020};
   failures += handoff.integrity != event::toric_cycle_rest_integrity(handoff) ||
-      handoff.body.regions[0].morphology != 366 ||
+      handoff.body.regions[0].admitted_tally != 366 ||
       handoff.mathematical_admitted_tally != 116 || handoff.codec_admitted_tally != 63 ||
       handoff.cm_incidence_admitted_tally != 17 || handoff.toric_cycle_admitted_tally != 19 ||
       handoff.toric_cycle.identity != exact::word{190'300} ||

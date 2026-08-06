@@ -12,7 +12,7 @@ namespace {
   if (left.head != right.head || left.continuation != right.continuation ||
       left.lineage != right.lineage) { return false; }
   for (std::size_t slot = 0; slot < body::live_region_capacity; ++slot) {
-    if (left.regions[slot].morphology != right.regions[slot].morphology ||
+    if (left.regions[slot].admitted_tally != right.regions[slot].admitted_tally ||
         left.regions[slot].current != right.regions[slot].current) { return false; }
   }
   return true;
@@ -23,7 +23,7 @@ namespace {
 apparatus::body_lifecycle_input r4_input() noexcept {
   apparatus::body_lifecycle_input input{};
   for (std::size_t slot = 0; slot < body::live_region_capacity; ++slot) {
-    input.regions[slot].morphology = 10U * (slot + 1U);
+    input.regions[slot].admitted_tally = 10U * (slot + 1U);
     input.regions[slot].current = slot + 1U;
   }
   input.request = event::deed_request{200'000'000U, 2, 5};
@@ -48,9 +48,9 @@ std::size_t r4_verification_failures(
       output.resume_state != event::lifecycle_status::exact ||
       output.commit.state != body::body_change_status::committed ||
       output.commit.predecessor.value() != seed || output.commit.successor.value() != seed + 1U ||
-      output.commit.admitted_tally_before != input.regions[input.request.region].morphology ||
+      output.commit.admitted_tally_before != input.regions[input.request.region].admitted_tally ||
       output.commit.admitted_tally_after !=
-          input.regions[input.request.region].morphology + input.returned_payload) {
+          input.regions[input.request.region].admitted_tally + input.returned_payload) {
     ++failures;
   }
   const std::uint64_t support = std::uint64_t{1} << input.request.region;
@@ -66,11 +66,11 @@ std::size_t r4_verification_failures(
     ++failures;
   }
   for (std::size_t slot = 0; slot < body::live_region_capacity; ++slot) {
-    const std::uint64_t expected_morphology = input.regions[slot].morphology +
+    const std::uint64_t expected_morphology = input.regions[slot].admitted_tally +
         (slot == input.request.region ? input.returned_payload : 0U);
     const std::uint64_t expected_current = slot == input.request.region
         ? input.returned_payload : input.regions[slot].current;
-    if (output.successor.regions[slot].morphology != expected_morphology ||
+    if (output.successor.regions[slot].admitted_tally != expected_morphology ||
         output.successor.regions[slot].current != expected_current) { ++failures; }
   }
   if (output.successor.head != seed + 1U ||

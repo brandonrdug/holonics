@@ -74,7 +74,7 @@ namespace holonics::receiver {
     const condensed_snapshot& left,
     const condensed_snapshot& right) noexcept {
   if (left.head != right.head || left.incidence != right.incidence ||
-      left.morphology != right.morphology || left.current != right.current ||
+      left.admitted_tally != right.admitted_tally || left.current != right.current ||
       left.lineage != right.lineage || left.logical_resource != right.logical_resource ||
       left.alternatives != right.alternatives || left.obstruction != right.obstruction ||
       left.source_count != right.source_count) {

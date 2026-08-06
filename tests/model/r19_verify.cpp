@@ -130,7 +130,7 @@ std::size_t r19_verification_failures(
       actual.final_continuation != exact::word{15'001'010};
   failures += handoff.integrity != event::characteristic_rest_integrity(handoff) ||
       handoff.body.head != 14'001'010 || handoff.body.continuation != 15'001'010 ||
-      handoff.body.regions[0].morphology != 217 ||
+      handoff.body.regions[0].admitted_tally != 217 ||
       handoff.first.identity != exact::word{181'200} || !handoff.first.accepted ||
       handoff.second.identity != exact::word{182'200} || !handoff.second.accepted ||
       handoff.geometry.identity != exact::word{184'300} || !handoff.geometry.accepted ||

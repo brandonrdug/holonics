@@ -32,7 +32,7 @@ failures(const holonics::apparatus::characteristic_executor_receipt &e,
     o.final_continuation.value() != 15'001'048);
   c(!r.applied || !r.application.accepted ||
     r.application.identity.value() != 200'302);
-  c(r.standing.standing.standing.body.regions[0].morphology != 1199);
+  c(r.standing.standing.standing.body.regions[0].admitted_tally != 1199);
   c(r.standing.standing.standing.mathematical_admitted_tally != 418 ||
     r.standing.standing.standing.codec_admitted_tally != 195);
   c(r.integrity != holonics::event::characteristic_rest_integrity(r));
@@ -113,8 +113,8 @@ int main(int argc, char **argv) {
        << "\nfinal_rest_bytes=" << sizeof(handoff)
        << "\nfinal_body=head:" << observation.final_head.value()
        << ",continuation:" << observation.final_continuation.value()
-       << ",morphology:"
-       << handoff.standing.standing.standing.body.regions[0].morphology
+       << ",admitted_tally:"
+       << handoff.standing.standing.standing.body.regions[0].admitted_tally
        << ",mathematical:"
        << handoff.standing.standing.standing.mathematical_admitted_tally
        << ",codec:" << handoff.standing.standing.standing.codec_admitted_tally

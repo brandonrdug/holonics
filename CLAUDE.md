@@ -23,7 +23,9 @@ the specific recurring failures observed across the Codex sessions of 2026-07-09
 
 ## 0. Fresh-session pickup
 
-Read this file first and in full. Then read `CONSTRUCTION_STATE.md` for the admitted position and
+Read this file first and in full. Then read **`blueprint/THE_SPINE.md`** — it says how much of the
+body each mechanism actually conducts through, and it is the shortest path to not repeating the
+error that produced it. Then `CONSTRUCTION_STATE.md` for the admitted position and
 `blueprint/EROS_EMBODIMENT_ROADMAP.md` for the ordered continuation. Do not re-read the archive by
 default.
 
@@ -83,10 +85,28 @@ port and the Phase 7 recut. Pushing remains Brandon's call, not yours.
 - The laboratory working tree is **frozen and dirty** — 52 files that participated in an interrupted
   invalid path. Port from `a07ff376` plus that checkpoint, never from the dirty tree.
 
-**Cost discipline.** The full suite takes about 33 minutes and the R30–R35 source-access and
-determinism tests dominate it. Run targeted `ctest -R` subsets for what you changed; reserve the
-full suite for a single end-of-phase gate. After a broad rename, **configure a clean build tree
-before trusting a green result** — stale objects have hidden a real inconsistency here before.
+**Cost discipline.** Measured 2026-08-06: 146 tests, 1,612 serial seconds. The frozen mathematical
+deeds `r11`-`r35` are **93.7%** of it; the audits, spine, and carriers that guard construction in
+progress are **101 seconds together**. Nothing is redundant within a run — each expensive group runs
+its deed three times because the three establish different facts (the deed, a byte-identical replay,
+a replay under a source-access probe). The waste is temporal: re-establishing a frozen owner's
+determinism after editing an unrelated owner catches nothing.
+
+```
+ctest -L 'audit|spine' -j 4     86 s   — what guards a change in progress
+ctest -L frozen-math            24 min — when a mathematical owner is touched
+ctest                           27 min — the milestone gate
+```
+
+Run the fast tier by default. Reach for `frozen-math` when you edit an owner under
+`include/holonics/organ/{trace,characteristic,arithmetic,hodge,toric}*` or anything `r11`-`r35`
+includes, and for the whole suite once at a milestone. After a broad rename, **configure a clean
+build tree before trusting a green result** — stale objects have hidden a real inconsistency here
+before, and a graph change can trip a ninja dyndep assertion that only a fresh tree clears.
+
+Open and unexplained: the `r34` discovery deed alone is **275 seconds** of exact integer work. That
+is a cost worth understanding before it is multiplied by three, but it is not a defect and is not
+scheduled.
 
 ## 1. The floor is a carrier, not a retired interface
 
@@ -292,6 +312,15 @@ The grading discipline in `canon/EPISTEMIC_GRADES.md` stands. Three additions:
   catches a capacity mismatch — it is not a banned token. Before borrowing a carrier, read the
   aperture it declares. The constraint deed misread a quintic because it called a degree-four
   divider. And a cross-check that cannot fail on the degenerate case is not a cross-check there.
+- **Reach is part of the grade.** A receipt says *this deed returned*; it does not say *the body
+  conducts through this*. State the reach — measured over the include graph by `r0.reach_audit`,
+  fifty milliseconds — in the receipt. A mechanism that cannot state its reach has not been graded.
+  Nine of six hundred and forty-nine went unnoticed for thirty-five steps because nothing asked.
+  Reach is a measurement, never a target; widening an include to raise it is the same defect as a
+  receipt overstating its code.
+- **Where an independent implementation exists, state both costs.** The conformance oracles *are*
+  independent implementations. One ran the identical algorithm 1,450 times faster than the deed it
+  was grading, and no test compared them because the parity test compares returns and never costs.
 - **A law that returns zero proves nothing about itself.** This is §8's tautology rule pointed the
   other way: a receipt that could not have come out otherwise carries no evidence, and so does a
   receipt that could not have come out at all. When the declared material cannot exercise a law —
