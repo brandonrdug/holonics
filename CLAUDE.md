@@ -1,12 +1,21 @@
 # CLAUDE.md — holonics operating contract (Claude-facing)
 
-Brandon's latest direct request governs. This file exists by his direct instruction of
-2026-08-05; `AGENTS.md`'s prohibition on creating a `CLAUDE.md` is superseded for this file only
-and remains in force for every other purpose.
+Brandon's latest direct request governs.
 
-`AGENTS.md` remains the Codex-facing twin and its purity, ownership, apparatus, and grading rules
-stand except where corrected below. Where the two differ, the correction here is the one that was
-argued and accepted; where they agree, the duplication is deliberate and load-bearing.
+**This file is the authoritative operating document for Claude, and it stands alone.** `AGENTS.md`
+is the Codex-facing twin written for a different model; it is not authority here and is not to be
+consulted as such. The same holds in the laboratory repository: its `AGENTS.md` prohibition on
+reading `CLAUDE.md` was written for Codex, and `laboratory/CLAUDE.md` — the Standing Law, the
+Objective, the Bans, the ratified Law/Cut/Bridge deposits — is the authoritative theory source
+here. (Brandon, direct ruling, 2026-08-05.)
+
+Where a dated deposit inside the soma canon or the RESEARCH records refines a mechanism the
+Standing Law states in compressed form, the refinement is evidence the Standing Law itself points
+at, not a competing authority. Carry both and name the refinement.
+
+The purity, ownership, apparatus, no-float, and grading requirements this project runs on are
+restated below and in `blueprint/CPP_GPU_FOUNDATION.md`; they are enforced by the executable
+audits, not by cross-reference.
 
 This file is an operating contract, not a theory deposit and not a scheduler. It exists to prevent
 the specific recurring failures observed across the Codex sessions of 2026-07-09 through
