@@ -176,7 +176,8 @@ production against an exterior checker, and the research ecology's contact front
 `72`; a source-detached remount returns `63` for a novel `7*9`; and exact ablation removes the
 route's structure so it stops conducting. The body retains the route, not the passages.
 
-**Regraded 2026-08-06 — the cost laws were not ported.** Reading the port against
+**Regraded 2026-08-06 — the cost laws were not ported, and Phase 7 movement 1 refounded them.**
+Reading the port against
 `suffix_ecology.rs` at checkpoint `93834398` establishes that three cost claims overstate the code:
 source-incidence formation is a cubic relaxation where the source is a linear depth-first walk;
 `span` rescans the occurrence population where the source reads a stored interval; and suffix
@@ -190,6 +191,50 @@ morphology, exact ablation removing later conduct, and source-detached condition
 aperture only.** The laboratory's scale figures are not claimed here; broad mounting is Phase 7.
 
 Receipt: [the ecology port receipt](receipts/PHASE_6_ECOLOGY_PORT_RECEIPT.md).
+
+## Phase 7 — broad mounting
+
+**Truth status:** `established-bounded` at the declared apertures.
+**Evidence tags:** `implemented-exact`, `computational-witness`.
+
+Three movements returned.
+
+**Movement 1 — the cost laws.** Suffix transitions became per-state fan-out held in canonical
+symbol order with a tail pointer; incidence formation became the source owner's `O(states)`
+child-chain build plus one explicit-stack depth-first walk; spans became stored intervals read
+rather than searched. Both implementations were instrumented identically and run at a quadrupled
+aperture: the superseded formation scaled `x27.57` and its lookup `x19.36`, against `x4.43` and
+`x4.46` refounded, on a bound of eight. **The state populations are identical under both — 80 and
+358 — so the returned structure did not change, only its cost.**
+
+**Movement 2 — the arena crossing.** `structure::resident_span` carries a pointer and an extent and
+owns nothing; the two ecologies became arenas of spans plus counters, with the fixed-capacity
+classes reduced to thin providers so every Phase 6 assertion returns identically. At 4,000
+informant paths: 26,031 states, 74,030 transitions, 48,000 caused occurrences, **23,968,000
+resident octets against 224 frame octets**, 1,024 device queries, zero parity failures, zero host
+replay work. The query laws take their arena by const reference, so a hot device path that founded
+anything **would not compile**. Doubling the corpus under a fixed germ alphabet raised formation
+`x1.27` and lookup `x1.91` — the remaining fan-out term is alphabet-set, not corpus-set, and that
+is measured.
+
+**Movement 3 — the mount.** This project's own record: **734 markdown containers, 37,278
+occurrences, 8,913,746 surface octets**, conditioned at a sixty-four-octet aperture into 2,430,094
+states and 3,679,276 transitions from 2,024,079 crossed octets; 636,445,538 resident octets against
+320 frame octets. The three literal gates return: `global_pair_population == 0`,
+`hot_host_replay_work == 0`, `bounded_delta_equal == true`, the last with an append delta of
+**fifty-six octets**. The rest is 10,703,154 octets and the remount founds the same body **from
+those octets alone**. Mount consumes the host and the consumed host refuses admission; a refused
+crossing returns its predecessor intact. All 37,278 document occurrences leave their causal fiber
+OPEN — corpus adjacency is not ancestry — and a declared control returns the one duplicate
+testimony and the one version fiber the corpus itself does not carry.
+
+**Not claimed.** The rollout importers are not ported, so the human/assistant/emanated population
+is absent and every occurrence carries `document`/`received`. The conditioning aperture is sixty-four
+octets; the full surface is rested and remounted exactly but only its prefix is conditioned. The
+laboratory's relation population and 101 MB route rest remain that body's figures.
+
+Receipt: [the broad mounting receipt](receipts/PHASE_7_BROAD_MOUNTING_RECEIPT.md). Artifacts:
+`receipts/PHASE_7_RESIDENT_MOUNT_DEED.txt`, `receipts/PHASE_7_BROAD_MOUNT_DEED.txt`.
 
 ## Construction provenance
 

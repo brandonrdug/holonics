@@ -1,0 +1,53 @@
+# Phase 7 resident mount deed
+
+## movement 1: the cost law, measured across a quadrupled aperture
+
+symbols 54 -> 216
+states 80 -> 358
+formation steps 366 -> 1622
+lookup steps 1465 -> 6526
+formation linear yes
+lookup linear yes
+
+## movement 2: the arena crossing
+
+### narrow aperture
+
+informant paths 2000
+germs per path 12
+states 24031
+transitions 48030
+caused occurrences 24000
+ordered sources 24000
+formation steps 120122
+lookup steps 10041087
+resident octets 23968000
+frame octets 224
+device answered queries 1024
+parity failures 0
+host replay work 0
+standing unchanged yes
+
+### declared aperture
+
+informant paths 4000
+germs per path 12
+states 26031
+transitions 74030
+caused occurrences 48000
+ordered sources 48000
+formation steps 152122
+lookup steps 19220371
+resident octets 23968000
+frame octets 224
+device answered queries 1024
+parity failures 0
+host replay work 0
+standing unchanged yes
+
+### the corpus scaling law
+
+the germ alphabet is fixed; the informant-path population doubles
+formation corpus-linear yes
+lookup corpus-linear yes
+device capability 8.9

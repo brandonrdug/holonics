@@ -76,5 +76,16 @@ int main() {
               << ablation.cultivated << "; source-detached returned "
               << ablation.novel_after_departure << " for novel 7*9; ablation stops conduct\n";
   }
+  const auto cost = holonics::tests::suffix_cost_law();
+  std::cerr << "phase 7 movement 1 cost law: symbols " << cost.small_symbols << " -> "
+            << cost.large_symbols << "; states " << cost.small_states << " -> "
+            << cost.large_states << "; formation " << cost.small_formation << " -> "
+            << cost.large_formation << "; lookup " << cost.small_lookup << " -> "
+            << cost.large_lookup << '\n';
+  if (!cost.holds) {
+    std::cerr << "PHASE 7 MOVEMENT 1 COST LAW FAILED: formation_linear="
+              << cost.formation_linear << " lookup_linear=" << cost.lookup_linear << '\n';
+    ++failures;
+  }
   return failures == 0 ? 0 : 1;
 }

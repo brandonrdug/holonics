@@ -447,12 +447,21 @@ anywhere in the conditioning path.
   selection; an obstructed proof path is retained because obstruction causes deeper motion.
 - **Observer aperture exhaustion is not linguistic rest.** Keep the three rest states distinct.
 
-## Phase 7 — Broad mounting
+## Phase 7 — Broad mounting — **ADMITTED 2026-08-06**
 
 **Recut 2026-08-06.** Phase 6 established the laws at an aperture of fifteen symbols. Reading that
 port against its source establishes that scale is not a parameter of it — three cost laws were not
 ported, and the ecologies are kernel-frame value types. Phase 7 is therefore three deeds in order,
 and only the third is the mount.
+
+**All three returned.** Movement 1: superseded formation `x27.57` and lookup `x19.36` against
+refounded `x4.43` and `x4.46` on a bound of eight, with identical state populations either way.
+Movement 2: 23,968,000 resident octets against 224 frame octets, zero parity failures, zero replay
+work, and corpus-doubling ratios of `x1.27` and `x1.91`. Movement 3: 734 containers, 37,278
+occurrences, 8,913,746 surface octets, all three literal gates returning, a fifty-six-octet append
+delta, and an exact remount from the rested octets alone.
+See [the broad mounting receipt](../receipts/PHASE_7_BROAD_MOUNTING_RECEIPT.md) for the boundary
+and the registered open fibers.
 
 ### 7.1 — Refound formation and lookup
 
@@ -534,6 +543,41 @@ declaration organ and its incidence, not by decrementing a counter.
 Worth stating plainly: **the laboratory never completed this deed.** `SESSION_HANDOFF.md:18-20`
 records the 2026-08-03 attempt as interrupted with its partial conditioning not admitted. This is
 new work in both bodies, and it is the first place the C++ body would genuinely lead.
+
+### What Phase 7 makes available, and the five movements it implies
+
+Every carrier this deed needs now stands. The plan is written against the owners that exist, so no
+movement below is a rederivation.
+
+- **8.1 — Declarations as mounted material.** Formal declarations cross through the Phase 7 mount
+  path as containers and sections, so the body **reaches** a declaration through the suffix ecology
+  and its source incidence rather than consulting a retained source face. `formal_production`'s
+  `mount_clean` already convicts the alternative: *a mount that retained a source face has already
+  contaminated the body it was meant to prepare.* Grade: a declaration reachable by span, with the
+  mounted body holding motions and zero mathematics.
+- **8.2 — Obstruction-driven local-star composition.** `compositions_caused` already carries the
+  law — an obstructed one-organ path is retained and licenses composition — and `select_target`
+  already refuses rather than substituting. This movement wires them to the reached population.
+  Grade: the composition population is caused by retained obstructions and by nothing else.
+- **8.3 — The first theorem.** Generate, cross the exterior checker through the standing apparatus
+  process, and retain the returned fiber. `may_cultivate` bars a partial family, so the crossing
+  stays open until every generated candidate returns. Grade: a real kernel acceptance on a real
+  generated passage, with the rejected passages retained beside it.
+- **8.4 — Conditioning on the return.** The kernel's acceptance and obstruction change **which
+  motions are reachable later**, through the training ecology's recurrence-gated route activation —
+  minimum two, refused below it. Grade: a motion reachable after the return that was not reachable
+  before, with the structural difference exhibited.
+- **8.5 — The second theorem and the exact ablation.** A second theorem depending on the first's
+  returned fiber, then that fiber **removed structurally** — the declaration organ and its
+  incidence deleted, using `training_ecology::ablate`, which removes structure and not a counter —
+  and the second theorem's acceptance must disappear.
+
+**Grade condition.** The second theorem is kernel-accepted with the fiber standing and is
+**obstructed** with it excluded, and the excluded run's obstruction is retained and readable.
+
+**Falsifier.** The second theorem is still accepted after structural exclusion. That would mean the
+dependency was decorative, which is precisely the failure Phase 0 convicted in its
+constant-subtraction form, and it must be reported as a falsification rather than repaired around.
 
 ---
 

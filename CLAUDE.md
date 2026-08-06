@@ -27,20 +27,37 @@ Read this file first and in full. Then read `CONSTRUCTION_STATE.md` for the admi
 `blueprint/EROS_EMBODIMENT_ROADMAP.md` for the ordered continuation. Do not re-read the archive by
 default.
 
-**Where the work stands (2026-08-05).** Phases 0–6 of the embodiment roadmap are admitted: the
+**Where the work stands (2026-08-06).** Phases 0–7 of the embodiment roadmap are admitted: the
 contaminated conditioning layer is excised and regraded, and the spine — minimum carrier, substrate,
 Swing and Standing, live machine and rest, causal-information receipt — is built, GPU-graded, and
-committed. The nine ecologies are ported and the phase grade — mounted-only withholds, cultivated returns, source-detached returns a novel product, ablation stops conduct — returned. **Phase 7, broad mounting, is next**, recut into three deeds: refound formation and lookup, cross to resident arenas, then mount.
+committed. The nine ecologies are ported and the phase grade — mounted-only withholds, cultivated returns, source-detached returns a novel product, ablation stops conduct — returned. **Phase 7 is admitted in all three of its movements**, and **Phase 8, mathematical production on the conditioned body, is next.**
 
-The recut has its own lesson. Phase 6's returned laws are exact and stand, but three of its **cost**
-claims overstated the code — a cubic relaxation where the source owner walks the tree once, a
-rescan where the source reads a stored interval, a flat scanned transition array where the source
-holds per-state fan-out. All three are correct at fifteen symbols and none completes at 11,879
-states. §8 caught this in my own work one phase after it caught the contamination. **A cost law is
-a law. Porting the return without the cost is not porting.**
+Phase 7's recut has its own lesson. Phase 6's returned laws are exact and stand, but three of its
+**cost** claims overstated the code — a cubic relaxation where the source owner walks the tree
+once, a rescan where the source reads a stored interval, a flat scanned transition array where the
+source holds per-state fan-out. All three are correct at fifteen symbols and none completes at
+11,879 states. §8 caught this in my own work one phase after it caught the contamination. **A cost
+law is a law. Porting the return without the cost is not porting.**
 
-Three commits sit unpushed on `main`: the roadmap recut, the Phase 0 excision, and the Phase 1–5
-spine. Pushing is Brandon's call, not yours.
+**What Phase 7 returned.** Movement 1 refounded those three against the source owner and measured
+both implementations at a quadrupled aperture — superseded `x27.57` and `x19.36`, refounded `x4.43`
+and `x4.46`, on a bound of eight, with identical state populations either way. Movement 2 made both
+ecologies arenas of spans: **23,968,000 resident octets against 224 frame octets**, and the query
+laws take their arena by const reference so a hot device path that founded anything would not
+compile. Movement 3 mounted this project's own record — **734 containers, 37,278 occurrences,
+8,913,746 surface octets** — with all three literal gates returning, an append delta of fifty-six
+octets, and an exact remount from the rested octets alone. What is *not* claimed: the rollout
+importers, the human/assistant/emanated population, whole-surface conditioning past the
+sixty-four-octet aperture, and the laboratory's relation population and route rest.
+
+Two things worth carrying. **A law that returns zero proves nothing about itself** — the corpus
+carries no repeat and no revision, so the plurality laws needed a declared control to be exercised
+rather than merely present, and the grade requires it. And the audit caught three things the author
+did not: `half` as a variable name, `7.1` as a phase number, and `double`/`float` standing alone in
+prose. Phase numbering in sources is **movement** numbering for that reason.
+
+`main` was pushed to `origin` on 2026-08-06 at Brandon's direct instruction, through the Phase 6
+port and the Phase 7 recut. Pushing remains Brandon's call, not yours.
 
 **What is true and easy to get wrong:**
 
@@ -255,6 +272,15 @@ The grading discipline in `canon/EPISTEMIC_GRADES.md` stands. Three additions:
   `counterexample` or `open` with the exact blindness proved, and do not treat the phase as failed.
 - **An aperture-complete instrument must say so.** When an atlas has exhausted its declared
   aperture, record the completeness and the aperture law rather than leaving it looking extensible.
+- **A cost law is a law.** Reproducing what an owner returns without reproducing what it costs is
+  not porting it. Grade the complexity against the source owner, measure both across a changed
+  aperture, and state the bound as a falsifier. Phase 7 movement 1 exists because this was missed.
+- **A law that returns zero proves nothing about itself.** This is §8's tautology rule pointed the
+  other way: a receipt that could not have come out otherwise carries no evidence, and so does a
+  receipt that could not have come out at all. When the declared material cannot exercise a law —
+  no repeat, no revision, no obstruction — add a declared control that does, and make the grade
+  require it to return non-zero. Otherwise the law is present in the code and absent from the
+  evidence, which is exactly the gap §13 convicted.
 
 ## 9. Construction conduct
 
@@ -319,6 +345,17 @@ the structural form of what is missing on the RH side.
 population, with a certified remainder and a reopening rule keyed to the receiver family.** Its
 prerequisite — a certified exact enclosure carrier — is promised in `canon/08` §3 and does not yet
 exist as a built instrument. That is the first brick.
+
+**The trivial instance is already built, and its triviality is the content.** Phase 7 movement 1
+refounded the source-incidence walk: a depth-first order over the suffix-link tree replaces every
+state's descendant population with a two-word interval, exactly, with an empty remainder. That *is*
+a far-field condensation with a compact realizer — free, because the incidence is a **tree**, where
+subtree equals interval and the interval is its own reopening rule. So the difficulty §11 names
+lives entirely in the departure from tree-ness, and there is a standard object for it:
+spanning-tree interval labelling, where every non-tree edge forces additional intervals and **that
+forced population is the certified remainder**, zero exactly when the incidence is a forest. This
+is `interpretation`, not a bridge to any Millennium result; see
+[the record](research/records/2026-08-06_THE_TREE_CONDENSES_FOR_FREE_THE_REMAINDER_IS_THE_DEPARTURE_FROM_A_FOREST.md).
 
 ## 12. Standing corrections to the record
 

@@ -37,3 +37,23 @@ struct ablation_return final {
 };
 [[nodiscard]] ablation_return cultivation_ablation();
 }  // namespace holonics::tests
+
+namespace holonics::tests {
+/// phase 7 movement 1: the cost law of the suffix ecology, measured across a quadrupled
+/// aperture. Formation and lookup must stay linear; the returned work figures
+/// are the artifact and the ratio bound is the falsifier.
+struct cost_return final {
+  std::uint32_t small_symbols{};
+  std::uint32_t large_symbols{};
+  std::uint32_t small_states{};
+  std::uint32_t large_states{};
+  std::uint64_t small_formation{};
+  std::uint64_t large_formation{};
+  std::uint64_t small_lookup{};
+  std::uint64_t large_lookup{};
+  bool formation_linear{};
+  bool lookup_linear{};
+  bool holds{};
+};
+[[nodiscard]] cost_return suffix_cost_law();
+}  // namespace holonics::tests

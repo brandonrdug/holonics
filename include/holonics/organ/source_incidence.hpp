@@ -3,201 +3,113 @@
 #include <cstddef>
 #include <cstdint>
 
+#include <holonics/organ/incidence_arena.hpp>
 #include <holonics/organ/suffix_automaton.hpp>
 
 namespace holonics::organ {
 
-/// **The source-incidence storage law, ported. Its formation is not.**
+/// A fixed-capacity provider of one incidence arena.
 ///
-/// Suffix links form a rooted tree. A depth-first order over that tree makes
-/// every state's descendant population **contiguous**, so a state's sources are
-/// one span into a single shared array. Storage is therefore
-/// `O(states + caused occurrences)` and **never `states x sources`** — the naive
-/// table does not fit at laboratory scale. That law holds here.
-///
-/// **The cost law does not.** The source owner
-/// (`suffix_ecology.rs:338` at checkpoint `93834398`) forms `first_child` /
-/// `next_sibling` from the links in `O(states)` and emits every span in one
-/// explicit-stack depth-first walk, `O(states + occurrences)`. `freeze` below
-/// substitutes a fixpoint relaxation and a per-state subtree rescan, which is
-/// cubic in the state population, and `span` rescans the whole occurrence
-/// population per query instead of reading a stored span. Both are exact and
-/// both are correct at the declared aperture; **neither survives broad
-/// mounting**, and refounding them is Phase 7.
-struct source_span final {
-  std::uint32_t start{};
-  std::uint32_t length{};
-};
-
-struct source_occurrence final {
-  std::uint32_t state{};
-  std::uint32_t source{};
-  std::uint32_t position{};
-};
-
+/// **The laws live in `incidence_law` over `incidence_arena`, not here.** This
+/// owner carries its own pages for a small declared aperture; at corpus scale
+/// the apparatus provides the same eight spans out of resident storage and the
+/// identical laws run over them.
 template<std::size_t StateCapacity, std::size_t OccurrenceCapacity>
 class source_incidence final {
   static_assert(StateCapacity > 0 && OccurrenceCapacity > 0);
 
  public:
-  HOLONICS_CALLABLE constexpr source_incidence() noexcept : enter_{}, leave_{}, occurrences_{} {}
+  HOLONICS_CALLABLE constexpr source_incidence() noexcept
+      : staged_{}, staged_next_{}, ordered_sources_{}, spans_{}, direct_head_{},
+        first_child_{}, next_sibling_{}, walk_stack_{} {
+    arena_.staged =
+        structure::resident_span<source_occurrence>{staged_, OccurrenceCapacity};
+    arena_.staged_next =
+        structure::resident_span<std::uint32_t>{staged_next_, OccurrenceCapacity};
+    arena_.ordered_sources =
+        structure::resident_span<std::uint32_t>{ordered_sources_, OccurrenceCapacity};
+    arena_.spans = structure::resident_span<source_span>{spans_, StateCapacity};
+    arena_.direct_head =
+        structure::resident_span<std::uint32_t>{direct_head_, StateCapacity};
+    arena_.first_child =
+        structure::resident_span<std::uint32_t>{first_child_, StateCapacity};
+    arena_.next_sibling =
+        structure::resident_span<std::uint32_t>{next_sibling_, StateCapacity};
+    arena_.walk_stack =
+        structure::resident_span<std::uint32_t>{walk_stack_, StateCapacity};
+    static_cast<void>(incidence_law::try_open(arena_));
+  }
+  source_incidence(const source_incidence&) = delete;
+  source_incidence& operator=(const source_incidence&) = delete;
+  source_incidence(source_incidence&&) = delete;
+  source_incidence& operator=(source_incidence&&) = delete;
+
+  [[nodiscard]] HOLONICS_CALLABLE constexpr incidence_arena& arena() noexcept {
+    return arena_;
+  }
+  [[nodiscard]] HOLONICS_CALLABLE constexpr const incidence_arena& arena() const noexcept {
+    return arena_;
+  }
 
   [[nodiscard]] HOLONICS_CALLABLE constexpr std::uint32_t occurrences() const noexcept {
-    return occurrences_used_;
+    return arena_.staged_used;
   }
-  [[nodiscard]] HOLONICS_CALLABLE constexpr const source_occurrence* at(
+  [[nodiscard]] HOLONICS_CALLABLE constexpr std::uint32_t ordered() const noexcept {
+    return arena_.ordered_used;
+  }
+  /// One source in depth-first emission order. The state it belongs to is
+  /// implied by the span that covers it — no per-occurrence state is retained
+  /// after formation.
+  [[nodiscard]] HOLONICS_CALLABLE constexpr std::uint32_t ordered_source(
       std::uint32_t slot) const noexcept {
-    return slot < occurrences_used_ ? &occurrences_[slot] : nullptr;
+    return slot < arena_.ordered_used ? arena_.ordered_sources.at(slot) : no_state;
+  }
+  /// Steps spent forming the incidence. Physical testimony; it enters no
+  /// admission, no ordering, and no return.
+  [[nodiscard]] HOLONICS_CALLABLE constexpr std::uint64_t formation_steps() const noexcept {
+    return arena_.formation_steps;
   }
 
-  /// Record that one caused occurrence of `source` ended at `state`.
   [[nodiscard]] HOLONICS_CALLABLE constexpr bool try_admit(
       std::uint32_t state,
       std::uint32_t source) noexcept {
-    if (occurrences_used_ >= OccurrenceCapacity) {
-      return false;
-    }
-    occurrences_[occurrences_used_] = source_occurrence{state, source, 0};
-    occurrences_used_ = occurrences_used_ + 1U;
-    return true;
+    return incidence_law::try_admit(arena_, state, source);
   }
 
-  /// Form the depth-first intervals over the suffix-link tree and sort the
-  /// occurrence population into that order. After this, a state's sources are a
-  /// contiguous run.
-  ///
-  /// **Cost:** a relaxation to a fixpoint over the link parents, then a subtree
-  /// rescan per state that walks every other state's link chain. Cubic in the
-  /// state population where the source owner is linear. Correct, and refused at
-  /// scale.
   template<std::size_t TransitionCapacity>
   [[nodiscard]] HOLONICS_CALLABLE constexpr bool freeze(
       const suffix_automaton<StateCapacity, TransitionCapacity>& automaton) noexcept {
-    const std::uint32_t states = automaton.states();
-    if (states > StateCapacity) {
-      return false;
-    }
-    std::uint32_t clock = 0;
-    for (std::uint32_t state = 0; state < states; ++state) {
-      enter_[state] = no_state;
-      leave_[state] = 0;
-    }
-    // Iterative post-order over the link tree: a state may be entered only after
-    // its parent. Depth is bounded by the state count, so this terminates.
-    for (std::uint32_t depth = 0; depth <= states; ++depth) {
-      bool advanced = false;
-      for (std::uint32_t state = 0; state < states; ++state) {
-        if (enter_[state] != no_state) {
-          continue;
-        }
-        const std::uint32_t parent = automaton.at(state)->link;
-        if (parent != no_state && enter_[parent] == no_state) {
-          continue;
-        }
-        enter_[state] = clock;
-        clock = clock + 1U;
-        advanced = true;
-      }
-      if (!advanced) {
-        break;
-      }
-    }
-    for (std::uint32_t state = 0; state < states; ++state) {
-      if (enter_[state] == no_state) {
-        return false;
-      }
-    }
-    // A state's subtree is every state whose chain of links passes through it.
-    for (std::uint32_t state = 0; state < states; ++state) {
-      std::uint32_t highest = enter_[state];
-      for (std::uint32_t other = 0; other < states; ++other) {
-        std::uint32_t walk = other;
-        for (std::uint32_t step = 0; step <= states; ++step) {
-          if (walk == state) {
-            highest = enter_[other] > highest ? enter_[other] : highest;
-            break;
-          }
-          if (walk == no_state) {
-            break;
-          }
-          walk = automaton.at(walk)->link;
-        }
-      }
-      leave_[state] = highest + 1U;
-    }
-    for (std::uint32_t slot = 0; slot < occurrences_used_; ++slot) {
-      occurrences_[slot].position = enter_[occurrences_[slot].state];
-    }
-    for (std::uint32_t slot = 1; slot < occurrences_used_; ++slot) {
-      const source_occurrence carried = occurrences_[slot];
-      std::uint32_t place = slot;
-      while (place > 0 && occurrences_[place - 1U].position > carried.position) {
-        occurrences_[place] = occurrences_[place - 1U];
-        place = place - 1U;
-      }
-      occurrences_[place] = carried;
-    }
-    frozen_ = true;
-    return true;
+    return incidence_law::freeze(arena_, automaton.arena());
   }
 
-  /// The contiguous span of occurrences whose end state lies in this state's
-  /// subtree. No per-state table exists — and no per-state span is stored
-  /// either, so this **rescans the occurrence population** rather than reading
-  /// the interval the depth-first walk already knew. Linear per query.
   [[nodiscard]] HOLONICS_CALLABLE constexpr source_span span(
       std::uint32_t state) const noexcept {
-    source_span found{};
-    if (!frozen_ || state >= StateCapacity || enter_[state] == no_state) {
-      return found;
-    }
-    const std::uint32_t low = enter_[state];
-    const std::uint32_t high = leave_[state];
-    std::uint32_t begin = occurrences_used_;
-    std::uint32_t end = occurrences_used_;
-    for (std::uint32_t slot = 0; slot < occurrences_used_; ++slot) {
-      const std::uint32_t position = occurrences_[slot].position;
-      if (position >= low && position < high) {
-        begin = begin == occurrences_used_ ? slot : begin;
-        end = slot + 1U;
-      }
-    }
-    if (begin == occurrences_used_) {
-      return found;
-    }
-    found.start = begin;
-    found.length = end - begin;
-    return found;
+    return incidence_law::span(arena_, state);
   }
-
-  /// Does `source` reach `state`? Answered from the span, never by scanning the
-  /// whole population.
   [[nodiscard]] HOLONICS_CALLABLE constexpr bool reaches(
       std::uint32_t state,
       std::uint32_t source) const noexcept {
-    const source_span found = span(state);
-    for (std::uint32_t slot = 0; slot < found.length; ++slot) {
-      if (occurrences_[found.start + slot].source == source) {
-        return true;
-      }
-    }
-    return false;
+    return incidence_law::reaches(arena_, state, source);
   }
 
-  /// The storage this attribution costs. It is linear in states plus caused
+  /// The storage this attribution costs. Linear in states plus caused
   /// occurrences; the refused alternative would have been their product.
   [[nodiscard]] HOLONICS_CALLABLE constexpr std::uint64_t linear_cost(
       std::uint32_t states) const noexcept {
     return static_cast<std::uint64_t>(states) +
-        static_cast<std::uint64_t>(occurrences_used_);
+        static_cast<std::uint64_t>(arena_.ordered_used);
   }
 
  private:
-  std::uint32_t enter_[StateCapacity]{};
-  std::uint32_t leave_[StateCapacity]{};
-  source_occurrence occurrences_[OccurrenceCapacity]{};
-  std::uint32_t occurrences_used_{};
-  bool frozen_{};
+  source_occurrence staged_[OccurrenceCapacity]{};
+  std::uint32_t staged_next_[OccurrenceCapacity]{};
+  std::uint32_t ordered_sources_[OccurrenceCapacity]{};
+  source_span spans_[StateCapacity]{};
+  std::uint32_t direct_head_[StateCapacity]{};
+  std::uint32_t first_child_[StateCapacity]{};
+  std::uint32_t next_sibling_[StateCapacity]{};
+  std::uint32_t walk_stack_[StateCapacity]{};
+  incidence_arena arena_{};
 };
 
 }  // namespace holonics::organ
