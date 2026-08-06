@@ -37,6 +37,14 @@ proof splices that name out of the standing, and structural exclusion removes bo
 route so nothing is emitted. A foil with the same proof term and the first theorem absent is refused
 by the kernel independently.
 
+**The constraint line is open and has its first deed.** A constraint equation is a `Chi` — two
+transports asserted equal — and the unknown is whatever the present chart does not determine.
+`x^5 - x - 1` returns a computed obstruction (transitive plus a transposition proves the group is
+not solvable, so no radical tower reaches the root), the rebase determines the unknown in the chart
+the obstruction names, and the invariant retained is the group rather than either local reading. See
+[the constraint record](research/records/2026-08-06_THE_CONSTRAINT_IS_THE_CHI_THE_UNKNOWN_IS_THE_MISSING_CHART.md),
+which also registers **counterexample search** as the standing application on Brandon's direction.
+
 Phase 7's recut has its own lesson. Phase 6's returned laws are exact and stand, but three of its
 **cost** claims overstated the code — a cubic relaxation where the source owner walks the tree
 once, a rescan where the source reads a stored interval, a flat scanned transition array where the
@@ -280,6 +288,10 @@ The grading discipline in `canon/EPISTEMIC_GRADES.md` stands. Three additions:
 - **A cost law is a law.** Reproducing what an owner returns without reproducing what it costs is
   not porting it. Grade the complexity against the source owner, measure both across a changed
   aperture, and state the bound as a falsifier. Phase 7 movement 1 exists because this was missed.
+- **An organ used past its declared aperture is a defect even when it appears to return.** No audit
+  catches a capacity mismatch — it is not a banned token. Before borrowing a carrier, read the
+  aperture it declares. The constraint deed misread a quintic because it called a degree-four
+  divider. And a cross-check that cannot fail on the degenerate case is not a cross-check there.
 - **A law that returns zero proves nothing about itself.** This is §8's tautology rule pointed the
   other way: a receipt that could not have come out otherwise carries no evidence, and so does a
   receipt that could not have come out at all. When the declared material cannot exercise a law —

@@ -139,6 +139,7 @@ include(cmake/PhaseSpine.cmake)
 include(cmake/PhaseResidentMount.cmake)
 include(cmake/PhaseTextMount.cmake)
 include(cmake/ConditionedProduction.cmake)
+include(cmake/ConstraintRebase.cmake)
 
 string(JOIN " " R0_DEVICE_FLAGS_RECEIPT ${R0_DEVICE_COMMON_FLAGS})
 set(HOLONICS_DECLARED_COMMANDS

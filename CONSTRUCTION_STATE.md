@@ -269,6 +269,39 @@ compose whole proofs from the exact organs, is the next deed.
 Receipt: [the conditioned production receipt](receipts/CONDITIONED_PRODUCTION_RECEIPT.md).
 Artifact: `receipts/CONDITIONED_PRODUCTION_DEED.txt`.
 
+## The constraint rebase
+
+**Truth status:** `established-bounded` at the declared aperture; the group-theoretic step is
+`proved-standard`.
+**Evidence tags:** `implemented-exact`, `computational-witness`.
+
+A constraint is a `Chi` — two transports asserted equal — and the unknown is whatever the present
+chart does not determine. For `x^5 - x - 1`, two primes out of a declared thirty-six settle it:
+`p=3` returns an irreducible quintic, witnessing transitivity, and `p=2` returns cycle type `(2,3)`,
+whose cube is a transposition. A transitive subgroup of the symmetric group on a prime number of
+points carrying a transposition is the whole group, and on five points that group is not solvable —
+so **no tower of cyclic charts reaches the root**. The obstruction is computed, and the aperture is
+abandoned the moment the witnesses stand.
+
+The rebase is then the chart the obstruction names: at `p=2` the constraint resolves into
+`x^2 + x + 1` and `x^3 + x^2 + 1`, whose product is the reduction, and **the unknown is determined
+there**. The two readings disagree as charts — `(5)` against `(2,3)` — and agree as a group; it is
+the group, not either reading, that is retained.
+
+The control `x^5 - 2` has the same shape and a different reach: at `p=151` its five roots form a
+coset of the fifth roots of unity, which is the radical tower witnessed locally. The asymmetry is
+proved on both sides.
+
+**A defect this deed found.** It first read `(5)` at `p=2`, wrongly, because it borrowed
+`arithmetic_field_detail::polynomial_divides` — an organ whose **declared aperture is degree four**.
+A quintic writes one slot past its remainder. Using an organ past its declared aperture is a defect
+even when it appears to return, and no audit catches it. The quintic now carries its own remainder.
+The deed's own product-agreement cross-check did not catch it either, because a single claimed
+factor equal to the whole reduction agrees with itself.
+
+Receipt: [the constraint rebase receipt](receipts/CONSTRAINT_REBASE_RECEIPT.md).
+Artifact: `receipts/CONSTRAINT_REBASE_DEED.txt`.
+
 ## Construction provenance
 
 **Truth status:** `historical`.

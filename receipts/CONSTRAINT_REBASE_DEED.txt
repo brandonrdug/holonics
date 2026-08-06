@@ -1,0 +1,42 @@
+# The constraint rebase deed
+
+A constraint is a Chi: two transports asserted equal. The unknown is
+whatever the present chart does not determine.
+
+## the constraint x^5 - x - 1, read across the prime aperture
+
+  p=2 type=(2,3) squarefree=yes product=agrees -> transposition
+  p=3 type=(5) squarefree=yes product=agrees -> transitivity
+  both witnesses stand; the aperture is not walked further
+
+transitivity witnessed at p=3
+transposition witnessed at p=2
+obstruction 2 (the group is the whole symmetric group on five points,
+  which is not solvable, so no tower of cyclic charts reaches
+  the root: the unknown is unreachable by radicals)
+
+## the rebase
+
+the chart the obstruction names is the finite one at p=2, where the unknown IS determined:
+  factor of degree 2: 1 1 1
+  factor of degree 3: 1 0 1 1
+  the factor degrees account for 5 of 5 roots
+  the product of the factors equals the reduction: yes
+
+## the invariant across charts
+
+the two readings differ as charts and agree as a group:
+  p=3 type=(5) squarefree=yes product=agrees
+  p=2 type=(2,3) squarefree=yes product=agrees
+both cycle types are realized inside one group, and it is that group,
+not either local reading, that the body retains
+
+## the control x^5 - 2, whose unknown the radical chart does reach
+
+at p=151 the roots are 22 25 49 90 116
+and they form a coset of the fifth roots of unity: every root is one
+root times a unit, which is the radical tower witnessed locally
+the aperture was walked 36 primes deep before the case appeared
+
+the same shape of constraint; different reach; the difference is proved
+and not assumed
