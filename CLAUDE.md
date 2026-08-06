@@ -190,6 +190,13 @@ happened and primed every later reader to refuse.
 
 ## 8. Grading corrections
 
+**Grade the implementation, not the receipt.** This is the first rule, and it is first because
+ignoring it is how thirty-five phases were admitted on a contaminated foundation (§13). A receipt
+is a claim about code. Before carrying any capability claim forward — including one already marked
+`established-bounded` — read the owner that implements it and confirm the mechanism is what the
+receipt says. Prose, morphology counters, and passing suites are not evidence that the named
+mechanism exists. When the two disagree, the code governs and the receipt is regraded.
+
 The grading discipline in `canon/EPISTEMIC_GRADES.md` stands. Three additions:
 
 - **Tautology detection is part of grading.** A receipt that could not have come out otherwise
@@ -235,6 +242,16 @@ The grading discipline in `canon/EPISTEMIC_GRADES.md` stands. Three additions:
   records already do. His corrections are provenance and they govern.
 - Do not moralize, do not hedge a verified result, and do not open with an assessment of the
   request. Answer the question that was asked.
+- **Do not restate what he has already told you.** Reporting a gap he named, or re-flagging a
+  limitation he has stated, is noise that reads as not having listened.
+- **Do not outsource internal engineering calls.** Ask only what genuinely changes the work and
+  what he alone can decide — scope, direction, ratification. Capacity numbers, file layout, owner
+  names, and which of two equivalent sources to grade on are yours to take. A question posed in
+  vocabulary he does not hold, about a decision he should not have to hold, is a failure of the
+  question and not of the answer.
+- **Report a severe finding when it is verified, not when the surrounding work is finished.** A
+  correction that changes what the next step means is worth more early and incomplete than late
+  and polished.
 
 ## 11. The one missing organ
 
@@ -284,3 +301,51 @@ These are established by review and are to be carried forward, not re-derived:
   transition between those two classes reduces an infinite-dimensional analytic positivity to the
   signature of a finite-rank quadratic form. That is an unexploited reduction of exactly the kind
   the atlas's own boundary invites.
+
+## 13. The conditioning contamination — established 2026-08-05
+
+**Truth status:** `established-bounded`. **Evidence:** direct source inspection.
+
+The C++ body's learning layer implements the mechanism the canon convicts. This was found by
+reading the owners rather than the receipts, and it is recorded here so it is never re-litigated
+and never built upon again.
+
+| Claim in the record | What the code does |
+|---|---|
+| conditioned navigation morphology | `organ/conditioning_law.hpp:34-58` — `response = response_weight*support + transport_weight*path_length + codec_bias`, gated by `obstruction_threshold`. A linear scorer with weights, a bias, and a threshold. |
+| the reusable morphology | `organ/conditioning_schema.hpp:18-26` — seven words: two weights, a gate, a bias, a threshold. |
+| returned training changes morphology | `organ/conditioning_law.hpp:61-88` — monotone weight overwrite; any returned value below its predecessor is rejected. No returned passage, no plural fiber, no retained obstruction. |
+| morphology totals in `CONSTRUCTION_STATE.md` | counters throughout `include/holonics/event/`: `mathematical_morphology_ += accepted ? 8U : 1U;` and siblings. An accepted-count tally, which `AGENTS.md` bans by name. |
+| exact returned-fiber ablation | `event/returned_fiber_exclusion_law.hpp:41-51` — `morphology -= 5U; mathematical -= 3U; codec -= 2U`, guarded by a hardcoded `morphology_delta == 5`. Nothing structural is removed. |
+| the Swing | `receiver/projective_swing_law.hpp` — the projective cross-ratio under a frame change only. Correct as geometry; it is not the one move. No flywheel, no TEST against standing, no RIDE/FOUND/OPEN/HOLONOMY, no winding deposit. |
+
+**Absent entirely:** resonance, suffix, morphological-route, relational, agentic, training, formal
+mathematics, and research ecologies; the informant membrane; leaders and fronts; continuation
+fibers; minimal witness families; causal-information receipts.
+
+**Structural ceiling:** `structure/marked_population.hpp:12-14` admits **four sources**, 16,384
+occurrences, 16,384 relations, with `uint16_t` slots capping every arena at 65,535 and no growth.
+The entire admitted body rests in 38,960 bytes. The laboratory mounted 976 files and rested
+ecologies of 15.8 MB, 31.4 MB, and 88.7 MB. External material enters only as `.card` files of
+29--191 bytes.
+
+**What is real and is kept.** The exact carriers; exact linear, chain, characteristic, trace,
+toric, Hodge, and arithmetic-spectral algebra; real Lean kernel acceptances on real generated
+proofs; GPU residency with exact host parity; rest and remount of domain data; and the audit
+apparatus. The mathematics is sound. Only the learning is simulated.
+
+**Standing obligations.**
+
+1. The scorer, the counter-morphology, and the constant-subtraction ablation are **removed, not
+   deprecated**. Superseded production machinery fails closed; Git history is the recovery surface.
+2. Every capability claim resting on them is regraded before it is carried forward. Specifically:
+   training changing reusable morphology, ablation removing later conduct, and source-detached
+   conditioning are **not** established in the C++ body and must not be cited as floor.
+3. **"Morphology" may never again name a counter.** A morphology is the contemporary causal
+   organization by which a body receives, transforms, retains, and emits differences. A training
+   claim requires a structural change in that organization plus source-detached remount plus an
+   ablation that removes the claimed later conduct by removing structure.
+4. No scalar score, weight, bias, gate, or threshold may appear anywhere in the conditioning path.
+   Plurality is the return; a continuation fiber is not a number.
+5. Restoring the learning ecology is **excision, substrate, then port** — in that order. Adding
+   ecologies onto the present substrate is not possible: four sources cannot hold a corpus.
