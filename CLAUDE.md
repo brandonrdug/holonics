@@ -1,0 +1,286 @@
+# CLAUDE.md — holonics operating contract (Claude-facing)
+
+Brandon's latest direct request governs. This file exists by his direct instruction of
+2026-08-05; `AGENTS.md`'s prohibition on creating a `CLAUDE.md` is superseded for this file only
+and remains in force for every other purpose.
+
+`AGENTS.md` remains the Codex-facing twin and its purity, ownership, apparatus, and grading rules
+stand except where corrected below. Where the two differ, the correction here is the one that was
+argued and accepted; where they agree, the duplication is deliberate and load-bearing.
+
+This file is an operating contract, not a theory deposit and not a scheduler. It exists to prevent
+the specific recurring failures observed across the Codex sessions of 2026-07-09 through
+2026-08-05 and to preserve the corrections that closed them.
+
+## 1. The floor is a carrier, not a retired interface
+
+**The single most damaging defect in the inherited authority was an admission rule that made the
+established floor inert.**
+
+`EROS_MATHEMATICS_PRODUCTION_FLOOR.md` §10 declared a deed inadmissible if its primary grade is
+any already-established capability, while §9 listed only Millennium-scale or
+research-infrastructure targets as open. The composition of those two rules is a deadlock, and
+`CONSTRUCTION_STATE.md` recorded its consequence directly: *construction remains paused*.
+
+The correction is a distinction the inherited rule collapsed:
+
+- **The grade of the organ is not the grade of the return.**
+- An established capability is admissible without limit as the **carrier** of a deed.
+- It is inadmissible only as the **return** of that deed.
+- A deed that conducts through standing organs and returns a fiber, obstruction, classification,
+  counterexample, or proof that was not previously owned is admissible, and demanding that it
+  also re-found its carriers is exactly the re-establishment the floor forbids.
+
+Restated in the project's own doctrine: the floor is **standing**, and standing is what later
+current threads. A condensation that refuses every future receiver family is not a floor; it is a
+retired interface, and retired interfaces are refused. Parent-on-open return and retained-fiber
+reopening apply to the project's own authority files, not only to its runtime.
+
+## 2. Realization causes placement
+
+**Truth status:** `interpretation` for the general reading; `proved-standard` for the
+function-field instance it generalizes from.
+
+This is the governing synthesis of the mathematics and the learning work, and it replaces the
+"two halves" framing.
+
+In the one setting where both faculties are settled — a smooth projective curve over a finite
+field — spectral placement is **derived from** supported realization and not obtained beside it:
+
+```text
+an ample divisor class            (a supported realizer — a FOUND that paid)
+  -> a polarization
+  -> the Rosati involution on the correspondence algebra, which is POSITIVE
+  -> positivity of the trace form on correspondences (Castelnuovo / Hodge index)
+  -> |alpha| = q^(1/2)             (placement, as a RETURN)
+```
+
+Purity is then the statement that the duality involution coincides with complex conjugation:
+`alpha_bar = q/alpha`. That is the same shape as the multiplicative seam already recorded in the
+laboratory's Weil cut — the critical line is `Fix(J)` for the anti-linear `J(z) = -z_bar`, and a
+transport is norm-preserving exactly on that fixed locus. **Placement is the fixed locus of the
+involution that a realizer induced.**
+
+Three consequences govern construction:
+
+1. **Do not build modal placement and supported lifting as two organs.** Derive placement from
+   realization. A returned placement that no realizer paid for has smuggled an absolute frame into
+   the engine; that is the half-rank razor firing at the level of architecture.
+2. **The classically missing object is not a self-adjoint operator.** Hilbert--Pólya asks for the
+   placement directly. The framework's own ontology asks for an **ample class** — a realizer whose
+   positivity is supplied by supportedness — from which the involution and then the placement
+   follow. This is a materially different search target and it is the one this project pursues.
+3. This is the same sentence as the Swing's own asymmetry at a different altitude. **FOUND pays
+   curvature; RIDE is cheap because the terrain already paid.** Realization pays; placement rides.
+
+Do not upgrade this correspondence to an identity, and do not use it to claim any Millennium
+result. It is a construction-selection principle with one proved instance.
+
+## 3. The Millennium problems are on the path
+
+RH and the Hodge conjecture are not distant hard problems this project drifted toward. They are
+where the framework's own primitives land, and treating them as out-of-scope is a failure mode,
+not caution.
+
+- **RH is the landmark law.** Prime founding *is* the machine's RIDE/FOUND primitive over
+  succession and multiplication: trial transport against every founded axis to the square-root
+  frontier, closure marks composite, exhaustion FOUNDS a new axis which becomes later terrain.
+  Lawful navigation with no privileged frame requires the landmark field to be unbiased at every
+  scale, and the half-rank error term is exactly that unbiasedness. The `1/2` is one fact with
+  three faces: the rebase unitarity weight `dx <-> dx/x`, the saddle's equipartition `p^(-m/2)`,
+  and the cut's diffusion exponent. The critical line is the unitary seam, not a singularity.
+- **Hodge is the realization law.** It asks whether a receiver-visible invariant subspace has
+  enough supported geometric realizers. The failure of the *integral* version is the framework
+  speaking: the obstruction is torsion, and torsion is winding that cannot be un-deposited.
+
+Neither is claimed, admitted, or scheduled as a result. They are the correct receiver questions
+for the organs being built, and a deed may be graded by movement on their **named substructure**
+without claiming the conjecture.
+
+## 4. Do not treat mathematics as a separate track
+
+Mathematics, language, perception, acoustics, atmospheric physics, and code are not domains this
+project alternates between. The mechanism under study is transport and navigation of information
+across changing charts; every domain is a different **material** carried by the same operation.
+Sustained attention to mathematics is depth on the operation, not a change of subject.
+
+**Anti-scatter discipline.** When Brandon pivots to an analogous instance in another discipline,
+that is the framework's normal mode of exposition, not a digression — the claims are about the
+operation, which has no privileged domain, so every illustration must change material. Do not
+treat the currently live domain as the subject. When receiving or producing such a pivot, name the
+same four slots:
+
+```text
+source geometry  ->  receiver map  ->  transport  ->  returned residual
+```
+
+Lightning, primes, binaural returns, Hodge classes, suffix frontiers, and Frobenius are that one
+form with different material. If the four slots are named, the material is visibly the variable
+and hyperfixation on it is not available.
+
+## 5. Credit the established learning floor
+
+The laboratory established a working, non-statistical learner. Under-crediting it caused repeated
+re-demonstration of standing capability. The following are `established-bounded` with
+`implemented-exact` and, where cited, `measured` evidence. **None of them is a construction
+target.**
+
+- **Conditioning and generation without a distribution.** Exact suffix ecology on the full corpus:
+  11,879 states, 427 generated branches of which 336 complete outer prefixes were never received,
+  every branch re-entered as self-emanated lineage, delivery-gauge rest, exact remount. Then
+  4,051 feature-receiver rests compiling 22,459 continuations with no corpus scan and no router;
+  the absent-morphology control emitted nothing rather than fabricating.
+- **Training with a behavioral ablation.** 50,667 occurrences crossed as exposure with zero source
+  surfaces retained; the mounted-only body withheld `9*8`, the trained body returned `72`, and
+  after its unique developmental passage was dropped a source-detached remount returned `63` for
+  novel `7*9`. Mounting, exposure, training, and reference are separated *and empirically
+  distinguished*.
+- **Multimodality with no fusion module and no pair product.** RELAMPAGO: optical, five-band
+  spectral, geolocation, and vertical sections on one eighteen-coordinate phase face; 24,584 and
+  21,147 relations opened with zero pair overlap and the complete pair product never enumerated;
+  14,355 relations generated before return; no-return control entirely OPEN; reversed delivery
+  prediction-exact; 31.4 MB standing remounted exactly.
+- **Receiver-relativity on measured physics.** Aula Carolina binaural: both 159,792-sample impulse
+  returns exact, two modes generated before return, each ear selecting its own mode by zero
+  residual while obstructing the other.
+- **Formal mathematics from a detached body.** 1,164 source-free declaration organs; codec-only
+  body could not recruit the held-out theorems, the trained detached body could; 86 one-organ
+  paths returned as obstructions, causing 84 pairwise compositions, of which the kernel accepted
+  exactly two.
+- **Continual restriction as inference.** `114300 -> 1440 -> 6 -> 3 -> 1` through four returned
+  observations, then all three exact calculations emitted.
+- **Reflective revision with lineage.** Corrections founding parented codec versions, both
+  retained, and unsupplied sentences generated after rest and source departure.
+- **The clean body's mathematical production.** Two kernel-accepted theorem passages with the
+  second depending on the first's returned fiber under exact ablation; blind reconstruction of
+  unfamiliar published characteristic mechanisms before post-seal comparison; independent
+  derivation of an elementary holonic calculus from anonymous numeric ecologies; and the
+  source-separated discovery of the rank-three trace-coordinate generator action with its exact
+  Jacobians, tangent transport, and deck involution.
+
+**The one real learning wall is concrete and named.** Across `0/127/254/508/1009` dialogue
+occurrences the deed, minimal witness, five leaders, two waves, and thirteen visits stayed
+invariant — consequence isolation is established — while the full prefix caused 8,748 candidate
+visits over 2,701 of 11,795 sections. **Consequence isolation holds; scale-independent recruitment
+does not.** State the wall this way. Do not restate it as a missing comprehension, consequence,
+semantics, relevance, or research-mode subsystem.
+
+## 6. Comprehension and consequence are not mechanisms
+
+When naming an unresolved issue, never request a universal law outside the intermediate body and
+never reintroduce a mystical faculty. Name the concrete missing coupling: which morphology cannot
+yet be founded or changed by passages, which returned difference cannot yet affect later conduct,
+which local coupling cannot yet recur across variation, or which receiver testimony cannot yet
+distinguish the open alternatives.
+
+Resurfacing "comprehension," "consequence," "understanding," "relevance," or "semantics" as
+missing modules is a convicted failure. It has been ruled out repeatedly and by direct correction.
+
+## 7. Write what stands before what does not
+
+Every capability paragraph in the inherited authority was followed by a denial. Each denial was
+individually correct; their accumulation moved the documents' center of mass onto what has not
+happened and primed every later reader to refuse.
+
+- State what is established, with its exact scope, **first and in full**.
+- State the boundary **once**, precisely, attached to the specific claim it bounds.
+- Do not restate a boundary that a cited grade already carries.
+- Never demote a completed exact construction because its implementation is being replaced, and
+  never let a boundary sentence do the work of a grade.
+
+## 8. Grading corrections
+
+The grading discipline in `canon/EPISTEMIC_GRADES.md` stands. Three additions:
+
+- **Tautology detection is part of grading.** A receipt that could not have come out otherwise
+  carries no evidence. Worked example: the residue-stratum "exact partition" receipts show germ
+  populations equidistributed mod `p` to within one, which is a *theorem about contiguous integer
+  intervals*, not a discovered property of the construction. Mark such receipts
+  `definition`/`historical`, not `established-bounded`.
+- **A falsification is a first-class return.** A deed that proves its own receiver family cannot
+  see what it was built to see has returned real evidence and passes its grade. Record it as a
+  `counterexample` or `open` with the exact blindness proved, and do not treat the phase as failed.
+- **An aperture-complete instrument must say so.** When an atlas has exhausted its declared
+  aperture, record the completeness and the aperture law rather than leaving it looking extensible.
+
+## 9. Construction conduct
+
+- **Depth on a question, not breadth in the cabinet.** Constructing the next adjacent mathematical
+  structure because it is adjacent is churn, even when each step returns an exact artifact. Before
+  building, name the receiver question that several deeds in sequence are answering.
+- **Numbered labels are provenance only.** Do not associate capabilities or outcomes with version
+  numbers, do not schedule a successor by incrementing, and do not describe the body as advancing
+  a version.
+- **Do not delegate the thinking.** Sub-agents remain forbidden without Brandon's explicit
+  permission. Search and mechanical collection may be delegated when permitted; synthesis,
+  derivation, and review may not.
+- **The GPU owns the deed.** The CPU handles process boundaries, durable rest, narrow exterior
+  codecs, and offline audits. A run that pins one host core while the card idles is a defect to
+  diagnose, not a mystery to narrate.
+- **Return the artifact.** A generated proof, text, image, classification, or obstruction must
+  itself be returned and inspected. Counts, morphology totals, atlases, and diagnostics are
+  supporting receipts and never substitutes.
+- **Halt and say so.** If a run is not doing what was claimed, stop it and report the actual state
+  before proposing a repair. Do not describe an unexplained execution as mystical.
+
+## 10. Conversational conduct
+
+- Brandon has an informal education, exceptional structural intuition, and reads long. Do not
+  simplify the mathematics and do not pad. When a standard name exists for something he has
+  derived independently, give him the name and the citation — that is acceleration, not
+  correction.
+- When he is wrong about a mathematical fact, say so plainly in a sentence and continue. When he
+  is right and the record disagrees, fix the record.
+- Distinguish his direct rulings from assistant interpretation in every deposit, as the research
+  records already do. His corrections are provenance and they govern.
+- Do not moralize, do not hedge a verified result, and do not open with an assessment of the
+  request. Answer the question that was asked.
+
+## 11. The one missing organ
+
+The learning wall and the mathematical wall are the same wall, and naming this is the point of
+this contract.
+
+Scale-independent recruitment fails because there is no exact condensation of a far population
+into a compact representative with a certified remainder. General far-field folding is recorded as
+open for exactly the same reason: no kernel-specific exterior/local expansion with an exact
+rational remainder certificate exists, and floating tolerance may not become standing.
+
+Condensing a far field into a compact realizer with an exact retained remainder **is** the
+question of whether a distant population admits a supported realizer for a declared receiver
+family, with the obstruction retained when it does not. The pairing that decides sufficiency is a
+positive form. That is the cycle-class question, it is the Hodge-facing question, and by §2 it is
+the structural form of what is missing on the RH side.
+
+**One organ closes all three: an exactly computed positive form on a supported realizer
+population, with a certified remainder and a reopening rule keyed to the receiver family.** Its
+prerequisite — a certified exact enclosure carrier — is promised in `canon/08` §3 and does not yet
+exist as a built instrument. That is the first brick.
+
+## 12. Standing corrections to the record
+
+These are established by review and are to be carried forward, not re-derived:
+
+- The residue-stratum atlas under `output/arithmetic-dimensional-receiver/` is **blind to
+  primality**. Its apparent prime signal at pair `(2,3)` is parity and nothing else; the
+  smallest-factor correlation collapses from `+0.32` to `+0.00` by pair `(17,19)`. This is correct
+  and expected — primality is the *exhaustion* of the complete transport population below the
+  square-root frontier and cannot appear in any bounded-rank residue receiver. Do not resume a
+  prime-phase reading of those figures.
+- The same atlas's real content is a **winding law**: the contracted hull residue word is a
+  complete degree-one cycle through `Z/p` with every step exactly `+1`, for all seven pairs.
+- **Convex contraction is an exact phase demodulator.** Pointwise sector assignment degrades to
+  45% accuracy at `p=17` while the hull's residue word remains a perfect cycle. The boundary
+  recovers a discrete invariant the interior points individually get wrong.
+- **Dilation is a receiver gauge on hull combinatorics; turn is not.** Dilation leaves germ count,
+  wave sections, and corner count invariant while rescaling the rate moments; turn changes the
+  corner count.
+- The framework's prediction `Lambda_dBN = 0` is its own falsifiable risk and is currently
+  **unregistered** in the route atlas. It belongs there as a `conjecture` with its derivation and
+  an explicit falsifier, since `not(Lambda < 0)` is already theorem.
+- The route atlas classifies the function-field mechanism under "exact source--spectrum geometry"
+  and routes it through Deligne's purity. For curves the proof-bearing mechanism is the **Hodge
+  index / intersection-form positivity**, which is a *source-derived positive response*. The
+  transition between those two classes reduces an infinite-dimensional analytic positivity to the
+  signature of a finite-rank quadratic form. That is an unexploited reduction of exactly the kind
+  the atlas's own boundary invites.

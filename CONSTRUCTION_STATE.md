@@ -127,21 +127,47 @@ binary gates, and a complete `136/136` suite. Its receipt remains
 
 **Truth status:** `project-postulate`.
 
-No numbered successor is scheduled. The previously drafted finite-field characteristic-cycle
-foundry has no authority and is recoverable only from Git history.
+No numbered successor is scheduled and none will be. The previously drafted finite-field
+characteristic-cycle foundry has no authority and is recoverable only from Git history.
 
 The live continuation contract is
-[the Eros mathematics-production floor](blueprint/EROS_MATHEMATICS_PRODUCTION_FLOOR.md), composed by
-[the complete roadmap](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md). Construction remains paused until
-the roadmap contains one expressly ratified unnumbered tuple over a real mathematical source or
-retained open fiber.
+[the Eros embodiment roadmap](blueprint/EROS_EMBODIMENT_ROADMAP.md), which composes
+[the Eros mathematics-production floor](blueprint/EROS_MATHEMATICS_PRODUCTION_FLOOR.md) and amends
+that file's §10 admission rule: **the grade of the organ is not the grade of the return.** An
+established capability is admissible without limit as the carrier of a deed and inadmissible only
+as its return. Every evidence requirement — source separation, post-seal comparison, checker
+return, ablation, sample-free rest, GPU deed, ownership, no-float, independent audit — is unchanged.
 
-That tuple must name the existing floor owners, the one genuinely missing composition, source
-access, exact mathematical return, alternatives, obstruction, proof/checker passage, sample-free
-rest, ablation, dependent later use, GPU deed, and full audits. It is inadmissible when its primary
-return merely re-demonstrates proof formation, training, characteristic calculation, finite
-enumeration, theorem selection inside a controller-authored grammar, or another capability already
-in the established floor.
+Construction is no longer paused. Movement A is admitted; Movement B is the next deed.
+
+## Admitted movements
+
+**Truth status:** `established-bounded`.
+**Evidence tags:** `implemented-exact`, `computational-witness`.
+
+### Movement A — certified exact enclosure carrier
+
+The `exact` value library now owns an exact dyadic endpoint carrier, a signed integer polynomial
+with division-free homogeneous sign evaluation, an enclosure as a set rather than a value, a
+separation certificate derived by the reciprocal Cauchy bound, and a sign-commitment law that
+refuses rather than guesses.
+
+The GPU-resident deed returned ten inspected occurrences at compute capability `8.9` with zero
+device/host parity failures and zero independent-oracle failures. It enclosed the positive root of
+`x^2 - 2` — a quantity no owned carrier represents exactly — committed an exact **zero** for a
+straddling enclosure that no refinement depth could decide, and returned that same commitment as
+`refused` under exact certificate ablation. Aperture exhaustion, absent bracket with a proved
+source contradiction, an underived certificate, and a disordered pair each returned their declared
+typed refusal.
+
+One apparatus law was established and is binding on every later movement: **64-bit integer division
+is float-reachable on this architecture.** NVCC lowers `/` through a helper whose Newton iteration
+begins with `I2F` / `MUFU.RCP` / `F2I`, and the binary SASS audit refuses it. Overflow admission in
+the device-reachable cone must be division-free.
+
+Receipt:
+[the certified enclosure receipt](receipts/MOVEMENT_A_CERTIFIED_ENCLOSURE_RECEIPT.md). Suite:
+`138/138`.
 
 Current open mathematical fibers are:
 
