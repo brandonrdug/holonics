@@ -7,13 +7,23 @@
 
 namespace holonics::organ {
 
-/// **The source-incidence invention, ported exactly.**
+/// **The source-incidence storage law, ported. Its formation is not.**
 ///
 /// Suffix links form a rooted tree. A depth-first order over that tree makes
 /// every state's descendant population **contiguous**, so a state's sources are
 /// one span into a single shared array. Storage is therefore
 /// `O(states + caused occurrences)` and **never `states x sources`** — the naive
-/// table does not fit at laboratory scale.
+/// table does not fit at laboratory scale. That law holds here.
+///
+/// **The cost law does not.** The source owner
+/// (`suffix_ecology.rs:338` at checkpoint `93834398`) forms `first_child` /
+/// `next_sibling` from the links in `O(states)` and emits every span in one
+/// explicit-stack depth-first walk, `O(states + occurrences)`. `freeze` below
+/// substitutes a fixpoint relaxation and a per-state subtree rescan, which is
+/// cubic in the state population, and `span` rescans the whole occurrence
+/// population per query instead of reading a stored span. Both are exact and
+/// both are correct at the declared aperture; **neither survives broad
+/// mounting**, and refounding them is Phase 7.
 struct source_span final {
   std::uint32_t start{};
   std::uint32_t length{};
@@ -55,6 +65,11 @@ class source_incidence final {
   /// Form the depth-first intervals over the suffix-link tree and sort the
   /// occurrence population into that order. After this, a state's sources are a
   /// contiguous run.
+  ///
+  /// **Cost:** a relaxation to a fixpoint over the link parents, then a subtree
+  /// rescan per state that walks every other state's link chain. Cubic in the
+  /// state population where the source owner is linear. Correct, and refused at
+  /// scale.
   template<std::size_t TransitionCapacity>
   [[nodiscard]] HOLONICS_CALLABLE constexpr bool freeze(
       const suffix_automaton<StateCapacity, TransitionCapacity>& automaton) noexcept {
@@ -127,7 +142,9 @@ class source_incidence final {
   }
 
   /// The contiguous span of occurrences whose end state lies in this state's
-  /// subtree. One binary search and one walk; no per-state table exists.
+  /// subtree. No per-state table exists — and no per-state span is stored
+  /// either, so this **rescans the occurrence population** rather than reading
+  /// the interval the depth-first walk already knew. Linear per query.
   [[nodiscard]] HOLONICS_CALLABLE constexpr source_span span(
       std::uint32_t state) const noexcept {
     source_span found{};

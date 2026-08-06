@@ -176,6 +176,15 @@ production against an exterior checker, and the research ecology's contact front
 `72`; a source-detached remount returns `63` for a novel `7*9`; and exact ablation removes the
 route's structure so it stops conducting. The body retains the route, not the passages.
 
+**Regraded 2026-08-06 — the cost laws were not ported.** Reading the port against
+`suffix_ecology.rs` at checkpoint `93834398` establishes that three cost claims overstate the code:
+source-incidence formation is a cubic relaxation where the source is a linear depth-first walk;
+`span` rescans the occurrence population where the source reads a stored interval; and suffix
+transitions are one flat scanned array where the source holds per-state fan-out. **Every returned
+law and every measured return above stands** — all three are exact at the declared aperture, and
+the `27` against `45` was always a storage figure. None of them completes at 11,879 states. The
+consequence is that broad mounting is not a dial, and the refounding is now Phase 7.1.
+
 **This re-earns the three claims Phase 0 withdrew** — returned training changing reusable
 morphology, exact ablation removing later conduct, and source-detached conditioning — **at this
 aperture only.** The laboratory's scale figures are not claimed here; broad mounting is Phase 7.

@@ -449,16 +449,76 @@ anywhere in the conditioning path.
 
 ## Phase 7 — Broad mounting
 
-`ExactTextMaterialCorpus` / `ExactTextMaterialAtlas` (`life/src/text_material.rs:224,456`) and
-`CudaResidentTextMaterialAtlas` (`text_material/resident.rs:120`), whose mount **consumes** the host
-atlas and whose remount **founds a fresh host from native bytes with no corpus or developmental
-source consulted**.
+**Recut 2026-08-06.** Phase 6 established the laws at an aperture of fifteen symbols. Reading that
+port against its source establishes that scale is not a parameter of it — three cost laws were not
+ported, and the ecologies are kernel-frame value types. Phase 7 is therefore three deeds in order,
+and only the third is the mount.
+
+### 7.1 — Refound formation and lookup
+
+The regrade in [the Phase 6 receipt](../receipts/PHASE_6_ECOLOGY_PORT_RECEIPT.md) names the three
+exactly. Each has a known source-owner form, so this is again a port and not a rederivation:
+
+- **Suffix transitions become per-state fan-out**, not one flat global array linearly scanned. The
+  source holds `SuffixState::transitions: RelationSpan`; `extend`'s suffix walk currently rescans
+  every transition in the body.
+- **`source_incidence::freeze` becomes the real walk**: `first_child`/`next_sibling` from the links
+  in `O(states)`, then one explicit-stack depth-first pass emitting spans, `O(states +
+  occurrences)`. The present relaxation-plus-rescan is cubic.
+- **Per-state spans are stored** by that walk, so `span` reads an interval instead of rescanning
+  the occurrence population.
+
+Grade: the same Phase 6 assertions return identically, plus a formation and query cost that is
+measured and linear in the declared population. **A returned law that changes here is a defect in
+7.1, not a licence to change the law.**
+
+### 7.2 — The arena crossing
+
+The ported ecologies are fixed-capacity value types carried in the kernel frame. Phase 5 already
+returned the physical evidence: a standing surface of roughly three kilobytes overflowed the default
+one-kilobyte device stack, and the repair was a reservation, not a semantics change. A corpus-scale
+suffix ecology cannot be a frame value at any reservation.
+
+The interior must therefore receive **spans over apparatus-owned resident arenas** rather than own
+its arrays. `sparse_ordinal_atlas` already holds the ordinal law this needs — 32-bit slots, never
+reused, tombstoned departure, a recovering form on every admission. What is missing is the carrier
+that hands its pages to a kernel without copying them into a frame.
+
+Constraint that governs the design: **no hot device path may replay the complete host algorithm**,
+so the card advances by append deltas derived from the host body and never re-forms it.
+
+### 7.3 — The mount
+
+`ExactTextMaterialCorpus` / `ExactTextMaterialAtlas` (`life/src/text_material.rs:214,446`) and
+`CudaResidentTextMaterialAtlas` (`text_material/resident.rs:101`), whose mount **consumes** the host
+atlas — so no exterior caller can bind the same card executor to a second semantic world — and whose
+remount **founds a fresh host from native bytes with no corpus or developmental source consulted**.
 
 Admission gates are literal: `global_pair_population == 0`, `hot_host_replay_work == 0`,
-`bounded_delta_equal == true`. A hot device path that replays the complete host algorithm fails.
+`bounded_delta_equal == true`.
+
+Three laws of the source owner that are load-bearing and easy to drop:
+
+- **The mount refusal carries its predecessor back out.** `TextMaterialCudaMountRefusal::into_parts`
+  returns the exact host atlas beside the error, so absent hardware or an ABI refusal cannot destroy
+  the only conditioned body merely because success consumes ownership. This is the same law as
+  `training_proposal` returning intact on a stale generation and the ordinal atlas's recovering
+  admission — it is the project's refusal discipline, not a convenience.
+- **Equal native identity with a different surface stays plural.** Occurrence identity is
+  `identity` + `native_identity` + `surface_sha256`. A revised occurrence is a version fiber, not a
+  duplicate — the reflective runtime's parented-codec law at corpus scale.
+- **Corpus adjacency is not ancestry.** `receive_emanated_caused` requires the supplied causal
+  witnesses; a caller that does not know them **leaves the fiber open** rather than assigning the
+  most recently stored occurrence as a fabricated parent.
+
+The material is this project's own history — `TextMaterialInput::CodexRollout` and `ClaudeCode`
+containers plus documents — so the body's generated deeds re-enter as later material through
+`TextMaterialPhase::Emanated` and change every subsequent local restriction. The corpus is
+self-referential by construction, and that is the point of it.
 
 Scale targets from the laboratory: 976 files → 42,937 prose sections + 25,490 production relations;
-route rest 101,381,760 bytes; complete conditioned rests near 194 MB with exact remount.
+route rest 101,381,760 bytes; complete conditioned rests near 194 MB with exact remount. **These are
+the source body's figures. Phase 7 claims them only when it returns them.**
 
 ---
 

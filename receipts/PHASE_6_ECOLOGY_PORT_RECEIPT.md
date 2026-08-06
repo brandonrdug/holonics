@@ -71,6 +71,26 @@ and that is the whole distinction the excised counter-morphology was imitating.
 - exact ablation removing later conduct;
 - source-detached conditioning.
 
+## Regrade, 2026-08-06 — the cost laws were not ported
+
+Established by reading this port against `suffix_ecology.rs` at checkpoint `93834398`. **Every
+returned law above stands; three cost claims do not**, and they were caught by the rule that caught
+the conditioning contamination — grade the implementation, not the receipt.
+
+| Claim above | What the code does | Source owner |
+|---|---|---|
+| source incidence "ported exactly" | **storage** is linear and holds no `states x sources` table, which is the law and is true. **Formation** is a fixpoint relaxation plus a per-state subtree rescan — cubic in states | `first_child`/`next_sibling` built in `O(states)`, one explicit-stack depth-first walk emitting every span, `O(states + occurrences)` (`suffix_ecology.rs:338-395`) |
+| "one binary search and one walk" in `source_incidence::span` | rescans the entire occurrence population per query; no per-state span is stored | `state_spans` is materialized by the walk and read directly |
+| suffix automaton inside the `2N` state bound | the **state** bound holds. Transitions are one flat global array linearly scanned per lookup, and `extend` scans it inside its suffix walk — quadratic in symbols | transitions are held **per state** (`SuffixState::transitions: RelationSpan`), so a lookup touches one state's fan-out |
+
+At the declared aperture — fifteen symbols, fifteen states, twenty-two transitions — all three are
+exact and the measured returns are unaffected. At 11,879 states and 50,667 occurrences none of them
+completes. **The measured `27` against `45` remains true as a storage figure and was never a time
+figure.**
+
+This is not a defect in the ported laws. It is the discovery that Phase 7 is not a dial: broad
+mounting requires refounding formation and lookup, and that is now Phase 7.1.
+
 ## Boundary
 
 **The law is reproduced; the scale is not.** The laboratory's figures — 50,667 occurrences crossed

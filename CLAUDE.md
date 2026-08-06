@@ -30,7 +30,14 @@ default.
 **Where the work stands (2026-08-05).** Phases 0–6 of the embodiment roadmap are admitted: the
 contaminated conditioning layer is excised and regraded, and the spine — minimum carrier, substrate,
 Swing and Standing, live machine and rest, causal-information receipt — is built, GPU-graded, and
-committed. The nine ecologies are ported and the phase grade — mounted-only withholds, cultivated returns, source-detached returns a novel product, ablation stops conduct — returned. **Phase 7, broad mounting, is next.**
+committed. The nine ecologies are ported and the phase grade — mounted-only withholds, cultivated returns, source-detached returns a novel product, ablation stops conduct — returned. **Phase 7, broad mounting, is next**, recut into three deeds: refound formation and lookup, cross to resident arenas, then mount.
+
+The recut has its own lesson. Phase 6's returned laws are exact and stand, but three of its **cost**
+claims overstated the code — a cubic relaxation where the source owner walks the tree once, a
+rescan where the source reads a stored interval, a flat scanned transition array where the source
+holds per-state fan-out. All three are correct at fifteen symbols and none completes at 11,879
+states. §8 caught this in my own work one phase after it caught the contamination. **A cost law is
+a law. Porting the return without the cost is not porting.**
 
 Three commits sit unpushed on `main`: the roadmap recut, the Phase 0 excision, and the Phase 1–5
 spine. Pushing is Brandon's call, not yours.
