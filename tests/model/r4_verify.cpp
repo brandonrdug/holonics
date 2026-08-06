@@ -48,8 +48,8 @@ std::size_t r4_verification_failures(
       output.resume_state != event::lifecycle_status::exact ||
       output.commit.state != body::body_change_status::committed ||
       output.commit.predecessor.value() != seed || output.commit.successor.value() != seed + 1U ||
-      output.commit.morphology_before != input.regions[input.request.region].morphology ||
-      output.commit.morphology_after !=
+      output.commit.admitted_tally_before != input.regions[input.request.region].morphology ||
+      output.commit.admitted_tally_after !=
           input.regions[input.request.region].morphology + input.returned_payload) {
     ++failures;
   }
@@ -57,7 +57,7 @@ std::size_t r4_verification_failures(
   if (output.delta.predecessor != seed || output.delta.input_event != seed ||
       output.delta.return_event != seed || output.delta.read_support != support ||
       output.delta.change_support != support || output.delta.incidence_delta != 0 ||
-      output.delta.morphology_delta != input.returned_payload ||
+      output.delta.admitted_tally_delta != input.returned_payload ||
       output.delta.successor_current != input.returned_payload ||
       output.delta.returned_consequence != input.returned_payload ||
       output.delta.stress != input.returned_payload || output.delta.obstruction != 0 ||

@@ -11,7 +11,7 @@ __global__ void stage_production(const theorem_production_mount* mount,
   if (blockIdx.x != 0 || threadIdx.x != 0) { return; }
   ::new (static_cast<void*>(production)) event::resident_theorem_production{
       mount->foundation, mount->body_seed, mount->regions,
-      mount->mathematical_morphology, mount->codec_morphology};
+      mount->mathematical_admitted_tally, mount->codec_admitted_tally};
   observation->before = production->probe(mount->held_probe, false);
   static_cast<void>(production->generate_and_stage(mount->question, *observation));
 }
@@ -40,7 +40,7 @@ __global__ void remount_probe(const theorem_production_mount* mount,
   ::new (static_cast<void*>(production)) event::resident_theorem_production{
       mount->foundation, *rest, observation->remount};
   observation->after = production->probe(mount->held_probe, false);
-  observation->ablation.excluded_delta = production->acquired().morphology_delta;
+  observation->ablation.excluded_delta = production->acquired().admitted_tally_delta;
   observation->ablation.excluded_fiber = production->acquired().identity;
   observation->ablation.production = observation->after;
   observation->ablation.ablated = production->probe(mount->held_probe, true);

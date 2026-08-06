@@ -83,12 +83,12 @@ event::regular_singular_rest_record r21_host_regular_singular_rest() noexcept {
       exact::word{160'600}, exact::word{194'400}, exact::word{12}, true};
   record.regular_singular = {exact::word{187'300}, exact::word{175'400},
       exact::word{160'700}, exact::word{195'400}, exact::word{13}, true};
-  record.mathematical_morphology = 79;
-  record.codec_morphology = 48;
-  record.geometry_morphology = 10;
-  record.phase_morphology = 14;
-  record.characteristic_morphology = 16;
-  record.regular_singular_morphology = 20;
+  record.mathematical_admitted_tally = 79;
+  record.codec_admitted_tally = 48;
+  record.geometry_admitted_tally = 10;
+  record.phase_admitted_tally = 14;
+  record.characteristic_admitted_tally = 16;
+  record.regular_singular_admitted_tally = 20;
   record.integrity = event::regular_singular_rest_integrity(record);
   return record;
 }

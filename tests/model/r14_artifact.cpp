@@ -46,8 +46,8 @@ void write_r14_artifact(std::ostream& output,
          << ",lineage=" << generation.passage.lineage.value() << '\n'
          << "generation_delta=head:" << value.generation_commit.predecessor.value() << ':'
          << value.generation_commit.successor.value() << ",morphology:"
-         << value.generation_commit.morphology_before << ':'
-         << value.generation_commit.morphology_after << '\n'
+         << value.generation_commit.admitted_tally_before << ':'
+         << value.generation_commit.admitted_tally_after << '\n'
          << "exclusion=answer_matches:" << generation.exclusion.mounted_answer_matches
          << ",lookups=" << generation.exclusion.lookup_entries
          << ",quoted_bytes=" << generation.exclusion.quoted_source_bytes
@@ -76,8 +76,8 @@ void write_r14_artifact(std::ostream& output,
          << value.returned_morphology.mathematical_after << ",codec:"
          << value.returned_morphology.codec_before << ':'
          << value.returned_morphology.codec_after << ",body:"
-         << value.returned_morphology.commit.morphology_before << ':'
-         << value.returned_morphology.commit.morphology_after << '\n'
+         << value.returned_morphology.commit.admitted_tally_before << ':'
+         << value.returned_morphology.commit.admitted_tally_after << '\n'
          << "behavior=before_available:" << value.before.available
          << ",after_available=" << value.after.available
          << ",changed=" << value.behavior_changed

@@ -21,16 +21,16 @@ HOLONICS_CALLABLE inline causal_linear_rest_receipt resident_causal_linear::rest
   record.moment_reconstruction = moment_reconstruction_; record.cm_incidence = cm_incidence_;
   record.toric_cycle = toric_cycle_; record.algebraic_variation = algebraic_variation_;
   record.causal_linear = causal_linear_;
-  record.mathematical_morphology = mathematical_morphology_;
-  record.codec_morphology = codec_morphology_; record.geometry_morphology = geometry_morphology_;
-  record.phase_morphology = phase_morphology_;
-  record.characteristic_morphology = characteristic_morphology_;
-  record.regular_singular_morphology = regular_singular_morphology_;
-  record.blind_reconstruction_morphology = blind_reconstruction_morphology_;
-  record.cm_incidence_morphology = cm_incidence_morphology_;
-  record.toric_cycle_morphology = toric_cycle_morphology_;
-  record.algebraic_variation_morphology = algebraic_variation_morphology_;
-  record.causal_linear_morphology = causal_linear_morphology_;
+  record.mathematical_admitted_tally = mathematical_admitted_tally_;
+  record.codec_admitted_tally = codec_admitted_tally_; record.geometry_admitted_tally = geometry_admitted_tally_;
+  record.phase_admitted_tally = phase_admitted_tally_;
+  record.characteristic_admitted_tally = characteristic_admitted_tally_;
+  record.regular_singular_admitted_tally = regular_singular_admitted_tally_;
+  record.blind_reconstruction_admitted_tally = blind_reconstruction_admitted_tally_;
+  record.cm_incidence_admitted_tally = cm_incidence_admitted_tally_;
+  record.toric_cycle_admitted_tally = toric_cycle_admitted_tally_;
+  record.algebraic_variation_admitted_tally = algebraic_variation_admitted_tally_;
+  record.causal_linear_admitted_tally = causal_linear_admitted_tally_;
   record.integrity = causal_linear_rest_integrity(record);
   receipt.theory = causal_linear_.identity; receipt.integrity = exact::word{record.integrity};
   receipt.prior_returns_preserved = first_.accepted && second_.accepted && geometry_.accepted &&

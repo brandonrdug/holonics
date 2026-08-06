@@ -21,17 +21,17 @@ struct causal_linear_rest_record final {
   organ::acquired_toric_cycle toric_cycle{};
   organ::acquired_algebraic_variation algebraic_variation{};
   organ::acquired_causal_linear causal_linear{};
-  std::uint64_t mathematical_morphology{};
-  std::uint64_t codec_morphology{};
-  std::uint64_t geometry_morphology{};
-  std::uint64_t phase_morphology{};
-  std::uint64_t characteristic_morphology{};
-  std::uint64_t regular_singular_morphology{};
-  std::uint64_t blind_reconstruction_morphology{};
-  std::uint64_t cm_incidence_morphology{};
-  std::uint64_t toric_cycle_morphology{};
-  std::uint64_t algebraic_variation_morphology{};
-  std::uint64_t causal_linear_morphology{};
+  std::uint64_t mathematical_admitted_tally{};
+  std::uint64_t codec_admitted_tally{};
+  std::uint64_t geometry_admitted_tally{};
+  std::uint64_t phase_admitted_tally{};
+  std::uint64_t characteristic_admitted_tally{};
+  std::uint64_t regular_singular_admitted_tally{};
+  std::uint64_t blind_reconstruction_admitted_tally{};
+  std::uint64_t cm_incidence_admitted_tally{};
+  std::uint64_t toric_cycle_admitted_tally{};
+  std::uint64_t algebraic_variation_admitted_tally{};
+  std::uint64_t causal_linear_admitted_tally{};
   std::uint64_t integrity{};
 };
 
@@ -63,21 +63,21 @@ struct causal_linear_remount_receipt final {
   inherited.moment_reconstruction = record.moment_reconstruction;
   inherited.cm_incidence = record.cm_incidence; inherited.toric_cycle = record.toric_cycle;
   inherited.algebraic_variation = record.algebraic_variation;
-  inherited.mathematical_morphology = record.mathematical_morphology;
-  inherited.codec_morphology = record.codec_morphology;
-  inherited.geometry_morphology = record.geometry_morphology;
-  inherited.phase_morphology = record.phase_morphology;
-  inherited.characteristic_morphology = record.characteristic_morphology;
-  inherited.regular_singular_morphology = record.regular_singular_morphology;
-  inherited.blind_reconstruction_morphology = record.blind_reconstruction_morphology;
-  inherited.cm_incidence_morphology = record.cm_incidence_morphology;
-  inherited.toric_cycle_morphology = record.toric_cycle_morphology;
-  inherited.algebraic_variation_morphology = record.algebraic_variation_morphology;
+  inherited.mathematical_admitted_tally = record.mathematical_admitted_tally;
+  inherited.codec_admitted_tally = record.codec_admitted_tally;
+  inherited.geometry_admitted_tally = record.geometry_admitted_tally;
+  inherited.phase_admitted_tally = record.phase_admitted_tally;
+  inherited.characteristic_admitted_tally = record.characteristic_admitted_tally;
+  inherited.regular_singular_admitted_tally = record.regular_singular_admitted_tally;
+  inherited.blind_reconstruction_admitted_tally = record.blind_reconstruction_admitted_tally;
+  inherited.cm_incidence_admitted_tally = record.cm_incidence_admitted_tally;
+  inherited.toric_cycle_admitted_tally = record.toric_cycle_admitted_tally;
+  inherited.algebraic_variation_admitted_tally = record.algebraic_variation_admitted_tally;
   std::uint64_t fold = algebraic_variation_rest_integrity(inherited);
   const std::uint64_t values[7]{record.causal_linear.identity.value(),
       record.causal_linear.passage.value(), record.causal_linear.kernel_return.value(),
-      record.causal_linear.lineage.value(), record.causal_linear.morphology_delta.value(),
-      record.causal_linear.accepted ? 1U : 0U, record.causal_linear_morphology};
+      record.causal_linear.lineage.value(), record.causal_linear.admitted_tally_delta.value(),
+      record.causal_linear.accepted ? 1U : 0U, record.causal_linear_admitted_tally};
   for (const auto value : values) { terminal_rest_detail::fold_value(fold, value); }
   return fold;
 }

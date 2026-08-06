@@ -25,8 +25,8 @@ apparatus::theorem_production_mount r14_case() noexcept {
     mount.regions[slot] = {128U + slot, 0};
   }
   mount.body_seed = 14'001'000;
-  mount.mathematical_morphology = 43;
-  mount.codec_morphology = 32;
+  mount.mathematical_admitted_tally = 43;
+  mount.codec_admitted_tally = 32;
   return mount;
 }
 

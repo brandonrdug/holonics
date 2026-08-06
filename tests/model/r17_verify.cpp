@@ -84,8 +84,8 @@ std::size_t r17_verification_failures(
   failures += actual.theory_commit.state != body::body_change_status::committed ||
       actual.theory_commit.predecessor != exact::word{14'001'004} ||
       actual.theory_commit.successor != exact::word{14'001'005} ||
-      actual.theory_commit.morphology_before != 152 ||
-      actual.theory_commit.morphology_after != 160;
+      actual.theory_commit.admitted_tally_before != 152 ||
+      actual.theory_commit.admitted_tally_after != 160;
   failures += actual.formal.passage != exact::word{173'300} ||
       actual.conversational.passage != actual.formal.passage ||
       !contains(actual.formal.bytes, actual.formal.byte_count, "theorem generated_mobius_sub") ||
@@ -114,13 +114,13 @@ std::size_t r17_verification_failures(
       morphology.commit.state != body::body_change_status::committed ||
       morphology.commit.predecessor != exact::word{14'001'005} ||
       morphology.commit.successor != exact::word{14'001'006} ||
-      morphology.commit.morphology_before != 160 ||
-      morphology.commit.morphology_after != 169 ||
+      morphology.commit.admitted_tally_before != 160 ||
+      morphology.commit.admitted_tally_after != 169 ||
       !morphology.returned_difference_applied;
   failures += actual.acquired.identity != exact::word{184'300} ||
       actual.acquired.passage != exact::word{173'300} ||
       actual.acquired.kernel_return != exact::word{160'400} ||
-      actual.acquired.morphology_delta != exact::word{9} || !actual.acquired.accepted;
+      actual.acquired.admitted_tally_delta != exact::word{9} || !actual.acquired.accepted;
   failures += !actual.rest.returned || !actual.rest.prior_theorems_preserved ||
       !actual.rest.source_detached || !actual.remount.same_body ||
       !actual.remount.theory_preserved || actual.remount.source_replayed ||
@@ -133,8 +133,8 @@ std::size_t r17_verification_failures(
       handoff.first.identity != exact::word{181'200} || !handoff.first.accepted ||
       handoff.second.identity != exact::word{182'200} || !handoff.second.accepted ||
       handoff.geometry.identity != exact::word{184'300} || !handoff.geometry.accepted ||
-      handoff.mathematical_morphology != 55 || handoff.codec_morphology != 39 ||
-      handoff.geometry_morphology != 10;
+      handoff.mathematical_admitted_tally != 55 || handoff.codec_admitted_tally != 39 ||
+      handoff.geometry_admitted_tally != 10;
   failures += !comparison.returned() || !comparison.opened_after_kernel_return ||
       !comparison.affine_neighbor_present || comparison.fractional_neighbor_present ||
       comparison.body_resumed_after_open || comparison.observer_reads != exact::word{1} ||

@@ -68,17 +68,17 @@ HOLONICS_CALLABLE inline bool resident_rederivation::resume_foil(
   const bool rejected = typed.state == checker_return_status::rejected ||
                         typed.state == checker_return_status::remaining_goals;
   auto &morphology = observation.foil.returned_morphology;
-  morphology.mathematical_before = mathematical_morphology_;
-  morphology.codec_before = codec_morphology_;
-  mathematical_morphology_ += 1;
-  codec_morphology_ += 2;
-  rederivation_morphology_ += 1;
+  morphology.mathematical_before = mathematical_admitted_tally_;
+  morphology.codec_before = codec_admitted_tally_;
+  mathematical_admitted_tally_ += 1;
+  codec_admitted_tally_ += 2;
+  rederivation_admitted_tally_ += 1;
   morphology.commit =
       body_.commit(expected.predecessor, 0, 4, expected.passage.value(),
                    pending->take_continuation());
   pending_live_ = false;
-  morphology.mathematical_after = mathematical_morphology_;
-  morphology.codec_after = codec_morphology_;
+  morphology.mathematical_after = mathematical_admitted_tally_;
+  morphology.codec_after = codec_admitted_tally_;
   morphology.returned_difference_applied =
       morphology.commit.state == body::body_change_status::committed;
   observation.foil.pending_after_return = false;
@@ -158,18 +158,18 @@ HOLONICS_CALLABLE inline bool resident_rederivation::resume_valid(
                                             observation.passage.conversational))
     return false;
   auto &morphology = observation.passage.returned_morphology;
-  morphology.mathematical_before = mathematical_morphology_;
-  morphology.codec_before = codec_morphology_;
-  mathematical_morphology_ += accepted ? 37U : 1U;
-  codec_morphology_ += accepted ? 12U : 2U;
-  rederivation_morphology_ += accepted ? 55U : 1U;
+  morphology.mathematical_before = mathematical_admitted_tally_;
+  morphology.codec_before = codec_admitted_tally_;
+  mathematical_admitted_tally_ += accepted ? 37U : 1U;
+  codec_admitted_tally_ += accepted ? 12U : 2U;
+  rederivation_admitted_tally_ += accepted ? 55U : 1U;
   const std::uint64_t delta = accepted ? 60U : 4U;
   morphology.commit =
       body_.commit(expected.predecessor, 0, delta, expected.passage.value(),
                    pending->take_continuation());
   pending_live_ = false;
-  morphology.mathematical_after = mathematical_morphology_;
-  morphology.codec_after = codec_morphology_;
+  morphology.mathematical_after = mathematical_admitted_tally_;
+  morphology.codec_after = codec_admitted_tally_;
   morphology.returned_difference_applied =
       morphology.commit.state == body::body_change_status::committed;
   observation.passage.pending_after_return = false;

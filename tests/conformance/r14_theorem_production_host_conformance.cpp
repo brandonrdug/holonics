@@ -28,7 +28,7 @@ holonics::event::checker_raw_return raw_for(
 int main() {
   const auto mount = holonics::tests::r14_case();
   holonics::event::resident_theorem_production production{mount.foundation, mount.body_seed,
-      mount.regions, mount.mathematical_morphology, mount.codec_morphology};
+      mount.regions, mount.mathematical_admitted_tally, mount.codec_admitted_tally};
   holonics::event::theorem_production_observation observation{};
   observation.before = production.probe(mount.held_probe, false);
   if (observation.before.available ||
@@ -54,8 +54,8 @@ int main() {
       !after.available || ablated.available || after.source_accesses != 0) { return 4; }
 
   holonics::event::resident_theorem_production rejected{mount.foundation,
-      mount.body_seed + 1U, mount.regions, mount.mathematical_morphology,
-      mount.codec_morphology};
+      mount.body_seed + 1U, mount.regions, mount.mathematical_admitted_tally,
+      mount.codec_admitted_tally};
   holonics::event::theorem_production_observation rejected_observation{};
   if (!rejected.generate_and_stage(mount.question, rejected_observation)) { return 5; }
   auto raw_rejected = raw_for(rejected_observation.outbound);

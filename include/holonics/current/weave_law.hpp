@@ -76,7 +76,7 @@ namespace holonics::current {
     }
     if (!weave_add(value_totals[event.cell], event.value_delta.value(),
             value_totals[event.cell]) ||
-        !weave_add(morphology_totals[event.cell], event.morphology_delta.value(),
+        !weave_add(morphology_totals[event.cell], event.admitted_tally_delta.value(),
             morphology_totals[event.cell])) {
       return weave_obstruction::invalid_program;
     }
@@ -146,7 +146,7 @@ namespace holonics::current {
     const weave_event& event) noexcept {
   return weave_delta{predecessor, event.identity, event.input_port, event.output_port,
       event.read_support, event.change_support, event.value_delta,
-      event.morphology_delta, event.successor_current, event.consequence,
+      event.admitted_tally_delta, event.successor_current, event.consequence,
       event.stress, exact::word{0}, event.logical_resource, event.lineage,
       event.interaction, event.cell};
 }
@@ -164,7 +164,7 @@ namespace holonics::current {
   std::uint64_t next_resource = 0;
   if (!weave_add(standing.cells[delta.cell].value.value(), delta.value_delta.value(), next_value) ||
       !weave_add(standing.cells[delta.cell].morphology.value(),
-          delta.morphology_delta.value(), next_morphology) ||
+          delta.admitted_tally_delta.value(), next_morphology) ||
       !weave_add(standing.logical.used.value(),
           delta.logical_resource.value(), next_resource) ||
       next_resource > standing.logical.capacity.value()) {

@@ -27,10 +27,10 @@ resident_trace_rebase::rest(trace_rebase_rest_record &record) noexcept {
   record.standing.integrity = trace_fiber_rest_integrity(record.standing);
   record.law = law_;
   record.application = application_;
-  record.rebase_morphology = rebase_morphology_;
-  record.differential_morphology = differential_morphology_;
-  record.deck_morphology = deck_morphology_;
-  record.path_morphology = path_morphology_;
+  record.rebase_admitted_tally = rebase_admitted_tally_;
+  record.differential_admitted_tally = differential_admitted_tally_;
+  record.deck_admitted_tally = deck_admitted_tally_;
+  record.path_admitted_tally = path_admitted_tally_;
   record.applied = stage_ == stage::applied;
   record.integrity = trace_rebase_rest_integrity(record);
   receipt.discovery = law_.discovery.identity;

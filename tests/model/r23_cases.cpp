@@ -67,13 +67,13 @@ event::cm_incidence_rest_record r23_host_cm_rest() noexcept {
   record.moment_reconstruction = prior.moment_reconstruction;
   record.cm_incidence = {exact::word{189'300}, exact::word{176'500},
       exact::word{160'900}, exact::word{190'900}, exact::word{16}, true};
-  record.mathematical_morphology = 104; record.codec_morphology = 58;
-  record.geometry_morphology = prior.geometry_morphology;
-  record.phase_morphology = prior.phase_morphology;
-  record.characteristic_morphology = prior.characteristic_morphology;
-  record.regular_singular_morphology = prior.regular_singular_morphology;
-  record.blind_reconstruction_morphology = prior.blind_reconstruction_morphology;
-  record.cm_incidence_morphology = 17;
+  record.mathematical_admitted_tally = 104; record.codec_admitted_tally = 58;
+  record.geometry_admitted_tally = prior.geometry_admitted_tally;
+  record.phase_admitted_tally = prior.phase_admitted_tally;
+  record.characteristic_admitted_tally = prior.characteristic_admitted_tally;
+  record.regular_singular_admitted_tally = prior.regular_singular_admitted_tally;
+  record.blind_reconstruction_admitted_tally = prior.blind_reconstruction_admitted_tally;
+  record.cm_incidence_admitted_tally = 17;
   record.integrity = event::cm_incidence_rest_integrity(record);
   return record;
 }

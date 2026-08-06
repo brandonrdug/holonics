@@ -17,13 +17,13 @@ struct blind_reconstruction_rest_record final {
   organ::acquired_regular_singular regular_singular{};
   organ::acquired_blind_reconstruction code_reconstruction{};
   organ::acquired_blind_reconstruction moment_reconstruction{};
-  std::uint64_t mathematical_morphology{};
-  std::uint64_t codec_morphology{};
-  std::uint64_t geometry_morphology{};
-  std::uint64_t phase_morphology{};
-  std::uint64_t characteristic_morphology{};
-  std::uint64_t regular_singular_morphology{};
-  std::uint64_t blind_reconstruction_morphology{};
+  std::uint64_t mathematical_admitted_tally{};
+  std::uint64_t codec_admitted_tally{};
+  std::uint64_t geometry_admitted_tally{};
+  std::uint64_t phase_admitted_tally{};
+  std::uint64_t characteristic_admitted_tally{};
+  std::uint64_t regular_singular_admitted_tally{};
+  std::uint64_t blind_reconstruction_admitted_tally{};
   std::uint64_t integrity{};
 };
 
@@ -53,28 +53,28 @@ struct blind_reconstruction_remount_receipt final {
   terminal_rest_detail::fold_fiber(fold, record.second);
   const std::uint64_t fibers[36]{record.geometry.identity.value(),
       record.geometry.passage.value(), record.geometry.kernel_return.value(),
-      record.geometry.lineage.value(), record.geometry.morphology_delta.value(),
+      record.geometry.lineage.value(), record.geometry.admitted_tally_delta.value(),
       record.geometry.accepted ? 1U : 0U, record.phase_crystal.identity.value(),
       record.phase_crystal.passage.value(), record.phase_crystal.kernel_return.value(),
-      record.phase_crystal.lineage.value(), record.phase_crystal.morphology_delta.value(),
+      record.phase_crystal.lineage.value(), record.phase_crystal.admitted_tally_delta.value(),
       record.phase_crystal.accepted ? 1U : 0U, record.characteristic.identity.value(),
       record.characteristic.passage.value(), record.characteristic.kernel_return.value(),
-      record.characteristic.lineage.value(), record.characteristic.morphology_delta.value(),
+      record.characteristic.lineage.value(), record.characteristic.admitted_tally_delta.value(),
       record.characteristic.accepted ? 1U : 0U, record.regular_singular.identity.value(),
       record.regular_singular.passage.value(), record.regular_singular.kernel_return.value(),
-      record.regular_singular.lineage.value(), record.regular_singular.morphology_delta.value(),
+      record.regular_singular.lineage.value(), record.regular_singular.admitted_tally_delta.value(),
       record.regular_singular.accepted ? 1U : 0U, record.code_reconstruction.identity.value(),
       record.code_reconstruction.passage.value(), record.code_reconstruction.kernel_return.value(),
-      record.code_reconstruction.lineage.value(), record.code_reconstruction.morphology_delta.value(),
+      record.code_reconstruction.lineage.value(), record.code_reconstruction.admitted_tally_delta.value(),
       record.code_reconstruction.accepted ? 1U : 0U, record.moment_reconstruction.identity.value(),
       record.moment_reconstruction.passage.value(), record.moment_reconstruction.kernel_return.value(),
-      record.moment_reconstruction.lineage.value(), record.moment_reconstruction.morphology_delta.value(),
+      record.moment_reconstruction.lineage.value(), record.moment_reconstruction.admitted_tally_delta.value(),
       record.moment_reconstruction.accepted ? 1U : 0U};
   for (const auto value : fibers) { terminal_rest_detail::fold_value(fold, value); }
-  const std::uint64_t morphology[7]{record.mathematical_morphology,
-      record.codec_morphology, record.geometry_morphology, record.phase_morphology,
-      record.characteristic_morphology, record.regular_singular_morphology,
-      record.blind_reconstruction_morphology};
+  const std::uint64_t morphology[7]{record.mathematical_admitted_tally,
+      record.codec_admitted_tally, record.geometry_admitted_tally, record.phase_admitted_tally,
+      record.characteristic_admitted_tally, record.regular_singular_admitted_tally,
+      record.blind_reconstruction_admitted_tally};
   for (const auto value : morphology) { terminal_rest_detail::fold_value(fold, value); }
   return fold;
 }

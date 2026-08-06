@@ -52,13 +52,13 @@ event::toric_cycle_rest_record r24_host_toric_rest() noexcept {
   record.cm_incidence = prior.cm_incidence;
   record.toric_cycle = {exact::word{190'300}, exact::word{177'500},
       exact::word{161'000}, exact::word{191'050}, exact::word{20}, true};
-  record.mathematical_morphology = 116; record.codec_morphology = 63;
-  record.geometry_morphology = prior.geometry_morphology;
-  record.phase_morphology = prior.phase_morphology;
-  record.characteristic_morphology = prior.characteristic_morphology;
-  record.regular_singular_morphology = prior.regular_singular_morphology;
-  record.blind_reconstruction_morphology = prior.blind_reconstruction_morphology;
-  record.cm_incidence_morphology = 17; record.toric_cycle_morphology = 19;
+  record.mathematical_admitted_tally = 116; record.codec_admitted_tally = 63;
+  record.geometry_admitted_tally = prior.geometry_admitted_tally;
+  record.phase_admitted_tally = prior.phase_admitted_tally;
+  record.characteristic_admitted_tally = prior.characteristic_admitted_tally;
+  record.regular_singular_admitted_tally = prior.regular_singular_admitted_tally;
+  record.blind_reconstruction_admitted_tally = prior.blind_reconstruction_admitted_tally;
+  record.cm_incidence_admitted_tally = 17; record.toric_cycle_admitted_tally = 19;
   record.integrity = event::toric_cycle_rest_integrity(record); return record;
 }
 

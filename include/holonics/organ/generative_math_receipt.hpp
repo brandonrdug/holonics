@@ -2,7 +2,6 @@
 
 #include <cstdint>
 
-#include <holonics/organ/conditioning_receipt.hpp>
 #include <holonics/organ/generative_math_schema.hpp>
 
 namespace holonics::organ {
@@ -43,7 +42,6 @@ struct causal_information_receipt final {
 
 struct generative_math_receipt final {
   generative_expansion_receipt expansion{};
-  navigation_consequence conditioning{};
   generated_math_passage passage{};
   generated_source_exclusion exclusion{};
   causal_information_receipt information{};

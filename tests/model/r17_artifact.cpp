@@ -59,8 +59,8 @@ void write_r17_artifact(std::ostream& output,
          << ",singular_boundary:" << inquiry.theory.singular_boundary << '\n'
          << "formation_delta=head:" << value.theory_commit.predecessor.value() << ':'
          << value.theory_commit.successor.value() << ",morphology:"
-         << value.theory_commit.morphology_before << ':'
-         << value.theory_commit.morphology_after << '\n'
+         << value.theory_commit.admitted_tally_before << ':'
+         << value.theory_commit.admitted_tally_after << '\n'
          << "checker=exit:" << value.raw.exit_status
          << ",stdout_bytes:" << value.raw.stdout_bytes
          << ",stderr_bytes:" << value.raw.stderr_bytes
@@ -74,9 +74,9 @@ void write_r17_artifact(std::ostream& output,
          << value.returned_morphology.mathematical_after << ",codec:"
          << value.returned_morphology.codec_before << ':'
          << value.returned_morphology.codec_after << ",geometry:0:"
-         << handoff.geometry_morphology << ",body:"
-         << value.returned_morphology.commit.morphology_before << ':'
-         << value.returned_morphology.commit.morphology_after << '\n'
+         << handoff.geometry_admitted_tally << ",body:"
+         << value.returned_morphology.commit.admitted_tally_before << ':'
+         << value.returned_morphology.commit.admitted_tally_after << '\n'
          << "sealed_comparison=opened_after_return:" << comparison.opened_after_kernel_return
          << ",observer_reads:" << comparison.observer_reads.value()
          << ",engine_reads:" << comparison.engine_reads.value()
@@ -87,10 +87,10 @@ void write_r17_artifact(std::ostream& output,
          << ",fold:" << comparison.content_fold << '\n'
          << "final_body=head:" << handoff.body.head
          << ",continuation:" << handoff.body.continuation
-         << ",body_morphology:" << handoff.body.regions[0].morphology
-         << ",mathematical:" << handoff.mathematical_morphology
-         << ",codec:" << handoff.codec_morphology
-         << ",geometry:" << handoff.geometry_morphology
+         << ",body_admitted_tally:" << handoff.body.regions[0].morphology
+         << ",mathematical:" << handoff.mathematical_admitted_tally
+         << ",codec:" << handoff.codec_admitted_tally
+         << ",geometry:" << handoff.geometry_admitted_tally
          << ",rest_bytes:" << rest_write.bytes.value()
          << ",integrity:" << handoff.integrity << '\n'
          << "logical_work=read_support:" << execution.logical.read_support.value()

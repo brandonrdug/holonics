@@ -10,8 +10,8 @@ __global__ void stage_checker(const lean_checker_mount* mount,
     event::checker_observation* observation) {
   if (blockIdx.x == 0 && threadIdx.x == 0) {
     ::new (static_cast<void*>(current)) event::resident_checker_current{
-        mount->body_seed, mount->regions, mount->mathematical_morphology,
-        mount->codec_morphology};
+        mount->body_seed, mount->regions, mount->mathematical_admitted_tally,
+        mount->codec_admitted_tally};
     observation->stage = current->stage(mount->source, *observation);
   }
 }

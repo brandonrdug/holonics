@@ -1,7 +1,7 @@
 #pragma once
 
 #include <holonics/event/dependent_theorem_setup.hpp>
-#include <holonics/event/returned_fiber_exclusion_law.hpp>
+#include <holonics/event/theorem_production_rest.hpp>
 #include <holonics/event/resident_theorem_production.hpp>
 
 namespace holonics::event {
@@ -9,7 +9,6 @@ namespace holonics::event {
 struct return_conditioning_observation final {
   theorem_production_remount_receipt production_remount{};
   theorem_production_remount_receipt ablation_remount{};
-  returned_fiber_exclusion_receipt exclusion{};
   organ::theorem_probe_receipt production{};
   organ::theorem_probe_receipt ablated{};
   dependent_theorem_setup setup{};

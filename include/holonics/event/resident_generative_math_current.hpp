@@ -48,7 +48,6 @@ class resident_generative_math_current final {
       receipt.obstruction = receipt.expansion.obstruction;
       return result;
     }
-    static_cast<void>(organ::respond(foundation_.conditioning, 2, 1, 0, receipt.conditioning));
     organ::proof_fiber selected{};
     std::uint16_t retained = 0;
     if (!organ::restrict_generative_fibers(receipt.expansion, selected, retained)) {

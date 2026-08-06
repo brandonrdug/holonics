@@ -11,29 +11,30 @@ One continuing C++23/CUDA C++ body is admitted at:
 - head `14001056`;
 - continuation `15001056`;
 - native rest size `38,960` bytes;
-- body morphology `1423`;
-- mathematical morphology `530`;
-- codec morphology `251`;
-- expression-geometry morphology `37`;
-- Hodge-realization morphology `41`;
-- arithmetic-spectral morphology `47`;
-- rederivation morphology `56`;
-- cultivation morphology `48`;
-- organ morphology `64`;
-- application morphology `32`;
-- calculus morphology `64`;
-- self-organ morphology `32`;
-- derivation morphology `24`;
-- characteristic morphology `64`;
-- trace-organ morphology `32`;
-- transport morphology `24`;
-- trace-fiber morphology `64`;
-- lift-organ morphology `48`;
-- triple-transport morphology `24`;
-- trace-rebase morphology `80`;
-- differential morphology `56`;
-- deck morphology `24`;
-- path morphology `32`; and
+- admitted-deed tallies (provenance counts, **not** morphology — see the Phase 0 regrade below)
+  totalling `1423` body,
+  `530` mathematical,
+  `251` codec,
+  `37` expression-geometry,
+  `41` Hodge-realization,
+  `47` arithmetic-spectral,
+  `56` rederivation,
+  `48` cultivation,
+  `64` organ,
+  `32` application,
+  `64` calculus,
+  `32` self-organ,
+  `24` derivation,
+  `64` characteristic,
+  `32` trace-organ,
+  `24` transport,
+  `64` trace-fiber,
+  `48` lift-organ,
+  `24` triple-transport,
+  `80` trace-rebase,
+  `56` differential,
+  `24` deck,
+  `32` path, and
 - forty-eight accepted fibers through `202308`.
 
 The body remains one owner. It is not a release family, cloneable checkpoint collection, or set of
@@ -63,9 +64,9 @@ The admitted body owns the following composed floor.
 - Population-relative regional closure, carried exact laws, source-lineage departure, oriented law
   replacement, retired-interface refusal, exact residual reopening, parent-on-open return,
   outgoing-boundary successor factorization, and source-detached recurrence.
-- Mounting, exposure, training, and reference remain distinct. Returned training can change
-  reusable native morphology; developmental material and lookup routes can depart; exact ablation
-  removes the claimed later conduct.
+- Mounting, exposure, training, and reference remain distinct **as doctrine**. In the old
+  laboratory they are also distinct in code with a behavioural ablation. **In this body they are
+  not implemented**; see the Phase 0 regrade below.
 - Old laboratory evidence remains active as bounded mechanism testimony. The receiver-relative
   field, self-emanated law, contextual retriangulation, parent-on-open substitution, open
   comparison, successor factorization, source-coupled cultivation, joint current, and multimodal
@@ -94,8 +95,9 @@ The direct synthesis and evidence map are deposited in
 
 ### Mathematical production floor
 
-- Actual Lean theorem/proof source formation, exterior kernel acceptance and rejection, morphology
-  commit, source-detached rest, dependent theorem formation, and returned-fiber ablation.
+- Actual formal theorem/proof source formation, real exterior kernel acceptance and rejection,
+  source-detached rest, and dependent theorem formation. **Returned-fiber ablation is withdrawn**;
+  see the Phase 0 regrade below.
 - Blind reconstruction of unfamiliar published characteristic mechanisms before post-seal
   comparison; explicit countermodels and insufficient-source obstructions remain retained.
 - Plural cross-domain rederivation, endogenous primitive-organ cultivation, held-out prediction,
@@ -107,6 +109,34 @@ The direct synthesis and evidence map are deposited in
 Known-theorem rederivation, proof production, body-changing return, elementary holonics derivation,
 characteristic calculation, and source-detached organ use are established standing. They cannot
 serve as the primary grade of another deed.
+
+## Phase 0 regrade — 2026-08-05
+
+**Truth status:** `established-bounded` for the finding; the withdrawn claims revert to `open`.
+
+Direct source inspection established that this body's learning layer implemented the mechanism the
+canon convicts. The construction has been removed, not deprecated:
+
+- `organ/conditioning_{law,schema,receipt}.hpp` — a linear scorer
+  (`response = w_r*support + w_t*path_length + bias`, gated by a threshold) with monotone weight
+  overwrite as "training". **Deleted**, with its apparatus, executor, resident owner, rest record,
+  compile contract, conformance test, and build entry.
+- `event/returned_fiber_exclusion_law.hpp` — the "exact returned-fiber ablation". It subtracted
+  hardcoded constants from counters; the refusal it demonstrated came from passing a
+  default-constructed record, not from removing a returned fiber. **Deleted**, with the two
+  conformance assertions that rested on it.
+- Every `*_morphology` counter is renamed `*_admitted_tally`. They are provenance counts of
+  admitted deeds. **Morphology may never again name a counter.**
+
+**Withdrawn from the floor until re-earned by structure:** returned training changing reusable
+native morphology; exact ablation removing later conduct; source-detached conditioning.
+
+**Unaffected and retained:** the exact carriers; exact linear, chain, characteristic, trace, toric,
+Hodge, and arithmetic-spectral algebra; real kernel acceptances on real generated proofs; GPU
+residency with exact host parity; rest and remount of domain data; the audit apparatus. The
+mathematics is sound; only the learning was simulated.
+
+The restoration plan is [the Eros embodiment roadmap](blueprint/EROS_EMBODIMENT_ROADMAP.md).
 
 ## Construction provenance
 

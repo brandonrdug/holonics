@@ -45,9 +45,9 @@ HOLONICS_CALLABLE inline resident_elementary_calculus::resident_elementary_calcu
     elementary_calculus_remount_receipt &receipt) noexcept
     : standing_(record.standing), body_(body::continuing_body::remount(
           record.standing.standing.body,receipt.body)), laws_(record.laws),
-      application_(record.application), calculus_morphology_(record.calculus_morphology),
-      self_organ_morphology_(record.self_organ_morphology),
-      derivation_morphology_(record.derivation_morphology),
+      application_(record.application), calculus_admitted_tally_(record.calculus_admitted_tally),
+      self_organ_admitted_tally_(record.self_organ_admitted_tally),
+      derivation_admitted_tally_(record.derivation_admitted_tally),
       stage_(record.applied ? stage::applied : stage::derived) {
   const bool exact = record.integrity == elementary_calculus_rest_integrity(record);
   bool fibers = record.laws.checker_founded && record.laws.self_organ.checker_founded &&

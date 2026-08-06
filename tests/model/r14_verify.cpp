@@ -53,8 +53,8 @@ std::size_t r14_verification_failures(
       actual.generation_commit.state != body::body_change_status::committed ||
       actual.generation_commit.predecessor != exact::word{14'001'000} ||
       actual.generation_commit.successor != exact::word{14'001'001} ||
-      actual.generation_commit.morphology_before != 128 ||
-      actual.generation_commit.morphology_after != 135 ||
+      actual.generation_commit.admitted_tally_before != 128 ||
+      actual.generation_commit.admitted_tally_after != 135 ||
       !generation.exact_local_expansion || !generation.exact_receiver_restriction ||
       !generation.proof_current_lineaged;
   const auto& exclusion = generation.exclusion;
@@ -90,11 +90,11 @@ std::size_t r14_verification_failures(
       morphology.commit.state != body::body_change_status::committed ||
       morphology.commit.predecessor != exact::word{14'001'001} ||
       morphology.commit.successor != exact::word{14'001'002} ||
-      morphology.commit.morphology_before != 135 || morphology.commit.morphology_after != 140 ||
+      morphology.commit.admitted_tally_before != 135 || morphology.commit.admitted_tally_after != 140 ||
       !morphology.returned_difference_applied;
   failures += actual.acquired.identity != exact::word{181'200} ||
       actual.acquired.passage != exact::word{171'200} || !actual.acquired.accepted ||
-      actual.acquired.morphology_delta != exact::word{5} ||
+      actual.acquired.admitted_tally_delta != exact::word{5} ||
       actual.before.available || actual.before.source_accesses != 0 ||
       !actual.after.available || actual.after.used_returned_fiber != exact::word{181'200} ||
       actual.after.source_accesses != 0 || !actual.behavior_changed;
@@ -110,7 +110,7 @@ std::size_t r14_verification_failures(
   failures += handoff.integrity != event::theorem_production_rest_integrity(handoff) ||
       handoff.body.head != 14'001'002 || handoff.body.regions[0].morphology != 140 ||
       handoff.acquired.identity != exact::word{181'200} || !handoff.acquired.accepted ||
-      handoff.mathematical_morphology != 46 || handoff.codec_morphology != 34;
+      handoff.mathematical_admitted_tally != 46 || handoff.codec_admitted_tally != 34;
   return failures;
 }
 

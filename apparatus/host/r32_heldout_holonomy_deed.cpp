@@ -18,8 +18,8 @@ std::size_t failures(const holonics::apparatus::elementary_executor_receipt&e,
   c(!o.remount.application_preserved||!o.handoff.returned||!o.final_can_continue);
   c(o.final_head.value()!=14'001'044||o.final_continuation.value()!=15'001'044);
   c(!r.applied||!r.application.accepted||r.application.identity.value()!=199'306);
-  c(r.standing.standing.body.regions[0].morphology!=1103);c(r.standing.standing.mathematical_morphology!=370);
-  c(r.standing.standing.codec_morphology!=171);c(r.integrity!=holonics::event::elementary_calculus_rest_integrity(r));return f;}
+  c(r.standing.standing.body.regions[0].morphology!=1103);c(r.standing.standing.mathematical_admitted_tally!=370);
+  c(r.standing.standing.codec_admitted_tally!=171);c(r.integrity!=holonics::event::elementary_calculus_rest_integrity(r));return f;}
 void atlas(std::ostream&out,const holonics::organ::heldout_holonomy_receipt&r){
   out<<"index\tprefix\tsource\tpredicted\tequal\n";for(std::uint8_t i=0;i<r.tail.sample_count;++i)
     out<<static_cast<unsigned>(i)<<'\t'<<(i<r.tail.prefix_count)<<'\t'<<r.tail.source[i].numerator<<'/'<<r.tail.source[i].denominator
@@ -49,8 +49,8 @@ int main(int argc,char**argv){if(argc!=15)return 2;holonics::apparatus::elementa
     <<"prediction_before_comparison="<<observation.inquiry.prediction_before_comparison<<"\nfinal_rest_bytes="<<sizeof(handoff)
     <<"\nfinal_body=head:"<<observation.final_head.value()<<",continuation:"<<observation.final_continuation.value()
     <<",morphology:"<<handoff.standing.standing.body.regions[0].morphology<<",mathematical:"
-    <<handoff.standing.standing.mathematical_morphology<<",codec:"<<handoff.standing.standing.codec_morphology
-    <<",derivation:"<<handoff.derivation_morphology<<"\nchecker_exit="<<observation.passage.raw.exit_status<<"\nformal_begin\n";
+    <<handoff.standing.standing.mathematical_admitted_tally<<",codec:"<<handoff.standing.standing.codec_admitted_tally
+    <<",derivation:"<<handoff.derivation_admitted_tally<<"\nchecker_exit="<<observation.passage.raw.exit_status<<"\nformal_begin\n";
   deed.write(observation.passage.formal.bytes,observation.passage.formal.byte_count);deed<<"formal_end\nconversation_begin\n";
   deed.write(observation.dossier.bytes,observation.dossier.byte_count);deed<<"\nconversation_end\n"
     <<"physical_telemetry=engine_time:unknown,checker_time:unknown,energy:unknown\n";

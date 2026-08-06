@@ -24,17 +24,17 @@ HOLONICS_CALLABLE inline bool resident_geometry_inquiry::resume(
   normalize_geometry_checker_return(raw, observation.formal, typed);
   const bool accepted = typed.state == checker_return_status::accepted;
   auto& morphology = observation.returned_morphology;
-  morphology.mathematical_before = mathematical_morphology_;
-  morphology.codec_before = codec_morphology_;
-  mathematical_morphology_ += accepted ? 6U : 1U;
-  codec_morphology_ += accepted ? 3U : 2U;
-  geometry_morphology_ += accepted ? 10U : 1U;
+  morphology.mathematical_before = mathematical_admitted_tally_;
+  morphology.codec_before = codec_admitted_tally_;
+  mathematical_admitted_tally_ += accepted ? 6U : 1U;
+  codec_admitted_tally_ += accepted ? 3U : 2U;
+  geometry_admitted_tally_ += accepted ? 10U : 1U;
   const std::uint64_t delta = accepted ? 9U : 4U;
   morphology.commit = body_.commit(expected.predecessor, 0, delta,
       expected.passage.value(), pending->take_continuation());
   pending_live_ = false;
-  morphology.mathematical_after = mathematical_morphology_;
-  morphology.codec_after = codec_morphology_;
+  morphology.mathematical_after = mathematical_admitted_tally_;
+  morphology.codec_after = codec_admitted_tally_;
   morphology.returned_difference_applied =
       morphology.commit.state == body::body_change_status::committed;
   observation.pending_after_return = pending_live_;
@@ -58,9 +58,9 @@ HOLONICS_CALLABLE inline geometry_inquiry_rest_receipt resident_geometry_inquiry
   record.first = first_;
   record.second = second_;
   record.geometry = geometry_;
-  record.mathematical_morphology = mathematical_morphology_;
-  record.codec_morphology = codec_morphology_;
-  record.geometry_morphology = geometry_morphology_;
+  record.mathematical_admitted_tally = mathematical_admitted_tally_;
+  record.codec_admitted_tally = codec_admitted_tally_;
+  record.geometry_admitted_tally = geometry_admitted_tally_;
   record.integrity = geometry_inquiry_rest_integrity(record);
   receipt.theory = geometry_.identity;
   receipt.integrity = exact::word{record.integrity};

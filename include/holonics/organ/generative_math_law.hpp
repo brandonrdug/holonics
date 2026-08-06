@@ -2,7 +2,6 @@
 
 #include <cstddef>
 
-#include <holonics/organ/conditioning_law.hpp>
 #include <holonics/organ/generative_math_receipt.hpp>
 
 namespace holonics::organ {
@@ -11,7 +10,7 @@ namespace holonics::organ {
     const generative_math_foundation& value) noexcept {
   if (value.ecology.value() == 0 || value.premise_declaration.value() == 0 ||
       value.premise_type.value() == 0 || value.premise_proof.value() == 0 ||
-      value.provenance.value() == 0 || !valid_morphology(value.conditioning)) {
+      value.provenance.value() == 0) {
     return false;
   }
   for (const auto& rule : value.rules) {

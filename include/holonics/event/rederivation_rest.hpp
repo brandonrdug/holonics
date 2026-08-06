@@ -29,22 +29,22 @@ struct rederivation_rest_record final {
   organ::acquired_rederivation_fiber lattice_rederivation{};
   organ::acquired_rederivation_fiber potential_rederivation{};
   organ::acquired_rederivation_fiber cover_rederivation{};
-  std::uint64_t mathematical_morphology{};
-  std::uint64_t codec_morphology{};
-  std::uint64_t geometry_morphology{};
-  std::uint64_t phase_morphology{};
-  std::uint64_t characteristic_morphology{};
-  std::uint64_t regular_singular_morphology{};
-  std::uint64_t blind_reconstruction_morphology{};
-  std::uint64_t cm_incidence_morphology{};
-  std::uint64_t toric_cycle_morphology{};
-  std::uint64_t algebraic_variation_morphology{};
-  std::uint64_t causal_linear_morphology{};
-  std::uint64_t intrinsic_hypergeometry_morphology{};
-  std::uint64_t expression_geometry_morphology{};
-  std::uint64_t hodge_realization_morphology{};
-  std::uint64_t arithmetic_spectral_morphology{};
-  std::uint64_t rederivation_morphology{};
+  std::uint64_t mathematical_admitted_tally{};
+  std::uint64_t codec_admitted_tally{};
+  std::uint64_t geometry_admitted_tally{};
+  std::uint64_t phase_admitted_tally{};
+  std::uint64_t characteristic_admitted_tally{};
+  std::uint64_t regular_singular_admitted_tally{};
+  std::uint64_t blind_reconstruction_admitted_tally{};
+  std::uint64_t cm_incidence_admitted_tally{};
+  std::uint64_t toric_cycle_admitted_tally{};
+  std::uint64_t algebraic_variation_admitted_tally{};
+  std::uint64_t causal_linear_admitted_tally{};
+  std::uint64_t intrinsic_hypergeometry_admitted_tally{};
+  std::uint64_t expression_geometry_admitted_tally{};
+  std::uint64_t hodge_realization_admitted_tally{};
+  std::uint64_t arithmetic_spectral_admitted_tally{};
+  std::uint64_t rederivation_admitted_tally{};
   std::uint64_t integrity{};
 };
 
@@ -85,26 +85,26 @@ rederivation_rest_integrity(const rederivation_rest_record &record) noexcept {
   inherited.expression_geometry = record.expression_geometry;
   inherited.hodge_realization = record.hodge_realization;
   inherited.arithmetic_spectral = record.arithmetic_spectral;
-  inherited.mathematical_morphology = record.mathematical_morphology;
-  inherited.codec_morphology = record.codec_morphology;
-  inherited.geometry_morphology = record.geometry_morphology;
-  inherited.phase_morphology = record.phase_morphology;
-  inherited.characteristic_morphology = record.characteristic_morphology;
-  inherited.regular_singular_morphology = record.regular_singular_morphology;
-  inherited.blind_reconstruction_morphology =
-      record.blind_reconstruction_morphology;
-  inherited.cm_incidence_morphology = record.cm_incidence_morphology;
-  inherited.toric_cycle_morphology = record.toric_cycle_morphology;
-  inherited.algebraic_variation_morphology =
-      record.algebraic_variation_morphology;
-  inherited.causal_linear_morphology = record.causal_linear_morphology;
-  inherited.intrinsic_hypergeometry_morphology =
-      record.intrinsic_hypergeometry_morphology;
-  inherited.expression_geometry_morphology =
-      record.expression_geometry_morphology;
-  inherited.hodge_realization_morphology = record.hodge_realization_morphology;
-  inherited.arithmetic_spectral_morphology =
-      record.arithmetic_spectral_morphology;
+  inherited.mathematical_admitted_tally = record.mathematical_admitted_tally;
+  inherited.codec_admitted_tally = record.codec_admitted_tally;
+  inherited.geometry_admitted_tally = record.geometry_admitted_tally;
+  inherited.phase_admitted_tally = record.phase_admitted_tally;
+  inherited.characteristic_admitted_tally = record.characteristic_admitted_tally;
+  inherited.regular_singular_admitted_tally = record.regular_singular_admitted_tally;
+  inherited.blind_reconstruction_admitted_tally =
+      record.blind_reconstruction_admitted_tally;
+  inherited.cm_incidence_admitted_tally = record.cm_incidence_admitted_tally;
+  inherited.toric_cycle_admitted_tally = record.toric_cycle_admitted_tally;
+  inherited.algebraic_variation_admitted_tally =
+      record.algebraic_variation_admitted_tally;
+  inherited.causal_linear_admitted_tally = record.causal_linear_admitted_tally;
+  inherited.intrinsic_hypergeometry_admitted_tally =
+      record.intrinsic_hypergeometry_admitted_tally;
+  inherited.expression_geometry_admitted_tally =
+      record.expression_geometry_admitted_tally;
+  inherited.hodge_realization_admitted_tally = record.hodge_realization_admitted_tally;
+  inherited.arithmetic_spectral_admitted_tally =
+      record.arithmetic_spectral_admitted_tally;
   std::uint64_t fold = arithmetic_spectral_rest_integrity(inherited);
   const organ::acquired_rederivation_fiber fibers[4]{
       record.matching_rederivation, record.lattice_rederivation,
@@ -113,12 +113,12 @@ rederivation_rest_integrity(const rederivation_rest_record &record) noexcept {
     const std::uint64_t local[6]{
         fiber.identity.value(),         fiber.passage.value(),
         fiber.returned_event.value(),   fiber.lineage.value(),
-        fiber.morphology_delta.value(), fiber.accepted ? 1U : 0U};
+        fiber.admitted_tally_delta.value(), fiber.accepted ? 1U : 0U};
     for (const auto value : local) {
       terminal_rest_detail::fold_value(fold, value);
     }
   }
-  const std::uint64_t values[1]{record.rederivation_morphology};
+  const std::uint64_t values[1]{record.rederivation_admitted_tally};
   for (const auto value : values) {
     terminal_rest_detail::fold_value(fold, value);
   }

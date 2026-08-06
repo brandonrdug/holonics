@@ -40,8 +40,8 @@ void write_r15_artifact(std::ostream& output,
          << ",delta=" << value.exclusion.excluded_delta.value()
          << ",head=" << value.exclusion.head_before.value() << ':'
          << value.exclusion.head_after.value()
-         << ",body_morphology=" << value.exclusion.body_morphology_before << ':'
-         << value.exclusion.body_morphology_after
+         << ",body_admitted_tally=" << value.exclusion.body_admitted_tally_before << ':'
+         << value.exclusion.body_admitted_tally_after
          << ",mathematical=" << value.exclusion.mathematical_before << ':'
          << value.exclusion.mathematical_after
          << ",codec=" << value.exclusion.codec_before << ':'

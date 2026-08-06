@@ -28,13 +28,13 @@ class resident_cm_incidence final {
         regular_singular_(record.regular_singular),
         code_reconstruction_(record.code_reconstruction),
         moment_reconstruction_(record.moment_reconstruction),
-        mathematical_morphology_(record.mathematical_morphology),
-        codec_morphology_(record.codec_morphology),
-        geometry_morphology_(record.geometry_morphology),
-        phase_morphology_(record.phase_morphology),
-        characteristic_morphology_(record.characteristic_morphology),
-        regular_singular_morphology_(record.regular_singular_morphology),
-        blind_reconstruction_morphology_(record.blind_reconstruction_morphology),
+        mathematical_admitted_tally_(record.mathematical_admitted_tally),
+        codec_admitted_tally_(record.codec_admitted_tally),
+        geometry_admitted_tally_(record.geometry_admitted_tally),
+        phase_admitted_tally_(record.phase_admitted_tally),
+        characteristic_admitted_tally_(record.characteristic_admitted_tally),
+        regular_singular_admitted_tally_(record.regular_singular_admitted_tally),
+        blind_reconstruction_admitted_tally_(record.blind_reconstruction_admitted_tally),
         source_detached_(true) {
     const bool exact = record.integrity == blind_reconstruction_rest_integrity(record);
     receipt.code_theory = code_reconstruction_.identity;
@@ -54,14 +54,14 @@ class resident_cm_incidence final {
         characteristic_(record.characteristic), regular_singular_(record.regular_singular),
         code_reconstruction_(record.code_reconstruction),
         moment_reconstruction_(record.moment_reconstruction), cm_incidence_(record.cm_incidence),
-        mathematical_morphology_(record.mathematical_morphology),
-        codec_morphology_(record.codec_morphology),
-        geometry_morphology_(record.geometry_morphology),
-        phase_morphology_(record.phase_morphology),
-        characteristic_morphology_(record.characteristic_morphology),
-        regular_singular_morphology_(record.regular_singular_morphology),
-        blind_reconstruction_morphology_(record.blind_reconstruction_morphology),
-        cm_incidence_morphology_(record.cm_incidence_morphology), source_detached_(true) {
+        mathematical_admitted_tally_(record.mathematical_admitted_tally),
+        codec_admitted_tally_(record.codec_admitted_tally),
+        geometry_admitted_tally_(record.geometry_admitted_tally),
+        phase_admitted_tally_(record.phase_admitted_tally),
+        characteristic_admitted_tally_(record.characteristic_admitted_tally),
+        regular_singular_admitted_tally_(record.regular_singular_admitted_tally),
+        blind_reconstruction_admitted_tally_(record.blind_reconstruction_admitted_tally),
+        cm_incidence_admitted_tally_(record.cm_incidence_admitted_tally), source_detached_(true) {
     const bool exact = record.integrity == cm_incidence_rest_integrity(record);
     receipt.theory = cm_incidence_.identity;
     receipt.same_body = receipt.body.returned && receipt.body.head == body_.head();
@@ -104,14 +104,14 @@ class resident_cm_incidence final {
   organ::acquired_blind_reconstruction moment_reconstruction_{};
   organ::acquired_cm_incidence cm_incidence_{};
   alignas(checker_pending_deed) unsigned char pending_storage_[sizeof(checker_pending_deed)]{};
-  std::uint64_t mathematical_morphology_{};
-  std::uint64_t codec_morphology_{};
-  std::uint64_t geometry_morphology_{};
-  std::uint64_t phase_morphology_{};
-  std::uint64_t characteristic_morphology_{};
-  std::uint64_t regular_singular_morphology_{};
-  std::uint64_t blind_reconstruction_morphology_{};
-  std::uint64_t cm_incidence_morphology_{};
+  std::uint64_t mathematical_admitted_tally_{};
+  std::uint64_t codec_admitted_tally_{};
+  std::uint64_t geometry_admitted_tally_{};
+  std::uint64_t phase_admitted_tally_{};
+  std::uint64_t characteristic_admitted_tally_{};
+  std::uint64_t regular_singular_admitted_tally_{};
+  std::uint64_t blind_reconstruction_admitted_tally_{};
+  std::uint64_t cm_incidence_admitted_tally_{};
   passage_stage stage_{passage_stage::none};
   bool source_detached_{};
   bool pending_live_{};

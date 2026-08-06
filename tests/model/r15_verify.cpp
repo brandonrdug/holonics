@@ -45,7 +45,7 @@ std::size_t r15_verification_failures(
       exclusion.excluded_delta != exact::word{5} ||
       exclusion.head_before != exact::word{14'001'002} ||
       exclusion.head_after != exact::word{14'001'001} ||
-      exclusion.body_morphology_before != 140 || exclusion.body_morphology_after != 135 ||
+      exclusion.body_admitted_tally_before != 140 || exclusion.body_admitted_tally_after != 135 ||
       exclusion.mathematical_before != 46 || exclusion.mathematical_after != 43 ||
       exclusion.codec_before != 34 || exclusion.codec_after != 32 ||
       !exclusion.original_integrity_exact || !exclusion.projected_integrity_exact ||

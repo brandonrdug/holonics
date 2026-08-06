@@ -78,8 +78,8 @@ int main(int argc, char **argv) {
       << "development_card_arguments=0\npredictions_before_comparison=1\n"
       << "final_body=head:" << observation.final_head.value() << ",continuation:"
       << observation.final_continuation.value() << ",morphology:" << handoff.standing.body.regions[0].morphology
-      << ",mathematical:" << handoff.standing.mathematical_morphology << ",codec:"
-      << handoff.standing.codec_morphology << ",application:" << handoff.application_morphology
+      << ",mathematical:" << handoff.standing.mathematical_admitted_tally << ",codec:"
+      << handoff.standing.codec_admitted_tally << ",application:" << handoff.application_admitted_tally
       << "\nchecker_exit=" << observation.passage.raw.exit_status << "\nformal_begin\n";
   deed.write(observation.passage.formal.bytes, observation.passage.formal.byte_count);
   deed << "formal_end\nconversation_begin\n";

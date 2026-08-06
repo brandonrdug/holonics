@@ -59,10 +59,10 @@ HOLONICS_CALLABLE inline resident_trace_rebase::resident_trace_rebase(
           record.standing.standing.standing.standing.standing.body,
           receipt.body)),
       law_(record.law), application_(record.application),
-      rebase_morphology_(record.rebase_morphology),
-      differential_morphology_(record.differential_morphology),
-      deck_morphology_(record.deck_morphology),
-      path_morphology_(record.path_morphology),
+      rebase_admitted_tally_(record.rebase_admitted_tally),
+      differential_admitted_tally_(record.differential_admitted_tally),
+      deck_admitted_tally_(record.deck_admitted_tally),
+      path_admitted_tally_(record.path_admitted_tally),
       stage_(record.applied ? stage::applied : stage::derived) {
   const bool exact = record.integrity == trace_rebase_rest_integrity(record);
   receipt.discovery = record.law.discovery.identity;

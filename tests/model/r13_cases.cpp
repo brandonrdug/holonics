@@ -20,8 +20,8 @@ apparatus::lean_checker_mount r13_case(const char* generated_source) noexcept {
   mount.regions[2] = {122, 0};
   mount.regions[3] = {123, 0};
   mount.body_seed = 13'001'000;
-  mount.mathematical_morphology = 40;
-  mount.codec_morphology = 30;
+  mount.mathematical_admitted_tally = 40;
+  mount.codec_admitted_tally = 30;
   return mount;
 }
 

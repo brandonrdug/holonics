@@ -25,8 +25,8 @@ class resident_geometry_inquiry final {
       terminal_theorem_remount_receipt& receipt) noexcept
       : foundation_(foundation), body_(body::continuing_body::remount(record.body, receipt.body)),
         first_(record.first), second_(record.second),
-        mathematical_morphology_(record.mathematical_morphology),
-        codec_morphology_(record.codec_morphology), source_detached_(true) {
+        mathematical_admitted_tally_(record.mathematical_admitted_tally),
+        codec_admitted_tally_(record.codec_admitted_tally), source_detached_(true) {
     const bool exact = record.integrity == terminal_theorem_rest_integrity(record);
     receipt.first_fiber = first_.identity;
     receipt.second_fiber = second_.identity;
@@ -43,9 +43,9 @@ class resident_geometry_inquiry final {
       geometry_inquiry_remount_receipt& receipt) noexcept
       : foundation_(foundation), body_(body::continuing_body::remount(record.body, receipt.body)),
         first_(record.first), second_(record.second), geometry_(record.geometry),
-        mathematical_morphology_(record.mathematical_morphology),
-        codec_morphology_(record.codec_morphology),
-        geometry_morphology_(record.geometry_morphology), source_detached_(true) {
+        mathematical_admitted_tally_(record.mathematical_admitted_tally),
+        codec_admitted_tally_(record.codec_admitted_tally),
+        geometry_admitted_tally_(record.geometry_admitted_tally), source_detached_(true) {
     const bool exact = record.integrity == geometry_inquiry_rest_integrity(record);
     receipt.theory = geometry_.identity;
     receipt.same_body = receipt.body.returned && receipt.body.head == body_.head();
@@ -113,9 +113,9 @@ class resident_geometry_inquiry final {
   organ::acquired_theorem_fiber second_{};
   organ::acquired_geometry_theory geometry_{};
   alignas(checker_pending_deed) unsigned char pending_storage_[sizeof(checker_pending_deed)]{};
-  std::uint64_t mathematical_morphology_{};
-  std::uint64_t codec_morphology_{};
-  std::uint64_t geometry_morphology_{};
+  std::uint64_t mathematical_admitted_tally_{};
+  std::uint64_t codec_admitted_tally_{};
+  std::uint64_t geometry_admitted_tally_{};
   bool source_detached_{};
   bool pending_live_{};
   bool admitted_{};

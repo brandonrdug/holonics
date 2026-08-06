@@ -94,8 +94,8 @@ std::size_t r16_verification_failures(
   failures += actual.generation_commit.state != body::body_change_status::committed ||
       actual.generation_commit.predecessor != exact::word{14'001'002} ||
       actual.generation_commit.successor != exact::word{14'001'003} ||
-      actual.generation_commit.morphology_before != 140 ||
-      actual.generation_commit.morphology_after != 147;
+      actual.generation_commit.admitted_tally_before != 140 ||
+      actual.generation_commit.admitted_tally_after != 147;
   failures += actual.formal.passage != exact::word{172'200} ||
       actual.conversational.passage != actual.formal.passage ||
       actual.checker_face.passage != actual.formal.passage ||
@@ -126,12 +126,12 @@ std::size_t r16_verification_failures(
       morphology.commit.state != body::body_change_status::committed ||
       morphology.commit.predecessor != exact::word{14'001'003} ||
       morphology.commit.successor != exact::word{14'001'004} ||
-      morphology.commit.morphology_before != 147 ||
-      morphology.commit.morphology_after != 152 || !morphology.returned_difference_applied;
+      morphology.commit.admitted_tally_before != 147 ||
+      morphology.commit.admitted_tally_after != 152 || !morphology.returned_difference_applied;
   failures += actual.second_acquired.identity != exact::word{182'200} ||
       actual.second_acquired.passage != exact::word{172'200} ||
       actual.second_acquired.selected_rule != exact::word{181'200} ||
-      actual.second_acquired.morphology_delta != exact::word{5} ||
+      actual.second_acquired.admitted_tally_delta != exact::word{5} ||
       !actual.second_acquired.accepted;
   failures += !actual.rest.returned || !actual.rest.source_detached ||
       actual.rest.retained_source_bytes != 0 || !actual.remount.same_body ||
@@ -144,7 +144,7 @@ std::size_t r16_verification_failures(
       handoff.body.regions[0].morphology != 152 ||
       handoff.first.identity != exact::word{181'200} || !handoff.first.accepted ||
       handoff.second.identity != exact::word{182'200} || !handoff.second.accepted ||
-      handoff.mathematical_morphology != 49 || handoff.codec_morphology != 36;
+      handoff.mathematical_admitted_tally != 49 || handoff.codec_admitted_tally != 36;
   return failures;
 }
 

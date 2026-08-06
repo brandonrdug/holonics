@@ -106,11 +106,11 @@ void write_r18_artifact(std::ostream& output,
       << value.typed.remaining_goal_count << ",kernel:" << value.typed.kernel_boundary_crossed
       << ",calls:" << execution.process.exterior_process_calls.value() << '\n'
       << "final_body=head:" << handoff.body.head << ",continuation:"
-      << handoff.body.continuation << ",body_morphology:"
+      << handoff.body.continuation << ",body_admitted_tally:"
       << handoff.body.regions[0].morphology << ",mathematical:"
-      << handoff.mathematical_morphology << ",codec:" << handoff.codec_morphology
-      << ",geometry:" << handoff.geometry_morphology << ",phase:"
-      << handoff.phase_morphology << ",rest_bytes:" << rest_write.bytes.value()
+      << handoff.mathematical_admitted_tally << ",codec:" << handoff.codec_admitted_tally
+      << ",geometry:" << handoff.geometry_admitted_tally << ",phase:"
+      << handoff.phase_admitted_tally << ",rest_bytes:" << rest_write.bytes.value()
       << ",integrity:" << handoff.integrity << '\n'
       << "physical_telemetry=engine_time:unknown,checker_time:unknown,temperature:unknown,"
          "power:unknown,energy:unknown\nformal_begin\n";

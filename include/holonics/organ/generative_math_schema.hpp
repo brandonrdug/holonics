@@ -3,7 +3,6 @@
 #include <cstddef>
 #include <cstdint>
 
-#include <holonics/organ/conditioning_schema.hpp>
 
 namespace holonics::organ {
 
@@ -35,7 +34,6 @@ struct generative_math_foundation final {
   exact::word premise_type{};
   exact::word premise_proof{};
   exact::word provenance{};
-  navigation_morphology conditioning{};
   generative_local_rule rules[generative_fiber_capacity]{};
 };
 

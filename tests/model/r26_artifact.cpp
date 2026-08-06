@@ -92,9 +92,9 @@ void write_r26_artifact(std::ostream& output, bool sources_loaded,
       << ",produced_bytes:" << value.passage.raw.produced_artifact_bytes
       << "\nfinal_body=head:" << handoff.body.head << ",continuation:"
       << handoff.body.continuation << ",morphology:" << handoff.body.regions[0].morphology
-      << ",mathematical:" << handoff.mathematical_morphology << ",codec:"
-      << handoff.codec_morphology << ",intrinsic_hypergeometry:"
-      << handoff.intrinsic_hypergeometry_morphology << ",rest_bytes:"
+      << ",mathematical:" << handoff.mathematical_admitted_tally << ",codec:"
+      << handoff.codec_admitted_tally << ",intrinsic_hypergeometry:"
+      << handoff.intrinsic_hypergeometry_admitted_tally << ",rest_bytes:"
       << rest_write.bytes.value() << ",integrity:" << handoff.integrity
       << "\nphysical_telemetry=engine_time:unknown,checker_time:unknown,temperature:unknown,"
          "power:unknown,energy:unknown\nformal_begin\n";

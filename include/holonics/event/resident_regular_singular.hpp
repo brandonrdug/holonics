@@ -25,11 +25,11 @@ class resident_regular_singular final {
       : foundation_(foundation), body_(body::continuing_body::remount(record.body, receipt.body)),
         first_(record.first), second_(record.second), geometry_(record.geometry),
         phase_crystal_(record.phase_crystal), characteristic_(record.characteristic),
-        mathematical_morphology_(record.mathematical_morphology),
-        codec_morphology_(record.codec_morphology),
-        geometry_morphology_(record.geometry_morphology),
-        phase_morphology_(record.phase_morphology),
-        characteristic_morphology_(record.characteristic_morphology), source_detached_(true) {
+        mathematical_admitted_tally_(record.mathematical_admitted_tally),
+        codec_admitted_tally_(record.codec_admitted_tally),
+        geometry_admitted_tally_(record.geometry_admitted_tally),
+        phase_admitted_tally_(record.phase_admitted_tally),
+        characteristic_admitted_tally_(record.characteristic_admitted_tally), source_detached_(true) {
     const bool exact = record.integrity == characteristic_rest_integrity(record);
     receipt.theory = characteristic_.identity;
     receipt.same_body = receipt.body.returned && receipt.body.head == body_.head();
@@ -47,12 +47,12 @@ class resident_regular_singular final {
         first_(record.first), second_(record.second), geometry_(record.geometry),
         phase_crystal_(record.phase_crystal), characteristic_(record.characteristic),
         regular_singular_(record.regular_singular),
-        mathematical_morphology_(record.mathematical_morphology),
-        codec_morphology_(record.codec_morphology),
-        geometry_morphology_(record.geometry_morphology),
-        phase_morphology_(record.phase_morphology),
-        characteristic_morphology_(record.characteristic_morphology),
-        regular_singular_morphology_(record.regular_singular_morphology),
+        mathematical_admitted_tally_(record.mathematical_admitted_tally),
+        codec_admitted_tally_(record.codec_admitted_tally),
+        geometry_admitted_tally_(record.geometry_admitted_tally),
+        phase_admitted_tally_(record.phase_admitted_tally),
+        characteristic_admitted_tally_(record.characteristic_admitted_tally),
+        regular_singular_admitted_tally_(record.regular_singular_admitted_tally),
         source_detached_(true) {
     const bool exact = record.integrity == regular_singular_rest_integrity(record);
     receipt.theory = regular_singular_.identity;
@@ -124,12 +124,12 @@ class resident_regular_singular final {
   organ::acquired_characteristic characteristic_{};
   organ::acquired_regular_singular regular_singular_{};
   alignas(checker_pending_deed) unsigned char pending_storage_[sizeof(checker_pending_deed)]{};
-  std::uint64_t mathematical_morphology_{};
-  std::uint64_t codec_morphology_{};
-  std::uint64_t geometry_morphology_{};
-  std::uint64_t phase_morphology_{};
-  std::uint64_t characteristic_morphology_{};
-  std::uint64_t regular_singular_morphology_{};
+  std::uint64_t mathematical_admitted_tally_{};
+  std::uint64_t codec_admitted_tally_{};
+  std::uint64_t geometry_admitted_tally_{};
+  std::uint64_t phase_admitted_tally_{};
+  std::uint64_t characteristic_admitted_tally_{};
+  std::uint64_t regular_singular_admitted_tally_{};
   bool source_detached_{};
   bool pending_live_{};
   bool admitted_{};

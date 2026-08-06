@@ -139,9 +139,9 @@ std::size_t r27_verification_failures(bool source_loaded,
       actual.final_head != exact::word{14'001'028} ||
       actual.final_continuation != exact::word{15'001'028};
   failures += handoff.integrity != event::expression_geometry_rest_integrity(handoff) ||
-      handoff.body.regions[0].morphology != 610 || handoff.mathematical_morphology != 184 ||
-      handoff.codec_morphology != 93 || handoff.intrinsic_hypergeometry_morphology != 31 ||
-      handoff.expression_geometry_morphology != 37 ||
+      handoff.body.regions[0].morphology != 610 || handoff.mathematical_admitted_tally != 184 ||
+      handoff.codec_admitted_tally != 93 || handoff.intrinsic_hypergeometry_admitted_tally != 31 ||
+      handoff.expression_geometry_admitted_tally != 37 ||
       handoff.expression_geometry.identity != exact::word{194'300} ||
       !handoff.expression_geometry.accepted || !handoff.intrinsic_hypergeometry.accepted;
   return failures;

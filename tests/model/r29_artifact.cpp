@@ -65,9 +65,9 @@ void write_r29_artifact(std::ostream& output, bool source_loaded,
       << ",produced_bytes:" << passage.raw.produced_artifact_bytes
       << "\nfinal_body=head:" << observation.final_head.value() << ",continuation:"
       << observation.final_continuation.value() << ",morphology:"
-      << handoff.body.regions[0].morphology << ",mathematical:" << handoff.mathematical_morphology
-      << ",codec:" << handoff.codec_morphology << ",hodge:" << handoff.hodge_realization_morphology
-      << ",arithmetic:" << handoff.arithmetic_spectral_morphology << ",rest_bytes:" << sizeof(handoff)
+      << handoff.body.regions[0].morphology << ",mathematical:" << handoff.mathematical_admitted_tally
+      << ",codec:" << handoff.codec_admitted_tally << ",hodge:" << handoff.hodge_realization_admitted_tally
+      << ",arithmetic:" << handoff.arithmetic_spectral_admitted_tally << ",rest_bytes:" << sizeof(handoff)
       << ",integrity:" << handoff.integrity
       << "\nrest_io=loaded:" << rest_load.returned() << ",written:" << rest_write.returned()
       << "\nphysical_telemetry=engine_time:unknown,checker_time:unknown,temperature:unknown,"

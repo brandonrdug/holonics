@@ -43,11 +43,11 @@ event::characteristic_rest_record r20_host_characteristic_rest() noexcept {
       exact::word{160'500}, exact::word{194'300}, exact::word{11}, true};
   record.characteristic = {exact::word{186'300}, exact::word{174'400},
       exact::word{160'600}, exact::word{194'400}, exact::word{12}, true};
-  record.mathematical_morphology = 70;
-  record.codec_morphology = 45;
-  record.geometry_morphology = 10;
-  record.phase_morphology = 14;
-  record.characteristic_morphology = 16;
+  record.mathematical_admitted_tally = 70;
+  record.codec_admitted_tally = 45;
+  record.geometry_admitted_tally = 10;
+  record.phase_admitted_tally = 14;
+  record.characteristic_admitted_tally = 16;
   record.integrity = event::characteristic_rest_integrity(record);
   return record;
 }

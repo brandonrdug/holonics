@@ -14,9 +14,9 @@ struct geometry_inquiry_rest_record final {
   organ::acquired_theorem_fiber first{};
   organ::acquired_theorem_fiber second{};
   organ::acquired_geometry_theory geometry{};
-  std::uint64_t mathematical_morphology{};
-  std::uint64_t codec_morphology{};
-  std::uint64_t geometry_morphology{};
+  std::uint64_t mathematical_admitted_tally{};
+  std::uint64_t codec_admitted_tally{};
+  std::uint64_t geometry_admitted_tally{};
   std::uint64_t integrity{};
 };
 
@@ -44,12 +44,12 @@ struct geometry_inquiry_remount_receipt final {
   terminal_rest_detail::fold_fiber(fold, record.second);
   const std::uint64_t geometry[6]{record.geometry.identity.value(),
       record.geometry.passage.value(), record.geometry.kernel_return.value(),
-      record.geometry.lineage.value(), record.geometry.morphology_delta.value(),
+      record.geometry.lineage.value(), record.geometry.admitted_tally_delta.value(),
       record.geometry.accepted ? 1U : 0U};
   for (const auto value : geometry) { terminal_rest_detail::fold_value(fold, value); }
-  terminal_rest_detail::fold_value(fold, record.mathematical_morphology);
-  terminal_rest_detail::fold_value(fold, record.codec_morphology);
-  terminal_rest_detail::fold_value(fold, record.geometry_morphology);
+  terminal_rest_detail::fold_value(fold, record.mathematical_admitted_tally);
+  terminal_rest_detail::fold_value(fold, record.codec_admitted_tally);
+  terminal_rest_detail::fold_value(fold, record.geometry_admitted_tally);
   return fold;
 }
 

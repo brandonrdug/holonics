@@ -77,8 +77,8 @@ std::size_t r18_verification_failures(
   failures += actual.formation_commit.state != body::body_change_status::committed ||
       actual.formation_commit.predecessor != exact::word{14'001'006} ||
       actual.formation_commit.successor != exact::word{14'001'007} ||
-      actual.formation_commit.morphology_before != 169 ||
-      actual.formation_commit.morphology_after != 181;
+      actual.formation_commit.admitted_tally_before != 169 ||
+      actual.formation_commit.admitted_tally_after != 181;
   failures += actual.formal.passage != exact::word{174'300} ||
       actual.conversational.passage != actual.formal.passage ||
       !contains(actual.formal.bytes, actual.formal.byte_count,
@@ -105,12 +105,12 @@ std::size_t r18_verification_failures(
       morphology.commit.state != body::body_change_status::committed ||
       morphology.commit.predecessor != exact::word{14'001'007} ||
       morphology.commit.successor != exact::word{14'001'008} ||
-      morphology.commit.morphology_before != 181 || morphology.commit.morphology_after != 192 ||
+      morphology.commit.admitted_tally_before != 181 || morphology.commit.admitted_tally_after != 192 ||
       !morphology.returned_difference_applied;
   failures += actual.acquired.identity != exact::word{185'300} ||
       actual.acquired.passage != exact::word{174'300} ||
       actual.acquired.kernel_return != exact::word{160'500} ||
-      actual.acquired.morphology_delta != exact::word{11} || !actual.acquired.accepted;
+      actual.acquired.admitted_tally_delta != exact::word{11} || !actual.acquired.accepted;
   failures += !actual.rest.returned || !actual.rest.prior_returns_preserved ||
       !actual.rest.source_detached || !actual.remount.same_body ||
       !actual.remount.atlas_preserved || actual.remount.source_replayed ||
@@ -124,8 +124,8 @@ std::size_t r18_verification_failures(
       handoff.second.identity != exact::word{182'200} || !handoff.second.accepted ||
       handoff.geometry.identity != exact::word{184'300} || !handoff.geometry.accepted ||
       handoff.phase_crystal.identity != exact::word{185'300} || !handoff.phase_crystal.accepted ||
-      handoff.mathematical_morphology != 62 || handoff.codec_morphology != 42 ||
-      handoff.geometry_morphology != 10 || handoff.phase_morphology != 14;
+      handoff.mathematical_admitted_tally != 62 || handoff.codec_admitted_tally != 42 ||
+      handoff.geometry_admitted_tally != 10 || handoff.phase_admitted_tally != 14;
   return failures;
 }
 

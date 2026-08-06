@@ -41,8 +41,8 @@ event::theorem_production_rest_record r16_host_rest() noexcept {
   record.acquired = {exact::word{181'200}, exact::word{171'200},
       exact::word{151'200}, exact::word{161'200}, exact::word{160'200},
       exact::word{141'010}, exact::word{5}, 3, true};
-  record.mathematical_morphology = 46;
-  record.codec_morphology = 34;
+  record.mathematical_admitted_tally = 46;
+  record.codec_admitted_tally = 34;
   record.integrity = event::theorem_production_rest_integrity(record);
   return record;
 }

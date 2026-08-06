@@ -70,13 +70,13 @@ event::blind_reconstruction_rest_record r22_host_blind_rest() noexcept {
       exact::word{160'802}, exact::word{196'300}, exact::word{12}, true};
   record.moment_reconstruction = {exact::word{188'301}, exact::word{176'400},
       exact::word{160'812}, exact::word{196'400}, exact::word{14}, true};
-  record.mathematical_morphology = 94;
-  record.codec_morphology = 54;
-  record.geometry_morphology = 10;
-  record.phase_morphology = 14;
-  record.characteristic_morphology = 16;
-  record.regular_singular_morphology = 20;
-  record.blind_reconstruction_morphology = 24;
+  record.mathematical_admitted_tally = 94;
+  record.codec_admitted_tally = 54;
+  record.geometry_admitted_tally = 10;
+  record.phase_admitted_tally = 14;
+  record.characteristic_admitted_tally = 16;
+  record.regular_singular_admitted_tally = 20;
+  record.blind_reconstruction_admitted_tally = 24;
   record.integrity = event::blind_reconstruction_rest_integrity(record);
   return record;
 }

@@ -33,8 +33,8 @@ failures(const holonics::apparatus::characteristic_executor_receipt &e,
   c(!r.applied || !r.application.accepted ||
     r.application.identity.value() != 200'302);
   c(r.standing.standing.standing.body.regions[0].morphology != 1199);
-  c(r.standing.standing.standing.mathematical_morphology != 418 ||
-    r.standing.standing.standing.codec_morphology != 195);
+  c(r.standing.standing.standing.mathematical_admitted_tally != 418 ||
+    r.standing.standing.standing.codec_admitted_tally != 195);
   c(r.integrity != holonics::event::characteristic_rest_integrity(r));
   return f;
 }
@@ -116,9 +116,9 @@ int main(int argc, char **argv) {
        << ",morphology:"
        << handoff.standing.standing.standing.body.regions[0].morphology
        << ",mathematical:"
-       << handoff.standing.standing.standing.mathematical_morphology
-       << ",codec:" << handoff.standing.standing.standing.codec_morphology
-       << ",transport:" << handoff.transport_morphology
+       << handoff.standing.standing.standing.mathematical_admitted_tally
+       << ",codec:" << handoff.standing.standing.standing.codec_admitted_tally
+       << ",transport:" << handoff.transport_admitted_tally
        << "\nchecker_exit=" << observation.passage.raw.exit_status
        << "\nformal_begin\n";
   deed.write(observation.passage.formal.bytes,

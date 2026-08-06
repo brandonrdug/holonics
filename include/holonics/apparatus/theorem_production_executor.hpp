@@ -28,8 +28,8 @@ struct theorem_production_mount final {
   receiver::dependent_theorem_question held_probe{};
   body::rest_region regions[body::live_region_capacity]{};
   std::uint64_t body_seed{};
-  std::uint64_t mathematical_morphology{};
-  std::uint64_t codec_morphology{};
+  std::uint64_t mathematical_admitted_tally{};
+  std::uint64_t codec_admitted_tally{};
 };
 
 struct theorem_production_executor_receipt final {

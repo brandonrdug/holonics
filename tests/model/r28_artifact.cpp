@@ -63,8 +63,8 @@ void write_r28_artifact(std::ostream& out, bool source_loaded,
       << "\nfinal_body=head:" << observation.final_head.value() << ",continuation:"
       << observation.final_continuation.value() << ",morphology:"
       << handoff.body.regions[0].morphology << ",mathematical:"
-      << handoff.mathematical_morphology << ",codec:" << handoff.codec_morphology
-      << ",hodge:" << handoff.hodge_realization_morphology
+      << handoff.mathematical_admitted_tally << ",codec:" << handoff.codec_admitted_tally
+      << ",hodge:" << handoff.hodge_realization_admitted_tally
       << ",rest_bytes:" << rest_write.bytes.value() << ",integrity:" << handoff.integrity
       << "\nrest_io=loaded:" << rest_load.returned() << ",written:" << rest_write.returned()
       << "\nphysical_telemetry=engine_time:unknown,checker_time:unknown,temperature:unknown,"

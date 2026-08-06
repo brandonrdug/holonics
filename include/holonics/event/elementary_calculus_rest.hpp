@@ -12,7 +12,7 @@ struct acquired_elementary_fiber final {
   exact::word passage{};
   exact::word returned_event{};
   exact::word lineage{};
-  exact::word morphology_delta{};
+  exact::word admitted_tally_delta{};
   bool accepted{};
 };
 
@@ -40,7 +40,7 @@ struct elementary_application_fiber final {
   exact::word passage{};
   exact::word returned_event{};
   exact::word lineage{};
-  exact::word morphology_delta{};
+  exact::word admitted_tally_delta{};
   bool accepted{};
 };
 
@@ -48,9 +48,9 @@ struct elementary_calculus_rest_record final {
   cultivated_organ_rest_record standing{};
   elementary_law_bundle laws{};
   elementary_application_fiber application{};
-  std::uint64_t calculus_morphology{};
-  std::uint64_t self_organ_morphology{};
-  std::uint64_t derivation_morphology{};
+  std::uint64_t calculus_admitted_tally{};
+  std::uint64_t self_organ_admitted_tally{};
+  std::uint64_t derivation_admitted_tally{};
   std::uint64_t integrity{};
   bool applied{};
 };
@@ -85,7 +85,7 @@ struct elementary_calculus_remount_receipt final {
   std::uint64_t fold = cultivated_organ_rest_integrity(record.standing);
   for (const auto &fiber : record.laws.fibers) {
     const std::uint64_t values[6]{fiber.identity.value(),fiber.passage.value(),
-        fiber.returned_event.value(),fiber.lineage.value(),fiber.morphology_delta.value(),
+        fiber.returned_event.value(),fiber.lineage.value(),fiber.admitted_tally_delta.value(),
         fiber.accepted ? 1U : 0U};
     for (const auto value : values) terminal_rest_detail::fold_value(fold,value);
   }
@@ -112,8 +112,8 @@ struct elementary_calculus_remount_receipt final {
   for (const auto value : law_values) terminal_rest_detail::fold_value(fold,value);
   const std::uint64_t tail[12]{record.application.identity.value(),record.application.passage.value(),
       record.application.returned_event.value(),record.application.lineage.value(),
-      record.application.morphology_delta.value(),record.application.accepted ? 1U : 0U,
-      record.calculus_morphology,record.self_organ_morphology,record.derivation_morphology,
+      record.application.admitted_tally_delta.value(),record.application.accepted ? 1U : 0U,
+      record.calculus_admitted_tally,record.self_organ_admitted_tally,record.derivation_admitted_tally,
       record.laws.conduct_code,record.laws.occurrence_mask,record.applied ? 1U : 0U};
   for (const auto value : tail) terminal_rest_detail::fold_value(fold,value);
   return fold;

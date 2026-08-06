@@ -22,7 +22,7 @@ struct combined_weave_delta final {
   exact::word read_support{};
   exact::word change_support{};
   exact::word value_deltas[weave_cell_capacity]{};
-  exact::word morphology_deltas[weave_cell_capacity]{};
+  exact::word admitted_tally_deltas[weave_cell_capacity]{};
   exact::word successor_currents[weave_cell_capacity]{};
   exact::word consequences[weave_event_capacity]{};
   exact::word stress{};
@@ -68,7 +68,7 @@ struct interaction_equalizer_receipt final {
   exact::word overlap_support{};
   exact::word interaction{};
   exact::word combined_value_delta{};
-  exact::word combined_morphology_delta{};
+  exact::word combined_admitted_tally_delta{};
   exact::word combined_current{};
   exact::word combined_consequence{};
   exact::word lineage{};

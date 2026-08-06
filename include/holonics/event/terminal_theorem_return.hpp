@@ -1,7 +1,7 @@
 #pragma once
 
 #include <holonics/event/dependent_theorem_production_law.hpp>
-#include <holonics/event/returned_fiber_exclusion_law.hpp>
+#include <holonics/event/theorem_production_rest.hpp>
 #include <holonics/event/terminal_theorem_rest.hpp>
 #include <holonics/event/theorem_production_return.hpp>
 
@@ -9,7 +9,6 @@ namespace holonics::event {
 
 struct terminal_theorem_observation final {
   theorem_production_remount_receipt production_remount{};
-  returned_fiber_exclusion_receipt exclusion{};
   theorem_production_remount_receipt ablation_remount{};
   dependent_theorem_generation_receipt generation{};
   dependent_theorem_generation_receipt ablated_generation{};

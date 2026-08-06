@@ -39,15 +39,15 @@ HOLONICS_CALLABLE inline bool resident_cultivated_organs::resume_application(
   cm_checker_detail::normalize(raw, out.passage.formal, declaration, source, typed);
   const bool accepted = typed.state == checker_return_status::accepted;
   auto &morphology = out.passage.returned_morphology;
-  morphology.mathematical_before = standing_.mathematical_morphology;
-  morphology.codec_before = standing_.codec_morphology;
-  standing_.mathematical_morphology += accepted ? 16U : 1U;
-  standing_.codec_morphology += accepted ? 8U : 1U;
-  application_morphology_ += accepted ? 32U : 1U;
+  morphology.mathematical_before = standing_.mathematical_admitted_tally;
+  morphology.codec_before = standing_.codec_admitted_tally;
+  standing_.mathematical_admitted_tally += accepted ? 16U : 1U;
+  standing_.codec_admitted_tally += accepted ? 8U : 1U;
+  application_admitted_tally_ += accepted ? 32U : 1U;
   morphology.commit = body_.commit(expected.predecessor, 0, accepted ? 32U : 1U,
       expected.passage.value(), live->take_continuation()); pending_live_ = false;
-  morphology.mathematical_after = standing_.mathematical_morphology;
-  morphology.codec_after = standing_.codec_morphology;
+  morphology.mathematical_after = standing_.mathematical_admitted_tally;
+  morphology.codec_after = standing_.codec_admitted_tally;
   morphology.returned_difference_applied =
       morphology.commit.state == body::body_change_status::committed;
   out.passage.pending_after_return = pending_live_;

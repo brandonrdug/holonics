@@ -84,8 +84,8 @@ int main(int argc, char **argv) {
       << "\nintermediate_rest_bytes=" << sizeof(handoff) << "\nsamples_in_rest=0\n"
       << "final_body=head:" << observation.final_head.value() << ",continuation:"
       << observation.final_continuation.value() << ",morphology:" << handoff.standing.body.regions[0].morphology
-      << ",mathematical:" << handoff.standing.mathematical_morphology << ",codec:"
-      << handoff.standing.codec_morphology << ",organ:" << handoff.organ_morphology
+      << ",mathematical:" << handoff.standing.mathematical_admitted_tally << ",codec:"
+      << handoff.standing.codec_admitted_tally << ",organ:" << handoff.organ_admitted_tally
       << "\nchecker_exit=" << observation.passage.raw.exit_status << "\nformal_begin\n";
   deed.write(observation.passage.formal.bytes, observation.passage.formal.byte_count);
   deed << "formal_end\nphysical_telemetry=engine_time:unknown,checker_time:unknown,energy:unknown\n";

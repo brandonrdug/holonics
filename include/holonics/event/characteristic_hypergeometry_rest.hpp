@@ -12,7 +12,7 @@ struct acquired_characteristic_fiber final {
   exact::word passage{};
   exact::word returned_event{};
   exact::word lineage{};
-  exact::word morphology_delta{};
+  exact::word admitted_tally_delta{};
   bool accepted{};
 };
 struct characteristic_law_bundle final {
@@ -28,16 +28,16 @@ struct characteristic_application_fiber final {
   exact::word passage{};
   exact::word returned_event{};
   exact::word lineage{};
-  exact::word morphology_delta{};
+  exact::word admitted_tally_delta{};
   bool accepted{};
 };
 struct characteristic_hypergeometry_rest_record final {
   elementary_calculus_rest_record standing{};
   characteristic_law_bundle law{};
   characteristic_application_fiber application{};
-  std::uint64_t characteristic_morphology{};
-  std::uint64_t trace_organ_morphology{};
-  std::uint64_t transport_morphology{};
+  std::uint64_t characteristic_admitted_tally{};
+  std::uint64_t trace_organ_admitted_tally{};
+  std::uint64_t transport_admitted_tally{};
   std::uint64_t integrity{};
   bool applied{};
 };
@@ -72,7 +72,7 @@ characteristic_rest_integrity(
                                r.law.discovery.passage.value(),
                                r.law.discovery.returned_event.value(),
                                r.law.discovery.lineage.value(),
-                               r.law.discovery.morphology_delta.value(),
+                               r.law.discovery.admitted_tally_delta.value(),
                                r.law.discovery.accepted ? 1U : 0U,
                                r.law.group_count};
   for (const auto value : first)
@@ -94,11 +94,11 @@ characteristic_rest_integrity(
                                r.application.passage.value(),
                                r.application.returned_event.value(),
                                r.application.lineage.value(),
-                               r.application.morphology_delta.value(),
+                               r.application.admitted_tally_delta.value(),
                                r.application.accepted ? 1U : 0U,
-                               r.characteristic_morphology,
-                               r.trace_organ_morphology,
-                               r.transport_morphology,
+                               r.characteristic_admitted_tally,
+                               r.trace_organ_admitted_tally,
+                               r.transport_admitted_tally,
                                r.law.checker_founded ? 1U : 0U,
                                r.applied ? 1U : 0U};
   for (const auto value : tail)

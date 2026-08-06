@@ -21,19 +21,19 @@ class resident_theorem_production final {
 
   HOLONICS_CALLABLE resident_theorem_production(
       const organ::theorem_production_foundation& foundation, std::uint64_t body_seed,
-      const body::rest_region* regions, std::uint64_t mathematical_morphology,
-      std::uint64_t codec_morphology) noexcept
+      const body::rest_region* regions, std::uint64_t mathematical_admitted_tally,
+      std::uint64_t codec_admitted_tally) noexcept
       : foundation_(foundation), body_(body_seed, regions),
-        mathematical_morphology_(mathematical_morphology),
-        codec_morphology_(codec_morphology), source_detached_(true) {}
+        mathematical_admitted_tally_(mathematical_admitted_tally),
+        codec_admitted_tally_(codec_admitted_tally), source_detached_(true) {}
 
   HOLONICS_CALLABLE resident_theorem_production(
       const organ::theorem_production_foundation& foundation,
       const theorem_production_rest_record& record,
       theorem_production_remount_receipt& receipt) noexcept
       : foundation_(foundation), body_(body::continuing_body::remount(record.body, receipt.body)),
-        acquired_(record.acquired), mathematical_morphology_(record.mathematical_morphology),
-        codec_morphology_(record.codec_morphology), source_detached_(true) {
+        acquired_(record.acquired), mathematical_admitted_tally_(record.mathematical_admitted_tally),
+        codec_admitted_tally_(record.codec_admitted_tally), source_detached_(true) {
     const bool integrity_exact = record.integrity == theorem_production_rest_integrity(record);
     receipt.acquired_fiber = acquired_.identity;
     receipt.same_body = receipt.body.returned && receipt.body.head == body_.head();
@@ -139,16 +139,16 @@ class resident_theorem_production final {
     if (!lineage_exact) { typed.state = checker_return_status::passage_mismatch; return false; }
     normalize_checker_return(raw, observation.checker_face, typed);
     const bool accepted = typed.state == checker_return_status::accepted;
-    observation.returned_morphology.mathematical_before = mathematical_morphology_;
-    observation.returned_morphology.codec_before = codec_morphology_;
-    mathematical_morphology_ += accepted ? 3U : 1U;
-    codec_morphology_ += accepted ? 2U : 3U;
+    observation.returned_morphology.mathematical_before = mathematical_admitted_tally_;
+    observation.returned_morphology.codec_before = codec_admitted_tally_;
+    mathematical_admitted_tally_ += accepted ? 3U : 1U;
+    codec_admitted_tally_ += accepted ? 2U : 3U;
     const std::uint64_t delta = accepted ? 5U : 4U;
     observation.returned_morphology.commit = body_.commit(expected.predecessor, 0, delta,
         expected.passage.value(), pending->take_continuation());
     pending_live_ = false;
-    observation.returned_morphology.mathematical_after = mathematical_morphology_;
-    observation.returned_morphology.codec_after = codec_morphology_;
+    observation.returned_morphology.mathematical_after = mathematical_admitted_tally_;
+    observation.returned_morphology.codec_after = codec_admitted_tally_;
     observation.returned_morphology.returned_difference_applied =
         observation.returned_morphology.commit.state == body::body_change_status::committed;
     observation.pending_after_return = pending_live_;
@@ -171,8 +171,8 @@ class resident_theorem_production final {
     receipt.body = body_.rest(record.body);
     if (!receipt.body.returned) { return receipt; }
     record.acquired = acquired_;
-    record.mathematical_morphology = mathematical_morphology_;
-    record.codec_morphology = codec_morphology_;
+    record.mathematical_admitted_tally = mathematical_admitted_tally_;
+    record.codec_admitted_tally = codec_admitted_tally_;
     record.integrity = theorem_production_rest_integrity(record);
     receipt.acquired_fiber = acquired_.identity;
     receipt.integrity = exact::word{record.integrity};
@@ -190,8 +190,8 @@ class resident_theorem_production final {
   body::continuing_body body_;
   organ::acquired_theorem_fiber acquired_{};
   alignas(checker_pending_deed) unsigned char pending_storage_[sizeof(checker_pending_deed)]{};
-  std::uint64_t mathematical_morphology_{};
-  std::uint64_t codec_morphology_{};
+  std::uint64_t mathematical_admitted_tally_{};
+  std::uint64_t codec_admitted_tally_{};
   bool source_detached_{};
   bool pending_live_{};
 };

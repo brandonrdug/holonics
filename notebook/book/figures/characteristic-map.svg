@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 310" role="img" aria-labelledby="title desc">
+  <title id="title">From a matrix entry chart to a characteristic fiber</title>
+  <desc id="desc">A two-vertex weighted graph becomes matrix coordinates, then trace and quadric coordinates, then a receiver fiber.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#315da8"/>
+    </marker>
+    <style>
+      .panel{fill:#f8faff;stroke:#cad2df;stroke-width:1.5}
+      .ink{fill:#172033;font-family:serif}
+      .label{fill:#315da8;font-family:serif;font-weight:700}
+      .line{fill:none;stroke:#315da8;stroke-width:2}
+      .soft{fill:none;stroke:#7895c7;stroke-width:1.4}
+      .dash{fill:none;stroke:#7895c7;stroke-width:1.3;stroke-dasharray:5 5}
+    </style>
+  </defs>
+
+  <rect class="panel" x="10" y="10" width="280" height="290" rx="10"/>
+  <rect class="panel" x="340" y="10" width="280" height="290" rx="10"/>
+  <rect class="panel" x="670" y="10" width="280" height="290" rx="10"/>
+
+  <text class="label" x="30" y="39" font-size="18">entry / graph chart</text>
+  <circle cx="88" cy="142" r="25" fill="#edf3fc" stroke="#315da8" stroke-width="2"/>
+  <circle cx="216" cy="142" r="25" fill="#edf3fc" stroke="#315da8" stroke-width="2"/>
+  <text class="ink" x="83" y="148" font-size="18">1</text>
+  <text class="ink" x="211" y="148" font-size="18">2</text>
+  <path class="line" d="M113 132 C145 106,176 106,191 132" marker-end="url(#arrow)"/>
+  <path class="line" d="M191 153 C163 180,133 180,113 153" marker-end="url(#arrow)"/>
+  <text class="ink" x="150" y="107" font-size="18">b</text>
+  <text class="ink" x="150" y="192" font-size="18">c</text>
+  <path class="soft" d="M68 121 C40 88,83 65,107 101" marker-end="url(#arrow)"/>
+  <path class="soft" d="M198 102 C225 67,263 94,237 123" marker-end="url(#arrow)"/>
+  <text class="ink" x="53" y="78" font-size="18">a</text>
+  <text class="ink" x="245" y="84" font-size="18">d</text>
+  <text class="ink" x="75" y="234" font-size="20">M = ( a  b )</text>
+  <text class="ink" x="121" y="258" font-size="20">( c  d )</text>
+  <text class="ink" x="46" y="285" font-size="14">basis-dependent presentation</text>
+
+  <path class="line" d="M296 155 L330 155" marker-end="url(#arrow)"/>
+
+  <text class="label" x="360" y="39" font-size="18">coordinate transport</text>
+  <text class="ink" x="373" y="82" font-size="19">t = a + d</text>
+  <text class="ink" x="373" y="113" font-size="19">x = a − d</text>
+  <text class="ink" x="373" y="144" font-size="19">y = b + c</text>
+  <text class="ink" x="373" y="175" font-size="19">z = b − c</text>
+  <line x1="366" y1="195" x2="594" y2="195" stroke="#cad2df" stroke-width="1.5"/>
+  <text class="ink" x="367" y="229" font-size="20">Δ = x² + y² − z²</text>
+  <text class="ink" x="367" y="260" font-size="18">p = (t² − Δ) / 4</text>
+  <text class="ink" x="378" y="285" font-size="14">invertible when 2 is a unit</text>
+
+  <path class="line" d="M626 155 L660 155" marker-end="url(#arrow)"/>
+
+  <text class="label" x="690" y="39" font-size="18">characteristic receiver</text>
+  <line x1="810" y1="64" x2="810" y2="232" stroke="#172033" stroke-width="1.2" marker-end="url(#arrow)"/>
+  <line x1="716" y1="175" x2="916" y2="175" stroke="#172033" stroke-width="1.2" marker-end="url(#arrow)"/>
+  <text class="ink" x="919" y="181" font-size="14">x,y</text>
+  <text class="ink" x="816" y="70" font-size="14">z</text>
+  <ellipse cx="810" cy="112" rx="57" ry="16" class="soft"/>
+  <ellipse cx="810" cy="145" rx="38" ry="11" class="soft"/>
+  <ellipse cx="810" cy="205" rx="47" ry="13" class="soft"/>
+  <path class="line" d="M753 112 C781 137,785 184,763 205"/>
+  <path class="line" d="M867 112 C839 137,835 184,857 205"/>
+  <path class="dash" d="M810 78 L810 248"/>
+  <text class="ink" x="706" y="262" font-size="17">fiber: x²+y²−z² = Δ</text>
+  <text class="ink" x="723" y="285" font-size="14">many sources; one (t,p)</text>
+</svg>
+

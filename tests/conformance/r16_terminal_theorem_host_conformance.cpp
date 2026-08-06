@@ -1,6 +1,5 @@
 #include <holonics/codec/theorem_production_renderer.hpp>
 #include <holonics/event/dependent_theorem_production_law.hpp>
-#include <holonics/event/returned_fiber_exclusion_law.hpp>
 
 #include "r16_cases.hpp"
 
@@ -22,13 +21,6 @@ int main() {
   failures += !holonics::codec::render_returned_fiber_theorem(surface, formal) ||
       !holonics::codec::render_returned_fiber_explanation(surface, conversation) ||
       formal.byte_count == 0 || conversation.byte_count == 0;
-  holonics::event::theorem_production_rest_record projected{};
-  const auto exclusion = holonics::event::exclude_returned_theorem_fiber(rest, projected);
-  holonics::event::dependent_theorem_generation_receipt ablated{};
-  failures += !exclusion.exact || holonics::event::form_dependent_theorem(
-      mount.foundation, projected.acquired, setup, ablated) ||
-      ablated.obstruction !=
-          holonics::organ::theorem_production_obstruction::returned_fiber_absent;
   holonics::event::terminal_theorem_rest_record terminal{};
   terminal.body = rest.body;
   terminal.first = rest.acquired;
@@ -36,8 +28,8 @@ int main() {
       holonics::exact::word{152'200}, holonics::exact::word{162'200},
       holonics::exact::word{160'300}, holonics::exact::word{181'200},
       holonics::exact::word{5}, 2, true};
-  terminal.mathematical_morphology = 49;
-  terminal.codec_morphology = 36;
+  terminal.mathematical_admitted_tally = 49;
+  terminal.codec_admitted_tally = 36;
   terminal.integrity = holonics::event::terminal_theorem_rest_integrity(terminal);
   failures += terminal.integrity != holonics::event::terminal_theorem_rest_integrity(terminal);
   return failures == 0 ? 0 : 1;

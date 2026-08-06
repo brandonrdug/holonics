@@ -12,8 +12,8 @@ namespace holonics::event {
 struct theorem_production_rest_record final {
   body::rest_record body{};
   organ::acquired_theorem_fiber acquired{};
-  std::uint64_t mathematical_morphology{};
-  std::uint64_t codec_morphology{};
+  std::uint64_t mathematical_admitted_tally{};
+  std::uint64_t codec_admitted_tally{};
   std::uint64_t integrity{};
 };
 
@@ -41,9 +41,9 @@ struct theorem_production_remount_receipt final {
   const std::uint64_t values[11]{record.acquired.identity.value(),
       record.acquired.passage.value(), record.acquired.statement.value(),
       record.acquired.proof.value(), record.acquired.kernel_return.value(),
-      record.acquired.selected_rule.value(), record.acquired.morphology_delta.value(),
+      record.acquired.selected_rule.value(), record.acquired.admitted_tally_delta.value(),
       record.acquired.dependency_count, record.acquired.accepted ? 1U : 0U,
-      record.mathematical_morphology, record.codec_morphology};
+      record.mathematical_admitted_tally, record.codec_admitted_tally};
   for (const auto value : values) {
     std::uint64_t remainder = value;
     for (std::size_t octet = 0; octet < 8; ++octet) {

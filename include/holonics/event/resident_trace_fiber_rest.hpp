@@ -22,9 +22,9 @@ resident_trace_fiber::rest(trace_fiber_rest_record &record) noexcept {
   record.standing.integrity = characteristic_rest_integrity(record.standing);
   record.law = law_;
   record.application = application_;
-  record.trace_fiber_morphology = trace_fiber_morphology_;
-  record.lift_organ_morphology = lift_organ_morphology_;
-  record.triple_transport_morphology = triple_transport_morphology_;
+  record.trace_fiber_admitted_tally = trace_fiber_admitted_tally_;
+  record.lift_organ_admitted_tally = lift_organ_admitted_tally_;
+  record.triple_transport_admitted_tally = triple_transport_admitted_tally_;
   record.applied = stage_ == stage::applied;
   record.integrity = trace_fiber_rest_integrity(record);
   receipt.discovery = law_.discovery.identity;

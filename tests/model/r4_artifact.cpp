@@ -25,7 +25,7 @@ void write_r4_artifact(
          << "return_state=" << static_cast<unsigned>(output.resume_state) << '\n'
          << "delta_read_support=" << output.delta.read_support << '\n'
          << "delta_change_support=" << output.delta.change_support << '\n'
-         << "delta_morphology=" << output.delta.morphology_delta << '\n'
+         << "delta_morphology=" << output.delta.admitted_tally_delta << '\n'
          << "successor_head=" << output.successor.head << '\n'
          << "successor_region_morphology="
          << output.successor.regions[output.delta.region].morphology << '\n'

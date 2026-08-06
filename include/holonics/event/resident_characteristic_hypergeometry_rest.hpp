@@ -22,9 +22,9 @@ resident_characteristic_hypergeometry::rest(
       elementary_calculus_rest_integrity(record.standing);
   record.law = law_;
   record.application = application_;
-  record.characteristic_morphology = characteristic_morphology_;
-  record.trace_organ_morphology = trace_organ_morphology_;
-  record.transport_morphology = transport_morphology_;
+  record.characteristic_admitted_tally = characteristic_admitted_tally_;
+  record.trace_organ_admitted_tally = trace_organ_admitted_tally_;
+  record.transport_admitted_tally = transport_admitted_tally_;
   record.applied = stage_ == stage::applied;
   record.integrity = characteristic_rest_integrity(record);
   receipt.discovery = law_.discovery.identity;

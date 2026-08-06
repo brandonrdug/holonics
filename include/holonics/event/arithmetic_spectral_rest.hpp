@@ -21,14 +21,14 @@ struct arithmetic_spectral_rest_record final {
   organ::acquired_expression_geometry expression_geometry{};
   organ::acquired_hodge_realization hodge_realization{};
   organ::acquired_arithmetic_spectral arithmetic_spectral{};
-  std::uint64_t mathematical_morphology{}; std::uint64_t codec_morphology{};
-  std::uint64_t geometry_morphology{}; std::uint64_t phase_morphology{};
-  std::uint64_t characteristic_morphology{}; std::uint64_t regular_singular_morphology{};
-  std::uint64_t blind_reconstruction_morphology{}; std::uint64_t cm_incidence_morphology{};
-  std::uint64_t toric_cycle_morphology{}; std::uint64_t algebraic_variation_morphology{};
-  std::uint64_t causal_linear_morphology{}; std::uint64_t intrinsic_hypergeometry_morphology{};
-  std::uint64_t expression_geometry_morphology{}; std::uint64_t hodge_realization_morphology{};
-  std::uint64_t arithmetic_spectral_morphology{}; std::uint64_t integrity{};
+  std::uint64_t mathematical_admitted_tally{}; std::uint64_t codec_admitted_tally{};
+  std::uint64_t geometry_admitted_tally{}; std::uint64_t phase_admitted_tally{};
+  std::uint64_t characteristic_admitted_tally{}; std::uint64_t regular_singular_admitted_tally{};
+  std::uint64_t blind_reconstruction_admitted_tally{}; std::uint64_t cm_incidence_admitted_tally{};
+  std::uint64_t toric_cycle_admitted_tally{}; std::uint64_t algebraic_variation_admitted_tally{};
+  std::uint64_t causal_linear_admitted_tally{}; std::uint64_t intrinsic_hypergeometry_admitted_tally{};
+  std::uint64_t expression_geometry_admitted_tally{}; std::uint64_t hodge_realization_admitted_tally{};
+  std::uint64_t arithmetic_spectral_admitted_tally{}; std::uint64_t integrity{};
 };
 
 struct arithmetic_spectral_rest_receipt final {
@@ -54,24 +54,24 @@ struct arithmetic_spectral_remount_receipt final {
   inherited.intrinsic_hypergeometry = record.intrinsic_hypergeometry;
   inherited.expression_geometry = record.expression_geometry;
   inherited.hodge_realization = record.hodge_realization;
-  inherited.mathematical_morphology = record.mathematical_morphology;
-  inherited.codec_morphology = record.codec_morphology; inherited.geometry_morphology = record.geometry_morphology;
-  inherited.phase_morphology = record.phase_morphology;
-  inherited.characteristic_morphology = record.characteristic_morphology;
-  inherited.regular_singular_morphology = record.regular_singular_morphology;
-  inherited.blind_reconstruction_morphology = record.blind_reconstruction_morphology;
-  inherited.cm_incidence_morphology = record.cm_incidence_morphology;
-  inherited.toric_cycle_morphology = record.toric_cycle_morphology;
-  inherited.algebraic_variation_morphology = record.algebraic_variation_morphology;
-  inherited.causal_linear_morphology = record.causal_linear_morphology;
-  inherited.intrinsic_hypergeometry_morphology = record.intrinsic_hypergeometry_morphology;
-  inherited.expression_geometry_morphology = record.expression_geometry_morphology;
-  inherited.hodge_realization_morphology = record.hodge_realization_morphology;
+  inherited.mathematical_admitted_tally = record.mathematical_admitted_tally;
+  inherited.codec_admitted_tally = record.codec_admitted_tally; inherited.geometry_admitted_tally = record.geometry_admitted_tally;
+  inherited.phase_admitted_tally = record.phase_admitted_tally;
+  inherited.characteristic_admitted_tally = record.characteristic_admitted_tally;
+  inherited.regular_singular_admitted_tally = record.regular_singular_admitted_tally;
+  inherited.blind_reconstruction_admitted_tally = record.blind_reconstruction_admitted_tally;
+  inherited.cm_incidence_admitted_tally = record.cm_incidence_admitted_tally;
+  inherited.toric_cycle_admitted_tally = record.toric_cycle_admitted_tally;
+  inherited.algebraic_variation_admitted_tally = record.algebraic_variation_admitted_tally;
+  inherited.causal_linear_admitted_tally = record.causal_linear_admitted_tally;
+  inherited.intrinsic_hypergeometry_admitted_tally = record.intrinsic_hypergeometry_admitted_tally;
+  inherited.expression_geometry_admitted_tally = record.expression_geometry_admitted_tally;
+  inherited.hodge_realization_admitted_tally = record.hodge_realization_admitted_tally;
   std::uint64_t fold = hodge_realization_rest_integrity(inherited);
   const std::uint64_t values[7]{record.arithmetic_spectral.identity.value(),
       record.arithmetic_spectral.passage.value(), record.arithmetic_spectral.returned_event.value(),
-      record.arithmetic_spectral.lineage.value(), record.arithmetic_spectral.morphology_delta.value(),
-      record.arithmetic_spectral.accepted ? 1U : 0U, record.arithmetic_spectral_morphology};
+      record.arithmetic_spectral.lineage.value(), record.arithmetic_spectral.admitted_tally_delta.value(),
+      record.arithmetic_spectral.accepted ? 1U : 0U, record.arithmetic_spectral_admitted_tally};
   for (const auto value : values) { terminal_rest_detail::fold_value(fold, value); }
   return fold;
 }

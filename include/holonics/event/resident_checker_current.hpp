@@ -17,9 +17,9 @@ class resident_checker_current final {
   resident_checker_current& operator=(resident_checker_current&&) = delete;
 
   HOLONICS_CALLABLE resident_checker_current(std::uint64_t seed, const body::rest_region* regions,
-      std::uint64_t mathematical_morphology, std::uint64_t codec_morphology) noexcept
-      : body_(seed, regions), mathematical_morphology_(mathematical_morphology),
-        codec_morphology_(codec_morphology) {}
+      std::uint64_t mathematical_admitted_tally, std::uint64_t codec_admitted_tally) noexcept
+      : body_(seed, regions), mathematical_admitted_tally_(mathematical_admitted_tally),
+        codec_admitted_tally_(codec_admitted_tally) {}
 
   [[nodiscard]] HOLONICS_CALLABLE checker_stage_status stage(
       const codec::formal_math_face& source, checker_observation& observation) noexcept {
@@ -60,16 +60,16 @@ class resident_checker_current final {
     }
     normalize_checker_return(raw, observation.checker_face, typed);
     const bool accepted = typed.state == checker_return_status::accepted;
-    observation.morphology.mathematical_before = mathematical_morphology_;
-    observation.morphology.codec_before = codec_morphology_;
-    mathematical_morphology_ += accepted ? 3U : 1U;
-    codec_morphology_ += accepted ? 2U : 3U;
+    observation.morphology.mathematical_before = mathematical_admitted_tally_;
+    observation.morphology.codec_before = codec_admitted_tally_;
+    mathematical_admitted_tally_ += accepted ? 3U : 1U;
+    codec_admitted_tally_ += accepted ? 2U : 3U;
     const std::uint64_t delta = accepted ? 5U : 4U;
     observation.morphology.commit = body_.commit(expected.predecessor, 0, delta,
         expected.passage.value(), pending->take_continuation());
     pending_live_ = false;
-    observation.morphology.mathematical_after = mathematical_morphology_;
-    observation.morphology.codec_after = codec_morphology_;
+    observation.morphology.mathematical_after = mathematical_admitted_tally_;
+    observation.morphology.codec_after = codec_admitted_tally_;
     observation.morphology.returned_difference_applied =
         observation.morphology.commit.state == body::body_change_status::committed;
     observation.pending_after_return = pending_live_;
@@ -85,8 +85,8 @@ class resident_checker_current final {
 
   body::continuing_body body_;
   alignas(checker_pending_deed) unsigned char pending_storage_[sizeof(checker_pending_deed)]{};
-  std::uint64_t mathematical_morphology_{};
-  std::uint64_t codec_morphology_{};
+  std::uint64_t mathematical_admitted_tally_{};
+  std::uint64_t codec_admitted_tally_{};
   bool pending_live_{};
 };
 

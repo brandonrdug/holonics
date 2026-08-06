@@ -79,10 +79,10 @@ void write_r30_artifact(std::ostream &out, bool loaded,
       << "\nfinal_body=head:" << o.final_head.value()
       << ",continuation:" << o.final_continuation.value()
       << ",morphology:" << h.body.regions[0].morphology
-      << ",mathematical:" << h.mathematical_morphology
-      << ",codec:" << h.codec_morphology
-      << ",arithmetic:" << h.arithmetic_spectral_morphology
-      << ",rederivation:" << h.rederivation_morphology
+      << ",mathematical:" << h.mathematical_admitted_tally
+      << ",codec:" << h.codec_admitted_tally
+      << ",arithmetic:" << h.arithmetic_spectral_admitted_tally
+      << ",rederivation:" << h.rederivation_admitted_tally
       << ",rest_bytes:" << sizeof(h) << ",integrity:" << h.integrity
       << "\nfinal_rest=returned:" << o.rest.returned
       << ",prior:" << o.rest.prior_returns_preserved

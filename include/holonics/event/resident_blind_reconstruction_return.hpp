@@ -26,18 +26,18 @@ HOLONICS_CALLABLE inline bool resident_blind_reconstruction::resume_code(
   blind_checker_detail::normalize(raw, observation.code.formal, declaration, source, typed);
   const bool accepted = typed.state == checker_return_status::accepted;
   auto& morphology = observation.code.returned_morphology;
-  morphology.mathematical_before = mathematical_morphology_;
-  morphology.codec_before = codec_morphology_;
-  mathematical_morphology_ += accepted ? 7U : 1U;
-  codec_morphology_ += accepted ? 3U : 2U;
-  blind_reconstruction_morphology_ += accepted ? 11U : 1U;
+  morphology.mathematical_before = mathematical_admitted_tally_;
+  morphology.codec_before = codec_admitted_tally_;
+  mathematical_admitted_tally_ += accepted ? 7U : 1U;
+  codec_admitted_tally_ += accepted ? 3U : 2U;
+  blind_reconstruction_admitted_tally_ += accepted ? 11U : 1U;
   const std::uint64_t delta = accepted ? 12U : 4U;
   morphology.commit = body_.commit(expected.predecessor, 0, delta,
       expected.passage.value(), pending->take_continuation());
   pending_live_ = false;
   pending_kind_ = passage_kind::none;
-  morphology.mathematical_after = mathematical_morphology_;
-  morphology.codec_after = codec_morphology_;
+  morphology.mathematical_after = mathematical_admitted_tally_;
+  morphology.codec_after = codec_admitted_tally_;
   morphology.returned_difference_applied =
       morphology.commit.state == body::body_change_status::committed;
   observation.code.pending_after_return = pending_live_;
@@ -130,18 +130,18 @@ HOLONICS_CALLABLE inline bool resident_blind_reconstruction::resume_moment(
   blind_checker_detail::normalize(raw, observation.moment.formal, declaration, source, typed);
   const bool accepted = typed.state == checker_return_status::accepted;
   auto& morphology = observation.moment.returned_morphology;
-  morphology.mathematical_before = mathematical_morphology_;
-  morphology.codec_before = codec_morphology_;
-  mathematical_morphology_ += accepted ? 8U : 1U;
-  codec_morphology_ += accepted ? 3U : 2U;
-  blind_reconstruction_morphology_ += accepted ? 13U : 1U;
+  morphology.mathematical_before = mathematical_admitted_tally_;
+  morphology.codec_before = codec_admitted_tally_;
+  mathematical_admitted_tally_ += accepted ? 8U : 1U;
+  codec_admitted_tally_ += accepted ? 3U : 2U;
+  blind_reconstruction_admitted_tally_ += accepted ? 13U : 1U;
   const std::uint64_t delta = accepted ? 14U : 4U;
   morphology.commit = body_.commit(expected.predecessor, 0, delta,
       expected.passage.value(), pending->take_continuation());
   pending_live_ = false;
   pending_kind_ = passage_kind::none;
-  morphology.mathematical_after = mathematical_morphology_;
-  morphology.codec_after = codec_morphology_;
+  morphology.mathematical_after = mathematical_admitted_tally_;
+  morphology.codec_after = codec_admitted_tally_;
   morphology.returned_difference_applied =
       morphology.commit.state == body::body_change_status::committed;
   observation.moment.pending_after_return = pending_live_;
@@ -174,13 +174,13 @@ resident_blind_reconstruction::rest(blind_reconstruction_rest_record& record) no
   record.regular_singular = regular_singular_;
   record.code_reconstruction = code_reconstruction_;
   record.moment_reconstruction = moment_reconstruction_;
-  record.mathematical_morphology = mathematical_morphology_;
-  record.codec_morphology = codec_morphology_;
-  record.geometry_morphology = geometry_morphology_;
-  record.phase_morphology = phase_morphology_;
-  record.characteristic_morphology = characteristic_morphology_;
-  record.regular_singular_morphology = regular_singular_morphology_;
-  record.blind_reconstruction_morphology = blind_reconstruction_morphology_;
+  record.mathematical_admitted_tally = mathematical_admitted_tally_;
+  record.codec_admitted_tally = codec_admitted_tally_;
+  record.geometry_admitted_tally = geometry_admitted_tally_;
+  record.phase_admitted_tally = phase_admitted_tally_;
+  record.characteristic_admitted_tally = characteristic_admitted_tally_;
+  record.regular_singular_admitted_tally = regular_singular_admitted_tally_;
+  record.blind_reconstruction_admitted_tally = blind_reconstruction_admitted_tally_;
   record.integrity = blind_reconstruction_rest_integrity(record);
   receipt.code_theory = code_reconstruction_.identity;
   receipt.moment_theory = moment_reconstruction_.identity;

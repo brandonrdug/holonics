@@ -76,15 +76,15 @@ void write_r16_artifact(std::ostream& output,
          << ",selected_rule=" << generation.passage.selected_rule.value() << '\n'
          << "generation_delta_b=head:" << value.generation_commit.predecessor.value() << ':'
          << value.generation_commit.successor.value() << ",morphology:"
-         << value.generation_commit.morphology_before << ':'
-         << value.generation_commit.morphology_after << '\n'
+         << value.generation_commit.admitted_tally_before << ':'
+         << value.generation_commit.admitted_tally_after << '\n'
          << "return_delta_b=mathematical:"
          << value.returned_morphology.mathematical_before << ':'
          << value.returned_morphology.mathematical_after << ",codec:"
          << value.returned_morphology.codec_before << ':'
          << value.returned_morphology.codec_after << ",body:"
-         << value.returned_morphology.commit.morphology_before << ':'
-         << value.returned_morphology.commit.morphology_after << '\n'
+         << value.returned_morphology.commit.admitted_tally_before << ':'
+         << value.returned_morphology.commit.admitted_tally_after << '\n'
          << "checker_b=exit:" << value.raw.exit_status
          << ",stdout_bytes=" << value.raw.stdout_bytes
          << ",stderr_bytes=" << value.raw.stderr_bytes
@@ -112,9 +112,9 @@ void write_r16_artifact(std::ostream& output,
          << ",source_replayed=" << value.remount.source_replayed << '\n'
          << "final_body=head:" << handoff.body.head
          << ",continuation=" << handoff.body.continuation
-         << ",body_morphology=" << handoff.body.regions[0].morphology
-         << ",mathematical=" << handoff.mathematical_morphology
-         << ",codec=" << handoff.codec_morphology
+         << ",body_admitted_tally=" << handoff.body.regions[0].morphology
+         << ",mathematical=" << handoff.mathematical_admitted_tally
+         << ",codec=" << handoff.codec_admitted_tally
          << ",integrity=" << handoff.integrity << '\n'
          << "logical_work=read_support:" << execution.logical.read_support.value()
          << ",change_support=" << execution.logical.change_support.value()

@@ -38,9 +38,9 @@ event::geometry_inquiry_rest_record r18_host_geometry_rest() noexcept {
       exact::word{162'200}, exact::word{160'300}, exact::word{181'200}, exact::word{5}, 2, true};
   record.geometry = {exact::word{184'300}, exact::word{173'300}, exact::word{160'400},
       exact::word{193'310}, exact::word{9}, true};
-  record.mathematical_morphology = 55;
-  record.codec_morphology = 39;
-  record.geometry_morphology = 10;
+  record.mathematical_admitted_tally = 55;
+  record.codec_admitted_tally = 39;
+  record.geometry_admitted_tally = 10;
   record.integrity = event::geometry_inquiry_rest_integrity(record);
   return record;
 }

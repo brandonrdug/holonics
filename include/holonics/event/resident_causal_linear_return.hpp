@@ -49,16 +49,16 @@ HOLONICS_CALLABLE inline bool resident_causal_linear::resume(
   cm_checker_detail::normalize(raw, observation.passage.formal, declaration, source, typed);
   const bool accepted = typed.state == checker_return_status::accepted;
   auto& morphology = observation.passage.returned_morphology;
-  morphology.mathematical_before = mathematical_morphology_;
-  morphology.codec_before = codec_morphology_;
-  mathematical_morphology_ += accepted ? 16U : 1U;
-  codec_morphology_ += accepted ? 7U : 2U;
-  causal_linear_morphology_ += accepted ? 29U : 1U;
+  morphology.mathematical_before = mathematical_admitted_tally_;
+  morphology.codec_before = codec_admitted_tally_;
+  mathematical_admitted_tally_ += accepted ? 16U : 1U;
+  codec_admitted_tally_ += accepted ? 7U : 2U;
+  causal_linear_admitted_tally_ += accepted ? 29U : 1U;
   const std::uint64_t delta = accepted ? 30U : 4U;
   morphology.commit = body_.commit(expected.predecessor, 0, delta,
       expected.passage.value(), pending->take_continuation());
-  pending_live_ = false; morphology.mathematical_after = mathematical_morphology_;
-  morphology.codec_after = codec_morphology_;
+  pending_live_ = false; morphology.mathematical_after = mathematical_admitted_tally_;
+  morphology.codec_after = codec_admitted_tally_;
   morphology.returned_difference_applied =
       morphology.commit.state == body::body_change_status::committed;
   observation.passage.pending_after_return = pending_live_;

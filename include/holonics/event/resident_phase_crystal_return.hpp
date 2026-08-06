@@ -21,17 +21,17 @@ HOLONICS_CALLABLE inline bool resident_phase_crystal::resume(
   phase_crystal_checker_detail::normalize(raw, observation.formal, typed);
   const bool accepted = typed.state == checker_return_status::accepted;
   auto& morphology = observation.returned_morphology;
-  morphology.mathematical_before = mathematical_morphology_;
-  morphology.codec_before = codec_morphology_;
-  mathematical_morphology_ += accepted ? 7U : 1U;
-  codec_morphology_ += accepted ? 3U : 2U;
-  phase_morphology_ += accepted ? 14U : 1U;
+  morphology.mathematical_before = mathematical_admitted_tally_;
+  morphology.codec_before = codec_admitted_tally_;
+  mathematical_admitted_tally_ += accepted ? 7U : 1U;
+  codec_admitted_tally_ += accepted ? 3U : 2U;
+  phase_admitted_tally_ += accepted ? 14U : 1U;
   const std::uint64_t delta = accepted ? 11U : 4U;
   morphology.commit = body_.commit(expected.predecessor, 0, delta,
       expected.passage.value(), pending->take_continuation());
   pending_live_ = false;
-  morphology.mathematical_after = mathematical_morphology_;
-  morphology.codec_after = codec_morphology_;
+  morphology.mathematical_after = mathematical_admitted_tally_;
+  morphology.codec_after = codec_admitted_tally_;
   morphology.returned_difference_applied =
       morphology.commit.state == body::body_change_status::committed;
   observation.pending_after_return = pending_live_;
@@ -56,10 +56,10 @@ HOLONICS_CALLABLE inline phase_crystal_rest_receipt resident_phase_crystal::rest
   record.second = second_;
   record.geometry = geometry_;
   record.phase_crystal = phase_crystal_;
-  record.mathematical_morphology = mathematical_morphology_;
-  record.codec_morphology = codec_morphology_;
-  record.geometry_morphology = geometry_morphology_;
-  record.phase_morphology = phase_morphology_;
+  record.mathematical_admitted_tally = mathematical_admitted_tally_;
+  record.codec_admitted_tally = codec_admitted_tally_;
+  record.geometry_admitted_tally = geometry_admitted_tally_;
+  record.phase_admitted_tally = phase_admitted_tally_;
   record.integrity = phase_crystal_rest_integrity(record);
   receipt.atlas = phase_crystal_.identity;
   receipt.integrity = exact::word{record.integrity};

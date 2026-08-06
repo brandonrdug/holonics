@@ -40,10 +40,10 @@ event::phase_crystal_rest_record r19_host_phase_rest() noexcept {
       exact::word{193'310}, exact::word{9}, true};
   record.phase_crystal = {exact::word{185'300}, exact::word{174'300},
       exact::word{160'500}, exact::word{194'300}, exact::word{11}, true};
-  record.mathematical_morphology = 62;
-  record.codec_morphology = 42;
-  record.geometry_morphology = 10;
-  record.phase_morphology = 14;
+  record.mathematical_admitted_tally = 62;
+  record.codec_admitted_tally = 42;
+  record.geometry_admitted_tally = 10;
+  record.phase_admitted_tally = 14;
   record.integrity = event::phase_crystal_rest_integrity(record);
   return record;
 }

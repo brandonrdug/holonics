@@ -24,8 +24,8 @@ class resident_dependent_theorem_production final {
       const theorem_production_rest_record& record,
       theorem_production_remount_receipt& receipt) noexcept
       : foundation_(foundation), body_(body::continuing_body::remount(record.body, receipt.body)),
-        first_(record.acquired), mathematical_morphology_(record.mathematical_morphology),
-        codec_morphology_(record.codec_morphology), source_detached_(true) {
+        first_(record.acquired), mathematical_admitted_tally_(record.mathematical_admitted_tally),
+        codec_admitted_tally_(record.codec_admitted_tally), source_detached_(true) {
     const bool exact = record.integrity == theorem_production_rest_integrity(record);
     receipt.acquired_fiber = first_.identity;
     receipt.same_body = receipt.body.returned && receipt.body.head == body_.head();
@@ -39,8 +39,8 @@ class resident_dependent_theorem_production final {
       terminal_theorem_remount_receipt& receipt) noexcept
       : foundation_(foundation), body_(body::continuing_body::remount(record.body, receipt.body)),
         first_(record.first), second_(record.second),
-        mathematical_morphology_(record.mathematical_morphology),
-        codec_morphology_(record.codec_morphology), source_detached_(true) {
+        mathematical_admitted_tally_(record.mathematical_admitted_tally),
+        codec_admitted_tally_(record.codec_admitted_tally), source_detached_(true) {
     const bool exact = record.integrity == terminal_theorem_rest_integrity(record);
     receipt.first_fiber = first_.identity;
     receipt.second_fiber = second_.identity;
@@ -112,16 +112,16 @@ class resident_dependent_theorem_production final {
     normalize_checker_return(raw, observation.checker_face, typed);
     const bool accepted = typed.state == checker_return_status::accepted;
     auto& morphology = observation.returned_morphology;
-    morphology.mathematical_before = mathematical_morphology_;
-    morphology.codec_before = codec_morphology_;
-    mathematical_morphology_ += accepted ? 3U : 1U;
-    codec_morphology_ += accepted ? 2U : 3U;
+    morphology.mathematical_before = mathematical_admitted_tally_;
+    morphology.codec_before = codec_admitted_tally_;
+    mathematical_admitted_tally_ += accepted ? 3U : 1U;
+    codec_admitted_tally_ += accepted ? 2U : 3U;
     const std::uint64_t delta = accepted ? 5U : 4U;
     morphology.commit = body_.commit(expected.predecessor, 0, delta,
         expected.passage.value(), pending->take_continuation());
     pending_live_ = false;
-    morphology.mathematical_after = mathematical_morphology_;
-    morphology.codec_after = codec_morphology_;
+    morphology.mathematical_after = mathematical_admitted_tally_;
+    morphology.codec_after = codec_admitted_tally_;
     morphology.returned_difference_applied =
         morphology.commit.state == body::body_change_status::committed;
     observation.pending_after_return = pending_live_;
@@ -147,8 +147,8 @@ class resident_dependent_theorem_production final {
     if (!receipt.body.returned) { return receipt; }
     record.first = first_;
     record.second = second_;
-    record.mathematical_morphology = mathematical_morphology_;
-    record.codec_morphology = codec_morphology_;
+    record.mathematical_admitted_tally = mathematical_admitted_tally_;
+    record.codec_admitted_tally = codec_admitted_tally_;
     record.integrity = terminal_theorem_rest_integrity(record);
     receipt.first_fiber = first_.identity;
     receipt.second_fiber = second_.identity;
@@ -168,8 +168,8 @@ class resident_dependent_theorem_production final {
   organ::acquired_theorem_fiber first_{};
   organ::acquired_theorem_fiber second_{};
   alignas(checker_pending_deed) unsigned char pending_storage_[sizeof(checker_pending_deed)]{};
-  std::uint64_t mathematical_morphology_{};
-  std::uint64_t codec_morphology_{};
+  std::uint64_t mathematical_admitted_tally_{};
+  std::uint64_t codec_admitted_tally_{};
   bool source_detached_{};
   bool pending_live_{};
 };

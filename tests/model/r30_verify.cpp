@@ -206,9 +206,9 @@ std::size_t r30_verification_failures(
        !o.final_can_continue ||
        h.integrity != event::rederivation_rest_integrity(h) ||
        h.body.regions[0].morphology != 903 ||
-       h.mathematical_morphology != 270 || h.codec_morphology != 127 ||
-       h.arithmetic_spectral_morphology != 47 ||
-       h.rederivation_morphology != 56 || !h.matching_rederivation.accepted ||
+       h.mathematical_admitted_tally != 270 || h.codec_admitted_tally != 127 ||
+       h.arithmetic_spectral_admitted_tally != 47 ||
+       h.rederivation_admitted_tally != 56 || !h.matching_rederivation.accepted ||
        !h.lattice_rederivation.accepted || !h.potential_rederivation.accepted ||
        !h.cover_rederivation.accepted;
   return f;

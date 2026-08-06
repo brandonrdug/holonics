@@ -63,17 +63,17 @@ resident_characteristic_hypergeometry::resume_discovery(
                                typed);
   const bool accepted = typed.state == checker_return_status::accepted;
   auto &m = out.passage.returned_morphology;
-  m.mathematical_before = standing_.standing.standing.mathematical_morphology;
-  m.codec_before = standing_.standing.standing.codec_morphology;
-  standing_.standing.standing.mathematical_morphology += accepted ? 36U : 1U;
-  standing_.standing.standing.codec_morphology += accepted ? 16U : 1U;
-  characteristic_morphology_ += accepted ? 64U : 1U;
-  trace_organ_morphology_ += accepted ? 32U : 0U;
+  m.mathematical_before = standing_.standing.standing.mathematical_admitted_tally;
+  m.codec_before = standing_.standing.standing.codec_admitted_tally;
+  standing_.standing.standing.mathematical_admitted_tally += accepted ? 36U : 1U;
+  standing_.standing.standing.codec_admitted_tally += accepted ? 16U : 1U;
+  characteristic_admitted_tally_ += accepted ? 64U : 1U;
+  trace_organ_admitted_tally_ += accepted ? 32U : 0U;
   m.commit = body_.commit(expected.predecessor, 0, accepted ? 72U : 1U,
                           expected.passage.value(), live->take_continuation());
   pending_live_ = false;
-  m.mathematical_after = standing_.standing.standing.mathematical_morphology;
-  m.codec_after = standing_.standing.standing.codec_morphology;
+  m.mathematical_after = standing_.standing.standing.mathematical_admitted_tally;
+  m.codec_after = standing_.standing.standing.codec_admitted_tally;
   m.returned_difference_applied =
       m.commit.state == body::body_change_status::committed;
   out.passage.pending_after_return = pending_live_;
@@ -147,16 +147,16 @@ resident_characteristic_hypergeometry::resume_heldout(
                                typed);
   const bool accepted = typed.state == checker_return_status::accepted;
   auto &m = out.passage.returned_morphology;
-  m.mathematical_before = standing_.standing.standing.mathematical_morphology;
-  m.codec_before = standing_.standing.standing.codec_morphology;
-  standing_.standing.standing.mathematical_morphology += accepted ? 12U : 1U;
-  standing_.standing.standing.codec_morphology += accepted ? 8U : 1U;
-  transport_morphology_ += accepted ? 24U : 1U;
+  m.mathematical_before = standing_.standing.standing.mathematical_admitted_tally;
+  m.codec_before = standing_.standing.standing.codec_admitted_tally;
+  standing_.standing.standing.mathematical_admitted_tally += accepted ? 12U : 1U;
+  standing_.standing.standing.codec_admitted_tally += accepted ? 8U : 1U;
+  transport_admitted_tally_ += accepted ? 24U : 1U;
   m.commit = body_.commit(expected.predecessor, 0, accepted ? 24U : 1U,
                           expected.passage.value(), live->take_continuation());
   pending_live_ = false;
-  m.mathematical_after = standing_.standing.standing.mathematical_morphology;
-  m.codec_after = standing_.standing.standing.codec_morphology;
+  m.mathematical_after = standing_.standing.standing.mathematical_admitted_tally;
+  m.codec_after = standing_.standing.standing.codec_admitted_tally;
   m.returned_difference_applied =
       m.commit.state == body::body_change_status::committed;
   out.passage.pending_after_return = pending_live_;

@@ -63,7 +63,7 @@ HOLONICS_CALLABLE constexpr void add_combined_event(
   combined.change_support = exact::word{
       combined.change_support.value() | event.change_support.value()};
   combined.value_deltas[event.cell] = event.value_delta;
-  combined.morphology_deltas[event.cell] = event.morphology_delta;
+  combined.admitted_tally_deltas[event.cell] = event.admitted_tally_delta;
   combined.successor_currents[event.cell] = event.successor_current;
   combined.consequences[event_slot] = event.consequence;
   combined.stress = exact::word{combined.stress.value() + event.stress.value()};
@@ -159,8 +159,8 @@ HOLONICS_CALLABLE constexpr void add_combined_event(
       result.overlap_support.value() != 0;
   if (!result.compatible) { return result; }
   result.combined_value_delta = exact::word{left.value_delta.value() + right.value_delta.value()};
-  result.combined_morphology_delta = exact::word{
-      left.morphology_delta.value() + right.morphology_delta.value()};
+  result.combined_admitted_tally_delta = exact::word{
+      left.admitted_tally_delta.value() + right.admitted_tally_delta.value()};
   result.combined_current = exact::word{
       left.successor_current.value() + right.successor_current.value()};
   result.combined_consequence = exact::word{left.consequence.value() + right.consequence.value()};

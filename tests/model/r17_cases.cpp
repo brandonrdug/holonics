@@ -36,8 +36,8 @@ event::terminal_theorem_rest_record r17_host_terminal_rest() noexcept {
       exact::word{161'200}, exact::word{160'200}, exact::word{141'010}, exact::word{5}, 3, true};
   record.second = {exact::word{182'200}, exact::word{172'200}, exact::word{152'200},
       exact::word{162'200}, exact::word{160'300}, exact::word{181'200}, exact::word{5}, 2, true};
-  record.mathematical_morphology = 49;
-  record.codec_morphology = 36;
+  record.mathematical_admitted_tally = 49;
+  record.codec_admitted_tally = 36;
   record.integrity = event::terminal_theorem_rest_integrity(record);
   return record;
 }
