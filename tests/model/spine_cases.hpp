@@ -24,5 +24,7 @@ inline constexpr std::size_t spine_case_count = 8;
 [[nodiscard]] bool carrier_laws_hold();
 [[nodiscard]] bool substrate_laws_hold();
 [[nodiscard]] bool information_laws_hold();
+/// Phase 6.1: the resonance ecology's found/ride asymmetry and provenance laws.
+[[nodiscard]] bool resonance_laws_hold();
 
 }  // namespace holonics::tests

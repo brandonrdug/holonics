@@ -1,6 +1,7 @@
 #include "spine_cases.hpp"
 
 #include <holonics/current/information_receipt.hpp>
+#include <holonics/event/resonance_ecology.hpp>
 #include <holonics/receiver/receiver_current_law.hpp>
 #include <holonics/structure/branch_lineage.hpp>
 #include <holonics/structure/directed_dependency.hpp>
@@ -233,6 +234,87 @@ bool information_laws_hold() {
   if (receipt_law::complete(without_artifact)) { return false; }
   return fiber_law::sufficiency(3, 0) == return_mode::restriction &&
       fiber_law::sufficiency(3, 1) == return_mode::base_change;
+}
+
+}  // namespace holonics::tests
+
+namespace holonics::tests {
+namespace {
+
+holonics::organ::receiver_fiber_identity fiber(std::uint64_t schema, std::uint32_t word) {
+  holonics::organ::receiver_fiber_identity value{};
+  value.schema = schema;
+  value.words[0] = word;
+  value.used = 1;
+  return value;
+}
+
+holonics::organ::resonance_germ seeded_germ(std::uint32_t word, std::uint64_t phase) {
+  return holonics::organ::resonance_germ{fiber(0xAA, word), phase};
+}
+
+}  // namespace
+
+bool resonance_laws_hold() {
+  using namespace holonics::organ;
+  holonics::event::resonance_ecology<256, 512> ecology{holonics::exact::word{1000}};
+  const resonance_germ path[3] = {seeded_germ(1, 0), seeded_germ(2, 0), seeded_germ(3, 0)};
+  const auto occurrence = germ_law::continuation_informant(fiber(0xBB, 7), 10, path, 3);
+
+  const auto first = ecology.receive(occurrence);
+  if (!first.accepted() || first.founded == 0 || first.opened != 0) { return false; }
+  const std::uint32_t receptors = ecology.registry().used();
+
+  // A repeated complete path RIDEs entirely and founds nothing new.
+  const auto repeated = ecology.receive(occurrence);
+  if (repeated.founded != 0 || repeated.rode != repeated.arm_count ||
+      ecology.registry().used() != receptors) { return false; }
+  if (ecology.recurrence(path[0]) < 2) { return false; }
+
+  // Equal identity with a changed phase is a DIFFERENT receptor, never averaged.
+  const resonance_germ shifted[3] = {seeded_germ(1, 99), seeded_germ(2, 0), seeded_germ(3, 0)};
+  const auto moved = ecology.receive(
+      germ_law::continuation_informant(fiber(0xBB, 7), 20, shifted, 3));
+  if (moved.founded == 0 || ecology.registry().used() <= receptors) { return false; }
+
+  // Provenance is carried permanently: a question is not inherited testimony.
+  bool question_origin = false;
+  bool inherited_origin = false;
+  const auto probed = ecology.receive(germ_law::probe(30, path, 3));
+  for (std::uint8_t slot = 0; slot < probed.arm_count; ++slot) {
+    question_origin = question_origin ||
+        (probed.arms[slot].consequent.schema == role_schema &&
+         probed.arms[slot].consequent.words[0] == question_origin_role_word);
+  }
+  for (std::uint8_t slot = 0; slot < first.arm_count; ++slot) {
+    inherited_origin = inherited_origin ||
+        (first.arms[slot].consequent.schema == role_schema &&
+         first.arms[slot].consequent.words[0] == inherited_origin_role_word);
+  }
+  if (!question_origin || !inherited_origin) { return false; }
+
+  // A duplicate germ is refused, never deduplicated.
+  const resonance_germ duplicated[2] = {seeded_germ(1, 0), seeded_germ(1, 0)};
+  if (ecology.receive(germ_law::continuation_informant(fiber(0xBB, 7), 40, duplicated, 2)).state !=
+      holonics::event::resonance_state::malformed_germ) { return false; }
+
+  // The emanated identity is the complete ordered path, not a digest.
+  receiver_fiber_identity forward{};
+  receiver_fiber_identity reversed{};
+  const std::uint32_t ascending[3] = {1, 2, 3};
+  const std::uint32_t descending[3] = {3, 2, 1};
+  if (!fiber_law::try_emanated_path_fiber(ascending, 3, forward) ||
+      !fiber_law::try_emanated_path_fiber(descending, 3, reversed) ||
+      forward.schema != emanated_path_schema || fiber_law::equal(forward, reversed)) {
+    return false;
+  }
+
+  // A continuation boundary carries the germ it continues from.
+  receiver_fiber_identity from_one{};
+  receiver_fiber_identity from_two{};
+  return fiber_law::try_continuation_target_role(fiber(0xAA, 1), from_one) &&
+      fiber_law::try_continuation_target_role(fiber(0xAA, 2), from_two) &&
+      !fiber_law::equal(from_one, from_two);
 }
 
 }  // namespace holonics::tests

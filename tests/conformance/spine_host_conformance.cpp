@@ -35,5 +35,8 @@ int main() {
   if (!holonics::tests::information_laws_hold()) {
     std::cerr << "causal-information laws failed\n"; ++failures;
   }
+  if (!holonics::tests::resonance_laws_hold()) {
+    std::cerr << "resonance ecology laws failed\n"; ++failures;
+  }
   return failures == 0 ? 0 : 1;
 }
