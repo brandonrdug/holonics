@@ -21,6 +21,36 @@ This file is an operating contract, not a theory deposit and not a scheduler. It
 the specific recurring failures observed across the Codex sessions of 2026-07-09 through
 2026-08-05 and to preserve the corrections that closed them.
 
+## 0. Fresh-session pickup
+
+Read this file first and in full. Then read `CONSTRUCTION_STATE.md` for the admitted position and
+`blueprint/EROS_EMBODIMENT_ROADMAP.md` for the ordered continuation. Do not re-read the archive by
+default.
+
+**Where the work stands (2026-08-05).** Phases 0–5 of the embodiment roadmap are admitted: the
+contaminated conditioning layer is excised and regraded, and the spine — minimum carrier, substrate,
+Swing and Standing, live machine and rest, causal-information receipt — is built, GPU-graded, and
+committed. Suite `137/137`. **Phase 6, the ecology port, is next.**
+
+Three commits sit unpushed on `main`: the roadmap recut, the Phase 0 excision, and the Phase 1–5
+spine. Pushing is Brandon's call, not yours.
+
+**What is true and easy to get wrong:**
+
+- The engine's mathematics is real and stays. Its **learning** was simulated by counters and is
+  withdrawn (§13). Do not cite the withdrawn claims as floor.
+- The laboratory holds the real learning ecology, in Rust, with receipts. Phase 6 is a **port**, not
+  a rederivation. Every owner names its source file in the roadmap.
+- Two of the strongest laboratory owners were **deleted** and survive only at checkpoint
+  `93834398` on `origin/agent/eros-production-owners`. Recover them read-only before porting.
+- The laboratory working tree is **frozen and dirty** — 52 files that participated in an interrupted
+  invalid path. Port from `a07ff376` plus that checkpoint, never from the dirty tree.
+
+**Cost discipline.** The full suite takes about 33 minutes and the R30–R35 source-access and
+determinism tests dominate it. Run targeted `ctest -R` subsets for what you changed; reserve the
+full suite for a single end-of-phase gate. After a broad rename, **configure a clean build tree
+before trusting a green result** — stale objects have hidden a real inconsistency here before.
+
 ## 1. The floor is a carrier, not a retired interface
 
 **The single most damaging defect in the inherited authority was an admission rule that made the

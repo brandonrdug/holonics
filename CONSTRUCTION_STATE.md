@@ -193,7 +193,9 @@ established capability is admissible without limit as the carrier of a deed and 
 as its return. Every evidence requirement — source separation, post-seal comparison, checker
 return, ablation, sample-free rest, GPU deed, ownership, no-float, independent audit — is unchanged.
 
-Construction is no longer paused. Movement A is admitted; Movement B is the next deed.
+Construction is no longer paused. **Phases 0-5 are admitted; Phase 6, the ecology port, is the next
+deed.** Movement A stands as the exactness floor; Movement B is not a movement and has folded into
+Phase 5 as its sufficiency test.
 
 ## Admitted movements
 

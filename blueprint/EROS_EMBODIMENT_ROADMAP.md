@@ -293,11 +293,40 @@ carrier itself must rebase. It is not a standalone movement; it is this phase's 
 inclusion-minimal, whose morphology change is typed, and which carries a complete obstruction where
 it did not close.
 
+**Amendment carried from the spectroscopy deposit.** The sufficiency test currently returns a
+radical rank. A nonempty kernel **will be occupied** — camouflage and counter-illumination are
+evolution engineering collisions in a receiver's quotient map. The honest return is therefore not
+the rank but **an exhibited colliding pair**: two distinct sources the declared family cannot
+separate. A metamer is a stronger falsifier than a number, and it is cheap to add.
+
 ---
 
 ## Phase 6 — The ecologies
 
-Ported in dependency order. Each names its laboratory source.
+**This is the largest phase and the one the whole plan exists for.** Ported in dependency order;
+each owner names its laboratory source file. Port from `a07ff376` plus the recovered checkpoint
+`93834398`, never from the frozen dirty tree.
+
+### Port order and why
+
+```text
+6.1 ResonanceEcology          needs Phases 3,4    (Swing + machine)
+6.2 ExactSuffixEcology        needs Phase 2       (frozen relation atlas)
+6.3 TrainingEcology           needs Phase 2       (keyed atlas, transactional proposal)
+6.4 MorphologicalLanguage     needs 6.1, 6.2      (five suffix scales over routes)
+6.5 ReflectiveRuntime         needs Phase 2       (independent of 6.1-6.4)
+6.6 RelationalLanguage        needs 6.1, Phase 5  (mounted resonance + receiver current)
+6.7 AgenticLanguage           needs 6.4, 6.5, 6.6, 6.3
+6.8 LeanMathematicsEcology    needs Phase 2, 6.7  (mount/train split, kernel returns)
+6.9 ResearchEcology + atlas   needs all above
+```
+
+6.2, 6.3 and 6.5 are independent of one another and of 6.1; they can be built in any order once the
+substrate stands. Everything from 6.4 onward is strictly ordered.
+
+**Each sub-phase is admitted only with a causal-information receipt (Phase 5) attached to its
+returned deed.** That is the standing requirement this plan exists to install; an ecology that
+returns a count instead of a receipt is not admitted.
 
 ### 6.1 `ResonanceEcology` — `life/src/resonance_ecology/ecology.rs:6`
 
@@ -384,12 +413,39 @@ occurrence and no unvisited caused bridge region** — not a reflection count.
 `mount_repository_excluding` is **causal exclusion, not a lexical filter**: it keeps the grading
 transcript from becoming inherited testimony on a rerun.
 
-**Grade condition for Phase 6.** Reproduce, in the C++ body, the laboratory's own ablation:
-a mounted-only body withholds a product; the trained body returns it; after the unique developmental
-passage is dropped, a source-detached remount returns a **novel** product. That is the receipt the
-excised counter-morphology was pretending to be.
+### Grade condition for Phase 6
+
+**Reproduce, in the C++ body, the laboratory's own ablation.** A mounted-only body withholds a
+product; the trained body returns it; after the unique developmental passage is dropped, a
+source-detached remount returns a **novel** product. In the laboratory this was `9*8` withheld, `72`
+returned, and `63` returned for an unseen `7*9` after the developmental passage departed.
+
+That is the receipt the excised counter-morphology was pretending to be, and it is the only thing
+that re-earns the three claims Phase 0 withdrew.
+
+**Falsifiers.** A trained body that returns the product with its developmental material still
+resident. A source-detached remount that returns nothing. A morphology change reported as a count
+rather than as changed structure. Any scalar score, weight, bias, gate, or threshold appearing
+anywhere in the conditioning path.
 
 ---
+
+### Carried forward into Phase 6 (do not rediscover)
+
+- **The production Swing may only RIDE or stand OPEN.** A re-comparison of already-exposed paths
+  cannot manufacture a FOUND; founding is a body-layer deed against new terrain. Built in Phase 3.
+- **`SourceIncidence` is not optional.** Suffix links form a rooted tree; a DFS order makes each
+  state's descendant population contiguous, so source attribution costs `O(states + occurrences)`.
+  The naive `states x sources` table does not fit at 78,860 states.
+- **`minimum_recurrence >= 2`.** A training route activates only on recurrence across *distinct*
+  occurrences. This is the non-scalar learning rule that replaces everything excised in Phase 0.
+- **Mount, expose, train and reference are four separate APIs**, and provenance is carried
+  permanently as `{Inherited, ReceiverQuestion, SelfEmanated}` role fibers on every constituent.
+- **Self-emanated identity is the complete exact path fiber**, not a hash. Re-entering generated
+  material changes provenance, not morphology.
+- **An incomplete kernel-return population cannot cultivate.** No fallback target, no partial-score
+  selection; an obstructed proof path is retained because obstruction causes deeper motion.
+- **Observer aperture exhaustion is not linguistic rest.** Keep the three rest states distinct.
 
 ## Phase 7 — Broad mounting
 
@@ -426,6 +482,23 @@ new work in both bodies, and it is the first place the C++ body would genuinely 
 Open conjectures, returned lemmas, retained counterexamples, and their dependency edges held as
 **the body's own standing**, reopened across rest. Grade: a lemma returned in one passage recruited
 as a dependency by a later passage across a rest boundary, **without the controller naming it**.
+
+Falsifier: the later passage requiring the controller to name the earlier lemma. That is reference,
+not standing.
+
+### Retained open fibers this phase may draw on
+
+Registered, not scheduled. Each is a real missing coupling with a named return:
+
+- **The Kramers--Kronig conjecture.** If a declared receiver's response is causal and admits a
+  complex response function, its absorption and dispersion faces satisfy a discrete
+  Kramers--Kronig relation and either is derivable from the other without measurement. Carriers —
+  regular-singular continuation, residues, monodromy — already stand. Falsifier: compute both faces
+  independently over a declared aperture and test the Hilbert transform relation exactly. Deposit:
+  [the receiver-quotient record](../research/records/2026-08-05_THE_RECEIVER_QUOTIENTS_THE_SPECTRUM_CAUSALITY_LOCKS_ITS_FACES.md).
+- **The winding falsifier** of Phase 5 in the aperture atlas, still unrun.
+- **Heterogeneous induced-family composition**, **phase/source reunion**, and **higher supported
+  realization**, as recorded in the mathematics-production floor.
 
 ---
 
