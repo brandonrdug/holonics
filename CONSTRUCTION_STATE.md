@@ -138,6 +138,31 @@ mathematics is sound; only the learning was simulated.
 
 The restoration plan is [the Eros embodiment roadmap](blueprint/EROS_EMBODIMENT_ROADMAP.md).
 
+## Phases 1-5 — the spine
+
+**Truth status:** `established-bounded`.
+**Evidence tags:** `implemented-exact`, `computational-witness`.
+
+The minimum carrier `K = (O, I, D, T)` now exists to the `ELEMENTARY_MECHANICS` specification, with
+OPEN as a first-class standing disposition and `Chi` as the ordered pair of parallel transports
+whose residual, holonomy-defect, and cross-ratio projections each refuse until their own chart is
+declared. Above it stand a substrate whose ordinals are never reused and whose refusals recover,
+persistent Standing that copies only the touched path, the Swing at both its layers, one continuing
+machine whose rebuildable aperture is absent from rest and identity, and a mandatory
+causal-information receipt carrying three continuation fibers, inclusion-minimal witness families,
+factorized reach, and the two modes of return.
+
+The GPU deed returned eight occurrences at compute capability `8.9` with zero device/host parity
+failures. A wound comparison at the production layer stands OPEN and **cannot** manufacture a
+FOUND; the body layer founds and deposits exactly one winding quantum without re-basing the groove
+at the cut. A `2^87` path population is carried exactly in two limbs across 1,864 passage visits. A
+receipt without its returned artifact is refused.
+
+Receipt: [the phases 0-5 spine receipt](receipts/PHASES_0_5_SPINE_RECEIPT.md). Suite: `137/137`.
+
+**This is a spine, not a learner.** Nothing here conditions a body, mounts a corpus, generates,
+trains, or returns a proof. Those are Phases 6 onward and remain `open`.
+
 ## Construction provenance
 
 **Truth status:** `historical`.

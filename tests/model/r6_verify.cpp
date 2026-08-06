@@ -37,7 +37,7 @@ bool equal(const current::weave_delta& left, const current::weave_delta& right) 
       left.input_port == right.input_port && left.output_port == right.output_port &&
       left.read_support == right.read_support && left.change_support == right.change_support &&
       left.value_delta == right.value_delta &&
-      left.morphology_delta == right.morphology_delta &&
+      left.admitted_tally_delta == right.admitted_tally_delta &&
       left.successor_current == right.successor_current &&
       left.consequence == right.consequence && left.stress == right.stress &&
       left.obstruction == right.obstruction &&

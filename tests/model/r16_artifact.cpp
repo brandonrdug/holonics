@@ -97,8 +97,8 @@ void write_r16_artifact(std::ostream& output,
          << ",produced_fold=" << value.raw.produced_artifact_fold
          << ",passage=" << value.raw.passage.value()
          << ",source=" << value.raw.source.value() << '\n'
-         << "ablation=excluded_fiber:" << value.exclusion.excluded_fiber.value()
-         << ",excluded_delta=" << value.exclusion.excluded_delta.value()
+      << "absent_fiber=withheld:" << value.absent_fiber.withheld_fiber.value()
+      << ",exact=" << value.absent_fiber.exact
          << ",production_generated="
          << (generation.obstruction == organ::theorem_production_obstruction::none)
          << ",ablated_generated=" << !value.ablation_generation_refused

@@ -71,7 +71,7 @@ namespace holonics::event {
   receipt.read_support = support;
   receipt.change_support = support;
   receipt.incidence_delta = 0;
-  receipt.morphology_delta = returned.payload;
+  receipt.admitted_tally_delta = returned.payload;
   receipt.successor_current = returned.payload;
   receipt.returned_consequence = returned.payload;
   receipt.stress = returned.payload;
@@ -89,7 +89,7 @@ namespace holonics::event {
     live_delta& delta) noexcept {
   const auto receipt = delta.receipt();
   return standing.commit(exact::word{receipt.predecessor}, receipt.region,
-      receipt.morphology_delta, receipt.successor_current, delta.take_continuation());
+      receipt.admitted_tally_delta, receipt.successor_current, delta.take_continuation());
 }
 
 HOLONICS_CALLABLE inline void recover(

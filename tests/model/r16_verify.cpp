@@ -55,10 +55,8 @@ std::size_t r16_verification_failures(
   failures += !actual.production_remount.same_body ||
       !actual.production_remount.acquired_return_preserved ||
       actual.production_remount.source_replayed || !actual.source_detached ||
-      !actual.setup_integrity_exact || !actual.exclusion.exact ||
-      actual.exclusion.excluded_fiber != exact::word{181'200} ||
-      actual.exclusion.excluded_delta != exact::word{5} ||
-      actual.exclusion.head_after != exact::word{14'001'001} ||
+      !actual.setup_integrity_exact || !actual.absent_fiber.exact ||
+      actual.absent_fiber.withheld_fiber != exact::word{181'200} ||
       !actual.ablation_remount.same_body || actual.ablation_remount.acquired_return_preserved ||
       actual.ablation_remount.source_replayed || !actual.ablation_generation_refused ||
       actual.ablated_generation.obstruction !=

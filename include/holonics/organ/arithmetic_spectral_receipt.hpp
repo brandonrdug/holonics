@@ -90,7 +90,7 @@ struct acquired_arithmetic_spectral final {
   exact::word passage{};
   exact::word returned_event{};
   exact::word lineage{};
-  exact::word morphology_delta{};
+  exact::word admitted_tally_delta{};
   bool accepted{};
 };
 

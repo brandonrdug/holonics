@@ -31,7 +31,7 @@ struct causal_information_receipt final {
   exact::word successor{};
   exact::word continuation{};
   exact::word selected_lineage{};
-  exact::word morphology_delta{};
+  exact::word admitted_tally_delta{};
   std::uint16_t alternatives_before{};
   std::uint16_t alternatives_after{};
   generative_obstruction returned_obstruction{generative_obstruction::invalid_foundation};

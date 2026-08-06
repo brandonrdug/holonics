@@ -122,7 +122,7 @@ void write_r6_artifact(std::ostream& output,
              << ",read=" << item.read_support.value()
              << ",change=" << item.change_support.value()
              << ",value=" << item.value_delta.value()
-             << ",morphology=" << item.morphology_delta.value()
+             << ",morphology=" << item.admitted_tally_delta.value()
              << ",current=" << item.successor_current.value()
              << ",consequence=" << item.consequence.value()
              << ",resource=" << item.logical_resource.value()

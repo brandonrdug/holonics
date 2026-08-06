@@ -41,8 +41,8 @@ std::size_t r13_verification_failures(
       morphology.commit.state != body::body_change_status::committed ||
       morphology.commit.predecessor != exact::word{13'001'000} ||
       morphology.commit.successor != exact::word{13'001'001} ||
-      morphology.commit.morphology_before != 123 ||
-      morphology.commit.morphology_after != 128 ||
+      morphology.commit.admitted_tally_before != 123 ||
+      morphology.commit.admitted_tally_after != 128 ||
       !morphology.returned_difference_applied;
   return failures;
 }

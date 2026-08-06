@@ -129,9 +129,9 @@ class resident_reflective_codec final {
       result.obstruction = codec::codec_obstruction::arithmetic_refused;
       return result;
     }
-    const std::uint64_t morphology_delta = request.next_bias.value() - result.old_bias.value();
+    const std::uint64_t admitted_tally_delta = request.next_bias.value() - result.old_bias.value();
     auto continuation = body_.take_continuation();
-    const auto commit = body_.commit(body_.head(), 0, morphology_delta,
+    const auto commit = body_.commit(body_.head(), 0, admitted_tally_delta,
         revised_probe.value(), static_cast<body::linear_continuation&&>(continuation));
     if (commit.state != body::body_change_status::committed) {
       result.obstruction = codec::codec_obstruction::continuation_refused;

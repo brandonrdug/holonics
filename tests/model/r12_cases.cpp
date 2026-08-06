@@ -11,8 +11,6 @@ apparatus::generative_math_mount r12_case() noexcept {
   mount.foundation.premise_type = exact::word{111'070};
   mount.foundation.premise_proof = exact::word{111'071};
   mount.foundation.provenance = exact::word{111'106};
-  mount.foundation.conditioning = {exact::word{10'001}, exact::word{100'001},
-      exact::word{2}, exact::word{1}, exact::word{0}, exact::word{0}, exact::word{1}};
   mount.foundation.rules[0] = {exact::word{121'010}, exact::word{121'011},
       exact::word{121'012}, organ::proof_formation::equivalence_symmetry, 1};
   mount.foundation.rules[1] = {exact::word{121'020}, exact::word{121'021},

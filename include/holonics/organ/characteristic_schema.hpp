@@ -71,7 +71,7 @@ struct acquired_characteristic final {
   exact::word passage{};
   exact::word kernel_return{};
   exact::word lineage{};
-  exact::word morphology_delta{};
+  exact::word admitted_tally_delta{};
   bool accepted{};
 };
 

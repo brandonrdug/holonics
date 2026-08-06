@@ -40,20 +40,13 @@ std::size_t r15_verification_failures(
       actual.production.used_returned_fiber != exact::word{181'200} ||
       actual.production.consequence != exact::word{192'200} ||
       actual.production.source_accesses != 0;
-  const auto& exclusion = actual.exclusion;
-  failures += exclusion.excluded_fiber != exact::word{181'200} ||
-      exclusion.excluded_delta != exact::word{5} ||
-      exclusion.head_before != exact::word{14'001'002} ||
-      exclusion.head_after != exact::word{14'001'001} ||
-      exclusion.body_admitted_tally_before != 140 || exclusion.body_admitted_tally_after != 135 ||
-      exclusion.mathematical_before != 46 || exclusion.mathematical_after != 43 ||
-      exclusion.codec_before != 34 || exclusion.codec_after != 32 ||
-      !exclusion.original_integrity_exact || !exclusion.projected_integrity_exact ||
-      !exclusion.exact;
+  const auto& control = actual.absent_fiber;
+  failures += control.withheld_fiber != exact::word{181'200} || !control.exact ||
+      !control.original_integrity_exact || !control.projected_integrity_exact;
   failures += !actual.ablation_remount.same_body ||
       actual.ablation_remount.acquired_return_preserved ||
       actual.ablation_remount.source_replayed ||
-      actual.ablation_head != exact::word{14'001'001} || actual.ablated.available ||
+      actual.ablation_head != actual.production_head || actual.ablated.available ||
       actual.ablated.obstruction != organ::theorem_production_obstruction::returned_fiber_absent ||
       actual.ablated.source_accesses != 0 || !actual.behavior_changed || !actual.dependency_exact;
   failures += setup.question.identity != exact::word{142'200} ||

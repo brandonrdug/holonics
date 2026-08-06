@@ -2,9 +2,21 @@
 
 #include <cstddef>
 
+#include <holonics/exact/integer_arithmetic.hpp>
 #include <holonics/organ/generative_math_receipt.hpp>
 
 namespace holonics::organ {
+
+/// Exact carried addition. This helper outlived the conditioning organ it used to
+/// live in; it is ordinary exact arithmetic and none of the removed mechanism.
+[[nodiscard]] HOLONICS_CALLABLE constexpr bool exact_add(
+    std::uint64_t left, std::uint64_t right, std::uint64_t& result) noexcept {
+  const auto value = exact::add(exact::unsigned_integer<1>::from_word(left),
+      exact::unsigned_integer<1>::from_word(right));
+  if (!value.accepted()) { return false; }
+  result = value.value.limb(0);
+  return true;
+}
 
 [[nodiscard]] HOLONICS_CALLABLE constexpr bool valid_generative_foundation(
     const generative_math_foundation& value) noexcept {

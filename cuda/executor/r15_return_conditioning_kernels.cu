@@ -22,7 +22,8 @@ __global__ void project_and_probe_ablation(const return_conditioning_mount* moun
     event::dependent_theorem_setup* setup,
     event::return_conditioning_observation* observation) {
   if (blockIdx.x != 0 || threadIdx.x != 0) { return; }
-  observation->exclusion = event::exclude_returned_theorem_fiber(mount->inherited, *projected);
+  observation->absent_fiber =
+      event::project_without_returned_fiber(mount->inherited, *projected);
   ::new (static_cast<void*>(ablation)) event::resident_theorem_production{
       mount->foundation, *projected, observation->ablation_remount};
   observation->ablated = ablation->probe(mount->question, false);
@@ -35,8 +36,8 @@ __global__ void project_and_probe_ablation(const return_conditioning_mount* moun
   observation->behavior_changed = observation->production.available &&
       !observation->ablated.available &&
       observation->production.consequence != observation->ablated.consequence;
-  observation->dependency_exact = observation->exclusion.exact &&
-      setup->question.required_returned_fiber == observation->exclusion.excluded_fiber &&
+  observation->dependency_exact = observation->absent_fiber.exact &&
+      setup->question.required_returned_fiber == observation->absent_fiber.withheld_fiber &&
       setup->factors_through_returned_fiber;
 }
 

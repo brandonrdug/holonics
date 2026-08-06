@@ -34,8 +34,6 @@ std::size_t r12_verification_failures(
       generation.expansion.global_candidate_scans != 0 ||
       generation.expansion.fibers[0].dependency_count != 1 ||
       generation.expansion.fibers[1].dependency_count != 4 ||
-      generation.conditioning.response != exact::word{expected.conditioning_response} ||
-      generation.conditioning.obstruction != exact::word{0} ||
       !generation.exact_local_expansion || !generation.exact_receiver_restriction ||
       !generation.proof_current_lineaged || generation.score_used || generation.registry_used;
   failures += generation.passage.statement != exact::word{expected.statement} ||

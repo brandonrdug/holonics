@@ -90,7 +90,7 @@ struct acquired_theorem_fiber final {
   exact::word proof{};
   exact::word kernel_return{};
   exact::word selected_rule{};
-  exact::word morphology_delta{};
+  exact::word admitted_tally_delta{};
   std::uint16_t dependency_count{};
   bool accepted{};
 };

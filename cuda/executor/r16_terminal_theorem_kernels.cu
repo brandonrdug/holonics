@@ -13,8 +13,8 @@ __global__ void stage_terminal_theorem(const terminal_theorem_mount* mount,
   if (blockIdx.x != 0 || threadIdx.x != 0) { return; }
   observation->setup_integrity_exact =
       mount->setup.integrity == event::dependent_setup_integrity(mount->setup);
-  observation->exclusion =
-      event::exclude_returned_theorem_fiber(mount->inherited, *projected);
+  observation->absent_fiber =
+      event::project_without_returned_fiber(mount->inherited, *projected);
   ::new (static_cast<void*>(ablation)) event::resident_dependent_theorem_production{
       mount->foundation, *projected, observation->ablation_remount};
   observation->ablation_generation_refused =
@@ -27,10 +27,10 @@ __global__ void stage_terminal_theorem(const terminal_theorem_mount* mount,
   const bool generated = production->generate_and_stage(mount->setup, *observation);
   observation->source_detached = true;
   observation->dependency_exact = generated && observation->setup_integrity_exact &&
-      observation->exclusion.exact && observation->ablation_generation_refused &&
+      observation->absent_fiber.exact && observation->ablation_generation_refused &&
       observation->generation.dependency_exact &&
       observation->generation.inherited_returned_fiber ==
-          observation->exclusion.excluded_fiber;
+          observation->absent_fiber.withheld_fiber;
 }
 
 __global__ void resume_terminal_theorem(const event::checker_raw_return* returned,

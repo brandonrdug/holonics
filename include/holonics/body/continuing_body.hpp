@@ -26,8 +26,8 @@ struct body_change_receipt final {
   exact::word continuation_before{};
   exact::word continuation_after{};
   std::uint16_t region{};
-  std::uint64_t morphology_before{};
-  std::uint64_t morphology_after{};
+  std::uint64_t admitted_tally_before{};
+  std::uint64_t admitted_tally_after{};
 };
 
 class continuing_body final {
@@ -79,7 +79,7 @@ class continuing_body final {
   [[nodiscard]] HOLONICS_CALLABLE body_change_receipt commit(
       exact::word predecessor,
       std::uint16_t region_slot,
-      std::uint64_t morphology_delta,
+      std::uint64_t admitted_tally_delta,
       std::uint64_t successor_current,
       linear_continuation&& capability) noexcept {
     body_change_receipt receipt{};
@@ -91,13 +91,13 @@ class continuing_body final {
     if (predecessor != head_.serial()) { receipt.state = body_change_status::stale_predecessor; }
     else if (!capability.valid() || continuation_.valid()) { receipt.state = body_change_status::invalid_continuation; }
     else if (region_slot >= live_region_capacity) { receipt.state = body_change_status::invalid_region; }
-    else if (~std::uint64_t{0} - regions_[region_slot].morphology < morphology_delta) {
+    else if (~std::uint64_t{0} - regions_[region_slot].morphology < admitted_tally_delta) {
       receipt.state = body_change_status::capacity_refused;
     } else {
-      receipt.morphology_before = regions_[region_slot].morphology;
-      regions_[region_slot].morphology += morphology_delta;
+      receipt.admitted_tally_before = regions_[region_slot].morphology;
+      regions_[region_slot].morphology += admitted_tally_delta;
       regions_[region_slot].current = successor_current;
-      receipt.morphology_after = regions_[region_slot].morphology;
+      receipt.admitted_tally_after = regions_[region_slot].morphology;
       capability.consume();
       head_ = head_mint_.mint();
       continuation_ = linear_continuation{exact::word{next_continuation_++}};
@@ -107,8 +107,8 @@ class continuing_body final {
       receipt.continuation_after = continuation_.serial();
       return receipt;
     }
-    receipt.morphology_before = region_slot < live_region_capacity ? regions_[region_slot].morphology : 0;
-    receipt.morphology_after = receipt.morphology_before;
+    receipt.admitted_tally_before = region_slot < live_region_capacity ? regions_[region_slot].morphology : 0;
+    receipt.admitted_tally_after = receipt.admitted_tally_before;
     recover(static_cast<linear_continuation&&>(capability));
     return receipt;
   }

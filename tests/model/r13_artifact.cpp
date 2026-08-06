@@ -55,8 +55,8 @@ void write_r13_artifact(std::ostream& output,
          << ",kernel=" << typed.kernel_boundary_crossed << '\n'
          << "morphology=mathematical:" << morphology.mathematical_before << ':'
          << morphology.mathematical_after << ",codec=" << morphology.codec_before << ':'
-         << morphology.codec_after << ",body=" << morphology.commit.morphology_before << ':'
-         << morphology.commit.morphology_after
+         << morphology.codec_after << ",body=" << morphology.commit.admitted_tally_before << ':'
+         << morphology.commit.admitted_tally_after
          << ",applied=" << morphology.returned_difference_applied << '\n'
          << "checker_source_begin\n";
   output.write(value.checker_face.bytes, value.checker_face.byte_count);

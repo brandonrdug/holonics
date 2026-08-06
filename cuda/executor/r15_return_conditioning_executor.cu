@@ -103,7 +103,7 @@ return_conditioning_executor_receipt execute_return_conditioning(
   }
   release(storage);
   if (!observation.production_remount.same_body || !observation.production.available ||
-      !observation.exclusion.exact || observation.ablated.available ||
+      !observation.absent_fiber.exact || observation.ablated.available ||
       !observation.dependency_exact || !observation.handoff.returned) {
     receipt.state = return_conditioning_executor_status::conditioning_refused; return receipt;
   }

@@ -1,13 +1,14 @@
 #pragma once
 
 #include <holonics/event/dependent_theorem_production_law.hpp>
-#include <holonics/event/theorem_production_rest.hpp>
+#include <holonics/event/absent_fiber_control.hpp>
 #include <holonics/event/terminal_theorem_rest.hpp>
 #include <holonics/event/theorem_production_return.hpp>
 
 namespace holonics::event {
 
 struct terminal_theorem_observation final {
+  absent_fiber_control_receipt absent_fiber{};
   theorem_production_remount_receipt production_remount{};
   theorem_production_remount_receipt ablation_remount{};
   dependent_theorem_generation_receipt generation{};

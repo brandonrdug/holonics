@@ -36,16 +36,8 @@ void write_r15_artifact(std::ostream& output,
          << ",consequence=" << value.production.consequence.value()
          << ",available=" << value.production.available
          << ",source_accesses=" << value.production.source_accesses << '\n'
-         << "exclusion=fiber:" << value.exclusion.excluded_fiber.value()
-         << ",delta=" << value.exclusion.excluded_delta.value()
-         << ",head=" << value.exclusion.head_before.value() << ':'
-         << value.exclusion.head_after.value()
-         << ",body_admitted_tally=" << value.exclusion.body_admitted_tally_before << ':'
-         << value.exclusion.body_admitted_tally_after
-         << ",mathematical=" << value.exclusion.mathematical_before << ':'
-         << value.exclusion.mathematical_after
-         << ",codec=" << value.exclusion.codec_before << ':'
-         << value.exclusion.codec_after << ",exact=" << value.exclusion.exact << '\n'
+         << "absent_fiber=withheld:" << value.absent_fiber.withheld_fiber.value()
+         << ",exact=" << value.absent_fiber.exact
          << "ablation=head:" << value.ablation_head.value()
          << ",available=" << value.ablated.available
          << ",behavior_changed=" << value.behavior_changed

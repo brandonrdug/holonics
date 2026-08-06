@@ -49,7 +49,7 @@ void write_r12_artifact(std::ostream& output,
          << "information=head:" << generation.information.predecessor.value() << ':'
          << generation.information.successor.value()
          << ",continuation=" << generation.information.continuation.value()
-         << ",morphology_delta=" << generation.information.morphology_delta.value()
+         << ",admitted_tally_delta=" << generation.information.admitted_tally_delta.value()
          << ",obstruction_changed=" << generation.information.obstruction_changed_passage
          << ",receiver_indexed=" << generation.information.receiver_indexed << '\n'
          << "faces=formal:" << returned.formal.identity.value()

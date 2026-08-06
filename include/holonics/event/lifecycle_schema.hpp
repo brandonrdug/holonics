@@ -53,7 +53,7 @@ struct complete_delta_receipt final {
   std::uint64_t read_support{};
   std::uint64_t change_support{};
   std::int64_t incidence_delta{};
-  std::uint64_t morphology_delta{};
+  std::uint64_t admitted_tally_delta{};
   std::uint64_t successor_current{};
   std::uint64_t returned_consequence{};
   std::uint64_t stress{};
