@@ -30,7 +30,12 @@ default.
 **Where the work stands (2026-08-06).** Phases 0–7 of the embodiment roadmap are admitted: the
 contaminated conditioning layer is excised and regraded, and the spine — minimum carrier, substrate,
 Swing and Standing, live machine and rest, causal-information receipt — is built, GPU-graded, and
-committed. The nine ecologies are ported and the phase grade — mounted-only withholds, cultivated returns, source-detached returns a novel product, ablation stops conduct — returned. **Phase 7 is admitted in all three of its movements**, and **Phase 8, mathematical production on the conditioned body, is next.**
+committed. The nine ecologies are ported and the phase grade — mounted-only withholds, cultivated returns, source-detached returns a novel product, ablation stops conduct — returned. **Phase 7 is admitted in all three of its movements**, and **conditioned mathematical production has
+returned** — the deed the Rust laboratory left interrupted. The body now stands **ahead of the
+laboratory on the proof line**: an accepted theorem becomes material the body later reaches, a second
+proof splices that name out of the standing, and structural exclusion removes both the reach and the
+route so nothing is emitted. A foil with the same proof term and the first theorem absent is refused
+by the kernel independently.
 
 Phase 7's recut has its own lesson. Phase 6's returned laws are exact and stand, but three of its
 **cost** claims overstated the code — a cubic relaxation where the source owner walks the tree

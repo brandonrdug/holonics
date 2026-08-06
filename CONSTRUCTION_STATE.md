@@ -236,6 +236,39 @@ laboratory's relation population and 101 MB route rest remain that body's figure
 Receipt: [the broad mounting receipt](receipts/PHASE_7_BROAD_MOUNTING_RECEIPT.md). Artifacts:
 `receipts/PHASE_7_RESIDENT_MOUNT_DEED.txt`, `receipts/PHASE_7_BROAD_MOUNT_DEED.txt`.
 
+## Conditioned mathematical production
+
+**Truth status:** `established-bounded` at the declared aperture.
+**Evidence tags:** `implemented-exact`, `formal-checked`, `computational-witness`.
+
+**The deed the Rust laboratory did not complete.** Its 2026-08-03 attempt is recorded as interrupted
+with the partial conditioning not admitted; this is the first place the C++ body leads rather than
+ports.
+
+Three declarations are mounted and conditioned — three occurrences, 209 states. The first theorem's
+target is reached through the material, a 382-octet source is emitted, and the exterior kernel
+accepts it, producing 45,576 octets. **That acceptance is then admitted back into the standing as
+emanated material** with its causing declaration supplied, and the ecology is re-formed over four
+occurrences and 298 states. The composition route, having now recurred across two distinct
+occurrences, conducts. The second theorem reaches the first **in the standing**, splices its name
+out of the retained surface octet by octet, and is accepted, producing 46,904 octets. A foil
+carrying the same proof term with the first theorem's declaration absent is **refused by the
+kernel**.
+
+The exclusion is structural: the emanated occurrence leaves the standing, the ecology is re-formed
+from the root back to exactly three occurrences and 209 states, and the route's fiber is deleted.
+The second target becomes unreachable, the route stops conducting, and **nothing is emitted**. No
+counter is decremented and no flag is set.
+
+**Not claimed.** The mathematics is modest and is not the grade — both theorems are trace identities
+and the grade is the dependency mechanism. Three declarations, not the laboratory's 1,164. The
+statement forms and proof shapes are authored in the exterior codec; what the body supplies is
+whether to emit, which target, and the name it splices. Joining that to the existing renderers, which
+compose whole proofs from the exact organs, is the next deed.
+
+Receipt: [the conditioned production receipt](receipts/CONDITIONED_PRODUCTION_RECEIPT.md).
+Artifact: `receipts/CONDITIONED_PRODUCTION_DEED.txt`.
+
 ## Construction provenance
 
 **Truth status:** `historical`.
