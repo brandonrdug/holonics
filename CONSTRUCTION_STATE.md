@@ -416,6 +416,23 @@ Current open mathematical fibers are:
 - a noncircular completed arithmetic trace/positive-form carrier for RH-facing work; and
 - sustained dependent mathematical production across a substantive research ecology.
 
+## What remains before frontier research
+
+**Truth status:** `project-postulate` for the ordering.
+
+Five remainders, in dependency order, deposited as
+[the foundation remainder](blueprint/THE_FOUNDATION_REMAINDER.md): **one standing** — a mathematical
+return must deposit structure into the standing that conditions later mathematical conduct, which
+today it cannot, because it commits a tally; **the rest carries the standing**, since a rest that
+omits what was derived can only make remounting equal to re-deriving, never cheaper; **RIDE actually
+rides**, the four laboratory mechanisms that made it so, each with a source to read; **the kernels
+use the card**, 215 of 262 launches being single-thread against a host oracle 794 times faster; and
+**the mandatory receipt attaches**, since the one the roadmap requires reaches one header.
+
+The objective those serve is unchanged and is Brandon's: the machine learning to produce
+mathematical proofs, with the learning as the intermediary mechanism. The remainder exists to make
+that iterable rather than demonstrable.
+
 Update this file only after a required artifact and its exact receipts have returned and passed, or
 when Brandon directly changes the construction authority. Do not record partial implementation or
 infer a deed from historical prose.

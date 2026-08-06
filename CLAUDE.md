@@ -23,11 +23,13 @@ the specific recurring failures observed across the Codex sessions of 2026-07-09
 
 ## 0. Fresh-session pickup
 
-Read this file first and in full. Then read **`blueprint/THE_SPINE.md`** — it says how much of the
-body each mechanism actually conducts through, and it is the shortest path to not repeating the
-error that produced it. Then `CONSTRUCTION_STATE.md` for the admitted position and
-`blueprint/EROS_EMBODIMENT_ROADMAP.md` for the ordered continuation. Do not re-read the archive by
-default.
+Read this file first and in full. Then two short files, in this order:
+**`blueprint/THE_SPINE.md`** — how much of the body each mechanism actually conducts through, and the
+shortest path to not repeating the error that produced it — and
+**`blueprint/THE_FOUNDATION_REMAINDER.md`**, the operative construction authority for what stands
+between here and frontier research. Then `CONSTRUCTION_STATE.md` for the admitted position.
+`blueprint/EROS_EMBODIMENT_ROADMAP.md` is the record of completed construction and the source-file
+map for each ported owner; it is provenance, not a schedule. Do not re-read the archive by default.
 
 **Where the work stands (2026-08-06).** Phases 0–7 of the embodiment roadmap are admitted: the
 contaminated conditioning layer is excised and regraded, and the spine — minimum carrier, substrate,
@@ -46,6 +48,12 @@ not solvable, so no radical tower reaches the root), the rebase determines the u
 the obstruction names, and the invariant retained is the group rather than either local reading. See
 [the constraint record](research/records/2026-08-06_THE_CONSTRAINT_IS_THE_CHI_THE_UNKNOWN_IS_THE_MISSING_CHART.md),
 which also registers **counterexample search** as the standing application on Brandon's direction.
+
+**The objective, in Brandon's words (2026-08-06):** *"a machine that can rigorously perform and
+analyze computations using internal machinery that accommodates transport mechanisms between
+arbitrary charts, the learning is the intermediary mechanism/law/equation"* — the machine learning
+to produce mathematical proofs. This is not a target that arrived late; it is what the work has been
+for. The foundation remainder exists to make it iterable.
 
 Phase 7's recut has its own lesson. Phase 6's returned laws are exact and stand, but three of its
 **cost** claims overstated the code — a cubic relaxation where the source owner walks the tree
