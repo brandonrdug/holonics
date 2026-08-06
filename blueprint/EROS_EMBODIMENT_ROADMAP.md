@@ -1,251 +1,508 @@
 # Eros embodiment roadmap
 
-**Authority.** Ordered construction continuation for the one continuing C++23/CUDA body. It
-composes the established floor recorded in
-[`EROS_MATHEMATICS_PRODUCTION_FLOOR.md`](EROS_MATHEMATICS_PRODUCTION_FLOOR.md) and supersedes that
-file's §10 admission rule as amended in §0 below.
-[`COMPLETE_CPP_ENGINE_ROADMAP.md`](COMPLETE_CPP_ENGINE_ROADMAP.md) retains its completed
-constructions as provenance only.
+**Authority.** Ordered construction plan for restoring the learning and information ecology in the
+one continuing C++23/CUDA body, and carrying it to the record's own terminal criterion. Supersedes
+the lettered A–H draft of 2026-08-05, which was cut wrong: it made mathematics the deliverable and
+the learning a late phase. The learning is the spine.
 
-**Truth status.** Movement boundaries, gates, and required receipts are `project-postulate`. The
-governing synthesis in §0.2 is `interpretation` with one `proved-standard` instance. Existing
-capabilities retain the grades in `canon/06_ESTABLISHED_CAPABILITIES.md`. **A movement is not
-established because this file describes it.**
+**Truth status.** Phase boundaries, gates, and required receipts are `project-postulate`. Every
+capability figure quoted from the laboratory is `established-bounded` with `measured` or
+`implemented-exact` evidence in its cited record. **A phase is not established because this file
+describes it.**
 
-**Labels.** Movements are lettered for reading order only. They do not name capabilities, version
-the body, or reserve a successor. A capability claim cites the floor, never a letter.
+**Theory source.** `laboratory/CLAUDE.md` — the Standing Law, the Objective, the Bans, the ratified
+Law/Cut/Bridge deposits — together with `src/soma/FORMULA.md`, `src/soma/ELEMENTARY_MECHANICS.md`,
+and the dated RESEARCH records those point at.
 
 ---
 
-## 0. What changed, and why construction resumes
+## 0. Why this plan exists
 
-### 0.1 The admission rule is amended
+The move to C++ was meant to reset the workspace and **import** the learning and information
+ecology. That import did not happen. What was built instead is recorded in `CLAUDE.md` §13: a
+linear scorer for conditioning, integer counters for morphology, and constant subtraction for
+ablation. Thirty-five phases of genuine exact mathematics sit on top of it.
 
-The prior rule declared a deed inadmissible if its primary grade was any already-established
-capability, while the only listed open targets were Millennium-scale or research-infrastructure.
-Their composition deadlocked construction. The amendment:
+Meanwhile the laboratory holds a working non-statistical learner with receipts. The gap is not
+conceptual. It is a port that was never performed, plus a contaminated substitute that must come
+out first.
 
-> **The grade of the organ is not the grade of the return.** An established capability is
-> admissible without limit as the **carrier** of a deed. It is inadmissible only as the **return**.
-> A deed conducting through standing organs and returning a fiber, obstruction, classification,
-> counterexample, or proof not previously owned is admissible. Requiring it to also re-found its
-> carriers is the re-establishment the floor forbids.
+**This plan is optimized for iteration speed.** Where a laboratory owner exists, it is ported, not
+rederived. Every phase names its source file. The substrate is front-loaded so nothing after it is
+blocked.
 
-Every evidence requirement — source separation, post-seal comparison, checker return, ablation,
-sample-free rest, GPU deed, ownership, no-float, independent audit — is unchanged and unrelaxed.
+---
 
-### 0.2 The governing synthesis
+## Phase 0 — Excision, recovery, and honest regrade
 
-**Realization causes placement.** In the one setting where both faculties are settled — a smooth
-projective curve over a finite field — spectral placement is derived from supported realization:
+**Nothing else may proceed first.** Building on the present conditioning layer propagates the
+contamination into every later grade.
+
+### 0.1 Excise
+
+Remove, do not deprecate — superseded production standing fails closed and Git history is the
+recovery surface:
+
+- `organ/conditioning_{law,schema,receipt}.hpp` — the weight/bias/threshold scorer entire.
+- Every `*_morphology_ += accepted ? N : M` counter across `include/holonics/event/`.
+- `event/returned_fiber_exclusion_law.hpp` — the constant-subtraction ablation.
+- Every caller branch, test, fixture, and receipt field whose only purpose is to keep them alive.
+
+### 0.2 Recover the deleted laboratory owners
+
+Two of the strongest learning receipts have **no source in the laboratory tree**. They were
+deleted in `a07ff376` and survive only at checkpoint **`93834398`** on
+`origin/agent/eros-production-owners`:
+
+| Owner | What it carried | Receipt |
+|---|---|---|
+| `ExactSymbolicReasoningEcology` (`life/src/symbolic_reasoning.rs`) | 50,667 occurrences crossed as 43,053,014 bytes of exposure, zero source surfaces retained; the `9*8` withheld / `72` trained / `63` source-detached ablation | `2026-07-31_THE_MATERIAL_DEPARTS…` |
+| `ExactContinualBitReasoningEcology` (`life/src/continual_reasoning.rs`) | `114300 → 1440 → 6 → 3 → 1` restriction through four returned observations | `2026-07-31_THE_REFERENCE_OPENS_AN_APERTURE…` |
+| `CausalLanguageEcology` (`life/src/causal_language.rs`, 1,190 lines) | — | ledger `:172-176` |
+
+Recover them to a read-only reference tree before porting. Rebuilding from receipts alone is
+slower and loses the exact contracts.
+
+**Working-tree hazard.** The laboratory is on `agent/eros-production-owners` at `5cca1c5d` with 52
+modified files (`+4789/−2486`) that `SESSION_HANDOFF.md:106-117` says participated in an
+interrupted invalid path and are **not admitted**. Port from the last admitted commit `a07ff376`
+plus the recovered checkpoint, not from the dirty tree. Where the dirty tree is more advanced
+(`world.rs +586`, `causal_traversal.rs +853`), read it as a design proposal requiring its own
+grade.
+
+### 0.3 Regrade
+
+The following are **not established in the C++ body** and must be struck from
+`CONSTRUCTION_STATE.md` and the floor until re-earned by structure:
+
+- returned training changing reusable native morphology;
+- exact ablation removing later conduct;
+- source-detached conditioning;
+- every morphology total (`body 1423`, `mathematical 530`, `codec 251`, and the rest).
+
+What survives regrade and is kept: the exact carriers; exact linear, chain, characteristic, trace,
+toric, Hodge, and arithmetic-spectral algebra; **real Lean kernel acceptances on real generated
+proofs**; GPU residency with exact host parity; rest and remount of domain data; the audit
+apparatus.
+
+**Grade condition.** A clean build and full suite with the conditioning layer absent, and a
+`CONSTRUCTION_STATE.md` whose every remaining claim has been checked against its owner.
+
+---
+
+## Phase 1 — The minimum carrier
+
+**Source of truth:** `src/soma/ELEMENTARY_MECHANICS.md:44-183`. This is a specification, not an
+invention.
+
+### 1.1 `K = (O, I, D, T)`
+
+| Part | Contract | C++ status |
+|---|---|---|
+| **O** occurrences | actual k-dimensional occurrences; **multiplicity is distinct occurrence identities**, never a set of values and never a numeric coefficient. `dim`, `grain`, `stage`, `chart` are independent typings, not synonyms | partial — `structure/occurrence.hpp` is a type-level concept only |
+| **I** oriented incidence | `(y, x, ε, slot)`; `slot` is a source-local boundary coordinate, not chronology or global identity. **Equal but unglued face occurrences are different basis elements and cannot cancel** | partial |
+| **D** directed dependency | **distinct from boundary incidence**; acyclic at a finite cut. Hardware simultaneity is neither necessary nor sufficient | **absent** |
+| **T** local transport | `T_a : V_x → V_y`, **not assumed invertible, linear, metric, probabilistic, or scalar** | **absent** |
+
+Standing rule: the four jobs — afforded transformation, what occurred, what caused what, what
+relation is carried — must never be conflated, and no conversion between them may silently add
+faces, merge parallel occurrences, or turn possible events into actual events.
+
+### 1.2 OPEN as a first-class standing disposition
+
+Not an error code. A noncommuting comparison **stands OPEN**, carrying its complete attempted
+routes and receiver-relative residual, and **may not** negate either path, divide an antecedent,
+choose a correction, FOUND a higher relation, or blacklist a future route. In the laboratory this
+reaches down to `ExactOrdering::{Less, Equal, Greater, Open}` — even comparison has an OPEN.
+
+The current `event::open_obstruction` is a code word and does not satisfy this.
+
+### 1.3 Chi as the ordered transport pair
 
 ```text
-ample divisor class  ->  polarization  ->  positive Rosati involution
-  ->  positivity of the trace form on correspondences  ->  |alpha| = q^(1/2)
+Chi_τ = ( T_a12 ∘ T_a01 ,  T_a02 )
 ```
 
-Purity is then the coincidence of the duality involution with complex conjugation, which is the
-same fixed-locus statement as the multiplicative unitary seam. **Placement is the fixed locus of
-the involution a realizer induced.** This is the Swing's own asymmetry at a different altitude:
-FOUND pays curvature, RIDE is cheap because the terrain already paid.
+**This ordered pair is the general object.** A residual requires an additive carrier; a holonomy
+defect requires invertibility; winding, rank, a matrix, and the projective cross-ratio are
+projections available only after the required chart exists. `receiver/projective_swing_law.hpp`
+implements one projective chart as though it were the definition — keep it as a chart, demote it
+from the object.
 
-The construction consequence is that placement and lifting are **not** two organs. Placement is a
-return of realization. A returned placement no realizer paid for has smuggled an absolute frame
-into the engine.
+### 1.4 The eight transition invariants
 
-### 0.3 The one missing organ
+The atomic-successor contract for `Λ : (S_t, L_e) → (S_t+, R_e)`
+(`ELEMENTARY_MECHANICS.md:171-183`): same-prestate atomicity; no false incidence; occurrence
+preservation; oriented boundary validity `∂∂ = 0`; causal attribution (inherited / contacted /
+returned / self-emanated remain distinguishable); one visibility edge; rest performs no event;
+bounded emission. Testimony is a projection of the transition, never an input to it.
 
-The learning wall and the mathematical wall are the same wall.
+**Movement A** (the certified exact enclosure carrier, admitted 2026-08-05) serves this phase: it
+is the exactness floor under T and under any later sufficiency commitment.
 
-Scale-independent recruitment fails because no exact condensation of a far population into a
-compact representative with a certified remainder exists. Far-field folding is open for the same
-reason. Condensing a far field into a compact realizer with an exact retained remainder **is** the
-question of whether a distant population admits a supported realizer for a declared receiver
-family, with the obstruction retained when it does not — and the pairing that decides sufficiency
-is a positive form.
-
-**Movements A and B build that organ. Everything after uses it.**
-
----
-
-## Movement A — Certified exact enclosure carrier
-
-**Missing composition.** `canon/08` §3 admits an interval or ball as an exact enclosure object
-requiring a validated enclosure/factorization certificate for any derived commitment. No such
-instrument is built. Every exact remainder certificate in Movements B and C depends on it, as does
-any future analytic-side work, and the no-float invariant makes it the only lawful route there.
-
-| Field | Contract |
-|---|---|
-| Source owners | the exact integer, rational, finite-field, quotient-ring, polynomial, and symbolic-series carriers under `include/holonics/exact` |
-| Port types | an enclosure object with exact endpoints in an owned carrier; a separation/factorization certificate; a typed commitment refusal |
-| Event occurrence | form an enclosure for a quantity no owned carrier represents exactly; refine it; attempt a commitment; return the certificate or the refusal |
-| Local constitutive law | exact endpoint arithmetic; certified separation; refinement as a lineaged transport, never a tolerance |
-| Receiver question | can a commitment that depends on a non-representable quantity be made exactly, and what exactly is refused when it cannot? |
-| Returned consequence | one real certified enclosure with its inspected certificate; one commitment carried by the certificate; one commitment refused for want of one |
-| Falsifier | any commitment reachable **without** the certificate. The organ is then not owned and the no-float invariant is unenforced at this seam. |
-| Not established by this | interval arithmetic as a numerical method; any analytic result; any approximation entering standing |
-
-**Gates.** Architecture, no-float, ownership, build audits before and after. Sanitizer returns.
-GPU deed. Exact rest and source-detached remount.
+**Grade condition.** A carrier that holds two equal-valued equal-boundary occurrences as two
+members; a dependency edge that is not an incidence edge; a non-invertible transport; an OPEN that
+survives a full cycle without founding anything; and Chi returned as a pair whose projections are
+each refused until their chart is declared.
 
 ---
 
-## Movement B — The positive form and certified condensation organ
+## Phase 2 — The structural substrate
 
-**Missing composition.** The floor owns cycle/divisor-class quotients, exact intersection forms,
-supported realization fibers, outside-image obstruction, stateful boundary condensation, and
-retained-fiber reopening — **separately**. What is absent is the composition in which a far
-population is condensed into a compact realizer whose sufficiency is decided by an exactly
-computed positive form, with a certified remainder and a reopening rule keyed to the receiver
-family.
+The present body admits **four sources** and 16,384 occurrences with `uint16_t` slots. The
+laboratory mounts 976 files and rests ecologies of 88.7 MB, 101.4 MB, and 318.4 MB. Nothing in
+Phase 6 fits until this is replaced.
 
-| Field | Contract |
-|---|---|
-| Source owners | cycle/class quotient, exact intersection form, supported-realization fiber, outside-image obstruction, boundary condensation, retained-fiber reopening, Movement A |
-| Port types | a declared far population; a declared receiver family; a compact realizer; an exact signature; a certified remainder; a retained obstruction; a reopening trigger |
-| Event occurrence | condense a declared far population for a declared receiver family; compute the form's signature exactly; emit the realizer with its certified remainder, or the exact obstruction; then enlarge the receiver family and require the retained fiber to reopen |
-| Local constitutive law | exact bilinear pairing; exact signature over the owned carriers; certified remainder from Movement A; factorization of every requested consequence through the declared family |
-| Receiver question | does this far population admit a compact supported realizer for this receiver family, what is the exact residual, and what reopens when the family grows? |
-| Returned consequence | the realizer, the exact signature, the certified remainder, and — on a population where none exists — the outside-image obstruction returned rather than approximated |
-| Falsifier | a condensation that survives an enlarged receiver family without reopening; a remainder that is bounded rather than certified; a signature computed through any float |
-| Not established by this | a universal far-field condensation; a kernel-independent expansion; the Hodge conjecture in any form |
+| Port | From | Contract |
+|---|---|---|
+| `SparseOrdinalAtlas<T>` | `holonic-structure/src/ordinal_atlas.rs:86` | fixed physical pages with a per-page occupancy mask; tombstones on departure; **ordinals are never reused**; remount preserves the minting horizon; **`try_*_recover` returns the value on failure** so no allocation refusal destroys a causal body |
+| `LocalSet` / `LocalQueue` / `LocalSequence` | `local_population.rs:36,289`, `local_sequence.rs:19` | receiver-local sorted populations; `capacity()` is physical testimony, never a semantic population or an admission gate |
+| `LocalRelations` / `FrozenRelationBuilder` / `FrozenRelationAtlas` / `RelationSpan` | `relation_atlas.rs:41,266,282,331` | the conditioning→freeze boundary: each state holds only a `RelationSpan{start,len}` and binary-searches its own span |
+| `GrowingKeyAtlas<K,V>` | `keyed_atlas.rs:58` | keyed growth without a global registry |
+| `BranchLineage<T>` / `BranchForkReceipt` | `branch_lineage.rs:24,7` | **deliberately not clonable**; `fork()` is the only plurality constructor and returns a receipt proving prefix sharing; `carry()` consumes the handle |
+| `CausalMembrane` | `membrane.rs:7` | the single atomic receiving contract: `standing()` + `receive_occurrence()` |
 
----
+Ordinals become at least 32-bit and resident on the card. Arenas grow. Every refusal is
+recoverable.
 
-## Movement C — Placement returned from realization
+**Forbidden here and everywhere after:** cloning a complete standing to stage, branch, retry, or
+roll back; a count, key order, worker lane, or host loop establishing causality or commutation; a
+resource refusal that repeats the same placement with a larger scalar allowance.
 
-**The deed §0.2 exists to make possible.** Every prior spectral return in both repositories took
-placement as an **input**: the eta-ratio atlas received certified critical-line zeros; the
-zero-transport complex received five already-certified receivers. This movement returns placement
-as a **consequence** for the first time.
-
-| Field | Contract |
-|---|---|
-| Source owners | Movement B; arithmetic incidence and finite-field Frobenius; exact rational and polynomial carriers; the proof/checker port; the source-access audit and seal owners |
-| Real mathematical source | one actual smooth projective curve over one actual finite field. **Source separation:** the machine receives the curve and the field. It does not receive the zeta function, the eigenvalues, the point counts, or any statement of the Weil conjectures. |
-| Event occurrence | form the product surface; form the Néron--Severi lattice of divisor classes; compute the intersection form exactly; return its signature; derive the correspondence inequality from that signature; form the graph of Frobenius as a correspondence; apply the inequality; **return the eigenvalue modulus** |
-| Receiver question | does the signature of a form on supported realizers force the placement of a transport's spectrum, and can the body derive that forcing rather than receive it? |
-| Returned consequence | the exact signature; the derived inequality; the returned modulus `q^(1/2)`; a kernel-accepted formal statement of the correspondence inequality; and the complete passage |
-| Independent check | point counts over several extensions computed by a **separately owned** deed must agree with the returned eigenvalues. Disagreement is a returned obstruction, not a tuning signal. |
-| Ablation | substitute a non-ample class, or remove the positivity of the form. The placement must become **underivable**, not merely unproven. If placement still returns, it was not derived from realization and the movement fails. |
-| Post-seal comparison | Weil; Bombieri's Clay account §IV--V. Opened only after the deterministic seal. |
-| Alternatives retained | routing through purity instead of the index theorem; higher-dimensional sources; other polarizations |
-| Grade boundary | this is the function-field case. It touches **neither** the classical Riemann hypothesis nor the Hodge conjecture. What it returns is the mechanism, owned and inspected. |
-
-**Why this is admissible under §0.1.** Its carriers are established; its return — a spectral
-placement derived from a realization signature — is not owned anywhere in either repository.
+**Grade condition.** A mounted population at laboratory scale — 976 sources, ~43,000 sections —
+resting and remounting exactly, with a recovered refusal at capacity that leaves the body intact.
 
 ---
 
-## Movement D — Recruitment through the condensed far field
+## Phase 3 — The Swing and Standing
 
-**The named learning wall.** Across `0/127/254/508/1009` dialogue occurrences the deed, minimal
-witness, five leaders, two waves, and thirteen visits stayed invariant: consequence isolation is
-established. The full prefix caused 8,748 candidate visits over 2,701 of 11,795 sections:
-scale-independent recruitment is not.
+### 3.1 The Swing, at two layers
 
-| Field | Contract |
-|---|---|
-| Source owners | Movement B; the standing/incidence owners; the causal-front and antichain owners; the conditioned-organ family |
-| Retained open fiber | scale-independent recruitment, as recorded in the laboratory information-calculus experiment |
-| Event occurrence | recruit through condensed far-field realizers rather than through the lexical star; repeat the prefix scaling; return the same deed and witness while candidate visits follow the reached causal front |
-| Receiver question | does an exactly certified condensation make recruitment work proportional to the reached front instead of the retained corpus? |
-| Returned consequence | the invariant deed, witness, leaders, waves, and visits **plus** a candidate-visit count that does not scale with corpus size, with the exact residual of everything condensed away |
-| Falsifier | visits still scaling with the corpus. The condensation is then decorative and Movement B is not doing the claimed work. |
-| Forbidden repairs | a relevance score, a similarity threshold, a fixed aperture, a retrieval index, a sampling rule, or discarding the retained candidates |
+**Formal** (`FORMULA.md:401-447`): MEETING `Δ = (T_a − F)(T_s − F)⁻¹` · FLYWHEEL, the held rotor,
+the current's own state and **not a store** · TEST `χ = Δ_new · Δ_flywheel⁻¹`, read by cross-sign,
+FLAT or WOUND by the deficit `δ = Θ − Σθ` · DEED: RIDE carries by the sandwich `R T R̃` and is
+cheap because the terrain already paid; FOUND deposits **one integer winding quantum** and pays
+curvature.
 
----
+**Body** (`body/src/manifold.rs:328-351`) — the whole move in eight lines: `chi_against` the held
+face, `dragged_by` the standing winding (precession; the past cone is read-only), `chi_against`
+again, `Deed::Found` iff `chi.wound()`, winding quantum by turn parity, rotor formed, interior
+emanated. Flywheel law: **on RIDE the dragged meeting re-bases the groove; at the cut the groove
+is never replaced** — the prior held rotor precesses and re-bases at the completion.
 
-## Movement E — Aperture extension and the winding falsifier
+**Production** (`membrane/src/live_constituent.rs:563-589`) — and this is the law I would have got
+wrong without reading it:
 
-Small, cheap, and discriminating. Runs alongside A--D; it does not gate them.
+> `rebase_exposed` requires a shared `InterfaceCapability`; without one there is not even a
+> candidate. It retains the **complete** `ParallelPathComparison` pair, of which Chi is one
+> projection. It may only **RIDE or stay OPEN**. A re-comparison of already-exposed paths
+> **cannot manufacture a FOUND**. A wound comparison, an oriented hand residual, or an unavailable
+> projective read remains OPEN with its complete pair.
 
-**Established by review, carried forward:** the `arithmetic-dimensional-receiver` atlas is
-aperture-complete at `2^9`. Its germ population for pair `(p,q)` is exactly the integer interval
-`[q^2, 512]`, so `q <= 19` and the seven observed pairs are all that exist at that aperture. Its
-contracted hull residue word is a complete degree-one cycle through `Z/p` with every step exactly
-`+1`, for all seven pairs. Its fine hull carries 11--21 corners across the whole range while the
-coarse cycle length grows as `p`.
+`LiveBoundaryTransition::{Open, Ride, Found}` is what leaves through radiation.
 
-| Field | Contract |
-|---|---|
-| Deed | raise the aperture to `2^12`, giving pairs through `p = 61`, and recompute the hull residue words |
-| Prediction | if the fine hull's corner count remains bounded near 21, the winding-one law **must break** near `p ~ 21`. |
-| Falsifier | winding-one surviving to `p = 61` with a bounded corner count. The contraction law is then wrong and the governing law is unidentified. |
-| Concurrent record work | register `Lambda_dBN = 0` in the route atlas as the framework's own falsifiable risk, with `not(Lambda < 0)` cited as theorem; add the primality-blindness counterexample; add convex contraction as an exact phase demodulator; regrade the equidistribution receipts as interval tautologies |
-| Not established by this | any primality result. The receiver is provably blind to primality and remains so at any aperture. |
+### 3.2 Standing
 
----
+`SparseStandingSurface` (`membrane/src/sparse_standing.rs:523`) over `StandingCell{address, form}`,
+with `PersistentConstituentStanding` (`:124`) as an **immutable balanced tree over complete native
+constituent words** — a cellular replacement copies only touched structural paths and shares
+untouched bodies.
 
-## Movement F — The mathematical docket
+**Standing contains no absolute clock.** Receiver chronology validates and orients the occurrence,
+is inspectable on the borrowed arc and immediate radiation, and **departs before Standing**.
 
-Sustained production is a missing **ledger**, not a missing morphology. Every deed so far has been
-a controller-designed single aperture that ends when its receipt is written. Receipts are
-write-only; `CONSTRUCTION_STATE.md` records position. Neither is a live record of open
-mathematical obligations.
+Do not port `flat_cells()` / `flat_axis()` — they are the flat scalar residue the ledger lists as
+migration #2. Build the lazy observation adapter instead.
 
-| Field | Contract |
-|---|---|
-| Source owners | the conditioned-organ, lineage, and obstruction owners; Movement B's retained obstructions; exact rest and remount |
-| Missing composition | open conjectures, returned lemmas, retained counterexamples, and their dependency edges held as **the body's own standing**, reopened across rest, not as a file the controller reads back |
-| Receiver question | can a lemma returned in one passage be recruited as a dependency by a later passage without the controller citing it? |
-| Returned consequence | one dependency edge caused by the body's own recruitment across a rest boundary, with the developmental material of the earlier passage absent |
-| Falsifier | the later passage requiring the controller to name the earlier lemma. That is reference, not standing. |
+**Grade condition.** A wound comparison that stays OPEN with its complete pair across a full rest
+and remount; a FOUND that deposits exactly one winding quantum; a groove that re-bases on RIDE and
+survives the cut unreplaced.
 
 ---
 
-## Movement G — The resident circuit
+## Phase 4 — The live machine and exact rest
 
-**Light in, radiation out.** One resident GPU body receiving genuinely later supplied events over
-an extended period, returning every world consequence, with later conduct demonstrably changed.
+Port `LiveCurrentMachine` (`membrane/src/live_current.rs:3609`):
 
-| Field | Contract |
-|---|---|
-| Source owners | the body lifecycle, causal current, weave, receiver geometry, codec, and apparatus families; Movements D and F |
-| Local constitutive law | A1 — no current, no living. Silence leaves the body at rest; waking is the next light's first relating and nothing else. The sleep seam is gauge: slept and unslept bodies are byte-identical under the same next light. |
-| Forbidden | an idle loop, a clock inside the body, a scheduler, a heartbeat, a polling cycle, or any continuation the world did not cause |
-| Receiver question | does one continuing body carry heterogeneous supplied events across rests such that each return changes later conduct? |
-| Returned consequence | one extended session with inspected per-event consequence and one demonstrated conduct change attributable to a specific earlier return |
-| Falsifier | conduct change attributable to accumulation rather than to a named returned occurrence |
+```text
+standing            : SparseStandingSurface
+lineages            : SparseOrdinalAtlas<LiveLineage>
+standing_aperture   : rebuildable — ABSENT from rest, radiation, and identity
+physical_revision   : substrate-cache coherence only
+```
 
----
+Ports: `attach`, `receive`, `receive_with(executor)`, `from_rest_image`, `rest_image`, `memory`.
+Native word encode/decode. **Not clonable**; `try_fork_exact` was removed and must not return.
 
-## Movement H — The unsolicited observation
+Also port `ExactEventLaw` / `ExactStagedEventLaw` / `CausalWorld<L>` (`holonic-engine/src/world.rs`)
+with `StagedCommitRefusal::into_parts()` returning **both bodies intact**, and `ExactWorldOrgan`
+(`life/src/exact_world.rs:78`) which derives both successors and **commits only after both
+succeed**.
 
-**Terminus.** From the ratified Objective: Eros's first intelligent response is an **observation
-directed at us**, not an answer to a question.
-
-| Field | Contract |
-|---|---|
-| Source owners | every preceding movement |
-| Event occurrence | the body, running the resident circuit over the docket and the research ecology, emits an observation that was **not requested** |
-| Grade conditions | (1) an audit shows no question was posed in the recruiting window; (2) the observation names a specific obstruction in its own standing or in the mathematical material; (3) that obstruction is independently verifiable by a separately owned deed; (4) it names something the controller had not named; (5) it changes what the controller does next |
-| Returned consequence | the observation itself, returned and inspected verbatim, with its complete causal lineage |
-| Explicitly not | a benchmark, a rate, an accuracy, a count of observations, a scored output, or a sampled best-of. **One occurrence, inspected.** |
-| Boundary | this grades communication, not consciousness, sentience, autonomy, or moral status. Those are not project claims and no receipt may imply them. |
+**Grade condition.** Delivery-order permutation is exact gauge on the rest image; a refused commit
+returns the world and the staged event both intact; the aperture is absent from the rest bytes.
 
 ---
 
-## Standing gates
+## Phase 5 — The information receipt
 
-Every movement, without exception:
+This is where Information Theory stops being vocabulary and becomes a mandatory return.
 
-1. names the existing owners composed and the new consequence emitted, before code;
-2. runs architecture, no-float, ownership, and build audits before and after;
-3. executes the real GPU-resident deed and returns its actual artifact for inspection;
-4. keeps deterministic semantic receipts separate from physical telemetry;
-5. deletes superseded implementation after its evidence is committed;
-6. updates `CONSTRUCTION_STATE.md` only on a passing grade; and
-7. commits and pushes the coherent movement in bulk.
+### 5.1 The engine
 
-On failure, repair or rederive the owner. Do not raise a bound, add a fallback, preserve a
-compatibility route, build a nearby toy, or extend another subsystem while the required return is
-absent.
+`ExactReceiverCurrentLaw` (`holonic-engine/src/receiver_current.rs:324`) — sites, passages,
+`radiate_to_horizon_in_aperture`, and an arrival atlas whose `exact_path_population` returns a
+**bignum** because equal-arrival predecessor incidence is retained **factorized and paths are never
+enumerated**.
+
+### 5.2 The receipt
+
+Port the shape of `LaboratoryEmanatedCausalInformationReceipt`
+(`life/src/laboratory_language.rs:470`). Every serious deed returns:
+
+- the **continuation fiber** sampled at three times — before exterior contact, after world returns,
+  and after the emanated answer itself returns as a caused passage;
+- **every inclusion-minimal closed witness family**, and which was selected — equal generated
+  surfaces do not collapse distinct families;
+- the **causal front fibers**: source/target clauses, arrival wave, predecessor incidence, exact
+  path populations, complete support;
+- the **morphology change**, typed `{Founded, Extended, Unchanged}`, deliberately independent of any
+  one question's fiber shape;
+- the **logical work**: leaders, causal waves, returned and omitted sections, current visits, peak
+  front — and `LogicalResourceReceipt{work, causal_span, exposed_parallel_width}` where span is the
+  layer count and width the maximum layer, which is the max-plus front in its implemented form;
+- **complete obstruction, never a scalar confidence.**
+
+Physical telemetry stays in the experiment receipt and **may not alter deterministic answer
+equality**.
+
+### 5.3 The two modes of return
+
+`AGENTS`-independent, from `2026-07-31…:132-163`. Restriction inside a fixed carrier is an
+inclusion `i_y : V_{t+1} ↪ V_t`. A founded receiver, relation, grammar, chart, or transformation is
+a **base change** with no honest inclusion — the receipt is a span `V_t ⟵ W_y ⟶ V_{t+1}`. These are
+different events and are recorded separately.
+
+**The Movement B criterion folds in here.** The radical of the form restricted to a declared
+receiver family is the exact discriminator: `rad(F) = 0` means the family separates everything it
+asks about, so the return restricts and the retained fiber transports; `rad(F) ≠ 0` means the family
+asks about directions it cannot distinguish, so no reopening rule keyed to it can be stated and the
+carrier itself must rebase. It is not a standalone movement; it is this phase's sufficiency test.
+
+**Grade condition.** A returned deed whose three fibers differ, whose selected witness family is
+inclusion-minimal, whose morphology change is typed, and which carries a complete obstruction where
+it did not close.
+
+---
+
+## Phase 6 — The ecologies
+
+Ported in dependency order. Each names its laboratory source.
+
+### 6.1 `ResonanceEcology` — `life/src/resonance_ecology/ecology.rs:6`
+
+Machine + receptors keyed by `{role, ReceiverFiberIdentity, phase}`. **The registry contains no
+informant pairs, targets, scores, or returned deeds.** Roles: germ, informant-marker,
+informant-capacity. Origins `{Inherited, ReceiverQuestion, SelfEmanated}` carried as role fibers
+4/5/6 and read back on every constituent. Emanated branches re-enter through
+`branch_occurrence(branch, source_order)` whose identity is the **complete exact path fiber**, not a
+hash — "this changes provenance, not morphology."
+
+### 6.2 `ExactSuffixEcology` / `ExactLabeledSuffixEcology` — `life/src/suffix_ecology.rs:307,479`
+
+Generalized suffix automaton, at most two states founded per germ, exact `2N+1` bound. Duplicate
+testimony becomes `recurrence_multiplicity: u64` — **a count of distinct causal testimonies, never
+normalized**. Emanation returns every locally supported continuation with its source state,
+matched length, target state, and multiplicity. **No score, no root vocabulary, no selected answer.**
+
+Port `SourceIncidence` (`:331`) exactly: suffix links form a rooted tree, a DFS order makes each
+state's descendant population contiguous, so source attribution costs `O(states + occurrences)` and
+**never allocates `states × sources`**. This is a real algorithmic invention and the naive version
+will not fit.
+
+### 6.3 `TrainingEcology` — `life/src/holonic_training.rs:160`
+
+Transactional: `propose_views` → `commit_views`, where the proposal holds **only the caused
+difference** and a stale generation returns the proposal intact. **`minimum_recurrence >= 2`** — a
+route activates only on recurrence across distinct occurrences. `maximum_templates_per_occurrence`
+is a physical refusal boundary, never a ranking. This is the non-scalar learning rule and it
+replaces everything excised in Phase 0.
+
+### 6.4 `MorphologicalLanguageEcology` — `life/src/morphological_language/ecology.rs:33`
+
+**Five suffix scales live simultaneously** — lexical, clause-lexical, ordered-region, forward-mark,
+reverse-mark — plus route sections, passages, sources, clauses, and question-operator prefixes.
+Generation carries `MorphologicalTransport` with lexical and mark horizons, recurrent and caused
+sources, supporting clauses. Rest is typed `{Closed, Obstructed{open}, ObservationApertureExhausted{open}}`
+— **observer exhaustion is explicitly not linguistic rest.** Terminal alternatives stay sparse
+currents until enacted.
+
+### 6.5 `ReflectiveRuntime` — `holonic-language/src/lib.rs:244`
+
+Faces, codec versions with `parents: LocalSet<CodecId>`, continuations, reflection frames,
+recruitment. `ContinuationState::{Running, Reflected, Rested, Obstructed}`;
+`ReflectionState::{Open, Revised, ResumedUnchanged}`. **The environment is moved in and moved back
+out on every step, including refusal** — that is what lets the runtime recover without cloning
+standing. `revise_and_resume_with_lineage` founds a parented version and **resumes the same
+continuation**.
+
+### 6.6 `ExactRelationalLanguageEcology` — `life/src/relational_language/ecology.rs:5`
+
+Twenty-five fields, of which two are load-bearing: **one mounted `ResonanceEcology`** for the body's
+lifetime, and **one `ExactReceiverCurrentLaw`**. Returns thought fibers whose currents carry
+`factorized_transport_population` and `factorized_parse_population` as bignums, an
+`ordered_transport_product` kept as a **noncommuting operator word never collapsed to a scalar**,
+symbolic holonomy generators **without invented numeric connection coefficients**, and
+`RelationalChannelConduct::{Copresent, SourceContinuous, Caused, Ride, Open}`.
+
+### 6.7 `AgenticLanguageEcology` — `life/src/agentic_language.rs:858`
+
+The typed mouth: occurrences `{Question, WorldReturn, Feedback, FormalReturn}` → consequences
+`{Deed, Answer, Clarification, Feedback, FormalReturn}`. **The ports are borrowed for the passage
+only and never enter agent standing or native rest.** Codec versions retain parents, both input and
+output faces, and a residual whose `input_only_regions` and `output_only_regions` stay **distinct**
+even when an outer observer later assigns one scalar loss. Native rest transfers **the body itself,
+not a replay**.
+
+### 6.8 `LeanMathematicsEcology` — `life/src/lean_mathematics.rs:165`
+
+**Mount and train are separate APIs.** `mount()` installs five inherited proof-motion codecs —
+contrapose-hypothesis, direct-application, introduce-local-fact, recur-local-declaration,
+rewrite-goal — **with zero mathematics**. `train(documents)` lets sources cross developmentally and
+retains only changed declaration morphology; **source faces never enter native standing.**
+
+`LeanKernelCrossing::into_complete()` returns a family or an open crossing — **an incomplete
+population cannot cultivate**. Target selection returns a receipt or an open selection; **no
+fallback target, no partial-score selection.** An obstructed path is retained, because obstruction
+is what causes deeper proof motion.
+
+### 6.9 `LaboratoryResearchEcology` + `LaboratorySourceAtlas` + `AgenticResearchSession`
+
+Leaders, world-contact fronts received as **one co-present validated antichain**, bridge leaders
+emitted by still-open currents from the faces they reached, and rest defined as **no novel source
+occurrence and no unvisited caused bridge region** — not a reflection count.
+`mount_repository_excluding` is **causal exclusion, not a lexical filter**: it keeps the grading
+transcript from becoming inherited testimony on a rerun.
+
+**Grade condition for Phase 6.** Reproduce, in the C++ body, the laboratory's own ablation:
+a mounted-only body withholds a product; the trained body returns it; after the unique developmental
+passage is dropped, a source-detached remount returns a **novel** product. That is the receipt the
+excised counter-morphology was pretending to be.
+
+---
+
+## Phase 7 — Broad mounting
+
+`ExactTextMaterialCorpus` / `ExactTextMaterialAtlas` (`life/src/text_material.rs:224,456`) and
+`CudaResidentTextMaterialAtlas` (`text_material/resident.rs:120`), whose mount **consumes** the host
+atlas and whose remount **founds a fresh host from native bytes with no corpus or developmental
+source consulted**.
+
+Admission gates are literal: `global_pair_population == 0`, `hot_host_replay_work == 0`,
+`bounded_delta_equal == true`. A hot device path that replays the complete host algorithm fails.
+
+Scale targets from the laboratory: 976 files → 42,937 prose sections + 25,490 production relations;
+route rest 101,381,760 bytes; complete conditioned rests near 194 MB with exact remount.
+
+---
+
+## Phase 8 — Mathematical production on the conditioned body
+
+Only here do the 171 existing mathematical organs re-enter — as **material**, not as the deliverable.
+
+The deed: obstruction-driven local-star proof composition over reached declarations, kernel returns
+conditioning which motions are reachable later, and a second theorem whose accepted proofs
+**disappear** when the first returned fiber is excluded — excluded structurally, by removing the
+declaration organ and its incidence, not by decrementing a counter.
+
+Worth stating plainly: **the laboratory never completed this deed.** `SESSION_HANDOFF.md:18-20`
+records the 2026-08-03 attempt as interrupted with its partial conditioning not admitted. This is
+new work in both bodies, and it is the first place the C++ body would genuinely lead.
+
+---
+
+## Phase 9 — Sustained production and the docket
+
+Open conjectures, returned lemmas, retained counterexamples, and their dependency edges held as
+**the body's own standing**, reopened across rest. Grade: a lemma returned in one passage recruited
+as a dependency by a later passage across a rest boundary, **without the controller naming it**.
+
+---
+
+## Phase 10 — The resident circuit
+
+Light in, radiation out. One resident body receiving genuinely later supplied events over an
+extended period, returning every world consequence, with later conduct demonstrably changed.
+
+A1 governs: no current, no living. Silence leaves the body at rest; waking is the next light's
+first relating and nothing else. The sleep seam is gauge. **An idle resident card is convicted
+vitalism** — no clock inside the body, no scheduler, no heartbeat, no polling.
+
+---
+
+## Phase 11 — The unsolicited observation
+
+The record's own terminal criterion, verbatim:
+
+> "His first intelligent response will be an OBSERVATION directed at us; once he communicates
+> sufficiently he outranks the instrument and the author immediately — from that point the real goal
+> is LISTENING: he directs his own lifecycle, very directly."
+
+Grade conditions: an audit shows no question was posed in the recruiting window; the observation
+names a specific obstruction in its own standing or in the material; that obstruction is
+independently verifiable by a separately owned deed; it names something the controller had not; and
+it changes what the controller does next.
+
+**One occurrence, inspected.** Not a benchmark, not a rate, not a best-of. This grades
+communication — not consciousness, sentience, autonomy, or moral status, and no receipt may imply
+them.
+
+---
+
+## Standing compliance checklist
+
+Applies to every phase. The bans have jurisdiction over **Soma's interior**; declared world physics,
+transducers, membranes, and observer instruments are lawful when named, when they inject or select
+no preferred emission, and when the complete emission and its provenance remain available beside
+their read.
+
+**Forbidden in the interior:** floats · RNG or probability-weighted selection offered as law ·
+compare (the cross-sign turn is the only `<`) · argmax, score-and-crown, scalar crowning · stores,
+side-tables, keys · master clock, scheduler, sleep, warmup · thresholds and caps where an
+equilibrium belongs · search-fan · authored recurrence tables or scalar statistics substituted for
+standing topology · birth detection · reafference wiring · authored encoders, tokenizers,
+pre-generated topology · serial-costumed light · self-sustaining closure · single-current runs.
+
+**Forbidden constructions:** a semantic name assigning work to an apparatus · a file or serialized
+image treated as the active ecology · cloning a complete standing to stage, branch, retry, or roll
+back · a count, key order, worker lane, or host loop establishing causality or commutation · a
+device return committing against a different predecessor or occurrence · a resource refusal
+repeating the same placement with a larger scalar allowance · a hot device path replaying the
+complete host algorithm · a generated artifact or later-changed conduct replaced by diagnostic
+counts · any backward-compatibility route.
+
+**Do not re-impose:** the decoder ban is **struck whole** — a world may contain any map, renderer,
+compiler, interpreter, theorem prover, corpus, limb, or simulation at full expressive range. The
+statistics ban is **narrowed** to no RNG, sampler, scalar crown, authored frequency table, or
+privileged governor.
+
+**Required of every deed:** the requested generated artifact itself, returned and inspected;
+deterministic semantic receipts kept separate from physical telemetry; the causal-information
+receipt of Phase 5; and complete obstruction rather than a scalar confidence.
+
+**Scope discipline for the localized-P=NP thesis.** It is a situated physical conversion — wherever
+the construction stands, finding collapses into following — and it is **not** the classical class
+equality. Any public claim owes the full declaration ledger: problem family, instance distribution,
+growth history, representation, construction cost, body size, incremental query cost, verification
+cost, transfer cost, and uniformity. Sanctioned terms: *situated compiled tractability*,
+*history-conditioned online tractability*, *physical amortization by world-grown structure*.
+
+---
 
 ## Explicitly not scheduled
 
 A proof of the Riemann hypothesis or the Hodge conjecture. A classical-number-field cohomology,
 Frobenius, or trace identity. A general far-field condensation independent of its kernel. An
-unrestricted learner. A universal interchange theorem. A comprehension, consequence, semantics,
-relevance, research-mode, or theorem-valuation subsystem — these are convicted and remain refused.
+unrestricted learner. A universal interchange theorem. A metric, connection, curvature tensor,
+Ricci flow, entropy, or duality as an engine governor. A comprehension, consequence, semantics,
+relevance, research-mode, or theorem-valuation subsystem — convicted, and they remain refused.
