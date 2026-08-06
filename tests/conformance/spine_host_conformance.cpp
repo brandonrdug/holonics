@@ -48,5 +48,33 @@ int main() {
   if (!holonics::tests::reflective_laws_hold()) {
     std::cerr << "reflective runtime laws failed\n"; ++failures;
   }
+  if (!holonics::tests::surface_laws_hold()) {
+    std::cerr << "surface scale laws failed\n"; ++failures;
+  }
+  if (!holonics::tests::relational_laws_hold()) {
+    std::cerr << "relational conduct laws failed\n"; ++failures;
+  }
+  if (!holonics::tests::mouth_laws_hold()) {
+    std::cerr << "agentic mouth laws failed\n"; ++failures;
+  }
+  if (!holonics::tests::formal_laws_hold()) {
+    std::cerr << "formal production laws failed\n"; ++failures;
+  }
+  if (!holonics::tests::research_laws_hold()) {
+    std::cerr << "research ecology laws failed\n"; ++failures;
+  }
+  const auto ablation = holonics::tests::cultivation_ablation();
+  if (!ablation.holds) {
+    std::cerr << "PHASE 6 GRADE FAILED: mounted=" << ablation.mounted_only
+              << " withheld=" << ablation.mounted_withheld
+              << " cultivated=" << ablation.cultivated
+              << " novel=" << ablation.novel_after_departure
+              << " ablated_stops=" << ablation.ablated_stops_conducting << '\n';
+    ++failures;
+  } else {
+    std::cerr << "phase 6 grade: mounted-only withheld 9*8; cultivated returned "
+              << ablation.cultivated << "; source-detached returned "
+              << ablation.novel_after_departure << " for novel 7*9; ablation stops conduct\n";
+  }
   return failures == 0 ? 0 : 1;
 }

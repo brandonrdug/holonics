@@ -198,6 +198,10 @@ add_custom_target(
     "-DEXTRA_ARTIFACTS=${HOLONICS_EXTRA_ARTIFACTS}"
     -P "${PROJECT_SOURCE_DIR}/cmake/WriteBuildManifest.cmake"
   DEPENDS
+    enclosure_device_deed
+    enclosure_device_artifacts
+    spine_device_deed
+    spine_device_artifacts
     r0_host_contract
     r0_normalize_device_object
     r0_device_artifacts

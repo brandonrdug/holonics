@@ -160,8 +160,27 @@ receipt without its returned artifact is refused.
 
 Receipt: [the phases 0-5 spine receipt](receipts/PHASES_0_5_SPINE_RECEIPT.md). Suite: `137/137`.
 
-**This is a spine, not a learner.** Nothing here conditions a body, mounts a corpus, generates,
-trains, or returns a proof. Those are Phases 6 onward and remain `open`.
+**This is a spine, not a learner.** Nothing in Phases 1-5 conditions a body.
+
+## Phase 6 — the ecology port
+
+**Truth status:** `established-bounded` at the declared aperture.
+**Evidence tags:** `implemented-exact`, `computational-witness`.
+
+Nine owners are ported from the laboratory: the resonance ecology and its receptor registry, the
+suffix automaton with its linear source-incidence attribution, the training ecology, the five
+simultaneous surface scales, the reflective runtime, relational conduct, the agentic mouth, formal
+production against an exterior checker, and the research ecology's contact fronts.
+
+**The phase grade returned.** A mounted-only body withholds `9*8`; the cultivated body returns
+`72`; a source-detached remount returns `63` for a novel `7*9`; and exact ablation removes the
+route's structure so it stops conducting. The body retains the route, not the passages.
+
+**This re-earns the three claims Phase 0 withdrew** — returned training changing reusable
+morphology, exact ablation removing later conduct, and source-detached conditioning — **at this
+aperture only.** The laboratory's scale figures are not claimed here; broad mounting is Phase 7.
+
+Receipt: [the ecology port receipt](receipts/PHASE_6_ECOLOGY_PORT_RECEIPT.md).
 
 ## Construction provenance
 
@@ -193,8 +212,7 @@ established capability is admissible without limit as the carrier of a deed and 
 as its return. Every evidence requirement — source separation, post-seal comparison, checker
 return, ablation, sample-free rest, GPU deed, ownership, no-float, independent audit — is unchanged.
 
-Construction is no longer paused. **Phases 0-5 are admitted; Phase 6, the ecology port, is the next
-deed.** Movement A stands as the exactness floor; Movement B is not a movement and has folded into
+Construction is no longer paused. **Phases 0-6 are admitted; Phase 7, broad mounting, is the next deed.** Movement A stands as the exactness floor; Movement B is not a movement and has folded into
 Phase 5 as its sufficiency test.
 
 ## Admitted movements

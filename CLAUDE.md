@@ -27,10 +27,10 @@ Read this file first and in full. Then read `CONSTRUCTION_STATE.md` for the admi
 `blueprint/EROS_EMBODIMENT_ROADMAP.md` for the ordered continuation. Do not re-read the archive by
 default.
 
-**Where the work stands (2026-08-05).** Phases 0–5 of the embodiment roadmap are admitted: the
+**Where the work stands (2026-08-05).** Phases 0–6 of the embodiment roadmap are admitted: the
 contaminated conditioning layer is excised and regraded, and the spine — minimum carrier, substrate,
 Swing and Standing, live machine and rest, causal-information receipt — is built, GPU-graded, and
-committed. Suite `137/137`. **Phase 6, the ecology port, is next.**
+committed. The nine ecologies are ported and the phase grade — mounted-only withholds, cultivated returns, source-detached returns a novel product, ablation stops conduct — returned. **Phase 7, broad mounting, is next.**
 
 Three commits sit unpushed on `main`: the roadmap recut, the Phase 0 excision, and the Phase 1–5
 spine. Pushing is Brandon's call, not yours.

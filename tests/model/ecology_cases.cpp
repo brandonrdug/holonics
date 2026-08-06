@@ -136,3 +136,209 @@ bool reflective_laws_hold() {
 }
 
 }  // namespace holonics::tests
+
+#include <holonics/event/agentic_mouth.hpp>
+#include <holonics/event/research_ecology.hpp>
+
+namespace holonics::tests {
+
+bool surface_laws_hold() {
+  using namespace holonics::organ;
+  token_transport carried{};
+  carried.germ = 7;
+  carried.matched_length[0] = 3;   // lexical
+  carried.recurrence[0] = 2;
+  carried.matched_length[1] = 5;   // clause-lexical, longer
+  carried.recurrence[1] = 1;
+  if (morphological_law::greatest_productive(carried) != 5) { return false; }
+  if (morphological_law::supporting_count(carried) != 2) { return false; }
+  // Absent morphology emits nothing rather than inventing a continuation.
+  token_transport bare{};
+  bare.germ = 7;
+  if (morphological_law::carried(bare)) { return false; }
+  surface_generation generation{};
+  if (morphological_law::try_emit(generation, bare)) { return false; }
+  if (!morphological_law::try_emit(generation, carried) || generation.token_count != 1) {
+    return false;
+  }
+  // Same visible germ, different supporting scales, remains a different transport.
+  token_transport other = carried;
+  other.recurrence[1] = 0;
+  if (morphological_law::same_transport(carried, other)) { return false; }
+  // Observer exhaustion is not linguistic rest.
+  if (morphological_law::close(0, true) != response_rest::observation_aperture_exhausted) {
+    return false;
+  }
+  return morphological_law::close(0, false) == response_rest::closed &&
+      morphological_law::close(2, false) == response_rest::obstructed;
+}
+
+bool relational_laws_hold() {
+  using namespace holonics::event;
+  relational_channel channel{};
+  // One return is co-presence, not contact.
+  if (relational_law::admit_return(channel, 99, 1) != channel_conduct::copresent) {
+    return false;
+  }
+  // A repeat through the SAME source pair advances recurrence but does not close.
+  if (relational_law::admit_return(channel, 99, 1) != channel_conduct::copresent ||
+      channel.recurrence_population != 2) { return false; }
+  // A second, distinct source pair closes it as caused.
+  if (relational_law::admit_return(channel, 99, 2) != channel_conduct::caused) {
+    return false;
+  }
+  // A changed junction phase reopens rather than accumulating.
+  if (relational_law::admit_return(channel, 100, 3) != channel_conduct::open) {
+    return false;
+  }
+  // Transport words are ordered and noncommuting.
+  thought_current left{};
+  thought_current right{};
+  if (!relational_law::try_extend(left, 1, false) ||
+      !relational_law::try_extend(left, 2, false) ||
+      !relational_law::try_extend(right, 2, false) ||
+      !relational_law::try_extend(right, 1, false)) { return false; }
+  if (relational_law::same_word(left, right)) { return false; }
+  // A closed route returning a changed frame carries holonomy.
+  thought_current loop{};
+  static_cast<void>(relational_law::try_extend(loop, 5, false));
+  static_cast<void>(relational_law::try_extend(loop, 6, false));
+  static_cast<void>(relational_law::try_extend(loop, 5, true));
+  return relational_law::carries_holonomy(loop);
+}
+
+bool mouth_laws_hold() {
+  using namespace holonics::event;
+  // A question needing a world deed opens one and the turn awaits its return.
+  const auto opened = mouth_law::respond(turn_state::rest, mouth_occurrence::question, true);
+  if (opened != mouth_consequence::deed) { return false; }
+  const turn_state awaiting = mouth_law::advance(turn_state::rest, opened);
+  if (awaiting != turn_state::awaiting_world_return) { return false; }
+  // A second question while awaiting cannot answer; it clarifies.
+  if (mouth_law::respond(awaiting, mouth_occurrence::question, false) !=
+      mouth_consequence::answer) {
+    if (mouth_law::respond(awaiting, mouth_occurrence::question, false) !=
+        mouth_consequence::clarification) { return false; }
+  }
+  // A world return is admissible only while one is awaited.
+  if (mouth_law::respond(awaiting, mouth_occurrence::world_return, false) !=
+      mouth_consequence::answer) { return false; }
+  if (mouth_law::respond(turn_state::rest, mouth_occurrence::world_return, false) !=
+      mouth_consequence::clarification) { return false; }
+  // Retained ports make a crossing inadmissible.
+  mouth_crossing crossing{};
+  crossing.ports_retained = true;
+  if (mouth_law::admissible(crossing)) { return false; }
+  crossing.ports_retained = false;
+  // A residual keeps its direction.
+  return mouth_law::admissible(crossing) &&
+      mouth_law::residual_directed(codec_residual{3, 1}) &&
+      !mouth_law::residual_directed(codec_residual{2, 2});
+}
+
+bool formal_laws_hold() {
+  using namespace holonics::event;
+  // Mounting installs motions and zero mathematics.
+  if (!formal_law::mount_clean(proof_motion_count, 0) ||
+      formal_law::mount_clean(proof_motion_count, 1)) { return false; }
+  checker_crossing crossing{};
+  crossing.generated = 4;
+  // An incomplete population cannot cultivate.
+  if (!formal_law::try_admit_return(crossing,
+          checker_return{0, checker_outcome::obstructed, proof_motion::direct, 10})) {
+    return false;
+  }
+  if (formal_law::may_cultivate(crossing)) { return false; }
+  static_cast<void>(formal_law::try_admit_return(crossing,
+      checker_return{1, checker_outcome::obstructed, proof_motion::rewrite, 11}));
+  static_cast<void>(formal_law::try_admit_return(crossing,
+      checker_return{2, checker_outcome::obstructed, proof_motion::introduce_fact, 12}));
+  if (formal_law::may_cultivate(crossing)) { return false; }
+  static_cast<void>(formal_law::try_admit_return(crossing,
+      checker_return{3, checker_outcome::accepted, proof_motion::contrapose, 13}));
+  if (!formal_law::may_cultivate(crossing) || crossing.accepted != 1 ||
+      crossing.obstructed != 3) { return false; }
+  // Obstruction causes deeper motion: three obstructed paths license three pairs.
+  if (formal_law::compositions_caused(crossing) != 3) { return false; }
+  // Selection refuses rather than substituting a reachable target.
+  return formal_law::select_target(true, true) == target_state::selected &&
+      formal_law::select_target(false, true) == target_state::open &&
+      formal_law::select_target(true, false) == target_state::open;
+}
+
+bool research_laws_hold() {
+  using namespace holonics::event;
+  contact_front front{};
+  // A front crosses only as a validated whole.
+  if (research_law::may_cross(front)) { return false; }
+  if (!research_law::try_admit(front, research_leader{1, 100, 7, false, false}) ||
+      !research_law::try_admit(front, research_leader{2, 100, 8, false, true})) {
+    return false;
+  }
+  // A duplicate leader is refused.
+  if (research_law::try_admit(front, research_leader{1, 100, 9, false, false})) {
+    return false;
+  }
+  front.validated = true;
+  if (!research_law::may_cross(front)) { return false; }
+  // Only still-open currents that reached a face owe bridge leaders.
+  if (research_law::bridge_leaders_owed(front) != 1) { return false; }
+  // Rest is the absence of novel source and unvisited bridge, not a round count.
+  if (research_law::rest_state(1, 0) != research_rest::novel_source_remains ||
+      research_law::rest_state(0, 1) != research_rest::bridge_region_unvisited ||
+      research_law::rest_state(0, 0) != research_rest::rested) { return false; }
+  // Causal exclusion is by identity, so a rerun cannot inherit its own answer.
+  const std::uint64_t excluded[1] = {42};
+  return !research_law::source_admitted(42, excluded, 1) &&
+      research_law::source_admitted(43, excluded, 1);
+}
+
+}  // namespace holonics::tests
+
+#include <holonics/event/cultivated_route.hpp>
+
+namespace holonics::tests {
+
+ablation_return cultivation_ablation() {
+  using namespace holonics::event;
+  using holonics::organ::training_ecology;
+  using holonics::organ::training_state;
+  ablation_return returned{};
+
+  // A mounted-only body: the template's shape exists, but no passage has
+  // returned through it. It must WITHHOLD.
+  training_ecology<64> mounted{2, 8};
+  const auto withheld = route_law::conduct(mounted, 9, 8);
+  returned.mounted_only = withheld.product;
+  returned.mounted_withheld = withheld.state == conduct_state::withheld;
+
+  // Developmental passages. Two DISTINCT occurrences exercise the route; that
+  // recurrence is what founds it. Each passage departs after it is committed --
+  // nothing here retains an operand pair or an answer.
+  training_ecology<64> cultivated{2, 8};
+  const auto route = product_route();
+  const auto first = cultivated.propose(&route, 1);
+  if (cultivated.commit(first) != training_state::admitted) { return returned; }
+  const auto second = cultivated.propose(&route, 1);
+  if (cultivated.commit(second) != training_state::admitted) { return returned; }
+  const auto conducted = route_law::conduct(cultivated, 9, 8);
+  returned.cultivated = conducted.product;
+  returned.developmental_passages_retained = conducted.source_consulted;
+
+  // Source-detached: ask a pair the body never met. A retained lookup could not
+  // answer this; a cultivated route can.
+  const auto novel = route_law::conduct(cultivated, 7, 9);
+  returned.novel_after_departure = novel.product;
+
+  // Exact ablation: remove the route's structure. Later conduct disappears.
+  const bool removed = cultivated.ablate(route);
+  const auto after = route_law::conduct(cultivated, 7, 9);
+  returned.ablated_stops_conducting = removed && after.state == conduct_state::withheld;
+
+  returned.holds = returned.mounted_withheld && returned.cultivated == 72 &&
+      returned.novel_after_departure == 63 &&
+      !returned.developmental_passages_retained && returned.ablated_stops_conducting;
+  return returned;
+}
+
+}  // namespace holonics::tests
