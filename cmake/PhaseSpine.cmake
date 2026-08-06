@@ -8,7 +8,8 @@ target_link_libraries(
 add_executable(
   spine_device_deed
   apparatus/host/spine_deed.cpp
-  tests/model/spine_cases.cpp)
+  tests/model/spine_cases.cpp
+  tests/model/ecology_cases.cpp)
 target_include_directories(spine_device_deed PRIVATE "${PROJECT_SOURCE_DIR}/tests/model")
 target_link_libraries(
   spine_device_deed
@@ -17,7 +18,8 @@ target_link_libraries(
 add_executable(
   spine_host_conformance
   tests/conformance/spine_host_conformance.cpp
-  tests/model/spine_cases.cpp)
+  tests/model/spine_cases.cpp
+  tests/model/ecology_cases.cpp)
 target_include_directories(spine_host_conformance PRIVATE "${PROJECT_SOURCE_DIR}/tests/model")
 target_link_libraries(
   spine_host_conformance

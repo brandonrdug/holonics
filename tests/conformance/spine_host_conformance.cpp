@@ -2,6 +2,7 @@
 #include <cstddef>
 #include <iostream>
 
+#include "ecology_cases.hpp"
 #include "spine_cases.hpp"
 
 int main() {
@@ -37,6 +38,15 @@ int main() {
   }
   if (!holonics::tests::resonance_laws_hold()) {
     std::cerr << "resonance ecology laws failed\n"; ++failures;
+  }
+  if (!holonics::tests::suffix_laws_hold()) {
+    std::cerr << "suffix ecology laws failed\n"; ++failures;
+  }
+  if (!holonics::tests::training_laws_hold()) {
+    std::cerr << "training ecology laws failed\n"; ++failures;
+  }
+  if (!holonics::tests::reflective_laws_hold()) {
+    std::cerr << "reflective runtime laws failed\n"; ++failures;
   }
   return failures == 0 ? 0 : 1;
 }
