@@ -1,5 +1,13 @@
 # The grown circuit
 
+> **SUPERSEDED 2026-08-07 — ARCHIVED-BODY PROVENANCE.**
+> This file describes the C++/CUDA engine, which was archived whole at `archive/cpp-engine/` when
+> the body moved to Rust. Its mechanisms, measurements and open items are **historical record**, not
+> the present position and not a schedule. The active spine is `CLAUDE.md` §0; the active roadmap is
+> `blueprint/THE_ROADMAP.md`. Nothing here is deleted — a reader following a citation into this file
+> should find what it said, and this banner telling them it no longer governs.
+
+
 **Ratified by Brandon, 2026-08-07.** This is the current direction. It supersedes the movement list
 in `THE_ORDER_OF_WORK.md` as the *thing being built toward*; that file's remaining movements — one
 standing, the current onto the mathematics, the front onto the card, the receiver layer — are the

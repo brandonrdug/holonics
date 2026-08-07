@@ -21,164 +21,87 @@ This file is an operating contract, not a theory deposit and not a scheduler. It
 the specific recurring failures observed across the Codex sessions of 2026-07-09 through
 2026-08-05 and to preserve the corrections that closed them.
 
-## 0. Fresh-session pickup
+## 0. Fresh-session pickup — the spine
 
-**Read `canon/THE_RECOVERED_LAW.md` before claiming anything about what holonics forbids.** It
-carries the jurisdiction doctrine, the elementary definitions with their dependency order, the
-information and gravitas laws, and the corrections to this project's capability claims — recovered
-from the frozen laboratory on 2026-08-07 after a major misinterpretation. **THE BANS HAVE
-JURISDICTION** (Brandon, ratified 2026-07-14): a ban governs Soma's interior or a mechanism offered
-as an explanation of Soma; it never governs the world or the observer. `No X inside Soma by analogy`
-must never mean `do not learn from X`.
+**The body is Rust.** The C++/CUDA engine was archived whole on 2026-08-07 at Brandon's direction
+after a comparative audit. It lives at `archive/cpp-engine/` and nothing there is authority. Sections
+below that speak of headers, deeds, `ctest`, CUDA executors or `R{i}` chains describe that archived
+body and are **provenance**, not the present position.
 
-**The current direction is `blueprint/THE_GROWN_CIRCUIT.md`** (Brandon, ratified 2026-08-07): the
-machine's emergent output analysed as a grown circuit, with the complex as the instrument and the
-renderer as one of its charts. `THE_ORDER_OF_WORK.md`'s remaining movements are the substrate it
-needs and are not cancelled.
+Read these four, in order, and nothing else by default:
 
-Read this file first and in full. Then **`blueprint/THE_ORDER_OF_WORK.md`** — the operative
-construction authority, six movements named by mechanism — and **`blueprint/THE_SPINE.md`** for how
-much of the body each mechanism actually conducts through. Then `CONSTRUCTION_STATE.md` for the
-admitted position.
+| file | what it is |
+|---|---|
+| **this file** | the operating contract. How to work, what is convicted, what is authorized. |
+| `canon/THE_DOCUMENT_LAW.md` | how a claim travels from conversation to canon, the genres, the grades, how supersession is recorded. |
+| `canon/THE_QUOTE_NETWORK.md` | **where every idea came from, in Brandon's words**, themed, with "where this lives now" per theme. Read this before theorising about what he wants. |
+| `blueprint/THE_ROADMAP.md` | the single active roadmap, fourteen movements named by mechanism. |
 
-`EROS_EMBODIMENT_ROADMAP.md`, `THE_FOUNDATION_REMAINDER.md`, and `COMPLETE_CPP_ENGINE_ROADMAP.md` are
-**provenance** — the record of completed construction and the source-file map per ported owner. Do
-not re-read the archive by default.
+`canon/THE_RECOVERED_LAW.md` carries the jurisdiction doctrine and the elementary definitions;
+consult it before claiming anything about what holonics forbids. `CONSTRUCTION_STATE.md`,
+`blueprint/THE_ORDER_OF_WORK.md`, `THE_SPINE.md`, `THE_FOUNDATION_REMAINDER.md` and
+`EROS_EMBODIMENT_ROADMAP.md` are **archived-body provenance**; do not schedule from them.
+
+### The workspace
+
+```
+crates/   holonic-structure  substrate: ordinal and relation atlases, local populations,
+                             branch lineage, typed atomic membrane
+          relational-geometry exact projective geometry over BigRational, Sturm-certified roots
+          holonic-engine     the receiver-relative geometry and physics body, ~95k lines,
+                             float-free, no Bevy, no wgpu, two hand-written CUDA kernels
+          holonic-language   the reflective runtime: reify, absorb, resume
+          holonic-architecture-lint  the monotone ownership ratchet
+soma/     body               pure law, no_std, zero dependencies
+          membrane · abi · surface · mount · life · tools
+          kernel/soma.spv    committed boundary artifact; its toolchain is excluded
+```
+
+**Measured 2026-08-07:** `cargo build --workspace` green; `cargo test --workspace` **543 passed,
+1 failed, 14 ignored in 15.7 s**. The one failure is `mount-scope-gate`'s
+`founded_reference_path_is_deterministic_and_nonvacuous` returning `(255,159,35)` against an expected
+`(256,160,38)` — laboratory fixture drift that predates the import and is now visible rather than
+frozen. It blocks that gate's fifth fixture.
+
+Build with `PATH=/opt/cuda/bin:$PATH`; `holonic-engine`'s build script shells out to `nvcc`.
+
+### The objective, in Brandon's words
+
+> *"a machine that can rigorously perform and analyze computations using internal machinery that
+> accommodates transport mechanisms between arbitrary charts, the learning is the intermediary
+> mechanism/law/equation"*
+
+and the umbrella it sits under:
+
+> *"the 'Universality Machine', which is an umbrella term for a machine that can relate arbitrary
+> informants in simulated ecologies, where holonics is a framework that encapsulates
+> interdisciplinary features of mathematics, physics, and computer science because they are all
+> related and generalize to everything."*
 
 **Never name work by an ordinal.** `R14`, `Phase 7`, `CUT 3` carry no capability and Brandon has
-corrected this three times: *"I do not want to attribute capabilities and version numbers to the
+corrected this repeatedly: *"I do not want to attribute capabilities and version numbers to the
 phases or the numbers you associate with the build, because then you eventually start to refer to
-the numbers like facts instead of using proper semantics."* Name the mechanism. Plans and ordered
-movements are wanted; ordinals standing in for content are not.
+the numbers like facts instead of using proper semantics."* Name the mechanism.
 
-**Where the work stands (2026-08-06).** Phases 0–7 of the embodiment roadmap are admitted: the
-contaminated conditioning layer is excised and regraded, and the spine — minimum carrier, substrate,
-Swing and Standing, live machine and rest, causal-information receipt — is built, GPU-graded, and
-committed. The nine ecologies are ported and the phase grade — mounted-only withholds, cultivated returns, source-detached returns a novel product, ablation stops conduct — returned. **Phase 7 is admitted in all three of its movements**, and **conditioned mathematical production has
-returned** — the deed the Rust laboratory left interrupted. The body now stands **ahead of the
-laboratory on the proof line**: an accepted theorem becomes material the body later reaches, a second
-proof splices that name out of the standing, and structural exclusion removes both the reach and the
-route so nothing is emitted. A foil with the same proof term and the first theorem absent is refused
-by the kernel independently.
+### What the archived body is worth
 
-**The constraint line is open and has its first deed.** A constraint equation is a `Chi` — two
-transports asserted equal — and the unknown is whatever the present chart does not determine.
-`x^5 - x - 1` returns a computed obstruction (transitive plus a transposition proves the group is
-not solvable, so no radical tower reaches the root), the rebase determines the unknown in the chart
-the obstruction names, and the invariant retained is the group rather than either local reading. See
-[the constraint record](research/records/2026-08-06_THE_CONSTRAINT_IS_THE_CHI_THE_UNKNOWN_IS_THE_MISSING_CHART.md),
-which also registers **counterexample search** as the standing application on Brandon's direction.
+Two things it had that this laboratory does not, both to be ported: the **conditioned production
+shape** — two theorems, kernel-refused foil, structural ablation, which C++ ran at three declarations
+and the laboratory never ran at all despite mounting 1,164 — and `exact/enclosure.hpp`, the certified
+exact enclosure carrier that §11 names as the first brick.
 
-**The objective, in Brandon's words (2026-08-06):** *"a machine that can rigorously perform and
-analyze computations using internal machinery that accommodates transport mechanisms between
-arbitrary charts, the learning is the intermediary mechanism/law/equation"* — the machine learning
-to produce mathematical proofs. This is not a target that arrived late; it is what the work has been
-for. The foundation remainder exists to make it iterable.
+And four lessons, each earned by a defect found in it:
 
-Phase 7's recut has its own lesson. Phase 6's returned laws are exact and stand, but three of its
-**cost** claims overstated the code — a cubic relaxation where the source owner walks the tree
-once, a rescan where the source reads a stored interval, a flat scanned transition array where the
-source holds per-state fan-out. All three are correct at fifteen symbols and none completes at
-11,879 states. §8 caught this in my own work one phase after it caught the contamination. **A cost
-law is a law. Porting the return without the cost is not porting.**
-
-**What Phase 7 returned.** Movement 1 refounded those three against the source owner and measured
-both implementations at a quadrupled aperture — superseded `x27.57` and `x19.36`, refounded `x4.43`
-and `x4.46`, on a bound of eight, with identical state populations either way. Movement 2 made both
-ecologies arenas of spans: **23,968,000 resident octets against 224 frame octets**, and the query
-laws take their arena by const reference so a hot device path that founded anything would not
-compile. Movement 3 mounted this project's own record — **734 containers, 37,278 occurrences,
-8,913,746 surface octets** — with all three literal gates returning, an append delta of fifty-six
-octets, and an exact remount from the rested octets alone. What is *not* claimed: the rollout
-importers, the human/assistant/emanated population, whole-surface conditioning past the
-sixty-four-octet aperture, and the laboratory's relation population and route rest.
-
-Two things worth carrying. **A law that returns zero proves nothing about itself** — the corpus
-carries no repeat and no revision, so the plurality laws needed a declared control to be exercised
-rather than merely present, and the grade requires it. And the audit caught three things the author
-did not: `half` as a variable name, `7.1` as a phase number, and `double`/`float` standing alone in
-prose. Phase numbering in sources is **movement** numbering for that reason.
-
-`main` was pushed to `origin` on 2026-08-06 at Brandon's direct instruction, through the Phase 6
-port and the Phase 7 recut. Pushing remains Brandon's call, not yours.
-
-**What is true and easy to get wrong:**
-
-- The engine's mathematics is real and stays. Its **learning** was simulated by counters and is
-  withdrawn (§13). Do not cite the withdrawn claims as floor.
-- The laboratory holds the real learning ecology, in Rust, with receipts. Phase 6 is a **port**, not
-  a rederivation. Every owner names its source file in the roadmap.
-- Two of the strongest laboratory owners were **deleted** and survive only at checkpoint
-  `93834398` on `origin/agent/eros-production-owners`. Recover them read-only before porting.
-- The laboratory working tree is **frozen and dirty** — 52 files that participated in an interrupted
-  invalid path. Port from `a07ff376` plus that checkpoint, never from the dirty tree.
-
-**Read `CONSTRUCTION_STATE.md`'s "Verified position" section first.** Two commits carry unverified
-gates and one deed is failing; the section says exactly which and what was ruled out.
-
-**A gate is not a gate until its pass line has been read.** Never `ctest ... | tail` — the pipeline
-returns `tail`'s status, always zero, and the label summary prints whether or not tests failed. Two
-commits were reported `126/126` on that artifact.
-
-**A deed is not a test, and ctest no longer holds one.** This was Brandon's correction, made three
-times, and the third time plainly: *"you keep getting hung up on optimizing these tests when
-preserving them at all is likely the real issue… this is just straight up wasted time and compute."*
-He was right and the framing of a "speed-up" was the misunderstanding.
-
-A deed mounts a rest, contacts cards, computes, and rests its return **as a file**. That is
-production, and whether it needs to run is decided by whether its inputs moved. Registering it as
-`add_test` meant it ran unconditionally, so the machine's entire founded production was recomputed
-from zero to answer any question about any part of the tree. Measured across a complete run: **of
-roughly 2,250 serial seconds, about 1,320 were byte-for-byte re-executions of a computation that had
-finished seconds earlier in the same invocation.**
-
-The deed chain was always a file-dependency graph, written longhand in every argument list — each
-deed's rest is the next one's argument. `cmake/HolonicStanding.cmake` reads that lineage off the
-arguments: **an artifact path is a return of the first founding that names it and a mount for every
-founding after.** 249 founded returns are in the build graph; 63 guards remain in ctest.
-
-```
-ninja                      build code
-ninja holonics_standing    bring the standing up to date — 0.031 s on an unmoved tree, measured
-ctest                      62 guards, 58 s, all passing — measured 2026-08-07, exit status read
-```
-
-The whole gate is **under a minute**. It was twenty-four.
-
-**What licenses the caching is the replay itself.** The determinism steps established that each deed
-is a pure function of its declared inputs; the source-access audits established that it opens
-nothing outside them. Together they are the certificate that the declared closure is a complete
-cache key. They were never waste — the waste was throwing their result away and re-establishing it
-from zero every time.
-
-**Foundings run one at a time**, in a `holonic_card` job pool of depth one. ninja's default of one
-job per core launched two dozen deeds at a single device and the plural rederivation returned
-`executor_state=10`, `kernel_launches=0`, and 7,194 verification failures — a deed that never
-reached the card, reported as a mathematical failure. Contention wearing a regression's mask, the
-same defect as the nineteen two-times timeout margins.
-
-**A build-graph change no longer needs a clean tree.** CMake was generating 132 dyndep scan files
-looking for C++20 modules this project does not have, and the resulting graph tripped a ninja
-assertion on every added header or target — roughly eight minutes of full rebuild, each time.
-`CMAKE_CXX_SCAN_FOR_MODULES OFF` is now set in `CMakeLists.txt`; measured 2026-08-06, zero dyndep
-files and a graph change rebuilds incrementally. A clean tree is still the discipline **after a
-broad rename**, where stale objects have hidden a real inconsistency.
-
-**Declare the producer before the consumer.** The lineage is inferred from declaration order, so a
-consumer declared above its producer inverts the graph. That is now a configure-time refusal rather
-than a silent inversion — it caught the cultivated-organs seal running before its replay.
-
-**A negative control's absence is evidence, not an unbuilt output.** A foil is a proof the kernel is
-supposed to refuse, so no compiled object is ever produced for it. Declaring that path as a founding's
-return makes the graph chase a file whose non-existence is the whole point, and re-run the founding
-and everything downstream of it forever. `holonic_withhold` it — globally, because withholding it
-from the deed alone only hands the claim to the next founding that names it.
-
-**A replay may not write where the deed wrote.** The source-access audits re-executed both deeds over
-the deeds' own output paths, so each audit overwrote the standing it was auditing and left everything
-downstream permanently dirty. They now redirect into a scratch region, as the determinism replays
-always did. When a founding chain will not converge, `ninja -d explain holonics_standing` names the
-file and the two timestamps.
+- **Bind every deposit to its content hash AND its closure hash, with a verifier.** The laboratory
+  lost its tiger figures and `semantics_invariant_under_exact_chart.lean` to an untracked `runs/`.
+- **No absolute frame in a lineage.** Ten C++ card adapters folded the filesystem path into the rest
+  integrity, and one deed asserted that dependence as its own success condition.
+- **A negative control's absence is evidence, not an unbuilt output.**
+- **An invariant is only visible across two frames.** Every contaminant found in two days was a
+  receiver-visible coordinate promoted into an invariant — an accepted-count into morphology, a mount
+  point into standing, a solver's pivot order into a reduction, one card's literals into an admission
+  rule. Each returned consistently until the frame moved. A machine with one frame cannot audit
+  itself, which is why the instruments that join partials outrank perfecting any organ.
 
 ## 1. The floor is a carrier, not a retired interface
 

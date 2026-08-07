@@ -1,0 +1,856 @@
+# The roadmap
+
+**This is the single active roadmap.** It supersedes `THE_ORDER_OF_WORK.md`, `THE_SPINE.md`,
+`THE_FOUNDATION_REMAINDER.md`, `THE_GROWN_CIRCUIT.md`, `EROS_EMBODIMENT_ROADMAP.md`,
+`EROS_MATHEMATICS_PRODUCTION_FLOOR.md`, and `COMPLETE_CPP_ENGINE_ROADMAP.md` as the statement of
+what is open. Those files become **provenance**: the record of completed construction and the
+source-file map per owner. Read them for history, never for direction.
+
+They are superseded for one reason, stated plainly in the next section: **every one of them
+describes a body that is no longer the body.**
+
+## Naming
+
+**No movement here is named by an ordinal.** Each is named by the mechanism it changes, and is
+referred to everywhere by that name. Position in this document carries order of work and nothing
+else — no capability, no version, no schedule. Brandon has corrected ordinal naming three times:
+
+> *"I do not want to attribute capabilities and version numbers to the phases or the numbers you
+> associate with the build, because then you eventually start to refer to the numbers like facts
+> instead of using proper semantics."*
+> — Brandon, direct ruling
+
+Do not reintroduce numbering by writing "the first movement" as though that were a name.
+
+## The objective
+
+Brandon, verbatim:
+
+> *"a machine that can rigorously perform and analyze computations using internal machinery that
+> accommodates transport mechanisms between arbitrary charts, the learning is the intermediary
+> mechanism/law/equation"*
+
+And on the encompassing frame, verbatim:
+
+> *"an umbrella term for a machine that can relate arbitrary informants in simulated ecologies,
+> where holonics is a framework that encapsulates interdisciplinary features of mathematics,
+> physics, and computer science because they are all related and generalize to everything"*
+
+Everything below is ranked by **what unblocks that**, not by what is easy and not by what is
+adjacent. Two movements near the end are the hardest work in the document and they are not last
+because they are optional; they are last because the movements above them are the instruments
+that make them statable as falsifiable laws.
+
+---
+
+## The fact that reframes every prior blueprint file
+
+**HEAD is `06518c3`, 2026-08-07: "Transition to Rust: archive the C++ body, import the laboratory
+machinery."** Brandon's decision after a comparative audit.
+
+- The C++ engine moved to `/home/b/Workspaces/holonics/archive/cpp-engine/`.
+- `crates/{holonic-structure, holonic-language, relational-geometry, holonic-engine,
+  holonic-architecture-lint}` and `soma/{body, abi, membrane, surface, life, mount, tools}` were
+  imported from laboratory `a07ff376` — 326 files, 282,274 lines.
+- The import is **byte-identical**. SHA-256 equality against `a07ff376` was verified for
+  `holonic_complex.rs`, `simplicial.rs`, `local_star.rs`, `receiver_phase_atlas.rs`, `conic.rs`,
+  `algebraic.rs`, `basin.rs`.
+- `cargo check --workspace --all-targets` passes in 23 seconds. 282 Rust files.
+- `grep -rnE "\bf32\b|\bf64\b" crates/holonic-engine/src crates/relational-geometry/src` returns
+  **zero**. The no-float discipline survived the transition in the two crates that carry the
+  mathematics.
+
+**The laboratory machinery is no longer only in the frozen laboratory.** It is live code at
+absolute paths under `/home/b/Workspaces/holonics/`. Reading it is no longer archaeology.
+
+The laboratory itself remains **frozen and dirty** and is still read only through git
+(`git -C /home/b/Workspaces/laboratory show a07ff376:<path>`). Never read its working tree, never
+write to it. That rule is unchanged.
+
+**No authority file was updated for the transition.** `THE_ORDER_OF_WORK.md`, `THE_SPINE.md`,
+`THE_FOUNDATION_REMAINDER.md`, `CONSTRUCTION_STATE.md`, and `CLAUDE.md` §0/§11/§13 all name C++
+headers that now resolve only under the archive. Verified by `find`:
+
+| Header named as live by an authority file | Actually resolves at |
+|---|---|
+| `body/live_machine.hpp` | `archive/cpp-engine/src/include/holonics/body/live_machine.hpp` |
+| `body/spine_execute.hpp` | `archive/cpp-engine/src/include/holonics/body/spine_execute.hpp` |
+| `structure/transition_invariants.hpp` | `archive/cpp-engine/src/include/holonics/structure/transition_invariants.hpp` |
+| `event/checker_return_schema.hpp` | `archive/cpp-engine/src/include/holonics/event/checker_return_schema.hpp` |
+| `structure/chi_pair.hpp` | `archive/cpp-engine/src/include/holonics/structure/chi_pair.hpp` |
+| `exact/enclosure.hpp` | `archive/cpp-engine/src/include/holonics/exact/enclosure.hpp` |
+
+Each of those is the subject of a movement in `THE_ORDER_OF_WORK.md`. **Those six movements are
+not open work in this body.** They describe defects in an archived engine. Some of them name real
+mechanisms that must be *re-established* in Rust — the Chi pair and the enclosure carrier
+especially — and where that is true, the movement below says so and does not inherit the C++
+framing.
+
+`CLAUDE.md` §0 does name `THE_GROWN_CIRCUIT.md` as current direction. Everything below that line
+in `CLAUDE.md` still describes the C++ body as live.
+
+---
+
+## Verified negative findings
+
+Per the ground rules, absences are reported as first-class results. Each of these was measured in
+`/home/b/Workspaces/holonics` at HEAD `06518c3`. "Zero" means zero.
+
+| Claim | Command | Result |
+|---|---|---|
+| Integer homology exists | `grep -rniE "smith_normal\|hermite_normal\|invariant_factor\|betti\|torsion" crates soma --include="*.rs"` | **1 hit, a doc comment** at `crates/holonic-engine/src/basin.rs:363` |
+| A Rust `ChiPair` exists | `grep -rn "ChiPair\|chi_pair" crates soma --include="*.rs"` | **zero** |
+| The recruitment remedies are implemented | `grep -rniE "mincover\|min_cover\|provisional" soma/life/src` | **zero** |
+| The deposit registry crossed to Rust | `grep -rln "closure_sha256" .` | **only** `archive/cpp-engine/cmake/HolonicDeposit.cmake` and `archive/cpp-engine/standing/MANIFEST.txt` |
+| `lean_mathematics.rs` composes reflection | `grep -c "holonic_language\|Reflect" soma/life/src/lean_mathematics.rs` | **zero** |
+| A Lean project is in the tree | `git ls-files soma/formal` | **7 files, all generated `.lake/agentic-research-kernel/formal_carry-0000{0..6}.lean`**; no `lakefile.toml`, no `lean-toolchain`, no manifest |
+| The atlas TSVs are read | `grep -rn "File::open" crates soma --include="*.rs" \| grep -i tsv` | **1 hit**, `mms_reconnection_traversal.rs:1443`, reading `source-sha256.tsv` — a provenance manifest, **not** the atlas |
+| A traversal schedule can be varied | `grep -n "pop_front" simplicial.rs local_star.rs graph_receiver.rs` | **5 hits, all hardcoded BFS**: `simplicial.rs:540`, `simplicial.rs:1203`, `graph_receiver.rs:1858`, `local_star.rs:370`, `local_star.rs:492` |
+| `exact_rational_rank` is reusable | `grep -rn "fn exact_rational_rank" crates` | **1 definition**, `algebraic.rs:1081`, **private**, ℚ-rank only |
+
+Two losses are permanent and are recorded so they are not searched for again:
+
+- `git log --all -- "*tiger*"` returns nothing in **either** repository. The tiger prediction PNGs
+  are gone.
+- `git log --all -- "*semantics_invariant*"` returns nothing in the laboratory at any commit. The
+  machine's kernel-accepted theorem `semantics_invariant_under_exact_chart` survives only as a
+  name, the proof term `by exact semantics_rebase_iff A e θ input output`, the axiom surface
+  `[Quot.sound]`, and SHA-256
+  `10eeb3fd789972d071498e590e836a5ac036dc4b4261bef29102366c28e00be1`.
+
+`.gitignore` still carries `/target/`, `/output/`, `/runs/`, `/data/`, and `.lake/` — the exact
+mechanism that lost them.
+
+---
+
+## What the laboratory already did
+
+Stated first and in full, per `CLAUDE.md` §7. **None of this is a construction target.** All of it
+is now live code in this repository, not a frozen achievement elsewhere.
+
+**The circuit is already a simplicial complex with enforced locality.**
+`crates/holonic-engine/src/simplicial.rs` (1,797 lines): `found_vertex` (:197), `found_face`
+(:211), `found_hinge` (:255). A wire is `HingeTransport { source, target, turn: ProjectiveTurn }`
+(:682); its law is `ProjectiveTurn` (:618-679), exact `(a·s+b)/(c·s+d)` over `BigRational` with
+`followed_by`, `inverse`, `is_projective_identity`. `HingeTransportNetwork::add` (:708) **refuses**
+any transport whose hinges do not share a face — `SimplicialError::NonlocalTransport`. Locality is
+a constructor invariant, not a convention. `flip_hinge` (:295) is the identity-preserving 2↔2
+rewrite.
+
+**`∂∂ = 0` is enforced at construction, not tested.**
+`crates/holonic-engine/src/algebraic.rs` (2,490 lines): `GradedCausalComplex::found_cell` (:269)
+refuses the cell when `boundary_of_chain(&boundary)` is nonzero —
+`CausalAlgebraicError::BoundarySquaredNonzero` (`:295`, `:400`). Coefficients are
+`ComparativeMultiplicity` (:40), signed ℤ as a `(BigUint, BigUint)` pair with `difference() ->
+BigInt` (:86). **The exact integer coefficient ring that Smith normal form needs already exists.**
+`SimplicialIncidenceReceipt::realize(&SimplicialComplex)` (:575) is the bridge from the grown
+circuit to the chain complex.
+
+**Layout is already exact and gauge-correct.** `crates/holonic-engine/src/local_star.rs` (3,805
+lines): `LocalSpatialStanding` (:258) holds no absolute positions. Edges carry `LocalEdgeState {
+previous_vector, vector }` where `vector = x_upper − x_lower` (:236-240) — Brandon's *"an absolute
+volume is the gauge violation"* is already the type. Positions are reconstructed on demand by
+`realize_vectors` (:335). `reform_obstructions` (:399) emits two residual populations that are
+already the right shape for the schedule work below: `face_residuals` (schedule-independent — it is
+`∂` on the 1-cochain) and `chord_residuals: Vec<LocalChordResidual>` (:244), which is
+`carried_vector − realized_vector` per non-tree edge and is **schedule-dependent by construction**.
+
+**Regge curvature is implemented.** `coordination_defect` (local_star.rs:1143) returns
+`LocalCoordinationDefect::InteriorCycle { coordination, charge: 6 − |link| }` — the disclination
+charge. `LocalTopologyChange::exact_charge_residual: Option<i64>` (:1177) is present only when every
+changed link is an interior cycle.
+
+**The spanning-tree / chord decomposition is implemented in the projective-transport case.**
+`HingeWorldLaw::propagate` (simplicial.rs:1174) does BFS from the pivot hinge, builds `tree_words`,
+and emits a `HingeCycleReturn` (:912) per chord carrying `tree_to_source`, `chord`, `tree_to_target`,
+`transition_word`, `class`, and `target_residual`. `HingeCycleClass` (:898) is
+`ProjectiveGauge` / `FixedPointHolonomy` / `DisplacedHolonomy`, decided **without materializing the
+product matrix** by testing `0, 1, ∞` (`transition_word_is_identity`, :1004). Ungluable
+disagreements become `HingeOpenSeam::ConflictingCandidates` (:846), carrying both arrival words.
+**This is `CLAUDE.md` §11's "spanning-tree interval labelling, where every non-tree edge forces
+additional intervals and that forced population is the certified remainder" — already built, for
+projective transport.**
+
+**The expansion schedule is already a typed receiver deed with a measured cost law.**
+`crates/holonic-engine/src/graph_receiver.rs` (2,547 lines): `ReceiverGraphDeed` (:922) =
+`Found | Dilate | Traverse | Refine | Coarsen | Retain`. `receive_section` (:85) is a
+layer-synchronous BFS over the coboundary, then `closed_hull`, then a hard `is_closed_support`
+check (:137), returning `ReceiverGraphQueryWork { roots, traversed_fronts, coboundary_lookups,
+coboundary_terms, closure_cells, returned_cells }`. `ReceiverGraphAnalysis` (:1003) returns
+`dimension`, `f_vector`, `euler_characteristic: BigInt`, `connected_components`, and
+`graph_cycle_rank: Option<BigUint>` (:1012), `None` unless every grade-1 cell has exactly one `+1`
+and one `−1` unit boundary member.
+
+**Recursive cell definition is the grain quotient.**
+`crates/holonic-engine/src/holonic_complex.rs` (1,298 lines): `promote_closed_hull` (:203) takes a
+cell's complete closed hull at grain `g` and founds one point at grain `g+1`, retaining the hull
+under `HolonicQuotient` (:137), refusing non-coarsening (`NoncoarseningQuotient`, :211).
+`HolonicOverlapCell` (:149) records genuine n-way sharing with no fabricated pairwise clique. A
+sub-circuit is one point at the parent grain and the parent never loses the child.
+
+**Planar-diagram analysis with a declared aperture.**
+`crates/relational-geometry/src/receiver_topology.rs` (1,268 lines): `analyze_receiver_topology`
+(:333) returns `{nodes, edges, faces, source_graph, face_dual_graph, source_ihara,
+face_dual_ihara}`. Cellularity is checked as Euler (`expected_faces = edges + 2 − nodes`, :550-559).
+`IharaSignature` (:219) is the exact-integer Ihara zeta of the graph **and** its face dual.
+**Declared aperture:** `DeterminantCutExceeded` — *"the determinant cut admits at most 20
+vertices"* (`:306`). `CLAUDE.md` §8 applies: using it past twenty vertices is a defect even if it
+appears to return.
+
+**Loss is already a geometric body, not a scalar.**
+`crates/holonic-engine/src/basin.rs`: `enact_outcome_basin` (:138) advances every preparation from
+its own immutable predecessor and cuts by a declared `observe`/`accepts` pair, returning
+`ExactGeometricLoss { region, boundary, minimum_corrections, measure }` (:384). `minimum_correction`
+(:256) is exact-rational Dijkstra with a deterministic `(distance, id)` tie-break. `probability` is
+a **derived** field, never a primitive.
+
+**And the learning ecology.** `CLAUDE.md` §5's established floor — conditioning and generation
+without a distribution, training with a behavioral ablation, multimodality with no fusion module,
+receiver-relativity on measured physics, formal mathematics from a detached body, continual
+restriction, reflective revision — all of it is `established-bounded` and all of its code is now
+in this tree.
+
+---
+
+## The order of work
+
+Movements in order. Each names the mechanism it changes, states the gap, what replaces it, the
+grade it must return, an explicit falsifier, and an honest split between what the laboratory
+already did and what remains.
+
+### Part one — the body can state what it is
+
+Nothing below Part one can be graded until Part one returns, because until then the repository
+cannot say which of its own claims survived the transition.
+
+---
+
+#### The record names the body it has
+
+**The gap.** No authority file has been updated for `06518c3`. Six C++ headers named as live
+subjects of open movements resolve only under `archive/cpp-engine/` (table above).
+**Nothing in the repository says which movements survived the transition.** A fresh session reading
+`CLAUDE.md` §0 is directed to `THE_ORDER_OF_WORK.md`, which describes an archived engine.
+
+This is not bookkeeping. `CLAUDE.md` §13's standing obligation — *"the scorer, the
+counter-morphology, and the constant-subtraction ablation are removed, not deprecated"* — was
+about C++ owners that are now archived wholesale. Whether the obligation is **discharged** (the
+contaminated owners are out of the live body) or **inherited** (the imported Rust owners carry
+their own version of it) is unanswered, and that answer changes what every later grade means.
+
+**What replaces it.** `CLAUDE.md` §0, §11, and §13 are rewritten against the Rust body.
+`THE_ORDER_OF_WORK.md`, `THE_SPINE.md`, `THE_FOUNDATION_REMAINDER.md`, and
+`THE_GROWN_CIRCUIT.md` are marked provenance and point here. `CONSTRUCTION_STATE.md` gets a
+"Verified position" section stating, per admitted mechanism, whether it survived the transition,
+was archived, or must be re-established. The §13 contamination audit is **re-run against the
+imported Rust** — a scalar-scorer, counter-morphology, and hardcoded-delta sweep over
+`crates/` and `soma/` — and its result recorded either way.
+
+**Grade.** Every mechanism `CONSTRUCTION_STATE.md` admits resolves to a path that exists in the
+live tree, or is explicitly marked archived. The §13 sweep returns a count and named sites, or a
+verified zero.
+
+**Falsifier.** Take every file path named in `CLAUDE.md`, `CONSTRUCTION_STATE.md`, and this file,
+and resolve it. **Any path that resolves only under `archive/` while its surrounding prose is in
+the present tense fails this movement.** Run it as a script; it is a five-line check and it should
+be permanent.
+
+**Laboratory vs remains.** Not a laboratory question at all. This gap was created by the
+transition and is owed entirely here.
+
+---
+
+#### The proof-line owners get drivers
+
+**The gap.** Ten imported owners have **zero** drivers — zero references in any `examples/`,
+`tests/`, or `bin/` path. Measured at HEAD:
+
+| Owner | Definition | Total refs | Driver refs |
+|---|---|---|---|
+| `ExactReceiverCurrentLaw` | `crates/holonic-engine/src/receiver_current.rs` | 12 | **0** |
+| `ExactRelationalLanguageEcology` | `soma/life/src/relational_language/ecology.rs` | 46 | **0** |
+| `LaboratorySourceAtlas` | `soma/life/src/laboratory_language/repository.rs` | 12 | **0** |
+| `LaboratoryResearchEcology` | `soma/life/src/laboratory_language.rs` | — | **0** |
+| `AgenticResearchSession` | `soma/life/src/agentic_research.rs` (1,426 lines) | 15 | **0** |
+| `AgenticLanguageEcology` | `soma/life/src/agentic_language.rs` (863 lines) | — | **0** |
+| `LeanMathematicsEcology` | `soma/life/src/lean_mathematics.rs` (878 lines) | 33 | **0** |
+| `LeanKernelWorld` | `soma/life/src/lean_mathematics.rs` | 4 | **0** |
+| `CudaResidentTextMaterialAtlas` | `soma/life/src/text_material/resident.rs` | 13 | **0** |
+| `ReflectiveRuntime` | `crates/holonic-language/src/lib.rs` | 82 | 5 |
+
+Contrast: `LiveCurrentMachine` (`soma/membrane/src/live_current.rs`) has **400** references and
+**223** in drivers. **The proof-line owners are precisely the undriven ones.** The correlation is
+not accidental — the proof line is the deed the laboratory left interrupted, so its owners were
+written and never exercised end to end.
+
+**What replaces it.** A driver per owner, or one composed driver that conducts through all ten.
+One composed driver is preferred: it is the shape the two-theorem deed needs anyway, and ten
+isolated examples would each prove its owner compiles without proving any of them compose.
+
+**Grade.** Each owner is entered from a driver, conducts, and returns its artifact — not its
+counts. Per `CLAUDE.md` §9, *"a generated proof, text, image, classification, or obstruction must
+itself be returned and inspected."*
+
+**Falsifier.** Delete each owner in turn and confirm the driver fails to build or fails to return.
+An owner whose removal changes nothing was never driven. Additionally: a driver whose declared
+material cannot exercise the owner's law returns zero and proves nothing about itself
+(`CLAUDE.md` §8) — each driver declares a control that makes its law return non-zero.
+
+**Laboratory vs remains.** The laboratory **wrote** all ten and unit-tested some. It **never drove
+them**; `ExactReceiverCurrentLaw`, `LaboratorySourceAtlas`, `LeanKernelWorld`, and
+`CudaResidentTextMaterialAtlas` have zero test lines even there. Nothing about this movement is
+theory work. It is the cheapest movement in the document and it gates the whole proof line.
+
+---
+
+#### The Lean project returns to the tree
+
+**The gap.** `soma/life/src/lean_mathematics.rs:811` shells
+`Command::new("lake").arg("env").arg("lean")` against a caller-supplied `project_root`. There is
+no project to supply.
+
+`git ls-files soma/formal` returns **7 files, all of them generated fixtures** under
+`.lake/agentic-research-kernel/formal_carry-0000{0..6}.lean`. There is no `lakefile.toml`, no
+`lean-toolchain`, no manifest. Worse: `.gitignore` carries `.lake/`, so the only tracked artifacts
+of formal mathematics in this repository are seven files matching an ignore pattern.
+
+The real projects exist. Laboratory `a07ff376` carries
+`src/soma/formal/elementary-holonics/{lakefile.toml, lean-toolchain}` and
+`src/soma/formal/rh-source-transport/{lakefile.toml, lean-toolchain}`, plus
+`src/labyrinth/mathematics/lean/`. The archive carries
+`archive/cpp-engine/formal/{elementary-holonics, rh-source-transport}`.
+
+**No formal mathematical production can run in this repository today.** That is a hard stop on the
+objective, and it is a missing-file problem, not a research problem.
+
+**What replaces it.** Import `elementary-holonics` and `rh-source-transport` from `a07ff376` with
+their toolchain pins. Narrow `.gitignore` so that generated `.lake/` build output is ignored while
+project sources are not. Pin the toolchain explicitly — the kernel verdict is the evidence, and a
+verdict from an unpinned toolchain is not reproducible evidence.
+
+**Grade.** `lake env lean` returns a real kernel verdict on a real source from a driver, and the
+toolchain version is recorded in the receipt beside the verdict.
+
+**Falsifier.** Submit a proof term known to be wrong and confirm the kernel **refuses** it. A
+formal pipeline that has never returned a refusal has not demonstrated that the kernel is in the
+loop. This is the same test the archived C++ deed passed with its foil, and it must be re-passed
+here.
+
+**Laboratory vs remains.** The laboratory has the projects, the toolchain pins, and 1,164
+source-free declaration organs. Remains: import, pin, unignore, and prove refusal.
+
+---
+
+#### The mount reference agrees with itself
+
+**The gap.** `soma/mount/src/bin/mount-scope-gate.rs:1436` —
+`founded_reference_path_is_deterministic_and_nonvacuous` fails, left `(255, 159, 35)` against right
+`(256, 160, 38)`. Confirmed failing live. The transition commit declared it pre-existing laboratory
+fixture drift *"now visible rather than frozen."* It is not diagnosed.
+
+The assertion that fails is `radiation_species(&a.3) == expected_species` (:1436-1440) — *"the
+founded radiation fixture retains its exact non-vacuous FOLD/STEP/CUT species."* The three-tuple is
+a FOLD/STEP/CUT population count, off by one, one, and three.
+
+**What replaces it.** A diagnosis, then either a corrected fixture or a corrected law — and the
+choice stated. `CLAUDE.md` §8's first rule governs: **grade the implementation, not the receipt.**
+If `founded_reference` is right and `EXPECTED_RADIATION_SPECIES` is stale, the constant is
+regenerated and the regeneration is shown. If the constant is right, a real defect in the founded
+reference path has been sitting frozen in the laboratory and that is the more valuable finding.
+
+**Grade.** The test passes for a stated reason. The receipt names which side moved and why.
+
+**Falsifier.** Perturb the founded reference path and confirm the species tuple moves. A fixture
+that cannot be made to disagree is not measuring the reference path, and "fixed" by regenerating a
+constant against a broken law would be exactly the receipt-over-implementation defect §8 convicts.
+
+**Laboratory vs remains.** The laboratory carried this failure frozen. It is small and it is not on
+the proof line — it is here because a red suite makes every later green result unreadable, and
+because §8 says a drifted fixture is a claim about code that has not been checked against the code.
+
+---
+
+#### Deposit and closure drift cross to Rust
+
+**The gap.** The artifact registry was built — **in C++, and it is archived.**
+`archive/cpp-engine/standing/MANIFEST.txt` carries `columns=path content_sha256 closure_sha256
+founding`, `deposited_returns=123`, `deposited_octets=802855`, and
+**`derived_returns_not_deposited=126`**. Commit `c3f75ca` added the verifier that separates
+**CONTENT drift** (*the deposit is corrupt — refuse*) from **CLOSURE drift** (*the machine advanced
+past what it rested — report*), and it caught the path-fold contamination in 0.03 seconds. The
+depositor is `archive/cpp-engine/cmake/HolonicDeposit.cmake:119-122`.
+
+`grep -rln "closure_sha256" .` hits **only the archive**. On the Rust side the mechanism does not
+exist, and `.gitignore` still carries `/output/`, `/runs/`, `/data/` — the exact mechanism that
+lost the tiger PNGs and `semantics_invariant_under_exact_chart` permanently.
+
+**This movement is here, above the proof line, for one reason: every movement below it produces
+artifacts, and without it they are produced into an ignored directory.** The two verified permanent
+losses above are what that costs.
+
+**What replaces it.** Port the manifest, depositor, and verifier to Rust with the content/closure
+distinction intact. Deposit the **126 underived returns**. Bind every emitted figure to the
+standing that produced it.
+
+**Grade.** A deposit is content-addressed, its closure hash is recorded, and the verifier
+distinguishes the two drift species on a deliberately corrupted deposit and on a deliberately
+advanced standing. Both cases exercised — a verifier that has only ever seen clean input returns
+zero and proves nothing about itself.
+
+**Falsifier.** Corrupt one deposited octet and confirm **refusal**. Advance the machine one step
+past its rest and confirm a **report**, not a refusal. If both produce the same response, the
+distinction that caught the path-fold contamination has not been ported.
+
+**Laboratory vs remains.** The laboratory **did not have this** — it is the one place the archived
+C++ body led. Its absence is exactly why the laboratory lost its tiger outputs. Remains: the whole
+port, plus the 126 deposits.
+
+---
+
+### Part two — the proof line
+
+This is the objective directly. `CLAUDE.md` §0 names it: *"the machine learning to produce
+mathematical proofs."*
+
+---
+
+#### The kernel return becomes a reflective morphology event
+
+**The gap.** Laboratory
+`src/soma/RESEARCH/2026-08-02_THE_PORT_CARRIES_THE_INTERIOR_THE_KERNEL_RETURN_CULTIVATES_THE_NEXT_THEOREM_PLAN.md:385`,
+verbatim:
+
+> *"make the kernel return a reflective morphology event. Compose `LeanMathematicsEcology`,
+> `LeanKernelWorld`, `AgenticResearchSession`, symbolic reasoning, and `ReflectiveRuntime` so the
+> formal return is not a detached report."*
+
+Every piece exists. `ReflectiveRuntime`, `ReflectionFrame`, `ReflectiveContinuation`, and
+`CodecStep::{Advance, Rest, Reflect}` are in `crates/holonic-language/`, `no_std`, deliberately not
+`Clone`. The reflective-force law is exact: `step(α_a(B, m'), x) = execute(m', x)`.
+
+**The composition was never made.** `soma/life/src/lean_mathematics.rs` contains **zero**
+references to `holonic_language` or any `Reflect*` symbol. Only
+`soma/life/src/agentic_language.rs:21-23` uses `ReflectiveRuntime`. The session that was to build
+it was interrupted by a resource failure.
+
+**This is the movement in which Brandon's "the learning is the intermediary mechanism" becomes true
+of mathematics rather than of a corpus about mathematics.** Today a kernel verdict is a detached
+report: the ecology emits a source, `lake` returns, and the return is read. Nothing about the
+machine's own morphology changed as a consequence of the kernel having spoken. A machine that
+learns to produce proofs is one whose next proof attempt is structurally different because of the
+last verdict — acceptance and refusal alike.
+
+**What replaces it.** The kernel return enters as a reflective morphology event through
+`CodecStep::Reflect`, founding a `ReflectionFrame` that later production conducts through. A
+refusal must change morphology as much as an acceptance does — a machine that only learns from
+success has not learned from the kernel, it has filtered on it.
+
+**Grade.** A kernel verdict causes a structural change in the reflective morphology, and a
+subsequent production passage conducts through the changed structure. Per `CLAUDE.md` §13's
+obligation 3: *a training claim requires a structural change in that organization plus
+source-detached remount plus an ablation that removes the claimed later conduct by removing
+structure.* All three, or the claim is not made.
+
+**Falsifier.** Ablate the reflection frame founded by verdict *V* and confirm the later production
+that depended on *V* **stops**. If it still returns, the verdict was decorative and the composition
+is a wrapper. Second falsifier: run with kernel refusals only, no acceptances, and confirm
+morphology still changes. If it does not, the mechanism is success-filtering wearing reflection's
+name.
+
+**Laboratory vs remains.** The laboratory built every component and **never composed them**;
+verified zero references. Remains: the whole checkpoint. Depends on **the proof-line owners get
+drivers** and **the Lean project returns to the tree**.
+
+---
+
+#### The two-theorem deed runs at declaration scale
+
+**The gap.** Laboratory `SESSION_HANDOFF.md` at `a07ff376`, "Ratified objective," verbatim:
+
+> *"The second theorem must use the first returned theorem fiber; removing that fiber must remove
+> every accepted second proof."*
+>
+> *"The actual conversation, complete Lean sources, kernel verdicts, alternatives, morphology
+> changes, causal-information receipts, exact card receipts, physical testimony, and rest/remount
+> are the deed. Counts, diagnostics, topology diagrams, local fixtures, and prior accepted proofs
+> are supporting evidence only."*
+>
+> *"This real two-theorem production deed has **not** been run. The cleanup below does not imply
+> its completion."*
+
+**Laboratory progress: none.** Never run. Its 2026-08-03 attempt is recorded as interrupted.
+
+**Archived C++ progress: ran, at toy scale.** `CONSTRUCTION_STATE.md:239-270`; artifacts at
+`archive/cpp-engine/receipts/CONDITIONED_PRODUCTION_DEED.txt`, `CONDITIONED_PRODUCTION_RECEIPT.md`,
+`HolonicsConditioned{One,Two,Foil}.lean`. Three declarations / 209 states → first theorem accepted
+(382 source octets, 45,576 produced) → the acceptance admitted back as emanated material
+(occurrences 3→4, states 209→298) → second theorem accepted, naming the first, splicing its name
+out of the retained surface octet by octet (605 octets, 46,904 produced) → a foil with the same
+proof term and the first declaration absent **refused by the kernel** → structural exclusion
+returns 4→3 and 298→209, the route's fiber is deleted, the second target becomes unreachable, and
+**nothing is emitted**. No counter decremented, no flag set.
+
+What is **not** claimed, verbatim from `CONSTRUCTION_STATE.md:265-267`:
+
+> *"both theorems are trace identities and the grade is the dependency mechanism. Three
+> declarations, not the laboratory's 1,164. The statement forms and proof shapes are authored in
+> the exterior codec; what the body supplies is whether to emit, which target, and the name it
+> splices. Joining that to the existing renderers, which compose whole proofs from the exact
+> organs, is the next deed."*
+
+**What replaces it.** Re-run in Rust through `LeanMathematicsEcology` + `AgenticResearchSession` at
+the laboratory's declaration scale, with **the actual conversation as the deed** rather than three
+authored strings. Then join it to proof composition from the exact organs — so the statement form
+and proof shape come from the body's own mathematics, not from an exterior codec.
+
+That join is the difference between a machine that *selects* proofs and a machine that *produces*
+them, and it is the sentence `CONSTRUCTION_STATE.md` itself names as the next deed.
+
+**Grade.** Two kernel-accepted theorems where the second depends on the first's returned fiber;
+structural exclusion of that fiber removes every accepted second proof; a foil carrying the same
+proof term with the first absent is kernel-refused independently. At declaration scale, with the
+conversation as the deed. The proof terms themselves are returned and inspected.
+
+**Falsifier.** Three, all required:
+1. Remove the first theorem's fiber; if any second proof is still accepted, the dependency is
+   decorative.
+2. Submit the foil; if the kernel accepts it, the dependency was never in the proof term.
+3. Author the second statement form in the exterior codec; if the return is unchanged, the join to
+   the exact organs did not happen and this is the archived toy deed at larger scale.
+
+**Laboratory vs remains.** Honestly: the laboratory has the scale (1,164 declarations) and never
+ran the deed. The archive ran the deed and never had the scale. **Neither has run what is
+specified.** Remains: both at once, plus the composition join.
+
+---
+
+### Part three — the circuit becomes analyzable
+
+This is a first-class line, not an appendix. The reason is `CLAUDE.md` §4: mathematics, physics,
+and code are not domains this project alternates between — they are different **material** carried
+by the same operation. The circuit is where the operation is visible as geometry, and it is the
+only place where a learning claim can be falsified **topologically**, in exact integers, with no
+tolerance anywhere.
+
+`THE_GROWN_CIRCUIT.md`, ratified by Brandon 2026-08-07, is current direction and **none of it has
+begun.**
+
+---
+
+#### The circuit becomes an integer chain complex with torsion, and the atlas gets a reader
+
+**The gap, two halves that run together.**
+
+*Homology.* There is no integer homology. `grep -rniE
+"smith_normal|hermite_normal|invariant_factor|betti|torsion"` over `crates` and `soma` returns
+**one doc comment**, `basin.rs:363`. What exists does not substitute:
+`graph_cycle_rank` (graph_receiver.rs:1012) is `b₁` of the **1-skeleton only** and is `None` for
+any non-graph complex; `euler_characteristic` cannot separate `b₁` from `b₂`; `exact_rational_rank`
+(algebraic.rs:1081) is **private** and returns ℚ-ranks, which carry no torsion.
+
+**Torsion is the object `CLAUDE.md` §3 identifies as *the* integral-Hodge obstruction** — *"the
+failure of the integral version is the framework speaking: the obstruction is torsion, and torsion
+is winding that cannot be un-deposited."* It is unreachable without Smith normal form. The
+framework's own named obstruction is currently not computable by the framework.
+
+*The reader.* The seven TSVs per run are written by the examples and **read by nothing**.
+`crates/holonic-engine/examples/whole_receiver_holonic_complex.rs:74-87` writes `summary.tsv`,
+`causal_layers.tsv`, `grain_cells.tsv`, `quotients.tsv`, `overlap_nerve.tsv`. The only
+`File::open` on a TSV anywhere is `mms_reconnection_traversal.rs:1443`, reading a provenance
+manifest. `THE_GROWN_CIRCUIT.md`: *"Costs almost nothing and makes step 1 checkable against figures
+that already exist."*
+
+**What replaces it.** `crates/holonic-engine/src/homology.rs`: `∂_k` extracted as ℤ-matrices from
+`GradedCausalComplex` (the `ComparativeMultiplicity::difference() -> BigInt` ring is already there),
+Smith normal form over ℤ, returning `(b_0…b_n, torsion: Vec<Vec<BigInt>>)`. Make
+`exact_rational_rank` public rather than maintaining a third copy — there are already two, the
+second at `receiver_ecology.rs:578`, also private. Plus germ, connection, and cycle queries over the
+emitted tables.
+
+**Grade.** Betti numbers **and torsion coefficients** over the machine's own transports and Chis,
+in exact integers, cross-checked against `euler_characteristic` (`Σ(−1)^k b_k = χ`) and against
+`graph_cycle_rank` on the graph species where both are defined.
+
+**Falsifier — and this is the strongest single falsifier in the document.**
+`THE_GROWN_CIRCUIT.md` states it: *"Excluding a deposit must change the homology: raise `b₁` where
+a filling was, or split `b₀`. **If exclusion changes nothing topological, the dependency was
+decorative** and the receipt overstates the code."*
+
+This is the conditioned-production ablation restated homologically. It applies to **the two-theorem
+deed's own dependency**: excluding the first theorem's fiber should be visible as a homological
+change in the circuit, not only as a stopped emission. If the two-theorem exclusion is topologically
+invisible, one of the two movements is overstating.
+
+Second falsifier: build a complex with known torsion — the standard `ℤ/2` example is enough — and
+confirm it is returned. An SNF that has only ever run on torsion-free input returns zero and proves
+nothing about itself.
+
+**Laboratory vs remains.** The laboratory built the entire substrate: `∂∂=0` as a constructor
+invariant, the exact signed-ℤ coefficient ring, the incidence bridge from the grown circuit, the
+Euler and cycle-rank analyses. It **never computed homology**. Remains: SNF, torsion, the public
+rank, the reader.
+
+---
+
+#### The schedule becomes an object and its difference is deposited as a Chi
+
+**The gap.** Every traversal in the engine is a **hardcoded breadth-first search**:
+`simplicial.rs:540`, `simplicial.rs:1203` (`HingeWorldLaw::propagate`), `local_star.rs:370`
+(`realize_vectors`), `local_star.rs:492`, `graph_receiver.rs:1858`. There is no seam at which a
+different schedule could be supplied.
+
+This matters more than it appears. `local_star.rs` already separates its residuals into
+`face_residuals` (**schedule-independent** — `∂` on the 1-cochain) and `chord_residuals`
+(**schedule-dependent by construction**). The engine's own types assert that some returns depend on
+traversal order and some do not. **That assertion has never been tested, because there is only one
+schedule.** By `CLAUDE.md` §8, a law that returns zero proves nothing about itself; a law that
+cannot be exercised at all proves less.
+
+And there is no Rust `ChiPair` — verified zero. `structure/chi_pair.hpp`, the `{composed, direct}`
+pair that **is** the boundary of a 2-cell, was C++ and is archived. `ReceiverGraphDelta::between`
+(graph_receiver.rs:978) compares two **sections**, not two **schedules** — a different object.
+
+**What replaces it.** A `GrowthSchedule` enum carrying at minimum `BreadthFirst` and `LargestFirst`,
+threaded through `realize_vectors`, `propagate`, and `receive_section`. Then a Rust `ChiPair`:
+`{composed, direct}` over two schedules' returns on the same circuit, with the residual
+**deposited** — not refined away, not tolerated, not averaged.
+
+This is the constraint mechanism `CLAUDE.md` §0 already names: *"A constraint equation is a `Chi` —
+two transports asserted equal — and the unknown is whatever the present chart does not determine."*
+Two schedules over one circuit are two transports asserted equal. Where they disagree, the schedule
+is the chart and the disagreement is the unknown.
+
+**Grade.** `face_residuals` are **identical** across schedules; `chord_residuals` differ; the
+difference is deposited as a Chi with its invariant retained. Both halves required — the invariance
+alone could be vacuous, and the variance alone would not distinguish a bug from a gauge.
+
+**Falsifier.** Run both schedules and confirm `face_residuals` agree **exactly**, as rationals, not
+to tolerance. If they differ, `∂` is being computed schedule-dependently and something is wrong
+with the boundary, not with the schedule. Conversely, if `chord_residuals` are **also** identical,
+the second schedule was not actually threaded through and the seam is decorative.
+
+**Laboratory vs remains.** The laboratory built the residual separation that makes this testable
+and never varied the schedule. Remains: the enum, the threading, the Chi carrier, both deposits.
+
+---
+
+#### A second receiver exhibits the gluing obstruction
+
+**The gap.** `THE_GROWN_CIRCUIT.md`: *"**Only one receiver has ever been constructed** — a single
+`ReceiverId(1)` with a hardcoded central ray family. Transition maps and the gluing obstruction have
+never been exercised on an image."* Confirmed at
+`crates/holonic-engine/examples/whole_receiver_holonic_complex.rs:44`.
+
+**The framework's central claim is receiver-relativity, and it has been tested with one receiver.**
+That is the shape of `CLAUDE.md` §8's tautology rule at the level of architecture: a receipt that
+could not have come out otherwise carries no evidence. With one receiver there is no transition map,
+so no gluing can fail, so nothing about receiver-relativity is at risk in any current figure.
+
+The machinery is present and unexercised: `HingeOpenSeam::ConflictingCandidates`
+(simplicial.rs:846) already carries **both** arrival words when candidates cannot glue. It has never
+had two receivers to disagree.
+
+**What replaces it.** A second receiver with its own ray family, overlapping the first. Transition
+maps on the overlap. Where sections fail to glue, **an exhibited obstruction** — returned and
+inspected as an artifact, per §9, not summarized as a count. Then the grain-1 renderer: draw the 82
+coarser quotient points and the 71 overlap cells, one of which has 14 members. `THE_GROWN_CIRCUIT`:
+that is the hypergeometric content — *points which are lines which are loops, which are also
+distributions of triangular vertices* — and **it has never been seen.** Only grain 0 has ever been
+looked at.
+
+**Grade.** Two receivers, a transition map on the overlap, and either an exact gluing or an
+exhibited obstruction with both arrival words. The grain-1 figure is deposited and bound to its
+standing.
+
+**Falsifier.** Construct two receivers whose sections are **known** not to glue and confirm the
+obstruction is returned rather than silently resolved. Then construct two that **must** glue — the
+same ray family twice — and confirm the obstruction is empty. A gluing law that returns an
+obstruction on the identity overlap is broken; one that returns none on a known conflict is not
+looking.
+
+**Laboratory vs remains.** The laboratory built the seam type, the overlap nerve, the quotient
+promotion, and every object the law acts on. It **constructed one receiver**. Remains: the second
+receiver, the transition maps, the obstruction return, the grain-1 render.
+
+---
+
+#### The layout answers its own curvature
+
+**The gap.** `local_star.rs:2082` — `displacement = geometry_responses[hinge] · (Δcoordinate/2)`,
+applied `−` to `edge.lower` and `+` to `edge.upper`. Exact rational, momentum-symmetric, and
+`geometry_responses` is **supplied, never updated by what the layout returned.** The metric does not
+respond to the curvature it produced.
+
+`coordination_defect` (:1143) already computes the discrete curvature — the disclination charge
+`6 − |link|` at each vertex, which `FORMULA §CVIII` notes is *"a strong structural resonance with
+Regge's codimension-two hinges."* The curvature is measured and discarded.
+
+**What replaces it.** `geometry_responses` updated by the traced deviation of the current face and
+chord residuals — discrete Ricci flow on the exact rational metric, with the update law stated as a
+law and its fixed points characterized.
+
+**Grade.** The response update is exact-rational with no tolerance, its fixed points are
+characterized, and the flow's effect on `coordination_defect` is measured across iterations.
+
+**Falsifier.** Start from a configuration with known nonzero disclination charge and confirm the
+flow **moves** it. Start from a flat configuration and confirm the flow leaves it fixed. A flow that
+moves a flat configuration is introducing curvature rather than responding to it; one that cannot
+move a charged configuration is not coupled.
+
+**Laboratory vs remains.** The laboratory built the exact force law, the momentum symmetry, the
+curvature measurement, and the two residual populations the update would consume. It **never closed
+the loop**. Remains: the update law and its characterization.
+
+---
+
+### Part four — the wall
+
+`CLAUDE.md` §11: *"The learning wall and the mathematical wall are the same wall, and naming this is
+the point of this contract."* These two movements are that wall from its two sides. They are last
+because the movements above are the instruments that make them statable, not because they are
+optional — and `THE_GROWN_CIRCUIT.md` names the second as **the highest-leverage single item.**
+
+---
+
+#### The receptive star is factored and contact separates from cultivation
+
+**The gap.** `research/records/2026-07-31_THE_PREFIX_GROWS_THE_DEED_RETAINS_ITS_WITNESSES_THE_LEXICAL_STAR_REMAINS_TOO_BROAD.md:195-231`.
+Verbatim: *"The stronger claim that recruitment is already scale-independent is false"* — the
+mechanism is *"broad union-based lexical recruitment followed by commitment-before-witness."*
+
+Measured: `S(R) = ⋃_{f∈R} I(f)`; **8,748 candidate visits over 2,701 unique sections of 11,795**
+(22.9%) for a question whose final witness contains **no** dialogue; **40 return visits over 24
+unique passages committed to persistent morphology though none belongs to the minimal witness
+family.** Across `0/127/254/508/1009` dialogue occurrences the deed, minimal witness, five leaders,
+two waves, and thirteen visits stayed **invariant**.
+
+State the wall exactly as `CLAUDE.md` §5 requires: **consequence isolation holds; scale-independent
+recruitment does not.** Do not restate it as a missing comprehension, consequence, semantics,
+relevance, or research-mode subsystem — §6 convicts that, repeatedly and by direct correction.
+
+**What replaces it.** Both remedies are named in that record and **neither is implemented**;
+`grep -rniE "mincover|min_cover|provisional"` over `soma/life/src` returns **zero**.
+
+1. *Factor the receptive star*: `I(R) = ⋃_{K ∈ MinCover(R)} ⋂_{f∈K} I(f)`, with `MinCover`
+   — verbatim — *"founded by the receiver's clause and entity morphology, not by an externally
+   assigned inverse-frequency score."* The parenthetical is the whole constraint: an
+   inverse-frequency weight would be a scalar score in the conditioning path, which `CLAUDE.md` §13
+   obligation 4 bans outright.
+2. *Separate provisional contact from continuing cultivation*: a section becomes continuing standing
+   **only if** it belongs to a minimal closed witness family, supports a still-open front surviving
+   rest, or returns an obstruction that changes morphology.
+
+**Grade.** Candidate visits scale sublinearly in corpus size while the minimal witness family, the
+leaders, the waves, and the visit count remain **invariant** — the same invariance already
+demonstrated across `0/127/254/508/1009`. Committed persistent morphology contains no passage
+outside the witness family.
+
+**Falsifier.** Quadruple the corpus and measure. If candidate visits grow proportionally, the star
+was not factored. If the minimal witness family changes, the factoring **broke consequence
+isolation**, which currently holds — and that is a regression, not a trade. Both must be reported;
+a receipt showing only the first has not graded the second.
+
+**Laboratory vs remains.** The laboratory **measured the wall precisely** and named both remedies.
+It implemented neither. Remains: both, and the scaled re-measurement.
+
+---
+
+#### The filler admission law returns a certified remainder
+
+**The gap, from two sides that are one gap.**
+
+*From the vision side.* Laboratory
+`src/soma/RESEARCH/2026-07-28_THE_POINT_CARRIES_THE_LOOP_THE_COMPLETED_COMPLEX_RETURNS_AS_ONE_RECEIVER_CELL.md:376-381`,
+verbatim:
+
+> *"Given an open lower-grain horn and a population of inherited closed complexes, the engine does
+> not yet have the derived receiver-relative admission relation which distinguishes a lawful new
+> filler from a merely graph-completable boundary. The correction forbids substituting pixel
+> continuation or an authored mask for that law."*
+
+The objects it must act on are all built — verbatim from the same record, *"analytical internal
+sections, exact boundaries and coboundaries, connection holonomy, source lineage, closed hulls,
+grain quotients, and genuine plural overlap"* — in `crates/holonic-engine/src/holonic_complex.rs`
+and `receiver_phase_atlas.rs`. The law itself: nothing.
+
+*From the mathematical side.* `CLAUDE.md` §11: **an exactly computed positive form on a supported
+realizer population, with a certified remainder and a reopening rule keyed to the receiver family.**
+
+`THE_GROWN_CIRCUIT.md:134-136` states the identification directly: *"That is the horn-filling law,
+and it is **the same gap as §11's one missing organ**, reached from the vision side."* **One law
+closes both.**
+
+**What exists, honestly.** The certified exact enclosure carrier was `exact/enclosure.hpp` — four
+typed states over `exact/dyadic.hpp` and `exact/separation.hpp`, the enclosure defined as a **set
+and never a value** — and it is **archived**. The trivial tree instance was Phase 7 movement one's
+suffix-link DFS interval labelling, also archived. On the Rust side, `enclosure` appears in
+`crates/holonic-engine/src/{coupled_informant, atmospheric_inverse, exact_value}.rs`,
+`crates/relational-geometry/src/exact_analysis.rs`, and `soma/body/src/medium.rs` — **not verified
+as the same four-state set-never-a-value carrier.** That verification is the first task of this
+movement, and if it fails, the carrier is re-established in Rust before anything else here.
+
+**The tree case is already solved and its triviality is the content.**
+`research/records/2026-08-06_THE_TREE_CONDENSES_FOR_FREE_THE_REMAINDER_IS_THE_DEPARTURE_FROM_A_FOREST.md`
+(graded `interpretation`): a depth-first order over a tree replaces every state's descendant
+population with a two-word interval, exactly, with an **empty** remainder — free, because subtree
+equals interval and the interval is its own reopening rule. **So the difficulty lives entirely in
+the departure from tree-ness**, and the standard object for it is spanning-tree interval labelling,
+where every non-tree edge forces additional intervals and **that forced population is the certified
+remainder**, zero exactly when the incidence is a forest.
+
+And that object **already exists in this repository for projective transport** —
+`HingeWorldLaw::propagate` and `HingeCycleReturn` (simplicial.rs:912), described above. The
+generalization is from projective transport words to a positive form on a realizer population.
+
+**What replaces it.** The admission relation, derived and receiver-relative, returning a certified
+exact remainder and a reopening rule keyed to the receiver family. Not pixel continuation. Not an
+authored mask. Not a floating tolerance — `CLAUDE.md` §11 is explicit that *floating tolerance may
+not become standing.*
+
+**Grade.** A lawful filler is admitted and a merely graph-completable boundary is **refused**, by
+the derived relation, with the remainder returned exactly and the reopening rule stated. The
+remainder is **zero exactly when the incidence is a forest** — that is the calibration that proves
+the general law degenerates correctly to the case already solved.
+
+**Falsifier.** Four, all required:
+1. Present a boundary that is graph-completable but not lawfully fillable; if it is admitted, the
+   relation is graph completion wearing another name — the exact substitution the correction
+   forbids.
+2. Present a forest incidence; if the remainder is nonzero, the law does not degenerate to the
+   solved case.
+3. Change only the receiver family; if the admission decision does not change, the relation is not
+   receiver-relative and the framework's central claim is not in it.
+4. Search for a floating value anywhere in the remainder path; one is a failure.
+
+**Laboratory vs remains.** The laboratory built every object the law acts on and **named the law as
+missing** rather than substituting for it — that restraint is itself a result and it is why this is
+statable now. The archive built the enclosure carrier and the tree case. Remains: the general law,
+the departure from tree-ness, and the Rust enclosure verification that precedes both.
+
+---
+
+## Discipline that governs every movement
+
+- **Grade the implementation, not the receipt** (`CLAUDE.md` §8). A receipt is a claim about code.
+  Read the owner before carrying any capability claim forward, including one already marked
+  `established-bounded`. Thirty-five phases were admitted on a contaminated foundation because this
+  was skipped.
+- **A cost law is a law.** Grade complexity against the source owner, measure across a changed
+  aperture, state the bound as a falsifier. `ReceiverGraphQueryWork` already does this and is the
+  pattern to copy.
+- **A law that returns zero proves nothing about itself.** Where declared material cannot exercise a
+  law, add a declared control that does, and make the grade require a non-zero return.
+- **An organ used past its declared aperture is a defect even when it appears to return.** No audit
+  catches a capacity mismatch — it is not a banned token. `analyze_receiver_topology` admits **at
+  most 20 vertices** (`receiver_topology.rs:306`). Read the aperture before borrowing the carrier.
+- **A falsification is a first-class return.** A deed proving its own receiver family cannot see
+  what it was built to see has returned real evidence and passes its grade.
+- **Return the artifact** (`CLAUDE.md` §9). Counts, morphology totals, atlases, and diagnostics are
+  supporting receipts and never substitutes.
+- **Depth on a question, not breadth in the cabinet.** Before building, name the receiver question
+  that several movements in sequence are answering. For this document it is one question and it is
+  Brandon's: **can the machine learn to produce mathematical proofs, with the learning as the
+  intermediary mechanism?**
+- **Halt and say so.** If a run is not doing what was claimed, stop it and report the actual state
+  before proposing a repair.
+- Pushing to `origin` remains Brandon's call.

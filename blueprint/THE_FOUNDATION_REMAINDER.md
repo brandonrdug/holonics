@@ -1,5 +1,13 @@
 # The foundation remainder
 
+> **SUPERSEDED 2026-08-07 — ARCHIVED-BODY PROVENANCE.**
+> This file describes the C++/CUDA engine, which was archived whole at `archive/cpp-engine/` when
+> the body moved to Rust. Its mechanisms, measurements and open items are **historical record**, not
+> the present position and not a schedule. The active spine is `CLAUDE.md` §0; the active roadmap is
+> `blueprint/THE_ROADMAP.md`. Nothing here is deleted — a reader following a citation into this file
+> should find what it said, and this banner telling them it no longer governs.
+
+
 **Truth status:** `project-postulate` for the ordering; every figure is `computational-witness`
 measured 2026-08-06.
 
