@@ -1,0 +1,48 @@
+# Conditioned mathematical production deed
+
+## the mounted material
+
+declarations 3
+occurrences after mounting 3
+states after mounting 209
+
+## the first theorem
+
+target reached yes
+reached span 1
+source octets 382
+kernel accepted yes
+produced artifact octets 45576
+
+## the intermediary
+
+emanated occurrence admitted yes
+occurrences after emanation 4
+states after emanation 298
+composition route observations 2
+route conducts yes
+
+## the second theorem
+
+target reached yes
+reached span 1
+source octets 605
+names the first theorem yes
+kernel accepted yes
+produced artifact octets 46904
+
+## the foil
+
+same proof term with the first theorem absent
+kernel accepted no
+
+## the exact ablation
+
+emanated occurrence excluded structurally yes
+occurrences after exclusion 3
+states after exclusion 209
+composition route removed yes
+second target reachable no
+composition route conducts no
+second theorem emitted no
+obstruction 1

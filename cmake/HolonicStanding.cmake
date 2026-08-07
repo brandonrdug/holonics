@@ -227,6 +227,17 @@ function(holonic_found)
   set_property(GLOBAL PROPERTY HOLONICS_CLAIMED_RETURNS "${claimed}")
   set_property(GLOBAL APPEND PROPERTY HOLONICS_STANDING_RETURNS ${returns})
   set_property(GLOBAL APPEND PROPERTY HOLONICS_MOUNTED_PATHS ${mounts})
+
+  # One line per founding, for the deposit: what produced it, from what, to what.
+  # `$<TARGET_FILE:>` resolves at generate time, so the plan carries real paths.
+  string(REPLACE ";" "+" plan_mounts "${mounts}")
+  string(REPLACE ";" "+" plan_returns "${returns}")
+  set(plan_executable "")
+  if(FOUND_EXECUTABLE)
+    set(plan_executable "$<TARGET_FILE:${FOUND_EXECUTABLE}>")
+  endif()
+  set_property(GLOBAL APPEND_STRING PROPERTY HOLONICS_STANDING_PLAN
+    "${FOUND_NAME}|${plan_executable}|${plan_mounts}|${plan_returns}\n")
 endfunction()
 
 # Closes the standing: one target carrying every founded return.
@@ -240,5 +251,28 @@ function(holonic_close_standing)
   get_property(returns GLOBAL PROPERTY HOLONICS_STANDING_RETURNS)
   list(LENGTH returns count)
   add_custom_target(holonics_standing DEPENDS ${returns})
+
+  get_property(plan GLOBAL PROPERTY HOLONICS_STANDING_PLAN)
+  set(plan_file "${PROJECT_BINARY_DIR}/standing-plan.txt")
+  file(GENERATE OUTPUT "${plan_file}" CONTENT "${plan}")
+
+  # Deposits the founded standing into the repository, where it survives a
+  # discarded build tree and can be read, diffed and cited.
+  #
+  # What is deposited is the standing itself — the rested state, the generated
+  # proofs, the graded receipts and the seals. What is NOT deposited is the
+  # derived bulk: compiled objects and diagnostic atlases, forty megabytes that
+  # every deed reproduces byte-identically and that would triple a fifteen
+  # megabyte repository to hold. The manifest binds each deposited file to the
+  # content hash of the deed binary and of every card and rest it mounted, so a
+  # deposit is evidence about a specific founding rather than a copy of a file.
+  add_custom_target(holonics_deposit
+    COMMAND "${CMAKE_COMMAND}" -DPLAN=${plan_file}
+            -DSTANDING=${PROJECT_SOURCE_DIR}/standing
+            -DBUILD_ROOT=${PROJECT_BINARY_DIR}
+            -P "${PROJECT_SOURCE_DIR}/cmake/HolonicDeposit.cmake"
+    COMMENT "depositing the standing"
+    VERBATIM)
+
   message(STATUS "Holonic standing: ${count} founded returns in the build graph")
 endfunction()

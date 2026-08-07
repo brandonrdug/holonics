@@ -1,0 +1,151 @@
+truth_status=established-bounded
+evidence=implemented-exact,computational-witness
+formal_truth_status=proved-derived
+formal_evidence=formal-checked
+program=r33_characteristic_discovery.sm_89
+verification_failures=0
+kernel_launches=12
+source_currents=3
+host_semantic_events=0
+word_populations=30,52,52
+pair_population=6308
+archetype_groups=281
+closed_strata=0,440,5868
+law_residuals=0
+intermediate_rest_bytes=2832
+developmental_rows_in_rest=0
+matrices_in_rest=0
+final_body=head:14001046,continuation:15001046,admitted_tally:1175,mathematical:406,codec:187,characteristic:64,trace_organ:32
+checker_exit=0
+formal_begin
+import Mathlib.Tactic.LinearCombination
+import Mathlib.Tactic.NormNum
+
+namespace Soma.Holonics.R33
+
+structure Matrix2 where
+  a : ℤ
+  b : ℤ
+  c : ℤ
+  d : ℤ
+  deriving DecidableEq, Repr
+
+def matrixMultiply (u v : Matrix2) : Matrix2 :=
+  {a:=u.a*v.a+u.b*v.c,b:=u.a*v.b+u.b*v.d,c:=u.c*v.a+u.d*v.c,d:=u.c*v.b+u.d*v.d}
+def matrixInverse (u : Matrix2) : Matrix2 := {a:=u.d,b:=-u.b,c:=-u.c,d:=u.a}
+def matrixTrace (u : Matrix2) : ℤ := u.a+u.d
+
+def traceLawCoefficients : List ℤ := [2,0,0,0,(-1),0,0,(-1),0,(-1),0,0,0,0,1,0,0,0,0,0,1]
+
+def tracePolynomial (x y z k : ℤ) : ℤ :=
+  2 * 1 + 0 * x + 0 * y + 0 * z + (-1) * x*x + 0 * x*y + 0 * x*z + (-1) * y*y + 0 * y*z + (-1) * z*z + 0 * x*x*x + 0 * x*x*y + 0 * x*x*z + 0 * x*y*y + 1 * x*y*z + 0 * x*z*z + 0 * y*y*y + 0 * y*y*z + 0 * y*z*z + 0 * z*z*z + 1 * k
+
+theorem returnedTraceLawCoefficients : traceLawCoefficients = [2,0,0,0,(-1),0,0,(-1),0,(-1),0,0,0,0,1,0,0,0,0,0,1] := by rfl
+
+theorem discoveredCharacteristicTransport (a b c d e f g h : ℤ)
+    (hA : a*d-b*c=1) (hB : e*h-f*g=1) :
+    let A : Matrix2 := {a:=a,b:=b,c:=c,d:=d}
+    let B : Matrix2 := {a:=e,b:=f,c:=g,d:=h}
+    tracePolynomial (matrixTrace A) (matrixTrace B) (matrixTrace (matrixMultiply A B))
+      (matrixTrace (matrixMultiply (matrixMultiply (matrixMultiply A B) (matrixInverse A)) (matrixInverse B))) = 0 := by
+  dsimp [tracePolynomial, matrixTrace, matrixMultiply, matrixInverse]
+  linear_combination ((e+h)*(e+h)-2) * hA + ((a+d)*(a+d)-2*(a*d-b*c)) * hB
+
+def w0lA : Matrix2 := {a:=1,b:=1,c:=0,d:=1}
+def w0lB : Matrix2 := {a:=1,b:=1,c:=0,d:=1}
+def w0lAB : Matrix2 := {a:=1,b:=2,c:=0,d:=1}
+def w0lC : Matrix2 := {a:=1,b:=0,c:=0,d:=1}
+
+def w0rA : Matrix2 := {a:=1,b:=1,c:=0,d:=1}
+def w0rB : Matrix2 := {a:=1,b:=0,c:=1,d:=1}
+def w0rAB : Matrix2 := {a:=2,b:=1,c:=1,d:=1}
+def w0rC : Matrix2 := {a:=3,b:=(-1),c:=1,d:=0}
+
+theorem individualFacesDoNotDetermineClosed :
+  w0lAB = matrixMultiply w0lA w0lB ∧
+  w0lC = matrixMultiply (matrixMultiply (matrixMultiply w0lA w0lB) (matrixInverse w0lA)) (matrixInverse w0lB) ∧
+  w0rAB = matrixMultiply w0rA w0rB ∧
+  w0rC = matrixMultiply (matrixMultiply (matrixMultiply w0rA w0rB) (matrixInverse w0rA)) (matrixInverse w0rB) ∧
+  matrixTrace w0lA = matrixTrace w0rA ∧ matrixTrace w0lB = matrixTrace w0rB ∧ matrixTrace w0lAB ≠ matrixTrace w0rAB ∧ matrixTrace w0lC ≠ matrixTrace w0rC := by
+  norm_num [w0lA, w0lB, w0lAB, w0lC, w0rA, w0rB, w0rAB, w0rC, matrixTrace, matrixMultiply, matrixInverse]
+
+def w1lA : Matrix2 := {a:=1,b:=1,c:=0,d:=1}
+def w1lB : Matrix2 := {a:=1,b:=1,c:=0,d:=1}
+def w1lAB : Matrix2 := {a:=1,b:=2,c:=0,d:=1}
+def w1lC : Matrix2 := {a:=1,b:=0,c:=0,d:=1}
+
+def w1rA : Matrix2 := {a:=0,b:=1,c:=(-1),d:=2}
+def w1rB : Matrix2 := {a:=0,b:=1,c:=(-1),d:=2}
+def w1rAB : Matrix2 := {a:=(-1),b:=2,c:=(-2),d:=3}
+def w1rC : Matrix2 := {a:=1,b:=0,c:=0,d:=1}
+
+theorem equalCharacteristicDoesNotIdentifySource :
+  w1lAB = matrixMultiply w1lA w1lB ∧
+  w1lC = matrixMultiply (matrixMultiply (matrixMultiply w1lA w1lB) (matrixInverse w1lA)) (matrixInverse w1lB) ∧
+  w1rAB = matrixMultiply w1rA w1rB ∧
+  w1rC = matrixMultiply (matrixMultiply (matrixMultiply w1rA w1rB) (matrixInverse w1rA)) (matrixInverse w1rB) ∧
+  matrixTrace w1lA = matrixTrace w1rA ∧ matrixTrace w1lB = matrixTrace w1rB ∧ matrixTrace w1lAB = matrixTrace w1rAB ∧ matrixTrace w1lC = matrixTrace w1rC ∧ (1 : ℕ) ≠ 2 := by
+  norm_num [w1lA, w1lB, w1lAB, w1lC, w1rA, w1rB, w1rAB, w1rC, matrixTrace, matrixMultiply, matrixInverse]
+
+def w2lA : Matrix2 := {a:=1,b:=1,c:=0,d:=1}
+def w2lB : Matrix2 := {a:=4,b:=3,c:=1,d:=1}
+def w2lAB : Matrix2 := {a:=5,b:=4,c:=1,d:=1}
+def w2lC : Matrix2 := {a:=6,b:=(-19),c:=1,d:=(-3)}
+
+def w2rA : Matrix2 := {a:=4,b:=3,c:=1,d:=1}
+def w2rB : Matrix2 := {a:=1,b:=1,c:=0,d:=1}
+def w2rAB : Matrix2 := {a:=4,b:=7,c:=1,d:=2}
+def w2rC : Matrix2 := {a:=(-3),b:=19,c:=(-1),d:=6}
+
+theorem orderReversalRetainsCharacteristic :
+  w2lAB = matrixMultiply w2lA w2lB ∧
+  w2lC = matrixMultiply (matrixMultiply (matrixMultiply w2lA w2lB) (matrixInverse w2lA)) (matrixInverse w2lB) ∧
+  w2rAB = matrixMultiply w2rA w2rB ∧
+  w2rC = matrixMultiply (matrixMultiply (matrixMultiply w2rA w2rB) (matrixInverse w2rA)) (matrixInverse w2rB) ∧
+  matrixTrace w2lC = matrixTrace w2rC ∧ w2lC ≠ w2rC := by
+  norm_num [w2lA, w2lB, w2lAB, w2lC, w2rA, w2rB, w2rAB, w2rC, matrixTrace, matrixMultiply, matrixInverse]
+
+def w3lA : Matrix2 := {a:=1,b:=1,c:=0,d:=1}
+def w3lB : Matrix2 := {a:=1,b:=1,c:=0,d:=1}
+def w3lAB : Matrix2 := {a:=1,b:=2,c:=0,d:=1}
+def w3lC : Matrix2 := {a:=1,b:=0,c:=0,d:=1}
+
+def w3rA : Matrix2 := {a:=0,b:=1,c:=(-1),d:=2}
+def w3rB : Matrix2 := {a:=0,b:=1,c:=(-1),d:=2}
+def w3rAB : Matrix2 := {a:=(-1),b:=2,c:=(-2),d:=3}
+def w3rC : Matrix2 := {a:=1,b:=0,c:=0,d:=1}
+
+theorem simultaneousRechartRetainsCharacteristic :
+  w3lAB = matrixMultiply w3lA w3lB ∧
+  w3lC = matrixMultiply (matrixMultiply (matrixMultiply w3lA w3lB) (matrixInverse w3lA)) (matrixInverse w3lB) ∧
+  w3rAB = matrixMultiply w3rA w3rB ∧
+  w3rC = matrixMultiply (matrixMultiply (matrixMultiply w3rA w3rB) (matrixInverse w3rA)) (matrixInverse w3rB) ∧
+  matrixTrace w3lA = matrixTrace w3rA ∧ matrixTrace w3lB = matrixTrace w3rB ∧ matrixTrace w3lAB = matrixTrace w3rAB ∧ matrixTrace w3lC = matrixTrace w3rC ∧ (w3lA ≠ w3rA ∨ w3lB ≠ w3rB) := by
+  norm_num [w3lA, w3lB, w3lAB, w3lC, w3rA, w3rB, w3rAB, w3rC, matrixTrace, matrixMultiply, matrixInverse]
+
+def w4lA : Matrix2 := {a:=1,b:=1,c:=0,d:=1}
+def w4lB : Matrix2 := {a:=1,b:=0,c:=1,d:=1}
+def w4lAB : Matrix2 := {a:=2,b:=1,c:=1,d:=1}
+def w4lC : Matrix2 := {a:=3,b:=(-1),c:=1,d:=0}
+
+def w4rA : Matrix2 := {a:=1,b:=1,c:=0,d:=1}
+def w4rB : Matrix2 := {a:=1,b:=0,c:=1,d:=1}
+def w4rAB : Matrix2 := {a:=2,b:=1,c:=1,d:=1}
+def w4rC : Matrix2 := {a:=3,b:=(-1),c:=1,d:=0}
+
+theorem parabolicFacesCanCloseHyperbolically :
+  w4lAB = matrixMultiply w4lA w4lB ∧
+  w4lC = matrixMultiply (matrixMultiply (matrixMultiply w4lA w4lB) (matrixInverse w4lA)) (matrixInverse w4lB) ∧
+  w4rAB = matrixMultiply w4rA w4rB ∧
+  w4rC = matrixMultiply (matrixMultiply (matrixMultiply w4rA w4rB) (matrixInverse w4rA)) (matrixInverse w4rB) ∧
+  matrixTrace w4lA = 2 ∧ matrixTrace w4lB = 2 ∧ matrixTrace w4lC ≠ 2 := by
+  norm_num [w4lA, w4lB, w4lAB, w4lC, w4rA, w4rB, w4rAB, w4rC, matrixTrace, matrixMultiply, matrixInverse]
+
+theorem generated_characteristic_hypergeometry : traceLawCoefficients = [2,0,0,0,(-1),0,0,(-1),0,(-1),0,0,0,0,1,0,0,0,0,0,1] := by exact returnedTraceLawCoefficients
+
+end Soma.Holonics.R33
+
+#check Soma.Holonics.R33.discoveredCharacteristicTransport
+#check Soma.Holonics.R33.generated_characteristic_hypergeometry
+formal_end
+physical_telemetry=engine_time:unknown,checker_time:unknown,energy:unknown

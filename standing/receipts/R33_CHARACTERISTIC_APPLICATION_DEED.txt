@@ -1,0 +1,55 @@
+truth_status=established-bounded
+evidence=implemented-exact,computational-witness
+formal_truth_status=proved-derived
+formal_evidence=formal-checked
+program=r33_characteristic_application.sm_89
+verification_failures=0
+kernel_launches=8
+source_currents=2
+host_semantic_events=0
+development_card_arguments=0
+prediction_before_comparison=1
+visible=3,2,4
+predicted_closed_trace=3
+source_closed_trace=3
+final_rest_bytes=2832
+final_body=head:14001048,continuation:15001048,admitted_tally:1199,mathematical:418,codec:195,transport:24
+checker_exit=0
+formal_begin
+import R33_CHARACTERISTIC_HYPERGEOMETRY
+
+namespace Soma.Holonics.R33
+
+def heldoutVisible : ℤ × ℤ × ℤ := (3,2,4)
+def heldoutPredictedTrace : ℤ := 3
+def heldoutSourceTrace : ℤ := 3
+def heldoutCharacteristic : List ℤ := [1,(-3),1]
+
+theorem heldoutCharacteristicTransport :
+  tracePolynomial 3 2 4 heldoutPredictedTrace = 0 ∧ heldoutPredictedTrace = heldoutSourceTrace ∧
+  heldoutCharacteristic = [1,-heldoutPredictedTrace,1] := by
+  have returned := discoveredCharacteristicTransport 2 1 1 1 2 1 (-1) 0 (by norm_num) (by norm_num)
+  norm_num [heldoutPredictedTrace, heldoutSourceTrace, heldoutCharacteristic, tracePolynomial] at returned ⊢
+
+theorem generated_heldout_characteristic_transport :
+  tracePolynomial 3 2 4 heldoutPredictedTrace = 0 := by exact heldoutCharacteristicTransport.1
+
+end Soma.Holonics.R33
+
+#check Soma.Holonics.R33.generated_heldout_characteristic_transport
+formal_end
+conversation_begin
+# R33 characteristic hypergeometry return
+
+Truth status: project-postulate pending gate admission.
+
+The three developmental transition ecologies formed 6308 ordered face pairs and 281 exact characteristic archetypes. Closed strata contained 0 elliptic, 440 parabolic, and 5868 hyperbolic returns in this bounded population. These are counts, not universal probabilities.
+
+Exact elimination selected the primitive coefficient geometry [2,0,0,0,(-1),0,0,(-1),0,(-1),0,0,0,0,1,0,0,0,0,0,1]. It transports the closed commutator trace from the three open face traces. The retained collisions show why the individual faces alone are insufficient, why equal characteristic coordinates do not identify their source, and why order and rechart information survive outside this receiver.
+
+After the developmental words and matrices departed, a five-edge held-out local system exposed only (3,2,4). The organ predicted closed trace 3, characteristic [1,(-3),1], and discriminant 5 before comparison; the independently formed matrix return agreed. Organ exclusion removed the prediction, while a determinant-violating transition returned an obstruction.
+
+The organ forgets word lineage, embedding, orientation, full matrices, and analytic continuation. Higher rank, arbitrary character varieties, Hodge realization, RH, and autonomous theorem valuation remain outside this aperture.
+
+conversation_end
+physical_telemetry=engine_time:unknown,checker_time:unknown,energy:unknown

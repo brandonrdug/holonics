@@ -1,0 +1,111 @@
+truth_status=established-bounded
+evidence=implemented-exact,computational-witness
+formal_truth_status=proved-derived
+formal_evidence=formal-checked
+published_theorem_status=outside-aperture
+historical_truth_status=historical
+program=r22_cm_norm_one_arithmetic_incidence.sm_89
+device_compute_capability=8.9
+kernel_launches=9
+launched_threads=10
+arithmetic_threads=3
+characteristic_threads=2
+bytes_to_device=9008
+bytes_from_device=88584
+resident_bytes=99088
+host_semantic_events=0
+logical_read_support=56
+logical_change_support=7
+logical_alternatives=10
+logical_obstructions=3
+verification_failures=0
+source_card=bytes:31,fold:16608495377416124209,path_fold:17453761205434610132
+source_aperture=order:5,degree:4,periodic_modulus:2,window:0:1,translations:5,expected_incidence:absent,expected_spectrum:absent
+predecessor=rest_bytes:592,head:14001016
+translation_return=count:5,all_norm_one:1
+periodic=vertices:16,edges:40,factors:3,commuting_characters:1
+window=vertices:16,edges:33,unit_pairs:33,lost:7,projection_loss:0,factors:5
+direction_population=8,8,8,8,1
+scattering=commutator_nonzero:4,4,4,4,coefficient_sum_images:5
+probe=returned:1,translation_count:4,periodic_edges:32,window_edges:32,lost:0
+probe_periodic_characteristic=1,0,-32,0,352,0,-1792,0,4352,0,-4096,0,0,0,0,0,0
+probe_window_characteristic=1,0,-32,0,352,0,-1792,0,4352,0,-4096,0,0,0,0,0,0
+checker=exit:0,stdout_bytes:214,stderr_bytes:0,produced_bytes:1113144,source_fold:12832826262254154632,artifact_fold:11775843662944598004
+final_body=head:14001018,continuation:15001018,admitted_tally:327,mathematical:104,codec:58,cm_incidence:17,rest_bytes:648,integrity:9852429452788266475
+physical_telemetry=engine_time:unknown,checker_time:unknown,temperature:unknown,power:unknown,energy:unknown
+formal_begin
+import Mathlib.Data.Finset.Prod
+import Mathlib.Data.Fintype.Fin
+import Mathlib.Tactic.NormNum
+import Mathlib.Tactic.Ring
+
+namespace Soma.Holonics.R22
+
+structure CM4 where
+  a0 : ℤ
+  a1 : ℤ
+  a2 : ℤ
+  a3 : ℤ
+deriving DecidableEq
+
+def cmOne : CM4 := ⟨1,0,0,0⟩
+def cmConj (a : CM4) : CM4 := ⟨a.a0-a.a1,-a.a1,a.a3-a.a1,a.a2-a.a1⟩
+def cmMul (a b : CM4) : CM4 :=
+  let c0 := a.a0*b.a0
+  let c1 := a.a0*b.a1+a.a1*b.a0
+  let c2 := a.a0*b.a2+a.a1*b.a1+a.a2*b.a0
+  let c3 := a.a0*b.a3+a.a1*b.a2+a.a2*b.a1+a.a3*b.a0
+  let c4 := a.a1*b.a3+a.a2*b.a2+a.a3*b.a1
+  let c5 := a.a2*b.a3+a.a3*b.a2
+  let c6 := a.a3*b.a3
+  ⟨c0-c4+c5,c1-c4+c6,c2-c4,c3-c4⟩
+def cmSub (a b : CM4) : CM4 := ⟨a.a0-b.a0,a.a1-b.a1,a.a2-b.a2,a.a3-b.a3⟩
+def cmNorm (a : CM4) : CM4 := cmMul a (cmConj a)
+
+def root0 : CM4 := ⟨1,0,0,0⟩
+def root1 : CM4 := ⟨0,1,0,0⟩
+def root2 : CM4 := ⟨0,0,1,0⟩
+def root3 : CM4 := ⟨0,0,0,1⟩
+def root4 : CM4 := ⟨-1,-1,-1,-1⟩
+
+theorem generated_norm_one_translations :
+    cmNorm root0 = cmOne ∧ cmNorm root1 = cmOne ∧ cmNorm root2 = cmOne ∧
+    cmNorm root3 = cmOne ∧ cmNorm root4 = cmOne := by native_decide
+
+def coeff (n shift : Nat) : ℤ := Int.ofNat ((n / (2^shift)) % 2)
+def point (n : Fin 16) : CM4 :=
+  ⟨coeff n.val 0,coeff n.val 1,coeff n.val 2,coeff n.val 3⟩
+def unitPair (i j : Fin 16) : Bool :=
+  decide (i.val < j.val) && decide (cmNorm (cmSub (point j) (point i)) = cmOne)
+def unitPairCount : Nat :=
+  (((Finset.univ : Finset (Fin 16)) ×ˢ (Finset.univ : Finset (Fin 16))).filter
+    (fun p : Fin 16 × Fin 16 => unitPair p.1 p.2 = true)).card
+
+theorem generated_bounded_embedding_injective :
+    ∀ i j : Fin 16, point i = point j → i = j := by native_decide
+
+theorem generated_unit_pair_count : unitPairCount = 33 := by native_decide
+
+def periodicChar (X : ℤ) : ℤ := ((((((((((((((((1 * X + 0) * X + -40) * X + 0) * X + 540) * X + -384) * X + -3480) * X + 5760) * X + 8070) * X + -29440) * X + 17640) * X + 37120) * X + -82020) * X + 74880) * X + -37800) * X + 10368) * X + -1215)
+def periodicFactor (X : ℤ) : ℤ := (((1 * X + 3)) ^ 5) * (((1 * X + -1)) ^ 10) * (((1 * X + -5)) ^ 1)
+def windowChar (X : ℤ) : ℤ := ((((((((((((((((1 * X + 0) * X + -33) * X + 0) * X + 376) * X + -48) * X + -1984) * X + 576) * X + 4992) * X + -2304) * X + -4864) * X + 3072) * X + 0) * X + 0) * X + 0) * X + 0) * X + 0)
+def windowFactor (X : ℤ) : ℤ := (((1 * X + 2)) ^ 3) * (((1 * X + 0)) ^ 5) * (((1 * X + -2)) ^ 3) * ((((1 * X + 1) * X + -4)) ^ 1) * (((((1 * X + -1) * X + -16) * X + 12)) ^ 1)
+
+theorem generated_cm_characteristic_transport (X : ℤ) :
+    periodicChar X = periodicFactor X ∧ windowChar X = windowFactor X := by
+  constructor <;>
+    simp only [periodicChar, periodicFactor, windowChar, windowFactor] <;> ring
+
+theorem generated_aperture_transport : (40 : ℤ) - 7 = 33 ∧ (0 : ℤ) = 0 := by norm_num
+
+end Soma.Holonics.R22
+
+#check Soma.Holonics.R22.generated_cm_characteristic_transport
+formal_end
+conversation_begin
+The exact CM source is Z[z]/(1+z+z^2+z^3+z^4). Its five derived powers have relative norm one, so every retained translation is a unit edge in the chosen complex receiver. The periodic residue crystal carries five commuting involutions. The bounded lift retains the field identities but refuses modular wrap: the resulting partial fifth direction no longer commutes with the four axes, and its characteristic return splits into boundary factors. Complete factorized translation incidence equals independent all-pair norm incidence; the injective field embedding loses no further edge. The four-direction, wrap-as-window, and coefficient-sum alternatives remain rejected.conversation_end
+checker_stdout_begin
+Soma.Holonics.R22.generated_cm_characteristic_transport (X : ℤ) :
+  Soma.Holonics.R22.periodicChar X = Soma.Holonics.R22.periodicFactor X ∧
+    Soma.Holonics.R22.windowChar X = Soma.Holonics.R22.windowFactor X
+checker_stdout_end

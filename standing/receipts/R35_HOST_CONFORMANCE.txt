@@ -1,0 +1,13 @@
+truth_status=established-bounded
+evidence=implemented-exact,computational-witness
+implementation=independent-host-no-continuation
+matrix_discovered_fiber_relation=1
+atlases_compared=5
+atlas_rows=14079
+atlas_states_exact=1
+atlas_edges_exact=1
+atlas_tangents_exact=1
+atlas_laws_exact=1
+atlas_heldout_exact=1
+heldout_mismatch_mask=0
+verification_failures=0

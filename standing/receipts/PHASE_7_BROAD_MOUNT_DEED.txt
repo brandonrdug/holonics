@@ -1,0 +1,47 @@
+# phase 7 movement 3 broad mount deed
+
+## the corpus
+
+containers 737
+occurrences 37707
+surface octets 9026878
+duplicate witnesses 1 (declared control)
+version fibers 1 (declared control)
+open causal fibers 37707
+
+## the conditioning
+
+octet aperture 64
+octets crossed 2049035
+states 2462650
+transitions 3729144
+caused occurrences admitted 2049035
+formation steps 11899633
+lookup steps 796921346
+resident octets 636719850
+frame octets 320
+
+## the admission gates
+
+global pair population 0
+hot host replay work 0
+bounded delta equal yes
+
+## rest and remount
+
+rest octets 10836878
+remount octets 10836934
+founded from octets alone yes
+remount exact yes
+
+## ownership
+
+mount consumed host yes
+consumed host refuses admission yes
+refusal returned predecessor yes
+
+## the resident query
+
+device answered queries 1024
+parity failures 0
+device capability 8.9

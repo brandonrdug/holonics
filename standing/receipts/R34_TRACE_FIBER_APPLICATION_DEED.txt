@@ -1,0 +1,80 @@
+truth_status=established-bounded
+evidence=implemented-exact,computational-witness
+formal_truth_status=proved-derived
+formal_evidence=formal-checked
+program=r34_trace_fiber_application.sm_89
+verification_failures=0
+kernel_launches=9
+source_currents=2
+host_semantic_events=0
+prediction_before_comparison=1
+visible=3,2,2,5,5,6
+anchor=15
+predicted_companion=11
+source_companion=11
+final_rest_bytes=4424
+final_body=head:14001052,continuation:15001052
+checker_exit=0
+formal_begin
+import R34_TRACE_FIBER_LIFTING
+
+namespace Soma.Holonics.R34
+
+def heldA : Matrix2 := {a:=2,b:=1,c:=1,d:=1}
+def heldB : Matrix2 := {a:=1,b:=2,c:=0,d:=1}
+def heldC : Matrix2 := {a:=1,b:=0,c:=2,d:=1}
+def heldAB : Matrix2 := {a:=2,b:=5,c:=1,d:=3}
+def heldAC : Matrix2 := {a:=4,b:=1,c:=3,d:=1}
+def heldBC : Matrix2 := {a:=5,b:=2,c:=2,d:=1}
+def heldABC : Matrix2 := {a:=12,b:=5,c:=7,d:=3}
+def heldACB : Matrix2 := {a:=4,b:=9,c:=3,d:=7}
+
+def heldLower : List ℤ := [3,2,2,5,5,6]
+def heldAnchor : ℤ := 15
+def heldCompanion : ℤ := 11
+def heldSourceCompanion : ℤ := 11
+def heldQuadratic : List ℤ := [1,(-26),165]
+
+theorem heldoutTraceFiberTransport :
+  heldAB = matrixMultiply heldA heldB ∧ heldAC = matrixMultiply heldA heldC ∧
+  heldBC = matrixMultiply heldB heldC ∧ heldABC = matrixMultiply heldAB heldC ∧
+  heldACB = matrixMultiply heldAC heldB ∧ heldCompanion = heldSourceCompanion ∧
+  traceSumPolynomial 3 2 2 5 5 6 (heldAnchor+heldCompanion) = 0 ∧ traceProductPolynomial 3 2 2 5 5 6 (heldAnchor*heldCompanion) = 0 := by
+  have returned := discoveredTraceFiber 2 1 1 1 1 2 0 1 1 0 2 1 (by norm_num) (by norm_num) (by norm_num)
+  constructor
+  · norm_num [heldA, heldB, heldAB, matrixMultiply]
+  constructor
+  · norm_num [heldA, heldC, heldAC, matrixMultiply]
+  constructor
+  · norm_num [heldB, heldC, heldBC, matrixMultiply]
+  constructor
+  · norm_num [heldAB, heldC, heldABC, matrixMultiply]
+  constructor
+  · norm_num [heldAC, heldB, heldACB, matrixMultiply]
+  constructor
+  · norm_num [heldCompanion, heldSourceCompanion]
+  constructor
+  · simpa [heldAnchor, heldCompanion, matrixMultiply, matrixTrace] using returned.1
+  · simpa [heldAnchor, heldCompanion, matrixMultiply, matrixTrace] using returned.2.1
+
+theorem generated_heldout_trace_fiber : heldCompanion = heldSourceCompanion := by
+  exact heldoutTraceFiberTransport.2.2.2.2.2.1
+
+end Soma.Holonics.R34
+
+#check Soma.Holonics.R34.generated_heldout_trace_fiber
+formal_end
+conversation_begin
+# R34 three-face trace-fiber return
+
+Truth status: project-postulate pending gate admission.
+
+The three source ecologies formed 5,184 ordered transition triples and 2072 exact lower-fiber archetypes. The discriminant partition contains 2580 branch rows and 2604 two-sheet rows. These are complete bounded counts, not probabilities.
+
+Two independently selected primitive organs transport the sum and product of the ordered triple traces from six lower trace coordinates. Together they form one monic quadratic. Its discriminant is the exact square of the root gap: zero joins the sheets, while a positive value retains two possible ordered traces.
+
+The held-out local system exposed lower face (3,2,2,5,5,6) and oriented anchor 15. The organs returned roots 11 and 15, then predicted hidden companion 11 before comparison; the source return agreed. Without orientation the same unordered roots remain, but neither is named as the companion.
+
+The lower receiver therefore lifts to a finite algebraic fiber, not to a complete matrix geometry. Matrix entries, source lineage, rechart and ordered-sheet assignment remain outside it. Higher rank, arbitrary character varieties, Hodge realization, RH and autonomous theorem valuation remain outside this aperture.
+conversation_end
+physical_telemetry=engine_time:unknown,checker_time:unknown,energy:unknown

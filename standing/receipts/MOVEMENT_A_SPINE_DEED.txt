@@ -1,0 +1,47 @@
+phases=0-5 minimum-carrier-substrate-swing-standing-machine-receipt
+grade=established-bounded
+evidence=implemented-exact
+device_compute=8.9
+bytes_to_device=576
+bytes_from_device=384
+launched_threads=64
+occurrences=8
+device_host_parity_failures=0
+swing_laws=1
+standing_shares=1
+open_never_concludes=1
+carrier_laws=1
+substrate_laws=1
+information_laws=1
+case=flat-production-ride
+  disposition=ride refusal=unadmitted winding=0 groove_rebased=1
+  retains_pair=1 may_conclude=1 grade=255
+  standing_population=6->6 path_copied=4 nodes=25
+case=wound-production-open-not-found
+  disposition=open refusal=available winding=0 groove_rebased=0
+  retains_pair=1 may_conclude=0 grade=255
+  standing_population=6->6 path_copied=4 nodes=25
+case=wound-body-found-with-winding
+  disposition=found refusal=unadmitted winding=1 groove_rebased=0
+  retains_pair=1 may_conclude=1 grade=255
+  standing_population=6->6 path_copied=4 nodes=25
+case=flat-body-ride
+  disposition=ride refusal=unadmitted winding=0 groove_rebased=1
+  retains_pair=1 may_conclude=1 grade=255
+  standing_population=6->6 path_copied=4 nodes=25
+case=no-interface-capability
+  disposition=open refusal=available winding=0 groove_rebased=0
+  retains_pair=1 may_conclude=0 grade=255
+  standing_population=6->6 path_copied=4 nodes=25
+case=chart-undeclared
+  disposition=open refusal=chart-undeclared winding=0 groove_rebased=0
+  retains_pair=1 may_conclude=0 grade=255
+  standing_population=6->6 path_copied=4 nodes=25
+case=wrong-chart-declared
+  disposition=open refusal=chart-undeclared winding=0 groove_rebased=0
+  retains_pair=1 may_conclude=0 grade=255
+  standing_population=6->6 path_copied=4 nodes=25
+case=oriented-hand-residual
+  disposition=open refusal=available winding=0 groove_rebased=0
+  retains_pair=1 may_conclude=0 grade=255
+  standing_population=6->6 path_copied=4 nodes=25

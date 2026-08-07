@@ -1,0 +1,240 @@
+truth_status=established-bounded
+evidence=implemented-exact,computational-witness
+formal_truth_status=proved-derived
+formal_evidence=formal-checked
+program=r34_trace_fiber_discovery.sm_89
+verification_failures=0
+kernel_launches=12
+source_currents=3
+host_semantic_events=0
+word_populations=12,12,12
+triple_population=5184
+fiber_groups=2072
+branch_strata=2580,2604
+law_residuals=0
+intermediate_rest_bytes=4424
+developmental_rows_in_rest=0
+target_traces_in_rest=0
+matrices_in_rest=0
+final_body=head:14001050,continuation:15001050
+checker_exit=0
+formal_begin
+import Mathlib.Tactic.LinearCombination
+import Mathlib.Tactic.NormNum
+import Mathlib.Tactic.Ring
+
+namespace Soma.Holonics.R34
+
+structure Matrix2 where
+  a : ℤ
+  b : ℤ
+  c : ℤ
+  d : ℤ
+  deriving DecidableEq, Repr
+
+def matrixMultiply (u v : Matrix2) : Matrix2 :=
+  {a:=u.a*v.a+u.b*v.c,b:=u.a*v.b+u.b*v.d,c:=u.c*v.a+u.d*v.c,d:=u.c*v.b+u.d*v.d}
+def matrixTrace (u : Matrix2) : ℤ := u.a+u.d
+
+def sumLawCoefficients : List ℤ := [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,(-1),0,0,0,0,0,0,0,(-1)]
+def productLawCoefficients : List ℤ := [4,0,0,0,0,0,0,(-1),0,(-1),0,0,(-1),0,0,0,(-1),0,0,0,0,(-1),0,0,0,0,0,(-1),0,0,0,0,0,(-1),0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,1]
+
+def traceSumPolynomial (a b c d e f s : ℤ) : ℤ :=
+  0 * 1 + 0 * f + 0 * e + 0 * d + 0 * c + 0 * b + 0 * a + 0 * f*f + 0 * e*f + 0 * e*e + 0 * d*f + 0 * d*e + 0 * d*d + 0 * c*f + 0 * c*e + 1 * c*d + 0 * c*c + 0 * b*f + 1 * b*e + 0 * b*d + 0 * b*c + 0 * b*b + 1 * a*f + 0 * a*e + 0 * a*d + 0 * a*c + 0 * a*b + 0 * a*a + 0 * f*f*f + 0 * e*f*f + 0 * e*e*f + 0 * e*e*e + 0 * d*f*f + 0 * d*e*f + 0 * d*e*e + 0 * d*d*f + 0 * d*d*e + 0 * d*d*d + 0 * c*f*f + 0 * c*e*f + 0 * c*e*e + 0 * c*d*f + 0 * c*d*e + 0 * c*d*d + 0 * c*c*f + 0 * c*c*e + 0 * c*c*d + 0 * c*c*c + 0 * b*f*f + 0 * b*e*f + 0 * b*e*e + 0 * b*d*f + 0 * b*d*e + 0 * b*d*d + 0 * b*c*f + 0 * b*c*e + 0 * b*c*d + 0 * b*c*c + 0 * b*b*f + 0 * b*b*e + 0 * b*b*d + 0 * b*b*c + 0 * b*b*b + 0 * a*f*f + 0 * a*e*f + 0 * a*e*e + 0 * a*d*f + 0 * a*d*e + 0 * a*d*d + 0 * a*c*f + 0 * a*c*e + 0 * a*c*d + 0 * a*c*c + 0 * a*b*f + 0 * a*b*e + 0 * a*b*d + (-1) * a*b*c + 0 * a*b*b + 0 * a*a*f + 0 * a*a*e + 0 * a*a*d + 0 * a*a*c + 0 * a*a*b + 0 * a*a*a + (-1) * s
+
+def traceProductPolynomial (a b c d e f r : ℤ) : ℤ :=
+  4 * 1 + 0 * f + 0 * e + 0 * d + 0 * c + 0 * b + 0 * a + (-1) * f*f + 0 * e*f + (-1) * e*e + 0 * d*f + 0 * d*e + (-1) * d*d + 0 * c*f + 0 * c*e + 0 * c*d + (-1) * c*c + 0 * b*f + 0 * b*e + 0 * b*d + 0 * b*c + (-1) * b*b + 0 * a*f + 0 * a*e + 0 * a*d + 0 * a*c + 0 * a*b + (-1) * a*a + 0 * f*f*f + 0 * e*f*f + 0 * e*e*f + 0 * e*e*e + 0 * d*f*f + (-1) * d*e*f + 0 * d*e*e + 0 * d*d*f + 0 * d*d*e + 0 * d*d*d + 0 * c*f*f + 0 * c*e*f + 0 * c*e*e + 0 * c*d*f + 0 * c*d*e + 0 * c*d*d + 0 * c*c*f + 0 * c*c*e + 0 * c*c*d + 0 * c*c*c + 0 * b*f*f + 0 * b*e*f + 0 * b*e*e + 0 * b*d*f + 0 * b*d*e + 0 * b*d*d + 1 * b*c*f + 0 * b*c*e + 0 * b*c*d + 0 * b*c*c + 0 * b*b*f + 0 * b*b*e + 0 * b*b*d + 0 * b*b*c + 0 * b*b*b + 0 * a*f*f + 0 * a*e*f + 0 * a*e*e + 0 * a*d*f + 0 * a*d*e + 0 * a*d*d + 0 * a*c*f + 1 * a*c*e + 0 * a*c*d + 0 * a*c*c + 0 * a*b*f + 0 * a*b*e + 1 * a*b*d + 0 * a*b*c + 0 * a*b*b + 0 * a*a*f + 0 * a*a*e + 0 * a*a*d + 0 * a*a*c + 0 * a*a*b + 0 * a*a*a + 1 * r
+
+theorem discoveredTraceFiber (a b c d e f g h i j k l : ℤ)
+    (hA : a*d-b*c=1) (hB : e*h-f*g=1) (hC : i*l-j*k=1) :
+    let A : Matrix2 := {a:=a,b:=b,c:=c,d:=d}
+    let B : Matrix2 := {a:=e,b:=f,c:=g,d:=h}
+    let C : Matrix2 := {a:=i,b:=j,c:=k,d:=l}
+    let p := matrixTrace (matrixMultiply (matrixMultiply A B) C)
+    let q := matrixTrace (matrixMultiply (matrixMultiply A C) B)
+    traceSumPolynomial (matrixTrace A) (matrixTrace B) (matrixTrace C)
+      (matrixTrace (matrixMultiply A B)) (matrixTrace (matrixMultiply A C))
+      (matrixTrace (matrixMultiply B C)) (p+q) = 0 ∧
+    traceProductPolynomial (matrixTrace A) (matrixTrace B) (matrixTrace C)
+      (matrixTrace (matrixMultiply A B)) (matrixTrace (matrixMultiply A C))
+      (matrixTrace (matrixMultiply B C)) (p*q) = 0 ∧
+    p*p-(p+q)*p+p*q=0 ∧ q*q-(p+q)*q+p*q=0 ∧
+    (p+q)*(p+q)-4*(p*q)=(p-q)*(p-q) := by
+  dsimp [traceSumPolynomial, traceProductPolynomial, matrixTrace, matrixMultiply]
+  constructor
+  · ring
+  constructor
+  · linear_combination 1 * (-e^2*i*l + e^2 + e*f*i*k - e*f*k*l + e*g*i*j - e*g*j*l - e*h*i^2 + 2*e*h*i*l - e*h*l^2 + f^2*k^2 - f*h*i*k + f*h*k*l + g^2*j^2 - g*h*i*j + g*h*j*l - h^2*i*l + h^2 + i^2 + l^2 - 2) * hA + 1 * (-a^2*i*l + a^2 + a*b*i*k - a*b*k*l + a*c*i*j - a*c*j*l + b^2*k^2 - b*c*i^2 + 2*b*c*i*l - b*c*l^2 - b*d*i*k + b*d*k*l + c^2*j^2 - c*d*i*j + c*d*j*l - d^2*i*l + d^2 + 2*i*l - 2) * hB + 1 * (-a^2*f*g + a*b*e*g - a*b*g*h + a*c*e*f - a*c*f*h + b^2*g^2 - b*c*e^2 + 2*b*c*f*g - b*c*h^2 + 2*b*c - b*d*e*g + b*d*g*h + c^2*f^2 - c*d*e*f + c*d*f*h - d^2*f*g + 2*f*g) * hC
+  constructor
+  · ring
+  constructor <;> ring
+
+def w0lA : Matrix2 := {a:=1,b:=1,c:=0,d:=1}
+def w0lB : Matrix2 := {a:=3,b:=5,c:=1,d:=2}
+def w0lC : Matrix2 := {a:=2,b:=5,c:=1,d:=3}
+def w0lAB : Matrix2 := {a:=4,b:=7,c:=1,d:=2}
+def w0lAC : Matrix2 := {a:=3,b:=8,c:=1,d:=3}
+def w0lBC : Matrix2 := {a:=11,b:=30,c:=4,d:=11}
+def w0lABC : Matrix2 := {a:=15,b:=41,c:=4,d:=11}
+def w0lACB : Matrix2 := {a:=17,b:=31,c:=6,d:=11}
+
+def w0rA : Matrix2 := {a:=1,b:=1,c:=0,d:=1}
+def w0rB : Matrix2 := {a:=2,b:=5,c:=1,d:=3}
+def w0rC : Matrix2 := {a:=3,b:=5,c:=1,d:=2}
+def w0rAB : Matrix2 := {a:=3,b:=8,c:=1,d:=3}
+def w0rAC : Matrix2 := {a:=4,b:=7,c:=1,d:=2}
+def w0rBC : Matrix2 := {a:=11,b:=20,c:=6,d:=11}
+def w0rABC : Matrix2 := {a:=17,b:=31,c:=6,d:=11}
+def w0rACB : Matrix2 := {a:=15,b:=41,c:=4,d:=11}
+
+theorem orientationExchangesSheets :
+  w0lAB = matrixMultiply w0lA w0lB ∧
+  w0lAC = matrixMultiply w0lA w0lC ∧
+  w0lBC = matrixMultiply w0lB w0lC ∧
+  w0lABC = matrixMultiply w0lAB w0lC ∧
+  w0lACB = matrixMultiply w0lAC w0lB ∧
+  w0rAB = matrixMultiply w0rA w0rB ∧
+  w0rAC = matrixMultiply w0rA w0rC ∧
+  w0rBC = matrixMultiply w0rB w0rC ∧
+  w0rABC = matrixMultiply w0rAB w0rC ∧
+  w0rACB = matrixMultiply w0rAC w0rB ∧
+  matrixTrace w0lA = matrixTrace w0rA ∧ matrixTrace w0lB = matrixTrace w0rB ∧ matrixTrace w0lC = matrixTrace w0rC ∧ matrixTrace w0lAB = matrixTrace w0rAB ∧ matrixTrace w0lAC = matrixTrace w0rAC ∧ matrixTrace w0lBC = matrixTrace w0rBC ∧ matrixTrace w0lABC = matrixTrace w0rACB ∧ matrixTrace w0lACB = matrixTrace w0rABC ∧ w0lABC ≠ w0lACB := by
+  norm_num [w0lA, w0lB, w0lC, w0lAB, w0lAC, w0lBC, w0lABC, w0lACB, w0rA, w0rB, w0rC, w0rAB, w0rAC, w0rBC, w0rABC, w0rACB, matrixTrace, matrixMultiply]
+
+def w1lA : Matrix2 := {a:=1,b:=1,c:=0,d:=1}
+def w1lB : Matrix2 := {a:=1,b:=1,c:=0,d:=1}
+def w1lC : Matrix2 := {a:=1,b:=1,c:=0,d:=1}
+def w1lAB : Matrix2 := {a:=1,b:=2,c:=0,d:=1}
+def w1lAC : Matrix2 := {a:=1,b:=2,c:=0,d:=1}
+def w1lBC : Matrix2 := {a:=1,b:=2,c:=0,d:=1}
+def w1lABC : Matrix2 := {a:=1,b:=3,c:=0,d:=1}
+def w1lACB : Matrix2 := {a:=1,b:=3,c:=0,d:=1}
+
+def w1rA : Matrix2 := {a:=1,b:=1,c:=0,d:=1}
+def w1rB : Matrix2 := {a:=1,b:=1,c:=0,d:=1}
+def w1rC : Matrix2 := {a:=1,b:=2,c:=0,d:=1}
+def w1rAB : Matrix2 := {a:=1,b:=2,c:=0,d:=1}
+def w1rAC : Matrix2 := {a:=1,b:=3,c:=0,d:=1}
+def w1rBC : Matrix2 := {a:=1,b:=3,c:=0,d:=1}
+def w1rABC : Matrix2 := {a:=1,b:=4,c:=0,d:=1}
+def w1rACB : Matrix2 := {a:=1,b:=4,c:=0,d:=1}
+
+theorem lowerFiberDoesNotIdentifySource :
+  w1lAB = matrixMultiply w1lA w1lB ∧
+  w1lAC = matrixMultiply w1lA w1lC ∧
+  w1lBC = matrixMultiply w1lB w1lC ∧
+  w1lABC = matrixMultiply w1lAB w1lC ∧
+  w1lACB = matrixMultiply w1lAC w1lB ∧
+  w1rAB = matrixMultiply w1rA w1rB ∧
+  w1rAC = matrixMultiply w1rA w1rC ∧
+  w1rBC = matrixMultiply w1rB w1rC ∧
+  w1rABC = matrixMultiply w1rAB w1rC ∧
+  w1rACB = matrixMultiply w1rAC w1rB ∧
+  matrixTrace w1lA = matrixTrace w1rA ∧ matrixTrace w1lB = matrixTrace w1rB ∧ matrixTrace w1lC = matrixTrace w1rC ∧ matrixTrace w1lAB = matrixTrace w1rAB ∧ matrixTrace w1lAC = matrixTrace w1rAC ∧ matrixTrace w1lBC = matrixTrace w1rBC ∧ (0 : ℕ) ≠ 1 := by
+  norm_num [w1lA, w1lB, w1lC, w1lAB, w1lAC, w1lBC, w1lABC, w1lACB, w1rA, w1rB, w1rC, w1rAB, w1rAC, w1rBC, w1rABC, w1rACB, matrixTrace, matrixMultiply]
+
+def w2lA : Matrix2 := {a:=1,b:=1,c:=0,d:=1}
+def w2lB : Matrix2 := {a:=1,b:=1,c:=0,d:=1}
+def w2lC : Matrix2 := {a:=1,b:=1,c:=0,d:=1}
+def w2lAB : Matrix2 := {a:=1,b:=2,c:=0,d:=1}
+def w2lAC : Matrix2 := {a:=1,b:=2,c:=0,d:=1}
+def w2lBC : Matrix2 := {a:=1,b:=2,c:=0,d:=1}
+def w2lABC : Matrix2 := {a:=1,b:=3,c:=0,d:=1}
+def w2lACB : Matrix2 := {a:=1,b:=3,c:=0,d:=1}
+
+def w2rA : Matrix2 := {a:=0,b:=1,c:=(-1),d:=2}
+def w2rB : Matrix2 := {a:=0,b:=1,c:=(-1),d:=2}
+def w2rC : Matrix2 := {a:=0,b:=1,c:=(-1),d:=2}
+def w2rAB : Matrix2 := {a:=(-1),b:=2,c:=(-2),d:=3}
+def w2rAC : Matrix2 := {a:=(-1),b:=2,c:=(-2),d:=3}
+def w2rBC : Matrix2 := {a:=(-1),b:=2,c:=(-2),d:=3}
+def w2rABC : Matrix2 := {a:=(-2),b:=3,c:=(-3),d:=4}
+def w2rACB : Matrix2 := {a:=(-2),b:=3,c:=(-3),d:=4}
+
+theorem simultaneousRechartRetainsFiber :
+  w2lAB = matrixMultiply w2lA w2lB ∧
+  w2lAC = matrixMultiply w2lA w2lC ∧
+  w2lBC = matrixMultiply w2lB w2lC ∧
+  w2lABC = matrixMultiply w2lAB w2lC ∧
+  w2lACB = matrixMultiply w2lAC w2lB ∧
+  w2rAB = matrixMultiply w2rA w2rB ∧
+  w2rAC = matrixMultiply w2rA w2rC ∧
+  w2rBC = matrixMultiply w2rB w2rC ∧
+  w2rABC = matrixMultiply w2rAB w2rC ∧
+  w2rACB = matrixMultiply w2rAC w2rB ∧
+  matrixTrace w2lA = matrixTrace w2rA ∧ matrixTrace w2lB = matrixTrace w2rB ∧ matrixTrace w2lC = matrixTrace w2rC ∧ matrixTrace w2lAB = matrixTrace w2rAB ∧ matrixTrace w2lAC = matrixTrace w2rAC ∧ matrixTrace w2lBC = matrixTrace w2rBC ∧ (w2lA ≠ w2rA ∨ w2lB ≠ w2rB ∨ w2lC ≠ w2rC) := by
+  norm_num [w2lA, w2lB, w2lC, w2lAB, w2lAC, w2lBC, w2lABC, w2lACB, w2rA, w2rB, w2rC, w2rAB, w2rAC, w2rBC, w2rABC, w2rACB, matrixTrace, matrixMultiply]
+
+def w3lA : Matrix2 := {a:=1,b:=1,c:=0,d:=1}
+def w3lB : Matrix2 := {a:=1,b:=1,c:=0,d:=1}
+def w3lC : Matrix2 := {a:=1,b:=1,c:=0,d:=1}
+def w3lAB : Matrix2 := {a:=1,b:=2,c:=0,d:=1}
+def w3lAC : Matrix2 := {a:=1,b:=2,c:=0,d:=1}
+def w3lBC : Matrix2 := {a:=1,b:=2,c:=0,d:=1}
+def w3lABC : Matrix2 := {a:=1,b:=3,c:=0,d:=1}
+def w3lACB : Matrix2 := {a:=1,b:=3,c:=0,d:=1}
+
+def w3rA : Matrix2 := {a:=1,b:=1,c:=0,d:=1}
+def w3rB : Matrix2 := {a:=1,b:=1,c:=0,d:=1}
+def w3rC : Matrix2 := {a:=1,b:=1,c:=0,d:=1}
+def w3rAB : Matrix2 := {a:=1,b:=2,c:=0,d:=1}
+def w3rAC : Matrix2 := {a:=1,b:=2,c:=0,d:=1}
+def w3rBC : Matrix2 := {a:=1,b:=2,c:=0,d:=1}
+def w3rABC : Matrix2 := {a:=1,b:=3,c:=0,d:=1}
+def w3rACB : Matrix2 := {a:=1,b:=3,c:=0,d:=1}
+
+theorem branchWitness :
+  w3lAB = matrixMultiply w3lA w3lB ∧
+  w3lAC = matrixMultiply w3lA w3lC ∧
+  w3lBC = matrixMultiply w3lB w3lC ∧
+  w3lABC = matrixMultiply w3lAB w3lC ∧
+  w3lACB = matrixMultiply w3lAC w3lB ∧
+  w3rAB = matrixMultiply w3rA w3rB ∧
+  w3rAC = matrixMultiply w3rA w3rC ∧
+  w3rBC = matrixMultiply w3rB w3rC ∧
+  w3rABC = matrixMultiply w3rAB w3rC ∧
+  w3rACB = matrixMultiply w3rAC w3rB ∧
+  matrixTrace w3lABC = matrixTrace w3lACB := by
+  norm_num [w3lA, w3lB, w3lC, w3lAB, w3lAC, w3lBC, w3lABC, w3lACB, w3rA, w3rB, w3rC, w3rAB, w3rAC, w3rBC, w3rABC, w3rACB, matrixTrace, matrixMultiply]
+
+def w4lA : Matrix2 := {a:=1,b:=1,c:=0,d:=1}
+def w4lB : Matrix2 := {a:=4,b:=3,c:=1,d:=1}
+def w4lC : Matrix2 := {a:=3,b:=2,c:=1,d:=1}
+def w4lAB : Matrix2 := {a:=5,b:=4,c:=1,d:=1}
+def w4lAC : Matrix2 := {a:=4,b:=3,c:=1,d:=1}
+def w4lBC : Matrix2 := {a:=15,b:=11,c:=4,d:=3}
+def w4lABC : Matrix2 := {a:=19,b:=14,c:=4,d:=3}
+def w4lACB : Matrix2 := {a:=19,b:=15,c:=5,d:=4}
+
+def w4rA : Matrix2 := {a:=1,b:=1,c:=0,d:=1}
+def w4rB : Matrix2 := {a:=4,b:=3,c:=1,d:=1}
+def w4rC : Matrix2 := {a:=3,b:=2,c:=1,d:=1}
+def w4rAB : Matrix2 := {a:=5,b:=4,c:=1,d:=1}
+def w4rAC : Matrix2 := {a:=4,b:=3,c:=1,d:=1}
+def w4rBC : Matrix2 := {a:=15,b:=11,c:=4,d:=3}
+def w4rABC : Matrix2 := {a:=19,b:=14,c:=4,d:=3}
+def w4rACB : Matrix2 := {a:=19,b:=15,c:=5,d:=4}
+
+theorem twoSheetWitness :
+  w4lAB = matrixMultiply w4lA w4lB ∧
+  w4lAC = matrixMultiply w4lA w4lC ∧
+  w4lBC = matrixMultiply w4lB w4lC ∧
+  w4lABC = matrixMultiply w4lAB w4lC ∧
+  w4lACB = matrixMultiply w4lAC w4lB ∧
+  w4rAB = matrixMultiply w4rA w4rB ∧
+  w4rAC = matrixMultiply w4rA w4rC ∧
+  w4rBC = matrixMultiply w4rB w4rC ∧
+  w4rABC = matrixMultiply w4rAB w4rC ∧
+  w4rACB = matrixMultiply w4rAC w4rB ∧
+  matrixTrace w4lABC ≠ matrixTrace w4lACB := by
+  norm_num [w4lA, w4lB, w4lC, w4lAB, w4lAC, w4lBC, w4lABC, w4lACB, w4rA, w4rB, w4rC, w4rAB, w4rAC, w4rBC, w4rABC, w4rACB, matrixTrace, matrixMultiply]
+
+theorem generated_trace_fiber_lifting :
+  sumLawCoefficients = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,(-1),0,0,0,0,0,0,0,(-1)] ∧ productLawCoefficients = [4,0,0,0,0,0,0,(-1),0,(-1),0,0,(-1),0,0,0,(-1),0,0,0,0,(-1),0,0,0,0,0,(-1),0,0,0,0,0,(-1),0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,1] := by constructor <;> rfl
+
+end Soma.Holonics.R34
+
+#check Soma.Holonics.R34.discoveredTraceFiber
+#check Soma.Holonics.R34.generated_trace_fiber_lifting
+formal_end
+physical_telemetry=engine_time:unknown,checker_time:unknown,energy:unknown

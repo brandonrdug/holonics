@@ -1,0 +1,286 @@
+import R34_TRACE_FIBER_LIFTING
+import Mathlib.Tactic.Linarith
+
+namespace Soma.Holonics.R35
+
+open Soma.Holonics.R34
+
+set_option linter.unusedVariables false
+set_option linter.unusedTactic false
+set_option linter.unreachableTactic false
+
+@[ext] structure TraceChart where
+  a : ℤ
+  b : ℤ
+  c : ℤ
+  d : ℤ
+  e : ℤ
+  f : ℤ
+  t : ℤ
+  deriving DecidableEq, Repr
+
+def matrixInverse (u : Matrix2) : Matrix2 :=
+  {a:=u.d,b:=-u.b,c:=-u.c,d:=u.a}
+
+def chartOf (A B C : Matrix2) : TraceChart :=
+  {a:=matrixTrace A,b:=matrixTrace B,c:=matrixTrace C,d:=matrixTrace (matrixMultiply A B),e:=matrixTrace (matrixMultiply A C),f:=matrixTrace (matrixMultiply B C),t:=matrixTrace (matrixMultiply (matrixMultiply A B) C)}
+
+def r35m0c0 (a b c d e f t : ℤ) : ℤ := 1 * b
+def r35m0c1 (a b c d e f t : ℤ) : ℤ := 1 * a
+def r35m0c2 (a b c d e f t : ℤ) : ℤ := 1 * c
+def r35m0c3 (a b c d e f t : ℤ) : ℤ := 1 * d
+def r35m0c4 (a b c d e f t : ℤ) : ℤ := 1 * f
+def r35m0c5 (a b c d e f t : ℤ) : ℤ := 1 * e
+def r35m0c6 (a b c d e f t : ℤ) : ℤ := (-1) * t + 1 * c*d + 1 * b*e + 1 * a*f + (-1) * a*b*c
+def r35m1c0 (a b c d e f t : ℤ) : ℤ := 1 * a
+def r35m1c1 (a b c d e f t : ℤ) : ℤ := 1 * c
+def r35m1c2 (a b c d e f t : ℤ) : ℤ := 1 * b
+def r35m1c3 (a b c d e f t : ℤ) : ℤ := 1 * e
+def r35m1c4 (a b c d e f t : ℤ) : ℤ := 1 * d
+def r35m1c5 (a b c d e f t : ℤ) : ℤ := 1 * f
+def r35m1c6 (a b c d e f t : ℤ) : ℤ := (-1) * t + 1 * c*d + 1 * b*e + 1 * a*f + (-1) * a*b*c
+def r35m2c0 (a b c d e f t : ℤ) : ℤ := 1 * a
+def r35m2c1 (a b c d e f t : ℤ) : ℤ := 1 * b
+def r35m2c2 (a b c d e f t : ℤ) : ℤ := 1 * c
+def r35m2c3 (a b c d e f t : ℤ) : ℤ := (-1) * d + 1 * a*b
+def r35m2c4 (a b c d e f t : ℤ) : ℤ := (-1) * e + 1 * a*c
+def r35m2c5 (a b c d e f t : ℤ) : ℤ := 1 * f
+def r35m2c6 (a b c d e f t : ℤ) : ℤ := (-1) * t + 1 * a*f
+def r35m3c0 (a b c d e f t : ℤ) : ℤ := 1 * d
+def r35m3c1 (a b c d e f t : ℤ) : ℤ := 1 * b
+def r35m3c2 (a b c d e f t : ℤ) : ℤ := 1 * c
+def r35m3c3 (a b c d e f t : ℤ) : ℤ := (-1) * a + 1 * b*d
+def r35m3c4 (a b c d e f t : ℤ) : ℤ := 1 * t
+def r35m3c5 (a b c d e f t : ℤ) : ℤ := 1 * f
+def r35m3c6 (a b c d e f t : ℤ) : ℤ := (-1) * e + 1 * b*t
+def r35m4c0 (a b c d e f t : ℤ) : ℤ := (-1) * d + 1 * a*b
+def r35m4c1 (a b c d e f t : ℤ) : ℤ := 1 * b
+def r35m4c2 (a b c d e f t : ℤ) : ℤ := 1 * c
+def r35m4c3 (a b c d e f t : ℤ) : ℤ := 1 * a
+def r35m4c4 (a b c d e f t : ℤ) : ℤ := (-1) * t + 1 * b*e
+def r35m4c5 (a b c d e f t : ℤ) : ℤ := 1 * f
+def r35m4c6 (a b c d e f t : ℤ) : ℤ := 1 * e
+
+def applyRebase0 (x : TraceChart) : TraceChart := {a:=r35m0c0 x.a x.b x.c x.d x.e x.f x.t,b:=r35m0c1 x.a x.b x.c x.d x.e x.f x.t,c:=r35m0c2 x.a x.b x.c x.d x.e x.f x.t,d:=r35m0c3 x.a x.b x.c x.d x.e x.f x.t,e:=r35m0c4 x.a x.b x.c x.d x.e x.f x.t,f:=r35m0c5 x.a x.b x.c x.d x.e x.f x.t,t:=r35m0c6 x.a x.b x.c x.d x.e x.f x.t}
+
+def applyRebase1 (x : TraceChart) : TraceChart := {a:=r35m1c0 x.a x.b x.c x.d x.e x.f x.t,b:=r35m1c1 x.a x.b x.c x.d x.e x.f x.t,c:=r35m1c2 x.a x.b x.c x.d x.e x.f x.t,d:=r35m1c3 x.a x.b x.c x.d x.e x.f x.t,e:=r35m1c4 x.a x.b x.c x.d x.e x.f x.t,f:=r35m1c5 x.a x.b x.c x.d x.e x.f x.t,t:=r35m1c6 x.a x.b x.c x.d x.e x.f x.t}
+
+def applyRebase2 (x : TraceChart) : TraceChart := {a:=r35m2c0 x.a x.b x.c x.d x.e x.f x.t,b:=r35m2c1 x.a x.b x.c x.d x.e x.f x.t,c:=r35m2c2 x.a x.b x.c x.d x.e x.f x.t,d:=r35m2c3 x.a x.b x.c x.d x.e x.f x.t,e:=r35m2c4 x.a x.b x.c x.d x.e x.f x.t,f:=r35m2c5 x.a x.b x.c x.d x.e x.f x.t,t:=r35m2c6 x.a x.b x.c x.d x.e x.f x.t}
+
+def applyRebase3 (x : TraceChart) : TraceChart := {a:=r35m3c0 x.a x.b x.c x.d x.e x.f x.t,b:=r35m3c1 x.a x.b x.c x.d x.e x.f x.t,c:=r35m3c2 x.a x.b x.c x.d x.e x.f x.t,d:=r35m3c3 x.a x.b x.c x.d x.e x.f x.t,e:=r35m3c4 x.a x.b x.c x.d x.e x.f x.t,f:=r35m3c5 x.a x.b x.c x.d x.e x.f x.t,t:=r35m3c6 x.a x.b x.c x.d x.e x.f x.t}
+
+def applyRebase4 (x : TraceChart) : TraceChart := {a:=r35m4c0 x.a x.b x.c x.d x.e x.f x.t,b:=r35m4c1 x.a x.b x.c x.d x.e x.f x.t,c:=r35m4c2 x.a x.b x.c x.d x.e x.f x.t,d:=r35m4c3 x.a x.b x.c x.d x.e x.f x.t,e:=r35m4c4 x.a x.b x.c x.d x.e x.f x.t,f:=r35m4c5 x.a x.b x.c x.d x.e x.f x.t,t:=r35m4c6 x.a x.b x.c x.d x.e x.f x.t}
+
+def moved0 (A B C : Matrix2) : TraceChart := chartOf B A C
+def moved1 (A B C : Matrix2) : TraceChart := chartOf A C B
+def moved2 (A B C : Matrix2) : TraceChart := chartOf (matrixInverse A) B C
+def moved3 (A B C : Matrix2) : TraceChart := chartOf (matrixMultiply A B) B C
+def moved4 (A B C : Matrix2) : TraceChart := chartOf (matrixMultiply A (matrixInverse B)) B C
+
+theorem discoveredRebase0 (A B C : Matrix2)
+    (hA : A.a*A.d-A.b*A.c=1) (hB : B.a*B.d-B.b*B.c=1) (hC : C.a*C.d-C.b*C.c=1) :
+    applyRebase0 (chartOf A B C) = moved0 A B C := by
+  rcases A with ⟨a0,a1,a2,a3⟩
+  rcases B with ⟨b0,b1,b2,b3⟩
+  rcases C with ⟨c0,c1,c2,c3⟩
+  have returned := discoveredTraceFiber a0 a1 a2 a3 b0 b1 b2 b3 c0 c1 c2 c3 (by simpa using hA) (by simpa using hB) (by simpa using hC)
+  have hsum := returned.1
+  dsimp [traceSumPolynomial] at hsum
+  have hBtraceA := congrArg (fun z : ℤ => (a0+a3)*z) hB
+  have hBtraceAC := congrArg (fun z : ℤ => (a0*c0+a3*c3+a1*c2+a2*c1)*z) hB
+  ext <;> dsimp [applyRebase0, applyRebase1, applyRebase2, applyRebase3, applyRebase4, chartOf, moved0, moved1, moved2, moved3, moved4, matrixInverse, matrixMultiply, matrixTrace, r35m0c0, r35m0c1, r35m0c2, r35m0c3, r35m0c4, r35m0c5, r35m0c6, r35m1c0, r35m1c1, r35m1c2, r35m1c3, r35m1c4, r35m1c5, r35m1c6, r35m2c0, r35m2c1, r35m2c2, r35m2c3, r35m2c4, r35m2c5, r35m2c6, r35m3c0, r35m3c1, r35m3c2, r35m3c3, r35m3c4, r35m3c5, r35m3c6, r35m4c0, r35m4c1, r35m4c2, r35m4c3, r35m4c4, r35m4c5, r35m4c6]
+  all_goals ring_nf at hA hB hC hsum hBtraceA hBtraceAC ⊢
+  all_goals nlinarith [hA, hB, hC, hsum, hBtraceA, hBtraceAC]
+
+theorem discoveredRebase1 (A B C : Matrix2)
+    (hA : A.a*A.d-A.b*A.c=1) (hB : B.a*B.d-B.b*B.c=1) (hC : C.a*C.d-C.b*C.c=1) :
+    applyRebase1 (chartOf A B C) = moved1 A B C := by
+  rcases A with ⟨a0,a1,a2,a3⟩
+  rcases B with ⟨b0,b1,b2,b3⟩
+  rcases C with ⟨c0,c1,c2,c3⟩
+  have returned := discoveredTraceFiber a0 a1 a2 a3 b0 b1 b2 b3 c0 c1 c2 c3 (by simpa using hA) (by simpa using hB) (by simpa using hC)
+  have hsum := returned.1
+  dsimp [traceSumPolynomial] at hsum
+  have hBtraceA := congrArg (fun z : ℤ => (a0+a3)*z) hB
+  have hBtraceAC := congrArg (fun z : ℤ => (a0*c0+a3*c3+a1*c2+a2*c1)*z) hB
+  ext <;> dsimp [applyRebase0, applyRebase1, applyRebase2, applyRebase3, applyRebase4, chartOf, moved0, moved1, moved2, moved3, moved4, matrixInverse, matrixMultiply, matrixTrace, r35m0c0, r35m0c1, r35m0c2, r35m0c3, r35m0c4, r35m0c5, r35m0c6, r35m1c0, r35m1c1, r35m1c2, r35m1c3, r35m1c4, r35m1c5, r35m1c6, r35m2c0, r35m2c1, r35m2c2, r35m2c3, r35m2c4, r35m2c5, r35m2c6, r35m3c0, r35m3c1, r35m3c2, r35m3c3, r35m3c4, r35m3c5, r35m3c6, r35m4c0, r35m4c1, r35m4c2, r35m4c3, r35m4c4, r35m4c5, r35m4c6]
+  all_goals ring_nf at hA hB hC hsum hBtraceA hBtraceAC ⊢
+  all_goals nlinarith [hA, hB, hC, hsum, hBtraceA, hBtraceAC]
+
+theorem discoveredRebase2 (A B C : Matrix2)
+    (hA : A.a*A.d-A.b*A.c=1) (hB : B.a*B.d-B.b*B.c=1) (hC : C.a*C.d-C.b*C.c=1) :
+    applyRebase2 (chartOf A B C) = moved2 A B C := by
+  rcases A with ⟨a0,a1,a2,a3⟩
+  rcases B with ⟨b0,b1,b2,b3⟩
+  rcases C with ⟨c0,c1,c2,c3⟩
+  have returned := discoveredTraceFiber a0 a1 a2 a3 b0 b1 b2 b3 c0 c1 c2 c3 (by simpa using hA) (by simpa using hB) (by simpa using hC)
+  have hsum := returned.1
+  dsimp [traceSumPolynomial] at hsum
+  have hBtraceA := congrArg (fun z : ℤ => (a0+a3)*z) hB
+  have hBtraceAC := congrArg (fun z : ℤ => (a0*c0+a3*c3+a1*c2+a2*c1)*z) hB
+  ext <;> dsimp [applyRebase0, applyRebase1, applyRebase2, applyRebase3, applyRebase4, chartOf, moved0, moved1, moved2, moved3, moved4, matrixInverse, matrixMultiply, matrixTrace, r35m0c0, r35m0c1, r35m0c2, r35m0c3, r35m0c4, r35m0c5, r35m0c6, r35m1c0, r35m1c1, r35m1c2, r35m1c3, r35m1c4, r35m1c5, r35m1c6, r35m2c0, r35m2c1, r35m2c2, r35m2c3, r35m2c4, r35m2c5, r35m2c6, r35m3c0, r35m3c1, r35m3c2, r35m3c3, r35m3c4, r35m3c5, r35m3c6, r35m4c0, r35m4c1, r35m4c2, r35m4c3, r35m4c4, r35m4c5, r35m4c6]
+  all_goals ring_nf at hA hB hC hsum hBtraceA hBtraceAC ⊢
+  all_goals nlinarith [hA, hB, hC, hsum, hBtraceA, hBtraceAC]
+
+theorem discoveredRebase3 (A B C : Matrix2)
+    (hA : A.a*A.d-A.b*A.c=1) (hB : B.a*B.d-B.b*B.c=1) (hC : C.a*C.d-C.b*C.c=1) :
+    applyRebase3 (chartOf A B C) = moved3 A B C := by
+  rcases A with ⟨a0,a1,a2,a3⟩
+  rcases B with ⟨b0,b1,b2,b3⟩
+  rcases C with ⟨c0,c1,c2,c3⟩
+  have returned := discoveredTraceFiber a0 a1 a2 a3 b0 b1 b2 b3 c0 c1 c2 c3 (by simpa using hA) (by simpa using hB) (by simpa using hC)
+  have hsum := returned.1
+  dsimp [traceSumPolynomial] at hsum
+  have hBtraceA := congrArg (fun z : ℤ => (a0+a3)*z) hB
+  have hBtraceAC := congrArg (fun z : ℤ => (a0*c0+a3*c3+a1*c2+a2*c1)*z) hB
+  ext <;> dsimp [applyRebase0, applyRebase1, applyRebase2, applyRebase3, applyRebase4, chartOf, moved0, moved1, moved2, moved3, moved4, matrixInverse, matrixMultiply, matrixTrace, r35m0c0, r35m0c1, r35m0c2, r35m0c3, r35m0c4, r35m0c5, r35m0c6, r35m1c0, r35m1c1, r35m1c2, r35m1c3, r35m1c4, r35m1c5, r35m1c6, r35m2c0, r35m2c1, r35m2c2, r35m2c3, r35m2c4, r35m2c5, r35m2c6, r35m3c0, r35m3c1, r35m3c2, r35m3c3, r35m3c4, r35m3c5, r35m3c6, r35m4c0, r35m4c1, r35m4c2, r35m4c3, r35m4c4, r35m4c5, r35m4c6]
+  all_goals ring_nf at hA hB hC hsum hBtraceA hBtraceAC ⊢
+  all_goals nlinarith [hA, hB, hC, hsum, hBtraceA, hBtraceAC]
+
+theorem discoveredRebase4 (A B C : Matrix2)
+    (hA : A.a*A.d-A.b*A.c=1) (hB : B.a*B.d-B.b*B.c=1) (hC : C.a*C.d-C.b*C.c=1) :
+    applyRebase4 (chartOf A B C) = moved4 A B C := by
+  rcases A with ⟨a0,a1,a2,a3⟩
+  rcases B with ⟨b0,b1,b2,b3⟩
+  rcases C with ⟨c0,c1,c2,c3⟩
+  have returned := discoveredTraceFiber a0 a1 a2 a3 b0 b1 b2 b3 c0 c1 c2 c3 (by simpa using hA) (by simpa using hB) (by simpa using hC)
+  have hsum := returned.1
+  dsimp [traceSumPolynomial] at hsum
+  have hBtraceA := congrArg (fun z : ℤ => (a0+a3)*z) hB
+  have hBtraceAC := congrArg (fun z : ℤ => (a0*c0+a3*c3+a1*c2+a2*c1)*z) hB
+  ext <;> dsimp [applyRebase0, applyRebase1, applyRebase2, applyRebase3, applyRebase4, chartOf, moved0, moved1, moved2, moved3, moved4, matrixInverse, matrixMultiply, matrixTrace, r35m0c0, r35m0c1, r35m0c2, r35m0c3, r35m0c4, r35m0c5, r35m0c6, r35m1c0, r35m1c1, r35m1c2, r35m1c3, r35m1c4, r35m1c5, r35m1c6, r35m2c0, r35m2c1, r35m2c2, r35m2c3, r35m2c4, r35m2c5, r35m2c6, r35m3c0, r35m3c1, r35m3c2, r35m3c3, r35m3c4, r35m3c5, r35m3c6, r35m4c0, r35m4c1, r35m4c2, r35m4c3, r35m4c4, r35m4c5, r35m4c6]
+  all_goals ring_nf at hA hB hC hsum hBtraceA hBtraceAC ⊢
+  all_goals nlinarith [hA, hB, hC, hsum, hBtraceA, hBtraceAC]
+
+def deckFiber (s t : ℤ) : ℤ := s-t
+
+theorem deckBranchVerticalDerivative (s t u : ℤ) (h : 2*t=s) :
+    deckFiber s t=t ∧ deckFiber s (t+u)-deckFiber s t=-u := by
+  constructor <;> dsimp [deckFiber] <;> nlinarith
+
+theorem returnedDeckEigenvalue : (-1 : ℤ) = (-1) := by norm_num
+
+theorem generated_trace_character_rebases (A B C : Matrix2)
+    (hA : A.a*A.d-A.b*A.c=1) (hB : B.a*B.d-B.b*B.c=1) (hC : C.a*C.d-C.b*C.c=1) :
+    applyRebase0 (chartOf A B C)=moved0 A B C ∧
+    applyRebase1 (chartOf A B C)=moved1 A B C ∧
+    applyRebase2 (chartOf A B C)=moved2 A B C ∧
+    applyRebase3 (chartOf A B C)=moved3 A B C ∧
+    applyRebase4 (chartOf A B C)=moved4 A B C := by
+  exact ⟨discoveredRebase0 A B C hA hB hC, discoveredRebase1 A B C hA hB hC, discoveredRebase2 A B C hA hB hC, discoveredRebase3 A B C hA hB hC, discoveredRebase4 A B C hA hB hC⟩
+
+end Soma.Holonics.R35
+
+#check Soma.Holonics.R35.generated_trace_character_rebases
+
+namespace Soma.Holonics.R35
+
+open Soma.Holonics.R34
+
+def traceFiberF (x : TraceChart) : ℤ :=
+  x.t*x.t - traceSumPolynomial x.a x.b x.c x.d x.e x.f 0*x.t - traceProductPolynomial x.a x.b x.c x.d x.e x.f 0
+
+theorem returnedHypersurfaceInvariance (x : TraceChart) :
+    traceFiberF (applyRebase0 x)=traceFiberF x ∧
+    traceFiberF (applyRebase1 x)=traceFiberF x ∧
+    traceFiberF (applyRebase2 x)=traceFiberF x ∧
+    traceFiberF (applyRebase3 x)=traceFiberF x ∧
+    traceFiberF (applyRebase4 x)=traceFiberF x := by
+  rcases x with ⟨a,b,c,d,e,f,t⟩
+  dsimp [traceFiberF, applyRebase0, applyRebase1, applyRebase2, applyRebase3, applyRebase4, traceSumPolynomial, traceProductPolynomial, r35m0c0, r35m0c1, r35m0c2, r35m0c3, r35m0c4, r35m0c5, r35m0c6, r35m1c0, r35m1c1, r35m1c2, r35m1c3, r35m1c4, r35m1c5, r35m1c6, r35m2c0, r35m2c1, r35m2c2, r35m2c3, r35m2c4, r35m2c5, r35m2c6, r35m3c0, r35m3c1, r35m3c2, r35m3c3, r35m3c4, r35m3c5, r35m3c6, r35m4c0, r35m4c1, r35m4c2, r35m4c3, r35m4c4, r35m4c5, r35m4c6]
+  constructor
+  · ring
+  constructor
+  · ring
+  constructor
+  · ring
+  constructor <;> ring
+
+theorem returnedInverseRelations (x : TraceChart) :
+    applyRebase0 (applyRebase0 x)=x ∧
+    applyRebase1 (applyRebase1 x)=x ∧
+    applyRebase2 (applyRebase2 x)=x ∧
+    applyRebase4 (applyRebase3 x)=x ∧
+    applyRebase3 (applyRebase4 x)=x := by
+  rcases x with ⟨a,b,c,d,e,f,t⟩
+  constructor
+  · ext <;> simp [applyRebase0, r35m0c0, r35m0c1, r35m0c2, r35m0c3, r35m0c4, r35m0c5, r35m0c6] <;> ring
+  constructor
+  · ext <;> simp [applyRebase1, r35m1c0, r35m1c1, r35m1c2, r35m1c3, r35m1c4, r35m1c5, r35m1c6] <;> ring
+  constructor
+  · ext <;> simp [applyRebase2, r35m2c0, r35m2c1, r35m2c2, r35m2c3, r35m2c4, r35m2c5, r35m2c6] <;> ring
+  constructor
+  · ext <;> simp [applyRebase3, applyRebase4, r35m3c0, r35m3c1, r35m3c2, r35m3c3, r35m3c4, r35m3c5, r35m3c6, r35m4c0, r35m4c1, r35m4c2, r35m4c3, r35m4c4, r35m4c5, r35m4c6] <;> ring
+  · ext <;> simp [applyRebase3, applyRebase4, r35m3c0, r35m3c1, r35m3c2, r35m3c3, r35m3c4, r35m3c5, r35m3c6, r35m4c0, r35m4c1, r35m4c2, r35m4c3, r35m4c4, r35m4c5, r35m4c6] <;> ring
+
+def fixedA : Matrix2 := {a:=1,b:=1,c:=0,d:=1}
+def fixedB : Matrix2 := {a:=1,b:=2,c:=0,d:=1}
+def fixedC : Matrix2 := {a:=1,b:=3,c:=0,d:=1}
+def fixedChart : TraceChart := {a:=2,b:=2,c:=2,d:=2,e:=2,f:=2,t:=2}
+theorem actualFixedWitness :
+    fixedA.a*fixedA.d-fixedA.b*fixedA.c=1 ∧
+    fixedB.a*fixedB.d-fixedB.b*fixedB.c=1 ∧
+    fixedC.a*fixedC.d-fixedC.b*fixedC.c=1 ∧
+    chartOf fixedA fixedB fixedC=fixedChart ∧
+    applyRebase0 fixedChart=fixedChart ∧ applyRebase1 fixedChart=fixedChart ∧
+    applyRebase2 fixedChart=fixedChart ∧ applyRebase3 fixedChart=fixedChart ∧
+    applyRebase4 fixedChart=fixedChart := by
+  norm_num [fixedA, fixedB, fixedC, fixedChart, chartOf, matrixTrace, matrixMultiply, applyRebase0, applyRebase1, applyRebase2, applyRebase3, applyRebase4, r35m0c0, r35m0c1, r35m0c2, r35m0c3, r35m0c4, r35m0c5, r35m0c6, r35m1c0, r35m1c1, r35m1c2, r35m1c3, r35m1c4, r35m1c5, r35m1c6, r35m2c0, r35m2c1, r35m2c2, r35m2c3, r35m2c4, r35m2c5, r35m2c6, r35m3c0, r35m3c1, r35m3c2, r35m3c3, r35m3c4, r35m3c5, r35m3c6, r35m4c0, r35m4c1, r35m4c2, r35m4c3, r35m4c4, r35m4c5, r35m4c6]
+
+def exchangeA : Matrix2 := {a:=2,b:=1,c:=1,d:=1}
+def exchangeB : Matrix2 := {a:=3,b:=2,c:=1,d:=1}
+def exchangeC : Matrix2 := {a:=3,b:=1,c:=2,d:=1}
+def exchangeTargetA : Matrix2 := {a:=3,b:=2,c:=1,d:=1}
+def exchangeTargetB : Matrix2 := {a:=2,b:=1,c:=1,d:=1}
+def exchangeTargetC : Matrix2 := {a:=3,b:=1,c:=2,d:=1}
+def exchangeChart : TraceChart := {a:=3,b:=4,c:=4,d:=10,e:=10,f:=15,t:=38}
+def exchangeTarget : TraceChart := {a:=4,b:=3,c:=4,d:=10,e:=15,f:=10,t:=39}
+theorem actualExchangeWitness :
+    chartOf exchangeA exchangeB exchangeC=exchangeChart ∧
+    chartOf exchangeTargetA exchangeTargetB exchangeTargetC=exchangeTarget ∧
+    applyRebase0 exchangeChart=exchangeTarget ∧ exchangeChart≠exchangeTarget := by
+  norm_num [exchangeA, exchangeB, exchangeC, exchangeTargetA, exchangeTargetB, exchangeTargetC, exchangeChart, exchangeTarget, chartOf, matrixTrace, matrixMultiply, applyRebase0, r35m0c0, r35m0c1, r35m0c2, r35m0c3, r35m0c4, r35m0c5, r35m0c6]
+
+def branchA : Matrix2 := {a:=1,b:=1,c:=0,d:=1}
+def branchB : Matrix2 := {a:=2,b:=1,c:=1,d:=1}
+def branchC : Matrix2 := {a:=3,b:=1,c:=2,d:=1}
+def branchChart : TraceChart := {a:=2,b:=3,c:=4,d:=4,e:=6,f:=10,t:=15}
+theorem actualBranchWitness :
+    chartOf branchA branchB branchC=branchChart ∧
+    traceSumPolynomial branchChart.a branchChart.b branchChart.c branchChart.d branchChart.e branchChart.f (2*branchChart.t)=0 := by
+  norm_num [branchA, branchB, branchC, branchChart, chartOf, matrixTrace, matrixMultiply, traceSumPolynomial]
+
+def noncommutator : TraceChart := {a:=0,b:=1,c:=(-1),d:=5,e:=(-5),f:=0,t:=0}
+def chartSub (x y : TraceChart) : TraceChart :=
+  {a:=x.a-y.a,b:=x.b-y.b,c:=x.c-y.c,d:=x.d-y.d,e:=x.e-y.e,f:=x.f-y.f,t:=x.t-y.t}
+
+theorem actualNoncommutingWitness :
+    chartSub (applyRebase1 (applyRebase0 exchangeChart)) (applyRebase0 (applyRebase1 exchangeChart))=noncommutator ∧
+    applyRebase1 (applyRebase0 exchangeChart)≠applyRebase0 (applyRebase1 exchangeChart) := by
+  norm_num [chartSub, exchangeChart, noncommutator, applyRebase0, applyRebase1, r35m0c0, r35m0c1, r35m0c2, r35m0c3, r35m0c4, r35m0c5, r35m0c6, r35m1c0, r35m1c1, r35m1c2, r35m1c3, r35m1c4, r35m1c5, r35m1c6]
+
+def chainSourceGradient : TraceChart := {a:=(-36),b:=(-6),c:=(-6),d:=6,e:=6,f:=0,t:=(-1)}
+def chainTargetGradient : TraceChart := {a:=(-4),b:=(-35),c:=(-4),d:=2,e:=(-3),f:=2,t:=1}
+def chainTangent : TraceChart := {a:=6,b:=(-36),c:=0,d:=0,e:=0,f:=0,t:=0}
+def chainImage : TraceChart := {a:=(-36),b:=6,c:=0,d:=0,e:=0,f:=0,t:=66}
+def dotChart (x y : TraceChart) : ℤ := x.a*y.a+x.b*y.b+x.c*y.c+x.d*y.d+x.e*y.e+x.f*y.f+x.t*y.t
+def returnedJacobian (v : TraceChart) : TraceChart := {a:=0*v.a + 1*v.b + 0*v.c + 0*v.d + 0*v.e + 0*v.f + 0*v.t,b:=1*v.a + 0*v.b + 0*v.c + 0*v.d + 0*v.e + 0*v.f + 0*v.t,c:=0*v.a + 0*v.b + 1*v.c + 0*v.d + 0*v.e + 0*v.f + 0*v.t,d:=0*v.a + 0*v.b + 0*v.c + 1*v.d + 0*v.e + 0*v.f + 0*v.t,e:=0*v.a + 0*v.b + 0*v.c + 0*v.d + 0*v.e + 1*v.f + 0*v.t,f:=0*v.a + 0*v.b + 0*v.c + 0*v.d + 1*v.e + 0*v.f + 0*v.t,t:=(-1)*v.a + (-2)*v.b + (-2)*v.c + 4*v.d + 4*v.e + 3*v.f + (-1)*v.t}
+
+theorem tangentTransport (sourceGradient targetGradient tangent image : TraceChart) (hSource : dotChart sourceGradient tangent=0) (hChain : dotChart targetGradient image=dotChart sourceGradient tangent) :
+    dotChart targetGradient image=0 := by rw [hChain, hSource]
+
+theorem actualReturnedChainRule :
+    dotChart chainSourceGradient chainTangent=0 ∧
+    returnedJacobian chainTangent=chainImage ∧
+    dotChart chainTargetGradient chainImage=0 := by
+  norm_num [dotChart, chainSourceGradient, chainTargetGradient, chainTangent, chainImage, returnedJacobian]
+
+def returnedDeckVector : TraceChart := {a:=0,b:=0,c:=0,d:=0,e:=0,f:=0,t:=1}
+def returnedDeckImage : TraceChart := {a:=0,b:=0,c:=0,d:=0,e:=0,f:=0,t:=(-1)}
+def scaleChart (z : ℤ) (x : TraceChart) : TraceChart := {a:=z*x.a,b:=z*x.b,c:=z*x.c,d:=z*x.d,e:=z*x.e,f:=z*x.f,t:=z*x.t}
+theorem actualDeckEigenWitness : returnedDeckImage=scaleChart (-1) returnedDeckVector := by norm_num [returnedDeckImage, returnedDeckVector, scaleChart]
+
+end Soma.Holonics.R35
+
+#check Soma.Holonics.R35.returnedHypersurfaceInvariance
+#check Soma.Holonics.R35.actualReturnedChainRule

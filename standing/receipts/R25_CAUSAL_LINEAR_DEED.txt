@@ -1,0 +1,94 @@
+truth_status=established-bounded
+evidence=implemented-exact,computational-witness
+formal_truth_status=proved-derived
+formal_evidence=formal-checked
+hodge_conjecture_status=outside-aperture
+riemann_hypothesis_status=outside-aperture
+program=r25_causal_linear_chain_calculus.sm_89
+device_compute_capability=8.9
+kernel_launches=14
+launched_threads=14
+semantic_threads=8
+bytes_to_device=9992
+bytes_from_device=488640
+resident_bytes=501280
+host_semantic_events=0
+verification_failures=0
+executor_state=0
+probe_state=0
+predecessor_remount=body:1,same_body:1,theory:1,source_replayed:0,theory_id:191300
+formation_state=0,checker_stage:0,formal_bytes:1536
+inquiry_state=all_exact:1,theory_formed:1,source_mask:15,obstruction:0,phase_exact:1,phase_d1:1,phase_d2:1,phase_char:1,cm_exact:1,cm_incidence:1,cm_char:1,cm_agrees:1,cm_factor:1,toric_exact:1,variation_exact:1
+source_cards=all_loaded:1,r25_bytes:23,fold:7252960809158082584,path_fold:6626239801163906009
+source_aperture=phase_product:2x3,cm_periodic:16x40,toric_fans:3+4,variation:pencil+form+loops,expected_invariants:absent
+predecessor=rest_bytes:760,head:14001022
+phase=cells:6,12,6,ranks:5,5,betti:1,2,1,tours:1x6,boundary_squared_zero:1
+cm=incidence_rank:15,homology:1,25,characteristic:1,0,-40,0,540,-384,-3480,5760,8070,-29440,17640,37120,-82020,74880,-37800,10368,-1215,factors:-3^5;1^10;5^1
+toric=free_cokernel:1,2,2,smith:1,1;1,1;1,1,exceptional_square:-1
+variation=pencil:0+1t,-1+0t;0+1t,0+-1t,determinant:0,1,-1,ranks:1,1,2,form:0,1;-1,0
+controls=equal_characteristic_unequal_fixed:1,fixed:2,1,unequal_kernel_placement:1,rational_rotation_eigenvalue_absent:1,rational_discriminant:-4,gaussian_eigenpair:1
+probe=returned:1,phase:8,16,8,ranks:7,7,tours:2x4,all_exact:1,source_mask:15,phase_exact:1,cm_exact:1
+checker=exit:0,stdout_bytes:1801,stderr_bytes:0,produced_bytes:592072
+final_body=head:14001024,continuation:15001024,admitted_tally:472,mathematical:146,codec:76,causal_linear:29,rest_bytes:816,integrity:5822556087819558638
+physical_telemetry=engine_time:unknown,checker_time:unknown,temperature:unknown,power:unknown,energy:unknown
+formal_begin
+import Mathlib.Tactic.NormNum
+import Mathlib.Tactic.Ring
+import Mathlib.Tactic.Linarith
+
+namespace Soma.Holonics.R25
+
+theorem generated_causal_linear_calculus :
+  (5 + 1 = 6 ∧ 5 + 1 = 6 ∧ 2 = 2 ∧ 15 + 1 = 16 ∧ 25 = 25 ∧ (1 : ℤ) = 1 ∧ (1 : ℤ) = 1 ∧ 2 ≠ 1) ∧
+  (∀ x : ℤ, (((x - (-3))^5 * (x - (1))^10 * (x - (5))^1) = (1*x^16 + 0*x^15 + -40*x^14 + 0*x^13 + 540*x^12 + -384*x^11 + -3480*x^10 + 5760*x^9 + 8070*x^8 + -29440*x^7 + 17640*x^6 + 37120*x^5 + -82020*x^4 + 74880*x^3 + -37800*x^2 + 10368*x^1 + -1215*x^0))) ∧
+  (∀ t : ℤ, ((0 + 1*t) * (0 + -1*t) - ((-1 + 0*t) * (0 + 1*t)) = (0 + 1*t + -1*t^2))) ∧
+  (∀ q : ℚ, q^2 + 1 ≠ 0) ∧
+  (((1*0*1 + 1*1*0 + 0*-1*1 + 0*0*0 : ℤ) = 0) ∧ ((1*0*2 + 1*1*1 + 0*-1*2 + 0*0*1 : ℤ) = 1) ∧ ((2*0*1 + 2*1*0 + 1*-1*1 + 1*0*0 : ℤ) = -1) ∧ ((2*0*2 + 2*1*1 + 1*-1*2 + 1*0*1 : ℤ) = 0) ∧ ((1*0*1 + 1*1*-2 + -2*-1*1 + -2*0*-2 : ℤ) = 0) ∧ ((1*0*0 + 1*1*1 + -2*-1*0 + -2*0*1 : ℤ) = 1) ∧ ((0*0*1 + 0*1*-2 + 1*-1*1 + 1*0*-2 : ℤ) = -1) ∧ ((0*0*0 + 0*1*1 + 1*-1*0 + 1*0*1 : ℤ) = 0) ∧ ((1*0*1 + 1*1*2 + 2*-1*1 + 2*0*2 : ℤ) = 0) ∧ ((1*0*-2 + 1*1*-3 + 2*-1*-2 + 2*0*-3 : ℤ) = 1) ∧ ((-2*0*1 + -2*1*2 + -3*-1*1 + -3*0*2 : ℤ) = -1) ∧ ((-2*0*-2 + -2*1*-3 + -3*-1*-2 + -3*0*-3 : ℤ) = 0))
+ := by
+  constructor
+  · norm_num
+  constructor
+  · intro x; ring
+  constructor
+  · intro t; ring
+  constructor
+  · intro q; nlinarith [sq_nonneg q]
+  · norm_num
+
+end Soma.Holonics.R25
+
+#check Soma.Holonics.R25.generated_causal_linear_calculus
+formal_end
+conversation_begin
+Four source geometries cross one exact calculus rather than four presentation-specific summaries. The cyclic product returns its complete cellular boundary and homology; the cyclotomic incidence crystal returns graph boundary, cycle space, and the same adjacency characteristic through an independent common carrier; the fan character maps return their determinantal divisors and the star subdivision returns a new free direction with an exceptional negative face; and the varying cubic returns its rank-jump pencil, alternating adjoints, exterior determinant, and tensor transport. Equal characteristic polynomials remain compatible with unequal fixed fibers, equal ranks retain differently placed kernels, and conjugate presentations retain their lineage. The rotation control refuses a rational eigenvalue but returns an exact eigenpair after the Gaussian coefficient extension. Thus characteristic placement is useful only beside its module, coefficient field, source incidence, and transported form. This bounded result is an instrument for later intrinsic hypergeometry; it is not a universal tensor calculus, Hodge realization, or RH evidence.conversation_end
+checker_stdout_begin
+Soma.Holonics.R25.generated_causal_linear_calculus :
+  (5 + 1 = 6 ∧ 5 + 1 = 6 ∧ 2 = 2 ∧ 15 + 1 = 16 ∧ 25 = 25 ∧ 1 = 1 ∧ 1 = 1 ∧ 2 ≠ 1) ∧
+    (∀ (x : ℤ),
+        (x - -3) ^ 5 * (x - 1) ^ 10 * (x - 5) ^ 1 =
+          1 * x ^ 16 + 0 * x ^ 15 + -40 * x ^ 14 + 0 * x ^ 13 + 540 * x ^ 12 + -384 * x ^ 11 + -3480 * x ^ 10 +
+                              5760 * x ^ 9 +
+                            8070 * x ^ 8 +
+                          -29440 * x ^ 7 +
+                        17640 * x ^ 6 +
+                      37120 * x ^ 5 +
+                    -82020 * x ^ 4 +
+                  74880 * x ^ 3 +
+                -37800 * x ^ 2 +
+              10368 * x ^ 1 +
+            -1215 * x ^ 0) ∧
+      (∀ (t : ℤ), (0 + 1 * t) * (0 + -1 * t) - (-1 + 0 * t) * (0 + 1 * t) = 0 + 1 * t + -1 * t ^ 2) ∧
+        (∀ (q : ℚ), q ^ 2 + 1 ≠ 0) ∧
+          1 * 0 * 1 + 1 * 1 * 0 + 0 * -1 * 1 + 0 * 0 * 0 = 0 ∧
+            1 * 0 * 2 + 1 * 1 * 1 + 0 * -1 * 2 + 0 * 0 * 1 = 1 ∧
+              2 * 0 * 1 + 2 * 1 * 0 + 1 * -1 * 1 + 1 * 0 * 0 = -1 ∧
+                2 * 0 * 2 + 2 * 1 * 1 + 1 * -1 * 2 + 1 * 0 * 1 = 0 ∧
+                  1 * 0 * 1 + 1 * 1 * -2 + -2 * -1 * 1 + -2 * 0 * -2 = 0 ∧
+                    1 * 0 * 0 + 1 * 1 * 1 + -2 * -1 * 0 + -2 * 0 * 1 = 1 ∧
+                      0 * 0 * 1 + 0 * 1 * -2 + 1 * -1 * 1 + 1 * 0 * -2 = -1 ∧
+                        0 * 0 * 0 + 0 * 1 * 1 + 1 * -1 * 0 + 1 * 0 * 1 = 0 ∧
+                          1 * 0 * 1 + 1 * 1 * 2 + 2 * -1 * 1 + 2 * 0 * 2 = 0 ∧
+                            1 * 0 * -2 + 1 * 1 * -3 + 2 * -1 * -2 + 2 * 0 * -3 = 1 ∧
+                              -2 * 0 * 1 + -2 * 1 * 2 + -3 * -1 * 1 + -3 * 0 * 2 = -1 ∧
+                                -2 * 0 * -2 + -2 * 1 * -3 + -3 * -1 * -2 + -3 * 0 * -3 = 0
+checker_stdout_end

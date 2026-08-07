@@ -1,0 +1,149 @@
+truth_status=established-bounded
+evidence=implemented-exact,computational-witness
+variation_interpretation_status=proved-standard
+formal_truth_status=proved-derived
+formal_evidence=formal-checked
+hodge_conjecture_status=outside-aperture
+riemann_hypothesis_status=outside-aperture
+program=r24_algebraic_variation_gauss_manin.sm_89
+device_compute_capability=8.9
+kernel_launches=6
+launched_threads=6
+semantic_threads=1
+bytes_to_device=9344
+bytes_from_device=63272
+resident_bytes=74560
+host_semantic_events=0
+logical_read_support=78
+logical_change_support=10
+logical_alternatives=14
+logical_obstructions=6
+verification_failures=0
+source_card=bytes:83,fold:10470058078190916659,path_fold:86161891748536941
+source_aperture=degree:3,cover:2,discovery:5,holdout:2,root:-2:2,form:-2:2,series:6,expected_names:absent
+predecessor=rest_bytes:704,head:14001020
+family=roots:0+0t@191400:10556219969939644901;0+1t@191401:10556219969939644902;1+0t@191402:10556219969939644903,discriminant:0,0,1,-2,1,vandermonde:0,0,1,-2,1
+collisions=0:multiplicity=2:lineage=10556219969939644932;1:multiplicity=2:lineage=10556219969939644933
+connection=denominator:2*(0,1,-1),numerator:0+1t,-1+0t;0+1t,0+-1t,holdout:1,symbolic:1,pole_support:1
+invariant=enumerated:544,survivors:2,retained:6,selected:0,1;-1,0
+scalar=second:0,4,-4,first:4,-8,zeroth:-1,constraint_rank:5,series:1,1/4,9/64,25/256,1225/16384,3969/65536,53361/1048576
+loops=M0:1,2;0,1,M1:1,0;-2,1,Minf:1,-2;2,-3,pairing_preserved:1,ordered_product:1,noncommuting:1
+selection=candidates:4,selected:191603,no_score:1,no_expected_statement:1,holdout_closed:1,foils_closed:1
+probe=returned:1,obstruction:10,roots:1,theorem_selected:0
+checker=exit:0,stdout_bytes:3975,stderr_bytes:0,produced_bytes:580048
+final_body=head:14001022,continuation:15001022,admitted_tally:413,mathematical:130,codec:69,variation:23,rest_bytes:760,integrity:5983478507332581995
+physical_telemetry=engine_time:unknown,checker_time:unknown,temperature:unknown,power:unknown,energy:unknown
+formal_begin
+import Mathlib.Tactic.NormNum
+import Mathlib.Tactic.Ring
+import Mathlib.Tactic.Linarith
+
+namespace Soma.Holonics.R24
+
+theorem generated_algebraic_variation
+    (t x u v du dv ddu : ℚ)
+    (hs0 : t ≠ 0) (hs1 : t ≠ 1)
+    (h0 : 2*(0*t^0 + 1*t^1 + -1*t^2)*du = (0 + 1*t)*u + (-1 + 0*t)*v)
+    (h1 : 2*(0*t^0 + 1*t^1 + -1*t^2)*dv = (0 + 1*t)*u + (0 + -1*t)*v)
+    (hd : 2*(1*t^0 + -2*t^1)*du + 2*(0*t^0 + 1*t^1 + -1*t^2)*ddu = 1*u + (0 + 1*t)*du + 0*v + (-1 + 0*t)*dv) :
+  ((0*t^0 + 4*t^1 + -4*t^2)*ddu + (4*t^0 + -8*t^1)*du + -1*u = 0) ∧
+  (((-1 + -1*t)^2*(0 + 1*t)^2 - 4*(1 + 0*t)*(0 + 1*t)^3 - 4*(-1 + -1*t)^3*(0 + 0*t) - 27*(1 + 0*t)^2*(0 + 0*t)^2 + 18*(1 + 0*t)*(-1 + -1*t)*(0 + 1*t)*(0 + 0*t)) = (0*t^0 + 0*t^1 + 1*t^2 + -2*t^3 + 1*t^4)) ∧
+  ((-2*(0*t^0 + 1*t^1 + -1*t^2))*x^0*(1*(0 + 0*t)*x^0 + 1*(1 + 0*t)*x^1 + 1*(-1 + 0*t)*x^2 + 1*(0 + 0*t)*x^3) - 2*((0 + 1*t) + (-1 + 0*t)*x)*(1*(0 + 0*t)*x^0 + 1*(0 + 1*t)*x^1 + 1*(-1 + -1*t)*x^2 + 1*(1 + 0*t)*x^3) - 2*2*(1*(-1 + 0*t)*x^0 + 2*(1 + 0*t)*x^1)*(1*(0 + 0*t)*x^0 + 1*(0 + 1*t)*x^1 + 1*(-1 + -1*t)*x^2 + 1*(1 + 0*t)*x^3) + 2*(1*(0 + 0*t)*x^0 + 1*(-1 + 0*t)*x^1 + 1*(1 + 0*t)*x^2)*(1*(0 + 1*t)*x^0 + 2*(-1 + -1*t)*x^1 + 3*(1 + 0*t)*x^2) = 0) ∧
+  ((-2*(0*t^0 + 1*t^1 + -1*t^2))*x^1*(1*(0 + 0*t)*x^0 + 1*(1 + 0*t)*x^1 + 1*(-1 + 0*t)*x^2 + 1*(0 + 0*t)*x^3) - 2*((0 + 1*t) + (0 + -1*t)*x)*(1*(0 + 0*t)*x^0 + 1*(0 + 1*t)*x^1 + 1*(-1 + -1*t)*x^2 + 1*(1 + 0*t)*x^3) - 2*2*(1*(0 + -1*t)*x^0 + 2*(0 + 1*t)*x^1)*(1*(0 + 0*t)*x^0 + 1*(0 + 1*t)*x^1 + 1*(-1 + -1*t)*x^2 + 1*(1 + 0*t)*x^3) + 2*(1*(0 + 0*t)*x^0 + 1*(0 + -1*t)*x^1 + 1*(0 + 1*t)*x^2)*(1*(0 + 1*t)*x^0 + 2*(-1 + -1*t)*x^1 + 3*(1 + 0*t)*x^2) = 0) ∧
+  (((1*0 + 0*-1)*1 + (1*1 + 0*0)*0 : ℤ) = 0 ∧ ((1*0 + 0*-1)*2 + (1*1 + 0*0)*1 : ℤ) = 1 ∧ ((2*0 + 1*-1)*1 + (2*1 + 1*0)*0 : ℤ) = -1 ∧ ((2*0 + 1*-1)*2 + (2*1 + 1*0)*1 : ℤ) = 0) ∧
+  (((1*0 + -2*-1)*1 + (1*1 + -2*0)*-2 : ℤ) = 0 ∧ ((1*0 + -2*-1)*0 + (1*1 + -2*0)*1 : ℤ) = 1 ∧ ((0*0 + 1*-1)*1 + (0*1 + 1*0)*-2 : ℤ) = -1 ∧ ((0*0 + 1*-1)*0 + (0*1 + 1*0)*1 : ℤ) = 0) ∧
+  (((1*0 + 2*-1)*1 + (1*1 + 2*0)*2 : ℤ) = 0 ∧ ((1*0 + 2*-1)*-2 + (1*1 + 2*0)*-3 : ℤ) = 1 ∧ ((-2*0 + -3*-1)*1 + (-2*1 + -3*0)*2 : ℤ) = -1 ∧ ((-2*0 + -3*-1)*-2 + (-2*1 + -3*0)*-3 : ℤ) = 0) ∧
+  (((1*1 + 2*-2)*1 + (1*0 + 2*1)*2 : ℤ) = 1 ∧ ((1*1 + 2*-2)*-2 + (1*0 + 2*1)*-3 : ℤ) = 0 ∧ ((0*1 + 1*-2)*1 + (0*0 + 1*1)*2 : ℤ) = 0 ∧ ((0*1 + 1*-2)*-2 + (0*0 + 1*1)*-3 : ℤ) = 1) ∧
+  ((4 : ℚ) * (1 / 4) = 1 * (1 / 1)) ∧
+  ((16 : ℚ) * (9 / 64) = 9 * (1 / 4)) ∧
+  ((36 : ℚ) * (25 / 256) = 25 * (9 / 64)) ∧
+  ((64 : ℚ) * (1225 / 16384) = 49 * (25 / 256)) ∧
+  ((100 : ℚ) * (3969 / 65536) = 81 * (1225 / 16384)) ∧
+  ((144 : ℚ) * (53361 / 1048576) = 121 * (3969 / 65536)) := by
+  constructor
+  · have hD : 2*(0*t^0 + 1*t^1 + -1*t^2) ≠ 0 := by
+      have hs0' : t - 0 ≠ 0 := sub_ne_zero.mpr hs0
+      have hs1' : 1 - t ≠ 0 := sub_ne_zero.mpr (Ne.symm hs1)
+      have hfactor : 2*(0*t^0 + 1*t^1 + -1*t^2) = 2*(t-0)*(1-t) := by ring
+      rw [hfactor]
+      exact mul_ne_zero (mul_ne_zero (by norm_num) hs0') hs1'
+    have hr0 : 2*(0*t^0 + 1*t^1 + -1*t^2)*du-(0 + 1*t)*u-(-1 + 0*t)*v = 0 := by linarith [h0]
+    have hr1 : 2*(0*t^0 + 1*t^1 + -1*t^2)*dv-(0 + 1*t)*u-(0 + -1*t)*v = 0 := by linarith [h1]
+    have hm : 2*(0*t^0 + 1*t^1 + -1*t^2) * ((-2)*(-1 + 0*t)*dv + -1*u + 2*(0 + -1*t)*du) = 0 := by
+      calc
+        _ = (-2)*(-1 + 0*t)*(2*(0*t^0 + 1*t^1 + -1*t^2)*dv-(0 + 1*t)*u-(0 + -1*t)*v) + (-2)*(0 + 1*t)*(2*(0*t^0 + 1*t^1 + -1*t^2)*du-(0 + 1*t)*u-(-1 + 0*t)*v) := by ring
+        _ = 0 := by rw [hr0, hr1]; ring
+    have hv : (-2)*(-1 + 0*t)*dv + -1*u + 2*(0 + -1*t)*du = 0 := (mul_eq_zero.mp hm).resolve_left hD
+    nlinarith [hd, hv]
+  constructor
+  · ring
+  constructor
+  · ring
+  constructor
+  · ring
+  constructor
+  · norm_num
+  · norm_num
+
+end Soma.Holonics.R24
+
+#check Soma.Holonics.R24.generated_algebraic_variation
+formal_end
+conversation_begin
+The coefficient family first separates into three affine root currents. Their pairwise collisions return a doubled singular divisor; that multiplicity is not collapsed into its reduced pole support. Exact reductions of two differential forms then return a rank-two rational transport law. Intersecting its characteristic constraints across discovery and held-out fibers leaves an oriented alternating form, while local, Euclidean, symmetric, and degenerate alternatives retain their failed residuals. Eliminating one transported component returns a scalar differential current and, independently, its exact coefficient recurrence. The two collision occurrences act as distinct noncommuting transvections even though their spectra agree; the ordered third return closes their loop product. The proof passage is selected only after these family, reduction, connection, pairing, operator, and loop dependencies close together. Under the separately declared smooth degree-two-cover and Picard--Lefschetz hypotheses this is a bounded variation-of-Hodge witness. It is not a proof of the general Picard--Fuchs theorem, the Hodge conjecture, or any RH consequence.conversation_end
+checker_stdout_begin
+Soma.Holonics.R24.generated_algebraic_variation (t x u v du dv ddu : ℚ) (hs0 : t ≠ 0) (hs1 : t ≠ 1)
+  (h0 : 2 * (0 * t ^ 0 + 1 * t ^ 1 + -1 * t ^ 2) * du = (0 + 1 * t) * u + (-1 + 0 * t) * v)
+  (h1 : 2 * (0 * t ^ 0 + 1 * t ^ 1 + -1 * t ^ 2) * dv = (0 + 1 * t) * u + (0 + -1 * t) * v)
+  (hd :
+    2 * (1 * t ^ 0 + -2 * t ^ 1) * du + 2 * (0 * t ^ 0 + 1 * t ^ 1 + -1 * t ^ 2) * ddu =
+      1 * u + (0 + 1 * t) * du + 0 * v + (-1 + 0 * t) * dv) :
+  (0 * t ^ 0 + 4 * t ^ 1 + -4 * t ^ 2) * ddu + (4 * t ^ 0 + -8 * t ^ 1) * du + -1 * u = 0 ∧
+    (-1 + -1 * t) ^ 2 * (0 + 1 * t) ^ 2 - 4 * (1 + 0 * t) * (0 + 1 * t) ^ 3 - 4 * (-1 + -1 * t) ^ 3 * (0 + 0 * t) -
+            27 * (1 + 0 * t) ^ 2 * (0 + 0 * t) ^ 2 +
+          18 * (1 + 0 * t) * (-1 + -1 * t) * (0 + 1 * t) * (0 + 0 * t) =
+        0 * t ^ 0 + 0 * t ^ 1 + 1 * t ^ 2 + -2 * t ^ 3 + 1 * t ^ 4 ∧
+      -2 * (0 * t ^ 0 + 1 * t ^ 1 + -1 * t ^ 2) * x ^ 0 *
+                  (1 * (0 + 0 * t) * x ^ 0 + 1 * (1 + 0 * t) * x ^ 1 + 1 * (-1 + 0 * t) * x ^ 2 +
+                    1 * (0 + 0 * t) * x ^ 3) -
+                2 * (0 + 1 * t + (-1 + 0 * t) * x) *
+                  (1 * (0 + 0 * t) * x ^ 0 + 1 * (0 + 1 * t) * x ^ 1 + 1 * (-1 + -1 * t) * x ^ 2 +
+                    1 * (1 + 0 * t) * x ^ 3) -
+              2 * 2 * (1 * (-1 + 0 * t) * x ^ 0 + 2 * (1 + 0 * t) * x ^ 1) *
+                (1 * (0 + 0 * t) * x ^ 0 + 1 * (0 + 1 * t) * x ^ 1 + 1 * (-1 + -1 * t) * x ^ 2 +
+                  1 * (1 + 0 * t) * x ^ 3) +
+            2 * (1 * (0 + 0 * t) * x ^ 0 + 1 * (-1 + 0 * t) * x ^ 1 + 1 * (1 + 0 * t) * x ^ 2) *
+              (1 * (0 + 1 * t) * x ^ 0 + 2 * (-1 + -1 * t) * x ^ 1 + 3 * (1 + 0 * t) * x ^ 2) =
+          0 ∧
+        -2 * (0 * t ^ 0 + 1 * t ^ 1 + -1 * t ^ 2) * x ^ 1 *
+                    (1 * (0 + 0 * t) * x ^ 0 + 1 * (1 + 0 * t) * x ^ 1 + 1 * (-1 + 0 * t) * x ^ 2 +
+                      1 * (0 + 0 * t) * x ^ 3) -
+                  2 * (0 + 1 * t + (0 + -1 * t) * x) *
+                    (1 * (0 + 0 * t) * x ^ 0 + 1 * (0 + 1 * t) * x ^ 1 + 1 * (-1 + -1 * t) * x ^ 2 +
+                      1 * (1 + 0 * t) * x ^ 3) -
+                2 * 2 * (1 * (0 + -1 * t) * x ^ 0 + 2 * (0 + 1 * t) * x ^ 1) *
+                  (1 * (0 + 0 * t) * x ^ 0 + 1 * (0 + 1 * t) * x ^ 1 + 1 * (-1 + -1 * t) * x ^ 2 +
+                    1 * (1 + 0 * t) * x ^ 3) +
+              2 * (1 * (0 + 0 * t) * x ^ 0 + 1 * (0 + -1 * t) * x ^ 1 + 1 * (0 + 1 * t) * x ^ 2) *
+                (1 * (0 + 1 * t) * x ^ 0 + 2 * (-1 + -1 * t) * x ^ 1 + 3 * (1 + 0 * t) * x ^ 2) =
+            0 ∧
+          ((1 * 0 + 0 * -1) * 1 + (1 * 1 + 0 * 0) * 0 = 0 ∧
+              (1 * 0 + 0 * -1) * 2 + (1 * 1 + 0 * 0) * 1 = 1 ∧
+                (2 * 0 + 1 * -1) * 1 + (2 * 1 + 1 * 0) * 0 = -1 ∧ (2 * 0 + 1 * -1) * 2 + (2 * 1 + 1 * 0) * 1 = 0) ∧
+            ((1 * 0 + -2 * -1) * 1 + (1 * 1 + -2 * 0) * -2 = 0 ∧
+                (1 * 0 + -2 * -1) * 0 + (1 * 1 + -2 * 0) * 1 = 1 ∧
+                  (0 * 0 + 1 * -1) * 1 + (0 * 1 + 1 * 0) * -2 = -1 ∧ (0 * 0 + 1 * -1) * 0 + (0 * 1 + 1 * 0) * 1 = 0) ∧
+              ((1 * 0 + 2 * -1) * 1 + (1 * 1 + 2 * 0) * 2 = 0 ∧
+                  (1 * 0 + 2 * -1) * -2 + (1 * 1 + 2 * 0) * -3 = 1 ∧
+                    (-2 * 0 + -3 * -1) * 1 + (-2 * 1 + -3 * 0) * 2 = -1 ∧
+                      (-2 * 0 + -3 * -1) * -2 + (-2 * 1 + -3 * 0) * -3 = 0) ∧
+                ((1 * 1 + 2 * -2) * 1 + (1 * 0 + 2 * 1) * 2 = 1 ∧
+                    (1 * 1 + 2 * -2) * -2 + (1 * 0 + 2 * 1) * -3 = 0 ∧
+                      (0 * 1 + 1 * -2) * 1 + (0 * 0 + 1 * 1) * 2 = 0 ∧
+                        (0 * 1 + 1 * -2) * -2 + (0 * 0 + 1 * 1) * -3 = 1) ∧
+                  4 * (1 / 4) = 1 * (1 / 1) ∧
+                    16 * (9 / 64) = 9 * (1 / 4) ∧
+                      36 * (25 / 256) = 25 * (9 / 64) ∧
+                        64 * (1225 / 16384) = 49 * (25 / 256) ∧
+                          100 * (3969 / 65536) = 81 * (1225 / 16384) ∧ 144 * (53361 / 1048576) = 121 * (3969 / 65536)
+checker_stdout_end

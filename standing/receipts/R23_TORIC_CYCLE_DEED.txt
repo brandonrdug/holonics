@@ -1,0 +1,148 @@
+truth_status=established-bounded
+evidence=implemented-exact,computational-witness
+standard_toric_status=proved-standard
+formal_truth_status=proved-derived
+formal_evidence=formal-checked
+hodge_conjecture_status=outside-aperture
+riemann_hypothesis_status=outside-aperture
+program=r23_toric_cycle_class_blowup_transport.sm_89
+device_compute_capability=8.9
+kernel_launches=6
+launched_threads=6
+semantic_threads=1
+bytes_to_device=9496
+bytes_from_device=189824
+resident_bytes=201360
+host_semantic_events=0
+logical_read_support=72
+logical_change_support=9
+logical_alternatives=12
+logical_obstructions=6
+verification_failures=0
+source_card=bytes:111,fold:2895061292798085899,path_fold:13346826461104260812
+source_aperture=fans:2,rays:3,4,selected_cone:0,representatives:-4:4,expected_names:absent
+predecessor=rest_bytes:648,head:14001018
+fan_3=primitive:1,smooth:1,complete:1,smith:1,1,picard_rank:1,inertia:1,0,0,determinant:1,betti_middle:1,hodge_11:1
+fan_4=primitive:1,smooth:1,complete:1,smith:1,1,picard_rank:2,inertia:1,1,0,determinant:-1,betti_middle:2,hodge_11:2
+fan_4_form=0,1;1,0
+fan_4_congruence=2,0;0,-2,basis_determinant:-2
+fan_chow_agreement=1,1
+fan_3_polarization=primitive:1,positive:1,orthogonal_direction:0
+integral_fiber=class:2,3,kernel_rank:2,representatives:42,first_identity:190480,first_lineage:16241887753902576719
+rational_fiber=class:1/2,0,representatives:72,integral:false
+incompatible_fiber=obstructed:1
+polarization=primitive:1,1,negative:1,-1,negative_square:-2
+blowup=ray:1,1,exceptional:-1,1,exceptional_square:-1,projection_formula:1,pullback_kernel_image:0,1,pushforward_kernel_image:1,1,betti_middle:2,hodge_11:2,negative:3,-2,negative_square:-8
+foils=nonprimitive:1,nonsmooth:1,incomplete:1,false_integral:1,incompatible:1,wrong_subdivision:1,principal_not_zero_support:1,congruence_not_conjugacy:1,equal_class_not_support:1
+probe=returned:1,changed_class:2,4
+checker=exit:0,stdout_bytes:3496,stderr_bytes:0,produced_bytes:225968,source_fold:7229165193267580645,artifact_fold:6118019909618437202
+final_body=head:14001020,continuation:15001020,admitted_tally:366,mathematical:116,codec:63,toric_cycle:19,rest_bytes:704,integrity:10191461936566341579
+physical_telemetry=engine_time:unknown,checker_time:unknown,temperature:unknown,power:unknown,energy:unknown
+formal_begin
+import Mathlib.Tactic.NormNum
+
+namespace Soma.Holonics.R23
+
+theorem generated_toric_cycle_transport :
+  ((1 * 1 - 0 * 0 : ℤ) = 1) ∧
+  ((0 * -1 - 1 * -1 : ℤ) = 1) ∧
+  ((-1 * 0 - -1 * 1 : ℤ) = 1) ∧
+  ((1 * 1 - 0 * 0 : ℤ) = 1) ∧
+  ((0 * 0 - 1 * -1 : ℤ) = 1) ∧
+  ((-1 * -1 - 0 * 0 : ℤ) = 1) ∧
+  ((0 * 0 - -1 * 1 : ℤ) = 1) ∧
+  ((1 * 1 - 0 * 1 : ℤ) = 1) ∧
+  ((1 * 1 - 1 * 0 : ℤ) = 1) ∧
+  ((0 * -1 - 1 * -1 : ℤ) = 1) ∧
+  ((-1 * 0 - -1 * 1 : ℤ) = 1) ∧
+  ((1 * 1 + 0 * 1 + -1 * 1 : ℤ) = 0) ∧
+  ((0 * 1 + 1 * 1 + -1 * 1 : ℤ) = 0) ∧
+  ((1 * 1 + 0 * 0 + -1 * 1 + 0 * 0 : ℤ) = 0) ∧
+  ((1 * 0 + 0 * 1 + -1 * 0 + 0 * 1 : ℤ) = 0) ∧
+  ((0 * 1 + 1 * 0 + 0 * 1 + -1 * 0 : ℤ) = 0) ∧
+  ((0 * 0 + 1 * 1 + 0 * 0 + -1 * 1 : ℤ) = 0) ∧
+  ((1 : ℤ) = 1) ∧
+  ((1 : ℤ) = 1) ∧
+  ((2 : ℤ) = 2) ∧
+  ((2 : ℤ) = 2) ∧
+  ((2 : ℤ) = 2) ∧
+  ((2 : ℤ) = 2) ∧
+  ((0 : ℤ) = 0) ∧
+  ((1 : ℤ) = 1) ∧
+  ((0 : ℤ) = 0) ∧
+  ((0 * 2 + 1 * 3 : ℤ) = 3) ∧
+  ((1 * 2 + 0 * 3 : ℤ) = 2) ∧
+  (((1 : ℚ) / 2).den = 2) ∧
+  (1 ≠ 0) ∧
+  ((1 + 0 : ℤ) = 1) ∧
+  ((0 + 1 : ℤ) = 1) ∧
+  ((1 + -1 : ℤ) = 0) ∧
+  ((0 + 1 : ℤ) = 1) ∧
+  ((1 + -1 : ℤ) = 0) ∧
+  ((0 + 1 : ℤ) = 1) ∧
+  ((0 : ℤ) = 0) ∧
+  ((1 : ℤ) = 1) ∧
+  ((-1 * 1 + 1 * 1 : ℤ) = 0) ∧
+  ((1 * 0 * 1 + 1 * 1 * -1 + -1 * 1 * 1 + -1 * 0 * -1 : ℤ) = -2) ∧
+  ((-1 * 0 * -1 + -1 * 1 * 1 + 1 * 1 * -1 + 1 * 1 * 1 : ℤ) = -1) ∧
+  ((3 * 0 * 3 + 3 * 1 * -2 + -2 * 1 * 3 + -2 * 1 * -2 : ℤ) = -8) := by native_decide
+
+end Soma.Holonics.R23
+
+#check Soma.Holonics.R23.generated_toric_cycle_transport
+formal_end
+conversation_begin
+The ordered primitive rays determine complete smooth fans, their character relations, and torsion-free divisor-class quotients without receiving a variety name or a basis. Independent fan-local and Chow-reduction passages return the same intersection form. Exact congruence, rather than matrix eigenvalue presentation, returns its inertia and separates the positive anticanonical direction from primitive negative controls. Under the declared standard toric comparison hypotheses, the bounded Betti and Hodge receiver ranks are attached separately from the constructed arithmetic. Response inversion returns an integral fiber, a rational fiber with no integral member, and an incompatible obstruction. The selected cone itself derives the star ray; every strict and total transform is retained, the resulting exceptional class has square minus one, and pullback, pushforward, their kernels and images, and the projection formula agree. These are bounded toric-surface constructions and do not assert the Hodge conjecture or any Riemann-hypothesis consequence.conversation_end
+checker_stdout_begin
+Soma.Holonics.R23.generated_toric_cycle_transport :
+  1 * 1 - 0 * 0 = 1 ∧
+    0 * -1 - 1 * -1 = 1 ∧
+      -1 * 0 - -1 * 1 = 1 ∧
+        1 * 1 - 0 * 0 = 1 ∧
+          0 * 0 - 1 * -1 = 1 ∧
+            -1 * -1 - 0 * 0 = 1 ∧
+              0 * 0 - -1 * 1 = 1 ∧
+                1 * 1 - 0 * 1 = 1 ∧
+                  1 * 1 - 1 * 0 = 1 ∧
+                    0 * -1 - 1 * -1 = 1 ∧
+                      -1 * 0 - -1 * 1 = 1 ∧
+                        1 * 1 + 0 * 1 + -1 * 1 = 0 ∧
+                          0 * 1 + 1 * 1 + -1 * 1 = 0 ∧
+                            1 * 1 + 0 * 0 + -1 * 1 + 0 * 0 = 0 ∧
+                              1 * 0 + 0 * 1 + -1 * 0 + 0 * 1 = 0 ∧
+                                0 * 1 + 1 * 0 + 0 * 1 + -1 * 0 = 0 ∧
+                                  0 * 0 + 1 * 1 + 0 * 0 + -1 * 1 = 0 ∧
+                                    1 = 1 ∧
+                                      1 = 1 ∧
+                                        2 = 2 ∧
+                                          2 = 2 ∧
+                                            2 = 2 ∧
+                                              2 = 2 ∧
+                                                0 = 0 ∧
+                                                  1 = 1 ∧
+                                                    0 = 0 ∧
+                                                      0 * 2 + 1 * 3 = 3 ∧
+                                                        1 * 2 + 0 * 3 = 2 ∧
+                                                          (1 / 2).den = 2 ∧
+                                                            1 ≠ 0 ∧
+                                                              1 + 0 = 1 ∧
+                                                                0 + 1 = 1 ∧
+                                                                  1 + -1 = 0 ∧
+                                                                    0 + 1 = 1 ∧
+                                                                      1 + -1 = 0 ∧
+                                                                        0 + 1 = 1 ∧
+                                                                          0 = 0 ∧
+                                                                            1 = 1 ∧
+                                                                              -1 * 1 + 1 * 1 = 0 ∧
+                                                                                1 * 0 * 1 + 1 * 1 * -1 + -1 * 1 * 1 +
+                                                                                      -1 * 0 * -1 =
+                                                                                    -2 ∧
+                                                                                  -1 * 0 * -1 + -1 * 1 * 1 +
+                                                                                          1 * 1 * -1 +
+                                                                                        1 * 1 * 1 =
+                                                                                      -1 ∧
+                                                                                    3 * 0 * 3 + 3 * 1 * -2 +
+                                                                                          -2 * 1 * 3 +
+                                                                                        -2 * 1 * -2 =
+                                                                                      -8
+checker_stdout_end

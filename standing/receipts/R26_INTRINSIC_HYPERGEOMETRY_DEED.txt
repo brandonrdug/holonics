@@ -1,0 +1,87 @@
+truth_status=established-bounded
+evidence=implemented-exact,computational-witness
+formal_truth_status=proved-derived
+formal_evidence=formal-checked
+hodge_conjecture_status=outside-aperture
+riemann_hypothesis_status=outside-aperture
+program=r26_intrinsic_hypergeometry_archetype_distribution.sm_89
+device_compute_capability=8.9
+kernel_launches=13
+launched_threads=31
+semantic_threads=23
+bytes_to_device=10144
+bytes_from_device=2747416
+resident_bytes=2759904
+host_semantic_events=0
+verification_failures=0
+executor_state=0
+predecessor_remount=body:1,same_body:1,theory:1,source_replayed:0,theory_id:192300
+inquiry=all_exact:1,theory_formed:1,source_mask:4095,obstruction:0,no_expected_invariants:1
+source_cards=all_loaded:1,r26_bytes:100,fold:18113643652046036805,path_fold:7836832754731454435
+source_aperture=phase_cases:10,vertices_per_case:323,edges_per_case:646,faces_per_case:323,flags_per_case:2584,series_depth:20,section_ring:Z/65521Z,cm_squares:40,expected_invariants:absent
+predecessor=rest_bytes:816,head:14001024
+phase_cases=2x3:cells=6,12,6,flags=48,tours=1x6,projection_fibers=6,word_fold=3005401531244400733;3x5:cells=15,30,15,flags=120,tours=1x15,projection_fibers=15,word_fold=17257313777842281915;5x7:cells=35,70,35,flags=280,tours=1x35,projection_fibers=35,word_fold=16517028317970595919;7x11:cells=77,154,77,flags=616,tours=1x77,projection_fibers=77,word_fold=7890629072050995331;11x13:cells=143,286,143,flags=1144,tours=1x143,projection_fibers=143,word_fold=5002683133807996204;13x17:cells=221,442,221,flags=1768,tours=1x221,projection_fibers=221,word_fold=333326788687596832;17x19:cells=323,646,323,flags=2584,tours=1x323,projection_fibers=323,word_fold=9816247015986302221;6x9:cells=54,108,54,flags=432,tours=3x18,projection_fibers=54,word_fold=11885351504144663136;8x12:cells=96,192,96,flags=768,tours=4x24,projection_fibers=96,word_fold=804875388390881630;7x5:cells=35,70,35,flags=280,tours=1x35,projection_fibers=35,word_fold=15595417998830986772
+local_section=series_terms:20,recurrence_exact:1,form_preserved:1,ordered_resolutions_unequal:1,commutator:13,8;8,5
+supported_cycle=cm_squares:40,cycle_characteristic:1,0,0,0,-1,phase_boundary:1,cm_no_two_cell:1,filled_extension_obstructed:1,supported_loop:1
+controls=equal_hull_unequal_transport:1,equal_local_population_unequal_order:1,equal_spectrum_unequal_support:1,conjugate_rechart:1,changed_source_sensitive:1
+changed_case=5x8,cells:40,80,40,flags:320,tours:1x40,word_fold:12996452429275640009
+checker=exit:0,stdout_bytes:2033,stderr_bytes:0,produced_bytes:169488
+final_body=head:14001026,continuation:15001026,admitted_tally:535,mathematical:164,codec:84,intrinsic_hypergeometry:31,rest_bytes:872,integrity:4268701919319549365
+physical_telemetry=engine_time:unknown,checker_time:unknown,temperature:unknown,power:unknown,energy:unknown
+formal_begin
+import Mathlib.Tactic.NormNum
+
+namespace Soma.Holonics.R26
+
+theorem generated_intrinsic_archetype_calculus :
+  ((6 : ℕ) + 6 = 12 ∧ (48 : ℕ) = 8 * 6 ∧ (1 : ℕ) * 6 = 6 ∧ (2 : ℕ) + 2 + 1 + 1 = 6 ∧ (2 : ℕ) = 2 ∧ (2 : ℕ) = 2 ∧ (1 : ℕ) = 1 ∧ (1 : ℕ) = 1) ∧
+  ((15 : ℕ) + 15 = 30 ∧ (120 : ℕ) = 8 * 15 ∧ (1 : ℕ) * 15 = 15 ∧ (8 : ℕ) + 4 + 2 + 1 = 15 ∧ (8 : ℕ) = 8 ∧ (4 : ℕ) = 4 ∧ (2 : ℕ) = 2 ∧ (1 : ℕ) = 1) ∧
+  ((35 : ℕ) + 35 = 70 ∧ (280 : ℕ) = 8 * 35 ∧ (1 : ℕ) * 35 = 35 ∧ (24 : ℕ) + 6 + 4 + 1 = 35 ∧ (24 : ℕ) = 24 ∧ (6 : ℕ) = 6 ∧ (4 : ℕ) = 4 ∧ (1 : ℕ) = 1) ∧
+  ((77 : ℕ) + 77 = 154 ∧ (616 : ℕ) = 8 * 77 ∧ (1 : ℕ) * 77 = 77 ∧ (60 : ℕ) + 10 + 6 + 1 = 77 ∧ (60 : ℕ) = 60 ∧ (10 : ℕ) = 10 ∧ (6 : ℕ) = 6 ∧ (1 : ℕ) = 1) ∧
+  ((143 : ℕ) + 143 = 286 ∧ (1144 : ℕ) = 8 * 143 ∧ (1 : ℕ) * 143 = 143 ∧ (120 : ℕ) + 12 + 10 + 1 = 143 ∧ (120 : ℕ) = 120 ∧ (12 : ℕ) = 12 ∧ (10 : ℕ) = 10 ∧ (1 : ℕ) = 1) ∧
+  ((221 : ℕ) + 221 = 442 ∧ (1768 : ℕ) = 8 * 221 ∧ (1 : ℕ) * 221 = 221 ∧ (192 : ℕ) + 16 + 12 + 1 = 221 ∧ (192 : ℕ) = 192 ∧ (16 : ℕ) = 16 ∧ (12 : ℕ) = 12 ∧ (1 : ℕ) = 1) ∧
+  ((323 : ℕ) + 323 = 646 ∧ (2584 : ℕ) = 8 * 323 ∧ (1 : ℕ) * 323 = 323 ∧ (288 : ℕ) + 18 + 16 + 1 = 323 ∧ (288 : ℕ) = 288 ∧ (18 : ℕ) = 18 ∧ (16 : ℕ) = 16 ∧ (1 : ℕ) = 1) ∧
+  ((54 : ℕ) + 54 = 108 ∧ (432 : ℕ) = 8 * 54 ∧ (3 : ℕ) * 18 = 54 ∧ (40 : ℕ) + 8 + 5 + 1 = 54 ∧ (40 : ℕ) = 40 ∧ (8 : ℕ) = 8 ∧ (5 : ℕ) = 5 ∧ (1 : ℕ) = 1) ∧
+  ((96 : ℕ) + 96 = 192 ∧ (768 : ℕ) = 8 * 96 ∧ (4 : ℕ) * 24 = 96 ∧ (77 : ℕ) + 11 + 7 + 1 = 96 ∧ (77 : ℕ) = 77 ∧ (11 : ℕ) = 11 ∧ (7 : ℕ) = 7 ∧ (1 : ℕ) = 1) ∧
+  ((35 : ℕ) + 35 = 70 ∧ (280 : ℕ) = 8 * 35 ∧ (1 : ℕ) * 35 = 35 ∧ (24 : ℕ) + 4 + 6 + 1 = 35 ∧ (24 : ℕ) = 24 ∧ (4 : ℕ) = 4 ∧ (6 : ℕ) = 6 ∧ (1 : ℕ) = 1) ∧
+((1 : ℤ) = 1) ∧ ((0 : ℤ) = 0) ∧ ((0 : ℤ) = 0) ∧ ((0 : ℤ) = 0) ∧ ((-1 : ℤ) = -1) ∧
+  (40 : ℕ) = 40 ∧ (2 : ℕ) ≠ 1 ∧
+  ((13 : ℤ) ≠ 1 ∨ (8 : ℤ) ≠ 0 ∨ (8 : ℤ) ≠ 0 ∨ (5 : ℤ) ≠ 1) ∧
+  (40 : ℕ) ≠ 35 ∧ (40 : ℕ) ≠ 35 ∧
+  ((65254 : ℕ) ≠ 65454 ∨ (65145 : ℕ) ≠ 65439 ∨ (65303 : ℕ) ≠ 65463 ∨ (65214 : ℕ) ≠ 65450) := by
+  norm_num
+
+end Soma.Holonics.R26
+
+#check Soma.Holonics.R26.generated_intrinsic_archetype_calculus
+formal_end
+conversation_begin
+The recurring polygon is only one receiver face. The resident return now keeps every product vertex, oriented edge, filled face, flag, star, link, shared seam, CRT successor, projection fiber, and transported local section. Its seam words act as causal teeth: their ordered neighboring distribution selects an exact continuation, while a simultaneous seam retains two unequal monodromy resolutions as an obstruction. A phase face and a CM Cayley square meet through the same oriented four-cycle and share its characteristic polynomial, but only the phase cycle bounds an owned two-cell. The nontrivial variation commutator can therefore remain supported on the CM loop while obstructing extension across the filled phase face. Equal four-corner receiver hulls, equal normalized local populations, and equal cycle spectra consequently do not erase their retained source fibers. Axis swap returns a basis-conjugate passage, and changing (5,7) to (5,8) rebuilds the word, section, and face population. This is a bounded characteristic archetype calculus, not evidence for Hodge or RH.conversation_end
+checker_stdout_begin
+Soma.Holonics.R26.generated_intrinsic_archetype_calculus :
+  (6 + 6 = 12 ∧ 48 = 8 * 6 ∧ 1 * 6 = 6 ∧ 2 + 2 + 1 + 1 = 6 ∧ 2 = 2 ∧ 2 = 2 ∧ 1 = 1 ∧ 1 = 1) ∧
+    (15 + 15 = 30 ∧ 120 = 8 * 15 ∧ 1 * 15 = 15 ∧ 8 + 4 + 2 + 1 = 15 ∧ 8 = 8 ∧ 4 = 4 ∧ 2 = 2 ∧ 1 = 1) ∧
+      (35 + 35 = 70 ∧ 280 = 8 * 35 ∧ 1 * 35 = 35 ∧ 24 + 6 + 4 + 1 = 35 ∧ 24 = 24 ∧ 6 = 6 ∧ 4 = 4 ∧ 1 = 1) ∧
+        (77 + 77 = 154 ∧ 616 = 8 * 77 ∧ 1 * 77 = 77 ∧ 60 + 10 + 6 + 1 = 77 ∧ 60 = 60 ∧ 10 = 10 ∧ 6 = 6 ∧ 1 = 1) ∧
+          (143 + 143 = 286 ∧
+              1144 = 8 * 143 ∧ 1 * 143 = 143 ∧ 120 + 12 + 10 + 1 = 143 ∧ 120 = 120 ∧ 12 = 12 ∧ 10 = 10 ∧ 1 = 1) ∧
+            (221 + 221 = 442 ∧
+                1768 = 8 * 221 ∧ 1 * 221 = 221 ∧ 192 + 16 + 12 + 1 = 221 ∧ 192 = 192 ∧ 16 = 16 ∧ 12 = 12 ∧ 1 = 1) ∧
+              (323 + 323 = 646 ∧
+                  2584 = 8 * 323 ∧ 1 * 323 = 323 ∧ 288 + 18 + 16 + 1 = 323 ∧ 288 = 288 ∧ 18 = 18 ∧ 16 = 16 ∧ 1 = 1) ∧
+                (54 + 54 = 108 ∧ 432 = 8 * 54 ∧ 3 * 18 = 54 ∧ 40 + 8 + 5 + 1 = 54 ∧ 40 = 40 ∧ 8 = 8 ∧ 5 = 5 ∧ 1 = 1) ∧
+                  (96 + 96 = 192 ∧
+                      768 = 8 * 96 ∧ 4 * 24 = 96 ∧ 77 + 11 + 7 + 1 = 96 ∧ 77 = 77 ∧ 11 = 11 ∧ 7 = 7 ∧ 1 = 1) ∧
+                    (35 + 35 = 70 ∧
+                        280 = 8 * 35 ∧ 1 * 35 = 35 ∧ 24 + 4 + 6 + 1 = 35 ∧ 24 = 24 ∧ 4 = 4 ∧ 6 = 6 ∧ 1 = 1) ∧
+                      1 = 1 ∧
+                        0 = 0 ∧
+                          0 = 0 ∧
+                            0 = 0 ∧
+                              -1 = -1 ∧
+                                40 = 40 ∧
+                                  2 ≠ 1 ∧
+                                    (13 ≠ 1 ∨ 8 ≠ 0 ∨ 8 ≠ 0 ∨ 5 ≠ 1) ∧
+                                      40 ≠ 35 ∧
+                                        40 ≠ 35 ∧ (65254 ≠ 65454 ∨ 65145 ≠ 65439 ∨ 65303 ≠ 65463 ∨ 65214 ≠ 65450)
+checker_stdout_end

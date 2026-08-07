@@ -1,0 +1,391 @@
+truth_status=established-bounded
+evidence=implemented-exact,computational-witness
+formal_truth_status=proved-derived
+formal_evidence=formal-checked
+classical_riemann_hypothesis_status=outside-aperture
+arbitrary_function_field_rh_status=outside-aperture
+program=r29_arithmetic_spectral.sm_89
+device_compute_capability=8.9
+kernel_launches=13
+launched_threads=302998
+semantic_threads=302612
+host_semantic_events=0
+verification_failures=0
+executor_state=0
+source_card=loaded:1,bytes:71,fold:12937010934574861854,path_fold:16185115516626808365
+predecessor_remount=body:1,same_body:1,theory:1,source_replayed:0
+fields=p5_candidates:10,p13_candidates:6,exact:1,1
+curve_0=p:5,c:1,counts:4,32,148,640,pi:1,2,char:1,-2,5,places:4,14,48,152,pointwise:32,bound:20,exact:1
+curve_1=p:5,c:4,counts:8,32,104,640,pi:-1,-2,char:1,2,5,places:8,12,32,152,pointwise:32,bound:20,exact:1
+curve_2=p:13,c:1,counts:20,160,2180,28800,pi:-3,-2,char:1,6,13,places:20,70,720,7160,pointwise:160,bound:52,exact:1
+curve_3=p:13,c:4,counts:8,160,2216,28800,pi:3,2,char:1,-6,13,places:8,76,736,7160,pointwise:160,bound:52,exact:1
+curve_4=p:13,c:2,counts:10,180,2290,28800,pi:2,-3,char:1,-4,13,places:10,85,760,7155,pointwise:180,bound:52,exact:1
+curve_5=p:13,c:3,counts:20,160,2180,28800,pi:-3,-2,char:1,6,13,places:20,70,720,7160,pointwise:160,bound:52,exact:1
+curve_6=p:13,c:7,counts:18,180,2106,28800,pi:-2,3,char:1,4,13,places:18,81,696,7155,pointwise:180,bound:52,exact:1
+controls=twist5:1,twist13:1,changed_twist:1,even:1,odd:1,equal_factor_rechart:1,phase_separated:1,archimedean_inapplicable:1
+theory=fixed:156260,candidates:567,points:904,trace_currents:567,norm_currents:1701
+checker=exit:0,stdout_bytes:585,stderr_bytes:0,produced_bytes:810984
+final_body=head:14001032,continuation:15001032,admitted_tally:782,mathematical:232,codec:113,hodge:41,arithmetic:47,rest_bytes:1040,integrity:9518517338642123549
+rest_io=loaded:1,written:1
+physical_telemetry=engine_time:unknown,checker_time:unknown,temperature:unknown,power:unknown,energy:unknown
+formal_begin
+import Mathlib.Tactic.NormNum
+import Mathlib.Tactic.Ring
+import Mathlib.Tactic.Positivity
+import Mathlib.Data.ZMod.Basic
+
+namespace Soma.Holonics.R29
+
+def primaryEigenvectorRelation (a b : ℤ) : Prop :=
+  (a*1 + (-b)*0 = a) ∧ (a*0 + (-b)*(-1) = b) ∧
+  (b*1 + a*0 = b) ∧ (b*0 + a*(-1) = -a) ∧
+  (a*1 + (-b)*0 = a) ∧ (a*0 + (-b)*1 = -b) ∧
+  (b*1 + a*0 = b) ∧ (b*0 + a*1 = a)
+
+def smoothnessStatement : Prop :=
+  (((-64) : ℤ) = -64 * 1^3) ∧
+  (((-64) : ℤ) % 5 ≠ 0) ∧
+  (((-4096) : ℤ) = -64 * 4^3) ∧
+  (((-4096) : ℤ) % 5 ≠ 0) ∧
+  (((-64) : ℤ) = -64 * 1^3) ∧
+  (((-64) : ℤ) % 13 ≠ 0) ∧
+  (((-4096) : ℤ) = -64 * 4^3) ∧
+  (((-4096) : ℤ) % 13 ≠ 0) ∧
+  (((-512) : ℤ) = -64 * 2^3) ∧
+  (((-512) : ℤ) % 13 ≠ 0) ∧
+  (((-1728) : ℤ) = -64 * 3^3) ∧
+  (((-1728) : ℤ) % 13 ≠ 0) ∧
+  (((-21952) : ℤ) = -64 * 7^3) ∧
+  (((-21952) : ℤ) % 13 ≠ 0)
+theorem generated_smoothness : smoothnessStatement := by
+  unfold smoothnessStatement
+  native_decide
+
+def carrierStatement : Prop :=
+  ((1*1 + 2*2 : ℤ) = 5) ∧
+  (∀ X : ℤ, (X-1)*(X-1) + 2*2 = X^2 - 2*1*X + 5) ∧
+  ((5 : ℤ) = 5) ∧
+  ((0 : ℤ) = 0) ∧
+  ((0 : ℤ) = 0) ∧
+  ((5 : ℤ) = 5) ∧
+  ((0 : ℤ) = 0) ∧
+  (((-5) : ℤ) = (-5)) ∧
+  ((5 : ℤ) = 5) ∧
+  ((0 : ℤ) = 0) ∧
+  (((-1)*(-1) + (-2)*(-2) : ℤ) = 5) ∧
+  (∀ X : ℤ, (X-(-1))*(X-(-1)) + (-2)*(-2) = X^2 - 2*(-1)*X + 5) ∧
+  ((5 : ℤ) = 5) ∧
+  ((0 : ℤ) = 0) ∧
+  ((0 : ℤ) = 0) ∧
+  ((5 : ℤ) = 5) ∧
+  ((0 : ℤ) = 0) ∧
+  (((-5) : ℤ) = (-5)) ∧
+  ((5 : ℤ) = 5) ∧
+  ((0 : ℤ) = 0) ∧
+  (((-3)*(-3) + (-2)*(-2) : ℤ) = 13) ∧
+  (∀ X : ℤ, (X-(-3))*(X-(-3)) + (-2)*(-2) = X^2 - 2*(-3)*X + 13) ∧
+  ((13 : ℤ) = 13) ∧
+  ((0 : ℤ) = 0) ∧
+  ((0 : ℤ) = 0) ∧
+  ((13 : ℤ) = 13) ∧
+  ((0 : ℤ) = 0) ∧
+  (((-13) : ℤ) = (-13)) ∧
+  ((13 : ℤ) = 13) ∧
+  ((0 : ℤ) = 0) ∧
+  ((3*3 + 2*2 : ℤ) = 13) ∧
+  (∀ X : ℤ, (X-3)*(X-3) + 2*2 = X^2 - 2*3*X + 13) ∧
+  ((13 : ℤ) = 13) ∧
+  ((0 : ℤ) = 0) ∧
+  ((0 : ℤ) = 0) ∧
+  ((13 : ℤ) = 13) ∧
+  ((0 : ℤ) = 0) ∧
+  (((-13) : ℤ) = (-13)) ∧
+  ((13 : ℤ) = 13) ∧
+  ((0 : ℤ) = 0) ∧
+  ((2*2 + (-3)*(-3) : ℤ) = 13) ∧
+  (∀ X : ℤ, (X-2)*(X-2) + (-3)*(-3) = X^2 - 2*2*X + 13) ∧
+  ((13 : ℤ) = 13) ∧
+  ((0 : ℤ) = 0) ∧
+  ((0 : ℤ) = 0) ∧
+  ((13 : ℤ) = 13) ∧
+  ((0 : ℤ) = 0) ∧
+  (((-13) : ℤ) = (-13)) ∧
+  ((13 : ℤ) = 13) ∧
+  ((0 : ℤ) = 0) ∧
+  (((-3)*(-3) + (-2)*(-2) : ℤ) = 13) ∧
+  (∀ X : ℤ, (X-(-3))*(X-(-3)) + (-2)*(-2) = X^2 - 2*(-3)*X + 13) ∧
+  ((13 : ℤ) = 13) ∧
+  ((0 : ℤ) = 0) ∧
+  ((0 : ℤ) = 0) ∧
+  ((13 : ℤ) = 13) ∧
+  ((0 : ℤ) = 0) ∧
+  (((-13) : ℤ) = (-13)) ∧
+  ((13 : ℤ) = 13) ∧
+  ((0 : ℤ) = 0) ∧
+  (((-2)*(-2) + 3*3 : ℤ) = 13) ∧
+  (∀ X : ℤ, (X-(-2))*(X-(-2)) + 3*3 = X^2 - 2*(-2)*X + 13) ∧
+  ((13 : ℤ) = 13) ∧
+  ((0 : ℤ) = 0) ∧
+  ((0 : ℤ) = 0) ∧
+  ((13 : ℤ) = 13) ∧
+  ((0 : ℤ) = 0) ∧
+  (((-13) : ℤ) = (-13)) ∧
+  ((13 : ℤ) = 13) ∧
+  ((0 : ℤ) = 0)
+theorem generated_carriers : carrierStatement := by
+  unfold carrierStatement
+  repeat' apply And.intro
+  all_goals intros
+  all_goals ring
+
+def traceStatement : Prop :=
+  ((4 : ℤ) = 1 + 5 - 2) ∧
+  ((4 : ℤ) = 4) ∧
+  ((32 : ℤ) = 1 + 25 - (-6)) ∧
+  ((32 : ℤ) = 32) ∧
+  ((148 : ℤ) = 1 + 125 - (-22)) ∧
+  ((148 : ℤ) = 148) ∧
+  ((640 : ℤ) = 1 + 625 - (-14)) ∧
+  ((640 : ℤ) = 640) ∧
+  ((8 : ℤ) = 1 + 5 - (-2)) ∧
+  ((8 : ℤ) = 8) ∧
+  ((32 : ℤ) = 1 + 25 - (-6)) ∧
+  ((32 : ℤ) = 32) ∧
+  ((104 : ℤ) = 1 + 125 - 22) ∧
+  ((104 : ℤ) = 104) ∧
+  ((640 : ℤ) = 1 + 625 - (-14)) ∧
+  ((640 : ℤ) = 640) ∧
+  ((20 : ℤ) = 1 + 13 - (-6)) ∧
+  ((20 : ℤ) = 20) ∧
+  ((160 : ℤ) = 1 + 169 - 10) ∧
+  ((160 : ℤ) = 160) ∧
+  ((2180 : ℤ) = 1 + 2197 - 18) ∧
+  ((2180 : ℤ) = 2180) ∧
+  ((28800 : ℤ) = 1 + 28561 - (-238)) ∧
+  ((28800 : ℤ) = 28800) ∧
+  ((8 : ℤ) = 1 + 13 - 6) ∧
+  ((8 : ℤ) = 8) ∧
+  ((160 : ℤ) = 1 + 169 - 10) ∧
+  ((160 : ℤ) = 160) ∧
+  ((2216 : ℤ) = 1 + 2197 - (-18)) ∧
+  ((2216 : ℤ) = 2216) ∧
+  ((28800 : ℤ) = 1 + 28561 - (-238)) ∧
+  ((28800 : ℤ) = 28800) ∧
+  ((10 : ℤ) = 1 + 13 - 4) ∧
+  ((10 : ℤ) = 10) ∧
+  ((180 : ℤ) = 1 + 169 - (-10)) ∧
+  ((180 : ℤ) = 180) ∧
+  ((2290 : ℤ) = 1 + 2197 - (-92)) ∧
+  ((2290 : ℤ) = 2290) ∧
+  ((28800 : ℤ) = 1 + 28561 - (-238)) ∧
+  ((28800 : ℤ) = 28800) ∧
+  ((20 : ℤ) = 1 + 13 - (-6)) ∧
+  ((20 : ℤ) = 20) ∧
+  ((160 : ℤ) = 1 + 169 - 10) ∧
+  ((160 : ℤ) = 160) ∧
+  ((2180 : ℤ) = 1 + 2197 - 18) ∧
+  ((2180 : ℤ) = 2180) ∧
+  ((28800 : ℤ) = 1 + 28561 - (-238)) ∧
+  ((28800 : ℤ) = 28800) ∧
+  ((18 : ℤ) = 1 + 13 - (-4)) ∧
+  ((18 : ℤ) = 18) ∧
+  ((180 : ℤ) = 1 + 169 - (-10)) ∧
+  ((180 : ℤ) = 180) ∧
+  ((2106 : ℤ) = 1 + 2197 - 92) ∧
+  ((2106 : ℤ) = 2106) ∧
+  ((28800 : ℤ) = 1 + 28561 - (-238)) ∧
+  ((28800 : ℤ) = 28800)
+theorem generated_traces : traceStatement := by
+  unfold traceStatement
+  norm_num
+
+def recurrenceCountStatement : Prop :=
+  ((2 : ℤ) = 2) ∧
+  ((2 : ℤ) = 2 * 1) ∧
+  (((-6) : ℤ) = 2 * 1 * 2 - 5 * 2) ∧
+  (((-22) : ℤ) = 2 * 1 * (-6) - 5 * 2) ∧
+  (((-14) : ℤ) = 2 * 1 * (-22) - 5 * (-6)) ∧
+  ((2 : ℤ) = 2) ∧
+  (((-2) : ℤ) = 2 * (-1)) ∧
+  (((-6) : ℤ) = 2 * (-1) * (-2) - 5 * 2) ∧
+  ((22 : ℤ) = 2 * (-1) * (-6) - 5 * (-2)) ∧
+  (((-14) : ℤ) = 2 * (-1) * 22 - 5 * (-6)) ∧
+  ((2 : ℤ) = 2) ∧
+  (((-6) : ℤ) = 2 * (-3)) ∧
+  ((10 : ℤ) = 2 * (-3) * (-6) - 13 * 2) ∧
+  ((18 : ℤ) = 2 * (-3) * 10 - 13 * (-6)) ∧
+  (((-238) : ℤ) = 2 * (-3) * 18 - 13 * 10) ∧
+  ((2 : ℤ) = 2) ∧
+  ((6 : ℤ) = 2 * 3) ∧
+  ((10 : ℤ) = 2 * 3 * 6 - 13 * 2) ∧
+  (((-18) : ℤ) = 2 * 3 * 10 - 13 * 6) ∧
+  (((-238) : ℤ) = 2 * 3 * (-18) - 13 * 10) ∧
+  ((2 : ℤ) = 2) ∧
+  ((4 : ℤ) = 2 * 2) ∧
+  (((-10) : ℤ) = 2 * 2 * 4 - 13 * 2) ∧
+  (((-92) : ℤ) = 2 * 2 * (-10) - 13 * 4) ∧
+  (((-238) : ℤ) = 2 * 2 * (-92) - 13 * (-10)) ∧
+  ((2 : ℤ) = 2) ∧
+  (((-6) : ℤ) = 2 * (-3)) ∧
+  ((10 : ℤ) = 2 * (-3) * (-6) - 13 * 2) ∧
+  ((18 : ℤ) = 2 * (-3) * 10 - 13 * (-6)) ∧
+  (((-238) : ℤ) = 2 * (-3) * 18 - 13 * 10) ∧
+  ((2 : ℤ) = 2) ∧
+  (((-4) : ℤ) = 2 * (-2)) ∧
+  (((-10) : ℤ) = 2 * (-2) * (-4) - 13 * 2) ∧
+  ((92 : ℤ) = 2 * (-2) * (-10) - 13 * (-4)) ∧
+  (((-238) : ℤ) = 2 * (-2) * 92 - 13 * (-10))
+theorem generated_recurrence_counts : recurrenceCountStatement := by
+  unfold recurrenceCountStatement
+  native_decide
+
+def zetaDualityStatement : Prop :=
+  (∀ T : ℤ, 5*T^2 - 2*T + 1 = 1 - 2*T + 5*T^2) ∧
+  (∀ T : ℤ, (5*T-1)*(T-1) = (1-T)*(1-5*T)) ∧
+  (∀ T : ℤ, 5*T^2 - (-2)*T + 1 = 1 - (-2)*T + 5*T^2) ∧
+  (∀ T : ℤ, (5*T-1)*(T-1) = (1-T)*(1-5*T)) ∧
+  (∀ T : ℤ, 13*T^2 - (-6)*T + 1 = 1 - (-6)*T + 13*T^2) ∧
+  (∀ T : ℤ, (13*T-1)*(T-1) = (1-T)*(1-13*T)) ∧
+  (∀ T : ℤ, 13*T^2 - 6*T + 1 = 1 - 6*T + 13*T^2) ∧
+  (∀ T : ℤ, (13*T-1)*(T-1) = (1-T)*(1-13*T)) ∧
+  (∀ T : ℤ, 13*T^2 - 4*T + 1 = 1 - 4*T + 13*T^2) ∧
+  (∀ T : ℤ, (13*T-1)*(T-1) = (1-T)*(1-13*T)) ∧
+  (∀ T : ℤ, 13*T^2 - (-6)*T + 1 = 1 - (-6)*T + 13*T^2) ∧
+  (∀ T : ℤ, (13*T-1)*(T-1) = (1-T)*(1-13*T)) ∧
+  (∀ T : ℤ, 13*T^2 - (-4)*T + 1 = 1 - (-4)*T + 13*T^2) ∧
+  (∀ T : ℤ, (13*T-1)*(T-1) = (1-T)*(1-13*T))
+theorem generated_zeta_duality : zetaDualityStatement := by
+  unfold zetaDualityStatement
+  repeat' apply And.intro
+  all_goals intros
+  all_goals ring
+
+def eulerCoefficientStatement : Prop :=
+  ((4 : ℤ) = 4) ∧
+  ((24 : ℤ) = 24) ∧
+  ((124 : ℤ) = 124) ∧
+  ((624 : ℤ) = 624) ∧
+  ((8 : ℤ) = 8) ∧
+  ((48 : ℤ) = 48) ∧
+  ((248 : ℤ) = 248) ∧
+  ((1248 : ℤ) = 1248) ∧
+  ((20 : ℤ) = 20) ∧
+  ((280 : ℤ) = 280) ∧
+  ((3660 : ℤ) = 3660) ∧
+  ((47600 : ℤ) = 47600) ∧
+  ((8 : ℤ) = 8) ∧
+  ((112 : ℤ) = 112) ∧
+  ((1464 : ℤ) = 1464) ∧
+  ((19040 : ℤ) = 19040) ∧
+  ((10 : ℤ) = 10) ∧
+  ((140 : ℤ) = 140) ∧
+  ((1830 : ℤ) = 1830) ∧
+  ((23800 : ℤ) = 23800) ∧
+  ((20 : ℤ) = 20) ∧
+  ((280 : ℤ) = 280) ∧
+  ((3660 : ℤ) = 3660) ∧
+  ((47600 : ℤ) = 47600) ∧
+  ((18 : ℤ) = 18) ∧
+  ((252 : ℤ) = 252) ∧
+  ((3294 : ℤ) = 3294) ∧
+  ((42840 : ℤ) = 42840)
+theorem generated_euler_coefficients : eulerCoefficientStatement := by
+  unfold eulerCoefficientStatement
+  native_decide
+
+def primaryEigenvectorStatement : Prop :=
+  (primaryEigenvectorRelation 1 2) ∧
+  (((0 : ℤ), (2 : ℤ)) = ((0 : ℤ), (2 : ℤ))) ∧
+  ((0^2 + 2^2 : ℤ) = 4) ∧
+  (primaryEigenvectorRelation (-1) (-2)) ∧
+  (((0 : ℤ), (2 : ℤ)) = ((0 : ℤ), (2 : ℤ))) ∧
+  ((0^2 + 2^2 : ℤ) = 4) ∧
+  (primaryEigenvectorRelation (-3) (-2)) ∧
+  (((0 : ℤ), (2 : ℤ)) = ((0 : ℤ), (2 : ℤ))) ∧
+  ((0^2 + 2^2 : ℤ) = 4) ∧
+  (primaryEigenvectorRelation 3 2) ∧
+  (((0 : ℤ), (2 : ℤ)) = ((0 : ℤ), (2 : ℤ))) ∧
+  ((0^2 + 2^2 : ℤ) = 4) ∧
+  (primaryEigenvectorRelation 2 (-3)) ∧
+  (((0 : ℤ), (2 : ℤ)) = ((0 : ℤ), (2 : ℤ))) ∧
+  ((0^2 + 2^2 : ℤ) = 4) ∧
+  (primaryEigenvectorRelation (-3) (-2)) ∧
+  (((0 : ℤ), (2 : ℤ)) = ((0 : ℤ), (2 : ℤ))) ∧
+  ((0^2 + 2^2 : ℤ) = 4) ∧
+  (primaryEigenvectorRelation (-2) 3) ∧
+  (((0 : ℤ), (2 : ℤ)) = ((0 : ℤ), (2 : ℤ))) ∧
+  ((0^2 + 2^2 : ℤ) = 4)
+theorem generated_primary_eigenvectors : primaryEigenvectorStatement := by
+  unfold primaryEigenvectorStatement primaryEigenvectorRelation
+  repeat' apply And.intro
+  all_goals ring
+
+def explicitFormulaStatement : Prop :=
+  (∀ c1 c2 c3 c4 : ℤ, c1*(4 - 1 - 5 + 2) + c2*(32 - 1 - 25 + (-6)) + c3*(148 - 1 - 125 + (-22)) + c4*(640 - 1 - 625 + (-14)) = 0) ∧
+  (∀ c1 c2 c3 c4 : ℤ, c1*(8 - 1 - 5 + (-2)) + c2*(32 - 1 - 25 + (-6)) + c3*(104 - 1 - 125 + 22) + c4*(640 - 1 - 625 + (-14)) = 0) ∧
+  (∀ c1 c2 c3 c4 : ℤ, c1*(20 - 1 - 13 + (-6)) + c2*(160 - 1 - 169 + 10) + c3*(2180 - 1 - 2197 + 18) + c4*(28800 - 1 - 28561 + (-238)) = 0) ∧
+  (∀ c1 c2 c3 c4 : ℤ, c1*(8 - 1 - 13 + 6) + c2*(160 - 1 - 169 + 10) + c3*(2216 - 1 - 2197 + (-18)) + c4*(28800 - 1 - 28561 + (-238)) = 0) ∧
+  (∀ c1 c2 c3 c4 : ℤ, c1*(10 - 1 - 13 + 4) + c2*(180 - 1 - 169 + (-10)) + c3*(2290 - 1 - 2197 + (-92)) + c4*(28800 - 1 - 28561 + (-238)) = 0) ∧
+  (∀ c1 c2 c3 c4 : ℤ, c1*(20 - 1 - 13 + (-6)) + c2*(160 - 1 - 169 + 10) + c3*(2180 - 1 - 2197 + 18) + c4*(28800 - 1 - 28561 + (-238)) = 0) ∧
+  (∀ c1 c2 c3 c4 : ℤ, c1*(18 - 1 - 13 + (-4)) + c2*(180 - 1 - 169 + (-10)) + c3*(2106 - 1 - 2197 + 92) + c4*(28800 - 1 - 28561 + (-238)) = 0)
+theorem generated_explicit_formula : explicitFormulaStatement := by
+  unfold explicitFormulaStatement
+  norm_num
+
+def positiveCurrentStatement : Prop :=
+  (∀ c0 c1 c2 c3 c4 : ℤ, 0 ≤ (c0*(-7) + c1*(-15) + c2*25 + c3*(-15) + c4*(-7))^2 + (c0*24 + c1*(-20) + c2*0 + c3*20 + c4*(-24))^2) ∧
+  (∀ c0 c1 c2 c3 c4 : ℤ, 0 ≤ (c0*(-7) + c1*(-15) + c2*25 + c3*(-15) + c4*(-7))^2 + (c0*24 + c1*(-20) + c2*0 + c3*20 + c4*(-24))^2) ∧
+  (∀ c0 c1 c2 c3 c4 : ℤ, 0 ≤ (c0*(-119) + c1*65 + c2*169 + c3*65 + c4*(-119))^2 + (c0*(-120) + c1*(-156) + c2*0 + c3*156 + c4*120)^2) ∧
+  (∀ c0 c1 c2 c3 c4 : ℤ, 0 ≤ (c0*(-119) + c1*65 + c2*169 + c3*65 + c4*(-119))^2 + (c0*(-120) + c1*(-156) + c2*0 + c3*156 + c4*120)^2) ∧
+  (∀ c0 c1 c2 c3 c4 : ℤ, 0 ≤ (c0*(-119) + c1*(-65) + c2*169 + c3*(-65) + c4*(-119))^2 + (c0*(-120) + c1*156 + c2*0 + c3*(-156) + c4*120)^2) ∧
+  (∀ c0 c1 c2 c3 c4 : ℤ, 0 ≤ (c0*(-119) + c1*65 + c2*169 + c3*65 + c4*(-119))^2 + (c0*(-120) + c1*(-156) + c2*0 + c3*156 + c4*120)^2) ∧
+  (∀ c0 c1 c2 c3 c4 : ℤ, 0 ≤ (c0*(-119) + c1*(-65) + c2*169 + c3*(-65) + c4*(-119))^2 + (c0*(-120) + c1*156 + c2*0 + c3*(-156) + c4*120)^2)
+theorem generated_positive_currents : positiveCurrentStatement := by
+  unfold positiveCurrentStatement
+  repeat' apply And.intro
+  all_goals intros
+  all_goals positivity
+
+def controlStatement : Prop :=
+  ((1 : ℤ) = -(-1)) ∧
+  ((2 : ℤ) = -(-2)) ∧
+  ((32 : ℤ) = 32) ∧
+  ((640 : ℤ) = 640) ∧
+  ((12 : ℤ) = 2 * (1 + 5)) ∧
+  ((252 : ℤ) = 2 * (1 + 125)) ∧
+  (((-3) : ℤ) = -3) ∧
+  (((-2) : ℤ) = -2) ∧
+  ((160 : ℤ) = 160) ∧
+  ((28800 : ℤ) = 28800) ∧
+  ((28 : ℤ) = 2 * (1 + 13)) ∧
+  ((4396 : ℤ) = 2 * (1 + 2197)) ∧
+  ((2 : ℤ) = -(-2)) ∧
+  (((-3) : ℤ) = -3) ∧
+  ((180 : ℤ) = 180) ∧
+  ((28800 : ℤ) = 28800) ∧
+  ((28 : ℤ) = 2 * (1 + 13)) ∧
+  ((4396 : ℤ) = 2 * (1 + 2197)) ∧
+  ((1 : ℤ) ≠ 3) ∧
+  ((20 : ℤ) = 20) ∧
+  ((160 : ℤ) = 160) ∧
+  ((2180 : ℤ) = 2180) ∧
+  ((28800 : ℤ) = 28800) ∧
+  (((-3) : ℤ) = (-3)) ∧
+  (((-2) : ℤ) = (-2)) ∧
+  ((3 : ZMod 13) = (2 : ZMod 13)^4) ∧
+  (((-3) : ℤ) ≠ 2) ∧
+  (((-2) : ℤ) ≠ (-3))
+theorem generated_controls : controlStatement := by
+  unfold controlStatement
+  native_decide
+
+theorem generated_arithmetic_spectral_placement : smoothnessStatement ∧ carrierStatement ∧ traceStatement ∧ recurrenceCountStatement ∧ zetaDualityStatement ∧ eulerCoefficientStatement ∧ primaryEigenvectorStatement ∧ explicitFormulaStatement ∧ positiveCurrentStatement ∧ controlStatement := by
+  exact ⟨generated_smoothness, generated_carriers, generated_traces, generated_recurrence_counts, generated_zeta_duality, generated_euler_coefficients, generated_primary_eigenvectors, generated_explicit_formula, generated_positive_currents, generated_controls⟩
+
+end Soma.Holonics.R29
+
+#check Soma.Holonics.R29.generated_arithmetic_spectral_placement
+formal_end
+conversation_begin
+Seven exact elliptic source passages were carried through finite fields of degrees one through four. The machine first derived each quotient field and enumerated the geometric fixed loci. Independently, it compared coordinate Frobenius with every bounded Gaussian endomorphism on every point over the quadratic field. Only after the unique geometric match returned did it form the rank-two operator. Its alternating form scales by p and its positive Rosati chart returns F-transpose-F equal to p times identity; the Gaussian eigenvalues therefore have exact norm p without a decimal modulus. Fixed-point counts, power traces, closed-place populations, the local zeta numerator, and its reciprocal duality all agree while retaining separate lineage. Twist pairs reverse odd spectral hands but preserve the shell and even counts; an equal-factor pair retains its source rechart. Every bounded explicit-formula current balances closed places against the two normalization poles and H1 trace, and every homogeneous phase current is a symbolic Gaussian norm square. This function-field world has no archimedean place. The return is a geometric calibration of spectral placement, not a classical RH operator, a finite zero fit, or a proof of all-test Weil positivity.
+conversation_end

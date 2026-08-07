@@ -1,0 +1,7 @@
+truth_status=established-bounded
+evidence=implemented-exact
+discovery_replay_exit=0
+application_replay_exit=0
+compared_artifacts=16
+path_relative_checker_transcripts=4
+deterministic=1

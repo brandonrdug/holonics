@@ -1,0 +1,13 @@
+truth_status=established-bounded
+evidence=implemented-exact,computational-witness
+implementation=independent-host-no-continuation
+atlases_compared=7
+atlas_rows=2266
+atlas_identity_incidence_exact=1
+atlas_composition_exact=1
+atlas_receiver_exact=1
+atlas_chart_exact=1
+atlas_conduct_exact=1
+atlas_connected_exact=1
+atlas_heldout_exact=1
+verification_failures=0

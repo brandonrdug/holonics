@@ -1,0 +1,158 @@
+truth_status=established-bounded
+evidence=implemented-exact,computational-witness
+formal_truth_status=proved-derived
+formal_evidence=formal-checked
+comparison_truth_status=pending-post-return
+historical_truth_status=historical
+program=r21_blind_characteristic_reconstruction.sm_89
+device_compute_capability=8.9
+kernel_launches=10
+launched_threads=16
+code_threads=4
+moment_threads=5
+bytes_to_device=17624
+bytes_from_device=220432
+resident_bytes=166600
+host_semantic_events=0
+released_solution_reads=0
+logical_read_support=133
+logical_change_support=10
+logical_alternatives=32
+logical_obstructions=2
+verification_failures=0
+source_cards=code_bytes:29,code_fold:7376861789171317010,code_path_fold:10811906335815055643,moment_bytes:191,moment_fold:665043138814216418,moment_path_fold:10319842732932332401
+source_aperture=released_solution:absent,expected_operator:absent,expected_roots:absent
+predecessor=rest_bytes:488,head:14001012
+code=vertices:128,codewords:16,minimum_distance:3,returned_pairs:3
+pair_shapes=d3:4x5,d4:5x4,d7:8x1,mass_adjoint:1,commuting_directions:1
+moment0=det:36,disc:36,roots:1,2,4
+moment1=det:900,disc:900,roots:-2,1,3
+moment2=det:4410000,disc:4410000,roots:0,2,5,7
+controls=collision_det:0,collision_disc:0,short_access:0,code_gpu_probe:1,moment_gpu_probe:1
+code_checker=exit:0,stdout_bytes:213,stderr_bytes:0,produced_bytes:828216,source_fold:2716943669611622695,artifact_fold:12109564245269848245
+moment_checker=exit:0,stdout_bytes:141,stderr_bytes:0,produced_bytes:372224,source_fold:15909112750488808264,artifact_fold:7139433044076365637
+final_body=head:14001016,continuation:15001016,admitted_tally:296,mathematical:94,codec:54,blind_reconstruction:24,rest_bytes:592,integrity:6679405993386916072
+physical_telemetry=engine_time:unknown,checker_time:unknown,temperature:unknown,power:unknown,energy:unknown
+code_formal_begin
+import Mathlib.LinearAlgebra.Matrix.Notation
+import Mathlib.Tactic.NormNum
+
+open Matrix BigOperators
+namespace Soma.Holonics.R21.Code
+
+def pairMass : Fin 20 → ℤ := ![1,4,6,4,1,3,12,18,12,3,3,12,18,12,3,1,4,6,4,1]
+
+def pairQ : Matrix (Fin 20) (Fin 20) ℤ :=
+  ![![0,4,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  ![1,0,3,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  ![0,2,0,2,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0],
+  ![0,0,3,0,1,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0],
+  ![0,0,0,4,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0],
+  ![1,0,0,0,0,0,4,0,0,0,2,0,0,0,0,0,0,0,0,0],
+  ![0,1,0,0,0,1,0,3,0,0,0,2,0,0,0,0,0,0,0,0],
+  ![0,0,1,0,0,0,2,0,2,0,0,0,2,0,0,0,0,0,0,0],
+  ![0,0,0,1,0,0,0,3,0,1,0,0,0,2,0,0,0,0,0,0],
+  ![0,0,0,0,1,0,0,0,4,0,0,0,0,0,2,0,0,0,0,0],
+  ![0,0,0,0,0,2,0,0,0,0,0,4,0,0,0,1,0,0,0,0],
+  ![0,0,0,0,0,0,2,0,0,0,1,0,3,0,0,0,1,0,0,0],
+  ![0,0,0,0,0,0,0,2,0,0,0,2,0,2,0,0,0,1,0,0],
+  ![0,0,0,0,0,0,0,0,2,0,0,0,3,0,1,0,0,0,1,0],
+  ![0,0,0,0,0,0,0,0,0,2,0,0,0,4,0,0,0,0,0,1],
+  ![0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,4,0,0,0],
+  ![0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,1,0,3,0,0],
+  ![0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,2,0,2,0],
+  ![0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,3,0,1],
+  ![0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,4,0]]
+
+def pairVector : Fin 20 → ℤ := ![18,0,-6,0,18,6,0,-2,0,6,-6,0,2,0,-6,-18,0,6,0,-18]
+def pairEigenvalue : ℤ := 1
+
+theorem generated_pair_detailed_balance :
+    ∀ i j, pairMass i * pairQ i j = pairMass j * pairQ j i := by
+  native_decide
+
+theorem generated_tensor_jacobi_eigenvector :
+    pairQ *ᵥ pairVector = pairEigenvalue • pairVector := by
+  native_decide
+
+def codeWeight : Fin 8 → ℤ := ![1,0,0,7,7,0,0,1]
+def codeDual : Fin 8 → ℤ := ![1,0,0,0,7,0,0,0]
+def krawtchouk : Matrix (Fin 8) (Fin 8) ℤ :=
+  ![![1,1,1,1,1,1,1,1],
+  ![7,5,3,1,-1,-3,-5,-7],
+  ![21,9,1,-3,-3,1,9,21],
+  ![35,5,-5,-3,3,5,-5,-35],
+  ![35,-5,-5,3,3,-5,-5,35],
+  ![21,-9,1,3,-3,-1,9,-21],
+  ![7,-5,3,-1,-1,3,-5,7],
+  ![1,-1,1,-1,1,-1,1,-1]]
+
+theorem generated_code_moment_transport :
+    ∀ j, codeDual j * 16 = ∑ i, codeWeight i * krawtchouk j i := by
+  native_decide
+
+def characteristicMultiplicity : Fin 8 → ℤ := ![1,2,3,4,4,3,2,1]
+
+theorem generated_pair_characteristic_degree :
+    ∑ i, characteristicMultiplicity i = 20 := by
+  native_decide
+
+end Soma.Holonics.R21.Code
+
+#check Soma.Holonics.R21.Code.generated_tensor_jacobi_eigenvector
+code_formal_end
+code_conversation_begin
+The binary card supplied only seven coordinate sites and three parity contacts. The card enumerated its own code population, then each nonzero pair distance repartitioned the whole cube by two receiver distances. Bit flips formed the cell contacts. Their quotient is not an unweighted grid: cell mass transports it by WQ=Q^T W. Complete contact then factors the distance-three and distance-four strata into commuting radial directions, whose integer Krawtchouk vectors carry the exact characteristic modes. The two strata share a factor only after swapping axes; their pair occurrences remain distinct. A one-shell collapse is exact only at the antipodal one-axis stratum. Unit weighting and lineage reversal retain plausible topology or spectrum but fail actual oriented contact.
+code_conversation_end
+moment_formal_begin
+import Mathlib.LinearAlgebra.Matrix.Notation
+import Mathlib.Tactic.NormNum
+import Mathlib.Tactic.Ring
+
+open Matrix
+namespace Soma.Holonics.R21.Moment
+
+def det3 (m : Matrix (Fin 3) (Fin 3) ℤ) : ℤ :=
+  m 0 0 * (m 1 1 * m 2 2 - m 1 2 * m 2 1) -
+  m 0 1 * (m 1 0 * m 2 2 - m 1 2 * m 2 0) +
+  m 0 2 * (m 1 0 * m 2 1 - m 1 1 * m 2 0)
+
+def h0 : Matrix (Fin 3) (Fin 3) ℤ := ![![3,7,21],![7,21,73],![21,73,273]]
+def h1 : Matrix (Fin 3) (Fin 3) ℤ := ![![7,21,73],![21,73,273],![73,273,1057]]
+def pencil (x : ℤ) : ℤ := det3 (fun i j => x * h0 i j - h1 i j)
+def recovered (x : ℤ) : ℤ := (-8) * x ^ 0 + (14) * x ^ 1 + (-7) * x ^ 2 + (1) * x ^ 3
+
+theorem generated_hankel_pencil (x : ℤ) : pencil x = 36 * recovered x := by
+  simp [pencil, det3, h0, h1, recovered]
+  ring
+
+def cubicDiscriminant (a b c : ℤ) : ℤ :=
+  a^2*b^2 - 4*b^3 - 4*a^3*c - 27*c^2 + 18*a*b*c
+
+theorem generated_vandermonde_discriminant : det3 h0 = 36 ∧ cubicDiscriminant (-7) (14) (-8) = 36 := by
+  native_decide
+
+theorem generated_recovered_roots : recovered 1 = 0 ∧ recovered 2 = 0 ∧ recovered 4 = 0 := by
+  native_decide
+
+def collisionH0 : Matrix (Fin 3) (Fin 3) ℤ := ![![3,6,18],![6,18,66],![18,66,258]]
+
+theorem generated_collision_obstruction : det3 collisionH0 = 0 := by
+  native_decide
+
+end Soma.Holonics.R21.Moment
+
+#check Soma.Holonics.R21.Moment.generated_hankel_pencil
+moment_formal_end
+moment_conversation_begin
+The moment card supplied no roots. Consecutive power sums formed H0 and its transported neighbor H1. Fraction-free elimination of xH0-H1 returns the characteristic polynomial of multiplication by the hidden coordinate in the moment basis; independent Newton transport returns the same monic law. Inside the declared integer aperture its roots remove that law exactly. With unit source masses, H0 factors as a Vandermonde matrix times its transpose, so det(H0) is exactly the polynomial discriminant. It is therefore the invertible transport aperture for distinct roots, not a generic label. The collision case returns determinant and discriminant zero; the short stream returns missing access. Neither is repaired by guessing. Toeplitz, reversed-order, and collapsed-degree candidates remain with the exact receiver each one fails.
+moment_conversation_end
+code_stdout_begin
+Soma.Holonics.R21.Code.generated_tensor_jacobi_eigenvector :
+  Soma.Holonics.R21.Code.pairQ *ᵥ Soma.Holonics.R21.Code.pairVector =
+    Soma.Holonics.R21.Code.pairEigenvalue • Soma.Holonics.R21.Code.pairVector
+code_stdout_end
+moment_stdout_begin
+Soma.Holonics.R21.Moment.generated_hankel_pencil (x : ℤ) :
+  Soma.Holonics.R21.Moment.pencil x = 36 * Soma.Holonics.R21.Moment.recovered x
+moment_stdout_end

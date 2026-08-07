@@ -1,0 +1,99 @@
+truth_status=established-bounded
+evidence=implemented-exact,computational-witness
+formal_truth_status=proved-derived
+formal_evidence=formal-checked
+program=r19_exact_characteristic_return.sm_89
+device_compute_capability=8.9
+kernel_launches=6
+launched_threads=21
+case_threads=16
+bytes_to_device=8752
+bytes_from_device=141456
+resident_bytes=151232
+host_semantic_events=0
+engine_source_reads=0
+exterior_retrieval_calls=0
+historical_renderer_bytes=0
+verification_failures=0
+question=identity:144400,receiver:144401,material:144402
+question_aperture=expected_eigenvalue_absent:1,prime_mode_label_absent:1,renderer_source_absent:1
+native_input=rest_bytes:376,source_bytes:0,retrieval_handles:0
+orbit_spectrum=returned_cases:16,simple_mode_cases:14,repeated_mode_cases:2,shape_tour_classes:18
+scalar_control=first_product:30,second_product:30,characteristic_equal:1,lineage_distinct:1
+matrix_order=first_trace:5,second_trace:4,first_determinant:2,second_determinant:2,first_lineage:833490030314056530,second_lineage:12042735391456664422,lineage_distinct:1,changes_characteristic:1
+matrix_rechart=trace:3,determinant:1,lineage:7457237092149246224,preserves_characteristic:1
+equal_characteristic_control=independent_fixed_dimension:2,coupled_fixed_dimension:1,unequal_conduct:1
+indicial=zero:rho(rho+1),one:rho^2,infinity:(rho-1)^2,single_branch_incomplete:1
+theory=passage:174400,diagonal_factor:1,weighted_cycle:1,matrix_controls:1,discriminants_typed:1,gauss_indicial:1
+checker=exit:0,stdout_bytes:170,stderr_bytes:0,produced_bytes:290320,declarations:1,remaining_goals:0,kernel:1,calls:1
+final_body=head:14001010,continuation:15001010,body_admitted_tally:217,mathematical:70,codec:45,geometry:10,phase:14,characteristic:16,rest_bytes:432,integrity:1323303867836747260
+physical_telemetry=engine_time:unknown,checker_time:unknown,temperature:unknown,power:unknown,energy:unknown
+formal_begin
+import Mathlib.Data.Nat.GCD.Basic
+import Mathlib.Algebra.Polynomial.Monic
+import Mathlib.Algebra.Polynomial.Degree.Operations
+import Mathlib.LinearAlgebra.Matrix.Charpoly.Coeff
+import Mathlib.LinearAlgebra.Matrix.Notation
+import Mathlib.Tactic.Ring
+import Mathlib.Tactic.NormNum
+
+open Polynomial Matrix
+namespace Soma.Holonics.R19
+
+noncomputable def diagonalCharacteristic (m n : Nat) : Polynomial ℤ :=
+  (X ^ Nat.lcm m n - 1) ^ Nat.gcd m n
+
+theorem generated_diagonal_characteristic_degree (m n : Nat)
+    (hm : m ≠ 0) (hn : n ≠ 0) :
+    (diagonalCharacteristic m n).natDegree = m * n := by
+  unfold diagonalCharacteristic
+  change ((X ^ Nat.lcm m n - C (1 : ℤ)) ^ Nat.gcd m n).natDegree = m * n
+  rw [(monic_X_pow_sub_C (1 : ℤ) (Nat.lcm_ne_zero hm hn)).natDegree_pow]
+  rw [natDegree_X_pow_sub_C, Nat.gcd_mul_lcm]
+
+def weightedTwoCycle (u v : ℤ) : Matrix (Fin 2) (Fin 2) ℤ :=
+  !![0, v; u, 0]
+
+theorem generated_weighted_two_cycle (u v : ℤ) :
+    (weightedTwoCycle u v).charpoly = X ^ 2 - C (u * v) := by
+  rw [Matrix.charpoly_fin_two]
+  simp [weightedTwoCycle, Matrix.trace, Matrix.det_fin_two]
+  ring
+
+def sourceReturn : Matrix (Fin 2) (Fin 2) ℤ := !![2, 1; 1, 1]
+def rechart : Matrix (Fin 2) (Fin 2) ℤ := !![1, 1; 0, 1]
+def rechartInv : Matrix (Fin 2) (Fin 2) ℤ := !![1, -1; 0, 1]
+
+theorem generated_rechart_characteristic :
+    (rechart * sourceReturn * rechartInv).charpoly = sourceReturn.charpoly := by
+  simp [Matrix.charpoly_fin_two, sourceReturn, rechart, rechartInv, Matrix.trace]
+
+def gaussZeroIndicial (rho : ℚ) := rho * (rho - 1) + 2 * rho
+def gaussOneIndicial (rho : ℚ) := rho * (rho + 1 + 1 - 2)
+def gaussInfinityIndicial (rho : ℚ) := (rho - 1) * (rho - 1)
+
+theorem generated_gauss_indicial (rho : ℚ) :
+    gaussZeroIndicial rho = rho * (rho + 1) ∧
+    gaussOneIndicial rho = rho ^ 2 ∧
+    gaussInfinityIndicial rho = (rho - 1) ^ 2 := by
+  constructor
+  · simp [gaussZeroIndicial]
+    ring
+  constructor
+  · simp [gaussOneIndicial]
+    ring
+  · simp [gaussInfinityIndicial, pow_two]
+
+end Soma.Holonics.R19
+
+#check Soma.Holonics.R19.generated_diagonal_characteristic_degree
+formal_end
+conversation_begin
+The diagonal phase current is an exact permutation with gcd(m,n) tours of lcm(m,n) steps. Its characteristic factor is X^lcm-1, repeated once per tour, while its minimal factor is not repeated. Shared-factor multiplicity therefore records coincident independent lineages rather than a singular local cell. Each exact shape type is retained as a formal transport indeterminate; its exponent around a tour is the shape population seen by any later constitutive specialization. Scalar edge weights return only their ordered product in the characteristic factor, so equal spectra can forget unequal edge words. Rank-two controls show both that edge order can change the characteristic return and that a conjugate rechart preserves it. Identity and Jordan returns have the same characteristic polynomial but different fixed-current dimensions. Finally, the Gauss (1,1;2) differential operator has exponent pairs (0,-1), (0,0), and (1,1) at zero, one, and infinity; the repeated exponent at one leaves a logarithmic/unipotent alternative which the single R18 coefficient branch could not expose.
+conversation_end
+stdout_begin
+Soma.Holonics.R19.generated_diagonal_characteristic_degree (m n : ℕ) (hm : m ≠ 0) (hn : n ≠ 0) :
+  (Soma.Holonics.R19.diagonalCharacteristic m n).natDegree = m * n
+stdout_end
+stderr_begin
+stderr_end
