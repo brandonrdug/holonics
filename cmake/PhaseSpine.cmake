@@ -75,7 +75,11 @@ set(SPINE_DEVICE_PTX_LIST "${SPINE_DEVICE_PTX}")
 set(SPINE_DEVICE_CUBIN_LIST "${SPINE_DEVICE_CUBIN}")
 
 set(SPINE_DEED_ARTIFACT "${PROJECT_BINARY_DIR}/receipts/MOVEMENT_A_SPINE_DEED.txt")
-add_test(
-  NAME phase_spine.spine_device_deed
-  COMMAND spine_device_deed "${SPINE_DEED_ARTIFACT}")
-add_test(NAME phase_spine.spine_host_conformance COMMAND spine_host_conformance)
+holonic_found(NAME phase_spine.spine_device_deed
+  EXECUTABLE spine_device_deed
+  COMMAND
+    "${SPINE_DEED_ARTIFACT}")
+holonic_found(NAME phase_spine.spine_host_conformance
+  EXECUTABLE spine_host_conformance
+  COMMAND
+   )

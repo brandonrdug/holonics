@@ -77,11 +77,13 @@ set(R9_DECLARED_COMMANDS
 
 set(R9_CODEC_FIXTURE "${PROJECT_SOURCE_DIR}/tests/fixtures/r9_reflective_codec.hcodec")
 set(R9_DEED_ARTIFACT "${PROJECT_BINARY_DIR}/receipts/R9_AGNOSTIC_CODECS_REFLECTION_DEED.txt")
-add_test(NAME r9.agnostic_codecs_reflection_device_deed
-  COMMAND r9_agnostic_codecs_reflection_device_deed
+holonic_found(NAME r9.agnostic_codecs_reflection_device_deed
+  EXECUTABLE r9_agnostic_codecs_reflection_device_deed
+  COMMAND
     "${R9_DEED_ARTIFACT}" "${R9_CODEC_FIXTURE}" "${PROJECT_BINARY_DIR}/r9-relocated-device")
-add_test(NAME r9.agnostic_codecs_reflection_host_conformance
-  COMMAND r9_agnostic_codecs_reflection_host_conformance
+holonic_found(NAME r9.agnostic_codecs_reflection_host_conformance
+  EXECUTABLE r9_agnostic_codecs_reflection_host_conformance
+  COMMAND
     "${R9_CODEC_FIXTURE}" "${PROJECT_BINARY_DIR}/r9-relocated-host")
 add_test(NAME r9.forbidden_reflective_codec_copy
   COMMAND "${CMAKE_COMMAND}"

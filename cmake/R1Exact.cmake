@@ -71,5 +71,11 @@ set(R1_DECLARED_COMMANDS
     "device_cubin=<CUDA_COMPILER> ${R1_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/cuda/executor/r1_exact_executor.cu -o <BUILD>/generated/r1_exact_executor.cubin\n")
 
 set(R1_DEED_ARTIFACT "${PROJECT_BINARY_DIR}/receipts/R1_EXACT_DEED.txt")
-add_test(NAME r1.exact_device_deed COMMAND r1_exact_device_deed "${R1_DEED_ARTIFACT}")
-add_test(NAME r1.exact_host_conformance COMMAND r1_exact_host_conformance)
+holonic_found(NAME r1.exact_device_deed
+  EXECUTABLE r1_exact_device_deed
+  COMMAND
+    "${R1_DEED_ARTIFACT}")
+holonic_found(NAME r1.exact_host_conformance
+  EXECUTABLE r1_exact_host_conformance
+  COMMAND
+   )

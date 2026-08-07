@@ -81,10 +81,14 @@ set(R7_DECLARED_COMMANDS
     "device_cubin=<CUDA_COMPILER> ${R7_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/cuda/executor/r7_geometry_kernels.cu -o <BUILD>/generated/r7_geometry_kernels.cubin\n")
 
 set(R7_DEED_ARTIFACT "${PROJECT_BINARY_DIR}/receipts/R7_CORE_RECEIVER_GEOMETRY_DEED.txt")
-add_test(NAME r7.core_receiver_geometry_device_deed
-  COMMAND r7_core_receiver_geometry_device_deed "${R7_DEED_ARTIFACT}")
-add_test(NAME r7.core_receiver_geometry_host_conformance
-  COMMAND r7_core_receiver_geometry_host_conformance)
+holonic_found(NAME r7.core_receiver_geometry_device_deed
+  EXECUTABLE r7_core_receiver_geometry_device_deed
+  COMMAND
+    "${R7_DEED_ARTIFACT}")
+holonic_found(NAME r7.core_receiver_geometry_host_conformance
+  EXECUTABLE r7_core_receiver_geometry_host_conformance
+  COMMAND
+   )
 add_test(NAME r7.forbidden_receiver_geometry_copy
   COMMAND "${CMAKE_COMMAND}"
     -DCOMPILER=${CMAKE_CXX_COMPILER}

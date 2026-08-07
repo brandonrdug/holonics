@@ -76,21 +76,22 @@ set(R21_MOMENT_OLEAN "${PROJECT_BINARY_DIR}/artifacts/R21_GENERATED_MOMENT_RECON
 set(R21_MOMENT_STDOUT "${PROJECT_BINARY_DIR}/artifacts/R21_MOMENT_LEAN_STDOUT.txt")
 set(R21_MOMENT_STDERR "${PROJECT_BINARY_DIR}/artifacts/R21_MOMENT_LEAN_STDERR.txt")
 set(R21_ATLAS "${PROJECT_BINARY_DIR}/artifacts/R21_BLIND_CHARACTERISTIC_ATLAS.tsv")
-add_test(NAME r21.blind_reconstruction_device_deed
-  COMMAND r21_blind_reconstruction_device_deed "${R21_DEED_ARTIFACT}"
-    "${R20_FINAL_REST}" "${R21_FINAL_REST}"
+holonic_found(NAME r21.blind_reconstruction_device_deed
+  EXECUTABLE r21_blind_reconstruction_device_deed
+  COMMAND
+    "${R21_DEED_ARTIFACT}" "${R20_FINAL_REST}" "${R21_FINAL_REST}"
     "${PROJECT_SOURCE_DIR}/apparatus/cards/R21_BINARY_CODE_PROBLEM.card"
-    "${PROJECT_SOURCE_DIR}/apparatus/cards/R21_GAPCVP_MOMENTS.card"
-    "${R21_CODE_SOURCE}" "${R21_CODE_OLEAN}" "${R21_CODE_STDOUT}" "${R21_CODE_STDERR}"
-    "${R21_MOMENT_SOURCE}" "${R21_MOMENT_OLEAN}" "${R21_MOMENT_STDOUT}"
-    "${R21_MOMENT_STDERR}" "${PROJECT_SOURCE_DIR}/formal/elementary-holonics"
+    "${PROJECT_SOURCE_DIR}/apparatus/cards/R21_GAPCVP_MOMENTS.card" "${R21_CODE_SOURCE}"
+    "${R21_CODE_OLEAN}" "${R21_CODE_STDOUT}" "${R21_CODE_STDERR}" "${R21_MOMENT_SOURCE}"
+    "${R21_MOMENT_OLEAN}" "${R21_MOMENT_STDOUT}" "${R21_MOMENT_STDERR}"
+    "${PROJECT_SOURCE_DIR}/formal/elementary-holonics"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lean-toolchain"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lake-manifest.json"
     "${PROJECT_BINARY_DIR}/artifacts" "${R21_ATLAS}")
-set_tests_properties(r21.blind_reconstruction_device_deed PROPERTIES
-  DEPENDS "r20.regular_singular_device_deed")
-add_test(NAME r21.blind_reconstruction_host_conformance
-  COMMAND r21_blind_reconstruction_host_conformance)
+holonic_found(NAME r21.blind_reconstruction_host_conformance
+  EXECUTABLE r21_blind_reconstruction_host_conformance
+  COMMAND
+   )
 add_test(NAME r21.forbidden_blind_reconstruction_copy
   COMMAND "${CMAKE_COMMAND}" -DCOMPILER=${CMAKE_CXX_COMPILER}
     -DSOURCE=${PROJECT_SOURCE_DIR}/tests/compile_contracts/forbidden_blind_reconstruction_copy.cpp

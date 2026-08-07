@@ -71,9 +71,14 @@ set(R5_DECLARED_COMMANDS
     "device_cubin=<CUDA_COMPILER> ${R5_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/cuda/executor/r5_current_kernels.cu -o <BUILD>/generated/r5_current_kernels.cubin\n")
 
 set(R5_DEED_ARTIFACT "${PROJECT_BINARY_DIR}/receipts/R5_CAUSAL_CURRENT_DEED.txt")
-add_test(NAME r5.causal_current_device_deed
-  COMMAND r5_causal_current_device_deed "${R5_DEED_ARTIFACT}")
-add_test(NAME r5.causal_current_host_conformance COMMAND r5_causal_current_host_conformance)
+holonic_found(NAME r5.causal_current_device_deed
+  EXECUTABLE r5_causal_current_device_deed
+  COMMAND
+    "${R5_DEED_ARTIFACT}")
+holonic_found(NAME r5.causal_current_host_conformance
+  EXECUTABLE r5_causal_current_host_conformance
+  COMMAND
+   )
 add_test(NAME r5.forbidden_causal_current_copy
   COMMAND "${CMAKE_COMMAND}"
     -DCOMPILER=${CMAKE_CXX_COMPILER}

@@ -74,10 +74,14 @@ set(R6_DECLARED_COMMANDS
     "device_cubin=<CUDA_COMPILER> ${R6_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/cuda/executor/r6_weave_kernels.cu -o <BUILD>/generated/r6_weave_kernels.cubin\n")
 
 set(R6_DEED_ARTIFACT "${PROJECT_BINARY_DIR}/receipts/R6_MANY_CURRENT_WEAVE_DEED.txt")
-add_test(NAME r6.many_current_weave_device_deed
-  COMMAND r6_many_current_weave_device_deed "${R6_DEED_ARTIFACT}")
-add_test(NAME r6.many_current_weave_host_conformance
-  COMMAND r6_many_current_weave_host_conformance)
+holonic_found(NAME r6.many_current_weave_device_deed
+  EXECUTABLE r6_many_current_weave_device_deed
+  COMMAND
+    "${R6_DEED_ARTIFACT}")
+holonic_found(NAME r6.many_current_weave_host_conformance
+  EXECUTABLE r6_many_current_weave_host_conformance
+  COMMAND
+   )
 add_test(NAME r6.forbidden_weave_copy
   COMMAND "${CMAKE_COMMAND}"
     -DCOMPILER=${CMAKE_CXX_COMPILER}

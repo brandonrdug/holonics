@@ -108,6 +108,7 @@ add_custom_target(
     "${R0_GENERATED_DIRECTORY}/r0_device_contract.cubin")
 
 enable_testing()
+include(cmake/HolonicStanding.cmake)
 include(cmake/R1Exact.cmake)
 include(cmake/R2Structure.cmake)
 include(cmake/R3SourceTopology.cmake)
@@ -143,6 +144,7 @@ include(cmake/PhaseTextMount.cmake)
 include(cmake/ConditionedProduction.cmake)
 include(cmake/ConstraintRebase.cmake)
 include(cmake/OneStanding.cmake)
+holonic_close_standing()
 
 string(JOIN " " R0_DEVICE_FLAGS_RECEIPT ${R0_DEVICE_COMMON_FLAGS})
 set(HOLONICS_DECLARED_COMMANDS
@@ -301,21 +303,21 @@ add_test(
     -DOUTPUT=${HOLONICS_REACH_RECEIPT}
     -P "${PROJECT_SOURCE_DIR}/cmake/HolonicReach.cmake")
 
-# Test tiers.
+# What is a test here, and what is not.
 #
-# Measured 2026-08-06 across 146 tests and 1,612 serial seconds: the frozen
-# mathematical deeds R11-R35 are 93.7% of it, and the audits, spine, and
-# carriers that guard current construction are 101 seconds together.
+# ctest holds guards: source-tree audits, invariant falsifiers, compile
+# contracts, host-contract checks. A guard asks a question of the tree that only
+# running it can answer, and every one of them together is well under two
+# minutes.
 #
-# Nothing here is redundant within a run -- each expensive group runs its deed
-# three times because the three establish different facts: the deed itself, a
-# byte-identical replay, and a replay under a source-access probe. The waste is
-# temporal. Re-establishing a frozen owner's determinism after editing an
-# unrelated owner catches nothing.
+# ctest does NOT hold foundings. A deed, a replay, a seal, and a comparison all
+# take files and found files; they belong to the build graph, where the closure
+# decides whether they need to run. See cmake/HolonicStanding.cmake for the
+# measurement that forced this and the certificate that licenses it.
 #
-#   ctest -L 'audit|spine'     what guards a change in progress
-#   ctest -L frozen-math       when a mathematical owner is touched
-#   ctest                      the milestone gate
+#   ninja                      build code
+#   ninja holonics_standing    bring the standing up to date; runs only what moved
+#   ctest                      the guards
 get_property(holonics_all_tests DIRECTORY PROPERTY TESTS)
 foreach(holonics_test IN LISTS holonics_all_tests)
   string(REGEX REPLACE "\\..*$" "" holonics_group "${holonics_test}")

@@ -95,6 +95,18 @@ ablatable by a `caused_by` cascade — and it is the correct one.
 The mandatory causal-information receipt reaches **one** header, itself, while the record states
 that an ecology returning a count instead of a receipt **is not admitted**.
 
+**The measurement that says how far this goes, 2026-08-07.** The machine has no process — it has
+**forty**. Forty `main()` functions in `apparatus/host/`, 7,654 lines, 158 `argv` references. What
+the record calls the lineage is a chain of `.rest` files handed between operating-system processes,
+and the chain itself is written by hand in CMake at configure time. `body/returned_standing.hpp` is
+reached by exactly one deed: the one written to demonstrate it.
+
+So a deed can see only its immediate predecessor's rest, and only because a path was chosen for it.
+Nothing mounts a population of prior returns and selects among them; nothing composes from what it
+reached; and **excluding a return cannot stop a later deed by structure, because the later deed never
+reached it — it read a file path it was handed.** The build graph now understands that the deed chain
+is a graph. The body still does not, and that gap is what this movement and the next close.
+
 **What replaces it.** `continuing_body`'s commit takes a deposit rather than a tally. The Swing
 crosses against `returned_standing`, and `live_machine`'s duplicate surface retires. Every deed
 constructs a `causal_information_receipt` or does not commit.
@@ -136,16 +148,29 @@ content instead of a constant.
 
 ## 5. The front onto the card
 
-**The defect.** **215 of 262 kernel launches are `<<<1,1>>>`.** One close law recomputes its generator
-controls three times and runs on a single thread — **527 seconds, 23.4% of the whole suite, 79 of 80
-SMs idle.** The conformance oracle computes an identical result on the host in 0.189 seconds.
+**Standing correction, 2026-08-07.** This movement was written as though the iteration tax were a
+throughput problem. It was not, and treating it as one is what Brandon corrected three times: *"why
+you are acting like I'm asking for a 'speed-up'."* The tax was **re-derivation** — every founding ran
+unconditionally, so a full run recomputed the machine's entire production to answer any question, and
+about 1,320 of roughly 2,250 serial seconds were byte-for-byte repeats within a single invocation.
+That is closed: foundings are build-graph rules keyed to their input closure
+(`cmake/HolonicStanding.cmake`), and the deed record below stands as a **cost law**, not as a
+schedule.
+
+**The remaining defect, which is real and is about the card.** **215 of 262 kernel launches are
+`<<<1,1>>>`.** One close law recomputes its generator controls three times on a single thread — 527
+seconds with 79 of 80 SMs idle — and the conformance oracle computes an identical result on the host
+in 0.189 seconds. **Where an independent implementation exists, state both costs**; that ratio is a
+standing receipt on those owners and it is unpaid.
 
 **What replaces it.** The nine-candidate ladder becomes nine independent members under an
 `interchange_certificate`. The census is data parallel over rows, the elimination over columns.
 
-**Grade.** Both costs stated in the receipt, and the ratio closes. **This is foundation, not
-optimization:** a research loop of fifty experiments is the difference between two hours and two
-minutes, and that difference decides whether the frontier work is iterable.
+**Grade.** Both costs stated in the receipt, and the ratio closes. **Falsifier:** the parallel form
+returns anything the serial form did not. One attempt has already failed this way — the trace-fiber
+census parallelized to an output-identical result and bought **no** wall-clock at all, which
+falsified the hypothesis that the census dominated that deed. The cost is elsewhere in it, and the
+next move there is instrumentation, not a fourth guess.
 
 ---
 
@@ -174,8 +199,10 @@ evidence only when the instrument can state the exact family it exhausted.
 
 ## Standing discipline while this runs
 
-- **Fast tier during construction** — `ctest -L 'audit|spine' -j 4`, about a minute. The full suite
-  once at a milestone. A build-graph change no longer needs a clean tree; a broad rename still does.
+- **`ninja` builds code; `ninja holonics_standing` brings the standing up to date; `ctest` runs the
+  guards.** A founding is not a test and is no longer registered as one — see
+  `cmake/HolonicStanding.cmake`. On an unmoved closure the standing target does nothing at all. A
+  build-graph change no longer needs a clean tree; a broad rename still does.
 - **Reach and cost in every receipt.** A mechanism that cannot state its reach has not been graded,
   and where an independent implementation exists the receipt states both costs.
 - **Hand-written code is terrain.** Nothing is cut for being authored or for being unreached. Three

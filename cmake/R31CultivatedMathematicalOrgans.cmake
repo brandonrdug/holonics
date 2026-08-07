@@ -81,105 +81,105 @@ set(R31_SOURCE_AUDIT "${PROJECT_BINARY_DIR}/receipts/R31_SOURCE_ACCESS_AUDIT.txt
 set(R31_SEAL "${PROJECT_BINARY_DIR}/receipts/R31_SEALED_RETURN.txt")
 set(R31_DETERMINISM "${PROJECT_BINARY_DIR}/receipts/R31_DETERMINISM.txt")
 
-add_test(NAME r31.organ_cultivation_device_deed COMMAND r31_organ_cultivation_device_deed
-  "${R31_CULTIVATION_DEED}" "${R30_FINAL_REST}" "${R31_INTERMEDIATE_REST}"
-  "${PROJECT_SOURCE_DIR}/apparatus/cards/R31_R18_RECIPROCAL.card"
-  "${PROJECT_SOURCE_DIR}/apparatus/cards/R31_R24_CENTRAL_WALK.card"
-  "${PROJECT_SOURCE_DIR}/apparatus/cards/R31_R29_SIGNED_TRACE.card"
-  "${PROJECT_SOURCE_DIR}/apparatus/cards/R31_R30_POLYGONS.card"
-  "${R31_CULTIVATION_SOURCE}" "${R31_CULTIVATION_OLEAN}"
-  "${R31_CULTIVATION_STDOUT}" "${R31_CULTIVATION_STDERR}"
-  "${PROJECT_SOURCE_DIR}/formal/elementary-holonics"
-  "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lean-toolchain"
-  "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lake-manifest.json"
-  "${PROJECT_BINARY_DIR}/artifacts" "${R31_CULTIVATION_ATLAS}")
-set_tests_properties(r31.organ_cultivation_device_deed PROPERTIES
-  DEPENDS "r30.plural_rederivation_device_deed" TIMEOUT 1800)
+holonic_found(NAME r31.organ_cultivation_device_deed
+  EXECUTABLE r31_organ_cultivation_device_deed
+  COMMAND
+    "${R31_CULTIVATION_DEED}" "${R30_FINAL_REST}" "${R31_INTERMEDIATE_REST}"
+    "${PROJECT_SOURCE_DIR}/apparatus/cards/R31_R18_RECIPROCAL.card"
+    "${PROJECT_SOURCE_DIR}/apparatus/cards/R31_R24_CENTRAL_WALK.card"
+    "${PROJECT_SOURCE_DIR}/apparatus/cards/R31_R29_SIGNED_TRACE.card"
+    "${PROJECT_SOURCE_DIR}/apparatus/cards/R31_R30_POLYGONS.card"
+    "${R31_CULTIVATION_SOURCE}" "${R31_CULTIVATION_OLEAN}" "${R31_CULTIVATION_STDOUT}"
+    "${R31_CULTIVATION_STDERR}" "${PROJECT_SOURCE_DIR}/formal/elementary-holonics"
+    "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lean-toolchain"
+    "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lake-manifest.json"
+    "${PROJECT_BINARY_DIR}/artifacts" "${R31_CULTIVATION_ATLAS}")
 
-add_test(NAME r31.cultivated_application_device_deed COMMAND r31_cultivated_application_device_deed
-  "${R31_APPLICATION_DEED}" "${R31_INTERMEDIATE_REST}" "${R31_FINAL_REST}"
-  "${PROJECT_SOURCE_DIR}/apparatus/cards/R31_CONDUCTANCE_STAR.card"
-  "${PROJECT_SOURCE_DIR}/apparatus/cards/R31_SQUARE_WALK.card"
-  "${PROJECT_SOURCE_DIR}/apparatus/cards/R31_SIGNED_CARRIER.card"
-  "${PROJECT_SOURCE_DIR}/apparatus/cards/R31_GRADED_INCIDENCE.card"
-  "${R31_APPLICATION_SOURCE}" "${R31_APPLICATION_OLEAN}"
-  "${R31_APPLICATION_STDOUT}" "${R31_APPLICATION_STDERR}"
-  "${PROJECT_SOURCE_DIR}/formal/elementary-holonics"
-  "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lean-toolchain"
-  "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lake-manifest.json"
-  "${PROJECT_BINARY_DIR}/artifacts" "${R31_DOSSIER}"
-  "${R31_APPLICATION_ATLAS}")
-set_tests_properties(r31.cultivated_application_device_deed PROPERTIES
-  DEPENDS "r31.organ_cultivation_device_deed" TIMEOUT 1800)
+holonic_found(NAME r31.cultivated_application_device_deed
+  EXECUTABLE r31_cultivated_application_device_deed
+  COMMAND
+    "${R31_APPLICATION_DEED}" "${R31_INTERMEDIATE_REST}" "${R31_FINAL_REST}"
+    "${PROJECT_SOURCE_DIR}/apparatus/cards/R31_CONDUCTANCE_STAR.card"
+    "${PROJECT_SOURCE_DIR}/apparatus/cards/R31_SQUARE_WALK.card"
+    "${PROJECT_SOURCE_DIR}/apparatus/cards/R31_SIGNED_CARRIER.card"
+    "${PROJECT_SOURCE_DIR}/apparatus/cards/R31_GRADED_INCIDENCE.card"
+    "${R31_APPLICATION_SOURCE}" "${R31_APPLICATION_OLEAN}" "${R31_APPLICATION_STDOUT}"
+    "${R31_APPLICATION_STDERR}" "${PROJECT_SOURCE_DIR}/formal/elementary-holonics"
+    "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lean-toolchain"
+    "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lake-manifest.json"
+    "${PROJECT_BINARY_DIR}/artifacts" "${R31_DOSSIER}" "${R31_APPLICATION_ATLAS}")
 
 add_library(r31_open_probe SHARED tests/apparatus/r31_open_probe.cpp)
 target_link_libraries(r31_open_probe PRIVATE holonics_contract_options)
 set_target_properties(r31_open_probe PROPERTIES PREFIX "")
-add_test(NAME r31.source_access_audit COMMAND "${CMAKE_COMMAND}"
-  -DCULT_EXEC=$<TARGET_FILE:r31_organ_cultivation_device_deed>
-  -DAPP_EXEC=$<TARGET_FILE:r31_cultivated_application_device_deed>
-  -DPROBE=$<TARGET_FILE:r31_open_probe> -DCULT_LOG=${R31_CULTIVATION_OPEN_LOG}
-  -DAPP_LOG=${R31_APPLICATION_OPEN_LOG} -DOUTPUT=${R31_SOURCE_AUDIT}
-  -DCULT_DEED=${R31_CULTIVATION_DEED} -DAPP_DEED=${R31_APPLICATION_DEED}
-  -DR30_REST=${R30_FINAL_REST} -DINTERMEDIATE=${R31_INTERMEDIATE_REST}
-  -DFINAL_REST=${R31_FINAL_REST}
-  -DD0=${PROJECT_SOURCE_DIR}/apparatus/cards/R31_R18_RECIPROCAL.card
-  -DD1=${PROJECT_SOURCE_DIR}/apparatus/cards/R31_R24_CENTRAL_WALK.card
-  -DD2=${PROJECT_SOURCE_DIR}/apparatus/cards/R31_R29_SIGNED_TRACE.card
-  -DD3=${PROJECT_SOURCE_DIR}/apparatus/cards/R31_R30_POLYGONS.card
-  -DH0=${PROJECT_SOURCE_DIR}/apparatus/cards/R31_CONDUCTANCE_STAR.card
-  -DH1=${PROJECT_SOURCE_DIR}/apparatus/cards/R31_SQUARE_WALK.card
-  -DH2=${PROJECT_SOURCE_DIR}/apparatus/cards/R31_SIGNED_CARRIER.card
-  -DH3=${PROJECT_SOURCE_DIR}/apparatus/cards/R31_GRADED_INCIDENCE.card
-  -DCULT_SOURCE=${R31_CULTIVATION_SOURCE} -DCULT_OLEAN=${R31_CULTIVATION_OLEAN}
-  -DCULT_STDOUT=${R31_CULTIVATION_STDOUT} -DCULT_STDERR=${R31_CULTIVATION_STDERR}
-  -DCULT_ATLAS=${R31_CULTIVATION_ATLAS} -DAPP_SOURCE=${R31_APPLICATION_SOURCE}
-  -DAPP_OLEAN=${R31_APPLICATION_OLEAN} -DAPP_STDOUT=${R31_APPLICATION_STDOUT}
-  -DAPP_STDERR=${R31_APPLICATION_STDERR} -DDOSSIER=${R31_DOSSIER}
-  -DAPP_ATLAS=${R31_APPLICATION_ATLAS}
-  -DFORMAL_ROOT=${PROJECT_SOURCE_DIR}/formal/elementary-holonics
-  -DTOOLCHAIN=${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lean-toolchain
-  -DMANIFEST=${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lake-manifest.json
-  -DARTIFACT_ROOT=${PROJECT_BINARY_DIR}/artifacts
-  -P "${PROJECT_SOURCE_DIR}/cmake/R31SourceAccessAudit.cmake")
-set_tests_properties(r31.source_access_audit PROPERTIES
-  DEPENDS "r31.cultivated_application_device_deed" TIMEOUT 1800)
-add_test(NAME r31.seal COMMAND "${CMAKE_COMMAND}" -DOUTPUT=${R31_SEAL}
-  -DSOURCE_AUDIT=${R31_SOURCE_AUDIT} -DCULT_DEED=${R31_CULTIVATION_DEED}
-  -DAPP_DEED=${R31_APPLICATION_DEED} -DINTERMEDIATE=${R31_INTERMEDIATE_REST}
-  -DFINAL_REST=${R31_FINAL_REST} -DCULT_SOURCE=${R31_CULTIVATION_SOURCE}
-  -DCULT_OLEAN=${R31_CULTIVATION_OLEAN} -DCULT_ATLAS=${R31_CULTIVATION_ATLAS}
-  -DAPP_SOURCE=${R31_APPLICATION_SOURCE} -DAPP_OLEAN=${R31_APPLICATION_OLEAN}
-  -DDOSSIER=${R31_DOSSIER} -DAPP_ATLAS=${R31_APPLICATION_ATLAS}
-  -DDETERMINISM=${R31_DETERMINISM}
-  -P "${PROJECT_SOURCE_DIR}/cmake/R31Seal.cmake")
-add_test(NAME r31.determinism COMMAND "${CMAKE_COMMAND}"
-  -DCULT_EXEC=$<TARGET_FILE:r31_organ_cultivation_device_deed>
-  -DAPP_EXEC=$<TARGET_FILE:r31_cultivated_application_device_deed>
-  -DTMP=${PROJECT_BINARY_DIR}/artifacts/r31-determinism -DR30_REST=${R30_FINAL_REST}
-  -DD0=${PROJECT_SOURCE_DIR}/apparatus/cards/R31_R18_RECIPROCAL.card
-  -DD1=${PROJECT_SOURCE_DIR}/apparatus/cards/R31_R24_CENTRAL_WALK.card
-  -DD2=${PROJECT_SOURCE_DIR}/apparatus/cards/R31_R29_SIGNED_TRACE.card
-  -DD3=${PROJECT_SOURCE_DIR}/apparatus/cards/R31_R30_POLYGONS.card
-  -DH0=${PROJECT_SOURCE_DIR}/apparatus/cards/R31_CONDUCTANCE_STAR.card
-  -DH1=${PROJECT_SOURCE_DIR}/apparatus/cards/R31_SQUARE_WALK.card
-  -DH2=${PROJECT_SOURCE_DIR}/apparatus/cards/R31_SIGNED_CARRIER.card
-  -DH3=${PROJECT_SOURCE_DIR}/apparatus/cards/R31_GRADED_INCIDENCE.card
-  -DFORMAL_ROOT=${PROJECT_SOURCE_DIR}/formal/elementary-holonics
-  -DTOOLCHAIN=${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lean-toolchain
-  -DMANIFEST=${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lake-manifest.json
-  -DARTIFACT_ROOT=${PROJECT_BINARY_DIR}/artifacts -DCULT_DEED=${R31_CULTIVATION_DEED}
-  -DAPP_DEED=${R31_APPLICATION_DEED} -DINTERMEDIATE=${R31_INTERMEDIATE_REST}
-  -DFINAL_REST=${R31_FINAL_REST} -DCULT_SOURCE=${R31_CULTIVATION_SOURCE}
-  -DCULT_OLEAN=${R31_CULTIVATION_OLEAN} -DCULT_STDOUT=${R31_CULTIVATION_STDOUT}
-  -DCULT_STDERR=${R31_CULTIVATION_STDERR} -DCULT_ATLAS=${R31_CULTIVATION_ATLAS}
-  -DAPP_SOURCE=${R31_APPLICATION_SOURCE} -DAPP_OLEAN=${R31_APPLICATION_OLEAN}
-  -DAPP_STDOUT=${R31_APPLICATION_STDOUT} -DAPP_STDERR=${R31_APPLICATION_STDERR}
-  -DDOSSIER=${R31_DOSSIER} -DAPP_ATLAS=${R31_APPLICATION_ATLAS}
-  -DOUTPUT=${R31_DETERMINISM} -P "${PROJECT_SOURCE_DIR}/cmake/R31Determinism.cmake")
-set_tests_properties(r31.determinism PROPERTIES DEPENDS "r31.source_access_audit" TIMEOUT 1800)
-set_tests_properties(r31.seal PROPERTIES DEPENDS "r31.determinism")
-add_test(NAME r31.cultivated_host_conformance COMMAND r31_cultivated_host_conformance)
+holonic_found(NAME r31.source_access_audit
+  COMMAND
+    "${CMAKE_COMMAND}" -DCULT_EXEC=$<TARGET_FILE:r31_organ_cultivation_device_deed>
+    -DAPP_EXEC=$<TARGET_FILE:r31_cultivated_application_device_deed>
+    -DPROBE=$<TARGET_FILE:r31_open_probe> -DCULT_LOG=${R31_CULTIVATION_OPEN_LOG}
+    -DAPP_LOG=${R31_APPLICATION_OPEN_LOG} -DOUTPUT=${R31_SOURCE_AUDIT}
+    -DCULT_DEED=${R31_CULTIVATION_DEED} -DAPP_DEED=${R31_APPLICATION_DEED}
+    -DR30_REST=${R30_FINAL_REST} -DINTERMEDIATE=${R31_INTERMEDIATE_REST}
+    -DFINAL_REST=${R31_FINAL_REST}
+    -DD0=${PROJECT_SOURCE_DIR}/apparatus/cards/R31_R18_RECIPROCAL.card
+    -DD1=${PROJECT_SOURCE_DIR}/apparatus/cards/R31_R24_CENTRAL_WALK.card
+    -DD2=${PROJECT_SOURCE_DIR}/apparatus/cards/R31_R29_SIGNED_TRACE.card
+    -DD3=${PROJECT_SOURCE_DIR}/apparatus/cards/R31_R30_POLYGONS.card
+    -DH0=${PROJECT_SOURCE_DIR}/apparatus/cards/R31_CONDUCTANCE_STAR.card
+    -DH1=${PROJECT_SOURCE_DIR}/apparatus/cards/R31_SQUARE_WALK.card
+    -DH2=${PROJECT_SOURCE_DIR}/apparatus/cards/R31_SIGNED_CARRIER.card
+    -DH3=${PROJECT_SOURCE_DIR}/apparatus/cards/R31_GRADED_INCIDENCE.card
+    -DCULT_SOURCE=${R31_CULTIVATION_SOURCE} -DCULT_OLEAN=${R31_CULTIVATION_OLEAN}
+    -DCULT_STDOUT=${R31_CULTIVATION_STDOUT} -DCULT_STDERR=${R31_CULTIVATION_STDERR}
+    -DCULT_ATLAS=${R31_CULTIVATION_ATLAS} -DAPP_SOURCE=${R31_APPLICATION_SOURCE}
+    -DAPP_OLEAN=${R31_APPLICATION_OLEAN} -DAPP_STDOUT=${R31_APPLICATION_STDOUT}
+    -DAPP_STDERR=${R31_APPLICATION_STDERR} -DDOSSIER=${R31_DOSSIER}
+    -DAPP_ATLAS=${R31_APPLICATION_ATLAS}
+    -DFORMAL_ROOT=${PROJECT_SOURCE_DIR}/formal/elementary-holonics
+    -DTOOLCHAIN=${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lean-toolchain
+    -DMANIFEST=${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lake-manifest.json
+    -DARTIFACT_ROOT=${PROJECT_BINARY_DIR}/artifacts -P
+    "${PROJECT_SOURCE_DIR}/cmake/R31SourceAccessAudit.cmake")
+holonic_found(NAME r31.determinism
+  WITHHOLD TMP
+  COMMAND
+    "${CMAKE_COMMAND}" -DCULT_EXEC=$<TARGET_FILE:r31_organ_cultivation_device_deed>
+    -DAPP_EXEC=$<TARGET_FILE:r31_cultivated_application_device_deed>
+    -DTMP=${PROJECT_BINARY_DIR}/artifacts/r31-determinism -DR30_REST=${R30_FINAL_REST}
+    -DD0=${PROJECT_SOURCE_DIR}/apparatus/cards/R31_R18_RECIPROCAL.card
+    -DD1=${PROJECT_SOURCE_DIR}/apparatus/cards/R31_R24_CENTRAL_WALK.card
+    -DD2=${PROJECT_SOURCE_DIR}/apparatus/cards/R31_R29_SIGNED_TRACE.card
+    -DD3=${PROJECT_SOURCE_DIR}/apparatus/cards/R31_R30_POLYGONS.card
+    -DH0=${PROJECT_SOURCE_DIR}/apparatus/cards/R31_CONDUCTANCE_STAR.card
+    -DH1=${PROJECT_SOURCE_DIR}/apparatus/cards/R31_SQUARE_WALK.card
+    -DH2=${PROJECT_SOURCE_DIR}/apparatus/cards/R31_SIGNED_CARRIER.card
+    -DH3=${PROJECT_SOURCE_DIR}/apparatus/cards/R31_GRADED_INCIDENCE.card
+    -DFORMAL_ROOT=${PROJECT_SOURCE_DIR}/formal/elementary-holonics
+    -DTOOLCHAIN=${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lean-toolchain
+    -DMANIFEST=${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lake-manifest.json
+    -DARTIFACT_ROOT=${PROJECT_BINARY_DIR}/artifacts -DCULT_DEED=${R31_CULTIVATION_DEED}
+    -DAPP_DEED=${R31_APPLICATION_DEED} -DINTERMEDIATE=${R31_INTERMEDIATE_REST}
+    -DFINAL_REST=${R31_FINAL_REST} -DCULT_SOURCE=${R31_CULTIVATION_SOURCE}
+    -DCULT_OLEAN=${R31_CULTIVATION_OLEAN} -DCULT_STDOUT=${R31_CULTIVATION_STDOUT}
+    -DCULT_STDERR=${R31_CULTIVATION_STDERR} -DCULT_ATLAS=${R31_CULTIVATION_ATLAS}
+    -DAPP_SOURCE=${R31_APPLICATION_SOURCE} -DAPP_OLEAN=${R31_APPLICATION_OLEAN}
+    -DAPP_STDOUT=${R31_APPLICATION_STDOUT} -DAPP_STDERR=${R31_APPLICATION_STDERR}
+    -DDOSSIER=${R31_DOSSIER} -DAPP_ATLAS=${R31_APPLICATION_ATLAS}
+    -DOUTPUT=${R31_DETERMINISM} -P "${PROJECT_SOURCE_DIR}/cmake/R31Determinism.cmake")
+holonic_found(NAME r31.seal
+  COMMAND
+    "${CMAKE_COMMAND}" -DOUTPUT=${R31_SEAL} -DSOURCE_AUDIT=${R31_SOURCE_AUDIT}
+    -DCULT_DEED=${R31_CULTIVATION_DEED} -DAPP_DEED=${R31_APPLICATION_DEED}
+    -DINTERMEDIATE=${R31_INTERMEDIATE_REST} -DFINAL_REST=${R31_FINAL_REST}
+    -DCULT_SOURCE=${R31_CULTIVATION_SOURCE} -DCULT_OLEAN=${R31_CULTIVATION_OLEAN}
+    -DCULT_ATLAS=${R31_CULTIVATION_ATLAS} -DAPP_SOURCE=${R31_APPLICATION_SOURCE}
+    -DAPP_OLEAN=${R31_APPLICATION_OLEAN} -DDOSSIER=${R31_DOSSIER}
+    -DAPP_ATLAS=${R31_APPLICATION_ATLAS} -DDETERMINISM=${R31_DETERMINISM} -P
+    "${PROJECT_SOURCE_DIR}/cmake/R31Seal.cmake")
+holonic_found(NAME r31.cultivated_host_conformance
+  EXECUTABLE r31_cultivated_host_conformance
+  COMMAND
+   )
 add_test(NAME r31.forbidden_cultivated_copy COMMAND "${CMAKE_COMMAND}"
   -DCOMPILER=${CMAKE_CXX_COMPILER}
   -DSOURCE=${PROJECT_SOURCE_DIR}/tests/compile_contracts/forbidden_cultivated_copy.cpp

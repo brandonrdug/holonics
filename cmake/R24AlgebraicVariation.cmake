@@ -69,19 +69,20 @@ set(R24_OLEAN "${PROJECT_BINARY_DIR}/artifacts/R24_GENERATED_ALGEBRAIC_VARIATION
 set(R24_STDOUT "${PROJECT_BINARY_DIR}/artifacts/R24_LEAN_STDOUT.txt")
 set(R24_STDERR "${PROJECT_BINARY_DIR}/artifacts/R24_LEAN_STDERR.txt")
 set(R24_ATLAS "${PROJECT_BINARY_DIR}/artifacts/R24_ALGEBRAIC_VARIATION_ATLAS.tsv")
-add_test(NAME r24.algebraic_variation_device_deed
-  COMMAND r24_algebraic_variation_device_deed "${R24_DEED_ARTIFACT}"
-    "${R23_FINAL_REST}" "${R24_FINAL_REST}"
-    "${PROJECT_SOURCE_DIR}/apparatus/cards/R24_ALGEBRAIC_VARIATION.card"
-    "${R24_SOURCE}" "${R24_OLEAN}" "${R24_STDOUT}" "${R24_STDERR}"
+holonic_found(NAME r24.algebraic_variation_device_deed
+  EXECUTABLE r24_algebraic_variation_device_deed
+  COMMAND
+    "${R24_DEED_ARTIFACT}" "${R23_FINAL_REST}" "${R24_FINAL_REST}"
+    "${PROJECT_SOURCE_DIR}/apparatus/cards/R24_ALGEBRAIC_VARIATION.card" "${R24_SOURCE}"
+    "${R24_OLEAN}" "${R24_STDOUT}" "${R24_STDERR}"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lean-toolchain"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lake-manifest.json"
     "${PROJECT_BINARY_DIR}/artifacts" "${R24_ATLAS}")
-set_tests_properties(r24.algebraic_variation_device_deed PROPERTIES
-  DEPENDS "r23.toric_cycle_device_deed")
-add_test(NAME r24.algebraic_variation_host_conformance
-  COMMAND r24_algebraic_variation_host_conformance)
+holonic_found(NAME r24.algebraic_variation_host_conformance
+  EXECUTABLE r24_algebraic_variation_host_conformance
+  COMMAND
+   )
 add_test(NAME r24.forbidden_algebraic_variation_copy
   COMMAND "${CMAKE_COMMAND}" -DCOMPILER=${CMAKE_CXX_COMPILER}
     -DSOURCE=${PROJECT_SOURCE_DIR}/tests/compile_contracts/forbidden_algebraic_variation_copy.cpp

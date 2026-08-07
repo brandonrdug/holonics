@@ -4,6 +4,7 @@ target_link_libraries(
 
 set(CONSTRAINT_DEED_ARTIFACT
     "${PROJECT_BINARY_DIR}/receipts/CONSTRAINT_REBASE_DEED.txt")
-add_test(
-  NAME constraint.rebase_deed
-  COMMAND constraint_rebase_deed "${CONSTRAINT_DEED_ARTIFACT}")
+holonic_found(NAME constraint.rebase_deed
+  EXECUTABLE constraint_rebase_deed
+  COMMAND
+    "${CONSTRAINT_DEED_ARTIFACT}")

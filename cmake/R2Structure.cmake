@@ -72,10 +72,14 @@ set(R2_DECLARED_COMMANDS
     "device_cubin=<CUDA_COMPILER> ${R2_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/cuda/executor/r2_structure_executor.cu -o <BUILD>/generated/r2_structure_executor.cubin\n")
 
 set(R2_DEED_ARTIFACT "${PROJECT_BINARY_DIR}/receipts/R2_STRUCTURE_DEED.txt")
-add_test(
-  NAME r2.structure_device_deed
-  COMMAND r2_structure_device_deed "${R2_DEED_ARTIFACT}")
-add_test(NAME r2.structure_host_conformance COMMAND r2_structure_host_conformance)
+holonic_found(NAME r2.structure_device_deed
+  EXECUTABLE r2_structure_device_deed
+  COMMAND
+    "${R2_DEED_ARTIFACT}")
+holonic_found(NAME r2.structure_host_conformance
+  EXECUTABLE r2_structure_host_conformance
+  COMMAND
+   )
 add_test(
   NAME r2.forbidden_structure_copy
   COMMAND

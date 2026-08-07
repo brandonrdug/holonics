@@ -10,11 +10,15 @@ target_link_libraries(
 set(CONDITIONED_ARTIFACTS "${PROJECT_BINARY_DIR}/artifacts")
 set(CONDITIONED_DEED_ARTIFACT
     "${PROJECT_BINARY_DIR}/receipts/CONDITIONED_PRODUCTION_DEED.txt")
-add_test(
-  NAME conditioned.production_deed
+# The foil is a proof the kernel is SUPPOSED to refuse, so no object is ever
+# produced at this path. Its absence is the negative control and must not be read
+# as work left undone by any founding that names it.
+holonic_withhold("${CONDITIONED_ARTIFACTS}/HolonicsConditionedFoil.olean")
+
+holonic_found(NAME conditioned.production_deed
+  EXECUTABLE conditioned_production_deed
   COMMAND
-    conditioned_production_deed "${CONDITIONED_DEED_ARTIFACT}"
-    "${CONDITIONED_ARTIFACTS}/HolonicsConditionedOne.lean"
+    "${CONDITIONED_DEED_ARTIFACT}" "${CONDITIONED_ARTIFACTS}/HolonicsConditionedOne.lean"
     "${CONDITIONED_ARTIFACTS}/HolonicsConditionedTwo.lean"
     "${CONDITIONED_ARTIFACTS}/HolonicsConditionedFoil.lean"
     "${CONDITIONED_ARTIFACTS}/HolonicsConditionedOne.olean"

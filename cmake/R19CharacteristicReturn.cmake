@@ -68,16 +68,19 @@ set(R19_OLEAN "${PROJECT_BINARY_DIR}/artifacts/R19_GENERATED_CHARACTERISTIC.olea
 set(R19_STDOUT "${PROJECT_BINARY_DIR}/artifacts/R19_LEAN_STDOUT.txt")
 set(R19_STDERR "${PROJECT_BINARY_DIR}/artifacts/R19_LEAN_STDERR.txt")
 set(R19_ATLAS "${PROJECT_BINARY_DIR}/artifacts/R19_CHARACTERISTIC_ATLAS.tsv")
-add_test(NAME r19.characteristic_device_deed
-  COMMAND r19_characteristic_device_deed "${R19_DEED_ARTIFACT}"
-    "${R18_FINAL_REST}" "${R19_FINAL_REST}" "${R19_SOURCE}" "${R19_OLEAN}"
-    "${R19_STDOUT}" "${R19_STDERR}" "${PROJECT_SOURCE_DIR}/formal/elementary-holonics"
+holonic_found(NAME r19.characteristic_device_deed
+  EXECUTABLE r19_characteristic_device_deed
+  COMMAND
+    "${R19_DEED_ARTIFACT}" "${R18_FINAL_REST}" "${R19_FINAL_REST}" "${R19_SOURCE}"
+    "${R19_OLEAN}" "${R19_STDOUT}" "${R19_STDERR}"
+    "${PROJECT_SOURCE_DIR}/formal/elementary-holonics"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lean-toolchain"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lake-manifest.json"
     "${PROJECT_BINARY_DIR}/artifacts" "${R19_ATLAS}")
-set_tests_properties(r19.characteristic_device_deed PROPERTIES
-  DEPENDS "r18.phase_crystal_device_deed")
-add_test(NAME r19.characteristic_host_conformance COMMAND r19_characteristic_host_conformance)
+holonic_found(NAME r19.characteristic_host_conformance
+  EXECUTABLE r19_characteristic_host_conformance
+  COMMAND
+   )
 add_test(NAME r19.forbidden_characteristic_copy
   COMMAND "${CMAKE_COMMAND}" -DCOMPILER=${CMAKE_CXX_COMPILER}
     -DSOURCE=${PROJECT_SOURCE_DIR}/tests/compile_contracts/forbidden_characteristic_copy.cpp

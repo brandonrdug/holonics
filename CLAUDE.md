@@ -107,18 +107,42 @@ gates and one deed is failing; the section says exactly which and what was ruled
 returns `tail`'s status, always zero, and the label summary prints whether or not tests failed. Two
 commits were reported `126/126` on that artifact.
 
-**Cost discipline.** Measured 2026-08-06: 146 tests, 1,612 serial seconds. The frozen mathematical
-deeds `r11`-`r35` are **93.7%** of it; the audits, spine, and carriers that guard construction in
-progress are **101 seconds together**. Nothing is redundant within a run — each expensive group runs
-its deed three times because the three establish different facts (the deed, a byte-identical replay,
-a replay under a source-access probe). The waste is temporal: re-establishing a frozen owner's
-determinism after editing an unrelated owner catches nothing.
+**A deed is not a test, and ctest no longer holds one.** This was Brandon's correction, made three
+times, and the third time plainly: *"you keep getting hung up on optimizing these tests when
+preserving them at all is likely the real issue… this is just straight up wasted time and compute."*
+He was right and the framing of a "speed-up" was the misunderstanding.
+
+A deed mounts a rest, contacts cards, computes, and rests its return **as a file**. That is
+production, and whether it needs to run is decided by whether its inputs moved. Registering it as
+`add_test` meant it ran unconditionally, so the machine's entire founded production was recomputed
+from zero to answer any question about any part of the tree. Measured across a complete run: **of
+roughly 2,250 serial seconds, about 1,320 were byte-for-byte re-executions of a computation that had
+finished seconds earlier in the same invocation.**
+
+The deed chain was always a file-dependency graph, written longhand in every argument list — each
+deed's rest is the next one's argument. `cmake/HolonicStanding.cmake` reads that lineage off the
+arguments: **an artifact path is a return of the first founding that names it and a mount for every
+founding after.** 249 founded returns are in the build graph; 63 guards remain in ctest.
 
 ```
-ctest -L 'audit|spine' -j 4     86 s   — what guards a change in progress
-ctest -L frozen-math            24 min — when a mathematical owner is touched
-ctest                           27 min — the milestone gate
+ninja                      build code
+ninja holonics_standing    bring the standing up to date — 0.031 s on an unmoved tree, measured
+ctest                      62 guards, 58 s, all passing — measured 2026-08-07, exit status read
 ```
+
+The whole gate is **under a minute**. It was twenty-four.
+
+**What licenses the caching is the replay itself.** The determinism steps established that each deed
+is a pure function of its declared inputs; the source-access audits established that it opens
+nothing outside them. Together they are the certificate that the declared closure is a complete
+cache key. They were never waste — the waste was throwing their result away and re-establishing it
+from zero every time.
+
+**Foundings run one at a time**, in a `holonic_card` job pool of depth one. ninja's default of one
+job per core launched two dozen deeds at a single device and the plural rederivation returned
+`executor_state=10`, `kernel_launches=0`, and 7,194 verification failures — a deed that never
+reached the card, reported as a mathematical failure. Contention wearing a regression's mask, the
+same defect as the nineteen two-times timeout margins.
 
 **A build-graph change no longer needs a clean tree.** CMake was generating 132 dyndep scan files
 looking for C++20 modules this project does not have, and the resulting graph tripped a ninja
@@ -127,15 +151,21 @@ assertion on every added header or target — roughly eight minutes of full rebu
 files and a graph change rebuilds incrementally. A clean tree is still the discipline **after a
 broad rename**, where stale objects have hidden a real inconsistency.
 
-Run the fast tier by default. Reach for `frozen-math` when you edit an owner under
-`include/holonics/organ/{trace,characteristic,arithmetic,hodge,toric}*` or anything `r11`-`r35`
-includes, and for the whole suite once at a milestone. After a broad rename, **configure a clean
-build tree before trusting a green result** — stale objects have hidden a real inconsistency here
-before, and a graph change can trip a ninja dyndep assertion that only a fresh tree clears.
+**Declare the producer before the consumer.** The lineage is inferred from declaration order, so a
+consumer declared above its producer inverts the graph. That is now a configure-time refusal rather
+than a silent inversion — it caught the cultivated-organs seal running before its replay.
 
-Open and unexplained: the `r34` discovery deed alone is **275 seconds** of exact integer work. That
-is a cost worth understanding before it is multiplied by three, but it is not a defect and is not
-scheduled.
+**A negative control's absence is evidence, not an unbuilt output.** A foil is a proof the kernel is
+supposed to refuse, so no compiled object is ever produced for it. Declaring that path as a founding's
+return makes the graph chase a file whose non-existence is the whole point, and re-run the founding
+and everything downstream of it forever. `holonic_withhold` it — globally, because withholding it
+from the deed alone only hands the claim to the next founding that names it.
+
+**A replay may not write where the deed wrote.** The source-access audits re-executed both deeds over
+the deeds' own output paths, so each audit overwrote the standing it was auditing and left everything
+downstream permanently dirty. They now redirect into a scratch region, as the determinism replays
+always did. When a founding chain will not converge, `ninja -d explain holonics_standing` names the
+file and the two timestamps.
 
 ## 1. The floor is a carrier, not a retired interface
 

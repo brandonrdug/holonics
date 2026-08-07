@@ -65,16 +65,20 @@ set(R28_OLEAN "${PROJECT_BINARY_DIR}/artifacts/R28_GENERATED_HODGE_REALIZATION.o
 set(R28_STDOUT "${PROJECT_BINARY_DIR}/artifacts/R28_LEAN_STDOUT.txt")
 set(R28_STDERR "${PROJECT_BINARY_DIR}/artifacts/R28_LEAN_STDERR.txt")
 set(R28_ATLAS "${PROJECT_BINARY_DIR}/artifacts/R28_HODGE_REALIZATION_ATLAS.tsv")
-add_test(NAME r28.hodge_device_deed COMMAND r28_hodge_device_deed "${R28_DEED_ARTIFACT}"
-  "${R27_FINAL_REST}" "${R28_FINAL_REST}" "${PROJECT_SOURCE_DIR}/apparatus/cards/R28_HODGE_REALIZATION.card"
-  "${R28_SOURCE}" "${R28_OLEAN}" "${R28_STDOUT}" "${R28_STDERR}"
-  "${PROJECT_SOURCE_DIR}/formal/elementary-holonics"
-  "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lean-toolchain"
-  "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lake-manifest.json"
-  "${PROJECT_BINARY_DIR}/artifacts" "${R28_ATLAS}")
-set_tests_properties(r28.hodge_device_deed PROPERTIES
-  DEPENDS "r27.expression_geometry_device_deed" TIMEOUT 1800)
-add_test(NAME r28.hodge_host_conformance COMMAND r28_hodge_host_conformance)
+holonic_found(NAME r28.hodge_device_deed
+  EXECUTABLE r28_hodge_device_deed
+  COMMAND
+    "${R28_DEED_ARTIFACT}" "${R27_FINAL_REST}" "${R28_FINAL_REST}"
+    "${PROJECT_SOURCE_DIR}/apparatus/cards/R28_HODGE_REALIZATION.card" "${R28_SOURCE}"
+    "${R28_OLEAN}" "${R28_STDOUT}" "${R28_STDERR}"
+    "${PROJECT_SOURCE_DIR}/formal/elementary-holonics"
+    "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lean-toolchain"
+    "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lake-manifest.json"
+    "${PROJECT_BINARY_DIR}/artifacts" "${R28_ATLAS}")
+holonic_found(NAME r28.hodge_host_conformance
+  EXECUTABLE r28_hodge_host_conformance
+  COMMAND
+   )
 add_test(NAME r28.forbidden_hodge_copy COMMAND "${CMAKE_COMMAND}"
   -DCOMPILER=${CMAKE_CXX_COMPILER}
   -DSOURCE=${PROJECT_SOURCE_DIR}/tests/compile_contracts/forbidden_hodge_realization_copy.cpp

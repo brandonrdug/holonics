@@ -75,9 +75,14 @@ set(R4_DECLARED_COMMANDS
     "device_cubin=<CUDA_COMPILER> ${R4_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/cuda/executor/r4_adversarial_kernels.cu -o <BUILD>/generated/r4_adversarial_kernels.cubin\n")
 
 set(R4_DEED_ARTIFACT "${PROJECT_BINARY_DIR}/receipts/R4_BODY_LIFECYCLE_DEED.txt")
-add_test(NAME r4.body_lifecycle_device_deed
-  COMMAND r4_body_lifecycle_device_deed "${R4_DEED_ARTIFACT}")
-add_test(NAME r4.body_lifecycle_host_conformance COMMAND r4_body_lifecycle_host_conformance)
+holonic_found(NAME r4.body_lifecycle_device_deed
+  EXECUTABLE r4_body_lifecycle_device_deed
+  COMMAND
+    "${R4_DEED_ARTIFACT}")
+holonic_found(NAME r4.body_lifecycle_host_conformance
+  EXECUTABLE r4_body_lifecycle_host_conformance
+  COMMAND
+   )
 add_test(NAME r4.forbidden_body_lifecycle_copy
   COMMAND "${CMAKE_COMMAND}"
     -DCOMPILER=${CMAKE_CXX_COMPILER}

@@ -61,6 +61,7 @@ set(RESIDENT_DEVICE_PTX_LIST "${RESIDENT_DEVICE_PTX}")
 set(RESIDENT_DEVICE_CUBIN_LIST "${RESIDENT_DEVICE_CUBIN}")
 
 set(RESIDENT_DEED_ARTIFACT "${PROJECT_BINARY_DIR}/receipts/PHASE_7_RESIDENT_MOUNT_DEED.txt")
-add_test(
-  NAME phase_resident.resident_mount_deed
-  COMMAND resident_mount_deed "${RESIDENT_DEED_ARTIFACT}")
+holonic_found(NAME phase_resident.resident_mount_deed
+  EXECUTABLE resident_mount_deed
+  COMMAND
+    "${RESIDENT_DEED_ARTIFACT}")

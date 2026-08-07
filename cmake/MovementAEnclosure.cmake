@@ -69,7 +69,11 @@ set(ENCLOSURE_DEVICE_PTX_LIST "${ENCLOSURE_DEVICE_PTX}")
 set(ENCLOSURE_DEVICE_CUBIN_LIST "${ENCLOSURE_DEVICE_CUBIN}")
 
 set(ENCLOSURE_DEED_ARTIFACT "${PROJECT_BINARY_DIR}/receipts/MOVEMENT_A_ENCLOSURE_DEED.txt")
-add_test(
-  NAME movement_a.enclosure_device_deed
-  COMMAND enclosure_device_deed "${ENCLOSURE_DEED_ARTIFACT}")
-add_test(NAME movement_a.enclosure_host_conformance COMMAND enclosure_host_conformance)
+holonic_found(NAME movement_a.enclosure_device_deed
+  EXECUTABLE enclosure_device_deed
+  COMMAND
+    "${ENCLOSURE_DEED_ARTIFACT}")
+holonic_found(NAME movement_a.enclosure_host_conformance
+  EXECUTABLE enclosure_host_conformance
+  COMMAND
+   )

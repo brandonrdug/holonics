@@ -74,21 +74,22 @@ set(R26_OLEAN "${PROJECT_BINARY_DIR}/artifacts/R26_GENERATED_INTRINSIC_HYPERGEOM
 set(R26_STDOUT "${PROJECT_BINARY_DIR}/artifacts/R26_LEAN_STDOUT.txt")
 set(R26_STDERR "${PROJECT_BINARY_DIR}/artifacts/R26_LEAN_STDERR.txt")
 set(R26_ATLAS "${PROJECT_BINARY_DIR}/artifacts/R26_INTRINSIC_HYPERGEOMETRY_ATLAS.tsv")
-add_test(NAME r26.intrinsic_hypergeometry_device_deed
-  COMMAND r26_intrinsic_hypergeometry_device_deed "${R26_DEED_ARTIFACT}"
-    "${R25_FINAL_REST}" "${R26_FINAL_REST}"
+holonic_found(NAME r26.intrinsic_hypergeometry_device_deed
+  EXECUTABLE r26_intrinsic_hypergeometry_device_deed
+  COMMAND
+    "${R26_DEED_ARTIFACT}" "${R25_FINAL_REST}" "${R26_FINAL_REST}"
     "${PROJECT_SOURCE_DIR}/apparatus/cards/R26_INTRINSIC_HYPERGEOMETRY.card"
     "${PROJECT_SOURCE_DIR}/apparatus/cards/R22_CM_INCIDENCE.card"
-    "${PROJECT_SOURCE_DIR}/apparatus/cards/R24_ALGEBRAIC_VARIATION.card"
-    "${R26_SOURCE}" "${R26_OLEAN}" "${R26_STDOUT}" "${R26_STDERR}"
+    "${PROJECT_SOURCE_DIR}/apparatus/cards/R24_ALGEBRAIC_VARIATION.card" "${R26_SOURCE}"
+    "${R26_OLEAN}" "${R26_STDOUT}" "${R26_STDERR}"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lean-toolchain"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lake-manifest.json"
     "${PROJECT_BINARY_DIR}/artifacts" "${R26_ATLAS}")
-set_tests_properties(r26.intrinsic_hypergeometry_device_deed PROPERTIES
-  DEPENDS "r25.causal_linear_device_deed" TIMEOUT 1800)
-add_test(NAME r26.intrinsic_hypergeometry_host_conformance
-  COMMAND r26_intrinsic_hypergeometry_host_conformance)
+holonic_found(NAME r26.intrinsic_hypergeometry_host_conformance
+  EXECUTABLE r26_intrinsic_hypergeometry_host_conformance
+  COMMAND
+   )
 add_test(NAME r26.forbidden_intrinsic_hypergeometry_copy
   COMMAND "${CMAKE_COMMAND}" -DCOMPILER=${CMAKE_CXX_COMPILER}
     -DSOURCE=${PROJECT_SOURCE_DIR}/tests/compile_contracts/forbidden_intrinsic_hypergeometry_copy.cpp

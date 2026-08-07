@@ -84,39 +84,41 @@ set(R30_OPEN_LOG "${PROJECT_BINARY_DIR}/artifacts/R30_OPEN_PATHS.txt")
 set(R30_SOURCE_AUDIT "${PROJECT_BINARY_DIR}/receipts/R30_SOURCE_ACCESS_AUDIT.txt")
 set(R30_SEAL_MANIFEST "${PROJECT_BINARY_DIR}/receipts/R30_SEALED_RETURN.txt")
 set(R30_COMPARISON "${PROJECT_BINARY_DIR}/artifacts/R30_POST_SEAL_COMPARISON.md")
-add_test(NAME r30.plural_rederivation_device_deed COMMAND r30_plural_rederivation_device_deed
-  "${R30_DEED_ARTIFACT}" "${R29_FINAL_REST}" "${R30_FINAL_REST}"
-  "${PROJECT_SOURCE_DIR}/apparatus/cards/R30_MATCHING_JACOBIAN.card"
-  "${PROJECT_SOURCE_DIR}/apparatus/cards/R30_LATTICE_POTENTIAL.card"
-  "${PROJECT_SOURCE_DIR}/apparatus/cards/R30_COORDINATE_COVER.card"
-  "${R30_SOURCE}" "${R30_OLEAN}" "${R30_STDOUT}" "${R30_STDERR}"
-  "${R30_FOIL_SOURCE}" "${R30_FOIL_OLEAN}" "${R30_FOIL_STDOUT}" "${R30_FOIL_STDERR}"
-  "${PROJECT_SOURCE_DIR}/formal/elementary-holonics"
-  "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lean-toolchain"
-  "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lake-manifest.json"
-  "${PROJECT_BINARY_DIR}/artifacts" "${R30_ATLAS}" "${R30_DOSSIER}")
-set_tests_properties(r30.plural_rederivation_device_deed PROPERTIES
-  DEPENDS "r29.arithmetic_spectral_device_deed" TIMEOUT 1800)
-add_test(NAME r30.source_access_audit COMMAND "${CMAKE_COMMAND}"
-  -DEXECUTABLE=$<TARGET_FILE:r30_plural_rederivation_device_deed>
-  -DPROBE=$<TARGET_FILE:r30_open_probe>
-  -DLOG=${R30_OPEN_LOG} -DOUTPUT=${R30_SOURCE_AUDIT}
-  -DSOURCE_ROOT=${PROJECT_SOURCE_DIR} -DDEED=${R30_DEED_ARTIFACT}
-  -DPREDECESSOR=${R29_FINAL_REST} -DHANDOFF=${R30_FINAL_REST}
-  -DMATCHING=${PROJECT_SOURCE_DIR}/apparatus/cards/R30_MATCHING_JACOBIAN.card
-  -DLATTICE=${PROJECT_SOURCE_DIR}/apparatus/cards/R30_LATTICE_POTENTIAL.card
-  -DCOVER=${PROJECT_SOURCE_DIR}/apparatus/cards/R30_COORDINATE_COVER.card
-  -DSOURCE=${R30_SOURCE} -DOLEAN=${R30_OLEAN} -DSTDOUT=${R30_STDOUT}
-  -DSTDERR=${R30_STDERR} -DFOIL_SOURCE=${R30_FOIL_SOURCE}
-  -DFOIL_OLEAN=${R30_FOIL_OLEAN} -DFOIL_STDOUT=${R30_FOIL_STDOUT}
-  -DFOIL_STDERR=${R30_FOIL_STDERR}
-  -DFORMAL_ROOT=${PROJECT_SOURCE_DIR}/formal/elementary-holonics
-  -DTOOLCHAIN=${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lean-toolchain
-  -DMANIFEST=${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lake-manifest.json
-  -DARTIFACT_ROOT=${PROJECT_BINARY_DIR}/artifacts -DATLAS=${R30_ATLAS}
-  -DDOSSIER=${R30_DOSSIER} -P "${PROJECT_SOURCE_DIR}/cmake/R30SourceAccessAudit.cmake")
-set_tests_properties(r30.source_access_audit PROPERTIES
-  DEPENDS "r30.plural_rederivation_device_deed" TIMEOUT 1800)
+# The foil is a proof the kernel is SUPPOSED to refuse, so no object is ever
+# produced at this path. Its absence is the deed's negative control and must not
+# be read as work left undone by any founding that names it.
+holonic_withhold("${R30_FOIL_OLEAN}")
+
+holonic_found(NAME r30.plural_rederivation_device_deed
+  EXECUTABLE r30_plural_rederivation_device_deed
+  COMMAND
+    "${R30_DEED_ARTIFACT}" "${R29_FINAL_REST}" "${R30_FINAL_REST}"
+    "${PROJECT_SOURCE_DIR}/apparatus/cards/R30_MATCHING_JACOBIAN.card"
+    "${PROJECT_SOURCE_DIR}/apparatus/cards/R30_LATTICE_POTENTIAL.card"
+    "${PROJECT_SOURCE_DIR}/apparatus/cards/R30_COORDINATE_COVER.card" "${R30_SOURCE}"
+    "${R30_OLEAN}" "${R30_STDOUT}" "${R30_STDERR}" "${R30_FOIL_SOURCE}" "${R30_FOIL_OLEAN}"
+    "${R30_FOIL_STDOUT}" "${R30_FOIL_STDERR}"
+    "${PROJECT_SOURCE_DIR}/formal/elementary-holonics"
+    "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lean-toolchain"
+    "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lake-manifest.json"
+    "${PROJECT_BINARY_DIR}/artifacts" "${R30_ATLAS}" "${R30_DOSSIER}")
+holonic_found(NAME r30.source_access_audit
+  COMMAND
+    "${CMAKE_COMMAND}" -DEXECUTABLE=$<TARGET_FILE:r30_plural_rederivation_device_deed>
+    -DPROBE=$<TARGET_FILE:r30_open_probe> -DLOG=${R30_OPEN_LOG} -DOUTPUT=${R30_SOURCE_AUDIT}
+    -DSOURCE_ROOT=${PROJECT_SOURCE_DIR} -DDEED=${R30_DEED_ARTIFACT}
+    -DPREDECESSOR=${R29_FINAL_REST} -DHANDOFF=${R30_FINAL_REST}
+    -DMATCHING=${PROJECT_SOURCE_DIR}/apparatus/cards/R30_MATCHING_JACOBIAN.card
+    -DLATTICE=${PROJECT_SOURCE_DIR}/apparatus/cards/R30_LATTICE_POTENTIAL.card
+    -DCOVER=${PROJECT_SOURCE_DIR}/apparatus/cards/R30_COORDINATE_COVER.card
+    -DSOURCE=${R30_SOURCE} -DOLEAN=${R30_OLEAN} -DSTDOUT=${R30_STDOUT}
+    -DSTDERR=${R30_STDERR} -DFOIL_SOURCE=${R30_FOIL_SOURCE} -DFOIL_OLEAN=${R30_FOIL_OLEAN}
+    -DFOIL_STDOUT=${R30_FOIL_STDOUT} -DFOIL_STDERR=${R30_FOIL_STDERR}
+    -DFORMAL_ROOT=${PROJECT_SOURCE_DIR}/formal/elementary-holonics
+    -DTOOLCHAIN=${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lean-toolchain
+    -DMANIFEST=${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lake-manifest.json
+    -DARTIFACT_ROOT=${PROJECT_BINARY_DIR}/artifacts -DATLAS=${R30_ATLAS}
+    -DDOSSIER=${R30_DOSSIER} -P "${PROJECT_SOURCE_DIR}/cmake/R30SourceAccessAudit.cmake")
 add_test(NAME r30.seal_and_compare COMMAND "${CMAKE_COMMAND}"
   -DOUTPUT=${R30_SEAL_MANIFEST} -DCOMPARISON=${R30_COMPARISON}
   -DSOURCE_AUDIT=${R30_SOURCE_AUDIT} -DDEED=${R30_DEED_ARTIFACT}
@@ -125,7 +127,10 @@ add_test(NAME r30.seal_and_compare COMMAND "${CMAKE_COMMAND}"
   -DATLAS=${R30_ATLAS} -DDOSSIER=${R30_DOSSIER}
   -P "${PROJECT_SOURCE_DIR}/cmake/R30SealComparison.cmake")
 set_tests_properties(r30.seal_and_compare PROPERTIES DEPENDS "r30.source_access_audit")
-add_test(NAME r30.rederivation_host_conformance COMMAND r30_rederivation_host_conformance)
+holonic_found(NAME r30.rederivation_host_conformance
+  EXECUTABLE r30_rederivation_host_conformance
+  COMMAND
+   )
 add_test(NAME r30.forbidden_rederivation_copy COMMAND "${CMAKE_COMMAND}"
   -DCOMPILER=${CMAKE_CXX_COMPILER}
   -DSOURCE=${PROJECT_SOURCE_DIR}/tests/compile_contracts/forbidden_rederivation_copy.cpp

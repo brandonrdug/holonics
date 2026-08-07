@@ -74,10 +74,14 @@ set(R8_DECLARED_COMMANDS
     "device_cubin=<CUDA_COMPILER> ${R8_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/cuda/executor/r8_condensation_kernels.cu -o <BUILD>/generated/r8_condensation_kernels.cubin\n")
 
 set(R8_DEED_ARTIFACT "${PROJECT_BINARY_DIR}/receipts/R8_STATEFUL_BOUNDARY_CONDENSATION_DEED.txt")
-add_test(NAME r8.stateful_boundary_condensation_device_deed
-  COMMAND r8_stateful_boundary_condensation_device_deed "${R8_DEED_ARTIFACT}")
-add_test(NAME r8.stateful_boundary_condensation_host_conformance
-  COMMAND r8_stateful_boundary_condensation_host_conformance)
+holonic_found(NAME r8.stateful_boundary_condensation_device_deed
+  EXECUTABLE r8_stateful_boundary_condensation_device_deed
+  COMMAND
+    "${R8_DEED_ARTIFACT}")
+holonic_found(NAME r8.stateful_boundary_condensation_host_conformance
+  EXECUTABLE r8_stateful_boundary_condensation_host_conformance
+  COMMAND
+   )
 add_test(NAME r8.forbidden_condensation_copy
   COMMAND "${CMAKE_COMMAND}"
     -DCOMPILER=${CMAKE_CXX_COMPILER}

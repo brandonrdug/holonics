@@ -87,9 +87,16 @@ HOLONICS_CALLABLE inline bool resident_rederivation::resume_foil(
   observation.foil.pending_after_return = false;
   observation.foil.passage_preserved = typed.passage == expected.passage;
   observation.foil.expected_rejection = rejected;
-  stage_ = rejected && morphology.returned_difference_applied
-               ? passage_stage::foil_returned
-               : passage_stage::none;
+  // The foil advances the passage when it was refused AND the refusal landed on
+  // the body. Reading `returned_difference_applied` here was correct only while
+  // that field was insensitive to the return; once it became `!rejected && …`
+  // this conjunction was `rejected && !rejected` and the stage could never be
+  // reached, so the valid passage was never formed and the deed returned
+  // `valid_process_refused` with an empty passage. The gate is the commit.
+  stage_ = rejected &&
+                  morphology.commit.state == body::body_change_status::committed
+              ? passage_stage::foil_returned
+              : passage_stage::none;
   return stage_ == passage_stage::foil_returned;
 }
 

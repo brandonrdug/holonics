@@ -70,19 +70,20 @@ set(R27_OLEAN "${PROJECT_BINARY_DIR}/artifacts/R27_GENERATED_EXPRESSION_GEOMETRY
 set(R27_STDOUT "${PROJECT_BINARY_DIR}/artifacts/R27_LEAN_STDOUT.txt")
 set(R27_STDERR "${PROJECT_BINARY_DIR}/artifacts/R27_LEAN_STDERR.txt")
 set(R27_ATLAS "${PROJECT_BINARY_DIR}/artifacts/R27_EXPRESSION_GEOMETRY_ATLAS.tsv")
-add_test(NAME r27.expression_geometry_device_deed
-  COMMAND r27_expression_geometry_device_deed "${R27_DEED_ARTIFACT}"
-    "${R26_FINAL_REST}" "${R27_FINAL_REST}"
-    "${PROJECT_SOURCE_DIR}/apparatus/cards/R27_EXPRESSION_GEOMETRY.card"
-    "${R27_SOURCE}" "${R27_OLEAN}" "${R27_STDOUT}" "${R27_STDERR}"
+holonic_found(NAME r27.expression_geometry_device_deed
+  EXECUTABLE r27_expression_geometry_device_deed
+  COMMAND
+    "${R27_DEED_ARTIFACT}" "${R26_FINAL_REST}" "${R27_FINAL_REST}"
+    "${PROJECT_SOURCE_DIR}/apparatus/cards/R27_EXPRESSION_GEOMETRY.card" "${R27_SOURCE}"
+    "${R27_OLEAN}" "${R27_STDOUT}" "${R27_STDERR}"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lean-toolchain"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lake-manifest.json"
     "${PROJECT_BINARY_DIR}/artifacts" "${R27_ATLAS}")
-set_tests_properties(r27.expression_geometry_device_deed PROPERTIES
-  DEPENDS "r26.intrinsic_hypergeometry_device_deed" TIMEOUT 1800)
-add_test(NAME r27.expression_geometry_host_conformance
-  COMMAND r27_expression_geometry_host_conformance)
+holonic_found(NAME r27.expression_geometry_host_conformance
+  EXECUTABLE r27_expression_geometry_host_conformance
+  COMMAND
+   )
 add_test(NAME r27.forbidden_expression_geometry_copy
   COMMAND "${CMAKE_COMMAND}" -DCOMPILER=${CMAKE_CXX_COMPILER}
     -DSOURCE=${PROJECT_SOURCE_DIR}/tests/compile_contracts/forbidden_expression_geometry_copy.cpp

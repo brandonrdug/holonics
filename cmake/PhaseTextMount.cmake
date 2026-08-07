@@ -60,6 +60,7 @@ set(TEXT_DEVICE_PTX_LIST "${TEXT_DEVICE_PTX}")
 set(TEXT_DEVICE_CUBIN_LIST "${TEXT_DEVICE_CUBIN}")
 
 set(TEXT_DEED_ARTIFACT "${PROJECT_BINARY_DIR}/receipts/PHASE_7_BROAD_MOUNT_DEED.txt")
-add_test(
-  NAME phase_text.text_mount_deed
-  COMMAND text_mount_deed "${PROJECT_SOURCE_DIR}" "${TEXT_DEED_ARTIFACT}")
+holonic_found(NAME phase_text.text_mount_deed
+  EXECUTABLE text_mount_deed
+  COMMAND
+    "${PROJECT_SOURCE_DIR}" "${TEXT_DEED_ARTIFACT}")

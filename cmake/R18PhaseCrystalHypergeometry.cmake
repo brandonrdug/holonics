@@ -68,16 +68,20 @@ set(R18_OLEAN "${PROJECT_BINARY_DIR}/artifacts/R18_GENERATED_PHASE_CRYSTAL.olean
 set(R18_STDOUT "${PROJECT_BINARY_DIR}/artifacts/R18_LEAN_STDOUT.txt")
 set(R18_STDERR "${PROJECT_BINARY_DIR}/artifacts/R18_LEAN_STDERR.txt")
 set(R18_ATLAS "${PROJECT_BINARY_DIR}/artifacts/R18_PHASE_CRYSTAL_ATLAS.tsv")
-add_test(NAME r18.phase_crystal_device_deed
-  COMMAND r18_phase_crystal_device_deed "${R18_DEED_ARTIFACT}"
-    "${PROJECT_SOURCE_DIR}/apparatus/rests/INHERITED_PREDECESSOR.rest" "${R18_FINAL_REST}" "${R18_SOURCE}" "${R18_OLEAN}"
-    "${R18_STDOUT}" "${R18_STDERR}" "${PROJECT_SOURCE_DIR}/formal/elementary-holonics"
+holonic_found(NAME r18.phase_crystal_device_deed
+  EXECUTABLE r18_phase_crystal_device_deed
+  COMMAND
+    "${R18_DEED_ARTIFACT}"
+    "${PROJECT_SOURCE_DIR}/apparatus/rests/INHERITED_PREDECESSOR.rest" "${R18_FINAL_REST}"
+    "${R18_SOURCE}" "${R18_OLEAN}" "${R18_STDOUT}" "${R18_STDERR}"
+    "${PROJECT_SOURCE_DIR}/formal/elementary-holonics"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lean-toolchain"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lake-manifest.json"
     "${PROJECT_BINARY_DIR}/artifacts" "${R18_ATLAS}")
-set_tests_properties(r18.phase_crystal_device_deed PROPERTIES
-  DEPENDS "r17.agnostic_geometry_inquiry_device_deed")
-add_test(NAME r18.phase_crystal_host_conformance COMMAND r18_phase_crystal_host_conformance)
+holonic_found(NAME r18.phase_crystal_host_conformance
+  EXECUTABLE r18_phase_crystal_host_conformance
+  COMMAND
+   )
 add_test(NAME r18.forbidden_phase_crystal_copy
   COMMAND "${CMAKE_COMMAND}" -DCOMPILER=${CMAKE_CXX_COMPILER}
     -DSOURCE=${PROJECT_SOURCE_DIR}/tests/compile_contracts/forbidden_phase_crystal_copy.cpp

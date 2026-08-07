@@ -58,14 +58,17 @@ set(R11_DECLARED_COMMANDS
 
 set(R11_DEED_ARTIFACT
   "${PROJECT_BINARY_DIR}/receipts/R11_MATHEMATICAL_OCCURRENCE_ECOLOGY_DEED.txt")
-add_test(NAME r11.mathematical_ecology_device_deed
-  COMMAND r11_mathematical_ecology_device_deed
+holonic_found(NAME r11.mathematical_ecology_device_deed
+  EXECUTABLE r11_mathematical_ecology_device_deed
+  COMMAND
     "${R11_DEED_ARTIFACT}"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/ElementaryHolonics/Algorithm/Transition.lean"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/ElementaryHolonics/Algorithm/Rebase.lean"
     "${PROJECT_BINARY_DIR}/r11_relocated_formal")
-add_test(NAME r11.mathematical_ecology_host_conformance
-  COMMAND r11_mathematical_ecology_host_conformance)
+holonic_found(NAME r11.mathematical_ecology_host_conformance
+  EXECUTABLE r11_mathematical_ecology_host_conformance
+  COMMAND
+   )
 add_test(NAME r11.forbidden_mathematical_ecology_copy
   COMMAND "${CMAKE_COMMAND}"
     -DCOMPILER=${CMAKE_CXX_COMPILER}

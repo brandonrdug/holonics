@@ -74,22 +74,23 @@ set(R25_OLEAN "${PROJECT_BINARY_DIR}/artifacts/R25_GENERATED_CAUSAL_LINEAR.olean
 set(R25_STDOUT "${PROJECT_BINARY_DIR}/artifacts/R25_LEAN_STDOUT.txt")
 set(R25_STDERR "${PROJECT_BINARY_DIR}/artifacts/R25_LEAN_STDERR.txt")
 set(R25_ATLAS "${PROJECT_BINARY_DIR}/artifacts/R25_CAUSAL_LINEAR_ATLAS.tsv")
-add_test(NAME r25.causal_linear_device_deed
-  COMMAND r25_causal_linear_device_deed "${R25_DEED_ARTIFACT}"
-    "${R24_FINAL_REST}" "${R25_FINAL_REST}"
+holonic_found(NAME r25.causal_linear_device_deed
+  EXECUTABLE r25_causal_linear_device_deed
+  COMMAND
+    "${R25_DEED_ARTIFACT}" "${R24_FINAL_REST}" "${R25_FINAL_REST}"
     "${PROJECT_SOURCE_DIR}/apparatus/cards/R25_CAUSAL_LINEAR_CHAIN.card"
     "${PROJECT_SOURCE_DIR}/apparatus/cards/R22_CM_INCIDENCE.card"
     "${PROJECT_SOURCE_DIR}/apparatus/cards/R23_TORIC_CYCLE.card"
-    "${PROJECT_SOURCE_DIR}/apparatus/cards/R24_ALGEBRAIC_VARIATION.card"
-    "${R25_SOURCE}" "${R25_OLEAN}" "${R25_STDOUT}" "${R25_STDERR}"
+    "${PROJECT_SOURCE_DIR}/apparatus/cards/R24_ALGEBRAIC_VARIATION.card" "${R25_SOURCE}"
+    "${R25_OLEAN}" "${R25_STDOUT}" "${R25_STDERR}"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lean-toolchain"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lake-manifest.json"
     "${PROJECT_BINARY_DIR}/artifacts" "${R25_ATLAS}")
-set_tests_properties(r25.causal_linear_device_deed PROPERTIES
-  DEPENDS "r24.algebraic_variation_device_deed" TIMEOUT 120)
-add_test(NAME r25.causal_linear_host_conformance
-  COMMAND r25_causal_linear_host_conformance)
+holonic_found(NAME r25.causal_linear_host_conformance
+  EXECUTABLE r25_causal_linear_host_conformance
+  COMMAND
+   )
 add_test(NAME r25.forbidden_causal_linear_copy
   COMMAND "${CMAKE_COMMAND}" -DCOMPILER=${CMAKE_CXX_COMPILER}
     -DSOURCE=${PROJECT_SOURCE_DIR}/tests/compile_contracts/forbidden_causal_linear_copy.cpp

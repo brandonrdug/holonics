@@ -93,14 +93,14 @@ set(R3_SOURCE_PATHS
     "${PROJECT_SOURCE_DIR}/tests/fixtures/R3_CONSTRUCTION_STATE.md"
     "${PROJECT_SOURCE_DIR}/papers/source/synopsis/README.md"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/ElementaryHolonics/Foundation/Receiver.lean")
-add_test(
-  NAME r3.source_topology_device_deed
-  COMMAND r3_source_topology_device_deed "${R3_DEED_ARTIFACT}" ${R3_SOURCE_PATHS}
-    "${PROJECT_BINARY_DIR}/r3-relocated-device")
-add_test(
-  NAME r3.source_topology_host_conformance
-  COMMAND r3_source_topology_host_conformance ${R3_SOURCE_PATHS}
-    "${PROJECT_BINARY_DIR}/r3-relocated-host")
+holonic_found(NAME r3.source_topology_device_deed
+  EXECUTABLE r3_source_topology_device_deed
+  COMMAND
+    "${R3_DEED_ARTIFACT}" ${R3_SOURCE_PATHS} "${PROJECT_BINARY_DIR}/r3-relocated-device")
+holonic_found(NAME r3.source_topology_host_conformance
+  EXECUTABLE r3_source_topology_host_conformance
+  COMMAND
+    ${R3_SOURCE_PATHS} "${PROJECT_BINARY_DIR}/r3-relocated-host")
 add_test(
   NAME r3.forbidden_source_environment_copy
   COMMAND "${CMAKE_COMMAND}"

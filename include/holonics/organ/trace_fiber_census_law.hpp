@@ -38,8 +38,8 @@ HOLONICS_CALLABLE inline void sorted_roots(
 ///
 /// This replaces a linear scan over every group already inserted. The scan cost
 /// 5,184 insertions against up to 2,304 groups — about ten million comparisons
-/// on one GPU thread — and the answer it computed is exactly `first_of`, which a
-/// kernel can compute for every triple at once.
+/// on a single device thread — and the answer it computed is exactly `first_of`,
+/// which a kernel can compute for every triple at once.
 HOLONICS_CALLABLE inline void place_group(trace_fiber_discovery_receipt &out,
                                           trace_fiber_workspace &workspace,
                                           std::uint16_t index) noexcept {

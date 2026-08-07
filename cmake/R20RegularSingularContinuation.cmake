@@ -68,17 +68,19 @@ set(R20_OLEAN "${PROJECT_BINARY_DIR}/artifacts/R20_GENERATED_REGULAR_SINGULAR.ol
 set(R20_STDOUT "${PROJECT_BINARY_DIR}/artifacts/R20_LEAN_STDOUT.txt")
 set(R20_STDERR "${PROJECT_BINARY_DIR}/artifacts/R20_LEAN_STDERR.txt")
 set(R20_ATLAS "${PROJECT_BINARY_DIR}/artifacts/R20_REGULAR_SINGULAR_ATLAS.tsv")
-add_test(NAME r20.regular_singular_device_deed
-  COMMAND r20_regular_singular_device_deed "${R20_DEED_ARTIFACT}"
-    "${R19_FINAL_REST}" "${R20_FINAL_REST}" "${R20_SOURCE}" "${R20_OLEAN}"
-    "${R20_STDOUT}" "${R20_STDERR}" "${PROJECT_SOURCE_DIR}/formal/elementary-holonics"
+holonic_found(NAME r20.regular_singular_device_deed
+  EXECUTABLE r20_regular_singular_device_deed
+  COMMAND
+    "${R20_DEED_ARTIFACT}" "${R19_FINAL_REST}" "${R20_FINAL_REST}" "${R20_SOURCE}"
+    "${R20_OLEAN}" "${R20_STDOUT}" "${R20_STDERR}"
+    "${PROJECT_SOURCE_DIR}/formal/elementary-holonics"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lean-toolchain"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lake-manifest.json"
     "${PROJECT_BINARY_DIR}/artifacts" "${R20_ATLAS}")
-set_tests_properties(r20.regular_singular_device_deed PROPERTIES
-  DEPENDS "r19.characteristic_device_deed")
-add_test(NAME r20.regular_singular_host_conformance
-  COMMAND r20_regular_singular_host_conformance)
+holonic_found(NAME r20.regular_singular_host_conformance
+  EXECUTABLE r20_regular_singular_host_conformance
+  COMMAND
+   )
 add_test(NAME r20.forbidden_regular_singular_copy
   COMMAND "${CMAKE_COMMAND}" -DCOMPILER=${CMAKE_CXX_COMPILER}
     -DSOURCE=${PROJECT_SOURCE_DIR}/tests/compile_contracts/forbidden_regular_singular_copy.cpp

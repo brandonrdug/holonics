@@ -64,17 +64,20 @@ set(R29_OLEAN "${PROJECT_BINARY_DIR}/artifacts/R29_GENERATED_ARITHMETIC_SPECTRAL
 set(R29_STDOUT "${PROJECT_BINARY_DIR}/artifacts/R29_LEAN_STDOUT.txt")
 set(R29_STDERR "${PROJECT_BINARY_DIR}/artifacts/R29_LEAN_STDERR.txt")
 set(R29_ATLAS "${PROJECT_BINARY_DIR}/artifacts/R29_ARITHMETIC_SPECTRAL_ATLAS.tsv")
-add_test(NAME r29.arithmetic_spectral_device_deed COMMAND r29_arithmetic_spectral_device_deed
-  "${R29_DEED_ARTIFACT}" "${R28_FINAL_REST}" "${R29_FINAL_REST}"
-  "${PROJECT_SOURCE_DIR}/apparatus/cards/R29_ARITHMETIC_SPECTRAL.card"
-  "${R29_SOURCE}" "${R29_OLEAN}" "${R29_STDOUT}" "${R29_STDERR}"
-  "${PROJECT_SOURCE_DIR}/formal/elementary-holonics"
-  "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lean-toolchain"
-  "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lake-manifest.json"
-  "${PROJECT_BINARY_DIR}/artifacts" "${R29_ATLAS}")
-set_tests_properties(r29.arithmetic_spectral_device_deed PROPERTIES
-  DEPENDS "r28.hodge_device_deed" TIMEOUT 1800)
-add_test(NAME r29.arithmetic_spectral_host_conformance COMMAND r29_arithmetic_spectral_host_conformance)
+holonic_found(NAME r29.arithmetic_spectral_device_deed
+  EXECUTABLE r29_arithmetic_spectral_device_deed
+  COMMAND
+    "${R29_DEED_ARTIFACT}" "${R28_FINAL_REST}" "${R29_FINAL_REST}"
+    "${PROJECT_SOURCE_DIR}/apparatus/cards/R29_ARITHMETIC_SPECTRAL.card" "${R29_SOURCE}"
+    "${R29_OLEAN}" "${R29_STDOUT}" "${R29_STDERR}"
+    "${PROJECT_SOURCE_DIR}/formal/elementary-holonics"
+    "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lean-toolchain"
+    "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lake-manifest.json"
+    "${PROJECT_BINARY_DIR}/artifacts" "${R29_ATLAS}")
+holonic_found(NAME r29.arithmetic_spectral_host_conformance
+  EXECUTABLE r29_arithmetic_spectral_host_conformance
+  COMMAND
+   )
 add_test(NAME r29.forbidden_arithmetic_spectral_copy COMMAND "${CMAKE_COMMAND}"
   -DCOMPILER=${CMAKE_CXX_COMPILER}
   -DSOURCE=${PROJECT_SOURCE_DIR}/tests/compile_contracts/forbidden_arithmetic_spectral_copy.cpp

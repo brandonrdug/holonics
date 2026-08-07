@@ -407,12 +407,39 @@ applied flag and the timeouts) were each reported as `126/126` on the strength o
 zero** — and the eight captured lines are the label summary, which prints whether or not tests
 failed. No pass line was ever read. The number was an artifact of the command.
 
-**Currently failing:** the trace-fiber discovery deed, `verification_failures=4`, and the four
-dependents that chain off its rest. The cause is **not** the applied-flag change: restoring that
-handler from `45ef174` leaves the failure in place. It may predate both unverified commits.
-
 **Standing method correction.** A gate is not a gate until its pass line has been read. Never pipe
 ctest through `tail`; capture ctest's own exit status.
+
+### The unverified commit did break the body — found 2026-08-07
+
+The unread gate was hiding a real regression, and it was mine.
+
+`2e15d4e` corrected `returned_difference_applied` to read `accepted && commit landed`. In the
+rederivation handler the foil is a return that is *supposed* to be refused, so its correct reading
+is `!rejected && commit landed`. But `resident_rederivation_return.hpp:90` gated the passage's stage
+advance on that same field:
+
+```cpp
+stage_ = rejected && morphology.returned_difference_applied ? foil_returned : none;
+```
+
+After the correction that conjunction is `rejected && !rejected` — **unsatisfiable**. The foil could
+never advance the passage, the valid formal passage was never formed, and the plural-rederivation
+deed returned `valid_process_refused` with an empty passage and **7,194 verification failures**. The
+gate on that commit was never read, so it shipped.
+
+The gate is now the commit landing, which is what the field meant before it was made sensitive to
+the return. **The flag correction stands; only the stage gate was wrong to read it.**
+
+**And it accounts for every failure that was being chased.** The trace-fiber deed's
+`verification_failures=4` and its four chained dependents were not an independent fault. The
+rederivation deed sits upstream of them, so its empty passage propagated a corrupt handoff rest down
+the whole chain. With the stage gate corrected and the chain re-founded in order, the trace-fiber
+discovery deed returns **`verification_failures=0`**, as do r30, r31, r32 and r33.
+
+Two method lessons, both already recorded in the operating contract and both earned here: a gate is
+not a gate until its pass line has been read, and **a failure in a chained deed is a claim about its
+whole upstream, not about itself.**
 
 ### What is nonetheless established this session
 
@@ -430,6 +457,32 @@ ctest through `tail`; capture ctest's own exit status.
   nothing observable. **It produced no speedup — 147 s before and after** — so the hypothesis that
   the ten-million-comparison census dominated that deed is FALSE. The cost is elsewhere in it and
   the next step is to instrument the launches rather than guess a third time.
+- **The foundings left ctest** — the entries that deposit files moved into the build graph; 62
+  guards remain. Measured: of roughly 2,250 serial seconds, about **1,320 were byte-for-byte
+  re-executions** of a computation that had finished seconds earlier in the same invocation. The
+  lineage was read off the argument lists — an artifact path is a return of the first founding that
+  names it and a mount for every founding after — so **249 founded returns** now carry their input
+  closure. **Measured on a settled tree 2026-08-07: `ninja holonics_standing` is 0.031 s and `ctest`
+  is 58.39 s, `100% tests passed, 0 tests failed out of 62`, exit status read directly.** The gate
+  was twenty-four minutes. Nothing was made faster; work already done stopped being done again. See
+  `cmake/HolonicStanding.cmake` and
+  [the record](research/records/2026-08-07_THE_DEED_IS_NOT_A_TEST_THE_FOUNDED_RETURN_IS_STANDING.md).
+- **Four graph defects were exposed by declaring the dependencies**, none of them detectable while
+  every founding ran unconditionally: a consumer declared above its producer; a negative control (the
+  foil's compiled object) declared as a product, which is never created because its absence is the
+  evidence; a dependency on when a deed was linked rather than on what it is; and **the source-access
+  audits re-executing both deeds over the deeds' own output paths**, which left every founding
+  downstream of an audit permanently dirty and meant the sealed artifacts a run left behind were the
+  probe-instrumented replay's output rather than the deed's. Determinism makes those bytes identical,
+  so no mathematics is affected — but nothing in the apparatus could have said so.
+- **Foundings serialize on the card.** ninja's default of one job per core launched two dozen deeds
+  at one device; the plural rederivation returned `executor_state=10`, `kernel_launches=0`, and
+  7,194 verification failures — a deed that never reached the card at all, reported as a
+  mathematical failure. A `holonic_card` job pool of depth one closes it.
+- **The standing is not yet durable.** The founded rests are **111 KB across 23 files**, 377 KB with
+  the generated Lean sources; the remaining 40 MB is `.olean` and diagnostic atlases. That 377 KB is
+  the machine's entire founded mathematical production and it lives in a gitignored build directory.
+  Depositing it as committed standing is the next step and is **not** done.
 
 ## Construction provenance
 

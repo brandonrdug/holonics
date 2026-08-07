@@ -72,19 +72,20 @@ set(R23_OLEAN "${PROJECT_BINARY_DIR}/artifacts/R23_GENERATED_TORIC_CYCLE.olean")
 set(R23_STDOUT "${PROJECT_BINARY_DIR}/artifacts/R23_LEAN_STDOUT.txt")
 set(R23_STDERR "${PROJECT_BINARY_DIR}/artifacts/R23_LEAN_STDERR.txt")
 set(R23_ATLAS "${PROJECT_BINARY_DIR}/artifacts/R23_TORIC_CYCLE_ATLAS.tsv")
-add_test(NAME r23.toric_cycle_device_deed
-  COMMAND r23_toric_cycle_device_deed "${R23_DEED_ARTIFACT}"
-    "${R22_FINAL_REST}" "${R23_FINAL_REST}"
-    "${PROJECT_SOURCE_DIR}/apparatus/cards/R23_TORIC_CYCLE.card"
-    "${R23_SOURCE}" "${R23_OLEAN}" "${R23_STDOUT}" "${R23_STDERR}"
+holonic_found(NAME r23.toric_cycle_device_deed
+  EXECUTABLE r23_toric_cycle_device_deed
+  COMMAND
+    "${R23_DEED_ARTIFACT}" "${R22_FINAL_REST}" "${R23_FINAL_REST}"
+    "${PROJECT_SOURCE_DIR}/apparatus/cards/R23_TORIC_CYCLE.card" "${R23_SOURCE}"
+    "${R23_OLEAN}" "${R23_STDOUT}" "${R23_STDERR}"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lean-toolchain"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lake-manifest.json"
     "${PROJECT_BINARY_DIR}/artifacts" "${R23_ATLAS}")
-set_tests_properties(r23.toric_cycle_device_deed PROPERTIES
-  DEPENDS "r22.cm_incidence_device_deed")
-add_test(NAME r23.toric_cycle_host_conformance
-  COMMAND r23_toric_cycle_host_conformance)
+holonic_found(NAME r23.toric_cycle_host_conformance
+  EXECUTABLE r23_toric_cycle_host_conformance
+  COMMAND
+   )
 add_test(NAME r23.forbidden_toric_cycle_copy
   COMMAND "${CMAKE_COMMAND}" -DCOMPILER=${CMAKE_CXX_COMPILER}
     -DSOURCE=${PROJECT_SOURCE_DIR}/tests/compile_contracts/forbidden_toric_cycle_copy.cpp
