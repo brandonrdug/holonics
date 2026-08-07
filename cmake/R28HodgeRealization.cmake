@@ -73,7 +73,7 @@ add_test(NAME r28.hodge_device_deed COMMAND r28_hodge_device_deed "${R28_DEED_AR
   "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lake-manifest.json"
   "${PROJECT_BINARY_DIR}/artifacts" "${R28_ATLAS}")
 set_tests_properties(r28.hodge_device_deed PROPERTIES
-  DEPENDS "r27.expression_geometry_device_deed" TIMEOUT 180)
+  DEPENDS "r27.expression_geometry_device_deed" TIMEOUT 1800)
 add_test(NAME r28.hodge_host_conformance COMMAND r28_hodge_host_conformance)
 add_test(NAME r28.forbidden_hodge_copy COMMAND "${CMAKE_COMMAND}"
   -DCOMPILER=${CMAKE_CXX_COMPILER}

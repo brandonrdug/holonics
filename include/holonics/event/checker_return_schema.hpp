@@ -74,6 +74,13 @@ struct checker_morphology_return final {
   std::uint64_t codec_before{};
   std::uint64_t codec_after{};
   body::body_change_receipt commit{};
+  /// True only when the exterior return was **accepted** and the commit landed.
+  ///
+  /// Until 2026-08-06 this read `commit.state == committed` alone, while the
+  /// commit fired unconditionally with `delta = accepted ? N : M`. A rejected
+  /// return therefore advanced the head, consumed the continuation, and set this
+  /// flag exactly as an accepted one did: **the field named "the returned
+  /// difference was applied" was insensitive to the returned difference.**
   bool returned_difference_applied{};
 };
 

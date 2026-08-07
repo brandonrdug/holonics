@@ -16,7 +16,7 @@ add_test(NAME r34.trace_fiber_discovery_device_deed
     "${PROJECT_BINARY_DIR}/artifacts" "${R34_WORD_ATLAS}" "${R34_TRIPLE_ATLAS}"
     "${R34_GROUP_ATLAS}" "${R34_LAW_ATLAS}")
 set_tests_properties(r34.trace_fiber_discovery_device_deed PROPERTIES
-  DEPENDS "r33.characteristic_application_device_deed" TIMEOUT 300)
+  DEPENDS "r33.characteristic_application_device_deed" TIMEOUT 1800)
 add_test(NAME r34.trace_fiber_application_device_deed
   COMMAND r34_trace_fiber_application_device_deed "${R34_APP_DEED}"
     "${R34_INTERMEDIATE_REST}" "${R34_FINAL_REST}" "${R34_HELDOUT}"
@@ -24,13 +24,13 @@ add_test(NAME r34.trace_fiber_application_device_deed
     "${R34_FORMAL_ROOT}" "${R34_TOOLCHAIN}" "${R34_FORMAL_MANIFEST}"
     "${PROJECT_BINARY_DIR}/artifacts" "${R34_DOSSIER}" "${R34_APP_ATLAS}")
 set_tests_properties(r34.trace_fiber_application_device_deed PROPERTIES
-  DEPENDS "r34.trace_fiber_discovery_device_deed" TIMEOUT 300)
+  DEPENDS "r34.trace_fiber_discovery_device_deed" TIMEOUT 1800)
 add_test(NAME r34.trace_fiber_host_conformance COMMAND r34_trace_fiber_host_conformance
   "${R34_POSITIVE}" "${R34_SIGNED}" "${R34_RECHARTED}" "${R34_HELDOUT}"
   "${R34_WORD_ATLAS}" "${R34_TRIPLE_ATLAS}" "${R34_GROUP_ATLAS}"
   "${R34_LAW_ATLAS}" "${R34_APP_ATLAS}" "${R34_HOST_CONFORMANCE}")
 set_tests_properties(r34.trace_fiber_host_conformance PROPERTIES
-  DEPENDS "r34.trace_fiber_application_device_deed" TIMEOUT 300)
+  DEPENDS "r34.trace_fiber_application_device_deed" TIMEOUT 1800)
 
 add_library(r34_open_probe SHARED tests/apparatus/r34_open_probe.cpp)
 target_link_libraries(r34_open_probe PRIVATE holonics_contract_options)
@@ -54,7 +54,7 @@ add_test(NAME r34.source_access_audit COMMAND "${CMAKE_COMMAND}"
   -DMANIFEST=${R34_FORMAL_MANIFEST} -DARTIFACT_ROOT=${PROJECT_BINARY_DIR}/artifacts
   -P "${PROJECT_SOURCE_DIR}/cmake/R34SourceAccessAudit.cmake")
 set_tests_properties(r34.source_access_audit PROPERTIES
-  DEPENDS "r34.trace_fiber_host_conformance" TIMEOUT 600)
+  DEPENDS "r34.trace_fiber_host_conformance" TIMEOUT 1800)
 
 add_test(NAME r34.determinism COMMAND "${CMAKE_COMMAND}"
   -DDISC_EXEC=$<TARGET_FILE:r34_trace_fiber_discovery_device_deed>
@@ -72,7 +72,7 @@ add_test(NAME r34.determinism COMMAND "${CMAKE_COMMAND}"
   -DAPP_STDOUT=${R34_APP_STDOUT} -DAPP_STDERR=${R34_APP_STDERR} -DDOSSIER=${R34_DOSSIER}
   -DAPP_ATLAS=${R34_APP_ATLAS} -DOUTPUT=${R34_DETERMINISM}
   -P "${PROJECT_SOURCE_DIR}/cmake/R34Determinism.cmake")
-set_tests_properties(r34.determinism PROPERTIES DEPENDS "r34.source_access_audit" TIMEOUT 600)
+set_tests_properties(r34.determinism PROPERTIES DEPENDS "r34.source_access_audit" TIMEOUT 1800)
 
 add_test(NAME r34.seal COMMAND "${CMAKE_COMMAND}" -DOUTPUT=${R34_SEAL}
   -DSOURCE_AUDIT=${R34_SOURCE_AUDIT} -DDISC_DEED=${R34_DISC_DEED} -DAPP_DEED=${R34_APP_DEED}

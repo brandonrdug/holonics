@@ -79,7 +79,10 @@ HOLONICS_CALLABLE inline bool resident_rederivation::resume_foil(
   pending_live_ = false;
   morphology.mathematical_after = mathematical_admitted_tally_;
   morphology.codec_after = codec_admitted_tally_;
-  morphology.returned_difference_applied =
+  // The foil is expected to be refused, so the difference must NOT apply. Before
+  // 2026-08-06 this read the commit alone and reported the refused foil as
+  // applied, exactly as it reported an accepted return.
+  morphology.returned_difference_applied = !rejected &&
       morphology.commit.state == body::body_change_status::committed;
   observation.foil.pending_after_return = false;
   observation.foil.passage_preserved = typed.passage == expected.passage;
@@ -170,7 +173,7 @@ HOLONICS_CALLABLE inline bool resident_rederivation::resume_valid(
   pending_live_ = false;
   morphology.mathematical_after = mathematical_admitted_tally_;
   morphology.codec_after = codec_admitted_tally_;
-  morphology.returned_difference_applied =
+  morphology.returned_difference_applied = accepted &&
       morphology.commit.state == body::body_change_status::committed;
   observation.passage.pending_after_return = false;
   observation.passage.passage_preserved = typed.passage == expected.passage;

@@ -48,7 +48,7 @@ HOLONICS_CALLABLE inline bool resident_cultivated_organs::resume_cultivation(
       expected.passage.value(), live->take_continuation()); pending_live_ = false;
   morphology.mathematical_after = standing_.mathematical_admitted_tally;
   morphology.codec_after = standing_.codec_admitted_tally;
-  morphology.returned_difference_applied =
+  morphology.returned_difference_applied = accepted &&
       morphology.commit.state == body::body_change_status::committed;
   out.passage.pending_after_return = pending_live_;
   out.passage.passage_preserved = raw.passage == expected.passage;

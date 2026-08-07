@@ -16,7 +16,7 @@ add_test(NAME r33.characteristic_discovery_device_deed
     "${PROJECT_BINARY_DIR}/artifacts" "${R33_WORD_ATLAS}" "${R33_PAIR_ATLAS}"
     "${R33_GROUP_ATLAS}" "${R33_LAW_ATLAS}")
 set_tests_properties(r33.characteristic_discovery_device_deed PROPERTIES
-  DEPENDS "r32.heldout_holonomy_device_deed" TIMEOUT 300)
+  DEPENDS "r32.heldout_holonomy_device_deed" TIMEOUT 1800)
 add_test(NAME r33.characteristic_application_device_deed
   COMMAND r33_characteristic_application_device_deed "${R33_APP_DEED}"
     "${R33_INTERMEDIATE_REST}" "${R33_FINAL_REST}" "${R33_HELDOUT}" "${R33_APP_SOURCE}"
@@ -24,7 +24,7 @@ add_test(NAME r33.characteristic_application_device_deed
     "${R33_TOOLCHAIN}" "${R33_FORMAL_MANIFEST}" "${PROJECT_BINARY_DIR}/artifacts"
     "${R33_DOSSIER}" "${R33_APP_ATLAS}")
 set_tests_properties(r33.characteristic_application_device_deed PROPERTIES
-  DEPENDS "r33.characteristic_discovery_device_deed" TIMEOUT 300)
+  DEPENDS "r33.characteristic_discovery_device_deed" TIMEOUT 1800)
 
 add_test(NAME r33.characteristic_host_conformance COMMAND r33_characteristic_host_conformance
   "${R33_POSITIVE}" "${R33_SIGNED}" "${R33_RECHARTED}" "${R33_HELDOUT}"
@@ -55,7 +55,7 @@ add_test(NAME r33.source_access_audit COMMAND "${CMAKE_COMMAND}"
   -DMANIFEST=${R33_FORMAL_MANIFEST} -DARTIFACT_ROOT=${PROJECT_BINARY_DIR}/artifacts
   -P "${PROJECT_SOURCE_DIR}/cmake/R33SourceAccessAudit.cmake")
 set_tests_properties(r33.source_access_audit PROPERTIES
-  DEPENDS "r33.characteristic_host_conformance" TIMEOUT 300)
+  DEPENDS "r33.characteristic_host_conformance" TIMEOUT 1800)
 
 add_test(NAME r33.determinism COMMAND "${CMAKE_COMMAND}"
   -DDISC_EXEC=$<TARGET_FILE:r33_characteristic_discovery_device_deed>
@@ -73,7 +73,7 @@ add_test(NAME r33.determinism COMMAND "${CMAKE_COMMAND}"
   -DAPP_STDOUT=${R33_APP_STDOUT} -DAPP_STDERR=${R33_APP_STDERR} -DDOSSIER=${R33_DOSSIER}
   -DAPP_ATLAS=${R33_APP_ATLAS} -DOUTPUT=${R33_DETERMINISM}
   -P "${PROJECT_SOURCE_DIR}/cmake/R33Determinism.cmake")
-set_tests_properties(r33.determinism PROPERTIES DEPENDS "r33.source_access_audit" TIMEOUT 300)
+set_tests_properties(r33.determinism PROPERTIES DEPENDS "r33.source_access_audit" TIMEOUT 1800)
 add_test(NAME r33.seal COMMAND "${CMAKE_COMMAND}" -DOUTPUT=${R33_SEAL}
   -DSOURCE_AUDIT=${R33_SOURCE_AUDIT} -DDISC_DEED=${R33_DISC_DEED} -DAPP_DEED=${R33_APP_DEED}
   -DHOST_CONFORMANCE=${R33_HOST_CONFORMANCE} -DINTERMEDIATE=${R33_INTERMEDIATE_REST}

@@ -85,7 +85,7 @@ HOLONICS_CALLABLE inline bool resident_trace_rebase::resume_discovery(
   m.mathematical_after =
       standing_.standing.standing.standing.standing.mathematical_admitted_tally;
   m.codec_after = standing_.standing.standing.standing.standing.codec_admitted_tally;
-  m.returned_difference_applied =
+  m.returned_difference_applied = accepted &&
       m.commit.state == body::body_change_status::committed;
   out.passage.pending_after_return = pending_live_;
   out.passage.passage_preserved = raw.passage == expected.passage;
@@ -178,7 +178,7 @@ HOLONICS_CALLABLE inline bool resident_trace_rebase::resume_heldout(
   m.mathematical_after =
       standing_.standing.standing.standing.standing.mathematical_admitted_tally;
   m.codec_after = standing_.standing.standing.standing.standing.codec_admitted_tally;
-  m.returned_difference_applied =
+  m.returned_difference_applied = accepted &&
       m.commit.state == body::body_change_status::committed;
   out.passage.pending_after_return = pending_live_;
   out.passage.passage_preserved = raw.passage == expected.passage;

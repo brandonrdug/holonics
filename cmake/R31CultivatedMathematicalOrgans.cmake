@@ -94,7 +94,7 @@ add_test(NAME r31.organ_cultivation_device_deed COMMAND r31_organ_cultivation_de
   "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lake-manifest.json"
   "${PROJECT_BINARY_DIR}/artifacts" "${R31_CULTIVATION_ATLAS}")
 set_tests_properties(r31.organ_cultivation_device_deed PROPERTIES
-  DEPENDS "r30.plural_rederivation_device_deed" TIMEOUT 300)
+  DEPENDS "r30.plural_rederivation_device_deed" TIMEOUT 1800)
 
 add_test(NAME r31.cultivated_application_device_deed COMMAND r31_cultivated_application_device_deed
   "${R31_APPLICATION_DEED}" "${R31_INTERMEDIATE_REST}" "${R31_FINAL_REST}"
@@ -110,7 +110,7 @@ add_test(NAME r31.cultivated_application_device_deed COMMAND r31_cultivated_appl
   "${PROJECT_BINARY_DIR}/artifacts" "${R31_DOSSIER}"
   "${R31_APPLICATION_ATLAS}")
 set_tests_properties(r31.cultivated_application_device_deed PROPERTIES
-  DEPENDS "r31.organ_cultivation_device_deed" TIMEOUT 300)
+  DEPENDS "r31.organ_cultivation_device_deed" TIMEOUT 1800)
 
 add_library(r31_open_probe SHARED tests/apparatus/r31_open_probe.cpp)
 target_link_libraries(r31_open_probe PRIVATE holonics_contract_options)
@@ -143,7 +143,7 @@ add_test(NAME r31.source_access_audit COMMAND "${CMAKE_COMMAND}"
   -DARTIFACT_ROOT=${PROJECT_BINARY_DIR}/artifacts
   -P "${PROJECT_SOURCE_DIR}/cmake/R31SourceAccessAudit.cmake")
 set_tests_properties(r31.source_access_audit PROPERTIES
-  DEPENDS "r31.cultivated_application_device_deed" TIMEOUT 300)
+  DEPENDS "r31.cultivated_application_device_deed" TIMEOUT 1800)
 add_test(NAME r31.seal COMMAND "${CMAKE_COMMAND}" -DOUTPUT=${R31_SEAL}
   -DSOURCE_AUDIT=${R31_SOURCE_AUDIT} -DCULT_DEED=${R31_CULTIVATION_DEED}
   -DAPP_DEED=${R31_APPLICATION_DEED} -DINTERMEDIATE=${R31_INTERMEDIATE_REST}
@@ -177,7 +177,7 @@ add_test(NAME r31.determinism COMMAND "${CMAKE_COMMAND}"
   -DAPP_STDOUT=${R31_APPLICATION_STDOUT} -DAPP_STDERR=${R31_APPLICATION_STDERR}
   -DDOSSIER=${R31_DOSSIER} -DAPP_ATLAS=${R31_APPLICATION_ATLAS}
   -DOUTPUT=${R31_DETERMINISM} -P "${PROJECT_SOURCE_DIR}/cmake/R31Determinism.cmake")
-set_tests_properties(r31.determinism PROPERTIES DEPENDS "r31.source_access_audit" TIMEOUT 300)
+set_tests_properties(r31.determinism PROPERTIES DEPENDS "r31.source_access_audit" TIMEOUT 1800)
 set_tests_properties(r31.seal PROPERTIES DEPENDS "r31.determinism")
 add_test(NAME r31.cultivated_host_conformance COMMAND r31_cultivated_host_conformance)
 add_test(NAME r31.forbidden_cultivated_copy COMMAND "${CMAKE_COMMAND}"

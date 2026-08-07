@@ -96,7 +96,7 @@ add_test(NAME r30.plural_rederivation_device_deed COMMAND r30_plural_rederivatio
   "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lake-manifest.json"
   "${PROJECT_BINARY_DIR}/artifacts" "${R30_ATLAS}" "${R30_DOSSIER}")
 set_tests_properties(r30.plural_rederivation_device_deed PROPERTIES
-  DEPENDS "r29.arithmetic_spectral_device_deed" TIMEOUT 300)
+  DEPENDS "r29.arithmetic_spectral_device_deed" TIMEOUT 1800)
 add_test(NAME r30.source_access_audit COMMAND "${CMAKE_COMMAND}"
   -DEXECUTABLE=$<TARGET_FILE:r30_plural_rederivation_device_deed>
   -DPROBE=$<TARGET_FILE:r30_open_probe>
@@ -116,7 +116,7 @@ add_test(NAME r30.source_access_audit COMMAND "${CMAKE_COMMAND}"
   -DARTIFACT_ROOT=${PROJECT_BINARY_DIR}/artifacts -DATLAS=${R30_ATLAS}
   -DDOSSIER=${R30_DOSSIER} -P "${PROJECT_SOURCE_DIR}/cmake/R30SourceAccessAudit.cmake")
 set_tests_properties(r30.source_access_audit PROPERTIES
-  DEPENDS "r30.plural_rederivation_device_deed" TIMEOUT 300)
+  DEPENDS "r30.plural_rederivation_device_deed" TIMEOUT 1800)
 add_test(NAME r30.seal_and_compare COMMAND "${CMAKE_COMMAND}"
   -DOUTPUT=${R30_SEAL_MANIFEST} -DCOMPARISON=${R30_COMPARISON}
   -DSOURCE_AUDIT=${R30_SOURCE_AUDIT} -DDEED=${R30_DEED_ARTIFACT}

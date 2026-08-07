@@ -56,7 +56,7 @@ HOLONICS_CALLABLE inline bool resident_expression_geometry::resume(
       expected.passage.value(), pending->take_continuation()); pending_live_ = false;
   morphology.mathematical_after = mathematical_admitted_tally_;
   morphology.codec_after = codec_admitted_tally_;
-  morphology.returned_difference_applied =
+  morphology.returned_difference_applied = accepted &&
       morphology.commit.state == body::body_change_status::committed;
   observation.passage.pending_after_return = pending_live_;
   observation.passage.passage_preserved = typed.passage == expected.passage &&

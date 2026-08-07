@@ -73,7 +73,7 @@ add_test(NAME r29.arithmetic_spectral_device_deed COMMAND r29_arithmetic_spectra
   "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lake-manifest.json"
   "${PROJECT_BINARY_DIR}/artifacts" "${R29_ATLAS}")
 set_tests_properties(r29.arithmetic_spectral_device_deed PROPERTIES
-  DEPENDS "r28.hodge_device_deed" TIMEOUT 300)
+  DEPENDS "r28.hodge_device_deed" TIMEOUT 1800)
 add_test(NAME r29.arithmetic_spectral_host_conformance COMMAND r29_arithmetic_spectral_host_conformance)
 add_test(NAME r29.forbidden_arithmetic_spectral_copy COMMAND "${CMAKE_COMMAND}"
   -DCOMPILER=${CMAKE_CXX_COMPILER}

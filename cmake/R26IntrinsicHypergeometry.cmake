@@ -86,7 +86,7 @@ add_test(NAME r26.intrinsic_hypergeometry_device_deed
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lake-manifest.json"
     "${PROJECT_BINARY_DIR}/artifacts" "${R26_ATLAS}")
 set_tests_properties(r26.intrinsic_hypergeometry_device_deed PROPERTIES
-  DEPENDS "r25.causal_linear_device_deed" TIMEOUT 180)
+  DEPENDS "r25.causal_linear_device_deed" TIMEOUT 1800)
 add_test(NAME r26.intrinsic_hypergeometry_host_conformance
   COMMAND r26_intrinsic_hypergeometry_host_conformance)
 add_test(NAME r26.forbidden_intrinsic_hypergeometry_copy

@@ -74,7 +74,7 @@ resident_characteristic_hypergeometry::resume_discovery(
   pending_live_ = false;
   m.mathematical_after = standing_.standing.standing.mathematical_admitted_tally;
   m.codec_after = standing_.standing.standing.codec_admitted_tally;
-  m.returned_difference_applied =
+  m.returned_difference_applied = accepted &&
       m.commit.state == body::body_change_status::committed;
   out.passage.pending_after_return = pending_live_;
   out.passage.passage_preserved = raw.passage == expected.passage;
@@ -157,7 +157,7 @@ resident_characteristic_hypergeometry::resume_heldout(
   pending_live_ = false;
   m.mathematical_after = standing_.standing.standing.mathematical_admitted_tally;
   m.codec_after = standing_.standing.standing.codec_admitted_tally;
-  m.returned_difference_applied =
+  m.returned_difference_applied = accepted &&
       m.commit.state == body::body_change_status::committed;
   out.passage.pending_after_return = pending_live_;
   out.passage.passage_preserved = raw.passage == expected.passage;

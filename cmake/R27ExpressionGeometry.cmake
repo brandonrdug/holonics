@@ -80,7 +80,7 @@ add_test(NAME r27.expression_geometry_device_deed
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lake-manifest.json"
     "${PROJECT_BINARY_DIR}/artifacts" "${R27_ATLAS}")
 set_tests_properties(r27.expression_geometry_device_deed PROPERTIES
-  DEPENDS "r26.intrinsic_hypergeometry_device_deed" TIMEOUT 180)
+  DEPENDS "r26.intrinsic_hypergeometry_device_deed" TIMEOUT 1800)
 add_test(NAME r27.expression_geometry_host_conformance
   COMMAND r27_expression_geometry_host_conformance)
 add_test(NAME r27.forbidden_expression_geometry_copy

@@ -330,3 +330,13 @@ foreach(holonics_test IN LISTS holonics_all_tests)
   endif()
   set_tests_properties("${holonics_test}" PROPERTIES LABELS "${holonics_label}")
 endforeach()
+
+# Test timeouts.
+#
+# Measured 2026-08-06: the heaviest deed runs 147 s standalone and carried
+# TIMEOUT 300. Under -j 2 those deeds share one card, each stretches past 300,
+# and ctest kills them -- producing failures that look like regressions and are
+# contention. A 2x margin against a measured cost is a coin flip, not a limit.
+#
+# Timeouts exist to catch a hang, not to police a duration. They are now well
+# clear of any measured cost; if a deed approaches one, that is a real hang.

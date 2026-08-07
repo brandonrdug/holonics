@@ -16,7 +16,7 @@ add_test(NAME r35.trace_rebase_discovery_device_deed
     "${PROJECT_BINARY_DIR}/artifacts" "${R35_STATE_ATLAS}" "${R35_EDGE_ATLAS}"
     "${R35_TANGENT_ATLAS}" "${R35_LAW_ATLAS}")
 set_tests_properties(r35.trace_rebase_discovery_device_deed PROPERTIES
-  DEPENDS "r34.trace_fiber_application_device_deed" TIMEOUT 900)
+  DEPENDS "r34.trace_fiber_application_device_deed" TIMEOUT 1800)
 add_test(NAME r35.trace_rebase_application_device_deed
   COMMAND r35_trace_rebase_application_device_deed "${R35_APP_DEED}"
     "${R35_INTERMEDIATE_REST}" "${R35_FINAL_REST}" "${R35_HELDOUT}"
@@ -24,13 +24,13 @@ add_test(NAME r35.trace_rebase_application_device_deed
     "${R35_FORMAL_ROOT}" "${R35_TOOLCHAIN}" "${R35_FORMAL_MANIFEST}"
     "${PROJECT_BINARY_DIR}/artifacts" "${R35_DOSSIER}" "${R35_APP_ATLAS}")
 set_tests_properties(r35.trace_rebase_application_device_deed PROPERTIES
-  DEPENDS "r35.trace_rebase_discovery_device_deed" TIMEOUT 300)
+  DEPENDS "r35.trace_rebase_discovery_device_deed" TIMEOUT 1800)
 add_test(NAME r35.trace_rebase_host_conformance COMMAND r35_trace_rebase_host_conformance
   "${R35_PRIMARY}" "${R35_SIGNED}" "${R35_RECHARTED}" "${R35_HELDOUT}"
   "${R35_STATE_ATLAS}" "${R35_EDGE_ATLAS}" "${R35_TANGENT_ATLAS}"
   "${R35_LAW_ATLAS}" "${R35_APP_ATLAS}" "${R35_HOST_CONFORMANCE}")
 set_tests_properties(r35.trace_rebase_host_conformance PROPERTIES
-  DEPENDS "r35.trace_rebase_application_device_deed" TIMEOUT 600)
+  DEPENDS "r35.trace_rebase_application_device_deed" TIMEOUT 1800)
 
 add_library(r35_open_probe SHARED tests/apparatus/r35_open_probe.cpp)
 target_link_libraries(r35_open_probe PRIVATE holonics_contract_options)
