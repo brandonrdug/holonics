@@ -1,19 +1,19 @@
 find_package(CUDAToolkit 13.2.78 EXACT REQUIRED)
 
 add_library(r19_characteristic_store STATIC
-  apparatus/host/characteristic_store_adapter.cpp)
+  src/apparatus/host/characteristic_store_adapter.cpp)
 target_link_libraries(r19_characteristic_store
   PRIVATE holonics::apparatus holonics_contract_options)
 
 add_library(r19_characteristic_executor STATIC
-  apparatus/host/lean_checker_process.cpp
-  cuda/executor/r19_characteristic_executor.cu
-  cuda/executor/r19_characteristic_kernels.cu)
+  src/apparatus/host/lean_checker_process.cpp
+  src/cuda/executor/r19_characteristic_executor.cu
+  src/cuda/executor/r19_characteristic_kernels.cu)
 target_link_libraries(r19_characteristic_executor
   PRIVATE holonics::apparatus holonics_contract_options CUDA::cudart)
 
 add_executable(r19_characteristic_device_deed
-  apparatus/host/r19_characteristic_deed.cpp
+  src/apparatus/host/r19_characteristic_deed.cpp
   tests/model/r19_artifact.cpp
   tests/model/r19_cases.cpp
   tests/model/r19_verify.cpp)
@@ -36,13 +36,13 @@ add_custom_target(r19_normalize_executable
   DEPENDS r19_characteristic_device_deed VERBATIM)
 
 file(GLOB_RECURSE R19_DEVICE_HEADERS CONFIGURE_DEPENDS
-  "${PROJECT_SOURCE_DIR}/include/holonics/*.hpp")
-set(R19_DEVICE_SOURCE "${PROJECT_SOURCE_DIR}/cuda/executor/r19_characteristic_kernels.cu")
+  "${PROJECT_SOURCE_DIR}/src/include/holonics/*.hpp")
+set(R19_DEVICE_SOURCE "${PROJECT_SOURCE_DIR}/src/cuda/executor/r19_characteristic_kernels.cu")
 set(R19_DEVICE_PTX "${R0_GENERATED_DIRECTORY}/r19_characteristic_kernels.ptx")
 set(R19_DEVICE_CUBIN "${R0_GENERATED_DIRECTORY}/r19_characteristic_kernels.cubin")
 set(R19_DEVICE_COMMON_FLAGS
   --std=c++20 -O3 --gpu-architecture=sm_89 --fmad=false --Werror=all-warnings
-  -I${PROJECT_SOURCE_DIR}/include
+  -I${PROJECT_SOURCE_DIR}/src/include
   -Xcompiler=-Wall,-Wextra,-Werror,-Wconversion,-Wsign-conversion,-Wshadow,-fno-exceptions,-fno-rtti,-fno-fast-math,-ffp-contract=off,-ffile-prefix-map=${PROJECT_SOURCE_DIR}=.,-ffile-prefix-map=${PROJECT_BINARY_DIR}=.)
 add_custom_command(OUTPUT "${R19_DEVICE_PTX}"
   COMMAND "${CMAKE_CUDA_COMPILER}" ${R19_DEVICE_COMMON_FLAGS} --ptx
@@ -56,8 +56,8 @@ add_custom_target(r19_device_artifacts ALL DEPENDS ${R19_DEVICE_PTX} ${R19_DEVIC
 
 string(JOIN " " R19_DEVICE_FLAGS_RECEIPT ${R19_DEVICE_COMMON_FLAGS})
 set(R19_DECLARED_COMMANDS
-  "device_ptx=<CUDA_COMPILER> ${R19_DEVICE_FLAGS_RECEIPT} --ptx <SOURCE>/cuda/executor/r19_characteristic_kernels.cu -o <BUILD>/generated/r19_characteristic_kernels.ptx\n"
-  "device_cubin=<CUDA_COMPILER> ${R19_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/cuda/executor/r19_characteristic_kernels.cu -o <BUILD>/generated/r19_characteristic_kernels.cubin\n"
+  "device_ptx=<CUDA_COMPILER> ${R19_DEVICE_FLAGS_RECEIPT} --ptx <SOURCE>/src/cuda/executor/r19_characteristic_kernels.cu -o <BUILD>/generated/r19_characteristic_kernels.ptx\n"
+  "device_cubin=<CUDA_COMPILER> ${R19_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/src/cuda/executor/r19_characteristic_kernels.cu -o <BUILD>/generated/r19_characteristic_kernels.cubin\n"
   "exterior_checker=/usr/bin/lake env lean -R <BUILD>/artifacts -o <BUILD>/artifacts/R19_GENERATED_CHARACTERISTIC.olean <BUILD>/artifacts/R19_GENERATED_CHARACTERISTIC.lean\n")
 
 file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/artifacts")
@@ -84,7 +84,7 @@ holonic_found(NAME r19.characteristic_host_conformance
 add_test(NAME r19.forbidden_characteristic_copy
   COMMAND "${CMAKE_COMMAND}" -DCOMPILER=${CMAKE_CXX_COMPILER}
     -DSOURCE=${PROJECT_SOURCE_DIR}/tests/compile_contracts/forbidden_characteristic_copy.cpp
-    -DINCLUDE_DIRECTORY=${PROJECT_SOURCE_DIR}/include
+    -DINCLUDE_DIRECTORY=${PROJECT_SOURCE_DIR}/src/include
     "-DEXPECTED_TEXT=use of deleted function"
     -P "${PROJECT_SOURCE_DIR}/cmake/ExpectCompileFailure.cmake")
 

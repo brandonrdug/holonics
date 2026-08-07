@@ -1,9 +1,9 @@
-set(R32_C0 "${PROJECT_SOURCE_DIR}/apparatus/cards/R32_OCCURRENCE_INCIDENCE.card")
-set(R32_C1 "${PROJECT_SOURCE_DIR}/apparatus/cards/R32_COMPOSITION.card")
-set(R32_C2 "${PROJECT_SOURCE_DIR}/apparatus/cards/R32_RECEIVER.card")
-set(R32_C3 "${PROJECT_SOURCE_DIR}/apparatus/cards/R32_LOCAL_CHART.card")
-set(R32_C4 "${PROJECT_SOURCE_DIR}/apparatus/cards/R32_RETURN_CONDUCT.card")
-set(R32_HELDOUT "${PROJECT_SOURCE_DIR}/apparatus/cards/R32_HELDOUT_TRIANGLE.card")
+set(R32_C0 "${PROJECT_SOURCE_DIR}/src/apparatus/cards/R32_OCCURRENCE_INCIDENCE.card")
+set(R32_C1 "${PROJECT_SOURCE_DIR}/src/apparatus/cards/R32_COMPOSITION.card")
+set(R32_C2 "${PROJECT_SOURCE_DIR}/src/apparatus/cards/R32_RECEIVER.card")
+set(R32_C3 "${PROJECT_SOURCE_DIR}/src/apparatus/cards/R32_LOCAL_CHART.card")
+set(R32_C4 "${PROJECT_SOURCE_DIR}/src/apparatus/cards/R32_RETURN_CONDUCT.card")
+set(R32_HELDOUT "${PROJECT_SOURCE_DIR}/src/apparatus/cards/R32_HELDOUT_TRIANGLE.card")
 set(R32_FORMAL_ROOT "${PROJECT_SOURCE_DIR}/formal/elementary-holonics")
 set(R32_TOOLCHAIN "${R32_FORMAL_ROOT}/lean-toolchain")
 set(R32_FORMAL_MANIFEST "${R32_FORMAL_ROOT}/lake-manifest.json")
@@ -93,5 +93,5 @@ holonic_found(NAME r32.post_seal_canon_comparison
     "${PROJECT_SOURCE_DIR}/cmake/R32CanonComparison.cmake")
 add_test(NAME r32.forbidden_elementary_copy COMMAND "${CMAKE_COMMAND}"
   -DCOMPILER=${CMAKE_CXX_COMPILER} -DSOURCE=${PROJECT_SOURCE_DIR}/tests/compile_contracts/forbidden_elementary_copy.cpp
-  -DINCLUDE_DIRECTORY=${PROJECT_SOURCE_DIR}/include "-DEXPECTED_TEXT=use of deleted function"
+  -DINCLUDE_DIRECTORY=${PROJECT_SOURCE_DIR}/src/include "-DEXPECTED_TEXT=use of deleted function"
   -P "${PROJECT_SOURCE_DIR}/cmake/ExpectCompileFailure.cmake")

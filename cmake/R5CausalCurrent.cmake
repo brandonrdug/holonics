@@ -2,15 +2,15 @@ find_package(CUDAToolkit 13.2.78 EXACT REQUIRED)
 
 add_library(
   r5_causal_current_executor STATIC
-  cuda/executor/r5_current_executor.cu
-  cuda/executor/r5_current_kernels.cu)
+  src/cuda/executor/r5_current_executor.cu
+  src/cuda/executor/r5_current_kernels.cu)
 target_link_libraries(
   r5_causal_current_executor
   PRIVATE holonics::apparatus holonics_contract_options CUDA::cudart)
 
 add_executable(
   r5_causal_current_device_deed
-  apparatus/host/r5_causal_current_deed.cpp
+  src/apparatus/host/r5_causal_current_deed.cpp
   tests/model/r5_artifact.cpp
   tests/model/r5_cases.cpp
   tests/model/r5_oracle.cpp
@@ -38,9 +38,9 @@ add_custom_target(
 
 file(
   GLOB_RECURSE R5_DEVICE_HEADERS CONFIGURE_DEPENDS
-  "${PROJECT_SOURCE_DIR}/include/holonics/*.hpp")
-set(R5_DEVICE_SOURCE "${PROJECT_SOURCE_DIR}/cuda/executor/r5_current_kernels.cu")
-set(R5_DEVICE_FRONT "${PROJECT_SOURCE_DIR}/cuda/executor/r5_current_front.cuh")
+  "${PROJECT_SOURCE_DIR}/src/include/holonics/*.hpp")
+set(R5_DEVICE_SOURCE "${PROJECT_SOURCE_DIR}/src/cuda/executor/r5_current_kernels.cu")
+set(R5_DEVICE_FRONT "${PROJECT_SOURCE_DIR}/src/cuda/executor/r5_current_front.cuh")
 set(R5_DEVICE_PTX "${R0_GENERATED_DIRECTORY}/r5_current_kernels.ptx")
 set(R5_DEVICE_CUBIN "${R0_GENERATED_DIRECTORY}/r5_current_kernels.cubin")
 set(R5_DEVICE_COMMON_FLAGS
@@ -49,7 +49,7 @@ set(R5_DEVICE_COMMON_FLAGS
     --gpu-architecture=sm_89
     --fmad=false
     --Werror=all-warnings
-    -I${PROJECT_SOURCE_DIR}/include
+    -I${PROJECT_SOURCE_DIR}/src/include
     -Xcompiler=-Wall,-Wextra,-Werror,-Wconversion,-Wsign-conversion,-Wshadow,-fno-exceptions,-fno-rtti,-fno-fast-math,-ffp-contract=off,-ffile-prefix-map=${PROJECT_SOURCE_DIR}=.,-ffile-prefix-map=${PROJECT_BINARY_DIR}=.)
 add_custom_command(
   OUTPUT "${R5_DEVICE_PTX}"
@@ -67,8 +67,8 @@ add_custom_target(r5_device_artifacts ALL DEPENDS ${R5_DEVICE_PTX} ${R5_DEVICE_C
 
 string(JOIN " " R5_DEVICE_FLAGS_RECEIPT ${R5_DEVICE_COMMON_FLAGS})
 set(R5_DECLARED_COMMANDS
-    "device_ptx=<CUDA_COMPILER> ${R5_DEVICE_FLAGS_RECEIPT} --ptx <SOURCE>/cuda/executor/r5_current_kernels.cu -o <BUILD>/generated/r5_current_kernels.ptx\n"
-    "device_cubin=<CUDA_COMPILER> ${R5_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/cuda/executor/r5_current_kernels.cu -o <BUILD>/generated/r5_current_kernels.cubin\n")
+    "device_ptx=<CUDA_COMPILER> ${R5_DEVICE_FLAGS_RECEIPT} --ptx <SOURCE>/src/cuda/executor/r5_current_kernels.cu -o <BUILD>/generated/r5_current_kernels.ptx\n"
+    "device_cubin=<CUDA_COMPILER> ${R5_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/src/cuda/executor/r5_current_kernels.cu -o <BUILD>/generated/r5_current_kernels.cubin\n")
 
 set(R5_DEED_ARTIFACT "${PROJECT_BINARY_DIR}/receipts/R5_CAUSAL_CURRENT_DEED.txt")
 holonic_found(NAME r5.causal_current_device_deed
@@ -83,7 +83,7 @@ add_test(NAME r5.forbidden_causal_current_copy
   COMMAND "${CMAKE_COMMAND}"
     -DCOMPILER=${CMAKE_CXX_COMPILER}
     -DSOURCE=${PROJECT_SOURCE_DIR}/tests/compile_contracts/forbidden_causal_current_copy.cpp
-    -DINCLUDE_DIRECTORY=${PROJECT_SOURCE_DIR}/include
+    -DINCLUDE_DIRECTORY=${PROJECT_SOURCE_DIR}/src/include
     "-DEXPECTED_TEXT=use of deleted function"
     -P "${PROJECT_SOURCE_DIR}/cmake/ExpectCompileFailure.cmake")
 

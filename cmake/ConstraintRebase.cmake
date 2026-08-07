@@ -1,4 +1,4 @@
-add_executable(constraint_rebase_deed apparatus/host/constraint_rebase_deed.cpp)
+add_executable(constraint_rebase_deed src/apparatus/host/constraint_rebase_deed.cpp)
 target_link_libraries(
   constraint_rebase_deed PRIVATE holonics::apparatus holonics_contract_options)
 

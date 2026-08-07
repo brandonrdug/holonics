@@ -1,19 +1,19 @@
 find_package(CUDAToolkit 13.2.78 EXACT REQUIRED)
 
 add_library(r18_phase_crystal_store STATIC
-  apparatus/host/phase_crystal_store_adapter.cpp)
+  src/apparatus/host/phase_crystal_store_adapter.cpp)
 target_link_libraries(r18_phase_crystal_store
   PRIVATE holonics::apparatus holonics_contract_options)
 
 add_library(r18_phase_crystal_executor STATIC
-  apparatus/host/lean_checker_process.cpp
-  cuda/executor/r18_phase_crystal_executor.cu
-  cuda/executor/r18_phase_crystal_kernels.cu)
+  src/apparatus/host/lean_checker_process.cpp
+  src/cuda/executor/r18_phase_crystal_executor.cu
+  src/cuda/executor/r18_phase_crystal_kernels.cu)
 target_link_libraries(r18_phase_crystal_executor
   PRIVATE holonics::apparatus holonics_contract_options CUDA::cudart)
 
 add_executable(r18_phase_crystal_device_deed
-  apparatus/host/r18_phase_crystal_deed.cpp
+  src/apparatus/host/r18_phase_crystal_deed.cpp
   tests/model/r18_artifact.cpp
   tests/model/r18_cases.cpp
   tests/model/r18_verify.cpp)
@@ -36,13 +36,13 @@ add_custom_target(r18_normalize_executable
   DEPENDS r18_phase_crystal_device_deed VERBATIM)
 
 file(GLOB_RECURSE R18_DEVICE_HEADERS CONFIGURE_DEPENDS
-  "${PROJECT_SOURCE_DIR}/include/holonics/*.hpp")
-set(R18_DEVICE_SOURCE "${PROJECT_SOURCE_DIR}/cuda/executor/r18_phase_crystal_kernels.cu")
+  "${PROJECT_SOURCE_DIR}/src/include/holonics/*.hpp")
+set(R18_DEVICE_SOURCE "${PROJECT_SOURCE_DIR}/src/cuda/executor/r18_phase_crystal_kernels.cu")
 set(R18_DEVICE_PTX "${R0_GENERATED_DIRECTORY}/r18_phase_crystal_kernels.ptx")
 set(R18_DEVICE_CUBIN "${R0_GENERATED_DIRECTORY}/r18_phase_crystal_kernels.cubin")
 set(R18_DEVICE_COMMON_FLAGS
   --std=c++20 -O3 --gpu-architecture=sm_89 --fmad=false --Werror=all-warnings
-  -I${PROJECT_SOURCE_DIR}/include
+  -I${PROJECT_SOURCE_DIR}/src/include
   -Xcompiler=-Wall,-Wextra,-Werror,-Wconversion,-Wsign-conversion,-Wshadow,-fno-exceptions,-fno-rtti,-fno-fast-math,-ffp-contract=off,-ffile-prefix-map=${PROJECT_SOURCE_DIR}=.,-ffile-prefix-map=${PROJECT_BINARY_DIR}=.)
 add_custom_command(OUTPUT "${R18_DEVICE_PTX}"
   COMMAND "${CMAKE_CUDA_COMPILER}" ${R18_DEVICE_COMMON_FLAGS} --ptx
@@ -56,17 +56,17 @@ add_custom_target(r18_device_artifacts ALL DEPENDS ${R18_DEVICE_PTX} ${R18_DEVIC
 
 string(JOIN " " R18_DEVICE_FLAGS_RECEIPT ${R18_DEVICE_COMMON_FLAGS})
 set(R18_DECLARED_COMMANDS
-  "device_ptx=<CUDA_COMPILER> ${R18_DEVICE_FLAGS_RECEIPT} --ptx <SOURCE>/cuda/executor/r18_phase_crystal_kernels.cu -o <BUILD>/generated/r18_phase_crystal_kernels.ptx\n"
-  "device_cubin=<CUDA_COMPILER> ${R18_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/cuda/executor/r18_phase_crystal_kernels.cu -o <BUILD>/generated/r18_phase_crystal_kernels.cubin\n"
+  "device_ptx=<CUDA_COMPILER> ${R18_DEVICE_FLAGS_RECEIPT} --ptx <SOURCE>/src/cuda/executor/r18_phase_crystal_kernels.cu -o <BUILD>/generated/r18_phase_crystal_kernels.ptx\n"
+  "device_cubin=<CUDA_COMPILER> ${R18_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/src/cuda/executor/r18_phase_crystal_kernels.cu -o <BUILD>/generated/r18_phase_crystal_kernels.cubin\n"
   "exterior_checker=/usr/bin/lake env lean -R <BUILD>/artifacts -o <BUILD>/artifacts/R18_GENERATED_PHASE_CRYSTAL.olean <BUILD>/artifacts/R18_GENERATED_PHASE_CRYSTAL.lean\n")
 
 file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/artifacts")
 
 # The inherited predecessor is founded, not committed. See
-# apparatus/host/inherited_predecessor_deed.cpp for why the 320-octet blob it
+# src/apparatus/host/inherited_predecessor_deed.cpp for why the 320-octet blob it
 # replaces could not survive a layout change.
 add_executable(inherited_predecessor_deed
-  apparatus/host/inherited_predecessor_deed.cpp tests/model/r18_cases.cpp)
+  src/apparatus/host/inherited_predecessor_deed.cpp tests/model/r18_cases.cpp)
 target_include_directories(inherited_predecessor_deed
   PRIVATE "${PROJECT_SOURCE_DIR}/tests/model")
 target_link_libraries(inherited_predecessor_deed
@@ -100,7 +100,7 @@ holonic_found(NAME r18.phase_crystal_host_conformance
 add_test(NAME r18.forbidden_phase_crystal_copy
   COMMAND "${CMAKE_COMMAND}" -DCOMPILER=${CMAKE_CXX_COMPILER}
     -DSOURCE=${PROJECT_SOURCE_DIR}/tests/compile_contracts/forbidden_phase_crystal_copy.cpp
-    -DINCLUDE_DIRECTORY=${PROJECT_SOURCE_DIR}/include
+    -DINCLUDE_DIRECTORY=${PROJECT_SOURCE_DIR}/src/include
     "-DEXPECTED_TEXT=use of deleted function"
     -P "${PROJECT_SOURCE_DIR}/cmake/ExpectCompileFailure.cmake")
 

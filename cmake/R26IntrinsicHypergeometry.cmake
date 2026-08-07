@@ -1,20 +1,20 @@
 find_package(CUDAToolkit 13.2.78 EXACT REQUIRED)
 
 add_library(r26_intrinsic_hypergeometry_store STATIC
-  apparatus/host/intrinsic_hypergeometry_card_adapter.cpp
-  apparatus/host/intrinsic_hypergeometry_store_adapter.cpp)
+  src/apparatus/host/intrinsic_hypergeometry_card_adapter.cpp
+  src/apparatus/host/intrinsic_hypergeometry_store_adapter.cpp)
 target_link_libraries(r26_intrinsic_hypergeometry_store
   PRIVATE holonics::apparatus holonics_contract_options)
 
 add_library(r26_intrinsic_hypergeometry_executor STATIC
-  apparatus/host/lean_checker_process.cpp
-  cuda/executor/r26_intrinsic_hypergeometry_executor.cu
-  cuda/executor/r26_intrinsic_hypergeometry_kernels.cu)
+  src/apparatus/host/lean_checker_process.cpp
+  src/cuda/executor/r26_intrinsic_hypergeometry_executor.cu
+  src/cuda/executor/r26_intrinsic_hypergeometry_kernels.cu)
 target_link_libraries(r26_intrinsic_hypergeometry_executor
   PRIVATE holonics::apparatus holonics_contract_options CUDA::cudart)
 
 add_executable(r26_intrinsic_hypergeometry_device_deed
-  apparatus/host/r26_intrinsic_hypergeometry_deed.cpp
+  src/apparatus/host/r26_intrinsic_hypergeometry_deed.cpp
   tests/model/r26_artifact.cpp
   tests/model/r26_atlas.cpp
   tests/model/r26_cases.cpp
@@ -42,13 +42,13 @@ add_custom_target(r26_normalize_executable
   DEPENDS r26_intrinsic_hypergeometry_device_deed VERBATIM)
 
 file(GLOB_RECURSE R26_DEVICE_HEADERS CONFIGURE_DEPENDS
-  "${PROJECT_SOURCE_DIR}/include/holonics/*.hpp")
-set(R26_DEVICE_SOURCE "${PROJECT_SOURCE_DIR}/cuda/executor/r26_intrinsic_hypergeometry_kernels.cu")
+  "${PROJECT_SOURCE_DIR}/src/include/holonics/*.hpp")
+set(R26_DEVICE_SOURCE "${PROJECT_SOURCE_DIR}/src/cuda/executor/r26_intrinsic_hypergeometry_kernels.cu")
 set(R26_DEVICE_PTX "${R0_GENERATED_DIRECTORY}/r26_intrinsic_hypergeometry_kernels.ptx")
 set(R26_DEVICE_CUBIN "${R0_GENERATED_DIRECTORY}/r26_intrinsic_hypergeometry_kernels.cubin")
 set(R26_DEVICE_COMMON_FLAGS
   --std=c++20 -O3 --gpu-architecture=sm_89 --fmad=false --Werror=all-warnings
-  -I${PROJECT_SOURCE_DIR}/include
+  -I${PROJECT_SOURCE_DIR}/src/include
   -Xcompiler=-Wall,-Wextra,-Werror,-Wconversion,-Wsign-conversion,-Wshadow,-fno-exceptions,-fno-rtti,-fno-fast-math,-ffp-contract=off,-ffile-prefix-map=${PROJECT_SOURCE_DIR}=.,-ffile-prefix-map=${PROJECT_BINARY_DIR}=.)
 add_custom_command(OUTPUT "${R26_DEVICE_PTX}"
   COMMAND "${CMAKE_CUDA_COMPILER}" ${R26_DEVICE_COMMON_FLAGS} --ptx
@@ -62,8 +62,8 @@ add_custom_target(r26_device_artifacts ALL DEPENDS ${R26_DEVICE_PTX} ${R26_DEVIC
 
 string(JOIN " " R26_DEVICE_FLAGS_RECEIPT ${R26_DEVICE_COMMON_FLAGS})
 set(R26_DECLARED_COMMANDS
-  "device_ptx=<CUDA_COMPILER> ${R26_DEVICE_FLAGS_RECEIPT} --ptx <SOURCE>/cuda/executor/r26_intrinsic_hypergeometry_kernels.cu -o <BUILD>/generated/r26_intrinsic_hypergeometry_kernels.ptx\n"
-  "device_cubin=<CUDA_COMPILER> ${R26_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/cuda/executor/r26_intrinsic_hypergeometry_kernels.cu -o <BUILD>/generated/r26_intrinsic_hypergeometry_kernels.cubin\n"
+  "device_ptx=<CUDA_COMPILER> ${R26_DEVICE_FLAGS_RECEIPT} --ptx <SOURCE>/src/cuda/executor/r26_intrinsic_hypergeometry_kernels.cu -o <BUILD>/generated/r26_intrinsic_hypergeometry_kernels.ptx\n"
+  "device_cubin=<CUDA_COMPILER> ${R26_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/src/cuda/executor/r26_intrinsic_hypergeometry_kernels.cu -o <BUILD>/generated/r26_intrinsic_hypergeometry_kernels.cubin\n"
   "checker=/usr/bin/lake env lean -R <BUILD>/artifacts -o <BUILD>/artifacts/R26_GENERATED_INTRINSIC_HYPERGEOMETRY.olean <BUILD>/artifacts/R26_GENERATED_INTRINSIC_HYPERGEOMETRY.lean\n")
 
 file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/artifacts" "${PROJECT_BINARY_DIR}/receipts")
@@ -78,9 +78,9 @@ holonic_found(NAME r26.intrinsic_hypergeometry_device_deed
   EXECUTABLE r26_intrinsic_hypergeometry_device_deed
   COMMAND
     "${R26_DEED_ARTIFACT}" "${R25_FINAL_REST}" "${R26_FINAL_REST}"
-    "${PROJECT_SOURCE_DIR}/apparatus/cards/R26_INTRINSIC_HYPERGEOMETRY.card"
-    "${PROJECT_SOURCE_DIR}/apparatus/cards/R22_CM_INCIDENCE.card"
-    "${PROJECT_SOURCE_DIR}/apparatus/cards/R24_ALGEBRAIC_VARIATION.card" "${R26_SOURCE}"
+    "${PROJECT_SOURCE_DIR}/src/apparatus/cards/R26_INTRINSIC_HYPERGEOMETRY.card"
+    "${PROJECT_SOURCE_DIR}/src/apparatus/cards/R22_CM_INCIDENCE.card"
+    "${PROJECT_SOURCE_DIR}/src/apparatus/cards/R24_ALGEBRAIC_VARIATION.card" "${R26_SOURCE}"
     "${R26_OLEAN}" "${R26_STDOUT}" "${R26_STDERR}"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lean-toolchain"
@@ -93,7 +93,7 @@ holonic_found(NAME r26.intrinsic_hypergeometry_host_conformance
 add_test(NAME r26.forbidden_intrinsic_hypergeometry_copy
   COMMAND "${CMAKE_COMMAND}" -DCOMPILER=${CMAKE_CXX_COMPILER}
     -DSOURCE=${PROJECT_SOURCE_DIR}/tests/compile_contracts/forbidden_intrinsic_hypergeometry_copy.cpp
-    -DINCLUDE_DIRECTORY=${PROJECT_SOURCE_DIR}/include
+    -DINCLUDE_DIRECTORY=${PROJECT_SOURCE_DIR}/src/include
     "-DEXPECTED_TEXT=use of deleted function"
     -P "${PROJECT_SOURCE_DIR}/cmake/ExpectCompileFailure.cmake")
 

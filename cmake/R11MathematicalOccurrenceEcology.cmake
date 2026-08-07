@@ -1,14 +1,14 @@
 find_package(CUDAToolkit 13.2.78 EXACT REQUIRED)
 
 add_library(r11_mathematical_ecology_executor STATIC
-  cuda/executor/r11_mathematical_ecology_executor.cu
-  cuda/executor/r11_mathematical_ecology_kernels.cu)
+  src/cuda/executor/r11_mathematical_ecology_executor.cu
+  src/cuda/executor/r11_mathematical_ecology_kernels.cu)
 target_link_libraries(r11_mathematical_ecology_executor
   PRIVATE holonics::apparatus holonics_contract_options CUDA::cudart)
 
 add_executable(r11_mathematical_ecology_device_deed
-  apparatus/host/r11_mathematical_occurrence_ecology_deed.cpp
-  apparatus/host/mathematical_source_adapter.cpp
+  src/apparatus/host/r11_mathematical_occurrence_ecology_deed.cpp
+  src/apparatus/host/mathematical_source_adapter.cpp
   tests/model/r11_artifact.cpp
   tests/model/r11_cases.cpp
   tests/model/r11_oracle.cpp
@@ -33,13 +33,13 @@ add_custom_target(r11_normalize_executable
   DEPENDS r11_mathematical_ecology_device_deed VERBATIM)
 
 file(GLOB_RECURSE R11_DEVICE_HEADERS CONFIGURE_DEPENDS
-  "${PROJECT_SOURCE_DIR}/include/holonics/*.hpp")
-set(R11_DEVICE_SOURCE "${PROJECT_SOURCE_DIR}/cuda/executor/r11_mathematical_ecology_kernels.cu")
+  "${PROJECT_SOURCE_DIR}/src/include/holonics/*.hpp")
+set(R11_DEVICE_SOURCE "${PROJECT_SOURCE_DIR}/src/cuda/executor/r11_mathematical_ecology_kernels.cu")
 set(R11_DEVICE_PTX "${R0_GENERATED_DIRECTORY}/r11_mathematical_ecology_kernels.ptx")
 set(R11_DEVICE_CUBIN "${R0_GENERATED_DIRECTORY}/r11_mathematical_ecology_kernels.cubin")
 set(R11_DEVICE_COMMON_FLAGS
   --std=c++20 -O3 --gpu-architecture=sm_89 --fmad=false --Werror=all-warnings
-  -I${PROJECT_SOURCE_DIR}/include
+  -I${PROJECT_SOURCE_DIR}/src/include
   -Xcompiler=-Wall,-Wextra,-Werror,-Wconversion,-Wsign-conversion,-Wshadow,-fno-exceptions,-fno-rtti,-fno-fast-math,-ffp-contract=off,-ffile-prefix-map=${PROJECT_SOURCE_DIR}=.,-ffile-prefix-map=${PROJECT_BINARY_DIR}=.)
 add_custom_command(OUTPUT "${R11_DEVICE_PTX}"
   COMMAND "${CMAKE_CUDA_COMPILER}" ${R11_DEVICE_COMMON_FLAGS} --ptx
@@ -53,8 +53,8 @@ add_custom_target(r11_device_artifacts ALL DEPENDS ${R11_DEVICE_PTX} ${R11_DEVIC
 
 string(JOIN " " R11_DEVICE_FLAGS_RECEIPT ${R11_DEVICE_COMMON_FLAGS})
 set(R11_DECLARED_COMMANDS
-  "device_ptx=<CUDA_COMPILER> ${R11_DEVICE_FLAGS_RECEIPT} --ptx <SOURCE>/cuda/executor/r11_mathematical_ecology_kernels.cu -o <BUILD>/generated/r11_mathematical_ecology_kernels.ptx\n"
-  "device_cubin=<CUDA_COMPILER> ${R11_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/cuda/executor/r11_mathematical_ecology_kernels.cu -o <BUILD>/generated/r11_mathematical_ecology_kernels.cubin\n")
+  "device_ptx=<CUDA_COMPILER> ${R11_DEVICE_FLAGS_RECEIPT} --ptx <SOURCE>/src/cuda/executor/r11_mathematical_ecology_kernels.cu -o <BUILD>/generated/r11_mathematical_ecology_kernels.ptx\n"
+  "device_cubin=<CUDA_COMPILER> ${R11_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/src/cuda/executor/r11_mathematical_ecology_kernels.cu -o <BUILD>/generated/r11_mathematical_ecology_kernels.cubin\n")
 
 set(R11_DEED_ARTIFACT
   "${PROJECT_BINARY_DIR}/receipts/R11_MATHEMATICAL_OCCURRENCE_ECOLOGY_DEED.txt")
@@ -73,7 +73,7 @@ add_test(NAME r11.forbidden_mathematical_ecology_copy
   COMMAND "${CMAKE_COMMAND}"
     -DCOMPILER=${CMAKE_CXX_COMPILER}
     -DSOURCE=${PROJECT_SOURCE_DIR}/tests/compile_contracts/forbidden_mathematical_ecology_copy.cpp
-    -DINCLUDE_DIRECTORY=${PROJECT_SOURCE_DIR}/include
+    -DINCLUDE_DIRECTORY=${PROJECT_SOURCE_DIR}/src/include
     "-DEXPECTED_TEXT=use of deleted function"
     -P "${PROJECT_SOURCE_DIR}/cmake/ExpectCompileFailure.cmake")
 

@@ -1,13 +1,13 @@
 find_package(CUDAToolkit 13.2.78 EXACT REQUIRED)
 
-add_library(resident_ecology_executor STATIC cuda/executor/resident_ecology_executor.cu)
+add_library(resident_ecology_executor STATIC src/cuda/executor/resident_ecology_executor.cu)
 target_link_libraries(
   resident_ecology_executor
   PRIVATE holonics::apparatus holonics_contract_options CUDA::cudart)
 
 add_executable(
   resident_mount_deed
-  apparatus/host/resident_mount_deed.cpp
+  src/apparatus/host/resident_mount_deed.cpp
   tests/model/cost_cases.cpp)
 target_include_directories(resident_mount_deed PRIVATE "${PROJECT_SOURCE_DIR}/tests/model")
 target_link_libraries(
@@ -15,12 +15,12 @@ target_link_libraries(
   PRIVATE holonics::apparatus holonics_contract_options resident_ecology_executor
           CUDA::cudart)
 
-set(RESIDENT_DEVICE_SOURCE "${PROJECT_SOURCE_DIR}/cuda/executor/resident_ecology_executor.cu")
+set(RESIDENT_DEVICE_SOURCE "${PROJECT_SOURCE_DIR}/src/cuda/executor/resident_ecology_executor.cu")
 file(
   GLOB RESIDENT_DEVICE_HEADERS CONFIGURE_DEPENDS
-  "${PROJECT_SOURCE_DIR}/include/holonics/apparatus/*.hpp"
-  "${PROJECT_SOURCE_DIR}/include/holonics/organ/*.hpp"
-  "${PROJECT_SOURCE_DIR}/include/holonics/structure/*.hpp")
+  "${PROJECT_SOURCE_DIR}/src/include/holonics/apparatus/*.hpp"
+  "${PROJECT_SOURCE_DIR}/src/include/holonics/organ/*.hpp"
+  "${PROJECT_SOURCE_DIR}/src/include/holonics/structure/*.hpp")
 set(RESIDENT_DEVICE_PTX "${R0_GENERATED_DIRECTORY}/resident_ecology_executor.ptx")
 set(RESIDENT_DEVICE_CUBIN "${R0_GENERATED_DIRECTORY}/resident_ecology_executor.cubin")
 set(RESIDENT_DEVICE_COMMON_FLAGS
@@ -29,7 +29,7 @@ set(RESIDENT_DEVICE_COMMON_FLAGS
     --gpu-architecture=sm_89
     --fmad=false
     --Werror=all-warnings
-    -I${PROJECT_SOURCE_DIR}/include
+    -I${PROJECT_SOURCE_DIR}/src/include
     -Xcompiler=-Wall,-Wextra,-Werror,-Wconversion,-Wsign-conversion,-Wshadow,-fno-exceptions,-fno-rtti,-fno-fast-math,-ffp-contract=off,-ffile-prefix-map=${PROJECT_SOURCE_DIR}=.,-ffile-prefix-map=${PROJECT_BINARY_DIR}=.)
 
 add_custom_command(
@@ -52,8 +52,8 @@ add_custom_target(
 
 string(JOIN " " RESIDENT_DEVICE_FLAGS_RECEIPT ${RESIDENT_DEVICE_COMMON_FLAGS})
 set(RESIDENT_DECLARED_COMMANDS
-    "device_ptx=<CUDA_COMPILER> ${RESIDENT_DEVICE_FLAGS_RECEIPT} --ptx <SOURCE>/cuda/executor/resident_ecology_executor.cu -o <BUILD>/generated/resident_ecology_executor.ptx\n"
-    "device_cubin=<CUDA_COMPILER> ${RESIDENT_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/cuda/executor/resident_ecology_executor.cu -o <BUILD>/generated/resident_ecology_executor.cubin\n")
+    "device_ptx=<CUDA_COMPILER> ${RESIDENT_DEVICE_FLAGS_RECEIPT} --ptx <SOURCE>/src/cuda/executor/resident_ecology_executor.cu -o <BUILD>/generated/resident_ecology_executor.ptx\n"
+    "device_cubin=<CUDA_COMPILER> ${RESIDENT_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/src/cuda/executor/resident_ecology_executor.cu -o <BUILD>/generated/resident_ecology_executor.cubin\n")
 
 set(RESIDENT_EXTRA_ARTIFACTS
     "$<TARGET_FILE:resident_mount_deed>|${RESIDENT_DEVICE_PTX}|${RESIDENT_DEVICE_CUBIN}")

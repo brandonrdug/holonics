@@ -1,21 +1,21 @@
 find_package(CUDAToolkit 13.2.78 EXACT REQUIRED)
 
 add_library(r25_causal_linear_store STATIC
-  apparatus/host/causal_linear_card_adapter.cpp
-  apparatus/host/causal_linear_store_adapter.cpp)
+  src/apparatus/host/causal_linear_card_adapter.cpp
+  src/apparatus/host/causal_linear_store_adapter.cpp)
 target_link_libraries(r25_causal_linear_store
   PRIVATE holonics::apparatus holonics_contract_options)
 
 add_library(r25_causal_linear_executor STATIC
-  apparatus/host/lean_checker_process.cpp
-  cuda/executor/r25_causal_linear_executor.cu
-  cuda/executor/r25_causal_linear_kernels.cu
-  cuda/executor/r25_causal_linear_probe.cu)
+  src/apparatus/host/lean_checker_process.cpp
+  src/cuda/executor/r25_causal_linear_executor.cu
+  src/cuda/executor/r25_causal_linear_kernels.cu
+  src/cuda/executor/r25_causal_linear_probe.cu)
 target_link_libraries(r25_causal_linear_executor
   PRIVATE holonics::apparatus holonics_contract_options CUDA::cudart)
 
 add_executable(r25_causal_linear_device_deed
-  apparatus/host/r25_causal_linear_deed.cpp
+  src/apparatus/host/r25_causal_linear_deed.cpp
   tests/model/r25_artifact.cpp
   tests/model/r25_cases.cpp
   tests/model/r25_verify.cpp)
@@ -42,13 +42,13 @@ add_custom_target(r25_normalize_executable
   DEPENDS r25_causal_linear_device_deed VERBATIM)
 
 file(GLOB_RECURSE R25_DEVICE_HEADERS CONFIGURE_DEPENDS
-  "${PROJECT_SOURCE_DIR}/include/holonics/*.hpp")
-set(R25_DEVICE_SOURCE "${PROJECT_SOURCE_DIR}/cuda/executor/r25_causal_linear_kernels.cu")
+  "${PROJECT_SOURCE_DIR}/src/include/holonics/*.hpp")
+set(R25_DEVICE_SOURCE "${PROJECT_SOURCE_DIR}/src/cuda/executor/r25_causal_linear_kernels.cu")
 set(R25_DEVICE_PTX "${R0_GENERATED_DIRECTORY}/r25_causal_linear_kernels.ptx")
 set(R25_DEVICE_CUBIN "${R0_GENERATED_DIRECTORY}/r25_causal_linear_kernels.cubin")
 set(R25_DEVICE_COMMON_FLAGS
   --std=c++20 -O3 --gpu-architecture=sm_89 --fmad=false --Werror=all-warnings
-  -I${PROJECT_SOURCE_DIR}/include
+  -I${PROJECT_SOURCE_DIR}/src/include
   -Xcompiler=-Wall,-Wextra,-Werror,-Wconversion,-Wsign-conversion,-Wshadow,-fno-exceptions,-fno-rtti,-fno-fast-math,-ffp-contract=off,-ffile-prefix-map=${PROJECT_SOURCE_DIR}=.,-ffile-prefix-map=${PROJECT_BINARY_DIR}=.)
 add_custom_command(OUTPUT "${R25_DEVICE_PTX}"
   COMMAND "${CMAKE_CUDA_COMPILER}" ${R25_DEVICE_COMMON_FLAGS} --ptx
@@ -62,8 +62,8 @@ add_custom_target(r25_device_artifacts ALL DEPENDS ${R25_DEVICE_PTX} ${R25_DEVIC
 
 string(JOIN " " R25_DEVICE_FLAGS_RECEIPT ${R25_DEVICE_COMMON_FLAGS})
 set(R25_DECLARED_COMMANDS
-  "device_ptx=<CUDA_COMPILER> ${R25_DEVICE_FLAGS_RECEIPT} --ptx <SOURCE>/cuda/executor/r25_causal_linear_kernels.cu -o <BUILD>/generated/r25_causal_linear_kernels.ptx\n"
-  "device_cubin=<CUDA_COMPILER> ${R25_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/cuda/executor/r25_causal_linear_kernels.cu -o <BUILD>/generated/r25_causal_linear_kernels.cubin\n"
+  "device_ptx=<CUDA_COMPILER> ${R25_DEVICE_FLAGS_RECEIPT} --ptx <SOURCE>/src/cuda/executor/r25_causal_linear_kernels.cu -o <BUILD>/generated/r25_causal_linear_kernels.ptx\n"
+  "device_cubin=<CUDA_COMPILER> ${R25_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/src/cuda/executor/r25_causal_linear_kernels.cu -o <BUILD>/generated/r25_causal_linear_kernels.cubin\n"
   "checker=/usr/bin/lake env lean -R <BUILD>/artifacts -o <BUILD>/artifacts/R25_GENERATED_CAUSAL_LINEAR.olean <BUILD>/artifacts/R25_GENERATED_CAUSAL_LINEAR.lean\n")
 
 file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/artifacts" "${PROJECT_BINARY_DIR}/receipts")
@@ -78,10 +78,10 @@ holonic_found(NAME r25.causal_linear_device_deed
   EXECUTABLE r25_causal_linear_device_deed
   COMMAND
     "${R25_DEED_ARTIFACT}" "${R24_FINAL_REST}" "${R25_FINAL_REST}"
-    "${PROJECT_SOURCE_DIR}/apparatus/cards/R25_CAUSAL_LINEAR_CHAIN.card"
-    "${PROJECT_SOURCE_DIR}/apparatus/cards/R22_CM_INCIDENCE.card"
-    "${PROJECT_SOURCE_DIR}/apparatus/cards/R23_TORIC_CYCLE.card"
-    "${PROJECT_SOURCE_DIR}/apparatus/cards/R24_ALGEBRAIC_VARIATION.card" "${R25_SOURCE}"
+    "${PROJECT_SOURCE_DIR}/src/apparatus/cards/R25_CAUSAL_LINEAR_CHAIN.card"
+    "${PROJECT_SOURCE_DIR}/src/apparatus/cards/R22_CM_INCIDENCE.card"
+    "${PROJECT_SOURCE_DIR}/src/apparatus/cards/R23_TORIC_CYCLE.card"
+    "${PROJECT_SOURCE_DIR}/src/apparatus/cards/R24_ALGEBRAIC_VARIATION.card" "${R25_SOURCE}"
     "${R25_OLEAN}" "${R25_STDOUT}" "${R25_STDERR}"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lean-toolchain"
@@ -94,7 +94,7 @@ holonic_found(NAME r25.causal_linear_host_conformance
 add_test(NAME r25.forbidden_causal_linear_copy
   COMMAND "${CMAKE_COMMAND}" -DCOMPILER=${CMAKE_CXX_COMPILER}
     -DSOURCE=${PROJECT_SOURCE_DIR}/tests/compile_contracts/forbidden_causal_linear_copy.cpp
-    -DINCLUDE_DIRECTORY=${PROJECT_SOURCE_DIR}/include
+    -DINCLUDE_DIRECTORY=${PROJECT_SOURCE_DIR}/src/include
     "-DEXPECTED_TEXT=use of deleted function"
     -P "${PROJECT_SOURCE_DIR}/cmake/ExpectCompileFailure.cmake")
 

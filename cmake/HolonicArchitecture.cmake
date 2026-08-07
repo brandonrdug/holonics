@@ -29,7 +29,7 @@ function(holonics_define_owner_targets)
     target_include_directories(
       holonics_${owner}
       INTERFACE
-        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>)
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/include>)
 
     foreach(dependency IN LISTS HOLONICS_OWNER_DEPENDENCIES_${owner})
       target_link_libraries(holonics_${owner} INTERFACE holonics::${dependency})

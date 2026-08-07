@@ -1,21 +1,21 @@
 find_package(CUDAToolkit 13.2.78 EXACT REQUIRED)
 
 add_library(r30_rederivation_store STATIC
-  apparatus/host/rederivation_card_adapter.cpp
-  apparatus/host/rederivation_store_adapter.cpp)
+  src/apparatus/host/rederivation_card_adapter.cpp
+  src/apparatus/host/rederivation_store_adapter.cpp)
 target_link_libraries(r30_rederivation_store
   PRIVATE holonics::apparatus holonics_contract_options)
 
 add_library(r30_rederivation_executor STATIC
-  apparatus/host/lean_checker_process.cpp
-  cuda/executor/r30_rederivation_currents.cu
-  cuda/executor/r30_rederivation_executor.cu
-  cuda/executor/r30_rederivation_kernels.cu)
+  src/apparatus/host/lean_checker_process.cpp
+  src/cuda/executor/r30_rederivation_currents.cu
+  src/cuda/executor/r30_rederivation_executor.cu
+  src/cuda/executor/r30_rederivation_kernels.cu)
 target_link_libraries(r30_rederivation_executor
   PRIVATE holonics::apparatus holonics_contract_options CUDA::cudart)
 
 add_executable(r30_plural_rederivation_device_deed
-  apparatus/host/r30_rederivation_deed.cpp
+  src/apparatus/host/r30_rederivation_deed.cpp
   tests/model/r30_artifact.cpp tests/model/r30_atlas.cpp tests/model/r30_cases.cpp
   tests/model/r30_reference.cpp tests/model/r30_reference_field.cpp
   tests/model/r30_verify.cpp)
@@ -41,13 +41,13 @@ add_custom_target(r30_normalize_executable
   DEPENDS r30_plural_rederivation_device_deed VERBATIM)
 
 file(GLOB_RECURSE R30_DEVICE_HEADERS CONFIGURE_DEPENDS
-  "${PROJECT_SOURCE_DIR}/include/holonics/*.hpp")
-set(R30_DEVICE_SOURCE "${PROJECT_SOURCE_DIR}/cuda/executor/r30_rederivation_kernels.cu")
+  "${PROJECT_SOURCE_DIR}/src/include/holonics/*.hpp")
+set(R30_DEVICE_SOURCE "${PROJECT_SOURCE_DIR}/src/cuda/executor/r30_rederivation_kernels.cu")
 set(R30_DEVICE_PTX "${R0_GENERATED_DIRECTORY}/r30_rederivation_kernels.ptx")
 set(R30_DEVICE_CUBIN "${R0_GENERATED_DIRECTORY}/r30_rederivation_kernels.cubin")
 set(R30_DEVICE_COMMON_FLAGS
   --std=c++20 -O3 --gpu-architecture=sm_89 --fmad=false --Werror=all-warnings
-  -I${PROJECT_SOURCE_DIR}/include
+  -I${PROJECT_SOURCE_DIR}/src/include
   -Xcompiler=-Wall,-Wextra,-Werror,-Wconversion,-Wsign-conversion,-Wshadow,-fno-exceptions,-fno-rtti,-fno-fast-math,-ffp-contract=off,-ffile-prefix-map=${PROJECT_SOURCE_DIR}=.,-ffile-prefix-map=${PROJECT_BINARY_DIR}=.)
 add_custom_command(OUTPUT "${R30_DEVICE_PTX}"
   COMMAND "${CMAKE_CUDA_COMPILER}" ${R30_DEVICE_COMMON_FLAGS} --ptx
@@ -61,8 +61,8 @@ add_custom_target(r30_device_artifacts ALL DEPENDS ${R30_DEVICE_PTX} ${R30_DEVIC
 
 string(JOIN " " R30_DEVICE_FLAGS_RECEIPT ${R30_DEVICE_COMMON_FLAGS})
 set(R30_DECLARED_COMMANDS
-  "device_ptx=<CUDA_COMPILER> ${R30_DEVICE_FLAGS_RECEIPT} --ptx <SOURCE>/cuda/executor/r30_rederivation_kernels.cu -o <BUILD>/generated/r30_rederivation_kernels.ptx\n"
-  "device_cubin=<CUDA_COMPILER> ${R30_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/cuda/executor/r30_rederivation_kernels.cu -o <BUILD>/generated/r30_rederivation_kernels.cubin\n"
+  "device_ptx=<CUDA_COMPILER> ${R30_DEVICE_FLAGS_RECEIPT} --ptx <SOURCE>/src/cuda/executor/r30_rederivation_kernels.cu -o <BUILD>/generated/r30_rederivation_kernels.ptx\n"
+  "device_cubin=<CUDA_COMPILER> ${R30_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/src/cuda/executor/r30_rederivation_kernels.cu -o <BUILD>/generated/r30_rederivation_kernels.cubin\n"
   "checker_foil=/usr/bin/lake env lean -R <BUILD>/artifacts -o <BUILD>/artifacts/R30_REJECTED_FOIL.olean <BUILD>/artifacts/R30_REJECTED_FOIL.lean\n"
   "checker_valid=/usr/bin/lake env lean -R <BUILD>/artifacts -o <BUILD>/artifacts/R30_GENERATED_PLURAL_REDERIVATION.olean <BUILD>/artifacts/R30_GENERATED_PLURAL_REDERIVATION.lean\n"
   "source_access=LD_PRELOAD=<BUILD>/r30_open_probe.so <BUILD>/r30_plural_rederivation_device_deed <R30_ARGUMENTS>\n")
@@ -93,9 +93,9 @@ holonic_found(NAME r30.plural_rederivation_device_deed
   EXECUTABLE r30_plural_rederivation_device_deed
   COMMAND
     "${R30_DEED_ARTIFACT}" "${R29_FINAL_REST}" "${R30_FINAL_REST}"
-    "${PROJECT_SOURCE_DIR}/apparatus/cards/R30_MATCHING_JACOBIAN.card"
-    "${PROJECT_SOURCE_DIR}/apparatus/cards/R30_LATTICE_POTENTIAL.card"
-    "${PROJECT_SOURCE_DIR}/apparatus/cards/R30_COORDINATE_COVER.card" "${R30_SOURCE}"
+    "${PROJECT_SOURCE_DIR}/src/apparatus/cards/R30_MATCHING_JACOBIAN.card"
+    "${PROJECT_SOURCE_DIR}/src/apparatus/cards/R30_LATTICE_POTENTIAL.card"
+    "${PROJECT_SOURCE_DIR}/src/apparatus/cards/R30_COORDINATE_COVER.card" "${R30_SOURCE}"
     "${R30_OLEAN}" "${R30_STDOUT}" "${R30_STDERR}" "${R30_FOIL_SOURCE}" "${R30_FOIL_OLEAN}"
     "${R30_FOIL_STDOUT}" "${R30_FOIL_STDERR}"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics"
@@ -108,9 +108,9 @@ holonic_found(NAME r30.source_access_audit
     -DPROBE=$<TARGET_FILE:r30_open_probe> -DLOG=${R30_OPEN_LOG} -DOUTPUT=${R30_SOURCE_AUDIT}
     -DSOURCE_ROOT=${PROJECT_SOURCE_DIR} -DDEED=${R30_DEED_ARTIFACT}
     -DPREDECESSOR=${R29_FINAL_REST} -DHANDOFF=${R30_FINAL_REST}
-    -DMATCHING=${PROJECT_SOURCE_DIR}/apparatus/cards/R30_MATCHING_JACOBIAN.card
-    -DLATTICE=${PROJECT_SOURCE_DIR}/apparatus/cards/R30_LATTICE_POTENTIAL.card
-    -DCOVER=${PROJECT_SOURCE_DIR}/apparatus/cards/R30_COORDINATE_COVER.card
+    -DMATCHING=${PROJECT_SOURCE_DIR}/src/apparatus/cards/R30_MATCHING_JACOBIAN.card
+    -DLATTICE=${PROJECT_SOURCE_DIR}/src/apparatus/cards/R30_LATTICE_POTENTIAL.card
+    -DCOVER=${PROJECT_SOURCE_DIR}/src/apparatus/cards/R30_COORDINATE_COVER.card
     -DSOURCE=${R30_SOURCE} -DOLEAN=${R30_OLEAN} -DSTDOUT=${R30_STDOUT}
     -DSTDERR=${R30_STDERR} -DFOIL_SOURCE=${R30_FOIL_SOURCE} -DFOIL_OLEAN=${R30_FOIL_OLEAN}
     -DFOIL_STDOUT=${R30_FOIL_STDOUT} -DFOIL_STDERR=${R30_FOIL_STDERR}
@@ -134,7 +134,7 @@ holonic_found(NAME r30.rederivation_host_conformance
 add_test(NAME r30.forbidden_rederivation_copy COMMAND "${CMAKE_COMMAND}"
   -DCOMPILER=${CMAKE_CXX_COMPILER}
   -DSOURCE=${PROJECT_SOURCE_DIR}/tests/compile_contracts/forbidden_rederivation_copy.cpp
-  -DINCLUDE_DIRECTORY=${PROJECT_SOURCE_DIR}/include
+  -DINCLUDE_DIRECTORY=${PROJECT_SOURCE_DIR}/src/include
   "-DEXPECTED_TEXT=use of deleted function"
   -P "${PROJECT_SOURCE_DIR}/cmake/ExpectCompileFailure.cmake")
 

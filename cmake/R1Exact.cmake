@@ -1,13 +1,13 @@
 find_package(CUDAToolkit 13.2.78 EXACT REQUIRED)
 
-add_library(r1_exact_executor STATIC cuda/executor/r1_exact_executor.cu)
+add_library(r1_exact_executor STATIC src/cuda/executor/r1_exact_executor.cu)
 target_link_libraries(
   r1_exact_executor
   PRIVATE holonics::apparatus holonics_contract_options CUDA::cudart)
 
 add_executable(
   r1_exact_device_deed
-  apparatus/host/r1_exact_deed.cpp
+  src/apparatus/host/r1_exact_deed.cpp
   tests/model/r1_artifact.cpp
   tests/model/r1_cases.cpp
   tests/model/r1_oracle.cpp)
@@ -32,12 +32,12 @@ add_custom_target(
   DEPENDS r1_exact_device_deed
   VERBATIM)
 
-set(R1_DEVICE_SOURCE "${PROJECT_SOURCE_DIR}/cuda/executor/r1_exact_executor.cu")
+set(R1_DEVICE_SOURCE "${PROJECT_SOURCE_DIR}/src/cuda/executor/r1_exact_executor.cu")
 file(
   GLOB R1_DEVICE_HEADERS CONFIGURE_DEPENDS
-  "${PROJECT_SOURCE_DIR}/include/holonics/apparatus/*.hpp"
-  "${PROJECT_SOURCE_DIR}/include/holonics/current/*.hpp"
-  "${PROJECT_SOURCE_DIR}/include/holonics/exact/*.hpp")
+  "${PROJECT_SOURCE_DIR}/src/include/holonics/apparatus/*.hpp"
+  "${PROJECT_SOURCE_DIR}/src/include/holonics/current/*.hpp"
+  "${PROJECT_SOURCE_DIR}/src/include/holonics/exact/*.hpp")
 set(R1_DEVICE_PTX "${R0_GENERATED_DIRECTORY}/r1_exact_executor.ptx")
 set(R1_DEVICE_CUBIN "${R0_GENERATED_DIRECTORY}/r1_exact_executor.cubin")
 set(R1_DEVICE_COMMON_FLAGS
@@ -46,7 +46,7 @@ set(R1_DEVICE_COMMON_FLAGS
     --gpu-architecture=sm_89
     --fmad=false
     --Werror=all-warnings
-    -I${PROJECT_SOURCE_DIR}/include
+    -I${PROJECT_SOURCE_DIR}/src/include
     -Xcompiler=-Wall,-Wextra,-Werror,-Wconversion,-Wsign-conversion,-Wshadow,-fno-exceptions,-fno-rtti,-fno-fast-math,-ffp-contract=off,-ffile-prefix-map=${PROJECT_SOURCE_DIR}=.,-ffile-prefix-map=${PROJECT_BINARY_DIR}=.)
 
 add_custom_command(
@@ -67,8 +67,8 @@ add_custom_target(r1_device_artifacts ALL DEPENDS "${R1_DEVICE_PTX}" "${R1_DEVIC
 
 string(JOIN " " R1_DEVICE_FLAGS_RECEIPT ${R1_DEVICE_COMMON_FLAGS})
 set(R1_DECLARED_COMMANDS
-    "device_ptx=<CUDA_COMPILER> ${R1_DEVICE_FLAGS_RECEIPT} --ptx <SOURCE>/cuda/executor/r1_exact_executor.cu -o <BUILD>/generated/r1_exact_executor.ptx\n"
-    "device_cubin=<CUDA_COMPILER> ${R1_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/cuda/executor/r1_exact_executor.cu -o <BUILD>/generated/r1_exact_executor.cubin\n")
+    "device_ptx=<CUDA_COMPILER> ${R1_DEVICE_FLAGS_RECEIPT} --ptx <SOURCE>/src/cuda/executor/r1_exact_executor.cu -o <BUILD>/generated/r1_exact_executor.ptx\n"
+    "device_cubin=<CUDA_COMPILER> ${R1_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/src/cuda/executor/r1_exact_executor.cu -o <BUILD>/generated/r1_exact_executor.cubin\n")
 
 set(R1_DEED_ARTIFACT "${PROJECT_BINARY_DIR}/receipts/R1_EXACT_DEED.txt")
 holonic_found(NAME r1.exact_device_deed

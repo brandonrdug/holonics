@@ -73,16 +73,16 @@ file(MAKE_DIRECTORY "${R0_GENERATED_DIRECTORY}")
 set(R0_DEVICE_SOURCE "${PROJECT_SOURCE_DIR}/tests/compile_contracts/valid_device.cu")
 file(
   GLOB_RECURSE R0_DEVICE_HEADERS CONFIGURE_DEPENDS
-  "${PROJECT_SOURCE_DIR}/include/holonics/*.h"
-  "${PROJECT_SOURCE_DIR}/include/holonics/*.hpp"
-  "${PROJECT_SOURCE_DIR}/include/holonics/*.cuh")
+  "${PROJECT_SOURCE_DIR}/src/include/holonics/*.h"
+  "${PROJECT_SOURCE_DIR}/src/include/holonics/*.hpp"
+  "${PROJECT_SOURCE_DIR}/src/include/holonics/*.cuh")
 set(R0_DEVICE_COMMON_FLAGS
     --std=c++20
     -O3
     --gpu-architecture=sm_89
     --fmad=false
     --Werror=all-warnings
-    -I${PROJECT_SOURCE_DIR}/include
+    -I${PROJECT_SOURCE_DIR}/src/include
     -Xcompiler=-Wall,-Wextra,-Werror,-Wconversion,-Wsign-conversion,-Wshadow,-fno-exceptions,-fno-rtti,-fno-fast-math,-ffp-contract=off,-ffile-prefix-map=${PROJECT_SOURCE_DIR}=.,-ffile-prefix-map=${PROJECT_BINARY_DIR}=.)
 
 add_custom_command(

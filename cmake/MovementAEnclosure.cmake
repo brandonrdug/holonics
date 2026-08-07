@@ -1,13 +1,13 @@
 find_package(CUDAToolkit 13.2.78 EXACT REQUIRED)
 
-add_library(enclosure_executor STATIC cuda/executor/enclosure_executor.cu)
+add_library(enclosure_executor STATIC src/cuda/executor/enclosure_executor.cu)
 target_link_libraries(
   enclosure_executor
   PRIVATE holonics::apparatus holonics_contract_options CUDA::cudart)
 
 add_executable(
   enclosure_device_deed
-  apparatus/host/enclosure_deed.cpp
+  src/apparatus/host/enclosure_deed.cpp
   tests/model/enclosure_cases.cpp)
 target_include_directories(enclosure_device_deed PRIVATE "${PROJECT_SOURCE_DIR}/tests/model")
 target_link_libraries(
@@ -23,12 +23,12 @@ target_link_libraries(
   enclosure_host_conformance
   PRIVATE holonics::exact holonics_contract_options)
 
-set(ENCLOSURE_DEVICE_SOURCE "${PROJECT_SOURCE_DIR}/cuda/executor/enclosure_executor.cu")
+set(ENCLOSURE_DEVICE_SOURCE "${PROJECT_SOURCE_DIR}/src/cuda/executor/enclosure_executor.cu")
 file(
   GLOB ENCLOSURE_DEVICE_HEADERS CONFIGURE_DEPENDS
-  "${PROJECT_SOURCE_DIR}/include/holonics/apparatus/*.hpp"
-  "${PROJECT_SOURCE_DIR}/include/holonics/current/*.hpp"
-  "${PROJECT_SOURCE_DIR}/include/holonics/exact/*.hpp")
+  "${PROJECT_SOURCE_DIR}/src/include/holonics/apparatus/*.hpp"
+  "${PROJECT_SOURCE_DIR}/src/include/holonics/current/*.hpp"
+  "${PROJECT_SOURCE_DIR}/src/include/holonics/exact/*.hpp")
 set(ENCLOSURE_DEVICE_PTX "${R0_GENERATED_DIRECTORY}/enclosure_executor.ptx")
 set(ENCLOSURE_DEVICE_CUBIN "${R0_GENERATED_DIRECTORY}/enclosure_executor.cubin")
 set(ENCLOSURE_DEVICE_COMMON_FLAGS
@@ -37,7 +37,7 @@ set(ENCLOSURE_DEVICE_COMMON_FLAGS
     --gpu-architecture=sm_89
     --fmad=false
     --Werror=all-warnings
-    -I${PROJECT_SOURCE_DIR}/include
+    -I${PROJECT_SOURCE_DIR}/src/include
     -Xcompiler=-Wall,-Wextra,-Werror,-Wconversion,-Wsign-conversion,-Wshadow,-fno-exceptions,-fno-rtti,-fno-fast-math,-ffp-contract=off,-ffile-prefix-map=${PROJECT_SOURCE_DIR}=.,-ffile-prefix-map=${PROJECT_BINARY_DIR}=.)
 
 add_custom_command(
@@ -60,8 +60,8 @@ add_custom_target(
 
 string(JOIN " " ENCLOSURE_DEVICE_FLAGS_RECEIPT ${ENCLOSURE_DEVICE_COMMON_FLAGS})
 set(ENCLOSURE_DECLARED_COMMANDS
-    "device_ptx=<CUDA_COMPILER> ${ENCLOSURE_DEVICE_FLAGS_RECEIPT} --ptx <SOURCE>/cuda/executor/enclosure_executor.cu -o <BUILD>/generated/enclosure_executor.ptx\n"
-    "device_cubin=<CUDA_COMPILER> ${ENCLOSURE_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/cuda/executor/enclosure_executor.cu -o <BUILD>/generated/enclosure_executor.cubin\n")
+    "device_ptx=<CUDA_COMPILER> ${ENCLOSURE_DEVICE_FLAGS_RECEIPT} --ptx <SOURCE>/src/cuda/executor/enclosure_executor.cu -o <BUILD>/generated/enclosure_executor.ptx\n"
+    "device_cubin=<CUDA_COMPILER> ${ENCLOSURE_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/src/cuda/executor/enclosure_executor.cu -o <BUILD>/generated/enclosure_executor.cubin\n")
 
 set(ENCLOSURE_EXTRA_ARTIFACTS
     "$<TARGET_FILE:enclosure_device_deed>|${ENCLOSURE_DEVICE_PTX}|${ENCLOSURE_DEVICE_CUBIN}")

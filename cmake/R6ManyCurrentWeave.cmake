@@ -2,15 +2,15 @@ find_package(CUDAToolkit 13.2.78 EXACT REQUIRED)
 
 add_library(
   r6_many_current_weave_executor STATIC
-  cuda/executor/r6_weave_executor.cu
-  cuda/executor/r6_weave_kernels.cu)
+  src/cuda/executor/r6_weave_executor.cu
+  src/cuda/executor/r6_weave_kernels.cu)
 target_link_libraries(
   r6_many_current_weave_executor
   PRIVATE holonics::apparatus holonics_contract_options CUDA::cudart)
 
 add_executable(
   r6_many_current_weave_device_deed
-  apparatus/host/r6_many_current_weave_deed.cpp
+  src/apparatus/host/r6_many_current_weave_deed.cpp
   tests/model/r6_artifact.cpp
   tests/model/r6_cases.cpp
   tests/model/r6_oracle.cpp
@@ -41,9 +41,9 @@ add_custom_target(
 
 file(
   GLOB_RECURSE R6_DEVICE_HEADERS CONFIGURE_DEPENDS
-  "${PROJECT_SOURCE_DIR}/include/holonics/*.hpp")
-set(R6_DEVICE_SOURCE "${PROJECT_SOURCE_DIR}/cuda/executor/r6_weave_kernels.cu")
-set(R6_DEVICE_LAW "${PROJECT_SOURCE_DIR}/cuda/executor/r6_weave_law.cuh")
+  "${PROJECT_SOURCE_DIR}/src/include/holonics/*.hpp")
+set(R6_DEVICE_SOURCE "${PROJECT_SOURCE_DIR}/src/cuda/executor/r6_weave_kernels.cu")
+set(R6_DEVICE_LAW "${PROJECT_SOURCE_DIR}/src/cuda/executor/r6_weave_law.cuh")
 set(R6_DEVICE_PTX "${R0_GENERATED_DIRECTORY}/r6_weave_kernels.ptx")
 set(R6_DEVICE_CUBIN "${R0_GENERATED_DIRECTORY}/r6_weave_kernels.cubin")
 set(R6_DEVICE_COMMON_FLAGS
@@ -52,7 +52,7 @@ set(R6_DEVICE_COMMON_FLAGS
     --gpu-architecture=sm_89
     --fmad=false
     --Werror=all-warnings
-    -I${PROJECT_SOURCE_DIR}/include
+    -I${PROJECT_SOURCE_DIR}/src/include
     -Xcompiler=-Wall,-Wextra,-Werror,-Wconversion,-Wsign-conversion,-Wshadow,-fno-exceptions,-fno-rtti,-fno-fast-math,-ffp-contract=off,-ffile-prefix-map=${PROJECT_SOURCE_DIR}=.,-ffile-prefix-map=${PROJECT_BINARY_DIR}=.)
 add_custom_command(
   OUTPUT "${R6_DEVICE_PTX}"
@@ -70,8 +70,8 @@ add_custom_target(r6_device_artifacts ALL DEPENDS ${R6_DEVICE_PTX} ${R6_DEVICE_C
 
 string(JOIN " " R6_DEVICE_FLAGS_RECEIPT ${R6_DEVICE_COMMON_FLAGS})
 set(R6_DECLARED_COMMANDS
-    "device_ptx=<CUDA_COMPILER> ${R6_DEVICE_FLAGS_RECEIPT} --ptx <SOURCE>/cuda/executor/r6_weave_kernels.cu -o <BUILD>/generated/r6_weave_kernels.ptx\n"
-    "device_cubin=<CUDA_COMPILER> ${R6_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/cuda/executor/r6_weave_kernels.cu -o <BUILD>/generated/r6_weave_kernels.cubin\n")
+    "device_ptx=<CUDA_COMPILER> ${R6_DEVICE_FLAGS_RECEIPT} --ptx <SOURCE>/src/cuda/executor/r6_weave_kernels.cu -o <BUILD>/generated/r6_weave_kernels.ptx\n"
+    "device_cubin=<CUDA_COMPILER> ${R6_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/src/cuda/executor/r6_weave_kernels.cu -o <BUILD>/generated/r6_weave_kernels.cubin\n")
 
 set(R6_DEED_ARTIFACT "${PROJECT_BINARY_DIR}/receipts/R6_MANY_CURRENT_WEAVE_DEED.txt")
 holonic_found(NAME r6.many_current_weave_device_deed
@@ -86,7 +86,7 @@ add_test(NAME r6.forbidden_weave_copy
   COMMAND "${CMAKE_COMMAND}"
     -DCOMPILER=${CMAKE_CXX_COMPILER}
     -DSOURCE=${PROJECT_SOURCE_DIR}/tests/compile_contracts/forbidden_weave_copy.cpp
-    -DINCLUDE_DIRECTORY=${PROJECT_SOURCE_DIR}/include
+    -DINCLUDE_DIRECTORY=${PROJECT_SOURCE_DIR}/src/include
     "-DEXPECTED_TEXT=use of deleted function"
     -P "${PROJECT_SOURCE_DIR}/cmake/ExpectCompileFailure.cmake")
 

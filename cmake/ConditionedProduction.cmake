@@ -1,9 +1,9 @@
 add_executable(
   conditioned_production_deed
-  apparatus/host/conditioned_production_deed.cpp
-  apparatus/host/lean_checker_process.cpp)
+  src/apparatus/host/conditioned_production_deed.cpp
+  src/apparatus/host/lean_checker_process.cpp)
 target_include_directories(
-  conditioned_production_deed PRIVATE "${PROJECT_SOURCE_DIR}/apparatus/host")
+  conditioned_production_deed PRIVATE "${PROJECT_SOURCE_DIR}/src/apparatus/host")
 target_link_libraries(
   conditioned_production_deed PRIVATE holonics::apparatus holonics_contract_options)
 

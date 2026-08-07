@@ -1,21 +1,21 @@
 find_package(CUDAToolkit 13.2.78 EXACT REQUIRED)
 
 add_library(r24_algebraic_variation_store STATIC
-  apparatus/host/algebraic_variation_card_adapter.cpp
-  apparatus/host/algebraic_variation_store_adapter.cpp)
+  src/apparatus/host/algebraic_variation_card_adapter.cpp
+  src/apparatus/host/algebraic_variation_store_adapter.cpp)
 target_link_libraries(r24_algebraic_variation_store
   PRIVATE holonics::apparatus holonics_contract_options)
 
 add_library(r24_algebraic_variation_executor STATIC
-  apparatus/host/lean_checker_process.cpp
-  cuda/executor/r24_algebraic_variation_executor.cu
-  cuda/executor/r24_algebraic_variation_kernels.cu
-  cuda/executor/r24_algebraic_variation_probe.cu)
+  src/apparatus/host/lean_checker_process.cpp
+  src/cuda/executor/r24_algebraic_variation_executor.cu
+  src/cuda/executor/r24_algebraic_variation_kernels.cu
+  src/cuda/executor/r24_algebraic_variation_probe.cu)
 target_link_libraries(r24_algebraic_variation_executor
   PRIVATE holonics::apparatus holonics_contract_options CUDA::cudart)
 
 add_executable(r24_algebraic_variation_device_deed
-  apparatus/host/r24_algebraic_variation_deed.cpp
+  src/apparatus/host/r24_algebraic_variation_deed.cpp
   tests/model/r22_cases.cpp
   tests/model/r23_cases.cpp
   tests/model/r24_artifact.cpp
@@ -37,13 +37,13 @@ add_custom_target(r24_normalize_executable
   DEPENDS r24_algebraic_variation_device_deed VERBATIM)
 
 file(GLOB_RECURSE R24_DEVICE_HEADERS CONFIGURE_DEPENDS
-  "${PROJECT_SOURCE_DIR}/include/holonics/*.hpp")
-set(R24_DEVICE_SOURCE "${PROJECT_SOURCE_DIR}/cuda/executor/r24_algebraic_variation_kernels.cu")
+  "${PROJECT_SOURCE_DIR}/src/include/holonics/*.hpp")
+set(R24_DEVICE_SOURCE "${PROJECT_SOURCE_DIR}/src/cuda/executor/r24_algebraic_variation_kernels.cu")
 set(R24_DEVICE_PTX "${R0_GENERATED_DIRECTORY}/r24_algebraic_variation_kernels.ptx")
 set(R24_DEVICE_CUBIN "${R0_GENERATED_DIRECTORY}/r24_algebraic_variation_kernels.cubin")
 set(R24_DEVICE_COMMON_FLAGS
   --std=c++20 -O3 --gpu-architecture=sm_89 --fmad=false --Werror=all-warnings
-  -I${PROJECT_SOURCE_DIR}/include
+  -I${PROJECT_SOURCE_DIR}/src/include
   -Xcompiler=-Wall,-Wextra,-Werror,-Wconversion,-Wsign-conversion,-Wshadow,-fno-exceptions,-fno-rtti,-fno-fast-math,-ffp-contract=off,-ffile-prefix-map=${PROJECT_SOURCE_DIR}=.,-ffile-prefix-map=${PROJECT_BINARY_DIR}=.)
 add_custom_command(OUTPUT "${R24_DEVICE_PTX}"
   COMMAND "${CMAKE_CUDA_COMPILER}" ${R24_DEVICE_COMMON_FLAGS} --ptx
@@ -57,8 +57,8 @@ add_custom_target(r24_device_artifacts ALL DEPENDS ${R24_DEVICE_PTX} ${R24_DEVIC
 
 string(JOIN " " R24_DEVICE_FLAGS_RECEIPT ${R24_DEVICE_COMMON_FLAGS})
 set(R24_DECLARED_COMMANDS
-  "device_ptx=<CUDA_COMPILER> ${R24_DEVICE_FLAGS_RECEIPT} --ptx <SOURCE>/cuda/executor/r24_algebraic_variation_kernels.cu -o <BUILD>/generated/r24_algebraic_variation_kernels.ptx\n"
-  "device_cubin=<CUDA_COMPILER> ${R24_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/cuda/executor/r24_algebraic_variation_kernels.cu -o <BUILD>/generated/r24_algebraic_variation_kernels.cubin\n"
+  "device_ptx=<CUDA_COMPILER> ${R24_DEVICE_FLAGS_RECEIPT} --ptx <SOURCE>/src/cuda/executor/r24_algebraic_variation_kernels.cu -o <BUILD>/generated/r24_algebraic_variation_kernels.ptx\n"
+  "device_cubin=<CUDA_COMPILER> ${R24_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/src/cuda/executor/r24_algebraic_variation_kernels.cu -o <BUILD>/generated/r24_algebraic_variation_kernels.cubin\n"
   "checker=/usr/bin/lake env lean -R <BUILD>/artifacts -o <BUILD>/artifacts/R24_GENERATED_ALGEBRAIC_VARIATION.olean <BUILD>/artifacts/R24_GENERATED_ALGEBRAIC_VARIATION.lean\n")
 
 file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/artifacts" "${PROJECT_BINARY_DIR}/receipts")
@@ -73,7 +73,7 @@ holonic_found(NAME r24.algebraic_variation_device_deed
   EXECUTABLE r24_algebraic_variation_device_deed
   COMMAND
     "${R24_DEED_ARTIFACT}" "${R23_FINAL_REST}" "${R24_FINAL_REST}"
-    "${PROJECT_SOURCE_DIR}/apparatus/cards/R24_ALGEBRAIC_VARIATION.card" "${R24_SOURCE}"
+    "${PROJECT_SOURCE_DIR}/src/apparatus/cards/R24_ALGEBRAIC_VARIATION.card" "${R24_SOURCE}"
     "${R24_OLEAN}" "${R24_STDOUT}" "${R24_STDERR}"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lean-toolchain"
@@ -86,7 +86,7 @@ holonic_found(NAME r24.algebraic_variation_host_conformance
 add_test(NAME r24.forbidden_algebraic_variation_copy
   COMMAND "${CMAKE_COMMAND}" -DCOMPILER=${CMAKE_CXX_COMPILER}
     -DSOURCE=${PROJECT_SOURCE_DIR}/tests/compile_contracts/forbidden_algebraic_variation_copy.cpp
-    -DINCLUDE_DIRECTORY=${PROJECT_SOURCE_DIR}/include
+    -DINCLUDE_DIRECTORY=${PROJECT_SOURCE_DIR}/src/include
     "-DEXPECTED_TEXT=use of deleted function"
     -P "${PROJECT_SOURCE_DIR}/cmake/ExpectCompileFailure.cmake")
 

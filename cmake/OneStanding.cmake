@@ -1,6 +1,6 @@
-add_executable(one_standing_deed apparatus/host/one_standing_deed.cpp)
+add_executable(one_standing_deed src/apparatus/host/one_standing_deed.cpp)
 target_include_directories(
-  one_standing_deed PRIVATE "${PROJECT_SOURCE_DIR}/apparatus/host")
+  one_standing_deed PRIVATE "${PROJECT_SOURCE_DIR}/src/apparatus/host")
 target_link_libraries(
   one_standing_deed PRIVATE holonics::apparatus holonics_contract_options)
 

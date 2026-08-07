@@ -2,16 +2,16 @@ find_package(CUDAToolkit 13.2.78 EXACT REQUIRED)
 
 add_library(
   r4_body_lifecycle_executor STATIC
-  cuda/executor/r4_adversarial_kernels.cu
-  cuda/executor/r4_lifecycle_executor.cu
-  cuda/executor/r4_lifecycle_kernels.cu)
+  src/cuda/executor/r4_adversarial_kernels.cu
+  src/cuda/executor/r4_lifecycle_executor.cu
+  src/cuda/executor/r4_lifecycle_kernels.cu)
 target_link_libraries(
   r4_body_lifecycle_executor
   PRIVATE holonics::apparatus holonics_contract_options CUDA::cudart)
 
 add_executable(
   r4_body_lifecycle_device_deed
-  apparatus/host/r4_body_lifecycle_deed.cpp
+  src/apparatus/host/r4_body_lifecycle_deed.cpp
   tests/model/r4_artifact.cpp
   tests/model/r4_verify.cpp)
 target_include_directories(r4_body_lifecycle_device_deed PRIVATE "${PROJECT_SOURCE_DIR}/tests/model")
@@ -34,9 +34,9 @@ add_custom_target(
 
 file(
   GLOB_RECURSE R4_DEVICE_HEADERS CONFIGURE_DEPENDS
-  "${PROJECT_SOURCE_DIR}/include/holonics/*.hpp")
-set(R4_LIFECYCLE_SOURCE "${PROJECT_SOURCE_DIR}/cuda/executor/r4_lifecycle_kernels.cu")
-set(R4_ADVERSARIAL_SOURCE "${PROJECT_SOURCE_DIR}/cuda/executor/r4_adversarial_kernels.cu")
+  "${PROJECT_SOURCE_DIR}/src/include/holonics/*.hpp")
+set(R4_LIFECYCLE_SOURCE "${PROJECT_SOURCE_DIR}/src/cuda/executor/r4_lifecycle_kernels.cu")
+set(R4_ADVERSARIAL_SOURCE "${PROJECT_SOURCE_DIR}/src/cuda/executor/r4_adversarial_kernels.cu")
 set(R4_LIFECYCLE_PTX "${R0_GENERATED_DIRECTORY}/r4_lifecycle_kernels.ptx")
 set(R4_LIFECYCLE_CUBIN "${R0_GENERATED_DIRECTORY}/r4_lifecycle_kernels.cubin")
 set(R4_ADVERSARIAL_PTX "${R0_GENERATED_DIRECTORY}/r4_adversarial_kernels.ptx")
@@ -47,7 +47,7 @@ set(R4_DEVICE_COMMON_FLAGS
     --gpu-architecture=sm_89
     --fmad=false
     --Werror=all-warnings
-    -I${PROJECT_SOURCE_DIR}/include
+    -I${PROJECT_SOURCE_DIR}/src/include
     -Xcompiler=-Wall,-Wextra,-Werror,-Wconversion,-Wsign-conversion,-Wshadow,-fno-exceptions,-fno-rtti,-fno-fast-math,-ffp-contract=off,-ffile-prefix-map=${PROJECT_SOURCE_DIR}=.,-ffile-prefix-map=${PROJECT_BINARY_DIR}=.)
 foreach(kind IN ITEMS LIFECYCLE ADVERSARIAL)
   add_custom_command(
@@ -69,10 +69,10 @@ add_custom_target(r4_device_artifacts ALL DEPENDS
 
 string(JOIN " " R4_DEVICE_FLAGS_RECEIPT ${R4_DEVICE_COMMON_FLAGS})
 set(R4_DECLARED_COMMANDS
-    "device_ptx=<CUDA_COMPILER> ${R4_DEVICE_FLAGS_RECEIPT} --ptx <SOURCE>/cuda/executor/r4_lifecycle_kernels.cu -o <BUILD>/generated/r4_lifecycle_kernels.ptx\n"
-    "device_cubin=<CUDA_COMPILER> ${R4_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/cuda/executor/r4_lifecycle_kernels.cu -o <BUILD>/generated/r4_lifecycle_kernels.cubin\n"
-    "device_ptx=<CUDA_COMPILER> ${R4_DEVICE_FLAGS_RECEIPT} --ptx <SOURCE>/cuda/executor/r4_adversarial_kernels.cu -o <BUILD>/generated/r4_adversarial_kernels.ptx\n"
-    "device_cubin=<CUDA_COMPILER> ${R4_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/cuda/executor/r4_adversarial_kernels.cu -o <BUILD>/generated/r4_adversarial_kernels.cubin\n")
+    "device_ptx=<CUDA_COMPILER> ${R4_DEVICE_FLAGS_RECEIPT} --ptx <SOURCE>/src/cuda/executor/r4_lifecycle_kernels.cu -o <BUILD>/generated/r4_lifecycle_kernels.ptx\n"
+    "device_cubin=<CUDA_COMPILER> ${R4_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/src/cuda/executor/r4_lifecycle_kernels.cu -o <BUILD>/generated/r4_lifecycle_kernels.cubin\n"
+    "device_ptx=<CUDA_COMPILER> ${R4_DEVICE_FLAGS_RECEIPT} --ptx <SOURCE>/src/cuda/executor/r4_adversarial_kernels.cu -o <BUILD>/generated/r4_adversarial_kernels.ptx\n"
+    "device_cubin=<CUDA_COMPILER> ${R4_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/src/cuda/executor/r4_adversarial_kernels.cu -o <BUILD>/generated/r4_adversarial_kernels.cubin\n")
 
 set(R4_DEED_ARTIFACT "${PROJECT_BINARY_DIR}/receipts/R4_BODY_LIFECYCLE_DEED.txt")
 holonic_found(NAME r4.body_lifecycle_device_deed
@@ -87,7 +87,7 @@ add_test(NAME r4.forbidden_body_lifecycle_copy
   COMMAND "${CMAKE_COMMAND}"
     -DCOMPILER=${CMAKE_CXX_COMPILER}
     -DSOURCE=${PROJECT_SOURCE_DIR}/tests/compile_contracts/forbidden_body_lifecycle_copy.cpp
-    -DINCLUDE_DIRECTORY=${PROJECT_SOURCE_DIR}/include
+    -DINCLUDE_DIRECTORY=${PROJECT_SOURCE_DIR}/src/include
     "-DEXPECTED_TEXT=use of deleted function"
     -P "${PROJECT_SOURCE_DIR}/cmake/ExpectCompileFailure.cmake")
 

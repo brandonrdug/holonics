@@ -1,19 +1,19 @@
 find_package(CUDAToolkit 13.2.78 EXACT REQUIRED)
 
 add_library(r28_hodge_store STATIC
-  apparatus/host/hodge_realization_card_adapter.cpp
-  apparatus/host/hodge_realization_store_adapter.cpp)
+  src/apparatus/host/hodge_realization_card_adapter.cpp
+  src/apparatus/host/hodge_realization_store_adapter.cpp)
 target_link_libraries(r28_hodge_store PRIVATE holonics::apparatus holonics_contract_options)
 
 add_library(r28_hodge_executor STATIC
-  apparatus/host/lean_checker_process.cpp
-  cuda/executor/r28_hodge_realization_executor.cu
-  cuda/executor/r28_hodge_realization_kernels.cu)
+  src/apparatus/host/lean_checker_process.cpp
+  src/cuda/executor/r28_hodge_realization_executor.cu
+  src/cuda/executor/r28_hodge_realization_kernels.cu)
 target_link_libraries(r28_hodge_executor
   PRIVATE holonics::apparatus holonics_contract_options CUDA::cudart)
 
 add_executable(r28_hodge_device_deed
-  apparatus/host/r28_hodge_realization_deed.cpp
+  src/apparatus/host/r28_hodge_realization_deed.cpp
   tests/model/r28_artifact.cpp
   tests/model/r28_atlas.cpp
   tests/model/r28_cases.cpp
@@ -33,13 +33,13 @@ add_custom_target(r28_normalize_executable
   DEPENDS r28_hodge_device_deed VERBATIM)
 
 file(GLOB_RECURSE R28_DEVICE_HEADERS CONFIGURE_DEPENDS
-  "${PROJECT_SOURCE_DIR}/include/holonics/*.hpp")
-set(R28_DEVICE_SOURCE "${PROJECT_SOURCE_DIR}/cuda/executor/r28_hodge_realization_kernels.cu")
+  "${PROJECT_SOURCE_DIR}/src/include/holonics/*.hpp")
+set(R28_DEVICE_SOURCE "${PROJECT_SOURCE_DIR}/src/cuda/executor/r28_hodge_realization_kernels.cu")
 set(R28_DEVICE_PTX "${R0_GENERATED_DIRECTORY}/r28_hodge_realization_kernels.ptx")
 set(R28_DEVICE_CUBIN "${R0_GENERATED_DIRECTORY}/r28_hodge_realization_kernels.cubin")
 set(R28_DEVICE_COMMON_FLAGS
   --std=c++20 -O3 --gpu-architecture=sm_89 --fmad=false --Werror=all-warnings
-  -I${PROJECT_SOURCE_DIR}/include
+  -I${PROJECT_SOURCE_DIR}/src/include
   -Xcompiler=-Wall,-Wextra,-Werror,-Wconversion,-Wsign-conversion,-Wshadow,-fno-exceptions,-fno-rtti,-fno-fast-math,-ffp-contract=off,-ffile-prefix-map=${PROJECT_SOURCE_DIR}=.,-ffile-prefix-map=${PROJECT_BINARY_DIR}=.)
 add_custom_command(OUTPUT "${R28_DEVICE_PTX}"
   COMMAND "${CMAKE_CUDA_COMPILER}" ${R28_DEVICE_COMMON_FLAGS} --ptx
@@ -53,8 +53,8 @@ add_custom_target(r28_device_artifacts ALL DEPENDS ${R28_DEVICE_PTX} ${R28_DEVIC
 
 string(JOIN " " R28_DEVICE_FLAGS_RECEIPT ${R28_DEVICE_COMMON_FLAGS})
 set(R28_DECLARED_COMMANDS
-  "device_ptx=<CUDA_COMPILER> ${R28_DEVICE_FLAGS_RECEIPT} --ptx <SOURCE>/cuda/executor/r28_hodge_realization_kernels.cu -o <BUILD>/generated/r28_hodge_realization_kernels.ptx\n"
-  "device_cubin=<CUDA_COMPILER> ${R28_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/cuda/executor/r28_hodge_realization_kernels.cu -o <BUILD>/generated/r28_hodge_realization_kernels.cubin\n"
+  "device_ptx=<CUDA_COMPILER> ${R28_DEVICE_FLAGS_RECEIPT} --ptx <SOURCE>/src/cuda/executor/r28_hodge_realization_kernels.cu -o <BUILD>/generated/r28_hodge_realization_kernels.ptx\n"
+  "device_cubin=<CUDA_COMPILER> ${R28_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/src/cuda/executor/r28_hodge_realization_kernels.cu -o <BUILD>/generated/r28_hodge_realization_kernels.cubin\n"
   "checker=/usr/bin/lake env lean -R <BUILD>/artifacts -o <BUILD>/artifacts/R28_GENERATED_HODGE_REALIZATION.olean <BUILD>/artifacts/R28_GENERATED_HODGE_REALIZATION.lean\n")
 
 file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/artifacts" "${PROJECT_BINARY_DIR}/receipts")
@@ -69,7 +69,7 @@ holonic_found(NAME r28.hodge_device_deed
   EXECUTABLE r28_hodge_device_deed
   COMMAND
     "${R28_DEED_ARTIFACT}" "${R27_FINAL_REST}" "${R28_FINAL_REST}"
-    "${PROJECT_SOURCE_DIR}/apparatus/cards/R28_HODGE_REALIZATION.card" "${R28_SOURCE}"
+    "${PROJECT_SOURCE_DIR}/src/apparatus/cards/R28_HODGE_REALIZATION.card" "${R28_SOURCE}"
     "${R28_OLEAN}" "${R28_STDOUT}" "${R28_STDERR}"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lean-toolchain"
@@ -82,7 +82,7 @@ holonic_found(NAME r28.hodge_host_conformance
 add_test(NAME r28.forbidden_hodge_copy COMMAND "${CMAKE_COMMAND}"
   -DCOMPILER=${CMAKE_CXX_COMPILER}
   -DSOURCE=${PROJECT_SOURCE_DIR}/tests/compile_contracts/forbidden_hodge_realization_copy.cpp
-  -DINCLUDE_DIRECTORY=${PROJECT_SOURCE_DIR}/include "-DEXPECTED_TEXT=use of deleted function"
+  -DINCLUDE_DIRECTORY=${PROJECT_SOURCE_DIR}/src/include "-DEXPECTED_TEXT=use of deleted function"
   -P "${PROJECT_SOURCE_DIR}/cmake/ExpectCompileFailure.cmake")
 
 set(R28_EXTRA_ARTIFACTS

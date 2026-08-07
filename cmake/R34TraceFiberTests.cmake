@@ -1,7 +1,7 @@
-set(R34_POSITIVE "${PROJECT_SOURCE_DIR}/apparatus/cards/R34_POSITIVE_TRIPLES.card")
-set(R34_SIGNED "${PROJECT_SOURCE_DIR}/apparatus/cards/R34_SIGNED_TRIPLES.card")
-set(R34_RECHARTED "${PROJECT_SOURCE_DIR}/apparatus/cards/R34_RECHARTED_TRIPLES.card")
-set(R34_HELDOUT "${PROJECT_SOURCE_DIR}/apparatus/cards/R34_HELDOUT_ORIENTED_SYSTEM.card")
+set(R34_POSITIVE "${PROJECT_SOURCE_DIR}/src/apparatus/cards/R34_POSITIVE_TRIPLES.card")
+set(R34_SIGNED "${PROJECT_SOURCE_DIR}/src/apparatus/cards/R34_SIGNED_TRIPLES.card")
+set(R34_RECHARTED "${PROJECT_SOURCE_DIR}/src/apparatus/cards/R34_RECHARTED_TRIPLES.card")
+set(R34_HELDOUT "${PROJECT_SOURCE_DIR}/src/apparatus/cards/R34_HELDOUT_ORIENTED_SYSTEM.card")
 set(R34_FORMAL_ROOT "${PROJECT_SOURCE_DIR}/formal/elementary-holonics")
 set(R34_TOOLCHAIN "${R34_FORMAL_ROOT}/lean-toolchain")
 set(R34_FORMAL_MANIFEST "${R34_FORMAL_ROOT}/lake-manifest.json")
@@ -96,5 +96,5 @@ holonic_found(NAME r34.post_seal_literature_comparison
 add_test(NAME r34.forbidden_trace_fiber_copy COMMAND "${CMAKE_COMMAND}"
   -DCOMPILER=${CMAKE_CXX_COMPILER}
   -DSOURCE=${PROJECT_SOURCE_DIR}/tests/compile_contracts/forbidden_trace_fiber_copy.cpp
-  -DINCLUDE_DIRECTORY=${PROJECT_SOURCE_DIR}/include "-DEXPECTED_TEXT=use of deleted function"
+  -DINCLUDE_DIRECTORY=${PROJECT_SOURCE_DIR}/src/include "-DEXPECTED_TEXT=use of deleted function"
   -P "${PROJECT_SOURCE_DIR}/cmake/ExpectCompileFailure.cmake")

@@ -1,7 +1,7 @@
-set(R33_POSITIVE "${PROJECT_SOURCE_DIR}/apparatus/cards/R33_POSITIVE_TRANSITIONS.card")
-set(R33_SIGNED "${PROJECT_SOURCE_DIR}/apparatus/cards/R33_SIGNED_TRANSITIONS.card")
-set(R33_RECHARTED "${PROJECT_SOURCE_DIR}/apparatus/cards/R33_RECHARTED_TRANSITIONS.card")
-set(R33_HELDOUT "${PROJECT_SOURCE_DIR}/apparatus/cards/R33_HELDOUT_LOCAL_SYSTEM.card")
+set(R33_POSITIVE "${PROJECT_SOURCE_DIR}/src/apparatus/cards/R33_POSITIVE_TRANSITIONS.card")
+set(R33_SIGNED "${PROJECT_SOURCE_DIR}/src/apparatus/cards/R33_SIGNED_TRANSITIONS.card")
+set(R33_RECHARTED "${PROJECT_SOURCE_DIR}/src/apparatus/cards/R33_RECHARTED_TRANSITIONS.card")
+set(R33_HELDOUT "${PROJECT_SOURCE_DIR}/src/apparatus/cards/R33_HELDOUT_LOCAL_SYSTEM.card")
 set(R33_FORMAL_ROOT "${PROJECT_SOURCE_DIR}/formal/elementary-holonics")
 set(R33_TOOLCHAIN "${R33_FORMAL_ROOT}/lean-toolchain")
 set(R33_FORMAL_MANIFEST "${R33_FORMAL_ROOT}/lake-manifest.json")
@@ -94,5 +94,5 @@ holonic_found(NAME r33.post_seal_literature_comparison
 add_test(NAME r33.forbidden_characteristic_hypergeometry_copy COMMAND "${CMAKE_COMMAND}"
   -DCOMPILER=${CMAKE_CXX_COMPILER}
   -DSOURCE=${PROJECT_SOURCE_DIR}/tests/compile_contracts/forbidden_characteristic_hypergeometry_copy.cpp
-  -DINCLUDE_DIRECTORY=${PROJECT_SOURCE_DIR}/include "-DEXPECTED_TEXT=use of deleted function"
+  -DINCLUDE_DIRECTORY=${PROJECT_SOURCE_DIR}/src/include "-DEXPECTED_TEXT=use of deleted function"
   -P "${PROJECT_SOURCE_DIR}/cmake/ExpectCompileFailure.cmake")

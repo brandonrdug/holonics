@@ -1,13 +1,13 @@
 find_package(CUDAToolkit 13.2.78 EXACT REQUIRED)
 
-add_library(spine_executor STATIC cuda/executor/spine_executor.cu)
+add_library(spine_executor STATIC src/cuda/executor/spine_executor.cu)
 target_link_libraries(
   spine_executor
   PRIVATE holonics::apparatus holonics_contract_options CUDA::cudart)
 
 add_executable(
   spine_device_deed
-  apparatus/host/spine_deed.cpp
+  src/apparatus/host/spine_deed.cpp
   tests/model/spine_cases.cpp
   tests/model/ecology_cases.cpp
   tests/model/cost_cases.cpp
@@ -29,12 +29,12 @@ target_link_libraries(
   spine_host_conformance
   PRIVATE holonics::apparatus holonics_contract_options)
 
-set(SPINE_DEVICE_SOURCE "${PROJECT_SOURCE_DIR}/cuda/executor/spine_executor.cu")
+set(SPINE_DEVICE_SOURCE "${PROJECT_SOURCE_DIR}/src/cuda/executor/spine_executor.cu")
 file(
   GLOB SPINE_DEVICE_HEADERS CONFIGURE_DEPENDS
-  "${PROJECT_SOURCE_DIR}/include/holonics/apparatus/*.hpp"
-  "${PROJECT_SOURCE_DIR}/include/holonics/current/*.hpp"
-  "${PROJECT_SOURCE_DIR}/include/holonics/exact/*.hpp")
+  "${PROJECT_SOURCE_DIR}/src/include/holonics/apparatus/*.hpp"
+  "${PROJECT_SOURCE_DIR}/src/include/holonics/current/*.hpp"
+  "${PROJECT_SOURCE_DIR}/src/include/holonics/exact/*.hpp")
 set(SPINE_DEVICE_PTX "${R0_GENERATED_DIRECTORY}/spine_executor.ptx")
 set(SPINE_DEVICE_CUBIN "${R0_GENERATED_DIRECTORY}/spine_executor.cubin")
 set(SPINE_DEVICE_COMMON_FLAGS
@@ -43,7 +43,7 @@ set(SPINE_DEVICE_COMMON_FLAGS
     --gpu-architecture=sm_89
     --fmad=false
     --Werror=all-warnings
-    -I${PROJECT_SOURCE_DIR}/include
+    -I${PROJECT_SOURCE_DIR}/src/include
     -Xcompiler=-Wall,-Wextra,-Werror,-Wconversion,-Wsign-conversion,-Wshadow,-fno-exceptions,-fno-rtti,-fno-fast-math,-ffp-contract=off,-ffile-prefix-map=${PROJECT_SOURCE_DIR}=.,-ffile-prefix-map=${PROJECT_BINARY_DIR}=.)
 
 add_custom_command(
@@ -66,8 +66,8 @@ add_custom_target(
 
 string(JOIN " " SPINE_DEVICE_FLAGS_RECEIPT ${SPINE_DEVICE_COMMON_FLAGS})
 set(SPINE_DECLARED_COMMANDS
-    "device_ptx=<CUDA_COMPILER> ${SPINE_DEVICE_FLAGS_RECEIPT} --ptx <SOURCE>/cuda/executor/spine_executor.cu -o <BUILD>/generated/spine_executor.ptx\n"
-    "device_cubin=<CUDA_COMPILER> ${SPINE_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/cuda/executor/spine_executor.cu -o <BUILD>/generated/spine_executor.cubin\n")
+    "device_ptx=<CUDA_COMPILER> ${SPINE_DEVICE_FLAGS_RECEIPT} --ptx <SOURCE>/src/cuda/executor/spine_executor.cu -o <BUILD>/generated/spine_executor.ptx\n"
+    "device_cubin=<CUDA_COMPILER> ${SPINE_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/src/cuda/executor/spine_executor.cu -o <BUILD>/generated/spine_executor.cubin\n")
 
 set(SPINE_EXTRA_ARTIFACTS
     "$<TARGET_FILE:spine_device_deed>|${SPINE_DEVICE_PTX}|${SPINE_DEVICE_CUBIN}")

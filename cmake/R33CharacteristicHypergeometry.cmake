@@ -1,32 +1,32 @@
 find_package(CUDAToolkit 13.2.78 EXACT REQUIRED)
 
-add_library(r33_characteristic_store STATIC apparatus/host/characteristic_card_adapter.cpp
-  apparatus/host/characteristic_rest_adapter.cpp)
+add_library(r33_characteristic_store STATIC src/apparatus/host/characteristic_card_adapter.cpp
+  src/apparatus/host/characteristic_rest_adapter.cpp)
 target_link_libraries(r33_characteristic_store PRIVATE holonics::apparatus holonics_contract_options)
-add_library(r33_characteristic_executor STATIC apparatus/host/lean_checker_process.cpp
-  apparatus/host/returned_theorem_checker_process.cpp cuda/executor/r33_characteristic_currents.cu
-  cuda/executor/r33_characteristic_kernels.cu cuda/executor/r33_heldout_kernels.cu cuda/executor/r33_discovery_executor.cu
-  cuda/executor/r33_application_executor.cu)
+add_library(r33_characteristic_executor STATIC src/apparatus/host/lean_checker_process.cpp
+  src/apparatus/host/returned_theorem_checker_process.cpp src/cuda/executor/r33_characteristic_currents.cu
+  src/cuda/executor/r33_characteristic_kernels.cu src/cuda/executor/r33_heldout_kernels.cu src/cuda/executor/r33_discovery_executor.cu
+  src/cuda/executor/r33_application_executor.cu)
 target_link_libraries(r33_characteristic_executor PRIVATE holonics::apparatus holonics_contract_options CUDA::cudart)
-add_executable(r33_characteristic_discovery_device_deed apparatus/host/r33_characteristic_discovery_deed.cpp)
+add_executable(r33_characteristic_discovery_device_deed src/apparatus/host/r33_characteristic_discovery_deed.cpp)
 target_link_libraries(r33_characteristic_discovery_device_deed PRIVATE holonics::apparatus
   holonics_contract_options r32_elementary_store r33_characteristic_store r33_characteristic_executor CUDA::cudart)
-add_executable(r33_characteristic_application_device_deed apparatus/host/r33_characteristic_application_deed.cpp)
+add_executable(r33_characteristic_application_device_deed src/apparatus/host/r33_characteristic_application_deed.cpp)
 target_link_libraries(r33_characteristic_application_device_deed PRIVATE holonics::apparatus
   holonics_contract_options r33_characteristic_store r33_characteristic_executor CUDA::cudart)
 add_executable(r33_characteristic_host_conformance
   tests/conformance/r33_characteristic_host_conformance.cpp)
 target_link_libraries(r33_characteristic_host_conformance PRIVATE holonics_contract_options)
 
-file(GLOB_RECURSE R33_DEVICE_HEADERS CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/include/holonics/*.hpp")
-set(R33_DEVICE_SOURCE "${PROJECT_SOURCE_DIR}/cuda/executor/r33_characteristic_kernels.cu")
+file(GLOB_RECURSE R33_DEVICE_HEADERS CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/src/include/holonics/*.hpp")
+set(R33_DEVICE_SOURCE "${PROJECT_SOURCE_DIR}/src/cuda/executor/r33_characteristic_kernels.cu")
 set(R33_DEVICE_PTX "${R0_GENERATED_DIRECTORY}/r33_characteristic_kernels.ptx")
 set(R33_DEVICE_CUBIN "${R0_GENERATED_DIRECTORY}/r33_characteristic_kernels.cubin")
-set(R33_HELDOUT_DEVICE_SOURCE "${PROJECT_SOURCE_DIR}/cuda/executor/r33_heldout_kernels.cu")
+set(R33_HELDOUT_DEVICE_SOURCE "${PROJECT_SOURCE_DIR}/src/cuda/executor/r33_heldout_kernels.cu")
 set(R33_HELDOUT_DEVICE_PTX "${R0_GENERATED_DIRECTORY}/r33_heldout_kernels.ptx")
 set(R33_HELDOUT_DEVICE_CUBIN "${R0_GENERATED_DIRECTORY}/r33_heldout_kernels.cubin")
 set(R33_DEVICE_COMMON_FLAGS --std=c++20 -O3 --gpu-architecture=sm_89 --fmad=false --Werror=all-warnings
-  -I${PROJECT_SOURCE_DIR}/include -Xcompiler=-Wall,-Wextra,-Werror,-Wconversion,-Wsign-conversion,-Wshadow,-fno-exceptions,-fno-rtti,-fno-fast-math,-ffp-contract=off,-ffile-prefix-map=${PROJECT_SOURCE_DIR}=.,-ffile-prefix-map=${PROJECT_BINARY_DIR}=.)
+  -I${PROJECT_SOURCE_DIR}/src/include -Xcompiler=-Wall,-Wextra,-Werror,-Wconversion,-Wsign-conversion,-Wshadow,-fno-exceptions,-fno-rtti,-fno-fast-math,-ffp-contract=off,-ffile-prefix-map=${PROJECT_SOURCE_DIR}=.,-ffile-prefix-map=${PROJECT_BINARY_DIR}=.)
 add_custom_command(OUTPUT "${R33_DEVICE_PTX}" COMMAND "${CMAKE_CUDA_COMPILER}" ${R33_DEVICE_COMMON_FLAGS}
   --ptx "${R33_DEVICE_SOURCE}" -o "${R33_DEVICE_PTX}" DEPENDS "${R33_DEVICE_SOURCE}" ${R33_DEVICE_HEADERS} VERBATIM)
 add_custom_command(OUTPUT "${R33_DEVICE_CUBIN}" COMMAND "${CMAKE_CUDA_COMPILER}" ${R33_DEVICE_COMMON_FLAGS}
@@ -41,10 +41,10 @@ add_custom_target(r33_device_artifacts ALL DEPENDS ${R33_DEVICE_PTX} ${R33_DEVIC
   ${R33_HELDOUT_DEVICE_PTX} ${R33_HELDOUT_DEVICE_CUBIN})
 string(JOIN " " R33_DEVICE_FLAGS_RECEIPT ${R33_DEVICE_COMMON_FLAGS})
 set(R33_DECLARED_COMMANDS
-  "device_ptx=<CUDA_COMPILER> ${R33_DEVICE_FLAGS_RECEIPT} --ptx <SOURCE>/cuda/executor/r33_characteristic_kernels.cu -o <BUILD>/generated/r33_characteristic_kernels.ptx\n"
-  "device_cubin=<CUDA_COMPILER> ${R33_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/cuda/executor/r33_characteristic_kernels.cu -o <BUILD>/generated/r33_characteristic_kernels.cubin\n"
-  "heldout_device_ptx=<CUDA_COMPILER> ${R33_DEVICE_FLAGS_RECEIPT} --ptx <SOURCE>/cuda/executor/r33_heldout_kernels.cu -o <BUILD>/generated/r33_heldout_kernels.ptx\n"
-  "heldout_device_cubin=<CUDA_COMPILER> ${R33_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/cuda/executor/r33_heldout_kernels.cu -o <BUILD>/generated/r33_heldout_kernels.cubin\n"
+  "device_ptx=<CUDA_COMPILER> ${R33_DEVICE_FLAGS_RECEIPT} --ptx <SOURCE>/src/cuda/executor/r33_characteristic_kernels.cu -o <BUILD>/generated/r33_characteristic_kernels.ptx\n"
+  "device_cubin=<CUDA_COMPILER> ${R33_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/src/cuda/executor/r33_characteristic_kernels.cu -o <BUILD>/generated/r33_characteristic_kernels.cubin\n"
+  "heldout_device_ptx=<CUDA_COMPILER> ${R33_DEVICE_FLAGS_RECEIPT} --ptx <SOURCE>/src/cuda/executor/r33_heldout_kernels.cu -o <BUILD>/generated/r33_heldout_kernels.ptx\n"
+  "heldout_device_cubin=<CUDA_COMPILER> ${R33_DEVICE_FLAGS_RECEIPT} --cubin <SOURCE>/src/cuda/executor/r33_heldout_kernels.cu -o <BUILD>/generated/r33_heldout_kernels.cubin\n"
   "checker_discovery=/usr/bin/lake env lean -R <BUILD>/artifacts -o <BUILD>/artifacts/R33_CHARACTERISTIC_HYPERGEOMETRY.olean <BUILD>/artifacts/R33_CHARACTERISTIC_HYPERGEOMETRY.lean\n"
   "checker_application=/usr/bin/lake env lean -R <BUILD>/artifacts -o <BUILD>/artifacts/R33_HELDOUT_CHARACTERISTIC.olean <BUILD>/artifacts/R33_HELDOUT_CHARACTERISTIC.lean\n")
 

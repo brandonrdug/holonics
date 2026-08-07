@@ -10,21 +10,21 @@ endif()
 include("${SOURCE_ROOT}/cmake/HolonicArchitecture.cmake")
 
 set(scan_patterns
-    "${SCAN_ROOT}/include/holonics/*.h"
-    "${SCAN_ROOT}/include/holonics/*.hpp"
-    "${SCAN_ROOT}/include/holonics/*.cuh"
+    "${SCAN_ROOT}/src/include/holonics/*.h"
+    "${SCAN_ROOT}/src/include/holonics/*.hpp"
+    "${SCAN_ROOT}/src/include/holonics/*.cuh"
     "${SCAN_ROOT}/src/*.cc"
     "${SCAN_ROOT}/src/*.cpp"
     "${SCAN_ROOT}/src/*.cxx"
-    "${SCAN_ROOT}/cuda/*.cuh"
-    "${SCAN_ROOT}/cuda/*.cu"
-    "${SCAN_ROOT}/apparatus/*.h"
-    "${SCAN_ROOT}/apparatus/*.hpp"
-    "${SCAN_ROOT}/apparatus/*.cuh"
-    "${SCAN_ROOT}/apparatus/*.cc"
-    "${SCAN_ROOT}/apparatus/*.cpp"
-    "${SCAN_ROOT}/apparatus/*.cxx"
-    "${SCAN_ROOT}/apparatus/*.cu")
+    "${SCAN_ROOT}/src/cuda/*.cuh"
+    "${SCAN_ROOT}/src/cuda/*.cu"
+    "${SCAN_ROOT}/src/apparatus/*.h"
+    "${SCAN_ROOT}/src/apparatus/*.hpp"
+    "${SCAN_ROOT}/src/apparatus/*.cuh"
+    "${SCAN_ROOT}/src/apparatus/*.cc"
+    "${SCAN_ROOT}/src/apparatus/*.cpp"
+    "${SCAN_ROOT}/src/apparatus/*.cxx"
+    "${SCAN_ROOT}/src/apparatus/*.cu")
 file(GLOB_RECURSE production_files LIST_DIRECTORIES false ${scan_patterns})
 list(SORT production_files)
 
@@ -72,15 +72,14 @@ foreach(path IN LISTS production_files)
 
   file(RELATIVE_PATH relative "${SCAN_ROOT}" "${path}")
   set(owner "")
-  if(relative MATCHES "^include/holonics/([^/]+)/")
+  # Most specific first. A header under src/include/holonics/<owner>/ names its
+  # own owner; everything under src/cuda/ and src/apparatus/ is apparatus, which
+  # is the only owner permitted to name a semantic chart.
+  if(relative MATCHES "^src/include/holonics/([^/]+)/")
     set(owner "${CMAKE_MATCH_1}")
-  elseif(relative MATCHES "^src/([^/]+)/")
-    set(owner "${CMAKE_MATCH_1}")
-  elseif(relative MATCHES "^cuda/executor/")
+  elseif(relative MATCHES "^src/cuda/")
     set(owner apparatus)
-  elseif(relative MATCHES "^cuda/([^/]+)/")
-    set(owner "${CMAKE_MATCH_1}")
-  elseif(relative MATCHES "^apparatus/")
+  elseif(relative MATCHES "^src/apparatus/")
     set(owner apparatus)
   endif()
 

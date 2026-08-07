@@ -1,7 +1,7 @@
-set(R35_PRIMARY "${PROJECT_SOURCE_DIR}/apparatus/cards/R35_PRIMARY_REBASE.card")
-set(R35_SIGNED "${PROJECT_SOURCE_DIR}/apparatus/cards/R35_SIGNED_REBASE.card")
-set(R35_RECHARTED "${PROJECT_SOURCE_DIR}/apparatus/cards/R35_RECHARTED_REBASE.card")
-set(R35_HELDOUT "${PROJECT_SOURCE_DIR}/apparatus/cards/R35_HELDOUT_REBASE_PATH.card")
+set(R35_PRIMARY "${PROJECT_SOURCE_DIR}/src/apparatus/cards/R35_PRIMARY_REBASE.card")
+set(R35_SIGNED "${PROJECT_SOURCE_DIR}/src/apparatus/cards/R35_SIGNED_REBASE.card")
+set(R35_RECHARTED "${PROJECT_SOURCE_DIR}/src/apparatus/cards/R35_RECHARTED_REBASE.card")
+set(R35_HELDOUT "${PROJECT_SOURCE_DIR}/src/apparatus/cards/R35_HELDOUT_REBASE_PATH.card")
 set(R35_FORMAL_ROOT "${PROJECT_SOURCE_DIR}/formal/elementary-holonics")
 set(R35_TOOLCHAIN "${R35_FORMAL_ROOT}/lean-toolchain")
 set(R35_FORMAL_MANIFEST "${R35_FORMAL_ROOT}/lake-manifest.json")
@@ -94,5 +94,5 @@ holonic_found(NAME r35.post_seal_literature_comparison
 add_test(NAME r35.forbidden_trace_rebase_copy COMMAND "${CMAKE_COMMAND}"
   -DCOMPILER=${CMAKE_CXX_COMPILER}
   -DSOURCE=${PROJECT_SOURCE_DIR}/tests/compile_contracts/forbidden_trace_rebase_copy.cpp
-  -DINCLUDE_DIRECTORY=${PROJECT_SOURCE_DIR}/include "-DEXPECTED_TEXT=use of deleted function"
+  -DINCLUDE_DIRECTORY=${PROJECT_SOURCE_DIR}/src/include "-DEXPECTED_TEXT=use of deleted function"
   -P "${PROJECT_SOURCE_DIR}/cmake/ExpectCompileFailure.cmake")
