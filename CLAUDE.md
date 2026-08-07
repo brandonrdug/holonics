@@ -31,6 +31,11 @@ JURISDICTION** (Brandon, ratified 2026-07-14): a ban governs Soma's interior or 
 as an explanation of Soma; it never governs the world or the observer. `No X inside Soma by analogy`
 must never mean `do not learn from X`.
 
+**The current direction is `blueprint/THE_GROWN_CIRCUIT.md`** (Brandon, ratified 2026-08-07): the
+machine's emergent output analysed as a grown circuit, with the complex as the instrument and the
+renderer as one of its charts. `THE_ORDER_OF_WORK.md`'s remaining movements are the substrate it
+needs and are not cancelled.
+
 Read this file first and in full. Then **`blueprint/THE_ORDER_OF_WORK.md`** — the operative
 construction authority, six movements named by mechanism — and **`blueprint/THE_SPINE.md`** for how
 much of the body each mechanism actually conducts through. Then `CONSTRUCTION_STATE.md` for the
