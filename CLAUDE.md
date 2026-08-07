@@ -23,6 +23,14 @@ the specific recurring failures observed across the Codex sessions of 2026-07-09
 
 ## 0. Fresh-session pickup
 
+**Read `canon/THE_RECOVERED_LAW.md` before claiming anything about what holonics forbids.** It
+carries the jurisdiction doctrine, the elementary definitions with their dependency order, the
+information and gravitas laws, and the corrections to this project's capability claims — recovered
+from the frozen laboratory on 2026-08-07 after a major misinterpretation. **THE BANS HAVE
+JURISDICTION** (Brandon, ratified 2026-07-14): a ban governs Soma's interior or a mechanism offered
+as an explanation of Soma; it never governs the world or the observer. `No X inside Soma by analogy`
+must never mean `do not learn from X`.
+
 Read this file first and in full. Then **`blueprint/THE_ORDER_OF_WORK.md`** — the operative
 construction authority, six movements named by mechanism — and **`blueprint/THE_SPINE.md`** for how
 much of the body each mechanism actually conducts through. Then `CONSTRUCTION_STATE.md` for the
