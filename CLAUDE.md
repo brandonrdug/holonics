@@ -5,17 +5,23 @@ Brandon's latest direct request governs.
 **This file is the authoritative operating document for Claude, and it stands alone.** `AGENTS.md`
 is the Codex-facing twin written for a different model; it is not authority here and is not to be
 consulted as such. The same holds in the laboratory repository: its `AGENTS.md` prohibition on
-reading `CLAUDE.md` was written for Codex, and `laboratory/CLAUDE.md` — the Standing Law, the
-Objective, the Bans, the ratified Law/Cut/Bridge deposits — is the authoritative theory source
-here. (Brandon, direct ruling, 2026-08-05.)
+reading `CLAUDE.md` was written for Codex, and the laboratory's own `CLAUDE.md` — the Standing Law,
+the Objective, the Bans, the ratified Law/Cut/Bridge deposits — is the authoritative theory source
+here. (Brandon, direct ruling, 2026-08-05.) The laboratory is frozen and dirty; read it only
+through git, `git -C /home/b/Workspaces/laboratory show a07ff376:CLAUDE.md`. Never its working
+tree, never a write.
 
 Where a dated deposit inside the soma canon or the RESEARCH records refines a mechanism the
 Standing Law states in compressed form, the refinement is evidence the Standing Law itself points
 at, not a competing authority. Carry both and name the refinement.
 
 The purity, ownership, apparatus, no-float, and grading requirements this project runs on are
-restated below and in `blueprint/CPP_GPU_FOUNDATION.md`; they are enforced by the executable
-audits, not by cross-reference.
+stated below. They were first written for the archived C++ body in
+`blueprint/CPP_GPU_FOUNDATION.md`, which now carries an archive banner; the requirements survive
+the body that occasioned them and this file carries them. They are meant to be enforced by
+executable audits rather than by cross-reference — `cargo test --workspace` does enforce the
+no-float and determinism gates, and `crates/holonic-architecture-lint` is the ownership ratchet but
+**does not currently run**, for the reason `CONSTRUCTION_STATE.md` records.
 
 This file is an operating contract, not a theory deposit and not a scheduler. It exists to prevent
 the specific recurring failures observed across the Codex sessions of 2026-07-09 through
@@ -28,19 +34,36 @@ after a comparative audit. It lives at `archive/cpp-engine/` and nothing there i
 below that speak of headers, deeds, `ctest`, CUDA executors or `R{i}` chains describe that archived
 body and are **provenance**, not the present position.
 
-Read these four, in order, and nothing else by default:
+Read these five, in order, and nothing else by default:
 
 | file | what it is |
 |---|---|
 | **this file** | the operating contract. How to work, what is convicted, what is authorized. |
 | `canon/THE_DOCUMENT_LAW.md` | how a claim travels from conversation to canon, the genres, the grades, how supersession is recorded. |
 | `canon/THE_QUOTE_NETWORK.md` | **where every idea came from, in Brandon's words**, themed, with "where this lives now" per theme. Read this before theorising about what he wants. |
-| `blueprint/THE_ROADMAP.md` | the single active roadmap, fourteen movements named by mechanism. |
+| `blueprint/THE_ROADMAP.md` | the single active roadmap, movements named by mechanism. |
+| `CONSTRUCTION_STATE.md` | the position record. What is admitted, what survived the transition, what must be re-established. |
 
 `canon/THE_RECOVERED_LAW.md` carries the jurisdiction doctrine and the elementary definitions;
-consult it before claiming anything about what holonics forbids. `CONSTRUCTION_STATE.md`,
-`blueprint/THE_ORDER_OF_WORK.md`, `THE_SPINE.md`, `THE_FOUNDATION_REMAINDER.md` and
-`EROS_EMBODIMENT_ROADMAP.md` are **archived-body provenance**; do not schedule from them.
+consult it before claiming anything about what holonics forbids.
+
+**Twelve files carry an archive banner and schedule nothing.** Under `blueprint/`:
+`THE_ORDER_OF_WORK.md`, `THE_SPINE.md`, `THE_FOUNDATION_REMAINDER.md`, `THE_GROWN_CIRCUIT.md`,
+`EROS_EMBODIMENT_ROADMAP.md`, `EROS_MATHEMATICS_PRODUCTION_FLOOR.md`,
+`COMPLETE_CPP_ENGINE_ROADMAP.md`, `CPP_GPU_FOUNDATION.md`, `THE_SPINE_THE_CUT_AND_THE_TERRAIN.md`,
+`BUILD_AND_GRADE.md`, `REALIZATION_AND_HARDWARE.md`; and
+`archive/cpp-engine/CONSTRUCTION_STATE.md`, the C++ body's position record. Read them for history,
+never for direction. The banner is the test: if the file opens with one, it is provenance.
+
+**Every path a governing document names must resolve in the body that document describes.** That is
+`canon/THE_DOCUMENT_LAW.md` §4, and it is checkable:
+
+```
+python3 tools/resolve_named_paths.py
+```
+
+An archive-bannered document may name archived paths; a live one may not. Run it after editing any
+document at the root, in `canon/`, or in `blueprint/`.
 
 ### The workspace
 
@@ -57,11 +80,11 @@ soma/     body               pure law, no_std, zero dependencies
           kernel/soma.spv    committed boundary artifact; its toolchain is excluded
 ```
 
-**Measured 2026-08-07:** `cargo build --workspace` green; `cargo test --workspace` **543 passed,
-1 failed, 14 ignored in 15.7 s**. The one failure is `mount-scope-gate`'s
-`founded_reference_path_is_deterministic_and_nonvacuous` returning `(255,159,35)` against an expected
-`(256,160,38)` — laboratory fixture drift that predates the import and is now visible rather than
-frozen. It blocks that gate's fifth fixture.
+**Measured 2026-08-07 14:34:** `cargo test --workspace` **730 passed, 0 failed, 14 ignored in
+22 s**. Earlier the same day it was `543 passed, 1 failed` on a `mount-scope-gate` radiation fixture
+that had never been regenerated across ten commits to `body::carriage`; that fixture was refounded
+against the law rather than the receipt. **Do not carry a gate figure without its clock time.**
+`CONSTRUCTION_STATE.md` is the position record and re-taking the number is one command.
 
 Build with `PATH=/opt/cuda/bin:$PATH`; `holonic-engine`'s build script shells out to `nvcc`.
 
@@ -85,15 +108,26 @@ the numbers like facts instead of using proper semantics."* Name the mechanism.
 
 ### What the archived body is worth
 
-Two things it had that this laboratory does not, both to be ported: the **conditioned production
-shape** — two theorems, kernel-refused foil, structural ablation, which C++ ran at three declarations
-and the laboratory never ran at all despite mounting 1,164 — and `exact/enclosure.hpp`, the certified
-exact enclosure carrier that §11 names as the first brick.
+**One thing it had that this body does not:** the **conditioned production shape** — two theorems,
+kernel-refused foil, structural ablation — which C++ ran at three declarations and the laboratory
+never ran at all despite mounting 1,164. It is a port that is owed.
+
+It was also credited with a second, the certified exact enclosure carrier at
+`archive/cpp-engine/src/include/holonics/exact/enclosure.hpp`. **That credit is withdrawn
+2026-08-07:**
+the certified exact enclosure carrier has a live Rust owner at
+`crates/holonic-engine/src/exact_value.rs`, and the Rust form is the stronger of the two — exact
+rationals rather than dyadics, a four-state ordering with `Open`, a Sturm isolation certificate, and
+a three-species tail certificate returning an exact rational remainder interval. §11 carries the
+measurement. Nothing needs porting there; what the carrier needs is a driver.
 
 And four lessons, each earned by a defect found in it:
 
 - **Bind every deposit to its content hash AND its closure hash, with a verifier.** The laboratory
-  lost its tiger figures and `semantics_invariant_under_exact_chart.lean` to an untracked `runs/`.
+  lost its tiger figures and the file holding `semantics_invariant_under_exact_chart` to an
+  untracked `runs/`. Neither is recoverable at any commit in either repository. The registry that
+  would have prevented it is archived (`closure_sha256` resolves only under `archive/cpp-engine/`)
+  and has no Rust owner.
 - **No absolute frame in a lineage.** Ten C++ card adapters folded the filesystem path into the rest
   integrity, and one deed asserted that dependence as its own success condition.
 - **A negative control's absence is evidence, not an unbuilt output.**
@@ -226,9 +260,10 @@ target.**
   after its unique developmental passage was dropped a source-detached remount returned `63` for
   novel `7*9`. Mounting, exposure, training, and reference are separated *and empirically
   distinguished*. **This is the LABORATORY's return and it stands there.** The C++ restatement of
-  it was withdrawn 2026-08-06 (CUT 5): `event/cultivated_route.hpp`'s "founded law" was the C++
-  multiply operator, and `product_route()` was nullary and `constexpr`, so the two "distinct
+  it was withdrawn 2026-08-06: the deleted `event/cultivated_route.hpp`'s "founded law" was the
+  C++ multiply operator, and `product_route()` was nullary and `constexpr`, so the two "distinct
   developmental passages" were one constant twice and no operand pair ever reached the ecology.
+  That owner and its withdrawal are archived; the laboratory's return is live code here.
 - **Multimodality with no fusion module and no pair product.** RELAMPAGO: optical, five-band
   spectral, geolocation, and vertical sections on one eighteen-coordinate phase face; 24,584 and
   21,147 relations opened with zero pair overlap and the complete pair product never enumerated;
@@ -401,8 +436,8 @@ this contract.
 
 Scale-independent recruitment fails because there is no exact condensation of a far population
 into a compact representative with a certified remainder. General far-field folding is recorded as
-open for exactly the same reason: no kernel-specific exterior/local expansion with an exact
-rational remainder certificate exists, and floating tolerance may not become standing.
+open for the closely related reason that no *kernel-specific* exterior/local expansion has been
+built for it, and floating tolerance may not become standing.
 
 Condensing a far field into a compact realizer with an exact retained remainder **is** the
 question of whether a distant population admits a supported realizer for a declared receiver
@@ -410,21 +445,42 @@ family, with the obstruction retained when it does not. The pairing that decides
 positive form. That is the cycle-class question, it is the Hodge-facing question, and by §2 it is
 the structural form of what is missing on the RH side.
 
-**The certified exact enclosure carrier EXISTS** — `exact/enclosure.hpp` defines the enclosure as a
-set and never a value, with four typed states over `exact/dyadic.hpp` and `exact/separation.hpp`.
-The first brick is laid; this section said otherwise until 2026-08-06.
+**The certified exact enclosure carrier EXISTS, and it is Rust.** This section located it at
+`archive/cpp-engine/src/include/holonics/exact/enclosure.hpp` until 2026-08-07, back when that
+header was live. Its owner now is
+`crates/holonic-engine/src/exact_value.rs`, and the Rust form is the stronger of the two:
 
-**One organ closes all three: an exactly computed positive form on a supported realizer
-population, with a certified remainder and a reopening rule keyed to the receiver family.** Its
-prerequisite — a certified exact enclosure carrier — is promised in `canon/08` §3 and does not yet
-exist as a built instrument. That is the first brick.
+- `:82` `ExactInterval { lower: Rat, upper: Rat }` — a set, never a value, over exact rationals
+  rather than dyadics.
+- `:64` `ExactOrdering { Less, Equal, Greater, Open }`. From the module's own opening: *"A decimal
+  approximation is never a member of this carrier. Values which cannot yet be ordered from their
+  exact certificates return `Open` rather than falling through to an epsilon comparison."*
+- `:189` `AlgebraicRoot` with a `SturmIsolationCertificate`, refusing construction unless the
+  isolating interval provably contains exactly one root.
+- `:238` `SeriesTailCertificate` — `AbsoluteGeometric`, `AlternatingMonotone`, `ExactTail` — each
+  returning an **exact rational remainder interval**, with `CertifiedSeries::enclosure` the partial
+  sum translated by that certified remainder.
 
-**The trivial instance is already built, and its triviality is the content.** Phase 7 movement 1
+So the sentence this section used to carry — *no exact rational remainder certificate exists* — is
+false of the present body. One exists, for series tails, with three species and a typed refusal.
+
+**One organ still closes all three: an exactly computed positive form on a supported realizer
+population, with a certified remainder and a reopening rule keyed to the receiver family.** Read
+that demand as four parts. The **certified remainder** is built. The **positive form**, the
+**supported realizer population**, and the **reopening rule** are not.
+
+**And the built part is not driven.** Measured 2026-08-07 over the whole tree: `ExactInterval` has
+104 references across 9 files, 20 in drivers; `CertifiedSeries` has 13 references in **one** file
+and `SeriesTailCertificate` 6 in **one**, with **zero in any `examples/`, `tests/`, or `bin/`
+path**. Per §8, reach is part of the grade: the remainder-certificate half of the carrier is
+written and never exercised, which is exactly the half this section's question needs.
+
+**The trivial instance is already built, and its triviality is the content.** The archived body
 refounded the source-incidence walk: a depth-first order over the suffix-link tree replaces every
 state's descendant population with a two-word interval, exactly, with an empty remainder. That *is*
 a far-field condensation with a compact realizer — free, because the incidence is a **tree**, where
-subtree equals interval and the interval is its own reopening rule. So the difficulty §11 names
-lives entirely in the departure from tree-ness, and there is a standard object for it:
+subtree equals interval and the interval is its own reopening rule. So the difficulty this section
+names lives entirely in the departure from tree-ness, and there is a standard object for it:
 spanning-tree interval labelling, where every non-tree edge forces additional intervals and **that
 forced population is the certified remainder**, zero exactly when the incidence is a forest. This
 is `interpretation`, not a bridge to any Millennium result; see
@@ -432,9 +488,14 @@ is `interpretation`, not a bridge to any Millennium result; see
 
 ## 12. Standing corrections to the record
 
-These are established by review and are to be carried forward, not re-derived:
+These are established by review and are to be carried forward, not re-derived.
 
-- The residue-stratum atlas under `output/arithmetic-dimensional-receiver/` is **blind to
+**The figures the first four bullets correct no longer exist.** The residue-stratum atlas was
+written to an untracked `output/arithmetic-dimensional-receiver/` and resolves at no commit in
+either repository — the same loss as the tiger figures. The corrections stand as *readings not to
+resume*; the atlas itself is not available to re-examine, and no claim may cite it as evidence.
+
+- The residue-stratum atlas was **blind to
   primality**. Its apparent prime signal at pair `(2,3)` is parity and nothing else; the
   smallest-factor correlation collapses from `+0.32` to `+0.00` by pair `(17,19)`. This is correct
   and expected — primality is the *exhaustion* of the complete transport population below the
@@ -458,55 +519,80 @@ These are established by review and are to be carried forward, not re-derived:
   signature of a finite-rank quadratic form. That is an unexploited reduction of exactly the kind
   the atlas's own boundary invites.
 
-## 13. The conditioning contamination — established 2026-08-05
+## 13. The conditioning contamination — convicted 2026-08-05, swept clean 2026-08-07
 
-**Truth status:** `established-bounded`. **Evidence:** direct source inspection.
+**Truth status:** `established-bounded` for both halves. **Evidence:** direct source inspection,
+twice, on two different bodies.
 
-The C++ body's learning layer implements the mechanism the canon convicts. This was found by
-reading the owners rather than the receipts, and it is recorded here so it is never re-litigated
-and never built upon again.
+### What was convicted
 
-| Claim in the record | What the code does |
-|---|---|
-| conditioned navigation morphology | `organ/conditioning_law.hpp:34-58` — `response = response_weight*support + transport_weight*path_length + codec_bias`, gated by `obstruction_threshold`. A linear scorer with weights, a bias, and a threshold. |
-| the reusable morphology | `organ/conditioning_schema.hpp:18-26` — seven words: two weights, a gate, a bias, a threshold. |
-| returned training changes morphology | `organ/conditioning_law.hpp:61-88` — monotone weight overwrite; any returned value below its predecessor is rejected. No returned passage, no plural fiber, no retained obstruction. |
-| morphology totals in `CONSTRUCTION_STATE.md` | counters throughout `include/holonics/event/`: `mathematical_morphology_ += accepted ? 8U : 1U;` and siblings. An accepted-count tally, which `AGENTS.md` bans by name. |
-| exact returned-fiber ablation | `event/returned_fiber_exclusion_law.hpp:41-51` — `morphology -= 5U; mathematical -= 3U; codec -= 2U`, guarded by a hardcoded `morphology_delta == 5`. Nothing structural is removed. |
-| the Swing | `receiver/projective_swing_law.hpp` — the projective cross-ratio under a frame change only. Correct as geometry; it is not the one move. No flywheel, no TEST against standing, no RIDE/FOUND/OPEN/HOLONOMY, no winding deposit. |
+The **archived C++ body's** learning layer implemented the mechanism the canon convicts. This was
+found by reading the owners rather than the receipts. Nothing below is live code.
 
-**Absent entirely:** resonance, suffix, morphological-route, relational, agentic, training, formal
-mathematics, and research ecologies; the informant membrane; leaders and fronts; continuation
-fibers; minimal witness families; causal-information receipts.
+**Four of the six owners are not even in the archive** — they were deleted from the tree before it
+was archived, and their only recovery surface is git history. Verified 2026-08-07: `git log --all`
+returns `2b562c8` ("Phase 0: excise the contaminated conditioning layer and regrade") as the last
+commit touching the three conditioning owners, and `40e1211` ("Cut the fabricated-theorem island")
+for `cultivated_route.hpp`. *That* is obligation 3 below actually being met.
 
-**Structural ceiling:** `structure/marked_population.hpp:12-14` admits **four sources**, 16,384
-occurrences, 16,384 relations, with `uint16_t` slots capping every arena at 65,535 and no growth.
-The entire admitted body rests in 38,960 bytes. The laboratory mounted 976 files and rested
-ecologies of 15.8 MB, 31.4 MB, and 88.7 MB. External material enters only as `.card` files of
-29--191 bytes.
+| Claim in the record | What the archived code did | Where it resolves |
+|---|---|---|
+| conditioned navigation morphology | `conditioning_law.hpp:34-58` — `response = response_weight*support + transport_weight*path_length + codec_bias`, gated by `obstruction_threshold`. A linear scorer with weights, a bias, and a threshold. | **deleted**, `2b562c8` |
+| the reusable morphology | `conditioning_schema.hpp:18-26` — seven words: two weights, a gate, a bias, a threshold. | **deleted**, `2b562c8` |
+| returned training changes morphology | `conditioning_law.hpp:61-88` — monotone weight overwrite; any returned value below its predecessor is rejected. No returned passage, no plural fiber, no retained obstruction. | **deleted**, `2b562c8` |
+| the cultivated route | its "founded law" was the C++ multiply operator; `product_route()` was nullary and `constexpr`, so two "distinct developmental passages" were one constant twice. | **deleted**, `40e1211` |
+| morphology totals in the position record | counters throughout the event owners: `mathematical_morphology_ += accepted ? 8U : 1U;` and siblings. An accepted-count tally. | `archive/cpp-engine/src/include/holonics/event/` |
+| exact returned-fiber ablation | `returned_fiber_exclusion_law.hpp:41-51` — `morphology -= 5U; mathematical -= 3U; codec -= 2U`, guarded by a hardcoded `morphology_delta == 5`. Nothing structural was removed. | **deleted**, `2b562c8` |
+| the Swing | the projective cross-ratio under a frame change only. Correct as geometry; not the one move. No flywheel, no TEST against standing, no RIDE/FOUND/OPEN/HOLONOMY, no winding deposit. | `archive/cpp-engine/src/include/holonics/receiver/projective_swing_law.hpp` |
 
-**What is real and is kept.** The exact carriers; exact linear, chain, characteristic, trace,
-toric, Hodge, and arithmetic-spectral algebra; real Lean kernel acceptances on real generated
-proofs; GPU residency with exact host parity; rest and remount of domain data; and the audit
-apparatus. The mathematics is sound. Only the learning is simulated.
+Its **structural ceiling** was
+`archive/cpp-engine/src/include/holonics/structure/marked_population.hpp:12-14`: four sources, 16,384
+occurrences, 16,384 relations, `uint16_t` slots capping every arena at 65,535, no growth, the whole
+admitted body resting in 38,960 bytes, external material entering only as `.card` files of 29–191
+octets. That ceiling is why the standing obligation ended *"four sources cannot hold a corpus."*
 
-**Standing obligations.**
+### What the sweep returned against the live Rust body
 
-1. The scorer, the counter-morphology, and the constant-subtraction ablation are **removed, not
-   deprecated**. Superseded production machinery fails closed; Git history is the recovery surface.
-   **This obligation was not met.** The 2026-08-05 excision renamed the field and preserved the
-   object: 66 `admitted_tally_ += accepted ? N : M` increment sites survived it byte-identical, as
-   `git show 2b562c8` shows. The tallies branch nothing — zero conduct branches on any of them
-   anywhere in the tree — and 27 files hardcode their cumulative sums as grades, a ratchet that
-   structurally penalizes recombination. Cutting them is scheduled work, not a claim.
-2. Every capability claim resting on them is regraded before it is carried forward. Specifically:
-   training changing reusable morphology, ablation removing later conduct, and source-detached
-   conditioning are **not** established in the C++ body and must not be cited as floor.
-3. **"Morphology" may never again name a counter.** A morphology is the contemporary causal
-   organization by which a body receives, transforms, retains, and emits differences. A training
-   claim requires a structural change in that organization plus source-detached remount plus an
-   ablation that removes the claimed later conduct by removing structure.
-4. No scalar score, weight, bias, gate, or threshold may appear anywhere in the conditioning path.
+Re-run 2026-08-07 over `crates/` and `soma/`. The full table with every command and every named
+site is in `CONSTRUCTION_STATE.md`; the result is:
+
+- **counter-morphology: zero.** No retained field named `morphology` or `tally` is incremented
+  anywhere. The 66 surviving C++ increment sites went with the body.
+- **the scorer's vocabulary: zero.** `response_weight`, `transport_weight`, `codec_bias`,
+  `obstruction_threshold`, `bias`, `learning_rate`, `softmax`, `sigmoid` — none occurs.
+- **hardcoded-delta ablation: zero.** The single `-= 1` on a count removes one occurrence of a key
+  from an exact multiset.
+- **`threshold`: seven occurrences, all seven negative declarations** — comments recording that the
+  code does *not* use one.
+- **`score`: thirty-five occurrences, thirty-four negative declarations.** The one live binding is
+  an exact `Dyadic` magnitude with a deterministic tie-break, in a driver ordering candidate
+  factors of a foreign pretrained model. Not the conditioning path.
+- **floats: zero in every library crate and every `soma/` library.** All 33 in the tree are
+  boundary codecs in `examples/`.
+
+**The §13 obligations are therefore DISCHARGED, not inherited.** The scorer, the counter-morphology,
+and the constant-subtraction ablation do not exist in the live body in any form. The discipline they
+were meant to enforce is legible in the source itself as thirty-four explicit refusals to use a
+score. Do not re-litigate this and do not re-run it as though it were open.
+
+**What the sweep does not establish.** A clean sweep proves the convicted mechanism is absent. It
+does not prove the mechanism demanded in its place is present. Specifically **not** established in
+this body and **not** citable as floor: training changing reusable morphology, ablation removing
+later conduct by removing structure, and source-detached conditioning. Those are the laboratory's
+returns, they stand there (§5), and whether the imported Rust owners *drive* them here is a separate
+grade that `blueprint/THE_ROADMAP.md` holds open.
+
+### The standing rules, which outlive both bodies
+
+1. **"Morphology" may never name a counter.** A morphology is the contemporary causal organization
+   by which a body receives, transforms, retains, and emits differences. A training claim requires a
+   structural change in that organization, plus source-detached remount, plus an ablation that
+   removes the claimed later conduct **by removing structure**.
+2. **No scalar score, weight, bias, gate, or threshold anywhere in the conditioning path.**
    Plurality is the return; a continuation fiber is not a number.
-5. Restoring the learning ecology is **excision, substrate, then port** — in that order. Adding
-   ecologies onto the present substrate is not possible: four sources cannot hold a corpus.
+3. **Superseded production machinery fails closed.** It is removed, not deprecated; git history is
+   the recovery surface. The scorer, the schema, and the constant-subtraction ablation were removed
+   this way and are recoverable only at `2b562c8`. The same excision *failed* the rule for the 66
+   accepted-count tally sites, which it renamed rather than cut; that failure went with the body.
+4. **Grade the implementation, not the receipt** (§8). This section exists because thirty-five
+   admitted steps rested on receipts nobody had checked against their owners.

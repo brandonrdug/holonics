@@ -9,9 +9,9 @@ schedule reconstruction.
 
 | Claim family | Direct record / receipt |
 |---|---|
-| Event substrate and exact receiver engine | [`holonic-exact-receiver-engine-01`](../evidence/observations/holonic-exact-receiver-engine-01/RESULTS.md); pinned implementation at `reference/engine-a07ff376/crates/holonic-engine/` |
+| Event substrate and exact receiver engine | [`holonic-exact-receiver-engine-01`](archive/cpp-engine/evidence/observations/holonic-exact-receiver-engine-01/RESULTS.md); pinned implementation at `reference/engine-a07ff376/crates/holonic-engine/` |
 | Exact conic/receiver geometry | [`THE_CONIC_IS_ITS_QUADRATIC`](../research/records/2026-07-26_THE_CONIC_IS_ITS_QUADRATIC_THE_HINGE_EVENT_EMITS_ITS_LOCAL_WORLD.md) |
-| Exact host/card restriction | [`THE_CARD_RESTRICTS_THE_CAUSED_SUPPORT`](../research/records/2026-07-26_THE_CARD_RESTRICTS_THE_CAUSED_SUPPORT_THE_PHASE_COLORS_THE_FACE.md); [`cuda-continuation-01`](../evidence/observations/cuda-continuation-01/README.md) |
+| Exact host/card restriction | [`THE_CARD_RESTRICTS_THE_CAUSED_SUPPORT`](../research/records/2026-07-26_THE_CARD_RESTRICTS_THE_CAUSED_SUPPORT_THE_PHASE_COLORS_THE_FACE.md); [`cuda-continuation-01`](archive/cpp-engine/evidence/observations/cuda-continuation-01/README.md) |
 | Causal local fronts | [`THE_CURRENT_CROSSES_THE_LOCAL_FRONT`](../research/records/2026-07-27_THE_CURRENT_CROSSES_THE_LOCAL_FRONT_THE_FRAME_CANNOT_SCHEDULE_THE_EVENT.md) |
 | Dimension-independent causal algebra | [`THE_OPPOSED_ENDS_CAST_THE_CAUSAL_BODY`](../research/records/2026-07-27_THE_OPPOSED_ENDS_CAST_THE_CAUSAL_BODY_THE_SCALAR_IS_A_RECEIVER_RECEIPT.md) |
 | Prime fibers, sheaves, horns, recurrence | [`THE_PRIME_RECEIVES_THE_POLYNOMIAL`](../research/records/2026-07-27_THE_PRIME_RECEIVES_THE_POLYNOMIAL_THE_RESIDUE_TRANSPORT_EMERGES_FROM_THE_FIBERS.md); [`THE_INHERITED_POLYNOMIAL_ENTERS_THE_PRIME`](../research/records/2026-07-27_THE_INHERITED_POLYNOMIAL_ENTERS_THE_PRIME_THE_OPEN_HORN_BECOMES_A_CAUSED_CELL.md); [`THE_HORN_EMITS_THE_COEFFICIENT_FAMILY`](../research/records/2026-07-27_THE_HORN_EMITS_THE_COEFFICIENT_FAMILY_THE_RECEIVER_MEASURES_ITS_REFINEMENT.md); [`THE_INDUCED_FACE_RECURS`](../research/records/2026-07-27_THE_INDUCED_FACE_RECURS_THE_HOMOLOGOUS_PATHS_RETURN_ONE_FAMILY.md) |
@@ -96,7 +96,7 @@ schedule reconstruction.
 ## Formal mathematics and papers
 
 - **Elementary holonics Lean project — `formal-checked` for its contained declarations.** The clean
-  formal source is under `formal/elementary-holonics/`.
+  formal source is under `archive/cpp-engine/formal/elementary-holonics/`.
 - **RH source transport project — mixed `formal-checked`/`open`.** Finite transport and quotient
   family results are formalized; its proportional/positivity obstruction is explicitly retained.
 - **Typst mathematical corpus — mixed grades.** Definitions, proved statements, conditional RH

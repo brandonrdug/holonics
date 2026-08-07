@@ -1,0 +1,5 @@
+name = "soma_kernel_witness"
+defaultTargets = ["KernelWitness"]
+
+[[lean_lib]]
+name = "KernelWitness"

@@ -1,8 +1,13 @@
-I have measured the tree directly. Here is the document.
-
----
-
 # THE SPINE, THE CUT, AND THE TERRAIN
+
+> **SUPERSEDED 2026-08-07 — ARCHIVED-BODY PROVENANCE.** This file describes the C++/CUDA engine,
+> which was archived whole at `archive/cpp-engine/` when the body moved to Rust. Its mechanisms,
+> measurements and open items are **historical record**, not the present position and not a
+> schedule. The active spine is `CLAUDE.md` §0; the active roadmap is `blueprint/THE_ROADMAP.md`.
+> What it does not settle: it is a direct measurement of the C++ tree and remains the most complete
+> map of what that tree contained. Nothing here is deleted — a reader following a citation into this
+> file should find what it said, and this banner telling them it no longer governs.
+
 
 **Measured 2026-08-06 over the actual include graph. Every number below is computed, not cited.**
 

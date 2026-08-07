@@ -53,18 +53,56 @@ const DENSE_AXIS: i64 = 8;
 const DENSE_CELLS: usize = (DENSE_AXIS * DENSE_AXIS) as usize; // one square dense chart per lane
 const STANDING_AXIS: usize = 8;
 const STANDING_CELLS: usize = STANDING_AXIS * STANDING_AXIS; // the founded receiving chart
-const DEPTH: usize = 8; // carrier reservation depth (ample for the short bounded lights)
+const DEPTH: usize = 8; // the declared carrier reservation; RESERVATION_LIMITED_LANES states its excess
 /// Lane counts swept: single · pair · triple · one whole block · a non-multiple of 64.
 const LANE_COUNTS: [usize; 5] = [1, 2, 3, 64, 100];
 /// Exact `(FOLD, STEP, CUT)` counts emitted by the shared host/body producer for each swept cohort.
 /// This pins the radiation fixture itself before CUDA parity: an empty or weakened aperture fails.
+///
+/// **Regenerated 2026-08-07 against the carriage law, not against a prior receipt.** The 64- and
+/// 100-lane entries stood at `(256, 160, 38)` and `(408, 250, 67)` from the commit that first pinned
+/// them (laboratory `687e0899`) and were never regenerated across the ten later commits that
+/// changed `body::carriage`. Two of those commits moved the tuple, and each is a deliberate
+/// correction that updated its own in-crate tests in the same commit:
+///
+/// - laboratory `323522b7`, *publish the current Soma production spine* — a lineage that exhausted
+///   its carrier reservation used to fold a channel and unwind, manufacturing one FOLD and one STEP
+///   out of a capacity limit. That branch was replaced by preservation of the live continuation plus
+///   the explicit `required_carrier_rebase_depth` / `rebase_carrier_row` boundary. 64 lanes:
+///   `(256, 160, 38)` -> `(254, 158, 38)`.
+/// - laboratory `f6c3a688`, *stabilize Soma lifecycle and navigation baseline* — a completed
+///   enclosure has already handed its composite on, so `release_co_present` releases its lower
+///   arrivals before the triggering successor is admitted. 64 lanes: `(254, 158, 38)` ->
+///   `(255, 159, 35)`. Measured consequence: lane 32 now completes INSIDE the declared depth-8
+///   reservation, where under the prior law it demanded depth 9.
+///
+/// The implementation was graded, not the receipt. Host x86-64 and device nvptx64 `sm_89` return
+/// **byte-identical** radiation for every swept cohort — `radiation EXACT · canonical EXACT` — and
+/// the stale constant was the only disagreeing party.
 const EXPECTED_RADIATION_SPECIES: [(usize, usize, usize); 5] = [
     (3, 1, 1),
     (5, 2, 1),
     (8, 4, 1),
-    (256, 160, 38),
-    (408, 250, 67),
+    (255, 159, 35),
+    (407, 249, 62),
 ];
+/// The lanes still standing at the declared carrier reservation when their stroke ends —
+/// `required_carrier_rebase_depth` returns `Some(DEPTH + 1)` for exactly these and `None` for every
+/// other lane. `founded_reference` carries one fixed row per lane and never rebases, so such a
+/// lane's later octets stand as exact zero padding rather than as construction, and
+/// `validate_radiation` accepts that padding as a canonical species. Pinning the set makes the
+/// truncation a stated fact instead of a silent one.
+///
+/// **Raising `DEPTH` does not empty this set.** Measured 2026-08-07 at reservations 8, 9, 10, 12 and
+/// 16: lane 86 demands `reserved + 1` at every one of them. Its enclosure descent is not bounded by
+/// any reservation this gate can declare, so the gate keeps its declared aperture and states the
+/// excess rather than chasing it.
+///
+/// Only the host-side self-checks read it, so it is `cfg(test)`. Left at module scope it made the
+/// binary build emit `constant is never used` — a warning the receipt that introduced it did not
+/// report.
+#[cfg(test)]
+const RESERVATION_LIMITED_LANES: [&[usize]; 5] = [&[], &[], &[], &[], &[86]];
 /// The exact long worldline used by body::carriage's within-atom continuation gate.
 const CONTINUATION_LIGHT: &[u8] =
     b"the cat sat on the mat and then it ran to see an old dog who was far too shy \
@@ -1405,7 +1443,8 @@ mod tests {
 
     #[test]
     fn founded_reference_path_is_deterministic_and_nonvacuous() {
-        for (lanes, expected_species) in LANE_COUNTS.into_iter().zip(EXPECTED_RADIATION_SPECIES) {
+        for (at, lanes) in LANE_COUNTS.into_iter().enumerate() {
+            let expected_species = EXPECTED_RADIATION_SPECIES[at];
             let standing = vec![0u32; STANDING_CELLS * FORM_WORDS];
             let (packed, rows, total_own_cells) = pack_founded_light(lanes);
             let a = founded_reference(lanes, &standing, &packed, &rows, total_own_cells);
@@ -1437,6 +1476,40 @@ mod tests {
                 radiation_species(&a.3),
                 expected_species,
                 "the founded radiation fixture retains its exact non-vacuous FOLD/STEP/CUT species ({lanes} lanes)"
+            );
+            // The species tuple above is only readable beside the aperture it was measured at: a
+            // lane still standing at the reservation contributed a truncated construction, and
+            // nothing else in this gate would say so.
+            let row_words = carrier_row_words(DEPTH);
+            let limited: Vec<usize> = (0..lanes)
+                .filter(|lane| {
+                    required_carrier_rebase_depth(&a.1[lane * row_words..(lane + 1) * row_words])
+                        .is_some()
+                })
+                .collect();
+            assert_eq!(
+                limited,
+                RESERVATION_LIMITED_LANES[at],
+                "exactly the pinned lanes are still standing at the declared carrier reservation ({lanes} lanes)"
+            );
+        }
+    }
+
+    /// A fixture that cannot be made to disagree is not measuring the path it names. Perturb one
+    /// octet of the staged founded light — nothing else — and confirm the species tuple leaves its
+    /// pinned value in every swept cohort. Without this, regenerating the constant against its own
+    /// output would test nothing at all.
+    #[test]
+    fn the_founded_species_fixture_moves_when_the_reference_path_is_perturbed() {
+        for (at, lanes) in LANE_COUNTS.into_iter().enumerate() {
+            let standing = vec![0u32; STANDING_CELLS * FORM_WORDS];
+            let (mut packed, rows, total_own_cells) = pack_founded_light(lanes);
+            packed[0] ^= 0x5a; // one octet of lane zero's raw light
+            let perturbed = founded_reference(lanes, &standing, &packed, &rows, total_own_cells);
+            assert_ne!(
+                radiation_species(&perturbed.3),
+                EXPECTED_RADIATION_SPECIES[at],
+                "the pinned species tuple is a live measurement of the founded reference path ({lanes} lanes)"
             );
         }
     }

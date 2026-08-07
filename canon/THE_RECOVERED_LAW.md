@@ -262,7 +262,7 @@ The tracked hard evidence is `src/soma/observations/*/` with `RESULTS.md`, `anal
 | recruitment wall | sharper than stated: **broad union-based lexical recruitment followed by commitment-before-witness**, `S(R) = ∪_{f∈R} I(f)`; 2,701/11,795 ≈ 22.9%; 24 passages committed though none entered the witness |
 
 **The best-evidenced experiment in the laboratory is tracked and this project never cites it.**
-`observations/transport-foil-world-01/RESULTS.md`: two byte-identical forward bodies, identical
+`archive/cpp-engine/evidence/observations/transport-foil-world-01/RESULTS.md`: two byte-identical forward bodies, identical
 terminal face, identical scalar loss `L=1`, both residuals 1,610 octets with **identical octet
 inventory SHA-256** but differing at 165 ordered positions. Whole residual → changed RIDE/FOUND
 distribution and every later probe. **Scalar-quotient collapse → every artifact byte-exact.**

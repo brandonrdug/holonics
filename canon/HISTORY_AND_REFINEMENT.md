@@ -69,7 +69,7 @@ The current spine is:
 - `papers/source/synopsis/README.md` and its audited registry;
 - `papers/source/holonics/foundations.typ` for postulates/definitions;
 - the remaining dependency-ordered holonics entries;
-- `formal/elementary-holonics/` for formalized declarations; and
+- `archive/cpp-engine/formal/elementary-holonics/` for formalized declarations; and
 - dated research records for later causal-information, constitutive, boundary, hardware, and
   learning refinements.
 

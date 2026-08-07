@@ -67,9 +67,10 @@ The laboratory itself remains **frozen and dirty** and is still read only throug
 (`git -C /home/b/Workspaces/laboratory show a07ff376:<path>`). Never read its working tree, never
 write to it. That rule is unchanged.
 
-**No authority file was updated for the transition.** `THE_ORDER_OF_WORK.md`, `THE_SPINE.md`,
-`THE_FOUNDATION_REMAINDER.md`, `CONSTRUCTION_STATE.md`, and `CLAUDE.md` §0/§11/§13 all name C++
-headers that now resolve only under the archive. Verified by `find`:
+**No authority file had been updated for the transition when this roadmap was written.**
+`THE_ORDER_OF_WORK.md`, `THE_SPINE.md`, `THE_FOUNDATION_REMAINDER.md`, `CONSTRUCTION_STATE.md`, and
+`CLAUDE.md` §0/§11/§13 all named C++ headers that resolve only under the archive. Verified by
+`find`:
 
 | Header named as live by an authority file | Actually resolves at |
 |---|---|
@@ -82,12 +83,16 @@ headers that now resolve only under the archive. Verified by `find`:
 
 Each of those is the subject of a movement in `THE_ORDER_OF_WORK.md`. **Those six movements are
 not open work in this body.** They describe defects in an archived engine. Some of them name real
-mechanisms that must be *re-established* in Rust — the Chi pair and the enclosure carrier
-especially — and where that is true, the movement below says so and does not inherit the C++
-framing.
+mechanisms that must be *re-established* in Rust — the Chi pair especially — and where that is
+true, the movement below says so and does not inherit the C++ framing.
 
-`CLAUDE.md` §0 does name `THE_GROWN_CIRCUIT.md` as current direction. Everything below that line
-in `CLAUDE.md` still describes the C++ body as live.
+**Corrected 2026-08-07 by the movement "The record names the body it has".** The table above is
+kept because it is the finding, not because it is still the state. `CLAUDE.md` §0, §11 and §13 are
+rewritten against the Rust body; `CONSTRUCTION_STATE.md` is the live position record and the C++
+one moved to `archive/cpp-engine/CONSTRUCTION_STATE.md`; eleven blueprint files carry the archive
+banner. **The enclosure carrier turned out not to need re-establishing** — it has a live Rust owner
+at `crates/holonic-engine/src/exact_value.rs` that is stronger than the archived header, and what
+it needs is a driver. `tools/resolve_named_paths.py` is the permanent check.
 
 ---
 
@@ -223,6 +228,23 @@ already did and what remains.
 Nothing below Part one can be graded until Part one returns, because until then the repository
 cannot say which of its own claims survived the transition.
 
+> **RETURNED 2026-08-07.** All five movements ran and every one returned. Each carries a
+> **`Returned`** block below stating what it produced, what was measured, and — this is the part
+> that matters — **what an independent adversarial reader cut down.** Four of the five receipts
+> were graded `overstated` and one `holds`; no repair was refuted. The **repairs** survived every
+> attack. The **receipts** did not, and the corrections are recorded in place rather than in a
+> separate errata, because a receipt read later without its correction is the exact failure
+> `CLAUDE.md` §8 convicts: *grade the implementation, not the receipt.*
+>
+> The prose above each `Returned` block is the state the movement was **written against** and is
+> kept as provenance. Where it speaks in the present tense about a gap that has since closed, the
+> `Returned` block governs.
+>
+> **Measured 2026-08-07 16:0x**, after the adversarial pass and the repairs it caused:
+> `cargo test --workspace` → **758 passed, 0 failed, 14 ignored**, counted off the 37 `test result:`
+> lines rather than through a pipe. `python3 tools/resolve_named_paths.py` → **0 failures, exit 0**,
+> over 991 path tokens.
+
 ---
 
 #### The record names the body it has
@@ -257,6 +279,48 @@ be permanent.
 
 **Laboratory vs remains.** Not a laboratory question at all. This gap was created by the
 transition and is owed entirely here.
+
+**Returned 2026-08-07 — receipt graded `overstated`, repair holds.**
+
+The falsifier exists as a permanent script, `tools/resolve_named_paths.py`, with its declared
+absences in `tools/resolve_named_paths.allow`. It resolves 991 path tokens across the root,
+`canon/` and `blueprint/`, classifies each LIVE / PROVENANCE / ARCHIVE / MISSING, and exits
+non-zero when a live document names a path that does not resolve live. **0 failures.**
+`CONSTRUCTION_STATE.md` is a live position record again — a prior session had archive-bannered the
+only one, leaving the repository with none against document law §1.4 — and eleven documents now
+carry banners that schedule nothing.
+
+Three corrections to `CLAUDE.md` came out of it and are carried there in full: the certified exact
+enclosure carrier **is not owed as a port**, because `crates/holonic-engine/src/exact_value.rs` is
+a stronger owner than the archived header (exact rationals over dyadics, a four-state ordering with
+`Open`, Sturm isolation, three species of series-tail certificate) — but its remainder half has
+**zero driver references**, so it is written and never exercised. Four of the six convicted §13
+owners are not in the archive at all; they were *deleted*, at `2b562c8` and `40e1211`, which is the
+fail-closed rule actually working. And `hodge` in this body names the cellular-sheaf Hodge
+Laplacian in `sheaf_diffusion.rs`, a different object from the supported-realization mechanism §2
+and §11 are about — a reader grepping the word would conclude §11's carrier exists.
+
+**What the receipt claimed and could not support.** The gate reported `0 failures` on a checker
+with three ways to be talked out of a check, all three since closed:
+
+- A directory named **without** its trailing slash was skipped entirely. Planting
+  `archive/cpp-engine/src/include/holonics/event` in `CLAUDE.md` produced `FAILURES: 0`. The discriminator is now the
+  first segment — it must name a real top-level directory, live or archived — which admits
+  `research/records` while leaving `Z/p`, `dx/x`, `C/d` and `RIDE/FOUND` alone. Closing it
+  immediately surfaced a real dead token that had been hiding.
+- The archive banner was a whole-document off switch reachable by ordinary prose. A quoted example
+  banner planted at line 9 of the active roadmap took it from exit 1 to exit 0. The test is now
+  structural rather than a line window: a document's own banner is front matter, and an ordinary
+  prose paragraph appearing first means any banner below it is a quotation. Making that strict
+  exposed `THE_SPINE_THE_CUT_AND_THE_TERRAIN.md` opening with a leaked assistant sentence above its
+  own title, which was deleted rather than the rule being loosened.
+- The allow file could assert an absence that was **false** and the tool would honour it: the
+  exemption applied at any verdict, including LIVE, and a stale entry printed without affecting the
+  exit code. Both now refuse. Enforcing it caught `blueprint/THE_ROADMAP.md :: lakefile.toml`,
+  declared absent while the Lean import had already made it resolve live.
+
+A falsifier's own coverage is part of its grade, and a gate reporting zero is evidence only once
+its blind spots are known.
 
 ---
 
@@ -301,6 +365,30 @@ them**; `ExactReceiverCurrentLaw`, `LaboratorySourceAtlas`, `LeanKernelWorld`, a
 `CudaResidentTextMaterialAtlas` have zero test lines even there. Nothing about this movement is
 theory work. It is the cheapest movement in the document and it gates the whole proof line.
 
+**Returned 2026-08-07 — receipt graded `holds`. The only one of the five that did.**
+
+Scoped to `LeanMathematicsEcology`, the proof-production owner: 33 references, zero drivers. One
+composed driver, `soma/life/examples/eros_lean_proof_production.rs`, now conducts through it and
+returns its artifact. It reads the repository's real Lean corpus — 13 documents, 27,980 bytes —
+and returns 39 declaration organs, 229 binder charts, **0 retained source surfaces**, 31 proof
+paths, 9 admitted against 22 obstructed (6 mathematical, 16 environment), and 8 admitted paths that
+recruited an organ. Twelve declared controls, all holding. The `.lean` files themselves are
+returned to `output/lean-proof-production/` and inspected, not summarized into counts.
+
+The controls are load-bearing on the owner's actual behavior, and this was established the strong
+way. A compile-break falsifier only proves the driver names a symbol, so the verifier made a
+single-point **semantic** mutation instead — `push_candidate` in
+`soma/life/src/lean_mathematics/syntax.rs:402` forced to store an empty `declaration_lineage`. The
+driver returned `[FAILS] the kernel admitted at least one path that recruited a conditioned
+declaration organ`, holds fell 12 → 11, exit 1. Reverted bit-identical.
+
+**Two limits, neither of which changes the grade.** One of the twelve assertions cannot fail: *"no
+generated path names the removed declaration"* is unfalsifiable, because the generator draws names
+only from its own organ set, so once the organ is gone naming it is impossible. It is harmless and
+it is not evidence. And the corpus this driver conditions on is the Lean import from the movement
+above — the driver does not stand alone, and committing it without the corpus and the Lake project
+would leave it reading zero documents and dying at its own `.expect`. They are committed together.
+
 ---
 
 #### The Lean project returns to the tree
@@ -320,8 +408,8 @@ The real projects exist. Laboratory `a07ff376` carries
 `src/labyrinth/mathematics/lean/`. The archive carries
 `archive/cpp-engine/formal/{elementary-holonics, rh-source-transport}`.
 
-**No formal mathematical production can run in this repository today.** That is a hard stop on the
-objective, and it is a missing-file problem, not a research problem.
+**No formal mathematical production could run in this repository before 2026-08-07.** That was a
+hard stop on the objective, and it was a missing-file problem, not a research problem.
 
 **What replaces it.** Import `elementary-holonics` and `rh-source-transport` from `a07ff376` with
 their toolchain pins. Narrow `.gitignore` so that generated `.lake/` build output is ignored while
@@ -338,6 +426,37 @@ here.
 
 **Laboratory vs remains.** The laboratory has the projects, the toolchain pins, and 1,164
 source-free declaration organs. Remains: import, pin, unignore, and prove refusal.
+
+**Returned 2026-08-07 — receipt graded `overstated`, repair holds.**
+
+Three Lake projects stand in the tree: `soma/formal/{elementary-holonics, kernel-witness,
+rh-source-transport}`, 23 files, each byte-identical by blob hash to its source. `.gitignore` was
+narrowed so `.lake/build`, `.lake/packages` and the compiled artifacts are ignored while
+`lakefile.toml`, `lean-toolchain`, `lake-manifest.json` and every sibling `.lean` are tracked. The
+toolchain is pinned `leanprover/lean4:v4.27.0` and the driver records the version beside the
+verdict.
+
+The falsifier passed and has teeth. `soma/life/src/lean_mathematics.rs:811` really does shell
+`lake env lean` and grade on the process status; a real Lean 4.27.0 kernel refused four
+known-wrong terms — two of them for a *false statement*, not merely a malformed proof — and
+admitted one correct one. An independent verifier inverted the expectations and got
+`disagreements = 2` against a driver that exits non-zero on any disagreement, so the comparison
+can fail; and with `PATH` emptied the owner returns `Err(Io(...))` rather than a silent
+`Obstructed`, so an absent toolchain cannot read as a refusal.
+
+**What the receipt claimed and could not support.** *"Built a fourth Lean project — this is
+required, not decorative"* inverts the situation. `render()` ignores `source_scope`, the driver
+re-declares `exactCarrier` in its own prefix, and no submitted source emits an `import` — so the
+same owner pointed at the repository root, which contains no Lake project at all, returns
+**byte-identical verdicts**. The three declarations in `KernelWitness.lean` are never elaborated by
+any test or driver. What this movement established is that Lean 4.27.0 is installed and that
+`LeanKernelWorld` correctly wraps it — a real and previously undriven result — **not** that the
+returned projects are in the loop. Putting them in the loop is Part two's first movement.
+
+Second correction: the files did not come from the laboratory. All 23 are byte-identical to files
+already tracked under `archive/cpp-engine/formal/`, so the move is archive-to-live. The doctrine
+sanctions that, but the provenance story in the receipt was wrong, and *"the only tracked artifacts
+of formal mathematics in this repository"* was false when written.
 
 ---
 
@@ -368,9 +487,35 @@ constant against a broken law would be exactly the receipt-over-implementation d
 the proof line — it is here because a red suite makes every later green result unreadable, and
 because §8 says a drifted fixture is a claim about code that has not been checked against the code.
 
----
+**Returned 2026-08-07 — receipt graded `overstated`, repair holds.**
 
-#### Deposit and closure drift cross to Rust
+Diagnosed, and the constant was the stale side. `EXPECTED_RADIATION_SPECIES` moved
+`(256,160,38)` → `(255,159,35)` and `(408,250,67)` → `(407,249,62)`, **refounded against the law
+rather than regenerated against the output**: two named laboratory commits are cited with the
+mechanism each contributed, and the change adds a structural assertion
+(`RESERVATION_LIMITED_LANES`) plus a measurement at reservations 8/9/10/12/16. The failure was
+inherited, not introduced — `git show HEAD:soma/mount/src/bin/mount-scope-gate.rs` is
+byte-identical to the laboratory reference, as are all 20 files in `soma/body/src`.
+
+The falsifier is real and is not cherry-picked. Perturbing the founded reference path moves the
+tuple, and an independent verifier perturbed each of the first 64 words of `packed` separately: 57
+moved it, 7 did not, so the site the test perturbs is an ordinary sensitive one rather than a lucky
+one.
+
+**What the receipt claimed and could not support.** Its headline evidence was *"an independent
+implementation — two independently compiled realizations of the law agreed."* That is a check that
+cannot fail. `soma/mount/soma-kernel-cuda` declares `body = { path = "../../body" }` and imports
+`body::carriage::carry_founded_stroke_trusted`; both that and `carry_founded_stroke` tail into the
+**same** `carry_founded_with_layout`. The kernel crate's own header says so in bold: *"the law is
+NOT re-expressed."* Host/device parity therefore tests nvptx64 codegen and span carving — a wrong
+law returns the same wrong tuple on both sides and the gate still prints `radiation EXACT`. This is
+the archived body's own convicted pattern, a deed asserting its dependence as its success
+condition, applied to the piece the receipt billed highest. It was also unnecessary: the genuinely
+decisive evidence — the content of the removed branch — was in the same receipt, billed as
+background.
+
+`CLAUDE.md` §8's *"where an independent implementation exists, state both costs"* means an
+independent **implementation**. A second compilation of one source is not one.
 
 **The gap.** The artifact registry was built — **in C++, and it is archived.**
 `archive/cpp-engine/standing/MANIFEST.txt` carries `columns=path content_sha256 closure_sha256
@@ -404,6 +549,54 @@ distinction that caught the path-fold contamination has not been ported.
 **Laboratory vs remains.** The laboratory **did not have this** — it is the one place the archived
 C++ body led. Its absence is exactly why the laboratory lost its tiger outputs. Remains: the whole
 port, plus the 126 deposits.
+
+**Returned 2026-08-07 — receipt graded `overstated`; the fail-open it missed is now closed.**
+
+`soma/tools/standing-deposit` carries the manifest, depositor and verifier in Rust with the
+content/closure distinction intact, and `standing/` holds 43 deposited returns under three
+foundings. Both halves of the falsifier were exercised independently, including by a verifier who
+made its own perturbations: one flipped bit in a deposited octet gives
+`content_drift=1 closure_drift=0 verdict=REFUSED exit=1`; 23 octets appended to a founding's
+material gives `content_drift=0 closure_held=36 closure_drift=7 verdict=HELD exit=0`. The two
+responses differ in verdict **and** exit status, which is the distinction that caught the path-fold
+contamination. Four independent mutations of `registry.rs` each killed a disjoint set of tests, so
+the two halves are separately load-bearing and neither passes by the other's mechanism. The reader
+consumes the real archived 123-row C++ manifest natively — an independent implementation in the
+sense §8 actually means, since CMake computed those hashes.
+
+**What the receipt claimed and could not support.** *"`verify` REFUSES on content drift or an
+absent deposit"* had a counterexample. Corrupting **one character of a recorded hash inside
+`MANIFEST.txt`** made `is_hex64` false; the row fell through the parser's `if` with no `else`; and
+because `verify_manifest` iterates only rows that survived parsing, the deposit left the gate and
+the gate returned `verdict=HELD exit=0`. On that input class the port was **strictly weaker than
+the machinery it replaced** — `archive/cpp-engine/cmake/HolonicRegistry.cmake:41`'s looser `([0-9a-f]+)` matched the row and
+refused it on comparison. Failing open where superseded machinery failed closed is the §13 rule-3
+defect exactly. A second gap sat beside it: the verifier walked the manifest and asked the tree
+about each row, but never walked the tree and asked the manifest, so a file no row binds was
+invisible.
+
+Closed 2026-08-07 with three closures, each shown load-bearing by reverting it and watching exactly
+its own test fail:
+
+- A row **shaped** like a deposit — two adjacent 64-character fields — whose digests are not hex
+  now refuses as `CorruptDigest` instead of vanishing. Width-only, so it cannot fire on prose.
+- `deposited_returns` and `foundings` are compared against the rows actually read. This is the
+  strictly necessary one: it catches a row lost by **any** mechanism, including deletion outright,
+  which nothing else catches, and it alone would have closed the demonstrated attack. The archived
+  reader parsed that header and never compared it to anything.
+- A file under the manifest's own territory that no row binds is `unmanifested` and **refuses**.
+  Territory is the set of first path components the rows occupy, so `MANIFEST.txt` and `PLAN.txt`
+  are outside it by construction rather than by a name list that would rot. `deposit` now prunes a
+  return dropped from the plan, so superseded returns fail closed instead of lingering — bounded to
+  the new manifest's own roots, and skipped entirely when it has no rows, so an empty plan can
+  never destroy a standing.
+
+Both real manifests pass all three unchanged: live 43 rows against 43 files, archived 123 against
+123, zero strays in either.
+
+**Not closed.** The manifest can still drift from the standing in one direction — `deposit` binds
+what the plan names, and a *plan* that goes stale relative to its driver is not detected here. The
+126-deposit backfill is also not done; 43 stand.
 
 ---
 
@@ -481,8 +674,8 @@ drivers** and **the Lean project returns to the tree**.
 **Laboratory progress: none.** Never run. Its 2026-08-03 attempt is recorded as interrupted.
 
 **Archived C++ progress: ran, at toy scale.** `CONSTRUCTION_STATE.md:239-270`; artifacts at
-`archive/cpp-engine/receipts/CONDITIONED_PRODUCTION_DEED.txt`, `CONDITIONED_PRODUCTION_RECEIPT.md`,
-`HolonicsConditioned{One,Two,Foil}.lean`. Three declarations / 209 states → first theorem accepted
+`archive/cpp-engine/receipts/CONDITIONED_PRODUCTION_DEED.txt`, `archive/cpp-engine/receipts/CONDITIONED_PRODUCTION_RECEIPT.md`,
+`archive/cpp-engine/standing/artifacts/HolonicsConditioned{One,Two,Foil}.lean`. Three declarations / 209 states → first theorem accepted
 (382 source octets, 45,576 produced) → the acceptance admitted back as emanated material
 (occurrences 3→4, states 209→298) → second theorem accepted, naming the first, splicing its name
 out of the retained surface octet by octet (605 octets, 46,904 produced) → a foil with the same
@@ -781,7 +974,7 @@ and it is **the same gap as §11's one missing organ**, reached from the vision 
 closes both.**
 
 **What exists, honestly.** The certified exact enclosure carrier was `exact/enclosure.hpp` — four
-typed states over `exact/dyadic.hpp` and `exact/separation.hpp`, the enclosure defined as a **set
+typed states over `archive/cpp-engine/src/include/holonics/exact/dyadic.hpp` and `archive/cpp-engine/src/include/holonics/exact/separation.hpp`, the enclosure defined as a **set
 and never a value** — and it is **archived**. The trivial tree instance was Phase 7 movement one's
 suffix-link DFS interval labelling, also archived. On the Rust side, `enclosure` appears in
 `crates/holonic-engine/src/{coupled_informant, atmospheric_inverse, exact_value}.rs`,

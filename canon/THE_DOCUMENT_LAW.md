@@ -704,8 +704,13 @@ What this law does not yet describe, stated as facts rather than intentions. Eac
 **The transition commit `06518c3` ("Transition to Rust: archive the C++ body, import the laboratory
 machinery", 2026-08-07 13:12:16 -0700) touched zero documentation files.**
 `git show --name-status 06518c3 -- CLAUDE.md CONSTRUCTION_STATE.md README.md AGENTS.md canon blueprint research`
-returns empty against 1,651 renames. Every governing document still describes a C++/CUDA body that
-now lives under `archive/cpp-engine/`.
+returns empty against 1,651 renames.
+
+**Rows struck through below were closed later on 2026-08-07** by the movement "The record names the
+body it has", which rewrote `CLAUDE.md` §0/§11/§13 against the Rust body, made
+`CONSTRUCTION_STATE.md` a live position record, banner-demoted eleven blueprint files, and deposited
+`tools/resolve_named_paths.py` — a permanent mechanical check that every path a live document names
+resolves in the live tree. The remaining rows are unchanged and remain `open`.
 
 | Defect | Measurement | Genre affected |
 |---|---|---|
@@ -713,11 +718,11 @@ now lives under `archive/cpp-engine/`.
 | No supersession index exists | 3 of 314 records carry a banner; no index rows anywhere | §3.4 |
 | Record atlas is stale by seven | `research/README.md` claims *"all 307 laboratory research deposits present at extraction on 3 August 2026"*; 314 records tracked, 7 dated after 2026-08-03 | §1.6 |
 | Truth-status grades are nearly unused | 5 of 314 records carry a `**Truth status:**` line; 278 carry a bold band in a laboratory vocabulary with no crosswalk | §5 |
-| Two dead canon links | `canon/06_ESTABLISHED_CAPABILITIES.md:12` and `:14` point at `../evidence/observations/`, moved to `archive/cpp-engine/evidence/observations/` by `06518c3` | §4 |
-| `README.md` reading order is pre-transition | links `formal/`, `evidence/observations/`, `provenance/` (all archived) and names `blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md` as the second thing to read | §1.2 |
+| ~~Two dead canon links~~ **closed 14:30** | `canon/06_ESTABLISHED_CAPABILITIES.md:12` and `:14` pointed at `../evidence/observations/`, which `06518c3` moved under `archive/cpp-engine/`. Both now carry the archive path | §4 |
+| `README.md` reading order is pre-transition | still names `blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md` — now archive-bannered — as the second thing to read. Its `evidence/observations/` and `provenance/` links were repaired at 14:45; its `formal/` link now resolves, to `soma/formal/` | §1.2 |
 | Observation genre is empty | `observations/` absent; 139 directories, 118 with `RESULTS.md`, sit under `archive/cpp-engine/evidence/observations/` | §1.8 |
 | Ownership ledger absent, lint broken | `HOLONIC_OWNERSHIP.md` absent; `crates/holonic-architecture-lint` names a `BASELINE_PATH` that does not exist at the root and `PROTECTED_ROOTS` under `src/soma/`, so its ratchet covers none of `soma/` | §1.9 |
-| No archive banners | `archive/cpp-engine/` and `reference/` carry no demotion banner on any file | §1.10 |
+| ~~No archive banners~~ **partly closed 14:12** | eleven `blueprint/` files and `archive/cpp-engine/CONSTRUCTION_STATE.md` now carry the §1.10 banner. Still open: no file directly under `archive/cpp-engine/` or `reference/` carries one | §1.10 |
 | No `//! Record:` doclines | zero owners across 282 `.rs` files name a record | §4.2 |
 
 **None of this is scheduled here.** `CLAUDE.md` §9 governs what gets built and Brandon's latest

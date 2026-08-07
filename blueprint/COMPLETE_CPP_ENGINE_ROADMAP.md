@@ -1,5 +1,15 @@
 # Complete C++/CUDA engine construction roadmap
 
+> **SUPERSEDED 2026-08-07 — ARCHIVED-BODY PROVENANCE.** This file describes the C++/CUDA engine,
+> which was archived whole at `archive/cpp-engine/` when the body moved to Rust. Its mechanisms,
+> measurements and open items are **historical record**, not the present position and not a
+> schedule. The active spine is `CLAUDE.md` §0; the active roadmap is `blueprint/THE_ROADMAP.md`.
+> What it does not settle: the exact mathematical organs it built are ported nowhere yet, and which
+> of them the Rust body already owns is a per-owner question the roadmap asks by mechanism. Nothing
+> here is deleted — a reader following a citation into this file should find what it said, and this
+> banner telling them it no longer governs.
+
+
 **Authority:** ratified construction plan for the pure engine. Completed numbered constructions
 are provenance only. Live continuation is unnumbered and is governed by the consolidated floor in
 [`EROS_MATHEMATICS_PRODUCTION_FLOOR.md`](EROS_MATHEMATICS_PRODUCTION_FLOOR.md).

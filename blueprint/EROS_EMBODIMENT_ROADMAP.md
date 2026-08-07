@@ -1,5 +1,15 @@
 # Eros embodiment roadmap
 
+> **SUPERSEDED 2026-08-07 — ARCHIVED-BODY PROVENANCE.** This file describes the C++/CUDA engine,
+> which was archived whole at `archive/cpp-engine/` when the body moved to Rust. Its mechanisms,
+> measurements and open items are **historical record**, not the present position and not a
+> schedule. The active spine is `CLAUDE.md` §0; the active roadmap is `blueprint/THE_ROADMAP.md`.
+> What it does not settle: its per-owner laboratory source map is still the best index of where a
+> mechanism came from, and the roadmap uses it as such. Nothing here is deleted — a reader following
+> a citation into this file should find what it said, and this banner telling them it no longer
+> governs.
+
+
 **Authority.** Ordered construction plan for restoring the learning and information ecology in the
 one continuing C++23/CUDA body, and carrying it to the record's own terminal criterion. Supersedes
 the lettered A–H draft of 2026-08-05, which was cut wrong: it made mathematics the deliverable and

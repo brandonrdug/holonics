@@ -1339,14 +1339,17 @@ mod tests {
             matches!(selection, LeanTargetSelectionReceipt::Selected(_)),
             "selection={selection:#?}"
         );
+        // The kernel target is `kernel-witness`, the one formal project in this tree with no
+        // package requirement, so this test elaborates against Lean core alone and never touches
+        // the network. `elementary-holonics` and `rh-source-transport` both `require mathlib`;
+        // pointing a test at either makes `lake env lean` clone the Mathlib package cache on
+        // every `cargo test`. Scratch goes to the repository's ignored `/output/`, never under a
+        // project's `.lake/`.
         let project_root =
-            std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../formal/elementary-holonics");
-        let kernel = LeanKernelWorld::new(
-            &project_root,
-            project_root.join(".lake/agentic-research-kernel"),
-            2,
-        )
-        .unwrap();
+            std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../formal/kernel-witness");
+        let scratch_root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../../output/agentic-research-kernel");
+        let kernel = LeanKernelWorld::new(&project_root, scratch_root, 2).unwrap();
         let deed = lean.open_kernel_deed().unwrap();
         let deed_identity = deed.identity().to_owned();
         let returns = kernel.grade_all(deed.problem(), deed.candidates()).unwrap();

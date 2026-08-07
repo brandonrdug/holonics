@@ -28,11 +28,17 @@ phase returns its required artifact and passes its grade.
 
 ## Authority and evidence
 
-`canon/` is normative doctrine. `blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md` is the ordered
-construction authority; the other blueprint files contain contracts it composes.
-`research/`, `papers/`, `formal/`, and `evidence/` are evidence in their declared contexts.
+`canon/` is normative doctrine. `blueprint/THE_ROADMAP.md` is the ordered construction authority;
+the other blueprint files contain contracts it composes, and eleven of them now carry an archive
+banner and schedule nothing — `blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`, named here as the
+authority until 2026-08-07, is one of them.
+`research/`, `papers/`, and `soma/formal/` are evidence in their declared contexts; the C++ body's
+`evidence/` moved to `archive/cpp-engine/evidence/`.
 `reference/` is non-authoritative historical material. Status prose inside imported records never
 schedules work.
+
+**This file has not otherwise been audited for the Rust transition.** `CLAUDE.md` was; this is the
+Codex-facing twin and is not authority here.
 
 Every material claim must carry exactly one truth-status grade and any applicable evidence tags
 defined in `canon/EPISTEMIC_GRADES.md`. Never promote an interpretation, visualization, numerical

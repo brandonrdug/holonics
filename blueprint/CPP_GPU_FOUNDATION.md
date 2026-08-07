@@ -1,5 +1,16 @@
 # C++ and GPU production foundation
 
+> **SUPERSEDED 2026-08-07 — ARCHIVED-BODY PROVENANCE.** This file describes the C++/CUDA engine,
+> which was archived whole at `archive/cpp-engine/` when the body moved to Rust. Its mechanisms,
+> measurements and open items are **historical record**, not the present position and not a
+> schedule. The active spine is `CLAUDE.md` §0; the active roadmap is `blueprint/THE_ROADMAP.md`.
+> What it does not settle: the purity, ownership, no-float and grading requirements it states are
+> still in force — they are carried by `CLAUDE.md` and enforced by
+> `crates/holonic-architecture-lint`, not by this file. Nothing here is deleted — a reader following
+> a citation into this file should find what it said, and this banner telling them it no longer
+> governs.
+
+
 **Decision.** The production realization is modern C++ plus CUDA C++; Rust is historical evidence
 only. The semantic canon remains language-independent, but no alternative implementation is kept
 for compatibility. The GPU is the primary resident workhorse. The CPU is a boundary apparatus for

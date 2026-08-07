@@ -1,5 +1,14 @@
 # Eros mathematics-production floor
 
+> **SUPERSEDED 2026-08-07 — ARCHIVED-BODY PROVENANCE.** This file describes the C++/CUDA engine,
+> which was archived whole at `archive/cpp-engine/` when the body moved to Rust. Its mechanisms,
+> measurements and open items are **historical record**, not the present position and not a
+> schedule. The active spine is `CLAUDE.md` §0; the active roadmap is `blueprint/THE_ROADMAP.md`.
+> What it does not settle: its admission deadlock is corrected in `CLAUDE.md` §1, which governs.
+> Nothing here is deleted — a reader following a citation into this file should find what it said,
+> and this banner telling them it no longer governs.
+
+
 **Authority.** This file is the unnumbered `project-postulate` governing continuation of the
 current pure holonic engine for mathematics production. It is composed by
 [`COMPLETE_CPP_ENGINE_ROADMAP.md`](COMPLETE_CPP_ENGINE_ROADMAP.md); the roadmap remains the sole

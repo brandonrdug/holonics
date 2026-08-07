@@ -1,0 +1,87 @@
+# Declared absences — paths a live document names in order to say they do not exist.
+#
+# Format:  <document> :: <token> :: <reason>
+#
+# Reporting an absence is required conduct here ("a negative finding is a result"), so a
+# document that names a missing file on purpose must not be forced to invent one. Every
+# entry below is a claim that the named path is DELIBERATELY absent, and the reason says
+# why. `tools/resolve_named_paths.py` reports any entry that is no longer named by its
+# document, so this file cannot silently rot.
+#
+# This file is NOT for stale references. If a path is absent because a document was never
+# updated, fix the document.
+
+# --- Genres the document law defines and this repository has not built (§7) ---
+canon/THE_DOCUMENT_LAW.md :: THE_CLAIM_INDEX.md :: the claim index is specified in §1.5 and explicitly "not yet built"
+canon/THE_DOCUMENT_LAW.md :: HOLONIC_OWNERSHIP.md :: the ownership ledger is specified in §1.9 and explicitly "not yet built"
+canon/THE_DOCUMENT_LAW.md :: RESULTS.md :: the observation-result genre filename; §1.8 states the live genre is empty
+canon/THE_DOCUMENT_LAW.md :: evidence/observations/ :: named as the archived location; the live genre is empty by §1.8
+
+# `.agents/COMMUNE/` needs no entry: it resolves in the frozen laboratory at a07ff376, and
+# `/tmp/codex-clipboard-T9jMYB.png` needs none either — an absolute path outside this repository
+# is not a claim about this tree.
+
+# --- Named permanent losses. These resolve at no commit in either repository. ---
+CLAUDE.md :: output/arithmetic-dimensional-receiver/ :: the residue-stratum atlas, written to an untracked output directory and lost; §12 says so in the sentence that names it
+CONSTRUCTION_STATE.md :: output/arithmetic-dimensional-receiver/ :: same loss, recorded in the verified-position section as the third of its kind
+canon/THE_RECOVERED_LAW.md :: src/soma/runs/ :: the untracked laboratory directory that took the tiger figures and the semantics theorem with it; the citation is the point
+
+# --- The roadmap's own diagnosis of this movement's defect ---
+# THE_ROADMAP.md's table has one column of bare C++ header names and one column showing
+# where each actually resolves. The bare names are the DEFECT BEING REPORTED. Rewriting
+# them would erase the finding.
+blueprint/THE_ROADMAP.md :: body/live_machine.hpp :: left column of the roadmap's own table of headers named as live by an authority file
+blueprint/THE_ROADMAP.md :: body/spine_execute.hpp :: same table
+blueprint/THE_ROADMAP.md :: structure/transition_invariants.hpp :: same table
+blueprint/THE_ROADMAP.md :: event/checker_return_schema.hpp :: same table
+blueprint/THE_ROADMAP.md :: structure/chi_pair.hpp :: same table
+blueprint/THE_ROADMAP.md :: exact/enclosure.hpp :: same table
+
+# --- Owners removed by an excision, recoverable only from git history ---
+# CLAUDE.md §13 names each with the commit that deleted it, so a reader can check with
+# `git show <commit> -- <path>`. These are the "removed, not deprecated" rule working.
+CLAUDE.md :: event/cultivated_route.hpp :: deleted at 40e1211; §13 names that commit in the same table row
+CLAUDE.md :: cultivated_route.hpp :: same, basename form
+CLAUDE.md :: conditioning_law.hpp :: deleted at 2b562c8; §13 names that commit in the same table row
+CLAUDE.md :: conditioning_schema.hpp :: deleted at 2b562c8; same
+CLAUDE.md :: returned_fiber_exclusion_law.hpp :: deleted at 2b562c8; same
+
+# --- Runtime artifact names, not repository paths ---
+# A driver writes or reads these at run time; they are outputs under a gitignored directory.
+blueprint/THE_ROADMAP.md :: source-sha256.tsv :: read at run time by mms_reconnection_traversal.rs:1443
+blueprint/THE_ROADMAP.md :: summary.tsv :: written at run time by whole_receiver_holonic_complex.rs:74-87
+blueprint/THE_ROADMAP.md :: causal_layers.tsv :: same driver
+blueprint/THE_ROADMAP.md :: grain_cells.tsv :: same driver
+blueprint/THE_ROADMAP.md :: quotients.tsv :: same driver
+blueprint/THE_ROADMAP.md :: overlap_nerve.tsv :: same driver
+
+# --- A path a movement proposes to create ---
+blueprint/THE_ROADMAP.md :: crates/holonic-engine/src/homology.rs :: the integer-homology movement's target; absent by design until it is built
+
+# --- Genre filename in a section stating the genre is empty ---
+canon/THE_RECOVERED_LAW.md :: RESULTS.md :: the observation-result genre filename; the live genre is empty per THE_DOCUMENT_LAW.md §1.8
+
+# --- Directory names in sentences that report their absence or their move ---
+CLAUDE.md :: runs/ :: the untracked laboratory directory that took the tiger figures and the semantics theorem; the sentence names it to say it is gone
+canon/THE_DOCUMENT_LAW.md :: ../evidence/observations/ :: the historical "from" side of a defect row: where two canon links USED to point before 06518c3 moved the target
+canon/THE_DOCUMENT_LAW.md :: observations/ :: §1.8's defect row states the live observation genre directory is absent; that absence is the row
+canon/THE_QUOTE_NETWORK.md :: evidence/observations/ :: quoted inside a measurement of README's dead links; the deadness is the finding
+canon/THE_QUOTE_NETWORK.md :: provenance/ :: same measurement, same sentence
+AGENTS.md :: evidence/ :: named as the OLD location in the sentence that says it moved to archive/cpp-engine/evidence/
+canon/THE_DOCUMENT_LAW.md :: provenance/ :: named as a repaired README link; the token records what the link used to say
+
+# --- A source constant quoted verbatim, not an existence claim ---
+# Surfaced 2026-08-07 when the checker learned to see a directory written without its trailing
+# slash. The prose says "whose `DEFAULT_OUTPUT` is *literally*" and then quotes the string; the
+# constant really is that, at crates/holonic-engine/examples/curved_receiver_phase_atlas.rs:22.
+# It names an output location under `target/`, which is a build directory this checker prunes and
+# git ignores, so the token can never resolve and must never be "fixed" by inventing a path.
+canon/THE_QUOTE_NETWORK.md :: target/holonic-engine/curved-receiver-phase-atlas-tiger :: a verbatim quotation of DEFAULT_OUTPUT at curved_receiver_phase_atlas.rs:22; an output path under the pruned build directory
+
+# --- Build directories quoted as ignore patterns, not as paths to follow ---
+# `.lake/` is Lake's generated-artifact directory. All four mentions quote it as a `.gitignore`
+# pattern or a directory KIND ("generated `.lake/` build output is ignored"), never as a path a
+# reader should open. It cannot resolve here even where it physically exists, because its only
+# contents are `build/` and `packages/` — both in this checker's own PRUNED set.
+CONSTRUCTION_STATE.md :: .lake/ :: Lake's generated-artifact directory, quoted as an ignore pattern; its contents are inside the checker's PRUNED set
+blueprint/THE_ROADMAP.md :: .lake/ :: Lake's generated-artifact directory, quoted as an ignore pattern; its contents are inside the checker's PRUNED set

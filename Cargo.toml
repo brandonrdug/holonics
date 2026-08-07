@@ -29,6 +29,7 @@ members = [
   "soma/life",
   "soma/mount",
   "soma/tools/record-index",
+  "soma/tools/standing-deposit",
 ]
 # The rust-gpu kernel and the nvptx mount kernel each pin their own nightly.
 # Their compiled artifacts -- soma/kernel/soma.spv and the mount PTX -- are

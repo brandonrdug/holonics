@@ -59,11 +59,11 @@ have been declared.
 - [`papers/rendered/`](papers/rendered/) contains the rendered core papers.
 - [`formal/`](formal/) contains only project-owned Lean sources and project manifests; generated
   `.lake` packages and build products were excluded.
-- [`evidence/observations/`](evidence/observations/) contains human-readable result records and
+- [`archive/cpp-engine/evidence/observations/`](archive/cpp-engine/evidence/observations/) contains human-readable result records and
   structured reports from prior experiments.
 - [`reference/`](reference/) contains provenance-locked historical theory and code. Nothing there
   is linked into a new build by default.
-- [`provenance/`](provenance/) states exactly what was copied, what remains laboratory-only, and
+- [`archive/cpp-engine/provenance/`](archive/cpp-engine/provenance/) states exactly what was copied, what remains laboratory-only, and
   which claims are canonical, implemented, measured, conditional, conjectural, or open.
 
 ## Governing distinction
