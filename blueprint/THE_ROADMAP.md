@@ -970,10 +970,13 @@ mechanical change rather than a design question.
 
 #### A second receiver exhibits the gluing obstruction
 
-**The gap.** `THE_GROWN_CIRCUIT.md`: *"**Only one receiver has ever been constructed** — a single
-`ReceiverId(1)` with a hardcoded central ray family. Transition maps and the gluing obstruction have
-never been exercised on an image."* Confirmed at
-`crates/holonic-engine/examples/whole_receiver_holonic_complex.rs:44`.
+**The gap.** `THE_GROWN_CIRCUIT.md` states it as *"**Only one receiver has ever been
+constructed**"*, and **that wording is too strong — a grep refutes it.** Measured 2026-08-07: a
+dozen distinct `ReceiverId`s occur across the examples. The accurate claim is narrower and still
+damning: **no two receivers have ever held overlapping sections of one source with a map between
+them**, so no gluing could fail. `whole_receiver_holonic_complex.rs:44` constructs exactly one
+receiver, and the overlaps exercised in `analytic_field_transport.rs` are germ overlaps in the field
+atlas, not two receivers' sections.
 
 **The framework's central claim is receiver-relativity, and it has been tested with one receiver.**
 That is the shape of `CLAUDE.md` §8's tautology rule at the level of architecture: a receipt that
@@ -1005,6 +1008,51 @@ looking.
 **Laboratory vs remains.** The laboratory built the seam type, the overlap nerve, the quotient
 promotion, and every object the law acts on. It **constructed one receiver**. Remains: the second
 receiver, the transition maps, the obstruction return, the grain-1 render.
+
+**Returned 2026-08-07 in its exact-integer half — `crates/holonic-engine/src/gluing.rs`.**
+
+Two sections over one incidence, their overlap and their union, each checked to be a genuine
+subcomplex before it is read, and the gluing obstruction computed exactly. The standard name is
+**Mayer–Vietoris**, and the connecting map is the obstruction — not by analogy, it is the map saying
+what the union carries that neither piece does.
+
+The sentence the module exists for, measured on rims of length 6, 12, 25 and 64:
+
+```text
+left arc   betti_1 = 0     each arc is a tree and carries no loop
+right arc  betti_1 = 0
+union      betti_1 = 1     their union is the rim and carries one
+overlap    betti_0 = 2     and the loop comes from the overlap being DISCONNECTED
+obstruction              grade 1, rank 1
+```
+
+**The invariant lives in neither receiver; it exists only in their disagreement.** That is
+`CLAUDE.md` §0's *"an invariant is only visible across two frames"* made computable, and it is the
+first construction in this repository where receiver-relativity could have failed.
+
+**Synthetic, and deliberately not a toy.** Brandon's correction: a known answer that comes from the
+structure being small enough to eyeball is a regression. The known answers here come from
+independent routes at parameterized scale — the classification of surfaces, where a one-vertex
+genus-`g` model must return `betti = [1, 2g, 1]` and `chi = 2 − 2g`, swept `g = 1..8`; a `p`-fold
+attachment which must deposit exactly `Z/p`, swept `p = 2..9`; and every cover of a rim at three
+lengths across every split, whose union reading must reproduce the **direct** reading of the same
+support. Nothing here is checked by inspection.
+
+**The controls that make the obstruction mean something.** A cover that must glue — the identity
+overlap — must return **no** obstruction; a law that obstructs there is broken. And a section that
+is not closed under boundary is refused rather than read, because its invariants would describe a
+structure that does not exist.
+
+**One defect the controls caught, and it was the central definition.** The obstruction was first
+written as the naive difference `b_n(A∪B) − (b_n(A) + b_n(B))`. That double-counts the overlap: two
+arcs each carry one component, so it reports `−1` at grade zero — not an obstruction but the
+ordinary fact that two overlapping connected pieces union to one — and it reported an obstruction
+for the identity cover, which is precisely the case that must return nothing. The correct quantity
+is the rank of the connecting map, which the exact sequence determines once solved downward from the
+top. Reverting to the naive form kills the genus sweep, so the correction is load-bearing.
+
+**Remains:** two receivers as *ray families over an image* rather than as supports — the tiger phase
+atlas is the next material, on this same organ — plus the transition maps and the grain-1 render.
 
 ---
 

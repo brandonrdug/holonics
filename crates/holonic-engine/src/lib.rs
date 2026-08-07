@@ -87,6 +87,7 @@ pub mod exact_value;
 pub mod executor;
 pub mod field_atlas;
 pub mod generative_transport;
+pub mod gluing;
 pub mod graph_receiver;
 pub mod holonic_complex;
 pub mod image;
