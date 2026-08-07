@@ -10,7 +10,8 @@ add_executable(
   apparatus/host/spine_deed.cpp
   tests/model/spine_cases.cpp
   tests/model/ecology_cases.cpp
-  tests/model/cost_cases.cpp)
+  tests/model/cost_cases.cpp
+  tests/model/invariant_cases.cpp)
 target_include_directories(spine_device_deed PRIVATE "${PROJECT_SOURCE_DIR}/tests/model")
 target_link_libraries(
   spine_device_deed
@@ -21,7 +22,8 @@ add_executable(
   tests/conformance/spine_host_conformance.cpp
   tests/model/spine_cases.cpp
   tests/model/ecology_cases.cpp
-  tests/model/cost_cases.cpp)
+  tests/model/cost_cases.cpp
+  tests/model/invariant_cases.cpp)
 target_include_directories(spine_host_conformance PRIVATE "${PROJECT_SOURCE_DIR}/tests/model")
 target_link_libraries(
   spine_host_conformance

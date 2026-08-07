@@ -77,5 +77,21 @@ int main() {
               << cost.formation_linear << " lookup_linear=" << cost.lookup_linear << '\n';
     ++failures;
   }
+  const auto inv = holonics::tests::invariant_falsifiers();
+  if (!inv.holds) {
+    std::cerr << "TRANSITION INVARIANT FALSIFIER FAILED:"
+              << " prestate=" << inv.same_prestate_refuses
+              << " incidence=" << inv.no_false_incidence_refuses
+              << " occurrence=" << inv.occurrence_preservation_refuses
+              << " boundary=" << inv.boundary_refuses
+              << " attribution=" << inv.attribution_refuses
+              << " visibility=" << inv.visibility_refuses
+              << " rest=" << inv.rest_refuses
+              << " emission=" << inv.emission_refuses << '\n';
+    ++failures;
+  } else {
+    std::cerr << "transition invariants: all eight hold on a lawful crossing and"
+                 " refuse on an unlawful one\n";
+  }
   return failures == 0 ? 0 : 1;
 }

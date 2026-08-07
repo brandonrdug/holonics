@@ -57,3 +57,21 @@ struct cost_return final {
 };
 [[nodiscard]] cost_return suffix_cost_law();
 }  // namespace holonics::tests
+
+namespace holonics::tests {
+/// The falsifier for the eight transition invariants. Each must hold on a lawful
+/// transition AND refuse on an unlawful one; an invariant that cannot be made
+/// false is not being checked.
+struct invariant_return final {
+  bool same_prestate_holds{}, same_prestate_refuses{};
+  bool no_false_incidence_holds{}, no_false_incidence_refuses{};
+  bool occurrence_preservation_holds{}, occurrence_preservation_refuses{};
+  bool boundary_holds{}, boundary_refuses{};
+  bool attribution_holds{}, attribution_refuses{};
+  bool visibility_holds{}, visibility_refuses{};
+  bool rest_holds{}, rest_refuses{};
+  bool emission_holds{}, emission_refuses{};
+  bool holds{};
+};
+[[nodiscard]] invariant_return invariant_falsifiers();
+}  // namespace holonics::tests

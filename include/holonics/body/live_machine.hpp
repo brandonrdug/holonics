@@ -96,15 +96,22 @@ class live_machine final {
     }
     crossing.value = swing_law::cross(input, projection, winding_quantum);
     crossing.disposition = crossing.value.disposition;
-    crossing.grade = grade_transition(crossing.value);
-    if (!crossing.grade.complete()) {
-      return crossing;
-    }
+    // The standing does the work first, because a grader that has not seen the
+    // work cannot grade it. A refused grade leaves `root_` where it was, so the
+    // minted nodes become unreferenced residue and no completed event is undone.
+    const std::uint32_t population_before = standing_.used();
     std::uint32_t copied = 0;
     const std::uint32_t next_root = standing_.replace(root_, placed, copied);
     if (next_root == structure::no_ordinal) {
       crossing.grade.refused_at =
           static_cast<std::uint8_t>(structure::transition_invariant::bounded_emission);
+      return crossing;
+    }
+    const exact::word head_after{head_.value() + 1U};
+    crossing.grade = grade_transition(crossing.value, staged_predecessor, head_,
+        head_, head_after, population_before, standing_.used(), copied, 1U, 1U,
+        structure::causal_attribution::contacted);
+    if (!crossing.grade.complete()) {
       return crossing;
     }
     root_ = next_root;
@@ -139,27 +146,56 @@ class live_machine final {
   }
 
  private:
+  /// Grade one crossing against the states it actually passed through.
+  ///
+  /// Until 2026-08-06 this took only the return and admitted **seven of the
+  /// eight** invariants with a literal `true`: the one move was certified by
+  /// assignment. A grader that receives only a return cannot check a transition,
+  /// so it now receives the prestate, the placement, and the work the standing
+  /// did. Every bit below is computed, and every one can be false.
   [[nodiscard]] HOLONICS_CALLABLE static constexpr structure::transition_grade
-  grade_transition(const swing_return& returned) noexcept {
+  grade_transition(
+      const swing_return& returned,
+      exact::word declared_predecessor,
+      exact::word met_predecessor,
+      exact::word head_before,
+      exact::word head_after,
+      std::uint32_t population_before,
+      std::uint32_t population_after,
+      std::uint32_t copied,
+      std::uint32_t placements,
+      std::uint32_t advanced_lineages,
+      structure::causal_attribution attribution) noexcept {
     using structure::transition_invariant;
+    namespace law = structure::transition_law;
     structure::transition_grade grade{};
     const bool concluded = returned.disposition.concluded();
-    grade = structure::transition_law::admit(
-        grade, transition_invariant::same_prestate_atomicity, true);
-    grade = structure::transition_law::admit(
-        grade, transition_invariant::no_false_incidence, true);
-    grade = structure::transition_law::admit(
-        grade, transition_invariant::occurrence_preservation, true);
-    grade = structure::transition_law::admit(
-        grade, transition_invariant::oriented_boundary_validity, true);
-    grade = structure::transition_law::admit(
-        grade, transition_invariant::causal_attribution, true);
-    grade = structure::transition_law::admit(
-        grade, transition_invariant::one_visibility_edge, true);
-    grade = structure::transition_law::admit(
-        grade, transition_invariant::rest_performs_no_event, true);
-    grade = structure::transition_law::admit(
-        grade, transition_invariant::bounded_emission, concluded);
+    const bool founded =
+        returned.disposition.state == structure::disposition::found;
+    const exact::word met[1]{met_predecessor};
+    grade = law::admit(grade, transition_invariant::same_prestate_atomicity,
+        law::same_prestate(declared_predecessor, met, 1));
+    // No false incidence: the successor grew by exactly the cells the
+    // replacement minted along the touched path, and by nothing else.
+    grade = law::admit(grade, transition_invariant::no_false_incidence,
+        population_after >= population_before &&
+            population_after - population_before <= copied + placements);
+    // The population must grow by exactly what the replacement minted. Passing
+    // the observed difference as the caused count would make this tautological,
+    // which is how a predicate becomes a constant without looking like one.
+    grade = law::admit(grade, transition_invariant::occurrence_preservation,
+        law::occurrences_preserved(population_before, copied + placements,
+            population_after));
+    grade = law::admit(grade, transition_invariant::oriented_boundary_validity,
+        law::boundary_parallel(returned.retained.composed, returned.retained.direct));
+    grade = law::admit(grade, transition_invariant::causal_attribution,
+        law::attribution_matches(attribution, founded, concluded));
+    grade = law::admit(grade, transition_invariant::one_visibility_edge,
+        law::single_visibility_edge(placements, advanced_lineages));
+    grade = law::admit(grade, transition_invariant::rest_performs_no_event,
+        law::rest_is_eventless(head_before, head_after, concluded));
+    grade = law::admit(grade, transition_invariant::bounded_emission,
+        law::emission_bounded(placements, population_before + copied));
     return grade;
   }
 

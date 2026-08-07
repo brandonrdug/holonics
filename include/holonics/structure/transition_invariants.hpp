@@ -143,5 +143,46 @@ template<std::size_t Capacity>
   return emitted <= interior_visited;
 }
 
+/// Oriented boundary validity: the two transports of a Chi are a genuine
+/// **parallel pair** — same source, same target, distinct identities. A pair
+/// that does not share both endpoints is not two routes between the same two
+/// places, and the residual between them measures nothing.
+[[nodiscard]] HOLONICS_CALLABLE constexpr bool boundary_parallel(
+    const local_transport& composed,
+    const local_transport& direct) noexcept {
+  return transport_law::admitted(composed) && transport_law::admitted(direct) &&
+      composed.source == direct.source && composed.target == direct.target &&
+      composed.identity != direct.identity;
+}
+
+/// Causal attribution: the four provenances stay distinguishable, and the
+/// disposition must match how the difference arrived.
+///
+/// **A FOUND may only issue from material that arrived** — contacted, or the
+/// body's own emanation returning. **A RIDE may only issue from what already
+/// stands** — inherited terrain, or a prior return. That is the Swing's
+/// asymmetry read as an attribution law: founding pays curvature and therefore
+/// needs something new; riding is cheap because the terrain already paid.
+[[nodiscard]] HOLONICS_CALLABLE constexpr bool attribution_matches(
+    causal_attribution attribution,
+    bool founded,
+    bool concluded) noexcept {
+  if (!concluded) {
+    return true;
+  }
+  const bool arrived = attribution == causal_attribution::contacted ||
+      attribution == causal_attribution::self_emanated;
+  return founded == arrived;
+}
+
+/// One visibility edge: a crossing exposes exactly one edge to the world. Not
+/// zero — that is a crossing that changed nothing while claiming to conclude —
+/// and not several, which would make the successor's visibility ambiguous.
+[[nodiscard]] HOLONICS_CALLABLE constexpr bool single_visibility_edge(
+    std::uint32_t placements,
+    std::uint32_t advanced_lineages) noexcept {
+  return placements == 1U && advanced_lineages == 1U;
+}
+
 }  // namespace transition_law
 }  // namespace holonics::structure
