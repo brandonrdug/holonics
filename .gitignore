@@ -1,17 +1,7 @@
-target/
-build/
-build-*/
-cmake-build-*/
-.cache/
-.lake/
-.venv/
-__pycache__/
-*.pyc
-*.tmp
+/target/
+/output/
+/runs/
+/data/
+/tmp/
 *.log
-.DS_Store
-
-# Future runtime material is evidence only after deliberate admission.
-runs/
-data/
-tmp/
+.lake/

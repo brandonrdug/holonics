@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Soma receiver observatory</title>
+  <link rel="stylesheet" href="observatory.css">
+</head>
+<body>
+  <header class="instrument-header">
+    <div class="title-block">
+      <p class="eyebrow">Soma receiver instrument · read only</p>
+      <h1>Receiver observatory</h1>
+    </div>
+    <div class="header-context" aria-label="Current receiving context">
+      <span><b>World</b><output id="construction-id">prime field</output></span>
+      <span><b>Receiver</b><output id="comparison-name">193 relative to zero</output></span>
+      <span><b>Cut</b><output id="cut-name">residue product</output></span>
+    </div>
+    <div class="load-state">
+      <span class="state-lamp" id="state-lamp" data-state="loading"></span>
+      <output id="load-status" role="status">Receiving exact artifacts</output>
+      <label class="file-action">
+        Open report
+        <input id="report-file" type="file" accept="application/json,.json">
+      </label>
+    </div>
+  </header>
+
+  <main class="workbench">
+    <aside class="construction-rail" aria-label="Receiver controls">
+      <section>
+        <p class="eyebrow">Receiving field</p>
+        <h2 class="rail-title">Instrument</h2>
+        <div class="mode-switch mode-switch-four" role="group" aria-label="Observation lens">
+          <button class="mode-button is-active" data-view="prime">Prime</button>
+          <button class="mode-button" data-view="zeta">Zeta</button>
+          <button class="mode-button" data-view="critical">Critical</button>
+          <button class="mode-button" data-view="carrier">Carrier</button>
+        </div>
+      </section>
+
+      <section id="prime-controls">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Zero-relative arithmetic</p>
+            <h2>Prime receiver</h2>
+          </div>
+        </div>
+        <label class="field-label" for="prime-lens">Local section</label>
+        <select id="prime-lens">
+          <option value="receiver">Exact axis section</option>
+          <option value="succession">Succession strings / sheets</option>
+          <option value="wheel">Primorial restriction / rebase</option>
+        </select>
+        <div id="receiver-controls">
+          <label class="field-label" for="prime-receiver">Receiving integer</label>
+          <div class="number-pair">
+            <input id="prime-receiver" type="range" min="2" max="509" value="193">
+            <input id="prime-receiver-number" type="number" min="2" max="509" value="193">
+          </div>
+          <div id="succession-axis-controls" hidden>
+            <label class="field-label" for="prime-axis">Held prime axis</label>
+            <select id="prime-axis"></select>
+          </div>
+          <label class="field-label" for="prime-span">Succession aperture <output id="prime-span-value">±6</output></label>
+          <input id="prime-span" type="range" min="1" max="24" value="6">
+        </div>
+        <div id="wheel-controls" hidden>
+          <label class="field-label" for="wheel-step">Founded axis</label>
+          <select id="wheel-step"></select>
+        </div>
+        <p class="instrument-note">Phase is retained as ζ<sub>p</sub><sup>r</sup>. Every requested cyclotomic embedding comes from a named rational series with its tail still present. The axis section and succession sweep are distinct reads.</p>
+      </section>
+
+      <section id="zeta-controls" hidden>
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Probability as recurrence</p>
+            <h2>Zeta scale-turn</h2>
+          </div>
+        </div>
+        <label class="field-label" for="zeta-lens">Relation</label>
+        <select id="zeta-lens">
+          <option value="series">Prime powers / complex series</option>
+          <option value="rebase">Valuation restriction / rebase</option>
+        </select>
+        <div id="zeta-series-controls">
+          <label class="field-label" for="zeta-zero">Zero character</label>
+          <select id="zeta-zero"></select>
+          <label class="field-label" for="zeta-sample">Receiver pivot</label>
+          <select id="zeta-sample"></select>
+          <label class="field-label" for="zeta-epsilon">Normal sheet ε</label>
+          <select id="zeta-epsilon">
+            <option value="0">0 · unitary seam</option>
+            <option value="1/16">+1/16</option>
+            <option value="-1/16">−1/16</option>
+            <option value="1/8">+1/8</option>
+            <option value="-1/8">−1/8</option>
+            <option value="1/4">+1/4</option>
+            <option value="-1/4">−1/4</option>
+          </select>
+        </div>
+        <div id="zeta-rebase-controls" hidden>
+          <label class="field-label" for="zeta-cylinder">Valuation cylinder</label>
+          <select id="zeta-cylinder"></select>
+          <label class="field-label" for="zeta-phase">Amplitude hand</label>
+          <select id="zeta-phase"></select>
+        </div>
+        <p class="instrument-note">Prime scale remains the formal word k·ℓ<sub>p</sub>. Each ℓ<sub>p</sub>, zero character, and complex exponential is inspectable as retained rational terms and a rational tail enclosure.</p>
+      </section>
+
+      <section id="critical-controls" hidden>
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Completed-Zeta receiver</p>
+            <h2>Critical receiver</h2>
+          </div>
+        </div>
+        <label class="field-label" for="critical-lens">Relation</label>
+        <select id="critical-lens">
+          <option value="field">Rational Smith field</option>
+          <option value="residual">Imported residual intervals</option>
+        </select>
+        <label class="field-label" for="critical-zero">Cayley pivot</label>
+        <select id="critical-zero"></select>
+        <label class="field-label" for="explicit-sample">Explicit-formula sample</label>
+        <select id="explicit-sample"></select>
+        <label class="field-label" for="critical-epsilon">Normal sheet ε</label>
+        <select id="critical-epsilon">
+          <option value="0">0 · unitary seam</option>
+          <option value="1/16">+1/16</option>
+          <option value="-1/16">−1/16</option>
+          <option value="1/8">+1/8</option>
+          <option value="-1/8">−1/8</option>
+        </select>
+        <p class="instrument-note">The Smith sphere is rationally parameterized. The finite zero field remains a factored relation; no product, gradient population, or residual interval is collapsed to one floating scalar.</p>
+      </section>
+
+      <section id="carrier-controls" hidden>
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Topology-only testimony</p>
+            <h2>Carrier audit</h2>
+          </div>
+        </div>
+        <label class="field-label" for="carrier-cut">Rest cut</label>
+        <select id="carrier-cut"></select>
+        <label class="field-label" for="carrier-constituent">Constituent</label>
+        <select id="carrier-constituent"></select>
+        <div class="path-cut">
+          <label><span class="field-label">Boundary</span><select id="carrier-boundary"></select></label>
+          <label><span class="field-label">Path</span><select id="carrier-path"></select></label>
+        </div>
+        <button id="inspect-constituent" class="quiet-button full-button">Inspect whole counts</button>
+        <p class="instrument-note warning-note">This rest wire retained topology but not the application inscription. It cannot tell you what the linguistic relation was about; only the selected causal path is rendered.</p>
+      </section>
+
+      <section id="module-controls">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Observer parameterization</p>
+            <h2>Declared section</h2>
+          </div>
+          <button id="reset-view" class="quiet-button">Reset</button>
+        </div>
+        <label class="field-label" for="receiver-zoom">Section scale</label>
+        <input id="receiver-zoom" type="range" min="70" max="180" value="100">
+        <fieldset class="layer-list">
+          <legend>Visible relations</legend>
+          <label><input type="checkbox" data-layer="sheet" checked><span>Receiver sheets</span></label>
+          <label><input type="checkbox" data-layer="transport" checked><span>Carried paths</span></label>
+          <label><input type="checkbox" data-layer="frames" checked><span>Axes / incidence</span></label>
+          <label><input type="checkbox" data-layer="residual" checked><span>Closures / residuals</span></label>
+          <label><input type="checkbox" data-layer="contacts" checked><span>Crossings</span></label>
+          <label><input type="checkbox" data-layer="labels" checked><span>Exact labels</span></label>
+        </fieldset>
+        <p class="instrument-note">Click any mark for its exact relation. Scaling changes only this declared receiver section; there is no free-orbit camera.</p>
+      </section>
+
+      <section class="gauge-readout">
+        <p class="eyebrow">Receiver declaration</p>
+        <dl>
+          <div><dt>Root</dt><dd id="gauge-root">integer 193</dd></div>
+          <div><dt>Coordinates</dt><dd id="gauge-embedding">modular phase</dd></div>
+          <div><dt>Metric</dt><dd id="gauge-metric">formal σ·ℓₚ</dd></div>
+          <div><dt>Intrinsic</dt><dd id="gauge-intrinsic">fixed stratum flat</dd></div>
+          <div><dt>Selected</dt><dd id="gauge-selected">0</dd></div>
+          <div><dt>Presented</dt><dd id="gauge-presented">0</dd></div>
+        </dl>
+      </section>
+    </aside>
+
+    <section class="field-workspace" aria-label="Receiver-relative field">
+      <header class="field-header">
+        <div>
+          <p class="eyebrow" id="field-kicker">Common-lift residue bundle</p>
+          <h2 id="field-title">One integer through distinct prime fibers</h2>
+        </div>
+        <div class="field-status">
+          <span class="legend-key primary" id="primary-legend">Receiver</span>
+          <span class="legend-key sibling" id="sibling-legend">Second path</span>
+          <span class="legend-key ride" id="ride-legend">Survives / returns</span>
+          <span class="legend-key found" id="found-legend">Pole / seam</span>
+        </div>
+      </header>
+
+      <div class="viewport-shell" id="viewport-shell">
+        <canvas id="scene" aria-label="Receiver-relative geometric field"></canvas>
+        <div class="viewport-label viewport-label-left" id="left-viewport-label">receiver 193 · relative to zero</div>
+        <div class="viewport-label viewport-label-right" id="right-viewport-label">σ = 2</div>
+        <div class="projection-notice">
+          <strong id="projection-label">Declared receiver</strong>
+          <span id="projection-notice">Residues and formal scale words remain exact; pixels are disposable.</span>
+        </div>
+        <div class="axis-cue" aria-hidden="true">
+          <span class="axis-x" id="axis-x">phase</span>
+          <span class="axis-y" id="axis-y">zero</span>
+          <span class="axis-z" id="axis-z">σ·ℓₚ</span>
+        </div>
+      </div>
+
+      <section class="comparison-band" aria-label="Interpretation boundary">
+        <div class="comparison-verdict">
+          <p class="eyebrow">What this field says</p>
+          <strong id="comparison-verdict">193 survives every prior residue pole and founds a new axis.</strong>
+          <span id="comparison-detail">The nested drawing is one section of a product of loops, not an absolute body.</span>
+        </div>
+        <div id="invariant-strip" class="invariant-strip"></div>
+      </section>
+    </section>
+
+    <aside class="exact-inspector" aria-label="Exact relation inspector">
+      <header class="inspector-header">
+        <div>
+          <p class="eyebrow">Exact selection</p>
+          <h2 id="selection-title">Receiver summary</h2>
+        </div>
+        <button id="clear-selection" class="quiet-button" disabled>Clear</button>
+      </header>
+      <div class="selection-kind" id="selection-kind">Observer declaration</div>
+      <dl class="exact-fields" id="exact-fields"></dl>
+      <section class="raw-record">
+        <div class="raw-heading">
+          <div>
+            <p class="eyebrow">Exact testimony</p>
+            <h3>Receipt fragment</h3>
+          </div>
+          <button id="copy-record" class="quiet-button">Copy</button>
+        </div>
+        <pre id="raw-json"></pre>
+      </section>
+    </aside>
+
+    <section class="lifecycle-rail" aria-label="Analytical receipt data">
+      <header>
+        <div>
+          <p class="eyebrow">Canonical analytical receipt</p>
+          <h2 id="lifecycle-title">Exact data</h2>
+        </div>
+        <div class="analysis-actions">
+          <span id="analysis-extent">0 rows</span>
+          <button id="export-analysis" class="quiet-button">Export receipt</button>
+        </div>
+      </header>
+      <div class="analysis-browser">
+        <label for="analysis-dataset">Relation</label>
+        <select id="analysis-dataset"></select>
+        <div class="analysis-table-wrap">
+          <table id="analysis-table">
+            <thead id="analysis-table-head"></thead>
+            <tbody id="analysis-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="instrument-footer">
+    <span>Λ fixed</span>
+    <span>receiver metric declared</span>
+    <span>display section disposable</span>
+    <span id="artifact-schema">schema pending</span>
+  </footer>
+
+  <script src="exact-series.js"></script>
+  <script src="observatory-core.js"></script>
+  <script src="scene-renderer.js"></script>
+  <script src="observatory.js"></script>
+</body>
+</html>

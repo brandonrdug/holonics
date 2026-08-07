@@ -1,0 +1,62 @@
+# The holonic body.
+#
+# One workspace, not six. The laboratory carried a root workspace of 772 packages
+# whose only purpose was to host a Bevy-era sandbox, and a separate soma
+# workspace of 190 that the actual body built against. The sandbox is not here.
+#
+# `body` is pure law: no_std, zero dependencies. `crates/holonic-structure` is the
+# substrate — ordinal and relation atlases, local populations, branch lineage,
+# typed atomic membrane. `crates/relational-geometry` and `crates/holonic-engine`
+# are the exact receiver-relative geometry, float-free over BigRational with
+# Sturm-certified algebraic roots. `crates/holonic-language` is the reflective
+# runtime. `soma/life` is the membrane where the ecologies live.
+#
+# Excluded on purpose: the rust-gpu kernel and the nvptx mount kernel each pin
+# their own nightly and publish a committed boundary artifact, so the host
+# workspace never needs those targets.
+[workspace]
+resolver = "2"
+members = [
+  "crates/holonic-structure",
+  "crates/holonic-language",
+  "crates/relational-geometry",
+  "crates/holonic-engine",
+  "crates/holonic-architecture-lint",
+  "soma/body",
+  "soma/abi",
+  "soma/membrane",
+  "soma/surface",
+  "soma/life",
+  "soma/mount",
+  "soma/tools/record-index",
+]
+# The rust-gpu kernel and the nvptx mount kernel each pin their own nightly.
+# Their compiled artifacts -- soma/kernel/soma.spv and the mount PTX -- are
+# committed boundary objects that soma-surface and mount include directly, so
+# the host workspace carries the artifact without carrying the toolchain.
+exclude = [
+  "soma/kernel",
+  "soma/kernel/builder",
+  "soma/mount/mount-smoke-kernel",
+  "soma/mount/soma-kernel-cuda",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+
+[workspace.dependencies]
+holonic-structure = { path = "crates/holonic-structure" }
+relational-geometry = { path = "crates/relational-geometry" }
+serde = { version = "1", features = ["derive", "rc"] }
+ron = "0.12"
+num-bigint = { version = "0.4", features = ["serde"] }
+num-rational = { version = "0.4", features = ["serde"] }
+num-traits = "0.2"
+sha2 = "0.10"
+thiserror = "2"
+
+[profile.release]
+opt-level = 3
+lto = true

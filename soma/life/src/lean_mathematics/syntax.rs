@@ -1,0 +1,565 @@
+use super::*;
+
+pub(super) fn declaration_proof_face(returned: &LeanKernelReturn) -> LeanDeclarationProofFace {
+    LeanDeclarationProofFace {
+        proof_sha256: sha256(returned.candidate.proof.as_bytes()),
+        source_sha256: returned.source_sha256.clone(),
+        motions: LocalSequence::from_slice(&returned.candidate.motions),
+        declaration_lineage: LocalSequence::from_iter(
+            returned.candidate.declaration_lineage.iter().cloned(),
+        ),
+    }
+}
+
+pub(super) fn proof_family_matches_paths(
+    proofs: &LocalSequence<LeanDeclarationProofFace>,
+    paths: &LocalSequence<LeanReturnedProofPath>,
+) -> bool {
+    proofs.len() == paths.len()
+        && proofs.iter().zip(paths).all(|(proof, path)| {
+            proof.proof_sha256 == path.proof_sha256
+                && proof.source_sha256 == path.source_sha256
+                && proof.motions == path.motions
+                && proof.declaration_lineage == path.declaration_lineage
+        })
+}
+
+pub(super) fn merge_kernel_admitted_organ(
+    family: &mut LeanDeclarationOrgan,
+    member: LeanDeclarationOrgan,
+) -> Result<(), LeanMathematicsError> {
+    if family.source != member.source
+        || family.name != member.name
+        || family.binders != member.binders
+        || family.statement_identifiers != member.statement_identifiers
+        || family.result_constructors != member.result_constructors
+    {
+        return Err(LeanMathematicsError::Parse(
+            "kernel-admitted paths did not return one common theorem face".to_owned(),
+        ));
+    }
+    family.tactic_species.extend(member.tactic_species);
+    family
+        .referenced_declarations
+        .extend(member.referenced_declarations);
+    Ok(())
+}
+
+/// Reify the plural proof family as one theorem declaration. Each independently kernel-admitted
+/// path is elaborated as a proof of the common theorem result. Proof irrelevance then glues their
+/// co-present sections; candidate chronology is retained for lineage but never used as a score.
+pub(super) fn family_composite_declaration(
+    problem: &LeanProofProblem,
+    returns: &LeanKernelReturnFamily,
+) -> Result<String, LeanMathematicsError> {
+    let result_at =
+        first_top_level_colon(&problem.theorem_header).ok_or(LeanMathematicsError::EmptyProblem)?;
+    let result = problem.theorem_header[result_at + 1..].trim();
+    if result.is_empty() {
+        return Err(LeanMathematicsError::EmptyProblem);
+    }
+    let mut declaration = format!("{} := by", problem.theorem_header);
+    let mut admitted = 0usize;
+    for returned in returns.kernel_admitted() {
+        declaration.push_str(&format!(
+            "\n  have family_path_{admitted} : {result} := {}",
+            returned.candidate.proof.replace('\n', "\n  ")
+        ));
+        admitted = admitted
+            .checked_add(1)
+            .ok_or(LeanMathematicsError::CarrierExtent)?;
+    }
+    if admitted == 0 {
+        return Err(LeanMathematicsError::NoKernelAdmittedProof);
+    }
+    declaration.push_str(&format!(
+        "\n  have family_fold_0 : {result} := family_path_0"
+    ));
+    for at in 1..admitted {
+        let prior = at - 1;
+        declaration.push_str(&format!(
+            "\n  have family_glue_{at} : family_path_0 = family_path_{at} := Subsingleton.elim _ _\n  have family_fold_{at} : {result} := Eq.ndrec (motive := fun _ => {result}) family_fold_{prior} family_glue_{at}"
+        ));
+    }
+    declaration.push_str(&format!("\n  exact family_fold_{}", admitted - 1));
+    Ok(declaration)
+}
+
+pub(super) fn returned_proof_path(returned: &LeanKernelReturn) -> LeanReturnedProofPath {
+    let mut declaration_lineage = LocalSequence::new();
+    for declaration in &returned.candidate.declaration_lineage {
+        declaration_lineage.push(Arc::clone(declaration));
+    }
+    LeanReturnedProofPath {
+        candidate_ordinal: returned.candidate.ordinal,
+        proof_sha256: sha256(returned.candidate.proof.as_bytes()),
+        source_sha256: returned.source_sha256.to_owned(),
+        diagnostic_sha256: returned.diagnostic_sha256.to_owned(),
+        motions: LocalSequence::from_slice(&returned.candidate.motions),
+        declaration_lineage,
+    }
+}
+
+pub(super) fn insert_declaration_incidence(
+    incidence: &mut LocalRelations<String, LocalSet<String>>,
+    identifier: String,
+    declaration: String,
+) {
+    if let Some(declarations) = incidence.get_mut(&identifier) {
+        declarations.insert(declaration);
+    } else {
+        incidence.insert(identifier, LocalSet::from([declaration]));
+    }
+}
+
+pub(super) fn proof_round(
+    ordinal: u64,
+    cause: &str,
+    returns: &LeanKernelReturnFamily,
+) -> Result<LeanProofRoundReceipt, LeanMathematicsError> {
+    let kernel_admitted = returns.kernel_admitted_extent();
+    Ok(LeanProofRoundReceipt {
+        ordinal,
+        cause: cause.to_owned(),
+        candidate_ordinals: returns
+            .members()
+            .iter()
+            .map(|returned| returned.candidate.ordinal)
+            .collect(),
+        kernel_admitted: u64::try_from(kernel_admitted)
+            .map_err(|_| LeanMathematicsError::CarrierExtent)?,
+        obstructed: u64::try_from(returns.members().len().saturating_sub(kernel_admitted))
+            .map_err(|_| LeanMathematicsError::CarrierExtent)?,
+    })
+}
+
+#[derive(Clone, Debug)]
+pub(super) struct ParsedDeclaration {
+    pub(super) organ: LeanDeclarationOrgan,
+    pub(super) proof: String,
+}
+
+pub(super) fn parse_declarations(
+    document: &LeanSourceDocument,
+) -> Result<Vec<ParsedDeclaration>, LeanMathematicsError> {
+    let lines = document.text.lines().collect::<Vec<_>>();
+    let mut context = Vec::<LeanBinderChart>::new();
+    let mut declarations = Vec::new();
+    let mut cursor = 0usize;
+    while cursor < lines.len() {
+        let trimmed = lines[cursor].trim();
+        if trimmed.starts_with("variable ") {
+            merge_binders(&mut context, parse_binder_charts(trimmed));
+            cursor += 1;
+            continue;
+        }
+        if !(trimmed.starts_with("theorem ") || trimmed.starts_with("lemma ")) {
+            cursor += 1;
+            continue;
+        }
+        let start = cursor;
+        cursor += 1;
+        while cursor < lines.len() {
+            let line = lines[cursor];
+            let next = line.trim_start();
+            if line.len() == next.len()
+                && (next.starts_with("theorem ") || next.starts_with("lemma "))
+            {
+                break;
+            }
+            cursor += 1;
+        }
+        let chunk = lines[start..cursor].join("\n");
+        let Some(split) = chunk.find(":=") else {
+            continue;
+        };
+        let header = chunk[..split].trim();
+        let proof = chunk[split + 2..].trim().to_owned();
+        let name = declaration_name(header).ok_or_else(|| {
+            LeanMathematicsError::Parse(format!(
+                "{}:{} has no declaration identity",
+                document.path,
+                start + 1
+            ))
+        })?;
+        let mut binders = context.clone();
+        merge_binders(&mut binders, parse_binder_charts(header));
+        let binder_names = binders
+            .iter()
+            .map(|binder| binder.name.clone())
+            .collect::<BTreeSet<_>>();
+        let statement_identifiers = lean_identifiers(header)
+            .difference(&binder_names)
+            .filter(|identifier| !lean_keyword(identifier) && *identifier != &name)
+            .cloned()
+            .collect();
+        let tactic_species = proof
+            .lines()
+            .filter_map(tactic_species)
+            .collect::<BTreeSet<_>>();
+        let result_constructors = result_constructors(header);
+        declarations.push(ParsedDeclaration {
+            organ: LeanDeclarationOrgan {
+                source: document.path.clone(),
+                name,
+                binders,
+                statement_identifiers,
+                tactic_species,
+                referenced_declarations: BTreeSet::new(),
+                result_constructors,
+            },
+            proof,
+        });
+    }
+    Ok(declarations)
+}
+
+pub(super) fn declaration_name(header: &str) -> Option<String> {
+    let rest = header
+        .strip_prefix("theorem ")
+        .or_else(|| header.strip_prefix("lemma "))?;
+    let name = rest
+        .split(|character: char| character.is_whitespace() || matches!(character, '(' | '{' | ':'))
+        .next()?;
+    (!name.is_empty()).then(|| name.to_owned())
+}
+
+pub(super) fn declaration_identity(organ: &LeanDeclarationOrgan) -> String {
+    format!("{}#{}", organ.source, organ.name)
+}
+
+pub(super) fn parse_binder_charts(text: &str) -> Vec<LeanBinderChart> {
+    // Only the declaration prefix can introduce declaration binders. Parenthesized terms after
+    // the top-level result colon (for example `(∑ n : Old, demand n)`) are expressions, not
+    // binder charts. Treating their locally bound indices as theorem arguments corrupts later
+    // application transport.
+    let binder_extent = first_top_level_colon(text).unwrap_or(text.len());
+    let text = &text[..binder_extent];
+    let characters = text.char_indices().collect::<Vec<_>>();
+    let mut binders = Vec::new();
+    let mut cursor = 0usize;
+    while cursor < characters.len() {
+        let (byte, character) = characters[cursor];
+        let (close, explicit) = match character {
+            '(' => (')', true),
+            '{' => ('}', false),
+            _ => {
+                cursor += 1;
+                continue;
+            }
+        };
+        let start = byte + character.len_utf8();
+        let mut depth = 1usize;
+        let mut end = None;
+        cursor += 1;
+        while cursor < characters.len() {
+            let (at, local) = characters[cursor];
+            if local == character {
+                depth += 1;
+            } else if local == close {
+                depth -= 1;
+                if depth == 0 {
+                    end = Some(at);
+                    break;
+                }
+            }
+            cursor += 1;
+        }
+        let Some(end) = end else {
+            break;
+        };
+        let content = &text[start..end];
+        if let Some((names, _)) = content.split_once(':') {
+            for name in names.split_whitespace() {
+                let name = name.trim_matches(|character: char| !is_identifier_character(character));
+                if valid_binder_name(name) {
+                    binders.push(LeanBinderChart {
+                        name: name.to_owned(),
+                        explicit,
+                    });
+                }
+            }
+        }
+        cursor += 1;
+    }
+    binders
+}
+
+pub(super) fn first_top_level_colon(text: &str) -> Option<usize> {
+    let mut round = 0usize;
+    let mut curly = 0usize;
+    let mut square = 0usize;
+    for (byte, character) in text.char_indices() {
+        match character {
+            '(' => round = round.saturating_add(1),
+            ')' => round = round.saturating_sub(1),
+            '{' => curly = curly.saturating_add(1),
+            '}' => curly = curly.saturating_sub(1),
+            '[' => square = square.saturating_add(1),
+            ']' => square = square.saturating_sub(1),
+            ':' if round == 0 && curly == 0 && square == 0 => return Some(byte),
+            _ => {}
+        }
+    }
+    None
+}
+
+pub(super) fn result_constructors(header: &str) -> BTreeSet<LeanResultConstructor> {
+    let Some(colon) = first_top_level_colon(header) else {
+        return BTreeSet::new();
+    };
+    let result = &header[colon + 1..];
+    let mut round = 0usize;
+    let mut curly = 0usize;
+    let mut square = 0usize;
+    let mut constructors = BTreeSet::new();
+    for character in result.chars() {
+        match character {
+            '(' => round = round.saturating_add(1),
+            ')' => round = round.saturating_sub(1),
+            '{' => curly = curly.saturating_add(1),
+            '}' => curly = curly.saturating_sub(1),
+            '[' => square = square.saturating_add(1),
+            ']' => square = square.saturating_sub(1),
+            '∧' if round == 0 && curly == 0 && square == 0 => {
+                constructors.insert(LeanResultConstructor::Conjunction);
+            }
+            _ => {}
+        }
+    }
+    constructors
+}
+
+pub(super) fn merge_binders(target: &mut Vec<LeanBinderChart>, source: Vec<LeanBinderChart>) {
+    for binder in source {
+        if let Some(existing) = target.iter_mut().find(|prior| prior.name == binder.name) {
+            existing.explicit |= binder.explicit;
+        } else {
+            target.push(binder);
+        }
+    }
+}
+
+pub(super) fn declaration_application(
+    organ: &LeanDeclarationOrgan,
+    target_names: &BTreeSet<String>,
+) -> String {
+    let arguments = organ
+        .binders
+        .iter()
+        .filter(|binder| binder.explicit && target_names.contains(&binder.name))
+        .map(|binder| binder.name.as_str())
+        .collect::<Vec<_>>();
+    if arguments.is_empty() {
+        organ.name.clone()
+    } else {
+        format!("{} {}", organ.name, arguments.join(" "))
+    }
+}
+
+pub(super) fn declaration_application_with_substitute(
+    organ: &LeanDeclarationOrgan,
+    target_names: &BTreeSet<String>,
+    substitute: &str,
+) -> String {
+    let unmatched = organ
+        .binders
+        .iter()
+        .filter(|binder| binder.explicit && !target_names.contains(&binder.name))
+        .count();
+    let arguments = organ
+        .binders
+        .iter()
+        .filter(|binder| binder.explicit)
+        .filter_map(|binder| {
+            if target_names.contains(&binder.name) {
+                Some(binder.name.as_str())
+            } else if unmatched == 1 {
+                Some(substitute)
+            } else {
+                None
+            }
+        })
+        .collect::<Vec<_>>();
+    if arguments.is_empty() {
+        organ.name.clone()
+    } else {
+        format!("{} {}", organ.name, arguments.join(" "))
+    }
+}
+
+pub(super) fn push_candidate(
+    candidates: &mut Vec<LeanProofCandidate>,
+    proof: String,
+    motions: Vec<LeanProofMotion>,
+    declaration_lineage: LocalSet<Arc<str>>,
+) -> Result<(), LeanMathematicsError> {
+    if candidates.iter().any(|candidate| candidate.proof == proof) {
+        return Ok(());
+    }
+    let ordinal =
+        u64::try_from(candidates.len()).map_err(|_| LeanMathematicsError::CarrierExtent)?;
+    candidates.push(LeanProofCandidate {
+        ordinal,
+        proof,
+        motions,
+        declaration_lineage,
+    });
+    Ok(())
+}
+
+pub(super) fn tactic_species(line: &str) -> Option<String> {
+    let line = line.trim().trim_start_matches('·').trim();
+    let first = line
+        .split(|character: char| character.is_whitespace() || character == '[')
+        .find(|word| !word.is_empty())?;
+    const TACTICS: &[&str] = &[
+        "aesop",
+        "apply",
+        "assumption",
+        "calc",
+        "constructor",
+        "exact",
+        "field_simp",
+        "have",
+        "linarith",
+        "nlinarith",
+        "omega",
+        "refine",
+        "rintro",
+        "ring",
+        "rw",
+        "simpa",
+        "simp",
+    ];
+    TACTICS.contains(&first).then(|| first.to_owned())
+}
+
+pub(super) fn lean_identifiers(text: &str) -> BTreeSet<String> {
+    let mut identifiers = BTreeSet::new();
+    let mut current = String::new();
+    for character in text.chars() {
+        if is_identifier_character(character) {
+            current.push(character);
+        } else if !current.is_empty() {
+            if valid_identifier(&current) {
+                identifiers.insert(std::mem::take(&mut current));
+            } else {
+                current.clear();
+            }
+        }
+    }
+    if valid_identifier(&current) {
+        identifiers.insert(current);
+    }
+    identifiers
+}
+
+pub(super) fn is_identifier_character(character: char) -> bool {
+    character.is_alphanumeric()
+        || matches!(character, '_' | '\'' | '.' | '₀'..='₉' | 'α'..='ω' | 'Α'..='Ω')
+}
+
+pub(super) fn valid_identifier(identifier: &str) -> bool {
+    !identifier.is_empty()
+        && identifier
+            .chars()
+            .any(|character| character.is_alphabetic() || character == '_')
+}
+
+pub(super) fn valid_binder_name(identifier: &str) -> bool {
+    valid_identifier(identifier)
+        && !matches!(identifier, "fun" | "forall" | "Prop" | "Type" | "Type*")
+}
+
+pub(super) fn lean_keyword(identifier: &str) -> bool {
+    matches!(
+        identifier,
+        "theorem"
+            | "lemma"
+            | "by"
+            | "if"
+            | "then"
+            | "else"
+            | "let"
+            | "in"
+            | "forall"
+            | "Prop"
+            | "Type"
+            | "Type*"
+            | "Nat"
+            | "Real"
+    )
+}
+
+pub(super) fn safe_identity(identity: &str) -> String {
+    identity
+        .chars()
+        .map(|character| {
+            if character.is_ascii_alphanumeric() || character == '-' {
+                character
+            } else {
+                '_'
+            }
+        })
+        .collect()
+}
+
+pub(super) fn sha256(bytes: &[u8]) -> String {
+    let mut digest = Sha256::new();
+    digest.update(bytes);
+    let digest = digest.finalize();
+    let alphabet = b"0123456789abcdef";
+    let mut face = String::with_capacity(digest.len() * 2);
+    for byte in digest {
+        face.push(char::from(alphabet[usize::from(byte >> 4)]));
+        face.push(char::from(alphabet[usize::from(byte & 0x0f)]));
+    }
+    face
+}
+
+pub(super) fn io_error(error: std::io::Error) -> LeanMathematicsError {
+    LeanMathematicsError::Io(error.to_string())
+}
+
+pub fn collect_lean_documents(
+    root: &Path,
+) -> Result<Vec<LeanSourceDocument>, LeanMathematicsError> {
+    fn visit(
+        root: &Path,
+        path: &Path,
+        documents: &mut Vec<LeanSourceDocument>,
+    ) -> Result<(), LeanMathematicsError> {
+        let mut entries = fs::read_dir(path)
+            .map_err(io_error)?
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(io_error)?;
+        entries.sort_by_key(|entry| entry.path());
+        for entry in entries {
+            let path = entry.path();
+            if path.is_dir() {
+                if path.file_name().is_some_and(|name| {
+                    matches!(
+                        name.to_string_lossy().as_ref(),
+                        ".git" | ".claude" | ".lake" | "target" | "runs"
+                    )
+                }) {
+                    continue;
+                }
+                visit(root, &path, documents)?;
+            } else if path
+                .extension()
+                .is_some_and(|extension| extension == "lean")
+            {
+                let relative = path.strip_prefix(root).unwrap_or(path.as_path());
+                let text = fs::read_to_string(&path).map_err(io_error)?;
+                documents.push(LeanSourceDocument::new(relative.to_string_lossy(), text));
+            }
+        }
+        Ok(())
+    }
+
+    let mut documents = Vec::new();
+    visit(root, root, &mut documents)?;
+    Ok(documents)
+}

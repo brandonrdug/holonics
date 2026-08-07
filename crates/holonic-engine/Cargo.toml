@@ -1,0 +1,28 @@
+[package]
+name = "holonic-engine"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[features]
+default = ["desktop-x11"]
+desktop-x11 = ["dep:x11rb"]
+
+[dependencies]
+holonic-structure = { workspace = true }
+num-bigint = { workspace = true }
+num-rational = { workspace = true }
+num-traits = { workspace = true }
+relational-geometry = { workspace = true }
+serde = { workspace = true }
+sha2 = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+claxon = "0.4.3"
+hound = "3.5.1"
+image = { version = "0.25.10", default-features = false, features = ["png"] }
+ron = { workspace = true }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+x11rb = { version = "0.13.2", default-features = false, features = ["allow-unsafe-code", "image"], optional = true }

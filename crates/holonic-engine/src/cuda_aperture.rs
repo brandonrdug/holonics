@@ -1,0 +1,1495 @@
+//! Exact CUDA realization of finite receiver-aperture conic support.
+//!
+//! CUDA owns allocation, launch, and return only. Continuous conics are
+//! transformed into the terminal chart on the host with exact rationals,
+//! denominators are cleared, and a conservative arbitrary-precision preflight
+//! admits exact native signed i128 device arithmetic. The changing local-star
+//! witness disproved the present hand-written wider-limb CUDA operators for
+//! both conics and transported segments, so a primitive outside that admitted
+//! carrier is evaluated by the same exact host law and merged before
+//! whole-face parity admission; it is never rounded or allowed to terminate
+//! the frame. The host law substitutes the terminal chart once and conducts
+//! integer/projective support; the retained rational implementation is its
+//! independent authority. Exact conic coefficients cross the host/card seam
+//! in a 128-bit signed-magnitude carrier. The card classifies each finite
+//! aperture member independently; it does not propagate through display
+//! adjacency and it does not evaluate floating point. Admission measures both
+//! exact carriers and retains the faster one for the bounded ecology rather
+//! than preferring CUDA by device presence.
+
+use std::collections::{BTreeMap, BTreeSet};
+use std::ffi::{CStr, c_char, c_void};
+use std::ptr;
+use std::time::Instant;
+
+use num_bigint::{BigInt, BigUint};
+use num_traits::{Signed, ToPrimitive, Zero};
+use relational_geometry::ReceiverId;
+use serde::{Deserialize, Serialize};
+use thiserror::Error;
+
+use crate::{
+    ContinuousPresentation, CpuExecutor, PresentationAddress, PresentationError,
+    PresentedPrimitiveKey, PrimitiveApertureTrace, ReceiverApertureTrace, ReceiverPrimitive,
+    TerminalMatrixSpec, terminal_integer_conic_coefficients, trace_receivers_aperture_with_cpu,
+};
+
+const CUDA_SUCCESS: i32 = 0;
+const THREADS_PER_BLOCK: u32 = 128;
+const TILE_EDGE: u32 = 16;
+/// Largest exact intermediate carried by the compiled device aperture.
+///
+/// This is a physical aperture of the present CUDA program, not a bound on
+/// holonic coordinates. Wider terminal faces must be re-charted or refused;
+/// they must never silently become a host rendering path.
+const MAX_DEVICE_INTERMEDIATE_BITS: u64 = 384;
+const PTX: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/exact_conic_support.ptx"));
+
+type CuDevice = i32;
+type CuContext = *mut c_void;
+type CuModule = *mut c_void;
+type CuFunction = *mut c_void;
+type CuDevicePtr = u64;
+type CuStream = *mut c_void;
+
+#[link(name = "cuda")]
+unsafe extern "C" {
+    fn cuInit(flags: u32) -> i32;
+    fn cuDeviceGetCount(count: *mut i32) -> i32;
+    fn cuDeviceGet(device: *mut CuDevice, ordinal: i32) -> i32;
+    fn cuDeviceGetName(name: *mut c_char, length: i32, device: CuDevice) -> i32;
+    fn cuCtxCreate_v2(context: *mut CuContext, flags: u32, device: CuDevice) -> i32;
+    fn cuCtxSetCurrent(context: CuContext) -> i32;
+    fn cuCtxDestroy_v2(context: CuContext) -> i32;
+    fn cuModuleLoadData(module: *mut CuModule, image: *const c_void) -> i32;
+    fn cuModuleUnload(module: CuModule) -> i32;
+    fn cuModuleGetFunction(function: *mut CuFunction, module: CuModule, name: *const c_char)
+    -> i32;
+    fn cuMemAlloc_v2(pointer: *mut CuDevicePtr, bytes: usize) -> i32;
+    fn cuMemFree_v2(pointer: CuDevicePtr) -> i32;
+    fn cuMemcpyHtoD_v2(destination: CuDevicePtr, source: *const c_void, bytes: usize) -> i32;
+    fn cuMemcpyDtoH_v2(destination: *mut c_void, source: CuDevicePtr, bytes: usize) -> i32;
+    fn cuMemsetD8_v2(destination: CuDevicePtr, value: u8, count: usize) -> i32;
+    fn cuLaunchKernel(
+        function: CuFunction,
+        grid_x: u32,
+        grid_y: u32,
+        grid_z: u32,
+        block_x: u32,
+        block_y: u32,
+        block_z: u32,
+        shared_memory_bytes: u32,
+        stream: CuStream,
+        kernel_parameters: *mut *mut c_void,
+        extra: *mut *mut c_void,
+    ) -> i32;
+    fn cuCtxSynchronize() -> i32;
+    fn cuGetErrorName(error: i32, name: *mut *const c_char) -> i32;
+    fn cuGetErrorString(error: i32, message: *mut *const c_char) -> i32;
+}
+
+fn driver_text(query: unsafe extern "C" fn(i32, *mut *const c_char) -> i32, code: i32) -> String {
+    let mut text = ptr::null();
+    // SAFETY: CUDA writes one driver-owned NUL-terminated string pointer.
+    let status = unsafe { query(code, &mut text) };
+    if status == CUDA_SUCCESS && !text.is_null() {
+        // SAFETY: successful CUDA error-string queries return a live C string.
+        unsafe { CStr::from_ptr(text) }
+            .to_string_lossy()
+            .into_owned()
+    } else {
+        "<no CUDA driver description>".to_owned()
+    }
+}
+
+fn driver(code: i32, operation: &'static str) -> Result<(), CudaApertureError> {
+    if code == CUDA_SUCCESS {
+        Ok(())
+    } else {
+        Err(CudaApertureError::Driver {
+            operation,
+            code,
+            name: driver_text(cuGetErrorName, code),
+            message: driver_text(cuGetErrorString, code),
+        })
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+struct PackedExactCoefficient {
+    lower: u64,
+    upper: u64,
+    negative: u32,
+    reserved: u32,
+}
+
+const _: () = assert!(std::mem::size_of::<PackedExactCoefficient>() == 24);
+
+#[repr(C)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+struct PackedExactConic {
+    xx: PackedExactCoefficient,
+    xy: PackedExactCoefficient,
+    yy: PackedExactCoefficient,
+    x: PackedExactCoefficient,
+    y: PackedExactCoefficient,
+    constant: PackedExactCoefficient,
+    primitive: u32,
+    required_bits: u32,
+}
+
+const _: () = assert!(std::mem::size_of::<PackedExactConic>() == 152);
+
+#[repr(C)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+struct PackedExactSegment {
+    line_a: PackedExactCoefficient,
+    line_b: PackedExactCoefficient,
+    line_c: PackedExactCoefficient,
+    bound_left: u32,
+    bound_top: u32,
+    bound_right: u32,
+    bound_bottom: u32,
+    primitive: u32,
+    required_bits: u32,
+}
+
+const _: () = assert!(std::mem::size_of::<PackedExactSegment>() == 96);
+
+struct DeviceAllocation {
+    pointer: CuDevicePtr,
+}
+
+impl DeviceAllocation {
+    fn new(bytes: usize) -> Result<Self, CudaApertureError> {
+        let mut pointer = 0;
+        // SAFETY: the active CUDA context owns the returned device allocation.
+        unsafe { driver(cuMemAlloc_v2(&mut pointer, bytes.max(1)), "cuMemAlloc_v2")? };
+        Ok(Self { pointer })
+    }
+}
+
+impl Drop for DeviceAllocation {
+    fn drop(&mut self) {
+        // SAFETY: this allocation is owned by the active context; drop is
+        // best-effort because Rust destructors cannot return driver errors.
+        unsafe {
+            let _ = cuMemFree_v2(self.pointer);
+        }
+    }
+}
+
+pub struct CudaApertureExecutor {
+    context: CuContext,
+    module: CuModule,
+    conic_function: CuFunction,
+    segment_function: CuFunction,
+    _conic_function_i192: CuFunction,
+    _segment_function_i192: CuFunction,
+    _conic_function_i256: CuFunction,
+    _segment_function_i256: CuFunction,
+    _conic_function_i128: CuFunction,
+    _segment_function_i128: CuFunction,
+    device_name: String,
+}
+
+impl CudaApertureExecutor {
+    pub fn new() -> Result<Self, CudaApertureError> {
+        // SAFETY: every raw result and returned handle is checked before use.
+        unsafe {
+            driver(cuInit(0), "cuInit")?;
+            let mut count = 0;
+            driver(cuDeviceGetCount(&mut count), "cuDeviceGetCount")?;
+            if count <= 0 {
+                return Err(CudaApertureError::NoDevice);
+            }
+            let mut device = 0;
+            driver(cuDeviceGet(&mut device, 0), "cuDeviceGet")?;
+            let mut name = [0_i8; 256];
+            driver(
+                cuDeviceGetName(name.as_mut_ptr(), name.len() as i32, device),
+                "cuDeviceGetName",
+            )?;
+            let device_name = CStr::from_ptr(name.as_ptr()).to_string_lossy().into_owned();
+            let mut context = ptr::null_mut();
+            driver(cuCtxCreate_v2(&mut context, 0, device), "cuCtxCreate_v2")?;
+
+            let mut image = PTX.to_vec();
+            if !image.ends_with(&[0]) {
+                image.push(0);
+            }
+            let mut module = ptr::null_mut();
+            if let Err(error) = driver(
+                cuModuleLoadData(&mut module, image.as_ptr().cast()),
+                "cuModuleLoadData",
+            ) {
+                let _ = cuCtxDestroy_v2(context);
+                return Err(error);
+            }
+            let mut conic_function = ptr::null_mut();
+            let conic_symbol = c"exact_conic_support";
+            if let Err(error) = driver(
+                cuModuleGetFunction(&mut conic_function, module, conic_symbol.as_ptr()),
+                "cuModuleGetFunction(exact_conic_support)",
+            ) {
+                let _ = cuModuleUnload(module);
+                let _ = cuCtxDestroy_v2(context);
+                return Err(error);
+            }
+            let mut segment_function = ptr::null_mut();
+            let segment_symbol = c"exact_segment_support";
+            if let Err(error) = driver(
+                cuModuleGetFunction(&mut segment_function, module, segment_symbol.as_ptr()),
+                "cuModuleGetFunction(exact_segment_support)",
+            ) {
+                let _ = cuModuleUnload(module);
+                let _ = cuCtxDestroy_v2(context);
+                return Err(error);
+            }
+            let mut conic_function_i128 = ptr::null_mut();
+            let mut conic_function_i192 = ptr::null_mut();
+            let conic_symbol_i192 = c"exact_conic_support_i192";
+            if let Err(error) = driver(
+                cuModuleGetFunction(&mut conic_function_i192, module, conic_symbol_i192.as_ptr()),
+                "cuModuleGetFunction(exact_conic_support_i192)",
+            ) {
+                let _ = cuModuleUnload(module);
+                let _ = cuCtxDestroy_v2(context);
+                return Err(error);
+            }
+            let mut segment_function_i192 = ptr::null_mut();
+            let segment_symbol_i192 = c"exact_segment_support_i192";
+            if let Err(error) = driver(
+                cuModuleGetFunction(
+                    &mut segment_function_i192,
+                    module,
+                    segment_symbol_i192.as_ptr(),
+                ),
+                "cuModuleGetFunction(exact_segment_support_i192)",
+            ) {
+                let _ = cuModuleUnload(module);
+                let _ = cuCtxDestroy_v2(context);
+                return Err(error);
+            }
+            let mut conic_function_i256 = ptr::null_mut();
+            let conic_symbol_i256 = c"exact_conic_support_i256";
+            if let Err(error) = driver(
+                cuModuleGetFunction(&mut conic_function_i256, module, conic_symbol_i256.as_ptr()),
+                "cuModuleGetFunction(exact_conic_support_i256)",
+            ) {
+                let _ = cuModuleUnload(module);
+                let _ = cuCtxDestroy_v2(context);
+                return Err(error);
+            }
+            let mut segment_function_i256 = ptr::null_mut();
+            let segment_symbol_i256 = c"exact_segment_support_i256";
+            if let Err(error) = driver(
+                cuModuleGetFunction(
+                    &mut segment_function_i256,
+                    module,
+                    segment_symbol_i256.as_ptr(),
+                ),
+                "cuModuleGetFunction(exact_segment_support_i256)",
+            ) {
+                let _ = cuModuleUnload(module);
+                let _ = cuCtxDestroy_v2(context);
+                return Err(error);
+            }
+            let conic_symbol_i128 = c"exact_conic_support_i128";
+            if let Err(error) = driver(
+                cuModuleGetFunction(&mut conic_function_i128, module, conic_symbol_i128.as_ptr()),
+                "cuModuleGetFunction(exact_conic_support_i128)",
+            ) {
+                let _ = cuModuleUnload(module);
+                let _ = cuCtxDestroy_v2(context);
+                return Err(error);
+            }
+            let mut segment_function_i128 = ptr::null_mut();
+            let segment_symbol_i128 = c"exact_segment_support_i128";
+            if let Err(error) = driver(
+                cuModuleGetFunction(
+                    &mut segment_function_i128,
+                    module,
+                    segment_symbol_i128.as_ptr(),
+                ),
+                "cuModuleGetFunction(exact_segment_support_i128)",
+            ) {
+                let _ = cuModuleUnload(module);
+                let _ = cuCtxDestroy_v2(context);
+                return Err(error);
+            }
+            Ok(Self {
+                context,
+                module,
+                conic_function,
+                segment_function,
+                _conic_function_i192: conic_function_i192,
+                _segment_function_i192: segment_function_i192,
+                _conic_function_i256: conic_function_i256,
+                _segment_function_i256: segment_function_i256,
+                _conic_function_i128: conic_function_i128,
+                _segment_function_i128: segment_function_i128,
+                device_name,
+            })
+        }
+    }
+
+    pub fn device_name(&self) -> &str {
+        &self.device_name
+    }
+
+    pub fn trace(
+        &self,
+        presentation: &ContinuousPresentation,
+        specification: &TerminalMatrixSpec,
+        receivers: &BTreeSet<ReceiverId>,
+        host_executor: &CpuExecutor,
+    ) -> Result<
+        (
+            BTreeMap<ReceiverId, ReceiverApertureTrace>,
+            CudaApertureReceipt,
+        ),
+        CudaApertureError,
+    > {
+        self.make_current()?;
+        let total_started = Instant::now();
+        let selected = presentation
+            .primitives
+            .iter()
+            .filter(|presented| receivers.contains(&presented.receiver))
+            .collect::<Vec<_>>();
+        let mut packed_conics = Vec::new();
+        let mut packed_segments = Vec::new();
+        let mut device_selected_ordinals = Vec::new();
+        let mut host_primitives = Vec::new();
+        let mut required_intermediate_bits = 0_u64;
+        for (primitive_ordinal, presented) in selected.iter().enumerate() {
+            let primitive =
+                u32::try_from(primitive_ordinal).map_err(|_| CudaApertureError::ExtentOverflow)?;
+            let packed = (|| {
+                let mut conics = Vec::new();
+                let mut segments = Vec::new();
+                match &presented.primitive {
+                    ReceiverPrimitive::Conic(conic) => {
+                        conics.push(pack_conic(&conic.form, specification, primitive)?);
+                    }
+                    ReceiverPrimitive::Triangle(triangle) => {
+                        for edge in triangle.vertices.windows(2) {
+                            segments.extend(pack_projective_segment(
+                                &edge[0],
+                                &edge[1],
+                                specification,
+                                primitive,
+                            )?);
+                        }
+                        segments.extend(pack_projective_segment(
+                            &triangle.vertices[2],
+                            &triangle.vertices[0],
+                            specification,
+                            primitive,
+                        )?);
+                    }
+                    ReceiverPrimitive::Thread(thread) => {
+                        for edge in thread.vertices.windows(2) {
+                            segments.extend(pack_projective_segment(
+                                &edge[0],
+                                &edge[1],
+                                specification,
+                                primitive,
+                            )?);
+                        }
+                        if thread.closed && thread.vertices.len() > 1 {
+                            segments.extend(pack_projective_segment(
+                                thread.vertices.last().expect("a closed thread has a tail"),
+                                &thread.vertices[0],
+                                specification,
+                                primitive,
+                            )?);
+                        }
+                    }
+                }
+                Ok::<_, CudaApertureError>((conics, segments))
+            })();
+            match packed {
+                Ok((conics, segments)) => {
+                    let primitive_bits = conics
+                        .iter()
+                        .map(|conic| conic.required_bits)
+                        .chain(segments.iter().map(|segment| segment.required_bits))
+                        .max()
+                        .unwrap_or(0);
+                    required_intermediate_bits =
+                        required_intermediate_bits.max(u64::from(primitive_bits));
+                    if u64::from(primitive_bits) <= MAX_DEVICE_INTERMEDIATE_BITS {
+                        let device_ordinal = u32::try_from(device_selected_ordinals.len())
+                            .map_err(|_| CudaApertureError::ExtentOverflow)?;
+                        device_selected_ordinals.push(primitive_ordinal);
+                        packed_conics.extend(conics.into_iter().map(|mut conic| {
+                            conic.primitive = device_ordinal;
+                            conic
+                        }));
+                        packed_segments.extend(segments.into_iter().map(|mut segment| {
+                            segment.primitive = device_ordinal;
+                            segment
+                        }));
+                    } else {
+                        host_primitives.push((**presented).clone());
+                    }
+                }
+                Err(CudaApertureError::IntegerRange { required_bits, .. }) => {
+                    if std::env::var_os("HOLONIC_CUDA_CARRIER_DIAG").is_some() {
+                        eprintln!(
+                            "carrier-open primitive={primitive_ordinal} species={} coefficient-bits={required_bits}",
+                            match &presented.primitive {
+                                ReceiverPrimitive::Conic(_) => "conic",
+                                ReceiverPrimitive::Triangle(_) => "triangle",
+                                ReceiverPrimitive::Thread(_) => "thread",
+                            },
+                        );
+                    }
+                    required_intermediate_bits = required_intermediate_bits.max(required_bits);
+                    host_primitives.push((**presented).clone());
+                }
+                Err(error) => return Err(error),
+            }
+        }
+        let selection_pack_nanoseconds = total_started.elapsed().as_nanos();
+        let _required_device_bits = packed_conics
+            .iter()
+            .map(|conic| conic.required_bits)
+            .chain(packed_segments.iter().map(|segment| segment.required_bits))
+            .max()
+            .unwrap_or(0);
+        let (conic_function, segment_function, device_arithmetic) =
+            (self.conic_function, self.segment_function, "signed 384-bit");
+        let pixel_count = specification
+            .width
+            .checked_mul(specification.height)
+            .ok_or(CudaApertureError::ExtentOverflow)?;
+        let support_word_count = usize::try_from(pixel_count.div_ceil(u32::BITS))
+            .map_err(|_| CudaApertureError::ExtentOverflow)?;
+        let output_count = support_word_count
+            .checked_mul(device_selected_ordinals.len())
+            .ok_or(CudaApertureError::ExtentOverflow)?;
+
+        let device_prepare_started = Instant::now();
+        let conic_allocation =
+            DeviceAllocation::new(packed_conics.len() * std::mem::size_of::<PackedExactConic>())?;
+        let segment_allocation = DeviceAllocation::new(
+            packed_segments.len() * std::mem::size_of::<PackedExactSegment>(),
+        )?;
+        let output_allocation = DeviceAllocation::new(output_count * std::mem::size_of::<u32>())?;
+        let query_allocation =
+            DeviceAllocation::new(device_selected_ordinals.len() * std::mem::size_of::<u64>())?;
+        if !packed_conics.is_empty() {
+            // SAFETY: source length exactly matches the allocated device span.
+            unsafe {
+                driver(
+                    cuMemcpyHtoD_v2(
+                        conic_allocation.pointer,
+                        packed_conics.as_ptr().cast(),
+                        packed_conics.len() * std::mem::size_of::<PackedExactConic>(),
+                    ),
+                    "cuMemcpyHtoD_v2(conics)",
+                )?
+            };
+        }
+        if !packed_segments.is_empty() {
+            // SAFETY: source length exactly matches the allocated device span.
+            unsafe {
+                driver(
+                    cuMemcpyHtoD_v2(
+                        segment_allocation.pointer,
+                        packed_segments.as_ptr().cast(),
+                        packed_segments.len() * std::mem::size_of::<PackedExactSegment>(),
+                    ),
+                    "cuMemcpyHtoD_v2(segments)",
+                )?
+            };
+        }
+        let mut output = vec![0_u32; output_count];
+        let mut query_counts = vec![0_u64; device_selected_ordinals.len()];
+        // Sparse local-section fibers write only actual support. Clear the
+        // bounded consequence carrier so inherited device state cannot enter.
+        unsafe {
+            driver(
+                cuMemsetD8_v2(
+                    output_allocation.pointer,
+                    0,
+                    output_count * std::mem::size_of::<u32>(),
+                ),
+                "cuMemsetD8_v2(output)",
+            )?;
+            driver(
+                cuMemsetD8_v2(
+                    query_allocation.pointer,
+                    0,
+                    device_selected_ordinals.len() * std::mem::size_of::<u64>(),
+                ),
+                "cuMemsetD8_v2(query)",
+            )?;
+        }
+        let device_prepare_nanoseconds = device_prepare_started.elapsed().as_nanos();
+        let mut conic_pointer = conic_allocation.pointer;
+        let mut segment_pointer = segment_allocation.pointer;
+        let mut output_pointer = output_allocation.pointer;
+        let mut query_pointer = query_allocation.pointer;
+        let mut width = specification.width;
+        let mut height = specification.height;
+        let mut conic_count =
+            u32::try_from(packed_conics.len()).map_err(|_| CudaApertureError::ExtentOverflow)?;
+        let mut segment_count =
+            u32::try_from(packed_segments.len()).map_err(|_| CudaApertureError::ExtentOverflow)?;
+        let receiver_count =
+            u32::try_from(receivers.len()).map_err(|_| CudaApertureError::ExtentOverflow)?;
+        let mut conic_arguments = [
+            (&mut conic_pointer as *mut CuDevicePtr).cast::<c_void>(),
+            (&mut output_pointer as *mut CuDevicePtr).cast::<c_void>(),
+            (&mut query_pointer as *mut CuDevicePtr).cast::<c_void>(),
+            (&mut width as *mut u32).cast::<c_void>(),
+            (&mut height as *mut u32).cast::<c_void>(),
+            (&mut conic_count as *mut u32).cast::<c_void>(),
+        ];
+        let mut segment_arguments = [
+            (&mut segment_pointer as *mut CuDevicePtr).cast::<c_void>(),
+            (&mut output_pointer as *mut CuDevicePtr).cast::<c_void>(),
+            (&mut query_pointer as *mut CuDevicePtr).cast::<c_void>(),
+            (&mut width as *mut u32).cast::<c_void>(),
+            (&mut height as *mut u32).cast::<c_void>(),
+            (&mut segment_count as *mut u32).cast::<c_void>(),
+        ];
+        let tile_columns = width.div_ceil(TILE_EDGE);
+        let tile_rows = height.div_ceil(TILE_EDGE);
+        let tile_count = tile_columns
+            .checked_mul(tile_rows)
+            .ok_or(CudaApertureError::ExtentOverflow)?;
+        let conic_work = tile_count
+            .checked_mul(conic_count)
+            .ok_or(CudaApertureError::ExtentOverflow)?;
+        let segment_work = tile_count
+            .checked_mul(segment_count)
+            .ok_or(CudaApertureError::ExtentOverflow)?;
+        let device_execute_started = Instant::now();
+        // SAFETY: the PTX signature and the six argument carriers above are
+        // pinned by the shared repr(C) wire and checked extents.
+        if conic_work > 0 {
+            unsafe {
+                driver(
+                    cuLaunchKernel(
+                        conic_function,
+                        conic_work.div_ceil(THREADS_PER_BLOCK),
+                        1,
+                        1,
+                        THREADS_PER_BLOCK,
+                        1,
+                        1,
+                        0,
+                        ptr::null_mut(),
+                        conic_arguments.as_mut_ptr(),
+                        ptr::null_mut(),
+                    ),
+                    "cuLaunchKernel(exact_conic_support)",
+                )?;
+            }
+        }
+        if segment_work > 0 {
+            unsafe {
+                driver(
+                    cuLaunchKernel(
+                        segment_function,
+                        segment_work.div_ceil(THREADS_PER_BLOCK),
+                        1,
+                        1,
+                        THREADS_PER_BLOCK,
+                        1,
+                        1,
+                        0,
+                        ptr::null_mut(),
+                        segment_arguments.as_mut_ptr(),
+                        ptr::null_mut(),
+                    ),
+                    "cuLaunchKernel(exact_segment_support)",
+                )?;
+            }
+        }
+        let device_launch_nanoseconds = device_execute_started.elapsed().as_nanos();
+        let host_primitive_count = host_primitives.len();
+        let host_conic_count = host_primitives
+            .iter()
+            .filter(|presented| matches!(&presented.primitive, ReceiverPrimitive::Conic(_)))
+            .count();
+        let mut host_workers = BigUint::zero();
+        let mut host_trace_nanoseconds = 0_u128;
+        let host_result = if host_primitives.is_empty() {
+            None
+        } else {
+            let mut host_presentation = presentation.clone();
+            host_presentation.primitives = host_primitives;
+            let host_trace_started = Instant::now();
+            let result = trace_receivers_aperture_with_cpu(
+                &host_presentation,
+                specification,
+                receivers,
+                host_executor,
+            )?;
+            host_trace_nanoseconds = host_trace_started.elapsed().as_nanos();
+            host_workers = result.1.workers_used.clone();
+            Some(result.0)
+        };
+        let device_wait_started = Instant::now();
+        unsafe {
+            driver(cuCtxSynchronize(), "cuCtxSynchronize")?;
+        }
+        let device_execute_nanoseconds =
+            device_launch_nanoseconds + device_wait_started.elapsed().as_nanos();
+        let device_download_started = Instant::now();
+        unsafe {
+            driver(
+                cuMemcpyDtoH_v2(
+                    output.as_mut_ptr().cast(),
+                    output_allocation.pointer,
+                    output.len() * std::mem::size_of::<u32>(),
+                ),
+                "cuMemcpyDtoH_v2(support)",
+            )?;
+            driver(
+                cuMemcpyDtoH_v2(
+                    query_counts.as_mut_ptr().cast(),
+                    query_allocation.pointer,
+                    query_counts.len() * std::mem::size_of::<u64>(),
+                ),
+                "cuMemcpyDtoH_v2(query)",
+            )?;
+        }
+        let device_download_nanoseconds = device_download_started.elapsed().as_nanos();
+
+        let device_decode_started = Instant::now();
+        let mut primitive_sections = BTreeMap::new();
+        for (device_primitive, selected_ordinal) in
+            device_selected_ordinals.iter().copied().enumerate()
+        {
+            let presented = selected[selected_ordinal];
+            let key = PresentedPrimitiveKey {
+                receiver: presented.receiver,
+                primitive: presented.primitive.id(),
+            };
+            let offset = device_primitive * support_word_count;
+            let addresses = decode_support_words(
+                &output[offset..offset + support_word_count],
+                specification.width,
+                specification.height,
+            )?;
+            if primitive_sections
+                .insert(
+                    key,
+                    PrimitiveApertureTrace {
+                        key,
+                        addresses,
+                        exact_support_queries: BigUint::from(query_counts[device_primitive]),
+                    },
+                )
+                .is_some()
+            {
+                return Err(CudaApertureError::Presentation(
+                    PresentationError::DuplicatePrimitiveTrace(key.receiver),
+                ));
+            }
+        }
+        let device_decode_nanoseconds = device_decode_started.elapsed().as_nanos();
+        let device_exact_support_evaluations = BigUint::from(query_counts.into_iter().sum::<u64>());
+        let mut host_exact_support_evaluations = BigUint::zero();
+        let mut exact_support_evaluations = device_exact_support_evaluations.clone();
+        let mut host_merge_nanoseconds = 0_u128;
+        if let Some(host_traces) = host_result {
+            let host_merge_started = Instant::now();
+            for host_trace in host_traces.into_values() {
+                exact_support_evaluations += &host_trace.exact_support_queries;
+                host_exact_support_evaluations += &host_trace.exact_support_queries;
+                for section in host_trace.primitive_sections.into_values() {
+                    let key = section.key;
+                    if primitive_sections.insert(key, section).is_some() {
+                        return Err(CudaApertureError::Presentation(
+                            PresentationError::DuplicatePrimitiveTrace(key.receiver),
+                        ));
+                    }
+                }
+            }
+            host_merge_nanoseconds = host_merge_started.elapsed().as_nanos();
+        }
+        let mut sections_by_receiver = receivers
+            .iter()
+            .copied()
+            .map(|receiver| (receiver, Vec::new()))
+            .collect::<BTreeMap<_, _>>();
+        for section in primitive_sections.into_values() {
+            sections_by_receiver
+                .get_mut(&section.key.receiver)
+                .expect("every selected primitive belongs to an admitted receiver")
+                .push(section);
+        }
+        let traces = sections_by_receiver
+            .into_iter()
+            .map(|(receiver, sections)| {
+                Ok((
+                    receiver,
+                    ReceiverApertureTrace::from_primitive_sections(receiver, sections)?,
+                ))
+            })
+            .collect::<Result<BTreeMap<_, _>, PresentationError>>()?;
+        let arithmetic = if host_primitive_count == 0 {
+            device_arithmetic.to_owned()
+        } else if device_selected_ordinals.is_empty() {
+            "exact host integer-projective".to_owned()
+        } else {
+            format!("{device_arithmetic} CUDA + exact host integer-projective")
+        };
+        Ok((
+            traces,
+            CudaApertureReceipt {
+                schema: "holonic-engine.cuda-aperture.v1".to_owned(),
+                device: self.device_name.clone(),
+                receivers: BigUint::from(receiver_count),
+                selected_primitives: BigUint::from(selected.len()),
+                device_primitives: BigUint::from(device_selected_ordinals.len()),
+                conics: BigUint::from(conic_count),
+                segments: BigUint::from(segment_count),
+                host_primitives: BigUint::from(host_primitive_count),
+                host_conics: BigUint::from(host_conic_count),
+                host_linear_primitives: BigUint::from(host_primitive_count - host_conic_count),
+                aperture_members: BigUint::from(pixel_count),
+                device_output_bytes: BigUint::from(output_count * std::mem::size_of::<u32>()),
+                device_threads: BigUint::from(conic_work) + BigUint::from(segment_work),
+                exact_support_evaluations,
+                device_exact_support_evaluations,
+                host_exact_support_evaluations,
+                intermediate_bits: BigUint::from(required_intermediate_bits),
+                device_arithmetic: arithmetic,
+                host_workers,
+                selection_pack_nanoseconds,
+                device_prepare_nanoseconds,
+                device_execute_nanoseconds,
+                device_download_nanoseconds,
+                device_decode_nanoseconds,
+                host_trace_nanoseconds,
+                host_merge_nanoseconds,
+                wall_nanoseconds: total_started.elapsed().as_nanos(),
+                host_parity: false,
+                execution_backend: ApertureExecutionBackend::HybridCuda.label().to_owned(),
+                admission_candidate_nanoseconds: 0,
+                admission_authority_nanoseconds: 0,
+            },
+        ))
+    }
+
+    pub fn admit(
+        self,
+        presentation: &ContinuousPresentation,
+        specification: &TerminalMatrixSpec,
+        receivers: &BTreeSet<ReceiverId>,
+        host_executor: &CpuExecutor,
+    ) -> Result<
+        (
+            AdmittedCudaApertureExecutor,
+            BTreeMap<ReceiverId, ReceiverApertureTrace>,
+            CudaApertureReceipt,
+        ),
+        CudaApertureError,
+    > {
+        let (candidate, mut receipt) =
+            self.trace(presentation, specification, receivers, host_executor)?;
+        let authority_started = Instant::now();
+        let (authority, authority_execution) = trace_receivers_aperture_with_cpu(
+            presentation,
+            specification,
+            receivers,
+            host_executor,
+        )?;
+        let authority_nanoseconds = authority_started.elapsed().as_nanos();
+        let exact = candidate.iter().all(|(receiver, candidate)| {
+            authority
+                .get(receiver)
+                .is_some_and(|authority| candidate.has_same_exact_support(authority))
+        }) && candidate.len() == authority.len();
+        if !exact {
+            return Err(CudaApertureError::ParityRefused);
+        }
+        let candidate_nanoseconds = receipt.wall_nanoseconds;
+        let preferred = if authority_nanoseconds < candidate_nanoseconds {
+            ApertureExecutionBackend::ExactHost
+        } else {
+            ApertureExecutionBackend::HybridCuda
+        };
+        receipt.host_parity = true;
+        receipt.admission_candidate_nanoseconds = candidate_nanoseconds;
+        receipt.admission_authority_nanoseconds = authority_nanoseconds;
+        let initial = match preferred {
+            ApertureExecutionBackend::ExactHost => {
+                let required_bits = receipt.intermediate_bits.clone();
+                receipt = exact_host_receipt(
+                    &self.device_name,
+                    presentation,
+                    specification,
+                    receivers,
+                    authority_execution.workers_used,
+                    &authority,
+                    authority_nanoseconds,
+                )?;
+                receipt.intermediate_bits = required_bits;
+                receipt.admission_candidate_nanoseconds = candidate_nanoseconds;
+                receipt.admission_authority_nanoseconds = authority_nanoseconds;
+                authority
+            }
+            ApertureExecutionBackend::HybridCuda => candidate,
+        };
+        Ok((
+            AdmittedCudaApertureExecutor {
+                inner: self,
+                preferred,
+            },
+            initial,
+            receipt,
+        ))
+    }
+
+    fn make_current(&self) -> Result<(), CudaApertureError> {
+        // SAFETY: this retained executor exclusively owns the context and every handle founded
+        // beneath it. CUDA current-context selection is thread-local apparatus, so each public
+        // device passage reactivates its owner before touching those handles.
+        unsafe { driver(cuCtxSetCurrent(self.context), "cuCtxSetCurrent") }
+    }
+}
+
+impl Drop for CudaApertureExecutor {
+    fn drop(&mut self) {
+        // SAFETY: module and context were created together and are destroyed
+        // in dependency order. Teardown is best-effort.
+        unsafe {
+            let _ = cuCtxSetCurrent(self.context);
+            let _ = cuModuleUnload(self.module);
+            let _ = cuCtxDestroy_v2(self.context);
+        }
+    }
+}
+
+pub struct AdmittedCudaApertureExecutor {
+    inner: CudaApertureExecutor,
+    preferred: ApertureExecutionBackend,
+}
+
+impl AdmittedCudaApertureExecutor {
+    pub fn trace(
+        &self,
+        presentation: &ContinuousPresentation,
+        specification: &TerminalMatrixSpec,
+        receivers: &BTreeSet<ReceiverId>,
+        host_executor: &CpuExecutor,
+    ) -> Result<
+        (
+            BTreeMap<ReceiverId, ReceiverApertureTrace>,
+            CudaApertureReceipt,
+        ),
+        CudaApertureError,
+    > {
+        match self.preferred {
+            ApertureExecutionBackend::ExactHost => {
+                let started = Instant::now();
+                let (traces, execution) = trace_receivers_aperture_with_cpu(
+                    presentation,
+                    specification,
+                    receivers,
+                    host_executor,
+                )?;
+                let wall_nanoseconds = started.elapsed().as_nanos();
+                let receipt = exact_host_receipt(
+                    self.inner.device_name(),
+                    presentation,
+                    specification,
+                    receivers,
+                    execution.workers_used,
+                    &traces,
+                    wall_nanoseconds,
+                )?;
+                Ok((traces, receipt))
+            }
+            ApertureExecutionBackend::HybridCuda => {
+                let (traces, mut receipt) =
+                    self.inner
+                        .trace(presentation, specification, receivers, host_executor)?;
+                receipt.host_parity = true;
+                Ok((traces, receipt))
+            }
+        }
+    }
+
+    /// Restrict only the structural primitive keys owed by a terminal-tube
+    /// plan. The existing admitted host/card law is reused on the exact
+    /// filtered continuous presentation; no device-side approximation or
+    /// receiver-wide overtrace is introduced.
+    pub fn trace_primitives(
+        &self,
+        presentation: &ContinuousPresentation,
+        specification: &TerminalMatrixSpec,
+        primitives: &BTreeSet<PresentedPrimitiveKey>,
+        host_executor: &CpuExecutor,
+    ) -> Result<
+        (
+            BTreeMap<ReceiverId, ReceiverApertureTrace>,
+            CudaApertureReceipt,
+        ),
+        CudaApertureError,
+    > {
+        let mut selected = presentation.clone();
+        selected.primitives.retain(|presented| {
+            primitives.contains(&PresentedPrimitiveKey {
+                receiver: presented.receiver,
+                primitive: presented.primitive.id(),
+            })
+        });
+        let selected_keys = selected
+            .primitives
+            .iter()
+            .map(|presented| PresentedPrimitiveKey {
+                receiver: presented.receiver,
+                primitive: presented.primitive.id(),
+            })
+            .collect::<BTreeSet<_>>();
+        if &selected_keys != primitives {
+            return Err(CudaApertureError::Presentation(
+                PresentationError::PrimitiveTracePopulationMismatch {
+                    requested: primitives.clone(),
+                    selected: selected_keys,
+                },
+            ));
+        }
+        let receivers = primitives
+            .iter()
+            .map(|key| key.receiver)
+            .collect::<BTreeSet<_>>();
+        self.trace(&selected, specification, &receivers, host_executor)
+    }
+
+    /// Conducts the admitted hybrid carrier even when the admission timing
+    /// selected the exact host carrier for ordinary presentation. This exists
+    /// for bounded parity and physical-cost measurements; it is not the live
+    /// executor selection law.
+    pub fn trace_hybrid(
+        &self,
+        presentation: &ContinuousPresentation,
+        specification: &TerminalMatrixSpec,
+        receivers: &BTreeSet<ReceiverId>,
+        host_executor: &CpuExecutor,
+    ) -> Result<
+        (
+            BTreeMap<ReceiverId, ReceiverApertureTrace>,
+            CudaApertureReceipt,
+        ),
+        CudaApertureError,
+    > {
+        self.inner
+            .trace(presentation, specification, receivers, host_executor)
+    }
+
+    pub fn device_name(&self) -> &str {
+        self.inner.device_name()
+    }
+
+    pub fn preferred_backend(&self) -> ApertureExecutionBackend {
+        self.preferred
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ApertureExecutionBackend {
+    ExactHost,
+    HybridCuda,
+}
+
+impl ApertureExecutionBackend {
+    pub fn label(self) -> &'static str {
+        match self {
+            Self::ExactHost => "exact host",
+            Self::HybridCuda => "hybrid CUDA/host",
+        }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CudaApertureReceipt {
+    pub schema: String,
+    pub device: String,
+    pub receivers: BigUint,
+    pub selected_primitives: BigUint,
+    pub device_primitives: BigUint,
+    pub conics: BigUint,
+    pub segments: BigUint,
+    pub host_primitives: BigUint,
+    pub host_conics: BigUint,
+    pub host_linear_primitives: BigUint,
+    pub aperture_members: BigUint,
+    pub device_output_bytes: BigUint,
+    pub device_threads: BigUint,
+    pub exact_support_evaluations: BigUint,
+    pub device_exact_support_evaluations: BigUint,
+    pub host_exact_support_evaluations: BigUint,
+    pub intermediate_bits: BigUint,
+    pub device_arithmetic: String,
+    pub host_workers: BigUint,
+    pub selection_pack_nanoseconds: u128,
+    pub device_prepare_nanoseconds: u128,
+    pub device_execute_nanoseconds: u128,
+    pub device_download_nanoseconds: u128,
+    pub device_decode_nanoseconds: u128,
+    pub host_trace_nanoseconds: u128,
+    pub host_merge_nanoseconds: u128,
+    pub wall_nanoseconds: u128,
+    pub host_parity: bool,
+    pub execution_backend: String,
+    pub admission_candidate_nanoseconds: u128,
+    pub admission_authority_nanoseconds: u128,
+}
+
+fn exact_host_receipt(
+    device_name: &str,
+    presentation: &ContinuousPresentation,
+    specification: &TerminalMatrixSpec,
+    receivers: &BTreeSet<ReceiverId>,
+    workers_used: BigUint,
+    traces: &BTreeMap<ReceiverId, ReceiverApertureTrace>,
+    wall_nanoseconds: u128,
+) -> Result<CudaApertureReceipt, CudaApertureError> {
+    let selected = presentation
+        .primitives
+        .iter()
+        .filter(|presented| receivers.contains(&presented.receiver))
+        .collect::<Vec<_>>();
+    let host_conics = selected
+        .iter()
+        .filter(|presented| matches!(&presented.primitive, ReceiverPrimitive::Conic(_)))
+        .count();
+    let exact_support_evaluations = traces.values().fold(BigUint::zero(), |sum, trace| {
+        sum + &trace.exact_support_queries
+    });
+    let aperture_members = specification
+        .width
+        .checked_mul(specification.height)
+        .ok_or(CudaApertureError::ExtentOverflow)?;
+    Ok(CudaApertureReceipt {
+        schema: "holonic-engine.cuda-aperture.v1".to_owned(),
+        device: device_name.to_owned(),
+        receivers: BigUint::from(receivers.len()),
+        selected_primitives: BigUint::from(selected.len()),
+        device_primitives: BigUint::zero(),
+        conics: BigUint::zero(),
+        segments: BigUint::zero(),
+        host_primitives: BigUint::from(selected.len()),
+        host_conics: BigUint::from(host_conics),
+        host_linear_primitives: BigUint::from(selected.len() - host_conics),
+        aperture_members: BigUint::from(aperture_members),
+        device_output_bytes: BigUint::zero(),
+        device_threads: BigUint::zero(),
+        exact_support_evaluations: exact_support_evaluations.clone(),
+        device_exact_support_evaluations: BigUint::zero(),
+        host_exact_support_evaluations: exact_support_evaluations,
+        intermediate_bits: BigUint::zero(),
+        device_arithmetic: "exact host integer-projective".to_owned(),
+        host_workers: workers_used,
+        selection_pack_nanoseconds: 0,
+        device_prepare_nanoseconds: 0,
+        device_execute_nanoseconds: 0,
+        device_download_nanoseconds: 0,
+        device_decode_nanoseconds: 0,
+        host_trace_nanoseconds: wall_nanoseconds,
+        host_merge_nanoseconds: 0,
+        wall_nanoseconds,
+        host_parity: true,
+        execution_backend: ApertureExecutionBackend::ExactHost.label().to_owned(),
+        admission_candidate_nanoseconds: 0,
+        admission_authority_nanoseconds: 0,
+    })
+}
+
+fn pack_exact_coefficient(value: &BigInt) -> Result<PackedExactCoefficient, CudaApertureError> {
+    let required_bits = value.magnitude().bits();
+    let magnitude = value
+        .magnitude()
+        .to_u128()
+        .ok_or(CudaApertureError::IntegerRange {
+            required_bits,
+            available_bits: 128,
+        })?;
+    Ok(PackedExactCoefficient {
+        lower: magnitude as u64,
+        upper: (magnitude >> 64) as u64,
+        negative: u32::from(value.is_negative()),
+        reserved: 0,
+    })
+}
+
+fn pack_conic(
+    form: &crate::HomogeneousConic,
+    specification: &TerminalMatrixSpec,
+    primitive: u32,
+) -> Result<PackedExactConic, CudaApertureError> {
+    let integer = terminal_integer_conic_coefficients(form, specification)?;
+    let required_bits =
+        preflight_intermediates(&integer, specification.width, specification.height)?;
+    let signed = integer
+        .each_ref()
+        .map(pack_exact_coefficient)
+        .into_iter()
+        .collect::<Result<Vec<_>, _>>()?;
+    Ok(PackedExactConic {
+        xx: signed[0],
+        xy: signed[1],
+        yy: signed[2],
+        x: signed[3],
+        y: signed[4],
+        constant: signed[5],
+        primitive,
+        required_bits: u32::try_from(required_bits)
+            .map_err(|_| CudaApertureError::ExtentOverflow)?,
+    })
+}
+
+fn pack_projective_segment(
+    start: &crate::ProjectivePoint2,
+    end: &crate::ProjectivePoint2,
+    specification: &TerminalMatrixSpec,
+    primitive: u32,
+) -> Result<Vec<PackedExactSegment>, CudaApertureError> {
+    crate::presentation::terminal_projective_segments(start, end, specification)
+        .into_iter()
+        .map(|(first, second)| pack_terminal_segment(&first, &second, specification, primitive))
+        .collect()
+}
+
+fn pack_terminal_segment(
+    first: &[BigInt; 3],
+    second: &[BigInt; 3],
+    specification: &TerminalMatrixSpec,
+    primitive: u32,
+) -> Result<PackedExactSegment, CudaApertureError> {
+    let mut line = [
+        &first[1] * &second[2] - &first[2] * &second[1],
+        &first[2] * &second[0] - &first[0] * &second[2],
+        &first[0] * &second[1] - &first[1] * &second[0],
+    ];
+    let content = line
+        .iter()
+        .map(Signed::abs)
+        .reduce(exact_gcd)
+        .unwrap_or_else(|| BigInt::from(1_u8));
+    if !content.is_zero() {
+        for coefficient in &mut line {
+            *coefficient /= &content;
+        }
+    }
+    if let Some(first_nonzero) = line.iter().find(|coefficient| !coefficient.is_zero())
+        && first_nonzero.is_negative()
+    {
+        for coefficient in &mut line {
+            *coefficient = -coefficient.clone();
+        }
+    }
+    let required_bits = preflight_segment_line(&line, specification.width, specification.height);
+    let signed = line
+        .iter()
+        .map(pack_exact_coefficient)
+        .collect::<Result<Vec<_>, _>>()?;
+    let [bound_left, bound_right] = terminal_axis_interval(first, second, 0, specification.width)?;
+    let [bound_top, bound_bottom] = terminal_axis_interval(first, second, 1, specification.height)?;
+    Ok(PackedExactSegment {
+        line_a: signed[0],
+        line_b: signed[1],
+        line_c: signed[2],
+        bound_left,
+        bound_top,
+        bound_right,
+        bound_bottom,
+        primitive,
+        required_bits: u32::try_from(required_bits)
+            .map_err(|_| CudaApertureError::ExtentOverflow)?,
+    })
+}
+
+fn exact_gcd(mut left: BigInt, mut right: BigInt) -> BigInt {
+    left = left.abs();
+    right = right.abs();
+    while !right.is_zero() {
+        let remainder = &left % &right;
+        left = right;
+        right = remainder;
+    }
+    left
+}
+
+fn terminal_axis_interval(
+    first: &[BigInt; 3],
+    second: &[BigInt; 3],
+    axis: usize,
+    aperture_limit: u32,
+) -> Result<[u32; 2], CudaApertureError> {
+    debug_assert!(first[2].is_positive() && second[2].is_positive());
+    let first_before_second = &first[axis] * &second[2] <= &second[axis] * &first[2];
+    let (lower, upper) = if first_before_second {
+        ((&first[axis], &first[2]), (&second[axis], &second[2]))
+    } else {
+        ((&second[axis], &second[2]), (&first[axis], &first[2]))
+    };
+    let lower_quotient = lower.0 / lower.1;
+    let lower_exact = lower.0 % lower.1 == BigInt::zero();
+    let first_member = if lower_exact && lower_quotient.is_positive() {
+        &lower_quotient - 1_u8
+    } else {
+        lower_quotient
+    };
+    let upper_quotient = upper.0 / upper.1;
+    let floor = first_member
+        .to_u32()
+        .ok_or(CudaApertureError::ExtentOverflow)?
+        .min(aperture_limit.saturating_sub(1));
+    let ceiling = upper_quotient
+        .to_u32()
+        .ok_or(CudaApertureError::ExtentOverflow)?
+        .min(aperture_limit.saturating_sub(1));
+    Ok([floor, ceiling])
+}
+
+fn preflight_segment_line(line: &[BigInt; 3], width: u32, height: u32) -> u64 {
+    [
+        line[0].abs(),
+        line[1].abs(),
+        line[2].abs(),
+        line[0].abs() * BigInt::from(width) + line[1].abs() * BigInt::from(height) + line[2].abs(),
+    ]
+    .into_iter()
+    .map(|value| value.magnitude().bits())
+    .max()
+    .unwrap_or(0)
+}
+
+fn preflight_intermediates(
+    coefficients: &[BigInt; 6],
+    width: u32,
+    height: u32,
+) -> Result<u64, CudaApertureError> {
+    let [xx, xy, yy, x, y, constant] = coefficients.each_ref().map(Signed::abs);
+    let horizontal = BigInt::from(width) + 1_u8;
+    let vertical = BigInt::from(height) + 1_u8;
+    let four = BigInt::from(4_u8);
+    let two = BigInt::from(2_u8);
+    let evaluation = &xx * &horizontal * &horizontal
+        + &xy * &horizontal * &vertical
+        + &yy * &vertical * &vertical
+        + &x * &horizontal
+        + &y * &vertical
+        + &constant;
+    let vertical_linear = &xy * &horizontal + &y;
+    let vertical_constant = &xx * &horizontal * &horizontal + &x * &horizontal + &constant;
+    let vertical_extreme = &four * &yy * &vertical_constant + &vertical_linear * &vertical_linear;
+    let horizontal_linear = &xy * &vertical + &x;
+    let horizontal_constant = &yy * &vertical * &vertical + &y * &vertical + &constant;
+    let horizontal_extreme =
+        &four * &xx * &horizontal_constant + &horizontal_linear * &horizontal_linear;
+    let determinant = &four * &xx * &yy + &xy * &xy;
+    let horizontal_numerator = &xy * &y + &two * &yy * &x;
+    let vertical_numerator = &xy * &x + &two * &xx * &y;
+    let interior = &xx * &horizontal_numerator * &horizontal_numerator
+        + &xy * &horizontal_numerator * &vertical_numerator
+        + &yy * &vertical_numerator * &vertical_numerator
+        + &x * &horizontal_numerator * &determinant
+        + &y * &vertical_numerator * &determinant
+        + &constant * &determinant * &determinant;
+    let ratio_product = std::cmp::max(
+        &horizontal * std::cmp::max(&two * &xx, determinant.clone()),
+        &vertical * std::cmp::max(&two * &yy, determinant.clone()),
+    );
+    let coefficient_limit = (BigInt::from(1_u8) << 128_u32) - 1_u8;
+    if let Some(required) = coefficients
+        .iter()
+        .map(Signed::abs)
+        .find(|value| value > &coefficient_limit)
+    {
+        return Err(CudaApertureError::IntegerRange {
+            required_bits: required.magnitude().bits(),
+            available_bits: 128,
+        });
+    }
+    let bounds = [
+        evaluation,
+        vertical_linear,
+        vertical_constant,
+        vertical_extreme,
+        horizontal_linear,
+        horizontal_constant,
+        horizontal_extreme,
+        determinant,
+        horizontal_numerator,
+        vertical_numerator,
+        interior,
+        ratio_product,
+    ];
+    let required_bits = bounds
+        .into_iter()
+        .map(|value| value.magnitude().bits())
+        .max()
+        .unwrap_or(0);
+    Ok(required_bits)
+}
+
+fn decode_support_words(
+    words: &[u32],
+    width: u32,
+    height: u32,
+) -> Result<BTreeSet<PresentationAddress>, CudaApertureError> {
+    let pixel_count = width
+        .checked_mul(height)
+        .ok_or(CudaApertureError::ExtentOverflow)?;
+    let word_count = usize::try_from(pixel_count.div_ceil(u32::BITS))
+        .map_err(|_| CudaApertureError::ExtentOverflow)?;
+    if words.len() != word_count {
+        return Err(CudaApertureError::ExtentOverflow);
+    }
+    let mut addresses = BTreeSet::new();
+    for (word_ordinal, word) in words.iter().copied().enumerate() {
+        let mut remaining = word;
+        while remaining != 0 {
+            let bit = remaining.trailing_zeros();
+            let pixel = u32::try_from(word_ordinal)
+                .map_err(|_| CudaApertureError::ExtentOverflow)?
+                .checked_mul(u32::BITS)
+                .and_then(|start| start.checked_add(bit))
+                .ok_or(CudaApertureError::ExtentOverflow)?;
+            if pixel < pixel_count {
+                addresses.insert(PresentationAddress {
+                    column: pixel % width,
+                    row: pixel / width,
+                });
+            }
+            remaining &= remaining - 1;
+        }
+    }
+    Ok(addresses)
+}
+
+#[derive(Debug, Error)]
+pub enum CudaApertureError {
+    #[error("no CUDA device is visible")]
+    NoDevice,
+    #[error("CUDA {operation} failed: {name} ({code}) — {message}")]
+    Driver {
+        operation: &'static str,
+        code: i32,
+        name: String,
+        message: String,
+    },
+    #[error(
+        "the exact conic or one of its device intermediates requires {required_bits} magnitude bits but its device carrier provides {available_bits}"
+    )]
+    IntegerRange {
+        required_bits: u64,
+        available_bits: u16,
+    },
+    #[error("the finite aperture extent exceeds the CUDA carrier")]
+    ExtentOverflow,
+    #[error("CUDA conic support differs from the exact host authority")]
+    ParityRefused,
+    #[error(transparent)]
+    Presentation(#[from] PresentationError),
+}
+
+#[cfg(test)]
+mod tests {
+    use relational_geometry::integer;
+
+    use super::*;
+    use crate::{HomogeneousConic, PresentationBoundary};
+
+    #[test]
+    fn rational_conic_clears_into_an_exact_integer_terminal_law() {
+        let form = HomogeneousConic::new([
+            integer(1),
+            integer(0),
+            integer(1),
+            integer(0),
+            integer(0),
+            integer(-1),
+        ])
+        .unwrap();
+        let specification = TerminalMatrixSpec {
+            width: 64,
+            height: 40,
+            boundary: PresentationBoundary {
+                horizontal_span: integer(2),
+                vertical_span: integer(5) / integer(4),
+            },
+        };
+        let packed = pack_conic(&form, &specification, 3).unwrap();
+        assert_eq!(packed.primitive, 3);
+        assert_ne!(
+            packed.xx,
+            PackedExactCoefficient {
+                lower: 0,
+                upper: 0,
+                negative: 0,
+                reserved: 0,
+            }
+        );
+        assert_ne!(
+            packed.yy,
+            PackedExactCoefficient {
+                lower: 0,
+                upper: 0,
+                negative: 0,
+                reserved: 0,
+            }
+        );
+        assert_eq!(
+            packed.xy,
+            PackedExactCoefficient {
+                lower: 0,
+                upper: 0,
+                negative: 0,
+                reserved: 0,
+            }
+        );
+    }
+
+    #[test]
+    fn a_coefficient_crosses_the_old_signed_i64_boundary_exactly() {
+        let magnitude = BigInt::from(1_u8) << 63_u32;
+        let packed = pack_exact_coefficient(&magnitude).unwrap();
+        assert_eq!(packed.lower, 1_u64 << 63);
+        assert_eq!(packed.upper, 0);
+        assert_eq!(packed.negative, 0);
+
+        let negative = pack_exact_coefficient(&-magnitude).unwrap();
+        assert_eq!(negative.lower, 1_u64 << 63);
+        assert_eq!(negative.upper, 0);
+        assert_eq!(negative.negative, 1);
+    }
+
+    #[test]
+    fn packed_support_words_decode_only_finite_aperture_members() {
+        let addresses = decode_support_words(
+            &[
+                (1_u32 << 0) | (1_u32 << 31),
+                (1_u32 << 0) | (1_u32 << 3) | (1_u32 << 31),
+            ],
+            7,
+            5,
+        )
+        .unwrap();
+        assert_eq!(
+            addresses,
+            [
+                PresentationAddress { column: 0, row: 0 },
+                PresentationAddress { column: 3, row: 4 },
+                PresentationAddress { column: 4, row: 4 },
+            ]
+            .into_iter()
+            .collect()
+        );
+    }
+}
