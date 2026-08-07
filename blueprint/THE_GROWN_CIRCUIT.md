@@ -1,11 +1,22 @@
 # The grown circuit
 
-> **SUPERSEDED 2026-08-07 — ARCHIVED-BODY PROVENANCE.**
-> This file describes the C++/CUDA engine, which was archived whole at `archive/cpp-engine/` when
-> the body moved to Rust. Its mechanisms, measurements and open items are **historical record**, not
-> the present position and not a schedule. The active spine is `CLAUDE.md` §0; the active roadmap is
-> `blueprint/THE_ROADMAP.md`. Nothing here is deleted — a reader following a citation into this file
-> should find what it said, and this banner telling them it no longer governs.
+> **ARCHIVED-BODY CITATIONS — but the DIRECTION here is live. Corrected 2026-08-07.**
+> The code this file cites is C++ and was archived whole at `archive/cpp-engine/` when the body moved
+> to Rust, so `structure/chi_pair.hpp`, `transition_law::boundary_parallel` and
+> `receiver/chart_contract.hpp` are historical record.
+>
+> **Its direction is not.** Brandon ratified it on 2026-08-07 and reaffirmed it the same day —
+> *"I am still personally fixated on achieving a circuitry analysis system like MorphoHDL for
+> holonics."* A prior pass banner-superseded this file wholesale because it names C++ paths, which
+> filed a ratified direction as dead provenance; that was an error and this replaces it. The
+> translation table, the claim that **the expansion schedule is a receiver**, and the reading of
+> homology and torsion as the machine's own invariants all stand.
+>
+> Where the direction lives now: `blueprint/THE_ROADMAP.md`, Part two's redirection block and *The
+> circuit becomes an integer chain complex with torsion*; and in code at
+> `crates/holonic-engine/src/rebase_invariants.rs` with its driver
+> `crates/holonic-engine/examples/grown_circuit_invariants.rs`, which grows one cell under three
+> schedules and returns the invariants that do not move.
 
 
 **Ratified by Brandon, 2026-08-07.** This is the current direction. It supersedes the movement list

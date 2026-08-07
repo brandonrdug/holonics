@@ -106,6 +106,7 @@ pub mod platform_x11;
 pub mod presentation;
 pub mod prime_ecology;
 pub mod realization;
+pub mod rebase_invariants;
 pub mod receiver;
 pub mod receiver_current;
 pub mod receiver_ecology;

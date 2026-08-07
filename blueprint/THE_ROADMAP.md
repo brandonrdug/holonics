@@ -602,6 +602,45 @@ what the plan names, and a *plan* that goes stale relative to its driver is not 
 
 ### Part two — the proof line
 
+> **REDIRECTED 2026-08-07 by Brandon, direct ruling. Lean is not the authority and never was.**
+>
+> Part two as written below centres an external checker. That is a defect in this document, and its
+> provenance is legible: the single sentence the whole proof line descends from names Lean as where
+> the request *came from* and corrects to internal machinery in the same breath — *"this came from
+> wanting the machine to work with linguistics and Lean in the last laboratory […] I meant for it to
+> lead into a machine that can rigorously perform and analyze computations using **internal
+> machinery** that accommodates transport mechanisms between **arbitrary charts**."* The documents
+> kept the origin and dropped the correction. Lean got centred because it is easy to grade —
+> binary, legible, produces receipts — which is `CLAUDE.md` §9b's convicted hyperfocus exactly.
+>
+> The ruling, verbatim:
+>
+> > *"What does the machine need Lean for? We don't need Lean to give the machine approval to grow
+> > circuitry, it can be its own Lean, I don't understand this obsession, I have already deterred it
+> > in the past."*
+>
+> > *"All of the complex geometry references I've made, references to polynomials, to the problems
+> > like RH and Hodge, they're all related not by the fields they come from, but by the fact that I
+> > know that they all fundamentally come down to being computationally founded and validated. There
+> > is nothing special about language in terms of 'proving' something, language is just a way of
+> > giving information degrees of freedom to transport and evolve […] it fundamentally doesn't
+> > matter if there is an existing paper that says anything about RH or Hodge, machines will still
+> > have to compute the consequences and intelligent constructs will have to think through the
+> > derivation independently thereafter still simply to continue networking the consequences."*
+>
+> **What replaces it.** Identity is what survives reorganizing the symbols — his 2026-08-06
+> statement, which the quote network already files as *the invariance requirement for the proof
+> machine*: *"the symbol does not dictate what the information contains, you could reorganize the
+> symbols and the structure of the proof or algorithm would determine the identity of the underlying
+> algorithmic patterns."* That is `chi' = G chi G^-1`, it is the MorphoHDL question *what survives
+> every expansion schedule*, and over an integer incidence it has an exact internal answer. Lean, if
+> it stays at all, is one receiver among receivers — a cheap second frame, never load-bearing, never
+> what a morphology keys on.
+>
+> **Returned the same day.** `crates/holonic-engine/src/rebase_invariants.rs` and
+> `crates/holonic-engine/examples/grown_circuit_invariants.rs`. See *The circuit becomes an integer
+> chain complex with torsion* in Part three, which this ruling moves above the proof line.
+
 This is the objective directly. `CLAUDE.md` §0 names it: *"the machine learning to produce
 mathematical proofs."*
 
@@ -782,6 +821,48 @@ nothing about itself.
 invariant, the exact signed-ℤ coefficient ring, the incidence bridge from the grown circuit, the
 Euler and cycle-rank analyses. It **never computed homology**. Remains: SNF, torsion, the public
 rank, the reader.
+
+**Returned 2026-08-07, in part — the invariants exist; the reader does not.**
+
+`crates/holonic-engine/src/rebase_invariants.rs`. Smith normal form over ℤ on the boundary matrices
+of `GradedCausalComplex`, returning per grade the **actual invariant factors** — not a count of them
+— with Betti numbers and torsion. Every entry is a `BigInt`; there is no float and no tolerance
+anywhere in the reduction, and each row and column operation is literally a rebase of one of the two
+chain groups, which is why what it computes is what rebasing leaves alone.
+
+The organ carries the one hazard its own history names. A convicted contaminant in this project was
+*a solver's pivot order promoted into a reduction*, so the pivot rule is an explicit parameter over
+three strategies, and `the_invariants_do_not_depend_on_the_pivot_rule` requires all three to return
+byte-identical factors. That check has teeth: removing the divisibility repair makes the rules
+genuinely disagree and the test fails. `the_invariants_do_not_depend_on_the_founding_order` does the
+same for the cell ordering, which is the other receiver coordinate in reach.
+
+`crates/holonic-engine/examples/grown_circuit_invariants.rs` is the driver, and it is the MorphoHDL
+question made executable. A recursive cell grows under **three expansion schedules** — breadth,
+largest-first, depth — producing three distinct charts, and the invariants are required to be
+identical across all three. Three structures are grown so that no law here returns zero and calls
+that evidence: a tree (no loops, no torsion), a rim (5 loops, so the loop reading is shown capable
+of being nonzero), and a rim carrying a face attached to it **twice**, which returns `Z/2`. **19
+declared controls, 0 failed.**
+
+The measured artifact, which is the point of the whole line:
+
+```text
+tree     betti [1, 0]                 no winding
+rim      betti [1, 5]                 five free loops
+wound    betti [1, 4, 0]  +  Z/2      one free loop traded for winding that cannot be un-deposited
+```
+
+Torsion is invisible to every rational rank in the tree, including `algebraic.rs`'s
+`exact_rational_rank`, which is why this had to be integral. Two defects were caught by the driver's
+own controls while it was being built: a uniform aperture made `largest-first` coincide exactly with
+`breadth`, so a schedule that could not change the layout was being reported as a third data point;
+and the claim that the wound face *kills* the loop was too strong — it trades exactly one free loop
+for `Z/2` and leaves the other four standing.
+
+**Remains:** the reader over the emitted atlas tables, and the public exact rank. The schedule is a
+parameter in the driver but the engine's own ten `pop_front` sites are still hardcoded — that is the
+next movement, and it is now the load-bearing one.
 
 ---
 
