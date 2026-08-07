@@ -3,14 +3,13 @@
 #include <holonics/event/resident_elementary_calculus.hpp>
 
 namespace holonics::event {
-
 HOLONICS_CALLABLE inline bool resident_elementary_calculus::form_calculus(
     elementary_calculus_observation &out) noexcept {
   if (!admitted_ || pending_live_ || stage_ != stage::developmental ||
       !out.inquiry.theory_formed || !codec::render_elementary_calculus(
           elementary_surface(cards_,out.inquiry),out.passage.formal)) return false;
   auto continuation = body_.take_continuation();
-  out.passage.formation_commit = body_.commit(body_.head(),0,0,out.inquiry.passage.value(),
+  out.passage.formation_commit = body_.commit(body_.head(),0,out.inquiry.passage.value(),
       static_cast<body::linear_continuation &&>(continuation));
   if (out.passage.formation_commit.state != body::body_change_status::committed) return false;
   const checker_outbound_occurrence outbound{body_.head(),exact::word{164'100},
@@ -37,23 +36,14 @@ HOLONICS_CALLABLE inline bool resident_elementary_calculus::resume_calculus(
   cm_checker_detail::normalize(raw,out.passage.formal,declaration,source,typed);
   const bool accepted = typed.state == checker_return_status::accepted;
   auto &morphology = out.passage.returned_morphology;
-  morphology.mathematical_before = standing_.standing.mathematical_admitted_tally;
-  morphology.codec_before = standing_.standing.codec_admitted_tally;
-  standing_.standing.mathematical_admitted_tally += accepted ? 40U : 1U;
-  standing_.standing.codec_admitted_tally += accepted ? 16U : 1U;
-  calculus_admitted_tally_ += accepted ? 64U : 1U;
-  self_organ_admitted_tally_ += accepted ? 32U : 0U;
-  morphology.commit = body_.commit(expected.predecessor,0,accepted ? 80U : 1U,
+  morphology.commit = body_.commit(expected.predecessor,0,
       expected.passage.value(),live->take_continuation()); pending_live_ = false;
-  morphology.mathematical_after = standing_.standing.mathematical_admitted_tally;
-  morphology.codec_after = standing_.standing.codec_admitted_tally;
   morphology.returned_difference_applied = morphology.commit.state == body::body_change_status::committed;
   out.passage.pending_after_return = pending_live_; out.passage.passage_preserved = raw.passage == expected.passage;
   if (accepted && morphology.returned_difference_applied) {
-    constexpr std::uint8_t deltas[6]{16,16,12,12,12,12};
     for (std::uint8_t i = 0; i < 6; ++i) {
       laws_.fibers[i] = {exact::word{199'300U+i},expected.passage,raw.event,
-          exact::word{out.inquiry.lineage.value()+i},exact::word{deltas[i]},true};
+          exact::word{out.inquiry.lineage.value()+i},true};
       out.passage.acquired[i] = laws_.fibers[i];
     }
     laws_.self_organ = out.inquiry.self_organ.organ;
@@ -84,7 +74,7 @@ HOLONICS_CALLABLE inline bool resident_elementary_calculus::form_heldout(
       !codec::render_heldout_holonomy(heldout_surface(out.inquiry,laws_.self_organ),
                                      out.passage.formal)) return false;
   auto continuation = body_.take_continuation();
-  out.passage.formation_commit = body_.commit(body_.head(),0,0,out.inquiry.passage.value(),
+  out.passage.formation_commit = body_.commit(body_.head(),0,out.inquiry.passage.value(),
       static_cast<body::linear_continuation &&>(continuation));
   if (out.passage.formation_commit.state != body::body_change_status::committed) return false;
   const checker_outbound_occurrence outbound{body_.head(),exact::word{164'110},
@@ -111,20 +101,13 @@ HOLONICS_CALLABLE inline bool resident_elementary_calculus::resume_heldout(
   cm_checker_detail::normalize(raw,out.passage.formal,declaration,source,typed);
   const bool accepted = typed.state == checker_return_status::accepted;
   auto &morphology = out.passage.returned_morphology;
-  morphology.mathematical_before = standing_.standing.mathematical_admitted_tally;
-  morphology.codec_before = standing_.standing.codec_admitted_tally;
-  standing_.standing.mathematical_admitted_tally += accepted ? 12U : 1U;
-  standing_.standing.codec_admitted_tally += accepted ? 8U : 1U;
-  derivation_admitted_tally_ += accepted ? 24U : 1U;
-  morphology.commit = body_.commit(expected.predecessor,0,accepted ? 24U : 1U,
+  morphology.commit = body_.commit(expected.predecessor,0,
       expected.passage.value(),live->take_continuation()); pending_live_ = false;
-  morphology.mathematical_after = standing_.standing.mathematical_admitted_tally;
-  morphology.codec_after = standing_.standing.codec_admitted_tally;
   morphology.returned_difference_applied = morphology.commit.state == body::body_change_status::committed;
   out.passage.pending_after_return = pending_live_; out.passage.passage_preserved = raw.passage == expected.passage;
   if (accepted && morphology.returned_difference_applied) {
-    application_ = {exact::word{199'306},expected.passage,raw.event,out.inquiry.lineage,
-        exact::word{24},true}; stage_ = stage::applied;
+    application_ = {exact::word{199'306},expected.passage,raw.event,
+        out.inquiry.lineage,true}; stage_ = stage::applied;
   }
   return accepted && morphology.returned_difference_applied;
 }

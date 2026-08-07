@@ -7,7 +7,6 @@
 #include <holonics/organ/characteristic_schema.hpp>
 
 namespace holonics::organ {
-
 inline constexpr std::size_t regular_singular_chart_capacity = 3;
 inline constexpr std::size_t regular_singular_term_capacity = 12;
 
@@ -88,7 +87,6 @@ struct acquired_regular_singular final {
   exact::word passage{};
   exact::word kernel_return{};
   exact::word lineage{};
-  exact::word admitted_tally_delta{};
   bool accepted{};
 };
 

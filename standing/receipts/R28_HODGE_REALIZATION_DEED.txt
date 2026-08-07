@@ -20,7 +20,7 @@ locus=quotient:-1,1,tangent:0,normal:1,multiplicity:1,graph_square:0,mutual:4,pr
 cycles=generators:7,translations:4,distinct:1,enumerated:2187,integral_realizers:16,half_realizers:16,effective_graphs:4,outside_obstructed:1
 blowup=rank:7,exceptional_square:-1,center:0,selected_square:-1,changed_center:1,changed_selected_square:-1
 checker=exit:0,stdout_bytes:543,stderr_bytes:0,produced_bytes:896936
-final_body=head:14001030,continuation:15001030,admitted_tally:693,mathematical:207,codec:103,hodge:41,rest_bytes:984,integrity:5813231700886005822
+final_body=head:14001030,continuation:15001030,rest_bytes:720,integrity:10607255173111083133
 rest_io=loaded:1,written:1
 physical_telemetry=engine_time:unknown,checker_time:unknown,temperature:unknown,power:unknown,energy:unknown
 formal_begin

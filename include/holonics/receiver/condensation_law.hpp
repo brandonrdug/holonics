@@ -7,7 +7,6 @@
 #include <holonics/receiver/geometry_exact.hpp>
 
 namespace holonics::receiver {
-
 [[nodiscard]] HOLONICS_CALLABLE constexpr bool factorable_family(
     const future_receiver_family& family,
     const std::uint16_t* groups,
@@ -74,7 +73,7 @@ namespace holonics::receiver {
     const condensed_snapshot& left,
     const condensed_snapshot& right) noexcept {
   if (left.head != right.head || left.incidence != right.incidence ||
-      left.admitted_tally != right.admitted_tally || left.current != right.current ||
+      left.current != right.current ||
       left.lineage != right.lineage || left.logical_resource != right.logical_resource ||
       left.alternatives != right.alternatives || left.obstruction != right.obstruction ||
       left.source_count != right.source_count) {

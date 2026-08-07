@@ -6,14 +6,10 @@
 #include <holonics/organ/cultivated_organ_receipt.hpp>
 
 namespace holonics::event {
-
 struct cultivated_organ_rest_record final {
   rederivation_rest_record standing{};
   organ::cultivated_shift_organ organs[organ::cultivation_family_count]{};
   organ::acquired_organ_application application{};
-  std::uint64_t cultivation_admitted_tally{};
-  std::uint64_t organ_admitted_tally{};
-  std::uint64_t application_admitted_tally{};
   std::uint64_t integrity{};
   bool applied{};
 };
@@ -51,11 +47,10 @@ cultivated_organ_rest_integrity(const cultivated_organ_rest_record &record) noex
     for (std::uint8_t i = 0; i < organ.features; ++i)
       terminal_rest_detail::fold_value(fold, static_cast<std::uint64_t>(organ.coefficients[i]));
   }
-  const std::uint64_t values[10]{record.application.identity.value(),
+  const std::uint64_t values[6]{record.application.identity.value(),
       record.application.passage.value(), record.application.returned_event.value(),
-      record.application.lineage.value(), record.application.admitted_tally_delta.value(),
-      record.application.accepted ? 1U : 0U, record.cultivation_admitted_tally,
-      record.organ_admitted_tally, record.application_admitted_tally, record.applied ? 1U : 0U};
+      record.application.lineage.value(),
+      record.application.accepted ? 1U : 0U, record.applied ? 1U : 0U};
   for (const auto value : values) terminal_rest_detail::fold_value(fold, value);
   return fold;
 }

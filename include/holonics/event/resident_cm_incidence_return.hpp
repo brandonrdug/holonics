@@ -3,7 +3,6 @@
 #include <holonics/event/resident_cm_incidence.hpp>
 
 namespace holonics::event {
-
 HOLONICS_CALLABLE inline bool resident_cm_incidence::form(
     const organ::cm_incidence_question& question,
     cm_incidence_observation& observation) noexcept {
@@ -57,7 +56,7 @@ HOLONICS_CALLABLE inline bool resident_cm_incidence::form(
     observation.inquiry.obstruction = organ::cm_obstruction::render_refused; return false;
   }
   auto continuation = body_.take_continuation();
-  observation.passage.formation_commit = body_.commit(body_.head(), 0, 15,
+  observation.passage.formation_commit = body_.commit(body_.head(), 0,
       inquiry.theory.passage.value(), static_cast<body::linear_continuation&&>(continuation));
   if (observation.passage.formation_commit.state != body::body_change_status::committed) {
     observation.inquiry.obstruction = organ::cm_obstruction::continuation_refused; return false;
@@ -94,17 +93,9 @@ HOLONICS_CALLABLE inline bool resident_cm_incidence::resume(
   cm_checker_detail::normalize(raw, observation.passage.formal, declaration, source, typed);
   const bool accepted = typed.state == checker_return_status::accepted;
   auto& morphology = observation.passage.returned_morphology;
-  morphology.mathematical_before = mathematical_admitted_tally_;
-  morphology.codec_before = codec_admitted_tally_;
-  mathematical_admitted_tally_ += accepted ? 10U : 1U;
-  codec_admitted_tally_ += accepted ? 4U : 2U;
-  cm_incidence_admitted_tally_ += accepted ? 17U : 1U;
-  const std::uint64_t delta = accepted ? 16U : 4U;
-  morphology.commit = body_.commit(expected.predecessor, 0, delta,
+  morphology.commit = body_.commit(expected.predecessor, 0,
       expected.passage.value(), pending->take_continuation());
   pending_live_ = false;
-  morphology.mathematical_after = mathematical_admitted_tally_;
-  morphology.codec_after = codec_admitted_tally_;
   morphology.returned_difference_applied = accepted &&
       morphology.commit.state == body::body_change_status::committed;
   observation.passage.pending_after_return = pending_live_;
@@ -112,7 +103,7 @@ HOLONICS_CALLABLE inline bool resident_cm_incidence::resume(
       observation.passage.formal.passage == expected.passage;
   if (accepted && morphology.returned_difference_applied) {
     cm_incidence_ = {exact::word{189'300}, expected.passage, raw.event,
-        observation.inquiry.theory.lineage, exact::word{delta}, true};
+        observation.inquiry.theory.lineage, true};
     observation.passage.acquired = cm_incidence_;
     stage_ = passage_stage::returned;
   }
@@ -139,14 +130,6 @@ HOLONICS_CALLABLE inline cm_incidence_rest_receipt resident_cm_incidence::rest(
   record.code_reconstruction = code_reconstruction_;
   record.moment_reconstruction = moment_reconstruction_;
   record.cm_incidence = cm_incidence_;
-  record.mathematical_admitted_tally = mathematical_admitted_tally_;
-  record.codec_admitted_tally = codec_admitted_tally_;
-  record.geometry_admitted_tally = geometry_admitted_tally_;
-  record.phase_admitted_tally = phase_admitted_tally_;
-  record.characteristic_admitted_tally = characteristic_admitted_tally_;
-  record.regular_singular_admitted_tally = regular_singular_admitted_tally_;
-  record.blind_reconstruction_admitted_tally = blind_reconstruction_admitted_tally_;
-  record.cm_incidence_admitted_tally = cm_incidence_admitted_tally_;
   record.integrity = cm_incidence_rest_integrity(record);
   receipt.theory = cm_incidence_.identity;
   receipt.integrity = exact::word{record.integrity};

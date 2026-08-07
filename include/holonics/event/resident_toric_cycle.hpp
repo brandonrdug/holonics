@@ -11,7 +11,6 @@
 #include <holonics/organ/toric_cycle_law.hpp>
 
 namespace holonics::event {
-
 class resident_toric_cycle final {
  public:
   resident_toric_cycle() = delete;
@@ -58,15 +57,6 @@ class resident_toric_cycle final {
   organ::acquired_cm_incidence cm_incidence_{};
   organ::acquired_toric_cycle toric_cycle_{};
   alignas(checker_pending_deed) unsigned char pending_storage_[sizeof(checker_pending_deed)]{};
-  std::uint64_t mathematical_admitted_tally_{};
-  std::uint64_t codec_admitted_tally_{};
-  std::uint64_t geometry_admitted_tally_{};
-  std::uint64_t phase_admitted_tally_{};
-  std::uint64_t characteristic_admitted_tally_{};
-  std::uint64_t regular_singular_admitted_tally_{};
-  std::uint64_t blind_reconstruction_admitted_tally_{};
-  std::uint64_t cm_incidence_admitted_tally_{};
-  std::uint64_t toric_cycle_admitted_tally_{};
   passage_stage stage_{passage_stage::none};
   bool source_detached_{};
   bool pending_live_{};

@@ -3,7 +3,6 @@
 #include <ostream>
 
 namespace holonics::tests {
-
 void write_r29_artifact(std::ostream& output, bool source_loaded,
     const apparatus::arithmetic_store_receipt& card,
     const apparatus::arithmetic_store_receipt& rest_load,
@@ -64,10 +63,7 @@ void write_r29_artifact(std::ostream& output, bool source_loaded,
       << passage.raw.stdout_bytes << ",stderr_bytes:" << passage.raw.stderr_bytes
       << ",produced_bytes:" << passage.raw.produced_artifact_bytes
       << "\nfinal_body=head:" << observation.final_head.value() << ",continuation:"
-      << observation.final_continuation.value() << ",admitted_tally:"
-      << handoff.body.regions[0].admitted_tally << ",mathematical:" << handoff.mathematical_admitted_tally
-      << ",codec:" << handoff.codec_admitted_tally << ",hodge:" << handoff.hodge_realization_admitted_tally
-      << ",arithmetic:" << handoff.arithmetic_spectral_admitted_tally << ",rest_bytes:" << sizeof(handoff)
+      << observation.final_continuation.value() << ",rest_bytes:" << sizeof(handoff)
       << ",integrity:" << handoff.integrity
       << "\nrest_io=loaded:" << rest_load.returned() << ",written:" << rest_write.returned()
       << "\nphysical_telemetry=engine_time:unknown,checker_time:unknown,temperature:unknown,"

@@ -28,7 +28,7 @@ current::weave_program make_program(std::uint64_t identity, bool alternative) no
   }
   for (std::size_t cell = 0; cell < program.cell_count; ++cell) {
     program.cells[cell] = {exact::word{identity * 100U + cell + 1U},
-        exact::word{100U + cell}, exact::word{10U + cell}, exact::word{0},
+        exact::word{100U + cell}, exact::word{0},
         exact::word{identity * 10U + cell}, 1, 8};
   }
   const std::uint64_t deltas[10]{3, 5, 7, 11, 13, 17, 19, 23, 29, 31};
@@ -40,8 +40,8 @@ current::weave_program make_program(std::uint64_t identity, bool alternative) no
         exact::word{identity * 1'000U + 300U + slot},
         exact::word{identity * 1'000U + 400U + slot},
         exact::word{support}, exact::word{support}, exact::word{deltas[slot]},
-        exact::word{slot + 1U}, exact::word{1'000U + slot},
-        exact::word{2'000U + slot}, exact::word{slot + 1U}, exact::word{1},
+        exact::word{1'000U + slot}, exact::word{2'000U + slot},
+        exact::word{slot + 1U}, exact::word{1},
         exact::word{0}, cells[slot]};
   }
   const exact::word intermediate{identity * 1'000U + 900U};
@@ -70,7 +70,7 @@ current::weave_program make_program(std::uint64_t identity, bool alternative) no
       exact::word{identity * 1'000U + 952U}, exact::word{400}, exact::word{600},
       exact::word{330'000}};
   for (std::size_t region = 0; region < body::live_region_capacity; ++region) {
-    program.body_regions[region] = {20U + region, 0};
+    program.body_regions[region] = {0};
   }
   return program;
 }

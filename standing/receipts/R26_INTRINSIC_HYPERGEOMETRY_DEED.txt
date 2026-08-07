@@ -9,9 +9,9 @@ device_compute_capability=8.9
 kernel_launches=13
 launched_threads=31
 semantic_threads=23
-bytes_to_device=10144
-bytes_from_device=2747416
-resident_bytes=2759904
+bytes_to_device=9928
+bytes_from_device=2747040
+resident_bytes=2758848
 host_semantic_events=0
 verification_failures=0
 executor_state=0
@@ -19,14 +19,14 @@ predecessor_remount=body:1,same_body:1,theory:1,source_replayed:0,theory_id:1923
 inquiry=all_exact:1,theory_formed:1,source_mask:4095,obstruction:0,no_expected_invariants:1
 source_cards=all_loaded:1,r26_bytes:100,fold:18113643652046036805,path_fold:7836832754731454435
 source_aperture=phase_cases:10,vertices_per_case:323,edges_per_case:646,faces_per_case:323,flags_per_case:2584,series_depth:20,section_ring:Z/65521Z,cm_squares:40,expected_invariants:absent
-predecessor=rest_bytes:816,head:14001024
+predecessor=rest_bytes:600,head:14001024
 phase_cases=2x3:cells=6,12,6,flags=48,tours=1x6,projection_fibers=6,word_fold=3005401531244400733;3x5:cells=15,30,15,flags=120,tours=1x15,projection_fibers=15,word_fold=17257313777842281915;5x7:cells=35,70,35,flags=280,tours=1x35,projection_fibers=35,word_fold=16517028317970595919;7x11:cells=77,154,77,flags=616,tours=1x77,projection_fibers=77,word_fold=7890629072050995331;11x13:cells=143,286,143,flags=1144,tours=1x143,projection_fibers=143,word_fold=5002683133807996204;13x17:cells=221,442,221,flags=1768,tours=1x221,projection_fibers=221,word_fold=333326788687596832;17x19:cells=323,646,323,flags=2584,tours=1x323,projection_fibers=323,word_fold=9816247015986302221;6x9:cells=54,108,54,flags=432,tours=3x18,projection_fibers=54,word_fold=11885351504144663136;8x12:cells=96,192,96,flags=768,tours=4x24,projection_fibers=96,word_fold=804875388390881630;7x5:cells=35,70,35,flags=280,tours=1x35,projection_fibers=35,word_fold=15595417998830986772
 local_section=series_terms:20,recurrence_exact:1,form_preserved:1,ordered_resolutions_unequal:1,commutator:13,8;8,5
 supported_cycle=cm_squares:40,cycle_characteristic:1,0,0,0,-1,phase_boundary:1,cm_no_two_cell:1,filled_extension_obstructed:1,supported_loop:1
 controls=equal_hull_unequal_transport:1,equal_local_population_unequal_order:1,equal_spectrum_unequal_support:1,conjugate_rechart:1,changed_source_sensitive:1
 changed_case=5x8,cells:40,80,40,flags:320,tours:1x40,word_fold:12996452429275640009
 checker=exit:0,stdout_bytes:2033,stderr_bytes:0,produced_bytes:169488
-final_body=head:14001026,continuation:15001026,admitted_tally:535,mathematical:164,codec:84,intrinsic_hypergeometry:31,rest_bytes:872,integrity:4268701919319549365
+final_body=head:14001026,continuation:15001026,rest_bytes:640,integrity:15330913953878000764
 physical_telemetry=engine_time:unknown,checker_time:unknown,temperature:unknown,power:unknown,energy:unknown
 formal_begin
 import Mathlib.Tactic.NormNum

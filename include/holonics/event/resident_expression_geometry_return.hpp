@@ -3,7 +3,6 @@
 #include <holonics/event/resident_expression_geometry.hpp>
 
 namespace holonics::event {
-
 HOLONICS_CALLABLE inline bool resident_expression_geometry::form(
     expression_geometry_observation& observation) noexcept {
   if (!admitted_ || pending_live_ || stage_ != passage_stage::none ||
@@ -16,7 +15,7 @@ HOLONICS_CALLABLE inline bool resident_expression_geometry::form(
     return false;
   }
   auto continuation = body_.take_continuation();
-  observation.passage.formation_commit = body_.commit(body_.head(), 0, 37,
+  observation.passage.formation_commit = body_.commit(body_.head(), 0,
       observation.inquiry.theory.passage.value(),
       static_cast<body::linear_continuation&&>(continuation));
   if (observation.passage.formation_commit.state != body::body_change_status::committed) {
@@ -47,15 +46,8 @@ HOLONICS_CALLABLE inline bool resident_expression_geometry::resume(
   constexpr char source[] = "theorem generated_expression_geometry";
   cm_checker_detail::normalize(raw, observation.passage.formal, declaration, source, typed);
   const bool accepted = typed.state == checker_return_status::accepted;
-  auto& morphology = observation.passage.returned_morphology;
-  morphology.mathematical_before = mathematical_admitted_tally_;
-  morphology.codec_before = codec_admitted_tally_;
-  mathematical_admitted_tally_ += accepted ? 20U : 1U; codec_admitted_tally_ += accepted ? 9U : 2U;
-  expression_geometry_admitted_tally_ += accepted ? 37U : 1U; const std::uint64_t delta = accepted ? 38U : 4U;
-  morphology.commit = body_.commit(expected.predecessor, 0, delta,
+  auto& morphology = observation.passage.returned_morphology;  morphology.commit = body_.commit(expected.predecessor, 0,
       expected.passage.value(), pending->take_continuation()); pending_live_ = false;
-  morphology.mathematical_after = mathematical_admitted_tally_;
-  morphology.codec_after = codec_admitted_tally_;
   morphology.returned_difference_applied = accepted &&
       morphology.commit.state == body::body_change_status::committed;
   observation.passage.pending_after_return = pending_live_;
@@ -63,7 +55,7 @@ HOLONICS_CALLABLE inline bool resident_expression_geometry::resume(
       observation.passage.formal.passage == expected.passage;
   if (accepted && morphology.returned_difference_applied) {
     expression_geometry_ = {exact::word{194'300}, expected.passage, raw.event,
-        observation.inquiry.theory.lineage, exact::word{delta}, true};
+        observation.inquiry.theory.lineage, true};
     observation.passage.acquired = expression_geometry_; stage_ = passage_stage::returned;
   }
   return morphology.returned_difference_applied && accepted;

@@ -3,7 +3,6 @@
 #include <holonics/event/resident_cultivated_organs.hpp>
 
 namespace holonics::event {
-
 HOLONICS_CALLABLE inline cultivated_organ_rest_receipt
 resident_cultivated_organs::rest(cultivated_organ_rest_record &record) noexcept {
   cultivated_organ_rest_receipt receipt{};
@@ -13,9 +12,7 @@ resident_cultivated_organs::rest(cultivated_organ_rest_record &record) noexcept 
   record.standing.integrity = rederivation_rest_integrity(record.standing);
   for (std::uint8_t i = 0; i < organ::cultivation_family_count; ++i)
     record.organs[i] = organs_[i];
-  record.application = application_; record.cultivation_admitted_tally = cultivation_admitted_tally_;
-  record.organ_admitted_tally = organ_admitted_tally_;
-  record.application_admitted_tally = application_admitted_tally_;
+  record.application = application_;
   record.applied = stage_ == stage::applied;
   record.integrity = cultivated_organ_rest_integrity(record);
   receipt.first_organ = organs_[0].identity; receipt.application = application_.identity;

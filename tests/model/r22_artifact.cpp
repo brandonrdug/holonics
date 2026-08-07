@@ -4,7 +4,6 @@
 
 namespace holonics::tests {
 namespace {
-
 void write_coefficients(std::ostream& output,
     const organ::cm_graph_receipt& graph) noexcept {
   for (std::size_t slot = 0; slot < organ::cm_characteristic_capacity; ++slot) {
@@ -90,9 +89,7 @@ void write_r22_artifact(std::ostream& output,
       << value.passage.raw.source_fold << ",artifact_fold:"
       << value.passage.raw.produced_artifact_fold
       << "\nfinal_body=head:" << handoff.body.head << ",continuation:"
-      << handoff.body.continuation << ",admitted_tally:" << handoff.body.regions[0].admitted_tally
-      << ",mathematical:" << handoff.mathematical_admitted_tally << ",codec:"
-      << handoff.codec_admitted_tally << ",cm_incidence:" << handoff.cm_incidence_admitted_tally
+      << handoff.body.continuation
       << ",rest_bytes:" << rest_write.bytes.value() << ",integrity:" << handoff.integrity
       << "\nphysical_telemetry=engine_time:unknown,checker_time:unknown,temperature:unknown,"
          "power:unknown,energy:unknown\nformal_begin\n";

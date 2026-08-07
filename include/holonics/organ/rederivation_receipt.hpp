@@ -5,7 +5,6 @@
 #include <holonics/organ/rederivation_schema.hpp>
 
 namespace holonics::organ {
-
 enum class rederivation_obstruction : std::uint8_t {
   none,
   card_refused,
@@ -196,7 +195,6 @@ struct acquired_rederivation_fiber final {
   exact::word passage{};
   exact::word returned_event{};
   exact::word lineage{};
-  exact::word admitted_tally_delta{};
   bool accepted{};
 };
 

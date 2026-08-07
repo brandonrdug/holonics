@@ -9,10 +9,10 @@ source_currents=5
 host_semantic_events=0
 identity_candidates=31
 conduct_candidates=2187
-intermediate_rest_bytes=2472
+intermediate_rest_bytes=2040
 development_rows_in_rest=0
 traces_in_rest=0
-final_body=head:14001042,continuation:15001042,admitted_tally:1079,mathematical:358,codec:163,calculus:64,self_organ:32
+final_body=head:14001042,continuation:15001042
 checker_exit=0
 formal_begin
 import Mathlib.LinearAlgebra.Matrix.Notation

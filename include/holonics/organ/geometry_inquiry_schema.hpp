@@ -6,7 +6,6 @@
 #include <holonics/exact/word.hpp>
 
 namespace holonics::organ {
-
 inline constexpr std::size_t geometry_inquiry_probe_capacity = 32;
 inline constexpr std::size_t geometry_inquiry_fiber_capacity = 4;
 
@@ -83,7 +82,6 @@ struct acquired_geometry_theory final {
   exact::word passage{};
   exact::word kernel_return{};
   exact::word lineage{};
-  exact::word admitted_tally_delta{};
   bool accepted{};
 };
 

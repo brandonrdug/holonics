@@ -62,9 +62,6 @@ HOLONICS_CALLABLE inline resident_trace_fiber::resident_trace_fiber(
       body_(body::continuing_body::remount(
           record.standing.standing.standing.standing.body, receipt.body)),
       law_(record.law), application_(record.application),
-      trace_fiber_admitted_tally_(record.trace_fiber_admitted_tally),
-      lift_organ_admitted_tally_(record.lift_organ_admitted_tally),
-      triple_transport_admitted_tally_(record.triple_transport_admitted_tally),
       stage_(record.applied ? stage::applied : stage::derived) {
   const bool exact = record.integrity == trace_fiber_rest_integrity(record);
   receipt.discovery = record.law.discovery.identity;

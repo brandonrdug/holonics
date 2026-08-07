@@ -6,7 +6,6 @@
 #include <holonics/exact/word.hpp>
 
 namespace holonics::organ {
-
 inline constexpr std::size_t blind_cube_dimension_capacity = 7;
 inline constexpr std::size_t blind_cube_vertex_capacity = 128;
 inline constexpr std::size_t blind_parity_row_capacity = 3;
@@ -115,7 +114,6 @@ struct acquired_blind_reconstruction final {
   exact::word passage{};
   exact::word kernel_return{};
   exact::word lineage{};
-  exact::word admitted_tally_delta{};
   bool accepted{};
 };
 

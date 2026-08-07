@@ -10,7 +10,6 @@
 #include <holonics/structure/identity_mint.hpp>
 
 namespace holonics::event {
-
 [[nodiscard]] HOLONICS_CALLABLE inline body_observation observe(
     const body::continuing_body& standing) noexcept {
   body_observation result{};
@@ -71,7 +70,6 @@ namespace holonics::event {
   receipt.read_support = support;
   receipt.change_support = support;
   receipt.incidence_delta = 0;
-  receipt.admitted_tally_delta = returned.payload;
   receipt.successor_current = returned.payload;
   receipt.returned_consequence = returned.payload;
   receipt.stress = returned.payload;
@@ -88,8 +86,7 @@ namespace holonics::event {
     body::continuing_body& standing,
     live_delta& delta) noexcept {
   const auto receipt = delta.receipt();
-  return standing.commit(exact::word{receipt.predecessor}, receipt.region,
-      receipt.admitted_tally_delta, receipt.successor_current, delta.take_continuation());
+  return standing.commit(exact::word{receipt.predecessor}, receipt.region, receipt.successor_current, delta.take_continuation());
 }
 
 HOLONICS_CALLABLE inline void recover(

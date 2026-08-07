@@ -3,7 +3,6 @@
 #include <cstdint>
 
 namespace holonics::tests {
-
 struct r9_expected final {
   std::uint64_t predecessor{};
   std::uint64_t continuation{};
@@ -21,7 +20,6 @@ struct r9_expected final {
   std::uint64_t after_render_first{};
   std::uint64_t after_transduce_first{};
   std::uint64_t after_transduce_second{};
-  std::uint64_t admitted_tally{};
   std::uint64_t current{};
 };
 

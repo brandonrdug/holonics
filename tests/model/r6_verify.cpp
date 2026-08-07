@@ -4,10 +4,8 @@
 
 namespace holonics::tests {
 namespace {
-
 bool equal(const current::weave_cell& left, const current::weave_cell& right) noexcept {
   return left.identity == right.identity && left.value == right.value &&
-      left.admitted_tally == right.admitted_tally && left.current == right.current &&
       left.lineage == right.lineage && left.placement == right.placement &&
       left.aperture == right.aperture;
 }
@@ -37,7 +35,6 @@ bool equal(const current::weave_delta& left, const current::weave_delta& right) 
       left.input_port == right.input_port && left.output_port == right.output_port &&
       left.read_support == right.read_support && left.change_support == right.change_support &&
       left.value_delta == right.value_delta &&
-      left.admitted_tally_delta == right.admitted_tally_delta &&
       left.successor_current == right.successor_current &&
       left.consequence == right.consequence && left.stress == right.stress &&
       left.obstruction == right.obstruction &&
@@ -85,7 +82,7 @@ std::size_t certificate_failures(const current::weave_program& program,
   failures += parallel.left_event != program.events[2].identity;
   failures += parallel.right_event != program.events[3].identity;
   failures += !parallel.identity_equal || !parallel.causal_order_equal ||
-      !parallel.incidence_equal || !parallel.admitted_tally_equal || !parallel.current_equal ||
+      !parallel.incidence_equal || !parallel.current_equal ||
       !parallel.consequence_equal || !parallel.obstruction_equal ||
       !parallel.logical_resource_equal || !parallel.complete_successor_equal;
   failures += !equal(parallel.left_right, parallel.right_left);

@@ -198,17 +198,11 @@ std::size_t r30_verification_failures(
        o.foil.returned_morphology.commit.successor != exact::word{14'001'034} ||
        o.passage.formation_commit.successor != exact::word{14'001'035} ||
        o.passage.returned_morphology.commit.successor !=
-           exact::word{14'001'036} ||
-       o.passage.returned_morphology.mathematical_after != 270 ||
-       o.passage.returned_morphology.codec_after != 127;
+           exact::word{14'001'036} ;
   f += o.final_head != exact::word{14'001'036} ||
        o.final_continuation != exact::word{15'001'036} ||
        !o.final_can_continue ||
-       h.integrity != event::rederivation_rest_integrity(h) ||
-       h.body.regions[0].admitted_tally != 903 ||
-       h.mathematical_admitted_tally != 270 || h.codec_admitted_tally != 127 ||
-       h.arithmetic_spectral_admitted_tally != 47 ||
-       h.rederivation_admitted_tally != 56 || !h.matching_rederivation.accepted ||
+       h.integrity != event::rederivation_rest_integrity(h) || !h.matching_rederivation.accepted ||
        !h.lattice_rederivation.accepted || !h.potential_rederivation.accepted ||
        !h.cover_rederivation.accepted;
   return f;

@@ -89,9 +89,7 @@ void write_r10_artifact(std::ostream& output,
          << ",cloned=" << value.ablation.owner_cloned
          << ",lost=" << value.ablation.consequence_lost << '\n'
          << "successor=head:" << value.final_head.value()
-         << ",admitted_tally=" << value.final_region.admitted_tally
-         << ",current=" << value.final_region.current
-         << ",obstruction=" << static_cast<unsigned>(value.obstruction) << '\n';
+         << ",
 }
 
 }  // namespace holonics::tests

@@ -7,9 +7,9 @@ device_compute_capability=8.9
 kernel_launches=6
 launched_threads=21
 case_threads=16
-bytes_to_device=8688
-bytes_from_device=45016
-resident_bytes=54608
+bytes_to_device=8608
+bytes_from_device=44776
+resident_bytes=54096
 host_semantic_events=0
 engine_source_reads=0
 exterior_retrieval_calls=0
@@ -17,12 +17,12 @@ historical_renderer_bytes=0
 verification_failures=0
 question=identity:144300,receiver:144301,material:144302
 question_aperture=mode_field_absent:1,expected_shape_absent:1,historical_renderer_absent:1
-native_input=rest_bytes:320,source_bytes:0,retrieval_handles:0
+native_input=rest_bytes:240,source_bytes:0,retrieval_handles:0
 atlas=returned_cases:16,prime_cases:7,composite_cases:5,shared_factor_cases:2,control_cases:9,shape_types:1226,transition_types:1226
 controls=dilation:1,turn:1,reversal:1
 theory=passage:174300,diagonal_lcm:1,coprime_full_tour:1,population_product:1,seam_cancellation:1,gauss_transport:1,projection_distinguished:1
 checker=exit:0,stdout_bytes:126,stderr_bytes:0,produced_bytes:114056,declarations:1,remaining_goals:0,kernel:1,calls:1
-final_body=head:14001008,continuation:15001008,body_admitted_tally:192,mathematical:62,codec:42,geometry:10,phase:14,rest_bytes:376,integrity:9217930957521484444
+final_body=head:14001008,continuation:15001008,rest_bytes:280,integrity:1247981010440518298
 physical_telemetry=engine_time:unknown,checker_time:unknown,temperature:unknown,power:unknown,energy:unknown
 formal_begin
 import Mathlib.Data.Nat.GCD.Basic

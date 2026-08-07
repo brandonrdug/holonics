@@ -4,7 +4,6 @@
 
 namespace holonics::tests {
 namespace {
-
 void write_matrix(std::ostream& output, organ::matrix_two value) {
   output << "[[" << value.a << ',' << value.b << "],[" << value.c << ',' << value.d << "]]";
 }
@@ -174,13 +173,7 @@ void write_r20_artifact(std::ostream& output,
       << value.typed.remaining_goal_count << ",kernel:" << value.typed.kernel_boundary_crossed
       << ",calls:" << execution.process.exterior_process_calls.value() << '\n'
       << "final_body=head:" << handoff.body.head << ",continuation:"
-      << handoff.body.continuation << ",body_admitted_tally:"
-      << handoff.body.regions[0].admitted_tally << ",mathematical:"
-      << handoff.mathematical_admitted_tally << ",codec:" << handoff.codec_admitted_tally
-      << ",geometry:" << handoff.geometry_admitted_tally << ",phase:"
-      << handoff.phase_admitted_tally << ",characteristic:"
-      << handoff.characteristic_admitted_tally << ",regular_singular:"
-      << handoff.regular_singular_admitted_tally << ",rest_bytes:" << rest_write.bytes.value()
+      << handoff.body.continuation << ",rest_bytes:" << rest_write.bytes.value()
       << ",integrity:" << handoff.integrity << '\n'
       << "physical_telemetry=engine_time:unknown,checker_time:unknown,temperature:unknown,"
          "power:unknown,energy:unknown\nformal_begin\n";

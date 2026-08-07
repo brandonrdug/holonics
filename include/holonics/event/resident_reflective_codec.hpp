@@ -8,7 +8,6 @@
 #include <holonics/event/reflective_codec_rest.hpp>
 
 namespace holonics::event {
-
 class resident_reflective_codec final {
  public:
   resident_reflective_codec() = delete;
@@ -129,9 +128,8 @@ class resident_reflective_codec final {
       result.obstruction = codec::codec_obstruction::arithmetic_refused;
       return result;
     }
-    const std::uint64_t admitted_tally_delta = request.next_bias.value() - result.old_bias.value();
     auto continuation = body_.take_continuation();
-    const auto commit = body_.commit(body_.head(), 0, admitted_tally_delta,
+    const auto commit = body_.commit(body_.head(), 0,
         revised_probe.value(), static_cast<body::linear_continuation&&>(continuation));
     if (commit.state != body::body_change_status::committed) {
       result.obstruction = codec::codec_obstruction::continuation_refused;

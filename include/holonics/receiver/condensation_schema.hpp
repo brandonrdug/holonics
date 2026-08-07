@@ -6,7 +6,6 @@
 #include <holonics/exact/word.hpp>
 
 namespace holonics::receiver {
-
 inline constexpr std::size_t condensation_source_capacity = 8;
 inline constexpr std::size_t condensation_query_capacity = 3;
 inline constexpr std::size_t condensation_history_capacity = 4;
@@ -35,7 +34,6 @@ struct condensation_program final {
   exact::word predecessor{};
   exact::word incidence{};
   exact::word lineage{};
-  exact::word admitted_tally{};
   exact::word current{};
   exact::word logical_resource{};
   exact::word alternatives{};

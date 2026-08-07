@@ -9,9 +9,9 @@ device_compute_capability=8.9
 kernel_launches=9
 launched_threads=12
 semantic_threads=7
-bytes_to_device=10728
-bytes_from_device=432464
-resident_bytes=445912
+bytes_to_device=10496
+bytes_from_device=432072
+resident_bytes=444792
 host_semantic_events=0
 verification_failures=0
 executor_state=0
@@ -28,7 +28,7 @@ residue=relation:4a5=1,nonzero:1,rank_one:1,square_zero:1,log_channel:1
 expression_fiber=members:3,rational_rechart:1,shift:1,gaussian_rechart:1,field_dependency:1
 changed=b:2,resultant:50000,-256,series_changed:1,source_sensitive:1
 checker=exit:0,stdout_bytes:1039,stderr_bytes:0,produced_bytes:819112
-final_body=head:14001028,continuation:15001028,admitted_tally:610,mathematical:184,codec:93,expression_geometry:37,rest_bytes:928,integrity:15878244373523038636
+final_body=head:14001028,continuation:15001028,rest_bytes:680,integrity:8897151479461903734
 rest_io=loaded:1,written:1
 physical_telemetry=engine_time:unknown,checker_time:unknown,temperature:unknown,power:unknown,energy:unknown
 formal_begin

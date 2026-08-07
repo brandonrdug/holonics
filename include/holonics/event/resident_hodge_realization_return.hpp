@@ -3,7 +3,6 @@
 #include <holonics/event/resident_hodge_realization.hpp>
 
 namespace holonics::event {
-
 HOLONICS_CALLABLE inline bool resident_hodge_realization::form(
     hodge_realization_observation& observation) noexcept {
   if (!admitted_ || pending_live_ || stage_ != passage_stage::none ||
@@ -16,7 +15,7 @@ HOLONICS_CALLABLE inline bool resident_hodge_realization::form(
     return false;
   }
   auto continuation = body_.take_continuation();
-  observation.passage.formation_commit = body_.commit(body_.head(), 0, 41,
+  observation.passage.formation_commit = body_.commit(body_.head(), 0,
       observation.inquiry.theory.passage.value(),
       static_cast<body::linear_continuation&&>(continuation));
   if (observation.passage.formation_commit.state != body::body_change_status::committed) {
@@ -48,15 +47,8 @@ HOLONICS_CALLABLE inline bool resident_hodge_realization::resume(
   cm_checker_detail::normalize(raw, observation.passage.formal, declaration, source, typed);
   const bool accepted = typed.state == checker_return_status::accepted;
   auto& morphology = observation.passage.returned_morphology;
-  morphology.mathematical_before = mathematical_admitted_tally_;
-  morphology.codec_before = codec_admitted_tally_;
-  mathematical_admitted_tally_ += accepted ? 23U : 1U; codec_admitted_tally_ += accepted ? 10U : 2U;
-  hodge_realization_admitted_tally_ += accepted ? 41U : 1U;
-  const std::uint64_t delta = accepted ? 42U : 4U;
-  morphology.commit = body_.commit(expected.predecessor, 0, delta,
+  morphology.commit = body_.commit(expected.predecessor, 0,
       expected.passage.value(), pending->take_continuation()); pending_live_ = false;
-  morphology.mathematical_after = mathematical_admitted_tally_;
-  morphology.codec_after = codec_admitted_tally_;
   morphology.returned_difference_applied = accepted &&
       morphology.commit.state == body::body_change_status::committed;
   observation.passage.pending_after_return = pending_live_;
@@ -64,7 +56,7 @@ HOLONICS_CALLABLE inline bool resident_hodge_realization::resume(
       observation.passage.formal.passage == expected.passage;
   if (accepted && morphology.returned_difference_applied) {
     hodge_realization_ = {exact::word{195'300}, expected.passage, raw.event,
-        observation.inquiry.theory.lineage, exact::word{delta}, true};
+        observation.inquiry.theory.lineage, true};
     observation.passage.acquired = hodge_realization_; stage_ = passage_stage::returned;
   }
   return morphology.returned_difference_applied && accepted;

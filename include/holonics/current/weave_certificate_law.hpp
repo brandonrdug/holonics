@@ -6,7 +6,6 @@
 #include <holonics/current/weave_law.hpp>
 
 namespace holonics::current {
-
 [[nodiscard]] HOLONICS_CALLABLE constexpr weave_snapshot apply_selected_events(
     const weave_program& program,
     const std::uint16_t* order,
@@ -63,7 +62,6 @@ HOLONICS_CALLABLE constexpr void add_combined_event(
   combined.change_support = exact::word{
       combined.change_support.value() | event.change_support.value()};
   combined.value_deltas[event.cell] = event.value_delta;
-  combined.admitted_tally_deltas[event.cell] = event.admitted_tally_delta;
   combined.successor_currents[event.cell] = event.successor_current;
   combined.consequences[event_slot] = event.consequence;
   combined.stress = exact::word{combined.stress.value() + event.stress.value()};
@@ -99,11 +97,8 @@ HOLONICS_CALLABLE constexpr void add_combined_event(
   }
   result.causal_order_equal = result.left_right.lineage_order == result.right_left.lineage_order;
   result.incidence_equal = result.left_right.incidence == result.right_left.incidence;
-  result.admitted_tally_equal = true;
   result.current_equal = true;
   for (std::size_t cell = 0; cell < program.cell_count; ++cell) {
-    result.admitted_tally_equal &= result.left_right.cells[cell].admitted_tally ==
-        result.right_left.cells[cell].admitted_tally;
     result.current_equal &= result.left_right.cells[cell].current ==
         result.right_left.cells[cell].current;
   }
@@ -159,8 +154,6 @@ HOLONICS_CALLABLE constexpr void add_combined_event(
       result.overlap_support.value() != 0;
   if (!result.compatible) { return result; }
   result.combined_value_delta = exact::word{left.value_delta.value() + right.value_delta.value()};
-  result.combined_admitted_tally_delta = exact::word{
-      left.admitted_tally_delta.value() + right.admitted_tally_delta.value()};
   result.combined_current = exact::word{
       left.successor_current.value() + right.successor_current.value()};
   result.combined_consequence = exact::word{left.consequence.value() + right.consequence.value()};

@@ -3,7 +3,6 @@
 #include <holonics/event/resident_characteristic_hypergeometry.hpp>
 
 namespace holonics::event {
-
 HOLONICS_CALLABLE inline hypergeometry_rest_receipt
 resident_characteristic_hypergeometry::rest(
     characteristic_hypergeometry_rest_record &record) noexcept {
@@ -22,9 +21,6 @@ resident_characteristic_hypergeometry::rest(
       elementary_calculus_rest_integrity(record.standing);
   record.law = law_;
   record.application = application_;
-  record.characteristic_admitted_tally = characteristic_admitted_tally_;
-  record.trace_organ_admitted_tally = trace_organ_admitted_tally_;
-  record.transport_admitted_tally = transport_admitted_tally_;
   record.applied = stage_ == stage::applied;
   record.integrity = characteristic_rest_integrity(record);
   receipt.discovery = law_.discovery.identity;

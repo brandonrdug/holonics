@@ -4,7 +4,6 @@
 
 namespace holonics::tests {
 namespace {
-
 template<std::size_t Capacity, class Count, std::size_t Pattern>
 [[nodiscard]] bool contains(const char (&bytes)[Capacity], Count used,
     const char (&pattern)[Pattern]) noexcept {
@@ -127,18 +126,13 @@ std::size_t r29_verification_failures(bool source_loaded,
       contains(passage.formal.bytes, passage.formal.byte_count, "sorry");
   failures += passage.formation_commit.predecessor != exact::word{14'001'030} ||
       passage.formation_commit.successor != exact::word{14'001'031} ||
-      passage.returned_morphology.commit.successor != exact::word{14'001'032} ||
-      passage.returned_morphology.mathematical_after != 232 ||
-      passage.returned_morphology.codec_after != 113;
+      passage.returned_morphology.commit.successor != exact::word{14'001'032} ;
   failures += !observation.rest.returned || !observation.rest.source_detached ||
       !observation.remount.same_body || !observation.remount.theory_preserved ||
       observation.remount.source_replayed || !observation.handoff.returned ||
       !observation.final_can_continue || observation.final_head != exact::word{14'001'032} ||
       observation.final_continuation != exact::word{15'001'032};
   failures += handoff.integrity != event::arithmetic_spectral_rest_integrity(handoff) ||
-      handoff.body.regions[0].admitted_tally != 782 || handoff.mathematical_admitted_tally != 232 ||
-      handoff.codec_admitted_tally != 113 || handoff.hodge_realization_admitted_tally != 41 ||
-      handoff.arithmetic_spectral_admitted_tally != 47 ||
       handoff.arithmetic_spectral.identity != exact::word{196'300} ||
       !handoff.arithmetic_spectral.accepted || !handoff.hodge_realization.accepted;
   return failures;

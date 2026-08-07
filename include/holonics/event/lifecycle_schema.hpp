@@ -7,7 +7,6 @@
 #include <holonics/structure/occurrence.hpp>
 
 namespace holonics::event {
-
 struct deed_request final {
   std::uint64_t owner_seed{};
   std::uint16_t region{};
@@ -53,7 +52,6 @@ struct complete_delta_receipt final {
   std::uint64_t read_support{};
   std::uint64_t change_support{};
   std::int64_t incidence_delta{};
-  std::uint64_t admitted_tally_delta{};
   std::uint64_t successor_current{};
   std::uint64_t returned_consequence{};
   std::uint64_t stress{};
@@ -76,9 +74,11 @@ struct lifecycle_adversarial_receipt final {
   lifecycle_status stale_return{lifecycle_status::malformed_return};
   lifecycle_status correct_return{lifecycle_status::malformed_return};
   lifecycle_status double_return{lifecycle_status::malformed_return};
-  body::body_change_status capacity_commit{body::body_change_status::invalid_continuation};
-  bool capacity_predecessor_preserved{};
-  bool capacity_capability_restored{};
+  // The capacity-refusal case was removed on 2026-08-07 with the counter that
+  // was its only trigger. A refusal case with no reachable cause is not
+  // evidence, and the obligation it carried — a typed refusal leaves the body
+  // untouched and returns the capability — is established by the five cases
+  // above and by the interruption cases below.
   bool interruption_predecessors[3]{};
   bool interruption_successor{};
 };

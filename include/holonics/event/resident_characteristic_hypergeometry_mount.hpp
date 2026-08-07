@@ -60,9 +60,6 @@ HOLONICS_CALLABLE inline resident_characteristic_hypergeometry::
       body_(body::continuing_body::remount(
           record.standing.standing.standing.body, receipt.body)),
       law_(record.law), application_(record.application),
-      characteristic_admitted_tally_(record.characteristic_admitted_tally),
-      trace_organ_admitted_tally_(record.trace_organ_admitted_tally),
-      transport_admitted_tally_(record.transport_admitted_tally),
       stage_(record.applied ? stage::applied : stage::derived) {
   const bool exact = record.integrity == characteristic_rest_integrity(record);
   receipt.discovery = record.law.discovery.identity;

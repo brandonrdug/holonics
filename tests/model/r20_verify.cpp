@@ -2,7 +2,6 @@
 
 namespace holonics::tests {
 namespace {
-
 template<std::size_t Capacity, class Count, std::size_t Pattern>
 [[nodiscard]] bool contains(const char (&bytes)[Capacity], Count used,
     const char (&pattern)[Pattern]) noexcept {
@@ -109,9 +108,7 @@ std::size_t r20_verification_failures(
       connection.one_loop_in_zero_basis.c.omega != -1;
   failures += actual.formation_commit.state != body::body_change_status::committed ||
       actual.formation_commit.predecessor != exact::word{14'001'010} ||
-      actual.formation_commit.successor != exact::word{14'001'011} ||
-      actual.formation_commit.admitted_tally_before != 217 ||
-      actual.formation_commit.admitted_tally_after != 231;
+      actual.formation_commit.successor != exact::word{14'001'011} ;
   failures += actual.formal.passage != exact::word{175'400} ||
       actual.conversational.passage != actual.formal.passage ||
       !contains(actual.formal.bytes, actual.formal.byte_count,
@@ -134,18 +131,14 @@ std::size_t r20_verification_failures(
       actual.raw.exit_status != 0 || actual.raw.stdout_bytes == 0 ||
       actual.raw.stderr_bytes != 0 || actual.raw.produced_artifact_bytes == 0;
   const auto& morphology = actual.returned_morphology;
-  failures += morphology.mathematical_before != 70 || morphology.mathematical_after != 79 ||
-      morphology.codec_before != 45 || morphology.codec_after != 48 ||
+  failures +=
       morphology.commit.state != body::body_change_status::committed ||
       morphology.commit.predecessor != exact::word{14'001'011} ||
       morphology.commit.successor != exact::word{14'001'012} ||
-      morphology.commit.admitted_tally_before != 231 ||
-      morphology.commit.admitted_tally_after != 244 ||
       !morphology.returned_difference_applied;
   failures += actual.acquired.identity != exact::word{187'300} ||
       actual.acquired.passage != exact::word{175'400} ||
-      actual.acquired.kernel_return != exact::word{160'700} ||
-      actual.acquired.admitted_tally_delta != exact::word{13} || !actual.acquired.accepted;
+      actual.acquired.kernel_return != exact::word{160'700} || !actual.acquired.accepted;
   failures += !actual.rest.returned || !actual.rest.prior_returns_preserved ||
       !actual.rest.source_detached || !actual.remount.same_body ||
       !actual.remount.theory_preserved || actual.remount.source_replayed ||
@@ -154,7 +147,6 @@ std::size_t r20_verification_failures(
       actual.final_continuation != exact::word{15'001'012};
   failures += handoff.integrity != event::regular_singular_rest_integrity(handoff) ||
       handoff.body.head != 14'001'012 || handoff.body.continuation != 15'001'012 ||
-      handoff.body.regions[0].admitted_tally != 244 ||
       handoff.first.identity != exact::word{181'200} || !handoff.first.accepted ||
       handoff.second.identity != exact::word{182'200} || !handoff.second.accepted ||
       handoff.geometry.identity != exact::word{184'300} || !handoff.geometry.accepted ||
@@ -163,10 +155,7 @@ std::size_t r20_verification_failures(
       handoff.characteristic.identity != exact::word{186'300} ||
       !handoff.characteristic.accepted ||
       handoff.regular_singular.identity != exact::word{187'300} ||
-      !handoff.regular_singular.accepted || handoff.mathematical_admitted_tally != 79 ||
-      handoff.codec_admitted_tally != 48 || handoff.geometry_admitted_tally != 10 ||
-      handoff.phase_admitted_tally != 14 || handoff.characteristic_admitted_tally != 16 ||
-      handoff.regular_singular_admitted_tally != 20;
+      !handoff.regular_singular.accepted ;
   return failures;
 }
 

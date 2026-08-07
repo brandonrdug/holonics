@@ -7,7 +7,6 @@
 #include <holonics/codec/formal_checker_face.hpp>
 
 namespace holonics::event {
-
 inline constexpr std::size_t checker_message_capacity = 4096;
 
 enum class checker_return_status : std::uint8_t {
@@ -69,10 +68,6 @@ struct checker_typed_return final {
 };
 
 struct checker_morphology_return final {
-  std::uint64_t mathematical_before{};
-  std::uint64_t mathematical_after{};
-  std::uint64_t codec_before{};
-  std::uint64_t codec_after{};
   body::body_change_receipt commit{};
   /// True only when the exterior return was **accepted** and the commit landed.
   ///

@@ -12,10 +12,10 @@ pair_population=6308
 archetype_groups=281
 closed_strata=0,440,5868
 law_residuals=0
-intermediate_rest_bytes=2832
+intermediate_rest_bytes=2360
 developmental_rows_in_rest=0
 matrices_in_rest=0
-final_body=head:14001046,continuation:15001046,admitted_tally:1175,mathematical:406,codec:187,characteristic:64,trace_organ:32
+final_body=head:14001046,continuation:15001046
 checker_exit=0
 formal_begin
 import Mathlib.Tactic.LinearCombination

@@ -28,7 +28,7 @@ current::causal_program base_program(
   program.component_count = components;
   program.receiver_front_aperture = fronts;
   for (std::size_t slot = 0; slot < body::live_region_capacity; ++slot) {
-    program.body_regions[slot] = {10U + slot, 0};
+    program.body_regions[slot] = {0};
   }
   for (std::size_t slot = 0; slot < sites; ++slot) {
     const std::uint64_t support = std::uint64_t{1} << slot;

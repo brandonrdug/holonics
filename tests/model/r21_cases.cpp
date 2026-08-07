@@ -2,7 +2,6 @@
 
 namespace holonics::tests {
 namespace {
-
 [[nodiscard]] organ::blind_reconstruction_foundation foundation(
     const organ::binary_code_problem_card& code,
     const organ::moment_problem_card& moments) noexcept {
@@ -66,29 +65,23 @@ event::regular_singular_rest_record r21_host_regular_singular_rest() noexcept {
   record.body.continuation = 15'001'012;
   record.body.next_continuation = 15'001'013;
   record.body.lineage = 16'001'012;
-  record.body.regions[0] = {244, 175'400};
-  record.body.regions[1] = {129, 0};
-  record.body.regions[2] = {130, 0};
-  record.body.regions[3] = {131, 0};
+  record.body.regions[0] = {175'400};
+  record.body.regions[1] = {0};
+  record.body.regions[2] = {0};
+  record.body.regions[3] = {0};
   record.body.integrity = body::rest_integrity(record.body);
   record.first = {exact::word{181'200}, exact::word{171'200}, exact::word{151'200},
-      exact::word{161'200}, exact::word{160'200}, exact::word{141'010}, exact::word{5}, 3, true};
+      exact::word{161'200}, exact::word{160'200}, exact::word{141'010}, 3, true};
   record.second = {exact::word{182'200}, exact::word{172'200}, exact::word{152'200},
-      exact::word{162'200}, exact::word{160'300}, exact::word{181'200}, exact::word{5}, 2, true};
+      exact::word{162'200}, exact::word{160'300}, exact::word{181'200}, 2, true};
   record.geometry = {exact::word{184'300}, exact::word{173'300}, exact::word{160'400},
-      exact::word{193'310}, exact::word{9}, true};
+      exact::word{193'310}, true};
   record.phase_crystal = {exact::word{185'300}, exact::word{174'300},
-      exact::word{160'500}, exact::word{194'300}, exact::word{11}, true};
+      exact::word{160'500}, exact::word{194'300}, true};
   record.characteristic = {exact::word{186'300}, exact::word{174'400},
-      exact::word{160'600}, exact::word{194'400}, exact::word{12}, true};
+      exact::word{160'600}, exact::word{194'400}, true};
   record.regular_singular = {exact::word{187'300}, exact::word{175'400},
-      exact::word{160'700}, exact::word{195'400}, exact::word{13}, true};
-  record.mathematical_admitted_tally = 79;
-  record.codec_admitted_tally = 48;
-  record.geometry_admitted_tally = 10;
-  record.phase_admitted_tally = 14;
-  record.characteristic_admitted_tally = 16;
-  record.regular_singular_admitted_tally = 20;
+      exact::word{160'700}, exact::word{195'400}, true};
   record.integrity = event::regular_singular_rest_integrity(record);
   return record;
 }

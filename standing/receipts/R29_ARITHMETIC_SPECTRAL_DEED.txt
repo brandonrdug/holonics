@@ -25,7 +25,7 @@ curve_6=p:13,c:7,counts:18,180,2106,28800,pi:-2,3,char:1,4,13,places:18,81,696,7
 controls=twist5:1,twist13:1,changed_twist:1,even:1,odd:1,equal_factor_rechart:1,phase_separated:1,archimedean_inapplicable:1
 theory=fixed:156260,candidates:567,points:904,trace_currents:567,norm_currents:1701
 checker=exit:0,stdout_bytes:585,stderr_bytes:0,produced_bytes:810984
-final_body=head:14001032,continuation:15001032,admitted_tally:782,mathematical:232,codec:113,hodge:41,arithmetic:47,rest_bytes:1040,integrity:9518517338642123549
+final_body=head:14001032,continuation:15001032,rest_bytes:760,integrity:3525030495724681958
 rest_io=loaded:1,written:1
 physical_telemetry=engine_time:unknown,checker_time:unknown,temperature:unknown,power:unknown,energy:unknown
 formal_begin

@@ -3,7 +3,6 @@
 #include <holonics/event/resident_trace_fiber.hpp>
 
 namespace holonics::event {
-
 HOLONICS_CALLABLE inline trace_fiber_rest_receipt
 resident_trace_fiber::rest(trace_fiber_rest_record &record) noexcept {
   trace_fiber_rest_receipt receipt{};
@@ -22,9 +21,6 @@ resident_trace_fiber::rest(trace_fiber_rest_record &record) noexcept {
   record.standing.integrity = characteristic_rest_integrity(record.standing);
   record.law = law_;
   record.application = application_;
-  record.trace_fiber_admitted_tally = trace_fiber_admitted_tally_;
-  record.lift_organ_admitted_tally = lift_organ_admitted_tally_;
-  record.triple_transport_admitted_tally = triple_transport_admitted_tally_;
   record.applied = stage_ == stage::applied;
   record.integrity = trace_fiber_rest_integrity(record);
   receipt.discovery = law_.discovery.identity;

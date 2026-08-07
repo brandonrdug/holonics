@@ -11,7 +11,6 @@
 #include <holonics/event/trace_rebase_return.hpp>
 
 namespace holonics::event {
-
 class resident_trace_rebase final {
 public:
   resident_trace_rebase() = delete;
@@ -69,10 +68,6 @@ private:
   trace_rebase_application application_{};
   alignas(checker_pending_deed) unsigned char pending_storage_[sizeof(
       checker_pending_deed)]{};
-  std::uint64_t rebase_admitted_tally_{};
-  std::uint64_t differential_admitted_tally_{};
-  std::uint64_t deck_admitted_tally_{};
-  std::uint64_t path_admitted_tally_{};
   stage stage_{stage::developmental};
   bool pending_live_{};
   bool admitted_{};

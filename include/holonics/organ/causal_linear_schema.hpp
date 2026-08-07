@@ -9,7 +9,6 @@
 #include <holonics/organ/toric_cycle_schema.hpp>
 
 namespace holonics::organ {
-
 inline constexpr std::size_t causal_matrix_rows = 16;
 inline constexpr std::size_t causal_matrix_columns = 48;
 inline constexpr std::size_t causal_square_degree = 16;
@@ -83,7 +82,6 @@ struct acquired_causal_linear final {
   exact::word passage{};
   exact::word kernel_return{};
   exact::word lineage{};
-  exact::word admitted_tally_delta{};
   bool accepted{};
 };
 

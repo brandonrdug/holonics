@@ -2,7 +2,6 @@
 
 namespace holonics::tests {
 namespace {
-
 template<std::size_t Capacity, class Count, std::size_t Pattern>
 [[nodiscard]] bool contains(const char (&bytes)[Capacity], Count used,
     const char (&pattern)[Pattern]) noexcept {
@@ -95,18 +94,13 @@ std::size_t r28_verification_failures(bool source_loaded,
       contains(passage.formal.bytes, passage.formal.byte_count, "sorry");
   failures += passage.formation_commit.predecessor != exact::word{14'001'028} ||
       passage.formation_commit.successor != exact::word{14'001'029} ||
-      passage.returned_morphology.commit.successor != exact::word{14'001'030} ||
-      passage.returned_morphology.mathematical_after != 207 ||
-      passage.returned_morphology.codec_after != 103;
+      passage.returned_morphology.commit.successor != exact::word{14'001'030} ;
   failures += !actual.rest.returned || !actual.rest.source_detached || !actual.remount.same_body ||
       !actual.remount.theory_preserved || actual.remount.source_replayed ||
       !actual.handoff.returned || !actual.final_can_continue ||
       actual.final_head != exact::word{14'001'030} ||
       actual.final_continuation != exact::word{15'001'030};
   failures += handoff.integrity != event::hodge_realization_rest_integrity(handoff) ||
-      handoff.body.regions[0].admitted_tally != 693 || handoff.mathematical_admitted_tally != 207 ||
-      handoff.codec_admitted_tally != 103 || handoff.expression_geometry_admitted_tally != 37 ||
-      handoff.hodge_realization_admitted_tally != 41 ||
       handoff.hodge_realization.identity != exact::word{195'300} ||
       !handoff.hodge_realization.accepted || !handoff.expression_geometry.accepted;
   return failures;

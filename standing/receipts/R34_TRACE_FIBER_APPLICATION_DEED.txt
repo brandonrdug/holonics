@@ -12,7 +12,7 @@ visible=3,2,2,5,5,6
 anchor=15
 predicted_companion=11
 source_companion=11
-final_rest_bytes=4424
+final_rest_bytes=3912
 final_body=head:14001052,continuation:15001052
 checker_exit=0
 formal_begin

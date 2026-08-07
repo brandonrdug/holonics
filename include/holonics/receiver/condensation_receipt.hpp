@@ -5,7 +5,6 @@
 #include <holonics/receiver/condensation_schema.hpp>
 
 namespace holonics::receiver {
-
 enum class condensation_obstruction : std::uint8_t {
   none,
   invalid_program,
@@ -18,7 +17,6 @@ enum class condensation_obstruction : std::uint8_t {
 struct condensed_snapshot final {
   exact::word head{};
   exact::word incidence{};
-  exact::word admitted_tally{};
   exact::word current{};
   exact::word lineage{};
   exact::word logical_resource{};
@@ -56,7 +54,6 @@ struct boundary_bisimulation_step final {
   bool obstruction_equal{};
   bool incidence_equal{};
   bool current_equal{};
-  bool admitted_tally_equal{};
   bool alternatives_equal{};
   bool lineage_equal{};
   bool logical_resource_equal{};

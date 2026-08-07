@@ -43,9 +43,7 @@ HOLONICS_CALLABLE inline resident_cultivated_organs::resident_cultivated_organs(
     cultivated_organ_remount_receipt &receipt) noexcept
     : standing_(record.standing),
       body_(body::continuing_body::remount(record.standing.body, receipt.body)),
-      application_(record.application), cultivation_admitted_tally_(record.cultivation_admitted_tally),
-      organ_admitted_tally_(record.organ_admitted_tally),
-      application_admitted_tally_(record.application_admitted_tally),
+      application_(record.application),
       stage_(record.applied ? stage::applied : stage::cultivated) {
   const bool exact = record.integrity == cultivated_organ_rest_integrity(record);
   bool organs_exact = true;

@@ -17,7 +17,7 @@ apparatus::reflective_codec_mount r9_case(
   mount.original_path = original.path_testimony;
   mount.relocated_path = relocated.path_testimony;
   for (std::size_t slot = 0; slot < body::live_region_capacity; ++slot) {
-    mount.regions[slot] = {10U + slot, 0};
+    mount.regions[slot] = {0};
   }
   mount.deed.probe = {exact::word{40}, exact::word{0}};
   mount.deed.render_core = exact::word{42};

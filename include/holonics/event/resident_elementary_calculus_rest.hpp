@@ -3,7 +3,6 @@
 #include <holonics/event/resident_elementary_calculus.hpp>
 
 namespace holonics::event {
-
 HOLONICS_CALLABLE inline elementary_calculus_rest_receipt resident_elementary_calculus::rest(
     elementary_calculus_rest_record &record) noexcept {
   elementary_calculus_rest_receipt receipt{};
@@ -13,9 +12,6 @@ HOLONICS_CALLABLE inline elementary_calculus_rest_receipt resident_elementary_ca
   record.standing.standing.integrity = rederivation_rest_integrity(record.standing.standing);
   record.standing.integrity = cultivated_organ_rest_integrity(record.standing);
   record.laws = laws_; record.application = application_;
-  record.calculus_admitted_tally = calculus_admitted_tally_;
-  record.self_organ_admitted_tally = self_organ_admitted_tally_;
-  record.derivation_admitted_tally = derivation_admitted_tally_;
   record.applied = stage_ == stage::applied; record.integrity = elementary_calculus_rest_integrity(record);
   receipt.first_fiber = laws_.fibers[0].identity; receipt.self_organ = laws_.self_organ.identity;
   receipt.application = application_.identity; receipt.integrity = exact::word{record.integrity};

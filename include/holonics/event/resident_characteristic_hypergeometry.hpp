@@ -12,7 +12,6 @@
 #include <holonics/event/cm_checker_normalization_law.hpp>
 
 namespace holonics::event {
-
 class resident_characteristic_hypergeometry final {
 public:
   resident_characteristic_hypergeometry() = delete;
@@ -78,9 +77,6 @@ private:
   characteristic_application_fiber application_{};
   alignas(checker_pending_deed) unsigned char pending_storage_[sizeof(
       checker_pending_deed)]{};
-  std::uint64_t characteristic_admitted_tally_{};
-  std::uint64_t trace_organ_admitted_tally_{};
-  std::uint64_t transport_admitted_tally_{};
   stage stage_{stage::developmental};
   bool pending_live_{};
   bool admitted_{};

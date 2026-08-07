@@ -5,7 +5,6 @@
 
 namespace holonics::tests {
 namespace {
-
 void write_snapshot(std::ostream& output,
     const char* kind,
     std::size_t case_slot,
@@ -24,7 +23,6 @@ void write_snapshot(std::ostream& output,
     output << "cell=" << case_slot << ':' << variant << ':' << cell
            << ",identity=" << item.identity.value()
            << ",value=" << item.value.value()
-           << ",morphology=" << item.admitted_tally.value()
            << ",current=" << item.current.value()
            << ",lineage=" << item.lineage.value()
            << ",placement=" << item.placement
@@ -53,7 +51,6 @@ void write_certificates(std::ostream& output,
          << ",identity=" << value.parallel.identity_equal
          << ",causal_order=" << value.parallel.causal_order_equal
          << ",incidence=" << value.parallel.incidence_equal
-         << ",morphology=" << value.parallel.admitted_tally_equal
          << ",current=" << value.parallel.current_equal
          << ",consequence=" << value.parallel.consequence_equal
          << ",obstruction=" << value.parallel.obstruction_equal
@@ -122,7 +119,6 @@ void write_r6_artifact(std::ostream& output,
              << ",read=" << item.read_support.value()
              << ",change=" << item.change_support.value()
              << ",value=" << item.value_delta.value()
-             << ",morphology=" << item.admitted_tally_delta.value()
              << ",current=" << item.successor_current.value()
              << ",consequence=" << item.consequence.value()
              << ",resource=" << item.logical_resource.value()

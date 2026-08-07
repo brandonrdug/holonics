@@ -8,9 +8,9 @@ kernel_launches=10
 source_currents=4
 host_semantic_events=0
 candidate_atlas_rows=38
-intermediate_rest_bytes=1872
+intermediate_rest_bytes=1520
 samples_in_rest=0
-final_body=head:14001038,continuation:15001038,admitted_tally:967,mathematical:302,codec:139,organ:64
+final_body=head:14001038,continuation:15001038
 checker_exit=0
 formal_begin
 import Mathlib.Tactic.NormNum

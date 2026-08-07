@@ -11,7 +11,6 @@
 #include <holonics/event/cultivated_organ_return.hpp>
 
 namespace holonics::event {
-
 class resident_cultivated_organs final {
  public:
   resident_cultivated_organs() = delete;
@@ -54,9 +53,6 @@ class resident_cultivated_organs final {
   organ::cultivated_shift_organ organs_[organ::cultivation_family_count]{};
   organ::acquired_organ_application application_{};
   alignas(checker_pending_deed) unsigned char pending_storage_[sizeof(checker_pending_deed)]{};
-  std::uint64_t cultivation_admitted_tally_{};
-  std::uint64_t organ_admitted_tally_{};
-  std::uint64_t application_admitted_tally_{};
   stage stage_{stage::developmental};
   bool pending_live_{};
   bool admitted_{};

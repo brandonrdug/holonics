@@ -31,7 +31,7 @@ HOLONICS_CALLABLE inline bool resident_trace_rebase::form_discovery(
     return false;
   auto continuation = body_.take_continuation();
   out.passage.formation_commit = body_.commit(
-      body_.head(), 0, 0, out.inquiry.passage.value(),
+      body_.head(), 0, out.inquiry.passage.value(),
       static_cast<body::linear_continuation &&>(continuation));
   if (out.passage.formation_commit.state != body::body_change_status::committed)
     return false;
@@ -69,29 +69,16 @@ HOLONICS_CALLABLE inline bool resident_trace_rebase::resume_discovery(
                                typed);
   const bool accepted = typed.state == checker_return_status::accepted;
   auto &m = out.passage.returned_morphology;
-  m.mathematical_before =
-      standing_.standing.standing.standing.standing.mathematical_admitted_tally;
-  m.codec_before = standing_.standing.standing.standing.standing.codec_admitted_tally;
-  standing_.standing.standing.standing.standing.mathematical_admitted_tally +=
-      accepted ? 48U : 1U;
-  standing_.standing.standing.standing.standing.codec_admitted_tally +=
-      accepted ? 24U : 1U;
-  rebase_admitted_tally_ += accepted ? 80U : 1U;
-  differential_admitted_tally_ += accepted ? 56U : 0U;
-  deck_admitted_tally_ += accepted ? 24U : 0U;
-  m.commit = body_.commit(expected.predecessor, 0, accepted ? 96U : 1U,
+  m.commit = body_.commit(expected.predecessor, 0,
                           expected.passage.value(), live->take_continuation());
   pending_live_ = false;
-  m.mathematical_after =
-      standing_.standing.standing.standing.standing.mathematical_admitted_tally;
-  m.codec_after = standing_.standing.standing.standing.standing.codec_admitted_tally;
   m.returned_difference_applied = accepted &&
       m.commit.state == body::body_change_status::committed;
   out.passage.pending_after_return = pending_live_;
   out.passage.passage_preserved = raw.passage == expected.passage;
   if (accepted && m.returned_difference_applied) {
     law_.discovery = {exact::word{202'300}, expected.passage, raw.event,
-                      out.inquiry.lineage, exact::word{48}, true};
+                      out.inquiry.lineage, true};
     out.passage.acquired = law_.discovery;
     for (std::uint8_t i = 0; i < organ::trace_rebase_move_count; ++i) {
       law_.maps[i] = out.inquiry.maps[i];
@@ -102,10 +89,10 @@ HOLONICS_CALLABLE inline bool resident_trace_rebase::resume_discovery(
       law_.transitions[i] = out.inquiry.transitions[i];
     }
     law_.tangent = {exact::word{202'306}, expected.passage, raw.event,
-                    out.inquiry.lineage, exact::word{56}, true};
+                    out.inquiry.lineage, true};
     law_.deck.return_receipt = {
         exact::word{202'307}, expected.passage, raw.event,
-        out.inquiry.lineage, exact::word{24}, true};
+        out.inquiry.lineage, true};
     for (std::uint8_t i = 0; i < organ::trace_rebase_coordinate_count; ++i) {
       law_.deck.vector[i] = out.inquiry.witnesses[3].vector[i];
       law_.deck.image[i] = out.inquiry.witnesses[3].image[i];
@@ -126,7 +113,7 @@ HOLONICS_CALLABLE inline bool resident_trace_rebase::form_heldout(
     return false;
   auto continuation = body_.take_continuation();
   out.passage.formation_commit = body_.commit(
-      body_.head(), 0, 0, out.inquiry.passage.value(),
+      body_.head(), 0, out.inquiry.passage.value(),
       static_cast<body::linear_continuation &&>(continuation));
   if (out.passage.formation_commit.state != body::body_change_status::committed)
     return false;
@@ -164,27 +151,16 @@ HOLONICS_CALLABLE inline bool resident_trace_rebase::resume_heldout(
                                typed);
   const bool accepted = typed.state == checker_return_status::accepted;
   auto &m = out.passage.returned_morphology;
-  m.mathematical_before =
-      standing_.standing.standing.standing.standing.mathematical_admitted_tally;
-  m.codec_before = standing_.standing.standing.standing.standing.codec_admitted_tally;
-  standing_.standing.standing.standing.standing.mathematical_admitted_tally +=
-      accepted ? 16U : 1U;
-  standing_.standing.standing.standing.standing.codec_admitted_tally +=
-      accepted ? 8U : 1U;
-  path_admitted_tally_ += accepted ? 32U : 1U;
-  m.commit = body_.commit(expected.predecessor, 0, accepted ? 32U : 1U,
+  m.commit = body_.commit(expected.predecessor, 0,
                           expected.passage.value(), live->take_continuation());
   pending_live_ = false;
-  m.mathematical_after =
-      standing_.standing.standing.standing.standing.mathematical_admitted_tally;
-  m.codec_after = standing_.standing.standing.standing.standing.codec_admitted_tally;
   m.returned_difference_applied = accepted &&
       m.commit.state == body::body_change_status::committed;
   out.passage.pending_after_return = pending_live_;
   out.passage.passage_preserved = raw.passage == expected.passage;
   if (accepted && m.returned_difference_applied) {
     application_ = {exact::word{202'308}, expected.passage, raw.event,
-                    out.inquiry.lineage, exact::word{32}, true};
+                    out.inquiry.lineage, true};
     stage_ = stage::applied;
   }
   return accepted && m.returned_difference_applied;

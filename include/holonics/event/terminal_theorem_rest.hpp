@@ -8,13 +8,10 @@
 #include <holonics/organ/theorem_production_schema.hpp>
 
 namespace holonics::event {
-
 struct terminal_theorem_rest_record final {
   body::rest_record body{};
   organ::acquired_theorem_fiber first{};
   organ::acquired_theorem_fiber second{};
-  std::uint64_t mathematical_admitted_tally{};
-  std::uint64_t codec_admitted_tally{};
   std::uint64_t integrity{};
 };
 
@@ -38,7 +35,6 @@ struct terminal_theorem_remount_receipt final {
 };
 
 namespace terminal_rest_detail {
-
 HOLONICS_CALLABLE constexpr void fold_value(std::uint64_t& fold, std::uint64_t value) noexcept {
   constexpr std::uint64_t prime = 1'099'511'628'211ULL;
   for (std::size_t octet = 0; octet < 8; ++octet) {
@@ -50,9 +46,9 @@ HOLONICS_CALLABLE constexpr void fold_value(std::uint64_t& fold, std::uint64_t v
 
 HOLONICS_CALLABLE constexpr void fold_fiber(
     std::uint64_t& fold, const organ::acquired_theorem_fiber& fiber) noexcept {
-  const std::uint64_t values[9]{fiber.identity.value(), fiber.passage.value(),
+  const std::uint64_t values[8]{fiber.identity.value(), fiber.passage.value(),
       fiber.statement.value(), fiber.proof.value(), fiber.kernel_return.value(),
-      fiber.selected_rule.value(), fiber.admitted_tally_delta.value(), fiber.dependency_count,
+      fiber.selected_rule.value(), fiber.dependency_count,
       fiber.accepted ? 1U : 0U};
   for (const auto value : values) { fold_value(fold, value); }
 }
@@ -64,8 +60,6 @@ HOLONICS_CALLABLE constexpr void fold_fiber(
   std::uint64_t fold = record.body.integrity;
   terminal_rest_detail::fold_fiber(fold, record.first);
   terminal_rest_detail::fold_fiber(fold, record.second);
-  terminal_rest_detail::fold_value(fold, record.mathematical_admitted_tally);
-  terminal_rest_detail::fold_value(fold, record.codec_admitted_tally);
   return fold;
 }
 

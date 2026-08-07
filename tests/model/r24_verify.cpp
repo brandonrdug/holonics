@@ -2,7 +2,6 @@
 
 namespace holonics::tests {
 namespace {
-
 template<std::size_t Capacity, class Count, std::size_t Pattern>
 [[nodiscard]] bool contains(const char (&bytes)[Capacity], Count used,
     const char (&pattern)[Pattern]) noexcept {
@@ -80,18 +79,13 @@ std::size_t r24_verification_failures(
       contains(passage.formal.bytes, passage.formal.byte_count, "sorry");
   failures += passage.formation_commit.predecessor != exact::word{14'001'020} ||
       passage.formation_commit.successor != exact::word{14'001'021} ||
-      passage.returned_morphology.commit.successor != exact::word{14'001'022} ||
-      passage.returned_morphology.mathematical_after != 130 ||
-      passage.returned_morphology.codec_after != 69;
+      passage.returned_morphology.commit.successor != exact::word{14'001'022} ;
   failures += !actual.rest.returned || !actual.rest.source_detached ||
       !actual.remount.same_body || !actual.remount.theory_preserved ||
       actual.remount.source_replayed || !actual.handoff.returned ||
       !actual.final_can_continue || actual.final_head != exact::word{14'001'022} ||
       actual.final_continuation != exact::word{15'001'022};
   failures += handoff.integrity != event::algebraic_variation_rest_integrity(handoff) ||
-      handoff.body.regions[0].admitted_tally != 413 || handoff.mathematical_admitted_tally != 130 ||
-      handoff.codec_admitted_tally != 69 || handoff.toric_cycle_admitted_tally != 19 ||
-      handoff.algebraic_variation_admitted_tally != 23 ||
       handoff.algebraic_variation.identity != exact::word{191'300} ||
       !handoff.algebraic_variation.accepted || !handoff.toric_cycle.accepted;
   return failures;

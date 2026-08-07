@@ -87,10 +87,38 @@ mid-chain; nothing downstream should notice.
 
 ## 3. One standing
 
-**The defect.** There are **three** standings. `continuing_body` carries head, continuation, lineage
-and four tallies. `live_machine` carries the Swing and a second, redundant standing surface.
-`body/returned_standing.hpp` carries returned organs by identity, reachable, composable, and
-ablatable by a `caused_by` cascade — and it is the correct one.
+**Corrected 2026-08-07 — it is not three standings.** That earlier reading was wrong and the true
+shape is worse and more useful. The state is a **five-deep chain of whole-state nesting**, measured
+over the rest records:
+
+```
+trace_rebase_rest_record
+  └ trace_fiber_rest_record
+      └ characteristic_hypergeometry_rest_record
+          └ elementary_calculus_rest_record
+              └ cultivated_organ_rest_record
+                  └ rederivation_rest_record  └ … └ body
+```
+
+Each deed's rest embeds its predecessor's **entire** rest as a member, by type. That is why the
+access paths in the residents read `r.standing.standing.standing.body.regions[0]`: the body sits at
+the bottom of a Russian doll, and the depth is a compile-time constant.
+
+Three consequences, and they are the whole problem:
+
+1. **Nothing is reachable by identity.** A later deed reaches a predecessor only by walking a fixed
+   number of `.standing` hops fixed when the type was written.
+2. **Nothing can be excluded.** Removing a predecessor's contribution means deleting a struct member
+   from a type. That is a recompile, not an ablation.
+3. **The rest grows monotonically** and carries every predecessor whether or not anything reaches it.
+
+So *"excluding a deposit stops a later deed by structure"* is currently impossible, and not because
+the wiring is missing: the later deed does not **reach** the earlier return, it **contains** it. Type
+embedding is the opposite of reach.
+
+`body/returned_standing.hpp` is the correct object for exactly the reasons the chain fails — organs
+addressed by identity, `caused_by` recorded so exclusion cascades, deposits that a later current
+reaches rather than inherits. It is reached by one deed, the one written to demonstrate it.
 
 The mandatory causal-information receipt reaches **one** header, itself, while the record states
 that an ecology returning a count instead of a receipt **is not admitted**.
@@ -107,9 +135,18 @@ reached; and **excluding a return cannot stop a later deed by structure, because
 reached it — it read a file path it was handed.** The build graph now understands that the deed chain
 is a graph. The body still does not, and that gap is what this movement and the next close.
 
-**What replaces it.** `continuing_body`'s commit takes a deposit rather than a tally. The Swing
-crosses against `returned_standing`, and `live_machine`'s duplicate surface retires. Every deed
-constructs a `causal_information_receipt` or does not commit.
+**What replaces it.** The five nesting members become deposits. A deed that today writes
+`standing{predecessor_rest}` instead deposits its own returned law into a shared
+`returned_standing` under an identity, naming the predecessor law it built on as `caused_by`; a
+later deed reaches by identity rather than by hop count. Every deed constructs a
+`causal_information_receipt` or does not commit.
+
+**Where it must live.** Not inside `continuing_body`. That object is constructed in device *local*
+memory by several kernels (`local_slot<body::continuing_body>`), and a sixty-four-organ standing is
+roughly ten kilobytes — embedding it there would blow local memory on the card. The standing is
+device-global, resident beside the ecology arenas, and the residents hold a reference. This is the
+same lesson the resident-span crossing already taught: an ecology must stop being a kernel-frame
+value.
 
 **Grade.** One standing, one head, one receipt. Reach for `swing.hpp` and `information_receipt.hpp`
 rises off 9 and 1. **The audit records the number and never targets it** — widening an include to

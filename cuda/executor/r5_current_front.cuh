@@ -126,7 +126,7 @@ __device__ inline void advance_member(current::resident_causal_body& body,
   auto& delta = body.delta(body.delta_base() + slot);
   delta = {body.standing().head(), exact::word{event}, exact::word{event},
       value.caused_support, exact::word{changed_support},
-      static_cast<std::int64_t>(body.output_count(slot)) - 1, exact::word{0},
+      static_cast<std::int64_t>(body.output_count(slot)) - 1,
       transformed.value, transformed.value, exact::word{value.multiplicity},
       exact::word{static_cast<std::uint64_t>(transformed.obstruction)},
       exact::word{body.output_count(slot)}, exact::word{value.lineage.value() + event},

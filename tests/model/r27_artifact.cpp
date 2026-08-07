@@ -3,7 +3,6 @@
 #include <ostream>
 
 namespace holonics::tests {
-
 void write_r27_artifact(std::ostream& out, bool source_loaded,
     const apparatus::expression_geometry_store_receipt& source_load,
     const apparatus::expression_geometry_store_receipt& rest_load,
@@ -86,10 +85,7 @@ void write_r27_artifact(std::ostream& out, bool source_loaded,
       << ",stderr_bytes:" << observation.passage.raw.stderr_bytes
       << ",produced_bytes:" << observation.passage.raw.produced_artifact_bytes
       << "\nfinal_body=head:" << observation.final_head.value() << ",continuation:"
-      << observation.final_continuation.value() << ",admitted_tally:"
-      << handoff.body.regions[0].admitted_tally << ",mathematical:"
-      << handoff.mathematical_admitted_tally << ",codec:" << handoff.codec_admitted_tally
-      << ",expression_geometry:" << handoff.expression_geometry_admitted_tally
+      << observation.final_continuation.value()
       << ",rest_bytes:" << rest_write.bytes.value() << ",integrity:" << handoff.integrity
       << "\nrest_io=loaded:" << rest_load.returned() << ",written:" << rest_write.returned()
       << "\nphysical_telemetry=engine_time:unknown,checker_time:unknown,temperature:unknown,"

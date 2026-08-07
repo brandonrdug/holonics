@@ -8,7 +8,6 @@
 
 namespace holonics::apparatus {
 namespace {
-
 template<class Value>
 struct local_slot final {
   alignas(Value) unsigned char bytes[sizeof(Value)];
@@ -21,8 +20,7 @@ struct local_slot final {
   if (left.head != right.head || left.continuation != right.continuation ||
       left.lineage != right.lineage) { return false; }
   for (std::size_t slot = 0; slot < body::live_region_capacity; ++slot) {
-    if (left.regions[slot].admitted_tally != right.regions[slot].admitted_tally ||
-        left.regions[slot].current != right.regions[slot].current) { return false; }
+    if (left.regions[slot].current != right.regions[slot].current) { return false; }
   }
   return true;
 }
@@ -58,27 +56,6 @@ __device__ void check_returns(event::lifecycle_adversarial_receipt& receipt) {
   receipt.correct_return = event::resume(*pending_storage.get(), returned, delta_storage.get());
   receipt.double_return = event::resume(*pending_storage.get(), returned, delta_storage.get());
   event::recover(*standing, *delta_storage.get());
-}
-
-__device__ void check_capacity(event::lifecycle_adversarial_receipt& receipt) {
-  body::rest_region regions[body::live_region_capacity]{};
-  regions[2].admitted_tally = ~std::uint64_t{0} - 2U;
-  local_slot<body::continuing_body> body_storage{};
-  local_slot<event::live_pending> pending_storage{};
-  local_slot<event::live_delta> delta_storage{};
-  auto* standing = ::new (static_cast<void*>(body_storage.get()))
-      body::continuing_body{60'000'000U, regions};
-  const auto before = event::observe(*standing);
-  const event::deed_request request{70'000'000U, 2, 3};
-  event::outbound_occurrence outbound{};
-  static_cast<void>(event::open(*standing, request, pending_storage.get(), outbound));
-  auto returned = matching_return(outbound, 7);
-  static_cast<void>(event::resume(*pending_storage.get(), returned, delta_storage.get()));
-  receipt.capacity_commit = event::commit(*standing, *delta_storage.get()).state;
-  const auto after = event::observe(*standing);
-  receipt.capacity_predecessor_preserved = same_observation(before, after);
-  receipt.capacity_capability_restored = standing->can_open() &&
-      standing->continuation_serial().value() == before.continuation;
 }
 
 __device__ bool recover_open_boundary(std::uint64_t seed) {
@@ -140,15 +117,20 @@ __device__ bool commit_successor_boundary(std::uint64_t seed) {
   auto returned = matching_return(outbound, 7);
   static_cast<void>(event::resume(*pending_storage.get(), returned, delta_storage.get()));
   const auto committed = event::commit(*standing, *delta_storage.get());
+  // The commit's effect is structural, not arithmetic: the head advances to a
+  // freshly minted identity and a new continuation stands where the consumed one
+  // was. This read `region(1).admitted_tally == 7` until 2026-08-07, which
+  // checked that a counter had been added to and said nothing about the change.
   return committed.state == body::body_change_status::committed &&
-      standing->region(1).admitted_tally == 7 && standing->can_open();
+      committed.successor != committed.predecessor &&
+      committed.continuation_after != committed.continuation_before &&
+      standing->can_open();
 }
 
 __global__ void adversarial_lifecycle(event::lifecycle_output* output) {
   if (blockIdx.x != 0 || threadIdx.x != 0) { return; }
   auto& receipt = output->adversarial;
   check_returns(receipt);
-  check_capacity(receipt);
   receipt.interruption_predecessors[0] = rest_predecessor_boundary(80'000'000U);
   receipt.interruption_predecessors[1] = recover_open_boundary(90'000'000U);
   receipt.interruption_predecessors[2] = recover_resume_boundary(100'000'000U);

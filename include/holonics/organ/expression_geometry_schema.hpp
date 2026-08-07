@@ -6,7 +6,6 @@
 #include <holonics/exact/word.hpp>
 
 namespace holonics::organ {
-
 inline constexpr std::size_t expression_presentation_capacity = 3;
 inline constexpr std::size_t expression_term_capacity = 12;
 inline constexpr std::size_t expression_parameter_capacity = 21;
@@ -115,7 +114,6 @@ struct acquired_expression_geometry final {
   exact::word passage{};
   exact::word kernel_return{};
   exact::word lineage{};
-  exact::word admitted_tally_delta{};
   bool accepted{};
 };
 

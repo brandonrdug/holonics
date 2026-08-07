@@ -8,7 +8,6 @@
 #include <holonics/organ/cm_incidence_schema.hpp>
 
 namespace holonics::organ {
-
 inline constexpr std::size_t intrinsic_case_capacity = 10;
 inline constexpr std::size_t intrinsic_vertex_capacity = 17U * 19U;
 inline constexpr std::size_t intrinsic_edge_capacity = 2U * intrinsic_vertex_capacity;
@@ -95,7 +94,6 @@ struct acquired_intrinsic_hypergeometry final {
   exact::word passage{};
   exact::word kernel_return{};
   exact::word lineage{};
-  exact::word admitted_tally_delta{};
   bool accepted{};
 };
 

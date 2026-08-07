@@ -2,7 +2,6 @@
 
 namespace holonics::tests {
 namespace {
-
 template<std::size_t Capacity, class Count, std::size_t Pattern>
 [[nodiscard]] bool contains(const char (&bytes)[Capacity], Count used,
     const char (&pattern)[Pattern]) noexcept {
@@ -172,18 +171,13 @@ std::size_t r21_verification_failures(
       actual.code.formation_commit.successor != exact::word{14'001'013} ||
       actual.code.returned_morphology.commit.successor != exact::word{14'001'014} ||
       actual.moment.formation_commit.successor != exact::word{14'001'015} ||
-      actual.moment.returned_morphology.commit.successor != exact::word{14'001'016} ||
-      actual.code.returned_morphology.mathematical_after != 86 ||
-      actual.moment.returned_morphology.mathematical_after != 94 ||
-      actual.moment.returned_morphology.codec_after != 54;
+      actual.moment.returned_morphology.commit.successor != exact::word{14'001'016} ;
   failures += !actual.rest.returned || !actual.rest.source_detached ||
       !actual.remount.same_body || !actual.remount.theories_preserved ||
       actual.remount.source_replayed || !actual.handoff.returned || !actual.final_can_continue ||
       actual.final_head != exact::word{14'001'016} ||
       actual.final_continuation != exact::word{15'001'016};
   failures += handoff.integrity != event::blind_reconstruction_rest_integrity(handoff) ||
-      handoff.body.regions[0].admitted_tally != 296 || handoff.mathematical_admitted_tally != 94 ||
-      handoff.codec_admitted_tally != 54 || handoff.blind_reconstruction_admitted_tally != 24 ||
       handoff.code_reconstruction.identity != exact::word{188'300} ||
       !handoff.code_reconstruction.accepted ||
       handoff.moment_reconstruction.identity != exact::word{188'301} ||

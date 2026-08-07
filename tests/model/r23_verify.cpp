@@ -2,7 +2,6 @@
 
 namespace holonics::tests {
 namespace {
-
 [[nodiscard]] bool rational(exact::small_rational value,
     std::int64_t numerator, std::int64_t denominator = 1) noexcept {
   return value.numerator == numerator && value.denominator == denominator;
@@ -198,18 +197,13 @@ std::size_t r23_verification_failures(
       contains(passage.formal.bytes, passage.formal.byte_count, "sorry");
   failures += passage.formation_commit.predecessor != exact::word{14'001'018} ||
       passage.formation_commit.successor != exact::word{14'001'019} ||
-      passage.returned_morphology.commit.successor != exact::word{14'001'020} ||
-      passage.returned_morphology.mathematical_after != 116 ||
-      passage.returned_morphology.codec_after != 63;
+      passage.returned_morphology.commit.successor != exact::word{14'001'020} ;
   failures += !actual.rest.returned || !actual.rest.source_detached ||
       !actual.remount.same_body || !actual.remount.theory_preserved ||
       actual.remount.source_replayed || !actual.handoff.returned ||
       !actual.final_can_continue || actual.final_head != exact::word{14'001'020} ||
       actual.final_continuation != exact::word{15'001'020};
   failures += handoff.integrity != event::toric_cycle_rest_integrity(handoff) ||
-      handoff.body.regions[0].admitted_tally != 366 ||
-      handoff.mathematical_admitted_tally != 116 || handoff.codec_admitted_tally != 63 ||
-      handoff.cm_incidence_admitted_tally != 17 || handoff.toric_cycle_admitted_tally != 19 ||
       handoff.toric_cycle.identity != exact::word{190'300} ||
       !handoff.toric_cycle.accepted || !handoff.cm_incidence.accepted;
   return failures;

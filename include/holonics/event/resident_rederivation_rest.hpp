@@ -3,7 +3,6 @@
 #include <holonics/event/resident_rederivation.hpp>
 
 namespace holonics::event {
-
 HOLONICS_CALLABLE inline rederivation_rest_receipt
 resident_rederivation::rest(rederivation_rest_record &record) noexcept {
   rederivation_rest_receipt receipt{};
@@ -44,23 +43,6 @@ resident_rederivation::rest(rederivation_rest_record &record) noexcept {
   record.lattice_rederivation = lattice_rederivation_;
   record.potential_rederivation = potential_rederivation_;
   record.cover_rederivation = cover_rederivation_;
-  record.mathematical_admitted_tally = mathematical_admitted_tally_;
-  record.codec_admitted_tally = codec_admitted_tally_;
-  record.geometry_admitted_tally = geometry_admitted_tally_;
-  record.phase_admitted_tally = phase_admitted_tally_;
-  record.characteristic_admitted_tally = characteristic_admitted_tally_;
-  record.regular_singular_admitted_tally = regular_singular_admitted_tally_;
-  record.blind_reconstruction_admitted_tally = blind_reconstruction_admitted_tally_;
-  record.cm_incidence_admitted_tally = cm_incidence_admitted_tally_;
-  record.toric_cycle_admitted_tally = toric_cycle_admitted_tally_;
-  record.algebraic_variation_admitted_tally = algebraic_variation_admitted_tally_;
-  record.causal_linear_admitted_tally = causal_linear_admitted_tally_;
-  record.intrinsic_hypergeometry_admitted_tally =
-      intrinsic_hypergeometry_admitted_tally_;
-  record.expression_geometry_admitted_tally = expression_geometry_admitted_tally_;
-  record.hodge_realization_admitted_tally = hodge_realization_admitted_tally_;
-  record.arithmetic_spectral_admitted_tally = arithmetic_spectral_admitted_tally_;
-  record.rederivation_admitted_tally = rederivation_admitted_tally_;
   record.integrity = rederivation_rest_integrity(record);
   receipt.theory = matching_rederivation_.identity;
   receipt.integrity = exact::word{record.integrity};

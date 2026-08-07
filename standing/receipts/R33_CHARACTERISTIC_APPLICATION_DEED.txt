@@ -12,8 +12,8 @@ prediction_before_comparison=1
 visible=3,2,4
 predicted_closed_trace=3
 source_closed_trace=3
-final_rest_bytes=2832
-final_body=head:14001048,continuation:15001048,admitted_tally:1199,mathematical:418,codec:195,transport:24
+final_rest_bytes=2360
+final_body=head:14001048,continuation:15001048
 checker_exit=0
 formal_begin
 import R33_CHARACTERISTIC_HYPERGEOMETRY

@@ -4,14 +4,12 @@
 
 namespace holonics::tests {
 namespace {
-
 bool equal(const receiver::word_pair& left, const receiver::word_pair& right) noexcept {
   return left.first == right.first && left.second == right.second;
 }
 
 bool equal(const current::weave_cell& left, const current::weave_cell& right) noexcept {
   return left.identity == right.identity && left.value == right.value &&
-      left.admitted_tally == right.admitted_tally && left.current == right.current &&
       left.lineage == right.lineage && left.placement == right.placement &&
       left.aperture == right.aperture;
 }

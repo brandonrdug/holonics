@@ -7,7 +7,6 @@
 #include <holonics/exact/word.hpp>
 
 namespace holonics::current {
-
 inline constexpr std::size_t weave_cell_capacity = 12;
 inline constexpr std::size_t weave_event_capacity = 10;
 inline constexpr std::size_t weave_variant_capacity = 4;
@@ -27,7 +26,6 @@ enum class weave_obstruction : std::uint8_t {
 struct weave_cell final {
   exact::word identity{};
   exact::word value{};
-  exact::word admitted_tally{};
   exact::word current{};
   exact::word lineage{};
   std::uint16_t placement{};
@@ -60,7 +58,6 @@ struct weave_event final {
   exact::word read_support{};
   exact::word change_support{};
   exact::word value_delta{};
-  exact::word admitted_tally_delta{};
   exact::word successor_current{};
   exact::word consequence{};
   exact::word stress{};
@@ -77,7 +74,6 @@ struct weave_delta final {
   exact::word read_support{};
   exact::word change_support{};
   exact::word value_delta{};
-  exact::word admitted_tally_delta{};
   exact::word successor_current{};
   exact::word consequence{};
   exact::word stress{};

@@ -3,7 +3,6 @@
 #include <holonics/organ/cultivated_organ_schema.hpp>
 
 namespace holonics::organ {
-
 enum class cultivation_obstruction : std::uint8_t {
   none,
   insufficient_rows,
@@ -101,7 +100,6 @@ struct acquired_organ_application final {
   exact::word passage{};
   exact::word returned_event{};
   exact::word lineage{};
-  exact::word admitted_tally_delta{};
   bool accepted{};
 };
 

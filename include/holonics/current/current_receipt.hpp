@@ -5,7 +5,6 @@
 #include <holonics/current/current_program.hpp>
 
 namespace holonics::current {
-
 enum class current_status : std::uint8_t {
   unmounted,
   mounted,
@@ -41,7 +40,6 @@ struct current_delta final {
   exact::word read_support{};
   exact::word change_support{};
   std::int64_t incidence_delta{};
-  exact::word admitted_tally_delta{};
   exact::word successor_current{};
   exact::word returned_consequence{};
   exact::word stress{};

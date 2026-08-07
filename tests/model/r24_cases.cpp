@@ -4,7 +4,6 @@
 
 namespace holonics::tests {
 namespace {
-
 [[nodiscard]] organ::algebraic_variation_foundation foundation(
     const organ::algebraic_variation_card& card) noexcept {
   return {exact::word{138'600}, exact::word{138'601}, exact::word{138'602},
@@ -42,7 +41,7 @@ event::toric_cycle_rest_record r24_host_toric_rest() noexcept {
   const auto prior = r23_host_cm_rest(); event::toric_cycle_rest_record record{};
   record.body = prior.body; record.body.head = 14'001'020; record.body.next_head = 14'001'021;
   record.body.continuation = 15'001'020; record.body.next_continuation = 15'001'021;
-  record.body.lineage = 16'001'020; record.body.regions[0] = {366, 190'300};
+  record.body.lineage = 16'001'020; record.body.regions[0] = {190'300};
   record.body.integrity = body::rest_integrity(record.body);
   record.first = prior.first; record.second = prior.second; record.geometry = prior.geometry;
   record.phase_crystal = prior.phase_crystal; record.characteristic = prior.characteristic;
@@ -51,14 +50,7 @@ event::toric_cycle_rest_record r24_host_toric_rest() noexcept {
   record.moment_reconstruction = prior.moment_reconstruction;
   record.cm_incidence = prior.cm_incidence;
   record.toric_cycle = {exact::word{190'300}, exact::word{177'500},
-      exact::word{161'000}, exact::word{191'050}, exact::word{20}, true};
-  record.mathematical_admitted_tally = 116; record.codec_admitted_tally = 63;
-  record.geometry_admitted_tally = prior.geometry_admitted_tally;
-  record.phase_admitted_tally = prior.phase_admitted_tally;
-  record.characteristic_admitted_tally = prior.characteristic_admitted_tally;
-  record.regular_singular_admitted_tally = prior.regular_singular_admitted_tally;
-  record.blind_reconstruction_admitted_tally = prior.blind_reconstruction_admitted_tally;
-  record.cm_incidence_admitted_tally = 17; record.toric_cycle_admitted_tally = 19;
+      exact::word{161'000}, exact::word{191'050}, true};
   record.integrity = event::toric_cycle_rest_integrity(record); return record;
 }
 

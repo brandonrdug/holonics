@@ -7,7 +7,6 @@
 #include <holonics/organ/phase_crystal_schema.hpp>
 
 namespace holonics::organ {
-
 inline constexpr std::size_t characteristic_case_capacity = phase_crystal_case_capacity;
 inline constexpr std::size_t characteristic_shape_capacity = phase_crystal_point_capacity;
 inline constexpr std::size_t characteristic_tour_capacity = 4;
@@ -71,7 +70,6 @@ struct acquired_characteristic final {
   exact::word passage{};
   exact::word kernel_return{};
   exact::word lineage{};
-  exact::word admitted_tally_delta{};
   bool accepted{};
 };
 

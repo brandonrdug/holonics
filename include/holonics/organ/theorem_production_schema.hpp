@@ -6,7 +6,6 @@
 #include <holonics/exact/word.hpp>
 
 namespace holonics::organ {
-
 inline constexpr std::size_t theorem_production_fiber_capacity = 2;
 
 enum class theorem_formation : std::uint8_t {
@@ -90,7 +89,6 @@ struct acquired_theorem_fiber final {
   exact::word proof{};
   exact::word kernel_return{};
   exact::word selected_rule{};
-  exact::word admitted_tally_delta{};
   std::uint16_t dependency_count{};
   bool accepted{};
 };

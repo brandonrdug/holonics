@@ -4,7 +4,6 @@
 
 namespace holonics::tests {
 namespace {
-
 bool equal(const current::sparse_current& left, const current::sparse_current& right) noexcept {
   return left.occurrence == right.occurrence && left.lineage == right.lineage &&
       left.local_state == right.local_state && left.caused_support == right.caused_support &&
@@ -24,7 +23,6 @@ bool equal(const current::current_delta& left, const current::current_delta& rig
       left.return_event == right.return_event && left.read_support == right.read_support &&
       left.change_support == right.change_support &&
       left.incidence_delta == right.incidence_delta &&
-      left.admitted_tally_delta == right.admitted_tally_delta &&
       left.successor_current == right.successor_current &&
       left.returned_consequence == right.returned_consequence && left.stress == right.stress &&
       left.obstruction == right.obstruction && left.logical_resource == right.logical_resource &&

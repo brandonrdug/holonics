@@ -5,14 +5,12 @@
 
 namespace holonics::tests {
 namespace {
-
 void write_snapshot(std::ostream& output,
     const char* label,
     std::size_t history,
     const receiver::condensed_snapshot& value) noexcept {
   output << label << '=' << history << ",head=" << value.head.value()
          << ",incidence=" << value.incidence.value()
-         << ",admitted_tally=" << value.admitted_tally.value()
          << ",current=" << value.current.value()
          << ",lineage=" << value.lineage.value()
          << ",resource=" << value.logical_resource.value()

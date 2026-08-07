@@ -5,7 +5,6 @@
 
 namespace holonics::tests {
 namespace {
-
 current::weave_snapshot initial(const current::weave_program& program) noexcept {
   current::weave_snapshot result{};
   result.head = program.predecessor;
@@ -25,7 +24,6 @@ void apply_event(current::weave_snapshot& standing,
     std::size_t slot) noexcept {
   auto& cell = standing.cells[event.cell];
   cell.value = exact::word{cell.value.value() + event.value_delta.value()};
-  cell.admitted_tally = exact::word{cell.admitted_tally.value() + event.admitted_tally_delta.value()};
   cell.current = event.successor_current;
   cell.lineage = event.lineage;
   standing.emitted[slot] = event.consequence;
@@ -89,7 +87,7 @@ void stage_live_deltas(const current::weave_program& program,
       const auto& event = program.events[slot];
       output.deltas[slot] = {exact::word{head}, event.identity, event.input_port,
           event.output_port, event.read_support, event.change_support, event.value_delta,
-          event.admitted_tally_delta, event.successor_current, event.consequence, event.stress,
+          event.successor_current, event.consequence, event.stress,
           exact::word{0}, event.logical_resource, event.lineage, event.interaction, event.cell};
     }
     ++head;

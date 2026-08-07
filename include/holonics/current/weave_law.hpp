@@ -6,7 +6,6 @@
 #include <holonics/current/weave_receipt.hpp>
 
 namespace holonics::current {
-
 [[nodiscard]] HOLONICS_CALLABLE constexpr bool weave_add(
     std::uint64_t left,
     std::uint64_t right,
@@ -33,7 +32,6 @@ namespace holonics::current {
   }
   std::uint64_t logical_total = 0;
   std::uint64_t value_totals[weave_cell_capacity]{};
-  std::uint64_t admitted_tally_totals[weave_cell_capacity]{};
   std::size_t layered_events = 0;
   for (std::size_t layer = 0; layer < program.layer_count; ++layer) {
     if (program.layer_offsets[layer] != layered_events || program.layer_counts[layer] == 0 ||
@@ -75,9 +73,7 @@ namespace holonics::current {
       return weave_obstruction::invalid_program;
     }
     if (!weave_add(value_totals[event.cell], event.value_delta.value(),
-            value_totals[event.cell]) ||
-        !weave_add(admitted_tally_totals[event.cell], event.admitted_tally_delta.value(),
-            admitted_tally_totals[event.cell])) {
+            value_totals[event.cell])) {
       return weave_obstruction::invalid_program;
     }
   }
@@ -87,8 +83,7 @@ namespace holonics::current {
   }
   for (std::size_t cell = 0; cell < program.cell_count; ++cell) {
     std::uint64_t admitted = 0;
-    if (!weave_add(program.cells[cell].value.value(), value_totals[cell], admitted) ||
-        !weave_add(program.cells[cell].admitted_tally.value(), admitted_tally_totals[cell], admitted)) {
+    if (!weave_add(program.cells[cell].value.value(), value_totals[cell], admitted)) {
       return weave_obstruction::invalid_program;
     }
   }
@@ -146,7 +141,7 @@ namespace holonics::current {
     const weave_event& event) noexcept {
   return weave_delta{predecessor, event.identity, event.input_port, event.output_port,
       event.read_support, event.change_support, event.value_delta,
-      event.admitted_tally_delta, event.successor_current, event.consequence,
+      event.successor_current, event.consequence,
       event.stress, exact::word{0}, event.logical_resource, event.lineage,
       event.interaction, event.cell};
 }
@@ -160,18 +155,14 @@ namespace holonics::current {
     return weave_obstruction::invalid_program;
   }
   std::uint64_t next_value = 0;
-  std::uint64_t next_admitted_tally = 0;
   std::uint64_t next_resource = 0;
   if (!weave_add(standing.cells[delta.cell].value.value(), delta.value_delta.value(), next_value) ||
-      !weave_add(standing.cells[delta.cell].admitted_tally.value(),
-          delta.admitted_tally_delta.value(), next_admitted_tally) ||
       !weave_add(standing.logical.used.value(),
           delta.logical_resource.value(), next_resource) ||
       next_resource > standing.logical.capacity.value()) {
     return weave_obstruction::logical_resource_refused;
   }
   standing.cells[delta.cell].value = exact::word{next_value};
-  standing.cells[delta.cell].admitted_tally = exact::word{next_admitted_tally};
   standing.cells[delta.cell].current = delta.successor_current;
   standing.cells[delta.cell].lineage = delta.lineage;
   standing.emitted[event_slot] = delta.consequence;
@@ -194,7 +185,7 @@ HOLONICS_CALLABLE constexpr void set_weave_successor_head(
     const auto& first = left.cells[slot];
     const auto& second = right.cells[slot];
     if (first.identity != second.identity || first.value != second.value ||
-        first.admitted_tally != second.admitted_tally || first.current != second.current ||
+        first.current != second.current ||
         first.lineage != second.lineage || first.placement != second.placement ||
         first.aperture != second.aperture) {
       return false;

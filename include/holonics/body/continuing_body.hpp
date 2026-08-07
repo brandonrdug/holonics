@@ -8,15 +8,13 @@
 #include <holonics/structure/identity_mint.hpp>
 
 namespace holonics::body {
-
 struct body_head_identity_owner final {};
 
 enum class body_change_status : std::uint8_t {
   committed,
   stale_predecessor,
   invalid_continuation,
-  invalid_region,
-  capacity_refused
+  invalid_region
 };
 
 struct body_change_receipt final {
@@ -26,8 +24,6 @@ struct body_change_receipt final {
   exact::word continuation_before{};
   exact::word continuation_after{};
   std::uint16_t region{};
-  std::uint64_t admitted_tally_before{};
-  std::uint64_t admitted_tally_after{};
 };
 
 class continuing_body final {
@@ -76,10 +72,23 @@ class continuing_body final {
     }
   }
 
+  /// Commit one change to the body.
+  ///
+  /// **What a commit is, and what it is not.** Until 2026-08-07 this took an
+  /// `admitted_tally_delta` and added it to a per-region counter. Nothing
+  /// anywhere branched on that counter — the only test of it was an overflow
+  /// guard on itself — while twenty-three owners incremented it by hand-picked
+  /// weights and fourteen graders asserted its running sum as a pass condition.
+  /// A deed inserted anywhere in the chain broke every later assertion, so the
+  /// apparatus penalised recombination by construction.
+  ///
+  /// What remains is the change itself, and it is structural: the head advances
+  /// to a freshly minted identity, the consumed capability is replaced by a new
+  /// continuation, the lineage advances, and the region carries the successor's
+  /// current. A refusal is typed and leaves all four untouched.
   [[nodiscard]] HOLONICS_CALLABLE body_change_receipt commit(
       exact::word predecessor,
       std::uint16_t region_slot,
-      std::uint64_t admitted_tally_delta,
       std::uint64_t successor_current,
       linear_continuation&& capability) noexcept {
     body_change_receipt receipt{};
@@ -91,13 +100,8 @@ class continuing_body final {
     if (predecessor != head_.serial()) { receipt.state = body_change_status::stale_predecessor; }
     else if (!capability.valid() || continuation_.valid()) { receipt.state = body_change_status::invalid_continuation; }
     else if (region_slot >= live_region_capacity) { receipt.state = body_change_status::invalid_region; }
-    else if (~std::uint64_t{0} - regions_[region_slot].admitted_tally < admitted_tally_delta) {
-      receipt.state = body_change_status::capacity_refused;
-    } else {
-      receipt.admitted_tally_before = regions_[region_slot].admitted_tally;
-      regions_[region_slot].admitted_tally += admitted_tally_delta;
+    else {
       regions_[region_slot].current = successor_current;
-      receipt.admitted_tally_after = regions_[region_slot].admitted_tally;
       capability.consume();
       head_ = head_mint_.mint();
       continuation_ = linear_continuation{exact::word{next_continuation_++}};
@@ -107,8 +111,6 @@ class continuing_body final {
       receipt.continuation_after = continuation_.serial();
       return receipt;
     }
-    receipt.admitted_tally_before = region_slot < live_region_capacity ? regions_[region_slot].admitted_tally : 0;
-    receipt.admitted_tally_after = receipt.admitted_tally_before;
     recover(static_cast<linear_continuation&&>(capability));
     return receipt;
   }

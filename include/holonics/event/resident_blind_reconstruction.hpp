@@ -11,7 +11,6 @@
 #include <holonics/organ/blind_reconstruction_law.hpp>
 
 namespace holonics::event {
-
 class resident_blind_reconstruction final {
  public:
   resident_blind_reconstruction() = delete;
@@ -27,13 +26,7 @@ class resident_blind_reconstruction final {
       : foundation_(foundation), body_(body::continuing_body::remount(record.body, receipt.body)),
         first_(record.first), second_(record.second), geometry_(record.geometry),
         phase_crystal_(record.phase_crystal), characteristic_(record.characteristic),
-        regular_singular_(record.regular_singular),
-        mathematical_admitted_tally_(record.mathematical_admitted_tally),
-        codec_admitted_tally_(record.codec_admitted_tally),
-        geometry_admitted_tally_(record.geometry_admitted_tally),
-        phase_admitted_tally_(record.phase_admitted_tally),
-        characteristic_admitted_tally_(record.characteristic_admitted_tally),
-        regular_singular_admitted_tally_(record.regular_singular_admitted_tally), source_detached_(true) {
+        regular_singular_(record.regular_singular), source_detached_(true) {
     const bool exact = record.integrity == regular_singular_rest_integrity(record);
     receipt.theory = regular_singular_.identity;
     receipt.same_body = receipt.body.returned && receipt.body.head == body_.head();
@@ -51,13 +44,6 @@ class resident_blind_reconstruction final {
         characteristic_(record.characteristic), regular_singular_(record.regular_singular),
         code_reconstruction_(record.code_reconstruction),
         moment_reconstruction_(record.moment_reconstruction),
-        mathematical_admitted_tally_(record.mathematical_admitted_tally),
-        codec_admitted_tally_(record.codec_admitted_tally),
-        geometry_admitted_tally_(record.geometry_admitted_tally),
-        phase_admitted_tally_(record.phase_admitted_tally),
-        characteristic_admitted_tally_(record.characteristic_admitted_tally),
-        regular_singular_admitted_tally_(record.regular_singular_admitted_tally),
-        blind_reconstruction_admitted_tally_(record.blind_reconstruction_admitted_tally),
         source_detached_(true) {
     const bool exact = record.integrity == blind_reconstruction_rest_integrity(record);
     receipt.code_theory = code_reconstruction_.identity;
@@ -118,7 +104,7 @@ class resident_blind_reconstruction final {
       observation.inquiry.obstruction = organ::blind_obstruction::render_refused; return false;
     }
     auto continuation = body_.take_continuation();
-    observation.code.formation_commit = body_.commit(body_.head(), 0, 13,
+    observation.code.formation_commit = body_.commit(body_.head(), 0,
         plan.code_passage.value(), static_cast<body::linear_continuation&&>(continuation));
     if (observation.code.formation_commit.state != body::body_change_status::committed) {
       observation.inquiry.obstruction = organ::blind_obstruction::continuation_refused; return false;
@@ -164,13 +150,6 @@ class resident_blind_reconstruction final {
   organ::acquired_blind_reconstruction code_reconstruction_{};
   organ::acquired_blind_reconstruction moment_reconstruction_{};
   alignas(checker_pending_deed) unsigned char pending_storage_[sizeof(checker_pending_deed)]{};
-  std::uint64_t mathematical_admitted_tally_{};
-  std::uint64_t codec_admitted_tally_{};
-  std::uint64_t geometry_admitted_tally_{};
-  std::uint64_t phase_admitted_tally_{};
-  std::uint64_t characteristic_admitted_tally_{};
-  std::uint64_t regular_singular_admitted_tally_{};
-  std::uint64_t blind_reconstruction_admitted_tally_{};
   passage_kind pending_kind_{passage_kind::none};
   passage_stage stage_{passage_stage::none};
   bool source_detached_{};

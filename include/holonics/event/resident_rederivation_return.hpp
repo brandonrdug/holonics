@@ -4,7 +4,6 @@
 #include <holonics/event/resident_rederivation.hpp>
 
 namespace holonics::event {
-
 HOLONICS_CALLABLE inline bool resident_rederivation::form_foil(
     rederivation_observation &observation) noexcept {
   if (!admitted_ || pending_live_ || stage_ != passage_stage::none ||
@@ -18,7 +17,7 @@ HOLONICS_CALLABLE inline bool resident_rederivation::form_foil(
     return false;
   auto continuation = body_.take_continuation();
   observation.foil.formation_commit = body_.commit(
-      body_.head(), 0, 2, observation.inquiry.theory.passage.value(),
+      body_.head(), 0, observation.inquiry.theory.passage.value(),
       static_cast<body::linear_continuation &&>(continuation));
   if (observation.foil.formation_commit.state !=
       body::body_change_status::committed)
@@ -68,17 +67,10 @@ HOLONICS_CALLABLE inline bool resident_rederivation::resume_foil(
   const bool rejected = typed.state == checker_return_status::rejected ||
                         typed.state == checker_return_status::remaining_goals;
   auto &morphology = observation.foil.returned_morphology;
-  morphology.mathematical_before = mathematical_admitted_tally_;
-  morphology.codec_before = codec_admitted_tally_;
-  mathematical_admitted_tally_ += 1;
-  codec_admitted_tally_ += 2;
-  rederivation_admitted_tally_ += 1;
   morphology.commit =
-      body_.commit(expected.predecessor, 0, 4, expected.passage.value(),
+      body_.commit(expected.predecessor, 0, expected.passage.value(),
                    pending->take_continuation());
   pending_live_ = false;
-  morphology.mathematical_after = mathematical_admitted_tally_;
-  morphology.codec_after = codec_admitted_tally_;
   // The foil is expected to be refused, so the difference must NOT apply. Before
   // 2026-08-06 this read the commit alone and reported the refused foil as
   // applied, exactly as it reported an accepted return.
@@ -115,7 +107,7 @@ HOLONICS_CALLABLE inline bool resident_rederivation::form_valid(
     return false;
   auto continuation = body_.take_continuation();
   observation.passage.formation_commit = body_.commit(
-      body_.head(), 0, 55, observation.inquiry.theory.passage.value(),
+      body_.head(), 0, observation.inquiry.theory.passage.value(),
       static_cast<body::linear_continuation &&>(continuation));
   if (observation.passage.formation_commit.state !=
       body::body_change_status::committed)
@@ -168,18 +160,10 @@ HOLONICS_CALLABLE inline bool resident_rederivation::resume_valid(
                                             observation.passage.conversational))
     return false;
   auto &morphology = observation.passage.returned_morphology;
-  morphology.mathematical_before = mathematical_admitted_tally_;
-  morphology.codec_before = codec_admitted_tally_;
-  mathematical_admitted_tally_ += accepted ? 37U : 1U;
-  codec_admitted_tally_ += accepted ? 12U : 2U;
-  rederivation_admitted_tally_ += accepted ? 55U : 1U;
-  const std::uint64_t delta = accepted ? 60U : 4U;
   morphology.commit =
-      body_.commit(expected.predecessor, 0, delta, expected.passage.value(),
+      body_.commit(expected.predecessor, 0, expected.passage.value(),
                    pending->take_continuation());
   pending_live_ = false;
-  morphology.mathematical_after = mathematical_admitted_tally_;
-  morphology.codec_after = codec_admitted_tally_;
   morphology.returned_difference_applied = accepted &&
       morphology.commit.state == body::body_change_status::committed;
   observation.passage.pending_after_return = false;
@@ -195,7 +179,7 @@ HOLONICS_CALLABLE inline bool resident_rederivation::resume_valid(
                     expected.passage,
                     raw.event,
                     observation.inquiry.theory.lineage,
-                    exact::word{delta},
+                    
                     true};
       observation.passage.acquired[i] = *fields[i];
     }

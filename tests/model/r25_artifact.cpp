@@ -4,7 +4,6 @@
 
 namespace holonics::tests {
 namespace {
-
 void polynomial(std::ostream& output,
     const organ::causal_characteristic_receipt& value) {
   for (std::uint8_t slot = 0; slot <= value.degree; ++slot) {
@@ -133,9 +132,7 @@ void write_r25_artifact(std::ostream& output, bool sources_loaded,
       << value.passage.raw.stdout_bytes << ",stderr_bytes:" << value.passage.raw.stderr_bytes
       << ",produced_bytes:" << value.passage.raw.produced_artifact_bytes
       << "\nfinal_body=head:" << handoff.body.head << ",continuation:"
-      << handoff.body.continuation << ",admitted_tally:" << handoff.body.regions[0].admitted_tally
-      << ",mathematical:" << handoff.mathematical_admitted_tally << ",codec:"
-      << handoff.codec_admitted_tally << ",causal_linear:" << handoff.causal_linear_admitted_tally
+      << handoff.body.continuation
       << ",rest_bytes:" << rest_write.bytes.value() << ",integrity:" << handoff.integrity
       << "\nphysical_telemetry=engine_time:unknown,checker_time:unknown,temperature:unknown,"
          "power:unknown,energy:unknown\nformal_begin\n";

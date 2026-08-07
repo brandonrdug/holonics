@@ -11,7 +11,6 @@
 #include <holonics/event/elementary_calculus_surface_law.hpp>
 
 namespace holonics::event {
-
 class resident_elementary_calculus final {
  public:
   resident_elementary_calculus() = delete;
@@ -54,9 +53,6 @@ class resident_elementary_calculus final {
   elementary_law_bundle laws_{};
   elementary_application_fiber application_{};
   alignas(checker_pending_deed) unsigned char pending_storage_[sizeof(checker_pending_deed)]{};
-  std::uint64_t calculus_admitted_tally_{};
-  std::uint64_t self_organ_admitted_tally_{};
-  std::uint64_t derivation_admitted_tally_{};
   stage stage_{stage::developmental};
   bool pending_live_{};
   bool admitted_{};

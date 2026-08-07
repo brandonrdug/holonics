@@ -91,7 +91,7 @@ apparatus::mathematical_ecology_mount r11_case(std::uint64_t material_testimony)
   mount.canonical = canonical_foundation(material_testimony);
   mount.reordered = reordered_foundation(mount.canonical);
   for (std::size_t slot = 0; slot < body::live_region_capacity; ++slot) {
-    mount.regions[slot] = {110U + slot, 0};
+    mount.regions[slot] = {0};
   }
   mount.held_out = {exact::word{115'001}, exact::word{115'002}, 6,
       exact::word{111'070}, exact::word{111'070}, exact::word{115'003}, false};

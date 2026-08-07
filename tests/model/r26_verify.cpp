@@ -2,7 +2,6 @@
 
 namespace holonics::tests {
 namespace {
-
 template<std::size_t Capacity, class Count, std::size_t Pattern>
 [[nodiscard]] bool contains(const char (&bytes)[Capacity], Count used,
     const char (&pattern)[Pattern]) noexcept {
@@ -145,18 +144,13 @@ std::size_t r26_verification_failures(bool sources_loaded,
       contains(passage.formal.bytes, passage.formal.byte_count, "sorry");
   failures += passage.formation_commit.predecessor != exact::word{14'001'024} ||
       passage.formation_commit.successor != exact::word{14'001'025} ||
-      passage.returned_morphology.commit.successor != exact::word{14'001'026} ||
-      passage.returned_morphology.mathematical_after != 164 ||
-      passage.returned_morphology.codec_after != 84;
+      passage.returned_morphology.commit.successor != exact::word{14'001'026} ;
   failures += !actual.rest.returned || !actual.rest.source_detached ||
       !actual.remount.same_body || !actual.remount.theory_preserved ||
       actual.remount.source_replayed || !actual.handoff.returned ||
       !actual.final_can_continue || actual.final_head != exact::word{14'001'026} ||
       actual.final_continuation != exact::word{15'001'026};
   failures += handoff.integrity != event::intrinsic_hypergeometry_rest_integrity(handoff) ||
-      handoff.body.regions[0].admitted_tally != 535 || handoff.mathematical_admitted_tally != 164 ||
-      handoff.codec_admitted_tally != 84 || handoff.causal_linear_admitted_tally != 29 ||
-      handoff.intrinsic_hypergeometry_admitted_tally != 31 ||
       handoff.intrinsic_hypergeometry.identity != exact::word{193'300} ||
       !handoff.intrinsic_hypergeometry.accepted || !handoff.causal_linear.accepted;
   return failures;

@@ -7,7 +7,6 @@
 #include <holonics/exact/word.hpp>
 
 namespace holonics::organ {
-
 inline constexpr std::size_t variation_coefficient_count = 4;
 inline constexpr std::size_t variation_sample_capacity = 9;
 inline constexpr std::size_t variation_polynomial_capacity = 9;
@@ -95,7 +94,6 @@ struct acquired_algebraic_variation final {
   exact::word passage{};
   exact::word kernel_return{};
   exact::word lineage{};
-  exact::word admitted_tally_delta{};
   bool accepted{};
 };
 

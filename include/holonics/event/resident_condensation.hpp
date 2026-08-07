@@ -8,7 +8,6 @@
 #include <holonics/receiver/condensation_response_law.hpp>
 
 namespace holonics::event {
-
 class resident_condensation final {
  public:
   resident_condensation() = delete;
@@ -20,8 +19,7 @@ class resident_condensation final {
   HOLONICS_CALLABLE explicit resident_condensation(
       const receiver::condensation_program& program,
       const body::rest_region* body_regions) noexcept
-      : program_(program), body_(program.predecessor.value(), body_regions),
-        admitted_tally_(program.admitted_tally), current_(program.current), lineage_(program.lineage),
+      : program_(program), body_(program.predecessor.value(), body_regions), current_(program.current), lineage_(program.lineage),
         logical_resource_(program.logical_resource), group_count_(program.initial_group_count) {
     observation_.program_identity = program.identity;
     observation_.obstruction = receiver::validate_condensation_program(program);
@@ -80,7 +78,7 @@ class resident_condensation final {
     }
     auto capability = body_.take_continuation();
     const auto commit = body_.commit(body_.head(), static_cast<std::uint16_t>(history_slot %
-        body::live_region_capacity), input.delta.value(), step.response.factorized.value(),
+        body::live_region_capacity), step.response.factorized.value(),
         static_cast<body::linear_continuation&&>(capability));
     if (commit.state != body::body_change_status::committed ||
         commit.successor != predicted.head) {
@@ -119,7 +117,7 @@ class resident_condensation final {
     result.old_group_count = group_count_;
     result.new_group_count = program_.refined_group_count;
     auto capability = body_.take_continuation();
-    const auto commit = body_.commit(body_.head(), 0, 0, current_.value(),
+    const auto commit = body_.commit(body_.head(), 0, current_.value(),
         static_cast<body::linear_continuation&&>(capability));
     if (commit.state != body::body_change_status::committed) {
       observation_.obstruction = receiver::condensation_obstruction::continuation_refused;
@@ -160,7 +158,7 @@ class resident_condensation final {
   }
   [[nodiscard]] HOLONICS_CALLABLE receiver::condensed_snapshot snapshot() const noexcept {
     return receiver::make_condensed_snapshot(program_, program_.source_values, body_.head(),
-        admitted_tally_, current_, lineage_, logical_resource_, observation_.obstruction);
+        current_, lineage_, logical_resource_, observation_.obstruction);
   }
   HOLONICS_CALLABLE void commit_input(const receiver::condensation_input& input,
       exact::word response) noexcept {
@@ -168,7 +166,6 @@ class resident_condensation final {
     program_.source_values[input.source_cell] = exact::word{
         program_.source_values[input.source_cell].value() + input.delta.value()};
     group_sums_[group] = exact::word{group_sums_[group].value() + input.delta.value()};
-    admitted_tally_ = exact::word{admitted_tally_.value() + input.delta.value()};
     current_ = response;
     lineage_ = exact::word{lineage_.value() + input.lineage.value()};
     logical_resource_ = exact::word{logical_resource_.value() + 1U};
@@ -186,7 +183,6 @@ class resident_condensation final {
     step.obstruction_equal = step.direct_obstruction == step.condensed_obstruction;
     step.incidence_equal = step.direct_successor.incidence == step.condensed_successor.incidence;
     step.current_equal = step.direct_successor.current == step.condensed_successor.current;
-    step.admitted_tally_equal = step.direct_successor.admitted_tally == step.condensed_successor.admitted_tally;
     step.alternatives_equal = step.direct_successor.alternatives == step.condensed_successor.alternatives;
     step.lineage_equal = step.direct_successor.lineage == step.condensed_successor.lineage;
     step.logical_resource_equal = step.direct_successor.logical_resource ==
@@ -198,7 +194,6 @@ class resident_condensation final {
   receiver::condensation_program program_{};
   body::continuing_body body_;
   receiver::condensation_observation observation_{};
-  exact::word admitted_tally_{};
   exact::word current_{};
   exact::word lineage_{};
   exact::word logical_resource_{};

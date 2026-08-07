@@ -22,7 +22,7 @@ HOLONICS_CALLABLE inline bool resident_trace_fiber::form_discovery(
     return false;
   auto continuation = body_.take_continuation();
   out.passage.formation_commit =
-      body_.commit(body_.head(), 0, 0, out.inquiry.passage.value(),
+      body_.commit(body_.head(), 0, out.inquiry.passage.value(),
                    static_cast<body::linear_continuation &&>(continuation));
   if (out.passage.formation_commit.state != body::body_change_status::committed)
     return false;
@@ -60,27 +60,16 @@ HOLONICS_CALLABLE inline bool resident_trace_fiber::resume_discovery(
                                typed);
   const bool accepted = typed.state == checker_return_status::accepted;
   auto &m = out.passage.returned_morphology;
-  m.mathematical_before =
-      standing_.standing.standing.standing.mathematical_admitted_tally;
-  m.codec_before = standing_.standing.standing.standing.codec_admitted_tally;
-  standing_.standing.standing.standing.mathematical_admitted_tally +=
-      accepted ? 36U : 1U;
-  standing_.standing.standing.standing.codec_admitted_tally += accepted ? 16U : 1U;
-  trace_fiber_admitted_tally_ += accepted ? 64U : 1U;
-  lift_organ_admitted_tally_ += accepted ? 48U : 0U;
-  m.commit = body_.commit(expected.predecessor, 0, accepted ? 72U : 1U,
+  m.commit = body_.commit(expected.predecessor, 0,
                           expected.passage.value(), live->take_continuation());
   pending_live_ = false;
-  m.mathematical_after =
-      standing_.standing.standing.standing.mathematical_admitted_tally;
-  m.codec_after = standing_.standing.standing.standing.codec_admitted_tally;
   m.returned_difference_applied = accepted &&
       m.commit.state == body::body_change_status::committed;
   out.passage.pending_after_return = pending_live_;
   out.passage.passage_preserved = raw.passage == expected.passage;
   if (accepted && m.returned_difference_applied) {
     law_.discovery = {exact::word{201'300}, expected.passage, raw.event,
-                      out.inquiry.lineage, exact::word{40}, true};
+                      out.inquiry.lineage, true};
     out.passage.acquired = law_.discovery;
     for (std::uint8_t target = 0; target < 2; ++target) {
       law_.organs[target] = out.inquiry.organs[target];
@@ -108,7 +97,7 @@ HOLONICS_CALLABLE inline bool resident_trace_fiber::form_heldout(
     return false;
   auto continuation = body_.take_continuation();
   out.passage.formation_commit =
-      body_.commit(body_.head(), 0, 0, out.inquiry.passage.value(),
+      body_.commit(body_.head(), 0, out.inquiry.passage.value(),
                    static_cast<body::linear_continuation &&>(continuation));
   if (out.passage.formation_commit.state != body::body_change_status::committed)
     return false;
@@ -146,26 +135,16 @@ HOLONICS_CALLABLE inline bool resident_trace_fiber::resume_heldout(
                                typed);
   const bool accepted = typed.state == checker_return_status::accepted;
   auto &m = out.passage.returned_morphology;
-  m.mathematical_before =
-      standing_.standing.standing.standing.mathematical_admitted_tally;
-  m.codec_before = standing_.standing.standing.standing.codec_admitted_tally;
-  standing_.standing.standing.standing.mathematical_admitted_tally +=
-      accepted ? 12U : 1U;
-  standing_.standing.standing.standing.codec_admitted_tally += accepted ? 8U : 1U;
-  triple_transport_admitted_tally_ += accepted ? 24U : 1U;
-  m.commit = body_.commit(expected.predecessor, 0, accepted ? 24U : 1U,
+  m.commit = body_.commit(expected.predecessor, 0,
                           expected.passage.value(), live->take_continuation());
   pending_live_ = false;
-  m.mathematical_after =
-      standing_.standing.standing.standing.mathematical_admitted_tally;
-  m.codec_after = standing_.standing.standing.standing.codec_admitted_tally;
   m.returned_difference_applied = accepted &&
       m.commit.state == body::body_change_status::committed;
   out.passage.pending_after_return = pending_live_;
   out.passage.passage_preserved = raw.passage == expected.passage;
   if (accepted && m.returned_difference_applied) {
     application_ = {exact::word{201'303}, expected.passage, raw.event,
-                    out.inquiry.lineage, exact::word{24}, true};
+                    out.inquiry.lineage, true};
     stage_ = stage::applied;
   }
   return accepted && m.returned_difference_applied;

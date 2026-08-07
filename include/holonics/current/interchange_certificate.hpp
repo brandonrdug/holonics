@@ -5,7 +5,6 @@
 #include <holonics/current/weave_schema.hpp>
 
 namespace holonics::current {
-
 struct restaging_receipt final {
   exact::word common_predecessor{};
   exact::word first_event{};
@@ -22,7 +21,6 @@ struct combined_weave_delta final {
   exact::word read_support{};
   exact::word change_support{};
   exact::word value_deltas[weave_cell_capacity]{};
-  exact::word admitted_tally_deltas[weave_cell_capacity]{};
   exact::word successor_currents[weave_cell_capacity]{};
   exact::word consequences[weave_event_capacity]{};
   exact::word stress{};
@@ -43,7 +41,6 @@ struct interchange_certificate final {
   bool identity_equal{};
   bool causal_order_equal{};
   bool incidence_equal{};
-  bool admitted_tally_equal{};
   bool current_equal{};
   bool consequence_equal{};
   bool obstruction_equal{};
@@ -68,7 +65,6 @@ struct interaction_equalizer_receipt final {
   exact::word overlap_support{};
   exact::word interaction{};
   exact::word combined_value_delta{};
-  exact::word combined_admitted_tally_delta{};
   exact::word combined_current{};
   exact::word combined_consequence{};
   exact::word lineage{};

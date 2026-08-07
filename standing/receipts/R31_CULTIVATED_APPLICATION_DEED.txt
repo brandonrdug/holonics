@@ -9,7 +9,7 @@ source_currents=4
 host_semantic_events=0
 development_card_arguments=0
 predictions_before_comparison=1
-final_body=head:14001040,continuation:15001040,admitted_tally:999,mathematical:318,codec:147,application:32
+final_body=head:14001040,continuation:15001040
 checker_exit=0
 formal_begin
 import Mathlib.Tactic.NormNum

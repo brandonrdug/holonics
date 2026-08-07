@@ -4,7 +4,6 @@
 
 namespace holonics::tests {
 namespace {
-
 void write_crossing(std::ostream& output,
     const char* label,
     const codec::codec_crossing& crossing) noexcept {
@@ -84,7 +83,6 @@ void write_r9_artifact(std::ostream& output,
   write_crossing(output, "after_render", observation.after.rendered);
   write_crossing(output, "after_transduce", observation.after.transduced);
   output << "successor=head:" << observation.final_head.value()
-         << ",admitted_tally=" << observation.final_region.admitted_tally
          << ",current=" << observation.final_region.current
          << ",obstruction=" << static_cast<unsigned>(observation.obstruction) << '\n';
 }

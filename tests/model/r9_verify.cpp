@@ -2,7 +2,6 @@
 
 namespace holonics::tests {
 namespace {
-
 [[nodiscard]] std::size_t crossing_failures(
     const codec::codec_crossing& crossing,
     codec::crossing_kind kind,
@@ -75,7 +74,6 @@ std::size_t r9_verification_failures(
       actual.after.transduced.output.second != exact::word{expected.after_transduce_second} ||
       actual.after.unrelated_parsed.core_value != exact::word{expected.after_core};
   failures += actual.final_head != exact::word{expected.successor} ||
-      actual.final_region.admitted_tally != expected.admitted_tally ||
       actual.final_region.current != expected.current;
   failures += !actual.storage_semantics_invariant || !actual.source_detached ||
       !actual.reflection_exact || !actual.revision_changed_conduct ||

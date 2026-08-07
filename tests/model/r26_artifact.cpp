@@ -3,7 +3,6 @@
 #include <ostream>
 
 namespace holonics::tests {
-
 void write_r26_artifact(std::ostream& output, bool sources_loaded,
     const apparatus::intrinsic_hypergeometry_store_receipt& card_load,
     const apparatus::intrinsic_hypergeometry_store_receipt& rest_load,
@@ -91,10 +90,7 @@ void write_r26_artifact(std::ostream& output, bool sources_loaded,
       << value.passage.raw.stdout_bytes << ",stderr_bytes:" << value.passage.raw.stderr_bytes
       << ",produced_bytes:" << value.passage.raw.produced_artifact_bytes
       << "\nfinal_body=head:" << handoff.body.head << ",continuation:"
-      << handoff.body.continuation << ",admitted_tally:" << handoff.body.regions[0].admitted_tally
-      << ",mathematical:" << handoff.mathematical_admitted_tally << ",codec:"
-      << handoff.codec_admitted_tally << ",intrinsic_hypergeometry:"
-      << handoff.intrinsic_hypergeometry_admitted_tally << ",rest_bytes:"
+      << handoff.body.continuation << ",rest_bytes:"
       << rest_write.bytes.value() << ",integrity:" << handoff.integrity
       << "\nphysical_telemetry=engine_time:unknown,checker_time:unknown,temperature:unknown,"
          "power:unknown,energy:unknown\nformal_begin\n";

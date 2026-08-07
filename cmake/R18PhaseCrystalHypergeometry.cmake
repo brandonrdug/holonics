@@ -61,6 +61,21 @@ set(R18_DECLARED_COMMANDS
   "exterior_checker=/usr/bin/lake env lean -R <BUILD>/artifacts -o <BUILD>/artifacts/R18_GENERATED_PHASE_CRYSTAL.olean <BUILD>/artifacts/R18_GENERATED_PHASE_CRYSTAL.lean\n")
 
 file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/artifacts")
+
+# The inherited predecessor is founded, not committed. See
+# apparatus/host/inherited_predecessor_deed.cpp for why the 320-octet blob it
+# replaces could not survive a layout change.
+add_executable(inherited_predecessor_deed
+  apparatus/host/inherited_predecessor_deed.cpp tests/model/r18_cases.cpp)
+target_include_directories(inherited_predecessor_deed
+  PRIVATE "${PROJECT_SOURCE_DIR}/tests/model")
+target_link_libraries(inherited_predecessor_deed
+  PRIVATE holonics::apparatus holonics_contract_options)
+set(INHERITED_PREDECESSOR "${PROJECT_BINARY_DIR}/artifacts/INHERITED_PREDECESSOR.rest")
+holonic_found(NAME inherited.predecessor
+  EXECUTABLE inherited_predecessor_deed
+  COMMAND "${INHERITED_PREDECESSOR}")
+
 set(R18_DEED_ARTIFACT "${PROJECT_BINARY_DIR}/receipts/R18_PHASE_CRYSTAL_DEED.txt")
 set(R18_FINAL_REST "${PROJECT_BINARY_DIR}/artifacts/R18_PHASE_CRYSTAL_HANDOFF.rest")
 set(R18_SOURCE "${PROJECT_BINARY_DIR}/artifacts/R18_GENERATED_PHASE_CRYSTAL.lean")
@@ -72,7 +87,7 @@ holonic_found(NAME r18.phase_crystal_device_deed
   EXECUTABLE r18_phase_crystal_device_deed
   COMMAND
     "${R18_DEED_ARTIFACT}"
-    "${PROJECT_SOURCE_DIR}/apparatus/rests/INHERITED_PREDECESSOR.rest" "${R18_FINAL_REST}"
+    "${INHERITED_PREDECESSOR}" "${R18_FINAL_REST}"
     "${R18_SOURCE}" "${R18_OLEAN}" "${R18_STDOUT}" "${R18_STDERR}"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lean-toolchain"

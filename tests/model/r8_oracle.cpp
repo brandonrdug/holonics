@@ -4,18 +4,15 @@
 
 namespace holonics::tests {
 namespace {
-
 receiver::condensed_snapshot snapshot(const receiver::condensation_program& program,
     const std::uint64_t* values,
     std::uint64_t head,
-    std::uint64_t admitted_tally,
     std::uint64_t current,
     std::uint64_t lineage,
     std::uint64_t resource) noexcept {
   receiver::condensed_snapshot result{};
   result.head = exact::word{head};
   result.incidence = program.incidence;
-  result.admitted_tally = exact::word{admitted_tally};
   result.current = exact::word{current};
   result.lineage = exact::word{lineage};
   result.logical_resource = exact::word{resource};
@@ -33,7 +30,6 @@ void fill_step(receiver::boundary_bisimulation_step& step,
     std::size_t history,
     const std::uint64_t* values,
     std::uint64_t predecessor,
-    std::uint64_t admitted_tally,
     std::uint64_t response,
     std::uint64_t lineage,
     std::uint64_t resource,
@@ -50,7 +46,7 @@ void fill_step(receiver::boundary_bisimulation_step& step,
       exact::word{response}, exact::word{response}, family.admitted_input_support,
       factors, true};
   const auto successor = snapshot(program, values, predecessor + 1U,
-      admitted_tally, response, lineage, resource);
+      response, lineage, resource);
   step.direct_successor = successor;
   step.condensed_successor = successor;
   step.next_language_equal = true;
@@ -58,7 +54,6 @@ void fill_step(receiver::boundary_bisimulation_step& step,
   step.obstruction_equal = true;
   step.incidence_equal = true;
   step.current_equal = true;
-  step.admitted_tally_equal = true;
   step.alternatives_equal = true;
   step.lineage_equal = true;
   step.logical_resource_equal = true;
@@ -74,11 +69,11 @@ apparatus::boundary_condensation_observation r8_oracle(
   const auto& program = mount.program;
   std::uint64_t values[8]{2, 3, 5, 7, 11, 13, 17, 19};
   output.program_identity = program.identity;
-  output.predecessor = snapshot(program, values, 8'001'000, 10, 0, 100, 0);
+  output.predecessor = snapshot(program, values, 8'001'000, 0, 100, 0);
   values[1] = 5;
-  fill_step(output.history[0], program, 0, values, 8'001'000, 12, 182, 101, 1, 3);
+  fill_step(output.history[0], program, 0, values, 8'001'000, 182, 101, 1, 3);
   values[4] = 14;
-  fill_step(output.history[1], program, 1, values, 8'001'001, 15, 434, 103, 2, 3);
+  fill_step(output.history[1], program, 1, values, 8'001'001, 434, 103, 2, 3);
   output.refinement.occurrence = program.refinement_occurrence;
   output.refinement.predecessor = exact::word{8'001'002};
   output.refinement.successor = exact::word{8'001'003};
@@ -95,10 +90,10 @@ apparatus::boundary_condensation_observation r8_oracle(
   output.refinement.exact_reconstruction = true;
   output.refinement.retained_fiber = true;
   values[0] = 7;
-  fill_step(output.history[2], program, 2, values, 8'001'003, 20, 795, 116, 4, 4);
+  fill_step(output.history[2], program, 2, values, 8'001'003, 795, 116, 4, 4);
   values[7] = 26;
-  fill_step(output.history[3], program, 3, values, 8'001'004, 27, 214, 120, 5, 4);
-  output.successor = snapshot(program, values, 8'001'005, 27, 214, 120, 5);
+  fill_step(output.history[3], program, 3, values, 8'001'004, 214, 120, 5, 4);
+  output.successor = snapshot(program, values, 8'001'005, 214, 120, 5);
   output.history_count = 4;
   output.factorized_boundary = true;
   output.stateful_bisimulation = true;

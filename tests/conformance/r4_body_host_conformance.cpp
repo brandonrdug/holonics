@@ -24,8 +24,7 @@ int main() {
       holonics::event::lifecycle_status::exact) { return 2; }
   holonics::event::recover(standing, *delta);
   const auto after = holonics::event::observe(standing);
-  if (before.head != after.head || before.continuation != after.continuation ||
-      before.regions[1].admitted_tally != after.regions[1].admitted_tally) { return 3; }
+  if (before.head != after.head || before.continuation != after.continuation ) { return 3; }
   holonics::body::rest_record rest{};
   const auto rest_receipt = standing.rest(rest);
   rest.integrity ^= 1U;

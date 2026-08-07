@@ -4,7 +4,6 @@
 #include <cstdint>
 
 namespace holonics::tests {
-
 apparatus::boundary_condensation_mount r8_case() noexcept {
   apparatus::boundary_condensation_mount mount{};
   auto& program = mount.program;
@@ -12,7 +11,6 @@ apparatus::boundary_condensation_mount r8_case() noexcept {
   program.predecessor = exact::word{8'001'000};
   program.incidence = exact::word{8'001'001};
   program.lineage = exact::word{100};
-  program.admitted_tally = exact::word{10};
   program.logical_resource = exact::word{0};
   program.alternatives = exact::word{2};
   program.reconstruction_capability = exact::word{8'009'001};
@@ -56,7 +54,7 @@ apparatus::boundary_condensation_mount r8_case() noexcept {
   program.history[3] = {exact::word{8'204}, exact::word{8'304}, exact::word{4},
       exact::word{7}, exact::word{2}, 7, 0};
   for (std::size_t region = 0; region < body::live_region_capacity; ++region) {
-    mount.body_regions[region] = {30U + region, 0};
+    mount.body_regions[region] = {0};
   }
   return mount;
 }

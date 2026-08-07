@@ -7,7 +7,6 @@
 #include <holonics/current/logical_resource_receipt.hpp>
 
 namespace holonics::apparatus {
-
 enum class lean_checker_executor_status : std::uint8_t {
   returned,
   invalid_aperture,
@@ -23,8 +22,6 @@ struct lean_checker_mount final {
   codec::formal_math_face source{};
   body::rest_region regions[body::live_region_capacity]{};
   std::uint64_t body_seed{};
-  std::uint64_t mathematical_admitted_tally{};
-  std::uint64_t codec_admitted_tally{};
 };
 
 struct lean_checker_executor_receipt final {

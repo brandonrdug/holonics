@@ -4,9 +4,9 @@ program=r9_agnostic_codecs_reflection.sm_89
 device_compute_capability=8.9
 kernel_launches=4
 launched_threads=4
-bytes_to_device=456
-bytes_from_device=1344
-resident_bytes=3376
+bytes_to_device=424
+bytes_from_device=1336
+resident_bytes=3296
 host_semantic_events=0
 storage_semantics_invariant=1
 source_detached=1
@@ -27,4 +27,4 @@ remount=program:9001/2,head=9001001,same_body=1,source_replayed=0
 after_parse=kind:0,occurrence=90300,lineage=90400,predecessor=9001001,program=9001/2,faces=9101:9301,surface=40:0->0:0,core=9401/45,obstruction=0
 after_render=kind:1,occurrence=90301,lineage=90401,predecessor=9001001,program=9001/2,faces=9301:9101,surface=0:0->37:0,core=9401/42,obstruction=0
 after_transduce=kind:2,occurrence=90302,lineage=90402,predecessor=9001001,program=9001/2,faces=9101:9102,surface=40:0->4:5,core=9401/45,obstruction=0
-successor=head:9001001,admitted_tally=13,current=45,obstruction=0
+successor=head:9001001,current=45,obstruction=0

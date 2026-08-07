@@ -8,7 +8,6 @@
 #include <holonics/current/weave_certificate_law.hpp>
 
 namespace holonics::current {
-
 class resident_weave final {
  public:
   resident_weave() = delete;
@@ -60,7 +59,7 @@ class resident_weave final {
     }
     auto capability = body_.take_continuation();
     const auto receipt = body_.commit(body_.head(), static_cast<std::uint16_t>(committed_layers_ %
-        body::live_region_capacity), 0, current_fold,
+        body::live_region_capacity), current_fold,
         static_cast<body::linear_continuation&&>(capability));
     if (receipt.state != body::body_change_status::committed) {
       standing_.obstruction = weave_obstruction::logical_resource_refused;
@@ -76,7 +75,6 @@ class resident_weave final {
     const weave_delta& value = deltas_[slot];
     weave_cell& cell = standing_.cells[value.cell];
     cell.value = exact::word{cell.value.value() + value.value_delta.value()};
-    cell.admitted_tally = exact::word{cell.admitted_tally.value() + value.admitted_tally_delta.value()};
     cell.current = value.successor_current;
     cell.lineage = value.lineage;
     standing_.emitted[slot] = value.consequence;

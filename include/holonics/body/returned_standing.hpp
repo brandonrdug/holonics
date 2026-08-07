@@ -6,7 +6,6 @@
 #include <holonics/exact/word.hpp>
 
 namespace holonics::body {
-
 inline constexpr std::uint32_t no_deposit = 0xFFFF'FFFFU;
 
 /// One returned organ, standing in the body.
@@ -23,11 +22,12 @@ struct returned_organ final {
 
 /// The standing a mathematical return deposits into.
 ///
-/// **This is the join the body did not have.** A mathematical deed committed
-/// `admitted_tally += n` and nothing else, so its return could condition no
-/// later conduct: a tally cannot be reached, composed, or ablated. Here a return
+/// **This is the join the body did not have.** A mathematical deed added to a
+/// per-region counter and did nothing else, so its return could condition no
+/// later conduct: a count cannot be reached, composed, or ablated. Here a return
 /// deposits its exact words under an identity, a later current **reaches** them,
-/// and excluding the deposit removes the reach by removing structure.
+/// and excluding the deposit removes the reach by removing structure. The
+/// counter itself was excised on 2026-08-07.
 ///
 /// Exclusion cascades along `caused_by`. An organ that was only reachable
 /// because an earlier return stood falls with it, which is what makes the

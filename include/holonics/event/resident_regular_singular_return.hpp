@@ -3,7 +3,6 @@
 #include <holonics/event/resident_regular_singular.hpp>
 
 namespace holonics::event {
-
 HOLONICS_CALLABLE inline bool resident_regular_singular::resume(
     const checker_raw_return& raw, regular_singular_observation& observation) noexcept {
   observation.raw = raw;
@@ -21,17 +20,9 @@ HOLONICS_CALLABLE inline bool resident_regular_singular::resume(
   regular_singular_checker_detail::normalize(raw, observation.formal, typed);
   const bool accepted = typed.state == checker_return_status::accepted;
   auto& morphology = observation.returned_morphology;
-  morphology.mathematical_before = mathematical_admitted_tally_;
-  morphology.codec_before = codec_admitted_tally_;
-  mathematical_admitted_tally_ += accepted ? 9U : 1U;
-  codec_admitted_tally_ += accepted ? 3U : 2U;
-  regular_singular_admitted_tally_ += accepted ? 20U : 1U;
-  const std::uint64_t delta = accepted ? 13U : 4U;
-  morphology.commit = body_.commit(expected.predecessor, 0, delta,
+  morphology.commit = body_.commit(expected.predecessor, 0,
       expected.passage.value(), pending->take_continuation());
   pending_live_ = false;
-  morphology.mathematical_after = mathematical_admitted_tally_;
-  morphology.codec_after = codec_admitted_tally_;
   morphology.returned_difference_applied = accepted &&
       morphology.commit.state == body::body_change_status::committed;
   observation.pending_after_return = pending_live_;
@@ -39,7 +30,7 @@ HOLONICS_CALLABLE inline bool resident_regular_singular::resume(
       observation.formal.passage == expected.passage;
   if (accepted && morphology.returned_difference_applied) {
     regular_singular_ = {exact::word{187'300}, expected.passage, raw.event,
-        observation.inquiry.theory.lineage, exact::word{delta}, true};
+        observation.inquiry.theory.lineage, true};
     observation.acquired = regular_singular_;
   }
   return morphology.returned_difference_applied;
@@ -59,12 +50,6 @@ HOLONICS_CALLABLE inline regular_singular_rest_receipt resident_regular_singular
   record.phase_crystal = phase_crystal_;
   record.characteristic = characteristic_;
   record.regular_singular = regular_singular_;
-  record.mathematical_admitted_tally = mathematical_admitted_tally_;
-  record.codec_admitted_tally = codec_admitted_tally_;
-  record.geometry_admitted_tally = geometry_admitted_tally_;
-  record.phase_admitted_tally = phase_admitted_tally_;
-  record.characteristic_admitted_tally = characteristic_admitted_tally_;
-  record.regular_singular_admitted_tally = regular_singular_admitted_tally_;
   record.integrity = regular_singular_rest_integrity(record);
   receipt.theory = regular_singular_.identity;
   receipt.integrity = exact::word{record.integrity};

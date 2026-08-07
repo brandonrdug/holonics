@@ -7,7 +7,6 @@
 #include <holonics/exact/word.hpp>
 
 namespace holonics::organ {
-
 inline constexpr std::size_t toric_fan_capacity = 2;
 inline constexpr std::size_t toric_ray_capacity = 5;
 inline constexpr std::size_t toric_rank_capacity = 3;
@@ -92,7 +91,6 @@ struct acquired_toric_cycle final {
   exact::word passage{};
   exact::word kernel_return{};
   exact::word lineage{};
-  exact::word admitted_tally_delta{};
   bool accepted{};
 };
 

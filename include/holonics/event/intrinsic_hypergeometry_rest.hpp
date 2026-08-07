@@ -6,7 +6,6 @@
 #include <holonics/organ/intrinsic_hypergeometry_schema.hpp>
 
 namespace holonics::event {
-
 struct intrinsic_hypergeometry_rest_record final {
   body::rest_record body{};
   organ::acquired_theorem_fiber first{};
@@ -22,18 +21,6 @@ struct intrinsic_hypergeometry_rest_record final {
   organ::acquired_algebraic_variation algebraic_variation{};
   organ::acquired_causal_linear causal_linear{};
   organ::acquired_intrinsic_hypergeometry intrinsic_hypergeometry{};
-  std::uint64_t mathematical_admitted_tally{};
-  std::uint64_t codec_admitted_tally{};
-  std::uint64_t geometry_admitted_tally{};
-  std::uint64_t phase_admitted_tally{};
-  std::uint64_t characteristic_admitted_tally{};
-  std::uint64_t regular_singular_admitted_tally{};
-  std::uint64_t blind_reconstruction_admitted_tally{};
-  std::uint64_t cm_incidence_admitted_tally{};
-  std::uint64_t toric_cycle_admitted_tally{};
-  std::uint64_t algebraic_variation_admitted_tally{};
-  std::uint64_t causal_linear_admitted_tally{};
-  std::uint64_t intrinsic_hypergeometry_admitted_tally{};
   std::uint64_t integrity{};
 };
 
@@ -67,25 +54,12 @@ intrinsic_hypergeometry_rest_integrity(
   inherited.cm_incidence = record.cm_incidence; inherited.toric_cycle = record.toric_cycle;
   inherited.algebraic_variation = record.algebraic_variation;
   inherited.causal_linear = record.causal_linear;
-  inherited.mathematical_admitted_tally = record.mathematical_admitted_tally;
-  inherited.codec_admitted_tally = record.codec_admitted_tally;
-  inherited.geometry_admitted_tally = record.geometry_admitted_tally;
-  inherited.phase_admitted_tally = record.phase_admitted_tally;
-  inherited.characteristic_admitted_tally = record.characteristic_admitted_tally;
-  inherited.regular_singular_admitted_tally = record.regular_singular_admitted_tally;
-  inherited.blind_reconstruction_admitted_tally = record.blind_reconstruction_admitted_tally;
-  inherited.cm_incidence_admitted_tally = record.cm_incidence_admitted_tally;
-  inherited.toric_cycle_admitted_tally = record.toric_cycle_admitted_tally;
-  inherited.algebraic_variation_admitted_tally = record.algebraic_variation_admitted_tally;
-  inherited.causal_linear_admitted_tally = record.causal_linear_admitted_tally;
   std::uint64_t fold = causal_linear_rest_integrity(inherited);
-  const std::uint64_t values[7]{record.intrinsic_hypergeometry.identity.value(),
+  const std::uint64_t values[5]{record.intrinsic_hypergeometry.identity.value(),
       record.intrinsic_hypergeometry.passage.value(),
       record.intrinsic_hypergeometry.kernel_return.value(),
       record.intrinsic_hypergeometry.lineage.value(),
-      record.intrinsic_hypergeometry.admitted_tally_delta.value(),
-      record.intrinsic_hypergeometry.accepted ? 1U : 0U,
-      record.intrinsic_hypergeometry_admitted_tally};
+      record.intrinsic_hypergeometry.accepted ? 1U : 0U};
   for (const auto value : values) { terminal_rest_detail::fold_value(fold, value); }
   return fold;
 }

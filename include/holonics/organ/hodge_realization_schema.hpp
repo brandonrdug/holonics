@@ -6,7 +6,6 @@
 #include <holonics/exact/word.hpp>
 
 namespace holonics::organ {
-
 inline constexpr std::size_t hodge_factor_capacity = 2;
 inline constexpr std::size_t hodge_term_capacity = 6;
 inline constexpr std::size_t hodge_rank = 6;
@@ -109,7 +108,6 @@ struct acquired_hodge_realization final {
   exact::word passage{};
   exact::word kernel_return{};
   exact::word lineage{};
-  exact::word admitted_tally_delta{};
   bool accepted{};
 };
 

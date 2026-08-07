@@ -2,7 +2,6 @@
 
 namespace holonics::tests {
 namespace {
-
 [[nodiscard]] organ::characteristic_foundation foundation() noexcept {
   return {exact::word{134'400}, exact::word{134'401}, exact::word{134'402},
       exact::word{134'403}, exact::word{134'404}, exact::word{134'405},
@@ -27,23 +26,19 @@ event::phase_crystal_rest_record r19_host_phase_rest() noexcept {
   record.body.continuation = 15'001'008;
   record.body.next_continuation = 15'001'009;
   record.body.lineage = 16'001'008;
-  record.body.regions[0] = {192, 174'300};
-  record.body.regions[1] = {129, 0};
-  record.body.regions[2] = {130, 0};
-  record.body.regions[3] = {131, 0};
+  record.body.regions[0] = {174'300};
+  record.body.regions[1] = {0};
+  record.body.regions[2] = {0};
+  record.body.regions[3] = {0};
   record.body.integrity = body::rest_integrity(record.body);
   record.first = {exact::word{181'200}, exact::word{171'200}, exact::word{151'200},
-      exact::word{161'200}, exact::word{160'200}, exact::word{141'010}, exact::word{5}, 3, true};
+      exact::word{161'200}, exact::word{160'200}, exact::word{141'010}, 3, true};
   record.second = {exact::word{182'200}, exact::word{172'200}, exact::word{152'200},
-      exact::word{162'200}, exact::word{160'300}, exact::word{181'200}, exact::word{5}, 2, true};
+      exact::word{162'200}, exact::word{160'300}, exact::word{181'200}, 2, true};
   record.geometry = {exact::word{184'300}, exact::word{173'300}, exact::word{160'400},
-      exact::word{193'310}, exact::word{9}, true};
+      exact::word{193'310}, true};
   record.phase_crystal = {exact::word{185'300}, exact::word{174'300},
-      exact::word{160'500}, exact::word{194'300}, exact::word{11}, true};
-  record.mathematical_admitted_tally = 62;
-  record.codec_admitted_tally = 42;
-  record.geometry_admitted_tally = 10;
-  record.phase_admitted_tally = 14;
+      exact::word{160'500}, exact::word{194'300}, true};
   record.integrity = event::phase_crystal_rest_integrity(record);
   return record;
 }

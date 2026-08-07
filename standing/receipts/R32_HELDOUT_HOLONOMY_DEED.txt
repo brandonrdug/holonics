@@ -9,8 +9,8 @@ source_currents=2
 host_semantic_events=0
 development_card_arguments=0
 prediction_before_comparison=1
-final_rest_bytes=2472
-final_body=head:14001044,continuation:15001044,admitted_tally:1103,mathematical:370,codec:171,derivation:24
+final_rest_bytes=2040
+final_body=head:14001044,continuation:15001044
 checker_exit=0
 formal_begin
 import R32_ELEMENTARY_CAUSAL_CALCULUS

@@ -6,7 +6,6 @@
 #include <holonics/organ/hodge_realization_schema.hpp>
 
 namespace holonics::event {
-
 struct hodge_realization_rest_record final {
   body::rest_record body{};
   organ::acquired_theorem_fiber first{}; organ::acquired_theorem_fiber second{};
@@ -20,13 +19,6 @@ struct hodge_realization_rest_record final {
   organ::acquired_intrinsic_hypergeometry intrinsic_hypergeometry{};
   organ::acquired_expression_geometry expression_geometry{};
   organ::acquired_hodge_realization hodge_realization{};
-  std::uint64_t mathematical_admitted_tally{}; std::uint64_t codec_admitted_tally{};
-  std::uint64_t geometry_admitted_tally{}; std::uint64_t phase_admitted_tally{};
-  std::uint64_t characteristic_admitted_tally{}; std::uint64_t regular_singular_admitted_tally{};
-  std::uint64_t blind_reconstruction_admitted_tally{}; std::uint64_t cm_incidence_admitted_tally{};
-  std::uint64_t toric_cycle_admitted_tally{}; std::uint64_t algebraic_variation_admitted_tally{};
-  std::uint64_t causal_linear_admitted_tally{}; std::uint64_t intrinsic_hypergeometry_admitted_tally{};
-  std::uint64_t expression_geometry_admitted_tally{}; std::uint64_t hodge_realization_admitted_tally{};
   std::uint64_t integrity{};
 };
 
@@ -52,23 +44,11 @@ struct hodge_realization_remount_receipt final {
   inherited.algebraic_variation = record.algebraic_variation; inherited.causal_linear = record.causal_linear;
   inherited.intrinsic_hypergeometry = record.intrinsic_hypergeometry;
   inherited.expression_geometry = record.expression_geometry;
-  inherited.mathematical_admitted_tally = record.mathematical_admitted_tally;
-  inherited.codec_admitted_tally = record.codec_admitted_tally; inherited.geometry_admitted_tally = record.geometry_admitted_tally;
-  inherited.phase_admitted_tally = record.phase_admitted_tally;
-  inherited.characteristic_admitted_tally = record.characteristic_admitted_tally;
-  inherited.regular_singular_admitted_tally = record.regular_singular_admitted_tally;
-  inherited.blind_reconstruction_admitted_tally = record.blind_reconstruction_admitted_tally;
-  inherited.cm_incidence_admitted_tally = record.cm_incidence_admitted_tally;
-  inherited.toric_cycle_admitted_tally = record.toric_cycle_admitted_tally;
-  inherited.algebraic_variation_admitted_tally = record.algebraic_variation_admitted_tally;
-  inherited.causal_linear_admitted_tally = record.causal_linear_admitted_tally;
-  inherited.intrinsic_hypergeometry_admitted_tally = record.intrinsic_hypergeometry_admitted_tally;
-  inherited.expression_geometry_admitted_tally = record.expression_geometry_admitted_tally;
   std::uint64_t fold = expression_geometry_rest_integrity(inherited);
-  const std::uint64_t values[7]{record.hodge_realization.identity.value(),
+  const std::uint64_t values[5]{record.hodge_realization.identity.value(),
       record.hodge_realization.passage.value(), record.hodge_realization.kernel_return.value(),
-      record.hodge_realization.lineage.value(), record.hodge_realization.admitted_tally_delta.value(),
-      record.hodge_realization.accepted ? 1U : 0U, record.hodge_realization_admitted_tally};
+      record.hodge_realization.lineage.value(),
+      record.hodge_realization.accepted ? 1U : 0U};
   for (const auto value : values) { terminal_rest_detail::fold_value(fold, value); }
   return fold;
 }

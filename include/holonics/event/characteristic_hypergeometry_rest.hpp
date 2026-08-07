@@ -6,13 +6,11 @@
 #include <holonics/organ/characteristic_hypergeometry_receipt.hpp>
 
 namespace holonics::event {
-
 struct acquired_characteristic_fiber final {
   exact::word identity{};
   exact::word passage{};
   exact::word returned_event{};
   exact::word lineage{};
-  exact::word admitted_tally_delta{};
   bool accepted{};
 };
 struct characteristic_law_bundle final {
@@ -28,16 +26,12 @@ struct characteristic_application_fiber final {
   exact::word passage{};
   exact::word returned_event{};
   exact::word lineage{};
-  exact::word admitted_tally_delta{};
   bool accepted{};
 };
 struct characteristic_hypergeometry_rest_record final {
   elementary_calculus_rest_record standing{};
   characteristic_law_bundle law{};
   characteristic_application_fiber application{};
-  std::uint64_t characteristic_admitted_tally{};
-  std::uint64_t trace_organ_admitted_tally{};
-  std::uint64_t transport_admitted_tally{};
   std::uint64_t integrity{};
   bool applied{};
 };
@@ -68,11 +62,10 @@ struct hypergeometry_remount_receipt final {
 characteristic_rest_integrity(
     const characteristic_hypergeometry_rest_record &r) noexcept {
   std::uint64_t fold = elementary_calculus_rest_integrity(r.standing);
-  const std::uint64_t first[7]{r.law.discovery.identity.value(),
+  const std::uint64_t first[6]{r.law.discovery.identity.value(),
                                r.law.discovery.passage.value(),
                                r.law.discovery.returned_event.value(),
                                r.law.discovery.lineage.value(),
-                               r.law.discovery.admitted_tally_delta.value(),
                                r.law.discovery.accepted ? 1U : 0U,
                                r.law.group_count};
   for (const auto value : first)
@@ -90,15 +83,11 @@ characteristic_rest_integrity(
     terminal_rest_detail::fold_value(fold, value);
   for (const auto value : o.coefficients)
     terminal_rest_detail::fold_value(fold, static_cast<std::uint64_t>(value));
-  const std::uint64_t tail[11]{r.application.identity.value(),
+  const std::uint64_t tail[7]{r.application.identity.value(),
                                r.application.passage.value(),
                                r.application.returned_event.value(),
                                r.application.lineage.value(),
-                               r.application.admitted_tally_delta.value(),
                                r.application.accepted ? 1U : 0U,
-                               r.characteristic_admitted_tally,
-                               r.trace_organ_admitted_tally,
-                               r.transport_admitted_tally,
                                r.law.checker_founded ? 1U : 0U,
                                r.applied ? 1U : 0U};
   for (const auto value : tail)

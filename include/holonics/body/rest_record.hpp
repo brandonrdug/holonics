@@ -6,24 +6,20 @@
 #include <holonics/exact/word.hpp>
 
 namespace holonics::body {
-
 inline constexpr std::size_t live_region_capacity = 4;
 
 /// One region of the continuing body's rest.
 ///
-/// `admitted_tally` is **provenance: a count of admitted deeds.** It was named
-/// `morphology` until 2026-08-06, which made the standing of every mathematical
-/// deed misdescribe itself — the excision of 2026-08-05 renamed the receipts and
-/// left the standing untouched, so the convicted word survived in the one place
-/// it mattered most.
+/// The region once carried an `admitted_tally` beside the current — a count of
+/// admitted deeds, called `morphology` until 2026-08-06. **A morphology is the
+/// contemporary causal organization by which a body receives, transforms,
+/// retains, and emits differences; it is never a number**, and the excision of
+/// 2026-08-05 renamed the receipts while leaving the standing untouched, so the
+/// convicted word survived in the one place it mattered most.
 ///
-/// **A morphology is the contemporary causal organization by which a body
-/// receives, transforms, retains, and emits differences.** It is never a number.
-/// A field of this type may be carried, folded into an integrity word, and
-/// reported as provenance; it may never be read as evidence that anything was
-/// learned.
+/// It is gone now, not renamed again. What a region rests is what a region is:
+/// the current that passed through it.
 struct rest_region final {
-  std::uint64_t admitted_tally{};
   std::uint64_t current{};
 };
 
@@ -61,8 +57,8 @@ struct rest_receipt final {
     }
   }
   for (std::size_t region = 0; region < live_region_capacity; ++region) {
-    std::uint64_t values[2]{record.regions[region].admitted_tally, record.regions[region].current};
-    for (std::size_t field = 0; field < 2; ++field) {
+    std::uint64_t values[1]{record.regions[region].current};
+    for (std::size_t field = 0; field < 1; ++field) {
       for (std::size_t octet = 0; octet < 8; ++octet) {
         fold ^= values[field] & 255U;
         fold *= prime;

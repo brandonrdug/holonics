@@ -90,7 +90,7 @@ class resident_causal_body final {
     auto capability = live->release();
     pending_live_ = false;
     return standing_.commit(live->predecessor(), static_cast<std::uint16_t>(front_count_ %
-        body::live_region_capacity), 0, current_fold.value(),
+        body::live_region_capacity), current_fold.value(),
         static_cast<body::linear_continuation&&>(capability));
   }
   HOLONICS_CALLABLE void recover_front() noexcept {

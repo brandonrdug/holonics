@@ -6,7 +6,6 @@
 #include <holonics/exact/word.hpp>
 
 namespace holonics::organ {
-
 inline constexpr std::size_t cm_degree_capacity = 4;
 inline constexpr std::size_t cm_translation_capacity = 5;
 inline constexpr std::size_t cm_point_capacity = 16;
@@ -89,7 +88,6 @@ struct acquired_cm_incidence final {
   exact::word passage{};
   exact::word kernel_return{};
   exact::word lineage{};
-  exact::word admitted_tally_delta{};
   bool accepted{};
 };
 

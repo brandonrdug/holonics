@@ -6,7 +6,6 @@
 #include <holonics/receiver/condensation_law.hpp>
 
 namespace holonics::receiver {
-
 [[nodiscard]] HOLONICS_CALLABLE constexpr bool make_group_sums(
     const exact::word* source_values,
     std::size_t source_count,
@@ -80,7 +79,6 @@ namespace holonics::receiver {
     const condensation_program& program,
     const exact::word* source_values,
     exact::word head,
-    exact::word admitted_tally,
     exact::word current,
     exact::word lineage,
     exact::word logical_resource,
@@ -88,7 +86,6 @@ namespace holonics::receiver {
   condensed_snapshot result{};
   result.head = head;
   result.incidence = program.incidence;
-  result.admitted_tally = admitted_tally;
   result.current = current;
   result.lineage = lineage;
   result.logical_resource = logical_resource;
@@ -108,18 +105,15 @@ namespace holonics::receiver {
     exact::word successor_head,
     exact::word response) noexcept {
   std::uint64_t source = 0;
-  std::uint64_t admitted_tally = 0;
   std::uint64_t lineage = 0;
   std::uint64_t resource = 0;
   if (!geometry_add(snapshot.source_values[input.source_cell].value(), input.delta.value(), source) ||
-      !geometry_add(snapshot.admitted_tally.value(), input.delta.value(), admitted_tally) ||
       !geometry_add(snapshot.lineage.value(), input.lineage.value(), lineage) ||
       !geometry_add(snapshot.logical_resource.value(), 1U, resource)) {
     return false;
   }
   snapshot.head = successor_head;
   snapshot.source_values[input.source_cell] = exact::word{source};
-  snapshot.admitted_tally = exact::word{admitted_tally};
   snapshot.current = response;
   snapshot.lineage = exact::word{lineage};
   snapshot.logical_resource = exact::word{resource};

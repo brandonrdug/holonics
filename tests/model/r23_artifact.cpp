@@ -4,7 +4,6 @@
 
 namespace holonics::tests {
 namespace {
-
 void rational(std::ostream& output, exact::small_rational value) {
   output << value.numerator;
   if (value.denominator != 1) { output << '/' << value.denominator; }
@@ -147,9 +146,7 @@ void write_r23_artifact(std::ostream& output,
       << ",source_fold:" << value.passage.raw.source_fold << ",artifact_fold:"
       << value.passage.raw.produced_artifact_fold
       << "\nfinal_body=head:" << handoff.body.head << ",continuation:"
-      << handoff.body.continuation << ",admitted_tally:" << handoff.body.regions[0].admitted_tally
-      << ",mathematical:" << handoff.mathematical_admitted_tally << ",codec:"
-      << handoff.codec_admitted_tally << ",toric_cycle:" << handoff.toric_cycle_admitted_tally
+      << handoff.body.continuation
       << ",rest_bytes:" << rest_write.bytes.value() << ",integrity:" << handoff.integrity
       << "\nphysical_telemetry=engine_time:unknown,checker_time:unknown,temperature:unknown,"
          "power:unknown,energy:unknown\nformal_begin\n";

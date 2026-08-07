@@ -6,7 +6,6 @@
 #include <holonics/organ/arithmetic_field_receipt.hpp>
 
 namespace holonics::organ {
-
 enum class arithmetic_spectral_obstruction : std::uint8_t {
   none,
   card_refused,
@@ -90,7 +89,6 @@ struct acquired_arithmetic_spectral final {
   exact::word passage{};
   exact::word returned_event{};
   exact::word lineage{};
-  exact::word admitted_tally_delta{};
   bool accepted{};
 };
 

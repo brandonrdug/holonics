@@ -3,7 +3,6 @@
 #include <ostream>
 
 namespace holonics::tests {
-
 void write_r21_artifact(std::ostream& output,
     const apparatus::blind_store_receipt& code_load,
     const apparatus::blind_store_receipt& moment_load,
@@ -75,10 +74,7 @@ void write_r21_artifact(std::ostream& output,
       << value.moment.raw.source_fold << ",artifact_fold:"
       << value.moment.raw.produced_artifact_fold
       << "\nfinal_body=head:" << handoff.body.head << ",continuation:"
-      << handoff.body.continuation << ",admitted_tally:" << handoff.body.regions[0].admitted_tally
-      << ",mathematical:" << handoff.mathematical_admitted_tally << ",codec:"
-      << handoff.codec_admitted_tally << ",blind_reconstruction:"
-      << handoff.blind_reconstruction_admitted_tally << ",rest_bytes:" << rest_write.bytes.value()
+      << handoff.body.continuation << ",rest_bytes:" << rest_write.bytes.value()
       << ",integrity:" << handoff.integrity
       << "\nphysical_telemetry=engine_time:unknown,checker_time:unknown,temperature:unknown,"
          "power:unknown,energy:unknown\ncode_formal_begin\n";

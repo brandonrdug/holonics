@@ -6,7 +6,6 @@
 #include <holonics/organ/algebraic_variation_schema.hpp>
 
 namespace holonics::event {
-
 struct algebraic_variation_rest_record final {
   body::rest_record body{};
   organ::acquired_theorem_fiber first{};
@@ -20,16 +19,6 @@ struct algebraic_variation_rest_record final {
   organ::acquired_cm_incidence cm_incidence{};
   organ::acquired_toric_cycle toric_cycle{};
   organ::acquired_algebraic_variation algebraic_variation{};
-  std::uint64_t mathematical_admitted_tally{};
-  std::uint64_t codec_admitted_tally{};
-  std::uint64_t geometry_admitted_tally{};
-  std::uint64_t phase_admitted_tally{};
-  std::uint64_t characteristic_admitted_tally{};
-  std::uint64_t regular_singular_admitted_tally{};
-  std::uint64_t blind_reconstruction_admitted_tally{};
-  std::uint64_t cm_incidence_admitted_tally{};
-  std::uint64_t toric_cycle_admitted_tally{};
-  std::uint64_t algebraic_variation_admitted_tally{};
   std::uint64_t integrity{};
 };
 
@@ -60,22 +49,11 @@ struct algebraic_variation_remount_receipt final {
   inherited.code_reconstruction = record.code_reconstruction;
   inherited.moment_reconstruction = record.moment_reconstruction;
   inherited.cm_incidence = record.cm_incidence; inherited.toric_cycle = record.toric_cycle;
-  inherited.mathematical_admitted_tally = record.mathematical_admitted_tally;
-  inherited.codec_admitted_tally = record.codec_admitted_tally;
-  inherited.geometry_admitted_tally = record.geometry_admitted_tally;
-  inherited.phase_admitted_tally = record.phase_admitted_tally;
-  inherited.characteristic_admitted_tally = record.characteristic_admitted_tally;
-  inherited.regular_singular_admitted_tally = record.regular_singular_admitted_tally;
-  inherited.blind_reconstruction_admitted_tally = record.blind_reconstruction_admitted_tally;
-  inherited.cm_incidence_admitted_tally = record.cm_incidence_admitted_tally;
-  inherited.toric_cycle_admitted_tally = record.toric_cycle_admitted_tally;
   std::uint64_t fold = toric_cycle_rest_integrity(inherited);
-  const std::uint64_t values[7]{record.algebraic_variation.identity.value(),
+  const std::uint64_t values[5]{record.algebraic_variation.identity.value(),
       record.algebraic_variation.passage.value(), record.algebraic_variation.kernel_return.value(),
       record.algebraic_variation.lineage.value(),
-      record.algebraic_variation.admitted_tally_delta.value(),
-      record.algebraic_variation.accepted ? 1U : 0U,
-      record.algebraic_variation_admitted_tally};
+      record.algebraic_variation.accepted ? 1U : 0U};
   for (const auto value : values) { terminal_rest_detail::fold_value(fold, value); }
   return fold;
 }

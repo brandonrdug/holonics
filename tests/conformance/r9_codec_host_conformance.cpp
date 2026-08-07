@@ -46,7 +46,6 @@ int main(int argument_count, char** arguments) {
       after.rendered.output.first != holonics::exact::word{expected.after_render_first} ||
       after.transduced.output.second != holonics::exact::word{expected.after_transduce_second} ||
       remounted.head() != holonics::exact::word{expected.successor} ||
-      remounted.region(0).admitted_tally != expected.admitted_tally ||
       remounted.region(0).current != expected.current) {
     return 1;
   }
