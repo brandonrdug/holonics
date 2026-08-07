@@ -248,9 +248,17 @@ endfunction()
 # to date by running exactly the foundings whose closure moved. On an unmoved
 # tree that is nothing at all, which is the entire point.
 function(holonic_close_standing)
+  cmake_parse_arguments(CLOSE "" "" "ALSO_DEPENDS" ${ARGN})
   get_property(returns GLOBAL PROPERTY HOLONICS_STANDING_RETURNS)
   list(LENGTH returns count)
   add_custom_target(holonics_standing DEPENDS ${returns})
+  # A custom TARGET is never triggered by ctest, so a receipt that only a build
+  # regenerates goes stale the moment a founding relinks a deed -- and the
+  # architecture audit then fails on a hash it cannot find. Anything the guards
+  # read must be reachable from the standing.
+  if(CLOSE_ALSO_DEPENDS)
+    add_dependencies(holonics_standing ${CLOSE_ALSO_DEPENDS})
+  endif()
 
   get_property(plan GLOBAL PROPERTY HOLONICS_STANDING_PLAN)
   set(plan_file "${PROJECT_BINARY_DIR}/standing-plan.txt")

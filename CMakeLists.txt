@@ -144,7 +144,6 @@ include(cmake/PhaseTextMount.cmake)
 include(cmake/ConditionedProduction.cmake)
 include(cmake/ConstraintRebase.cmake)
 include(cmake/OneStanding.cmake)
-holonic_close_standing()
 
 string(JOIN " " R0_DEVICE_FLAGS_RECEIPT ${R0_DEVICE_COMMON_FLAGS})
 set(HOLONICS_DECLARED_COMMANDS
@@ -274,6 +273,10 @@ add_custom_target(
   BYPRODUCTS "${HOLONICS_BUILD_MANIFEST}"
   COMMAND_EXPAND_LISTS
   VERBATIM)
+
+# The standing closes over the manifest: a guard that reads a receipt must be
+# able to reach it, and ctest never triggers a custom target.
+holonic_close_standing(ALSO_DEPENDS holonics_build_manifest)
 
 add_custom_target(
   holonic-audit ALL

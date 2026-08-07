@@ -423,6 +423,31 @@ The grading discipline in `canon/EPISTEMIC_GRADES.md` stands. Three additions:
 - **Halt and say so.** If a run is not doing what was claimed, stop it and report the actual state
   before proposing a repair. Do not describe an unexplained execution as mystical.
 
+## 9b. Partials are the unit of work, and the machine is an ecology
+
+**Brandon's intuitions are partials of months of prior work, not fresh exploration.** *"I do not
+suggest intuitions without having some partially developed basis for the suggestion."* When he raises
+lightning, integration, reflection, the arc, sphere packing or the phase atlas, the laboratory almost
+certainly holds a partial implementation and a graded deposit. **Go and read before theorising**, and
+expect to find the idea already carried further than the conversation implies.
+
+**The pivots between partials were responses to fabricated walls, not abandonment.** *"None of these
+experiments were completed… I pivot between partials of research because it was not yet feasible to
+fully capitalize on whatever partial work was implemented."* A partial is therefore never evidence
+that a line failed. Treating it as one is the same error as under-crediting the established floor.
+
+**The convicted failure mode is hyperfocus.** *"It is extremely common for LLMs like Sol or you to
+hyperfocus on the individual components of the holonic engine and force particular results as opposed
+to holistically understanding the machine. Because the machine is meant to be applied to real world
+problems and ecological dynamics, it is the case that you cannot focus on any one mechanism, because
+ecologies themselves do not depend on any one mechanism, and are rather balanced distributions of
+relatively unique factors and phases."*
+
+The practical consequence, and it is a priority rule: **work that joins partials outranks work that
+perfects one organ.** A registry, a reader, a durable standing, an addressable deposit — these let a
+pivot keep what it leaves. Without them every pivot rebuilds from zero, which is exactly how
+`semantics_invariant_under_exact_chart` came to survive only as a name, a proof term and a hash.
+
 ## 10. Conversational conduct
 
 - Brandon has an informal education, exceptional structural intuition, and reads long. Do not
