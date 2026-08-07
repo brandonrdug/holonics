@@ -24,8 +24,8 @@ namespace holonics::tests {
 [[nodiscard]] bool research_laws_hold();
 }  // namespace holonics::tests
 namespace holonics::tests {
-/// The Phase 6 grade condition: mounted-only withholds, the cultivated body
-/// returns, and a source-detached remount returns a NOVEL product.
+/// WITHDRAWN 2026-08-06 (CUT 5). Retained as a type so the conformance report
+/// still compiles; it returns nothing and grades nothing.
 struct ablation_return final {
   std::uint64_t mounted_only{};
   bool mounted_withheld{};

@@ -343,6 +343,57 @@ reuse mechanisms the laboratory had — revision key with exact logical compare,
 append delta with stable base address, reuse counted in the receipt — are unported, and the rest
 carries a fixed-size summary rather than the derived population.
 
+## The cut — 2026-08-06
+
+**Truth status:** `established-bounded` for the finding; the cut claims revert to `open`.
+
+A twenty-six-agent workflow measured the tree against the corrected contamination test — hand-written
+code is **terrain** and is never convicted for being authored or unreached; three tests convict:
+it simulates the mechanism it names, it consumes current without transforming information, or it is
+frozen against relation.
+
+**The governing measurement.** Over the actual include graph, the **live engine is 77 headers**. The
+bloat was the 575-header frozen line hanging off it: the pure engine was buried, not bloated. And
+`receiver/` — the entire chart, projection, and condensation layer — had **zero live reach**, the
+largest unreached owner in the repository and never previously named.
+
+**What was cut, and why.** The whole fabricated-theorem island: R12, R13, R14, R15, R16, R17. Every
+"generated" theorem in this body was a string literal. The R14 loop was closed by three files holding
+the same hardcoded name — an emitter, a prober that `#print`s it, and an acceptor with three
+`constexpr char declaration[]` entries, where a fourth theorem falls to the `else` and is reported
+rejected. **Six receipt fields certifying the entire anti-cheating contract had zero assignments
+anywhere in the tree** and were asserted `== 0`; the frozen theorem request was certified by reading
+zero-initialized memory. R17's every verdict-bearing field was a compile-time constant for every
+admissible input.
+
+`event/cultivated_route.hpp` went with them: its "founded law" was the C++ multiply operator and
+`product_route()` was nullary and `constexpr`, so the two "distinct developmental passages" were one
+constant twice. **The `9*8`/`7*9` grade is withdrawn** from `CLAUDE.md` §5. The laboratory's return
+stands there; the C++ restatement of it never did.
+
+`face_contract` and `constitutive_contract` went as empty pullback contracts that named the record's
+central mounting requirement and typed none of it.
+
+**No mathematics was removed.** R18–R35 stand whole, and R18 now mounts a frozen predecessor rest
+(`apparatus/rests/INHERITED_PREDECESSOR.rest`) which was already the only possible output of the deed
+that produced it.
+
+**Two corrections to the record, in the same motion.** The certified exact enclosure carrier
+**exists** — `exact/enclosure.hpp`, the enclosure as a set and never a value — and §11 said otherwise.
+And the 2026-08-05 excision **renamed the field and preserved the object**: 66 increment sites
+survived it byte-identical, and §13 obligation 1 was not met.
+
+**Reach after the cut:** 652 → 614 headers; `continuing_body` 169 → **145**. The reach audit now
+carries **ceilings as well as floors** — a spine mechanism must not shrink, a carrier under
+supersession must not spread — because its first version could not express that the fall was the work.
+
+**Outstanding from the ten cuts:** the constant emitters R18–R20 still include (CUT 4); the 66 tally
+sites and 27 hardcoded cumulative grades (CUT 6); the nine schema-serial gates (CUT 8); the answer-key
+closes (CUT 9); and **seven of eight transition invariants admitted with a literal `true` in the live
+spine** (CUT 10). None is claimed done.
+
+Deposited: [the spine, the cut, and the terrain](blueprint/THE_SPINE_THE_CUT_AND_THE_TERRAIN.md).
+
 ## Construction provenance
 
 **Truth status:** `historical`.

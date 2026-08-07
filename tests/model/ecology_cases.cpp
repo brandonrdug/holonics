@@ -295,50 +295,17 @@ bool research_laws_hold() {
 
 }  // namespace holonics::tests
 
-#include <holonics/event/cultivated_route.hpp>
 
 namespace holonics::tests {
 
 ablation_return cultivation_ablation() {
-  using namespace holonics::event;
-  using holonics::organ::training_ecology;
-  using holonics::organ::training_state;
-  ablation_return returned{};
+  // CUT 5, 2026-08-06. This returned 9*8=72 and 7*9=63 because C++ multiplies.
+  // `product_route()` was nullary and constexpr -- one global constant fiber, so the
+  // "two distinct developmental passages" were the same constant twice, and no operand
+  // pair was ever supplied to the ecology by any path in the repository. The grade it
+  // carried is withdrawn from CLAUDE.md section 5 in the same commit.
+  return ablation_return{};
 
-  // A mounted-only body: the template's shape exists, but no passage has
-  // returned through it. It must WITHHOLD.
-  training_ecology<64> mounted{2, 8};
-  const auto withheld = route_law::conduct(mounted, 9, 8);
-  returned.mounted_only = withheld.product;
-  returned.mounted_withheld = withheld.state == conduct_state::withheld;
-
-  // Developmental passages. Two DISTINCT occurrences exercise the route; that
-  // recurrence is what founds it. Each passage departs after it is committed --
-  // nothing here retains an operand pair or an answer.
-  training_ecology<64> cultivated{2, 8};
-  const auto route = product_route();
-  const auto first = cultivated.propose(&route, 1);
-  if (cultivated.commit(first) != training_state::admitted) { return returned; }
-  const auto second = cultivated.propose(&route, 1);
-  if (cultivated.commit(second) != training_state::admitted) { return returned; }
-  const auto conducted = route_law::conduct(cultivated, 9, 8);
-  returned.cultivated = conducted.product;
-  returned.developmental_passages_retained = conducted.source_consulted;
-
-  // Source-detached: ask a pair the body never met. A retained lookup could not
-  // answer this; a cultivated route can.
-  const auto novel = route_law::conduct(cultivated, 7, 9);
-  returned.novel_after_departure = novel.product;
-
-  // Exact ablation: remove the route's structure. Later conduct disappears.
-  const bool removed = cultivated.ablate(route);
-  const auto after = route_law::conduct(cultivated, 7, 9);
-  returned.ablated_stops_conducting = removed && after.state == conduct_state::withheld;
-
-  returned.holds = returned.mounted_withheld && returned.cultivated == 72 &&
-      returned.novel_after_departure == 63 &&
-      !returned.developmental_passages_retained && returned.ablated_stops_conducting;
-  return returned;
 }
 
 }  // namespace holonics::tests

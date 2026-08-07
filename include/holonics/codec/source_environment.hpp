@@ -46,7 +46,5 @@ class source_environment final {
   encoded_source_environment* encoded_{};
 };
 
-static_assert(face_contract<source_mount_port, source_mount_port>::source_port_type::direction ==
-    structure::port_direction::inbound);
 
 }  // namespace holonics::codec

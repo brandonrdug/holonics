@@ -63,19 +63,9 @@ int main() {
   if (!holonics::tests::research_laws_hold()) {
     std::cerr << "research ecology laws failed\n"; ++failures;
   }
-  const auto ablation = holonics::tests::cultivation_ablation();
-  if (!ablation.holds) {
-    std::cerr << "PHASE 6 GRADE FAILED: mounted=" << ablation.mounted_only
-              << " withheld=" << ablation.mounted_withheld
-              << " cultivated=" << ablation.cultivated
-              << " novel=" << ablation.novel_after_departure
-              << " ablated_stops=" << ablation.ablated_stops_conducting << '\n';
-    ++failures;
-  } else {
-    std::cerr << "phase 6 grade: mounted-only withheld 9*8; cultivated returned "
-              << ablation.cultivated << "; source-detached returned "
-              << ablation.novel_after_departure << " for novel 7*9; ablation stops conduct\n";
-  }
+  // The Phase 6 cultivation grade was withdrawn 2026-08-06 (CUT 5): the "founded
+  // law" was the C++ multiply operator and the two developmental passages were one
+  // constant twice.
   const auto cost = holonics::tests::suffix_cost_law();
   std::cerr << "phase 7 movement 1 cost law: symbols " << cost.small_symbols << " -> "
             << cost.large_symbols << "; states " << cost.small_states << " -> "

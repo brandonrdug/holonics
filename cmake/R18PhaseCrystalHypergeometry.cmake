@@ -70,7 +70,7 @@ set(R18_STDERR "${PROJECT_BINARY_DIR}/artifacts/R18_LEAN_STDERR.txt")
 set(R18_ATLAS "${PROJECT_BINARY_DIR}/artifacts/R18_PHASE_CRYSTAL_ATLAS.tsv")
 add_test(NAME r18.phase_crystal_device_deed
   COMMAND r18_phase_crystal_device_deed "${R18_DEED_ARTIFACT}"
-    "${R17_FINAL_REST}" "${R18_FINAL_REST}" "${R18_SOURCE}" "${R18_OLEAN}"
+    "${PROJECT_SOURCE_DIR}/apparatus/rests/INHERITED_PREDECESSOR.rest" "${R18_FINAL_REST}" "${R18_SOURCE}" "${R18_OLEAN}"
     "${R18_STDOUT}" "${R18_STDERR}" "${PROJECT_SOURCE_DIR}/formal/elementary-holonics"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lean-toolchain"
     "${PROJECT_SOURCE_DIR}/formal/elementary-holonics/lake-manifest.json"

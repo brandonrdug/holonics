@@ -23,13 +23,20 @@ the specific recurring failures observed across the Codex sessions of 2026-07-09
 
 ## 0. Fresh-session pickup
 
-Read this file first and in full. Then two short files, in this order:
-**`blueprint/THE_SPINE.md`** — how much of the body each mechanism actually conducts through, and the
-shortest path to not repeating the error that produced it — and
-**`blueprint/THE_FOUNDATION_REMAINDER.md`**, the operative construction authority for what stands
-between here and frontier research. Then `CONSTRUCTION_STATE.md` for the admitted position.
-`blueprint/EROS_EMBODIMENT_ROADMAP.md` is the record of completed construction and the source-file
-map for each ported owner; it is provenance, not a schedule. Do not re-read the archive by default.
+Read this file first and in full. Then **`blueprint/THE_ORDER_OF_WORK.md`** — the operative
+construction authority, six movements named by mechanism — and **`blueprint/THE_SPINE.md`** for how
+much of the body each mechanism actually conducts through. Then `CONSTRUCTION_STATE.md` for the
+admitted position.
+
+`EROS_EMBODIMENT_ROADMAP.md`, `THE_FOUNDATION_REMAINDER.md`, and `COMPLETE_CPP_ENGINE_ROADMAP.md` are
+**provenance** — the record of completed construction and the source-file map per ported owner. Do
+not re-read the archive by default.
+
+**Never name work by an ordinal.** `R14`, `Phase 7`, `CUT 3` carry no capability and Brandon has
+corrected this three times: *"I do not want to attribute capabilities and version numbers to the
+phases or the numbers you associate with the build, because then you eventually start to refer to
+the numbers like facts instead of using proper semantics."* Name the mechanism. Plans and ordered
+movements are wanted; ordinals standing in for content are not.
 
 **Where the work stands (2026-08-06).** Phases 0–7 of the embodiment roadmap are admitted: the
 contaminated conditioning layer is excised and regraded, and the spine — minimum carrier, substrate,
@@ -245,7 +252,10 @@ target.**
   surfaces retained; the mounted-only body withheld `9*8`, the trained body returned `72`, and
   after its unique developmental passage was dropped a source-detached remount returned `63` for
   novel `7*9`. Mounting, exposure, training, and reference are separated *and empirically
-  distinguished*.
+  distinguished*. **This is the LABORATORY's return and it stands there.** The C++ restatement of
+  it was withdrawn 2026-08-06 (CUT 5): `event/cultivated_route.hpp`'s "founded law" was the C++
+  multiply operator, and `product_route()` was nullary and `constexpr`, so the two "distinct
+  developmental passages" were one constant twice and no operand pair ever reached the ecology.
 - **Multimodality with no fusion module and no pair product.** RELAMPAGO: optical, five-band
   spectral, geolocation, and vertical sections on one eighteen-coordinate phase face; 24,584 and
   21,147 relations opened with zero pair overlap and the complete pair product never enumerated;
@@ -402,6 +412,10 @@ family, with the obstruction retained when it does not. The pairing that decides
 positive form. That is the cycle-class question, it is the Hodge-facing question, and by §2 it is
 the structural form of what is missing on the RH side.
 
+**The certified exact enclosure carrier EXISTS** — `exact/enclosure.hpp` defines the enclosure as a
+set and never a value, with four typed states over `exact/dyadic.hpp` and `exact/separation.hpp`.
+The first brick is laid; this section said otherwise until 2026-08-06.
+
 **One organ closes all three: an exactly computed positive form on a supported realizer
 population, with a certified remainder and a reopening rule keyed to the receiver family.** Its
 prerequisite — a certified exact enclosure carrier — is promised in `canon/08` §3 and does not yet
@@ -482,6 +496,11 @@ apparatus. The mathematics is sound. Only the learning is simulated.
 
 1. The scorer, the counter-morphology, and the constant-subtraction ablation are **removed, not
    deprecated**. Superseded production machinery fails closed; Git history is the recovery surface.
+   **This obligation was not met.** The 2026-08-05 excision renamed the field and preserved the
+   object: 66 `admitted_tally_ += accepted ? N : M` increment sites survived it byte-identical, as
+   `git show 2b562c8` shows. The tallies branch nothing — zero conduct branches on any of them
+   anywhere in the tree — and 27 files hardcode their cumulative sums as grades, a ratchet that
+   structurally penalizes recombination. Cutting them is scheduled work, not a claim.
 2. Every capability claim resting on them is regraded before it is carried forward. Specifically:
    training changing reusable morphology, ablation removing later conduct, and source-detached
    conditioning are **not** established in the C++ body and must not be cited as floor.

@@ -16,10 +16,11 @@ class environment_contract final {
   }
 };
 
-template<structure::typed_port Source, structure::typed_port Destination>
-struct face_contract final {
-  using source_port_type = Source;
-  using destination_port_type = Destination;
-};
+// `face_contract` stood here: two type aliases, no members, no callables, and no
+// constraint beyond what `structure::typed_port` already imposes at every use
+// site. It named the record's contact requirement -- a typed pullback yielding
+// zero, one, or plural organs with an obstruction at zero-match and at
+// unresolved plurality (`PURE_HOLONIC_ENGINE.md:100-107`) -- and typed none of
+// it. Removed 2026-08-06; the requirement it named is owed, not deleted.
 
 }  // namespace holonics::codec

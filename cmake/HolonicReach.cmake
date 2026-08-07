@@ -62,16 +62,22 @@ set(reach_seeds
     "current/information_receipt.hpp"
     "exact/small_rational.hpp")
 
-# Recorded floors, measured 2026-08-06. A drop below any of these is a
-# regression in how much of the body its own spine conducts.
+# Floors and ceilings, measured 2026-08-06.
+#
+# A spine mechanism carries a FLOOR: the body must not conduct through less of
+# it than it already does. A carrier under supersession carries a CEILING: it
+# must not spread further while it is being retired. `continuing_body` fell from
+# 169 to 145 in the cut of 2026-08-06 and that fall is the work, not a
+# regression -- which the first version of this audit could not express.
 set(reach_floor_body/swing.hpp 9)
 set(reach_floor_structure/chi_pair.hpp 13)
 set(reach_floor_structure/local_transport.hpp 13)
 set(reach_floor_structure/transition_invariants.hpp 9)
 set(reach_floor_body/live_machine.hpp 8)
-set(reach_floor_body/continuing_body.hpp 169)
 set(reach_floor_current/information_receipt.hpp 1)
 set(reach_floor_exact/small_rational.hpp 1)
+
+set(reach_ceiling_body/continuing_body.hpp 145)
 
 set(report "headers_total=${reach_total}\n")
 set(regressions "")
@@ -84,8 +90,13 @@ foreach(seed IN LISTS reach_seeds)
   math(EXPR permille "${counted} * 1000 / ${reach_total}")
   string(APPEND report "reach ${seed} = ${counted}/${reach_total} (${permille} per mille)\n")
   set(floor "${reach_floor_${seed}}")
-  if(DEFINED floor AND counted LESS floor)
+  if(NOT floor STREQUAL "" AND counted LESS floor)
     string(APPEND regressions "  ${seed}: ${counted} < recorded floor ${floor}\n")
+  endif()
+  set(ceiling "${reach_ceiling_${seed}}")
+  if(NOT ceiling STREQUAL "" AND counted GREATER ceiling)
+    string(APPEND regressions
+      "  ${seed}: ${counted} > recorded ceiling ${ceiling} -- a superseded carrier spread\n")
   endif()
 endforeach()
 

@@ -9,7 +9,6 @@
 #include <holonics/event/deed.hpp>
 #include <holonics/event/obstruction.hpp>
 #include <holonics/exact/word.hpp>
-#include <holonics/organ/constitutive_contract.hpp>
 #include <holonics/receiver/chart_contract.hpp>
 #include <holonics/structure/occurrence.hpp>
 
@@ -23,7 +22,6 @@ using outbound_port = holonics::structure::port<
     carrier,
     holonics::structure::port_direction::outbound>;
 using occurrence = holonics::structure::occurrence<carrier, inbound_port>;
-using organ = holonics::organ::constitutive_contract<inbound_port, outbound_port>;
 
 static_assert(holonics::exact::exact_carrier<carrier>);
 static_assert(holonics::structure::typed_port<inbound_port>);
@@ -37,7 +35,6 @@ static_assert(holonics::structure::receipt<holonics::apparatus::physical_telemet
 static_assert(!std::same_as<
               holonics::current::logical_resource_receipt,
               holonics::apparatus::physical_telemetry_receipt>);
-static_assert(std::same_as<typename organ::input_port_type, inbound_port>);
 static_assert(!std::copy_constructible<holonics::body::body_contract>);
 static_assert(!std::is_copy_assignable_v<holonics::body::body_contract>);
 static_assert(!std::copy_constructible<holonics::body::live_morphology_contract>);
