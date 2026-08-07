@@ -100,6 +100,13 @@ port and the Phase 7 recut. Pushing remains Brandon's call, not yours.
 - The laboratory working tree is **frozen and dirty** — 52 files that participated in an interrupted
   invalid path. Port from `a07ff376` plus that checkpoint, never from the dirty tree.
 
+**Read `CONSTRUCTION_STATE.md`'s "Verified position" section first.** Two commits carry unverified
+gates and one deed is failing; the section says exactly which and what was ruled out.
+
+**A gate is not a gate until its pass line has been read.** Never `ctest ... | tail` — the pipeline
+returns `tail`'s status, always zero, and the label summary prints whether or not tests failed. Two
+commits were reported `126/126` on that artifact.
+
 **Cost discipline.** Measured 2026-08-06: 146 tests, 1,612 serial seconds. The frozen mathematical
 deeds `r11`-`r35` are **93.7%** of it; the audits, spine, and carriers that guard construction in
 progress are **101 seconds together**. Nothing is redundant within a run — each expensive group runs
