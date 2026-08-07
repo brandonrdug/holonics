@@ -136,5 +136,47 @@ template<std::size_t Capacity>
   return true;
 }
 
+/// Collapse repeated meetings of one pair into a single entry.
+///
+/// A carry displaces every entry of the pivot into the other cell, so a pair can
+/// accumulate many entries that mean one coefficient. Compaction keeps the
+/// working set bounded by DISTINCT meetings rather than by the number of rebases
+/// performed, which is what lets the descent run without a growing arena.
+template<std::size_t Capacity>
+HOLONICS_CALLABLE inline void compact(
+    rebase_entry (&entries)[Capacity],
+    std::size_t& used,
+    bool& exact) noexcept {
+  for (std::size_t slot = 0; slot < used; ++slot) {
+    if (!entries[slot].live) {
+      continue;
+    }
+    for (std::size_t other = slot + 1U; other < used; ++other) {
+      if (!entries[other].live || entries[other].higher != entries[slot].higher ||
+          entries[other].lower != entries[slot].lower) {
+        continue;
+      }
+      const auto sum = exact::add(entries[slot].coefficient, entries[other].coefficient);
+      if (!sum.accepted()) {
+        exact = false;
+        return;
+      }
+      entries[slot].coefficient = sum.value;
+      entries[other].live = false;
+    }
+    if (entries[slot].coefficient.magnitude().is_zero()) {
+      entries[slot].live = false;
+    }
+  }
+  std::size_t kept = 0;
+  for (std::size_t slot = 0; slot < used; ++slot) {
+    if (entries[slot].live) {
+      entries[kept] = entries[slot];
+      kept = kept + 1U;
+    }
+  }
+  used = kept;
+}
+
 }  // namespace rebase_law
 }  // namespace holonics::structure

@@ -148,7 +148,7 @@ toric_store_receipt read_toric_cycle_card(
     receipt.state = toric_store_status::parse_refused; return receipt;
   }
   card.byte_count = bytes.count; card.byte_fold = bytes.fold; card.path_fold = fold_path(path);
-  card.lineage = exact::word{card.occurrence.value() + card.byte_fold + card.path_fold};
+  card.lineage = exact::word{card.occurrence.value() + card.byte_fold};
   card.parsed = true;
   receipt.bytes = exact::word{bytes.count}; receipt.transfer_calls = exact::word{1};
   receipt.byte_fold = bytes.fold; receipt.path_fold = card.path_fold;

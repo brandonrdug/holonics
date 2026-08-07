@@ -127,7 +127,7 @@ arithmetic_store_receipt read_arithmetic_spectral_card(
   card.rechart_left = static_cast<std::uint8_t>(rechart_left);
   card.rechart_right = static_cast<std::uint8_t>(rechart_right);
   card.byte_count = bytes.count; card.byte_fold = bytes.fold; card.path_fold = fold_path(path);
-  card.lineage = exact::word{card.occurrence.value() + card.byte_fold + card.path_fold};
+  card.lineage = exact::word{card.occurrence.value() + card.byte_fold};
   for (std::uint8_t slot = 0; slot < organ::arithmetic_baseline_count; ++slot) {
     card.baseline[slot].lineage = exact::word{card.lineage.value() + slot + 1U};
   }

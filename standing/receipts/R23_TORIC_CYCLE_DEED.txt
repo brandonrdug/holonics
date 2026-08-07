@@ -19,7 +19,7 @@ logical_change_support=9
 logical_alternatives=12
 logical_obstructions=6
 verification_failures=0
-source_card=bytes:111,fold:2895061292798085899,path_fold:13346826461104260812
+source_card=bytes:111,fold:2895061292798085899,path_fold:4987931845705659563
 source_aperture=fans:2,rays:3,4,selected_cone:0,representatives:-4:4,expected_names:absent
 predecessor=rest_bytes:480,head:14001018
 fan_3=primitive:1,smooth:1,complete:1,smith:1,1,picard_rank:1,inertia:1,0,0,determinant:1,betti_middle:1,hodge_11:1
@@ -28,7 +28,7 @@ fan_4_form=0,1;1,0
 fan_4_congruence=2,0;0,-2,basis_determinant:-2
 fan_chow_agreement=1,1
 fan_3_polarization=primitive:1,positive:1,orthogonal_direction:0
-integral_fiber=class:2,3,kernel_rank:2,representatives:42,first_identity:190480,first_lineage:16241887753902576719
+integral_fiber=class:2,3,kernel_rank:2,representatives:42,first_identity:190480,first_lineage:2895061292798315907
 rational_fiber=class:1/2,0,representatives:72,integral:false
 incompatible_fiber=obstructed:1
 polarization=primitive:1,1,negative:1,-1,negative_square:-2
@@ -36,7 +36,7 @@ blowup=ray:1,1,exceptional:-1,1,exceptional_square:-1,projection_formula:1,pullb
 foils=nonprimitive:1,nonsmooth:1,incomplete:1,false_integral:1,incompatible:1,wrong_subdivision:1,principal_not_zero_support:1,congruence_not_conjugacy:1,equal_class_not_support:1
 probe=returned:1,changed_class:2,4
 checker=exit:0,stdout_bytes:3496,stderr_bytes:0,produced_bytes:225968,source_fold:7229165193267580645,artifact_fold:6118019909618437202
-final_body=head:14001020,continuation:15001020,rest_bytes:520,integrity:12602302619654079318
+final_body=head:14001020,continuation:15001020,rest_bytes:520,integrity:12437405276377746369
 physical_telemetry=engine_time:unknown,checker_time:unknown,temperature:unknown,power:unknown,energy:unknown
 formal_begin
 import Mathlib.Tactic.NormNum

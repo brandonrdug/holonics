@@ -70,11 +70,21 @@ codec_store_result mount_codec_store(const char* path) noexcept {
   environment.operative = program_from(values + 3);
   environment.unrelated = program_from(values + 12);
   environment.source_material_testimony = result.receipt.material_testimony;
+  // The path is a chart the apparatus chose, never material. It is retained as
+  // testimony on the receipt and kept OUT of the lineage: a body whose standing
+  // depends on where its cards are mounted has an absolute frame in it, and two
+  // machines holding identical cards at different mount points would disagree.
   std::uint64_t path_fold = 14'695'981'039'346'656'037ULL;
   for (const char* cursor = path; *cursor != '\0'; ++cursor) {
     mix(path_fold, static_cast<unsigned char>(*cursor));
   }
-  environment.storage_lineage = exact::word{path_fold};
+  std::uint64_t material_fold = 14'695'981'039'346'656'037ULL;
+  for (const std::uint64_t value : values) {
+    for (unsigned shift = 0; shift < 64U; shift += 8U) {
+      mix(material_fold, static_cast<unsigned char>((value >> shift) & 255U));
+    }
+  }
+  environment.storage_lineage = exact::word{material_fold};
   result.receipt.path_testimony = exact::word{path_fold};
   result.receipt.inherited_provenance = environment.inherited_provenance;
   result.receipt.state = codec::valid_environment(environment)
@@ -113,7 +123,14 @@ bool same_codec_material(
       a.core_occurrence == b.core_occurrence && codec::equal_program(a.operative, b.operative) &&
       codec::equal_program(a.unrelated, b.unrelated) &&
       a.source_material_testimony == b.source_material_testimony &&
-      a.storage_lineage != b.storage_lineage;
+      // Until 2026-08-07 this asserted `a.storage_lineage != b.storage_lineage`
+      // -- the deed named AGNOSTIC CODECS required the codec to be sensitive to
+      // its own file path. The storage lineage folded the path and nothing else,
+      // so relocation changed the standing of identical material. The lineage
+      // now folds what was stored rather than where, and the property this deed
+      // exists to establish is that it does NOT move. The relocation is still
+      // exhibited: the receipts carry differing path testimony.
+      a.storage_lineage == b.storage_lineage;
 }
 
 }  // namespace holonics::apparatus

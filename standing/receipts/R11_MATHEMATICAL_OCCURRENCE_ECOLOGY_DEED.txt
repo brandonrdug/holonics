@@ -10,7 +10,7 @@ resident_bytes=10440
 source_bytes_after_mount=0
 host_semantic_events=0
 verification_failures=0
-sources=original_bytes:3761,relocated_bytes=3761,original_chunks=52,relocated_chunks=30,material=10009503438183541483:10009503438183541483,paths=1080565402668110298:3225447309066296892,recognized=15,exact_material=1,detached=1
+sources=original_bytes:3761,relocated_bytes=3761,original_chunks=52,relocated_chunks=30,material=10009503438183541483:10009503438183541483,paths=1080565402668110298:16361916483802004570,recognized=15,exact_material=1,detached=1
 held_out=question:115001,head=11001000,environment=111001,type=111070,declarations=7,dependencies=10,joins=10,alternatives=4,substitutions=1,unknowns=1,global_scans=0,proof=111071,closed=1,inherited=1,goal_open=1,source_detached=1,text_answer=0,obstruction=0
 reordered=question:115001,head=11002000,environment=111001,type=111070,declarations=7,dependencies=10,joins=10,alternatives=4,substitutions=1,unknowns=1,global_scans=0,proof=111071,closed=1,inherited=1,goal_open=1,source_detached=1,text_answer=0,obstruction=0
 mismatch=question:115004,head=11001000,environment=111001,type=0,declarations=0,dependencies=0,joins=0,alternatives=0,substitutions=0,unknowns=1,global_scans=0,proof=0,closed=0,inherited=0,goal_open=1,source_detached=1,text_answer=0,obstruction=3

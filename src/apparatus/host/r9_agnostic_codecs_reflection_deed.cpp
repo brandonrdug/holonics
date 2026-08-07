@@ -18,7 +18,10 @@ int main(int argument_count, char** arguments) {
   auto relocated = holonics::apparatus::mount_relocated_codec_store(arguments[2], arguments[3]);
   if (original.receipt.state != holonics::apparatus::codec_store_status::exact ||
       relocated.receipt.state != holonics::apparatus::codec_store_status::exact ||
-      !holonics::apparatus::same_codec_material(original.environment, relocated.environment)) {
+      !holonics::apparatus::same_codec_material(original.environment, relocated.environment) ||
+      // The relocation must actually have happened, or the agnosticism above is
+      // vacuous: two mounts of the SAME path would trivially agree.
+      original.receipt.path_testimony == relocated.receipt.path_testimony) {
     std::cerr << "codec source admission failed\n";
     return 3;
   }

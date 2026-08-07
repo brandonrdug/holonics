@@ -1,0 +1,11 @@
+truth_status=established-bounded
+evidence=implemented-exact
+law=the reduction is the swing over incidence; what no rebase carries away is an invariant factor
+carrier=exact signed magnitude with typed refusal; no field, no tolerance, no materialised matrix
+pivot=the first standing meeting, never a global scan
+witness_failures=0
+circle_boundary_cancels=exact:1,rank:0,factors:0,torsion:0,first:0,rides:0,foundings:0
+disc_fills_the_cycle=exact:1,rank:1,factors:1,torsion:0,first:1,rides:0,foundings:0
+projective_plane_retains_two=exact:1,rank:1,factors:1,torsion:1,first:2,rides:0,foundings:0
+coprime_rebases_to_a_unit=exact:1,rank:1,factors:1,torsion:0,first:1,rides:1,foundings:1
+the_projective_plane_is_the_witness=its rank equals the disc's and its whole content is the retained factor two

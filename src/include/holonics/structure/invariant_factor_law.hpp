@@ -47,19 +47,26 @@ template<std::size_t Capacity>
       if (value.magnitude().is_zero()) {
         continue;
       }
-      if (!standing ||
-          exact::compare(value.magnitude(), chosen.magnitude()) < 0) {
-        standing = true;
-        chosen = value;
-        chosen_face = entry.lower;
-        chosen_cell = entry.higher;
-      }
+      // The FIRST standing meeting is the pivot. Classical reductions scan the
+      // remaining block for the smallest magnitude; that scan is a stability
+      // heuristic for inexact arithmetic and it is a solver imposing an order
+      // from outside. With exact coefficients every order returns the same
+      // factors, so the scan bought a global sweep and no invariant.
+      standing = true;
+      chosen = value;
+      chosen_face = entry.lower;
+      chosen_cell = entry.higher;
+      break;
     }
     if (!standing || !out.exact) {
       break;
     }
 
-    // Carry the pivot out of every other cell meeting the same face.
+    // Carry between the two cells that meet, reducing the LARGER by the
+    // smaller. That is the Euclidean descent done locally: a comparison between
+    // two partials that already stand, never a sweep of the block. Reducing the
+    // smaller by the larger would return a quotient of zero and never converge,
+    // which is what the classical global scan was really guarding against.
     bool remainder_stands = false;
     for (std::size_t slot = 0; slot < used && out.exact; ++slot) {
       const auto& entry = entries[slot];
@@ -68,27 +75,40 @@ template<std::size_t Capacity>
         continue;
       }
       const std::uint16_t other = entry.higher;
-      const coefficient value =
+      coefficient mine =
           rebase_law::meeting(entries, used, other, chosen_face, out.exact);
-      if (value.magnitude().is_zero()) {
+      if (mine.magnitude().is_zero()) {
         continue;
       }
-      const auto split = exact::divide(value.magnitude(), chosen.magnitude());
+      std::uint16_t from = chosen_cell;
+      std::uint16_t into = other;
+      coefficient divisor = chosen;
+      coefficient dividend = mine;
+      if (exact::compare(mine.magnitude(), chosen.magnitude()) < 0) {
+        from = other;
+        into = chosen_cell;
+        divisor = mine;
+        dividend = chosen;
+      }
+      const auto split = exact::divide(dividend.magnitude(), divisor.magnitude());
       if (!split.accepted()) {
         out.exact = false;
         break;
       }
-      const coefficient factor{value.negative() != chosen.negative(), split.quotient};
-      if (!rebase_law::carry(entries, used, chosen_cell, other, factor)) {
+      const coefficient factor{dividend.negative() != divisor.negative(),
+          split.quotient};
+      if (!rebase_law::carry(entries, used, from, into, factor)) {
         out.exact = false;
         break;
       }
+      rebase_law::compact(entries, used, out.exact);
       if (split.remainder.is_zero()) {
         out.rides = out.rides + 1U;
       } else {
         out.foundings = out.foundings + 1U;
         remainder_stands = true;
       }
+      break;  // one meeting per pass; the next pass re-reads the star
     }
     if (!out.exact) {
       break;
@@ -98,6 +118,10 @@ template<std::size_t Capacity>
     }
 
     // The star has closed. What is left is an invariant factor.
+    chosen = rebase_law::meeting(entries, used, chosen_cell, chosen_face, out.exact);
+    if (chosen.magnitude().is_zero() || !out.exact) {
+      break;
+    }
     retired_cell[chosen_cell] = true;
     retired_face[chosen_face] = true;
     out.rank = out.rank + 1U;

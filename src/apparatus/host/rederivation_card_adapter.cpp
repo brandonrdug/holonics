@@ -110,8 +110,7 @@ void metadata(organ::rederivation_card_metadata &target, const bytes &source,
   target.byte_count = source.count;
   target.byte_fold = source.fold;
   target.path_fold = path_fold(path);
-  target.lineage = exact::word{target.occurrence.value() + target.byte_fold +
-                               target.path_fold};
+  target.lineage = exact::word{target.occurrence.value() + target.byte_fold};
   target.parsed = true;
 }
 rederivation_store_receipt

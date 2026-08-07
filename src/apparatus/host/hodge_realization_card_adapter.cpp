@@ -131,7 +131,7 @@ hodge_store_receipt read_hodge_realization_card(
   card.changed_center_selector = static_cast<std::uint8_t>(header[11]);
   card.question_count = static_cast<std::uint8_t>(header[12]);
   card.byte_count = bytes.count; card.byte_fold = bytes.fold; card.path_fold = fold_path(path);
-  card.lineage = exact::word{card.occurrence.value() + card.byte_fold + card.path_fold};
+  card.lineage = exact::word{card.occurrence.value() + card.byte_fold};
   for (std::uint8_t slot = 0; slot < organ::hodge_factor_capacity; ++slot) {
     card.factors[slot].lineage = exact::word{card.lineage.value() + slot + 1U};
   }

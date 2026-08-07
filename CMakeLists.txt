@@ -144,6 +144,7 @@ include(cmake/PhaseTextMount.cmake)
 include(cmake/ConditionedProduction.cmake)
 include(cmake/ConstraintRebase.cmake)
 include(cmake/OneStanding.cmake)
+include(cmake/GrownCircuit.cmake)
 
 string(JOIN " " R0_DEVICE_FLAGS_RECEIPT ${R0_DEVICE_COMMON_FLAGS})
 set(HOLONICS_DECLARED_COMMANDS
@@ -297,6 +298,17 @@ add_custom_target(
   VERBATIM)
 
 include(cmake/HolonicContractTests.cmake)
+
+# The deposited standing is checked as a guard: cheap, and the only thing that
+# makes a deposit evidence rather than a copy.
+set(HOLONICS_REGISTRY_RECEIPT "${PROJECT_BINARY_DIR}/receipts/REGISTRY_AUDIT.txt")
+add_test(
+  NAME r0.registry_audit
+  COMMAND
+    "${CMAKE_COMMAND}" -DSTANDING=${PROJECT_SOURCE_DIR}/standing
+    -DBUILD_ROOT=${PROJECT_BINARY_DIR}
+    -DOUTPUT=${HOLONICS_REGISTRY_RECEIPT}
+    -P "${PROJECT_SOURCE_DIR}/cmake/HolonicRegistry.cmake")
 
 set(HOLONICS_REACH_RECEIPT "${PROJECT_BINARY_DIR}/receipts/REACH_AUDIT.txt")
 add_test(

@@ -113,7 +113,7 @@ causal_linear_store_receipt read_causal_linear_card(
   card.eigen_min = static_cast<std::int8_t>(eigen_min);
   card.eigen_max = static_cast<std::int8_t>(eigen_max);
   card.byte_count = bytes.count; card.byte_fold = bytes.fold; card.path_fold = fold_path(path);
-  card.lineage = exact::word{card.occurrence.value() + card.byte_fold + card.path_fold};
+  card.lineage = exact::word{card.occurrence.value() + card.byte_fold};
   card.parsed = true; receipt.bytes = exact::word{bytes.count};
   receipt.transfer_calls = exact::word{1}; receipt.byte_fold = bytes.fold;
   receipt.path_fold = card.path_fold; receipt.integrity_exact = true; return receipt;

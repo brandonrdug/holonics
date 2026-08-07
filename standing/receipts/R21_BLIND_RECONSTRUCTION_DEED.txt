@@ -20,7 +20,7 @@ logical_change_support=10
 logical_alternatives=32
 logical_obstructions=2
 verification_failures=0
-source_cards=code_bytes:29,code_fold:7376861789171317010,code_path_fold:10811906335815055643,moment_bytes:191,moment_fold:665043138814216418,moment_path_fold:10319842732932332401
+source_cards=code_bytes:29,code_fold:7376861789171317010,code_path_fold:439269326463025052,moment_bytes:191,moment_fold:665043138814216418,moment_path_fold:7712381854168250132
 source_aperture=released_solution:absent,expected_operator:absent,expected_roots:absent
 predecessor=rest_bytes:360,head:14001012
 code=vertices:128,codewords:16,minimum_distance:3,returned_pairs:3
@@ -31,7 +31,7 @@ moment2=det:4410000,disc:4410000,roots:0,2,5,7
 controls=collision_det:0,collision_disc:0,short_access:0,code_gpu_probe:1,moment_gpu_probe:1
 code_checker=exit:0,stdout_bytes:213,stderr_bytes:0,produced_bytes:828216,source_fold:2716943669611622695,artifact_fold:12109564245269848245
 moment_checker=exit:0,stdout_bytes:141,stderr_bytes:0,produced_bytes:372224,source_fold:15909112750488808264,artifact_fold:7139433044076365637
-final_body=head:14001016,continuation:15001016,rest_bytes:440,integrity:4402755465148046550
+final_body=head:14001016,continuation:15001016,rest_bytes:440,integrity:11231906566685607613
 physical_telemetry=engine_time:unknown,checker_time:unknown,temperature:unknown,power:unknown,energy:unknown
 code_formal_begin
 import Mathlib.LinearAlgebra.Matrix.Notation

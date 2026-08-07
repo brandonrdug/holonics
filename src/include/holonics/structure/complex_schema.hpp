@@ -7,8 +7,11 @@
 
 namespace holonics::structure {
 
-inline constexpr std::size_t resident_cell_capacity = 16;
-inline constexpr std::size_t resident_incidence_capacity = 48;
+// Widened 2026-08-07. Sixteen cells could not hold the machine's own
+// transport population, and an organ used past its declared aperture is a
+// defect even when it appears to return.
+inline constexpr std::size_t resident_cell_capacity = 64;
+inline constexpr std::size_t resident_incidence_capacity = 256;
 inline constexpr std::size_t resident_path_capacity = 16;
 inline constexpr std::size_t encoded_cell_capacity = 20;
 inline constexpr std::size_t encoded_incidence_capacity = 64;

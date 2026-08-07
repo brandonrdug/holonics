@@ -7,7 +7,7 @@ kernel_launches=2
 launched_threads=256
 bytes_to_device=13760
 bytes_from_device=2560
-resident_structure_bytes=29280
+resident_structure_bytes=131680
 verification_failures=0
 case=8192 admission=exact admitted=0/0 boundary=0/0/0 traversal=exact/0/0/0/0/0 support_hash=0/0 append=exact/0 departure=exact/0/0 active=0/0 standing=12161962213042174405/12161962213042174405 mint=10000/10000 visited=0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 case=8193 admission=exact admitted=1/0 boundary=0/0/0 traversal=exact/1/1/0/1/1 support_hash=1649786411698908908/1649786411698908908 append=exact/1 departure=exact/0/0 active=1/2 standing=15747635513271731629/15545781056025126846 mint=10100/10102 visited=10100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -16,6 +16,6 @@ case=8195 admission=exact admitted=7/9 boundary=1/0/6 traversal=exact/7/7/9/7/3 
 case=8196 admission=exact admitted=11/11 boundary=1/0/6 traversal=exact/7/7/9/7/3 support_hash=13963327022500610874/9265030821523542749 append=exact/0 departure=exact/1/0 active=11/10 standing=2163490617686777401/7347470738914057866 mint=10400/10411 visited=10406,10403,10404,10405,10400,10401,10402,0,0,0,0,0,0,0,0,0,
 case=8197 admission=exact admitted=15/28 boundary=5/0/36 traversal=exact/15/15/28/15/4 support_hash=12444959536399535137/1382185700129458837 append=exact/0 departure=exact/0/0 active=15/15 standing=181810322613650273/181810322613650273 mint=10500/10515 visited=10514,10510,10511,10512,10513,10504,10505,10507,10506,10508,10509,10500,10501,10502,10503,0,
 case=8198 admission=exact admitted=7/9 boundary=1/0/6 traversal=exact/7/7/9/7/3 support_hash=13457366724342983981/6880031742246304298 append=exact/0 departure=exact/0/0 active=7/7 standing=4406118131161857446/4406118131161857446 mint=10600/10607 visited=10606,10603,10604,10605,10600,10601,10602,0,0,0,0,0,0,0,0,0,
-case=8199 admission=exact admitted=15/0 boundary=0/0/0 traversal=exact/1/1/0/1/1 support_hash=14308659457970812406/14308659457970812406 append=capacity_refused/0 departure=exact/0/0 active=15/15 standing=9531842488169510022/9531842488169510022 mint=10700/10715 visited=10700,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-case=8200 admission=capacity_refused admitted=0/0 boundary=0/0/0 traversal=exact/0/0/0/0/0 support_hash=0/0 append=exact/0 departure=exact/0/0 active=0/0 standing=12161962213042174405/12161962213042174405 mint=10800/10800 visited=0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+case=8199 admission=exact admitted=15/0 boundary=0/0/0 traversal=exact/1/1/0/1/1 support_hash=14308659457970812406/14308659457970812406 append=exact/2 departure=exact/0/0 active=15/17 standing=9531842488169510022/9365023617973052635 mint=10700/10717 visited=10700,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+case=8200 admission=exact admitted=17/0 boundary=0/0/0 traversal=exact/0/0/0/0/0 support_hash=0/0 append=exact/0 departure=exact/0/0 active=17/17 standing=3074992526709276146/3074992526709276146 mint=10800/10817 visited=0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 case=8201 admission=exact admitted=3/2 boundary=0/0/0 traversal=exact/3/3/2/3/2 support_hash=8926558656176261604/16078250365689130054 append=exact/0 departure=departure_blocked/0/0 active=3/3 standing=7605775500952555035/7605775500952555035 mint=10900/10903 visited=10902,10900,10901,0,0,0,0,0,0,0,0,0,0,0,0,0,

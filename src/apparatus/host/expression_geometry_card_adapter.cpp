@@ -142,7 +142,7 @@ expression_geometry_store_receipt read_expression_geometry_card(
   card.chart_min = static_cast<std::int8_t>(chart_min);
   card.chart_max = static_cast<std::int8_t>(chart_max);
   card.byte_count = bytes.count; card.byte_fold = bytes.fold; card.path_fold = fold_path(path);
-  card.lineage = exact::word{card.occurrence.value() + card.byte_fold + card.path_fold};
+  card.lineage = exact::word{card.occurrence.value() + card.byte_fold};
   for (std::uint8_t slot = 0; slot < 3; ++slot) {
     card.presentations[slot].lineage = exact::word{card.lineage.value() + slot + 1U};
   }

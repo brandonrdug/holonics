@@ -145,7 +145,7 @@ blind_store_receipt read_binary_code_card(
   card.byte_count = bytes.count;
   card.byte_fold = bytes.fold;
   card.path_fold = out.path_fold;
-  card.lineage = exact::word{card.occurrence.value() + bytes.fold + out.path_fold};
+  card.lineage = exact::word{card.occurrence.value() + bytes.fold};
   card.parsed = true;
   return out;
 }
@@ -200,7 +200,7 @@ blind_store_receipt read_moment_problem_card(
   card.byte_count = bytes.count;
   card.byte_fold = bytes.fold;
   card.path_fold = out.path_fold;
-  card.lineage = exact::word{bytes.fold + out.path_fold + card.schema.value()};
+  card.lineage = exact::word{bytes.fold+ card.schema.value()};
   card.parsed = true;
   return out;
 }

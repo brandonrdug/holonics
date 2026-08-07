@@ -12,7 +12,7 @@ semantic_threads=15
 host_semantic_events=0
 verification_failures=0
 executor_state=0
-source_card=loaded:1,bytes:169,fold:17977030774370587561,path_fold:2180899666262822647
+source_card=loaded:1,bytes:169,fold:17977030774370587561,path_fold:14104664455259772980
 predecessor_remount=body:1,same_body:1,theory:1,source_replayed:0
 family=legendre_product,factors:2,rank:6,hodge:1,4,1,denominator:-4
 transport=cup_t:1,cup_u:1,mixed_zero:1,griffiths:1
@@ -20,7 +20,7 @@ locus=quotient:-1,1,tangent:0,normal:1,multiplicity:1,graph_square:0,mutual:4,pr
 cycles=generators:7,translations:4,distinct:1,enumerated:2187,integral_realizers:16,half_realizers:16,effective_graphs:4,outside_obstructed:1
 blowup=rank:7,exceptional_square:-1,center:0,selected_square:-1,changed_center:1,changed_selected_square:-1
 checker=exit:0,stdout_bytes:543,stderr_bytes:0,produced_bytes:896936
-final_body=head:14001030,continuation:15001030,rest_bytes:720,integrity:10607255173111083133
+final_body=head:14001030,continuation:15001030,rest_bytes:720,integrity:1790936420805539019
 rest_io=loaded:1,written:1
 physical_telemetry=engine_time:unknown,checker_time:unknown,temperature:unknown,power:unknown,energy:unknown
 formal_begin

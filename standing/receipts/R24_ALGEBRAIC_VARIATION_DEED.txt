@@ -19,11 +19,11 @@ logical_change_support=10
 logical_alternatives=14
 logical_obstructions=6
 verification_failures=0
-source_card=bytes:83,fold:10470058078190916659,path_fold:86161891748536941
+source_card=bytes:83,fold:10470058078190916659,path_fold:6129623529830480470
 source_aperture=degree:3,cover:2,discovery:5,holdout:2,root:-2:2,form:-2:2,series:6,expected_names:absent
 predecessor=rest_bytes:520,head:14001020
-family=roots:0+0t@191400:10556219969939644901;0+1t@191401:10556219969939644902;1+0t@191402:10556219969939644903,discriminant:0,0,1,-2,1,vandermonde:0,0,1,-2,1
-collisions=0:multiplicity=2:lineage=10556219969939644932;1:multiplicity=2:lineage=10556219969939644933
+family=roots:0+0t@191400:10470058078191107960;0+1t@191401:10470058078191107961;1+0t@191402:10470058078191107962,discriminant:0,0,1,-2,1,vandermonde:0,0,1,-2,1
+collisions=0:multiplicity=2:lineage=10470058078191107991;1:multiplicity=2:lineage=10470058078191107992
 connection=denominator:2*(0,1,-1),numerator:0+1t,-1+0t;0+1t,0+-1t,holdout:1,symbolic:1,pole_support:1
 invariant=enumerated:544,survivors:2,retained:6,selected:0,1;-1,0
 scalar=second:0,4,-4,first:4,-8,zeroth:-1,constraint_rank:5,series:1,1/4,9/64,25/256,1225/16384,3969/65536,53361/1048576
@@ -31,7 +31,7 @@ loops=M0:1,2;0,1,M1:1,0;-2,1,Minf:1,-2;2,-3,pairing_preserved:1,ordered_product:
 selection=candidates:4,selected:191603,no_score:1,no_expected_statement:1,holdout_closed:1,foils_closed:1
 probe=returned:1,obstruction:10,roots:1,theorem_selected:0
 checker=exit:0,stdout_bytes:3975,stderr_bytes:0,produced_bytes:580048
-final_body=head:14001022,continuation:15001022,rest_bytes:560,integrity:18136157943531362438
+final_body=head:14001022,continuation:15001022,rest_bytes:560,integrity:7447313915372809206
 physical_telemetry=engine_time:unknown,checker_time:unknown,temperature:unknown,power:unknown,energy:unknown
 formal_begin
 import Mathlib.Tactic.NormNum

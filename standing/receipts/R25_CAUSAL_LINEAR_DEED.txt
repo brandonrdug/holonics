@@ -19,7 +19,7 @@ probe_state=0
 predecessor_remount=body:1,same_body:1,theory:1,source_replayed:0,theory_id:191300
 formation_state=0,checker_stage:0,formal_bytes:1536
 inquiry_state=all_exact:1,theory_formed:1,source_mask:15,obstruction:0,phase_exact:1,phase_d1:1,phase_d2:1,phase_char:1,cm_exact:1,cm_incidence:1,cm_char:1,cm_agrees:1,cm_factor:1,toric_exact:1,variation_exact:1
-source_cards=all_loaded:1,r25_bytes:23,fold:7252960809158082584,path_fold:6626239801163906009
+source_cards=all_loaded:1,r25_bytes:23,fold:7252960809158082584,path_fold:9739825040995892914
 source_aperture=phase_product:2x3,cm_periodic:16x40,toric_fans:3+4,variation:pencil+form+loops,expected_invariants:absent
 predecessor=rest_bytes:560,head:14001022
 phase=cells:6,12,6,ranks:5,5,betti:1,2,1,tours:1x6,boundary_squared_zero:1
@@ -29,7 +29,7 @@ variation=pencil:0+1t,-1+0t;0+1t,0+-1t,determinant:0,1,-1,ranks:1,1,2,form:0,1;-
 controls=equal_characteristic_unequal_fixed:1,fixed:2,1,unequal_kernel_placement:1,rational_rotation_eigenvalue_absent:1,rational_discriminant:-4,gaussian_eigenpair:1
 probe=returned:1,phase:8,16,8,ranks:7,7,tours:2x4,all_exact:1,source_mask:15,phase_exact:1,cm_exact:1
 checker=exit:0,stdout_bytes:1801,stderr_bytes:0,produced_bytes:592072
-final_body=head:14001024,continuation:15001024,rest_bytes:600,integrity:17651440612373294460
+final_body=head:14001024,continuation:15001024,rest_bytes:600,integrity:11680064041161129433
 physical_telemetry=engine_time:unknown,checker_time:unknown,temperature:unknown,power:unknown,energy:unknown
 formal_begin
 import Mathlib.Tactic.NormNum

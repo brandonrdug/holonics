@@ -17,7 +17,7 @@ verification_failures=0
 executor_state=0
 predecessor_remount=body:1,same_body:1,theory:1,source_replayed:0,theory_id:193300
 inquiry=all_exact:1,theory_formed:1,source_mask:7,obstruction:0,no_expected_invariants:1
-source_card=loaded:1,bytes:186,fold:14259186912112544110,path_fold:15983410030714073361
+source_card=loaded:1,bytes:186,fold:14259186912112544110,path_fold:1976401232239363614
 source_aperture=presentations:3,variables:3,terms:12,degree:5,sylvester:9x9,module_rank:4,series_depth:11,expected_invariants:absent
 presentation_0=terms:4,shift:0,b:1,singulars:5,resultant:3125,-256,resultant_mask:511,bezout_mask:511,sample0:265269,basis_rank:4,samples:11,exact:1
 presentation_1=terms:9,shift:1,b:1,singulars:5,resultant:3125,-256,resultant_mask:511,bezout_mask:511,sample0:265269,basis_rank:4,samples:11,exact:1
@@ -28,7 +28,7 @@ residue=relation:4a5=1,nonzero:1,rank_one:1,square_zero:1,log_channel:1
 expression_fiber=members:3,rational_rechart:1,shift:1,gaussian_rechart:1,field_dependency:1
 changed=b:2,resultant:50000,-256,series_changed:1,source_sensitive:1
 checker=exit:0,stdout_bytes:1039,stderr_bytes:0,produced_bytes:819112
-final_body=head:14001028,continuation:15001028,rest_bytes:680,integrity:8897151479461903734
+final_body=head:14001028,continuation:15001028,rest_bytes:680,integrity:768185777767747400
 rest_io=loaded:1,written:1
 physical_telemetry=engine_time:unknown,checker_time:unknown,temperature:unknown,power:unknown,energy:unknown
 formal_begin

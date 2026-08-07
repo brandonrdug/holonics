@@ -2,7 +2,7 @@
 
 **Truth status:** `interpretation`.
 
-The comparison opened the four declared canon files only after the computational return, formal source, dossier, source audit, deterministic replay, and native rests were sealed. The seal remained byte-identical (`44ab8c4084c329b9ff60b94e4381ae9a651562589c12a872bc738767795ae62a`).
+The comparison opened the four declared canon files only after the computational return, formal source, dossier, source audit, deterministic replay, and native rests were sealed. The seal remained byte-identical (`b9a4b1e88e29da9c6f68cafbba86c6e19064c112e92356fc4dc0ae1f2e6f0570`).
 
 | Returned exact mechanism | Exterior canon relation | Comparison |
 |---|---|---|
