@@ -906,6 +906,66 @@ the second schedule was not actually threaded through and the seam is decorative
 **Laboratory vs remains.** The laboratory built the residual separation that makes this testable
 and never varied the schedule. Remains: the enum, the threading, the Chi carrier, both deposits.
 
+**Returned 2026-08-07 as DILATION AND LINEAGE — Brandon's naming, and it is the better one.**
+
+*"That next step is something we've referred to as 'dilation' or 'lineage' in the past."* Calling it
+*the schedule* was MorphoHDL's vocabulary imported over the project's own. Both words already had
+apparatus here: `ReceiverGraphDeed::Dilate { upper_horizon }` changes how far a receiver sees and
+returns `Retained` when the horizon did not move, and lineage is *"existing structure to be pivotted
+off of"*, carried by `BranchLineage<T>` and `dialogue_lineage.rs`. So the gap was never "the
+schedule is hardcoded" — it is that **ten traversals bypass a receiver vocabulary the engine already
+owns**, each an undeclared horizon with no record of what it pivoted off. The sharpest instance is
+inside the file that defines the vocabulary: `graph_receiver.rs:1858` counts components with a raw
+unbounded walk.
+
+`crates/holonic-engine/src/dilation.rs` gives a walk a declared `Horizon`, a `WalkOrder`, and a
+`DilationLineage` recording what it reached, in what order, at what incidence distance, **what it
+had to pivot off to close** (`closure_added`, retained rather than folded in), and what lies one
+step beyond (`open_frontier`). `rebase_invariants_on` then reads the invariants of a section, so
+*"did dilating move the invariants?"* is an exact integer question.
+
+**The law, with the condition `CLAUDE.md` §12 omitted:**
+
+```text
+horizon >= covering  ->  GAUGE.       chart moves with the walk order; invariants do not
+horizon <  covering  ->  RESTRICTION. the receiver genuinely sees less; invariants move
+```
+
+Measured over a grown circuit, focus at the root, covering horizon 7:
+
+```text
+horizon  0   1 cell    betti [1]        horizon  5  21 cells  betti [1, 4]
+horizon  1   5 cells   betti [1, 0]     horizon  6  21 cells  betti [1, 4]
+horizon  3  13 cells   betti [1, 0]     horizon  7+ 22 cells  betti [1, 5]   GAUGE
+```
+
+§12's unconditional form was untestable — without the restriction half there is nothing that could
+have moved, and "invariant under dilation" would be a claim about a walk that always covered
+everything. The measurement §12 rests on was taken on the residue-stratum atlas, which resolves at
+no commit in either repository, so the gauge/non-gauge pair is **re-established here on live
+material** rather than cited.
+
+**The second frame, and it was free.** `graph_receiver.rs:1868-1874` already computes `b0` and `b1`
+by the Euler route, and nothing had ever compared them to the integer homology. `euler_reading`
+makes that comparison a control, and declines rather than returning a number where the shortcut
+does not apply. Two independent implementations of the same two integers is what §0 means by an
+invariant needing two frames.
+
+**Three defects the controls caught, one of them in the organ.** The horizon was labelling cells by
+*discovery depth*, so under a depth-first walk the walk order changed which cells fell inside the
+horizon — the horizon was not a receiver property and dilation was not a gauge. Distance is now
+always breadth-first, which is what makes it distance, and the order decides only the chart. Second:
+`is_covering` was being compared against the whole complex, which makes the horizon answer for
+connectivity too; it means the receiver covered *its own component*. Third, and for the third time
+in one day: **material that cannot distinguish the coordinate under test proves nothing about it** —
+the gauge test first used a path, where breadth and depth produce identical walks, and a deliberate
+corruption of the Euler formula's `components` term passed unnoticed because every section reached
+from one focus is connected. A disconnected fixture now exists for exactly that term.
+
+**26 declared controls, 0 failed.** Remains from this movement as originally written: the Chi
+carrier and the two deposits; and porting the ten bare traversals onto `Horizon`, which is now a
+mechanical change rather than a design question.
+
 ---
 
 #### A second receiver exhibits the gluing obstruction

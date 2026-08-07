@@ -57,8 +57,9 @@ use holonic_engine::algebraic::{
     CausalCellId, CausalChain, ComparativeMultiplicity, GradedCausalComplex,
 };
 use holonic_engine::causal::EventId;
+use holonic_engine::dilation::{covering_horizon, dilate, euler_reading, Horizon, WalkOrder};
 use holonic_engine::rebase_invariants::{
-    invariants_agree, rebase_invariants, PivotRule, RebaseInvariants,
+    invariants_agree, rebase_invariants, rebase_invariants_on, PivotRule, RebaseInvariants,
 };
 
 // -------------------------------------------------------------------------------------------
@@ -120,6 +121,7 @@ struct Site {
 /// What a growth returns: the complex, the order sites were actually expanded in, and the layout.
 struct Growth {
     complex: GradedCausalComplex,
+    root: CausalCellId,
     /// The chart. Expansion order is exactly what differs between schedules.
     layout: Vec<String>,
     edges: Vec<CausalCellId>,
@@ -252,6 +254,7 @@ fn grow(schedule: Schedule, depth: u32, split: u32, closure: Closure) -> Growth 
 
     Growth {
         complex,
+        root,
         layout,
         edges,
         rim,
@@ -334,6 +337,157 @@ fn sweep(title: &str, depth: u32, split: u32, closure: Closure) -> Vec<Reading> 
         });
     }
     readings
+}
+
+/// Dilation on a structure the machine grew, rather than one authored for the test.
+///
+/// A receiver at a declared horizon holds a section. Above the covering horizon, changing the
+/// horizon or the walk order moves the chart and nothing else — the gauge. Below it, the receiver
+/// genuinely sees less and the invariants move, which is not a defect and is the only reason the
+/// gauge half is testable at all.
+fn dilation_sweep(holds: &mut Vec<(&'static str, bool, String)>) {
+    println!("\nDilating a receiver over the grown circuit");
+    println!("------------------------------------------");
+
+    let growth = grow(Schedule::Breadth, 3, 2, Closure::Rim);
+    let whole = rebase_invariants_on(&growth.complex, None, PivotRule::FirstNonzero)
+        .expect("the whole incidence reads");
+    let covering = covering_horizon(&growth.complex, growth.root).expect("the focus resolves");
+    println!(
+        "  focus {:?}  covering horizon {covering}  whole {:?}",
+        growth.root,
+        whole.betti_vector()
+    );
+
+    let unbounded_support = dilate(
+        &growth.complex,
+        growth.root,
+        Horizon::Unbounded,
+        WalkOrder::Breadth,
+    )
+    .expect("an unbounded dilation resolves")
+    .support;
+
+    let mut above_charts = BTreeSet::new();
+    let mut above_settled: Option<Vec<usize>> = None;
+    let mut above_agree = true;
+    let mut frontier_law = true;
+    let mut frames_agree = true;
+    let mut lineage_recorded = false;
+    let mut restricted_moved = false;
+    let mut restricted_proper = true;
+
+    for horizon in 0..=covering + 2 {
+        for order in WalkOrder::ALL {
+            let section = dilate(
+                &growth.complex,
+                growth.root,
+                Horizon::Steps(horizon),
+                order,
+            )
+            .expect("a dilation from a founded focus resolves");
+            let seen = rebase_invariants_on(
+                &growth.complex,
+                Some(section.support()),
+                PivotRule::FirstNonzero,
+            )
+            .expect("a section reads");
+
+            // is_covering() means nothing incident is outside the section -- the receiver covered
+            // its own component. The right comparison is against what an UNBOUNDED horizon reaches
+            // from the same focus, not against the whole complex, which would make the horizon
+            // answer for connectivity as well.
+            let covers = section.support == unbounded_support;
+            if section.lineage.is_covering() != covers {
+                frontier_law = false;
+            }
+            if !section.lineage.closure_added.is_empty() {
+                lineage_recorded = true;
+            }
+
+            // Second frame, free: Euler against Smith normal form wherever Euler applies.
+            if let Some((components, cycles)) =
+                euler_reading(&growth.complex, Some(section.support())).expect("graph-like or not")
+            {
+                let betti = seen.betti_vector();
+                if (betti[0], betti.get(1).copied().unwrap_or(0)) != (components, cycles) {
+                    frames_agree = false;
+                }
+            }
+
+            if horizon >= covering {
+                above_charts.insert(section.lineage.reached.clone());
+                match &above_settled {
+                    None => above_settled = Some(seen.betti_vector()),
+                    Some(first) => {
+                        if *first != seen.betti_vector() {
+                            above_agree = false;
+                        }
+                    }
+                }
+            } else {
+                if section.support.len() >= unbounded_support.len() {
+                    restricted_proper = false;
+                }
+                if seen.betti_vector() != whole.betti_vector() {
+                    restricted_moved = true;
+                }
+                if order == WalkOrder::Breadth {
+                    println!(
+                        "  horizon {horizon:>2} RESTRICTS  cells {:>3}/{:<3}  betti {:?}  frontier {:>2}  closure {:>2}",
+                        section.support.len(),
+                        growth.complex.cells().len(),
+                        seen.betti_vector(),
+                        section.lineage.open_frontier.len(),
+                        section.lineage.closure_added.len(),
+                    );
+                }
+            }
+        }
+    }
+    println!(
+        "  horizon {:>2}+ GAUGE      cells {:>3}      betti {:?}  charts {}",
+        covering,
+        growth.complex.cells().len(),
+        above_settled.clone().unwrap_or_default(),
+        above_charts.len()
+    );
+
+    holds.push((
+        "DILATION above the covering horizon does not move the invariants",
+        above_agree,
+        format!("covering {covering}, betti {:?}", above_settled.unwrap_or_default()),
+    ));
+    holds.push((
+        "the walk order produced distinct charts above covering, so that is not a self-comparison",
+        above_charts.len() > 1,
+        format!("{} distinct charts", above_charts.len()),
+    ));
+    holds.push((
+        "CONTROL below the covering horizon the section is PROPER",
+        restricted_proper,
+        "every sub-covering horizon held fewer cells than the whole".to_owned(),
+    ));
+    holds.push((
+        "CONTROL below the covering horizon the invariants DO move, so the gauge is not vacuous",
+        restricted_moved,
+        "at least one restricting horizon returned different invariants".to_owned(),
+    ));
+    holds.push((
+        "the open frontier is empty exactly when the receiver has covered its own component",
+        frontier_law,
+        "is_covering() agreed with the unbounded-horizon support at every horizon".to_owned(),
+    ));
+    holds.push((
+        "LINEAGE the closure the walk pivoted off is recorded, not folded in",
+        lineage_recorded,
+        "at least one section reached a cell whose faces it had not walked".to_owned(),
+    ));
+    holds.push((
+        "TWO FRAMES Euler-formula and Smith-normal-form agree on every section they both see",
+        frames_agree,
+        "independent implementations, never before compared in this tree".to_owned(),
+    ));
 }
 
 fn main() {
@@ -475,6 +629,8 @@ fn main() {
         one_loop_traded && wound_torsion == vec![num_bigint::BigInt::from(2)],
         format!("cyclic betti {cyclic_betti:?} -> wound betti {wound_betti:?} + {wound_torsion:?}"),
     ));
+
+    dilation_sweep(&mut holds);
 
     // -- report ------------------------------------------------------------------------------
 

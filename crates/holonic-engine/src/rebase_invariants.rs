@@ -49,7 +49,7 @@
 //! can fail, and it is the same shape as the machine-level question: reorganize the computation,
 //! and the invariants must not move.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
@@ -401,9 +401,23 @@ pub fn boundary_matrix(
     complex: &GradedCausalComplex,
     grade: u32,
 ) -> Result<IntegerMatrix, CausalAlgebraicError> {
-    let columns: Vec<CausalCellId> = cells_at(complex, grade);
+    boundary_matrix_on(complex, grade, None)
+}
+
+/// The boundary matrix restricted to a section.
+///
+/// `support` is a set of cells that must already be **closed under boundary** — a genuine
+/// subcomplex, which `GradedCausalComplex::is_closed_support` decides. A support that is not closed
+/// would silently drop faces out of the rows and return invariants for a structure that does not
+/// exist; the caller owes that check, and `dilation::DilatedSection` performs it on construction.
+pub fn boundary_matrix_on(
+    complex: &GradedCausalComplex,
+    grade: u32,
+    support: Option<&BTreeSet<CausalCellId>>,
+) -> Result<IntegerMatrix, CausalAlgebraicError> {
+    let columns: Vec<CausalCellId> = cells_at_on(complex, grade, support);
     let rows: Vec<CausalCellId> = match grade.checked_sub(1) {
-        Some(lower) => cells_at(complex, lower),
+        Some(lower) => cells_at_on(complex, lower, support),
         None => Vec::new(),
     };
     let row_index: BTreeMap<CausalCellId, usize> = rows
@@ -425,11 +439,28 @@ pub fn boundary_matrix(
     Ok(matrix)
 }
 
-fn cells_at(complex: &GradedCausalComplex, grade: u32) -> Vec<CausalCellId> {
+fn section_dimension(
+    complex: &GradedCausalComplex,
+    support: Option<&BTreeSet<CausalCellId>>,
+) -> Option<u32> {
+    complex
+        .cells()
+        .values()
+        .filter(|cell| support.is_none_or(|support| support.contains(&cell.id)))
+        .map(|cell| cell.grade)
+        .max()
+}
+
+fn cells_at_on(
+    complex: &GradedCausalComplex,
+    grade: u32,
+    support: Option<&BTreeSet<CausalCellId>>,
+) -> Vec<CausalCellId> {
     complex
         .cells()
         .values()
         .filter(|cell| cell.grade == grade)
+        .filter(|cell| support.is_none_or(|support| support.contains(&cell.id)))
         .map(|cell| cell.id)
         .collect()
 }
@@ -443,16 +474,29 @@ pub fn rebase_invariants(
     complex: &GradedCausalComplex,
     rule: PivotRule,
 ) -> Result<RebaseInvariants, CausalAlgebraicError> {
-    let top = complex.dimension().unwrap_or(0);
+    rebase_invariants_on(complex, None, rule)
+}
+
+/// The invariants of a section, which is what a receiver at a declared horizon actually holds.
+///
+/// A receiver never sees the whole incidence. `dilation` returns the section a horizon admits, and
+/// this reads its invariants — so "did dilating move the invariants?" is a question with an exact
+/// integer answer rather than a description.
+pub fn rebase_invariants_on(
+    complex: &GradedCausalComplex,
+    support: Option<&BTreeSet<CausalCellId>>,
+    rule: PivotRule,
+) -> Result<RebaseInvariants, CausalAlgebraicError> {
+    let top = section_dimension(complex, support).unwrap_or(0);
     let mut forms: BTreeMap<u32, SmithNormalForm> = BTreeMap::new();
     for grade in 0..=top + 1 {
-        let matrix = boundary_matrix(complex, grade)?;
+        let matrix = boundary_matrix_on(complex, grade, support)?;
         forms.insert(grade, smith_normal_form(&matrix, rule));
     }
 
     let mut grades = Vec::new();
     for grade in 0..=top {
-        let cells = cells_at(complex, grade).len();
+        let cells = cells_at_on(complex, grade, support).len();
         let boundary_rank = forms.get(&grade).map_or(0, SmithNormalForm::rank);
         let filling = forms.get(&(grade + 1));
         let filling_rank = filling.map_or(0, SmithNormalForm::rank);

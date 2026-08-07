@@ -76,6 +76,7 @@ pub mod cuda_aperture;
 pub mod cuda_relation;
 pub mod device;
 pub mod diffusion;
+pub mod dilation;
 pub mod dimensional_receiver;
 pub mod dimensional_wave;
 pub mod display;
