@@ -39,6 +39,30 @@ __global__ void triples_kernel(event::trace_fiber_discovery_observation *o,
       o->inquiry.words[source].words[b],
       o->inquiry.words[source].words[c], source, o->inquiry.triples[at]);
 }
+/// Every triple finds the least index carrying its own fiber key, at once.
+///
+/// This is the ten million comparisons the serial census performed on one
+/// thread. The answer is identical: sequential insertion appends a group the
+/// first time a key appears, so the first-appearance index determines the group
+/// ordinal, and computing it per triple in parallel changes nothing observable.
+__global__ void census_first_kernel(
+    const event::trace_fiber_discovery_observation *o,
+    organ::trace_fiber_workspace *w) {
+  const std::uint32_t index = blockIdx.x * blockDim.x + threadIdx.x;
+  if (index >= organ::trace_fiber_triple_capacity) {
+    return;
+  }
+  std::uint16_t first = static_cast<std::uint16_t>(index);
+  for (std::uint32_t other = 0; other < index; ++other) {
+    if (organ::trace_fiber_census_detail::same_fiber(
+            o->inquiry.triples[other], o->inquiry.triples[index])) {
+      first = static_cast<std::uint16_t>(other);
+      break;
+    }
+  }
+  w->first_of[index] = first;
+}
+
 __global__ void close_kernel(const trace_fiber_discovery_mount *m,
                              event::trace_fiber_discovery_observation *o,
                              organ::trace_fiber_workspace *w) {
@@ -117,6 +141,9 @@ cudaError_t launch_trace_fiber_close(
     const trace_fiber_discovery_mount *m,
     event::trace_fiber_discovery_observation *o,
     organ::trace_fiber_workspace *w) noexcept {
+  // The census first, across the card. 5,184 triples over 128-wide blocks,
+  // against a serial scan that cost about ten million comparisons on one thread.
+  census_first_kernel<<<(organ::trace_fiber_triple_capacity + 127U) / 128U, 128>>>(o, w);
   close_kernel<<<1, 1>>>(m, o, w);
   return cudaGetLastError();
 }

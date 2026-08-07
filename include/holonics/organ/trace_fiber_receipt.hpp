@@ -92,6 +92,18 @@ struct trace_fiber_basis final {
   std::uint8_t rank{};
   bool exact{true};
 };
-struct trace_fiber_workspace final { trace_fiber_basis basis{}; };
+/// The census scratch.
+///
+/// `first_of[i]` is the least index whose fiber key equals triple `i`'s, and
+/// `ordinal_of[i]` is the group that index landed in. Sequential insertion
+/// appends a group the first time a key appears, so a group's ordinal **is** the
+/// rank of its first appearance in index order — which means computing
+/// `first_of` in parallel and assembling in one linear pass returns byte-for-byte
+/// what the quadratic scan returned.
+struct trace_fiber_workspace final {
+  trace_fiber_basis basis{};
+  std::uint16_t first_of[trace_fiber_triple_capacity]{};
+  std::uint16_t ordinal_of[trace_fiber_triple_capacity]{};
+};
 
 } // namespace holonics::organ

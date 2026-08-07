@@ -37,7 +37,7 @@ HOLONICS_CALLABLE inline void close(trace_fiber_discovery_receipt &out,
         ++out.branch_count;
       else
         ++out.two_sheet_count;
-      trace_fiber_census_detail::add_group(out, t);
+      trace_fiber_census_detail::place_group(out, workspace, static_cast<std::uint16_t>(base + i));
       ++population;
     }
   }

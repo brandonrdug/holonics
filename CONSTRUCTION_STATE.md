@@ -394,6 +394,43 @@ spine** (CUT 10). None is claimed done.
 
 Deposited: [the spine, the cut, and the terrain](blueprint/THE_SPINE_THE_CUT_AND_THE_TERRAIN.md).
 
+## Verified position — 2026-08-06, end of session
+
+**Read this before trusting any figure below it.**
+
+**The last gate actually read** is the one after the cut, commit `40e1211`: `100% tests passed, 0
+tests failed out of 126`.
+
+**Two commits after it are UNVERIFIED.** `45ef174` (the transition invariants) and `2e15d4e` (the
+applied flag and the timeouts) were each reported as `126/126` on the strength of a gate run as
+`ctest -j 2 2>&1 | tail -8`. **In a pipeline the exit status is `tail`'s, not ctest's — always
+zero** — and the eight captured lines are the label summary, which prints whether or not tests
+failed. No pass line was ever read. The number was an artifact of the command.
+
+**Currently failing:** the trace-fiber discovery deed, `verification_failures=4`, and the four
+dependents that chain off its rest. The cause is **not** the applied-flag change: restoring that
+handler from `45ef174` leaves the failure in place. It may predate both unverified commits.
+
+**Standing method correction.** A gate is not a gate until its pass line has been read. Never pipe
+ctest through `tail`; capture ctest's own exit status.
+
+### What is nonetheless established this session
+
+- **The cut** — the fabricated-theorem island removed, 7,754 lines, no mathematics lost. Gate read.
+- **The transition invariants** — `grade_transition` previously received only the return and so
+  could not check a transition at all; it now takes the states, and `tests/model/invariant_cases.cpp`
+  drives all eight to false on purpose. Two wired calls were tautological on the first attempt and
+  were corrected. Needs its gate re-read.
+- **The applied flag** — `returned_difference_applied` now reads `accepted && commit landed`; it
+  previously read the commit alone while the commit fired unconditionally, so a rejected return
+  reported as applied. Needs its gate re-read.
+- **The parallel census** — output-identical and confirmed so: `fiber_groups=2072`,
+  `triple_population=5184`, `branch_strata=2580,2604`, `law_residuals=0`, every published figure
+  matching. First-appearance rank **is** the group ordinal, so computing it across the card changes
+  nothing observable. **It produced no speedup — 147 s before and after** — so the hypothesis that
+  the ten-million-comparison census dominated that deed is FALSE. The cost is elsewhere in it and
+  the next step is to instrument the launches rather than guess a third time.
+
 ## Construction provenance
 
 **Truth status:** `historical`.

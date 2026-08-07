@@ -34,6 +34,43 @@ HOLONICS_CALLABLE inline void sorted_roots(
   sorted_roots(b, br);
   return same_lower(a, b) && ar[0] == br[0] && ar[1] == br[1];
 }
+/// Assemble one triple into the census, given the first index carrying its key.
+///
+/// This replaces a linear scan over every group already inserted. The scan cost
+/// 5,184 insertions against up to 2,304 groups — about ten million comparisons
+/// on one GPU thread — and the answer it computed is exactly `first_of`, which a
+/// kernel can compute for every triple at once.
+HOLONICS_CALLABLE inline void place_group(trace_fiber_discovery_receipt &out,
+                                          trace_fiber_workspace &workspace,
+                                          std::uint16_t index) noexcept {
+  const auto &t = out.triples[index];
+  const std::uint16_t first = workspace.first_of[index];
+  if (first != index) {
+    const std::uint16_t at = workspace.ordinal_of[first];
+    workspace.ordinal_of[index] = at;
+    if (at < trace_fiber_group_capacity) {
+      ++out.groups[at].population;
+    }
+    return;
+  }
+  if (out.group_count >= trace_fiber_group_capacity) {
+    workspace.ordinal_of[index] = trace_fiber_group_capacity;
+    return;
+  }
+  std::int64_t roots[2]{};
+  sorted_roots(t, roots);
+  auto &g = out.groups[out.group_count];
+  for (std::uint8_t i = 0; i < trace_fiber_lower_count; ++i)
+    g.lower[i] = t.lower[i];
+  g.roots[0] = roots[0];
+  g.roots[1] = roots[1];
+  g.population = 1;
+  g.branch = t.branch;
+  g.valid = true;
+  workspace.ordinal_of[index] = out.group_count;
+  ++out.group_count;
+}
+
 HOLONICS_CALLABLE inline void add_group(trace_fiber_discovery_receipt &out,
                                         const transition_triple_receipt &t) noexcept {
   std::int64_t roots[2]{};
