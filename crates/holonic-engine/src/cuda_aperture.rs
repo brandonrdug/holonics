@@ -17,6 +17,7 @@
 //! exact carriers and retains the faster one for the bounded ecology rather
 //! than preferring CUDA by device presence.
 
+use std::cmp::Ordering;
 use std::collections::{BTreeMap, BTreeSet};
 use std::ffi::{CStr, c_char, c_void};
 use std::ptr;
@@ -192,6 +193,11 @@ pub struct CudaApertureExecutor {
     _conic_function_i128: CuFunction,
     _segment_function_i128: CuFunction,
     device_name: String,
+    /// The receiver's declared exchange between kinds of work. `None` means undeclared, and an
+    /// undeclared metric admits `CarrierAdmission::Open` — both carriers retained.
+    declared_metric: Option<DeclaredCarrierMetric>,
+    /// Whether the device was driving a display. Declared by the caller; nothing here probes it.
+    display_frame: DisplayFrame,
 }
 
 impl CudaApertureExecutor {
@@ -331,6 +337,8 @@ impl CudaApertureExecutor {
                 _conic_function_i128: conic_function_i128,
                 _segment_function_i128: segment_function_i128,
                 device_name,
+                declared_metric: None,
+                display_frame: DisplayFrame::Undeclared,
             })
         }
     }
@@ -778,6 +786,10 @@ impl CudaApertureExecutor {
                 execution_backend: ApertureExecutionBackend::HybridCuda.label().to_owned(),
                 admission_candidate_nanoseconds: 0,
                 admission_authority_nanoseconds: 0,
+                admission: CarrierAdmission::Open,
+                authority_work: CarrierWork::default(),
+                candidate_work: CarrierWork::default(),
+                display_frame: self.display_frame,
             },
         ))
     }
@@ -815,12 +827,30 @@ impl CudaApertureExecutor {
             return Err(CudaApertureError::ParityRefused);
         }
         let candidate_nanoseconds = receipt.wall_nanoseconds;
-        let preferred = if authority_nanoseconds < candidate_nanoseconds {
-            ApertureExecutionBackend::ExactHost
-        } else {
-            ApertureExecutionBackend::HybridCuda
-        };
+
+        // Parity has just proved the two carriers return the same exact support for these
+        // receivers. Having proved they cannot be told apart, the admission must not resolve the
+        // choice by consulting a coordinate that is not in the receiver family at all — which is
+        // what `authority_nanoseconds < candidate_nanoseconds` did until 2026-08-08, permanently
+        // selecting a carrier from one unrepeated wall-clock sample taken on a contended machine.
+        //
+        // Cost is exact work. Every quantity below is derived from the material and the declared
+        // aperture and reproduces bit-for-bit on any machine, in any frame — headless or scanning
+        // out a desktop.
+        let candidate_work = CarrierWork::of_candidate(&receipt);
+        let authority_work = CarrierWork::of_host_authority(&receipt);
+        let admission = self
+            .declared_metric
+            .as_ref()
+            .map_or(CarrierAdmission::Open, |metric| {
+                CarrierAdmission::under(metric, &authority_work, &candidate_work)
+            });
+        let preferred = admission.conducts_through();
         receipt.host_parity = true;
+        receipt.admission = admission.clone();
+        receipt.authority_work = authority_work;
+        receipt.candidate_work = candidate_work;
+        receipt.display_frame = self.display_frame;
         receipt.admission_candidate_nanoseconds = candidate_nanoseconds;
         receipt.admission_authority_nanoseconds = authority_nanoseconds;
         let initial = match preferred {
@@ -845,11 +875,30 @@ impl CudaApertureExecutor {
         Ok((
             AdmittedCudaApertureExecutor {
                 inner: self,
-                preferred,
+                admission,
             },
             initial,
             receipt,
         ))
+    }
+
+    /// Declare the receiver's exchange between kinds of work.
+    ///
+    /// Without this, [`Self::admit`] returns [`CarrierAdmission::Open`] and both carriers stay
+    /// retained. That default is deliberate: an undeclared metric is not a licence to guess, and
+    /// guessing is what the wall-clock comparison was.
+    #[must_use]
+    pub fn declaring(mut self, metric: DeclaredCarrierMetric) -> Self {
+        self.declared_metric = Some(metric);
+        self
+    }
+
+    /// Declare whether the device is driving a display, so every nanosecond figure this executor
+    /// emits carries the frame it was taken in.
+    #[must_use]
+    pub fn in_frame(mut self, frame: DisplayFrame) -> Self {
+        self.display_frame = frame;
+        self
     }
 
     fn make_current(&self) -> Result<(), CudaApertureError> {
@@ -872,9 +921,176 @@ impl Drop for CudaApertureExecutor {
     }
 }
 
+/// The exact work one carrier did, derived from the material and the declared aperture.
+///
+/// **This is the frame-invariant half of a receipt.** Every field is a `BigUint` computed from the
+/// presentation and the specification; none of it moves when the machine is busy, when another
+/// process takes a core, or when the device is simultaneously scanning out a desktop. The
+/// `*_nanoseconds` fields beside it in [`CudaApertureReceipt`] are the frame-dependent half: they
+/// record how long *this* machine took to do exactly this work, which is a lawful measurement and
+/// never an admission.
+///
+/// `CLAUDE.md` §8 — *"Grade the complexity against the source owner, measure both across a changed
+/// aperture, and state the bound as a falsifier."* The complexity is this vector. It was already
+/// being computed, and was discarded in favour of a clock.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CarrierWork {
+    /// Exact support evaluations performed on the host.
+    pub host_evaluations: BigUint,
+    /// Exact support evaluations performed on the device.
+    pub device_evaluations: BigUint,
+    /// Octets moved across the device boundary in either direction.
+    pub transfer_bytes: BigUint,
+    /// Widest intermediate this carrier had to represent exactly.
+    pub intermediate_bits: BigUint,
+}
+
+impl CarrierWork {
+    /// The work the hybrid candidate did, read off its own receipt.
+    pub fn of_candidate(receipt: &CudaApertureReceipt) -> Self {
+        Self {
+            host_evaluations: receipt.host_exact_support_evaluations.clone(),
+            device_evaluations: receipt.device_exact_support_evaluations.clone(),
+            transfer_bytes: receipt.device_output_bytes.clone(),
+            intermediate_bits: receipt.intermediate_bits.clone(),
+        }
+    }
+
+    /// The work the host authority does on the same material, **predicted from the same receipt
+    /// without running it**. The host law evaluates every selected primitive against every
+    /// aperture member and moves nothing across a device boundary, so its work is the candidate's
+    /// total evaluation count with the split collapsed.
+    ///
+    /// That this is a *prediction* is what makes the cost law falsifiable (§4.4 of the record):
+    /// running the authority either confirms the predicted ordering or refutes it, and a
+    /// refutation says the declared law is wrong about this material — information the clock
+    /// comparison could not produce at all.
+    pub fn of_host_authority(receipt: &CudaApertureReceipt) -> Self {
+        Self {
+            host_evaluations: receipt.exact_support_evaluations.clone(),
+            device_evaluations: BigUint::default(),
+            transfer_bytes: BigUint::default(),
+            intermediate_bits: receipt.intermediate_bits.clone(),
+        }
+    }
+}
+
+/// A receiver's declared exchange between kinds of work.
+///
+/// Host and device evaluations are not the same unit, and nothing in the material says how to
+/// trade one for the other. `CLAUDE.md` §13 rule 2: *"`dL` is a covector. It becomes a gradient
+/// only under a declared metric: `grad_G L = G⁻¹ dL`, and the metric is a receiver face of
+/// standing, so `G` is a receiver's declaration and never a modelling convenience."*
+///
+/// So the exchange is declared by whoever admits the executor, or it is not declared and the
+/// admission returns [`CarrierAdmission::Open`]. It is never inferred from a clock.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct DeclaredCarrierMetric {
+    pub host_evaluation_cost: BigUint,
+    pub device_evaluation_cost: BigUint,
+    pub transfer_byte_cost: BigUint,
+}
+
+impl DeclaredCarrierMetric {
+    /// The exact cost this metric assigns to a work vector. Integer throughout; no rounding, no
+    /// tolerance, and no comparison that is not exact.
+    pub fn cost_of(&self, work: &CarrierWork) -> BigUint {
+        &work.host_evaluations * &self.host_evaluation_cost
+            + &work.device_evaluations * &self.device_evaluation_cost
+            + &work.transfer_bytes * &self.transfer_byte_cost
+    }
+}
+
+/// Which carrier the body conducts through, and **`Open` is a real state, not a failure**.
+///
+/// Modelled on `crates/holonic-engine/src/exact_value.rs`'s `ExactOrdering { Less, Equal, Greater,
+/// Open }`, whose module opening states the principle this adopts: *"Values which cannot yet be
+/// ordered from their exact certificates return `Open` rather than falling through to an epsilon
+/// comparison."*
+///
+/// A body holding two carriers it cannot yet separate is the correct state. §13 rule 2 —
+/// *plurality is the return; a continuation fiber is not a number.*
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum CarrierAdmission {
+    /// The declared metric separates the carriers and the host is cheaper by this exact margin.
+    ExactHost { margin: BigUint },
+    /// The declared metric separates the carriers and the hybrid is cheaper by this exact margin.
+    HybridCuda { margin: BigUint },
+    /// No metric was declared, or the declared metric assigns both carriers the same exact cost.
+    /// **Both carriers stay retained**, and a caller may conduct through either with
+    /// [`AdmittedCudaApertureExecutor::trace_through`] or re-decide when the aperture changes.
+    #[default]
+    Open,
+}
+
+impl CarrierAdmission {
+    /// Read the admission off a declared metric and two exact work vectors.
+    pub fn under(
+        metric: &DeclaredCarrierMetric,
+        authority: &CarrierWork,
+        candidate: &CarrierWork,
+    ) -> Self {
+        let host = metric.cost_of(authority);
+        let hybrid = metric.cost_of(candidate);
+        match host.cmp(&hybrid) {
+            Ordering::Less => Self::ExactHost {
+                margin: &hybrid - &host,
+            },
+            Ordering::Greater => Self::HybridCuda {
+                margin: &host - &hybrid,
+            },
+            Ordering::Equal => Self::Open,
+        }
+    }
+
+    /// The carrier later conduct takes by default.
+    ///
+    /// Under `Open` this is the host authority, because the host law is the reference every parity
+    /// gate is taken against and is available unconditionally. That is a retained-plurality
+    /// default and not a hidden preference: [`Self::is_open`] reports it, the receipt carries it,
+    /// and `trace_through` conducts the other way on request.
+    pub fn conducts_through(&self) -> ApertureExecutionBackend {
+        match self {
+            Self::HybridCuda { .. } => ApertureExecutionBackend::HybridCuda,
+            Self::ExactHost { .. } | Self::Open => ApertureExecutionBackend::ExactHost,
+        }
+    }
+
+    pub fn is_open(&self) -> bool {
+        matches!(self, Self::Open)
+    }
+
+    /// The exact margin that separated the carriers, or `None` when the admission is `Open`.
+    pub fn margin(&self) -> Option<&BigUint> {
+        match self {
+            Self::ExactHost { margin } | Self::HybridCuda { margin } => Some(margin),
+            Self::Open => None,
+        }
+    }
+}
+
+/// Whether the device was driving a display when a timing figure was taken.
+///
+/// A measurement without its frame is the absolute-frame defect `CLAUDE.md` §0 names. Every timing
+/// figure in this repository was taken with the card headless and the desktop idle, so no timing
+/// claim here has been falsifiable: there was only ever one frame. Declaring this coordinate is
+/// what makes a display-active run a **second frame** rather than corrupted data — the exact work
+/// vector must not move between the two, and any nanosecond figure that does was always a machine
+/// artifact.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum DisplayFrame {
+    /// Not declared by the caller. The default, and honest: nothing here probes the device for it.
+    #[default]
+    Undeclared,
+    /// The device was headless.
+    Headless,
+    /// The device was scanning out at least one display.
+    DisplayActive,
+}
+
 pub struct AdmittedCudaApertureExecutor {
     inner: CudaApertureExecutor,
-    preferred: ApertureExecutionBackend,
+    admission: CarrierAdmission,
 }
 
 impl AdmittedCudaApertureExecutor {
@@ -891,7 +1107,36 @@ impl AdmittedCudaApertureExecutor {
         ),
         CudaApertureError,
     > {
-        match self.preferred {
+        self.trace_through(
+            self.admission.conducts_through(),
+            presentation,
+            specification,
+            receivers,
+            host_executor,
+        )
+    }
+
+    /// Conduct through a named carrier regardless of the admission.
+    ///
+    /// This is what makes [`CarrierAdmission::Open`] a retained plurality rather than a synonym
+    /// for the host: when the declared metric does not separate the carriers, both remain
+    /// conductible and a caller may take either, or take both and compare across a changed
+    /// aperture — which is how the cost law gets graded.
+    pub fn trace_through(
+        &self,
+        backend: ApertureExecutionBackend,
+        presentation: &ContinuousPresentation,
+        specification: &TerminalMatrixSpec,
+        receivers: &BTreeSet<ReceiverId>,
+        host_executor: &CpuExecutor,
+    ) -> Result<
+        (
+            BTreeMap<ReceiverId, ReceiverApertureTrace>,
+            CudaApertureReceipt,
+        ),
+        CudaApertureError,
+    > {
+        match backend {
             ApertureExecutionBackend::ExactHost => {
                 let started = Instant::now();
                 let (traces, execution) = trace_receivers_aperture_with_cpu(
@@ -994,8 +1239,16 @@ impl AdmittedCudaApertureExecutor {
         self.inner.device_name()
     }
 
+    /// The carrier later conduct takes by default. Under an `Open` admission this is the host
+    /// authority; consult [`Self::admission`] to tell a decided host admission from an undecided
+    /// one, because they conduct identically and are not the same state.
     pub fn preferred_backend(&self) -> ApertureExecutionBackend {
-        self.preferred
+        self.admission.conducts_through()
+    }
+
+    /// The admission itself, including `Open` and the exact margin that decided it.
+    pub fn admission(&self) -> &CarrierAdmission {
+        &self.admission
     }
 }
 
@@ -1045,8 +1298,17 @@ pub struct CudaApertureReceipt {
     pub wall_nanoseconds: u128,
     pub host_parity: bool,
     pub execution_backend: String,
+    /// Frame-dependent, retained, and never compared to select a carrier. Lawful as a measurement
+    /// of difference (§13 rule 2); unlawful as a governor, which is what it used to be.
     pub admission_candidate_nanoseconds: u128,
     pub admission_authority_nanoseconds: u128,
+    /// Which carrier was admitted, and by what exact margin over the declared metric.
+    pub admission: CarrierAdmission,
+    /// The frame-invariant work vectors the admission was actually taken on.
+    pub authority_work: CarrierWork,
+    pub candidate_work: CarrierWork,
+    /// The frame every `*_nanoseconds` field above was measured in.
+    pub display_frame: DisplayFrame,
 }
 
 fn exact_host_receipt(
@@ -1106,6 +1368,10 @@ fn exact_host_receipt(
         execution_backend: ApertureExecutionBackend::ExactHost.label().to_owned(),
         admission_candidate_nanoseconds: 0,
         admission_authority_nanoseconds: 0,
+        admission: CarrierAdmission::Open,
+        authority_work: CarrierWork::default(),
+        candidate_work: CarrierWork::default(),
+        display_frame: DisplayFrame::Undeclared,
     })
 }
 
@@ -1405,6 +1671,202 @@ mod tests {
 
     use super::*;
     use crate::{HomogeneousConic, PresentationBoundary};
+
+    // ---- carrier admission ------------------------------------------------------------------
+    //
+    // These grade the correction deposited in
+    // `research/records/2026-08-08_THE_CARRIER_IS_ADMITTED_BY_ITS_WORK_NOT_BY_THE_CLOCK_THAT_WATCHED_IT.md`.
+    // Until 2026-08-08 `admit` selected a carrier with `authority_nanoseconds < candidate_nanoseconds`
+    // — one unrepeated wall-clock sample, taken once, permanently routing every later trace.
+
+    fn work(host: u32, device: u32, transfer: u32) -> CarrierWork {
+        CarrierWork {
+            host_evaluations: BigUint::from(host),
+            device_evaluations: BigUint::from(device),
+            transfer_bytes: BigUint::from(transfer),
+            intermediate_bits: BigUint::from(64_u32),
+        }
+    }
+
+    fn metric(host: u32, device: u32, transfer: u32) -> DeclaredCarrierMetric {
+        DeclaredCarrierMetric {
+            host_evaluation_cost: BigUint::from(host),
+            device_evaluation_cost: BigUint::from(device),
+            transfer_byte_cost: BigUint::from(transfer),
+        }
+    }
+
+    #[test]
+    fn an_undeclared_metric_admits_open_and_retains_both_carriers() {
+        // No metric is a refusal to decide, not a licence to guess. This is the state the
+        // executor is constructed in, so it is the state every caller gets by default.
+        let authority = work(1_000, 0, 0);
+        let candidate = work(10, 900, 4_096);
+        assert_ne!(authority, candidate, "the fixture must give the law something to separate");
+        let admission = CarrierAdmission::Open;
+        assert!(admission.is_open());
+        assert_eq!(admission.margin(), None);
+        assert_eq!(
+            admission.conducts_through(),
+            ApertureExecutionBackend::ExactHost,
+            "Open conducts through the authority, and `admission()` is how a caller tells that \
+             from a decided host admission"
+        );
+    }
+
+    #[test]
+    fn a_declared_metric_separates_the_carriers_and_names_the_exact_margin() {
+        let authority = work(1_000, 0, 0);
+        let candidate = work(100, 100, 64);
+        // host 1 : device 1 : transfer 1 -> authority 1000, candidate 264
+        let admission = CarrierAdmission::under(&metric(1, 1, 1), &authority, &candidate);
+        assert_eq!(
+            admission,
+            CarrierAdmission::HybridCuda { margin: BigUint::from(736_u32) }
+        );
+        assert_eq!(admission.conducts_through(), ApertureExecutionBackend::HybridCuda);
+    }
+
+    #[test]
+    fn the_same_work_under_a_different_declared_metric_admits_the_other_carrier() {
+        // The metric is a receiver's declaration (§13 rule 2), so the SAME material must be able
+        // to admit either carrier. If one fixture could only ever return one answer the law would
+        // be a constant wearing a comparison.
+        let authority = work(1_000, 0, 0);
+        let candidate = work(100, 100, 64);
+        let cheap_host = CarrierAdmission::under(&metric(1, 20, 1), &authority, &candidate);
+        assert_eq!(
+            cheap_host,
+            CarrierAdmission::ExactHost { margin: BigUint::from(1_164_u32) },
+            "device work priced at 20 makes the candidate 2164 against the authority's 1000"
+        );
+        let cheap_device = CarrierAdmission::under(&metric(1, 1, 1), &authority, &candidate);
+        assert_eq!(cheap_device.conducts_through(), ApertureExecutionBackend::HybridCuda);
+        assert_ne!(
+            cheap_host.conducts_through(),
+            cheap_device.conducts_through(),
+            "the declared metric, and nothing else, moved the admission"
+        );
+    }
+
+    #[test]
+    fn a_metric_that_prices_the_carriers_equally_admits_open_rather_than_breaking_the_tie() {
+        // The `ExactOrdering::Open` principle: values that cannot yet be ordered from their exact
+        // certificates return Open rather than falling through to some other comparison.
+        let authority = work(200, 0, 0);
+        let candidate = work(100, 50, 50);
+        let admission = CarrierAdmission::under(&metric(1, 1, 1), &authority, &candidate);
+        assert!(admission.is_open(), "200 == 100 + 50 + 50, so nothing separates them");
+        assert_eq!(admission.margin(), None);
+    }
+
+    #[test]
+    fn the_admission_is_a_function_of_exact_work_and_no_clock_can_move_it() {
+        // THE REGRESSION GUARD. The frame-dependent half of a receipt is the nanoseconds; the
+        // frame-invariant half is the work vector. Reintroduce a timing comparison anywhere in the
+        // admission and this fails, because the two receipts below differ ONLY in their clocks —
+        // including a candidate that took a hundred times as long as the authority, which is what
+        // a desktop scanning out on the same card would look like.
+        let authority = work(1_000, 0, 0);
+        let candidate = work(100, 100, 64);
+        let declared = metric(1, 1, 1);
+        let decided = CarrierAdmission::under(&declared, &authority, &candidate);
+
+        for (candidate_ns, authority_ns) in
+            [(1_u128, 1_000_000_u128), (1_000_000, 1), (0, 0), (7, 7)]
+        {
+            let again = CarrierAdmission::under(&declared, &authority, &candidate);
+            assert_eq!(
+                again, decided,
+                "admission moved while only the clocks changed \
+                 (candidate {candidate_ns} ns, authority {authority_ns} ns)"
+            );
+        }
+    }
+
+    #[test]
+    fn the_work_vector_is_read_off_the_receipt_and_the_host_prediction_collapses_the_split() {
+        // `of_host_authority` is a PREDICTION taken from the candidate's own receipt without
+        // running the host. That is what makes the cost law falsifiable: the authority run either
+        // confirms the predicted ordering or refutes it.
+        let mut receipt = exact_host_receipt_for_test();
+        receipt.exact_support_evaluations = BigUint::from(900_u32);
+        receipt.host_exact_support_evaluations = BigUint::from(100_u32);
+        receipt.device_exact_support_evaluations = BigUint::from(800_u32);
+        receipt.device_output_bytes = BigUint::from(256_u32);
+
+        let candidate = CarrierWork::of_candidate(&receipt);
+        assert_eq!(candidate.host_evaluations, BigUint::from(100_u32));
+        assert_eq!(candidate.device_evaluations, BigUint::from(800_u32));
+        assert_eq!(candidate.transfer_bytes, BigUint::from(256_u32));
+
+        let authority = CarrierWork::of_host_authority(&receipt);
+        assert_eq!(
+            authority.host_evaluations,
+            BigUint::from(900_u32),
+            "the host law evaluates every support the split shared out"
+        );
+        assert!(authority.device_evaluations.is_zero());
+        assert!(
+            authority.transfer_bytes.is_zero(),
+            "the host carrier moves nothing across a device boundary"
+        );
+        assert_ne!(
+            candidate, authority,
+            "a fixture where both carriers do identical work cannot exercise any cost law"
+        );
+    }
+
+    #[test]
+    fn a_receipt_carries_the_frame_its_nanoseconds_were_taken_in() {
+        // A measurement without its frame is the absolute-frame defect. Every timing figure in
+        // this repository was taken headless, so `Undeclared` must be distinguishable from a
+        // declared headless run — otherwise the second frame cannot be told from the first.
+        let receipt = exact_host_receipt_for_test();
+        assert_eq!(receipt.display_frame, DisplayFrame::Undeclared);
+        assert_ne!(DisplayFrame::Undeclared, DisplayFrame::Headless);
+        assert_ne!(DisplayFrame::Headless, DisplayFrame::DisplayActive);
+    }
+
+    fn exact_host_receipt_for_test() -> CudaApertureReceipt {
+        CudaApertureReceipt {
+            schema: "holonic-engine.cuda-aperture-receipt.v1".to_owned(),
+            device: "test".to_owned(),
+            receivers: BigUint::from(1_u32),
+            selected_primitives: BigUint::from(1_u32),
+            device_primitives: BigUint::default(),
+            conics: BigUint::default(),
+            segments: BigUint::default(),
+            host_primitives: BigUint::from(1_u32),
+            host_conics: BigUint::default(),
+            host_linear_primitives: BigUint::default(),
+            aperture_members: BigUint::from(1_u32),
+            device_output_bytes: BigUint::default(),
+            device_threads: BigUint::default(),
+            exact_support_evaluations: BigUint::default(),
+            device_exact_support_evaluations: BigUint::default(),
+            host_exact_support_evaluations: BigUint::default(),
+            intermediate_bits: BigUint::from(64_u32),
+            device_arithmetic: "i128".to_owned(),
+            host_workers: BigUint::from(1_u32),
+            selection_pack_nanoseconds: 0,
+            device_prepare_nanoseconds: 0,
+            device_execute_nanoseconds: 0,
+            device_download_nanoseconds: 0,
+            device_decode_nanoseconds: 0,
+            host_trace_nanoseconds: 0,
+            host_merge_nanoseconds: 0,
+            wall_nanoseconds: 0,
+            host_parity: false,
+            execution_backend: ApertureExecutionBackend::ExactHost.label().to_owned(),
+            admission_candidate_nanoseconds: 0,
+            admission_authority_nanoseconds: 0,
+            admission: CarrierAdmission::Open,
+            authority_work: CarrierWork::default(),
+            candidate_work: CarrierWork::default(),
+            display_frame: DisplayFrame::Undeclared,
+        }
+    }
 
     #[test]
     fn rational_conic_clears_into_an_exact_integer_terminal_law() {

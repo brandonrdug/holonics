@@ -283,8 +283,37 @@ should be avoided.
 
 ## Owners
 
-**None.** This record asserts no implementation. The paths named above are the **site of the defect
-and the organs to imitate**, not owners of anything this record built:
+**Four of the six parts were built later the same day, after Brandon read this record.** §4.1, §4.2,
+§4.3 and §4.6 are implemented in `crates/holonic-engine/src/cuda_aperture.rs`; §4.4's predictive
+half is built and its falsifier is not yet driven; §4.5 is not built.
+
+| part | state | owner |
+|---|---|---|
+| §4.1 split the three fused roles | **built** | `CarrierWork`, `DeclaredCarrierMetric`, `CarrierAdmission` — parity is untouched and still refuses on disagreement |
+| §4.2 cost is exact work | **built** | `CarrierWork::of_candidate` reads the `BigUint` quantities the receipt already carried; the clock comparison at `:818` is gone |
+| §4.3 four-state admission with `Open` | **built** | `CarrierAdmission::{ExactHost, HybridCuda, Open}` carrying the exact separating margin; `Open` retains both carriers and `trace_through` conducts either |
+| §4.4 declared, predictive cost law | **half built** | `CarrierWork::of_host_authority` predicts the host's work from the candidate's own receipt without running it, which is the falsifiable half. The metric is a receiver's declaration (`declaring`), never inferred — an undeclared metric admits `Open` rather than guessing. **Not yet driven against a real authority run, so the prediction has never been confronted.** |
+| §4.5 two apertures, non-trivial orbit | **not built** | `examples/desktop_receiver.rs` still runs `640x400` and `640x720` and still compares nothing |
+| §4.6 nanoseconds retained, demoted, framed | **built** | every `*_nanoseconds` field kept and never compared to select a carrier; `DisplayFrame::{Undeclared, Headless, DisplayActive}` on the receipt, declared by the caller via `in_frame` — nothing probes the device, which would be a second unstated frame |
+
+**The design choice worth recording, because the obvious repair is also wrong.** Replacing the clock
+with a weighted sum of work would swap one collapsing scalar for another and would still always
+answer. Host and device evaluations are not the same unit and the material does not say how to trade
+them, so the exchange is a **receiver's declaration** — §13 rule 2, *the metric is a receiver face of
+standing.* Undeclared, the admission is `Open`.
+
+**Graded, with the mutation table.** `cargo test -p holonic-engine --lib cuda_aperture` → 10 passed,
+0 failed. Five mutations applied singly against a gold copy and reverted, restore verified
+byte-identical by sha256; all five die: `under` always `Open` (3 killers), the orderings swapped
+(fails to compile), `Equal` breaking the tie to host instead of `Open` (2), the host prediction
+keeping the device split instead of collapsing it (2), and `Open` conducting through the device (2).
+
+**The bound on that grade, stated here rather than in an errata.** `admit` itself requires a CUDA
+device and is not unit-tested, so the regression guard covers `CarrierAdmission::under` — the law —
+and not the call site. Someone could reintroduce a clock comparison *inside* `admit` and these tests
+would not see it. Closing that needs §4.5's driver, which is the same work.
+
+The paths below are the **site of the defect and the organs imitated**:
 
 - `crates/holonic-engine/src/cuda_aperture.rs` :: `CudaApertureExecutor::admit` — the convicted site
 - `crates/holonic-engine/src/exact_value.rs` :: `ExactOrdering` — the four-state ordering §4.3 adopts
