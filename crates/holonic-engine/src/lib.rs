@@ -158,6 +158,9 @@ pub mod interaction;
 pub mod inverse_transport;
 pub mod live_presentation;
 pub mod local_star;
+// The Chow ring of a matroid. Reached explicitly: its forms are indefinite by construction and a
+// caller who wanted a Gram matrix must not arrive here by accident.
+pub mod matroid_chow;
 pub mod mode;
 // The declared-option modeling surface. Reached explicitly, like the other presentation membranes:
 // an option is a receiver coordinate and every call site must name it as one.
