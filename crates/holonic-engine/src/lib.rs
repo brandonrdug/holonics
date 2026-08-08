@@ -110,6 +110,7 @@ pub mod prime_ecology;
 pub mod realization;
 pub mod rebase_invariants;
 pub mod receiver;
+pub mod receiver_exact_compression;
 pub mod receiver_current;
 pub mod receiver_ecology;
 pub mod receiver_phase_atlas;
