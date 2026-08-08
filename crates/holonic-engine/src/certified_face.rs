@@ -128,10 +128,6 @@ pub struct CellObstruction {
 pub enum ObstructionReason {
     /// The subdivision bound was reached with more than one feature still in the cell.
     SubdivisionBoundReached,
-    /// A cell endpoint is itself a root, so the strict-interval Sturm count does not apply there.
-    /// Reported rather than nudged: moving the endpoint to make the count work would be the
-    /// magic-number-and-retry defect.
-    RootAtCellBoundary,
 }
 
 /// One exactly evaluated station on the curve.
@@ -408,4 +404,356 @@ pub fn mark_census(face: &CertifiedFace) -> BTreeMap<String, usize> {
 }
 
 #[cfg(test)]
-mod tests;
+mod tests {
+    //! Controls for the certified face.
+    //!
+    //! Every law here must be capable of returning non-zero and capable of failing. A test that
+    //! could not have come out otherwise carries no evidence (`CLAUDE.md` §8), so each positive
+    //! control is paired with the negative one that proves the law is looking.
+
+    use num_bigint::BigInt;
+    use relational_geometry::rat;
+
+    use super::*;
+
+    /// x^2 - 2. One root in [0,2] (sqrt 2), irrational and therefore representable by no rational
+    /// sample. A sampler can only bracket it; the certificate counts it exactly.
+    fn quadratic_two() -> IntegerPolynomial {
+        IntegerPolynomial::new(vec![BigInt::from(-2), BigInt::from(0), BigInt::from(1)])
+            .expect("degree two")
+    }
+
+    /// (x-1)(x-2)(x-3) = x^3 - 6x^2 + 11x - 6. Three simple rational roots.
+    fn cubic_three_roots() -> IntegerPolynomial {
+        IntegerPolynomial::new(vec![
+            BigInt::from(-6),
+            BigInt::from(11),
+            BigInt::from(-6),
+            BigInt::from(1),
+        ])
+        .expect("degree three")
+    }
+
+    /// x^2 + 1. No real roots anywhere: the featureless control.
+    fn no_real_roots() -> IntegerPolynomial {
+        IntegerPolynomial::new(vec![BigInt::from(1), BigInt::from(0), BigInt::from(1)])
+            .expect("degree two")
+    }
+
+    /// 1000000 x^2 - 1, i.e. roots at ±1/1000: two features closer together than any coarse cell.
+    fn narrow_pair() -> IntegerPolynomial {
+        IntegerPolynomial::new(vec![
+            BigInt::from(-1),
+            BigInt::from(0),
+            BigInt::from(1_000_000),
+        ])
+        .expect("degree two")
+    }
+
+    #[test]
+    fn a_featureless_window_returns_no_features_and_no_obstructions() {
+        // The control that keeps the obstruction law honest. If this obstructed, the organ would
+        // obstruct everything and the obstruction population would carry no information.
+        let window = ReceiverWindow::new(integer(-3), integer(3), 8, 6).expect("window");
+        let face = certify_face(&no_real_roots(), &window).expect("face");
+        assert_eq!(face.certified_feature_count, 0);
+        assert!(face.features.is_empty());
+        assert!(
+            face.obstructions.is_empty(),
+            "a featureless curve must not obstruct: {:?}",
+            face.obstructions
+        );
+        assert!(face.is_complete());
+        assert!(face.population_reconciles());
+    }
+
+    #[test]
+    fn three_separated_roots_are_all_located() {
+        let window = ReceiverWindow::new(rat(1, 2), rat(7, 2), 8, 8).expect("window");
+        let face = certify_face(&cubic_three_roots(), &window).expect("face");
+        assert_eq!(face.certified_feature_count, 3);
+        assert_eq!(face.features.len(), 3);
+        assert!(face.obstructions.is_empty());
+        assert!(face.population_reconciles());
+    }
+
+    #[test]
+    fn an_irrational_root_is_located_without_any_float() {
+        let window = ReceiverWindow::new(integer(0), integer(2), 4, 8).expect("window");
+        let face = certify_face(&quadratic_two(), &window).expect("face");
+        assert_eq!(face.certified_feature_count, 1);
+        assert_eq!(face.features.len(), 1);
+        let located = &face.features[0];
+        assert!(located.interval.lower < rat(3, 2));
+        assert!(located.interval.upper > rat(7, 5));
+        assert!(face.population_reconciles());
+    }
+
+    /// FALSIFIER ONE — the obstruction falsifier.
+    ///
+    /// Two roots closer together than the cell width, with the subdivision budget removed. A
+    /// sampler's documented behaviour here is to miss them silently. This organ must return them
+    /// as an obstruction that states the count it could not separate.
+    #[test]
+    fn an_unresolvable_cell_returns_an_obstruction_carrying_its_exact_count() {
+        let window = ReceiverWindow::new(integer(-1), integer(1), 1, 0).expect("window");
+        let face = certify_face(&narrow_pair(), &window).expect("face");
+
+        assert_eq!(face.certified_feature_count, 2, "both roots are counted");
+        assert!(
+            face.features.is_empty(),
+            "with no budget neither root can be separated"
+        );
+        assert_eq!(
+            face.obstructions.len(),
+            1,
+            "the unresolved cell must be returned, not dropped"
+        );
+        assert_eq!(
+            face.obstructions[0].unresolved_feature_count, 2,
+            "the obstruction states how many features it could not separate"
+        );
+        assert_eq!(
+            face.obstructions[0].reason,
+            ObstructionReason::SubdivisionBoundReached
+        );
+        assert!(!face.is_complete());
+        assert!(face.population_reconciles());
+    }
+
+    /// The other half of falsifier one: given budget, the same pair IS separated. Without this,
+    /// the obstruction above could be an organ that never resolves anything.
+    #[test]
+    fn the_same_pair_resolves_once_the_budget_allows_it() {
+        let window = ReceiverWindow::new(integer(-1), integer(1), 1, 24).expect("window");
+        let face = certify_face(&narrow_pair(), &window).expect("face");
+        assert_eq!(face.certified_feature_count, 2);
+        assert_eq!(face.features.len(), 2, "with budget both roots separate");
+        assert!(face.obstructions.is_empty());
+        assert!(face.population_reconciles());
+    }
+
+    #[test]
+    fn the_population_always_reconciles_across_subdivision_budgets() {
+        // Whatever subdivision does, located + unresolved must equal the whole-window count. The
+        // sweep is how a lost feature shows up as a failure rather than a thinner picture.
+        let cubic = cubic_three_roots();
+        for budget in 0..10 {
+            for cells in 1..6 {
+                let window =
+                    ReceiverWindow::new(rat(1, 2), rat(7, 2), cells, budget).expect("window");
+                let face = certify_face(&cubic, &window).expect("face");
+                assert_eq!(face.certified_feature_count, 3);
+                assert!(
+                    face.population_reconciles(),
+                    "cells={cells} budget={budget} lost or invented a feature: located={} unresolved={:?}",
+                    face.features.len(),
+                    face.obstructions
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn the_certified_count_is_independent_of_the_aperture() {
+        // The aperture is a receiver coordinate. The feature count in the window is not.
+        let cubic = cubic_three_roots();
+        let counts: Vec<u32> = (1..12)
+            .map(|cells| {
+                let window = ReceiverWindow::new(rat(1, 2), rat(7, 2), cells, 8).expect("window");
+                certify_face(&cubic, &window)
+                    .expect("face")
+                    .certified_feature_count
+            })
+            .collect();
+        assert!(
+            counts.iter().all(|count| *count == 3),
+            "the certificate moved with the aperture: {counts:?}"
+        );
+    }
+
+    /// FALSIFIER THREE, first half — non-creation.
+    #[test]
+    fn emitted_marks_never_exceed_source_structure() {
+        let cubic = cubic_three_roots();
+        for cells in 1..10 {
+            let window = ReceiverWindow::new(rat(1, 2), rat(7, 2), cells, 8).expect("window");
+            let face = certify_face(&cubic, &window).expect("face");
+            let census = mark_census(&face);
+            assert_eq!(
+                census["stations"],
+                (cells + 1) as usize,
+                "a station is a declared cell boundary and nothing else"
+            );
+            let source_items =
+                face.features.len() + face.obstructions.len() + (cells + 1) as usize;
+            let total_marks: usize = census.values().sum();
+            assert!(
+                total_marks <= source_items,
+                "the face minted geometry: {total_marks} marks from {source_items} source items"
+            );
+        }
+    }
+
+    #[test]
+    fn every_station_ordinate_is_the_exact_polynomial_value() {
+        let cubic = cubic_three_roots();
+        let window = ReceiverWindow::new(integer(0), integer(4), 9, 4).expect("window");
+        let face = certify_face(&cubic, &window).expect("face");
+        for station in &face.stations {
+            assert_eq!(
+                station.ordinate,
+                cubic.evaluate(&station.abscissa),
+                "a station ordinate diverged from the exact evaluation"
+            );
+        }
+    }
+
+    #[test]
+    fn the_naive_sign_reading_and_the_certificate_disagree_and_the_certificate_governs() {
+        // The whole argument, made measurable. Two roots inside one cell produce NO sign change
+        // across that cell's endpoints: the naive reading a sampling plotter uses sees nothing,
+        // while the Sturm certificate counts two.
+        let window = ReceiverWindow::new(integer(-1), integer(1), 1, 0).expect("window");
+        let face = certify_face(&narrow_pair(), &window).expect("face");
+        let naive = station_sign_changes(&face);
+        assert_eq!(naive, 0, "the sampled reading sees no sign change");
+        assert_eq!(face.certified_feature_count, 2, "the certificate knows two");
+        assert!(
+            u32::try_from(face.features.len()).unwrap() + naive < face.certified_feature_count,
+            "the disagreement is the point and must be visible in the artifact"
+        );
+    }
+
+    #[test]
+    fn an_inverted_window_is_refused_rather_than_silently_swapped() {
+        assert_eq!(
+            ReceiverWindow::new(integer(3), integer(1), 4, 4).unwrap_err(),
+            FaceError::EmptyWindow
+        );
+    }
+
+    #[test]
+    fn a_vacuous_aperture_is_refused() {
+        assert_eq!(
+            ReceiverWindow::new(integer(0), integer(1), 0, 4).unwrap_err(),
+            FaceError::VacuousAperture
+        );
+    }
+
+    #[test]
+    fn a_root_at_the_window_boundary_is_reported_not_nudged() {
+        // x^2 - 1 has a root at each endpoint of [-1,1]. Moving the window to make the count work
+        // would be the magic-number-and-retry defect; the organ reports instead.
+        let polynomial =
+            IntegerPolynomial::new(vec![BigInt::from(-1), BigInt::from(0), BigInt::from(1)])
+                .expect("degree two");
+        let window = ReceiverWindow::new(integer(-1), integer(1), 4, 4).expect("window");
+        let face = certify_face(&polynomial, &window).expect("face");
+        assert!(
+            !face.obstructions.is_empty(),
+            "a boundary root must be returned as an obstruction"
+        );
+        assert_eq!(
+            face.obstructions[0].reason,
+            ObstructionReason::RootAtCellBoundary
+        );
+    }
+
+    #[test]
+    fn the_face_carries_no_decimal_expansion_anywhere() {
+        // A decimal point in a presented row would mean a float reached the presentation
+        // boundary, which is the one thing this organ exists to prevent.
+        let window = ReceiverWindow::new(integer(0), integer(2), 3, 6).expect("window");
+        let face = certify_face(&quadratic_two(), &window).expect("face");
+        for (abscissa, ordinate) in face.station_rows() {
+            assert!(
+                !abscissa.contains('.') && !ordinate.contains('.'),
+                "a decimal expansion reached a presented row: {abscissa} {ordinate}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_rational_window_with_awkward_denominators_stays_exact() {
+        // Thirds and sevenths terminate in no binary or decimal float. They are exact here.
+        let window = ReceiverWindow::new(rat(1, 3), rat(22, 7), 7, 5).expect("window");
+        let face = certify_face(&cubic_three_roots(), &window).expect("face");
+        assert!(face.population_reconciles());
+        let last = face.stations.last().expect("stations exist");
+        assert_eq!(
+            last.abscissa,
+            rat(22, 7),
+            "the window endpoint survived the cell arithmetic exactly"
+        );
+        assert_eq!(last.ordinate, cubic_three_roots().evaluate(&rat(22, 7)));
+    }
+
+    #[test]
+    fn a_high_multiplicity_root_counts_once_as_a_distinct_root() {
+        // (x-1)^3. Sturm counts DISTINCT roots, so this is one feature, not three. Recorded
+        // because a reader could reasonably expect three, and the distinction is exact.
+        let cubed = IntegerPolynomial::new(vec![
+            BigInt::from(-1),
+            BigInt::from(3),
+            BigInt::from(-3),
+            BigInt::from(1),
+        ])
+        .expect("degree three");
+        let window = ReceiverWindow::new(integer(0), integer(3), 6, 6).expect("window");
+        let face = certify_face(&cubed, &window).expect("face");
+        assert_eq!(
+            face.certified_feature_count, 1,
+            "a triple root is one distinct root"
+        );
+        assert!(face.population_reconciles());
+    }
+
+    #[test]
+    fn the_station_grid_scales_with_the_declared_aperture_only() {
+        let cubic = cubic_three_roots();
+        let widths: Vec<usize> = [2u32, 4, 8, 16]
+            .into_iter()
+            .map(|cells| {
+                let window = ReceiverWindow::new(integer(0), integer(4), cells, 4).expect("window");
+                certify_face(&cubic, &window).expect("face").stations.len()
+            })
+            .collect();
+        assert_eq!(
+            widths,
+            vec![3, 5, 9, 17],
+            "stations are exactly one per cell boundary"
+        );
+    }
+
+    #[test]
+    fn a_wider_window_can_only_gain_features_never_lose_them() {
+        let cubic = cubic_three_roots();
+        let narrow = ReceiverWindow::new(rat(3, 2), rat(5, 2), 4, 6).expect("window");
+        let wide = ReceiverWindow::new(rat(1, 2), rat(7, 2), 4, 6).expect("window");
+        let narrow_face = certify_face(&cubic, &narrow).expect("face");
+        let wide_face = certify_face(&cubic, &wide).expect("face");
+        assert_eq!(narrow_face.certified_feature_count, 1);
+        assert_eq!(wide_face.certified_feature_count, 3);
+        assert!(wide_face.certified_feature_count >= narrow_face.certified_feature_count);
+    }
+
+    #[test]
+    fn the_fixtures_are_what_they_claim_to_be() {
+        // If these polynomials are not what the comments say, every count above measures the
+        // wrong object.
+        let cubic = cubic_three_roots();
+        for root in [integer(1), integer(2), integer(3)] {
+            assert!(
+                cubic.evaluate(&root).is_zero(),
+                "cubic_three_roots does not vanish at a claimed root"
+            );
+        }
+        assert_eq!(
+            quadratic_two().evaluate(&integer(2)),
+            integer(2),
+            "quadratic_two is not x^2 - 2"
+        );
+        assert!(narrow_pair().evaluate(&rat(1, 1000)).is_zero());
+    }
+}

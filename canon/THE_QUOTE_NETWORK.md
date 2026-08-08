@@ -589,8 +589,10 @@ Executable: `soma/life/src/morphological_language/` and `morphological_language.
 carriers. `soma/life/src/resonance_ecology/` carries the leader/front material.
 
 **Absent:** the brain-plus-emergent-limbs architecture; joints/degrees-of-freedom as a measured
-quantity; the symmetry ⇔ closed-loop claim; "ant integration"; "warp and weft". `[measured]` None of
-these five strings occurs anywhere outside `archive/` and the conversation logs. The 2026-07-11
+quantity; the symmetry ⇔ closed-loop claim; "ant integration"; "warp and weft". `[measured]` **partly FALSE, corrected
+2026-08-07**: `canon/04_GEOMETRY_NAVIGATION_AND_WEAVE.md:65-79` carries *ant integration* and
+*warp and weft* as ratified canon, with the definition, and two research records use them
+operationally. The claim stands only for the remaining strings. The 2026-07-11
 vocabulary retirement he issued and that was never honoured belongs here too:
 
 > "I am also considering that we need to not use the word 'germline'. I mean something specific by
@@ -1078,8 +1080,12 @@ promoted into a physical cell"* — plus `receiver_phase_atlas.rs`, `phase_curre
 `research/records/2026-07-30_THE_PRIME_POWER_EMITS_THE_TRAVELING_PHASE_THE_RECEIVER_FORMS_COLOR_AFTER_SUPERPOSITION.md`.
 
 **Absent:** the glyph-invariance requirement is not stated as a constraint on the proof machine
-anywhere; photosynthesis, bioluminescence, and biofluorescence have no representation in this
-repository.
+anywhere; **the photosynthesis clause here was FALSE and is corrected 2026-08-07** — two full
+deposits exist, `research/records/2026-07-27_THE_RECEIVER_ACCEPTS_A_PATH_THE_GATE_CARRIES_THE_BOUNDARY_THE_TERMINAL_REFINES_THE_DIFFERENCE.md`
+(the reception factorization, the scorpion byproduct hypothesis) and
+`research/records/2026-08-05_THE_RECEIVER_QUOTIENTS_THE_SPECTRUM_CAUSALITY_LOCKS_ITS_FACES.md`,
+which is §15's actual answer and which this section never cited. The true and weaker claim is that
+**no code implements them**.
 
 ---
 
@@ -2107,8 +2113,9 @@ immediately proceed into construction" (2026-08-07T18:01:03Z), which is what
 | Skein relations as the certified-remainder condensation | §11 | none — this is `CLAUDE.md` §11's missing organ |
 | His ranking: RH personal, Hodge structurally central | §10 | none |
 | Sevenfold structure in the residue-stratum render | §10 | unchecked against the winding law |
-| Brain-plus-emergent-limbs; joints; symmetry ⇔ closed loop; ant integration; warp and weft | §7 | none |
-| Photosynthesis / bioluminescence / biofluorescence lines | §15 | none |
+| Brain-plus-emergent-limbs; joints; symmetry ⇔ closed loop | §7 | none |
+| ant integration; warp and weft | §7 | **`canon/04_GEOMETRY_NAVIGATION_AND_WEAVE.md:65-79`**, ratified; the `(position ; winding)` datatype is not implemented |
+| Photosynthesis / bioluminescence / biofluorescence lines | §15 | **two deposits** — `2026-07-27_THE_RECEIVER_ACCEPTS_A_PATH…`, `2026-08-05_THE_RECEIVER_QUOTIENTS_THE_SPECTRUM…`; no code |
 | Counterexample search organ (traversal that eliminates redundant checks) | §16 | none |
 | Tiger reconstruction | §17 | **live**, `crates/holonic-engine/examples/curved_receiver_phase_atlas.rs`, input path dead |
 | RAM / clock / storage ontology | §17 | partial, `research/records/2026-08-02_THE_CLOCK_IS_A_RECEIVER_PHASE…` |

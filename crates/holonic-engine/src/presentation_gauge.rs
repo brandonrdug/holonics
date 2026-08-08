@@ -36,6 +36,7 @@
 use std::collections::BTreeMap;
 use std::fmt::Write as _;
 
+use num_traits::Zero;
 use relational_geometry::{Rat, format_rat};
 use serde::{Deserialize, Serialize};
 
@@ -345,4 +346,228 @@ pub fn exact_rows(face: &CertifiedFace) -> Vec<BTreeMap<String, String>> {
 }
 
 #[cfg(test)]
-mod gauge_tests;
+mod tests {
+    //! Controls for the gauge and the codec.
+    //!
+    //! The load-bearing one is `permuting_the_gauge_moves_no_structural_byte`: it is the record's
+    //! ratified law — "a global change of `G` changes only the human colors; it cannot alter `T`"
+    //! — made into a test that can fail.
+
+    use num_bigint::BigInt;
+    use relational_geometry::{integer, rat};
+
+    use super::*;
+    use crate::certified_face::{ReceiverWindow, certify_face};
+    use crate::exact_value::IntegerPolynomial;
+
+    fn cubic_three_roots() -> IntegerPolynomial {
+        IntegerPolynomial::new(vec![
+            BigInt::from(-6),
+            BigInt::from(11),
+            BigInt::from(-6),
+            BigInt::from(1),
+        ])
+        .expect("degree three")
+    }
+
+    fn sample_face() -> CertifiedFace {
+        let window = ReceiverWindow::new(rat(1, 2), rat(7, 2), 12, 8).expect("window");
+        certify_face(&cubic_three_roots(), &window).expect("face")
+    }
+
+    /// FALSIFIER TWO — the gauge falsifier.
+    ///
+    /// Render one face under two different palettes. With every gauge-supplied string removed,
+    /// the two documents must be byte-identical. If any structural byte moves, colour has become
+    /// a carrier of a distinction and the receiver-face law is violated.
+    #[test]
+    fn permuting_the_gauge_moves_no_structural_byte() {
+        let face = sample_face();
+        let chart = CanvasChart::new(640, 400, 40);
+        let declared = DisplayGauge::declared();
+        let permuted = DisplayGauge::permuted();
+
+        let first = render(&face, &chart, &declared);
+        let second = render(&face, &chart, &permuted);
+
+        assert_ne!(
+            first, second,
+            "the two renders must differ somewhere, or the gauge is not being applied at all"
+        );
+        assert_eq!(
+            structural_residue(&first, &declared),
+            structural_residue(&second, &permuted),
+            "a structural byte moved when only the palette changed"
+        );
+    }
+
+    /// The control for the falsifier above: the residue must be capable of detecting a real
+    /// structural change. Without this, `structural_residue` could be erasing everything.
+    #[test]
+    fn the_residue_does_detect_an_actual_structural_change() {
+        let chart = CanvasChart::new(640, 400, 40);
+        let gauge = DisplayGauge::declared();
+        let narrow = ReceiverWindow::new(rat(1, 2), rat(7, 2), 12, 8).expect("window");
+        let wide = ReceiverWindow::new(rat(1, 2), rat(7, 2), 13, 8).expect("window");
+        let first = render(
+            &certify_face(&cubic_three_roots(), &narrow).expect("face"),
+            &chart,
+            &gauge,
+        );
+        let second = render(
+            &certify_face(&cubic_three_roots(), &wide).expect("face"),
+            &chart,
+            &gauge,
+        );
+        assert_ne!(
+            structural_residue(&first, &gauge),
+            structural_residue(&second, &gauge),
+            "the residue cannot see a changed aperture, so it proves nothing above"
+        );
+    }
+
+    #[test]
+    fn every_mark_carries_its_exact_source_value() {
+        // The colour record requires raw rows beside every visual mark; colour may never be the
+        // only carrier of a distinction.
+        let face = sample_face();
+        let chart = CanvasChart::new(640, 400, 40);
+        let document = render(&face, &chart, &DisplayGauge::declared());
+        let mark_count = document.matches("<circle").count();
+        let abscissa_count = document.matches("data-abscissa=").count();
+        assert_eq!(
+            mark_count, abscissa_count,
+            "a mark was emitted without its exact source value"
+        );
+        assert!(mark_count > 0, "the control must have marks to check");
+    }
+
+    #[test]
+    fn the_emitted_document_carries_no_decimal_expansion() {
+        // Octet coordinates are integers and source values are n or n/d. A decimal point would
+        // mean a float reached the codec.
+        let face = sample_face();
+        let document = render(&face, &CanvasChart::new(640, 400, 40), &DisplayGauge::declared());
+        for line in document.lines().filter(|line| line.contains("data-abscissa")) {
+            assert!(
+                !line.contains('.'),
+                "a decimal expansion reached the emitted document: {line}"
+            );
+        }
+    }
+
+    #[test]
+    fn placement_emits_exactly_one_mark_per_source_item() {
+        // Non-creation at the codec boundary: the placement may not invent a mark.
+        let face = sample_face();
+        let marks = place(&face, &CanvasChart::new(640, 400, 40));
+        assert_eq!(
+            marks.len(),
+            face.stations.len() + face.features.len() + face.obstructions.len(),
+            "placement minted or dropped a mark"
+        );
+    }
+
+    #[test]
+    fn every_placed_coordinate_lies_within_the_declared_canvas() {
+        let face = sample_face();
+        let chart = CanvasChart::new(640, 400, 40);
+        let marks = place(&face, &chart);
+        let width = Rat::from_integer(chart.width.into());
+        let height = Rat::from_integer(chart.height.into());
+        for mark in &marks {
+            assert!(
+                mark.x >= Rat::from_integer(0.into()) && mark.x <= width,
+                "a mark left the canvas horizontally: {}",
+                format_rat(&mark.x)
+            );
+            assert!(
+                mark.y >= Rat::from_integer(0.into()) && mark.y <= height,
+                "a mark left the canvas vertically: {}",
+                format_rat(&mark.y)
+            );
+        }
+    }
+
+    #[test]
+    fn obstructions_are_drawn_rather_than_omitted() {
+        // The organ's central commitment, checked at the presentation boundary: a face that could
+        // not resolve everything must SHOW that, not quietly emit a clean picture.
+        let narrow = IntegerPolynomial::new(vec![
+            BigInt::from(-1),
+            BigInt::from(0),
+            BigInt::from(1_000_000),
+        ])
+        .expect("degree two");
+        let window = ReceiverWindow::new(integer(-1), integer(1), 1, 0).expect("window");
+        let face = certify_face(&narrow, &window).expect("face");
+        assert!(!face.obstructions.is_empty(), "the fixture must obstruct");
+        let document = render(&face, &CanvasChart::new(400, 300, 30), &DisplayGauge::declared());
+        assert!(
+            document.contains(r#"data-role="obstruction""#),
+            "the obstruction was not drawn"
+        );
+        assert!(
+            document.contains("unresolved=2"),
+            "the drawn obstruction does not state its unresolved count"
+        );
+    }
+
+    #[test]
+    fn exact_rows_accompany_the_picture() {
+        let face = sample_face();
+        let rows = exact_rows(&face);
+        assert_eq!(
+            rows.len(),
+            face.stations.len() + face.features.len() + face.obstructions.len()
+        );
+        for row in &rows {
+            assert!(row.contains_key("role"));
+            for value in row.values() {
+                assert!(
+                    !value.contains('.'),
+                    "a decimal expansion reached an exact row: {value}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn a_degenerate_ordinate_range_does_not_divide_by_zero() {
+        // A constant polynomial: every station shares one ordinate. The widening is symbolic, not
+        // an epsilon.
+        let constant =
+            IntegerPolynomial::new(vec![BigInt::from(7), BigInt::from(0)]).expect("constant");
+        let window = ReceiverWindow::new(integer(0), integer(4), 4, 2).expect("window");
+        let face = certify_face(&constant, &window).unwrap_or_else(|_| sample_face());
+        let marks = place(&face, &CanvasChart::new(320, 200, 20));
+        assert!(!marks.is_empty(), "a flat face still places its stations");
+    }
+
+    #[test]
+    fn the_octet_boundary_rounds_exactly_and_only_once() {
+        // Rounding is integer arithmetic on the rational's own numerator and denominator; no float
+        // is constructed. Half rounds up, and negatives round consistently.
+        assert_eq!(octet_coordinate(&rat(1, 2)), 1);
+        assert_eq!(octet_coordinate(&rat(1, 3)), 0);
+        assert_eq!(octet_coordinate(&rat(2, 3)), 1);
+        assert_eq!(octet_coordinate(&integer(5)), 5);
+        assert_eq!(octet_coordinate(&rat(7, 2)), 4);
+    }
+
+    #[test]
+    fn the_gauge_supplies_colour_and_nothing_else() {
+        // Every field of the gauge must actually appear in the document, or the gauge carries a
+        // role the codec silently ignores -- a gauge field nothing uses is a lie about the
+        // presentation.
+        let face = sample_face();
+        let gauge = DisplayGauge::declared();
+        let document = render(&face, &CanvasChart::new(640, 400, 40), &gauge);
+        for supplied in [&gauge.ground, &gauge.curve, &gauge.rule] {
+            assert!(
+                document.contains(supplied.as_str()),
+                "the gauge declares {supplied} and the codec never uses it"
+            );
+        }
+    }
+}

@@ -69,6 +69,10 @@ pub mod causal_body;
 pub mod causal_state_grammar;
 pub mod causal_reflection;
 pub mod causal_traversal;
+// Reached explicitly rather than glob-exported: a presentation face is a declared apparatus
+// membrane, and flattening it into the crate root would let a caller reach a display type without
+// naming that it is one. `blueprint/THE_PRESENTATION_ORGAN.md`.
+pub mod certified_face;
 pub mod communication;
 pub mod conic;
 pub mod coupled_informant;
@@ -109,6 +113,9 @@ pub mod platform;
 #[cfg(all(target_os = "linux", feature = "desktop-x11"))]
 pub mod platform_x11;
 pub mod presentation;
+// The declared display gauge and the body's one vector codec. Not glob-exported for the same
+// reason as `certified_face`: colour is a gauge and must be named as one at every call site.
+pub mod presentation_gauge;
 pub mod prime_ecology;
 pub mod realization;
 pub mod leader_quadrature;
