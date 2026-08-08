@@ -140,9 +140,20 @@ pub mod gluing;
 // root where nothing says which form they are of. `blueprint/THE_ASSEMBLY.md` step 6.
 pub mod graded_complex_form;
 pub mod graph_receiver;
+// A size-agnostic recursive cell, the schedules that expand it, and the 2-complex it grows.
+// Declared, never glob-exported: it names `grow`, `split`, `cat` and `evaluate`, and a glob would
+// put those verbs in the crate root where nothing says what material they are of.
+pub mod grown_cell;
 pub mod holonic_complex;
 pub mod image;
 pub mod implicit;
+// Sylvester's law of inertia over exact rationals: the signature of a symmetric form, which is the
+// only way a positivity claim in this body can be a claim about material rather than about the
+// shape of the expression that produced it. Declared, never glob-exported: it names `inertia`,
+// `congruence`, `PivotOrder` and `PivotStep`, and `PivotOrder`/`PivotStep` collide in meaning with
+// `rebase_invariants::PivotRule`/`PivotSchedule` — a form's pivot order and a Smith reduction's
+// must be named apart at every call site.
+pub mod inertia;
 pub mod interaction;
 pub mod inverse_transport;
 pub mod live_presentation;

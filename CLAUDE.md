@@ -234,6 +234,107 @@ Three consequences govern construction:
 Do not upgrade this correspondence to an identity, and do not use it to claim any Millennium
 result. It is a construction-selection principle with one proved instance.
 
+## 2b. A sign is a passage, never a state
+
+**Truth status:** `established-bounded` for the mathematics; `interpretation` for the reading, which
+is Brandon's and was derived with him 2026-08-08.
+
+**The keystone, in his words:**
+
+> *"Integration by **reflection** (lightning arcs; sphere packing) → Information Theory (Computer
+> Science; holomorphic spaces; circuitry) + General Relativity (relativistic physics and
+> mathematics)."*
+
+### What negativity is
+
+Holomorphically, `−1 = e^{iπ}`. There is no separate species of quantity called negative; there is
+rotation, and `−1` is the half-turn. ℝ sees only the two fixed points of conjugation on the unit
+circle, so a sign is **what remains of a phase after the winding is deleted**. That is the float
+argument one level down: a float keeps the magnitude and discards the residual; a sign keeps the
+magnitude and discards the turn.
+
+His 2026-07-04 ruling states the rest, and it governs:
+
+> *"It's actually not {0,1} for our purposes. It's combinations of possibilities where the quantum
+> is between two choices. 2^x."* — and the record's reading: the quantum is **the fork**, not a
+> state, and explicitly not `{±1}`-as-a-value, *"that would re-reify the state with a sign on it."*
+> **What the signed floor signs is the PASSAGE, never the state: CW/CCW = the two hands through the
+> fork.**
+
+And `4 = 2·2` are **different currencies**: the octave (2:1, magnitude, one rank step) and the hand
+(one quarter-turn, phase, costing no action). *"On the unsigned floor the phase factor is INVISIBLE,
+so both factors were booked as magnitude."* Hence `√x = x^{2^{-1}}`: squaring doubles the argument, so
+the `±` of a square root **is** the half-turn squaring erases, because `2(θ+π) ≡ 2θ`. The ambiguity
+is not in the root; it is in the floor that deleted the phase which would have decided it.
+
+### Measured, 2026-08-08, and this is the check
+
+The cycle `C_n`'s adjacency eigenvalues are `2cos(2πk/n)`, one per star polygon `{n/k}` — the n-grams
+on the same vertices, which is why a polygon cannot be had without them.
+
+```text
+  2cos(2πk/n) < 0   ⟺   2πk/n > π/2   ⟺   the step exceeds ONE QUARTER TURN
+```
+
+**The sign of an eigenvalue is the winding of its star polygon past the hand.** The triangle returns
+inertia `(1, 0, 2)` — one zero-frequency passage and two that wind past the quarter — bit-identical
+to what `crates/holonic-engine/src/inertia.rs` computes by pure elimination with no trigonometry
+anywhere. And the null directions sit at exactly `k/n = 1/4, 3/4`, present exactly when `4 | n`:
+**the form returns nothing precisely at the hand.**
+
+### Inertia, re-derived as passages
+
+The state reading — *"p directions are positive"* — is the reification the ruling above strikes. The
+passage reading:
+
+> `Q(v)` is what traversing `v` returns. The **null cone** `{Q(v) = 0}` is where traversal returns
+> nothing. `p` is the largest dimension of a family of passages that **never crosses the null cone**,
+> all returning the same hand.
+
+Sylvester's law of inertia is then not a fact about positivity: **a change of basis relabels
+passages; it neither creates nor destroys them.** The two cones cannot merge because you cannot pass
+between them without passing through zero, and that is an event rather than a coordinate.
+
+**So positivity is not absolute, and the correction is precise.** `A` and `−A` have swapped inertia,
+so which side is called positive is a convention — a hand. Minkowski's `(+,−,−,−)` versus
+`(−,+,+,+)` is a live convention that changes no physics. What no frame touches is **the split**:
+that it is one against nine rather than five against five.
+
+And the two sides are coupled, exactly as concave is to convex. A **definite** form has an *empty*
+null cone — one side has nothing in it — which is a receiver inertially at rest, no vacuous
+difference, no potential. An **indefinite** form has both cones with the null cone between them, and
+**the null cone is the vacuous difference.** In Minkowski it is the light cone.
+
+Superseded by this section: any statement that a form "is positive" as though positivity were a
+property of the form rather than of a declared side. State the **split** and the **hand** separately.
+
+### What it changes for RH and Hodge
+
+- **RH for curves.** `Tr(αα†) > 0` for `α ≠ 0` says: **no nonzero correspondence self-pairs to
+  nothing — the null cone of the trace form is `{0}`.** With `π†π = q` that forces `|σ(π)|² = q`.
+  The open content is therefore *"does a passage exist in the cone"*, which is a **search for an
+  object**, not a proof of a predicate — and searching is what this machine does.
+- **Hodge–Riemann.** The sign is carried by `i^{p−q}`: **the hand is determined by which piece the
+  class sits in and alternates across the pieces.** It is the fork, in the Annals.
+- **The Hodge index theorem** `(1, ρ−1)` is the coupling as a theorem. You cannot have the ample
+  direction without the negative complement; a `(−1)`-curve's `E² = −1` is the necessary other side,
+  not an awkward case.
+- **The integral failure.** Kollár: `pα` algebraic, `α` not — **the passage exists at multiplicity
+  `p` and not at 1.** That is winding that cannot be un-deposited, and it is why
+  `ObstructionSpecies::ReachableOnlyInMultiple { factor }` is the faithful model.
+
+### The standing obligation this creates
+
+**A count of signs is a state reading. Name the windings instead.** Where a form carries a cyclic or
+circulant symmetry its inertia factors through the character group and every negative direction has
+a name — its winding number — so the lawful return is *these nine passages, each labelled by how far
+it winds*, never *nine negative directions*. `inertia.rs` computes the split correctly by elimination
+and does **not** yet name the passages. That is owed.
+
+And the audit this implies, which nobody has run: **every bare sign stored on a conduct path has done
+what a float does.** Find each `-` that is retained state rather than traversal and ask whether the
+turn that produced it was kept.
+
 ## 3. The Millennium problems are on the path
 
 RH and the Hodge conjecture are not distant hard problems this project drifted toward. They are

@@ -21,7 +21,7 @@
 //! A class the receiver can *distinguish* but no realizer can *reach* is an exhibited obstruction.
 //! That is not a defect in the machine; it is the machine locating its own frontier.
 //!
-//! ## The construction, and why the positive form falls out rather than being installed
+//! ## The construction, and what the Gram matrix is — and is not
 //!
 //! Let `M` be the integer incidence of realizers against classes: `M[r][c]` counts the ways
 //! realizer `r` lands in class `c`. Then over the integers:
@@ -30,13 +30,30 @@
 //!   rank(M)                    how many classes are independently reachable
 //!   |C| - rank(M)              classes no realizer reaches even rationally  -- FREE obstruction
 //!   invariant factors above 1  classes reached only in MULTIPLE             -- TORSION obstruction
-//!   M^T M                      the positive form
+//!   M^T M                      the GRAM matrix of the class columns
 //! ```
 //!
-//! `M^T M` is positive semi-definite for free, because `x^T (M^T M) x = |M x|^2`. Nothing installs
-//! positivity; it is a property of the pairing between realizers and what they realize. That is
-//! §2's shape exactly — *"positivity of the trace form on correspondences"*, supplied by
-//! supportedness rather than obtained beside it — at the altitude this machine can compute.
+//! `M^T M` is the **Gram matrix** of the columns of `M` under the standard inner product on the
+//! realizer space: entry `(c, d)` is the ordinary dot product of class `c`'s column with class `d`'s.
+//! Its positive semi-definiteness is automatic — `x^T (M^T M) x = |M x|^2 >= 0` for *every* integer
+//! matrix and *every* probe — so it is a property of the expression `M^T M` and not of the realizer
+//! population that was fed to it. No incidence whatsoever could make it come out otherwise, which by
+//! `CLAUDE.md` §8's tautology rule is exactly as much evidence as it carries: none. A test asserting
+//! it was removed 2026-08-08; see `the_gram_nullity_is_the_corank_of_the_incidence`.
+//!
+//! **This module previously called that "§2's shape exactly — positivity of the trace form on
+//! correspondences". It is not, and the correction is not cosmetic.** The trace form on
+//! correspondences is *indefinite*. The Castelnuovo/Hodge-index content is that its **signature** is
+//! `(1, rho - 1)` — one plus direction, everything else negative — and the Hodge--Riemann relations
+//! likewise say an a-priori indefinite form becomes definite only after restriction to a primitive
+//! subspace and a single Hodge type, with the sign alternating with degree. Those are signature
+//! theorems whose count can come out wrong. A Gram matrix's positivity cannot, which is why reaching
+//! for one was the symptom rather than the construction: it is the only positive form available to a
+//! body with no inertia routine. That routine now exists at [`crate::inertia`].
+//!
+//! Read through it, `M^T M` does report something about `M` that can fail: its nullity is
+//! `|C| - rank(M)` and its positive count is `rank(M)`. That is a joint statement about the incidence
+//! and about the elimination, and it is what this module now checks.
 //!
 //! **The torsion column is the whole point.** A class reached only as `2·c` and never as `c` is
 //! supported over the rationals and unsupported over the integers, and the cokernel records a
@@ -142,10 +159,17 @@ pub fn incidence(realizations: &[Realization], class_extent: usize) -> IntegerMa
     matrix
 }
 
-/// The positive form `M^T M`.
+/// The Gram matrix `M^T M` of an incidence's class columns.
 ///
-/// Positive semi-definite by construction, since `x^T (M^T M) x = |M x|^2`. It is computed rather
-/// than assumed so that `the_form_is_positive_semi_definite_on_every_probe` has something to check.
+/// Entry `(c, d)` is the ordinary dot product of class `c`'s column with class `d`'s, so the result
+/// is symmetric and positive semi-definite **by construction**: `x^T (M^T M) x = |M x|^2`. That
+/// positivity is a fact about the expression, true of every integer matrix, and therefore not a
+/// finding about any realizer population — see this module's header for why the name "the positive
+/// form" was withdrawn.
+///
+/// What the Gram matrix does carry is the geometry of the pairing. Over a field
+/// `rank(M^T M) = rank(M)`, so its inertia is `(rank(M), |C| - rank(M), 0)` — a statement about `M`
+/// which [`crate::inertia::inertia`] returns independently and which can be wrong.
 pub fn positive_form(incidence: &IntegerMatrix) -> IntegerMatrix {
     let mut form = IntegerMatrix::zeros(incidence.columns(), incidence.columns());
     for left in 0..incidence.columns() {
@@ -249,6 +273,7 @@ pub fn landings_from_classes(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::inertia::{SymmetricForm, inertia};
 
     fn realization(realizer: u64, landings: &[(usize, i64)]) -> Realization {
         Realization {
@@ -341,12 +366,20 @@ mod tests {
     }
 
     // -----------------------------------------------------------------------------------------
-    // the positive form
+    // the Gram matrix
+    //
+    // `the_form_is_positive_semi_definite_on_every_probe` stood here until 2026-08-08. It asserted
+    // `x^T (M^T M) x >= 0` over seven hand-chosen probes, which is true of every integer matrix and
+    // every probe: the assertion could not have come out otherwise on any input, so by `CLAUDE.md`
+    // §8 it carried no evidence. The two tests below are what it is replaced with. The first checks
+    // an IDENTITY rather than an inequality — it can fail, and would, if `positive_form` computed
+    // `M M^T` or mis-indexed. The second reads the Gram matrix's SIGNATURE through
+    // `crate::inertia`, which is a joint statement about `M` and about the elimination.
 
-    /// `x^T (M^T M) x = |M x|^2 >= 0` for every integer probe. Nothing installs this; it is a
-    /// property of the pairing. If it ever failed, the form would not be the one §2 asks for.
+    /// `x^T (M^T M) x = |M x|^2` exactly. An identity, not an inequality: a transposed or
+    /// mis-indexed `positive_form`, or a `quadratic_value` that dropped the cross terms, breaks it.
     #[test]
-    fn the_form_is_positive_semi_definite_on_every_probe() {
+    fn the_form_evaluates_to_the_squared_length_of_the_image() {
         let realizations = vec![
             realization(0, &[(0, 3), (1, -2)]),
             realization(1, &[(1, 5), (2, 1)]),
@@ -355,6 +388,7 @@ mod tests {
         let matrix = incidence(&realizations, 3);
         let form = positive_form(&matrix);
 
+        let mut saw_asymmetric_probe = false;
         for probe in [
             [1i64, 0, 0],
             [0, 1, 0],
@@ -364,13 +398,8 @@ mod tests {
             [-11, 7, -13],
             [0, 0, 0],
         ] {
+            saw_asymmetric_probe |= probe.iter().any(|value| *value < 0);
             let vector: Vec<BigInt> = probe.iter().map(|value| BigInt::from(*value)).collect();
-            let value = quadratic_value(&form, &vector);
-            assert!(
-                value >= BigInt::zero(),
-                "the form returned {value} on probe {probe:?}; a positive form cannot"
-            );
-            // And it equals |M x|^2 exactly, which is the reason it is positive.
             let mut squared = BigInt::zero();
             for row in 0..matrix.rows() {
                 let mut entry = BigInt::zero();
@@ -379,8 +408,93 @@ mod tests {
                 }
                 squared += &entry * &entry;
             }
-            assert_eq!(value, squared, "probe {probe:?}");
+            assert_eq!(quadratic_value(&form, &vector), squared, "probe {probe:?}");
         }
+        assert!(
+            saw_asymmetric_probe,
+            "unit and all-ones probes cannot separate M^T M from M M^T; a mixed-sign probe must run"
+        );
+    }
+
+    /// What the Gram matrix genuinely reports about the incidence it came from.
+    ///
+    /// Over a field `rank(M^T M) = rank(M)`, so the inertia of `M^T M` must be exactly
+    /// `(rank(M), |C| - rank(M), 0)`. The rank is taken independently, by the Smith normal form of
+    /// `M` itself; the inertia is taken by an elimination that never sees `M`. Either could
+    /// disagree with the other, and a rank-deficient incidence is included on purpose — a corank
+    /// check run only on invertible material asserts `0 == 0` and is the tautology again.
+    #[test]
+    fn the_gram_nullity_is_the_corank_of_the_incidence() {
+        let cases: [(Vec<Realization>, usize); 6] = [
+            // full column rank: nullity zero
+            (
+                vec![
+                    realization(0, &[(0, 3), (1, -2)]),
+                    realization(1, &[(1, 5), (2, 1)]),
+                    realization(2, &[(0, -7), (2, 4)]),
+                ],
+                3,
+            ),
+            // two proportional realizers over three classes: rank one, nullity two
+            (
+                vec![
+                    realization(0, &[(0, 1), (1, 2)]),
+                    realization(1, &[(0, 2), (1, 4)]),
+                ],
+                3,
+            ),
+            // two classes reached, four declared: nullity two
+            (
+                vec![realization(0, &[(0, 1)]), realization(1, &[(1, 1)])],
+                4,
+            ),
+            // the torsion fixture — integrally obstructed, rationally full rank
+            (
+                vec![realization(0, &[(0, 2)]), realization(1, &[(1, 1)])],
+                2,
+            ),
+            (
+                vec![
+                    realization(0, &[(0, 1), (1, 1)]),
+                    realization(1, &[(0, 1), (1, -1)]),
+                ],
+                2,
+            ),
+            // nothing produced at all: the Gram matrix is the zero form, nullity is the whole family
+            (Vec::new(), 3),
+        ];
+
+        let mut saw_degenerate = false;
+        let mut saw_nondegenerate = false;
+        for (realizations, class_extent) in &cases {
+            let matrix = incidence(realizations, *class_extent);
+            let form = positive_form(&matrix);
+            let rank = smith_normal_form(&matrix, PivotRule::FirstNonzero).rank();
+            let reading = inertia(
+                &SymmetricForm::from_integer_matrix(&form).expect("a Gram matrix is symmetric"),
+            );
+
+            assert_eq!(
+                reading.zero,
+                class_extent - rank,
+                "the Gram matrix's nullity must be the incidence's corank; rank {rank}, \
+                 classes {class_extent}, inertia {reading:?}"
+            );
+            assert_eq!(
+                reading.positive, rank,
+                "and its positive count must be the incidence's rank; inertia {reading:?}"
+            );
+            // Not asserted as evidence of positivity — that is the tautology. Asserted because the
+            // elimination is an independent computation that must agree with the algebra.
+            assert_eq!(reading.negative, 0, "inertia {reading:?}");
+
+            saw_degenerate |= reading.is_degenerate();
+            saw_nondegenerate |= !reading.is_degenerate();
+        }
+        assert!(
+            saw_degenerate && saw_nondegenerate,
+            "the corank check saw only one side, so it never had to distinguish anything"
+        );
     }
 
     #[test]

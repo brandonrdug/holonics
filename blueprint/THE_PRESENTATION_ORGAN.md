@@ -174,6 +174,78 @@ not have come out otherwise carries no evidence. Each falsifier below must be ca
 
 ---
 
+---
+
+## Part two — the modeling surface
+
+**Provenance:** Brandon, 2026-08-08: *"I would like to be able to model advanced mathematics
+topologies, geometries, and various other complex figures. The way that they represent providing
+parameters to functions is also perfect."*
+
+Part one built one certified face. This part answers the second half of the request: the **option
+convention**, and the objects this body actually has to model.
+
+### The option convention is adopted; two faculties inside it are refused
+
+Mathematica's convention is that a call names the object and the domain, and every other degree of
+freedom is a named, defaulted, inspectable option — `PlotPoints`, `MeshFunctions`,
+`ScalingFunctions`, `ColorFunction`, `RegionFunction`. Its virtue is that the assumptions are
+declared where a reader can see them. That is adopted wholesale, in structure and in spirit:
+`ModelOptions` carries each as a typed field, and `ModelOptions::record()` deposits the option set
+**into the emitted artifact**, so a figure carries the assumptions it was made under.
+
+In holonic vocabulary an option is a **receiver coordinate**: it says how a receiver reads, never
+what the object is. `option_change_never_moves_the_object` enforces exactly that — changing the
+scaling changes what is read, and the winding does not move.
+
+Two of Wolfram's faculties cannot cross into this body, and the reasons are arithmetic rather than
+doctrinal:
+
+| Wolfram | Why it cannot be computed here | The exact object that replaces it |
+|---|---|---|
+| `Arg[f]` — the colour wheel of `ComplexPlot3D` | transcendental; **`atan2` appears nowhere in either repository**, verified by search | the **winding number**: `eta_boundary_winding` already returns a certified integer from sign-of-cross-product ray crossings, and `read_turn` gives the same for any walk |
+| `Abs[f]` — the height of `ComplexPlot3D` | `sqrt` is transcendental and a rational has no rational modulus | `SquaredModulus` (`|z|² = Re²+Im²`, exactly rational) |
+| `ScalingFunctions -> "Log"` | transcendental | `IntegerDecades`: the exact integer `k` with `10^k ≤ |v| < 10^(k+1)`, by integer comparison |
+| `MeshFunctions` by interpolation | a contour fitted through samples is not a witnessed statement | a **certified sign change** of `reading − level`, bracketed between stations |
+
+**This is a strengthening, not a compromise.** A phase colour wheel shows a reader where a zero
+probably is. A winding number over a closed boundary *proves how many zeros are inside it* — and
+Wolfram's own documentation concedes its samplers may miss features. The image polygon that
+`WindingReceipt` already carries is that proof made drawable: the curve encircles the origin exactly
+`winding` times, and no angle is computed anywhere.
+
+### The three objects this surface must carry
+
+Measured in both repositories, 2026-08-08. Each is already exact; none needed new mathematics.
+
+1. **The zeta/eta face.** `eta_boundary_winding`, `eta_evaluate`, `eta_partial_current` over
+   `ComplexReceiverBox { sigma, tau }` — the complex plane as a lattice of rational rectangles, never
+   as points. Certified winding per box is an exact zero count.
+2. **The lightning face.** `leader_quadrature::integrate_by_leaders` — integration by lightning
+   leaders over an exact rational interval, where `LocalJet::swept` is itself a winding and each
+   extension rebases the material boundary it reads. This is the reflective-integration law in
+   `research/records/2026-07-30_THE_REFLECTION_RETURNS_TO_THE_BODY_THE_LIGHT_FRONT_CANNOT_CLONE_THE_WORLD.md`
+   made computational: *"A caused difference reaches a receiver, changes that receiver's local
+   morphology, and leaves as a further caused difference."*
+3. **The invariant face.** `rebase_invariants` and `smith_normal_form` over a singly-graded complex:
+   per-grade Betti numbers and torsion, exact over `Z`.
+
+### The Hodge boundary, stated before anything is drawn
+
+`CONSTRUCTION_STATE.md` already rules on this and the ruling binds every figure produced here:
+*"`Hodge` in the live body names the cellular-sheaf Laplacian in `sheaf_diffusion.rs`, a discrete
+differential operator — **not** the supported-realization mechanism … Do not read one for the
+other."* Verified independently: no `p,q` bigrading, no `F^p` filtration, no Hodge star, no Dolbeault
+operator exists in any live Rust file in either repository.
+
+**Therefore no figure from this surface may be captioned as a Hodge decomposition, and no Hodge
+diamond may be drawn.** The invariant face renders a singly-graded complex and must say so in its
+own title. A figure that implied a bigrading would be manufacturing a mathematical structure the
+body does not have, which is the same defect as minting geometry — worse, because it would be
+minting a theorem.
+
+---
+
 ## What this contract does not license
 
 - It does not schedule work. `blueprint/THE_ROADMAP.md` schedules work.
