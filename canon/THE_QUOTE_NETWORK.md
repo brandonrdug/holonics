@@ -761,7 +761,7 @@ deposit, and it carries the laboratory's machine-checked answer verbatim from
 continuum to subdivide; there is a LINEAGE of discrete events (windings), and the area IS the exact
 running sum of them. No mesh, no limit, no error."*
 
-**No Rust owner implements lightning-leader quadrature.** The closest live material is
+**Stale as of `a444d78`, 2026-08-07.** `crates/holonic-engine/src/leader_quadrature.rs` now implements lightning-leader quadrature, with the self-similarity termination law measured. As deposited this line read: *"No Rust owner implements lightning-leader quadrature."* The closest live material is
 `crates/holonic-engine/src/wave_propagation.rs`, `diffusion.rs`, `sheaf_diffusion.rs`, and the
 RELAMPAGO lightning ecologies. Sphere-packing appears nowhere. The self-similarity termination
 criterion is undeposited as a falsifier.
