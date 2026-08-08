@@ -260,8 +260,17 @@ fn exhibit_collapsed(
                 });
                 break;
             }
+            // BOTH sides terminate on this input. That is not a distinction and it is not the end of
+            // the search — the rest of the frontier may still separate them on another input.
+            //
+            // This read `break` until 2026-08-07, which abandoned the whole search and made
+            // `is_exact()` return true while `refinement()` was nonzero: adding an input the system
+            // admits could make the reported loss go from one pair to zero. No fixture in this
+            // module could catch it, because none of them ever enqueues a both-terminate frontier
+            // entry — the cyclic counter is total, and `TwoRoutes` rests where it is rather than
+            // stopping.
             let (Some(here_item), Some(there_item)) = (here, there) else {
-                break;
+                continue;
             };
             if !word.is_empty() {
                 if let Some(receiver) = receivers.iter().copied().find(|receiver| {
@@ -538,6 +547,61 @@ mod tests {
             "the two-step route through A is shortest; the four-step route through B also works \
              and must not be what is returned"
         );
+    }
+
+    /// Both sides terminating on one input must not end the search.
+    ///
+    /// Input `A` stops both `0` and `1`; input `B` sends them to items a receiver separates. The
+    /// pair is genuinely collapsed and must be reported whether or not `A` is declared. Before the
+    /// fix, declaring `A` alongside `B` silently dropped the pair and `is_exact()` returned true
+    /// while `refinement()` stayed at 1 — a reported loss of zero on a system that loses something.
+    struct BothStop;
+    impl ObservedSystem for BothStop {
+        fn items(&self) -> Vec<ItemId> {
+            (0..4).map(ItemId).collect()
+        }
+        fn receivers(&self) -> Vec<ReceiverId> {
+            vec![ReceiverId(0)]
+        }
+        fn inputs(&self) -> Vec<InputId> {
+            vec![InputId(0), InputId(1)]
+        }
+        fn observation(&self, item: ItemId, _receiver: ReceiverId) -> Observation {
+            match item.0 {
+                2 => Observation(1),
+                3 => Observation(2),
+                _ => Observation(0),
+            }
+        }
+        fn successor(&self, item: ItemId, input: InputId) -> Option<ItemId> {
+            match (item.0, input == InputId(0)) {
+                (_, true) => None,
+                (0, false) => Some(ItemId(2)),
+                (1, false) => Some(ItemId(3)),
+                _ => None,
+            }
+        }
+    }
+
+    #[test]
+    fn a_both_terminating_input_does_not_end_the_search_for_a_distinguishing_word() {
+        let compression = compress(&BothStop);
+        assert!(
+            !compression.is_exact(),
+            "the pair (0,1) is separated by input B and must be reported"
+        );
+        assert_eq!(
+            compression.refinement() > 0,
+            !compression.is_exact(),
+            "is_exact() and refinement() must never contradict each other"
+        );
+        let pair = compression
+            .collapsed
+            .iter()
+            .find(|pair| (pair.left, pair.right) == (ItemId(0), ItemId(1)))
+            .expect("the collapsed pair is exhibited, not silently dropped");
+        assert_eq!(pair.distinguishing_word, vec![InputId(1)]);
+        assert!(pair.witness.is_some());
     }
 
     /// A terminus is a distinction. Two items that read alike but where one continues and the

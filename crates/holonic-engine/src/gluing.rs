@@ -46,6 +46,8 @@
 
 use std::collections::BTreeSet;
 
+use num_bigint::BigInt;
+
 use serde::{Deserialize, Serialize};
 
 use crate::algebraic::{CausalAlgebraicError, CausalCellId, GradedCausalComplex};
@@ -104,12 +106,24 @@ pub struct GluingReading {
     /// Whether `b_n(A∪B) <= b_n(A) + b_n(B) + b_{n-1}(A∩B)` at every grade — the finer rank
     /// consequence of exactness, which the Euler identity alone does not imply.
     pub rank_bound_holds: bool,
+    /// Per grade, torsion the union carries that neither section does.
+    ///
+    /// **`obstruction` above cannot see this and never could.** It is solved arithmetically from
+    /// four Betti vectors, and Betti numbers are free ranks — torsion is invisible to every term in
+    /// that solve. A Möbius band glued to a disc along their common circle is `RP²`: both sections
+    /// are torsion-free, the overlap is torsion-free, the union carries `Z/2`, and the free-rank
+    /// obstruction is **zero at every grade**. The organ reported a clean gluing on the exact case
+    /// its own doc claims as its headline — a class living in neither receiver.
+    ///
+    /// So the connecting map's rank is necessary and not sufficient. This is the other half.
+    pub torsion_obstruction: Vec<Vec<BigInt>>,
 }
 
 impl GluingReading {
     /// The cover exhibits a class neither receiver sees.
     pub fn exhibits_obstruction(&self) -> bool {
         self.obstruction.iter().any(|delta| *delta != 0)
+            || self.torsion_obstruction.iter().any(|grade| !grade.is_empty())
     }
 
     /// The grades at which the union and the pieces disagree, with the amount.
@@ -225,6 +239,39 @@ pub fn read_cover(
         }
     }
 
+    // Torsion the union carries that neither section does, per grade. A multiset difference, so a
+    // union carrying Z/2 twice where a section carries it once still reports one.
+    let mut torsion_obstruction = Vec::with_capacity(grades);
+    for grade in 0..grades {
+        let mut held: Vec<BigInt> = left
+            .grades
+            .get(grade)
+            .map(|entry| entry.torsion.clone())
+            .unwrap_or_default();
+        held.extend(
+            right
+                .grades
+                .get(grade)
+                .map(|entry| entry.torsion.clone())
+                .unwrap_or_default(),
+        );
+        let mut unmatched = Vec::new();
+        for factor in union
+            .grades
+            .get(grade)
+            .map(|entry| entry.torsion.clone())
+            .unwrap_or_default()
+        {
+            match held.iter().position(|carried| *carried == factor) {
+                Some(at) => {
+                    held.remove(at);
+                }
+                None => unmatched.push(factor),
+            }
+        }
+        torsion_obstruction.push(unmatched);
+    }
+
     let euler_defect = union.euler_characteristic() - left.euler_characteristic()
         - right.euler_characteristic()
         + overlap.euler_characteristic();
@@ -237,6 +284,7 @@ pub fn read_cover(
         obstruction,
         euler_defect,
         rank_bound_holds,
+        torsion_obstruction,
     })
 }
 
@@ -464,6 +512,70 @@ mod tests {
                 "and it comes from the overlap being DISCONNECTED (n={length})"
             );
         }
+    }
+
+    /// A Mobius band glued to a disc along their common circle is `RP²`, and this is the case the
+    /// free-rank obstruction is structurally blind to.
+    ///
+    /// `d(M) = z - 2c`, `d(D) = z`. Both sections are torsion-free, the overlap is torsion-free,
+    /// and the union carries `Z/2` — a class in **neither** receiver, which is the sentence this
+    /// module opens with. The connecting map's rank is `0` at every grade, because it is solved from
+    /// four Betti vectors and Betti numbers cannot see torsion. Before `torsion_obstruction` this
+    /// returned a clean gluing on the headline case.
+    #[test]
+    fn the_free_rank_obstruction_is_blind_to_a_torsion_class_in_neither_section() {
+        let mut complex = GradedCausalComplex::default();
+        let vertex = complex
+            .found_cell("v", source(), 0, CausalChain::default())
+            .unwrap();
+        let loop_at = |complex: &mut GradedCausalComplex, name: &str| {
+            let mut boundary = CausalChain::default();
+            boundary.add_term(vertex, ComparativeMultiplicity::positive(1u32));
+            boundary.add_term(vertex, ComparativeMultiplicity::negative(1u32));
+            complex.found_cell(name, source(), 1, boundary).unwrap()
+        };
+        let rim = loop_at(&mut complex, "z");
+        let core = loop_at(&mut complex, "c");
+
+        let mut band = CausalChain::default();
+        band.add_term(rim, ComparativeMultiplicity::positive(1u32));
+        band.add_term(core, ComparativeMultiplicity::negative(2u32));
+        let moebius = complex.found_cell("M", source(), 2, band).unwrap();
+
+        let mut cap = CausalChain::default();
+        cap.add_term(rim, ComparativeMultiplicity::positive(1u32));
+        let disc = complex.found_cell("D", source(), 2, cap).unwrap();
+
+        let cover = Cover {
+            left: BTreeSet::from([vertex, rim, core, moebius]),
+            right: BTreeSet::from([vertex, rim, disc]),
+        };
+        let reading = read_cover(&complex, &cover, PivotRule::FirstNonzero).unwrap();
+
+        assert!(reading.left.total_torsion().is_empty(), "the band is torsion-free");
+        assert!(reading.right.total_torsion().is_empty(), "the disc is torsion-free");
+        assert!(reading.overlap.total_torsion().is_empty(), "the circle is torsion-free");
+        assert_eq!(
+            reading.union.total_torsion(),
+            vec![BigInt::from(2)],
+            "their union is RP-two and carries Z/2"
+        );
+
+        assert!(
+            reading.obstruction.iter().all(|rank| *rank == 0),
+            "the free-rank obstruction sees nothing here, and structurally cannot: {:?}",
+            reading.obstruction
+        );
+        assert_eq!(
+            reading.torsion_obstruction[1],
+            vec![BigInt::from(2)],
+            "the torsion half must name it at grade one"
+        );
+        assert!(
+            reading.exhibits_obstruction(),
+            "a class in neither receiver is an obstruction whether it is free or torsion"
+        );
+        assert_eq!(reading.euler_defect, 0, "exactness still holds");
     }
 
     /// The control without which the obstruction proves nothing: a cover that must glue cleanly

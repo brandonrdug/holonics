@@ -68,6 +68,7 @@ pub mod causal;
 pub mod causal_body;
 pub mod causal_state_grammar;
 pub mod causal_traversal;
+pub mod communication;
 pub mod conic;
 pub mod coupled_informant;
 #[cfg(target_os = "linux")]
