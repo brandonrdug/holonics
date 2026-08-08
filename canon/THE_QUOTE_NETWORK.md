@@ -676,12 +676,32 @@ Byrne's *Elements* proposed as a reasoning mode, not a style:
 that the expansion schedule is a receiver and the invariants are Betti numbers, torsion, and hinge
 deficit. `canon/01_CAUSAL_CALCULUS.md` holds the causal-calculus doctrine.
 
-**No code implements it.** The nearest carriers are
-`crates/holonic-engine/src/simplicial.rs` and `holonic_complex.rs`,
-`crates/holonic-engine/examples/whole_receiver_holonic_complex.rs`, and `soma/surface` (4,977 lines,
-wgpu 27, ships `soma/kernel/soma.spv` at 2,538,328 bytes). "Relativistic calculus of information
-topology" appears nowhere. The **triangular hinge-like simplicial complex** he names as prior art is
-unrecovered. Byrne's styling is not present in `papers/source/` as a reasoning mode.
+**"No code implements it" until 2026-08-08 — CORRECTED, and it was two-thirds wrong.**
+
+**The grown-circuit half is built.** `crates/holonic-engine/src/grown_cell.rs` grows a size-agnostic
+recursive cell by exhaustion of material — `split` refuses width below two and raises into a
+fallback, with no counter and no `if` — and `rebase_invariants.rs` reads it as an integer chain
+complex with Betti numbers and torsion. The measured law
+`H₁ = Z^{6w−3} ⊕ (Z/2)^{(w−1)²}` at widths two through six is in
+`research/records/2026-08-08_THE_DEFICIT_IS_THE_OCTAVE_THE_LINEAGE_TORSION_IS_THE_HAND.md`. The
+expansion schedule really is a receiver and the invariants really are Betti numbers and torsion,
+exactly as `THE_GROWN_CIRCUIT.md` claimed.
+
+**The rendering half is built.** `crates/holonic-engine/src/certified_face.rs` and
+`presentation_gauge.rs` refuse a decimal expansion reaching an emitted document at runtime;
+`model_surface.rs` reads a turn in quarter-turns and refuses to name a phase at the origin.
+
+**What is still absent, and this part of the row stands.** *"Relativistic calculus of information
+topology"* appears nowhere. The **triangular hinge-like simplicial complex** he names as prior art is
+unrecovered. Byrne's styling is not present in `papers/source/` as a reasoning mode. And the
+rendering organs have **never been pointed at a grown circuit**, which is the object the commission
+was about — so the two built halves have not met.
+
+**This row is the third stale "nothing implements it" found on 2026-08-08**, after the skein
+condensation and the integer-homology row in `CONSTRUCTION_STATE.md`. All three were correct when
+written and none was re-run. §8's *grade the implementation, not the receipt* applies to registers of
+absence exactly as it does to registers of capability: **an absence claim is a measurement and decays
+like one.**
 
 ---
 

@@ -53,9 +53,19 @@ impl Register {
         }
     }
 
-    /// One occupied grip releases (annihilation — Brandon's ruling, 2026-07-10: the chart must
-    /// shrink as well as grow; successful compression and competitive selection lawfully vacate
-    /// space). The returned Boolean is the borrow: the decrement whose transition walks OUT of
+    /// One occupied grip releases — **departure**, in `FORMULA §CV`'s trichotomy, and Brandon's
+    /// ruling of 2026-07-10: the chart must shrink as well as grow; successful compression and
+    /// competitive selection lawfully vacate space.
+    ///
+    /// **This comment said "annihilation" until 2026-08-08 and the rename matters.** `§CV` separates
+    /// three mechanisms that had been sharing one name: *loss* is oriented fiber information a
+    /// declared outgoing presentation does not transport; *annihilation* is opposed contributions
+    /// composing to an actual zero **in one fiber**, which leaves the fiber occupied and is
+    /// `soma/membrane/src/sparse_surface.rs`'s law; *departure* is a constituent no longer factoring
+    /// into the continuing relation, which is this. Reading the second for the third would free a
+    /// slot on every opposed pair and delete exactly the population `CLAUDE.md` §2b says to name.
+    /// The record is
+    /// `research/records/2026-08-08_ANNIHILATION_IS_RELEASE_DEPARTURE_IS_THE_VACANCY.md`. The returned Boolean is the borrow: the decrement whose transition walks OUT of
     /// the RETIRING rank's hand — the exact tooth whose crossing forced this axis's digit. The
     /// mirror is exact: the carry fires walking INTO `hand(axis)` at axis `A`; the borrow fires
     /// walking OUT of `hand(A)` at axis `2A`. Rank zero has no digit to retire. The borrow's
