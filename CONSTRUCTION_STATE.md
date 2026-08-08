@@ -4,8 +4,19 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-07, 14:34. **Body:** Rust. The C++/CUDA engine's position record is
+**Currency:** 2026-08-08. **Body:** Rust. The C++/CUDA engine's position record is
 `archive/cpp-engine/CONSTRUCTION_STATE.md` and governs nothing.
+
+**The position is now stated against a spine.** `canon/THE_HOLOBROCHOS_SPINE.md`, deposited
+2026-08-08, states the loop the body is supposed to be — two loops, four flows — and places every
+live organ on a station. **Read the position through it**: what is admitted below is *which stations
+conduct*, not which modules compile. The one broken edge is REAFFERENCE, and it is stated in
+`blueprint/THE_ROADMAP.md` under `THE OPEN WORK, BY STATION`.
+
+**Measured 2026-08-08:** `cargo test --workspace` → **1475 passed, 0 failed, 14 ignored**, summed
+across every `test result:` line, not read off a pipe. `python3 tools/resolve_named_paths.py` → **0
+failures over 825 path tokens**. `soma/` reaches **8** of `holonic-engine`'s **96** modules; nothing
+on the engine side reaches `soma`.
 
 **Read the currency stamp, not just the date.** This record was written while other work was
 landing in the same working tree; two of its measurements moved between 14:09 and 14:34 and were
