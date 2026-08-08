@@ -1326,6 +1326,20 @@ impl ExactAnalyticAdvectionLaw {
         })
     }
 
+    /// The exact Cayley successor `U`, in the law's own arc order.
+    ///
+    /// Exposed so a **material** loop can be carried against it — `kelvin.rs`. The fixed
+    /// circulation probes this law certifies are the special case where the loop is a left
+    /// eigenvector of `U`; a material loop needs `U` itself in order to move.
+    pub fn successor(&self) -> &ExactRatMatrix {
+        &self.update
+    }
+
+    /// The arc order every vector and covector in this law is written in.
+    pub fn arc_order(&self) -> &[AnalyticFieldArcId] {
+        &self.arcs
+    }
+
     pub fn initial_standing(
         &self,
         values: BTreeMap<AnalyticFieldArcId, Rat>,

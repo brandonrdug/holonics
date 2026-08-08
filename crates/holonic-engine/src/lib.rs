@@ -157,6 +157,10 @@ pub mod inertia;
 pub mod interaction;
 pub mod inverse_transport;
 pub mod live_presentation;
+// The material loop and its circulation -- Kelvin's theorem as a carried loop rather than a fixed
+// covector. Reached explicitly: `MaterialLoop` and `circulation` say nothing at the crate root
+// about which field they belong to.
+pub mod kelvin;
 pub mod local_star;
 // The Chow ring of a matroid. Reached explicitly: its forms are indefinite by construction and a
 // caller who wanted a Gram matrix must not arrive here by accident.
