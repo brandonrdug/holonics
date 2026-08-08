@@ -56,18 +56,47 @@
 //! instrument returned a false relation with ten-digit coefficients. Both gates failed together, and
 //! they failed on precisely the material the movement is about.
 //!
-//! The repair is structural and carries no constant: **the enclosure's own endpoints are a second
-//! frame.** [`EnclosureFrame`] lifts a face by its lower endpoint, its midpoint, or its upper
-//! endpoint, and [`reopen`] requires agreement across all three at every declared grain. If the
-//! retained tail is finer than the grain the three lift to the *same* integers and cost nothing; if
-//! the tail was discarded at the grain they lift to integers that differ by a full lattice unit and
-//! a spurious vector cannot survive all three. **The frame the collapse destroys is exactly the
-//! frame that would have caught it** — which is this movement's thesis, arrived at from the failure
-//! side rather than the success side.
+//! **The first repair was tried and measured failing, and it is recorded here rather than deleted.**
+//! [`EnclosureFrame`] lifts a face by its lower endpoint, its midpoint, or its upper endpoint, and
+//! [`reopen`] does probe all three at every declared grain. On a face collapsed at the grain the
+//! three lift to integers differing by a full lattice unit, so the *lattice* genuinely moves — but
+//! the spurious vector's own last coordinate is already of the same order as its height, so a
+//! one-unit shift is an `O(1)` relative perturbation and **the same false vector came out of all
+//! three.** The gauge's orbit on the returned object is trivial, which by `CLAUDE.md` §8 means its
+//! agreement carries no evidence. It is kept because it is free and correct in form; it is not
+//! counted as a gate.
 //!
-//! The reported quantities that do **not** gate — the coefficient height, the grain modulus, the
-//! reduction work — are measurements. `CLAUDE.md` §13 rule 2: a scalar that measures is lawful, a
-//! scalar that governs is not.
+//! ### The third gate, which is the one that works
+//!
+//! What a collapsed face actually destroys is **resolution**, so the gate has to be about the
+//! searched population rather than about frames. A vector of height `A` over `n` faces is drawn from
+//! a searched population of `(2A+1)^n` integer vectors; the residual enclosure it must land inside
+//! has width `Σ|a_i| w_i`. So the expected number of vectors that would have straddled zero **by
+//! chance** is
+//!
+//! ```text
+//!   chance population  =  (2A+1)^n · Σ|a_i| w_i
+//! ```
+//!
+//! and a candidate whose chance population is one or more has told the receiver nothing. The
+//! threshold is exactly **one expected coincidence** — there is no constant to choose, and the
+//! comparison is exact over `Rat`. The null model (that `Σ a_i x_i` is equidistributed at unit
+//! scale) is conservative here, since the declared faces have `Σ|x_i| > 1`, so the rule can only
+//! refuse more than the sharp form and never admit more.
+//!
+//! A candidate that fails it is **not discarded**. It returns as
+//! [`ReopeningVerdict::BelowTheFacesResolution`] carrying the vector and the exact population that
+//! defeats it — the `Open` state of `exact_value::ExactOrdering`, which retains both rather than
+//! tie-breaking (`CLAUDE.md` §8).
+//!
+//! Two of the reported quantities gate and the rest do not, and the difference is deliberate.
+//! `CLAUDE.md` §13 rule 2: a scalar that measures is lawful, a scalar that governs is not. The
+//! **grain modulus** and the **reduction work** only measure — nothing selects on them, and in
+//! particular no clock selects anything anywhere in this file. The **coefficient height** measures
+//! and then enters the chance-population gate below, where its jurisdiction is stated: it does not
+//! rank candidates, discard a loser or break a tie; it decides one exact inequality whose bar is one
+//! expected coincidence, and a candidate that fails it is **retained** with the number that defeated
+//! it rather than deleted.
 //!
 //! ## The aperture
 //!
@@ -738,8 +767,11 @@ pub struct GrainProbe {
     pub residual: ExactInterval,
     /// The faces themselves prove `Σ a_i x_i ≠ 0`.
     pub refuted: bool,
-    /// `max |a_i|`. Reported, never a gate.
+    /// `max |a_i|`.
     pub height: BigInt,
+    /// `(2·height + 1)^n · width(residual)`: the expected number of integer vectors this short whose
+    /// residual would have straddled zero by chance. One or more means the agreement is empty.
+    pub chance_population: Rat,
     /// `2^bits`. Reported, never a gate.
     pub grain_modulus: BigInt,
     pub work: LatticeWork,
@@ -759,6 +791,10 @@ pub struct RelationCandidate {
     /// `Σ a_i · enclosure_i`, exactly. Contains zero, or the candidate would have been refuted.
     pub residual: ExactInterval,
     pub height: BigInt,
+    /// `(2·height + 1)^n · width(residual)`, exactly. Strictly below one, or the candidate would
+    /// have returned as [`ReopeningVerdict::BelowTheFacesResolution`]. This is the number that says
+    /// the agreement was not available by chance.
+    pub chance_population: Rat,
 }
 
 impl fmt::Display for RelationCandidate {
@@ -802,6 +838,17 @@ pub enum ReopeningVerdict {
     /// of the enclosure was lifted, rather than an invariant of the faces, and **nothing is
     /// returned**. `probes` carries which (grain, frame) produced each vector.
     FrameDependent { vectors: Vec<Vec<BigInt>> },
+    /// Every frame agreed and the faces cannot refute the vector, but the faces are not fine enough
+    /// for the agreement to mean anything: the searched population of vectors this short is
+    /// expected to contain at least one that would have straddled zero by chance.
+    ///
+    /// This is the `Open` state, not a discard. The vector is retained with the exact population
+    /// that defeats it, so a caller who supplies a finer tail can re-ask the same question.
+    BelowTheFacesResolution {
+        coefficients: Vec<BigInt>,
+        residual: ExactInterval,
+        chance_population: Rat,
+    },
 }
 
 impl ReopeningVerdict {
@@ -961,6 +1008,7 @@ pub fn probe_at_frame(
         .map(|entry| BigInt::from(entry.magnitude().clone()))
         .max()
         .unwrap_or_else(BigInt::zero);
+    let chance_population = chance_population(&height, count, &residual);
 
     Ok(GrainProbe {
         grain,
@@ -970,9 +1018,22 @@ pub fn probe_at_frame(
         residual,
         refuted,
         height,
+        chance_population,
         grain_modulus: modulus,
         work: reduction.work,
     })
+}
+
+/// The expected number of integer vectors of height at most `height`, over `faces` faces, whose
+/// residual enclosure would have straddled zero by chance: `(2·height + 1)^faces · width(residual)`.
+///
+/// Exact over `Rat`. A value of one or more says the agreement carries no evidence: a population
+/// that large is expected to contain such a coincidence whether or not a relation exists. The
+/// threshold is one expected coincidence and nothing was chosen.
+pub fn chance_population(height: &BigInt, faces: usize, residual: &ExactInterval) -> Rat {
+    let width = &residual.upper - &residual.lower;
+    let population = (BigInt::from(2) * height + BigInt::one()).pow(faces as u32);
+    Rat::from_integer(population) * width
 }
 
 /// The minimum-Euclidean-norm row of a reduced basis, tie-broken lexicographically so the choice is
@@ -1064,6 +1125,12 @@ pub fn reopen_with_frames(
             coefficients: first,
             residual: probes[0].residual.clone(),
         }
+    } else if probes[0].chance_population >= Rat::one() {
+        ReopeningVerdict::BelowTheFacesResolution {
+            coefficients: first,
+            residual: probes[0].residual.clone(),
+            chance_population: probes[0].chance_population.clone(),
+        }
     } else {
         ReopeningVerdict::Candidate(RelationCandidate {
             coefficients: first,
@@ -1071,6 +1138,7 @@ pub fn reopen_with_frames(
             grains: grains.to_vec(),
             residual: probes[0].residual.clone(),
             height: probes[0].height.clone(),
+            chance_population: probes[0].chance_population.clone(),
         })
     };
 
@@ -1445,38 +1513,51 @@ mod tests {
     }
 
     #[test]
-    fn midpoint_only_framing_returns_a_spurious_relation_on_collapsed_faces() {
+    fn a_collapsed_face_defeats_two_gates_and_is_caught_by_the_third() {
         // This is the measurement that falsified the first form of this instrument, pinned so it
         // cannot silently return. Collapsed to exactly the grain, the faces cannot refute a
         // spurious vector -- the enclosure is one lattice unit wide -- and two adjacent grains are
         // not two frames, so grain-only framing agreed with itself and returned a false relation.
-        let sources = [log_face(2, 80, 96), log_face(3, 80, 96), log_face(5, 80, 96)];
+        let sources = [log_face(2, 120, 210), log_face(3, 120, 210), log_face(5, 120, 210)];
         let collapsed: Vec<ExactFace> = sources
             .iter()
             .map(|face| ExactFace::collapsed(format!("{} collapsed", face.name), face, 96))
             .collect();
         let grains = [DeclaredGrain::bits(95), DeclaredGrain::bits(96)];
 
-        let midpoint_only =
-            reopen_with_frames(&collapsed, &grains, &[EnclosureFrame::Midpoint]).expect("probeable");
-        let spurious = midpoint_only
-            .verdict
-            .candidate()
-            .expect("midpoint-only framing is known to return a false relation here");
-        assert!(
-            spurious.height > BigInt::from(1_000_000),
-            "the false relation has coefficients no unique factorisation would allow"
-        );
-        // And the faces cannot refute it: the collapse spent exactly the tail that would have.
-        assert!(midpoint_only.probes.iter().any(|probe| !probe.refuted));
+        // Gate one, exact refutation: blind. The collapse spent exactly the tail it would have used.
+        let probe = probe_at_grain(&collapsed, DeclaredGrain::bits(96)).expect("probeable");
+        assert!(!probe.refuted);
+        assert!(probe.height > BigInt::from(1_000_000));
 
-        // The enclosure's own endpoints are the frame the collapse destroyed, and they catch it.
-        let framed = reopen(&collapsed, &grains).expect("probeable");
-        assert!(
-            framed.verdict.returned_nothing(),
-            "endpoint framing must refuse what midpoint framing admitted: {:?}",
-            framed.verdict
+        // Gate two, the enclosure frames: their orbit on the returned object is TRIVIAL here. The
+        // lattice does move -- the three frames lift to integers a full unit apart -- but the
+        // spurious vector's last coordinate is already of its own height's order, so a one-unit
+        // shift does not dislodge it. Pinned because it was tried as the repair and it failed.
+        let lower = probe_at_frame(&collapsed, DeclaredGrain::bits(96), EnclosureFrame::Lower)
+            .expect("probeable");
+        let upper = probe_at_frame(&collapsed, DeclaredGrain::bits(96), EnclosureFrame::Upper)
+            .expect("probeable");
+        assert_ne!(
+            lower.shortest_row.last(),
+            upper.shortest_row.last(),
+            "the frames must lift to genuinely different lattices"
         );
+        assert_eq!(
+            lower.coefficients, upper.coefficients,
+            "and they return the same vector anyway: the gauge's orbit is trivial on the return"
+        );
+
+        // Gate three, the searched population, is the one that works.
+        assert!(probe.chance_population >= Rat::one());
+        let framed = reopen(&collapsed, &grains).expect("probeable");
+        match &framed.verdict {
+            ReopeningVerdict::BelowTheFacesResolution {
+                chance_population, ..
+            } => assert!(*chance_population >= Rat::one()),
+            other => panic!("a collapsed face cannot resolve a height-2^31 vector: {other:?}"),
+        }
+        assert!(framed.verdict.returned_nothing());
     }
 
     #[test]

@@ -285,7 +285,11 @@ pub struct ReductionWork {
     /// Entries written by a row or column operation.
     pub entries_written: u64,
     /// Total bit-length of every entry written. **The quantity that explains the wall.**
-    pub written_bits: u128,
+    ///
+    /// `u64` rather than `u128` because a deposit's serializer refuses `u128`, and the headroom is
+    /// not close: the largest reduction measured on grown material wrote 594,005 bits. Accumulation
+    /// saturates rather than wrapping, so an impossible run reports a ceiling instead of a lie.
+    pub written_bits: u64,
     /// The widest single entry the reduction ever wrote. Expression swell, exhibited.
     pub peak_entry_bits: u64,
     /// Divisibility repairs, each of which restarts a reduction on a fresh copy.
@@ -295,18 +299,24 @@ pub struct ReductionWork {
 impl ReductionWork {
     fn record(&mut self, value: &BigInt) {
         let bits = u64::from(value.bits());
-        self.entries_written += 1;
-        self.written_bits += u128::from(bits);
+        self.entries_written = self.entries_written.saturating_add(1);
+        self.written_bits = self.written_bits.saturating_add(bits);
         if bits > self.peak_entry_bits {
             self.peak_entry_bits = bits;
         }
     }
 
+    /// Fold another reading's work into this one. Public so a consumer joining two readings —
+    /// `skein::read_substitution` joins a before and an after — can report one figure.
+    pub fn absorb_public(&mut self, other: &Self) {
+        self.absorb(other);
+    }
+
     fn absorb(&mut self, other: &Self) {
-        self.entries_written += other.entries_written;
-        self.written_bits += other.written_bits;
+        self.entries_written = self.entries_written.saturating_add(other.entries_written);
+        self.written_bits = self.written_bits.saturating_add(other.written_bits);
         self.peak_entry_bits = self.peak_entry_bits.max(other.peak_entry_bits);
-        self.repairs += other.repairs;
+        self.repairs = self.repairs.saturating_add(other.repairs);
     }
 }
 
@@ -332,6 +342,21 @@ pub struct ReadingSchedule {
     /// map has no rows or no columns contributes an empty schedule rather than being dropped, so
     /// two schedules are comparable position for position.
     pub per_grade: Vec<(u32, PivotSchedule)>,
+}
+
+impl ReadingSchedule {
+    /// What the whole reading cost, summed over its grades. Exact and machine-independent.
+    ///
+    /// A consumer that wants to report a reading's cost should take this rather than re-run the
+    /// reduction. `skein::read_substitution` did exactly that re-run until 2026-08-08, because it
+    /// called `rebase_invariants_on` and the work vector sat one call below.
+    pub fn work(&self) -> ReductionWork {
+        let mut total = ReductionWork::default();
+        for (_, schedule) in &self.per_grade {
+            total.absorb(&schedule.work);
+        }
+        total
+    }
 }
 
 /// Reduce to Smith normal form over the integers.
@@ -862,7 +887,7 @@ mod tests {
                 "{rule:?} recorded no work at all, so the instrument is not wired"
             );
         }
-        let widths: BTreeSet<u128> = work.iter().map(|(_, w)| w.written_bits).collect();
+        let widths: BTreeSet<u64> = work.iter().map(|(_, w)| w.written_bits).collect();
         assert!(
             widths.len() > 1,
             "every rule wrote the same number of bits, so this material cannot separate them and \
@@ -916,7 +941,7 @@ mod tests {
         let (_, schedule) = smith_normal_form_with_schedule(&matrix, PivotRule::FirstNonzero);
         assert!(schedule.work.peak_entry_bits > 0);
         assert!(
-            u128::from(schedule.work.peak_entry_bits) <= schedule.work.written_bits,
+            schedule.work.peak_entry_bits <= schedule.work.written_bits,
             "the peak is one entry; the total is every entry"
         );
     }

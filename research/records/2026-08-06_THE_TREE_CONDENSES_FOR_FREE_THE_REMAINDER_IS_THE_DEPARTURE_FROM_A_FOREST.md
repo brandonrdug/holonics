@@ -69,7 +69,9 @@ reopening rule           ->  interval containment, extended by the remainder
 ```
 
 Under this reading the remainder is not a vague residue. It is a **counted, exhibitable population
-of intervals**, and it is zero exactly when the incidence is a forest. That is a testable statement
+of intervals**, and it is zero whenever the incidence is a forest — **but not only then**, which
+this record asserted and which was falsified 2026-08-08; see the correction appended at the foot of
+this file. That is a testable statement
 about any incidence this project builds.
 
 ## 4. What this does and does not license
@@ -113,3 +115,36 @@ from the evidence. A declared control was added for that reason and the phase gr
 return non-zero. This is the tautology-detection discipline of §8 pointed at the opposite failure:
 §8 catches a receipt that could not have come out otherwise, and this catches a receipt that could
 not have come out at all.
+
+---
+
+## Correction, 2026-08-08
+
+**CORRECTED 2026-08-08 — the biconditional is false in one direction, and the invariant is
+elsewhere.** *Forest ⟹ zero forced intervals* holds. **The converse fails**, and the witness is four
+nodes: `a→b, a→c, a→d, b→d`, cyclomatic number one, not a forest — where an ascending depth-first
+walk forces **zero** intervals and a descending one forces **one**. The forced-interval count moves
+with the walk order, which is a **receiver coordinate**, so it is not an invariant and cannot carry a
+falsifier. Measured non-trivial orbits on real grown material: `{98, 112}`, `{430, 640}`,
+`{430, 608, 820}`, `{208, 256, 404}`.
+
+**What IS invariant is skein's own remainder**, and it is exact:
+
+```text
+  -betti_change(grade 1)  ==  |E| - |V| + 1  ==  the non-tree edge count
+```
+
+verified in every declared context under every walk order, by three independent computations that
+know nothing of each other — a depth-first edge classification, an arithmetic count, and a Smith
+normal form over `BigInt` inside `skein`. **State the falsifier on skein's remainder, never on the
+interval count.**
+
+**And this is the fifth instance today of one defect class.** A quantity that varies with a receiver
+coordinate was being read as an invariant — the same shape as `PivotRule::ALL` producing identical
+traces on material that could not separate it, `ComparativeMultiplicity` reducing at construction,
+`Thread::{Warp, Weft}` tagging an axis statically when the law says the partition is frame-relative,
+and `ref_rank` never being implemented at all. `CLAUDE.md` §8 already carries the rule; what today
+adds is that it applies to a *falsifier's own quantity*, not only to a gauge's.
+
+**Found by:** an Opus 5 sub-agent driving the condensation at scale, which was not looking for this;
+re-verified here on the four-node witness before the correction was made.

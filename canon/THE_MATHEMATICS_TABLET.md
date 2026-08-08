@@ -133,10 +133,20 @@ currently admit the expansions the RH-facing reading is written in.** That is an
 with a name: an optimal-truncation certificate, where the remainder bound is the smallest term and
 the certificate must carry *where* the truncation was taken.
 
-**And the carrier has no drivers.** Measured 2026-08-07 and unchanged: `CertifiedSeries` has 13
-references in one file, `SeriesTailCertificate` 6 in one, **zero in any `examples/`, `tests/`, or
-`bin/` path.** §8: reach is part of the grade. The half of the enclosure carrier that this section's
-law needs is written and never exercised.
+**The carrier had no drivers, and now it has one — corrected 2026-08-08.** Measured 2026-08-07:
+`CertifiedSeries` 13 references in one file, `SeriesTailCertificate` 6 in one, **zero in any
+`examples/`, `tests/`, or `bin/` path**. Re-measured 2026-08-08 after the reopening organ landed: **26
+and 15 references across three files each, one of them a driver** —
+`crates/holonic-engine/examples/reopening_the_collapsed_face.rs`, which prints the tail certificate's
+species and its first omitted term rather than only consuming them.
+
+That matters beyond bookkeeping, because **the driver is what proved the tail is load-bearing.**
+Fold the arctangent to 4 terms instead of 128 and the certified tail ceiling drops to `2⁻¹⁰`; asking
+for `2⁻¹¹` is then refused by name, and at the finest grain the starved tail allows the search
+returns **nothing**. Retain the tail — ceiling `2⁻²⁶³` — and the same basis returns `(16, −4, −1)`,
+Machin's identity, as exact integers. *You may take the expansion; you may not discard the tail* is
+no longer only a law about honesty. It is the difference between recovering a theorem and recovering
+nothing.
 
 ---
 

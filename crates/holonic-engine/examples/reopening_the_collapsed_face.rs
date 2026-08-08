@@ -42,18 +42,29 @@
 //! ## The exactness route
 //!
 //! Exact throughout. `BigInt` lattice entries, `Rat` Gram–Schmidt, `Rat` Lovász test. There is no
-//! float, no tolerance, no epsilon and no threshold anywhere in `reopening.rs`, and the admission
-//! rule is not a tolerance at all — it is `CLAUDE.md` §0's fourth lesson, *an invariant is only
-//! visible across two frames*, with the **grain as the frame**.
+//! float, no tolerance, no epsilon and no threshold anywhere in `reopening.rs`.
+//!
+//! The instrument has **three** gates and none of them is a tolerance. Gate 1 is exact refutation by
+//! the faces' own enclosures. Gate 2 is frame invariance — `CLAUDE.md` §0's fourth lesson, *an
+//! invariant is only visible across two frames*, with the grain and the enclosure endpoint as the
+//! frames. Gate 3 is the searched population, `(2A+1)^n · width(residual) < 1`, whose bar is one
+//! expected coincidence and therefore chose nothing.
+//!
+//! **Which gate carries which control is measured below, and the measurement was not what was
+//! designed.** Gate 1 alone carries every retained-tail negative control; gate 2's endpoint sub-gauge
+//! was built as the repair for collapsed faces and its orbit on the *returned vector* is trivial
+//! everywhere measured, so it is reported and not counted; gate 3 is what actually returns nothing on
+//! a collapsed face. `CLAUDE.md` §8 requires a gauge to exhibit its own orbit before its agreement is
+//! read as evidence, and that requirement is what convicted gate 2 here.
 
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
 
-use holonic_engine::exact_value::ExactInterval;
+use holonic_engine::exact_value::{CertifiedSeries, ExactInterval, SeriesTailCertificate};
 use holonic_engine::reopening::{
-    CertifiedBits, DeclaredGrain, ExactFace, LatticeWork, Reopening, ReopeningError,
-    ReopeningVerdict, arctan_unit_fraction, dyadic_scale, finest_admissible_grain, probe_at_grain,
-    reopen,
+    CertifiedBits, DeclaredGrain, EnclosureFrame, ExactFace, FaceProvenance, LatticeWork,
+    Reopening, ReopeningError, ReopeningVerdict, arctan_unit_fraction, dyadic_scale,
+    finest_admissible_grain, probe_at_frame, probe_at_grain, reopen, reopen_with_frames,
 };
 use relational_geometry::exact::{Rat, integer};
 use relational_geometry::exact_analysis::log_rational_interval;
@@ -63,10 +74,20 @@ const LOG_TERMS: u32 = 120;
 const LOG_BITS: u32 = 210;
 
 fn arctan_face(denominator: u32, terms: u32) -> ExactFace {
-    ExactFace::from_certified_series(
-        format!("atan(1/{denominator})"),
-        arctan_unit_fraction(denominator, terms).expect("a unit-fraction arctangent"),
-    )
+    let series: CertifiedSeries =
+        arctan_unit_fraction(denominator, terms).expect("a unit-fraction arctangent");
+    // The enclosure IS the retained tail: the partial sum translated by the exact rational
+    // remainder interval the certificate returns.
+    debug_assert_eq!(
+        series.enclosure().lower,
+        &series.partial_sum
+            + &series
+                .tail_certificate
+                .remainder_interval()
+                .expect("a validated certificate")
+                .lower
+    );
+    ExactFace::from_certified_series(format!("atan(1/{denominator})"), series)
 }
 
 fn log_face(value: i64) -> ExactFace {
@@ -121,14 +142,52 @@ fn abbreviate(vector: &[BigInt]) -> String {
     format!("({})", entries.join(", "))
 }
 
+/// The provenance, returned as the artifact it is rather than as a label.
+///
+/// `canon/THE_MATHEMATICS_TABLET.md` §2 measured `CertifiedSeries` at thirteen references in one
+/// file and `SeriesTailCertificate` at six in one, with **zero in any `examples/`, `tests/` or
+/// `bin/` path** -- the half of the enclosure carrier that this movement's question needs, written
+/// and never exercised. This driver exercises it, so the certificate is printed and not just used.
+fn describe_provenance(face: &ExactFace) -> String {
+    match &face.provenance {
+        FaceProvenance::Rational => "exact rational".to_string(),
+        FaceProvenance::CertifiedSeries(series) => {
+            let species: &str = match &series.tail_certificate {
+                SeriesTailCertificate::AlternatingMonotone { first_omitted_term } => {
+                    return format!(
+                        "CertifiedSeries/AlternatingMonotone, {} terms folded, first omitted term {}",
+                        series.terms_folded,
+                        scale_of(first_omitted_term)
+                    );
+                }
+                SeriesTailCertificate::AbsoluteGeometric { .. } => "AbsoluteGeometric",
+                SeriesTailCertificate::ExactTail { .. } => "ExactTail",
+            };
+            format!("CertifiedSeries/{species}, {} terms folded", series.terms_folded)
+        }
+        FaceProvenance::AnalyticEnclosure { carrier } => format!("exact_analysis::{carrier}"),
+        FaceProvenance::IntegerCombination { parts } => {
+            let terms: Vec<String> = parts
+                .iter()
+                .map(|(coefficient, name)| format!("{coefficient}*{name}"))
+                .collect();
+            format!("integer combination {}", terms.join(" + "))
+        }
+        FaceProvenance::Collapsed { truncated_at_bits } => {
+            format!("COLLAPSED at {truncated_at_bits} bits -- the tail is gone")
+        }
+    }
+}
+
 fn report_faces(label: &str, faces: &[ExactFace]) {
     println!("  {label}");
     for face in faces {
         println!(
-            "    {:<34} enclosure width {:<10} certified to {}",
+            "    {:<34} width {:<10} certified to {:<8} {}",
             face.name,
             scale_of(&face.width()),
-            face.certified_bits()
+            face.certified_bits().to_string(),
+            describe_provenance(face)
         );
     }
     println!(
@@ -153,8 +212,9 @@ fn report_work(work: &LatticeWork) {
 fn report(reopening: &Reopening) {
     for probe in &reopening.probes {
         println!(
-            "    probe at grain {:<8} shortest vector {:<40} residual {}",
+            "    probe {:<8} frame {:<9} shortest vector {:<40} residual {}",
             probe.grain.to_string(),
+            probe.frame.to_string(),
             abbreviate(&probe.coefficients),
             describe_enclosure(&probe.residual)
         );
@@ -165,6 +225,11 @@ fn report(reopening: &Reopening) {
             println!("      coefficients  {}", vector_text(&candidate.coefficients));
             println!("      height        {}", candidate.height);
             println!("      residual      {}", describe_enclosure(&candidate.residual));
+            println!(
+                "      chance popn   {}  (expected coincidences in the searched population; \
+                 admission needs < 1)",
+                scale_of(&candidate.chance_population)
+            );
             println!(
                 "      grains        {}",
                 candidate
@@ -187,14 +252,36 @@ fn report(reopening: &Reopening) {
                 describe_enclosure(residual)
             );
         }
-        ReopeningVerdict::GrainDependent { vectors } => {
+        ReopeningVerdict::FrameDependent { vectors } => {
             println!(
-                "    RETURNED NOTHING  the grains disagreed; the shortest vector is a coordinate \
-                 of the grain, not an invariant of the faces"
+                "    RETURNED NOTHING  the frames disagreed; the shortest vector is a coordinate \
+                 of the frame, not an invariant of the faces"
             );
+            let mut distinct: Vec<&Vec<BigInt>> = Vec::new();
             for vector in vectors {
+                if !distinct.contains(&vector) {
+                    distinct.push(vector);
+                }
+            }
+            for vector in distinct {
                 println!("      {}", abbreviate(vector));
             }
+        }
+        ReopeningVerdict::BelowTheFacesResolution {
+            coefficients,
+            chance_population,
+            ..
+        } => {
+            println!(
+                "    RETURNED NOTHING  every frame agreed on {} and the faces cannot refute it, \
+                 but they cannot resolve it either:",
+                abbreviate(coefficients)
+            );
+            println!(
+                "      the searched population of vectors this short is expected to contain {} \
+                 that straddle zero by chance",
+                scale_of(chance_population)
+            );
         }
     }
     report_work(&reopening.total_work());
@@ -407,8 +494,11 @@ fn main() {
     }
 
     println!("\n-- which gate returned nothing, measured --");
-    println!("   The instrument has two gates: exact refutation by the faces' own enclosures, and");
-    println!("   cross-grain invariance. Which one carries the negative control is a measurement.");
+    println!("   The instrument has three gates and only measurement says which carries the");
+    println!("   negative control:");
+    println!("     1. exact refutation      the faces' own enclosures PROVE the sum is nonzero");
+    println!("     2. frame invariance      every grain and every enclosure endpoint must agree");
+    println!("     3. searched population   (2A+1)^n * width(residual) must be below one");
     println!("   Faces certified to width 2^-W, probed at grain 2^g:");
     println!("     basis        W      g      height of shortest vector   refuted by the faces?");
     let log_certified = match finest_admissible_grain(&three_logs) {
@@ -439,15 +529,17 @@ fn main() {
     println!("   The algebra says why. A spurious vector has |sum a_i x_i| ~ 2^(g/n - g) while the");
     println!("   enclosure half-width is ~2^(g/n - W), so the two cross at W = g -- and the aperture");
     println!("   rule already forces W >= g. So on faces whose tail was RETAINED past the grain,");
-    println!("   refutation alone carries the negative control and cross-grain invariance is");
-    println!("   redundant. That is not a defence of the second gate; it is the measurement");
-    println!("   refusing one. The second gate has to be shown load-bearing somewhere or it is a");
-    println!("   check that cannot fail (`CLAUDE.md` §8).");
+    println!("   gate 1 alone carries the negative control. That is not a defence of gates 2 and 3;");
+    println!("   it is the measurement refusing them here. A gate has to be shown load-bearing");
+    println!("   somewhere or it is a check that cannot fail (`CLAUDE.md` §8).");
     println!("\n   So: collapse the same faces to EXACTLY the grain, which is what a float does, and");
-    println!("   the exact gate goes blind. This is the movement's thesis at its sharpest -- the");
-    println!("   discarded tail is precisely what the refutation was spending.");
-    println!("     collapsed to   probed at   height of shortest vector   refuted by the faces?");
+    println!("   watch the gates fall over one at a time. This is the movement's thesis at its");
+    println!("   sharpest -- the discarded tail is precisely what gate 1 was spending.");
+    println!(
+        "     collapsed to   probed at   height        gate 1 refutes?   gate 3 population"
+    );
     let mut blind_probes = 0usize;
+    let mut frames_disagreed = 0usize;
     for collapse_bits in [96u32, 120, 144] {
         let collapsed_logs: Vec<ExactFace> = three_logs
             .iter()
@@ -465,10 +557,29 @@ fn main() {
             if !probe.refuted {
                 blind_probes += 1;
             }
+            // Gate 2, exhibited: do the enclosure endpoints move the lattice, and do they move the
+            // returned vector? Those are different questions and only the second is the gauge.
+            let lower =
+                probe_at_frame(&collapsed_logs, DeclaredGrain::bits(grain_bits), EnclosureFrame::Lower)
+                    .expect("within the aperture");
+            let upper =
+                probe_at_frame(&collapsed_logs, DeclaredGrain::bits(grain_bits), EnclosureFrame::Upper)
+                    .expect("within the aperture");
+            let lattice_moved = lower.shortest_row.last() != upper.shortest_row.last();
+            let return_moved = lower.coefficients != upper.coefficients;
+            if return_moved {
+                frames_disagreed += 1;
+            }
             println!(
-                "     2^-{collapse_bits:<11} 2^{grain_bits:<9}  ~2^{:<24} {}",
+                "     2^-{collapse_bits:<11} 2^{grain_bits:<9}  ~2^{:<10} {:<17} {}",
                 probe.height.magnitude().bits().saturating_sub(1),
-                if probe.refuted { "yes" } else { "NO -- blind" }
+                if probe.refuted { "yes" } else { "NO -- blind" },
+                scale_of(&probe.chance_population)
+            );
+            println!(
+                "                                          gate 2: lattice moved {}, return moved {}",
+                if lattice_moved { "yes" } else { "no" },
+                if return_moved { "yes" } else { "NO -- orbit trivial" }
             );
         }
         let pair = [
@@ -483,16 +594,34 @@ fn main() {
                 ReopeningVerdict::Candidate(candidate) =>
                     format!("SPURIOUS RELATION {}", abbreviate(&candidate.coefficients)),
                 ReopeningVerdict::InvariantButRefuted { .. } =>
-                    "nothing, by exact refutation".to_string(),
-                ReopeningVerdict::GrainDependent { .. } =>
-                    "nothing, by CROSS-GRAIN INVARIANCE alone".to_string(),
+                    "nothing, by gate 1 (exact refutation)".to_string(),
+                ReopeningVerdict::FrameDependent { .. } =>
+                    "nothing, by gate 2 (frame invariance)".to_string(),
+                ReopeningVerdict::BelowTheFacesResolution { .. } =>
+                    "nothing, by gate 3 (searched population)".to_string(),
             }
         );
+        // What midpoint-only framing -- the naive instrument, and the first form of this one --
+        // would have returned on the same faces.
+        let naive = reopen_with_frames(&collapsed_logs, &pair, &[EnclosureFrame::Midpoint])
+            .expect("within the aperture");
+        if let ReopeningVerdict::Candidate(candidate) = &naive.verdict {
+            println!(
+                "         and with gate 3 removed it returns {} -- a FALSE relation",
+                abbreviate(&candidate.coefficients)
+            );
+        }
     }
-    println!(
-        "   probes where the exact gate went blind: {blind_probes}. On those the instrument still"
-    );
-    println!("   returned nothing, and only the frame change could have made it do so.");
+    println!("   probes where gate 1 went blind: {blind_probes}.");
+    println!("   probes where gate 2's ENDPOINT sub-gauge moved the return: {frames_disagreed}.");
+    println!("   Gate 2's GRAIN sub-gauge did fire once above (2^119 vs 2^120 returned different
+   vectors). Its ENDPOINT sub-gauge never did: it moves the lattice and does not move
+   the answer, because a spurious vector's last");
+    println!("   coordinate is already of its own height's order, so a one-unit endpoint shift is");
+    println!("   an O(1) relative perturbation. It was tried as the repair and it failed; it is");
+    println!("   reported rather than deleted, and it is not counted as a gate here.");
+    println!("   Gate 3 is what returns nothing on collapsed faces, and it is not a threshold: the");
+    println!("   bar is one expected coincidence in the population the search actually swept.");
 
     println!("\n-- summary --");
     let mut summary_work = LatticeWork::default();

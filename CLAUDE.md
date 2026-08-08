@@ -866,7 +866,8 @@ a far-field condensation with a compact realizer — free, because the incidence
 subtree equals interval and the interval is its own reopening rule. So the difficulty this section
 names lives entirely in the departure from tree-ness, and there is a standard object for it:
 spanning-tree interval labelling, where every non-tree edge forces additional intervals and **that
-forced population is the certified remainder**, zero exactly when the incidence is a forest. This
+forced population is the certified remainder**, and it is zero *whenever* the incidence is a
+forest — but **not only** then; see the correction below. This
 is `interpretation`, not a bridge to any Millennium result; see
 [the record](research/records/2026-08-06_THE_TREE_CONDENSES_FOR_FREE_THE_REMAINDER_IS_THE_DEPARTURE_FROM_A_FOREST.md).
 

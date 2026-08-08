@@ -1303,7 +1303,8 @@ population with a two-word interval, exactly, with an **empty** remainder — fr
 equals interval and the interval is its own reopening rule. **So the difficulty lives entirely in
 the departure from tree-ness**, and the standard object for it is spanning-tree interval labelling,
 where every non-tree edge forces additional intervals and **that forced population is the certified
-remainder**, zero exactly when the incidence is a forest.
+remainder**, zero whenever the incidence is a forest and **not only** then — corrected 2026-08-08,
+see below.
 
 And that object **already exists in this repository for projective transport** —
 `HingeWorldLaw::propagate` and `HingeCycleReturn` (simplicial.rs:912), described above. The
@@ -1316,7 +1317,7 @@ not become standing.*
 
 **Grade.** A lawful filler is admitted and a merely graph-completable boundary is **refused**, by
 the derived relation, with the remainder returned exactly and the reopening rule stated. The
-remainder is **zero exactly when the incidence is a forest** — that is the calibration that proves
+remainder is **zero whenever the incidence is a forest, and the converse is FALSE** — that is the calibration that proves
 the general law degenerates correctly to the case already solved.
 
 **Falsifier.** Four, all required:

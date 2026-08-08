@@ -46,7 +46,9 @@ use num_bigint::BigInt;
 use serde::{Deserialize, Serialize};
 
 use crate::algebraic::{CausalAlgebraicError, CausalCellId, GradedCausalComplex};
-use crate::rebase_invariants::{rebase_invariants_on, PivotRule, RebaseInvariants};
+use crate::rebase_invariants::{
+    rebase_invariants_with_schedule_on, PivotRule, RebaseInvariants, ReductionWork,
+};
 
 /// Two fillings of one hole, and the boundary they share.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -102,6 +104,13 @@ pub struct ContextVerdict {
     pub after: RebaseInvariants,
     /// Empty exactly when the substitution is invisible in this context.
     pub remainder: Vec<GradeRemainder>,
+    /// What reading this context cost, in **work** rather than in elapsed time — entries written,
+    /// bits written, peak entry width, divisibility repairs. Summed over both readings.
+    ///
+    /// Carried since 2026-08-08. Before that this verdict discarded the schedule its own reduction
+    /// produced, so a consumer wanting to report skein's cost had to run the reduction a second
+    /// time. `CLAUDE.md` §8: a cost is measured in work, never in elapsed time.
+    pub work: ReductionWork,
 }
 
 impl ContextVerdict {
@@ -251,14 +260,19 @@ pub fn read_substitution(
             context.union(&substitution.before).copied().collect();
         let with_after: BTreeSet<CausalCellId> =
             context.union(&substitution.after).copied().collect();
-        let before = rebase_invariants_on(complex, Some(&with_before), rule)?;
-        let after = rebase_invariants_on(complex, Some(&with_after), rule)?;
+        let (before, before_schedule) =
+            rebase_invariants_with_schedule_on(complex, Some(&with_before), rule)?;
+        let (after, after_schedule) =
+            rebase_invariants_with_schedule_on(complex, Some(&with_after), rule)?;
         let moved = remainder(&before, &after);
+        let mut work = before_schedule.work();
+        work.absorb_public(&after_schedule.work());
         verdicts.push(ContextVerdict {
             context: index,
             before,
             after,
             remainder: moved,
+            work,
         });
     }
 
