@@ -169,6 +169,9 @@ pub mod realization;
 pub mod leader_quadrature;
 pub mod discrete_curvature;
 pub mod running_integral;
+// The temper: founding and decay as one property of a structure's own twist. No glob — `Twist`
+// and `Temper` are deliberately narrow names and must be reached through the module.
+pub mod temper;
 pub mod rebase_invariants;
 pub mod receiver;
 pub mod receiver_exact_compression;
