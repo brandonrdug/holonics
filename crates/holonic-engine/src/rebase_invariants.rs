@@ -156,19 +156,27 @@ impl IntegerMatrix {
     }
 
     /// `row_target -= factor * row_source`. A rebase of the chain group this matrix maps out of.
-    fn reduce_row(&mut self, target: usize, source: usize, factor: &BigInt) {
+    fn reduce_row(&mut self, target: usize, source: usize, factor: &BigInt, work: &mut ReductionWork) {
         for column in 0..self.columns {
             let delta = self.at(source, column) * factor;
             let value = self.at(target, column) - delta;
+            work.record(&value);
             self.set(target, column, value);
         }
     }
 
     /// `column_target -= factor * column_source`. A rebase of the chain group this matrix maps into.
-    fn reduce_column(&mut self, target: usize, source: usize, factor: &BigInt) {
+    fn reduce_column(
+        &mut self,
+        target: usize,
+        source: usize,
+        factor: &BigInt,
+        work: &mut ReductionWork,
+    ) {
         for row in 0..self.rows {
             let delta = self.at(row, source) * factor;
             let value = self.at(row, target) - delta;
+            work.record(&value);
             self.set(row, target, value);
         }
     }
@@ -257,12 +265,56 @@ pub struct PivotSchedule {
     /// A divisibility repair pushes the pivot it abandoned *and* the one it settled on afterwards,
     /// because the reduction really did select twice there.
     pub selections: Vec<(usize, usize)>,
+    /// What the reduction actually cost, in work rather than in elapsed time.
+    pub work: ReductionWork,
+}
+
+/// The exact work a reduction performed. Deterministic, machine-independent, reproducible.
+///
+/// **This exists because the pivot count does not explain the cost.** Measured 2026-08-08 on the
+/// grade-two boundary map of a grown Brent–Kung adder: `SmallestMagnitude` took `1.0` selections per
+/// extent and one millisecond, `LargestMagnitude` took `1.5` and eight, and `FirstNonzero` took the
+/// same `1.5` and **did not complete in 390 seconds**. Three rules, two of them indistinguishable by
+/// selection count and three orders of magnitude apart in cost. The dominating quantity is the
+/// **bit-length of the intermediate entries**, and nothing counted it until now.
+///
+/// `CLAUDE.md` §8: *a cost is measured in work, never in elapsed time; a clock may measure, it may
+/// never select.* A caller choosing between carriers must admit on this, not on a wall clock.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+pub struct ReductionWork {
+    /// Entries written by a row or column operation.
+    pub entries_written: u64,
+    /// Total bit-length of every entry written. **The quantity that explains the wall.**
+    pub written_bits: u128,
+    /// The widest single entry the reduction ever wrote. Expression swell, exhibited.
+    pub peak_entry_bits: u64,
+    /// Divisibility repairs, each of which restarts a reduction on a fresh copy.
+    pub repairs: u64,
+}
+
+impl ReductionWork {
+    fn record(&mut self, value: &BigInt) {
+        let bits = u64::from(value.bits());
+        self.entries_written += 1;
+        self.written_bits += u128::from(bits);
+        if bits > self.peak_entry_bits {
+            self.peak_entry_bits = bits;
+        }
+    }
+
+    fn absorb(&mut self, other: &Self) {
+        self.entries_written += other.entries_written;
+        self.written_bits += other.written_bits;
+        self.peak_entry_bits = self.peak_entry_bits.max(other.peak_entry_bits);
+        self.repairs += other.repairs;
+    }
 }
 
 impl PivotSchedule {
     fn new() -> Self {
         Self {
             selections: Vec::new(),
+            work: ReductionWork::default(),
         }
     }
 
@@ -308,17 +360,26 @@ pub struct ReadingSchedule {
 /// divisibility repair on this material, at exactly `extent` pivot selections against `1.5 × extent`
 /// for the other two.
 ///
-/// **`SmallestMagnitude` is therefore the rule to pass at a single-rule call site.** `PivotRule::ALL`
+/// **`SmallestMagnitude` is the rule to pass at a single-rule call site ON THIS MATERIAL — and that
+/// qualification is load-bearing.** Measured 2026-08-08 by `ReductionWork`: on a dense `4×4` of
+/// three-digit integers `FirstNonzero` writes 36,352 bits, `SmallestMagnitude` 95,665 (taking the
+/// only divisibility repair of the three), and `LargestMagnitude` 373,576. **Which rule is cheapest
+/// is material-dependent**, and a cost law that does not name its material is no more a bound than
+/// one that does not name its rule. What is stable across both measurements is that the *swell*
+/// separates them: peak single-entry widths spread by more than an order of magnitude. `PivotRule::ALL`
 /// remains the gauge and is unchanged — the point of it is that the *returns* do not move — but note
 /// what this measurement says about it: on grown material the gauge's group acts non-trivially on
 /// **cost** while acting trivially on the return, and `invariants_agree` compares returns and never
 /// costs. That is `CLAUDE.md` §8's independent-implementation bullet pointing at a gauge.
 ///
-/// **What is not instrumented, and it is the falsifier this cost law still lacks.** The pivot
-/// selection count is *not* where the blowup lives — it is `1.0` and `1.5` selections per extent at
-/// both widths, for rules three orders of magnitude apart. The dominating quantity is the bit-length
-/// of the intermediate entries, and nothing here counts it. Until it does, the figures above are a
-/// clock reading and carry their frame, per §8: a clock may measure, it may never select.
+/// **The falsifier this cost law lacked is now built.** The pivot selection count is *not* where the
+/// blowup lives — it is `1.0` and `1.5` selections per extent at both widths, for rules three orders
+/// of magnitude apart in cost. The dominating quantity is the bit-length of the intermediate
+/// entries, and [`ReductionWork`] counts it: `entries_written`, `written_bits`, `peak_entry_bits`
+/// and `repairs`, returned on every [`PivotSchedule`]. Those are exact, deterministic and
+/// machine-independent, so a caller may now **admit on work** rather than on a wall clock, which is
+/// what §8 requires. The nanosecond figures above remain lawful as measurement and carry their
+/// frame; they no longer have to select anything.
 pub fn smith_normal_form(matrix: &IntegerMatrix, rule: PivotRule) -> SmithNormalForm {
     smith_normal_form_with_schedule(matrix, rule).0
 }
@@ -344,42 +405,43 @@ fn reduce(
     origin: usize,
     schedule: &mut PivotSchedule,
 ) -> SmithNormalForm {
-    let mut work = matrix.clone();
-    let extent = work.rows.min(work.columns);
+    let mut work_matrix = matrix.clone();
+    let mut work = ReductionWork::default();
+    let extent = work_matrix.rows.min(work_matrix.columns);
     let mut factors = Vec::new();
 
     for pivot in 0..extent {
-        let Some((row, column)) = work.find_pivot(pivot, rule) else {
+        let Some((row, column)) = work_matrix.find_pivot(pivot, rule) else {
             break;
         };
         schedule.selections.push((row + origin, column + origin));
-        work.swap_rows(pivot, row);
-        work.swap_columns(pivot, column);
+        work_matrix.swap_rows(pivot, row);
+        work_matrix.swap_columns(pivot, column);
 
         // Euclidean descent on the pivot cross. Each pass strictly reduces |pivot| whenever it does
         // not already divide its cross, so this terminates.
         loop {
-            for row in pivot + 1..work.rows {
-                if work.at(row, pivot).is_zero() {
+            for row in pivot + 1..work_matrix.rows {
+                if work_matrix.at(row, pivot).is_zero() {
                     continue;
                 }
-                let quotient = work.at(row, pivot) / work.at(pivot, pivot);
-                work.reduce_row(row, pivot, &quotient);
-                if !work.at(row, pivot).is_zero() {
-                    work.swap_rows(pivot, row);
+                let quotient = work_matrix.at(row, pivot) / work_matrix.at(pivot, pivot);
+                work_matrix.reduce_row(row, pivot, &quotient, &mut work);
+                if !work_matrix.at(row, pivot).is_zero() {
+                    work_matrix.swap_rows(pivot, row);
                 }
             }
-            for column in pivot + 1..work.columns {
-                if work.at(pivot, column).is_zero() {
+            for column in pivot + 1..work_matrix.columns {
+                if work_matrix.at(pivot, column).is_zero() {
                     continue;
                 }
-                let quotient = work.at(pivot, column) / work.at(pivot, pivot);
-                work.reduce_column(column, pivot, &quotient);
-                if !work.at(pivot, column).is_zero() {
-                    work.swap_columns(pivot, column);
+                let quotient = work_matrix.at(pivot, column) / work_matrix.at(pivot, pivot);
+                work_matrix.reduce_column(column, pivot, &quotient, &mut work);
+                if !work_matrix.at(pivot, column).is_zero() {
+                    work_matrix.swap_columns(pivot, column);
                 }
             }
-            if work.is_zero_below(pivot) && work.is_zero_right(pivot) {
+            if work_matrix.is_zero_below(pivot) && work_matrix.is_zero_right(pivot) {
                 break;
             }
         }
@@ -388,50 +450,54 @@ fn reduce(
         // that entry's row into the pivot row and descend again; the pivot strictly decreases in
         // magnitude, so this terminates too.
         let mut repaired = false;
-        'repair: for row in pivot + 1..work.rows {
-            for column in pivot + 1..work.columns {
-                if work.at(row, column).is_zero() {
+        'repair: for row in pivot + 1..work_matrix.rows {
+            for column in pivot + 1..work_matrix.columns {
+                if work_matrix.at(row, column).is_zero() {
                     continue;
                 }
-                if (work.at(row, column) % work.at(pivot, pivot)).is_zero() {
+                if (work_matrix.at(row, column) % work_matrix.at(pivot, pivot)).is_zero() {
                     continue;
                 }
                 let one = BigInt::from(-1);
-                work.reduce_row(pivot, row, &one);
+                work_matrix.reduce_row(pivot, row, &one, &mut work);
                 repaired = true;
                 break 'repair;
             }
         }
         if repaired {
             // Redo this pivot with the folded row in place.
-            let tail = reduce_from(&work, pivot, rule, origin, schedule);
+            work.repairs += 1;
+            schedule.work.absorb(&work);
+            let tail = reduce_from(&work_matrix, pivot, rule, origin, schedule);
             factors.extend(tail);
             return normalize(factors);
         }
 
-        let diagonal = work.at(pivot, pivot).clone();
+        work.record(work_matrix.at(pivot, pivot));
+        let diagonal = work_matrix.at(pivot, pivot).clone();
         if diagonal.is_zero() {
             break;
         }
         factors.push(diagonal.abs());
     }
 
+    schedule.work.absorb(&work);
     normalize(factors)
 }
 
 /// Resume the reduction at `from`, used by the divisibility repair so the retry does not discard
 /// the factors already settled above it.
 fn reduce_from(
-    work: &IntegerMatrix,
+    work_matrix: &IntegerMatrix,
     from: usize,
     rule: PivotRule,
     origin: usize,
     schedule: &mut PivotSchedule,
 ) -> Vec<BigInt> {
-    let mut trailing = IntegerMatrix::zeros(work.rows - from, work.columns - from);
-    for row in from..work.rows {
-        for column in from..work.columns {
-            trailing.set(row - from, column - from, work.at(row, column).clone());
+    let mut trailing = IntegerMatrix::zeros(work_matrix.rows - from, work_matrix.columns - from);
+    for row in from..work_matrix.rows {
+        for column in from..work_matrix.columns {
+            trailing.set(row - from, column - from, work_matrix.at(row, column).clone());
         }
     }
     reduce(&trailing, rule, origin + from, schedule).factors
@@ -742,6 +808,117 @@ mod tests {
         let form = smith_normal_form(&matrix, PivotRule::FirstNonzero);
         assert_eq!(form.rank(), 1, "every row is a multiple of the first");
         assert_eq!(form.factors, vec![BigInt::one()]);
+    }
+
+    /// **The work vector explains the cost wall that the pivot count does not.**
+    ///
+    /// Measured 2026-08-08: on the grade-two boundary map of a grown Brent–Kung adder at width 3,
+    /// `SmallestMagnitude` returned in 1 ms and `FirstNonzero` did not complete in 390 s — while
+    /// their *pivot selection* counts stood at `1.0` and `1.5` per extent, three orders of magnitude
+    /// apart in cost and indistinguishable by that measure. The cost law was therefore a clock
+    /// reading with no exact falsifier, which `CLAUDE.md` §8 forbids from selecting anything.
+    ///
+    /// This is the falsifier it lacked. `written_bits` and `peak_entry_bits` are exact, deterministic
+    /// and machine-independent, and they separate the rules **on a matrix small enough that all three
+    /// complete** — so the separation can be asserted rather than inferred from a wall clock.
+    #[test]
+    fn the_exact_work_vector_separates_pivot_rules_that_the_selection_count_cannot() {
+        // A matrix whose entries differ in magnitude, so the rules genuinely diverge. Equal-magnitude
+        // entries make `find_pivot` tie-break identically and the gauge acts trivially -- §8.
+        let matrix = matrix_of(
+            4,
+            4,
+            &[
+                210, 330, 462, 770, //
+                1155, 462, 330, 210, //
+                2310, 1155, 770, 66, //
+                30, 42, 70, 105,
+            ],
+        );
+
+        let mut readings = Vec::new();
+        for rule in PivotRule::ALL {
+            let (form, schedule) = smith_normal_form_with_schedule(&matrix, rule);
+            readings.push((rule, form.factors.clone(), schedule));
+        }
+
+        // The RETURNS agree -- that is the uniqueness theorem and the existing gauge.
+        let factors = readings[0].1.clone();
+        for (rule, returned, _) in &readings {
+            assert_eq!(
+                returned, &factors,
+                "{rule:?} returned different invariant factors; the uniqueness theorem forbids it"
+            );
+        }
+
+        // The WORK does not, and `invariants_agree` never compares it.
+        let work: Vec<_> = readings
+            .iter()
+            .map(|(rule, _, schedule)| (*rule, schedule.work))
+            .collect();
+        for (rule, measured) in &work {
+            assert!(
+                measured.entries_written > 0 && measured.written_bits > 0,
+                "{rule:?} recorded no work at all, so the instrument is not wired"
+            );
+        }
+        let widths: BTreeSet<u128> = work.iter().map(|(_, w)| w.written_bits).collect();
+        assert!(
+            widths.len() > 1,
+            "every rule wrote the same number of bits, so this material cannot separate them and \
+             the control is vacuous -- §8's gauge rule. Work: {work:?}"
+        );
+
+        // THE SWELL, EXHIBITED. Peak single-entry widths on a 4x4 of three-digit integers spread
+        // by more than an order of magnitude. That is the intermediate expression swell that the
+        // clock could only infer, measured exactly.
+        let peaks: Vec<u64> = work.iter().map(|(_, w)| w.peak_entry_bits).collect();
+        let widest = peaks.iter().max().copied().unwrap();
+        let narrowest = peaks.iter().min().copied().unwrap();
+        assert!(
+            widest >= narrowest * 4,
+            "the rules should differ substantially in peak entry width, which IS the swell; \
+             peaks were {peaks:?}"
+        );
+
+        // AND WHICH RULE IS CHEAPEST IS MATERIAL-DEPENDENT. This assertion was written the other
+        // way round first -- that `SmallestMagnitude` writes the fewest bits, because on the grown
+        // Brent-Kung boundary map it beats `FirstNonzero` by orders of magnitude and finishes where
+        // that rule does not complete in 390 seconds. On THIS matrix it loses, and it loses while
+        // taking the only divisibility repair of the three. So the roadmap's "SmallestMagnitude is
+        // the rule to pass at a single-rule call site" is right for the grown material it was
+        // measured on and is NOT a general law. A cost law that does not name its material is no
+        // more a bound than one that does not name its rule.
+        let cheapest = work
+            .iter()
+            .min_by_key(|(_, w)| w.written_bits)
+            .map(|(rule, _)| *rule)
+            .unwrap();
+        assert_eq!(
+            cheapest,
+            PivotRule::FirstNonzero,
+            "on this dense small matrix the scanning rule is cheapest, which is the counterexample \
+             to the naive reading of the grown-material measurement; work was {work:?}"
+        );
+        assert_eq!(
+            work.iter()
+                .find(|(rule, _)| *rule == PivotRule::SmallestMagnitude)
+                .map(|(_, w)| w.repairs),
+            Some(1),
+            "and it is the only rule that took a divisibility repair here"
+        );
+    }
+
+    /// The peak entry width is the swell itself, and it is retained rather than summarised away.
+    #[test]
+    fn the_peak_entry_width_is_retained_beside_the_total() {
+        let matrix = matrix_of(2, 2, &[6, 10, 15, 21]);
+        let (_, schedule) = smith_normal_form_with_schedule(&matrix, PivotRule::FirstNonzero);
+        assert!(schedule.work.peak_entry_bits > 0);
+        assert!(
+            u128::from(schedule.work.peak_entry_bits) <= schedule.work.written_bits,
+            "the peak is one entry; the total is every entry"
+        );
     }
 
     #[test]
