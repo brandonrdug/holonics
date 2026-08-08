@@ -67,6 +67,7 @@ pub mod category;
 pub mod causal;
 pub mod causal_body;
 pub mod causal_state_grammar;
+pub mod causal_reflection;
 pub mod causal_traversal;
 pub mod communication;
 pub mod conic;
