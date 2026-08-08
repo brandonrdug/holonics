@@ -1165,9 +1165,20 @@ unique passages committed to persistent morphology though none belongs to the mi
 family.** Across `0/127/254/508/1009` dialogue occurrences the deed, minimal witness, five leaders,
 two waves, and thirteen visits stayed **invariant**.
 
-State the wall exactly as `CLAUDE.md` §5 requires: **consequence isolation holds; scale-independent
-recruitment does not.** Do not restate it as a missing comprehension, consequence, semantics,
-relevance, or research-mode subsystem — §6 convicts that, repeatedly and by direct correction.
+**Corrected 2026-08-08 — this row previously read "consequence isolation holds; scale-independent
+recruitment does not", and the second clause is withdrawn.** `CLAUDE.md` §5 carries the audit. In
+short: the recruited **return** is already scale-independent — 40 return visits at every nonzero
+scale, unique returns `25 / 27 / 27 / 24`, *lower* at the largest corpus — and what grows is the
+candidate **sweep**. The source disclaims the scaling claim outright (`:136`, *"this bounded run
+does not establish an asymptotic class"*; wall-clock ×1.33 against ×4.44 in sections), and the
+defect it does name — **commitment-before-witness** — is a correctness defect that is equally wrong
+at 127 occurrences.
+
+So this row is not a wall and not a scaling problem. It is **an unimplemented formula and an
+uncorrected commitment rule**, which is why it belongs on a roadmap at all. Do not restate it as a
+missing comprehension, consequence, semantics, relevance, or research-mode subsystem — §6 convicts
+that, repeatedly and by direct correction. That ban is on the mystical restatements; it is not a bar
+on auditing the measurement.
 
 **What replaces it.** Both remedies are named in that record and **neither is implemented**;
 `grep -rniE "mincover|min_cover|provisional"` over `soma/life/src` returns **zero**.

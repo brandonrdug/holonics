@@ -293,12 +293,59 @@ target.**
   source-separated discovery of the rank-three trace-coordinate generator action with its exact
   Jacobians, tangent transport, and deck involution.
 
-**The one real learning wall is concrete and named.** Across `0/127/254/508/1009` dialogue
-occurrences the deed, minimal witness, five leaders, two waves, and thirteen visits stayed
-invariant — consequence isolation is established — while the full prefix caused 8,748 candidate
-visits over 2,701 of 11,795 sections. **Consequence isolation holds; scale-independent recruitment
-does not.** State the wall this way. Do not restate it as a missing comprehension, consequence,
-semantics, relevance, or research-mode subsystem.
+**There is one named open construction here, and it was miscarried as a wall until 2026-08-08.**
+
+Across `0/127/254/508/1009` dialogue occurrences the deed, minimal witness, five leaders, two waves,
+and thirteen visits stayed invariant. **Consequence isolation is established.** That half stands.
+
+The other half — *"scale-independent recruitment does not"* — was **withdrawn 2026-08-08** after
+Brandon challenged it as imposed and the source was re-read. It is wrong in four ways, and the
+source record refutes it directly:
+
+- **It is false on its own terms.** What recruitment *returns* is already scale-independent: **40
+  return visits at every nonzero scale**, unique returns `25 / 27 / 27 / 24` — non-monotonic, and
+  *lower* at the largest corpus. What grows is the candidate **sweep**, not the recruited return.
+  The sentence names the returned quantity and reports the swept one.
+- **The source disclaims the scaling claim.**
+  `research/records/2026-07-31_THE_PREFIX_GROWS_THE_DEED_RETAINS_ITS_WITNESSES_THE_LEXICAL_STAR_REMAINS_TOO_BROAD.md:136`
+  — *"The measured work is sublinear over this range, but it is not constant and **this bounded run
+  does not establish an asymptotic class.**"* Wall-clock grew **×1.33** against **×4.44** in
+  sections. Four points, with visits at ×5.02 against sections at ×4.44 — a ratio of 1.13 — cannot
+  separate linear from `n log n` from `n^1.05`.
+- **It inverts a refusal into a finding.** The record at `:197` says *"The stronger claim that
+  recruitment is already scale-independent is false"* — a bar on asserting it, not evidence for its
+  negation.
+- **It misfiles a correctness defect as a scaling one.** The record at `:216` states the precise
+  issue and it is **not** about scale: *"broad union-based lexical recruitment followed by
+  **commitment-before-witness**."* 24 passages conditioned persistent morphology though none
+  belonged to the minimal witness family. That is wrong at 127 occurrences as much as at 1,009.
+
+**What actually stands is an unimplemented formula.** The record names both remedies and neither has
+ever been written — `grep -rniE "mincover|min_cover"` over `crates/` and `soma/` returns **zero**:
+
+```text
+I(R) = ⋃_{K ∈ MinCover(R)} ⋂_{f∈K} I(f)          factor the receptive star
+                                                  MinCover founded by the receiver's clause and
+                                                  entity morphology, never by an inverse-frequency
+                                                  score — that would be §13's banned governor
+separate provisional contact from continuing cultivation
+```
+
+**And that formula is the far-field condensation §11 asks for.** A union of intersections over a
+minimal cover *is* replacing a far population with compact representatives; the sections a cover
+fails to reach are the retained obstruction. §11 says the learning wall and the mathematical wall
+are one wall — they are, and the learning side has had a closed form sitting unwritten since
+2026-07-31 while the section treated it as a deep open problem.
+
+Note also that the record never states what breadth would be **correct**. `22.9%` is called *"too
+broad"* with no target and no computed alternative, so as written it cannot be falsified — §8's own
+defect, in the document that convicts it.
+
+**Reading rule.** Do not restate this as a missing comprehension, consequence, semantics, relevance,
+or research-mode subsystem — §6 convicts that repeatedly and by direct correction. That ban is on
+the mystical restatements. It is **not** a bar on auditing the measurement, and the previous form of
+this paragraph ordered a phrasing to be preserved verbatim, which made a false sentence
+unexaminable for eight days.
 
 ## 6. Comprehension and consequence are not mechanisms
 
