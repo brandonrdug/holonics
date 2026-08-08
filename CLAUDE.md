@@ -768,6 +768,41 @@ perfects one organ.** A registry, a reader, a durable standing, an addressable d
 pivot keep what it leaves. Without them every pivot rebuilds from zero, which is exactly how
 `semantics_invariant_under_exact_chart` came to survive only as a name, a proof term and a hash.
 
+### Fetching a deposit is not authority to import its corpus — convicted 2026-08-08
+
+Brandon named one concept, `holobrochos`, and asked that the spine be outlined. The response fetched
+it from the frozen laboratory and then restructured live canon around `holobrochos/CANON/` and
+`labyrinth/` — the laboratory's **speculative record**, which its own catalog grades `HUNCH`/`OPEN`
+and which carries a twenty-seven-entry superseded ledger. His correction: *"you're likely re-opening
+contaminants and misinterpretations… which is an overreach."*
+
+**Two live documents already prevented it and neither was read first.**
+
+- `reference/README.md`, first line: *"Nothing in this directory is active production or current
+  doctrine by location alone."* The entire corpus is vendored at
+  `reference/holobrochos-a07ff376/` — 110 files — so the trip to the frozen laboratory was not even
+  necessary.
+- `papers/source/synopsis/AUDIT.md` and `README.md` **already performed the Holobrochos inheritance
+  audit**, listing eight distinctions retained as mathematically exact and seven named as historical
+  overclaims not to import.
+
+The rules, and they are checkable:
+
+1. **Search the live repository before the frozen one.** `reference/`, `papers/`, `canon/`, and
+   `research/records/` hold most of what a laboratory query is looking for, already graded and
+   already audited. Going to `a07ff376` first is how an audited source gets re-imported unaudited.
+2. **If a live audit of a source exists, it governs what may be inherited from it.** Do not extend
+   its retained list from the corpus it audited.
+3. **Soma is the rigorous line; the physics and canon rooms are application and comparison domain.**
+   `MATHEMATICAL_HOLONICS.md` says so of itself: it *"extracts the geometry-first line from the mixed
+   engine, machine-learning, physics, and historical records… none defines this programme."* Its own
+   named authority is `PAPERS/synopsis/` and `PAPERS/holonics/registry.typ`, both live here under
+   `papers/source/`. Brandon, same ruling: *"Read through Soma as the most rigorously founded
+   directory and source of research so far."*
+4. **Grade nothing above its source.** A `HUNCH` may motivate a build; it may not grade one, and it
+   may not set a document's structure — structure is a stronger claim than a carried grade, because
+   a reader infers authority from position long before reading a grade line.
+
 ## 10. Conversational conduct
 
 - Brandon has an informal education, exceptional structural intuition, and reads long. Do not
