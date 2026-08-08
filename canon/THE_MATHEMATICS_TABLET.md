@@ -9,12 +9,22 @@ with no owner named is a section not yet written, and says so.
 Holonic readings of it are `interpretation` and are marked. Anything the repository implements is
 `implemented-exact` with its owner. **Nothing here is a Millennium claim.**
 
-**Quotation convention, and it is load-bearing.** A `>` blockquote in this file is **Brandon,
-verbatim**, and nothing else — his typos included, because a silently corrected quotation is a
-composed one. Assistant statements are bold or plain, never blockquoted. `CLAUDE.md` §9 convicts
-fabricated provenance and this file is exactly the kind of document a later reader would mine for
-rulings; the convention is what makes that safe. Every blockquote below was certified against
-`~/.claude/history.jsonl` and this session's transcript before deposit.
+**Quotation convention, and it is load-bearing.** A `>` blockquote is **verbatim source text**, and
+the sentence introducing it **names the source**. Where the source is Brandon it is his words exactly,
+his typos included, because a silently corrected quotation is a composed one. Where it is a laboratory
+or canon document it says so. **Nothing attributed to Brandon here is anything but a real message of
+his**, and that is the property `CLAUDE.md` §9 protects — this file is exactly the kind of document a
+later reader mines for rulings.
+
+*This convention was stated more narrowly on 2026-08-08 — "a blockquote is Brandon and nothing else" —
+and then broken by the sections added the same day, which blockquote laboratory documents. Widened here
+rather than by silently converting the quotes, because the narrow rule was the wrong rule: the property
+worth enforcing is that an attribution is true, not that only one person may be quoted.*
+
+Every Brandon quotation below was certified before deposit against `~/.claude/history.jsonl`, this
+session's transcript, `~/.codex/sessions/`, and the laboratory's `conv_chord` corpus at `a07ff376`.
+Certification is per-corpus and `UNCERTIFIABLE` is not `fabricated` — the surviving transcript record
+begins well after much of this material was said.
 
 **Reading rule.** Every section names the same four slots, because the framework's claims are about
 the operation and not about the material (`CLAUDE.md` §4):
@@ -527,7 +537,232 @@ the live body.
 
 ---
 
-## 7. Sections not yet written
+## 7. Fluid dynamics, and why Navier–Stokes is not a distant Millennium problem
+
+**Truth status:** `established-bounded` for the built gates; `proved-standard` for the cited
+mathematics; `interpretation` for the framework reading, which is Brandon's and predates this file.
+
+### 7.1 The claim, stated four times across three months
+
+> *"So fluid dynamics encompass all dynamics."*
+
+> *"Fluid dynamics encompass every other kind of dynamics from what I gather."*
+
+> *"Fluid dynamics embody all dynamics, I have made this point before."*
+
+**The quote network carried no fluid entry at all until 2026-08-08** — a theme stated four times over
+three months with no provenance row. That gap is why a session in August could treat Navier–Stokes as
+a distant problem while the engine already carried its gates.
+
+### 7.2 His ruling on how to do it, which is §13 rule 2 a month early
+
+> *"The flow is what carries the meaning, and it's what determines the pressure. First axiom. **Do
+> not use scalar pressure.** You are fragmenting about a chicken or the egg dilemma regarding (1) and
+> (2). For 3 you are imagining a global field. **Do not start imagining absolute frames just because I
+> started talking about fluid dynamics.** We have such a good relativistic foundation, do not fuck it
+> up."*
+
+The laboratory's `MENO_FORMULA §VII` states the consequence: *"the pressure is NOT the field the
+current flows through and NOT a coordinate — it is an observer's reading of the flow… `p = G/V` is a
+reading, not the substance."* That is `CLAUDE.md` §13 rule 2 — **a scalar that measures is lawful, a
+scalar that governs is not** — stated for fluids on 2026-07-06, a month before §13 was written.
+
+### 7.3 What is already built, and it is more than the record said
+
+`crates/holonic-engine/src/analytic_field.rs`, `ExactAnalyticAdvectionLaw`, refuses construction
+unless **both** gates hold, exactly over `Rat`:
+
+```text
+AᵀΩ + ΩA = 0     capacity-skew        -> AdvectionNotCapacitySkew
+A · 1     = 0     divergence-free      -> AdvectionNotDivergenceFree
+```
+
+then builds the Cayley successor `U = (I − hA/2)⁻¹(I + hA/2)` and **re-certifies**
+`UᵀΩU = Ω ∧ U·1 = 1`. Declared circulation covectors must be closed at the boundary *and* **left-fixed
+by the successor** (`CirculationProbeNotClosed`, `NoninvariantCirculationProbe`).
+
+**Incompressibility is a typed construction refusal here, not a diagnostic**, and conserved
+circulation is a certificate. That is Kelvin's circulation theorem as a gate. Its own boundary clause
+is carried and not softened: *"an exact finite conservative advection law, **not** a relabelling of
+diffusion or a claim to complete Navier–Stokes."*
+
+`diffusion.rs` and `wave_propagation.rs` are **not** fluid — an implicit-Euler graph-Laplacian solve
+and a linear finite causal kernel respectively. `HOLONIC_MACHINE_OWNERSHIP.md` bans the confusion by
+name: *"diffusion relabelled as fluid motion, complete Navier–Stokes."*
+
+### 7.4 Why the Millennium problem is dimension-specific in exactly this framework's way
+
+`proved-standard`. The Clay problem is **3D incompressible** Navier–Stokes. In 2D, global regularity
+is known. The entire difference is the vortex-stretching term `(ω·∇)u`, which vanishes identically in
+2D — and vorticity `ω = ∇×u` is a **curl, a winding density**. So the term that makes the problem hard
+is *winding being amplified by the flow that carries it*, which is §2b at the top of a Millennium
+problem.
+
+The second obstruction is scaling. NS is invariant under `u_λ(x,t) = λu(λx, λ²t)`; the critical space
+is `L³` while the controlled quantity — energy — is `L²`, which is **supercritical**. The gap between
+what is controlled and what the scaling demands is a rank gap of the same shape as the half-rank.
+
+**And the theorem he could not name on 2026-06-11 — *"the water droplet pinching, that paradoxical
+theorem, I don't know the name currently"* — was never identified in either repository.** It is the
+**Plateau–Rayleigh instability**, and the paradox is real: free-surface Navier–Stokes *provably does*
+form a **finite-time singularity** at pinch-off, and Eggers (1993) derived its **universal
+self-similar** solution. The same equations the Millennium problem asks about produce an observed,
+self-similar blowup the moment a free surface is admitted.
+
+### 7.5 The reason it belongs, which is stronger than the analogy
+
+From the laboratory, 2026-07-11, recording his extension:
+
+```text
+a hot, gaseous body of information is COMPRESSIBLE (loose relations, free volume);
+as it comprehends, the relations lock and it approaches INCOMPRESSIBILITY —
+the fully comprehended body is the crystal.
+```
+
+**So the incompressible limit is the comprehension limit, and Navier–Stokes is the equation of that
+limit.** That is why it sits with RH and Hodge rather than beside them, and it is a materially better
+reason than "both are dynamics."
+
+### 7.6 The prior solver, and the ruling on how to treat it
+
+A complete exact-rational Navier–Stokes body existed — `holo_fluid.rs`, 617 lines, Brandon's own
+commit 2026-06-25, surviving only at laboratory commit `b3d83376`. Its thesis:
+
+```text
+Navier-Stokes existence/smoothness asks the ABSOLUTE-FRAME question.
+Holonics asks the THREE-BODY question -- what INVARIANT does the flow SYNC on? --
+and the answer is EXACT: KELVIN'S CIRCULATION THEOREM.
+Gamma is conserved bit-identically for the conservative current,
+WHILE the absolute parcel trajectories are sensitive/chaotic.
+```
+
+It reported `Γ = 6`, `ζ = 14`, and a cross-ratio invariant across `N = 8` and `N = 16`.
+
+**Brandon's ruling on it, 2026-08-08, governs and this file obeys it:**
+
+> *"you can pull them into the archive, otherwise it doesn't matter because the older machinery was
+> simply not as advanced as the current holonic engine, whatever we labeled 'solver' was probably a
+> partial that you can easily lift and supersede."*
+
+So: **lift and supersede.** The live engine already holds the gates that solver's thesis rests on; what
+it lacks is the material — parcels and a material loop — on which `Γ` is read. That is the owed
+construction, and it is a port of an idea rather than a restoration of a file.
+
+---
+
+## 8. Phases of matter, and the zeta distribution
+
+**Truth status:** `established-bounded` for the definition and the built owner; `proved-standard` for
+the distribution's arithmetic; `interpretation` for the Bost–Connes correspondence, which is deposited
+as an evidence card with its non-equivalence stated.
+
+### 8.1 A phase, defined
+
+The project's own definition, deposited 2026-07-19:
+
+```text
+A phase is a maximal connected transport stratum on which a local trivialization continues.
+Its boundary is the DISCRIMINANT LOCUS where that trivialization fails.
+```
+
+and the consequence, which is the load-bearing half:
+
+```text
+A phase transition is a discrete event in the transported topology
+EVEN WHEN a visible coordinate or order parameter remains continuous.
+```
+
+That is why *"the phase transition is literally a discrete event"* is exact rather than figurative,
+and it is the same object as §3's discriminant locus, where a polynomial's resolvent collapses.
+
+### 8.2 His question, and the answer it already had
+
+> *"Think of how we call liquids 'incompressible', it's not that you physically can't force them
+> together, it's that if you do so you'll cause a phase transition that makes it an entirely
+> different kind of problem relative to classical physics. The 'phase' transition is literally a
+> discrete event. **Am I perhaps trying to refer to 'self-similar phases'?**"*
+
+**Yes, and it was answered the same day.** The zeta distribution is an exact self-similar phase:
+
+```text
+p_sigma(n) = n^(-sigma) / zeta(sigma)                    the zeta distribution
+Pr(v_p(N) = k) = (1 - p^(-sigma)) p^(-sigma k)           independent geometric valuation axes
+Pr(m divides N) = m^(-sigma)      and      Law(N/m | m divides N) = Law(N)
+
+  restrict to mN  ->  re-base by division by m  ->  RECOVER THE SAME LAW
+```
+
+That last line is a new frame inside one self-similar phase, exactly. Sourced to DLMF 25.2.E11 and
+Cranston–Peltzer 2022.
+
+**And it has a live exact owner.** `crates/holonic-engine/src/arithmetic_fiber.rs`
+`zeta_receiver_measure` computes the per-prime `recurrence_ratio = 1/p^σ`, the
+`zero_valuation_mass = (p^σ − 1)/p^σ`, the finite-place Euler product `Π_p (1 − p^{−σ})` and its
+reciprocal return — all over `Rat`/`BigInt` — and **refuses `σ ≤ 1`**, because at `σ = 1` the
+normalization diverges and the distribution ceases to exist. `prime_emergence_observatory.rs` drives
+it and asserts `coprime_cell_mass · valuation_return_mass = 1` exactly.
+
+**The boundary is carried:** analytic continuation into the critical strip is **not** a probability
+distribution. The `σ > 1` normalized distribution, the `β = 1` transition, and the continued strip are
+**three distinct constructions** and the record types them apart.
+
+### 8.3 Phases of matter and zeta are one object, and the citation is Bost–Connes
+
+Deposited 2026-07-19 as an evidence card: Bost and Connes, *Selecta Mathematica* 1 (1995) 411–457,
+construct a `C*`-dynamical system **whose partition function is the Riemann zeta function** and which
+undergoes spontaneous symmetry breaking at inverse temperature `β = 1`. The card grades it
+`DIRECT CORRESPONDENCE` for the zeta boundary and `STRUCTURAL RESONANCE` for the broader phase
+definition, and states what a stronger bridge would owe: **the algebra, the evolution, the KMS states,
+and the symmetry action.** None of those four is implemented; `KMS` occurs once in the live tree, in
+that card.
+
+So *"phases of matter are relevant to holomorphic distributions, like how we consider the Zeta
+distribution"* is not an analogy awaiting justification. It is a named correspondence with a
+citation, a deposited grade, and a stated four-part debt.
+
+---
+
+## 9. Fission and fusion are one axis, and the owner is unnamed
+
+**Truth status:** `established-bounded`. Brandon's ruling is verbatim; the live sweep is measured.
+
+> *"We've learned this session that treating mechanisms with completely separate implementations in
+> order to represent directionality is actually contamination; **fission and fusion are along one
+> axis: coherence.** When the hidden state of a holon decoheres and has no reason to remain as one
+> unit; the lattice/manifold *forks* through time … It is in the other direction of this axis in
+> which we find fusion."*
+
+and, earlier and more compactly:
+
+> *"Like how fusion and fission are actually along the same axis and just mechanisms that occur as
+> discrete events."*
+
+The laboratory later narrowed the second clause: **nothing fissions or fuses as an *event*.** They are
+the inward and outward readings of one driven boundary circuit — plural worldlines received through
+one enclosure, or one enclosure threaded and left along plural traceable emanations — *"not predicates
+the engine evaluates, and not inverse state operations."* Read arithmetically that is multiplication
+and factorization, which is where §3 lives.
+
+**Measured in the live tree, 2026-08-08:** `fission` occurs **zero** times. `fusion` occurs 307 times
+and **every one is `Diffusion`, `SheafDiffusion`, `confusion`, or sensor fusion.** There is no owner
+under that name.
+
+**But the mechanism is implemented.** `crates/holonic-engine/src/temper.rs` is founding and decay as
+**one continuous property of a structure's own twist**, read twice — `Twist::{Closed, Open}` from a
+structure's own retained cycles, `found_on` as the single deposit, and its own statement that *"there
+is no decay rule beside the founding rule, and no decay event to schedule."* That is "one axis:
+coherence" with no event, in code, under a different name.
+
+**Two cautions, both discharged 2026-08-08.** `temper.rs` opened on an epigraph carrying *"a closed
+coil SELF-SUSTAINS"* and *"an open coil leaks by its own openness"*, both of which the laboratory
+**prohibited on the day they were written** — standing closure is deposited topology, not an active
+circulation, and openness may not run an interior decay clock. The code never did either; the prose
+did, and it is repaired. And that epigraph was assistant-authored while being presented as founding
+law, which is `CLAUDE.md` §9's discipline.
+
+---
+
+## 10. Sections not yet written
 
 Named here so their absence is legible rather than silent, per §7 and §8.
 
