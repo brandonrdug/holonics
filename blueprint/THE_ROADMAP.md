@@ -641,6 +641,25 @@ what the plan names, and a *plan* that goes stale relative to its driver is not 
 > `crates/holonic-engine/examples/grown_circuit_invariants.rs`. See *The circuit becomes an integer
 > chain complex with torsion* in Part three, which this ruling moves above the proof line.
 
+> **DEMOTED 2026-08-07 by Brandon, direct ruling. Lean is an export codec, not a proof line.**
+>
+> > *"We can produce MorphoHDL-like artifacts with the machine and analyze them, that was what I
+> > wanted the machine to do in terms of learning mathematics and producing derivations and
+> > theorems; **Lean was just a side-effect** where we can ideally translate the production of the
+> > machine into Lean artifacts that can be used for verification and formalization."*
+>
+> So the objective is: **the machine produces a derivation, the derivation is a grown circuit, and
+> the machine analyses it internally** — `β₀` the distinct contents derived, `β₁` the independent
+> distinct routes to one result (the phase distribution over proofs, as an exact integer, not a
+> probability over tactics), torsion a step that cannot be un-derived. Lean then formalizes what was
+> *already produced*, at the boundary, so it can be verified and cited.
+>
+> The two movements below keep their mechanisms and lose their rank. They are the **export path**.
+> One consequence is immediate: *the reflective composition belongs on the decomposer, not on the
+> kernel verdict* — what re-integration founds must change how the next decomposition cuts, which is
+> the downward crossing the laboratory's own record names as absent (*"`wr` is inert; founding is
+> byte-level bottom-up"*).
+
 This is the objective directly. `CLAUDE.md` §0 names it: *"the machine learning to produce
 mathematical proofs."*
 

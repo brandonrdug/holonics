@@ -117,6 +117,7 @@ pub mod receiver_phase_atlas;
 pub mod resource;
 pub mod sheaf_diffusion;
 pub mod simplicial;
+pub mod supported_realizers;
 pub mod tube;
 pub mod wave_propagation;
 pub mod world;

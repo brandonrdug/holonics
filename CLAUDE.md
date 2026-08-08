@@ -472,8 +472,18 @@ false of the present body. One exists, for series tails, with three species and 
 
 **One organ still closes all three: an exactly computed positive form on a supported realizer
 population, with a certified remainder and a reopening rule keyed to the receiver family.** Read
-that demand as four parts. The **certified remainder** is built. The **positive form**, the
-**supported realizer population**, and the **reopening rule** are not.
+that demand as four parts. **Two are now built, 2026-08-07:**
+
+| part | state |
+|---|---|
+| **certified remainder** | **built, twice.** `crates/holonic-engine/src/exact_value.rs` for series tails; and `crates/holonic-engine/src/receiver_exact_compression.rs`, whose collapsed population is a *counted, exhibitable* remainder — each pair carrying the shortest input word that separates it and the receiver that sees the difference, which is the form `canon/THE_RECOVERED_LAW.md` specifies for compression's exact loss. |
+| **reopening rule keyed to the receiver family** | **built.** `crates/holonic-engine/src/gluing.rs`. The Mayer–Vietoris connecting map `δ` is keyed to which cover — which *receivers* — you chose, and it returns what the union carries that neither piece does. |
+| **supported realizer population** | not built. |
+| **positive form** | not built. |
+
+The remaining two are **one** thing, not two, and §2 already says why: placement is the fixed locus
+of the involution *a realizer induced*, so positivity is supplied by supportedness rather than
+obtained beside it. Do not build them as separate organs.
 
 **And the built part is not driven.** Measured 2026-08-07 over the whole tree: `ExactInterval` has
 104 references across 9 files, 20 in drivers; `CertifiedSeries` has 13 references in **one** file
