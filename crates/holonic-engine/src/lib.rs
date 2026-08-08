@@ -102,6 +102,26 @@ pub mod cuda_relation;
 pub mod device;
 pub mod diffusion;
 pub mod derivation_atlas;
+// The derivation's layout read as a hinge incidence, realized as a closed oriented surface the
+// curvature bridge can read, and the write-back that spends the returned curvature back into
+// `local_star`'s own geometry. Declared, never glob-exported: it names `realize`, `flow` and
+// `found`, which say nothing at the crate root about which carrier they belong to.
+pub mod derivation_curvature;
+// A foreign codec, recovered from its own declared statistics, entering the conditioning path by
+// the seam `conditioned_derivation::FoundedMorphology::from_founded_words` declares for exactly
+// that. Declared, never glob-exported: it names `present`, `intake` and `distinguish`, and all
+// three are verbs that say nothing at the crate root about which carrier they belong to.
+pub mod derivation_codec_intake;
+// Integration through reflection on a derivation circuit: the routes, and the holonomy their
+// disagreement retains. Declared, never glob-exported: it names `Route`, `AccumulationRule` and
+// `accumulation`, and `Route`/`accumulation` say nothing at the crate root about which carrier
+// they belong to.
+pub mod derivation_integral;
+// The moves a conditioned production made, read as substitutions and paid for by placement.
+// Declared, never glob-exported: it names `MoveSpecies`, `OpenClass`, `ClassReading` and
+// `substitutions`, and `OpenClass` collides with `placement`'s own while the verb `substitutions`
+// says nothing at the crate root about which family it means.
+pub mod derivation_skein;
 pub mod dilation;
 pub mod dimensional_receiver;
 pub mod dimensional_wave;
