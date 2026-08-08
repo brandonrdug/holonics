@@ -22,7 +22,8 @@ rather than by silently converting the quotes, because the narrow rule was the w
 worth enforcing is that an attribution is true, not that only one person may be quoted.*
 
 Every Brandon quotation below was certified before deposit against `~/.claude/history.jsonl`, this
-session's transcript, `~/.codex/sessions/`, and the laboratory's `conv_chord` corpus at `a07ff376`.
+session's transcript, the Codex session rollouts, and the laboratory's `conv_chord` corpus at
+`a07ff376`.
 Certification is per-corpus and `UNCERTIFIABLE` is not `fabricated` — the surviving transcript record
 begins well after much of this material was said.
 
