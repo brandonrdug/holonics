@@ -43,13 +43,44 @@ import sys
 from pathlib import Path
 
 REPO = Path("/home/b/Workspaces/holonics")
-# Most of THE_QUOTE_NETWORK predates this repository: the quotes were said in the laboratory
-# sessions. Those transcripts are the provenance source and reading them is unrelated to the
-# laboratory REPOSITORY being frozen — that ban is on its working tree, not on what he said.
+# THE CORPUS. Corrected 2026-08-08 after a dialect survey measured what was actually here: the
+# per-project Claude Code transcripts hold only ~298 genuine user messages, because Claude Code
+# prunes them — the hundreds of megabytes in those directories are `tool-results/` and `subagents/`.
+# An earlier form of this tool read only those and reported 130 quotations "uncertifiable", which
+# was a property of the corpus and not of the quotations.
+#
+# The real corpus is 8,935 messages over 2026-05-11 → 2026-08-08:
+#   ~/.claude/history.jsonl            7,895   one JSON object per line, text at `display`
+#   ~/.codex/sessions/**/rollout-*     1,050   the Codex month; text at payload.content[].text
+#   the surviving per-project transcripts, which are almost entirely subsumed
+#
+# The Codex rollouts are not optional. They are the densest month of the current project and are
+# exactly what he means by "refer to the Codex conversation log"; without them the corpus has a
+# three-week hole at maximum recency.
+CLAUDE_HISTORY = "/home/b/.claude/history.jsonl"
+CODEX_ROLLOUTS = "/home/b/.codex/sessions/**/rollout-*.jsonl"
 TRANSCRIPTS = sorted(
     glob.glob("/home/b/.claude/projects/-home-b-Workspaces-holonics/*.jsonl")
     + glob.glob("/home/b/.claude/projects/-home-b-Workspaces-laboratory/*.jsonl")
 )
+
+MACHINE_PREFIXES = (
+    "<task-notification",
+    "<local-command",
+    "<system-reminder",
+    "[SYSTEM NOTIFICATION",
+    "<environment_context",
+    "<permissions instructions",
+    "<user_instructions",
+)
+
+
+def _is_machine(text):
+    """Machine-authored blocks. Including them would let the assistant certify its own words."""
+    if text.lstrip().startswith(MACHINE_PREFIXES):
+        return True
+    return "This session is being continued from a previous conversation" in text[:300]
+
 
 DOCS = ["CLAUDE.md", "CONSTRUCTION_STATE.md", "AGENTS.md"]
 DIRS = ["canon", "blueprint", "research/records", "standing"]
@@ -65,9 +96,46 @@ def normalize(text):
 
 
 def load_user_text():
-    """Every genuine Brandon message. Excludes task notifications and compaction summaries,
-    which are machine-authored and would let an agent's own words certify themselves."""
+    """Every genuine message he wrote, from all three sources.
+
+    Excludes task notifications, environment blocks and compaction summaries, which are
+    machine-authored — including them would let the assistant's own words certify themselves.
+    """
     blobs = []
+
+    # 1. The Claude Code history: every prompt typed at the CLI, across every project.
+    if Path(CLAUDE_HISTORY).exists():
+        for line in open(CLAUDE_HISTORY, errors="replace"):
+            try:
+                record = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            text = record.get("display") or ""
+            if text and not _is_machine(text):
+                blobs.append(normalize(text))
+
+    # 2. The Codex rollouts: the densest month of this project.
+    for path in glob.glob(CODEX_ROLLOUTS, recursive=True):
+        for line in open(path, errors="replace"):
+            if '"role": "user"' not in line and '"role":"user"' not in line:
+                continue
+            try:
+                record = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            payload = record.get("payload") or {}
+            if payload.get("type") != "message" or payload.get("role") != "user":
+                continue
+            parts = payload.get("content") or []
+            text = " ".join(
+                part.get("text", "")
+                for part in parts
+                if isinstance(part, dict) and part.get("type") in ("input_text", "text")
+            )
+            if text and not _is_machine(text):
+                blobs.append(normalize(text))
+
+    # 3. The surviving per-project transcripts, mostly subsumed but cheap to include.
     for path in TRANSCRIPTS:
         for line in open(path, errors="replace"):
             try:
@@ -87,14 +155,9 @@ def load_user_text():
                 )
             else:
                 continue
-            stripped = text.lstrip()
-            if stripped.startswith("<task-notification") or stripped.startswith("<local-command"):
-                continue
-            if "This session is being continued from a previous conversation" in text[:300]:
-                continue
-            if stripped.startswith("[SYSTEM NOTIFICATION"):
-                continue
-            blobs.append(normalize(text))
+            if text and not _is_machine(text):
+                blobs.append(normalize(text))
+
     return blobs
 
 

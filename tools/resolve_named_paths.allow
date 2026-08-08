@@ -92,3 +92,7 @@ blueprint/THE_ROADMAP.md :: .lake/ :: Lake's generated-artifact directory, quote
 CLAUDE.md :: continual_reasoning.rs :: deleted BY the pinned laboratory commit a07ff376; survives at its parent 93834398, which §5 states
 CLAUDE.md :: runs/dialogue-distractor-scaling/REPORT.json :: never tracked at any laboratory commit; §5 names it to record that the 8,748/2,701/11,795 receipt is unrecoverable, the same loss class as the tiger figures
 CLAUDE.md :: src/soma/life/src/symbolic_reasoning.rs :: same — the owner whose receipt §5 regrades, deleted BY a07ff376 and readable at 93834398
+
+# --- Directories outside this repository, named to describe what fills a transcript directory ---
+canon/THE_DIALECT.md :: subagents/ :: a Claude Code runtime directory under ~/.claude, named in §0 to explain why the per-project transcripts hold only ~298 genuine messages; not a path in this tree
+canon/THE_DIALECT.md :: tool-results/ :: same — the other Claude Code runtime directory named in §0

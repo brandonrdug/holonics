@@ -1001,44 +1001,84 @@ impl DeclaredCarrierMetric {
     }
 }
 
-/// Which carrier the body conducts through, and **`Open` is a real state, not a failure**.
+/// The dilation between two carriers, held as the exact pair `(C, d)` and **never divided**.
+///
+/// `MENO_FORMULA §VIII`, ratified: *"`π_Β` is held HOLONIC — the pair `(C, d)`, NEVER divided into
+/// an integer. `8/2` and `4/1` are different holonic states (different arc, different diagonal,
+/// different rank); the integer throws that away and re-smuggles the absolute frame."*
+///
+/// Here the two carriers are the two frames, and that is the only lawful reading — Ledger U:
+/// *"dilation is relational, a ratio of frames, never a property of one node."* So there is no
+/// per-carrier cost scalar in this type. There is one pair.
+///
+/// **The host authority is `d`.** It crosses directly: every support evaluated in one place, no
+/// split, no transfer, no merge. **The hybrid candidate is `C`.** It detours — packs, dispatches,
+/// runs the wide primitives back on the host, downloads, merges. Parity has already proved the two
+/// share endpoints, which is exactly what makes them an arc and a chord rather than two unrelated
+/// walks.
+///
+/// `C = d` is the **mirror**: the detour founded nothing.
+/// `C ≠ d` is the **founding**: it wound to get there, and whether the winding paid is a question
+/// for the receiver that declared the metric, never for a clock.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CarrierDilation {
+    /// `C` — the finding-walk. What the hybrid candidate traversed under the declared metric.
+    pub arc: BigUint,
+    /// `d` — the checking-step. What the host authority crosses directly under the same metric.
+    pub chord: BigUint,
+}
+
+impl CarrierDilation {
+    /// `C = d`. The arc never left the diagonal.
+    pub fn is_mirror(&self) -> bool {
+        self.arc == self.chord
+    }
+
+    /// Order two dilations **without forming either quotient**. `a₁·d₂` against `a₂·d₁` is the
+    /// cross-multiplication every exact ratio comparison uses: it never divides and never rounds.
+    pub fn cmp_against(&self, other: &Self) -> Ordering {
+        (&self.arc * &other.chord).cmp(&(&other.arc * &self.chord))
+    }
+}
+
+/// Which carrier the body conducts through, carrying the whole dilation rather than a verdict.
 ///
 /// Modelled on `crates/holonic-engine/src/exact_value.rs`'s `ExactOrdering { Less, Equal, Greater,
-/// Open }`, whose module opening states the principle this adopts: *"Values which cannot yet be
-/// ordered from their exact certificates return `Open` rather than falling through to an epsilon
-/// comparison."*
+/// Open }`: *"Values which cannot yet be ordered from their exact certificates return `Open` rather
+/// than falling through to an epsilon comparison."*
 ///
-/// A body holding two carriers it cannot yet separate is the correct state. §13 rule 2 —
-/// *plurality is the return; a continuation fiber is not a number.*
+/// Every deciding variant carries the pair. A caller that wants a number may form one; nothing on
+/// this path does — §13 rule 2, *plurality is the return; a continuation fiber is not a number.*
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub enum CarrierAdmission {
-    /// The declared metric separates the carriers and the host is cheaper by this exact margin.
-    ExactHost { margin: BigUint },
-    /// The declared metric separates the carriers and the hybrid is cheaper by this exact margin.
-    HybridCuda { margin: BigUint },
-    /// No metric was declared, or the declared metric assigns both carriers the same exact cost.
-    /// **Both carriers stay retained**, and a caller may conduct through either with
-    /// [`AdmittedCudaApertureExecutor::trace_through`] or re-decide when the aperture changes.
+    /// The arc wound further than the chord, `C > d`: the direct crossing is the shorter walk.
+    ExactHost { dilation: CarrierDilation },
+    /// The arc is the shorter walk, `C < d`: the detour paid under this receiver's declaration.
+    HybridCuda { dilation: CarrierDilation },
+    /// No metric was declared, or the declared metric makes this a **mirror** — `C = d`, the arc
+    /// never left the diagonal, nothing separates the carriers. **Both stay retained**, and a
+    /// caller may conduct through either with [`AdmittedCudaApertureExecutor::trace_through`].
     #[default]
     Open,
 }
 
 impl CarrierAdmission {
     /// Read the admission off a declared metric and two exact work vectors.
+    ///
+    /// The metric turns a path into a length, which is what a metric is for. It does not turn two
+    /// lengths into a winner — that is the pair's job, and the pair survives into the return.
     pub fn under(
         metric: &DeclaredCarrierMetric,
         authority: &CarrierWork,
         candidate: &CarrierWork,
     ) -> Self {
-        let host = metric.cost_of(authority);
-        let hybrid = metric.cost_of(candidate);
-        match host.cmp(&hybrid) {
-            Ordering::Less => Self::ExactHost {
-                margin: &hybrid - &host,
-            },
-            Ordering::Greater => Self::HybridCuda {
-                margin: &host - &hybrid,
-            },
+        let dilation = CarrierDilation {
+            arc: metric.cost_of(candidate),
+            chord: metric.cost_of(authority),
+        };
+        match dilation.arc.cmp(&dilation.chord) {
+            Ordering::Greater => Self::ExactHost { dilation },
+            Ordering::Less => Self::HybridCuda { dilation },
             Ordering::Equal => Self::Open,
         }
     }
@@ -1046,9 +1086,9 @@ impl CarrierAdmission {
     /// The carrier later conduct takes by default.
     ///
     /// Under `Open` this is the host authority, because the host law is the reference every parity
-    /// gate is taken against and is available unconditionally. That is a retained-plurality
-    /// default and not a hidden preference: [`Self::is_open`] reports it, the receipt carries it,
-    /// and `trace_through` conducts the other way on request.
+    /// gate is taken against and is available unconditionally. That is a retained-plurality default
+    /// and not a hidden preference: [`Self::is_open`] reports it, the receipt carries it, and
+    /// `trace_through` conducts the other way on request.
     pub fn conducts_through(&self) -> ApertureExecutionBackend {
         match self {
             Self::HybridCuda { .. } => ApertureExecutionBackend::HybridCuda,
@@ -1060,15 +1100,14 @@ impl CarrierAdmission {
         matches!(self, Self::Open)
     }
 
-    /// The exact margin that separated the carriers, or `None` when the admission is `Open`.
-    pub fn margin(&self) -> Option<&BigUint> {
+    /// The whole pair `(C, d)`, or `None` when nothing was declared to form it against.
+    pub fn dilation(&self) -> Option<&CarrierDilation> {
         match self {
-            Self::ExactHost { margin } | Self::HybridCuda { margin } => Some(margin),
+            Self::ExactHost { dilation } | Self::HybridCuda { dilation } => Some(dilation),
             Self::Open => None,
         }
     }
 }
-
 /// Whether the device was driving a display when a timing figure was taken.
 ///
 /// A measurement without its frame is the absolute-frame defect `CLAUDE.md` §0 names. Every timing
@@ -1705,7 +1744,7 @@ mod tests {
         assert_ne!(authority, candidate, "the fixture must give the law something to separate");
         let admission = CarrierAdmission::Open;
         assert!(admission.is_open());
-        assert_eq!(admission.margin(), None);
+        assert_eq!(admission.dilation(), None);
         assert_eq!(
             admission.conducts_through(),
             ApertureExecutionBackend::ExactHost,
@@ -1720,11 +1759,16 @@ mod tests {
         let candidate = work(100, 100, 64);
         // host 1 : device 1 : transfer 1 -> authority 1000, candidate 264
         let admission = CarrierAdmission::under(&metric(1, 1, 1), &authority, &candidate);
-        assert_eq!(
-            admission,
-            CarrierAdmission::HybridCuda { margin: BigUint::from(736_u32) }
-        );
+        let dilation = admission.dilation().expect("the metric separated them");
+        assert_eq!(dilation.arc, BigUint::from(264_u32), "C, the candidate's walk");
+        assert_eq!(dilation.chord, BigUint::from(1_000_u32), "d, the direct crossing");
+        assert!(!dilation.is_mirror(), "the arc left the diagonal");
         assert_eq!(admission.conducts_through(), ApertureExecutionBackend::HybridCuda);
+        // The pair survives whole. Nothing on this path forms 264/1000, and `8/2` and `4/1` must
+        // stay distinguishable -- that is the whole point of holding it holonic.
+        let scaled = CarrierDilation { arc: BigUint::from(528_u32), chord: BigUint::from(2_000_u32) };
+        assert_ne!(*dilation, scaled, "equal quotient, different holonic state");
+        assert_eq!(dilation.cmp_against(&scaled), Ordering::Equal, "and yet the same ratio");
     }
 
     #[test]
@@ -1735,11 +1779,10 @@ mod tests {
         let authority = work(1_000, 0, 0);
         let candidate = work(100, 100, 64);
         let cheap_host = CarrierAdmission::under(&metric(1, 20, 1), &authority, &candidate);
-        assert_eq!(
-            cheap_host,
-            CarrierAdmission::ExactHost { margin: BigUint::from(1_164_u32) },
-            "device work priced at 20 makes the candidate 2164 against the authority's 1000"
-        );
+        let dilation = cheap_host.dilation().expect("the metric separated them");
+        assert_eq!(dilation.arc, BigUint::from(2_164_u32), "device work priced at 20");
+        assert_eq!(dilation.chord, BigUint::from(1_000_u32));
+        assert_eq!(cheap_host.conducts_through(), ApertureExecutionBackend::ExactHost);
         let cheap_device = CarrierAdmission::under(&metric(1, 1, 1), &authority, &candidate);
         assert_eq!(cheap_device.conducts_through(), ApertureExecutionBackend::HybridCuda);
         assert_ne!(
@@ -1756,8 +1799,13 @@ mod tests {
         let authority = work(200, 0, 0);
         let candidate = work(100, 50, 50);
         let admission = CarrierAdmission::under(&metric(1, 1, 1), &authority, &candidate);
-        assert!(admission.is_open(), "200 == 100 + 50 + 50, so nothing separates them");
-        assert_eq!(admission.margin(), None);
+        assert!(admission.is_open(), "200 == 100 + 50 + 50 -- C = d, the mirror");
+        assert_eq!(admission.dilation(), None);
+        assert!(
+            CarrierDilation { arc: BigUint::from(200_u32), chord: BigUint::from(200_u32) }
+                .is_mirror(),
+            "the arc never left the diagonal, so it founded nothing"
+        );
     }
 
     #[test]
