@@ -269,6 +269,12 @@ target.**
   21,147 relations opened with zero pair overlap and the complete pair product never enumerated;
   14,355 relations generated before return; no-return control entirely OPEN; reversed delivery
   prediction-exact; 31.4 MB standing remounted exactly.
+  **Bounded, 2026-08-07, and this bound belongs with the claim rather than in a separate errata:**
+  `canon/THE_RECOVERED_LAW.md` records that **all 21,147 spectral pairs returned apart** — zero
+  positive relations came from the second modality. What stands is that relations were *opened*
+  across modalities with zero pair overlap and no fusion module; what does **not** stand is that the
+  second modality contributed a positive relation. Read as "multimodality established," this
+  paragraph overstates its own evidence.
 - **Receiver-relativity on measured physics.** Aula Carolina binaural: both 159,792-sample impulse
   returns exact, two modes generated before return, each ear selecting its own mode by zero
   residual while obstructing the other.
@@ -588,8 +594,40 @@ grade that `blueprint/THE_ROADMAP.md` holds open.
    by which a body receives, transforms, retains, and emits differences. A training claim requires a
    structural change in that organization, plus source-detached remount, plus an ablation that
    removes the claimed later conduct **by removing structure**.
-2. **No scalar score, weight, bias, gate, or threshold anywhere in the conditioning path.**
-   Plurality is the return; a continuation fiber is not a number.
+2. **No privileged scalar governor inside the body.** Plurality is the return; a continuation fiber
+   is not a number.
+
+   **This rule was stated as a blanket ban until 2026-08-07 and the blanket form is wrong.** It read
+   *"no scalar score, weight, bias, gate, or threshold anywhere in the conditioning path"*, which is
+   the misreading Brandon corrected directly: *"I understand why you wrote 'no gradient, no
+   distribution, no sampling', but you've just surfaced a misinterpretation. Refer to the old
+   laboratory's definition and derivations of probability and loss. Gradients, distributions, and
+   'sampling' are all key and fundamental concepts, you've grossly misinterpreted what makes them
+   'contaminants'."* The reconciliation is `canon/THE_RECOVERED_LAW.md` §"the jurisdiction doctrine",
+   which this file did not cite, and the contradiction stood unreconciled in every document until
+   now.
+
+   What is actually banned is **`G_authored`**: a privileged scalar governor *inside* Soma that
+   chooses, rewards, punishes, stops, or replaces the plural causal construction. What is lawful,
+   and derived rather than tolerated:
+
+   - `r = Δ(y,y*;F)` is the complete oriented residual; `L = ℓ_B(r)` is one receiver's measurement
+     of it. *A loss function is a valid measurement of difference, not reward, punishment, or a
+     judgment about a learner.*
+   - `dL` is a **covector**. It becomes a gradient only under a declared metric:
+     `grad_G L = G⁻¹ dL`, and **the metric is a receiver face of standing**, so `G` is a receiver's
+     declaration and never a modelling convenience.
+   - The distribution has **four faces and only the fourth is the contaminant** — `Π_{B,t}` the
+     lived construction, `Q_{B,t}` the quotient, `q_current` the transported testimony, and
+     `G_authored`. *A statistic may occupy any of the first three; it may never silently become the
+     fourth.*
+   - Surprisal and cross-entropy are exact symbolic instruments. Zero support FOUNDs a new relation
+     rather than taking a smoothing constant.
+
+   The operative test is therefore **jurisdiction, not vocabulary**. A scalar that measures is
+   lawful; a scalar that governs is not. Reading a banned token as a banned *concept* is the failure
+   this rule now exists to prevent, and §L's standing reading rule governs it: *"`No X inside Soma
+   by analogy` must never again mean `do not learn from X`."*
 3. **Superseded production machinery fails closed.** It is removed, not deprecated; git history is
    the recovery surface. The scorer, the schema, and the constant-subtraction ablation were removed
    this way and are recoverable only at `2b562c8`. The same excision *failed* the rule for the 66
