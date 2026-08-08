@@ -77,6 +77,43 @@ torsion in the setting where they are *defined*. The reason is one sentence: the
 topological content is `χ`, `χ` is an alternating sum of ranks, and ranks land in a torsion-free
 group.
 
+## 2b. The width law, measured after the cost wall came down
+
+**Added the same day.** The width sweep was unreachable while `PivotRule::FirstNonzero` was the
+default; with `SmallestMagnitude` the whole sweep is **43 ms**. Re-run and verified by this session,
+not taken from a report:
+
+```text
+w=2  betti  9   torsion rank  1   (w-1)^2  1   every factor 2
+w=3  betti 15   torsion rank  4   (w-1)^2  4   every factor 2
+w=4  betti 21   torsion rank  9   (w-1)^2  9   every factor 2
+w=5  betti 27   torsion rank 16   (w-1)^2 16   every factor 2
+w=6  betti 33   torsion rank 25   (w-1)^2 25   every factor 2
+```
+
+**`H₁ = Z^{6w−3} ⊕ (Z/2)^{(w−1)²}`, exactly, at every width measured.** The torsion subgroup is
+elementary abelian — no `Z/4` ever appears at the `DIVISION` aperture — and the free rank is identical
+in the netlist section, so `i_*` is rank-preserving throughout.
+
+**This hardens §2 from "measured disagreement" to "different growth laws."** Torsion rank is exactly
+quadratic in the width. `Σδ = 6V − 2E` is `−48, −118, −196, −304, −420` — second differences
+`−8, −30, −8`, the irregular arc of a prefix adder. `6χ` is exactly linear, `−36w + 24`. Three
+functions of width, three growth classes, and the two curvature-side ones track each other far more
+closely than either tracks the torsion. **The `Σδ = 6χ` coincidence at `w = 2` is now visibly the
+isolated accident §2 called it.**
+
+**And the census would have given the wrong answer at every width.** Faces carrying `k > 1` go
+`8, 18, 28, 44, 60` against torsion ranks `1, 4, 9, 16, 25` — not proportional, not affine. Counting
+reconvergent divisions does not predict the torsion; only the Smith reduction does. `CLAUDE.md` §9's
+*return the artifact, never the census* as a measured fact.
+
+`(w−1)²` is the count of internal group-carry reconvergences in a Brent–Kung prefix tree — the
+propagate/generate pairs meeting at a shared carry, which is what `k = 2` marks and what the width-2
+generator exhibited as a square of two sources against two carries. **The torsion counts those
+squares.** Nothing about `6 − deg(v)` produces a perfect square in the width, and nothing about a
+deficit distinguishes a reconvergent carry from a rippled one — ripple returns zero torsion at every
+width while its deficits are as large.
+
 ## 3. The Bockstein, both halves
 
 **The tautological half.** From `0 → Z →^2 Z → F₂ → 0`, exactness gives

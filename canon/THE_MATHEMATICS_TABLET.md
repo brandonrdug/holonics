@@ -33,7 +33,7 @@ retains both and offers the collapse as a *reading*.
 
 | carrier | keeps | deletes | the deleted thing is | lawful form, and its owner |
 |---|---|---|---|---|
-| **float** | the magnitude | the tail | the residual of the expansion | `CertifiedSeries` + `SeriesTailCertificate`, `holonic-engine/src/exact_value.rs:236` |
+| **float** | the magnitude | the tail | the residual of the expansion | `CertifiedSeries` + `SeriesTailCertificate`, `holonic-engine/src/exact_value.rs:238` |
 | **sign** | the magnitude | the turn | the winding, `−1 = e^{iπ}` | `OrientedWinding` `soma/body/src/channel.rs:111`; `RayCrossings` `relational-geometry/src/exact_analysis.rs` |
 | **reduced coefficient** | the difference | the passages | which hands were actually taken | `ComparativeMultiplicity`, `holonic-engine/src/algebraic.rs`, repaired 2026-08-08 |
 
@@ -54,6 +54,21 @@ remainder interval**, so the returned object is a *set that provably contains th
 point that provably is not it. §2b's sentence about signs is the same sentence one carrier over: *a
 float keeps the magnitude and discards the residual; a sign keeps the magnitude and discards the
 turn.*
+
+**The laboratory deposited this law first and carried it further, 2026-06-21.**
+`src/eros/um/THEORY_AND_EQUATIONS.md` §32 states it whole — *"a float is a truncated series"*, and
+`0.1f ≢ 0.1_real` as two different objects rather than one object with error. It also carries the
+part this section did not have, which is the **stopping rule**:
+
+> *"you traverse the series until the provable tail can no longer change the outcome of the relating.
+> For a decaying series the tail is bounded, so you know when it cannot straddle the decision. This
+> is more exact than a fixed-precision float, not less."*
+
+That is the operational form of `SeriesTailCertificate` and it predates the carrier. §43 of the same
+file adds the clause that keeps the ban from becoming a ban on mathematics: *"every algorithm that
+would normally output a floating point number is actually a relativistic series"* — `exp`, `ln`,
+`sqrt`, `sin`, the cross-ratio are all kept; what stops is the **collapse**. Reachable only through
+`git -C /home/b/Workspaces/laboratory show a07ff376:src/eros/um/THEORY_AND_EQUATIONS.md`.
 
 **And today's coefficient repair is the third instance**, which is why it belongs in this table and
 not only in a defect record. `ComparativeMultiplicity` held two arms and destroyed them at
@@ -118,6 +133,24 @@ law needs is written and never exercised.
 
 **This is the section the keywords converge on, and it is where a standard theorem says exactly what
 Brandon has been saying.**
+
+**Read the prior deposits before this section.** `research/records/2026-08-06_THE_CONSTRAINT_IS_THE_CHI_THE_UNKNOWN_IS_THE_MISSING_CHART.md`
+already carries the Galois reading at `proved-standard`, names Klein's icosahedron, and states the
+resolution shape as *"found a chart whose symmetry matches the obstruction, and the unknown becomes
+determined."* `2026-07-17_THE_ARC_IS_THE_CONSTRUCTION...` carries Doyle–McMullen. This section
+restates and extends them; it does not discover them, and I wrote a first draft as though it did.
+
+**And the frame-relativity is Brandon's ruling, already persisted**, 2026-07-03:
+
+> *"The FLT sense in particular is very important and I need solvability being frame-relative to be a
+> persisted fact, I don't want to bother with winning that argument again."*
+
+together with the harder one, 2026-07-08:
+
+> *"you are not recognizing that the RH and FLT are plagued by absolute frames, they are malformed
+> like absolute P vs NP or AGI as notions."*
+
+So §3.4 below is not an acceleration offered to him. It is his ruling, with the citations attached.
 
 ### 3.1 What he posed
 
@@ -188,11 +221,23 @@ it is exactly the framework's own objective — transport between arbitrary char
 
 So the picture is:
 
+- **Doyle–McMullen**: a *generally convergent purely iterative* solution. A degree-11 rational map
+  is canonically associated with the icosahedron's 12 vertices, its symmetry realises `A_5` as Möbius
+  transformations, and a full-measure population of initial points converges to the 20 dual
+  dodecahedral vertices, from which a root is recovered. Already carried at
+  `research/records/2026-07-17_THE_ARC_IS_THE_CONSTRUCTION_THE_SPECTRUM_IS_ITS_RECEIVER_FACE.md:195-226`.
+
 ```text
 radical chart        ->  REFUSES at degree 5, and the obstruction has a name: A_5 is simple
 hypergeometric chart ->  RETURNS, as a series in the coefficients
 elliptic modular     ->  RETURNS, as a theta quotient
+icosahedral dynamics ->  RETURNS, as the limit of an exactly-constructed iteration
 ```
+
+**And `A_5` being the obstruction is not decoration — it is the icosahedron's rotation group.** The
+chart that resolves the quintic is the chart whose symmetry *is* the obstruction. That is the
+sentence the 2026-08-06 record already deposited, and it is the cleanest instance in the whole tablet
+of *"the unknown is a missing dimensional pathway."*
 
 **Galois theory does not say "unsolvable." It says "not in this chart," and it hands you the
 obstruction group.** That is a receiver-relative statement with a named, computable obstruction — the
@@ -210,10 +255,27 @@ cubic solution is the geometric completion of a cube; Ferrari's quartic passes t
 cubic; the quintic's resolvent has degree 6 and does not descend. Each resolvent **is** a diagram
 whose sides are the symmetric functions and whose unknown is the missing edge.
 
-The live owner adjacent to this is `crates/relational-geometry` — exact projective geometry over
-`BigRational` with **Sturm-certified roots** — and `exact_value.rs:189` `AlgebraicRoot`, which refuses
-construction unless its isolating interval provably contains exactly one root. *Root isolation is
-already exact here; root solving by chart transport is not built.*
+**The obstruction organ is BUILT and driven, and this section's first draft missed it.**
+`crates/holonic-engine/src/arithmetic_monodromy.rs` (1,748 lines) carries
+`QuinticTransitiveGroup::{Cyclic5, Dihedral5, Frobenius20, Alternating5, Symmetric5}` — the five
+transitive subgroups of `S_5` — with the predicate in code:
+
+```rust
+pub fn solvable_by_radicals(self) -> bool {
+    matches!(self, Self::Cyclic5 | Self::Dihedral5 | Self::Frobenius20)
+}
+```
+
+plus exact monic normalisation preserving the splitting field, discriminants by Sylvester resultant
+through a **fraction-free Bareiss determinant** over `BigInt`, and a declared refusal: *"absence of an
+unobserved cycle type never excludes a group."* Driven by
+`examples/arithmetic_monodromy_ecology.rs`. So the machine already **computes the obstruction**; what
+it does not do is **transport to the chart the obstruction names**.
+
+Root isolation is likewise exact — `exact_value.rs:189` `AlgebraicRoot` refuses construction unless
+its Sturm certificate proves exactly one root in the interval, and `implicit.rs:719` returns a full
+certified real-root population at a declared **quartic** aperture. *Root isolation and obstruction
+detection are built; root solving by chart transport is not.*
 
 **Owed, and it is a well-posed construction rather than a research question:** a Tschirnhaus organ.
 Take a degree-5 input, transport it to Bring form by an exact rational chart change, return the
@@ -288,7 +350,184 @@ in this repository has a lawful answer.
 
 ---
 
-## 4. Sections not yet written
+## 4. The weave: warp and weft are a reading in a frame
+
+**Truth status:** `established-bounded` for the laboratory's statement of the law; `measured` for the
+implementation gap. The governing sentence is a laboratory deposit, not this session's invention.
+
+Brandon's question, which is the whole content:
+
+> *"Can you make sure that your probing adheres to the Frame usage? Which axes are warp vs weft
+> relative to *what*?"*
+
+The laboratory answered it, and the answer is the same shape as §2b:
+
+> Warp/weft is not a label a fibre carries; it is a **reading in a frame.** From a frame below it,
+> lineage `X` is a **warp**. From a frame at `X`'s own level or above, the same `X` is a **weft**. So
+> **every fibre is simultaneously warp-for-some and weft-for-others.** *"Is `X` warp or weft?"* is
+> malformed; only *"warp or weft **from which frame**"* is well-posed.
+> — `THE_FABRIC.md:19-25` at laboratory `a07ff376`
+
+and the rule is explicit and quantitative: **a thread is warp iff its rank is above the frame's own
+`ref_rank`, weft iff at or below** (`THEORY_AND_EQUATIONS.md:3957-3963`). The frame carries a turn
+*and* a rank-level; shift the rank-level and the partition re-cuts.
+
+**This is §2b's sentence for a different carrier.** There, the *split* is invariant and the *hand* is
+a convention. Here, the *cloth* is invariant and the *partition into warp and weft* is a receiver
+declaration. Same law, different material — which is §4 of the contract exactly.
+
+### The defect, and it is today's defect again
+
+**`ref_rank` has no implementation anywhere** — not at `a07ff376`, not at its parent, not here. The
+only axis-tagging owner that ever existed, `pub enum Thread { Warp, Weft }` in a laboratory
+encoder module deleted before `a07ff376`, **tagged each axis statically at construction**. Nothing re-partitions
+under a frame change.
+
+That is the same defect this session repaired in `ComparativeMultiplicity` and convicted in `§8`:
+
+> **A receiver-relative reading, frozen into the carrier at construction time.** The law says the
+> partition is a function of `(fibre, frame)`; the carrier stored it as a function of `fibre` alone.
+> No downstream consumer can recover the frame-dependence, because the constructor discarded it.
+
+The live canon states warp/weft (`canon/04_GEOMETRY_NAVIGATION_AND_WEAVE.md:67-73`) and **drops the
+frame-relativity clause entirely** — the load-bearing half. That is a documentation regression to
+repair, and the construction it implies is small: a warp/weft *reading* that takes a frame, rather
+than a `Thread` field.
+
+---
+
+## 5. Friction is the coupling, not the residual
+
+**Truth status:** `established-bounded` for the definitions; `implemented-exact` for the carrier.
+
+I had this wrong in an earlier draft of this file and the correction matters. Friction is **not** a
+retained residual of a gluing that failed to close. It is the **relating itself**:
+
+> A wing, flagellum, foot, spider leg, or silk line does not possess propulsion in isolation. Its
+> internal articulation becomes worldline consequence only through the contemporary body it meets. At
+> the declared project grain, **friction** names this consequential boundary coupling.
+> — laboratory `2026-07-13_THE_MEDIUM_CLOSES_THE_STROKE.md:10-13`, ratified
+
+Brandon's own framing is the traversal reading:
+
+> *"The whole point of this is friction! Like it always has to do with scaling to find the ideal
+> points of friction to traverse to the place you want to get to. That's how you get from A to B, in
+> any sense, it's always with the chaining friction, like in any dynamic context about any entities."*
+
+and the inversion that makes it sharp — **rest is the friction; the ride is free.** A form is mass
+holding itself against the current. Frictionless means *no traversal at all*, which is the same
+statement as §2b's *"a receiver inertially at rest… no vacuous difference, no potential."*
+
+### It has a live owner, and it is the triangle
+
+**`soma/body/src/arrow.rs:17` `pub struct Arrow { reach, aim, cross }`**, named as the friction
+triangle by `soma/body/src/manifold.rs:99`:
+
+```text
+reach = |Δ|²             the squared span — the well of the relating
+aim   = Δa · Δb          the dot, the cosine — THE GRIP
+cross = Δa × Δb          the wedge, the sine — THE GYRATION, the slip
+```
+
+That is the law of cosines, and the minimal relating is three bodies — **the triangle is the quantum
+of friction.** `aim` and `cross` are the two faces of one contact: grip and slip, cosine and sine,
+and neither is a scalar summary of the other. The whole arrow travels; §2b's rule against reducing a
+pair to one number is already obeyed here.
+
+**Bounded, and the laboratory bounds it itself:** *"Physical friction includes deformation, adhesion,
+phonons, electrons, chemistry, and wear across scales. There is no established universal triangle
+quantum of tribological friction."* The triangle is the project's grain, not a claim about tribology.
+
+---
+
+## 6. Ant integration is the exact part, and it misses exactly what today's finding measured
+
+**This is the section that changes what is owed, and it is the strongest join in this document.**
+
+### What it is
+
+Brandon's original sense, verbatim:
+
+> *"Do you have enough context on her parallel sense I/O streams? The ant integration idea?"*
+
+and its retraction of an earlier over-claim, also his:
+
+> *"Refer to what I used to call "The Fundamental Theorem of the Machine", I was wrong about what it
+> was at that point, the ant integration is not it."*
+
+The laboratory's settled reading, which is a theorem-shaped statement:
+
+```text
+FTC:  the EXACT part  dη            — ∫f′ = f, the flat reconstruction, TRIVIAL cohomology
+      the COHOMOLOGICAL part        — dω = 0, ω ≠ dη, the holonomy, the path-dependence
+
+      the ANTS are the exact part. Many parallel integrators, each flat, no curl.
+      the SPIDER is the one organism whose web carries the cohomology.
+```
+
+And the operator where the split lives is **modulo**: *remainder = position rebuilt by walking;
+quotient = the integer the loop deposited.* The laboratory named the lawful return type on
+2026-07-11 and it has never been built:
+
+```text
+( position re-derived  ;  winding accumulated )
+```
+
+### Why this is today's finding under another name
+
+On 2026-08-08 the grown circuit returned `H₁ = Z⁹ ⊕ Z/2` at width 2 and `Z¹⁵ ⊕ (Z/2)⁴` at width 3.
+The torsion generator was exhibited: four lineage boxes, zero gate pins, a class reachable at
+multiplicity 2 and not at 1. And the finding attached to it:
+
+> `derivation_integral` retains its chord obstructions as `BigInt` (`running_integral.rs:594, 744`).
+> `Hom(Z/n, ℤ) = 0`. **A `ℤ`-valued holonomy is a homomorphism out of `H₁` and kills every torsion
+> class by construction.** The tree's holonomy instrument is provably blind to the class the tree's
+> invariant instrument just found, and they are in the same crate.
+
+**That is precisely the ant/spider split.** The running integral is an ant: it walks the path and
+rebuilds the position exactly, `∫f′ = f`, and it is correct. What it cannot carry is the quotient —
+the integer the loop deposited — because its carrier is a group with no torsion in it.
+
+So four names denote one missing organ:
+
+| named as | where | when |
+|---|---|---|
+| the cohomological part the ant integration misses | laboratory `FTC.md:43-50` | 2026-06 |
+| `( position re-derived ; winding accumulated )` | laboratory `2026-07-11_THE_CALCULUS_IN_CIRCULATION.md:61` | 2026-07-11 |
+| a `ℤ/n`-valued chord test | this session's torsion record | 2026-08-08 |
+| §2b's *"name the windings instead"* | `CLAUDE.md` §2b, standing obligation | 2026-08-08 |
+
+**And one half of it now exists.** `RayCrossings`, built today in
+`relational-geometry/src/exact_analysis.rs`, is exactly this datatype for one carrier: it retains the
+crossing population *by address* and offers `winding()` as a reading. `total()` is the ant's count;
+`winding()` is the spider's integer; `cancels()` is the case where the ant walked and the spider
+deposited nothing. **The pattern is built and driven for the η boundary and for nothing else.**
+
+The owed construction is therefore concrete rather than a research question: give
+`running_integral`'s chord obstruction the same two-arm shape, with a coefficient group the caller
+declares. A prototype detector already ran — solving over `F₂` for a cocycle pairing to 1 with the
+torsion class returned a support of **size one**, the single arc appearing in one face boundary with
+coefficient 2.
+
+### The bound
+
+The laboratory's own soma-era record refuses the over-reading, and it is worth carrying:
+
+> *"Research on harvester ants gives a disciplined biological comparison. Colony task decisions can
+> arise without central control from local encounter rates… This establishes that differentiated
+> local interaction can regulate collective activity. It does not establish a software data
+> structure, exact commutation, repository semantics, or a proof that every local process should run
+> concurrently."*
+
+There is **no stigmergy or pheromone mechanism** anywhere in the material — the biological citation
+is encounter rates, and the inference to a data structure is explicitly barred. The one code owner
+that ever implemented ant integration is a PyTorch sidecar computing a scalar-gated soft attention
+over content lines, which is the shape `CLAUDE.md` §13 rule 2 governs, and it has no counterpart in
+the live body.
+
+---
+
+## 7. Sections not yet written
 
 Named here so their absence is legible rather than silent, per §7 and §8.
 
@@ -307,14 +546,8 @@ Named here so their absence is legible rather than silent, per §7 and §8.
 - **Hodge and holomorphic spaces** — flagged by Brandon as neglected. Partly discharged 2026-08-08 by
   `matroid_chow.rs` (Hodge–Riemann on a matroid representable over no field) and by §2/§3 of the
   contract; the holomorphic half is not written.
-- **Weave: warp and weft** — *"Which axes are warp vs weft relative to what?"* Collection in progress.
 - **Illicium** — *"the illicium is itself the frame… the arrow of time, the arrow of entropy, in the
   active system."* Collection in progress.
-- **Friction** — *"'Good' intuition feels smooth; brains can objectively feel when patterns are not
-  quite clicking together."* Collection in progress. The candidate identification is friction = the
-  retained residual of a gluing that did not close, which already has an owner in
-  `running_integral::ChordObstruction`.
-- **Ant integration** — *"parallel sense I/O streams."* Collection in progress.
 - **MorphoHDL and grown circuitry** — partly discharged: `grown_cell.rs` grows by exhaustion of
   material with no counter, and §3 of this tablet's cost finding came out of it.
 - **Rendering coupled to perspective receivers.**
