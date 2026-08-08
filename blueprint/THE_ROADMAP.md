@@ -43,6 +43,46 @@ that make them statable as falsifiable laws.
 
 ---
 
+## The active line, ratified 2026-08-07 and deposited so it is not re-derived
+
+> *"I have been more explicit about my desire to use a conditioned variant of the machine for
+> mathematics derivation and theorems involving linguistics! That directly involves the curvature
+> loop, the atlas reader, the skein relations, integration through reflection & sphere packing, and
+> codec recovery!"*
+
+**This is one piece of work, not six.** It was repeatedly mistaken for six adjacent items and put to
+Brandon as a choice between them; it is not a choice and the composition is stated here once.
+
+**A conditioned variant of the machine, on mathematical and linguistic material, producing
+derivations and analysing them as grown circuits.** A derivation *is* a circuit. Analysing it is
+reading its invariants. The named pieces are the operations that reading needs:
+
+| piece | what it is in the line | state |
+|---|---|---|
+| **codec recovery** | the decomposition must be **recovered**, never authored. A tokenizer is a codec; braille, morse and colour are the same operation on other surfaces. Hand-auditing one is not work. | `crates/holonic-engine/src/bit_causal.rs` recovers opaque bit transducers; the symbol-transducer analogue is being built |
+| **integration through reflection** | the derivation is traversed as an exact **running sum**, and two paths enclosing one region are compared as a pair whose disagreement is **deposited as holonomy** rather than refined away | `Derive_FTC.lean` proves `∂`/`∫` inverse in the frozen laboratory; the Rust owner is being built |
+| **curvature loop** | where those paths disagree is curvature, and it lives on the hinges. `coordination_defect` computes the disclination charge and `geometry_responses` never consumes it — the loop is drawn and open | being built |
+| **sphere packing** | Brandon's lightning-leader quadrature: the integration paths are **leaders extending along founded paths**, not spheres radiating. The packing of their reach is the area, and the pathway population is the phase distribution | being built |
+| **skein relations** | when two derivations are the **same theorem**: related by local substitutions that preserve the invariant. Supplied 2026-07-24 as *"pivotal for the Riemann Hypothesis and how we define compression for machine learning"* | `crates/holonic-engine/src/skein.rs` |
+| **atlas reader** | what lets any of it be read back rather than emitted into a directory nothing opens | open |
+
+**Lean is an export codec**, not a judge and not the proof line — see the redirection at Part two.
+The machine produces the derivation and analyses it internally; Lean formalizes what was already
+produced so it can be verified and cited.
+
+**What is explicitly NOT this line, and has been refused twice:** the tiger phase atlas, landscape
+photography, music decomposition. Those are *material*, and choosing material as the subject is the
+hyperfixation `CLAUDE.md` §4 convicts. The mechanism is domain-free — *"the communication medium is
+arbitrary and it is the causal calculus that informs common ecological invariants intersecting
+between domains."* Do not propose them again.
+
+**Standing conduct on this line.** Brandon, 2026-08-07: *"You need to proceed continuously… this
+checkpointing shit you're doing is the reason we can't progress."* Build through the line rather
+than stopping after each organ to report and ask which is next. Where his intention or this roadmap
+is unclear, **deposit the clarification here** rather than putting the question to him.
+
+---
+
 ## The fact that reframes every prior blueprint file
 
 **HEAD is `06518c3`, 2026-08-07: "Transition to Rust: archive the C++ body, import the laboratory
