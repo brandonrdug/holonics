@@ -39,12 +39,13 @@ soma/    body                         pure law, no_std, zero dependencies
 2026-08-08, summed across **42** `test result:` lines on a tree with nothing else running):
 
 ```
-1405 passed, 0 failed, 14 ignored
+1440 passed, 0 failed, 14 ignored
 ```
 
-Taken at `4df360f` **in a detached worktree checked out from the commit**, not in the working tree —
-so the figure is a property of what is committed. The working tree carries one further untracked
-module (`matroid_chow`) that is not in it.
+Taken at `4d2bd53` on a working tree `git status` reports **clean**, so the figure is a property of
+what is committed. The earlier `1405` was taken at `4df360f` in a **detached worktree checked out
+from the commit** — the stricter method, and the one to use whenever the working tree is dirty. The
+figure moved by `matroid_chow`'s 32 tests plus three declared controls.
 
 **Take the figure by summing the result lines, never by reading one of them and never through a pipe
 to `tail`.** A `tail` cuts the earlier packages off and returns a number that looks like a total; it
