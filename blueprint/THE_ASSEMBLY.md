@@ -35,9 +35,16 @@ condensation half and its positivity half.** Write `fn item(c: CausalCellId) -> 
 never `impl From` in `algebraic.rs`, which would put a placement dependency in the algebraic carrier.
 
 `ComplexSystem { complex, receivers: Vec<DilatedSection>, inputs: Vec<CausalCellId> }`. Observation
-is `1 + section.lineage.distance[&cell]` inside the horizon, `0` outside — a receiver-local address,
-the same shape `eros_placement_over_real_charts.rs` already uses. Successor steps across a 1-cell;
-`None` is a declared terminus.
+is `1 + section.lineage.distance[&cell]` inside the horizon, `0` outside — a receiver-local address.
+Successor steps across a 1-cell; `None` is a declared terminus.
+
+**Corrected 2026-08-08.** This paragraph said the address was *"the same shape
+`eros_placement_over_real_charts.rs` already uses."* It is not, and the difference is load-bearing.
+That driver's observation is `Observation(automaton_state)` — a state **identity**, independent of
+any receiver metric and injective per item. `1 + distance` is a **metric** address, and only a
+metric address makes equidistant cells share a class, which is the only reason a collapsed
+population exists at all. Written the other way the one-shot partition is already discrete and the
+organ returns nothing. Two organs, two receiver species; do not read one as the other.
 
 **The seam is one-directional and that is a declaration, not an omission.** `Observation` is
 documented as *"an opaque exact token — never a magnitude."* There is no adapter back. Widening it
@@ -69,14 +76,35 @@ identity types `local_star` uses. Three pieces are not free:
   that picks a canonical direction has invented geometry the layout did not have.**
 
 **5 · Plate I/O.** Each of the ~25 `soma/life/examples` sites keeps its hash **and** writes the
-octets to `output/<driver>/<name>.form`. Then `holon-plate deposit` and `standing-deposit deposit`
-run from the shell. **No dependency is added anywhere**, which is what F1 requires.
+octets under `output/<driver>/`. Then `holon-plate deposit` and `standing-deposit deposit` run from
+the shell. **No dependency is added anywhere**, which is what F1 requires.
+
+**Corrected 2026-08-08, and the correction is a measurement.** This said the path was
+`output/<driver>/<name>.form` — a fixed name per site — which contradicts the choreography below,
+where *"a plate's filename is its `plate_sha256`; nothing is written twice."* The design did not say
+which governs, and the implementation took the fixed name. On the real driver:
+
+```text
+distinct rest hashes in eros_text_training's own report:  511
+.form files deposited:                                      1
+```
+
+**510 of 511 returned forms were overwritten**, and the survivor carries no lineage saying which
+rest it is. A fixed name is correct only for a site called exactly once, and the sites are called
+in loops. **Content addressing governs**: the name carries the hash, and the driver reports the
+address it wrote. This is the same sentence as the reviewable rule below — the JSON receipt kept
+511 hashes and zero artifact addresses, which is a population reduced to a scalar on its way
+onward, with the reduction happening in the filesystem rather than in a type.
 
 **6 · The `RBIN` plate schema.** A census is fixed names and `u64` values, so a varying-arity family
 like `betti_0…betti_k` cannot be one. Use `cells`, `grades`, `boundary_rank_total`, `betti_total`,
 `torsion_factors`, and the Euler characteristic — the last encoded as `euler_positive` and
-`euler_negative`, exactly one nonzero, because **`i64 → u64` must be a declared bijection, never a
-cast.**
+`euler_negative`, **at most one nonzero**, because **`i64 → u64` must be a declared bijection, never
+a cast.**
+
+**Corrected 2026-08-08:** this said *"exactly one nonzero"*, which is false at `χ = 0`, where both
+are zero — and `χ = 0` is not exotic, the hollow triangle returns it. The implementation already
+said "at most one"; the design was the wrong one of the pair.
 
 ## The plate choreography
 
@@ -127,7 +155,20 @@ deficit to zero"* is **FALSE** — bipartite components with unequal parts are f
 deficit, at a scale that is pure counting. A run claiming universal convergence has mis-graded.
 
 **(c) PRODUCTION → ANALYSIS.** β₁ at grade 1 is the independent routes to one result; torsion is a
-recruitment that cannot be un-derived. **(a) and (c) are one crossing on two materials** — that is
+recruitment that cannot be un-derived.
+
+**Both halves of that sentence are false of the implementation, measured 2026-08-08, and this is
+the only loop whose WIRING was refuted rather than its evidence.** β₁ does not see statement
+identity: `found_circuit` never reads `derivation.statement` when founding cells, so two artifacts
+proving **different, unrelated** statements return β₁ = 2, identical to two proving the same one.
+What it counts is shared preamble tokens among any declarations, related or not. And the only
+nonzero torsion in the entire deposit is the `end` keyword — every artifact names `Soma` twice
+because Lean requires `namespace Soma … end Soma`, so removing the wrapper takes `Z/2` to empty.
+That is the **export codec's closing-brace convention promoted into a homological invariant**: a
+receiver-visible coordinate promoted into an invariant, which is the contaminant species `CLAUDE.md`
+§0 names, found again here. Either the circuit learns to see statement identity and to exclude the
+codec's own structural keywords, or the quantity is renamed to what it measures. Do not carry this
+sentence as written. **(a) and (c) are one crossing on two materials** — that is
 §4's anti-scatter discipline holding, not two organs. **Falsifier:** withhold the reading and confirm
 target selection is identical; and **the reading must be able to be nonzero** — the 31 deposited
 artifacts today are one statement with β₁ = 0, so the first obligation is a declared control.
@@ -150,6 +191,51 @@ and torsion obstructions, the second existing because the first was insufficient
 
 **The reviewable rule: no adapter may reduce one of these structures to a boolean or a scalar on its
 way to the next organ.** Gate on the boolean if you must; deposit the population.
+
+### Three of those four preventers were defeated, and the design named each failure in advance
+
+Measured 2026-08-08, by eight adversaries against the eight organs built to this design. The
+document called these four correctly; what it did not anticipate is that **declaring a preventer is
+not installing one.**
+
+- **The pivot rule.** *"Read under all three and compare"* was implemented exactly — and on every
+  declared fixture the three rules produce **identical execution traces**, because `find_pivot`
+  breaks ties with strict `<`/`>` and every boundary matrix these fixtures build has all nonzero
+  entries of equal magnitude. It is one computation run three times and compared with itself twice;
+  cutting the loop to a single rule kills zero of thirty-one tests. The material that would separate
+  the rules exists in `rebase_invariants.rs`'s own test matrices, which distinguish them 5 of 5, and
+  was not used.
+- **The walk order.** The adapter kept `lineage.distance` and dropped `lineage.reached` — and
+  `dilate` computes distance breadth-first regardless of how it walked, so `reached` is the *only*
+  order-sensitive field. This is the sentence above, verbatim, with the field names changed: it kept
+  the invariant, deleted the chart, and then certified the invariance that the deletion guaranteed.
+- **The aperture.** *"Composing without reading them returns a wrong answer"* — and it did.
+  Declaring two new substitutions, and merely relaxing the admission filter over a fixed
+  population, return **bit-identical `Placement`s**, both reported as `Founded`. `placement.rs`
+  carries `receiver_extent` precisely so the receiver-side aperture cannot do this; the
+  realizer-side aperture has no such carrier.
+
+Only the receiver preventer held, and it held because it had already been through this once — the
+torsion obstruction exists because free-rank alone was found insufficient.
+
+**The law this yields, and it is checkable rather than exhortatory:**
+
+> **A gauge whose group acts trivially on the declared material is not a gauge.** Declaring N
+> schedules does not make N frames; the *material* decides whether the orbit is non-trivial, and
+> that is a measurement you can take. Instrument the transformation, record the orbit, and require
+> it to be non-trivial before reading agreement as evidence.
+
+This is the third member of a family `CLAUDE.md` §8 already carries two of: *a receipt that could
+not have come out otherwise carries no evidence*; *a law that returns zero proves nothing about
+itself*; and now *a gauge that could not have disagreed has not agreed about anything*. All three
+are the one defect — **a check whose material cannot vary the property under test** — and the third
+is the one that survives review, because unlike the other two it produces a green, plural,
+rigorous-looking receipt.
+
+The instrument for it already exists in this repository and is the same organ: a vacuous gauge is
+one whose declared schedules land in **one block of the Nerode partition** on the declared material,
+and `receiver_exact_compression` returns exactly that — the collapsed pairs, each carrying the
+shortest word that separates them. A gauge should be required to exhibit its distinguishing word.
 
 ## What must not be built
 

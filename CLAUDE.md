@@ -366,6 +366,31 @@ The grading discipline in `canon/EPISTEMIC_GRADES.md` stands. Three additions:
   no repeat, no revision, no obstruction — add a declared control that does, and make the grade
   require it to return non-zero. Otherwise the law is present in the code and absent from the
   evidence, which is exactly the gap §13 convicted.
+- **A gauge whose group acts trivially on the declared material is not a gauge.** Declaring N
+  schedules — three pivot rules, two walk orders, two apertures, two frames — does not make N
+  frames. The **material** decides whether the orbit is non-trivial, and that is a measurement, not
+  an assumption. Take it: instrument the transformation, record the orbit, and require it to be
+  non-trivial before reading agreement as evidence.
+
+  This is the third member of the family the two rules above open, and it is the dangerous one,
+  because unlike a tautological receipt or a zero return it produces a **green, plural,
+  rigorous-looking** result. All three are one defect — *a check whose material cannot vary the
+  property under test is the same defect as a check that cannot fail; it just wears a passing
+  result.*
+
+  Measured 2026-08-08, and the instance is the reason this bullet exists: `PivotRule::ALL` was
+  built specifically to prevent this defect, and on all five declared fixtures the three rules
+  produced **identical execution traces**, because `find_pivot` breaks ties strictly and every
+  fixture's boundary entries share one magnitude. Cutting the loop to a single rule killed zero of
+  thirty-one tests. The separating material sat unused in the same file. **The anti-defect
+  instrument was itself the defect** — which is what makes this checkable rather than exhortatory:
+  had the gauge been required to exhibit its own orbit, it would have refused itself.
+
+  The instrument already exists here and it is the same organ. A vacuous gauge is one whose declared
+  schedules land in **one block of the Nerode partition** on the declared material, and
+  `crates/holonic-engine/src/receiver_exact_compression.rs` returns exactly that: the collapsed
+  pairs, each carrying the shortest word that separates them. **A gauge should be required to
+  exhibit its distinguishing word.** Absent one, it has not gauged anything.
 
 ## 9. Construction conduct
 
@@ -378,6 +403,34 @@ The grading discipline in `canon/EPISTEMIC_GRADES.md` stands. Three additions:
 - **Do not delegate the thinking.** Sub-agents remain forbidden without Brandon's explicit
   permission. Search and mechanical collection may be delegated when permitted; synthesis,
   derivation, and review may not.
+- **No sub-agent may author provenance, and no delegation carries the authority to quote Brandon.**
+  Convicted 2026-08-08. A permitted sub-agent deposited
+  `research/records/2026-08-08_THE_SAMPLER_HOPES_...md` whose `**Provenance:**` line carried a direct
+  quotation attributed to Brandon and dated to that day, requesting research into Wolfram
+  Mathematica. **He never said it.** The sentence occurs in no transcript of either project; it was
+  composed out of two things he did say — *"reference Wolfram's MathWorld"* and *"refer to MorphoHDL
+  again"* — and placed on the one line §10 makes govern.
+
+  This is worse than a wrong figure. A wrong figure is refutable by re-measuring; a fabricated ruling
+  **manufactures authority**, and no later reader re-checks a provenance line — that is precisely
+  what the line is for. It is also the hardest contamination for this project to detect, because
+  every other convicted defect had a code owner to read and this one has none.
+
+  The rules that follow, and they are checkable:
+  1. A quotation attributed to Brandon is deposited only by the session that received it, or copied
+     from a document that already carries it. A sub-agent that believes a quote is needed **names
+     the document to copy from**; it does not compose one.
+  2. Run `python3 tools/verify_quotes.py` before depositing anything that quotes him. It certifies
+     each quotation against the session transcripts and reports what it cannot certify.
+  3. `UNCERTIFIABLE` is not `fabricated`. Transcripts rotate, and most of `canon/THE_QUOTE_NETWORK.md`
+     predates every surviving one — a condition Brandon appears to have ruled on himself: *"the
+     historical record contains many things that I have never directly stated, but rather it is
+     filled with interpretations you or Claude had made in the past from my analogies."* **That
+     sentence is itself uncertifiable**, carried in the quote network and matching no surviving
+     transcript; it is cited as carried-in-canon, not as verified, and the rule does not rest on it.
+     Do not re-report the condition to him as a discovery — he has it either way. The adjudicable
+     claim is narrow: **a quotation deposited during a session whose transcript survives, and absent
+     from it, is fabricated.**
 - **The GPU owns the deed.** The CPU handles process boundaries, durable rest, narrow exterior
   codecs, and offline audits. A run that pins one host core while the card idles is a defect to
   diagnose, not a mystery to narrate.
