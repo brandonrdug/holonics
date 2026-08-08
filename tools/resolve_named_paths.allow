@@ -40,7 +40,6 @@ blueprint/THE_ROADMAP.md :: exact/enclosure.hpp :: same table
 # --- Owners removed by an excision, recoverable only from git history ---
 # CLAUDE.md §13 names each with the commit that deleted it, so a reader can check with
 # `git show <commit> -- <path>`. These are the "removed, not deprecated" rule working.
-CLAUDE.md :: event/cultivated_route.hpp :: deleted at 40e1211; §13 names that commit in the same table row
 CLAUDE.md :: cultivated_route.hpp :: same, basename form
 CLAUDE.md :: conditioning_law.hpp :: deleted at 2b562c8; §13 names that commit in the same table row
 CLAUDE.md :: conditioning_schema.hpp :: deleted at 2b562c8; same
@@ -85,3 +84,11 @@ canon/THE_QUOTE_NETWORK.md :: target/holonic-engine/curved-receiver-phase-atlas-
 # contents are `build/` and `packages/` — both in this checker's own PRUNED set.
 CONSTRUCTION_STATE.md :: .lake/ :: Lake's generated-artifact directory, quoted as an ignore pattern; its contents are inside the checker's PRUNED set
 blueprint/THE_ROADMAP.md :: .lake/ :: Lake's generated-artifact directory, quoted as an ignore pattern; its contents are inside the checker's PRUNED set
+
+# --- Laboratory owners deleted BY the pinned commit, and one permanent loss ---
+# `a07ff376` is itself the commit that removed the symbolic-reasoning family; §5 names these in
+# the sentence that regrades their receipt, and says where they survive (`93834398`). Naming a
+# deleted owner is the point of the regrade — it is how a reader checks the claim against history.
+CLAUDE.md :: continual_reasoning.rs :: deleted BY the pinned laboratory commit a07ff376; survives at its parent 93834398, which §5 states
+CLAUDE.md :: runs/dialogue-distractor-scaling/REPORT.json :: never tracked at any laboratory commit; §5 names it to record that the 8,748/2,701/11,795 receipt is unrecoverable, the same loss class as the tiger figures
+CLAUDE.md :: src/soma/life/src/symbolic_reasoning.rs :: same — the owner whose receipt §5 regrades, deleted BY a07ff376 and readable at 93834398

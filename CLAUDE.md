@@ -255,15 +255,45 @@ target.**
   every branch re-entered as self-emanated lineage, delivery-gauge rest, exact remount. Then
   4,051 feature-receiver rests compiling 22,459 continuations with no corpus scan and no router;
   the absent-morphology control emitted nothing rather than fabricating.
-- **Training with a behavioral ablation.** 50,667 occurrences crossed as exposure with zero source
-  surfaces retained; the mounted-only body withheld `9*8`, the trained body returned `72`, and
-  after its unique developmental passage was dropped a source-detached remount returned `63` for
-  novel `7*9`. Mounting, exposure, training, and reference are separated *and empirically
-  distinguished*. **This is the LABORATORY's return and it stands there.** The C++ restatement of
-  it was withdrawn 2026-08-06: the deleted `event/cultivated_route.hpp`'s "founded law" was the
-  C++ multiply operator, and `product_route()` was nullary and `constexpr`, so the two "distinct
-  developmental passages" were one constant twice and no operand pair ever reached the ecology.
-  That owner and its withdrawal are archived; the laboratory's return is live code here.
+- **Training with a behavioral ablation — REGRADED 2026-08-08 by reading the owner, and the citation
+  moves.** The `9*8` / `7*9` receipt was carried here for weeks without anyone opening the code. Its
+  owner is `src/soma/life/src/symbolic_reasoning.rs`, and four things are true of it:
+  the trained *content* is authored, not corpus-derived — `AutonomousLeaderSpec` carries `&'static`
+  literal probes `"3 * 4"` and `"7 * 6"`, and the 50,667-occurrence corpus contributed only glyph
+  counts that decide *whether* a family fires; the ablation is construction-by-omission, since
+  `mounted` is a separately built body that was never exposed and `drop(corpus)` is source
+  *departure*, not removal; the arithmetic is **mounted**, computed by the inherited rational
+  normalizer, so training gates *admission* and not capability — `63` for novel `7*9` evidences a
+  retained admission gate surviving detachment, which is real but narrower than "the trained body
+  returned 72"; and the record's own successor says so, *"it did not train the inherited exact
+  operator laws or the mounted articulation transducer."*
+  It is also **deleted**: `a07ff376` is the commit that removed it, along with `continual_reasoning.rs`
+  and both drivers. It survives only at `93834398`, and `runs/` was never tracked, so the 50,667
+  receipt is unrecoverable.
+  It is still better than the C++ restatement withdrawn 2026-08-06 — there, `product_route()` was
+  nullary and `constexpr`, one constant twice, and no operand pair reached the ecology at all; here
+  two genuinely different operand pairs cross the parser and the exact normalizer.
+
+  **What stands in its place, live at `a07ff376` and stronger, is where the citation now points:**
+  `src/soma/life/src/holonic_training.rs` (`TrainingEcology`, 1,387 lines), whose structure is
+  *derived from the occurrence* rather than authored — `consequence_complex` → `derive_templates` →
+  **`predict` before mutation** → `ConsequenceRelation::{None, Ride, OpenIncluded, OpenResidual}`,
+  with a contradicting later return graded `OpenResidual` rather than "incorrect", and
+  `:567` *"Receiver parameters do not assign a scalar score."*
+  And `src/soma/life/src/agentic_language/tests.rs:656`, which is the sharpest demonstration in
+  either repository: the first returned correction changes no conduct, the second does
+  (`CODEC_MINIMUM_RECURRENCE = 2`), a novel third surface never supplied is emitted carrying
+  `version_lineage` naming both causing returns, the detached training bytes alone predict a fourth
+  novel name, and a full remount emits a fifth.
+
+  **Three ablation shapes are measured; a fourth does not exist anywhere.** Construction-by-omission
+  (four probes, zero candidate paths). **Receiver-axis withholding** — withholding the `language`
+  axis takes `agreement_rank` 3 → 2 and complete paths 1 → **2**, so *withholding structure
+  increases plurality* rather than decrementing a number; this is the shape to imitate.
+  Reference-vs-return (`bit_causal.rs`: inspecting a reference leaves the rest image bytewise
+  unchanged). The fourth — **deleting a founded fiber and re-querying** — has no implementation in
+  the laboratory or here; `git grep 'fn remove|fn forget|fn prune|fn ablate'` over the training
+  owners returns nothing. §13 rule 1's strict form is therefore **owed construction, not a port.**
 - **Multimodality with no fusion module and no pair product.** RELAMPAGO: optical, five-band
   spectral, geolocation, and vertical sections on one eighteen-coordinate phase face; 24,584 and
   21,147 relations opened with zero pair overlap and the complete pair product never enumerated;
@@ -320,26 +350,47 @@ source record refutes it directly:
   **commitment-before-witness**."* 24 passages conditioned persistent morphology though none
   belonged to the minimal witness family. That is wrong at 127 occurrences as much as at 1,009.
 
-**What actually stands is an unimplemented formula.** The record names both remedies and neither has
-ever been written — `grep -rniE "mincover|min_cover"` over `crates/` and `soma/` returns **zero**:
+**Corrected again, same day, after actually reading the laboratory.** An earlier form of this
+paragraph said the two remedies were "an unimplemented formula" and cited a `MinCover` grep
+returning zero in *this* repository. That was archaeology on a July record instead of a look at the
+body that ran it, and it is wrong twice over.
 
-```text
-I(R) = ⋃_{K ∈ MinCover(R)} ⋂_{f∈K} I(f)          factor the receptive star
-                                                  MinCover founded by the receiver's clause and
-                                                  entity morphology, never by an inverse-frequency
-                                                  score — that would be §13's banned governor
-separate provisional contact from continuing cultivation
-```
+**Both remedies exist as working laboratory code**, one layer away from where they were wanted:
 
-**And that formula is the far-field condensation §11 asks for.** A union of intersections over a
-minimal cover *is* replacing a far population with compact representatives; the sections a cover
-fails to reach are the retained obstruction. §11 says the learning wall and the mathematical wall
-are one wall — they are, and the learning side has had a closed form sitting unwritten since
-2026-07-31 while the section treated it as a deep open problem.
+| remedy | owner at `a07ff376` |
+|---|---|
+| factor the receptive star, `I(R) = ⋃_K ⋂_{f∈K} I(f)` | `src/soma/life/src/relational_language/ecology.rs:1362` `clause_region_incidence` — the intersection form, with the cover founded on the receiver's own clause and entity morphology exactly as demanded, never inverse frequency. Plus `morphological_language/ecology.rs:437`, which falls back to the union when an intersection is empty, so a single-feature alternative stays lineage rather than being declared false. |
+| provisional contact ≠ continuing cultivation | `src/soma/life/src/holonic_training.rs` — `propose_views` / `commit_views`, generation-checked and refused intact if another return moved the generation first; with `minimum_recurrence ≥ 2`, so a route is retained but inactive until it recurs across **distinct** occurrences. And `src/soma/membrane/src/live_holon.rs:204` `ProvisionalSettlement`, a two-phase prepare/commit primitive. |
 
-Note also that the record never states what breadth would be **correct**. `22.9%` is called *"too
-broad"* with no target and no computed alternative, so as written it cannot be falsified — §8's own
-defect, in the document that convicts it.
+**And the laboratory withdrew the framing itself, twice, before it froze.** 2026-08-01: *"This is not
+evidence that broad recruitment should be reduced."* 2026-08-02: *"Broad recruitment remains
+lawful."* Brandon, 2026-07-29, ruling directly: *"Do not remove chronology. Let informants couple
+through the capacitance they enable about one another, and let sparse lightning-like leaders derive
+a resonant image of the retained patterns."* In that run one germ recruited 1,159 of 1,556
+informants — 74% — and the record graded it `OPEN` without calling it a defect. Its title is the
+ruling: **the aperture cannot decide the deed.**
+
+**What the laboratory named as actually missing is concrete and still true in the frozen code.**
+`relational_language/ecology.rs:626` and `:639` set `characteristic_delay: 1` on both directions of
+every promoted pair. Unit cost on every relation edge makes a high-incidence infrastructure face an
+artificially fast traffic hub across many source regions. The named construction, verbatim:
+
+> *an exact receiver-local transport law in which capacitance, branch population, source continuity,
+> returned recurrence, and competing current occupancy affect passage delay without turning those
+> relations into a scalar relevance score or deleting the broad routes.*
+
+That is a buildable organ in the project's own circuit vocabulary, not a wall. Note also that the
+July record never stated what breadth would be **correct** — `22.9%` was called "too broad" with no
+target and no computed alternative, so as written it could not be falsified: §8's own defect, in a
+document that convicts it.
+
+**The failure loop, named by the laboratory as a shape, because it recurs:**
+*interior materialization → resource refusal → widen a scalar aperture → replay under another
+executor → add a lookup structure around the same global question.* Recognise it and stop.
+
+**The figures are unrecoverable.** `runs/` was never tracked; there are zero files under it at any
+laboratory commit, so `runs/dialogue-distractor-scaling/REPORT.json` and the 8,748 / 2,701 / 11,795
+receipt are gone — the same loss as the tiger figures, and the reason §0 demands a verifier.
 
 **Reading rule.** Do not restate this as a missing comprehension, consequence, semantics, relevance,
 or research-mode subsystem — §6 convicts that repeatedly and by direct correction. That ban is on
