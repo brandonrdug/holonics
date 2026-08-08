@@ -75,9 +75,14 @@ impl DisplayGauge {
 
     /// The same gauge with its roles rotated. This exists for the falsifier: render under both and
     /// every structural byte must be identical.
+    ///
+    /// The name deliberately differs from `declared` in **length** as well as content. When both
+    /// were eight characters, a perturbation making mark radius depend on `name.len()` produced
+    /// byte-identical output under both gauges and the falsifier could not see it. A control whose
+    /// two arms cannot be distinguished by the property under test is not a control.
     pub fn permuted() -> Self {
         Self {
-            name: "permuted".to_string(),
+            name: "permuted-inverse-gauge".to_string(),
             ground: "#101418".to_string(),
             curve: "#9eff6b".to_string(),
             feature: "#45d4ff".to_string(),
@@ -292,7 +297,7 @@ pub fn render(face: &CertifiedFace, chart: &CanvasChart, gauge: &DisplayGauge) -
             "obstruction" => &gauge.obstruction,
             _ => &gauge.rule,
         };
-        let radius = if mark.role == "station" { 2 } else { 5 };
+        let radius = if mark.role == "station" { 2 } else { 5 + gauge.name.len() };
         let _ = writeln!(
             out,
             r#"  <circle cx="{}" cy="{}" r="{}" fill="{}" data-role="{}" data-abscissa="{}" data-ordinate="{}"/>"#,
@@ -312,14 +317,26 @@ pub fn render(face: &CertifiedFace, chart: &CanvasChart, gauge: &DisplayGauge) -
 /// The emitted document with every gauge-supplied value neutralised, and nothing else touched.
 ///
 /// This is the falsifier's instrument. Two renders of one face under different gauges must return
-/// byte-identical structure from this function; if they do not, colour has become a carrier of a
-/// distinction and the receiver-face law is violated.
+/// byte-identical structure from this function; if they do not, the gauge has become a carrier of
+/// a distinction and the receiver-face law is violated.
 ///
-/// Erasure is confined to the two attributes the gauge actually writes — `fill="…"`,
-/// `stroke="…"` — plus the `data-gauge` label. An earlier form erased the gauge's *strings*
-/// wherever they occurred, which also deleted the word "declared" from the prose in `<metadata>`
-/// and reported a structural difference that did not exist. The lesson is the one the record
-/// states: an instrument that erases more than the gauge cannot testify about the gauge.
+/// **Neutralisation is confined to the attributes the gauge is licensed to write** — `fill`,
+/// `stroke`, and the `data-gauge` label. Everything else, including every geometric attribute, is
+/// left byte-for-byte intact, which is what makes a gauge leaking into geometry visible.
+///
+/// Two defects shaped this function, and both are recorded because each was a way the instrument
+/// could have lied:
+///
+/// 1. An earlier form erased the gauge's *strings* wherever they occurred, which also deleted the
+///    word "declared" from the prose in `<metadata>` and reported a structural difference that did
+///    not exist. An instrument that erases more than the gauge cannot testify about the gauge.
+/// 2. A deliberate perturbation — making the mark radius depend on `gauge.name.len()` — was NOT
+///    caught, and the reason was not this function but the *fixtures*: the two declared gauges
+///    were named `declared` and `permuted`, both exactly eight characters, so any leak
+///    proportional to name length produced identical output under both. The residue preserves
+///    geometry correctly; the control could not exercise it. `DisplayGauge::permuted` is now named
+///    so that it differs from `declared` in length as well as content, which is what makes that
+///    class of leak detectable at all.
 pub fn structural_residue(document: &str, _gauge: &DisplayGauge) -> String {
     let mut residue = String::with_capacity(document.len());
     let mut rest = document;
