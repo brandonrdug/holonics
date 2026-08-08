@@ -399,6 +399,23 @@ fn verify_winding(receipt: &WindingReceipt, label: &str) -> Result<(), String> {
         !receipt.segments.is_empty(),
         format!("{label}: empty boundary receipt"),
     )?;
+    // The net and the two arms are two readings of one crossing population and must agree.
+    require(
+        receipt.crossings.winding() == receipt.winding,
+        format!("{label}: the net winding disagrees with the crossing arms"),
+    )?;
+    // Every crossing carries a segment address and every address resolves.
+    for index in receipt
+        .crossings
+        .with_the_turn
+        .iter()
+        .chain(receipt.crossings.against_the_turn.iter())
+    {
+        require(
+            *index < receipt.polygon.len(),
+            format!("{label}: crossing address {index} is outside the boundary"),
+        )?;
+    }
     require(
         receipt.segments.len() == receipt.polygon.len(),
         format!("{label}: segment/polygon extent differs"),
@@ -828,12 +845,34 @@ fn main() -> Result<(), String> {
         atlas.elapsed_milliseconds
     );
     for lineage in &atlas.zero_lineages {
+        // What the bisection discarded, and whether the discarded half was doing work.
+        //
+        // A half is dropped on `winding == 0`, which is correct by the argument principle. It is
+        // not the same as *the image never approached the ray*: a half whose crossings cancel met
+        // the ray and came back. Until the two crossing arms were retained this atlas could not
+        // tell the two apart, and a net winding still cannot. `CLAUDE.md` §2b.
+        let (mut discarded, mut cancelling, mut crossings_dropped) = (0usize, 0usize, 0usize);
+        for step in &lineage.refinements {
+            let dropped = if step.selected == "left" {
+                &step.right
+            } else {
+                &step.left
+            };
+            discarded += 1;
+            crossings_dropped += dropped.crossings.total();
+            if dropped.crossings.cancels() {
+                cancelling += 1;
+            }
+        }
         println!(
-            "zero {} tau={} root_winding={} refinement_grains={}",
+            "zero {} tau={} root_winding={} refinement_grains={} discarded={} of_which_cancelling={} crossings_in_discarded={}",
             lineage.ordinal,
             lineage.final_receiver.tau,
             lineage.root.winding,
-            lineage.refinements.len()
+            lineage.refinements.len(),
+            discarded,
+            cancelling,
+            crossings_dropped
         );
     }
     for relation in &atlas.interval_relations {

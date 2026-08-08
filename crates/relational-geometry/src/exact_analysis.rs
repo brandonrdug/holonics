@@ -1063,10 +1063,52 @@ pub struct BoundarySegmentReceipt {
     pub depth: u32,
 }
 
+/// The ray crossings of one closed boundary, held as two arms and never netted.
+///
+/// A winding number is what survives after the two hands are subtracted, and the subtraction is
+/// exactly the deletion `CLAUDE.md` §2b names: it keeps the magnitude and discards which passages
+/// produced it. Both arms are kept here, **by segment index**, so a receiver can ask not only *how
+/// many times did the image enclose the origin* but *where on this boundary is the image doing
+/// work*. Those are different questions and only the second can say which half to subdivide.
+///
+/// `winding()` is the group completion and is what the argument principle counts; it is a reading
+/// of the arms and never replaces them. A boundary whose image crosses the ray four times and
+/// encloses nothing is not the same object as one that never approaches it, and `winding == 0`
+/// cannot tell them apart.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct RayCrossings {
+    /// Indices of the polygon segments crossing the ray upward, in boundary order.
+    pub with_the_turn: Vec<usize>,
+    /// Indices of the polygon segments crossing the ray downward, in boundary order.
+    pub against_the_turn: Vec<usize>,
+}
+
+impl RayCrossings {
+    /// The argument-principle winding: the two arms, group-completed.
+    pub fn winding(&self) -> i32 {
+        self.with_the_turn.len() as i32 - self.against_the_turn.len() as i32
+    }
+
+    /// Every crossing, both hands. Zero exactly when the image never meets the ray.
+    pub fn total(&self) -> usize {
+        self.with_the_turn.len() + self.against_the_turn.len()
+    }
+
+    /// The image crosses the ray and still encloses nothing.
+    ///
+    /// This is the case a net winding cannot report, and it is the one that says a half is worth
+    /// subdividing rather than discarding.
+    pub fn cancels(&self) -> bool {
+        self.total() > 0 && self.winding() == 0
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct WindingReceipt {
     pub receiver: ComplexReceiverBox,
+    /// `crossings.winding()`, carried for readers that want the group completion directly.
     pub winding: i32,
+    pub crossings: RayCrossings,
     pub ray_parameter: i64,
     pub segments: Vec<BoundarySegmentReceipt>,
     pub polygon: Vec<RatComplex>,
@@ -1156,7 +1198,7 @@ fn transformed_ray_point(point: &RatComplex, parameter: i64) -> RatComplex {
     RatComplex::new(&point.re + &k * &point.im, &point.im - k * &point.re)
 }
 
-fn polygon_winding(polygon: &[RatComplex]) -> Result<(i32, i64), ExactAnalysisError> {
+fn polygon_winding(polygon: &[RatComplex]) -> Result<(RayCrossings, i64), ExactAnalysisError> {
     for parameter in 0..=32i64 {
         let transformed = polygon
             .iter()
@@ -1165,18 +1207,18 @@ fn polygon_winding(polygon: &[RatComplex]) -> Result<(i32, i64), ExactAnalysisEr
         if transformed.iter().any(|point| point.im.is_zero()) {
             continue;
         }
-        let mut winding = 0i32;
+        let mut crossings = RayCrossings::default();
         for index in 0..transformed.len() {
             let start = &transformed[index];
             let end = &transformed[(index + 1) % transformed.len()];
             let cross = start.cross(end);
             if start.im.is_negative() && end.im.is_positive() && cross.is_positive() {
-                winding += 1;
+                crossings.with_the_turn.push(index);
             } else if start.im.is_positive() && end.im.is_negative() && cross.is_negative() {
-                winding -= 1;
+                crossings.against_the_turn.push(index);
             }
         }
-        return Ok((winding, parameter));
+        return Ok((crossings, parameter));
     }
     Err(ExactAnalysisError::NoAdmissibleWindingRay)
 }
@@ -1251,10 +1293,11 @@ pub fn eta_boundary_winding(
     for segment in &segments {
         polygon.push(segment.start_value.midpoint());
     }
-    let (winding, ray_parameter) = polygon_winding(&polygon)?;
+    let (crossings, ray_parameter) = polygon_winding(&polygon)?;
     Ok(WindingReceipt {
         receiver: receiver.clone(),
-        winding,
+        winding: crossings.winding(),
+        crossings,
         ray_parameter,
         segments,
         polygon,
@@ -1386,6 +1429,74 @@ mod tests {
         let expected = pi.square().scale(&rat(1, 12));
         assert!(eta.re.lower <= expected.upper && expected.lower <= eta.re.upper);
         assert!(eta.im.contains_zero());
+    }
+
+    fn corner(re: i64, im: i64) -> RatComplex {
+        RatComplex::new(integer(re), integer(im))
+    }
+
+    /// Three boundaries, three distinct returns, and the middle one is invisible to a net winding.
+    ///
+    /// The declared control for `RayCrossings`. Until 2026-08-08 `polygon_winding` accumulated
+    /// `+= 1` / `-= 1` into an `i32` and deposited no crossing, so the first two rows below were
+    /// one return. `winding == 0` was doing two jobs — *the image never approached the ray* and
+    /// *the image crossed it and came back* — and the η-zero bisection discards a half on exactly
+    /// that predicate. Discarding is right in both cases by the argument principle; they are not
+    /// the same evidence about where the boundary is doing work.
+    #[test]
+    fn a_boundary_that_crosses_the_ray_and_encloses_nothing_is_not_a_boundary_that_never_met_it() {
+        // Entirely in the upper half plane: the ray is never crossed.
+        let (away, _) = polygon_winding(&[corner(1, 1), corner(3, 1), corner(3, 2), corner(1, 2)])
+            .expect("an admissible ray");
+        assert_eq!(away.total(), 0);
+        assert_eq!(away.winding(), 0);
+        assert!(!away.cancels());
+
+        // To the right of the origin, straddling the axis: crossed once each hand, encloses nothing.
+        let (straddling, _) =
+            polygon_winding(&[corner(2, 1), corner(2, -1), corner(3, -1), corner(3, 1)])
+                .expect("an admissible ray");
+        assert_eq!(straddling.winding(), 0, "it encloses nothing and must say so");
+        assert_eq!(straddling.total(), 2, "and it met the ray twice getting there");
+        assert!(straddling.cancels());
+        assert_eq!(straddling.with_the_turn.len(), 1);
+        assert_eq!(straddling.against_the_turn.len(), 1);
+        assert_ne!(
+            straddling.with_the_turn, straddling.against_the_turn,
+            "the two hands are at different places on the boundary and the receipt says where"
+        );
+
+        // Around the origin: one crossing, one turn.
+        let (enclosing, _) =
+            polygon_winding(&[corner(1, -1), corner(1, 1), corner(-1, 1), corner(-1, -1)])
+                .expect("an admissible ray");
+        assert_eq!(enclosing.winding(), 1);
+        assert_eq!(enclosing.total(), 1);
+        assert!(!enclosing.cancels());
+
+        // The property under test genuinely varies across the declared material: a check whose
+        // fixtures cannot separate the two readings would be the trivial-orbit defect.
+        assert_eq!(
+            [away.winding(), straddling.winding(), enclosing.winding()],
+            [0, 0, 1]
+        );
+        assert_eq!([away.total(), straddling.total(), enclosing.total()], [0, 2, 1]);
+    }
+
+    /// Reversing a boundary swaps the hands and negates the winding, and moves nothing else.
+    #[test]
+    fn the_two_hands_swap_under_reversal_while_the_crossing_population_does_not() {
+        let forward = [corner(1, -1), corner(1, 1), corner(-1, 1), corner(-1, -1)];
+        let mut backward = forward.to_vec();
+        backward.reverse();
+
+        let (ahead, _) = polygon_winding(&forward).expect("an admissible ray");
+        let (behind, _) = polygon_winding(&backward).expect("an admissible ray");
+
+        assert_eq!(ahead.winding(), -behind.winding());
+        assert_eq!(ahead.total(), behind.total(), "the same passages, the other way");
+        assert_eq!(ahead.with_the_turn.len(), behind.against_the_turn.len());
+        assert_eq!(ahead.against_the_turn.len(), behind.with_the_turn.len());
     }
 
     #[test]
