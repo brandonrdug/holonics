@@ -88,6 +88,11 @@ pub mod communication;
 // `receiver_exact_compression` and collide at the crate root with `relational_geometry::ReceiverId`
 // and with `graph_receiver`'s own vocabulary. `blueprint/THE_ASSEMBLY.md`, "what must not be built".
 pub mod complex_system;
+// The conditioning, the production it makes possible, and that production read back as a circuit,
+// on one carrier with a map from every cell to the passage that founded it. Declared, never
+// glob-exported: `ItemId`, `ReceiverId` and `Observation` reach it from
+// `receiver_exact_compression` and collide at the crate root.
+pub mod conditioned_derivation;
 pub mod conic;
 pub mod coupled_informant;
 #[cfg(target_os = "linux")]
@@ -123,6 +128,9 @@ pub mod inverse_transport;
 pub mod live_presentation;
 pub mod local_star;
 pub mod mode;
+// The declared-option modeling surface. Reached explicitly, like the other presentation membranes:
+// an option is a receiver coordinate and every call site must name it as one.
+pub mod model_surface;
 pub mod observation_ecology;
 pub mod organizational_grammar;
 pub mod parameter;
