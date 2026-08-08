@@ -481,6 +481,14 @@ impl RebaseInvariants {
 /// as an ordered pair of positive and negative counts and never collapses it; the group-completed
 /// difference is the canonical map to the integers and is what a boundary map means. The pair is
 /// still upstream — nothing here writes back.
+///
+/// **This paragraph was false until 2026-08-08 and is now true.** `ComparativeMultiplicity::new`
+/// subtracted the common population on every construction and `validate()` made a retained pair a
+/// hard error, so after construction at most one arm was ever nonzero: the type had the anatomy of
+/// `OrientedWinding` and the behaviour of `i64`. This function's own figures never moved — they read
+/// `difference()` — which is exactly why nothing caught it. What moved was every consumer that read
+/// `boundary.support()` as a **face relation**; see `gluing::a_loop_is_not_admitted_into_a_receiver_
+/// that_does_not_hold_its_vertex`.
 pub fn boundary_matrix(
     complex: &GradedCausalComplex,
     grade: u32,

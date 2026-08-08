@@ -860,10 +860,10 @@ mod tests {
         forked.add_term(points[2], ComparativeMultiplicity::negative(2u32));
         let fork = complex.found_cell("fork", source(), 1, forked).unwrap();
 
-        let mut empty = CausalChain::default();
-        empty.add_term(points[1], ComparativeMultiplicity::positive(1u32));
-        empty.add_term(points[1], ComparativeMultiplicity::negative(1u32));
-        let vanished = complex.found_cell("vanished", source(), 1, empty).unwrap();
+        let mut opposed = CausalChain::default();
+        opposed.add_term(points[1], ComparativeMultiplicity::positive(1u32));
+        opposed.add_term(points[1], ComparativeMultiplicity::negative(1u32));
+        let vanished = complex.found_cell("opposed", source(), 1, opposed).unwrap();
 
         let system = metric(&complex, Vec::new(), vec![loop_cell, fork, vanished]);
 
@@ -887,8 +887,18 @@ mod tests {
             );
         }
 
-        assert!(complex.cell(vanished).unwrap().boundary.is_zero());
-        assert_eq!(system.crossing(points[1], vanished), None);
+        let opposed_boundary = &complex.cell(vanished).unwrap().boundary;
+        assert!(
+            !opposed_boundary.is_zero(),
+            "a loop at v1 is attached to v1 twice, once each hand — it does not vanish"
+        );
+        assert!(opposed_boundary.difference_is_zero());
+        assert_eq!(
+            system.crossing(points[1], vanished),
+            Some(points[1]),
+            "an opposed pair at v1 is a one-ended cell and rests there, exactly as 2[v0] does — \
+             the two loop presentations are indistinguishable to a crossing, which is the point"
+        );
     }
 
     // ---------------------------------------------------------------- the declaration

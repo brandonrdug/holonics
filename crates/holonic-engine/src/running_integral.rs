@@ -611,8 +611,13 @@ impl Disagreement {
     ///
     /// A pair whose cycle is zero cannot disagree on any cochain, so a fixture built from such a
     /// pair is incapable of exercising the property this module exists to test.
+    /// The two traversals differ as *cycles*, not merely as passages.
+    ///
+    /// A backtrack deposits opposed terms on one carrier; those are retained
+    /// by `CausalChain` and are two passages, so the chains genuinely differ.
+    /// They are the same cycle, and it is the cycle this predicate reports.
     pub fn paths_are_distinct(&self) -> bool {
-        !self.cycle.is_zero()
+        !self.cycle.difference_is_zero()
     }
 }
 
@@ -633,7 +638,7 @@ pub fn disagreement(
     }
 
     let cycle = left.chain().minus(&right.chain());
-    if !complex.boundary_of_chain(&cycle)?.is_zero() {
+    if !complex.boundary_of_chain(&cycle)?.difference_is_zero() {
         return Err(RunningIntegralError::PairIsNotACycle);
     }
 
@@ -1465,10 +1470,17 @@ mod tests {
             PathStep::along(bc),
         ]);
         assert_ne!(direct.steps(), detoured.steps(), "different traversals");
-        assert_eq!(
+        assert_ne!(
             direct.chain(),
             detoured.chain(),
-            "identical chains — the backtrack cancelled"
+            "the backtrack is two more passages over `bc` and the chain retains both"
+        );
+        assert!(
+            direct
+                .chain()
+                .minus(&detoured.chain())
+                .difference_is_zero(),
+            "they differ by a cancelling pair, so they are one cycle and carry one integral"
         );
 
         for values in [
@@ -1573,7 +1585,16 @@ mod tests {
         let mut boundary = CausalChain::default();
         boundary.add_term(a, ComparativeMultiplicity::positive(1u32));
         boundary.add_term(a, ComparativeMultiplicity::negative(1u32));
-        assert!(boundary.is_zero(), "the two ends cancelled in the carrier");
+        assert!(
+            !boundary.is_zero(),
+            "both ends stay attached to `a`; the cancellation is in the difference, not the record"
+        );
+        assert!(boundary.difference_is_zero());
+        assert_eq!(
+            boundary.support(),
+            BTreeSet::from([a]),
+            "the carrier's face relation still names `a`, which is what makes closure decidable"
+        );
         let self_loop = complex.found_cell("loop", source(), 1, boundary).unwrap();
 
         let w = Cochain::from_values(1, [(self_loop, big(4))]);

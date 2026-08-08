@@ -200,6 +200,11 @@ pub mod substitution_realizers;
 pub mod supported_realizers;
 pub mod tube;
 pub mod wave_propagation;
+// Inertia returned as windings rather than as a count of signs. Declared, never glob-exported:
+// `Passage` collides with `conditioned_derivation::Passage`, and `Hand`, `StarPolygon` and
+// `PassageReturn` say nothing at the crate root about which carrier they belong to. `CLAUDE.md`
+// §2b, "a sign is a passage, never a state".
+pub mod winding_inertia;
 pub mod world;
 
 pub use algebraic::*;

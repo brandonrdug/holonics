@@ -401,6 +401,52 @@ mod tests {
         }
     }
 
+    /// A receiver holding only `w` must not be handed the loop attached at `v`.
+    ///
+    /// This is the falsifier for the face relation. `saturate` decides membership with
+    /// `cell.boundary.support().is_subset(&support)`, and until 2026-08-08 a loop edge's boundary
+    /// terms cancelled to an **empty** map — so `∅ ⊆ S` held for every `S` and the loop, then the
+    /// face attached to it, entered *both* sides of *every* cover. The two receivers came back
+    /// agreeing on cells neither of them supported, and `δ` was computed against a pair of sets
+    /// that were not subcomplexes. Nothing in the suite could see it: every `cover_by_vertices`
+    /// caller runs on `rim`, which has no loop, and the two complexes that do carry loops build
+    /// their covers by hand.
+    #[test]
+    fn a_loop_is_not_admitted_into_a_receiver_that_does_not_hold_its_vertex() {
+        let mut complex = GradedCausalComplex::default();
+        let v = complex
+            .found_cell("v", source(), 0, CausalChain::default())
+            .unwrap();
+        let w = complex
+            .found_cell("w", source(), 0, CausalChain::default())
+            .unwrap();
+        let mut looped = CausalChain::default();
+        looped.add_term(v, ComparativeMultiplicity::positive(1u32));
+        looped.add_term(v, ComparativeMultiplicity::negative(1u32));
+        let edge = complex.found_cell("e", source(), 1, looped).unwrap();
+        let mut attached = CausalChain::default();
+        attached.add_term(edge, ComparativeMultiplicity::positive(2u32));
+        let face = complex.found_cell("face", source(), 2, attached).unwrap();
+
+        assert_eq!(
+            complex.cell(edge).unwrap().boundary.support(),
+            BTreeSet::from([v]),
+            "the loop's face relation names v — this is what the cancellation used to erase"
+        );
+
+        let cover = cover_by_vertices(&complex, &BTreeSet::from([w]), &BTreeSet::from([v])).unwrap();
+        assert_eq!(cover.left, BTreeSet::from([w]), "w alone supports nothing else");
+        assert_eq!(
+            cover.right,
+            BTreeSet::from([v, edge, face]),
+            "v carries the loop and the face attached to it"
+        );
+        assert!(
+            cover.overlap().is_empty(),
+            "two receivers sharing no vertex share no cell"
+        );
+    }
+
     /// One vertex, one loop, one face attached `p` times. Known: `H_1 = Z/p`.
     fn torsion_space(p: u32) -> GradedCausalComplex {
         let mut complex = GradedCausalComplex::default();

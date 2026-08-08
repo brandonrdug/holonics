@@ -30,12 +30,21 @@ use crate::{
     VertexId,
 };
 
-/// An oriented coefficient derived from two nonnegative occurrence counts.
+/// An oriented coefficient held as two nonnegative occurrence counts.
 ///
-/// `(positive, negative)` and `(positive + common, negative + common)`
-/// represent the same difference. Constructors remove the common population
-/// immediately. This is the additive group completion needed by oriented
-/// boundaries; a private scalar is not assigned to an incidence cell.
+/// **The two arms never cancel.** `(positive, negative)` and
+/// `(positive + common, negative + common)` share a `difference()` and are
+/// nonetheless different coefficients: the second records `common` more
+/// passages each way. A loop edge attaches to its vertex twice, once each
+/// hand, and its boundary coefficient there is `(1, 1)` — not the absence of
+/// an attachment. Deleting the common population would keep the magnitude and
+/// discard the turn, which is what a sign does and what this body refuses.
+///
+/// `difference()` is the group completion to the integers and is what a
+/// boundary *map* means; it is a reading of the pair and never replaces it.
+/// This mirrors `soma::body::channel::OrientedWinding` and
+/// `phase_current::ExactSignedPhasePopulation`, which keep their arms apart for
+/// the same reason.
 #[derive(Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct ComparativeMultiplicity {
     positive: BigUint,
@@ -43,11 +52,20 @@ pub struct ComparativeMultiplicity {
 }
 
 impl ComparativeMultiplicity {
-    pub fn new(mut positive: BigUint, mut negative: BigUint) -> Self {
-        let common = min(positive.clone(), negative.clone());
-        positive -= &common;
-        negative -= common;
+    pub fn new(positive: BigUint, negative: BigUint) -> Self {
         Self { positive, negative }
+    }
+
+    /// The common population removed — the smallest pair with this difference.
+    ///
+    /// This is a *reading*, taken by a receiver that has declared it cannot
+    /// tell `(p + c, n + c)` from `(p, n)`. Nothing in the complex stores it.
+    pub fn reduced(&self) -> Self {
+        let common = min(self.positive.clone(), self.negative.clone());
+        Self {
+            positive: &self.positive - &common,
+            negative: &self.negative - &common,
+        }
     }
 
     pub fn positive(count: impl Into<BigUint>) -> Self {
@@ -87,20 +105,24 @@ impl ComparativeMultiplicity {
         BigInt::from(self.positive.clone()) - BigInt::from(self.negative.clone())
     }
 
+    /// No passage either way. Distinct from [`Self::difference_is_zero`].
     pub fn is_zero(&self) -> bool {
         self.positive.is_zero() && self.negative.is_zero()
+    }
+
+    /// The passages cancel under the group completion.
+    ///
+    /// `(1, 1)` returns `true` here and `false` from [`Self::is_zero`]: two
+    /// passages were taken and the boundary map cannot see them apart. Every
+    /// `boundary(boundary) = 0` and cycle check wants *this* predicate; a check
+    /// that wants "nothing is attached here" wants `is_zero`.
+    pub fn difference_is_zero(&self) -> bool {
+        self.positive == self.negative
     }
 
     pub fn is_unit_orientation(&self) -> bool {
         (self.positive.is_one() && self.negative.is_zero())
             || (self.negative.is_one() && self.positive.is_zero())
-    }
-
-    pub fn validate(&self) -> Result<(), CausalAlgebraicError> {
-        if !self.positive.is_zero() && !self.negative.is_zero() {
-            return Err(CausalAlgebraicError::UnreducedComparativeMultiplicity);
-        }
-        Ok(())
     }
 
     pub fn plus(&self, other: &Self) -> Self {
@@ -121,8 +143,16 @@ impl ComparativeMultiplicity {
         self.plus(&other.negated())
     }
 
+    /// The tensor of two arm-pairs, taken on the arms rather than on their
+    /// differences: like hands compose to `positive`, unlike hands to
+    /// `negative`. `difference()` of the result is the product of the
+    /// differences, so every integer reading is unchanged, but a passage
+    /// scaled by a cancelling coefficient stays two passages.
     pub fn times(&self, other: &Self) -> Self {
-        Self::from_bigint(self.difference() * other.difference())
+        Self {
+            positive: &self.positive * &other.positive + &self.negative * &other.negative,
+            negative: &self.positive * &other.negative + &self.negative * &other.positive,
+        }
     }
 }
 
@@ -154,8 +184,23 @@ impl CausalChain {
         self.coefficients.keys().copied().collect()
     }
 
+    /// Nothing is deposited on any cell.
+    ///
+    /// This is the *structural* reading and it is what `support()` reports.
+    /// A chain carrying `(1, 1)` on one cell is not zero here: that cell is
+    /// attached, twice, once each hand.
     pub fn is_zero(&self) -> bool {
         self.coefficients.is_empty()
+    }
+
+    /// Every deposited coefficient cancels under the group completion.
+    ///
+    /// This is the *algebraic* reading and it is what `boundary(boundary) = 0`
+    /// and every cycle condition mean.
+    pub fn difference_is_zero(&self) -> bool {
+        self.coefficients
+            .values()
+            .all(ComparativeMultiplicity::difference_is_zero)
     }
 
     pub fn add_term(&mut self, cell: CausalCellId, coefficient: ComparativeMultiplicity) {
@@ -166,11 +211,12 @@ impl CausalChain {
             .coefficients
             .get(&cell)
             .map_or(coefficient.clone(), |current| current.plus(&coefficient));
-        if next.is_zero() {
-            self.coefficients.remove(&cell);
-        } else {
-            self.coefficients.insert(cell, next);
-        }
+        // `next` cannot be `is_zero` here — both arms are monotone under
+        // `plus` and `coefficient` carried at least one — so the attachment is
+        // always retained. Opposed terms on one cell accumulate to `(c, c)`
+        // rather than deleting the key, which is what keeps `support()` a
+        // face relation instead of a reduced-boundary artifact.
+        self.coefficients.insert(cell, next);
     }
 
     pub fn plus(&self, other: &Self) -> Self {
@@ -205,7 +251,6 @@ impl CausalChain {
 
     pub fn validate(&self) -> Result<(), CausalAlgebraicError> {
         for coefficient in self.coefficients.values() {
-            coefficient.validate()?;
             if coefficient.is_zero() {
                 return Err(CausalAlgebraicError::StoredZeroCoefficient);
             }
@@ -291,7 +336,7 @@ impl GradedCausalComplex {
             }
         }
         let squared = self.boundary_of_chain(&boundary)?;
-        if !squared.is_zero() {
+        if !squared.difference_is_zero() {
             return Err(CausalAlgebraicError::BoundarySquaredNonzero(squared));
         }
 
@@ -396,7 +441,7 @@ impl GradedCausalComplex {
                 }
             }
             let squared = self.boundary_of_chain(&cell.boundary)?;
-            if !squared.is_zero() {
+            if !squared.difference_is_zero() {
                 return Err(CausalAlgebraicError::BoundarySquaredNonzero(squared));
             }
         }
@@ -861,9 +906,6 @@ impl HomogeneousPolynomial {
     ) -> Result<u32, CausalAlgebraicError> {
         if self.is_zero() {
             return Err(CausalAlgebraicError::ZeroAlgebraRelation);
-        }
-        for coefficient in self.terms.values() {
-            coefficient.validate()?;
         }
         let degree = self
             .homogeneous_degree(generators)?
@@ -1960,8 +2002,6 @@ impl ExactEventLaw for CausalAlgebraicLaw {
 pub enum CausalAlgebraicError {
     #[error("orientation hand must be +1 or -1, received {0}")]
     InvalidOrientationHand(i8),
-    #[error("comparative multiplicity retained a cancellable common population")]
-    UnreducedComparativeMultiplicity,
     #[error("a zero chain coefficient was stored explicitly")]
     StoredZeroCoefficient,
     #[error("causal cell {0:?} is absent")]
@@ -2113,10 +2153,34 @@ mod tests {
     #[test]
     fn oriented_coefficients_are_group_completed_occurrence_counts() {
         let left = ComparativeMultiplicity::new(7_u8.into(), 3_u8.into());
-        assert_eq!(left.positive_count(), &BigUint::from(4_u8));
-        assert!(left.negative_count().is_zero());
+        assert_eq!(
+            (left.positive_count(), left.negative_count()),
+            (&BigUint::from(7_u8), &BigUint::from(3_u8)),
+            "ten passages were taken and all ten are retained"
+        );
+        assert_eq!(left.difference(), BigInt::from(4_u8));
+        assert_eq!(left.reduced().positive_count(), &BigUint::from(4_u8));
+        assert!(
+            left.reduced().negative_count().is_zero(),
+            "the reduction is available as a reading and is not what is stored"
+        );
         let right = ComparativeMultiplicity::negative(4_u8);
-        assert!(left.plus(&right).is_zero());
+        let sum = left.plus(&right);
+        assert!(
+            !sum.is_zero(),
+            "seven one way and seven the other is fourteen passages, not an absence"
+        );
+        assert!(sum.difference_is_zero());
+        assert_eq!(
+            (sum.positive_count(), sum.negative_count()),
+            (&BigUint::from(7_u8), &BigUint::from(7_u8))
+        );
+        let opposed = ComparativeMultiplicity::new(1_u8.into(), 1_u8.into());
+        assert_eq!(
+            opposed.times(&opposed),
+            ComparativeMultiplicity::new(2_u8.into(), 2_u8.into()),
+            "a cancelling coefficient squared is four passages, not zero"
+        );
         assert_eq!(
             ComparativeMultiplicity::negative(3_u8)
                 .times(&ComparativeMultiplicity::negative(2_u8))
@@ -2149,7 +2213,7 @@ mod tests {
             incidence
                 .boundary_of_chain(&first_boundary)
                 .unwrap()
-                .is_zero()
+                .difference_is_zero()
         );
     }
 
@@ -2325,7 +2389,7 @@ mod tests {
                 outgoing,
             })
             .unwrap();
-        assert!(receipt.residual.is_zero());
+        assert!(receipt.residual.difference_is_zero());
     }
 
     #[test]

@@ -342,7 +342,6 @@ impl ExactDimensionalSource {
                     lower,
                     coefficient,
                 } => {
-                    coefficient.validate()?;
                     let body = self.incidence.cell(*higher)?;
                     let lower_body = self.incidence.cell(*lower)?;
                     if body.grade != lower_body.grade.saturating_add(1)

@@ -1129,7 +1129,7 @@ mod tests {
                 .incidence
                 .boundary_of_chain(&boundary)
                 .unwrap()
-                .is_zero()
+                .difference_is_zero()
         );
         assert!(grain.coboundary(vertices[0]).unwrap().support().len() >= 2);
         assert_eq!(grain.incidence.cell(face).unwrap().grade, 2);

@@ -811,7 +811,7 @@ impl CausalBodyStanding {
         if !boundary.support().is_subset(&self.active_cells) {
             return Err(CausalBodyError::OpeningOutsideActiveBody);
         }
-        if !self.incidence.boundary_of_chain(&boundary)?.is_zero() {
+        if !self.incidence.boundary_of_chain(&boundary)?.difference_is_zero() {
             return Err(CausalBodyError::OpeningBoundaryNotClosed);
         }
         let boundary_grade = self
@@ -961,7 +961,7 @@ impl CausalBodyStanding {
         let mut chords = Vec::new();
         let edges = self.active_by_grade.get(&1).cloned().unwrap_or_default();
         for edge in edges {
-            if self.incidence.cell(edge)?.boundary.is_zero() {
+            if self.incidence.cell(edge)?.boundary.difference_is_zero() {
                 chords.push((edge, None));
                 continue;
             }
@@ -1000,7 +1000,7 @@ impl CausalBodyStanding {
                 };
                 cycle.add_term(carrier, coefficient);
             }
-            if !self.incidence.boundary_of_chain(&cycle)?.is_zero() {
+            if !self.incidence.boundary_of_chain(&cycle)?.difference_is_zero() {
                 return Err(CausalBodyError::FundamentalCycleNotClosed(edge));
             }
             result.push((edge, canonical_chain(&cycle)));
@@ -1069,7 +1069,7 @@ impl CausalBodyStanding {
                 loop_boundary.add_term(carrier, coefficient);
                 ordered_steps.push(CausalTransportStep { carrier, hand });
             }
-            if !self.incidence.boundary_of_chain(&loop_boundary)?.is_zero() {
+            if !self.incidence.boundary_of_chain(&loop_boundary)?.difference_is_zero() {
                 return Err(CausalBodyError::FundamentalCycleNotClosed(
                     connection.carrier,
                 ));

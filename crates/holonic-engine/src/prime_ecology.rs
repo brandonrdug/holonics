@@ -2264,7 +2264,7 @@ mod tests {
                 .incidence()
                 .boundary_of_chain(&body.boundary)
                 .unwrap()
-                .is_zero()
+                .difference_is_zero()
         );
         world.standing().validate().unwrap();
 
@@ -2398,7 +2398,7 @@ mod tests {
                         .boundary
                 )
                 .unwrap()
-                .is_zero()
+                .difference_is_zero()
         );
         assert_eq!(
             triangle
@@ -2560,7 +2560,7 @@ mod tests {
                 .incidence()
                 .boundary_of_chain(&body.boundary)
                 .unwrap()
-                .is_zero()
+                .difference_is_zero()
         );
         world.standing().validate().unwrap();
     }

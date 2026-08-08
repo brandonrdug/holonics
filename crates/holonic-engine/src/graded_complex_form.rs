@@ -130,16 +130,6 @@ pub enum GradedComplexFormError {
     )]
     LeadingZeroMagnitude { field: &'static str },
     #[error(
-        "the boundary term on cell {cell} declares {positive} positive and {negative} negative \
-         occurrences; a comparative multiplicity removes the common population, so this pair would \
-         mount as a different one"
-    )]
-    UnreducedTerm {
-        cell: u64,
-        positive: String,
-        negative: String,
-    },
-    #[error(
         "the boundary term on cell {cell} declares no occurrence on either hand; a chain does not \
          retain a zero coefficient"
     )]
@@ -298,13 +288,6 @@ pub fn decode_native_bytes(
             previous = Some(face);
             let positive = cursor.magnitude("positive")?;
             let negative = cursor.magnitude("negative")?;
-            if !positive.is_zero() && !negative.is_zero() {
-                return Err(GradedComplexFormError::UnreducedTerm {
-                    cell: face,
-                    positive: positive.to_string(),
-                    negative: negative.to_string(),
-                });
-            }
             if positive.is_zero() && negative.is_zero() {
                 return Err(GradedComplexFormError::ZeroTerm { cell: face });
             }
@@ -712,11 +695,19 @@ mod tests {
             wire
         };
 
-        // (3, 1) would mount as (2, 0) and re-encode differently.
-        let refusal = decode_native_bytes(&head(&[(1, 3, 1)])).expect_err("an unreduced pair");
-        assert!(
-            matches!(refusal, GradedComplexFormError::UnreducedTerm { cell: 1, .. }),
-            "expected an unreduced-term refusal, got {refusal}"
+        // (3, 1) mounts as (3, 1): the wire carries both arms and the body retains both.
+        let mounted = decode_native_bytes(&head(&[(1, 3, 1)])).expect("a retained pair");
+        let term = mounted
+            .cells()
+            .values()
+            .find(|cell| cell.grade == 1)
+            .expect("the grade-one cell")
+            .boundary
+            .coefficient(CausalCellId(1));
+        assert_eq!(
+            (term.positive_count(), term.negative_count()),
+            (&BigUint::from(3u32), &BigUint::from(1u32)),
+            "four passages crossed the wire and four were mounted"
         );
         // (0, 0) would be dropped by `add_term` and re-encode with one term fewer.
         let refusal = decode_native_bytes(&head(&[(1, 0, 0)])).expect_err("a zero pair");

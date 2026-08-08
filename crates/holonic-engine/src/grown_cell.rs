@@ -1753,7 +1753,7 @@ pub fn found_complex(
                         ComparativeMultiplicity::negative(weight),
                     );
                 }
-                if boundary.is_zero() {
+                if boundary.difference_is_zero() {
                     continue;
                 }
                 if paths > BigUint::one() {
