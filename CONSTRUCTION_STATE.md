@@ -218,3 +218,50 @@ artifact, a movement's proposed target, or the roadmap's own table of the defect
 closed. The check reports any allow entry whose document no longer names it, so the file cannot
 rot. **It is not for stale references**: a path absent because a document was never updated is a
 failure, and the document gets fixed.
+
+## The scale claim, reconciled — deposited 2026-08-07
+
+Brandon, 2026-08-07: *"evolution is not exclusive to biology, diffusion and coarse graining happens
+on a cosmological scale too, that is what our galaxies come from logically."*
+
+A sweep of both repositories returns: **no deposit anywhere states that biological evolution,
+information diffusion, and cosmological structure formation are one mechanism at different scales.**
+That absence is the finding, and it is not an oversight — the record stops one step short on
+purpose, and the stopping is doctrinal.
+
+**The two statements are not in conflict, and this is the reconciliation the record lacked.**
+
+His own governing clause is in the same family of messages
+(`canon/THE_QUOTE_NETWORK.md:202-210`): morphology is *"the framework in which biology can be
+studied by, the same framework you'd use to study variations of stars that fuse elements into
+heavier elements, and the same framework you'd use to figure out astronomical distributions"* — and
+in the same breath, **"there is no one general law."** The unification he asserts is of **method**,
+and he explicitly denies a single dynamical law. The laboratory's own doctrine says the same thing:
+*"the commonality is the operator ecology, not a flattened representation or one formula."*
+
+And the live record's nearest statement, `research/records/2026-07-19_THE_STRESS_IS_THE_TRANSPORT_OF_TRANSPORT_THE_HEAT_IS_THE_BOUNDARY_DEED.md`:
+
+> *"This is the exact sense in which physical, evolutionary, linguistic, and mathematical patterns
+> can be self-similar. … The lawful comparison transports cut, symmetry, conservation/hand,
+> recurrence, phase boundary, response, and consequence. **It does not identify the material
+> interiors.**"*
+
+So the deposit is: **one grammar, many media, no shared carrier.** Coarse-graining is the common
+operation; the coupling constants and phase boundaries stay medium-specific. Claiming one mechanism
+would flatten exactly what he forbids flattening; claiming mere analogy would contradict his
+standing rebuke — *"all of my biological analogies are not really simply analogies … the way
+evolution works mechanically is exactly what we are trying to encapsulate. The trees, branches, and
+roots of a forest as an analogy is **literal**"* — which the quote network grades as *his most
+persistent and least-deposited cluster.* Both are now carried.
+
+**The falsifier, which makes this a claim rather than a posture.** If the same coarse-graining
+operation is genuinely the common method, then `crates/holonic-engine/src/receiver_exact_compression.rs`
+must return the same *kind* of artifact — a counted, exhibitable collapsed population with the
+shortest separating context — on materially unrelated sources, and the *shapes* of those populations
+must differ. Identical shapes would mean the instrument is reading itself rather than the material;
+no exhibitable population at all on some medium would bound the claim to the media where it works.
+
+**The sharpest open item this sweep found is not cosmological.** The grain-1 quotient of the phase
+atlas — **82 coarser points, 71 overlap cells, one with 14 members** — was computed and **has never
+been drawn or looked at**. Every figure this project has examined is grain 0. The coarse grain
+exists as data and nobody has seen it.

@@ -764,7 +764,9 @@ running sum of them. No mesh, no limit, no error."*
 **Stale as of `a444d78`, 2026-08-07.** `crates/holonic-engine/src/leader_quadrature.rs` now implements lightning-leader quadrature, with the self-similarity termination law measured. As deposited this line read: *"No Rust owner implements lightning-leader quadrature."* The closest live material is
 `crates/holonic-engine/src/wave_propagation.rs`, `diffusion.rs`, `sheaf_diffusion.rs`, and the
 RELAMPAGO lightning ecologies. Sphere-packing appears nowhere. The self-similarity termination
-criterion is undeposited as a falsifier.
+criterion is **now deposited as a falsifier and measured** at
+`crates/holonic-engine/src/leader_quadrature.rs`: a span of `10^12` rides in the same extension
+count as a span of `10`, returning `10^24/2` exactly.
 
 ---
 
