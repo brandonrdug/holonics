@@ -1442,6 +1442,68 @@ instead of a test-tier scheme, and the test-tier scheme is what was built.
 
 ---
 
+## 21b. Fluid dynamics encompass all dynamics
+
+**Added 2026-08-08.** This theme had **no entry in this file** despite being stated four times across
+three months, and its absence let a session in August treat Navier–Stokes as a distant problem while
+the engine already carried its gates. That is exactly the failure this file exists to prevent.
+
+The claim, three times in his own words:
+
+> "\"Bath\"; and I keep asking you about the fluid body simulation where we flow music into it in
+> order to stimulate it, exactly like shining light on the holon. So fluid dynamics encompass all
+> dynamics. The water droplet pinching, that paradoxical theorem, I don't know the name currently,
+> it is answered in this too then?"
+>
+> — 2026-06-11T19:38:31Z, `CC`
+
+> "…the actual induced current is like a gust of wind, it seems to be \"pulling\" you, it is a
+> difference in pressure. So this is like electromagnetism, where the motion is in events over time,
+> and you can relate it to what we've done with the ideal gas law regarding pressure. The action
+> current is literally just a current, and all of this works out to fluid dynamics. Fluid dynamics
+> encompass every other kind of dynamics from what I gather."
+>
+> — 2026-07-06T21:06:05Z, `CC`
+
+> "Fluid dynamics embody all dynamics, I have made this point before."
+>
+> — 2026-08-08, `CC`
+
+**And the ruling on how to build it, which is `CLAUDE.md` §13 rule 2 a month before §13 was written:**
+
+> "The flow is what carries the meaning, and it's what determines the pressure. First axiom. Do not
+> use scalar pressure. You are fragmenting about a chicken or the egg dilemma regarding (1) and (2).
+> For 3 you are imagining a global field. Do not start imagining absolute frames just because I
+> started talking about fluid dynamics. We have such a good relativistic foundation, do not fuck it
+> up."
+>
+> — 2026-07-06T21:34:31Z, `CC`
+
+**Where this lives now.** `crates/holonic-engine/src/analytic_field.rs` is the owner and it is further
+along than any document said: `ExactAnalyticAdvectionLaw` refuses construction unless `AᵀΩ + ΩA = 0`
+**and `A·1 = 0`**, so **incompressibility is a typed refusal rather than a diagnostic**, and declared
+circulation covectors must be closed *and left-fixed by the successor* — Kelvin's circulation theorem
+as a construction gate, exact over `Rat`. It carries its own bound: *"not a relabelling of diffusion
+or a claim to complete Navier–Stokes."* One driver, `examples/analytic_field_transport.rs`; zero
+tests. `diffusion.rs` and `wave_propagation.rs` are **not** fluid and the ownership document bans the
+confusion by name.
+
+`canon/THE_MATHEMATICS_TABLET.md` §7 is the synopsis, including why the Millennium problem is
+dimension-specific in this framework's way — vortex stretching vanishes in 2D and vorticity is a
+winding density, so the hard term is winding amplified by the flow that carries it.
+
+**The unnamed theorem is answered.** *"The water droplet pinching, that paradoxical theorem, I don't
+know the name currently"* went unidentified in both repositories for three months. It is the
+**Plateau–Rayleigh instability**; the paradox is that free-surface Navier–Stokes *provably does* form
+a **finite-time singularity** at pinch-off, and Eggers (1993) derived its universal **self-similar**
+solution — the same instinct as his *"self-similar phases"* question of 2026-07-19.
+
+**Still owed.** The prior solver — a complete exact-rational Navier–Stokes body carrying a
+bit-identically conserved Kelvin circulation `Γ` while parcel trajectories stayed chaotic — survives
+only at laboratory commit `b3d83376`. His ruling, 2026-08-08: *"whatever we labeled 'solver' was
+probably a partial that you can easily lift and supersede."* The live engine holds the gates; it lacks
+the parcels and the material loop on which `Γ` is read.
+
 ## 22. Partials: the unit of work
 
 The correction that reframes every long conceptual message in the corpus:

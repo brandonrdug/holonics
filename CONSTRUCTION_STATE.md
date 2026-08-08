@@ -195,6 +195,28 @@ that list this record adds `CertifiedSeries` and `SeriesTailCertificate`, measur
 
 No successor is scheduled by incrementing anything, and no movement is named by an ordinal.
 
+### The consolidation pass — 2026-08-08
+
+**Truth status:** `established-bounded`. Four contradictions in the record were found and closed in
+one pass, each by reading a source rather than by re-deriving.
+
+- **The laboratory's physics wing is imported**, nineteen documents to `archive/laboratory-physics/`.
+  It was reachable from no live path. Every document in it is `OPEN` by its own grade; none may be
+  cited as established; the banner carries Brandon's *lift and supersede, never restore* ruling.
+- **Annihilation, departure and loss were three mechanisms under one name.** `FORMULA §CV` separates
+  them and both live owners were already correct — `sparse_surface` for annihilation, `chart::depart`
+  for departure. The record is
+  `research/records/2026-08-08_ANNIHILATION_IS_RELEASE_DEPARTURE_IS_THE_VACANCY.md`.
+- **`temper.rs` carried two struck sentences as founding law.** Assistant-authored, prohibited the
+  day they were written, and presented as authority. The code never obeyed them; the prose did.
+- **`canon/THE_QUOTE_NETWORK.md` had no fluid-dynamics entry** for a theme stated four times across
+  three months, which is what let this session treat Navier–Stokes as distant while
+  `analytic_field.rs` already refused construction on `A·1 ≠ 0`.
+
+**The pattern worth carrying:** every one of the four was a *record* defect over *correct* code. §8
+rule 1 says grade the implementation, not the receipt; this pass is the same rule with the error on
+the other side, and it cost more time to find because nothing failed.
+
 ### The oriented coefficient reduced on construction — convicted and repaired 2026-08-08
 
 **Truth status:** `established-bounded`. Source read directly; the falsifier is executable and was
