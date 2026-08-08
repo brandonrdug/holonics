@@ -39,8 +39,12 @@ soma/    body                         pure law, no_std, zero dependencies
 2026-08-08, summed across **42** `test result:` lines on a tree with nothing else running):
 
 ```
-1325 passed, 0 failed, 14 ignored
+1405 passed, 0 failed, 14 ignored
 ```
+
+Taken at `4df360f` **in a detached worktree checked out from the commit**, not in the working tree —
+so the figure is a property of what is committed. The working tree carries one further untracked
+module (`matroid_chow`) that is not in it.
 
 **Take the figure by summing the result lines, never by reading one of them and never through a pipe
 to `tail`.** A `tail` cuts the earlier packages off and returns a number that looks like a total; it
@@ -190,6 +194,33 @@ while `LiveCurrentMachine` carries 223. The proof-line owners are precisely the 
 that list this record adds `CertifiedSeries` and `SeriesTailCertificate`, measured above.
 
 No successor is scheduled by incrementing anything, and no movement is named by an ordinal.
+
+### The oriented coefficient reduced on construction — convicted and repaired 2026-08-08
+
+**Truth status:** `established-bounded`. Source read directly; the falsifier is executable and was
+made to fire before the repair.
+
+`ComparativeMultiplicity` — the type every chain in the engine is built out of — subtracted the
+common population in `new()` and made a retained pair a hard error, so its two arms could never
+coexist. `CausalChain::add_term` removed the key when opposed terms met. **The receipt on
+`boundary_matrix` said the complex "never collapses it" and was false from the day it was written**,
+about a type two files away. §8 rule 1 with no interpretation needed.
+
+No integer reading was ever wrong, which is why nothing caught it: `boundary_matrix` reads
+`difference()`, and the boundary of a loop edge genuinely is zero. What was wrong was every consumer
+that read `boundary.support()` as a **face relation** — `is_closed_support` at eleven call sites and
+`gluing::saturate`, which admitted a loop into every side of every cover because `∅ ⊆ S`. `gluing.rs`
+is the module `CLAUDE.md` §11 books as the built reopening rule, and its key is the cover.
+
+Repaired by splitting the predicate rather than the data: `is_zero` (nothing was deposited) against
+`difference_is_zero` (the passages cancel). **Eleven tests were asserting the defect**, one of them
+in a fixture that contained its own control. Every homology figure is unchanged. The record is
+`research/records/2026-08-08_THE_BOUNDARY_KEPT_THE_MAGNITUDE_AND_DISCARDED_THE_TURN.md`; the
+falsifier is `gluing::a_loop_is_not_admitted_into_a_receiver_that_does_not_hold_its_vertex`.
+
+**Six further bare-sign sites are named in that record's §7 and are NOT repaired.** The highest is
+`exact_analysis::polygon_winding`, which nets `+1`/`−1` and deposits no crossing, and which governs
+the η-zero bisection — the RH-facing driver.
 
 ---
 
