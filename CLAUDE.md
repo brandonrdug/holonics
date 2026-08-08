@@ -531,12 +531,35 @@ that demand as four parts. **Two are now built, 2026-08-07:**
 |---|---|
 | **certified remainder** | **built, twice.** `crates/holonic-engine/src/exact_value.rs` for series tails; and `crates/holonic-engine/src/receiver_exact_compression.rs`, whose collapsed population is a *counted, exhibitable* remainder — each pair carrying the shortest input word that separates it and the receiver that sees the difference, which is the form `canon/THE_RECOVERED_LAW.md` specifies for compression's exact loss. |
 | **reopening rule keyed to the receiver family** | **built.** `crates/holonic-engine/src/gluing.rs`. The Mayer–Vietoris connecting map `δ` is keyed to which cover — which *receivers* — you chose, and it returns what the union carries that neither piece does. |
-| **supported realizer population** | not built. |
-| **positive form** | not built. |
+| **supported realizer population** | **built and driven, 2026-08-08.** `crates/holonic-engine/src/substitution_realizers.rs`. Each declared `skein::Substitution` is a realizer whose landings are `substitution.added()`; refusals are retained as a typed population; admission is under a declared aperture that the return now *carries* rather than erases. |
+| **positive form** | **built and driven, 2026-08-08.** `supported_realizers::positive_form` — `MᵀM` over the realizer-against-class incidence, exact over `BigInt`, cross-checked against an independently rebuilt incidence and against `\|Mx\|²` on ten probes with a required nonzero count. |
 
-The remaining two are **one** thing, not two, and §2 already says why: placement is the fixed locus
-of the involution *a realizer induced*, so positivity is supplied by supportedness rather than
-obtained beside it. Do not build them as separate organs.
+The remaining two were **one** thing, not two, and §2 said why: placement is the fixed locus of the
+involution *a realizer induced*, so positivity is supplied by supportedness rather than obtained
+beside it. **They were built that way.** `place_substitutions` derives `STANDING`/`OPEN` *from* which
+realizers reached which conduct class; placement rides on realization and is not computed beside it.
+
+**So all four parts now exist, and the demand's own obstruction is returned by name.** On the hollow
+tetrahedron, one move depositing two cells the receiver family cannot tell apart returns:
+
+```text
+OPEN  class 8  f012 f013
+         reached only as 2·c — rational, not integral
+support: rank 1   invariant factors [2]   free obstruction 10   torsion obstruction [2]
+```
+
+A class reached by a realizer **only rationally** is exactly the failure of the *integral* cycle-class
+statement, and §3 already names that shape: *"the obstruction is torsion, and torsion is winding that
+cannot be un-deposited."* The machine now computes it, exactly, with the invariant factor exhibited
+and the receiver family that saw it declared.
+
+**What is NOT done, and the gap is now a scale question rather than a construction question.** This
+runs on four vertices, six edges and four candidate faces — eleven conduct classes. §11's actual
+demand is about a **far** population: condensing a far field into a compact realizer with an exact
+retained remainder, which is what scale-independent recruitment needs. The organ has never been run
+where the population is far enough that condensation is *required* rather than incidental. That —
+not the construction — is what remains, and §11's trivial instance (spanning-tree interval labelling,
+where the forced non-tree population **is** the certified remainder) is the named route to it.
 
 **And the built part is not driven.** Measured 2026-08-07 over the whole tree: `ExactInterval` has
 104 references across 9 files, 20 in drivers; `CertifiedSeries` has 13 references in **one** file

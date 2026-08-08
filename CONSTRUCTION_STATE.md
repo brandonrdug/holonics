@@ -35,15 +35,25 @@ soma/    body                         pure law, no_std, zero dependencies
          kernel/soma.spv              committed boundary artifact
 ```
 
-**The gate, read directly** (`PATH=/opt/cuda/bin:$PATH cargo test --workspace`, 2026-08-07
-14:34):
+**The gate, read directly** (`PATH=/opt/cuda/bin:$PATH cargo test --workspace --no-fail-fast`,
+2026-08-08, summed across **42** `test result:` lines on a tree with nothing else running):
 
 ```
-730 passed, 0 failed, 14 ignored
+1184 passed, 0 failed, 14 ignored
 ```
 
-**This moved during the session.** At 14:09 the same command returned `543 passed, 1 failed, 14
-ignored`, the one failure being `mount-scope-gate`'s
+**Take the figure by summing the result lines, never by reading one of them and never through a pipe
+to `tail`.** A `tail` cuts the earlier packages off and returns a number that looks like a total; it
+happened here on 2026-08-08 and returned 237.
+
+**The two figures before it, and why they moved.** `982` was the tree at `6778219`, before the
+assembly landed. `730` was 2026-08-07 14:34. Between `982` and `1184`, eight organs were wired to
+`blueprint/THE_ASSEMBLY.md`, eight adversaries refuted the *evidence* for all eight — roughly forty
+mutations surviving a green suite, none of them against the wiring — and eight repairs closed them.
+The intermediate `1121` figure appears in those reports and was honest when taken.
+
+**Earlier still, this moved during a session.** At 14:09 on 2026-08-07 the same command returned
+`543 passed, 1 failed, 14 ignored`, the one failure being `mount-scope-gate`'s
 `founded_reference_path_is_deterministic_and_nonvacuous` returning `(255, 159, 35)` against an
 expected `(256, 160, 38)` — laboratory fixture drift that predated the import. That fixture was
 regenerated against the carriage law, and a Lean kernel witness was added, in the same tree in the
