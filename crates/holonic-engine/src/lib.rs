@@ -193,6 +193,13 @@ pub mod temper;
 pub mod rebase_invariants;
 pub mod receiver;
 pub mod receiver_exact_compression;
+// Exact integer relation detection over `BigInt`: a collapsed numeric face read as the truncated
+// series expansion it is, and the basis in which it can continue founded by lattice reduction.
+// Declared, never glob-exported: it names `ExactFace`, `reopen`, `probe_at_grain` and
+// `DeclaredGrain`, and `ExactFace` collides in meaning with `certified_face`'s presentation face
+// while `reopen` says nothing at the crate root about what is being reopened. `CLAUDE.md` §2b and
+// `canon/THE_MATHEMATICS_TABLET.md` §1, "one deletion, three carriers".
+pub mod reopening;
 pub mod receiver_current;
 pub mod receiver_ecology;
 pub mod receiver_phase_atlas;
