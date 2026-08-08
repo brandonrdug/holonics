@@ -168,12 +168,27 @@ That is the **export codec's closing-brace convention promoted into a homologica
 receiver-visible coordinate promoted into an invariant, which is the contaminant species `CLAUDE.md`
 §0 names, found again here. Either the circuit learns to see statement identity and to exclude the
 codec's own structural keywords, or the quantity is renamed to what it measures. Do not carry this
-sentence as written. **(a) and (c) are one crossing on two materials** — that is
-§4's anti-scatter discipline holding, not two organs. **Falsifier:** withhold the reading and confirm
-target selection is identical; and **the reading must be able to be nonzero** — the 31 deposited
-artifacts today are one statement with β₁ = 0, so the first obligation is a declared control.
-Refusals must feed it too: a reader ingesting only acceptances is success-filtering wearing
-analysis's name.
+sentence as written.
+
+**Resolved 2026-08-08 — the circuit now does all three.** Codec structural keywords are excluded and
+the `end` line is no longer a recruitment, so the `Z/2` artefact is gone and torsion traces to real
+repeated recruitments (`apply ×3`, `exact_chart_carry ×3` → `Z/3 + Z/3`). A third aperture axis,
+`StatementIncidence::{Withheld, Founded}`, gives each statement a 0-cell and each declaration a
+reach 1-cell, so **the routes to one result are `β₁(Founded) − β₁(Withheld)`** and the
+statement-blind β₁ is renamed to what it always measured: independent **recruitment** cycles. Both
+quantities are now cross-checked against a second implementation — a union-find spanning forest that
+reads `boundary.support()` and never a coefficient. Under the repaired rule the reading became a
+function of the proof bodies rather than the preamble: two artifacts of one declaration now recruit
+different populations, and grade-1 β over `standing/output` moved `0 → 34`.
+
+**(a) and (c) are one crossing on two materials** — that is §4's anti-scatter discipline holding,
+not two organs. **Falsifier:** withhold the reading and confirm target selection **changes** — if it
+is identical, the reading is not selecting and the loop is decorative. *(Corrected 2026-08-08: this
+said "confirm target selection is identical", which is the inverse. Identity is the falsification,
+not the pass, and the driver that was built to this line selected from a hardcoded literal and
+passed.)* And **the reading must be able to be nonzero** — the 31 deposited artifacts were one
+statement with β₁ = 0, so the first obligation is a declared control. Refusals must feed it too: a
+reader ingesting only acceptances is success-filtering wearing analysis's name.
 
 **(d) PLATE I/O.** The signal is the octets. **Falsifier:** round-trip through a second process — a
 `FormNotCanonical` refusal proves the driver's rest was never a canonical form, **and that can fail

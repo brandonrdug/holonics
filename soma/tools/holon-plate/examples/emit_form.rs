@@ -1,7 +1,9 @@
 //! `cargo run -p holon-plate --example emit_form -- HTEC out.form`
 //! `cargo run -p holon-plate --example emit_form -- ERST out.form`
+//! `cargo run -p holon-plate --example emit_form -- RBIN out.form`
 //! `cargo run -p holon-plate --example emit_form -- HTEC-DEED out.deed`
 //! `cargo run -p holon-plate --example emit_form -- ERST-DEED out.deed`
+//! `cargo run -p holon-plate --example emit_form -- RBIN-DEED out.deed`
 //!
 //! A driver, so that the mouth can be fed.
 //!
@@ -16,19 +18,24 @@
 //! capability claim rests on them and the census they carry is whatever those occurrences actually
 //! produced.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::path::PathBuf;
 
 use body::num::Cog;
 use holon_plate::schemas::current::CurrentDeed;
+use holon_plate::schemas::rebase::{BoundaryTerm, RebaseDeed};
 use holon_plate::schemas::training::TrainingDeed;
+use holonic_engine::algebraic::{CausalChain, ComparativeMultiplicity, GradedCausalComplex};
+use holonic_engine::causal::EventId;
+use holonic_engine::graded_complex_form::encode_native_bytes;
 use life::holonic_training::{FaceAddress, SourceFace, TrainingEcology};
 use soma_abi::active::{ActionCurrent, RelationAtom};
 use soma_membrane::{
     ContemporaryEvent, CurrentEvent, CurrentGeometry, LiveCurrentMachine, SparseStandingSurface,
 };
 
-const USAGE: &str = "usage: emit_form (HTEC|ERST|HTEC-DEED|ERST-DEED) OUT";
+const USAGE: &str =
+    "usage: emit_form (HTEC|ERST|RBIN|HTEC-DEED|ERST-DEED|RBIN-DEED) OUT";
 
 fn main() -> Result<(), String> {
     let mut arguments = std::env::args().skip(1);
@@ -38,8 +45,10 @@ fn main() -> Result<(), String> {
     let octets = match what.as_str() {
         "HTEC" => training_form()?,
         "ERST" => current_form()?,
+        "RBIN" => rebase_form()?,
         "HTEC-DEED" => training_deed(),
         "ERST-DEED" => current_deed(),
+        "RBIN-DEED" => rebase_deed(),
         other => return Err(format!("`{other}` is not a held schema\n{USAGE}")),
     };
     std::fs::write(&out, &octets).map_err(|error| format!("cannot write {}: {error}", out.display()))?;
@@ -107,6 +116,46 @@ fn current_deed() -> Vec<u8> {
     CurrentDeed {
         relation: 71,
         action: 1,
+    }
+    .encode()
+}
+
+/// Two vertices joined by one edge, grown through the incidence's own founder. The RBIN deed below
+/// closes a loop on it, so the re-lit body's `betti_total` moves the other way from the way the
+/// joining edge moved it.
+fn rebase_form() -> Result<Vec<u8>, String> {
+    let source = BTreeSet::from([EventId(1)]);
+    let mut complex = GradedCausalComplex::default();
+    let a = complex
+        .found_cell("a", source.clone(), 0, CausalChain::default())
+        .map_err(debug)?;
+    let b = complex
+        .found_cell("b", source.clone(), 0, CausalChain::default())
+        .map_err(debug)?;
+    let mut boundary = CausalChain::default();
+    boundary.add_term(b, ComparativeMultiplicity::positive(1u32));
+    boundary.add_term(a, ComparativeMultiplicity::negative(1u32));
+    complex.found_cell("ab", source, 1, boundary).map_err(debug)?;
+    encode_native_bytes(&complex).map_err(debug)
+}
+
+fn rebase_deed() -> Vec<u8> {
+    RebaseDeed {
+        name: "ab2".to_owned(),
+        grade: 1,
+        source_events: vec![7],
+        boundary: vec![
+            BoundaryTerm {
+                cell: 2,
+                positive: 1,
+                negative: 0,
+            },
+            BoundaryTerm {
+                cell: 1,
+                positive: 0,
+                negative: 1,
+            },
+        ],
     }
     .encode()
 }

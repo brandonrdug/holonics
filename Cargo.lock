@@ -567,7 +567,9 @@ name = "holon-plate"
 version = "0.1.0"
 dependencies = [
  "body",
+ "holonic-engine",
  "life",
+ "num-bigint",
  "soma-abi",
  "soma-membrane",
  "soma-standing-deposit",

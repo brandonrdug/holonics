@@ -3,6 +3,7 @@ use std::fmt::Debug;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 
+use life::form_mouth::deposit_form_or_message;
 use life::holonic_training::{
     CandidateTransduction, ConsequenceComplex, ConsequenceEdge, ConsequenceRelation, FaceAddress,
     PathStep, SourceFace, TemplateStep, TrainingEcology, TrainingPrediction, TransductionTemplate,
@@ -10,6 +11,14 @@ use life::holonic_training::{
 use serde::Deserialize;
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
+
+/// This driver's name at the plate mouth: `output/eros_holonic_training_ecology/<name>-<sha256>.form`.
+const FORM_DRIVER: &str = "eros_holonic_training_ecology";
+/// The training-ecology form this driver seals. `HTEC` is the schema `holon-plate` holds for it,
+/// and it is the ONLY `HTEC` producer among the drivers wired at this mouth.
+const TRAINING_REST_FORM: &str = "training-ecology-rest";
+/// The same ecology's form re-taken after a source-detached remount — a second frame, deposited apart.
+const TRAINING_REMOUNT_FORM: &str = "training-ecology-remount";
 
 const SOURCE_SCHEMA: &str = "eros.holonic-training-ecology.source.v1";
 const REPORT_SCHEMA: &str = "eros.holonic-training-ecology.report.v1";
@@ -133,9 +142,20 @@ fn run_cell(mut source: Source, source_sha256: String) -> Result<Value, String> 
     source.training_occurrences.clear();
 
     let rest = ecology.encode_native_bytes()?;
+    // THE_ASSEMBLY.md step 5, loop (d): *the signal is the octets*. The hash below is untouched and
+    // still reported; these are the same octets reaching `holon-plate deposit --from HTEC:` instead
+    // of being hashed and dropped.
+    let deposited = deposit_form_or_message(FORM_DRIVER, TRAINING_REST_FORM, &rest)?;
+    eprintln!("form deposited: {}", deposited.path.display());
     let rest_sha256 = sha256(&rest);
     let remounted = TrainingEcology::decode_native_bytes(&rest)?;
-    let rest_exact = remounted == ecology && remounted.encode_native_bytes()? == rest;
+    let remounted_rest = remounted.encode_native_bytes()?;
+    // The remounted body's own form, deposited apart from the one it was mounted from. The equality
+    // below is unchanged; depositing the two apart is what lets a later reader see them as two
+    // frames rather than as one form written twice, which is the only way the equality is evidence.
+    let deposited = deposit_form_or_message(FORM_DRIVER, TRAINING_REMOUNT_FORM, &remounted_rest)?;
+    eprintln!("form deposited: {}", deposited.path.display());
+    let rest_exact = remounted == ecology && remounted_rest == rest;
     drop(ecology);
 
     let mut probes = Vec::new();

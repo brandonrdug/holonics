@@ -13,6 +13,12 @@ use soma_membrane::{
     LiveCurrentMachine, LiveCurrentRestImage, LiveMemory, ParallelHostLiveCurrentExecutor,
     RegionalRelationArc, RegionalRelationCell, SparseStandingSurface,
 };
+use life::form_mouth::deposit_form_or_message;
+
+/// This driver's name at the plate mouth: `output/eros_receiver_relative_field/<name>-<sha256>.form`.
+const FORM_DRIVER: &str = "eros_receiver_relative_field";
+/// The live-current rest this driver seals. `ERST` is the schema `holon-plate` holds for it.
+const MACHINE_REST_FORM: &str = "machine-rest";
 
 const FIELD: InterfaceCapability = InterfaceCapability::new(0x4649_454c_44, 1);
 const FOREIGN: InterfaceCapability = InterfaceCapability::new(0x4649_454c_44, 2);
@@ -384,6 +390,13 @@ fn branch_read(role: &'static str, outcome: &Outcome) -> Result<BranchRead, Stri
 fn machine_read(machine: &LiveCurrentMachine) -> Result<MachineRead, String> {
     let rest = machine.rest_image().map_err(debug)?;
     let bytes = rest.encode_native_bytes().map_err(debug)?;
+    // THE_ASSEMBLY.md step 5, loop (d): *the signal is the octets*. The hash below is untouched and
+    // still reported; these are the same octets reaching `holon-plate deposit --from ERST:` instead
+    // of being hashed and dropped. The address is the content, so this helper -- called at many
+    // rests -- deposits every distinct form it sealed instead of overwriting all but the last, and
+    // the file name it returns carries the same hash the receipt does.
+    let deposited = deposit_form_or_message(FORM_DRIVER, MACHINE_REST_FORM, &bytes)?;
+    eprintln!("form deposited: {}", deposited.path.display());
     let LiveMemory {
         live_lineages,
         carrier_words,

@@ -18,6 +18,7 @@ use life::resonance_ecology::{
     ResonanceConstituentRead, ResonanceEcology, ResonanceEcologyRestImage, ResonanceGerm,
     ResonanceOccurrence, ResonanceOccurrenceOrigin,
 };
+use life::form_mouth::deposit_form_or_message;
 use life::suffix_ecology::{ExactSuffixEcology, SuffixBranchSupport};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
@@ -26,6 +27,15 @@ use soma_membrane::{
     LiveBoundaryTransition, LiveConstituent, LiveCurrentMachine, ParallelHostLiveCurrentExecutor,
     ReceiverFiberIdentity, SparseStandingSurface,
 };
+
+/// This driver's name at the plate mouth: `output/eros_resonant_generation/<name>-<sha256>.form`.
+const FORM_DRIVER: &str = "eros_resonant_generation";
+/// The four forms this driver seals. None is `ERST` or `HTEC`: the suffix ecology and the
+/// resonance ecology carry their own native wires, which `holon-plate` does not hold.
+const SUFFIX_REST_FORM: &str = "suffix-rest";
+const RESONANCE_REST_FORM: &str = "resonance-rest";
+const RESONANCE_REMOUNT_FORM: &str = "resonance-remount";
+const RESONANCE_REVERSE_FORM: &str = "resonance-reverse-delivery";
 
 const REPORT_SCHEMA: &str = "eros.resonant-generation.report.v2";
 const PREFIX_CONTEXT_SCHEMA: u64 = 0x4552_4f53_5052_4546;
@@ -265,6 +275,11 @@ fn run() -> Result<(), String> {
     let suffix_ecology = ExactSuffixEcology::condition(&token_paths).map_err(debug)?;
     let suffix_configuration_wall_millis = suffix_configuration_started.elapsed().as_millis();
     let suffix_rest_bytes = suffix_ecology.encode_native_bytes().map_err(debug)?;
+    // THE_ASSEMBLY.md step 5, loop (d): *the signal is the octets*. Every hash here is untouched.
+    // This is the exact-suffix ecology's own wire; no held plate schema reads it, which is a fact
+    // about the reader's held set and is what the falsifier reports.
+    let deposited = deposit_form_or_message(FORM_DRIVER, SUFFIX_REST_FORM, &suffix_rest_bytes)?;
+    eprintln!("form deposited: {}", deposited.path.display());
     let suffix_rest_sha256 = sha256(&suffix_rest_bytes);
     let suffix_reopened =
         ExactSuffixEcology::from_native_bytes(&suffix_rest_bytes).map_err(debug)?;
@@ -307,15 +322,20 @@ fn run() -> Result<(), String> {
     let configuration_wall_millis = started.elapsed().as_millis();
     let rest = ecology.rest_image().map_err(debug)?;
     let rest_bytes = rest.encode_native_bytes().map_err(debug)?;
+    // The resonance ecology's own rest wire. Same discipline; no held plate schema reads it either.
+    let deposited = deposit_form_or_message(FORM_DRIVER, RESONANCE_REST_FORM, &rest_bytes)?;
+    eprintln!("form deposited: {}", deposited.path.display());
     let rest_sha256 = sha256(&rest_bytes);
     let reopened = ResonanceEcologyRestImage::from_native_bytes(&rest_bytes).map_err(debug)?;
     let remounted = ResonanceEcology::from_rest_image(reopened).map_err(debug)?;
-    let remount_exact = remounted
+    let remounted_bytes = remounted
         .rest_image()
         .map_err(debug)?
         .encode_native_bytes()
-        .map_err(debug)?
-        == rest_bytes;
+        .map_err(debug)?;
+    let deposited = deposit_form_or_message(FORM_DRIVER, RESONANCE_REMOUNT_FORM, &remounted_bytes)?;
+    eprintln!("form deposited: {}", deposited.path.display());
+    let remount_exact = remounted_bytes == rest_bytes;
 
     let reversed = occurrences.iter().rev().cloned().collect::<Vec<_>>();
     let mut reverse_executor = ParallelHostLiveCurrentExecutor::new(threads);
@@ -327,12 +347,14 @@ fn run() -> Result<(), String> {
         .receive_configuration_with(&reversed, action()?, &mut reverse_executor)
         .map_err(debug)?;
     let reverse_configuration_wall_millis = reverse_started.elapsed().as_millis();
-    let delivery_permutation_exact = reverse
+    let reverse_bytes = reverse
         .rest_image()
         .map_err(debug)?
         .encode_native_bytes()
-        .map_err(debug)?
-        == rest_bytes;
+        .map_err(debug)?;
+    let deposited = deposit_form_or_message(FORM_DRIVER, RESONANCE_REVERSE_FORM, &reverse_bytes)?;
+    eprintln!("form deposited: {}", deposited.path.display());
+    let delivery_permutation_exact = reverse_bytes == rest_bytes;
     eprintln!(
         "eros resonant generation: conditioned {} paths / {} prefix contexts · resonance rest {} bytes · suffix states {} / bound {} · suffix rest {} bytes · both delivery gauges {}",
         source.training_lines.len(),

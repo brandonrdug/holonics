@@ -14,12 +14,21 @@ publish = false
 # through a crate it did not itself verify would have moved the trust rather
 # than established it. The plate inherits that verification rather than adding
 # a second hash dependency beside it.
+#
+# `holonic-engine` is the third codec's owner: `graded_complex_form` writes the
+# canonical octets of a `GradedCausalComplex` and `rebase_invariants` takes the
+# reading over it. This is not a cycle. The engine sits BELOW `life`, which
+# already depends on it, so the edge added here is one the build graph already
+# carried -- `blueprint/THE_ASSEMBLY.md` F1 is about a `life` example calling
+# UP into the plate, which nothing here does.
 [dependencies]
 soma-standing-deposit = { path = "../standing-deposit" }
 soma-membrane = { path = "../../membrane" }
 soma-abi = { path = "../../abi" }
 body = { path = "../../body" }
 life = { path = "../../life" }
+holonic-engine = { path = "../../../crates/holonic-engine", default-features = false }
+num-bigint = "0.4"
 
 [lib]
 name = "holon_plate"

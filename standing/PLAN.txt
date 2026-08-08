@@ -78,3 +78,81 @@ return output/agentic-research-kernel/formal_carry-00003.lean
 return output/agentic-research-kernel/formal_carry-00004.lean
 return output/agentic-research-kernel/formal_carry-00005.lean
 return output/agentic-research-kernel/formal_carry-00006.lean
+
+# The declared nonzero control for the derivation atlas reading, and the loop that
+# reads it back. The reader returns betti at grade 1 = 0 on `lean.proof-production`
+# because all thirty-one artifacts declare ONE theorem name and collapse onto one
+# 0-cell. These deposits are one statement posed under TWO declaration names, so the
+# reading is nonzero and the loop closes on a signal that has fired. Every generated
+# path is deposited, refused as well as admitted; KERNEL_VERDICTS.txt records which,
+# by the rendered source's hash and never by the kernel's message, which carries this
+# checkout's absolute path.
+founding lean.plural-route-control
+mount soma/life/examples/eros_lean_plural_route_control.rs
+mount soma/life/src/lean_mathematics.rs
+mount soma/life/src/lean_mathematics/ecology.rs
+mount soma/life/src/lean_mathematics/kernel_returns.rs
+mount soma/life/src/lean_mathematics/syntax.rs
+mount crates/holonic-engine/src/derivation_atlas.rs
+mount soma/formal/kernel-witness/KernelWitness.lean
+return output/lean-plural-route-control/KERNEL_VERDICTS.txt
+return output/lean-plural-route-control/carrier-transport-direct-00000.lean
+return output/lean-plural-route-control/carrier-transport-direct-00001.lean
+return output/lean-plural-route-control/carrier-transport-direct-00002.lean
+return output/lean-plural-route-control/carrier-transport-direct-00003.lean
+return output/lean-plural-route-control/carrier-transport-direct-00004.lean
+return output/lean-plural-route-control/carrier-transport-direct-00005.lean
+return output/lean-plural-route-control/carrier-transport-direct-00006.lean
+return output/lean-plural-route-control/carrier-transport-direct-00007.lean
+return output/lean-plural-route-control/carrier-transport-direct-00008.lean
+return output/lean-plural-route-control/carrier-transport-direct-00009.lean
+return output/lean-plural-route-control/carrier-transport-direct-00010.lean
+return output/lean-plural-route-control/carrier-transport-direct-00011.lean
+return output/lean-plural-route-control/carrier-transport-direct-00012.lean
+return output/lean-plural-route-control/carrier-transport-direct-00013.lean
+return output/lean-plural-route-control/carrier-transport-direct-00014.lean
+return output/lean-plural-route-control/carrier-transport-direct-00015.lean
+return output/lean-plural-route-control/carrier-transport-direct-00016.lean
+return output/lean-plural-route-control/carrier-transport-direct-00017.lean
+return output/lean-plural-route-control/carrier-transport-direct-00018.lean
+return output/lean-plural-route-control/carrier-transport-direct-00019.lean
+return output/lean-plural-route-control/carrier-transport-direct-00020.lean
+return output/lean-plural-route-control/carrier-transport-direct-00021.lean
+return output/lean-plural-route-control/carrier-transport-direct-00022.lean
+return output/lean-plural-route-control/carrier-transport-direct-00023.lean
+return output/lean-plural-route-control/carrier-transport-direct-00024.lean
+return output/lean-plural-route-control/carrier-transport-direct-00025.lean
+return output/lean-plural-route-control/carrier-transport-direct-00026.lean
+return output/lean-plural-route-control/carrier-transport-direct-00027.lean
+return output/lean-plural-route-control/carrier-transport-direct-00028.lean
+return output/lean-plural-route-control/carrier-transport-direct-00029.lean
+return output/lean-plural-route-control/carrier-transport-direct-00030.lean
+return output/lean-plural-route-control/carrier-transport-relayed-00000.lean
+return output/lean-plural-route-control/carrier-transport-relayed-00001.lean
+return output/lean-plural-route-control/carrier-transport-relayed-00002.lean
+return output/lean-plural-route-control/carrier-transport-relayed-00003.lean
+return output/lean-plural-route-control/carrier-transport-relayed-00004.lean
+return output/lean-plural-route-control/carrier-transport-relayed-00005.lean
+return output/lean-plural-route-control/carrier-transport-relayed-00006.lean
+return output/lean-plural-route-control/carrier-transport-relayed-00007.lean
+return output/lean-plural-route-control/carrier-transport-relayed-00008.lean
+return output/lean-plural-route-control/carrier-transport-relayed-00009.lean
+return output/lean-plural-route-control/carrier-transport-relayed-00010.lean
+return output/lean-plural-route-control/carrier-transport-relayed-00011.lean
+return output/lean-plural-route-control/carrier-transport-relayed-00012.lean
+return output/lean-plural-route-control/carrier-transport-relayed-00013.lean
+return output/lean-plural-route-control/carrier-transport-relayed-00014.lean
+return output/lean-plural-route-control/carrier-transport-relayed-00015.lean
+return output/lean-plural-route-control/carrier-transport-relayed-00016.lean
+return output/lean-plural-route-control/carrier-transport-relayed-00017.lean
+return output/lean-plural-route-control/carrier-transport-relayed-00018.lean
+return output/lean-plural-route-control/carrier-transport-relayed-00019.lean
+return output/lean-plural-route-control/carrier-transport-relayed-00020.lean
+return output/lean-plural-route-control/carrier-transport-relayed-00021.lean
+return output/lean-plural-route-control/carrier-transport-relayed-00022.lean
+return output/lean-plural-route-control/carrier-transport-relayed-00023.lean
+return output/lean-plural-route-control/carrier-transport-relayed-00024.lean
+return output/lean-plural-route-control/carrier-transport-relayed-00025.lean
+return output/lean-plural-route-control/carrier-transport-relayed-00026.lean
+return output/lean-plural-route-control/carrier-transport-relayed-00027.lean
+return output/lean-plural-route-control/carrier-transport-relayed-00028.lean

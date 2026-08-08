@@ -1,0 +1,6 @@
+import KernelWitness
+namespace Soma
+theorem carrier_transport_direct (P : Prop) (h : P) : exactCarrier P := by
+  rw [formal_carry]
+  nlinarith
+end Soma

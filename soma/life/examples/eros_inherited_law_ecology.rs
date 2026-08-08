@@ -17,6 +17,20 @@ use soma_membrane::{
     LiveBoundaryTransition, LiveConstituent, LiveCurrentMachine, LiveCurrentRestImage,
     SparseStandingSurface,
 };
+use life::form_mouth::deposit_form_or_message;
+
+/// This driver's name at the plate mouth: `output/eros_inherited_law_ecology/<name>-<sha256>.form`.
+const FORM_DRIVER: &str = "eros_inherited_law_ecology";
+/// The live-current rest this driver seals. `ERST` is the schema `holon-plate` holds for it.
+const MACHINE_REST_FORM: &str = "machine-rest";
+/// The `ERST` half of the ecology checkpoint.
+const CHECKPOINT_MACHINE_FORM: &str = "checkpoint-machine";
+/// The inherited-law wire (`ELAW`) and the four relation-organ wires. Real codecs, no held schema.
+const CHECKPOINT_LAW_FORM: &str = "checkpoint-law";
+const EDGE_0_FORM: &str = "checkpoint-edge-0";
+const EDGE_1_FORM: &str = "checkpoint-edge-1";
+const EDGE_2_FORM: &str = "checkpoint-edge-2";
+const RESIDUAL_FORM: &str = "checkpoint-residual";
 
 const FIELD_INTERFACE: InterfaceCapability = InterfaceCapability::new(0x4845_5849_53, 1);
 const UPDATE_INTERFACE: InterfaceCapability = InterfaceCapability::new(0x4845_5849_53, 2);
@@ -1265,6 +1279,9 @@ fn population_read(
         .map_err(debug)?
         .encode_native_bytes()
         .map_err(debug)?;
+    // THE_ASSEMBLY.md step 5, loop (d): *the signal is the octets*. The hash below is untouched.
+    let deposited = deposit_form_or_message(FORM_DRIVER, MACHINE_REST_FORM, &machine_bytes)?;
+    eprintln!("form deposited: {}", deposited.path.display());
     Ok(PopulationRead {
         probe,
         traversal,
@@ -1376,6 +1393,14 @@ fn action() -> ActionCurrent {
 fn encode_checkpoint(checkpoint: &EcologyCheckpoint) -> Result<Vec<u8>, String> {
     let machine = checkpoint.machine.encode_native_bytes().map_err(debug)?;
     let law = checkpoint.law.encode_native_bytes()?;
+    // THE_ASSEMBLY.md step 5, loop (d): *the signal is the octets*. The checkpoint hash below is
+    // untouched. The three constituent forms are deposited apart — the machine half is `ERST` and
+    // has a mouth; the law wire and the four organ wires are forms of codecs this file and the
+    // membrane own, which no held plate schema reads.
+    let deposited = deposit_form_or_message(FORM_DRIVER, CHECKPOINT_MACHINE_FORM, &machine)?;
+    eprintln!("form deposited: {}", deposited.path.display());
+    let deposited = deposit_form_or_message(FORM_DRIVER, CHECKPOINT_LAW_FORM, &law)?;
+    eprintln!("form deposited: {}", deposited.path.display());
     let total = CHECKPOINT_HEADER_BYTES
         .checked_add(machine.len())
         .and_then(|value| value.checked_add(ORGAN_BYTES * 4))
@@ -1387,13 +1412,16 @@ fn encode_checkpoint(checkpoint: &EcologyCheckpoint) -> Result<Vec<u8>, String> 
     push_u64(&mut bytes, machine.len() as u64);
     push_u64(&mut bytes, law.len() as u64);
     bytes.extend_from_slice(&machine);
-    for organ in [
-        checkpoint.edge_0,
-        checkpoint.edge_1,
-        checkpoint.edge_2,
-        checkpoint.residual,
+    for (name, organ) in [
+        (EDGE_0_FORM, checkpoint.edge_0),
+        (EDGE_1_FORM, checkpoint.edge_1),
+        (EDGE_2_FORM, checkpoint.edge_2),
+        (RESIDUAL_FORM, checkpoint.residual),
     ] {
-        bytes.extend_from_slice(&organ.encode_native_bytes());
+        let organ_octets = organ.encode_native_bytes();
+        let deposited = deposit_form_or_message(FORM_DRIVER, name, &organ_octets)?;
+        eprintln!("form deposited: {}", deposited.path.display());
+        bytes.extend_from_slice(&organ_octets);
     }
     bytes.extend_from_slice(&law);
     if bytes.len() != total {

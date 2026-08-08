@@ -134,4 +134,7 @@ pub use registry::{
     deposit, held_schemas, inspect, redeposit, resume, schema_for, Deposited, Inspection, Relit,
 };
 pub use schema::{present_and_require_change, LitBody, PlateSchema, ResumeRefusal};
-pub use schemas::{CURRENT_SCHEMA_VERSION, CURRENT_TAG, TRAINING_SCHEMA_VERSION, TRAINING_TAG};
+pub use schemas::{
+    CURRENT_SCHEMA_VERSION, CURRENT_TAG, REBASE_SCHEMA_VERSION, REBASE_TAG,
+    TRAINING_SCHEMA_VERSION, TRAINING_TAG,
+};

@@ -9,8 +9,14 @@ pub mod agentic_research;
 pub mod causal_language;
 pub mod coupled_informant_current;
 pub mod current_world;
+// The downward crossing of `blueprint/THE_ASSEMBLY.md` loop (a): a decomposer run as a codec, whose
+// grain is revised by the collapsed-pair population its own reading returned. It lives here rather
+// than in `holonic-engine` because it needs both `holonic_language`'s reflective runtime and the
+// engine's `receiver_exact_compression`, and only `life` depends on both.
+pub mod decomposing_codec;
 pub mod dialogue_lineage;
 pub mod exact_world;
+pub mod form_mouth;
 pub mod holonic_training;
 pub mod laboratory_language;
 pub mod lean_mathematics;

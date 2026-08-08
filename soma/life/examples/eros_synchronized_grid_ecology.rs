@@ -37,6 +37,12 @@ use serde_json::Value;
 use sha2::{Digest, Sha256};
 use soma_abi::active::ActionCurrent;
 use soma_membrane::{LiveCurrentMachine, ReceiverChartIdentity, SparseStandingSurface};
+use life::form_mouth::deposit_form_or_message;
+
+/// This driver's name at the plate mouth: `output/eros_synchronized_grid_ecology/<name>-<sha256>.form`.
+const FORM_DRIVER: &str = "eros_synchronized_grid_ecology";
+/// The live-current rest this driver seals. `ERST` is the schema `holon-plate` holds for it.
+const MACHINE_REST_FORM: &str = "machine-rest";
 
 const ALIGNMENT_HZ: u64 = 25_000;
 const PHASE_EXTENT: usize = 16;
@@ -273,6 +279,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .map_err(|error| format!("machine standing could not rest: {error:?}"))?
         .encode_native_bytes()
         .map_err(|error| format!("machine rest image could not encode: {error:?}"))?;
+    // THE_ASSEMBLY.md step 5, loop (d): *the signal is the octets*. The hash below is untouched and
+    // still reported; these are the same octets reaching `holon-plate deposit --from ERST:`.
+    let deposited = deposit_form_or_message(FORM_DRIVER, MACHINE_REST_FORM, &machine_bytes)?;
+    eprintln!("form deposited: {}", deposited.path.display());
     let standing_sha256 = hex_digest(&machine_bytes);
 
     println!(

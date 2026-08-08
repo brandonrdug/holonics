@@ -28,6 +28,7 @@ A form to feed it:
 ```sh
 cargo run -p holon-plate --example emit_form -- HTEC training.form
 cargo run -p holon-plate --example emit_form -- ERST current.form
+cargo run -p holon-plate --example emit_form -- RBIN incidence.form
 ```
 
 ## What the plate deposits, and what it does not
@@ -133,11 +134,30 @@ it to prove the refusal can fire.
 |---|---|---|---|
 | `HTEC` | 1 | `soma/life/src/holonic_training.rs:443` | one cultivation occurrence |
 | `ERST` | 2 | `soma/membrane/src/live_current.rs:1241` | one contemporary event continuing every settled lineage |
+| `RBIN` | 1 | `crates/holonic-engine/src/graded_complex_form.rs` | one further cell, founded through the incidence's own founder |
 
 A plate naming anything else is **refused, never guessed at** — separately for an unheld tag and an
 unheld codec version, because a form at another version is another form. `ERST`'s version is read
-from `LIVE_CURRENT_REST_LAYOUT_VERSION` rather than copied, so a membrane that bumps its rest layout
-stops this reader by version instead of silently misreading.
+from `LIVE_CURRENT_REST_LAYOUT_VERSION` rather than copied, and `RBIN`'s from
+`GRADED_COMPLEX_FORM_LAYOUT_VERSION`, so a codec that bumps its wire stops this reader by version
+instead of silently misreading.
+
+`RBIN` is the sharpest illustration of the census being a **second frame** rather than a copy. The
+octets are a graded causal incidence — cells, grades, source events, oriented boundary chains. The
+census is the *rebase-invariants reading taken over it*: Smith-normal-form ranks, free ranks,
+torsion coefficients and the Euler characteristic, recomputed on every mount under all three pivot
+rules. Nothing of the reading is on the disk, so a resumer cannot copy it, and a forged incidence
+cannot carry a declaration that survives the recomputation.
+
+Two things about that census are load-bearing and easy to get wrong:
+
+- **The Euler characteristic is a declared bijection, not a cast.** It is signed and a census value
+  is a `u64`, so it travels as `euler_positive` / `euler_negative` with at most one nonzero.
+  `chi as u64` would send `-1` to `18446744073709551615`.
+- **The field the hand-off moves is `betti_total`**, and *which way* it moves says whether the deed
+  founded a generator or killed one. `cells` and the Euler pair also move on every accepted deed —
+  but by the same amount in both cases, so neither can say what the deed did. `grades`,
+  `boundary_rank_total` and `torsion_factors` need not move at all.
 
 `ERST` is the sharpest illustration of the FORM/current line, because its own codec already draws
 it: `LiveCurrentMachine::rest_image` refuses to close over an **attached seed** — a lineage opened

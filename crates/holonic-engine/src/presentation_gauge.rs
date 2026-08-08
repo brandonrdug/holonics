@@ -297,7 +297,7 @@ pub fn render(face: &CertifiedFace, chart: &CanvasChart, gauge: &DisplayGauge) -
             "obstruction" => &gauge.obstruction,
             _ => &gauge.rule,
         };
-        let radius = if mark.role == "station" { 2 } else { 5 + gauge.name.len() };
+        let radius = if mark.role == "station" { 2 } else { 5 };
         let _ = writeln!(
             out,
             r#"  <circle cx="{}" cy="{}" r="{}" fill="{}" data-role="{}" data-abscissa="{}" data-ordinate="{}"/>"#,

@@ -11,6 +11,7 @@ use std::process::{Command, Output};
 use std::sync::atomic::{AtomicU32, Ordering};
 
 use holon_plate::schemas::current::CurrentDeed;
+use holon_plate::schemas::rebase::{BoundaryTerm, RebaseDeed};
 use holon_plate::schemas::training::TrainingDeed;
 
 static NEXT: AtomicU32 = AtomicU32::new(0);
@@ -319,6 +320,152 @@ fn a_deed_addressed_to_another_schema_refuses_through_the_binary() {
     assert!(message.contains("addressed to schema ERST"), "{message}");
 }
 
+/// The choreography, end to end and through two processes: a graded incidence is written by the
+/// engine's own codec, sealed, re-lit by the binary, founded on, and re-sealed.
+///
+/// The deed closes a loop on a body whose one edge had joined two pieces, so `betti_total` moves
+/// **up** here where the joining edge had moved it down. A run that reported only that the body
+/// changed would not have said that.
+#[test]
+fn an_incidence_deposits_re_lights_and_is_founded_on_through_the_binary() {
+    let scratch = Scratch::new("rbin");
+    let form = scratch.at("incidence.form");
+    let deed = scratch.at("further.deed");
+    let first = scratch.at("first.holon");
+    let second = scratch.at("second.holon");
+
+    // two vertices joined by one edge: one piece, no loop
+    let complex = {
+        use std::collections::BTreeSet;
+        use holonic_engine::algebraic::{CausalChain, ComparativeMultiplicity, GradedCausalComplex};
+        use holonic_engine::causal::EventId;
+
+        let source = BTreeSet::from([EventId(1)]);
+        let mut complex = GradedCausalComplex::default();
+        let a = complex
+            .found_cell("a", source.clone(), 0, CausalChain::default())
+            .expect("a vertex");
+        let b = complex
+            .found_cell("b", source.clone(), 0, CausalChain::default())
+            .expect("a vertex");
+        let mut boundary = CausalChain::default();
+        boundary.add_term(b, ComparativeMultiplicity::positive(1u32));
+        boundary.add_term(a, ComparativeMultiplicity::negative(1u32));
+        complex.found_cell("ab", source, 1, boundary).expect("an edge");
+        complex
+    };
+    fs::write(
+        &form,
+        holonic_engine::graded_complex_form::encode_native_bytes(&complex).expect("a form"),
+    )
+    .expect("write");
+    fs::write(
+        &deed,
+        RebaseDeed {
+            name: "ab2".to_owned(),
+            grade: 1,
+            source_events: vec![7],
+            boundary: vec![
+                BoundaryTerm {
+                    cell: 2,
+                    positive: 1,
+                    negative: 0,
+                },
+                BoundaryTerm {
+                    cell: 1,
+                    positive: 0,
+                    negative: 1,
+                },
+            ],
+        }
+        .encode(),
+    )
+    .expect("write");
+
+    let deposited = holon_plate(&[
+        "deposit",
+        "--from",
+        &format!("RBIN:{}", text(&form)),
+        "--to",
+        &text(&first),
+    ]);
+    assert!(
+        deposited.status.success(),
+        "{}{}",
+        stdout(&deposited),
+        stderr(&deposited)
+    );
+    let report = stdout(&deposited);
+    assert!(report.contains("schema        RBIN/1"), "{report}");
+    assert!(report.contains("betti_total=1"), "one piece, no loop: {report}");
+    assert!(report.contains("torsion_factors=0"), "{report}");
+    assert!(report.contains("euler_positive=1"), "2 - 1 = +1: {report}");
+    assert!(report.contains("euler_negative=0"), "{report}");
+
+    let resumed = holon_plate(&[
+        "resume",
+        "--plate",
+        &text(&first),
+        "--deed",
+        &text(&deed),
+        "--to",
+        &text(&second),
+    ]);
+    assert!(
+        resumed.status.success(),
+        "{}{}",
+        stdout(&resumed),
+        stderr(&resumed)
+    );
+    let report = stdout(&resumed);
+    assert!(report.contains("accepted it and CHANGED"), "{report}");
+    assert!(
+        report.contains("betti_total  1 -> 2"),
+        "closing a loop must FOUND a generator: {report}"
+    );
+    assert!(
+        report.contains("boundary_rank_total  1  (unmoved)"),
+        "the second edge on the same pair adds no rank: {report}"
+    );
+    assert!(
+        report.contains("grades  2  (unmoved)"),
+        "the top grade was already open: {report}"
+    );
+    assert!(report.contains("cells  3 -> 4"), "{report}");
+    assert!(
+        report.contains("byte-identical to the plate it resumed: no"),
+        "{report}"
+    );
+    assert_ne!(
+        fs::read(&first).expect("first"),
+        fs::read(&second).expect("second")
+    );
+
+    // and the moved plate re-lights in its own right, with the moved reading
+    let again = holon_plate(&["resume", "--plate", &text(&second)]);
+    assert!(again.status.success(), "{}", stderr(&again));
+    assert!(stdout(&again).contains("betti_total=2"), "{}", stdout(&again));
+}
+
+/// A form addressed to the wrong held schema must refuse at the mount, not be guessed at.
+#[test]
+fn a_form_deposited_under_the_wrong_held_schema_refuses_through_the_binary() {
+    let scratch = Scratch::new("misfiled");
+    let form = training_form(&scratch);
+    let plate = scratch.at("plate.holon");
+    let refused = holon_plate(&[
+        "deposit",
+        "--from",
+        &format!("RBIN:{}", text(&form)),
+        "--to",
+        &text(&plate),
+    ]);
+    assert_eq!(refused.status.code(), Some(1), "a mis-filed form must exit 1");
+    let message = stderr(&refused);
+    assert!(message.contains("REFUSED"), "{message}");
+    assert!(message.contains("RBIN"), "{message}");
+}
+
 #[test]
 fn the_help_states_what_the_plate_does_not_claim() {
     let helped = holon_plate(&["--help"]);
@@ -326,6 +473,7 @@ fn the_help_states_what_the_plate_does_not_claim() {
     let report = stdout(&helped);
     assert!(report.contains("HTEC/1"), "{report}");
     assert!(report.contains("ERST/2"), "{report}");
+    assert!(report.contains("RBIN/1"), "{report}");
     assert!(report.contains("REFUSED, never guessed at"), "{report}");
     assert!(
         report.contains("is not comprehension"),

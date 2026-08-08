@@ -18,7 +18,12 @@ use soma_membrane::{
     LiveCurrentMachine, LiveMemory, RegionalExecutionRequest, RegionalRelationArc,
     RegionalRelationCell, SparseStandingSurface,
 };
+use life::form_mouth::deposit_form_or_message;
 
+/// This driver's name at the plate mouth: `output/eros_formula_ecology/<name>-<sha256>.form`.
+const FORM_DRIVER: &str = "eros_formula_ecology";
+/// The live-current rest this driver seals. `ERST` is the schema `holon-plate` holds for it.
+const MACHINE_REST_FORM: &str = "machine-rest";
 const PRIMING_VALUES: [i64; 8] = [13, 29, 17, 31, -63_245, 47, 71, -89];
 const RECRUIT_LOCAL: u64 = 0;
 const PRIME_AXES: [u32; 3] = [2, 3, 5];
@@ -2987,6 +2992,18 @@ fn machine_read(machine: &LiveCurrentMachine) -> Result<MachineRead, String> {
         live_lineages,
         ..
     } = machine.memory();
+    let rest_octets = machine
+        .rest_image()
+        .map_err(debug)?
+        .encode_native_bytes()
+        .map_err(debug)?;
+    // THE_ASSEMBLY.md step 5, loop (d): *the signal is the octets*. The hash below is untouched and
+    // still reported; these are the same octets reaching `holon-plate deposit --from ERST:` instead
+    // of being hashed and dropped. This site sits inside a helper the driver calls at every read.
+    // The address is the content, so every distinct rest it seals is deposited at its own address
+    // instead of all but the last being overwritten, and the file name carries the reported hash.
+    let deposited = deposit_form_or_message(FORM_DRIVER, MACHINE_REST_FORM, &rest_octets)?;
+    eprintln!("form deposited: {}", deposited.path.display());
     Ok(MachineRead {
         standing_rank: machine.standing().rank(),
         standing_cells,
@@ -2997,13 +3014,7 @@ fn machine_read(machine: &LiveCurrentMachine) -> Result<MachineRead, String> {
         constituent_paths,
         constituent_transport_terms,
         live_lineages,
-        rest_sha256: sha256(
-            &machine
-                .rest_image()
-                .map_err(debug)?
-                .encode_native_bytes()
-                .map_err(debug)?,
-        ),
+        rest_sha256: sha256(&rest_octets),
     })
 }
 

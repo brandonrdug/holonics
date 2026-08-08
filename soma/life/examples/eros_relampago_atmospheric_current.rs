@@ -42,6 +42,7 @@ use holonic_engine::{
 };
 use life::coupled_informant_current::CoupledInformantCurrentAdapter;
 use life::exact_world::ExactWorldOrgan;
+use life::form_mouth::deposit_form;
 use life::live_current_cuda::CudaLiveCurrentExecutor;
 use num_bigint::BigInt;
 use num_traits::{ToPrimitive, Zero};
@@ -52,6 +53,14 @@ use soma_membrane::{
     ContemporaryRadiation, HostLiveCurrentExecutor, LiveCurrentExecutor, LiveCurrentMachine,
     LiveCurrentRestImage, SparseStandingSurface,
 };
+
+/// This driver's name at the plate mouth: `output/eros_relampago_atmospheric_current/<name>-<sha256>.form`.
+const FORM_DRIVER: &str = "eros_relampago_atmospheric_current";
+/// The live-current rest this driver seals. `ERST` is the schema `holon-plate` holds for it. This
+/// driver already wrote these octets to a caller-supplied directory as `coupled-live-current.bin`;
+/// that write stays, and this one puts the same octets at the declared mouth path where a plate
+/// deposit finds them without being told where the driver's run directory was.
+const COUPLED_LIVE_CURRENT_FORM: &str = "coupled-live-current";
 
 const GLM_FAMILY: ReceiverCoordinateFamilyId = ReceiverCoordinateFamilyId(0x0047_4c4d);
 const GLM_GROUP_ALGORITHM: ReturnedAlgorithmId = ReturnedAlgorithmId(0x0047_4c4d_4752_4f55);
@@ -725,6 +734,9 @@ fn main() -> Result<(), Box<dyn Error>> {
         .encode_native_bytes()
         .map_err(|error| format!("{error:?}"))?;
     fs::write(output.join("coupled-live-current.bin"), &live_native)?;
+    // THE_ASSEMBLY.md step 5, loop (d): *the signal is the octets*.
+    let deposited = deposit_form(FORM_DRIVER, COUPLED_LIVE_CURRENT_FORM, &live_native)?;
+    eprintln!("form deposited: {}", deposited.path.display());
     let adapter_words = coupled_world.adapter().checkpoint().encode_native_words();
     let mut adapter_native = Vec::with_capacity(adapter_words.len() * 4);
     for word in adapter_words {

@@ -221,9 +221,32 @@ impl RecoveredCodec {
         Some(self.boundary[left.0 as usize][right.0 as usize])
     }
 
+    /// The boundary must be square over the classes, because every runner below indexes it by a
+    /// class on both axes.
+    ///
+    /// A structure that fails this is not a codec written badly — it is not a codec. Until
+    /// 2026-08-08 nothing checked it and both [`segment`](Self::segment) and
+    /// [`shortest_separating_input`](Self::shortest_separating_input) indexed straight into the rows:
+    /// a `RecoveredCodec` carrying real classes and a one-by-one boundary **panicked** with an
+    /// index out of bounds, while `codec_system::CodecSystem::joint` over the same value returned a
+    /// typed refusal. Two organs that disagree about what is answerable cannot cross-check each
+    /// other, so the refusal is stated here once and both runners take it.
+    fn boundary_shape(&self) -> Result<(), RecoveryError> {
+        let classes = self.classes.len();
+        if self.boundary.len() != classes || self.boundary.iter().any(|row| row.len() != classes) {
+            return Err(RecoveryError::MalformedBoundary {
+                rows: self.boundary.len(),
+                columns: self.boundary.first().map_or(0, Vec::len),
+                classes,
+            });
+        }
+        Ok(())
+    }
+
     /// Run the recovered codec. Symbols outside the recovered alphabet are **refused**, never
-    /// guessed at.
+    /// guessed at, and so is a boundary that is not square over the classes.
     pub fn segment(&self, input: &str) -> Result<Vec<String>, RecoveryError> {
+        self.boundary_shape()?;
         let mut tokens = Vec::new();
         let mut current = String::new();
         let mut previous: Option<usize> = None;
@@ -271,6 +294,8 @@ impl RecoveredCodec {
         if self.classes != other.classes || self.emission != other.emission {
             return Err(RecoveryError::IncomparableCodecs);
         }
+        self.boundary_shape()?;
+        other.boundary_shape()?;
         let count = self.classes.len();
 
         #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -518,6 +543,12 @@ pub enum RecoveryError {
     UnknownSymbol { symbol: char },
     #[error("codecs over different symbol classes carry no common input to separate them on")]
     IncomparableCodecs,
+    #[error("a codec over {classes} classes declares a {rows}x{columns} boundary")]
+    MalformedBoundary {
+        rows: usize,
+        columns: usize,
+        classes: usize,
+    },
 }
 
 /// Recover an opaque symbol codec from testimony over the declared query family.
@@ -1809,6 +1840,90 @@ mod tests {
         };
         assert_eq!(
             left.shortest_separating_input(&right),
+            Err(RecoveryError::IncomparableCodecs)
+        );
+    }
+
+    /// A boundary that is not square over the classes is refused by **both** runners, with the same
+    /// shape named.
+    ///
+    /// This was an index-out-of-bounds panic in both until 2026-08-08, found by comparing this
+    /// organ's refusals against `codec_system::CodecSystem::joint`'s, which already returned a typed
+    /// refusal on the identical value. The two must refuse the same populations or the cross-check
+    /// between them is comparing organs that disagree about what is answerable.
+    #[test]
+    fn a_boundary_that_is_not_square_over_the_classes_is_refused_by_both_runners() {
+        let well_formed = RecoveredCodec {
+            schema: CODEC_SCHEMA.to_owned(),
+            classes: vec![BTreeSet::from(['a']), BTreeSet::from(['b'])],
+            emission: vec![Emission::Emit, Emission::Emit],
+            boundary: vec![
+                vec![Boundary::Join, Boundary::Cut],
+                vec![Boundary::Cut, Boundary::Join],
+            ],
+        };
+        let short_row = RecoveredCodec {
+            boundary: vec![vec![Boundary::Join], vec![Boundary::Cut, Boundary::Join]],
+            ..well_formed.clone()
+        };
+        let missing_row = RecoveredCodec {
+            boundary: vec![vec![Boundary::Join, Boundary::Cut]],
+            ..well_formed.clone()
+        };
+
+        // The well-formed codec answers both, so the refusals below are about the shape and not
+        // about the material being unanswerable.
+        assert_eq!(well_formed.segment("ab").unwrap(), vec!["a", "b"]);
+        assert_eq!(
+            well_formed.shortest_separating_input(&short_row),
+            Err(RecoveryError::MalformedBoundary {
+                rows: 2,
+                columns: 1,
+                classes: 2
+            })
+        );
+        assert_eq!(
+            short_row.segment("ab"),
+            Err(RecoveryError::MalformedBoundary {
+                rows: 2,
+                columns: 1,
+                classes: 2
+            })
+        );
+        assert_eq!(
+            missing_row.segment("ab"),
+            Err(RecoveryError::MalformedBoundary {
+                rows: 1,
+                columns: 2,
+                classes: 2
+            })
+        );
+        assert_eq!(
+            missing_row.shortest_separating_input(&well_formed),
+            Err(RecoveryError::MalformedBoundary {
+                rows: 1,
+                columns: 2,
+                classes: 2
+            })
+        );
+        // The malformed side is found wherever it sits, not only in the receiver.
+        assert_eq!(
+            well_formed.shortest_separating_input(&missing_row),
+            Err(RecoveryError::MalformedBoundary {
+                rows: 1,
+                columns: 2,
+                classes: 2
+            })
+        );
+        // Incomparability is decided first, so a malformed codec over different classes still says
+        // the thing that is true of both of them.
+        let elsewhere = RecoveredCodec {
+            classes: vec![BTreeSet::from(['x'])],
+            emission: vec![Emission::Emit],
+            ..missing_row.clone()
+        };
+        assert_eq!(
+            well_formed.shortest_separating_input(&elsewhere),
             Err(RecoveryError::IncomparableCodecs)
         );
     }

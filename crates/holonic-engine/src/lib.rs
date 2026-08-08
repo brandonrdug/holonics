@@ -69,12 +69,25 @@ pub mod causal_body;
 pub mod causal_state_grammar;
 pub mod causal_reflection;
 pub mod codec_recovery;
+// The adapter from a recovered codec to `receiver_exact_compression::ObservedSystem`, and the
+// cross-check between its Nerode congruence and `RecoveredCodec::shortest_separating_input`.
+// Declared, never glob-exported: `ItemId`, `Observation`, `ReceiverId` and `Disagreement` collide
+// across the engine's receiver modules and must be named at every call site.
+pub mod codec_system;
 pub mod causal_traversal;
+// Reached explicitly rather than glob-exported for the same reason as
+// `discrete_curvature`: the bridge names `read`, `step` and `revise`, and a glob would put those
+// verbs in the crate root where nothing says what they read or step. `blueprint/THE_ASSEMBLY.md`.
+pub mod curvature_bridge;
 // Reached explicitly rather than glob-exported: a presentation face is a declared apparatus
 // membrane, and flattening it into the crate root would let a caller reach a display type without
 // naming that it is one. `blueprint/THE_PRESENTATION_ORGAN.md`.
 pub mod certified_face;
 pub mod communication;
+// Declared, never glob-exported. `ReceiverId`, `Observation` and `ItemId` reach this module from
+// `receiver_exact_compression` and collide at the crate root with `relational_geometry::ReceiverId`
+// and with `graph_receiver`'s own vocabulary. `blueprint/THE_ASSEMBLY.md`, "what must not be built".
+pub mod complex_system;
 pub mod conic;
 pub mod coupled_informant;
 #[cfg(target_os = "linux")]
@@ -83,6 +96,7 @@ pub mod cuda_aperture;
 pub mod cuda_relation;
 pub mod device;
 pub mod diffusion;
+pub mod derivation_atlas;
 pub mod dilation;
 pub mod dimensional_receiver;
 pub mod dimensional_wave;
@@ -95,6 +109,11 @@ pub mod executor;
 pub mod field_atlas;
 pub mod generative_transport;
 pub mod gluing;
+// The canonical octet form of a `GradedCausalComplex`, so a rebase-invariants reading can be
+// deposited and re-lit by a different part. Declared, never glob-exported: it names
+// `encode_native_bytes` and `decode_native_bytes`, and a glob would put those verbs in the crate
+// root where nothing says which form they are of. `blueprint/THE_ASSEMBLY.md` step 6.
+pub mod graded_complex_form;
 pub mod graph_receiver;
 pub mod holonic_complex;
 pub mod image;
@@ -132,6 +151,10 @@ pub mod resource;
 pub mod sheaf_diffusion;
 pub mod simplicial;
 pub mod skein;
+// Declared, never glob-exported: `ReceiverId`, `Disagreement`, `Partition`, `Cover`, `Observation`
+// and `ItemId` collide across the placement family, and a realizer founded by a substitution must
+// be reached by naming which organ founded it. `blueprint/THE_ASSEMBLY.md` step 2.
+pub mod substitution_realizers;
 pub mod supported_realizers;
 pub mod tube;
 pub mod wave_propagation;

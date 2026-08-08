@@ -16,6 +16,7 @@ use std::{
 use body::num::Cog;
 use life::{
     causal_language::lexical_tokens,
+    form_mouth::deposit_form_or_message,
     morphological_language::{
         MorphologicalGeneratedText, MorphologicalGenerationSpec, MorphologicalLanguageEcology,
         MorphologicalLanguageGeneration, MorphologicalLanguagePassage, MorphologicalResponseRest,
@@ -24,6 +25,12 @@ use life::{
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use soma_abi::active::ActionCurrent;
+
+/// This driver's name at the plate mouth:
+/// `output/eros_morphological_language_generation/<name>-<sha256>.form`.
+const FORM_DRIVER: &str = "eros_morphological_language_generation";
+/// The resonance ecology's returned rest wire. `holon-plate` holds no schema that reads it.
+const RETURNED_REST_FORM: &str = "returned-rest";
 
 const REPORT_SCHEMA: &str = "soma.morphological-language.report.v5";
 
@@ -467,6 +474,9 @@ fn output_read(
         .returned_rest_image()
         .encode_native_bytes()
         .map_err(debug)?;
+    // THE_ASSEMBLY.md step 5, loop (d): *the signal is the octets*. Everything reported is untouched.
+    let deposited = deposit_form_or_message(FORM_DRIVER, RETURNED_REST_FORM, &returned)?;
+    eprintln!("form deposited: {}", deposited.path.display());
     let output_tokens = output
         .tokens
         .iter()

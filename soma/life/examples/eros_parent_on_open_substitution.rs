@@ -19,6 +19,12 @@ use soma_membrane::{
     ParallelHostLiveCurrentExecutor, RegionalRelationArc, RegionalRelationCell,
     SparseStandingSurface,
 };
+use life::form_mouth::deposit_form_or_message;
+
+/// This driver's name at the plate mouth: `output/eros_parent_on_open_substitution/<name>-<sha256>.form`.
+const FORM_DRIVER: &str = "eros_parent_on_open_substitution";
+/// The live-current rest this driver seals. `ERST` is the schema `holon-plate` holds for it.
+const MACHINE_REST_FORM: &str = "machine-rest";
 
 const SOURCE_SCHEMA: &str = "eros.parent-on-open-substitution.source.v1";
 const REPORT_SCHEMA: &str = "eros.parent-on-open-substitution.report.v1";
@@ -1838,6 +1844,17 @@ fn machine_read(machine: &LiveCurrentMachine) -> Result<Value, String> {
         live_lineages,
         ..
     } = machine.memory();
+    let rest_octets = machine
+        .rest_image()
+        .map_err(debug)?
+        .encode_native_bytes()
+        .map_err(debug)?;
+    // THE_ASSEMBLY.md step 5, loop (d): *the signal is the octets*. The hash below is untouched and
+    // still reported; these are the same octets reaching `holon-plate deposit --from ERST:` instead
+    // of being hashed and dropped. This helper reads several machines; the address is the content,
+    // so each distinct rest is deposited at its own address rather than overwriting the previous.
+    let deposited = deposit_form_or_message(FORM_DRIVER, MACHINE_REST_FORM, &rest_octets)?;
+    eprintln!("form deposited: {}", deposited.path.display());
     Ok(json!({
         "standing_rank": machine.standing().rank(),
         "standing_cells": standing_cells,
@@ -1848,7 +1865,7 @@ fn machine_read(machine: &LiveCurrentMachine) -> Result<Value, String> {
         "constituent_paths": constituent_paths,
         "constituent_transport_terms": constituent_transport_terms,
         "live_lineages": live_lineages,
-        "rest_sha256": sha256(&machine.rest_image().map_err(debug)?.encode_native_bytes().map_err(debug)?),
+        "rest_sha256": sha256(&rest_octets),
     }))
 }
 

@@ -9,6 +9,7 @@ use body::incidence::IncidenceHand;
 use body::manifold::FeltDeed;
 use body::num::Cog;
 use exact_pcm::{ButterflyAtlas, ExactPathChart, PcmWave};
+use life::form_mouth::deposit_form_or_message;
 use life::current_world::{
     present_native_event_with_regional, NativeEventCurrent, NativeRegionalArc,
     NativeRegionalRelation, NativeRelationOrgan, NativeRelationOrganImage,
@@ -23,6 +24,12 @@ use soma_membrane::{
     LiveCurrentMachine, LiveCurrentRestImage, LiveMemory, RegionalArcRadiation,
     RegionalExecutionRequest, SparseStandingSurface,
 };
+
+/// This driver's name at the plate mouth: `output/eros_audio_inscription/<name>-<sha256>.form`.
+const FORM_DRIVER: &str = "eros_audio_inscription";
+/// The two live-current rests this driver seals, at its two named passages. `ERST` reads both.
+const SUCCESSOR_REST_FORM: &str = "successor-rest";
+const PREFLIGHT_REST_FORM: &str = "preflight-rest";
 
 const PREFLIGHT_RANKS: [u32; 3] = [6, 7, 8];
 const PREFLIGHT_WORD: &str = "zero";
@@ -305,6 +312,13 @@ impl AudioWorld {
             .first()
             .ok_or_else(|| "the acoustic event returned no regional constituent".to_owned())?;
         let rest = self.machine.rest_image().map_err(debug)?;
+        let successor_rest_octets = rest.encode_native_bytes().map_err(debug)?;
+        // THE_ASSEMBLY.md step 5, loop (d): *the signal is the octets*. The hash below is untouched
+        // and still reported; these are the same octets reaching the plate's mouth instead of being
+        // hashed and dropped. This runs at every acoustic event; the address is the content, so
+        // every distinct rest is deposited at its own address rather than overwriting the previous.
+        let deposited = deposit_form_or_message(FORM_DRIVER, SUCCESSOR_REST_FORM, &successor_rest_octets)?;
+        eprintln!("form deposited: {}", deposited.path.display());
         Ok(AcousticEventRead {
             role,
             source_path: source.display().to_string(),
@@ -323,7 +337,7 @@ impl AudioWorld {
             emitted: shape_read(region.constituent()),
             before,
             after: memory_read(self.machine.memory()),
-            successor_rest_sha256: sha256(&rest.encode_native_bytes().map_err(debug)?),
+            successor_rest_sha256: sha256(&successor_rest_octets),
         })
     }
 }
@@ -591,6 +605,10 @@ fn preflight(source: &Path) -> Result<PreflightReport, String> {
         .ok_or_else(|| "the preflight returned no regional constituent".to_owned())?
         .constituent();
     let rest = machine.rest_image().map_err(debug)?;
+    let preflight_rest_octets = rest.encode_native_bytes().map_err(debug)?;
+    // THE_ASSEMBLY.md step 5, loop (d): *the signal is the octets*. The hash below is untouched.
+    let deposited = deposit_form_or_message(FORM_DRIVER, PREFLIGHT_REST_FORM, &preflight_rest_octets)?;
+    eprintln!("form deposited: {}", deposited.path.display());
 
     Ok(PreflightReport {
         schema: "eros.audio-inscription.preflight.v1",
@@ -621,7 +639,7 @@ fn preflight(source: &Path) -> Result<PreflightReport, String> {
         elapsed_microseconds,
         emitted: shape_read(constituent),
         memory: memory_read(machine.memory()),
-        rest_sha256: sha256(&rest.encode_native_bytes().map_err(debug)?),
+        rest_sha256: sha256(&preflight_rest_octets),
     })
 }
 

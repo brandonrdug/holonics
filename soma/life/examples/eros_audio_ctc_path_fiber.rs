@@ -12,6 +12,7 @@ use body::incidence::IncidenceHand;
 use body::manifold::FeltDeed;
 use body::num::Cog;
 use exact_pcm::{ExactPathChart, PcmWave};
+use life::form_mouth::deposit_form_or_message;
 use life::current_world::{
     present_native_event_with_regional, NativeEventCurrent, NativeRegionalArc,
     NativeRegionalRelation, NativeRelationOrgan,
@@ -26,6 +27,11 @@ use soma_membrane::{
     LiveCurrentMachine, LiveMemory, ParallelHostLiveCurrentExecutor, RegionalArcRadiation,
     RegionalSupportSection, SparseStandingSurface,
 };
+
+/// This driver's name at the plate mouth: `output/eros_audio_ctc_path_fiber/<name>-<sha256>.form`.
+const FORM_DRIVER: &str = "eros_audio_ctc_path_fiber";
+/// The live-current rest this driver seals. `ERST` is the schema `holon-plate` holds for it.
+const MACHINE_REST_FORM: &str = "machine-rest";
 
 const SOURCE_SCHEMA: &str = "eros.audio-ctc-path-fiber.source.v1";
 const REPORT_SCHEMA: &str = "eros.audio-ctc-path-fiber.report.v1";
@@ -585,7 +591,13 @@ fn run(source: &Source, source_bytes: usize, source_sha256: String) -> Result<Va
     }
 
     let rest = machine.rest_image().map_err(debug)?;
-    let rest_bytes = rest.encode_native_bytes().map_err(debug)?.len();
+    let rest_octets = rest.encode_native_bytes().map_err(debug)?;
+    // THE_ASSEMBLY.md step 5, loop (d): *the signal is the octets*. This site reported only the
+    // octet COUNT and dropped the octets; the count below is unchanged and the octets now reach
+    // `holon-plate deposit --from ERST:`.
+    let deposited = deposit_form_or_message(FORM_DRIVER, MACHINE_REST_FORM, &rest_octets)?;
+    eprintln!("form deposited: {}", deposited.path.display());
+    let rest_bytes = rest_octets.len();
     let remounted = LiveCurrentMachine::from_rest_image(rest.clone()).map_err(debug)?;
     let rest_exact = remounted.rest_image().map_err(debug)? == rest
         && remounted.standing() == machine.standing();

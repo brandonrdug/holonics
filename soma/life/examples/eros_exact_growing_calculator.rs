@@ -17,6 +17,17 @@ use soma_membrane::{
     LiveBoundaryTransition, LiveConstituent, LiveCurrentMachine, LiveCurrentRestImage,
     SparseStandingSurface,
 };
+use life::form_mouth::deposit_form_or_message;
+
+/// This driver's name at the plate mouth: `output/eros_exact_growing_calculator/<name>-<sha256>.form`.
+const FORM_DRIVER: &str = "eros_exact_growing_calculator";
+/// The `ERST` half of the calculator checkpoint. This one has a mouth today.
+const CHECKPOINT_MACHINE_FORM: &str = "checkpoint-machine";
+/// The four relation-organ wires of the same checkpoint. Real codecs; no held plate schema.
+const GCD_STATE_FORM: &str = "checkpoint-gcd-state";
+const RATIO_STATE_FORM: &str = "checkpoint-ratio-state";
+const CONTEXT_FORM: &str = "checkpoint-context";
+const ARRIVAL_FORM: &str = "checkpoint-arrival";
 
 const TRAINING_INPUTS: [Pair; 2] = [Pair::new(84, 30), Pair::new(1_071, 462)];
 const HELD_OUT_INPUT: Pair = Pair::new(391, 299);
@@ -981,15 +992,24 @@ fn capability_name(stage: u32) -> &'static str {
 
 fn checkpoint_bytes(checkpoint: &CalculatorCheckpoint) -> Result<Vec<u8>, String> {
     let machine = checkpoint.machine.encode_native_bytes().map_err(debug)?;
+    // THE_ASSEMBLY.md step 5, loop (d): *the signal is the octets*. The checkpoint hash below is
+    // untouched. The machine half is a canonical `ERST` form and reaches the plate's mouth here;
+    // the four organ wires are deposited beside it under their own names rather than only inside a
+    // concatenation, because a form no reader holds is still a form and the falsifier reports it.
+    let deposited = deposit_form_or_message(FORM_DRIVER, CHECKPOINT_MACHINE_FORM, &machine)?;
+    eprintln!("form deposited: {}", deposited.path.display());
     let mut bytes = Vec::with_capacity(machine.len() + 4 * 20);
     bytes.extend_from_slice(&machine);
-    for organ in [
-        checkpoint.gcd_state,
-        checkpoint.ratio_state,
-        checkpoint.context,
-        checkpoint.arrival,
+    for (name, organ) in [
+        (GCD_STATE_FORM, checkpoint.gcd_state),
+        (RATIO_STATE_FORM, checkpoint.ratio_state),
+        (CONTEXT_FORM, checkpoint.context),
+        (ARRIVAL_FORM, checkpoint.arrival),
     ] {
-        bytes.extend_from_slice(&organ.encode_native_bytes());
+        let organ_octets = organ.encode_native_bytes();
+        let deposited = deposit_form_or_message(FORM_DRIVER, name, &organ_octets)?;
+        eprintln!("form deposited: {}", deposited.path.display());
+        bytes.extend_from_slice(&organ_octets);
     }
     Ok(bytes)
 }

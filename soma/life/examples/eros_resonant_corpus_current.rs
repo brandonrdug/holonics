@@ -15,6 +15,7 @@ use std::{
 };
 
 use body::num::Cog;
+use life::form_mouth::deposit_form_or_message;
 use life::resonance_ecology::{
     ResonanceConstituentRead, ResonanceEcology, ResonanceEcologyRestImage, ResonanceGerm,
     ResonanceOccurrence,
@@ -26,6 +27,12 @@ use soma_membrane::{
     LiveBoundaryTransition, LiveCurrentMachine, LiveMemory, ParallelHostLiveCurrentExecutor,
     ReceiverFiberIdentity, SparseStandingSurface,
 };
+
+/// This driver's name at the plate mouth: `output/eros_resonant_corpus_current/<name>-<sha256>.form`.
+const FORM_DRIVER: &str = "eros_resonant_corpus_current";
+/// The resonance ecology's own rest wire. `holon-plate` holds no schema that reads it.
+const RESONANCE_REST_FORM: &str = "resonance-rest";
+const RESONANCE_REMOUNT_FORM: &str = "resonance-remount";
 
 const REPORT_SCHEMA: &str = "eros.resonant-corpus-current.report.v1";
 const INFORMANT_SCHEMA: u64 = 0x4552_4f53_4c49_4e45;
@@ -274,15 +281,20 @@ fn run() -> Result<(), String> {
     };
     let rest = ecology.rest_image().map_err(debug)?;
     let rest_bytes = rest.encode_native_bytes().map_err(debug)?;
+    // THE_ASSEMBLY.md step 5, loop (d): *the signal is the octets*. The hash below is untouched.
+    let deposited = deposit_form_or_message(FORM_DRIVER, RESONANCE_REST_FORM, &rest_bytes)?;
+    eprintln!("form deposited: {}", deposited.path.display());
     let rest_sha256 = sha256(&rest_bytes);
     let decoded_rest = ResonanceEcologyRestImage::from_native_bytes(&rest_bytes).map_err(debug)?;
     let remounted = ResonanceEcology::from_rest_image(decoded_rest).map_err(debug)?;
-    let remount_exact = remounted
+    let remounted_bytes = remounted
         .rest_image()
         .map_err(debug)?
         .encode_native_bytes()
-        .map_err(debug)?
-        == rest_bytes;
+        .map_err(debug)?;
+    let deposited = deposit_form_or_message(FORM_DRIVER, RESONANCE_REMOUNT_FORM, &remounted_bytes)?;
+    eprintln!("form deposited: {}", deposited.path.display());
+    let remount_exact = remounted_bytes == rest_bytes;
 
     let mut reverse_executor = ParallelHostLiveCurrentExecutor::new(threads);
     let mut reverse = ResonanceEcology::new(LiveCurrentMachine::new(

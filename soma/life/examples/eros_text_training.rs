@@ -20,7 +20,12 @@ use soma_membrane::{
     LiveCurrentMachine, LiveCurrentRestImage, LiveMemory, RegionalExecutionRequest,
     SparseStandingSurface,
 };
+use life::form_mouth::deposit_form_or_message;
 
+/// This driver's name at the plate mouth: `output/eros_text_training/<name>-<sha256>.form`.
+const FORM_DRIVER: &str = "eros_text_training";
+/// The live-current rest this driver seals. `ERST` is the schema `holon-plate` holds for it.
+const MACHINE_REST_FORM: &str = "machine-rest";
 const TRAINING_LINES: [&str; 4] = [
     "one red sheep runs.",
     "two red sheep walk.",
@@ -167,7 +172,7 @@ struct CandidateRead {
     contact: ContactRead,
     regional: RegionalRead,
     signature: CandidateSignature,
-    successor_rest_sha256: String,
+    successor_rest: SealedRest,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -177,7 +182,7 @@ struct ProbeRead {
     actual_display: String,
     rival: u8,
     contextual_events: u64,
-    contextual_rest_sha256: String,
+    contextual_rest: SealedRest,
     contextual_memory: MemoryRead,
     contextual_standing: StandingRead,
     touching_candidates: Vec<u8>,
@@ -202,7 +207,7 @@ struct CheckpointRead {
     pass: u32,
     direction: &'static str,
     training_events: u64,
-    rest_sha256: String,
+    rest: SealedRest,
     memory: MemoryRead,
     standing: StandingRead,
     probe_summary: ProbeSummary,
@@ -497,7 +502,7 @@ fn passage_read(
         pass,
         forward_training,
         reversed_training,
-        checkpoint_rests_equal: forward_read.rest_sha256 == reversed_read.rest_sha256,
+        checkpoint_rests_equal: forward_read.rest.sha256 == reversed_read.rest.sha256,
         forward: forward_read,
         reversed: reversed_read,
     })
@@ -590,7 +595,7 @@ fn checkpoint_read(
         pass,
         direction,
         training_events: checkpoint.training_events,
-        rest_sha256: rest_sha256(&checkpoint.machine)?,
+        rest: seal_rest(&checkpoint.machine)?,
         memory: memory_read(machine.memory()),
         standing: standing_read(machine.standing())?,
         probe_summary,
@@ -608,7 +613,7 @@ fn probe_read(
     let contextual_checkpoint = contextual.checkpoint()?;
     let contextual_memory = memory_read(contextual.machine.memory());
     let contextual_standing = standing_read(contextual.machine.standing())?;
-    let contextual_rest_sha256 = rest_sha256(&contextual_checkpoint.machine)?;
+    let contextual_rest = seal_rest(&contextual_checkpoint.machine)?;
     let context = probe
         .prefix
         .as_bytes()
@@ -660,7 +665,7 @@ fn probe_read(
             contact: contact_read(arc.contact()),
             regional,
             signature,
-            successor_rest_sha256: rest_sha256(&world.machine.rest_image().map_err(debug)?)?,
+            successor_rest: seal_rest(&world.machine.rest_image().map_err(debug)?)?,
         });
     }
 
@@ -684,7 +689,7 @@ fn probe_read(
         actual_display: display(probe.actual),
         rival,
         contextual_events,
-        contextual_rest_sha256,
+        contextual_rest,
         contextual_memory,
         contextual_standing,
         actual_is_only_touching_candidate: touching_candidates == [probe.actual],
@@ -922,8 +927,38 @@ fn display(octet: u8) -> String {
     octet.escape_ascii().map(char::from).collect()
 }
 
-fn rest_sha256(rest: &LiveCurrentRestImage) -> Result<String, String> {
-    Ok(sha256(&rest.encode_native_bytes().map_err(debug)?))
+/// One rest, sealed: the hash this driver has always reported, and the address of the artifact it
+/// is a hash OF. Reporting only the hash is what lost 510 of this driver's 511 returned rests.
+#[derive(Clone, Debug, Serialize)]
+struct SealedRest {
+    sha256: String,
+    form: String,
+}
+
+/// Seal one rest at the plate mouth and return both halves of its receipt.
+///
+/// THE_ASSEMBLY.md step 5, loop (d): *the signal is the octets*. The hash is untouched and still
+/// reported; these are the same octets reaching `holon-plate deposit --from ERST:` instead of being
+/// hashed and dropped.
+///
+/// This helper is called once per checkpoint, once per probe, and **once per candidate inside the
+/// probe loop** -- 511 distinct rests in a full run. Under a fixed `machine-rest.form` the first
+/// 510 were overwritten and the survivor carried nothing saying which rest it was, so the receipt
+/// held 511 hashes and the disk held one nameless artifact. The mouth now addresses a form by its
+/// content, and the address travels back into the receipt beside the hash rather than being
+/// dropped at the call site.
+fn seal_rest(rest: &LiveCurrentRestImage) -> Result<SealedRest, String> {
+    let octets = rest.encode_native_bytes().map_err(debug)?;
+    let deposited = deposit_form_or_message(FORM_DRIVER, MACHINE_REST_FORM, &octets)?;
+    // The hash reported here is the mouth's content address, not a second digest computed beside
+    // it. That is the whole point of addressing a form by its content: the receipt's hash and the
+    // artifact's file name are one string rather than two that could drift. The independent frame
+    // on it is a different process -- `holon-plate deposit` recomputes `form_sha256` from the file
+    // and prints it, so a wrong address here is visible outside this crate.
+    Ok(SealedRest {
+        sha256: deposited.address,
+        form: deposited.path.display().to_string(),
+    })
 }
 
 fn words_sha256(words: &[u32]) -> String {
@@ -932,10 +967,6 @@ fn words_sha256(words: &[u32]) -> String {
         hash.update(word.to_le_bytes());
     }
     encode_digest(hash.finalize())
-}
-
-fn sha256(bytes: &[u8]) -> String {
-    encode_digest(Sha256::digest(bytes))
 }
 
 fn encode_digest(digest: impl IntoIterator<Item = u8>) -> String {

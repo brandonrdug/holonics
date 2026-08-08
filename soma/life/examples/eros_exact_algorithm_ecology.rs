@@ -17,11 +17,20 @@ use serde::Deserialize;
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 use soma_abi::active::{ActionCurrent, RelationAtom};
+use life::form_mouth::deposit_form_or_message;
 use soma_membrane::{
     ContemporaryEvent, CurrentBoundaryPort, CurrentEvent, CurrentGeometry, CurrentLineage,
     InterfaceCapability, LiveConstituent, LiveCurrentMachine, LiveMemory, RegionalRelationArc,
     RegionalRelationCell, SparseStandingSurface,
 };
+
+/// This driver's name at the plate mouth: `output/eros_exact_algorithm_ecology/<name>-<sha256>.form`.
+const FORM_DRIVER: &str = "eros_exact_algorithm_ecology";
+/// The two live-current rests this driver seals: the source population's, and the final one after
+/// source-absent conduct. `ERST` reads both, and depositing them apart is what lets a second frame
+/// see that the two are different bodies rather than one form written twice.
+const SOURCE_REST_FORM: &str = "source-rest";
+const FINAL_REST_FORM: &str = "final-rest";
 
 const SOURCE_SCHEMA: &str = "eros.exact-algorithm-ecology.source.v1";
 const REPORT_SCHEMA: &str = "eros.exact-algorithm-ecology.report.v1";
@@ -273,6 +282,10 @@ fn run_host(source: Source, source_sha256: String) -> Result<Value, String> {
         &initial_chart,
     )?;
     let source_rest = machine.rest_image().map_err(debug)?;
+    // THE_ASSEMBLY.md step 5, loop (d): *the signal is the octets*. Every hash here is untouched.
+    let source_rest_octets = source_rest.encode_native_bytes().map_err(debug)?;
+    let deposited = deposit_form_or_message(FORM_DRIVER, SOURCE_REST_FORM, &source_rest_octets)?;
+    eprintln!("form deposited: {}", deposited.path.display());
     let source_departed = machine.memory().live_lineages == 0;
     let source_chart_exact = standing_chart(&machine, chart_handle.data_root)?.1 == initial_chart;
 
@@ -307,7 +320,10 @@ fn run_host(source: Source, source_sha256: String) -> Result<Value, String> {
     chart_handle = next_handle;
     let final_chart = standing_chart(&machine, chart_handle.data_root)?.1;
     let final_rest = machine.rest_image().map_err(debug)?;
-    let final_rest_sha256 = sha256(&final_rest.encode_native_bytes().map_err(debug)?);
+    let final_rest_octets = final_rest.encode_native_bytes().map_err(debug)?;
+    let deposited = deposit_form_or_message(FORM_DRIVER, FINAL_REST_FORM, &final_rest_octets)?;
+    eprintln!("form deposited: {}", deposited.path.display());
+    let final_rest_sha256 = sha256(&final_rest_octets);
     let remounted = LiveCurrentMachine::from_rest_image(final_rest.clone()).map_err(debug)?;
     let remount_exact = remounted.rest_image().map_err(debug)? == final_rest
         && standing_chart(&remounted, chart_handle.data_root)?.1 == final_chart;
@@ -427,7 +443,7 @@ fn run_host(source: Source, source_sha256: String) -> Result<Value, String> {
             "event": seed,
             "source_lineages_departed": source_departed,
             "chart_returned_exactly": source_chart_exact,
-            "rest_sha256": sha256(&source_rest.encode_native_bytes().map_err(debug)?)
+            "rest_sha256": sha256(&source_rest_octets)
         },
         "output_training": output_reads,
         "trace_receiver_refinement": trace_read,

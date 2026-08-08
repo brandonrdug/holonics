@@ -22,7 +22,16 @@ use soma_membrane::{
     LiveCurrentMachine, LiveCurrentRestImage, LiveMemory, RegionalExecutionRequest,
     SparseStandingSurface,
 };
+use life::form_mouth::deposit_form_or_message;
 
+/// This driver's name at the plate mouth: `output/eros_euclidean_worldline/<name>-<sha256>.form`.
+const FORM_DRIVER: &str = "eros_euclidean_worldline";
+/// The live-current rest this driver seals. `ERST` is the schema `holon-plate` holds for it.
+const MACHINE_REST_FORM: &str = "machine-rest";
+/// The `ERST` half of the world checkpoint, deposited apart from the concatenation the driver hashes.
+const CHECKPOINT_MACHINE_FORM: &str = "checkpoint-machine";
+/// The relation-organ half of the same checkpoint. Its codec is real; no held plate schema reads it.
+const CHECKPOINT_TRAJECTORY_FORM: &str = "checkpoint-trajectory";
 const TRAINING_FORWARD: [Pair; 2] = [Pair::new(84, 30), Pair::new(55, 34)];
 const HELD_OUT: Pair = Pair::new(391, 299);
 
@@ -960,13 +969,32 @@ fn deed_name(deed: FeltDeed) -> &'static str {
 }
 
 fn checkpoint_bytes(checkpoint: &WorldCheckpoint) -> Result<Vec<u8>, String> {
-    let mut bytes = checkpoint.machine.encode_native_bytes().map_err(debug)?;
-    bytes.extend_from_slice(&checkpoint.trajectory.encode_native_bytes());
+    let machine = checkpoint.machine.encode_native_bytes().map_err(debug)?;
+    let trajectory = checkpoint.trajectory.encode_native_bytes();
+    // The checkpoint the driver hashes is the two wires concatenated, which is a form of no schema
+    // any reader holds. Its two constituents are each a form of their own codec, so they are
+    // deposited apart: the machine half is `ERST` and has a mouth today; the organ half is the
+    // relation-organ wire and has none, which is a fact about the reader's held set rather than
+    // about these octets, and the falsifier reports it rather than the concatenation hiding it.
+    let deposited = deposit_form_or_message(FORM_DRIVER, CHECKPOINT_MACHINE_FORM, &machine)?;
+    eprintln!("form deposited: {}", deposited.path.display());
+    let deposited = deposit_form_or_message(FORM_DRIVER, CHECKPOINT_TRAJECTORY_FORM, &trajectory)?;
+    eprintln!("form deposited: {}", deposited.path.display());
+    let mut bytes = machine;
+    bytes.extend_from_slice(&trajectory);
     Ok(bytes)
 }
 
 fn rest_sha256(rest: &LiveCurrentRestImage) -> Result<String, String> {
-    Ok(sha256(&rest.encode_native_bytes().map_err(debug)?))
+    let octets = rest.encode_native_bytes().map_err(debug)?;
+    // THE_ASSEMBLY.md step 5, loop (d): *the signal is the octets*. The hash below is untouched and
+    // still reported; these are the same octets reaching `holon-plate deposit --from ERST:` instead
+    // of being hashed and dropped. The address is the content, so this helper -- called at many
+    // rests -- deposits every distinct form it sealed instead of overwriting all but the last, and
+    // the file name it returns carries the same hash the receipt does.
+    let deposited = deposit_form_or_message(FORM_DRIVER, MACHINE_REST_FORM, &octets)?;
+    eprintln!("form deposited: {}", deposited.path.display());
+    Ok(sha256(&octets))
 }
 
 fn words_sha256(words: &[u32]) -> String {

@@ -48,6 +48,23 @@
 //! the falsifier is that all three rules must return byte-identical invariant factors. That check
 //! can fail, and it is the same shape as the machine-level question: reorganize the computation,
 //! and the invariants must not move.
+//!
+//! ## The schedule is returned, because otherwise the falsifier cannot be audited
+//!
+//! A three-rule agreement is only evidence if the three rules actually computed differently. On a
+//! boundary matrix whose nonzero entries all have magnitude one — which is *every* matrix a
+//! simplicial fixture produces — [`IntegerMatrix::find_pivot`] breaks its ties with strict `<` and
+//! `>`, so all three rules select the first nonzero and the falsifier compares one computation with
+//! itself twice. Measured 2026-08-08 on the five declared plate fixtures: three identical pivot
+//! traces on all five.
+//!
+//! So the pivot positions are a **returned artifact** — [`PivotSchedule`], [`ReadingSchedule`] —
+//! and a caller checking the agreement can check that it was an agreement between different
+//! computations. `the_three_pivot_rules_take_three_different_paths_to_the_same_invariants` is that
+//! check, and `staggered_attachment`-shaped material — a face attached with *unequal* winding
+//! around parallel edges — is what makes it possible. A schedule is a receiver coordinate and is
+//! excluded from [`invariants_agree`] by construction; it is returned to be *audited*, never to be
+//! compared as an invariant.
 
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -224,6 +241,47 @@ impl SmithNormalForm {
     }
 }
 
+/// The pivot positions one reduction chose, in the order it chose them.
+///
+/// A pivot position is a **receiver coordinate** — a property of the solver, never of the incidence
+/// — and this is the only place one leaves the reduction. It is returned so that "all three rules
+/// agreed" can be audited for being an agreement between *different* computations: three identical
+/// schedules are one computation compared with itself twice, which is a check whose material cannot
+/// vary the property under test.
+///
+/// It is never compared as an invariant. [`invariants_agree`] does not read it and
+/// [`RebaseInvariants`] does not carry it.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct PivotSchedule {
+    /// `(row, column)` in the coordinates of the matrix handed in, one entry per pivot settled.
+    /// A divisibility repair pushes the pivot it abandoned *and* the one it settled on afterwards,
+    /// because the reduction really did select twice there.
+    pub selections: Vec<(usize, usize)>,
+}
+
+impl PivotSchedule {
+    fn new() -> Self {
+        Self {
+            selections: Vec::new(),
+        }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.selections.is_empty()
+    }
+}
+
+/// Every pivot a whole reading's reductions chose, tagged by the grade whose boundary map they were
+/// chosen in, and by the rule that chose them.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ReadingSchedule {
+    pub rule: PivotRule,
+    /// One entry per grade the reading reduced, in ascending grade order. A grade whose boundary
+    /// map has no rows or no columns contributes an empty schedule rather than being dropped, so
+    /// two schedules are comparable position for position.
+    pub per_grade: Vec<(u32, PivotSchedule)>,
+}
+
 /// Reduce to Smith normal form over the integers.
 ///
 /// Classical algorithm: clear the pivot row and column by repeated division with remainder — the
@@ -231,6 +289,30 @@ impl SmithNormalForm {
 /// each diagonal entry divides the next. Every step is an exact integer row or column operation,
 /// which is to say a rebase of one of the two chain groups.
 pub fn smith_normal_form(matrix: &IntegerMatrix, rule: PivotRule) -> SmithNormalForm {
+    smith_normal_form_with_schedule(matrix, rule).0
+}
+
+/// The same reduction, returning the pivot positions it chose.
+///
+/// [`smith_normal_form`] delegates here rather than the reverse, so the schedule is the schedule
+/// the reduction actually walked and cannot drift from it.
+pub fn smith_normal_form_with_schedule(
+    matrix: &IntegerMatrix,
+    rule: PivotRule,
+) -> (SmithNormalForm, PivotSchedule) {
+    let mut schedule = PivotSchedule::new();
+    let form = reduce(matrix, rule, 0, &mut schedule);
+    (form, schedule)
+}
+
+/// `origin` is where this matrix sits inside the one the caller handed in, so a divisibility
+/// repair's recursion reports absolute positions rather than positions in its own trailing block.
+fn reduce(
+    matrix: &IntegerMatrix,
+    rule: PivotRule,
+    origin: usize,
+    schedule: &mut PivotSchedule,
+) -> SmithNormalForm {
     let mut work = matrix.clone();
     let extent = work.rows.min(work.columns);
     let mut factors = Vec::new();
@@ -239,6 +321,7 @@ pub fn smith_normal_form(matrix: &IntegerMatrix, rule: PivotRule) -> SmithNormal
         let Some((row, column)) = work.find_pivot(pivot, rule) else {
             break;
         };
+        schedule.selections.push((row + origin, column + origin));
         work.swap_rows(pivot, row);
         work.swap_columns(pivot, column);
 
@@ -290,8 +373,7 @@ pub fn smith_normal_form(matrix: &IntegerMatrix, rule: PivotRule) -> SmithNormal
         }
         if repaired {
             // Redo this pivot with the folded row in place.
-            let mut retry = work.clone();
-            let tail = smith_normal_form_from(&mut retry, pivot, rule);
+            let tail = reduce_from(&work, pivot, rule, origin, schedule);
             factors.extend(tail);
             return normalize(factors);
         }
@@ -308,10 +390,12 @@ pub fn smith_normal_form(matrix: &IntegerMatrix, rule: PivotRule) -> SmithNormal
 
 /// Resume the reduction at `from`, used by the divisibility repair so the retry does not discard
 /// the factors already settled above it.
-fn smith_normal_form_from(
-    work: &mut IntegerMatrix,
+fn reduce_from(
+    work: &IntegerMatrix,
     from: usize,
     rule: PivotRule,
+    origin: usize,
+    schedule: &mut PivotSchedule,
 ) -> Vec<BigInt> {
     let mut trailing = IntegerMatrix::zeros(work.rows - from, work.columns - from);
     for row in from..work.rows {
@@ -319,7 +403,7 @@ fn smith_normal_form_from(
             trailing.set(row - from, column - from, work.at(row, column).clone());
         }
     }
-    smith_normal_form(&trailing, rule).factors
+    reduce(&trailing, rule, origin + from, schedule).factors
 }
 
 fn normalize(mut factors: Vec<BigInt>) -> SmithNormalForm {
@@ -477,6 +561,17 @@ pub fn rebase_invariants(
     rebase_invariants_on(complex, None, rule)
 }
 
+/// The same reading, with the pivot schedule every one of its reductions walked.
+///
+/// A caller cross-checking the three rules against each other needs this to know the cross-check
+/// was one: see the module doc.
+pub fn rebase_invariants_with_schedule(
+    complex: &GradedCausalComplex,
+    rule: PivotRule,
+) -> Result<(RebaseInvariants, ReadingSchedule), CausalAlgebraicError> {
+    rebase_invariants_with_schedule_on(complex, None, rule)
+}
+
 /// The invariants of a section, which is what a receiver at a declared horizon actually holds.
 ///
 /// A receiver never sees the whole incidence. `dilation` returns the section a horizon admits, and
@@ -487,11 +582,24 @@ pub fn rebase_invariants_on(
     support: Option<&BTreeSet<CausalCellId>>,
     rule: PivotRule,
 ) -> Result<RebaseInvariants, CausalAlgebraicError> {
+    Ok(rebase_invariants_with_schedule_on(complex, support, rule)?.0)
+}
+
+/// The section reading, with its schedule. [`rebase_invariants_on`] delegates here, so the
+/// schedule is the one the returned invariants were reduced along.
+pub fn rebase_invariants_with_schedule_on(
+    complex: &GradedCausalComplex,
+    support: Option<&BTreeSet<CausalCellId>>,
+    rule: PivotRule,
+) -> Result<(RebaseInvariants, ReadingSchedule), CausalAlgebraicError> {
     let top = section_dimension(complex, support).unwrap_or(0);
     let mut forms: BTreeMap<u32, SmithNormalForm> = BTreeMap::new();
+    let mut per_grade: Vec<(u32, PivotSchedule)> = Vec::new();
     for grade in 0..=top + 1 {
         let matrix = boundary_matrix_on(complex, grade, support)?;
-        forms.insert(grade, smith_normal_form(&matrix, rule));
+        let (form, schedule) = smith_normal_form_with_schedule(&matrix, rule);
+        forms.insert(grade, form);
+        per_grade.push((grade, schedule));
     }
 
     let mut grades = Vec::new();
@@ -511,11 +619,14 @@ pub fn rebase_invariants_on(
         });
     }
 
-    Ok(RebaseInvariants {
-        schema: "holonic-engine.rebase-invariants.v1".to_owned(),
-        pivot_rule: rule,
-        grades,
-    })
+    Ok((
+        RebaseInvariants {
+            schema: "holonic-engine.rebase-invariants.v1".to_owned(),
+            pivot_rule: rule,
+            grades,
+        },
+        ReadingSchedule { rule, per_grade },
+    ))
 }
 
 /// Two invariant readings agree on everything a rebase cannot move.
@@ -604,6 +715,12 @@ mod tests {
     /// The falsifier for this module, and the same shape as the machine-level question: reorganize
     /// the computation and the invariants must not move. If a pivot order ever leaked into a
     /// returned factor, this is what would catch it.
+    ///
+    /// The agreement is asserted **beside the divergence of the schedules that produced it**. An
+    /// agreement between three identical pivot walks is one computation compared with itself twice
+    /// and carries no evidence at all, so each case must also show three different walks — and the
+    /// case that cannot (`(2,0,0,3)`, every nonzero at magnitude two or three but only one entry
+    /// per row and column reachable) is declared as such rather than being silently counted.
     #[test]
     fn the_invariants_do_not_depend_on_the_pivot_rule() {
         let cases = [
@@ -613,10 +730,13 @@ mod tests {
             matrix_of(4, 3, &[0, 0, 6, 0, 15, 0, 21, 0, 0, 0, 0, 0]),
             matrix_of(3, 3, &[6, 10, 0, 0, 2, 4, 3, 0, 9]),
         ];
+        let mut distinct_walks = Vec::new();
         for (index, matrix) in cases.iter().enumerate() {
             let mut settled: Option<Vec<BigInt>> = None;
+            let mut walks: BTreeSet<Vec<(usize, usize)>> = BTreeSet::new();
             for rule in PivotRule::ALL {
-                let form = smith_normal_form(matrix, rule);
+                let (form, schedule) = smith_normal_form_with_schedule(matrix, rule);
+                walks.insert(schedule.selections);
                 assert!(
                     form.divisibility_holds(),
                     "case {index} under {rule:?} returned a non-divisor chain: {:?}",
@@ -631,7 +751,14 @@ mod tests {
                     ),
                 }
             }
+            distinct_walks.push(walks.len());
         }
+        assert_eq!(
+            distinct_walks,
+            vec![2, 2, 2, 3, 3],
+            "each case must produce the declared number of distinct pivot walks; a case that \
+             collapsed to one walk contributes no evidence to the agreement above it"
+        );
     }
 
     // -----------------------------------------------------------------------------------------
@@ -741,5 +868,234 @@ mod tests {
             invariants_agree(&forward, &backward),
             "founding order or pivot rule reached a returned invariant:\n{forward:?}\n{backward:?}"
         );
+    }
+
+    // -----------------------------------------------------------------------------------------
+    // the three-rule gauge, and the material that makes it a gauge
+
+    /// Three parallel edges between two vertices, and one face attached to them with **unequal
+    /// winding**: `4*e1 - 6*e2 + 2*e3`. Every edge has the same boundary `b - a`, so the
+    /// coefficients sum to zero and `found_cell` accepts the attachment; and 4, 6, 2 are three
+    /// different magnitudes, which is the whole point.
+    ///
+    /// Every other fixture in this module has all its nonzero boundary entries at magnitude one.
+    /// On such a matrix `find_pivot` breaks its ties with strict `<` and `>`, so all three rules
+    /// select the first nonzero and a three-rule check is one computation compared with itself
+    /// twice. Here `FirstNonzero` takes row 0, `LargestMagnitude` takes the `-6` at row 1, and
+    /// `SmallestMagnitude` takes the `2` at row 2 — three entries, three walks, one answer.
+    ///
+    /// It carries torsion too: `gcd(4, 6, 2) = 2`, so the reduction settles a `Z/2` at grade 1.
+    fn staggered_attachment() -> GradedCausalComplex {
+        let mut complex = GradedCausalComplex::default();
+        let a = complex.found_cell("a", source(), 0, CausalChain::default()).unwrap();
+        let b = complex.found_cell("b", source(), 0, CausalChain::default()).unwrap();
+        let mut edges = Vec::new();
+        for name in ["first", "second", "third"] {
+            let mut boundary = CausalChain::default();
+            boundary.add_term(b, ComparativeMultiplicity::positive(1u32));
+            boundary.add_term(a, ComparativeMultiplicity::negative(1u32));
+            edges.push(complex.found_cell(name, source(), 1, boundary).unwrap());
+        }
+        let mut face = CausalChain::default();
+        face.add_term(edges[0], ComparativeMultiplicity::positive(4u32));
+        face.add_term(edges[1], ComparativeMultiplicity::negative(6u32));
+        face.add_term(edges[2], ComparativeMultiplicity::positive(2u32));
+        complex.found_cell("staggered", source(), 2, face).unwrap();
+        complex
+    }
+
+    /// The same idea at rank two: four parallel edges and **two** staggered faces, so the filling
+    /// map is `4 x 2` and the reduction settles two pivots rather than one. The single-column
+    /// fixture above never exercises a column operation, so it cannot show a rule reaching a
+    /// returned factor through the *column* half of the Euclidean descent; this one can.
+    ///
+    /// `4*e1 - 6*e2 + 2*e3` and `2*e1 + 3*e2 - 5*e4`, each summing to zero so each closes. The
+    /// entries have gcd one and the 2x2 minors have gcd two, so the invariant factors are `1 | 2`
+    /// and the torsion is again a `Z/2` — this time carried by the *second* factor.
+    fn twice_staggered_attachment() -> GradedCausalComplex {
+        let mut complex = GradedCausalComplex::default();
+        let a = complex.found_cell("a", source(), 0, CausalChain::default()).unwrap();
+        let b = complex.found_cell("b", source(), 0, CausalChain::default()).unwrap();
+        let mut edges = Vec::new();
+        for name in ["first", "second", "third", "fourth"] {
+            let mut boundary = CausalChain::default();
+            boundary.add_term(b, ComparativeMultiplicity::positive(1u32));
+            boundary.add_term(a, ComparativeMultiplicity::negative(1u32));
+            edges.push(complex.found_cell(name, source(), 1, boundary).unwrap());
+        }
+        let mut first = CausalChain::default();
+        first.add_term(edges[0], ComparativeMultiplicity::positive(4u32));
+        first.add_term(edges[1], ComparativeMultiplicity::negative(6u32));
+        first.add_term(edges[2], ComparativeMultiplicity::positive(2u32));
+        complex.found_cell("staggered", source(), 2, first).unwrap();
+        let mut second = CausalChain::default();
+        second.add_term(edges[0], ComparativeMultiplicity::positive(2u32));
+        second.add_term(edges[1], ComparativeMultiplicity::positive(3u32));
+        second.add_term(edges[3], ComparativeMultiplicity::negative(5u32));
+        complex.found_cell("staggered-again", source(), 2, second).unwrap();
+        complex
+    }
+
+    /// The fixture's own precondition, asserted rather than assumed: the boundary map the three
+    /// rules disagree over must actually carry entries of unequal magnitude. If a later edit
+    /// flattened those coefficients to units, the gauge below would keep passing while measuring
+    /// nothing, and this is the assertion that would fail first.
+    #[test]
+    fn the_staggered_fixture_carries_boundary_entries_of_unequal_magnitude() {
+        let complex = staggered_attachment();
+        let filling = boundary_matrix(&complex, 2).unwrap();
+        assert_eq!((filling.rows(), filling.columns()), (3, 1));
+        let magnitudes: BTreeSet<BigInt> = (0..filling.rows())
+            .map(|row| filling.at(row, 0).abs())
+            .filter(|magnitude| !magnitude.is_zero())
+            .collect();
+        assert_eq!(
+            magnitudes,
+            BTreeSet::from([BigInt::from(2), BigInt::from(4), BigInt::from(6)]),
+            "the filling map must carry three different magnitudes or no pivot rule can differ"
+        );
+
+        // and the contrast: the hollow triangle, which is what every other fixture looks like
+        let flat = boundary_matrix(&hollow_triangle(), 1).unwrap();
+        let flat_magnitudes: BTreeSet<BigInt> = (0..flat.rows())
+            .flat_map(|row| (0..flat.columns()).map(move |column| (row, column)))
+            .map(|(row, column)| flat.at(row, column).abs())
+            .filter(|magnitude| !magnitude.is_zero())
+            .collect();
+        assert_eq!(
+            flat_magnitudes,
+            BTreeSet::from([BigInt::one()]),
+            "a simplicial incidence has every nonzero entry at magnitude one, which is why it \
+             cannot gauge the pivot rule"
+        );
+    }
+
+    /// **The gauge.** Three rules, three genuinely different pivot walks, one set of invariants.
+    ///
+    /// This is what `PivotRule::ALL` exists for, and until this fixture existed it was measuring
+    /// nothing: on every simplicial body the three walks coincide, so the loop ran one computation
+    /// three times and compared it with itself twice.
+    #[test]
+    fn the_three_pivot_rules_take_three_different_paths_to_the_same_invariants() {
+        let complex = staggered_attachment();
+
+        let mut settled: Option<RebaseInvariants> = None;
+        let mut walks: BTreeSet<Vec<(u32, Vec<(usize, usize)>)>> = BTreeSet::new();
+        for rule in PivotRule::ALL {
+            let (reading, schedule) = rebase_invariants_with_schedule(&complex, rule).unwrap();
+            assert_eq!(schedule.rule, rule, "a schedule must name the rule that walked it");
+            walks.insert(
+                schedule
+                    .per_grade
+                    .iter()
+                    .map(|(grade, walk)| (*grade, walk.selections.clone()))
+                    .collect(),
+            );
+            match &settled {
+                None => settled = Some(reading),
+                Some(first) => assert!(
+                    invariants_agree(first, &reading),
+                    "{rule:?} moved the returned invariants:\n{first:?}\n{reading:?}"
+                ),
+            }
+        }
+        assert_eq!(
+            walks.len(),
+            3,
+            "the three rules must walk three different pivot sequences or their agreement is one \
+             computation compared with itself twice; walks: {walks:?}"
+        );
+
+        // the agreement is on a reading that is itself nontrivial: a Z/2 at grade 1
+        let settled = settled.expect("three rules were declared");
+        assert_eq!(settled.total_torsion(), vec![BigInt::from(2)]);
+        assert_eq!(settled.betti_vector(), vec![1, 1, 0], "one piece, one unfilled loop");
+        assert_eq!(settled.cell_euler_characteristic(), 0, "2 - 3 + 1");
+    }
+
+    /// The same gauge over a **two-pivot** reduction, so the column half of the Euclidean descent
+    /// is walked under three different rules too.
+    #[test]
+    fn the_rank_two_filling_map_is_also_walked_three_different_ways() {
+        let complex = twice_staggered_attachment();
+        let filling = boundary_matrix(&complex, 2).unwrap();
+        assert_eq!(
+            (filling.rows(), filling.columns()),
+            (4, 2),
+            "the reduction must settle two pivots or the column operations are never reached"
+        );
+
+        let mut settled: Option<RebaseInvariants> = None;
+        let mut walks: BTreeSet<Vec<(u32, Vec<(usize, usize)>)>> = BTreeSet::new();
+        for rule in PivotRule::ALL {
+            let (reading, schedule) = rebase_invariants_with_schedule(&complex, rule).unwrap();
+            walks.insert(
+                schedule
+                    .per_grade
+                    .iter()
+                    .map(|(grade, walk)| (*grade, walk.selections.clone()))
+                    .collect(),
+            );
+            match &settled {
+                None => settled = Some(reading),
+                Some(first) => assert!(
+                    invariants_agree(first, &reading),
+                    "{rule:?} moved the returned invariants:\n{first:?}\n{reading:?}"
+                ),
+            }
+        }
+        assert_eq!(walks.len(), 3, "walks: {walks:?}");
+
+        let settled = settled.expect("three rules were declared");
+        assert_eq!(
+            smith_normal_form(&filling, PivotRule::FirstNonzero).factors,
+            vec![BigInt::one(), BigInt::from(2)],
+            "gcd of the entries is one and gcd of the 2x2 minors is two"
+        );
+        assert_eq!(settled.total_torsion(), vec![BigInt::from(2)]);
+        assert_eq!(settled.betti_vector(), vec![1, 1, 0]);
+        assert_eq!(settled.cell_euler_characteristic(), 0, "2 - 4 + 2");
+    }
+
+    /// The gauge's own aperture, stated rather than left to be discovered. On a simplicial
+    /// incidence the three rules walk **one** sequence, so a three-rule check over such a body is
+    /// vacuous — which is exactly what was true of every fixture in this project until the
+    /// staggered one was founded.
+    #[test]
+    fn on_a_simplicial_incidence_the_three_rules_walk_the_same_sequence() {
+        for (label, complex) in [
+            ("hollow_triangle", hollow_triangle()),
+            ("doubled_attachment", {
+                let mut complex = GradedCausalComplex::default();
+                let a = complex.found_cell("a", source(), 0, CausalChain::default()).unwrap();
+                let mut loop_boundary = CausalChain::default();
+                loop_boundary.add_term(a, ComparativeMultiplicity::positive(1u32));
+                loop_boundary.add_term(a, ComparativeMultiplicity::negative(1u32));
+                let edge = complex.found_cell("loop", source(), 1, loop_boundary).unwrap();
+                let mut face = CausalChain::default();
+                face.add_term(edge, ComparativeMultiplicity::positive(2u32));
+                complex.found_cell("twice", source(), 2, face).unwrap();
+                complex
+            }),
+        ] {
+            let walks: BTreeSet<Vec<(u32, Vec<(usize, usize)>)>> = PivotRule::ALL
+                .into_iter()
+                .map(|rule| {
+                    rebase_invariants_with_schedule(&complex, rule)
+                        .unwrap()
+                        .1
+                        .per_grade
+                        .iter()
+                        .map(|(grade, walk)| (*grade, walk.selections.clone()))
+                        .collect()
+                })
+                .collect();
+            assert_eq!(
+                walks.len(),
+                1,
+                "{label}: this body has a single pivot walk under all three rules, so a three-rule \
+                 agreement over it is not evidence"
+            );
+        }
     }
 }
