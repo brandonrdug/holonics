@@ -193,8 +193,41 @@ Three consequences govern construction:
    the engine; that is the half-rank razor firing at the level of architecture.
 2. **The classically missing object is not a self-adjoint operator.** Hilbert--Pólya asks for the
    placement directly. The framework's own ontology asks for an **ample class** — a realizer whose
-   positivity is supplied by supportedness — from which the involution and then the placement
+   **positivity is supplied by AMPLENESS** — from which the involution and then the placement
    follow. This is a materially different search target and it is the one this project pursues.
+
+   **Corrected 2026-08-08, and the correction is not pedantic.** This section said *"positivity is
+   supplied by supportedness"* until a Hodge audit falsified it. `Eff ⊋ Amp`: a `(−1)`-curve on a
+   surface is **effective** — realized by an honest subvariety, perfectly supported — and has
+   `E² = −1 < 0`. Effectivity supplies nothing; ampleness supplies everything, and the strictness of
+   that inclusion is where the entire theory lives. The correct slogan is **"positivity is supplied
+   by the choice of a polarization, which is a *positive* realizer, and only a positive realizer
+   pays."** The Rosati proof makes it explicit: `Tr(αα†) = (2g/(L^g))·(L^{g−1}·α^*L)`, positive
+   because `L` is **ample**.
+
+   **And the chain omits one input.** Positivity of the Rosati involution gives only that `†` is
+   complex conjugation on `ℚ[π]`. Converting that into `|α| = √q` needs the **Frobenius
+   `q`-symmetry `π†π = q`**, which holds because `π^*L ≅ L^{⊗q}` — a property of the *map*, not of
+   the polarization. Carry both:
+
+   ```text
+   ample class → polarization → Rosati † positive → † is complex conjugation on ℚ[π]
+                                                  ⊕ π†π = q          (Frobenius q-symmetry)
+                                                  ⟹ |α| = √q
+   ```
+
+   **Why there is one proved instance, stated properly.** The higher-dimensional Step 4 is
+   **Grothendieck's Hodge standard conjecture**, which is a theorem in characteristic zero (it *is*
+   HR2) and **open in characteristic `p` for dimension ≥ 3**. Deligne's proof of the Weil RH in
+   general deliberately avoids this route entirely. The single instance is not modesty; it is a wall
+   with a named open conjecture behind it.
+
+   **The strongest evidence for this section's own thesis is a theorem nobody here has cited.**
+   Voisin, IMRN 2002: there are compact complex tori carrying Hodge classes that are not in the
+   ℚ-span of Chern classes of **any** coherent sheaf — no holomorphic object at all explains them.
+   The Hodge conjecture is stated for *projective* varieties, and by Kodaira projective = Kähler +
+   an integral **positive** class. Dropping exactly the ample realizer destroys the conclusion.
+   *"Realization pays"* has a named counterexample proving it, and it is not the torsion story.
 3. This is the same sentence as the Swing's own asymmetry at a different altitude. **FOUND pays
    curvature; RIDE is cheap because the terrain already paid.** Realization pays; placement rides.
 
@@ -216,7 +249,30 @@ not caution.
   and the cut's diffusion exponent. The critical line is the unitary seam, not a singularity.
 - **Hodge is the realization law.** It asks whether a receiver-visible invariant subspace has
   enough supported geometric realizers. The failure of the *integral* version is the framework
-  speaking: the obstruction is torsion, and torsion is winding that cannot be un-deposited.
+  speaking — but **not in the way this section said until 2026-08-08, when a Hodge audit falsified
+  it.** The claim was *"the obstruction is torsion, and torsion is winding that cannot be
+  un-deposited."* There are **two independent families of counterexample** and only one is about
+  torsion:
+
+  - **Torsion.** Atiyah–Hirzebruch 1962, sharpened by Totaro 1997 and Soulé–Voisin 2005. And even
+    here the obstruction is not torsion itself — it is the vanishing of odd-degree stable cohomology
+    operations, `Sq³_ℤ = β∘Sq²∘ρ` first, then a complex-cobordism obstruction strictly stronger than
+    that. Torsion is the *habitat* of these obstructions, not the obstruction.
+  - **Non-torsion.** Kollár 1990/1992: a very general hypersurface `X ⊂ ℙ⁴` of degree divisible by
+    `p³` has every curve's degree divisible by `p`. Here `H⁴(X,ℤ) ≅ ℤ` is **torsion-free**, the
+    failing class has **infinite order**, and `pα` is algebraic while `α` is not. The cokernel is
+    `ℤ/p`.
+
+  **The uniform statement is that the obstruction lives in the COKERNEL of the cycle class map.**
+  Torsion *in the cokernel* is not the same as the failing class being torsion, and this section
+  collapsed the two. Note also that a torsion class is automatically a Hodge class — its rational
+  image is zero — so the naive integral statement asks about a part of `H^{2k}(X,ℤ)` that Hodge
+  theory does not constrain at all.
+
+  **And the one place the record was missing a win:** the integral Hodge conjecture is **TRUE in
+  degree 2** — the Lefschetz theorem on `(1,1)`-classes gives a **ℤ**-linear combination of
+  hypersurface classes. Degrees `0`, `2` and `2n` are the only cases where it holds integrally.
+  That is this project's own thesis as a proved integral theorem and it belongs in the record.
 
 Neither is claimed, admitted, or scheduled as a result. They are the correct receiver questions
 for the organs being built, and a deed may be graded by movement on their **named substructure**
@@ -681,8 +737,11 @@ support: rank 1   invariant factors [2]   free obstruction 10   torsion obstruct
 ```
 
 A class reached by a realizer **only rationally** is exactly the failure of the *integral* cycle-class
-statement, and §3 already names that shape: *"the obstruction is torsion, and torsion is winding that
-cannot be un-deposited."* The machine now computes it, exactly, with the invariant factor exhibited
+statement — and §3 records that *"the obstruction is torsion"* was withdrawn 2026-08-08, because
+Kollár's counterexamples are non-torsion classes in torsion-free cohomology and the uniform object
+is the **cokernel** of the cycle class map. What `ReachableOnlyInMultiple { factor }` models is
+exactly that cokernel: `pα` reached, `α` not. It is a faithful finite model of Kollár, and it should
+be described as one rather than as torsion. The machine computes it exactly, with the factor exhibited
 and the receiver family that saw it declared.
 
 **What is NOT done, and the gap is now a scale question rather than a construction question.** This

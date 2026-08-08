@@ -107,9 +107,17 @@ exactly what closed.
 member, and the doc names the failure it prevents: *"a carried reach counter is the von-Neumann
 hideout."*
 
+**Corrected 2026-08-08, and the correction shrinks this gap.** A mathematics inventory across both
+repositories established that `Θ` and `π` are **one object measured by two rulers**, related by
+`Θ = 2·(C/d) = C/r`. There is no contradiction to reconcile and no factor-of-two defect anywhere:
+every Einstein-form and Gauss–Bonnet statement in the older strata that writes `2·(C/d)` **is already
+writing `Θ`**. What is owed is a notation normalization, not a port — and one real hazard, which is
+that a **third** `C/d` shares the glyph: the nest depth, and the strike's mirror-versus-founding
+discriminant. Those must be kept typed apart from the turn.
+
 `crates/holonic-engine/src/cuda_aperture.rs:1024` carries `CarrierDilation { arc, chord }`, which I
-wrote today. It holds the pair and never divides, which is right, but it is `C/d` — the
-view-from-both-sides ruler that Soma superseded:
+wrote today. It holds the pair and never divides, which is right, but it measures against the chord
+rather than from the pole:
 
 > *"`C/d` measures the turn against the diameter — a chord through the whole body, a both-ends,
 > view-from-outside ruler. `C/r` measures from the pole — the frame's own reach, one hand… The
@@ -183,9 +191,20 @@ check — is unbuilt, and it is the same driver that would close both.
 ~29 of the ~41 mutation survivors the adversaries reported were never re-tested. 25 of 33 drivers the
 form-mouth repair touched ran only as far as compiling, because their corpora are not in this tree.
 
-### 4.9 · The ownership ratchet does not run
+### 4.9 · The ownership ratchet does not run, and the cause is one missing file
 
-`crates/holonic-architecture-lint` is a workspace member and is not invoked by anything.
+`crates/holonic-architecture-lint` is a workspace member and is not invoked by anything. Running it
+gives the exact cause:
+
+```text
+holonic architecture lint failed: failed to read
+  /home/b/Workspaces/holonics/HOLONIC_DSA_BASELINE.tsv: No such file or directory
+```
+
+The baseline is a monotone census the ratchet compares against — counts may only fall, and a new
+file starts at zero allowance. The laboratory's own copy is 135 lines over 616 protected files and
+is readable at `git -C /home/b/Workspaces/laboratory show a07ff376:HOLONIC_DSA_BASELINE.tsv`.
+Regenerating it against this tree is what turns the ratchet on.
 
 ### 4.10 · Still absent, from the position record and re-verified today
 

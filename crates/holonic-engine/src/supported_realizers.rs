@@ -4,7 +4,15 @@
 //!
 //! `CLAUDE.md` §3: Hodge *"asks whether a receiver-visible invariant subspace has enough supported
 //! geometric realizers. The failure of the **integral** version is the framework speaking: the
-//! obstruction is torsion, and torsion is winding that cannot be un-deposited."*
+//! obstruction lives in the COKERNEL of the cycle class map."* — corrected 2026-08-08. The earlier
+//! form of this line said *"the obstruction is torsion"*, which a Hodge audit falsified: Kollár's
+//! counterexamples are classes of INFINITE order in TORSION-FREE cohomology, where `pα` is algebraic
+//! and `α` is not, and the cokernel is `ℤ/p`. Torsion *in the cokernel* is not the same as the
+//! failing class being torsion.
+//!
+//! **`ObstructionSpecies::ReachableOnlyInMultiple { factor }` is a faithful finite model of exactly
+//! that**, and it is the better half of this module: a class reached only as a multiple, with the
+//! multiple exhibited. Describe it that way.
 //!
 //! `receiver_exact_compression` now returns the receiver-visible invariant subspace exactly — the
 //! conduct classes, the distinctions no later continuation can erase. This module asks the other
