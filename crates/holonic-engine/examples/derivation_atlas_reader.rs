@@ -190,7 +190,7 @@ fn main() {
         let circuit =
             found_circuit(&derivations, aperture).expect("a declared aperture is admissible");
         let reading = circuit
-            .invariants(PivotRule::FirstNonzero)
+            .invariants(PivotRule::SmallestMagnitude)
             .expect("the atlas reads");
         let forest = circuit.spanning_forest_reading();
         println!(
@@ -341,7 +341,7 @@ fn main() {
         )
         .expect("one artifact carries one route, so nothing is summed");
         let reading = alone
-            .invariants(PivotRule::FirstNonzero)
+            .invariants(PivotRule::SmallestMagnitude)
             .expect("the atlas reads");
         let repeated: Vec<String> = derivation
             .recruited
@@ -370,7 +370,7 @@ fn main() {
     println!("-------------------------------------------------------");
     let mut agreements = Vec::new();
     for identity in [DerivationIdentity::ByDeclaration, DerivationIdentity::ByRoute] {
-        let agreement = route_cycle_agreement(&derivations, identity, PivotRule::FirstNonzero)
+        let agreement = route_cycle_agreement(&derivations, identity, PivotRule::SmallestMagnitude)
             .expect("an incidence reading is admissible under either identity");
         println!(
             "  {identity:?}  homological {:>4}   lineage {:>4}   recruitment connected {}",
@@ -401,7 +401,7 @@ fn main() {
         let before = found_circuit(withheld, CircuitAperture::DEPOSITED_READER)
             .expect("the deposited reader's aperture is admissible");
         let earlier = before
-            .invariants(PivotRule::FirstNonzero)
+            .invariants(PivotRule::SmallestMagnitude)
             .expect("the atlas reads");
         let movement = invariant_movement(&earlier, invariants);
         let routes = route_movement(&before, deposited);

@@ -536,7 +536,7 @@ fn main() {
         complex,
         &substitutions,
         &narrow_contexts(&world),
-        PivotRule::FirstNonzero,
+        PivotRule::SmallestMagnitude,
     );
 
     println!("\n================ step 2: the declared population ================");
@@ -594,7 +594,7 @@ fn main() {
         complex,
         &substitutions[3..4],
         &narrow_contexts(&world),
-        PivotRule::FirstNonzero,
+        PivotRule::SmallestMagnitude,
     );
     let doubled_placed = place_substitutions(&system, &doubled, RealizerAdmission::EveryRead);
     println!("\n================ the integral-versus-rational split, alone ================");
@@ -609,7 +609,7 @@ fn main() {
         complex,
         &substitutions[..1],
         &narrow_contexts(&world),
-        PivotRule::FirstNonzero,
+        PivotRule::SmallestMagnitude,
     );
     let a_before = place_substitutions(&system, &one_move, RealizerAdmission::EveryRead);
     let a_after = place_substitutions(&system, &narrow, RealizerAdmission::EveryRead);
@@ -650,7 +650,7 @@ fn main() {
         complex,
         &substitutions,
         &wide_contexts(&world),
-        PivotRule::FirstNonzero,
+        PivotRule::SmallestMagnitude,
     );
     let c_before = place_substitutions(&system, &looked_harder, RealizerAdmission::Invisible);
     let c_after = place_substitutions(&system, &narrow, RealizerAdmission::Invisible);

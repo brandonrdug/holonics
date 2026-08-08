@@ -397,10 +397,17 @@ fn main() {
     }
 
     banner("what survives every schedule and every pivot rule");
-    println!("  A cost law, measured and declared: the Smith reduction is cubic in the cell count and");
-    println!("  its intermediate entries grow, so a reading is taken where it is affordable and the");
-    println!("  population census above carries the shape at every width. Elapsed milliseconds are");
-    println!("  printed with each reading rather than hidden.\n");
+    println!("  A cost law, and this file declared a FALSE one until 2026-08-08. It said the Smith");
+    println!("  reduction is `cubic in the cell count`. Measured on the grade-two boundary map of a");
+    println!("  width-3 Brent-Kung adder, [143 x 101], the three pivot rules -- which the uniqueness");
+    println!("  theorem forces to return the SAME factors -- came in at 1 ms, 8 ms, and over 390 s.");
+    println!("  A spread of 390,000x at FIXED dimension. The cost is carried by the rule, through");
+    println!("  intermediate expression swell, and a bound that does not name the rule is not a bound.");
+    println!("  `SmallestMagnitude` is the mitigation and is what every single-rule site now passes.");
+    println!("  The readings below still run all three rules, because the gauge is the point: what is");
+    println!("  claimed is that the RETURNS do not move. They do not. The costs do, by five orders of");
+    println!("  magnitude, and nothing in the suite compares costs. Elapsed milliseconds are printed");
+    println!("  with each reading rather than hidden.\n");
 
     let readings: Vec<(&str, &str, usize, ComplexAperture)> = vec![
         ("ripple-adder", "division", 3, ComplexAperture::DIVISION),
@@ -562,7 +569,7 @@ fn main() {
             }
             if schedule == Schedule::Instantiation {
                 let whole =
-                    rebase_invariants_on(&grown.complex, None, PivotRule::FirstNonzero).unwrap();
+                    rebase_invariants_on(&grown.complex, None, PivotRule::SmallestMagnitude).unwrap();
                 println!(
                     "  {rule} width {width}: section {} of {} cells",
                     support.len(),

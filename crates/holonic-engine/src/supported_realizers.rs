@@ -198,7 +198,7 @@ pub fn quadratic_value(form: &IntegerMatrix, probe: &[BigInt]) -> BigInt {
 /// Decide support for a declared realizer population against a declared class family.
 pub fn decide_support(realizations: &[Realization], class_extent: usize) -> RealizerSupport {
     let matrix = incidence(realizations, class_extent);
-    let form = smith_normal_form(&matrix, PivotRule::FirstNonzero);
+    let form = smith_normal_form(&matrix, PivotRule::SmallestMagnitude);
     let supported_rank = form.rank();
 
     let mut obstructions = Vec::new();

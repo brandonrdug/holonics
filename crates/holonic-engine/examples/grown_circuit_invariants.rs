@@ -312,7 +312,7 @@ fn sweep(title: &str, depth: u32, split: u32, closure: Closure) -> Vec<Reading> 
     let mut readings = Vec::new();
     for schedule in Schedule::ALL {
         let growth = grow(schedule, depth, split, closure);
-        let invariants = rebase_invariants(&growth.complex, PivotRule::FirstNonzero)
+        let invariants = rebase_invariants(&growth.complex, PivotRule::SmallestMagnitude)
             .expect("every cell in a grown complex resolves");
         println!(
             "\n  schedule {:<14} sites {:>3}  wires {:>3}  rim {:>3}  layout {}",
@@ -350,7 +350,7 @@ fn dilation_sweep(holds: &mut Vec<(&'static str, bool, String)>) {
     println!("------------------------------------------");
 
     let growth = grow(Schedule::Breadth, 3, 2, Closure::Rim);
-    let whole = rebase_invariants_on(&growth.complex, None, PivotRule::FirstNonzero)
+    let whole = rebase_invariants_on(&growth.complex, None, PivotRule::SmallestMagnitude)
         .expect("the whole incidence reads");
     let covering = covering_horizon(&growth.complex, growth.root).expect("the focus resolves");
     println!(
@@ -389,7 +389,7 @@ fn dilation_sweep(holds: &mut Vec<(&'static str, bool, String)>) {
             let seen = rebase_invariants_on(
                 &growth.complex,
                 Some(section.support()),
-                PivotRule::FirstNonzero,
+                PivotRule::SmallestMagnitude,
             )
             .expect("a section reads");
 

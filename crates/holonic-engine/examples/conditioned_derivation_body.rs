@@ -149,7 +149,7 @@ fn exhibit(passage: &DerivedPassage) {
 fn betti(circuit: &ConditionedCircuit, grade: u32) -> Option<usize> {
     circuit
         .circuit
-        .invariants(PivotRule::FirstNonzero)
+        .invariants(PivotRule::SmallestMagnitude)
         .ok()
         .and_then(|invariants| {
             invariants

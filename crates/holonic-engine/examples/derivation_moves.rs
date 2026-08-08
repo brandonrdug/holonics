@@ -330,7 +330,7 @@ fn rank_of(placed: &PlacedMoves, admission: RealizerAdmission) -> usize {
                 .realizations_under(admission, &placement.compression.conduct),
             placement.class_extent,
         ),
-        PivotRule::FirstNonzero,
+        PivotRule::SmallestMagnitude,
     )
     .rank()
 }
@@ -537,7 +537,7 @@ fn main() {
     let refused: Vec<String> = every_move
         .iter()
         .filter(|declared| {
-            read_substitution(complex, &declared.substitution, &contexts, PivotRule::FirstNonzero)
+            read_substitution(complex, &declared.substitution, &contexts, PivotRule::SmallestMagnitude)
                 .is_err()
         })
         .map(|declared| declared.deposits.join(" "))
@@ -558,7 +558,7 @@ fn main() {
         &splits,
         &contexts,
         RealizerAdmission::EveryRead,
-        PivotRule::FirstNonzero,
+        PivotRule::SmallestMagnitude,
     );
     println!(
         "\n  {} classes the receivers distinguish; {} stand, {} open.",
@@ -602,7 +602,7 @@ fn main() {
         &split_and_deposit,
         &contexts,
         RealizerAdmission::EveryRead,
-        PivotRule::FirstNonzero,
+        PivotRule::SmallestMagnitude,
     );
     println!(
         "\n    {:<34} {:>14} {:>18}",
@@ -676,7 +676,7 @@ fn main() {
         &every_move,
         &contexts,
         RealizerAdmission::Invisible,
-        PivotRule::FirstNonzero,
+        PivotRule::SmallestMagnitude,
     );
     let wide = place_moves(
         &circuit,
@@ -684,7 +684,7 @@ fn main() {
         &every_move,
         &contexts,
         RealizerAdmission::EveryRead,
-        PivotRule::FirstNonzero,
+        PivotRule::SmallestMagnitude,
     );
     println!(
         "\n  one declared family of {} moves, read at two realizer apertures.",
@@ -877,7 +877,7 @@ fn main() {
     );
 
     let contexts_disagree = split_and_deposit.iter().any(|declared| {
-        read_substitution(complex, &declared.substitution, &contexts, PivotRule::FirstNonzero)
+        read_substitution(complex, &declared.substitution, &contexts, PivotRule::SmallestMagnitude)
             .map(|reading| {
                 reading
                     .verdicts

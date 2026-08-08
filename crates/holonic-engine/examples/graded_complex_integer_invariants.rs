@@ -443,7 +443,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         &out.join("smith_ladder.tsv"),
         &complex,
         top,
-        PivotRule::FirstNonzero,
+        PivotRule::SmallestMagnitude,
     )?;
     for (grade, factors, divides) in &ladders {
         println!(

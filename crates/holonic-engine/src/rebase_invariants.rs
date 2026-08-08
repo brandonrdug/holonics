@@ -288,6 +288,37 @@ pub struct ReadingSchedule {
 /// Euclidean descent, which is why the pivot ends up carrying the gcd — then repair divisibility so
 /// each diagonal entry divides the next. Every step is an exact integer row or column operation,
 /// which is to say a rebase of one of the two chain groups.
+///
+/// # The cost is carried by the RULE, not by the dimensions — measured 2026-08-08
+///
+/// The three rules are proved to return the same factors and are **not** proved to cost the same.
+/// On the grade-two boundary map of a grown Brent–Kung adder at width 3, `[143 × 101]`, release
+/// build, one machine, one sitting:
+///
+/// ```text
+///   SmallestMagnitude      1 ms   rank 101   factors > 1  [2, 2, 2, 2]
+///   LargestMagnitude       8 ms   rank 101   factors > 1  [2, 2, 2, 2]
+///   FirstNonzero           did not complete in 390 s
+/// ```
+///
+/// A spread of at least **390,000×** at fixed dimension. So any statement of the form *"the Smith
+/// reduction is cubic in the cell count"* is not a bound — it omits the variable that dominates.
+/// The mechanism is classical intermediate expression swell in the Euclidean descent below, and
+/// `SmallestMagnitude` is its standard mitigation; it is also the only rule that took **no**
+/// divisibility repair on this material, at exactly `extent` pivot selections against `1.5 × extent`
+/// for the other two.
+///
+/// **`SmallestMagnitude` is therefore the rule to pass at a single-rule call site.** `PivotRule::ALL`
+/// remains the gauge and is unchanged — the point of it is that the *returns* do not move — but note
+/// what this measurement says about it: on grown material the gauge's group acts non-trivially on
+/// **cost** while acting trivially on the return, and `invariants_agree` compares returns and never
+/// costs. That is `CLAUDE.md` §8's independent-implementation bullet pointing at a gauge.
+///
+/// **What is not instrumented, and it is the falsifier this cost law still lacks.** The pivot
+/// selection count is *not* where the blowup lives — it is `1.0` and `1.5` selections per extent at
+/// both widths, for rules three orders of magnitude apart. The dominating quantity is the bit-length
+/// of the intermediate entries, and nothing here counts it. Until it does, the figures above are a
+/// clock reading and carry their frame, per §8: a clock may measure, it may never select.
 pub fn smith_normal_form(matrix: &IntegerMatrix, rule: PivotRule) -> SmithNormalForm {
     smith_normal_form_with_schedule(matrix, rule).0
 }

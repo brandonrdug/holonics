@@ -141,13 +141,13 @@ fn betti_at(invariants: &RebaseInvariants, grade: u32) -> usize {
 fn reading(derivations: &[Derivation]) -> RebaseInvariants {
     found_circuit(derivations, CircuitAperture::DEPOSITED_READER)
         .expect("the deposited reader's aperture is admissible")
-        .invariants(PivotRule::FirstNonzero)
+        .invariants(PivotRule::SmallestMagnitude)
         .expect("the atlas reads")
 }
 
 fn forest_agrees(circuit: &DerivationCircuit) -> bool {
     let reading = circuit
-        .invariants(PivotRule::FirstNonzero)
+        .invariants(PivotRule::SmallestMagnitude)
         .expect("the atlas reads");
     let forest = circuit.spanning_forest_reading();
     forest.betti_0() == betti_at(&reading, 0) && forest.betti_1() == betti_at(&reading, 1)
@@ -249,7 +249,7 @@ fn main() {
     let before_circuit = found_circuit(&standing_population, CircuitAperture::DEPOSITED_READER)
         .expect("the deposited reader's aperture is admissible");
     let before = before_circuit
-        .invariants(PivotRule::FirstNonzero)
+        .invariants(PivotRule::SmallestMagnitude)
         .expect("the atlas reads");
     println!(
         "    BEFORE  {} artifacts, {} declarations, {} recruitments",
@@ -446,7 +446,7 @@ fn main() {
     let control_circuit = found_circuit(&control_population, CircuitAperture::DEPOSITED_READER)
         .expect("the deposited reader's aperture is admissible");
     let control = control_circuit
-        .invariants(PivotRule::FirstNonzero)
+        .invariants(PivotRule::SmallestMagnitude)
         .expect("the atlas reads");
     println!(
         "    {} artifacts, {} declarations, {} recruitments",
@@ -537,7 +537,7 @@ fn main() {
     let after_circuit = found_circuit(&joined, CircuitAperture::DEPOSITED_READER)
         .expect("the deposited reader's aperture is admissible");
     let after = after_circuit
-        .invariants(PivotRule::FirstNonzero)
+        .invariants(PivotRule::SmallestMagnitude)
         .expect("the atlas reads");
 
     let movement = invariant_movement(&before, &after);
@@ -578,13 +578,13 @@ fn main() {
     let excess_before = route_cycle_agreement(
         &standing_population,
         DerivationIdentity::ByDeclaration,
-        PivotRule::FirstNonzero,
+        PivotRule::SmallestMagnitude,
     )
     .expect("an incidence reading is admissible");
     let excess_after = route_cycle_agreement(
         &joined,
         DerivationIdentity::ByDeclaration,
-        PivotRule::FirstNonzero,
+        PivotRule::SmallestMagnitude,
     )
     .expect("an incidence reading is admissible");
     println!(
