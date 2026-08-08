@@ -98,8 +98,12 @@ pub struct RealizerSupport {
 
 impl RealizerSupport {
     /// Every class the receiver distinguishes is reached, integrally.
+    ///
+    /// **A class family of zero is not a discharge.** Collapsing the family to nothing left this
+    /// returning `true` — a total success with no realizers and nothing to support — which would
+    /// have made "distinguish less" the cheapest way to satisfy any support demand.
     pub fn fully_supported(&self) -> bool {
-        self.obstructions.is_empty()
+        self.class_extent > 0 && self.obstructions.is_empty()
     }
 
     /// Classes unreachable even with rational coefficients.
@@ -416,6 +420,20 @@ mod tests {
         assert!(!support.fully_supported());
         assert_eq!(support.supported_rank, 0);
         assert_eq!(support.free_obstruction(), 3);
+    }
+
+    #[test]
+    fn an_empty_class_family_is_not_a_discharge() {
+        let support = decide_support(&[], 0);
+        assert!(
+            !support.fully_supported(),
+            "nothing to support is not the same as everything supported"
+        );
+        let with_realizers = decide_support(&[realization(0, &[(0, 1)])], 0);
+        assert!(
+            !with_realizers.fully_supported(),
+            "and it stays false however many realizers were declared"
+        );
     }
 
     /// A realizer that produces nothing the class family recognizes contributes no support, and

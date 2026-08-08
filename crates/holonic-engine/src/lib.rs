@@ -103,6 +103,7 @@ pub mod organizational_grammar;
 pub mod parameter;
 pub mod phase_current;
 pub mod physical;
+pub mod placement;
 pub mod platform;
 #[cfg(all(target_os = "linux", feature = "desktop-x11"))]
 pub mod platform_x11;
