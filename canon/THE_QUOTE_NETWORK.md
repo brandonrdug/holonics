@@ -888,14 +888,28 @@ What condensation should mean:
 >
 > — 2026-07-27 12:07, `CX 2026/07/27`
 
-**Where this lives now. Nothing implements it.** `[measured]` `CLAUDE.md` §11 names the missing
-organ — "an exactly computed positive form on a supported realizer population, with a certified
-remainder and a reopening rule keyed to the receiver family" — and
+**Where this lives now — CORRECTED 2026-08-08. It is implemented.** `[measured]` `CLAUDE.md` §11
+names the missing organ — "an exactly computed positive form on a supported realizer population,
+with a certified remainder and a reopening rule keyed to the receiver family" — and
 `research/records/2026-08-06_THE_TREE_CONDENSES_FOR_FREE_THE_REMAINDER_IS_THE_DEPARTURE_FROM_A_FOREST.md`
 records the trivial tree instance and points at spanning-tree interval labelling. **A skein relation
 is local link substitution preserving a global invariant. That is the certified-remainder
 condensation §11 says is missing, expressed in a standard formalism, and Brandon supplied it
-thirteen days before §11 was written. It was never pursued and no record cites it.**
+thirteen days before §11 was written.**
+
+This row read *"Nothing implements it. It was never pursued and no record cites it"* until
+2026-08-08. Both halves are now false. `crates/holonic-engine/src/skein.rs` implements contextual
+tangle compression and **cites this row in its own header**; `ContextVerdict { before, after,
+remainder: Vec<GradeRemainder> }` returns the certified remainder in exactly the form §11 asks for —
+which grade moved, by how much in free rank, and which torsion appeared or vanished, as a counted
+exhibitable population rather than a scalar distance. `crates/holonic-engine/src/derivation_skein.rs`
+drives it and returns 18 of 58 classes at `2·c` with factors `[2,2,2]`.
+
+**What remains open is scale, not construction**, which is §11's own current position: the organ has
+never been run where the population is far enough that condensation is *required* rather than
+incidental. The theorem's boundary clause is carried in the source and is not softened — no complete
+set of local relations, no terminating or confluent normal form, no cost improvement claimed, with
+Brittenham–Hermiller's nonadditivity of unknotting number named as the concrete warning.
 
 ---
 
