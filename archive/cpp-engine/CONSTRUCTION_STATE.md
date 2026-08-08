@@ -84,7 +84,7 @@ The admitted body owns the following composed floor.
   world returns are not reconstruction targets.
 
 The direct synthesis and evidence map are deposited in
-[the Eros mathematics-production floor](blueprint/EROS_MATHEMATICS_PRODUCTION_FLOOR.md).
+[the Eros mathematics-production floor](archive/blueprints/EROS_MATHEMATICS_PRODUCTION_FLOOR.md).
 
 ### Exact mathematical floor
 
@@ -147,7 +147,7 @@ Hodge, and arithmetic-spectral algebra; real kernel acceptances on real generate
 residency with exact host parity; rest and remount of domain data; the audit apparatus. The
 mathematics is sound; only the learning was simulated.
 
-The restoration plan is [the Eros embodiment roadmap](blueprint/EROS_EMBODIMENT_ROADMAP.md).
+The restoration plan is [the Eros embodiment roadmap](archive/blueprints/EROS_EMBODIMENT_ROADMAP.md).
 
 ## Phases 1-5 — the spine
 
@@ -329,7 +329,7 @@ receipt attached to production deeds is a different type of the same name carryi
 tally delta, which the roadmap declares inadmissible. And **the body is two machines** — the spine
 and the ecologies conduct through the one move, the 169-header mathematical library conducts
 through a carrier that predates it, and they share no head, continuation, or rest record. Deposited
-as [the spine](blueprint/THE_SPINE.md).
+as [the spine](archive/blueprints/THE_SPINE.md).
 
 **The exact arithmetic was refounded.** Every division on the device path was a sixty-four-iteration
 software loop and `gcd` was Euclidean over it — five gcds and ten divisions per elimination step.
@@ -403,7 +403,7 @@ sites and 27 hardcoded cumulative grades (CUT 6); the nine schema-serial gates (
 closes (CUT 9); and **seven of eight transition invariants admitted with a literal `true` in the live
 spine** (CUT 10). None is claimed done.
 
-Deposited: [the spine, the cut, and the terrain](blueprint/THE_SPINE_THE_CUT_AND_THE_TERRAIN.md).
+Deposited: [the spine, the cut, and the terrain](archive/blueprints/THE_SPINE_THE_CUT_AND_THE_TERRAIN.md).
 
 ## Verified position — 2026-08-06, end of session
 
@@ -500,7 +500,7 @@ whole upstream, not about itself.**
 **Truth status:** `historical`.
 
 The completed numbered sequence remains available in Git history, the provenance portions of
-[the complete roadmap](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md), and the files under `receipts/`.
+[the complete roadmap](archive/blueprints/COMPLETE_CPP_ENGINE_ROADMAP.md), and the files under `receipts/`.
 Those identifiers record admission order and predecessor lineage only. They do not name current
 capabilities, divide the continuing ecology into versions, or reserve a successor.
 
@@ -518,8 +518,8 @@ No numbered successor is scheduled and none will be. The previously drafted fini
 characteristic-cycle foundry has no authority and is recoverable only from Git history.
 
 The live continuation contract is
-[the Eros embodiment roadmap](blueprint/EROS_EMBODIMENT_ROADMAP.md), which composes
-[the Eros mathematics-production floor](blueprint/EROS_MATHEMATICS_PRODUCTION_FLOOR.md) and amends
+[the Eros embodiment roadmap](archive/blueprints/EROS_EMBODIMENT_ROADMAP.md), which composes
+[the Eros mathematics-production floor](archive/blueprints/EROS_MATHEMATICS_PRODUCTION_FLOOR.md) and amends
 that file's §10 admission rule: **the grade of the organ is not the grade of the return.** An
 established capability is admissible without limit as the carrier of a deed and inadmissible only
 as its return. Every evidence requirement — source separation, post-seal comparison, checker
@@ -614,7 +614,7 @@ Artifact: `receipts/ONE_STANDING_DEED.txt`.
 
 **Four of five returned 2026-08-06; see the section above.** What follows is the original statement
 of the five, retained because it names the sources and the falsifiers. Deposited as
-[the foundation remainder](blueprint/THE_FOUNDATION_REMAINDER.md): **one standing** — a mathematical
+[the foundation remainder](archive/blueprints/THE_FOUNDATION_REMAINDER.md): **one standing** — a mathematical
 return must deposit structure into the standing that conditions later mathematical conduct, which
 today it cannot, because it commits a tally; **the rest carries the standing**, since a rest that
 omits what was derived can only make remounting equal to re-deriving, never cheaper; **RIDE actually

@@ -48,7 +48,7 @@ These are the mechanisms the doctrine says the body conducts through. Measured 2
 Two of these numbers are the whole diagnosis.
 
 **`current/information_receipt.hpp` reaches one header — itself.**
-`blueprint/EROS_EMBODIMENT_ROADMAP.md:327-329` states that an ecology returning a count instead of
+`archive/blueprints/EROS_EMBODIMENT_ROADMAP.md:327-329` states that an ecology returning a count instead of
 a receipt **is not admitted**. The receipt attached to production mathematical deeds is a different
 type of the same name, `organ/generative_math_receipt.hpp`, carrying two `uint16_t` alternative
 counts and a tally delta. By the project's own admission rule the mathematical body is unadmitted,
@@ -62,7 +62,7 @@ and touch none of the library.
 
 ## 3. The asymmetry is a law and is not yet a cost
 
-`blueprint/EROS_EMBODIMENT_ROADMAP.md:183-185` — *"RIDE carries by the sandwich `R T R̃` and is
+`archive/blueprints/EROS_EMBODIMENT_ROADMAP.md:183-185` — *"RIDE carries by the sandwich `R T R̃` and is
 cheap because the terrain already paid; FOUND deposits one integer winding quantum and pays
 curvature."*
 

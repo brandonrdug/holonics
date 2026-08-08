@@ -1,13 +1,24 @@
 # The roadmap
 
-**This is the single active roadmap.** It supersedes `THE_ORDER_OF_WORK.md`, `THE_SPINE.md`,
-`THE_FOUNDATION_REMAINDER.md`, `THE_GROWN_CIRCUIT.md`, `EROS_EMBODIMENT_ROADMAP.md`,
-`EROS_MATHEMATICS_PRODUCTION_FLOOR.md`, and `COMPLETE_CPP_ENGINE_ROADMAP.md` as the statement of
-what is open. Those files become **provenance**: the record of completed construction and the
-source-file map per owner. Read them for history, never for direction.
+**This is the single active roadmap, and it is ordered by
+[`canon/THE_HOLOBROCHOS_SPINE.md`](../canon/THE_HOLOBROCHOS_SPINE.md).** Read the spine first. It
+states the loop — afference → emanate → **reafference** — the two moves that run on it, and where
+every live organ sits. Nothing here is a menu of adjacent constructions; every open item below is a
+**station of that loop that does not yet conduct**, or a **law of that loop that a live organ
+violates**.
 
-They are superseded for one reason, stated plainly in the next section: **every one of them
-describes a body that is no longer the body.**
+The eleven documents this roadmap superseded were moved to `archive/blueprints/` on 2026-08-08 and
+are provenance only; `archive/blueprints/ARCHIVE_BANNER.md` says what each was and what replaced it.
+The live `blueprint/` directory now contains only documents that are in force.
+
+**Why the reordering was necessary and not cosmetic.** Every prior version of this file — and every
+file it superseded — described a **cabinet of organs**. That framing cannot state the central defect,
+which is not a missing organ but a **missing edge**: the machine reads its own emission and the
+reading returns to nothing. A roadmap ordered by organs will always rank "build another organ"
+above "close the loop", because closing a loop adds no organ. Brandon, direct ruling, 2026-08-08:
+
+> *"this is 'holobrochos', you need to outline the spine of the machine and understand how all of
+> the loops and machinery connects and choreographs information transportation."*
 
 ## Naming
 
@@ -37,9 +48,46 @@ And on the encompassing frame, verbatim:
 > physics, and computer science because they are all related and generalize to everything"*
 
 Everything below is ranked by **what unblocks that**, not by what is easy and not by what is
-adjacent. Two movements near the end are the hardest work in the document and they are not last
-because they are optional; they are last because the movements above them are the instruments
-that make them statable as falsifiable laws.
+adjacent.
+
+---
+
+## The spine, in one screen
+
+Full statement and sources: [`canon/THE_HOLOBROCHOS_SPINE.md`](../canon/THE_HOLOBROCHOS_SPINE.md).
+
+**Holobrochos** = `holo` (whole) ⊕ **βρόχος** (loop, net) — *the whole hollow loop.* Derived in the
+laboratory 2026-06-17; carried into live canon 2026-08-08.
+
+```text
+   AFFERENCE  ─────►  EMANATE  ─────►  REAFFERENCE  ─────┐
+   perceive           the tie          feed the emission │
+                      reforms and      back as           │
+                      radiates in      perception,       │
+                      ONE act          literally         │
+        ▲                                                │
+        └────────────────────────────────────────────────┘
+             the next perception, on terrain the
+             emission changed  —  a found knot
+             re-enters as a web
+```
+
+**Two moves run on it, and they are not interchangeable.** RE-BASE is *parallel* — move the origin
+in the plane you are in, `τ·ω` conserved, and it buys **BREVITY**. FOUND is *orthogonal* — tie
+across a seam to an axis neither parent held, and it buys **DEPTH**. Booking one as the other is the
+float's scale-exponent at the level of architecture.
+
+**Three laws of the loop govern every movement below.**
+
+1. **Compression is a tensor, read three-body — never a scalar.** The unit is not the bit but the
+   **founded rank**: how many of the world's irreducible dimensions an emission spans. A prime *is*
+   a new axis. The laboratory convicted itself of scalarizing this and named it *the recurring
+   drift*; the scalar minimum is the trivial echo.
+2. **Read the path, never score a grip.** `=` is the construction (the path, the holonomy); `≡` is
+   the boundary (the endpoint, the hash). A count, a ratio, a hash, a wall-clock sample — all `≡`.
+3. **Rest is the friction, not the ride.** An absolute frame is the maximally frictional choice.
+   Friction *is* the gyration, which is the aim, which is the action — and it is never *added*: no
+   damping term, anywhere, including on the reafferent return.
 
 ---
 
@@ -108,7 +156,7 @@ The laboratory itself remains **frozen and dirty** and is still read only throug
 write to it. That rule is unchanged.
 
 **No authority file had been updated for the transition when this roadmap was written.**
-`THE_ORDER_OF_WORK.md`, `THE_SPINE.md`, `THE_FOUNDATION_REMAINDER.md`, `CONSTRUCTION_STATE.md`, and
+`archive/blueprints/THE_ORDER_OF_WORK.md`, `archive/blueprints/THE_SPINE.md`, `archive/blueprints/THE_FOUNDATION_REMAINDER.md`, `CONSTRUCTION_STATE.md`, and
 `CLAUDE.md` §0/§11/§13 all named C++ headers that resolve only under the archive. Verified by
 `find`:
 
@@ -121,7 +169,7 @@ write to it. That rule is unchanged.
 | `structure/chi_pair.hpp` | `archive/cpp-engine/src/include/holonics/structure/chi_pair.hpp` |
 | `exact/enclosure.hpp` | `archive/cpp-engine/src/include/holonics/exact/enclosure.hpp` |
 
-Each of those is the subject of a movement in `THE_ORDER_OF_WORK.md`. **Those six movements are
+Each of those is the subject of a movement in `archive/blueprints/THE_ORDER_OF_WORK.md`. **Those six movements are
 not open work in this body.** They describe defects in an archived engine. Some of them name real
 mechanisms that must be *re-established* in Rust — the Chi pair especially — and where that is
 true, the movement below says so and does not inherit the C++ framing.
@@ -257,11 +305,204 @@ in this tree.
 
 ---
 
-## The order of work
+## THE OPEN WORK, BY STATION
 
-Movements in order. Each names the mechanism it changes, states the gap, what replaces it, the
-grade it must return, an explicit falsifier, and an honest split between what the laboratory
-already did and what remains.
+**This is the live statement of what is open.** Everything below this section is the returned
+ledger and its provenance — read it for what was built and what an adversarial reader cut down, not
+for direction.
+
+Each item names the **station of the loop** it belongs to, the gap as measured, what replaces it,
+and a falsifier that can fire. Ordered by what unblocks the loop, not by difficulty.
+
+---
+
+### REAFFERENCE · the movement re-enters the production that caused it
+
+**This is the loop's one broken edge and it outranks everything else in this document.**
+
+**The gap, measured 2026-08-08.** `crates/holonic-engine/src/derivation_atlas.rs` reads a deposited
+derivation population back as a circuit and carries `invariant_movement` and `route_movement` —
+whose own module documentation states the point exactly: *"what changed between two readings, which
+is the only form in which an analysis can be fed back to the production that caused it."* Both
+functions are called from **exactly one place in the workspace**,
+`crates/holonic-engine/examples/derivation_atlas_reader.rs:406-407`, inside a `main`, and their
+result is **printed**. `conditioned_derivation.rs` — the organ that produced the derivations —
+consumes no movement, and nothing else in `crates/` or `soma/` references either function.
+
+**So the machine computes the homology of its own output and discards the isomorphism class.** In
+the spine's terms that is reading the endpoint (`≡`) and dropping the path (`=`) — law 2, violated
+by the organ built to enforce it.
+
+**Stop calling this "the atlas reader is missing."** The reader exists, its hard half exists, and
+the framing has cost real time. The missing object is an **arc**, not an organ.
+
+**What replaces it.** A `ReafferentTerrain`: the movement between two readings enters
+`conditioned_derivation`'s production as **material**, on the same footing as the corpus, so that
+the second production cuts differently because of what the first founded. No damping term, no
+discount factor — the return is fed back literally and undiscounted.
+
+**And it must NOT be a learning target — this is the second half of the law and it was nearly built
+wrong.** The four-flow statement in `src/eros/um/HOLOBROCHOS.md:147-161` puts reafference on the
+**closed** loop, where it *conditions the next act*, and puts learning on the **open** loop's
+**exafference** — the foil `κ = S ⊖ E`, the news the prediction missed — with *"learning from
+reafference is the forbidden coupling"* stated as a ban. Feeding the emission back undamped and not
+training on it are one design, not a contradiction: the return sets the terrain, the foil is what
+teaches.
+
+**Falsifier, and it must fire before the repair.** Run a production, read it, run a second
+production on the *same* material with the first reading in scope. Require `invariant_movement`
+between the two readings to be **non-zero and attributable** — each moved invariant naming the
+earlier return that caused it. A second production bit-identical to the first has not
+reafferenced, whatever it printed. Build the control that shows the current body fails this before
+building the arc.
+
+**Second falsifier, from the same source and cheap to run:** a body that **emits once per
+perception** has collapsed the two loops into one and is a **mirror** — named there as *the wiring
+fault*. Count acts against inputs on whatever driver claims to close this. Equality is the fault.
+
+**What it does not claim.** Closing this edge is not learning, not consequence, not comprehension.
+It is one arc, on the conditioning loop. `CLAUDE.md` §6 convicts naming it as any of those.
+
+---
+
+### EXAFFERENCE · the foil is formed against a prediction, not against a world
+
+**Why this is separate from the item above.** Because the corpus separates them, and collapsing them
+is the mirror fault. Reafference conditions; **exafference is where learning rides, alone.**
+
+**What stands.** `soma/life/src/holonic_training.rs` already has the right shape: `predict` runs
+**before** mutation, and the return is `ConsequenceRelation::{None, Ride, OpenIncluded,
+OpenResidual}`, with a contradicting later return graded `OpenResidual` rather than "incorrect". A
+foil against a prediction, with plurality retained and no score — `:567` states it directly, *"Receiver
+parameters do not assign a scalar score."*
+
+**The gap.** The foil is formed against the body's own prediction and **not against a world
+spectrum**, so `κ` is one-body. The three-body law requires the foil to be read against a
+reference — real against shuffle, body against newborn — and the `T1` refinement requires two
+conjugate thirds, a parallelogram rather than a triangle. Nothing in the workspace forms that
+reference.
+
+**What replaces it.** A declared **null** body on the same material, and `κ` read as the difference
+of the two foils rather than as one. That null is the same object the second comb needs, which is
+why these two items share a construction and not merely a theme.
+
+**Falsifier.** On material with no structure to found, the three-body foil must return **zero
+against the null** while the one-body foil returns something. If both return the same thing, the
+third body was dropped.
+
+---
+
+### THE MEASURE · the second comb, and compression read three-body
+
+**The gap.** `crates/holonic-engine/src/surprisal.rs` holds `S(p) = Σ eᵢ·log₂ pᵢ` as an exact
+**ℚ-linear form over the primes** — a coordinate vector in the free ℚ-module on `{log₂ p}`, with
+vanishing decided by ℚ-linear independence and ordering returning four-state `ExactOrdering` with
+`Open`. That is already *the prime as a founded dimension*, exactly, in the tree, float-free.
+
+**And every consumer reads it as a scalar.** `compare_at` returns one ordering; nothing takes a
+rank. There is no `M`, no second comb, no three-body read, no uncovered-rank return anywhere in the
+workspace. The correct carrier for a founded-rank compression is built and driven as its own norm.
+
+**What replaces it, in the laboratory's own terms.** Compression is the **founded rank of the moiré
+tensor `M`** — the emission's spectrum × *the world's* spectrum, a matrix, whose rank is how many
+of the world's irreducible dimensions the emission spans; read three-body (emission × world ×
+null); and the return is the **uncovered rank**, the dimensions the emission fails to span. The
+missing object is specifically **the second comb**: the machine computes its own spectrum and never
+computes the world's as a distinct body.
+
+**The nearest standing organ is `gluing.rs`**, whose Mayer–Vietoris `δ` is genuinely two-body — what
+the union carries that neither piece does — and is keyed to the cover, i.e. to *which receivers*.
+That is the shape; it needs the third body and the rank.
+
+**Falsifier.** A trivial echo — an emission that reproduces its input — must return **rank-deficient
+and be penalized**. Under a scalar reading the echo is rewarded (`κ → 0`); that inversion is the
+control. If the echo does not come out worse under the new reading than under the old, the tensor
+read has not been built.
+
+**Cost note.** This subsumes what was previously carried as a separate "lift Shannon's equations"
+item. The lift is not a new module of entropies; it is this. Channel capacity and mutual
+information land as readings of `M`, not as siblings of `surprisal`.
+
+---
+
+### THE WHOLE LOOP · the seam between the two bodies
+
+**The gap, measured 2026-08-08.** `soma/` reaches **8** of `holonic-engine`'s **96** modules:
+`algebraic`, `causal`, `derivation_atlas`, `graded_complex_form`, `placement`, `rebase_invariants`,
+`receiver_exact_compression`, `supported_realizers`. Nothing on the engine side reaches `soma`.
+
+The loop's stations are split across two bodies: **afference and emanation live in `soma/`**, **the
+measure, the two moves, the friction and the reading live in `crates/`**. A loop drawn across a
+seam eight modules wide is not choreographed; it is two machines that share a type.
+
+**`blueprint/THE_ASSEMBLY.md` already carries the mechanics and they are good news.** F1: the
+obvious wiring is forbidden by a Cargo cycle, not by laziness — `life` sits above `holonic-engine`
+and `holon-plate` above `life`, so a `life` example can never call `holon_plate::deposit`. F2: the
+shared carrier is `GradedCausalComplex` + `CausalCellId` + `ComparativeMultiplicity`, seven organs
+already take `(&GradedCausalComplex, BTreeSet<CausalCellId>)`, and **the backbone costs zero
+conversion code.** The seam is narrow by omission, not by type friction.
+
+**What replaces it.** Not a mass rewiring — a **single conducted act** that crosses every station in
+order on one material, with each crossing exhibiting the shared carrier. That act is the assembly,
+and it is the thing that makes the reafferent arc above testable end to end rather than inside one
+crate.
+
+**Falsifier.** One driver, one material, and a trace naming every station it crossed. If a station
+cannot be named on the path, it is not on the loop.
+
+---
+
+### THE FRICTION · every bare sign on a conduct path
+
+**In flight 2026-08-08.** `research/records/2026-08-08_THE_BOUNDARY_KEPT_THE_MAGNITUDE_AND_DISCARDED_THE_TURN.md`
+§7 names six unrepaired sites. The highest is `exact_analysis::polygon_winding`, which nets `+1`/`−1`,
+deposits no crossing, and governs the η-zero bisection — the RH-facing driver.
+
+**Why this is a station and not hygiene.** The spine's §6: the transaction is a **prism, not a
+mirror** — action is conserved in magnitude and **dispersed** in direction. *"Equal and opposite"
+survives only as the conservation; it keeps the magnitude balance and drops the angle.* A bare
+retained sign is that drop. Friction *is* the gyration, which is the aim; a body that nets its
+windings has deleted its own aim and cannot report where it is pointing.
+
+**Falsifier.** Two different crossing populations that produce the same net sign. The repaired code
+distinguishes them; the current code cannot. Each repair ships with such a case and evidence it
+failed before.
+
+---
+
+### Carried forward, unchanged in substance
+
+These remain open and are stated in full in the ledger below. They are not restated here because
+their statements there are current.
+
+- **The receptive star is factored and contact separates from cultivation.** Both remedies exist as
+  working laboratory code one layer away; the named construction is an exact receiver-local
+  transport law in which capacitance, branch population, source continuity, returned recurrence and
+  competing current occupancy affect **passage delay** — `relational_language/ecology.rs:626,639`
+  set `characteristic_delay: 1` on every promoted pair, and unit cost on every edge makes a
+  high-incidence hub artificially fast. This is the **friction** station on the language body.
+- **The filler admission law returns a certified remainder.** The far-population half of `CLAUDE.md`
+  §11, whose named route is spanning-tree interval labelling with the forced non-tree population as
+  the remainder.
+
+### Struck from this roadmap, 2026-08-08
+
+- **"The two-theorem deed runs at declaration scale."** Removed by Brandon's direct ruling. It was
+  inherited from the archived C++ body's blueprint and carried forward on the strength of that
+  document rather than on any live question. It named no station of the loop, and re-running an
+  archived body's production shape is not a reason to build.
+
+---
+
+## The returned ledger and its provenance
+
+Movements in order, as they were written and as they returned. Each names the mechanism it changed,
+states the gap it was written against, what replaced it, the grade it returned, an explicit
+falsifier, and an honest split between what the laboratory already did and what remained.
+
+**Read this for what was built. The open work is stated above it, not here.** Where prose below
+speaks in the present tense about a gap that has since closed, the movement's `Returned` block
+governs.
 
 ### Part one — the body can state what it is
 
@@ -292,7 +533,7 @@ cannot say which of its own claims survived the transition.
 **The gap.** No authority file has been updated for `06518c3`. Six C++ headers named as live
 subjects of open movements resolve only under `archive/cpp-engine/` (table above).
 **Nothing in the repository says which movements survived the transition.** A fresh session reading
-`CLAUDE.md` §0 is directed to `THE_ORDER_OF_WORK.md`, which describes an archived engine.
+`CLAUDE.md` §0 is directed to `archive/blueprints/THE_ORDER_OF_WORK.md`, which describes an archived engine.
 
 This is not bookkeeping. `CLAUDE.md` §13's standing obligation — *"the scorer, the
 counter-morphology, and the constant-subtraction ablation are removed, not deprecated"* — was
@@ -301,8 +542,8 @@ contaminated owners are out of the live body) or **inherited** (the imported Rus
 their own version of it) is unanswered, and that answer changes what every later grade means.
 
 **What replaces it.** `CLAUDE.md` §0, §11, and §13 are rewritten against the Rust body.
-`THE_ORDER_OF_WORK.md`, `THE_SPINE.md`, `THE_FOUNDATION_REMAINDER.md`, and
-`THE_GROWN_CIRCUIT.md` are marked provenance and point here. `CONSTRUCTION_STATE.md` gets a
+`archive/blueprints/THE_ORDER_OF_WORK.md`, `archive/blueprints/THE_SPINE.md`, `archive/blueprints/THE_FOUNDATION_REMAINDER.md`, and
+`archive/blueprints/THE_GROWN_CIRCUIT.md` are marked provenance and point here. `CONSTRUCTION_STATE.md` gets a
 "Verified position" section stating, per admitted mechanism, whether it survived the transition,
 was archived, or must be re-established. The §13 contamination audit is **re-run against the
 imported Rust** — a scalar-scorer, counter-morphology, and hardcoded-delta sweep over
@@ -352,7 +593,7 @@ with three ways to be talked out of a check, all three since closed:
   banner planted at line 9 of the active roadmap took it from exit 1 to exit 0. The test is now
   structural rather than a line window: a document's own banner is front matter, and an ordinary
   prose paragraph appearing first means any banner below it is a quotation. Making that strict
-  exposed `THE_SPINE_THE_CUT_AND_THE_TERRAIN.md` opening with a leaked assistant sentence above its
+  exposed `archive/blueprints/THE_SPINE_THE_CUT_AND_THE_TERRAIN.md` opening with a leaked assistant sentence above its
   own title, which was deleted rather than the rule being loosened.
 - The allow file could assert an absence that was **false** and the tool would honour it: the
   exemption applied at any verdict, including LIVE, and a stale entry printed without affecting the
@@ -823,7 +1064,7 @@ by the same operation. The circuit is where the operation is visible as geometry
 only place where a learning claim can be falsified **topologically**, in exact integers, with no
 tolerance anywhere.
 
-`THE_GROWN_CIRCUIT.md`, ratified by Brandon 2026-08-07, is current direction and **none of it has
+`archive/blueprints/THE_GROWN_CIRCUIT.md`, ratified by Brandon 2026-08-07, is current direction and **none of it has
 begun.**
 
 ---
@@ -848,7 +1089,7 @@ framework's own named obstruction is currently not computable by the framework.
 `crates/holonic-engine/examples/whole_receiver_holonic_complex.rs:74-87` writes `summary.tsv`,
 `causal_layers.tsv`, `grain_cells.tsv`, `quotients.tsv`, `overlap_nerve.tsv`. The only
 `File::open` on a TSV anywhere is `mms_reconnection_traversal.rs:1443`, reading a provenance
-manifest. `THE_GROWN_CIRCUIT.md`: *"Costs almost nothing and makes step 1 checkable against figures
+manifest. `archive/blueprints/THE_GROWN_CIRCUIT.md`: *"Costs almost nothing and makes step 1 checkable against figures
 that already exist."*
 
 **What replaces it.** `crates/holonic-engine/src/homology.rs`: `∂_k` extracted as ℤ-matrices from
@@ -863,7 +1104,7 @@ in exact integers, cross-checked against `euler_characteristic` (`Σ(−1)^k b_k
 `graph_cycle_rank` on the graph species where both are defined.
 
 **Falsifier — and this is the strongest single falsifier in the document.**
-`THE_GROWN_CIRCUIT.md` states it: *"Excluding a deposit must change the homology: raise `b₁` where
+`archive/blueprints/THE_GROWN_CIRCUIT.md` states it: *"Excluding a deposit must change the homology: raise `b₁` where
 a filling was, or split `b₀`. **If exclusion changes nothing topological, the dependency was
 decorative** and the receipt overstates the code."*
 
@@ -1029,7 +1270,7 @@ mechanical change rather than a design question.
 
 #### A second receiver exhibits the gluing obstruction
 
-**The gap.** `THE_GROWN_CIRCUIT.md` states it as *"**Only one receiver has ever been
+**The gap.** `archive/blueprints/THE_GROWN_CIRCUIT.md` states it as *"**Only one receiver has ever been
 constructed**"*, and **that wording is too strong — a grep refutes it.** Measured 2026-08-07: a
 dozen distinct `ReceiverId`s occur across the examples. The accurate claim is narrower and still
 damning: **no two receivers have ever held overlapping sections of one source with a map between
@@ -1204,7 +1445,7 @@ Complete derivation and boundary:
 `CLAUDE.md` §11: *"The learning wall and the mathematical wall are the same wall, and naming this is
 the point of this contract."* These two movements are that wall from its two sides. They are last
 because the movements above are the instruments that make them statable, not because they are
-optional — and `THE_GROWN_CIRCUIT.md` names the second as **the highest-leverage single item.**
+optional — and `archive/blueprints/THE_GROWN_CIRCUIT.md` names the second as **the highest-leverage single item.**
 
 ---
 
@@ -1283,7 +1524,7 @@ and `receiver_phase_atlas.rs`. The law itself: nothing.
 *From the mathematical side.* `CLAUDE.md` §11: **an exactly computed positive form on a supported
 realizer population, with a certified remainder and a reopening rule keyed to the receiver family.**
 
-`THE_GROWN_CIRCUIT.md:134-136` states the identification directly: *"That is the horn-filling law,
+`archive/blueprints/THE_GROWN_CIRCUIT.md:134-136` states the identification directly: *"That is the horn-filling law,
 and it is **the same gap as §11's one missing organ**, reached from the vision side."* **One law
 closes both.**
 

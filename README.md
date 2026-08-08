@@ -22,7 +22,7 @@ have been declared.
 ## Reading order
 
 1. [`CONSTRUCTION_STATE.md`](CONSTRUCTION_STATE.md) — the admitted position and next deed.
-2. [`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`](blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md) — the
+2. [`archive/blueprints/COMPLETE_CPP_ENGINE_ROADMAP.md`](archive/blueprints/COMPLETE_CPP_ENGINE_ROADMAP.md) — the
    complete ordered construction from the C++/CUDA foundation through the dependent two-theorem
    Lean-mediated production deed.
 3. [`canon/00_PURE_HOLONICS.md`](canon/00_PURE_HOLONICS.md) — the compact doctrine and its terms.
@@ -45,11 +45,11 @@ have been declared.
    engine contract.
 13. [`blueprint/ARBITRARY_LEARNING_MACHINE.md`](blueprint/ARBITRARY_LEARNING_MACHINE.md) — the machine
    construction.
-14. [`blueprint/CPP_GPU_FOUNDATION.md`](blueprint/CPP_GPU_FOUNDATION.md) — the ratified C++/CUDA,
+14. [`archive/blueprints/CPP_GPU_FOUNDATION.md`](archive/blueprints/CPP_GPU_FOUNDATION.md) — the ratified C++/CUDA,
     GPU-primary, bit-pure production realization.
-15. [`blueprint/REALIZATION_AND_HARDWARE.md`](blueprint/REALIZATION_AND_HARDWARE.md),
+15. [`archive/blueprints/REALIZATION_AND_HARDWARE.md`](archive/blueprints/REALIZATION_AND_HARDWARE.md),
     [`blueprint/ADAPTING_A_NEW_ECOLOGY.md`](blueprint/ADAPTING_A_NEW_ECOLOGY.md), and
-    [`blueprint/BUILD_AND_GRADE.md`](blueprint/BUILD_AND_GRADE.md) — adaptation, realization, and
+    [`archive/blueprints/BUILD_AND_GRADE.md`](archive/blueprints/BUILD_AND_GRADE.md) — adaptation, realization, and
     grade index.
 
 ## Evidence map

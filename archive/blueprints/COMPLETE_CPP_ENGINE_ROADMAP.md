@@ -3710,11 +3710,11 @@ read, in order:
 1. `AGENTS.md`;
 2. `CONSTRUCTION_STATE.md`;
 3. this roadmap and
-   `blueprint/EROS_MATHEMATICS_PRODUCTION_FLOOR.md`;
+   `archive/blueprints/EROS_MATHEMATICS_PRODUCTION_FLOOR.md`;
 4. `canon/00_PURE_HOLONICS.md`, `canon/01_CAUSAL_CALCULUS.md`,
    `canon/03_CONDITIONING_AND_LEARNING.md`, and
    `canon/08_CORE_MATHEMATICAL_INSTRUMENTS.md`;
-5. `blueprint/PURE_HOLONIC_ENGINE.md` and `blueprint/CPP_GPU_FOUNDATION.md`; and
+5. `blueprint/PURE_HOLONIC_ENGINE.md` and `archive/blueprints/CPP_GPU_FOUNDATION.md`; and
 6. only the smallest evidence paths named by the deed being built.
 
 Do not reread the entire imported research archive, infer a continuation from historical status

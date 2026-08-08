@@ -3,7 +3,7 @@
 **Date:** 2026-08-04  
 **Scope:** RH/Hodge synthesis and R23 construction selection  
 **Disposition:** this record informs the directly frozen R23 deed in
-`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`; it does not admit R23 or schedule a later phase.
+`archive/blueprints/COMPLETE_CPP_ENGINE_ROADMAP.md`; it does not admit R23 or schedule a later phase.
 
 ## 1. The proposed two halves require a third relation
 

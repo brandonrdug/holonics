@@ -17,7 +17,7 @@ at, not a competing authority. Carry both and name the refinement.
 
 The purity, ownership, apparatus, no-float, and grading requirements this project runs on are
 stated below. They were first written for the archived C++ body in
-`blueprint/CPP_GPU_FOUNDATION.md`, which now carries an archive banner; the requirements survive
+`archive/blueprints/CPP_GPU_FOUNDATION.md`, which now carries an archive banner; the requirements survive
 the body that occasioned them and this file carries them. They are meant to be enforced by
 executable audits rather than by cross-reference — `cargo test --workspace` does enforce the
 no-float and determinism gates, and `crates/holonic-architecture-lint` is the ownership ratchet but
@@ -34,24 +34,38 @@ after a comparative audit. It lives at `archive/cpp-engine/` and nothing there i
 below that speak of headers, deeds, `ctest`, CUDA executors or `R{i}` chains describe that archived
 body and are **provenance**, not the present position.
 
-Read these five, in order, and nothing else by default:
+Read these six, in order, and nothing else by default:
 
 | file | what it is |
 |---|---|
 | **this file** | the operating contract. How to work, what is convicted, what is authorized. |
+| `canon/THE_HOLOBROCHOS_SPINE.md` | **the spine — the whole hollow loop.** Two loops, four flows, the two moves that run on them, the three laws, and where every live organ sits. **The roadmap is ordered by it.** Read it before proposing any construction; an organ that no station names is churn. |
 | `canon/THE_DOCUMENT_LAW.md` | how a claim travels from conversation to canon, the genres, the grades, how supersession is recorded. |
 | `canon/THE_QUOTE_NETWORK.md` | **where every idea came from, in Brandon's words**, themed, with "where this lives now" per theme. Read this before theorising about what he wants. |
-| `blueprint/THE_ROADMAP.md` | the single active roadmap, movements named by mechanism. |
+| `blueprint/THE_ROADMAP.md` | the single active roadmap. **The open work is stated by station** at the top; everything below that is the returned ledger and its provenance. |
 | `CONSTRUCTION_STATE.md` | the position record. What is admitted, what survived the transition, what must be re-established. |
+
+**The spine is new to the live canon as of 2026-08-08 and the reason it was missing is worth
+carrying.** The concept — `holo` ⊕ βρόχος, *the whole hollow loop*, the laboratory's unification of
+Information Theory and General Relativity — was derived 2026-06-17 and **no live document contained
+the string**. Every live blueprint described a *cabinet of organs*, and a cabinet cannot state the
+central defect, which is not a missing organ but a **missing edge**. Brandon named it directly:
+
+> *"this is 'holobrochos', you need to outline the spine of the machine and understand how all of
+> the loops and machinery connects and choreographs information transportation."*
+
+**Eleven blueprint documents moved to `archive/blueprints/` the same day.** They already carried
+archive banners; `blueprint/` now contains only documents in force, and
+`archive/blueprints/ARCHIVE_BANNER.md` says what each was and what replaced it.
 
 `canon/THE_RECOVERED_LAW.md` carries the jurisdiction doctrine and the elementary definitions;
 consult it before claiming anything about what holonics forbids.
 
 **Twelve files carry an archive banner and schedule nothing.** Under `blueprint/`:
-`THE_ORDER_OF_WORK.md`, `THE_SPINE.md`, `THE_FOUNDATION_REMAINDER.md`, `THE_GROWN_CIRCUIT.md`,
-`EROS_EMBODIMENT_ROADMAP.md`, `EROS_MATHEMATICS_PRODUCTION_FLOOR.md`,
-`COMPLETE_CPP_ENGINE_ROADMAP.md`, `CPP_GPU_FOUNDATION.md`, `THE_SPINE_THE_CUT_AND_THE_TERRAIN.md`,
-`BUILD_AND_GRADE.md`, `REALIZATION_AND_HARDWARE.md`; and
+`archive/blueprints/THE_ORDER_OF_WORK.md`, `archive/blueprints/THE_SPINE.md`, `archive/blueprints/THE_FOUNDATION_REMAINDER.md`, `archive/blueprints/THE_GROWN_CIRCUIT.md`,
+`archive/blueprints/EROS_EMBODIMENT_ROADMAP.md`, `archive/blueprints/EROS_MATHEMATICS_PRODUCTION_FLOOR.md`,
+`archive/blueprints/COMPLETE_CPP_ENGINE_ROADMAP.md`, `archive/blueprints/CPP_GPU_FOUNDATION.md`, `archive/blueprints/THE_SPINE_THE_CUT_AND_THE_TERRAIN.md`,
+`archive/blueprints/BUILD_AND_GRADE.md`, `archive/blueprints/REALIZATION_AND_HARDWARE.md`; and
 `archive/cpp-engine/CONSTRUCTION_STATE.md`, the C++ body's position record. Read them for history,
 never for direction. The banner is the test: if the file opens with one, it is provenance.
 
@@ -142,7 +156,7 @@ And four lessons, each earned by a defect found in it:
 **The single most damaging defect in the inherited authority was an admission rule that made the
 established floor inert.**
 
-`EROS_MATHEMATICS_PRODUCTION_FLOOR.md` §10 declared a deed inadmissible if its primary grade is
+`archive/blueprints/EROS_MATHEMATICS_PRODUCTION_FLOOR.md` §10 declared a deed inadmissible if its primary grade is
 any already-established capability, while §9 listed only Millennium-scale or
 research-infrastructure targets as open. The composition of those two rules is a deadlock, and
 `CONSTRUCTION_STATE.md` recorded its consequence directly: *construction remains paused*.

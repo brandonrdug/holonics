@@ -10,7 +10,7 @@ they never schedule work.
 ## Fresh-session pickup
 
 The sole current construction authority is
-`blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`. The admitted position and next deed are in
+`archive/blueprints/COMPLETE_CPP_ENGINE_ROADMAP.md`. The admitted position and next deed are in
 `CONSTRUCTION_STATE.md`; that file is the only current-position record and must be updated as gates
 pass. Do not substitute a Lean fixture, language experiment, CPU reference implementation,
 visualization, or isolated capability proof for its named next deed.
@@ -30,7 +30,7 @@ phase returns its required artifact and passes its grade.
 
 `canon/` is normative doctrine. `blueprint/THE_ROADMAP.md` is the ordered construction authority;
 the other blueprint files contain contracts it composes, and eleven of them now carry an archive
-banner and schedule nothing — `blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md`, named here as the
+banner and schedule nothing — `archive/blueprints/COMPLETE_CPP_ENGINE_ROADMAP.md`, named here as the
 authority until 2026-08-07, is one of them.
 `research/`, `papers/`, and `soma/formal/` are evidence in their declared contexts; the C++ body's
 `evidence/` moved to `archive/cpp-engine/evidence/`.
@@ -117,7 +117,7 @@ construction merely because its current implementation is being replaced.
 
 - The ratified production realization is C++23 plus CUDA C++. Rust is historical reference only;
   do not create a compatibility port or dual implementation. Establish the restricted C++
-  ownership/type subset in `blueprint/CPP_GPU_FOUNDATION.md` before domain code.
+  ownership/type subset in `archive/blueprints/CPP_GPU_FOUNDATION.md` before domain code.
 - The GPU is the primary resident workhorse. The CPU handles process/apparatus boundaries, durable
   rest/I/O, narrow exterior codecs, and offline admission audits; it does not own the hot deed,
   semantic phase selection, or a fallback implementation.

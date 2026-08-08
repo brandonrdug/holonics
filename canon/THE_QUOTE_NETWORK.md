@@ -244,7 +244,7 @@ And the newest theoretical claim in the corpus — what the machine is actually 
 >
 > — 2026-08-05 10:32, `CX 2026/08/05`
 
-**Where this lives now.** `blueprint/EROS_MATHEMATICS_PRODUCTION_FLOOR.md` is the standing floor.
+**Where this lives now.** `archive/blueprints/EROS_MATHEMATICS_PRODUCTION_FLOOR.md` is the standing floor.
 Executable: `soma/life/src/lean_mathematics/` and `lean_mathematics.rs` inside `soma/life` (41,975
 lines, 124 tests) — the detached-body formal mathematics ecology, live in the Rust tree. Records:
 `research/records/2026-07-31_THE_THEOREM_OPENS_ITS_LOCAL_STAR_THE_KERNEL_RETURN_CAUSES_DEEPER_PROOF_MOTION.md`,
@@ -474,7 +474,7 @@ all three are referenced **zero times** in `soma/life/src/` or `soma/life/exampl
 GMP/MPFR — an MPFR-float dependency standing in the manifest of the ecology crate. It should be
 struck.
 
-`blueprint/CONTAMINATION_BANS.md` and `blueprint/CPP_GPU_FOUNDATION.md` state the rules; the latter
+`blueprint/CONTAMINATION_BANS.md` and `archive/blueprints/CPP_GPU_FOUNDATION.md` state the rules; the latter
 is now named for an archived body.
 
 ---
@@ -581,7 +581,7 @@ Eight words carrying the whole circuit reading of machine learning:
 >
 > — 2026-07-20 21:41, `CX 2026/07/19`
 
-**Where this lives now.** `canon/03_CONDITIONING_AND_LEARNING.md`; `blueprint/THE_GROWN_CIRCUIT.md`
+**Where this lives now.** `canon/03_CONDITIONING_AND_LEARNING.md`; `archive/blueprints/THE_GROWN_CIRCUIT.md`
 (ratified 2026-08-07) is the only construction contract in the tree that treats growth as the object.
 Executable: `soma/life/src/morphological_language/` and `morphological_language.rs`;
 `soma/life/src/suffix_ecology.rs` (1,661 lines) realizes the emergent-tokenizer claim;
@@ -670,7 +670,7 @@ Byrne's *Elements* proposed as a reasoning mode, not a style:
 >
 > — 2026-07-23 16:14, `CX 2026/07/19`
 
-**Where this lives now.** `blueprint/THE_GROWN_CIRCUIT.md` — ratified by Brandon 2026-08-07, and
+**Where this lives now.** `archive/blueprints/THE_GROWN_CIRCUIT.md` — ratified by Brandon 2026-08-07, and
 `[measured]` **the only file in the entire repository outside `archive/` that contains the string
 "MorphoHDL"**. It carries the construct-by-construct translation table and the load-bearing claim
 that the expansion schedule is a receiver and the invariants are Betti numbers, torsion, and hinge
@@ -685,7 +685,7 @@ complex with Betti numbers and torsion. The measured law
 `H₁ = Z^{6w−3} ⊕ (Z/2)^{(w−1)²}` at widths two through six is in
 `research/records/2026-08-08_THE_DEFICIT_IS_THE_OCTAVE_THE_LINEAGE_TORSION_IS_THE_HAND.md`. The
 expansion schedule really is a receiver and the invariants really are Betti numbers and torsion,
-exactly as `THE_GROWN_CIRCUIT.md` claimed.
+exactly as `archive/blueprints/THE_GROWN_CIRCUIT.md` claimed.
 
 **The rendering half is built.** `crates/holonic-engine/src/certified_face.rs` and
 `presentation_gauge.rs` refuse a decimal expansion reaching an emitted document at runtime;
@@ -1223,7 +1223,7 @@ one file path away from running.
 The engine itself: `crates/relational-geometry` (7,946 lines, `projection.rs` 1,613,
 `exact_analysis.rs` 1,399) plus `soma/surface` (wgpu 27, `soma/kernel/soma.spv`) plus
 `crates/holonic-engine/src/{conic,simplicial,physical,wave_propagation,presentation,display}.rs` and
-`examples/desktop_receiver.rs` (3,130 lines). `blueprint/REALIZATION_AND_HARDWARE.md` carries the
+`examples/desktop_receiver.rs` (3,130 lines). `archive/blueprints/REALIZATION_AND_HARDWARE.md` carries the
 hardware doctrine.
 
 **The ontology he asked for — RAM, clock speeds, and storage as one thing under different
@@ -2191,7 +2191,7 @@ implementation detail.** He says outright he was approving workflows without rea
 explicit content-bearing ratifications count — for example msg 45, "Completely ratified. Let's
 clearly establish this as our current direction within the workspace's blueprints/plans, and then
 immediately proceed into construction" (2026-08-07T18:01:03Z), which is what
-`blueprint/THE_GROWN_CIRCUIT.md` records.
+`archive/blueprints/THE_GROWN_CIRCUIT.md` records.
 
 ---
 
@@ -2203,7 +2203,7 @@ immediately proceed into construction" (2026-08-07T18:01:03Z), which is what
 | "Intelligence does not cost gigawatts" as the governing constraint | §4 | none |
 | Algorithms as parameterized mathematical objects | §4 | none |
 | Methodologies as abstract algorithmic structures | §3 | none |
-| MorphoHDL circuitry analysis; triangular hinge-like simplicial complex | §8 | `blueprint/THE_GROWN_CIRCUIT.md` (contract only, no code) |
+| MorphoHDL circuitry analysis; triangular hinge-like simplicial complex | §8 | `archive/blueprints/THE_GROWN_CIRCUIT.md` (contract only, no code) |
 | "Relativistic calculus of information topology" | §8 | none |
 | Lightning-leader integration; sphere-packing; self-similarity limit | §9 | `research/records/2026-08-07_THE_INTEGRAL_IS_THE_PAIR…` (no code) |
 | Skein relations as the certified-remainder condensation | §11 | none — this is `CLAUDE.md` §11's missing organ |

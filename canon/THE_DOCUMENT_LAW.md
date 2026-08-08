@@ -84,8 +84,8 @@ laws, gate definitions, and completion criteria.
 
 **May not contain:** a truth claim about the world. A blueprint asserts *this will be built and
 graded this way*, never *this is true*. Blueprint files that have been fully built become
-provenance and take the archive banner (§3.3); `blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md` and
-`blueprint/EROS_EMBODIMENT_ROADMAP.md` are in that state and `CLAUDE.md` already calls them
+provenance and take the archive banner (§3.3); `archive/blueprints/COMPLETE_CPP_ENGINE_ROADMAP.md` and
+`archive/blueprints/EROS_EMBODIMENT_ROADMAP.md` are in that state and `CLAUDE.md` already calls them
 provenance.
 
 ### 1.4 Position record — `CONSTRUCTION_STATE.md`
@@ -719,7 +719,7 @@ resolves in the live tree. The remaining rows are unchanged and remain `open`.
 | Record atlas is stale by seven | `research/README.md` claims *"all 307 laboratory research deposits present at extraction on 3 August 2026"*; 314 records tracked, 7 dated after 2026-08-03 | §1.6 |
 | Truth-status grades are nearly unused | 5 of 314 records carry a `**Truth status:**` line; 278 carry a bold band in a laboratory vocabulary with no crosswalk | §5 |
 | ~~Two dead canon links~~ **closed 14:30** | `canon/06_ESTABLISHED_CAPABILITIES.md:12` and `:14` pointed at `../evidence/observations/`, which `06518c3` moved under `archive/cpp-engine/`. Both now carry the archive path | §4 |
-| `README.md` reading order is pre-transition | still names `blueprint/COMPLETE_CPP_ENGINE_ROADMAP.md` — now archive-bannered — as the second thing to read. Its `evidence/observations/` and `provenance/` links were repaired at 14:45; its `formal/` link now resolves, to `soma/formal/` | §1.2 |
+| `README.md` reading order is pre-transition | still names `archive/blueprints/COMPLETE_CPP_ENGINE_ROADMAP.md` — now archive-bannered — as the second thing to read. Its `evidence/observations/` and `provenance/` links were repaired at 14:45; its `formal/` link now resolves, to `soma/formal/` | §1.2 |
 | Observation genre is empty | `observations/` absent; 139 directories, 118 with `RESULTS.md`, sit under `archive/cpp-engine/evidence/observations/` | §1.8 |
 | Ownership ledger absent, lint broken | `HOLONIC_OWNERSHIP.md` absent; `crates/holonic-architecture-lint` names a `BASELINE_PATH` that does not exist at the root and `PROTECTED_ROOTS` under `src/soma/`, so its ratchet covers none of `soma/` | §1.9 |
 | ~~No archive banners~~ **partly closed 14:12** | eleven `blueprint/` files and `archive/cpp-engine/CONSTRUCTION_STATE.md` now carry the §1.10 banner. Still open: no file directly under `archive/cpp-engine/` or `reference/` carries one | §1.10 |

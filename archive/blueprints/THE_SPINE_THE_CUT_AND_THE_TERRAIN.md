@@ -64,14 +64,14 @@ Seven mechanisms. Nothing else is spine. Everything else is either terrain a cur
 ### S1. `exact` — the bit-pure carrier, including the certified enclosure
 
 Limb words, normalized rationals, finite fields, exact polynomials; overflow is a typed refusal or a lineaged promotion; no float may decide a branch, index, coefficient, or any committed bit.
-— `canon/08_CORE_MATHEMATICAL_INSTRUMENTS.md:78-94`; `blueprint/CPP_GPU_FOUNDATION.md:62-80`
+— `canon/08_CORE_MATHEMATICAL_INSTRUMENTS.md:78-94`; `archive/blueprints/CPP_GPU_FOUNDATION.md:62-80`
 
 **Status: BUILT, and the record is out of date.** `CLAUDE.md` §11 says the certified exact enclosure carrier "does not yet exist as a built instrument." It exists: `include/holonics/exact/enclosure.hpp:9-33` defines the enclosure as a **set, never a value** — closed dyadic interval, four typed states `{admitted, aperture_refused, bracket_absent, order_refused}` — over `exact/dyadic.hpp` (205 lines) and `exact/separation.hpp` (109). The first brick is laid. Amend §11.
 
 ### S2. `structure` — the minimum carrier `K=(O,I,D,T)`, Chi, and OPEN
 
 `chi_pair` as the **ordered transport pair**, projections available only after a chart exists; OPEN as a first-class disposition carrying the complete attempted routes; the eight transition invariants.
-— `blueprint/EROS_EMBODIMENT_ROADMAP.md:102-138`
+— `archive/blueprints/EROS_EMBODIMENT_ROADMAP.md:102-138`
 
 **Status: BUILT AND CORRECT** (`structure/chi_pair.hpp`, `structure/disposition.hpp`, `structure/local_transport.hpp`, `structure/transition_invariants.hpp:18-27`). **One defect, in the live spine, reported below as CUT 10.**
 

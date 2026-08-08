@@ -122,7 +122,7 @@ schedule reconstruction.
 - **Consolidated floor — `implemented-exact`.** The present body identity, old-laboratory
   inheritance, capability floor, and unnumbered mathematics-production direction are recorded in
   [`CONSTRUCTION_STATE.md`](../CONSTRUCTION_STATE.md) and
-  [`EROS_MATHEMATICS_PRODUCTION_FLOOR.md`](../blueprint/EROS_MATHEMATICS_PRODUCTION_FLOOR.md).
+  [`archive/blueprints/EROS_MATHEMATICS_PRODUCTION_FLOOR.md`](archive/blueprints/EROS_MATHEMATICS_PRODUCTION_FLOOR.md).
   Numbered construction labels are receipt provenance only.
 
 ## Not yet established
