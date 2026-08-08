@@ -490,6 +490,40 @@ The grading discipline in `canon/EPISTEMIC_GRADES.md` stands. Three additions:
   pairs, each carrying the shortest word that separates them. **A gauge should be required to
   exhibit its distinguishing word.** Absent one, it has not gauged anything.
 
+- **A cost is measured in work, never in elapsed time. A clock may measure; it may never select.**
+  This is the fourth member of the family above and the one with a live instance. Convicted
+  2026-08-08 at `crates/holonic-engine/src/cuda_aperture.rs:818`, where
+  `if authority_nanoseconds < candidate_nanoseconds` — **one unrepeated wall-clock sample per
+  carrier** — permanently selects which of two exact carriers the body conducts through for the rest
+  of its life. Brandon, ruling directly on being shown it: *"A clock timing sample should not be the
+  decider of "carrier admission""*
+
+  The defect is not that timing is noisy. It is that the parity gate three lines above has **already
+  proved the two carriers indistinguishable** under the declared receiver family — so the question
+  has no answer inside that family, and the code resolves it by consulting a coordinate that is not
+  in it and is not even receiver-visible: host contention, which includes whether the card is
+  simultaneously scanning out a desktop. A receiver-visible coordinate promoted into an invariant,
+  §0's fourth lesson, returning consistently because there has only ever been one frame.
+
+  By §13 rule 2's jurisdiction test this is unambiguous: a scalar that **measures** is lawful, a
+  scalar that **governs** is not, and this one selects a carrier and discards the loser.
+
+  The rule, and it is checkable: **admit on the exact work vector, which the receipt already carries
+  as `BigUint` and then discards** — `exact_support_evaluations`, `device_threads`,
+  `intermediate_bits`, `aperture_members` and their siblings, all derived from the material and the
+  declared aperture, all reproducing bit-for-bit on any machine. Admission returns the four-state
+  `ExactOrdering { Less, Equal, Greater, Open }` this body already owns at `exact_value.rs:64`, and
+  **`Open` retains both carriers** rather than tie-breaking on a clock. Nanoseconds stay in the
+  receipt as measurement — lawful under §13 rule 2 — but must carry the **frame** they were taken
+  in, including whether the device had an active display, because a measurement without its frame is
+  the absolute-frame defect §0 names.
+
+  The corollary is why this is worth having: with one timing frame, no timing claim in this
+  repository is falsifiable. Putting the compute card under a display load is not contamination once
+  the frame is declared — it is the **second frame**, and the exact work vector must not move across
+  it. That is the falsifier the cost law currently lacks.
+  [The record](research/records/2026-08-08_THE_CARRIER_IS_ADMITTED_BY_ITS_WORK_NOT_BY_THE_CLOCK_THAT_WATCHED_IT.md).
+
 ## 9. Construction conduct
 
 - **Depth on a question, not breadth in the cabinet.** Constructing the next adjacent mathematical

@@ -1144,6 +1144,61 @@ the loop**. Remains: the update law and its characterization.
 
 ---
 
+#### The carrier is admitted by its work and the clock is demoted to a measurement
+
+**The gap.** `crates/holonic-engine/src/cuda_aperture.rs:818`. `CudaApertureExecutor::admit` fuses
+three roles that are not one role: it checks parity exactly (`:809-816`, correct), it takes one
+wall-clock sample per carrier (`:808`, `:817`), and then it **selects the carrier from the second**
+— `if authority_nanoseconds < candidate_nanoseconds`. `preferred` is stored on the returned
+`AdmittedCudaApertureExecutor` and routes every subsequent trace (`:894`). One unrepeated sample,
+taken on a contended machine, permanently decides what the body conducts through.
+
+The parity gate three lines above has already proved the carriers indistinguishable under the
+declared receiver family, so the admission asks a question with no answer inside that family and
+resolves it from host contention — a coordinate that is not receiver-visible at all. Underneath sits
+a second defect: that parity is a **one-shot** reading, convicted verbatim by
+`receiver_exact_compression.rs:18-19` quoting `canon/01_CAUSAL_CALCULUS.md` — *"equal one-shot output
+is inadequate."*
+
+**What replaces it.** `admit` returns three objects instead of one: `ExactAgreement` (parity,
+unchanged), `CarrierWork` (an exact `BigUint` work vector per carrier), and `CarrierAdmission`
+derived from a **declared cost law** over `CarrierWork`, returning the four-state
+`ExactOrdering { Less, Equal, Greater, Open }` already owned at `exact_value.rs:64`. `Open` retains
+**both** carriers. The work vector needs no new measurement: `CudaApertureReceipt` (`:1017-1050`)
+already carries `exact_support_evaluations`, `device_exact_support_evaluations`,
+`host_exact_support_evaluations`, `device_threads`, `device_output_bytes`, `intermediate_bits` and
+`aperture_members` as `BigUint`, and the admission currently ignores all of them.
+
+The cost law is stated as a **prediction computable before either carrier runs** — host work from
+`aperture_members × selected_primitives`, device work from the device evaluations plus transfer words
+plus the host remainder for primitives over `MAX_DEVICE_INTERMEDIATE_BITS`. Nanoseconds stay in the
+receipt as measurement and gain the frame they were taken in, including whether the device had an
+active display.
+
+**Grade.** The admitted carrier is a function of the material and the declared aperture only, and
+reproduces bit-for-bit across machines and across display-active and headless frames. `Open` is
+reachable on declared material rather than being a dead arm.
+
+**Falsifier.** Two of them, both cheap. Run the admission across the two apertures
+`examples/desktop_receiver.rs` **already builds and never compares** — `640x400` and `640x720` — and
+require the work ratio to move; if the ordering and the ratio are identical across both, the cost law
+is a constant wearing a law's clothes and the admission must return `Open`. Then run the identical
+material in both hardware frames, headless and display-active: the exact work vector must be
+**bytewise identical** across them. If it moves, something machine-visible is still entering the
+carrier decision.
+
+**Laboratory vs remains.** Nothing here is a port. The exact work vector is computed today and
+discarded; the four-state ordering exists today and is not used here; the second aperture exists
+today and is not compared. Remains: the split of the three roles, the declared cost law, the `Open`
+arm, the frame field, and moving `examples/desktop_receiver.rs:2745` — an `assert_eq!` on the outcome
+of the race that **does not currently run**, since Cargo's default `test = false` for examples keeps
+it out of the workspace gate — into a gate, rewritten against the work law.
+
+Complete derivation and boundary:
+`research/records/2026-08-08_THE_CARRIER_IS_ADMITTED_BY_ITS_WORK_NOT_BY_THE_CLOCK_THAT_WATCHED_IT.md`.
+
+---
+
 ### Part four — the wall
 
 `CLAUDE.md` §11: *"The learning wall and the mathematical wall are the same wall, and naming this is
