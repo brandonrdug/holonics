@@ -199,6 +199,10 @@ pub mod skein;
 // Declared, never glob-exported: `ReceiverId`, `Disagreement`, `Partition`, `Cover`, `Observation`
 // and `ItemId` collide across the placement family, and a realizer founded by a substitution must
 // be reached by naming which organ founded it. `blueprint/THE_ASSEMBLY.md` step 2.
+// Surprisal as an exact symbolic form. Reached explicitly, never glob-exported: `Support` and
+// `entropy` say nothing at the crate root about which carrier they belong to, and a caller wanting a
+// number must be made to ask for an enclosure. `canon/THE_RECOVERED_LAW.md` §1 and §3.
+pub mod surprisal;
 pub mod substitution_realizers;
 pub mod supported_realizers;
 pub mod tube;

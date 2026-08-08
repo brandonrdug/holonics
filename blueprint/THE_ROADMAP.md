@@ -1336,6 +1336,184 @@ the departure from tree-ness, and the Rust enclosure verification that precedes 
 
 ---
 
+### Part five — the instruments the consolidation named
+
+**Ratified 2026-08-08**, after a four-collector sweep of the frozen laboratory closed four
+contradictions in the record. Brandon: *"Next must be clearly outlined and planned out so that you
+can proceed autonomously, you can orchestrate or implement directly."* Every movement below states
+what it builds, what it returns, a control that **can fail**, and what it does not claim.
+
+The four are not independent. Each is *"given a truncated or collapsed reading, recover what it
+forgot"* on different material — a series tail, a moving loop's circulation, a far population, a
+numeric face. That is `canon/THE_MATHEMATICS_TABLET.md` §1's one deletion at four carriers.
+
+---
+
+#### The surprisal becomes exact and symbolic, and drives the enclosure carrier
+
+**The gap.** `canon/THE_RECOVERED_LAW.md` §1 ratifies surprisal and cross-entropy as **exact
+instruments** and §3 states that Shannon is a lawful *declared quotient*. Measured 2026-08-08:
+`shannon`, `entropy`, `surprisal`, `cross_entropy`, `kullback`, `log2`, `mutual_information` return
+**zero files** across every library crate and every `soma/` library. The registry carries `H.0410`
+Kolmogorov, `H.0411` entropy with `I(X;Y) = D_KL(p_{X,Y} ‖ p_X p_Y)`, `H.0412` the data-processing
+inequality and `H.0413` source/channel coding — all Typst, all unimplemented. **The only `-log₂` ever
+written in this lineage was a string formatter that never evaluated a logarithm, and it was deleted.**
+
+So the body implements the part Shannon's quotient *forgets* — `receiver_exact_compression`'s
+collapsed-pair population with distinguishing words — and not the quotient. The fiber without the
+base. Nothing can currently say what a quotient **cost**.
+
+**What replaces it.** `crates/holonic-engine/src/surprisal.rs`.
+
+The carrier is not a number. For `p = Π p_i^{−e_i}` with `e_i ∈ ℚ`, surprisal is
+
+```text
+S(p) = Σ_i e_i · log₂ p_i
+```
+
+which is a **ℚ-linear form in the logarithms of primes** — represented exactly as
+`BTreeMap<u64, Rat>`, never evaluated. Three facts make this a carrier rather than a notation:
+
+- **Equality and vanishing are decided EXACTLY, with no enclosure.** If `Σ q_i log₂ p_i = 0` with
+  `q_i ∈ ℚ`, clear denominators to get `Π p_i^{n_i} = 1` with `n_i ∈ ℤ`; unique factorization forces
+  every `n_i = 0`. So `{log₂ p}` is ℚ-linearly independent and the zero test is exact arithmetic.
+  This is elementary — no transcendence theory is invoked or needed.
+- **Ordering two distinct forms is not exact, and must say so.** It returns
+  `exact_value::ExactOrdering { Less, Equal, Greater, Open }`, with enclosures from
+  `relational_geometry::exact_analysis::log_rational_interval`. **`Open` is the honest return** when
+  the intervals overlap. This is what drives the carrier `CLAUDE.md` §11 measures at zero drivers.
+- **Zero support is not `+∞`.** `Q_B(a) = 0` returns a typed `Unsupported`, and §1's law is that the
+  live event **FOUNDs a new relation and changes the support** rather than taking a smoothing
+  constant.
+
+Cross-entropy `H_B(P,Q) = Σ_a P_B(a)·S(Q_B(a))` is a ℚ-linear combination of the same forms.
+
+**Grade.** `implemented-exact`, with the returned artifact being **the symbolic form itself**, printed
+as its prime-exponent vector, not a decimal.
+
+**Declared controls, and they can fail.**
+
+1. **Additivity over a conditional chain.** `S(Π p_k) = Σ S(p_k)` exactly, as forms — the multiplicative
+   chain becoming an additive depth face, with no rounding anywhere.
+2. **Canonicalization.** Two different constructions of one rational return the *same* form.
+3. **Gibbs.** `H(P,Q) ≥ H(P)`, equality iff `P = Q`. **This is the falsifier**: it is a real theorem
+   that a wrong implementation violates, and deciding the inequality exercises the `Open` path.
+4. **The four-state ordering is non-vacuous.** The declared material must produce **both** a definite
+   verdict and an `Open` — otherwise the carrier is decorative and this is `CLAUDE.md` §8's
+   trivial-orbit defect wearing a passing result.
+5. **The FOUND is exhibited.** A zero-support event must be shown *changing the support*, not merely
+   returning `Unsupported`. A law that returns zero proves nothing about itself.
+
+**What it does not claim.** Not a distribution inside the body, not a governor, not a selector. §13
+rule 2: a scalar that measures is lawful, a scalar that governs is not. Nothing here chooses a deed.
+
+**Why first.** It is small, it has never run, it drives an undriven carrier, and it is the only
+instrument that makes **cost** answerable — which the 2026-08-08 Smith finding left open with no
+lawful work vector.
+
+---
+
+#### The material loop carries its circulation
+
+**The gap.** `crates/holonic-engine/src/analytic_field.rs` already refuses construction unless
+`AᵀΩ + ΩA = 0` **and `A·1 = 0`**, then re-certifies `UᵀΩU = Ω ∧ U·1 = 1`. **Incompressibility is a
+typed refusal, not a diagnostic**, and declared circulation covectors must be closed and left-fixed by
+the successor. That is most of Kelvin's circulation theorem, built.
+
+What is missing is the *material* half. The existing probes are **fixed covectors on a fixed
+complex**. Kelvin's theorem is about a loop that **moves with the flow**, and that is the whole
+content: `Γ = ∮ v·dl` around a *material* loop is conserved while the parcels composing it are
+carried.
+
+The laboratory had it — `holo_fluid.rs`, 617 lines, Brandon's own commit 2026-06-25, surviving only
+at `b3d83376` with `MatLoop`, `circulation`, `vorticity_plaquette`, reporting `Γ = 6`, `ζ = 14`, and a
+cross-ratio invariant across `N = 8` and `N = 16`. Brandon's ruling on it, 2026-08-08: *"whatever we
+labeled 'solver' was probably a partial that you can easily lift and supersede."*
+
+**What replaces it.** Parcels carried by the existing exact successor, and a material loop whose
+vertices *are* parcels, with `Γ` read as an exact `Rat` at every step. **Lift the idea, not the file.**
+
+**Grade.** `Γ` conserved **bit-identically** over N steps of the conservative successor, exact over
+`Rat`, with the loop's parcel positions changing at every step.
+
+**Declared controls.**
+
+1. **`Γ` is invariant while the trajectories are not.** Perturb one initial parcel position; show the
+   trajectories diverge and `Γ` stays bit-identical. **This is the artifact** — it is the three-body
+   question the prior solver posed, and it is what makes the invariant worth having.
+2. **The falsifier.** A generator that fails `AᵀΩ + ΩA = 0` must **move** `Γ`. If a non-conservative
+   generator leaves the circulation invariant, the test is vacuous and the receipt is empty.
+3. **Loop closure is checked, not assumed** — a non-closed chain must be refused by name.
+
+**What it does not claim.** Not Navier–Stokes. Not existence or smoothness. Not viscosity. The module
+that hosts it already carries that boundary and it is not to be softened.
+
+---
+
+#### The condensation meets a far population
+
+**The gap.** `crates/holonic-engine/src/skein.rs` implements contextual tangle compression with an
+exhibitable remainder — `ContextVerdict { before, after, remainder }`, naming which grade moved, by
+how much in free rank, and which torsion appeared or vanished. The quote network said *"Nothing
+implements it"* until 2026-08-08; that row was stale and is corrected.
+
+So `CLAUDE.md` §11's certified-remainder condensation **has an owner**. What is open is **scale**:
+`derivation_skein` drives it on 58 classes, and the organ has never run where the population is far
+enough that condensation is *required* rather than incidental — which is §11's own current position.
+
+**What replaces it.** A driver on a genuinely far population, with the spanning-tree interval labelling
+§11 names as the route: on a tree the condensation is free and the remainder empty; every non-tree
+edge forces additional intervals and **that forced population is the certified remainder**, zero
+exactly when the incidence is a forest.
+
+**Grade.** The remainder returned as a counted, exhibitable population on a population large enough
+that enumerating it directly is not the cheaper path.
+
+**Falsifier.** The remainder must be **empty on a forest** and **non-empty exactly in proportion to the
+departure from one**. If a cyclomatic-number-zero incidence returns a non-empty remainder, or a
+strongly cyclic one returns an empty one, the condensation is not certified.
+
+**What it does not claim.** No complete set of local relations, no terminating or confluent normal
+form, no cost improvement. Brittenham–Hermiller's nonadditivity of unknotting number stands as the
+named warning and is carried in the source.
+
+---
+
+#### The collapsed face is reopened
+
+**The gap.** Brandon, 2026-08-08: *"To provide statistics to the machine, including founded floating
+point numbers which are collapsed data points, is to give it partial faces of a larger series
+expansion; it can attempt to found the basis in which the series and the provided face can continue to
+be logically manipulated and iterated upon."*
+
+That operation is **integer relation detection** — given a numeric face and candidate basis elements,
+find exact integers `a_i` with `Σ a_i x_i = 0`. LLL and PSLQ do it exactly over integers. It is how
+the BBP formula for π was **discovered** rather than derived, and it requires the face at high
+precision, which is exactly why the discarded tail matters: **exactness is the precondition for
+reopening.**
+
+**What replaces it.** Exact lattice reduction over `BigInt`, run on faces this body can already
+produce at arbitrary precision — and the material is already here. `soma/life/examples/` opens real
+OLMo safetensors and decodes BF16 to exact dyadics; the 2026-07-21 record measured the complete
+1,484,916,736-word payload as containing only **9,990 distinct codewords**, all finite normal.
+
+**Grade.** A rediscovered identity on material with a known answer, returned as exact integers.
+
+**Declared controls.**
+
+1. **A known identity is recovered** — a Machin-like arctangent relation, or BBP itself.
+2. **The negative control is the grade.** Run it on a face with no relation and require it to return
+   **nothing**. A relation finder that always finds a relation has found nothing, and this is the
+   whole difference between an instrument and a fitting procedure.
+3. **Precision dependence is exhibited**, not assumed: the same search must fail at low precision and
+   succeed at high, on the same face.
+
+**What it does not claim.** Not a proof of any recovered identity — a returned relation is a
+*candidate* with an exact certificate of the lattice computation, not a theorem. Not a decompression
+of a weight file. Not semantic recovery of a foreign model.
+
+---
+
 ## Discipline that governs every movement
 
 - **Grade the implementation, not the receipt** (`CLAUDE.md` §8). A receipt is a claim about code.
