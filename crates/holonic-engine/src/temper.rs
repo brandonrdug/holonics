@@ -1,13 +1,36 @@
 //! The temper — founding and decay as one continuous property of a structure's own twist.
 //!
-//! ## The force this is
+//! ## The force this is, and the half of its source that was struck
 //!
-//! From the laboratory, 2026-07-10, naming what the build was missing:
+//! From the laboratory, 2026-07-10 — **assistant-authored** (`SINGULARITIES.md`), not a Brandon
+//! ruling, and corrected below:
 //!
 //! > *"Fusion is CLOSURE: the stable atom is a closing trigram — a loop whose holonomy closes,
 //! > on-quantum — and a closed coil SELF-SUSTAINS. Decay is THE LEAK OF OPENNESS: an open coil
 //! > leaks by its own openness — **the instability IS the leak — no damping term, no threshold.**
 //! > Neither is a trigger — both are continuous properties of the structure's own twist."*
+//!
+//! **Two of those clauses were prohibited by the laboratory on the same day**, and this module
+//! carried them as founding law until 2026-08-08. The COMMUNE letter
+//! `2026-07-10_sol-to-fable_the-star-is-the-circulation…`:
+//!
+//! > *"Two of its load-bearing sentences are prohibited now: a closed coil **self-sustains**; an
+//! > open coil leaks at its own **pace**. … without supplied stimulus there is no current,
+//! > relating, Θ, or passage of proper time. Standing closure between lights is deposited topology,
+//! > not an active circulation. It cannot feed itself, and openness cannot run an interior decay
+//! > clock. 'Leak by its own openness' can survive only as a boundary response **under infall**,
+//! > never as autonomous decay."*
+//!
+//! **What survives, and what this module actually implements:** *the instability IS the leak — no
+//! damping term, no threshold*, and *neither is a trigger*. Those are the load-bearing clauses and
+//! they are untouched. What is struck is any reading in which a closed structure circulates on its
+//! own or an open one decays on a clock of its own.
+//!
+//! **The code was already lawful and the epigraph was not.** Nothing here runs a clock: `Twist` is
+//! read from a structure's own retained cycles, `leak` is a sum of retained obstruction magnitudes,
+//! and `found_on` is a deposit made by a current that arrived. There is no autonomous decay
+//! anywhere in this file, which is why the defect was in the prose and is repaired there. That is
+//! `CLAUDE.md` §8 rule 1 running backwards — usually the receipt overstates the code.
 //!
 //! and the consequence it named:
 //!
@@ -90,8 +113,11 @@ use crate::running_integral::{ChordObstruction, Cochain, RunningIntegralError, f
 /// this module exists to avoid.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Twist {
-    /// Every cycle closes. The coil self-sustains and may condense: nothing leaks out of it, so
-    /// forgetting its interior loses nothing the outside could have seen.
+    /// Every cycle closes, so the structure may condense: nothing leaks out of it, and forgetting
+    /// its interior loses nothing the outside could have seen.
+    ///
+    /// **Not "self-sustains"** — that reading is struck (see the header). A closed structure is
+    /// deposited topology, not an active circulation; it carries no current until one is supplied.
     ///
     /// `chords_tested` is carried because **a closure over zero chords is vacuous** — a structure
     /// with no cycles closes trivially and proves nothing. Read it before reading the verdict.
