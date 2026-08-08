@@ -39,7 +39,7 @@ soma/    body                         pure law, no_std, zero dependencies
 2026-08-08, summed across **42** `test result:` lines on a tree with nothing else running):
 
 ```
-1184 passed, 0 failed, 14 ignored
+1325 passed, 0 failed, 14 ignored
 ```
 
 **Take the figure by summing the result lines, never by reading one of them and never through a pipe
