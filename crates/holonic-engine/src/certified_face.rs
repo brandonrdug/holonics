@@ -46,6 +46,7 @@
 
 use std::collections::BTreeMap;
 
+use num_bigint::BigInt;
 use num_traits::{Signed, Zero};
 use relational_geometry::{Rat, format_rat, integer};
 use serde::{Deserialize, Serialize};
@@ -201,39 +202,121 @@ pub enum FaceError {
     Exact(#[from] ExactValueError),
 }
 
+/// Divide `polynomial` by the exact linear factor of the rational root `point`, repeatedly.
+///
+/// A root at a rational point is *exactly known*, so it is deflated away rather than treated as an
+/// impediment. For `point = n/d` in lowest terms, `(d·x − n)` divides the polynomial exactly, and
+/// the synthetic division below is integer arithmetic throughout: the rational root theorem
+/// guarantees every quotient in the recurrence is integral, so no remainder is ever discarded. The
+/// loop repeats to strip a repeated root down to its last copy.
+///
+/// This is what lets a cell boundary sit exactly on a root without the count becoming unavailable.
+/// The alternative — nudging the boundary until the Sturm count applies — is the
+/// magic-number-and-retry defect `AGENTS.md` forbids.
+fn deflate_at(polynomial: &IntegerPolynomial, point: &Rat) -> IntegerPolynomial {
+    let mut current = polynomial.clone();
+    while current.degree() > 0 && current.evaluate(point).is_zero() {
+        let numerator = point.numer().clone();
+        let denominator = point.denom().clone();
+        // Ascending coefficients, as `IntegerPolynomial::evaluate` reads them.
+        let ascending = current.coefficients.clone();
+        let degree = ascending.len() - 1;
+        let mut quotient_descending: Vec<BigInt> = Vec::with_capacity(degree);
+        // Descending recurrence: A_m = d·B_{m-1}; A_j = d·B_{j-1} − n·B_j.
+        let mut carry = &ascending[degree] / &denominator;
+        quotient_descending.push(carry.clone());
+        for index in (1..degree).rev() {
+            let next = (&ascending[index] + &numerator * &carry) / &denominator;
+            quotient_descending.push(next.clone());
+            carry = next;
+        }
+        let mut quotient: Vec<BigInt> = quotient_descending.into_iter().rev().collect();
+        if quotient.is_empty() {
+            quotient.push(BigInt::from(1));
+        }
+        match IntegerPolynomial::new(quotient) {
+            Ok(next) => current = next,
+            Err(_) => break,
+        }
+    }
+    current
+}
+
+/// Distinct roots in the closed interval `[lower, upper]`, returned with the exactly rational
+/// endpoint roots separated out.
+///
+/// Returns `(endpoint_roots, interior_count, deflated)`. The deflated polynomial has no root at
+/// either endpoint, so `distinct_root_count` applies to it without refusal.
+fn closed_interval_census(
+    polynomial: &IntegerPolynomial,
+    lower: &Rat,
+    upper: &Rat,
+) -> (Vec<Rat>, u32, IntegerPolynomial) {
+    let mut endpoint_roots = Vec::new();
+    let mut working = polynomial.clone();
+    if working.evaluate(lower).is_zero() {
+        endpoint_roots.push(lower.clone());
+        working = deflate_at(&working, lower);
+    }
+    if working.evaluate(upper).is_zero() {
+        endpoint_roots.push(upper.clone());
+        working = deflate_at(&working, upper);
+    }
+    let interior = if working.degree() == 0 {
+        0
+    } else {
+        match ExactInterval::new(lower.clone(), upper.clone()) {
+            Ok(interval) => working.distinct_root_count(&interval).unwrap_or(0),
+            Err(_) => 0,
+        }
+    };
+    (endpoint_roots, interior, working)
+}
+
 /// Certify the feature population of `polynomial` over `window`, and return the face.
 ///
 /// The whole-window count is taken first, so the face can audit itself: whatever subdivision does,
-/// located features plus unresolved features must equal the number the Sturm sequence promised at
-/// the outset. That check is not a formality -- it is what makes a lost feature a test failure
-/// rather than a slightly emptier picture.
+/// located features plus unresolved features must equal the number certified at the outset. That
+/// check is not a formality -- it is what makes a lost feature a test failure rather than a
+/// slightly emptier picture.
 pub fn certify_face(
     polynomial: &IntegerPolynomial,
     window: &ReceiverWindow,
 ) -> Result<CertifiedFace, FaceError> {
-    let whole = ExactInterval::new(window.lower.clone(), window.upper.clone())?;
-    let certified_feature_count = match polynomial.distinct_root_count(&whole) {
-        Ok(count) => count,
-        // A root exactly at a window endpoint is a real fact about the object, not a reason to
-        // move the window. The whole-window count is unavailable, so the face reports that and
-        // the per-cell law still runs.
-        Err(ExactValueError::RootAtIntervalBoundary) => {
-            return Ok(boundary_refused_face(polynomial, window));
-        }
-        Err(error) => return Err(FaceError::Exact(error)),
-    };
+    // Guard the window shape through the exact carrier before any counting.
+    let _ = ExactInterval::new(window.lower.clone(), window.upper.clone())?;
+    let (window_endpoint_roots, window_interior, _) =
+        closed_interval_census(polynomial, &window.lower, &window.upper);
+    let certified_feature_count =
+        u32::try_from(window_endpoint_roots.len()).unwrap_or(0) + window_interior;
 
     let mut features = Vec::new();
     let mut obstructions = Vec::new();
     let width = window.width();
     let cells = Rat::from_integer(window.initial_cells.into());
+    let step = &width / &cells;
+
+    // Every cell boundary is inspected exactly once, so a root sitting on a shared boundary is
+    // located once rather than claimed by both neighbouring cells.
+    for index in 0..=window.initial_cells {
+        let boundary = &window.lower + &step * Rat::from_integer(index.into());
+        if polynomial.evaluate(&boundary).is_zero() {
+            features.push(LocatedFeature {
+                interval: ExactInterval::point(boundary),
+                variations_at_lower: 0,
+                variations_at_upper: 0,
+            });
+        }
+    }
 
     for index in 0..window.initial_cells {
-        let step = &width / &cells;
         let lower = &window.lower + &step * Rat::from_integer(index.into());
         let upper = &window.lower + &step * Rat::from_integer((index + 1).into());
+        // Deflating at both ends leaves a polynomial whose roots in this cell are strictly
+        // interior; the boundary roots were already located above.
+        let (_, _, interior_polynomial) = closed_interval_census(polynomial, &lower, &upper);
         resolve_cell(
-            polynomial,
+            &interior_polynomial,
             &lower,
             &upper,
             window.subdivision_bound,
@@ -255,6 +338,9 @@ pub fn certify_face(
 }
 
 /// The per-cell law. Count exactly; recurse only with the count as the certificate.
+///
+/// `polynomial` here is already deflated at the cell's own endpoints, so every root it still
+/// carries inside the cell is strictly interior.
 fn resolve_cell(
     polynomial: &IntegerPolynomial,
     lower: &Rat,
@@ -263,22 +349,16 @@ fn resolve_cell(
     features: &mut Vec<LocatedFeature>,
     obstructions: &mut Vec<CellObstruction>,
 ) {
+    if polynomial.degree() == 0 {
+        return;
+    }
     let interval = match ExactInterval::new(lower.clone(), upper.clone()) {
         Ok(interval) => interval,
         Err(_) => return,
     };
 
-    let count = match polynomial.distinct_root_count(&interval) {
-        Ok(count) => count,
-        Err(ExactValueError::RootAtIntervalBoundary) => {
-            obstructions.push(CellObstruction {
-                interval,
-                unresolved_feature_count: 1,
-                reason: ObstructionReason::RootAtCellBoundary,
-            });
-            return;
-        }
-        Err(_) => return,
+    let Ok(count) = polynomial.distinct_root_count(&interval) else {
+        return;
     };
 
     if count == 0 {
@@ -308,8 +388,19 @@ fn resolve_cell(
     }
 
     let midpoint = (lower + upper) / integer(2);
+    // The midpoint may itself be an exact rational root. Locate it once and deflate, so neither
+    // half claims it and the population still reconciles.
+    let mut working = polynomial.clone();
+    if working.evaluate(&midpoint).is_zero() {
+        features.push(LocatedFeature {
+            interval: ExactInterval::point(midpoint.clone()),
+            variations_at_lower: 0,
+            variations_at_upper: 0,
+        });
+        working = deflate_at(&working, &midpoint);
+    }
     resolve_cell(
-        polynomial,
+        &working,
         lower,
         &midpoint,
         remaining_subdivisions - 1,
@@ -317,7 +408,7 @@ fn resolve_cell(
         obstructions,
     );
     resolve_cell(
-        polynomial,
+        &working,
         &midpoint,
         upper,
         remaining_subdivisions - 1,
@@ -350,25 +441,6 @@ fn exact_stations(polynomial: &IntegerPolynomial, window: &ReceiverWindow) -> Ve
             ExactStation { abscissa, ordinate }
         })
         .collect()
-}
-
-fn boundary_refused_face(
-    polynomial: &IntegerPolynomial,
-    window: &ReceiverWindow,
-) -> CertifiedFace {
-    CertifiedFace {
-        schema: "holonic-engine.certified-face.v1".to_string(),
-        window: window.clone(),
-        stations: exact_stations(polynomial, window),
-        features: Vec::new(),
-        obstructions: vec![CellObstruction {
-            interval: ExactInterval::new(window.lower.clone(), window.upper.clone())
-                .expect("the window was validated on construction"),
-            unresolved_feature_count: 1,
-            reason: ObstructionReason::RootAtCellBoundary,
-        }],
-        certified_feature_count: 1,
-    }
 }
 
 /// Sign changes across consecutive stations.
@@ -642,22 +714,96 @@ mod tests {
     }
 
     #[test]
-    fn a_root_at_the_window_boundary_is_reported_not_nudged() {
-        // x^2 - 1 has a root at each endpoint of [-1,1]. Moving the window to make the count work
-        // would be the magic-number-and-retry defect; the organ reports instead.
+    fn a_root_exactly_on_the_window_boundary_is_located_not_obstructed() {
+        // x^2 - 1 has a root at each endpoint of [-1,1]. A rational root is EXACTLY known, so
+        // deflating it away and locating it is the correct reading; calling it unresolved would
+        // be the organ declaring ignorance of something it can name exactly. Nudging the window
+        // until the Sturm count applies would be the magic-number-and-retry defect instead.
+        //
+        // This control exists because the first implementation got it wrong in both directions at
+        // once: it obstructed on the boundary AND double-counted the root across the two adjacent
+        // cells, which `population_reconciles` caught.
         let polynomial =
             IntegerPolynomial::new(vec![BigInt::from(-1), BigInt::from(0), BigInt::from(1)])
                 .expect("degree two");
         let window = ReceiverWindow::new(integer(-1), integer(1), 4, 4).expect("window");
         let face = certify_face(&polynomial, &window).expect("face");
+        assert_eq!(face.certified_feature_count, 2, "both roots are counted");
+        assert_eq!(face.features.len(), 2, "and both are located exactly");
         assert!(
-            !face.obstructions.is_empty(),
-            "a boundary root must be returned as an obstruction"
+            face.obstructions.is_empty(),
+            "an exactly known rational root is not an obstruction: {:?}",
+            face.obstructions
         );
+        assert!(face.population_reconciles());
+        // Each located root is a degenerate interval carrying the exact rational.
+        let located: Vec<Rat> = face
+            .features
+            .iter()
+            .map(|feature| feature.interval.lower.clone())
+            .collect();
+        assert!(located.contains(&integer(-1)) && located.contains(&integer(1)));
+    }
+
+    #[test]
+    fn a_root_on_an_interior_cell_boundary_is_counted_exactly_once() {
+        // The double-count this organ's first implementation had. x^2 - 4 over [-4,4] cut into 4
+        // cells puts roots at -2 and +2 exactly on interior cell boundaries.
+        let polynomial =
+            IntegerPolynomial::new(vec![BigInt::from(-4), BigInt::from(0), BigInt::from(1)])
+                .expect("degree two");
+        let window = ReceiverWindow::new(integer(-4), integer(4), 4, 6).expect("window");
+        let face = certify_face(&polynomial, &window).expect("face");
+        assert_eq!(face.certified_feature_count, 2);
         assert_eq!(
-            face.obstructions[0].reason,
-            ObstructionReason::RootAtCellBoundary
+            face.features.len(),
+            2,
+            "a shared cell boundary claimed the root twice"
         );
+        assert!(face.population_reconciles());
+    }
+
+    #[test]
+    fn exact_deflation_divides_without_remainder() {
+        // The deflation is integer synthetic division and must be exact. Deflating a known root
+        // has to return a polynomial that still vanishes at the OTHER roots and no longer at the
+        // deflated one.
+        let cubic = cubic_three_roots();
+        let deflated = deflate_at(&cubic, &integer(2));
+        assert!(
+            !deflated.evaluate(&integer(2)).is_zero(),
+            "the deflated root survived"
+        );
+        assert!(
+            deflated.evaluate(&integer(1)).is_zero() && deflated.evaluate(&integer(3)).is_zero(),
+            "deflation destroyed the other roots"
+        );
+        assert_eq!(deflated.degree(), 2, "degree must drop by exactly one");
+    }
+
+    #[test]
+    fn deflation_strips_a_repeated_root_completely() {
+        // (x-1)^3: the loop must remove every copy, leaving a polynomial with no root at 1.
+        let cubed = IntegerPolynomial::new(vec![
+            BigInt::from(-1),
+            BigInt::from(3),
+            BigInt::from(-3),
+            BigInt::from(1),
+        ])
+        .expect("degree three");
+        let deflated = deflate_at(&cubed, &integer(1));
+        assert!(!deflated.evaluate(&integer(1)).is_zero());
+        assert_eq!(deflated.degree(), 0, "all three copies were stripped");
+    }
+
+    #[test]
+    fn deflation_is_exact_at_a_non_integer_rational_root() {
+        // 2x - 1 has the root 1/2. Synthetic division by (d·x − n) must stay integral.
+        let linear =
+            IntegerPolynomial::new(vec![BigInt::from(-1), BigInt::from(2)]).expect("degree one");
+        assert!(linear.evaluate(&rat(1, 2)).is_zero());
+        let deflated = deflate_at(&linear, &rat(1, 2));
+        assert_eq!(deflated.degree(), 0);
     }
 
     #[test]

@@ -187,14 +187,29 @@ pub fn place(face: &CertifiedFace, chart: &CanvasChart) -> Vec<PlacedMark> {
             source_ordinate: format_rat(&station.ordinate),
         });
     }
+    // A root sits at ordinate zero, but zero need not be inside the face's own ordinate range --
+    // for a curve that never approaches the axis in this window, placing a feature at `place_y(0)`
+    // throws the mark far off the canvas. The axis is therefore placed at the range's own zero
+    // when zero is in range, and clamped to the nearer edge when it is not. The clamp is a CHART
+    // decision, exact and recorded: the mark's exact source value is unchanged by it.
+    let zero = Rat::from_integer(0.into());
+    let axis = if low <= zero && zero <= high {
+        place_y(&zero)
+    } else if zero < low {
+        place_y(&low)
+    } else {
+        place_y(&high)
+    };
+
     for feature in &face.features {
         // A feature is an interval, and its midpoint is a chart convenience, not a claim that the
         // root is there. The exact isolating interval travels with the mark.
-        let midpoint = (&feature.interval.lower + &feature.interval.upper) / Rat::from_integer(2.into());
+        let midpoint =
+            (&feature.interval.lower + &feature.interval.upper) / Rat::from_integer(2.into());
         marks.push(PlacedMark {
             role: "feature".to_string(),
             x: place_x(&midpoint),
-            y: place_y(&Rat::from_integer(0.into())),
+            y: axis.clone(),
             source_abscissa: format!(
                 "[{},{}]",
                 format_rat(&feature.interval.lower),
@@ -204,12 +219,12 @@ pub fn place(face: &CertifiedFace, chart: &CanvasChart) -> Vec<PlacedMark> {
         });
     }
     for obstruction in &face.obstructions {
-        let midpoint =
-            (&obstruction.interval.lower + &obstruction.interval.upper) / Rat::from_integer(2.into());
+        let midpoint = (&obstruction.interval.lower + &obstruction.interval.upper)
+            / Rat::from_integer(2.into());
         marks.push(PlacedMark {
             role: "obstruction".to_string(),
             x: place_x(&midpoint),
-            y: place_y(&Rat::from_integer(0.into())),
+            y: axis.clone(),
             source_abscissa: format!(
                 "[{},{}]",
                 format_rat(&obstruction.interval.lower),
@@ -294,22 +309,41 @@ pub fn render(face: &CertifiedFace, chart: &CanvasChart, gauge: &DisplayGauge) -
     out
 }
 
-/// The emitted document with every gauge-supplied string removed.
+/// The emitted document with every gauge-supplied value neutralised, and nothing else touched.
 ///
 /// This is the falsifier's instrument. Two renders of one face under different gauges must return
 /// byte-identical structure from this function; if they do not, colour has become a carrier of a
 /// distinction and the receiver-face law is violated.
-pub fn structural_residue(document: &str, gauge: &DisplayGauge) -> String {
-    let mut residue = document.to_string();
-    for supplied in [
-        &gauge.ground,
-        &gauge.curve,
-        &gauge.feature,
-        &gauge.obstruction,
-        &gauge.rule,
-        &gauge.name,
-    ] {
-        residue = residue.replace(supplied.as_str(), "");
+///
+/// Erasure is confined to the two attributes the gauge actually writes — `fill="…"`,
+/// `stroke="…"` — plus the `data-gauge` label. An earlier form erased the gauge's *strings*
+/// wherever they occurred, which also deleted the word "declared" from the prose in `<metadata>`
+/// and reported a structural difference that did not exist. The lesson is the one the record
+/// states: an instrument that erases more than the gauge cannot testify about the gauge.
+pub fn structural_residue(document: &str, _gauge: &DisplayGauge) -> String {
+    let mut residue = String::with_capacity(document.len());
+    let mut rest = document;
+    // Replace the value inside each gauge-written attribute with a fixed token, leaving every
+    // other byte — coordinates, roles, exact source values, prose — untouched. The EARLIEST
+    // occurrence is taken each pass so the document is walked in positional order regardless of
+    // which attribute comes first.
+    while !rest.is_empty() {
+        let next = ["fill=\"", "stroke=\"", "data-gauge=\""]
+            .into_iter()
+            .filter_map(|attribute| rest.find(attribute).map(|start| (start, attribute)))
+            .min_by_key(|(start, _)| *start);
+        let Some((start, attribute)) = next else {
+            residue.push_str(rest);
+            break;
+        };
+        let value_start = start + attribute.len();
+        let Some(length) = rest[value_start..].find('"') else {
+            residue.push_str(rest);
+            break;
+        };
+        residue.push_str(&rest[..value_start]);
+        residue.push_str("GAUGE");
+        rest = &rest[value_start + length..];
     }
     residue
 }
@@ -468,25 +502,87 @@ mod tests {
         );
     }
 
+    /// Every placed coordinate must lie on the declared canvas — checked across faces that carry
+    /// features, obstructions, and neither.
+    ///
+    /// The first version of this control used one fixture whose ordinate range happened to contain
+    /// zero, so it could not fail. Direct inspection of an emitted artifact found an obstruction
+    /// mark at `cy="323999724"`: features are placed at ordinate zero, and zero is not in every
+    /// face's range. A control that passes because its fixture cannot exercise the law proves
+    /// nothing about the law (`CLAUDE.md` §8), so the fixtures below deliberately include a face
+    /// whose range excludes zero.
     #[test]
     fn every_placed_coordinate_lies_within_the_declared_canvas() {
-        let face = sample_face();
         let chart = CanvasChart::new(640, 400, 40);
-        let marks = place(&face, &chart);
         let width = Rat::from_integer(chart.width.into());
         let height = Rat::from_integer(chart.height.into());
-        for mark in &marks {
-            assert!(
-                mark.x >= Rat::from_integer(0.into()) && mark.x <= width,
-                "a mark left the canvas horizontally: {}",
-                format_rat(&mark.x)
-            );
-            assert!(
-                mark.y >= Rat::from_integer(0.into()) && mark.y <= height,
-                "a mark left the canvas vertically: {}",
-                format_rat(&mark.y)
-            );
+
+        // The obstruction fixture: two roots in one cell, and stations far from the axis.
+        let narrow = IntegerPolynomial::new(vec![
+            BigInt::from(-1),
+            BigInt::from(0),
+            BigInt::from(1_000_000),
+        ])
+        .expect("degree two");
+        // x^2 + 1 over [2,3]: strictly positive, so zero is BELOW the whole ordinate range.
+        let positive =
+            IntegerPolynomial::new(vec![BigInt::from(1), BigInt::from(0), BigInt::from(1)])
+                .expect("degree two");
+        // -(x^2) - 1 over [2,3]: strictly negative, so zero is ABOVE the whole range.
+        let negative =
+            IntegerPolynomial::new(vec![BigInt::from(-1), BigInt::from(0), BigInt::from(-1)])
+                .expect("degree two");
+
+        let faces = vec![
+            ("sample", sample_face()),
+            (
+                "obstruction",
+                certify_face(
+                    &narrow,
+                    &ReceiverWindow::new(integer(-1), integer(1), 1, 0).expect("window"),
+                )
+                .expect("face"),
+            ),
+            (
+                "zero below range",
+                certify_face(
+                    &positive,
+                    &ReceiverWindow::new(integer(2), integer(3), 6, 4).expect("window"),
+                )
+                .expect("face"),
+            ),
+            (
+                "zero above range",
+                certify_face(
+                    &negative,
+                    &ReceiverWindow::new(integer(2), integer(3), 6, 4).expect("window"),
+                )
+                .expect("face"),
+            ),
+        ];
+
+        let mut saw_obstruction = false;
+        for (name, face) in &faces {
+            saw_obstruction |= !face.obstructions.is_empty();
+            for mark in place(face, &chart) {
+                assert!(
+                    mark.x >= Rat::from_integer(0.into()) && mark.x <= width,
+                    "{name}: a {} mark left the canvas horizontally: {}",
+                    mark.role,
+                    format_rat(&mark.x)
+                );
+                assert!(
+                    mark.y >= Rat::from_integer(0.into()) && mark.y <= height,
+                    "{name}: a {} mark left the canvas vertically: {}",
+                    mark.role,
+                    format_rat(&mark.y)
+                );
+            }
         }
+        assert!(
+            saw_obstruction,
+            "the fixtures must include an obstruction mark or this control cannot fail"
+        );
     }
 
     #[test]

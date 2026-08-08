@@ -68,6 +68,7 @@ pub mod causal;
 pub mod causal_body;
 pub mod causal_state_grammar;
 pub mod causal_reflection;
+pub mod codec_recovery;
 pub mod causal_traversal;
 // Reached explicitly rather than glob-exported: a presentation face is a declared apparatus
 // membrane, and flattening it into the crate root would let a caller reach a display type without
