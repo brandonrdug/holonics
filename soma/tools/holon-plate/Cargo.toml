@@ -1,0 +1,30 @@
+[package]
+name = "holon-plate"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+# The plate is a container and a mouth, not a codec. Every octet it holds is
+# produced by a form codec that already exists in this body, so the dependency
+# list is exactly: the two codecs whose schemas it holds, and the deposit
+# ledger whose SHA-256 it reuses.
+#
+# `soma-standing-deposit` carries its own written-out, three-way cross-checked
+# SHA-256 for the reason its README gives -- a registry that verified deposits
+# through a crate it did not itself verify would have moved the trust rather
+# than established it. The plate inherits that verification rather than adding
+# a second hash dependency beside it.
+[dependencies]
+soma-standing-deposit = { path = "../standing-deposit" }
+soma-membrane = { path = "../../membrane" }
+soma-abi = { path = "../../abi" }
+body = { path = "../../body" }
+life = { path = "../../life" }
+
+[lib]
+name = "holon_plate"
+path = "src/lib.rs"
+
+[[bin]]
+name = "holon-plate"
+path = "src/main.rs"
