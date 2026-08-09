@@ -88,6 +88,11 @@ pub mod communication;
 // `receiver_exact_compression` and collide at the crate root with `relational_geometry::ReceiverId`
 // and with `graph_receiver`'s own vocabulary. `blueprint/THE_ASSEMBLY.md`, "what must not be built".
 pub mod complex_system;
+// Coherence is collocation over time: two things relate iff presented together within one source.
+// The ratified law `reference/holobrochos-a07ff376/src/soma/FORMULA.md:298` and its referent law at
+// `:1278`, which had no implementation in either tree until this module. Declared, never
+// glob-exported: `Presentation` collides with the `presentation` family at the crate root.
+pub mod collocation;
 // The conditioning, the production it makes possible, and that production read back as a circuit,
 // on one carrier with a map from every cell to the passage that founded it. Declared, never
 // glob-exported: `ItemId`, `ReceiverId` and `Observation` reach it from
@@ -108,6 +113,13 @@ pub mod cuda_relation;
 pub mod device;
 pub mod diffusion;
 pub mod derivation_atlas;
+// The deposited derivation circuit conducted as an exact population current: `receiver_current`'s
+// transport law pointed at the atlas's own 0-cells and 1-cells, so that an atom recruited by ninety
+// derivations separates from one recruited by two through a dilated passage delay rather than
+// through a score. Declared, never glob-exported: it names `CapacityLaw`, `named_lines`,
+// `one_result_star` and `read`, and all four say nothing at the crate root about which carrier they
+// belong to.
+pub mod derivation_capacitance;
 // The derivation's layout read as a hinge incidence, realized as a closed oriented surface the
 // curvature bridge can read, and the write-back that spends the returned curvature back into
 // `local_star`'s own geometry. Declared, never glob-exported: it names `realize`, `flow` and

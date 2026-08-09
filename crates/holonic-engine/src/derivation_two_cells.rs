@@ -45,19 +45,52 @@
 //! that population by name, because a pair whose elaborations agree and whose vertices touch no
 //! common symbol closes no loop for a 2-cell to fill.
 //!
-//! ## Two declared criteria, because one of them is vacuous on this material
+//! ## The declared criteria: two shapes of agreement, two of crossing, in three directions
 //!
-//! [`AgreementCriterion::Exact`] asks that the two meanings be the same population at the same
-//! depths. [`AgreementCriterion::OnOverlap`] asks only that they agree **where they meet** — every
-//! constituent in both enters at the same depth, and the cycles they share are the same. The second
-//! is the sheaf condition: local sections agreeing on overlaps.
+//! [`AgreementShape::Exact`] asks that the two meanings be the same population at the same depths.
+//! [`AgreementShape::OnOverlap`] asks only that they agree **where they meet** — every constituent in
+//! both enters at the same depth, and the cycles they share are the same. The second is the sheaf
+//! condition: local sections agreeing on overlaps.
 //!
-//! Both are run and both are reported. `CLAUDE.md` §8: *a check whose material cannot vary the
-//! property under test is the same defect as a check that cannot fail.* On the deposited material
-//! `Exact` fills nothing — every pair of declarations differs by at least one recruited symbol — and
-//! that is reported as a vacuity of the criterion rather than repaired by loosening it. `OnOverlap`
-//! separates the population, and the two criteria disagreeing on the same pairs is what makes this a
-//! gauge with a non-trivial orbit rather than one reading wearing two names.
+//! **Both of those are agreements of the whole, and the crossing is not.** Two meanings'
+//! *intersection* — the constituents both carry, at which depth each side entered, and the passages
+//! that brought it on each side — is a richer object than a verdict on the whole, and it is the
+//! **crossing** ([`Crossing`]). A pair may disagree on the whole and still cross at a named
+//! constituent, and that crossing is a face. So:
+//!
+//! - [`AgreementShape::Crossing`] — some constituent stands in both at **one** depth.
+//! - [`AgreementShape::ConstructedCrossing`] — some constituent stands in both at one depth **two or
+//!   more steps out**, so the meeting is one neither side named directly. The crossing is *built*.
+//!
+//! **The square a crossing founds asserts a meeting, not an identity**, and that is the whole
+//! difference. `β₁` under a crossing criterion counts the routes that do not even meet; `β₁` under an
+//! agreement criterion counts the routes that are not the same proof. They are different quantities
+//! and this module reports them separately rather than reconciling them. In particular a crossing
+//! criterion **does not consult** [`ElaborationDisagreement::contains_other_root`]: a proof built out
+//! of another proof is not that proof, and it does meet it.
+//!
+//! ### And the crossing runs in both directions, because a meaning has two halves
+//!
+//! `crate::name_elaboration` returns a name's meaning as a **pair**: the antecedent closure (what it
+//! is built from) and the consequent closure (what it reaches). Two routes that agree on antecedents
+//! may disagree on consequents and the reverse, so [`MeaningDirection`] is the third axis and
+//! [`AgreementCriterion::EVERY`] is the full grid. `RouteFilling::pairs` carries **every** verdict for
+//! **every** pair, so the four combinations of (antecedents agree) × (consequents agree) can be read
+//! off a single reading without re-running it, and nothing here picks a preferred criterion.
+//!
+//! **One exclusion is declared and it is the exact dual of the root exclusion.** Two routes compared
+//! at a statement reach that statement *by hypothesis*, so letting the shared `|- S` count as a
+//! shared consequent would make consequent-crossing true for every pair the reading ever examines —
+//! a check that cannot fail. The statement the pair is compared at is set aside exactly as the two
+//! roots are, and both are named in [`ElaborationDisagreement::hypothesis`] rather than dropped
+//! silently.
+//!
+//! Every criterion is run and every one is reported. `CLAUDE.md` §8: *a check whose material cannot
+//! vary the property under test is the same defect as a check that cannot fail.* On the deposited
+//! material `Exact` fills nothing — every pair of declarations differs by at least one recruited
+//! symbol — and that is reported as a vacuity of the criterion rather than repaired by loosening it.
+//! `OnOverlap` separates the population, and the criteria disagreeing on the same pairs is what makes
+//! this a gauge with a non-trivial orbit rather than one reading wearing several names.
 //!
 //! ## Higher overlaps
 //!
@@ -136,31 +169,256 @@ use crate::derivation_atlas::{
     found_circuit, CircuitAperture, Derivation, DerivationAtlasRefusal, DerivationCircuit,
     SpanningForestReading, StatementIncidence,
 };
+use crate::derivation_atlas::statement_vertex_key;
 use crate::name_elaboration::{
-    Elaboration, ElaborationAperture, ElaborationDeposit, ElaborationRefusal, RetainedCycle,
+    ConsequentClosure, Elaboration, ElaborationAperture, ElaborationDeposit, ElaborationRefusal,
+    NameMeaning, RetainedCycle, STATEMENT_KEY_PREFIX,
 };
 use crate::rebase_invariants::{rebase_invariants, PivotRule, RebaseInvariants};
 
-/// When two elaborated meanings count as one meaning.
+/// Which half of a meaning a criterion reads. A comparison or a [`Crossing`] never carries
+/// [`Self::Both`]; only a criterion does.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
-pub enum AgreementCriterion {
+pub enum MeaningDirection {
+    /// What the name is built **from**: `crate::name_elaboration::Elaboration`.
+    Antecedent,
+    /// What the name **reaches**: `crate::name_elaboration::ConsequentClosure`.
+    Consequent,
+    /// Both halves must return the same verdict. Not the same as either.
+    Both,
+}
+
+impl MeaningDirection {
+    pub const DECLARED: [Self; 3] = [Self::Antecedent, Self::Consequent, Self::Both];
+
+    pub const fn name(&self) -> &'static str {
+        match self {
+            Self::Antecedent => "antecedent",
+            Self::Consequent => "consequent",
+            Self::Both => "both",
+        }
+    }
+}
+
+/// What a criterion asks of two meanings. Two are agreements of the whole; two are crossings.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum AgreementShape {
     /// The same constituents at the same depths, and the same retained cycles. An equality, and
     /// therefore transitive.
     Exact,
     /// Agreement **where the two meet**: every shared constituent enters at the same depth and every
     /// shared cycle is the same cycle. The sheaf condition, and **not** transitive.
     OnOverlap,
+    /// **Some** constituent stands in both at one depth. The intersection, not the agreement: a pair
+    /// that disagrees on the whole may still cross. Does not consult `contains_other_root`.
+    Crossing,
+    /// The same, restricted to a meeting **two or more steps out**, so it is one neither side named
+    /// directly. The crossing is built rather than read off.
+    ConstructedCrossing,
 }
 
-impl AgreementCriterion {
-    pub const DECLARED: [Self; 2] = [Self::Exact, Self::OnOverlap];
+impl AgreementShape {
+    pub const DECLARED: [Self; 4] = [
+        Self::Exact,
+        Self::OnOverlap,
+        Self::Crossing,
+        Self::ConstructedCrossing,
+    ];
 
     pub const fn name(&self) -> &'static str {
         match self {
             Self::Exact => "exact",
             Self::OnOverlap => "on-overlap",
+            Self::Crossing => "crossing",
+            Self::ConstructedCrossing => "constructed-crossing",
         }
+    }
+
+    /// Whether this shape reads the whole population or only the intersection.
+    pub const fn is_crossing(&self) -> bool {
+        matches!(self, Self::Crossing | Self::ConstructedCrossing)
+    }
+}
+
+/// When two elaborated meanings count as one meaning, or as meeting.
+///
+/// A direction and a shape. The two original members keep their names and their meaning:
+/// [`Self::Exact`] and [`Self::OnOverlap`] are the antecedent whole-agreement criteria and
+/// [`Self::DECLARED`] is still exactly that pair, so a reading founded before the consequent half
+/// existed returns what it returned. [`Self::EVERY`] is the full grid.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum AgreementCriterion {
+    Exact,
+    OnOverlap,
+    Crossing,
+    ConstructedCrossing,
+    ConsequentExact,
+    ConsequentOnOverlap,
+    ConsequentCrossing,
+    ConsequentConstructedCrossing,
+    BothExact,
+    BothOnOverlap,
+    BothCrossing,
+    BothConstructedCrossing,
+}
+
+impl AgreementCriterion {
+    /// The two whole-agreement criteria on antecedents. Unchanged since this module was founded.
+    pub const DECLARED: [Self; 2] = [Self::Exact, Self::OnOverlap];
+
+    /// **Every declared criterion**: four shapes in three directions. Nothing here is preferred and
+    /// nothing is a default; a reading declares which one it ran and `RouteFilling::pairs` carries
+    /// the verdict of all twelve for every pair it examined.
+    pub const EVERY: [Self; 12] = [
+        Self::Exact,
+        Self::OnOverlap,
+        Self::Crossing,
+        Self::ConstructedCrossing,
+        Self::ConsequentExact,
+        Self::ConsequentOnOverlap,
+        Self::ConsequentCrossing,
+        Self::ConsequentConstructedCrossing,
+        Self::BothExact,
+        Self::BothOnOverlap,
+        Self::BothCrossing,
+        Self::BothConstructedCrossing,
+    ];
+
+    pub const fn of(direction: MeaningDirection, shape: AgreementShape) -> Self {
+        match (direction, shape) {
+            (MeaningDirection::Antecedent, AgreementShape::Exact) => Self::Exact,
+            (MeaningDirection::Antecedent, AgreementShape::OnOverlap) => Self::OnOverlap,
+            (MeaningDirection::Antecedent, AgreementShape::Crossing) => Self::Crossing,
+            (MeaningDirection::Antecedent, AgreementShape::ConstructedCrossing) => {
+                Self::ConstructedCrossing
+            }
+            (MeaningDirection::Consequent, AgreementShape::Exact) => Self::ConsequentExact,
+            (MeaningDirection::Consequent, AgreementShape::OnOverlap) => Self::ConsequentOnOverlap,
+            (MeaningDirection::Consequent, AgreementShape::Crossing) => Self::ConsequentCrossing,
+            (MeaningDirection::Consequent, AgreementShape::ConstructedCrossing) => {
+                Self::ConsequentConstructedCrossing
+            }
+            (MeaningDirection::Both, AgreementShape::Exact) => Self::BothExact,
+            (MeaningDirection::Both, AgreementShape::OnOverlap) => Self::BothOnOverlap,
+            (MeaningDirection::Both, AgreementShape::Crossing) => Self::BothCrossing,
+            (MeaningDirection::Both, AgreementShape::ConstructedCrossing) => {
+                Self::BothConstructedCrossing
+            }
+        }
+    }
+
+    pub const fn direction(&self) -> MeaningDirection {
+        match self {
+            Self::Exact | Self::OnOverlap | Self::Crossing | Self::ConstructedCrossing => {
+                MeaningDirection::Antecedent
+            }
+            Self::ConsequentExact
+            | Self::ConsequentOnOverlap
+            | Self::ConsequentCrossing
+            | Self::ConsequentConstructedCrossing => MeaningDirection::Consequent,
+            Self::BothExact
+            | Self::BothOnOverlap
+            | Self::BothCrossing
+            | Self::BothConstructedCrossing => MeaningDirection::Both,
+        }
+    }
+
+    pub const fn shape(&self) -> AgreementShape {
+        match self {
+            Self::Exact | Self::ConsequentExact | Self::BothExact => AgreementShape::Exact,
+            Self::OnOverlap | Self::ConsequentOnOverlap | Self::BothOnOverlap => {
+                AgreementShape::OnOverlap
+            }
+            Self::Crossing | Self::ConsequentCrossing | Self::BothCrossing => {
+                AgreementShape::Crossing
+            }
+            Self::ConstructedCrossing
+            | Self::ConsequentConstructedCrossing
+            | Self::BothConstructedCrossing => AgreementShape::ConstructedCrossing,
+        }
+    }
+
+    pub const fn name(&self) -> &'static str {
+        match self {
+            Self::Exact => "exact",
+            Self::OnOverlap => "on-overlap",
+            Self::Crossing => "crossing",
+            Self::ConstructedCrossing => "constructed-crossing",
+            Self::ConsequentExact => "consequent-exact",
+            Self::ConsequentOnOverlap => "consequent-on-overlap",
+            Self::ConsequentCrossing => "consequent-crossing",
+            Self::ConsequentConstructedCrossing => "consequent-constructed-crossing",
+            Self::BothExact => "both-exact",
+            Self::BothOnOverlap => "both-on-overlap",
+            Self::BothCrossing => "both-crossing",
+            Self::BothConstructedCrossing => "both-constructed-crossing",
+        }
+    }
+}
+
+/// **The crossing of two meanings: their intersection, retained rather than reduced to a verdict.**
+///
+/// What the whole-agreement criteria discard. `at_one_depth` is the crossing proper — the names both
+/// sides reached at the same distance — and `at_two_depths` is the population that shares a name and
+/// does **not** meet there, which is a different thing and is kept beside it rather than folded into
+/// a disagreement count. `entered_left` and `entered_right` name the passages each side arrived by,
+/// because two meetings at one name are not the same meeting when the sides arrived along different
+/// edges.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Crossing {
+    pub left: String,
+    pub right: String,
+    /// Which half of the two meanings was intersected. Never [`MeaningDirection::Both`].
+    pub direction: MeaningDirection,
+    /// Constituents both meanings carry **at one depth**, with that depth.
+    pub at_one_depth: BTreeMap<String, usize>,
+    /// Constituents both carry at **different** depths: `(left depth, right depth)`. Shared, and not
+    /// a crossing.
+    pub at_two_depths: BTreeMap<String, (usize, usize)>,
+    /// Per crossing constituent, the passages that brought it on the left.
+    pub entered_left: BTreeMap<String, Vec<String>>,
+    pub entered_right: BTreeMap<String, Vec<String>>,
+}
+
+impl Crossing {
+    /// Whether the two meanings meet anywhere.
+    pub fn crosses(&self) -> bool {
+        !self.at_one_depth.is_empty()
+    }
+
+    /// How many names they meet at. **A count that is reported and never consulted**: nothing in
+    /// this module compares two widths to select, rank, or drop a pair.
+    pub fn width(&self) -> usize {
+        self.at_one_depth.len()
+    }
+
+    /// The crossings neither side named directly — reached only by opening what it did name. This is
+    /// [`crate::name_elaboration::Elaboration::constructed`] read across two meanings at once.
+    pub fn constructed(&self) -> BTreeMap<&str, usize> {
+        self.at_one_depth
+            .iter()
+            .filter(|(_, depth)| **depth >= 2)
+            .map(|(name, depth)| (name.as_str(), *depth))
+            .collect()
+    }
+
+    pub fn crosses_constructed(&self) -> bool {
+        !self.constructed().is_empty()
+    }
+
+    /// The crossing as one line, for a driver that has to print it.
+    pub fn render(&self) -> String {
+        if self.at_one_depth.is_empty() {
+            return "nothing".to_owned();
+        }
+        self.at_one_depth
+            .iter()
+            .map(|(name, depth)| format!("{name}@{depth}"))
+            .collect::<Vec<_>>()
+            .join(" ")
     }
 }
 
@@ -193,6 +451,17 @@ pub struct ElaborationDisagreement {
     /// on-overlap criterion is an agreement *on*, carried so an empty overlap is visible as one
     /// rather than as agreement.
     pub shared: usize,
+    /// Which half of the two meanings this compared. `Antecedent` or `Consequent`, never `Both`.
+    pub direction: MeaningDirection,
+    /// **The intersection**, retained beside the verdict on the whole.
+    pub crossing: Crossing,
+    /// What was set aside as hypothesis rather than compared: the two roots always, and — in the
+    /// consequent direction — the statement the pair was compared at. Named rather than dropped, so
+    /// the exclusion is auditable instead of buried in the comparison.
+    pub hypothesis: BTreeSet<String>,
+    /// Statements both meanings reach, the one they were compared at excluded. Empty in the
+    /// antecedent direction, where a statement is not a constituent at all.
+    pub shared_statements: BTreeSet<String>,
 }
 
 impl ElaborationDisagreement {
@@ -201,17 +470,25 @@ impl ElaborationDisagreement {
         self.shared
     }
 
-    /// Whether the two meanings agree under a declared criterion.
-    pub fn agrees(&self, criterion: AgreementCriterion) -> bool {
+    /// Whether the two meanings agree — or meet — under a declared shape.
+    ///
+    /// The two crossing shapes deliberately do **not** consult `contains_other_root`: a crossing is
+    /// a claim that the two meanings meet somewhere, not that they are one meaning, and a proof
+    /// built out of another proof does meet it. That is the whole difference between the two
+    /// families and folding it away would make the crossing a loosened agreement instead of a
+    /// different relation.
+    pub fn agrees(&self, shape: AgreementShape) -> bool {
         let where_they_meet = self.depth_disagreement.is_empty()
             && self.contains_other_root.is_empty()
             && self.cycles_only_left.is_empty()
             && self.cycles_only_right.is_empty();
-        match criterion {
-            AgreementCriterion::Exact => {
+        match shape {
+            AgreementShape::Exact => {
                 where_they_meet && self.only_left.is_empty() && self.only_right.is_empty()
             }
-            AgreementCriterion::OnOverlap => where_they_meet,
+            AgreementShape::OnOverlap => where_they_meet,
+            AgreementShape::Crossing => self.crossing.crosses(),
+            AgreementShape::ConstructedCrossing => self.crossing.crosses_constructed(),
         }
     }
 
@@ -253,41 +530,110 @@ impl ElaborationDisagreement {
     }
 }
 
-/// Compare two elaborated meanings, retaining every way they differ.
+/// Compare two **antecedent** closures, retaining every way they differ and the crossing.
 pub fn compare(left: &Elaboration, right: &Elaboration) -> ElaborationDisagreement {
-    let full_left = left.signature();
-    let full_right = right.signature();
-    let roots = [left.root(), right.root()];
+    compare_signatures(
+        left.root(),
+        right.root(),
+        MeaningDirection::Antecedent,
+        left.signature(),
+        right.signature(),
+        left.cycles(),
+        right.cycles(),
+        BTreeSet::new(),
+        &|name| left.arrivals_into(name),
+        &|name| right.arrivals_into(name),
+    )
+}
+
+/// Compare two **consequent** closures, retaining every way they differ and the crossing.
+///
+/// `at_statement` is the statement the pair is being compared at, if any. It is set aside exactly as
+/// the two roots are, and for the same reason: two routes compared at a statement reach that
+/// statement by hypothesis, so counting `|- S` as a shared consequent would make every crossing
+/// question true for every pair the reading ever examines. What was set aside is returned in
+/// [`ElaborationDisagreement::hypothesis`].
+pub fn compare_consequents(
+    left: &ConsequentClosure,
+    right: &ConsequentClosure,
+    at_statement: Option<&str>,
+) -> ElaborationDisagreement {
+    let hypothesis: BTreeSet<String> = at_statement
+        .map(|statement| BTreeSet::from([statement_vertex_key(statement)]))
+        .unwrap_or_default();
+    compare_signatures(
+        left.root(),
+        right.root(),
+        MeaningDirection::Consequent,
+        left.signature(),
+        right.signature(),
+        left.cycles(),
+        right.cycles(),
+        hypothesis,
+        &|name| left.arrivals_into(name),
+        &|name| right.arrivals_into(name),
+    )
+}
+
+/// The one comparison, run over whichever half of a meaning it was handed.
+///
+/// **One implementation, both directions.** The antecedent and the consequent readings are different
+/// relations and they are not two different notions of *comparison*; writing this twice is how the
+/// two would drift.
+#[allow(clippy::too_many_arguments)]
+fn compare_signatures(
+    left_root: &str,
+    right_root: &str,
+    direction: MeaningDirection,
+    full_left: BTreeMap<&str, usize>,
+    full_right: BTreeMap<&str, usize>,
+    left_cycles_in: &[RetainedCycle],
+    right_cycles_in: &[RetainedCycle],
+    extra_hypothesis: BTreeSet<String>,
+    left_entered: &dyn Fn(&str) -> Vec<String>,
+    right_entered: &dyn Fn(&str) -> Vec<String>,
+) -> ElaborationDisagreement {
+    let roots = [left_root, right_root];
 
     // One root standing inside the other's meaning. Retained before the roots are set aside,
     // because it is the one way a name difference *is* a meaning difference.
     let mut contains_other_root = BTreeMap::new();
-    if let Some(depth) = full_left.get(right.root()) {
-        contains_other_root.insert(right.root().to_owned(), *depth);
+    if let Some(depth) = full_left.get(right_root) {
+        contains_other_root.insert(right_root.to_owned(), *depth);
     }
-    if let Some(depth) = full_right.get(left.root()) {
-        contains_other_root.insert(left.root().to_owned(), *depth);
+    if let Some(depth) = full_right.get(left_root) {
+        contains_other_root.insert(left_root.to_owned(), *depth);
     }
+
+    let mut hypothesis: BTreeSet<String> = roots.iter().map(|root| (*root).to_owned()).collect();
+    hypothesis.extend(extra_hypothesis.iter().cloned());
+
+    let set_aside = |name: &str| roots.contains(&name) || extra_hypothesis.contains(name);
 
     let left_signature: BTreeMap<&str, usize> = full_left
         .into_iter()
-        .filter(|(name, _)| !roots.contains(name))
+        .filter(|(name, _)| !set_aside(name))
         .collect();
     let right_signature: BTreeMap<&str, usize> = full_right
         .into_iter()
-        .filter(|(name, _)| !roots.contains(name))
+        .filter(|(name, _)| !set_aside(name))
         .collect();
 
     let mut only_left = BTreeMap::new();
     let mut only_right = BTreeMap::new();
     let mut depth_disagreement = BTreeMap::new();
+    let mut at_one_depth: BTreeMap<String, usize> = BTreeMap::new();
+    let mut at_two_depths: BTreeMap<String, (usize, usize)> = BTreeMap::new();
     let mut shared = 0usize;
     for (name, depth) in &left_signature {
         match right_signature.get(name) {
             Some(other) => {
                 shared += 1;
-                if other != depth {
+                if other == depth {
+                    at_one_depth.insert((*name).to_owned(), *depth);
+                } else {
                     depth_disagreement.insert((*name).to_owned(), (*depth, *other));
+                    at_two_depths.insert((*name).to_owned(), (*depth, *other));
                 }
             }
             None => {
@@ -301,12 +647,26 @@ pub fn compare(left: &Elaboration, right: &Elaboration) -> ElaborationDisagreeme
         }
     }
 
-    let left_cycles: BTreeSet<&RetainedCycle> = left.cycles().iter().collect();
-    let right_cycles: BTreeSet<&RetainedCycle> = right.cycles().iter().collect();
+    let mut entered_left: BTreeMap<String, Vec<String>> = BTreeMap::new();
+    let mut entered_right: BTreeMap<String, Vec<String>> = BTreeMap::new();
+    for name in at_one_depth.keys() {
+        entered_left.insert(name.clone(), left_entered(name));
+        entered_right.insert(name.clone(), right_entered(name));
+    }
+
+    let shared_statements: BTreeSet<String> = at_one_depth
+        .keys()
+        .chain(at_two_depths.keys())
+        .filter(|name| name.starts_with(STATEMENT_KEY_PREFIX))
+        .cloned()
+        .collect();
+
+    let left_cycles: BTreeSet<&RetainedCycle> = left_cycles_in.iter().collect();
+    let right_cycles: BTreeSet<&RetainedCycle> = right_cycles_in.iter().collect();
 
     ElaborationDisagreement {
-        left: left.root().to_owned(),
-        right: right.root().to_owned(),
+        left: left_root.to_owned(),
+        right: right_root.to_owned(),
         only_left,
         only_right,
         depth_disagreement,
@@ -320,6 +680,18 @@ pub fn compare(left: &Elaboration, right: &Elaboration) -> ElaborationDisagreeme
             .map(|cycle| (*cycle).clone())
             .collect(),
         shared,
+        direction,
+        crossing: Crossing {
+            left: left_root.to_owned(),
+            right: right_root.to_owned(),
+            direction,
+            at_one_depth,
+            at_two_depths,
+            entered_left,
+            entered_right,
+        },
+        hypothesis,
+        shared_statements,
     }
 }
 
@@ -354,7 +726,70 @@ pub struct HeldOpenRoute {
     /// The symbols a square could have been founded over had the meanings agreed. Retained, so the
     /// hole is exhibited with the filling it refused rather than only with its own name.
     pub refused_symbols: BTreeSet<String>,
+    /// The **antecedent** comparison. Carried under its original name because a reading founded
+    /// before the consequent half existed reads it, and it means what it meant.
     pub disagreement: ElaborationDisagreement,
+    /// The **consequent** comparison of the same pair, whichever direction the criterion read. A
+    /// pair held open on antecedents may agree on consequents, and a reading that returned only the
+    /// half its criterion consulted would have hidden exactly that.
+    pub consequent_disagreement: ElaborationDisagreement,
+}
+
+/// **One route pair, classified under every declared criterion at once.**
+///
+/// The 2-cell criterion of a reading picks one; this carries all twelve, both comparisons, and both
+/// crossings, so the combinations of (antecedents agree) × (consequents agree) can be read off a
+/// single reading. Nothing here is reduced to a verdict: the populations behind every verdict are on
+/// the two disagreements.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct PairVerdict {
+    pub statement: String,
+    pub left: String,
+    pub right: String,
+    /// The recruited symbols both vertices name. A square is founded over each of these when the
+    /// reading's criterion admits the pair.
+    pub shared_symbols: BTreeSet<String>,
+    pub antecedent: ElaborationDisagreement,
+    pub consequent: ElaborationDisagreement,
+    pub verdicts: BTreeMap<AgreementCriterion, bool>,
+}
+
+impl PairVerdict {
+    pub fn agrees(&self, criterion: AgreementCriterion) -> bool {
+        self.verdicts.get(&criterion).copied().unwrap_or(false)
+    }
+
+    pub fn key(&self) -> (&str, &str, &str) {
+        (
+            self.statement.as_str(),
+            self.left.as_str(),
+            self.right.as_str(),
+        )
+    }
+
+    /// The crossing of the two antecedent closures.
+    pub const fn antecedent_crossing(&self) -> &Crossing {
+        &self.antecedent.crossing
+    }
+
+    /// The crossing of the two consequent closures.
+    pub const fn consequent_crossing(&self) -> &Crossing {
+        &self.consequent.crossing
+    }
+}
+
+/// Decide one pair under one criterion, reading whichever half or halves the criterion names.
+pub fn agrees_under(
+    antecedent: &ElaborationDisagreement,
+    consequent: &ElaborationDisagreement,
+    criterion: AgreementCriterion,
+) -> bool {
+    let shape = criterion.shape();
+    match criterion.direction() {
+        MeaningDirection::Antecedent => antecedent.agrees(shape),
+        MeaningDirection::Consequent => consequent.agrees(shape),
+        MeaningDirection::Both => antecedent.agrees(shape) && consequent.agrees(shape),
+    }
 }
 
 /// Why three pairwise-agreeing meanings admit no joint section.
@@ -419,6 +854,7 @@ pub struct RouteFilling {
     held_open: Vec<HeldOpenRoute>,
     agreeing_without_square: Vec<AgreeingWithoutSquare>,
     triples: Vec<TripleOverlap>,
+    pairs: Vec<PairVerdict>,
     pairs_examined: usize,
     triples_examined: usize,
 }
@@ -463,6 +899,33 @@ impl RouteFilling {
 
     pub fn triples(&self) -> &[TripleOverlap] {
         &self.triples
+    }
+
+    /// **Every pair the reading examined, with the verdict of every declared criterion.**
+    ///
+    /// One reading, twelve classifications. This is what makes the criteria comparable without
+    /// running twelve fillings and hoping they saw the same material.
+    pub fn pairs(&self) -> &[PairVerdict] {
+        &self.pairs
+    }
+
+    /// The pairs one criterion admits, by key. Founded from [`Self::pairs`], so it answers for a
+    /// criterion the reading did not itself fill under.
+    pub fn admitted_by(&self, criterion: AgreementCriterion) -> BTreeSet<(&str, &str, &str)> {
+        self.pairs
+            .iter()
+            .filter(|pair| pair.agrees(criterion))
+            .map(PairVerdict::key)
+            .collect()
+    }
+
+    /// The pairs one criterion refuses, by key.
+    pub fn refused_by(&self, criterion: AgreementCriterion) -> BTreeSet<(&str, &str, &str)> {
+        self.pairs
+            .iter()
+            .filter(|pair| !pair.agrees(criterion))
+            .map(PairVerdict::key)
+            .collect()
     }
 
     /// How many route pairs the criterion was asked about.
@@ -601,9 +1064,10 @@ pub fn fill_routes(
     let circuit = found_circuit(derivations, aperture)?;
     let deposit = ElaborationDeposit::read(derivations);
 
-    // Elaborate every derivation vertex once. The vertex keys `found_circuit` uses and the keys
-    // `ElaborationDeposit` resolves are the same strings under both declared identities.
-    let mut meanings: BTreeMap<String, Elaboration> = BTreeMap::new();
+    // Read every derivation vertex's meaning once, in **both** directions, under one uniform
+    // aperture. The vertex keys `found_circuit` uses and the keys `ElaborationDeposit` resolves are
+    // the same strings under both declared identities.
+    let mut meanings: BTreeMap<String, NameMeaning> = BTreeMap::new();
     for reaching in circuit.reaching_vertices().values() {
         for vertex in reaching {
             if meanings.contains_key(*vertex) {
@@ -611,7 +1075,7 @@ pub fn fill_routes(
             }
             meanings.insert(
                 (*vertex).to_owned(),
-                deposit.elaborate(vertex, elaboration_aperture)?,
+                deposit.meaning(vertex, elaboration_aperture)?,
             );
         }
     }
@@ -621,6 +1085,7 @@ pub fn fill_routes(
     let mut held_open: Vec<HeldOpenRoute> = Vec::new();
     let mut agreeing_without_square: Vec<AgreeingWithoutSquare> = Vec::new();
     let mut agreement: BTreeMap<(String, String, String), bool> = BTreeMap::new();
+    let mut verdicts: Vec<PairVerdict> = Vec::new();
     let mut pairs_examined = 0usize;
 
     let reaching_by_statement: BTreeMap<String, Vec<String>> = circuit
@@ -641,10 +1106,33 @@ pub fn fill_routes(
             for right in (left + 1)..reaching.len() {
                 pairs_examined += 1;
                 let (a, b) = (&reaching[left], &reaching[right]);
-                let disagreement = compare(&meanings[a], &meanings[b]);
-                let agrees = disagreement.agrees(criterion);
+                let antecedent = compare(meanings[a].antecedent(), meanings[b].antecedent());
+                let consequent = compare_consequents(
+                    meanings[a].consequent(),
+                    meanings[b].consequent(),
+                    Some(statement),
+                );
+                let every: BTreeMap<AgreementCriterion, bool> = AgreementCriterion::EVERY
+                    .into_iter()
+                    .map(|declared| {
+                        (
+                            declared,
+                            agrees_under(&antecedent, &consequent, declared),
+                        )
+                    })
+                    .collect();
+                let agrees = every[&criterion];
                 agreement.insert((statement.clone(), a.clone(), b.clone()), agrees);
                 let shared = shared_between(&recruited, a, b);
+                verdicts.push(PairVerdict {
+                    statement: statement.clone(),
+                    left: a.clone(),
+                    right: b.clone(),
+                    shared_symbols: shared.clone(),
+                    antecedent: antecedent.clone(),
+                    consequent: consequent.clone(),
+                    verdicts: every,
+                });
                 if agrees {
                     if shared.is_empty() {
                         agreeing_without_square.push(AgreeingWithoutSquare {
@@ -661,7 +1149,8 @@ pub fn fill_routes(
                         left: a.clone(),
                         right: b.clone(),
                         refused_symbols: shared,
-                        disagreement,
+                        disagreement: antecedent,
+                        consequent_disagreement: consequent,
                     });
                 }
             }
@@ -841,6 +1330,7 @@ pub fn fill_routes(
         held_open,
         agreeing_without_square,
         triples,
+        pairs: verdicts,
         pairs_examined,
         triples_examined,
     })
@@ -851,7 +1341,7 @@ pub fn fill_routes(
 fn joint_section_obstruction(
     deposit: &ElaborationDeposit,
     members: &[String; 3],
-    meanings: &BTreeMap<String, Elaboration>,
+    meanings: &BTreeMap<String, NameMeaning>,
 ) -> Option<JointSectionObstruction> {
     let mut union: BTreeMap<String, usize> = BTreeMap::new();
     let mut carried_by: BTreeMap<String, BTreeMap<String, usize>> = BTreeMap::new();
@@ -859,7 +1349,7 @@ fn joint_section_obstruction(
         let Some(meaning) = meanings.get(member) else {
             continue;
         };
-        for (name, depth) in meaning.signature() {
+        for (name, depth) in meaning.antecedent().signature() {
             carried_by
                 .entry(name.to_owned())
                 .or_default()
@@ -1215,7 +1705,12 @@ mod tests {
         assert!(disagreement.only_right.is_empty(), "{disagreement:?}");
         assert!(disagreement.contains_other_root.is_empty());
         assert_eq!(disagreement.overlap(), 2);
-        assert!(disagreement.agrees(AgreementCriterion::Exact));
+        assert!(disagreement.agrees(AgreementShape::Exact));
+        assert_eq!(disagreement.direction, MeaningDirection::Antecedent);
+        assert_eq!(
+            disagreement.hypothesis,
+            BTreeSet::from(["alpha".to_owned(), "beta".to_owned()])
+        );
     }
 
     #[test]
@@ -1489,5 +1984,253 @@ mod tests {
         // And it is genuinely elaboration that refused it: the two share recruited symbols, so a
         // reading that filled every loop it could would have filled this one.
         assert!(held.disagreement.overlap() > 0);
+    }
+
+    // ============================================================ the crossing, and both directions
+
+    #[test]
+    fn a_pair_whole_agreement_holds_open_still_crosses_at_a_named_constituent() {
+        // **The finding item 2 exists for.** `outer` names `inner`, so one root stands inside the
+        // other's meaning and both whole-agreement criteria refuse the pair. They still MEET, at
+        // `shared`, at depth one on both sides, and the crossing names it and the passages that
+        // brought it.
+        let population = nested_routes();
+        let deposit = ElaborationDeposit::read(&population);
+        let outer = deposit
+            .elaborate("outer", ElaborationAperture::Exhausted)
+            .expect("declared");
+        let inner = deposit
+            .elaborate("inner", ElaborationAperture::Exhausted)
+            .expect("declared");
+        let disagreement = compare(&outer, &inner);
+
+        assert!(!disagreement.agrees(AgreementShape::Exact));
+        assert!(!disagreement.agrees(AgreementShape::OnOverlap));
+        assert!(disagreement.agrees(AgreementShape::Crossing));
+        assert_eq!(
+            disagreement.crossing.at_one_depth,
+            BTreeMap::from([("shared".to_owned(), 1usize)])
+        );
+        assert_eq!(disagreement.crossing.width(), 1);
+        // The passages, not only the name -- and the left side reached `shared` twice, directly and
+        // again through `inner`, which a verdict on the whole discards and the crossing keeps.
+        assert_eq!(
+            disagreement.crossing.entered_left["shared"],
+            vec![
+                "outer --recruits--> shared@1".to_owned(),
+                "inner --recruits--> shared@2".to_owned(),
+            ]
+        );
+        assert_eq!(
+            disagreement.crossing.entered_right["shared"],
+            vec!["inner --recruits--> shared@1".to_owned()]
+        );
+        // And the whole reading founds it: the crossing criterion fills what agreement held open.
+        let held_open_by_agreement = fill(&population, AgreementCriterion::OnOverlap);
+        let filled_by_crossing = fill(&population, AgreementCriterion::Crossing);
+        assert_eq!(held_open_by_agreement.held_open().len(), 1);
+        assert_eq!(filled_by_crossing.held_open().len(), 0);
+        assert_eq!(filled_by_crossing.squares().len(), 1);
+        assert_eq!(filled_by_crossing.squares()[0].shared_symbol, "shared");
+    }
+
+    /// `alpha` and `beta` reach one statement, name nothing in common, and both name a declaration
+    /// that names `deep`. They meet **only** two steps out.
+    fn crossing_only_in_construction() -> Vec<Derivation> {
+        vec![
+            derivation("alpha", "S", &[("via_alpha", 1)]),
+            derivation("beta", "S", &[("via_beta", 1)]),
+            derivation("via_alpha", "T", &[("deep", 1)]),
+            derivation("via_beta", "U", &[("deep", 1)]),
+        ]
+    }
+
+    #[test]
+    fn a_constructed_crossing_is_a_meeting_neither_side_named_and_the_two_shapes_separate() {
+        let deposit = ElaborationDeposit::read(&crossing_only_in_construction());
+        let deep = compare(
+            &deposit.elaborate("alpha", ElaborationAperture::Exhausted).expect("declared"),
+            &deposit.elaborate("beta", ElaborationAperture::Exhausted).expect("declared"),
+        );
+        assert!(deep.agrees(AgreementShape::Crossing));
+        assert!(deep.agrees(AgreementShape::ConstructedCrossing));
+        assert_eq!(
+            deep.crossing.constructed(),
+            BTreeMap::from([("deep", 2usize)])
+        );
+
+        // And the two shapes are not one shape: a pair that meets only at a directly named symbol
+        // crosses and does not cross in construction.
+        let shallow_population = overlapping_routes();
+        let shallow_deposit = ElaborationDeposit::read(&shallow_population);
+        let shallow = compare(
+            &shallow_deposit.elaborate("alpha", ElaborationAperture::Exhausted).expect("declared"),
+            &shallow_deposit.elaborate("beta", ElaborationAperture::Exhausted).expect("declared"),
+        );
+        assert!(shallow.agrees(AgreementShape::Crossing));
+        assert!(!shallow.agrees(AgreementShape::ConstructedCrossing));
+        assert_eq!(shallow.crossing.at_one_depth, BTreeMap::from([("shared".to_owned(), 1usize)]));
+    }
+
+    /// Two pairs whose two directions disagree in **opposite** ways. `alpha`/`beta` have identical
+    /// recruitment and are recruited differently; `gamma`/`delta` have different recruitment and are
+    /// recruited by nothing at all.
+    fn both_directions_disagree_oppositely() -> Vec<Derivation> {
+        vec![
+            derivation("alpha", "S", &[("shared", 1), ("also", 1)]),
+            derivation("beta", "S", &[("shared", 1), ("also", 1)]),
+            derivation("cites_alpha", "T", &[("alpha", 1)]),
+            derivation("gamma", "U", &[("only_gamma", 1)]),
+            derivation("delta", "U", &[("only_delta", 1)]),
+        ]
+    }
+
+    #[test]
+    fn two_routes_may_agree_on_antecedents_and_disagree_on_consequents_and_the_reverse() {
+        // **Item 3, measured.** One reading, one deposit, both combinations present. Neither
+        // direction is the other's refinement and neither is preferred.
+        let filling = fill(&both_directions_disagree_oppositely(), AgreementCriterion::Exact);
+
+        let same_recruitment = filling
+            .pairs()
+            .iter()
+            .find(|pair| pair.left == "alpha" && pair.right == "beta")
+            .expect("the pair reaching S");
+        assert!(same_recruitment.agrees(AgreementCriterion::Exact));
+        assert!(!same_recruitment.agrees(AgreementCriterion::ConsequentExact));
+        assert!(!same_recruitment.agrees(AgreementCriterion::BothExact));
+        // And what differs upward is named: `alpha` is recruited and `beta` is not.
+        assert!(same_recruitment
+            .consequent
+            .only_left
+            .contains_key("cites_alpha"));
+
+        let same_consequents = filling
+            .pairs()
+            .iter()
+            .find(|pair| pair.left == "delta" && pair.right == "gamma")
+            .or_else(|| {
+                filling
+                    .pairs()
+                    .iter()
+                    .find(|pair| pair.left == "gamma" && pair.right == "delta")
+            })
+            .expect("the pair reaching U");
+        assert!(!same_consequents.agrees(AgreementCriterion::Exact));
+        assert!(same_consequents.agrees(AgreementCriterion::ConsequentExact));
+        assert!(!same_consequents.agrees(AgreementCriterion::BothExact));
+        // And what differs downward is named.
+        assert!(!same_consequents.antecedent.only_left.is_empty());
+    }
+
+    #[test]
+    fn the_statement_a_pair_is_compared_at_is_set_aside_as_hypothesis_and_named() {
+        // Without the exclusion every pair the reading examines would carry `|- S` as a shared
+        // consequent at depth one, and consequent-crossing would be a check that cannot fail.
+        let filling = fill(&identical_routes(), AgreementCriterion::Exact);
+        let pair = &filling.pairs()[0];
+        assert!(pair.consequent.hypothesis.contains("|- S"));
+        assert!(pair.consequent.hypothesis.contains("alpha"));
+        assert!(pair.consequent.hypothesis.contains("beta"));
+        assert!(!pair.agrees(AgreementCriterion::ConsequentCrossing));
+        assert!(pair.consequent_crossing().at_one_depth.is_empty());
+        // And the antecedent direction sets aside the roots and nothing else.
+        assert_eq!(
+            pair.antecedent.hypothesis,
+            BTreeSet::from(["alpha".to_owned(), "beta".to_owned()])
+        );
+    }
+
+    #[test]
+    fn the_declared_criteria_found_different_populations_and_the_grid_is_read_off_one_reading() {
+        // `CLAUDE.md` §8: a gauge whose group acts trivially on the declared material is not a
+        // gauge. Here the orbit is exhibited rather than assumed -- four criteria, four different
+        // admitted populations, from the pairs of ONE reading.
+        let filling = fill(&both_directions_disagree_oppositely(), AgreementCriterion::Exact);
+        let mut populations: BTreeSet<BTreeSet<(&str, &str, &str)>> = BTreeSet::new();
+        for criterion in AgreementCriterion::EVERY {
+            populations.insert(filling.admitted_by(criterion));
+        }
+        assert!(
+            populations.len() >= 3,
+            "the twelve criteria collapsed onto {} populations",
+            populations.len()
+        );
+        // And the two directions genuinely disagree rather than one refining the other.
+        assert_ne!(
+            filling.admitted_by(AgreementCriterion::Exact),
+            filling.admitted_by(AgreementCriterion::ConsequentExact)
+        );
+        assert!(filling
+            .admitted_by(AgreementCriterion::BothExact)
+            .is_empty());
+    }
+
+    #[test]
+    fn every_pair_carries_a_verdict_for_every_declared_criterion() {
+        let filling = fill(&both_directions_disagree_oppositely(), AgreementCriterion::OnOverlap);
+        assert_eq!(filling.pairs().len(), filling.pairs_examined());
+        for pair in filling.pairs() {
+            assert_eq!(pair.verdicts.len(), AgreementCriterion::EVERY.len());
+            for criterion in AgreementCriterion::EVERY {
+                assert!(pair.verdicts.contains_key(&criterion));
+            }
+            // The direction axis is not decorative: a "both" verdict is the conjunction and is
+            // computed, not copied.
+            for shape in AgreementShape::DECLARED {
+                assert_eq!(
+                    pair.agrees(AgreementCriterion::of(MeaningDirection::Both, shape)),
+                    pair.agrees(AgreementCriterion::of(MeaningDirection::Antecedent, shape))
+                        && pair.agrees(AgreementCriterion::of(
+                            MeaningDirection::Consequent,
+                            shape
+                        ))
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn a_held_open_pair_returns_both_halves_whichever_half_refused_it() {
+        let filling = fill(&both_directions_disagree_oppositely(), AgreementCriterion::Exact);
+        let held = filling
+            .held_open()
+            .iter()
+            .find(|held| held.statement == "U")
+            .expect("gamma and delta differ downward");
+        assert_eq!(held.disagreement.direction, MeaningDirection::Antecedent);
+        assert_eq!(
+            held.consequent_disagreement.direction,
+            MeaningDirection::Consequent
+        );
+        // Held open on antecedents and agreeing on consequents: the reading returns the half its
+        // criterion did not consult rather than only the one that refused.
+        assert!(!held.disagreement.agrees(AgreementShape::Exact));
+        assert!(held.consequent_disagreement.agrees(AgreementShape::Exact));
+    }
+
+    #[test]
+    fn the_independent_rank_agrees_with_the_smith_normal_form_under_every_declared_criterion() {
+        for population in [
+            identical_routes(),
+            overlapping_routes(),
+            nested_routes(),
+            crossing_only_in_construction(),
+            both_directions_disagree_oppositely(),
+        ] {
+            for criterion in AgreementCriterion::EVERY {
+                let filling = fill(&population, criterion);
+                let before = filling.invariants_before(PivotRule::FirstNonzero).expect("reads");
+                let after = filling.invariants_after(PivotRule::FirstNonzero).expect("reads");
+                let moved = betti_at(&before, 1) - betti_at(&after, 1);
+                assert_eq!(
+                    moved,
+                    filling.independent_filling_rank(),
+                    "{} on {} squares",
+                    criterion.name(),
+                    filling.squares().len()
+                );
+            }
+        }
     }
 }

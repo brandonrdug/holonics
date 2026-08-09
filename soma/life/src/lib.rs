@@ -27,6 +27,11 @@ pub mod lean_mathematics;
 pub mod live_current_cuda;
 pub mod morphological_language;
 pub mod relational_language;
+// The join `research/records/2026-08-08_FACES_GROW_FROM_COLLOCATION_AND_THE_ATOM_IS_NOT_EMPTY.md`
+// §4(v) names as owed: `holonic-engine`'s `name_elaboration` decomposes a name and never recomposes,
+// `decomposing_codec` revises its grain at what its own reading collapsed, and the two had never
+// met. It lives here for the same reason `decomposing_codec` does — only `life` depends on both.
+pub mod reintegrating_elaboration;
 pub mod research_intelligence;
 pub mod resonance_ecology;
 pub mod suffix_ecology;
