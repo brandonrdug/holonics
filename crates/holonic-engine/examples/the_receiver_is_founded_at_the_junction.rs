@@ -294,16 +294,19 @@ fn main() {
     // channel for water that has none flowing will experience nothing but the collection of debris."
     // What is required now is that an axis carrying no current of its own is MEASURED AND NAMED,
     // not that the count went up.
-    let silted = panel.silted();
+    let redundant = panel.redundant();
+    let capacities = panel.capacities();
+    let feedback_exact = panel.founded.iter().all(|found| {
+        capacities[&found.id] == num_bigint::BigUint::from(found.residue) + 1u32
+    });
     controls.push((
-        panel.founded.iter().all(|found| found.blocks_gained > 0),
-        "control 4 -- every founded axis gained blocks, and silt is measured rather than assumed"
-            .to_owned(),
+        panel.founded.iter().all(|found| found.blocks_gained > 0) && feedback_exact,
+        "control 4 -- residue is measured, and capacity is the residue".to_owned(),
         format!(
-            "one-shot {} -> {}, {} of {} silted",
+            "one-shot {} -> {}, {} of {} with empty residue",
             panel.one_shot_before.len(),
             panel.one_shot_after.len(),
-            silted.len(),
+            redundant.len(),
             panel.founded.len()
         ),
     ));
@@ -456,15 +459,37 @@ fn report(system: &Development, panel: &FoundedPanel) {
                 }
             };
             println!(
-                "    #{:<3} {:<22?} {:<52}  +{} blocks, {} unique",
-                found.id.0, found.species, pressure, found.blocks_gained, found.unique_separations
+                "    #{:<3} {:<22?} {:<52}  +{} blocks, residue {}",
+                found.id.0, found.species, pressure, found.blocks_gained, found.residue
             );
         }
         println!("\n  axis species founded: {:?}", panel.species_founded());
-        let silted = panel.silted();
-        println!("  silted (carrying no current of their own): {}", silted.len());
-        for found in &silted {
-            println!("    #{} {:?} -- separates nothing another receiver does not", found.id.0, found.species);
+        let redundant = panel.redundant();
+        println!(
+            "  empty residue (redundant -- removing them leaves the partition unmoved): {}",
+            redundant.len()
+        );
+        for found in &redundant {
+            println!("    #{} {:?}", found.id.0, found.species);
+        }
+        println!("\n  THE FEEDBACK: capacity is the residue.");
+        println!("    service_rounds = ceil(co_present_demand / capacity), so capacity DIVIDES");
+        println!("    demand and a wider site dilates less. An axis is cheap because it carried");
+        println!("    what nothing else carried. `set_site_capacity` refuses zero, so an empty");
+        println!("    residue takes capacity 1 -- the MOST congested route, dilating maximally,");
+        println!("    never deleted by a chooser.");
+        println!("\n    {:<6} {:<22} {:>9} {:>10}", "axis", "species", "residue", "capacity");
+        println!("    {}", "-".repeat(52));
+        for (id, capacity) in panel.capacities() {
+            let found = panel
+                .founded
+                .iter()
+                .find(|found| found.id == id)
+                .expect("a capacity names a founded axis");
+            println!(
+                "    #{:<5} {:<22?} {:>9} {:>10}",
+                id.0, found.species, found.residue, capacity
+            );
         }
     }
     if !panel.refused.is_empty() {

@@ -68,6 +68,9 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use serde::{Deserialize, Serialize};
 
+use num_bigint::BigUint;
+use num_traits::One;
+
 use crate::receiver_exact_compression::{
     compress, CollapsedPair, InputId, ItemId, ObservedSystem, Observation, Partition, ReceiverId,
 };
@@ -120,16 +123,24 @@ pub struct FoundedReceiver {
     pub pressure: FoundingPressure,
     /// What kind of axis it is. Two of one species are four fingers; two species are a thumb.
     pub species: AxisSpecies,
-    /// **Silt.** How many pairs this axis separates that **no other receiver in the final panel
-    /// separates**. Zero means the channel carries nothing of its own.
+    /// **The residue of this axis under the rest of the panel**, as a cardinality.
     ///
-    /// Brandon, 2026-08-09: *"More joints != survival and propagation… The channel for water that
-    /// has none flowing will experience nothing but the collection of debris, where the collection
-    /// of debris changes the potential of how gradients of current can flow in the future."* A
-    /// founded axis is not free and does not stay neutral: one that carries no unique current has
-    /// silted, and [`FoundedPanel::silted`] returns them. This is what stops "more axes" from being
-    /// monotone.
-    pub unique_separations: usize,
+    /// For a receiver `r` in panel `R`, let `≡_r` be the equivalence it induces on items — the pairs
+    /// it identifies. The residue is
+    ///
+    /// ```text
+    ///   Res(r) = ( ⋂_{s ≠ r} ≡_s )  ∖  ≡_r
+    /// ```
+    ///
+    /// the pairs **every other receiver identifies and this one separates**: what remains after
+    /// quotienting by the rest. This is the residue-quotient sense the project already carries at
+    /// `papers/source/mathematics/definitions/radix-residue-character-cell.typ`, not a metaphor.
+    ///
+    /// `Res(r) = ∅` iff `⋂_{s≠r} ≡_s ⊆ ≡_r`, iff **removing `r` does not move the partition** — the
+    /// axis is redundant in the family. That is the exact statement, and it is what stops "more
+    /// axes" from being monotone: an axis is not a gain because it exists, but because its residue
+    /// is non-empty.
+    pub residue: usize,
     /// The pair whose separation no declared receiver witnessed. This is the junction.
     pub junction: (ItemId, ItemId),
     /// The shortest input word after which conduct separated that pair.
@@ -196,11 +207,43 @@ impl FoundedPanel {
         self.founded.iter().map(|found| found.species).collect()
     }
 
-    /// Founded axes carrying no current of their own — the silted channels.
-    pub fn silted(&self) -> Vec<&FoundedReceiver> {
+    /// Founded axes with **empty residue** — redundant in the family, since removing any of them
+    /// leaves the partition unmoved.
+    pub fn redundant(&self) -> Vec<&FoundedReceiver> {
         self.founded
             .iter()
-            .filter(|found| found.unique_separations == 0)
+            .filter(|found| found.residue == 0)
+            .collect()
+    }
+
+    /// **The feedback: capacity is the residue.**
+    ///
+    /// `receiver_current`'s law is `service_rounds = ⌈co_present_branch_population / site_capacity⌉`
+    /// and `passage_delay = characteristic_delay + (service_rounds − 1)`, so capacity **divides**
+    /// demand: a wider site dilates less. Setting an axis's capacity to its residue closes the loop
+    ///
+    /// ```text
+    ///   residue -> capacity -> service_rounds -> passage_delay -> what conducts -> residue
+    /// ```
+    ///
+    /// and it is the exact form of *"the routes are cheap by design because that is something the
+    /// brain did before this situation"*: a route is cheap **because it carried what nothing else
+    /// carried**.
+    ///
+    /// **The `+ 1` is forced and it is meaningful.** `ExactReceiverCurrentLaw::set_site_capacity`
+    /// refuses zero — `ceil_population_division` would divide by it — so an axis with empty residue
+    /// takes capacity **1**, the minimum. It is not deleted; it becomes the **most congested** route,
+    /// dilating maximally under any co-present demand. A redundant axis therefore changes what later
+    /// current finds cheap without ever being removed by a chooser.
+    pub fn capacities(&self) -> BTreeMap<ReceiverId, BigUint> {
+        self.founded
+            .iter()
+            .map(|found| {
+                (
+                    found.id,
+                    BigUint::from(found.residue) + BigUint::one(),
+                )
+            })
             .collect()
     }
 }
@@ -416,7 +459,7 @@ pub fn found_to_exhaustion(system: &dyn ObservedSystem, skip: &[(ItemId, ItemId)
                         id: ReceiverId(next_id),
                         pressure: FoundingPressure::Congestion { block, occupancy },
                         species,
-                        unique_separations: 0,
+                        residue: 0,
                         junction: (ItemId(0), ItemId(0)),
                         after: Vec::new(),
                         reads: reads.clone(),
@@ -436,7 +479,7 @@ pub fn found_to_exhaustion(system: &dyn ObservedSystem, skip: &[(ItemId, ItemId)
                         id: ReceiverId(next_id),
                         pressure: FoundingPressure::Congestion { block, occupancy },
                         species,
-                        unique_separations: 0,
+                        residue: 0,
                         junction: (ItemId(0), ItemId(0)),
                         after: Vec::new(),
                         reads,
@@ -456,7 +499,7 @@ pub fn found_to_exhaustion(system: &dyn ObservedSystem, skip: &[(ItemId, ItemId)
                 founded: &founded,
             };
             let settled = compress(&widened);
-            measure_silt(system, &mut founded);
+            measure_residue(system, &mut founded);
             return FoundedPanel {
                 declared,
                 rounds: founded.len(),
@@ -553,7 +596,7 @@ pub fn found_to_exhaustion(system: &dyn ObservedSystem, skip: &[(ItemId, ItemId)
                 id: ReceiverId(next_id),
                 pressure: pressure.clone(),
                 species,
-                unique_separations: 0,
+                residue: 0,
                 junction: (pair.left, pair.right),
                 after: pair.distinguishing_word.clone(),
                 reads: reads.clone(),
@@ -572,7 +615,7 @@ pub fn found_to_exhaustion(system: &dyn ObservedSystem, skip: &[(ItemId, ItemId)
             id: ReceiverId(next_id),
             pressure,
             species,
-            unique_separations: 0,
+            residue: 0,
             junction: (pair.left, pair.right),
             after: pair.distinguishing_word.clone(),
             reads,
@@ -582,12 +625,11 @@ pub fn found_to_exhaustion(system: &dyn ObservedSystem, skip: &[(ItemId, ItemId)
     }
 }
 
-/// **Silt.** For each founded axis, how many pairs it separates that no other receiver separates.
+/// The residue of each founded axis under the rest of the panel: `( ⋂_{s≠r} ≡_s ) ∖ ≡_r`.
 ///
-/// A channel with no current of its own has collected debris. This is the measurement that makes
-/// the founded population non-monotone: adding an axis is not automatically a gain, and an axis
-/// that carries nothing unique is reported rather than counted.
-fn measure_silt(system: &dyn ObservedSystem, founded: &mut [FoundedReceiver]) {
+/// Empty residue means the axis is redundant — removing it leaves the partition unmoved. This is
+/// the measurement that makes the founded population non-monotone.
+fn measure_residue(system: &dyn ObservedSystem, founded: &mut [FoundedReceiver]) {
     let items = system.items();
     let declared = system.receivers();
     let readings: Vec<BTreeMap<ItemId, Observation>> =
@@ -611,7 +653,7 @@ fn measure_silt(system: &dyn ObservedSystem, founded: &mut [FoundedReceiver]) {
                 }
             }
         }
-        found.unique_separations = unique;
+        found.residue = unique;
     }
 }
 
@@ -848,6 +890,50 @@ mod tests {
             panel.exhausted() || !panel.refused.is_empty(),
             "an unwitnessed junction that cannot be founded must be REFUSED, not passed over"
         );
+    }
+
+    #[test]
+    fn residue_is_empty_exactly_when_the_axis_is_redundant() {
+        let panel = found_to_exhaustion(&BlindPanel, &[]);
+        let items = BlindPanel.items();
+        for found in &panel.founded {
+            // Recompute the definition directly: pairs every OTHER receiver identifies and this
+            // one separates. `( ⋂_{s≠r} ≡_s ) ∖ ≡_r`.
+            let mut counted = 0usize;
+            for (place, left) in items.iter().enumerate() {
+                for right in &items[place + 1..] {
+                    let mine = found.reads.get(left) != found.reads.get(right);
+                    let others = BlindPanel.receivers().iter().any(|receiver| {
+                        BlindPanel.observation(*left, *receiver)
+                            != BlindPanel.observation(*right, *receiver)
+                    }) || panel.founded.iter().any(|other| {
+                        other.id != found.id && other.reads.get(left) != other.reads.get(right)
+                    });
+                    if mine && !others {
+                        counted += 1;
+                    }
+                }
+            }
+            assert_eq!(found.residue, counted, "the residue is the definition, recomputed");
+        }
+    }
+
+    #[test]
+    fn capacity_is_the_residue_and_an_empty_residue_takes_the_minimum() {
+        let panel = found_to_exhaustion(&BlindPanel, &[]);
+        let capacities = panel.capacities();
+        for found in &panel.founded {
+            assert_eq!(
+                capacities[&found.id],
+                BigUint::from(found.residue) + BigUint::one(),
+                "capacity is the residue; the +1 is forced by set_site_capacity refusing zero"
+            );
+            // An empty residue is not deleted -- it takes capacity 1, the MOST congested route,
+            // so it dilates maximally under any co-present demand rather than being chosen against.
+            if found.residue == 0 {
+                assert_eq!(capacities[&found.id], BigUint::one());
+            }
+        }
     }
 
     #[test]

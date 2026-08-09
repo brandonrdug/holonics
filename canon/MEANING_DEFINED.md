@@ -76,7 +76,7 @@ specificity is the shape of the channel. The traffic form is `canon/THE_TRAFFIC_
 | identity is decided by recurring transport, not by the surface | `receiver_exact_compression.rs` — the Nerode partition refines until conduct separates, and the loss is exhibited as **the shortest separating word** | **built and driven** |
 | a distinction the panel cannot carry founds a new axis | `founded_receiver.rs` — `FoundingPressure::Blindness` | **built and driven** |
 | congestion founds another pathway | `founded_receiver.rs` — `FoundingPressure::Congestion` | **built and driven** |
-| an axis carrying no current silts | `founded_receiver.rs` — `unique_separations`, `silted()` | **built**; the silt does not yet feed back into capacity |
+| an axis with empty residue is redundant, and capacity follows the residue | `founded_receiver.rs` — `Res(r) = (⋂_{s≠r} ≡_s) ∖ ≡_r`, `capacities()` | **built and closed**: `capacity := \|Res(r)\| + 1` |
 | frequency is the criterion, and it is `Π` | `corpus_census.rs`, `surprisal.rs` | **built**; `CLAUDE.md` §13 rule 2 governs — count freely, report what you count, never let a count quietly decide |
 | competing decompositions live as pathways, not branches | — | **not built.** The panel now grows, which is the precondition; nothing yet keeps two incompatible decompositions live and lets load decide between them. |
 

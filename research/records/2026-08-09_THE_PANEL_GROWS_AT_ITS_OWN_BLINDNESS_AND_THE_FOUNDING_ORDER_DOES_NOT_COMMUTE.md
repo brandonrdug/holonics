@@ -121,7 +121,7 @@ Seven declared, seven held.
 - **The orbit is exhibited before the gyration is read**, and a trivial orbit would be reported as
   measuring nothing rather than as agreement. It came back non-trivial.
 
-## 6. EXTENDED THE SAME DAY — congestion is the second pressure, and an axis can silt
+## 6. EXTENDED THE SAME DAY — congestion is the second pressure, and the residue sets the capacity
 
 Brandon, 2026-08-09, stating the grand-scale behaviour of evolution:
 
@@ -152,12 +152,32 @@ construct more dynamic pathways to navigate between."* A block holding many item
 site — **not blind but undifferentiated**, which a sharper aperture cannot fix. `AxisSpecies::ConductReach`
 is the different pathway: how far conduct carries before it stops.
 
-**An axis that carries nothing silts.** `unique_separations` counts the pairs an axis separates that
-**no other receiver separates**. Zero means the channel carries no current of its own.
+**An axis that carries nothing is redundant, and that is a definition rather than an image.** For a
+receiver `r` in panel `R`, let `≡_r` be the equivalence it induces on items. The **residue** is
+
+```text
+  Res(r) = ( ⋂_{s ≠ r} ≡_s )  ∖  ≡_r
+```
+
+— the pairs every other receiver identifies and this one separates: what remains after quotienting by
+the rest. `Res(r) = ∅` iff `⋂_{s≠r} ≡_s ⊆ ≡_r` iff **removing `r` leaves the partition unmoved**.
+This is the residue-quotient sense the project already carries at
+`papers/source/mathematics/definitions/radix-residue-character-cell.typ`.
+
+**And it feeds back into capacity, exactly.** `receiver_current`'s law is
+`service_rounds = ⌈co_present_branch_population / site_capacity⌉` and
+`passage_delay = characteristic_delay + (service_rounds − 1)`, so capacity **divides** demand.
+Setting `capacity := |Res(r)| + 1` closes the loop
+`residue → capacity → service_rounds → delay → what conducts → residue`, and it is the exact form of
+*"the routes are cheap by design because that is something the brain did before this situation"*: a
+route is cheap **because it carried what nothing else carried**. The `+1` is forced —
+`set_site_capacity` refuses zero — and it is meaningful: an empty residue takes capacity **1**, the
+most congested route, dilating maximally under any co-present demand. **It is never deleted by a
+chooser.**
 
 **And control 4 was the naive law and is replaced.** It required the panel to read strictly finer —
-"more joints is better", exactly what the message forbids. It now requires that silt be **measured
-and named** rather than that the count went up.
+"more joints is better", exactly what the message forbids. It now requires the **residue** to be
+measured and the capacity to equal it.
 
 Measured on `soma/formal` after the extension:
 
@@ -168,7 +188,13 @@ Measured on `soma/formal` after the extension:
                                                                +7 blocks, 64 unique
   #5 ContinuationAperture  BLIND      comp_assoc | comp_id                      +7 blocks, 12 unique
   #6 ConductReach          CONGESTED  block 6, 12 items                         +1 blocks,  2 unique
-  one-shot         7 -> 28 blocks     silted 0 of 4      8 of 8 controls held
+  one-shot         7 -> 28 blocks     empty residue 0 of 4      8 of 8 controls held
+
+  axis   species                residue   capacity
+  #3     ContinuationAperture         4          5
+  #4     ContinuationAperture        64         65
+  #5     ContinuationAperture        12         13
+  #6     ConductReach                 2          3
 ```
 
 The congestion axis gains only **one** block where the blindness axes gained six and seven — which is

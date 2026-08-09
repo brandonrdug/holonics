@@ -98,8 +98,8 @@ and 2026-06-20:
 | co-present demand dilates passage delay | `receiver_current.rs:549-563`, exact over `BigUint` |
 | what does not get through is **deferred, not deleted** | `deferred_arrivals`, same file — this is the *dark information* form: a passage that exists, is admissible, and is not currently carrying |
 | congestion founds another pathway | `founded_receiver.rs` — `FoundingPressure::Congestion` |
-| the current takes the cheapest route, and the routes are cheap *by prior conduct* | **partially owned.** `characteristic_delay` is pinned at `1` by its only caller, so every channel currently costs the same. Channel specificity — the enzyme lowering one barrier — is owed. |
-| a channel with no current silts, and the silt changes the future gradient | `founded_receiver.rs` — `unique_separations`, `FoundedPanel::silted` |
+| the current takes the cheapest route, and the routes are cheap *by prior conduct* | **owned for founded axes** — `capacity := \|residue\| + 1` makes a route cheap exactly because it carried what nothing else carried. Still owed for **declared** passages: `characteristic_delay` is pinned at `1` by its only caller. |
+| an axis with empty residue is redundant, and its capacity says so | `founded_receiver.rs` — `residue`, `FoundedPanel::redundant`, `FoundedPanel::capacities`. `Res(r) = (⋂_{s≠r} ≡_s) ∖ ≡_r`; `capacity := \|Res(r)\| + 1`, so a redundant axis takes the **minimum** capacity and dilates maximally rather than being deleted. |
 
 ## 4. Bounds
 
