@@ -596,6 +596,39 @@ construction"* (it is driven in four places), and §11's reach figure for the re
 > calibrated to the generated deposit; re-pointing without re-calibrating is the same aperture defect
 > in the other direction.
 
+### RETURNED 2026-08-09 — the receiver population grows, and gyr[a,b] is measured
+
+> **Ratified and built the same turn.** Design:
+> [`research/records/2026-08-09_THE_PANEL_IS_LOCKED_AND_THE_JUNCTION_IS_WHERE_A_RECEIVER_SHOULD_BE_FOUNDED.md`](../research/records/2026-08-09_THE_PANEL_IS_LOCKED_AND_THE_JUNCTION_IS_WHERE_A_RECEIVER_SHOULD_BE_FOUNDED.md).
+> Return:
+> [`research/records/2026-08-09_THE_PANEL_GROWS_AT_ITS_OWN_BLINDNESS_AND_THE_FOUNDING_ORDER_DOES_NOT_COMMUTE.md`](../research/records/2026-08-09_THE_PANEL_GROWS_AT_ITS_OWN_BLINDNESS_AND_THE_FOUNDING_ORDER_DOES_NOT_COMMUTE.md).
+>
+> **`ObservedSystem::receivers()` was called once and never again** — the partition refined and the
+> receiver population was locked. `crates/holonic-engine/src/founded_receiver.rs` founds a receiver
+> at every junction the declared panel cannot witness, and re-refines to exhaustion.
+>
+> On `soma/formal`, 66 declarations, a three-face declared panel: **318 unwitnessed pairs**, 3
+> receivers founded, one-shot **7 → 27** blocks, unwitnessed **318 → 0**, conduct **36 → 36**
+> invariant, 3 foundings against a structural bound of 65.
+>
+> **The reading had to be local, and the global form is the measurement that says why.** Reading the
+> item's own aperture founds **one** receiver that closes all 318 junctions, because the same
+> function founds the same receiver everywhere; the gyration then distinguished provenance, not
+> content. The junction is at `left·w` and `right·w`, so `aperture_after` reads from there — and
+> founding goes 1 → 3.
+>
+> **`gyr[a,b]` is a measured holonomy.** Two founding orders, one starting panel, both reaching the
+> **same** one-shot and conduct partitions by **different** junctions — `Compression|Programme`
+> against `Compression|Route`. Same endpoint, different path, with a real transport under it: the
+> founding order is the path and the panel is what is carried. The paper's own bound is respected —
+> this is the finite holonomy face, not the gyroparallelogram, which still has no owner.
+>
+> Seven controls held, including the null (a panel that witnesses everything founds nothing) and the
+> conduct invariant. `1732 passed, 0 failed, 14 ignored.`
+>
+> **Open:** competitive selection among readings. The panel now grows, which is the precondition;
+> nothing yet keeps two incompatible decompositions alive and lets the material choose.
+
 ### RETURNED 2026-08-09 — position, and the proof body as a leader
 
 > **Depth, position, and the proof body.** `interpretation` — Brandon approved an order of work,

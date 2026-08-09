@@ -95,7 +95,7 @@ soma/     body               pure law, no_std, zero dependencies
           kernel/soma.spv    committed boundary artifact; its toolchain is excluded
 ```
 
-**Measured 2026-08-09 at `083cc55`+1:** `cargo test --workspace` **1,724 passed, 0 failed, 14
+**Measured 2026-08-09 at `532ea1b`+1:** `cargo test --workspace` **1,732 passed, 0 failed, 14
 ignored**, summed across 42 `test result:` lines. (Earlier: 1,701 at `fa0f92d`; 1,545 on 2026-08-08
 19:27 at `101882f`; 1,512 at `d91720e`; on 2026-08-07 14:34 it was **730**.) Earlier the same day it was `543 passed, 1 failed` on a `mount-scope-gate` radiation fixture
 that had never been regenerated across ten commits to `body::carriage`; that fixture was refounded

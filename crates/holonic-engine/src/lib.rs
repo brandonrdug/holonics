@@ -183,6 +183,10 @@ pub mod inverse_transport;
 // declared so that using the one-artifact reader on many-declaration material is detectable rather
 // than silently absorbed. Reached explicitly: `join`, `DeclaredForm` and `read_development` say
 // nothing at the crate root about what they read.
+// A receiver FOUNDED at a junction the declared panel could not witness, and the gyration between
+// two founding orders. Reached explicitly: `Gyration` and `FoundedReceiver` say nothing at the crate
+// root about which population they grow.
+pub mod founded_receiver;
 pub mod lean_development;
 pub mod live_presentation;
 // The material loop and its circulation -- Kelvin's theorem as a carried loop rather than a fixed
