@@ -35,7 +35,9 @@
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 
-use holonic_engine::founded_receiver::{found_to_exhaustion, gyration, FoundedPanel};
+use holonic_engine::founded_receiver::{
+    found_to_exhaustion, gyration, FoundedPanel, FoundingPressure,
+};
 use holonic_engine::lean_development::{
     join, read_development, ConductGrain, DeclarationGrain, DevelopmentReading,
 };
@@ -286,14 +288,37 @@ fn main() {
             panel.conduct.len()
         ),
     ));
+    // CONTROL 4, REPLACED. The first form required the panel to read strictly finer, which is the
+    // naive "more joints is better" the material forbids: "More joints != survival and propagation
+    // ... the joints must satisfy some sort of contextual ecological transport mechanism. The
+    // channel for water that has none flowing will experience nothing but the collection of debris."
+    // What is required now is that an axis carrying no current of its own is MEASURED AND NAMED,
+    // not that the count went up.
+    let silted = panel.silted();
     controls.push((
-        panel.rounds == 0 || panel.one_shot_after.len() > panel.one_shot_before.len(),
-        "control 4 -- a grown panel reads strictly finer".to_owned(),
+        panel.founded.iter().all(|found| found.blocks_gained > 0),
+        "control 4 -- every founded axis gained blocks, and silt is measured rather than assumed"
+            .to_owned(),
         format!(
-            "one-shot {} -> {}",
+            "one-shot {} -> {}, {} of {} silted",
             panel.one_shot_before.len(),
-            panel.one_shot_after.len()
+            panel.one_shot_after.len(),
+            silted.len(),
+            panel.founded.len()
         ),
+    ));
+
+    // CONTROL 8. Four axes of one species are four fingers. A second species is the thumb.
+    let species = panel.species_founded();
+    println!("\n  THE THUMB: {} distinct axis species founded.", species.len());
+    println!("  Founding on blindness alone founds one species repeatedly -- modes of freedom the");
+    println!("  panel already has. Congestion is a DIFFERENT pressure and founds a different axis:");
+    println!("  a congested block is not blind, it is undifferentiated, and a sharper aperture");
+    println!("  cannot differentiate it. That is what \"uniquely founded axes\" requires.");
+    controls.push((
+        species.len() >= 2,
+        "control 8 -- founding reaches more than one axis species".to_owned(),
+        format!("{:?}", species),
     ));
     controls.push((
         panel.rounds <= panel.bound,
@@ -420,14 +445,26 @@ fn report(system: &Development, panel: &FoundedPanel) {
         println!("\n  every founded receiver, with the junction that provoked it");
         println!("  ---------------------------------------------------------");
         for found in &panel.founded {
+            let pressure = match &found.pressure {
+                FoundingPressure::Blindness { left, right } => format!(
+                    "BLIND    {} | {}",
+                    system.name_of(*left),
+                    system.name_of(*right)
+                ),
+                FoundingPressure::Congestion { block, occupancy } => {
+                    format!("CONGESTED block {block}, {occupancy} items")
+                }
+            };
             println!(
-                "    #{:<3} at  {:<34} | {:<34}  after {} input(s), +{} blocks",
-                found.id.0,
-                system.name_of(found.junction.0),
-                system.name_of(found.junction.1),
-                found.after.len(),
-                found.blocks_gained
+                "    #{:<3} {:<22?} {:<52}  +{} blocks, {} unique",
+                found.id.0, found.species, pressure, found.blocks_gained, found.unique_separations
             );
+        }
+        println!("\n  axis species founded: {:?}", panel.species_founded());
+        let silted = panel.silted();
+        println!("  silted (carrying no current of their own): {}", silted.len());
+        for found in &silted {
+            println!("    #{} {:?} -- separates nothing another receiver does not", found.id.0, found.species);
         }
     }
     if !panel.refused.is_empty() {

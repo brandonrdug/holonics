@@ -72,11 +72,64 @@ use crate::receiver_exact_compression::{
     compress, CollapsedPair, InputId, ItemId, ObservedSystem, Observation, Partition, ReceiverId,
 };
 
+/// **Why an axis was founded.** Two pressures, and the second is the traffic law.
+///
+/// Founding on blindness alone is the four-fingers case: every axis founded the same way, each a
+/// mode of freedom the others already have. Brandon, 2026-07-31, giving the other pressure:
+/// *"It is stupid to try to serialize things generally through major pathways because they end up
+/// becoming overcrowded and inaccessible because there is too much traffic, so what you would
+/// normally do in engineering is just construct more dynamic pathways to navigate between."*
+///
+/// **Congestion founds an axis.** A block holding many items is an overloaded site: the declared
+/// panel routes everything through one distinction, and the engineering answer is not a finer
+/// version of that distinction but *another pathway*.
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+pub enum FoundingPressure {
+    /// Conduct separates a pair and no receiver in the panel witnesses it.
+    Blindness { left: ItemId, right: ItemId },
+    /// A block of the one-shot partition carries more items than any other. The site is overloaded.
+    Congestion { block: usize, occupancy: usize },
+}
+
+/// **What kind of axis was founded.** The species matters as much as the count.
+///
+/// Brandon, 2026-08-09: *"We literally have 5 fingers per hand, where 4 of the fingers have similar
+/// modes of freedom, but the 5th is an opposable thumb that **exponentially increases the
+/// combinatorial potentials** of what we can do with our hands."* Four axes of one species do not
+/// multiply what a panel can do; an axis of a **different** species does. So the species is
+/// retained, and [`FoundedPanel::species_founded`] returns how many distinct ones a run reached —
+/// which is the non-naive reading of "more degrees of freedom".
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum AxisSpecies {
+    /// Which admitted inputs offer a successor, read at the junction's own word. The distinction a
+    /// terminus junction exhibits.
+    ContinuationAperture,
+    /// How far conduct carries from here before it stops — the length of the longest word this item
+    /// admits, bounded by the population. A congested block is not blind; it is *undifferentiated*,
+    /// and depth of reach differentiates it where aperture cannot.
+    ConductReach,
+}
+
 /// A receiver founded at a junction the declared panel could not witness.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct FoundedReceiver {
     /// The id minted for it, above every declared id in the starting panel.
     pub id: ReceiverId,
+    /// Why it was founded.
+    pub pressure: FoundingPressure,
+    /// What kind of axis it is. Two of one species are four fingers; two species are a thumb.
+    pub species: AxisSpecies,
+    /// **Silt.** How many pairs this axis separates that **no other receiver in the final panel
+    /// separates**. Zero means the channel carries nothing of its own.
+    ///
+    /// Brandon, 2026-08-09: *"More joints != survival and propagation… The channel for water that
+    /// has none flowing will experience nothing but the collection of debris, where the collection
+    /// of debris changes the potential of how gradients of current can flow in the future."* A
+    /// founded axis is not free and does not stay neutral: one that carries no unique current has
+    /// silted, and [`FoundedPanel::silted`] returns them. This is what stops "more axes" from being
+    /// monotone.
+    pub unique_separations: usize,
     /// The pair whose separation no declared receiver witnessed. This is the junction.
     pub junction: (ItemId, ItemId),
     /// The shortest input word after which conduct separated that pair.
@@ -136,6 +189,20 @@ impl FoundedPanel {
     pub const fn exhausted(&self) -> bool {
         self.unwitnessed_remaining == 0
     }
+
+    /// How many **distinct axis species** the run founded. Four axes of one species are four
+    /// fingers; two species are a thumb, and that is what multiplies what the panel can do.
+    pub fn species_founded(&self) -> BTreeSet<AxisSpecies> {
+        self.founded.iter().map(|found| found.species).collect()
+    }
+
+    /// Founded axes carrying no current of their own — the silted channels.
+    pub fn silted(&self) -> Vec<&FoundedReceiver> {
+        self.founded
+            .iter()
+            .filter(|found| found.unique_separations == 0)
+            .collect()
+    }
 }
 
 /// The item's own continuation aperture: which admitted inputs offer a successor here.
@@ -182,6 +249,69 @@ pub fn aperture_after(
         }
     }
     continuation_aperture(system, here)
+}
+
+/// **The second axis species: how far conduct carries from here before it stops.**
+///
+/// A congested block is not blind — every receiver agrees about its members. It is
+/// *undifferentiated*, and a finer version of the same aperture cannot differentiate it. Depth of
+/// reach can: two items with identical apertures may still admit words of different length.
+///
+/// Bounded by the population, so the walk terminates: a cycle cannot extend the reach past the
+/// number of items.
+pub fn conduct_reach(system: &dyn ObservedSystem, item: ItemId) -> Observation {
+    let bound = system.items().len();
+    let inputs = system.inputs();
+    let mut frontier = vec![item];
+    let mut seen: BTreeSet<ItemId> = BTreeSet::from([item]);
+    let mut reach = 0u64;
+    while !frontier.is_empty() && (reach as usize) < bound {
+        let mut next = Vec::new();
+        for here in frontier {
+            for input in &inputs {
+                if let Some(there) = system.successor(here, *input)
+                    && seen.insert(there)
+                {
+                    next.push(there);
+                }
+            }
+        }
+        if next.is_empty() {
+            break;
+        }
+        frontier = next;
+        reach += 1;
+    }
+    Observation(reach)
+}
+
+/// The reading for one axis species, at one junction word.
+fn read_species(
+    system: &dyn ObservedSystem,
+    species: AxisSpecies,
+    word: &[InputId],
+) -> BTreeMap<ItemId, Observation> {
+    system
+        .items()
+        .into_iter()
+        .map(|item| {
+            let read = match species {
+                AxisSpecies::ContinuationAperture => aperture_after(system, item, word),
+                AxisSpecies::ConductReach => conduct_reach(system, item),
+            };
+            (item, read)
+        })
+        .collect()
+}
+
+/// The most occupied block of a partition — the overloaded site.
+fn congested_block(partition: &Partition) -> Option<(usize, usize)> {
+    partition
+        .blocks
+        .iter()
+        .enumerate()
+        .max_by_key(|(_, block)| block.len())
+        .map(|(index, block)| (index, block.len()))
 }
 
 /// A system whose panel is the declared one plus everything founded so far.
@@ -262,11 +392,71 @@ pub fn found_to_exhaustion(system: &dyn ObservedSystem, skip: &[(ItemId, ItemId)
             .find(|pair| pair.witness.is_none() && !deferred.contains(&(pair.left, pair.right)))
             .or_else(|| first_junction(&reading.collapsed));
         let Some(pair) = junction else {
+            // BLINDNESS IS EXHAUSTED. The other pressure remains: a block holding many items is an
+            // overloaded site, and the traffic answer is another pathway rather than a finer
+            // version of the same one. The axis founded here is a DIFFERENT SPECIES -- the thumb,
+            // not a fifth finger -- because a congested block is undifferentiated rather than
+            // blind, and a sharper aperture cannot differentiate it.
             let widened = WidenedSystem {
                 declared: system,
                 founded: &founded,
             };
             let settled = compress(&widened);
+
+            if founded.len() < bound
+                && let Some((block, occupancy)) = congested_block(&settled.one_shot)
+                && occupancy > 1
+            {
+                let species = AxisSpecies::ConductReach;
+                let reads = read_species(system, species, &[]);
+                let distinct: BTreeSet<Observation> = reads.values().copied().collect();
+                let gained = {
+                    let mut trial = founded.clone();
+                    trial.push(FoundedReceiver {
+                        id: ReceiverId(next_id),
+                        pressure: FoundingPressure::Congestion { block, occupancy },
+                        species,
+                        unique_separations: 0,
+                        junction: (ItemId(0), ItemId(0)),
+                        after: Vec::new(),
+                        reads: reads.clone(),
+                        blocks_gained: 0,
+                    });
+                    let widened = WidenedSystem {
+                        declared: system,
+                        founded: &trial,
+                    };
+                    compress(&widened)
+                        .one_shot
+                        .len()
+                        .saturating_sub(settled.one_shot.len())
+                };
+                if distinct.len() > 1 && gained > 0 {
+                    founded.push(FoundedReceiver {
+                        id: ReceiverId(next_id),
+                        pressure: FoundingPressure::Congestion { block, occupancy },
+                        species,
+                        unique_separations: 0,
+                        junction: (ItemId(0), ItemId(0)),
+                        after: Vec::new(),
+                        reads,
+                        blocks_gained: gained,
+                    });
+                    next_id += 1;
+                    continue;
+                }
+                refused.push(FoundingRefusal::FoundedNothing {
+                    left: ItemId(0),
+                    right: ItemId(0),
+                });
+            }
+
+            let widened = WidenedSystem {
+                declared: system,
+                founded: &founded,
+            };
+            let settled = compress(&widened);
+            measure_silt(system, &mut founded);
             return FoundedPanel {
                 declared,
                 rounds: founded.len(),
@@ -302,15 +492,12 @@ pub fn found_to_exhaustion(system: &dyn ObservedSystem, skip: &[(ItemId, ItemId)
         }
 
         // The candidate reading, off the material and LOCAL to this junction's word.
-        let reads: BTreeMap<ItemId, Observation> = items
-            .iter()
-            .map(|item| {
-                (
-                    *item,
-                    aperture_after(system, *item, &pair.distinguishing_word),
-                )
-            })
-            .collect();
+        let pressure = FoundingPressure::Blindness {
+            left: pair.left,
+            right: pair.right,
+        };
+        let species = AxisSpecies::ContinuationAperture;
+        let reads = read_species(system, species, &pair.distinguishing_word);
 
         // It must see the junction it was founded for, and it must found something.
         let left_read = reads.get(&pair.left).copied().unwrap_or(Observation(0));
@@ -364,6 +551,9 @@ pub fn found_to_exhaustion(system: &dyn ObservedSystem, skip: &[(ItemId, ItemId)
         let gained = {
             let candidate = FoundedReceiver {
                 id: ReceiverId(next_id),
+                pressure: pressure.clone(),
+                species,
+                unique_separations: 0,
                 junction: (pair.left, pair.right),
                 after: pair.distinguishing_word.clone(),
                 reads: reads.clone(),
@@ -380,12 +570,48 @@ pub fn found_to_exhaustion(system: &dyn ObservedSystem, skip: &[(ItemId, ItemId)
 
         founded.push(FoundedReceiver {
             id: ReceiverId(next_id),
+            pressure,
+            species,
+            unique_separations: 0,
             junction: (pair.left, pair.right),
             after: pair.distinguishing_word.clone(),
             reads,
             blocks_gained: gained,
         });
         next_id += 1;
+    }
+}
+
+/// **Silt.** For each founded axis, how many pairs it separates that no other receiver separates.
+///
+/// A channel with no current of its own has collected debris. This is the measurement that makes
+/// the founded population non-monotone: adding an axis is not automatically a gain, and an axis
+/// that carries nothing unique is reported rather than counted.
+fn measure_silt(system: &dyn ObservedSystem, founded: &mut [FoundedReceiver]) {
+    let items = system.items();
+    let declared = system.receivers();
+    let readings: Vec<BTreeMap<ItemId, Observation>> =
+        founded.iter().map(|found| found.reads.clone()).collect();
+
+    for (index, found) in founded.iter_mut().enumerate() {
+        let mut unique = 0usize;
+        for (place, left) in items.iter().enumerate() {
+            for right in &items[place + 1..] {
+                let mine = readings[index].get(left) != readings[index].get(right);
+                if !mine {
+                    continue;
+                }
+                let others_see = declared.iter().any(|receiver| {
+                    system.observation(*left, *receiver) != system.observation(*right, *receiver)
+                }) || readings.iter().enumerate().any(|(other, reading)| {
+                    other != index && reading.get(left) != reading.get(right)
+                });
+                if !others_see {
+                    unique += 1;
+                }
+            }
+        }
+        found.unique_separations = unique;
     }
 }
 

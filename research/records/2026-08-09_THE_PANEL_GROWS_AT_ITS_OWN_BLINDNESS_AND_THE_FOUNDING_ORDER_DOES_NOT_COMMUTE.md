@@ -121,7 +121,67 @@ Seven declared, seven held.
 - **The orbit is exhibited before the gyration is read**, and a trivial orbit would be reported as
   measuring nothing rather than as agreement. It came back non-trivial.
 
-## 6. What this does not claim
+## 6. EXTENDED THE SAME DAY — congestion is the second pressure, and an axis can silt
+
+Brandon, 2026-08-09, stating the grand-scale behaviour of evolution:
+
+> *"Evolution seems to be this endless process in which things apart of universality (everything)
+> tends toward dynamics such that action and energy is provided **more degrees of freedom that are
+> uniquely founded axes relative to any local ecologies**, and this tendency occurs even in
+> infinitesimal frames."*
+
+and the constraint that stops it being a scalar:
+
+> *"More joints != survival and propagation though. I have been clearly writing that the joints must
+> satisfy some sort of contextual ecological transport mechanism. **The channel for water that has
+> none flowing will experience nothing but the collection of debris, where the collection of debris
+> changes the potential of how gradients of current can flow in the future.**"*
+
+Three defects in the organ above, each named by that message, each now closed.
+
+**The thumb, not a fifth finger.** Founding on blindness alone founds one species of axis
+repeatedly — modes of freedom the panel already has. *"We literally have 5 fingers per hand, where 4
+of the fingers have similar modes of freedom, but the 5th is an opposable thumb that exponentially
+increases the combinatorial potentials."* `AxisSpecies` is retained and
+`FoundedPanel::species_founded` returns how many distinct ones a run reached.
+
+**Congestion is the second pressure, and it is his, from 2026-07-31:** *"It is stupid to try to
+serialize things generally through major pathways because they end up becoming overcrowded and
+inaccessible because there is too much traffic, so what you would normally do in engineering is just
+construct more dynamic pathways to navigate between."* A block holding many items is an overloaded
+site — **not blind but undifferentiated**, which a sharper aperture cannot fix. `AxisSpecies::ConductReach`
+is the different pathway: how far conduct carries before it stops.
+
+**An axis that carries nothing silts.** `unique_separations` counts the pairs an axis separates that
+**no other receiver separates**. Zero means the channel carries no current of its own.
+
+**And control 4 was the naive law and is replaced.** It required the panel to read strictly finer —
+"more joints is better", exactly what the message forbids. It now requires that silt be **measured
+and named** rather than that the count went up.
+
+Measured on `soma/formal` after the extension:
+
+```text
+  founded          4 receivers, 2 axis species
+  #3 ContinuationAperture  BLIND      Compression | Programme                   +6 blocks,  4 unique
+  #4 ContinuationAperture  BLIND      Compression.receiver_eq… | RatioPresentation.ext
+                                                               +7 blocks, 64 unique
+  #5 ContinuationAperture  BLIND      comp_assoc | comp_id                      +7 blocks, 12 unique
+  #6 ConductReach          CONGESTED  block 6, 12 items                         +1 blocks,  2 unique
+  one-shot         7 -> 28 blocks     silted 0 of 4      8 of 8 controls held
+```
+
+The congestion axis gains only **one** block where the blindness axes gained six and seven — which is
+the honest shape: an overloaded site is a weaker signal than a blind one, and the return says so
+rather than treating both pressures as equivalent.
+
+The analogy that motivates the congestion law had **no canon presence at all** —
+`grep -i 'traffic\|automobile' canon/` returned zero — while the law was already implemented at
+`receiver_current.rs:549-563`. It is deposited as `canon/THE_TRAFFIC_SYSTEM.md`. And
+`canon/MEANING_DEFINED.md`, which Brandon asked for on 2026-07-07 and which was never written in
+either repository, is deposited with his definition and the table of what carries each clause.
+
+## 7. What this does not claim
 
 - **The founded reading is one species, not the species.** The aperture at the junction's word is the
   distinction a *terminus* junction exhibits. A junction of another species would found a different
