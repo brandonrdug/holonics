@@ -21,7 +21,9 @@ use holonic_engine::algebraic::{
     CausalCellId, CausalChain, ComparativeMultiplicity, GradedCausalComplex,
 };
 use holonic_engine::causal::EventId;
+use holonic_engine::conditioned_derivation::{expose, ConditionedBody};
 use holonic_engine::graded_complex_form::encode_native_bytes;
+use life::conditioned_rest::ConditionedRest;
 use life::holonic_training::{FaceAddress, SourceFace, TrainingEcology};
 use num_bigint::BigInt;
 use soma_abi::active::{ActionCurrent, RelationAtom};
@@ -39,6 +41,7 @@ use crate::schemas::rebase::{
     decode_euler, encode_euler, BoundaryTerm, RebaseBody, RebaseDeed, REBASE_SCHEMA_VERSION,
     REBASE_TAG,
 };
+use crate::schemas::conditioned::{CONDITIONED_SCHEMA_VERSION, CONDITIONED_TAG};
 use crate::schemas::training::{TrainingDeed, TRAINING_SCHEMA_VERSION, TRAINING_TAG};
 
 // ---------------------------------------------------------------------------------------------
@@ -65,6 +68,40 @@ fn training_form() -> Vec<u8> {
             .expect("a cultivation");
     }
     ecology.encode_native_bytes().expect("a training form")
+}
+
+/// A conditioned derivation body carried to a real founded morphology by exposure to two wholes,
+/// mounted on two declared artifacts. Driven by `life`'s own owner; nothing here is a fixture blob.
+fn conditioned_form() -> Vec<u8> {
+    let mut body = ConditionedBody::mount([
+        (
+            "alpha.lean".to_owned(),
+            "namespace Soma\ntheorem carrier_alpha (h : P) : exactCarrier P := by\n  \
+             have bridged := exactCarry h\nend Soma\n"
+                .to_owned(),
+        ),
+        (
+            "beta.lean".to_owned(),
+            "namespace Soma\ntheorem carrier_beta (h : P) : exactCarrier P := by\n  \
+             have bridged := formalKernel h\nend Soma\n"
+                .to_owned(),
+        ),
+    ])
+    .expect("the deposit mounts");
+    body.condition(&[
+        expose(
+            "document:one",
+            "the exact carrier carries a formal kernel through a transport",
+        ),
+        expose(
+            "document:two",
+            "an exact transport of the formal carrier meets the kernel",
+        ),
+    ]);
+    ConditionedRest::seal(&body)
+        .expect("the body seals")
+        .encode_native_bytes()
+        .expect("a conditioned rest form")
 }
 
 fn relation(value: i64) -> RelationAtom {
@@ -541,7 +578,12 @@ fn an_unheld_schema_refuses_rather_than_guessing() {
     assert_eq!(*version, Some(1));
     assert_eq!(
         held,
-        &["HTEC/1".to_owned(), "ERST/2".to_owned(), "RBIN/1".to_owned()]
+        &[
+            "HTEC/1".to_owned(),
+            "ERST/2".to_owned(),
+            "RBIN/1".to_owned(),
+            "CDER/1".to_owned()
+        ]
     );
     let rendered = refusal.to_string();
     assert!(rendered.contains("ZZZZ/1"), "{rendered}");
@@ -589,6 +631,13 @@ fn the_held_versions_are_taken_from_the_codecs_they_hold() {
         REBASE_SCHEMA_VERSION,
         "the held version must be the one the codec writes, not a literal beside it"
     );
+
+    // CDER's codec writes b"CDER\0\0\0\x01"; the schema version is that trailing octet, and the
+    // constant is derived from the prefix rather than restated beside it.
+    let form = conditioned_form();
+    assert_eq!(&form[0..8], b"CDER\0\0\0\x01".as_slice());
+    assert_eq!(CONDITIONED_SCHEMA_VERSION, u32::from(form[7]));
+    assert_eq!(CONDITIONED_TAG.to_string(), "CDER");
 }
 
 // ---------------------------------------------------------------------------------------------

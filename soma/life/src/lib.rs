@@ -7,6 +7,10 @@
 pub mod agentic_language;
 pub mod agentic_research;
 pub mod causal_language;
+// The rest wire for `holonic-engine`'s conditioned derivation body. It lives here for the same
+// reason `decomposing_codec` does: `life` depends on `holonic-engine` and the reverse edge does not
+// exist, so the engine's one public re-founding seam can be driven from here and not from there.
+pub mod conditioned_rest;
 pub mod coupled_informant_current;
 pub mod current_world;
 // The downward crossing of `blueprint/THE_ASSEMBLY.md` loop (a): a decomposer run as a codec, whose

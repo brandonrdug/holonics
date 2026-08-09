@@ -135,12 +135,22 @@ it to prove the refusal can fire.
 | `HTEC` | 1 | `soma/life/src/holonic_training.rs:443` | one cultivation occurrence |
 | `ERST` | 2 | `soma/membrane/src/live_current.rs:1241` | one contemporary event continuing every settled lineage |
 | `RBIN` | 1 | `crates/holonic-engine/src/graded_complex_form.rs` | one further cell, founded through the incidence's own founder |
+| `CDER` | 1 | `soma/life/src/conditioned_rest.rs` | one further whole of linguistic material |
 
 A plate naming anything else is **refused, never guessed at** — separately for an unheld tag and an
 unheld codec version, because a form at another version is another form. `ERST`'s version is read
-from `LIVE_CURRENT_REST_LAYOUT_VERSION` rather than copied, and `RBIN`'s from
-`GRADED_COMPLEX_FORM_LAYOUT_VERSION`, so a codec that bumps its wire stops this reader by version
-instead of silently misreading.
+from `LIVE_CURRENT_REST_LAYOUT_VERSION` rather than copied, `RBIN`'s from
+`GRADED_COMPLEX_FORM_LAYOUT_VERSION`, and `CDER`'s from the trailing octet of
+`CONDITIONED_REST_PREFIX`, so a codec that bumps its wire stops this reader by version instead of
+silently misreading.
+
+`CDER` is the first schema whose form reaches this mouth from a **production driver** rather than
+from `examples/emit_form`: `soma/life/examples/eros_mathematics_instance_rest.rs` seals a real
+conditioned body — a morphology founded on fourteen declared documents, over a 103-artifact
+standing — through `life::form_mouth`, and `tests/plate_mouth.rs` carries it the rest of the way.
+It is also the schema that most sharply carries the FORM/current line: it holds a body's founded
+morphology and the material that body conducts over, and **no query and no derived passage**, so a
+body re-lit off it has to derive and cannot replay.
 
 `RBIN` is the sharpest illustration of the census being a **second frame** rather than a copy. The
 octets are a graded causal incidence — cells, grades, source events, oriented boundary chains. The

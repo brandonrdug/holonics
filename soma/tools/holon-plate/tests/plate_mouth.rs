@@ -54,9 +54,12 @@ use std::sync::{Mutex, MutexGuard};
 use body::num::Cog;
 use holon_plate::registry::{deposit, resume};
 use holon_plate::schema::{present_and_require_change, ResumeRefusal};
+use holon_plate::schemas::conditioned::{ConditionedDeed, CONDITIONED_TAG};
 use holon_plate::schemas::current::{CurrentDeed, CURRENT_TAG};
 use holon_plate::schemas::training::{TrainingDeed, TRAINING_TAG};
 use holon_plate::SchemaTag;
+use holonic_engine::conditioned_derivation::{expose, ConditionedBody, DerivationQuery};
+use life::conditioned_rest::ConditionedRest;
 use life::form_mouth::{
     content_address, declared_path, deposit_form, deposit_form_or_message, deposit_form_under,
     DepositedForm, FormMouthRefusal, DEPOSIT_ROOT,
@@ -165,6 +168,53 @@ fn current_octets_from(relations: &[i64]) -> Vec<u8> {
         .expect("a current form")
 }
 
+/// A `CDER` form, through `ConditionedRest::seal(&body)?.encode_native_bytes()?` — the two calls
+/// `eros_mathematics_instance_rest.rs` makes at its seal. The material is this file's, not that
+/// driver's: the driver reads fourteen declared documents and a 103-artifact deposit off disk, and a
+/// test that needed those paths would be a test of the repository's contents.
+fn conditioned_octets() -> Vec<u8> {
+    conditioned_octets_from("the exact carrier carries a formal kernel through a transport")
+}
+
+/// The same producer over declared material, so a second `CDER` form can be made that is genuinely
+/// a different form rather than a copy of the first.
+fn conditioned_octets_from(surface: &str) -> Vec<u8> {
+    let mut body = ConditionedBody::mount([
+        (
+            "alpha.lean".to_owned(),
+            "namespace Soma\ntheorem carrier_alpha (h : P) : exactCarrier P := by\n  \
+             have bridged := exactCarry h\nend Soma\n"
+                .to_owned(),
+        ),
+        (
+            "beta.lean".to_owned(),
+            "namespace Soma\ntheorem carrier_beta (h : P) : exactCarrier P := by\n  \
+             have bridged := formalKernel h\nend Soma\n"
+                .to_owned(),
+        ),
+    ])
+    .expect("the deposit mounts");
+    body.condition(&[
+        expose("document:one", surface),
+        expose(
+            "document:two",
+            "an exact transport of the formal carrier meets the kernel",
+        ),
+    ]);
+    ConditionedRest::seal(&body)
+        .expect("the body seals")
+        .encode_native_bytes()
+        .expect("a conditioned rest form")
+}
+
+fn conditioned_deed() -> Vec<u8> {
+    ConditionedDeed {
+        whole: "document:three".to_owned(),
+        text: "a novel receiver meets the exact carrier".to_owned(),
+    }
+    .encode()
+}
+
 fn training_deed() -> Vec<u8> {
     TrainingDeed {
         faces: vec![face("left", 9, "nine"), face("right", 9, "six")],
@@ -197,6 +247,12 @@ fn wired() -> Vec<(&'static str, SchemaTag, Vec<u8>, Vec<u8>)> {
             CURRENT_TAG,
             current_octets(),
             current_deed(),
+        ),
+        (
+            "conditioned-rest",
+            CONDITIONED_TAG,
+            conditioned_octets(),
+            conditioned_deed(),
         ),
     ]
 }
@@ -325,6 +381,8 @@ fn a_driver_form_under_the_wrong_held_tag_is_refused() {
     let crossed = [
         ("training-ecology-rest", CURRENT_TAG, training_octets()),
         ("machine-rest", TRAINING_TAG, current_octets()),
+        ("conditioned-rest", TRAINING_TAG, conditioned_octets()),
+        ("training-ecology-rest", CONDITIONED_TAG, training_octets()),
     ];
     for (site, wrong_tag, octets) in crossed {
         let deposited = at_the_mouth(&root, &driver, site, &octets);
@@ -393,6 +451,68 @@ fn the_mouth_refuses_an_empty_form() {
         other => panic!("the empty-form law must fire here, got {other:?}"),
     }
     assert!(!root.exists(), "a refused deposit founds nothing at all");
+}
+
+/// A body resumed off the mouth **derives**; it does not replay.
+///
+/// The `CDER` form has no field for a query and none for a derived passage, and this drives that
+/// claim rather than restating it: the body is resumed from octets alone, asked a statement, and
+/// every artifact it returns is checked to be absent from the octets it was resumed from. A schema
+/// that had quietly sealed its last answer beside the body would fail here and pass every other
+/// test in this file.
+#[test]
+fn a_conditioned_body_resumed_off_the_mouth_derives_what_the_octets_do_not_carry() {
+    let _alone = alone();
+    let (root, driver) = scratch("conditioned-derives");
+    let octets = conditioned_octets();
+    let deposited = at_the_mouth(&root, &driver, "conditioned-rest", &octets);
+    let from_disk = std::fs::read(&deposited.path).expect("the deposited form");
+    let plate = deposit(CONDITIONED_TAG, &from_disk).expect("a deposit");
+    let relit = resume(&plate.plate).expect("a resume");
+
+    // the body is re-mounted from the resumed form's octets and asked
+    let rest = ConditionedRest::decode_native_bytes(&relit.body.form().expect("the form"))
+        .expect("the form reopens");
+    let body = rest.mount().expect("the rest mounts");
+    let derived = body
+        .derive(&DerivationQuery::reaching("(h : P) : exactCarrier P"))
+        .expect("derives");
+    assert!(
+        !derived.is_empty(),
+        "the resumed body derived nothing, so nothing below is evidence"
+    );
+    for passage in &derived {
+        assert!(
+            !from_disk
+                .windows(passage.name.len())
+                .any(|window| window == passage.name.as_bytes()),
+            "the sealed octets carry the artifact name {:?}, so this is a replay",
+            passage.name
+        );
+    }
+    std::fs::remove_dir_all(&root).ok();
+}
+
+/// Two conditioned rests from one site — the shape a driver produces when it seals once per run —
+/// take two addresses and both resume as bodies.
+#[test]
+fn two_conditioned_rests_from_one_site_both_reach_the_far_side() {
+    let _alone = alone();
+    let (root, driver) = scratch("two-conditioned");
+    let earlier = conditioned_octets_from("the exact carrier carries a formal kernel");
+    let later = conditioned_octets_from("the exact carrier carries a formal kernel and a receiver");
+    assert_ne!(earlier, later, "the two fixtures must be two forms");
+
+    let first = at_the_mouth(&root, &driver, "conditioned-rest", &earlier);
+    let second = at_the_mouth(&root, &driver, "conditioned-rest", &later);
+    assert_ne!(first.path, second.path);
+    for deposited in [&first, &second] {
+        let from_disk = std::fs::read(&deposited.path).expect("both forms are still on disk");
+        let plate = deposit(CONDITIONED_TAG, &from_disk).expect("a deposit");
+        let relit = resume(&plate.plate).expect("a resume");
+        assert_eq!(relit.body.form().expect("the form"), deposited.octets);
+    }
+    std::fs::remove_dir_all(&root).ok();
 }
 
 // ---------------------------------------------------------------------------------------------

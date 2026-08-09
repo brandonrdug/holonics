@@ -1,9 +1,11 @@
 //! `cargo run -p holon-plate --example emit_form -- HTEC out.form`
 //! `cargo run -p holon-plate --example emit_form -- ERST out.form`
 //! `cargo run -p holon-plate --example emit_form -- RBIN out.form`
+//! `cargo run -p holon-plate --example emit_form -- CDER out.form`
 //! `cargo run -p holon-plate --example emit_form -- HTEC-DEED out.deed`
 //! `cargo run -p holon-plate --example emit_form -- ERST-DEED out.deed`
 //! `cargo run -p holon-plate --example emit_form -- RBIN-DEED out.deed`
+//! `cargo run -p holon-plate --example emit_form -- CDER-DEED out.deed`
 //!
 //! A driver, so that the mouth can be fed.
 //!
@@ -17,17 +19,27 @@
 //! real contemporary events. They are a **demonstration seed**, not evidence of anything: no
 //! capability claim rests on them and the census they carry is whatever those occurrences actually
 //! produced.
+//!
+//! `CDER` is the one species that no longer has to come from here. Its production driver,
+//! `soma/life/examples/eros_mathematics_instance_rest.rs`, opens its own mouth and writes a real
+//! 989 KB conditioned rest — a morphology founded on fourteen declared documents over a
+//! 103-artifact standing — to `output/eros_mathematics_instance_rest/`. The seed below exists so
+//! that the `--deed` path is reachable from a shell without running that driver first, and it is
+//! deliberately tiny beside it.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::PathBuf;
 
 use body::num::Cog;
+use holon_plate::schemas::conditioned::ConditionedDeed;
 use holon_plate::schemas::current::CurrentDeed;
 use holon_plate::schemas::rebase::{BoundaryTerm, RebaseDeed};
 use holon_plate::schemas::training::TrainingDeed;
 use holonic_engine::algebraic::{CausalChain, ComparativeMultiplicity, GradedCausalComplex};
+use holonic_engine::conditioned_derivation::{expose, ConditionedBody};
 use holonic_engine::causal::EventId;
 use holonic_engine::graded_complex_form::encode_native_bytes;
+use life::conditioned_rest::ConditionedRest;
 use life::holonic_training::{FaceAddress, SourceFace, TrainingEcology};
 use soma_abi::active::{ActionCurrent, RelationAtom};
 use soma_membrane::{
@@ -35,7 +47,7 @@ use soma_membrane::{
 };
 
 const USAGE: &str =
-    "usage: emit_form (HTEC|ERST|RBIN|HTEC-DEED|ERST-DEED|RBIN-DEED) OUT";
+    "usage: emit_form (HTEC|ERST|RBIN|CDER|HTEC-DEED|ERST-DEED|RBIN-DEED|CDER-DEED) OUT";
 
 fn main() -> Result<(), String> {
     let mut arguments = std::env::args().skip(1);
@@ -46,9 +58,11 @@ fn main() -> Result<(), String> {
         "HTEC" => training_form()?,
         "ERST" => current_form()?,
         "RBIN" => rebase_form()?,
+        "CDER" => conditioned_form()?,
         "HTEC-DEED" => training_deed(),
         "ERST-DEED" => current_deed(),
         "RBIN-DEED" => rebase_deed(),
+        "CDER-DEED" => conditioned_deed(),
         other => return Err(format!("`{other}` is not a held schema\n{USAGE}")),
     };
     std::fs::write(&out, &octets).map_err(|error| format!("cannot write {}: {error}", out.display()))?;
@@ -110,6 +124,48 @@ fn current_form() -> Result<Vec<u8>, String> {
         .map_err(debug)?
         .encode_native_bytes()
         .map_err(debug)
+}
+
+/// A conditioned derivation body over two declared artifacts, conditioned by exposure to two
+/// wholes. The deed below presents a third whole, which founds stems the first two never witnessed.
+fn conditioned_form() -> Result<Vec<u8>, String> {
+    let mut body = ConditionedBody::mount([
+        (
+            "alpha.lean".to_owned(),
+            "namespace Soma\ntheorem carrier_alpha (h : P) : exactCarrier P := by\n  \
+             have bridged := exactCarry h\nend Soma\n"
+                .to_owned(),
+        ),
+        (
+            "beta.lean".to_owned(),
+            "namespace Soma\ntheorem carrier_beta (h : P) : exactCarrier P := by\n  \
+             have bridged := formalKernel h\nend Soma\n"
+                .to_owned(),
+        ),
+    ])
+    .map_err(debug)?;
+    body.condition(&[
+        expose(
+            "document:one",
+            "the exact carrier carries a formal kernel through a transport",
+        ),
+        expose(
+            "document:two",
+            "an exact transport of the formal carrier meets the kernel",
+        ),
+    ]);
+    ConditionedRest::seal(&body)
+        .map_err(|refusal| refusal.to_string())?
+        .encode_native_bytes()
+        .map_err(|refusal| refusal.to_string())
+}
+
+fn conditioned_deed() -> Vec<u8> {
+    ConditionedDeed {
+        whole: "document:three".to_owned(),
+        text: "a novel receiver family meets the exact carrier".to_owned(),
+    }
+    .encode()
 }
 
 fn current_deed() -> Vec<u8> {
