@@ -194,6 +194,13 @@ pub mod temper;
 // it as material. Joins `derivation_atlas`'s movement and the `temper`/`derivation_integral`
 // cochain circuit, neither of which had a consumer.
 pub mod returned_reading;
+// The Tschirnhaus organ: transport a quintic to another chart, exhibit the transport, and refuse
+// with the obstruction named when the target chart cannot represent the answer.
+// `canon/TABLET_THE_CHART.md:280`.
+pub mod quintic_chart;
+// Exact univariate and bivariate polynomials over `Q`, with the complete rational-root census and
+// the fraction-free polynomial resultant that `quintic_chart` eliminates with.
+pub mod rational_polynomial;
 pub mod rebase_invariants;
 pub mod receiver;
 pub mod receiver_exact_compression;
@@ -293,6 +300,8 @@ pub use platform::*;
 pub use platform_x11::*;
 pub use presentation::*;
 pub use prime_ecology::*;
+pub use quintic_chart::*;
+pub use rational_polynomial::*;
 pub use realization::*;
 pub use receiver::*;
 pub use receiver_current::*;
