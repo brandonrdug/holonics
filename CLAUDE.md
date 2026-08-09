@@ -34,7 +34,7 @@ after a comparative audit. It lives at `archive/cpp-engine/` and nothing there i
 below that speak of headers, deeds, `ctest`, CUDA executors or `R{i}` chains describe that archived
 body and are **provenance**, not the present position.
 
-Read these six, in order, and nothing else by default:
+Read these seven, in order, and nothing else by default:
 
 | file | what it is |
 |---|---|
@@ -42,6 +42,7 @@ Read these six, in order, and nothing else by default:
 | `canon/THE_HOLOBROCHOS_SPINE.md` | **the spine — the whole hollow loop.** Two loops, four flows, the two moves that run on them, the three laws, and where every live organ sits. **The roadmap is ordered by it.** Read it before proposing any construction; an organ that no station names is churn. |
 | `canon/THE_DOCUMENT_LAW.md` | how a claim travels from conversation to canon, the genres, the grades, how supersession is recorded. |
 | `canon/THE_QUOTE_NETWORK.md` | **where every idea came from, in Brandon's words**, themed, with "where this lives now" per theme. Read this before theorising about what he wants. |
+| `canon/THE_MEASURED_CAPABILITIES.md` | **the evidence index: what the machine has actually done**, from 96 binaries run rather than read. Seven operations, seven causal mechanisms, the bounds, and the unrecoverable figures that may not be cited. Read this before proposing construction — most of what looks unbuilt is built, undriven, or blocked on one missing input file. |
 | `blueprint/THE_ROADMAP.md` | the single active roadmap. **The open work is stated by station** at the top; everything below that is the returned ledger and its provenance. |
 | `CONSTRUCTION_STATE.md` | the position record. What is admitted, what survived the transition, what must be re-established. |
 

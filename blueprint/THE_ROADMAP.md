@@ -528,6 +528,64 @@ in this tree.
 
 ---
 
+## WHERE THE WORK STANDS — 2026-08-08, after 96 binaries were run
+
+**The evidence index is [`canon/THE_MEASURED_CAPABILITIES.md`](../canon/THE_MEASURED_CAPABILITIES.md).**
+Read it before proposing construction: it says what the machine has *done*, grouped by operation,
+with the bounds and the unrecoverable figures named. This section says only what follows for the
+plan.
+
+**The instance line returned in full.** Five joins plus statement founding, all driven, all
+verified by running them. `cargo test --workspace` → **1,545 passed, 0 failed, 14 ignored**.
+
+**Three claims in the operating contract were falsified by measurement and are corrected:** the
+archived C++ body's *"one thing this body does not have"* (the conditioned production shape — it
+runs here at 39 declarations against a real Lean kernel), §5's fourth ablation shape as *"owed
+construction"* (it is driven in four places), and §11's reach figure for the remainder certificate
+(it is driven, hard).
+
+### The frontier, ranked, and none of it needs a decision
+
+1. **The Tschirnhaus organ.** `canon/TABLET_THE_CHART.md:227-289` specifies it; nothing implements
+   it. Take a degree-5 input, transport it to Bring form by an **exact rational chart change**,
+   return the transported form **and the transport**, and **refuse with the obstruction named** when
+   the target chart cannot represent the answer. It is the only construction in the record where
+   hypergeometry, the quintic, and chart transport are one computation (Mellin–Birkeland: the roots
+   of a trinomial are `₄F₃` in the coefficients). **Every substrate is built and exact** — Bareiss
+   resultants over `BigInt` with a typed refusal on inexact division, `monic_polynomial_discriminant`,
+   Sturm isolation refusing construction unless exactly one root is proved, `SeriesTailCertificate`,
+   and `QuinticTransitiveGroup::solvable_by_radicals()`, **which is already the radical chart's typed
+   refusal**. *Falsifier:* the radical chart must refuse degree 5 with `A₅ is simple` named, and
+   return for a solvable quintic.
+
+2. **The float mouth on `reopening.rs`.** Every `ExactFace` constructor requires an exact source, so
+   the organ built to reverse the float's deletion can only reverse a deletion it performed itself.
+   The missing constructor exists: `soma/life/examples/eros_self_emanated_law.rs` parses safetensors,
+   refuses any dtype but `BF16`, and converts bf16 words to an exact `Dyadic { BigInt, i32 }`.
+   *Falsifier:* a face built from a real measured float must be **refused by name**
+   (`FaceCoarserThanGrain`) unless it carries a retained tail certificate — a mouth that accepts
+   everything has not been built.
+
+3. **`SOURCE.json`.** **24 `eros_*` drivers are inert for want of one input file that exists nowhere
+   in the tree**, including all four built for real pretrained artifacts. `output/` shows eight have
+   run before. This is the external-artifact path, blocked by a missing input rather than a missing
+   organ, and it is the cheapest large capability recovery available.
+
+4. **Two untested invariances of the project's own central claim.** `cross_ratio` is private in
+   `relational-geometry`; `ProjectiveTurn` is in `holonic-engine`, which depends on it — so
+   `cross_ratio(T·p) == cross_ratio(p)` **cannot be written where either lives**. And
+   `ProjectiveTurn`'s group laws are untested. *Falsifier:* the orbit must be exhibited —
+   `rebase_invariants.rs:1220` is the standard, asserting `walks.len() == 3` *"or their agreement is
+   one computation compared with itself twice."*
+
+5. **The evidence sinks.** `meta/OUTPUT_MANIFEST.tsv` now binds 685 artifacts / 217.7 MB under
+   `output/` to their content addresses, with `python3 tools/output_manifest.py --check` as the
+   verifier. **The closure half of `CLAUDE.md` §0 lesson 1 still has no owner**, and two probe
+   binaries (`zz_smith_cost_probe`, `zz_torsion_width_law`) run from `target/` returning real cost
+   laws whose sources were never committed.
+
+---
+
 ## THE OPEN WORK, BY STATION
 
 **This is the live statement of what is open.** Everything below this section is the returned ledger
