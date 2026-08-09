@@ -179,6 +179,11 @@ pub mod implicit;
 pub mod inertia;
 pub mod interaction;
 pub mod inverse_transport;
+// A human-written formal development read at the grain of its OWN declarations, with the aperture
+// declared so that using the one-artifact reader on many-declaration material is detectable rather
+// than silently absorbed. Reached explicitly: `join`, `DeclaredForm` and `read_development` say
+// nothing at the crate root about what they read.
+pub mod lean_development;
 pub mod live_presentation;
 // The material loop and its circulation -- Kelvin's theorem as a carried loop rather than a fixed
 // covector. Reached explicitly: `MaterialLoop` and `circulation` say nothing at the crate root

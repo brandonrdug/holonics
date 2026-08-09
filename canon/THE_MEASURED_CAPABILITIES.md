@@ -7,7 +7,8 @@ admitted; **this says what was measured, by whom, and whether it still stands.**
 **Truth status:** `established-bounded`. **Evidence:** `measured` — 96 binaries **executed** at
 `101882f` on 2026-08-08, not read; all 324 research records indexed and deduplicated; the
 counting/hypergeometry/basis machinery inventoried against the live tree.
-`cargo test --workspace` → **1,545 passed, 0 failed, 14 ignored**.
+`cargo test --workspace` → **1,545 passed, 0 failed, 14 ignored** at deposit; **1,717** at
+2026-08-09. A gate figure is a measurement and decays like one — re-take it rather than carry it.
 **Provenance:** Brandon, 2026-08-08: *"Analyze the partially successful implementations and research
 observations we've already attained from the machine so you have a catalog of measured capabilities
 and causal mechanisms."* Three collectors; every load-bearing figure re-verified before deposit.

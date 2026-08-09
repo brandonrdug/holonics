@@ -162,6 +162,25 @@ Every organ pointed `CLAUDE.md` §8's tautology rule at its **own** construction
 
 ## 7. The bound, and it is one fact
 
+> **FALSIFIED 2026-08-09, the day after this was written, and the figure below is wrong on its own
+> deposit.** Record:
+> [`2026-08-09_THE_MATERIAL_WAS_IN_THE_TREE_AND_THE_INTAKE_COULD_NOT_RESOLVE_IT.md`](2026-08-09_THE_MATERIAL_WAS_IN_THE_TREE_AND_THE_INTAKE_COULD_NOT_RESOLVE_IT.md).
+>
+> `derivation_atlas::read_derivation` founds a declaration on `theorem` alone and returns **one**
+> derivation per file. So `def exactCarrier`, declared in this very deposit, was read as an **atom**;
+> **39 of the 103 artifacts carry two top-level declarations**; the openable count is **two**, not
+> one, and **five** declarations recruit another. The bound below was measured through the same
+> defect it was reporting.
+>
+> And the material it asks for was already in the tree. `soma/formal` carries **66 top-level
+> declarations, 80 declared→declared edges, 48 three-link chains** — over which the same reader
+> returns **zero** openable names, worse than the generated deposit. What remained was an
+> **intake**, `crates/holonic-engine/src/lean_development.rs`, not a corpus.
+>
+> The paragraph stands below as written, because the reasoning that produced it is the evidence for
+> §8's standing discipline: **before reporting that material is missing, read the intake that failed
+> to find it.**
+
 **Exactly one recruited identifier in 103 artifacts is declared.** Every organ's power is capped by
 it: consequents by the deposit's 3 statements, recruitment by its 1 declaration, re-integration's
 strict form by the absence of a **chain** of declarations — a declared name recruiting another

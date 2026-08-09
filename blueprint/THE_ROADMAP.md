@@ -559,10 +559,42 @@ construction"* (it is driven in four places), and §11's reach figure for the re
 > was predicted flat by theorem and confirmed; an undemanded cut leaves 21,731 pairs collapsed where
 > the derived one leaves 0.
 >
-> **What remains is one material fact, not a construction gap:** exactly one recruited identifier in
-> 103 artifacts is declared. Consequents are capped by the deposit's 3 statements, recruitment by its
-> 1 declaration, and re-integration's strict form by the absence of a **chain** of declarations.
+> **What was reported as remaining — "one material fact, not a construction gap: exactly one
+> recruited identifier in 103 artifacts is declared" — was FALSIFIED the next day.** See the movement
+> immediately below.
 > `1701 passed, 0 failed, 14 ignored.`
+
+### RETURNED 2026-08-09 — the intake, not the corpus
+
+> **The material bound was an instrument bound, and the figure was wrong on its own deposit.**
+> Record:
+> [`research/records/2026-08-09_THE_MATERIAL_WAS_IN_THE_TREE_AND_THE_INTAKE_COULD_NOT_RESOLVE_IT.md`](../research/records/2026-08-09_THE_MATERIAL_WAS_IN_THE_TREE_AND_THE_INTAKE_COULD_NOT_RESOLVE_IT.md).
+>
+> `derivation_atlas::read_derivation` founds a declaration on `theorem` alone, returns **one**
+> derivation per file, and charges doc-comment English as recruitment. Its aperture was never
+> declared, so nothing detected its use past it — `CLAUDE.md` §8's *"an organ used past its declared
+> aperture is a defect even when it appears to return."*
+>
+> **`soma/formal`, thirteen files in this tree the whole time: 66 top-level declarations, 80
+> declared→declared edges, 48 three-link chains.** The old reader returns **zero** openable names
+> over it. And on the generated deposit, **39 of 103 artifacts carry two declarations** — `def
+> exactCarrier` was an atom, the openable count is **two**, and five declarations recruit another.
+>
+> `crates/holonic-engine/src/lean_development.rs` — every top-level former founds; comment, preamble
+> and scoping populations each **returned** rather than dropped; the grain declared so the narrow
+> aperture hands back the 55 it skipped. The elaboration now reaches **42 of 66 roots past depth
+> one**, deepest `total_demand_le_total_capacity` at depth 3 with 40 constituents, against the old
+> reading's *"no root carries a constituent past depth one."*
+>
+> Seven controls, all held, two of them **wrong when first written and corrected against the
+> material**. The over-parsing null is a second scanner written differently: 66/66 and 142/142.
+> The advance prediction missed twice and its one match was **two errors cancelling** — carried, not
+> adjusted. `1717 passed, 0 failed, 14 ignored.`
+>
+> **Open, and now unblocked rather than blocked on a corpus:** re-point collocation, consequents,
+> capacitance and re-integration at `soma/formal` at the declared grain. Each carries controls
+> calibrated to the generated deposit; re-pointing without re-calibrating is the same aperture defect
+> in the other direction.
 
 ### The movement as it was written
 
