@@ -9,7 +9,7 @@ use std::collections::{BTreeMap, BTreeSet, VecDeque, btree_map::Entry};
 
 use num_bigint::BigUint;
 use num_traits::{One, Zero};
-use relational_geometry::{FrameId, Rat};
+use relational_geometry::{FrameId, Rat, RatVec2};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -675,6 +675,94 @@ impl ProjectiveTurn {
     /// nonzero scalar multiple of the identity is the same projective turn.
     pub fn is_projective_identity(&self) -> bool {
         self.b.is_zero() && self.c.is_zero() && self.a == self.d
+    }
+
+    /// Whether this turn is affine — `c = 0`, so it fixes the point at
+    /// infinity and never moves it.
+    ///
+    /// The affine subgroup is the weak part of the group: translation and
+    /// dilation are what `soma/body/src/soul.rs`'s own cross-ratio fixture
+    /// varies, and cross-ratio invariance under it is a much smaller claim
+    /// than invariance under `PGL(2,ℚ)`.  A declared family of turns that is
+    /// entirely affine has not exercised the projective statement, so this is
+    /// asked before a family is believed.
+    pub fn is_affine(&self) -> bool {
+        self.c.is_zero()
+    }
+
+    /// The one pencil parameter this turn sends to infinity: `-d/c`.  An
+    /// affine turn has none, which is the same sentence as `is_affine`.
+    pub fn pole(&self) -> Option<Rat> {
+        (!self.c.is_zero()).then(|| -(&self.d / &self.c))
+    }
+}
+
+/// One line in a receiver face, carried as an exact origin and a nonzero
+/// direction with the parameterisation `origin + parameter * direction`.
+///
+/// This exists so that a [`ProjectiveTurn`] has something to act on that
+/// `relational_geometry::cross_ratio` will accept.  The turn is a `PGL(2,ℚ)`
+/// map of the projective *line* — it moves one `Rat` — while `cross_ratio`
+/// reads four *plane* points and refuses any quadruple that leaves one pencil.
+/// A pencil is the join: it carries a parameter quadruple into the plane, and
+/// carrying it through a turn first lands on the same line, so the refusal
+/// never fires and the quadruple that reaches `cross_ratio` is a genuine
+/// projective image of the one before it.
+///
+/// The coordinate `cross_ratio` reads off the plane (`x`, or `y` when the
+/// pencil is vertical) is an **affine** function of the pencil parameter, and
+/// the cross-ratio is blind to an affine reparameterisation.  So the value
+/// `cross_ratio` returns for `place(t_0..t_3)` is the cross-ratio of
+/// `t_0..t_3` themselves, and what invariance under this action tests is the
+/// projective statement rather than the affine one — provided the declared
+/// turns are not all affine, which is what [`ProjectiveTurn::is_affine`] is
+/// asked for.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ProjectivePencil {
+    pub origin: RatVec2,
+    pub direction: RatVec2,
+}
+
+impl ProjectivePencil {
+    pub fn new(origin: RatVec2, direction: RatVec2) -> Result<Self, SimplicialError> {
+        if direction.x.is_zero() && direction.y.is_zero() {
+            return Err(SimplicialError::CollapsedPencil);
+        }
+        Ok(Self { origin, direction })
+    }
+
+    /// Where one exact parameter sits in the receiver face.
+    pub fn place(&self, parameter: &Rat) -> RatVec2 {
+        self.origin.add(&self.direction.scale(parameter))
+    }
+
+    /// Every parameter placed, in order.
+    pub fn place_all(&self, parameters: &[Rat]) -> Vec<RatVec2> {
+        parameters.iter().map(|value| self.place(value)).collect()
+    }
+
+    /// Carry a parameter population through one turn and place the images on
+    /// this same pencil.
+    ///
+    /// A parameter at the turn's pole is refused by name rather than dropped:
+    /// a projective turn genuinely sends one point of the line out of every
+    /// affine face, and an affine face that quietly discarded it would be
+    /// reporting the affine statement while claiming the projective one.
+    pub fn carry(
+        &self,
+        turn: &ProjectiveTurn,
+        parameters: &[Rat],
+    ) -> Result<Vec<RatVec2>, SimplicialError> {
+        parameters
+            .iter()
+            .map(|parameter| {
+                turn.apply(parameter)
+                    .map(|image| self.place(&image))
+                    .ok_or_else(|| {
+                        SimplicialError::TurnSendsParameterToInfinity(parameter.clone())
+                    })
+            })
+            .collect()
     }
 }
 
@@ -1454,6 +1542,13 @@ pub enum SimplicialError {
     },
     #[error("a projective turn must have nonzero determinant")]
     SingularTurn,
+    #[error("a projective pencil must have a nonzero direction")]
+    CollapsedPencil,
+    #[error(
+        "the turn sends pencil parameter {0} to the pencil's point at infinity, which no affine \
+         receiver face holds"
+    )]
+    TurnSendsParameterToInfinity(Rat),
     #[error("a hinge cannot transport to itself: {0:?}")]
     ReflexiveTransport(HingeId),
     #[error("hinges {from_hinge:?} and {to_hinge:?} share no incident face")]
@@ -1481,7 +1576,7 @@ pub enum HingeWorldError {
 
 #[cfg(test)]
 mod tests {
-    use relational_geometry::{Construction, RatVec3, integer};
+    use relational_geometry::{Construction, CrossRatioRefusal, RatVec3, cross_ratio, integer, rat};
 
     use super::*;
     use crate::{CausalWorld, ConicClass};
@@ -1793,5 +1888,424 @@ mod tests {
         assert_eq!(returned.returned_parameter, integer(5));
         assert_eq!(returned.class, HingeCycleClass::DisplacedHolonomy);
         assert_eq!(returned.target_residual, integer(3));
+    }
+
+    // =====================================================================================
+    // THE SWING IS THE INVARIANT
+    //
+    // `ProjectiveTurn` is `PGL(2,ℚ)` and `relational_geometry::cross_ratio` is the
+    // cross-ratio, and until 2026-08-08 nothing in this workspace asserted the one sentence
+    // that relates them, nor any of the group's own laws.  The three fixtures that used
+    // `ProjectiveTurn` used `identity()` or the fixed translate `(1,1,0,1)`, so the orbit
+    // was trivial by construction.
+    //
+    // Everything below is exact over `Rat`.  There is no tolerance, no epsilon, and no
+    // decimal comparison anywhere in it.
+    // =====================================================================================
+
+    /// The declared family of turns.  Named, so a reader can see at a glance that it is not
+    /// all affine — the last three have `c ≠ 0` and are therefore outside the subgroup that
+    /// `soma/body/src/soul.rs`'s own cross-ratio fixture varies.
+    fn declared_turns() -> Vec<(&'static str, ProjectiveTurn)> {
+        vec![
+            (
+                "translate  t -> t+1",
+                ProjectiveTurn::new(integer(1), integer(1), integer(0), integer(1)).unwrap(),
+            ),
+            (
+                "dilate     t -> 3t",
+                ProjectiveTurn::new(integer(3), integer(0), integer(0), integer(1)).unwrap(),
+            ),
+            (
+                "invert     t -> 1/t",
+                ProjectiveTurn::new(integer(0), integer(1), integer(1), integer(0)).unwrap(),
+            ),
+            (
+                "general    t -> (2t+1)/(t+3)",
+                ProjectiveTurn::new(integer(2), integer(1), integer(1), integer(3)).unwrap(),
+            ),
+            (
+                "general    t -> (t-2)/(3t+1)",
+                ProjectiveTurn::new(integer(1), integer(-2), integer(3), integer(1)).unwrap(),
+            ),
+        ]
+    }
+
+    /// Two pencils that read different coordinates.  `cross_ratio` reduces a quadruple to
+    /// the pencil's `x` when the direction has nonzero `x` and to its `y` otherwise, so a
+    /// family of one pencil would leave half of that branch unexercised.
+    fn declared_pencils() -> Vec<(&'static str, ProjectivePencil)> {
+        vec![
+            (
+                "oblique  (1,-2) + t(3,5)   [read on x]",
+                ProjectivePencil::new(
+                    RatVec2::new(integer(1), integer(-2)),
+                    RatVec2::new(integer(3), integer(5)),
+                )
+                .unwrap(),
+            ),
+            (
+                "vertical (4,1) + t(0,7)    [read on y]",
+                ProjectivePencil::new(
+                    RatVec2::new(integer(4), integer(1)),
+                    RatVec2::new(Rat::zero(), integer(7)),
+                )
+                .unwrap(),
+            ),
+        ]
+    }
+
+    /// Two parameter quadruples, containing neither a **pole** nor a **fixed point** of any
+    /// declared turn.
+    ///
+    /// The poles are `0` for `t -> 1/t`, `-3` and `-1/3` for the two general turns; the
+    /// affine turns have none.  The rational fixed points are `0` for the dilation and `±1`
+    /// for the inversion; `t^2 + t - 1` and `3t^2 + 2` have no rational root, so the two
+    /// general turns fix nothing here.  Both lists avoid all of it, which is what lets the
+    /// orbit test demand that **every** mark move rather than merely that the quadruple as a
+    /// whole land somewhere else.
+    fn declared_quadruples() -> Vec<Vec<Rat>> {
+        vec![
+            vec![integer(2), integer(3), integer(5), integer(8)],
+            vec![rat(-3, 2), rat(1, 5), integer(2), integer(9)],
+        ]
+    }
+
+    fn coordinates(points: &[RatVec2]) -> Vec<(Rat, Rat)> {
+        points
+            .iter()
+            .map(|point| (point.x.clone(), point.y.clone()))
+            .collect()
+    }
+
+    /// **The defining property, with the orbit required first.**
+    ///
+    /// `cross_ratio(T·p) == cross_ratio(p)` over `PGL(2,ℚ)`, exactly, over `Rat`.
+    ///
+    /// The gate is the one `rebase_invariants.rs:1220` sets: agreement is evidence only once
+    /// the transformations are known to have *moved* the material.  So the images of each
+    /// quadruple under the five declared turns are collected into a `BTreeSet` and the set is
+    /// required to have five members, none of them the source — a turn that moves nothing
+    /// proves nothing, and five turns that agree with each other prove nothing either.
+    #[test]
+    fn a_projective_turn_moves_every_mark_and_moves_no_cross_ratio() {
+        let turns = declared_turns();
+        assert!(
+            turns.iter().filter(|(_, turn)| !turn.is_affine()).count() >= 3,
+            "a declared family that is entirely affine tests the weaker statement that \
+             soul.rs already covers"
+        );
+
+        for (pencil_name, pencil) in declared_pencils() {
+            for parameters in declared_quadruples() {
+                let source = pencil.place_all(&parameters);
+                let source_ratio = cross_ratio(&source).unwrap();
+
+                // THE ORBIT.  One image quadruple per declared turn, all distinct, none of
+                // them the source.
+                let mut orbit: BTreeSet<Vec<(Rat, Rat)>> = BTreeSet::new();
+                for (turn_name, turn) in &turns {
+                    let image = pencil.carry(turn, &parameters).unwrap();
+
+                    for (index, (before, after)) in source.iter().zip(image.iter()).enumerate() {
+                        assert_ne!(
+                            before, after,
+                            "{pencil_name} / {turn_name} left mark {index} where it found it"
+                        );
+                    }
+                    orbit.insert(coordinates(&image));
+
+                    // THE INVARIANCE.  Exact equality of two `Rat`s.
+                    assert_eq!(
+                        cross_ratio(&image).unwrap(),
+                        source_ratio,
+                        "{pencil_name} / {turn_name} moved the cross-ratio"
+                    );
+                }
+
+                assert_eq!(
+                    orbit.len(),
+                    turns.len(),
+                    "{pencil_name}: the declared turns do not take the quadruple to \
+                     {} distinct places, so their agreement is one computation compared with \
+                     itself {} times",
+                    turns.len(),
+                    turns.len() - 1
+                );
+                assert!(
+                    !orbit.contains(&coordinates(&source)),
+                    "{pencil_name}: a declared turn returned the source quadruple"
+                );
+            }
+        }
+    }
+
+    /// **The control that can fail.**
+    ///
+    /// A non-projective reparameterisation of the same pencil — `t -> t^2` and `t -> t^3` —
+    /// runs through the identical machinery, lands on the identical line, and must **change**
+    /// the cross-ratio.  If it did not, the invariance above would be a property of the
+    /// fixture rather than of the group.
+    #[test]
+    fn a_non_projective_reparameterisation_moves_the_cross_ratio() {
+        for (pencil_name, pencil) in declared_pencils() {
+            for parameters in declared_quadruples() {
+                let source_ratio = cross_ratio(&pencil.place_all(&parameters)).unwrap();
+                for (name, exponent) in [("square t -> t^2", 2u32), ("cube t -> t^3", 3)] {
+                    let bent = parameters
+                        .iter()
+                        .map(|parameter| parameter.pow(exponent as i32))
+                        .collect::<Vec<_>>();
+                    let bent_ratio = cross_ratio(&pencil.place_all(&bent)).unwrap();
+                    assert_ne!(
+                        bent_ratio, source_ratio,
+                        "{pencil_name} / {name} left the cross-ratio standing, so the \
+                         invariance is vacuous"
+                    );
+                }
+            }
+        }
+    }
+
+    /// The declared planar homography, acting on homogeneous plane coordinates `(x,y,1)`.
+    /// Its bottom row is `(0,1,2)`, so `w = y+2` is not constant and the map is genuinely
+    /// projective in the plane rather than affine.  Determinant `8`.
+    fn declared_homography() -> relational_geometry::RatMat3 {
+        relational_geometry::RatMat3::from_i64([[2, 1, 0], [1, 3, 1], [0, 1, 2]])
+    }
+
+    /// Carry plane marks through a planar homography and dehomogenize.  A mark on the map's
+    /// vanishing line returns `None` rather than being repaired.
+    fn carry_through_plane(
+        homography: &relational_geometry::RatMat3,
+        points: &[RatVec2],
+    ) -> Option<Vec<RatVec2>> {
+        points
+            .iter()
+            .map(|point| {
+                let image = homography.apply(&relational_geometry::RatVec3::new(
+                    point.x.clone(),
+                    point.y.clone(),
+                    Rat::one(),
+                ));
+                (!image.z.is_zero()).then(|| RatVec2::new(&image.x / &image.z, &image.y / &image.z))
+            })
+            .collect()
+    }
+
+    /// Which coordinate `cross_ratio` reduces this quadruple on.
+    fn reduction_axis(points: &[RatVec2]) -> &'static str {
+        if points[1].x != points[0].x { "x" } else { "y" }
+    }
+
+    /// **The plane itself moves, and the line moves with it.**
+    ///
+    /// The turn family above moves marks *along* one fixed pencil.  This moves the pencil: a
+    /// `PGL(3,ℚ)` homography of the receiver plane takes the source line to a *different*
+    /// line, and the cross-ratio still stands.
+    ///
+    /// It is the sharper statement for two reasons.  The collinearity gate in `cross_ratio`
+    /// is a real gate here — a non-projective planar map fails it, as the fixture below
+    /// shows — so passing it is evidence the image is a genuine line.  And on the vertical
+    /// pencil the homography takes a line `cross_ratio` reduces on **y** to one it reduces on
+    /// **x**: the implementation's own internal branch changes across the transformation and
+    /// the returned value does not.  `CLAUDE.md` §0: *an invariant is only visible across two
+    /// frames.*
+    #[test]
+    fn a_planar_homography_moves_the_pencil_and_the_reduction_axis_but_not_the_cross_ratio() {
+        let homography = declared_homography();
+        assert!(!homography.determinant().is_zero());
+
+        let mut axis_flips = 0usize;
+        for (pencil_name, pencil) in declared_pencils() {
+            for parameters in declared_quadruples() {
+                let source = pencil.place_all(&parameters);
+                let source_ratio = cross_ratio(&source).unwrap();
+                let image = carry_through_plane(&homography, &source)
+                    .expect("no declared mark sits on the homography's vanishing line");
+
+                // The line moved: at least one image mark is off the source pencil.
+                let direction = source[1].subtract(&source[0]);
+                assert!(
+                    image
+                        .iter()
+                        .any(|mark| direction.cross(&mark.subtract(&source[0])) != Rat::zero()),
+                    "{pencil_name}: the homography returned the source line"
+                );
+
+                // The image is still a line -- which is exactly what `cross_ratio` not
+                // refusing it means.
+                let image_ratio = cross_ratio(&image).unwrap();
+                assert_eq!(
+                    image_ratio, source_ratio,
+                    "{pencil_name}: a planar homography moved the cross-ratio"
+                );
+
+                if reduction_axis(&source) != reduction_axis(&image) {
+                    axis_flips += 1;
+                }
+            }
+        }
+        assert!(
+            axis_flips > 0,
+            "the homography never changed which coordinate cross_ratio reduces on, so the \
+             reduction branch was read in one frame only"
+        );
+    }
+
+    /// A map that leaves the pencil is refused rather than silently answered: coordinatewise
+    /// squaring in the plane takes a line to a parabola, and `cross_ratio` says so by name.
+    #[test]
+    fn a_planar_nonlinear_map_leaves_the_pencil_and_is_refused_by_name() {
+        let (_, pencil) = declared_pencils().into_iter().next().unwrap();
+        let bent = pencil
+            .place_all(&declared_quadruples()[0])
+            .iter()
+            .map(|point| RatVec2::new(&point.x * &point.x, &point.y * &point.y))
+            .collect::<Vec<_>>();
+        assert_eq!(
+            cross_ratio(&bent),
+            Err(CrossRatioRefusal::MarksOutsideOnePencil)
+        );
+    }
+
+    /// **The group laws.** `T ∘ T⁻¹ = id`, associativity, `apply` respecting `followed_by`,
+    /// and the documented gauge: a common nonzero scale is not a different turn.
+    #[test]
+    fn projective_turns_compose_invert_and_associate() {
+        let turns = declared_turns();
+        let probes = [rat(-3, 2), rat(1, 5), integer(2), integer(9), integer(4)];
+
+        for (name, turn) in &turns {
+            assert!(
+                turn.followed_by(&turn.inverse()).is_projective_identity(),
+                "{name}: T then T-inverse is not the identity turn"
+            );
+            assert!(
+                turn.inverse().followed_by(turn).is_projective_identity(),
+                "{name}: T-inverse then T is not the identity turn"
+            );
+
+            // `apply` respects `followed_by`: the composite matrix and the two applications
+            // agree wherever both are defined.
+            for (second_name, second) in &turns {
+                let composite = turn.followed_by(second);
+                for probe in &probes {
+                    let staged = turn.apply(probe).and_then(|middle| second.apply(&middle));
+                    match (composite.apply(probe), staged) {
+                        (Some(one_step), Some(two_step)) => assert_eq!(
+                            one_step, two_step,
+                            "{name} then {second_name} at {probe}: the composite matrix and \
+                             the staged application disagree"
+                        ),
+                        (None, None) => {}
+                        (one, two) => panic!(
+                            "{name} then {second_name} at {probe}: one route reached the \
+                             point at infinity and the other did not: {one:?} / {two:?}"
+                        ),
+                    }
+                }
+            }
+        }
+
+        // Associativity, on the nose: the matrices are unnormalized and matrix product is
+        // associative, so this is exact equality and not merely projective equality.
+        for (_, first) in &turns {
+            for (_, second) in &turns {
+                for (_, third) in &turns {
+                    assert_eq!(
+                        first.followed_by(second).followed_by(third),
+                        first.followed_by(&second.followed_by(third))
+                    );
+                }
+            }
+        }
+
+        // The gauge stated at `followed_by`'s doc comment: `2I` is the identity turn and a
+        // scaled matrix is the same map.
+        let scaled_identity =
+            ProjectiveTurn::new(integer(2), Rat::zero(), Rat::zero(), integer(2)).unwrap();
+        assert!(scaled_identity.is_projective_identity());
+        let (_, general) = &turns[3];
+        let scaled = ProjectiveTurn::new(
+            &general.a * integer(5),
+            &general.b * integer(5),
+            &general.c * integer(5),
+            &general.d * integer(5),
+        )
+        .unwrap();
+        assert_ne!(scaled, *general, "the scaled matrix is a different matrix");
+        for probe in &probes {
+            assert_eq!(
+                scaled.apply(probe),
+                general.apply(probe),
+                "a common nonzero scale changed the map, so it is not gauge"
+            );
+        }
+
+        // THE ORBIT OF THE GROUP ITSELF.  If the declared family commuted, associativity
+        // would be nearly vacuous on it.  It does not.
+        let (_, left) = &turns[2];
+        let (_, right) = &turns[3];
+        assert!(
+            !left
+                .followed_by(right)
+                .followed_by(&right.followed_by(left).inverse())
+                .is_projective_identity(),
+            "the declared turns commute, so the composition law was never exercised"
+        );
+    }
+
+    /// Degeneracy is refused by name on both sides of the seam.
+    #[test]
+    fn degenerate_turns_pencils_and_quadruples_are_refused_by_name() {
+        assert!(matches!(
+            ProjectiveTurn::new(integer(2), integer(4), integer(1), integer(2)),
+            Err(SimplicialError::SingularTurn)
+        ));
+        assert!(matches!(
+            ProjectiveTurn::new(Rat::zero(), Rat::zero(), Rat::zero(), Rat::zero()),
+            Err(SimplicialError::SingularTurn)
+        ));
+        assert!(matches!(
+            ProjectivePencil::new(RatVec2::new(integer(1), integer(2)), RatVec2::zero()),
+            Err(SimplicialError::CollapsedPencil)
+        ));
+
+        // A projective turn has a pole and an affine one does not; the pole is refused by
+        // name rather than dropped from the quadruple.
+        let (_, invert) = &declared_turns()[2];
+        assert_eq!(invert.pole(), Some(Rat::zero()));
+        assert!(declared_turns()[0].1.pole().is_none());
+        let (_, pencil) = declared_pencils().into_iter().next().unwrap();
+        assert_eq!(
+            pencil.carry(invert, &[integer(1), Rat::zero()]),
+            Err(SimplicialError::TurnSendsParameterToInfinity(Rat::zero()))
+        );
+
+        let a = RatVec2::new(integer(0), integer(0));
+        let b = RatVec2::new(integer(1), integer(2));
+        let c = RatVec2::new(integer(3), integer(6));
+        assert_eq!(
+            cross_ratio(&[a.clone(), b.clone(), c.clone()]),
+            Err(CrossRatioRefusal::NotFourMarks(3))
+        );
+        assert_eq!(
+            cross_ratio(&[a.clone(), a.clone(), b.clone(), c.clone()]),
+            Err(CrossRatioRefusal::CoincidentPivotMarks)
+        );
+        assert_eq!(
+            cross_ratio(&[
+                a.clone(),
+                b.clone(),
+                b.clone(),
+                RatVec2::new(integer(5), integer(10)),
+            ]),
+            Err(CrossRatioRefusal::RepeatedProjectiveMember)
+        );
+        assert_eq!(
+            cross_ratio(&[a, b, c, RatVec2::new(integer(1), integer(0))]),
+            Err(CrossRatioRefusal::MarksOutsideOnePencil)
+        );
     }
 }

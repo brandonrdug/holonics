@@ -294,7 +294,7 @@ pub enum ReceiverAtlasError {
     DegenerateSwing {
         receiver: ReceiverId,
         cell: u64,
-        reason: String,
+        reason: CrossRatioRefusal,
     },
     #[error("atlas comparison requires the same receiver and occurrence identities")]
     IncompatibleAtlases,
@@ -607,17 +607,71 @@ fn ensure_unique_occurrences(occurrences: &[MarkedOccurrence]) -> Result<(), Rec
     Ok(())
 }
 
-fn cross_ratio(points: &[RatVec2]) -> Result<Rat, String> {
+/// Why one marked quadruple carries no cross-ratio.
+///
+/// Every variant is a **return**, never a panic and never a silent repair.  A
+/// receiver that supplied a degenerate quadruple is told which degeneracy it
+/// supplied, by name, and the refusal is a value it can carry.
+#[derive(Clone, Debug, Error, PartialEq, Eq)]
+pub enum CrossRatioRefusal {
+    #[error("a swing requires exactly four points, and {0} were supplied")]
+    NotFourMarks(usize),
+    #[error("the first two pivot marks coincide")]
+    CoincidentPivotMarks,
+    #[error("the four marks do not lie in one projective pencil")]
+    MarksOutsideOnePencil,
+    #[error("the marked quadruple has a repeated projective member")]
+    RepeatedProjectiveMember,
+}
+
+/// The exact cross-ratio of four marks lying in one projective pencil.
+///
+/// The four marks are reduced to one line coordinate — the pencil's `x` when
+/// its direction has nonzero `x`, otherwise its `y` — and returned as
+/// `(c-a)(d-b) / ((c-b)(d-a))` over `Rat`.  Nothing here is approximated and
+/// no quadruple is repaired: a degenerate one is refused by name above.
+///
+/// # Why this is `pub`
+///
+/// The cross-ratio's *defining* property is that it is the invariant of the
+/// projective group acting on a line, and until 2026-08-08 that property was
+/// asserted nowhere in this workspace.  The computation lived here as a
+/// private `fn` while the only genuine `PGL(2,ℚ)` carrier in the tree —
+/// `holonic_engine::simplicial::ProjectiveTurn`, exact over `Rat`, with
+/// `apply`, `followed_by`, `inverse` and a refusal for singular matrices —
+/// lives one crate *above* this one.  `holonic-engine` depends on
+/// `relational-geometry`, so `cross_ratio(T·p) == cross_ratio(p)` could not
+/// be written on either side of that seam.  The property most cited in this
+/// project was the one property of it nothing checked.
+///
+/// Three closures were available and this is the smallest of them.
+///
+/// - **Publish the reading** (taken): one visibility word and a typed refusal.
+///   No dependency moves and no second implementation appears.
+/// - **Move `ProjectiveTurn` down into this crate** (refused): it would drag
+///   `SimplicialError` and the hinge-transport vocabulary into a crate that
+///   has no hinges, to make a group visible to a function that does not use
+///   it.  The group belongs with the transports that carry it.
+/// - **Grow a second projective action here** (refused): two `PGL(2,ℚ)`
+///   carriers in one workspace, and a second implementation agreeing with the
+///   first is one computation compared with itself twice — `CLAUDE.md` §8.
+///   `soma/body/src/soul.rs:159` is already a third cross-ratio, and its own
+///   invariance test covers only the affine subgroup.
+///
+/// The invariance itself is asserted in `holonic-engine`, where the group
+/// lives: `crates/holonic-engine/src/simplicial.rs` and the driver
+/// `crates/holonic-engine/examples/the_swing_is_the_invariant.rs`.
+pub fn cross_ratio(points: &[RatVec2]) -> Result<Rat, CrossRatioRefusal> {
     if points.len() != 4 {
-        return Err("a swing requires exactly four points".to_owned());
+        return Err(CrossRatioRefusal::NotFourMarks(points.len()));
     }
     let direction = points[1].subtract(&points[0]);
     if direction.x.is_zero() && direction.y.is_zero() {
-        return Err("the first two pivot marks coincide".to_owned());
+        return Err(CrossRatioRefusal::CoincidentPivotMarks);
     }
     for point in &points[2..] {
         if direction.cross(&point.subtract(&points[0])) != Rat::zero() {
-            return Err("the four marks do not lie in one projective pencil".to_owned());
+            return Err(CrossRatioRefusal::MarksOutsideOnePencil);
         }
     }
     let coordinates = if !direction.x.is_zero() {
@@ -634,7 +688,7 @@ fn cross_ratio(points: &[RatVec2]) -> Result<Rat, String> {
     let numerator = (&coordinates[2] - &coordinates[0]) * (&coordinates[3] - &coordinates[1]);
     let denominator = (&coordinates[2] - &coordinates[1]) * (&coordinates[3] - &coordinates[0]);
     if denominator.is_zero() {
-        return Err("the marked quadruple has a repeated projective member".to_owned());
+        return Err(CrossRatioRefusal::RepeatedProjectiveMember);
     }
     Ok(numerator / denominator)
 }
@@ -689,6 +743,23 @@ mod tests {
         assert_eq!(grain.aspect_ratio(), Rat::one());
     }
 
+    /// **Two receivers, two genuinely different faces, one swing.**
+    ///
+    /// This fixture asserted `receiver_values.len() == 2` and nothing else until
+    /// 2026-08-08.  `receiver_values` is a `BTreeMap<ReceiverId, _>`, so that
+    /// length counts *receivers* and is fixed by `receiver_family` before any
+    /// geometry runs — it cannot fall.  Agreement between two receivers is
+    /// evidence only once the two receivers are known to have projected the
+    /// marks differently, exactly as `holonic-engine`'s pivot gauge requires its
+    /// three walks to be three walks
+    /// (`crates/holonic-engine/src/rebase_invariants.rs:1220`).
+    ///
+    /// So the orbit is taken first: the four received coordinates are collected
+    /// per receiver and the collection is *required* to have two members, and
+    /// then required to differ at every single mark rather than at one stray
+    /// one.  The two maps are also different in kind — orthographic against a
+    /// rotated perspective ray — so the surviving cross-ratio crosses an affine
+    /// face and a genuinely projective one.
     #[test]
     fn four_marks_carry_one_cross_ratio_through_distinct_receivers() {
         let (construction, frame) = Construction::new("source");
@@ -717,9 +788,59 @@ mod tests {
             &[cell],
         )
         .unwrap();
+
+        // THE ORBIT.  What each receiver actually put on its own face.
+        let received: BTreeSet<Vec<(Rat, Rat)>> = atlas
+            .faces
+            .iter()
+            .map(|face| {
+                face.occurrences
+                    .iter()
+                    .map(|occurrence| {
+                        let point = occurrence
+                            .projected
+                            .rational
+                            .clone()
+                            .expect("both declared receivers stay rational on this line");
+                        (point.x, point.y)
+                    })
+                    .collect()
+            })
+            .collect();
+        assert_eq!(
+            received.len(),
+            2,
+            "the two receivers put the same four coordinates on their faces, so the surviving \
+             cross-ratio below is one computation compared with itself twice: {received:?}"
+        );
+
+        // And at every mark, so no single stray coordinate carries the whole
+        // difference while the rest of the quadruple is shared.
+        for joint in &atlas.occurrences {
+            let first = joint.faces[&ReceiverId(1)]
+                .projected
+                .rational
+                .clone()
+                .expect("the orthographic receiver stays rational");
+            let second = joint.faces[&ReceiverId(2)]
+                .projected
+                .rational
+                .clone()
+                .expect("the perspective receiver stays rational");
+            assert_ne!(
+                first, second,
+                "mark {:?} landed on the same coordinate in both receivers",
+                joint.occurrence
+            );
+        }
+
         let swing = atlas.swing(1).unwrap();
-        assert!(swing.invariant.is_some());
         assert_eq!(swing.receiver_values.len(), 2);
+        assert!(
+            swing.invariant.is_some(),
+            "two receivers that moved every mark still returned one cross-ratio: {:?}",
+            swing.receiver_values
+        );
     }
 
     #[test]
