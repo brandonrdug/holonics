@@ -1,21 +1,53 @@
-//! Exact transport from an integral quintic through prime-place monodromy and Euler receivers.
+//! Exact transport from an integral polynomial through prime-place monodromy and Euler receivers.
 //!
 //! This is one production mathematical world, not a Galois-group lookup table or a rendered
-//! polynomial fixture. An inherited degree-five integral polynomial is changed by an exact
-//! rational root-scale into the monic integer probe accepted by [`crate::PrimeEcologyLaw`].
-//! Every subsequently founded prime receives that same probe. The emitted finite-field
-//! factorization is transported, without re-factorization here, into:
+//! polynomial fixture. An inherited integral polynomial **of any degree at least two** is changed
+//! by an exact rational root-scale into the monic integer probe accepted by
+//! [`crate::PrimeEcologyLaw`]. Every subsequently founded prime receives that same probe. The
+//! emitted finite-field factorization is transported, without re-factorization here, into:
 //!
 //! - an unramified Frobenius cycle section;
-//! - an exact conditional fiber of transitive quintic Galois groups;
+//! - the exact **constraint population** the observed sections leave on the Galois group;
 //! - a formal permutation-Euler denominator; and
 //! - every already-open exact integer-sigma Euler receiver.
 //!
-//! The transitive-group catalogue is inherited mathematics. Observed cycle types may restrict
-//! it, and one irreducible reduction certifies rational irreducibility, but absence of an
-//! unobserved cycle type never excludes a group. A repeated reduction is retained as an open
-//! polynomial-discriminant place; this law does not pretend that the chosen power basis supplies
-//! a ramified number-field Euler factor.
+//! ## The degree is a rung, not a category
+//!
+//! Until 2026-08-09 this module carried `const QUINTIC_DEGREE: usize = 5` and refused any
+//! polynomial whose coefficient count was not six. `canon/THE_CONTAMINANT_PROTOCOL.md` §2.6 names
+//! that species — **a restriction the organ imposes presented as a fact about the subject** — and
+//! records why it is not hygiene: `solvable_by_radicals` refusing at degree five is meaningful only
+//! against the degrees where it does *not* refuse, so an organ that only ever sees degree five
+//! cannot state its own theorem.
+//!
+//! ## What replaced the catalogue
+//!
+//! There are exactly five transitive subgroups of `S_5` and no such small catalogue exists at
+//! general degree, so the catalogue is **not** generalised. It is retained as the degree-five
+//! instance and an independent cross-check ([`quintic_group_catalogue`],
+//! [`QuinticTransitiveGroup`]), and the degree-general return is the constraint population:
+//!
+//! - the observed cycle types with their witness primes;
+//! - parity, from whether the discriminant is a square in `Q` — `G <= A_n` exactly then;
+//! - transitivity, certified by one prime whose reduction is irreducible of full degree;
+//! - and, **at prime degree only**, Galois's theorem on solvable equations of prime degree:
+//!   an irreducible polynomial of prime degree `p` over a characteristic-zero field is solvable by
+//!   radicals **iff** its Galois group embeds in `AGL(1,p) = {x -> ax + b}`, of order `p(p-1)`.
+//!   An element `x -> ax + b` has cycle type `[1^p]` (identity), `[p]` (`a = 1`, `b != 0`), or
+//!   `[1, d, ..., d]` with `d = ord(a)` dividing `p-1` and `(p-1)/d` cycles. Observing a Frobenius
+//!   cycle type outside that derived set therefore **proves** `G` is not contained in `AGL(1,p)`,
+//!   and at irreducible prime degree that is a proof of non-solvability with a named witness prime.
+//!   At `p = 5` the admissible set is `{[1,1,1,1,1], [1,2,2], [1,4], [5]}`, which is exactly the
+//!   union of the cycle types of `C_5`, `D_5` and `F_20` — the three the catalogue marks solvable.
+//!
+//! At composite degree the theorem states nothing, and [`SolvabilityConstraint`] returns
+//! `NoCriterionAtThisDegree` rather than a guess. **A refusal that names why is the correct
+//! return.**
+//!
+//! Observed cycle types may restrict the degree-five catalogue, and one irreducible reduction
+//! certifies rational irreducibility, but absence of an unobserved cycle type never excludes a
+//! group. A repeated reduction is retained as an open polynomial-discriminant place; this law does
+//! not pretend that the chosen power basis supplies a ramified number-field Euler factor.
 //!
 //! The accompanying atlas is an exact local-chart receipt. It carries no screen coordinates and
 //! makes no canonical identification between root sheets at different prime receivers.
@@ -35,7 +67,15 @@ use crate::{
     PrimeEcologyGeometryReceipt, PrimeEcologyLaw, PrimeEcologyRadiation, PrimeEcologyStanding,
 };
 
-const QUINTIC_DEGREE: usize = 5;
+/// The lowest degree at which this organ's own material exists.
+///
+/// **MATERIAL, and the theorem is named.** Every return here is founded on the discriminant
+/// `disc(f) = (-1)^(n(n-1)/2) Res(f, f')`, and `Res(f, f')` requires `deg f' >= 1`, hence `n >= 2`.
+/// The same floor is stated independently by
+/// [`crate::rational_polynomial::integer_discriminant`], which refuses `degree < 2` with
+/// `DiscriminantDegreeTooLow`. It is not an aperture: a degree-one polynomial has one root, no pair
+/// of roots to separate, no cycle type but the identity, and no Galois group to constrain.
+const LEAST_DEGREE_WITH_A_DISCRIMINANT: usize = 2;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct QuinticProblemId(pub u64);
@@ -43,10 +83,13 @@ pub struct QuinticProblemId(pub u64);
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct EulerReceiverId(pub u64);
 
-/// One inherited integral quintic, coefficient-first.
+/// One inherited integral polynomial, coefficient-first, of any degree at least two.
 ///
 /// The leading coefficient may be any nonzero integer. Scalar content is not erased: it remains
 /// visible in the inherited presentation even though it does not change the root population.
+///
+/// **The degree is read off the coefficient vector.** The type keeps its historical name because
+/// its module does; the *code* imposes no degree.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct IntegralQuinticProblem {
     pub schema: String,
@@ -71,11 +114,16 @@ impl IntegralQuinticProblem {
         Ok(problem)
     }
 
+    /// The degree, read off the coefficient vector. Never authored.
+    pub fn degree(&self) -> usize {
+        self.coefficients.len().saturating_sub(1)
+    }
+
     pub fn validate(&self) -> Result<(), ArithmeticMonodromyError> {
         if self.schema != "holonic-engine.integral-quintic-problem.v1"
             || self.name.is_empty()
-            || self.coefficients.len() != QUINTIC_DEGREE + 1
-            || self.coefficients[QUINTIC_DEGREE].is_zero()
+            || self.coefficients.len() < LEAST_DEGREE_WITH_A_DISCRIMINANT + 1
+            || self.coefficients[self.degree()].is_zero()
         {
             return Err(ArithmeticMonodromyError::MalformedQuintic(self.id));
         }
@@ -84,22 +132,25 @@ impl IntegralQuinticProblem {
 
     /// Change `f(x)` into the monic integral polynomial
     ///
-    /// `g(y) = a_5^4 f(y/a_5)`, with `y = a_5 x`.
+    /// `g(y) = a_n^(n-1) f(y/a_n)`, with `y = a_n x`.
     ///
-    /// This preserves the splitting field over `Q`; it is not a numerical normalization.
+    /// This preserves the splitting field over `Q`; it is not a numerical normalization. The
+    /// coefficient of `y^d` is `c_d a_n^(n-1-d)`, and at `d = n` that is `a_n a_n^(-1) = 1`, which
+    /// is why the loop runs below the leading term and pushes the one.
     pub fn normalize(&self) -> Result<NormalizedQuintic, ArithmeticMonodromyError> {
         self.validate()?;
-        let root_scale = self.coefficients[QUINTIC_DEGREE].clone();
-        let mut normalized_coefficients = Vec::with_capacity(QUINTIC_DEGREE + 1);
-        for (degree, coefficient) in self.coefficients[..QUINTIC_DEGREE].iter().enumerate() {
-            let exponent = u32::try_from(QUINTIC_DEGREE - 1 - degree)
+        let degree = self.degree();
+        let root_scale = self.coefficients[degree].clone();
+        let mut normalized_coefficients = Vec::with_capacity(degree + 1);
+        for (power, coefficient) in self.coefficients[..degree].iter().enumerate() {
+            let exponent = u32::try_from(degree - 1 - power)
                 .map_err(|_| ArithmeticMonodromyError::CarrierOverflow)?;
             normalized_coefficients.push(coefficient * root_scale.pow(exponent));
         }
         normalized_coefficients.push(BigInt::one());
         let probe = IntegerPolynomialProbe::new(
             PolynomialProbeId(self.id.0),
-            format!("quintic[{}]", self.name),
+            format!("degree-{degree}[{}]", self.name),
             normalized_coefficients.clone(),
         )?;
         let discriminant = monic_polynomial_discriminant(&normalized_coefficients)?;
@@ -130,11 +181,16 @@ pub struct NormalizedQuintic {
 }
 
 impl NormalizedQuintic {
+    /// The degree, read off the normalised coefficient vector.
+    pub fn degree(&self) -> usize {
+        self.coefficients.len().saturating_sub(1)
+    }
+
     fn validate(&self, inherited: &IntegralQuinticProblem) -> Result<(), ArithmeticMonodromyError> {
         if self.schema != "holonic-engine.normalized-quintic.v1"
             || self.problem != inherited.id
             || self.probe.id != PolynomialProbeId(inherited.id.0)
-            || self.coefficients.len() != QUINTIC_DEGREE + 1
+            || self.coefficients.len() != inherited.coefficients.len()
             || self.coefficients.last() != Some(&BigInt::one())
             || self.probe.coefficients != self.coefficients
             || self.discriminant != monic_polynomial_discriminant(&self.coefficients)?
@@ -154,7 +210,173 @@ impl NormalizedQuintic {
     }
 }
 
+/// One observed Frobenius cycle type together with the prime that returned it.
+///
+/// A witness, not a count: the return names the material that decided it.
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+pub struct CycleTypeWitness {
+    pub prime: u64,
+    pub cycle_type: Vec<u32>,
+}
+
+/// What the observed sections have settled about solvability by radicals, at any degree.
+///
+/// This is the degree-general replacement for reading a five-element catalogue. It returns a
+/// **constraint**, never a group name, because at general degree there is no small catalogue to
+/// name one from.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub enum SolvabilityConstraint {
+    /// The degree is composite. Galois's theorem on solvable equations of **prime** degree states
+    /// nothing here, and this organ returns no solvability verdict rather than guessing one.
+    NoCriterionAtThisDegree {
+        degree: usize,
+        /// The smallest nontrivial factor, exhibited so the refusal names its own reason.
+        least_factor: usize,
+    },
+    /// Prime degree, but no prime has yet certified irreducibility, so the theorem's hypothesis is
+    /// unmet. Any affine-inadmissible type observed is still carried: *that* reading is a fact
+    /// about `AGL(1,p)` and needs no hypothesis, but it does not by itself decide solvability.
+    IrreducibilityNotCertified {
+        degree: usize,
+        outside_affine_group: Option<CycleTypeWitness>,
+    },
+    /// Prime degree, irreducible, and an observed Frobenius cycle type is the cycle type of no
+    /// element of `AGL(1,p)`. Therefore `G` is not contained in `AGL(1,p)`, and by Galois's theorem
+    /// the polynomial is **not solvable by radicals**. The witness prime is named.
+    NotSolvable {
+        degree: usize,
+        witness: CycleTypeWitness,
+        /// The derived admissible set the witness fell outside of.
+        admissible_cycle_types: BTreeSet<Vec<u32>>,
+    },
+    /// Prime degree, irreducible, and every observed cycle type is admissible for `AGL(1,p)`.
+    ///
+    /// **This is not a proof of solvability.** The receiver family has seen finitely many primes
+    /// and an unobserved type excludes nothing. The name says so.
+    ConsistentWithSolvable {
+        degree: usize,
+        observed_cycle_types: BTreeSet<Vec<u32>>,
+        admissible_cycle_types: BTreeSet<Vec<u32>>,
+    },
+}
+
+impl SolvabilityConstraint {
+    pub fn label(&self) -> &'static str {
+        match self {
+            Self::NoCriterionAtThisDegree { .. } => "NO-CRITERION-AT-THIS-DEGREE",
+            Self::IrreducibilityNotCertified { .. } => "IRREDUCIBILITY-NOT-CERTIFIED",
+            Self::NotSolvable { .. } => "NOT-SOLVABLE",
+            Self::ConsistentWithSolvable { .. } => "CONSISTENT-WITH-SOLVABLE",
+        }
+    }
+
+    /// The one verdict this criterion is entitled to assert.
+    pub fn refutes_solvability(&self) -> bool {
+        matches!(self, Self::NotSolvable { .. })
+    }
+
+    /// What refused, written out. Never a bool and never a group name at general degree.
+    pub fn written(&self) -> String {
+        match self {
+            Self::NoCriterionAtThisDegree {
+                degree,
+                least_factor,
+            } => format!(
+                "degree {degree} is composite ({least_factor} divides it); Galois's prime-degree \
+                 theorem states nothing here and no solvability verdict is returned"
+            ),
+            Self::IrreducibilityNotCertified {
+                degree,
+                outside_affine_group,
+            } => match outside_affine_group {
+                Some(witness) => format!(
+                    "degree {degree} is prime and the cycle type {:?} at prime {} lies outside \
+                     AGL(1,{degree}), so G is not contained in it — but irreducibility is not \
+                     certified, so Galois's theorem does not convert that into a solvability \
+                     verdict",
+                    witness.cycle_type, witness.prime
+                ),
+                None => format!(
+                    "degree {degree} is prime but irreducibility is not certified, so the \
+                     prime-degree criterion has no hypothesis to run on"
+                ),
+            },
+            Self::NotSolvable {
+                degree, witness, ..
+            } => format!(
+                "the Frobenius cycle type {:?} at prime {} is the cycle type of no affine map \
+                 x -> ax + b over F_{degree}, so G is not contained in AGL(1,{degree}); by \
+                 Galois's theorem on irreducible equations of prime degree, not solvable by \
+                 radicals",
+                witness.cycle_type, witness.prime
+            ),
+            Self::ConsistentWithSolvable {
+                degree,
+                observed_cycle_types,
+                ..
+            } => format!(
+                "every one of the {} observed cycle types is admissible for AGL(1,{degree}); \
+                 consistent with solvability and NOT a proof of it — an unobserved type excludes \
+                 nothing",
+                observed_cycle_types.len()
+            ),
+        }
+    }
+}
+
+/// The cycle types of the elements of `AGL(1,p) = {x -> ax + b : a in F_p^*, b in F_p}`, derived.
+///
+/// - `a = 1, b = 0` is the identity: `[1^p]`.
+/// - `a = 1, b != 0` is a single `p`-cycle: `[p]`.
+/// - `a != 1` has the unique fixed point `x = b/(1-a)` and every other orbit of length
+///   `d = ord(a)`, which divides `p-1`: `[1, d, ..., d]` with `(p-1)/d` cycles of length `d`.
+///
+/// Every `d >= 2` dividing `p-1` is realised, because `F_p^*` is cyclic of order `p-1`. Nothing is
+/// tabulated: the set is computed from `p` by enumerating the divisors of `p-1`.
+///
+/// At `p = 5` this returns `{[1,1,1,1,1], [1,2,2], [1,4], [5]}`, which is exactly the union of the
+/// cycle types of `C_5`, `D_5` and `F_20`.
+pub fn affine_group_cycle_types(prime_degree: usize) -> BTreeSet<Vec<u32>> {
+    let mut types = BTreeSet::new();
+    let degree = u32::try_from(prime_degree).unwrap_or(u32::MAX);
+    types.insert(vec![1_u32; prime_degree]);
+    types.insert(vec![degree]);
+    for order in 2..prime_degree {
+        if !(prime_degree - 1).is_multiple_of(order) {
+            continue;
+        }
+        let cycles = (prime_degree - 1) / order;
+        let mut cycle_type = vec![1_u32];
+        cycle_type.extend(std::iter::repeat_n(
+            u32::try_from(order).unwrap_or(u32::MAX),
+            cycles,
+        ));
+        cycle_type.sort_unstable();
+        types.insert(cycle_type);
+    }
+    types
+}
+
+/// The least nontrivial factor of `n`, or `None` when `n` is prime. Trial transport to the
+/// square-root frontier: exhaustion is what founds primality, exactly as `CLAUDE.md` §3 states it.
+pub fn least_nontrivial_factor(value: usize) -> Option<usize> {
+    if value < 2 {
+        return Some(value);
+    }
+    let mut candidate: usize = 2;
+    while candidate.saturating_mul(candidate) <= value {
+        if value.is_multiple_of(candidate) {
+            return Some(candidate);
+        }
+        candidate += 1;
+    }
+    None
+}
+
 /// The five transitive subgroups of `S_5`, in their natural degree-five actions.
+///
+/// **Retained as the degree-five instance and an independent cross-check**, not generalised. See
+/// [`SolvabilityConstraint`] for the criterion that runs at every degree.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub enum QuinticTransitiveGroup {
     Cyclic5,
@@ -194,22 +416,37 @@ pub enum QuinticIrreducibility {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct QuinticGaloisFiber {
     pub schema: String,
+    /// The degree of the normalised source, read off its coefficients.
+    pub degree: usize,
     pub discriminant: BigInt,
     pub discriminant_square_root: Option<BigInt>,
     pub irreducibility: QuinticIrreducibility,
     /// Cycle type -> every prime receiver which returned that exact type.
     pub cycle_witnesses: BTreeMap<Vec<u32>, BTreeSet<u64>>,
-    /// Conditional until `irreducibility` closes. Empty means that the transitive catalogue was
-    /// obstructed by the received sections; it does not classify a reducible polynomial.
+    /// The degree-general constraint: what the observed sections have settled about solvability.
+    pub solvability: SolvabilityConstraint,
+    /// **Degree five only.** Conditional until `irreducibility` closes. Empty means either that the
+    /// transitive catalogue was obstructed by the received sections, or that the degree is not five
+    /// and the catalogue does not apply at all — [`Self::catalogue_applies`] separates the two.
     pub transitive_candidates: BTreeSet<QuinticTransitiveGroup>,
 }
 
 impl QuinticGaloisFiber {
+    /// Whether the degree-five transitive catalogue is inside its declared aperture here.
+    ///
+    /// An organ used past its declared aperture is a defect even when it appears to return
+    /// (`CLAUDE.md` §8), and an empty candidate set means *obstructed* only when the catalogue
+    /// applies in the first place.
+    pub fn catalogue_applies(&self) -> bool {
+        self.degree == catalogued_transitive_degree()
+    }
+
     pub fn unique_certified_group(&self) -> Option<QuinticTransitiveGroup> {
         if matches!(
             self.irreducibility,
             QuinticIrreducibility::CertifiedByPrime { .. }
-        ) && self.transitive_candidates.len() == 1
+        ) && self.catalogue_applies()
+            && self.transitive_candidates.len() == 1
         {
             self.transitive_candidates.iter().copied().next()
         } else {
@@ -217,15 +454,49 @@ impl QuinticGaloisFiber {
         }
     }
 
+    /// The cycle types the surviving degree-five candidates could still return. Empty at every
+    /// other degree, where the catalogue does not apply.
     pub fn admitted_future_cycle_types(
         &self,
     ) -> Result<BTreeSet<Vec<u32>>, ArithmeticMonodromyError> {
+        if !self.catalogue_applies() {
+            return Ok(BTreeSet::new());
+        }
         let catalogue = quintic_group_catalogue()?;
         Ok(self
             .transitive_candidates
             .iter()
             .flat_map(|group| catalogue[group].cycle_types.iter().cloned())
             .collect())
+    }
+
+    /// The two routes to a solvability verdict, held against each other at degree five.
+    ///
+    /// `Some(true)` means both applied and agreed, `Some(false)` means both applied and disagreed —
+    /// which is a defect in one of them — and `None` means only one route applied, so there is
+    /// nothing to compare. The equivalence asserted is
+    ///
+    /// ```text
+    ///   SolvabilityConstraint::NotSolvable  <=>  no admitted transitive group is solvable
+    /// ```
+    ///
+    /// and it holds at `p = 5` because `AGL(1,5)`'s cycle types are exactly the union of `C_5`'s,
+    /// `D_5`'s and `F_20`'s.
+    pub fn criterion_agrees_with_catalogue(&self) -> Option<bool> {
+        if !self.catalogue_applies()
+            || !matches!(
+                self.irreducibility,
+                QuinticIrreducibility::CertifiedByPrime { .. }
+            )
+        {
+            return None;
+        }
+        let catalogue_refutes = !self.transitive_candidates.is_empty()
+            && !self
+                .transitive_candidates
+                .iter()
+                .any(|group| group.solvable_by_radicals());
+        Some(self.solvability.refutes_solvability() == catalogue_refutes)
     }
 }
 
@@ -409,7 +680,7 @@ impl QuinticProblemStanding {
                 prime: fiber.prime,
             });
         }
-        let section = derive_prime_section(self.problem.id, fiber)?;
+        let section = derive_prime_section(self.problem.id, self.normalized.degree(), fiber)?;
         let before_candidates = self.galois.transitive_candidates.clone();
         let before_irreducibility = self.galois.irreducibility.clone();
         transport_section_into_galois(&mut self.galois, &section)?;
@@ -567,8 +838,8 @@ impl ArithmeticMonodromyStanding {
         Ok(ArithmeticMonodromyAtlasReceipt {
             schema: "holonic-engine.arithmetic-monodromy-atlas-receipt.v1".to_owned(),
             problem,
-            inherited_coefficient_count: QUINTIC_DEGREE + 1,
-            normalized_projective_free_rank: QUINTIC_DEGREE,
+            inherited_coefficient_count: standing.problem.coefficients.len(),
+            normalized_projective_free_rank: standing.normalized.degree(),
             root_scale: standing.normalized.root_scale.clone(),
             prime_charts,
             transport_cells,
@@ -887,16 +1158,18 @@ fn transport_emitted_fibers(
 
 fn derive_prime_section(
     problem: QuinticProblemId,
+    degree: usize,
     fiber: &PolynomialPrimeFiber,
 ) -> Result<QuinticPrimeSection, ArithmeticMonodromyError> {
     fiber.validate()?;
-    if fiber.signature.degree
-        != u32::try_from(QUINTIC_DEGREE).map_err(|_| ArithmeticMonodromyError::CarrierOverflow)?
-    {
-        return Err(ArithmeticMonodromyError::NonQuinticFiber {
+    let expected =
+        u32::try_from(degree).map_err(|_| ArithmeticMonodromyError::CarrierOverflow)?;
+    if fiber.signature.degree != expected {
+        return Err(ArithmeticMonodromyError::FiberDegreeMismatch {
             problem,
             prime: fiber.prime,
             degree: fiber.signature.degree,
+            expected,
         });
     }
     if fiber.lineage.kind != CausalMaterialKind::Enacted {
@@ -931,7 +1204,7 @@ fn derive_prime_section(
                 sum.checked_add(*degree)
                     .ok_or(ArithmeticMonodromyError::CarrierOverflow)
             })?;
-            if total != QUINTIC_DEGREE as u32 {
+            if total != expected {
                 return Err(ArithmeticMonodromyError::InvalidCycleType {
                     prime: fiber.prime,
                     cycle_type: cycles,
@@ -949,13 +1222,15 @@ fn derive_prime_section(
                 .try_fold(1_u32, checked_least_common_multiple)
         })
         .transpose()?;
+    // The sign of a permutation on `n` points is `(-1)^(n - number of cycles)`: each cycle of
+    // length `L` is `L - 1` transpositions, and the lengths sum to `n`.
     let permutation_is_even = cycle_type.as_ref().map(|cycles| {
-        (QUINTIC_DEGREE as u32 - u32::try_from(cycles.len()).expect("five cycles fit in u32"))
+        (expected - u32::try_from(cycles.len()).expect("a cycle population fits in u32"))
             .is_multiple_of(2)
     });
     let euler_denominator = cycle_type
         .as_ref()
-        .map(|cycles| formal_euler_denominator(cycles))
+        .map(|cycles| formal_euler_denominator(cycles, degree))
         .transpose()?;
     Ok(QuinticPrimeSection {
         schema: "holonic-engine.quintic-prime-section.v1".to_owned(),
@@ -974,24 +1249,80 @@ fn derive_prime_section(
 fn initial_galois_fiber(
     normalized: &NormalizedQuintic,
 ) -> Result<QuinticGaloisFiber, ArithmeticMonodromyError> {
-    let catalogue = quintic_group_catalogue()?;
-    let transitive_candidates = if normalized.discriminant.is_zero() {
+    let degree = normalized.degree();
+    // Parity is degree-general: `disc(f)` is a square in `Q` exactly when `G <= A_n`. The
+    // catalogue is not, so it is filtered only at its own degree.
+    let transitive_candidates = if normalized.discriminant.is_zero() || degree != catalogued_transitive_degree() {
         BTreeSet::new()
     } else {
         let square = normalized.discriminant_square_root.is_some();
-        catalogue
+        quintic_group_catalogue()?
             .iter()
             .filter_map(|(group, entry)| (entry.all_even == square).then_some(*group))
             .collect()
     };
-    Ok(QuinticGaloisFiber {
+    let mut galois = QuinticGaloisFiber {
         schema: "holonic-engine.quintic-galois-fiber.v1".to_owned(),
+        degree,
         discriminant: normalized.discriminant.clone(),
         discriminant_square_root: normalized.discriminant_square_root.clone(),
         irreducibility: QuinticIrreducibility::Open,
         cycle_witnesses: BTreeMap::new(),
+        solvability: SolvabilityConstraint::NoCriterionAtThisDegree {
+            degree,
+            least_factor: 0,
+        },
         transitive_candidates,
-    })
+    };
+    galois.solvability = derive_solvability_constraint(&galois);
+    Ok(galois)
+}
+
+/// Galois's theorem on solvable equations of prime degree, run against the observed cycle types.
+///
+/// The reading is entirely derived: [`affine_group_cycle_types`] computes the admissible set from
+/// the degree, and a single observed type outside it proves `G` is not contained in `AGL(1,p)`.
+/// Everything the theorem does not license is returned as one of the two non-verdict species.
+fn derive_solvability_constraint(galois: &QuinticGaloisFiber) -> SolvabilityConstraint {
+    let degree = galois.degree;
+    if let Some(least_factor) = least_nontrivial_factor(degree) {
+        return SolvabilityConstraint::NoCriterionAtThisDegree {
+            degree,
+            least_factor,
+        };
+    }
+    let admissible = affine_group_cycle_types(degree);
+    let outside = galois
+        .cycle_witnesses
+        .iter()
+        .find(|(cycle_type, _)| !admissible.contains(*cycle_type))
+        .and_then(|(cycle_type, primes)| {
+            primes.iter().next().map(|prime| CycleTypeWitness {
+                prime: *prime,
+                cycle_type: cycle_type.clone(),
+            })
+        });
+    if !matches!(
+        galois.irreducibility,
+        QuinticIrreducibility::CertifiedByPrime { .. }
+    ) {
+        return SolvabilityConstraint::IrreducibilityNotCertified {
+            degree,
+            outside_affine_group: outside,
+        };
+    }
+    match outside {
+        Some(witness) => SolvabilityConstraint::NotSolvable {
+            degree,
+            witness,
+            admissible_cycle_types: admissible,
+        },
+        None => SolvabilityConstraint::ConsistentWithSolvable {
+            degree,
+            observed_cycle_types: galois.cycle_witnesses.keys().cloned().collect(),
+            admissible_cycle_types: admissible,
+        },
+    }
 }
 
 fn transport_section_into_galois(
@@ -1001,34 +1332,40 @@ fn transport_section_into_galois(
     let Some(cycle_type) = &section.cycle_type else {
         return Ok(());
     };
+    let full_cycle =
+        u32::try_from(galois.degree).map_err(|_| ArithmeticMonodromyError::CarrierOverflow)?;
     galois
         .cycle_witnesses
         .entry(cycle_type.clone())
         .or_default()
         .insert(section.prime);
-    if cycle_type == &[QUINTIC_DEGREE as u32]
-        && matches!(galois.irreducibility, QuinticIrreducibility::Open)
-    {
+    if cycle_type == &[full_cycle] && matches!(galois.irreducibility, QuinticIrreducibility::Open) {
         galois.irreducibility = QuinticIrreducibility::CertifiedByPrime {
             prime: section.prime,
             source_events: section.source_events.clone(),
         };
     }
-    let catalogue = quintic_group_catalogue()?;
-    galois
-        .transitive_candidates
-        .retain(|group| catalogue[group].cycle_types.contains(cycle_type));
-    if matches!(
-        galois.irreducibility,
-        QuinticIrreducibility::CertifiedByPrime { .. }
-    ) && galois.transitive_candidates.is_empty()
-    {
-        return Err(ArithmeticMonodromyError::TransitiveCatalogueContradiction);
+    if galois.catalogue_applies() {
+        let catalogue = quintic_group_catalogue()?;
+        galois
+            .transitive_candidates
+            .retain(|group| catalogue[group].cycle_types.contains(cycle_type));
+        if matches!(
+            galois.irreducibility,
+            QuinticIrreducibility::CertifiedByPrime { .. }
+        ) && galois.transitive_candidates.is_empty()
+        {
+            return Err(ArithmeticMonodromyError::TransitiveCatalogueContradiction);
+        }
     }
+    galois.solvability = derive_solvability_constraint(galois);
     Ok(())
 }
 
-fn formal_euler_denominator(cycle_type: &[u32]) -> Result<Vec<BigInt>, ArithmeticMonodromyError> {
+fn formal_euler_denominator(
+    cycle_type: &[u32],
+    degree: usize,
+) -> Result<Vec<BigInt>, ArithmeticMonodromyError> {
     let mut result = vec![BigInt::one()];
     for degree in cycle_type {
         if *degree == 0 {
@@ -1044,7 +1381,7 @@ fn formal_euler_denominator(cycle_type: &[u32]) -> Result<Vec<BigInt>, Arithmeti
         factor[degree] = -BigInt::one();
         result = multiply_integer_polynomials(&result, &factor);
     }
-    if result.len() != QUINTIC_DEGREE + 1 || result[0] != BigInt::one() {
+    if result.len() != degree + 1 || result[0] != BigInt::one() {
         return Err(ArithmeticMonodromyError::MalformedEulerDenominator);
     }
     Ok(result)
@@ -1098,7 +1435,13 @@ fn greatest_common_divisor_u32(mut left: u32, mut right: u32) -> u32 {
     left
 }
 
-type Permutation5 = [u8; QUINTIC_DEGREE];
+/// A permutation of `0..n`, in one-line notation.
+///
+/// **This carrier was `type Permutation5 = [u8; QUINTIC_DEGREE]` until 2026-08-09** — the degree
+/// carried as a type, which no search over `const NAME: type = N;` could ever see
+/// (`canon/THE_AUTHORED_LEVEL.md` §5.4 names it as the standing example). Its extent is now read
+/// off the permutation itself.
+type Permutation = Vec<u8>;
 
 #[derive(Clone, Debug)]
 struct QuinticGroupCatalogueEntry {
@@ -1106,34 +1449,62 @@ struct QuinticGroupCatalogueEntry {
     all_even: bool,
 }
 
-fn quintic_group_catalogue()
--> Result<BTreeMap<QuinticTransitiveGroup, QuinticGroupCatalogueEntry>, ArithmeticMonodromyError> {
-    let rotation = [1, 2, 3, 4, 0];
-    let reflection = [0, 4, 3, 2, 1];
-    let dilation_two = [0, 2, 4, 1, 3];
-    let three_cycle = [1, 2, 0, 3, 4];
-    let transposition = [1, 0, 2, 3, 4];
-    let generators = BTreeMap::from([
-        (QuinticTransitiveGroup::Cyclic5, vec![rotation]),
+/// The declared generators of the five transitive subgroups of `S_5`, as **material**.
+///
+/// A permutation is not a level: it is the group's definition, written in one-line notation. Their
+/// common extent is what [`catalogued_transitive_degree`] reads, so the catalogue's degree is
+/// carried by the mathematics it declares rather than by a constant this organ authored.
+fn quintic_group_generators() -> BTreeMap<QuinticTransitiveGroup, Vec<Permutation>> {
+    let rotation: Permutation = vec![1, 2, 3, 4, 0];
+    let reflection: Permutation = vec![0, 4, 3, 2, 1];
+    let dilation_two: Permutation = vec![0, 2, 4, 1, 3];
+    let three_cycle: Permutation = vec![1, 2, 0, 3, 4];
+    let transposition: Permutation = vec![1, 0, 2, 3, 4];
+    BTreeMap::from([
+        (QuinticTransitiveGroup::Cyclic5, vec![rotation.clone()]),
         (
             QuinticTransitiveGroup::Dihedral5,
-            vec![rotation, reflection],
+            vec![rotation.clone(), reflection],
         ),
         (
             QuinticTransitiveGroup::Frobenius20,
-            vec![rotation, dilation_two],
+            vec![rotation.clone(), dilation_two],
         ),
         (
             QuinticTransitiveGroup::Alternating5,
-            vec![rotation, three_cycle],
+            vec![rotation.clone(), three_cycle],
         ),
         (
             QuinticTransitiveGroup::Symmetric5,
             vec![rotation, transposition],
         ),
-    ]);
+    ])
+}
+
+/// The degree the transitive catalogue is declared over, **read off its own generators**.
+///
+/// `S_5` has exactly five transitive subgroups; there is no comparably small catalogue at general
+/// degree, so the catalogue is not generalised. It is retained as its own instance and as the
+/// independent cross-check on [`SolvabilityConstraint`], and this function is how any other organ
+/// asks whether it is inside that aperture — without a `5` written anywhere but in the declared
+/// permutations themselves.
+pub fn catalogued_transitive_degree() -> usize {
+    quintic_group_generators()
+        .values()
+        .flat_map(|generators| generators.iter())
+        .map(Vec::len)
+        .max()
+        .unwrap_or(0)
+}
+
+/// The five transitive subgroups of `S_5`, generated rather than tabulated.
+///
+/// **Degree five only, and deliberately so.** This is the catalogued instance
+/// [`SolvabilityConstraint`] is cross-checked against; it is not the criterion.
+fn quintic_group_catalogue()
+-> Result<BTreeMap<QuinticTransitiveGroup, QuinticGroupCatalogueEntry>, ArithmeticMonodromyError> {
     let mut catalogue = BTreeMap::new();
-    for (group, generators) in generators {
+    for (group, generators) in quintic_group_generators() {
         let elements = generated_permutation_group(&generators)?;
         if elements.len()
             != usize::try_from(group.order())
@@ -1141,7 +1512,10 @@ fn quintic_group_catalogue()
         {
             return Err(ArithmeticMonodromyError::InvalidGroupCatalogue(group));
         }
-        let cycle_types = elements.iter().map(permutation_cycle_type).collect();
+        let cycle_types = elements
+            .iter()
+            .map(permutation_cycle_type)
+            .collect();
         let all_even = elements.iter().all(permutation_is_even);
         catalogue.insert(
             group,
@@ -1154,20 +1528,36 @@ fn quintic_group_catalogue()
     Ok(catalogue)
 }
 
+/// The subgroup of `S_n` generated by a declared generator set, by breadth-first closure.
+///
+/// The closure bound is `n!` — the order of the whole symmetric group, which no subgroup exceeds by
+/// Lagrange. It is read off the generators' own extent, never authored: the previous form compared
+/// against the literal `120`, which is `5!` written as a number.
 fn generated_permutation_group(
-    generators: &[Permutation5],
-) -> Result<BTreeSet<Permutation5>, ArithmeticMonodromyError> {
+    generators: &[Permutation],
+) -> Result<BTreeSet<Permutation>, ArithmeticMonodromyError> {
+    let extent = generators
+        .first()
+        .map(Vec::len)
+        .ok_or(ArithmeticMonodromyError::InvalidPermutationGroup)?;
     for generator in generators {
-        validate_permutation(generator)?;
+        validate_permutation(generator, extent)?;
     }
-    let identity = [0, 1, 2, 3, 4];
-    let mut elements = BTreeSet::from([identity]);
+    let symmetric_order = (1..=extent).try_fold(1_usize, |product, factor| {
+        product
+            .checked_mul(factor)
+            .ok_or(ArithmeticMonodromyError::CarrierOverflow)
+    })?;
+    let identity: Permutation = (0..extent)
+        .map(|index| u8::try_from(index).map_err(|_| ArithmeticMonodromyError::CarrierOverflow))
+        .collect::<Result<_, _>>()?;
+    let mut elements = BTreeSet::from([identity.clone()]);
     let mut frontier = VecDeque::from([identity]);
     while let Some(current) = frontier.pop_front() {
         for generator in generators {
             let next = compose_permutations(&current, generator);
-            if elements.insert(next) {
-                if elements.len() > 120 {
+            if elements.insert(next.clone()) {
+                if elements.len() > symmetric_order {
                     return Err(ArithmeticMonodromyError::InvalidPermutationGroup);
                 }
                 frontier.push_back(next);
@@ -1177,25 +1567,32 @@ fn generated_permutation_group(
     Ok(elements)
 }
 
-fn validate_permutation(permutation: &Permutation5) -> Result<(), ArithmeticMonodromyError> {
-    if permutation.iter().copied().collect::<BTreeSet<_>>() != BTreeSet::from([0, 1, 2, 3, 4]) {
+fn validate_permutation(
+    permutation: &Permutation,
+    extent: usize,
+) -> Result<(), ArithmeticMonodromyError> {
+    let expected = (0..extent)
+        .map(|index| u8::try_from(index).map_err(|_| ArithmeticMonodromyError::CarrierOverflow))
+        .collect::<Result<BTreeSet<_>, _>>()?;
+    if permutation.len() != extent
+        || permutation.iter().copied().collect::<BTreeSet<_>>() != expected
+    {
         return Err(ArithmeticMonodromyError::InvalidPermutationGroup);
     }
     Ok(())
 }
 
-fn compose_permutations(left: &Permutation5, right: &Permutation5) -> Permutation5 {
-    let mut result = [0_u8; QUINTIC_DEGREE];
-    for index in 0..QUINTIC_DEGREE {
-        result[index] = left[usize::from(right[index])];
-    }
-    result
+fn compose_permutations(left: &Permutation, right: &Permutation) -> Permutation {
+    right
+        .iter()
+        .map(|index| left[usize::from(*index)])
+        .collect()
 }
 
-fn permutation_cycle_type(permutation: &Permutation5) -> Vec<u32> {
-    let mut visited = [false; QUINTIC_DEGREE];
+fn permutation_cycle_type(permutation: &Permutation) -> Vec<u32> {
+    let mut visited = vec![false; permutation.len()];
     let mut cycles = Vec::new();
-    for start in 0..QUINTIC_DEGREE {
+    for start in 0..permutation.len() {
         if visited[start] {
             continue;
         }
@@ -1212,9 +1609,9 @@ fn permutation_cycle_type(permutation: &Permutation5) -> Vec<u32> {
     cycles
 }
 
-fn permutation_is_even(permutation: &Permutation5) -> bool {
+fn permutation_is_even(permutation: &Permutation) -> bool {
     let cycles = permutation_cycle_type(permutation);
-    (QUINTIC_DEGREE as u32 - cycles.len() as u32).is_multiple_of(2)
+    (permutation.len() - cycles.len()).is_multiple_of(2)
 }
 
 fn monic_polynomial_discriminant(
@@ -1509,11 +1906,15 @@ pub enum ArithmeticMonodromyError {
     ReceiverIncidenceMismatch,
     #[error("prime ecology emitted no radiation")]
     MissingPrimeRadiation,
-    #[error("problem {problem:?} received a degree-{degree} fiber at prime {prime}")]
-    NonQuinticFiber {
+    #[error(
+        "problem {problem:?} received a degree-{degree} fiber at prime {prime}, but its own degree \
+         is {expected}"
+    )]
+    FiberDegreeMismatch {
         problem: QuinticProblemId,
         prime: u64,
         degree: u32,
+        expected: u32,
     },
     #[error("problem {problem:?} received an uncaused fiber at prime {prime}")]
     UncausedPrimeFiber {
@@ -1589,6 +1990,162 @@ mod tests {
             ))?;
         }
         Ok(())
+    }
+
+    /// The degree-general criterion, held against the degree-five catalogue on the one degree
+    /// where both exist.
+    ///
+    /// `AGL(1,5)`'s cycle types must be **exactly** the union of the cycle types of `C_5`, `D_5`
+    /// and `F_20` — the three groups `solvable_by_radicals()` marks solvable. That is not an
+    /// arrangement: `F_20` **is** `AGL(1,5)`, and the other two are its subgroups. Two independent
+    /// implementations of one set, per `CLAUDE.md` §8.
+    #[test]
+    fn the_affine_criterion_reproduces_the_catalogue_at_degree_five() {
+        let catalogue = quintic_group_catalogue().unwrap();
+        let solvable_union = catalogue
+            .iter()
+            .filter(|(group, _)| group.solvable_by_radicals())
+            .flat_map(|(_, entry)| entry.cycle_types.iter().cloned())
+            .collect::<BTreeSet<_>>();
+        assert_eq!(affine_group_cycle_types(5), solvable_union);
+        assert_eq!(
+            solvable_union,
+            BTreeSet::from([vec![1, 1, 1, 1, 1], vec![1, 2, 2], vec![1, 4], vec![5]])
+        );
+        // And the separating material: every cycle type an S_5 or A_5 element has that the affine
+        // group does not is a refuter, so the criterion is not vacuous at this degree.
+        let symmetric = &catalogue[&QuinticTransitiveGroup::Symmetric5].cycle_types;
+        let refuters = symmetric
+            .difference(&solvable_union)
+            .cloned()
+            .collect::<BTreeSet<_>>();
+        assert_eq!(
+            refuters,
+            BTreeSet::from([vec![1, 1, 1, 2], vec![1, 1, 3], vec![2, 3]])
+        );
+    }
+
+    /// The admissible set is computed from the divisors of `p-1`, never tabulated.
+    ///
+    /// `|types| = tau(p-1) + 1`: the identity, the `p`-cycle, and one type per divisor `d >= 2` of
+    /// `p-1`. Every type partitions `p`, which is what makes it a cycle type on `p` points at all.
+    #[test]
+    fn affine_cycle_types_are_derived_from_the_divisors_of_the_predecessor() {
+        for prime in [2_usize, 3, 5, 7, 11, 13] {
+            let types = affine_group_cycle_types(prime);
+            let divisors = (1..prime).filter(|d| (prime - 1) % d == 0).count();
+            assert_eq!(
+                types.len(),
+                divisors + 1,
+                "AGL(1,{prime}) should carry tau({}) + 1 cycle types",
+                prime - 1
+            );
+            for cycle_type in &types {
+                let total: u32 = cycle_type.iter().sum();
+                assert_eq!(total as usize, prime, "{cycle_type:?} does not partition {prime}");
+            }
+            assert!(types.contains(&vec![prime as u32]));
+            assert!(types.contains(&vec![1_u32; prime]));
+        }
+        // Degree seven, worked: the divisors of six above one are 2, 3 and 6.
+        assert_eq!(
+            affine_group_cycle_types(7),
+            BTreeSet::from([
+                vec![1, 1, 1, 1, 1, 1, 1],
+                vec![1, 2, 2, 2],
+                vec![1, 3, 3],
+                vec![1, 6],
+                vec![7],
+            ])
+        );
+    }
+
+    /// Trial transport to the square-root frontier, which is what founds primality.
+    #[test]
+    fn the_least_factor_founds_the_degrees_the_criterion_applies_to() {
+        for prime in [2_usize, 3, 5, 7, 11, 13, 17, 19, 23] {
+            assert_eq!(least_nontrivial_factor(prime), None, "{prime} is prime");
+        }
+        assert_eq!(least_nontrivial_factor(4), Some(2));
+        assert_eq!(least_nontrivial_factor(6), Some(2));
+        assert_eq!(least_nontrivial_factor(9), Some(3));
+        assert_eq!(least_nontrivial_factor(25), Some(5));
+        assert_eq!(least_nontrivial_factor(35), Some(5));
+    }
+
+    /// The permutation carrier is general, and the closure bound is `n!` read off the generators.
+    ///
+    /// `Permutation5 = [u8; 5]` could not have run this at all: the degree was the type.
+    #[test]
+    fn the_permutation_carrier_generates_at_a_degree_other_than_five() {
+        // S_3 from a transposition and a three-cycle.
+        let symmetric_three =
+            generated_permutation_group(&[vec![1, 0, 2], vec![1, 2, 0]]).unwrap();
+        assert_eq!(symmetric_three.len(), 6);
+        assert_eq!(
+            symmetric_three
+                .iter()
+                .map(permutation_cycle_type)
+                .collect::<BTreeSet<_>>(),
+            BTreeSet::from([vec![1, 1, 1], vec![1, 2], vec![3]])
+        );
+        // C_7 from a single seven-cycle: order seven, every non-identity element a full cycle.
+        let cyclic_seven = generated_permutation_group(&[vec![1, 2, 3, 4, 5, 6, 0]]).unwrap();
+        assert_eq!(cyclic_seven.len(), 7);
+        assert!(cyclic_seven.iter().all(permutation_is_even));
+        // A malformed generator is refused rather than silently padded.
+        assert!(generated_permutation_group(&[vec![0, 0, 1]]).is_err());
+    }
+
+    /// Normalization is `a_n^(n-1) f(y/a_n)` at every degree, checked at exact integer receivers.
+    #[test]
+    fn a_cubic_and_a_sextic_normalize_through_the_same_root_scale() {
+        for (degree, coefficients) in [
+            (3_usize, vec![5_i64, -1, 4, 3]),
+            (6, vec![-7_i64, 2, 0, 1, -3, 0, -2]),
+        ] {
+            let problem = IntegralQuinticProblem::new(
+                QuinticProblemId(degree as u64),
+                format!("degree-{degree}"),
+                coefficients.iter().copied().map(BigInt::from).collect(),
+            )
+            .unwrap();
+            assert_eq!(problem.degree(), degree);
+            let normalized = problem.normalize().unwrap();
+            assert_eq!(normalized.degree(), degree);
+            assert_eq!(normalized.coefficients.last(), Some(&BigInt::one()));
+            let exponent = u32::try_from(degree - 1).unwrap();
+            for x in -3_i64..=3 {
+                let x = BigInt::from(x);
+                let y = &normalized.root_scale * &x;
+                assert_eq!(
+                    evaluate_integer_polynomial(&normalized.coefficients, &y),
+                    normalized.root_scale.pow(exponent)
+                        * evaluate_integer_polynomial(&problem.coefficients, &x)
+                );
+            }
+        }
+    }
+
+    /// The one degree floor this organ keeps, and it is a theorem rather than an aperture.
+    #[test]
+    fn a_linear_polynomial_is_refused_because_it_has_no_discriminant() {
+        assert!(
+            IntegralQuinticProblem::new(
+                QuinticProblemId(1),
+                "linear",
+                vec![BigInt::from(-2), BigInt::one()],
+            )
+            .is_err()
+        );
+        assert!(
+            IntegralQuinticProblem::new(
+                QuinticProblemId(1),
+                "quadratic",
+                vec![BigInt::from(-2), BigInt::from(0), BigInt::one()],
+            )
+            .is_ok()
+        );
     }
 
     #[test]

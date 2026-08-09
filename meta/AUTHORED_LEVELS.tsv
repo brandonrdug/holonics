@@ -11,7 +11,7 @@
 # Regenerate: python3 tools/authored_levels.py --write
 # Verify:     python3 tools/authored_levels.py --check
 disposition	owner	name	value	why
-PIN	crates/holonic-engine/src/arithmetic_monodromy.rs	QUINTIC_DEGREE	5	EXCISE. Not a fact about quintics -- a REFUSAL GATE at :77 plus seven fixed-size-5 arrays including `type Permutation5 = [u8; 5]`. The organ cannot see a quartic or a sextic, so `solvable_by_radicals` refusing degree 5 has no degree to contrast against. Replace: read the degree off the polynomial; `Permutation5` -> a general permutation. `rational_polynomial.rs` already carries general-degree resultants and Sturm sequences.
+MATERIAL	crates/holonic-engine/src/arithmetic_monodromy.rs	LEAST_DEGREE_WITH_A_DISCRIMINANT	2	THEOREM: disc(f) = (-1)^(n(n-1)/2) Res(f,f')/a_n requires deg f' >= 1, hence n >= 2. Stated independently by rational_polynomial::integer_discriminant, which refuses degree < 2.
 ABI	crates/holonic-engine/src/conditioned_derivation.rs	AT_END_RECEIVER	0	an index or identity element, not a level
 APERTURE	crates/holonic-engine/src/conditioned_derivation.rs	COMMITTING_RECURRENCE	2	Two occurrences before a route commits. Declared, and the withheld routes are RETURNED as lineage rather than discarded. To derive: the recurrence a receiver requires is that receiver\u2019s declaration, and belongs with it.
 ABI	crates/holonic-engine/src/conditioned_derivation.rs	STEM_RECEIVER_BASE	1	an index or identity element, not a level
@@ -29,7 +29,7 @@ PIN	crates/holonic-engine/src/derivation_integral.rs	LEADER_WITNESS_DEPTH	1	EXCI
 MATERIAL	crates/holonic-engine/src/discrete_curvature.rs	FLAT_COORDINATION	6	A vertex of the flat triangular lattice has coordination 6, and the angular defect is measured against it. Theorem: six equilateral triangles tile 2\u03c0 exactly. This does not vary.
 APERTURE	crates/holonic-engine/src/matroid_chow.rs	GROUND_APERTURE	9	Declared and refused past, and the Chow ring of a matroid grows super-exponentially in the ground set. To derive: the level follows from the caller\u2019s memory declaration, which should be supplied rather than assumed.
 APERTURE	crates/holonic-engine/src/matroid_chow.rs	RANK_APERTURE	4	As GROUND_APERTURE.
-PIN	crates/holonic-engine/src/quintic_chart.rs	QUINTIC_DEGREE	5	EXCISE, same defect and same replacement as arithmetic_monodromy. The Tschirnhaus line IS transport between degrees; pinning the degree removes the thing being transported.
+MATERIAL	crates/holonic-engine/src/quintic_chart.rs	SOLVABLE_SYMMETRIC_DEGREE	4	THEOREM: Abel-Ruffini. S_n is solvable exactly for n <= 4; A_5 is simple and non-abelian. The one number in this organ that does not move with the degree, and lifting the degree pin is what made it visible.
 PIN	crates/holonic-engine/src/receiver_phase_atlas.rs	CHANNEL_COUNT	3	EXCISE. Three channels pins the receiver family; the count is a declaration of the material presented.
 APERTURE	crates/holonic-engine/src/surprisal.rs	LOG_SERIES_TERMS	64	A truncation of an exact series with a RETAINED remainder certificate. `exact_value.rs::SeriesTailCertificate` is the carrier and the remainder is an exact rational interval, so the outside IS returned. To derive: the terms needed follow from the requested enclosure width, which the caller should declare.
 MATERIAL	crates/holonic-structure/src/keyed_atlas.rs	MAXIMUM_AVL_DEPTH	128	An AVL tree over a `usize`-indexed population has depth < 1.4405\u00b7log2(n+2); 128 exceeds any population addressable on a 64-bit carrier. Theorem, not a budget.

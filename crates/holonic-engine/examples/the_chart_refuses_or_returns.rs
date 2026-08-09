@@ -174,8 +174,13 @@ fn report(declared: &Declared, atlas: &QuinticChartAtlas) {
         atlas.root_scale
     );
     println!(
-        "  power sums   s_0..s_5 = [{}]",
-        atlas.power_sums[..=5]
+        "  degree       {}",
+        atlas.degree
+    );
+    println!(
+        "  power sums   s_0..s_{} = [{}]",
+        atlas.degree,
+        atlas.power_sums[..=atlas.degree]
             .iter()
             .map(written_rational)
             .collect::<Vec<_>>()
@@ -429,18 +434,17 @@ fn control_radical_both_directions(
             RadicalChartVerdict::Returns(RadicalReturn::BelowTheWall {
                 residual_degree, ..
             }) => format!("below the wall, residual degree {residual_degree}"),
-            RadicalChartVerdict::Returns(RadicalReturn::DepressedBinomial { constant, .. }) => {
+            RadicalChartVerdict::Returns(RadicalReturn::DepressedBinomial {
+                degree,
+                constant,
+                ..
+            }) => {
+                let mut coefficients = vec![Rat::zero(); *degree + 1];
+                coefficients[0] = constant.clone();
+                coefficients[*degree] = Rat::one();
                 format!(
                     "depressed binomial {}",
-                    RationalPolynomial::new(vec![
-                        constant.clone(),
-                        Rat::zero(),
-                        Rat::zero(),
-                        Rat::zero(),
-                        Rat::zero(),
-                        Rat::one()
-                    ])
-                    .written("y")
+                    RationalPolynomial::new(coefficients).written("y")
                 )
             }
             _ => String::new(),
@@ -667,6 +671,13 @@ fn control_the_obstruction_population(
                 }
                 ChartObstructionSpecies::EliminationDegenerate { .. }
                 | ChartObstructionSpecies::OutsideTransformAperture { .. } => true,
+                ChartObstructionSpecies::ChartUndefinedAtDegree {
+                    least_source_degree,
+                    ..
+                } => *least_source_degree > 0,
+                ChartObstructionSpecies::EliminantExceedsBezoutBound { cost, .. } => {
+                    !cost.condition_degrees.is_empty()
+                }
             };
             if !carries {
                 failures.push(format!(
@@ -817,6 +828,10 @@ fn species_name(species: &ChartObstructionSpecies) -> &'static str {
         ChartObstructionSpecies::AuxiliaryHasNoRoot { .. } => "AuxiliaryHasNoRoot",
         ChartObstructionSpecies::TransportCollapsesRoots { .. } => "TransportCollapsesRoots",
         ChartObstructionSpecies::OutsideTransformAperture { .. } => "OutsideTransformAperture",
+        ChartObstructionSpecies::ChartUndefinedAtDegree { .. } => "ChartUndefinedAtDegree",
+        ChartObstructionSpecies::EliminantExceedsBezoutBound { .. } => {
+            "EliminantExceedsBezoutBound"
+        }
     }
 }
 
