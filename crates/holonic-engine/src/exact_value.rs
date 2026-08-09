@@ -3,6 +3,14 @@
 //! A decimal approximation is never a member of this carrier.  Values which
 //! cannot yet be ordered from their exact certificates return `Open` rather
 //! than falling through to an epsilon comparison.
+//!
+//! ## The one floating-point boundary
+//!
+//! [`ieee754`] is the **single declared floating-point exception** in the library files of this
+//! workspace, and it is a codec and nothing else: a bit pattern goes in, an exact dyadic comes out,
+//! and no arithmetic is ever performed on the machine float. Everything downstream of it —
+//! including `crate::reopening`, which is what it was built to feed — sees `BigInt`, `BigUint` and
+//! `Rat` and never an IEEE scalar.
 
 use std::cmp::Ordering;
 
@@ -407,6 +415,33 @@ pub enum ExactValueError {
     NegativeTailBound,
     #[error("an absolute geometric tail ratio must satisfy 0 <= r < 1")]
     InvalidGeometricRatio,
+    #[error(
+        "the {species} bit pattern 0x{bits:x} is not a number: it names no ratio, so it has no exact dyadic and no enclosure"
+    )]
+    NotANumberFloat { species: &'static str, bits: u64 },
+    #[error(
+        "the {species} bit pattern 0x{bits:x} is an infinity (negative: {negative}): it names no ratio, so it has no exact dyadic and no enclosure"
+    )]
+    InfiniteFloat {
+        species: &'static str,
+        negative: bool,
+        bits: u64,
+    },
+    #[error("the bit pattern 0x{bits:x} carries bits above the {width}-bit {species} format")]
+    OverWideBitPattern {
+        species: &'static str,
+        width: u32,
+        bits: u64,
+    },
+    #[error(
+        "a {species} datum does not re-encode to the pattern 0x{bits:x} it was decoded from; the decode is not a bijection and must not be trusted"
+    )]
+    NonInvertibleDecode { species: &'static str, bits: u64 },
+    #[error("a {holding} datum cannot be re-encoded as a {wanted}")]
+    FloatSpeciesMismatch {
+        holding: &'static str,
+        wanted: &'static str,
+    },
 }
 
 fn reverse(ordering: ExactOrdering) -> ExactOrdering {
@@ -536,6 +571,470 @@ fn sign_variations(sequence: &[Vec<Rat>], point: &Rat) -> u32 {
     signs.windows(2).filter(|pair| pair[0] != pair[1]).count() as u32
 }
 
+/// **The mouth: an IEEE-754-shaped bit pattern in, an exact dyadic and its deleted tail out.**
+///
+/// This module is the workspace's one declared floating-point exception, and the declaration is
+/// narrow on purpose. `f64` and `f32` occur in exactly four functions here — [`decode_f64`],
+/// [`decode_f32`], [`encode_f64`], [`encode_f32`] — and each is one call to `to_bits` or
+/// `from_bits`. **No arithmetic is performed on a machine float anywhere in this module or
+/// downstream of it.** Everything else takes `u16`/`u32`/`u64` words, which is what a weight file,
+/// a wire format or a sensor actually hands a program.
+///
+/// ## What a float is, stated precisely
+///
+/// `canon/THE_MATHEMATICS_TABLET.md` §1: *a float is not a bad approximation of a ratio — it is the
+/// ratio's series expansion in base two, truncated, with the remainder discarded.* The first half of
+/// that sentence is the part usually missed: the truncated expansion is itself **exact**. An
+/// IEEE-754 value is precisely `±m · 2^e` with `m` an integer, and nothing in that statement is
+/// approximate. What was destroyed is the **tail** — everything below the last retained bit — and
+/// the tail's width is exactly one unit in the last place, `2^e`.
+///
+/// So the honest face of a float has two possible shapes and **which one it is is not a property of
+/// the bits**:
+///
+/// | the bits are… | the face is… | width |
+/// |---|---|---|
+/// | the datum itself — a stored weight, a wire word, a constant | a **point** | `0` |
+/// | a rounding of a quantity that is not representable | an **enclosure** | one ulp |
+///
+/// [`FloatReading`] is that declaration and the caller must make it. A codec that guessed would be
+/// choosing, for every consumer it will ever have, whether a deletion happened — which is the
+/// defect `canon/THE_MATHEMATICS_TABLET.md` §1 names in its own generalisation: *a carrier that
+/// reduces on construction has decided, for every consumer it will ever have, which distinctions
+/// are invisible.*
+///
+/// ## What is refused, by name
+///
+/// `NaN` and `±∞` name no ratio. They are refused as [`ExactValueError::NotANumberFloat`] and
+/// [`ExactValueError::InfiniteFloat`] rather than mapped to some sentinel, because a sentinel is a
+/// third thing pretending to be a number. Subnormals and both zeros are **accepted** — a subnormal
+/// is an ordinary dyadic with the leading one absent, and `−0.0` is a sign bit over an empty
+/// magnitude, which is why the sign is retained separately from the significand here rather than
+/// folded into a `BigInt` that cannot hold it.
+///
+/// ## The decode is a bijection and says so
+///
+/// [`decode_bits`] re-encodes what it just decoded and refuses with
+/// [`ExactValueError::NonInvertibleDecode`] if the pattern does not come back identical. The round
+/// trip is therefore a **law of the codec**, checked on every call, rather than a property a driver
+/// asserts about it afterwards.
+pub mod ieee754 {
+    use num_bigint::{BigInt, BigUint};
+    use num_traits::{One, ToPrimitive, Zero};
+    use relational_geometry::Rat;
+    use serde::{Deserialize, Serialize};
+
+    use super::{ExactInterval, ExactValueError};
+
+    /// The three binary interchange shapes this codec accepts.
+    ///
+    /// `bfloat16` is not an IEEE-754 interchange format, but it has the same three fields with the
+    /// same meanings and the same subnormal convention, so one decode covers all three. It is here
+    /// because it is the format the material arrives in: a transformer weight file is `BF16`, and
+    /// `soma/life/examples/eros_self_emanated_law.rs` refuses every other dtype by name.
+    #[derive(
+        Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize,
+    )]
+    pub enum BinaryFloatSpecies {
+        /// 1 sign, 8 exponent, 7 stored significand bits. Same exponent range as `binary32`, eight
+        /// significand bits of ratio.
+        Bfloat16,
+        /// IEEE-754 `binary32`: 1 sign, 8 exponent, 23 stored significand bits.
+        Binary32,
+        /// IEEE-754 `binary64`: 1 sign, 11 exponent, 52 stored significand bits.
+        Binary64,
+    }
+
+    impl BinaryFloatSpecies {
+        pub const ALL: [BinaryFloatSpecies; 3] = [Self::Bfloat16, Self::Binary32, Self::Binary64];
+
+        pub const fn name(self) -> &'static str {
+            match self {
+                Self::Bfloat16 => "bfloat16",
+                Self::Binary32 => "binary32",
+                Self::Binary64 => "binary64",
+            }
+        }
+
+        pub const fn width_bits(self) -> u32 {
+            match self {
+                Self::Bfloat16 => 16,
+                Self::Binary32 => 32,
+                Self::Binary64 => 64,
+            }
+        }
+
+        /// Bits of **stored** significand. A normal value's leading one is not stored, so the
+        /// integer significand of a normal value has `stored_significand_bits() + 1` bits.
+        pub const fn stored_significand_bits(self) -> u32 {
+            match self {
+                Self::Bfloat16 => 7,
+                Self::Binary32 => 23,
+                Self::Binary64 => 52,
+            }
+        }
+
+        pub const fn exponent_bits(self) -> u32 {
+            match self {
+                Self::Bfloat16 | Self::Binary32 => 8,
+                Self::Binary64 => 11,
+            }
+        }
+
+        pub const fn exponent_bias(self) -> i32 {
+            (1_i32 << (self.exponent_bits() - 1)) - 1
+        }
+
+        const fn exponent_mask(self) -> u64 {
+            (1_u64 << self.exponent_bits()) - 1
+        }
+
+        const fn significand_mask(self) -> u64 {
+            (1_u64 << self.stored_significand_bits()) - 1
+        }
+
+        /// The dyadic grid the subnormals and both zeros of this format sit on: every subnormal is
+        /// an integer multiple of `2^{subnormal_ulp_exponent()}`, and so is zero.
+        pub const fn subnormal_ulp_exponent(self) -> i32 {
+            1 - self.exponent_bias() - self.stored_significand_bits() as i32
+        }
+    }
+
+    /// How the bits are to be read, which is a declaration and never an inference.
+    ///
+    /// The same 64 bits are a different mathematical object under each reading, and
+    /// `crate::reopening`'s admission law separates them: a point admits every grain, an enclosure
+    /// of width one ulp admits no grain finer than the ulp and is refused past it by name.
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+    pub enum FloatReading {
+        /// **The bits are the datum.** A stored network weight, a wire word, a table constant: the
+        /// value in the file *is* `±m·2^e` and no rounding of anything else happened at this
+        /// boundary. The enclosure is a point and nothing was deleted **here** — whatever deleted a
+        /// tail did so upstream, and that deletion is not this face's to certify.
+        ExactBitPattern,
+        /// **The bits are the round-to-nearest image of a quantity that is not representable.** The
+        /// enclosure is the point plus or minus half a unit in the last place, so its width is
+        /// exactly one ulp.
+        ///
+        /// The enclosure is **outward**: at the low edge of a binade the true rounding preimage is
+        /// only a quarter-ulp wide below the point, and this returns a half-ulp there. Outward is
+        /// the honest direction — it can only refuse a relation that a sharper enclosure would have
+        /// admitted, never admit one a sharper enclosure would have refused.
+        RoundedToNearest,
+        /// **The bits are the truncation toward zero of the quantity.** The enclosure runs one full
+        /// ulp away from zero. A zero datum under this reading straddles zero by one ulp on each
+        /// side, since every quantity of magnitude below one ulp truncates to it.
+        TruncatedTowardZero,
+    }
+
+    impl FloatReading {
+        pub const ALL: [FloatReading; 3] = [
+            Self::ExactBitPattern,
+            Self::RoundedToNearest,
+            Self::TruncatedTowardZero,
+        ];
+
+        pub const fn name(self) -> &'static str {
+            match self {
+                Self::ExactBitPattern => "exact bit pattern",
+                Self::RoundedToNearest => "rounded to nearest",
+                Self::TruncatedTowardZero => "truncated toward zero",
+            }
+        }
+
+        /// Whether this reading declares that a tail was deleted at this boundary.
+        pub const fn deletes_a_tail(self) -> bool {
+            !matches!(self, Self::ExactBitPattern)
+        }
+    }
+
+    /// One decoded binary floating-point datum: an exact dyadic, plus the scale of what the format
+    /// could not carry.
+    ///
+    /// `significand` is **not reduced**. `0.5_f64` decodes to `2^51 · 2^-52`, not to `1 · 2^-1`,
+    /// because the two carry different information: the value is the same and the **ulp is not**.
+    /// The unit in the last place is a property of the format at this magnitude, and stripping
+    /// trailing zeros from the significand would destroy exactly the quantity this whole module
+    /// exists to retain. [`BinaryFloatDatum::reduced_dyadic`] offers the stripped form as a
+    /// *reading*, which is where a reduction belongs.
+    #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+    pub struct BinaryFloatDatum {
+        pub species: BinaryFloatSpecies,
+        /// The pattern this datum was decoded from, zero-extended to 64 bits.
+        pub bits: u64,
+        /// The sign bit, retained **separately** from the magnitude. A signed integer significand
+        /// cannot hold the sign of `−0.0`, and a codec that cannot round-trip `−0.0` is not a
+        /// bijection on the format it claims to decode.
+        pub negative: bool,
+        /// The unsigned integer significand, with a normal value's hidden leading one restored.
+        pub significand: BigUint,
+        /// `value = ±significand · 2^{ulp_exponent}`, and `2^{ulp_exponent}` is one unit in the
+        /// last place.
+        pub ulp_exponent: i32,
+        pub subnormal: bool,
+    }
+
+    impl BinaryFloatDatum {
+        /// The exact value, as a rational. This is not an approximation of the float; it **is** the
+        /// float.
+        pub fn value(&self) -> Rat {
+            let magnitude = scaled(BigInt::from(self.significand.clone()), self.ulp_exponent);
+            if self.negative { -magnitude } else { magnitude }
+        }
+
+        /// One unit in the last place, exactly: `2^{ulp_exponent}`. This is the width of what the
+        /// format deleted, and under a rounding reading it is the width of the enclosure.
+        pub fn unit_in_last_place(&self) -> Rat {
+            power_of_two(self.ulp_exponent)
+        }
+
+        /// The ulp said as a bit count: `ulp = 2^{-ulp_bits()}`. Negative for values so large that
+        /// the format's spacing exceeds one.
+        pub fn ulp_bits(&self) -> i32 {
+            -self.ulp_exponent
+        }
+
+        pub fn is_zero(&self) -> bool {
+            self.significand.is_zero()
+        }
+
+        pub fn signed_significand(&self) -> BigInt {
+            let magnitude = BigInt::from(self.significand.clone());
+            if self.negative { -magnitude } else { magnitude }
+        }
+
+        /// The same value with trailing factors of two stripped: `(m, e)` with `m` odd or zero.
+        ///
+        /// A **reading**, offered rather than imposed. The ulp is not recoverable from it.
+        pub fn reduced_dyadic(&self) -> (BigInt, i32) {
+            let mut numerator = self.signed_significand();
+            let mut exponent = self.ulp_exponent;
+            if numerator.is_zero() {
+                return (numerator, 0);
+            }
+            let trailing = numerator
+                .magnitude()
+                .trailing_zeros()
+                .unwrap_or(0)
+                .min(i32::MAX as u64) as usize;
+            numerator >>= trailing;
+            exponent += trailing as i32;
+            (numerator, exponent)
+        }
+
+        /// The face this datum presents under a declared reading.
+        ///
+        /// This is the whole content of the module in four lines: the point is the truncated
+        /// expansion, and the interval is the point plus the tail the format threw away.
+        pub fn enclosure(&self, reading: FloatReading) -> ExactInterval {
+            let value = self.value();
+            let ulp = self.unit_in_last_place();
+            match reading {
+                FloatReading::ExactBitPattern => ExactInterval::point(value),
+                FloatReading::RoundedToNearest => {
+                    let half = ulp / Rat::from_integer(BigInt::from(2));
+                    ExactInterval {
+                        lower: &value - &half,
+                        upper: &value + &half,
+                    }
+                }
+                FloatReading::TruncatedTowardZero => {
+                    if self.is_zero() {
+                        ExactInterval {
+                            lower: -ulp.clone(),
+                            upper: ulp,
+                        }
+                    } else if self.negative {
+                        ExactInterval {
+                            lower: &value - &ulp,
+                            upper: value,
+                        }
+                    } else {
+                        ExactInterval {
+                            lower: value.clone(),
+                            upper: &value + &ulp,
+                        }
+                    }
+                }
+            }
+        }
+
+        /// Re-encode to the interchange pattern, computed from the decoded fields rather than
+        /// echoed from [`BinaryFloatDatum::bits`].
+        ///
+        /// [`decode_bits`] calls this on every decode and refuses when the two disagree, which is
+        /// what makes the round trip a law rather than a claim.
+        pub fn to_bits(&self) -> Result<u64, ExactValueError> {
+            let species = self.species;
+            let stored = species.stored_significand_bits();
+            let significand = self.significand.to_u64().ok_or({
+                ExactValueError::NonInvertibleDecode {
+                    species: species.name(),
+                    bits: self.bits,
+                }
+            })?;
+            let sign = u64::from(self.negative) << (species.width_bits() - 1);
+            if self.subnormal {
+                if significand > species.significand_mask()
+                    || self.ulp_exponent != species.subnormal_ulp_exponent()
+                {
+                    return Err(ExactValueError::NonInvertibleDecode {
+                        species: species.name(),
+                        bits: self.bits,
+                    });
+                }
+                return Ok(sign | significand);
+            }
+            let hidden = 1_u64 << stored;
+            let raw_exponent = self.ulp_exponent + species.exponent_bias() + stored as i32;
+            if significand < hidden
+                || significand >= hidden << 1
+                || raw_exponent < 1
+                || raw_exponent as u64 >= species.exponent_mask()
+            {
+                return Err(ExactValueError::NonInvertibleDecode {
+                    species: species.name(),
+                    bits: self.bits,
+                });
+            }
+            Ok(sign | ((raw_exponent as u64) << stored) | (significand - hidden))
+        }
+    }
+
+    /// Decode one interchange pattern of a declared species into its exact dyadic.
+    ///
+    /// The sole arithmetic is on integers: a shift, a mask, and one subtraction of the bias. `NaN`
+    /// and `±∞` are refused by name; subnormals, `+0.0` and `−0.0` are decoded like anything else.
+    pub fn decode_bits(
+        species: BinaryFloatSpecies,
+        bits: u64,
+    ) -> Result<BinaryFloatDatum, ExactValueError> {
+        let width = species.width_bits();
+        if width < 64 && (bits >> width) != 0 {
+            return Err(ExactValueError::OverWideBitPattern {
+                species: species.name(),
+                width,
+                bits,
+            });
+        }
+        let stored = species.stored_significand_bits();
+        let negative = (bits >> (width - 1)) & 1 == 1;
+        let raw_exponent = (bits >> stored) & species.exponent_mask();
+        let fraction = bits & species.significand_mask();
+        if raw_exponent == species.exponent_mask() {
+            return Err(if fraction == 0 {
+                ExactValueError::InfiniteFloat {
+                    species: species.name(),
+                    negative,
+                    bits,
+                }
+            } else {
+                ExactValueError::NotANumberFloat {
+                    species: species.name(),
+                    bits,
+                }
+            });
+        }
+        let (significand, ulp_exponent, subnormal) = if raw_exponent == 0 {
+            (fraction, species.subnormal_ulp_exponent(), true)
+        } else {
+            (
+                (1_u64 << stored) | fraction,
+                raw_exponent as i32 - species.exponent_bias() - stored as i32,
+                false,
+            )
+        };
+        let datum = BinaryFloatDatum {
+            species,
+            bits,
+            negative,
+            significand: BigUint::from(significand),
+            ulp_exponent,
+            subnormal,
+        };
+        if datum.to_bits()? != bits {
+            return Err(ExactValueError::NonInvertibleDecode {
+                species: species.name(),
+                bits,
+            });
+        }
+        Ok(datum)
+    }
+
+    /// A `bfloat16` word, as `soma/life/examples/eros_self_emanated_law.rs` reads them out of a
+    /// safetensors payload.
+    pub fn decode_bfloat16_bits(word: u16) -> Result<BinaryFloatDatum, ExactValueError> {
+        decode_bits(BinaryFloatSpecies::Bfloat16, u64::from(word))
+    }
+
+    /// An IEEE-754 `binary32` word.
+    pub fn decode_binary32_bits(word: u32) -> Result<BinaryFloatDatum, ExactValueError> {
+        decode_bits(BinaryFloatSpecies::Binary32, u64::from(word))
+    }
+
+    /// An IEEE-754 `binary64` word.
+    pub fn decode_binary64_bits(word: u64) -> Result<BinaryFloatDatum, ExactValueError> {
+        decode_bits(BinaryFloatSpecies::Binary64, word)
+    }
+
+    /// **The mouth for a live machine float.** One `to_bits`, then integers the rest of the way.
+    ///
+    /// This is one of the four functions in this workspace's library files that mention an IEEE
+    /// type at all. It performs no arithmetic on `value`; `f64::to_bits` is a reinterpretation of
+    /// the same storage.
+    pub fn decode_f64(value: f64) -> Result<BinaryFloatDatum, ExactValueError> {
+        decode_binary64_bits(value.to_bits())
+    }
+
+    /// [`decode_f64`] for `binary32`.
+    pub fn decode_f32(value: f32) -> Result<BinaryFloatDatum, ExactValueError> {
+        decode_binary32_bits(value.to_bits())
+    }
+
+    /// The inverse mouth, so the bijection can be exercised end to end by a driver.
+    pub fn encode_f64(datum: &BinaryFloatDatum) -> Result<f64, ExactValueError> {
+        if datum.species != BinaryFloatSpecies::Binary64 {
+            return Err(ExactValueError::FloatSpeciesMismatch {
+                holding: datum.species.name(),
+                wanted: BinaryFloatSpecies::Binary64.name(),
+            });
+        }
+        Ok(f64::from_bits(datum.to_bits()?))
+    }
+
+    /// [`encode_f64`] for `binary32`.
+    pub fn encode_f32(datum: &BinaryFloatDatum) -> Result<f32, ExactValueError> {
+        if datum.species != BinaryFloatSpecies::Binary32 {
+            return Err(ExactValueError::FloatSpeciesMismatch {
+                holding: datum.species.name(),
+                wanted: BinaryFloatSpecies::Binary32.name(),
+            });
+        }
+        let bits = datum.to_bits()?;
+        let word = u32::try_from(bits).map_err(|_| ExactValueError::NonInvertibleDecode {
+            species: datum.species.name(),
+            bits,
+        })?;
+        Ok(f32::from_bits(word))
+    }
+
+    fn power_of_two(exponent: i32) -> Rat {
+        if exponent >= 0 {
+            Rat::from_integer(BigInt::one() << (exponent as usize))
+        } else {
+            Rat::new(BigInt::one(), BigInt::one() << ((-exponent) as usize))
+        }
+    }
+
+    fn scaled(numerator: BigInt, exponent: i32) -> Rat {
+        if exponent >= 0 {
+            Rat::from_integer(numerator << (exponent as usize))
+        } else {
+            Rat::new(numerator, BigInt::one() << ((-exponent) as usize))
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use relational_geometry::{integer, rat};
@@ -587,6 +1086,165 @@ mod tests {
             ExactValue::CertifiedSeries(left).compare(&ExactValue::CertifiedSeries(right)),
             ExactOrdering::Less
         );
+    }
+
+    /// Every pattern this codec accepts must come back out of it identical.
+    ///
+    /// Stated at the level of **bits** rather than of `f64`, deliberately: `f32` and `f64` occur in
+    /// exactly four functions of `ieee754` and nowhere else in any library file of this workspace,
+    /// and that includes this test module. The live-float round trip is exercised by
+    /// `examples/a_float_is_a_dyadic_and_a_deleted_tail.rs`, which is a boundary driver and may
+    /// hold one.
+    #[test]
+    fn every_accepted_bit_pattern_re_encodes_identically() {
+        use ieee754::{BinaryFloatSpecies, decode_bits};
+        let declared: &[(BinaryFloatSpecies, u64)] = &[
+            // binary64: one, pi, both zeros, the extreme subnormals, a long mantissa, max finite.
+            (BinaryFloatSpecies::Binary64, 0x3ff0_0000_0000_0000),
+            (BinaryFloatSpecies::Binary64, 0x4009_21fb_5444_2d18),
+            (BinaryFloatSpecies::Binary64, 0x0000_0000_0000_0000),
+            (BinaryFloatSpecies::Binary64, 0x8000_0000_0000_0000),
+            (BinaryFloatSpecies::Binary64, 0x0000_0000_0000_0001),
+            (BinaryFloatSpecies::Binary64, 0x000f_ffff_ffff_ffff),
+            (BinaryFloatSpecies::Binary64, 0xbfe5_5555_5555_5555),
+            (BinaryFloatSpecies::Binary64, 0x7fef_ffff_ffff_ffff),
+            // binary32, including a real GPT-2 attention weight.
+            (BinaryFloatSpecies::Binary32, 0x3f80_0000),
+            (BinaryFloatSpecies::Binary32, 0x0000_0001),
+            (BinaryFloatSpecies::Binary32, 0x8000_0000),
+            (BinaryFloatSpecies::Binary32, 0x7f7f_ffff),
+            (BinaryFloatSpecies::Binary32, 0xbef2_9c42),
+            // bfloat16, including a real Qwen down-projection weight.
+            (BinaryFloatSpecies::Bfloat16, 0x3f80),
+            (BinaryFloatSpecies::Bfloat16, 0x0001),
+            (BinaryFloatSpecies::Bfloat16, 0x8000),
+            (BinaryFloatSpecies::Bfloat16, 0xbd1e),
+        ];
+        for (species, bits) in declared {
+            let datum = decode_bits(*species, *bits)
+                .unwrap_or_else(|error| panic!("{} 0x{bits:x} decodes: {error}", species.name()));
+            assert_eq!(
+                datum.to_bits().expect("a decoded datum re-encodes"),
+                *bits,
+                "{} 0x{bits:x} must return identical",
+                species.name()
+            );
+        }
+    }
+
+    /// `NaN` and `±∞` name no ratio, so they are refused by name rather than mapped to a sentinel.
+    #[test]
+    fn not_a_number_and_the_infinities_are_refused_by_name() {
+        use ieee754::{BinaryFloatSpecies, decode_bits};
+        assert!(matches!(
+            decode_bits(BinaryFloatSpecies::Binary64, 0x7ff0_0000_0000_0000),
+            Err(ExactValueError::InfiniteFloat {
+                negative: false, ..
+            })
+        ));
+        assert!(matches!(
+            decode_bits(BinaryFloatSpecies::Binary64, 0xfff0_0000_0000_0000),
+            Err(ExactValueError::InfiniteFloat { negative: true, .. })
+        ));
+        assert!(matches!(
+            decode_bits(BinaryFloatSpecies::Binary64, 0x7ff8_0000_0000_0000),
+            Err(ExactValueError::NotANumberFloat { .. })
+        ));
+        // A signalling pattern is refused for the same reason as a quiet one.
+        assert!(matches!(
+            decode_bits(BinaryFloatSpecies::Binary64, 0x7ff0_0000_0000_0001),
+            Err(ExactValueError::NotANumberFloat { .. })
+        ));
+        assert!(matches!(
+            decode_bits(BinaryFloatSpecies::Bfloat16, 0x7f80),
+            Err(ExactValueError::InfiniteFloat { .. })
+        ));
+        assert!(matches!(
+            decode_bits(BinaryFloatSpecies::Binary32, 0x7fc0_0000),
+            Err(ExactValueError::NotANumberFloat { .. })
+        ));
+        // And a pattern too wide for its declared format is not silently masked.
+        assert!(matches!(
+            decode_bits(BinaryFloatSpecies::Bfloat16, 0x1_0000),
+            Err(ExactValueError::OverWideBitPattern { width: 16, .. })
+        ));
+    }
+
+    /// The ulp belongs to the **format at this magnitude**, not to the value, and the codec must
+    /// not reduce the significand or it destroys exactly that.
+    #[test]
+    fn the_unit_in_the_last_place_survives_a_value_that_reduces() {
+        use ieee754::{BinaryFloatSpecies, decode_bits};
+        // 1.0 and 0.5 reduce to 1*2^0 and 1*2^-1; their ulps differ by a factor of two.
+        let one = decode_bits(BinaryFloatSpecies::Binary64, 0x3ff0_0000_0000_0000).unwrap();
+        let half = decode_bits(BinaryFloatSpecies::Binary64, 0x3fe0_0000_0000_0000).unwrap();
+        assert_eq!(one.value(), integer(1));
+        assert_eq!(half.value(), rat(1, 2));
+        assert_eq!(one.reduced_dyadic(), (BigInt::one(), 0));
+        assert_eq!(half.reduced_dyadic(), (BigInt::one(), -1));
+        assert_eq!(one.ulp_bits(), 52);
+        assert_eq!(half.ulp_bits(), 53);
+        assert_eq!(one.unit_in_last_place(), rat(1, 1_i64 << 52));
+
+        // The smallest subnormal is one ulp of the subnormal grid, and it is exact.
+        let tiny = decode_bits(BinaryFloatSpecies::Binary64, 0x0000_0000_0000_0001).unwrap();
+        assert!(tiny.subnormal);
+        assert_eq!(tiny.ulp_bits(), 1074);
+        assert_eq!(tiny.value(), tiny.unit_in_last_place());
+
+        // Both zeros carry the subnormal ulp, and the sign of zero survives the decode.
+        let plus = decode_bits(BinaryFloatSpecies::Binary64, 0).unwrap();
+        let minus = decode_bits(BinaryFloatSpecies::Binary64, 0x8000_0000_0000_0000).unwrap();
+        assert!(plus.is_zero() && minus.is_zero());
+        assert_eq!(plus.value(), minus.value());
+        assert!(!plus.negative && minus.negative);
+        assert_ne!(plus.to_bits().unwrap(), minus.to_bits().unwrap());
+    }
+
+    /// The bfloat16 decode must agree with the reader it was taken from,
+    /// `soma/life/examples/eros_self_emanated_law.rs:60`, on real material.
+    #[test]
+    fn the_bfloat16_decode_agrees_with_the_reader_it_was_taken_from() {
+        use ieee754::{BinaryFloatSpecies, decode_bfloat16_bits, decode_bits};
+        // `model.language_model.layers.1.mlp.down_proj.weight[0]` of Qwen3.5-4B.
+        let weight = decode_bfloat16_bits(0xbd1e).unwrap();
+        assert_eq!(weight.reduced_dyadic(), (BigInt::from(-79), -11));
+        assert_eq!(weight.signed_significand(), BigInt::from(-158));
+        assert_eq!(weight.ulp_exponent, -12);
+        assert_eq!(weight.value(), rat(-158, 4096));
+        // The archetype's subnormal exponent is -133 and its normal exponent is `raw - 134`.
+        assert_eq!(BinaryFloatSpecies::Bfloat16.subnormal_ulp_exponent(), -133);
+        let subnormal = decode_bits(BinaryFloatSpecies::Bfloat16, 0x0001).unwrap();
+        assert_eq!(subnormal.ulp_exponent, -133);
+    }
+
+    /// The three readings of one pattern are three different faces, and the difference is the
+    /// entire content of the distinction.
+    #[test]
+    fn one_pattern_presents_three_faces_under_three_readings() {
+        use ieee754::{BinaryFloatSpecies, FloatReading, decode_bits};
+        let datum = decode_bits(BinaryFloatSpecies::Binary64, 0x3ff0_0000_0000_0000).unwrap();
+        let ulp = datum.unit_in_last_place();
+
+        let point = datum.enclosure(FloatReading::ExactBitPattern);
+        assert!(point.is_point());
+        assert_eq!(point.lower, integer(1));
+
+        let rounded = datum.enclosure(FloatReading::RoundedToNearest);
+        assert_eq!(&rounded.upper - &rounded.lower, ulp);
+        assert!(rounded.lower < integer(1) && rounded.upper > integer(1));
+
+        let truncated = datum.enclosure(FloatReading::TruncatedTowardZero);
+        assert_eq!(&truncated.upper - &truncated.lower, ulp);
+        assert_eq!(truncated.lower, integer(1));
+
+        // A zero truncated toward zero straddles zero by one ulp on each side: every quantity
+        // smaller than one ulp truncates onto it.
+        let zero = decode_bits(BinaryFloatSpecies::Binary64, 0).unwrap();
+        let straddle = zero.enclosure(FloatReading::TruncatedTowardZero);
+        assert_eq!(straddle.lower, -zero.unit_in_last_place());
+        assert_eq!(straddle.upper, zero.unit_in_last_place());
+        assert!(zero.enclosure(FloatReading::ExactBitPattern).is_point());
     }
 
     #[test]

@@ -176,6 +176,17 @@ fn describe_provenance(face: &ExactFace) -> String {
         FaceProvenance::Collapsed { truncated_at_bits } => {
             format!("COLLAPSED at {truncated_at_bits} bits -- the tail is gone")
         }
+        FaceProvenance::MeasuredFloat {
+            species,
+            bits,
+            reading,
+            ulp_bits,
+            source,
+        } => format!(
+            "{} 0x{bits:x} read as {}, ulp 2^-{ulp_bits}, from {source}",
+            species.name(),
+            reading.name()
+        ),
     }
 }
 

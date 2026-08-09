@@ -106,6 +106,37 @@
 //! **the tail sets the grain ceiling, and the grain ceiling is what decides whether a relation of a
 //! given height is reachable at all.**
 //!
+//! ## The mouth: where a real float enters
+//!
+//! Every constructor above this line requires an already-exact source, so for its first form this
+//! instrument could only reverse a deletion it had performed itself with [`ExactFace::collapsed`].
+//! [`ExactFace::from_binary_float`] is the constructor that takes a **measured** IEEE-754 datum —
+//! a network weight read out of a safetensors payload, a wire word, a decimal literal the compiler
+//! rounded — decoded by `crate::exact_value::ieee754`, which is the workspace's one declared
+//! floating-point boundary. **No float crosses into this file.** The mouth takes a
+//! `BinaryFloatDatum`, which is `BigUint` and a power of two.
+//!
+//! The declaration the caller must make is `FloatReading`, and it is the whole content of the
+//! mouth:
+//!
+//! ```text
+//!   ExactBitPattern       the bits ARE the datum        -> a POINT,     width 0,  every grain
+//!   RoundedToNearest      the bits round something else -> an ENCLOSURE, width 1 ulp
+//!   TruncatedTowardZero   the bits truncate something   -> an ENCLOSURE, width 1 ulp
+//! ```
+//!
+//! and the admission law above **already separates them without a new rule**. A point admits every
+//! grain because its width is zero. An enclosure of width `2^-u` has [`CertifiedBits::Bits(u)`] and
+//! is refused at grain `u+1` by [`ReopeningError::FaceCoarserThanGrain`], which is the same
+//! refusal a starved series tail earns and is not weakened by anything here. A rounded `f64` near
+//! `1` carries `u = 52`; the same `f64` read as a bit pattern carries no ceiling at all. That
+//! difference is measured in `examples/a_float_is_a_dyadic_and_a_deleted_tail.rs`, where the same
+//! sixteen bits return a candidate under one reading and nothing under the other.
+//!
+//! [`ExactFace::aperture_source`] reports **what paid for a face's ceiling** — a retained tail, an
+//! analytic width, a unit in the last place — so a refusal can be reported as its cause rather than
+//! as its symptom.
+//!
 //! ## What this does not claim
 //!
 //! Not a proof of any recovered identity. Not a decompression of a weight file. Not semantic
@@ -124,6 +155,7 @@ use thiserror::Error;
 use relational_geometry::exact::{Rat, integer};
 use relational_geometry::exact_analysis::RatInterval;
 
+use crate::exact_value::ieee754::{BinaryFloatDatum, BinaryFloatSpecies, FloatReading};
 use crate::exact_value::{CertifiedSeries, ExactInterval, SeriesTailCertificate};
 use relational_geometry::exact::ExactExpr;
 
@@ -259,6 +291,72 @@ pub enum FaceProvenance {
     /// A face that arrived already collapsed: a value with a declared truncation and no series
     /// behind it. The enclosure is the collapse itself.
     Collapsed { truncated_at_bits: u32 },
+    /// A face that arrived as a **real IEEE-754-shaped datum** — a stored weight, a wire word, a
+    /// decimal literal a compiler rounded — decoded by `crate::exact_value::ieee754`.
+    ///
+    /// Everything needed to re-derive the face is retained: the exact pattern, the format, the
+    /// declared reading, the scale of what the format could not carry, and where the bits came
+    /// from. A face that says *"this came from somewhere"* without saying where has smuggled in an
+    /// absolute frame, which is `CLAUDE.md` §0's second lesson.
+    MeasuredFloat {
+        species: BinaryFloatSpecies,
+        /// The interchange pattern, exactly as read, zero-extended to 64 bits.
+        bits: u64,
+        /// Whether the bits are the datum or a rounding of something else. This decides whether
+        /// the enclosure is a point or one ulp wide, and therefore what grains the face admits.
+        reading: FloatReading,
+        /// `ulp = 2^{-ulp_bits}`, exactly. Negative when the format's spacing at this magnitude
+        /// exceeds one, in which case no grain is admissible at all.
+        ulp_bits: i32,
+        /// The artifact, tensor and coordinate the pattern was read from.
+        source: String,
+    },
+}
+
+/// What paid for a face's grain ceiling.
+///
+/// A [`ReopeningError::FaceCoarserThanGrain`] says a face was too coarse for a question. This says
+/// **why**, in the vocabulary of whatever supplied the width, so a refusal is reported as its cause
+/// rather than as its symptom. It is a reading of [`FaceProvenance`] and adds no rule to the
+/// admission law.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ApertureSource {
+    /// A point. Nothing was deleted at this boundary and every grain is admissible.
+    NoDeletion,
+    /// The exact remainder interval a [`SeriesTailCertificate`] retained.
+    RetainedSeriesTail,
+    /// The width an analytic enclosure carrier returned.
+    AnalyticWidth,
+    /// One unit in the last place of a binary floating-point format at this magnitude. This is the
+    /// tail the float deleted, and it is the only thing standing between the face and a finer
+    /// grain.
+    UnitInTheLastPlace {
+        species: BinaryFloatSpecies,
+        ulp_bits: i32,
+    },
+    /// A declared truncation with no certificate behind it.
+    DeclaredTruncation { bits: u32 },
+    /// The outward integer combination of other faces' apertures.
+    CombinedApertures,
+}
+
+impl fmt::Display for ApertureSource {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::NoDeletion => write!(formatter, "no deletion"),
+            Self::RetainedSeriesTail => write!(formatter, "a retained series tail"),
+            Self::AnalyticWidth => write!(formatter, "an analytic enclosure width"),
+            Self::UnitInTheLastPlace { species, ulp_bits } => write!(
+                formatter,
+                "one {} ulp, 2^-{ulp_bits}",
+                species.name()
+            ),
+            Self::DeclaredTruncation { bits } => {
+                write!(formatter, "a declared truncation at {bits} bits")
+            }
+            Self::CombinedApertures => write!(formatter, "combined apertures"),
+        }
+    }
 }
 
 /// One numeric face: a rational approximation **with its certified error**.
@@ -363,6 +461,75 @@ impl ExactFace {
             },
             provenance: FaceProvenance::Collapsed {
                 truncated_at_bits: bits,
+            },
+        }
+    }
+
+    /// **The mouth.** A real measured floating-point datum, plus the declaration that says what it
+    /// is, becomes the face it actually is.
+    ///
+    /// `datum` is already exact — `crate::exact_value::ieee754` decoded the interchange pattern
+    /// into `BigUint × 2^e` and refused `NaN` and `±∞` by name before this is reachable, so no
+    /// float crosses into this module. `reading` is the caller's declaration and cannot be
+    /// inferred from the bits:
+    ///
+    /// - [`FloatReading::ExactBitPattern`] — the datum **is** the quantity. A stored `bf16` weight
+    ///   is such a datum: the number in the file is exactly `−158·2^-12` and nothing rounded it at
+    ///   *this* boundary. The face is a point and admits every grain.
+    /// - [`FloatReading::RoundedToNearest`] / [`FloatReading::TruncatedTowardZero`] — the datum is
+    ///   an image of something else and the deleted tail is one unit in the last place wide. The
+    ///   face is an enclosure of exactly that width and is refused, by name, at any finer grain.
+    ///
+    /// `source` names the artifact, tensor and coordinate. It is retained because a face whose
+    /// provenance is *"a float"* cannot be re-derived, and a receipt that cannot be re-derived is
+    /// the defect this whole module is instrumented against.
+    ///
+    /// Infallible on purpose: a float too coarse for any grain — the format's spacing at that
+    /// magnitude exceeding one — is a **legal face** whose [`ExactFace::certified_bits`] is
+    /// [`CertifiedBits::Coarser`], and it is refused where every other coarse face is refused, by
+    /// the aperture law in [`probe_at_frame`]. Refusing it at construction would move the aperture
+    /// law into the constructor and leave the caller nothing to inspect.
+    pub fn from_binary_float(
+        name: impl Into<String>,
+        source: impl Into<String>,
+        datum: &BinaryFloatDatum,
+        reading: FloatReading,
+    ) -> Self {
+        Self {
+            name: name.into(),
+            enclosure: datum.enclosure(reading),
+            provenance: FaceProvenance::MeasuredFloat {
+                species: datum.species,
+                bits: datum.bits,
+                reading,
+                ulp_bits: datum.ulp_bits(),
+                source: source.into(),
+            },
+        }
+    }
+
+    /// What paid for this face's grain ceiling.
+    ///
+    /// A reading of the provenance, not a rule. Where the answer is
+    /// [`ApertureSource::UnitInTheLastPlace`], the ceiling is a **deletion** rather than a
+    /// certificate: nothing was measured to that width, a format simply stopped carrying bits.
+    pub fn aperture_source(&self) -> ApertureSource {
+        if self.enclosure.is_point() {
+            return ApertureSource::NoDeletion;
+        }
+        match &self.provenance {
+            FaceProvenance::Rational => ApertureSource::NoDeletion,
+            FaceProvenance::CertifiedSeries(_) => ApertureSource::RetainedSeriesTail,
+            FaceProvenance::AnalyticEnclosure { .. } => ApertureSource::AnalyticWidth,
+            FaceProvenance::IntegerCombination { .. } => ApertureSource::CombinedApertures,
+            FaceProvenance::Collapsed { truncated_at_bits } => ApertureSource::DeclaredTruncation {
+                bits: *truncated_at_bits,
+            },
+            FaceProvenance::MeasuredFloat {
+                species, ulp_bits, ..
+            } => ApertureSource::UnitInTheLastPlace {
+                species: *species,
+                ulp_bits: *ulp_bits,
             },
         }
     }
@@ -1177,6 +1344,7 @@ pub fn finest_admissible_grain(faces: &[ExactFace]) -> CertifiedBits {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::exact_value::ieee754::{decode_bfloat16_bits, decode_binary64_bits};
     use relational_geometry::exact_analysis::log_rational_interval;
 
     fn grain_pair() -> Vec<DeclaredGrain> {
@@ -1600,6 +1768,191 @@ mod tests {
             machin.verdict.candidate().expect("Machin").coefficients,
             vec![BigInt::from(16), BigInt::from(-4), BigInt::from(-1)]
         );
+    }
+
+    /// The mouth must not accept everything. A float read as a **measurement** carries a ceiling of
+    /// exactly one unit in the last place, and the aperture law refuses past it by name.
+    ///
+    /// The two patterns are the CODATA 2022 inverse fine-structure constant and Rydberg constant as
+    /// `binary64`. Their ulps differ by sixteen binary places purely because their magnitudes do,
+    /// which is the point: **the ulp belongs to the format at a magnitude, not to the format.**
+    #[test]
+    fn a_rounded_float_face_is_refused_past_its_own_unit_in_the_last_place() {
+        let alpha_inverse = decode_binary64_bits(0x4061_2126_e7be_fcbc).expect("a finite pattern");
+        let rydberg = decode_binary64_bits(0x4164_ee44_722e_5797).expect("a finite pattern");
+        assert_eq!(alpha_inverse.ulp_bits(), 45);
+        assert_eq!(rydberg.ulp_bits(), 29);
+
+        let faces = vec![
+            ExactFace::from_binary_float(
+                "alpha^-1",
+                "CODATA 2022, as a binary64 literal",
+                &alpha_inverse,
+                FloatReading::RoundedToNearest,
+            ),
+            ExactFace::from_binary_float(
+                "R_inf",
+                "CODATA 2022, as a binary64 literal",
+                &rydberg,
+                FloatReading::RoundedToNearest,
+            ),
+        ];
+        assert_eq!(faces[0].certified_bits(), CertifiedBits::Bits(45));
+        assert_eq!(faces[1].certified_bits(), CertifiedBits::Bits(29));
+        assert_eq!(finest_admissible_grain(&faces), CertifiedBits::Bits(29));
+        assert_eq!(
+            faces[1].aperture_source(),
+            ApertureSource::UnitInTheLastPlace {
+                species: BinaryFloatSpecies::Binary64,
+                ulp_bits: 29,
+            }
+        );
+
+        let error = probe_at_grain(&faces, DeclaredGrain::bits(30))
+            .expect_err("a 29-bit face cannot answer a 30-bit question");
+        match error {
+            ReopeningError::FaceCoarserThanGrain {
+                ref name,
+                certified,
+                bits,
+            } => {
+                assert_eq!(name, "R_inf");
+                assert_eq!(certified, CertifiedBits::Bits(29));
+                assert_eq!(bits, 30);
+            }
+            other => panic!("the refusal must name the face and its aperture, got {other}"),
+        }
+        assert!(probe_at_grain(&faces, DeclaredGrain::bits(29)).is_ok());
+    }
+
+    /// The same pattern under the two readings is two different objects, and the admission law —
+    /// which was written before the mouth existed and is unchanged by it — separates them.
+    #[test]
+    fn one_pattern_admits_every_grain_as_a_point_and_carries_a_ceiling_as_a_measurement() {
+        let datum = decode_binary64_bits(0x4061_2126_e7be_fcbc).expect("a finite pattern");
+        let point = ExactFace::from_binary_float(
+            "alpha^-1 as a pattern",
+            "CODATA 2022",
+            &datum,
+            FloatReading::ExactBitPattern,
+        );
+        let measured = ExactFace::from_binary_float(
+            "alpha^-1 as a measurement",
+            "CODATA 2022",
+            &datum,
+            FloatReading::RoundedToNearest,
+        );
+        assert_eq!(point.certified_bits(), CertifiedBits::Exact);
+        assert!(point.admits(DeclaredGrain::bits(4096)));
+        assert_eq!(point.aperture_source(), ApertureSource::NoDeletion);
+        assert_eq!(measured.certified_bits(), CertifiedBits::Bits(45));
+        assert!(!measured.admits(DeclaredGrain::bits(46)));
+        assert_eq!(measured.width(), datum.unit_in_last_place());
+        // The point sits strictly inside the measurement's enclosure: they are the same quantity
+        // read two ways, not two quantities.
+        assert!(measured.enclosure.lower < point.enclosure.lower);
+        assert!(measured.enclosure.upper > point.enclosure.upper);
+
+        // A magnitude whose format spacing exceeds one admits no grain at all as a measurement,
+        // and every grain as a pattern.
+        let huge = decode_binary64_bits(0x7fef_ffff_ffff_ffff).expect("the largest finite pattern");
+        assert_eq!(huge.ulp_bits(), -971);
+        let coarse = ExactFace::from_binary_float(
+            "the largest finite binary64",
+            "declared bit pattern",
+            &huge,
+            FloatReading::RoundedToNearest,
+        );
+        assert_eq!(coarse.certified_bits(), CertifiedBits::Coarser);
+        assert!(!coarse.admits(DeclaredGrain::bits(0)));
+        let exact = ExactFace::from_binary_float(
+            "the largest finite binary64",
+            "declared bit pattern",
+            &huge,
+            FloatReading::ExactBitPattern,
+        );
+        assert_eq!(exact.certified_bits(), CertifiedBits::Exact);
+    }
+
+    /// **Real material, and the distinction is load-bearing on it.**
+    ///
+    /// Three `bfloat16` words from `model.language_model.layers.1.mlp.down_proj.weight` of
+    /// Qwen3.5-4B. Read as *patterns* they are exact dyadics with eight-bit significands, so they
+    /// are commensurable and the relation `7a − 4b + 6c = 0` holds **exactly** — the residual is a
+    /// point at zero, not an enclosure containing zero. Read as *measurements* the same forty-eight
+    /// bits carry ceilings of `2^-12`, `2^-13`, `2^-12` and the instrument returns nothing.
+    ///
+    /// The existence of *some* relation among three rationals is guaranteed; what is measured here
+    /// is that the instrument recovers it at height 7 with an exactly zero residual, and that one
+    /// reading of the same bits destroys it.
+    #[test]
+    fn three_real_bfloat16_weights_relate_as_patterns_and_not_as_measurements() {
+        let words: [u16; 3] = [0xbd1e, 0xbc94, 0x3d07];
+        let data: Vec<_> = words
+            .iter()
+            .map(|word| decode_bfloat16_bits(*word).expect("a finite weight"))
+            .collect();
+        let source = "Qwen3.5-4B model.language_model.layers.1.mlp.down_proj.weight[0..3]";
+
+        let patterns: Vec<ExactFace> = data
+            .iter()
+            .enumerate()
+            .map(|(index, datum)| {
+                ExactFace::from_binary_float(
+                    format!("w{index} as a pattern"),
+                    source,
+                    datum,
+                    FloatReading::ExactBitPattern,
+                )
+            })
+            .collect();
+        let grains = [DeclaredGrain::bits(32), DeclaredGrain::bits(64)];
+        let reopening = reopen(&patterns, &grains).expect("points admit every grain");
+        let candidate = reopening
+            .verdict
+            .candidate()
+            .expect("three exact dyadics are commensurable");
+        assert_eq!(
+            candidate.coefficients,
+            vec![BigInt::from(7), BigInt::from(-4), BigInt::from(6)]
+        );
+        assert!(
+            candidate.residual.is_point() && candidate.residual.lower.is_zero(),
+            "patterns relate exactly, not to within an enclosure: {:?}",
+            candidate.residual
+        );
+        assert!(candidate.chance_population.is_zero());
+        // And the relation is checkable by hand: 7*(-316) + (-4)*(-148) + 6*270 = 0 over 2^-13.
+        let check = BigInt::from(7) * BigInt::from(-316)
+            + BigInt::from(-4) * BigInt::from(-148)
+            + BigInt::from(6) * BigInt::from(270);
+        assert!(check.is_zero());
+
+        let measurements: Vec<ExactFace> = data
+            .iter()
+            .enumerate()
+            .map(|(index, datum)| {
+                ExactFace::from_binary_float(
+                    format!("w{index} as a measurement"),
+                    source,
+                    datum,
+                    FloatReading::RoundedToNearest,
+                )
+            })
+            .collect();
+        assert_eq!(finest_admissible_grain(&measurements), CertifiedBits::Bits(12));
+        let measured = reopen(
+            &measurements,
+            &[DeclaredGrain::bits(11), DeclaredGrain::bits(12)],
+        )
+        .expect("both grains are within the coarsest ulp");
+        assert!(
+            measured.verdict.returned_nothing(),
+            "eight significand bits cannot resolve a relation: {:?}",
+            measured.verdict
+        );
+        // Every probe's own enclosure refutes its vector; gate one carries this, not gate three.
+        assert!(measured.probes.iter().all(|probe| probe.refuted));
     }
 
     #[test]
