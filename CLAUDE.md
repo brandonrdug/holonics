@@ -94,8 +94,9 @@ soma/     body               pure law, no_std, zero dependencies
           kernel/soma.spv    committed boundary artifact; its toolchain is excluded
 ```
 
-**Measured 2026-08-07 14:34:** `cargo test --workspace` **730 passed, 0 failed, 14 ignored in
-22 s**. Earlier the same day it was `543 passed, 1 failed` on a `mount-scope-gate` radiation fixture
+**Measured 2026-08-08 19:27 at `101882f`:** `cargo test --workspace` **1,545 passed, 0 failed, 14
+ignored**, summed across 42 `test result:` lines. (Earlier the same day: 1,512 at `d91720e`; on
+2026-08-07 14:34 it was **730**.) Earlier the same day it was `543 passed, 1 failed` on a `mount-scope-gate` radiation fixture
 that had never been regenerated across ten commits to `body::carriage`; that fixture was refounded
 against the law rather than the receipt. **Do not carry a gate figure without its clock time.**
 `CONSTRUCTION_STATE.md` is the position record and re-taking the number is one command.
@@ -122,9 +123,16 @@ the numbers like facts instead of using proper semantics."* Name the mechanism.
 
 ### What the archived body is worth
 
-**One thing it had that this body does not:** the **conditioned production shape** — two theorems,
-kernel-refused foil, structural ablation — which C++ ran at three declarations and the laboratory
-never ran at all despite mounting 1,164. It is a port that is owed.
+**WITHDRAWN 2026-08-08 by running the driver.** This read: *"One thing it had that this body does
+not: the conditioned production shape — two theorems, kernel-refused foil, structural ablation —
+which C++ ran at three declarations… It is a port that is owed."* It is not owed.
+`soma/life/examples/eros_lean_proof_production.rs` runs all three against a real Lean toolchain
+(`lake env lean` in the loop): 39 declaration organs, 31 paths, **9 kernel-admitted, 22 obstructed
+with verbatim errors**, structural ablation taking admissions **9 → 3**, and a 34,628-octet detached
+remount that reproduces the family. C++ ran it at three declarations; this body runs it at
+thirty-nine.
+
+**The archive is now worth exactly its four lessons and nothing else.**
 
 It was also credited with a second, the certified exact enclosure carrier at
 `archive/cpp-engine/src/include/holonics/exact/enclosure.hpp`. **That credit is withdrawn
@@ -478,10 +486,26 @@ target.**
   pattern could not match. An absence claim is a measurement and decays like one; this one was
   false on the day it was written.
 
+  **And it is driven in FOUR places, measured 2026-08-08 by running them:**
+
+  | driver | what was deleted | what departed |
+  |---|---|---|
+  | `conditioned_derivation_body` | a founded stem, then re-ask | conditioned licenses 105 named passages; unconditioned **0 stems, 0 passages**; 18 controls |
+  | `eros_lean_proof_production` | declaration organs | `39 → 38` organs, `31 → 14` paths, **`9 → 3` kernel-admitted**; 6 admitted proofs named and lost |
+  | `derivation_holonomy` | the 7 artifacts declaring `formal_carry` | circuit W winds with `residual 57`; circuit E **exact** after the ablation |
+  | `eros_mathematics_conditioning` | whole corpus documents, all fourteen in turn | passage population moves as a **population**, appearance not departure |
+
   **What remains true, narrowly:** no deletion primitive exists on the `soma/life` **training**
   owners — `holonic_training.rs` and the language ecologies — which is the scope the grep was
   actually run over. So §13 rule 1's strict form is **owed on the training body and already met on
   the conditioned-derivation morphology.** State it that way; do not restate the general form.
+
+  **And `eros_lean_proof_production` is the conditioned production shape §0 says only the archived
+  C++ body ever ran.** It shells `lake env lean` in the loop against a real toolchain: 39 declaration
+  organs, 31 paths, **9 kernel-admitted and 22 obstructed with verbatim Lean errors**, a structural
+  ablation that takes admissions `9 → 3`, and a **34,628-octet detached remount that reproduces the
+  family**. Two theorems, kernel-refused foil, structural ablation — all three, live, in Rust.
+  §0's *"one thing it had that this body does not"* is **withdrawn**.
 
   **And there is one live boundary on it**, found 2026-08-08 by building the rest wire:
   `without_stem` retains the surviving stems' original `StemId`s, while `from_founded_words` —
@@ -948,11 +972,29 @@ where the population is far enough that condensation is *required* rather than i
 not the construction — is what remains, and §11's trivial instance (spanning-tree interval labelling,
 where the forced non-tree population **is** the certified remainder) is the named route to it.
 
-**And the built part is not driven.** Measured 2026-08-07 over the whole tree: `ExactInterval` has
-104 references across 9 files, 20 in drivers; `CertifiedSeries` has 13 references in **one** file
-and `SeriesTailCertificate` 6 in **one**, with **zero in any `examples/`, `tests/`, or `bin/`
-path**. Per §8, reach is part of the grade: the remainder-certificate half of the carrier is
-written and never exercised, which is exactly the half this section's question needs.
+**FALSIFIED 2026-08-08, twice independently.** This section read: *"`CertifiedSeries` has 13
+references in one file and `SeriesTailCertificate` 6 in one, with zero in any `examples/`, `tests/`,
+or `bin/` path… written and never exercised."* Both collectors measured otherwise:
+
+```
+CertifiedSeries        exact_value.rs 13 · reopening.rs 8 · examples/reopening_the_collapsed_face.rs 6
+SeriesTailCertificate  exact_value.rs  6 · reopening.rs 4 · examples/reopening_the_collapsed_face.rs 5
+```
+
+**The remainder-certificate half is driven, and driven hard.** `reopening_the_collapsed_face`
+recovered Euler `(4,4,−1)` and Machin `(16,−4,−1)` exactly, returned **0 spurious relations over 16
+relation-free searches**, and *measured which of its three admission gates carried each refusal* —
+the enclosure gate was blind on 5 of 6 collapsed probes. `AlgebraicRoot` is driven by
+`signs_are_windings`. **A reach figure is a measurement and decays like one; re-take it rather than
+carrying it.**
+
+**What is still true, and is the real bound:** `reopening.rs` has **no external mouth.** Every
+`ExactFace` constructor requires an exact source — `collapsed` takes an *existing* `ExactFace` and
+truncates it — so the organ built to reverse the float's deletion can only reverse a deletion it
+performed itself. It refuses a face coarser than its grain by name (`FaceCoarserThanGrain`), which
+is precisely what a measured float is. **The missing constructor already exists**:
+`soma/life/examples/eros_self_emanated_law.rs` parses safetensors directly, refuses any dtype but
+`BF16`, and converts bf16 words to an exact `Dyadic { numerator: BigInt, exponent: i32 }`.
 
 **The trivial instance is already built, and its triviality is the content.** The archived body
 refounded the source-incidence walk: a depth-first order over the suffix-link tree replaces every
