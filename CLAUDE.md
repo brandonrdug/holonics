@@ -934,6 +934,28 @@ into a compact representative with a certified remainder. General far-field fold
 open for the closely related reason that no *kernel-specific* exterior/local expansion has been
 built for it, and floating tolerance may not become standing.
 
+**CORRECTED 2026-08-09: for the Laplacian, one IS built, and the open item splits.**
+`crates/holonic-engine/src/diffusion.rs:475-497` computes the Schur complement
+`S = L_∂∂ − L_∂I L_II⁻¹ L_I∂` — the discrete **Dirichlet-to-Neumann** map — exactly over `Rat`, with
+a certificate carrying both inverse residuals and a `TransferCertificateFailure` refusal when either
+is non-zero. The far interior is eliminated **exactly**, and remains recoverable by
+`u_I = −L_II⁻¹ L_I∂ f`, so the retained remainder is **zero** rather than bounded. That row
+`−L_II⁻¹L_I∂` is harmonic measure: the exit distribution of the walk, exactly rational.
+
+**The honest bound is that elimination is not condensation.** `S` is a dense `|∂| × |∂|` operator.
+Replacing a far population by a **compact** representative needs that dense block to admit a low-rank
+or hierarchical form with a certified remainder — which is what an FMM-type expansion supplies and
+what nothing here does. So:
+
+| part of the demand | state |
+|---|---|
+| exact elimination of a far interior, kernel-specific, with certificate | **built** — `diffusion.rs:475-497` |
+| a **compact** representative for the resulting boundary operator | **not built** — this is the real content of the open item |
+
+The full derivation, and why diffusion *is* integration over boundary points weighted by harmonic
+measure with the kernel built by reflection, is
+[the record](research/records/2026-08-09_THE_INTERIOR_IS_AN_INTEGRAL_OVER_ITS_BOUNDARY_AND_THE_KERNEL_IS_BUILT_BY_REFLECTION.md).
+
 Condensing a far field into a compact realizer with an exact retained remainder **is** the
 question of whether a distant population admits a supported realizer for a declared receiver
 family, with the obstruction retained when it does not. The pairing that decides sufficiency is a
