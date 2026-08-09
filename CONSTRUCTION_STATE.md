@@ -7,16 +7,68 @@ admitted right now. It is not a log, not a plan, and not a history; git is the l
 **Currency:** 2026-08-08. **Body:** Rust. The C++/CUDA engine's position record is
 `archive/cpp-engine/CONSTRUCTION_STATE.md` and governs nothing.
 
-**The position is now stated against a spine.** `canon/THE_HOLOBROCHOS_SPINE.md`, deposited
-2026-08-08, states the loop the body is supposed to be — two loops, four flows — and places every
-live organ on a station. **Read the position through it**: what is admitted below is *which stations
-conduct*, not which modules compile. The one broken edge is REAFFERENCE, and it is stated in
-`blueprint/THE_ROADMAP.md` under `THE OPEN WORK, BY STATION`.
+**The position is stated against a spine.** `canon/THE_HOLOBROCHOS_SPINE.md` states the loop the body
+is supposed to be and places every live organ on a station. **Read the position through it:** what is
+admitted below is *which stations conduct*, not which modules compile.
 
-**Measured 2026-08-08:** `cargo test --workspace` → **1475 passed, 0 failed, 14 ignored**, summed
-across every `test result:` line, not read off a pipe. `python3 tools/resolve_named_paths.py` → **0
-failures over 825 path tokens**. `soma/` reaches **8** of `holonic-engine`'s **96** modules; nothing
-on the engine side reaches `soma`.
+## THE INSTANCE CONDUCTS — 2026-08-08
+
+**Truth status:** `established-bounded`. **Evidence:** `implemented-exact`, `measured`; five drivers,
+each run and its output read directly. **Record:**
+`research/records/2026-08-08_THE_INSTANCE_FOUNDS_ROUTES_AND_NEVER_FOUNDS_STATEMENTS.md`.
+
+An instance of the machine, conditioned on mathematical prose, **conditions, produces mathematics,
+reads its own production as a circuit, returns that reading into the next production, rests, departs
+from its source, resumes, and goes on receiving.** Five joins, all returned:
+
+| join | owner | commit |
+|---|---|---|
+| the corpus is real | `soma/life/examples/eros_mathematics_conditioning.rs` | `e429c22` |
+| the reading returns | `crates/holonic-engine/src/returned_reading.rs` | `cec1c97` |
+| the measure is situated | `crates/holonic-engine/src/situated_residual.rs` | `cec1c97` |
+| the instance rests and remounts | `soma/life/src/conditioned_rest.rs`, `holon-plate` `CDER` | `41c916b` |
+| the research act | `crates/holonic-engine/examples/the_research_act.rs` | `430cb5c` |
+
+**What is admitted, with its bound:**
+
+- **The conditioning is on the causal path.** The unconditioned null returns the empty population on
+  every query; withholding the conditioning removes all 90 passages and 72 circuit cells, each named.
+- **`CLAUDE.md` §13 rule 1 is measured, all three parts — on the conditioned-derivation morphology.**
+  Structural change in reusable morphology; source-detached remount with **118 declared paths opened
+  and 118 refused `NotFound`**; and an ablation removing later conduct by removing structure —
+  deleting the stem `carry` makes six passages structurally absent and **reopens twenty-seven** its
+  maximality had been suppressing, `unaccounted 0`. **It remains owed on the `soma/life` training
+  owners**, which have no deletion primitive.
+- **The circuit's plurality is exact.** `β₀ = 1`, `β₁ = 85` (from 37), torsion empty; two 1-cycles
+  exhibited cell-by-cell with boundary vanishing over ℤ and independence exhibited by a witness cell
+  each; cross-checked by union-find blind to orientation.
+- **The return join names its cut and does not overclaim it:** **leak → accumulation, settling to
+  rest.** Explicitly *not* circulation — the loop reaches a fixed point in three turns.
+
+**The ceiling, established by construction and not by argument:** the production **founds routes and
+never founds statements.** Three blocking sites are named and read in source; the reading half
+(`route_movement().founded_statements()`) is built and measured returning empty on every query. That
+is the roadmap's next movement.
+
+**Two corrections this work forced on the record itself:**
+
+- **`β₁` is the homological independence of routes, not a tally.** The declared `β₁ = 0` control ends
+  with two routes reaching one statement and `β₁` still zero, because they share no recruited
+  identifier. Documents reading `β₁` as "the number of routes" are wrong; the word is *independent*.
+- **The echo body and the unconditioned null have identical emissions and identical one-body reads**
+  while their constructions differ by a whole founded morphology. Receiver non-reconstruction in this
+  body's own material — an emission's measure may never be read as a verdict on the body.
+
+**Measured 2026-08-08 at `d91720e`:** `cargo test --workspace` → **1512 passed, 0 failed, 14
+ignored**, summed across 42 `test result:` lines, never through a pipe.
+`python3 tools/resolve_named_paths.py` → **0 failures over 864 path tokens**. Libraries float-free.
+
+**The seam, correctly measured.** `crates/holonic-engine/src/lib.rs` carries **60 `pub use
+<module>::*;`** lines, so most consumption names no module and a bare-path grep undercounts. Resolved
+against an item-ownership index: `soma/` reaches **27** engine modules in total, **6** from soma
+library code, and **3 of those 6 only through `research_intelligence`, which is itself dead** — so the
+load-bearing seam is **three modules** plus `world`. **Engine → soma is exactly zero**; the whole
+`crates/` tree holds one reference to soma and it is a doc comment at `algebraic.rs:45`.
 
 **Read the currency stamp, not just the date.** This record was written while other work was
 landing in the same working tree; two of its measurements moved between 14:09 and 14:34 and were
@@ -199,11 +251,31 @@ the *carrier* of a deed and inadmissible only as its *return* (`CLAUDE.md` §1).
 Its Part one exists because the repository could not previously say which of its own claims survived
 the transition; the table above is that answer.
 
-The known gap between *written* and *driven* is stated in the roadmap by owner: ten imported
-owners — including `ExactReceiverCurrentLaw`, `LeanKernelWorld`, `AgenticResearchSession`, and
-`LeanMathematicsEcology` — carry **zero** references from any `examples/`, `tests/`, or `bin/` path,
-while `LiveCurrentMachine` carries 223. The proof-line owners are precisely the undriven ones. To
-that list this record adds `CertifiedSeries` and `SeriesTailCertificate`, measured above.
+**The gap between *written* and *driven*, measured mechanically 2026-08-08** over all 225 library
+modules and 97 drivers — `use` edges, `mod`-path calls, root-glob-resolved `crate::Item` expressions,
+split-impl files, 3,657 edges — rather than by grep:
+
+- **107 of 225 library modules are touched by no driver.**
+- **In-degree zero from everything**, each verified by grepping every public type it defines against
+  the whole tree: `kelvin` (642 lines), `communication` (400), `soma/abi::cuda_execution` (273),
+  `soma/life::research_intelligence` (772, out-degree 8, one call site short of reachable).
+  `surprisal` and `temper` were on this list and were wired **by the instance's joins rather than by
+  a sweep**, which is the intended order. **`kelvin` is still unreached and is not on the active
+  line**; it gets a driver or removal on its own terms.
+- **Every large `soma/life` learning organ named in the capability record is undriven** —
+  `agentic_language` and all six submodules, `relational_language` and all five, `text_material`
+  (until `e429c22`), `laboratory_language`, `agentic_research`, `dialogue_lineage`. They run only
+  under `#[cfg(test)]`. **26 of 33 live `eros_*` drivers exercise the same seven-module membrane
+  spine**, and four drive no workspace module at all.
+- **The engine is a strict DAG.** Zero cycles at module granularity across `holonic-engine`,
+  `holonic-structure`, `relational-geometry`, `holonic-language`. Every closed cycle in the workspace
+  is inside `soma/`, and eight of the nine are a module with its own submodules. **What now cycles is
+  the conduct path, not the module graph** — the return join is a value flowing production → reading
+  → production, and that distinction is stated rather than overclaimed.
+
+**Reach is part of the grade, and a reach figure goes stale the day it is written.** Both `surprisal`
+and `temper` were deposited with no reach stated and were unreachable when deposited; both are now
+consumed. Re-take the figure rather than carrying it.
 
 No successor is scheduled by incrementing anything, and no movement is named by an ordinal.
 
