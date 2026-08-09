@@ -118,6 +118,22 @@ being licensed. A body that resumed inert would have passed every other check.
 > claimed later conduct by removing structure. All three are now measured **on the
 > conditioned-derivation morphology**. They remain owed on the `soma/life` training owners.
 
+> **SUPERSEDED IN PART, 2026-08-08, THE SAME DAY.** §6's falsification is correct **about
+> `conditioned_derivation::derive`** and false as a claim about the engine. A fourth species —
+> `statement_grammar.rs` + `statement_composition.rs`, driven by
+> `examples/the_statement_is_founded.rs` — founds **47 statements absent from
+> `standing_statements()`**, and `route_movement().founded_statements()` returns exactly those 47.
+> The three blocking sites are untouched and remain correct for what they gate. Read §6 as *what
+> `derive` cannot do and why*, which is still exact and still the reason a fourth species was needed.
+>
+> **Also regraded:** §8's *"explicitly not circulation, because this deposit exhausts in three
+> turns"* is **unsupported**. No current was measured, and `q_{k+1} − q_k = 0` with `r = 0` gives
+> `j ∈ ker B`, not `j = 0`; `kelvin.rs` shows unchanged standing and nonzero circulation are
+> distinct. The verdict is `unmeasured`. And §3's `β₁` slogan is corrected in
+> `CONSTRUCTION_STATE.md`: bare `β₁` is the cycle rank `E − V + C`; the route-specific quantity is
+> the founded-minus-withheld **increment**, and it agrees with lineage route excess only when the
+> recruitment graph was already connected.
+
 ## 6. THE FALSIFICATION — the production founds routes and never founds statements
 
 **Question:** can the instance reach a statement absent from `standing_statements()`?

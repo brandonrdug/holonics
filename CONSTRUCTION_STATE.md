@@ -42,19 +42,41 @@ from its source, resumes, and goes on receiving.** Five joins, all returned:
 - **The circuit's plurality is exact.** `β₀ = 1`, `β₁ = 85` (from 37), torsion empty; two 1-cycles
   exhibited cell-by-cell with boundary vanishing over ℤ and independence exhibited by a witness cell
   each; cross-checked by union-find blind to orientation.
-- **The return join names its cut and does not overclaim it:** **leak → accumulation, settling to
-  rest.** Explicitly *not* circulation — the loop reaches a fixed point in three turns.
+- **The return join's cut is regraded `unmeasured`, 2026-08-08.** It was recorded as *"leak →
+  accumulation, settling to rest, explicitly not circulation."* Three corrections: `j` was never
+  computed — `returned_reading.rs` contains no current and no conductance — and Soma's law gives
+  `q_{k+1} − q_k = 0` with `r = 0` ⟹ `j ∈ ker B`, **not** `j = 0`, so unchanged standing and nonzero
+  circulation are not distinguishable without measuring `j`; `kelvin.rs` is the owner that would.
+  The driver permits **five** turns and asserts neither "exactly three" nor rest — its controls
+  require only one later movement and a nonempty turn table — so *"reaches a fixed point in three
+  turns"* overstated a bounded trace. What the fixture does show is exact morphology equality after
+  its returned witnesses stop adding new pairs.
 
-**The ceiling, established by construction and not by argument:** the production **founds routes and
-never founds statements.** Three blocking sites are named and read in source; the reading half
-(`route_movement().founded_statements()`) is built and measured returning empty on every query. That
-is the roadmap's next movement.
+**The ceiling was lifted the same day, and this record was stale about it for one commit.**
+`crates/holonic-engine/src/statement_grammar.rs` and `statement_composition.rs` are live owners; the
+driver `examples/the_statement_is_founded.rs` founds **47 statements absent from
+`standing_statements()`**, deposits 47 new statement 0-cells, and `route_movement().founded_statements()`
+— the organ measured returning empty on every query — returns exactly those 47.
+
+**The three blocking sites are untouched and remain correct** for what they gate:
+`conditioned_derivation::derive` founds **routes**, and route-founding must preserve the statement.
+Statement founding is a **fourth species beside it**, not a weakening of it. Any statement of the
+form *"the machine cannot found statements"* is now false of the engine and true only of `derive`.
+
+**The bound:** 43 of the 47 are licensed by a single residual letter and many are not well-typed
+Lean. Four are licensed by a committed word. The machine composes and admits statements it was not
+given; **what it composes is not yet mathematics.**
 
 **Two corrections this work forced on the record itself:**
 
-- **`β₁` is the homological independence of routes, not a tally.** The declared `β₁ = 0` control ends
-  with two routes reaching one statement and `β₁` still zero, because they share no recruited
-  identifier. Documents reading `β₁` as "the number of routes" are wrong; the word is *independent*.
+- **`β₁` is the graph's complete cycle rank `E − V + C`, and it is NOT intrinsically "routes".**
+  Corrected 2026-08-08 by adversarial audit; the earlier slogan *"β₁ is the homological independence
+  of routes"* was an overgeneralization this record carried. The route-specific quantity is the
+  **increment** `β₁(statements founded) − β₁(statements withheld)`, and it agrees with the lineage
+  route excess **only when the recruitment graph was already connected** — a hypothesis
+  `derivation_atlas` checks and reports. What the declared `β₁ = 0` control does establish stands:
+  two routes reaching one statement leave `β₁` at zero when they share no recruited identifier, so
+  the bare number is not a route count.
 - **The echo body and the unconditioned null have identical emissions and identical one-body reads**
   while their constructions differ by a whole founded morphology. Receiver non-reconstruction in this
   body's own material — an emission's measure may never be read as a verdict on the body.

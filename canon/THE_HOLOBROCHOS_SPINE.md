@@ -218,11 +218,20 @@ emanation becomes **the pole the next arrival is related from** — a standing c
 not "the emission fed back as material"; it is the emission becoming part of the terrain that later
 arrivals are situated against.
 
-### The test, and it is sharp
+### The test — and it is THIS FILE'S, not FORMULA's
 
 **Did the emission leave the process, land in the world's own record, and come back as later
 material?** If it went from a reading to a production without ever being written and re-read, it is
-a wire, and a wire is refused however well it is measured.
+a wire.
+
+**Graded honestly, 2026-08-08, after an adversarial audit found it overstated.** FORMULA requires a
+**shared medium** and a **genuinely later return**. It does **not** say filesystem, content-addressed
+form, or process boundary. The write-and-reread test above is **this file's `interpretation`**, and
+`reference/` is non-authoritative historical material by location. That `condition_again` passes an
+in-memory reading straight into production and back is a **fact about the call path**; that the
+remedy must be a seal on disk is **a proposal, not an entailment**. Do not cite it as an
+architectural theorem. Other shared media satisfy FORMULA's requirement and have not been
+considered.
 
 ### What this convicts, and what it credits, in the live body
 
@@ -281,8 +290,16 @@ A mechanical census of all 225 library modules — `use` edges, `mod`-path calls
 `crate::Item` expressions, split-impl files, and 97 drivers, 3,657 edges total — returns:
 
 > **`crates/holonic-engine`, `crates/holonic-structure`, `crates/relational-geometry` and
-> `crates/holonic-language` contain ZERO cycles at module granularity. Nothing an engine module
-> emits re-enters any module upstream of it.**
+> `crates/holonic-language` contain ZERO cycles at module granularity.**
+
+**BOUNDED 2026-08-08 by adversarial audit, and the bound matters.** That census is about the
+**import graph**. An earlier form of this section inferred from it that *"nothing an engine module
+emits re-enters any module upstream"* and that the engine is therefore *"a strict pipeline"* with no
+`q_n = q_m`. **That is a category error: a module dependency graph and a state-transition graph are
+different objects.** `returned_reading::condition_again` disproves the inference operationally — it
+calls `derive`, carries the reading into the morphology, and calls `derive` again, so the **conduct
+path cycles while the import graph does not.** The measurement stands; the conclusion drawn from it
+is withdrawn.
 
 Every closed cycle in the workspace is inside `soma/` — nine of them, and eight are a module with its
 own submodules through `use super::*`, not two organs feeding each other. Only
