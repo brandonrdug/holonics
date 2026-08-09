@@ -544,7 +544,27 @@ runs here at 39 declarations against a real Lean kernel), §5's fourth ablation 
 construction"* (it is driven in four places), and §11's reach figure for the remainder certificate
 (it is driven, hard).
 
-### THE NEXT MOVEMENT — collocation, consequents, crossings, capacitance
+### RETURNED 2026-08-09 — collocation, consequents, crossings, capacitance
+
+> **All four landed. The wall is dissolved and the record is
+> [`research/records/2026-08-09_FOUR_RELATIONS_SEPARATE_THE_ATOM_AND_EACH_REFUTED_ITSELF_FIRST.md`](../research/records/2026-08-09_FOUR_RELATIONS_SEPARATE_THE_ATOM_AND_EACH_REFUTED_ITSELF_FIRST.md).**
+>
+> Recruitment partitions the 17 atoms into **one** block. Consequents give **16**, collocation **16**
+> at founding grain, capacitance **12**. Neither elaboration direction refines the other; collocation
+> is non-monotone in grain; capacitance inverts against recruitment twelve times.
+>
+> **Every organ refuted itself before being asked** — the null-bind founds forcings so forcings are
+> not the return; the founding-grain orbit is trivial and was excluded; `⊢ S` holds by hypothesis and
+> was set aside; `crossing` fills everything and was reported vacuous; an alternative capacity law
+> was predicted flat by theorem and confirmed; an undemanded cut leaves 21,731 pairs collapsed where
+> the derived one leaves 0.
+>
+> **What remains is one material fact, not a construction gap:** exactly one recruited identifier in
+> 103 artifacts is declared. Consequents are capped by the deposit's 3 statements, recruitment by its
+> 1 declaration, and re-integration's strict form by the absence of a **chain** of declarations.
+> `1701 passed, 0 failed, 14 ignored.`
+
+### The movement as it was written
 
 **Ratified 2026-08-08 by Brandon's correction, and it replaces a wall with four constructions that
 need no new material.** Record:
