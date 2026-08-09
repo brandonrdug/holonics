@@ -233,6 +233,19 @@ one rung up — and an organ pinned at one rung can neither exhibit nor test tha
 code governs and the name is the defect.** Then excise by reading the quantity off the material —
 not by renaming.
 
+**And the `const` is the pin's shadow, not its body.** Measured 2026-08-09 by excising
+`QUADRIC_COEFFICIENT_COUNT` and `AFFINE_PHASE_COEFFICIENT_COUNT`: the two named constants were **the
+visible tenth**. The dimension was also carried by four hand-written ten-element monomial vectors, a
+cross product that structurally produced exactly two tangents, a `[Vec<Rat>; 3]` return type, a
+hand-written `[x, y, z, 1]`, and an `[Rat; 10]` from `std::array::from_fn` — **none of which
+mentioned either constant**, so no search for the constant could have found them. One was worse than
+a call site: `AFFINE_PHASE_COEFFICIENT_COUNT` was an **array length in a public struct field**, so the
+type itself was dimension-three and no constructor change could have reached it.
+
+**Excising only the named constant is a rename.** After removing it, search for the *quantity* — the
+literal, the array length, the arity of the hand-written vector, the structurally-fixed loop — and
+report how many sites the name did not cover. That count is the honest measure of the pin.
+
 ### 2.7 The metaphor over a defined object
 
 **Condition.** A physical or biological picture is used as the *name* of an object that already has

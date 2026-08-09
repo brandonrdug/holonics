@@ -5,6 +5,17 @@
 //! instead of truncating, averaging, or replacing the prior testimony.
 //! Complete images remain receiver sections. Their sample addresses are never
 //! promoted into world vertices.
+//!
+//! It has no authored *dimension* either, and until 2026-08-09 it did: two
+//! `const`s named as coefficient counts — `10` and `4` — pinned the ambient
+//! dimension at three directly beneath the sentence above. Every coefficient
+//! population is now read off a [`FieldChart`] the caller declares per region:
+//! `C(n+2,2)` quadric coefficients, `n+1` affine coefficients, `n-1` tangents
+//! of a normal. The ceiling that remains is the sample carrier's own —
+//! [`RatVec3`] has three coordinates and [`ExactQuadric3`] holds ten — so a
+//! chart names between one and three of them, and a chart of dimension `n < 3`
+//! resolves in its own coefficient population and lifts into the ambient
+//! carrier as the cylinder over its quadric.
 
 use std::collections::{BTreeMap, BTreeSet, VecDeque};
 
@@ -20,8 +31,149 @@ use crate::{
     TorusRayFiber,
 };
 
-const QUADRIC_COEFFICIENT_COUNT: usize = 10;
-const AFFINE_PHASE_COEFFICIENT_COUNT: usize = 4;
+/// One coordinate of the ambient sample carrier.
+///
+/// The carrier is [`RatVec3`] and its coordinates are exactly these three, so
+/// the ambient dimension is not a level this organ chose: it is the coordinate
+/// population of the carrier the samples arrive in. A fourth axis cannot be
+/// named here because `RatVec3` has no fourth component.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+pub enum FieldChartAxis {
+    X,
+    Y,
+    Z,
+}
+
+impl FieldChartAxis {
+    /// Every coordinate the ambient sample carrier has, in carrier order.
+    /// Read off `RatVec3`'s own fields rather than declared here.
+    pub const AMBIENT: [Self; 3] = [Self::X, Self::Y, Self::Z];
+
+    pub fn read(self, point: &RatVec3) -> Rat {
+        match self {
+            Self::X => point.x.clone(),
+            Self::Y => point.y.clone(),
+            Self::Z => point.z.clone(),
+        }
+    }
+
+    fn write(self, point: &mut RatVec3, value: Rat) {
+        match self {
+            Self::X => point.x = value,
+            Self::Y => point.y = value,
+            Self::Z => point.z = value,
+        }
+    }
+}
+
+/// A degree-at-most-two monomial in a declared chart's coordinates.
+///
+/// `Cross` always carries its pair in ambient coordinate order, so one
+/// monomial has one identity no matter which chart produced it.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+pub enum FieldQuadricMonomial {
+    Square(FieldChartAxis),
+    Cross(FieldChartAxis, FieldChartAxis),
+    Linear(FieldChartAxis),
+    Constant,
+}
+
+/// The receiver-declared local chart a region's analytical germs are read in.
+///
+/// The chart is the ordered list of ambient coordinates the region's material
+/// is read against. Its dimension `n` fixes every coefficient population this
+/// organ needs, and the organ authors none of them:
+///
+/// ```text
+///   quadric coefficients   C(n + 2, 2) = (n + 2)(n + 1) / 2
+///   affine coefficients    n + 1
+///   tangents of a normal   n - 1
+/// ```
+///
+/// A chart is declared by the caller on the standing before the region founds
+/// anything; an undeclared region is read in the ambient chart, which is the
+/// carrier's own coordinate population and not a level.
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+pub struct FieldChart {
+    axes: Vec<FieldChartAxis>,
+}
+
+impl FieldChart {
+    pub fn new(axes: Vec<FieldChartAxis>) -> Result<Self, FieldAtlasError> {
+        if axes.is_empty() {
+            return Err(FieldAtlasError::EmptyChart);
+        }
+        if axes.iter().copied().collect::<BTreeSet<_>>().len() != axes.len() {
+            return Err(FieldAtlasError::RepeatedChartAxis);
+        }
+        Ok(Self { axes })
+    }
+
+    /// Every coordinate the sample carrier has.
+    pub fn ambient() -> Self {
+        Self {
+            axes: FieldChartAxis::AMBIENT.to_vec(),
+        }
+    }
+
+    pub fn axes(&self) -> &[FieldChartAxis] {
+        &self.axes
+    }
+
+    pub fn dimension(&self) -> usize {
+        self.axes.len()
+    }
+
+    pub fn is_ambient(&self) -> bool {
+        self.axes == FieldChartAxis::AMBIENT
+    }
+
+    /// `C(n + 2, 2)`, the coefficient population of a quadric in `n`
+    /// variables.
+    pub fn quadric_coefficient_count(&self) -> usize {
+        let dimension = self.dimension();
+        (dimension + 2) * (dimension + 1) / 2
+    }
+
+    /// `n + 1`, the coefficient population of an affine law in `n` variables.
+    pub fn affine_coefficient_count(&self) -> usize {
+        self.dimension() + 1
+    }
+
+    /// The chart's degree-at-most-two monomials in the order the coefficient
+    /// fiber's coordinates carry them: squares, crosses, linears, constant.
+    /// At the ambient chart this is exactly [`ExactQuadric3`]'s coefficient
+    /// order.
+    pub fn quadric_monomials(&self) -> Vec<FieldQuadricMonomial> {
+        let mut monomials = Vec::with_capacity(self.quadric_coefficient_count());
+        monomials.extend(self.axes.iter().map(|axis| FieldQuadricMonomial::Square(*axis)));
+        for (position, left) in self.axes.iter().enumerate() {
+            for right in &self.axes[position + 1..] {
+                monomials.push(FieldQuadricMonomial::Cross(
+                    *left.min(right),
+                    *left.max(right),
+                ));
+            }
+        }
+        monomials.extend(self.axes.iter().map(|axis| FieldQuadricMonomial::Linear(*axis)));
+        monomials.push(FieldQuadricMonomial::Constant);
+        monomials
+    }
+
+    pub fn coordinates(&self, point: &RatVec3) -> Vec<Rat> {
+        self.axes.iter().map(|axis| axis.read(point)).collect()
+    }
+
+    /// The ambient vector whose chart coordinates are `coordinates` and whose
+    /// remaining coordinates are zero.
+    pub fn embed(&self, coordinates: &[Rat]) -> RatVec3 {
+        let mut point = RatVec3::zero();
+        for (axis, coordinate) in self.axes.iter().zip(coordinates) {
+            axis.write(&mut point, coordinate.clone());
+        }
+        point
+    }
+}
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct FieldRegionId(pub u64);
@@ -52,26 +204,55 @@ pub enum FieldPhaseChannel {
     },
 }
 
+/// An exact affine law in one declared chart.
+///
+/// The coefficient population is `n + 1` — one per chart coordinate, then the
+/// constant — so the law's own chart states its length rather than a constant
+/// stating it for every chart at once.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ExactAffinePhaseLaw {
-    /// `[x,y,z,1]` coefficients.
-    pub coefficients: [Rat; AFFINE_PHASE_COEFFICIENT_COUNT],
+    chart: FieldChart,
+    coefficients: Vec<Rat>,
 }
 
 impl ExactAffinePhaseLaw {
-    pub fn evaluate(&self, point: &RatVec3) -> Rat {
-        &self.coefficients[0] * &point.x
-            + &self.coefficients[1] * &point.y
-            + &self.coefficients[2] * &point.z
-            + &self.coefficients[3]
+    pub fn new(chart: FieldChart, coefficients: Vec<Rat>) -> Result<Self, FieldAtlasError> {
+        if coefficients.len() != chart.affine_coefficient_count() {
+            return Err(FieldAtlasError::PhaseLawCoefficientPopulation {
+                required: chart.affine_coefficient_count(),
+                supplied: coefficients.len(),
+            });
+        }
+        Ok(Self {
+            chart,
+            coefficients,
+        })
     }
 
+    pub fn chart(&self) -> &FieldChart {
+        &self.chart
+    }
+
+    pub fn coefficients(&self) -> &[Rat] {
+        &self.coefficients
+    }
+
+    pub fn evaluate(&self, point: &RatVec3) -> Rat {
+        self.chart
+            .coordinates(point)
+            .iter()
+            .zip(&self.coefficients)
+            .fold(Rat::zero(), |total, (coordinate, coefficient)| {
+                total + coordinate * coefficient
+            })
+            + &self.coefficients[self.chart.dimension()]
+    }
+
+    /// The ambient gradient. Coordinates outside the chart carry zero, which
+    /// is the law's own extension along the directions it does not read.
     pub fn gradient(&self) -> RatVec3 {
-        RatVec3::new(
-            self.coefficients[0].clone(),
-            self.coefficients[1].clone(),
-            self.coefficients[2].clone(),
-        )
+        self.chart
+            .embed(&self.coefficients[..self.chart.dimension()])
     }
 }
 
@@ -183,6 +364,10 @@ pub enum FieldGermOrigin {
 pub struct CausalFieldGerm {
     pub id: FieldGermId,
     pub region: FieldRegionId,
+    /// The chart this germ was founded in. It is its region's declared chart
+    /// at founding, and a region may not redeclare after founding.
+    #[serde(default = "FieldChart::ambient")]
+    pub chart: FieldChart,
     pub source_event: EventId,
     pub last_event: EventId,
     pub origin: FieldGermOrigin,
@@ -319,6 +504,10 @@ pub struct CausalFieldStanding {
     /// Every contemporary alternative per local region. Departed predecessors
     /// remain in `germs` as causal history, not current support.
     pub active_regions: BTreeMap<FieldRegionId, BTreeSet<FieldGermId>>,
+    /// The caller's declared chart per region. An absent region is read in the
+    /// ambient chart.
+    #[serde(default)]
+    pub region_charts: BTreeMap<FieldRegionId, FieldChart>,
     pub observations: BTreeMap<FieldObservationId, FieldObservation>,
     pub arrows: BTreeMap<FieldArrowId, FieldCausalArrow>,
     pub overlaps: BTreeMap<FieldOverlapId, FieldOverlap>,
@@ -341,6 +530,7 @@ impl Default for CausalFieldStanding {
             last_chronology: None,
             germs: BTreeMap::new(),
             active_regions: BTreeMap::new(),
+            region_charts: BTreeMap::new(),
             observations: BTreeMap::new(),
             arrows: BTreeMap::new(),
             overlaps: BTreeMap::new(),
@@ -358,6 +548,32 @@ impl Default for CausalFieldStanding {
 }
 
 impl CausalFieldStanding {
+    /// Declare the chart a region's germs are read in.
+    ///
+    /// A region that has already founded a germ may not be redeclared: the
+    /// germs already carry the chart they were founded in, and a later
+    /// declaration would leave the standing describing two charts at once.
+    pub fn declare_region_chart(
+        &mut self,
+        region: FieldRegionId,
+        chart: FieldChart,
+    ) -> Result<(), FieldAtlasError> {
+        if self.germs.values().any(|germ| germ.region == region) {
+            return Err(FieldAtlasError::RegionChartAfterFounding(region));
+        }
+        self.region_charts.insert(region, chart);
+        Ok(())
+    }
+
+    /// The chart a region is read in. An undeclared region is read in the
+    /// ambient chart, which is the sample carrier's coordinate population.
+    pub fn region_chart(&self, region: FieldRegionId) -> FieldChart {
+        self.region_charts
+            .get(&region)
+            .cloned()
+            .unwrap_or_else(FieldChart::ambient)
+    }
+
     pub fn active_germs(&self) -> BTreeSet<FieldGermId> {
         self.active_regions
             .values()
@@ -603,6 +819,13 @@ fn validate_standing(standing: &CausalFieldStanding) -> Result<(), FieldAtlasErr
             return Err(FieldAtlasError::MalformedStanding);
         }
     }
+    if standing
+        .germs
+        .values()
+        .any(|germ| germ.chart != standing.region_chart(germ.region))
+    {
+        return Err(FieldAtlasError::MalformedStanding);
+    }
     if standing.germs.values().any(|germ| {
         matches!(
             &germ.support,
@@ -757,6 +980,26 @@ fn admit_source_torus(
             occurrence.torus.id,
         ));
     }
+    let chart = standing.region_chart(occurrence.region);
+    if !chart.is_ambient() {
+        // `ExactTorus` carries an ambient center and axis, so a source torus
+        // cannot be read in a proper sub-chart of the sample carrier.
+        return Err(FieldAtlasError::SourceTorusOutsideAmbientChart {
+            region: occurrence.region,
+            chart,
+        });
+    }
+    if let Some(law) = occurrence
+        .phases
+        .values()
+        .find(|law| *law.chart() != chart)
+    {
+        return Err(FieldAtlasError::PhaseLawChartMismatch {
+            region: occurrence.region,
+            declared: chart,
+            supplied: law.chart().clone(),
+        });
+    }
     let id = standing.allocate_germ()?;
     let mut torus = occurrence.torus.clone();
     torus.last_event = event.event;
@@ -770,6 +1013,7 @@ fn admit_source_torus(
         CausalFieldGerm {
             id,
             region: occurrence.region,
+            chart,
             source_event: event.event,
             last_event: event.event,
             origin: FieldGermOrigin::SourceTorus {
@@ -956,6 +1200,7 @@ fn new_quadric_germ(
     region: FieldRegionId,
     observation: &FieldObservation,
 ) -> Result<FieldGermId, FieldAtlasError> {
+    let chart = standing.region_chart(region);
     let id = standing.allocate_germ()?;
     let implicit = standing.allocate_implicit()?;
     let germ = CausalFieldGerm {
@@ -969,10 +1214,11 @@ fn new_quadric_germ(
         lineage: BTreeSet::new(),
         support: FieldSupportStanding::Quadric {
             implicit,
-            fiber: ExactAffineVersionFiber::new(QUADRIC_COEFFICIENT_COUNT)?,
+            fiber: ExactAffineVersionFiber::new(chart.quadric_coefficient_count())?,
             resolved: None,
             coorientation: None,
         },
+        chart,
         phases: BTreeMap::new(),
     };
     let admitted = admit_sample_to_germ(germ, observation, &standing.observations)?
@@ -995,10 +1241,11 @@ fn emanate_germ(
         .cloned()
         .ok_or(FieldAtlasError::MalformedStanding)?;
     let id = standing.allocate_germ()?;
+    let chart = parent_germ.chart.clone();
     let support = if obstruction.support {
         FieldSupportStanding::Quadric {
             implicit: standing.allocate_implicit()?,
-            fiber: ExactAffineVersionFiber::new(QUADRIC_COEFFICIENT_COUNT)?,
+            fiber: ExactAffineVersionFiber::new(chart.quadric_coefficient_count())?,
             resolved: None,
             coorientation: None,
         }
@@ -1008,6 +1255,7 @@ fn emanate_germ(
     let germ = CausalFieldGerm {
         id,
         region,
+        chart,
         source_event: event,
         last_event: event,
         origin: FieldGermOrigin::ObstructionEmanation {
@@ -1079,6 +1327,7 @@ fn admit_sample_to_germ(
         support: false,
         phase_channels: BTreeSet::new(),
     };
+    let chart = germ.chart.clone();
     match &mut germ.support {
         FieldSupportStanding::Quadric {
             implicit,
@@ -1087,7 +1336,9 @@ fn admit_sample_to_germ(
             coorientation,
         } => {
             let mut trial = fiber.clone();
-            for coefficients in quadric_observation_rows(&observation.point, &observation.normal) {
+            for coefficients in
+                quadric_observation_rows(&chart, &observation.point, &observation.normal)?
+            {
                 trial.admit(coefficients, Rat::zero())?;
                 if trial.affine_dimension() == 0 {
                     obstruction.support = true;
@@ -1095,8 +1346,13 @@ fn admit_sample_to_germ(
                 }
             }
             if !obstruction.support {
-                let candidate =
-                    resolve_quadric(*implicit, germ.source_event, observation.event, &trial)?;
+                let candidate = resolve_quadric(
+                    &chart,
+                    *implicit,
+                    germ.source_event,
+                    observation.event,
+                    &trial,
+                )?;
                 let candidate_coorientation = candidate
                     .as_ref()
                     .map(|quadric| {
@@ -1133,15 +1389,15 @@ fn admit_sample_to_germ(
     let mut phases = germ.phases.clone();
     for (channel, value) in &observation.phase {
         let phase = phases.entry(*channel).or_insert(ExactPhaseFiber {
-            fiber: ExactAffineVersionFiber::new(AFFINE_PHASE_COEFFICIENT_COUNT)?,
+            fiber: ExactAffineVersionFiber::new(chart.affine_coefficient_count())?,
             law: None,
         });
         match phase
             .fiber
-            .admit(affine_point_row(&observation.point), value.clone())
+            .admit(affine_point_row(&chart, &observation.point), value.clone())
         {
             Ok(_) => {
-                phase.law = resolve_phase_law(&phase.fiber)?;
+                phase.law = resolve_phase_law(&chart, &phase.fiber)?;
             }
             Err(InverseTransportError::AffineFiberObstructed) => {
                 obstruction.phase_channels.insert(*channel);
@@ -1207,80 +1463,136 @@ fn resolve_quadric_coorientation(
     Ok(coorientation)
 }
 
-fn quadric_observation_rows(point: &RatVec3, normal: &RatVec3) -> [Vec<Rat>; 3] {
-    let value = vec![
-        &point.x * &point.x,
-        &point.y * &point.y,
-        &point.z * &point.z,
-        &point.x * &point.y,
-        &point.x * &point.z,
-        &point.y * &point.z,
-        point.x.clone(),
-        point.y.clone(),
-        point.z.clone(),
-        Rat::one(),
-    ];
-    let gradient_x = vec![
-        Rat::from_integer(2.into()) * &point.x,
-        Rat::zero(),
-        Rat::zero(),
-        point.y.clone(),
-        point.z.clone(),
-        Rat::zero(),
-        Rat::one(),
-        Rat::zero(),
-        Rat::zero(),
-        Rat::zero(),
-    ];
-    let gradient_y = vec![
-        Rat::zero(),
-        Rat::from_integer(2.into()) * &point.y,
-        Rat::zero(),
-        point.x.clone(),
-        Rat::zero(),
-        point.z.clone(),
-        Rat::zero(),
-        Rat::one(),
-        Rat::zero(),
-        Rat::zero(),
-    ];
-    let gradient_z = vec![
-        Rat::zero(),
-        Rat::zero(),
-        Rat::from_integer(2.into()) * &point.z,
-        Rat::zero(),
-        point.x.clone(),
-        point.y.clone(),
-        Rat::zero(),
-        Rat::zero(),
-        Rat::one(),
-        Rat::zero(),
-    ];
-    let (first_tangent, second_tangent) = tangent_basis(normal);
-    [
-        value,
-        combine_gradient_rows(&gradient_x, &gradient_y, &gradient_z, &first_tangent),
-        combine_gradient_rows(&gradient_x, &gradient_y, &gradient_z, &second_tangent),
-    ]
+fn monomial_value(monomial: FieldQuadricMonomial, point: &RatVec3) -> Rat {
+    match monomial {
+        FieldQuadricMonomial::Square(axis) => {
+            let coordinate = axis.read(point);
+            &coordinate * &coordinate
+        }
+        FieldQuadricMonomial::Cross(left, right) => &left.read(point) * &right.read(point),
+        FieldQuadricMonomial::Linear(axis) => axis.read(point),
+        FieldQuadricMonomial::Constant => Rat::one(),
+    }
 }
 
-fn tangent_basis(normal: &RatVec3) -> (RatVec3, RatVec3) {
-    let first = if !normal.x.is_zero() || !normal.y.is_zero() {
-        RatVec3::new(-normal.y.clone(), normal.x.clone(), Rat::zero())
-    } else {
-        RatVec3::from_i64(1, 0, 0)
-    };
-    let second = normal.cross(&first);
-    (first, second)
+/// The coefficient of `monomial` in the partial derivative with respect to
+/// `direction`.
+fn monomial_derivative(
+    monomial: FieldQuadricMonomial,
+    direction: FieldChartAxis,
+    point: &RatVec3,
+) -> Rat {
+    match monomial {
+        FieldQuadricMonomial::Square(axis) if axis == direction => {
+            Rat::from_integer(2.into()) * axis.read(point)
+        }
+        FieldQuadricMonomial::Cross(left, right) if left == direction => right.read(point),
+        FieldQuadricMonomial::Cross(left, right) if right == direction => left.read(point),
+        FieldQuadricMonomial::Linear(axis) if axis == direction => Rat::one(),
+        _ => Rat::zero(),
+    }
 }
 
-fn combine_gradient_rows(x: &[Rat], y: &[Rat], z: &[Rat], direction: &RatVec3) -> Vec<Rat> {
-    (0..QUADRIC_COEFFICIENT_COUNT)
-        .map(|index| &direction.x * &x[index] + &direction.y * &y[index] + &direction.z * &z[index])
-        .collect()
+/// One oriented observation as exact rows of the chart's coefficient fiber.
+///
+/// The population is `1 + (n - 1)`: the value row, and one row per tangent of
+/// the chart-projected normal. Nothing here is authored — both counts come
+/// from the chart's own coordinate list.
+fn quadric_observation_rows(
+    chart: &FieldChart,
+    point: &RatVec3,
+    normal: &RatVec3,
+) -> Result<Vec<Vec<Rat>>, FieldAtlasError> {
+    let monomials = chart.quadric_monomials();
+    let value = monomials
+        .iter()
+        .map(|monomial| monomial_value(*monomial, point))
+        .collect::<Vec<_>>();
+    let gradient_rows = chart
+        .axes()
+        .iter()
+        .map(|direction| {
+            monomials
+                .iter()
+                .map(|monomial| monomial_derivative(*monomial, *direction, point))
+                .collect::<Vec<_>>()
+        })
+        .collect::<Vec<_>>();
+    let mut rows = vec![value];
+    for tangent in chart_tangent_basis(chart, normal)? {
+        rows.push(combine_gradient_rows(&gradient_rows, &tangent));
+    }
+    Ok(rows)
+}
+
+/// An exact basis of the chart-orthogonal complement of a normal, in chart
+/// coordinates.
+///
+/// For a normal whose chart coordinates are `v` with `v[p] != 0`, the family
+/// `v[p]·e_i - v[i]·e_p` for every `i != p` is orthogonal to `v` and
+/// independent, and has exactly `n - 1` members. A normal whose chart
+/// projection is zero carries no orientation this chart can read, and is
+/// refused rather than projected away.
+fn chart_tangent_basis(
+    chart: &FieldChart,
+    normal: &RatVec3,
+) -> Result<Vec<Vec<Rat>>, FieldAtlasError> {
+    let coordinates = chart.coordinates(normal);
+    let pivot = coordinates
+        .iter()
+        .position(|coordinate| !coordinate.is_zero())
+        .ok_or(FieldAtlasError::SampleNormalOutsideChart {
+            chart: chart.clone(),
+        })?;
+    let mut tangents = Vec::new();
+    for index in 0..coordinates.len() {
+        if index == pivot {
+            continue;
+        }
+        let mut tangent = vec![Rat::zero(); coordinates.len()];
+        tangent[index] = coordinates[pivot].clone();
+        tangent[pivot] = -coordinates[index].clone();
+        tangents.push(tangent);
+    }
+    Ok(tangents)
+}
+
+fn combine_gradient_rows(gradient_rows: &[Vec<Rat>], direction: &[Rat]) -> Vec<Rat> {
+    let mut row = vec![Rat::zero(); gradient_rows.first().map_or(0, Vec::len)];
+    for (gradient, weight) in gradient_rows.iter().zip(direction) {
+        for (entry, coefficient) in row.iter_mut().zip(gradient) {
+            *entry += weight * coefficient;
+        }
+    }
+    row
+}
+
+/// Place a chart's quadric coefficients into the ambient support carrier.
+///
+/// The chart's monomials are a subset of the ambient chart's, so the lift is
+/// the inclusion `C(n+2,2) -> C(5,2)` with zero in every ambient monomial the
+/// chart does not carry. Geometrically it is the cylinder over the chart's
+/// quadric along the coordinates the chart does not read, which contains every
+/// ambient point whose chart projection the quadric contains.
+fn lift_quadric_to_ambient(
+    chart: &FieldChart,
+    coefficients: Vec<Rat>,
+) -> Result<Vec<Rat>, FieldAtlasError> {
+    let ambient = FieldChart::ambient();
+    let ambient_monomials = ambient.quadric_monomials();
+    let mut lifted = vec![Rat::zero(); ambient.quadric_coefficient_count()];
+    for (monomial, coefficient) in chart.quadric_monomials().into_iter().zip(coefficients) {
+        let slot = ambient_monomials
+            .iter()
+            .position(|ambient_monomial| *ambient_monomial == monomial)
+            .ok_or(FieldAtlasError::MalformedQuadricFiber)?;
+        lifted[slot] = coefficient;
+    }
+    Ok(lifted)
 }
 
 fn resolve_quadric(
+    chart: &FieldChart,
     implicit: ImplicitCellId,
     source_event: EventId,
     last_event: EventId,
@@ -1294,52 +1606,55 @@ fn resolve_quadric(
         .iter()
         .map(|row| row.pivot)
         .collect::<BTreeSet<_>>();
-    let free = (0..QUADRIC_COEFFICIENT_COUNT)
+    let free = (0..chart.quadric_coefficient_count())
         .find(|coordinate| !pivots.contains(coordinate))
         .ok_or(FieldAtlasError::MalformedQuadricFiber)?;
-    let mut coefficients = std::array::from_fn(|_| Rat::zero());
+    let mut coefficients = vec![Rat::zero(); chart.quadric_coefficient_count()];
     coefficients[free] = Rat::one();
     for row in fiber.rows() {
         coefficients[row.pivot] = -row.coefficients[free].clone();
     }
-    let mut quadric = ExactQuadric3::new(implicit, source_event, coefficients)?;
+    let lifted = lift_quadric_to_ambient(chart, coefficients)?
+        .try_into()
+        .map_err(|_| FieldAtlasError::MalformedQuadricFiber)?;
+    let mut quadric = ExactQuadric3::new(implicit, source_event, lifted)?;
     quadric.last_event = last_event;
     Ok(Some(quadric))
 }
 
-fn affine_point_row(point: &RatVec3) -> Vec<Rat> {
-    vec![
-        point.x.clone(),
-        point.y.clone(),
-        point.z.clone(),
-        Rat::one(),
-    ]
+fn affine_point_row(chart: &FieldChart, point: &RatVec3) -> Vec<Rat> {
+    let mut row = chart.coordinates(point);
+    row.push(Rat::one());
+    row
 }
 
 fn resolve_phase_law(
+    chart: &FieldChart,
     fiber: &ExactAffineVersionFiber,
 ) -> Result<Option<ExactAffinePhaseLaw>, FieldAtlasError> {
+    if fiber.variable_count() != chart.affine_coefficient_count() {
+        return Err(FieldAtlasError::MalformedPhaseFiber);
+    }
     let Some(solution) = fiber.unique_solution()? else {
         return Ok(None);
     };
-    let coefficients = solution
-        .try_into()
-        .map_err(|_| FieldAtlasError::MalformedPhaseFiber)?;
-    Ok(Some(ExactAffinePhaseLaw { coefficients }))
+    Ok(Some(ExactAffinePhaseLaw::new(chart.clone(), solution)?))
 }
 
 fn phase_fiber_from_law(law: &ExactAffinePhaseLaw) -> Result<ExactPhaseFiber, FieldAtlasError> {
-    let mut fiber = ExactAffineVersionFiber::new(AFFINE_PHASE_COEFFICIENT_COUNT)?;
-    for point in [
-        RatVec3::zero(),
-        RatVec3::from_i64(1, 0, 0),
-        RatVec3::from_i64(0, 1, 0),
-        RatVec3::from_i64(0, 0, 1),
-    ] {
-        fiber.admit(affine_point_row(&point), law.evaluate(&point))?;
+    let chart = law.chart().clone();
+    let mut fiber = ExactAffineVersionFiber::new(chart.affine_coefficient_count())?;
+    let mut points = vec![RatVec3::zero()];
+    for index in 0..chart.dimension() {
+        let mut unit = vec![Rat::zero(); chart.dimension()];
+        unit[index] = Rat::one();
+        points.push(chart.embed(&unit));
+    }
+    for point in points {
+        fiber.admit(affine_point_row(&chart, &point), law.evaluate(&point))?;
     }
     Ok(ExactPhaseFiber {
-        law: resolve_phase_law(&fiber)?,
+        law: resolve_phase_law(&chart, &fiber)?,
         fiber,
     })
 }
@@ -1381,6 +1696,10 @@ pub struct FieldReceiverQuery {
 pub struct FieldGermTestimony {
     pub germ: FieldGermId,
     pub region: FieldRegionId,
+    /// The chart the germ was founded in, so a receipt states the chart its
+    /// fibers were read against without consulting the standing.
+    #[serde(default = "FieldChart::ambient")]
+    pub chart: FieldChart,
     pub source_event: EventId,
     pub last_event: EventId,
     pub origin: FieldGermOrigin,
@@ -1393,6 +1712,7 @@ impl From<&CausalFieldGerm> for FieldGermTestimony {
         Self {
             germ: germ.id,
             region: germ.region,
+            chart: germ.chart.clone(),
             source_event: germ.source_event,
             last_event: germ.last_event,
             origin: germ.origin.clone(),
@@ -1627,6 +1947,29 @@ pub enum FieldAtlasError {
     EmptySampleRegion,
     #[error("an oriented field sample cannot have a zero normal")]
     ZeroSampleNormal,
+    #[error("a declared field chart must name at least one ambient coordinate")]
+    EmptyChart,
+    #[error("a declared field chart cannot name one ambient coordinate twice")]
+    RepeatedChartAxis,
+    #[error("region {0:?} has already founded germs and cannot redeclare its chart")]
+    RegionChartAfterFounding(FieldRegionId),
+    #[error("a sample normal carries no component inside the declared chart {chart:?}")]
+    SampleNormalOutsideChart { chart: FieldChart },
+    #[error(
+        "region {region:?} declares chart {chart:?}; a source torus carries an ambient center and axis"
+    )]
+    SourceTorusOutsideAmbientChart {
+        region: FieldRegionId,
+        chart: FieldChart,
+    },
+    #[error("region {region:?} declares chart {declared:?}; the supplied phase law reads {supplied:?}")]
+    PhaseLawChartMismatch {
+        region: FieldRegionId,
+        declared: FieldChart,
+        supplied: FieldChart,
+    },
+    #[error("an affine phase law in this chart requires {required} coefficients, not {supplied}")]
+    PhaseLawCoefficientPopulation { required: usize, supplied: usize },
     #[error("the causal-field standing is malformed")]
     MalformedStanding,
     #[error("an image section is malformed")]
@@ -1696,9 +2039,384 @@ mod tests {
     }
 
     fn phase_law() -> ExactAffinePhaseLaw {
-        ExactAffinePhaseLaw {
-            coefficients: [integer(1), integer(2), integer(3), integer(4)],
+        ExactAffinePhaseLaw::new(
+            FieldChart::ambient(),
+            vec![integer(1), integer(2), integer(3), integer(4)],
+        )
+        .unwrap()
+    }
+
+    fn rat(numerator: i64, denominator: i64) -> Rat {
+        Rat::new(numerator.into(), denominator.into())
+    }
+
+    /// Five exact rational points of `x^2 + y^2 = 4` in the plane `z = 0`,
+    /// each carrying its radial in-plane normal.
+    fn coplanar_circle_samples(region: FieldRegionId) -> Vec<OrientedFieldSample> {
+        [
+            RatVec3::from_i64(2, 0, 0),
+            RatVec3::from_i64(-2, 0, 0),
+            RatVec3::from_i64(0, 2, 0),
+            RatVec3::from_i64(0, -2, 0),
+            RatVec3::new(rat(6, 5), rat(8, 5), integer(0)),
+        ]
+        .into_iter()
+        .map(|point| OrientedFieldSample {
+            regions: BTreeSet::from([region]),
+            normal: point.clone(),
+            point,
+            phase: BTreeMap::new(),
+            receiver_contact: None,
+        })
+        .collect()
+    }
+
+    fn resolve_under_chart(
+        chart: FieldChart,
+        samples: Vec<OrientedFieldSample>,
+        region: FieldRegionId,
+    ) -> (usize, usize, Option<ExactQuadric3>) {
+        let law = CausalFieldAtlasLaw;
+        let mut standing = law.initial_standing();
+        standing.declare_region_chart(region, chart).unwrap();
+        let mut event = empty_event(1, 1);
+        event.oriented_samples = samples;
+        let standing = law.enact(&standing, &event).unwrap().standing_after;
+        let germ = standing.germs.values().next().unwrap();
+        let FieldSupportStanding::Quadric {
+            fiber, resolved, ..
+        } = &germ.support
+        else {
+            panic!("an oriented sample founds a quadric germ");
+        };
+        (
+            fiber.variable_count(),
+            fiber.affine_dimension(),
+            resolved.clone(),
+        )
+    }
+
+    #[test]
+    fn every_coefficient_population_is_read_off_the_declared_chart() {
+        for (axes, dimension, quadric, affine) in [
+            (vec![FieldChartAxis::X], 1_usize, 3_usize, 2_usize),
+            (vec![FieldChartAxis::X, FieldChartAxis::Y], 2, 6, 3),
+            (
+                vec![FieldChartAxis::X, FieldChartAxis::Y, FieldChartAxis::Z],
+                3,
+                10,
+                4,
+            ),
+        ] {
+            let chart = FieldChart::new(axes).unwrap();
+            assert_eq!(chart.dimension(), dimension);
+            assert_eq!(chart.quadric_coefficient_count(), quadric);
+            assert_eq!(
+                chart.quadric_monomials().len(),
+                chart.quadric_coefficient_count(),
+                "the enumerated monomials must be exactly C(n+2,2)"
+            );
+            assert_eq!(chart.affine_coefficient_count(), affine);
+            let tangents =
+                chart_tangent_basis(&chart, &RatVec3::from_i64(1, 1, 1)).unwrap();
+            assert_eq!(
+                tangents.len(),
+                dimension - 1,
+                "a normal in n coordinates has n-1 tangents"
+            );
         }
+    }
+
+    #[test]
+    fn a_declared_chart_refuses_an_empty_or_repeated_coordinate_list() {
+        assert_eq!(FieldChart::new(Vec::new()), Err(FieldAtlasError::EmptyChart));
+        assert_eq!(
+            FieldChart::new(vec![FieldChartAxis::X, FieldChartAxis::X]),
+            Err(FieldAtlasError::RepeatedChartAxis)
+        );
+    }
+
+    #[test]
+    fn coplanar_material_resolves_in_its_own_chart_and_never_in_the_ambient_one() {
+        let region = FieldRegionId(1);
+        let (ambient_variables, ambient_dimension, ambient_resolved) = resolve_under_chart(
+            FieldChart::ambient(),
+            coplanar_circle_samples(region),
+            region,
+        );
+        assert_eq!(ambient_variables, 10);
+        assert_eq!(ambient_dimension, 2);
+        assert_eq!(
+            ambient_resolved, None,
+            "in the ambient chart the coplanar pencil never collapses to one quadric"
+        );
+
+        let (plane_variables, plane_dimension, plane_resolved) = resolve_under_chart(
+            FieldChart::new(vec![FieldChartAxis::X, FieldChartAxis::Y]).unwrap(),
+            coplanar_circle_samples(region),
+            region,
+        );
+        assert_eq!(plane_variables, 6);
+        assert_eq!(plane_dimension, 1);
+        let quadric = plane_resolved.expect("the same material resolves the conic in its plane");
+        assert_eq!(
+            quadric.coefficients,
+            [
+                integer(1),
+                integer(1),
+                integer(0),
+                integer(0),
+                integer(0),
+                integer(0),
+                integer(0),
+                integer(0),
+                integer(0),
+                integer(-4),
+            ],
+            "the conic lifts to the ambient cylinder x^2 + y^2 - 4"
+        );
+    }
+
+    #[test]
+    fn a_coplanar_phase_resolves_in_its_own_chart_and_never_in_the_ambient_one() {
+        let law = CausalFieldAtlasLaw;
+        let region = FieldRegionId(11);
+        let channel = FieldPhaseChannel::Declared(1);
+        // `3x + 5y + 7`, read on material that never leaves the plane z = 0.
+        let phase_of = |point: &RatVec3| {
+            integer(3) * &point.x + integer(5) * &point.y + integer(7)
+        };
+        let samples = || {
+            coplanar_circle_samples(region)
+                .into_iter()
+                .map(|mut sample| {
+                    sample.phase = BTreeMap::from([(channel, phase_of(&sample.point))]);
+                    sample
+                })
+                .collect::<Vec<_>>()
+        };
+        let resolved_phase = |chart: FieldChart| {
+            let mut standing = law.initial_standing();
+            standing.declare_region_chart(region, chart).unwrap();
+            let mut event = empty_event(1, 1);
+            event.oriented_samples = samples();
+            let standing = law.enact(&standing, &event).unwrap().standing_after;
+            let germ = standing.germs.values().next().unwrap();
+            let fiber = &germ.phases[&channel];
+            (fiber.fiber.variable_count(), fiber.law.clone())
+        };
+
+        let (ambient_variables, ambient_law) = resolved_phase(FieldChart::ambient());
+        assert_eq!(ambient_variables, 4);
+        assert_eq!(
+            ambient_law, None,
+            "coplanar material can never pivot the ambient chart's fourth coordinate"
+        );
+
+        let (plane_variables, plane_law) = resolved_phase(
+            FieldChart::new(vec![FieldChartAxis::X, FieldChartAxis::Y]).unwrap(),
+        );
+        assert_eq!(plane_variables, 3);
+        let plane_law = plane_law.expect("the same material resolves the affine law in its plane");
+        assert_eq!(
+            plane_law.coefficients(),
+            [integer(3), integer(5), integer(7)]
+        );
+        assert_eq!(plane_law.gradient(), RatVec3::from_i64(3, 5, 0));
+        assert_eq!(
+            plane_law.evaluate(&RatVec3::from_i64(1, 1, 9)),
+            integer(15),
+            "the chart's law does not read the coordinate the chart does not name"
+        );
+    }
+
+    #[test]
+    fn a_one_coordinate_chart_resolves_a_binary_quadratic() {
+        let region = FieldRegionId(3);
+        let samples = [(2_i64, 1_i64), (-2, -1)]
+            .into_iter()
+            .map(|(position, orientation)| OrientedFieldSample {
+                regions: BTreeSet::from([region]),
+                point: RatVec3::from_i64(position, 0, 0),
+                normal: RatVec3::from_i64(orientation, 0, 0),
+                phase: BTreeMap::new(),
+                receiver_contact: None,
+            })
+            .collect();
+        let (variables, dimension, resolved) = resolve_under_chart(
+            FieldChart::new(vec![FieldChartAxis::X]).unwrap(),
+            samples,
+            region,
+        );
+        assert_eq!(variables, 3);
+        assert_eq!(dimension, 1);
+        let quadric = resolved.expect("two oriented points resolve x^2 - 4 in a one-axis chart");
+        assert_eq!(
+            quadric.coefficients,
+            [
+                integer(1),
+                integer(0),
+                integer(0),
+                integer(0),
+                integer(0),
+                integer(0),
+                integer(0),
+                integer(0),
+                integer(0),
+                integer(-4),
+            ]
+        );
+    }
+
+    #[test]
+    fn a_normal_with_no_component_in_the_declared_chart_is_refused_by_name() {
+        let law = CausalFieldAtlasLaw;
+        let region = FieldRegionId(5);
+        let chart = FieldChart::new(vec![FieldChartAxis::X, FieldChartAxis::Y]).unwrap();
+        let sample = |normal: RatVec3| OrientedFieldSample {
+            regions: BTreeSet::from([region]),
+            point: RatVec3::from_i64(2, 0, 0),
+            normal,
+            phase: BTreeMap::new(),
+            receiver_contact: None,
+        };
+        let mut standing = law.initial_standing();
+        standing.declare_region_chart(region, chart.clone()).unwrap();
+
+        let mut refused = empty_event(1, 1);
+        refused.oriented_samples = vec![sample(RatVec3::from_i64(0, 0, 1))];
+        assert_eq!(
+            law.enact(&standing, &refused),
+            Err(FieldAtlasError::SampleNormalOutsideChart { chart })
+        );
+
+        let mut admitted = empty_event(1, 1);
+        admitted.oriented_samples = vec![sample(RatVec3::from_i64(1, 0, 0))];
+        assert!(
+            law.enact(&standing, &admitted).is_ok(),
+            "the same point with an in-chart normal is admitted"
+        );
+    }
+
+    #[test]
+    fn a_region_that_has_founded_cannot_redeclare_its_chart() {
+        let law = CausalFieldAtlasLaw;
+        let region = FieldRegionId(9);
+        let mut event = empty_event(1, 1);
+        event.oriented_samples = sphere_samples(region);
+        let mut standing = law.enact(&law.initial_standing(), &event).unwrap().standing_after;
+        assert_eq!(
+            standing.declare_region_chart(
+                region,
+                FieldChart::new(vec![FieldChartAxis::X, FieldChartAxis::Y]).unwrap()
+            ),
+            Err(FieldAtlasError::RegionChartAfterFounding(region))
+        );
+        assert!(
+            standing
+                .declare_region_chart(
+                    FieldRegionId(10),
+                    FieldChart::new(vec![FieldChartAxis::X, FieldChartAxis::Y]).unwrap()
+                )
+                .is_ok(),
+            "an unfounded region may still declare"
+        );
+    }
+
+    #[test]
+    fn a_phase_law_states_its_own_coefficient_population_and_its_own_chart() {
+        let plane = FieldChart::new(vec![FieldChartAxis::X, FieldChartAxis::Y]).unwrap();
+        assert_eq!(
+            ExactAffinePhaseLaw::new(plane.clone(), vec![integer(1), integer(2), integer(3)])
+                .map(|law| law.coefficients().len()),
+            Ok(3)
+        );
+        assert_eq!(
+            ExactAffinePhaseLaw::new(
+                plane.clone(),
+                vec![integer(1), integer(2), integer(3), integer(4)]
+            ),
+            Err(FieldAtlasError::PhaseLawCoefficientPopulation {
+                required: 3,
+                supplied: 4
+            })
+        );
+
+        // A source torus is an ambient carrier, so a phase law read in a
+        // proper sub-chart cannot be attached to one.
+        let law = CausalFieldAtlasLaw;
+        let region = FieldRegionId(12);
+        let torus = || {
+            ExactTorus::new(
+                ImplicitCellId(1),
+                EventId(1),
+                RatVec3::zero(),
+                RatVec3::from_i64(0, 0, 1),
+                integer(3),
+                integer(1),
+            )
+            .unwrap()
+        };
+        let occurrence = |phase: ExactAffinePhaseLaw| CausalFieldEvent {
+            event: EventId(1),
+            chronology: 1,
+            images: Vec::new(),
+            oriented_samples: Vec::new(),
+            source_tori: vec![SourceTorusOccurrence {
+                region,
+                torus: torus(),
+                phases: BTreeMap::from([(FieldPhaseChannel::Declared(1), phase)]),
+            }],
+        };
+        let standing = law.initial_standing();
+        assert_eq!(
+            law.enact(
+                &standing,
+                &occurrence(
+                    ExactAffinePhaseLaw::new(
+                        plane.clone(),
+                        vec![integer(1), integer(2), integer(3)]
+                    )
+                    .unwrap()
+                )
+            ),
+            Err(FieldAtlasError::PhaseLawChartMismatch {
+                region,
+                declared: FieldChart::ambient(),
+                supplied: plane,
+            })
+        );
+        assert!(
+            law.enact(&standing, &occurrence(phase_law())).is_ok(),
+            "the same torus with an ambient phase law is admitted"
+        );
+    }
+
+    #[test]
+    fn a_source_torus_is_refused_in_a_proper_sub_chart() {
+        let law = CausalFieldAtlasLaw;
+        let region = FieldRegionId(2);
+        let chart = FieldChart::new(vec![FieldChartAxis::X, FieldChartAxis::Y]).unwrap();
+        let mut standing = law.initial_standing();
+        standing.declare_region_chart(region, chart.clone()).unwrap();
+        let mut event = empty_event(1, 1);
+        event.source_tori.push(SourceTorusOccurrence {
+            region,
+            torus: ExactTorus::new(
+                ImplicitCellId(1),
+                EventId(1),
+                RatVec3::zero(),
+                RatVec3::from_i64(0, 0, 1),
+                integer(3),
+                integer(1),
+            )
+            .unwrap(),
+            phases: BTreeMap::new(),
+        });
+        assert_eq!(
+            law.enact(&standing, &event),
+            Err(FieldAtlasError::SourceTorusOutsideAmbientChart { region, chart })
+        );
     }
 
     fn sphere_samples(region: FieldRegionId) -> Vec<OrientedFieldSample> {
