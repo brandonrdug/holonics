@@ -137,12 +137,30 @@ diffusion at once.
 
 | object | owner |
 |---|---|
-| the weighted Laplacian assembled from oriented conductances | `diffusion.rs:460-468` |
-| `L_II⁻¹` | `:474` `interior_inverse` |
-| the Schur complement `S` = the Dirichlet-to-Neumann map | `:475-483` `schur_boundary_operator` |
+| the operator `M = C + τL` — capacities on the diagonal, **then** the oriented couplings | `diffusion.rs:457-468` |
+| `M_II⁻¹` | `:474` `interior_inverse` |
+| the Schur complement `S = M_∂∂ − M_∂I M_II⁻¹ M_I∂` | `:475-483` `schur_boundary_operator` |
 | the certificate | `:185-190` `DiffusionBoundaryTransferCertificate`, carrying the operator, both inverses, and **both inverse residuals** |
 | the refusal | `:497` `TransferCertificateFailure` when either residual is not identically zero |
 | the independent check | `:877` `certified_schur_transfer_matches_direct_solve_and_reuses_structure` |
+
+> **CORRECTED 2026-08-09, and the correction is not cosmetic.** An earlier form of this table read
+> `L_II⁻¹` and claimed `−L_II⁻¹L_I∂` **is** harmonic measure. **That is true of the bare Laplacian and
+> false of the operator this organ builds.** `diffusion.rs:457-458` writes each node's `capacity` onto
+> the diagonal *before* `:463-467` add the couplings, and `:65-67` refuses a non-positive capacity
+> outright — so the operator is `M = C + τL` with `C` **strictly positive**. The walk is therefore
+> **killed** at every interior site and the exit rows are **sub-stochastic**: measured on a declared
+> complex, the row at interior site 1 sums to `292181/333395`, with killed share `41214/333395`.
+>
+> Harmonic measure is the `C → 0` limit, which this organ **refuses by construction**. So §1–3's
+> classical chain stands and the identification of *this owner* with it does not: what
+> `diffusion.rs` computes is the exit kernel of a walk with killing — a resolvent — and the harmonic
+> case is the boundary of its declared domain rather than a point in it.
+>
+> The correction makes the cross-check **harder**, which is why it is worth having: stochastic rows
+> sum to one and that free constraint would mask an error in mass propagation. Sub-stochastic rows
+> carry no such constraint, so the killed share has to come out right too. The Lagrangian side
+> therefore needs a third method — `parcel.rs:141` `dissipation` — and it exists because of this.
 
 Its module header already states the discipline: *"The solve is exact rational elimination. No
 continuous PDE, floating point, pixel adjacency, authored probability, or convergence tolerance

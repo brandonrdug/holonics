@@ -178,6 +178,7 @@ pub mod implicit;
 // must be named apart at every call site.
 pub mod inertia;
 pub mod interaction;
+pub mod interchange;
 pub mod inverse_transport;
 // A human-written formal development read at the grain of its OWN declarations, with the aperture
 // declared so that using the one-artifact reader on many-declaration material is detectable rather
@@ -210,6 +211,7 @@ pub mod model_surface;
 pub mod observation_ecology;
 pub mod organizational_grammar;
 pub mod parameter;
+pub mod parcel;
 pub mod phase_current;
 pub mod physical;
 pub mod placement;
@@ -217,6 +219,7 @@ pub mod platform;
 #[cfg(all(target_os = "linux", feature = "desktop-x11"))]
 pub mod platform_x11;
 pub mod presentation;
+pub mod quantity;
 // The declared display gauge and the body's one vector codec. Not glob-exported for the same
 // reason as `certified_face`: colour is a gauge and must be named as one at every call site.
 pub mod presentation_gauge;

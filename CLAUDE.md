@@ -936,13 +936,18 @@ into a compact representative with a certified remainder. General far-field fold
 open for the closely related reason that no *kernel-specific* exterior/local expansion has been
 built for it, and floating tolerance may not become standing.
 
-**CORRECTED 2026-08-09: for the Laplacian, one IS built, and the open item splits.**
+**CORRECTED 2026-08-09: for this kernel, one IS built, and the open item splits.**
 `crates/holonic-engine/src/diffusion.rs:475-497` computes the Schur complement
-`S = L_∂∂ − L_∂I L_II⁻¹ L_I∂` — the discrete **Dirichlet-to-Neumann** map — exactly over `Rat`, with
-a certificate carrying both inverse residuals and a `TransferCertificateFailure` refusal when either
-is non-zero. The far interior is eliminated **exactly**, and remains recoverable by
-`u_I = −L_II⁻¹ L_I∂ f`, so the retained remainder is **zero** rather than bounded. That row
-`−L_II⁻¹L_I∂` is harmonic measure: the exit distribution of the walk, exactly rational.
+`S = M_∂∂ − M_∂I M_II⁻¹ M_I∂` exactly over `Rat`, with a certificate carrying both inverse residuals
+and a `TransferCertificateFailure` refusal when either is non-zero. The far interior is eliminated
+**exactly**, and remains recoverable by `u_I = −M_II⁻¹ M_I∂ f`, so the retained remainder is **zero**
+rather than bounded.
+
+**The operator is `M = C + τL`, not `L`** — `:457-458` writes capacities on the diagonal before the
+couplings and `:65` refuses a non-positive capacity — so the walk is **killed** at interior sites and
+the exit rows are **sub-stochastic**. It is a resolvent, not the harmonic extension; harmonic measure
+is the `C → 0` boundary of the declared domain, which the organ refuses. Verified against a parcel
+cohort riding the same complex, and the killed share is exhibited rather than normalised away.
 
 **The honest bound is that elimination is not condensation.** `S` is a dense `|∂| × |∂|` operator.
 Replacing a far population by a **compact** representative needs that dense block to admit a low-rank

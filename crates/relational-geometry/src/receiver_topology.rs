@@ -225,6 +225,93 @@ pub struct IharaSignature {
     pub primitive_oriented_cycles: Vec<BigInt>,
 }
 
+/// The two-route reading of one `IharaSignature`.
+///
+/// Ihara's theorem states
+/// `det(I - uB) = prod over primitive closed geodesics [P] of (1 - u^len(P))`.
+/// `IharaSignature` carries the determinant on one side and the primitive
+/// cycle counts on the other; this carries the comparison of the two, and it
+/// carries both windows rather than a verdict.
+///
+/// The caller-declared horizon truncates the product. `prod_{l > horizon}
+/// (1 - u^l)^{N_l}` is `1 + O(u^{horizon + 1})`, so the truncated product is
+/// congruent to the determinant modulo `u^{horizon + 1}` and says nothing at
+/// all above that degree. Coefficients `0..=horizon` are therefore compared
+/// and coefficients above the horizon are withheld. A window wider than the
+/// determinant's own degree is still lawful and is a stronger reading: the
+/// product's coefficients there must vanish.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct IharaCrossCheck {
+    /// The horizon the signature was taken at, read off the length of
+    /// `primitive_oriented_cycles` rather than authored here.
+    pub horizon: usize,
+    /// Coefficients `0..=horizon` of `prod_{l=1}^{horizon} (1 - u^l)^{N_l}`.
+    pub euler_product_window: Vec<BigInt>,
+    /// Coefficients `0..=horizon` of `det(I - uB)`, zero-extended.
+    pub reciprocal_window: Vec<BigInt>,
+    /// Degree of `det(I - uB)`.
+    pub reciprocal_degree: usize,
+    /// `horizon + 1`.
+    pub compared_coefficients: usize,
+    /// Coefficients of `det(I - uB)` strictly above the horizon, which the
+    /// truncated product does not determine.
+    pub withheld_coefficients: usize,
+    /// Lowest degree at which the two windows disagree.
+    pub first_disagreement: Option<usize>,
+}
+
+impl IharaCrossCheck {
+    pub fn agrees(&self) -> bool {
+        self.first_disagreement.is_none()
+    }
+}
+
+/// One frame's reading of the Ihara identity, carrying the graph shape the
+/// identity was taken over so two frames can be compared without re-deriving
+/// it.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct IharaFrameReading {
+    pub frame: String,
+    pub vertex_count: usize,
+    pub edge_count: usize,
+    /// `edges - vertices + 1`. `ihara_signature` has already refused a
+    /// disconnected graph, so this is the first Betti number.
+    pub cycle_rank: usize,
+    pub reciprocal_degree: usize,
+    pub reciprocal: ExactPolynomial,
+    pub primitive_oriented_cycles: Vec<BigInt>,
+    pub cross_check: IharaCrossCheck,
+}
+
+/// The source graph and the face-dual graph read as two frames on one
+/// construction.
+///
+/// The face dual is dual to the **diagram** graph, not to the source graph:
+/// an apparent crossing splits source segments into further diagram edges. The
+/// diagram counts are carried here so that difference is visible rather than
+/// assumed away, and the dual pairing is asserted against the diagram.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TwoFrameIharaReading {
+    pub source: IharaFrameReading,
+    pub face_dual: IharaFrameReading,
+    pub apparent_crossings: usize,
+    pub diagram_vertex_count: usize,
+    pub diagram_edge_count: usize,
+    pub diagram_cycle_rank: usize,
+    /// True exactly when no apparent crossing split a source segment, which is
+    /// when the source graph *is* the diagram graph.
+    pub source_graph_is_diagram_graph: bool,
+    /// `cycle_rank(diagram) + cycle_rank(face dual)`.
+    pub dual_cycle_rank_sum: usize,
+    /// Euler's formula makes the sum above equal the shared edge count.
+    pub dual_cycle_rank_sum_is_edge_count: bool,
+    pub reciprocal_degrees_agree: bool,
+    /// Lowest degree at which the two frames' reciprocals differ.
+    pub first_reciprocal_difference: Option<usize>,
+    /// Lowest length at which the two frames' primitive cycle counts differ.
+    pub first_cycle_count_difference: Option<usize>,
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum TopologyDiscriminant {
     UnsupportedRadicalProjection,
@@ -1070,6 +1157,232 @@ pub fn ihara_signature(
     })
 }
 
+/// `(1 - u^length)^exponent`, as coefficients `0..=bound`.
+///
+/// The generalized binomial series is used rather than repeated multiplication
+/// so that a **negative** exponent is carried by the same owner as a positive
+/// one. A negative exponent is what a perturbation control needs, and routing
+/// it through a second code path would let the control and the check disagree
+/// for a reason that is not the material.
+fn one_minus_power_raised(length: usize, exponent: &BigInt, bound: usize) -> Vec<BigInt> {
+    let mut window = vec![BigInt::zero(); bound + 1];
+    if length == 0 {
+        // `(1 - u^0)^e` is not a factor of any Euler product: a closed geodesic
+        // has positive length. Return the zero window so a caller that reaches
+        // here cannot silently read it as the identity factor.
+        return window;
+    }
+    let mut binomial = BigInt::one();
+    let mut step = 0usize;
+    loop {
+        let Some(degree) = step.checked_mul(length) else {
+            break;
+        };
+        if degree > bound {
+            break;
+        }
+        window[degree] = if step % 2 == 0 {
+            binomial.clone()
+        } else {
+            -binomial.clone()
+        };
+        // C(e, k+1) = C(e, k) * (e - k) / (k + 1), exact over the integers.
+        let numerator = &binomial * (exponent - BigInt::from(step));
+        let divisor = BigInt::from(step + 1);
+        debug_assert!((&numerator % &divisor).is_zero());
+        binomial = numerator / divisor;
+        if binomial.is_zero() {
+            break;
+        }
+        step += 1;
+    }
+    window
+}
+
+fn truncated_window_multiply(left: &[BigInt], right: &[BigInt], bound: usize) -> Vec<BigInt> {
+    let mut product = vec![BigInt::zero(); bound + 1];
+    for (left_degree, left_value) in left.iter().enumerate() {
+        if left_value.is_zero() || left_degree > bound {
+            continue;
+        }
+        for (right_degree, right_value) in right.iter().enumerate() {
+            let degree = left_degree + right_degree;
+            if degree > bound {
+                break;
+            }
+            if right_value.is_zero() {
+                continue;
+            }
+            product[degree] += left_value * right_value;
+        }
+    }
+    product
+}
+
+/// `prod_{l=1}^{horizon} (1 - u^l)^{N_l}` as coefficients `0..=horizon`, where
+/// `N_l` is `primitive_oriented_cycles[l - 1]`.
+///
+/// The horizon is the length of the slice, which is the horizon the caller
+/// declared to `ihara_signature`. Nothing here authors one.
+pub fn ihara_euler_product_window(primitive_oriented_cycles: &[BigInt]) -> Vec<BigInt> {
+    let horizon = primitive_oriented_cycles.len();
+    let mut window = vec![BigInt::zero(); horizon + 1];
+    window[0] = BigInt::one();
+    for (index, count) in primitive_oriented_cycles.iter().enumerate() {
+        if count.is_zero() {
+            continue;
+        }
+        let factor = one_minus_power_raised(index + 1, count, horizon);
+        window = truncated_window_multiply(&window, &factor, horizon);
+    }
+    window
+}
+
+/// Assert Ihara's theorem against one signature: expand the Euler product over
+/// the primitive closed geodesics and compare it coefficient by coefficient
+/// with `det(I - uB)`.
+pub fn cross_check_ihara(signature: &IharaSignature) -> IharaCrossCheck {
+    cross_check_ihara_perturbed(signature, &[])
+}
+
+/// The same comparison with the primitive-cycle counts perturbed first.
+///
+/// `perturbations` are `(length, delta)` pairs. A length outside
+/// `1..=horizon` lies outside the compared window and is not applied. An
+/// empty slice is the identity, and the check is evidence only because a
+/// non-empty perturbation breaks it: multiplying the product by
+/// `(1 - u^l)^{delta}` moves the coefficient at degree `l` by exactly
+/// `-delta`, since the product's constant coefficient is one.
+pub fn cross_check_ihara_perturbed(
+    signature: &IharaSignature,
+    perturbations: &[(usize, i64)],
+) -> IharaCrossCheck {
+    let horizon = signature.primitive_oriented_cycles.len();
+    let mut counts = signature.primitive_oriented_cycles.clone();
+    for (length, delta) in perturbations {
+        if (1..=horizon).contains(length) {
+            counts[length - 1] += BigInt::from(*delta);
+        }
+    }
+    let euler_product_window = ihara_euler_product_window(&counts);
+    let reciprocal_degree = signature.reciprocal.coefficients.len().saturating_sub(1);
+    let reciprocal_window = (0..=horizon)
+        .map(|degree| {
+            signature
+                .reciprocal
+                .coefficients
+                .get(degree)
+                .cloned()
+                .unwrap_or_else(BigInt::zero)
+        })
+        .collect::<Vec<_>>();
+    let first_disagreement =
+        (0..=horizon).find(|degree| euler_product_window[*degree] != reciprocal_window[*degree]);
+    IharaCrossCheck {
+        horizon,
+        euler_product_window,
+        reciprocal_window,
+        reciprocal_degree,
+        compared_coefficients: horizon + 1,
+        withheld_coefficients: reciprocal_degree.saturating_sub(horizon),
+        first_disagreement,
+    }
+}
+
+pub fn ihara_frame_reading(
+    frame: impl Into<String>,
+    graph: &ExactMultiGraph,
+    signature: &IharaSignature,
+) -> IharaFrameReading {
+    IharaFrameReading {
+        frame: frame.into(),
+        vertex_count: graph.vertex_count,
+        edge_count: graph.edges.len(),
+        cycle_rank: graph.edges.len() + 1 - graph.vertex_count,
+        reciprocal_degree: signature.reciprocal.coefficients.len().saturating_sub(1),
+        reciprocal: signature.reciprocal.clone(),
+        primitive_oriented_cycles: signature.primitive_oriented_cycles.clone(),
+        cross_check: cross_check_ihara(signature),
+    }
+}
+
+/// The graph the receiver diagram presents, after apparent crossings have split
+/// source segments. The face-dual graph is dual to this, not to the source
+/// graph.
+pub fn diagram_graph(topology: &ReceiverTopology) -> ExactMultiGraph {
+    ExactMultiGraph {
+        vertex_count: topology.nodes.len(),
+        edges: topology
+            .edges
+            .iter()
+            .map(|edge| GraphEdge {
+                left: edge.from.0 as usize - 1,
+                right: edge.to.0 as usize - 1,
+                source: format!(
+                    "e{}:{}@{}",
+                    edge.source.entity.0, edge.source.segment, edge.id.0
+                ),
+            })
+            .collect(),
+    }
+}
+
+fn first_coefficient_difference(left: &ExactPolynomial, right: &ExactPolynomial) -> Option<usize> {
+    let length = left.coefficients.len().max(right.coefficients.len());
+    (0..length).find(|degree| {
+        let left_value = left.coefficients.get(*degree);
+        let right_value = right.coefficients.get(*degree);
+        match (left_value, right_value) {
+            (Some(left_value), Some(right_value)) => left_value != right_value,
+            (Some(value), None) | (None, Some(value)) => !value.is_zero(),
+            (None, None) => false,
+        }
+    })
+}
+
+impl ReceiverTopology {
+    /// Read the source graph and the face-dual graph as two frames on one
+    /// construction, asserting Ihara's theorem separately in each.
+    pub fn two_frame_ihara_reading(&self) -> TwoFrameIharaReading {
+        let diagram = diagram_graph(self);
+        let source = ihara_frame_reading("source graph", &self.source_graph, &self.source_ihara);
+        let face_dual = ihara_frame_reading(
+            "face-dual graph",
+            &self.face_dual_graph,
+            &self.face_dual_ihara,
+        );
+        let diagram_cycle_rank = diagram.edges.len() + 1 - diagram.vertex_count;
+        let dual_cycle_rank_sum = diagram_cycle_rank + face_dual.cycle_rank;
+        TwoFrameIharaReading {
+            apparent_crossings: self.apparent_crossing_count(),
+            diagram_vertex_count: diagram.vertex_count,
+            diagram_edge_count: diagram.edges.len(),
+            diagram_cycle_rank,
+            source_graph_is_diagram_graph: diagram.vertex_count == self.source_graph.vertex_count
+                && diagram.edges.len() == self.source_graph.edges.len(),
+            dual_cycle_rank_sum,
+            dual_cycle_rank_sum_is_edge_count: dual_cycle_rank_sum == diagram.edges.len()
+                && diagram.edges.len() == face_dual.edge_count,
+            reciprocal_degrees_agree: source.reciprocal_degree == face_dual.reciprocal_degree,
+            first_reciprocal_difference: first_coefficient_difference(
+                &source.reciprocal,
+                &face_dual.reciprocal,
+            ),
+            first_cycle_count_difference: (0..source
+                .primitive_oriented_cycles
+                .len()
+                .min(face_dual.primitive_oriented_cycles.len()))
+                .find(|index| {
+                    source.primitive_oriented_cycles[*index]
+                        != face_dual.primitive_oriented_cycles[*index]
+                })
+                .map(|index| index + 1),
+            source,
+            face_dual,
+        }
+    }
+}
+
 fn determinant(matrix: &[Vec<ExactPolynomial>]) -> Result<ExactPolynomial, ReceiverTopologyError> {
     let size = matrix.len();
     if size > 20 {
@@ -1264,5 +1577,294 @@ mod tests {
         let signature = ihara_signature(&graph, 6).unwrap();
         assert_eq!(signature.primitive_oriented_cycles[2], BigInt::from(8));
         assert_eq!(signature.reciprocal.coefficients[0], BigInt::one());
+    }
+
+    fn complete_graph(vertex_count: usize) -> ExactMultiGraph {
+        let mut edges = Vec::new();
+        for left in 0..vertex_count {
+            for right in (left + 1)..vertex_count {
+                edges.push(GraphEdge {
+                    left,
+                    right,
+                    source: format!("{left}-{right}"),
+                });
+            }
+        }
+        ExactMultiGraph {
+            vertex_count,
+            edges,
+        }
+    }
+
+    fn cycle_graph(vertex_count: usize) -> ExactMultiGraph {
+        ExactMultiGraph {
+            vertex_count,
+            edges: (0..vertex_count)
+                .map(|left| GraphEdge {
+                    left,
+                    right: (left + 1) % vertex_count,
+                    source: format!("c{left}"),
+                })
+                .collect(),
+        }
+    }
+
+    fn bowtie_construction() -> (Construction, Receiver) {
+        let (mut construction, frame) = Construction::new("apparent crossing");
+        construction
+            .add_entity(
+                "self-crossing closed thread",
+                frame,
+                Geometry::Thread {
+                    vertices: vec![
+                        RatVec3::from_i64(0, 0, 0),
+                        RatVec3::from_i64(2, 2, 0),
+                        RatVec3::from_i64(2, 0, 1),
+                        RatVec3::from_i64(0, 2, 1),
+                    ],
+                    closed: true,
+                },
+            )
+            .unwrap();
+        let receiver = Receiver::new(
+            ReceiverId(1),
+            "crossing receiver",
+            frame,
+            ProjectionLaw::Orthographic,
+        );
+        (construction, receiver)
+    }
+
+    #[test]
+    fn the_euler_product_over_primitive_geodesics_reproduces_the_ihara_determinant() {
+        // 2|E| = 12 for K4, so a horizon of 12 compares every coefficient the
+        // determinant carries and withholds none.
+        let signature = ihara_signature(&complete_graph(4), 12).unwrap();
+        let check = cross_check_ihara(&signature);
+        assert_eq!(check.horizon, 12);
+        assert_eq!(check.reciprocal_degree, 12);
+        assert_eq!(check.compared_coefficients, 13);
+        assert_eq!(check.withheld_coefficients, 0);
+        assert_eq!(check.first_disagreement, None);
+        assert!(check.agrees());
+        assert_eq!(check.euler_product_window, check.reciprocal_window);
+    }
+
+    #[test]
+    fn the_k4_determinant_matches_the_published_closed_form() {
+        // A third route, outside this body. Terras gives the Ihara zeta of K4
+        // in factored form as
+        //     Z(u)^-1 = (1 - u^2)^2 (1 - u)(1 - 2u)(1 + u + 2u^2)^3.
+        // Two routes agreeing with each other is weaker evidence than either
+        // agreeing with a source neither of them produced, so the factors are
+        // multiplied out here and compared with the determinant.
+        let factored =
+            ExactPolynomial::from_coefficients(vec![BigInt::one(), BigInt::zero(), -BigInt::one()])
+                .pow(2)
+                .multiply(&ExactPolynomial::from_coefficients(vec![
+                    BigInt::one(),
+                    -BigInt::one(),
+                ]))
+                .multiply(&ExactPolynomial::from_coefficients(vec![
+                    BigInt::one(),
+                    BigInt::from(-2),
+                ]))
+                .multiply(
+                    &ExactPolynomial::from_coefficients(vec![
+                        BigInt::one(),
+                        BigInt::one(),
+                        BigInt::from(2),
+                    ])
+                    .pow(3),
+                );
+        let signature = ihara_signature(&complete_graph(4), 12).unwrap();
+        assert_eq!(signature.reciprocal, factored);
+        assert_eq!(
+            factored.coefficients,
+            vec![1, 0, 0, -8, -6, 0, 16, 24, -3, -16, -24, 0, 16]
+                .into_iter()
+                .map(BigInt::from)
+                .collect::<Vec<_>>()
+        );
+    }
+
+    #[test]
+    fn a_horizon_below_the_determinant_degree_withholds_the_coefficients_it_cannot_determine() {
+        let signature = ihara_signature(&complete_graph(4), 5).unwrap();
+        let check = cross_check_ihara(&signature);
+        assert_eq!(check.compared_coefficients, 6);
+        assert_eq!(check.withheld_coefficients, 7);
+        assert!(check.agrees());
+        // The truncated product is wrong above the horizon, which is exactly
+        // why those coefficients are withheld rather than compared.
+        let full = ihara_euler_product_window(
+            &ihara_signature(&complete_graph(4), 12)
+                .unwrap()
+                .primitive_oriented_cycles,
+        );
+        let truncated = ihara_euler_product_window(&signature.primitive_oriented_cycles);
+        assert_eq!(truncated[..=5], full[..=5]);
+    }
+
+    #[test]
+    fn a_perturbed_primitive_cycle_count_breaks_the_ihara_comparison_at_that_length() {
+        let signature = ihara_signature(&complete_graph(4), 12).unwrap();
+        assert!(cross_check_ihara(&signature).agrees());
+        for length in 1..=12usize {
+            for delta in [1i64, -1] {
+                let broken = cross_check_ihara_perturbed(&signature, &[(length, delta)]);
+                assert_eq!(
+                    broken.first_disagreement,
+                    Some(length),
+                    "perturbing length {length} by {delta} must first disagree at degree {length}"
+                );
+                let moved = &broken.euler_product_window[length]
+                    - &cross_check_ihara(&signature).euler_product_window[length];
+                assert_eq!(moved, BigInt::from(-delta));
+            }
+        }
+    }
+
+    #[test]
+    fn a_pendant_vertex_lies_on_no_closed_geodesic_and_drops_the_determinant_degree() {
+        // A triangle with one pendant edge. `2|E|` is 8, but the leading
+        // coefficient of `det(I - Au + (D - I)u^2)` is `prod (deg - 1)`, which
+        // the degree-one vertex sends to zero. The degree is `2|E|` of the
+        // two-core, and both routes see only the triangle.
+        let graph = ExactMultiGraph {
+            vertex_count: 4,
+            edges: [(0, 1), (1, 2), (2, 0), (0, 3)]
+                .into_iter()
+                .map(|(left, right)| GraphEdge {
+                    left,
+                    right,
+                    source: format!("{left}-{right}"),
+                })
+                .collect(),
+        };
+        let signature = ihara_signature(&graph, 8).unwrap();
+        let check = cross_check_ihara(&signature);
+        assert_eq!(check.reciprocal_degree, 6);
+        assert!(check.reciprocal_degree < 2 * graph.edges.len());
+        assert_eq!(signature.primitive_oriented_cycles[2], BigInt::from(2));
+        assert!(check.agrees());
+        // Identical to the two-core's reciprocal: the pendant edge is invisible
+        // on both routes rather than absorbed differently by each.
+        let triangle = cycle_graph(3);
+        assert_eq!(
+            signature.reciprocal,
+            ihara_signature(&triangle, 8).unwrap().reciprocal
+        );
+    }
+
+    #[test]
+    fn a_perturbation_above_the_horizon_is_outside_the_compared_window() {
+        let signature = ihara_signature(&complete_graph(4), 5).unwrap();
+        let untouched = cross_check_ihara_perturbed(&signature, &[(9, 1)]);
+        assert!(untouched.agrees());
+        assert_eq!(untouched.withheld_coefficients, 7);
+    }
+
+    #[test]
+    fn the_four_cycle_reciprocal_is_the_square_of_one_minus_u_to_the_fourth() {
+        let signature = ihara_signature(&cycle_graph(4), 8).unwrap();
+        assert_eq!(
+            signature.reciprocal.coefficients,
+            vec![
+                BigInt::one(),
+                BigInt::zero(),
+                BigInt::zero(),
+                BigInt::zero(),
+                BigInt::from(-2),
+                BigInt::zero(),
+                BigInt::zero(),
+                BigInt::zero(),
+                BigInt::one(),
+            ]
+        );
+        assert_eq!(signature.primitive_oriented_cycles[3], BigInt::from(2));
+        let check = cross_check_ihara(&signature);
+        assert!(check.agrees());
+        assert_eq!(check.withheld_coefficients, 0);
+    }
+
+    #[test]
+    fn the_square_and_its_face_dual_are_two_frames_carrying_one_identity() {
+        let (mut construction, frame) = Construction::new("square");
+        construction
+            .add_entity(
+                "closed square",
+                frame,
+                Geometry::Thread {
+                    vertices: vec![
+                        RatVec3::from_i64(-1, -1, 0),
+                        RatVec3::from_i64(1, -1, 0),
+                        RatVec3::from_i64(1, 1, 0),
+                        RatVec3::from_i64(-1, 1, 0),
+                    ],
+                    closed: true,
+                },
+            )
+            .unwrap();
+        let receiver = Receiver::new(
+            ReceiverId(1),
+            "square receiver",
+            frame,
+            ProjectionLaw::Orthographic,
+        );
+        let topology = analyze_receiver_topology(&construction, &receiver, 8).unwrap();
+        let reading = topology.two_frame_ihara_reading();
+
+        // The identity is what does not move.
+        assert!(reading.source.cross_check.agrees());
+        assert!(reading.face_dual.cross_check.agrees());
+
+        // With no apparent crossing the source graph is the diagram graph, so
+        // the two frames are a genuine planar dual pair.
+        assert_eq!(reading.apparent_crossings, 0);
+        assert!(reading.source_graph_is_diagram_graph);
+        assert_eq!(reading.source.edge_count, reading.face_dual.edge_count);
+        assert!(reading.reciprocal_degrees_agree);
+        assert_eq!(reading.source.reciprocal_degree, 8);
+
+        // The cycle ranks are complementary and sum to the shared edge count.
+        assert_eq!(reading.source.cycle_rank, 1);
+        assert_eq!(reading.face_dual.cycle_rank, 3);
+        assert!(reading.dual_cycle_rank_sum_is_edge_count);
+
+        // And the orbit is not trivial: the two frames' returns differ.
+        assert_eq!(reading.first_reciprocal_difference, Some(2));
+        assert_eq!(reading.first_cycle_count_difference, Some(2));
+    }
+
+    #[test]
+    fn an_apparent_crossing_separates_the_source_graph_from_the_frame_the_face_dual_is_dual_to() {
+        let (construction, receiver) = bowtie_construction();
+        let topology = analyze_receiver_topology(&construction, &receiver, 12).unwrap();
+        let reading = topology.two_frame_ihara_reading();
+
+        assert_eq!(reading.apparent_crossings, 1);
+        assert!(!reading.source_graph_is_diagram_graph);
+        assert_eq!(reading.source.edge_count, 4);
+        assert_eq!(reading.diagram_edge_count, 6);
+        assert_eq!(reading.face_dual.edge_count, 6);
+
+        // The identity still holds in both frames.
+        assert!(reading.source.cross_check.agrees());
+        assert!(reading.face_dual.cross_check.agrees());
+
+        // `2|E|` is the invariant, and it is shared by the diagram graph and
+        // its dual rather than by the source graph and the dual.
+        assert_eq!(reading.source.reciprocal_degree, 8);
+        assert_eq!(reading.face_dual.reciprocal_degree, 12);
+        assert!(!reading.reciprocal_degrees_agree);
+        let diagram = diagram_graph(&topology);
+        let diagram_signature = ihara_signature(&diagram, 12).unwrap();
+        assert_eq!(
+            diagram_signature.reciprocal.coefficients.len() - 1,
+            2 * reading.diagram_edge_count
+        );
+        assert!(cross_check_ihara(&diagram_signature).agrees());
+        assert!(reading.dual_cycle_rank_sum_is_edge_count);
     }
 }
