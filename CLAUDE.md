@@ -1145,6 +1145,24 @@ grade that `blueprint/THE_ROADMAP.md` holds open.
    lawful; a scalar that governs is not. Reading a banned token as a banned *concept* is the failure
    this rule now exists to prevent, and §L's standing reading rule governs it: *"`No X inside Soma
    by analogy` must never again mean `do not learn from X`."*
+
+   **And the inverse failure is live, convicted 2026-08-08: renaming a lawful thing to make it
+   sound lawful.** The assistant described `conditioned_derivation`'s frequency criterion as
+   "recurrence" and then argued *from the renaming* that frequency was forbidden. Brandon, ruling
+   directly: *"you've been masking frequency as 'recurrence'? That's dumb. It's just frequency, but
+   you're not authorized to control frequencies, it is a part of the machine's mechanics regarding
+   Information Theory, probability, and loss."*
+
+   **Frequency is `Π`, the lived construction.** It is what happened; it is not the assistant's to
+   gate. **Probability is `Q`**, and `FORMULA.md:2459` fixes what that means, ratified: *"A
+   probability distribution over which event will be received is an observer's declared quotient
+   over what that observer does not carry… This law requires neither microscopic quantum randomness
+   nor a probability head."* A frequency becomes a probability only under a **declared receiver**,
+   and being a quotient its loss is exhibitable as a separating word.
+
+   **Count freely. Report what you count. Never let a count quietly decide.** The full statement,
+   including what a probability deletes — the phase, as the fourth carrier of the one deletion — is
+   `canon/THE_HOLOBROCHOS_SPINE.md` §3b.
 3. **Superseded production machinery fails closed.** It is removed, not deprecated; git history is
    the recovery surface. The scorer, the schema, and the constant-subtraction ablation were removed
    this way and are recoverable only at `2b562c8`. The same excision *failed* the rule for the 66

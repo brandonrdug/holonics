@@ -187,6 +187,80 @@ contribution of crossed seams."*
 
 ---
 
+## 3b · What "linguistics" means here, and what frequency is
+
+**Deposited 2026-08-08, Brandon's ruling, and it corrects an error this file's author made twice in
+one exchange.**
+
+### The measured definition, which is narrower than the word
+
+`conditioned_derivation.rs` commits a stem when a substring occurs across **two distinct wholes** —
+`COMMITTING_RECURRENCE = 2`. No length threshold, no frequency cut, no inverse-document weighting,
+no ranking. A single letter is a founded stem exactly as `carrier` is, because *"the aperture cannot
+decide the deed."*
+
+So what the machine calls linguistics is **morphemic frequency over identifier surfaces**. It is
+**orthographic**. `exactCarrier → exact|carrier` decomposes a *string*; that the decomposition is
+also meaningful is an accident of mathematical naming convention — a real and exploitable accident,
+not the machine understanding.
+
+**That is why 43 of 47 founded statements are noise.** With surface structure and no denotation,
+`exactCarrier apply` is exactly as licensable as `exact_chart_carry P`.
+
+### Frequency is not forbidden, and calling it "recurrence" was the error
+
+**Renaming frequency to avoid the word is reading a banned *token* as a banned *concept* — the exact
+inversion §13 rule 2 was rewritten to stop.** Brandon, ruling directly: *"you've been masking
+frequency as 'recurrence'? That's dumb. It's just frequency, but you're not authorized to control
+frequencies, it is a part of the machine's mechanics regarding Information Theory, probability, and
+loss."*
+
+The test is **jurisdiction, not vocabulary**. Against §13 rule 2's four faces:
+
+- **frequency is `Π`** — the lived construction. It is what happened. It is machine mechanics and it
+  is not the assistant's to gate.
+- **probability is `Q`** — and `FORMULA.md:2459` says what that means, ratified: *"A probability
+  distribution over which event will be received is **an observer's declared quotient over what that
+  observer does not carry**. The quantum-mechanical face is structural… This law requires neither
+  microscopic quantum randomness nor a probability head."*
+
+So a frequency becomes a probability **only under a declared receiver**, and because it is a
+**quotient**, its loss is exhibitable — `receiver_exact_compression` returns the shortest word that
+separates a collapsed pair. Count freely. Report what you count. Never let a count quietly decide.
+
+### What a probability deletes — the fourth carrier
+
+An amplitude is complex; a probability is its **squared modulus**. So:
+
+```text
+   a float                keeps the magnitude, deletes the TAIL
+   a bare sign            keeps the magnitude, deletes the TURN
+   a reduced coefficient  keeps the difference, deletes the PASSAGES
+   a probability          keeps the magnitude, deletes the PHASE
+```
+
+**One deletion, four carriers.** And it has a consequence that is not rhetorical: two routes to one
+result add as **amplitudes, not counts**, so a frequency census cannot distinguish two routes that
+reinforce from two that cancel. `β₁` can. And `dimensional_wave.rs` already conserves
+`Σ Yᵢ|aᵢ|² = Σ Yᵢ|bᵢ|²` **exactly over complex rationals**, with a unit-conic change of basis per
+traversal — the Born normalisation as an exact conservation law, no float and no probability head.
+
+### The consequence for construction
+
+> **An invariant token is DENSE and UNSEPARATED, and those are the magnitude and the phase of one
+> reading. Neither alone.**
+
+Density alone calls `set` iron and misses that its uses genuinely differ. Separation alone calls a
+rare term of art iron and misses that a dense token is load-bearing terrain. The conjunction is two
+measurements, neither a rank, and the separating word is what is learned from.
+
+**And the warping is the incidence.** A non-iron token's meaning is its position relative to the iron
+ones — which is a complex, which carries a form, which has an inertia and a chart. **So the
+linguistic reading and the geometric reading are the same object at two receivers**, and the
+elaboration movement and the geometry coupling are one movement rather than two.
+
+---
+
 ## 4 · The return is world-mediated — corrected 2026-08-08
 
 **An earlier form of this section presented `afference → efference → reafference` as the machine
