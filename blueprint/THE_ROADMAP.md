@@ -121,18 +121,114 @@ Brandon as a choice between them; it is not a choice and the composition is stat
 derivations and analysing them as grown circuits.** A derivation *is* a circuit. Analysing it is
 reading its invariants. The named pieces are the operations that reading needs:
 
-| piece | what it is in the line | state |
+| piece | what it is in the line | owner |
 |---|---|---|
-| **codec recovery** | the decomposition must be **recovered**, never authored. A tokenizer is a codec; braille, morse and colour are the same operation on other surfaces. Hand-auditing one is not work. | `crates/holonic-engine/src/bit_causal.rs` recovers opaque bit transducers; the symbol-transducer analogue is being built |
-| **integration through reflection** | the derivation is traversed as an exact **running sum**, and two paths enclosing one region are compared as a pair whose disagreement is **deposited as holonomy** rather than refined away | `Derive_FTC.lean` proves `∂`/`∫` inverse in the frozen laboratory; the Rust owner is being built |
-| **curvature loop** | where those paths disagree is curvature, and it lives on the hinges. `coordination_defect` computes the disclination charge and `geometry_responses` never consumes it — the loop is drawn and open | being built |
-| **sphere packing** | Brandon's lightning-leader quadrature: the integration paths are **leaders extending along founded paths**, not spheres radiating. The packing of their reach is the area, and the pathway population is the phase distribution | being built |
-| **skein relations** | when two derivations are the **same theorem**: related by local substitutions that preserve the invariant. Supplied 2026-07-24 as *"pivotal for the Riemann Hypothesis and how we define compression for machine learning"* | `crates/holonic-engine/src/skein.rs` |
-| **atlas reader** | what lets any of it be read back rather than emitted into a directory nothing opens | open |
+| **codec recovery** | the decomposition must be **recovered**, never authored. A tokenizer is a codec; braille, morse and colour are the same operation on other surfaces. | `bit_causal.rs`, `codec_recovery.rs`, `derivation_codec_intake.rs` |
+| **integration through reflection** | the derivation traversed as an exact running sum; two paths enclosing one region compared as a pair whose disagreement is **deposited as holonomy** rather than refined away | `derivation_integral.rs`, `running_integral.rs`, `temper.rs` |
+| **curvature loop** | where those paths disagree is curvature, and it lives on the hinges | `derivation_curvature.rs`, `curvature_bridge.rs`, `discrete_curvature.rs` |
+| **skein relations** | when two derivations are the **same theorem**: related by local substitutions preserving the invariant | `skein.rs`, `derivation_skein.rs`, `substitution_realizers.rs` |
+| **the reading** | the production read back as a circuit with integer invariants and per-cell provenance | `derivation_atlas.rs`, `rebase_invariants.rs`, `conditioned_derivation.rs` |
 
 **Lean is an export codec**, not a judge and not the proof line — see the redirection at Part two.
 The machine produces the derivation and analyses it internally; Lean formalizes what was already
 produced so it can be verified and cited.
+
+---
+
+## THE INSTANCE — what is actually being built, and its five joins
+
+**Ratified 2026-08-08.** *"proceed to the point where we can conduct research using the holonic
+engine in order to emerge an instance of Eros that specializes in mathematics and linguistics around
+mathematics."*
+
+**Every organ this needs exists. The work is joining them, and there are five joins.** No new theory
+is required and none is open. This section is the plan and it is adhered to; movements elsewhere in
+this document are subordinate to it until it returns.
+
+### The body already exists and states its own receiver question
+
+`crates/holonic-engine/src/conditioned_derivation.rs`, module header, verbatim:
+
+> *"Can a body conditioned on linguistic material derive mathematics that the same body,
+> unconditioned, cannot — and can we read what it derived as a circuit?"*
+
+It carries all three parts on one carrier: `FoundedMorphology` (the conditioning, with per-stem
+lineage), `DerivedPassage` (the production, each carrying the bridge that licensed it),
+`ConditionedCircuit` (that production as a `GradedCausalComplex`), and `provenance`, the map from
+each cell back to the passages that founded it. `ConditionedBody` holds `condition`,
+`carry_morphology`, `derive`, `passages`, `standing_statements`, `recruited_population`.
+
+**And its governing law is already the ablation.** An unconditioned morphology commits no stem, so
+no two identifiers share one, no bridge is licensed, and `derive` returns the **empty population**.
+The conditioning is on the causal path, not beside it — which is precisely the ablation shape
+`CLAUDE.md` §5 says is owed and has never existed here.
+
+### What distinguishes an instance from a run
+
+A run conditions, produces, prints, and exits. **An instance** conditions on a declared corpus,
+produces, reads its own production as a circuit, **returns that reading into the next production**,
+and **rests so it can be remounted and resume without its corpus**. Four properties, five joins.
+
+| join | from | to | state |
+|---|---|---|---|
+| **the corpus is real** | `soma/life` `text_material` + `morphological_language` + `causal_language` | `conditioned_derivation::{expose, condition}` | **in flight** |
+| **the reading returns** | `derivation_atlas::{invariant_movement, route_movement}`; `temper` ⇄ `derivation_integral` through `Cochain` | the next production, as material | **in flight** |
+| **the measure is situated** | `surprisal.rs` + `FoundedMorphology::unconditioned()` as the declared null | the residual as a population, ordering may be `Open` | **in flight** |
+| **the instance rests and remounts** | `soma/life/src/form_mouth.rs`, `soma/tools/holon-plate` | a body that resumes from bytes with the corpus absent | **open** |
+| **the research act** | all four | a returned mathematical artifact on a question the standing deposit does not carry | **open** |
+
+### The joins, each with its falsifier
+
+**The corpus is real.** Today the exposures are string literals authored in
+`examples/conditioned_derivation_body.rs`. `soma/life/src/text_material.rs` is the real intake owner
+and is reached by no driver. `soma/life` depends on `holonic-engine`, so a `life` driver may call
+both; the reverse is a Cargo cycle and always will be.
+*Falsifier:* the unconditioned control emits **zero** passages on the same query and standing, and
+the conditioned body emits at least one whose bridge stem is founded by a **nameable corpus
+document**. Plus a corpus ablation returning the passage **population** that appeared or departed —
+not a count delta.
+
+**The reading returns.** The measured defect: `invariant_movement` and `route_movement` are called
+from one place, inside a `main`, and printed. `temper` and `derivation_integral` produce exactly what
+each other consume, through `Cochain`, in both directions, and neither file references the other.
+*Falsifier:* the current body's second production is bit-identical to its first — confirm that
+first. After: the movement is non-zero and **attributable**, each changed thing naming the earlier
+return that caused it. Plus a no-op control: a reading that moves nothing leaves the next production
+bit-identical. And **name the cut** — circulation, rest, accumulation, leak, short circuit — before
+and after.
+
+**The measure is situated.** `surprisal.rs` holds the exact ℚ-linear form over the primes and has
+zero consumers. Soma's law: comparison is situated by a frame and is therefore at least
+frame/object/object; a measure from one body is not a comparison. The null is already in the tree —
+`FoundedMorphology::unconditioned()` on identical material.
+*Falsifier:* on material with no structure to found, the situated read returns **zero against the
+null** while the one-body read returns something. And `Open` must actually occur at some declared
+grain with both members retained — a four-state ordering that never returns `Open` has not been
+exercised.
+
+**The instance rests and remounts.** `form_mouth` seals octets to a content-addressed path and
+`holon-plate` reads them from above. This is what makes the body an instance rather than a process.
+*Falsifier:* a body remounted **from bytes alone, with the corpus directory absent**, derives the
+same passages; and derives at least one passage it had not derived before remount, on a query it had
+not been asked. Source departure is the point — the laboratory's own strongest result had it.
+
+**The research act.** Pose a mathematical question the standing deposit does not reach; let the
+instance produce; read the production as a circuit; return the artifact.
+*Falsifier:* the returned passage reaches a statement absent from `standing_statements()`, its
+bridge names the stem and the corpus document that founded it, and the circuit's `β₁` exhibits at
+least two independent routes to one result — the plurality that is the return, as an exact integer,
+never a probability over tactics.
+
+### What this line does NOT do
+
+- It does not claim RH, Hodge, or any Millennium result, and no movement here is graded by movement
+  on one. *"A construction useful for RH must be pulled back from the actual completed zeta
+  relation; a suggestive geometric image does not become an RH object merely by resemblance."*
+- It does not call the returned edge learning, consequence, or comprehension. `CLAUDE.md` §6.
+- It does not introduce a score. The return is a population; where it cannot be ordered, it is
+  `Open`, and `Open` is retained rather than resolved.
+- It does not wait on the dead-organ sweep. `surprisal` and `temper` are wired **by these joins**;
+  `kelvin` and `communication` are not on this line and get a driver or removal on their own terms.
 
 **What is explicitly NOT this line, and has been refused twice:** the tiger phase atlas, landscape
 photography, music decomposition. Those are *material*, and choosing material as the subject is the
