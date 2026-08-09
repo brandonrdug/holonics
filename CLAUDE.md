@@ -462,9 +462,33 @@ target.**
   axis takes `agreement_rank` 3 → 2 and complete paths 1 → **2**, so *withholding structure
   increases plurality* rather than decrementing a number; this is the shape to imitate.
   Reference-vs-return (`bit_causal.rs`: inspecting a reference leaves the rest image bytewise
-  unchanged). The fourth — **deleting a founded fiber and re-querying** — has no implementation in
-  the laboratory or here; `git grep 'fn remove|fn forget|fn prune|fn ablate'` over the training
-  owners returns nothing. §13 rule 1's strict form is therefore **owed construction, not a port.**
+  unchanged).
+
+  **The fourth — deleting a founded fiber and re-querying — WAS said here to have no implementation
+  anywhere. That is false of the body, and corrected 2026-08-08.** It exists as
+  `FoundedMorphology::without_stem` (`conditioned_derivation.rs:352`) and
+  `ConditionedBody::without_stem` (`:1362`), and it is driven **with both controls** at
+  `derivation_codec_intake.rs:1250-1300`: a committed stem the material never exercises, whose
+  removal must leave the reading **indistinguishable**; and then, *in canonical order rather than
+  chosen*, the first reaching stem whose removal **moves** the reading, required to exhibit the
+  distinguishing word. Also driven at `examples/foreign_codec_intake.rs:805,833`.
+
+  **The claim was an artifact of its own grep.** The pattern was
+  `fn remove|fn forget|fn prune|fn ablate`, and the owner is named `fn without_stem` — a word the
+  pattern could not match. An absence claim is a measurement and decays like one; this one was
+  false on the day it was written.
+
+  **What remains true, narrowly:** no deletion primitive exists on the `soma/life` **training**
+  owners — `holonic_training.rs` and the language ecologies — which is the scope the grep was
+  actually run over. So §13 rule 1's strict form is **owed on the training body and already met on
+  the conditioned-derivation morphology.** State it that way; do not restate the general form.
+
+  **And there is one live boundary on it**, found 2026-08-08 by building the rest wire:
+  `without_stem` retains the surviving stems' original `StemId`s, while `from_founded_words` —
+  the only foreign constructor — *derives* ids from arrival order. An ablated morphology therefore
+  cannot round-trip through that seam, and `soma/life/src/conditioned_rest.rs` refuses such a body
+  **at the seal, by name, with a negative control**, rather than sealing something it cannot
+  reproduce. Lifting it needs `FoundedMorphology::from_founded_stems(Vec<FoundedStem>)`.
 - **Multimodality with no fusion module and no pair product.** RELAMPAGO: optical, five-band
   spectral, geolocation, and vertical sections on one eighteen-coordinate phase face; 24,584 and
   21,147 relations opened with zero pair overlap and the complete pair product never enumerated;
