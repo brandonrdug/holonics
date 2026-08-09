@@ -596,6 +596,43 @@ construction"* (it is driven in four places), and §11's reach figure for the re
 > calibrated to the generated deposit; re-pointing without re-calibrating is the same aperture defect
 > in the other direction.
 
+### RETURNED 2026-08-09 — position, and the proof body as a leader
+
+> **Depth is a chart index, not a counter.** Ratified by Brandon and grounded in Soma. Record:
+> [`research/records/2026-08-09_POSITION_IS_RELATIVE_TO_A_FRAME_AND_THE_PROOF_BODY_IS_A_LEADER.md`](../research/records/2026-08-09_POSITION_IS_RELATIVE_TO_A_FRAME_AND_THE_PROOF_BODY_IS_A_LEADER.md).
+>
+> `FORMULA.md` §XVI: *"`frame(n+1)` is the emanation of the relating in `frame(n)`"*, and
+> `manifold.rs`: *"a completion at depth k is an arrival at depth k+1 — the same node, the same
+> verb… the illicium is depth-recursive; the hourglass nests."* So *"no root carries a constituent
+> past depth one"* never meant shallow — it meant **the machine had never once changed charts inside
+> a meaning.**
+>
+> **Position.** One structural rule — *inside a binder group the names before the `:` are founded and
+> the type after it is recruited* — removes `hc`, `hcong`, `hm`, `hn`, `hz`, `hnm` from the term
+> population **with no authored list of names**. Tactics are **returned beside** the terms, never
+> deleted, because a route's tactic choice is real production; `ConductGrain` is the declared
+> aperture. `144 terms · 38 tactics · 64 local bindings`. Five position defects found by running,
+> each structural — the sharpest being that `'` was not admitted in an identifier, so **`hab'` and
+> `hab` were one name**.
+>
+> **The null holds: cleaning moved no mathematical edge.** 80 declared→declared, against the 80
+> measured before position existed.
+>
+> **The sub-illicium.** A proof body's binding steps are declarations one grain down. **57 steps, 29
+> internal arrivals, 7 declarations carrying their own depth** — `hcap@74 → hcap_pos@80`,
+> `b'@43 → rfl@43 → hab@45`. Arrivals are indexed by **step**, not name, because Lean shadows and
+> keying by name would merge two objects — the same defect one grain further down.
+>
+> Nine controls, all held. `1724 passed, 0 failed, 14 ignored.`
+>
+> **Still open, and it is the accumulation cut.** The walk does not **rebase**: `name_elaboration`
+> reads the same global map at every depth, so its jet never moves — dead reckoning, which W9 rules
+> out. And `depths` is retained then collapsed onto one 0-cell per name, so a constituent reached at
+> two depths is one vertex although two depths are two frames; the cycle it closes is read as `β₁`
+> where it is **holonomy**. Splitting that vertex by frame and depositing the disagreement through
+> `temper`/`derivation_integral` is the remaining construction, and it is the engine's missing
+> `q_n = q_m`.
+
 ### The movement as it was written
 
 **Ratified 2026-08-08 by Brandon's correction, and it replaces a wall with four constructions that

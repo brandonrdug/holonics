@@ -81,7 +81,7 @@ use std::path::{Path, PathBuf};
 
 use holonic_engine::derivation_atlas::{read_derivation, Derivation};
 use holonic_engine::lean_development::{
-    join, read_development, DeclarationGrain, DevelopmentReading,
+    join, read_development, ConductGrain, DeclarationGrain, DevelopmentReading,
 };
 use holonic_engine::name_elaboration::{ElaborationAperture, ElaborationDeposit};
 
@@ -99,6 +99,13 @@ const MINIMUM_RECRUITING: usize = 40;
 
 /// Tokens the probe found in doc comments and nowhere else. English, not mathematics.
 const COMMENT_PROSE: [&str; 6] = ["Consequently", "Different", "Every", "If", "It", "No"];
+
+/// Proof-local hypothesis binders measured in the term population BEFORE position existed. Two
+/// characters, so the single-character binder rule could not reach them.
+const BINDER_CONTAMINANTS: [&str; 6] = ["hc", "hcong", "hm", "hn", "hz", "hnm"];
+
+/// Tactic heads measured in the term population before position existed.
+const TACTIC_CONTAMINANTS: [&str; 6] = ["intro", "apply", "exact", "rw", "simp", "classical"];
 
 /// Modifiers that may precede a top-level former.
 const MODIFIERS: [&str; 6] = [
@@ -171,6 +178,8 @@ fn main() {
     control_one_the_chain(&plural, &mut controls);
     control_two_the_aperture(&development_paths, &plural, &historical, &mut controls);
     control_three_the_commentary(&plural, &mut controls);
+    control_eight_position(&plural, &mut controls);
+    control_nine_sub_illicium(&plural, &mut controls);
     control_six_the_elaboration_deepens(&plural, &mut controls);
 
     let generated_paths = lean_paths(&generated_root);
@@ -511,6 +520,180 @@ fn control_three_the_commentary(
 // Controls 4 and 5 -- the null control on the generated deposit
 // -------------------------------------------------------------------------------------------------
 
+/// Control 8 -- position removes the named contaminants and moves no mathematical edge.
+fn control_eight_position(plural: &DevelopmentReading, controls: &mut Vec<(bool, String, String)>) {
+    section("CONTROL 8 -- POSITION, AND THE EDGES IT MUST NOT MOVE");
+
+    println!("\n  `FORMULA.md` §XVI: the illicium is friction, and `medium.rs`: \"Many faces from one");
+    println!("  point IS the illicium and friction\". A reading with one face per point feels nothing.");
+    println!("  Every name now carries a POSITION read from Lean's own grammar -- inside a binder");
+    println!("  group the names before the `:` are founded and the type after it is recruited.\n");
+
+    let terms: BTreeSet<&str> = plural
+        .declarations
+        .iter()
+        .flat_map(|form| form.recruited.keys().map(String::as_str))
+        .collect();
+    let bindings: BTreeSet<&str> = plural
+        .declarations
+        .iter()
+        .flat_map(|form| form.local_bindings.keys().map(String::as_str))
+        .collect();
+    let tactics: BTreeSet<&str> = plural
+        .declarations
+        .iter()
+        .flat_map(|form| form.tactics.keys().map(String::as_str))
+        .collect();
+
+    // A leak is EXHIBITED with the declarations holding it, never counted. A count cannot be
+    // diagnosed and a residue that cannot be diagnosed becomes permanent.
+    let holders = |name: &str| -> Vec<&str> {
+        plural
+            .declarations
+            .iter()
+            .filter(|form| form.recruited.contains_key(name))
+            .map(|form| form.name.as_str())
+            .collect()
+    };
+
+    println!("  {:<22} {:>14}   {}", "name", "now", "still a term in");
+    println!("  {}", "-".repeat(76));
+    let mut binders_clean = true;
+    let mut tactics_clean = true;
+    for (population, expect_binding) in [(&BINDER_CONTAMINANTS[..], true), (&TACTIC_CONTAMINANTS[..], false)] {
+        for name in population {
+            let place = if bindings.contains(name) {
+                "local binding"
+            } else if tactics.contains(name) {
+                "tactic"
+            } else {
+                "UNPLACED"
+            };
+            let held = holders(name);
+            let placed = if expect_binding {
+                bindings.contains(name)
+            } else {
+                tactics.contains(name)
+            };
+            // One reconciliation, and it is the position law demonstrating itself: `Compression`
+            // declares a STRUCTURE FIELD named `exact`. The same surface is a tactic in one frame
+            // and a field in another, so `exact` in term position there is correct and the control
+            // requires exactly that holder and no other.
+            let reconciled: &[&str] = if *name == "exact" { &["Compression"] } else { &[] };
+            let unexplained: Vec<&&str> =
+                held.iter().filter(|holder| !reconciled.contains(holder)).collect();
+            if expect_binding {
+                binders_clean &= placed && unexplained.is_empty();
+            } else {
+                tactics_clean &= placed && unexplained.is_empty();
+            }
+            println!(
+                "  {name:<22} {place:>14}   {}",
+                if held.is_empty() {
+                    "-".to_owned()
+                } else {
+                    held.join(", ")
+                }
+            );
+        }
+    }
+
+    println!("\n  RECONCILED, and it is the position law demonstrating itself on real material:");
+    println!("  `structure Compression … where … exact : ∀ i x, factor i (quotient x) = receiver i x`");
+    println!("  declares a FIELD named `exact`. The same surface is a tactic in one frame and a");
+    println!("  field in another, which is what it means for position to be relative to a frame.");
+
+    println!("\n  populations, over the whole development");
+    println!("  --------------------------------------");
+    println!("    terms            {:>6} distinct", terms.len());
+    println!("    tactics          {:>6} distinct", tactics.len());
+    println!("    local bindings   {:>6} distinct", bindings.len());
+
+    println!("\n  THE NULL: cleaning must move no mathematical edge. The declared -> declared");
+    println!("  population is computed from terms alone and is compared against control 1's figure,");
+    println!("  which was measured BEFORE position existed. A cleaning that changed it would have");
+    println!("  deleted or manufactured a join.");
+    let edges: usize = plural
+        .declared_recruitment()
+        .values()
+        .map(BTreeSet::len)
+        .sum();
+    println!("    declared -> declared edges  {edges}  against control 1's {EDGES}");
+
+    println!("\n  the two bounding instruments, each returned rather than acted on");
+    println!("  ----------------------------------------------------------------");
+    let tactic_declared = plural.tactic_position_declared();
+    println!(
+        "    structural residue -- declared names found in tactic position: {}",
+        tactic_declared.len()
+    );
+    for (name, holders) in tactic_declared.iter().take(6) {
+        println!("      {name:<32} in {}", holders.join(", "));
+    }
+    let singular = plural.single_occurrence_terms();
+    println!(
+        "    distributional residue -- terms in exactly one declaration, declared nowhere: {}",
+        singular.len()
+    );
+    println!("      (environment lemmas used once are indistinguishable from a missed local");
+    println!("       binding without a second frame, so the population is returned, not subtracted)");
+
+    controls.push((
+        binders_clean && tactics_clean && edges == EDGES,
+        "control 8 -- binders and tactics leave the term population, and no edge moves".to_owned(),
+        format!(
+            "{} terms, {} tactics, {} bindings, {edges} edges",
+            terms.len(),
+            tactics.len(),
+            bindings.len()
+        ),
+    ));
+}
+
+/// Control 9 -- the sub-illicium: a completion at depth k is an arrival at depth k+1.
+fn control_nine_sub_illicium(
+    plural: &DevelopmentReading,
+    controls: &mut Vec<(bool, String, String)>,
+) {
+    section("CONTROL 9 -- THE SUB-ILLICIUM: A COMPLETION IS AN ARRIVAL ONE GRAIN UP");
+
+    println!("\n  `soma/body/src/manifold.rs`, W9: \"the sub-illicium -- the atom-grain traversal given");
+    println!("  the SAME live law, so the walk FEELS the standing terrain instead of dead reckoning.");
+    println!("  Its completions are THE FOLDS -- handed up as the word grain's arrivals.\" And the");
+    println!("  carrier law: \"a completion at depth k is an arrival at depth k+1 -- the same node,");
+    println!("  the same verb.\"\n");
+
+    let steps: usize = plural.declarations.iter().map(|form| form.steps.len()).sum();
+    let arrivals: usize = plural
+        .declarations
+        .iter()
+        .map(|form| form.internal_arrivals().len())
+        .sum();
+    let depths = plural.internal_depths();
+
+    println!("  proof steps founded across the development   {steps:>5}");
+    println!("  internal arrivals (step recruits step)       {arrivals:>5}");
+    println!("  declarations with an internal depth > 1      {:>5}", depths.len());
+
+    println!("\n  every declaration whose proof body carries its own depth");
+    println!("  --------------------------------------------------------");
+    for (name, chain) in &depths {
+        println!("    {name:<44} {}", chain.join("  ->  "));
+    }
+
+    println!("\n  The flat reading charged every one of these bodies to its theorem as a DEPTH-ONE");
+    println!("  STAR, so a declaration's own depth was zero by construction. This is the leader");
+    println!("  inside one declaration: each step changes the material the next step reads.");
+
+    let held = steps > 0 && arrivals > 0 && !depths.is_empty();
+    controls.push((
+        held,
+        "control 9 -- the proof body founds steps and a later step arrives at an earlier one"
+            .to_owned(),
+        format!("{steps} steps, {arrivals} arrivals, {} with depth > 1", depths.len()),
+    ));
+}
+
 /// Control 4 -- nothing is invented, checked against a second scanner on both materials.
 fn control_four_no_over_parsing(
     materials: &[(&str, &[PathBuf])],
@@ -651,12 +834,15 @@ fn control_five_and_seven_the_generated_deposit(
         }
         let dropped = subtract(&old.recruited, &form.recruited);
         let added = subtract(&form.recruited, &old.recruited);
-        // The old reader charged the preamble AND the `namespace X` line to the declaration. Both
-        // are accounted here by name; nothing else may differ.
+        // The old reader charged five populations to the one declaration: the terms, the tactic
+        // heads, the names the declaration's own text founds, the file preamble, and the
+        // `namespace X` scope line. Each is accounted here by name; nothing else may differ.
         let mut set_aside = new.preamble.clone();
-        for (token, count) in &new.scoping {
-            let slot = set_aside.entry(token.clone()).or_insert(0u32);
-            *slot = slot.saturating_add(*count);
+        for population in [&new.scoping, &form.tactics, &form.local_bindings] {
+            for (token, count) in population {
+                let slot = set_aside.entry(token.clone()).or_insert(0u32);
+                *slot = slot.saturating_add(*count);
+            }
         }
         let accounted: BTreeMap<String, u32> = dropped
             .iter()
@@ -681,7 +867,7 @@ fn control_five_and_seven_the_generated_deposit(
     println!("    single-declaration artifacts       {single:>5}");
     println!("    same declared name                 {same_name:>5}");
     println!("    same statement text                {same_statement:>5}");
-    println!("    difference is preamble + scoping   {difference_is_preamble:>5}");
+    println!("    difference accounted by name       {difference_is_preamble:>5}");
     if let Some(divergence) = &first_divergence {
         println!("    first divergence: {divergence}");
     }
@@ -697,7 +883,7 @@ fn control_five_and_seven_the_generated_deposit(
         && difference_is_preamble == single;
     controls.push((
         parity,
-        "control 5 -- parity where the historical aperture is exact, difference exactly preamble + scoping"
+        "control 5 -- parity where the historical aperture is exact, every dropped token accounted"
             .to_owned(),
         format!("{single} single-declaration artifacts, {difference_is_preamble} accounted"),
     ));
@@ -724,7 +910,7 @@ fn control_six_the_elaboration_deepens(
 ) {
     section("CONTROL 6 -- THE ELABORATION REACHES PAST DEPTH ONE");
 
-    let derivations: Vec<Derivation> = plural.derivations();
+    let derivations: Vec<Derivation> = plural.derivations(ConductGrain::TermsOnly);
     let deposit = ElaborationDeposit::read(&derivations);
 
     let mut deepest: Option<(String, usize, usize)> = None;
