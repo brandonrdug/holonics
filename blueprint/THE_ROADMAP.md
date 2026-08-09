@@ -494,19 +494,21 @@ result is *which cut moved*.
 **Measured, in-degree zero from everything, each verified by grepping every public type it defines
 against the whole tree:**
 
-| module | lines | consumers |
-|---|---|---|
-| `crates/holonic-engine/src/surprisal.rs` | 593 | **0** |
-| `crates/holonic-engine/src/kelvin.rs` | 642 | **0** |
-| `crates/holonic-engine/src/temper.rs` | 597 | **0** |
-| `crates/holonic-engine/src/communication.rs` | 400 | **0** |
-| `soma/life/src/research_intelligence.rs` | 772 | **0**, out-degree 8 |
-| `soma/abi/src/cuda_execution.rs` | 273 | **0** |
+| module | lines | at the census | now |
+|---|---|---|---|
+| `crates/holonic-engine/src/kelvin.rs` | 642 | **0** | **0** |
+| `crates/holonic-engine/src/communication.rs` | 400 | **0** | **0** |
+| `soma/life/src/research_intelligence.rs` | 772 | **0**, out-degree 8 | **0** |
+| `soma/abi/src/cuda_execution.rs` | 273 | **0** | **0** |
+| `crates/holonic-engine/src/surprisal.rs` | 593 | **0** | **consumed** — `situated_residual.rs`, library path |
+| `crates/holonic-engine/src/temper.rs` | 597 | **0** | wired by the return join |
 
-**`surprisal` and `kelvin` were built here within the last two days** — the exact symbolic measure
-and the material loop carrying its circulation, which *is* the spine's `j ≠ 0` cut — and neither is
-reachable. Their only mention anywhere is a `pub mod` line. `CLAUDE.md` §8 states that **reach is
-part of the grade**; those deposits did not state it, and this row is the correction.
+**`surprisal` and `kelvin` were built here within two days of that census** — the exact symbolic
+measure and the material loop carrying its circulation, which *is* the spine's `j ≠ 0` cut — and
+neither was reachable when deposited. `CLAUDE.md` §8 states that **reach is part of the grade**; those
+deposits did not state it, and this row is the correction. `surprisal` and `temper` were wired by the
+instance's joins rather than by a sweep, which is the intended order. **`kelvin` is still unreached**
+and is not on the instance line.
 
 **`research_intelligence.rs` is fully constructed and one call site short of reachable:**
 `agentic_research` emits `&LaboratorySourceAtlas`, which is precisely `research_intelligence::new`'s

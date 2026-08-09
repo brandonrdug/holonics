@@ -278,15 +278,32 @@ reappearing under different names.
 
 ### Written and reaching nothing
 
-**In-degree zero from everything, verified by grepping every public type each defines against the
-whole tree:** `communication` (400 lines), `kelvin` (642), `surprisal` (593), `temper` (597),
-`soma/abi::cuda_execution` (273), `soma/life::research_intelligence` (772). Their only mention is a
-`pub mod` line.
+**Measured 2026-08-08 by grepping every public type each defines against the whole tree.** The `then`
+column is what that census returned; `now` records what the instance's joins have since wired.
 
-**`surprisal` and `kelvin` were built in this repository within the last two days** as the exact
-symbolic measure and the material loop carrying its circulation — §1's `j ≠ 0` cut. Both are
-unreachable. A deposit that names an organ built and does not state its reach has not graded it;
-`CLAUDE.md` §8 says reach is part of the grade, and these were not measured against it.
+| module | lines | then | now |
+|---|---|---|---|
+| `communication` | 400 | 0 | **0** |
+| `kelvin` | 642 | 0 | **0** |
+| `soma/abi::cuda_execution` | 273 | 0 | **0** |
+| `soma/life::research_intelligence` | 772 | 0 | **0** — out-degree 8, one call site short of reachable |
+| `surprisal` | 593 | 0 | **consumed on a library path** by `situated_residual.rs`, through `use crate::surprisal::{…}` at `:84` |
+| `temper` | 597 | 0 | wired by the return join — see `blueprint/THE_ROADMAP.md` |
+
+**`surprisal` and `kelvin` were built in this repository within two days of that census** as the
+exact symbolic measure and the material loop carrying its circulation — §1's `j ≠ 0` cut. Both were
+unreachable when deposited. A deposit that names an organ built and does not state its reach has not
+graded it; `CLAUDE.md` §8 says reach is part of the grade, and neither was measured against it at the
+time. **`kelvin` is still unreached**, is not on the instance line, and gets a driver or removal on
+its own terms.
+
+**And the reach instrument was itself the defect it names.** The first attempt at measuring
+`surprisal`'s new reach matched bare item names, counted `Grain` inside `ReceiverGrainId` and
+`Support::` inside `VerticalFiberSupport::`, and returned 171 sites across 11 files for a module
+nothing consumed. Corrected by resolving through the import — the module is declared and never
+glob-exported, so a file not naming `crate::surprisal` cannot reach it. This is another member of the
+family `CLAUDE.md` §8 records: *a check whose material cannot vary the property under test is the
+same defect as a check that cannot fail; it just wears a passing result.*
 
 **107 of 225 library modules are touched by no driver.** Concentrated where it matters most: **every
 large `soma/life` learning organ named in this project's capability record is undriven** —
