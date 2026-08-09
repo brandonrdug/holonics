@@ -80,6 +80,37 @@ const LOG_SERIES_TERMS: u32 = 64;
 /// Working bits for the enclosure grain. A grain change, never a float conversion.
 const LOG_SERIES_BITS: u32 = 192;
 
+/// The declared grain an enclosure is taken at: series terms and working bits, carried as one
+/// receiver coordinate instead of two loose arguments.
+///
+/// **A receiver coordinate, never a tuning knob.** Nothing in this module selects a grain; a caller
+/// declares one and every return carries it, so a verdict is not separable from the grain that
+/// reached it. Two verdicts on one pair at two grains are two readings and not a disagreement —
+/// `Open` is a statement about the receiver's grain, never about the forms.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+pub struct Grain {
+    pub terms: u32,
+    pub bits: u32,
+}
+
+impl Grain {
+    /// The grain [`SymbolicSurprisal::enclosure`] and [`SymbolicSurprisal::compare`] take.
+    pub const DECLARED: Self = Self {
+        terms: LOG_SERIES_TERMS,
+        bits: LOG_SERIES_BITS,
+    };
+
+    pub const fn at(terms: u32, bits: u32) -> Self {
+        Self { terms, bits }
+    }
+}
+
+impl std::fmt::Display for Grain {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(formatter, "grain(terms={}, bits={})", self.terms, self.bits)
+    }
+}
+
 /// `S = Σ_p coefficient(p) · log₂ p`, exact, stored and never evaluated.
 ///
 /// A coefficient is a `Rat` so that a fractional power — a `√2` gear word, `p^{1/2}` — is
@@ -234,6 +265,11 @@ impl SymbolicSurprisal {
         ExactInterval::new(lower, upper).map_err(|_| SurprisalError::EnclosureUnavailable)
     }
 
+    /// The same enclosure at a declared [`Grain`].
+    pub fn enclosure_grain(&self, grain: Grain) -> Result<ExactInterval, SurprisalError> {
+        self.enclosure_at(grain.terms, grain.bits)
+    }
+
     /// Compare two forms, returning `Open` when the certified enclosures cannot separate them.
     ///
     /// Equality is decided **exactly** first, by the coefficient test — so `Equal` is never a
@@ -263,6 +299,16 @@ impl SymbolicSurprisal {
         } else {
             Ok(ExactOrdering::Open)
         }
+    }
+
+    /// The same comparison at a declared [`Grain`]. Equality is still decided **exactly**, before
+    /// any enclosure is taken, so no grain can make two distinct forms compare `Equal`.
+    pub fn compare_grain(
+        &self,
+        other: &Self,
+        grain: Grain,
+    ) -> Result<ExactOrdering, SurprisalError> {
+        self.compare_at(other, grain.terms, grain.bits)
     }
 
     /// The form written as its prime-exponent vector — the returned artifact, never a decimal.
@@ -327,6 +373,39 @@ impl Support {
     pub fn found(standing: &mut BTreeMap<u64, BigUint>, event: u64) {
         *standing.entry(event).or_insert_with(BigUint::zero) += BigUint::one();
     }
+}
+
+/// Read a whole **population** of events against one standing: one [`Support`] per event.
+///
+/// [`Support::read`] answers for a single event and re-sums the standing on every call, so a caller
+/// holding a population pays that sum once per member. Cost is the smaller half of the reason this
+/// exists. The larger half is the **shape of the return**: a population of typed answers with every
+/// `Unsupported` arm retained *in place, named by its event*, rather than a reading that collapses
+/// the moment one event has no standing — which is what [`cross_entropy`] must do, correctly, because
+/// a weighted sum has nowhere to put a refusal.
+///
+/// The events read are the **population's** own and not the standing's. An event the population
+/// carries and the standing does not returns [`Support::Unsupported`] — the arm the law resolves by
+/// FOUNDing, and the arm a situated comparison exists to exhibit.
+pub fn read_population(
+    population: &BTreeMap<u64, BigUint>,
+    standing: &BTreeMap<u64, BigUint>,
+) -> Result<BTreeMap<u64, Support>, SurprisalError> {
+    let total: BigUint = standing.values().sum();
+    let mut read = BTreeMap::new();
+    for event in population.keys() {
+        let support = match standing.get(event) {
+            _ if total.is_zero() => Support::Unsupported,
+            None => Support::Unsupported,
+            Some(count) if count.is_zero() => Support::Unsupported,
+            Some(count) => {
+                let probability = Rat::new(BigInt::from(count.clone()), BigInt::from(total.clone()));
+                Support::Supported(SymbolicSurprisal::of_probability(&probability)?)
+            }
+        };
+        read.insert(*event, support);
+    }
+    Ok(read)
 }
 
 /// `H(P,Q) = Σ_a P(a) · S_Q(a)` — the depth incurred when one population is received through
@@ -575,6 +654,60 @@ mod tests {
             SymbolicSurprisal::term(1, Rat::one()),
             Err(SurprisalError::NotAPrime(1))
         );
+    }
+
+    /// **The population constructor agrees with the single-event read, member for member.**
+    ///
+    /// Two independent implementations of one reading, and the parity is what makes the cheaper one
+    /// admissible. The `Unsupported` arm is exercised here too: `7` is in the population and not in
+    /// the standing, so it must be returned by name and in place rather than collapsing the reading.
+    #[test]
+    fn the_population_read_agrees_with_the_single_event_read_and_retains_the_refusal() {
+        let emitted = population(&[(1, 3), (2, 1), (7, 5)]);
+        let standing = population(&[(1, 1), (2, 3)]);
+
+        let read = read_population(&emitted, &standing).unwrap();
+        assert_eq!(read.len(), 3, "one answer per member of the POPULATION");
+        for event in emitted.keys() {
+            assert_eq!(
+                read.get(event),
+                Some(&Support::read(&standing, *event).unwrap()),
+                "member {event} must agree with the single-event read"
+            );
+        }
+        assert_eq!(read.get(&7), Some(&Support::Unsupported), "retained in place, by name");
+        assert!(matches!(read.get(&1), Some(Support::Supported(_))));
+
+        // An empty standing supports nothing, and says so per member rather than erroring.
+        let none = read_population(&emitted, &BTreeMap::new()).unwrap();
+        assert!(none.values().all(|support| *support == Support::Unsupported));
+    }
+
+    /// The grain carried as one receiver coordinate is the same reading as the two loose arguments.
+    #[test]
+    fn a_declared_grain_is_the_same_reading_as_its_two_coordinates() {
+        let log_three = SymbolicSurprisal::term(3, Rat::one()).unwrap();
+        let log_five = SymbolicSurprisal::term(5, Rat::one()).unwrap();
+
+        let coarse = Grain::at(1, 4);
+        assert_eq!(
+            log_five.compare_grain(&log_three, coarse).unwrap(),
+            log_five.compare_at(&log_three, 1, 4).unwrap()
+        );
+        assert_eq!(
+            log_five.compare_grain(&log_three, coarse).unwrap(),
+            ExactOrdering::Open
+        );
+        assert_eq!(
+            log_five.compare_grain(&log_three, Grain::DECLARED).unwrap(),
+            ExactOrdering::Greater,
+            "the declared grain is the one `compare` takes"
+        );
+        assert_eq!(
+            log_five.enclosure_grain(Grain::DECLARED).unwrap(),
+            log_five.enclosure().unwrap()
+        );
+        assert_eq!(format!("{coarse}"), "grain(terms=1, bits=4)");
     }
 
     /// A probability above one, or at zero, is refused — the latter because that case FOUNDs.

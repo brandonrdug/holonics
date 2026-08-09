@@ -190,6 +190,10 @@ pub mod running_integral;
 // The temper: founding and decay as one property of a structure's own twist. No glob — `Twist`
 // and `Temper` are deliberately narrow names and must be reached through the module.
 pub mod temper;
+// The return path: the movement between two readings, carried back into the production that caused
+// it as material. Joins `derivation_atlas`'s movement and the `temper`/`derivation_integral`
+// cochain circuit, neither of which had a consumer.
+pub mod returned_reading;
 pub mod rebase_invariants;
 pub mod receiver;
 pub mod receiver_exact_compression;
@@ -206,6 +210,11 @@ pub mod receiver_phase_atlas;
 pub mod resource;
 pub mod sheaf_diffusion;
 pub mod simplicial;
+// One emission read against a declared reference body's standing, on material both were given.
+// Declared, never glob-exported: `Emission`, `Frame` and `situate` say nothing at the crate root
+// about which carrier they belong to, and `Frame` would collide with the receiver families.
+// `canon/THE_HOLOBROCHOS_SPINE.md` §2 — comparison is situated by a frame.
+pub mod situated_residual;
 pub mod skein;
 // Declared, never glob-exported: `ReceiverId`, `Disagreement`, `Partition`, `Cover`, `Observation`
 // and `ItemId` collide across the placement family, and a realizer founded by a substitution must
