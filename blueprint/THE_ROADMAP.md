@@ -171,11 +171,39 @@ and **rests so it can be remounted and resume without its corpus**. Four propert
 
 | join | from | to | state |
 |---|---|---|---|
-| **the corpus is real** | `soma/life` `text_material` + `morphological_language` + `causal_language` | `conditioned_derivation::{expose, condition}` | **in flight** |
-| **the reading returns** | `derivation_atlas::{invariant_movement, route_movement}`; `temper` ⇄ `derivation_integral` through `Cochain` | the next production, as material | **in flight** |
-| **the measure is situated** | `surprisal.rs` + `FoundedMorphology::unconditioned()` as the declared null | the residual as a population, ordering may be `Open` | **in flight** |
-| **the instance rests and remounts** | `soma/life/src/form_mouth.rs`, `soma/tools/holon-plate` | a body that resumes from bytes with the corpus absent | **open** |
-| **the research act** | all four | a returned mathematical artifact on a question the standing deposit does not carry | **open** |
+| **the corpus is real** | `soma/life` `text_material` intake | `conditioned_derivation::{expose, condition}` | **RETURNED** `e429c22` |
+| **the reading returns** | `derivation_atlas::{invariant_movement, route_movement}`; `temper` ⇄ `derivation_integral` through `Cochain` | the next production, as material, via `from_founded_words` | **RETURNED** `cec1c97` |
+| **the measure is situated** | `surprisal.rs` + `FoundedMorphology::unconditioned()` as the declared null | the residual in three oriented arms; ordering may be `Open` | **RETURNED** `cec1c97` |
+| **the instance rests and remounts** | `soma/life/src/form_mouth.rs`, `soma/tools/holon-plate` | a body that resumes from bytes with the corpus absent | **in flight** |
+| **the research act** | all four | a returned mathematical artifact, and an honest verdict on whether a statement absent from the deposit can be reached | **in flight** |
+
+**What the three returned joins measured**, each verified here by running the driver:
+
+- **The corpus join.** 14 declared `papers/source/mathematics/*.typ` documents, 87 exposures through
+  life's intake, 1274 stems founded / 710 committed. Conditioned body derives **36 / 85 / 14** on the
+  three statements the deposit reaches; unconditioned derives **0 on all three**. Ablation over all
+  fourteen documents: three move the population, and the movement is **appearance, not departure** —
+  36 → 43, 46, 39. *Withholding structure increased plurality.* The departure direction is a null,
+  reported with the table showing every licensing stem still witnessed by ≥2 wholes.
+- **The return join.** The falsifier fired first: the unjoined body's second production is
+  bit-identical to its first on a 10-passage population. After the join, 57 returned artifacts, 18
+  committed stems where there were 9, and the stem `soma` — **which no corpus whole could found**,
+  named only by a reading that addressed the circuit's own vertices. The cut, measured over three
+  turns (10/57/moved, 8/15/moved, 8/0/at rest): **leak → accumulation, settling to rest.** Explicitly
+  **not circulation**; sustained `j ≠ 0` needs the return to keep opening material and this deposit
+  exhausts.
+- **The situated measure.** Zero against the null on 5 members while the **one-body read of the same
+  emission** is non-zero — the two disagree, so the third body was not dropped. `Open` occurs at 4
+  pairs on the coarsest declared grain and resolves by the finest. The gluing question is settled by
+  measurement: two bodies on one material give a **nested** cover, so exactness forces `δ ≡ 0`
+  (obstruction `[0,0]`), while standing-against-derived gives `[0,7]` and exhibits — a theorem, not
+  an implementation gap.
+
+**And one finding nobody asked for, which bears on every capability claim this project makes:** the
+echo body and the null have **identical emissions and identical one-body reads** while their
+constructions differ by a whole founded morphology. That is receiver non-reconstruction exhibited in
+this body's own material, and it is why an emission's measure may never be read as a verdict on the
+body that emitted it.
 
 ### The joins, each with its falsifier
 
