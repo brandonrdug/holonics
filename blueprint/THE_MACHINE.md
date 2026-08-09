@@ -176,7 +176,7 @@ absent from the evidence*:
 |---|---|
 | `leader_quadrature` | `RideDiscipline::GermBounded` gates on `standing.reach > law.grain`, which at the module's natural setting is `1 > 1`. **RIDE never fires**, the leader degenerates to grain-only, and it still returns the exact area, so nothing downstream notices. Worked around by declaring grain `1/3`; not fixed. |
 | `causal_reflection` | `from_retarded_values` is causal **by construction**, so it cannot decide the law it is handed. The module says so itself. Worked around by embedding the route pair; not fixed. |
-| `codec_recovery` | radius 2 cannot recover an adjacency touching a Drop class — a dropped symbol contributes no character for a two-symbol return to place — contrary to what `FAMILY_APERTURE`'s arithmetic invites. |
+| `codec_recovery` | radius 2 cannot recover an adjacency touching a Drop class — a dropped symbol contributes no character for a two-symbol return to place — contrary to what the declared family's arithmetic invites. (That arithmetic lived in `FAMILY_APERTURE`, excised 2026-08-09 to a caller-declared `RecoveryApertures`; the radius-2 limitation is unchanged by the excision.) |
 | `supported_realizers` | `RealizerSupport::free_obstruction()` returns `class_extent − supported_rank` = 53 on real material while `SupportObstruction.classes` holds 38. Both sit under the words "free obstruction" and the doc reads as a count of that set. **A receipt quoting the number as a population size is wrong by 15.** |
 
 ### 4.7 · The carrier admission's guard covers the law, not the call site

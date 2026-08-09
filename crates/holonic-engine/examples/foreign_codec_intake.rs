@@ -35,7 +35,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 
 use holonic_engine::codec_recovery::{
-    conform, Boundary, Emission, OpaqueSymbolCodec, SymbolSeparation,
+    conform, Boundary, Emission, OpaqueSymbolCodec, RecoveryApertures, SymbolSeparation,
 };
 use holonic_engine::conditioned_derivation::{
     derive, expose, ConditionedBody, DerivationQuery, FoundedMorphology, MorphemicIncidence,
@@ -51,9 +51,9 @@ use holonic_engine::derivation_codec_intake::{
 
 /// The declared alphabet: the twenty-six ASCII letters and the three separators the deposited
 /// identifiers and the prose both carry. Twenty-nine symbols at radius three is
-/// `29 + 841 + 24389 = 25259` family words, inside `codec_recovery`'s declared aperture, and radius
-/// three is the shortest radius that can decide an adjacency touching a dropped class — a two-symbol
-/// word carries no character for a dropped symbol's boundary to place.
+/// `29 + 841 + 24389 = 25259` family words, inside the aperture this driver declares below, and
+/// radius three is the shortest radius that can decide an adjacency touching a dropped class — a
+/// two-symbol word carries no character for a dropped symbol's boundary to place.
 fn alphabet() -> Vec<char> {
     let mut declared: Vec<char> = ('a'..='z').collect();
     declared.extend([' ', '.', '_']);
@@ -61,6 +61,16 @@ fn alphabet() -> Vec<char> {
 }
 
 const RADIUS: usize = 3;
+
+/// **The apertures this driver declares.** They moved out of `codec_recovery` on 2026-08-09
+/// (`canon/THE_AUTHORED_LEVEL.md` §5.2): neither is derivable from the material, both are statements
+/// about the host, so the caller states them. 65,536 family words holds this alphabet at radius
+/// three with 40,277 to spare, and the free-entry aperture bounds a `2^k` enumeration at
+/// 4,096 tables. Past either the recovery refuses by name rather than sampling.
+const APERTURES: RecoveryApertures = RecoveryApertures {
+    family_words: 65_536,
+    free_entries: 12,
+};
 
 fn is_separator(symbol: char) -> bool {
     matches!(symbol, ' ' | '.' | '_')
@@ -535,21 +545,21 @@ fn main() {
     rule("[1]  THE RELATIONS -- derived from each conditioner's own declared statistics");
     // ---------------------------------------------------------------------------------------------
 
-    let runs = match intake("word-runs", &word_runs(), &declared, RADIUS, &corpus) {
+    let runs = match intake("word-runs", &word_runs(), &declared, RADIUS, APERTURES, &corpus) {
         Ok(carried) => carried,
         Err(refusal) => {
             eprintln!("the word-runs conditioner was refused: {refusal}");
             std::process::exit(2);
         }
     };
-    let chars = match intake("characters", &characters(), &declared, RADIUS, &corpus) {
+    let chars = match intake("characters", &characters(), &declared, RADIUS, APERTURES, &corpus) {
         Ok(carried) => carried,
         Err(refusal) => {
             eprintln!("the character conditioner was refused: {refusal}");
             std::process::exit(2);
         }
     };
-    let syllabic = match intake("syllables", &syllables(), &declared, RADIUS, &corpus) {
+    let syllabic = match intake("syllables", &syllables(), &declared, RADIUS, APERTURES, &corpus) {
         Ok(carried) => carried,
         Err(refusal) => {
             eprintln!("the syllabic conditioner was refused: {refusal}");
@@ -616,7 +626,7 @@ fn main() {
     rule("[2]  THE REFUSALS -- typed, never an empty return");
     // ---------------------------------------------------------------------------------------------
 
-    let no_relation = intake("one-class", &one_class(), &declared, RADIUS, &corpus);
+    let no_relation = intake("one-class", &one_class(), &declared, RADIUS, APERTURES, &corpus);
     match &no_relation {
         Ok(_) => println!("\n  one-class: RECOVERED, which it must not be"),
         Err(refusal) => print_refusal("one-class -- statistics that separate no two symbols", refusal),
@@ -631,7 +641,7 @@ fn main() {
     );
 
     let absent: Vec<char> = vec!['\u{2603}', '\u{2604}', ' '];
-    let no_word = intake("word-runs", &word_runs(), &absent, RADIUS, &corpus);
+    let no_word = intake("word-runs", &word_runs(), &absent, RADIUS, APERTURES, &corpus);
     match &no_word {
         Ok(_) => println!("\n  absent-alphabet: RECOVERED, which it must not be"),
         Err(refusal) => print_refusal(
@@ -646,7 +656,7 @@ fn main() {
     );
 
     let single = corpus[..1].to_vec();
-    let no_commitment = intake("word-runs", &word_runs(), &declared, RADIUS, &single);
+    let no_commitment = intake("word-runs", &word_runs(), &declared, RADIUS, APERTURES, &single);
     match &no_commitment {
         Ok(_) => println!("\n  single-whole: RECOVERED, which it must not be"),
         Err(refusal) => print_refusal(

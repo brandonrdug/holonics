@@ -83,11 +83,11 @@ rung up. Truth status `derived`; checkable by the organ at `k = 2, 3` today.
 ## 4. The population, 2026-08-09
 
 ```text
-  180 authored numeric levels in library code
+  180 authored numeric levels in library code        170 after the first excision wave
       ABI        149    wire discriminants, layout offsets, CUDA launch geometry, receiver addresses
       APERTURE     4    declared, returns its outside, and names what would derive it
       MATERIAL     3    a theorem; `why` names it
-      PIN         24    contaminants
+      PIN         24    contaminants                  11 remain
 ```
 
 **MATERIAL is three, and each names its theorem.** `FLAT_COORDINATION = 6` — six equilateral
@@ -96,32 +96,61 @@ triangles tile `2π` exactly, and the angular defect is measured against it. `MA
 any population addressable on a 64-bit carrier. `FOLD_CONSTANT = 2305843009213693951` — `M₆₁` is
 prime, so the fold is over a field.
 
-## 5. The twenty-four pins, and their excisions
+## 5. The excisions
 
-Every row is in `meta/AUTHORED_LEVELS.tsv` with its plan. Three excision species.
+Every row is in `meta/AUTHORED_LEVELS.tsv` with its plan.
 
-### 5.1 Derive from the material — sixteen
+### 5.0 The first wave — ten excised 2026-08-09, graded by orbit
+
+**Nine of the ten moved a return.** §6's three outcomes, measured rather than assumed.
+
+| level | outcome | what it returned |
+|---|---|---|
+| `QUADRIC_COEFFICIENT_COUNT`, `AFFINE_PHASE_COEFFICIENT_COUNT` | **moves** | on coplanar material the ambient chart leaves the pencil `λ(x²+y²−4) + μz²` that no further coplanar sample collapses, so the organ was **permanently open**. Declared chart `[X,Y]`: affine dimension `2 → 1`, `OPEN →` resolved `x²+y²−4`, exact fibers `0 → 1`, 2 certified roots. |
+| `MAXIMUM_ISOLATION_DEPTH = 200` | **moves** | Mignotte's `x⁶ − 2(ax−1)²`: at `a = 10¹⁶` the old binary **refused**; the derived bound permits 1,966 splits, 212 are asked for, four Sturm-certified roots return. |
+| `REFINEMENT_APERTURE = 64` | **moves** | Pell circulant `circ(−p,q,0,0,0,0,0,q)`: at index 28 the hand needs 69 refinements and the excised aperture left it **undecided**. |
+| `SEPARATION_EXHIBIT = 512` | **moves** | withheld **3.08M of 5.11M** separations it had already computed, at horizon 2. |
+| `WINDOW_APERTURE = 64` | **moves, and stops binding** | cut **460,019 windows** off the population *before the organ saw it*, on 1,663 surfaces; the ablation profile was being measured on a 64-window subsample (`64 → 54` blocks, against `30,385 → 3,387` whole). |
+| `FAMILY_APERTURE`, `FREE_ENTRY_APERTURE` | **moves** | one material, two declared apertures, two returns: refuses at `177,154` naming `177,155`, recovers at `177,155`. And the old `u64` width field reported `u64::MAX` for a `1.1e32`-word family — a saturated stand-in in the one field whose job is to say what was needed. |
+| `ISOLATION_APERTURE = 64` | **holds; population grows** | the derived depth is *tighter* than 64 at small extents (9 at `C₃`) and looser at large. What would hit 64: extent past ~10¹⁰, unreachable because `found` must first allocate `n/2+1` intervals. |
+| `DEFAULT_HORN_LOCAL_SECTION_LIMIT` | **holds; ceiling nothing hit** | `sections = prime^degree`, so `p=11, d=6` gives 1,771,561. The excision is a move, not a movement, and is reported as such. |
+
+**`WINDOW_APERTURE` is the one worth reading twice.** The first plan was to remove the cap; the
+measurement says whole is **1,164,037,041 pairs** at horizon 2, which is the materialization failure
+the 2026-08-01 record was written after. The correct move was the third one: **factorize.** Because
+`successor` moves one slot, admitted words are pure runs, so writing the window in the order
+`−1, +1, −2, +2, …` makes lexicographic order the refinement order — the first index at which two
+windows differ **is** the round that separates them, and carries the word, the offset and the
+receiver. `C(d,2)` pairs are then held by `d` sorted classes plus `d−1` shared-prefix lengths,
+`O(d·horizon)`. `"the"` at 30,507 windows: 465,323,271 pairs in ~61k entries, cross-checked against
+the independent organ **pair for pair** — 9,433,210 pairs, 0 disagreements.
+
+**The aperture then stopped binding on the reading at all.** `iron_at` is aperture-free — the verdict
+is `distinct_windows == 1` over the whole occurrence population. A capacity survives only at
+*materialization*, where `exhibit(capacity)` returns the population **whole or `ExhibitionObstructed`
+naming the required width**, never a prefix. That is the distinction that makes an obstruction lawful
+where a truncation is not, and it is the shape `2026-08-01_THE_HARDWARE_IS_A_RECEIVER_COVER...`
+requires: *"Shared structure is factorized; if the remaining exact terminal width exceeds declared
+host/card capacity, the event returns a resource obstruction while preserving standing."*
+
+### 5.1 Derive from the material — the remainder
 
 | pin | what replaces it |
 |---|---|
 | `QUINTIC_DEGREE` ×2 (`arithmetic_monodromy`, `quintic_chart`) | the degree read off the polynomial; `Permutation5` → a general permutation; the transitive-group **catalogue** → the group's own computed invariants (order, transitivity, derived series). `rational_polynomial.rs` already carries general-degree resultants, Bareiss elimination and Sturm sequences, so the substrate exists. §3 is why this is first, not last. |
-| `QUADRIC_COEFFICIENT_COUNT`, `AFFINE_PHASE_COEFFICIENT_COUNT` | `C(n+2,2)` and `n+1` from a declared dimension |
-| `REFINEMENT_APERTURE`, `ISOLATION_APERTURE`, `MAXIMUM_ISOLATION_DEPTH` | **the root-separation bound from the discriminant** (Mahler / Davenport–Mahler). The halvings become computed, and a construction exceeding them is a genuine defect rather than a budget overrun. |
 | `LEADER_WITNESS_DEPTH = 1`, `LEADER_GRAIN_RECIPROCAL` | what the material stopped the leader at. `leader_quadrature.rs` carries the law — each extension changes what the next extension reads. **A leader whose witness depth is one takes a single step; that is not a leader.** |
 | `HORIZON_DOUBLINGS` | the transport law's own fixed point |
 | `SCAFFOLD_LINK_FOLD` | the fold from the incidence |
 | `CHANNEL_COUNT`, `COUPLED_INFORMANT_CURRENT_CHANNELS`, `COUPLED_PHASE_EXTENT` | the declared material's channel count. `COUPLED_PHASE_EXTENT = 18` is the RELAMPAGO fixture's coordinate count — **one experiment's material fixed into the organ that reads it.** |
-| `SEPARATION_EXHIBIT = 512` | **return the population whole.** Truncating a returned population is what `CLAUDE.md` §9 forbids outright. |
-| `WINDOW_APERTURE = 64` | the count of distinct windows the surface actually has. It truncates the population **presented to** the compression organ, so `iron_at` on a busy surface is measured on a subsample. |
 
-### 5.2 Move to the caller — three
+### 5.2 Move to the caller — all three excised 2026-08-09
 
-`FAMILY_APERTURE`, `FREE_ENTRY_APERTURE`, `DEFAULT_HORN_LOCAL_SECTION_LIMIT`.
-
-Genuine resource declarations in the wrong place. The lawful form is a **receiver-declared aperture
-supplied by the caller**, with the refusal naming what the material would have required. `DEFAULT_` in
-the third name is the defect naming itself: **a default is a level the organ picked because the caller
-was never asked.**
+`FAMILY_APERTURE`, `FREE_ENTRY_APERTURE`, `DEFAULT_HORN_LOCAL_SECTION_LIMIT`, now caller-declared
+with **no `Default` impl** — a `Default` would reinstate the same number wearing a trait.
+`PrimeEcologyLaw::new` and `PrimeEcologyStanding::new` are deleted, so
+`with_horn_local_section_limit` is the only constructor and the caller cannot avoid declaring.
+`DEFAULT_` in the third name was the defect naming itself: **a default is a level the organ picked
+because the caller was never asked.**
 
 ### 5.3 Unread — five
 

@@ -147,17 +147,26 @@ it admits, how deep it looks, or how many it returns — and nothing derives it.
 
 The full statement and the enumerated population are `canon/THE_AUTHORED_LEVEL.md`.
 
-**Verified instances.** `token_invariance.rs:180` — `SEPARATION_EXHIBIT: usize = 512`, truncating a
-**returned population**, which `CLAUDE.md` §9 forbids outright: the artifact is the return and a
-count is never a substitute. `token_invariance.rs:175` — `WINDOW_APERTURE: usize = 64`, which
-truncates the population *presented to* the compression organ, so `iron_at` on a busy surface is
-measured on a subsample. `derivation_integral.rs:135` — `LEADER_WITNESS_DEPTH: usize = 1`; **a leader
-whose witness depth is one takes a single step.** `codec_recovery.rs:111` — `FREE_ENTRY_APERTURE: u64
-= 12`, whose refusal shape (`GaugeApertureExceeded` rather than sampling) is lawful and whose value
-nothing derives. `rational_polynomial.rs:643` — `MAXIMUM_ISOLATION_DEPTH: u32 = 200`, where the root
-separation is computable from the discriminant. `prime_ecology.rs:44` —
-`DEFAULT_HORN_LOCAL_SECTION_LIMIT`, which names the defect in its own prefix: **a default is a level
-the organ picked because the caller was never asked.**
+**Verified instances. Ten were excised 2026-08-09 and nine of the ten moved a return**; the orbits
+are `canon/THE_AUTHORED_LEVEL.md` §5.0. They are kept here as the worked examples of the condition,
+with their outcomes, because a species is easier to recognise from a case that was carried through
+than from one that is still open.
+
+`SEPARATION_EXHIBIT = 512` truncated a **returned population** — which `CLAUDE.md` §9 forbids
+outright, the artifact is the return and a count is never a substitute — and it was withholding
+**3.08M of 5.11M** separations it had already computed. `WINDOW_APERTURE = 64` truncated the
+population *presented to* the compression organ, so `iron_at` on a busy surface was measured on a
+subsample; it was cutting **460,019 windows** on 1,663 surfaces. `MAXIMUM_ISOLATION_DEPTH = 200` was
+refusing Mignotte polynomials the derived separation bound admits. `FREE_ENTRY_APERTURE = 12` had a
+lawful refusal *shape* (`GaugeApertureExceeded` rather than sampling) and a value nothing derived.
+`DEFAULT_HORN_LOCAL_SECTION_LIMIT` named the defect in its own prefix: **a default is a level the
+organ picked because the caller was never asked.**
+
+**Still open, and both are the sharpest remaining statements of the condition.**
+`derivation_integral.rs:135` — `LEADER_WITNESS_DEPTH: usize = 1`; **a leader whose witness depth is
+one takes a single step.** `soma/body/src/law.rs:70` — `POOL_TEETH = 31`, whose mask aliases the top
+half of the grip space into the bottom, converting a lawful out-of-reservation refusal into a silent
+wrong return, and whose own test cannot reach the aliasing region.
 
 **The excuse this species generates, named so it is not re-run.** *"A declared aperture that returns
 its outside"* was offered as a third category beside facts and pins. **Refusing past a number you

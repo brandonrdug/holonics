@@ -37,6 +37,13 @@ use num_bigint::BigInt;
 use num_traits::{One, Zero};
 use relational_geometry::Rat;
 
+/// **What this driver declares as its horn local-section limit.** `prime_ecology` stopped picking a
+/// default on 2026-08-09 (`canon/THE_CONTAMINANT_PROTOCOL.md` §2.5 — *a default is a level the
+/// organ picked because the caller was never asked*). It bounds how many affine
+/// integer-polynomial torsors one horn-resolution event may retain; past it the event refuses by
+/// name rather than sampling.
+const HORN_LOCAL_SECTION_LIMIT: u64 = 1_000_000;
+
 const PRIME_LIMIT: u64 = 97;
 
 /// One declared input, with the role it plays in the controls.
@@ -117,7 +124,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 .map(|value| BigInt::from(*value))
                 .collect(),
         )?;
-        atlases.push((declared, read_quintic_charts(&problem, PRIME_LIMIT)?));
+        atlases.push((declared, read_quintic_charts(&problem, PRIME_LIMIT, HORN_LOCAL_SECTION_LIMIT)?));
     }
 
     println!("THE CHART REFUSES OR RETURNS");

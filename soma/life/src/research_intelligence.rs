@@ -41,6 +41,10 @@ pub struct ExactQuinticResearchSpec {
     pub receiver: EulerReceiverId,
     pub sigma: u32,
     pub integer_through: u64,
+    /// How many affine integer-polynomial torsors one horn-resolution event may retain. Declared by
+    /// whoever forms the spec; `prime_ecology` stopped picking a default on 2026-08-09
+    /// (`canon/THE_CONTAMINANT_PROTOCOL.md` §2.5).
+    pub horn_local_section_limit: u64,
 }
 
 impl ExactQuinticResearchSpec {
@@ -51,7 +55,11 @@ impl ExactQuinticResearchSpec {
         receiver: EulerReceiverId,
         sigma: u32,
         integer_through: u64,
+        horn_local_section_limit: u64,
     ) -> Result<Self, String> {
+        if horn_local_section_limit == 0 {
+            return Err("a horn local-section limit of zero admits no torsor".to_owned());
+        }
         if integer_through < 11 {
             return Err(
                 "an arithmetic-monodromy deed must admit integers through at least 11".to_owned(),
@@ -66,6 +74,7 @@ impl ExactQuinticResearchSpec {
             receiver,
             sigma,
             integer_through,
+            horn_local_section_limit,
         })
     }
 }
@@ -582,8 +591,11 @@ fn execute_quintic(spec: &ExactQuinticResearchSpec) -> Result<ExactQuinticResear
     const PROBLEM_EVENT: EventId = EventId(8_000_000_000);
     const RECEIVER_EVENT: EventId = EventId(8_000_000_001);
     let started = Instant::now();
-    let law = ArithmeticMonodromyLaw::new(1).map_err(|error| error.to_string())?;
-    let standing = ArithmeticMonodromyStanding::new(1).map_err(|error| error.to_string())?;
+    let law = ArithmeticMonodromyLaw::with_horn_local_section_limit(1, spec.horn_local_section_limit)
+        .map_err(|error| error.to_string())?;
+    let standing =
+        ArithmeticMonodromyStanding::with_horn_local_section_limit(1, spec.horn_local_section_limit)
+            .map_err(|error| error.to_string())?;
     let mut world = CausalWorld::new(law, standing);
     world
         .receive(&ArithmeticMonodromyEvent::InheritQuintic {

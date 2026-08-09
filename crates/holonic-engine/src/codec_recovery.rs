@@ -89,26 +89,59 @@
 //! classes** and nothing more. A target outside that shape does not return a wrong codec: every
 //! assignment is refuted and [`Obstruction::NoConformingTable`] exhibits the input, the target's
 //! return, and the candidate's return. A capacity mismatch is a defect even when an organ appears to
-//! return, so the two apertures — [`FAMILY_APERTURE`] and [`FREE_ENTRY_APERTURE`] — are declared,
-//! checked, and refused rather than approximated.
+//! return, so the two apertures are **declared by the caller** in [`RecoveryApertures`], checked,
+//! and refused rather than approximated.
+//!
+//! ## The apertures are the caller's, and there is no default
+//!
+//! Until 2026-08-09 the two numbers were `const FAMILY_APERTURE: u64 = 65_536` and
+//! `const FREE_ENTRY_APERTURE: u64 = 12`, authored here. `canon/THE_AUTHORED_LEVEL.md` convicted
+//! both: neither is derivable from the material — they are statements about the **host** the
+//! recovery runs on — so neither was this organ's to pick. They now arrive in
+//! [`RecoveryApertures`], which deliberately implements no `Default`: *a default is a level the
+//! organ picked because the caller was never asked.*
+//!
+//! The **refusal shape was already lawful and is preserved**: past either aperture the recovery
+//! returns `Err(RecoveryError::FamilyExceedsAperture)` or
+//! `Obstruction::GaugeApertureExceeded` rather than sampling. One thing improved with the move: the
+//! family refusal now names the width the material required as an exact [`BigUint`], where it
+//! previously reported `u64::MAX` whenever `|alphabet|^radius` overflowed the counter — a saturated
+//! stand-in in the one field whose whole job is to say what was needed.
 
 use std::cell::Cell;
 use std::collections::{BTreeMap, BTreeSet, VecDeque};
 
+use num_bigint::BigUint;
+use num_traits::ToPrimitive;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-/// The largest declared query family this instrument will exhaust.
+/// The resource apertures one recovery runs under, declared by the caller.
 ///
-/// The family holds `sum(|alphabet|^L for L in 1..=radius)` words and every one of them is returned
-/// once, so this is a call budget as well as a memory bound.
-pub const FAMILY_APERTURE: u64 = 65_536;
+/// Both bound work rather than meaning: the family aperture is a call budget and a memory bound on
+/// `sum(|alphabet|^L for L in 1..=radius)` returned words, and the free-entry aperture bounds a
+/// `2^k` enumeration of the boundary entries the family leaves open. Neither is read off the
+/// material; both are read off the host. **No `Default` is provided, on purpose.**
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+pub struct RecoveryApertures {
+    /// The largest declared query family this recovery may exhaust. Every word is returned once, so
+    /// this is a call budget as well as a memory bound.
+    pub family_words: u64,
+    /// The largest number of boundary entries the declared family may leave open. Every assignment
+    /// is enumerated, so the search is `2^k` and this is the exponent.
+    pub free_entries: u64,
+}
 
-/// The largest number of boundary entries the declared family may leave open.
-///
-/// Every assignment of the open entries is enumerated, so the search is `2^k`. Past this the
-/// recovery refuses with [`Obstruction::GaugeApertureExceeded`] rather than sampling.
-pub const FREE_ENTRY_APERTURE: u64 = 12;
+impl RecoveryApertures {
+    /// Declare both apertures. Named rather than constructed field-wise so a call site reads as a
+    /// declaration.
+    pub fn declared(family_words: u64, free_entries: u64) -> Self {
+        Self {
+            family_words,
+            free_entries,
+        }
+    }
+}
 
 const RECOVERY_SCHEMA: &str = "holonic-engine.codec-recovery.v1";
 const CODEC_SCHEMA: &str = "holonic-engine.recovered-symbol-codec.v1";
@@ -538,7 +571,13 @@ pub enum RecoveryError {
     #[error("a radius of {radius} admits no adjacency; the family must reach two-symbol words")]
     RadiusBelowAperture { radius: usize },
     #[error("the declared family holds {words} words, past the {aperture}-word aperture")]
-    FamilyExceedsAperture { words: u64, aperture: u64 },
+    FamilyExceedsAperture { words: BigUint, aperture: u64 },
+    /// The declared free-entry aperture is past what the enumeration carrier can address. Read off
+    /// the carrier — the assignment ordinal is a `u64` — and not authored.
+    #[error(
+        "a free-entry aperture of {aperture} exceeds the {carrier_bits}-bit enumeration carrier"
+    )]
+    FreeEntryApertureUnrepresentable { aperture: u64, carrier_bits: u32 },
     #[error("the symbol {symbol:?} is outside the recovered alphabet")]
     UnknownSymbol { symbol: char },
     #[error("codecs over different symbol classes carry no common input to separate them on")]
@@ -554,11 +593,13 @@ pub enum RecoveryError {
 /// Recover an opaque symbol codec from testimony over the declared query family.
 ///
 /// `alphabet` is deduplicated and ordered; `radius` is the longest word the instrument may ask
-/// about. Nothing else is declared, and in particular no character classes are supplied.
+/// about; `apertures` is what this caller's host can hold. Nothing else is declared, and in
+/// particular no character classes are supplied.
 pub fn recover(
     target: &OpaqueSymbolCodec,
     alphabet: &[char],
     radius: usize,
+    apertures: RecoveryApertures,
 ) -> Result<CodecRecovery, RecoveryError> {
     let alphabet: Vec<char> = alphabet.iter().copied().collect::<BTreeSet<_>>().into_iter().collect();
     if alphabet.is_empty() {
@@ -567,33 +608,43 @@ pub fn recover(
     if radius < 2 {
         return Err(RecoveryError::RadiusBelowAperture { radius });
     }
+    if apertures.free_entries >= u64::BITS as u64 {
+        return Err(RecoveryError::FreeEntryApertureUnrepresentable {
+            aperture: apertures.free_entries,
+            carrier_bits: u64::BITS,
+        });
+    }
     let symbols = alphabet.len();
+
+    // The family's exact size, before a single word is built or a single call is made. Computed
+    // over `BigUint` so an over-large declaration is refused with the width the material actually
+    // required rather than with a saturated stand-in.
+    let mut required = BigUint::from(0u32);
+    let mut power = BigUint::from(1u32);
+    for _ in 1..=radius {
+        power *= symbols;
+        required += &power;
+    }
+    if required > BigUint::from(apertures.family_words) {
+        return Err(RecoveryError::FamilyExceedsAperture {
+            words: required,
+            aperture: apertures.family_words,
+        });
+    }
+    // Inside the declared aperture the count fits the carrier by construction.
+    let total = required
+        .to_u64()
+        .expect("a family inside a u64 aperture fits a u64");
 
     // The family, laid out by increasing length then lexicographically, so an index into it is
     // arithmetic and "shortest first" is the traversal order rather than a sort.
     let mut offsets = vec![0usize; radius + 2];
-    let mut power = 1u64;
-    let mut total = 0u64;
+    let mut running = 0u64;
+    let mut length_count = 1u64;
     for slot in offsets.iter_mut().take(radius + 1).skip(1) {
-        power = power
-            .checked_mul(symbols as u64)
-            .ok_or(RecoveryError::FamilyExceedsAperture {
-                words: u64::MAX,
-                aperture: FAMILY_APERTURE,
-            })?;
-        *slot = total as usize;
-        total = total
-            .checked_add(power)
-            .ok_or(RecoveryError::FamilyExceedsAperture {
-                words: u64::MAX,
-                aperture: FAMILY_APERTURE,
-            })?;
-        if total > FAMILY_APERTURE {
-            return Err(RecoveryError::FamilyExceedsAperture {
-                words: total,
-                aperture: FAMILY_APERTURE,
-            });
-        }
+        length_count *= symbols as u64;
+        *slot = running as usize;
+        running += length_count;
     }
     offsets[radius + 1] = total as usize;
 
@@ -812,7 +863,7 @@ pub fn recover(
             }
         }
     }
-    if free.len() as u64 > FREE_ENTRY_APERTURE {
+    if free.len() as u64 > apertures.free_entries {
         return Ok(halted(
             &alphabet,
             radius,
@@ -820,7 +871,7 @@ pub fn recover(
             separations,
             Obstruction::GaugeApertureExceeded {
                 free_entries: free.len() as u64,
-                aperture: FREE_ENTRY_APERTURE,
+                aperture: apertures.free_entries,
             },
             work,
         ));
@@ -1113,6 +1164,15 @@ fn segment_digits(
 mod tests {
     use super::*;
 
+    /// **What this test body declares as its host capacity.** A fixture is a caller and declares
+    /// its own apertures; the values that used to live in the organ as `FAMILY_APERTURE = 65_536`
+    /// and `FREE_ENTRY_APERTURE = 12` are reproduced here so the fixtures' returns are unchanged by
+    /// the move and the orbit is measured against the level rather than against a new number.
+    const TEST_APERTURES: RecoveryApertures = RecoveryApertures {
+        family_words: 65_536,
+        free_entries: 12,
+    };
+
     /// A genuine character-class state machine, written as a state machine and never as a table, so
     /// the recovery has to find the quotient rather than read it.
     ///
@@ -1195,7 +1255,7 @@ mod tests {
     #[test]
     fn the_character_classes_of_a_tokenizer_are_recovered_from_testimony_alone() {
         let target = tokenizer();
-        let recovery = recover(&target, &TOKENIZER_ALPHABET, 3).expect("the family is admissible");
+        let recovery = recover(&target, &TOKENIZER_ALPHABET, 3, TEST_APERTURES).expect("the family is admissible");
         assert!(
             recovery.obstructions.is_empty(),
             "unexpected obstructions: {:?}",
@@ -1237,7 +1297,7 @@ mod tests {
     #[test]
     fn the_recovered_codec_conforms_exactly_on_held_out_material_longer_than_the_family() {
         let target = tokenizer();
-        let recovery = recover(&target, &TOKENIZER_ALPHABET, 3).expect("the family is admissible");
+        let recovery = recover(&target, &TOKENIZER_ALPHABET, 3, TEST_APERTURES).expect("the family is admissible");
         let codec = recovery.codec.as_ref().expect("the codec is recovered");
 
         let population = [
@@ -1280,7 +1340,7 @@ mod tests {
     #[test]
     fn conformance_exhibits_a_disagreement_against_a_target_the_codec_does_not_describe() {
         let target = tokenizer();
-        let recovery = recover(&target, &TOKENIZER_ALPHABET, 3).expect("the family is admissible");
+        let recovery = recover(&target, &TOKENIZER_ALPHABET, 3, TEST_APERTURES).expect("the family is admissible");
         let codec = recovery.codec.as_ref().expect("the codec is recovered");
 
         // Same alphabet, different law: digits now agglutinate with letters.
@@ -1320,7 +1380,7 @@ mod tests {
     #[test]
     fn material_carrying_an_undeclared_symbol_is_refused_rather_than_guessed() {
         let target = tokenizer();
-        let recovery = recover(&target, &TOKENIZER_ALPHABET, 3).expect("the family is admissible");
+        let recovery = recover(&target, &TOKENIZER_ALPHABET, 3, TEST_APERTURES).expect("the family is admissible");
         let codec = recovery.codec.as_ref().expect("the codec is recovered");
         let conformance = conform(codec, &target, &["ab qq", "ab zz"]);
         assert!(conformance.disagreements.is_empty());
@@ -1339,7 +1399,7 @@ mod tests {
     #[test]
     fn a_separation_carries_the_shortest_context_that_produced_it() {
         let target = tokenizer();
-        let recovery = recover(&target, &TOKENIZER_ALPHABET, 3).expect("the family is admissible");
+        let recovery = recover(&target, &TOKENIZER_ALPHABET, 3, TEST_APERTURES).expect("the family is admissible");
 
         let find = |left: char, right: char| {
             recovery
@@ -1397,7 +1457,7 @@ mod tests {
         for radius in 2..=4 {
             let target = tokenizer();
             let recovery =
-                recover(&target, &TOKENIZER_ALPHABET, radius).expect("the family is admissible");
+                recover(&target, &TOKENIZER_ALPHABET, radius, TEST_APERTURES).expect("the family is admissible");
             sizes.push(recovery.classes.len());
             if let Some(coarser) = &previous {
                 for block in &recovery.classes {
@@ -1433,8 +1493,8 @@ mod tests {
             }
             tokens
         });
-        let coarse = recover(&staged, &['a', 'b'], 2).expect("the family is admissible");
-        let fine = recover(&staged, &['a', 'b'], 3).expect("the family is admissible");
+        let coarse = recover(&staged, &['a', 'b'], 2, TEST_APERTURES).expect("the family is admissible");
+        let fine = recover(&staged, &['a', 'b'], 3, TEST_APERTURES).expect("the family is admissible");
         assert_eq!(coarse.classes.len(), 1, "{:?}", coarse.classes);
         assert_eq!(fine.classes.len(), 2, "{:?}", fine.classes);
         for block in &fine.classes {
@@ -1449,7 +1509,7 @@ mod tests {
     #[test]
     fn a_family_that_cannot_see_through_a_dropped_symbol_names_the_word_it_could_not_ask() {
         let target = soft_join();
-        let recovery = recover(&target, &['a', 'b', '_'], 2).expect("the family is admissible");
+        let recovery = recover(&target, &['a', 'b', '_'], 2, TEST_APERTURES).expect("the family is admissible");
 
         assert!(
             recovery.codec.is_none(),
@@ -1511,7 +1571,7 @@ mod tests {
         for radius in 2..=3 {
             let target = soft_join();
             let recovery =
-                recover(&target, &['a', 'b', '_'], radius).expect("the family is admissible");
+                recover(&target, &['a', 'b', '_'], radius, TEST_APERTURES).expect("the family is admissible");
             assert!(recovery.codec.is_none(), "radius {radius}");
             let Some(Obstruction::UndeterminedCodec {
                 separating_input, ..
@@ -1524,7 +1584,7 @@ mod tests {
         assert_eq!(named, vec![3, 4]);
 
         let target = soft_join();
-        let recovery = recover(&target, &['a', 'b', '_'], 4).expect("the family is admissible");
+        let recovery = recover(&target, &['a', 'b', '_'], 4, TEST_APERTURES).expect("the family is admissible");
         assert!(
             recovery.obstructions.is_empty(),
             "{:?}",
@@ -1552,7 +1612,7 @@ mod tests {
     #[test]
     fn a_retained_population_no_input_separates_is_reported_as_gauge_and_not_as_an_obstruction() {
         let target = tokenizer();
-        let recovery = recover(&target, &TOKENIZER_ALPHABET, 3).expect("the family is admissible");
+        let recovery = recover(&target, &TOKENIZER_ALPHABET, 3, TEST_APERTURES).expect("the family is admissible");
         assert!(recovery.obstructions.is_empty());
         assert_eq!(recovery.inequivalent_codecs, 1);
 
@@ -1584,7 +1644,7 @@ mod tests {
                 .map(str::to_uppercase)
                 .collect()
         });
-        let recovery = recover(&shouting, &['a', 'b', ' '], 3).expect("the family is admissible");
+        let recovery = recover(&shouting, &['a', 'b', ' '], 3, TEST_APERTURES).expect("the family is admissible");
         assert!(recovery.codec.is_none());
         assert_eq!(
             recovery.obstructions,
@@ -1613,7 +1673,7 @@ mod tests {
                 vec![token]
             }
         });
-        let recovery = recover(&swallowing, &['a', 'b'], 3).expect("the family is admissible");
+        let recovery = recover(&swallowing, &['a', 'b'], 3, TEST_APERTURES).expect("the family is admissible");
         assert!(recovery.codec.is_none());
         assert_eq!(
             recovery.obstructions,
@@ -1645,7 +1705,7 @@ mod tests {
             }
             tokens
         });
-        let recovery = recover(&capped, &['a', 'b'], 4).expect("the family is admissible");
+        let recovery = recover(&capped, &['a', 'b'], 4, TEST_APERTURES).expect("the family is admissible");
         assert!(recovery.codec.is_none());
         assert_eq!(recovery.classes.len(), 1, "{:?}", recovery.classes);
 
@@ -1690,7 +1750,7 @@ mod tests {
             }
             tokens
         });
-        let recovery = recover(&many, &['a', 'b', 'c', 'd', 'e', 'f', ' '], 3)
+        let recovery = recover(&many, &['a', 'b', 'c', 'd', 'e', 'f', ' '], 3, TEST_APERTURES)
             .expect("the family is admissible");
         assert!(recovery.codec.is_none());
         assert_eq!(recovery.classes.len(), 7, "{:?}", recovery.classes);
@@ -1698,7 +1758,7 @@ mod tests {
             recovery.obstructions,
             vec![Obstruction::GaugeApertureExceeded {
                 free_entries: 13,
-                aperture: FREE_ENTRY_APERTURE,
+                aperture: TEST_APERTURES.free_entries,
             }]
         );
     }
@@ -1928,20 +1988,147 @@ mod tests {
         );
     }
 
+    /// **The apertures are the caller's, and the orbit shows it.** One target, one alphabet, one
+    /// radius; two declarations; two different returns. If the level were still the organ's this
+    /// test could not be written at all — which is what makes it evidence rather than a snapshot.
+    #[test]
+    fn one_material_returns_differently_under_two_declared_apertures() {
+        // The family aperture. Eleven symbols at radius five is 177,155 words.
+        let words = 11u64 + 121 + 1331 + 14641 + 161_051;
+        let narrow = recover(
+            &tokenizer(),
+            &TOKENIZER_ALPHABET,
+            5,
+            RecoveryApertures::declared(words - 1, 12),
+        );
+        assert_eq!(
+            narrow,
+            Err(RecoveryError::FamilyExceedsAperture {
+                words: BigUint::from(words),
+                aperture: words - 1,
+            }),
+            "one short of the requirement refuses AND names the requirement"
+        );
+        let wide = recover(
+            &tokenizer(),
+            &TOKENIZER_ALPHABET,
+            5,
+            RecoveryApertures::declared(words, 12),
+        )
+        .expect("the same material at the width it asked for");
+        assert_eq!(wide.work.declared_family_words, words);
+        assert!(wide.is_recovered(), "obstructions: {:?}", wide.obstructions);
+
+        // The free-entry aperture, on the material that has thirteen open entries.
+        let many = || {
+            OpaqueSymbolCodec::new(|input: &str| {
+                let mut tokens = Vec::new();
+                let mut current = String::new();
+                let mut previous: Option<char> = None;
+                for symbol in input.chars() {
+                    let cut = previous != Some(symbol) || symbol == 'f';
+                    if cut && !current.is_empty() {
+                        tokens.push(std::mem::take(&mut current));
+                    }
+                    if symbol != ' ' {
+                        current.push(symbol);
+                    }
+                    previous = Some(symbol);
+                }
+                if !current.is_empty() {
+                    tokens.push(current);
+                }
+                tokens
+            })
+        };
+        let alphabet = ['a', 'b', 'c', 'd', 'e', 'f', ' '];
+        let refused = recover(&many(), &alphabet, 3, RecoveryApertures::declared(65_536, 12))
+            .expect("the family is admissible");
+        assert_eq!(
+            refused.obstructions,
+            vec![Obstruction::GaugeApertureExceeded {
+                free_entries: 13,
+                aperture: 12,
+            }]
+        );
+        let admitted = recover(&many(), &alphabet, 3, RecoveryApertures::declared(65_536, 13))
+            .expect("the family is admissible");
+        assert!(
+            !admitted
+                .obstructions
+                .iter()
+                .any(|obstruction| matches!(obstruction, Obstruction::GaugeApertureExceeded { .. })),
+            "one more declared entry admits the enumeration: {:?}",
+            admitted.obstructions
+        );
+        assert_eq!(admitted.work.tables_examined, 1 << 13);
+    }
+
+    /// The family refusal names the width the material required **exactly**, past what the counter
+    /// it used to be kept in could hold.
+    ///
+    /// Until 2026-08-09 this field was a `u64` filled by `checked_mul`, so any declaration whose
+    /// family overflowed the counter reported `u64::MAX` — a saturated stand-in in the one field
+    /// whose whole job is to say what was needed. Forty symbols at radius twenty needs
+    /// `(40^21 - 40) / 39` words, which is about `1.1e32`.
+    #[test]
+    fn an_overflowing_family_names_its_exact_width_rather_than_a_saturated_stand_in() {
+        let alphabet: Vec<char> = (0u8..40).map(|ordinal| (b'A' + ordinal) as char).collect();
+        let mut expected = BigUint::from(0u32);
+        let mut power = BigUint::from(1u32);
+        for _ in 1..=20 {
+            power *= 40u32;
+            expected += &power;
+        }
+        assert!(
+            expected > BigUint::from(u64::MAX),
+            "the fixture must exceed the carrier the field used to be kept in"
+        );
+        let target = tokenizer();
+        assert_eq!(
+            recover(&target, &alphabet, 20, RecoveryApertures::declared(65_536, 12)),
+            Err(RecoveryError::FamilyExceedsAperture {
+                words: expected,
+                aperture: 65_536,
+            })
+        );
+        assert_eq!(target.calls(), 0, "an aperture refusal costs no testimony");
+    }
+
+    /// A free-entry aperture past the enumeration carrier is refused by a bound read off the
+    /// carrier — `u64::BITS` — rather than by a number authored here.
+    #[test]
+    fn a_free_entry_aperture_past_the_enumeration_carrier_is_refused() {
+        let target = tokenizer();
+        assert_eq!(
+            recover(
+                &target,
+                &TOKENIZER_ALPHABET,
+                3,
+                RecoveryApertures::declared(65_536, u64::BITS as u64)
+            ),
+            Err(RecoveryError::FreeEntryApertureUnrepresentable {
+                aperture: u64::BITS as u64,
+                carrier_bits: u64::BITS,
+            })
+        );
+        assert_eq!(target.calls(), 0);
+    }
+
     /// Declared apertures are refused, not approximated.
     #[test]
     fn the_declared_apertures_are_checked_before_any_testimony_is_taken() {
         let target = tokenizer();
         assert_eq!(
-            recover(&target, &[], 3),
+            recover(&target, &[], 3, TEST_APERTURES),
             Err(RecoveryError::EmptyAlphabet)
         );
         assert_eq!(
-            recover(&target, &['a', 'b'], 1),
+            recover(&target, &['a', 'b'], 1, TEST_APERTURES),
             Err(RecoveryError::RadiusBelowAperture { radius: 1 })
         );
         assert!(matches!(
-            recover(&target, &TOKENIZER_ALPHABET, 6),
+            recover(&target, &TOKENIZER_ALPHABET, 6, TEST_APERTURES),
             Err(RecoveryError::FamilyExceedsAperture { .. })
         ));
         assert_eq!(target.calls(), 0, "an aperture refusal costs no testimony");
@@ -1952,7 +2139,7 @@ mod tests {
     #[test]
     fn the_recovery_states_its_cost_and_never_returns_a_codec_beside_an_obstruction() {
         let target = tokenizer();
-        let recovery = recover(&target, &TOKENIZER_ALPHABET, 3).expect("the family is admissible");
+        let recovery = recover(&target, &TOKENIZER_ALPHABET, 3, TEST_APERTURES).expect("the family is admissible");
         assert_eq!(recovery.work.declared_family_words, 11 + 121 + 1331);
         assert_eq!(recovery.work.target_calls, recovery.work.declared_family_words);
         assert_eq!(recovery.work.tables_examined, 1 << 9);
@@ -1961,7 +2148,7 @@ mod tests {
         assert_eq!(recovery.is_recovered(), recovery.obstructions.is_empty());
 
         let blind = soft_join();
-        let obstructed = recover(&blind, &['a', 'b', '_'], 2).expect("the family is admissible");
+        let obstructed = recover(&blind, &['a', 'b', '_'], 2, TEST_APERTURES).expect("the family is admissible");
         assert_eq!(obstructed.is_recovered(), obstructed.obstructions.is_empty());
     }
 
@@ -1969,8 +2156,8 @@ mod tests {
     /// hash seed, or an iteration accident.
     #[test]
     fn the_recovery_is_deterministic() {
-        let first = recover(&tokenizer(), &TOKENIZER_ALPHABET, 3).expect("admissible");
-        let second = recover(&tokenizer(), &TOKENIZER_ALPHABET, 3).expect("admissible");
+        let first = recover(&tokenizer(), &TOKENIZER_ALPHABET, 3, TEST_APERTURES).expect("admissible");
+        let second = recover(&tokenizer(), &TOKENIZER_ALPHABET, 3, TEST_APERTURES).expect("admissible");
         assert_eq!(first, second);
     }
 }

@@ -16,6 +16,13 @@ use holonic_engine::{
 };
 use num_bigint::BigInt;
 
+/// **What this driver declares as its horn local-section limit.** `prime_ecology` stopped picking a
+/// default on 2026-08-09 (`canon/THE_CONTAMINANT_PROTOCOL.md` §2.5 — *a default is a level the
+/// organ picked because the caller was never asked*). It bounds how many affine
+/// integer-polynomial torsors one horn-resolution event may retain; past it the event refuses by
+/// name rather than sampling.
+const HORN_LOCAL_SECTION_LIMIT: u64 = 1_000_000;
+
 const TRIANGLES: [[u64; 3]; 4] = [[2, 3, 5], [2, 3, 7], [2, 5, 7], [3, 5, 7]];
 
 fn probes() -> Result<Vec<(EventId, IntegerPolynomialProbe)>, Box<dyn Error>> {
@@ -35,8 +42,8 @@ fn probes() -> Result<Vec<(EventId, IntegerPolynomialProbe)>, Box<dyn Error>> {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let law = PrimeEcologyLaw::new(3)?;
-    let standing = PrimeEcologyStanding::new(3)?;
+    let law = PrimeEcologyLaw::with_horn_local_section_limit(3, HORN_LOCAL_SECTION_LIMIT)?;
+    let standing = PrimeEcologyStanding::with_horn_local_section_limit(3, HORN_LOCAL_SECTION_LIMIT)?;
     let mut world = CausalWorld::new(law, standing);
     for value in 2..=7 {
         world.receive(&PrimeEcologyEvent::AdmitInteger(ArithmeticFiberEvent {
@@ -111,9 +118,9 @@ fn main() -> Result<(), Box<dyn Error>> {
     }
     let homologous_paths_are_exact = homologous.values().all(|branches| {
         branches.len() == 2
-            && branches[0].torsors(1_000_000).is_ok_and(|left| {
+            && branches[0].torsors(HORN_LOCAL_SECTION_LIMIT).is_ok_and(|left| {
                 branches[1]
-                    .torsors(1_000_000)
+                    .torsors(HORN_LOCAL_SECTION_LIMIT)
                     .is_ok_and(|right| left == right)
             })
     });

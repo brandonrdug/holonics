@@ -47,6 +47,34 @@
 //! [`crate::arithmetic_monodromy`]'s integer Bareiss determinant. Nothing is evaluated at a point
 //! and nothing is approximated.
 //!
+//! ## How deep the bisection may go, and why nobody chooses that
+//!
+//! A bisection that splits an interval until each piece holds one root needs a floor: the point at
+//! which two roots are provably too far apart to share a piece. That floor is **not a budget**. It
+//! is Mahler's root separation bound, and it is computed from the polynomial's own discriminant and
+//! coefficient norm:
+//!
+//! ```text
+//!   sep(f)  >  sqrt( 3 |disc(f)| / n^(n+2) ) * ||f||_2^(1-n)
+//! ```
+//!
+//! for `f` squarefree of degree `n >= 2` (Mahler, *An inequality for the discriminant of a
+//! polynomial*, Michigan Math. J. **11** (1964) 257-262; stated in this `||f||_2` form at Wolfram
+//! MathWorld, *Root Separation*). Squaring keeps every quantity exactly rational:
+//!
+//! ```text
+//!   sep(f)^2  >  3 |disc(f)| / ( n^(n+2) * (sum a_i^2)^(n-1) )  =:  S
+//! ```
+//!
+//! `disc(f) = (-1)^(n(n-1)/2) Res(f, f') / a_n` is an integer, `sum a_i^2` is an integer, and `S`
+//! is an exact positive rational. So the number of splits needed is *read off the polynomial*:
+//! an interval of width `w` is split at most until `w^2 <= S`, at which point it cannot hold two
+//! distinct roots. A recursion that passes that depth is a **contradiction between Sturm and the
+//! discriminant**, and is refused as one — not as a budget overrun.
+//!
+//! `S` is invariant under scaling `f` by a nonzero constant, exactly as the separation it bounds
+//! is: `disc(cf) = c^(2n-2) disc(f)` and `||cf||_2^2 = c^2 ||f||_2^2` cancel.
+//!
 //! No float, no tolerance, no threshold, no ranking. Every returned population is returned whole.
 
 use num_bigint::BigInt;
@@ -383,6 +411,306 @@ fn integer_gcd(left: &BigInt, right: &BigInt) -> BigInt {
     left
 }
 
+// ===============================================================================================
+// the root separation bound: how far a bisection may go, read off the polynomial
+
+/// `Res(f, g)` by the Euclidean recurrence over `Q`, with the exact step count.
+///
+/// ```text
+///   res(f, g) = g_0^deg(f)                                         when deg g = 0
+///   res(f, g) = 0                                                  when f mod g = 0 and deg g >= 1
+///   res(f, g) = (-1)^(deg f * deg g) lc(g)^(deg f - deg r) res(g, r),   r = f mod g
+/// ```
+///
+/// This is the **second** route to a resultant in this module. [`resultant_in_eliminated_variable`]
+/// takes the Sylvester determinant by fraction-free Bareiss elimination; this one runs the
+/// Euclidean recurrence. `the_two_resultant_routes_agree` holds them against each other, which is
+/// what makes either figure a measurement rather than a single unchecked route.
+pub fn euclidean_resultant(
+    left: &RationalPolynomial,
+    right: &RationalPolynomial,
+) -> Result<(Rat, u64), ExactPolynomialError> {
+    let mut first = left.clone();
+    let mut second = right.clone();
+    let mut accumulated = Rat::one();
+    let mut steps = 0_u64;
+    loop {
+        let first_degree = first.degree().ok_or(ExactPolynomialError::ZeroPolynomial)?;
+        let second_degree = second.degree().ok_or(ExactPolynomialError::ZeroPolynomial)?;
+        if second_degree > first_degree {
+            if (first_degree * second_degree) % 2 == 1 {
+                accumulated = -accumulated;
+            }
+            std::mem::swap(&mut first, &mut second);
+            steps += 1;
+            continue;
+        }
+        if second_degree == 0 {
+            let constant = second.coefficient(0);
+            let power = u32::try_from(first_degree).map_err(|_| ExactPolynomialError::DegreeTooLarge)?;
+            return Ok((accumulated * constant.pow(power as i32), steps));
+        }
+        let (_, remainder) = first.divided_by(&second)?;
+        steps += 1;
+        if remainder.is_zero() {
+            return Ok((Rat::zero(), steps));
+        }
+        let remainder_degree = remainder.degree().expect("a nonzero remainder has a degree");
+        if (first_degree * second_degree) % 2 == 1 {
+            accumulated = -accumulated;
+        }
+        let leading = second.leading().expect("a nonzero divisor leads").clone();
+        let drop = u32::try_from(first_degree - remainder_degree)
+            .map_err(|_| ExactPolynomialError::DegreeTooLarge)?;
+        accumulated *= leading.pow(drop as i32);
+        first = second;
+        second = remainder;
+    }
+}
+
+/// `disc(f) = (-1)^(n(n-1)/2) Res(f, f') / a_n`, exact.
+///
+/// MathWorld, *Polynomial Discriminant*: `D(p) = (-1)^(n(n-1)/2) R(p, p') / a_n` in characteristic
+/// zero. The return is refused rather than rounded if it comes out non-integral, because the
+/// discriminant of an integer polynomial is an integer and a fractional one means the resultant is
+/// wrong.
+pub fn integer_discriminant(
+    polynomial: &IntegerPolynomial,
+) -> Result<(BigInt, u64), ExactPolynomialError> {
+    let degree = polynomial.degree();
+    if degree < 2 {
+        return Err(ExactPolynomialError::DiscriminantDegreeTooLow { degree });
+    }
+    let rational = RationalPolynomial::from_integer_polynomial(polynomial);
+    let (resultant, steps) = euclidean_resultant(&rational, &rational.derivative())?;
+    let leading = rational.leading().expect("a nonzero polynomial leads").clone();
+    let mut value = resultant / leading;
+    if (degree * (degree - 1) / 2) % 2 == 1 {
+        value = -value;
+    }
+    if !value.is_integer() {
+        return Err(ExactPolynomialError::NonIntegralDiscriminant);
+    }
+    Ok((value.to_integer(), steps))
+}
+
+/// The exact material Mahler's bound is read off, and the bound itself.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct RootSeparationBound {
+    pub degree: usize,
+    /// `disc(f)`, nonzero exactly because `f` is squarefree.
+    pub discriminant: BigInt,
+    /// `||f||_2^2 = sum a_i^2`.
+    pub coefficient_norm_squared: BigInt,
+    /// `3 |disc(f)| / ( n^(n+2) (||f||_2^2)^(n-1) )`, which is strictly below `sep(f)^2`.
+    pub squared_lower_bound: Rat,
+    /// Exact work of the Euclidean resultant, in division steps. Never a clock.
+    pub euclidean_steps: u64,
+}
+
+/// What the material says about how close two of its roots may be.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub enum RootSeparation {
+    /// Degree below two. There is no pair of roots, so no interval can hold two of them and no
+    /// split can ever be required. This is a statement about the polynomial, not a missing bound.
+    NothingToSeparate { degree: usize },
+    Bounded(RootSeparationBound),
+}
+
+impl RootSeparation {
+    pub fn squared_lower_bound(&self) -> Option<&Rat> {
+        match self {
+            Self::NothingToSeparate { .. } => None,
+            Self::Bounded(bound) => Some(&bound.squared_lower_bound),
+        }
+    }
+
+    /// Whether an interval of this width provably holds at most one root.
+    ///
+    /// `width^2 <= S < sep(f)^2` forces `width < sep(f)`, and two distinct roots inside one open
+    /// interval are closer than its width.
+    pub fn holds_at_most_one_root(&self, width: &Rat) -> bool {
+        match self.squared_lower_bound() {
+            None => true,
+            Some(square) => &(width * width) <= square,
+        }
+    }
+
+    /// How many splits at a retained fraction of `retained` bring an interval of width
+    /// `initial_width` down to one that provably holds at most one root.
+    ///
+    /// `retained` is the largest fraction of an interval that one child of a split may keep — a
+    /// property of the declared split schedule, obtained from [`worst_retained_fraction`]. Nothing
+    /// here is chosen: the width comes from the caller, the schedule from the organ, and the floor
+    /// from the discriminant.
+    pub fn splitting_depth(
+        &self,
+        initial_width: &Rat,
+        retained: &Rat,
+    ) -> Result<u64, ExactPolynomialError> {
+        match self.squared_lower_bound() {
+            None => Ok(0),
+            Some(square) => {
+                squared_shrinking_steps(&(initial_width * initial_width), retained, square)
+            }
+        }
+    }
+}
+
+/// Mahler's root separation bound, exactly, for a squarefree integer polynomial.
+///
+/// ```text
+///   sep(f)^2  >  3 |disc(f)| / ( n^(n+2) * (||f||_2^2)^(n-1) )
+/// ```
+///
+/// A vanishing discriminant is refused by name: it means the polynomial is not squarefree, and the
+/// bound is only stated for squarefree polynomials.
+pub fn root_separation(
+    polynomial: &IntegerPolynomial,
+) -> Result<RootSeparation, ExactPolynomialError> {
+    let degree = polynomial.degree();
+    if degree < 2 {
+        return Ok(RootSeparation::NothingToSeparate { degree });
+    }
+    let (discriminant, euclidean_steps) = integer_discriminant(polynomial)?;
+    if discriminant.is_zero() {
+        return Err(ExactPolynomialError::VanishingDiscriminant);
+    }
+    let coefficient_norm_squared = polynomial
+        .coefficients
+        .iter()
+        .map(|value| value * value)
+        .sum::<BigInt>();
+    let exponent = u32::try_from(degree + 2).map_err(|_| ExactPolynomialError::DegreeTooLarge)?;
+    let power = u32::try_from(degree - 1).map_err(|_| ExactPolynomialError::DegreeTooLarge)?;
+    let denominator =
+        BigInt::from(degree).pow(exponent) * coefficient_norm_squared.pow(power);
+    let squared_lower_bound = Rat::new(BigInt::from(3) * discriminant.abs(), denominator);
+    Ok(RootSeparation::Bounded(RootSeparationBound {
+        degree,
+        discriminant,
+        coefficient_norm_squared,
+        squared_lower_bound,
+        euclidean_steps,
+    }))
+}
+
+/// Cauchy's lower bound on the **nonzero** roots: every root `x != 0` of `f` has
+/// `|x| >= |a_m| / ( |a_m| + max_{i>m} |a_i| )`, where `a_m` is the lowest nonzero coefficient.
+///
+/// This is Cauchy's upper bound applied to the reversal of `f / x^m`, whose roots are the
+/// reciprocals. `None` exactly when `f` is a monomial and therefore has no nonzero root.
+pub fn nonzero_root_lower_bound(polynomial: &IntegerPolynomial) -> Option<Rat> {
+    let degree = polynomial.degree();
+    let lowest = polynomial
+        .coefficients
+        .iter()
+        .position(|value| !value.is_zero())?;
+    if lowest == degree {
+        return None;
+    }
+    let anchor = polynomial.coefficients[lowest].abs();
+    let largest = polynomial.coefficients[lowest + 1..=degree]
+        .iter()
+        .map(|value| value.abs())
+        .max()
+        .unwrap_or_else(BigInt::zero);
+    Some(Rat::new(anchor.clone(), anchor + largest))
+}
+
+/// The interior points a bisection may split at, read off the degree.
+///
+/// A polynomial of degree `d` has at most `d` roots, so `d + 1` distinct interior points contain at
+/// least one non-root — by pigeonhole, with no list to run out. The points are `k / (d + 2)` of the
+/// way across, ordered by distance from the middle, so the **first** candidate is the midpoint
+/// whenever `d` is even and the nearest point to it otherwise.
+///
+/// This replaces a hand-written list of thirteen fractions, which silently could not serve a
+/// polynomial of degree thirteen or above.
+pub fn interior_split_schedule(degree: usize) -> Vec<Rat> {
+    let parts = BigInt::from(degree + 2);
+    let mut fractions: Vec<Rat> = (1..=degree + 1)
+        .map(|step| Rat::new(BigInt::from(step), parts.clone()))
+        .collect();
+    let middle = Rat::new(BigInt::one(), BigInt::from(2));
+    fractions.sort_by(|left, right| {
+        let left_gap = (left - &middle).abs();
+        let right_gap = (right - &middle).abs();
+        left_gap.cmp(&right_gap).then_with(|| left.cmp(right))
+    });
+    fractions
+}
+
+/// The largest fraction of an interval either child of a split may retain.
+///
+/// For a schedule of split points `f`, the two children keep `f` and `1 - f`, so the worst case is
+/// `max_f max(f, 1 - f)`. It is what turns a split count into a width guarantee, and it is read off
+/// the schedule rather than assumed to be one half.
+pub fn worst_retained_fraction(schedule: &[Rat]) -> Result<Rat, ExactPolynomialError> {
+    let mut worst: Option<Rat> = None;
+    for fraction in schedule {
+        if !fraction.is_positive() || fraction >= &Rat::one() {
+            return Err(ExactPolynomialError::InvalidSplitFraction);
+        }
+        let retained = fraction.clone().max(Rat::one() - fraction);
+        worst = Some(match worst {
+            None => retained,
+            Some(current) => current.max(retained),
+        });
+    }
+    worst.ok_or(ExactPolynomialError::EmptySplitSchedule)
+}
+
+/// The smallest `r` with `initial_squared * retained^(2r) <= target_squared`.
+///
+/// Everything is kept squared so that a bound whose square root is irrational — which every root
+/// separation bound's is — never has to be taken. Found by bracketing and then bisecting on `r`, so
+/// the cost is logarithmic in the answer and every comparison is an exact integer comparison.
+pub fn squared_shrinking_steps(
+    initial_squared: &Rat,
+    retained: &Rat,
+    target_squared: &Rat,
+) -> Result<u64, ExactPolynomialError> {
+    if !initial_squared.is_positive()
+        || !target_squared.is_positive()
+        || !retained.is_positive()
+        || retained >= &Rat::one()
+    {
+        return Err(ExactPolynomialError::InvalidShrinkingStep);
+    }
+    // `initial * (rn/rd)^(2r) <= target`  <=>  `initial_n * target_d * rn^(2r) <= target_n *
+    // initial_d * rd^(2r)`, all positive integers.
+    let left_constant = initial_squared.numer() * target_squared.denom();
+    let right_constant = target_squared.numer() * initial_squared.denom();
+    let step_numerator = retained.numer().clone();
+    let step_denominator = retained.denom().clone();
+    let reached = |steps: u64| -> Result<bool, ExactPolynomialError> {
+        let exponent =
+            u32::try_from(steps.saturating_mul(2)).map_err(|_| ExactPolynomialError::DegreeTooLarge)?;
+        Ok(&left_constant * step_numerator.pow(exponent)
+            <= &right_constant * step_denominator.pow(exponent))
+    };
+    if reached(0)? {
+        return Ok(0);
+    }
+    let mut high = 1_u64;
+    while !reached(high)? {
+        high = high
+            .checked_mul(2)
+            .ok_or(ExactPolynomialError::DegreeTooLarge)?;
+    }
+    let mut low = high / 2;
+    while low + 1 < high {
+        let middle = low + (high - low) / 2;
+        if reached(middle)? {
+            high = middle;
+        } else {
+            low = middle;
+        }
+    }
+    Ok(high)
+}
+
 /// One real root of the auxiliary polynomial, isolated with its Sturm sign-variation certificate,
 /// together with the exact statement of whether it is rational.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -411,6 +739,15 @@ pub struct RationalRootCensus {
     pub roots: Vec<CensusedRealRoot>,
     /// Every rational root of `source`, exactly and completely.
     pub rational_roots: Vec<Rat>,
+    /// Mahler's bound on the squared distance between two roots of the squarefree part, read off
+    /// its own discriminant. This is what decides how far the isolation is allowed to descend.
+    pub separation: RootSeparation,
+    /// The splits the bound above permits, given the widest leaf the half-integer descent handed on
+    /// and the worst fraction the declared split schedule can retain. A recursion that passes this
+    /// is a contradiction, not an exhausted budget.
+    pub isolation_depth_bound: u64,
+    /// The worst fraction either child of a split may retain, read off the split schedule.
+    pub split_schedule_retained: Rat,
     pub work: CensusWork,
 }
 
@@ -437,6 +774,11 @@ pub struct CensusWork {
     pub sturm_counts: u64,
     pub bisection_steps: u64,
     pub exact_evaluations: u64,
+    /// The deepest the isolation actually descended. Compared against
+    /// [`RationalRootCensus::isolation_depth_bound`], this is the whole content of the claim that
+    /// the depth is read off the material: the bound is what the discriminant permits, and this is
+    /// what the polynomial asked for.
+    pub isolation_depth_reached: u64,
 }
 
 /// Count and isolate the real roots and return every rational root, exactly.
@@ -501,10 +843,30 @@ pub fn rational_root_census(
     let squarefree = RationalPolynomial::from_integer_polynomial(&monic_companion)
         .squarefree_part()?
         .primitive_integer_form()?;
+
+    // The floor of the descent, read off the squarefree part rather than chosen: Mahler's bound
+    // from its own discriminant, against the widest leaf the half-integer descent produced and the
+    // worst fraction the declared split schedule can retain.
+    let separation = root_separation(&squarefree)?;
+    let split_schedule_retained =
+        worst_retained_fraction(&interior_split_schedule(squarefree.degree()))?;
+    let widest_leaf = leaves
+        .iter()
+        .map(|(leaf_lower, leaf_upper, _)| leaf_upper - leaf_lower)
+        .max()
+        .unwrap_or_else(Rat::zero);
+    let isolation_depth_bound = if widest_leaf.is_positive() {
+        separation.splitting_depth(&widest_leaf, &split_schedule_retained)?
+    } else {
+        0
+    };
+
     let mut isolated = Vec::new();
     for (leaf_lower, leaf_upper, count) in leaves {
         isolate_within(
             &squarefree,
+            &separation,
+            isolation_depth_bound,
             &leaf_lower,
             &leaf_upper,
             count,
@@ -559,6 +921,9 @@ pub fn rational_root_census(
         distinct_real_roots,
         roots,
         rational_roots,
+        separation,
+        isolation_depth_bound,
+        split_schedule_retained,
         work,
     })
 }
@@ -640,27 +1005,39 @@ fn descend_half_integer(
     )
 }
 
-const MAXIMUM_ISOLATION_DEPTH: u32 = 200;
-
 /// Split a leaf until each surviving interval holds exactly one root of the squarefree part.
+///
+/// **Both refusals below are defect reports, not budget overruns.** The material — the polynomial's
+/// own discriminant, through [`root_separation`] — states how narrow an interval has to be before
+/// it can hold at most one root, and how many splits at the declared schedule's worst retained
+/// fraction reach that width. Passing either means Sturm and the discriminant disagree about the
+/// same polynomial.
+#[allow(clippy::too_many_arguments)]
 fn isolate_within(
     squarefree: &IntegerPolynomial,
+    separation: &RootSeparation,
+    depth_bound: u64,
     lower: &Rat,
     upper: &Rat,
     count: u32,
-    depth: u32,
+    depth: u64,
     isolated: &mut Vec<(Rat, Rat)>,
     work: &mut CensusWork,
 ) -> Result<(), ExactPolynomialError> {
     if count == 0 {
         return Ok(());
     }
+    work.isolation_depth_reached = work.isolation_depth_reached.max(depth);
     if count == 1 {
         isolated.push((lower.clone(), upper.clone()));
         return Ok(());
     }
-    if depth >= MAXIMUM_ISOLATION_DEPTH {
-        return Err(ExactPolynomialError::IsolationDepthExhausted);
+    // The sharp form, independent of any schedule: an interval this narrow cannot hold two roots.
+    if separation.holds_at_most_one_root(&(upper - lower)) {
+        return Err(ExactPolynomialError::SeparationBoundContradicted { count });
+    }
+    if depth >= depth_bound {
+        return Err(ExactPolynomialError::IsolationPastTheSeparationBound { depth_bound });
     }
     let middle = interior_non_root(squarefree, lower, upper, work)?;
     work.bisection_steps += 1;
@@ -669,14 +1046,36 @@ fn isolate_within(
     if left + right != count {
         return Err(ExactPolynomialError::SturmCountsDisagree);
     }
-    isolate_within(squarefree, lower, &middle, left, depth + 1, isolated, work)?;
-    isolate_within(squarefree, &middle, upper, right, depth + 1, isolated, work)
+    isolate_within(
+        squarefree,
+        separation,
+        depth_bound,
+        lower,
+        &middle,
+        left,
+        depth + 1,
+        isolated,
+        work,
+    )?;
+    isolate_within(
+        squarefree,
+        separation,
+        depth_bound,
+        &middle,
+        upper,
+        right,
+        depth + 1,
+        isolated,
+        work,
+    )
 }
 
 /// A point strictly inside `(lower, upper)` at which the polynomial does not vanish.
 ///
-/// A squarefree polynomial of degree `d` has at most `d` roots, so at most `d + 1` declared
-/// candidates are ever needed and the search is bounded rather than hopeful.
+/// The candidates come from [`interior_split_schedule`], which reads their count off the degree:
+/// a polynomial of degree `d` has at most `d` roots, so `d + 1` distinct interior points cannot all
+/// be roots. `NoInteriorNonRoot` is therefore unreachable for a genuine polynomial and is retained
+/// as the defect report it is.
 fn interior_non_root(
     squarefree: &IntegerPolynomial,
     lower: &Rat,
@@ -684,23 +1083,8 @@ fn interior_non_root(
     work: &mut CensusWork,
 ) -> Result<Rat, ExactPolynomialError> {
     let width = upper - lower;
-    let candidates: [(i64, i64); 13] = [
-        (1, 2),
-        (1, 3),
-        (2, 3),
-        (1, 4),
-        (3, 4),
-        (1, 5),
-        (2, 5),
-        (3, 5),
-        (4, 5),
-        (1, 6),
-        (5, 6),
-        (1, 7),
-        (2, 7),
-    ];
-    for (numerator, denominator) in candidates {
-        let point = lower + &width * Rat::new(BigInt::from(numerator), BigInt::from(denominator));
+    for fraction in interior_split_schedule(squarefree.degree()) {
+        let point = lower + &width * fraction;
         work.exact_evaluations += 1;
         if !squarefree.evaluate(&point).is_zero() {
             return Ok(point);
@@ -1000,8 +1384,34 @@ pub enum ExactPolynomialError {
     BisectionStalled,
     #[error("no declared interior candidate avoided the root set")]
     NoInteriorNonRoot,
-    #[error("root isolation exhausted its declared depth")]
-    IsolationDepthExhausted,
+    #[error(
+        "root isolation passed the {depth_bound} splits the root separation bound derived from the discriminant permits; Sturm and the discriminant disagree about this polynomial"
+    )]
+    IsolationPastTheSeparationBound { depth_bound: u64 },
+    #[error(
+        "an interval no wider than the root separation bound still reported {count} distinct roots; Sturm and the discriminant contradict each other"
+    )]
+    SeparationBoundContradicted { count: u32 },
+    #[error(
+        "a discriminant needs degree at least two, and this polynomial has degree {degree}: a linear polynomial has no pair of roots to separate"
+    )]
+    DiscriminantDegreeTooLow { degree: usize },
+    #[error("the discriminant of an integer polynomial came out non-integral")]
+    NonIntegralDiscriminant,
+    #[error(
+        "the discriminant vanished, so the polynomial is not squarefree and Mahler's bound does not apply to it"
+    )]
+    VanishingDiscriminant,
+    #[error("a split schedule fraction is not strictly inside (0, 1)")]
+    InvalidSplitFraction,
+    #[error("a split schedule with no candidates retains everything")]
+    EmptySplitSchedule,
+    #[error(
+        "a shrinking count needs a positive width, a positive target, and a retained fraction strictly inside (0, 1)"
+    )]
+    InvalidShrinkingStep,
+    #[error("a degree or exponent exceeded what an exact power can carry")]
+    DegreeTooLarge,
     #[error("root isolation was refused by the Sturm certificate")]
     IsolationRefused,
     #[error("a censused rational root did not vanish on the source polynomial")]
@@ -1165,6 +1575,281 @@ mod tests {
                 outer.evaluate(&inner.evaluate(&integer(point)))
             );
         }
+    }
+
+    // -------------------------------------------------------------------------------------
+    // the root separation bound
+
+    fn constant_bivariate(polynomial: &RationalPolynomial) -> BivariatePolynomial {
+        BivariatePolynomial::new(
+            polynomial
+                .coefficients()
+                .iter()
+                .map(|value| RationalPolynomial::constant(value.clone()))
+                .collect(),
+        )
+    }
+
+    /// Two independent routes to `Res(f, f')`: the Euclidean recurrence used by the bound, and the
+    /// Sylvester determinant by fraction-free Bareiss elimination. §2.3 — a figure deposited from
+    /// one route is a figure with no second reading.
+    #[test]
+    fn the_two_resultant_routes_agree_and_reproduce_the_classical_discriminants() {
+        // disc(x^n + a) = (-1)^(n(n-1)/2) n^n a^(n-1), plus the two textbook small cases.
+        let family: [(Vec<i64>, i64); 6] = [
+            (vec![-2, 0, 1], 8),          // x^2 - 2
+            (vec![-1, -1, 1], 5),         // x^2 - x - 1
+            (vec![-2, 0, 0, 1], -108),    // x^3 - 2
+            (vec![-6, 11, -6, 1], 4),     // (x-1)(x-2)(x-3)
+            (vec![1, 0, 0, 0, 1], 256),   // x^4 + 1
+            (vec![-8, 12, -6, 1], 0),     // (x-2)^3, not squarefree
+        ];
+        let mut saw_a_vanishing_discriminant = false;
+        let mut saw_both_signs = (false, false);
+        for (coefficients, expected) in family {
+            let rational = polynomial(&coefficients);
+            let integral = rational.primitive_integer_form().unwrap();
+            let (discriminant, steps) = integer_discriminant(&integral).unwrap();
+            assert_eq!(
+                discriminant,
+                BigInt::from(expected),
+                "disc of {}",
+                rational.written("x")
+            );
+            assert!(steps > 0, "the Euclidean route took no step");
+
+            // Route two: the Sylvester determinant, then the same normalisation.
+            let derivative = rational.derivative();
+            let (sylvester, _) = resultant_in_eliminated_variable(
+                &constant_bivariate(&rational),
+                &constant_bivariate(&derivative),
+            )
+            .unwrap();
+            let degree = integral.degree();
+            let mut by_sylvester =
+                sylvester.coefficient(0) / rational.leading().unwrap().clone();
+            if (degree * (degree - 1) / 2) % 2 == 1 {
+                by_sylvester = -by_sylvester;
+            }
+            assert_eq!(
+                by_sylvester,
+                Rat::from_integer(discriminant.clone()),
+                "the Euclidean and Sylvester routes disagree on {}",
+                rational.written("x")
+            );
+
+            saw_a_vanishing_discriminant |= discriminant.is_zero();
+            saw_both_signs.0 |= discriminant.is_positive();
+            saw_both_signs.1 |= discriminant.is_negative();
+        }
+        assert!(
+            saw_a_vanishing_discriminant && saw_both_signs.0 && saw_both_signs.1,
+            "a family without a vanishing discriminant and both signs cannot exercise the sign rule"
+        );
+    }
+
+    /// Mahler's bound, held against separations that are known exactly. The orbit is wide on
+    /// purpose: `sep^2` runs from `8` down to `1`, and a wrong exponent anywhere in
+    /// `3 |disc| / (n^(n+2) (||f||_2^2)^(n-1))` breaks one of these.
+    #[test]
+    fn the_separation_bound_lies_strictly_below_every_separation_known_exactly() {
+        // (coefficients, exact sep^2)
+        let family: [(Vec<i64>, Rat); 5] = [
+            // x^2 - 2: roots +-sqrt2, gap 2 sqrt2.
+            (vec![-2, 0, 1], integer(8)),
+            // x^2 - x - 1: roots (1 +- sqrt5)/2, gap sqrt5.
+            (vec![-1, -1, 1], integer(5)),
+            // (x-1)(x-2)(x-3): gap 1.
+            (vec![-6, 11, -6, 1], integer(1)),
+            // (2x-1)(2x-3) = 4x^2 - 8x + 3: roots 1/2 and 3/2, gap 1.
+            (vec![3, -8, 4], integer(1)),
+            // x^2 + 1: roots +-i, gap 2 — the bound is over the COMPLEX roots, so a real-only
+            // reading of it would fail here.
+            (vec![1, 0, 1], integer(4)),
+        ];
+        let mut ratios = Vec::new();
+        for (coefficients, squared_separation) in family {
+            let integral = polynomial(&coefficients).primitive_integer_form().unwrap();
+            let RootSeparation::Bounded(bound) = root_separation(&integral).unwrap() else {
+                panic!("degree two and above is bounded");
+            };
+            assert!(
+                bound.squared_lower_bound < squared_separation,
+                "Mahler's bound {} is not below sep^2 = {squared_separation} for {}",
+                bound.squared_lower_bound,
+                polynomial(&coefficients).written("x")
+            );
+            ratios.push(squared_separation / bound.squared_lower_bound);
+        }
+        assert!(
+            ratios.iter().any(|ratio| ratio > &integer(1000)),
+            "every fixture sat within a factor of a thousand of the bound, so the check could not \
+             distinguish a correct exponent from a mildly wrong one"
+        );
+    }
+
+    /// The bound is a property of the root set, so it may not move when the polynomial is scaled:
+    /// `disc(cf) = c^(2n-2) disc(f)` and `||cf||_2^2 = c^2 ||f||_2^2` cancel exactly.
+    ///
+    /// This is the control with the non-trivial orbit: the *discriminant* moves by `c^(2n-2)` and
+    /// the *norm* by `c^2`, both exhibited below, and only their combination stands still.
+    #[test]
+    fn the_separation_bound_does_not_move_when_the_polynomial_is_scaled() {
+        let base = polynomial(&[-6, 11, -6, 1]);
+        let RootSeparation::Bounded(unscaled) =
+            root_separation(&base.primitive_integer_form().unwrap()).unwrap()
+        else {
+            panic!("a cubic is bounded")
+        };
+        let mut moved_discriminants = 0;
+        for factor in [2_i64, 3, 5] {
+            let scaled = IntegerPolynomial::new(
+                base.coefficients()
+                    .iter()
+                    .map(|value| (value * integer(factor)).to_integer())
+                    .collect(),
+            )
+            .unwrap();
+            let RootSeparation::Bounded(moved) = root_separation(&scaled).unwrap() else {
+                panic!("a cubic is bounded")
+            };
+            // `2n - 2 = 4` and `n - 1 = 2` here, so both inputs really do move.
+            assert_eq!(
+                moved.discriminant,
+                &unscaled.discriminant * BigInt::from(factor).pow(4)
+            );
+            assert_eq!(
+                moved.coefficient_norm_squared,
+                &unscaled.coefficient_norm_squared * BigInt::from(factor).pow(2)
+            );
+            assert_ne!(moved.discriminant, unscaled.discriminant);
+            moved_discriminants += 1;
+            // And the bound they compose to does not move at all.
+            assert_eq!(moved.squared_lower_bound, unscaled.squared_lower_bound);
+        }
+        assert_eq!(moved_discriminants, 3);
+    }
+
+    #[test]
+    fn a_polynomial_that_is_not_squarefree_is_refused_by_its_own_vanishing_discriminant() {
+        let repeated = polynomial(&[-8, 12, -6, 1]) // (x - 2)^3
+            .primitive_integer_form()
+            .unwrap();
+        assert_eq!(
+            root_separation(&repeated),
+            Err(ExactPolynomialError::VanishingDiscriminant)
+        );
+        // A linear polynomial has one root and therefore no pair to separate. That is a statement
+        // about the polynomial, not a missing bound.
+        let linear = polynomial(&[-1, 2]).primitive_integer_form().unwrap();
+        assert_eq!(
+            root_separation(&linear).unwrap(),
+            RootSeparation::NothingToSeparate { degree: 1 }
+        );
+        assert!(
+            root_separation(&linear)
+                .unwrap()
+                .holds_at_most_one_root(&integer(1_000_000))
+        );
+    }
+
+    /// The split schedule's size is read off the degree by pigeonhole, so it cannot run out — which
+    /// the hand-written list of thirteen fractions it replaces silently could, from degree thirteen.
+    #[test]
+    fn the_split_schedule_carries_one_more_candidate_than_the_degree_admits_roots() {
+        for degree in [0_usize, 1, 5, 6, 13, 40] {
+            let schedule = interior_split_schedule(degree);
+            assert_eq!(schedule.len(), degree + 1);
+            let distinct: std::collections::BTreeSet<_> = schedule.iter().cloned().collect();
+            assert_eq!(distinct.len(), degree + 1, "the candidates must be distinct");
+            for fraction in &schedule {
+                assert!(fraction.is_positive() && fraction < &Rat::one());
+            }
+            assert_eq!(
+                worst_retained_fraction(&schedule).unwrap(),
+                Rat::new(BigInt::from(degree + 1), BigInt::from(degree + 2))
+            );
+        }
+        // The first candidate is the midpoint whenever the degree admits one exactly.
+        assert_eq!(interior_split_schedule(6)[0], rat(1, 2));
+        assert_eq!(interior_split_schedule(0)[0], rat(1, 2));
+        // A degree-13 polynomial has fourteen candidates; the list this replaced had thirteen.
+        assert_eq!(interior_split_schedule(13).len(), 14);
+        assert_eq!(
+            worst_retained_fraction(&[]),
+            Err(ExactPolynomialError::EmptySplitSchedule)
+        );
+        assert_eq!(
+            worst_retained_fraction(&[Rat::one()]),
+            Err(ExactPolynomialError::InvalidSplitFraction)
+        );
+    }
+
+    #[test]
+    fn the_shrinking_count_is_exact_and_logarithmic() {
+        let half = rat(1, 2);
+        // width 1 down to 1/1024 is ten halvings, and the count is taken on squares throughout.
+        assert_eq!(
+            squared_shrinking_steps(&integer(1), &half, &rat(1, 1_048_576)).unwrap(),
+            10
+        );
+        assert_eq!(squared_shrinking_steps(&integer(1), &half, &integer(1)).unwrap(), 0);
+        assert_eq!(squared_shrinking_steps(&integer(1), &half, &integer(4)).unwrap(), 0);
+        // A retained fraction nearer one costs proportionally more steps, which is exactly why the
+        // schedule's worst case has to be read off rather than assumed to be a half.
+        let slow = squared_shrinking_steps(&integer(1), &rat(6, 7), &rat(1, 1_048_576)).unwrap();
+        assert_eq!(slow, 45);
+        assert_eq!(
+            squared_shrinking_steps(&integer(1), &Rat::one(), &rat(1, 2)),
+            Err(ExactPolynomialError::InvalidShrinkingStep)
+        );
+    }
+
+    /// **The orbit.** Mignotte's `x^6 - 2(a x - 1)^2` has two roots about `sqrt2 * a^(-4)` apart, so
+    /// the isolation depth it demands is set by `a` and by nothing else. At `a = 10^12` it is under
+    /// the authored two hundred this replaced; at `a = 10^16` it is over, and the census now returns
+    /// where the authored depth refused.
+    #[test]
+    fn mignottes_family_pushes_the_isolation_past_the_depth_that_was_authored() {
+        /// The level this excised. Carried here as history, never consulted by library code.
+        const THE_EXCISED_DEPTH: u64 = 200;
+        let mignotte = |power: u32| {
+            let scale = BigInt::from(10).pow(power);
+            RationalPolynomial::new(vec![
+                integer(-2),
+                Rat::from_integer(&scale * BigInt::from(4)),
+                Rat::from_integer(-(&scale * &scale) * BigInt::from(2)),
+                Rat::zero(),
+                Rat::zero(),
+                Rat::zero(),
+                Rat::one(),
+            ])
+        };
+        let mut under = 0;
+        let mut over = 0;
+        for power in [12_u32, 16] {
+            let census = rational_root_census(&mignotte(power)).unwrap();
+            assert_eq!(census.distinct_real_roots, 4);
+            assert!(census.rational_roots.is_empty());
+            // The bound is derived and the descent is inside it: that is the soundness statement,
+            // and a bound that came out too small would have refused rather than returned.
+            assert!(
+                census.work.isolation_depth_reached < census.isolation_depth_bound,
+                "10^{power}: reached {} of a permitted {}",
+                census.work.isolation_depth_reached,
+                census.isolation_depth_bound
+            );
+            if census.work.isolation_depth_reached < THE_EXCISED_DEPTH {
+                under += 1;
+            } else {
+                over += 1;
+            }
+        }
+        assert_eq!(
+            (under, over),
+            (1, 1),
+            "the family must straddle the excised depth, or it separates nothing"
+        );
     }
 
     #[test]

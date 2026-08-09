@@ -54,26 +54,61 @@
 //! [`axis_witnesses`] proves the family's orbit is non-trivial by exhibiting, for each axis, a pair
 //! of surfaces that axis separates and the other two do not.
 //!
-//! ## The two apertures, and the one bound
+//! ## The separation population is FACTORIZED, and that is why no aperture bounds this reading
 //!
-//! The **horizon** is a receiver coordinate, not a knob: every reading carries the horizon it was
-//! taken at, and [`iron_at`] is monotone — iron at horizon `h+1` is contained in iron at horizon
-//! `h`, because a longer word can only separate more. The driver takes both declared horizons and
-//! asserts the containment.
+//! Until 2026-08-09 this module carried two authored levels — `WINDOW_APERTURE = 64` capping how
+//! many distinct windows reached the compression organ, and `SEPARATION_EXHIBIT = 512` capping how
+//! many separations the reading carried. Both were **silent truncations**: the return was a prefix
+//! and a count, and a caller could not tell a complete answer from a cut one. Both are gone, and
+//! neither was replaced by a larger number.
 //!
-//! The one bound is [`WINDOW_APERTURE`]: at most that many *distinct* radius-`h` windows are
-//! presented to the compression organ per surface, in corpus order, and
-//! [`SeparationReading::windows_withheld`] names the residual. **The bound provably cannot
-//! manufacture an iron verdict**, because a surface is iron exactly when it has one distinct window,
-//! and one window is never withheld. It bounds only how many separating words are exhibited.
+//! What replaced them is the observation that the population **factorizes exactly**, so the
+//! quadratic object never has to be materialized to be returned:
+//!
+//! 1. **Conduct words are pure runs.** `successor` moves one slot, and a mixed word such as `LR`
+//!    returns to the root, which the organ's breadth-first search has already seen and never
+//!    enqueues. So the admitted words are `L^k` and `R^k` for `k <= horizon`, explored in the order
+//!    `L, R, LL, RR, LLL, RRR, …`.
+//! 2. **A [`Window`] is therefore an ordered word, not a set.** It is written in exactly that
+//!    order — offset `-1`, `+1`, `-2`, `+2`, … — so *lexicographic order on windows is the organ's
+//!    own refinement order*, and the first index at which two windows differ **is** the round at
+//!    which Moore's algorithm separates them.
+//! 3. **Two occurrences separate exactly when their windows differ**, and the shortest separating
+//!    word is read straight off that first differing index: `L` when it is even, `R` when it is
+//!    odd, at depth `index / 2 + 1`.
+//! 4. So the whole separation population is carried by the window classes **in sorted order**
+//!    together with the length of the prefix each shares with its predecessor — the standard
+//!    longest-common-prefix array. That is `O(d · horizon)` for `d` distinct windows, against
+//!    `C(d, 2)` pairs, and every pair is recoverable from it exactly.
+//!
+//! Measured on the declared corpus by `examples/the_iron_tokens_carry_the_field` on 2026-08-09, at
+//! horizon 2: `"the"` had **30,507** distinct windows and `C(30507, 2) = 465,323,271` separated
+//! pairs, held by 30,507 classes and 30,506 shared-prefix lengths. **That figure moves**, because
+//! the declared corpus is this repository and it is written to; re-take it rather than carrying it.
+//! What does not move is the shape: the old aperture presented 64 of those windows and reported
+//! `conduct_blocks = 64` — a number produced by the level rather than by the corpus.
+//!
+//! ## Where a declared capacity still binds, and what it returns
+//!
+//! Materializing pairs is the one operation whose cost is genuinely quadratic. It is not performed
+//! by the reading; a caller asks for it, declares the capacity it has, and
+//! [`SeparationComplex::exhibit`] either returns the population **whole** or returns
+//! [`ExhibitionObstructed`] naming the width the material required. It never returns a prefix.
+//!
+//! `research/records/2026-08-01_THE_HARDWARE_IS_A_RECEIVER_COVER_THE_CARD_MUST_CARRY_THE_CURRENT.md`,
+//! ratified, is the law this follows: *"An exact antichain can have genuine large width. That width
+//! is an unresolved alternative fiber, not permission to exhaust memory or truncate silently. Shared
+//! structure is factorized; if the remaining exact terminal width exceeds declared host/card
+//! capacity, the event returns a resource obstruction while preserving standing."* The standing
+//! preserved here is the complex itself: an obstructed exhibition costs the caller nothing it had.
 //!
 //! ## Two independent implementations of one partition
 //!
-//! `CLAUDE.md` §8: where an independent implementation exists, state both. The distinct-window
-//! census computed here and the Nerode refinement computed by `receiver_exact_compression` are two
-//! implementations of the same partition — the window is the complete information a word of length
-//! at most `h` can reach — and [`SeparationReading::parity`] is their agreement. It is asserted, not
-//! assumed.
+//! `CLAUDE.md` §8: where an independent implementation exists, state both. The factorization
+//! computed here and the Nerode refinement computed by `receiver_exact_compression` are two
+//! implementations of the same partition, and [`cross_check`] runs the second against the first
+//! **pair for pair** — word, witness, and terminus — on any surface whose pair population fits a
+//! declared capacity. It is asserted, not assumed.
 
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -81,7 +116,7 @@ use num_bigint::BigUint;
 
 use crate::corpus_census::{CorpusCensus, Kind, SurfaceId, weight_band_name};
 use crate::receiver_exact_compression::{
-    AblatedSystem, CollapsedPair, InputId, ItemId, ObservedSystem, Observation, ReceiverId, compress,
+    AblatedSystem, InputId, ItemId, Observation, ObservedSystem, ReceiverId, compress,
 };
 
 /// One declared receiver. Each reads exactly one coordinate of the census signature, so each is
@@ -119,6 +154,15 @@ impl ReceiverAxis {
             ReceiverAxis::Kind => "kind",
             ReceiverAxis::Weight => "weight",
             ReceiverAxis::Density => "density",
+        }
+    }
+
+    /// What this axis reads out of a census signature.
+    pub fn read(self, signature: (u64, u64, u64)) -> u64 {
+        match self {
+            ReceiverAxis::Kind => signature.0,
+            ReceiverAxis::Weight => signature.1,
+            ReceiverAxis::Density => signature.2,
         }
     }
 
@@ -170,39 +214,573 @@ impl Step {
     }
 }
 
-/// The declared window aperture: at most this many distinct windows per surface reach the
-/// compression organ. See the module header — it cannot manufacture an iron verdict.
-pub const WINDOW_APERTURE: usize = 64;
-
-/// The declared cap on separations retained per surface. The organ computes every one; this bounds
-/// what the reading carries so a whole-corpus sweep fits in memory.
-/// [`SeparationReading::separations_found`] always reports the true total.
-pub const SEPARATION_EXHIBIT: usize = 512;
-
-/// The complete information a word of length at most `horizon` can reach from one occurrence:
-/// the receiver signature at every offset in `-horizon..=horizon` except `0`, with `None` where the
-/// whole ends.
+/// The complete information a word of length at most `horizon` can reach from one occurrence,
+/// written **in the order the organ's breadth-first search reaches it**: offset `-1`, `+1`, `-2`,
+/// `+2`, …, with `None` where the whole ends.
+///
+/// The order is the content. Lexicographic comparison of two windows is Moore refinement of the two
+/// occurrences they belong to, and the first differing index is the round at which they separate.
 pub type Window = Vec<Option<(u64, u64, u64)>>;
+
+/// The `(side, depth)` a window index names. Index `2(k-1)` is `L^k`; index `2(k-1)+1` is `R^k`.
+pub fn step_at(index: usize) -> (Step, usize) {
+    (
+        if index % 2 == 0 { Step::Left } else { Step::Right },
+        index / 2 + 1,
+    )
+}
+
+/// The signed stream offset a window index names.
+pub fn offset_at(index: usize) -> i64 {
+    let (side, depth) = step_at(index);
+    side.offset() * depth as i64
+}
 
 /// The window of the occurrence at `position` in `whole`.
 pub fn window(census: &CorpusCensus, whole: u32, position: u32, horizon: usize) -> Window {
     let stream = &census.wholes()[whole as usize].stream;
     let mut reading = Vec::with_capacity(2 * horizon);
-    for offset in -(horizon as i64)..=(horizon as i64) {
-        if offset == 0 {
-            continue;
-        }
-        let index = position as i64 + offset;
-        if index < 0 || index >= stream.len() as i64 {
+    for index in 0..2 * horizon {
+        let site = position as i64 + offset_at(index);
+        if site < 0 || site >= stream.len() as i64 {
             reading.push(None);
         } else {
-            reading.push(Some(census.signature(stream[index as usize])));
+            reading.push(Some(census.signature(stream[site as usize])));
         }
     }
     reading
 }
 
+/// The window of one occurrence under a family with one axis removed. The ablated reading is the
+/// same word with one coordinate deleted, so ablation is a projection of the factorization and
+/// needs no separate refinement.
+fn ablated_window(
+    census: &CorpusCensus,
+    whole: u32,
+    position: u32,
+    horizon: usize,
+    without: ReceiverAxis,
+) -> Vec<Option<(u64, u64)>> {
+    window(census, whole, position, horizon)
+        .into_iter()
+        .map(|reading| {
+            reading.map(|signature| {
+                let kept: Vec<u64> = ReceiverAxis::DECLARED
+                    .into_iter()
+                    .filter(|axis| *axis != without)
+                    .map(|axis| axis.read(signature))
+                    .collect();
+                (kept[0], kept[1])
+            })
+        })
+        .collect()
+}
+
+// -------------------------------------------------------------------------------------------------
+// The factorized separation population
+// -------------------------------------------------------------------------------------------------
+
+/// One distinct window, with **every** occurrence that reads it.
+///
+/// The occurrences inside a class are indistinguishable to the declared family within the horizon —
+/// no admitted word separates them — so collapsing them is an exact quotient rather than a sample.
+/// The multiplicity is retained, which is what lets the complex report the separated population
+/// over the whole occurrence set and not merely over representatives.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct WindowClass {
+    pub window: Window,
+    pub sites: Vec<(u32, u32)>,
+}
+
+impl WindowClass {
+    pub fn occurrences(&self) -> usize {
+        self.sites.len()
+    }
+}
+
+/// The whole separation population of one surface at one horizon, factorized.
+///
+/// `classes` is in lexicographic window order, which is the organ's refinement order.
+/// `shared_prefix[i]` is the length of the longest common prefix of `classes[i]` and
+/// `classes[i + 1]` — the standard longest-common-prefix array of the sorted population. The first
+/// index at which classes `i < j` differ is `min(shared_prefix[i..j])`, and that index carries the
+/// shortest separating word, its offset, and the receiver that sees it.
+///
+/// This is `O(d · horizon)` and holds `C(d, 2)` pairs exactly. Nothing is truncated and nothing is
+/// summarised: [`SeparationComplex::separation_between`] returns any one of them.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct SeparationComplex {
+    pub surface: SurfaceId,
+    pub horizon: usize,
+    pub classes: Vec<WindowClass>,
+    pub shared_prefix: Vec<usize>,
+}
+
+/// A materialization the caller's declared capacity cannot hold.
+///
+/// Standing is preserved: the [`SeparationComplex`] is intact and every figure it carries remains
+/// exact. What is refused is only the caller's request to write the quadratic population out, and
+/// the refusal names the width the material required so the caller can declare it or ask a
+/// narrower question.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ExhibitionObstructed {
+    pub surface: SurfaceId,
+    pub horizon: usize,
+    pub declared_capacity: u64,
+    pub required: BigUint,
+}
+
+impl std::fmt::Display for ExhibitionObstructed {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            formatter,
+            "exhibiting the separation population of surface {} at horizon {} requires width {}, \
+             past the declared capacity {}",
+            self.surface.0, self.horizon, self.required, self.declared_capacity
+        )
+    }
+}
+
+impl std::error::Error for ExhibitionObstructed {}
+
+impl SeparationComplex {
+    /// Build the complex from the surface's whole occurrence population. No aperture participates.
+    pub fn read(census: &CorpusCensus, surface: SurfaceId, horizon: usize) -> Self {
+        let mut grouped: BTreeMap<Window, Vec<(u32, u32)>> = BTreeMap::new();
+        for (whole, position) in census.sites(surface) {
+            grouped
+                .entry(window(census, *whole, *position, horizon))
+                .or_default()
+                .push((*whole, *position));
+        }
+        // `BTreeMap` already yields lexicographic window order, which is refinement order.
+        let classes: Vec<WindowClass> = grouped
+            .into_iter()
+            .map(|(window, sites)| WindowClass { window, sites })
+            .collect();
+        let shared_prefix = classes
+            .windows(2)
+            .map(|pair| {
+                pair[0]
+                    .window
+                    .iter()
+                    .zip(pair[1].window.iter())
+                    .take_while(|(left, right)| left == right)
+                    .count()
+            })
+            .collect();
+        Self {
+            surface,
+            horizon,
+            classes,
+            shared_prefix,
+        }
+    }
+
+    pub fn distinct_windows(&self) -> usize {
+        self.classes.len()
+    }
+
+    pub fn occurrences(&self) -> BigUint {
+        self.classes
+            .iter()
+            .map(|class| BigUint::from(class.occurrences()))
+            .sum()
+    }
+
+    /// `C(d, 2)` — every pair of distinct window classes separates, exactly.
+    pub fn separated_class_pairs(&self) -> BigUint {
+        choose_two(&BigUint::from(self.classes.len()))
+    }
+
+    /// The separated pairs over the **whole occurrence population**: `C(N,2)` minus the pairs inside
+    /// a class, which no admitted word separates.
+    pub fn separated_occurrence_pairs(&self) -> BigUint {
+        let inside: BigUint = self
+            .classes
+            .iter()
+            .map(|class| choose_two(&BigUint::from(class.occurrences())))
+            .sum();
+        choose_two(&self.occurrences()) - inside
+    }
+
+    /// The first index at which classes `left < right` differ. `None` when they are the same class.
+    pub fn first_difference(&self, left: usize, right: usize) -> Option<usize> {
+        let (low, high) = if left <= right {
+            (left, right)
+        } else {
+            (right, left)
+        };
+        if low == high {
+            return None;
+        }
+        self.shared_prefix[low..high].iter().min().copied()
+    }
+
+    /// The shallowest separation in the population — the round at which this surface first
+    /// shatters. `None` for a surface with one window class.
+    pub fn first_depth(&self) -> Option<usize> {
+        self.shared_prefix
+            .iter()
+            .min()
+            .map(|index| step_at(*index).1)
+    }
+
+    /// One named pair's separation, materialized exactly.
+    pub fn separation_between(
+        &self,
+        census: &CorpusCensus,
+        left: usize,
+        right: usize,
+    ) -> Option<Separation> {
+        let index = self.first_difference(left, right)?;
+        Some(self.materialize(census, left, right, index))
+    }
+
+    /// The separation that separates soonest, with the lowest class pair as the declared tie-break.
+    /// A complete answer to a narrower question — never a prefix of the population.
+    pub fn shortest_separation(&self, census: &CorpusCensus) -> Option<Separation> {
+        let (position, _) = self
+            .shared_prefix
+            .iter()
+            .enumerate()
+            .min_by_key(|(position, index)| (**index, *position))?;
+        self.separation_between(census, position, position + 1)
+    }
+
+    /// The whole separation population, or a typed obstruction naming the width it required.
+    ///
+    /// **Never a prefix.** A truncation returns a cut population and a count, and the caller cannot
+    /// tell it from a complete one; an obstruction returns no population, the reason, and the width,
+    /// and the caller can. `codec_recovery::Obstruction::GaugeApertureExceeded` is the same shape.
+    pub fn exhibit(
+        &self,
+        census: &CorpusCensus,
+        declared_capacity: u64,
+    ) -> Result<Vec<Separation>, ExhibitionObstructed> {
+        let required = self.separated_class_pairs();
+        if required > BigUint::from(declared_capacity) {
+            return Err(ExhibitionObstructed {
+                surface: self.surface,
+                horizon: self.horizon,
+                declared_capacity,
+                required,
+            });
+        }
+        let mut separations = Vec::new();
+        for left in 0..self.classes.len() {
+            for right in left + 1..self.classes.len() {
+                let index = self
+                    .first_difference(left, right)
+                    .expect("distinct classes differ");
+                separations.push(self.materialize(census, left, right, index));
+            }
+        }
+        Ok(separations)
+    }
+
+    /// Every separation of one named class against the rest, complete. A *stated* sub-population
+    /// rather than an anonymous prefix, so a caller who cannot hold `C(d,2)` can still receive a
+    /// whole answer to a smaller question.
+    pub fn exhibit_class(
+        &self,
+        census: &CorpusCensus,
+        class: usize,
+        declared_capacity: u64,
+    ) -> Result<Vec<Separation>, ExhibitionObstructed> {
+        let required = BigUint::from(self.classes.len().saturating_sub(1));
+        if required > BigUint::from(declared_capacity) {
+            return Err(ExhibitionObstructed {
+                surface: self.surface,
+                horizon: self.horizon,
+                declared_capacity,
+                required,
+            });
+        }
+        Ok((0..self.classes.len())
+            .filter(|other| *other != class)
+            .filter_map(|other| self.separation_between(census, class.min(other), class.max(other)))
+            .collect())
+    }
+
+    fn materialize(
+        &self,
+        census: &CorpusCensus,
+        left: usize,
+        right: usize,
+        index: usize,
+    ) -> Separation {
+        let (side, depth) = step_at(index);
+        let offset = offset_at(index);
+        let left_reading = self.classes[left].window[index];
+        let right_reading = self.classes[right].window[index];
+        let left_site = self.classes[left].sites[0];
+        let right_site = self.classes[right].sites[0];
+        let landing = |site: (u32, u32), reading: Option<(u64, u64, u64)>| -> Option<SurfaceId> {
+            reading?;
+            let stream = &census.wholes()[site.0 as usize].stream;
+            let position = site.1 as i64 + offset;
+            if position < 0 || position >= stream.len() as i64 {
+                None
+            } else {
+                Some(stream[position as usize])
+            }
+        };
+        let (axis, readings) = match (left_reading, right_reading) {
+            (Some(left_signature), Some(right_signature)) => {
+                let axis = ReceiverAxis::DECLARED
+                    .into_iter()
+                    .find(|axis| axis.read(left_signature) != axis.read(right_signature))
+                    .expect("distinct signatures differ on some declared axis");
+                (
+                    Some(axis),
+                    Some((axis.read(left_signature), axis.read(right_signature))),
+                )
+            }
+            _ => (None, None),
+        };
+        Separation {
+            left_class: left,
+            right_class: right,
+            left_site,
+            right_site,
+            left_occurrences: BigUint::from(self.classes[left].occurrences()),
+            right_occurrences: BigUint::from(self.classes[right].occurrences()),
+            word: vec![side; depth],
+            offset,
+            left_surface: landing(left_site, left_reading),
+            right_surface: landing(right_site, right_reading),
+            axis,
+            readings,
+            by_terminus: left_reading.is_none() != right_reading.is_none(),
+        }
+    }
+}
+
+fn choose_two(population: &BigUint) -> BigUint {
+    if population < &BigUint::from(2u32) {
+        return BigUint::from(0u32);
+    }
+    population.clone() * (population.clone() - BigUint::from(1u32)) / BigUint::from(2u32)
+}
+
+/// One exhibited separation: two window classes the one-shot reading held together, the shortest
+/// word that separates them, and what was seen there.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Separation {
+    pub left_class: usize,
+    pub right_class: usize,
+    /// A representative occurrence of each class. Every occurrence in a class reads identically, so
+    /// which one is named changes nothing the receivers can see.
+    pub left_site: (u32, u32),
+    pub right_site: (u32, u32),
+    /// How many occurrences stand behind each side. The class pair stands for
+    /// `left_occurrences * right_occurrences` separated occurrence pairs.
+    pub left_occurrences: BigUint,
+    pub right_occurrences: BigUint,
+    pub word: Vec<Step>,
+    pub offset: i64,
+    pub left_surface: Option<SurfaceId>,
+    pub right_surface: Option<SurfaceId>,
+    pub axis: Option<ReceiverAxis>,
+    pub readings: Option<(u64, u64)>,
+    /// The word separates them because one occurrence runs out of whole and the other does not.
+    pub by_terminus: bool,
+}
+
+impl Separation {
+    /// How many occurrence pairs this class pair stands for, exactly.
+    pub fn occurrence_pairs(&self) -> BigUint {
+        self.left_occurrences.clone() * self.right_occurrences.clone()
+    }
+
+    /// The separation, exhibited as text: the word, where it landed, and what each side found.
+    pub fn exhibit(&self, census: &CorpusCensus) -> String {
+        let word = if self.word.is_empty() {
+            "<empty>".to_owned()
+        } else {
+            self.word
+                .iter()
+                .map(|step| match step {
+                    Step::Left => "L",
+                    Step::Right => "R",
+                })
+                .collect::<Vec<_>>()
+                .join("")
+        };
+        let render = |surface: Option<SurfaceId>| match surface {
+            Some(id) => format!("{:?}", census.surface(id)),
+            None => "<end of whole>".to_owned(),
+        };
+        match (self.axis, self.readings) {
+            (Some(axis), Some((left, right))) => format!(
+                "word {word} (offset {:+}) -> {} vs {}, receiver `{}` returned {} vs {}",
+                self.offset,
+                render(self.left_surface),
+                render(self.right_surface),
+                axis.name(),
+                axis.render(left),
+                axis.render(right),
+            ),
+            _ => format!(
+                "word {word} (offset {:+}) -> {} vs {}, separated by TERMINUS (no receiver saw a \
+                 difference; one occurrence ran out of whole)",
+                self.offset,
+                render(self.left_surface),
+                render(self.right_surface),
+            ),
+        }
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+// The reading
+// -------------------------------------------------------------------------------------------------
+
+/// What the separation reading returns for one surface.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Verdict {
+    /// One conduct block. The corpus never used this surface in a context the family can tell apart.
+    Iron,
+    /// More than one conduct block, with the shortest separating word at depth `first_depth`.
+    Separated { first_depth: usize },
+}
+
+impl Verdict {
+    pub fn is_iron(self) -> bool {
+        matches!(self, Verdict::Iron)
+    }
+}
+
+/// One surface's separation reading at one declared horizon.
+///
+/// Every figure here is taken over the **whole** occurrence population. No level bounds it.
+#[derive(Clone, Debug)]
+pub struct SeparationReading {
+    pub surface: SurfaceId,
+    pub horizon: usize,
+    pub occurrences: BigUint,
+    /// The true number of distinct radius-`horizon` windows, over **every** occurrence.
+    pub distinct_windows: usize,
+    pub verdict: Verdict,
+    pub complex: SeparationComplex,
+}
+
+impl SeparationReading {
+    /// `C(N,2)` — the number of occurrence pairs the verdict ranged over, exact.
+    ///
+    /// **`CLAUDE.md` §8's tautology rule, made a number the reading carries.** A receipt that could
+    /// not have come out otherwise carries no evidence, and a surface occurring **once** is
+    /// unseparated by arithmetic rather than by the corpus's usage: there is no pair for conduct to
+    /// separate. This is the exact count of the non-separations an iron verdict actually survived,
+    /// and it is `0` exactly where the verdict is vacuous.
+    pub fn survived_pairs(&self) -> BigUint {
+        choose_two(&self.occurrences)
+    }
+
+    /// An iron verdict on a surface with fewer than two occurrences. True iron, vacuously.
+    pub fn vacuously_iron(&self) -> bool {
+        self.verdict.is_iron() && self.occurrences < BigUint::from(2u32)
+    }
+
+    /// An iron verdict that at least one occurrence pair could have refuted and did not.
+    pub fn witnessed_iron(&self) -> bool {
+        self.verdict.is_iron() && !self.vacuously_iron()
+    }
+
+    /// The shortest separating word length, or `None` for an iron surface.
+    pub fn first_depth(&self) -> Option<usize> {
+        match self.verdict {
+            Verdict::Separated { first_depth } => Some(first_depth),
+            _ => None,
+        }
+    }
+
+    /// The exact separated-pair population over the whole occurrence set.
+    pub fn separated_occurrence_pairs(&self) -> BigUint {
+        self.complex.separated_occurrence_pairs()
+    }
+
+    /// The shortest separating word this surface carries, materialized.
+    pub fn shortest_separation(&self, census: &CorpusCensus) -> Option<Separation> {
+        self.complex.shortest_separation(census)
+    }
+
+    /// The whole separation population, or the typed obstruction naming what it required.
+    pub fn exhibit(
+        &self,
+        census: &CorpusCensus,
+        declared_capacity: u64,
+    ) -> Result<Vec<Separation>, ExhibitionObstructed> {
+        self.complex.exhibit(census, declared_capacity)
+    }
+}
+
+/// Read one surface's occurrence population at one declared horizon.
+pub fn separation_reading(
+    census: &CorpusCensus,
+    surface: SurfaceId,
+    horizon: usize,
+) -> SeparationReading {
+    let complex = SeparationComplex::read(census, surface, horizon);
+    let distinct_windows = complex.distinct_windows();
+    let verdict = match complex.first_depth() {
+        None => Verdict::Iron,
+        Some(first_depth) => Verdict::Separated { first_depth },
+    };
+    SeparationReading {
+        surface,
+        horizon,
+        occurrences: BigUint::from(census.occurrences(surface)),
+        distinct_windows,
+        verdict,
+        complex,
+    }
+}
+
+/// The whole measured population, read at one horizon. Every word surface appears.
+pub fn sweep(census: &CorpusCensus, horizon: usize) -> BTreeMap<SurfaceId, SeparationReading> {
+    census
+        .word_surfaces()
+        .into_iter()
+        .map(|surface| (surface, separation_reading(census, surface, horizon)))
+        .collect()
+}
+
+/// The iron population at one horizon: every surface whose whole occurrence population survives in
+/// one conduct block.
+///
+/// Read over the **whole** occurrence population of every surface. Until 2026-08-09 this ran on the
+/// first 64 distinct windows of each surface, which is what `canon/THE_CONTAMINANT_PROTOCOL.md`
+/// §2.5 convicted; the aperture is gone and no subsample participates.
+pub fn iron_at(sweep: &BTreeMap<SurfaceId, SeparationReading>) -> BTreeSet<SurfaceId> {
+    sweep
+        .iter()
+        .filter(|(_, reading)| reading.verdict.is_iron())
+        .map(|(surface, _)| *surface)
+        .collect()
+}
+
+/// The iron population **that could have been refuted**: iron surfaces with at least one occurrence
+/// pair. `CLAUDE.md` §8 — a receipt that could not have come out otherwise carries no evidence, and
+/// a surface occurring once is unseparated by arithmetic. The complement is not dropped: it is
+/// [`iron_at`] minus this, and both are returned.
+pub fn witnessed_iron_at(sweep: &BTreeMap<SurfaceId, SeparationReading>) -> BTreeSet<SurfaceId> {
+    sweep
+        .iter()
+        .filter(|(_, reading)| reading.witnessed_iron())
+        .map(|(surface, _)| *surface)
+        .collect()
+}
+
+// -------------------------------------------------------------------------------------------------
+// The second implementation, and the cross-check between them
+// -------------------------------------------------------------------------------------------------
+
 /// One surface's occurrence population, presented as a system the compression organ can refine.
+///
+/// This is the **second** implementation of the partition the factorization computes. It exists to
+/// be disagreed with: [`cross_check`] runs both and compares pair for pair.
 pub struct OccurrenceSystem<'a> {
     census: &'a CorpusCensus,
     roots: Vec<(u32, u32)>,
@@ -285,11 +863,9 @@ impl ObservedSystem for OccurrenceSystem<'_> {
             // Unreachable for a declared item; a missing site is a terminus, never an observation.
             return Observation(u64::MAX);
         };
-        let (kind, weight, density) = self.census.signature(surface);
+        let signature = self.census.signature(surface);
         Observation(match ReceiverAxis::from_id(receiver) {
-            Some(ReceiverAxis::Kind) => kind,
-            Some(ReceiverAxis::Weight) => weight,
-            Some(ReceiverAxis::Density) => density,
+            Some(axis) => axis.read(signature),
             None => u64::MAX,
         })
     }
@@ -307,293 +883,120 @@ impl ObservedSystem for OccurrenceSystem<'_> {
     }
 }
 
-/// One exhibited separation: two occurrences the one-shot reading held together, the shortest word
-/// that separates them, and what was seen there.
+/// What running both implementations returned.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct Separation {
-    pub left_site: (u32, u32),
-    pub right_site: (u32, u32),
-    pub word: Vec<Step>,
-    pub offset: i64,
-    pub left_surface: Option<SurfaceId>,
-    pub right_surface: Option<SurfaceId>,
-    pub axis: Option<ReceiverAxis>,
-    pub readings: Option<(u64, u64)>,
-    /// The word separates them because one occurrence runs out of whole and the other does not.
-    pub by_terminus: bool,
-}
-
-impl Separation {
-    /// The separation, exhibited as text: the word, where it landed, and what each side found.
-    pub fn exhibit(&self, census: &CorpusCensus) -> String {
-        let word = if self.word.is_empty() {
-            "<empty>".to_owned()
-        } else {
-            self.word
-                .iter()
-                .map(|step| match step {
-                    Step::Left => "L",
-                    Step::Right => "R",
-                })
-                .collect::<Vec<_>>()
-                .join("")
-        };
-        let render = |surface: Option<SurfaceId>| match surface {
-            Some(id) => format!("{:?}", census.surface(id)),
-            None => "<end of whole>".to_owned(),
-        };
-        match (self.axis, self.readings) {
-            (Some(axis), Some((left, right))) => format!(
-                "word {word} (offset {:+}) -> {} vs {}, receiver `{}` returned {} vs {}",
-                self.offset,
-                render(self.left_surface),
-                render(self.right_surface),
-                axis.name(),
-                axis.render(left),
-                axis.render(right),
-            ),
-            _ => format!(
-                "word {word} (offset {:+}) -> {} vs {}, separated by TERMINUS (no receiver saw a \
-                 difference; one occurrence ran out of whole)",
-                self.offset,
-                render(self.left_surface),
-                render(self.right_surface),
-            ),
-        }
-    }
-}
-
-/// What the separation reading returns for one surface.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum Verdict {
-    /// One conduct block. The corpus never used this surface in a context the family can tell apart.
-    Iron,
-    /// More than one conduct block, with the shortest separating word at depth `first_depth`.
-    Separated { first_depth: usize },
-    /// The presented population did not separate but the aperture withheld windows. **Unreachable by
-    /// construction** — retained as a typed refusal rather than as an assumption.
-    ApertureOpen,
-}
-
-impl Verdict {
-    pub fn is_iron(self) -> bool {
-        matches!(self, Verdict::Iron)
-    }
-}
-
-/// One surface's separation reading at one declared horizon.
-#[derive(Clone, Debug)]
-pub struct SeparationReading {
+pub struct CrossCheck {
     pub surface: SurfaceId,
     pub horizon: usize,
-    pub occurrences: BigUint,
-    /// The true number of distinct radius-`horizon` windows, over **every** occurrence.
-    pub distinct_windows: usize,
-    pub windows_presented: usize,
-    /// The named residual of the declared aperture.
-    pub windows_withheld: usize,
-    pub one_shot_blocks: usize,
+    /// Distinct windows, from the factorization.
+    pub classes: usize,
+    /// Conduct blocks among the presented roots, from `receiver_exact_compression`.
     pub conduct_blocks: usize,
+    pub one_shot_blocks: usize,
     pub refinement_rounds: usize,
-    pub verdict: Verdict,
-    /// Every separation the organ found among the presented roots, up to [`SEPARATION_EXHIBIT`].
-    pub separations: Vec<Separation>,
-    pub separations_found: usize,
-    /// How many separated pairs the organ resolved by a terminus rather than by a receiver.
-    pub terminus_separations: usize,
+    /// Pairs the factorization returned; equal to the organ's collapsed population when they agree.
+    pub factorized_pairs: usize,
+    pub organ_pairs: usize,
+    /// Pairs where the two implementations disagree on the word, the witness, or the terminus.
+    pub disagreements: Vec<(usize, usize)>,
 }
 
-impl SeparationReading {
-    /// The two independent implementations agree: the distinct-window census over the presented
-    /// roots is the Nerode refinement the organ computed.
-    pub fn parity(&self) -> bool {
-        self.conduct_blocks == self.windows_presented
-    }
-
-    /// `C(N,2)` — the number of occurrence pairs the verdict ranged over, exact.
-    ///
-    /// **`CLAUDE.md` §8's tautology rule, made a number the reading carries.** A receipt that could
-    /// not have come out otherwise carries no evidence, and a surface occurring **once** is
-    /// unseparated by arithmetic rather than by the corpus's usage: there is no pair for conduct to
-    /// separate. This is the exact count of the non-separations an iron verdict actually survived,
-    /// and it is `0` exactly where the verdict is vacuous.
-    pub fn survived_pairs(&self) -> BigUint {
-        let occurrences = self.occurrences.clone();
-        if occurrences < BigUint::from(2u32) {
-            return BigUint::from(0u32);
-        }
-        let one = BigUint::from(1u32);
-        occurrences.clone() * (occurrences - &one) / BigUint::from(2u32)
-    }
-
-    /// An iron verdict on a surface with fewer than two occurrences. True iron, vacuously.
-    pub fn vacuously_iron(&self) -> bool {
-        self.verdict.is_iron() && self.occurrences < BigUint::from(2u32)
-    }
-
-    /// An iron verdict that at least one occurrence pair could have refuted and did not.
-    pub fn witnessed_iron(&self) -> bool {
-        self.verdict.is_iron() && !self.vacuously_iron()
-    }
-
-    /// The shortest separating word length, or `None` for an iron surface.
-    pub fn first_depth(&self) -> Option<usize> {
-        match self.verdict {
-            Verdict::Separated { first_depth } => Some(first_depth),
-            _ => None,
-        }
+impl CrossCheck {
+    /// The two implementations agree on the partition **and** on every pair's separating word.
+    pub fn agrees(&self) -> bool {
+        self.classes == self.conduct_blocks
+            && self.factorized_pairs == self.organ_pairs
+            && self.disagreements.is_empty()
     }
 }
 
-/// Read one surface's occurrence population at one declared horizon.
-pub fn separation_reading(
+/// Run `receiver_exact_compression` over the same surface and compare pair for pair.
+///
+/// The organ's cost is quadratic in the presented population, so the caller declares the capacity it
+/// has; past it this refuses with the width the material required rather than running a subsample.
+pub fn cross_check(
     census: &CorpusCensus,
     surface: SurfaceId,
     horizon: usize,
-) -> SeparationReading {
-    let sites = census.sites(surface);
-    let mut seen: BTreeMap<Window, ()> = BTreeMap::new();
-    let mut roots: Vec<(u32, u32)> = Vec::new();
-    let mut distinct = 0usize;
-    for (whole, position) in sites {
-        let reading = window(census, *whole, *position, horizon);
-        if seen.insert(reading, ()).is_none() {
-            distinct += 1;
-            if roots.len() < WINDOW_APERTURE {
-                roots.push((*whole, *position));
-            }
-        }
+    declared_capacity: u64,
+) -> Result<CrossCheck, ExhibitionObstructed> {
+    let complex = SeparationComplex::read(census, surface, horizon);
+    let required = complex.separated_class_pairs();
+    if required > BigUint::from(declared_capacity) {
+        return Err(ExhibitionObstructed {
+            surface,
+            horizon,
+            declared_capacity,
+            required,
+        });
     }
-
+    let roots: Vec<(u32, u32)> = complex
+        .classes
+        .iter()
+        .map(|class| class.sites[0])
+        .collect();
     let presented = roots.len();
     let system = OccurrenceSystem::new(census, roots, horizon);
     let compression = compress(&system);
+    let root_items: BTreeMap<ItemId, usize> = (0..presented)
+        .map(|root| (system.root_item(root), root))
+        .collect();
 
-    let root_items: BTreeSet<ItemId> = (0..presented).map(|root| system.root_item(root)).collect();
-    let one_shot_blocks = block_count(&compression.one_shot.blocks, &root_items);
-    let conduct_blocks = block_count(&compression.conduct.blocks, &root_items);
+    let block_count = |blocks: &[BTreeSet<ItemId>]| {
+        blocks
+            .iter()
+            .filter(|block| block.iter().any(|item| root_items.contains_key(item)))
+            .count()
+    };
 
-    let mut separations = Vec::new();
-    let mut found = 0usize;
-    let mut terminus = 0usize;
-    let mut first_depth: Option<usize> = None;
+    let mut organ_pairs = 0usize;
+    let mut disagreements = Vec::new();
     for pair in &compression.collapsed {
-        if !root_items.contains(&pair.left) || !root_items.contains(&pair.right) {
+        let (Some(left), Some(right)) = (
+            root_items.get(&pair.left).copied(),
+            root_items.get(&pair.right).copied(),
+        ) else {
             continue;
-        }
-        found += 1;
-        if pair.separated_by_terminus {
-            terminus += 1;
-        }
-        let depth = pair.distinguishing_word.len();
-        first_depth = Some(match first_depth {
-            Some(current) => current.min(depth),
-            None => depth,
-        });
-        if separations.len() < SEPARATION_EXHIBIT {
-            separations.push(translate(&system, pair));
+        };
+        organ_pairs += 1;
+        let index = complex
+            .first_difference(left, right)
+            .expect("distinct classes differ");
+        let mine = complex.materialize(census, left.min(right), left.max(right), index);
+        let organ_word: Vec<Step> = pair
+            .distinguishing_word
+            .iter()
+            .filter_map(|input| Step::from_input(*input))
+            .collect();
+        let organ_axis = pair
+            .witness
+            .and_then(|(receiver, _, _)| ReceiverAxis::from_id(receiver));
+        if organ_word != mine.word
+            || organ_axis != mine.axis
+            || pair.separated_by_terminus != mine.by_terminus
+        {
+            disagreements.push((left.min(right), left.max(right)));
         }
     }
 
-    let verdict = if conduct_blocks <= 1 {
-        if presented < distinct {
-            Verdict::ApertureOpen
-        } else {
-            Verdict::Iron
-        }
-    } else {
-        Verdict::Separated {
-            first_depth: first_depth.unwrap_or(0),
-        }
-    };
-
-    SeparationReading {
+    Ok(CrossCheck {
         surface,
         horizon,
-        occurrences: BigUint::from(census.occurrences(surface)),
-        distinct_windows: distinct,
-        windows_presented: presented,
-        windows_withheld: distinct.saturating_sub(presented),
-        one_shot_blocks,
-        conduct_blocks,
+        classes: complex.classes.len(),
+        conduct_blocks: block_count(&compression.conduct.blocks),
+        one_shot_blocks: block_count(&compression.one_shot.blocks),
         refinement_rounds: compression.rounds,
-        verdict,
-        separations,
-        separations_found: found,
-        terminus_separations: terminus,
-    }
+        factorized_pairs: required
+            .try_into()
+            .expect("bounded by the declared capacity"),
+        organ_pairs,
+        disagreements,
+    })
 }
 
-fn block_count(blocks: &[BTreeSet<ItemId>], roots: &BTreeSet<ItemId>) -> usize {
-    blocks
-        .iter()
-        .filter(|block| block.iter().any(|item| roots.contains(item)))
-        .count()
-}
-
-fn translate(system: &OccurrenceSystem<'_>, pair: &CollapsedPair) -> Separation {
-    let word: Vec<Step> = pair
-        .distinguishing_word
-        .iter()
-        .filter_map(|input| Step::from_input(*input))
-        .collect();
-    let offset = OccurrenceSystem::word_offset(&pair.distinguishing_word);
-    let landing = |item: ItemId| -> Option<SurfaceId> {
-        let mut current = item;
-        for input in &pair.distinguishing_word {
-            current = system.successor(current, *input)?;
-        }
-        system.surface_at(current)
-    };
-    let left_surface = landing(pair.left);
-    let right_surface = landing(pair.right);
-    let (axis, readings) = match pair.witness {
-        Some((receiver, left, right)) => (ReceiverAxis::from_id(receiver), Some((left.0, right.0))),
-        None => (None, None),
-    };
-    Separation {
-        left_site: system.site(pair.left).unwrap_or((u32::MAX, u32::MAX)),
-        right_site: system.site(pair.right).unwrap_or((u32::MAX, u32::MAX)),
-        word,
-        offset,
-        left_surface,
-        right_surface,
-        axis,
-        readings,
-        by_terminus: pair.separated_by_terminus,
-    }
-}
-
-/// The whole measured population, read at one horizon. Every word surface appears.
-pub fn sweep(census: &CorpusCensus, horizon: usize) -> BTreeMap<SurfaceId, SeparationReading> {
-    census
-        .word_surfaces()
-        .into_iter()
-        .map(|surface| (surface, separation_reading(census, surface, horizon)))
-        .collect()
-}
-
-/// The iron population at one horizon: every surface whose whole occurrence population survives in
-/// one conduct block.
-pub fn iron_at(sweep: &BTreeMap<SurfaceId, SeparationReading>) -> BTreeSet<SurfaceId> {
-    sweep
-        .iter()
-        .filter(|(_, reading)| reading.verdict.is_iron())
-        .map(|(surface, _)| *surface)
-        .collect()
-}
-
-/// The iron population **that could have been refuted**: iron surfaces with at least one occurrence
-/// pair. `CLAUDE.md` §8 — a receipt that could not have come out otherwise carries no evidence, and
-/// a surface occurring once is unseparated by arithmetic. The complement is not dropped: it is
-/// [`iron_at`] minus this, and both are returned.
-pub fn witnessed_iron_at(sweep: &BTreeMap<SurfaceId, SeparationReading>) -> BTreeSet<SurfaceId> {
-    sweep
-        .iter()
-        .filter(|(_, reading)| reading.witnessed_iron())
-        .map(|(surface, _)| *surface)
-        .collect()
-}
+// -------------------------------------------------------------------------------------------------
+// The declared family's orbit, and its ablation
+// -------------------------------------------------------------------------------------------------
 
 /// A pair of surfaces one axis separates and the other two do not. The orbit assertion: a family
 /// whose members all agree has not been shown to be a family.
@@ -643,8 +1046,8 @@ pub fn axis_witnesses(census: &CorpusCensus) -> BTreeMap<ReceiverAxis, AxisWitne
     witnesses
 }
 
-/// What one axis's removal costs a surface's reading. `AblatedSystem` is the organ's own ablation,
-/// and H.0016's transformations clause guarantees removal can only **coarsen**.
+/// What one axis's removal costs a surface's reading. H.0016's transformations clause guarantees
+/// removal can only **coarsen**.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct AblationReading {
     pub axis: ReceiverAxis,
@@ -658,42 +1061,89 @@ impl AblationReading {
     }
 }
 
-/// Ablate each declared axis in turn on one surface's presented population.
+/// Ablate each declared axis in turn on one surface's whole occurrence population.
+///
+/// Exact and unbounded: an ablated family reads the same window word with one coordinate deleted, so
+/// the ablated partition is a **projection** of the factorization and is counted directly. The
+/// compression organ's own `AblatedSystem` is the second implementation and
+/// [`cross_check_ablation`] runs it against this one.
 pub fn ablation_profile(
     census: &CorpusCensus,
     surface: SurfaceId,
     horizon: usize,
 ) -> Vec<AblationReading> {
     let sites = census.sites(surface);
-    let mut seen: BTreeSet<Window> = BTreeSet::new();
-    let mut roots: Vec<(u32, u32)> = Vec::new();
-    for (whole, position) in sites {
-        let reading = window(census, *whole, *position, horizon);
-        if seen.insert(reading) && roots.len() < WINDOW_APERTURE {
-            roots.push((*whole, *position));
-        }
+    let with = sites
+        .iter()
+        .map(|(whole, position)| window(census, *whole, *position, horizon))
+        .collect::<BTreeSet<_>>()
+        .len();
+    ReceiverAxis::DECLARED
+        .into_iter()
+        .map(|axis| AblationReading {
+            axis,
+            blocks_with: with,
+            blocks_without: sites
+                .iter()
+                .map(|(whole, position)| {
+                    ablated_window(census, *whole, *position, horizon, axis)
+                })
+                .collect::<BTreeSet<_>>()
+                .len(),
+        })
+        .collect()
+}
+
+/// The compression organ's own `AblatedSystem`, run against [`ablation_profile`] on one surface.
+///
+/// Quadratic in the presented population, so the caller declares its capacity and this refuses past
+/// it with the width the material required.
+pub fn cross_check_ablation(
+    census: &CorpusCensus,
+    surface: SurfaceId,
+    horizon: usize,
+    declared_capacity: u64,
+) -> Result<Vec<AblationReading>, ExhibitionObstructed> {
+    let complex = SeparationComplex::read(census, surface, horizon);
+    let required = complex.separated_class_pairs();
+    if required > BigUint::from(declared_capacity) {
+        return Err(ExhibitionObstructed {
+            surface,
+            horizon,
+            declared_capacity,
+            required,
+        });
     }
+    let roots: Vec<(u32, u32)> = complex.classes.iter().map(|class| class.sites[0]).collect();
     let presented = roots.len();
     let system = OccurrenceSystem::new(census, roots, horizon);
     let root_items: BTreeSet<ItemId> = (0..presented).map(|root| system.root_item(root)).collect();
-    let full = compress(&system);
-    let with = block_count(&full.conduct.blocks, &root_items);
-    ReceiverAxis::DECLARED
+    let block_count = |blocks: &[BTreeSet<ItemId>]| {
+        blocks
+            .iter()
+            .filter(|block| block.iter().any(|item| root_items.contains(item)))
+            .count()
+    };
+    let with = block_count(&compress(&system).conduct.blocks);
+    Ok(ReceiverAxis::DECLARED
         .into_iter()
         .map(|axis| {
             let ablated = AblatedSystem {
                 inner: &system,
                 without: axis.id(),
             };
-            let reduced = compress(&ablated);
             AblationReading {
                 axis,
                 blocks_with: with,
-                blocks_without: block_count(&reduced.conduct.blocks, &root_items),
+                blocks_without: block_count(&compress(&ablated).conduct.blocks),
             }
         })
-        .collect()
+        .collect())
 }
+
+// -------------------------------------------------------------------------------------------------
+// The warping
+// -------------------------------------------------------------------------------------------------
 
 /// One row of the warping: what a surface recruits and what recruits it, relative to one iron axis.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
@@ -820,6 +1270,9 @@ mod tests {
     use super::*;
     use std::fs;
 
+    /// The declared capacity these fixtures run under. A test is a caller and declares its own.
+    const TEST_CAPACITY: u64 = 4_096;
+
     fn scratch(name: &str) -> std::path::PathBuf {
         let root = std::env::temp_dir().join(format!("holonic-token-invariance-{name}"));
         let _ = fs::remove_dir_all(&root);
@@ -869,20 +1322,24 @@ mod tests {
 
         let iron = separation_reading(&census, arxiv, 1);
         assert_eq!(iron.distinct_windows, 1, "one construction, one window");
-        assert_eq!(iron.conduct_blocks, 1);
         assert_eq!(iron.verdict, Verdict::Iron);
-        assert!(iron.parity(), "the window census and the Nerode refinement must agree");
+        assert_eq!(
+            iron.exhibit(&census, TEST_CAPACITY).expect("within capacity"),
+            Vec::new(),
+            "an iron surface has no separations at all"
+        );
 
         let fuzzy = separation_reading(&census, set, 1);
         assert!(fuzzy.distinct_windows > 1, "several constructions, several windows");
         assert!(matches!(fuzzy.verdict, Verdict::Separated { .. }));
-        assert!(fuzzy.parity());
-        assert!(
-            fuzzy.separations_found > 0,
-            "a separated surface must exhibit at least one separating word"
+        let separations = fuzzy.exhibit(&census, TEST_CAPACITY).expect("within capacity");
+        assert_eq!(
+            BigUint::from(separations.len()),
+            fuzzy.complex.separated_class_pairs(),
+            "the exhibition is the WHOLE population or it is an obstruction"
         );
         assert!(
-            fuzzy.separations.iter().all(|separation| !separation.word.is_empty()),
+            separations.iter().all(|separation| !separation.word.is_empty()),
             "an empty word is the one-shot reading, which held every occurrence together"
         );
 
@@ -908,23 +1365,42 @@ mod tests {
         let _ = fs::remove_dir_all(&root);
     }
 
-    /// The window census and the organ's Nerode refinement are two implementations of one
-    /// partition, over **every** surface at both declared horizons.
+    /// The factorization and the organ's Nerode refinement are two implementations of one partition,
+    /// checked **pair for pair** over every surface at both declared horizons.
     #[test]
-    fn the_window_census_and_the_nerode_refinement_agree_on_every_surface() {
+    fn the_factorization_and_the_nerode_refinement_agree_pair_for_pair() {
         let root = declared_corpus("parity");
         let census = CorpusCensus::read(&root).unwrap();
+        let mut checked = 0usize;
         for horizon in [1usize, 2] {
-            for (surface, reading) in sweep(&census, horizon) {
+            for surface in census.word_surfaces() {
+                let check = cross_check(&census, surface, horizon, TEST_CAPACITY)
+                    .expect("the fixture is inside the declared capacity");
                 assert!(
-                    reading.parity(),
-                    "horizon {horizon}, {:?}: {} presented windows vs {} conduct blocks",
-                    census.surface(surface),
-                    reading.windows_presented,
-                    reading.conduct_blocks
+                    check.agrees(),
+                    "horizon {horizon}, {:?}: {check:?}",
+                    census.surface(surface)
                 );
+                checked += 1;
             }
         }
+        assert!(checked > 0, "the cross-check must run on something");
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    /// The cross-check has a non-trivial orbit: it is comparing populations that are not empty, so a
+    /// disagreement is a thing the material could have produced.
+    #[test]
+    fn the_cross_check_ranges_over_a_non_empty_pair_population() {
+        let root = declared_corpus("orbit-of-the-check");
+        let census = CorpusCensus::read(&root).unwrap();
+        let set = census.lookup("set").unwrap();
+        let check = cross_check(&census, set, 1, TEST_CAPACITY).expect("within capacity");
+        assert!(
+            check.organ_pairs > 0 && check.factorized_pairs > 0,
+            "a cross-check over zero pairs cannot fail and is not evidence: {check:?}"
+        );
+        assert_eq!(check.factorized_pairs, check.organ_pairs);
         let _ = fs::remove_dir_all(&root);
     }
 
@@ -942,11 +1418,7 @@ mod tests {
             let right = census.signature(witness.right);
             let differing: Vec<ReceiverAxis> = ReceiverAxis::DECLARED
                 .into_iter()
-                .filter(|other| match other {
-                    ReceiverAxis::Kind => left.0 != right.0,
-                    ReceiverAxis::Weight => left.1 != right.1,
-                    ReceiverAxis::Density => left.2 != right.2,
-                })
+                .filter(|other| other.read(left) != other.read(right))
                 .collect();
             assert_eq!(
                 differing,
@@ -960,15 +1432,21 @@ mod tests {
         let _ = fs::remove_dir_all(&root);
     }
 
-    /// Removing a receiver may only coarsen — H.0016's transformations clause, on real material.
+    /// Removing a receiver may only coarsen — H.0016's transformations clause, on real material —
+    /// and the projection and the organ's own `AblatedSystem` return the same numbers.
     #[test]
-    fn ablating_an_axis_never_refines_the_reading() {
+    fn ablating_an_axis_never_refines_the_reading_and_both_routes_agree() {
         let root = declared_corpus("ablation");
         let census = CorpusCensus::read(&root).unwrap();
         let set = census.lookup("set").unwrap();
-        let profile = ablation_profile(&census, set, 1);
-        assert_eq!(profile.len(), 3);
-        for reading in &profile {
+        let projected = ablation_profile(&census, set, 1);
+        let organ = cross_check_ablation(&census, set, 1, TEST_CAPACITY).expect("within capacity");
+        assert_eq!(projected.len(), 3);
+        assert_eq!(
+            projected, organ,
+            "the projection and `AblatedSystem` are two implementations of one ablation"
+        );
+        for reading in &projected {
             assert!(
                 reading.blocks_without <= reading.blocks_with,
                 "{} ablated REFINED {} -> {}",
@@ -1037,25 +1515,94 @@ mod tests {
         let _ = fs::remove_dir_all(&root);
     }
 
-    /// The declared aperture cannot manufacture an iron verdict: a surface is iron exactly when it
-    /// has one distinct window, and one window is never withheld.
+    /// The separated population over the whole occurrence set is exact and is **not** `C(N,2)`:
+    /// occurrences sharing a window are held together, and the difference is the factorization.
     #[test]
-    fn the_declared_aperture_cannot_manufacture_an_iron_verdict() {
-        let root = declared_corpus("aperture");
+    fn the_separated_occurrence_population_excludes_the_pairs_inside_a_window_class() {
+        let root = declared_corpus("occurrence-pairs");
         let census = CorpusCensus::read(&root).unwrap();
-        for horizon in [1usize, 2] {
-            for reading in sweep(&census, horizon).values() {
-                if reading.verdict.is_iron() {
-                    assert_eq!(reading.distinct_windows, 1);
-                    assert_eq!(reading.windows_withheld, 0);
-                }
-                assert_ne!(
-                    reading.verdict,
-                    Verdict::ApertureOpen,
-                    "the aperture-open arm is unreachable by construction"
-                );
-            }
-        }
+        let arxiv = census.lookup("arxiv").unwrap();
+        let reading = separation_reading(&census, arxiv, 1);
+        assert_eq!(reading.survived_pairs(), BigUint::from(3u32));
+        assert_eq!(
+            reading.separated_occurrence_pairs(),
+            BigUint::from(0u32),
+            "three occurrences in one window class separate into nothing"
+        );
+
+        let set = census.lookup("set").unwrap();
+        let fuzzy = separation_reading(&census, set, 1);
+        let exhibited = fuzzy.exhibit(&census, TEST_CAPACITY).expect("within capacity");
+        let from_pairs: BigUint = exhibited
+            .iter()
+            .map(|separation| separation.occurrence_pairs())
+            .sum();
+        assert_eq!(
+            from_pairs,
+            fuzzy.separated_occurrence_pairs(),
+            "the class-pair multiplicities must sum to the occurrence-pair population"
+        );
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    /// A capacity the material exceeds returns a typed obstruction naming the required width, and
+    /// **no separations at all** — never a prefix a caller could mistake for the whole.
+    #[test]
+    fn an_exceeded_capacity_returns_an_obstruction_and_never_a_prefix() {
+        let root = declared_corpus("obstruction");
+        let census = CorpusCensus::read(&root).unwrap();
+        let set = census.lookup("set").unwrap();
+        let reading = separation_reading(&census, set, 1);
+        let required = reading.complex.separated_class_pairs();
+        assert!(required > BigUint::from(1u32), "the fixture must exceed a capacity of one");
+
+        let obstruction = reading
+            .exhibit(&census, 1)
+            .expect_err("a capacity of one cannot hold this population");
+        assert_eq!(obstruction.declared_capacity, 1);
+        assert_eq!(obstruction.required, required);
+        assert_eq!(obstruction.surface, set);
+
+        // The standing is preserved: the complex still answers everything that is not the
+        // materialization, and a larger declaration returns the population whole.
+        assert!(reading.shortest_separation(&census).is_some());
+        assert_eq!(
+            BigUint::from(reading.exhibit(&census, TEST_CAPACITY).expect("fits").len()),
+            required
+        );
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    /// The window is an ordered word whose lexicographic order is the organ's refinement order, and
+    /// the index arithmetic that reads a word off it is exact.
+    #[test]
+    fn a_window_index_names_the_word_the_organ_would_have_walked() {
+        assert_eq!(step_at(0), (Step::Left, 1));
+        assert_eq!(step_at(1), (Step::Right, 1));
+        assert_eq!(step_at(2), (Step::Left, 2));
+        assert_eq!(step_at(3), (Step::Right, 2));
+        assert_eq!(offset_at(0), -1);
+        assert_eq!(offset_at(1), 1);
+        assert_eq!(offset_at(2), -2);
+        assert_eq!(offset_at(3), 2);
+    }
+
+    /// A separation resolved by a terminus rather than by a receiver is returned as such, on
+    /// material that forces one: the papers whole opens on `pad`, so that occurrence has no left
+    /// neighbour while every other `pad` does.
+    #[test]
+    fn a_terminus_is_a_distinction_and_is_named_as_one() {
+        let root = declared_corpus("terminus");
+        let census = CorpusCensus::read(&root).unwrap();
+        let pad = census.lookup("pad").unwrap();
+        let reading = separation_reading(&census, pad, 1);
+        let separations = reading.exhibit(&census, TEST_CAPACITY).expect("within capacity");
+        assert!(
+            separations.iter().any(|separation| separation.by_terminus),
+            "the opening `pad` has no left neighbour and every other one does: {separations:?}"
+        );
+        let check = cross_check(&census, pad, 1, TEST_CAPACITY).expect("within capacity");
+        assert!(check.agrees(), "the organ must agree about the terminus too: {check:?}");
         let _ = fs::remove_dir_all(&root);
     }
 }

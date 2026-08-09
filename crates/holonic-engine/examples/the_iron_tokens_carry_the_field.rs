@@ -80,8 +80,8 @@ use holonic_engine::surprisal::{
     Grain, Support, SymbolicSurprisal, cross_entropy, read_population,
 };
 use holonic_engine::token_invariance::{
-    AblationReading, ReceiverAxis, SEPARATION_EXHIBIT, SeparationReading, Verdict, WINDOW_APERTURE,
-    ablation_profile, axis_witnesses, iron_at, sweep, warping_incidence, witnessed_iron_at,
+    AblationReading, ReceiverAxis, SeparationReading, Verdict, ablation_profile, axis_witnesses,
+    cross_check, iron_at, sweep, warping_incidence, window, witnessed_iron_at,
 };
 use num_bigint::BigUint;
 
@@ -92,6 +92,20 @@ const WARP_RADIUS: usize = 4;
 /// The declared exhibition floor. A **presentation** bound on printing, never on measuring: every
 /// surface below it is still measured, still in the return, and its count is named.
 const EXHIBITION_FLOOR: u64 = 4;
+/// **The capacity this caller declares**, in separated class pairs per surface.
+///
+/// `canon/THE_AUTHORED_LEVEL.md`: a level is either read off the material or declared by the caller.
+/// This is the caller declaring, and it is a statement about *this host*, not about the corpus:
+/// materializing a pair population is the one quadratic operation in the reading, and 8,192 pairs
+/// per surface is what this driver is willing to hold at once. Every surface past it returns
+/// `ExhibitionObstructed` naming the width its material required, and this driver **prints that
+/// population and its widths** rather than letting it disappear.
+const DECLARED_CAPACITY: u64 = 8_192;
+/// The window aperture this module carried as an authored constant until 2026-08-09, kept here only
+/// so the excision's orbit can be measured against it. It decides nothing.
+const EXCISED_WINDOW_APERTURE: usize = 64;
+/// The separation cap this module carried as an authored constant until 2026-08-09, same purpose.
+const EXCISED_SEPARATION_EXHIBIT: usize = 512;
 
 fn main() {
     let root = std::env::args()
@@ -286,11 +300,16 @@ fn main() {
     );
     println!();
     println!(
-        "  declared aperture: at most {WINDOW_APERTURE} distinct windows per surface reach the \
-         organ, in corpus\n  order; the residual is named per surface. It provably cannot \
-         manufacture an iron verdict:\n  a surface is iron exactly when it has ONE distinct \
-         window, and one window is never withheld.\n  At most {SEPARATION_EXHIBIT} separations are \
-         retained per surface; the true total is always reported."
+        "  NO APERTURE BOUNDS THIS READING. The separation population factorizes: conduct words are\n\
+         \x20 pure runs, so a window is an ORDERED word (-1, +1, -2, +2, ...) whose lexicographic\n\
+         \x20 order IS the organ's refinement order, and the first index at which two windows differ\n\
+         \x20 carries the shortest separating word, its offset, and the receiver that sees it. The\n\
+         \x20 whole population of `C(d,2)` pairs is therefore held by `d` sorted classes and `d-1`\n\
+         \x20 shared-prefix lengths -- `O(d * horizon)` -- and every pair is recoverable exactly.\n\
+         \x20 Until 2026-08-09 this module presented the first {EXCISED_WINDOW_APERTURE} distinct \
+         windows per surface and\n\
+         \x20 retained {EXCISED_SEPARATION_EXHIBIT} separations. Section 6 measures what that was \
+         withholding."
     );
 
     let mut sweeps: BTreeMap<usize, BTreeMap<SurfaceId, SeparationReading>> = BTreeMap::new();
@@ -305,26 +324,39 @@ fn main() {
 
     println!();
     println!(
-        "  {:<8} {:>10} {:>10} {:>12} {:>12} {:>12} {:>10}",
-        "horizon", "measured", "iron", "vacuous", "witnessed", "separated", "withheld"
+        "  {:<8} {:>10} {:>10} {:>12} {:>12} {:>12} {:>14} {:>18}",
+        "horizon",
+        "measured",
+        "iron",
+        "vacuous",
+        "witnessed",
+        "separated",
+        "max windows",
+        "separated pairs"
     );
     for horizon in HORIZONS {
         let reading = &sweeps[&horizon];
         let iron = &irons[&horizon];
         let seen = &witnessed[&horizon];
-        let withheld = reading
+        let widest = reading
             .values()
-            .filter(|row| row.windows_withheld > 0)
-            .count();
+            .map(|row| row.distinct_windows)
+            .max()
+            .unwrap_or(0);
+        let pairs: BigUint = reading
+            .values()
+            .map(|row| row.complex.separated_class_pairs())
+            .sum();
         println!(
-            "  {:<8} {:>10} {:>10} {:>12} {:>12} {:>12} {:>10}",
+            "  {:<8} {:>10} {:>10} {:>12} {:>12} {:>12} {:>14} {:>18}",
             horizon,
             reading.len(),
             iron.len(),
             iron.len() - seen.len(),
             seen.len(),
             reading.len() - iron.len(),
-            withheld
+            widest,
+            pairs
         );
     }
     println!();
@@ -372,26 +404,75 @@ fn main() {
     ));
 
     // ------------------------------------------------- CONTROL 6: two implementations agree
-    let mut parity_failures = Vec::new();
+    //
+    // The factorization computed by `token_invariance` and the Moore refinement computed by
+    // `receiver_exact_compression` are two implementations of one partition, and this compares them
+    // PAIR FOR PAIR -- word, witness, terminus -- not just block counts. The organ's cost is
+    // quadratic, so the comparison runs under this caller's declared capacity and the surfaces past
+    // it are named with the width they required rather than dropped.
+    println!();
+    println!("  CONTROL 6 -- the second implementation, run pair for pair against the first.");
+    let mut checked = 0usize;
+    let mut compared_pairs = BigUint::from(0u32);
+    let mut check_failures: Vec<String> = Vec::new();
+    let mut obstructed: Vec<(usize, SurfaceId, BigUint)> = Vec::new();
     for horizon in HORIZONS {
-        for (surface, row) in &sweeps[&horizon] {
-            if !row.parity() {
-                parity_failures.push((horizon, *surface, row.windows_presented, row.conduct_blocks));
+        for surface in sweeps[&horizon].keys() {
+            match cross_check(&census, *surface, horizon, DECLARED_CAPACITY) {
+                Ok(check) => {
+                    checked += 1;
+                    compared_pairs += BigUint::from(check.organ_pairs);
+                    if !check.agrees() {
+                        check_failures.push(format!(
+                            "h{horizon} {:?}: {} classes vs {} conduct blocks, {} vs {} pairs, \
+                             {} word/witness disagreements",
+                            census.surface(*surface),
+                            check.classes,
+                            check.conduct_blocks,
+                            check.factorized_pairs,
+                            check.organ_pairs,
+                            check.disagreements.len()
+                        ));
+                    }
+                }
+                Err(obstruction) => {
+                    obstructed.push((horizon, *surface, obstruction.required.clone()));
+                }
             }
         }
     }
+    obstructed.sort_by(|left, right| right.2.cmp(&left.2));
+    println!(
+        "    {checked} readings cross-checked, {compared_pairs} pairs compared, {} disagreements",
+        check_failures.len()
+    );
+    println!(
+        "    {} readings OBSTRUCTED at the declared capacity of {DECLARED_CAPACITY} class pairs. \
+         An obstruction is\n    not a truncation: no separations were returned for these, and each \
+         names the width its\n    material required. The widest:",
+        obstructed.len()
+    );
+    for (horizon, surface, required) in obstructed.iter().take(6) {
+        println!(
+            "      h{horizon} {:<16} required width {required} ({} distinct windows)",
+            format!("{:?}", census.surface(*surface)),
+            sweeps[horizon][surface].distinct_windows
+        );
+    }
     holds.push((
-        "control 6 -- the distinct-window census and the organ's Nerode refinement are two \
-         independent implementations of one partition and agree on EVERY surface at BOTH horizons"
+        "control 6 -- the factorized separation complex and the organ's Moore refinement are two \
+         independent implementations of one partition and agree PAIR FOR PAIR on every surface \
+         inside the declared capacity, at both horizons"
             .to_owned(),
-        parity_failures.is_empty(),
-        if parity_failures.is_empty() {
+        check_failures.is_empty() && compared_pairs > BigUint::from(0u32),
+        if check_failures.is_empty() {
             format!(
-                "{} readings checked, 0 disagreements",
-                sweeps.values().map(BTreeMap::len).sum::<usize>()
+                "{checked} readings, {compared_pairs} pairs compared, 0 disagreements; \
+                 {} readings obstructed and named",
+                obstructed.len()
             )
         } else {
-            format!("{} disagreements, first: {:?}", parity_failures.len(), parity_failures[0])
+            format!("{} disagreements, first: {}", check_failures.len(), check_failures[0])
         },
     ));
 
@@ -452,15 +533,22 @@ fn main() {
     ));
 
     // ------------------------------------------------- CONTROL 2: every separable word exhibited
+    //
+    // `shortest_separation` is a COMPLETE answer to a narrower question, not a prefix of the
+    // population: it is the pair that separates soonest, materialized from the complex on demand.
+    // It runs on every separable surface at both horizons regardless of width, because it costs one
+    // pair rather than `C(d,2)`.
     let mut unexhibited = Vec::new();
     let mut empty_word = Vec::new();
     for horizon in HORIZONS {
         for (surface, row) in &sweeps[&horizon] {
             if matches!(row.verdict, Verdict::Separated { .. }) {
-                if row.separations_found == 0 || row.separations.is_empty() {
-                    unexhibited.push((horizon, *surface));
-                } else if row.separations.iter().any(|s| s.word.is_empty()) {
-                    empty_word.push((horizon, *surface));
+                match row.shortest_separation(&census) {
+                    None => unexhibited.push((horizon, *surface)),
+                    Some(separation) if separation.word.is_empty() => {
+                        empty_word.push((horizon, *surface));
+                    }
+                    Some(_) => {}
                 }
             }
         }
@@ -490,21 +578,28 @@ fn main() {
             }
         }
     }
-    let aperture_open = HORIZONS
-        .iter()
-        .flat_map(|horizon| sweeps[horizon].values())
-        .filter(|row| row.verdict == Verdict::ApertureOpen)
-        .count();
+    // Every verdict is taken over the WHOLE occurrence population: the sum of each surface's window
+    // classes' occurrences must be the census's own count for that surface, or something was
+    // sampled. This is failable — a subsampling reading fails it on the first busy surface.
+    let mut short_read: Vec<(usize, SurfaceId)> = Vec::new();
+    for horizon in HORIZONS {
+        for (surface, row) in &sweeps[&horizon] {
+            if row.complex.occurrences() != BigUint::from(census.occurrences(*surface)) {
+                short_read.push((horizon, *surface));
+            }
+        }
+    }
     holds.push((
-        "control 3 -- every measured surface appears in BOTH readings at BOTH horizons, and no \
-         verdict rests on the declared aperture"
+        "control 3 -- every measured surface appears in BOTH readings at BOTH horizons, and every \
+         separation reading covers that surface's WHOLE occurrence population"
             .to_owned(),
-        both_readings && aperture_open == 0,
+        both_readings && short_read.is_empty(),
         format!(
-            "{} density rows, {} separation rows per horizon, {} aperture-dependent verdicts",
+            "{} density rows, {} separation rows per horizon, {} surfaces read short of their \
+             census count",
             density.len(),
             sweeps[&HORIZONS[0]].len(),
-            aperture_open
+            short_read.len()
         ),
     ));
 
@@ -549,7 +644,6 @@ fn main() {
                 slot.1 += 1;
                 *slot.2.entry(first_depth).or_default() += 1;
             }
-            Verdict::ApertureOpen => {}
         }
     }
     println!(
@@ -623,17 +717,14 @@ fn main() {
     for (surface, _) in by_occurrence.iter().take(10) {
         let row = &far_sweep[surface];
         println!(
-            "  {:?}  occ {}  windows {} (presented {}, withheld {})  conduct blocks on the \
-             presented population {}  separations {}",
+            "  {:?}  occ {}  windows {}  separated class pairs {}  separated occurrence pairs {}",
             census.surface(**surface),
             row.occurrences,
             row.distinct_windows,
-            row.windows_presented,
-            row.windows_withheld,
-            row.conduct_blocks,
-            row.separations_found
+            row.complex.separated_class_pairs(),
+            row.separated_occurrence_pairs()
         );
-        match row.separations.first() {
+        match row.shortest_separation(&census) {
             Some(separation) => println!("      {}", separation.exhibit(&census)),
             None => {
                 every_dense_separates = false;
@@ -643,24 +734,109 @@ fn main() {
     }
 
     println!();
-    println!("  A dense surface's separating words, in full -- the fuzziness exhibited, not scored.");
+    println!(
+        "  A dense surface's separating words -- the fuzziness exhibited, not scored. The WHOLE\n\
+         \x20 population is materialized under this caller's declared capacity and then quotiented\n\
+         \x20 by the word it exhibits, so what is printed is a complete census of the distinct\n\
+         \x20 separations rather than a prefix of the pair list."
+    );
     let holon = census.lookup("holon");
     if let Some(holon) = holon {
         let row = &far_sweep[&holon];
         println!();
-        println!(
-            "  {:?} at horizon {}: occ {}, {} distinct windows, {} conduct blocks, {} separations",
-            census.surface(holon),
-            HORIZONS[1],
-            row.occurrences,
-            row.distinct_windows,
-            row.conduct_blocks,
-            row.separations_found
-        );
-        for separation in row.separations.iter().take(8) {
-            println!("      {}", separation.exhibit(&census));
+        match row.exhibit(&census, DECLARED_CAPACITY) {
+            Ok(separations) => {
+                let mut distinct: BTreeMap<String, usize> = BTreeMap::new();
+                for separation in &separations {
+                    *distinct.entry(separation.exhibit(&census)).or_default() += 1;
+                }
+                println!(
+                    "  {:?} at horizon {}: occ {}, {} distinct windows, {} separations returned \
+                     WHOLE, {} distinct separating readings",
+                    census.surface(holon),
+                    HORIZONS[1],
+                    row.occurrences,
+                    row.distinct_windows,
+                    separations.len(),
+                    distinct.len()
+                );
+                let mut by_multiplicity: Vec<(&String, &usize)> = distinct.iter().collect();
+                by_multiplicity.sort_by(|left, right| right.1.cmp(left.1).then(left.0.cmp(right.0)));
+                for (exhibit, count) in by_multiplicity.iter().take(8) {
+                    println!("      x{count:<5} {exhibit}");
+                }
+            }
+            Err(obstruction) => println!(
+                "  {:?} at horizon {}: OBSTRUCTED -- {obstruction}",
+                census.surface(holon),
+                HORIZONS[1]
+            ),
         }
     }
+
+    // And on a surface whose whole population this caller's capacity refuses: a NAMED complete
+    // sub-population rather than a prefix. `exhibit_class` answers "everything that separates from
+    // this one class", which is a smaller question answered whole -- the distinction that makes an
+    // obstruction lawful where a truncation is not.
+    let mut narrow_answered = false;
+    if let Some(densest) = by_occurrence.first().map(|(surface, _)| **surface) {
+        let row = &far_sweep[&densest];
+        println!();
+        match row.exhibit(&census, DECLARED_CAPACITY) {
+            Err(obstruction) => {
+                println!(
+                    "  {:?}: the whole population is REFUSED -- {obstruction}\n\
+                     \x20   so ask a narrower question instead of taking a prefix of the answer to \
+                     the wide one:",
+                    census.surface(densest)
+                );
+                let narrow = row.complex.exhibit_class(
+                    &census,
+                    0,
+                    row.distinct_windows.saturating_sub(1) as u64,
+                );
+                match narrow {
+                    Ok(separations) => {
+                        narrow_answered = separations.len() == row.distinct_windows - 1;
+                        let mut distinct: BTreeSet<String> = BTreeSet::new();
+                        for separation in &separations {
+                            distinct.insert(separation.exhibit(&census));
+                        }
+                        println!(
+                            "     window class 0 against all {} others: {} separations returned \
+                             WHOLE, {} distinct readings among them; the shallowest:\n       {}",
+                            row.distinct_windows - 1,
+                            separations.len(),
+                            distinct.len(),
+                            separations
+                                .iter()
+                                .min_by_key(|separation| separation.word.len())
+                                .map(|separation| separation.exhibit(&census))
+                                .unwrap_or_else(|| "<none>".to_owned())
+                        );
+                    }
+                    Err(narrow_obstruction) => {
+                        println!("     even the narrow question is refused: {narrow_obstruction}")
+                    }
+                }
+            }
+            Ok(separations) => {
+                narrow_answered = true;
+                println!(
+                    "  {:?}: the whole population fits the declared capacity -- {} separations",
+                    census.surface(densest),
+                    separations.len()
+                );
+            }
+        }
+    }
+    holds.push((
+        "an obstructed width still answers a NAMED narrower question whole -- one window class \
+         against every other -- rather than handing back a prefix of the wide answer"
+            .to_owned(),
+        narrow_answered,
+        format!("declared capacity {DECLARED_CAPACITY} class pairs"),
+    ));
 
     // Control 1: a dense separable surface and a sparse unseparated one, both exhibited.
     let dense_separable = by_occurrence
@@ -685,24 +861,24 @@ fn main() {
                  separating word exists within the horizon",
                 census.surface(dense),
                 dense_row.occurrences,
-                dense_row.conduct_blocks,
+                dense_row.distinct_windows,
                 dense_row.first_depth().unwrap_or(0),
                 census.surface(sparse),
                 sparse_row.occurrences,
             );
             holds.push((
                 "control 1 -- density and separation come apart on the real corpus".to_owned(),
-                dense_row.conduct_blocks > 1
-                    && sparse_row.conduct_blocks == 1
+                dense_row.distinct_windows > 1
+                    && sparse_row.distinct_windows == 1
                     && dense_row.occurrences > sparse_row.occurrences,
                 format!(
                     "{:?} occ {} blocks {} vs {:?} occ {} blocks {}",
                     census.surface(dense),
                     dense_row.occurrences,
-                    dense_row.conduct_blocks,
+                    dense_row.distinct_windows,
                     census.surface(sparse),
                     sparse_row.occurrences,
-                    sparse_row.conduct_blocks
+                    sparse_row.distinct_windows
                 ),
             ));
         }
@@ -760,7 +936,7 @@ fn main() {
             if actual { "iron" } else { "fuzzy" },
             if gating { "" } else { "  (declared, non-gating)" },
             row.occurrences,
-            row.conduct_blocks,
+            row.distinct_windows,
             HORIZONS[1],
         );
         if gating && actual != expected_iron {
@@ -1063,6 +1239,121 @@ fn main() {
         format!("Open-at-coarse: {ordering_nonvacuous}, exact Equal: {equality_exact}"),
     ));
 
+    // ---------------------------------------------------------- 6: the excision's own orbit
+    println!();
+    println!("6 -- WHAT THE TWO EXCISED LEVELS WERE WITHHOLDING");
+    println!("-------------------------------------------------");
+    println!(
+        "`canon/THE_CONTAMINANT_PROTOCOL.md` §4: lift the level, re-run the declared material,\n\
+         exhibit the difference. `WINDOW_APERTURE = 64` presented the first 64 distinct windows per\n\
+         surface IN CORPUS ORDER and reported the conduct-block count of that subsample;\n\
+         `SEPARATION_EXHIBIT = 512` then kept the first 512 separations of what was left. Both were\n\
+         silent: the return was a prefix and a count, and no caller could tell it from the whole."
+    );
+    println!();
+    println!(
+        "  {:<8} {:>12} {:>14} {:>16} {:>18} {:>18}",
+        "horizon", "capped", "windows lost", "old cap on pairs", "old pairs kept", "whole pairs"
+    );
+    let mut orbit_moved = false;
+    for horizon in HORIZONS {
+        let reading = &sweeps[&horizon];
+        let capped = reading
+            .values()
+            .filter(|row| row.distinct_windows > EXCISED_WINDOW_APERTURE)
+            .count();
+        let windows_lost: usize = reading
+            .values()
+            .map(|row| row.distinct_windows.saturating_sub(EXCISED_WINDOW_APERTURE))
+            .sum();
+        let old_found: BigUint = reading
+            .values()
+            .map(|row| pairs_of(row.distinct_windows.min(EXCISED_WINDOW_APERTURE)))
+            .sum();
+        let old_kept: BigUint = reading
+            .values()
+            .map(|row| {
+                pairs_of(row.distinct_windows.min(EXCISED_WINDOW_APERTURE))
+                    .min(BigUint::from(EXCISED_SEPARATION_EXHIBIT))
+            })
+            .sum();
+        let whole: BigUint = reading
+            .values()
+            .map(|row| row.complex.separated_class_pairs())
+            .sum();
+        if capped > 0 && whole > old_kept {
+            orbit_moved = true;
+        }
+        println!(
+            "  {horizon:<8} {capped:>12} {windows_lost:>14} {old_found:>16} {old_kept:>18} \
+             {whole:>18}"
+        );
+    }
+    holds.push((
+        "the excised levels were DECIDING the reading, not bounding an unreached ceiling: on the \
+         declared corpus the window aperture cut the presented population and the separation cap \
+         cut the return"
+            .to_owned(),
+        orbit_moved,
+        "measured at both horizons in the table above".to_owned(),
+    ));
+
+    // The distinguishing material: a separation between two window classes the old aperture never
+    // presented. Under `WINDOW_APERTURE = 64` this pair did not exist for any caller.
+    println!();
+    println!(
+        "  THE DISTINGUISHING MATERIAL. A separation between two window classes that both sat past\n\
+         \x20 the old aperture's first-64-in-corpus-order selection. Under the excised constant no\n\
+         \x20 caller could reach either side of it, at any capacity, because the population was cut\n\
+         \x20 before the organ ever saw it."
+    );
+    let mut exhibited_withheld = false;
+    for name in ["holon", "receiver", "exact", "the"] {
+        let Some(surface) = census.lookup(name) else {
+            continue;
+        };
+        let row = &far_sweep[&surface];
+        if row.distinct_windows <= EXCISED_WINDOW_APERTURE {
+            continue;
+        }
+        let presented = old_aperture_selection(&census, surface, HORIZONS[1], row);
+        let withheld: Vec<usize> = (0..row.distinct_windows)
+            .filter(|class| !presented.contains(class))
+            .collect();
+        if withheld.len() < 2 {
+            continue;
+        }
+        let (left, right) = (withheld[0], withheld[withheld.len() - 1]);
+        let Some(separation) = row.complex.separation_between(&census, left, right) else {
+            continue;
+        };
+        println!();
+        println!(
+            "  {:?} at horizon {}: {} window classes, {} of them withheld by the old aperture.\n\
+             \x20   class {} vs class {} -- neither was ever presented:\n      {}\n\
+             \x20   and it stands for {} separated occurrence pairs ({} x {}).",
+            census.surface(surface),
+            HORIZONS[1],
+            row.distinct_windows,
+            withheld.len(),
+            left,
+            right,
+            separation.exhibit(&census),
+            separation.occurrence_pairs(),
+            separation.left_occurrences,
+            separation.right_occurrences,
+        );
+        exhibited_withheld = true;
+        break;
+    }
+    holds.push((
+        "the excision exhibits its own distinguishing material: a separating word between two \
+         window classes the old aperture withheld from every caller"
+            .to_owned(),
+        exhibited_withheld,
+        "searched over the declared probes in corpus order".to_owned(),
+    ));
+
     // ---------------------------------------------------------------- verdicts
     println!();
     println!("DECLARED CONTROLS");
@@ -1086,6 +1377,45 @@ fn main() {
         );
         std::process::exit(1);
     }
+}
+
+/// `C(n,2)`, exact.
+fn pairs_of(population: usize) -> BigUint {
+    if population < 2 {
+        return BigUint::from(0u32);
+    }
+    BigUint::from(population) * BigUint::from(population - 1) / BigUint::from(2u32)
+}
+
+/// Which window classes the excised `WINDOW_APERTURE = 64` would have presented: the first 64
+/// distinct windows **in corpus order**, which is the order `CorpusCensus::sites` returns.
+///
+/// Reconstructed rather than remembered, so the orbit is measured against what the old code did and
+/// not against a description of it. Note what the selection depended on: file traversal order.
+fn old_aperture_selection(
+    census: &CorpusCensus,
+    surface: SurfaceId,
+    horizon: usize,
+    row: &SeparationReading,
+) -> BTreeSet<usize> {
+    let index: BTreeMap<&Vec<Option<(u64, u64, u64)>>, usize> = row
+        .complex
+        .classes
+        .iter()
+        .enumerate()
+        .map(|(position, class)| (&class.window, position))
+        .collect();
+    let mut selected = BTreeSet::new();
+    for (whole, position) in census.sites(surface) {
+        if selected.len() >= EXCISED_WINDOW_APERTURE {
+            break;
+        }
+        let reading = window(census, *whole, *position, horizon);
+        if let Some(class) = index.get(&reading) {
+            selected.insert(*class);
+        }
+    }
+    selected
 }
 
 fn render_support(support: &Support) -> String {

@@ -53,8 +53,11 @@
 //!    `D_n(z + z^{-1}) = z^n + z^{-n}`. Those roots are isolated by **exact Sturm bisection** through
 //!    [`IntegerPolynomial::distinct_root_count`], and `β_m` is strictly decreasing in `m`, so the
 //!    descending order of the isolated intervals *is* the labelling by `m`. This drives the
-//!    Sturm/`AlgebraicRoot` carrier, which `CLAUDE.md` §11 measured at **zero drivers** in any
-//!    `examples/`, `tests/` or `bin/` path.
+//!    Sturm/`AlgebraicRoot` carrier. **The "zero drivers" figure this line used to cite from
+//!    `CLAUDE.md` §11 was falsified there on 2026-08-08 and is struck**; the carrier is driven, by
+//!    `examples/reopening_the_collapsed_face.rs` among others, and now also from below by
+//!    [`crate::rational_polynomial::root_separation`], which reads its own descent depth off the
+//!    same polynomial's discriminant.
 //! 2. **The rational special case.** By Niven's theorem `2cos(2πm/n)` is rational exactly when
 //!    `n/gcd(m,n) ∈ {1,2,3,4,6}`, with values `2, −2, −1, 0, 1`. Those entries are stored as exact
 //!    points, never refined — and each is **cross-checked against the interval Sturm isolated
@@ -104,6 +107,28 @@
 //! than assumed, and `the_two_hands_swap_under_negation_while_the_split_does_not` holds this module
 //! to it.
 //!
+//! ## How far the refinement may go, and why nobody chooses that
+//!
+//! Two questions bound the refinement, and **both are answered by the material**:
+//!
+//! ```text
+//!   how narrow must an enclosure be to decide a hand?     |lambda_k| > 0, bounded below by
+//!                                                          Cauchy's lower bound on the nonzero
+//!                                                          roots of det(xI - C)
+//!   how narrow must it be to isolate one root?            sep(det(xI - C)), bounded below by
+//!                                                          Mahler's root separation bound from
+//!                                                          that polynomial's own discriminant
+//! ```
+//!
+//! Both are exact positive rationals — see [`crate::rational_polynomial::root_separation`] and
+//! [`crate::rational_polynomial::nonzero_root_lower_bound`] — and the enclosure's width after `r`
+//! refinements is bounded by `(sum_j |c_j|) * w_max * retained^r`. So the number of refinements is
+//! *computed*, and a construction that passes it is a contradiction between the character route and
+//! the determinant rather than a run that wanted a larger allowance.
+//!
+//! The same holds one level down: the star table's own root isolation descends no further than the
+//! star polynomial's separation bound permits.
+//!
 //! ## Exactness and governance
 //!
 //! `Rat` and `BigInt` throughout. The split-point schedule in [`StarTable`] and the refinement
@@ -120,16 +145,10 @@ use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
 use crate::exact_value::{AlgebraicRoot, ExactInterval, ExactValueError, IntegerPolynomial};
 use crate::grown_cell::GrownComplex;
 use crate::inertia::{Inertia, InertiaError, SymmetricForm};
-
-/// How many times the star table may be halved before the construction refuses.
-///
-/// A bound, not a tolerance: each refinement halves every inexact interval, so this is `2^-64` of
-/// the starting width. A construction that has not decided a hand by then has a defect and must say
-/// so rather than spin.
-const REFINEMENT_APERTURE: usize = 64;
-
-/// How deep the isolating bisection may go before it refuses.
-const ISOLATION_APERTURE: usize = 64;
+use crate::rational_polynomial::{
+    ExactPolynomialError, RootSeparation, interior_split_schedule, nonzero_root_lower_bound,
+    root_separation, squared_shrinking_steps, worst_retained_fraction,
+};
 
 // ===============================================================================================
 // the form
@@ -493,6 +512,11 @@ pub fn winding_inertia(circulant: &SymmetricCirculant) -> Result<WindingInertia,
     let mut table = StarTable::found(extent)?;
     let symbol_rational: Vec<Rat> = symbol.iter().cloned().map(Rat::from_integer).collect();
 
+    // The floor of the refinement, read off the determinant rather than chosen.
+    let separation = root_separation(&characteristic_polynomial)?;
+    let refinement_bound =
+        refinements_the_material_allows(&symbol, &table, &characteristic_polynomial, &separation)?;
+
     let mut passages = Vec::with_capacity(extent);
     for character in 0..extent {
         let star_polygon = StarPolygon::of(character, extent);
@@ -534,10 +558,18 @@ pub fn winding_inertia(circulant: &SymmetricCirculant) -> Result<WindingInertia,
                     // passage is not null. The two exact routes contradict each other.
                     return Err(WindingError::HandDisagreesWithCyclotomic { character });
                 }
+                if table.refinements() as u64 >= refinement_bound {
+                    return Err(WindingError::RefinementPastTheDerivedBound {
+                        character,
+                        bound: refinement_bound,
+                    });
+                }
                 table.refine()?;
                 continue;
             };
-            if let Some(certificate) = certify(&characteristic_polynomial, &scaled_enclosure) {
+            if let Some(certificate) =
+                certify(&characteristic_polynomial, &separation, &scaled_enclosure)
+            {
                 break Passage {
                     character,
                     winding: Rat::new(BigInt::from(character), BigInt::from(extent)),
@@ -547,6 +579,12 @@ pub fn winding_inertia(circulant: &SymmetricCirculant) -> Result<WindingInertia,
                     certificate,
                     null_witness: null_witness.clone(),
                 };
+            }
+            if table.refinements() as u64 >= refinement_bound {
+                return Err(WindingError::RefinementPastTheDerivedBound {
+                    character,
+                    bound: refinement_bound,
+                });
             }
             table.refine()?;
         };
@@ -559,7 +597,7 @@ pub fn winding_inertia(circulant: &SymmetricCirculant) -> Result<WindingInertia,
         symbol,
         characteristic_polynomial,
         passages,
-        refinements: table.refinements,
+        refinements: table.refinements(),
     })
 }
 
@@ -667,6 +705,11 @@ pub struct StarTable {
     exact: Vec<bool>,
     polynomial: IntegerPolynomial,
     refinements: usize,
+    /// How deep the founding isolation actually descended, against what the star polynomial's own
+    /// discriminant permitted. The pair is the whole content of *the level is read off the
+    /// material*: the second is what the theorem allows, the first is what the material asked for.
+    isolation_depth_reached: u64,
+    isolation_depth_permitted: u64,
 }
 
 impl StarTable {
@@ -683,7 +726,8 @@ impl StarTable {
             Rat::from_integer(BigInt::from(-3)),
             Rat::from_integer(BigInt::from(3)),
         )?;
-        let mut isolated = isolate_all_roots(&polynomial, &bound)?;
+        let (mut isolated, isolation_depth_reached, isolation_depth_permitted) =
+            isolate_all_roots(&polynomial, &bound)?;
         if isolated.len() != population {
             return Err(WindingError::RootPopulation {
                 expected: population,
@@ -713,7 +757,20 @@ impl StarTable {
             exact,
             polynomial,
             refinements: 0,
+            isolation_depth_reached,
+            isolation_depth_permitted,
         })
+    }
+
+    /// How deep the founding isolation went, and how deep the star polynomial's own discriminant
+    /// permitted it to go.
+    ///
+    /// **A measurement with no library consumer.** Nothing downstream reads it; its only reader is
+    /// `examples/the_material_states_its_own_isolation_depth.rs`, which needs the pair to exhibit
+    /// that the derived depth is what governs. Stated rather than left to be discovered
+    /// (`canon/THE_CONTAMINANT_PROTOCOL.md` §2.1).
+    pub fn isolation_depth(&self) -> (u64, u64) {
+        (self.isolation_depth_reached, self.isolation_depth_permitted)
     }
 
     pub fn extent(&self) -> usize {
@@ -729,13 +786,32 @@ impl StarTable {
         self.exact.get(step).copied().unwrap_or(false)
     }
 
-    /// Halve every inexact interval. A schedule, not a governor.
+    /// The star polynomial the table's inexact entries are roots of.
+    pub fn polynomial(&self) -> &IntegerPolynomial {
+        &self.polynomial
+    }
+
+    pub fn refinements(&self) -> usize {
+        self.refinements
+    }
+
+    /// The widest entry still carried as an interval. Exact entries have width zero and never move,
+    /// so this is what an enclosure's width is actually made of.
+    pub fn widest_inexact_width(&self) -> Rat {
+        self.values
+            .iter()
+            .enumerate()
+            .filter(|(step, _)| !self.exact[*step])
+            .map(|(_, interval)| &interval.upper - &interval.lower)
+            .max()
+            .unwrap_or_else(Rat::zero)
+    }
+
+    /// Sharpen every inexact interval one split. A schedule, not a governor, and **not a budget**:
+    /// how many of these a construction may take is decided by its own material, at the caller,
+    /// where the symbol and the characteristic polynomial are known. See
+    /// [`refinements_the_material_allows`].
     pub fn refine(&mut self) -> Result<(), WindingError> {
-        if self.refinements >= REFINEMENT_APERTURE {
-            return Err(WindingError::RefinementAperture {
-                aperture: REFINEMENT_APERTURE,
-            });
-        }
         let mut moved = false;
         for (step, interval) in self.values.iter_mut().enumerate() {
             if self.exact[step] {
@@ -812,29 +888,19 @@ fn niven_value(step: usize, extent: usize) -> Option<Rat> {
 // ===============================================================================================
 // exact root isolation
 
-/// The split points a bisection may take, as fractions of the interval.
+/// A point strictly inside the interval at which the polynomial does not vanish.
 ///
-/// A **schedule**. An endpoint of a Sturm count may not itself be a root, so a midpoint that lands
-/// on one is stepped over rather than nudged by an epsilon. A polynomial of degree `d` has at most
-/// `d` roots, so a list this long exhausts the obstruction for every degree this module reaches.
-fn split_fractions() -> Vec<Rat> {
-    let mut fractions = Vec::new();
-    for denominator in [2_i64, 3, 5, 7, 11, 13, 17, 19] {
-        for numerator in 1..denominator {
-            if gcd_usize(numerator as usize, denominator as usize) == 1 {
-                fractions.push(Rat::new(BigInt::from(numerator), BigInt::from(denominator)));
-            }
-        }
-    }
-    fractions
-}
-
+/// An endpoint of a Sturm count may not itself be a root, so a split point that lands on one is
+/// stepped over rather than nudged by an epsilon. The candidates come from
+/// [`interior_split_schedule`], whose **count is read off the degree**: a polynomial of degree `d`
+/// has at most `d` roots, so `d + 1` distinct interior points cannot all be roots. There is no list
+/// to run out, and [`WindingError::NoSplitPoint`] is retained as the defect report it now is.
 fn interior_non_root(
     polynomial: &IntegerPolynomial,
     interval: &ExactInterval,
 ) -> Result<Rat, WindingError> {
     let width = &interval.upper - &interval.lower;
-    for fraction in split_fractions() {
+    for fraction in interior_split_schedule(polynomial.degree()) {
         let candidate = &interval.lower + &width * &fraction;
         if !polynomial.evaluate(&candidate).is_zero() {
             return Ok(candidate);
@@ -843,29 +909,42 @@ fn interior_non_root(
     Err(WindingError::NoSplitPoint)
 }
 
+/// The worst fraction of an interval either child of a split of this polynomial can retain.
+fn retained_fraction(polynomial: &IntegerPolynomial) -> Result<Rat, WindingError> {
+    Ok(worst_retained_fraction(&interior_split_schedule(
+        polynomial.degree(),
+    ))?)
+}
+
 /// Every distinct real root of a squarefree polynomial in one interval, isolated, ascending.
+///
+/// The descent stops where the polynomial's own discriminant says two roots cannot both fit, so the
+/// two refusals below are **defect reports**: reaching either means the Sturm count and the
+/// discriminant disagree about the same polynomial.
 fn isolate_all_roots(
     polynomial: &IntegerPolynomial,
     bound: &ExactInterval,
-) -> Result<Vec<ExactInterval>, WindingError> {
-    let mut pending = vec![(
-        bound.clone(),
-        polynomial.distinct_root_count(bound)?,
-        0_usize,
-    )];
+) -> Result<(Vec<ExactInterval>, u64, u64), WindingError> {
+    let separation = root_separation(polynomial)?;
+    let retained = retained_fraction(polynomial)?;
+    let depth_bound = separation.splitting_depth(&(&bound.upper - &bound.lower), &retained)?;
+    let mut pending = vec![(bound.clone(), polynomial.distinct_root_count(bound)?, 0_u64)];
     let mut isolated: Vec<ExactInterval> = Vec::new();
+    let mut deepest = 0_u64;
     while let Some((interval, count, depth)) = pending.pop() {
         if count == 0 {
             continue;
         }
+        deepest = deepest.max(depth);
         if count == 1 {
             isolated.push(interval);
             continue;
         }
-        if depth >= ISOLATION_APERTURE {
-            return Err(WindingError::IsolationAperture {
-                aperture: ISOLATION_APERTURE,
-            });
+        if separation.holds_at_most_one_root(&(&interval.upper - &interval.lower)) {
+            return Err(WindingError::SeparationBoundContradicted { count });
+        }
+        if depth >= depth_bound {
+            return Err(WindingError::IsolationPastTheSeparationBound { depth_bound });
         }
         let middle = interior_non_root(polynomial, &interval)?;
         let lower = ExactInterval::new(interval.lower.clone(), middle.clone())?;
@@ -876,7 +955,7 @@ fn isolate_all_roots(
         pending.push((upper, upper_count, depth + 1));
     }
     isolated.sort_by(|left, right| left.lower.cmp(&right.lower));
-    Ok(isolated)
+    Ok((isolated, deepest, depth_bound))
 }
 
 /// Halve an interval already known to isolate exactly one root, keeping the half that has it.
@@ -899,26 +978,111 @@ fn halve_isolating_interval(
 /// on a root is refused by [`AlgebraicRoot::isolate`] and must be stepped over rather than nudged.
 /// `None` means the enclosure is still too wide to separate two eigenvalues, which the caller
 /// answers by refining the star table.
-fn certify(polynomial: &IntegerPolynomial, enclosure: &ExactInterval) -> Option<AlgebraicRoot> {
+///
+/// **Both the give-up and the attempt count are read off the material.** An enclosure whose squared
+/// width already reaches the separation bound cannot be padded into an isolating interval at all, so
+/// it returns immediately rather than spending Sturm sequences discovering that. Below that width,
+/// the padded interval provably holds exactly one root, and the only way an attempt can fail is an
+/// endpoint landing on a root — which each of the `degree` roots can cause for at most one pad on
+/// each side. `2 * degree + 1` attempts therefore exhaust the obstruction.
+fn certify(
+    polynomial: &IntegerPolynomial,
+    separation: &RootSeparation,
+    enclosure: &ExactInterval,
+) -> Option<AlgebraicRoot> {
     let two = Rat::from_integer(BigInt::from(2));
     if !enclosure.is_point()
         && let Ok(root) = AlgebraicRoot::isolate(polynomial.clone(), enclosure.clone()) {
             return Some(root);
         }
-    let mut pad = if enclosure.is_point() {
-        Rat::one()
-    } else {
-        (&enclosure.upper - &enclosure.lower) / &two
-    };
-    for _ in 0..REFINEMENT_APERTURE {
-        let candidate =
-            ExactInterval::new(&enclosure.lower - &pad, &enclosure.upper + &pad).ok()?;
+    let width = &enclosure.upper - &enclosure.lower;
+    let room = separation.squared_lower_bound().cloned();
+    if let Some(square) = &room
+        && &width * &width >= *square
+    {
+        return None;
+    }
+    let mut pad = Rat::one();
+    if let Some(square) = &room {
+        loop {
+            let padded = &width + &pad * &two;
+            if &padded * &padded < *square {
+                break;
+            }
+            pad /= &two;
+        }
+    }
+    for _ in 0..2 * polynomial.degree() + 1 {
+        let candidate = ExactInterval::new(&enclosure.lower - &pad, &enclosure.upper + &pad).ok()?;
         if let Ok(root) = AlgebraicRoot::isolate(polynomial.clone(), candidate) {
             return Some(root);
         }
         pad /= &two;
     }
     None
+}
+
+/// How many star-table refinements the material permits before a passage must have been decided.
+///
+/// The enclosure of `lambda_k` is `c_0 [+/- c_(n/2)] + sum_pair c_pair * beta_step`, so its width is
+/// at most `(sum_pair |c_pair|) * w_max`, and every refinement multiplies `w_max` by at most the
+/// worst fraction a split of the star polynomial can retain. It has to come down to
+///
+/// ```text
+///   Cauchy's lower bound on the nonzero roots of det(xI - C)   -- to decide a hand
+///   Mahler's separation bound for the same polynomial          -- to isolate one root
+/// ```
+///
+/// whichever is smaller. Both are exact rationals derived from the determinant's own coefficients.
+///
+/// **Both uses need the strict inequality, and one further step supplies it** rather than a margin
+/// anybody chose: [`squared_shrinking_steps`] returns the first `r` with `W_r <= T`, and since the
+/// schedule retains strictly less than all of an interval, `W_(r+1) <= retained * T < T`.
+///
+/// A zero width — every star entry already exact — permits zero refinements, which is correct
+/// rather than a degenerate case: there is nothing left to sharpen.
+fn refinements_the_material_allows(
+    symbol: &[BigInt],
+    table: &StarTable,
+    characteristic: &IntegerPolynomial,
+    separation: &RootSeparation,
+) -> Result<u64, WindingError> {
+    let extent = symbol.len();
+    let mut coefficient_sum = Rat::zero();
+    for coefficient in symbol
+        .iter()
+        .take(extent.saturating_sub(1) / 2 + 1)
+        .skip(1)
+    {
+        coefficient_sum += Rat::from_integer(coefficient.abs());
+    }
+    let initial_width = coefficient_sum * table.widest_inexact_width();
+    if !initial_width.is_positive() {
+        return Ok(0);
+    }
+    let mut target_squared: Option<Rat> = None;
+    let mut narrow = |candidate: Rat| {
+        target_squared = Some(match target_squared.take() {
+            None => candidate,
+            Some(current) => current.min(candidate),
+        });
+    };
+    if let Some(floor) = nonzero_root_lower_bound(characteristic) {
+        narrow(&floor * &floor);
+    }
+    if let Some(square) = separation.squared_lower_bound() {
+        narrow(square.clone());
+    }
+    let Some(target_squared) = target_squared else {
+        // Degree one and every root zero: there is one eigenvalue, it is exactly zero, and no
+        // sharpening can tell anyone anything they do not already have exactly.
+        return Ok(0);
+    };
+    Ok(squared_shrinking_steps(
+        &(&initial_width * &initial_width),
+        &retained_fraction(table.polynomial())?,
+        &target_squared,
+    )? + 1)
 }
 
 // ===============================================================================================
@@ -1251,14 +1415,26 @@ pub enum WindingError {
         "the cyclotomic witness for character {character} is not integral, so it cannot be a divisor of an integral symbol"
     )]
     NonIntegralWitness { character: usize },
-    #[error("no interior split point avoided a root of the polynomial")]
+    #[error(
+        "no interior split point avoided a root of the polynomial, though the schedule carries one more candidate than the degree admits roots"
+    )]
     NoSplitPoint,
-    #[error("root isolation exceeded its declared aperture of {aperture} bisections")]
-    IsolationAperture { aperture: usize },
-    #[error("the star table exceeded its declared aperture of {aperture} refinements")]
-    RefinementAperture { aperture: usize },
+    #[error(
+        "root isolation passed the {depth_bound} splits the star polynomial's own discriminant permits; Sturm and the discriminant disagree"
+    )]
+    IsolationPastTheSeparationBound { depth_bound: u64 },
+    #[error(
+        "an interval no wider than the root separation bound still reported {count} distinct roots"
+    )]
+    SeparationBoundContradicted { count: u32 },
+    #[error(
+        "character {character} was still undecided after the {bound} refinements the determinant's own separation and nonzero-root bounds permit"
+    )]
+    RefinementPastTheDerivedBound { character: usize, bound: u64 },
     #[error("every star value is already exact, so nothing can be refined further")]
     NothingLeftToRefine,
+    #[error(transparent)]
+    Polynomial(#[from] ExactPolynomialError),
     #[error(transparent)]
     Exact(#[from] ExactValueError),
     #[error(transparent)]
@@ -2008,6 +2184,185 @@ mod tests {
             "no grown chart moved with the expansion schedule, so the three schedules produced one \
              frame and the cross-check never crossed anything"
         );
+    }
+
+    // -----------------------------------------------------------------------------------------
+    // the depth the material states
+
+    /// `(p_k, q_k)` with `p/q -> sqrt 2`, so `|p_k - q_k sqrt 2| = 1/(p_k + q_k sqrt 2)`.
+    fn pell(index: usize) -> (BigInt, BigInt) {
+        let (mut previous_p, mut p) = (BigInt::one(), BigInt::one());
+        let (mut previous_q, mut q) = (BigInt::zero(), BigInt::one());
+        for _ in 1..index {
+            let next_p = BigInt::from(2) * &p + &previous_p;
+            let next_q = BigInt::from(2) * &q + &previous_q;
+            previous_p = p;
+            previous_q = q;
+            p = next_p;
+            q = next_q;
+        }
+        (p, q)
+    }
+
+    /// `circ(-p, q, 0, 0, 0, 0, 0, q)` on eight characters: `lambda_1 = q sqrt2 - p`, which is
+    /// `1/(p + q sqrt2)` in magnitude — tiny against coefficients of size `q`.
+    fn near_cancelling(index: usize) -> SymmetricCirculant {
+        let (p, q) = pell(index);
+        let mut row = vec![Rat::zero(); 8];
+        row[0] = Rat::from_integer(-p);
+        row[1] = Rat::from_integer(q.clone());
+        row[7] = Rat::from_integer(q);
+        SymmetricCirculant::from_first_row(row).expect("reversal symmetric")
+    }
+
+    /// The excised aperture, replayed against the public star table: how many refinements it takes
+    /// to put an enclosure strictly on one side of zero, refusing at `cap` exactly as the deleted
+    /// `REFINEMENT_APERTURE` did.
+    fn refinements_to_decide(
+        form: &SymmetricCirculant,
+        character: usize,
+        cap: usize,
+    ) -> Option<usize> {
+        let (_, symbol) = form.integral_symbol();
+        let mut table = StarTable::found(form.extent()).expect("the star table founds");
+        for taken in 0..=cap {
+            let enclosure = table.enclose(&symbol, character).expect("the symbol encloses");
+            if enclosure.lower.is_positive() || enclosure.upper.is_negative() {
+                return Some(taken);
+            }
+            if taken == cap {
+                return None;
+            }
+            table.refine().expect("an inexact table refines");
+        }
+        None
+    }
+
+    /// **The orbit.** The excised `REFINEMENT_APERTURE = 64` was a ceiling, and this is the material
+    /// that hits it: a circulant whose eigenvalue at one character is a Pell near-cancellation
+    /// `q sqrt2 - p`, of size `1/(2 sqrt2 q)` against coefficients of size `q`. The refinements grow
+    /// like `log(q^2)`, so the family straddles sixty-four, and past it the construction now returns
+    /// where the aperture refused.
+    #[test]
+    fn a_near_cancelling_circulant_needs_more_refinements_than_the_excised_aperture_allowed() {
+        /// The level this excised. History, and consulted by nothing in the library.
+        const THE_EXCISED_APERTURE: usize = 64;
+        let mut straddle = (0, 0);
+        let mut hands_seen = (false, false);
+        for index in [13_usize, 28] {
+            let (p, q) = pell(index);
+            let form = near_cancelling(index);
+            let reading = winding_inertia(&form).unwrap();
+            // Pell's identity `p^2 - 2q^2 = (-1)^k` decides the hand of character 1 exactly, with no
+            // reference to this module: `lambda_1 = q sqrt2 - p` is negative exactly when
+            // `p^2 > 2 q^2`. That is the independent route the naming is checked against.
+            let expected = if &p * &p > BigInt::from(2) * &q * &q {
+                Hand::AgainstTheTurn
+            } else {
+                Hand::WithTheTurn
+            };
+            for character in [1_usize, 7] {
+                assert_eq!(
+                    reading.passage(character).unwrap().returns,
+                    PassageReturn::Handed(expected),
+                    "index {index}, character {character}"
+                );
+            }
+            match expected {
+                Hand::WithTheTurn => hands_seen.0 = true,
+                Hand::AgainstTheTurn => hands_seen.1 = true,
+            }
+            assert_eq!(
+                reading.split(),
+                inertia(&form.as_symmetric_form().unwrap()),
+                "index {index}: the elimination must agree with the character route"
+            );
+            assert!(reading.null_windings().is_empty());
+            assert_eq!(reading.split().zero, 0);
+
+            // The soundness statement: the descent stayed inside what the determinant permits.
+            let (_, symbol) = form.integral_symbol();
+            let separation = root_separation(&reading.characteristic_polynomial).unwrap();
+            let permitted = refinements_the_material_allows(
+                &symbol,
+                &StarTable::found(8).unwrap(),
+                &reading.characteristic_polynomial,
+                &separation,
+            )
+            .unwrap();
+            assert!(
+                (reading.refinements as u64) < permitted,
+                "index {index}: took {} of a permitted {permitted}",
+                reading.refinements
+            );
+
+            // And the excised aperture, replayed on the public table.
+            let decided = refinements_to_decide(&form, 1, THE_EXCISED_APERTURE);
+            if reading.refinements < THE_EXCISED_APERTURE {
+                assert!(
+                    decided.is_some(),
+                    "index {index} decides inside the excised aperture"
+                );
+                straddle.0 += 1;
+            } else {
+                assert_eq!(
+                    decided, None,
+                    "index {index} must be undecided at the excised aperture, or it separates \
+                     nothing"
+                );
+                straddle.1 += 1;
+            }
+        }
+        assert_eq!(
+            straddle,
+            (1, 1),
+            "the family must fall on both sides of the excised aperture"
+        );
+        assert_eq!(
+            hands_seen,
+            (true, true),
+            "both hands must appear, or the Pell cross-check is one-sided"
+        );
+    }
+
+    /// The bound is computed from the determinant, so it moves with the material rather than
+    /// standing at one number. A bound that did not move would be an authored level wearing a
+    /// derivation.
+    #[test]
+    fn the_refinement_bound_moves_with_the_material_it_is_read_off() {
+        let mut bounds = Vec::new();
+        for index in [4_usize, 12, 20, 28] {
+            let form = near_cancelling(index);
+            let (_, symbol) = form.integral_symbol();
+            let reading = winding_inertia(&form).unwrap();
+            let separation = root_separation(&reading.characteristic_polynomial).unwrap();
+            bounds.push(
+                refinements_the_material_allows(
+                    &symbol,
+                    &StarTable::found(8).unwrap(),
+                    &reading.characteristic_polynomial,
+                    &separation,
+                )
+                .unwrap(),
+            );
+        }
+        assert!(
+            bounds.windows(2).all(|pair| pair[0] < pair[1]),
+            "the permitted refinements must grow with the near-cancellation: {bounds:?}"
+        );
+        // The cycle's own adjacency asks for a bound too, and it is a different number again.
+        let cycle = winding_inertia(&cycle_adjacency(12).unwrap()).unwrap();
+        let (_, symbol) = cycle_adjacency(12).unwrap().integral_symbol();
+        let separation = root_separation(&cycle.characteristic_polynomial).unwrap();
+        let cycle_bound = refinements_the_material_allows(
+            &symbol,
+            &StarTable::found(12).unwrap(),
+            &cycle.characteristic_polynomial,
+            &separation,
+        )
+        .unwrap();
+        assert!((cycle.refinements as u64) < cycle_bound);
+        assert!(!bounds.contains(&cycle_bound));
     }
 
     // -----------------------------------------------------------------------------------------

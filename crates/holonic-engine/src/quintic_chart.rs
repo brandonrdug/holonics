@@ -508,9 +508,15 @@ impl QuinticChartAtlas {
 }
 
 /// Read one integral quintic through the whole chart family.
+///
+/// `horn_local_section_limit` is the caller's declaration of how many affine integer-polynomial
+/// torsors one horn-resolution event of the arithmetic-monodromy fiber may retain. It moved out of
+/// `prime_ecology` on 2026-08-09 (`canon/THE_CONTAMINANT_PROTOCOL.md` §2.5) and is passed straight
+/// through: this organ does not pick it either.
 pub fn read_quintic_charts(
     problem: &IntegralQuinticProblem,
     prime_limit: u64,
+    horn_local_section_limit: u64,
 ) -> Result<QuinticChartAtlas, QuinticChartError> {
     let normalized = problem.normalize()?;
     let monic_source = RationalPolynomial::from_integers(&normalized.coefficients);
@@ -535,7 +541,13 @@ pub fn read_quintic_charts(
         obstructions.push(obstruction.clone());
     }
 
-    let radical = radical_chart(problem, &monic_source, &depressed, prime_limit)?;
+    let radical = radical_chart(
+        problem,
+        &monic_source,
+        &depressed,
+        prime_limit,
+        horn_local_section_limit,
+    )?;
     if let RadicalChartVerdict::Refuses(obstruction) = &radical.verdict {
         obstructions.push(obstruction.clone());
     }
@@ -1364,9 +1376,11 @@ fn radical_chart(
     monic_source: &RationalPolynomial,
     depressed: &ChartOutcome,
     prime_limit: u64,
+    horn_local_section_limit: u64,
 ) -> Result<RadicalChartReading, QuinticChartError> {
-    let law = ArithmeticMonodromyLaw::new(1)?;
-    let standing = ArithmeticMonodromyStanding::new(1)?;
+    let law = ArithmeticMonodromyLaw::with_horn_local_section_limit(1, horn_local_section_limit)?;
+    let standing =
+        ArithmeticMonodromyStanding::with_horn_local_section_limit(1, horn_local_section_limit)?;
     let mut world = CausalWorld::new(law, standing);
     world.receive(&ArithmeticMonodromyEvent::InheritQuintic {
         event: CHART_PROBLEM_EVENT,
@@ -1514,6 +1528,11 @@ mod tests {
     use crate::arithmetic_monodromy::QuinticProblemId;
 
     use super::*;
+
+    /// **What this test body declares as its horn local-section limit**, since `prime_ecology` no
+    /// longer picks one (`canon/THE_CONTAMINANT_PROTOCOL.md` §2.5). The value reproduces the
+    /// excised `DEFAULT_HORN_LOCAL_SECTION_LIMIT`.
+    const TEST_HORN_LOCAL_SECTION_LIMIT: u64 = 1_000_000;
 
     fn quintic(name: &str, coefficients: &[i64]) -> IntegralQuinticProblem {
         IntegralQuinticProblem::new(
@@ -1668,7 +1687,7 @@ mod tests {
     #[test]
     fn every_returned_transport_kills_exactly_what_its_chart_promised() {
         let problem = quintic("x^5-2", &[-2, 0, 0, 0, 0, 1]);
-        let atlas = read_quintic_charts(&problem, 41).unwrap();
+        let atlas = read_quintic_charts(&problem, 41, TEST_HORN_LOCAL_SECTION_LIMIT).unwrap();
         for (chart, outcome) in atlas.outcomes() {
             if let Some(transport) = outcome.transport() {
                 for degree in chart.killed_degrees() {
@@ -1686,7 +1705,7 @@ mod tests {
     #[test]
     fn the_radical_chart_refuses_a_non_solvable_quintic_and_names_the_obstruction() {
         let problem = quintic("x^5-x-1", &[-1, -1, 0, 0, 0, 1]);
-        let atlas = read_quintic_charts(&problem, 41).unwrap();
+        let atlas = read_quintic_charts(&problem, 41, TEST_HORN_LOCAL_SECTION_LIMIT).unwrap();
         let RadicalChartVerdict::Refuses(obstruction) = &atlas.radical.verdict else {
             panic!("x^5 - x - 1 has Galois group S_5 and the radical chart must refuse");
         };
@@ -1708,7 +1727,7 @@ mod tests {
     fn the_radical_chart_returns_for_a_declared_solvable_quintic() {
         // (x - 1)(x^4 - 2): the rational-root receiver deflates below the degree-five wall.
         let problem = quintic("(x-1)(x^4-2)", &[2, -2, 0, 0, -1, 1]);
-        let atlas = read_quintic_charts(&problem, 41).unwrap();
+        let atlas = read_quintic_charts(&problem, 41, TEST_HORN_LOCAL_SECTION_LIMIT).unwrap();
         let RadicalChartVerdict::Returns(RadicalReturn::BelowTheWall {
             residual_degree, ..
         }) = &atlas.radical.verdict
@@ -1724,7 +1743,7 @@ mod tests {
         // (x+1)^5 + 2 is not a binomial; its depressed transport is. The radical chart returns on
         // the transported form and would be Open on the source without it.
         let problem = quintic("(x+1)^5+2", &[3, 5, 10, 10, 5, 1]);
-        let atlas = read_quintic_charts(&problem, 41).unwrap();
+        let atlas = read_quintic_charts(&problem, 41, TEST_HORN_LOCAL_SECTION_LIMIT).unwrap();
         assert_eq!(
             atlas.radical.depressed_binomial_constant,
             Some(Rat::from_integer(BigInt::from(2)))
@@ -1742,7 +1761,7 @@ mod tests {
         // discriminant 11^4. Every Frobenius cycle type is 1^5 or 5, and A_5 has both, so no
         // observation can ever exclude A_5. The fiber stays {C_5, A_5}: one solvable, one not.
         let problem = quintic("cyclic-quintic", &[1, 3, -3, -4, 1, 1]);
-        let atlas = read_quintic_charts(&problem, 97).unwrap();
+        let atlas = read_quintic_charts(&problem, 97, TEST_HORN_LOCAL_SECTION_LIMIT).unwrap();
         // D_5 sits inside A_5 for degree five — a reflection on five points is a product of two
         // transpositions and therefore even — so a square discriminant admits {C_5, D_5, A_5}.
         assert_eq!(
@@ -1765,7 +1784,7 @@ mod tests {
     fn a_refusal_is_a_population_and_every_member_carries_what_refused_it() {
         // x^5 + x^3 + 1 refuses in three charts at once, for three different reasons.
         let problem = quintic("x^5+x^3+1", &[1, 0, 0, 1, 0, 1]);
-        let atlas = read_quintic_charts(&problem, 41).unwrap();
+        let atlas = read_quintic_charts(&problem, 41, TEST_HORN_LOCAL_SECTION_LIMIT).unwrap();
         assert_eq!(
             atlas.obstructions.len(),
             3,
@@ -1837,7 +1856,7 @@ mod tests {
             &[1, 3, -3, -4, 1, 1][..],
         ] {
             let problem = quintic("population-probe", coefficients);
-            let atlas = read_quintic_charts(&problem, 41).unwrap();
+            let atlas = read_quintic_charts(&problem, 41, TEST_HORN_LOCAL_SECTION_LIMIT).unwrap();
             let mut unique: Vec<&ChartObstruction> = Vec::new();
             for obstruction in &atlas.obstructions {
                 if !unique.contains(&obstruction) {
@@ -1887,7 +1906,7 @@ mod tests {
         // radical anywhere — while its Galois group is still S_5 and the radical chart still
         // refuses. That is the tablet's sentence as a computation: not solvable IN THAT CHART.
         let problem = quintic("x^5-2x^3+x-1", &[-1, 1, 0, -2, 0, 1]);
-        let atlas = read_quintic_charts(&problem, 41).unwrap();
+        let atlas = read_quintic_charts(&problem, 41, TEST_HORN_LOCAL_SECTION_LIMIT).unwrap();
         let transport = atlas
             .bring
             .transport()
@@ -1906,7 +1925,7 @@ mod tests {
         // x^5 - x - 1 IS Bring form. The organ must recognise that rather than hunt for a cubic
         // transform, and the transform it returns is the identity shift.
         let problem = quintic("x^5-x-1", &[-1, -1, 0, 0, 0, 1]);
-        let atlas = read_quintic_charts(&problem, 41).unwrap();
+        let atlas = read_quintic_charts(&problem, 41, TEST_HORN_LOCAL_SECTION_LIMIT).unwrap();
         let transport = atlas
             .bring
             .transport()

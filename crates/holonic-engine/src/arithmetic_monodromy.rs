@@ -29,7 +29,7 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use crate::{
-    ArithmeticFiberEvent, CausalMaterialKind, DEFAULT_HORN_LOCAL_SECTION_LIMIT, EventId,
+    ArithmeticFiberEvent, CausalMaterialKind, EventId,
     EventSuccessor, ExactEventLaw, IntegerPolynomialProbe, PolynomialFiberSignature,
     PolynomialPrimeFiber, PolynomialProbeId, PrimeEcologyError, PrimeEcologyEvent,
     PrimeEcologyGeometryReceipt, PrimeEcologyLaw, PrimeEcologyRadiation, PrimeEcologyStanding,
@@ -480,10 +480,6 @@ pub struct ArithmeticMonodromyStanding {
 }
 
 impl ArithmeticMonodromyStanding {
-    pub fn new(max_phase_grade: u32) -> Result<Self, ArithmeticMonodromyError> {
-        Self::with_horn_local_section_limit(max_phase_grade, DEFAULT_HORN_LOCAL_SECTION_LIMIT)
-    }
-
     pub fn with_horn_local_section_limit(
         max_phase_grade: u32,
         max_horn_local_sections: u64,
@@ -729,10 +725,6 @@ pub struct ArithmeticMonodromyLaw {
 }
 
 impl ArithmeticMonodromyLaw {
-    pub fn new(max_phase_grade: u32) -> Result<Self, ArithmeticMonodromyError> {
-        Self::with_horn_local_section_limit(max_phase_grade, DEFAULT_HORN_LOCAL_SECTION_LIMIT)
-    }
-
     pub fn with_horn_local_section_limit(
         max_phase_grade: u32,
         max_horn_local_sections: u64,
@@ -1556,6 +1548,13 @@ pub enum ArithmeticMonodromyError {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// **What this test body declares as its horn local-section limit.** It moved out of the organ
+    /// on 2026-08-09 (`canon/THE_CONTAMINANT_PROTOCOL.md` §2.5 — *a default is a level the organ
+    /// picked because the caller was never asked*), and a fixture is a caller. The value reproduces
+    /// the excised `DEFAULT_HORN_LOCAL_SECTION_LIMIT` so these fixtures' returns are unchanged by
+    /// the move.
+    const TEST_HORN_LOCAL_SECTION_LIMIT: u64 = 1_000_000;
     use crate::CausalWorld;
 
     const PROBLEM_EVENT: EventId = EventId(1_000_000);
@@ -1630,8 +1629,8 @@ mod tests {
 
     #[test]
     fn a5_fibers_drive_the_same_galois_and_euler_standing_across_chronologies() {
-        let law = ArithmeticMonodromyLaw::new(1).unwrap();
-        let standing = ArithmeticMonodromyStanding::new(1).unwrap();
+        let law = ArithmeticMonodromyLaw::with_horn_local_section_limit(1, TEST_HORN_LOCAL_SECTION_LIMIT).unwrap();
+        let standing = ArithmeticMonodromyStanding::with_horn_local_section_limit(1, TEST_HORN_LOCAL_SECTION_LIMIT).unwrap();
         let mut early = CausalWorld::new(law, standing);
         early
             .receive(&ArithmeticMonodromyEvent::InheritQuintic {
@@ -1649,8 +1648,8 @@ mod tests {
             .unwrap();
         admit_through(&mut early, 61).unwrap();
 
-        let law = ArithmeticMonodromyLaw::new(1).unwrap();
-        let standing = ArithmeticMonodromyStanding::new(1).unwrap();
+        let law = ArithmeticMonodromyLaw::with_horn_local_section_limit(1, TEST_HORN_LOCAL_SECTION_LIMIT).unwrap();
+        let standing = ArithmeticMonodromyStanding::with_horn_local_section_limit(1, TEST_HORN_LOCAL_SECTION_LIMIT).unwrap();
         let mut late = CausalWorld::new(law, standing);
         admit_through(&mut late, 61).unwrap();
         late.receive(&ArithmeticMonodromyEvent::InheritQuintic {
@@ -1685,8 +1684,8 @@ mod tests {
 
     #[test]
     fn certified_a5_future_cycle_fiber_rejects_every_odd_partition() {
-        let law = ArithmeticMonodromyLaw::new(1).unwrap();
-        let standing = ArithmeticMonodromyStanding::new(1).unwrap();
+        let law = ArithmeticMonodromyLaw::with_horn_local_section_limit(1, TEST_HORN_LOCAL_SECTION_LIMIT).unwrap();
+        let standing = ArithmeticMonodromyStanding::with_horn_local_section_limit(1, TEST_HORN_LOCAL_SECTION_LIMIT).unwrap();
         let mut world = CausalWorld::new(law, standing);
         world
             .receive(&ArithmeticMonodromyEvent::InheritQuintic {
@@ -1710,8 +1709,8 @@ mod tests {
 
     #[test]
     fn nonsquare_control_closes_as_s5_from_caused_prime_sections() {
-        let law = ArithmeticMonodromyLaw::new(1).unwrap();
-        let standing = ArithmeticMonodromyStanding::new(1).unwrap();
+        let law = ArithmeticMonodromyLaw::with_horn_local_section_limit(1, TEST_HORN_LOCAL_SECTION_LIMIT).unwrap();
+        let standing = ArithmeticMonodromyStanding::with_horn_local_section_limit(1, TEST_HORN_LOCAL_SECTION_LIMIT).unwrap();
         let mut world = CausalWorld::new(law, standing);
         let problem = IntegralQuinticProblem::new(
             PROBLEM,

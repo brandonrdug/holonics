@@ -15,6 +15,13 @@ use holonic_engine::{
 use num_bigint::BigInt;
 use num_traits::One;
 
+/// **What this driver declares as its horn local-section limit.** `prime_ecology` stopped picking a
+/// default on 2026-08-09 (`canon/THE_CONTAMINANT_PROTOCOL.md` §2.5 — *a default is a level the
+/// organ picked because the caller was never asked*). It bounds how many affine
+/// integer-polynomial torsors one horn-resolution event may retain; past it the event refuses by
+/// name rather than sampling.
+const HORN_LOCAL_SECTION_LIMIT: u64 = 1_000_000;
+
 const PROBE_EVENT_BASE: u64 = 1_000_000;
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -26,8 +33,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     }
 
     let probes = probes()?;
-    let law = PrimeEcologyLaw::new(2)?;
-    let standing = PrimeEcologyStanding::new(2)?;
+    let law = PrimeEcologyLaw::with_horn_local_section_limit(2, HORN_LOCAL_SECTION_LIMIT)?;
+    let standing = PrimeEcologyStanding::with_horn_local_section_limit(2, HORN_LOCAL_SECTION_LIMIT)?;
     let mut world = CausalWorld::new(law, standing);
     admit_integers(&mut world, 2, 5)?;
 
@@ -90,8 +97,8 @@ fn main() -> Result<(), Box<dyn Error>> {
         ],
     )?;
 
-    let alternate_law = PrimeEcologyLaw::new(2)?;
-    let alternate_standing = PrimeEcologyStanding::new(2)?;
+    let alternate_law = PrimeEcologyLaw::with_horn_local_section_limit(2, HORN_LOCAL_SECTION_LIMIT)?;
+    let alternate_standing = PrimeEcologyStanding::with_horn_local_section_limit(2, HORN_LOCAL_SECTION_LIMIT)?;
     let mut alternate = CausalWorld::new(alternate_law, alternate_standing);
     for (event, probe) in probes {
         alternate.receive(&PrimeEcologyEvent::InheritPolynomial { event, probe })?;

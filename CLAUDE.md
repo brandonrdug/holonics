@@ -755,7 +755,9 @@ The grading discipline in `canon/EPISTEMIC_GRADES.md` stands. Three additions:
   has `C(n+2,2)` coefficients and 10 pins the ambient dimension at 3 while the name reads as a
   count. And `APERTURE` must state **what would derive the level from the material**: refusing past a
   number you invented does not make the number derived, which is what `FREE_ENTRY_APERTURE = 12`
-  and `REFINEMENT_APERTURE = 64` were relying on.
+  and `REFINEMENT_APERTURE = 64` were relying on. **Both are excised as of 2026-08-09**, along with
+  eight more; nine of the ten moved a return when lifted, and the orbits are
+  `canon/THE_AUTHORED_LEVEL.md` §5.0.
 
 - **A cost is measured in work, never in elapsed time. A clock may measure; it may never select.**
   This is the fourth member of the family above and the one with a live instance. Convicted

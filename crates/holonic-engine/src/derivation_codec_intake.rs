@@ -107,8 +107,8 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use crate::codec_recovery::{
-    recover, Boundary, Emission, Obstruction, OpaqueSymbolCodec, RecoveredCodec, RecoveryError,
-    RecoveryWork, SymbolSeparation,
+    recover, Boundary, Emission, Obstruction, OpaqueSymbolCodec, RecoveredCodec, RecoveryApertures,
+    RecoveryError, RecoveryWork, SymbolSeparation,
 };
 use crate::conditioned_derivation::{
     ConditionedDerivationRefusal, FoundedMorphology, MorphemicIncidence, StemFiring,
@@ -328,9 +328,10 @@ pub enum IntakeRefusal {
 /// Recover a foreign conditioner from its declared statistics and condition on real material with it.
 ///
 /// `alphabet` and `radius` declare the query family, which is exhausted rather than sampled, so
-/// every relation returned is a statement about the whole family. `material` is named wholes of real
-/// text; it is presented through [`present`] and segmented by the recovered structure, and the
-/// tokens enter [`FoundedMorphology::from_founded_words`] — the one seam.
+/// every relation returned is a statement about the whole family. `apertures` is what the **caller's
+/// host** can hold; it is passed through to [`recover`] and is not this organ's to pick. `material`
+/// is named wholes of real text; it is presented through [`present`] and segmented by the recovered
+/// structure, and the tokens enter [`FoundedMorphology::from_founded_words`] — the one seam.
 ///
 /// ## Cost
 ///
@@ -343,9 +344,10 @@ pub fn intake(
     target: &OpaqueSymbolCodec,
     alphabet: &[char],
     radius: usize,
+    apertures: RecoveryApertures,
     material: &[(String, String)],
 ) -> Result<CodecIntake, IntakeRefusal> {
-    let recovery = recover(target, alphabet, radius)?;
+    let recovery = recover(target, alphabet, radius, apertures)?;
     if !recovery.obstructions.is_empty() {
         return Err(IntakeRefusal::RecoveryObstructed {
             obstructions: recovery.obstructions,
@@ -689,6 +691,15 @@ mod tests {
         derive, expose, ConditionedBody, DerivationQuery, StemStanding,
     };
 
+    /// **What this test body declares as its host capacity.** The apertures moved out of
+    /// `codec_recovery` on 2026-08-09 (`canon/THE_AUTHORED_LEVEL.md` §5.2); a fixture is a caller
+    /// and declares its own. The values reproduce the excised constants so these fixtures' returns
+    /// are unchanged by the move.
+    const TEST_APERTURES: RecoveryApertures = RecoveryApertures {
+        family_words: 65_536,
+        free_entries: 12,
+    };
+
     // ---------------------------------------------------------------------------------------------
     // Material. Two wholes of prose, so a word can recur across distinct sources, plus a deposit
     // whose recruited identifiers carry the morphemes the prose founds.
@@ -862,7 +873,7 @@ mod tests {
     /// recovered relation from a working one.
     #[test]
     fn the_declared_statistics_return_relations_with_the_shortest_context_that_produced_each() {
-        let carried = intake("word-runs", &word_runs(), &alphabet(), 3, &corpus())
+        let carried = intake("word-runs", &word_runs(), &alphabet(), 3, TEST_APERTURES, &corpus())
             .expect("the conditioner is recoverable and founds a committed population");
         let relations = &carried.relations;
 
@@ -913,7 +924,7 @@ mod tests {
     /// and the intake says so by type rather than handing back an empty morphology.
     #[test]
     fn statistics_that_separate_no_two_symbols_are_refused_by_type_and_not_returned_empty() {
-        let refusal = intake("one-class", &one_class(), &alphabet(), 3, &corpus())
+        let refusal = intake("one-class", &one_class(), &alphabet(), 3, TEST_APERTURES, &corpus())
             .expect_err("a conditioner that separates nothing supplies no relation");
         let IntakeRefusal::NoRelationRecovered { classes } = refusal else {
             panic!("expected NoRelationRecovered, got {refusal:?}");
@@ -930,7 +941,7 @@ mod tests {
             ("digits".to_owned(), "0123 4567 89".to_owned()),
             ("more-digits".to_owned(), "9876 5432 10".to_owned()),
         ];
-        let refusal = intake("word-runs", &word_runs(), &alphabet(), 3, &numerals)
+        let refusal = intake("word-runs", &word_runs(), &alphabet(), 3, TEST_APERTURES, &numerals)
             .expect_err("no declared letter appears in the material");
         let IntakeRefusal::NoFoundedWord { wholes } = refusal else {
             panic!("expected NoFoundedWord, got {refusal:?}");
@@ -943,7 +954,7 @@ mod tests {
     #[test]
     fn a_population_that_never_recurs_across_two_wholes_is_refused_by_type() {
         let single = vec![("only".to_owned(), FIRST.to_owned())];
-        let refusal = intake("word-runs", &word_runs(), &alphabet(), 3, &single)
+        let refusal = intake("word-runs", &word_runs(), &alphabet(), 3, TEST_APERTURES, &single)
             .expect_err("one whole cannot witness a recurrence across distinct wholes");
         let IntakeRefusal::NoCommittedStem { founded } = refusal else {
             panic!("expected NoCommittedStem, got {refusal:?}");
@@ -955,7 +966,7 @@ mod tests {
     /// carried, not approximated by the nearest structure that fits.
     #[test]
     fn a_conditioner_outside_the_declared_shape_carries_the_recovery_obstruction_forward() {
-        let refusal = intake("capped", &capped(), &['a', 'b'], 4, &corpus())
+        let refusal = intake("capped", &capped(), &['a', 'b'], 4, TEST_APERTURES, &corpus())
             .expect_err("a token-length cap is not an adjacency law");
         let IntakeRefusal::RecoveryObstructed { obstructions } = refusal else {
             panic!("expected RecoveryObstructed, got {refusal:?}");
@@ -977,7 +988,7 @@ mod tests {
     /// prose, exactly the words the body's own reading founds — in order, whole by whole.
     #[test]
     fn the_recovered_conditioner_founds_exactly_the_words_the_bodys_own_reading_founds() {
-        let carried = intake("word-runs", &word_runs(), &alphabet(), 3, &corpus())
+        let carried = intake("word-runs", &word_runs(), &alphabet(), 3, TEST_APERTURES, &corpus())
             .expect("the conditioner is recoverable");
         let declared: BTreeSet<char> = carried.relations.alphabet.iter().copied().collect();
 
@@ -1002,7 +1013,7 @@ mod tests {
 
         // A different conditioner over the same alphabet does depart, so the agreement above is a
         // property of this conditioner and not of the comparison.
-        let other = intake("characters", &characters(), &alphabet(), 3, &corpus())
+        let other = intake("characters", &characters(), &alphabet(), 3, TEST_APERTURES, &corpus())
             .expect("the conditioner is recoverable");
         let presented = present("first", FIRST, &declared);
         let split: Vec<String> = presented
@@ -1017,7 +1028,7 @@ mod tests {
     /// **everything any conduct path reads**, and differs exactly in the field none reads.
     #[test]
     fn the_carried_morphology_differs_from_the_native_one_only_in_the_lineage_nothing_reads() {
-        let carried = intake("word-runs", &word_runs(), &alphabet(), 3, &corpus())
+        let carried = intake("word-runs", &word_runs(), &alphabet(), 3, TEST_APERTURES, &corpus())
             .expect("the conditioner is recoverable")
             .morphology;
         let native = native();
@@ -1087,7 +1098,7 @@ mod tests {
     #[test]
     fn the_body_tells_a_character_conditioner_from_its_own_reading_and_names_the_word() {
         let population = identifiers();
-        let carried = intake("characters", &characters(), &alphabet(), 3, &corpus())
+        let carried = intake("characters", &characters(), &alphabet(), 3, TEST_APERTURES, &corpus())
             .expect("the conditioner is recoverable");
         let native = native();
 
@@ -1131,7 +1142,7 @@ mod tests {
     #[test]
     fn the_body_tells_a_syllabic_conditioner_apart_as_well() {
         let population = identifiers();
-        let carried = intake("syllables", &syllables(), &alphabet(), 3, &corpus())
+        let carried = intake("syllables", &syllables(), &alphabet(), 3, TEST_APERTURES, &corpus())
             .expect("the conditioner is recoverable");
         assert_eq!(carried.relations.classes.len(), 3, "{:?}", carried.relations.classes);
         assert_eq!(
@@ -1193,7 +1204,7 @@ mod tests {
             ("native", &native),
             (
                 "characters",
-                &intake("characters", &characters(), &alphabet(), 3, &corpus())
+                &intake("characters", &characters(), &alphabet(), 3, TEST_APERTURES, &corpus())
                     .expect("recoverable")
                     .morphology,
             ),
@@ -1205,7 +1216,7 @@ mod tests {
         );
 
         // Only now is the empty return admissible as evidence.
-        let carried = intake("word-runs", &word_runs(), &alphabet(), 3, &corpus())
+        let carried = intake("word-runs", &word_runs(), &alphabet(), 3, TEST_APERTURES, &corpus())
             .expect("recoverable");
         let agreement = distinguish(
             &population,
@@ -1305,9 +1316,9 @@ mod tests {
     /// object.
     #[test]
     fn the_two_conditioners_are_separated_as_codecs_by_a_named_input() {
-        let runs = intake("word-runs", &word_runs(), &alphabet(), 3, &corpus())
+        let runs = intake("word-runs", &word_runs(), &alphabet(), 3, TEST_APERTURES, &corpus())
             .expect("recoverable");
-        let chars = intake("characters", &characters(), &alphabet(), 3, &corpus())
+        let chars = intake("characters", &characters(), &alphabet(), 3, TEST_APERTURES, &corpus())
             .expect("recoverable");
 
         assert_eq!(runs.codec.classes, chars.codec.classes);
@@ -1350,7 +1361,7 @@ mod tests {
         assert!(body.derive(&query).expect("ASCII identifiers").is_empty());
 
         body.carry_morphology(
-            intake("word-runs", &word_runs(), &alphabet(), 3, &corpus())
+            intake("word-runs", &word_runs(), &alphabet(), 3, TEST_APERTURES, &corpus())
                 .expect("recoverable")
                 .morphology,
         );
@@ -1370,7 +1381,7 @@ mod tests {
         assert_eq!(carried, own, "the seam must not change the production");
 
         body.carry_morphology(
-            intake("characters", &characters(), &alphabet(), 3, &corpus())
+            intake("characters", &characters(), &alphabet(), 3, TEST_APERTURES, &corpus())
                 .expect("recoverable")
                 .morphology,
         );
@@ -1411,7 +1422,7 @@ mod tests {
             ]
         );
 
-        let carried = intake("word-runs", &word_runs(), &alphabet(), 3, &corpus())
+        let carried = intake("word-runs", &word_runs(), &alphabet(), 3, TEST_APERTURES, &corpus())
             .expect("recoverable");
         assert!(
             carried
@@ -1430,7 +1441,7 @@ mod tests {
     /// testimony.
     #[test]
     fn the_recovered_structure_conforms_with_the_conditioner_on_held_out_real_runs() {
-        let carried = intake("word-runs", &word_runs(), &alphabet(), 3, &corpus())
+        let carried = intake("word-runs", &word_runs(), &alphabet(), 3, TEST_APERTURES, &corpus())
             .expect("recoverable");
         let declared: BTreeSet<char> = carried.relations.alphabet.iter().copied().collect();
         let presented = present("second", SECOND, &declared);
@@ -1464,7 +1475,7 @@ mod tests {
     /// distinct wholes witnessed.
     #[test]
     fn the_intake_states_its_cost_and_commits_only_what_recurred_across_wholes() {
-        let carried = intake("word-runs", &word_runs(), &alphabet(), 3, &corpus())
+        let carried = intake("word-runs", &word_runs(), &alphabet(), 3, TEST_APERTURES, &corpus())
             .expect("recoverable");
         assert_eq!(
             carried.relations.work.declared_family_words,
@@ -1495,8 +1506,8 @@ mod tests {
     /// accident.
     #[test]
     fn the_intake_is_deterministic() {
-        let first = intake("word-runs", &word_runs(), &alphabet(), 3, &corpus()).expect("ok");
-        let second = intake("word-runs", &word_runs(), &alphabet(), 3, &corpus()).expect("ok");
+        let first = intake("word-runs", &word_runs(), &alphabet(), 3, TEST_APERTURES, &corpus()).expect("ok");
+        let second = intake("word-runs", &word_runs(), &alphabet(), 3, TEST_APERTURES, &corpus()).expect("ok");
         assert_eq!(first, second);
 
         let population = identifiers();

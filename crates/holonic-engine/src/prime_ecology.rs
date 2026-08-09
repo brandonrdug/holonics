@@ -41,7 +41,17 @@ pub struct HornFillerBranchId {
     pub ordinal: u32,
 }
 
-pub const DEFAULT_HORN_LOCAL_SECTION_LIMIT: u64 = 1_000_000;
+// There is deliberately no `DEFAULT_HORN_LOCAL_SECTION_LIMIT` here.
+//
+// Until 2026-08-09 this line read `pub const DEFAULT_HORN_LOCAL_SECTION_LIMIT: u64 = 1_000_000;`
+// and `PrimeEcologyLaw::new` / `PrimeEcologyStanding::new` handed it to
+// `with_horn_local_section_limit` on the caller's behalf. `canon/THE_CONTAMINANT_PROTOCOL.md` §2.5
+// convicted the name itself: **a default is a level the organ picked because the caller was never
+// asked.** The horn local-section limit bounds how many affine integer-polynomial torsors one
+// horn-resolution event may retain, which is a statement about the host, so
+// `with_horn_local_section_limit` is now the only constructor and every caller states it. The
+// refusal shape is unchanged: a zero limit is `PrimeEcologyError::ZeroHornLocalSectionLimit` and an
+// exceeded one is refused rather than sampled.
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub enum CausalMaterialKind {
@@ -1506,10 +1516,6 @@ pub struct PrimeEcologyStanding {
 }
 
 impl PrimeEcologyStanding {
-    pub fn new(max_phase_grade: u32) -> Result<Self, PrimeEcologyError> {
-        Self::with_horn_local_section_limit(max_phase_grade, DEFAULT_HORN_LOCAL_SECTION_LIMIT)
-    }
-
     pub fn with_horn_local_section_limit(
         max_phase_grade: u32,
         max_horn_local_sections: u64,
@@ -1937,6 +1943,13 @@ impl PrimeEcologyStanding {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// **What this test body declares as its horn local-section limit.** It moved out of the organ
+    /// on 2026-08-09 (`canon/THE_CONTAMINANT_PROTOCOL.md` §2.5 — *a default is a level the organ
+    /// picked because the caller was never asked*), and a fixture is a caller. The value reproduces
+    /// the excised `DEFAULT_HORN_LOCAL_SECTION_LIMIT` so these fixtures' returns are unchanged by
+    /// the move.
+    const TEST_HORN_LOCAL_SECTION_LIMIT: u64 = 1_000_000;
     use crate::CausalWorld;
 
     fn arithmetic_through(limit: u64) -> ArithmeticFiberStanding {
@@ -1987,8 +2000,8 @@ mod tests {
     }
 
     fn ecology_primes_then_probes(limit: u64) -> CausalWorld<PrimeEcologyLaw> {
-        let law = PrimeEcologyLaw::new(2).unwrap();
-        let standing = PrimeEcologyStanding::new(2).unwrap();
+        let law = PrimeEcologyLaw::with_horn_local_section_limit(2, TEST_HORN_LOCAL_SECTION_LIMIT).unwrap();
+        let standing = PrimeEcologyStanding::with_horn_local_section_limit(2, TEST_HORN_LOCAL_SECTION_LIMIT).unwrap();
         let mut world = CausalWorld::new(law, standing);
         for value in 2..=limit {
             world
@@ -2108,8 +2121,8 @@ mod tests {
     fn induced_face_families_recombine_into_exact_tetrahedral_families() {
         let support = vec![2_u64, 3, 5, 7];
         let triangle_supports = combinations(&support, 3);
-        let law = PrimeEcologyLaw::new(3).unwrap();
-        let standing = PrimeEcologyStanding::new(3).unwrap();
+        let law = PrimeEcologyLaw::with_horn_local_section_limit(3, TEST_HORN_LOCAL_SECTION_LIMIT).unwrap();
+        let standing = PrimeEcologyStanding::with_horn_local_section_limit(3, TEST_HORN_LOCAL_SECTION_LIMIT).unwrap();
         let mut world = CausalWorld::new(law, standing);
         for value in 2..=7 {
             world
@@ -2225,10 +2238,10 @@ mod tests {
 
         for branches in homologous.values() {
             let left = branches[0]
-                .torsors(DEFAULT_HORN_LOCAL_SECTION_LIMIT)
+                .torsors(TEST_HORN_LOCAL_SECTION_LIMIT)
                 .unwrap();
             let right = branches[1]
-                .torsors(DEFAULT_HORN_LOCAL_SECTION_LIMIT)
+                .torsors(TEST_HORN_LOCAL_SECTION_LIMIT)
                 .unwrap();
             assert_eq!(left, right);
             assert_eq!(
@@ -2295,8 +2308,8 @@ mod tests {
 
     #[test]
     fn three_pairwise_phase_channels_derive_the_complete_horn_filler_space() {
-        let law = PrimeEcologyLaw::new(2).unwrap();
-        let standing = PrimeEcologyStanding::new(2).unwrap();
+        let law = PrimeEcologyLaw::with_horn_local_section_limit(2, TEST_HORN_LOCAL_SECTION_LIMIT).unwrap();
+        let standing = PrimeEcologyStanding::with_horn_local_section_limit(2, TEST_HORN_LOCAL_SECTION_LIMIT).unwrap();
         let mut world = CausalWorld::new(law, standing);
         for value in 2..=5 {
             world
@@ -2349,7 +2362,7 @@ mod tests {
         assert_eq!(quadratic.degree, 2);
         assert_eq!(quadratic.modulus, BigInt::from(30));
         assert_eq!(quadratic.missing_stratum.section_count, 3);
-        let quadratic_torsors = quadratic.torsors(DEFAULT_HORN_LOCAL_SECTION_LIMIT).unwrap();
+        let quadratic_torsors = quadratic.torsors(TEST_HORN_LOCAL_SECTION_LIMIT).unwrap();
         assert_eq!(
             quadratic_torsors
                 .iter()
@@ -2447,8 +2460,8 @@ mod tests {
     fn inherited_probe_and_prime_choreography_converge_to_one_geometry() {
         let primes_then_probes = ecology_primes_then_probes(5);
 
-        let law = PrimeEcologyLaw::new(2).unwrap();
-        let standing = PrimeEcologyStanding::new(2).unwrap();
+        let law = PrimeEcologyLaw::with_horn_local_section_limit(2, TEST_HORN_LOCAL_SECTION_LIMIT).unwrap();
+        let standing = PrimeEcologyStanding::with_horn_local_section_limit(2, TEST_HORN_LOCAL_SECTION_LIMIT).unwrap();
         let mut probes_then_primes = CausalWorld::new(law, standing);
         for (event, probe) in ecology_probes() {
             probes_then_primes
@@ -2526,8 +2539,8 @@ mod tests {
 
     #[test]
     fn a_common_receiver_phase_founds_a_grade_three_cell_with_closed_boundary() {
-        let law = PrimeEcologyLaw::new(3).unwrap();
-        let standing = PrimeEcologyStanding::new(3).unwrap();
+        let law = PrimeEcologyLaw::with_horn_local_section_limit(3, TEST_HORN_LOCAL_SECTION_LIMIT).unwrap();
+        let standing = PrimeEcologyStanding::with_horn_local_section_limit(3, TEST_HORN_LOCAL_SECTION_LIMIT).unwrap();
         let mut world = CausalWorld::new(law, standing);
         let probe = IntegerPolynomialProbe::cyclotomic(PolynomialProbeId(1), 2).unwrap();
         world
@@ -3522,10 +3535,6 @@ pub struct PrimeEcologyLaw {
 }
 
 impl PrimeEcologyLaw {
-    pub fn new(max_phase_grade: u32) -> Result<Self, PrimeEcologyError> {
-        Self::with_horn_local_section_limit(max_phase_grade, DEFAULT_HORN_LOCAL_SECTION_LIMIT)
-    }
-
     pub fn with_horn_local_section_limit(
         max_phase_grade: u32,
         max_horn_local_sections: u64,

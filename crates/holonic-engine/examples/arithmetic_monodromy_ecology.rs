@@ -17,6 +17,13 @@ use holonic_engine::{
 };
 use num_bigint::BigInt;
 
+/// **What this driver declares as its horn local-section limit.** `prime_ecology` stopped picking a
+/// default on 2026-08-09 (`canon/THE_CONTAMINANT_PROTOCOL.md` §2.5 — *a default is a level the
+/// organ picked because the caller was never asked*). It bounds how many affine
+/// integer-polynomial torsors one horn-resolution event may retain; past it the event refuses by
+/// name rather than sampling.
+const HORN_LOCAL_SECTION_LIMIT: u64 = 1_000_000;
+
 const PROBLEM: QuinticProblemId = QuinticProblemId(17);
 const RECEIVER: EulerReceiverId = EulerReceiverId(23);
 const PROBLEM_EVENT: EventId = EventId(1_000_000);
@@ -40,8 +47,8 @@ fn main() -> Result<(), Box<dyn Error>> {
         IntegralQuinticProblem::new(PROBLEM, "arithmetic-monodromy-subject", coefficients)?;
 
     let start = Instant::now();
-    let law = ArithmeticMonodromyLaw::new(1)?;
-    let standing = ArithmeticMonodromyStanding::new(1)?;
+    let law = ArithmeticMonodromyLaw::with_horn_local_section_limit(1, HORN_LOCAL_SECTION_LIMIT)?;
+    let standing = ArithmeticMonodromyStanding::with_horn_local_section_limit(1, HORN_LOCAL_SECTION_LIMIT)?;
     let mut world = CausalWorld::new(law, standing);
     world.receive(&ArithmeticMonodromyEvent::InheritQuintic {
         event: PROBLEM_EVENT,
@@ -94,8 +101,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     }
     world.standing().validate()?;
 
-    let alternate_law = ArithmeticMonodromyLaw::new(1)?;
-    let alternate_standing = ArithmeticMonodromyStanding::new(1)?;
+    let alternate_law = ArithmeticMonodromyLaw::with_horn_local_section_limit(1, HORN_LOCAL_SECTION_LIMIT)?;
+    let alternate_standing = ArithmeticMonodromyStanding::with_horn_local_section_limit(1, HORN_LOCAL_SECTION_LIMIT)?;
     let mut alternate = CausalWorld::new(alternate_law, alternate_standing);
     admit_through(&mut alternate, limit)?;
     alternate.receive(&ArithmeticMonodromyEvent::InheritQuintic {

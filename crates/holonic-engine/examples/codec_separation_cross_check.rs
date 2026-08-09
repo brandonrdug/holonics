@@ -27,7 +27,8 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::error::Error;
 
 use holonic_engine::codec_recovery::{
-    recover, Boundary, CodecRecovery, Obstruction, OpaqueSymbolCodec, RecoveredCodec, SymbolClass,
+    recover, Boundary, CodecRecovery, Obstruction, OpaqueSymbolCodec, RecoveredCodec,
+    RecoveryApertures, SymbolClass,
 };
 use holonic_engine::codec_system::{
     cross_check, cross_check_over, CodecIndexReceiver, CodecSystem, JointCarrier, JointReading,
@@ -35,6 +36,15 @@ use holonic_engine::codec_system::{
     TheJointAutomaton, CROSS_CHECK_SCHEMA,
 };
 use holonic_engine::receiver_exact_compression::{compress, InputId, ItemId, ObservedSystem};
+
+/// **The apertures this driver declares.** They moved out of `codec_recovery` on 2026-08-09
+/// (`canon/THE_AUTHORED_LEVEL.md` §5.2): neither is derivable from the material, both are statements
+/// about the host, so the caller states them. Past either the recovery refuses by name rather than
+/// sampling, and that refusal shape is what the move preserved.
+const APERTURES: RecoveryApertures = RecoveryApertures {
+    family_words: 65_536,
+    free_entries: 12,
+};
 
 /// The opaque target. A character-class state machine written as a state machine, never as a table:
 /// word characters agglutinate, digits agglutinate only with each other, whitespace is dropped and
@@ -364,7 +374,7 @@ fn show_cross_check(label: &str, check: &SeparationCrossCheck) {
 
 fn main() -> Result<(), Box<dyn Error>> {
     let target = tokenizer();
-    let recovery = recover(&target, &TOKENIZER_ALPHABET, 3)?;
+    let recovery = recover(&target, &TOKENIZER_ALPHABET, 3, APERTURES)?;
     show_recovery(&recovery, "an opaque tokenizer, from testimony alone");
     let codec = recovery.codec.as_ref().expect("the codec is recovered");
 
@@ -378,7 +388,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     // The second target, at the radius that leaves it undetermined: two codecs a real recovery
     // retained and could not choose between, and the word it was not allowed to ask.
     println!();
-    let blind = recover(&soft_join(), &['a', 'b', '_'], 2)?;
+    let blind = recover(&soft_join(), &['a', 'b', '_'], 2, APERTURES)?;
     let Some(Obstruction::UndeterminedCodec {
         left,
         right,

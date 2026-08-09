@@ -1015,7 +1015,16 @@ pub fn cross_check_over(
 mod tests {
     use super::*;
 
-    use crate::codec_recovery::{recover, CodecRecovery, Obstruction, OpaqueSymbolCodec};
+    use crate::codec_recovery::{
+        recover, CodecRecovery, Obstruction, OpaqueSymbolCodec, RecoveryApertures,
+    };
+
+    /// **What this test body declares as its host capacity**, since `codec_recovery` no longer
+    /// picks one (`canon/THE_AUTHORED_LEVEL.md` §5.2). Reproduces the excised constants.
+    const TEST_APERTURES: RecoveryApertures = RecoveryApertures {
+        family_words: 65_536,
+        free_entries: 12,
+    };
     use crate::receiver_exact_compression::AblatedSystem;
 
     /// The same shape of target `codec_recovery` recovers from: a character-class state machine
@@ -1083,7 +1092,7 @@ mod tests {
     }
 
     fn tokenizer_recovery() -> CodecRecovery {
-        recover(&tokenizer(), &TOKENIZER_ALPHABET, 3).expect("the family is admissible")
+        recover(&tokenizer(), &TOKENIZER_ALPHABET, 3, TEST_APERTURES).expect("the family is admissible")
     }
 
     /// Real recovered codecs, from two different opaque targets, with materially different shapes:
@@ -1092,7 +1101,7 @@ mod tests {
     /// open across a dropped symbol, which is exactly the conduct the whole adaptation turns on.
     fn real_codecs() -> Vec<(&'static str, RecoveredCodec)> {
         let tokenizer_codec = tokenizer_recovery().codec.expect("the codec is recovered");
-        let soft = recover(&soft_join(), &['a', 'b', '_'], 4)
+        let soft = recover(&soft_join(), &['a', 'b', '_'], 4, TEST_APERTURES)
             .expect("the family is admissible")
             .codec
             .expect("the codec is recovered");
@@ -1110,7 +1119,7 @@ mod tests {
     /// as separating them. Real recovered material, not hand-written tables.
     fn undetermined(radius: usize) -> (RecoveredCodec, RecoveredCodec, String) {
         let recovery =
-            recover(&soft_join(), &['a', 'b', '_'], radius).expect("the family is admissible");
+            recover(&soft_join(), &['a', 'b', '_'], radius, TEST_APERTURES).expect("the family is admissible");
         let Some(Obstruction::UndeterminedCodec {
             left,
             right,
