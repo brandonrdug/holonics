@@ -732,6 +732,25 @@ The grading discipline in `canon/EPISTEMIC_GRADES.md` stands. Three additions:
   pairs, each carrying the shortest word that separates them. **A gauge should be required to
   exhibit its distinguishing word.** Absent one, it has not gauged anything.
 
+- **A level is either read off the material or declared by the caller — never authored inside the
+  organ.** The fifth member of the family above, and the one that was being found *serially*: a
+  pinned `characteristic_delay: 1`, a `LEADER_WITNESS_DEPTH: usize = 1`, a `REFINEMENT_APERTURE` of
+  64, each discovered by hand and each reported as though it were the last. Brandon, ruling on that
+  loop: *"we are not the ones meant to be pinning levels to minimums and maximums."*
+
+  **The census is mechanical and the registry is the ratchet.** `python3 tools/authored_levels.py
+  --check` enumerates every authored numeric level in library code and fails on anything
+  undispositioned, moved, or departed. 180 levels at 2026-08-09: 149 `ABI`, 4 `APERTURE`, 3
+  `MATERIAL`, **24 `PIN`**, each pin carrying its excision plan in `meta/AUTHORED_LEVELS.tsv`.
+  Full statement: `canon/THE_AUTHORED_LEVEL.md`.
+
+  **Two dispositions carry a burden of proof, because both were used to excuse.** `MATERIAL` must
+  name its theorem — `QUADRIC_COEFFICIENT_COUNT = 10` is not one, since a quadric in `n` variables
+  has `C(n+2,2)` coefficients and 10 pins the ambient dimension at 3 while the name reads as a
+  count. And `APERTURE` must state **what would derive the level from the material**: refusing past a
+  number you invented does not make the number derived, which is what `FREE_ENTRY_APERTURE = 12`
+  and `REFINEMENT_APERTURE = 64` were relying on.
+
 - **A cost is measured in work, never in elapsed time. A clock may measure; it may never select.**
   This is the fourth member of the family above and the one with a live instance. Convicted
   2026-08-08 at `crates/holonic-engine/src/cuda_aperture.rs:818`, where

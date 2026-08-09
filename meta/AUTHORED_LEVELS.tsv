@@ -1,0 +1,193 @@
+# Every numeric level authored inside a library organ, with its disposition.
+#
+# THE LAW: a level is either read off the material or declared by the caller. It is never
+# authored inside the organ. See canon/THE_AUTHORED_LEVEL.md.
+#
+# MATERIAL  a fact that cannot vary; `why` names the theorem.
+# ABI       hardware, wire format, or foreign interface.
+# APERTURE  declared, returns its outside, and `why` states what would derive it.
+# PIN       a contaminant; `why` carries the excision plan.
+#
+# Regenerate: python3 tools/authored_levels.py --write
+# Verify:     python3 tools/authored_levels.py --check
+disposition	owner	name	value	why
+ABI	crates/holonic-engine/src/conditioned_derivation.rs	AT_END_RECEIVER	0	an index or identity element, not a level
+ABI	crates/holonic-engine/src/conditioned_derivation.rs	STEM_RECEIVER_BASE	1	an index or identity element, not a level
+ABI	crates/holonic-engine/src/cuda_aperture.rs	THREADS_PER_BLOCK	128	CUDA launch geometry, fixed by the device interface
+ABI	crates/holonic-engine/src/cuda_aperture.rs	TILE_EDGE	16	CUDA launch geometry, fixed by the device interface
+ABI	crates/holonic-engine/src/cuda_relation.rs	GRADE_ITEMS_PER_THREAD	8	CUDA launch geometry, fixed by the device interface
+ABI	crates/holonic-engine/src/cuda_relation.rs	GRADE_THREADS_PER_BLOCK	256	CUDA launch geometry, fixed by the device interface
+ABI	crates/holonic-engine/src/cuda_relation.rs	THREADS_PER_BLOCK	128	CUDA launch geometry, fixed by the device interface
+ABI	crates/holonic-engine/src/derivation_curvature.rs	UNIT_RESPONSE	1	an index or identity element, not a level
+ABI	soma/abi/src/contact.rs	COMMAND	0	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/contact.rs	COMMAND_FORM	1	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/contact.rs	COMMAND_STOP	2	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/contact.rs	HEAD	2	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/contact.rs	LIVE	1	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/contact.rs	NODE	5	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/contact.rs	OUTPUT_LIVE	0	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/contact.rs	OUTPUT_SAME	1	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/cuda_execution.rs	CONTACT_EVENT	0	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/emission.rs	DEED_KIND	0	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/emission.rs	DEED_POSITION	1	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/holon.rs	RETURN_BIRTH	1	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/holon.rs	RETURN_CONTINUED	2	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/holon.rs	SETTLEMENT_KIND	2	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/holon.rs	SETTLEMENT_RETURNED	1	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/holon.rs	SETTLEMENT_SILENT	2	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/holon.rs	SOURCE_CONTINUED	2	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/holon.rs	SOURCE_ENDED	3	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/holon.rs	SOURCE_STANDING	1	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/live_event_cuda.rs	CONTACT_PRESENT	0	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/live_event_cuda.rs	CONTROL_PARAMS	0	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/live_event_cuda.rs	DIRECTED_FROM	0	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/live_event_cuda.rs	EMANATION_CELLS	0	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/live_event_cuda.rs	EVENT_FACE	0	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/live_event_cuda.rs	PARAM_CARRIER_DEPTH	6	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/live_event_cuda.rs	PARAM_CARRIER_MAX_DEPTH	7	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/live_event_cuda.rs	PARAM_COMPLEX	13	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/live_event_cuda.rs	PARAM_DIRECTED_EVENTS	11	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/live_event_cuda.rs	PARAM_EMISSION_CAPACITY	9	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/live_event_cuda.rs	PARAM_ENDING	4	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/live_event_cuda.rs	PARAM_MOUNT	2	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/live_event_cuda.rs	PARAM_OVERFLOW_CAPACITY	8	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/live_event_cuda.rs	PARAM_OWN_CAPACITY	5	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/live_event_cuda.rs	PARAM_RELATIONS	10	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/live_event_cuda.rs	PARAM_SOURCE_GRAIN	12	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/live_event_cuda.rs	PARAM_STANDING_AXIS	1	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/live_event_cuda.rs	PARAM_WHOLE_DARK	3	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/live_event_cuda.rs	RECEIVER_CHANNEL	0	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/live_event_cuda.rs	REGIONAL_STATUS_COMPLETE	1	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/live_event_cuda.rs	REGIONAL_STATUS_INVALID	0	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/live_event_cuda.rs	REGIONAL_STATUS_QUERY_REFUSED	3	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/live_event_cuda.rs	REGIONAL_STATUS_STRUCTURE	2	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/live_event_cuda.rs	STANDING_CELLS	0	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/live_event_cuda.rs	STANDING_ROW_FORM	1	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/live_event_cuda.rs	STANDING_ROW_GRIP	0	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/live_event_cuda.rs	STATE_CARRIER_DEPTH	6	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/live_event_cuda.rs	STATE_EMISSIONS	7	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/live_event_cuda.rs	STATE_OWN_AXIS	0	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/live_event_cuda.rs	STATE_OWN_LIVE	1	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/live_event_cuda.rs	STATE_THOUGHTS	8	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/live_event_cuda.rs	STATUS_COMPLETE	1	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/live_event_cuda.rs	STATUS_INVALID	0	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/live_event_cuda.rs	STATUS_KIND	0	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/live_event_cuda.rs	STATUS_REQUIRED_EMISSIONS	5	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/live_event_cuda.rs	STATUS_REQUIRED_OVERFLOW	4	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/live_event_cuda.rs	STATUS_REQUIRED_OWN	1	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/live_event_cuda.rs	STATUS_RESOURCE	3	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/live_event_cuda.rs	STATUS_STRUCTURE	2	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/register.rs	LANE_CAPACITY_CELLS	7	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/register.rs	LANE_CARRIER_WORD_BASE	8	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/register.rs	LANE_FRAME_CURRENT	3	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/register.rs	LANE_FRAME_PREVIOUS	2	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/register.rs	LANE_OWN_WORD_BASE	6	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/register.rs	LANE_RAW_COUNT	1	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/register.rs	STATUS_KIND	0	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/register.rs	STATUS_NEW_AXIS	2	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/register.rs	STATUS_OLD_AXIS	1	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/text_restrict_cuda.rs	APERTURE	2	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/text_restrict_cuda.rs	EPOCH	1	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/text_restrict_cuda.rs	FEATURE_CURSORS_AT	9	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/text_restrict_cuda.rs	FEATURE_NODE_NEXT	1	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/text_restrict_cuda.rs	FEATURE_NODE_SECTION	0	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/text_restrict_cuda.rs	LEADER_FEATURES	3	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/text_restrict_cuda.rs	LEADER_FEATURES_AT	7	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/text_restrict_cuda.rs	QUERY_TRANSPORTS	4	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/text_restrict_cuda.rs	QUERY_TRANSPORTS_AT	8	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/text_restrict_cuda.rs	RETURN_COMPLETE_POPULATION	0	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/text_restrict_cuda.rs	RETURN_HANDLE_POPULATION	1	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/text_restrict_cuda.rs	RETURN_MASK_AT	1	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/text_restrict_cuda.rs	RETURN_SECTION_HANDLE	0	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/text_restrict_cuda.rs	SECTION_FEATURES	1	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/text_restrict_cuda.rs	SECTION_FEATURE_AT	0	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/text_restrict_cuda.rs	SECTION_TOKENS	3	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/text_restrict_cuda.rs	SECTION_TOKEN_AT	2	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/body/src/law.rs	W_WELL	0	an index or identity element, not a level
+ABI	soma/body/src/medium/codec.rs	COMPACT_FORM_FLAGS_WORD	10	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/medium/codec.rs	COMPACT_FORM_OTHER_MAG_WORD	3	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/medium/codec.rs	COMPACT_FORM_OTHER_RANK_MAG_WORD	4	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/medium/codec.rs	COMPACT_FORM_OTHER_RANK_RANK_WORD	5	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/medium/codec.rs	COMPACT_FORM_OTHER_TURN_SHIFT	3	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/medium/codec.rs	COMPACT_FORM_SAME_MAG_WORD	0	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/medium/codec.rs	COMPACT_FORM_SAME_RANK_MAG_WORD	1	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/medium/codec.rs	COMPACT_FORM_SAME_RANK_RANK_WORD	2	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/medium/codec.rs	COMPACT_FORM_SAME_TURN_SHIFT	0	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/medium/codec.rs	COMPACT_FORM_THAT_WAY_MAG_WORD	8	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/medium/codec.rs	COMPACT_FORM_THAT_WAY_RANK_WORD	9	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/medium/codec.rs	COMPACT_FORM_THIS_WAY_MAG_WORD	6	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/medium/codec.rs	COMPACT_FORM_THIS_WAY_RANK_WORD	7	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/medium/codec.rs	COMPACT_FORM_TURN_MASK	3	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/medium/codec.rs	OCCUPIED	16	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/medium/codec.rs	OTHER_MAG	5	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/medium/codec.rs	OTHER_RANK_MAG	6	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/medium/codec.rs	OTHER_RANK_NEG	8	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/medium/codec.rs	OTHER_RANK_RANK	7	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/medium/codec.rs	OTHER_TURN	9	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/medium/codec.rs	SAME_MAG	0	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/medium/codec.rs	SAME_RANK_MAG	1	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/medium/codec.rs	SAME_RANK_NEG	3	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/medium/codec.rs	SAME_RANK_RANK	2	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/medium/codec.rs	SAME_TURN	4	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/medium/codec.rs	THAT_WAY_MAG	13	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/medium/codec.rs	THAT_WAY_NEG	15	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/medium/codec.rs	THAT_WAY_RANK	14	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/medium/codec.rs	THIS_WAY_MAG	10	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/medium/codec.rs	THIS_WAY_NEG	12	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/medium/codec.rs	THIS_WAY_RANK	11	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/register.rs	ARM	3	mode or lineage discriminant; a tag, not a level
+ABI	soma/body/src/register.rs	K_WORD	7	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/register.rs	MODE_DELTA	3	mode or lineage discriminant; a tag, not a level
+ABI	soma/body/src/register.rs	MODE_DIRECT	1	mode or lineage discriminant; a tag, not a level
+ABI	soma/body/src/register.rs	MODE_FLAT	0	mode or lineage discriminant; a tag, not a level
+ABI	soma/body/src/register.rs	MODE_FOUND	4	mode or lineage discriminant; a tag, not a level
+ABI	soma/body/src/register.rs	MODE_RANK	2	mode or lineage discriminant; a tag, not a level
+ABI	soma/life/src/current_world.rs	ORGAN_PRESENT_WORD	2	compact-form layout offset; a wire position, not a level
+ABI	soma/life/src/decomposing_codec.rs	CLOSES_RECEIVER	256	compact-form layout offset; a wire position, not a level
+ABI	soma/life/src/dialogue_lineage.rs	ASSISTANT_COMMENTARY_RECEIVER	20000001	receiver identity token -- an address in a declared numbering, not a level
+ABI	soma/life/src/dialogue_lineage.rs	ASSISTANT_FINAL_RECEIVER	20000002	receiver identity token -- an address in a declared numbering, not a level
+ABI	soma/life/src/dialogue_lineage.rs	ASSISTANT_OTHER_RECEIVER	20000003	receiver identity token -- an address in a declared numbering, not a level
+ABI	soma/life/src/dialogue_lineage.rs	USER_RECEIVER	20000000	receiver identity token -- an address in a declared numbering, not a level
+ABI	soma/life/src/laboratory_language/repository.rs	CODE_RECEIVER_BASE	1000000	receiver identity token -- an address in a declared numbering, not a level
+ABI	soma/life/src/laboratory_language/repository.rs	THEORY_RECEIVER_BASE	10000	receiver identity token -- an address in a declared numbering, not a level
+ABI	soma/life/src/research_intelligence.rs	CODE_RECEIVER_BASE	31000000	receiver identity token -- an address in a declared numbering, not a level
+ABI	soma/life/src/research_intelligence.rs	MATHEMATICS_RECEIVER	30000000	receiver identity token -- an address in a declared numbering, not a level
+ABI	soma/life/src/text_material.rs	TEXT_ASSISTANT_FINAL_RECEIVER	40000002	receiver identity token -- an address in a declared numbering, not a level
+ABI	soma/life/src/text_material.rs	TEXT_ASSISTANT_PROCESS_RECEIVER	40000001	receiver identity token -- an address in a declared numbering, not a level
+ABI	soma/life/src/text_material.rs	TEXT_DOCUMENT_RECEIVER	40000003	receiver identity token -- an address in a declared numbering, not a level
+ABI	soma/life/src/text_material.rs	TEXT_EMANATED_RECEIVER	40000004	receiver identity token -- an address in a declared numbering, not a level
+ABI	soma/life/src/text_material.rs	TEXT_USER_RECEIVER	40000000	receiver identity token -- an address in a declared numbering, not a level
+ABI	soma/membrane/src/live_current.rs	REST_LINEAGE_ORDINAL	0	mode or lineage discriminant; a tag, not a level
+ABI	soma/membrane/src/live_current.rs	REST_LINEAGE_PENDING	2	mode or lineage discriminant; a tag, not a level
+ABI	soma/mount/src/cuda.rs	CU_LIMIT_STACK_SIZE	0	CUDA launch geometry, fixed by the device interface
+APERTURE	crates/holonic-engine/src/conditioned_derivation.rs	COMMITTING_RECURRENCE	2	Two occurrences before a route commits. Declared, and the withheld routes are RETURNED as lineage rather than discarded. To derive: the recurrence a receiver requires is that receiver\u2019s declaration, and belongs with it.
+APERTURE	crates/holonic-engine/src/matroid_chow.rs	GROUND_APERTURE	9	Declared and refused past, and the Chow ring of a matroid grows super-exponentially in the ground set. To derive: the level follows from the caller\u2019s memory declaration, which should be supplied rather than assumed.
+APERTURE	crates/holonic-engine/src/matroid_chow.rs	RANK_APERTURE	4	As GROUND_APERTURE.
+APERTURE	crates/holonic-engine/src/surprisal.rs	LOG_SERIES_TERMS	64	A truncation of an exact series with a RETAINED remainder certificate. `exact_value.rs::SeriesTailCertificate` is the carrier and the remainder is an exact rational interval, so the outside IS returned. To derive: the terms needed follow from the requested enclosure width, which the caller should declare.
+MATERIAL	crates/holonic-engine/src/discrete_curvature.rs	FLAT_COORDINATION	6	A vertex of the flat triangular lattice has coordination 6, and the angular defect is measured against it. Theorem: six equilateral triangles tile 2\u03c0 exactly. This does not vary.
+MATERIAL	crates/holonic-structure/src/keyed_atlas.rs	MAXIMUM_AVL_DEPTH	128	An AVL tree over a `usize`-indexed population has depth < 1.4405\u00b7log2(n+2); 128 exceeds any population addressable on a 64-bit carrier. Theorem, not a budget.
+MATERIAL	soma/mount/src/lib.rs	FOLD_CONSTANT	2305843009213693951	2^61-1 is the Mersenne prime M61, so the fold is over a field. Theorem, not a budget.
+PIN	crates/holonic-engine/src/arithmetic_monodromy.rs	QUINTIC_DEGREE	5	EXCISE. Not a fact about quintics -- a REFUSAL GATE at :77 plus seven fixed-size-5 arrays including `type Permutation5 = [u8; 5]`. The organ cannot see a quartic or a sextic, so `solvable_by_radicals` refusing degree 5 has no degree to contrast against. Replace: read the degree off the polynomial; `Permutation5` -> a general permutation. `rational_polynomial.rs` already carries general-degree resultants and Sturm sequences.
+PIN	crates/holonic-engine/src/codec_recovery.rs	FAMILY_APERTURE	65536	EXCISE by MOVING, not by deleting. Its own doc calls it "a call budget as well as a memory bound", which is the admission. The lawful form is a receiver-declared aperture supplied by the CALLER, with the refusal naming what the material would have required. The organ does not get to pin it.
+PIN	crates/holonic-engine/src/codec_recovery.rs	FREE_ENTRY_APERTURE	12	EXCISE by moving to the caller. The refusal shape is lawful -- `GaugeApertureExceeded` rather than sampling -- but nothing derives 12. 2^12 = 4096 is a machine-capacity guess in an aperture\u2019s clothes.
+PIN	crates/holonic-engine/src/coupled_informant.rs	COUPLED_PHASE_EXTENT	18	EXCISE. 18 is the RELAMPAGO fixture\u2019s coordinate count -- one experiment\u2019s material fixed into the organ that reads it.
+PIN	crates/holonic-engine/src/derivation_capacitance.rs	HORIZON_DOUBLINGS	64	EXCISE. The horizon is the transport law\u2019s own fixed point, not 64 doublings.
+PIN	crates/holonic-engine/src/derivation_curvature.rs	SCAFFOLD_LINK_FOLD	3	EXCISE. The fold should come from the incidence, not be authored at 3.
+PIN	crates/holonic-engine/src/derivation_integral.rs	LEADER_GRAIN_RECIPROCAL	3	EXCISE with LEADER_WITNESS_DEPTH; the grain follows the same law.
+PIN	crates/holonic-engine/src/derivation_integral.rs	LEADER_WITNESS_DEPTH	1	EXCISE. A leader whose witness depth is ONE takes a single step; that is not a leader. `leader_quadrature.rs` carries the law -- each extension changes the material the next extension reads -- and the depth is whatever the material stopped it at. Replace with the returned extension count.
+PIN	crates/holonic-engine/src/field_atlas.rs	AFFINE_PHASE_COEFFICIENT_COUNT	4	EXCISE. An affine form in n variables has n+1 coefficients, so 4 pins the ambient dimension at 3. Same replacement.
+PIN	crates/holonic-engine/src/field_atlas.rs	QUADRIC_COEFFICIENT_COUNT	10	EXCISE. A quadric in n variables has C(n+2,2) coefficients, so 10 pins the AMBIENT DIMENSION at 3 while the name reads as a coefficient count. `ExactAffineVersionFiber::new` already takes the count, so the machinery is dimension-agnostic and only the caller pins it. Replace with `(n+2)(n+1)/2` from a declared dimension.
+PIN	crates/holonic-engine/src/prime_ecology.rs	DEFAULT_HORN_LOCAL_SECTION_LIMIT	1000000	EXCISE by moving to the caller. `DEFAULT_` names the defect: a default is a level the organ picked because the caller was not asked.
+PIN	crates/holonic-engine/src/quintic_chart.rs	QUINTIC_DEGREE	5	EXCISE, same defect and same replacement as arithmetic_monodromy. The Tschirnhaus line IS transport between degrees; pinning the degree removes the thing being transported.
+PIN	crates/holonic-engine/src/rational_polynomial.rs	MAXIMUM_ISOLATION_DEPTH	200	EXCISE. Same root-separation bound; 200 is arbitrary.
+PIN	crates/holonic-engine/src/receiver_phase_atlas.rs	CHANNEL_COUNT	3	EXCISE. Three channels pins the receiver family; the count is a declaration of the material presented.
+PIN	crates/holonic-engine/src/token_invariance.rs	SEPARATION_EXHIBIT	512	EXCISE. 512 truncates a RETURNED POPULATION, which CLAUDE.md \u00a79 forbids -- the artifact is the return and a count is never a substitute. Return the population whole.
+PIN	crates/holonic-engine/src/token_invariance.rs	WINDOW_APERTURE	64	EXCISE by moving to the caller. The occurrence window is a receiver declaration, not a module fact.
+PIN	crates/holonic-engine/src/winding_inertia.rs	ISOLATION_APERTURE	64	EXCISE with REFINEMENT_APERTURE, same bound.
+PIN	crates/holonic-engine/src/winding_inertia.rs	REFINEMENT_APERTURE	64	EXCISE. 64 halvings is 2^-64 of the starting width and 64 is a familiar number, not a derived one. The halvings needed to separate two roots are determined by the ROOT SEPARATION, computable from the discriminant by a Mahler/Davenport bound. Replace with that bound; a construction exceeding it is then a genuine defect rather than a budget overrun.
+PIN	soma/body/src/geom.rs	MODES	128	UNREAD -- disposition requires reading soma/body/src/geom.rs. Treated as a contaminant until read, which is the conservative direction.
+PIN	soma/body/src/law.rs	FLOW_TEETH	13	UNREAD -- disposition requires reading soma/body/src/law.rs. Treated as a contaminant until read, which is the conservative direction.
+PIN	soma/body/src/law.rs	POOL_TEETH	31	UNREAD -- disposition requires reading soma/body/src/law.rs. Treated as a contaminant until read, which is the conservative direction.
+PIN	soma/body/src/law.rs	SWEEP_TEETH	13	UNREAD -- disposition requires reading soma/body/src/law.rs. Treated as a contaminant until read, which is the conservative direction.
+PIN	soma/life/src/coupled_informant_current.rs	COUPLED_INFORMANT_CURRENT_CHANNELS	8	UNREAD -- disposition requires reading soma/life/src/coupled_informant_current.rs. Treated as a contaminant until read, which is the conservative direction.
+PIN	soma/life/src/laboratory_language/repository.rs	BLOCK_LINES	24	UNREAD -- disposition requires reading soma/life/src/laboratory_language/repository.rs. Treated as a contaminant until read, which is the conservative direction.
