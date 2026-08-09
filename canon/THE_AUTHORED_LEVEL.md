@@ -131,6 +131,28 @@ is a theorem, never the reverse. `FLOW_TEETH = 13` and `POOL_TEETH = 31` are bot
 be a coprimality theorem about gear periods, but saying so without reading `soma/body/src/law.rs`
 would be exactly the excusing this document exists to stop.
 
+## 5.4 The levels the census cannot see, measured
+
+**A `const` is the easiest kind of level to spell and the least dangerous kind to hold.** Reading the
+five unread rows turned §7's caveat into a measured population: the levels that actually **truncate a
+return** in those files are not constants and carry no name at all.
+
+| site | the level | what it decides |
+|---|---|---|
+| `soma/body/src/geom.rs:50` | bare `while k < 64` in `fold` | `convolve` writes mode-counts at ranks `0..=126`; `fold` reads `0..=63`. **63 of 128 slots are written on every call and read by nothing.** `bond = fold ∘ convolve` is the geometric product, so this is where the product caps. |
+| `soma/body/src/geom.rs:29`, `:31` | two more bare `64` | the shape word's extent, written as a literal rather than `u64::BITS` |
+| `soma/life/.../repository.rs:443` | `if !(5..=96).contains(&words) { return Ok(()) }` | **silently drops** any theory sentence outside 5–96 alphanumeric tokens. Two authored levels deciding what enters the atlas at all. |
+| `crates/holonic-engine/src/arithmetic_monodromy.rs:1109` | `type Permutation5 = [u8; 5]` | the degree, as a type |
+
+Every one is a level by §1 — *a numeric bound that decides how far a construction goes, how much it
+admits, or how many it returns* — and none can be matched by a pattern over `const NAME: type = N;`.
+**Three of the four truncate a returned population, which is the species `CLAUDE.md` §9 forbids
+outright**, and they are less visible than the twenty-four registered pins rather than more.
+
+The reading in `canon/THE_CONTAMINANT_PROTOCOL.md` §3 step 2 is what finds these, and it says so:
+*"Fixed-size arrays, `.take(n)`, and `min`/`max` against a literal are levels; the declaration form is
+irrelevant."*
+
 ## 6. Grading an excision
 
 Lift the pin, re-run the declared material, exhibit the difference. The three outcomes and their
