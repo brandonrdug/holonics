@@ -94,6 +94,12 @@ pub mod complex_system;
 // `receiver_exact_compression` and collide at the crate root.
 pub mod conditioned_derivation;
 pub mod conic;
+// The lived construction `Π` of a declared text corpus: every surface form counted, every whole and
+// stratum it reaches named, and the exact symbolic surprisal of its embodied probability. Declared,
+// never glob-exported: it names `Kind`, `Stratum`, `SurfaceId`, `tokenize` and `classify`, none of
+// which say at the crate root which carrier they belong to, and `Stratum` would collide with the
+// geometry family. `CLAUDE.md` §13 rule 2 — a scalar that measures is lawful.
+pub mod corpus_census;
 pub mod coupled_informant;
 #[cfg(target_os = "linux")]
 pub mod cuda_aperture;
@@ -117,6 +123,11 @@ pub mod derivation_codec_intake;
 // `accumulation`, and `Route`/`accumulation` say nothing at the crate root about which carrier
 // they belong to.
 pub mod derivation_integral;
+// The 2-cells `derivation_atlas` refused to found, resolved by construction rather than by choosing:
+// a route loop is filled where the two routes' elaborated meanings agree and held open with a typed
+// disagreement where they do not. Declared, never glob-exported: it names `compare`, `fill_routes`
+// and `betti_at`, and all three say nothing at the crate root about which carrier they belong to.
+pub mod derivation_two_cells;
 // The moves a conditioned production made, read as substitutions and paid for by placement.
 // Declared, never glob-exported: it names `MoveSpecies`, `OpenClass`, `ClassReading` and
 // `substitutions`, and `OpenClass` collides with `placement`'s own while the verb `substitutions`
@@ -166,6 +177,12 @@ pub mod local_star;
 // caller who wanted a Gram matrix must not arrive here by accident.
 pub mod matroid_chow;
 pub mod mode;
+// The constructive meaning of a name: the transitive closure of what it recruits, as a complex, with
+// the depth every constituent entered at, the cycles retained whole, and what the aperture left
+// outside exhibited by name. Declared, never glob-exported: it names `Arrival`, `Constituent` and
+// `compare`-adjacent vocabulary that says nothing at the crate root about which carrier it belongs
+// to.
+pub mod name_elaboration;
 // The declared-option modeling surface. Reached explicitly, like the other presentation membranes:
 // an option is a receiver coordinate and every call site must name it as one.
 pub mod model_surface;
@@ -239,6 +256,12 @@ pub mod statement_grammar;
 pub mod surprisal;
 pub mod substitution_realizers;
 pub mod supported_realizers;
+// Which tokens a corpus treats as invariant objects: a surface's occurrence population presented to
+// `receiver_exact_compression` as positions under a declared receiver family, so an unseparated
+// population is iron and a shattered one exhibits the shortest word that shattered it. Declared,
+// never glob-exported: `ItemId`, `ReceiverId`, `Observation`, `Step`, `Verdict` and `window` reach
+// it from `receiver_exact_compression` and collide at the crate root.
+pub mod token_invariance;
 pub mod tube;
 pub mod wave_propagation;
 // Inertia returned as windings rather than as a count of signs. Declared, never glob-exported:

@@ -17,12 +17,24 @@
 //!             a reach:       this derivation proved that statement
 //! ```
 //!
-//! There are no 2-cells, and that is a **correction to the reader's own module documentation**,
-//! which has always declared a 2-cell as *"two derivations reaching the SAME statement by different
-//! recruitment"* while `main` founded none. Founding them would not be free: a square 2-cell over a
-//! pair of derivations sharing two symbols **cancels exactly the grade-1 cycle** the same document
-//! reads as *"independent distinct routes to one result"*. Those two sentences are not compatible,
-//! and this module refuses to pick one silently. It founds no 2-cell and says so here.
+//! There are no 2-cells **in this module**, and that is a **correction to the reader's own module
+//! documentation**, which has always declared a 2-cell as *"two derivations reaching the SAME
+//! statement by different recruitment"* while `main` founded none. Founding them would not be free:
+//! a square 2-cell over a pair of derivations sharing two symbols **cancels exactly the grade-1
+//! cycle** the same document reads as *"independent distinct routes to one result"*. Those two
+//! sentences are not compatible, and this module refuses to pick one silently. It founds no 2-cell
+//! and says so here.
+//!
+//! **The refusal is resolved by construction in [`crate::derivation_two_cells`], and the resolution
+//! is not a choice between those two sentences.** The distinction this module could not draw is
+//! whether two routes to one result are one proof or two, and answering it needs a denotation that
+//! an orthographic reading does not carry. [`crate::name_elaboration`] supplies one — the meaning of
+//! a name is the transitive closure of what it recruits, with the depth every constituent entered at
+//! — so a square is founded exactly where the two routes' elaborated meanings agree, and where they
+//! do not the hole is left and the disagreement retained as a typed obstruction. `β₁` after filling
+//! is then the first sentence's quantity and the filled population is the second's, and both are
+//! returned. This module remains the reading that founds no 2-cell, which is what makes it the
+//! *before* the other one measures against.
 //!
 //! ## What a recruitment is, and what it is not
 //!
