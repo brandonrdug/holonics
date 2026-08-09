@@ -181,6 +181,15 @@ pairs returned **apart**.
 | the 50,667-occurrence source-departure receipt | `runs/` | owner deleted at `a07ff376`, survives at `93834398` |
 | `zz_smith_cost_probe`, `zz_torsion_width_law` — **they run right now from `target/`** and return real cost laws | sources never committed | `git log --all -- '*zz_*'` → empty |
 
+**The two probes' output is now transcribed verbatim** in
+[`research/records/2026-08-09_TWO_COST_LAWS_RAN_FROM_A_BINARY_WITH_NO_SOURCE_AND_THE_PROFILE_IS_MILLISECONDS.md`](../research/records/2026-08-09_TWO_COST_LAWS_RAN_FROM_A_BINARY_WITH_NO_SOURCE_AND_THE_PROFILE_IS_MILLISECONDS.md),
+so their **figures are citable** — the pivot rule deciding feasibility by more than 390,000× at equal
+rank, and `torsion rank = (w−1)²` with `betti = 6w−3` over Brent–Kung widths 2–6. **Their
+reproducibility is not recovered**; one `cargo clean` still ends it, and the same record states the
+reconstruction, which is owed. That record also carries the **cost profile** this document does not:
+the exact-invariant family returns certified answers in 12–15 MB and under a third of a second, in
+two frames.
+
 ---
 
 ## 5 · What is inert, and why
