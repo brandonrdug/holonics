@@ -738,11 +738,17 @@ The grading discipline in `canon/EPISTEMIC_GRADES.md` stands. Three additions:
   64, each discovered by hand and each reported as though it were the last. Brandon, ruling on that
   loop: *"we are not the ones meant to be pinning levels to minimums and maximums."*
 
-  **The census is mechanical and the registry is the ratchet.** `python3 tools/authored_levels.py
-  --check` enumerates every authored numeric level in library code and fails on anything
-  undispositioned, moved, or departed. 180 levels at 2026-08-09: 149 `ABI`, 4 `APERTURE`, 3
-  `MATERIAL`, **24 `PIN`**, each pin carrying its excision plan in `meta/AUTHORED_LEVELS.tsv`.
-  Full statement: `canon/THE_AUTHORED_LEVEL.md`.
+  **Recognising one takes reading, and the population is enumerated.** 180 authored numeric levels in
+  library code at 2026-08-09: 149 `ABI`, 4 `APERTURE`, 3 `MATERIAL`, **24 `PIN`**, each pin carrying
+  its excision plan. Full statement and the excisions: `canon/THE_AUTHORED_LEVEL.md`; ledger
+  `meta/AUTHORED_LEVELS.tsv`; `tools/authored_levels.py --check` keeps the ledger current and is a
+  convenience, never the authority — a level its regex does not match is exactly as much a
+  contaminant as one it does, and `Permutation5 = [u8; 5]` is the standing example.
+
+  **The reading procedure, the other seven contaminant species, and how an excision is graded:**
+  `canon/THE_CONTAMINANT_PROTOCOL.md`. An excision is graded by its **orbit** — lift the level, re-run
+  the declared material, exhibit the difference. A wave of excisions reporting no movement anywhere
+  has done bookkeeping and must say so rather than presenting a green suite as evidence.
 
   **Two dispositions carry a burden of proof, because both were used to excuse.** `MATERIAL` must
   name its theorem — `QUADRIC_COEFFICIENT_COUNT = 10` is not one, since a quadric in `n` variables

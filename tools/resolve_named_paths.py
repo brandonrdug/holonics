@@ -53,6 +53,7 @@ than inferred from tone.
 from __future__ import annotations
 
 import argparse
+import functools
 import json
 import os
 import re
@@ -126,7 +127,24 @@ BRACE_RE = re.compile(r"\{([^{}]*)\}")
 TRAILING_RE = re.compile(r"(::[A-Za-z_][A-Za-z0-9_:]*|:\d+(-\d+)?|#L?\d+(-\d+)?)$")
 
 
-PRUNED = {".git", "target", "build", "packages", "node_modules"}
+# (the working-tree walk that needed a prune list is gone; `git ls-files --others
+# --exclude-standard` does the same job with git's own ignore rules)
+
+
+@functools.lru_cache(maxsize=None)
+def is_ignored(rel: str) -> bool:
+    """Does git ignore this path? An ignored artifact is not part of the body.
+
+    `git check-ignore` exits 0 when the path IS ignored, 1 when it is not, and 128 on error;
+    an error is read as not-ignored so a broken git never suppresses a resolution.
+    """
+    return (
+        subprocess.run(
+            ["git", "-C", ROOT, "check-ignore", "-q", "--", rel],
+            capture_output=True,
+        ).returncode
+        == 0
+    )
 
 
 def tracked_files() -> list[str]:
@@ -134,18 +152,19 @@ def tracked_files() -> list[str]:
 
     Both are needed. A file staged but not committed, or written this session and not
     yet added, still resolves for a reader — and a document that names it is correct.
+
+    **Ignored files are not the body.** `--exclude-standard` is what makes the verdict a property
+    of the commit rather than of the machine: `runs/`, `output/` and `target/` exist wherever a
+    driver has been run and nowhere else, so counting them would make the same commit pass here and
+    fail on a clean clone.
     """
-    out = subprocess.run(
-        ["git", "-C", ROOT, "ls-files"], capture_output=True, text=True, check=True
-    ).stdout
-    found = set(out.splitlines())
-    for dirpath, dirnames, filenames in os.walk(ROOT):
-        dirnames[:] = [d for d in dirnames if d not in PRUNED]
-        rel = os.path.relpath(dirpath, ROOT)
-        prefix = "" if rel == "." else rel + "/"
-        for name in filenames:
-            found.add(prefix + name)
-    return sorted(found)
+    def git(*arguments: str) -> set[str]:
+        out = subprocess.run(
+            ["git", "-C", ROOT, *arguments], capture_output=True, text=True, check=True
+        ).stdout
+        return set(out.splitlines())
+
+    return sorted(git("ls-files") | git("ls-files", "--others", "--exclude-standard"))
 
 
 def laboratory_index() -> set[str]:
@@ -304,8 +323,13 @@ class Resolver:
         rel = rel.rstrip("/")
         if rel in self.tracked or rel in self.dirs:
             return True
-        # An untracked file in the working tree still resolves for a reader.
-        return os.path.exists(os.path.join(ROOT, rel))
+        # An untracked file in the working tree still resolves for a reader — but a GITIGNORED one
+        # does not. `runs/`, `output/` and `target/` are driver artifacts: present on the machine
+        # that ran a driver, absent on a clean clone of the same commit. Honouring them makes the
+        # verdict depend on local state rather than on the body, which is the absolute-frame defect
+        # this checker exists to catch. A document naming `runs/` to say it is GONE was being told
+        # its own absence declaration was false, on one machine only.
+        return os.path.exists(os.path.join(ROOT, rel)) and not is_ignored(rel)
 
     def _there(self, rel: str) -> bool:
         rel = rel.rstrip("/")
