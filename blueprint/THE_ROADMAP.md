@@ -544,6 +544,63 @@ runs here at 39 declarations against a real Lean kernel), §5's fourth ablation 
 construction"* (it is driven in four places), and §11's reach figure for the remainder certificate
 (it is driven, hard).
 
+### THE NEXT MOVEMENT — collocation, consequents, crossings, capacitance
+
+**Ratified 2026-08-08 by Brandon's correction, and it replaces a wall with four constructions that
+need no new material.** Record:
+[`research/records/2026-08-08_FACES_GROW_FROM_COLLOCATION_AND_THE_ATOM_IS_NOT_EMPTY.md`](../research/records/2026-08-08_FACES_GROW_FROM_COLLOCATION_AND_THE_ATOM_IS_NOT_EMPTY.md).
+
+The elaboration organ returned *"17 of 18 recruited identifiers are atoms with no constituents, so
+the route to more discrimination is a deposit that declares more of what it recruits."* **That is a
+request for material rather than a construction, and it is false.** Four meaning-bearing relations
+the deposit already carries are each non-empty exactly where recruitment goes empty:
+
+1. **Collocation.** `FORMULA.md:298`, ratified: *"coherence is collocation over time — two things
+   relate iff presented together, across time. **Faces grow from collocation**."* And `:615`, *"at
+   EVERY grain"*, with `:1278`'s referent law: *"association only through a REAL cross-sense
+   invariant of ONE SOURCE — random pairing is the null-bind."*
+   **`grep -rli 'colloc' crates soma` → zero.** Ratified, no owner. An atom with no constituents
+   still co-occurs, and co-presentation founds a face with no declaration at all.
+   *Falsifier:* random pairing must found nothing — the null-bind is the control, and a collocation
+   organ that founds a face on shuffled co-presentation has not implemented the referent law.
+
+2. **Consequents.** `name_elaboration` walks **recruitment** — what a name is built from, downward.
+   `derivation_atlas` already carries the other edge species, a **reach**: *"this derivation proved
+   that statement."* An atom's downward closure is empty and its **upward** closure is its whole
+   meaning. The conclusion that 17 atoms are undiscriminable followed from walking one direction and
+   calling the other absent.
+   *Falsifier:* two atoms with identical recruitment must be separated by their consequents, or the
+   upward reading adds nothing.
+
+3. **The crossing is the intersection, not the agreement.** Two elaborations were compared for
+   agreement of the **whole**; their **intersection** — shared constituents, at which depths, by
+   which arrival edges — is the crossing. A pair that disagrees on the whole may still cross at a
+   named constituent, and that crossing is a face.
+   *Falsifier:* exhibit a pair held open by the whole-agreement criterion that crosses; if none
+   exists, the intersection reading is subsumed and should be said so.
+
+4. **Capacitance, which separates without ranking.** `receiver_current.rs:549-563` computes
+   `service_rounds = ⌈co_present_branch_population / site_capacity⌉` exactly over `BigUint`, and
+   dilates **passage delay**. An atom recruited by ninety derivations is high-capacitance terrain;
+   one recruited by two is not. That distinguishes `apply` from `exact_chart_carry` **without a
+   score** — lawful under §13 rule 2 where an inverse-document weight is not. It is the organ §5's
+   owed transport law names, built, and never pointed at a derivation circuit.
+   *Falsifier:* the dilation must be non-trivial on this material — if every atom's service rounds
+   come out equal, the capacitance reading is vacuous here and must be reported so.
+
+**And the re-integration is owed across all four.** `soma/life/src/decomposing_codec.rs` performs
+DECOMPOSE → RE-INTEGRATE and revises its grain **at the collapsed pair's own separating word**. The
+elaboration decomposes and never recomposes, so it never learns what its own decomposition collapsed.
+That is the lightning shape — the leader founds the channel, the return rides it — and the two organs
+have never met.
+
+**Why this is the movement rather than the corpus.** All four are measurable on `standing/output` as
+it stands. A request for a richer deposit is the failure `papers/source/synopsis/AUDIT.md:49-68`
+already named: *locate a valid obstruction, rename it a calculation or carrier or criterion, update
+neighbouring prose, return to the same obstruction.*
+
+---
+
 ### The frontier, ranked, and none of it needs a decision
 
 1. **The Tschirnhaus organ.** `canon/TABLET_THE_CHART.md:227-289` specifies it; nothing implements
