@@ -574,6 +574,28 @@ artificially fast traffic hub across many source regions. The named construction
 > returned recurrence, and competing current occupancy affect passage delay without turning those
 > relations into a scalar relevance score or deleting the broad routes.*
 
+**FALSIFIED 2026-08-08, and the complaint is inverted.** Four of those five inputs are **built and
+exact**, in `crates/holonic-engine/src/receiver_current.rs:549-563`:
+
+```text
+co_present_branch_population = branch_population x |active outgoing passages|
+service_rounds               = ceil(co_present_branch_population / site_capacity)
+passage_delay                = characteristic_delay + (service_rounds - 1)
+```
+
+over `BigUint`, no score, no ranking, later arrivals retained as `deferred_arrivals` rather than
+discarded. `site_capacity` is capacitance and is changed by returned recurrence
+(`set_site_capacity`); `co_present_branch_population` is competing current occupancy. **Only source
+continuity has no term.**
+
+**And "unit cost makes a high-incidence hub artificially fast" is backwards.** A high-incidence hub
+has the most active outgoing passages, so the largest `co_present_branch_population`, so the largest
+dilation. Congestion already penalises exactly the hub the record called fast. What is genuinely
+owed is narrow: `characteristic_delay` is pinned at `1` by its **one caller**
+(`soma/life/src/relational_language/ecology.rs`, lines 626 and 639), not by the law, which accepts any positive
+`u64` and refuses zero. The record is
+`research/records/2026-08-08_THE_LEADER_IS_THE_TREE_THE_RETURN_IS_THE_CHORD.md`.
+
 That is a buildable organ in the project's own circuit vocabulary, not a wall. Note also that the
 July record never stated what breadth would be **correct** — `22.9%` was called "too broad" with no
 target and no computed alternative, so as written it could not be falsified: §8's own defect, in a

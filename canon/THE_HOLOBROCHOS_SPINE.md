@@ -379,6 +379,53 @@ type friction.
 
 ---
 
+## 5b · The loop was never meant to feed itself — corrected 2026-08-08
+
+**The assistant spent a day treating a loop's failure to sustain itself as the central defect. The
+record forbids the thing that was being chased.**
+
+`crates/holonic-engine/src/temper.rs:14-22`, carrying a prohibition dated 2026-07-10:
+
+> *"Two of its load-bearing sentences are prohibited now: a closed coil **self-sustains**; an open
+> coil leaks at its own **pace**. … without supplied stimulus there is no current, relating, Θ, or
+> passage of proper time. Standing closure between lights is deposited topology, not an active
+> circulation. **It cannot feed itself**, and openness cannot run an interior decay clock."*
+
+Executable: `soma/abi/src/active.rs:266` — `ActionCurrent::new` **refuses zero**, *"A1 supplies a
+real current."* **Current is supplied. A loop that stops is at a named cut, not in a fault state.**
+
+**And the settling has an exact cause that is neither of the two the assistant proposed.**
+`conditioned_derivation.rs:284` — `witness` is **idempotent on `(word, whole)`**, so the return path
+is a set union on a finite lattice and terminates by the ascending chain condition. Knaster–Tarski,
+not relaxation: `57 → 15 → 0` terminates *at zero exactly*, which no dissipative operator does.
+
+**The circulation verdict is regraded to `unmeasured`.** Soma's law gives `q_{k+1} − q_k = 0` with
+`r = 0` ⟹ `B·j = 0` ⟹ **`j ∈ ker B`, not `j = 0`**. Rest and circulation are both consistent with
+the measured stillness, and `returned_reading.rs` contains zero occurrences of current or
+conductance — `j` was never computed. Every statement of the form *"explicitly not circulation"* was
+an invalid inference from `q` not moving.
+
+### The unification this opened, and it is the useful part
+
+`simplicial.rs:1198-1280` roots a **spanning tree** of transports and classifies every **chord** by
+its transition word and `target_residual`. `running_integral.rs:840-940` does the same shape on
+another material, retaining `ChordObstruction { residual = declared − implied }`. And `CLAUDE.md`
+§11 names spanning-tree interval labelling as the route to the one missing organ.
+
+> **The tree is what the leader founded — cheap to ride, because the terrain already paid. The
+> chords are what returns. The residual on a chord is simultaneously the friction, the holonomy, and
+> §11's certified remainder.**
+
+`FORMULA.md:8732` supplies the reading the assistant was groping for and forbids the one it gave:
+*"a lightning leader changes the medium, and the return stroke is **genuinely later current RIDING
+that changed route**"* — deposited as **causal parity**, `∂∂ = 0` does not create a temporal inverse.
+**A return stroke is a chord, not output wired back to input.**
+
+Full record:
+[`research/records/2026-08-08_THE_LEADER_IS_THE_TREE_THE_RETURN_IS_THE_CHORD.md`](../research/records/2026-08-08_THE_LEADER_IS_THE_TREE_THE_RETURN_IS_THE_CHORD.md).
+
+---
+
 ## 6 · What this file forbids
 
 1. **No claim inherited from the speculative corpus beyond §2's retained list.** `holobrochos/`,
