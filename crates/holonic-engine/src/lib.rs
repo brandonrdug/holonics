@@ -216,6 +216,13 @@ pub mod simplicial;
 // `canon/THE_HOLOBROCHOS_SPINE.md` §2 — comparison is situated by a frame.
 pub mod situated_residual;
 pub mod skein;
+// A statement grammar recovered from the deposit's own statement population, and the composition of
+// a statement the deposit does not reach into a slot that recovery founded. Declared, never
+// glob-exported: they name `Span`, `Slot`, `recover`, `normalize` and `admit`, every one of which
+// says nothing at the crate root about which surface it belongs to, and `recover` would collide
+// with `codec_recovery::recover`.
+pub mod statement_composition;
+pub mod statement_grammar;
 // Declared, never glob-exported: `ReceiverId`, `Disagreement`, `Partition`, `Cover`, `Observation`
 // and `ItemId` collide across the placement family, and a realizer founded by a substitution must
 // be reached by naming which organ founded it. `blueprint/THE_ASSEMBLY.md` step 2.

@@ -113,6 +113,16 @@ pub enum MoveSpecies {
     /// One passage replaced by the two that carry the same bridge under two other standing
     /// declarations. The move whose deposits arrive in twins.
     LemmaSplit,
+    /// The frame becomes the frame carrying a passage **and the statement 0-cell it reaches**.
+    ///
+    /// The three species above all preserve `statement` by construction: both sides of each of them
+    /// already reach the statement, so the statement vertex sits in the move's **boundary**. This one
+    /// deposits that vertex. It is founded by
+    /// [`crate::statement_composition::statement_composition_moves`], which owns the recovered
+    /// grammar and the licence that composed the statement; the discriminator is
+    /// [`crate::statement_composition::deposits_its_statement_vertex`] and it is a property of the
+    /// substitution rather than of the name.
+    StatementComposition,
 }
 
 impl MoveSpecies {
@@ -121,6 +131,7 @@ impl MoveSpecies {
             Self::Deposit => "deposit",
             Self::RecruitmentExchange => "recruitment-exchange",
             Self::LemmaSplit => "lemma-split",
+            Self::StatementComposition => "statement-composition",
         }
     }
 }
@@ -1200,6 +1211,13 @@ mod tests {
                     assert!(!declared.substitution.removed().is_empty());
                     assert!(!declared.substitution.added().is_empty());
                 }
+                // This module reads three species off a production and never the fourth. A
+                // statement-composition move is founded by `statement_composition`, which owns the
+                // recovered grammar the composition needs; `moves_the_production_made` returning one
+                // would mean this module had acquired a statement grammar it must not have.
+                MoveSpecies::StatementComposition => unreachable!(
+                    "moves_the_production_made reads only the three statement-preserving species"
+                ),
             }
         }
     }
