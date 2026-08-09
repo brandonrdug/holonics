@@ -174,8 +174,66 @@ and **rests so it can be remounted and resume without its corpus**. Four propert
 | **the corpus is real** | `soma/life` `text_material` intake | `conditioned_derivation::{expose, condition}` | **RETURNED** `e429c22` |
 | **the reading returns** | `derivation_atlas::{invariant_movement, route_movement}`; `temper` ⇄ `derivation_integral` through `Cochain` | the next production, as material, via `from_founded_words` | **RETURNED** `cec1c97` |
 | **the measure is situated** | `surprisal.rs` + `FoundedMorphology::unconditioned()` as the declared null | the residual in three oriented arms; ordering may be `Open` | **RETURNED** `cec1c97` |
-| **the instance rests and remounts** | `soma/life/src/form_mouth.rs`, `soma/tools/holon-plate` | a body that resumes from bytes with the corpus absent | **in flight** |
-| **the research act** | all four | a returned mathematical artifact, and an honest verdict on whether a statement absent from the deposit can be reached | **in flight** |
+| **the instance rests and remounts** | `soma/life/src/conditioned_rest.rs`, `holon-plate` `CDER` schema | a body that resumes from bytes with the corpus provably unreachable | **RETURNED** `41c916b` |
+| **the research act** | all four | the artifact, and the verdict on reaching an absent statement | **RETURNED** `430cb5c` |
+
+**ALL FIVE JOINS RETURNED, 2026-08-08.** The record is
+[`research/records/2026-08-08_THE_INSTANCE_FOUNDS_ROUTES_AND_NEVER_FOUNDS_STATEMENTS.md`](../research/records/2026-08-08_THE_INSTANCE_FOUNDS_ROUTES_AND_NEVER_FOUNDS_STATEMENTS.md).
+**The instance conducts.** It conditions on a real corpus, produces mathematics, reads its own
+production as a circuit, returns the reading into the next production, rests, departs from its
+source, resumes, and goes on receiving.
+
+**And it has a ceiling, which is the line's next movement.**
+
+---
+
+## THE NEXT MOVEMENT — the production founds routes and never founds statements
+
+**Truth status:** `counterexample`, established by construction 2026-08-08. **This is a
+falsification and it passes its grade** (`CLAUDE.md` §8): a deed that proves its own receiver family
+cannot see what it was built to see has returned real evidence.
+
+**Determined four ways, not argued:** five absent statements written in the deposit's own vocabulary
+return the empty population; the complete query aperture emits exactly the standing statement set;
+no new statement 0-cell appears in the circuit; and a remount of the production as a fresh deposit
+reaches nothing new.
+
+**Three blocking sites, each a different kind of block, all read in source:**
+
+| site | block |
+|---|---|
+| `conditioned_derivation.rs:992` | `if route.statement != query.statement { continue; }` |
+| `compose_passage` | writes the queried statement **verbatim**; its one degree of freedom is `brought`, a **recruitment**, not a statement |
+| `conditioned_derivation.rs:1318` | typed refusal `EmittedPassageMissedItsStatement` |
+
+**The reading half already exists and is measured returning nothing.**
+`route_movement().founded_statements()` returns the empty population on every query in the complete
+aperture while returning founded **routes** on the same queries.
+
+**What to build.** A fourth move species beside `derivation_skein`'s `Deposit`,
+`RecruitmentExchange` and `LemmaSplit` — **all three of which preserve `statement` by
+construction.** It needs two things this body does not have:
+
+1. **A statement grammar.** `read_derivation` is deliberately shallow — it reads what a file
+   declares, not what it means — so a statement is an opaque normalized string with no operation on
+   it. Composing `exactCarrier (exactCarrier P)` from `exactCarrier P` requires knowing that
+   `exactCarrier` is applied to an argument, which is a semantics claim the export codec deliberately
+   refuses to make. **Decide where that claim is allowed to live before writing it**, because putting
+   it in the codec re-centres Lean, which Part two's ruling removed.
+2. **A population-valued admission rule** with retained obstructions, **never a filter.** The
+   conditioning half is reusable as it stands: the morphemic bridge supplies the licence mechanism
+   and `FoundedMorphology::cover` already decomposes a word the morphology has never seen.
+
+**Falsifier.** A returned passage reaching a statement absent from `standing_statements()`, whose
+statement 0-cell appears in the circuit, whose composition names the founded structure that licensed
+it, and which `route_movement().founded_statements()` reports. Plus a control where the composition
+is **refused** with the obstruction retained — an admission rule that admits everything is a filter
+inverted, not a rule.
+
+**And the ceiling this lifts is exactly the objective's.** *"the learning is the intermediary
+mechanism/law/equation"*: a body that founds only routes has learned to travel between statements
+someone else wrote down. Founding a statement is where the intermediary starts producing terrain
+rather than paths across it.
 
 **What the three returned joins measured**, each verified here by running the driver:
 
