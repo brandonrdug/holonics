@@ -34,3 +34,7 @@
 # Python bytecode from `tools/`. The tools are sources; their caches are not.
 __pycache__/
 *.pyc
+
+# A driver return that landed at the root before its default path was corrected (2026-08-08).
+# Returns belong under `/output/`, where the manifest can certify them.
+/holonic-eta-ratio-atlas.ron

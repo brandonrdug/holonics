@@ -755,13 +755,21 @@ fn verify_artifact(path: &PathBuf) -> Result<(), String> {
     Ok(())
 }
 
+/// Returns land under `output/`, never at the repository root.
+///
+/// This driver wrote a 49 MB artifact to the root until 2026-08-08, where `git status` reported it
+/// as untracked clutter and `meta/OUTPUT_MANIFEST.tsv` could not certify it. `.gitignore` states the
+/// law: *"A driver writes its returns under `/output/`."* The address is the certificate, and a
+/// return outside the sink has none.
+const DEFAULT_ARTIFACT: &str = "output/holonic-eta-ratio-atlas/holonic-eta-ratio-atlas.ron";
+
 fn main() -> Result<(), String> {
     let arguments = env::args().skip(1).collect::<Vec<_>>();
     if arguments.first().map(String::as_str) == Some("verify") {
         let path = arguments
             .get(1)
             .map(PathBuf::from)
-            .unwrap_or_else(|| PathBuf::from("holonic-eta-ratio-atlas.ron"));
+            .unwrap_or_else(|| PathBuf::from(DEFAULT_ARTIFACT));
         return verify_artifact(&path);
     }
     let lower = arguments
@@ -777,7 +785,7 @@ fn main() -> Result<(), String> {
     let output = arguments
         .get(2)
         .map(PathBuf::from)
-        .unwrap_or_else(|| PathBuf::from("holonic-eta-ratio-atlas.ron"));
+        .unwrap_or_else(|| PathBuf::from(DEFAULT_ARTIFACT));
     let available = thread::available_parallelism()
         .map(|count| count.get())
         .unwrap_or(1);
