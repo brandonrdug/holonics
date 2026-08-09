@@ -272,8 +272,8 @@ fn exhibit_collapsed(
             let (Some(here_item), Some(there_item)) = (here, there) else {
                 continue;
             };
-            if !word.is_empty() {
-                if let Some(receiver) = receivers.iter().copied().find(|receiver| {
+            if !word.is_empty()
+                && let Some(receiver) = receivers.iter().copied().find(|receiver| {
                     system.observation(here_item, *receiver)
                         != system.observation(there_item, *receiver)
                 }) {
@@ -290,7 +290,6 @@ fn exhibit_collapsed(
                     });
                     break;
                 }
-            }
             for input in &inputs {
                 let next = (
                     system.successor(here_item, *input),

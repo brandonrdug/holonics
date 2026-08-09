@@ -1,0 +1,91 @@
+{
+  "provenance": {
+    "kind": "RECOVERED",
+    "recovered_from_repository": "/home/b/Workspaces/laboratory (frozen)",
+    "recovered_from_commit": "a07ff376",
+    "recovered_from_path": "src/soma/observations/eros-exact-algorithm-ecology-01/SOURCE.json",
+    "recovered_bytes": 2481,
+    "note": "Recovered whole from the frozen laboratory. Every member below this one is the laboratory's own content; this `provenance` member is the only addition and the driver's deserializer ignores it. Nothing here was authored or measured in the holonics repository."
+  },
+  "schema": "eros.exact-algorithm-ecology.source.v1",
+  "observation_id": "eros-exact-algorithm-ecology-01",
+  "question": "Can one exact receiver-coupled ecology carry typed algorithm paths, let output testimony preserve a plural hypothesis fiber, let a trace receiver refine that fiber without erasing output equivalence, and later conduct from the cultivated boundary after the source and oracle have departed?",
+  "word_width": 8,
+  "candidates": [
+    {
+      "id": 0,
+      "name": "square_then_add",
+      "expression": "x*x+x"
+    },
+    {
+      "id": 1,
+      "name": "successor_product",
+      "expression": "x*(x+1)"
+    },
+    {
+      "id": 2,
+      "name": "square_then_subtract",
+      "expression": "x*x-x"
+    },
+    {
+      "id": 3,
+      "name": "double_by_shift",
+      "expression": "x<<1"
+    }
+  ],
+  "output_probes": [
+    {
+      "input": 0,
+      "oracle_output": 0
+    },
+    {
+      "input": 1,
+      "oracle_output": 2
+    },
+    {
+      "input": 2,
+      "oracle_output": 6
+    }
+  ],
+  "trace_oracle": "square_then_add",
+  "later_source_absent_input": 3,
+  "later_expected_output": 12,
+  "division_cases": [
+    {
+      "id": "electrical",
+      "left": "12",
+      "left_unit": "voltage",
+      "right": "3",
+      "right_unit": "resistance",
+      "expected": "4",
+      "expected_unit": "current"
+    },
+    {
+      "id": "kinematic",
+      "left": "12",
+      "left_unit": "length",
+      "right": "3",
+      "right_unit": "time",
+      "expected": "4",
+      "expected_unit": "speed"
+    },
+    {
+      "id": "zero-boundary",
+      "left": "12",
+      "left_unit": "length",
+      "right": "0",
+      "right_unit": "time",
+      "expected": null,
+      "expected_unit": null
+    }
+  ],
+  "physical_preflight": {
+    "executor": "bounded host",
+    "event_limit_seconds": 30,
+    "run_limit_seconds": 120,
+    "maximum_regional_arcs_per_event": 256,
+    "floating_point_causal_data": false,
+    "cuda": false
+  },
+  "stopping_condition": "Stop after the source program population has departed into one exact outgoing chart factor; output probes leave exactly square_then_add and successor_product; a trace observation refines only the trace receiver to square_then_add; rest/remount preserves that distinction; later source-absent conduct returns 12 through the recruited path; the same exact DIVIDE graph returns numerically 4 under two nonidentical unit charts; zero division remains OPEN; and the no-Standing control cannot form a result."
+}

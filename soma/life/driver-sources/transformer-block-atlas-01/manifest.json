@@ -1,0 +1,168 @@
+{
+  "provenance": {
+    "kind": "RECOVERED",
+    "recovered_from_repository": "/home/b/Workspaces/laboratory (frozen)",
+    "recovered_from_commit": "a07ff376",
+    "recovered_from_path": "experiments/informant-ecology/results/transformer-block-atlas-01/manifest.json",
+    "note": "Recovered whole. This `provenance` member is the only addition; the driver's deserializer ignores it. Every measurement below is the laboratory's, taken from OLMo-2-0425-1B-Instruct. Nothing here was authored or re-measured."
+  },
+  "architecture": {
+    "attention_heads": 16,
+    "attention_implementation": "eager",
+    "head_rank": 128,
+    "key_value_heads": 16,
+    "layer_count": 16,
+    "mlp_rank": 8192,
+    "residual_rank": 2048,
+    "selected_layer": 0
+  },
+  "environment": {
+    "cublas_workspace_config": ":4096:8",
+    "cuda_capability": [
+      8,
+      9
+    ],
+    "cuda_device": "NVIDIA GeForce RTX 4080 SUPER",
+    "deterministic_algorithms": true,
+    "nvidia_smi": "NVIDIA GeForce RTX 4080 SUPER, 16376 MiB, 595.71.05",
+    "packages": {
+      "huggingface-hub": "1.15.0",
+      "safetensors": "0.7.0",
+      "torch": "2.10.0",
+      "transformers": "5.8.1"
+    },
+    "platform": "Linux-7.0.5-2-cachyos-x86_64-with-glibc2.43",
+    "python": "3.12.12 (main, Dec  9 2025, 19:02:36) [Clang 21.1.4 ]",
+    "tf32_matmul": false,
+    "torch_cuda": "12.8"
+  },
+  "fixture": {
+    "attention_implementation": "eager",
+    "fixture_version": 1,
+    "generation": {
+      "do_sample": false,
+      "max_new_tokens": 8,
+      "use_cache": true
+    },
+    "interventions": [
+      [
+        "query"
+      ],
+      [
+        "key"
+      ],
+      [
+        "value"
+      ],
+      [
+        "query",
+        "key"
+      ],
+      [
+        "query",
+        "key",
+        "value"
+      ]
+    ],
+    "layer": 0,
+    "model_role": "primary",
+    "observation_id": "transformer-block-atlas-01",
+    "relation_id": "informant_reposition.conversation",
+    "source_current_id": "drop_then_reverse.conversation.relevant_before",
+    "target_current_id": "drop_then_reverse.conversation.relevant_after"
+  },
+  "fixture_hashes": {
+    "models.json": {
+      "bytes": 771,
+      "sha256": "1a0d80d93fb71e2cca6dfc735de993d802ed42db0c561b0dc3b4173e09605072"
+    },
+    "world/block_atlas_experiment.json": {
+      "bytes": 571,
+      "sha256": "d8658d0914be9e80b269109e5c1ca386c048d3c4e0665b8efb9d8c8da7ce11d6"
+    },
+    "world/irrelevant.md": {
+      "bytes": 538,
+      "sha256": "22fefcdbc057ef275bfe2348361bbeed4f7989e77b06a61ace9d2e295ae3f69c"
+    },
+    "world/operations.md": {
+      "bytes": 524,
+      "sha256": "12226c8af5a103cd71afcfb4351540cbd748d499684ab5e0f66146005a486b3e"
+    },
+    "world/relational_experiment.json": {
+      "bytes": 3185,
+      "sha256": "6dbda3675d486e2805b6409c74cbc9a0a587a9a9acb2d6297ffb91a9f570a916"
+    }
+  },
+  "fixture_version": 1,
+  "model": {
+    "repository": "allenai/OLMo-2-0425-1B-Instruct",
+    "revision": "48d788eca847d4d7548f375ad03d3c9312f6139e",
+    "role": "final_instruct"
+  },
+  "model_files": [
+    {
+      "bytes": 1519,
+      "path": ".gitattributes",
+      "sha256": "11ad7efa24975ee4b0c3c3a38ed18737f0658a5f75a0a96787b576a78a023361"
+    },
+    {
+      "bytes": 6161,
+      "path": "README.md",
+      "sha256": "5f5b891d66a46079920172f8d5957ec386825f76cfc14ae2e79c7208d4dca4d8"
+    },
+    {
+      "bytes": 625,
+      "path": "config.json",
+      "sha256": "0d15ebb6cb8d998513b46ef337214176a6fd59fe5f16b30387c70d5f87795a9c"
+    },
+    {
+      "bytes": 121,
+      "path": "generation_config.json",
+      "sha256": "437b97826bb4430c205083a0986fbe31f4959cffbe445e47fb7c5192fdcb8d58"
+    },
+    {
+      "bytes": 916646,
+      "path": "merges.txt",
+      "sha256": "b6fe424e334903f7fb84d3a106d9730455f4744b9fe3c21ee136d97a00e72502"
+    },
+    {
+      "bytes": 2969854224,
+      "path": "model.safetensors",
+      "sha256": "36d044c73655bb904f822915e6294ba3dae8e6e1af5e703e9d452f2d6a3a294f"
+    },
+    {
+      "bytes": 581,
+      "path": "special_tokens_map.json",
+      "sha256": "78afb564e81264029b25f9caf24bda2521d5bdaeff5cd3fdbc01d3da2e8ce2f2"
+    },
+    {
+      "bytes": 7137177,
+      "path": "tokenizer.json",
+      "sha256": "73fd5254624f39a88e3faac6a8e11300fc3c735ed37880d4f4f08db898eaecca"
+    },
+    {
+      "bytes": 4884,
+      "path": "tokenizer_config.json",
+      "sha256": "50c412c57d832057a3d5db42064c741f751e570f7c8788f037bfb0d2dd6e5f49"
+    },
+    {
+      "bytes": 1611056,
+      "path": "vocab.json",
+      "sha256": "9e14712c91b37c7aab74b1306baa46ac342d620637a4b44523cdc3aec7d24195"
+    }
+  ],
+  "model_parameter_count": 1484916736,
+  "model_snapshot": "/home/b/.cache/huggingface/models--allenai--OLMo-2-0425-1B-Instruct/snapshots/48d788eca847d4d7548f375ad03d3c9312f6139e",
+  "observation_id": "transformer-block-atlas-01",
+  "observer_law": {
+    "alignment": "chronological token LCS; observer map, not whole identity",
+    "embedding_identity": "exact installed embedding row at the initial carrier cut",
+    "numerical_evidence": "raw BF16 codewords decoded as exact dyadics",
+    "semantic_admission_gate": null,
+    "shared_world_face": "exact rendered UTF-8 span incidence",
+    "similarity_threshold": null,
+    "token_identity": "source-declared categorical tokenizer address"
+  },
+  "source_commit": "d363bfb19854e3007e9afe94be953bbedfdbcd6e",
+  "source_status_before_observation": ""
+}

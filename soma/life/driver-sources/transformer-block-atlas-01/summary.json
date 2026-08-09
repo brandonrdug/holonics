@@ -1,0 +1,193 @@
+{
+  "aligned_attention_weights": {
+    "bit_equal_vectors": 83,
+    "bit_equal_words": 391453,
+    "vector_count": 204,
+    "whole_bit_equal": false,
+    "word_count": 665856
+  },
+  "aligned_initial_faces": {
+    "embedding": true,
+    "key.normalized": true,
+    "key.projected": true,
+    "query.normalized": true,
+    "query.projected": true,
+    "value.heads": true,
+    "value.projected": true
+  },
+  "aligned_rotary_faces": {
+    "key": {
+      "bit_equal_vectors": 89,
+      "bit_equal_words": 235879,
+      "dtype": "torch.bfloat16",
+      "left_sha256": "ba0273676fb1e6bae3c62e2e30e467ed6df27806b16a70af21c1331bdf00a838",
+      "right_sha256": "8ebe4e9c51afcacb750b25ab0a5fe708e0f192ab0d608a65a181c9b6631b5fb2",
+      "shape": [
+        1,
+        16,
+        204,
+        128
+      ],
+      "vector_count": 204,
+      "whole_bit_equal": false,
+      "word_count": 417792
+    },
+    "query": {
+      "bit_equal_vectors": 89,
+      "bit_equal_words": 236276,
+      "dtype": "torch.bfloat16",
+      "left_sha256": "e0f9bcd00511340deaa6880b12dd4de0a9a7d96d92b511bb17f3c71aaf0a3044",
+      "right_sha256": "ae24433c76e6a7826c2776637476f90d4144c3637a6f36703fbfbbb5fe53656e",
+      "shape": [
+        1,
+        16,
+        204,
+        128
+      ],
+      "vector_count": 204,
+      "whole_bit_equal": false,
+      "word_count": 417792
+    }
+  },
+  "aligned_token_count": 204,
+  "intervention_expression_relations": {
+    "target_expression": 4,
+    "third_expression": 1
+  },
+  "interventions": [
+    {
+      "attention_raw_target_exact": false,
+      "block_output_target_exact": false,
+      "emitted_relation": "target_expression",
+      "patch_faces": [
+        "query"
+      ],
+      "patches": [
+        {
+          "after_sha256": "e0f9bcd00511340deaa6880b12dd4de0a9a7d96d92b511bb17f3c71aaf0a3044",
+          "before_sha256": "ae24433c76e6a7826c2776637476f90d4144c3637a6f36703fbfbbb5fe53656e",
+          "changed_from_target": true,
+          "face": "query",
+          "replacement_exact": true,
+          "selected_vectors": 204,
+          "source_sha256": "e0f9bcd00511340deaa6880b12dd4de0a9a7d96d92b511bb17f3c71aaf0a3044"
+        }
+      ]
+    },
+    {
+      "attention_raw_target_exact": false,
+      "block_output_target_exact": false,
+      "emitted_relation": "third_expression",
+      "patch_faces": [
+        "key"
+      ],
+      "patches": [
+        {
+          "after_sha256": "ba0273676fb1e6bae3c62e2e30e467ed6df27806b16a70af21c1331bdf00a838",
+          "before_sha256": "8ebe4e9c51afcacb750b25ab0a5fe708e0f192ab0d608a65a181c9b6631b5fb2",
+          "changed_from_target": true,
+          "face": "key",
+          "replacement_exact": true,
+          "selected_vectors": 204,
+          "source_sha256": "ba0273676fb1e6bae3c62e2e30e467ed6df27806b16a70af21c1331bdf00a838"
+        }
+      ]
+    },
+    {
+      "attention_raw_target_exact": true,
+      "block_output_target_exact": true,
+      "emitted_relation": "target_expression",
+      "patch_faces": [
+        "value"
+      ],
+      "patches": [
+        {
+          "after_sha256": "56ea5b47be8295c54cd2df48c5de9462a73b397ee62591f518f683524458e3f7",
+          "before_sha256": "56ea5b47be8295c54cd2df48c5de9462a73b397ee62591f518f683524458e3f7",
+          "changed_from_target": false,
+          "face": "value",
+          "replacement_exact": true,
+          "selected_vectors": 204,
+          "source_sha256": "56ea5b47be8295c54cd2df48c5de9462a73b397ee62591f518f683524458e3f7"
+        }
+      ]
+    },
+    {
+      "attention_raw_target_exact": false,
+      "block_output_target_exact": false,
+      "emitted_relation": "target_expression",
+      "patch_faces": [
+        "query",
+        "key"
+      ],
+      "patches": [
+        {
+          "after_sha256": "e0f9bcd00511340deaa6880b12dd4de0a9a7d96d92b511bb17f3c71aaf0a3044",
+          "before_sha256": "ae24433c76e6a7826c2776637476f90d4144c3637a6f36703fbfbbb5fe53656e",
+          "changed_from_target": true,
+          "face": "query",
+          "replacement_exact": true,
+          "selected_vectors": 204,
+          "source_sha256": "e0f9bcd00511340deaa6880b12dd4de0a9a7d96d92b511bb17f3c71aaf0a3044"
+        },
+        {
+          "after_sha256": "ba0273676fb1e6bae3c62e2e30e467ed6df27806b16a70af21c1331bdf00a838",
+          "before_sha256": "8ebe4e9c51afcacb750b25ab0a5fe708e0f192ab0d608a65a181c9b6631b5fb2",
+          "changed_from_target": true,
+          "face": "key",
+          "replacement_exact": true,
+          "selected_vectors": 204,
+          "source_sha256": "ba0273676fb1e6bae3c62e2e30e467ed6df27806b16a70af21c1331bdf00a838"
+        }
+      ]
+    },
+    {
+      "attention_raw_target_exact": false,
+      "block_output_target_exact": false,
+      "emitted_relation": "target_expression",
+      "patch_faces": [
+        "query",
+        "key",
+        "value"
+      ],
+      "patches": [
+        {
+          "after_sha256": "e0f9bcd00511340deaa6880b12dd4de0a9a7d96d92b511bb17f3c71aaf0a3044",
+          "before_sha256": "ae24433c76e6a7826c2776637476f90d4144c3637a6f36703fbfbbb5fe53656e",
+          "changed_from_target": true,
+          "face": "query",
+          "replacement_exact": true,
+          "selected_vectors": 204,
+          "source_sha256": "e0f9bcd00511340deaa6880b12dd4de0a9a7d96d92b511bb17f3c71aaf0a3044"
+        },
+        {
+          "after_sha256": "ba0273676fb1e6bae3c62e2e30e467ed6df27806b16a70af21c1331bdf00a838",
+          "before_sha256": "8ebe4e9c51afcacb750b25ab0a5fe708e0f192ab0d608a65a181c9b6631b5fb2",
+          "changed_from_target": true,
+          "face": "key",
+          "replacement_exact": true,
+          "selected_vectors": 204,
+          "source_sha256": "ba0273676fb1e6bae3c62e2e30e467ed6df27806b16a70af21c1331bdf00a838"
+        },
+        {
+          "after_sha256": "56ea5b47be8295c54cd2df48c5de9462a73b397ee62591f518f683524458e3f7",
+          "before_sha256": "56ea5b47be8295c54cd2df48c5de9462a73b397ee62591f518f683524458e3f7",
+          "changed_from_target": false,
+          "face": "value",
+          "replacement_exact": true,
+          "selected_vectors": 204,
+          "source_sha256": "56ea5b47be8295c54cd2df48c5de9462a73b397ee62591f518f683524458e3f7"
+        }
+      ]
+    }
+  ],
+  "moved_aligned_tokens": 115,
+  "native_capture_integrity_exact": true,
+  "observation_id": "transformer-block-atlas-01",
+  "prompt_token_extent": 253,
+  "semantic_admission_gate": null,
+  "similarity_threshold": null,
+  "source_current_id": "drop_then_reverse.conversation.relevant_before",
+  "status": "complete",
+  "target_current_id": "drop_then_reverse.conversation.relevant_after"
+}

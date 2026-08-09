@@ -1,0 +1,1709 @@
+{
+  "provenance": {
+    "kind": "RECOVERED",
+    "recovered_from_repository": "/home/b/Workspaces/laboratory (frozen)",
+    "recovered_from_commit": "a07ff376",
+    "recovered_from_path": "src/soma/observations/eros-residual-chart-cultivation-01/SOURCE.json",
+    "recovered_bytes": 49640,
+    "note": "Recovered whole from the frozen laboratory. Every member below this one is the laboratory's own content; this `provenance` member is the only addition and the driver's deserializer ignores it. Nothing here was authored or measured in the holonics repository."
+  },
+  "checkpoints": [
+    {
+      "after_events": 6,
+      "diagram": {
+        "internal_nodes": 1,
+        "leaf_nodes": 2,
+        "nodes": [
+          {
+            "children": [],
+            "distribution": [
+              {
+                "count": 2,
+                "quotient": "1",
+                "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+              }
+            ],
+            "ordinal": 0,
+            "split": null
+          },
+          {
+            "children": [],
+            "distribution": [
+              {
+                "count": 2,
+                "quotient": "1",
+                "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+              }
+            ],
+            "ordinal": 1,
+            "split": null
+          },
+          {
+            "children": [
+              {
+                "node": 0,
+                "value": "absent"
+              },
+              {
+                "node": 1,
+                "value": "irrelevant_before"
+              },
+              {
+                "node": 1,
+                "value": "relevant_after"
+              }
+            ],
+            "distribution": [
+              {
+                "count": 2,
+                "quotient": "1/3",
+                "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+              },
+              {
+                "count": 4,
+                "quotient": "2/3",
+                "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+              }
+            ],
+            "ordinal": 2,
+            "split": "condition"
+          }
+        ],
+        "root": 2,
+        "sha256": "94eb1669700479e170bb0cf10ec16d39c9dffe5d619191f90bf7d320bde0af52"
+      },
+      "name": "related_context_before_contact",
+      "probes": [
+        {
+          "actual_taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb",
+          "current_id": "drop_then_reverse.code_comment.absent",
+          "distribution": [
+            {
+              "count": 2,
+              "quotient": "1",
+              "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+            }
+          ],
+          "event_ordinal": 6,
+          "relation_to_withheld_actual": "RIDE"
+        },
+        {
+          "actual_taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078",
+          "current_id": "drop_then_reverse.code_comment.irrelevant_before",
+          "distribution": [
+            {
+              "count": 2,
+              "quotient": "1",
+              "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+            }
+          ],
+          "event_ordinal": 7,
+          "relation_to_withheld_actual": "RIDE"
+        },
+        {
+          "actual_taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078",
+          "current_id": "drop_then_reverse.code_comment.relevant_after",
+          "distribution": [
+            {
+              "count": 2,
+              "quotient": "1",
+              "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+            }
+          ],
+          "event_ordinal": 8,
+          "relation_to_withheld_actual": "RIDE"
+        }
+      ]
+    },
+    {
+      "after_events": 9,
+      "diagram": {
+        "internal_nodes": 1,
+        "leaf_nodes": 2,
+        "nodes": [
+          {
+            "children": [],
+            "distribution": [
+              {
+                "count": 3,
+                "quotient": "1",
+                "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+              }
+            ],
+            "ordinal": 0,
+            "split": null
+          },
+          {
+            "children": [],
+            "distribution": [
+              {
+                "count": 3,
+                "quotient": "1",
+                "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+              }
+            ],
+            "ordinal": 1,
+            "split": null
+          },
+          {
+            "children": [
+              {
+                "node": 0,
+                "value": "absent"
+              },
+              {
+                "node": 1,
+                "value": "irrelevant_before"
+              },
+              {
+                "node": 1,
+                "value": "relevant_after"
+              }
+            ],
+            "distribution": [
+              {
+                "count": 3,
+                "quotient": "1/3",
+                "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+              },
+              {
+                "count": 6,
+                "quotient": "2/3",
+                "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+              }
+            ],
+            "ordinal": 2,
+            "split": "condition"
+          }
+        ],
+        "root": 2,
+        "sha256": "029ba95d5a0610692a32c96994579978f93fb757c48b140c66c30f976454abba"
+      },
+      "name": "changed_operation_before_contact",
+      "probes": [
+        {
+          "actual_taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078",
+          "current_id": "reverse_then_drop.conversation.relevant_before",
+          "distribution": [
+            {
+              "count": 3,
+              "quotient": "1/3",
+              "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+            },
+            {
+              "count": 6,
+              "quotient": "2/3",
+              "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+            }
+          ],
+          "event_ordinal": 9,
+          "relation_to_withheld_actual": "OPEN_INCLUDED"
+        },
+        {
+          "actual_taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078",
+          "current_id": "reverse_then_drop.prose.relevant_before",
+          "distribution": [
+            {
+              "count": 3,
+              "quotient": "1/3",
+              "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+            },
+            {
+              "count": 6,
+              "quotient": "2/3",
+              "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+            }
+          ],
+          "event_ordinal": 10,
+          "relation_to_withheld_actual": "OPEN_INCLUDED"
+        },
+        {
+          "actual_taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb",
+          "current_id": "reverse_then_drop.code_comment.relevant_before",
+          "distribution": [
+            {
+              "count": 3,
+              "quotient": "1/3",
+              "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+            },
+            {
+              "count": 6,
+              "quotient": "2/3",
+              "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+            }
+          ],
+          "event_ordinal": 11,
+          "relation_to_withheld_actual": "OPEN_INCLUDED"
+        }
+      ]
+    },
+    {
+      "after_events": 12,
+      "diagram": {
+        "internal_nodes": 3,
+        "leaf_nodes": 4,
+        "nodes": [
+          {
+            "children": [],
+            "distribution": [
+              {
+                "count": 3,
+                "quotient": "1",
+                "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+              }
+            ],
+            "ordinal": 0,
+            "split": null
+          },
+          {
+            "children": [],
+            "distribution": [
+              {
+                "count": 3,
+                "quotient": "1",
+                "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+              }
+            ],
+            "ordinal": 1,
+            "split": null
+          },
+          {
+            "children": [
+              {
+                "node": 0,
+                "value": "absent"
+              },
+              {
+                "node": 1,
+                "value": "irrelevant_before"
+              },
+              {
+                "node": 1,
+                "value": "relevant_after"
+              }
+            ],
+            "distribution": [
+              {
+                "count": 3,
+                "quotient": "1/3",
+                "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+              },
+              {
+                "count": 6,
+                "quotient": "2/3",
+                "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+              }
+            ],
+            "ordinal": 2,
+            "split": "condition"
+          },
+          {
+            "children": [],
+            "distribution": [
+              {
+                "count": 1,
+                "quotient": "1",
+                "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+              }
+            ],
+            "ordinal": 3,
+            "split": null
+          },
+          {
+            "children": [],
+            "distribution": [
+              {
+                "count": 1,
+                "quotient": "1",
+                "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+              }
+            ],
+            "ordinal": 4,
+            "split": null
+          },
+          {
+            "children": [
+              {
+                "node": 3,
+                "value": "code_comment"
+              },
+              {
+                "node": 4,
+                "value": "conversation"
+              },
+              {
+                "node": 4,
+                "value": "prose"
+              }
+            ],
+            "distribution": [
+              {
+                "count": 1,
+                "quotient": "1/3",
+                "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+              },
+              {
+                "count": 2,
+                "quotient": "2/3",
+                "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+              }
+            ],
+            "ordinal": 5,
+            "split": "context"
+          },
+          {
+            "children": [
+              {
+                "node": 2,
+                "value": "drop_then_reverse"
+              },
+              {
+                "node": 5,
+                "value": "reverse_then_drop"
+              }
+            ],
+            "distribution": [
+              {
+                "count": 4,
+                "quotient": "1/3",
+                "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+              },
+              {
+                "count": 8,
+                "quotient": "2/3",
+                "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+              }
+            ],
+            "ordinal": 6,
+            "split": "operation"
+          }
+        ],
+        "root": 6,
+        "sha256": "16372c263fb4fe59ef7e0b93fac2bf1b68362a3df08ee2f8953d947e8fd68a81"
+      },
+      "name": "final_source_absent_recall",
+      "probes": [
+        {
+          "actual_taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb",
+          "current_id": "drop_then_reverse.conversation.absent",
+          "distribution": [
+            {
+              "count": 3,
+              "quotient": "1",
+              "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+            }
+          ],
+          "event_ordinal": 0,
+          "relation_to_withheld_actual": "RIDE"
+        },
+        {
+          "actual_taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078",
+          "current_id": "drop_then_reverse.conversation.irrelevant_before",
+          "distribution": [
+            {
+              "count": 3,
+              "quotient": "1",
+              "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+            }
+          ],
+          "event_ordinal": 1,
+          "relation_to_withheld_actual": "RIDE"
+        },
+        {
+          "actual_taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078",
+          "current_id": "drop_then_reverse.conversation.relevant_after",
+          "distribution": [
+            {
+              "count": 3,
+              "quotient": "1",
+              "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+            }
+          ],
+          "event_ordinal": 2,
+          "relation_to_withheld_actual": "RIDE"
+        },
+        {
+          "actual_taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb",
+          "current_id": "drop_then_reverse.prose.absent",
+          "distribution": [
+            {
+              "count": 3,
+              "quotient": "1",
+              "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+            }
+          ],
+          "event_ordinal": 3,
+          "relation_to_withheld_actual": "RIDE"
+        },
+        {
+          "actual_taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078",
+          "current_id": "drop_then_reverse.prose.irrelevant_before",
+          "distribution": [
+            {
+              "count": 3,
+              "quotient": "1",
+              "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+            }
+          ],
+          "event_ordinal": 4,
+          "relation_to_withheld_actual": "RIDE"
+        },
+        {
+          "actual_taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078",
+          "current_id": "drop_then_reverse.prose.relevant_after",
+          "distribution": [
+            {
+              "count": 3,
+              "quotient": "1",
+              "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+            }
+          ],
+          "event_ordinal": 5,
+          "relation_to_withheld_actual": "RIDE"
+        },
+        {
+          "actual_taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb",
+          "current_id": "drop_then_reverse.code_comment.absent",
+          "distribution": [
+            {
+              "count": 3,
+              "quotient": "1",
+              "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+            }
+          ],
+          "event_ordinal": 6,
+          "relation_to_withheld_actual": "RIDE"
+        },
+        {
+          "actual_taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078",
+          "current_id": "drop_then_reverse.code_comment.irrelevant_before",
+          "distribution": [
+            {
+              "count": 3,
+              "quotient": "1",
+              "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+            }
+          ],
+          "event_ordinal": 7,
+          "relation_to_withheld_actual": "RIDE"
+        },
+        {
+          "actual_taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078",
+          "current_id": "drop_then_reverse.code_comment.relevant_after",
+          "distribution": [
+            {
+              "count": 3,
+              "quotient": "1",
+              "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+            }
+          ],
+          "event_ordinal": 8,
+          "relation_to_withheld_actual": "RIDE"
+        },
+        {
+          "actual_taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078",
+          "current_id": "reverse_then_drop.conversation.relevant_before",
+          "distribution": [
+            {
+              "count": 1,
+              "quotient": "1",
+              "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+            }
+          ],
+          "event_ordinal": 9,
+          "relation_to_withheld_actual": "RIDE"
+        },
+        {
+          "actual_taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078",
+          "current_id": "reverse_then_drop.prose.relevant_before",
+          "distribution": [
+            {
+              "count": 1,
+              "quotient": "1",
+              "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+            }
+          ],
+          "event_ordinal": 10,
+          "relation_to_withheld_actual": "RIDE"
+        },
+        {
+          "actual_taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb",
+          "current_id": "reverse_then_drop.code_comment.relevant_before",
+          "distribution": [
+            {
+              "count": 1,
+              "quotient": "1",
+              "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+            }
+          ],
+          "event_ordinal": 11,
+          "relation_to_withheld_actual": "RIDE"
+        }
+      ]
+    }
+  ],
+  "events": [
+    {
+      "actual_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1326,
+          1476,
+          76,
+          954,
+          856
+        ]
+      },
+      "actual_taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb",
+      "current_id": "drop_then_reverse.conversation.absent",
+      "interfaces": {
+        "condition": "absent",
+        "context": "conversation",
+        "operation": "drop_then_reverse"
+      },
+      "ordinal": 0
+    },
+    {
+      "actual_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "actual_taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078",
+      "current_id": "drop_then_reverse.conversation.irrelevant_before",
+      "interfaces": {
+        "condition": "irrelevant_before",
+        "context": "conversation",
+        "operation": "drop_then_reverse"
+      },
+      "ordinal": 1
+    },
+    {
+      "actual_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "actual_taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078",
+      "current_id": "drop_then_reverse.conversation.relevant_after",
+      "interfaces": {
+        "condition": "relevant_after",
+        "context": "conversation",
+        "operation": "drop_then_reverse"
+      },
+      "ordinal": 2
+    },
+    {
+      "actual_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1326,
+          1476,
+          76,
+          954,
+          856
+        ]
+      },
+      "actual_taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb",
+      "current_id": "drop_then_reverse.prose.absent",
+      "interfaces": {
+        "condition": "absent",
+        "context": "prose",
+        "operation": "drop_then_reverse"
+      },
+      "ordinal": 3
+    },
+    {
+      "actual_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "actual_taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078",
+      "current_id": "drop_then_reverse.prose.irrelevant_before",
+      "interfaces": {
+        "condition": "irrelevant_before",
+        "context": "prose",
+        "operation": "drop_then_reverse"
+      },
+      "ordinal": 4
+    },
+    {
+      "actual_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "actual_taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078",
+      "current_id": "drop_then_reverse.prose.relevant_after",
+      "interfaces": {
+        "condition": "relevant_after",
+        "context": "prose",
+        "operation": "drop_then_reverse"
+      },
+      "ordinal": 5
+    },
+    {
+      "actual_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1326,
+          1476,
+          76,
+          954,
+          856
+        ]
+      },
+      "actual_taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb",
+      "current_id": "drop_then_reverse.code_comment.absent",
+      "interfaces": {
+        "condition": "absent",
+        "context": "code_comment",
+        "operation": "drop_then_reverse"
+      },
+      "ordinal": 6
+    },
+    {
+      "actual_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "actual_taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078",
+      "current_id": "drop_then_reverse.code_comment.irrelevant_before",
+      "interfaces": {
+        "condition": "irrelevant_before",
+        "context": "code_comment",
+        "operation": "drop_then_reverse"
+      },
+      "ordinal": 7
+    },
+    {
+      "actual_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "actual_taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078",
+      "current_id": "drop_then_reverse.code_comment.relevant_after",
+      "interfaces": {
+        "condition": "relevant_after",
+        "context": "code_comment",
+        "operation": "drop_then_reverse"
+      },
+      "ordinal": 8
+    },
+    {
+      "actual_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "actual_taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078",
+      "current_id": "reverse_then_drop.conversation.relevant_before",
+      "interfaces": {
+        "condition": "relevant_before",
+        "context": "conversation",
+        "operation": "reverse_then_drop"
+      },
+      "ordinal": 9
+    },
+    {
+      "actual_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "actual_taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078",
+      "current_id": "reverse_then_drop.prose.relevant_before",
+      "interfaces": {
+        "condition": "relevant_before",
+        "context": "prose",
+        "operation": "reverse_then_drop"
+      },
+      "ordinal": 10
+    },
+    {
+      "actual_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1326,
+          1476,
+          76,
+          954,
+          856
+        ]
+      },
+      "actual_taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb",
+      "current_id": "reverse_then_drop.code_comment.relevant_before",
+      "interfaces": {
+        "condition": "relevant_before",
+        "context": "code_comment",
+        "operation": "reverse_then_drop"
+      },
+      "ordinal": 11
+    }
+  ],
+  "expected_final_diagram": {
+    "internal_nodes": 3,
+    "leaf_nodes": 4,
+    "nodes": [
+      {
+        "children": [],
+        "distribution": [
+          {
+            "count": 3,
+            "quotient": "1",
+            "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+          }
+        ],
+        "ordinal": 0,
+        "split": null
+      },
+      {
+        "children": [],
+        "distribution": [
+          {
+            "count": 3,
+            "quotient": "1",
+            "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+          }
+        ],
+        "ordinal": 1,
+        "split": null
+      },
+      {
+        "children": [
+          {
+            "node": 0,
+            "value": "absent"
+          },
+          {
+            "node": 1,
+            "value": "irrelevant_before"
+          },
+          {
+            "node": 1,
+            "value": "relevant_after"
+          }
+        ],
+        "distribution": [
+          {
+            "count": 3,
+            "quotient": "1/3",
+            "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+          },
+          {
+            "count": 6,
+            "quotient": "2/3",
+            "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+          }
+        ],
+        "ordinal": 2,
+        "split": "condition"
+      },
+      {
+        "children": [],
+        "distribution": [
+          {
+            "count": 1,
+            "quotient": "1",
+            "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+          }
+        ],
+        "ordinal": 3,
+        "split": null
+      },
+      {
+        "children": [],
+        "distribution": [
+          {
+            "count": 1,
+            "quotient": "1",
+            "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+          }
+        ],
+        "ordinal": 4,
+        "split": null
+      },
+      {
+        "children": [
+          {
+            "node": 3,
+            "value": "code_comment"
+          },
+          {
+            "node": 4,
+            "value": "conversation"
+          },
+          {
+            "node": 4,
+            "value": "prose"
+          }
+        ],
+        "distribution": [
+          {
+            "count": 1,
+            "quotient": "1/3",
+            "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+          },
+          {
+            "count": 2,
+            "quotient": "2/3",
+            "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+          }
+        ],
+        "ordinal": 5,
+        "split": "context"
+      },
+      {
+        "children": [
+          {
+            "node": 2,
+            "value": "drop_then_reverse"
+          },
+          {
+            "node": 5,
+            "value": "reverse_then_drop"
+          }
+        ],
+        "distribution": [
+          {
+            "count": 4,
+            "quotient": "1/3",
+            "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+          },
+          {
+            "count": 8,
+            "quotient": "2/3",
+            "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+          }
+        ],
+        "ordinal": 6,
+        "split": "operation"
+      }
+    ],
+    "root": 6,
+    "sha256": "16372c263fb4fe59ef7e0b93fac2bf1b68362a3df08ee2f8953d947e8fd68a81"
+  },
+  "expected_relation_counts": {
+    "NONE": 1,
+    "OPEN_INCLUDED": 4,
+    "OPEN_RESIDUAL": 4,
+    "RIDE": 3
+  },
+  "expected_trajectory": [
+    {
+      "after": {
+        "internal_nodes": 0,
+        "leaf_nodes": 1,
+        "nodes": 1,
+        "root_distribution": [
+          {
+            "count": 1,
+            "quotient": "1",
+            "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+          }
+        ],
+        "root_split": null,
+        "sha256": "b28cd6f4e289d8480ad303cda8c6da3b3b17d7f75552d5b7f105fe65cde12554"
+      },
+      "before": {
+        "internal_nodes": 0,
+        "leaf_nodes": 0,
+        "nodes": 0,
+        "root_distribution": [],
+        "root_split": null,
+        "sha256": null
+      },
+      "current_id": "drop_then_reverse.conversation.absent",
+      "event_ordinal": 0,
+      "prediction": [],
+      "relation": "NONE"
+    },
+    {
+      "after": {
+        "internal_nodes": 1,
+        "leaf_nodes": 2,
+        "nodes": 3,
+        "root_distribution": [
+          {
+            "count": 1,
+            "quotient": "1/2",
+            "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+          },
+          {
+            "count": 1,
+            "quotient": "1/2",
+            "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+          }
+        ],
+        "root_split": "condition",
+        "sha256": "60777f88d79ee97081236cd012980f7a83af42c7afae94ba762c35771d28c934"
+      },
+      "before": {
+        "internal_nodes": 0,
+        "leaf_nodes": 1,
+        "nodes": 1,
+        "root_distribution": [
+          {
+            "count": 1,
+            "quotient": "1",
+            "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+          }
+        ],
+        "root_split": null,
+        "sha256": "b28cd6f4e289d8480ad303cda8c6da3b3b17d7f75552d5b7f105fe65cde12554"
+      },
+      "current_id": "drop_then_reverse.conversation.irrelevant_before",
+      "event_ordinal": 1,
+      "prediction": [
+        {
+          "count": 1,
+          "quotient": "1",
+          "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+        }
+      ],
+      "relation": "OPEN_RESIDUAL"
+    },
+    {
+      "after": {
+        "internal_nodes": 1,
+        "leaf_nodes": 2,
+        "nodes": 3,
+        "root_distribution": [
+          {
+            "count": 1,
+            "quotient": "1/3",
+            "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+          },
+          {
+            "count": 2,
+            "quotient": "2/3",
+            "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+          }
+        ],
+        "root_split": "condition",
+        "sha256": "129b187d8dac2f06c0198e0c1f730ed2a017cfd8186964bac99f4737b798ff5e"
+      },
+      "before": {
+        "internal_nodes": 1,
+        "leaf_nodes": 2,
+        "nodes": 3,
+        "root_distribution": [
+          {
+            "count": 1,
+            "quotient": "1/2",
+            "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+          },
+          {
+            "count": 1,
+            "quotient": "1/2",
+            "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+          }
+        ],
+        "root_split": "condition",
+        "sha256": "60777f88d79ee97081236cd012980f7a83af42c7afae94ba762c35771d28c934"
+      },
+      "current_id": "drop_then_reverse.conversation.relevant_after",
+      "event_ordinal": 2,
+      "prediction": [
+        {
+          "count": 1,
+          "quotient": "1/2",
+          "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+        },
+        {
+          "count": 1,
+          "quotient": "1/2",
+          "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+        }
+      ],
+      "relation": "OPEN_INCLUDED"
+    },
+    {
+      "after": {
+        "internal_nodes": 2,
+        "leaf_nodes": 2,
+        "nodes": 4,
+        "root_distribution": [
+          {
+            "count": 2,
+            "quotient": "1/2",
+            "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+          },
+          {
+            "count": 2,
+            "quotient": "1/2",
+            "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+          }
+        ],
+        "root_split": "context",
+        "sha256": "2479c7818d4e4874acbcbded3095a7aed010b41ceff27a8a0e3cf08f4c6b8a9a"
+      },
+      "before": {
+        "internal_nodes": 1,
+        "leaf_nodes": 2,
+        "nodes": 3,
+        "root_distribution": [
+          {
+            "count": 1,
+            "quotient": "1/3",
+            "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+          },
+          {
+            "count": 2,
+            "quotient": "2/3",
+            "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+          }
+        ],
+        "root_split": "condition",
+        "sha256": "129b187d8dac2f06c0198e0c1f730ed2a017cfd8186964bac99f4737b798ff5e"
+      },
+      "current_id": "drop_then_reverse.prose.absent",
+      "event_ordinal": 3,
+      "prediction": [
+        {
+          "count": 1,
+          "quotient": "1",
+          "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+        }
+      ],
+      "relation": "RIDE"
+    },
+    {
+      "after": {
+        "internal_nodes": 3,
+        "leaf_nodes": 2,
+        "nodes": 5,
+        "root_distribution": [
+          {
+            "count": 2,
+            "quotient": "2/5",
+            "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+          },
+          {
+            "count": 3,
+            "quotient": "3/5",
+            "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+          }
+        ],
+        "root_split": "context",
+        "sha256": "94cf6d6ccd8d826aaa8adcebe3669f9dbdf01608e0f283fdbf3ce66944f19ede"
+      },
+      "before": {
+        "internal_nodes": 2,
+        "leaf_nodes": 2,
+        "nodes": 4,
+        "root_distribution": [
+          {
+            "count": 2,
+            "quotient": "1/2",
+            "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+          },
+          {
+            "count": 2,
+            "quotient": "1/2",
+            "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+          }
+        ],
+        "root_split": "context",
+        "sha256": "2479c7818d4e4874acbcbded3095a7aed010b41ceff27a8a0e3cf08f4c6b8a9a"
+      },
+      "current_id": "drop_then_reverse.prose.irrelevant_before",
+      "event_ordinal": 4,
+      "prediction": [
+        {
+          "count": 1,
+          "quotient": "1",
+          "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+        }
+      ],
+      "relation": "OPEN_RESIDUAL"
+    },
+    {
+      "after": {
+        "internal_nodes": 1,
+        "leaf_nodes": 2,
+        "nodes": 3,
+        "root_distribution": [
+          {
+            "count": 2,
+            "quotient": "1/3",
+            "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+          },
+          {
+            "count": 4,
+            "quotient": "2/3",
+            "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+          }
+        ],
+        "root_split": "condition",
+        "sha256": "94eb1669700479e170bb0cf10ec16d39c9dffe5d619191f90bf7d320bde0af52"
+      },
+      "before": {
+        "internal_nodes": 3,
+        "leaf_nodes": 2,
+        "nodes": 5,
+        "root_distribution": [
+          {
+            "count": 2,
+            "quotient": "2/5",
+            "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+          },
+          {
+            "count": 3,
+            "quotient": "3/5",
+            "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+          }
+        ],
+        "root_split": "context",
+        "sha256": "94cf6d6ccd8d826aaa8adcebe3669f9dbdf01608e0f283fdbf3ce66944f19ede"
+      },
+      "current_id": "drop_then_reverse.prose.relevant_after",
+      "event_ordinal": 5,
+      "prediction": [
+        {
+          "count": 1,
+          "quotient": "1/2",
+          "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+        },
+        {
+          "count": 1,
+          "quotient": "1/2",
+          "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+        }
+      ],
+      "relation": "OPEN_INCLUDED"
+    },
+    {
+      "after": {
+        "internal_nodes": 2,
+        "leaf_nodes": 2,
+        "nodes": 4,
+        "root_distribution": [
+          {
+            "count": 3,
+            "quotient": "3/7",
+            "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+          },
+          {
+            "count": 4,
+            "quotient": "4/7",
+            "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+          }
+        ],
+        "root_split": "context",
+        "sha256": "23b4e547fd00cce29aac487494fc3608ff8536494000543256f90d3b84745114"
+      },
+      "before": {
+        "internal_nodes": 1,
+        "leaf_nodes": 2,
+        "nodes": 3,
+        "root_distribution": [
+          {
+            "count": 2,
+            "quotient": "1/3",
+            "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+          },
+          {
+            "count": 4,
+            "quotient": "2/3",
+            "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+          }
+        ],
+        "root_split": "condition",
+        "sha256": "94eb1669700479e170bb0cf10ec16d39c9dffe5d619191f90bf7d320bde0af52"
+      },
+      "current_id": "drop_then_reverse.code_comment.absent",
+      "event_ordinal": 6,
+      "prediction": [
+        {
+          "count": 2,
+          "quotient": "1",
+          "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+        }
+      ],
+      "relation": "RIDE"
+    },
+    {
+      "after": {
+        "internal_nodes": 3,
+        "leaf_nodes": 2,
+        "nodes": 5,
+        "root_distribution": [
+          {
+            "count": 3,
+            "quotient": "3/8",
+            "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+          },
+          {
+            "count": 5,
+            "quotient": "5/8",
+            "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+          }
+        ],
+        "root_split": "context",
+        "sha256": "e6494b4ced2d70a974dd7a870851c7d7db13365501503fdf8315bbe9f753bd87"
+      },
+      "before": {
+        "internal_nodes": 2,
+        "leaf_nodes": 2,
+        "nodes": 4,
+        "root_distribution": [
+          {
+            "count": 3,
+            "quotient": "3/7",
+            "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+          },
+          {
+            "count": 4,
+            "quotient": "4/7",
+            "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+          }
+        ],
+        "root_split": "context",
+        "sha256": "23b4e547fd00cce29aac487494fc3608ff8536494000543256f90d3b84745114"
+      },
+      "current_id": "drop_then_reverse.code_comment.irrelevant_before",
+      "event_ordinal": 7,
+      "prediction": [
+        {
+          "count": 1,
+          "quotient": "1",
+          "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+        }
+      ],
+      "relation": "OPEN_RESIDUAL"
+    },
+    {
+      "after": {
+        "internal_nodes": 1,
+        "leaf_nodes": 2,
+        "nodes": 3,
+        "root_distribution": [
+          {
+            "count": 3,
+            "quotient": "1/3",
+            "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+          },
+          {
+            "count": 6,
+            "quotient": "2/3",
+            "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+          }
+        ],
+        "root_split": "condition",
+        "sha256": "029ba95d5a0610692a32c96994579978f93fb757c48b140c66c30f976454abba"
+      },
+      "before": {
+        "internal_nodes": 3,
+        "leaf_nodes": 2,
+        "nodes": 5,
+        "root_distribution": [
+          {
+            "count": 3,
+            "quotient": "3/8",
+            "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+          },
+          {
+            "count": 5,
+            "quotient": "5/8",
+            "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+          }
+        ],
+        "root_split": "context",
+        "sha256": "e6494b4ced2d70a974dd7a870851c7d7db13365501503fdf8315bbe9f753bd87"
+      },
+      "current_id": "drop_then_reverse.code_comment.relevant_after",
+      "event_ordinal": 8,
+      "prediction": [
+        {
+          "count": 1,
+          "quotient": "1/2",
+          "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+        },
+        {
+          "count": 1,
+          "quotient": "1/2",
+          "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+        }
+      ],
+      "relation": "OPEN_INCLUDED"
+    },
+    {
+      "after": {
+        "internal_nodes": 2,
+        "leaf_nodes": 3,
+        "nodes": 5,
+        "root_distribution": [
+          {
+            "count": 3,
+            "quotient": "3/10",
+            "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+          },
+          {
+            "count": 7,
+            "quotient": "7/10",
+            "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+          }
+        ],
+        "root_split": "operation",
+        "sha256": "9b1b9717173797890a67f36b46a9c8164129447cf28eab7af078ef004e60eebd"
+      },
+      "before": {
+        "internal_nodes": 1,
+        "leaf_nodes": 2,
+        "nodes": 3,
+        "root_distribution": [
+          {
+            "count": 3,
+            "quotient": "1/3",
+            "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+          },
+          {
+            "count": 6,
+            "quotient": "2/3",
+            "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+          }
+        ],
+        "root_split": "condition",
+        "sha256": "029ba95d5a0610692a32c96994579978f93fb757c48b140c66c30f976454abba"
+      },
+      "current_id": "reverse_then_drop.conversation.relevant_before",
+      "event_ordinal": 9,
+      "prediction": [
+        {
+          "count": 3,
+          "quotient": "1/3",
+          "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+        },
+        {
+          "count": 6,
+          "quotient": "2/3",
+          "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+        }
+      ],
+      "relation": "OPEN_INCLUDED"
+    },
+    {
+      "after": {
+        "internal_nodes": 2,
+        "leaf_nodes": 3,
+        "nodes": 5,
+        "root_distribution": [
+          {
+            "count": 3,
+            "quotient": "3/11",
+            "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+          },
+          {
+            "count": 8,
+            "quotient": "8/11",
+            "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+          }
+        ],
+        "root_split": "operation",
+        "sha256": "aa26345f61333949c1b63f046ae21594306f8aec77367e3c2689c96415c43b38"
+      },
+      "before": {
+        "internal_nodes": 2,
+        "leaf_nodes": 3,
+        "nodes": 5,
+        "root_distribution": [
+          {
+            "count": 3,
+            "quotient": "3/10",
+            "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+          },
+          {
+            "count": 7,
+            "quotient": "7/10",
+            "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+          }
+        ],
+        "root_split": "operation",
+        "sha256": "9b1b9717173797890a67f36b46a9c8164129447cf28eab7af078ef004e60eebd"
+      },
+      "current_id": "reverse_then_drop.prose.relevant_before",
+      "event_ordinal": 10,
+      "prediction": [
+        {
+          "count": 1,
+          "quotient": "1",
+          "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+        }
+      ],
+      "relation": "RIDE"
+    },
+    {
+      "after": {
+        "internal_nodes": 3,
+        "leaf_nodes": 4,
+        "nodes": 7,
+        "root_distribution": [
+          {
+            "count": 4,
+            "quotient": "1/3",
+            "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+          },
+          {
+            "count": 8,
+            "quotient": "2/3",
+            "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+          }
+        ],
+        "root_split": "operation",
+        "sha256": "16372c263fb4fe59ef7e0b93fac2bf1b68362a3df08ee2f8953d947e8fd68a81"
+      },
+      "before": {
+        "internal_nodes": 2,
+        "leaf_nodes": 3,
+        "nodes": 5,
+        "root_distribution": [
+          {
+            "count": 3,
+            "quotient": "3/11",
+            "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+          },
+          {
+            "count": 8,
+            "quotient": "8/11",
+            "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+          }
+        ],
+        "root_split": "operation",
+        "sha256": "aa26345f61333949c1b63f046ae21594306f8aec77367e3c2689c96415c43b38"
+      },
+      "current_id": "reverse_then_drop.code_comment.relevant_before",
+      "event_ordinal": 11,
+      "prediction": [
+        {
+          "count": 2,
+          "quotient": "1",
+          "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+        }
+      ],
+      "relation": "OPEN_RESIDUAL"
+    }
+  ],
+  "observation_id": "eros-residual-chart-cultivation-01",
+  "question": "Can an Eros ecology cultivate an exact conditional consequence distribution online, use returned residuals to rebase its contextual diagram, and later conduct source-absent currents through reduced Standing?",
+  "schema": "eros.residual-chart-cultivation.source.v1",
+  "source": {
+    "layer": 7,
+    "model": {
+      "model_path": "/home/b/.cache/huggingface/models--allenai--OLMo-2-0425-1B-Instruct/snapshots/48d788eca847d4d7548f375ad03d3c9312f6139e/model.safetensors",
+      "model_sha256": "36d044c73655bb904f822915e6294ba3dae8e6e1af5e703e9d452f2d6a3a294f",
+      "repository": "allenai/OLMo-2-0425-1B-Instruct",
+      "revision": "48d788eca847d4d7548f375ad03d3c9312f6139e"
+    },
+    "observation_id": "eros-contextual-retriangulation-01",
+    "path": "src/soma/observations/eros-contextual-retriangulation-01/SOURCE.json",
+    "receiver_axes": [
+      76,
+      856,
+      954,
+      1326,
+      1476
+    ],
+    "sha256": "d437eddf312cba5c8bea1506956d3606ab74f2ef16d20a2269e5532f0e1daf8d"
+  },
+  "stopping_condition": "one fixed twelve-event chronology; source-absent probes after events six, nine, and twelve; one no-diagram control; no model rerun, feature-order search, threshold, fixture adjustment, CUDA run, or engine change",
+  "taxa": [
+    {
+      "face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1326,
+          1476,
+          76,
+          954,
+          856
+        ]
+      },
+      "identity": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb",
+      "total_count": 4,
+      "total_quotient": [
+        {
+          "count": 4,
+          "quotient": "1/3",
+          "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+        },
+        {
+          "count": 8,
+          "quotient": "2/3",
+          "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+        }
+      ]
+    },
+    {
+      "face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "identity": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078",
+      "total_count": 8,
+      "total_quotient": [
+        {
+          "count": 4,
+          "quotient": "1/3",
+          "taxon": "07b8af3a11c871886bc340d6cf50a838e67941d7d64e64f2e0d09bef8ec60deb"
+        },
+        {
+          "count": 8,
+          "quotient": "2/3",
+          "taxon": "75c4495f7574995dc31816a84c07173f33d9ed155a3730a2763d7e1666f8e078"
+        }
+      ]
+    }
+  ],
+  "training_law": {
+    "feature_order": [
+      "operation",
+      "context",
+      "condition"
+    ],
+    "fold": "add the actual interface/taxon occurrence with exact integer count",
+    "numerical_law": "integer counts and reduced exact rational quotients only",
+    "prediction": "the exact recurrence distribution at the deepest applicable node; an unseen branch falls back to its parent distribution",
+    "reduce": "build in declared feature order, elide an axis whose observed branches have equal normalized continuation shape, merge their exact counts, and intern identical counted subtrees",
+    "relations": [
+      "NONE",
+      "RIDE",
+      "OPEN_INCLUDED",
+      "OPEN_RESIDUAL"
+    ],
+    "taxon_identity": "SHA-256 of the exact canonical receiver face under eros-receiver-taxon-v1"
+  }
+}

@@ -310,7 +310,7 @@ pub fn passage_support(circuit: &ConditionedCircuit, passage: &Passage) -> BTree
 
 /// The derived passages, grouped by the bridge they carry: statement, licensing stem and brought
 /// identifier. Members of one group differ **only** in the standing declaration they extend.
-fn bridge_groups<'a>(passages: &'a [Passage]) -> BTreeMap<(String, String, String), Vec<&'a Passage>> {
+fn bridge_groups(passages: &[Passage]) -> BTreeMap<(String, String, String), Vec<&Passage>> {
     let mut grouped: BTreeMap<(String, String, String), Vec<&Passage>> = BTreeMap::new();
     for passage in passages {
         if let PassageOrigin::Derived { stem, brought, .. } = &passage.origin {
@@ -332,7 +332,7 @@ fn bridge_groups<'a>(passages: &'a [Passage]) -> BTreeMap<(String, String, Strin
 
 /// The derived passages, grouped by the route they extend: statement, licensing stem and the
 /// standing declaration. Members of one group differ **only** in what they brought.
-fn route_groups<'a>(passages: &'a [Passage]) -> BTreeMap<(String, String, String), Vec<&'a Passage>> {
+fn route_groups(passages: &[Passage]) -> BTreeMap<(String, String, String), Vec<&Passage>> {
     let mut grouped: BTreeMap<(String, String, String), Vec<&Passage>> = BTreeMap::new();
     for passage in passages {
         if let PassageOrigin::Derived { stem, reaches, .. } = &passage.origin {

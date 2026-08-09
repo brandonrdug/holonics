@@ -1,0 +1,363 @@
+{
+  "provenance": {
+    "kind": "RECOVERED",
+    "recovered_from_repository": "/home/b/Workspaces/laboratory (frozen)",
+    "recovered_from_commit": "a07ff376",
+    "recovered_from_path": "src/soma/observations/eros-holonic-execution-paths-01/SOURCE.json",
+    "recovered_bytes": 8260,
+    "note": "Recovered whole from the frozen laboratory. Every member below this one is the laboratory's own content; this `provenance` member is the only addition and the driver's deserializer ignores it. Nothing here was authored or measured in the holonics repository."
+  },
+  "schema": "eros.holonic-execution-paths.source.v1",
+  "observation_id": "eros-holonic-execution-paths-01",
+  "base_carrier": {
+    "constituent_source": "exact inscription spans and every recurrent binary presentation",
+    "execution_source": "complete typed causal paths returned by the bounded world",
+    "causal_numeric_data": "integers and exact octets only",
+    "floating_point": false
+  },
+  "lambda": {
+    "minimum_constituent_recurrence": 2,
+    "minimum_path_recurrence": 2,
+    "parameter_axes": [
+      "medium",
+      "objective"
+    ],
+    "surface_law": "ordered source faces divide an inscription into exact constant segments and open literal slots",
+    "path_law": "the complete typed DAG is retained; a later inscription binds its slots and re-enacts that DAG",
+    "receiver_law": "retain every afforded path on the maximal exact parameter-agreement face",
+    "reduction_law": "the next ecology is the sole outgoing factor; source paths and replaced ecologies depart"
+  },
+  "training_paths": [
+    {
+      "ordinal": 0,
+      "id": "arithmetic-1-plus-2",
+      "inscription": "1+2",
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "arithmetic"
+      },
+      "nodes": [
+        {
+          "kind": "literal",
+          "source_face": "1",
+          "value": {
+            "kind": "integer",
+            "exact": "1"
+          }
+        },
+        {
+          "kind": "literal",
+          "source_face": "2",
+          "value": {
+            "kind": "integer",
+            "exact": "2"
+          }
+        },
+        {
+          "kind": "binary",
+          "operation": "add_integer",
+          "left": 0,
+          "right": 1
+        },
+        {
+          "kind": "return",
+          "source": 2
+        }
+      ],
+      "expected_output": {
+        "kind": "integer",
+        "exact": "3"
+      }
+    },
+    {
+      "ordinal": 1,
+      "id": "arithmetic-1-plus-3",
+      "inscription": "1+3",
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "arithmetic"
+      },
+      "nodes": [
+        {
+          "kind": "literal",
+          "source_face": "1",
+          "value": {
+            "kind": "integer",
+            "exact": "1"
+          }
+        },
+        {
+          "kind": "literal",
+          "source_face": "3",
+          "value": {
+            "kind": "integer",
+            "exact": "3"
+          }
+        },
+        {
+          "kind": "binary",
+          "operation": "add_integer",
+          "left": 0,
+          "right": 1
+        },
+        {
+          "kind": "return",
+          "source": 2
+        }
+      ],
+      "expected_output": {
+        "kind": "integer",
+        "exact": "4"
+      }
+    },
+    {
+      "ordinal": 2,
+      "id": "arithmetic-2-plus-2",
+      "inscription": "2+2",
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "arithmetic"
+      },
+      "nodes": [
+        {
+          "kind": "literal",
+          "source_face": "2",
+          "value": {
+            "kind": "integer",
+            "exact": "2"
+          }
+        },
+        {
+          "kind": "literal",
+          "source_face": "2",
+          "value": {
+            "kind": "integer",
+            "exact": "2"
+          }
+        },
+        {
+          "kind": "binary",
+          "operation": "add_integer",
+          "left": 0,
+          "right": 1
+        },
+        {
+          "kind": "return",
+          "source": 2
+        }
+      ],
+      "expected_output": {
+        "kind": "integer",
+        "exact": "4"
+      }
+    },
+    {
+      "ordinal": 3,
+      "id": "concatenate-1-plus-2",
+      "inscription": "1+2",
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "concatenate"
+      },
+      "nodes": [
+        {
+          "kind": "literal",
+          "source_face": "1",
+          "value": {
+            "kind": "text",
+            "exact": "1"
+          }
+        },
+        {
+          "kind": "literal",
+          "source_face": "2",
+          "value": {
+            "kind": "text",
+            "exact": "2"
+          }
+        },
+        {
+          "kind": "binary",
+          "operation": "concatenate_text",
+          "left": 0,
+          "right": 1
+        },
+        {
+          "kind": "return",
+          "source": 2
+        }
+      ],
+      "expected_output": {
+        "kind": "text",
+        "exact": "12"
+      }
+    },
+    {
+      "ordinal": 4,
+      "id": "concatenate-1-plus-3",
+      "inscription": "1+3",
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "concatenate"
+      },
+      "nodes": [
+        {
+          "kind": "literal",
+          "source_face": "1",
+          "value": {
+            "kind": "text",
+            "exact": "1"
+          }
+        },
+        {
+          "kind": "literal",
+          "source_face": "3",
+          "value": {
+            "kind": "text",
+            "exact": "3"
+          }
+        },
+        {
+          "kind": "binary",
+          "operation": "concatenate_text",
+          "left": 0,
+          "right": 1
+        },
+        {
+          "kind": "return",
+          "source": 2
+        }
+      ],
+      "expected_output": {
+        "kind": "text",
+        "exact": "13"
+      }
+    },
+    {
+      "ordinal": 5,
+      "id": "concatenate-2-plus-2",
+      "inscription": "2+2",
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "concatenate"
+      },
+      "nodes": [
+        {
+          "kind": "literal",
+          "source_face": "2",
+          "value": {
+            "kind": "text",
+            "exact": "2"
+          }
+        },
+        {
+          "kind": "literal",
+          "source_face": "2",
+          "value": {
+            "kind": "text",
+            "exact": "2"
+          }
+        },
+        {
+          "kind": "binary",
+          "operation": "concatenate_text",
+          "left": 0,
+          "right": 1
+        },
+        {
+          "kind": "return",
+          "source": 2
+        }
+      ],
+      "expected_output": {
+        "kind": "text",
+        "exact": "22"
+      }
+    }
+  ],
+  "source_absent_probes": [
+    {
+      "id": "unseen-arithmetic",
+      "inscription": "1+4",
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "arithmetic"
+      },
+      "expected_outputs": [
+        {
+          "kind": "integer",
+          "exact": "5"
+        }
+      ],
+      "expected_candidate_count": 1,
+      "required_active_fold": "1+"
+    },
+    {
+      "id": "unseen-concatenation",
+      "inscription": "1+4",
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "concatenate"
+      },
+      "expected_outputs": [
+        {
+          "kind": "text",
+          "exact": "14"
+        }
+      ],
+      "expected_candidate_count": 1,
+      "required_active_fold": "1+"
+    },
+    {
+      "id": "withheld-objective",
+      "inscription": "1+4",
+      "parameters": {
+        "medium": "symbolic"
+      },
+      "expected_outputs": [
+        {
+          "kind": "integer",
+          "exact": "5"
+        },
+        {
+          "kind": "text",
+          "exact": "14"
+        }
+      ],
+      "expected_candidate_count": 2,
+      "required_active_fold": "1+"
+    },
+    {
+      "id": "plural-surface-bindings",
+      "inscription": "1+2+3",
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "concatenate"
+      },
+      "expected_outputs": [
+        {
+          "kind": "text",
+          "exact": "12+3"
+        },
+        {
+          "kind": "text",
+          "exact": "1+23"
+        }
+      ],
+      "expected_candidate_count": 2,
+      "required_active_fold": "1+"
+    },
+    {
+      "id": "unafforded-surface",
+      "inscription": "1*4",
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "arithmetic"
+      },
+      "expected_outputs": [],
+      "expected_candidate_count": 0,
+      "required_active_fold": null
+    }
+  ],
+  "stopping_condition": "Stop when one source-absent remount re-instantiates the complete ADD path for unseen 1+4 and returns exact 5, the same surface under CONCAT returns text 14, withholding objective preserves both, ambiguous slot placement stays plural, an unafforded surface returns no path, all teacher and replaced carriers depart, and the complete ecology survives exact rest."
+}

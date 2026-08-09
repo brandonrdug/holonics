@@ -258,15 +258,14 @@ pub fn decode_native_bytes(
         let mut previous: Option<u64> = None;
         for _ in 0..event_count {
             let event = cursor.u64("source event")?;
-            if let Some(previous) = previous {
-                if event <= previous {
+            if let Some(previous) = previous
+                && event <= previous {
                     return Err(GradedComplexFormError::NotAscending {
                         field: "source events",
                         previous,
                         found: event,
                     });
                 }
-            }
             previous = Some(event);
             source_events.insert(EventId(event));
         }
@@ -276,15 +275,14 @@ pub fn decode_native_bytes(
         let mut previous: Option<u64> = None;
         for _ in 0..term_count {
             let face = cursor.u64("term cell")?;
-            if let Some(previous) = previous {
-                if face <= previous {
+            if let Some(previous) = previous
+                && face <= previous {
                     return Err(GradedComplexFormError::NotAscending {
                         field: "boundary terms",
                         previous,
                         found: face,
                     });
                 }
-            }
             previous = Some(face);
             let positive = cursor.magnitude("positive")?;
             let negative = cursor.magnitude("negative")?;

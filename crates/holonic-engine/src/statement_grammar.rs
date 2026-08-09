@@ -887,7 +887,7 @@ pub fn recover(
                     let start = at;
                     while at < leading.through
                         && !(bytes[at] as char).is_whitespace()
-                        && !(bytes[at] as char == open)
+                        && (bytes[at] as char != open)
                     {
                         at += 1;
                     }
@@ -957,14 +957,13 @@ pub fn recover(
                         occupant: text.clone(),
                     })
                     .collect();
-                if let Some((open, _)) = bracket {
-                    if arguments
+                if let Some((open, _)) = bracket
+                    && arguments
                         .iter()
                         .any(|slot| slot.occupant.starts_with(open))
                     {
                         argument_carried_a_group = true;
                     }
-                }
                 heads
                     .entry(head.occupant.clone())
                     .or_default()

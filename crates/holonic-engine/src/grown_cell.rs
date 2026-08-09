@@ -674,7 +674,7 @@ impl Body<'_, '_> {
         for shape in declared {
             let width = shape
                 .width(&arguments)
-                .map_err(|refusal| BodyStop::Refused(refusal))?;
+                .map_err(BodyStop::Refused)?;
             outputs.push(self.grower.fresh_bus(width));
         }
         let id = InstanceId(self.grower.instances.len() as u64 + 1);
@@ -1897,7 +1897,7 @@ pub fn found_complex(
             }
         }
         for (name, boundary) in proposals {
-            for (_, coefficient) in boundary.coefficients() {
+            for coefficient in boundary.coefficients().values() {
                 let magnitude = coefficient.difference().magnitude().clone();
                 if magnitude > largest {
                     largest = magnitude;

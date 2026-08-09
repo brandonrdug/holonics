@@ -779,8 +779,8 @@ pub fn adjudicate(
             },
         ));
     }
-    if candidate.species == CompositionSpecies::ArgumentApplication {
-        if let Some(bound) = grammar.aperture().iter().find(|bound| {
+    if candidate.species == CompositionSpecies::ArgumentApplication
+        && let Some(bound) = grammar.aperture().iter().find(|bound| {
             matches!(
                 bound,
                 GrammarAperture::ArgumentPositionNeverCarriedAnApplication { .. }
@@ -792,7 +792,6 @@ pub fn adjudicate(
                 },
             ));
         }
-    }
 
     // 2. the lengths the population founds
     if matches!(
@@ -877,8 +876,8 @@ pub fn adjudicate(
 
     // what the grammar does not certify about the admission, carried rather than erased
     let mut carried_aperture = Vec::new();
-    if let Some(reading) = grammar.reading(&candidate.from) {
-        if let Some(BodyReading::Applied { head, .. }) = &reading.body {
+    if let Some(reading) = grammar.reading(&candidate.from)
+        && let Some(BodyReading::Applied { head, .. }) = &reading.body {
             let composed_head = if candidate.slot == Some(SlotSpecies::BodyHead) {
                 candidate.brought.clone()
             } else {
@@ -888,7 +887,6 @@ pub fn adjudicate(
                 carried_aperture.push(bound);
             }
         }
-    }
 
     Ok(StatementAdmission::Admitted {
         licences: found,

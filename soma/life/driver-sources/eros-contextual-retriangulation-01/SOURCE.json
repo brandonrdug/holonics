@@ -1,0 +1,1642 @@
+{
+  "provenance": {
+    "kind": "RECOVERED",
+    "recovered_from_repository": "/home/b/Workspaces/laboratory (frozen)",
+    "recovered_from_commit": "a07ff376",
+    "recovered_from_path": "src/soma/observations/eros-contextual-retriangulation-01/SOURCE.json",
+    "recovered_bytes": 49911,
+    "note": "Recovered whole from the frozen laboratory. Every member below this one is the laboratory's own content; this `provenance` member is the only addition and the driver's deserializer ignores it. Nothing here was authored or measured in the holonics repository."
+  },
+  "chart_law": {
+    "changed_operation_prefix": "reverse_then_drop.",
+    "law_shape": [
+      6,
+      5
+    ],
+    "layer": 7,
+    "pivot_factors": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "pivot_selection": "scan source-factor ordinals once from zero and retain a column exactly when it raises rational rank on the six conversation/prose training currents; stop at full rank; do not search alternate charts",
+    "rank": 6,
+    "receiver_axes": [
+      76,
+      856,
+      954,
+      1326,
+      1476
+    ],
+    "related_holdout_context": "code_comment",
+    "source_factor_count": 8192,
+    "training_contexts": [
+      "conversation",
+      "prose"
+    ]
+  },
+  "coefficient_extent": {
+    "count": 30,
+    "maximum_denominator_bits": 81,
+    "maximum_numerator_bits": 86
+  },
+  "contexts": [
+    {
+      "capture": {
+        "bytes": 69057360,
+        "path": "experiments/informant-ecology/runs/transformer-relational-field-01/captures/drop_then_reverse.conversation.absent.safetensors",
+        "sha256": "f1bfcb750a1295439974e9fcecbe3a54a9867ad5cb228cb0210e3f03be1f97c5"
+      },
+      "condition": "absent",
+      "context": "conversation",
+      "current_id": "drop_then_reverse.conversation.absent",
+      "derived_prediction": {
+        "equals_factorized_output": true,
+        "exact_output": [
+          "-1240944236393/8796093022208",
+          "-7988787867389/4398046511104",
+          "-28142963623631/140737488355328",
+          "883502513491/4398046511104",
+          "3147079804039/17592186044416"
+        ],
+        "face": {
+          "orientation": [
+            "negative",
+            "negative",
+            "negative",
+            "positive",
+            "positive"
+          ],
+          "signed_axis_order": [
+            1326,
+            1476,
+            76,
+            954,
+            856
+          ]
+        },
+        "factorized_face_rides": true,
+        "factorized_residual": [
+          {
+            "prediction": "-1240944236393/8796093022208",
+            "target": "-1240944236393/8796093022208",
+            "target_minus_prediction": "0"
+          },
+          {
+            "prediction": "-7988787867389/4398046511104",
+            "target": "-7988787867389/4398046511104",
+            "target_minus_prediction": "0"
+          },
+          {
+            "prediction": "-28142963623631/140737488355328",
+            "target": "-28142963623631/140737488355328",
+            "target_minus_prediction": "0"
+          },
+          {
+            "prediction": "883502513491/4398046511104",
+            "target": "883502513491/4398046511104",
+            "target_minus_prediction": "0"
+          },
+          {
+            "prediction": "3147079804039/17592186044416",
+            "target": "3147079804039/17592186044416",
+            "target_minus_prediction": "0"
+          }
+        ],
+        "observed_face_rides": true
+      },
+      "group": "training",
+      "phase": "cultivation",
+      "pivot_activation_words": [
+        48464,
+        15496,
+        48285,
+        47804,
+        15512,
+        15088
+      ],
+      "prompt_extent": 136,
+      "prompt_sha256": "c2c4299fddb15b178438da6b674e104acafdef30f464ce4945e57591141d5c94",
+      "receiver_position": 135,
+      "target_factorized_exact_output": [
+        "-1240944236393/8796093022208",
+        "-7988787867389/4398046511104",
+        "-28142963623631/140737488355328",
+        "883502513491/4398046511104",
+        "3147079804039/17592186044416"
+      ],
+      "target_factorized_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1326,
+          1476,
+          76,
+          954,
+          856
+        ]
+      },
+      "target_observed_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1326,
+          1476,
+          76,
+          954,
+          856
+        ]
+      },
+      "target_observed_output_words": [
+        48656,
+        49129,
+        48717,
+        15950,
+        15927
+      ]
+    },
+    {
+      "capture": {
+        "bytes": 126159768,
+        "path": "experiments/informant-ecology/runs/transformer-relational-field-01/captures/drop_then_reverse.conversation.irrelevant_before.safetensors",
+        "sha256": "91e400d6f4810cc1848e4d9ef7014582538e4a5e5c0942b49a487c8b29b5b665"
+      },
+      "condition": "irrelevant_before",
+      "context": "conversation",
+      "current_id": "drop_then_reverse.conversation.irrelevant_before",
+      "derived_prediction": {
+        "equals_factorized_output": true,
+        "exact_output": [
+          "-638188489601/4398046511104",
+          "-4139192403693/2199023255552",
+          "-6777597405/34359738368",
+          "195569386353/1099511627776",
+          "913906245171/4398046511104"
+        ],
+        "face": {
+          "orientation": [
+            "negative",
+            "negative",
+            "negative",
+            "positive",
+            "positive"
+          ],
+          "signed_axis_order": [
+            1476,
+            1326,
+            76,
+            954,
+            856
+          ]
+        },
+        "factorized_face_rides": true,
+        "factorized_residual": [
+          {
+            "prediction": "-638188489601/4398046511104",
+            "target": "-638188489601/4398046511104",
+            "target_minus_prediction": "0"
+          },
+          {
+            "prediction": "-4139192403693/2199023255552",
+            "target": "-4139192403693/2199023255552",
+            "target_minus_prediction": "0"
+          },
+          {
+            "prediction": "-6777597405/34359738368",
+            "target": "-6777597405/34359738368",
+            "target_minus_prediction": "0"
+          },
+          {
+            "prediction": "195569386353/1099511627776",
+            "target": "195569386353/1099511627776",
+            "target_minus_prediction": "0"
+          },
+          {
+            "prediction": "913906245171/4398046511104",
+            "target": "913906245171/4398046511104",
+            "target_minus_prediction": "0"
+          }
+        ],
+        "observed_face_rides": true
+      },
+      "group": "training",
+      "phase": "cultivation",
+      "pivot_activation_words": [
+        48533,
+        15531,
+        48282,
+        48036,
+        15466,
+        48006
+      ],
+      "prompt_extent": 254,
+      "prompt_sha256": "ddbefe18d8f48e555cc79cd32fed3aa556dc8c16b80b42d2a40a2cd2ace9b5d0",
+      "receiver_position": 253,
+      "target_factorized_exact_output": [
+        "-638188489601/4398046511104",
+        "-4139192403693/2199023255552",
+        "-6777597405/34359738368",
+        "195569386353/1099511627776",
+        "913906245171/4398046511104"
+      ],
+      "target_factorized_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "target_observed_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "target_observed_output_words": [
+        48661,
+        49137,
+        48714,
+        15926,
+        15957
+      ]
+    },
+    {
+      "capture": {
+        "bytes": 125025168,
+        "path": "experiments/informant-ecology/runs/transformer-relational-field-01/captures/drop_then_reverse.conversation.relevant_after.safetensors",
+        "sha256": "88973d8a0573500b9fd9a40c8be88eeea5bb91dabaa8799d164646bfa175945b"
+      },
+      "condition": "relevant_after",
+      "context": "conversation",
+      "current_id": "drop_then_reverse.conversation.relevant_after",
+      "derived_prediction": {
+        "equals_factorized_output": true,
+        "exact_output": [
+          "-655120172113/4398046511104",
+          "-14831794213/8589934592",
+          "-14025334517759/70368744177664",
+          "191091504877/1099511627776",
+          "859453757325/4398046511104"
+        ],
+        "face": {
+          "orientation": [
+            "negative",
+            "negative",
+            "negative",
+            "positive",
+            "positive"
+          ],
+          "signed_axis_order": [
+            1476,
+            1326,
+            76,
+            954,
+            856
+          ]
+        },
+        "factorized_face_rides": true,
+        "factorized_residual": [
+          {
+            "prediction": "-655120172113/4398046511104",
+            "target": "-655120172113/4398046511104",
+            "target_minus_prediction": "0"
+          },
+          {
+            "prediction": "-14831794213/8589934592",
+            "target": "-14831794213/8589934592",
+            "target_minus_prediction": "0"
+          },
+          {
+            "prediction": "-14025334517759/70368744177664",
+            "target": "-14025334517759/70368744177664",
+            "target_minus_prediction": "0"
+          },
+          {
+            "prediction": "191091504877/1099511627776",
+            "target": "191091504877/1099511627776",
+            "target_minus_prediction": "0"
+          },
+          {
+            "prediction": "859453757325/4398046511104",
+            "target": "859453757325/4398046511104",
+            "target_minus_prediction": "0"
+          }
+        ],
+        "observed_face_rides": true
+      },
+      "group": "training",
+      "phase": "cultivation",
+      "pivot_activation_words": [
+        48473,
+        15250,
+        47972,
+        48051,
+        15517,
+        48026
+      ],
+      "prompt_extent": 253,
+      "prompt_sha256": "9166d999c4c3c6f7e5f93d444c133f900aacc2ef35d64eace111e3f53e88c4a3",
+      "receiver_position": 252,
+      "target_factorized_exact_output": [
+        "-655120172113/4398046511104",
+        "-14831794213/8589934592",
+        "-14025334517759/70368744177664",
+        "191091504877/1099511627776",
+        "859453757325/4398046511104"
+      ],
+      "target_factorized_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "target_observed_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "target_observed_output_words": [
+        48664,
+        49117,
+        48716,
+        15922,
+        15944
+      ]
+    },
+    {
+      "capture": {
+        "bytes": 74529608,
+        "path": "experiments/informant-ecology/runs/transformer-relational-field-01/captures/drop_then_reverse.prose.absent.safetensors",
+        "sha256": "187480ad9f0b89907089903ac4726bd629a71a561cb431f7030ad08ece44e299"
+      },
+      "condition": "absent",
+      "context": "prose",
+      "current_id": "drop_then_reverse.prose.absent",
+      "derived_prediction": {
+        "equals_factorized_output": true,
+        "exact_output": [
+          "-305162492095/2199023255552",
+          "-223933752651/137438953472",
+          "-897616483501/4398046511104",
+          "7045962874999/35184372088832",
+          "6406138111885/35184372088832"
+        ],
+        "face": {
+          "orientation": [
+            "negative",
+            "negative",
+            "negative",
+            "positive",
+            "positive"
+          ],
+          "signed_axis_order": [
+            1326,
+            1476,
+            76,
+            954,
+            856
+          ]
+        },
+        "factorized_face_rides": true,
+        "factorized_residual": [
+          {
+            "prediction": "-305162492095/2199023255552",
+            "target": "-305162492095/2199023255552",
+            "target_minus_prediction": "0"
+          },
+          {
+            "prediction": "-223933752651/137438953472",
+            "target": "-223933752651/137438953472",
+            "target_minus_prediction": "0"
+          },
+          {
+            "prediction": "-897616483501/4398046511104",
+            "target": "-897616483501/4398046511104",
+            "target_minus_prediction": "0"
+          },
+          {
+            "prediction": "7045962874999/35184372088832",
+            "target": "7045962874999/35184372088832",
+            "target_minus_prediction": "0"
+          },
+          {
+            "prediction": "6406138111885/35184372088832",
+            "target": "6406138111885/35184372088832",
+            "target_minus_prediction": "0"
+          }
+        ],
+        "observed_face_rides": true
+      },
+      "group": "training",
+      "phase": "cultivation",
+      "pivot_activation_words": [
+        48518,
+        15385,
+        48378,
+        48126,
+        15475,
+        48006
+      ],
+      "prompt_extent": 142,
+      "prompt_sha256": "b9e492315bf80db3afa257f2e62b12a641e873faad399e8352ba8da15c109117",
+      "receiver_position": 141,
+      "target_factorized_exact_output": [
+        "-305162492095/2199023255552",
+        "-223933752651/137438953472",
+        "-897616483501/4398046511104",
+        "7045962874999/35184372088832",
+        "6406138111885/35184372088832"
+      ],
+      "target_factorized_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1326,
+          1476,
+          76,
+          954,
+          856
+        ]
+      },
+      "target_observed_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1326,
+          1476,
+          76,
+          954,
+          856
+        ]
+      },
+      "target_observed_output_words": [
+        48654,
+        49105,
+        48721,
+        15949,
+        15930
+      ]
+    },
+    {
+      "capture": {
+        "bytes": 128961424,
+        "path": "experiments/informant-ecology/runs/transformer-relational-field-01/captures/drop_then_reverse.prose.irrelevant_before.safetensors",
+        "sha256": "9ffa1c63c647ae973d9d701830e045a0e9d8477aa3ec8aff68bb01787948a2d4"
+      },
+      "condition": "irrelevant_before",
+      "context": "prose",
+      "current_id": "drop_then_reverse.prose.irrelevant_before",
+      "derived_prediction": {
+        "equals_factorized_output": true,
+        "exact_output": [
+          "-2646485945429/17592186044416",
+          "-1840138011625/1099511627776",
+          "-3503330741777/17592186044416",
+          "2917562810911/17592186044416",
+          "421547205385/2199023255552"
+        ],
+        "face": {
+          "orientation": [
+            "negative",
+            "negative",
+            "negative",
+            "positive",
+            "positive"
+          ],
+          "signed_axis_order": [
+            1476,
+            1326,
+            76,
+            954,
+            856
+          ]
+        },
+        "factorized_face_rides": true,
+        "factorized_residual": [
+          {
+            "prediction": "-2646485945429/17592186044416",
+            "target": "-2646485945429/17592186044416",
+            "target_minus_prediction": "0"
+          },
+          {
+            "prediction": "-1840138011625/1099511627776",
+            "target": "-1840138011625/1099511627776",
+            "target_minus_prediction": "0"
+          },
+          {
+            "prediction": "-3503330741777/17592186044416",
+            "target": "-3503330741777/17592186044416",
+            "target_minus_prediction": "0"
+          },
+          {
+            "prediction": "2917562810911/17592186044416",
+            "target": "2917562810911/17592186044416",
+            "target_minus_prediction": "0"
+          },
+          {
+            "prediction": "421547205385/2199023255552",
+            "target": "421547205385/2199023255552",
+            "target_minus_prediction": "0"
+          }
+        ],
+        "observed_face_rides": true
+      },
+      "group": "training",
+      "phase": "cultivation",
+      "pivot_activation_words": [
+        48529,
+        15463,
+        48396,
+        48184,
+        15042,
+        48170
+      ],
+      "prompt_extent": 260,
+      "prompt_sha256": "3831d5a5969d70bda7dee0a21284035b3d56f02793b5dffef672f85b27888e9a",
+      "receiver_position": 259,
+      "target_factorized_exact_output": [
+        "-2646485945429/17592186044416",
+        "-1840138011625/1099511627776",
+        "-3503330741777/17592186044416",
+        "2917562810911/17592186044416",
+        "421547205385/2199023255552"
+      ],
+      "target_factorized_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "target_observed_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "target_observed_output_words": [
+        48666,
+        49111,
+        48716,
+        15914,
+        15941
+      ]
+    },
+    {
+      "capture": {
+        "bytes": 127826832,
+        "path": "experiments/informant-ecology/runs/transformer-relational-field-01/captures/drop_then_reverse.prose.relevant_after.safetensors",
+        "sha256": "f7f7dc737e710f736327f56248f34f0f44e15dd014545b41aa05d59de6571141"
+      },
+      "condition": "relevant_after",
+      "context": "prose",
+      "current_id": "drop_then_reverse.prose.relevant_after",
+      "derived_prediction": {
+        "equals_factorized_output": true,
+        "exact_output": [
+          "-10834102540603/70368744177664",
+          "-29144474745615/17592186044416",
+          "-3523726433937/17592186044416",
+          "1559441248645/8796093022208",
+          "196259591323/1099511627776"
+        ],
+        "face": {
+          "orientation": [
+            "negative",
+            "negative",
+            "negative",
+            "positive",
+            "positive"
+          ],
+          "signed_axis_order": [
+            1476,
+            1326,
+            76,
+            954,
+            856
+          ]
+        },
+        "factorized_face_rides": true,
+        "factorized_residual": [
+          {
+            "prediction": "-10834102540603/70368744177664",
+            "target": "-10834102540603/70368744177664",
+            "target_minus_prediction": "0"
+          },
+          {
+            "prediction": "-29144474745615/17592186044416",
+            "target": "-29144474745615/17592186044416",
+            "target_minus_prediction": "0"
+          },
+          {
+            "prediction": "-3523726433937/17592186044416",
+            "target": "-3523726433937/17592186044416",
+            "target_minus_prediction": "0"
+          },
+          {
+            "prediction": "1559441248645/8796093022208",
+            "target": "1559441248645/8796093022208",
+            "target_minus_prediction": "0"
+          },
+          {
+            "prediction": "196259591323/1099511627776",
+            "target": "196259591323/1099511627776",
+            "target_minus_prediction": "0"
+          }
+        ],
+        "observed_face_rides": true
+      },
+      "group": "training",
+      "phase": "cultivation",
+      "pivot_activation_words": [
+        48480,
+        15274,
+        48133,
+        48134,
+        15306,
+        47919
+      ],
+      "prompt_extent": 259,
+      "prompt_sha256": "d9c07eda4b386bffb1f844a197587c9c8b100a2f02de2987655d673c37bd2cef",
+      "receiver_position": 258,
+      "target_factorized_exact_output": [
+        "-10834102540603/70368744177664",
+        "-29144474745615/17592186044416",
+        "-3523726433937/17592186044416",
+        "1559441248645/8796093022208",
+        "196259591323/1099511627776"
+      ],
+      "target_factorized_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "target_observed_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "target_observed_output_words": [
+        48669,
+        49108,
+        48717,
+        15926,
+        15927
+      ]
+    },
+    {
+      "capture": {
+        "bytes": 71994192,
+        "path": "experiments/informant-ecology/runs/transformer-relational-field-01/captures/drop_then_reverse.code_comment.absent.safetensors",
+        "sha256": "3ee90567622ee97e9bc652cc688643539f7a51d000bd9e4778735ba5c5f38c1b"
+      },
+      "condition": "absent",
+      "context": "code_comment",
+      "current_id": "drop_then_reverse.code_comment.absent",
+      "derived_prediction": {
+        "equals_factorized_output": false,
+        "exact_output": [
+          "113296190671658860627980961/1874130046882540292270981120",
+          "73251275279942283923706473/234266255860317536533872640",
+          "970260356767459005962155969/44979121125180967014503546880",
+          "69024529201984328762605331/1405597535161905219203235840",
+          "-17091219767855847065214001/5622390140647620876812943360"
+        ],
+        "face": {
+          "orientation": [
+            "positive",
+            "positive",
+            "positive",
+            "positive",
+            "negative"
+          ],
+          "signed_axis_order": [
+            856,
+            76,
+            1326,
+            954,
+            1476
+          ]
+        },
+        "factorized_face_rides": false,
+        "factorized_residual": [
+          {
+            "prediction": "113296190671658860627980961/1874130046882540292270981120",
+            "target": "-2260171296121/17592186044416",
+            "target_minus_prediction": "-354076667098369898520503931/1874130046882540292270981120"
+          },
+          {
+            "prediction": "73251275279942283923706473/234266255860317536533872640",
+            "target": "-3722481860303/2199023255552",
+            "target_minus_prediction": "-469814561147617414678041183/234266255860317536533872640"
+          },
+          {
+            "prediction": "970260356767459005962155969/44979121125180967014503546880",
+            "target": "-3240577402145/17592186044416",
+            "target_minus_prediction": "-9255661791165653597619419569/44979121125180967014503546880"
+          },
+          {
+            "prediction": "69024529201984328762605331/1405597535161905219203235840",
+            "target": "1952872354289/8796093022208",
+            "target_minus_prediction": "60760111978188394327730191/351399383790476304800808960"
+          },
+          {
+            "prediction": "-17091219767855847065214001/5622390140647620876812943360",
+            "target": "14415631992359/70368744177664",
+            "target_minus_prediction": "2337770719594008800494173947/11244780281295241753625886720"
+          }
+        ],
+        "observed_face_rides": false
+      },
+      "group": "related_holdout",
+      "phase": "cultivation",
+      "pivot_activation_words": [
+        48529,
+        15493,
+        48404,
+        47999,
+        15200,
+        15316
+      ],
+      "prompt_extent": 138,
+      "prompt_sha256": "a360a3b2e478833bd7c85e8f95026653a31353ecfab7e32460f64973fc38106e",
+      "receiver_position": 137,
+      "target_factorized_exact_output": [
+        "-2260171296121/17592186044416",
+        "-3722481860303/2199023255552",
+        "-3240577402145/17592186044416",
+        "1952872354289/8796093022208",
+        "14415631992359/70368744177664"
+      ],
+      "target_factorized_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1326,
+          1476,
+          76,
+          954,
+          856
+        ]
+      },
+      "target_observed_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1326,
+          1476,
+          76,
+          954,
+          856
+        ]
+      },
+      "target_observed_output_words": [
+        48644,
+        49113,
+        48701,
+        15971,
+        15954
+      ]
+    },
+    {
+      "capture": {
+        "bytes": 126426008,
+        "path": "experiments/informant-ecology/runs/transformer-relational-field-01/captures/drop_then_reverse.code_comment.irrelevant_before.safetensors",
+        "sha256": "47b57857e907985a44a3545bd2fc1bae170c0584808505505813969ecfa02a7f"
+      },
+      "condition": "irrelevant_before",
+      "context": "code_comment",
+      "current_id": "drop_then_reverse.code_comment.irrelevant_before",
+      "derived_prediction": {
+        "equals_factorized_output": false,
+        "exact_output": [
+          "-98869319634069089018779559/937065023441270146135490560",
+          "-2525408906419163311396843287/1874130046882540292270981120",
+          "-14821724950488464436909350359/89958242250361934029007093760",
+          "8051383331119446768877892929/44979121125180967014503546880",
+          "6317533534091916970208212009/44979121125180967014503546880"
+        ],
+        "face": {
+          "orientation": [
+            "negative",
+            "negative",
+            "negative",
+            "positive",
+            "positive"
+          ],
+          "signed_axis_order": [
+            1326,
+            1476,
+            76,
+            954,
+            856
+          ]
+        },
+        "factorized_face_rides": false,
+        "factorized_residual": [
+          {
+            "prediction": "-98869319634069089018779559/937065023441270146135490560",
+            "target": "-4702305929385/35184372088832",
+            "target_minus_prediction": "-52734292567744689791710607/1874130046882540292270981120"
+          },
+          {
+            "prediction": "-2525408906419163311396843287/1874130046882540292270981120",
+            "target": "-3833038491651/2199023255552",
+            "target_minus_prediction": "-741319896890938953631917273/1874130046882540292270981120"
+          },
+          {
+            "prediction": "-14821724950488464436909350359/89958242250361934029007093760",
+            "target": "-3159789128523/17592186044416",
+            "target_minus_prediction": "-1335964330768118843335454921/89958242250361934029007093760"
+          },
+          {
+            "prediction": "8051383331119446768877892929/44979121125180967014503546880",
+            "target": "6605354602485/35184372088832",
+            "target_minus_prediction": "392793077367574502357384471/44979121125180967014503546880"
+          },
+          {
+            "prediction": "6317533534091916970208212009/44979121125180967014503546880",
+            "target": "3776025199631/17592186044416",
+            "target_minus_prediction": "3336883170979744842569316071/44979121125180967014503546880"
+          }
+        ],
+        "observed_face_rides": false
+      },
+      "group": "related_holdout",
+      "phase": "cultivation",
+      "pivot_activation_words": [
+        48537,
+        15550,
+        48468,
+        48134,
+        47523,
+        47781
+      ],
+      "prompt_extent": 256,
+      "prompt_sha256": "6d985f7e79f9fc1dc099fd54ffea119a7d3df8de84ae73879e4006984cfcf99e",
+      "receiver_position": 255,
+      "target_factorized_exact_output": [
+        "-4702305929385/35184372088832",
+        "-3833038491651/2199023255552",
+        "-3159789128523/17592186044416",
+        "6605354602485/35184372088832",
+        "3776025199631/17592186044416"
+      ],
+      "target_factorized_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "target_observed_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "target_observed_output_words": [
+        48649,
+        49119,
+        48696,
+        15937,
+        15964
+      ]
+    },
+    {
+      "capture": {
+        "bytes": 125959056,
+        "path": "experiments/informant-ecology/runs/transformer-relational-field-01/captures/drop_then_reverse.code_comment.relevant_after.safetensors",
+        "sha256": "ee280c538fb98a9e037939d7f0ef8fe6d2158b9295c0e21e51fa67fb692282cb"
+      },
+      "condition": "relevant_after",
+      "context": "code_comment",
+      "current_id": "drop_then_reverse.code_comment.relevant_after",
+      "derived_prediction": {
+        "equals_factorized_output": false,
+        "exact_output": [
+          "-45127097534101546788040947/937065023441270146135490560",
+          "-164110575065763549577408177/234266255860317536533872640",
+          "-613909330409261892048461751/7496520187530161169083924480",
+          "302538446476275597975762851/3748260093765080584541962240",
+          "405933915537120826801656021/3748260093765080584541962240"
+        ],
+        "face": {
+          "orientation": [
+            "negative",
+            "negative",
+            "negative",
+            "positive",
+            "positive"
+          ],
+          "signed_axis_order": [
+            1476,
+            1326,
+            76,
+            954,
+            856
+          ]
+        },
+        "factorized_face_rides": true,
+        "factorized_residual": [
+          {
+            "prediction": "-45127097534101546788040947/937065023441270146135490560",
+            "target": "-688286711021/4398046511104",
+            "target_minus_prediction": "-101521966173800789539190993/937065023441270146135490560"
+          },
+          {
+            "prediction": "-164110575065763549577408177/234266255860317536533872640",
+            "target": "-7265271901911/4398046511104",
+            "target_minus_prediction": "-111440625024056960640916729/117133127930158768266936320"
+          },
+          {
+            "prediction": "-613909330409261892048461751/7496520187530161169083924480",
+            "target": "-1787661892741/8796093022208",
+            "target_minus_prediction": "-909635660938191689184149209/7496520187530161169083924480"
+          },
+          {
+            "prediction": "302538446476275597975762851/3748260093765080584541962240",
+            "target": "13046332775693/70368744177664",
+            "target_minus_prediction": "196193624682284152835910327/1874130046882540292270981120"
+          },
+          {
+            "prediction": "405933915537120826801656021/3748260093765080584541962240",
+            "target": "6891195773849/35184372088832",
+            "target_minus_prediction": "328198671857825821538083909/3748260093765080584541962240"
+          }
+        ],
+        "observed_face_rides": true
+      },
+      "group": "related_holdout",
+      "phase": "cultivation",
+      "pivot_activation_words": [
+        48482,
+        15265,
+        48090,
+        48031,
+        15469,
+        48006
+      ],
+      "prompt_extent": 255,
+      "prompt_sha256": "344675535eee2e2ebbf8c5e5998acbd2b8e44dfeff564007fe64c0959425b874",
+      "receiver_position": 254,
+      "target_factorized_exact_output": [
+        "-688286711021/4398046511104",
+        "-7265271901911/4398046511104",
+        "-1787661892741/8796093022208",
+        "13046332775693/70368744177664",
+        "6891195773849/35184372088832"
+      ],
+      "target_factorized_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "target_observed_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "target_observed_output_words": [
+        48672,
+        49107,
+        48720,
+        15934,
+        15944
+      ]
+    },
+    {
+      "capture": {
+        "bytes": 126360472,
+        "path": "experiments/informant-ecology/runs/transformer-relational-field-01/captures/reverse_then_drop.conversation.relevant_before.safetensors",
+        "sha256": "d2fa9a53d2f730cd1117fb56ba905b33716c8b6190788d9f2909e838da68e82d"
+      },
+      "condition": "relevant_before",
+      "context": "conversation",
+      "current_id": "reverse_then_drop.conversation.relevant_before",
+      "derived_prediction": {
+        "equals_factorized_output": false,
+        "exact_output": [
+          "71771629051637637200755085/1499304037506032233816784896",
+          "79049121249446651284418913/374826009376508058454196224",
+          "96991572771654188018858023/2998608075012064467633569792",
+          "-3933386748450250516451489/749652018753016116908392448",
+          "18301747497958204311100211/749652018753016116908392448"
+        ],
+        "face": {
+          "orientation": [
+            "positive",
+            "positive",
+            "positive",
+            "negative",
+            "positive"
+          ],
+          "signed_axis_order": [
+            856,
+            76,
+            954,
+            1476,
+            1326
+          ]
+        },
+        "factorized_face_rides": false,
+        "factorized_residual": [
+          {
+            "prediction": "71771629051637637200755085/1499304037506032233816784896",
+            "target": "-3086783319821/17592186044416",
+            "target_minus_prediction": "-334844488935523308453420661/1499304037506032233816784896"
+          },
+          {
+            "prediction": "79049121249446651284418913/374826009376508058454196224",
+            "target": "-16332504087851/8796093022208",
+            "target_minus_prediction": "-775022585254262929585710541/374826009376508058454196224"
+          },
+          {
+            "prediction": "96991572771654188018858023/2998608075012064467633569792",
+            "target": "-837834152917/4398046511104",
+            "target_minus_prediction": "-668230701351756682169774439/2998608075012064467633569792"
+          },
+          {
+            "prediction": "-3933386748450250516451489/749652018753016116908392448",
+            "target": "796054499127/4398046511104",
+            "target_minus_prediction": "139621779493113760333668113/749652018753016116908392448"
+          },
+          {
+            "prediction": "18301747497958204311100211/749652018753016116908392448",
+            "target": "1741220916283/8796093022208",
+            "target_minus_prediction": "130094793067374273333030437/749652018753016116908392448"
+          }
+        ],
+        "observed_face_rides": false
+      },
+      "group": "changed_operation_holdout",
+      "phase": "evaluation",
+      "pivot_activation_words": [
+        48535,
+        15506,
+        48309,
+        48060,
+        47882,
+        47845
+      ],
+      "prompt_extent": 253,
+      "prompt_sha256": "4e561bb3898316f2739134d6756f786d938eb1561aa2281e85cbdacd8d9bd25a",
+      "receiver_position": 252,
+      "target_factorized_exact_output": [
+        "-3086783319821/17592186044416",
+        "-16332504087851/8796093022208",
+        "-837834152917/4398046511104",
+        "796054499127/4398046511104",
+        "1741220916283/8796093022208"
+      ],
+      "target_factorized_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "target_observed_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "target_observed_output_words": [
+        48692,
+        49134,
+        48707,
+        15929,
+        15947
+      ]
+    },
+    {
+      "capture": {
+        "bytes": 128293776,
+        "path": "experiments/informant-ecology/runs/transformer-relational-field-01/captures/reverse_then_drop.prose.relevant_before.safetensors",
+        "sha256": "2763cf09800732c568549dcfea3b3a0a29365039ace3dfced6eb1162b5cedebe"
+      },
+      "condition": "relevant_before",
+      "context": "prose",
+      "current_id": "reverse_then_drop.prose.relevant_before",
+      "derived_prediction": {
+        "equals_factorized_output": false,
+        "exact_output": [
+          "-290269550499296316734659019/937065023441270146135490560",
+          "-373337057472829690448178967/117133127930158768266936320",
+          "-1429443453089950002500403851/3748260093765080584541962240",
+          "593262345460957313542432211/1874130046882540292270981120",
+          "585109461940461120365789511/1874130046882540292270981120"
+        ],
+        "face": {
+          "orientation": [
+            "negative",
+            "negative",
+            "negative",
+            "positive",
+            "positive"
+          ],
+          "signed_axis_order": [
+            1326,
+            1476,
+            76,
+            954,
+            856
+          ]
+        },
+        "factorized_face_rides": false,
+        "factorized_residual": [
+          {
+            "prediction": "-290269550499296316734659019/937065023441270146135490560",
+            "target": "-1570133962029/8796093022208",
+            "target_minus_prediction": "123000103232206329209936489/937065023441270146135490560"
+          },
+          {
+            "prediction": "-373337057472829690448178967/117133127930158768266936320",
+            "target": "-14541230250385/8796093022208",
+            "target_minus_prediction": "718795355618650992264961143/468532511720635073067745280"
+          },
+          {
+            "prediction": "-1429443453089950002500403851/3748260093765080584541962240",
+            "target": "-6819457630801/35184372088832",
+            "target_minus_prediction": "702953270627191404268393281/3748260093765080584541962240"
+          },
+          {
+            "prediction": "593262345460957313542432211/1874130046882540292270981120",
+            "target": "3014456721961/17592186044416",
+            "target_minus_prediction": "-272126364782343414233820441/1874130046882540292270981120"
+          },
+          {
+            "prediction": "585109461940461120365789511/1874130046882540292270981120",
+            "target": "424685319921/2199023255552",
+            "target_minus_prediction": "-223168988357757143315477751/1874130046882540292270981120"
+          }
+        ],
+        "observed_face_rides": false
+      },
+      "group": "changed_operation_holdout",
+      "phase": "evaluation",
+      "pivot_activation_words": [
+        48519,
+        15388,
+        48300,
+        48220,
+        15119,
+        48106
+      ],
+      "prompt_extent": 260,
+      "prompt_sha256": "4889df6b1bae944074a8bd9620775f5dc82c53977dd98c4fa19a8566706d83c8",
+      "receiver_position": 259,
+      "target_factorized_exact_output": [
+        "-1570133962029/8796093022208",
+        "-14541230250385/8796093022208",
+        "-6819457630801/35184372088832",
+        "3014456721961/17592186044416",
+        "424685319921/2199023255552"
+      ],
+      "target_factorized_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "target_observed_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1476,
+          1326,
+          76,
+          954,
+          856
+        ]
+      },
+      "target_observed_output_words": [
+        48694,
+        49108,
+        48711,
+        15919,
+        15942
+      ]
+    },
+    {
+      "capture": {
+        "bytes": 127294360,
+        "path": "experiments/informant-ecology/runs/transformer-relational-field-01/captures/reverse_then_drop.code_comment.relevant_before.safetensors",
+        "sha256": "2c79cbdcc2e7e0dff8f2e7f71bb06e704688b6fc8bab167d94398461865af4bc"
+      },
+      "condition": "relevant_before",
+      "context": "code_comment",
+      "current_id": "reverse_then_drop.code_comment.relevant_before",
+      "derived_prediction": {
+        "equals_factorized_output": false,
+        "exact_output": [
+          "256080193921665439452155693/1874130046882540292270981120",
+          "565445824667905851594162673/468532511720635073067745280",
+          "1412300536515227013856294073/11244780281295241753625886720",
+          "-156090807875628954977059369/2811195070323810438406471680",
+          "-216336154287437998043410489/2811195070323810438406471680"
+        ],
+        "face": {
+          "orientation": [
+            "positive",
+            "positive",
+            "positive",
+            "negative",
+            "negative"
+          ],
+          "signed_axis_order": [
+            856,
+            76,
+            954,
+            1326,
+            1476
+          ]
+        },
+        "factorized_face_rides": false,
+        "factorized_residual": [
+          {
+            "prediction": "256080193921665439452155693/1874130046882540292270981120",
+            "target": "-783918398743/4398046511104",
+            "target_minus_prediction": "-590129645576853576672177733/1874130046882540292270981120"
+          },
+          {
+            "prediction": "565445824667905851594162673/468532511720635073067745280",
+            "target": "-241613498911/137438953472",
+            "target_minus_prediction": "-1389111726150809693730907313/468532511720635073067745280"
+          },
+          {
+            "prediction": "1412300536515227013856294073/11244780281295241753625886720",
+            "target": "-12462585841/68719476736",
+            "target_minus_prediction": "-3451591959777936256546910393/11244780281295241753625886720"
+          },
+          {
+            "prediction": "-156090807875628954977059369/2811195070323810438406471680",
+            "target": "446266112495/2199023255552",
+            "target_minus_prediction": "726590047631781258531285169/2811195070323810438406471680"
+          },
+          {
+            "prediction": "-216336154287437998043410489/2811195070323810438406471680",
+            "target": "1747615753761/8796093022208",
+            "target_minus_prediction": "774866945104372468745223799/2811195070323810438406471680"
+          }
+        ],
+        "observed_face_rides": false
+      },
+      "group": "changed_operation_holdout",
+      "phase": "evaluation",
+      "pivot_activation_words": [
+        48540,
+        15510,
+        48424,
+        48104,
+        48232,
+        15166
+      ],
+      "prompt_extent": 255,
+      "prompt_sha256": "abd6ecdbcd16e846651644dd3c2b4f9456176eba068ab4b5d28cb201b713d16a",
+      "receiver_position": 254,
+      "target_factorized_exact_output": [
+        "-783918398743/4398046511104",
+        "-241613498911/137438953472",
+        "-12462585841/68719476736",
+        "446266112495/2199023255552",
+        "1747615753761/8796093022208"
+      ],
+      "target_factorized_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1326,
+          1476,
+          76,
+          954,
+          856
+        ]
+      },
+      "target_observed_face": {
+        "orientation": [
+          "negative",
+          "negative",
+          "negative",
+          "positive",
+          "positive"
+        ],
+        "signed_axis_order": [
+          1326,
+          1476,
+          76,
+          954,
+          856
+        ]
+      },
+      "target_observed_output_words": [
+        48695,
+        49121,
+        48698,
+        15952,
+        15948
+      ]
+    }
+  ],
+  "fixed_prediction_summary": {
+    "changed_operation_holdout": {
+      "currents": 3,
+      "exact_outputs": 0,
+      "factorized_face_rides": 0,
+      "observed_face_rides": 0
+    },
+    "related_holdout": {
+      "currents": 3,
+      "exact_outputs": 0,
+      "factorized_face_rides": 1,
+      "observed_face_rides": 1
+    },
+    "training": {
+      "currents": 6,
+      "exact_outputs": 6,
+      "factorized_face_rides": 6,
+      "observed_face_rides": 6
+    }
+  },
+  "law_coefficients": [
+    [
+      "-3414601912245733006118481/457551280977182688542720",
+      "-8280492437280367263760631/114387820244295672135680",
+      "-11427591287931379115847683/1372653842931548065628160",
+      "8829783699386658194076301/1372653842931548065628160",
+      "7131712409670579162549211/1372653842931548065628160"
+    ],
+    [
+      "-184273882443028094000661/11438782024429567213568",
+      "-493788804526412660758051/2859695506107391803392",
+      "-2469137792901922598672669/137265384293154806562816",
+      "948686648000952406171169/68632692146577403281408",
+      "944950486939932661210055/68632692146577403281408"
+    ],
+    [
+      "-333109045269387729259009/114387820244295672135680",
+      "-852945007471464132819349/28596955061073918033920",
+      "-1229974447677757048407041/457551280977182688542720",
+      "38026667351542034519457/28596955061073918033920",
+      "159047468241666373600819/57193910122147836067840"
+    ],
+    [
+      "1589531733337079676266759/28596955061073918033920",
+      "970464016771923092666061/1787309691317119877120",
+      "44256037809768323679178921/686326921465774032814080",
+      "-1121750626325549016787921/21447716295805438525440",
+      "-3806997826186195823898769/85790865183221754101760"
+    ],
+    [
+      "-163991525673092206687429/14298477530536959016960",
+      "-108889267436131830538461/893654845658559938560",
+      "-2425235990075819987574613/171581730366443508203520",
+      "1040221992850354847967793/85790865183221754101760",
+      "898747349002117443709993/85790865183221754101760"
+    ],
+    [
+      "-99218486677477255454681/11438782024429567213568",
+      "-246511902152227578124061/2859695506107391803392",
+      "-260731644854374851159607/22877564048859134427136",
+      "73573620660946009635637/5719391012214783606784",
+      "29426727475934966542385/5719391012214783606784"
+    ]
+  ],
+  "numerical_law": "BF16 words are decoded exactly; pivot selection, elimination, law formation, prediction, comparison, and residuals use integers and rational numbers only",
+  "observation_id": "eros-contextual-retriangulation-01",
+  "participation_boundary": {
+    "claim": "reduced source participation at the Eros boundary only; no end-to-end transformer latency, energy, or model-size reduction",
+    "later_activation_words_per_current": 6,
+    "upstream_activation_words_per_current": 8192,
+    "upstream_field_was_already_physically_produced": true
+  },
+  "question": "Can one exact local retriangulation cultivated from six inherited transformer currents stand in Soma, conduct later related currents through only six source activations, and leave changed context open without retuning?",
+  "schema": "eros.contextual-retriangulation.source.v1",
+  "source": {
+    "environment": {
+      "cublas_workspace_config": ":4096:8",
+      "cuda_capability": [
+        8,
+        9
+      ],
+      "cuda_device": "NVIDIA GeForce RTX 4080 SUPER",
+      "deterministic_algorithms": true,
+      "nvidia_smi": "NVIDIA GeForce RTX 4080 SUPER, 16376 MiB, 595.71.05",
+      "packages": {
+        "huggingface-hub": "1.15.0",
+        "safetensors": "0.7.0",
+        "torch": "2.10.0",
+        "transformers": "5.8.1"
+      },
+      "platform": "Linux-7.0.5-2-cachyos-x86_64-with-glibc2.43",
+      "python": "3.12.12 (main, Dec  9 2025, 19:02:36) [Clang 21.1.4 ]",
+      "tf32_matmul": false,
+      "torch_cuda": "12.8"
+    },
+    "model": {
+      "model_path": "/home/b/.cache/huggingface/models--allenai--OLMo-2-0425-1B-Instruct/snapshots/48d788eca847d4d7548f375ad03d3c9312f6139e/model.safetensors",
+      "model_sha256": "36d044c73655bb904f822915e6294ba3dae8e6e1af5e703e9d452f2d6a3a294f",
+      "repository": "allenai/OLMo-2-0425-1B-Instruct",
+      "revision": "48d788eca847d4d7548f375ad03d3c9312f6139e"
+    },
+    "observation_id": "eros-pretrained-ecology-cultivation-01",
+    "path": "src/soma/observations/eros-pretrained-ecology-cultivation-01/SOURCE.json",
+    "sha256": "38f52aecd3c19d79a1d3a41a65647e79ac39d81823c24b52ae7b5c0e411e784c"
+  },
+  "stopping_condition": "one deterministic rank chart, one exact law, three related holdouts, three changed-operation holdouts, and one no-Standing control; no alternate pivot search, fixture tuning, model rerun, CUDA run, or larger model"
+}

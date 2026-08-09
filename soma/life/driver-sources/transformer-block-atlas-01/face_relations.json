@@ -1,0 +1,584 @@
+{
+  "aligned_token_count": 204,
+  "faces": {
+    "attention.head_mixture": {
+      "bit_equal_vectors": 83,
+      "bit_equal_words": 178171,
+      "dtype": "torch.bfloat16",
+      "left_sha256": "0fd273109db17df3675b162522af052f3e2f81465031089124176d4d84092ffc",
+      "right_sha256": "a2eb6d6548cc6dc06041ab7cd0656ad130c05e9e6bdcb7dbda8d82b6d0a01ef0",
+      "shape": [
+        1,
+        204,
+        16,
+        128
+      ],
+      "vector_count": 204,
+      "whole_bit_equal": false,
+      "word_count": 417792
+    },
+    "attention.mixture": {
+      "bit_equal_vectors": 83,
+      "bit_equal_words": 178171,
+      "dtype": "torch.bfloat16",
+      "left_sha256": "0fd273109db17df3675b162522af052f3e2f81465031089124176d4d84092ffc",
+      "right_sha256": "a2eb6d6548cc6dc06041ab7cd0656ad130c05e9e6bdcb7dbda8d82b6d0a01ef0",
+      "shape": [
+        1,
+        204,
+        2048
+      ],
+      "vector_count": 204,
+      "whole_bit_equal": false,
+      "word_count": 417792
+    },
+    "attention.raw": {
+      "bit_equal_vectors": 83,
+      "bit_equal_words": 175937,
+      "dtype": "torch.bfloat16",
+      "left_sha256": "88d10014785fa0a18b3135e312b52d3e90c1943d442947eb9e16b743b53f12c0",
+      "right_sha256": "38f3e7396f5e8aa0bb56fab4da10e993208b4863cbdfaaa7dd07e87a472bbc49",
+      "shape": [
+        1,
+        204,
+        2048
+      ],
+      "vector_count": 204,
+      "whole_bit_equal": false,
+      "word_count": 417792
+    },
+    "attention.return": {
+      "bit_equal_vectors": 83,
+      "bit_equal_words": 176157,
+      "dtype": "torch.bfloat16",
+      "left_sha256": "e3c43922c3ab855c787e38aa59ed571d36236da1c6b4b607d99fb8b6a4867e24",
+      "right_sha256": "4a1f67513018759f3240a1517aa95e9f4f0d412c7c353a433a51457d7f30a178",
+      "shape": [
+        1,
+        204,
+        2048
+      ],
+      "vector_count": 204,
+      "whole_bit_equal": false,
+      "word_count": 417792
+    },
+    "attention.weights": {
+      "bit_equal_vectors": 83,
+      "bit_equal_words": 391453,
+      "dtype": "torch.bfloat16",
+      "heads": [
+        {
+          "bit_equal_vectors": 83,
+          "bit_equal_words": 24220,
+          "dtype": "torch.bfloat16",
+          "left_sha256": "2dc65b698e95b0addbc2cafdd1ad7d646d99218252c3a6dfd950dd802653e0a9",
+          "right_sha256": "c93c004e7bf83abf0eca4af7679b44f212b77d9a23f868c367d9cc237e433ff4",
+          "shape": [
+            1,
+            204,
+            204
+          ],
+          "vector_count": 204,
+          "whole_bit_equal": false,
+          "word_count": 41616
+        },
+        {
+          "bit_equal_vectors": 83,
+          "bit_equal_words": 24212,
+          "dtype": "torch.bfloat16",
+          "left_sha256": "f3c875b0cc67d8bd8fc9630c1bead2d3a0f50b47c23cb710f6c17338c55479d4",
+          "right_sha256": "e353866052da656a5db7b7f2288ba0bb153e1e835729d1c2054534aa4b1593e9",
+          "shape": [
+            1,
+            204,
+            204
+          ],
+          "vector_count": 204,
+          "whole_bit_equal": false,
+          "word_count": 41616
+        },
+        {
+          "bit_equal_vectors": 83,
+          "bit_equal_words": 24738,
+          "dtype": "torch.bfloat16",
+          "left_sha256": "d0351980f7b6534f72579b6bf6c791608bf101022aa7597f96bb4be58f304faf",
+          "right_sha256": "91740257ec2a72c07688f45adb106d9cb35447e20cd31081f4d735ba329b2074",
+          "shape": [
+            1,
+            204,
+            204
+          ],
+          "vector_count": 204,
+          "whole_bit_equal": false,
+          "word_count": 41616
+        },
+        {
+          "bit_equal_vectors": 83,
+          "bit_equal_words": 24436,
+          "dtype": "torch.bfloat16",
+          "left_sha256": "6b0f5422154b82679464064d5ea213f343db1b849154e8e6736a3f057858b073",
+          "right_sha256": "2bf08aa115685b4a9c0c1c918689a23434fedcf84457f22b70cc4966ffade361",
+          "shape": [
+            1,
+            204,
+            204
+          ],
+          "vector_count": 204,
+          "whole_bit_equal": false,
+          "word_count": 41616
+        },
+        {
+          "bit_equal_vectors": 83,
+          "bit_equal_words": 25011,
+          "dtype": "torch.bfloat16",
+          "left_sha256": "ade90786b9972b79fe8592ad653fa9c9a41677490c81d4481334d3f819ccf30f",
+          "right_sha256": "14ab1a888c05d81ede2503ca9ea617ae96007e4c2b4ff43f0d2a9c74685a10d7",
+          "shape": [
+            1,
+            204,
+            204
+          ],
+          "vector_count": 204,
+          "whole_bit_equal": false,
+          "word_count": 41616
+        },
+        {
+          "bit_equal_vectors": 83,
+          "bit_equal_words": 24230,
+          "dtype": "torch.bfloat16",
+          "left_sha256": "8f1ed65948c3283f941c641f0c11bd87e1007fb79d2ef28cc49d7dd8d47a55a8",
+          "right_sha256": "6650fe68f51863d9540e16a1bdf7511fe70e448a05709abb97dde3e02e790414",
+          "shape": [
+            1,
+            204,
+            204
+          ],
+          "vector_count": 204,
+          "whole_bit_equal": false,
+          "word_count": 41616
+        },
+        {
+          "bit_equal_vectors": 83,
+          "bit_equal_words": 24418,
+          "dtype": "torch.bfloat16",
+          "left_sha256": "f9e5208fc049779fa60c5b234fa7853b21114fa900fef007bbdfa0a5776c0419",
+          "right_sha256": "9c6f416f818a8c5ce39cc07072576e631b5a8bae416796476bf02507829ce904",
+          "shape": [
+            1,
+            204,
+            204
+          ],
+          "vector_count": 204,
+          "whole_bit_equal": false,
+          "word_count": 41616
+        },
+        {
+          "bit_equal_vectors": 83,
+          "bit_equal_words": 24340,
+          "dtype": "torch.bfloat16",
+          "left_sha256": "de4f97c4ba3edba3c508fa3a4d1ba7cfc34b7d117a53972bf313bc5b6fc3ca7a",
+          "right_sha256": "9cd792be6bf478505dc02925e0a5eb2b8ffd2d5964c8767cefb6ac4418ce6777",
+          "shape": [
+            1,
+            204,
+            204
+          ],
+          "vector_count": 204,
+          "whole_bit_equal": false,
+          "word_count": 41616
+        },
+        {
+          "bit_equal_vectors": 83,
+          "bit_equal_words": 24820,
+          "dtype": "torch.bfloat16",
+          "left_sha256": "9d206e47167ff752d5b5aad1a9308ddaa29a180ebc9028834c15f22181e774c5",
+          "right_sha256": "276db3ad8d738a5b6fd5aac3007b0df19ca2b774694c403ceda52e77f6385721",
+          "shape": [
+            1,
+            204,
+            204
+          ],
+          "vector_count": 204,
+          "whole_bit_equal": false,
+          "word_count": 41616
+        },
+        {
+          "bit_equal_vectors": 83,
+          "bit_equal_words": 24251,
+          "dtype": "torch.bfloat16",
+          "left_sha256": "2fbf09900ddd1da7e3e43ac742d5c84db6cba2937cc5ff4d82551253a8b500cf",
+          "right_sha256": "ca78f26ed819634bb98ad582fdbcef942080f50ee0836de1c378b7df830898a3",
+          "shape": [
+            1,
+            204,
+            204
+          ],
+          "vector_count": 204,
+          "whole_bit_equal": false,
+          "word_count": 41616
+        },
+        {
+          "bit_equal_vectors": 83,
+          "bit_equal_words": 25247,
+          "dtype": "torch.bfloat16",
+          "left_sha256": "efb21995246127f3f74729e2c7231ea8d0f3d4d9f8efd9b355730367216ebbf1",
+          "right_sha256": "c232d8f0b053e493f6638c15b9761b482576c1f0548d770eb1892f003c192ff1",
+          "shape": [
+            1,
+            204,
+            204
+          ],
+          "vector_count": 204,
+          "whole_bit_equal": false,
+          "word_count": 41616
+        },
+        {
+          "bit_equal_vectors": 83,
+          "bit_equal_words": 24373,
+          "dtype": "torch.bfloat16",
+          "left_sha256": "a089330c1f458da343d311f37d6a92c020b8e32039c6f5ddc6644fcff1f3386d",
+          "right_sha256": "0db83dde561f2e870f71f93e6040aec7fd033e0e15dba6edf6c56391ebe4be85",
+          "shape": [
+            1,
+            204,
+            204
+          ],
+          "vector_count": 204,
+          "whole_bit_equal": false,
+          "word_count": 41616
+        },
+        {
+          "bit_equal_vectors": 83,
+          "bit_equal_words": 24330,
+          "dtype": "torch.bfloat16",
+          "left_sha256": "5c437d0bc01f77851e0e59c09c2b4cb0a52e1de09b493a9b08e3ef852fa9fa34",
+          "right_sha256": "910cd3ab123bdf31cec606f1899e1491d95faf637f8423b9448fd166b9c77caa",
+          "shape": [
+            1,
+            204,
+            204
+          ],
+          "vector_count": 204,
+          "whole_bit_equal": false,
+          "word_count": 41616
+        },
+        {
+          "bit_equal_vectors": 83,
+          "bit_equal_words": 24226,
+          "dtype": "torch.bfloat16",
+          "left_sha256": "2b776cc2251280e41b6cee1412c77781cfdff1107f12ef7f7737af12424b36c1",
+          "right_sha256": "f95387439b5c5c2bd6c4c61d4ab2e9eaddca5e1d89d12a57830e2d8263f09c95",
+          "shape": [
+            1,
+            204,
+            204
+          ],
+          "vector_count": 204,
+          "whole_bit_equal": false,
+          "word_count": 41616
+        },
+        {
+          "bit_equal_vectors": 83,
+          "bit_equal_words": 24305,
+          "dtype": "torch.bfloat16",
+          "left_sha256": "7ccdfc5d2cf9c24d027625ef4984c967abfa9d916a1232745bf5917b4146b129",
+          "right_sha256": "ca3a7effb1d15962d84a9efdb9500a01808a6579b1db8a2a91969cc2c240c523",
+          "shape": [
+            1,
+            204,
+            204
+          ],
+          "vector_count": 204,
+          "whole_bit_equal": false,
+          "word_count": 41616
+        },
+        {
+          "bit_equal_vectors": 83,
+          "bit_equal_words": 24296,
+          "dtype": "torch.bfloat16",
+          "left_sha256": "f503782b277b6a2579d2cf874f73af8c60c41fc2e2cc8f13048ed7a7439ef4e1",
+          "right_sha256": "544c4c0a2295f964922d39dfaebfc1c30f30318ff8d1ba6d456fad8c38577196",
+          "shape": [
+            1,
+            204,
+            204
+          ],
+          "vector_count": 204,
+          "whole_bit_equal": false,
+          "word_count": 41616
+        }
+      ],
+      "left_sha256": "2e19fcf832978299806a57ba02813225b4570a605b3358d0d424ad7c8d9b191f",
+      "right_sha256": "6886f2cf94f61a3b5b7bd090b06730d8dc71d52baf8b9b0ff152233a692da9bd",
+      "shape": [
+        1,
+        16,
+        204,
+        204
+      ],
+      "vector_count": 204,
+      "whole_bit_equal": false,
+      "word_count": 665856
+    },
+    "block.input": {
+      "bit_equal_vectors": 204,
+      "bit_equal_words": 417792,
+      "dtype": "torch.bfloat16",
+      "left_sha256": "fa03b7cbd9edafa31c8058a62056980eaf8c7f1465ac75ca856b5f035c6e2ee4",
+      "right_sha256": "fa03b7cbd9edafa31c8058a62056980eaf8c7f1465ac75ca856b5f035c6e2ee4",
+      "shape": [
+        1,
+        204,
+        2048
+      ],
+      "vector_count": 204,
+      "whole_bit_equal": true,
+      "word_count": 417792
+    },
+    "block.output": {
+      "bit_equal_vectors": 83,
+      "bit_equal_words": 182577,
+      "dtype": "torch.bfloat16",
+      "left_sha256": "2f6813630a3895686a823d2a6ed13c5d334d9d548e99ac7444675a7c7c04d89c",
+      "right_sha256": "ad97e5f00f3d4fe8e2cf6ab046f4b17d0a063e849d921866a9f392e19a00e28d",
+      "shape": [
+        1,
+        204,
+        2048
+      ],
+      "vector_count": 204,
+      "whole_bit_equal": false,
+      "word_count": 417792
+    },
+    "embedding": {
+      "bit_equal_vectors": 204,
+      "bit_equal_words": 417792,
+      "dtype": "torch.bfloat16",
+      "left_sha256": "fa03b7cbd9edafa31c8058a62056980eaf8c7f1465ac75ca856b5f035c6e2ee4",
+      "right_sha256": "fa03b7cbd9edafa31c8058a62056980eaf8c7f1465ac75ca856b5f035c6e2ee4",
+      "shape": [
+        1,
+        204,
+        2048
+      ],
+      "vector_count": 204,
+      "whole_bit_equal": true,
+      "word_count": 417792
+    },
+    "key.normalized": {
+      "bit_equal_vectors": 204,
+      "bit_equal_words": 417792,
+      "dtype": "torch.bfloat16",
+      "left_sha256": "0521c76979f6debf3d1e8dca99d8fb27245fea74df82cb2760ffefd7b94d6e8a",
+      "right_sha256": "0521c76979f6debf3d1e8dca99d8fb27245fea74df82cb2760ffefd7b94d6e8a",
+      "shape": [
+        1,
+        204,
+        2048
+      ],
+      "vector_count": 204,
+      "whole_bit_equal": true,
+      "word_count": 417792
+    },
+    "key.projected": {
+      "bit_equal_vectors": 204,
+      "bit_equal_words": 417792,
+      "dtype": "torch.bfloat16",
+      "left_sha256": "87c040ccf15c7bcc2df048d19b6931cab89287cc82939c141f0be85cb9c20380",
+      "right_sha256": "87c040ccf15c7bcc2df048d19b6931cab89287cc82939c141f0be85cb9c20380",
+      "shape": [
+        1,
+        204,
+        2048
+      ],
+      "vector_count": 204,
+      "whole_bit_equal": true,
+      "word_count": 417792
+    },
+    "key.rotary": {
+      "bit_equal_vectors": 89,
+      "bit_equal_words": 235879,
+      "dtype": "torch.bfloat16",
+      "left_sha256": "ba0273676fb1e6bae3c62e2e30e467ed6df27806b16a70af21c1331bdf00a838",
+      "right_sha256": "8ebe4e9c51afcacb750b25ab0a5fe708e0f192ab0d608a65a181c9b6631b5fb2",
+      "shape": [
+        1,
+        16,
+        204,
+        128
+      ],
+      "vector_count": 204,
+      "whole_bit_equal": false,
+      "word_count": 417792
+    },
+    "mlp.gate": {
+      "bit_equal_vectors": 83,
+      "bit_equal_words": 723280,
+      "dtype": "torch.bfloat16",
+      "left_sha256": "93576a1c906440e3dda38a648d24aeb5a9a99c5ed8f738fae54d82b31bea24b5",
+      "right_sha256": "2ecbfd2d19eca4fd41bc69ad62d12c6791ae7e6f825c7cef5835db323e40fda2",
+      "shape": [
+        1,
+        204,
+        8192
+      ],
+      "vector_count": 204,
+      "whole_bit_equal": false,
+      "word_count": 1671168
+    },
+    "mlp.product": {
+      "bit_equal_vectors": 83,
+      "bit_equal_words": 703873,
+      "dtype": "torch.bfloat16",
+      "left_sha256": "8fd16b5606b0367e91290c13512be104f9d8220c2960e47936cba1d50629d991",
+      "right_sha256": "e099dca1429e6e2325826c79772f15c682e033cd866128f028d154438e33bc08",
+      "shape": [
+        1,
+        204,
+        8192
+      ],
+      "vector_count": 204,
+      "whole_bit_equal": false,
+      "word_count": 1671168
+    },
+    "mlp.raw": {
+      "bit_equal_vectors": 83,
+      "bit_equal_words": 176853,
+      "dtype": "torch.bfloat16",
+      "left_sha256": "5ab2f9a39a569ed1e6454a47ca76fda2ff2576f80b99bcbd4f205575c9211d6c",
+      "right_sha256": "962a9e1a40dd85102e284118bc0957ce1a19f31c8c8809291b678338dc5c352d",
+      "shape": [
+        1,
+        204,
+        2048
+      ],
+      "vector_count": 204,
+      "whole_bit_equal": false,
+      "word_count": 417792
+    },
+    "mlp.return": {
+      "bit_equal_vectors": 83,
+      "bit_equal_words": 176800,
+      "dtype": "torch.bfloat16",
+      "left_sha256": "2ca58d03987d24a7751a46bc43d323c4d3ed3126ac67d16fe2c08c6d59db57b9",
+      "right_sha256": "27ab68c61f2956a8edd9c304db373bea93d86286338148dc127067efeda71dbb",
+      "shape": [
+        1,
+        204,
+        2048
+      ],
+      "vector_count": 204,
+      "whole_bit_equal": false,
+      "word_count": 417792
+    },
+    "mlp.up": {
+      "bit_equal_vectors": 83,
+      "bit_equal_words": 730552,
+      "dtype": "torch.bfloat16",
+      "left_sha256": "ca9c52e07d7f03bc52f152a084eb02855d9ea8b7166240c96836be9c856a8772",
+      "right_sha256": "5f52d551a8cd670fc114face1c12b8d752732e93e345f8fe6b5355b249ebc3a3",
+      "shape": [
+        1,
+        204,
+        8192
+      ],
+      "vector_count": 204,
+      "whole_bit_equal": false,
+      "word_count": 1671168
+    },
+    "post_attention": {
+      "bit_equal_vectors": 83,
+      "bit_equal_words": 186921,
+      "dtype": "torch.bfloat16",
+      "left_sha256": "2e7f9853b3ee0036b93ca4aec3f8cbd0626049fd9f8f7252028819f29f5b7c73",
+      "right_sha256": "be38e90749c24e11d3bb09a2186fa06969aebecc40d3d3a96a342af4f881d3b0",
+      "shape": [
+        1,
+        204,
+        2048
+      ],
+      "vector_count": 204,
+      "whole_bit_equal": false,
+      "word_count": 417792
+    },
+    "query.normalized": {
+      "bit_equal_vectors": 204,
+      "bit_equal_words": 417792,
+      "dtype": "torch.bfloat16",
+      "left_sha256": "28ba136f4bed53e5fbddf9d2d5dc472ec1c47d605c61fc661f6771c798a4b210",
+      "right_sha256": "28ba136f4bed53e5fbddf9d2d5dc472ec1c47d605c61fc661f6771c798a4b210",
+      "shape": [
+        1,
+        204,
+        2048
+      ],
+      "vector_count": 204,
+      "whole_bit_equal": true,
+      "word_count": 417792
+    },
+    "query.projected": {
+      "bit_equal_vectors": 204,
+      "bit_equal_words": 417792,
+      "dtype": "torch.bfloat16",
+      "left_sha256": "91913a8a349f7a62c1306fef9314850d7f3518b98c48fa5e00efeee7f34ec42b",
+      "right_sha256": "91913a8a349f7a62c1306fef9314850d7f3518b98c48fa5e00efeee7f34ec42b",
+      "shape": [
+        1,
+        204,
+        2048
+      ],
+      "vector_count": 204,
+      "whole_bit_equal": true,
+      "word_count": 417792
+    },
+    "query.rotary": {
+      "bit_equal_vectors": 89,
+      "bit_equal_words": 236276,
+      "dtype": "torch.bfloat16",
+      "left_sha256": "e0f9bcd00511340deaa6880b12dd4de0a9a7d96d92b511bb17f3c71aaf0a3044",
+      "right_sha256": "ae24433c76e6a7826c2776637476f90d4144c3637a6f36703fbfbbb5fe53656e",
+      "shape": [
+        1,
+        16,
+        204,
+        128
+      ],
+      "vector_count": 204,
+      "whole_bit_equal": false,
+      "word_count": 417792
+    },
+    "value.heads": {
+      "bit_equal_vectors": 204,
+      "bit_equal_words": 417792,
+      "dtype": "torch.bfloat16",
+      "left_sha256": "56ea5b47be8295c54cd2df48c5de9462a73b397ee62591f518f683524458e3f7",
+      "right_sha256": "56ea5b47be8295c54cd2df48c5de9462a73b397ee62591f518f683524458e3f7",
+      "shape": [
+        1,
+        16,
+        204,
+        128
+      ],
+      "vector_count": 204,
+      "whole_bit_equal": true,
+      "word_count": 417792
+    },
+    "value.projected": {
+      "bit_equal_vectors": 204,
+      "bit_equal_words": 417792,
+      "dtype": "torch.bfloat16",
+      "left_sha256": "585f1a913badb224362e1340102ed4b04441418e0c7502c5b27bb4b3bc36f96b",
+      "right_sha256": "585f1a913badb224362e1340102ed4b04441418e0c7502c5b27bb4b3bc36f96b",
+      "shape": [
+        1,
+        204,
+        2048
+      ],
+      "vector_count": 204,
+      "whole_bit_equal": true,
+      "word_count": 417792
+    }
+  },
+  "source_current_id": "drop_then_reverse.conversation.relevant_before",
+  "target_current_id": "drop_then_reverse.conversation.relevant_after"
+}

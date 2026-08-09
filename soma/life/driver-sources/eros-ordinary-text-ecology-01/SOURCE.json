@@ -1,0 +1,32 @@
+{
+  "provenance": {
+    "kind": "RECOVERED",
+    "recovered_from_repository": "/home/b/Workspaces/laboratory (frozen)",
+    "recovered_from_commit": "a07ff376",
+    "recovered_from_path": "src/soma/observations/eros-ordinary-text-ecology-01/SOURCE.json",
+    "recovered_bytes": 1222,
+    "note": "Recovered whole from the frozen laboratory. Every member below this one is the laboratory's own content; this `provenance` member is the only addition and the driver's deserializer ignores it. Nothing here was authored or measured in the holonics repository."
+  },
+  "schema": "eros.ordinary-text-ecology.source.v1",
+  "observation_id": "eros-ordinary-text-ecology-01",
+  "corpus": {
+    "train_path": "experiments/corpora/diet/child.train.txt",
+    "train_sha256": "dee0502fde77085b9fe051cca8609df0f01f53e20e4df008f8565f2ac1798904",
+    "train_utterances": 1024,
+    "validation_path": "experiments/corpora/diet/child.val.txt",
+    "validation_sha256": "48a668563b96a6e394d02e1e8d6d1ca4d4f53a4496390596086a2023c367822a",
+    "validation_utterances": 256
+  },
+  "lambda": {
+    "tokenizer": "utf8-whitespace-inclusive-v1",
+    "chronology": "utterance-local-relative-token-distance",
+    "minimum_context_recurrence": 2,
+    "maximum_horizon": 5,
+    "maximum_templates_per_view": 4096,
+    "floating_point": false
+  },
+  "observer": {
+    "maximum_complete_paths_per_representative": 128
+  },
+  "stopping_condition": "Stop after the frozen real-text cut yields complete representative recurrent-single, recurrent-plural, recurrent-copy, multi-token, unseen-consequence, and shorter-recurrent-cut fields; exact rest/remount; a chronology-reversal foil; and the changed field after the held-out residual actually enters as later current. Refuse rather than truncate any causal path."
+}

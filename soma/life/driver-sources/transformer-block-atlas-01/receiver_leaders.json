@@ -1,0 +1,1134 @@
+{
+  "drop_then_reverse.conversation.relevant_after": [
+    {
+      "attention_ratio": "59/256",
+      "attention_word": 15980,
+      "head": 0,
+      "receiver_position": 252,
+      "receiver_token": {
+        "byte_end": 1060,
+        "byte_start": 1059,
+        "char_end": 1060,
+        "char_start": 1059,
+        "position": 252,
+        "rendered_text": "\n",
+        "roles": [],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "source_position": 251,
+      "source_token": {
+        "byte_end": 1059,
+        "byte_start": 1058,
+        "char_end": 1059,
+        "char_start": 1058,
+        "position": 251,
+        "rendered_text": ">",
+        "roles": [],
+        "token_id": 29,
+        "token_piece": ">"
+      },
+      "unscaled_query_key_pairing": {
+        "coefficient": 73573194912305687307014304824748250718982721587998465,
+        "power_of_two": -169,
+        "ratio": "73573194912305687307014304824748250718982721587998465/748288838313422294120286634350736906063837462003712"
+      }
+    },
+    {
+      "attention_ratio": "175/4096",
+      "attention_word": 15663,
+      "head": 1,
+      "receiver_position": 252,
+      "receiver_token": {
+        "byte_end": 1060,
+        "byte_start": 1059,
+        "char_end": 1060,
+        "char_start": 1059,
+        "position": 252,
+        "rendered_text": "\n",
+        "roles": [],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "source_position": 0,
+      "source_token": {
+        "byte_end": 13,
+        "byte_start": 0,
+        "char_end": 13,
+        "char_start": 0,
+        "position": 0,
+        "rendered_text": "<|endoftext|>",
+        "roles": [],
+        "token_id": 100257,
+        "token_piece": "<|endoftext|>"
+      },
+      "unscaled_query_key_pairing": {
+        "coefficient": 40359433030987975008906737298498046616431232533372307,
+        "power_of_two": -169,
+        "ratio": "40359433030987975008906737298498046616431232533372307/748288838313422294120286634350736906063837462003712"
+      }
+    },
+    {
+      "attention_ratio": "67/512",
+      "attention_word": 15878,
+      "head": 2,
+      "receiver_position": 252,
+      "receiver_token": {
+        "byte_end": 1060,
+        "byte_start": 1059,
+        "char_end": 1060,
+        "char_start": 1059,
+        "position": 252,
+        "rendered_text": "\n",
+        "roles": [],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "source_position": 52,
+      "source_token": {
+        "byte_end": 211,
+        "byte_start": 210,
+        "char_end": 211,
+        "char_start": 210,
+        "position": 52,
+        "rendered_text": ",",
+        "roles": [
+          "prompt"
+        ],
+        "token_id": 11,
+        "token_piece": ","
+      },
+      "unscaled_query_key_pairing": {
+        "coefficient": 285397130564678515661553263189915896196120932574520419,
+        "power_of_two": -171,
+        "ratio": "285397130564678515661553263189915896196120932574520419/2993155353253689176481146537402947624255349848014848"
+      }
+    },
+    {
+      "attention_ratio": "227/1024",
+      "attention_word": 15971,
+      "head": 3,
+      "receiver_position": 252,
+      "receiver_token": {
+        "byte_end": 1060,
+        "byte_start": 1059,
+        "char_end": 1060,
+        "char_start": 1059,
+        "position": 252,
+        "rendered_text": "\n",
+        "roles": [],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "source_position": 0,
+      "source_token": {
+        "byte_end": 13,
+        "byte_start": 0,
+        "char_end": 13,
+        "char_start": 0,
+        "position": 0,
+        "rendered_text": "<|endoftext|>",
+        "roles": [],
+        "token_id": 100257,
+        "token_piece": "<|endoftext|>"
+      },
+      "unscaled_query_key_pairing": {
+        "coefficient": 5287277539939167595951737250371335001166983075517397,
+        "power_of_two": -166,
+        "ratio": "5287277539939167595951737250371335001166983075517397/93536104789177786765035829293842113257979682750464"
+      }
+    },
+    {
+      "attention_ratio": "135/1024",
+      "attention_word": 15879,
+      "head": 4,
+      "receiver_position": 252,
+      "receiver_token": {
+        "byte_end": 1060,
+        "byte_start": 1059,
+        "char_end": 1060,
+        "char_start": 1059,
+        "position": 252,
+        "rendered_text": "\n",
+        "roles": [],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "source_position": 246,
+      "source_token": {
+        "byte_end": 1046,
+        "byte_start": 1045,
+        "char_end": 1046,
+        "char_start": 1045,
+        "position": 246,
+        "rendered_text": "\n",
+        "roles": [],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "unscaled_query_key_pairing": {
+        "coefficient": 577773374091353021278300556376252163544526957765165245,
+        "power_of_two": -174,
+        "ratio": "577773374091353021278300556376252163544526957765165245/23945242826029513411849172299223580994042798784118784"
+      }
+    },
+    {
+      "attention_ratio": "195/4096",
+      "attention_word": 15683,
+      "head": 5,
+      "receiver_position": 252,
+      "receiver_token": {
+        "byte_end": 1060,
+        "byte_start": 1059,
+        "char_end": 1060,
+        "char_start": 1059,
+        "position": 252,
+        "rendered_text": "\n",
+        "roles": [],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "source_position": 217,
+      "source_token": {
+        "byte_end": 902,
+        "byte_start": 901,
+        "char_end": 902,
+        "char_start": 901,
+        "position": 217,
+        "rendered_text": "A",
+        "roles": [
+          "prompt",
+          "informant"
+        ],
+        "token_id": 32,
+        "token_piece": "A"
+      },
+      "unscaled_query_key_pairing": {
+        "coefficient": 114539960886144642890113025358698989059705815740976345,
+        "power_of_two": -171,
+        "ratio": "114539960886144642890113025358698989059705815740976345/2993155353253689176481146537402947624255349848014848"
+      }
+    },
+    {
+      "attention_ratio": "89/2048",
+      "attention_word": 15666,
+      "head": 6,
+      "receiver_position": 252,
+      "receiver_token": {
+        "byte_end": 1060,
+        "byte_start": 1059,
+        "char_end": 1060,
+        "char_start": 1059,
+        "position": 252,
+        "rendered_text": "\n",
+        "roles": [],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "source_position": 240,
+      "source_token": {
+        "byte_end": 1027,
+        "byte_start": 1026,
+        "char_end": 1027,
+        "char_start": 1026,
+        "position": 240,
+        "rendered_text": "\n",
+        "roles": [
+          "prompt",
+          "informant"
+        ],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "unscaled_query_key_pairing": {
+        "coefficient": 311898480157495759986082469990684798151784453374708877,
+        "power_of_two": -173,
+        "ratio": "311898480157495759986082469990684798151784453374708877/11972621413014756705924586149611790497021399392059392"
+      }
+    },
+    {
+      "attention_ratio": "197/512",
+      "attention_word": 16069,
+      "head": 7,
+      "receiver_position": 252,
+      "receiver_token": {
+        "byte_end": 1060,
+        "byte_start": 1059,
+        "char_end": 1060,
+        "char_start": 1059,
+        "position": 252,
+        "rendered_text": "\n",
+        "roles": [],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "source_position": 240,
+      "source_token": {
+        "byte_end": 1027,
+        "byte_start": 1026,
+        "char_end": 1027,
+        "char_start": 1026,
+        "position": 240,
+        "rendered_text": "\n",
+        "roles": [
+          "prompt",
+          "informant"
+        ],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "unscaled_query_key_pairing": {
+        "coefficient": 455598223096203288850549159546354900598069411458863953,
+        "power_of_two": -172,
+        "ratio": "455598223096203288850549159546354900598069411458863953/5986310706507378352962293074805895248510699696029696"
+      }
+    },
+    {
+      "attention_ratio": "51/256",
+      "attention_word": 15948,
+      "head": 8,
+      "receiver_position": 252,
+      "receiver_token": {
+        "byte_end": 1060,
+        "byte_start": 1059,
+        "char_end": 1060,
+        "char_start": 1059,
+        "position": 252,
+        "rendered_text": "\n",
+        "roles": [],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "source_position": 252,
+      "source_token": {
+        "byte_end": 1060,
+        "byte_start": 1059,
+        "char_end": 1060,
+        "char_start": 1059,
+        "position": 252,
+        "rendered_text": "\n",
+        "roles": [],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "unscaled_query_key_pairing": {
+        "coefficient": 6651320340187026822175572997303173996809625655345258093,
+        "power_of_two": -176,
+        "ratio": "6651320340187026822175572997303173996809625655345258093/95780971304118053647396689196894323976171195136475136"
+      }
+    },
+    {
+      "attention_ratio": "253/4096",
+      "attention_word": 15741,
+      "head": 9,
+      "receiver_position": 252,
+      "receiver_token": {
+        "byte_end": 1060,
+        "byte_start": 1059,
+        "char_end": 1060,
+        "char_start": 1059,
+        "position": 252,
+        "rendered_text": "\n",
+        "roles": [],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "source_position": 138,
+      "source_token": {
+        "byte_end": 552,
+        "byte_start": 551,
+        "char_end": 552,
+        "char_start": 551,
+        "position": 138,
+        "rendered_text": "1",
+        "roles": [
+          "prompt",
+          "informant"
+        ],
+        "token_id": 16,
+        "token_piece": "1"
+      },
+      "unscaled_query_key_pairing": {
+        "coefficient": 174543180719813517515390630355144811180793086832082705,
+        "power_of_two": -171,
+        "ratio": "174543180719813517515390630355144811180793086832082705/2993155353253689176481146537402947624255349848014848"
+      }
+    },
+    {
+      "attention_ratio": "1/2",
+      "attention_word": 16128,
+      "head": 10,
+      "receiver_position": 252,
+      "receiver_token": {
+        "byte_end": 1060,
+        "byte_start": 1059,
+        "char_end": 1060,
+        "char_start": 1059,
+        "position": 252,
+        "rendered_text": "\n",
+        "roles": [],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "source_position": 251,
+      "source_token": {
+        "byte_end": 1059,
+        "byte_start": 1058,
+        "char_end": 1059,
+        "char_start": 1058,
+        "position": 251,
+        "rendered_text": ">",
+        "roles": [],
+        "token_id": 29,
+        "token_piece": ">"
+      },
+      "unscaled_query_key_pairing": {
+        "coefficient": 485771451639,
+        "power_of_two": -33,
+        "ratio": "485771451639/8589934592"
+      }
+    },
+    {
+      "attention_ratio": "187/256",
+      "attention_word": 16187,
+      "head": 11,
+      "receiver_position": 252,
+      "receiver_token": {
+        "byte_end": 1060,
+        "byte_start": 1059,
+        "char_end": 1060,
+        "char_start": 1059,
+        "position": 252,
+        "rendered_text": "\n",
+        "roles": [],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "source_position": 246,
+      "source_token": {
+        "byte_end": 1046,
+        "byte_start": 1045,
+        "char_end": 1046,
+        "char_start": 1045,
+        "position": 246,
+        "rendered_text": "\n",
+        "roles": [],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "unscaled_query_key_pairing": {
+        "coefficient": 107341085434431876559391177726390366809376711923020641,
+        "power_of_two": -169,
+        "ratio": "107341085434431876559391177726390366809376711923020641/748288838313422294120286634350736906063837462003712"
+      }
+    },
+    {
+      "attention_ratio": "125/1024",
+      "attention_word": 15866,
+      "head": 12,
+      "receiver_position": 252,
+      "receiver_token": {
+        "byte_end": 1060,
+        "byte_start": 1059,
+        "char_end": 1060,
+        "char_start": 1059,
+        "position": 252,
+        "rendered_text": "\n",
+        "roles": [],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "source_position": 250,
+      "source_token": {
+        "byte_end": 1058,
+        "byte_start": 1057,
+        "char_end": 1058,
+        "char_start": 1057,
+        "position": 250,
+        "rendered_text": "|",
+        "roles": [],
+        "token_id": 91,
+        "token_piece": "|"
+      },
+      "unscaled_query_key_pairing": {
+        "coefficient": 55120232387241838670420000346707576255005094178309763,
+        "power_of_two": -169,
+        "ratio": "55120232387241838670420000346707576255005094178309763/748288838313422294120286634350736906063837462003712"
+      }
+    },
+    {
+      "attention_ratio": "169/8192",
+      "attention_word": 15529,
+      "head": 13,
+      "receiver_position": 252,
+      "receiver_token": {
+        "byte_end": 1060,
+        "byte_start": 1059,
+        "char_end": 1060,
+        "char_start": 1059,
+        "position": 252,
+        "rendered_text": "\n",
+        "roles": [],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "source_position": 225,
+      "source_token": {
+        "byte_end": 940,
+        "byte_start": 939,
+        "char_end": 940,
+        "char_start": 939,
+        "position": 225,
+        "rendered_text": ".",
+        "roles": [
+          "prompt",
+          "informant"
+        ],
+        "token_id": 13,
+        "token_piece": "."
+      },
+      "unscaled_query_key_pairing": {
+        "coefficient": 41867434936153010411551252521744749615830165083301891,
+        "power_of_two": -170,
+        "ratio": "41867434936153010411551252521744749615830165083301891/1496577676626844588240573268701473812127674924007424"
+      }
+    },
+    {
+      "attention_ratio": "9/64",
+      "attention_word": 15888,
+      "head": 14,
+      "receiver_position": 252,
+      "receiver_token": {
+        "byte_end": 1060,
+        "byte_start": 1059,
+        "char_end": 1060,
+        "char_start": 1059,
+        "position": 252,
+        "rendered_text": "\n",
+        "roles": [],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "source_position": 216,
+      "source_token": {
+        "byte_end": 901,
+        "byte_start": 900,
+        "char_end": 901,
+        "char_start": 900,
+        "position": 216,
+        "rendered_text": "\n",
+        "roles": [
+          "prompt",
+          "informant"
+        ],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "unscaled_query_key_pairing": {
+        "coefficient": 247731570761380343566620181803855694654162570347351601,
+        "power_of_two": -171,
+        "ratio": "247731570761380343566620181803855694654162570347351601/2993155353253689176481146537402947624255349848014848"
+      }
+    },
+    {
+      "attention_ratio": "225/2048",
+      "attention_word": 15841,
+      "head": 15,
+      "receiver_position": 252,
+      "receiver_token": {
+        "byte_end": 1060,
+        "byte_start": 1059,
+        "char_end": 1060,
+        "char_start": 1059,
+        "position": 252,
+        "rendered_text": "\n",
+        "roles": [],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "source_position": 240,
+      "source_token": {
+        "byte_end": 1027,
+        "byte_start": 1026,
+        "char_end": 1027,
+        "char_start": 1026,
+        "position": 240,
+        "rendered_text": "\n",
+        "roles": [
+          "prompt",
+          "informant"
+        ],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "unscaled_query_key_pairing": {
+        "coefficient": 151206281733499807148491828499323687001818897,
+        "power_of_two": -141,
+        "ratio": "151206281733499807148491828499323687001818897/2787593149816327892691964784081045188247552"
+      }
+    }
+  ],
+  "drop_then_reverse.conversation.relevant_before": [
+    {
+      "attention_ratio": "109/512",
+      "attention_word": 15962,
+      "head": 0,
+      "receiver_position": 252,
+      "receiver_token": {
+        "byte_end": 1060,
+        "byte_start": 1059,
+        "char_end": 1060,
+        "char_start": 1059,
+        "position": 252,
+        "rendered_text": "\n",
+        "roles": [],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "source_position": 251,
+      "source_token": {
+        "byte_end": 1059,
+        "byte_start": 1058,
+        "char_end": 1059,
+        "char_start": 1058,
+        "position": 251,
+        "rendered_text": ">",
+        "roles": [],
+        "token_id": 29,
+        "token_piece": ">"
+      },
+      "unscaled_query_key_pairing": {
+        "coefficient": 73573194912305687307014304824748250718982721587998465,
+        "power_of_two": -169,
+        "ratio": "73573194912305687307014304824748250718982721587998465/748288838313422294120286634350736906063837462003712"
+      }
+    },
+    {
+      "attention_ratio": "45/1024",
+      "attention_word": 15668,
+      "head": 1,
+      "receiver_position": 252,
+      "receiver_token": {
+        "byte_end": 1060,
+        "byte_start": 1059,
+        "char_end": 1060,
+        "char_start": 1059,
+        "position": 252,
+        "rendered_text": "\n",
+        "roles": [],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "source_position": 0,
+      "source_token": {
+        "byte_end": 13,
+        "byte_start": 0,
+        "char_end": 13,
+        "char_start": 0,
+        "position": 0,
+        "rendered_text": "<|endoftext|>",
+        "roles": [],
+        "token_id": 100257,
+        "token_piece": "<|endoftext|>"
+      },
+      "unscaled_query_key_pairing": {
+        "coefficient": 40359433030987975008906737298498046616431232533372307,
+        "power_of_two": -169,
+        "ratio": "40359433030987975008906737298498046616431232533372307/748288838313422294120286634350736906063837462003712"
+      }
+    },
+    {
+      "attention_ratio": "9/64",
+      "attention_word": 15888,
+      "head": 2,
+      "receiver_position": 252,
+      "receiver_token": {
+        "byte_end": 1060,
+        "byte_start": 1059,
+        "char_end": 1060,
+        "char_start": 1059,
+        "position": 252,
+        "rendered_text": "\n",
+        "roles": [],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "source_position": 214,
+      "source_token": {
+        "byte_end": 920,
+        "byte_start": 919,
+        "char_end": 920,
+        "char_start": 919,
+        "position": 214,
+        "rendered_text": ",",
+        "roles": [
+          "prompt",
+          "current_inscription"
+        ],
+        "token_id": 11,
+        "token_piece": ","
+      },
+      "unscaled_query_key_pairing": {
+        "coefficient": 2420168528760367798978594565026398237662399006494110625,
+        "power_of_two": -174,
+        "ratio": "2420168528760367798978594565026398237662399006494110625/23945242826029513411849172299223580994042798784118784"
+      }
+    },
+    {
+      "attention_ratio": "211/1024",
+      "attention_word": 15955,
+      "head": 3,
+      "receiver_position": 252,
+      "receiver_token": {
+        "byte_end": 1060,
+        "byte_start": 1059,
+        "char_end": 1060,
+        "char_start": 1059,
+        "position": 252,
+        "rendered_text": "\n",
+        "roles": [],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "source_position": 0,
+      "source_token": {
+        "byte_end": 13,
+        "byte_start": 0,
+        "char_end": 13,
+        "char_start": 0,
+        "position": 0,
+        "rendered_text": "<|endoftext|>",
+        "roles": [],
+        "token_id": 100257,
+        "token_piece": "<|endoftext|>"
+      },
+      "unscaled_query_key_pairing": {
+        "coefficient": 5287277539939167595951737250371335001166983075517397,
+        "power_of_two": -166,
+        "ratio": "5287277539939167595951737250371335001166983075517397/93536104789177786765035829293842113257979682750464"
+      }
+    },
+    {
+      "attention_ratio": "135/1024",
+      "attention_word": 15879,
+      "head": 4,
+      "receiver_position": 252,
+      "receiver_token": {
+        "byte_end": 1060,
+        "byte_start": 1059,
+        "char_end": 1060,
+        "char_start": 1059,
+        "position": 252,
+        "rendered_text": "\n",
+        "roles": [],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "source_position": 246,
+      "source_token": {
+        "byte_end": 1046,
+        "byte_start": 1045,
+        "char_end": 1046,
+        "char_start": 1045,
+        "position": 246,
+        "rendered_text": "\n",
+        "roles": [],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "unscaled_query_key_pairing": {
+        "coefficient": 577773374091353021278300556376252163544526957765165245,
+        "power_of_two": -174,
+        "ratio": "577773374091353021278300556376252163544526957765165245/23945242826029513411849172299223580994042798784118784"
+      }
+    },
+    {
+      "attention_ratio": "157/4096",
+      "attention_word": 15645,
+      "head": 5,
+      "receiver_position": 252,
+      "receiver_token": {
+        "byte_end": 1060,
+        "byte_start": 1059,
+        "char_end": 1060,
+        "char_start": 1059,
+        "position": 252,
+        "rendered_text": "\n",
+        "roles": [],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "source_position": 251,
+      "source_token": {
+        "byte_end": 1059,
+        "byte_start": 1058,
+        "char_end": 1059,
+        "char_start": 1058,
+        "position": 251,
+        "rendered_text": ">",
+        "roles": [],
+        "token_id": 29,
+        "token_piece": ">"
+      },
+      "unscaled_query_key_pairing": {
+        "coefficient": 13744233282777997754700711825183126805248339206983299,
+        "power_of_two": -168,
+        "ratio": "13744233282777997754700711825183126805248339206983299/374144419156711147060143317175368453031918731001856"
+      }
+    },
+    {
+      "attention_ratio": "89/2048",
+      "attention_word": 15666,
+      "head": 6,
+      "receiver_position": 252,
+      "receiver_token": {
+        "byte_end": 1060,
+        "byte_start": 1059,
+        "char_end": 1060,
+        "char_start": 1059,
+        "position": 252,
+        "rendered_text": "\n",
+        "roles": [],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "source_position": 240,
+      "source_token": {
+        "byte_end": 1023,
+        "byte_start": 1022,
+        "char_end": 1023,
+        "char_start": 1022,
+        "position": 240,
+        "rendered_text": "\n",
+        "roles": [
+          "prompt"
+        ],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "unscaled_query_key_pairing": {
+        "coefficient": 311898480157495759986082469990684798151784453374708877,
+        "power_of_two": -173,
+        "ratio": "311898480157495759986082469990684798151784453374708877/11972621413014756705924586149611790497021399392059392"
+      }
+    },
+    {
+      "attention_ratio": "19/32",
+      "attention_word": 16152,
+      "head": 7,
+      "receiver_position": 252,
+      "receiver_token": {
+        "byte_end": 1060,
+        "byte_start": 1059,
+        "char_end": 1060,
+        "char_start": 1059,
+        "position": 252,
+        "rendered_text": "\n",
+        "roles": [],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "source_position": 240,
+      "source_token": {
+        "byte_end": 1023,
+        "byte_start": 1022,
+        "char_end": 1023,
+        "char_start": 1022,
+        "position": 240,
+        "rendered_text": "\n",
+        "roles": [
+          "prompt"
+        ],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "unscaled_query_key_pairing": {
+        "coefficient": 455598223096203288850549159546354900598069411458863953,
+        "power_of_two": -172,
+        "ratio": "455598223096203288850549159546354900598069411458863953/5986310706507378352962293074805895248510699696029696"
+      }
+    },
+    {
+      "attention_ratio": "197/1024",
+      "attention_word": 15941,
+      "head": 8,
+      "receiver_position": 252,
+      "receiver_token": {
+        "byte_end": 1060,
+        "byte_start": 1059,
+        "char_end": 1060,
+        "char_start": 1059,
+        "position": 252,
+        "rendered_text": "\n",
+        "roles": [],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "source_position": 252,
+      "source_token": {
+        "byte_end": 1060,
+        "byte_start": 1059,
+        "char_end": 1060,
+        "char_start": 1059,
+        "position": 252,
+        "rendered_text": "\n",
+        "roles": [],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "unscaled_query_key_pairing": {
+        "coefficient": 6651320340187026822175572997303173996809625655345258093,
+        "power_of_two": -176,
+        "ratio": "6651320340187026822175572997303173996809625655345258093/95780971304118053647396689196894323976171195136475136"
+      }
+    },
+    {
+      "attention_ratio": "83/1024",
+      "attention_word": 15782,
+      "head": 9,
+      "receiver_position": 252,
+      "receiver_token": {
+        "byte_end": 1060,
+        "byte_start": 1059,
+        "char_end": 1060,
+        "char_start": 1059,
+        "position": 252,
+        "rendered_text": "\n",
+        "roles": [],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "source_position": 140,
+      "source_token": {
+        "byte_end": 590,
+        "byte_start": 587,
+        "char_end": 590,
+        "char_start": 587,
+        "position": 140,
+        "rendered_text": " to",
+        "roles": [
+          "prompt",
+          "informant"
+        ],
+        "token_id": 311,
+        "token_piece": "Ġto"
+      },
+      "unscaled_query_key_pairing": {
+        "coefficient": 1461693031025316693442995491308493156028882753248156095,
+        "power_of_two": -174,
+        "ratio": "1461693031025316693442995491308493156028882753248156095/23945242826029513411849172299223580994042798784118784"
+      }
+    },
+    {
+      "attention_ratio": "129/256",
+      "attention_word": 16129,
+      "head": 10,
+      "receiver_position": 252,
+      "receiver_token": {
+        "byte_end": 1060,
+        "byte_start": 1059,
+        "char_end": 1060,
+        "char_start": 1059,
+        "position": 252,
+        "rendered_text": "\n",
+        "roles": [],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "source_position": 251,
+      "source_token": {
+        "byte_end": 1059,
+        "byte_start": 1058,
+        "char_end": 1059,
+        "char_start": 1058,
+        "position": 251,
+        "rendered_text": ">",
+        "roles": [],
+        "token_id": 29,
+        "token_piece": ">"
+      },
+      "unscaled_query_key_pairing": {
+        "coefficient": 485771451639,
+        "power_of_two": -33,
+        "ratio": "485771451639/8589934592"
+      }
+    },
+    {
+      "attention_ratio": "189/256",
+      "attention_word": 16189,
+      "head": 11,
+      "receiver_position": 252,
+      "receiver_token": {
+        "byte_end": 1060,
+        "byte_start": 1059,
+        "char_end": 1060,
+        "char_start": 1059,
+        "position": 252,
+        "rendered_text": "\n",
+        "roles": [],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "source_position": 246,
+      "source_token": {
+        "byte_end": 1046,
+        "byte_start": 1045,
+        "char_end": 1046,
+        "char_start": 1045,
+        "position": 246,
+        "rendered_text": "\n",
+        "roles": [],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "unscaled_query_key_pairing": {
+        "coefficient": 107341085434431876559391177726390366809376711923020641,
+        "power_of_two": -169,
+        "ratio": "107341085434431876559391177726390366809376711923020641/748288838313422294120286634350736906063837462003712"
+      }
+    },
+    {
+      "attention_ratio": "241/2048",
+      "attention_word": 15857,
+      "head": 12,
+      "receiver_position": 252,
+      "receiver_token": {
+        "byte_end": 1060,
+        "byte_start": 1059,
+        "char_end": 1060,
+        "char_start": 1059,
+        "position": 252,
+        "rendered_text": "\n",
+        "roles": [],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "source_position": 250,
+      "source_token": {
+        "byte_end": 1058,
+        "byte_start": 1057,
+        "char_end": 1058,
+        "char_start": 1057,
+        "position": 250,
+        "rendered_text": "|",
+        "roles": [],
+        "token_id": 91,
+        "token_piece": "|"
+      },
+      "unscaled_query_key_pairing": {
+        "coefficient": 55120232387241838670420000346707576255005094178309763,
+        "power_of_two": -169,
+        "ratio": "55120232387241838670420000346707576255005094178309763/748288838313422294120286634350736906063837462003712"
+      }
+    },
+    {
+      "attention_ratio": "177/8192",
+      "attention_word": 15537,
+      "head": 13,
+      "receiver_position": 252,
+      "receiver_token": {
+        "byte_end": 1060,
+        "byte_start": 1059,
+        "char_end": 1060,
+        "char_start": 1059,
+        "position": 252,
+        "rendered_text": "\n",
+        "roles": [],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "source_position": 233,
+      "source_token": {
+        "byte_end": 985,
+        "byte_start": 984,
+        "char_end": 985,
+        "char_start": 984,
+        "position": 233,
+        "rendered_text": ".",
+        "roles": [
+          "prompt",
+          "current_inscription"
+        ],
+        "token_id": 13,
+        "token_piece": "."
+      },
+      "unscaled_query_key_pairing": {
+        "coefficient": 1345270324269182514851886713356485112043194161187816229,
+        "power_of_two": -175,
+        "ratio": "1345270324269182514851886713356485112043194161187816229/47890485652059026823698344598447161988085597568237568"
+      }
+    },
+    {
+      "attention_ratio": "225/2048",
+      "attention_word": 15841,
+      "head": 14,
+      "receiver_position": 252,
+      "receiver_token": {
+        "byte_end": 1060,
+        "byte_start": 1059,
+        "char_end": 1060,
+        "char_start": 1059,
+        "position": 252,
+        "rendered_text": "\n",
+        "roles": [],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "source_position": 204,
+      "source_token": {
+        "byte_end": 879,
+        "byte_start": 878,
+        "char_end": 879,
+        "char_start": 878,
+        "position": 204,
+        "rendered_text": "\n",
+        "roles": [
+          "prompt"
+        ],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "unscaled_query_key_pairing": {
+        "coefficient": 122229888339707863971895896497359070216870040473272635,
+        "power_of_two": -170,
+        "ratio": "122229888339707863971895896497359070216870040473272635/1496577676626844588240573268701473812127674924007424"
+      }
+    },
+    {
+      "attention_ratio": "27/256",
+      "attention_word": 15832,
+      "head": 15,
+      "receiver_position": 252,
+      "receiver_token": {
+        "byte_end": 1060,
+        "byte_start": 1059,
+        "char_end": 1060,
+        "char_start": 1059,
+        "position": 252,
+        "rendered_text": "\n",
+        "roles": [],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "source_position": 240,
+      "source_token": {
+        "byte_end": 1023,
+        "byte_start": 1022,
+        "char_end": 1023,
+        "char_start": 1022,
+        "position": 240,
+        "rendered_text": "\n",
+        "roles": [
+          "prompt"
+        ],
+        "token_id": 198,
+        "token_piece": "Ċ"
+      },
+      "unscaled_query_key_pairing": {
+        "coefficient": 151206281733499807148491828499323687001818897,
+        "power_of_two": -141,
+        "ratio": "151206281733499807148491828499323687001818897/2787593149816327892691964784081045188247552"
+      }
+    }
+  ]
+}

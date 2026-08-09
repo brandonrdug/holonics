@@ -1,0 +1,302 @@
+{
+  "provenance": {
+    "kind": "RECOVERED",
+    "recovered_from_repository": "/home/b/Workspaces/laboratory (frozen)",
+    "recovered_from_commit": "a07ff376",
+    "recovered_from_path": "src/soma/observations/eros-holonic-constituent-ecology-01/SOURCE.json",
+    "recovered_bytes": 7359,
+    "note": "Recovered whole from the frozen laboratory. Every member below this one is the laboratory's own content; this `provenance` member is the only addition and the driver's deserializer ignores it. Nothing here was authored or measured in the holonics repository."
+  },
+  "schema": "eros.holonic-constituent-ecology.source.v1",
+  "observation_id": "eros-holonic-constituent-ecology-01",
+  "base_carrier": {
+    "species": "source-supplied UTF-8 octets",
+    "bounded_alphabet": "ASCII",
+    "identity": "exact octet value at an ordered source occurrence"
+  },
+  "lambda": {
+    "minimum_recurrence": 2,
+    "parameter_axes": [
+      "medium",
+      "objective"
+    ],
+    "fold_law": "An adjacent binary composition becomes an addressable constituent after two exact occurrences. Every valid binary presentation remains plural.",
+    "receiver_law": "Among prior faces of the identical inscription, retain every face with maximal exact parameter agreement. Returned consequence changes the successor afterward.",
+    "reduction_law": "Aggregate exact recurrence, share identical expansions, retain competing presentations and contextual consequence fibers, and emit only the future-contact boundary."
+  },
+  "events": [
+    {
+      "ordinal": 0,
+      "id": "symbolic-arithmetic-1-plus-2-a",
+      "inscription": "1+2",
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "arithmetic"
+      },
+      "consequence": "number:3",
+      "expected_relation": "NONE"
+    },
+    {
+      "ordinal": 1,
+      "id": "symbolic-concatenate-1-plus-2-a",
+      "inscription": "1+2",
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "concatenate"
+      },
+      "consequence": "text:12",
+      "expected_relation": "OPEN_RESIDUAL"
+    },
+    {
+      "ordinal": 2,
+      "id": "code-arithmetic-1-plus-2",
+      "inscription": "add(1,2)",
+      "parameters": {
+        "medium": "code",
+        "objective": "arithmetic"
+      },
+      "consequence": "number:3",
+      "expected_relation": "NONE"
+    },
+    {
+      "ordinal": 3,
+      "id": "language-arithmetic-1-plus-2",
+      "inscription": "one plus two",
+      "parameters": {
+        "medium": "language",
+        "objective": "arithmetic"
+      },
+      "consequence": "number:3",
+      "expected_relation": "NONE"
+    },
+    {
+      "ordinal": 4,
+      "id": "symbolic-arithmetic-1-plus-3",
+      "inscription": "1+3",
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "arithmetic"
+      },
+      "consequence": "number:4",
+      "expected_relation": "NONE"
+    },
+    {
+      "ordinal": 5,
+      "id": "symbolic-concatenate-1-plus-3",
+      "inscription": "1+3",
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "concatenate"
+      },
+      "consequence": "text:13",
+      "expected_relation": "OPEN_RESIDUAL"
+    },
+    {
+      "ordinal": 6,
+      "id": "code-arithmetic-1-plus-3",
+      "inscription": "add(1,3)",
+      "parameters": {
+        "medium": "code",
+        "objective": "arithmetic"
+      },
+      "consequence": "number:4",
+      "expected_relation": "NONE"
+    },
+    {
+      "ordinal": 7,
+      "id": "language-arithmetic-1-plus-3",
+      "inscription": "one plus three",
+      "parameters": {
+        "medium": "language",
+        "objective": "arithmetic"
+      },
+      "consequence": "number:4",
+      "expected_relation": "NONE"
+    },
+    {
+      "ordinal": 8,
+      "id": "symbolic-arithmetic-2-plus-2",
+      "inscription": "2+2",
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "arithmetic"
+      },
+      "consequence": "number:4",
+      "expected_relation": "NONE"
+    },
+    {
+      "ordinal": 9,
+      "id": "symbolic-concatenate-2-plus-2",
+      "inscription": "2+2",
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "concatenate"
+      },
+      "consequence": "text:22",
+      "expected_relation": "OPEN_RESIDUAL"
+    },
+    {
+      "ordinal": 10,
+      "id": "symbolic-arithmetic-1-plus-2-b",
+      "inscription": "1+2",
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "arithmetic"
+      },
+      "consequence": "number:3",
+      "expected_relation": "RIDE"
+    },
+    {
+      "ordinal": 11,
+      "id": "symbolic-concatenate-1-plus-2-b",
+      "inscription": "1+2",
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "concatenate"
+      },
+      "consequence": "text:12",
+      "expected_relation": "RIDE"
+    },
+    {
+      "ordinal": 12,
+      "id": "symbolic-partial-1-plus-2",
+      "inscription": "1+2",
+      "parameters": {
+        "medium": "symbolic"
+      },
+      "consequence": "number:3",
+      "expected_relation": "OPEN_INCLUDED"
+    }
+  ],
+  "probes": [
+    {
+      "kind": "inscription",
+      "id": "known-symbolic-arithmetic",
+      "inscription": "1+2",
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "arithmetic"
+      },
+      "expected_distribution": [
+        {
+          "consequence": "number:3",
+          "count": 2
+        }
+      ],
+      "required_active_folds": [
+        "1+",
+        "+2",
+        "1+2"
+      ]
+    },
+    {
+      "kind": "inscription",
+      "id": "known-symbolic-concatenate",
+      "inscription": "1+2",
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "concatenate"
+      },
+      "expected_distribution": [
+        {
+          "consequence": "text:12",
+          "count": 2
+        }
+      ],
+      "required_active_folds": [
+        "1+",
+        "+2",
+        "1+2"
+      ]
+    },
+    {
+      "kind": "inscription",
+      "id": "partial-symbolic-receiver",
+      "inscription": "1+2",
+      "parameters": {
+        "medium": "symbolic"
+      },
+      "expected_distribution": [
+        {
+          "consequence": "number:3",
+          "count": 3
+        },
+        {
+          "consequence": "text:12",
+          "count": 2
+        }
+      ],
+      "required_active_folds": [
+        "1+",
+        "+2",
+        "1+2"
+      ]
+    },
+    {
+      "kind": "inscription",
+      "id": "unparameterized-path",
+      "inscription": "1+2",
+      "parameters": {},
+      "expected_distribution": [
+        {
+          "consequence": "number:3",
+          "count": 3
+        },
+        {
+          "consequence": "text:12",
+          "count": 2
+        }
+      ],
+      "required_active_folds": [
+        "1+",
+        "+2",
+        "1+2"
+      ]
+    },
+    {
+      "kind": "inscription",
+      "id": "known-grain-unknown-consequence",
+      "inscription": "1+4",
+      "parameters": {
+        "medium": "symbolic",
+        "objective": "arithmetic"
+      },
+      "expected_distribution": [],
+      "required_active_folds": [
+        "1+"
+      ]
+    },
+    {
+      "kind": "consequence",
+      "id": "number-three-cross-inscription",
+      "consequence": "number:3",
+      "expected_inscriptions": [
+        "1+2",
+        "add(1,2)",
+        "one plus two"
+      ]
+    }
+  ],
+  "required_overlap": {
+    "expansion": "1+2",
+    "presentations": [
+      [
+        "1+",
+        "2"
+      ],
+      [
+        "1",
+        "+2"
+      ]
+    ]
+  },
+  "required_shared_consequence": {
+    "consequence": "number:3",
+    "inscriptions": [
+      "1+2",
+      "add(1,2)",
+      "one plus two"
+    ]
+  },
+  "stopping_condition": "Stop after one bounded host passage closes reversible folding, plural overlap, receiver-relative consequence fibers, exact residual return, outgoing-factor replacement, source-absent local recruitment, inverse consequence recruitment, no-standing refusal, and exact rest/remount; otherwise stop at the first concrete carrier obstruction."
+}

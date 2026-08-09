@@ -1,0 +1,238 @@
+{
+  "provenance": {
+    "kind": "RECOVERED",
+    "recovered_from_repository": "/home/b/Workspaces/laboratory (frozen)",
+    "recovered_from_commit": "a07ff376",
+    "recovered_from_path": "src/soma/observations/eros-retriangulating-branch-transport-01/SOURCE.json",
+    "recovered_bytes": 4060,
+    "note": "Recovered whole from the frozen laboratory. Every member below this one is the laboratory's own content; this `provenance` member is the only addition and the driver's deserializer ignores it. Nothing here was authored or measured in the holonics repository."
+  },
+  "schema": "eros.retriangulating-branch-transport.source.v1",
+  "observation_id": "eros-retriangulating-branch-transport-01",
+  "question": "Can one exact local triangulation law remain consequential after its source lineage departs, act on later quadrilaterals in changed scale and chart, and expose the information lost by a cross-ratio-plus-endpoint quotient?",
+  "program": {
+    "name": "ordered Ptolemy flip",
+    "output": 8,
+    "nodes": [
+      {
+        "op": "input",
+        "role": "a"
+      },
+      {
+        "op": "input",
+        "role": "b"
+      },
+      {
+        "op": "input",
+        "role": "c"
+      },
+      {
+        "op": "input",
+        "role": "d"
+      },
+      {
+        "op": "input",
+        "role": "e"
+      },
+      {
+        "op": "multiply",
+        "left": 0,
+        "right": 2
+      },
+      {
+        "op": "multiply",
+        "left": 1,
+        "right": 3
+      },
+      {
+        "op": "add",
+        "left": 5,
+        "right": 6
+      },
+      {
+        "op": "divide",
+        "left": 7,
+        "right": 4
+      }
+    ],
+    "domain": "the divisor carried at role e must be nonzero",
+    "relation": "e*f = a*c + b*d"
+  },
+  "source_occurrence": {
+    "chart": "a,b,c,d cyclic; e is the live diagonal; f is the alternate diagonal",
+    "values": [
+      "2",
+      "3",
+      "5",
+      "7",
+      "1"
+    ],
+    "path": [
+      "a*c = 10",
+      "b*d = 21",
+      "a*c + b*d = 31",
+      "(a*c + b*d)/e = 31"
+    ],
+    "output": "31"
+  },
+  "quotient": {
+    "retains": [
+      "chi = (a*c)/(b*d)",
+      "source output f"
+    ],
+    "chi": "10/21",
+    "source_output": "31",
+    "forgets": [
+      "the metric scale b*d",
+      "the old diagonal e as a divisor",
+      "the ordered multiply-add-divide path",
+      "the domain seam at e = 0"
+    ]
+  },
+  "cases": [
+    {
+      "id": "uniform-scale-two",
+      "group": "heldout",
+      "chart": "same cyclic chart; every lambda length is rebased by scale two",
+      "source_role_order": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e"
+      ],
+      "values": [
+        "4",
+        "6",
+        "10",
+        "14",
+        "2"
+      ],
+      "expected_path": [
+        "a*c = 40",
+        "b*d = 84",
+        "a*c + b*d = 124",
+        "(a*c + b*d)/e = 62"
+      ],
+      "expected_output": "62",
+      "expected_condition": "closed"
+    },
+    {
+      "id": "cyclic-rechart",
+      "group": "heldout",
+      "chart": "local roles rotate from (a,b,c,d) to (b,c,d,a)",
+      "source_role_order": [
+        "b",
+        "c",
+        "d",
+        "a",
+        "e"
+      ],
+      "values": [
+        "3",
+        "5",
+        "7",
+        "2",
+        "1"
+      ],
+      "expected_path": [
+        "a*c = 21",
+        "b*d = 10",
+        "a*c + b*d = 31",
+        "(a*c + b*d)/e = 31"
+      ],
+      "expected_output": "31",
+      "expected_condition": "closed"
+    },
+    {
+      "id": "scaled-cyclic-rechart",
+      "group": "heldout",
+      "chart": "the cyclic rechart and scale-two rebase occur together",
+      "source_role_order": [
+        "b",
+        "c",
+        "d",
+        "a",
+        "e"
+      ],
+      "values": [
+        "6",
+        "10",
+        "14",
+        "4",
+        "2"
+      ],
+      "expected_path": [
+        "a*c = 84",
+        "b*d = 40",
+        "a*c + b*d = 124",
+        "(a*c + b*d)/e = 62"
+      ],
+      "expected_output": "62",
+      "expected_condition": "closed"
+    },
+    {
+      "id": "rational-alternate-diagonal",
+      "group": "heldout",
+      "chart": "same roles, nonintegral exact receiver",
+      "source_role_order": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e"
+      ],
+      "values": [
+        "2",
+        "3",
+        "4",
+        "5",
+        "7"
+      ],
+      "expected_path": [
+        "a*c = 8",
+        "b*d = 15",
+        "a*c + b*d = 23",
+        "(a*c + b*d)/e = 23/7"
+      ],
+      "expected_output": "23/7",
+      "expected_condition": "closed"
+    },
+    {
+      "id": "zero-diagonal-seam",
+      "group": "boundary",
+      "chart": "the presented old diagonal collapses to the divisor seam",
+      "source_role_order": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e"
+      ],
+      "values": [
+        "2",
+        "3",
+        "5",
+        "7",
+        "0"
+      ],
+      "expected_path": [
+        "a*c = 10",
+        "b*d = 21",
+        "a*c + b*d = 31",
+        "division by e is OPEN"
+      ],
+      "expected_output": null,
+      "expected_condition": "open"
+    }
+  ],
+  "physical_preflight": {
+    "executor": "bounded host",
+    "event_limit_seconds": 30,
+    "run_limit_seconds": 120,
+    "maximum_regional_arcs_per_event": 256,
+    "floating_point_causal_data": false,
+    "cuda": false
+  },
+  "stopping_condition": "Stop after the complete carrier, quotient foil, no-standing control, four later closed paths, one e=0 open path, exact rest/remount, and exact returned-result comparisons have all been read. If the world must still interpret the recovered program, name that seam instead of claiming direct Eros enactment."
+}

@@ -1,0 +1,276 @@
+{
+  "provenance": {
+    "kind": "RECOVERED",
+    "recovered_from_repository": "/home/b/Workspaces/laboratory (frozen)",
+    "recovered_from_commit": "a07ff376",
+    "recovered_from_path": "src/soma/observations/eros-holonic-training-ecology-01/SOURCE.json",
+    "recovered_bytes": 6030,
+    "note": "Recovered whole from the frozen laboratory. Every member below this one is the laboratory's own content; this `provenance` member is the only addition and the driver's deserializer ignores it. Nothing here was authored or measured in the holonics repository."
+  },
+  "schema": "eros.holonic-training-ecology.source.v1",
+  "observation_id": "eros-holonic-training-ecology-01",
+  "lambda": {
+    "minimum_recurrence": 2,
+    "maximum_templates_per_occurrence": 4096,
+    "causal_carrier": "the complete finite consequence-boundary complex: exact COPY edges from co-present addressed faces plus exact elementary FOUND edges",
+    "receiver_law": "retain every afforded complete path at maximal exact parameter-axis incidence; missing axes preserve alternatives",
+    "residual_law": "compare the actual later consequence with the complete afforded path population as NONE, RIDE, OPEN_INCLUDED, or OPEN_RESIDUAL",
+    "floating_point": false
+  },
+  "training_occurrences": [
+    {
+      "ordinal": 0,
+      "id": "utterance-ada",
+      "faces": [
+        {
+          "axis": "subject",
+          "ordinal": 0,
+          "value": "Ada"
+        }
+      ],
+      "parameters": {
+        "medium": "text",
+        "objective": "greet"
+      },
+      "consequence": "Hello, Ada!"
+    },
+    {
+      "ordinal": 1,
+      "id": "utterance-lin",
+      "faces": [
+        {
+          "axis": "subject",
+          "ordinal": 0,
+          "value": "Lin"
+        }
+      ],
+      "parameters": {
+        "medium": "text",
+        "objective": "greet"
+      },
+      "consequence": "Hello, Lin!"
+    },
+    {
+      "ordinal": 2,
+      "id": "name-ada",
+      "faces": [
+        {
+          "axis": "subject",
+          "ordinal": 0,
+          "value": "Ada"
+        }
+      ],
+      "parameters": {
+        "medium": "text",
+        "objective": "name"
+      },
+      "consequence": "Ada"
+    },
+    {
+      "ordinal": 3,
+      "id": "name-lin",
+      "faces": [
+        {
+          "axis": "subject",
+          "ordinal": 0,
+          "value": "Lin"
+        }
+      ],
+      "parameters": {
+        "medium": "text",
+        "objective": "name"
+      },
+      "consequence": "Lin"
+    },
+    {
+      "ordinal": 4,
+      "id": "python-emit-ada",
+      "faces": [
+        {
+          "axis": "utterance",
+          "ordinal": 0,
+          "value": "Hello, Ada!"
+        }
+      ],
+      "parameters": {
+        "language": "python",
+        "medium": "code",
+        "objective": "emit"
+      },
+      "consequence": "emit(\"Hello, Ada!\")"
+    },
+    {
+      "ordinal": 5,
+      "id": "python-emit-lin",
+      "faces": [
+        {
+          "axis": "utterance",
+          "ordinal": 0,
+          "value": "Hello, Lin!"
+        }
+      ],
+      "parameters": {
+        "language": "python",
+        "medium": "code",
+        "objective": "emit"
+      },
+      "consequence": "emit(\"Hello, Lin!\")"
+    },
+    {
+      "ordinal": 6,
+      "id": "rust-emit-ada",
+      "faces": [
+        {
+          "axis": "utterance",
+          "ordinal": 0,
+          "value": "Hello, Ada!"
+        }
+      ],
+      "parameters": {
+        "language": "rust",
+        "medium": "code",
+        "objective": "emit"
+      },
+      "consequence": "println!(\"Hello, Ada!\");"
+    },
+    {
+      "ordinal": 7,
+      "id": "rust-emit-lin",
+      "faces": [
+        {
+          "axis": "utterance",
+          "ordinal": 0,
+          "value": "Hello, Lin!"
+        }
+      ],
+      "parameters": {
+        "language": "rust",
+        "medium": "code",
+        "objective": "emit"
+      },
+      "consequence": "println!(\"Hello, Lin!\");"
+    },
+    {
+      "ordinal": 8,
+      "id": "application-sin-x",
+      "faces": [
+        {
+          "axis": "operator",
+          "ordinal": 0,
+          "value": "sin"
+        },
+        {
+          "axis": "argument",
+          "ordinal": 0,
+          "value": "x"
+        }
+      ],
+      "parameters": {
+        "medium": "mathematics",
+        "objective": "apply"
+      },
+      "consequence": "sin(x)"
+    },
+    {
+      "ordinal": 9,
+      "id": "application-cos-y",
+      "faces": [
+        {
+          "axis": "operator",
+          "ordinal": 0,
+          "value": "cos"
+        },
+        {
+          "axis": "argument",
+          "ordinal": 0,
+          "value": "y"
+        }
+      ],
+      "parameters": {
+        "medium": "mathematics",
+        "objective": "apply"
+      },
+      "consequence": "cos(y)"
+    }
+  ],
+  "probes": [
+    {
+      "id": "unseen-utterance",
+      "faces": [
+        {
+          "axis": "subject",
+          "ordinal": 0,
+          "value": "Mira"
+        }
+      ],
+      "parameters": {
+        "medium": "text",
+        "objective": "greet"
+      },
+      "expected_consequences": [
+        "Hello, Mira!"
+      ],
+      "actual_consequence": "Hello, Mira!"
+    },
+    {
+      "id": "withheld-objective",
+      "faces": [
+        {
+          "axis": "subject",
+          "ordinal": 0,
+          "value": "Mira"
+        }
+      ],
+      "parameters": {
+        "medium": "text"
+      },
+      "expected_consequences": [
+        "Hello, Mira!",
+        "Mira"
+      ],
+      "actual_consequence": "Mira"
+    },
+    {
+      "id": "unseen-math-application",
+      "faces": [
+        {
+          "axis": "operator",
+          "ordinal": 0,
+          "value": "tan"
+        },
+        {
+          "axis": "argument",
+          "ordinal": 0,
+          "value": "z"
+        }
+      ],
+      "parameters": {
+        "medium": "mathematics",
+        "objective": "apply"
+      },
+      "expected_consequences": [
+        "tan(z)"
+      ],
+      "actual_consequence": "tan(z)"
+    },
+    {
+      "id": "contradicting-return",
+      "faces": [
+        {
+          "axis": "subject",
+          "ordinal": 0,
+          "value": "Mira"
+        }
+      ],
+      "parameters": {
+        "medium": "text",
+        "objective": "greet"
+      },
+      "expected_consequences": [
+        "Hello, Mira!"
+      ],
+      "actual_consequence": "Greetings, Mira."
+    }
+  ],
+  "stopping_condition": "Stop after one exact mixed-medium ecology derives paths from ordinary consequences, survives source-free rest/remount, composes an unseen text consequence into two code paths, preserves alternatives under withheld context, and returns one honest contradiction residual."
+}

@@ -1178,13 +1178,11 @@ impl CausalBodyStanding {
             if let Some(old) = previous
                 .as_ref()
                 .and_then(|old| old.diffusion.content.values.get(cell))
-            {
-                if old.len() == sheaf.stalk_dimension(*cell)? {
+                && old.len() == sheaf.stalk_dimension(*cell)? {
                     values.insert(*cell, old.clone());
                     carried.insert(*cell);
                     continue;
                 }
-            }
             expected_entering.insert(*cell);
             let supplied = entering_content
                 .get(cell)
@@ -1469,15 +1467,14 @@ fn bind_source_vertex(
     source: SourceVertexId,
     causal: CausalCellId,
 ) -> Result<(), CausalBodyError> {
-    if let Some(existing) = bindings.insert(source, causal) {
-        if existing != causal {
+    if let Some(existing) = bindings.insert(source, causal)
+        && existing != causal {
             return Err(CausalBodyError::ProjectionSourceVertexInconsistent {
                 source_vertex: source,
                 first: existing,
                 second: causal,
             });
         }
-    }
     Ok(())
 }
 

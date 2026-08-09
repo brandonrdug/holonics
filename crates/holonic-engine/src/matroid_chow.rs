@@ -660,11 +660,10 @@ fn extend_chains(
 ) {
     let start = current.last().map_or(0, |last| last + 1);
     for next in start..containment.len() {
-        if let Some(last) = current.last() {
-            if !containment[*last][next] {
+        if let Some(last) = current.last()
+            && !containment[*last][next] {
                 continue;
             }
-        }
         current.push(next);
         out.push(current.clone());
         if current.len() < max_length {
@@ -1459,7 +1458,7 @@ impl ChowRing {
         let ambient_split = inertia(&ambient_form);
 
         // Restrict to the primitive part and apply the declared hand.
-        let hand: i64 = if degree % 2 == 0 { 1 } else { -1 };
+        let hand: i64 = if degree.is_multiple_of(2) { 1 } else { -1 };
         let mut rows = vec![vec![Rat::zero(); primitive_dimension]; primitive_dimension];
         for (row, left) in primitive.iter().enumerate() {
             for (column, right) in primitive.iter().enumerate() {

@@ -764,9 +764,9 @@ impl StarTable {
     ) -> Result<ExactInterval, WindingError> {
         let extent = self.extent;
         let mut total = ExactInterval::point(Rat::from_integer(symbol[0].clone()));
-        if extent % 2 == 0 {
+        if extent.is_multiple_of(2) {
             let middle = &symbol[extent / 2];
-            let signed = if character % 2 == 0 {
+            let signed = if character.is_multiple_of(2) {
                 middle.clone()
             } else {
                 -middle.clone()
@@ -901,11 +901,10 @@ fn halve_isolating_interval(
 /// answers by refining the star table.
 fn certify(polynomial: &IntegerPolynomial, enclosure: &ExactInterval) -> Option<AlgebraicRoot> {
     let two = Rat::from_integer(BigInt::from(2));
-    if !enclosure.is_point() {
-        if let Ok(root) = AlgebraicRoot::isolate(polynomial.clone(), enclosure.clone()) {
+    if !enclosure.is_point()
+        && let Ok(root) = AlgebraicRoot::isolate(polynomial.clone(), enclosure.clone()) {
             return Some(root);
         }
-    }
     let mut pad = if enclosure.is_point() {
         Rat::one()
     } else {
@@ -1116,7 +1115,7 @@ fn cyclotomic_polynomial(order: usize) -> Vec<Rat> {
     result[order] = Rat::one();
     result[0] = -Rat::one();
     for divisor in 1..order {
-        if order % divisor == 0 {
+        if order.is_multiple_of(divisor) {
             let (quotient, _) = poly_divmod(&result, &cyclotomic_polynomial(divisor))
                 .expect("a cyclotomic polynomial is nonzero");
             result = quotient;

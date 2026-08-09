@@ -632,7 +632,7 @@ pub fn arctan_unit_fraction(
         odd_power *= &base_squared;
     }
     let magnitude = Rat::new(BigInt::one(), &odd_power * BigInt::from(2 * terms + 1));
-    let first_omitted_term = if terms % 2 == 0 {
+    let first_omitted_term = if terms.is_multiple_of(2) {
         magnitude
     } else {
         -magnitude

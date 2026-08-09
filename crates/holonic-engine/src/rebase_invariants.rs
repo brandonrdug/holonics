@@ -298,7 +298,7 @@ pub struct ReductionWork {
 
 impl ReductionWork {
     fn record(&mut self, value: &BigInt) {
-        let bits = u64::from(value.bits());
+        let bits = value.bits();
         self.entries_written = self.entries_written.saturating_add(1);
         self.written_bits = self.written_bits.saturating_add(bits);
         if bits > self.peak_entry_bits {

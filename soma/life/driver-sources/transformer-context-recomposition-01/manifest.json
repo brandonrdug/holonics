@@ -1,0 +1,130 @@
+{
+  "provenance": {
+    "kind": "RECOVERED",
+    "recovered_from_repository": "/home/b/Workspaces/laboratory (frozen)",
+    "recovered_from_commit": "a07ff376",
+    "recovered_from_path": "experiments/informant-ecology/results/transformer-context-recomposition-01/manifest.json",
+    "feeds": "eros_self_emanated_law <context-result-dir>",
+    "known_blocker": "The two 33,139,024-byte activation captures this manifest names under `runs/transformer-block-atlas-01/captures/` are NOT tracked at a07ff376 -- `git ls-tree -r a07ff376 | grep -c '\\.safetensors$'` returns 0 -- so `eros_self_emanated_law` still refuses at `verify_artifact`. The manifest is recovered anyway because it is the correct one (the `transformer-relational-field-01` manifest has no `input_artifacts` member at all) and because the driver's OTHER external input, `model_snapshot/model.safetensors`, is present on this machine at the exact snapshot named.",
+    "note": "Recovered whole; this `provenance` member is the only addition and the driver's deserializer ignores it."
+  },
+  "architecture": {
+    "attention_heads": 16,
+    "head_rank": 128,
+    "key_value_heads": 16,
+    "layer_count": 16,
+    "mlp_rank": 8192,
+    "residual_rank": 2048,
+    "selected_layer": 0
+  },
+  "environment": {
+    "cublas_workspace_config": ":4096:8",
+    "cuda_capability": [
+      8,
+      9
+    ],
+    "cuda_device": "NVIDIA GeForce RTX 4080 SUPER",
+    "deterministic_algorithms": true,
+    "nvidia_smi": "NVIDIA GeForce RTX 4080 SUPER, 16376 MiB, 595.71.05",
+    "packages": {
+      "huggingface-hub": "1.15.0",
+      "safetensors": "0.7.0",
+      "torch": "2.10.0",
+      "transformers": "5.8.1"
+    },
+    "platform": "Linux-7.0.5-2-cachyos-x86_64-with-glibc2.43",
+    "python": "3.12.12 (main, Dec  9 2025, 19:02:36) [Clang 21.1.4 ]",
+    "tf32_matmul": false,
+    "torch_cuda": "12.8"
+  },
+  "input_artifacts": {
+    "results/transformer-block-atlas-01/token_spans.jsonl": {
+      "bytes": 86125,
+      "sha256": "dd55eaa430e455754b5db7d96e1460ffbfbcb08fbe791b167a6ceec84892de89"
+    },
+    "runs/transformer-block-atlas-01/captures/drop_then_reverse.conversation.relevant_after.safetensors": {
+      "bytes": 33139024,
+      "sha256": "e8251263b3ffd6087bc0b75bc95e17c031930005f4a550435df1819d12cff06f"
+    },
+    "runs/transformer-block-atlas-01/captures/drop_then_reverse.conversation.relevant_before.safetensors": {
+      "bytes": 33139024,
+      "sha256": "09c4e897b79f48097ebd5c9305475138e8bf5d1dd1d223aae51740d47c905005"
+    }
+  },
+  "model": {
+    "repository": "allenai/OLMo-2-0425-1B-Instruct",
+    "revision": "48d788eca847d4d7548f375ad03d3c9312f6139e",
+    "role": "final_instruct"
+  },
+  "model_files": [
+    {
+      "bytes": 1519,
+      "path": ".gitattributes",
+      "sha256": "11ad7efa24975ee4b0c3c3a38ed18737f0658a5f75a0a96787b576a78a023361"
+    },
+    {
+      "bytes": 6161,
+      "path": "README.md",
+      "sha256": "5f5b891d66a46079920172f8d5957ec386825f76cfc14ae2e79c7208d4dca4d8"
+    },
+    {
+      "bytes": 625,
+      "path": "config.json",
+      "sha256": "0d15ebb6cb8d998513b46ef337214176a6fd59fe5f16b30387c70d5f87795a9c"
+    },
+    {
+      "bytes": 121,
+      "path": "generation_config.json",
+      "sha256": "437b97826bb4430c205083a0986fbe31f4959cffbe445e47fb7c5192fdcb8d58"
+    },
+    {
+      "bytes": 916646,
+      "path": "merges.txt",
+      "sha256": "b6fe424e334903f7fb84d3a106d9730455f4744b9fe3c21ee136d97a00e72502"
+    },
+    {
+      "bytes": 2969854224,
+      "path": "model.safetensors",
+      "sha256": "36d044c73655bb904f822915e6294ba3dae8e6e1af5e703e9d452f2d6a3a294f"
+    },
+    {
+      "bytes": 581,
+      "path": "special_tokens_map.json",
+      "sha256": "78afb564e81264029b25f9caf24bda2521d5bdaeff5cd3fdbc01d3da2e8ce2f2"
+    },
+    {
+      "bytes": 7137177,
+      "path": "tokenizer.json",
+      "sha256": "73fd5254624f39a88e3faac6a8e11300fc3c735ed37880d4f4f08db898eaecca"
+    },
+    {
+      "bytes": 4884,
+      "path": "tokenizer_config.json",
+      "sha256": "50c412c57d832057a3d5db42064c741f751e570f7c8788f037bfb0d2dd6e5f49"
+    },
+    {
+      "bytes": 1611056,
+      "path": "vocab.json",
+      "sha256": "9e14712c91b37c7aab74b1306baa46ac342d620637a4b44523cdc3aec7d24195"
+    }
+  ],
+  "model_snapshot": "/home/b/.cache/huggingface/models--allenai--OLMo-2-0425-1B-Instruct/snapshots/48d788eca847d4d7548f375ad03d3c9312f6139e",
+  "numerical_evidence": "exact BF16 codewords and SHA-256 identities; no similarity, norm, or decimal threshold",
+  "observation_id": "transformer-context-recomposition-01",
+  "physical_inventory": {
+    "active_carrier_bf16_words": 2072576,
+    "active_carrier_faces": [
+      "block.input",
+      "query.normalized",
+      "key.normalized",
+      "value.projected"
+    ],
+    "active_post_extraction_law_parameters": 54530048,
+    "full_model_parameters_loaded_for_extraction": 1484916736,
+    "note": "inventory only; parameter count is not the project's definition of compression"
+  },
+  "question": "Can source-carried pre-context material plus the inherited block law reform the complete target-relative field when chronology changes?",
+  "source_commit": "b280e94446df3949a2baf7811d8bc904d49ad6c2",
+  "source_status_before_observation": "",
+  "stopping_condition": "compare every one of the 22 target faces once against recomposition and two frozen-field foils"
+}
