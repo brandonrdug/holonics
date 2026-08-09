@@ -2,7 +2,7 @@
 
 **This is the single active roadmap, and it is ordered by
 [`canon/THE_HOLOBROCHOS_SPINE.md`](../canon/THE_HOLOBROCHOS_SPINE.md).** Read the spine first. It
-states the loop — afference → emanate → **reafference** — the two moves that run on it, and where
+states the loop as a chain law with **five named cuts**, the two moves that run on it, and where
 every live organ sits. Nothing here is a menu of adjacent constructions; every open item below is a
 **station of that loop that does not yet conduct**, or a **law of that loop that a live organ
 violates**.
@@ -282,6 +282,31 @@ first. After: the movement is non-zero and **attributable**, each changed thing 
 return that caused it. Plus a no-op control: a reading that moves nothing leaves the next production
 bit-identical. And **name the cut** — circulation, rest, accumulation, leak, short circuit — before
 and after.
+
+> **REGRADED 2026-08-08, and this is the correction Brandon's question forced.** The join was built
+> as a **private wire**: `returned_reading::condition_again` takes the reading in memory, calls
+> `carried_into(morphology)`, and derives again. Nothing leaves the process, lands in the world's
+> record, or is re-read.
+>
+> **Soma names that shape and refuses it, five times.** `FORMULA.md:318` lists *"reafference wiring"*
+> among the **contaminants**; `:696` *"No reafference wiring… **Reafference is the world's, never a
+> wire's**"*; `:876` *"**Not reafference.** The frame advancing by its own emanation is not output
+> wired back as input — nothing re-enters as stimulus. **The consequence returns AS A PLACE:** the
+> emanation becomes the pole the next arrival is related from — the standing coupling law, not a
+> feedback loop"*; `:1246` *"never a private reafference wire"*.
+>
+> **What survives:** every measurement. The movement is real, attributable, moved the production, and
+> named its cut honestly. **What is regraded:** the channel it travels.
+>
+> **What is owed:** route the movement **through the seal.** The production is deposited by
+> `form_mouth` at its content address and the next conditioning reads it **back from the deposit**
+> rather than receiving it across a call. `blueprint/THE_ASSEMBLY.md` F1 makes this the natural
+> shape here anyway — `holon-plate` sits above `life`, so the world's record is already the only
+> lawful crossing.
+>
+> **Falsifier for the repair:** the second conditioning must fail if the sealed form is deleted
+> between the two turns. A return that survives the deletion of the world's record never went
+> through it.
 
 **The measure is situated.** `surprisal.rs` holds the exact ℚ-linear form over the primes and has
 zero consumers. Soma's law: comparison is situated by a frame and is therefore at least

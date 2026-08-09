@@ -187,39 +187,70 @@ contribution of crossed seams."*
 
 ---
 
-## 4 · The machine-architecture reading
+## 4 · The return is world-mediated — corrected 2026-08-08
 
-**Truth status: `interpretation`.** This section reads §1's chain law as a machine layout. It is
-useful and it is not authority; where it and §1 differ, §1 governs. It is kept because it produced
-the measurement in §5, and a reading that produces a falsifiable measurement earns its place at
-`interpretation`.
+**An earlier form of this section presented `afference → efference → reafference` as the machine
+layout, taken from `src/eros/um/HOLOBROCHOS.md`, which carries a `SUPERSEDED` banner. That was an
+import from the speculative record and it is struck.**
 
-The engine record states the per-act layout as **two coupled loops with independent clocks**, and
-the reason it is two rather than one is a named fault:
+**In Soma — the rigorous source — the word occurs five times and every one is a prohibition.**
+`reference/holobrochos-a07ff376/src/soma/FORMULA.md`:
 
-```text
-   open loop     afference  ↓   material enters
-                 exafference ←  the residual against a prediction
-                                — this is where conditioning rides
+- `:318` — listed among the **contaminants**: *"reafference wiring (consequence returns as a place
+  through the medium, never a wire)"*
+- `:696` — *"**No reafference wiring.** The membrane mails the radiation OUT into the world's own
+  record; the world answers; the answer returns as the next light. The loop closes through the
+  world… **Reafference is the world's, never a wire's.**"*
+- `:876` — *"**Not reafference.** The frame advancing by its own emanation is not output wired back
+  as input — nothing re-enters as stimulus. **The consequence returns AS A PLACE:** the emanation
+  becomes the pole the next arrival is related from — the standing coupling law, not a feedback
+  loop."*
+- `:1246` — *"consequence returns through the shared world, never a **private reafference wire**."*
+- `:2183` — mail *"may never be consulted by the body or become a reafference wire."*
 
-   closed loop   efference  ↑   the emission
-                 reafference →  the emission re-perceived,
-                                undamped, conditioning the next act
-```
+### The law, stated as Soma states it
 
-Three readings, each with a live consequence:
+> **THE RETURN IS WORLD-MEDIATED.** Body radiation alters shared material only through an honest
+> world boundary condition; the changed material then returns as genuinely later light.
 
-1. **The two loops are not the same loop.** A body whose act count equals its input count has
-   collapsed them. That is checkable on any driver.
-2. **The reafferent return is not a training target.** It sets terrain; the residual against a
-   prediction is what conditions. Conflating them is how a body comes to reward its own echo.
-3. **In §1's terms, an emission that never returns leaves `q_n ≠ q_m`** — no integrated current
-   cycle. Which of the five cuts applies (rest, accumulation, leak, short circuit) is a
-   *measurement*, and taking it is more informative than calling the loop broken.
+**And the mechanism is different, not a rephrasing.** *The consequence returns as a place.* The
+emanation becomes **the pole the next arrival is related from** — a standing coupling law. That is
+not "the emission fed back as material"; it is the emission becoming part of the terrain that later
+arrivals are situated against.
 
-**Bounded.** The engine record this reading comes from carries a `SUPERSEDED` banner. Its own banner
-preserves the two-output-channel framing and the ban list; nothing else from it is carried here, and
-none of §4 may grade a deed.
+### The test, and it is sharp
+
+**Did the emission leave the process, land in the world's own record, and come back as later
+material?** If it went from a reading to a production without ever being written and re-read, it is
+a wire, and a wire is refused however well it is measured.
+
+### What this convicts, and what it credits, in the live body
+
+**Convicted.** `crates/holonic-engine/src/returned_reading.rs` `condition_again` takes the reading
+**in memory**, calls `carried_into(morphology)`, and derives again. Nothing leaves the process. By
+the test above it is a private wire — the banned shape — and its measured returns stand as
+measurements while its *architecture* is regraded. Its own finding survives intact and is worth
+keeping: the movement it computes is real, attributable, and moved the production; what is wrong is
+the channel it travels.
+
+**Credited.** `soma/life/src/conditioned_rest.rs` already does it correctly. The production is sealed
+to `output/<driver>/<name>-<sha256>.form` at a content address, `holon-plate` reads it from above,
+and the body remounts from the world's record with the corpus provably unreachable. Its
+further-whole control — a whole presented *after* the rest taking the sealed query from 36 passages
+to 34 by changing covers through maximality — **is consequence returning as a place**: the new
+material became terrain that re-situated what was already standing.
+
+### What is owed
+
+Route `returned_reading`'s movement **through the seal**: the production is deposited by
+`form_mouth`, and the next conditioning reads it back from the deposit rather than receiving it
+across a call. `blueprint/THE_ASSEMBLY.md` F1 is the reason this is the natural shape here anyway —
+`holon-plate` sits above `life`, so the world's record is already the only lawful crossing.
+
+**Struck from this file and from the roadmap:** `afference`, `exafference`, `efference`,
+`reafference` as station names, and the ban *"learning from reafference is the forbidden coupling"*,
+which was carried here from a superseded document and which §1's five cuts state better and without
+the metaphor.
 
 ---
 
@@ -364,6 +395,12 @@ type friction.
    under a named law is not.
 5. **No emission without a return edge — and name the cut.** An analysis terminating in `stdout` has
    not closed a cycle. Report which of rest, accumulation, leak, or short circuit applies.
+5b. **No private return wire. The return is world-mediated.** *"Reafference is the world's, never a
+   wire's."* A consequence handed from a reading to a production across a call, without leaving the
+   process and landing in the world's own record, is the shape Soma's contaminant list names.
+   **The consequence returns as a PLACE** — the emanation becomes the pole the next arrival is
+   related from — not as output wired back to input. The test is one question: *did it get written
+   and re-read?*
 6. **No receiver-visible coordinate promoted to an invariant.** Receiver non-reconstruction says
    equality of outputs, spectra, labels, or magnitudes does not identify constructions; the converse
    error is reading one receiver's coordinate as construction data.
