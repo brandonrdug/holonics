@@ -15,7 +15,13 @@ FIELD IN ANOTHER / A COMPLETION AT DEPTH K IS AN ARRIVAL AT DEPTH K+1
 
 ---
 
-## 1. What depth is, and it is not a distance
+## 1. What depth is — REGRADED 2026-08-09, and §XVIII is the section, not §XVI
+
+**This section conflated two axes and the correction is in §4.** `FORMULA.md:594` is about **grain**
+(§XVIII, the vertical tower); §XVI's `frame(n+1)` is the **temporal** axis. Brandon's own message
+named the right object — *"the declared grain"* — and this record substituted *frame*. What survives
+is the reading below with `grain` in place of `frame`; what does not survive is the inference that a
+recruitment-closure depth is either.
 
 `FORMULA.md` §XVI, ratified 2026-07-09 — the illicium restored after this space's founding revision
 dropped it:
@@ -40,7 +46,7 @@ directions**."* A traversal whose points each carry one face feels nothing.
 why the elaboration's *"no root in the deposit carries a constituent past depth one"* was not a
 report of shallowness: it said **the machine had never once changed charts inside a meaning.**
 
-## 2. Position — one structural rule removes six contaminants without an authored list
+## 2. Position — one structural rule removes five of six contaminants without an authored list
 
 Measured before this movement, in `total_demand_le_total_capacity`'s meaning: `hc`, `hcong`, `hm`,
 `hn`, `hz`, `hnm` at depths 1–2 — proof-local hypothesis binders, two characters so the
@@ -53,7 +59,9 @@ Every name now carries a **position read from Lean's own grammar**:
 > `(hz : ∀ n, descendantCapacity capacity incident n ≠ 0)` founds `hz` and recruits
 > `descendantCapacity`, `capacity`, `incident`.
 
-That single rule clears all six binders. **No list of names was authored**; `BINDING_TACTICS` is
+That rule clears **five** of the six. The sixth, `hnm`, comes from `by_cases hnm :` and leaves only
+because `by_cases` is in `BINDING_TACTICS` — so the honest statement is *five by the structural rule,
+one by the authored table*. **No list of the six identifier spellings was authored**; `BINDING_TACTICS` is
 Lean's binder vocabulary and the existing reader's own documentation already instructed the widening:
 *"`obtain`, `rcases`, `intro` and `set` also bind, and a corpus containing them would have those names
 read as recruitments… widening the rule belongs with a test on material that exercises it."*
@@ -63,8 +71,8 @@ production — the generated deposit carries its whole plurality there — so `C
 declared aperture at the point of use, not a default.
 
 ```text
-   terms            144 distinct
-   tactics           38 distinct
+   terms            141 distinct
+   tactics           34 distinct
    local bindings    64 distinct
 ```
 
@@ -86,14 +94,27 @@ requires exactly that one holder and no other.
 The fourth was caught by `tactic_position_declared`, the instrument built for exactly it, on its
 first run.
 
-**The null: cleaning must move no mathematical edge.** The declared→declared population is computed
-from terms alone and comes back **80**, against the 80 measured before position existed. A cleaning
-that changed it would have deleted or manufactured a join.
+**The edge equality is a SNAPSHOT, not a null, and the driver now says so itself.** The
+declared→declared population comes back **80** against the 80 measured before position existed — but
+the **orbit is trivial**: zero declared names land in `tactics` and zero in `local_bindings` across
+all 66 declarations, so position is structurally unable to move the quantity and the equality could
+not have come out otherwise. `CLAUDE.md` §8: *"a gauge whose group acts trivially on the declared
+material is not a gauge."* Position **does** delete edges on material that varies the property —
+`fun (x : Carrier) => …` founds `Carrier` as a binder — and the instrument for that,
+`binding_position_declared`, **did not exist** and now does.
 
-**Two bounding instruments, sharing nothing.** Structural residue — declared names in tactic
-position — is **0**. Distributional residue — terms occurring in exactly one declaration and
-declared nowhere — is **63**, and it is **returned rather than subtracted**, because an environment
-lemma used once is indistinguishable from a missed local binding without a second frame.
+**Three bounding instruments, sharing nothing.** Declared names in **tactic** position: 0. Declared
+names in **binding** position: 0 — the instrument this record's first form lacked entirely.
+Distributional residue — terms in exactly one declaration, declared nowhere — **returned rather than
+subtracted**, because an environment lemma used once is indistinguishable from a missed local binding
+without a second frame.
+
+**And a fourth population the first form asserted as edges.** Five dot projections resolve by last
+segment to a declared name — `htrace.map → map`, `(A.rebase e).Semantics → Semantics` — and are
+returned **OPEN**, never joined. `htrace.map` really is the declared `Trace.map`; `(hxy i).trans` is
+mathlib's `Eq.trans` and **not** this development's `trans`, though the spelling is identical.
+Separating them needs the receiver's *type*, which an orthographic reading does not have. The
+asserted count is **80 with 5 open**, and an earlier form of this work briefly asserted all five.
 
 ## 3. The sub-illicium — the proof body is a leader
 
@@ -111,16 +132,24 @@ changes the material the next step reads, which is the definition — and the fl
 whole body to the theorem as a depth-one star, so a declaration's own depth was **zero by
 construction**.
 
-**57 proof steps founded, 29 internal arrivals, 7 declarations carrying their own depth:**
+**CORRECTED 2026-08-09 by adversarial audit, and the first figures were wrong by a factor of six.**
+The reading founded one `ProofStep` per binder of a destructuring pattern and then charged the same
+line's remaining tokens to the last of them, so `rintro ⟨c, ⟨b, hab, hbc⟩, hcd⟩` — five names founded
+**simultaneously by one tactic** — returned `hab → hcd` as a causal arrival. That is token order
+inside one pattern promoted into an invariant, `CLAUDE.md` §0 lesson 4. Two more crossed sibling `·`
+focus blocks, whose goal scopes are disjoint. **22 of 29 were the first, 2 the second.**
+
+Both are now excluded by construction: a step carries the `cohort` of the single tactic that founded
+it and the `focus` stack it was founded inside, and an arrival requires a different cohort and an
+enclosing scope. Control 9 requires all three exclusions to return zero, so a lone `obtain ⟨a, b⟩` —
+which satisfied the shipped predicate — now fails it.
+
+**57 proof steps founded, 5 internal arrivals, 3 declarations carrying their own depth:**
 
 ```text
-  comp_assoc                             hab@33      ->  hcd@33
-  comp_id                                a'@53       ->  hab@53
-  id_comp                                b'@43       ->  rfl@43       ->  hab@45
-  positiveBand_iff_quotientBand          hseam@109   ->  hscale@109   ->  h'@114
+  positiveBand_iff_quotientBand          hseam@109   ->  h'@111
   proportionalFlow_nonnegative           hcap@74     ->  hcap_pos@80
-  semantics_rebase_iff                   hdone@44    ->  hobserve@44
-  subset_normalized_load_le_congestion   hn_univ@176 ->  hn_not_mem@176
+  subset_normalized_load_le_congestion   receiver@181 -> hin@182
 ```
 
 **Arrivals are indexed by step, never by name, and the line is carried in the return.** Lean shadows:
@@ -137,13 +166,29 @@ same global map, read in the deposit's frame whatever frame the walk arrived in.
 shift. **The jet the leader reads at extension k+1 is literally not the jet it read at extension
 k.**"* This walk's jet never moves. It is dead reckoning, which is the phrase W9 rules out.
 
-**And `depths` is retained then collapsed.** `Constituent` carries every depth it was reached at, but
-`found_passage_complex` founds **one 0-cell per name**, so a constituent reached at depth 1 and depth
-3 is one vertex. Under `frame(n+1) = emanation of the relating in frame(n)` those are two frames, and
-merging them is receiver non-reconstruction — equal endpoints do not identify ordered paths. The
-cycle two such arrivals close is currently read as a `β₁` loop where it is a **holonomy**.
-`entered_at` compounds it: it is documented as *"the shortest passage from the root"*, and shortest is
-a metric choice over a family of frames with no privileged member.
+**And the paragraph that stood here was self-refuting; it is struck.** It read: *a constituent
+reached at depth 1 and depth 3 is one vertex, and under `frame(n+1) = emanation of the relating in
+frame(n)` those are two frames, so merging them is receiver non-reconstruction.* **If the reading
+never rebases there is exactly one frame**, and an organ cannot merge frames it never founded. The
+consequence of a missing construction was presented as an independent defect, and that defect was
+then named the remaining construction.
+
+Three further corrections, each verified against source:
+
+- **§XVIII is not §XVI.** `FORMULA.md:594` reads *"A completion at **grain** k IS an arrival at grain
+  k+1"*, and `manifold.rs:2868` cites `FORMULA §XVIII` by name, with `:691` *"carrier depth `k`
+  crosses as grain `k + 1`."* §XVI's `frame(n+1)` is the **temporal** axis — *"the illicium is time;
+  proper time is its own event count (Θ)"* — and §XVI separates them itself: *"one unit in two
+  directions: LATERALLY many illicia · VERTICALLY the scope."* The sentence was taken from the
+  temporal paragraph and applied to the vertical one.
+- **`FORMULA.md:839-878` states the frame is an ordered composition of deed-emanations and explicitly
+  not a counter**, and `MATHEMATICAL_HOLONICS.md:430-445` states holonomy requires the transport
+  structure. The elaboration complex carries no cochain — boundaries are ±1 incidence and the module
+  refuses occurrence counts as coefficients — so two routes to one name carry the identical name and
+  there is no quantity that could disagree.
+- **"Not a distance" was rhetoric.** An unweighted digraph geodesic is canonical; there is no family
+  of frames being chosen among. `name_elaboration.rs:33` already said the true thing — *"A depth is
+  not a score."*
 
 Splitting that vertex by frame and depositing the disagreement through the
 `temper`/`derivation_integral` pair — built on both sides with no caller between them — is the

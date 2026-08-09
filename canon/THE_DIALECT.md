@@ -4,7 +4,7 @@
 **Truth status:** `established-bounded`. Every row is measured over a named corpus and every quote is
 dated; the inference rules in §5 are `interpretation` drawn from that measurement.
 **Evidence:** `measured` — 8,935 genuine messages, 3.29 MB, 2026-05-11 → 2026-08-08, continuous.
-Certified against the corpus by `tools/verify_quotes.py`.
+Quotations are copied from the conversation logs.
 **Provenance:** Brandon, 2026-08-08, asking for exactly this:
 
 > *"I think one of the largest current issues in our workflows and communication procedures is that

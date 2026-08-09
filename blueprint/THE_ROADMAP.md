@@ -38,7 +38,7 @@ Do not reintroduce numbering by writing "the first movement" as though that were
 Brandon, verbatim:
 
 > *"a machine that can rigorously perform and analyze computations using internal machinery that
-> accommodates transport mechanisms between arbitrary charts, the learning is the intermediary
+> accomodates transport mechanisms between arbitrary charts, the learning is the intermediary
 > mechanism/law/equation"*
 
 And on the encompassing frame, verbatim:
@@ -598,7 +598,8 @@ construction"* (it is driven in four places), and §11's reach figure for the re
 
 ### RETURNED 2026-08-09 — position, and the proof body as a leader
 
-> **Depth is a chart index, not a counter.** Ratified by Brandon and grounded in Soma. Record:
+> **Depth, position, and the proof body.** `interpretation` — Brandon approved an order of work,
+> not this reading, and an earlier form of this line claimed his ratification. Record:
 > [`research/records/2026-08-09_POSITION_IS_RELATIVE_TO_A_FRAME_AND_THE_PROOF_BODY_IS_A_LEADER.md`](../research/records/2026-08-09_POSITION_IS_RELATIVE_TO_A_FRAME_AND_THE_PROOF_BODY_IS_A_LEADER.md).
 >
 > `FORMULA.md` §XVI: *"`frame(n+1)` is the emanation of the relating in `frame(n)`"*, and
@@ -618,12 +619,19 @@ construction"* (it is driven in four places), and §11's reach figure for the re
 > **The null holds: cleaning moved no mathematical edge.** 80 declared→declared, against the 80
 > measured before position existed.
 >
-> **The sub-illicium.** A proof body's binding steps are declarations one grain down. **57 steps, 29
-> internal arrivals, 7 declarations carrying their own depth** — `hcap@74 → hcap_pos@80`,
-> `b'@43 → rfl@43 → hab@45`. Arrivals are indexed by **step**, not name, because Lean shadows and
-> keying by name would merge two objects — the same defect one grain further down.
+> **The sub-illicium.** A proof body's binding steps are declarations one grain down. **57 steps, 5
+> internal arrivals, 3 declarations carrying their own depth** — `hcap@74 → hcap_pos@80`. The first
+> figures were 29 and 7; **22 were names founded simultaneously by one destructuring pattern and 2
+> crossed sibling `·` focus blocks.** A step now carries the `cohort` of the tactic that founded it
+> and the `focus` stack it sits in, and control 9 requires every arrival to be cross-line,
+> cross-cohort and in scope — a lone `obtain ⟨a, b⟩` satisfied the shipped predicate and now fails.
 >
-> Nine controls, all held. `1724 passed, 0 failed, 14 ignored.`
+> **80 asserted edges with 5 OPEN dot projections.** `htrace.map` is the declared `Trace.map`;
+> `(hxy i).trans` is mathlib's `Eq.trans`, same spelling, different object. Separating them needs the
+> receiver's type, so the population is returned OPEN rather than joined.
+>
+> Nine controls held — with control 8 **declaring its own orbit trivial and refusing itself as
+> evidence**, which is what §8 demands of a gauge.
 >
 > **Still open, and it is the accumulation cut.** The walk does not **rebase**: `name_elaboration`
 > reads the same global map at every depth, so its jet never moves — dead reckoning, which W9 rules
@@ -758,7 +766,10 @@ emits re-enters any module upstream of it. Every closed cycle in the workspace i
 nine, of which eight are a module and its own submodules joined by `use super::*`. Only
 `body::{manifold, medium}` and `membrane::{active_topology, sparse_standing}` join independent organs.
 
-**In the spine's terms:** the engine has no `q_n = q_m` anywhere. It is a strict pipeline. The
+**In the spine's terms** — and the inference below was **withdrawn in canon on 2026-08-08** as a
+category error, *"a module dependency graph and a state-transition graph are different objects"*,
+with `returned_reading::condition_again` disproving it operationally. The measurement stands; read
+the conclusion as retired. The
 residual is not stored and re-entered; it is emitted and dropped. That is the **accumulation** cut,
 and it is why the same defect kept resurfacing under different names — atlas reader, consequence,
 reflective composition, the downward crossing — none of which named the structure.
@@ -1345,7 +1356,7 @@ what the plan names, and a *plan* that goes stale relative to its driver is not 
 > the request *came from* and corrects to internal machinery in the same breath — *"this came from
 > wanting the machine to work with linguistics and Lean in the last laboratory […] I meant for it to
 > lead into a machine that can rigorously perform and analyze computations using **internal
-> machinery** that accommodates transport mechanisms between **arbitrary charts**."* The documents
+> machinery** that accomodates transport mechanisms between **arbitrary charts**."* The documents
 > kept the origin and dropped the correction. Lean got centred because it is easy to grade —
 > binary, legible, produces receipts — which is `CLAUDE.md` §9b's convicted hyperfocus exactly.
 >

@@ -609,16 +609,46 @@ fn control_eight_position(plural: &DevelopmentReading, controls: &mut Vec<(bool,
     println!("    tactics          {:>6} distinct", tactics.len());
     println!("    local bindings   {:>6} distinct", bindings.len());
 
-    println!("\n  THE NULL: cleaning must move no mathematical edge. The declared -> declared");
-    println!("  population is computed from terms alone and is compared against control 1's figure,");
-    println!("  which was measured BEFORE position existed. A cleaning that changed it would have");
-    println!("  deleted or manufactured a join.");
     let edges: usize = plural
         .declared_recruitment()
         .values()
         .map(BTreeSet::len)
         .sum();
-    println!("    declared -> declared edges  {edges}  against control 1's {EDGES}");
+
+    // THE ORBIT. `CLAUDE.md` §8: a gauge whose group acts trivially on the declared material is not
+    // a gauge. Position can only move an edge if a DECLARED name lands in `tactics` or in
+    // `local_bindings`. Both populations are exhibited; if both are empty the transformation cannot
+    // move the quantity and the equality below is evidence of nothing.
+    let tactic_declared = plural.tactic_position_declared();
+    let binding_declared = plural.binding_position_declared();
+    let orbit = tactic_declared.len() + binding_declared.len();
+
+    println!("\n  THE ORBIT, before the null is read");
+    println!("  ---------------------------------");
+    println!("    declared names in tactic position   {}", tactic_declared.len());
+    println!("    declared names in binding position  {}", binding_declared.len());
+    if orbit == 0 {
+        println!("\n    ORBIT TRIVIAL -- and this REFUSES the edge-count null as evidence.");
+        println!("    No declared name lands in either moved population, so `edges == {EDGES}` is");
+        println!("    structurally immune to position and could not have come out otherwise.");
+        println!("    `CLAUDE.md` §8: \"a gauge whose group acts trivially on the declared material");
+        println!("    is not a gauge\". The check below is a REGRESSION SNAPSHOT, not a null, and it");
+        println!("    is reported as one. Position does delete edges on material that varies the");
+        println!("    property -- `fun (x : Carrier) => ...` founds `Carrier` as a binder -- which is");
+        println!("    what `binding_position_declared` exists to catch and why it was built.");
+    }
+    println!("\n    declared -> declared edges  {edges}  against control 1's {EDGES}  (snapshot)");
+
+    println!("\n  OPEN -- dot projections the reading cannot certify without the receiver's type");
+    println!("  ----------------------------------------------------------------------------");
+    for (from, set) in plural.open_projections() {
+        for (written, tail) in set {
+            println!("    {from:<28} --{written}-->  {tail}");
+        }
+    }
+    println!("    `htrace.map` really is the declared `Trace.map`; `(hxy i).trans` is mathlib's");
+    println!("    `Eq.trans` and NOT this development's `trans`, though the spelling is identical.");
+    println!("    Telling them apart needs the receiver's TYPE. Returned OPEN, never joined.");
 
     println!("\n  the two bounding instruments, each returned rather than acted on");
     println!("  ----------------------------------------------------------------");
@@ -640,9 +670,12 @@ fn control_eight_position(plural: &DevelopmentReading, controls: &mut Vec<(bool,
 
     controls.push((
         binders_clean && tactics_clean && edges == EDGES,
-        "control 8 -- binders and tactics leave the term population, and no edge moves".to_owned(),
         format!(
-            "{} terms, {} tactics, {} bindings, {edges} edges",
+            "control 8 -- binders and tactics leave the term population (edge equality is a {} )",
+            if orbit == 0 { "SNAPSHOT: orbit trivial" } else { "null: orbit non-trivial" }
+        ),
+        format!(
+            "{} terms, {} tactics, {} bindings, {edges} edges, orbit {orbit}",
             terms.len(),
             tactics.len(),
             bindings.len()
@@ -685,12 +718,51 @@ fn control_nine_sub_illicium(
     println!("  STAR, so a declaration's own depth was zero by construction. This is the leader");
     println!("  inside one declaration: each step changes the material the next step reads.");
 
-    let held = steps > 0 && arrivals > 0 && !depths.is_empty();
+    // The predicate that shipped was `steps > 0 && arrivals > 0 && !depths.is_empty()`, which a
+    // single `obtain ⟨a, b⟩` satisfies: two names founded SIMULTANEOUSLY by one tactic on one line,
+    // reported as a completion arriving at the next. 22 of the original 29 arrivals were that, and
+    // 2 more crossed sibling `·` focus blocks. The law now requires what the claim actually says.
+    let mut same_line = 0usize;
+    let mut same_cohort = 0usize;
+    let mut crossed_focus = 0usize;
+    for form in &plural.declarations {
+        for (from, to) in form.internal_arrivals() {
+            let (a, b) = (&form.steps[from], &form.steps[to]);
+            if a.line == b.line {
+                same_line += 1;
+            }
+            if a.cohort == b.cohort {
+                same_cohort += 1;
+            }
+            if !b.focus.starts_with(&a.focus) {
+                crossed_focus += 1;
+            }
+        }
+    }
+    println!("\n  what an arrival must NOT be, and the count of each");
+    println!("  ------------------------------------------------");
+    println!("    founded by the same tactic (simultaneous)   {same_cohort}");
+    println!("    founded on the same source line             {same_line}");
+    println!("    crossing a sibling `·` focus block          {crossed_focus}");
+    println!("    A destructuring pattern founds its names in ONE act. Reading their token order as");
+    println!("    a causal chain promotes source layout into an invariant, which is the species");
+    println!("    `CLAUDE.md` §0 lesson 4 convicts. Lean's `·` goal scopes are disjoint, so an");
+    println!("    arrival across siblings is a leak. Both are now excluded by construction and");
+    println!("    counted here so the exclusion is auditable rather than asserted.");
+
+    let held = steps > 0
+        && arrivals > 0
+        && !depths.is_empty()
+        && same_cohort == 0
+        && same_line == 0
+        && crossed_focus == 0;
     controls.push((
         held,
-        "control 9 -- the proof body founds steps and a later step arrives at an earlier one"
-            .to_owned(),
-        format!("{steps} steps, {arrivals} arrivals, {} with depth > 1", depths.len()),
+        "control 9 -- every internal arrival is cross-line, cross-cohort and in scope".to_owned(),
+        format!(
+            "{steps} steps, {arrivals} arrivals, {} with depth > 1; {same_cohort} simultaneous, {same_line} same-line, {crossed_focus} out-of-scope",
+            depths.len()
+        ),
     ));
 }
 

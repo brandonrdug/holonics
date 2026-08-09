@@ -7,7 +7,7 @@
 //! appear to return. Run against `soma/formal` it reads 13 files, emits 11 derivations named by
 //! whichever `theorem` happened to be **last** in each file, hands each of them the whole file's
 //! tokens as its recruitment, and reports **zero** recruited-and-declared names — a deposit in which
-//! nothing can be opened, from material carrying 78 declared-to-declared recruitment edges.
+//! nothing can be opened, from material carrying 80 declared-to-declared recruitment edges.
 //!
 //! That number was the evidence behind a wall.
 //! `research/records/2026-08-09_FOUR_RELATIONS_SEPARATE_THE_ATOM_AND_EACH_REFUTED_ITSELF_FIRST.md`
@@ -54,8 +54,8 @@
 //! [`DeclarationGrain`] is the point of this module as much as the parsing is.
 //! [`DeclarationGrain::OneArtifactOneDeclaration`] reproduces the historical aperture **and reports
 //! every top-level former it did not open** as [`DevelopmentReading::unopened`]. That is the defect
-//! above made visible: the old reader absorbed 52 declarations in silence and returned a plausible
-//! answer. This one returns the same answer and hands back the 52.
+//! above made visible: the old reader absorbed 55 declarations in silence and returned a plausible
+//! answer. This one returns the same answer and hands back the 55.
 //!
 //! ## What is joined on, and the ambiguity that is returned rather than resolved
 //!
@@ -80,8 +80,10 @@
 //! **Every name carries a [`NamePosition`], read from the material's grammar.** Inside a binder
 //! group the names before the `:` are *founded* and the type after it is *recruited*, so
 //! `(hz : ∀ n, descendantCapacity capacity incident n ≠ 0)` founds `hz` and recruits
-//! `descendantCapacity`. That one structural rule removes `hc`, `hcong`, `hm`, `hn`, `hz`, `hnm`
-//! from the term population without an authored list of names. The head of a tactic step is
+//! `descendantCapacity`. That rule removes **five of six** measured contaminants — `hc`, `hcong`,
+//! `hm`, `hn`, `hz` — with no authored list of names. The sixth, `hnm`, comes from `by_cases hnm :`
+//! and leaves only because `by_cases` is in [`BINDING_TACTICS`]; stating "one rule removes all six"
+//! overclaimed and is corrected here. The head of a tactic step is
 //! [`NamePosition::Tactic`] and is **returned beside** the terms rather than deleted, because a
 //! route's tactic choice is real production — the generated deposit carries its whole plurality
 //! there. [`ConductGrain`] is the declared aperture over the two.
@@ -181,6 +183,14 @@ pub struct UnopenedDeclaration {
 pub struct ProofStep {
     /// The binding tactic that founds it: `have`, `obtain`, `set`, …
     pub former: String,
+    /// Which single tactic founded it. `rintro ⟨c, ⟨b, hab, hbc⟩, hcd⟩` founds five names in **one
+    /// act**, so they share a cohort and none of them arrives at another: they are simultaneous, and
+    /// reading their token order as a causal chain promotes source layout into an invariant.
+    pub cohort: usize,
+    /// The `·` focus block this step was founded inside, as the stack of marker columns. A name
+    /// founded in one focus block is **not in scope** in its sibling; Lean's goal scopes are
+    /// disjoint and an arrival across them is a leak.
+    pub focus: Vec<(usize, usize)>,
     /// The name it founds. A destructuring pattern founds several; each becomes its own step
     /// sharing one statement and one recruitment, because the material founds them together.
     pub binder: String,
@@ -276,9 +286,19 @@ impl DeclaredForm {
         let mut arrivals = Vec::new();
         for (index, step) in self.steps.iter().enumerate() {
             for (name, earlier) in &latest {
-                if step.recruited.contains_key(*name) {
-                    arrivals.push((*earlier, index));
+                if !step.recruited.contains_key(*name) {
+                    continue;
                 }
+                let from = &self.steps[*earlier];
+                // Simultaneous founding is not an arrival.
+                if from.cohort == step.cohort {
+                    continue;
+                }
+                // A name founded in a sibling focus block is out of scope here.
+                if !step.focus.starts_with(&from.focus) {
+                    continue;
+                }
+                arrivals.push((*earlier, index));
             }
             latest.insert(step.binder.as_str(), index);
         }
@@ -351,6 +371,49 @@ impl DevelopmentReading {
             .iter()
             .map(|form| form.derivation(grain))
             .collect()
+    }
+
+    /// Dot projections whose last segment is declared here: candidate edges the reading cannot
+    /// certify without the receiver's type. Returned `OPEN`, never joined. See [`resolve_projection`].
+    pub fn open_projections(&self) -> BTreeMap<&str, BTreeSet<(&str, &str)>> {
+        let declared = self.declared_names();
+        let mut found: BTreeMap<&str, BTreeSet<(&str, &str)>> = BTreeMap::new();
+        for form in &self.declarations {
+            for symbol in form.recruited.keys() {
+                if declared.contains(symbol.as_str()) {
+                    continue;
+                }
+                let Some(tail) = symbol.rsplit('.').next() else {
+                    continue;
+                };
+                if tail == symbol || tail == form.name || !declared.contains(tail) {
+                    continue;
+                }
+                found
+                    .entry(form.name.as_str())
+                    .or_default()
+                    .insert((symbol.as_str(), tail));
+            }
+        }
+        found
+    }
+
+    /// **A declared name the position rule sent to `local_bindings`.**
+    ///
+    /// The dual of [`Self::tactic_position_declared`], and it did not exist: position provably
+    /// deletes an edge when a declared name lands here, and nothing looked. `fun (x : Carrier) => …`
+    /// founds `Carrier` as a binder because the lambda rule takes everything before the arrow.
+    pub fn binding_position_declared(&self) -> BTreeMap<&str, Vec<&str>> {
+        let declared = self.declared_names();
+        let mut found: BTreeMap<&str, Vec<&str>> = BTreeMap::new();
+        for form in &self.declarations {
+            for name in form.local_bindings.keys() {
+                if declared.contains(name.as_str()) {
+                    found.entry(name.as_str()).or_default().push(&form.name);
+                }
+            }
+        }
+        found
     }
 
     /// **First bounding instrument on the position rule, and it is structural.**
@@ -437,6 +500,26 @@ impl DevelopmentReading {
         found
     }
 }
+
+/// A dot projection whose last segment this development declares — **a candidate edge, never an
+/// asserted one.**
+///
+/// `htrace.map` resolves to the declared `Trace.map` and `(A.rebase e).Semantics` to the declared
+/// `Semantics`; both are real. `(hxy i).trans` resolves to mathlib's `Eq.trans` and **not** to this
+/// development's `Trace.trans`, though the spelling is identical. Telling them apart needs the
+/// receiver's *type*, which an orthographic reading does not have — so the population is returned
+/// `OPEN` rather than joined. `OPEN` may not be resolved by choosing.
+///
+/// This is why the headline edge figure is **80 asserted with 4 open**, not 84. An earlier form of
+/// this module asserted all four, and the driver's own reconciliation text called
+/// `semantics_rebase_iff → Semantics` a projection "to another namespace" when both sit in
+/// `Soma.Holonics.SituatedAlgorithm`.
+///
+/// **This was the intake's largest single loss and it produced a wrong headline figure.** The term
+/// population keeps what the source wrote — `A.Semantics` stays `A.Semantics`, which is provenance —
+/// but the **join** must see through the projection, or `semantics_rebase_iff → Semantics` is invisible
+/// and the development reads as one edge poorer than it is. The driver's own printed reconciliation
+/// called that pair a projection "to another namespace"; both sit in `Soma.Holonics.SituatedAlgorithm`.
 
 /// Join two readings of different texts into one development population.
 ///
@@ -633,6 +716,16 @@ fn is_preamble(line: &str) -> bool {
 // Position — where a name stood when the reading met it
 // -------------------------------------------------------------------------------------------------
 
+/// Modifiers that may precede a top-level former. Declaration syntax, recruited by nothing —
+/// measured as terms of `proportionalFlow` and `congestion` before this exclusion existed.
+pub const DECLARATION_MODIFIERS: [&str; 5] =
+    ["noncomputable", "private", "protected", "partial", "unsafe"];
+
+/// Top-level commands that scope the declaration *after* them. `omit [Fintype Old] in` is neither a
+/// former nor preamble, so it was appended to the PREVIOUS declaration's lines: measured, `congestion`
+/// recruited `omit`.
+pub const SCOPING_COMMANDS: [&str; 2] = ["omit", "attribute"];
+
 /// Tactics that found a name, as exercised by the declared material.
 ///
 /// `crate::derivation_atlas`'s own documentation declares the widening this list performs:
@@ -735,15 +828,12 @@ fn founded_names(lines: &[String]) -> BTreeSet<String> {
         }
         let after = trimmed[head.len()..].trim_start();
         // The pattern runs to the first `:`, `:=` or `with`, whichever comes first.
-        let pattern = after
-            .split(" with ")
-            .next()
-            .unwrap_or(after)
+        let pattern = split_before_with(after)
             .split(":=")
             .next()
             .unwrap_or(after);
         let pattern = pattern.split(':').next().unwrap_or(pattern);
-        for token in identifier_tokens(pattern) {
+        for token in identifier_tokens(pattern).filter(|name| *name != "with") {
             founded.insert(token.to_owned());
         }
     }
@@ -789,6 +879,18 @@ fn demands_continuation(trimmed: &str) -> bool {
         .any(|ending| trimmed.ends_with(ending))
 }
 
+/// The part of a tactic's argument before its `with` clause.
+///
+/// `induction n with` ends the line, so a ` with ` split with a trailing space never fired and the
+/// binder came back as the literal string `with` — which then appeared as a **term** of `map`,
+/// `trans`, `faceEq_of_carrierEq` and `finite_telescoping`.
+fn split_before_with(after: &str) -> &str {
+    if let Some(rest) = after.strip_suffix(" with") {
+        return rest;
+    }
+    after.split(" with ").next().unwrap_or(after)
+}
+
 /// Strip a focus dot, a `<;>` combinator, or a case bar from the head of a tactic line.
 fn strip_step_marker(trimmed: &str) -> &str {
     for marker in ["<;>", "·", "|"] {
@@ -827,6 +929,17 @@ fn classify(mut form: DeclaredForm, lines: &[String]) -> DeclaredForm {
     let mut previous_demands = false;
     // (column, index into form.steps) — the open steps, innermost last.
     let mut open_steps: Vec<(usize, usize)> = Vec::new();
+    // One cohort per binding tactic: every name a single `rintro ⟨…⟩` founds shares it.
+    let mut cohort = 0usize;
+    // Inside a `calc` block every relation step is a TERM line, even when it opens with an
+    // identifier: `n * ell = (n * ell * k) / k := by` was read as a tactic named `n`. The block
+    // runs to the end of the declaration, which is the aperture this reading declares.
+    let mut in_calc = false;
+    // The open `·` focus blocks, outermost first, as (column, unique id). The id matters: two
+    // SIBLING blocks sit at the same column, and a name founded in one is out of scope in the
+    // other. Keying on column alone made siblings indistinguishable and leaked `rfl` across them.
+    let mut focus: Vec<(usize, usize)> = Vec::new();
+    let mut focus_id = 0usize;
 
     for (offset, line) in lines.iter().enumerate() {
         let trimmed = line.trim();
@@ -840,6 +953,11 @@ fn classify(mut form: DeclaredForm, lines: &[String]) -> DeclaredForm {
         // A step head closes every open step at or inside its own column.
         if opens_step {
             open_steps.retain(|(held, _)| *held < column);
+            focus.retain(|(held, _)| *held < column);
+            if trimmed.starts_with('·') {
+                focus_id += 1;
+                focus.push((column, focus_id));
+            }
         }
 
         let mut head: Option<&str> = None;
@@ -847,18 +965,15 @@ fn classify(mut form: DeclaredForm, lines: &[String]) -> DeclaredForm {
         // relation and begins with `(`, so its first identifier `n` is a bound variable and not a
         // tactic; `_ = ∑ m : New, …` begins with Lean's placeholder and heads every later `calc`
         // step. Reading either as a head put `calc`'s own relation steps into tactic position.
-        if opens_step && stripped.starts_with(char::is_alphabetic) {
-            head = identifier_tokens(stripped).next();
+        if opens_step && stripped.starts_with(char::is_alphabetic) && !in_calc {
+            head = identifier_tokens(stripped).next().filter(|name| !SCOPING_COMMANDS.contains(name));
             if let Some(name) = head {
                 let slot = form.tactics.entry(name.to_owned()).or_insert(0u32);
                 *slot = slot.saturating_add(1);
 
                 if BINDING_TACTICS.contains(&name) {
                     let after = stripped[name.len()..].trim_start();
-                    let pattern = after
-                        .split(" with ")
-                        .next()
-                        .unwrap_or(after)
+                    let pattern = split_before_with(after)
                         .split(":=")
                         .next()
                         .unwrap_or(after);
@@ -869,10 +984,13 @@ fn classify(mut form: DeclaredForm, lines: &[String]) -> DeclaredForm {
                     // choosing one would be a receiver decision this reading may not make.
                     // Single-character binders are Lean's binder convention and are dropped from
                     // every recruitment population, so a step for one could never be arrived at.
+                    cohort += 1;
                     for binder in identifier_tokens(pattern).filter(|name| name.chars().count() > 1)
                     {
                         form.steps.push(ProofStep {
                             former: name.to_owned(),
+                            cohort,
+                            focus: focus.clone(),
                             binder: binder.to_owned(),
                             statement: statement.clone(),
                             recruited: BTreeMap::new(),
@@ -901,7 +1019,11 @@ fn classify(mut form: DeclaredForm, lines: &[String]) -> DeclaredForm {
                 founds_next = true;
                 continue;
             }
-            if token.chars().count() <= 1 || token == own {
+            if token.chars().count() <= 1
+                || token == own
+                || DECLARATION_MODIFIERS.contains(&token)
+                || SCOPING_COMMANDS.contains(&token)
+            {
                 continue;
             }
             // The innermost open step carries the token whatever its position at the DECLARATION
@@ -922,7 +1044,7 @@ fn classify(mut form: DeclaredForm, lines: &[String]) -> DeclaredForm {
                 *slot = slot.saturating_add(1);
                 continue;
             }
-            if CODEC_KEYWORDS.contains(&token) {
+            if CODEC_KEYWORDS.contains(&token) || token == "with" {
                 continue;
             }
             let slot = form.recruited.entry(token.to_owned()).or_insert(0u32);
@@ -931,6 +1053,18 @@ fn classify(mut form: DeclaredForm, lines: &[String]) -> DeclaredForm {
 
         if trimmed.contains("by") && identifier_tokens(trimmed).any(|token| token == "by") {
             in_tactic = true;
+        }
+        // A `calc` block alternates RELATION steps (terms) with nested `:= by` tactic blocks. The
+        // flag arms at `calc` and at every `_`-headed relation step, and disarms the moment a nested
+        // `by` opens — sticky to the end of the declaration would have made every tactic in the
+        // block a term.
+        if identifier_tokens(trimmed).next() == Some("calc") || stripped.starts_with('_') {
+            in_calc = true;
+        }
+        // Order matters and the two are NOT exclusive: `_ ≤ ∑ m : New, capacity m := by` both opens
+        // a relation step and opens its tactic block, so the disarm must run after the arm.
+        if OPENS_BLOCK.iter().any(|opener| trimmed.ends_with(opener)) {
+            in_calc = false;
         }
         previous_demands = demands_continuation(trimmed);
     }

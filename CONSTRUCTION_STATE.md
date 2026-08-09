@@ -4,12 +4,44 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-08. **Body:** Rust. The C++/CUDA engine's position record is
+**Currency:** 2026-08-09. **Body:** Rust. The C++/CUDA engine's position record is
 `archive/cpp-engine/CONSTRUCTION_STATE.md` and governs nothing.
 
 **The position is stated against a spine.** `canon/THE_HOLOBROCHOS_SPINE.md` states the loop the body
 is supposed to be and places every live organ on a station. **Read the position through it:** what is
 admitted below is *which stations conduct*, not which modules compile.
+
+## THE INTAKE — 2026-08-09
+
+`crates/holonic-engine/src/lean_development.rs`, driven by
+`examples/the_development_declares_its_own_chain.rs`. Commits `083cc55`, `d734a02`, and the
+correction that follows them.
+
+**What it establishes.** `derivation_atlas::read_derivation` reads one artifact as one `theorem`.
+Pointed at `soma/formal` — thirteen human-written Lean files in this tree — it returns 11 derivations
+and **zero** openable names over material carrying **66 top-level declarations and 80
+declared→declared edges**. A record deposited the day before called that a *material* constraint; it
+was an instrument bound. Every top-level former now founds; comment, preamble and scoping populations
+are each returned rather than dropped; the grain is declared, so the narrow aperture hands back the
+55 it skipped.
+
+**Position.** Every name carries a position read from Lean's grammar. Inside a binder group the names
+before the `:` are founded and the type after it is recruited — that removes five of six measured
+contaminants with no authored list of names; the sixth leaves by the `BINDING_TACTICS` table.
+`141 terms · 34 tactics · 64 local bindings`, and **5 dot projections returned OPEN** because
+separating `Trace.map` from `Eq.trans` needs the receiver's type.
+
+**Bounded, and the bounds are measured rather than asserted.** The edge equality is a **snapshot, not
+a null** — the orbit is trivial, zero declared names in either moved population, and the driver says
+so and refuses itself as evidence. The sub-illicium returns **5 arrivals over 3 declarations**, down
+from a first figure of 29 and 7 in which 22 were names founded simultaneously by one destructuring
+pattern and 2 crossed sibling focus blocks.
+
+**Struck, after four independent audits:** the identification of a recruitment-closure depth with
+`FORMULA.md` §XVI's frame (§XVIII's *grain* is the section, and neither is a graph-path length); the
+per-frame vertex split and its holonomy, which needs a cochain the complex does not carry; the
+`walk→extension` rename; the `decomposing_codec` handoff, which already exists at
+`soma/life/src/reintegrating_elaboration.rs` and would discard the positions it was meant to refine.
 
 ## THE INSTANCE CONDUCTS — 2026-08-08
 
