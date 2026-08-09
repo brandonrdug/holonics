@@ -189,12 +189,82 @@ fn sort_current_constituents(currents: &mut [LocalCurrentConstituent]) {
     });
 }
 
-fn current_frontier(currents: &[LocalCurrentConstituent]) -> BTreeMap<HingeId, Rat> {
-    let mut frontier = BTreeMap::<HingeId, Rat>::new();
-    for current in currents {
-        *frontier.entry(current.hinge).or_insert_with(Rat::zero) += &current.amount;
+/// The exact current standing at one hinge, held as TWO ARMS that never cancel.
+///
+/// **A sign is a passage, never a state** (`CLAUDE.md` §2b). Until 2026-08-08 the frontier was one
+/// `Rat` per hinge and a hinge whose constituents cancelled was *dropped from the map*, so a hinge
+/// that two opposed currents reached reported identically to a hinge nothing ever reached. The
+/// constituents themselves were retained with their transport words, so the loss was recoverable —
+/// but the frontier, which is what a later deed reads, said the hinge was never touched.
+///
+/// [`Self::net`] is the group completion and is exactly the `Rat` the old map held; it is a
+/// *reading* of the arms and never replaces them. Membership in the frontier map means the hinge
+/// was reached; the constituents that reached it sit beside the map in the same receipt, filtered
+/// by `hinge`.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct HingeCurrentArms {
+    /// The sum of the arriving amounts that run with the hinge's own orientation. Never negative.
+    toward: Rat,
+    /// The sum of the magnitudes that run against it. Never negative.
+    against: Rat,
+}
+
+impl HingeCurrentArms {
+    pub fn toward(&self) -> &Rat {
+        &self.toward
     }
-    frontier.retain(|_, current| !current.is_zero());
+
+    pub fn against(&self) -> &Rat {
+        &self.against
+    }
+
+    /// `toward - against`: the group completion, and the only quantity a balance may consume.
+    pub fn net(&self) -> Rat {
+        &self.toward - &self.against
+    }
+
+    /// Every arrival, both hands. Zero exactly when nothing but zero amounts arrived.
+    pub fn total(&self) -> Rat {
+        &self.toward + &self.against
+    }
+
+    /// Nothing of either hand arrived. Distinct from [`Self::net_is_zero`].
+    pub fn is_zero(&self) -> bool {
+        self.toward.is_zero() && self.against.is_zero()
+    }
+
+    /// The arrivals cancel under the group completion.
+    pub fn net_is_zero(&self) -> bool {
+        self.toward == self.against
+    }
+
+    /// Current arrived from both hands and cancelled. This is the case a net cannot report, and it
+    /// is the one that says the hinge did work no balance can see.
+    pub fn cancels(&self) -> bool {
+        !self.is_zero() && self.net_is_zero()
+    }
+
+    fn deposit(&mut self, amount: &Rat) {
+        if amount.is_negative() {
+            self.against -= amount;
+        } else {
+            self.toward += amount;
+        }
+    }
+}
+
+/// Every hinge any constituent reached, with the arms that reached it.
+///
+/// A hinge is present exactly when a constituent named it. It is **not** removed when the arms
+/// cancel: the cancellation is the finding, and `HingeCurrentArms::cancels` is where it is read.
+fn current_frontier(currents: &[LocalCurrentConstituent]) -> BTreeMap<HingeId, HingeCurrentArms> {
+    let mut frontier = BTreeMap::<HingeId, HingeCurrentArms>::new();
+    for current in currents {
+        frontier
+            .entry(current.hinge)
+            .or_default()
+            .deposit(&current.amount);
+    }
     frontier
 }
 
@@ -784,7 +854,7 @@ pub struct LocalStarStanding {
 }
 
 impl LocalStarStanding {
-    pub fn open_frontier(&self) -> BTreeMap<HingeId, Rat> {
+    pub fn open_frontier(&self) -> BTreeMap<HingeId, HingeCurrentArms> {
         current_frontier(&self.open_currents)
     }
 
@@ -1099,7 +1169,7 @@ pub struct LocalCurrentBalance {
     pub hinge: HingeId,
     pub entered: Rat,
     pub deposited: Rat,
-    pub emitted: Vec<(HingeId, Rat)>,
+    pub emitted: Vec<(HingeId, HingeCurrentArms)>,
     pub departed: Rat,
     pub exact_residual: Rat,
 }
@@ -1264,7 +1334,7 @@ pub enum LocalPropagationBoundary {
 pub struct LocalCausalLayerReceipt {
     pub ordinal: usize,
     pub active_hinges: Vec<HingeId>,
-    pub emitted_frontier: BTreeMap<HingeId, Rat>,
+    pub emitted_frontier: BTreeMap<HingeId, HingeCurrentArms>,
     pub emitted_currents: Vec<LocalCurrentConstituent>,
     pub cpu_execution: CpuExecutionReceipt,
 }
@@ -1284,7 +1354,7 @@ pub struct LocalStarRadiation {
     pub receiver_population: Vec<ReceiverPopulationChange>,
     pub topology_changes: Vec<LocalTopologyChange>,
     pub rewrite_candidates: Vec<LocalRewriteCandidate>,
-    pub open_frontier: BTreeMap<HingeId, Rat>,
+    pub open_frontier: BTreeMap<HingeId, HingeCurrentArms>,
     pub cpu_execution: CpuExecutionReceipt,
     pub kinematic: HingeRadiation,
 }
@@ -1679,7 +1749,7 @@ impl LocalStarLaw {
             .fold(Rat::zero(), |sum, path| sum + &path.departed);
         let emitted_after = emitted
             .iter()
-            .fold(Rat::zero(), |sum, (_, current)| sum + current);
+            .fold(Rat::zero(), |sum, (_, current)| sum + current.net());
         let exact_current_residual = &entered - &deposited - &emitted_after - &departed;
         let exact_residual = &momentum_after - &momentum_before - &internal_impulse - &deposited;
         debug_assert!(exact_residual.is_zero());
@@ -3502,6 +3572,67 @@ mod tests {
             .unwrap();
         assert_eq!(forward.standing_after, reverse.standing_after);
         assert_eq!(forward.radiation, reverse.radiation);
+    }
+
+    /// THE DECLARED CONTROL for the current frontier (`CLAUDE.md` §2b). Until 2026-08-08
+    /// `current_frontier` summed the arriving amounts into one `Rat` per hinge and then
+    /// `retain`ed only the nonzero ones, so a hinge that two opposed currents reached was
+    /// **deleted from the frontier** and reported exactly as a hinge nothing ever reached.
+    ///
+    /// Four populations are separated here that the old carrier collapsed to three. The old return
+    /// is preserved bit-for-bit as `net()`; what is new is that the map still contains the hinge,
+    /// and that a hinge reached by `+3` and `-1` is distinguishable from a hinge reached by `+2`.
+    ///
+    /// Against the old carrier the two `contains_key` assertions and both `total()` assertions
+    /// fail: the cancelling hinge is absent and there is nothing to read a gross arrival off.
+    #[test]
+    fn a_hinge_two_opposed_currents_reached_is_not_a_hinge_nothing_reached() {
+        let hinge = HingeId(7);
+        let elsewhere = HingeId(9);
+        let arrival = |ordinal: u64, amount: Rat| LocalCurrentConstituent {
+            root: LocalCurrentRoot::Source {
+                event: EventId(ordinal),
+                hinge: elsewhere,
+            },
+            hinge,
+            amount,
+            word: Vec::new(),
+        };
+
+        let untouched = current_frontier(&[]);
+        let cancelled = current_frontier(&[arrival(1, integer(3)), arrival(2, integer(-3))]);
+        let net_two_from_two = current_frontier(&[arrival(1, integer(3)), arrival(2, integer(-1))]);
+        let net_two_from_one = current_frontier(&[arrival(1, integer(2))]);
+
+        // The group completion cannot separate the first two, and that is what a net is.
+        assert!(untouched.get(&hinge).is_none());
+        assert_eq!(cancelled[&hinge].net(), Rat::zero());
+        assert!(
+            cancelled.contains_key(&hinge),
+            "the hinge was reached; the cancellation is the finding, not a reason to erase it"
+        );
+        assert!(cancelled[&hinge].cancels());
+        assert!(!cancelled[&hinge].is_zero());
+        assert_eq!(cancelled[&hinge].total(), integer(6), "both hands arrived");
+        assert_eq!(cancelled[&hinge].toward(), &integer(3));
+        assert_eq!(cancelled[&hinge].against(), &integer(3));
+
+        // And two populations with the same net are separated by their arms.
+        assert_eq!(
+            net_two_from_two[&hinge].net(),
+            net_two_from_one[&hinge].net(),
+            "the same net current stands at the hinge either way"
+        );
+        assert_ne!(net_two_from_two[&hinge], net_two_from_one[&hinge]);
+        assert_eq!(net_two_from_two[&hinge].total(), integer(4));
+        assert_eq!(net_two_from_one[&hinge].total(), integer(2));
+        assert!(!net_two_from_two[&hinge].cancels() && !net_two_from_one[&hinge].cancels());
+
+        // A zero-amount arrival reaches the hinge and deposits nothing on either arm. It is the
+        // one case where membership and `is_zero` disagree, and membership is the truth.
+        let nothing_carried = current_frontier(&[arrival(1, Rat::zero())]);
+        assert!(nothing_carried.contains_key(&hinge));
+        assert!(nothing_carried[&hinge].is_zero() && !nothing_carried[&hinge].cancels());
     }
 
     #[test]

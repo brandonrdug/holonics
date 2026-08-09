@@ -1660,6 +1660,98 @@ fn the_deed_emanation_becomes_the_next_frame_and_turn() {
 /// mirrored): at the CUT the groove is never replaced by the meeting — the PRIOR held rotor
 /// precesses (dragged by the approached winding, re-based at the completion); on the RIDE the
 /// dragged meeting re-bases the groove (adoption IS the groove's own transport when flat).
+/// THE DECLARED CONTROL for `StandingWinding` (`CLAUDE.md` §2b). Until 2026-08-08 the standing
+/// winding was one signed `Cog`, so a past cone that wound once each way was byte-identical to a
+/// past cone that never wound — the magnitude kept, the turn discarded, in the crate that owns
+/// `OrientedWinding` one module away.
+///
+/// Three past cones are separated here that the old carrier collapsed to two: nothing stood; two
+/// passages stood and cancel; one passage stood. The drag is the identity for the first two — that
+/// is the argument principle and it is correct — and the crossing must still be able to say which
+/// of them it was, because a terrain that wound twice did work the rotor cannot see.
+///
+/// Against the old carrier this test cannot even be spelled: there is no construction for a cone
+/// with both hands. Netting on deposit (`this_way.sub(that_way)` into one arm) makes `wound` equal
+/// `unwound`, `cancels()` false, and every assertion below fail.
+#[test]
+fn a_past_cone_that_wound_both_ways_is_not_a_past_cone_that_never_wound() {
+    let unwound = StandingWinding::UNWOUND;
+    let wound = StandingWinding::UNWOUND
+        .deposit(WindingQuantum::ThisWay)
+        .deposit(WindingQuantum::ThatWay);
+    let once = StandingWinding::at_boundary(1);
+
+    // The group completion cannot separate the first two. That is what a net turn count is.
+    assert_eq!(unwound.turns(), wound.turns(), "both net to no turn");
+    assert!(unwound.turns_are_zero() && wound.turns_are_zero());
+
+    // The arms can, and the predicates split exactly as `ComparativeMultiplicity` splits.
+    assert_ne!(unwound, wound, "two passages are not no passage");
+    assert!(unwound.is_zero(), "nothing was ever deposited");
+    assert!(!wound.is_zero(), "two passages were deposited");
+    assert!(wound.cancels(), "they wound and still drag as the identity");
+    assert!(!unwound.cancels(), "nothing wound, so nothing cancelled");
+    assert_eq!(unwound.total(), Cog::lit(0));
+    assert_eq!(wound.total(), Cog::lit(2), "both hands, counted");
+    assert_eq!(once.turns(), Cog::lit(1));
+    assert!(!once.turns_are_zero() && !once.is_zero() && !once.cancels());
+
+    // Every reading through the drag is unchanged: the repair moves no rotor.
+    let held = Face {
+        arrow: Arrow {
+            reach: Cog::lit(1),
+            aim: Cog::lit(3),
+            cross: Cog::lit(2),
+        },
+    };
+    assert_eq!(
+        held.dragged_by(unwound),
+        held.dragged_by(wound),
+        "the drag by a cancelling cone is the identity, exactly as by an empty one"
+    );
+    assert_eq!(held.dragged_by(unwound), held, "and it is the identity");
+    assert_ne!(
+        held.dragged_by(once),
+        held,
+        "one standing turn is a live control: the drag does move"
+    );
+
+    // And the distinction survives into the crossing that carries it.
+    let meeting = Face {
+        arrow: Arrow {
+            reach: Cog::lit(2),
+            aim: Cog::lit(1),
+            cross: Cog::lit(5),
+        },
+    };
+    let empty = cross(meeting, held, unwound).expect("a crossing forms");
+    let cancelled = cross(meeting, held, wound).expect("a crossing forms");
+    assert_eq!(
+        empty.emanation.chi, cancelled.emanation.chi,
+        "the invariant that crosses the horizon is untouched"
+    );
+    assert_eq!(empty.deed, cancelled.deed);
+    assert_ne!(
+        empty, cancelled,
+        "the crossing retains which past cone it stood in"
+    );
+    assert!(empty.standing_winding.is_zero() && !cancelled.standing_winding.is_zero());
+
+    // The bounded restore witness takes the same branch for both and still represents.
+    assert!(
+        empty
+            .restore_meeting(&held)
+            .expect("the witness forms")
+            .represents(&meeting)
+    );
+    assert!(
+        cancelled
+            .restore_meeting(&held)
+            .expect("the witness forms")
+            .represents(&meeting)
+    );
+}
+
 #[test]
 fn the_found_flywheel_precesses_and_is_never_the_meeting() {
     let first = place::extend(place::origin(), false);

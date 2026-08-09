@@ -476,6 +476,55 @@ mod tests {
         );
     }
 
+    /// THE DECLARED CONTROL for founding zero (`CLAUDE.md` §2b). Until 2026-08-08
+    /// [`Cochain::set`] removed the key on a zero deposit, so `found_on(w, cell, 0)` returned `w`
+    /// unchanged: **founding zero founded nothing**, and the one founding that says *nothing crosses
+    /// here* was the one the carrier could not record.
+    ///
+    /// It is not a null operation. On a ring whose values close, moving one edge to zero opens the
+    /// coil with a leak of exactly `2` — a deposit that the old carrier could still see through its
+    /// value, but which it recorded by *deleting* the cell it was deposited on. Against the old
+    /// carrier the domain assertions below fail and `founded == closed` holds.
+    #[test]
+    fn founding_zero_founds_and_the_cell_it_founded_on_is_named() {
+        let (complex, vertices, edges) = ring(3);
+        let closed = Cochain::from_values(
+            1,
+            [
+                (edges[0], BigInt::from(1)),
+                (edges[1], BigInt::from(1)),
+                (edges[2], BigInt::from(-2)),
+            ],
+        );
+        let before = Twist::read(&complex, &closed, vertices[0], &whole(&edges)).expect("a read");
+        assert!(before.may_condense() && before.leak().is_zero());
+
+        let founded = found_on(&closed, edges[2], BigInt::zero());
+        assert_ne!(founded, closed, "a zero deposit is a deposit");
+        assert_eq!(
+            founded.assigned(),
+            whole(&edges),
+            "the founding names every cell it has spoken about, including the one it zeroed"
+        );
+        assert_eq!(
+            founded.support(),
+            BTreeSet::from([edges[0], edges[1]]),
+            "and `e2` carries nothing, which is a different statement"
+        );
+        let after = Twist::read(&complex, &founded, vertices[0], &whole(&edges)).expect("a read");
+        assert!(!after.may_condense(), "founding zero opened the coil");
+        assert_eq!(after.leak(), BigInt::from(2), "|0 - (-2)|");
+
+        // And founding zero on a cell the potential already implies zero opens nothing, which is
+        // the control that keeps the assertion above from being about the deposit alone.
+        let quiet = found_on(&closed, edges[0], BigInt::from(1));
+        assert_eq!(quiet, closed, "an unchanged value is an unchanged cochain");
+        let silent = Cochain::new(1);
+        let spoken = found_on(&silent, edges[0], BigInt::zero());
+        assert!(silent.is_zero() && spoken.is_zero(), "both are zero cochains");
+        assert!(silent.assigns_nothing() && !spoken.assigns_nothing());
+    }
+
     #[test]
     fn a_structure_with_no_cycles_closes_for_free_and_says_so() {
         // §8's tautology rule against this module's own return: a tree has no chord, so its closure

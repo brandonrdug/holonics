@@ -205,6 +205,15 @@ built out of — was the one that did not follow it.
 
 ## 7. What is still owed, from the same audit and not repaired here
 
+**Closed 2026-08-08, later the same day.** All six are now swept: 1 and 6 were already closed by the
+commits that deposited this record — `polygon_winding` by `RayCrossings`, and 6 by `winding_inertia`
+— and 2, 3, 4 and 5 were repaired with a declared control each, every one made to fail against a
+restored netting carrier first. `CONSTRUCTION_STATE.md` carries the table. **Item 6's proposed repair
+was refused rather than taken:** `InertiaSchedule.steps` carries pivot indices, which `inertia.rs`
+states in its own doc are receiver coordinates of the solver and not of the form, so labelling
+passages by them would install a solver coordinate as an invariant. The list below is left as it was
+written.
+
 Ranked, each verified by reading the owner, none of them repaired:
 
 1. **`exact_analysis::polygon_winding`** accumulates `winding += 1 / -= 1` and deposits no crossing.

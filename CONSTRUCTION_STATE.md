@@ -252,9 +252,26 @@ in a fixture that contained its own control. Every homology figure is unchanged.
 `research/records/2026-08-08_THE_BOUNDARY_KEPT_THE_MAGNITUDE_AND_DISCARDED_THE_TURN.md`; the
 falsifier is `gluing::a_loop_is_not_admitted_into_a_receiver_that_does_not_hold_its_vertex`.
 
-**Six further bare-sign sites are named in that record's §7 and are NOT repaired.** The highest is
-`exact_analysis::polygon_winding`, which nets `+1`/`−1` and deposits no crossing, and which governs
-the η-zero bisection — the RH-facing driver.
+### The six further bare-sign sites — swept 2026-08-08, four repaired and two already closed
+
+The record's §7 named six more sites. **All six are now closed**, and the sentence that stood here
+until 2026-08-08 — *"Six further bare-sign sites are named in that record's §7 and are NOT
+repaired"* — was already stale when it was written, because two of them had been closed by the
+commits that deposited the record.
+
+| site | verdict |
+|---|---|
+| `exact_analysis::polygon_winding` | **already repaired**, `6d49517`. `RayCrossings` retains both hands by *segment index*; `winding()` is the reading; `cancels()` names the case a net cannot report; `holonic_eta_ratio_atlas` reports how many discarded halves met the ray and came back. |
+| `soma/body/src/manifold.rs` `StandingWinding` | **repaired.** Two arms, deposit-only, mirroring `channel::OrientedWinding` one module away. `turns()` is the group completion the drag rotor consumes; `is_zero` (nothing stood) splits from `turns_are_zero` (what stood cancels). The drag branches on the second and the crossing retains the first. Falsifier `manifold::a_past_cone_that_wound_both_ways_is_not_a_past_cone_that_never_wound`. |
+| `running_integral::Cochain::set` / `temper::found_on` | **repaired.** A zero deposit is a deposit. `assigned` (the declared domain) splits from `support` (the nonzero cells) and `assigns_nothing` from `is_zero`. Two consequences: `found_potential` now returns a potential defined on exactly what it reached, base included, and `coboundary`'s standing claim to be *total on its grade* became true. Falsifiers `running_integral::a_cell_assigned_zero_is_not_a_cell_that_was_never_assigned` and `temper::founding_zero_founds_and_the_cell_it_founded_on_is_named`. |
+| `receiver_phase_atlas` germ populations | **repaired.** The count became the addressed population — `BTreeMap<Signature, BTreeSet<GermId>>` — with the count as a reading, and `validate` now refuses a population that disagrees with the germs. The three bare `i8` signs became `PhaseHand`, which cannot represent a non-passage. Falsifier `the_germ_passage_population_is_addressed_and_the_count_is_a_reading`. |
+| `local_star::current_frontier` | **repaired.** `HingeCurrentArms { toward, against }` with `net()` as the reading. A hinge whose constituents cancel is retained and reports `cancels()` instead of vanishing from the frontier. Falsifier `local_star::a_hinge_two_opposed_currents_reached_is_not_a_hinge_nothing_reached`. |
+| `inertia::Inertia { positive, zero, negative }` | **already closed**, `4df360f`, by `winding_inertia` — passages named by character, winding and star polygon, with `split()` as the reading and 19 declared controls. **The record's proposed repair is refused:** `InertiaSchedule.steps` carries pivot *indices*, and `inertia.rs` states in its own doc that a pivot position is a receiver coordinate of the solver, not of the form. Promoting one into the invariant return is §0's fourth lesson — a receiver-visible coordinate promoted into an invariant. Where a symmetry supplies an intrinsic address the passages are named; where none does, the count is the honest return. |
+
+**Measured 2026-08-08 after the sweep:** `cargo test --workspace` **1480 passed, 0 failed, 14
+ignored**, against 1475/0/14 before it. Every integer reading is unchanged; the five new tests are
+the declared controls. Each was made to fail against a restored netting carrier before the repair
+was kept.
 
 ---
 

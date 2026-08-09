@@ -116,9 +116,27 @@ impl Orientation {
 
 /// Exact values assigned to the cells of one declared grade.
 ///
-/// An absent cell carries zero, exactly as [`CausalChain`] treats an absent coefficient. A stored
-/// zero is removed on assignment so that two cochains are equal precisely when they assign equal
-/// values everywhere.
+/// An absent cell carries zero, exactly as [`CausalChain`] treats an absent coefficient. **A cell
+/// assigned zero is not an absent cell.** Until 2026-08-08 [`Cochain::set`] removed the key on a
+/// zero deposit, so founding zero founded nothing and the spanning tree's own base — the one vertex
+/// whose potential is fixed by declaration — vanished from the cochain that carried it. That is
+/// `CLAUDE.md` §2b at the level of a carrier: the reading was kept and the deposit discarded.
+///
+/// Two predicates split rather than the data, exactly as they do on
+/// [`crate::algebraic::ComparativeMultiplicity`]:
+///
+/// | predicate | means |
+/// |---|---|
+/// | [`Cochain::assigns_nothing`] | no value was deposited on any cell |
+/// | [`Cochain::is_zero`] | every deposited value is zero — the cochain *is* the zero cochain |
+///
+/// and two populations likewise: [`Cochain::assigned`] is the domain the receiver declared, and
+/// [`Cochain::support`] is the algebraic support, the cells carrying a nonzero value. Every cocycle,
+/// coboundary and closure reading wants `support`/`is_zero`; a reading that asks *where has this
+/// cochain been defined* wants `assigned`/`assigns_nothing`.
+///
+/// Equality is structural, on the deposits. Two cochains that assign the same values on different
+/// domains are compared with [`Cochain::assigns_the_same_values`].
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Cochain {
     grade: u32,
@@ -157,20 +175,48 @@ impl Cochain {
         self.values.get(&cell).cloned().unwrap_or_else(BigInt::zero)
     }
 
+    /// Deposit a value on one cell. **A zero deposit is a deposit.** It enters
+    /// [`Cochain::assigned`] and leaves [`Cochain::support`] alone, which is the whole distinction
+    /// between *the receiver said nothing here* and *the receiver said nothing is here*.
     pub fn set(&mut self, cell: CausalCellId, value: BigInt) {
-        if value.is_zero() {
-            self.values.remove(&cell);
-        } else {
-            self.values.insert(cell, value);
-        }
+        self.values.insert(cell, value);
     }
 
+    /// The cells carrying a **nonzero** value: the algebraic support.
     pub fn support(&self) -> BTreeSet<CausalCellId> {
+        self.values
+            .iter()
+            .filter(|(_, value)| !value.is_zero())
+            .map(|(cell, _)| *cell)
+            .collect()
+    }
+
+    /// Every cell a value was deposited on, zero or not: the declared domain.
+    pub fn assigned(&self) -> BTreeSet<CausalCellId> {
         self.values.keys().copied().collect()
     }
 
+    /// Every deposited value is zero — this *is* the zero cochain. Distinct from
+    /// [`Cochain::assigns_nothing`], and this is the predicate every closure reading wants.
     pub fn is_zero(&self) -> bool {
+        self.values.values().all(BigInt::is_zero)
+    }
+
+    /// Nothing was deposited anywhere. A cochain that assigned zero to one cell is not this.
+    pub fn assigns_nothing(&self) -> bool {
         self.values.is_empty()
+    }
+
+    /// The two cochains assign equal values on every cell of the same grade, whatever their declared
+    /// domains. This is the extensional reading; `==` compares the deposits.
+    pub fn assigns_the_same_values(&self, other: &Self) -> bool {
+        if self.grade != other.grade {
+            return false;
+        }
+        self.values
+            .keys()
+            .chain(other.values.keys())
+            .all(|cell| self.value(*cell) == other.value(*cell))
     }
 
     pub fn negated(&self) -> Self {
@@ -233,7 +279,10 @@ impl Cochain {
 ///
 /// This is the adjoint of the incidence boundary, so `d d = 0` follows from `boundary boundary = 0`
 /// — which the complex already refuses to violate at construction. Every cell one grade above the
-/// cochain is visited, so the returned cochain is total on its grade.
+/// cochain is visited, so the returned cochain is total on its grade: its [`Cochain::assigned`] is
+/// exactly that grade's cell population, including the cells the coboundary sends to zero. That
+/// sentence was written before 2026-08-08 and was false until then, because [`Cochain::set`] deleted
+/// the vanishing cells and left a return that could not say where `d w` had been evaluated.
 pub fn coboundary(
     complex: &GradedCausalComplex,
     cochain: &Cochain,
@@ -1077,6 +1126,111 @@ mod tests {
         fn exact(&self) -> Cochain {
             coboundary(&self.complex, &self.potential()).expect("the potential has a coboundary")
         }
+    }
+
+    // -----------------------------------------------------------------------------------------
+    // the declared control for the zero deposit
+
+    /// THE DECLARED CONTROL for [`Cochain::set`] (`CLAUDE.md` §2b). Until 2026-08-08 a zero deposit
+    /// removed the key, so three different things were one thing: a cell never spoken of, a cell the
+    /// receiver assigned zero, and a cell where an exact computation *returned* zero.
+    ///
+    /// The three readings this separates are load-bearing, not cosmetic:
+    ///
+    /// 1. `found_potential` fixes `f(base) = 0` **by declaration** — that is the gauge choice the
+    ///    whole search rests on — and the old carrier deleted it from the cochain it returned. The
+    ///    search's own `reached` set kept it, so the return contradicted itself.
+    /// 2. `coboundary`'s doc promised a return total on its grade. It was not: every 2-cell where
+    ///    `d w` vanished was dropped, so the return could not say where `d w` had been evaluated,
+    ///    which is exactly the difference between *closed here* and *not looked at here*.
+    /// 3. `temper::found_on(w, cell, 0)` founded nothing at all.
+    ///
+    /// Against the old carrier every `assigned()` assertion below collapses onto `support()` and
+    /// fails.
+    #[test]
+    fn a_cell_assigned_zero_is_not_a_cell_that_was_never_assigned() {
+        // The bare carrier reading first: same values everywhere, different declared domains.
+        let square = Square::hollow();
+        let silent = Cochain::new(1);
+        let spoken = Cochain::from_values(1, [(square.ab, big(0))]);
+        assert!(silent.is_zero() && spoken.is_zero(), "both are zero cochains");
+        assert!(
+            silent.assigns_the_same_values(&spoken),
+            "and they pair identically against every chain"
+        );
+        assert_ne!(silent, spoken, "one spoke about `ab` and the other did not");
+        assert!(silent.assigns_nothing() && !spoken.assigns_nothing());
+        assert_eq!(spoken.support(), BTreeSet::new(), "nothing stands on `ab`");
+        assert_eq!(
+            spoken.assigned(),
+            BTreeSet::from([square.ab]),
+            "and `ab` is nonetheless where this cochain has been defined"
+        );
+
+        // 1. The gauge the search declares survives into the cochain it returns, and so does every
+        //    other vertex the tree happens to send back to zero.
+        let mut complex = GradedCausalComplex::default();
+        let a = vertex(&mut complex, "a");
+        let b = vertex(&mut complex, "b");
+        let c = vertex(&mut complex, "c");
+        let ab = edge(&mut complex, "ab", a, b);
+        let bc = edge(&mut complex, "bc", b, c);
+        // f(a) = 0 by declaration, f(b) = 1, f(c) = 0 by cancellation. Two different zeros.
+        let w = Cochain::from_values(1, [(ab, big(1)), (bc, big(-1))]);
+        let search = found_potential(&complex, &w, a).unwrap();
+        assert!(search.admits_a_potential());
+        assert_eq!(search.reached, BTreeSet::from([a, b, c]));
+        assert_eq!(
+            search.potential.support(),
+            BTreeSet::from([b]),
+            "only `b` carries a nonzero potential"
+        );
+        assert_eq!(
+            search.potential.assigned(),
+            search.reached,
+            "the potential is defined on exactly what the walk reached, base included"
+        );
+        assert_eq!(search.potential.value(a), big(0));
+        assert_eq!(search.potential.value(c), big(0));
+        assert!(
+            !search.potential.assigns_nothing() && !search.potential.is_zero(),
+            "a live control: this potential is not the zero cochain"
+        );
+
+        // 2. The coboundary is total on its grade, and says so by its domain.
+        let (filled, face) = Square::filled();
+        let exact = filled.exact();
+        let d_exact = coboundary(&filled.complex, &exact).unwrap();
+        assert!(d_exact.is_zero(), "d d f = 0");
+        assert_eq!(
+            d_exact.assigned(),
+            BTreeSet::from([face]),
+            "`d d f` was evaluated on the face and returned zero there; that is not the same \
+             return as never having been evaluated"
+        );
+        assert_eq!(d_exact.support(), BTreeSet::new());
+        let d_standing = coboundary(&filled.complex, &filled.standing()).unwrap();
+        assert_eq!(
+            d_standing.assigned(),
+            d_exact.assigned(),
+            "the same aperture was swept either way"
+        );
+        assert_eq!(
+            d_standing.support(),
+            BTreeSet::from([face]),
+            "and here it returned non-zero, which is why the domain is not the support"
+        );
+        assert_ne!(d_standing, d_exact, "the two coboundaries differ");
+
+        // 3. Nothing above changed any integer reading. This is the invariance contract.
+        assert_eq!(
+            running_sum(&complex, &w, &Path::along([ab, bc]))
+                .unwrap()
+                .total,
+            big(0)
+        );
+        assert!(is_closed(&filled.complex, &exact).unwrap());
+        assert!(!is_closed(&filled.complex, &filled.standing()).unwrap());
     }
 
     // -----------------------------------------------------------------------------------------

@@ -106,13 +106,44 @@ impl From<ConicClass> for ReceiverConicSpecies {
     }
 }
 
+/// Which way an exact quantity passes, named rather than signed.
+///
+/// `CLAUDE.md` §2b: *"What the signed floor signs is the PASSAGE, never the state."* These were
+/// three bare `i8`s until 2026-08-08. A bare `i8` also admits 253 values that name no passage, so a
+/// deserialized standing could carry `gradient_signs: [42, -7]` and validate; this enumeration
+/// cannot represent one.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum PhaseHand {
+    /// The quantity passes against the chart's own hand.
+    AgainstTheTurn,
+    /// The quantity is exactly zero: no passage at all, not a small one.
+    AtRest,
+    /// The quantity passes with the chart's own hand.
+    WithTheTurn,
+}
+
+impl PhaseHand {
+    /// The hand of an exact rational. Zero is [`PhaseHand::AtRest`] and is decided exactly — there
+    /// is no tolerance here and there could not be one.
+    pub fn of(value: &Rat) -> Self {
+        if value.is_positive() {
+            Self::WithTheTurn
+        } else if value.is_negative() {
+            Self::AgainstTheTurn
+        } else {
+            Self::AtRest
+        }
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct ReceiverPhaseGermSignature {
     pub dominant_coordinate: u8,
     pub conic_species: ReceiverConicSpecies,
-    pub gradient_signs: [i8; 2],
-    pub hessian_trace_sign: i8,
-    pub hessian_determinant_sign: i8,
+    pub gradient_hands: [PhaseHand; 2],
+    pub hessian_trace_hand: PhaseHand,
+    pub hessian_determinant_hand: PhaseHand,
     pub persistence_order: u32,
 }
 
@@ -211,7 +242,14 @@ pub struct ReceiverPhaseAtlasStanding {
     pub germs: BTreeMap<ReceiverPhaseGermId, ReceiverPhaseGerm>,
     pub connections: BTreeMap<ReceiverPhaseConnectionId, ReceiverPhaseConnection>,
     pub cycles: BTreeMap<ReceiverPhaseCycleId, ReceiverPhaseCycle>,
-    pub germ_populations: BTreeMap<ReceiverPhaseGermSignature, u64>,
+    /// Every germ that took each passage, **named**, not counted.
+    ///
+    /// `CLAUDE.md` §2b: *"A count of signs is a state reading. Name the windings instead."* This was
+    /// `u64` until 2026-08-08 — a tally standing beside the population it summarised, which nothing
+    /// checked and which no reader could resolve back to a germ. The count is now a reading
+    /// ([`ReceiverPhaseAtlasStanding::germ_population_count`]) and the addresses are the data, in
+    /// the same shape `RayCrossings` uses for its crossing indices.
+    pub germ_populations: BTreeMap<ReceiverPhaseGermSignature, BTreeSet<ReceiverPhaseGermId>>,
     pub used_events: BTreeSet<EventId>,
     pub last_chronology: Option<u64>,
     next_section: u64,
@@ -240,6 +278,23 @@ impl Default for ReceiverPhaseAtlasStanding {
 }
 
 impl ReceiverPhaseAtlasStanding {
+    /// How many germs took one passage. A **reading** of the addressed population; nothing stores
+    /// it, so it cannot drift from the germs it counts.
+    pub fn germ_population_count(&self, signature: &ReceiverPhaseGermSignature) -> usize {
+        self.germ_populations
+            .get(signature)
+            .map_or(0, BTreeSet::len)
+    }
+
+    /// The signature one germ was admitted under, read from the population map rather than from the
+    /// germ's own copy. The two must agree, and [`Self::validate`] is what refuses it when they do
+    /// not.
+    pub fn passage_of(&self, germ: ReceiverPhaseGermId) -> Option<&ReceiverPhaseGermSignature> {
+        self.germ_populations
+            .iter()
+            .find_map(|(signature, population)| population.contains(&germ).then_some(signature))
+    }
+
     pub fn validate(&self) -> Result<(), ReceiverPhaseAtlasError> {
         validate_standing(self)
     }
@@ -363,6 +418,25 @@ fn validate_standing(standing: &ReceiverPhaseAtlasStanding) -> Result<(), Receiv
     {
         return Err(ReceiverPhaseAtlasError::MalformedStanding);
     }
+    // The passage population is the germ population, seen through the signatures. A count could
+    // never be checked against the germs it counted; a set of addresses can, and this refusal is
+    // what makes the repair a check rather than a rename.
+    let mut addressed = 0_usize;
+    for (signature, population) in &standing.germ_populations {
+        if population.is_empty() {
+            return Err(ReceiverPhaseAtlasError::EmptyGermPassage);
+        }
+        for germ in population {
+            match standing.germs.get(germ) {
+                Some(body) if body.signature == *signature => {}
+                _ => return Err(ReceiverPhaseAtlasError::GermPassageMismatch(*germ)),
+            }
+        }
+        addressed += population.len();
+    }
+    if addressed != standing.germs.len() {
+        return Err(ReceiverPhaseAtlasError::MalformedStanding);
+    }
     Ok(())
 }
 
@@ -455,13 +529,11 @@ fn admit_section(
             level_sets: extracted.level_sets,
             signature: extracted.signature,
         };
-        let population = standing
+        standing
             .germ_populations
             .entry(germ.signature.clone())
-            .or_insert(0_u64);
-        *population = population
-            .checked_add(1)
-            .ok_or(ReceiverPhaseAtlasError::CarrierOverflow)?;
+            .or_default()
+            .insert(id);
         section.germs.insert(id);
         standing.germs.insert(id, germ);
     }
@@ -579,9 +651,9 @@ fn extract_germs(
             let signature = ReceiverPhaseGermSignature {
                 dominant_coordinate,
                 conic_species: conic.classify().into(),
-                gradient_signs: [rat_sign(&gradient[0]), rat_sign(&gradient[1])],
-                hessian_trace_sign: rat_sign(&trace),
-                hessian_determinant_sign: rat_sign(&determinant),
+                gradient_hands: [PhaseHand::of(&gradient[0]), PhaseHand::of(&gradient[1])],
+                hessian_trace_hand: PhaseHand::of(&trace),
+                hessian_determinant_hand: PhaseHand::of(&determinant),
                 persistence_order,
             };
             germs.push(ExtractedGerm {
@@ -1043,16 +1115,6 @@ fn rat_usize(value: usize) -> Rat {
     Rat::from_integer(BigInt::from(value))
 }
 
-fn rat_sign(value: &Rat) -> i8 {
-    if value.is_positive() {
-        1
-    } else if value.is_negative() {
-        -1
-    } else {
-        0
-    }
-}
-
 fn usize_to_u64(value: usize) -> Result<u64, ReceiverPhaseAtlasError> {
     u64::try_from(value).map_err(|_| ReceiverPhaseAtlasError::CarrierOverflow)
 }
@@ -1061,6 +1123,10 @@ fn usize_to_u64(value: usize) -> Result<u64, ReceiverPhaseAtlasError> {
 pub enum ReceiverPhaseAtlasError {
     #[error("a receiver-phase event must contain at least one section")]
     EmptyEvent,
+    #[error("a germ passage with no germ in it is a key standing for a population that is not there")]
+    EmptyGermPassage,
+    #[error("germ {0:?} is filed under a passage that is not the one it carries")]
+    GermPassageMismatch(ReceiverPhaseGermId),
     #[error("receiver-phase event {0:?} has already entered standing")]
     RepeatedEvent(EventId),
     #[error("receiver-phase chronology {supplied} does not follow {previous}")]
@@ -1203,5 +1269,97 @@ mod tests {
             })
             .unwrap();
         assert!(world.standing().germs.len() > before);
+    }
+
+    /// THE DECLARED CONTROL for the germ passage population (`CLAUDE.md` §2b). Until 2026-08-08
+    /// `germ_populations` was `BTreeMap<Signature, u64>` — *"a count of signs is a state reading"* —
+    /// a tally standing beside the germs it summarised, which `validate` did not look at and which
+    /// no reader could resolve back to a germ.
+    ///
+    /// Three things this now supports and a count could not:
+    ///
+    /// - the passages are **addressed**: every germ under a signature can be named and re-read at
+    ///   its exact `Rat` jet, which is where the hands came from;
+    /// - two standings with identical counts on identical signatures are distinguishable when they
+    ///   are populated by different germs;
+    /// - the map is **checkable against the germs**, so a corrupted standing is refused by name.
+    ///   A count can only ever be checked against another count.
+    ///
+    /// Against the old carrier the address assertions cannot be written and the mismatch below
+    /// validates cleanly.
+    #[test]
+    fn the_germ_passage_population_is_addressed_and_the_count_is_a_reading() {
+        let law = ReceiverPhaseAtlasLaw;
+        let mut world = CausalWorld::new(law.clone(), law.initial_standing());
+        world
+            .receive(&ReceiverPhaseAtlasEvent {
+                event: EventId(1),
+                chronology: 1,
+                sections: vec![curved_section(1, 1, 0)],
+            })
+            .unwrap();
+        let standing = world.standing();
+        assert!(!standing.germ_populations.is_empty(), "a live control");
+
+        // Every germ is named by exactly one passage, and the count is that population's extent.
+        let mut named = BTreeSet::new();
+        for (signature, population) in &standing.germ_populations {
+            assert_eq!(standing.germ_population_count(signature), population.len());
+            for germ in population {
+                assert!(named.insert(*germ), "a germ takes exactly one passage");
+                let body = &standing.germs[germ];
+                assert_eq!(&body.signature, signature);
+                assert_eq!(standing.passage_of(*germ), Some(signature));
+                // The hands are re-derivable from the exact jet the germ still carries; the
+                // signature is a reading of that material and never a substitute for it.
+                let dominant = usize::from(body.dominant_coordinate);
+                let hessian = &body.jet.hessians[dominant];
+                let trace = &hessian[0][0] + &hessian[1][1];
+                let determinant =
+                    &hessian[0][0] * &hessian[1][1] - &hessian[0][1] * &hessian[1][0];
+                assert_eq!(signature.hessian_trace_hand, PhaseHand::of(&trace));
+                assert_eq!(
+                    signature.hessian_determinant_hand,
+                    PhaseHand::of(&determinant)
+                );
+            }
+        }
+        assert_eq!(
+            named,
+            standing.germs.keys().copied().collect::<BTreeSet<_>>(),
+            "the passage population is the germ population, seen through the signatures"
+        );
+
+        // And the standing now refuses a population that disagrees with its germs. A count could
+        // not have been checked at all.
+        let signature = standing
+            .germ_populations
+            .keys()
+            .next()
+            .expect("a live control")
+            .clone();
+        let absent = ReceiverPhaseGermId(u64::MAX);
+        let mut corrupt = standing.clone();
+        corrupt
+            .germ_populations
+            .get_mut(&signature)
+            .expect("the passage stands")
+            .insert(absent);
+        assert!(matches!(
+            corrupt.validate(),
+            Err(ReceiverPhaseAtlasError::GermPassageMismatch(germ)) if germ == absent
+        ));
+
+        let mut emptied = standing.clone();
+        emptied
+            .germ_populations
+            .get_mut(&signature)
+            .expect("the passage stands")
+            .clear();
+        assert!(matches!(
+            emptied.validate(),
+            Err(ReceiverPhaseAtlasError::EmptyGermPassage)
+        ));
+        assert!(standing.validate().is_ok(), "and the honest standing passes");
     }
 }

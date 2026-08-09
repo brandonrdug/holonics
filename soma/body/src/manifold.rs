@@ -165,7 +165,10 @@ impl Face {
     /// The §XXIV drag with the approached past-cone winding kept oriented. This is a read-only
     /// input to one lineage's crossing, not the winding this deed may newly emit.
     pub fn dragged_by(&self, winding: StandingWinding) -> Face {
-        if winding.is_zero() {
+        // `turns_are_zero`, not `is_zero`: a rotation by `arctan(0)` is the identity whether nothing
+        // stood or the standing passages cancelled, so the drag takes the same branch either way.
+        // The distinction is not lost — it is retained on the winding, which the crossing carries.
+        if winding.turns_are_zero() {
             return *self;
         }
         let w = winding.turns();
@@ -222,27 +225,129 @@ pub enum Deed {
     Found,
 }
 
-/// An oriented integer winding already standing in the crossing's past cone. Its hand is relative
-/// to this illicium; the wrapper keeps it distinct from the one quantum a new FOUND may emit.
+/// The winding already standing in the crossing's past cone, held as TWO ARMS that never cancel.
+///
+/// Its hand is relative to this illicium; the carrier keeps it distinct from the one quantum a new
+/// FOUND may emit. **A sign is a passage, never a state** (`CLAUDE.md` §2b): this carried a single
+/// `Cog` until 2026-08-08, so a past cone that wound once each way was byte-identical to a past cone
+/// that never wound at all — the magnitude kept, the turn discarded. The arms are the same anatomy
+/// `channel::OrientedWinding` carries one module away, and for the same reason: a circuit followed by
+/// its opposite is two deposited passages, not a return to nothing.
+///
+/// [`StandingWinding::turns`] is the group completion and is what the drag rotor consumes; it is a
+/// *reading* of the arms and never replaces them. [`StandingWinding::is_zero`] asks whether anything
+/// stood at all; [`StandingWinding::turns_are_zero`] asks whether what stood cancels. The drag
+/// consults the second, because a rotation by `arctan(0)` is the identity either way — but the
+/// crossing retains the first, because the two past cones are not the same evidence.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct StandingWinding(Cog);
+pub struct StandingWinding {
+    this_way: Cog,
+    that_way: Cog,
+}
 
 impl StandingWinding {
+    /// Nothing stood in the past cone. Distinct from a cone whose passages cancel.
+    pub const UNWOUND: StandingWinding = StandingWinding {
+        this_way: Cog::ZERO,
+        that_way: Cog::ZERO,
+    };
+
     /// Boundary/test constructor. Production linkage will supply this construction whole once LINK
     /// is derived; this constructor does not define how multiple emissions integrate.
+    ///
+    /// A signed glyph arriving from the boundary carries one hand and one magnitude, so it deposits
+    /// into exactly one arm. It cannot express a cone that wound both ways — [`Self::from_arms`] and
+    /// [`Self::deposit`] can, and that is the whole distinction this carrier exists to keep.
     #[inline]
     pub fn at_boundary(turns: i64) -> StandingWinding {
-        StandingWinding(Cog::lit(turns))
+        let glyph = Cog::lit(turns);
+        // The half-turn bit selects the arm; the magnitude enters unsigned, so no `abs` is taken and
+        // `i64::MIN` needs no special case.
+        let magnitude = Cog {
+            mag: glyph.mag,
+            rank: glyph.rank,
+            turn: 0,
+        };
+        if (glyph.turn >> 1) & 1 == 1 {
+            StandingWinding {
+                this_way: Cog::ZERO,
+                that_way: magnitude,
+            }
+        } else {
+            StandingWinding {
+                this_way: magnitude,
+                that_way: Cog::ZERO,
+            }
+        }
     }
 
+    /// Both arms at once — the construction a boundary glyph cannot express.
+    #[inline]
+    pub fn from_arms(this_way: u32, that_way: u32) -> StandingWinding {
+        StandingWinding {
+            this_way: Cog::lit(this_way as i64),
+            that_way: Cog::lit(that_way as i64),
+        }
+    }
+
+    /// Deposit one more quantum on the arm it belongs to. Deposit-only: neither arm ever shrinks,
+    /// which is what makes the pair a lineage rather than a running total.
+    #[inline]
+    pub fn deposit(self, quantum: WindingQuantum) -> StandingWinding {
+        let one = Cog::lit(1);
+        match quantum {
+            WindingQuantum::None => self,
+            WindingQuantum::ThisWay => StandingWinding {
+                this_way: self.this_way.add(one),
+                ..self
+            },
+            WindingQuantum::ThatWay => StandingWinding {
+                that_way: self.that_way.add(one),
+                ..self
+            },
+        }
+    }
+
+    #[inline]
+    pub fn this_way(self) -> Cog {
+        self.this_way
+    }
+
+    #[inline]
+    pub fn that_way(self) -> Cog {
+        self.that_way
+    }
+
+    /// No passage stood either way. Distinct from [`Self::turns_are_zero`].
     #[inline]
     pub fn is_zero(self) -> bool {
-        self.0.mag == 0
+        self.this_way.mag == 0 && self.that_way.mag == 0
     }
 
+    /// The passages cancel under the group completion. A cone that wound once each way returns
+    /// `true` here and `false` from [`Self::is_zero`].
+    #[inline]
+    pub fn turns_are_zero(self) -> bool {
+        self.turns().mag == 0
+    }
+
+    /// Every passage, both hands. Zero exactly when nothing stood.
+    #[inline]
+    pub fn total(self) -> Cog {
+        self.this_way.add(self.that_way)
+    }
+
+    /// The past cone wound and still returns the identity drag. This is the case a net turn count
+    /// cannot report, and it is the one that says the terrain did work the rotor cannot see.
+    #[inline]
+    pub fn cancels(self) -> bool {
+        !self.is_zero() && self.turns_are_zero()
+    }
+
+    /// The group-completed turn — `this_way − that_way`. The drag rotor's `w`.
     #[inline]
     pub fn turns(self) -> Cog {
-        self.0
+        self.this_way.sub(self.that_way)
     }
 }
 
@@ -299,7 +404,9 @@ impl Crossing {
     pub fn restore_meeting(self, held: &Face) -> Option<MeetingCause> {
         let flywheel = soul::FormedRotor::of(held.arrow.aim, held.arrow.cross)?;
         let dragged = self.emanation.chi.restore_against(flywheel);
-        if self.standing_winding.is_zero() {
+        // The same predicate `dragged_by` branched on: the drag applied was the identity exactly
+        // when the standing turns cancel, whether or not anything stood.
+        if self.standing_winding.turns_are_zero() {
             return Some(MeetingCause {
                 reach: self.reach,
                 rotor: dragged,

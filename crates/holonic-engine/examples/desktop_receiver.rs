@@ -944,7 +944,17 @@ impl ResearchTrace {
             .standing()
             .open_frontier()
             .iter()
-            .map(|(hinge, current)| format!("{}:{}", hinge.0, current))
+            .map(|(hinge, current)| {
+                // The arms, not only the net: a hinge two opposed currents reached is not a hinge
+                // nothing reached, and until 2026-08-08 the frontier could not say which.
+                format!(
+                    "{}:{}({}/{})",
+                    hinge.0,
+                    current.net(),
+                    current.toward(),
+                    current.against()
+                )
+            })
             .collect::<Vec<_>>()
             .join(";");
         let action_balances = radiation.map_or_else(
@@ -979,7 +989,15 @@ impl ResearchTrace {
                         let emitted = balance
                             .emitted
                             .iter()
-                            .map(|(target, current)| format!("{}:{}", target.0, current))
+                            .map(|(target, current)| {
+                                format!(
+                                    "{}:{}({}/{})",
+                                    target.0,
+                                    current.net(),
+                                    current.toward(),
+                                    current.against()
+                                )
+                            })
                             .collect::<Vec<_>>()
                             .join(",");
                         format!(
