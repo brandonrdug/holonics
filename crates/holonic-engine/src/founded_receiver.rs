@@ -162,6 +162,18 @@ pub enum FoundingRefusal {
     FoundedNothing { left: ItemId, right: ItemId },
     /// The structural bound `|items| − 1` was reached with unwitnessed pairs still standing.
     BoundReached { remaining: usize },
+    /// The declared junction is not standing against the prefix it was staged over: either the
+    /// present panel already witnesses that pair, or the panel now separates it one-shot, or conduct
+    /// never separated it at all.
+    ///
+    /// **This is the refusal `crate::interchange` reads as a failed rebase.** A staged occurrence
+    /// that ceases to be a junction once another occurrence has been founded is not independent of
+    /// it, and the front stays ordered.
+    NotAStandingJunction { left: ItemId, right: ItemId },
+    /// The founding gained no block against the prefix it was staged over. [`FoundedReceiver`]'s own
+    /// `blocks_gained` documentation says a founding that gained none is refused; only
+    /// [`found_at`] enforces it — [`found_to_exhaustion`] computes the gain and pushes regardless.
+    GainedNoBlock { left: ItemId, right: ItemId },
 }
 
 /// The founding run to exhaustion, with everything it refused.
@@ -362,9 +374,9 @@ fn congested_block(partition: &Partition) -> Option<(usize, usize)> {
 /// The item population, the input population and the successor law are the declared system's,
 /// untouched. Only `receivers` and `observation` widen — which is exactly the claim: founding
 /// changes what is **seen**, never what the material **does**.
-struct WidenedSystem<'a> {
-    declared: &'a dyn ObservedSystem,
-    founded: &'a [FoundedReceiver],
+pub struct WidenedSystem<'a> {
+    pub declared: &'a dyn ObservedSystem,
+    pub founded: &'a [FoundedReceiver],
 }
 
 impl ObservedSystem for WidenedSystem<'_> {
@@ -625,6 +637,164 @@ pub fn found_to_exhaustion(system: &dyn ObservedSystem, skip: &[(ItemId, ItemId)
     }
 }
 
+/// The next receiver id above every declared id and every id in the prefix. A mint ordinal, and
+/// therefore an **absolute frame** in the sense of `CLAUDE.md` §0 lesson 2 — recorded so a caller
+/// can see it move, never a coordinate a comparison may depend on.
+fn next_receiver_id(system: &dyn ObservedSystem, prefix: &[FoundedReceiver]) -> ReceiverId {
+    let top = system
+        .receivers()
+        .iter()
+        .map(|receiver| receiver.0)
+        .chain(prefix.iter().map(|found| found.id.0))
+        .max();
+    ReceiverId(top.map_or(0, |top| top + 1))
+}
+
+/// The junctions standing against a declared prefix: pairs the widened panel identifies one-shot,
+/// conduct separates, and no receiver in that panel witnesses.
+///
+/// This is the population [`found_to_exhaustion`] walks one at a time. It is exposed because the
+/// interchange question is *which* of these may be taken in either order, which needs the standing
+/// population before and after a staged founding rather than only the run's own choice.
+pub fn standing_junctions(
+    system: &dyn ObservedSystem,
+    prefix: &[FoundedReceiver],
+) -> Vec<CollapsedPair> {
+    let widened = WidenedSystem {
+        declared: system,
+        founded: prefix,
+    };
+    compress(&widened)
+        .collapsed
+        .into_iter()
+        .filter(|pair| pair.witness.is_none())
+        .collect()
+}
+
+/// **Found ONE receiver at a DECLARED junction, against a declared prefix.** The staged occurrence.
+///
+/// [`found_to_exhaustion`] chooses its own junctions and runs to a fixed point; that is a complete
+/// order, not an occurrence. An interchange question needs an occurrence: *this* junction, over
+/// *this* predecessor, so that the same two occurrences can be rebased in both orders and the
+/// results compared. The admission rules are the ones `found_to_exhaustion` applies at a blindness
+/// junction, unchanged, plus the two that only make sense when the junction is named by a caller:
+/// the junction must actually be standing, and the founding must gain a block.
+///
+/// **The reading is the material's and the word is the panel's.** `reads` is
+/// [`aperture_after`] over the *declared* system, so it does not depend on the prefix. The junction's
+/// `after` word does — it comes from `compress` over the widened panel, and a wider panel can find a
+/// witness earlier in the same breadth-first frontier. That is the whole coupling channel between
+/// two staged occurrences, and it is why an interchange certificate must compare the word and the
+/// reading rather than only the endpoint.
+pub fn found_at(
+    system: &dyn ObservedSystem,
+    prefix: &[FoundedReceiver],
+    junction: (ItemId, ItemId),
+) -> Result<FoundedReceiver, FoundingRefusal> {
+    let widened = WidenedSystem {
+        declared: system,
+        founded: prefix,
+    };
+    let reading = compress(&widened);
+    let Some(pair) = reading
+        .collapsed
+        .iter()
+        .find(|pair| pair.witness.is_none() && (pair.left, pair.right) == junction)
+    else {
+        return Err(FoundingRefusal::NotAStandingJunction {
+            left: junction.0,
+            right: junction.1,
+        });
+    };
+
+    let species = AxisSpecies::ContinuationAperture;
+    let reads = read_species(system, species, &pair.distinguishing_word);
+    let distinct: BTreeSet<Observation> = reads.values().copied().collect();
+    if distinct.len() < 2 {
+        return Err(FoundingRefusal::FoundedNothing {
+            left: pair.left,
+            right: pair.right,
+        });
+    }
+    if reads.get(&pair.left) == reads.get(&pair.right) {
+        return Err(FoundingRefusal::DoesNotSeparateItsJunction {
+            left: pair.left,
+            right: pair.right,
+        });
+    }
+
+    let candidate = FoundedReceiver {
+        id: next_receiver_id(system, prefix),
+        pressure: FoundingPressure::Blindness {
+            left: pair.left,
+            right: pair.right,
+        },
+        species,
+        residue: 0,
+        junction: (pair.left, pair.right),
+        after: pair.distinguishing_word.clone(),
+        reads,
+        blocks_gained: 0,
+    };
+    let mut trial = prefix.to_vec();
+    trial.push(candidate.clone());
+    let gained = compress(&WidenedSystem {
+        declared: system,
+        founded: &trial,
+    })
+    .one_shot
+    .len()
+    .saturating_sub(reading.one_shot.len());
+    if gained == 0 {
+        return Err(FoundingRefusal::GainedNoBlock {
+            left: pair.left,
+            right: pair.right,
+        });
+    }
+
+    Ok(FoundedReceiver {
+        blocks_gained: gained,
+        ..candidate
+    })
+}
+
+/// Close a staged founding sequence into a [`FoundedPanel`], measuring residue over the settled
+/// family.
+///
+/// [`found_to_exhaustion`] builds its panel on the way out; a staged sequence needs the same closure
+/// so that the same organs read it — in particular [`FoundedPanel::capacities`], which is the
+/// logical-resource face an interchange certificate has to compare.
+pub fn panel_from_founded(
+    system: &dyn ObservedSystem,
+    mut founded: Vec<FoundedReceiver>,
+    refused: Vec<FoundingRefusal>,
+) -> FoundedPanel {
+    let declared = system.receivers();
+    let bound = system.items().len().saturating_sub(1);
+    let before = compress(system);
+    measure_residue(system, &mut founded);
+    let settled = compress(&WidenedSystem {
+        declared: system,
+        founded: &founded,
+    });
+    let unwitnessed = settled
+        .collapsed
+        .iter()
+        .filter(|pair| pair.witness.is_none())
+        .count();
+    FoundedPanel {
+        declared,
+        rounds: founded.len(),
+        bound,
+        one_shot_before: before.one_shot,
+        one_shot_after: settled.one_shot,
+        conduct: settled.conduct,
+        unwitnessed_remaining: unwitnessed,
+        founded,
+        refused,
+    }
+}
+
 /// The residue of each founded axis under the rest of the panel: `( ⋂_{s≠r} ≡_s ) ∖ ≡_r`.
 ///
 /// Empty residue means the axis is redundant — removing it leaves the partition unmoved. This is
@@ -703,7 +873,13 @@ pub fn gyration(system: &dyn ObservedSystem) -> Gyration {
     // Defer the junction the first order took first, so the second order must take another.
     let deferred: Vec<(ItemId, ItemId)> = left.founded.first().map(|f| f.junction).into_iter().collect();
     let right = found_to_exhaustion(system, &deferred);
+    gyration_of(&left, &right)
+}
 
+/// The gyration between two founding orders already run. [`gyration`] is this over the two orders it
+/// runs itself; a caller holding the panels — `crate::interchange` does — compares the same way
+/// rather than re-running the founding.
+pub fn gyration_of(left: &FoundedPanel, right: &FoundedPanel) -> Gyration {
     let left_order = left.order();
     let right_order = right.order();
     let divergence = left_order
@@ -934,6 +1110,75 @@ mod tests {
                 assert_eq!(capacities[&found.id], BigUint::one());
             }
         }
+    }
+
+    #[test]
+    fn found_at_takes_the_declared_junction_and_agrees_with_the_run_that_chose_it() {
+        let standing = standing_junctions(&BlindPanel, &[]);
+        assert!(!standing.is_empty(), "the fixture must present a junction");
+        let junction = (standing[0].left, standing[0].right);
+        let staged = found_at(&BlindPanel, &[], junction).expect("a standing junction founds");
+        let run = found_to_exhaustion(&BlindPanel, &[]);
+        // The run chose the same first junction, so the two must agree on everything that is not a
+        // mint ordinal: the junction, the word it reads from, and what it returns for every item.
+        assert_eq!(staged.junction, run.founded[0].junction);
+        assert_eq!(staged.after, run.founded[0].after);
+        assert_eq!(staged.reads, run.founded[0].reads);
+    }
+
+    #[test]
+    fn found_at_refuses_a_junction_that_is_not_standing_by_name() {
+        // A pair the declared panel already separates one-shot is not a junction.
+        let refusal = found_at(&SeeingPanel, &[], (ItemId(0), ItemId(1)))
+            .expect_err("a fully witnessing panel presents no junction");
+        assert_eq!(
+            refusal,
+            FoundingRefusal::NotAStandingJunction {
+                left: ItemId(0),
+                right: ItemId(1)
+            }
+        );
+    }
+
+    /// `GainedNoBlock` is a **defence, not a measured refusal**, and this states why rather than
+    /// leaving a branch that cannot fire.
+    ///
+    /// A blindness founding is admitted only after `DoesNotSeparateItsJunction` has passed, which
+    /// means the reading separates a pair the present one-shot partition held in one block. Splitting
+    /// a block strictly refines, so the block count must rise. The assertion below is that statement
+    /// over the declared material: every junction that survives the separation check gains.
+    #[test]
+    fn separating_its_own_junction_implies_gaining_a_block() {
+        for standing in standing_junctions(&BlindPanel, &[]) {
+            match found_at(&BlindPanel, &[], (standing.left, standing.right)) {
+                Ok(found) => assert!(
+                    found.blocks_gained > 0,
+                    "a founding that separated its junction must have split a block"
+                ),
+                Err(FoundingRefusal::GainedNoBlock { .. }) => panic!(
+                    "GainedNoBlock fired, so the reasoning above is wrong and the branch is a \
+                     measured refusal rather than a defence"
+                ),
+                Err(_) => {}
+            }
+        }
+    }
+
+    #[test]
+    fn a_staged_panel_measures_its_residue_and_carries_its_capacities() {
+        let standing = standing_junctions(&BlindPanel, &[]);
+        let found = found_at(&BlindPanel, &[], (standing[0].left, standing[0].right))
+            .expect("a standing junction founds");
+        let id = found.id;
+        let panel = panel_from_founded(&BlindPanel, vec![found], Vec::new());
+        assert_eq!(panel.rounds, 1);
+        let capacities = panel.capacities();
+        assert_eq!(
+            capacities[&id],
+            BigUint::from(panel.founded[0].residue) + BigUint::one(),
+            "capacity is the residue measured over the settled family, plus the forced one"
+        );
+        assert_eq!(panel.conduct, compress(&BlindPanel).conduct, "conduct is invariant");
     }
 
     #[test]
