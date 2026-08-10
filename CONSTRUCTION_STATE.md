@@ -4,8 +4,59 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-09. **Body:** Rust. The C++/CUDA engine's position record is
+**Currency:** 2026-08-10 at `9d15666`. **Body:** Rust. The C++/CUDA engine's position record is
 `archive/cpp-engine/CONSTRUCTION_STATE.md` and governs nothing.
+
+**Gates at that commit**, re-taken rather than carried: `cargo test --workspace` **1,984 passed, 0
+failed, 14 ignored** summed over 42 `test result:` lines; `tools/authored_levels.py --check` **0
+failures**; ten Typst roots compile; `tools/resolve_named_paths.py` **0 failures**. Working tree
+clean and in sync with `origin/main`.
+
+## THE HYPERGEOMETRY TOWER CONDUCTS — 2026-08-10
+
+**Truth status:** `established-bounded`. **Evidence:** `implemented-exact`, `measured`; three drivers,
+each run and its output read. **Record:**
+`research/records/2026-08-10_THE_MANIFOLD_IS_THE_INVARIANT_OF_THE_CURRENTS_NOT_THEIR_CONTAINER_AND_THE_RUNG_IS_THE_HINGE_DEFICIT.md`.
+**Canon:** `canon/TABLET_THE_MANIFOLD.md`, `canon/TABLET_THE_TURN.md` §§11.5–11.6.2.
+
+**The carrier.** `crates/holonic-engine/src/multiquadratic.rs` — `ℚ(√k₁,…,√kₙ)` as the twisted group
+algebra of `(ℤ/2)ⁿ`, graded by symmetric difference. `Corner::sine` moved from `Option<Rat>`, which was
+`None` for essentially every real corner, to an exact field element. 75 irrational corners over
+generators `{3, 7, 1463}` now compose where none did.
+
+**The rung.** `contact_gluing::hinge_deficits`. A triangle's own three corners compose to `e^{iπ}`
+identically — **that is Regge's flatness hypothesis, `definition`-grade, not a defect**. Curvature is
+on the codimension-two hinge. Measured: `1 → 5` distinct turns over 11 hinges, `flat 5 · positive 3 ·
+negative 3`, six hinges moving under a non-similar metric and **zero** under a similarity. The winding
+is an integer read off monotone `π`-crossings, so no angle is taken anywhere.
+
+**The event-site hinge.** `contact_gluing::{orient, hinge_residuals}` — §III's four branches against a
+**solved orientation**, because the raw induced hands are a chart and reading a gluing off them was
+§0's fourth lesson (a failing test caught it). 25 faces, 5 seams, 20 branching, 0 exposed, 0
+reversing, coherently orientable; **11 of 11 singular links explained by a founding face.**
+
+**The grain.** `contact_gluing::{triangles_at_rank, grain_roles}` — **25 of 25** rank-0 two-cells are
+rank-1 curvature hinges, corners read by the identical law. That is the tower's upward map.
+
+**The flow.** `discrete_curvature::{total_multiplier, coefficient_species, dissipative_annihilator,
+step_at}`. `Σ K' = (1 − 2c) Σ K`, proved in two lines and checked exactly at six coefficients over six
+steps. The module's derived `c = 1` is the multiplier `−1` — a **reflection** — and `c = 1/2` is the
+unique annihilator: **`I − P` against `I − 2P`**, §2b's half turn arriving from the curvature side.
+
+**Bounds carried with it.** `interior 0 of 11` — every link is singular — is **not a wall**:
+`2026-07-20_THE_HINGE_CARRIES_THE_FRAME…` §V rules that plural branches and disconnected links are
+FOUND seams and the carrier is never required to be a manifold. `Σδ = 2πχ` is a **correctness gate**,
+`definition`-grade, and does not apply here (`3F = 75` against `2E = 50`). On a **bipartite** incidence
+the alternating deficit is invariant at every coefficient — two-colourability is the obstruction to
+convergence. And `c = 1/2` flattening in one step is a property of **component regularity**, not of the
+coefficient; the irregular control is in the module's tests.
+
+**The process defect this line convicted, and it is the one to carry.** The first deposit searched the
+frozen laboratory and the vendored `reference/` corpus and **never grepped `research/records/`** — 342
+live records here. Two Brandon-ratified records answering its central question were cited by exactly
+one file in the tree, the vendored `FORMULA.md`. `CLAUDE.md` §9b rule 1 names `research/records/`
+explicitly and the record that violated it cited that rule. **Search the live repository first, and
+`research/records/` is the live repository.**
 
 **The position is stated against a spine.** `canon/THE_HOLOBROCHOS_SPINE.md` states the loop the body
 is supposed to be and places every live organ on a station. **Read the position through it:** what is

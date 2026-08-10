@@ -815,13 +815,19 @@ neighbouring prose, return to the same obstruction.*
    refusal**. *Falsifier:* the radical chart must refuse degree 5 with `A₅ is simple` named, and
    return for a solvable quintic.
 
-2. **The float mouth on `reopening.rs`.** Every `ExactFace` constructor requires an exact source, so
-   the organ built to reverse the float's deletion can only reverse a deletion it performed itself.
-   The missing constructor exists: `soma/life/examples/eros_self_emanated_law.rs` parses safetensors,
-   refuses any dtype but `BF16`, and converts bf16 words to an exact `Dyadic { BigInt, i32 }`.
-   *Falsifier:* a face built from a real measured float must be **refused by name**
-   (`FaceCoarserThanGrain`) unless it carries a retained tail certificate — a mouth that accepts
-   everything has not been built.
+2. **The float mouth on `reopening.rs` — STRUCK 2026-08-10, the premise was false.** This item read
+   *"Every `ExactFace` constructor requires an exact source, so the organ built to reverse the
+   float's deletion can only reverse a deletion it performed itself."* The mouth exists:
+   `ExactFace::from_binary_float` at `crates/holonic-engine/src/reopening.rs:492`, documented as the
+   mouth at `:109-117` — *"where a real float enters… No float crosses into this file"* — consuming a
+   `BinaryFloatDatum` of `BigUint` and a power of two, and driven by
+   `crates/holonic-engine/examples/a_float_is_a_dyadic_and_a_deleted_tail.rs`. `CLAUDE.md` §11 already
+   carried this correction; this file did not, which is the currency defect §"WHERE THE POSITION
+   RECORD STANDS" now exists to catch.
+
+   **What survives of the item, narrowly:** `collapsed` does take an existing `ExactFace` and
+   truncate it, and `FaceCoarserThanGrain` does refuse a face coarser than its grain. The falsifier
+   as written — *a mouth that accepts everything has not been built* — is met by that refusal.
 
 3. **`SOURCE.json` — STRUCK 2026-08-09, the premise was false.** 15 are tracked, added at `a91a84f`
    on 2026-08-08; 19 drivers take an input, 14 are supplied, 12 of 13 run returned exit 0. Only four
