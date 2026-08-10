@@ -575,15 +575,25 @@ singular(deg 4)   5     port ported porter transported transporter
 ```
 
 Some edge lies in three or four triangles where a surface admits exactly two. **So by the star/link
-record's own bar, none of these deficits is a curvature.** They are exact readings on a complex that
-is nowhere a Regge geometry. Calling them curvature would be rounding the link into a sphere, which
-is precisely what *"that residual geometry is information"* forbids.
+record's own bar, none of these deficits is a curvature.** Calling them curvature would be rounding
+the link into a sphere, which is precisely what *"that residual geometry is information"* forbids.
 
-That is a `counterexample`-grade return under `CLAUDE.md` §8 — *a deed that proves its own receiver
-family cannot see what it was built to see has returned real evidence and passes its grade.* The
-organ is correct and driven; what it says about **this** material is that the material is not a
-surface. Whether any material in this body is one is now a well-posed question and is not answered
-here.
+**CORRECTED THE SAME DAY, and the correction inverts what this measurement means.** The paragraph
+that stood here read *"the material is not a Regge geometry… a `counterexample` that passes its
+grade"*, and graded a wall. `research/records/2026-07-20_THE_HINGE_CARRIES_THE_FRAME_THE_SUCCESSOR_REPLACES_THE_STANDING_STAR.md`
+§V — **Brandon-ratified, live in this repository since extraction, and cited by nothing here** —
+already rules on exactly this configuration:
+
+> *"A complex is manifold-like only where these links have the appropriate sphere or ball species.
+> In a two-dimensional interior, each edge has two incident triangles and each regular vertex has a
+> circular link. **Plural branches, disconnected links, or other failures are genuine boundaries,
+> singularities, or FOUND seams.** Calling the carrier a graded cell complex therefore does not
+> demand that every local region already be a smooth manifold."*
+
+So `singular 11` is **not** a limit of the material. It is **eleven FOUND seams**, which is the
+positive return the framework's own vocabulary names, and the carrier was never required to be a
+manifold in the first place. The measurement is unchanged; the reading was inverted, and it was
+inverted because the ratified record was not read.
 
 ### 9b.4 Two authored levels excised, and a latent unsoundness found doing it
 
@@ -619,6 +629,85 @@ It was reachable, and nothing had stated it.
 condition measured before any total is read — and it fails, so no total is asserted. And the species
 census did **not** move under the metric change even though six turns did; that is reported as a
 measurement on one material and asserted of nothing else.
+
+---
+
+## 9c · THE PROCESS DEFECT, AND THE THREE PARTIALS IT HID
+
+**Truth status:** `established-bounded`; each citation was opened.
+**Occasion:** Brandon, 2026-08-10: *"I get the sense that you are under-utilizing our older records
+and hypotheses, and that there may be missing partials in your holonic synopsis that you're
+currently aware of, because you seem complacent with these outcomes."* He is right, and the defect
+is mechanical rather than a matter of judgement.
+
+**What happened.** §9b was built after searching the frozen laboratory at `a07ff376` and the
+vendored `reference/holobrochos-a07ff376/`. **`research/records/` — 342 live records in this
+repository — was never grepped.** `canon/THE_DOCUMENT_LAW.md` §1 ranks a research record as
+*evidence* and the vendored corpus as *historical, provenance only*; `CLAUDE.md` §9b rule 1 says
+*"Search the live repository before the frozen one"* and names `research/records/` explicitly. This
+record cites that rule and violated it in the same session. Two ratified records that answer its
+central question are cited by exactly one file in the tree — the vendored `FORMULA.md` — and by
+nothing live.
+
+### 9c.1 The hinge law is already ratified, and it is not the angle deficit
+
+`2026-07-20_THE_HINGE_CARRIES_THE_FRAME…` §III, Brandon-ratified, gives the hinge residual and its
+law:
+
+```text
+delta_e = a_R|e − G_(L→R)(a_L|e)
+
+delta_e = 0                                the transport RIDEs and the internal seam may fold
+nonzero, carried by existing support       the configuration pivots or redistributes through it
+nonzero, requiring independent support     the failure FOUNDS a new axis
+consequential and exposed                  it remains a leader able to enter an adjacent face
+```
+
+**That is RIDE/FOUND on the hinge, and `2π − Σθ` is one special case of it** — the residual when
+the transition `G` is a rotation and the carried datum is the frame's own turn. The organ built in
+§9b computes that case correctly and was **sited against nothing**. It should be stated as an
+instance of `delta_e`, and the other three branches of the trichotomy are unbuilt.
+
+### 9c.2 Two different hinges were conflated, and the distinction is grain-relative
+
+The same record separates what §9b fused:
+
+- the **event-site** hinge is *"their shared oriented face"* — in two dimensions an **edge**,
+  codimension one, where two cells actually compare;
+- the **curvature** hinge is codimension **two** — a vertex in 2D, *"in four dimensions such a hinge
+  is a triangle."*
+
+And the sentence that matters most for the ladder: *"The same triangle may thus be a whole two-cell
+at one grain, a boundary face at another, and a curvature hinge from a four-dimensional receiver."*
+**Which object is the hinge is receiver- and grain-relative**, which is the tower's upward map stated
+three weeks before §8 posed it as open. §9b implements only the codimension-two vertex and named it
+"the hinge" without qualification.
+
+### 9c.3 The curvature flow already has a ratified meaning, and the live organ does not match it
+
+`2026-07-19_THE_RICCI_TRACE_CHANGES_THE_RECEIVER_THE_SINGULAR_NECK_REBASES_THE_BODY.md`, ratified:
+
+> *"For a declared Riemannian receiver, Ricci curvature is, up to the record's curvature-sign
+> convention, the transverse trace of gravitas. **Ricci flow feeds that receiver quotient back into
+> the metric by which later continuations are compared.**"*
+
+`discrete_curvature.rs` has exactly that shape — `r_e ← r_e + h(u) + h(v)` feeds a returned deficit
+back into the hinge responses that produced it — and **`canon/TABLET_THE_TURN.md` §11 describes it
+without ever naming Ricci or citing this record.** The correspondence is `Chow–Luo`'s combinatorial
+Ricci flow, `proved-standard`, which converges for circle packings.
+
+**But the live law is not a flow, and §11.1 says so without drawing the consequence.** It records
+`Σ_v K'(v) = −Σ_v K(v)` — *"an exact involution on the total-curvature functional"*. An involution
+alternates; it does not converge. **Ricci flow's entire content is dissipative approach to a
+constant-curvature metric, and an involution cannot do that.** So `discrete_curvature` is a
+curvature *feedback* with the Ricci shape and a **reflective rather than dissipative** law, which is
+a real and checkable gap: `c = 1` was derived as the unique value annulling a vertex's own deficit,
+and that is precisely the value that makes the total-curvature map an involution instead of a
+contraction.
+
+That is the missing partial with the sharpest consequence, and it is a construction, not a research
+question: **the flow that would converge is a different `c`, and the record naming why convergence
+matters — singular blow-up, neck surgery, component departure, Poincaré — is live and uncited.**
 
 ---
 

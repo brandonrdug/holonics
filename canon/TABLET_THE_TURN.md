@@ -204,11 +204,68 @@ interior 0 of 11        every link is singular: some edge lies in 3 or 4 triangl
 ```
 
 **No hinge of this complex is a manifold point, so by the bar above none of these deficits is a
-curvature.** They are exact readings on a complex that is nowhere a Regge geometry, and calling them
-curvature would be the rounding the record forbids. Under §8 this is a `counterexample` and it passes
-its grade: *a deed that proves its own receiver family cannot see what it was built to see has
-returned real evidence.* Whether any material in this body **is** a surface is now a well-posed
-question and is not answered.
+curvature**, and calling them curvature would be the rounding the record forbids.
+
+**But that is not a wall, and reading it as one was a defect.**
+`research/records/2026-07-20_THE_HINGE_CARRIES_THE_FRAME_THE_SUCCESSOR_REPLACES_THE_STANDING_STAR.md`
+§V is Brandon-ratified, live here since extraction, and cited by nothing in this repository:
+
+> *"Plural branches, disconnected links, or other failures are genuine boundaries, singularities, or
+> **FOUND seams**. Calling the carrier a graded cell complex therefore does not demand that every
+> local region already be a smooth manifold."*
+
+So `singular 11` is **eleven FOUND seams**, which is the positive return the framework's own
+vocabulary names. The carrier was never required to be a manifold.
+
+### 11.5.3 What the same ratified record says that these organs do not yet do
+
+**The hinge residual is already law, and the angle deficit is one case of it.** §III:
+
+```text
+delta_e = a_R|e − G_(L→R)(a_L|e)
+
+= 0                                   the transport RIDEs and the seam may fold
+nonzero on existing support           the configuration pivots or redistributes
+nonzero needing independent support   the failure FOUNDS a new axis
+consequential and exposed             it remains a leader able to enter an adjacent face
+```
+
+`2π − Σθ` is `delta_e` where `G` is a rotation and the carried datum is the frame's own turn. The
+other three branches are unbuilt.
+
+**And two hinges are being conflated.** The *event-site* hinge is the shared oriented face —
+codimension one, an edge in 2D. The *curvature* hinge is codimension two — a vertex in 2D, and *"in
+four dimensions such a hinge is a triangle."* Which object is the hinge is **grain- and
+receiver-relative**: *"The same triangle may thus be a whole two-cell at one grain, a boundary face
+at another, and a curvature hinge from a four-dimensional receiver."* That is the tower's upward map,
+stated three weeks before §11.5 posed it as open. `hinge_deficits` implements only the codimension-two
+vertex.
+
+### 11.6 The flow in §11.1 has the Ricci shape and the wrong law, and §11.1 says so without noticing
+
+**Truth status:** `proved-standard` for Chow–Luo; `established-bounded` for the involution, which
+§11.1 already displays; `interpretation` for the identification.
+
+`research/records/2026-07-19_THE_RICCI_TRACE_CHANGES_THE_RECEIVER_THE_SINGULAR_NECK_REBASES_THE_BODY.md`,
+Brandon-ratified and likewise cited nowhere live:
+
+> *"For a declared Riemannian receiver, Ricci curvature is, up to the record's curvature-sign
+> convention, the transverse trace of gravitas. **Ricci flow feeds that receiver quotient back into
+> the metric by which later continuations are compared.**"*
+
+§11.1's `r_e ← r_e + h(u) + h(v)` is exactly that shape — a returned deficit fed back into the hinge
+responses that produced it — and it is **Chow–Luo's combinatorial Ricci flow** by construction,
+which is `proved-standard` and converges for circle packings.
+
+**The live law is not a flow.** §11.1 records `Σ_v K'(v) = −Σ_v K(v)`, *"an exact involution on the
+total-curvature functional"* — and an involution alternates rather than converging. Ricci flow's
+whole content is dissipative approach to a constant-curvature metric, which an involution cannot
+perform. The derived `c = 1`, unique for annulling a vertex's own deficit, is precisely the value
+that makes the total-curvature map a reflection instead of a contraction.
+
+**So the organ is a curvature feedback with the Ricci shape and a reflective law**, and the
+convergent flow is a different `c`. The record naming why convergence is the point — singular
+blow-up, neck surgery, component departure, Poincaré — is live, ratified, and was never cited.
 
 ---
 

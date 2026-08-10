@@ -25,6 +25,31 @@
 //! per hinge, defines the deficit on it, and states the law by which a
 //! returned deficit revises the responses that produced it.
 //!
+//! # What this flow is, named 2026-08-10
+//!
+//! Feeding a returned deficit back into the metric that produced it is
+//! **Chow–Luo's combinatorial Ricci flow** by construction, and the ratified
+//! reading of what that means is
+//! `research/records/2026-07-19_THE_RICCI_TRACE_CHANGES_THE_RECEIVER_THE_SINGULAR_NECK_REBASES_THE_BODY.md`:
+//!
+//! > *"For a declared Riemannian receiver, Ricci curvature is, up to the
+//! > record's curvature-sign convention, the transverse trace of gravitas.
+//! > Ricci flow feeds that receiver quotient back into the metric by which
+//! > later continuations are compared."*
+//!
+//! **And the law below is not a flow.** It satisfies
+//! `Σ_v K'(v) = −Σ_v K(v)` — an exact *involution* on the total-curvature
+//! functional, which alternates rather than converging. Ricci flow's whole
+//! content is dissipative approach to a constant-curvature metric, and an
+//! involution cannot perform it. The `c = 1` derived below is unique for
+//! annulling a vertex's own deficit, and that is precisely the coefficient
+//! that makes the total map a reflection instead of a contraction.
+//!
+//! So this organ is a curvature **feedback** with the Ricci shape and a
+//! **reflective** law. A convergent flow is a different `c`, and it is not
+//! built. `canon/TABLET_THE_TURN.md` §11.6 carries the statement and its
+//! bound; neither is claimed here.
+//!
 //! # The carrier
 //!
 //! A [`DiscreteCurvatureConfiguration`] is a finite hinge incidence:

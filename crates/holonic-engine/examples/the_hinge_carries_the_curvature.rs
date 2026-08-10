@@ -538,15 +538,30 @@ fn main() {
     println!(
         "\n  5. THE FINDING THAT OUTRANKS THE REST — {regular} of {} hinges have a regular interior\n\
          \x20    link. Every hinge of this complex is SINGULAR: some edge lies in three or four\n\
-         \x20    triangles, where a surface admits exactly two. So the complex is nowhere a\n\
-         \x20    manifold, 3F = {} against 2E = {}, and BY THE RECORD'S OWN BAR none of these\n\
-         \x20    deficits is a curvature. They are exact readings on a singular complex.\n\
-         \x20    Calling them curvature would be rounding the link into a sphere, which is exactly\n\
-         \x20    what the star/link record forbids. The organ is built and driven; what it says\n\
-         \x20    about THIS material is that the material is not a Regge geometry.",
+         \x20    triangles, where a surface admits exactly two, and 3F = {} against 2E = {}.\n\
+         \x20    So none of these deficits is a curvature; rounding the link into a sphere is\n\
+         \x20    exactly what the star/link record forbids.\n\
+         \x20    AND THAT IS NOT A WALL. research/records/2026-07-20_THE_HINGE_CARRIES_THE_FRAME…\n\
+         \x20    §V, Brandon-ratified and cited nowhere live until today: \"Plural branches,\n\
+         \x20    disconnected links, or other failures are genuine boundaries, singularities, or\n\
+         \x20    FOUND seams. Calling the carrier a graded cell complex therefore does not demand\n\
+         \x20    that every local region already be a smooth manifold.\"\n\
+         \x20    So this is ELEVEN FOUND SEAMS, which is a positive return in the framework's own\n\
+         \x20    vocabulary. The carrier was never required to be a manifold.",
         deficits.len(),
         3 * faces,
         2 * edges.len()
+    );
+    println!(
+        "\n  6. WHAT THIS ORGAN IS NOT YET. The same ratified record gives the hinge residual as\n\
+         \x20    delta_e = a_R|e − G_(L→R)(a_L|e), with FOUR branches: zero RIDEs and the seam may\n\
+         \x20    fold; nonzero on existing support pivots; nonzero needing independent support\n\
+         \x20    FOUNDS a new axis; exposed remains a leader. 2π − Σθ is the ONE case where G is a\n\
+         \x20    rotation and the datum is the frame's own turn. The other three are unbuilt.\n\
+         \x20    And two hinges are conflated here: the EVENT-SITE hinge is the shared oriented\n\
+         \x20    face (codim 1, an edge in 2D); the CURVATURE hinge is codim 2 (a vertex in 2D, a\n\
+         \x20    triangle in 4D). Which one is the hinge is grain- and receiver-relative, which is\n\
+         \x20    the tower's upward map, stated three weeks before it was posed here as open."
     );
 
     if failures.is_empty() {
