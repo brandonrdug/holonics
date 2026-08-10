@@ -146,7 +146,8 @@ host/card capacity, the event returns a resource obstruction while preserving st
 | `LEADER_WITNESS_DEPTH = 1`, `LEADER_GRAIN_RECIPROCAL` | what the material stopped the leader at. `leader_quadrature.rs` carries the law — each extension changes what the next extension reads. **A leader whose witness depth is one takes a single step; that is not a leader.** |
 | `HORIZON_DOUBLINGS` | the transport law's own fixed point |
 | `SCAFFOLD_LINK_FOLD` | the fold from the incidence |
-| `CHANNEL_COUNT`, `COUPLED_INFORMANT_CURRENT_CHANNELS`, `COUPLED_PHASE_EXTENT` | the declared material's channel count. `COUPLED_PHASE_EXTENT = 18` is the RELAMPAGO fixture's coordinate count — **one experiment's material fixed into the organ that reads it.** |
+| `CHANNEL_COUNT`, `COUPLED_PHASE_EXTENT` | the declared material's channel count. `COUPLED_PHASE_EXTENT = 18` was the RELAMPAGO fixture's coordinate count — **one experiment's material fixed into the organ that reads it** — and is now `optical_arity + 2·bands − 1 + 5` from a declared chart. |
+| `COUPLED_INFORMANT_CURRENT_CHANNELS` | **mis-filed here until 2026-08-09 and it is a different species.** It is not a material channel count but the **arity of a closed list of the law's own organ faces**, so the excision is `ALL.len()` plus an exhaustive `match` — a declaration whose extent is read rather than counted. Its real defect was that `[Self; 8]` kept its length when a variant was added and `organs[channel as usize]` panicked; the `match` now fails to compile instead. |
 
 ### 5.2 Move to the caller — all three excised 2026-08-09
 
