@@ -646,3 +646,61 @@ mod tests {
         ));
     }
 }
+
+// -------------------------------------------------------------------------------------------------
+// The structural aperture: what this carrier can represent, stated once
+// -------------------------------------------------------------------------------------------------
+
+/// **The aperture of this carrier is a degree condition, and it is not [`DECLARED_KERNEL_BOUND`].**
+///
+/// `DECLARED_KERNEL_BOUND` bounds a *search* — how far trial division looks for a squarefree kernel —
+/// and a refusal from it is an obstruction of the apparatus. The **structural** aperture is a
+/// property of the field itself and no bound can move it:
+///
+/// ```text
+///   x ∈ ℚ(√k₁,…,√kₙ)   ⟹   [ℚ(x):ℚ] divides 2ⁿ
+/// ```
+///
+/// because each generator adjoins at most one square root, so the whole tower has degree `2ⁿ` over
+/// `ℚ` and every subfield's degree divides it. **A number whose minimal polynomial has degree not a
+/// power of two is not in this carrier and cannot be put there by raising any bound.**
+///
+/// # What that makes this module
+///
+/// A tower of quadratic extensions is exactly what a **straightedge and compass** construct: the two
+/// instruments intersect lines and circles, so every new coordinate solves a linear or quadratic
+/// equation over what is already built. So this carrier's reach *is* the classical constructible
+/// field, and `2^(1/3)` — the Delian constant, the side of a doubled cube — is outside it for a
+/// reason that has nothing to do with any bound this module declares.
+///
+/// MathWorld's `CubeDuplication` states the classical half verbatim: *"the problem cannot be solved
+/// because the Delian constant `2^(1/3)` … is not a Euclidean number… The problem can be solved,
+/// however, using a **Neusis construction**."* Adjoining the marked ruler is `H.0420`'s purchased
+/// channel: it reaches cubics, and it is not built here.
+///
+/// **The direction matters and is the whole content of [`admits_degree`].** Failing the condition
+/// **refuses exactly**; passing it is **necessary and not sufficient**, because sufficiency needs the
+/// Galois closure to be a 2-group and this function does not decide that.
+///
+/// Record:
+/// `research/records/2026-08-10_THE_INSTRUMENT_DECLARES_THE_APERTURE_AND_THE_REFUSAL_IS_THE_RETURN.md`.
+pub const fn structural_aperture_is_a_power_of_two() -> bool {
+    true
+}
+
+/// Whether a degree is a power of two — the compass rung's necessary condition.
+///
+/// `0` is not a degree and returns `false`; `1` is `2⁰` and returns `true`.
+pub fn admits_degree(degree: usize) -> bool {
+    degree != 0 && degree.is_power_of_two()
+}
+
+impl Multiquadratic {
+    /// The degree of the tower this element is written over: `2ⁿ` for `n` generators.
+    ///
+    /// This is the *ambient* tower's degree, not the degree of this element's own minimal
+    /// polynomial, which divides it. Returned as the exact bound it is.
+    pub fn tower_degree(&self) -> u64 {
+        1u64 << self.generators.len()
+    }
+}

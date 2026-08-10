@@ -318,6 +318,45 @@ subjects that exist only at `a07ff376` and were never carried forward.
 
 ---
 
+## 7b · BUILT AND MEASURED, 2026-08-10 — the two rungs meet and disagree
+
+**Truth status:** `implemented-exact`; `measured` for every figure, from
+`crates/holonic-engine/examples/the_two_instruments_disagree.rs`.
+
+`multiquadratic.rs` now states its **structural aperture** in its own source, distinguished from
+`DECLARED_KERNEL_BOUND`: the bound limits a *search*, the aperture limits the *field*, and no bound
+can move it. `Multiquadratic::tower_degree` returns `2ⁿ`, read off the element.
+
+`quintic_chart::{CompassVerdict, read_compass_rung, LadderReading, read_ladder}` joins the rungs, and
+the positive verdict is named `NecessaryConditionHolds` because that is all a degree test earns —
+a degree-four irreducible with Galois group `A₄` or `S₄` passes it and is not constructible. **There
+is deliberately no `is_constructible` method.**
+
+Measured on seven declared polynomials, one receiver family, both instruments:
+
+```text
+polynomial                       deg  compass          radical
+x^3 - 2   (the doubled cube)       3  REFUSES          RETURNS   ← RUNGS DISAGREE
+x^3 - 3x - 1 (trisection cubic)    3  REFUSES          RETURNS   ← RUNGS DISAGREE
+x^2 - 2                            2  NECESSARY-ONLY   RETURNS
+x^4 - 2                            4  NECESSARY-ONLY   RETURNS
+x^5 - x - 1                        5  REFUSES          REFUSES
+x^6 - x - 1                        6  REFUSES          OPEN
+x^7 - 7x + 3                       7  REFUSES          REFUSES
+```
+
+**Two of the three Greek problems of antiquity appear as a disagreement between two instruments over
+one object, and both verdicts are correct.** The compass refuses `∛2` because the Delian constant is
+not a Euclidean number; radicals return it because every cubic is solvable. The trisection cubic does
+the same. Neither instrument is better and neither object changed.
+
+Controls: the compass refuses somewhere and not everywhere (5 / 2); the radical wall is real and
+crossed (4 returned / 2 refused); the tower degree is read off a real element rather than declared.
+Open item 1 of the roadmap is closed; item 2, the neusis rung, is not purchased and is stated as
+unpurchased in the driver.
+
+---
+
 ## 8 · Bounds
 
 - §1's ladder is `interpretation`. The individual apertures are `proved-standard`; that they form one

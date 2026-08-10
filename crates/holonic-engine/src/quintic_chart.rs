@@ -2627,3 +2627,109 @@ mod tests {
         }
     }
 }
+
+// -------------------------------------------------------------------------------------------------
+// The compass rung, and the ladder the two rungs make
+// -------------------------------------------------------------------------------------------------
+
+/// **What the straightedge-and-compass rung says about a declared integer polynomial.**
+///
+/// The compass field is `crate::multiquadratic`'s: a tower of quadratic extensions, degree `2ⁿ`,
+/// Galois group `(ℤ/2)ⁿ`. So a root reachable by compass has minimal-polynomial degree a power of
+/// two, and **the direction of that implication is the whole content of this enum**.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum CompassVerdict {
+    /// **REFUSED, exactly and completely.** The polynomial is certified irreducible of a degree that
+    /// is not a power of two, so no root of it lies in any tower of quadratic extensions. No bound
+    /// this body declares can move this: it is a property of the field, not of a search.
+    Refuses { degree: usize, certifying_prime: u64 },
+    /// **The necessary condition holds, and that is all this says.** The degree is a power of two.
+    /// Sufficiency requires the Galois closure to be a 2-group, which this function does not decide
+    /// — a degree-four irreducible with Galois group `A₄` or `S₄` passes here and is *not*
+    /// constructible. Reported as necessary-only rather than as an admission.
+    NecessaryConditionHolds { degree: usize, tower_bound: u64 },
+    /// Irreducibility was not certified over the declared receiver family, so the minimal-polynomial
+    /// degree is unknown and no verdict is available. An `Open` is a return.
+    Open { degree: usize },
+}
+
+impl CompassVerdict {
+    pub fn label(&self) -> &'static str {
+        match self {
+            Self::Refuses { .. } => "REFUSES",
+            Self::NecessaryConditionHolds { .. } => "NECESSARY-ONLY",
+            Self::Open { .. } => "OPEN",
+        }
+    }
+
+    /// Whether this rung refused. Deliberately not an `is_constructible`: the positive side of this
+    /// verdict is necessary and not sufficient, and a method named for admission would invite a
+    /// caller to read it as one.
+    pub fn refuses(&self) -> bool {
+        matches!(self, Self::Refuses { .. })
+    }
+}
+
+/// **Read the compass rung on a declared problem.**
+///
+/// Irreducibility is taken from the same certified source the radical rung uses, so the two rungs
+/// answer about the *same* object under the *same* receiver family and their disagreement is about
+/// the instrument rather than about the material.
+pub fn read_compass_rung(reading: &RadicalChartReading) -> CompassVerdict {
+    let degree = reading.degree;
+    match &reading.irreducibility {
+        QuinticIrreducibility::CertifiedByPrime { prime, .. } => {
+            let prime = *prime;
+            if crate::multiquadratic::admits_degree(degree) {
+                CompassVerdict::NecessaryConditionHolds {
+                    degree,
+                    tower_bound: 1u64 << degree.trailing_zeros(),
+                }
+            } else {
+                CompassVerdict::Refuses {
+                    degree,
+                    certifying_prime: prime,
+                }
+            }
+        }
+        QuinticIrreducibility::Open => CompassVerdict::Open { degree },
+    }
+}
+
+/// **One object read by two instruments**, so that a disagreement is legible as an aperture
+/// difference and not as a defect in either rung.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct LadderReading {
+    pub degree: usize,
+    pub compass: CompassVerdict,
+    pub radical: RadicalChartVerdict,
+}
+
+impl LadderReading {
+    /// **The rungs disagree**: one instrument refuses what the other returns.
+    ///
+    /// This is the ladder's whole point. `2^(1/3)` is refused by the compass — the Delian constant is
+    /// not a Euclidean number — and returned by radicals, because every cubic is solvable. Neither
+    /// verdict is wrong and neither instrument is better; **the aperture belongs to the instrument.**
+    pub fn rungs_disagree(&self) -> bool {
+        self.compass.refuses() && matches!(self.radical, RadicalChartVerdict::Returns(_))
+    }
+
+    pub fn written(&self) -> String {
+        format!(
+            "degree {} — compass {} · radical {}",
+            self.degree,
+            self.compass.label(),
+            self.radical.label()
+        )
+    }
+}
+
+/// Read both rungs of the instrument ladder on one fiber.
+pub fn read_ladder(reading: &RadicalChartReading) -> LadderReading {
+    LadderReading {
+        degree: reading.degree,
+        compass: read_compass_rung(reading),
+        radical: reading.verdict.clone(),
+    }
+}
