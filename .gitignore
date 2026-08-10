@@ -38,3 +38,8 @@ __pycache__/
 # A driver return that landed at the root before its default path was corrected (2026-08-08).
 # Returns belong under `/output/`, where the manifest can certify them.
 /holonic-eta-ratio-atlas.ron
+
+# Third-party transcripts held for reference. `reference/**` asserts nothing (THE_DOCUMENT_LAW §1),
+# and these are not this project's material to redistribute: they are working sources, cited in short
+# attributed fragments by the records that use them and never carried in the tree.
+reference/external/3b1b-compression-*

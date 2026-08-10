@@ -304,6 +304,8 @@ comparison, not necessarily in the theory.
 | the instrument's aperture | **straightedge-and-compass constructibility**; Gauss–Wantzel; Fermat primes | `multiquadratic.rs` — the field is built and unnamed |
 | the lattice's admissible turns | **the crystallographic restriction theorem** | `winding_inertia.rs:62` computes the set and calls it Niven's theorem |
 | a code as a condensation | **Huffman coding**, Kraft, prefix-free, minimum redundancy | absent from the live tree; `a07ff376:…/Derive_Eaten.lean:205` has *a perfect code reads as a PRIME* |
+| the cost of the wrong receiver | **cross-entropy**, `H(p,q) = H(p) + KL(p‖q)`; *"prediction and compression are mathematically equivalent"* (3Blue1Brown, *Compression is Intelligence* I–II) | `H.0420`'s receiver square; the compression trichotomy — the split is the same one, with the receiver named. `2026-08-10_PREDICTION_AND_COMPRESSION_ARE_ONE_COIN…` |
+| the information of an event | `−log p` as a **height over a probability**, and entropy as its expectation (same source) | `surprisal.rs`; `THE_RECOVERED_LAW.md` §3, Shannon as a lawful declared quotient |
 | order as a priced quantity | **Devillers–Gandoin**, `n log₂ n` for the vertex order | `merge_witnesses`, where host arrival order is carried |
 | a training phase change | **grokking** (Power et al. 2022); susceptibility `χ` as a detector | absent live; 22 files and two runnable experiments at `a07ff376` |
 | the transformer as a bundle | **Liang 2026**, `arXiv:2607.17146` — RoPE as gauge connection, `[𝒯,ℛ]` torsion measured at 23× baseline | `structure_group.rs`, `H.0420` |
