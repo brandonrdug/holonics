@@ -1548,4 +1548,230 @@ mod tests {
             Err(DerivationIntegralError::StatementCarriesNoPlurality { reaching: 1, .. })
         ));
     }
+
+    // ---------------------------------------------------------------------------------------------
+    // The conducted return
+    // ---------------------------------------------------------------------------------------------
+
+    /// Every 1-cell of the circuit, as one declared structure. The family is the caller's.
+    fn whole_structure(circuit: &ConditionedCircuit) -> Vec<(String, BTreeSet<CausalCellId>)> {
+        let complex = circuit.circuit.complex();
+        let cells: BTreeSet<CausalCellId> = complex
+            .cells()
+            .values()
+            .filter(|cell| cell.grade == 1)
+            .map(|cell| cell.id)
+            .collect();
+        vec![("whole".to_owned(), cells)]
+    }
+
+    /// **The reading enters the next production as material, and something moves.**
+    ///
+    /// The falsifier `blueprint/THE_ROADMAP.md` names for the accumulation cut: *"Require
+    /// `invariant_movement` to be non-zero and attributable — each moved invariant naming the
+    /// earlier return that caused it. A second production bit-identical to the first has not closed
+    /// the cycle, whatever it printed."*
+    #[test]
+    fn the_reading_returns_as_material_and_the_second_reading_moves() {
+        let circuit = circuit(head_separated());
+        let complex = circuit.circuit.complex();
+        let base = complex
+            .cells()
+            .values()
+            .find(|cell| cell.grade == 0)
+            .map(|cell| cell.id)
+            .expect("the fixture founds a vertex");
+        let family = whole_structure(&circuit);
+        let returned = conduct_return(&circuit, AccumulationRule::RecruitmentLoad, base, &family)
+            .expect("the fixture reads");
+
+        // The first reading must actually find an obstruction, or there is nothing to return and
+        // the test would pass on a vacuum.
+        assert!(
+            !returned.deposits.is_empty(),
+            "the first reading found no leak, so the return is vacuous: {:?}",
+            returned.before
+        );
+        // And the second reading must differ from the first.
+        assert!(
+            returned.moved_at_all(),
+            "the second reading was identical to the first.
+  deposits {:?}
+  before {:?}
+  after {:?}",
+            returned.deposits, returned.before, returned.after
+        );
+        // And every movement must name the deposit that caused it.
+        assert!(
+            returned.every_movement_is_attributable(),
+            "unattributable movement: {:?}",
+            returned.unattributable()
+        );
+    }
+
+    /// **The control that keeps the test above honest.** An empty structure has no cycles, so it is
+    /// `Closed`, so it deposits nothing — and the second reading must then be identical. A body that
+    /// moves without a deposit did not move because of the return.
+    #[test]
+    fn a_closed_structure_deposits_nothing_and_the_second_reading_does_not_move() {
+        let circuit = circuit(head_separated());
+        let complex = circuit.circuit.complex();
+        let base = complex
+            .cells()
+            .values()
+            .find(|cell| cell.grade == 0)
+            .map(|cell| cell.id)
+            .expect("a vertex");
+        let empty = vec![("empty".to_owned(), BTreeSet::new())];
+
+        let returned = conduct_return(&circuit, AccumulationRule::RecruitmentLoad, base, &empty)
+            .expect("the fixture reads");
+
+        assert!(returned.deposits.is_empty(), "a closed structure returned something");
+        assert!(!returned.moved_at_all(), "movement with no deposit: {:?}", returned.moved);
+        assert_eq!(returned.before, returned.after);
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+// The conducted return: a reading enters the next production as material
+// -------------------------------------------------------------------------------------------------
+
+/// **What one structure's reading deposited, and what moved because of it.**
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ReturnedDeposit {
+    /// The structure whose reading produced the value.
+    pub from: String,
+    /// The cell the caller declared it lands on.
+    pub at: CausalCellId,
+    /// The retained leak, deposited whole. Never a summary of it.
+    pub value: BigInt,
+}
+
+/// **One conducted return.** The reading is taken, its obstruction is deposited into the shared
+/// cochain, and the reading is taken again against the changed material.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ConductedReturn {
+    pub before: crate::temper::TemperedFamily,
+    /// Every deposit made, each naming the structure whose reading produced it.
+    pub deposits: Vec<ReturnedDeposit>,
+    pub after: crate::temper::TemperedFamily,
+    /// The structures whose twist changed, each paired with the deposits that could have caused it.
+    pub moved: Vec<(String, Vec<String>)>,
+}
+
+impl ConductedReturn {
+    /// **The cycle closed and something moved.** A second reading identical to the first has not
+    /// closed anything, whatever it printed.
+    pub fn moved_at_all(&self) -> bool {
+        !self.moved.is_empty()
+    }
+
+    /// **Every movement names an earlier return.** This is the half that separates a conducted
+    /// return from a coincidence: a structure that moved with no deposit attributable to it is a
+    /// movement this organ cannot account for, and it is reported rather than counted.
+    pub fn every_movement_is_attributable(&self) -> bool {
+        !self.moved.is_empty() && self.moved.iter().all(|(_, causes)| !causes.is_empty())
+    }
+
+    pub fn unattributable(&self) -> Vec<&str> {
+        self.moved
+            .iter()
+            .filter(|(_, causes)| causes.is_empty())
+            .map(|(name, _)| name.as_str())
+            .collect()
+    }
+}
+
+/// **Conduct one return.**
+///
+/// `blueprint/THE_ROADMAP.md`'s accumulation cut names this exact pair: *"`temper` ⇄
+/// `derivation_integral`, through `Cochain`, in **both** directions… **Neither file references the
+/// other.**"* Both halves were built and nothing sat between them.
+///
+/// The loop, and every step is an existing organ:
+///
+/// ```text
+///   accumulation(circuit, rule)          -> Cochain          the production's own 1-cochain
+///   TemperedFamily::read(…, &cochain, …) -> the reading      which structures leak, and by how much
+///   temper::found_on(&cochain, at, leak) -> Cochain          THE READING BECOMES MATERIAL
+///   TemperedFamily::read(…, &founded, …) -> the next reading against the changed world
+/// ```
+///
+/// **The return is world-mediated, not wired.** `canon/THE_HOLOBROCHOS_SPINE.md` §5b: *"A consequence
+/// handed from a reading to a production across a call, without leaving the process and landing in
+/// the world's own record, is the shape Soma's contaminant list names. **The consequence returns as a
+/// PLACE.**"* Here the place is a cell of the shared cochain: the deposit is not passed to the second
+/// read, it is written into the material the second read consults, and the second read does not know
+/// where it came from.
+///
+/// **Only a retained obstruction is deposited, and the place is read off the material.** A
+/// `Twist::Closed` structure has nothing to return — depositing on it would be inventing a residual.
+/// A `Twist::Open` one carries `ChordObstruction`s, and each names **its own cell**, so the residual
+/// returns exactly where the reading found it. There is no caller-declared deposit site and no
+/// authored level: the reading says where its own residual lives.
+///
+/// **What the deposit does to the structure is the material's business, not this organ's.**
+/// `temper::found_on` is the *opening* face — *"depositing a value on one cell that the potential
+/// does not imply opens the structure"* — so returning the residual may open the structure further
+/// rather than close it. Which happens is what the second reading measures, and this function
+/// reports it either way rather than choosing a correction that would make the outcome its own.
+pub fn conduct_return(
+    circuit: &ConditionedCircuit,
+    rule: AccumulationRule,
+    base: CausalCellId,
+    family: &[(String, BTreeSet<CausalCellId>)],
+) -> Result<ConductedReturn, RunningIntegralError> {
+    use crate::temper::{found_on, TemperedFamily, Twist};
+
+    let complex = circuit.circuit.complex();
+    let cochain = accumulation(circuit, rule);
+    let before = TemperedFamily::read(complex, &cochain, base, family)?;
+
+    let mut founded = cochain.clone();
+    let mut deposits = Vec::new();
+    for (name, twist) in &before.twists {
+        let Twist::Open { obstructions, .. } = twist else { continue };
+        for obstruction in obstructions {
+            founded = found_on(&founded, obstruction.cell, obstruction.residual.clone());
+            deposits.push(ReturnedDeposit {
+                from: name.clone(),
+                at: obstruction.cell,
+                value: obstruction.residual.clone(),
+            });
+        }
+    }
+
+    let after = TemperedFamily::read(complex, &founded, base, family)?;
+
+    // A structure moved when its twist differs. It is attributable to a deposit exactly when that
+    // deposit's cell lies inside the structure the second read consulted — which is what makes the
+    // attribution a fact about the incidence rather than about the order of the loop above.
+    let structures: BTreeMap<&str, &BTreeSet<CausalCellId>> = family
+        .iter()
+        .map(|(name, cells)| (name.as_str(), cells))
+        .collect();
+    let mut moved = Vec::new();
+    for ((name, was), (_, now)) in before.twists.iter().zip(after.twists.iter()) {
+        if was == now {
+            continue;
+        }
+        let causes: Vec<String> = deposits
+            .iter()
+            .filter(|deposit| {
+                structures
+                    .get(name.as_str())
+                    .is_some_and(|cells| cells.contains(&deposit.at))
+            })
+            .map(|deposit| deposit.from.clone())
+            .collect();
+        moved.push((name.clone(), causes));
+    }
+
+    Ok(ConductedReturn {
+        before,
+        deposits,
+        after,
+        moved,
+    })
 }

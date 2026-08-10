@@ -493,6 +493,40 @@ construction.
 Six controls, one of which reaches **all five cuts on one incidence** — a theta graph with the third
 parallel edge as the load — so the return is a classification and not a predicate wearing five names.
 
+### 7b.5 The return conducts — roadmap item 6, first half
+
+`derivation_integral::conduct_return`. The roadmap named this exact pair: *"`temper` ⇄
+`derivation_integral`, through `Cochain`, in **both** directions… **Neither file references the
+other.**"* Both halves were built and nothing sat between them.
+
+```text
+accumulation(circuit, rule)          -> Cochain      the production's own 1-cochain
+TemperedFamily::read(…, &cochain, …) -> the reading  which structures leak, and where
+temper::found_on(&cochain, at, r)    -> Cochain      THE READING BECOMES MATERIAL
+TemperedFamily::read(…, &founded, …) -> the next reading, against the changed world
+```
+
+**The return is world-mediated.** The deposit is not passed to the second read; it is written into
+the cochain the second read consults, and the second read does not know where it came from. That is
+`canon/THE_HOLOBROCHOS_SPINE.md` §5b — *"the consequence returns as a PLACE"* — rather than output
+wired back to input.
+
+**And the place is read off the material.** The first implementation took a caller-declared
+`deposit_at` map and **its test failed**: an arbitrary 1-cell is not on the chord carrying the
+residual, so the second reading was identical. Each `ChordObstruction` names **its own cell**, so the
+residual returns where the reading found it. The failure located the design and removed an authored
+level at the same time.
+
+**What the deposit does is the material's business.** `found_on` is the *opening* face, so returning
+a residual may open a structure further rather than close it; the organ reports which and does not
+choose a correction that would make the outcome its own.
+
+Falsifier met: the movement is non-zero **and attributable** — every moved structure names the
+deposit inside it — with a `Closed`-structure control that deposits nothing and must not move.
+
+**Still open:** `supported_realizers::positive_form → inertia` is joined only inside `#[cfg(test)]`,
+so §2's realization-causes-placement chain remains a test assertion on the conduct path.
+
 ---
 
 ## 8 · Bounds

@@ -107,10 +107,21 @@ is deposited in place.
    resistances, no cost. An **empty load is refused**, because with no load every closed current is
    trivially a short circuit and the cut would be a property of the declaration rather than of the
    material. Six controls, including one that reaches all five cuts on one incidence.
-6. **The accumulation cut.** `temper` and `derivation_integral` are built in both directions through
-   `Cochain` and still do not reference each other; `supported_realizers::positive_form → inertia` is
-   still joined only inside `#[cfg(test)]`. *Falsifier:* `invariant_movement` non-zero **and
-   attributable**, each moved invariant naming the earlier return that caused it.
+6. **The accumulation cut — FIRST HALF CLOSED 2026-08-10.** `derivation_integral::conduct_return`
+   is the edge: `accumulation → TemperedFamily::read → found_on → read again`. The reading's residual
+   is written into the shared cochain and the second reading consults it **without being handed it**,
+   which is §5b's world-mediated return — *"the consequence returns as a PLACE"*.
+
+   **The deposit site is read off the material, not declared.** Each `ChordObstruction` names its own
+   cell, so the residual returns exactly where the reading found it; there is no caller-declared
+   deposit map and no authored level. The first attempt used one and the test failed, because an
+   arbitrary cell is not on the chord that carries the residual — the failure located the design.
+
+   Falsifier met: the movement is non-zero **and attributable**, every moved structure naming the
+   deposit inside it, with a `Closed`-structure control that deposits nothing and must not move.
+
+   **Still open:** `supported_realizers::positive_form → inertia` is joined only inside
+   `#[cfg(test)]`, so §2's realization-causes-placement chain is still a test assertion.
 7. **The evidence sinks**, now with two cost laws already lost.
 
 **Carried forward from the laboratory and never inherited:** Huffman/Kraft (with
