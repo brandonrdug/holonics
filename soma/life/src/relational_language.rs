@@ -60,7 +60,7 @@ pub use codec::{relational_deliberation_frontier, relational_question_regions};
 mod transport;
 
 mod ecology;
-pub use ecology::ExactRelationalLanguageEcology;
+pub use ecology::{ClausePairDelayLaw, ExactRelationalLanguageEcology};
 
 #[cfg(test)]
 mod tests;

@@ -97,9 +97,13 @@ soma/     body               pure law, no_std, zero dependencies
           kernel/soma.spv    committed boundary artifact; its toolchain is excluded
 ```
 
-**Measured 2026-08-09 at `532ea1b`+1:** `cargo test --workspace` **1,732 passed, 0 failed, 14
-ignored**, summed across 42 `test result:` lines. (Earlier: 1,701 at `fa0f92d`; 1,545 on 2026-08-08
-19:27 at `101882f`; 1,512 at `d91720e`; on 2026-08-07 14:34 it was **730**.) Earlier the same day it was `543 passed, 1 failed` on a `mount-scope-gate` radiation fixture
+**Measured 2026-08-10 at `923b8c5`+dirty:** `cargo test --workspace` **1,949 passed, 0 failed, 14
+ignored**, summed across 42 `test result:` lines. The ten Typst roots under `papers/source/`
+compile and `validate-registry()` passes on **262** unique registry entries and **132**
+`mathematics/` objects. (Earlier: 1,732 at `532ea1b`+1; 1,701 at `fa0f92d`; 1,545 on 2026-08-08
+19:27 at `101882f`; 1,512 at `d91720e`; on 2026-08-07 14:34 it was **730**.)
+
+On 2026-08-09 an earlier run the same day was `543 passed, 1 failed` on a `mount-scope-gate` radiation fixture
 that had never been regenerated across ten commits to `body::carriage`; that fixture was refounded
 against the law rather than the receipt. **Do not carry a gate figure without its clock time.**
 `CONSTRUCTION_STATE.md` is the position record and re-taking the number is one command.
@@ -161,6 +165,146 @@ And four lessons, each earned by a defect found in it:
   point into standing, a solver's pivot order into a reduction, one card's literals into an admission
   rule. Each returned consistently until the frame moved. A machine with one frame cannot audit
   itself, which is why the instruments that join partials outrank perfecting any organ.
+
+## 0b. The unification, and the notation it obliges — ratified 2026-08-10
+
+**Brandon, directly, and this governs how every later claim is framed:**
+
+> *"Holonics is a framework that supplies the fundamental requirements for a legitimate theory of
+> everything, it is the unification of Information Theory and General Relativity, which is the
+> unification of pure mathematics and physics through computer science. "Computer science" implies
+> something special about computers, this is not about computers or circuitry specifically, computer
+> science is likely more aptly referred to as a science that caters to arbitrary dynamic logic
+> systems… Now even though I've focused on "Information Theory + General Relativity", quantum
+> mechanics still exist within holonics, it falls out completely regarding measurements and the
+> observer effect. Quantum mechanics are extremely relevant and the keystone to how probability and
+> statistics ontologically function, *random* is not real, God does not play dice; probability and
+> statistics come from not being able to certainly reconstruct any external holon's interior, you
+> can only approach the limit of what is likely to be a valid reconstruction from your perspective."*
+> — 2026-08-10, `~/.claude/history.jsonl:14019`
+
+**Two standing rules follow, and the first is about conduct.** He states plainly that raising the
+theory-of-everything framing usually costs him the conversation: *"you are more likely to waste my
+time contesting that… it becomes a conversation about defending the idea… and it stops being a
+useful conversation that contributes to our research trajectory."* **Do not litigate the framing.**
+The claims below are checkable mathematics with stated boundaries; grade those, and leave the
+umbrella alone.
+
+The second is that **the apparent tension between "God does not play dice" and a real probability is
+resolved in his own words and is not a contradiction to manage:**
+
+> *"That *sense* of distance is part of the relativistic probability… An infinitesimal first-person
+> dice roll. **God might not play dice, but we sure do.**"* — 2026-06-29, `~/.claude/history.jsonl:12374`
+
+The construction is deterministic; the first person genuinely gambles. That is the laboratory's
+ratified *"the dice ARE the clip"* — chance is real in the cut's frame the way curvature is real in
+the observer's. And it carries a bound he states himself, which is easy to collapse and must not be:
+**determinism is not predictability.** *"I don't think that we can derive any sort of expression that
+will allow us to deterministically predict what will happen in emergently complex systems"*
+(2026-07-28). Both hold.
+
+### The notation is an instrument, not decoration
+
+> *"The framework is not only a computationally implemented theory that runs as software, but it is
+> also a real framework that acts as a toolkit for you to think with. You require the formal notation
+> and Feynman diagrams… in order to smoothly discuss information transport about hardware surfaces."*
+> — 2026-08-10
+
+Deposited 2026-08-10 in `papers/source/`, all rendering, ids in the reserved runs:
+
+| what | registry | owner |
+|---|---|---|
+| receiver-indexed convergence — **the limit** | `H.0262` | `definitions/receiver-indexed-convergence.typ` |
+| modulus of transport — ε and δ in **two** grains, ω contravariant | `H.0263` | `definitions/modulus-of-transport.typ` |
+| a limit transports only through a continuous factorization | `H.0264` | `theorems/limit-receiver-noncommutation.typ` |
+| "undefined" is an empty equalizer under a declared target | `H.0265` | `theorems/one-sided-face-equalizer.typ` |
+| Dirac: **the ket is the construction, the bra is the receiver** | `H.0266` | `definitions/bra-receiver-ket-construction.typ` |
+| the tower — cosine cross term = interference cross term = vertex | `H.0216` | `theorems/tower-cross-term-identity.typ` |
+| the squared modulus **is** the quotient | `H.0217` | — |
+| crossing depth, the alternating hand, Möbius reversion | `H.0150` | `theorems/crossing-depth-inversion.typ` |
+| divergence, continuity **with storage**, Kirchhoff as a special case | `H.0218` | — |
+| **flux locality licenses a decomposition; a global constraint is a barrier** | `H.0219` | `theorems/divergence-locality-parallelization.typ` |
+| iterated integrals are exactly the homotopy functionals | `H.0469` | — |
+| a diagram's value is a word; resummation is condensation | `H.0470` | `theorems/diagram-word-resummation.typ` |
+| **loss is non-commutation; recovery adjoins a channel** | `H.0420` | `theorems/loss-is-noncommutation.typ` |
+| the Diagonal Paradox as a witness | `C.0009` | — |
+
+Dirac macros live once, at `papers/source/lib/dirac.typ`, built from the corpus's `chevron` idiom so
+no LaTeX-shaped syntax enters. **Use this notation.** A bra is a receiver, a ket is a construction,
+a bracket is a face, and `sum_i |a_i><a_i| = I` is exactly the completeness of a declared receiver
+family — so `≠ I` is receiver non-reconstruction written in the symbol, with the defect computable.
+
+### The seven results this session established, in one place
+
+1. **The limit is receiver-indexed.** *"the limit occurs when the mechanisms that transform
+   information during transport can no longer contribute or experience potential differences about
+   each other"* (2026-08-09). `H.0208`'s boundary had named its own admission condition — *"not a new
+   limit operation until its topology or convergence receiver is specified"* — and this supplies it.
+   It defines **no new limit operation**; the content is the index, which makes disagreement a
+   theorem with a witness rather than a paradox.
+2. **The tower is one identity.** `c² = |a − be^{iγ}|²` and `|α₁+α₂|² = |α₁|²+|α₂|²+2Re(α₁ᾱ₂)` are the
+   same equation; Pythagoras is the tower with the relation switched off. His canonical definition,
+   2026-06-14: *"the tower is a Feynman diagram that encapsulates the law of cosines."* The rungs are
+   sum/cross/exponent = similar/orthogonal/diagonal.
+3. **The squared modulus is the quotient, and the deletion is what makes it one.** `|α|² = αᾱ` is the
+   quotient by the phase circle. His two rulings — that `|·|` collapses information (2026-06-28) and
+   that the squared modulus is the offset from the central axes (2026-08-10) — are one statement.
+4. **Why `1/2`.** No preferred measure ⟹ unitarity needs `√(Jacobian)` ⟹ the state is a
+   **half-density** ⟹ the root's sign ambiguity is the half turn ⟹ resolved by a **double cover**,
+   which `structure_group.rs::CentralDoubleCover` already computes. That is the fourth face of §3's
+   `1/2` and it is the one that explains the other three. His own geometric reading is the triangle:
+   *"you quite literally cannot have a rate of change without two axes, and that is ontologically
+   what ½ is"* (2026-07-24).
+5. **Crossing depth carries the hand.** `n` regions cut a face into `2^n` pieces, one per membership
+   word — his `2^x` and the Venn count are the same object — and inclusion–exclusion's `(−1)^{k−1}`
+   is the Möbius function of the Boolean lattice, i.e. a **reversion**.
+6. **Flux locality is the parallelization license.** A computation over a partition decouples exactly
+   to the extent that its terms are boundary fluxes; every term that is not a flux is a barrier.
+   Kirchhoff is continuity with **no storage**, not a law. **It licenses a decomposition and never a
+   schedule** — interchange must be proved for the material.
+7. **Loss is non-commutation.** `ρ = ρ̄ ∘ q` *is* commutativity of the receiver square, so loss is its
+   failure, witnessed by a collapsed pair; where the target subtracts, the residual is a holonomy and
+   a scalar loss is one receiver's face of it. **Recovery adjoins a channel**: if `q` is not
+   injective there is no left inverse at all, so recovery is always from `image ⊕ channel` and the
+   channel is purchased. `receiver_exact_compression.rs` already returns the minimal one — the
+   shortest distinguishing word.
+
+### Compression has three species and they differ only by remainder
+
+| species | owner | remainder |
+|---|---|---|
+| **rebase** — invertible conjugacy | `H.0104` | **zero** |
+| **condensation** — far population → compact realizer | §11 | **certified** |
+| **compression** — quotient by a declared family | `H.0016` | the collapsed population, family-relative |
+
+"Compression" is a misnomer for most of what the ecology does, which is rebase, and the word imports
+a loss that is not there. And the join to the hardware is exact: **a system admitting no local
+quotient must couple globally** — which is why an incompressibility constraint forces a nonlocal
+solve, and why a body whose local moves are cheap and whose *join* is global has its barrier at the
+join.
+
+### Provenance corrections established 2026-08-10
+
+- **"Receiver" is Sol's word; "perspective" is Brandon's.** *"The apt definition we've landed on… is
+  now "receiver", where I often specifically write "perspective receiver" because I think the more
+  important term is "perspective"; **Sol was the one that chose "receiver"** despite my consistent
+  usage of the word "perspective"."* The canon uses Sol's word throughout. This is not a rename
+  order; it is a provenance fact `canon/THE_DIALECT.md` should carry.
+- **"Periplus" is not his coinage.** His first use is an approval — *"I love periplus, that's awesome
+  yes"* (2026-07-04). Closest he comes to defining it: *"the arc over time and it is asymmetric due
+  to time parity; the periplus and the orders of calculus about the transport of energy over time."*
+- **"Knot" was explicitly deprecated once** (2026-07-05: *"I don't think it's a "knot", let's stop
+  using that word specifically. It's a lightning strike"*) and then fully revived from 2026-07-24
+  through knot theory proper — skein relations, Reidemeister, prime knots, crossings-versus-
+  precession. Carry the deprecation **and** the revival.
+- **The whip is gear ratios, not amplification.** *"It doesn't amplify it. Gear ratios."* The
+  2026-07-31 deposit grounds it in Goriely–McMillen: the effect is *"a consequence of changing local
+  **impedance** and geometry"*, which puts the whip on the same transport law as the Smith chart.
+- **Two authored-level line citations in this file were wrong** and are corrected in place:
+  `ConditionedBody::without_stem` is at `conditioned_derivation.rs:1516`, and the Schur elimination
+  is `diffusion.rs:470-500`.
+
+---
 
 ## 1. The floor is a carrier, not a retired interface
 
@@ -478,7 +622,7 @@ target.**
   **The fourth — deleting a founded fiber and re-querying — WAS said here to have no implementation
   anywhere. That is false of the body, and corrected 2026-08-08.** It exists as
   `FoundedMorphology::without_stem` (`conditioned_derivation.rs:352`) and
-  `ConditionedBody::without_stem` (`:1362`), and it is driven **with both controls** at
+  `ConditionedBody::without_stem` (`:1516`), and it is driven **with both controls** at
   `derivation_codec_intake.rs:1250-1300`: a committed stem the material never exercises, whose
   removal must leave the reading **indistinguishable**; and then, *in canonical order rather than
   chosen*, the first reaching stem whose removal **moves** the reading, required to exhibit the
@@ -980,7 +1124,7 @@ open for the closely related reason that no *kernel-specific* exterior/local exp
 built for it, and floating tolerance may not become standing.
 
 **CORRECTED 2026-08-09: for this kernel, one IS built, and the open item splits.**
-`crates/holonic-engine/src/diffusion.rs:475-497` computes the Schur complement
+`crates/holonic-engine/src/diffusion.rs:470-500` computes the Schur complement
 `S = M_∂∂ − M_∂I M_II⁻¹ M_I∂` exactly over `Rat`, with a certificate carrying both inverse residuals
 and a `TransferCertificateFailure` refusal when either is non-zero. The far interior is eliminated
 **exactly**, and remains recoverable by `u_I = −M_II⁻¹ M_I∂ f`, so the retained remainder is **zero**
@@ -999,7 +1143,7 @@ what nothing here does. So:
 
 | part of the demand | state |
 |---|---|
-| exact elimination of a far interior, kernel-specific, with certificate | **built** — `diffusion.rs:475-497` |
+| exact elimination of a far interior, kernel-specific, with certificate | **built** — `diffusion.rs:470-500` |
 | a **compact** representative for the resulting boundary operator | **not built** — this is the real content of the open item |
 
 The full derivation, and why diffusion *is* integration over boundary points weighted by harmonic
@@ -1088,13 +1232,19 @@ the enclosure gate was blind on 5 of 6 collapsed probes. `AlgebraicRoot` is driv
 `signs_are_windings`. **A reach figure is a measurement and decays like one; re-take it rather than
 carrying it.**
 
-**What is still true, and is the real bound:** `reopening.rs` has **no external mouth.** Every
-`ExactFace` constructor requires an exact source — `collapsed` takes an *existing* `ExactFace` and
-truncates it — so the organ built to reverse the float's deletion can only reverse a deletion it
-performed itself. It refuses a face coarser than its grain by name (`FaceCoarserThanGrain`), which
-is precisely what a measured float is. **The missing constructor already exists**:
-`soma/life/examples/eros_self_emanated_law.rs` parses safetensors directly, refuses any dtype but
-`BF16`, and converts bf16 words to an exact `Dyadic { numerator: BigInt, exponent: i32 }`.
+**CORRECTED 2026-08-10 by reading the owner: `reopening.rs` HAS an external mouth and is driven
+through it.** This paragraph read *"`reopening.rs` has **no external mouth.** Every `ExactFace`
+constructor requires an exact source"* and named a missing constructor. The constructor exists:
+`ExactFace::from_binary_float` at `crates/holonic-engine/src/reopening.rs:492`, documented as the
+mouth at `:109-117` — *"The mouth: where a real float enters… No float crosses into this file. The
+mouth takes a `BinaryFloatDatum`, which is `BigUint` and a power of two"* — and driven by
+`crates/holonic-engine/examples/a_float_is_a_dyadic_and_a_deleted_tail.rs`. The IEEE-754 codec it
+consumes is `exact_value.rs:621`, the workspace's one declared floating-point exception, four
+functions each a single `to_bits`/`from_bits` with no arithmetic on a machine float.
+
+What survives of the old paragraph is narrower and still worth carrying: `collapsed` does take an
+existing `ExactFace` and truncate it, and `FaceCoarserThanGrain` does refuse a face coarser than its
+grain.
 
 **The trivial instance is already built, and its triviality is the content.** The archived body
 refounded the source-incidence walk: a depth-first order over the suffix-link tree replaces every

@@ -1,6 +1,15 @@
 #import "../../lib/elements.typ": *
 #import "../../mathematics/definitions/receiver-configuration-calculus.typ": receiver-configuration-calculus
 #import "../../mathematics/definitions/graded-arithmetic-accessibility-current.typ": graded-arithmetic-accessibility-current
+#import "../../mathematics/definitions/receiver-indexed-convergence.typ": receiver-indexed-convergence
+#import "../../mathematics/definitions/modulus-of-transport.typ": modulus-of-transport
+#import "../../mathematics/theorems/limit-receiver-noncommutation.typ": limit-receiver-noncommutation
+#import "../../mathematics/definitions/bra-receiver-ket-construction.typ": bra-receiver-ket-construction
+#import "../../mathematics/theorems/crossing-depth-inversion.typ": crossing-depth-inversion
+#import "../../mathematics/theorems/divergence-locality-parallelization.typ": divergence-locality-parallelization
+#import "../../mathematics/theorems/diagram-word-resummation.typ": diagram-word-resummation
+#import "../../mathematics/theorems/tower-cross-term-identity.typ": tower-cross-term-identity
+#import "../../mathematics/theorems/one-sided-face-equalizer.typ": one-sided-face-equalizer
 #import "../../mathematics/theorems/receiver-stratified-fundamental-theorem.typ": receiver-stratified-fundamental-theorem
 #import "../../mathematics/theorems/receiver-relative-second-order-calculus.typ": receiver-relative-second-order-calculus
 #import "../../mathematics/theorems/prime-cut-incidence-calculus.typ": prime-cut-incidence-calculus
@@ -10,6 +19,15 @@
 #let elements = (
   receiver_configuration_calculus: receiver-configuration-calculus,
   graded_arithmetic_accessibility_current: graded-arithmetic-accessibility-current,
+  receiver_indexed_convergence: receiver-indexed-convergence,
+  modulus_of_transport: modulus-of-transport,
+  limit_receiver_noncommutation: limit-receiver-noncommutation,
+  tower_cross_term_identity: tower-cross-term-identity,
+  bra_receiver_ket_construction: bra-receiver-ket-construction,
+  crossing_depth_inversion: crossing-depth-inversion,
+  divergence_locality_parallelization: divergence-locality-parallelization,
+  diagram_word_resummation: diagram-word-resummation,
+  one_sided_face_equalizer: one-sided-face-equalizer,
   receiver_stratified_fundamental_theorem: receiver-stratified-fundamental-theorem,
   receiver_relative_second_order_calculus: receiver-relative-second-order-calculus,
   prime_cut_incidence_calculus: prime-cut-incidence-calculus,
@@ -201,6 +219,164 @@ universal update rule imposed on every system.  It is the projective
 differential available whenever four ordered incidences furnish its marks.
 Another application may supply a different invariant, but it enters the same
 receiver-relative calculus.
+
+== One relating, and the term that belongs to neither argument
+
+#object-entry(elements.tower_cross_term_identity)
+
+The Swing above differentiates a relation of four marks; this identity reads the
+relating of *two* and names what the pair returns that neither member carries.
+The cross term is that object.  It is absent exactly at the square corner, which
+is why a right angle carries no relating and why an orthogonal decomposition is
+the case where the parts say nothing about each other.
+
+Two readings usually kept apart are the same algebra.  A triangle of contacts
+returns the Law of Cosines; a superposition of two oriented contributions returns
+an interference sum; and the substitution $alpha_1=a$, $alpha_2=-b e^(i gamma)$
+carries one to the other term by term.  Whatever an ecology's returns are made
+of, if two of them meet at one consequence then the meeting contributes a term
+depending on their relative turn, and that term is the whole content of the
+meeting.
+
+= The notation, and what it is for
+
+Notation here is an instrument for reasoning, not a decoration on results
+already obtained.  Each of the four below is adopted because it makes a
+distinction *visible in the symbol* that the framework insists on and the
+conventional spelling hides.
+
+== A bra is a receiver; a ket is a construction
+
+#object-entry(elements.bra_receiver_ket_construction)
+
+Writing $chevron.l psi,phi chevron.r$ computes the same number and presents the
+two arguments as one species.  They are not: one is what is presented and the
+other is what presents it.  Riesz makes the conflation harmless for the *value*
+and lossy for the *reading*, and the reading is what the framework is about.
+The payoff is immediate: a receiver family is complete exactly when it resolves
+the identity, so non-reconstruction is no longer a caveat carried in prose --
+it is the inequality $sum_i ketbra(a_i, a_i) != I$, and the defect $I-P$ is a
+computable object.
+
+== Crossing depth, and why the correction terms alternate
+
+#object-entry(elements.crossing_depth_inversion)
+
+An arrangement of $n$ regions cuts its ambient face into $2^n$ pieces, one per
+membership word: the fork is *per curve* and a region is a word, not a set.
+Grading by how many regions contain a piece recovers inclusion--exclusion, whose
+alternating sign is the Möbius function of the Boolean lattice -- which is to
+say that the correction series is an *inverted* one.  Depth one is what the
+parts carry alone; every deeper term is what a meeting carries and no part does.
+That is the tower's cross term at arity $k$, and it is why the pieces of depth
+at least two are the constrained ones.
+
+== Flux locality is the parallelization license
+
+#object-entry(elements.divergence_locality_parallelization)
+
+This is the part of the notation that has to survive contact with an apparatus.
+The divergence theorem says an interior speaks only through its boundary, so a
+partition decouples exactly to the extent that its terms are boundary fluxes --
+and every term that is not a flux is a barrier.  Interior elimination is
+independent per subdomain and the interface is the only meeting; that is domain
+decomposition, and it is the statement as an algorithm.
+
+The instructive case is the one that *fails* to decouple.  Incompressibility is
+a statement about the domain and not about any cell, so the pressure it
+determines is an elliptic solve with globally supported Green's function.
+Advection and diffusion parallelize; the projection does not.  A body whose
+local moves are cheap and whose *join* is global has the same shape, and the
+join is where the barrier will be.
+
+The caution belongs in the same breath: this licenses a decomposition and never
+a schedule.  Whether co-present events may be enacted in any order is a property
+of the material, to be proved for that material, and no theorem about coupling
+supplies it.
+
+== A diagram's value is a word
+
+#object-entry(elements.diagram_word_resummation)
+
+Chen's theorem is a completeness statement about a face: iterated integrals are
+*exactly* the homotopy functionals on path space, so that face sees ordered
+transport up to homotopy and nothing further, and endpoint evaluation is the
+strictly coarser face the winding separates from it.  Their algebra is the
+shuffle algebra on words, which is why the evaluated tetrahedral vacuum diagram
+reduces to four-letter words in a seven-letter alphabet.  Ordered transport and
+word combinatorics are one algebra.
+
+Replacing an infinite family of such words by a closed return is condensation,
+and the cited Fermi-gas result is evidence that it is achievable outside a
+perturbative regime -- with the physical gas serving as a second apparatus chart
+for one law.  It is an instance and not a method, and the boundary field says so.
+
+= The limit is indexed by its receiver
+
+The integral in the next part presupposes a convergence, and until this part
+that convergence was borrowed silently from the ambient analysis.  Borrowing it
+is lawful; borrowing it *without an index* is the absolute frame returning by
+the back door.  The convergence taxonomy already separates the species; what it
+did not carry is a relation that says *at which receiver* a net has settled.
+
+== A limit is the exhaustion of one receiver's distinguishing tests
+
+#object-entry(elements.receiver_indexed_convergence)
+
+Nothing new is proved about any classical limit and nothing classical is
+displaced.  Inside one index this is exactly convergence in $Y_rho$, with every
+ordinary theorem intact.  What the index buys is that two receivers may now
+disagree *as a theorem with a witness* rather than as a paradox, and that the
+phrase "the limit" is no longer permitted to name an unstated frame.
+
+The reading in the transport vocabulary is the one that matters for the machine:
+a net has converged at $rho$ when continued transport can no longer contribute a
+difference $rho$ is able to experience.  Convergence is not arrival at a point.
+It is the *exhaustion of a declared family of differences*, and the point is
+whatever remains once that family is spent.
+
+== Epsilon and delta live in two different grains
+
+#object-entry(elements.modulus_of_transport)
+
+The classical statement writes one absolute-value bar on both sides of the
+implication and thereby identifies the two grains without saying so.  Separating
+them exposes the object the alternation was always asserting: a map $omega_a$
+running *backwards* along $f$, from what the observer demands to what the source
+must supply.  Continuity is the existence of that transport; the familiar
+hierarchy -- pointwise, uniform, Lipschitz, Hölder -- is a hierarchy on $omega_a$
+and on nothing else.
+
+== Disagreement between receivers is an obstruction, not an inconsistency
+
+#object-entry(elements.limit_receiver_noncommutation)
+
+The staircase is worth stating plainly because it is the cleanest available
+demonstration that a limit is not a property of a sequence.  The same sequence
+converges and does not converge, exactly, at two receivers of the same object.
+Arc length does not factor continuously through the image, and the sequence is
+the certificate.  This is receiver non-reconstruction at the level of limits:
+agreement of one face does not transport to a face that face does not determine.
+
+Golab's theorem then supplies the *hand* of the failure.  Length can only be
+lost in the limit, never gained, so the obstruction is oriented.  An obstruction
+with a hand is a stronger return than an obstruction without one, and the
+difference is exactly the difference between OPEN and a signed residual.
+
+== "Undefined" names an empty equalizer under a declared target
+
+#object-entry(elements.one_sided_face_equalizer)
+
+The side of an approach is part of the receiver, not part of the expression.
+Once that is said, $1\/x$ at the origin stops being an exception: three declared
+targets return three exact values, and the classical verdict "undefined" is the
+third receiver's OPEN under one of them.  On the one-point compactification --
+where the expression is the chart inversion $[z:w] |-> [w:z]$ and $infinity$ has
+no sides -- the equalizer closes and there is nothing left to reconcile.
+
+This is the general shape and not a trick played on one example.  A construction
+that reports "undefined" without naming its target has reported the emptiness of
+an equalizer it did not declare.
 
 = One calculus for flow and event
 

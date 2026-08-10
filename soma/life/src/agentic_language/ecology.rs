@@ -209,6 +209,8 @@ impl AgenticLanguageEcology {
             worker_threads: worker_threads.max(1),
             spec,
             inherited_body,
+            inherited_passages: inherited_passages.to_vec(),
+            history: Vec::new(),
             relational_body,
             inherited_cofaces,
             capabilities: capability_map,
@@ -469,6 +471,30 @@ impl AgenticLanguageEcology {
             next_episode: self.next_episode,
             next_dialogue: self.next_dialogue,
             standing: self.standing.clone(),
+        })
+    }
+
+    /// The exterior causes this body has admitted, in arrival order.
+    pub fn history(&self) -> &[AgenticOwnedLanguageOccurrence] {
+        &self.history
+    }
+
+    /// Take a **non-consuming** image from which an independent second body is remounted.
+    ///
+    /// This is the fork a counterfactual arm needs: `into_native_rest` consumes the body, so
+    /// without this owner the only way to obtain a second body at the same standing was to
+    /// destroy the first. The image replays rather than clones, because `GrowingKeyAtlas`
+    /// refuses cloning by declared law.
+    pub fn rest_image(&self) -> Result<AgenticLanguageRestImage, AgenticLanguageError> {
+        Ok(AgenticLanguageRestImage {
+            inherited_passages: self.inherited_passages.clone(),
+            capabilities: self.capabilities.values().cloned().collect(),
+            trajectories: self.trajectories.clone(),
+            spec: self.spec,
+            action: self.action,
+            worker_threads: self.worker_threads,
+            history: self.history.clone(),
+            receipt: self.rest_receipt()?,
         })
     }
 
@@ -1517,7 +1543,10 @@ impl CausalMembrane for AgenticLanguageEcology {
     where
         Self: 'a,
     {
-        match occurrence {
+        // The cause is retained only when the membrane admitted it. A refused occurrence caused
+        // no standing, so replaying it would found standing the imaged body never had.
+        let retained = occurrence.owned();
+        let consequence = match occurrence {
             AgenticLanguageOccurrence::Question(question) => self.receive_question(question),
             AgenticLanguageOccurrence::WorldReturn(world_return) => {
                 self.receive_world_return(world_return)
@@ -1526,6 +1555,8 @@ impl CausalMembrane for AgenticLanguageEcology {
             AgenticLanguageOccurrence::FormalReturn(returned) => self
                 .receive_formal_return(returned)
                 .map(AgenticLanguageConsequence::FormalReturn),
-        }
+        }?;
+        self.history.push(retained);
+        Ok(consequence)
     }
 }

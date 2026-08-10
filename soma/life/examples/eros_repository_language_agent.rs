@@ -337,11 +337,6 @@ struct DeedArgumentReport {
 #[derive(Serialize)]
 #[serde(tag = "kind", rename_all = "kebab-case")]
 enum ControlConsequenceReport {
-    /// The laboratory's non-consuming fork (`rest_image`) does not exist in this body, so the
-    /// counterfactual arm has no control to run. Recorded, never silently omitted.
-    Unavailable {
-        reason: String,
-    },
     Answer {
         answer: AnswerReport,
     },
@@ -464,8 +459,9 @@ struct AgentReport {
     revision_question: String,
     uncorrected_control: ControlConsequenceReport,
     revised_answer: AnswerReport,
-    /// `None` when no control body could be built -- see `ControlConsequenceReport::Unavailable`.
-    correction_changed_later_conduct: Option<bool>,
+    /// Measured against a real fork: the control body received every cause this one did except
+    /// the correction.
+    correction_changed_later_conduct: bool,
     revised_answer_used_committed_codec: bool,
     detached_remount_question: String,
     detached_remount_answer: AnswerReport,
@@ -570,6 +566,16 @@ fn main() -> Result<(), String> {
         .map(|threads| threads.get())
         .unwrap_or(1)
         .min(LOCAL_ORGAN_WORKER_APERTURE);
+    // A driver that runs for minutes with no output is not diagnosable, and `CLAUDE.md` §9 says a
+    // run that pins one host core while the card idles is a defect to DIAGNOSE. Every phase below
+    // stamps its own wall clock so the long pole is named rather than guessed at. These are
+    // measurements in one frame and select nothing.
+    let phase_clock = Instant::now();
+    macro_rules! phase {
+        ($($argument:tt)*) => {
+            eprintln!("[{:>7.1}s] {}", phase_clock.elapsed().as_secs_f64(), format!($($argument)*))
+        };
+    }
     let mut agent = AgenticLanguageEcology::condition(
         &inherited_body,
         &[AgenticLanguageCapability::new(SEARCH_CAPABILITY, 80)],
@@ -585,7 +591,7 @@ fn main() -> Result<(), String> {
     )
     .map_err(|error| format!("condition agent: {error:?}"))?;
     let conditioning_millis = conditioning_started.elapsed().as_millis();
-    eprintln!("agent conditioned in {conditioning_millis} ms");
+    phase!("agent conditioned in {conditioning_millis} ms");
 
     if std::env::args()
         .skip(1)
@@ -615,12 +621,12 @@ fn main() -> Result<(), String> {
         }
         other => return Err(format!("first question returned {other:?}")),
     };
-    eprintln!("live deed emitted: {}", deed.identity);
+    phase!("live deed emitted: {}", deed.identity);
     if world.enacted_deeds != 0 {
         return Err("repository acted before the language deed".to_owned());
     }
     let sections = world.enact(&deed)?;
-    eprintln!("live world sections: {}", sections.len());
+    phase!("live world sections: {}", sections.len());
     let enacted_deeds_before_first_return = world.enacted_deeds;
     let returned = AgenticLanguageWorldReturn::new(deed.identity.clone(), sections.clone());
     let first_answer = match agent
@@ -633,7 +639,7 @@ fn main() -> Result<(), String> {
         }
         other => return Err(format!("world return produced {other:?}")),
     };
-    eprintln!("first answer: {}", first_answer.text);
+    phase!("first answer: {}", first_answer.text);
 
     let second_question = AgenticLanguageQuestion::new(
         "live-reflection-followup",
@@ -654,7 +660,7 @@ fn main() -> Result<(), String> {
         other => return Err(format!("follow-up returned {other:?}")),
     };
     let second_answer_text = second_answer.text.clone();
-    eprintln!("second answer: {second_answer_text}");
+    phase!("second answer: {second_answer_text}");
     if world.enacted_deeds != enacted_deeds_before_first_return {
         return Err("the grounded follow-up replayed the repository deed".to_owned());
     }
@@ -662,30 +668,58 @@ fn main() -> Result<(), String> {
     let revision_question_text =
         "What forms the next emanation, and what does the observer aperture restrict?";
     // A counterfactual grading receiver is an explicit observer branch. Production continuation
-    // remains singular; the compatibility image replays only this detached control body.
-    // THE FORK IS GONE — and this is the sharpest divergence in the port.
+    // remains singular; the fork replays only this detached control body.
     //
-    // The laboratory built this counterfactual control with `agent.rest_image()?.remount()?`.
-    // `AgenticLanguageRestImage` was a REPLAY image — inherited passages, capabilities,
-    // trajectories, history, receipt — so remounting it produced a SECOND live body without
-    // consuming the first. That is a fork, and a counterfactual control needs exactly a fork.
+    // THE ARM RUNS. `AgenticLanguageEcology::rest_image` is a non-consuming replay image —
+    // inherited passages, capabilities, trajectories, the arrival-ordered causes, and the receipt —
+    // so remounting it yields a SECOND live body without consuming the first. A counterfactual
+    // control needs exactly that, and until it existed this arm was recorded as unrunnable rather
+    // than faked with a re-conditioned body (which is a different experiment: a body conditioned
+    // from the declared inputs has never received the two questions above).
     //
-    // The live body replaced it with `AgenticLanguageNativeRest`, whose own documentation says it
-    // "contains the cultivated body itself and remounts by direct transfer. It does not replay
-    // dialogue, reconstruct the relation organ, or recondition codec training from source
-    // occurrences." `into_native_rest` takes `self`. The native rest is the stronger object for a
-    // source-detachment claim and the weaker one here: there is no non-consuming duplicate, so
-    // this arm cannot run.
+    // The fork is taken HERE, before the correction is received, so the control body is this body
+    // at this instant. It is then asked the same revision question the corrected body will be
+    // asked. Any difference between the two answers is caused by the correction and by nothing
+    // else, because the two bodies share every prior cause exactly.
     //
-    // It is refused by name rather than replaced by a re-conditioned body, because a body
-    // re-conditioned from the declared inputs is NOT this body at this instant -- it has never
-    // received the two questions above -- and reporting it as the uncorrected control would be a
-    // different experiment wearing this one's label.
-    let _ = revision_question_text;
-    let uncorrected_control = ControlConsequenceReport::Unavailable {
-        reason: "AgenticLanguageEcology::rest_image (the non-consuming replay fork) does not exist \
-in this body; into_native_rest consumes the agent, so no counterfactual duplicate can be made"
-            .to_owned(),
+    // A fork COSTS A REPLAY, and that cost is stated rather than hidden: `GrowingKeyAtlas` refuses
+    // cloning by declared law, so the second body is re-conducted from the first's causes. Each
+    // fork here is therefore taken exactly once — `remount` already refuses unless the replay
+    // reproduces the imaged receipt, so calling `remount_equal` beside it would buy a second full
+    // replay for a fact `remount` has already established.
+    let uncorrected_image = agent
+        .rest_image()
+        .map_err(|error| format!("fork the uncorrected control: {error:?}"))?;
+    let forked_at = Instant::now();
+    let mut uncorrected = uncorrected_image
+        .remount()
+        .map_err(|error| format!("remount the uncorrected control: {error:?}"))?;
+    phase!(
+        "uncorrected control forked: {} causes replayed in {:.1}s",
+        uncorrected_image.history().len(),
+        forked_at.elapsed().as_secs_f64()
+    );
+    let uncorrected_revision_question =
+        AgenticLanguageQuestion::new("corrected-revision-question", 90, revision_question_text);
+    let uncorrected_control = match uncorrected
+        .receive_occurrence(AgenticLanguageOccurrence::Question(
+            &uncorrected_revision_question,
+        ))
+        .map_err(|error| format!("uncorrected control question: {error:?}"))?
+    {
+        AgenticLanguageConsequence::Answer(answer) => ControlConsequenceReport::Answer {
+            answer: answer_report(answer)?,
+        },
+        AgenticLanguageConsequence::Deed(deed) => ControlConsequenceReport::Deed {
+            identity: deed.identity.clone(),
+            argument_surface: deed.argument_surface(),
+        },
+        AgenticLanguageConsequence::Clarification(clarification) => {
+            ControlConsequenceReport::Clarification {
+                text: clarification.text.clone(),
+            }
+        }
+        other => return Err(format!("uncorrected control returned {other:?}")),
     };
 
     let reified_target_before_revision = agent
@@ -714,19 +748,18 @@ in this body; into_native_rest consumes the agent, so no counterfactual duplicat
         AgenticLanguageConsequence::Answer(answer) => answer,
         other => return Err(format!("corrected body returned {other:?}")),
     };
-    eprintln!("revised answer: {}", revised_answer.text);
+    phase!("revised answer: {}", revised_answer.text);
+    // The control body received every cause this one did EXCEPT the correction, so a difference
+    // here is caused by the correction and by nothing else.
     let correction_changed_later_conduct = match &uncorrected_control {
         ControlConsequenceReport::Answer { answer } => {
-            Some(answer.text.as_str() != revised_answer.text.as_str())
+            answer.text.as_str() != revised_answer.text.as_str()
         }
         ControlConsequenceReport::Deed { .. } | ControlConsequenceReport::Clarification { .. } => {
-            Some(true)
+            true
         }
-        // No control body exists, so this run may not claim the correction changed later conduct.
-        // It reports OPEN rather than passing a check it cannot perform.
-        ControlConsequenceReport::Unavailable { .. } => None,
     };
-    if correction_changed_later_conduct == Some(false) {
+    if !correction_changed_later_conduct {
         return Err("correction did not change the later consequence".to_owned());
     }
     if !revised_answer
@@ -801,7 +834,7 @@ in this body; into_native_rest consumes the agent, so no counterfactual duplicat
     if detached_remount_answer.world_deed.is_some() {
         return Err("detached remount answer retained an exterior world deed".to_owned());
     }
-    eprintln!("detached remount answer: {}", detached_remount_answer.text);
+    phase!("detached remount answer: {}", detached_remount_answer.text);
 
     // Two homologous operator returns cultivate one reusable question-to-answer transport. The
     // first return remains inactive as a general path; the second may found recurrence. A held-out
@@ -836,8 +869,16 @@ in this body; into_native_rest consumes the agent, so no counterfactual duplicat
         .ok_or_else(|| "first cultivation committed no codec version".to_owned())?
         .cultivation
         .active_transductions_after;
-    // Same removed fork; same refusal. See the note on `uncorrected_control` above.
+    // The one-return control, forked HERE: the body as it stands after exactly one returned
+    // correction. `CODEC_MINIMUM_RECURRENCE = 2` says a route is retained but inactive until it
+    // recurs across DISTINCT occurrences, so this arm is the falsifier for the whole cultivation
+    // claim — if one return already generated the held-out third face, the second return founded
+    // nothing and the recurrence law is decoration.
+    let one_return_fork = agent
+        .rest_image()
+        .map_err(|error| format!("fork the one-return control: {error:?}"))?;
 
+    phase!("first cultivation returned; active transductions {first_active}");
     let second_cultivation_question = AgenticLanguageQuestion::new(
         "terminal-testimony-cultivation-question",
         90,
@@ -871,15 +912,43 @@ in this body; into_native_rest consumes the agent, so no counterfactual duplicat
         return Err("the homologous second return founded no recurrent codec path".to_owned());
     }
 
+    phase!("second cultivation returned; active transductions {second_active}");
     let novel_cultivated_question = AgenticLanguageQuestion::new(
         "causal-geometry-cultivated-question",
         90,
         "Can the suffix receiver return causal geometry?",
     );
-    let one_return_control = ControlConsequenceReport::Unavailable {
-        reason: "same removed fork: the one-return cultivation control needs a duplicate of the \
-body as it stood after exactly one returned correction, and no non-consuming duplicate exists"
-            .to_owned(),
+    let forked_at = Instant::now();
+    let mut one_return_body = one_return_fork
+        .remount()
+        .map_err(|error| format!("remount the one-return control: {error:?}"))?;
+    phase!(
+        "one-return control forked: {} causes replayed in {:.1}s",
+        one_return_fork.history().len(),
+        forked_at.elapsed().as_secs_f64()
+    );
+    let one_return_question = AgenticLanguageQuestion::new(
+        "causal-geometry-cultivated-question",
+        90,
+        "Can the suffix receiver return causal geometry?",
+    );
+    let one_return_control = match one_return_body
+        .receive_occurrence(AgenticLanguageOccurrence::Question(&one_return_question))
+        .map_err(|error| format!("one-return control question: {error:?}"))?
+    {
+        AgenticLanguageConsequence::Answer(answer) => ControlConsequenceReport::Answer {
+            answer: answer_report(answer)?,
+        },
+        AgenticLanguageConsequence::Deed(deed) => ControlConsequenceReport::Deed {
+            identity: deed.identity.clone(),
+            argument_surface: deed.argument_surface(),
+        },
+        AgenticLanguageConsequence::Clarification(clarification) => {
+            ControlConsequenceReport::Clarification {
+                text: clarification.text.clone(),
+            }
+        }
+        other => return Err(format!("one-return control returned {other:?}")),
     };
     let novel_cultivated_answer = match agent
         .receive_occurrence(AgenticLanguageOccurrence::Question(
@@ -916,6 +985,7 @@ body as it stood after exactly one returned correction, and no non-consuming dup
         return Err("held-out codec face was not a source-independent generated deed".to_owned());
     }
 
+    phase!("novel cultivated face generated: {}", novel_cultivated_answer.text);
     let codec_training_native = agent
         .codec_training_native_bytes()
         .map_err(|error| format!("form native cultivated codec body: {error:?}"))?;
@@ -939,6 +1009,7 @@ body as it stood after exactly one returned correction, and no non-consuming dup
     if !cultivated_agent_rest_remount_exact {
         return Err("cultivated agent rest receipt was not stable".to_owned());
     }
+    phase!("cultivated codec body sealed: {} octets", codec_training_native.len());
     let remounted_cultivated_question = AgenticLanguageQuestion::new(
         "projective-light-remounted-question",
         90,

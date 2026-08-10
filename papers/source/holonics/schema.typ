@@ -1,6 +1,8 @@
 // Cold entry grammar for the dependency-ordered holonics synopsis.
 // This file deliberately contains no page or publication styling.
 
+#import "../lib/dirac.typ": bra, ket, braket, ketbra
+
 #let allowed-grades = (
   "project-postulate",
   "definition",

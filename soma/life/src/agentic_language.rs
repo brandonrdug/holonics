@@ -562,6 +562,51 @@ pub enum AgenticLanguageOccurrence<'a> {
     FormalReturn(&'a AgenticFormalReturn),
 }
 
+/// The owned twin of [`AgenticLanguageOccurrence`], retained in arrival order so a body can state
+/// the complete population of exterior causes that produced its present standing.
+///
+/// This is the *cause* record, never a transcript of what the body returned. A consequence is not
+/// stored here; it is re-derived when the causes are replayed.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum AgenticOwnedLanguageOccurrence {
+    Question(AgenticLanguageQuestion),
+    WorldReturn(AgenticLanguageWorldReturn),
+    Feedback(AgenticLanguageFeedback),
+    FormalReturn(AgenticFormalReturn),
+}
+
+impl AgenticOwnedLanguageOccurrence {
+    /// Borrow this owned cause as the occurrence species the receiving membrane accepts.
+    pub const fn borrowed(&self) -> AgenticLanguageOccurrence<'_> {
+        match self {
+            Self::Question(question) => AgenticLanguageOccurrence::Question(question),
+            Self::WorldReturn(returned) => AgenticLanguageOccurrence::WorldReturn(returned),
+            Self::Feedback(feedback) => AgenticLanguageOccurrence::Feedback(feedback),
+            Self::FormalReturn(returned) => AgenticLanguageOccurrence::FormalReturn(returned),
+        }
+    }
+}
+
+impl AgenticLanguageOccurrence<'_> {
+    /// Retain this occurrence as an owned cause.
+    pub fn owned(&self) -> AgenticOwnedLanguageOccurrence {
+        match self {
+            Self::Question(question) => {
+                AgenticOwnedLanguageOccurrence::Question((*question).clone())
+            }
+            Self::WorldReturn(returned) => {
+                AgenticOwnedLanguageOccurrence::WorldReturn((*returned).clone())
+            }
+            Self::Feedback(feedback) => {
+                AgenticOwnedLanguageOccurrence::Feedback((*feedback).clone())
+            }
+            Self::FormalReturn(returned) => {
+                AgenticOwnedLanguageOccurrence::FormalReturn((*returned).clone())
+            }
+        }
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum AgenticTurnStanding {
     Rest,
@@ -691,6 +736,119 @@ impl AgenticLanguageNativeRest {
             });
         }
         Ok(self.body)
+    }
+}
+
+/// A **non-consuming** image of a continuing body, from which an independent second body is
+/// remounted by replaying the causes rather than by copying the organ.
+///
+/// This is deliberately not a clone. `GrowingKeyAtlas` — which the relation organ and every
+/// receptor registry below it are built on — declares that the complete atlas **cannot be
+/// cloned**, and requires a caller needing plurality to share immutable material above the owner
+/// or express a recoverable delta. This image is that second road: it carries the *inherited
+/// material and the arrival-ordered exterior causes*, and [`Self::remount`] re-conducts them.
+///
+/// Two consequences follow, and both are the point:
+///
+/// - **A fork is available where a clone is refused.** `into_native_rest` consumes the body, so
+///   before this owner existed a counterfactual arm had no control to run against — the second
+///   arm could only be had by destroying the first.
+/// - **Remount is a source-detachment falsifier, not a convenience.** [`Self::remount`] refuses
+///   with `RestRemountMismatch` unless the replayed body's rest receipt is *equal* to the receipt
+///   taken at image time. A body carrying standing that its declared causes do not reproduce
+///   cannot be remounted, and that refusal is the return.
+#[derive(Clone, Debug)]
+pub struct AgenticLanguageRestImage {
+    inherited_passages: Vec<MorphologicalLanguagePassage>,
+    capabilities: Vec<AgenticLanguageCapability>,
+    trajectories: Vec<AgenticLanguageTrajectory>,
+    spec: AgenticLanguageSpec,
+    action: ActionCurrent,
+    worker_threads: usize,
+    history: Vec<AgenticOwnedLanguageOccurrence>,
+    receipt: AgenticLanguageRestReceipt,
+}
+
+impl AgenticLanguageRestImage {
+    /// The rest receipt as it stood when this image was taken.
+    pub const fn receipt(&self) -> &AgenticLanguageRestReceipt {
+        &self.receipt
+    }
+
+    /// The arrival-ordered exterior causes this image will replay.
+    pub fn history(&self) -> &[AgenticOwnedLanguageOccurrence] {
+        &self.history
+    }
+
+    /// The inherited material the body was conditioned on.
+    pub fn inherited_passages(&self) -> &[MorphologicalLanguagePassage] {
+        &self.inherited_passages
+    }
+
+    /// The same image with only the first `causes` exterior causes retained.
+    ///
+    /// This is the structural ablation the counterfactual arm is for: it removes *causes*, not a
+    /// count, and the removal is visible to the replay because the replay conducts through them.
+    /// The receipt is carried unchanged on purpose — an ablated image is expected to fail
+    /// [`Self::remount`], and that refusal is what names the standing the struck causes carried.
+    pub fn with_history_prefix(&self, causes: usize) -> Self {
+        let mut ablated = self.clone();
+        ablated.history.truncate(causes);
+        ablated
+    }
+
+    /// The same image with every cause the predicate refuses struck out.
+    ///
+    /// Ablating by *species* rather than by prefix is what separates "the body needs its returns"
+    /// from "the body needs its most recent occurrence".
+    pub fn without_causes(
+        &self,
+        struck: impl Fn(&AgenticOwnedLanguageOccurrence) -> bool,
+    ) -> Self {
+        let mut ablated = self.clone();
+        ablated.history.retain(|cause| !struck(cause));
+        ablated
+    }
+
+    /// Remount an independent body, refusing unless the replay reproduces the receipt exactly.
+    pub fn remount(&self) -> Result<AgenticLanguageEcology, AgenticLanguageError> {
+        let replayed = self.replay()?;
+        if replayed.rest_receipt()? != self.receipt {
+            return Err(AgenticLanguageError::RestRemountMismatch);
+        }
+        Ok(replayed)
+    }
+
+    /// Remount without requiring the receipt to match, then report whether it did.
+    ///
+    /// This is the measurement [`Self::remount`] makes into a refusal. A caller studying *where*
+    /// a body departs from its causes needs the departed body itself, not an error.
+    pub fn remount_departed(
+        &self,
+    ) -> Result<(AgenticLanguageEcology, bool), AgenticLanguageError> {
+        let replayed = self.replay()?;
+        let reproduced = replayed.rest_receipt()? == self.receipt;
+        Ok((replayed, reproduced))
+    }
+
+    /// Whether replaying the declared causes reproduces the imaged standing exactly.
+    pub fn remount_equal(&self) -> Result<bool, AgenticLanguageError> {
+        Ok(self.remount_departed()?.1)
+    }
+
+    fn replay(&self) -> Result<AgenticLanguageEcology, AgenticLanguageError> {
+        let mut ecology = AgenticLanguageEcology::condition(
+            &self.inherited_passages,
+            &self.capabilities,
+            &self.trajectories,
+            self.spec,
+            self.action,
+            self.worker_threads,
+        )?;
+        for occurrence in &self.history {
+            ecology.receive_occurrence(occurrence.borrowed())?;
+        }
+        Ok(ecology)
     }
 }
 
@@ -836,6 +994,13 @@ pub struct AgenticLanguageEcology {
     worker_threads: usize,
     spec: AgenticLanguageSpec,
     inherited_body: MorphologicalLanguageEcology,
+    /// The material the inherited body was conditioned on, retained so the body can state its own
+    /// causes. Conditioning consumes these by reference; without retaining them a body cannot be
+    /// re-founded except by destroying itself.
+    inherited_passages: Vec<MorphologicalLanguagePassage>,
+    /// Every exterior cause this body has received, in arrival order. Not a transcript: the
+    /// returns are absent and are re-derived on replay.
+    history: Vec<AgenticOwnedLanguageOccurrence>,
     /// One continuing relation organ. Individual questions restrict this standing through their
     /// caused passage apertures; they do not rebuild private clause ecologies.
     relational_body: ExactRelationalLanguageEcology,

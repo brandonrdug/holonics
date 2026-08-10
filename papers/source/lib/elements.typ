@@ -5,6 +5,8 @@
 // colored construction should recur in the main figure, inline reasoning, and
 // equations. Textual labels remain present so color is never the sole address.
 
+#import "dirac.typ": bra, ket, braket, ketbra
+
 #let by-red = rgb("#D94D1A")
 #let by-blue = rgb("#265999")
 #let by-yellow = rgb("#E3A511")

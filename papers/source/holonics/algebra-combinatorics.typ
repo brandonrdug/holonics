@@ -547,4 +547,45 @@
     ],
     source: [Standard linear-recurrence theory.],
   ),
+  entry(
+    id: "H.0150",
+    kind: "Theorem",
+    grade: "proved-standard",
+    title: [Crossing depth, the alternating hand, and Möbius reversion],
+    depends: ("H.0120", "H.0126"),
+    statement: [
+      An arrangement of $n$ regions partitions its ambient face into
+      $sum_(k=0)^n binom(n,k)=2^n$ regions, one per word in
+      ${"in","out"}^n$. Grading by crossing depth $k$, a finitely additive
+      measure satisfies
+      $
+        mu(union.big_(i=1)^n A_i)
+        =sum_k (-1)^(k-1) sum_(abs(S)=k) mu(inter.big_(i in S)A_i).
+      $
+      The coefficient $(-1)^(abs(S))$ is the Möbius function of the Boolean
+      lattice, and Möbius inversion is inversion of that lattice's zeta function
+      in its incidence algebra.
+    ],
+    derivation: [
+      A point of depth $k&gt;=1$ receives coefficient
+      $-sum_(j=1)^k binom(k,j)(-1)^j=1$; a point of depth $0$ receives none.
+      $mu(emptyset,S)=(-1)^(abs(S))$ inverts $zeta(emptyset,S)=1$.
+    ],
+    transformations: [
+      The Venn region count *is* the per-curve fork: a region is a binary word,
+      not a set. Depth one is what the parts carry alone and every deeper term is
+      what a meeting carries that no part carries -- H.0216's cross term at arity
+      $k$ -- so removing one region changes every term of depth $&gt;=2$ containing
+      it while leaving depth-one terms alone. The alternating sign is an
+      accumulated hand, and reversion is the operation that recovers a
+      construction from the faces of its parts.
+    ],
+    boundary: [
+      A theorem about a supplied finitely additive measure, not about the
+      regions. It says nothing about which measure to declare, does not assert
+      that any alternating expansion converges, and licenses no mechanical
+      reading of "load" without a constitutive law.
+    ],
+    source: [Classical inclusion--exclusion and Möbius inversion; the crossing reading is the laboratory's.],
+  ),
 )

@@ -1,5 +1,8 @@
 #import "definitions/situated-occurrence.typ": situated-occurrence
 #import "definitions/receiver.typ": receiver
+#import "definitions/bra-receiver-ket-construction.typ": bra-receiver-ket-construction
+#import "definitions/receiver-indexed-convergence.typ": receiver-indexed-convergence
+#import "definitions/modulus-of-transport.typ": modulus-of-transport
 #import "definitions/holon.typ": holon
 #import "definitions/comparison-face.typ": comparison-face
 #import "definitions/phase.typ": phase
@@ -107,6 +110,13 @@
 #import "theorems/prime-cut-incidence-calculus.typ": prime-cut-incidence-calculus
 #import "theorems/prime-interval-wall-current.typ": prime-interval-wall-current
 #import "theorems/transcendental-accessibility-transport.typ": transcendental-accessibility-transport
+#import "theorems/limit-receiver-noncommutation.typ": limit-receiver-noncommutation
+#import "theorems/one-sided-face-equalizer.typ": one-sided-face-equalizer
+#import "theorems/tower-cross-term-identity.typ": tower-cross-term-identity
+#import "theorems/crossing-depth-inversion.typ": crossing-depth-inversion
+#import "theorems/divergence-locality-parallelization.typ": divergence-locality-parallelization
+#import "theorems/diagram-word-resummation.typ": diagram-word-resummation
+#import "theorems/loss-is-noncommutation.typ": loss-is-noncommutation
 #import "corollaries/point-line-loop.typ": point-line-loop
 #import "corollaries/equal-return-tangency.typ": equal-return-tangency
 #import "corollaries/receiver-domination-rh.typ": receiver-domination-rh
@@ -125,6 +135,16 @@
 #let elements = (
   situated_occurrence: situated-occurrence,
   receiver: receiver,
+  receiver_indexed_convergence: receiver-indexed-convergence,
+  modulus_of_transport: modulus-of-transport,
+  limit_receiver_noncommutation: limit-receiver-noncommutation,
+  one_sided_face_equalizer: one-sided-face-equalizer,
+  tower_cross_term_identity: tower-cross-term-identity,
+  bra_receiver_ket_construction: bra-receiver-ket-construction,
+  crossing_depth_inversion: crossing-depth-inversion,
+  divergence_locality_parallelization: divergence-locality-parallelization,
+  diagram_word_resummation: diagram-word-resummation,
+  loss_is_noncommutation: loss-is-noncommutation,
   holon: holon,
   comparison_face: comparison-face,
   phase: phase,

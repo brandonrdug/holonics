@@ -1,4 +1,4 @@
-#import "schema.typ": entry
+#import "schema.typ": entry, bra, ket, braket, ketbra
 
 #let topology-analysis-dynamics = (
   entry(
@@ -734,5 +734,172 @@
       properties are separately proved.
     ],
     source: [Standard asymptotic notation.],
+  ),
+  entry(
+    id: "H.0262",
+    kind: "Definition",
+    grade: "definition",
+    title: [Receiver-indexed convergence],
+    depends: ("H.0003", "H.0012", "H.0220", "H.0250"),
+    statement: [
+      Let $q_rho:X arrow.r Y_rho$ be a receiver which additionally declares a
+      separating family $cal(D)_rho$ of tests $d$ with $d(y,y)=0$, valued in
+      ordered objects with declared grains. A net $(x_i)$ in $X$ *converges at
+      $rho$* to $x$, written $x_i arrow.r_rho x$, when
+      $
+        forall d in cal(D)_rho forall g succ 0 exists i_0 forall i succ.eq i_0:
+        d(q_rho (x_i),q_rho (x)) prec g.
+      $
+      Equivalently, continued transport no longer contributes a difference this
+      receiver can experience.
+    ],
+    transformations: [
+      This is ordinary convergence in $Y_rho$ pulled back along $q_rho$; the
+      content is the index. It supplies the convergence receiver H.0208 names as
+      the admission condition for calling a limit holonic, and it makes the
+      species enumerated in H.0250 the *values* of an index rather than a list.
+    ],
+    boundary: [
+      No new limit operation is defined and no classical theorem is displaced.
+      A separating family is supplied by the receiver, not derived from $X$; two
+      receivers sharing a map but not a test family are different receivers.
+      Transport between indices is not licensed here.
+    ],
+    source: [Laboratory definition over standard convergence; see H.0208, H.0250.],
+  ),
+  entry(
+    id: "H.0263",
+    kind: "Definition",
+    grade: "definition",
+    title: [Modulus of transport, and the two grains of an epsilon--delta statement],
+    depends: ("H.0003", "H.0262"),
+    statement: [
+      For $f:X arrow.r Z$ between a source receiver $q_rho$ with grains $G_rho$
+      and an observing receiver $q_sigma$ with grains $G_sigma$, continuity at
+      $a$ relative to $(rho,sigma)$ is the existence of
+      $
+        omega_a:G_sigma arrow.r G_rho
+      $
+      with
+      $
+        d_rho (q_rho (x),q_rho (a)) prec omega_a (epsilon)
+        arrow.r.double
+        d_sigma (q_sigma (f x),q_sigma (f a)) prec epsilon
+      $
+      for every $epsilon in G_sigma$.
+    ],
+    transformations: [
+      The alternation $forall epsilon exists delta$ *is* the assertion that
+      $omega_a$ exists, and $omega_a$ runs contravariantly: it carries the
+      observing grain back to the source grain, opposite to $f$. Uniform
+      continuity is $omega_a$ independent of $a$; Lipschitz is $omega_a$ linear.
+      The classical statement is this one with $rho=sigma$ and the two grain
+      families silently identified.
+    ],
+    boundary: [
+      Existence of $omega_a$ is a hypothesis about the receiver pair, not a
+      property of $f$ alone. A construction that cannot exhibit $omega_a$ returns
+      OPEN and has not established discontinuity.
+    ],
+    source: [Standard modulus of continuity, re-indexed by its two receivers.],
+  ),
+  entry(
+    id: "H.0264",
+    kind: "Theorem",
+    grade: "proved-derived",
+    title: [A limit transports between receivers only through a continuous factorization],
+    depends: ("H.0012", "H.0262"),
+    statement: [
+      If $q_sigma=h compose q_rho$ with $h$ continuous, then
+      $x_i arrow.r_rho x$ implies $x_i arrow.r_sigma x$. Consequently, a net
+      converging at $rho$ and not at $sigma$ *witnesses* that no such $h$ exists.
+    ],
+    derivation: [
+      Continuity of $h$ carries a convergent net to a convergent net; the second
+      claim is the contrapositive.
+    ],
+    transformations: [
+      Disagreement between two receivers about a limit is an obstruction to
+      factorization with an exhibited witness, not an inconsistency. This is
+      H.0012's non-reconstruction at the level of limits: agreement of one face
+      does not transport to another face it does not determine.
+    ],
+    boundary: [
+      The theorem supplies a criterion, not a construction. Exhibiting $h$ when
+      it exists, and exhibiting a separating net when it does not, remain work
+      for the particular pair.
+    ],
+    source: [Laboratory derivation; witness at C.0009.],
+  ),
+  entry(
+    id: "H.0265",
+    kind: "Theorem",
+    grade: "proved-derived",
+    title: [An undefined two-sided limit is an empty equalizer under a declared target],
+    depends: ("H.0262", "H.0264"),
+    statement: [
+      For $f(x)=1\/x$ at $0$, the approach side belongs to the receiver. With
+      the two-sided receiver defined as the equalizer of the one-sided receivers,
+      the target decides the return: on $RR$ all three return OPEN; on
+      $RR union {plus.minus infinity}$ the one-sided returns are
+      $minus infinity$ and $plus infinity$ and the equalizer is empty; on the
+      one-point $RR union {infinity}$ both one-sided returns are $infinity$ and
+      the equalizer returns $infinity$.
+    ],
+    derivation: [
+      Each row is the ordinary limit in the named target. The quotient
+      identifying $plus.minus infinity$ is the map under which the two
+      disagreeing returns become one.
+    ],
+    transformations: [
+      "Undefined" is a receiver return that must name its target before it can be
+      read as a fact about the expression. On the Riemann sphere the expression
+      has no sides at $infinity$ and no discrepancy arises.
+    ],
+    boundary: [
+      This does not make every undefined limit definable, and OPEN is not a
+      licence to choose a side. Adopting $RR union {infinity}$ closes this
+      equalizer and destroys the order; a construction needing
+      $minus infinity < plus infinity$ may not adopt it.
+    ],
+    source: [Standard compactifications; laboratory receiver reading.],
+  ),
+  entry(
+    id: "H.0266",
+    kind: "Definition",
+    grade: "definition",
+    title: [Dirac notation: the ket is the construction, the bra is the receiver],
+    depends: ("H.0003", "H.0012", "H.0241"),
+    statement: [
+      In a complex Hilbert space $cal(H)$ with dual $cal(H)^*$,
+      $
+        ket(psi) in cal(H) " the construction",
+        quad
+        bra(a) in cal(H)^* " the receiver",
+        quad
+        braket(a, psi) " the face",
+      $
+      with $q_(bra(a))=braket(a, dot)$ a receiver in the sense of H.0003. The
+      outer product $ketbra(phi, a)$ is transport: it receives with $bra(a)$ and
+      emits with $ket(phi)$, in that order.
+    ],
+    transformations: [
+      A declared receiver family is complete exactly when it resolves the
+      identity, $sum_i ketbra(a_i, a_i)=I$; when the sum is a proper projection
+      $P$, the defect $I-P$ is what the family cannot see, so H.0012's
+      non-reconstruction is the statement $sum_i ketbra(a_i, a_i) != I$ written in
+      this notation. A POVM is a complete family whose faces are quotients
+      $p(i)=braket(psi, E_i, psi)$.
+    ],
+    boundary: [
+      The symmetric form $chevron.l psi,phi chevron.r$ computes the same number
+      and makes the two arguments look like one species. Riesz gives
+      $cal(H) tilde.eq cal(H)^*$, so the conflation is harmless for the value and
+      lossy for the reading -- the isomorphism is antilinear and depends on the
+      inner product. This is notation: it asserts no Born rule, no measurement
+      postulate, and no claim that any ecology's constructions are Hilbert
+      vectors.
+    ],
+    source: [Standard Dirac notation, adopted for the role typing it makes visible.],
   ),
 )

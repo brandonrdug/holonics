@@ -847,3 +847,140 @@ fn unresolved_action_relation_returns_a_readable_clarification() {
         other => panic!("refinement must select the repository deed, received {other:?}"),
     }
 }
+
+// -------------------------------------------------------------------------------------------------
+// The non-consuming fork.
+//
+// `into_native_rest` consumes the body, so before `rest_image` existed a counterfactual arm had no
+// control to run against: the second body could only be had by destroying the first. These four
+// tests establish that the fork exists, that it is exact, that it is *non*-consuming, and that the
+// two arms it yields are causally independent.
+// -------------------------------------------------------------------------------------------------
+
+#[test]
+fn a_rest_image_remounts_an_exact_second_body_without_consuming_the_first() {
+    let mut cultivated = body();
+    answer_with_return(
+        &mut cultivated,
+        "suffix-question",
+        "What did the suffix correction establish?",
+        "The returned event advances the suffix current.",
+    );
+    let image = cultivated.rest_image().unwrap();
+    assert_eq!(image.history().len(), cultivated.history().len());
+    assert!(
+        !image.history().is_empty(),
+        "the image must carry the causes, not merely the standing"
+    );
+
+    let remounted = image.remount().expect("the declared causes reproduce the body");
+    assert_eq!(
+        remounted.rest_receipt().unwrap(),
+        cultivated.rest_receipt().unwrap(),
+        "a replayed body must be receipt-identical to the one imaged"
+    );
+
+    // Non-consuming: the original still conducts, and taking the image did not move its standing.
+    let after = cultivated.rest_receipt().unwrap();
+    assert_eq!(&after, image.receipt());
+}
+
+#[test]
+fn the_two_arms_of_a_fork_diverge_only_by_what_each_received() {
+    let mut cultivated = body();
+    answer_with_return(
+        &mut cultivated,
+        "suffix-question",
+        "What did the suffix correction establish?",
+        "The returned event advances the suffix current.",
+    );
+    let image = cultivated.rest_image().unwrap();
+
+    let held = image.remount().unwrap();
+    let mut moved = image.remount().unwrap();
+    assert_eq!(
+        held.rest_receipt().unwrap(),
+        moved.rest_receipt().unwrap(),
+        "two arms of one fork begin identical"
+    );
+
+    // One arm receives a further cause; the other receives nothing.
+    answer_with_return(
+        &mut moved,
+        "phase-question",
+        "What did the phase correction establish?",
+        "The phase receiver retained quotient and carry.",
+    );
+    assert_ne!(
+        held.rest_receipt().unwrap(),
+        moved.rest_receipt().unwrap(),
+        "the arm that received a cause must depart from the arm that did not"
+    );
+    assert_eq!(
+        held.rest_receipt().unwrap(),
+        *image.receipt(),
+        "the untouched arm must not have moved: the two arms are causally independent"
+    );
+}
+
+#[test]
+fn a_refused_occurrence_founds_no_cause_and_therefore_no_history() {
+    let mut cultivated = body();
+    let before = cultivated.history().len();
+    // A world return naming a deed that was never emitted is refused; refusing must retain nothing,
+    // or the replay would found standing the imaged body never had.
+    let orphan = AgenticLanguageWorldReturn::new(
+        "deed/never-emitted",
+        vec![MorphologicalLanguagePassage::new(
+            "orphan-observation",
+            "orphan-source",
+            93,
+            "A section returned for a deed the body never emitted.",
+        )],
+    );
+    assert!(cultivated
+        .receive_occurrence(AgenticLanguageOccurrence::WorldReturn(&orphan))
+        .is_err());
+    assert_eq!(
+        cultivated.history().len(),
+        before,
+        "a refused occurrence caused no standing and must leave no cause behind"
+    );
+    assert!(cultivated.rest_image().unwrap().remount_equal().unwrap());
+}
+
+#[test]
+fn remount_refuses_a_body_its_declared_causes_do_not_reproduce() {
+    // The falsifier, exercised rather than asserted: strike a cause out of an otherwise exact
+    // image and require the remount to REFUSE, naming the mismatch. Absent this control the
+    // equality above could hold for a `remount` that never compared anything.
+    let mut cultivated = body();
+    answer_with_return(
+        &mut cultivated,
+        "suffix-question",
+        "What did the suffix correction establish?",
+        "The returned event advances the suffix current.",
+    );
+    let image = cultivated.rest_image().unwrap();
+    assert!(image.remount_equal().unwrap());
+
+    let ablated = image.with_history_prefix(0);
+    assert!(
+        ablated.history().is_empty(),
+        "the ablated image declares no causes"
+    );
+    assert!(
+        matches!(
+            ablated.remount(),
+            Err(AgenticLanguageError::RestRemountMismatch)
+        ),
+        "an image whose causes do not reproduce its receipt must refuse to remount"
+    );
+    let (departed, reproduced) = ablated.remount_departed().unwrap();
+    assert!(!reproduced);
+    assert_ne!(
+        departed.rest_receipt().unwrap(),
+        *ablated.receipt(),
+        "the departed body is returned so the departure can be read, not only reported"
+    );
+}

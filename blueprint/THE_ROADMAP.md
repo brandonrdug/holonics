@@ -935,7 +935,7 @@ against the whole tree:**
 |---|---|---|---|
 | `crates/holonic-engine/src/kelvin.rs` | 642 | **0** | **0** |
 | `crates/holonic-engine/src/communication.rs` | 400 | **0** | **0** |
-| `soma/life/src/research_intelligence.rs` | 772 | **0**, out-degree 8 | **0** |
+| `soma/life/src/research_intelligence.rs` | 772 | **0**, out-degree 8 | **driven 2026-08-10** |
 | `soma/abi/src/cuda_execution.rs` | 273 | **0** | **0** |
 | `crates/holonic-engine/src/surprisal.rs` | 593 | **0** | **consumed** — `situated_residual.rs`, library path |
 | `crates/holonic-engine/src/temper.rs` | 597 | **0** | wired by the return join |
@@ -947,15 +947,28 @@ deposits did not state it, and this row is the correction. `surprisal` and `temp
 instance's joins rather than by a sweep, which is the intended order. **`kelvin` is still unreached**
 and is not on the instance line.
 
-**`research_intelligence.rs` is fully constructed and one call site short of reachable:**
-`agentic_research` emits `&LaboratorySourceAtlas`, which is precisely `research_intelligence::new`'s
-required input.
+**`research_intelligence.rs` was fully constructed and one call site short of reachable, and that
+call site now exists.** `soma/life/examples/eros_heterogeneous_research_world.rs` mounts the atlas,
+imports a real Codex rollout through `dialogue_lineage`, and drives all four receiver sections:
+repository inscriptions, visible dialogue, exact arithmetic monodromy, and real `cargo test`
+execution. **Measured 2026-08-10:** a control leader anchoring nothing returns 5,860 sections with
+the mathematics receipt **absent** and zero code receipts; an anchored arithmetic leader causes the
+quintic deed and receives its exact Euler product; a leader whose region is read off an actual user
+message reaches **14 dialogue sections and 2,551 repository sections in one return** with no fusion
+module; and `--with-code-deeds` returns two `cargo test` receipts with `success=true`.
+
+**Three defects were hiding behind its undrivenness**, two of them absolute frames — `execute_rust`
+shelling into `src/soma`, and `LaboratorySourceAtlas` mounting `src/soma/RESEARCH`/`PAPERS` and
+returning `theory_sections: 0` while looking healthy — and one brittle refusal, `dialogue_lineage`
+rejecting a 2.1 GB container because 466 of its 2,667 messages carry no provider `id`. Full
+statement in `canon/THE_HOLOBROCHOS_SPINE.md`.
 
 **And 107 of 225 library modules are touched by no driver**, concentrated where it is worst: **every
 large `soma/life` learning organ named in this project's capability record is undriven** —
 `agentic_language` and all six submodules, `relational_language` and all five, `text_material`,
-`laboratory_language`, `agentic_research`, `dialogue_lineage`. None of the 37 `eros_*` drivers
-reaches any of them; they run only under `#[cfg(test)]`. **26 of the 33 live `eros_*` drivers
+`laboratory_language`, `agentic_research`, `dialogue_lineage`. At the census none of the 37 `eros_*`
+drivers reached any of them; they ran only under `#[cfg(test)]`. **`dialogue_lineage`,
+`research_intelligence` and `laboratory_language` are driven as of 2026-08-10.** **26 of the 33 live `eros_*` drivers
 exercise the same seven-module membrane spine**, and **four drive no workspace module at all**
 (`eros_conformal_rebase_atlas`, `eros_precessing_chord_conic_transport`,
 `eros_transcendental_presentation_topology`, `radix_residue_character_transport`).
@@ -979,7 +992,8 @@ names no module at all. Resolved against an item-ownership index of 5,170 items:
 
 - `soma/` reaches **27** engine-side modules counting drivers and tests;
 - **6** are consumed by soma *library* code;
-- **3 of those 6** only by `research_intelligence`, which is dead. Delete that file and the
+- **3 of those 6** only by `research_intelligence`, which is **no longer dead** — deleting it is
+  withdrawn, and it is now the widest soma->engine seam in the tree. Without it the
   load-bearing soma→engine seam is **three modules** — `executor`, `receiver_exact_compression`,
   `receiver_current` — plus `world` through `exact_world`.
 - **Engine → soma is exactly zero.** No engine manifest names a soma crate; the whole `crates/` tree

@@ -50,6 +50,33 @@ pub struct LaboratorySourceAtlas {
     pub(super) receipt: LaboratoryAtlasReceipt,
 }
 
+/// Which roots beneath a repository this atlas mounts, and under which extensions.
+///
+/// **These are the caller's declaration, not the organ's.** They were authored inside
+/// `mount_repository_excluding` as `src/soma/RESEARCH`, `src/soma/PAPERS` and `src/soma` until
+/// 2026-08-10 — the archived laboratory's directory layout, which resolves to nothing in this
+/// body. The measured consequence was silent rather than loud: the atlas mounted `crates/` (which
+/// both layouts happen to share), reported **220 source files and 15,102 Rust sections**, and
+/// returned `theory_sections: 0` while the whole `soma/` tree and every research record went
+/// unseen. A blind atlas that returns a large number reads exactly like a working one.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct LaboratorySourceRoots {
+    /// Roots whose `md`/`typ` inscriptions become theory sections.
+    pub theory: Vec<PathBuf>,
+    /// Roots whose `rs` sources become code sections.
+    pub code: Vec<PathBuf>,
+}
+
+impl Default for LaboratorySourceRoots {
+    /// This body's layout.
+    fn default() -> Self {
+        Self {
+            theory: vec![PathBuf::from("research/records"), PathBuf::from("papers")],
+            code: vec![PathBuf::from("crates"), PathBuf::from("soma")],
+        }
+    }
+}
+
 impl LaboratorySourceAtlas {
     /// Mount every research/paper inscription and every Rust source beneath the repository's
     /// production roots. Build output, observations, and run artifacts are not source receivers.
@@ -66,19 +93,31 @@ impl LaboratorySourceAtlas {
         root: &Path,
         excluded_sources: &BTreeSet<String>,
     ) -> Result<Self, LaboratoryLanguageError> {
+        Self::mount_repository_roots(root, &LaboratorySourceRoots::default(), excluded_sources)
+    }
+
+    /// Mount the repository beneath roots the caller declares.
+    pub fn mount_repository_roots(
+        root: &Path,
+        roots: &LaboratorySourceRoots,
+        excluded_sources: &BTreeSet<String>,
+    ) -> Result<Self, LaboratoryLanguageError> {
+        if roots.theory.is_empty() && roots.code.is_empty() {
+            return Err(LaboratoryLanguageError::Io(
+                "an atlas mounted over no declared root receives nothing".to_owned(),
+            ));
+        }
         let mut theory_paths = Vec::new();
-        receive_paths(&root.join("src/soma/RESEARCH"), &["md"], &mut theory_paths)?;
-        receive_paths(
-            &root.join("src/soma/PAPERS"),
-            &["md", "typ"],
-            &mut theory_paths,
-        )?;
+        for relative in &roots.theory {
+            receive_paths(&root.join(relative), &["md", "typ"], &mut theory_paths)?;
+        }
         theory_paths.sort();
         theory_paths.dedup();
 
         let mut rust_paths = Vec::new();
-        receive_paths(&root.join("crates"), &["rs"], &mut rust_paths)?;
-        receive_paths(&root.join("src/soma"), &["rs"], &mut rust_paths)?;
+        for relative in &roots.code {
+            receive_paths(&root.join(relative), &["rs"], &mut rust_paths)?;
+        }
         rust_paths.retain(|path| !path.components().any(|part| part.as_os_str() == "target"));
         rust_paths.sort();
         rust_paths.dedup();

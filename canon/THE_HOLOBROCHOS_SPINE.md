@@ -426,7 +426,7 @@ column is what that census returned; `now` records what the instance's joins hav
 | `communication` | 400 | 0 | **0** |
 | `kelvin` | 642 | 0 | **0** |
 | `soma/abi::cuda_execution` | 273 | 0 | **0** |
-| `soma/life::research_intelligence` | 772 | 0 | **0** — out-degree 8, one call site short of reachable |
+| `soma/life::research_intelligence` | 772 | 0 | **driven 2026-08-10** — `eros_heterogeneous_research_world`; and it could not have run before, see below |
 | `surprisal` | 593 | 0 | **consumed on a library path** by `situated_residual.rs`, through `use crate::surprisal::{…}` at `:84` |
 | `temper` | 597 | 0 | wired by the return join — see `blueprint/THE_ROADMAP.md` |
 
@@ -445,13 +445,39 @@ glob-exported, so a file not naming `crate::surprisal` cannot reach it. This is 
 family `CLAUDE.md` §8 records: *a check whose material cannot vary the property under test is the
 same defect as a check that cannot fail; it just wears a passing result.*
 
-**107 of 225 library modules are touched by no driver.** Concentrated where it matters most: **every
-large `soma/life` learning organ named in this project's capability record is undriven** —
-`agentic_language` and all six submodules, `relational_language` and all five, `text_material`,
-`laboratory_language`, `agentic_research`, `dialogue_lineage`, `research_intelligence`. None of the
-37 `eros_*` drivers reaches any of them; they run only under `#[cfg(test)]`. Meanwhile **26 of the 33
-live `eros_*` drivers exercise the same seven-module membrane spine**, and **four drive no workspace
-module at all**.
+**107 of 225 library modules were touched by no driver at the census.** Concentrated where it
+mattered most: **every large `soma/life` learning organ named in this project's capability record
+was undriven** — `agentic_language` and all six submodules, `relational_language` and all five,
+`text_material`, `laboratory_language`, `agentic_research`, `dialogue_lineage`,
+`research_intelligence`. Meanwhile **26 of the 33 live `eros_*` drivers exercised the same
+seven-module membrane spine**, and **four drove no workspace module at all**.
+
+**The last two of that list were driven 2026-08-10 and the reason they were dead is the finding.**
+`eros_heterogeneous_research_world` reaches `research_intelligence` and `dialogue_lineage` together
+— it has to, since `ExactResearchWorld::new` requires an `ExactDialogueLineage` — and getting it to
+run surfaced **three defects that undrivenness had been hiding**:
+
+- **`research_intelligence::execute_rust` shelled cargo into `root.join("src/soma")`** — the
+  archived laboratory's directory layout, inside the one organ whose entire purpose is executing in
+  a foreign chart. No such path exists in this body. The code section of that world could not have
+  returned here at any commit.
+- **`LaboratorySourceAtlas::mount_repository_excluding` mounted `src/soma/RESEARCH`,
+  `src/soma/PAPERS` and `src/soma`** — the same layout, in an organ that *is* reached. It failed
+  **silently and impressively**: `crates/` is common to both layouts, so the atlas returned 220
+  source files and 15,102 Rust sections with `theory_sections: 0`, and the whole `soma/` tree plus
+  every research record went unseen. Declaring the roots as `LaboratorySourceRoots` took it to
+  **939 files, 61,317 theory sections, 26,822 Rust sections**. *A blind atlas that returns a large
+  number reads exactly like a working one.*
+- **`dialogue_lineage` refused a whole container over an absent provider `id`.** Measured on the
+  largest rollout on disk: **466 of 2,667** visible message records carry no `payload.id`, every one
+  of them real user or assistant text, and the membrane hard-refused all 2.1 GB on their account. An
+  absent identity is a condition of the container, not a corruption; the record address is exact and
+  already retained, so it founds one — typed `DialogueIdentitySpecies::FoundedFromRecordRange` and
+  counted in the receipt so a membrane coordinate is never mistaken for the container's.
+
+Two of the three are `CLAUDE.md` §0's second lesson — *no absolute frame in a lineage* — and the
+general statement is worth carrying: **an undriven organ is not merely unproven, it is unexposed.
+A module nothing runs is where an absolute frame goes to survive.**
 
 ### The seam, corrected
 
@@ -461,9 +487,10 @@ consumption names no module. Resolved against an item-ownership index:
 
 - `soma/` reaches **27** engine-side modules in total, counting drivers and tests;
 - **6** are consumed by soma *library* code;
-- **3 of those 6** are consumed only by `research_intelligence`, which is itself dead. Delete that one
-  file and the load-bearing soma→engine seam is **three modules**: `executor`,
-  `receiver_exact_compression`, `receiver_current` — plus `world` through `exact_world`.
+- **3 of those 6** are consumed only by `research_intelligence`. That was an argument for deleting
+  the file while it was dead; **it is now an argument for the opposite.** Driven, it is the widest
+  soma→engine seam in the tree, and the load-bearing remainder without it would be three modules:
+  `executor`, `receiver_exact_compression`, `receiver_current` — plus `world` through `exact_world`.
 - **Engine → soma is exactly zero.** No engine manifest names a soma crate; the entire `crates/` tree
   contains one reference to soma and it is a doc comment at `algebraic.rs:45`.
 
@@ -567,11 +594,75 @@ Full record:
 
 ## 7 · What this file does not claim
 
-- It does not claim `IT ⊕ GR`, any field-equation form, or any spectral reading of the primes.
-  Those are `HUNCH`/`OPEN` at source and are barred by §2 from carrying construction.
+- **`IT ⊕ GR` is Brandon's own thesis and is ratified as the framework's statement of itself
+  (2026-08-10); the speculative apparatus that historically travelled with it is not.** This line
+  read *"It does not claim `IT ⊕ GR`"* until that date, which conflated two different things. What
+  he ratified: *"holonics… is the unification of Information Theory and General Relativity, which is
+  the unification of pure mathematics and physics through computer science"*, with "computer
+  science" meaning **the science of arbitrary dynamic logic systems** and not machines. What remains
+  barred by §2, unchanged: the field-equation forms, the four bridges, the friction/prism/whip
+  images, and every spectral reading of the primes. Those are `HUNCH`/`OPEN` at source and may not
+  carry a construction. **The umbrella is his; the apparatus still needs its own typed hypotheses.**
+  And he states the conduct rule himself — raising the framing usually costs the conversation, so do
+  not litigate it: grade the checkable statements and leave the umbrella alone.
 - It does not claim §4. That section is `interpretation` and earns its place only by §5.
 - It does not supersede `papers/source/synopsis/` or `papers/source/holonics/registry.typ`, which are
   the current authority for pure-holonics and RH scope, nor `canon/THE_RECOVERED_LAW.md` on
   jurisdiction, nor `canon/EPISTEMIC_GRADES.md` on grading.
 - It is not a schedule. `blueprint/THE_ROADMAP.md` is ordered by it and remains the only statement of
   what is open.
+
+---
+
+## 8 · The notation station, and the one law that reaches the apparatus
+
+**Added 2026-08-10.** Every station above describes a flow; this one describes the instrument used to
+*state* a flow, and it exists because Brandon named the lack as the blocker:
+
+> *"The framework is not only a computationally implemented theory that runs as software, but it is
+> also a real framework that acts as a toolkit for you to think with… The synopses and notation
+> foundations will enable you to efficiently reason about the parallel hardware surfaces and
+> inner-networking of the machine."*
+
+The deposits are enumerated in `CLAUDE.md` §0b with their registry ids. Three of them are spine
+business rather than tablet business, because they change what a station can say:
+
+**The limit is receiver-indexed (`H.0262`).** A flow that "converges" now has to say *at which
+receiver*, and disagreement between two receivers is an obstruction with an exhibited witness rather
+than a paradox. Every station that reports a settled state inherits this obligation.
+
+**Loss is non-commutation (`H.0420`).** Exact compression is commutativity of the receiver square, so
+loss is its failure and is witnessed by a collapsed pair; a scalar loss is one receiver's face of the
+residual. This gives §1's cut list its measurement: a body that emits and does not return is at a
+named cut, and *which* cut is a question about which square fails to commute.
+
+**Flux locality is the parallelization license (`H.0219`), and it is the only law here that reaches
+the apparatus.**
+
+```text
+A computation over a partition decouples exactly to the extent that its terms are
+boundary fluxes.  Every term that is not a flux is a barrier.
+```
+
+This is the divergence theorem read as an architecture statement, and it supplies the spine's missing
+edge to the hardware surface:
+
+- **`∂` is the whole inter-channel protocol.** An interior speaks to the rest only through its
+  boundary, which is why a front of co-present events can be enacted wide at all.
+- **Kirchhoff is the no-storage special case.** Conservation is `∂ρ/∂t + ∇·J = s`; a capacitor is a
+  node with storage, and instantaneous balance is a declared regime rather than a law. This is §1's
+  chain law `q_{k+1} − q_k + B j_k = r_k` in continuum dress, and it is why *the residual can be
+  stored* is already the spine's sentence.
+- **A global constraint is the barrier, and it is the one to look for.** Incompressibility is a
+  statement about the domain rather than any cell, so the pressure it forces is an elliptic solve
+  with globally supported Green's function: advection and diffusion parallelize, the projection does
+  not. **A system admitting no local quotient must couple globally** (`H.0420`), so the barrier is
+  always where the compression fails to be local.
+- **It licenses a decomposition and never a schedule.** Whether co-present events may be enacted in
+  any order is a property of the material and must be proved for it. This is the standing bar on
+  reading a front as parallel because its geometry looks parallel.
+
+**Consequence for every organ on the spine:** an organ's place in the apparatus is decided by one
+question — *is its coupling a boundary flux, or a global constraint?* The first parallelizes over any
+partition; the second is a barrier and must be named as one. An organ whose coupling has never been
+classified has not been sited on the spine, whatever station names it.

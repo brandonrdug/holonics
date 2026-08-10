@@ -706,13 +706,20 @@ fn execute_quintic(spec: &ExactQuinticResearchSpec) -> Result<ExactQuinticResear
     })
 }
 
+/// Enact one code deed by executing the named test in the caller's declared workspace.
+///
+/// `root` is the **cargo workspace root**, used verbatim. It was `root.join("src/soma")` until
+/// 2026-08-10 — the archived laboratory's directory layout folded into the world executor, so the
+/// deed resolved to a path that does not exist in this body and the code section of this world
+/// could never return. That is `CLAUDE.md` §0's second lesson (*no absolute frame in a lineage*)
+/// living inside the one organ whose whole purpose is executing in a foreign chart.
 fn execute_rust(
     root: &Path,
     spec: &RustVerificationSpec,
 ) -> Result<RustVerificationReceipt, String> {
     let started = Instant::now();
     let output = Command::new("cargo")
-        .current_dir(root.join("src/soma"))
+        .current_dir(root)
         .env("CARGO_TERM_COLOR", "never")
         .args([
             "test",

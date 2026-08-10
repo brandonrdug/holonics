@@ -120,8 +120,9 @@ ignored**, summed across 42 `test result:` lines, never through a pipe.
 **The seam, correctly measured.** `crates/holonic-engine/src/lib.rs` carries **60 `pub use
 <module>::*;`** lines, so most consumption names no module and a bare-path grep undercounts. Resolved
 against an item-ownership index: `soma/` reaches **27** engine modules in total, **6** from soma
-library code, and **3 of those 6 only through `research_intelligence`, which is itself dead** — so the
-load-bearing seam is **three modules** plus `world`. **Engine → soma is exactly zero**; the whole
+library code, and **3 of those 6 only through `research_intelligence`, which was itself dead at the census and is
+driven as of 2026-08-10** — so without it the load-bearing seam is **three modules** plus `world`,
+and with it `research_intelligence` is the widest soma->engine seam in the tree. **Engine → soma is exactly zero**; the whole
 `crates/` tree holds one reference to soma and it is a doc comment at `algebraic.rs:45`.
 
 **Read the currency stamp, not just the date.** This record was written while other work was
@@ -312,14 +313,18 @@ split-impl files, 3,657 edges — rather than by grep:
 - **107 of 225 library modules are touched by no driver.**
 - **In-degree zero from everything**, each verified by grepping every public type it defines against
   the whole tree: `kelvin` (642 lines), `communication` (400), `soma/abi::cuda_execution` (273),
-  `soma/life::research_intelligence` (772, out-degree 8, one call site short of reachable).
+  `soma/life::research_intelligence` (772, out-degree 8, one call site short of reachable —
+  **that call site was built 2026-08-10** and the module is driven).
   `surprisal` and `temper` were on this list and were wired **by the instance's joins rather than by
   a sweep**, which is the intended order. **`kelvin` is still unreached and is not on the active
   line**; it gets a driver or removal on its own terms.
 - **Every large `soma/life` learning organ named in the capability record is undriven** —
   `agentic_language` and all six submodules, `relational_language` and all five, `text_material`
-  (until `e429c22`), `laboratory_language`, `agentic_research`, `dialogue_lineage`. They run only
-  under `#[cfg(test)]`. **26 of 33 live `eros_*` drivers exercise the same seven-module membrane
+  (until `e429c22`), `laboratory_language`, `agentic_research`, `dialogue_lineage`. They ran only
+  under `#[cfg(test)]`; `agentic_language`, `relational_language`, `laboratory_language`,
+  `dialogue_lineage` and `research_intelligence` are driven as of 2026-08-10, and driving the last
+  two exposed **two absolute frames and one brittle refusal** that had survived precisely because
+  nothing ran them (`canon/THE_HOLOBROCHOS_SPINE.md`). **26 of 33 live `eros_*` drivers exercise the same seven-module membrane
   spine**, and four drive no workspace module at all.
 - **The engine is a strict DAG.** Zero cycles at module granularity across `holonic-engine`,
   `holonic-structure`, `relational-geometry`, `holonic-language`. Every closed cycle in the workspace

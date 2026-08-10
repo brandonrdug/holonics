@@ -26,7 +26,7 @@ use crate::{
 
 mod repository;
 
-pub use repository::{LaboratoryAtlasReceipt, LaboratorySourceAtlas};
+pub use repository::{LaboratoryAtlasReceipt, LaboratorySourceAtlas, LaboratorySourceRoots};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum LaboratoryLanguageError {

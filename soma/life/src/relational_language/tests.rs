@@ -932,3 +932,132 @@ fn paired_receiver_current_resumes_the_unreturned_direction_without_new_ids() {
         Some(&[forward, reverse])
     );
 }
+
+// -------------------------------------------------------------------------------------------------
+// The clause-pair characteristic delay, and its orbit.
+//
+// `characteristic_delay: 1` was pinned at both promotion sites by this ecology — the law's ONLY
+// caller — while `ExactReceiverCurrentLaw` accepts any positive `u64`. Every current reading ever
+// taken through this organ was therefore taken in one frame, which is `CLAUDE.md` §8's condition
+// for a reading that cannot be falsified.
+//
+// A lifted level that moves nothing is bookkeeping. These tests require the orbit.
+// -------------------------------------------------------------------------------------------------
+
+/// One source stating four clauses far apart on its strand, so a separation exists to read.
+fn separated_strand() -> Vec<MorphologicalLanguagePassage> {
+    vec![MorphologicalLanguagePassage::new(
+        "strand",
+        "strand-source",
+        1,
+        "Alpha carries nexus. Beta holds nexus. Gamma retains nexus. Delta preserves nexus.",
+    )]
+}
+
+#[test]
+fn the_uniform_frame_is_the_frame_every_prior_reading_was_taken_in() {
+    let ecology = ExactRelationalLanguageEcology::condition(&separated_strand()).unwrap();
+    assert_eq!(
+        ecology.characteristic_delay_law(),
+        ClausePairDelayLaw::Uniform,
+        "the default must not move, or every standing reading silently changes frame"
+    );
+    for passage in ecology.receiver_current.passages() {
+        assert_eq!(passage.characteristic_delay, 1);
+    }
+}
+
+#[test]
+fn source_continuity_separates_clause_pairs_the_uniform_frame_superposed() {
+    let uniform = ExactRelationalLanguageEcology::condition(&separated_strand()).unwrap();
+    let continuity = ExactRelationalLanguageEcology::condition_with_delay_law(
+        &separated_strand(),
+        1,
+        ClausePairDelayLaw::SourceContinuity,
+    )
+    .unwrap();
+
+    // Same material, same promoted pairs: only the term differs.
+    assert_eq!(
+        uniform.current_passages.len(),
+        continuity.current_passages.len(),
+        "changing the delay term must not change WHICH pairs conduct"
+    );
+    assert!(
+        uniform.current_passages.len() > 0,
+        "a frame comparison over zero passages is vacuous"
+    );
+
+    let uniform_delays: Vec<u64> = uniform
+        .receiver_current
+        .passages()
+        .map(|passage| passage.characteristic_delay)
+        .collect();
+    let continuity_delays: Vec<u64> = continuity
+        .receiver_current
+        .passages()
+        .map(|passage| passage.characteristic_delay)
+        .collect();
+
+    // THE ORBIT. Under the uniform term every passage carries 1, so the frame cannot tell any two
+    // pairs apart. Under source continuity the source's own statement order separates them.
+    assert!(uniform_delays.iter().all(|delay| *delay == 1));
+    assert!(
+        continuity_delays.iter().any(|delay| *delay > 1),
+        "source continuity returned the uniform frame's delays: the term is inert on this \
+         material and the comparison establishes nothing"
+    );
+    let distinct: BTreeSet<u64> = continuity_delays.iter().copied().collect();
+    assert!(
+        distinct.len() > 1,
+        "the second frame must DISTINGUISH pairs the first superposed, not merely rescale them"
+    );
+}
+
+#[test]
+fn a_pair_crossing_sources_carries_the_extent_of_the_strand_it_leaves() {
+    // Across sources there is no separation defined in the material — nothing in either source
+    // measures the distance to the other — so the term reads the extent of the strand being left.
+    // It is therefore ASYMMETRIC, and the two directions of one pair are computed separately.
+    //
+    // A cross-source pair is promoted only on an exact object-to-subject contact, so the long
+    // strand ends on the short strand's subject.
+    let crossing = vec![
+        MorphologicalLanguagePassage::new(
+            "long",
+            "long-source",
+            1,
+            "Alpha carries beta. Beta holds gamma. Gamma retains delta. Delta preserves epsilon.",
+        ),
+        MorphologicalLanguagePassage::new("short", "short-source", 2, "Epsilon receives nexus."),
+    ];
+    let continuity = ExactRelationalLanguageEcology::condition_with_delay_law(
+        &crossing,
+        1,
+        ClausePairDelayLaw::SourceContinuity,
+    )
+    .unwrap();
+
+    let mut crossed_directions = Vec::new();
+    for (pair, _) in continuity.current_passages.iter() {
+        let (left, right) = *pair;
+        if continuity.clauses[left].source == continuity.clauses[right].source {
+            continue;
+        }
+        crossed_directions.push((
+            continuity.pair_characteristic_delay(left, right).unwrap(),
+            continuity.pair_characteristic_delay(right, left).unwrap(),
+        ));
+    }
+    assert!(
+        !crossed_directions.is_empty(),
+        "the fixture founded no cross-source pair, so the asymmetry is untested"
+    );
+    assert!(
+        crossed_directions
+            .iter()
+            .any(|(forward, reverse)| forward != reverse),
+        "leaving a four-clause strand and leaving a one-clause strand must not cost the same; \
+         a symmetric return here means the direction was copied rather than computed"
+    );
+}

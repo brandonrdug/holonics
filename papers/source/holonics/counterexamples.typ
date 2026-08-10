@@ -218,4 +218,46 @@
     ],
     source: [Elementary cardinality and semantic-boundary argument.],
   ),
+  entry(
+    id: "C.0009",
+    kind: "Counterexample",
+    grade: "counterexample",
+    title: [Convergence at one receiver does not transport to another],
+    depends: ("H.0262", "H.0264"),
+    statement: [
+      Let $X$ be the rectifiable paths in the unit square from $(0,0)$ to
+      $(1,1)$, let $s_n$ be the staircase of $2 n$ alternating axis-parallel
+      segments, and let $D$ be the diagonal. Let $q_"pos"$ return the image in
+      the Hausdorff metric and $q_"len"$ the arc length. Then
+      $
+        q_"pos" (s_n) arrow.r q_"pos" (D),
+        quad
+        q_"len" (s_n)=2 " for every " n,
+        quad
+        q_"len" (D)=sqrt(2).
+      $
+      So $s_n arrow.r_"pos" D$ and $s_n arrow.r.not_"len" D$.
+    ],
+    derivation: [
+      Hausdorff distance from $s_n$ to $D$ is at most $1\/n$. The horizontal
+      displacements of $s_n$ sum to $1$ and the vertical displacements sum to
+      $1$, with no segment traversed backward, so the length is $2$ regardless of
+      $n$ and of the step sizes. By Golab's semicontinuity theorem the failure is
+      one-sided: $cal(H)^1(K) <= liminf cal(H)^1 (K_n)$ for compact connected
+      $K_n arrow.r K$, and here $sqrt(2) <= 2$ strictly.
+    ],
+    transformations: [
+      Both returns are exact at their declared receivers. The classical paradox
+      is produced entirely by the unindexed word "converges", and by H.0264 the
+      disagreement witnesses that arc length does not factor continuously through
+      the image.
+    ],
+    boundary: [
+      This is not a defect of the limit, of the staircase, or of arc length, and
+      it establishes no general one-sidedness law: Golab requires compact
+      connected sets, and another receiver may fail in the other direction or in
+      neither.
+    ],
+    source: [Classical; Golab semicontinuity. Cited to this project by Brandon, 2026-08-10.],
+  ),
 )

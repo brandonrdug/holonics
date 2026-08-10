@@ -494,4 +494,51 @@
       classification of $Pi^0_1$ sentences.
     ],
   ),
+  entry(
+    id: "H.0420",
+    kind: "Theorem",
+    grade: "proved-derived",
+    title: [Loss is non-commutation; recovery adjoins a channel; the three species differ only by remainder],
+    depends: ("H.0012", "H.0016", "H.0104", "H.0210", "H.0219", "H.0411"),
+    statement: [
+      For a compression $q:X arrow.r Q$ and receiver $rho:X arrow.r Y$, H.0016's
+      factorization $rho=overline(rho) compose q$ *is* commutativity of the
+      receiver square, so loss is its failure and is witnessed by a pair
+      $
+        q(x)=q(x') " and " rho(x) != rho(x').
+      $
+      Where $Y$ admits subtraction, the residual
+      $r=rho(x)-overline(rho)(q(x))$ measures the failure and is a holonomy of
+      the square (H.0210). For a further declared receiver $s:X arrow.r S$,
+      $(q,s)$ is injective exactly when $s$ separates every fibre of $q$; and if
+      $q$ is not injective, no left inverse $Q arrow.r X$ exists at all.
+    ],
+    derivation: [
+      The factorization is the universal property of the quotient. A left
+      inverse would force injectivity. Separation of fibres is exactly
+      injectivity of the pair.
+    ],
+    transformations: [
+      Three species of change of form differ only in what remainder they carry,
+      and the corpus already types all three: *rebase* (H.0104) is an invertible
+      conjugacy with **zero** remainder; *condensation* replaces a far population
+      by a compact realizer with a **certified** remainder; *compression*
+      (H.0016) is a quotient whose remainder is the collapsed population,
+      **relative to a declared family**. Recovery of a "lossy" transformation is
+      therefore never recovery from the image: it is recovery from image
+      $xor$ channel, and the channel is purchased. A classical loss
+      function is one receiver's scalar face of the residual and never the
+      residual itself. A system admitting no local quotient must couple globally
+      -- which is H.0219's barrier, and why an incompressibility constraint
+      forces a nonlocal solve.
+    ],
+    boundary: [
+      This does not make loss unreal; it makes it relative to a declared family
+      and makes recovery a purchase with a stated price. Between bare sets there
+      is no residual and no holonomy -- only the presence or absence of a filler
+      -- and reading curvature into a set-level failure is an overreach. Nothing
+      here supplies a family, a channel, or a constraint.
+    ],
+    source: [Universal property of the quotient; the identification and the trichotomy are the laboratory's.],
+  ),
 )

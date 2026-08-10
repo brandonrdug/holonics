@@ -42,10 +42,31 @@ pub enum DialoguePhase {
     Other(String),
 }
 
+/// Where an occurrence's identity came from.
+///
+/// A container may or may not supply one. When it does not, the occurrence still has an exact,
+/// reproducible address — the raw record range this membrane already computes and already retains
+/// — so the identity is **founded** from it rather than the container being refused whole.
+///
+/// The species is carried because the two are not the same testimony and must never be conflated:
+/// a supplied identity is the container's coordinate, a founded one is this membrane's. Measured
+/// 2026-08-10 on the largest rollout on disk: **466 of 2,667** visible message records carry no
+/// `id`, and every one of them is real user or assistant text. Refusing on their account deleted a
+/// 2.1 GB container to protect a coordinate that is testimony rather than content.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum DialogueIdentitySpecies {
+    /// The container supplied `payload.id`.
+    Supplied,
+    /// The container supplied none; the identity is this membrane's own record address.
+    FoundedFromRecordRange,
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct DialogueLineageOccurrence {
     pub ordinal: u64,
     pub identity: String,
+    pub identity_species: DialogueIdentitySpecies,
     pub turn: String,
     pub timestamp: String,
     pub speaker: DialogueSpeaker,
@@ -116,6 +137,10 @@ pub struct CodexDialogueLineageReceipt {
     pub assistant_final_occurrences: usize,
     pub assistant_other_occurrences: usize,
     pub excluded_control_occurrences: usize,
+    /// Visible occurrences whose identity this membrane founded from its own record address
+    /// because the container supplied none. Never silent: an identity that is this membrane's
+    /// coordinate rather than the container's is counted here and typed on every occurrence.
+    pub founded_identity_occurrences: usize,
     pub through_occurrence: Option<String>,
 }
 
@@ -145,6 +170,7 @@ impl ExactDialogueLineage {
         let mut prefix = Sha256::new();
         let mut occurrences = Vec::new();
         let mut excluded_control_occurrences = 0usize;
+        let mut founded_identities = 0usize;
         let mut reached_boundary = spec.through_occurrence.is_none();
         loop {
             raw.clear();
@@ -182,6 +208,23 @@ impl ExactDialogueLineage {
                         } => {
                             let ordinal = u64::try_from(occurrences.len())
                                 .map_err(|_| "dialogue occurrence extent".to_owned())?;
+                            // The record address is exact, reproducible, and already retained on
+                            // the occurrence below, so it founds an identity when the container
+                            // supplies none. The species is carried beside it.
+                            let (identity, identity_species) = match identity {
+                                Some(supplied) => {
+                                    (supplied, DialogueIdentitySpecies::Supplied)
+                                }
+                                None => {
+                                    founded_identities = founded_identities
+                                        .checked_add(1)
+                                        .ok_or_else(|| "founded identity extent".to_owned())?;
+                                    (
+                                        format!("codex-record/{record}/{raw_at}-{raw_end}"),
+                                        DialogueIdentitySpecies::FoundedFromRecordRange,
+                                    )
+                                }
+                            };
                             let is_boundary = spec
                                 .through_occurrence
                                 .as_deref()
@@ -189,6 +232,7 @@ impl ExactDialogueLineage {
                             occurrences.push(DialogueLineageOccurrence {
                                 ordinal,
                                 identity,
+                                identity_species,
                                 turn,
                                 timestamp,
                                 speaker,
@@ -259,6 +303,7 @@ impl ExactDialogueLineage {
             assistant_final_occurrences,
             assistant_other_occurrences,
             excluded_control_occurrences,
+            founded_identity_occurrences: founded_identities,
             through_occurrence: spec.through_occurrence.clone(),
         };
         Ok(Self {
@@ -286,7 +331,8 @@ impl ExactDialogueLineage {
 enum VisibleMessage {
     Control,
     Dialogue {
-        identity: String,
+        /// `None` when the container supplied no `payload.id`.
+        identity: Option<String>,
         turn: String,
         timestamp: String,
         speaker: DialogueSpeaker,
@@ -323,11 +369,12 @@ fn visible_message(
     if phase == DialoguePhase::Commentary && !include_commentary {
         return Ok(None);
     }
+    // An absent `id` is a condition of the container, not a corruption of it. It is returned as
+    // `None` and founded from the record address at the push site, where the address is known.
     let identity = payload
         .get("id")
         .and_then(Value::as_str)
-        .ok_or_else(|| "visible dialogue message has no identity".to_owned())?
-        .to_owned();
+        .map(str::to_owned);
     let turn = payload
         .get("internal_chat_message_metadata_passthrough")
         .and_then(|metadata| metadata.get("turn_id"))
@@ -494,6 +541,55 @@ mod tests {
             Some("assistant-2")
         );
         assert_eq!(lineage.passages()[0].text, "How does current return?");
+        std::fs::remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn a_container_supplying_no_identity_founds_one_from_the_record_address() {
+        // Measured on the largest rollout on disk: 466 of 2,667 visible message records carry no
+        // `payload.id`. The membrane refused the whole 2.1 GB container on their account until
+        // 2026-08-10. An absent identity is a condition of the container, not a corruption, and
+        // the record address is exact and already retained.
+        let path = temporary();
+        let material = concat!(
+            "{\"timestamp\":\"t0\",\"type\":\"response_item\",\"payload\":{\"type\":\"message\",\"role\":\"user\",\"id\":\"user-1\",\"content\":[{\"type\":\"input_text\",\"text\":\"How does current return?\"}]}}\n",
+            "{\"timestamp\":\"t1\",\"type\":\"response_item\",\"payload\":{\"type\":\"message\",\"role\":\"assistant\",\"phase\":\"final_answer\",\"content\":[{\"type\":\"output_text\",\"text\":\"The returned current changes standing.\"}]}}\n",
+            "{\"timestamp\":\"t2\",\"type\":\"response_item\",\"payload\":{\"type\":\"message\",\"role\":\"user\",\"content\":[{\"type\":\"input_text\",\"text\":\"Apply that correction.\"}]}}\n"
+        );
+        std::fs::write(&path, material).unwrap();
+        let lineage =
+            ExactDialogueLineage::import_codex_rollout(&path, &CodexDialogueImportSpec::default())
+                .unwrap();
+
+        assert_eq!(lineage.occurrences.len(), 3);
+        assert_eq!(lineage.receipt.founded_identity_occurrences, 2);
+        assert_eq!(
+            lineage.occurrences[0].identity_species,
+            DialogueIdentitySpecies::Supplied
+        );
+        assert_eq!(lineage.occurrences[0].identity, "user-1");
+        for founded in &lineage.occurrences[1..] {
+            assert_eq!(
+                founded.identity_species,
+                DialogueIdentitySpecies::FoundedFromRecordRange
+            );
+            // The founded identity IS the record address, so it is reproducible from the container.
+            assert_eq!(
+                founded.identity,
+                format!(
+                    "codex-record/{}/{}-{}",
+                    founded.raw_record, founded.raw_range.start, founded.raw_range.end
+                )
+            );
+        }
+        // Distinct records found distinct identities, so chronology and address remain exact.
+        assert_ne!(lineage.occurrences[1].identity, lineage.occurrences[2].identity);
+        assert_eq!(
+            lineage.occurrences[2].addressed.as_deref(),
+            Some(lineage.occurrences[1].identity.as_str()),
+            "a founded identity carries the addressed lineage exactly as a supplied one does"
+        );
+        assert_eq!(lineage.passages()[2].text, "Apply that correction.");
         std::fs::remove_file(path).unwrap();
     }
 }

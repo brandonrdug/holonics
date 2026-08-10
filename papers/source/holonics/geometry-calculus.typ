@@ -618,4 +618,167 @@
     ],
     source: [Finite-difference inclusion--exclusion and standard connection curvature.],
   ),
+  entry(
+    id: "H.0216",
+    kind: "Identity",
+    grade: "proved-standard",
+    title: [The cosine cross term, the interference cross term, and the vertex are one term],
+    depends: ("H.0201", "H.0212"),
+    statement: [
+      $
+        c^2=a^2+b^2-2 a b cos gamma
+          =(a-b e^(i gamma))(a-b e^(-i gamma))
+          =abs(a-b e^(i gamma))^2,
+      $
+      and
+      $
+        abs(alpha_1+alpha_2)^2
+        =abs(alpha_1)^2+abs(alpha_2)^2+2 op("Re")(alpha_1 overline(alpha_2)).
+      $
+      Setting $alpha_1=a$ and $alpha_2=-b e^(i gamma)$ carries the second to the
+      first term by term, with
+      $2 op("Re")(alpha_1 overline(alpha_2))=-2 a b cos gamma$ the single cross
+      term of both.
+    ],
+    derivation: [
+      Expand the conjugate product and apply
+      $e^(i gamma)+e^(-i gamma)=2cos gamma$ (H.0212). Expand
+      $abs(alpha_1+alpha_2)^2=(alpha_1+alpha_2)overline((alpha_1+alpha_2))$ and
+      pair the two conjugate mixed terms.
+    ],
+    transformations: [
+      Pythagoras is this identity with the relation switched off: at
+      $gamma=pi\/2$ the cross term vanishes and the two legs return nothing about
+      each other. A three-line vertex $A,B arrow.r C$ states that $C$ is returned
+      *in the frame of* ${A,B}$, and the term depending on both is exactly the
+      term depending on their relative turn. At $gamma=pi\/2$ the factorization is
+      the Gaussian norm, so an odd prime that is the hypotenuse of a primitive
+      integer right triangle splits in $ZZ[i]$ and is $1 mod 4$.
+    ],
+    boundary: [
+      An identity of carried magnitudes across one turn. It does not assert that
+      an ecology's relating is metric, that its returns are complex scalars, or
+      that a diagram of an interaction is a Feynman diagram with a propagator,
+      coupling, or perturbative expansion. In curved ambient geometry the
+      composition law differs and recovers this only to first nonconstant order.
+    ],
+    source: [Classical; the identification is the laboratory's, 2026-06-14 onward.],
+  ),
+  entry(
+    id: "H.0217",
+    kind: "Boundary",
+    grade: "proved-derived",
+    title: [The squared modulus is the quotient, and the deletion is what makes it one],
+    depends: ("H.0216", "H.0019"),
+    statement: [
+      For $alpha in CC$, $abs(alpha)^2=alpha overline(alpha)$ retains the
+      magnitude and discards the argument. The map
+      $
+        CC arrow.r RR_(&gt;=0), quad alpha |-> abs(alpha)^2
+      $
+      is therefore a quotient by the phase circle $U(1)$, and its fibers are the
+      orbits of that action.
+    ],
+    derivation: [
+      $abs(e^(i theta)alpha)^2=abs(alpha)^2$ for every $theta$, so the map is
+      constant on $U(1)$-orbits; conversely equal moduli give
+      $alpha'=e^(i theta)alpha$ for some $theta$. The fibers are exactly the
+      orbits.
+    ],
+    transformations: [
+      Two consequences that are usually stated as opposites are one statement.
+      *The modulus destroys information*: two routes to one consequence add as
+      amplitudes and not as counts, so by H.0216 a magnitude census cannot
+      distinguish reinforcement from cancellation -- the cross term is precisely
+      what the quotient discards. *And that destruction is what makes the return a
+      probability*: a probability is a receiver quotient (H.0019), and this is the
+      quotient map. The same deletion appears at other carriers -- a truncated
+      binary expansion discards the tail, a bare sign discards the turn -- and the
+      phase is its fourth.
+    ],
+    boundary: [
+      This says nothing about which quotient any application should take, and
+      does not assert that a physical Born rule follows from the algebra. It also
+      does not license reading $abs(dot)$ as harmless: outside a declared
+      quotient, taking a modulus is a loss with no receipt.
+    ],
+    source: [Elementary; the reading joins H.0019's quotient to H.0216's cross term.],
+  ),
+  entry(
+    id: "H.0218",
+    kind: "Theorem",
+    grade: "proved-standard",
+    title: [Divergence, continuity with storage, and Kirchhoff as a special case],
+    depends: ("H.0204", "H.0205", "H.0207", "H.0208"),
+    statement: [
+      For compact $V$ with piecewise-smooth boundary and $C^1$ field $F$,
+      $
+        integral_V nabla dot F dif v = integral.cont_(partial V) F dot n dif a.
+      $
+      Conservation is the continuity relation
+      $(partial rho)/(partial t)+nabla dot J=s$, whose discrete form is
+      $q_(k+1)-q_k+B j_k=r_k$ with $B$ the oriented incidence. Kirchhoff's
+      current law is the case $(partial rho)/(partial t)=0$.
+    ],
+    derivation: [
+      The divergence theorem is generalized Stokes for the $(n-1)$-form
+      $iota_F dif v$, i.e. H.0208 at top degree; continuity is its integral form
+      on a fixed region, and the discrete statement is the chain law over the
+      incidence complex.
+    ],
+    transformations: [
+      Instantaneous balance is a declared regime, not a law: a node with
+      $(partial rho)/(partial t) != 0$ stores, and a capacitor is exactly such a
+      node. The general statement is the telescoping identity over orders of
+      time, and the boundary pairing is the only channel through which an
+      interior speaks.
+    ],
+    boundary: [
+      Requires the stated regularity and fails for non-integrable divergence. A
+      discrete complex must supply its own incidence rather than inherit one.
+    ],
+    source: [Classical vector calculus; the storage reading is the spine's chain law.],
+  ),
+  entry(
+    id: "H.0219",
+    kind: "Boundary",
+    grade: "proved-derived",
+    title: [Flux locality licenses a decomposition; a global constraint is a barrier],
+    depends: ("H.0207", "H.0218"),
+    statement: [
+      Partition a region into subdomains. By H.0218 the coupling between a
+      subdomain and its complement is entirely the flux through its boundary, so
+      a computation over the partition decouples exactly to the extent that its
+      terms are boundary fluxes; every term that is not a flux is a barrier. For
+      a discrete transport operator ordered as interior and interface,
+      $
+        S=M_(partial partial)-M_(partial I)M_(I I)^(-1)M_(I partial),
+      $
+      where $M_(I I)$ is block diagonal over subdomains, so interior
+      eliminations are independent and the interface solve is the only meeting.
+    ],
+    derivation: [
+      Block elimination gives $S$; $M_(I I)$ is block diagonal because any
+      interior--interior coupling across subdomains would lie on no interface,
+      and the partition places every such term on the interface.
+    ],
+    transformations: [
+      In incompressible flow, advection and diffusion are local stencils while
+      $nabla dot u=0$ determines the pressure through an elliptic solve whose
+      Green's function has global support: the projection is the barrier, and it
+      is one because incompressibility is a statement about the domain rather
+      than about any cell. The chart-transport weight is the Jacobian of H.0207,
+      and the weight under which transport is unitary with no preferred measure
+      is its square root.
+    ],
+    boundary: [
+      A statement about coupling, never about cost: it says which terms need no
+      communication, not that evaluating them is faster, that the interface solve
+      is cheap, or that a partition is balanced. Load, latency and residency are
+      apparatus testimony belonging to a measured receipt. It licenses a
+      decomposition and *not* a schedule -- interchange of co-present events must
+      be proved for the material at hand.
+    ],
+    source: [Classical domain decomposition; the barrier reading is the laboratory's.],
+  ),
 )

@@ -40,6 +40,26 @@ pub struct ExactRelationalLanguageEcology {
     pub(super) predicate_lexicon: LocalSet<String>,
     pub(super) passage_identities: GrowingKeyAtlas<String, RelationalPassageStanding>,
     pub(super) next_passage_order: u64,
+    /// Which term plays a promoted clause pair's characteristic delay. `Uniform` is the frame every
+    /// reading before 2026-08-10 was taken in, and it stays the default so no standing reading
+    /// silently moves; `SourceContinuity` is the second frame that makes any of them falsifiable.
+    pub(super) characteristic_delay_law: ClausePairDelayLaw,
+}
+
+/// What plays a promoted clause pair's positive characteristic delay.
+///
+/// This exists because `characteristic_delay: 1` was pinned at both promotion sites, and a level
+/// pinned by its only caller rather than by its law is `CLAUDE.md` §8's authored level: *"we are
+/// not the ones meant to be pinning levels to minimums and maximums."* Two frames is the minimum
+/// at which a delay reading can be checked at all.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
+pub enum ClausePairDelayLaw {
+    /// Every promoted pair carries delay one.
+    #[default]
+    Uniform,
+    /// One plus the separation between the two clauses' serial positions on their source's clause
+    /// strand; across sources, one plus the extent of the strand being left.
+    SourceContinuity,
 }
 
 impl fmt::Debug for ExactRelationalLanguageEcology {
@@ -74,6 +94,27 @@ impl ExactRelationalLanguageEcology {
     ) -> Result<Self, RelationalLanguageError> {
         let mut host = ParallelHostLiveCurrentExecutor::new(worker_threads.max(1));
         Self::condition_with_executor(passages, worker_threads, &mut host)
+    }
+
+    /// Condition one organ under a declared clause-pair delay law.
+    ///
+    /// Pairs are promoted **during** conditioning, and a promoted pair refuses a conflicting
+    /// re-founding, so the law has to be declared before the material arrives. This is the
+    /// constructor a caller comparing two frames uses; there is no way to move a standing organ
+    /// from one frame to the other, and there should not be.
+    pub fn condition_with_delay_law(
+        passages: &[MorphologicalLanguagePassage],
+        worker_threads: usize,
+        law: ClausePairDelayLaw,
+    ) -> Result<Self, RelationalLanguageError> {
+        if passages.is_empty() {
+            return Err(RelationalLanguageError::EmptyEcology);
+        }
+        let mut host = ParallelHostLiveCurrentExecutor::new(worker_threads.max(1));
+        let mut ecology = Self::empty(worker_threads)?;
+        ecology.characteristic_delay_law = law;
+        ecology.receive_with_executor(passages, worker_threads, &mut host)?;
+        Ok(ecology)
     }
 
     /// Condition one same-predecessor passage front. Administrative member order remains stable;
@@ -134,6 +175,7 @@ impl ExactRelationalLanguageEcology {
             predicate_lexicon: inherited_predicate_lexicon(),
             passage_identities: GrowingKeyAtlas::new(),
             next_passage_order: 0,
+            characteristic_delay_law: ClausePairDelayLaw::default(),
         })
     }
 
@@ -607,6 +649,75 @@ impl ExactRelationalLanguageEcology {
         Ok(received)
     }
 
+    /// What plays a promoted clause pair's positive characteristic delay.
+    ///
+    /// `ExactReceiverCurrentLaw` accepts any positive `u64` and refuses zero; this ecology — its
+    /// only caller — pinned **1** on both directions of every promoted pair, so every reading ever
+    /// taken through `receiver_current` was taken in the uniform frame and no other frame existed
+    /// to compare it against.
+    ///
+    /// `derivation_capacitance::CharacteristicDelayLaw::SourceContinuity` supplies the engine-side
+    /// term, but it separates *deposited source lines*, and a clause pair has no lines. The
+    /// clause's own continuity coordinate is `source_local_step`: its serial position on its
+    /// source's clause strand, which the transducer already retains and which no receiver assigned.
+    pub const fn characteristic_delay_law(&self) -> ClausePairDelayLaw {
+        self.characteristic_delay_law
+    }
+
+    /// Declare which term plays the characteristic delay of pairs promoted after this call.
+    ///
+    /// Existing passages are left standing: a promoted pair is founded once and refuses a
+    /// conflicting re-founding, so changing the law cannot silently rewrite conducted history.
+    /// A caller comparing two frames promotes under each from its own ecology.
+    pub fn set_characteristic_delay_law(&mut self, law: ClausePairDelayLaw) {
+        self.characteristic_delay_law = law;
+    }
+
+    /// The delay this pair carries under the declared law, in the declared direction.
+    ///
+    /// Under [`ClausePairDelayLaw::SourceContinuity`] two clauses on the same source strand are
+    /// separated by their own serial positions, so a pair the source states adjacently conducts
+    /// faster than a pair it states far apart. Two clauses from **different** sources have no
+    /// separation defined in the material at all — nothing in either source measures the distance
+    /// to the other — so they are typed as discontinuous and carry the strand's own extent rather
+    /// than an authored penalty: crossing sources costs at least as much as traversing the whole
+    /// strand you are leaving.
+    pub(super) fn pair_characteristic_delay(
+        &self,
+        from: usize,
+        to: usize,
+    ) -> Result<u64, RelationalLanguageError> {
+        match self.characteristic_delay_law {
+            ClausePairDelayLaw::Uniform => Ok(1),
+            ClausePairDelayLaw::SourceContinuity => {
+                let departing = self
+                    .clauses
+                    .get(from)
+                    .ok_or(RelationalLanguageError::CarrierExtent)?;
+                let arriving = self
+                    .clauses
+                    .get(to)
+                    .ok_or(RelationalLanguageError::CarrierExtent)?;
+                let separation = if departing.source == arriving.source {
+                    departing
+                        .source_local_step
+                        .abs_diff(arriving.source_local_step)
+                } else {
+                    // The extent of the strand being left, read off the material.
+                    self.clauses
+                        .iter()
+                        .filter(|clause| clause.source == departing.source)
+                        .map(|clause| clause.source_local_step)
+                        .max()
+                        .unwrap_or(0)
+                };
+                separation
+                    .checked_add(1)
+                    .ok_or(RelationalLanguageError::CarrierExtent)
+            }
+        }
+    }
+
     pub(super) fn promote_conducting_pair(
         &mut self,
         left: usize,
@@ -623,7 +734,7 @@ impl ExactRelationalLanguageEcology {
             id: forward,
             from: left_site,
             to: right_site,
-            characteristic_delay: 1,
+            characteristic_delay: self.pair_characteristic_delay(left, right)?,
         };
         match self.receiver_current.passage(forward) {
             Some(standing) if standing != &forward_passage => {
@@ -636,7 +747,10 @@ impl ExactRelationalLanguageEcology {
             id: reverse,
             from: right_site,
             to: left_site,
-            characteristic_delay: 1,
+            // Computed in the reverse direction rather than copied. Under source continuity within
+            // one strand the separation is symmetric, but across strands it is NOT: the extent of
+            // the strand you leave is not the extent of the one you leave from the other side.
+            characteristic_delay: self.pair_characteristic_delay(right, left)?,
         };
         match self.receiver_current.passage(reverse) {
             Some(standing) if standing != &reverse_passage => {

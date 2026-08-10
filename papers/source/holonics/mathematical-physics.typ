@@ -1,4 +1,4 @@
-#import "schema.typ": entry
+#import "schema.typ": entry, bra, ket, braket, ketbra
 
 #let mathematical-physics = (
   entry(
@@ -601,5 +601,76 @@
         Samtleben, Eleven-dimensional supergravity
       ].
     ],
+  ),
+  entry(
+    id: "H.0469",
+    kind: "Theorem",
+    grade: "proved-standard",
+    title: [Iterated integrals are exactly the homotopy functionals, and their algebra is words],
+    depends: ("H.0210", "H.0266"),
+    statement: [
+      For one-forms $omega_1,dots,omega_m$ and a path $gamma$, the iterated
+      integral
+      $
+        integral_gamma omega_1 dots.c omega_m
+        =integral_(0&lt;t_1&lt;dots.c&lt;t_m&lt;1)
+          gamma^*omega_1(t_1) dots.c gamma^*omega_m(t_m)
+      $
+      is a homotopy functional rel endpoints, and every such functional arises
+      this way: integration is an isomorphism from the bar complex onto them.
+      Their algebra is the shuffle algebra on words in the $omega_i$, with the
+      deconcatenation coproduct.
+    ],
+    derivation: [Chen's de Rham theory for path spaces.],
+    transformations: [
+      This is the ordered-transport receiver, exactly: it sees the path up to
+      homotopy and nothing more, and endpoint evaluation is the strictly coarser
+      face that the winding separates from it. Because the carrier is a word and
+      composition is concatenation, ordered transport and word combinatorics are
+      one algebra rather than two subjects.
+    ],
+    boundary: [
+      Complete for homotopy functionals and blind to everything else. Arc length
+      is not homotopy invariant, which is why C.0009 has a witness.
+    ],
+    source: [Chen, iterated path integrals and loop space homology.],
+  ),
+  entry(
+    id: "H.0470",
+    kind: "Boundary",
+    grade: "conditional",
+    title: [A diagram's value is a word; resummation is condensation, and the emulator is a second chart],
+    depends: ("H.0150", "H.0216", "H.0469"),
+    statement: [
+      The finite part of the scalar three-loop tetrahedral vacuum diagram, in
+      each of its ten zero-or-unit-mass cases, reduces to four-letter words in an
+      alphabet of seven letters -- each word an iterated integral -- evaluating to
+      combinations of $zeta(3)$, $zeta(4)$ and three further constants. A
+      diagram's value is therefore a word in the shuffle algebra of H.0469; its
+      alternating signs are H.0150's; and the two-leg meeting at each vertex is
+      H.0216's cross term.
+    ],
+    derivation: [
+      Quoted from the evaluated case. The resummation claim below is cited
+      experimental and computational evidence, not a derivation.
+    ],
+    transformations: [
+      Replacing an infinite family of such words by a closed return is the
+      condensation of a far population into a compact realizer. Bold diagrammatic
+      Monte Carlo achieves this in a genuinely non-perturbative regime for the
+      unitary Fermi gas, cross-validated against ultracold-atom measurement: the
+      gas is a second apparatus chart for one law, and the agreement is the
+      evidence that the condensation is faithful.
+    ],
+    boundary: [
+      An instance, not a method. It establishes that one diagrammatic series
+      admits controlled non-perturbative resummation for one system with one
+      validated emulator, and supplies no general convergence criterion, no
+      transportable error bound, and no construction. No Feynman rules are given
+      here: this says what a value *is* once rules are supplied, and asserts
+      nothing about whether any ecology in this corpus has a perturbative
+      expansion at all.
+    ],
+    source: [Tetrahedral vacuum diagram evaluation; Van Houcke et al., bold diagrammatic Monte Carlo versus a Fermi-gas emulator.],
   ),
 )

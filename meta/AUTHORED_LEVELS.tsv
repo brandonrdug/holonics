@@ -116,6 +116,38 @@ ABI	soma/body/src/geom.rs	MODES	128	the mode index is i+j over set bits of two u
 ABI	soma/body/src/law.rs	FLOW_TEETH	13	a bit-field width of one packed u32: pack is flow | rmag<<13 | rrank<<26 (law.rs:104-106). SWEEP_RANK_TEETH = ceil(log2 u64::BITS) = 6 is the forced field; 13 = (u32::BITS-6)/2 under the declared equal split (law.rs:28-29). NOT a gear period -- nothing is taken mod 13. Defect: law.rs:58 derives the forced 6 FROM the two authored 13s, backwards; reverse the chain and one declared datum remains, the equal split.
 ABI	soma/body/src/law.rs	SWEEP_TEETH	13	the same 13, asserted equal to FLOW_TEETH by the declared self-similarity at law.rs:28-29 -- the single piece of authored content in the packing, and the thing to attack. Decides a return: SWEEP_MASK sets the re-base point (law.rs:124) so windings keep 13 significant bits. law.rs:119's `rrank >= 64 - SWEEP_TEETH - 1` is a genuinely derived guard in the same file.
 ABI	soma/body/src/law.rs	W_WELL	0	an index or identity element, not a level
+ABI	soma/body/src/manifold.rs	CARRIER_CONTINUATION_BRICK	3	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/manifold.rs	CARRIER_CONTINUATION_PHASE	0	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/manifold.rs	CARRIER_PENDING_CONTROL	0	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/manifold.rs	CARRIER_PENDING_FORM	1	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/manifold.rs	CARRIER_SUB_STANCE	4	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/manifold.rs	COMPLETION_AFFERENT	2	mode or lineage discriminant; a tag, not a level
+ABI	soma/body/src/manifold.rs	COMPLETION_ATOM_FOLD	1	mode or lineage discriminant; a tag, not a level
+ABI	soma/body/src/manifold.rs	COMPLETION_EFFERENT	3	mode or lineage discriminant; a tag, not a level
+ABI	soma/body/src/manifold.rs	COMPLETION_KIND	0	mode or lineage discriminant; a tag, not a level
+ABI	soma/body/src/manifold.rs	CONTINUATION_NONE	0	mode or lineage discriminant; a tag, not a level
+ABI	soma/body/src/manifold.rs	CONTINUATION_PATH_AFFERENT	5	mode or lineage discriminant; a tag, not a level
+ABI	soma/body/src/manifold.rs	CONTINUATION_PATH_EFFERENT	6	mode or lineage discriminant; a tag, not a level
+ABI	soma/body/src/manifold.rs	CONTINUATION_PATH_UNWIND	7	mode or lineage discriminant; a tag, not a level
+ABI	soma/body/src/manifold.rs	CONTINUATION_PERCEIVE_AFFERENT	1	mode or lineage discriminant; a tag, not a level
+ABI	soma/body/src/manifold.rs	CONTINUATION_PERCEIVE_EFFERENT	2	mode or lineage discriminant; a tag, not a level
+ABI	soma/body/src/manifold.rs	CONTINUATION_PERCEIVE_UNWIND	3	mode or lineage discriminant; a tag, not a level
+ABI	soma/body/src/manifold.rs	CONTINUATION_WORD_PATH	4	mode or lineage discriminant; a tag, not a level
+ABI	soma/body/src/manifold.rs	CONTINUATION_WORD_PERCEIVE	8	mode or lineage discriminant; a tag, not a level
+ABI	soma/body/src/manifold.rs	ENCLOSURE_REGISTER	0	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/manifold.rs	OWN_CELL_LIVE	0	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/manifold.rs	OWN_REGISTER_AXIS	0	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/manifold.rs	PENDING_CONTACT_SHIFT	3	the bit position at which the contact hand begins, forced by PENDING_KIND_MASK's width immediately above it (manifold.rs:3174 composes the two). A field boundary in a packed u32, not a level: nothing is taken mod 3.
+ABI	soma/body/src/manifold.rs	PENDING_DARK_BEFORE	1	mode or lineage discriminant; a tag, not a level
+ABI	soma/body/src/manifold.rs	PENDING_DARK_TERMINAL	2	mode or lineage discriminant; a tag, not a level
+ABI	soma/body/src/manifold.rs	PENDING_ENCLOSURE_CO_PRESENT	4	mode or lineage discriminant; a tag, not a level
+ABI	soma/body/src/manifold.rs	PENDING_ENCLOSURE_TERMINAL	5	mode or lineage discriminant; a tag, not a level
+ABI	soma/body/src/manifold.rs	PENDING_INVALID	7	mode or lineage discriminant; a tag, not a level
+ABI	soma/body/src/manifold.rs	PENDING_NONE	0	mode or lineage discriminant; a tag, not a level
+ABI	soma/body/src/manifold.rs	PENDING_PATH	6	mode or lineage discriminant; a tag, not a level
+ABI	soma/body/src/manifold.rs	PENDING_SUB	3	mode or lineage discriminant; a tag, not a level
+ABI	soma/body/src/manifold.rs	RADIATION_FLAGS	0	compact-form layout offset; a wire position, not a level
+ABI	soma/body/src/manifold.rs	RADIATION_FOLD	1	compact-form layout offset; a wire position, not a level
 ABI	soma/body/src/medium/codec.rs	COMPACT_FORM_FLAGS_WORD	10	compact-form layout offset; a wire position, not a level
 ABI	soma/body/src/medium/codec.rs	COMPACT_FORM_OTHER_MAG_WORD	3	compact-form layout offset; a wire position, not a level
 ABI	soma/body/src/medium/codec.rs	COMPACT_FORM_OTHER_RANK_MAG_WORD	4	compact-form layout offset; a wire position, not a level
@@ -154,6 +186,8 @@ ABI	soma/body/src/register.rs	MODE_DIRECT	1	mode or lineage discriminant; a tag,
 ABI	soma/body/src/register.rs	MODE_FLAT	0	mode or lineage discriminant; a tag, not a level
 ABI	soma/body/src/register.rs	MODE_FOUND	4	mode or lineage discriminant; a tag, not a level
 ABI	soma/body/src/register.rs	MODE_RANK	2	mode or lineage discriminant; a tag, not a level
+APERTURE	soma/life/src/agentic_language.rs	CODEC_MINIMUM_RECURRENCE	2	Two DISTINCT occurrences before a route commits; withheld routes are RETAINED as lineage rather than discarded, so the outside is returned. Driven with its orbit at agentic_language/tests.rs (the first correction changes no conduct, the second does). To derive: the recurrence a receiver requires is that receiver's declaration and belongs on the receiver, not on this caller -- TrainingEcology::new already accepts it as an argument.
+APERTURE	soma/life/src/agentic_language.rs	CODEC_TEMPLATE_APERTURE	4096	The template population one codec continuation is willing to hold. Declared by this caller and passed to TrainingEcology::new, which accepts any positive value. To derive: it follows from the caller's memory declaration, which should be supplied rather than assumed -- the same excision GROUND_APERTURE and the Chow-ring bound carry.
 ABI	soma/life/src/current_world.rs	ORGAN_PRESENT_WORD	2	compact-form layout offset; a wire position, not a level
 ABI	soma/life/src/decomposing_codec.rs	CLOSES_RECEIVER	256	compact-form layout offset; a wire position, not a level
 ABI	soma/life/src/dialogue_lineage.rs	ASSISTANT_COMMENTARY_RECEIVER	20000001	receiver identity token -- an address in a declared numbering, not a level
@@ -162,8 +196,19 @@ ABI	soma/life/src/dialogue_lineage.rs	ASSISTANT_OTHER_RECEIVER	20000003	receiver
 ABI	soma/life/src/dialogue_lineage.rs	USER_RECEIVER	20000000	receiver identity token -- an address in a declared numbering, not a level
 ABI	soma/life/src/laboratory_language/repository.rs	CODE_RECEIVER_BASE	1000000	receiver identity token -- an address in a declared numbering, not a level
 ABI	soma/life/src/laboratory_language/repository.rs	THEORY_RECEIVER_BASE	10000	receiver identity token -- an address in a declared numbering, not a level
+MATERIAL	soma/life/src/relational_language.rs	RELATIONAL_SWING_OCCURRENCE_SPAN	2	THEOREM-shaped: one Resonance occurrence occupies an antecedent order and its next consequent order, so its span is the arity of the relation and is 2 by definition of the pair. It does not vary with material, capacity, or receiver.
 ABI	soma/life/src/research_intelligence.rs	CODE_RECEIVER_BASE	31000000	receiver identity token -- an address in a declared numbering, not a level
 ABI	soma/life/src/research_intelligence.rs	MATHEMATICS_RECEIVER	30000000	receiver identity token -- an address in a declared numbering, not a level
+ABI	soma/life/src/resonance_ecology.rs	CAPACITY_ATOM	1	receiver identity token -- an address in a declared numbering, not a level
+ABI	soma/life/src/resonance_ecology.rs	CONTINUATION_SOURCE_ROLE_WORD	3	receiver identity token -- an address in a declared numbering, not a level
+ABI	soma/life/src/resonance_ecology.rs	EMANATED_ORIGIN_ROLE_WORD	6	receiver identity token -- an address in a declared numbering, not a level
+ABI	soma/life/src/resonance_ecology.rs	GERM_RECEPTOR	1	receiver identity token -- an address in a declared numbering, not a level
+ABI	soma/life/src/resonance_ecology.rs	GERM_ROLE_WORD	1	receiver identity token -- an address in a declared numbering, not a level
+ABI	soma/life/src/resonance_ecology.rs	INFORMANT_CAPACITY_RECEPTOR	3	receiver identity token -- an address in a declared numbering, not a level
+ABI	soma/life/src/resonance_ecology.rs	INFORMANT_MARKER_RECEPTOR	2	receiver identity token -- an address in a declared numbering, not a level
+ABI	soma/life/src/resonance_ecology.rs	INFORMANT_ROLE_WORD	2	receiver identity token -- an address in a declared numbering, not a level
+ABI	soma/life/src/resonance_ecology.rs	INHERITED_ORIGIN_ROLE_WORD	4	receiver identity token -- an address in a declared numbering, not a level
+ABI	soma/life/src/resonance_ecology.rs	QUESTION_ORIGIN_ROLE_WORD	5	receiver identity token -- an address in a declared numbering, not a level
 ABI	soma/life/src/text_material.rs	TEXT_ASSISTANT_FINAL_RECEIVER	40000002	receiver identity token -- an address in a declared numbering, not a level
 ABI	soma/life/src/text_material.rs	TEXT_ASSISTANT_PROCESS_RECEIVER	40000001	receiver identity token -- an address in a declared numbering, not a level
 ABI	soma/life/src/text_material.rs	TEXT_DOCUMENT_RECEIVER	40000003	receiver identity token -- an address in a declared numbering, not a level
