@@ -540,6 +540,39 @@ Controlled both ways: two independent realizers over two classes return nullity 
 with the third the sum of the first two return nullity `1`, and that null direction **is** the
 dependency.
 
+### 7b.7 The closure half, and what it measured — roadmap item 7
+
+`tools/closure_manifest.py`. `CLAUDE.md` §0 lesson 1 asks for **both** halves — *"bind every deposit
+to its content hash AND its closure hash, with a verifier"* — and `tools/output_manifest.py`'s own
+header states the gap: *"This is the content half. The closure half still has no owner."*
+
+A content hash answers *"are these the bytes it was?"* It cannot answer *"can this tree still produce
+them?"*, and the two lost probe binaries are exactly that distinction: `zz_smith_cost_probe` and
+`zz_torsion_width_law` ran from `target/`, returned real cost laws, and their sources were never
+committed. Their content hashes would have verified perfectly until the binaries were deleted.
+
+The closure of a return is the driver source, every source file of its crate, and that crate's
+manifest, hashed together. If any of those move, the closure moves, and a return whose closure no
+longer matches is one the tree cannot reproduce.
+
+**Measured on the first run: 9 orphans of 33 return directories** — over a quarter of the evidence
+under `output/` has no driver in the tree bearing its name.
+
+```text
+agentic-research-kernel · lean-kernel-witness · lean-plural-route-control
+lean-proof-production   · mms-reconnection    · reintegrating-elaboration
+source-revival          · zzy-kernel-teeth-probe · zzz-adversarial-probe
+```
+
+**And the `zz` family is larger than the roadmap said.** It named two; two more sourceless `zz*`
+probes have returns on disk, and `ls */examples/zz*` matches nothing anywhere in the workspace. The
+two named ones are worse: **their returns are gone as well, so they leave no trace for a manifest to
+find** — which is the exact shape of the loss §0 lesson 1 was written about, and the reason a closure
+manifest has to exist before the next one happens rather than after.
+
+An orphan is reported and does not fail the check, because it is a measurement about the corpus and
+not a defect in the tool.
+
 ---
 
 ## 8 · Bounds

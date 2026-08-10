@@ -127,7 +127,31 @@ is deposited in place.
    and the content is where the rank falls: **the null directions are exactly the realizer
    combinations that land on nothing**, which is the population §11's demand calls the certified
    remainder. Controlled on an independent population (nullity 0) and a dependent one (nullity 1).
-7. **The evidence sinks**, now with two cost laws already lost.
+7. **The evidence sinks — CLOSURE HALF CLOSED 2026-08-10, and it measured the sink.**
+   `tools/closure_manifest.py` binds every return directory under `output/` to the **closure** that
+   produced it — the driver source, every source file of its crate, and that crate's manifest — which
+   is `CLAUDE.md` §0 lesson 1's second half, the half `tools/output_manifest.py` says in its own
+   header it does not carry. A content hash answers *"are these the bytes it was"*; only a closure
+   hash answers *"can this tree still produce them"*.
+
+   **Measured on the first run: 9 orphans of 33 return directories.** Over a quarter of the evidence
+   under `output/` has no driver in the tree bearing its name, so it cannot be reproduced:
+
+   ```text
+   agentic-research-kernel · lean-kernel-witness · lean-plural-route-control
+   lean-proof-production   · mms-reconnection    · reintegrating-elaboration
+   source-revival          · zzy-kernel-teeth-probe · zzz-adversarial-probe
+   ```
+
+   **The `zz` family is larger than this file said.** It named `zz_smith_cost_probe` and
+   `zz_torsion_width_law`; two more sourceless `zz*` probes have returns on disk, and `ls
+   */examples/zz*` matches nothing anywhere in the workspace. Those two named binaries are worse
+   still: their returns are gone as well, so they leave **no trace for a manifest to find**, which is
+   the exact shape of the loss.
+
+   **Still open:** re-establishing the nine orphans' producers, or recording each as unrecoverable.
+   The tool reports them without failing, because an orphan is a measurement about the corpus rather
+   than a defect in the tool.
 
 **Carried forward from the laboratory and never inherited:** Huffman/Kraft (with
 `Derive_Eaten.lean`'s *a perfect code reads as a PRIME*), grokking with a **measured** susceptibility
