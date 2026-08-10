@@ -381,13 +381,27 @@ fn main() {
     println!("  none of them. A control asserting `rank 1 retains rank 0's generators` would hold");
     println!("  on two empty sets and prove nothing, so it is not asserted.");
 
+    println!();
+    println!("  ANSWERED 2026-08-10, and not by a new carrier. A planar triangle's angles sum to π,");
+    println!("  so composing ONE simplex's own three corners is constant BY HYPOTHESIS — that is");
+    println!("  Regge calculus' founding assumption, every simplex flat and all curvature");
+    println!("  concentrated on the codimension-two hinges BETWEEN them. Under CLAUDE.md §8 the");
+    println!("  (−1,0) receipt is `definition`-grade: it could not have come out otherwise.");
+    println!("  The object that carries curvature is the HINGE: one corner from each incident");
+    println!("  triangle, deficit = 2π − Σθ. Measured by `the_hinge_carries_the_curvature` on this");
+    println!("  same material: 5 distinct hinge turns over 11 hinges against 1 over 25 triangles,");
+    println!("  generators {{3, 7, 1463}} reached, and 6 of 11 hinges moving under a non-similar");
+    println!("  metric while 0 move under a similarity.");
+    println!("  See canon/TABLET_THE_TURN.md §11.5 and the 2026-08-10 manifold record.");
+
     open_falsifiers.push((
         "the climb carries the corners' generators upward".to_owned(),
         format!(
             "rank 0 corners found {corner_generators:?}; rank 1 carries {rank_one_generators:?}. \
-             Declared OPEN while the rung composes all three corners. This is the falsifier for any \
-             repair: a rung that carries information will move a generator upward, and this line \
-             will stop being empty."
+             Still empty, and now EXPLAINED rather than open: the per-simplex rung is constant by \
+             Regge's flatness hypothesis, so no generator can survive it. This line is retained as \
+             provenance. The live falsifier moved to the hinge and is driven by \
+             `the_hinge_carries_the_curvature`."
         ),
     ));
 

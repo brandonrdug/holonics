@@ -103,9 +103,12 @@ an alternating sum of ranks, and ranks land in a torsion-free group.
 
 ### 11.5 The rung is the hinge deficit, and the vacuous triangle was Regge's own hypothesis
 
-**Truth status:** `proved-standard` for Regge calculus; `established-bounded` for the measured
-vacuity; `interpretation` for the siting, which is this project's.
+**Truth status:** `proved-standard` for Regge calculus; `implemented-exact` for
+`contact_gluing::hinge_deficits` and `multiquadratic::sign_in_principal_embedding`; `measured` for
+every figure below; `counterexample` for §11.5.2, which is the sharpest of them; `interpretation`
+for the siting, which is this project's.
 **Record:** `research/records/2026-08-10_THE_MANIFOLD_IS_THE_INVARIANT_OF_THE_CURRENTS_NOT_THEIR_CONTAINER_AND_THE_RUNG_IS_THE_HINGE_DEFICIT.md`
+**Driver:** `crates/holonic-engine/examples/the_hinge_carries_the_curvature.rs`
 
 `contact_gluing::coarse_grain` composes a triangle's three exact corners and returns `e^{iπ} = (−1,0)`
 **identically** — measured 25 of 25 realizable triangles over five distinct weight shapes — and
@@ -157,13 +160,55 @@ its grading is the branch bookkeeping the double cover demands.
 
 **And the invariant is a gate, not evidence.** `Σ_v deficit(v) = 2πχ` is a theorem for closed
 triangulated surfaces, so by §11.4 it is `definition`-grade — worth computing as a check that the
-corner algebra composes, never reportable as a finding. It does not even apply to `contact_graph`,
-which is a graph with `β₁ = 8` and not a surface. **The non-tautological return is the deficit
+corner algebra composes, never reportable as a finding. **The non-tautological return is the deficit
 population and the link classification**: `L ≅ S^{d−1}` is the regular phase, and a link that is a
 ball, has genus, has several components, or is pinched is respectively a boundary, a handle, a branch
 or a neck — *"that residual geometry is information. It must not be rounded into a sphere"*, from the
 laboratory's `src/soma/RESEARCH/2026-07-26_THE_RECEIVER_IS_ITS_LOCAL_STAR_THE_LINK_IS_ITS_HYPERSPHERICAL_HORIZON.md`
 at `a07ff376`.
+
+### 11.5.1 Built, and the winding is an integer read off crossings
+
+`hinge_deficits` composes one corner per coface and carries the turn **with its winding**. Every
+corner of a realizable triangle has `θ ∈ (0,π)`, so the accumulated angle strictly increases and one
+step crosses at most one `π`-boundary; counting crossings gives `Σθ ∈ [mπ, (m+1)π)` exactly, which
+separates `Σθ < 2π` from `= 2π` from `> 2π` **with no angle taken anywhere**. That is §2b's standing
+obligation — *a count of signs is a state reading; name the windings instead* — met on the object it
+was written for.
+
+Reading a winding needs the hand of `√k`, which `multiquadratic` deliberately refuses to supply.
+`sign_in_principal_embedding` **declares** the sheet in its own name: zero is decided structurally
+from the coefficient vector, sound because distinct squarefree radicals are linearly independent over
+`ℚ`; a non-zero element is enclosed by exact dyadic intervals and refined by doubling until it
+separates from zero, returning `Undetermined` at a declared aperture rather than guessing.
+
+Measured, on 21 words / 32 arcs / 25 realizable triangles:
+
+```text
+per-simplex turn   1 distinct value over 25 triangles     (−1, 0)
+per-hinge turn     5 distinct values over 11 hinges       generators {3, 7, 1463}
+species            flat 5 · positive 3 · negative 3
+orbit              6 of 11 hinges move under w ↦ w+1 ; 0 of 11 under w ↦ 3w
+```
+
+**And five of the five flat hinges are the equilateral tiling** — six equal-sided cofaces, so
+`Σθ = 6·(π/3) = 2π` is arithmetic. §8's tautology rule firing one level up from where it was
+expected; the driver separates them by name. The genuine content is the other six, and those six are
+**exactly** the ones the metric moves.
+
+### 11.5.2 The measurement falsifies the material, not the organ
+
+```text
+interior 0 of 11        every link is singular: some edge lies in 3 or 4 triangles
+3F = 75  against  2E = 50        the closed-surface condition FAILS
+```
+
+**No hinge of this complex is a manifold point, so by the bar above none of these deficits is a
+curvature.** They are exact readings on a complex that is nowhere a Regge geometry, and calling them
+curvature would be the rounding the record forbids. Under §8 this is a `counterexample` and it passes
+its grade: *a deed that proves its own receiver family cannot see what it was built to see has
+returned real evidence.* Whether any material in this body **is** a surface is now a well-posed
+question and is not answered.
 
 ---
 

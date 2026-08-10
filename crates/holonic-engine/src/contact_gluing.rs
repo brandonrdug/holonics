@@ -61,14 +61,31 @@ use crate::algebraic::{CausalCellId, CausalChain, ComparativeMultiplicity, Grade
 use crate::causal::EventId;
 use crate::conditioned_derivation::{FoundedCover, FoundedMorphology};
 use crate::gluing::{read_cover, Cover, GluingReading, GluingRefusal};
-use crate::multiquadratic::{Multiquadratic, MultiquadraticRefusal, DECLARED_KERNEL_BOUND};
+use crate::multiquadratic::{
+    EmbeddedSign, Multiquadratic, MultiquadraticRefusal, DECLARED_KERNEL_BOUND,
+};
 
-/// APERTURE — how many distinct squarefree generators one composed turn may carry.
+/// **The generator aperture a triangle's own corners require**, read off the material.
 ///
-/// The multiquadratic basis is `2ⁿ` wide, so this bounds a real resource. Declared here as the
-/// default for [`coarse_grain`]; [`coarse_grain_in_aperture`] takes it from the caller, and a
-/// climbing tower should pass its own.
-pub const DECLARED_GENERATOR_APERTURE: usize = 12;
+/// The multiquadratic basis is `2ⁿ` wide in the number of distinct squarefree generators, so the
+/// aperture bounds a real resource — but the value is not a choice. A composition can only carry
+/// the kernels its own corners already hold, so the union of those kernels **is** the aperture.
+///
+/// This was `pub const DECLARED_GENERATOR_APERTURE: usize = 12` until 2026-08-10, which is
+/// `canon/THE_AUTHORED_LEVEL.md`'s convicted shape exactly: *"refusing past a number you invented
+/// does not make the number derived"*, the same defect that excised `FREE_ENTRY_APERTURE = 12` and
+/// `REFINEMENT_APERTURE = 64`. Lifting it moved no return on the declared material — three corners
+/// contribute at most three generators, well inside twelve — so this is **bookkeeping and is
+/// reported as bookkeeping**, not as an orbit.
+pub fn required_aperture(triangle: &ContactTriangle) -> usize {
+    let mut kernels: BTreeSet<&BigInt> = BTreeSet::new();
+    for corner in &triangle.corners {
+        if let Ok(sine) = &corner.sine {
+            kernels.extend(sine.generators());
+        }
+    }
+    kernels.len().max(1)
+}
 use crate::rebase_invariants::PivotRule;
 use crate::running_integral::{
     running_sum, Cochain, Orientation, Path, PathStep, RunningIntegralError,
@@ -1261,9 +1278,10 @@ pub enum CoarseTurn {
     NotRealizable { short: BigInt, other: BigInt, long: BigInt },
 }
 
-/// Compose a triangle's three corners into the single turn it contributes upward.
+/// Compose a triangle's three corners into the single turn it contributes upward, under the
+/// aperture the triangle's own corners require ([`required_aperture`]).
 pub fn coarse_grain(triangle: &ContactTriangle) -> CoarseTurn {
-    coarse_grain_in_aperture(triangle, DECLARED_GENERATOR_APERTURE)
+    coarse_grain_in_aperture(triangle, required_aperture(triangle))
 }
 
 /// [`coarse_grain`] under a caller-declared generator aperture.
@@ -1319,4 +1337,473 @@ pub fn coarse_grain_in_aperture(triangle: &ContactTriangle, aperture: usize) -> 
         sine = next_sine;
     }
     CoarseTurn::Exact { cosine, sine }
+}
+
+// -------------------------------------------------------------------------------------------------
+// The hinge: where the curvature actually is, and why the triangle never carried it
+// -------------------------------------------------------------------------------------------------
+
+/// **How a vertex's link sits**, read off the triangles incident to it and nothing else.
+///
+/// The laboratory's `2026-07-26_THE_RECEIVER_IS_ITS_LOCAL_STAR_THE_LINK_IS_ITS_HYPERSPHERICAL_HORIZON`
+/// (read at `a07ff376`) defines a receiver as `(σ, H = St̄(σ), L = Lk(σ), g, 𝒯, q, 𝒫)` and states the
+/// bar this enum exists to hold:
+///
+/// > *"When the link is a ball, has nonzero genus, has several components, is pinched, or fails the
+/// > manifold-link condition, the receiver is respectively at an exposed boundary, a handled region,
+/// > a branch, a neck, or a singular discriminant. **That residual geometry is information. It must
+/// > not be rounded into a sphere.**"*
+///
+/// So this is not a validity check with a pass and a fail. Every variant is a return.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum LinkClass {
+    /// The link is a single cycle: `L ≅ S¹`, and the star is a disc. The regular interior phase,
+    /// and the only one in which a deficit angle means what Regge calculus says it means.
+    Sphere { length: usize },
+    /// The link is a single arc: `L ≅ B¹`. An **exposed boundary** — the vertex sits on the edge of
+    /// the complex, so `2π − Σθ` measures the opening and not a curvature.
+    Ball { length: usize },
+    /// The link has several connected components. A **branch**: two or more sheets meet only at
+    /// this vertex.
+    Components { count: usize },
+    /// Some link vertex has degree three or more — three or more triangles share one edge here, so
+    /// the manifold-link condition fails. A **singular discriminant**.
+    Singular { max_degree: usize },
+    /// No realizable triangle is incident. There is no link and no hinge.
+    Empty,
+}
+
+impl LinkClass {
+    /// Whether a Regge deficit read at this hinge is a curvature rather than an opening or a
+    /// singularity. Only [`LinkClass::Sphere`] qualifies, and saying so is the point of the enum.
+    pub fn is_regular_interior(&self) -> bool {
+        matches!(self, LinkClass::Sphere { .. })
+    }
+}
+
+/// **The turn a hinge's incident corners compose to**, with the winding that says which multiple of
+/// `2π` it came back around.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum HingeHolonomy {
+    /// `∏_{t ∋ v} e^{iθ_v(t)}` as an exact point on the unit circle, together with the number of
+    /// `π`-boundaries the accumulated angle crossed on the way.
+    ///
+    /// The turn alone gives only `Σθ mod 2π`. The winding is what separates `Σθ = 2π` from
+    /// `Σθ = 0` or `4π`, and it is an **integer read off monotone crossings** rather than a
+    /// comparison of magnitudes — `CLAUDE.md` §2b's standing obligation, *name the windings*, met
+    /// on the object it was stated for.
+    Exact {
+        cosine: Multiquadratic,
+        sine: Multiquadratic,
+        /// How many times the accumulated angle crossed a multiple of `π`. Each corner contributes
+        /// `θ ∈ (0, π)`, so the accumulated angle is strictly increasing and one step crosses at
+        /// most one boundary; hence `Σθ ∈ [half_turns·π, (half_turns+1)·π)`.
+        half_turns: u32,
+    },
+    /// A corner refused to certify its sine, or a winding read exhausted its refinement aperture.
+    /// The hinge is retained with the reason rather than dropped.
+    Refused { refusals: Vec<(String, String)> },
+}
+
+/// **What the deficit at a hinge is**, as a trichotomy with no angle ever taken.
+///
+/// With `Σθ ∈ [m·π, (m+1)·π)` for `m = half_turns`:
+///
+/// ```text
+///   m ≤ 1                       Σθ < 2π      POSITIVE — a cone point, curvature toward the vertex
+///   m = 2 and the turn is (1,0) Σθ = 2π      FLAT
+///   m = 2 and it is not         Σθ > 2π      NEGATIVE — a saddle
+///   m ≥ 3                       Σθ ≥ 3π      NEGATIVE
+/// ```
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum DeficitSpecies {
+    /// `Σθ = 2π` exactly. The hinge is flat and deposits nothing.
+    Flat,
+    /// `Σθ < 2π`. A cone point.
+    Positive,
+    /// `Σθ > 2π`. A saddle.
+    Negative,
+    /// A corner or a winding refused. No species is asserted.
+    Unreadable,
+}
+
+/// **One hinge and what it deposits.**
+///
+/// In a two-dimensional piecewise-flat geometry the hinge is a vertex and its cofaces are the
+/// triangles containing it. This is the object `coarse_grain` is *not*: that composes the three
+/// corners of one simplex, which is `Σθ = π` identically because a planar triangle's angles sum to
+/// `π` — Regge's flatness hypothesis, measured here as 25 of 25 and correctly so.
+///
+/// **Curvature lives on the hinge between cells, never on a cell's own corners.**
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct HingeDeficit {
+    /// The identifier the hinge sits at.
+    pub at: String,
+    /// The realizable triangles containing it, in canonical order.
+    pub cofaces: Vec<[String; 3]>,
+    /// How the link sits. A deficit is a curvature only when this is [`LinkClass::Sphere`].
+    pub link: LinkClass,
+    /// The composed turn and its winding.
+    pub holonomy: HingeHolonomy,
+    /// The trichotomy.
+    pub species: DeficitSpecies,
+}
+
+/// The link graph of `at`: its neighbours, and one link edge per incident triangle.
+fn link_of(at: &str, cofaces: &[[String; 3]]) -> LinkClass {
+    if cofaces.is_empty() {
+        return LinkClass::Empty;
+    }
+    let mut adjacency: BTreeMap<&str, BTreeSet<&str>> = BTreeMap::new();
+    for triangle in cofaces {
+        let others: Vec<&str> = triangle
+            .iter()
+            .map(String::as_str)
+            .filter(|name| *name != at)
+            .collect();
+        if others.len() != 2 {
+            continue;
+        }
+        adjacency.entry(others[0]).or_default().insert(others[1]);
+        adjacency.entry(others[1]).or_default().insert(others[0]);
+    }
+    if adjacency.is_empty() {
+        return LinkClass::Empty;
+    }
+
+    let max_degree = adjacency.values().map(BTreeSet::len).max().unwrap_or(0);
+    if max_degree > 2 {
+        return LinkClass::Singular { max_degree };
+    }
+
+    // Components, by traversal over the link graph.
+    let mut unseen: BTreeSet<&str> = adjacency.keys().copied().collect();
+    let mut components = 0usize;
+    while let Some(seed) = unseen.iter().next().copied() {
+        components += 1;
+        let mut frontier = vec![seed];
+        unseen.remove(seed);
+        while let Some(current) = frontier.pop() {
+            for next in &adjacency[current] {
+                if unseen.remove(*next) {
+                    frontier.push(next);
+                }
+            }
+        }
+    }
+    if components > 1 {
+        return LinkClass::Components { count: components };
+    }
+
+    let ends = adjacency.values().filter(|neighbours| neighbours.len() == 1).count();
+    match ends {
+        0 => LinkClass::Sphere { length: adjacency.len() },
+        2 => LinkClass::Ball { length: adjacency.len() },
+        // One endpoint, or more than two, in a single connected component with max degree two is
+        // not a graph shape a path or cycle can have; report it rather than force it into one.
+        other => LinkClass::Singular { max_degree: other },
+    }
+}
+
+/// **Every hinge of a triangle population, with its deficit.**
+///
+/// **The generator aperture is read off the material and not authored.** A hinge's composition can
+/// only carry the squarefree kernels its own cofaces' corners already carry, so the union of those
+/// kernels *is* the aperture — computable before composing, exact, and moving with the material.
+/// `canon/THE_AUTHORED_LEVEL.md` §1: *a level is either read off the material or declared by the
+/// caller; it is never authored inside the organ.* [`hinge_deficits_in_aperture`] is the
+/// caller-declared form for a caller who wants to bound it more tightly and be refused by name.
+pub fn hinge_deficits(triangles: &[ContactTriangle]) -> Vec<HingeDeficit> {
+    let mut kernels: BTreeSet<BigInt> = BTreeSet::new();
+    for triangle in triangles {
+        if triangle.euclidean != EuclideanRealization::Realized {
+            continue;
+        }
+        for corner in &triangle.corners {
+            if let Ok(sine) = &corner.sine {
+                kernels.extend(sine.generators().iter().cloned());
+            }
+        }
+    }
+    hinge_deficits_in_aperture(triangles, kernels.len().max(1))
+}
+
+/// [`hinge_deficits`] under a caller-declared generator aperture.
+///
+/// There is no refinement aperture: [`Multiquadratic::sign_in_principal_embedding`] terminates by
+/// theorem rather than by budget, and an authored cap there would have been a level the material
+/// determines.
+pub fn hinge_deficits_in_aperture(
+    triangles: &[ContactTriangle],
+    generator_aperture: usize,
+) -> Vec<HingeDeficit> {
+    // Only realizable triangles have corners; a degenerate triple is not a coface.
+    let mut cofaces: BTreeMap<String, Vec<[String; 3]>> = BTreeMap::new();
+    let mut corner_at: BTreeMap<(String, [String; 3]), &Corner> = BTreeMap::new();
+    for triangle in triangles {
+        if triangle.euclidean != EuclideanRealization::Realized {
+            continue;
+        }
+        for corner in &triangle.corners {
+            cofaces
+                .entry(corner.at.clone())
+                .or_default()
+                .push(triangle.identifiers.clone());
+            corner_at.insert((corner.at.clone(), triangle.identifiers.clone()), corner);
+        }
+    }
+
+    let mut deficits = Vec::new();
+    for (at, mut incident) in cofaces {
+        incident.sort();
+        incident.dedup();
+        let link = link_of(&at, &incident);
+
+        // Compose one corner from each coface. The accumulated angle rises monotonically because
+        // every corner of a realizable triangle has θ ∈ (0, π); the winding counts the π-crossings.
+        let mut cosine = Multiquadratic::one();
+        let mut sine = Multiquadratic::zero();
+        let mut half_turns = 0u32;
+        // The accumulated angle starts at 0: on the positive real axis, entering the upper half.
+        let mut upper = true;
+        let mut refusals: Vec<(String, String)> = Vec::new();
+
+        for triangle in &incident {
+            let Some(corner) = corner_at.get(&(at.clone(), triangle.clone())) else {
+                continue;
+            };
+            let Ok(corner_sine) = corner.sine.as_ref() else {
+                refusals.push((
+                    triangle.join("|"),
+                    format!("{:?}", corner.sine.as_ref().unwrap_err()),
+                ));
+                continue;
+            };
+            let corner_cosine = Multiquadratic::rational(corner.cosine.clone());
+            let composed = (|| {
+                let next_cosine = cosine
+                    .multiply(&corner_cosine, generator_aperture)?
+                    .subtract(&sine.multiply(corner_sine, generator_aperture)?, generator_aperture)?;
+                let next_sine = cosine
+                    .multiply(corner_sine, generator_aperture)?
+                    .add(&sine.multiply(&corner_cosine, generator_aperture)?, generator_aperture)?;
+                Ok::<_, MultiquadraticRefusal>((next_cosine, next_sine))
+            })();
+            match composed {
+                Ok((next_cosine, next_sine)) => {
+                    // Which half-plane the accumulated point now sits in. The sign of the sine is
+                    // read in the principal embedding, declared by the method's own name.
+                    let sign = next_sine.sign_in_principal_embedding();
+                    let now_upper = match sign {
+                        EmbeddedSign::Positive => true,
+                        EmbeddedSign::Negative => false,
+                        // sin = 0 is the axis itself: the crossing is exactly here. Whether it is
+                        // 0 or π is decided by the cosine, and either way the step ends on a
+                        // boundary rather than inside a half-plane.
+                        EmbeddedSign::Zero => !upper,
+                        EmbeddedSign::DependentGenerators => {
+                            refusals.push((
+                                triangle.join("|"),
+                                "the accumulated turn's generators are multiplicatively dependent \
+                                 modulo squares, so its coefficient vector is not a basis reading"
+                                    .to_owned(),
+                            ));
+                            upper
+                        }
+                    };
+                    if now_upper != upper {
+                        half_turns += 1;
+                        upper = now_upper;
+                    }
+                    cosine = next_cosine;
+                    sine = next_sine;
+                }
+                Err(refusal) => refusals.push((triangle.join("|"), format!("{refusal:?}"))),
+            }
+        }
+
+        let (holonomy, species) = if refusals.is_empty() {
+            let closed = sine == Multiquadratic::zero() && cosine == Multiquadratic::one();
+            let species = match (half_turns, closed) {
+                (0 | 1, _) => DeficitSpecies::Positive,
+                (2, true) => DeficitSpecies::Flat,
+                (2, false) => DeficitSpecies::Negative,
+                _ => DeficitSpecies::Negative,
+            };
+            (
+                HingeHolonomy::Exact { cosine, sine, half_turns },
+                species,
+            )
+        } else {
+            (HingeHolonomy::Refused { refusals }, DeficitSpecies::Unreadable)
+        };
+
+        deficits.push(HingeDeficit { at, cofaces: incident, link, holonomy, species });
+    }
+    deficits
+}
+
+#[cfg(test)]
+mod hinge_tests {
+    use super::*;
+
+    fn weight(value: i64) -> BigInt {
+        BigInt::from(value)
+    }
+
+    fn triangle(names: [&str; 3], weights: [i64; 3]) -> ContactTriangle {
+        let stems = [
+            format!("{}{}", names[0], names[1]),
+            format!("{}{}", names[1], names[2]),
+            format!("{}{}", names[2], names[0]),
+        ];
+        let w = [weight(weights[0]), weight(weights[1]), weight(weights[2])];
+        let corners = corners_from_weights(
+            names,
+            [&stems[0], &stems[1], &stems[2]],
+            [&w[0], &w[1], &w[2]],
+        );
+        let euclidean = realization_of([&w[0], &w[1], &w[2]]);
+        let composes_exactly = euclidean == EuclideanRealization::Realized
+            && corners.iter().all(|corner| corner.sine.is_ok());
+        ContactTriangle {
+            identifiers: [names[0].to_owned(), names[1].to_owned(), names[2].to_owned()],
+            stems,
+            weights: w,
+            corners,
+            euclidean,
+            composes_exactly,
+        }
+    }
+
+    /// The vacuity the tower reported is Regge's flatness hypothesis, and it stays true.
+    #[test]
+    fn one_simplex_is_flat_and_that_is_the_hypothesis_not_a_defect() {
+        let unit = triangle(["a", "b", "c"], [1, 1, 1]);
+        let CoarseTurn::Exact { cosine, sine } = coarse_grain(&unit) else {
+            panic!("the equilateral triangle composes");
+        };
+        // e^{iπ} = (−1, 0): Σθ = π, per simplex, always.
+        assert_eq!(cosine, Multiquadratic::rational(Rat::from_integer(BigInt::from(-1))));
+        assert_eq!(sine, Multiquadratic::zero());
+    }
+
+    /// Six equilateral triangles around one vertex tile the plane exactly: Σθ = 6·(π/3) = 2π.
+    #[test]
+    fn six_equilateral_cofaces_close_a_flat_hinge() {
+        let rim = ["r0", "r1", "r2", "r3", "r4", "r5"];
+        let triangles: Vec<ContactTriangle> = (0..6)
+            .map(|index| triangle(["hub", rim[index], rim[(index + 1) % 6]], [1, 1, 1]))
+            .collect();
+        let deficits = hinge_deficits(&triangles);
+        let hub = deficits.iter().find(|hinge| hinge.at == "hub").expect("the hub is a hinge");
+        assert_eq!(hub.link, LinkClass::Sphere { length: 6 });
+        assert_eq!(hub.species, DeficitSpecies::Flat);
+        let HingeHolonomy::Exact { half_turns, cosine, sine } = &hub.holonomy else {
+            panic!("the hub composes");
+        };
+        assert_eq!(*half_turns, 2, "Σθ = 2π crosses π and 2π");
+        assert_eq!(*cosine, Multiquadratic::one());
+        assert_eq!(*sine, Multiquadratic::zero());
+    }
+
+    /// Five of the same triangles leave a cone point: Σθ = 5π/3 < 2π. **This is the rung carrying
+    /// information** — the same corners, one fewer coface, a different species.
+    #[test]
+    fn five_equilateral_cofaces_leave_a_cone_point() {
+        let rim = ["r0", "r1", "r2", "r3", "r4"];
+        let triangles: Vec<ContactTriangle> = (0..5)
+            .map(|index| triangle(["hub", rim[index], rim[(index + 1) % 5]], [1, 1, 1]))
+            .collect();
+        let deficits = hinge_deficits(&triangles);
+        let hub = deficits.iter().find(|hinge| hinge.at == "hub").expect("the hub is a hinge");
+        assert_eq!(hub.link, LinkClass::Sphere { length: 5 });
+        assert_eq!(hub.species, DeficitSpecies::Positive);
+        let HingeHolonomy::Exact { half_turns, .. } = &hub.holonomy else {
+            panic!("the hub composes");
+        };
+        assert_eq!(*half_turns, 1, "Σθ = 5π/3 crosses π only");
+    }
+
+    /// Seven of them overshoot: Σθ = 7π/3 > 2π, a saddle.
+    #[test]
+    fn seven_equilateral_cofaces_make_a_saddle() {
+        let rim = ["r0", "r1", "r2", "r3", "r4", "r5", "r6"];
+        let triangles: Vec<ContactTriangle> = (0..7)
+            .map(|index| triangle(["hub", rim[index], rim[(index + 1) % 7]], [1, 1, 1]))
+            .collect();
+        let deficits = hinge_deficits(&triangles);
+        let hub = deficits.iter().find(|hinge| hinge.at == "hub").expect("the hub is a hinge");
+        assert_eq!(hub.species, DeficitSpecies::Negative);
+        let HingeHolonomy::Exact { half_turns, .. } = &hub.holonomy else {
+            panic!("the hub composes");
+        };
+        assert_eq!(*half_turns, 2, "Σθ = 7π/3 is past 2π but short of 3π");
+    }
+
+    /// An open fan is a boundary, not a curvature, and the link says so before the deficit is read.
+    #[test]
+    fn an_open_fan_reports_a_ball_link_and_not_a_sphere() {
+        let triangles = vec![
+            triangle(["hub", "r0", "r1"], [1, 1, 1]),
+            triangle(["hub", "r1", "r2"], [1, 1, 1]),
+        ];
+        let deficits = hinge_deficits(&triangles);
+        let hub = deficits.iter().find(|hinge| hinge.at == "hub").expect("the hub is a hinge");
+        assert_eq!(hub.link, LinkClass::Ball { length: 3 });
+        assert!(!hub.link.is_regular_interior());
+    }
+
+    /// Three sheets on one edge fails the manifold-link condition and is retained as singular.
+    #[test]
+    fn three_triangles_on_one_edge_are_a_singular_discriminant() {
+        let triangles = vec![
+            triangle(["hub", "r0", "r1"], [1, 1, 1]),
+            triangle(["hub", "r0", "r2"], [1, 1, 1]),
+            triangle(["hub", "r0", "r3"], [1, 1, 1]),
+        ];
+        let deficits = hinge_deficits(&triangles);
+        let hub = deficits.iter().find(|hinge| hinge.at == "hub").expect("the hub is a hinge");
+        assert_eq!(hub.link, LinkClass::Singular { max_degree: 3 });
+        assert!(!hub.link.is_regular_interior());
+    }
+
+    /// The declared embedding reads a sign, and zero needs no embedding at all.
+    #[test]
+    fn the_principal_embedding_reads_the_sign_and_zero_is_structural() {
+        let three = Multiquadratic::square_root(&Rat::from_integer(BigInt::from(3)), DECLARED_KERNEL_BOUND).unwrap();
+        assert_eq!(three.sign_in_principal_embedding(), EmbeddedSign::Positive);
+        assert_eq!(three.negated().sign_in_principal_embedding(), EmbeddedSign::Negative);
+        assert_eq!(Multiquadratic::zero().sign_in_principal_embedding(), EmbeddedSign::Zero);
+        // √2 − √3 < 0, and no rational coefficient makes that visible without the enclosure.
+        let two = Multiquadratic::square_root(&Rat::from_integer(BigInt::from(2)), DECLARED_KERNEL_BOUND).unwrap();
+        let difference = two.subtract(&three, 4).unwrap();
+        assert_eq!(difference.sign_in_principal_embedding(), EmbeddedSign::Negative);
+    }
+
+    /// **The dependency guard fires**, and it guards a real unsoundness rather than a hypothetical.
+    ///
+    /// `{3, 7, 21}` is distinct, squarefree and ascending — everything the constructors maintain —
+    /// and `3·7·21 = 441 = 21²`, so `√21 = √3·√7` and the `2³` monomials are not a basis. On such a
+    /// set a non-zero coefficient vector can represent zero, which would make both the structural
+    /// zero test and the refinement loop wrong. It is refused by name.
+    #[test]
+    fn a_multiplicatively_dependent_generator_set_is_refused_rather_than_answered() {
+        let root = |value: i64| {
+            Multiquadratic::square_root(&Rat::from_integer(BigInt::from(value)), DECLARED_KERNEL_BOUND)
+                .expect("a squarefree root")
+        };
+        let dependent = root(3).add(&root(7), 4).unwrap().add(&root(21), 4).unwrap();
+        assert_eq!(dependent.generators(), &[BigInt::from(3), BigInt::from(7), BigInt::from(21)]);
+        assert!(!dependent.generators_are_independent());
+        assert_eq!(
+            dependent.sign_in_principal_embedding(),
+            EmbeddedSign::DependentGenerators
+        );
+
+        // And the ordinary case is independent, so the guard is not refusing everything.
+        let independent = root(3).add(&root(7), 4).unwrap();
+        assert!(independent.generators_are_independent());
+        assert_eq!(independent.sign_in_principal_embedding(), EmbeddedSign::Positive);
+    }
 }

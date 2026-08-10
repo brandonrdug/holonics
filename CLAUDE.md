@@ -97,8 +97,8 @@ soma/     body               pure law, no_std, zero dependencies
           kernel/soma.spv    committed boundary artifact; its toolchain is excluded
 ```
 
-**Measured 2026-08-10 at `923b8c5`+dirty:** `cargo test --workspace` **1,949 passed, 0 failed, 14
-ignored**, summed across 42 `test result:` lines. The ten Typst roots under `papers/source/`
+**Measured 2026-08-10 at `e8e9f45`+dirty:** `cargo test --workspace` **1,970 passed, 0 failed, 14
+ignored**, summed across 42 `test result:` lines. (1,949 at `923b8c5`+dirty; 1,963 at `27fc74d`.) The ten Typst roots under `papers/source/`
 compile and `validate-registry()` passes on **262** unique registry entries and **132**
 `mathematics/` objects. (Earlier: 1,732 at `532ea1b`+1; 1,701 at `fa0f92d`; 1,545 on 2026-08-08
 19:27 at `101882f`; 1,512 at `d91720e`; on 2026-08-07 14:34 it was **730**.)
@@ -330,13 +330,21 @@ of which was `None` before.
 
 **And then the driver refused the rung.** `coarse_grain` composes all three corners of a triangle,
 and a planar triangle's angles sum to `π`, so the product is `e^{iπ} = (−1,0)` **identically** —
-measured, **25 of 25 realizable triangles, one distinct value over five distinct weight shapes**.
-That is §8's receipt that could not have come out otherwise, and the vacuity propagates: no generator
-ever reaches a rank above 0. Brandon's own statement names the repair — *"the tower is the
-INTERACTION, a Feynman vertex A,B→C, C relative to the {A,B} frame"* — **a vertex is two in, one
-out**, and composing two corners to return the third is the Law of Cosines' actual content and is not
-constant. Left as a declared open falsifier in `examples/the_tower_climbs.rs` rather than guessed:
-*a rung that carries information will move a generator upward.*
+measured, **25 of 25 realizable triangles**. That was left as a declared open falsifier.
+
+**ANSWERED 2026-08-10, and the falsifier was pointed at the wrong object.** `Σθ = π` per planar
+triangle is **Regge calculus' founding hypothesis** — every simplex is flat and all curvature is
+concentrated on the codimension-two **hinges between** them — so the `(−1,0)` receipt is
+`definition`-grade and could not have come out otherwise. The rung is the **hinge deficit**
+`2π − Σ_{t ⊇ h} θ_h(t)`, which is what Brandon's own `THE_MANIFOLD.md` §III said in 2026-07:
+*"a founding is a deficit angle at a triangular hinge."* Built as `contact_gluing::hinge_deficits`
+with `multiquadratic::sign_in_principal_embedding` supplying the declared hand a winding needs.
+Measured: `1 → 5` distinct turns, `flat 5 · positive 3 · negative 3`, six hinges moving under a
+non-similar metric and zero under a similarity. **And the finding that outranks it: `interior 0 of
+11` — every link is singular, `3F = 75` against `2E = 50`, so by the star/link record's own bar none
+of these deficits is a curvature and this complex is nowhere a Regge geometry.** A `counterexample`
+that passes its grade. `canon/TABLET_THE_TURN.md` §11.5 and
+`research/records/2026-08-10_THE_MANIFOLD_IS_THE_INVARIANT_OF_THE_CURRENTS…`.
 
 ### `kelvin.rs`: the closure argument is a two-junction accident
 

@@ -349,8 +349,172 @@ impl PartialOrd for Multiquadratic {
     /// generator — and this carrier declares none, for the reason the module header states: the
     /// sign of `√k` is a hand, and choosing it is choosing a sheet. Equal elements compare equal;
     /// anything else returns `None` and the caller must declare an embedding to say more.
+    ///
+    /// A caller that *does* declare one calls [`Multiquadratic::sign_in_principal_embedding`],
+    /// which names the sheet it takes in its own name.
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         (self == other).then_some(Ordering::Equal)
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+// One declared embedding, and the sign it makes readable
+// -------------------------------------------------------------------------------------------------
+
+/// The sign of a field element under a declared embedding, or the reason it could not be read.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub enum EmbeddedSign {
+    /// Every coefficient is zero. **This needs no embedding at all**: over an independent generator
+    /// set the basis monomials are linearly independent over `ℚ`, so the element is zero in *every*
+    /// embedding exactly when its coefficient vector vanishes. Structural, exact, and sheet-free.
+    Zero,
+    Positive,
+    Negative,
+    /// **The generator set is multiplicatively dependent modulo squares** — some non-empty subset
+    /// multiplies to a perfect square, so `√(∏ kᵢ)` is rational and the `2ⁿ` monomials are *not* a
+    /// basis.
+    ///
+    /// On such a set a non-zero coefficient vector can represent zero (`√21 − √3·√7 = 0` over
+    /// `{3, 7, 21}`), which breaks both the structural zero test and `PartialEq`. This is refused
+    /// by name rather than answered, and it is the one condition under which the refinement loop
+    /// below could fail to terminate.
+    DependentGenerators,
+}
+
+/// Integer square root of a non-negative `BigInt`, exactly, by Newton descent.
+///
+/// Returns `⌊√n⌋`. No float, and no dependency on `num-integer`, which this workspace does not
+/// carry.
+fn integer_square_root(value: &BigInt) -> BigInt {
+    if value.is_zero() || value.is_one() {
+        return value.clone();
+    }
+    let mut guess = BigInt::one() << ((value.bits() as usize).div_ceil(2) + 1);
+    loop {
+        let next = (&guess + value / &guess) >> 1;
+        if next >= guess {
+            break;
+        }
+        guess = next;
+    }
+    guess
+}
+
+/// A dyadic rational enclosure `[lo, hi]` of `√k` for a non-negative integer `k`, at `bits` of
+/// binary precision, with `hi − lo ≤ 2^{−bits}`.
+///
+/// `⌊√(k·4^b)⌋ / 2^b ≤ √k < (⌊√(k·4^b)⌋ + 1) / 2^b`, which is exact integer arithmetic and never
+/// an approximation with a discarded tail — the two endpoints *are* the return, in the sense
+/// `exact_value.rs` requires of an enclosure.
+fn root_enclosure(kernel: &BigInt, bits: u64) -> (Rat, Rat) {
+    let scale = BigInt::one() << bits;
+    let floor = integer_square_root(&(kernel * &scale * &scale));
+    (
+        Rat::new(floor.clone(), scale.clone()),
+        Rat::new(floor + BigInt::one(), scale),
+    )
+}
+
+impl Multiquadratic {
+    /// **Whether the generator set is multiplicatively independent modulo squares.**
+    ///
+    /// The `2ⁿ` monomials `∏_{i∈S} √kᵢ` are a `ℚ`-basis exactly when no non-empty subset product is
+    /// a perfect square. This tests every subset directly by exact integer square root — no
+    /// factorization, no bound, and `n` subsets' worth of work is the same order as the coefficient
+    /// vector this element already carries.
+    ///
+    /// **Why it is worth testing rather than assuming.** The constructors keep the generator list
+    /// distinct, squarefree and ascending, which is *not* the same as independent: `{3, 7, 21}`
+    /// satisfies every one of those and is dependent, because `3·7·21 = 21²`. On such a set
+    /// `√21 − √3·√7 = 0` with a non-zero coefficient vector, so both the structural zero test and
+    /// the derived `PartialEq` are unsound. No constructor in this module produces such a set from
+    /// another element's generators — [`Multiquadratic::multiply`] takes a union and never mints a
+    /// kernel — but [`Multiquadratic::square_root`] can, from radicands a caller supplies, and
+    /// nothing prevented two such elements from meeting.
+    pub fn generators_are_independent(&self) -> bool {
+        let count = self.generators.len();
+        for subset in 1u32..(1u32 << count) {
+            let mut product = BigInt::one();
+            for (index, generator) in self.generators.iter().enumerate() {
+                if subset & (1 << index) != 0 {
+                    product *= generator;
+                }
+            }
+            let root = integer_square_root(&product);
+            if &root * &root == product {
+                return false;
+            }
+        }
+        true
+    }
+
+    /// **The sign of this element in the principal embedding, where every `√kᵢ` is taken positive.**
+    ///
+    /// The module refuses to order two elements because ordering needs a sheet. This method takes
+    /// one — the principal sheet, `√k > 0` for every generator — and says so in its name, so a
+    /// reader never has to discover a smuggled hand. It is the receiver declaration
+    /// `CLAUDE.md` §13 rule 2 requires: the embedding *measures*, and the caller declares it.
+    ///
+    /// **There is no aperture here and there deliberately is not one.** Zero is decided structurally
+    /// from the coefficient vector; the generator set is checked for independence, which is the one
+    /// condition that could make that test wrong; and a non-zero element is then enclosed by exact
+    /// dyadic intervals and refined by doubling. The width halves each doubling while the value is a
+    /// fixed non-zero real, so separation occurs at finite precision — **termination is a theorem,
+    /// not a budget**, and an authored cap here would have been a level the material determines.
+    pub fn sign_in_principal_embedding(&self) -> EmbeddedSign {
+        if !self.generators_are_independent() {
+            return EmbeddedSign::DependentGenerators;
+        }
+        if self.coefficients.iter().all(Zero::is_zero) {
+            return EmbeddedSign::Zero;
+        }
+        // The value of basis monomial `S` is `√(∏_{i∈S} kᵢ)`, one integer root per subset.
+        let mut radicands: Vec<BigInt> = Vec::with_capacity(self.coefficients.len());
+        for subset in 0..self.coefficients.len() {
+            let mut radicand = BigInt::one();
+            for (index, generator) in self.generators.iter().enumerate() {
+                if subset & (1 << index) != 0 {
+                    radicand *= generator;
+                }
+            }
+            radicands.push(radicand);
+        }
+
+        // The starting precision is read off the material: enough bits to hold the largest
+        // coefficient and radicand in play, so the first pass already separates in the ordinary
+        // case and nothing is authored.
+        let mut bits: u64 = self
+            .coefficients
+            .iter()
+            .map(|coefficient| coefficient.numer().bits().max(coefficient.denom().bits()))
+            .chain(radicands.iter().map(|radicand| radicand.bits()))
+            .max()
+            .unwrap_or(1)
+            + 1;
+        loop {
+            let mut low = Rat::zero();
+            let mut high = Rat::zero();
+            for (subset, coefficient) in self.coefficients.iter().enumerate() {
+                if coefficient.is_zero() {
+                    continue;
+                }
+                let (root_low, root_high) = root_enclosure(&radicands[subset], bits);
+                if coefficient.is_positive() {
+                    low += coefficient * &root_low;
+                    high += coefficient * &root_high;
+                } else {
+                    low += coefficient * &root_high;
+                    high += coefficient * &root_low;
+                }
+            }
+            if low.is_positive() {
+                return EmbeddedSign::Positive;
+            }
+            if high.is_negative() {
+                return EmbeddedSign::Negative;
+            }
+            bits *= 2;
+        }
     }
 }
 

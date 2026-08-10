@@ -516,6 +516,112 @@ active-line supersession dated 2026-07-16 which strikes its own generic identifi
 
 ---
 
+## 9b · BUILT AND MEASURED, 2026-08-10 — and the measurement falsifies the material, not the organ
+
+**Truth status:** `implemented-exact` for both organs; `measured` for every figure, each from a run
+of `crates/holonic-engine/examples/the_hinge_carries_the_curvature.rs` on the material declared
+inline in that file, identical to `the_tower_climbs`'s.
+
+### 9b.1 What was built
+
+| owner | what it is |
+|---|---|
+| `multiquadratic.rs` `sign_in_principal_embedding` | the module refuses to order two elements because *"the sign of `√k` is a hand, and choosing it is choosing a sheet."* This **declares** the principal sheet in its own name and reads a sign exactly: zero is decided structurally by the coefficient vector — sound because distinct squarefree radicals are linearly independent over `ℚ` — and a non-zero element is enclosed by exact dyadic intervals `⌊√(k·4^b)⌋/2^b` and refined by doubling until it separates from zero, returning `Undetermined` at a declared aperture rather than guessing a hand. |
+| `contact_gluing.rs` `hinge_deficits` | one corner from **each** coface, composed; `LinkClass` classifying the link as sphere / ball / components / singular / empty; `HingeHolonomy` carrying the turn **and its winding**; `DeficitSpecies` the trichotomy. |
+
+**The winding is an integer read off monotone crossings.** Every corner of a realizable triangle has
+`θ ∈ (0, π)`, so the accumulated angle strictly increases and one step crosses at most one
+`π`-boundary. Counting crossings gives `Σθ ∈ [mπ, (m+1)π)` exactly, which separates `Σθ < 2π` from
+`= 2π` from `> 2π` **with no angle ever taken**. That is `CLAUDE.md` §2b's standing obligation —
+*"A count of signs is a state reading. Name the windings instead"* — met on the object it was written
+for.
+
+Seven unit controls, all passing, and the middle three are the ones that matter: **five, six and
+seven equilateral cofaces at one hinge return `Positive`, `Flat`, `Negative`** with `m = 1, 2, 2` —
+the same corners, one coface different, three different species. The rung carries information.
+
+### 9b.2 Measured on the material
+
+```text
+21 words · 35 stems · 21 vertices · 32 arcs · 30 triangles (25 realizable)
+
+per-simplex turn      1 distinct value over 25 triangles      (−1, 0)
+per-hinge turn        5 distinct values over 11 hinges        generators {3, 7, 1463} reached
+species               flat 5 · positive 3 · negative 3 · unreadable 0
+links                 interior 0 · boundary 0 · branch 0 · singular 11
+orbit                 6 of 11 hinges move under w ↦ w+1 ; 0 of 11 move under w ↦ 3w
+```
+
+**The falsifier `the_tower_climbs` left open is answered**, and not by a new carrier: `1 → 5` distinct
+values came from moving the index of summation.
+
+### 9b.3 Two findings that outrank the pass
+
+**First: all five flat hinges are the equilateral tiling, and the driver says so itself.** Each has
+six cofaces of one equal-sided shape, so `Σθ = 6·(π/3) = 2π` is arithmetic and not a return. §8's
+tautology rule fires one level up from where it was expected, and the driver separates those five out
+by name rather than reporting `flat 5` as a discovery. The genuine content is the **other six** —
+irrational turns over `{3, 7, 1463}`, split 3 cone / 3 saddle — and those six are **exactly** the six
+that move under the metric change. The tautological five do not move. The correspondence is complete
+and was not arranged.
+
+**Second, and this outranks everything else here: not one hinge is a manifold point.**
+
+```text
+interior 0 of 11        every link is singular
+singular(deg 3)   6     charged charger charges discharge recharge transport
+singular(deg 4)   5     port ported porter transported transporter
+3F = 75  against  2E = 50       the closed-surface condition FAILS
+```
+
+Some edge lies in three or four triangles where a surface admits exactly two. **So by the star/link
+record's own bar, none of these deficits is a curvature.** They are exact readings on a complex that
+is nowhere a Regge geometry. Calling them curvature would be rounding the link into a sphere, which
+is precisely what *"that residual geometry is information"* forbids.
+
+That is a `counterexample`-grade return under `CLAUDE.md` §8 — *a deed that proves its own receiver
+family cannot see what it was built to see has returned real evidence and passes its grade.* The
+organ is correct and driven; what it says about **this** material is that the material is not a
+surface. Whether any material in this body is one is now a well-posed question and is not answered
+here.
+
+### 9b.4 Two authored levels excised, and a latent unsoundness found doing it
+
+`tools/authored_levels.py --check` refused the first build, and it was right to. Both levels are
+gone and neither was replaced by another number:
+
+| level | disposition |
+|---|---|
+| `DECLARED_GENERATOR_APERTURE = 12` | **read off the material.** A composition can only carry the squarefree kernels its own corners already hold, so `required_aperture(triangle)` is the union of those kernels. `canon/THE_AUTHORED_LEVEL.md`'s convicted shape exactly — *"refusing past a number you invented does not make the number derived"* — and the same defect that excised `FREE_ENTRY_APERTURE = 12`. |
+| `DECLARED_REFINEMENT_APERTURE = 8` | **deleted, not derived.** `sign_in_principal_embedding` now loops unbounded: the enclosure halves each doubling while the value is a fixed non-zero real, so **termination is a theorem rather than a budget.** |
+
+**Reported as bookkeeping, per `canon/THE_AUTHORED_LEVEL.md` §5: lifting both moved no return.**
+Every figure in §9b.2 is bit-identical before and after. A wave of excisions reporting no movement
+has done bookkeeping and must say so rather than presenting a green suite as evidence.
+
+**But removing the second one found a real hazard.** An unbounded loop is only sound if the
+structural zero test is sound, and that test rests on the `2ⁿ` monomials being a basis. The
+constructors keep the generator list *distinct, squarefree and ascending* — which is **not** the same
+as multiplicatively independent modulo squares. `{3, 7, 21}` satisfies all three and
+`3·7·21 = 441 = 21²`, so `√21 − √3·√7 = 0` **with a non-zero coefficient vector**, which breaks both
+the zero test and the derived `PartialEq`. `Multiquadratic::generators_are_independent` now tests
+every subset product for squareness by exact integer square root — no factorization, no bound — and
+a dependent set is refused as `EmbeddedSign::DependentGenerators` rather than answered. Driven by a
+control that constructs the dependent set and requires the refusal, plus its negative twin.
+
+The hazard is latent rather than live: no operation in the module mints a kernel from another
+element's generators — `multiply` takes a union — so only a caller supplying radicands can reach it.
+It was reachable, and nothing had stated it.
+
+### 9b.5 What was deliberately not claimed
+
+`Σδ = 2πχ` is computed and labelled a **correctness gate**, `definition`-grade, with the surface
+condition measured before any total is read — and it fails, so no total is asserted. And the species
+census did **not** move under the metric change even though six turns did; that is reported as a
+measurement on one material and asserted of nothing else.
+
+---
+
 ## 10 · Bounds
 
 - Everything in §8 is a **reading of records plus standard Regge calculus**. No rung has been built and
