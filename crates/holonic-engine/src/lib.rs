@@ -271,6 +271,7 @@ pub mod skein;
 // with `codec_recovery::recover`.
 pub mod statement_composition;
 pub mod contact_gluing;
+pub mod multiquadratic;
 pub mod structure_group;
 pub mod statement_grammar;
 // Declared, never glob-exported: `ReceiverId`, `Disagreement`, `Partition`, `Cover`, `Observation`

@@ -671,12 +671,26 @@ impl MorphologicalLanguageEcology {
         action: ActionCurrent,
         worker_threads: usize,
     ) -> Result<MorphologicalLanguageGeneration, MorphologicalLanguageError> {
+        let mut host = ParallelHostLiveCurrentExecutor::new(worker_threads.max(1));
+        self.generate_with_executor(prompt, spec, action, &mut host)
+    }
+
+    /// Generate through one caller-retained physical executor. Terminal current selection remains
+    /// exact host suffix work, but every returned path is materialized on the supplied executor, so
+    /// one mounted card crosses every Swing event on this generation path. Selecting a card at the
+    /// outer language boundary cannot silently construct a private host executor here.
+    pub fn generate_with_executor(
+        &self,
+        prompt: &str,
+        spec: MorphologicalGenerationSpec,
+        action: ActionCurrent,
+        executor: &mut dyn LiveCurrentExecutor,
+    ) -> Result<MorphologicalLanguageGeneration, MorphologicalLanguageError> {
         let generation = self.generate_currents(prompt, spec)?;
-        let outputs = generation
-            .outputs
-            .into_iter()
-            .map(|current| current.into_materialized_return(prompt, action, worker_threads))
-            .collect::<Result<Vec<_>, _>>()?;
+        let mut outputs = Vec::with_capacity(generation.outputs.len());
+        for current in generation.outputs {
+            outputs.push(current.into_materialized_return_with_executor(prompt, action, executor)?);
+        }
         Ok(MorphologicalLanguageGeneration {
             charge: generation.charge,
             outputs,

@@ -2357,7 +2357,6 @@ mod tests {
             .any(|name| name.contains("_via_carry_")));
     }
 
-    #[test]
     /// **Re-founded 2026-08-09. The reopening this test pinned was maximality's own shadow.**
     ///
     /// It asserted that removing `carry` *reopens* `car` — true while the constructor deleted every

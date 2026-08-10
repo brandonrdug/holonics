@@ -13,9 +13,13 @@
 //! independent authority. Exact conic coefficients cross the host/card seam
 //! in a 128-bit signed-magnitude carrier. The card classifies each finite
 //! aperture member independently; it does not propagate through display
-//! adjacency and it does not evaluate floating point. Admission measures both
-//! exact carriers and retains the faster one for the bounded ecology rather
-//! than preferring CUDA by device presence.
+//! adjacency and it does not evaluate floating point. Admission compares the
+//! two exact carriers on their **exact work vectors** — figures derived from
+//! the material and the declared aperture that reproduce bit-for-bit in any
+//! frame — and never on the wall clock that watched them. Where the work
+//! vector does not separate them, the admission is `Open` and **both carriers
+//! stay retained**; it never prefers CUDA by device presence and it never
+//! breaks a tie on a timing sample.
 
 use std::cmp::Ordering;
 use std::collections::{BTreeMap, BTreeSet};
@@ -29,6 +33,7 @@ use relational_geometry::ReceiverId;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+use crate::exact_value::ExactOrdering;
 use crate::{
     ContinuousPresentation, CpuExecutor, PresentationAddress, PresentationError,
     PresentedPrimitiveKey, PrimitiveApertureTrace, ReceiverApertureTrace, ReceiverPrimitive,
@@ -787,6 +792,7 @@ impl CudaApertureExecutor {
                 admission_candidate_nanoseconds: 0,
                 admission_authority_nanoseconds: 0,
                 admission: CarrierAdmission::Open,
+                work_ordering: ExactOrdering::Open,
                 authority_work: CarrierWork::default(),
                 candidate_work: CarrierWork::default(),
                 display_frame: self.display_frame,
@@ -839,15 +845,18 @@ impl CudaApertureExecutor {
         // out a desktop.
         let candidate_work = CarrierWork::of_candidate(&receipt);
         let authority_work = CarrierWork::of_host_authority(&receipt);
-        let admission = self
-            .declared_metric
-            .as_ref()
-            .map_or(CarrierAdmission::Open, |metric| {
-                CarrierAdmission::under(metric, &authority_work, &candidate_work)
-            });
+        // The four-state exact ordering of the two work vectors, taken with nothing declared. It
+        // is retained on the receipt whether or not it decided, because `Equal` (a mirror) and
+        // `Open` (incomparable kinds of work) are different states that conduct identically.
+        let work_ordering = candidate_work.order_against(&authority_work);
+        let admission = match self.declared_metric.as_ref() {
+            Some(metric) => CarrierAdmission::under(metric, &authority_work, &candidate_work),
+            None => CarrierAdmission::from_work(&authority_work, &candidate_work),
+        };
         let preferred = admission.conducts_through();
         receipt.host_parity = true;
         receipt.admission = admission.clone();
+        receipt.work_ordering = work_ordering;
         receipt.authority_work = authority_work;
         receipt.candidate_work = candidate_work;
         receipt.display_frame = self.display_frame;
@@ -856,6 +865,13 @@ impl CudaApertureExecutor {
         let initial = match preferred {
             ApertureExecutionBackend::ExactHost => {
                 let required_bits = receipt.intermediate_bits.clone();
+                // The host receipt is rebuilt from the host run, so every field carrying the
+                // admission's own evidence has to be carried across the swap. Losing it here would
+                // leave the branch where the host was admitted unable to say why — which is the
+                // branch a reader checks first.
+                let carried_admission = std::mem::take(&mut receipt.admission);
+                let carried_authority_work = std::mem::take(&mut receipt.authority_work);
+                let carried_candidate_work = std::mem::take(&mut receipt.candidate_work);
                 receipt = exact_host_receipt(
                     &self.device_name,
                     presentation,
@@ -866,6 +882,11 @@ impl CudaApertureExecutor {
                     authority_nanoseconds,
                 )?;
                 receipt.intermediate_bits = required_bits;
+                receipt.admission = carried_admission;
+                receipt.work_ordering = work_ordering;
+                receipt.authority_work = carried_authority_work;
+                receipt.candidate_work = carried_candidate_work;
+                receipt.display_frame = self.display_frame;
                 receipt.admission_candidate_nanoseconds = candidate_nanoseconds;
                 receipt.admission_authority_nanoseconds = authority_nanoseconds;
                 authority
@@ -884,9 +905,14 @@ impl CudaApertureExecutor {
 
     /// Declare the receiver's exchange between kinds of work.
     ///
-    /// Without this, [`Self::admit`] returns [`CarrierAdmission::Open`] and both carriers stay
-    /// retained. That default is deliberate: an undeclared metric is not a licence to guess, and
-    /// guessing is what the wall-clock comparison was.
+    /// Without this, [`Self::admit`] falls back to [`CarrierAdmission::from_work`] — the
+    /// **metric-free** product order, which decides only when one carrier dominates the other in
+    /// every coordinate and returns [`CarrierAdmission::Open`] otherwise, retaining both. That
+    /// default is deliberate: an undeclared metric is not a licence to guess, and guessing is what
+    /// the wall-clock comparison was. On this executor's own material the two carriers trade host
+    /// evaluations against device evaluations plus transferred octets, so the product order is
+    /// [`ExactOrdering::Open`] whenever the card did any work at all — which is exactly why a
+    /// declaration, and not a clock, is what separates them.
     #[must_use]
     pub fn declaring(mut self, metric: DeclaredCarrierMetric) -> Self {
         self.declared_metric = Some(metric);
@@ -973,6 +999,44 @@ impl CarrierWork {
             intermediate_bits: receipt.intermediate_bits.clone(),
         }
     }
+
+    /// Order this work vector against another **with no metric at all**, returning the four-state
+    /// [`ExactOrdering`] this body already owns at `crates/holonic-engine/src/exact_value.rs`.
+    ///
+    /// This is the componentwise (product) order, and it is a **partial** order on purpose. A
+    /// coordinate here is a kind of work, and the kinds are not interconvertible: a host evaluation
+    /// and a device evaluation are different units, and nothing in the material says how many of one
+    /// buys one of the other. So:
+    ///
+    /// - `Less` / `Greater` — one carrier does no more work in **every** coordinate and strictly
+    ///   less in at least one. That is domination, and it holds under every monotone metric, so it
+    ///   needs no receiver declaration to be read.
+    /// - `Equal` — the two vectors coincide. The detour founded nothing.
+    /// - `Open` — some coordinate is strictly less and another strictly greater. The carriers are
+    ///   **incomparable**, not tied, and **both stay retained**. From `exact_value.rs`'s own
+    ///   opening: *"Values which cannot yet be ordered from their exact certificates return `Open`
+    ///   rather than falling through to an epsilon comparison."* A wall-clock sample is what falling
+    ///   through looked like here.
+    ///
+    /// `intermediate_bits` participates: it is a width rather than a count, so
+    /// [`DeclaredCarrierMetric`] does not price it, but a carrier that had to represent wider
+    /// intermediates exactly did strictly more work per evaluation and the product order may say so.
+    pub fn order_against(&self, other: &Self) -> ExactOrdering {
+        let coordinates = [
+            self.host_evaluations.cmp(&other.host_evaluations),
+            self.device_evaluations.cmp(&other.device_evaluations),
+            self.transfer_bytes.cmp(&other.transfer_bytes),
+            self.intermediate_bits.cmp(&other.intermediate_bits),
+        ];
+        let any_less = coordinates.iter().any(|order| *order == Ordering::Less);
+        let any_greater = coordinates.iter().any(|order| *order == Ordering::Greater);
+        match (any_less, any_greater) {
+            (true, true) => ExactOrdering::Open,
+            (true, false) => ExactOrdering::Less,
+            (false, true) => ExactOrdering::Greater,
+            (false, false) => ExactOrdering::Equal,
+        }
+    }
 }
 
 /// A receiver's declared exchange between kinds of work.
@@ -1052,12 +1116,21 @@ impl CarrierDilation {
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub enum CarrierAdmission {
     /// The arc wound further than the chord, `C > d`: the direct crossing is the shorter walk.
-    ExactHost { dilation: CarrierDilation },
+    ///
+    /// `dilation` is `None` when no metric was declared and the admission was taken on the
+    /// **metric-free** product order instead — there, one carrier dominates the other in every
+    /// coordinate, which is a stronger statement than any single metric makes and forms no pair.
+    ExactHost { dilation: Option<CarrierDilation> },
     /// The arc is the shorter walk, `C < d`: the detour paid under this receiver's declaration.
-    HybridCuda { dilation: CarrierDilation },
-    /// No metric was declared, or the declared metric makes this a **mirror** — `C = d`, the arc
-    /// never left the diagonal, nothing separates the carriers. **Both stay retained**, and a
-    /// caller may conduct through either with [`AdmittedCudaApertureExecutor::trace_through`].
+    HybridCuda { dilation: Option<CarrierDilation> },
+    /// The carriers are not separated. Either no metric was declared and the work vectors are
+    /// **incomparable** — [`ExactOrdering::Open`], some coordinate strictly less and another
+    /// strictly greater — or the declared metric makes this a **mirror**, `C = d`, the arc never
+    /// left the diagonal. **Both stay retained**, and a caller may conduct through either with
+    /// [`AdmittedCudaApertureExecutor::trace_through`].
+    ///
+    /// The receipt's `work_ordering` field tells the two apart: `Equal` is a mirror, `Open` is
+    /// incomparability. They conduct the same way and they are not the same state.
     #[default]
     Open,
 }
@@ -1077,9 +1150,30 @@ impl CarrierAdmission {
             chord: metric.cost_of(authority),
         };
         match dilation.arc.cmp(&dilation.chord) {
-            Ordering::Greater => Self::ExactHost { dilation },
-            Ordering::Less => Self::HybridCuda { dilation },
+            Ordering::Greater => Self::ExactHost {
+                dilation: Some(dilation),
+            },
+            Ordering::Less => Self::HybridCuda {
+                dilation: Some(dilation),
+            },
             Ordering::Equal => Self::Open,
+        }
+    }
+
+    /// Read the admission off the two exact work vectors alone, **with nothing declared**.
+    ///
+    /// This is [`CarrierWork::order_against`] read as an admission. It decides only on domination —
+    /// no more work in any coordinate, strictly less in one — because that is the only separation
+    /// available without a receiver's declared exchange between kinds of work. Everything else,
+    /// including genuine incomparability, is [`Self::Open`] and retains both carriers.
+    ///
+    /// An undeclared metric is not a licence to guess. It is also not a licence to refuse a
+    /// separation the material already carries.
+    pub fn from_work(authority: &CarrierWork, candidate: &CarrierWork) -> Self {
+        match candidate.order_against(authority) {
+            ExactOrdering::Less => Self::HybridCuda { dilation: None },
+            ExactOrdering::Greater => Self::ExactHost { dilation: None },
+            ExactOrdering::Equal | ExactOrdering::Open => Self::Open,
         }
     }
 
@@ -1100,10 +1194,11 @@ impl CarrierAdmission {
         matches!(self, Self::Open)
     }
 
-    /// The whole pair `(C, d)`, or `None` when nothing was declared to form it against.
+    /// The whole pair `(C, d)`, or `None` when nothing was declared to form it against — which
+    /// includes a decided admission taken on the metric-free product order.
     pub fn dilation(&self) -> Option<&CarrierDilation> {
         match self {
-            Self::ExactHost { dilation } | Self::HybridCuda { dilation } => Some(dilation),
+            Self::ExactHost { dilation } | Self::HybridCuda { dilation } => dilation.as_ref(),
             Self::Open => None,
         }
     }
@@ -1343,6 +1438,11 @@ pub struct CudaApertureReceipt {
     pub admission_authority_nanoseconds: u128,
     /// Which carrier was admitted, and by what exact margin over the declared metric.
     pub admission: CarrierAdmission,
+    /// The candidate's work vector ordered against the authority's **with nothing declared**, in
+    /// the four states of `exact_value::ExactOrdering`. `Open` here is incomparability — kinds of
+    /// work that trade against each other and cannot be ordered without a receiver's declaration —
+    /// and it is a different state from `Equal`, which is a mirror. Both retain both carriers.
+    pub work_ordering: ExactOrdering,
     /// The frame-invariant work vectors the admission was actually taken on.
     pub authority_work: CarrierWork,
     pub candidate_work: CarrierWork,
@@ -1408,6 +1508,7 @@ fn exact_host_receipt(
         admission_candidate_nanoseconds: 0,
         admission_authority_nanoseconds: 0,
         admission: CarrierAdmission::Open,
+        work_ordering: ExactOrdering::Open,
         authority_work: CarrierWork::default(),
         candidate_work: CarrierWork::default(),
         display_frame: DisplayFrame::Undeclared,
@@ -1866,6 +1967,76 @@ mod tests {
     }
 
     #[test]
+    fn the_metric_free_product_order_decides_only_on_domination() {
+        // Domination needs no declaration: a carrier that does no more work in any coordinate and
+        // strictly less in one is cheaper under EVERY monotone metric.
+        let dominated = work(100, 50, 32);
+        let dominating = work(1_000, 50, 64);
+        assert_eq!(dominated.order_against(&dominating), ExactOrdering::Less);
+        assert_eq!(dominating.order_against(&dominated), ExactOrdering::Greater);
+        assert_eq!(
+            CarrierAdmission::from_work(&dominating, &dominated).conducts_through(),
+            ApertureExecutionBackend::HybridCuda,
+            "the candidate dominates, and nothing had to be declared to read it"
+        );
+        assert_eq!(
+            CarrierAdmission::from_work(&dominated, &dominating).conducts_through(),
+            ApertureExecutionBackend::ExactHost
+        );
+        assert_eq!(
+            CarrierAdmission::from_work(&dominating, &dominated).dilation(),
+            None,
+            "no metric formed a pair, so no pair is claimed"
+        );
+        assert_eq!(dominated.order_against(&dominated), ExactOrdering::Equal);
+    }
+
+    #[test]
+    fn incomparable_work_vectors_admit_open_and_retain_both_carriers() {
+        // THE FINDING. The two carriers on this executor's own material trade host evaluations
+        // against device evaluations plus transferred octets. That is not a tie -- the vectors are
+        // INCOMPARABLE, and `Equal` and `Open` are different states.
+        let authority = work(1_000, 0, 0);
+        let candidate = work(100, 900, 4_096);
+        assert_eq!(
+            candidate.order_against(&authority),
+            ExactOrdering::Open,
+            "strictly fewer host evaluations, strictly more device work: no product order"
+        );
+        let admission = CarrierAdmission::from_work(&authority, &candidate);
+        assert!(admission.is_open(), "both carriers stay retained");
+        assert_eq!(admission.dilation(), None);
+        // And a declared metric does separate the same two vectors, which is what makes the Open
+        // above a refusal rather than an inability.
+        assert!(!CarrierAdmission::under(&metric(1, 1, 1), &authority, &candidate).is_open());
+    }
+
+    #[test]
+    fn the_real_material_work_vectors_are_incomparable_whenever_the_card_did_anything() {
+        // Read off `of_candidate` / `of_host_authority` rather than a hand-built fixture, so this
+        // is a statement about the live path and not about the test's own arithmetic.
+        let mut receipt = exact_host_receipt_for_test();
+        receipt.exact_support_evaluations = BigUint::from(900_u32);
+        receipt.host_exact_support_evaluations = BigUint::from(100_u32);
+        receipt.device_exact_support_evaluations = BigUint::from(800_u32);
+        receipt.device_output_bytes = BigUint::from(256_u32);
+        let candidate = CarrierWork::of_candidate(&receipt);
+        let authority = CarrierWork::of_host_authority(&receipt);
+        assert_eq!(candidate.order_against(&authority), ExactOrdering::Open);
+
+        // And when the card did nothing, the split collapses and the two carriers are a mirror.
+        receipt.host_exact_support_evaluations = BigUint::from(900_u32);
+        receipt.device_exact_support_evaluations = BigUint::zero();
+        receipt.device_output_bytes = BigUint::zero();
+        assert_eq!(
+            CarrierWork::of_candidate(&receipt).order_against(&CarrierWork::of_host_authority(
+                &receipt
+            )),
+            ExactOrdering::Equal,
+        );
+    }
+
+    #[test]
     fn a_receipt_carries_the_frame_its_nanoseconds_were_taken_in() {
         // A measurement without its frame is the absolute-frame defect. Every timing figure in
         // this repository was taken headless, so `Undeclared` must be distinguishable from a
@@ -1910,6 +2081,7 @@ mod tests {
             admission_candidate_nanoseconds: 0,
             admission_authority_nanoseconds: 0,
             admission: CarrierAdmission::Open,
+            work_ordering: ExactOrdering::Open,
             authority_work: CarrierWork::default(),
             candidate_work: CarrierWork::default(),
             display_frame: DisplayFrame::Undeclared,

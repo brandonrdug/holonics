@@ -676,14 +676,25 @@ pub(super) fn receive_question(
     action: ActionCurrent,
     worker_threads: usize,
 ) -> Result<ResonanceEcology, MorphologicalLanguageError> {
+    let mut host = ParallelHostLiveCurrentExecutor::new(worker_threads.max(1));
+    receive_question_with_executor(prompt, action, &mut host)
+}
+
+/// Receive the outer question through one caller-retained physical executor. The executor crosses
+/// the question's Swing event; selecting a card at the outer language boundary cannot silently
+/// construct a private host executor here.
+pub(super) fn receive_question_with_executor(
+    prompt: &[String],
+    action: ActionCurrent,
+    executor: &mut dyn LiveCurrentExecutor,
+) -> Result<ResonanceEcology, MorphologicalLanguageError> {
     let machine = LiveCurrentMachine::new(
         SparseStandingSurface::empty_rank(10)
             .map_err(|_| MorphologicalLanguageError::CarrierExtent)?,
     );
     let mut ecology = ResonanceEcology::new(machine);
     let occurrence = ResonanceOccurrence::probe(0, token_germs(prompt)?)?;
-    let mut executor = ParallelHostLiveCurrentExecutor::new(worker_threads.max(1));
-    ecology.receive_with(&occurrence, action, &mut executor)?;
+    ecology.receive_with(&occurrence, action, executor)?;
     Ok(ecology)
 }
 
@@ -711,14 +722,54 @@ pub(super) fn materialize_generated_current_live(
     })
 }
 
+/// Carry the selected current back through the same live question body on one caller-retained
+/// physical executor. The question event and every self-emanated return cross the same executor,
+/// so a mounted card is not silently abandoned between reception and emanation.
+pub(super) fn materialize_generated_current_live_with_executor(
+    prompt: &[String],
+    returned_question: ResonanceEcology,
+    current: MorphologicalGeneratedCurrent,
+    action: ActionCurrent,
+    executor: &mut dyn LiveCurrentExecutor,
+) -> Result<MorphologicalGeneratedText, MorphologicalLanguageError> {
+    let returned_rest = materialize_returned_path_live_with_executor(
+        returned_question,
+        prompt,
+        current.tokens.iter().map(|token| token.token.as_str()),
+        action,
+        executor,
+    )?;
+    Ok(MorphologicalGeneratedText {
+        text: current.text,
+        tokens: current.tokens,
+        phases: current.phases,
+        rest: current.rest,
+        caused_seams: current.caused_seams,
+        returned_rest,
+    })
+}
+
 pub(super) fn materialize_returned_path_live<'a>(
-    mut ecology: ResonanceEcology,
+    ecology: ResonanceEcology,
     prompt: &[String],
     generated: impl IntoIterator<Item = &'a str>,
     action: ActionCurrent,
     worker_threads: usize,
 ) -> Result<ResonanceEcologyRestImage, MorphologicalLanguageError> {
-    let mut executor = ParallelHostLiveCurrentExecutor::new(worker_threads.max(1));
+    let mut host = ParallelHostLiveCurrentExecutor::new(worker_threads.max(1));
+    materialize_returned_path_live_with_executor(ecology, prompt, generated, action, &mut host)
+}
+
+/// Re-enter every generated event as self-emanated cause through one caller-retained physical
+/// executor. Each returned event crosses the supplied executor; the emanation path cannot select a
+/// private host pool behind a caller which already mounted one.
+pub(super) fn materialize_returned_path_live_with_executor<'a>(
+    mut ecology: ResonanceEcology,
+    prompt: &[String],
+    generated: impl IntoIterator<Item = &'a str>,
+    action: ActionCurrent,
+    executor: &mut dyn LiveCurrentExecutor,
+) -> Result<ResonanceEcologyRestImage, MorphologicalLanguageError> {
     let mut predecessor = prompt.last().cloned().unwrap_or_default();
     for (generated_at, generated) in generated.into_iter().enumerate() {
         let source_order = u64::try_from(generated_at)
@@ -727,7 +778,7 @@ pub(super) fn materialize_returned_path_live<'a>(
             .ok_or(MorphologicalLanguageError::CarrierExtent)?;
         let germs = token_germs(&[predecessor, generated.to_owned()])?;
         let occurrence = ResonanceOccurrence::self_emanated(source_order, germs)?;
-        ecology.receive_with(&occurrence, action, &mut executor)?;
+        ecology.receive_with(&occurrence, action, executor)?;
         predecessor = generated.to_owned();
     }
     Ok(ecology.rest_image()?)

@@ -306,6 +306,68 @@ join.
 
 ---
 
+## 0c. The implementation wave of 2026-08-10, and the four defects it found
+
+**Every item of the assessment's ordered list was attempted. The findings outrank the completions.**
+
+### The tower: the blocker was misdiagnosed, and correcting it produced the connection
+
+The assessment said `Corner::sine: Option<Rat>` → `AlgebraicRoot`. **That is wrong.**
+`exact_value::AlgebraicRoot` has no arithmetic — no `Add`, no `Mul` — it is a *comparison* carrier
+with Sturm ordering. Substituting it would let the tower represent a sine and still not compose a
+turn.
+
+The right carrier is `crates/holonic-engine/src/multiquadratic.rs`: `sin C = √d` with
+`d = 1 − cos² ∈ ℚ`, so three corners land in `ℚ(√d₁,√d₂,√d₃)` — **multiquadratic**, degree ≤ 2³,
+carried as the **twisted group algebra of `(ℤ/2)ⁿ` over ℚ**, graded by symmetric difference with
+structure constant `∏_{i∈S∩T} kᵢ`. Exact, closed, no float, no angle.
+
+**Its grading group is the fork.** The `2ⁿ` basis monomials are exactly `H.0150`'s membership words;
+multiplying two turns is symmetric difference of their crossing words; each generator's sign
+ambiguity is §2b's half turn. **The crossing-word algebra and the turn-composition algebra are one
+algebra.** Measured on real material: 75 irrational corners over generators `{3, 7, 1463}`, every one
+of which was `None` before.
+
+**And then the driver refused the rung.** `coarse_grain` composes all three corners of a triangle,
+and a planar triangle's angles sum to `π`, so the product is `e^{iπ} = (−1,0)` **identically** —
+measured, **25 of 25 realizable triangles, one distinct value over five distinct weight shapes**.
+That is §8's receipt that could not have come out otherwise, and the vacuity propagates: no generator
+ever reaches a rank above 0. Brandon's own statement names the repair — *"the tower is the
+INTERACTION, a Feynman vertex A,B→C, C relative to the {A,B} frame"* — **a vertex is two in, one
+out**, and composing two corners to return the third is the Law of Cosines' actual content and is not
+constant. Left as a declared open falsifier in `examples/the_tower_climbs.rs` rather than guessed:
+*a rung that carries information will move a generator upward.*
+
+### `kelvin.rs`: the closure argument is a two-junction accident
+
+The spine's own `j ≠ 0` cut organ had zero callers and zero drivers. Driving it found that its
+`carried()` doc's explanation — `1ᵀ(Uᵀ)⁻¹c = 1ᵀc` because `U·1 = 1`, *"the material loop stays closed
+because the flow is incompressible"* — preserves the covector's **total sum**, and total-sum equals
+closedness **only when `|V| = 2`**. On a three-junction incidence all three declared closed covectors
+break closure: **9 of 9 junction readings non-zero while every total sum is still exactly 0**, and
+`CarriedLoopNotClosed` fires on all three. The code is right; the doc's reason is narrower than it
+reads, and the module's own tests only ever used the theta graph. Sharper still: on that incidence
+`⟨c,v⟩` is *still* conserved — that identity does not consult the incidence — **but the carried
+covector is no longer a loop, so what is conserved is not a circulation.**
+
+### The seam, and what it confirmed about the front
+
+Five `_with_executor` twins now thread one mounted executor through the generation path, with a
+counting-executor test that a fake twin fails. **`generate_currents` was deliberately given no twin
+because it crosses no Swing event at all** — zero `ResonanceEcology`, zero `receive_with`; it is pure
+host suffix arithmetic. So mounting a card on the frontier is **not** a threading problem: it
+requires changing what a state-expansion *is*.
+
+### Unreachable refusals, reported not counted
+
+`KelvinError::{LoopCollapsed, Linear}` and `RunningIntegralError::PairIsNotACycle` cannot be reached
+through their public paths — in each case an upstream check already establishes the invariant the
+guard asserts. And `found_potential`'s base is a **live gauge**: 3 distinct trees, 3 distinct chords,
+4 distinct potentials over 4 bases, with `|residual|` the single invariant. The module's own tests
+only ever called it from one base, so base-invariance had never been separated from base-blindness.
+
+---
+
 ## 1. The floor is a carrier, not a retired interface
 
 **The single most damaging defect in the inherited authority was an admission rule that made the
@@ -947,8 +1009,28 @@ The grading discipline in `canon/EPISTEMIC_GRADES.md` stands. Three additions:
   `canon/THE_AUTHORED_LEVEL.md` §5.0.
 
 - **A cost is measured in work, never in elapsed time. A clock may measure; it may never select.**
-  This is the fourth member of the family above and the one with a live instance. Convicted
-  2026-08-08 at `crates/holonic-engine/src/cuda_aperture.rs:818`, where
+  This is the fourth member of the family above. **REPAIRED, and this bullet called it live until
+  2026-08-10, which was stale by two days.** The clock comparison was removed at `cdf2a7b`
+  (2026-08-08). What had never been built was a driver, and building one on 2026-08-10 found three
+  further gaps in the repair, all now closed: `Equal` was collapsed into `Open`, so a mirror could
+  not be told from a genuine incomparability; an undeclared metric admitted nothing even where one
+  carrier dominated in every coordinate; and `admit`'s host branch rebuilt its receipt while
+  **discarding the admission, both work vectors and the display frame**, so the branch that admitted
+  the host could not say why. Driver: `crates/holonic-engine/examples/the_carrier_is_admitted_by_its_work.rs`,
+  run on a real RTX 4080 SUPER.
+
+  **Two measured findings, and the first changes what the rule can promise.** On real material the
+  work vector **never orders the two carriers**: the candidate is
+  `(host 0, device 2060, transfer 288)` against the authority's `(host 2060, device 0, transfer 0)`
+  — one coordinate strictly less and two strictly greater, hence **incomparable, not tied**. The
+  carriers trade host evaluations against device evaluations plus transferred octets, and *nothing
+  in the material prices that exchange*. So a **declared receiver metric is load-bearing**, and the
+  rule's honest form is: the work vector removes the clock, and where it returns `Open` a *declared
+  metric* decides — never elapsed time. Second, `CarrierWork::of_host_authority` predicts 2060 host
+  evaluations where the host law performs **649**, a 3.17× over-prediction whose *ordering* survives;
+  the magnitude is refuted and returned as evidence. Neither figure was obtainable from a clock.
+
+  **What was convicted, as provenance.** At `cuda_aperture.rs:818`, where
   `if authority_nanoseconds < candidate_nanoseconds` — **one unrepeated wall-clock sample per
   carrier** — permanently selects which of two exact carriers the body conducts through for the rest
   of its life. Brandon, ruling directly on being shown it: *"A clock timing sample should not be the

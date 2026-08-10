@@ -1,6 +1,7 @@
 use super::current::{
     collect_oriented_returned_seams, materialize_generated_current_live,
-    materialize_oriented_returned_seam, receive_question, returned_seam_dominates,
+    materialize_generated_current_live_with_executor, materialize_oriented_returned_seam,
+    receive_question, receive_question_with_executor, returned_seam_dominates,
 };
 use super::*;
 
@@ -156,6 +157,30 @@ impl MorphologicalGeneratedCurrent {
             self,
             action,
             worker_threads,
+        )
+    }
+
+    /// Carry the selected current through the same live question body on one caller-retained
+    /// physical executor. The executor crosses both the question event and every self-emanated
+    /// return; selecting a card at the outer language boundary cannot silently construct a private
+    /// host executor here.
+    pub fn into_materialized_return_with_executor(
+        self,
+        prompt: &str,
+        action: ActionCurrent,
+        executor: &mut dyn LiveCurrentExecutor,
+    ) -> Result<MorphologicalGeneratedText, MorphologicalLanguageError> {
+        let prompt_tokens = lexical_tokens(prompt);
+        if prompt_tokens.is_empty() {
+            return Err(MorphologicalLanguageError::EmptyPrompt);
+        }
+        let returned_question = receive_question_with_executor(&prompt_tokens, action, executor)?;
+        materialize_generated_current_live_with_executor(
+            &prompt_tokens,
+            returned_question,
+            self,
+            action,
+            executor,
         )
     }
 

@@ -436,6 +436,21 @@ impl CausalLanguageEcology {
         action: ActionCurrent,
         worker_threads: usize,
     ) -> Result<CausalLanguageGeneration, CausalLanguageError> {
+        let mut host = ParallelHostLiveCurrentExecutor::new(worker_threads.max(1));
+        self.generate_with_executor(prompt, spec, action, &mut host)
+    }
+
+    /// Generate through one caller-retained physical executor. Recruitment and suffix emanation
+    /// remain exact host work, but the question event and every self-emanated return of every
+    /// terminal path cross the supplied executor; selecting a card at the outer language boundary
+    /// cannot silently construct a private host executor here.
+    pub fn generate_with_executor(
+        &self,
+        prompt: &str,
+        spec: CausalLanguageGenerationSpec,
+        action: ActionCurrent,
+        executor: &mut dyn LiveCurrentExecutor,
+    ) -> Result<CausalLanguageGeneration, CausalLanguageError> {
         let prompt_tokens = lexical_tokens(prompt);
         if prompt_tokens.is_empty() {
             return Err(CausalLanguageError::EmptyPrompt);
@@ -517,36 +532,34 @@ impl CausalLanguageEcology {
             }
         }
 
-        let outputs = states
-            .into_iter()
-            .map(|state| {
-                let mut ecology = self.receive_question(&prompt_tokens, action, worker_threads)?;
-                let mut predecessor = prompt_tokens
+        let mut outputs = Vec::with_capacity(states.len());
+        for state in states {
+            let mut ecology =
+                self.receive_question_with_executor(&prompt_tokens, action, executor)?;
+            let mut predecessor = prompt_tokens
+                .last()
+                .map(ToOwned::to_owned)
+                .ok_or(CausalLanguageError::EmptyPrompt)?;
+            for (generated_at, generated) in state.emitted.iter().enumerate() {
+                let source_order = u64::try_from(generated_at)
+                    .map_err(|_| CausalLanguageError::CarrierExtent)?
+                    .checked_add(1)
+                    .ok_or(CausalLanguageError::CarrierExtent)?;
+                let germs = token_germs(&[predecessor, generated.token.to_owned()])?;
+                let occurrence = ResonanceOccurrence::self_emanated(source_order, germs)?;
+                ecology.receive_with(&occurrence, action, executor)?;
+                predecessor = generated.token.to_owned();
+            }
+            outputs.push(CausalGeneratedText {
+                text: render_tokens(state.emitted.iter().map(|token| token.token.as_str())),
+                stopped_at_sentence_boundary: state
+                    .emitted
                     .last()
-                    .map(ToOwned::to_owned)
-                    .ok_or(CausalLanguageError::EmptyPrompt)?;
-                let mut executor = ParallelHostLiveCurrentExecutor::new(worker_threads.max(1));
-                for (generated_at, generated) in state.emitted.iter().enumerate() {
-                    let source_order = u64::try_from(generated_at)
-                        .map_err(|_| CausalLanguageError::CarrierExtent)?
-                        .checked_add(1)
-                        .ok_or(CausalLanguageError::CarrierExtent)?;
-                    let germs = token_germs(&[predecessor, generated.token.to_owned()])?;
-                    let occurrence = ResonanceOccurrence::self_emanated(source_order, germs)?;
-                    ecology.receive_with(&occurrence, action, &mut executor)?;
-                    predecessor = generated.token.to_owned();
-                }
-                Ok(CausalGeneratedText {
-                    text: render_tokens(state.emitted.iter().map(|token| token.token.as_str())),
-                    stopped_at_sentence_boundary: state
-                        .emitted
-                        .last()
-                        .is_some_and(|token| sentence_boundary(&token.token)),
-                    tokens: state.emitted,
-                    returned_rest: ecology.rest_image()?,
-                })
-            })
-            .collect::<Result<_, CausalLanguageError>>()?;
+                    .is_some_and(|token| sentence_boundary(&token.token)),
+                tokens: state.emitted,
+                returned_rest: ecology.rest_image()?,
+            });
+        }
         Ok(CausalLanguageGeneration {
             prompt: prompt.to_owned(),
             prompt_tokens,
@@ -667,11 +680,30 @@ impl CausalLanguageEcology {
             .collect())
     }
 
+    /// The retained host mouth for the question event. It has no library caller: this organ's one
+    /// generation path now threads a caller-retained executor all the way down, so keeping a
+    /// private host construction on that path would be the very defect the twin below removes.
+    /// The signature is preserved rather than cut because it is the worker-count mouth a caller
+    /// which has mounted nothing still expects.
+    #[allow(dead_code)]
     fn receive_question(
         &self,
         prompt: &[String],
         action: ActionCurrent,
         worker_threads: usize,
+    ) -> Result<ResonanceEcology, CausalLanguageError> {
+        let mut host = ParallelHostLiveCurrentExecutor::new(worker_threads.max(1));
+        self.receive_question_with_executor(prompt, action, &mut host)
+    }
+
+    /// Receive the outer question through one caller-retained physical executor. The executor
+    /// crosses the question's Swing event; selecting a card at the outer language boundary cannot
+    /// silently construct a private host executor here.
+    fn receive_question_with_executor(
+        &self,
+        prompt: &[String],
+        action: ActionCurrent,
+        executor: &mut dyn LiveCurrentExecutor,
     ) -> Result<ResonanceEcology, CausalLanguageError> {
         let machine = LiveCurrentMachine::new(
             SparseStandingSurface::empty_rank(10)
@@ -679,8 +711,7 @@ impl CausalLanguageEcology {
         );
         let mut ecology = ResonanceEcology::new(machine);
         let question = ResonanceOccurrence::probe(0, token_germs(prompt)?)?;
-        let mut executor = ParallelHostLiveCurrentExecutor::new(worker_threads.max(1));
-        ecology.receive_with(&question, action, &mut executor)?;
+        ecology.receive_with(&question, action, executor)?;
         Ok(ecology)
     }
 }
@@ -1030,8 +1061,143 @@ fn join_u64(low: u32, high: u32) -> Option<u64> {
 mod tests {
     use super::*;
 
+    use soma_membrane::{
+        CurrentExecutionRequest, DirectedExecutionRequest, ExecutedContemporaryEvent,
+        LiveCurrentError, RegionalExecutionRequest,
+    };
+
+    use crate::morphological_language::{
+        MorphologicalGenerationSpec, MorphologicalLanguageEcology, MorphologicalLanguagePassage,
+    };
+
     fn action() -> ActionCurrent {
         ActionCurrent::new(Cog::lit(1)).unwrap()
+    }
+
+    /// One caller-retained executor which counts the events it was actually asked to realize. It
+    /// changes no result: it forwards every request to the same host carrier the private path
+    /// would have built.
+    struct CountingHostExecutor {
+        host: ParallelHostLiveCurrentExecutor,
+        enactments: usize,
+    }
+
+    impl CountingHostExecutor {
+        const fn new(worker_threads: usize) -> Self {
+            Self {
+                host: ParallelHostLiveCurrentExecutor::new(worker_threads),
+                enactments: 0,
+            }
+        }
+    }
+
+    impl LiveCurrentExecutor for CountingHostExecutor {
+        fn enact(
+            &mut self,
+            physical_revision: u64,
+            standing: &SparseStandingSurface,
+            currents: &[CurrentExecutionRequest<'_>],
+            relations: &[DirectedExecutionRequest],
+            regional: &[RegionalExecutionRequest<'_>],
+        ) -> Result<ExecutedContemporaryEvent, LiveCurrentError> {
+            self.enactments += 1;
+            self.host
+                .enact(physical_revision, standing, currents, relations, regional)
+        }
+    }
+
+    /// One supplied executor crosses every Swing event on both generation paths, and the return is
+    /// the one the private-host path already produced.
+    ///
+    /// Equality alone would not separate a real twin from one which quietly rebuilt its own host
+    /// pool and ignored the argument. The count is the frame that makes it falsifiable: the
+    /// supplied executor is the only executor either generation path may reach, so a nonzero count
+    /// is proof that the question event and every self-emanated return crossed it.
+    #[test]
+    fn one_supplied_executor_crosses_every_swing_event_on_both_generation_paths() {
+        let causal = CausalLanguageEcology::condition(
+            &[
+                CausalLanguagePassage::new(
+                    "training",
+                    1,
+                    "Training is conditioning morphology through returned consequence.",
+                ),
+                CausalLanguagePassage::new(
+                    "multimodality",
+                    2,
+                    "Multimodality is caused co-presence viewed through different receivers.",
+                ),
+            ],
+            action(),
+            2,
+        )
+        .unwrap();
+        let causal_prompt = "What changes the intermediate body? Training is";
+        let causal_spec = CausalLanguageGenerationSpec {
+            maximum_generated_tokens: 16,
+            stop_at_sentence_boundary: true,
+        };
+        let private_host = causal
+            .generate(causal_prompt, causal_spec, action(), 2)
+            .unwrap();
+        assert!(private_host
+            .outputs
+            .iter()
+            .any(|output| !output.text.is_empty()));
+        let mut causal_executor = CountingHostExecutor::new(2);
+        let supplied = causal
+            .generate_with_executor(causal_prompt, causal_spec, action(), &mut causal_executor)
+            .unwrap();
+        assert_eq!(private_host, supplied);
+        assert!(causal_executor.enactments >= private_host.outputs.len());
+
+        let morphological = MorphologicalLanguageEcology::condition(
+            &[
+                MorphologicalLanguagePassage::new(
+                    "training",
+                    "training-source",
+                    1,
+                    "Training changes morphology.",
+                ),
+                MorphologicalLanguagePassage::new(
+                    "uncertainty",
+                    "uncertainty-source",
+                    2,
+                    "Changes morphology while uncertainty remains.",
+                ),
+                MorphologicalLanguagePassage::new(
+                    "control",
+                    "control-source",
+                    3,
+                    "A separate receiver retains a control.",
+                ),
+            ],
+            action(),
+            2,
+        )
+        .unwrap();
+        let morphological_prompt = "Relate training and uncertainty.";
+        let morphological_spec = MorphologicalGenerationSpec {
+            maximum_observed_tokens: 32,
+        };
+        let private_host = morphological
+            .generate(morphological_prompt, morphological_spec, action(), 2)
+            .unwrap();
+        assert!(private_host
+            .outputs
+            .iter()
+            .any(|output| !output.text.is_empty()));
+        let mut morphological_executor = CountingHostExecutor::new(2);
+        let supplied = morphological
+            .generate_with_executor(
+                morphological_prompt,
+                morphological_spec,
+                action(),
+                &mut morphological_executor,
+            )
+            .unwrap();
+        assert_eq!(private_host, supplied);
+        assert!(morphological_executor.enactments >= private_host.outputs.len());
     }
 
     #[test]

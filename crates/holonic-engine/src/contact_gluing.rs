@@ -54,13 +54,21 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use num_bigint::{BigInt, BigUint};
-use num_traits::{Signed, Zero};
+use num_traits::Zero;
 use relational_geometry::Rat;
 
 use crate::algebraic::{CausalCellId, CausalChain, ComparativeMultiplicity, GradedCausalComplex};
 use crate::causal::EventId;
 use crate::conditioned_derivation::{FoundedCover, FoundedMorphology};
 use crate::gluing::{read_cover, Cover, GluingReading, GluingRefusal};
+use crate::multiquadratic::{Multiquadratic, MultiquadraticRefusal, DECLARED_KERNEL_BOUND};
+
+/// APERTURE — how many distinct squarefree generators one composed turn may carry.
+///
+/// The multiquadratic basis is `2ⁿ` wide, so this bounds a real resource. Declared here as the
+/// default for [`coarse_grain`]; [`coarse_grain_in_aperture`] takes it from the caller, and a
+/// climbing tower should pass its own.
+pub const DECLARED_GENERATOR_APERTURE: usize = 12;
 use crate::rebase_invariants::PivotRule;
 use crate::running_integral::{
     running_sum, Cochain, Orientation, Path, PathStep, RunningIntegralError,
@@ -688,15 +696,91 @@ mod tests {
     /// A rational cosine rarely has a rational sine, so a turn rarely composes in `ℚ`. Asserted so
     /// the `Open` return is legible as an arithmetic bound rather than a property of the material.
     #[test]
-    fn the_equilateral_corner_has_no_rational_sine_and_says_so() {
+    fn the_equilateral_corner_now_carries_an_exact_sine_rather_than_none() {
         let half = Rat::new(BigInt::from(1), BigInt::from(2));
-        assert_eq!(rational_sine(&half), None, "sqrt(3)/2 is not rational");
+        // Until 2026-08-10 this asserted `None` — the tower's blocker. The sine is irrational and
+        // is now carried exactly, with the generator named.
+        let sine = exact_sine(&half).expect("1 - 1/4 = 3/4 has an exact root");
+        assert_eq!(sine.generators(), &[BigInt::from(3)]);
+        assert!(sine.as_rational().is_none(), "sqrt(3)/2 is not rational");
         // A Pythagorean corner does: 3-4-5 gives cos 4/5, sin 3/5.
         let four_fifths = Rat::new(BigInt::from(4), BigInt::from(5));
         assert_eq!(
-            rational_sine(&four_fifths),
+            exact_sine(&four_fifths).unwrap().as_rational(),
             Some(Rat::new(BigInt::from(3), BigInt::from(5)))
         );
+    }
+
+    /// **The rung composes.** An equilateral contact triangle has three corners of `cos = 1/2`,
+    /// and their composition is the full turn: `(1/2 + i√3/2)³ = −1`. Exactly, in the field, with
+    /// no angle taken anywhere.
+    ///
+    /// Before 2026-08-10 this could not be written: `coarse_grain` returned `Open` on this exact
+    /// input because `√3/2` is not rational, so the tower's own headline case was the case it
+    /// could not do.
+    #[test]
+    fn an_equilateral_triangle_coarse_grains_to_the_half_turn_exactly() {
+        let corner = |at: &str| Corner {
+            at: at.to_owned(),
+            left_stem: "l".to_owned(),
+            right_stem: "r".to_owned(),
+            opposite_stem: "o".to_owned(),
+            cosine: Rat::new(BigInt::from(1), BigInt::from(2)),
+            sine: exact_sine(&Rat::new(BigInt::from(1), BigInt::from(2))),
+        };
+        let triangle = ContactTriangle {
+            euclidean: EuclideanRealization::Realized,
+            identifiers: ["a".to_owned(), "b".to_owned(), "c".to_owned()],
+            stems: ["ab".to_owned(), "bc".to_owned(), "ca".to_owned()],
+            weights: [BigInt::from(5), BigInt::from(5), BigInt::from(5)],
+            corners: [corner("a"), corner("b"), corner("c")],
+            composes_exactly: true,
+        };
+        match coarse_grain(&triangle) {
+            CoarseTurn::Exact { cosine, sine } => {
+                // (1/2 + i√3/2)³ = e^{iπ} = −1: cosine −1, sine 0. The half turn, exactly.
+                assert_eq!(
+                    cosine.as_rational(),
+                    Some(Rat::from_integer(BigInt::from(-1))),
+                    "three thirds of a turn is the half turn"
+                );
+                assert_eq!(sine.as_rational(), Some(Rat::from_integer(BigInt::from(0))));
+            }
+            other => panic!("the equilateral rung must compose exactly, returned {other:?}"),
+        }
+    }
+
+    /// A degenerate triple has no turn to compose, and says which weights refused it.
+    #[test]
+    fn a_degenerate_triangle_returns_not_realizable_rather_than_a_fabricated_turn() {
+        let corner = |at: &str, cosine: Rat| Corner {
+            at: at.to_owned(),
+            left_stem: "l".to_owned(),
+            right_stem: "r".to_owned(),
+            opposite_stem: "o".to_owned(),
+            sine: exact_sine(&cosine),
+            cosine,
+        };
+        let triangle = ContactTriangle {
+            euclidean: EuclideanRealization::Degenerate {
+                short: BigInt::from(1),
+                other: BigInt::from(5),
+                long: BigInt::from(7),
+            },
+            identifiers: ["a".to_owned(), "b".to_owned(), "c".to_owned()],
+            stems: ["ab".to_owned(), "bc".to_owned(), "ca".to_owned()],
+            weights: [BigInt::from(7), BigInt::from(5), BigInt::from(1)],
+            corners: [
+                corner("a", Rat::new(BigInt::from(25), BigInt::from(14))),
+                corner("b", Rat::new(BigInt::from(1), BigInt::from(2))),
+                corner("c", Rat::new(BigInt::from(1), BigInt::from(2))),
+            ],
+            composes_exactly: false,
+        };
+        assert!(matches!(
+            coarse_grain(&triangle),
+            CoarseTurn::NotRealizable { .. }
+        ));
     }
 
     /// **The contact graph carries real cycles, and the circuit closes with a reflected return.**
@@ -791,10 +875,15 @@ pub struct Corner {
     pub opposite_stem: String,
     /// `cos` of the corner, exactly. **Carried; never resolved to an angle.**
     pub cosine: Rat,
-    /// `sin` of the corner when it is rational — a rational point on the unit circle, so the corner
-    /// composes with others by exact complex multiplication. `None` when `1 − cos²` is not a
-    /// rational square, in which case the turn is **retained unresolved** rather than approximated.
-    pub sine: Option<Rat>,
+    /// `sin` of the corner, exactly, in the multiquadratic field `ℚ(√(1 − cos²))` — or the named
+    /// refusal that prevented certifying it.
+    ///
+    /// **This was `Option<Rat>` until 2026-08-10 and that was the tower's blocker.** Only a
+    /// Pythagorean corner has a rational sine — the equilateral corner already needs `√3/2` — so
+    /// the option was `None` for essentially every real corner and [`coarse_grain`] could not
+    /// compose a rung. `crate::multiquadratic` supplies the field, so the sine is now carried
+    /// exactly in every case and the composition closes.
+    pub sine: Result<Multiquadratic, MultiquadraticRefusal>,
 }
 
 impl Corner {
@@ -857,27 +946,70 @@ fn law_of_cosines(a: &BigInt, b: &BigInt, c: &BigInt) -> Option<Rat> {
     Some(Rat::new(numerator, denominator))
 }
 
-/// The rational square root of `1 − cos²`, when there is one.
+/// `sin` of a corner from its cosine, exactly, in `ℚ(√(1 − cos²))`.
 ///
-/// A corner whose cosine **and** sine are both rational is a rational point on the unit circle — a
-/// Pythagorean triple — and such turns compose by exact complex multiplication over `ℚ`. Where the
-/// sine is irrational the turn is real and simply not rational, and this returns `None` so the
-/// caller retains it unresolved instead of taking a root it cannot certify.
-fn rational_sine(cosine: &Rat) -> Option<Rat> {
+/// `sin C = √(1 − cos²C)` and `1 − cos²` is an exact rational, so the sine is one square root and
+/// [`Multiquadratic::square_root`] reduces it to a canonical generator. A Pythagorean corner
+/// returns a rational carrying no generator at all; every other corner returns a genuine field
+/// element. Nothing is approximated and no angle is taken.
+///
+/// The material makes the radicand cheap: with `cos C = (a²+b²−c²)/(2ab)`, Heron gives
+/// `16·Area² = (a+b+c)(−a+b+c)(a−b+c)(a+b−c)` and `sin C = 2·Area/(ab)`, so the generator is the
+/// squarefree kernel of a product of four integers no larger than the perimeter.
+fn exact_sine(cosine: &Rat) -> Result<Multiquadratic, MultiquadraticRefusal> {
     let one = Rat::from_integer(BigInt::from(1));
     let square = &one - &(cosine * cosine);
-    if square.is_negative() {
-        return None;
-    }
-    let (numerator, denominator) = (square.numer().clone(), square.denom().clone());
-    let root = |value: &BigInt| -> Option<BigInt> {
-        if value.is_zero() {
-            return Some(BigInt::from(0));
+    Multiquadratic::square_root(&square, DECLARED_KERNEL_BOUND)
+}
+
+/// **The three corners of a triangle, from its three identifiers and three weights.**
+///
+/// Extracted so that a rung at *any* rank reads its corners by the same law. `contact_triangles`
+/// uses it at rank 0 over stems; [`climb`] uses it at every rank above over the arcs a rank induces.
+/// A tower whose upper ranks read corners by a different rule would not be a tower.
+///
+/// `weights` are ordered `[ab, bc, ca]` and `identifiers` `[a, b, c]`; the corner **at** a vertex is
+/// opposite the arc that does not touch it.
+pub fn corners_from_weights(
+    identifiers: [&str; 3],
+    stems: [&str; 3],
+    weights: [&BigInt; 3],
+) -> [Corner; 3] {
+    let [a, b, c] = identifiers;
+    let [ab, bc, ca] = stems;
+    let [wab, wbc, wca] = weights;
+    [
+        (a, ab, ca, bc, wab, wca, wbc),
+        (b, ab, bc, ca, wab, wbc, wca),
+        (c, bc, ca, ab, wbc, wca, wab),
+    ]
+    .map(|(at, left, right, opposite, wl, wr, wo)| {
+        let cosine =
+            law_of_cosines(wl, wr, wo).unwrap_or_else(|| Rat::from_integer(BigInt::from(0)));
+        Corner {
+            at: at.to_owned(),
+            left_stem: left.to_owned(),
+            right_stem: right.to_owned(),
+            opposite_stem: opposite.to_owned(),
+            sine: exact_sine(&cosine),
+            cosine,
         }
-        let candidate = value.sqrt();
-        (&candidate * &candidate == *value).then_some(candidate)
-    };
-    Some(Rat::new(root(&numerator)?, root(&denominator)?))
+    })
+}
+
+/// **Whether three weights realize a planar triangle**, read before any corner is read as a corner.
+pub fn realization_of(weights: [&BigInt; 3]) -> EuclideanRealization {
+    let mut sides = [weights[0].clone(), weights[1].clone(), weights[2].clone()];
+    sides.sort();
+    if &sides[0] + &sides[1] <= sides[2] {
+        EuclideanRealization::Degenerate {
+            short: sides[0].clone(),
+            other: sides[1].clone(),
+            long: sides[2].clone(),
+        }
+    } else {
+        EuclideanRealization::Realized
+    }
 }
 
 /// **Every triangle in the contact graph, with its three exact cosines.**
@@ -922,38 +1054,16 @@ pub fn contact_triangles(graph: &ContactGraph) -> Vec<ContactTriangle> {
                     continue;
                 };
                 // The corner AT a vertex is opposite the arc that does not touch it.
-                let corners = [
-                    (first, &ab, &ca, &bc, &wab, &wca, &wbc),
-                    (second, &ab, &bc, &ca, &wab, &wbc, &wca),
-                    (third, &bc, &ca, &ab, &wbc, &wca, &wab),
-                ]
-                .map(|(at, left, right, opposite, wl, wr, wo)| {
-                    let cosine = law_of_cosines(wl, wr, wo)
-                        .unwrap_or_else(|| Rat::from_integer(BigInt::from(0)));
-                    Corner {
-                        at: (*at).clone(),
-                        left_stem: left.clone(),
-                        right_stem: right.clone(),
-                        opposite_stem: opposite.clone(),
-                        sine: rational_sine(&cosine),
-                        cosine,
-                    }
-                });
+                let corners = corners_from_weights(
+                    [first, second, third],
+                    [&ab, &bc, &ca],
+                    [&wab, &wbc, &wca],
+                );
                 // The triangle inequality, checked over the three weights before any corner is
                 // read as a corner. A triple that fails it has no planar realization.
-                let mut sides = [wab.clone(), wbc.clone(), wca.clone()];
-                sides.sort();
-                let euclidean = if &sides[0] + &sides[1] <= sides[2] {
-                    EuclideanRealization::Degenerate {
-                        short: sides[0].clone(),
-                        other: sides[1].clone(),
-                        long: sides[2].clone(),
-                    }
-                } else {
-                    EuclideanRealization::Realized
-                };
+                let euclidean = realization_of([&wab, &wbc, &wca]);
                 let composes_exactly = euclidean == EuclideanRealization::Realized
-                    && corners.iter().all(|corner| corner.sine.is_some());
+                    && corners.iter().all(|corner| corner.sine.is_ok());
                 triangles.push(ContactTriangle {
                     euclidean,
                     identifiers: [
@@ -972,6 +1082,149 @@ pub fn contact_triangles(graph: &ContactGraph) -> Vec<ContactTriangle> {
     triangles
 }
 
+// -------------------------------------------------------------------------------------------------
+// The ladder: one rung is a coarse graining, and the tower is the ladder climbed
+// -------------------------------------------------------------------------------------------------
+
+/// **One rank of the tower**: the triangles of the rank below, joined where they share a stem.
+///
+/// A rung is not another graph of the same kind drawn at a larger scale. It is the *dual*: each
+/// realizable triangle of rank `k` becomes one vertex of rank `k + 1`, carrying the turn it
+/// coarse-grained to, and two such vertices are joined exactly when their triangles share a stem —
+/// which is the only relation the material already carries between them. **Nothing is declared.**
+/// The arcs' weights are the shared stems' own weights, unchanged, so no new level enters at any
+/// rank.
+///
+/// Brandon's statement of the object is that the climb is the point: *"this is how coils and caverns
+/// form over time, this is how higher order structures in time change the tides of the ecosystems
+/// around them and found orbits of invariants as accessible axes distributed about them; this is
+/// recursive, coarse graining."*
+///
+/// **What a rung does NOT claim.** That a quantity survives the climb is a measurement, not a
+/// property of this construction. [`climb`] returns the rank whole — its vertices, their turns, its
+/// arcs — so a caller can compare ranks and *find out* what is invariant. A rung that reported an
+/// invariant it had assumed would be the receipt-over-implementation defect at the level of the
+/// tower.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct TowerRank {
+    /// The rank index; `0` is the identifier graph the triangles were read from.
+    pub rank: usize,
+    /// One vertex per realizable triangle of the rank below, named by its three identifiers, with
+    /// the turn it composed.
+    pub vertices: Vec<(String, CoarseTurn)>,
+    /// `(left vertex, right vertex, shared stem, that stem's weight)`.
+    pub arcs: Vec<(String, String, String, BigInt)>,
+    /// Triangles of the rank below that did not realize, retained with their obstruction rather
+    /// than filtered out of the population.
+    pub unrealizable: Vec<([String; 3], CoarseTurn)>,
+    /// Every squarefree generator any turn at this rank carries, ascending. The `(ℤ/2)ⁿ` grading
+    /// group of the rank's turn algebra, and the population a climb can only grow.
+    pub generators: Vec<BigInt>,
+}
+
+/// Name a triangle's vertex at the next rank, canonically and from the material alone.
+fn triangle_name(identifiers: &[String; 3]) -> String {
+    let mut sorted = identifiers.clone();
+    sorted.sort();
+    sorted.join("|")
+}
+
+/// **Climb one rung.**
+///
+/// Takes the triangles of a rank and returns the rank above: their turns, and the arcs the shared
+/// stems induce between them. The generator aperture is the caller's and is passed through to
+/// [`coarse_grain_in_aperture`], because the multiquadratic basis is `2ⁿ` wide and a climbing tower
+/// accumulates generators.
+pub fn climb(rank: usize, triangles: &[ContactTriangle], aperture: usize) -> TowerRank {
+    let mut vertices = Vec::new();
+    let mut unrealizable = Vec::new();
+    let mut generators: BTreeSet<BigInt> = BTreeSet::new();
+    // stem -> the vertices whose triangle carries it
+    let mut by_stem: BTreeMap<String, Vec<String>> = BTreeMap::new();
+    let mut weight_of_stem: BTreeMap<String, BigInt> = BTreeMap::new();
+
+    for triangle in triangles {
+        let turn = coarse_grain_in_aperture(triangle, aperture);
+        let name = triangle_name(&triangle.identifiers);
+        if let CoarseTurn::Exact { cosine, sine } = &turn {
+            for generator in cosine.generators().iter().chain(sine.generators()) {
+                generators.insert(generator.clone());
+            }
+        }
+        if matches!(turn, CoarseTurn::NotRealizable { .. }) {
+            unrealizable.push((triangle.identifiers.clone(), turn));
+            continue;
+        }
+        for (stem, weight) in triangle.stems.iter().zip(&triangle.weights) {
+            by_stem.entry(stem.clone()).or_default().push(name.clone());
+            weight_of_stem.insert(stem.clone(), weight.clone());
+        }
+        vertices.push((name, turn));
+    }
+
+    let mut arcs = Vec::new();
+    for (stem, holders) in &by_stem {
+        let weight = weight_of_stem.get(stem).cloned().unwrap_or_else(|| BigInt::from(0));
+        for (position, left) in holders.iter().enumerate() {
+            for right in holders.iter().skip(position + 1) {
+                if left == right {
+                    continue;
+                }
+                let (a, b) = if left <= right { (left, right) } else { (right, left) };
+                arcs.push((a.clone(), b.clone(), stem.clone(), weight.clone()));
+            }
+        }
+    }
+    arcs.sort();
+    arcs.dedup();
+
+    TowerRank {
+        rank,
+        vertices,
+        arcs,
+        unrealizable,
+        generators: generators.into_iter().collect(),
+    }
+}
+
+impl TowerRank {
+    /// The turns of this rank composed around the whole rank, in the order the vertices stand.
+    ///
+    /// This is the rank's own accumulated turn. It is **reported, never compared to anything** by
+    /// this method: whether it is preserved by a climb is exactly the question a driver must
+    /// measure, and answering it here would be assuming the orbit instead of exhibiting it.
+    pub fn accumulated_turn(&self, aperture: usize) -> Option<(Multiquadratic, Multiquadratic)> {
+        let mut cosine = Multiquadratic::one();
+        let mut sine = Multiquadratic::zero();
+        for (_, turn) in &self.vertices {
+            let CoarseTurn::Exact { cosine: c, sine: s } = turn else {
+                return None;
+            };
+            let next_cosine = cosine
+                .multiply(c, aperture)
+                .ok()?
+                .subtract(&sine.multiply(s, aperture).ok()?, aperture)
+                .ok()?;
+            let next_sine = cosine
+                .multiply(s, aperture)
+                .ok()?
+                .add(&sine.multiply(c, aperture).ok()?, aperture)
+                .ok()?;
+            cosine = next_cosine;
+            sine = next_sine;
+        }
+        Some((cosine, sine))
+    }
+
+    /// How many vertices of this rank composed a turn exactly.
+    pub fn exact_vertices(&self) -> usize {
+        self.vertices
+            .iter()
+            .filter(|(_, turn)| matches!(turn, CoarseTurn::Exact { .. }))
+            .count()
+    }
+}
+
 /// **One rung of the tower: coarse-grain a triangle to a vertex carrying its turn.**
 ///
 /// The triangle's corners compose by multiplying their unit-circle points, exactly, when every sine
@@ -984,24 +1237,42 @@ pub fn contact_triangles(graph: &ContactGraph) -> Vec<ContactTriangle> {
 /// through to an epsilon comparison.*
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum CoarseTurn {
-    /// The composed turn, as an exact rational point `(cos, sin)` on the unit circle.
-    Exact { cosine: Rat, sine: Rat },
-    /// At least one corner's sine is irrational; the composition is retained, not approximated.
+    /// The composed turn, exactly, as a point `(cos, sin)` on the unit circle in the multiquadratic
+    /// field the three corners generate.
     ///
-    /// **This is the common case and it is a bound, not a result.** Only a Pythagorean-triple angle
-    /// is a rational point on the unit circle, so almost no corner composes in `ℚ` — the equilateral
-    /// corner `cos = 1/2` already needs `√3/2`. Composing distinct turns exactly needs the quadratic
-    /// extension `ℚ(√(1−c²))`, which `exact_value::AlgebraicRoot` with its Sturm certificate is the
-    /// carrier for and which **is not wired here**. Saying so is the point: an `Open` returned
-    /// because the arithmetic is unbuilt is not the same claim as one returned because the material
-    /// is genuinely unresolved, and this variant means the former.
-    Open { irrational_corners: Vec<String> },
+    /// **This variant used to be reachable only for Pythagorean triangles.** `Corner::sine` was
+    /// `Option<Rat>` and the composition ran over `ℚ`, so a corner whose sine was irrational — which
+    /// is essentially every corner, the equilateral one already needing `√3/2` — returned `Open`
+    /// and the tower could not climb a rung. `crate::multiquadratic` supplies
+    /// `ℚ(√d₁, √d₂, √d₃)` and the composition now closes for every realizable triangle.
+    Exact {
+        cosine: Multiquadratic,
+        sine: Multiquadratic,
+    },
+    /// At least one corner's sine could not be certified, with the refusal that prevented it.
+    ///
+    /// This is now a genuine obstruction rather than the arithmetic being unbuilt: the radicand
+    /// exceeded the declared squarefree bound, or the generator population exceeded the declared
+    /// aperture. Each corner that refused is named with its reason.
+    Refused {
+        refusals: Vec<(String, MultiquadraticRefusal)>,
+    },
     /// The three weights do not realize a planar triangle, so there is no turn to compose.
     NotRealizable { short: BigInt, other: BigInt, long: BigInt },
 }
 
 /// Compose a triangle's three corners into the single turn it contributes upward.
 pub fn coarse_grain(triangle: &ContactTriangle) -> CoarseTurn {
+    coarse_grain_in_aperture(triangle, DECLARED_GENERATOR_APERTURE)
+}
+
+/// [`coarse_grain`] under a caller-declared generator aperture.
+///
+/// The multiquadratic basis is `2ⁿ` wide in the number of distinct squarefree generators, so the
+/// aperture is a real resource statement. Three corners contribute at most three generators, but a
+/// tower climbing many rungs accumulates them, and exceeding the declared aperture is refused by
+/// name rather than held.
+pub fn coarse_grain_in_aperture(triangle: &ContactTriangle, aperture: usize) -> CoarseTurn {
     if let EuclideanRealization::Degenerate { short, other, long } = &triangle.euclidean {
         return CoarseTurn::NotRealizable {
             short: short.clone(),
@@ -1009,23 +1280,41 @@ pub fn coarse_grain(triangle: &ContactTriangle) -> CoarseTurn {
             long: long.clone(),
         };
     }
-    let mut irrational = Vec::new();
+    let mut refusals = Vec::new();
     for corner in &triangle.corners {
-        if corner.sine.is_none() {
-            irrational.push(corner.at.clone());
+        if let Err(refusal) = &corner.sine {
+            refusals.push((corner.at.clone(), refusal.clone()));
         }
     }
-    if !irrational.is_empty() {
-        return CoarseTurn::Open { irrational_corners: irrational };
+    if !refusals.is_empty() {
+        return CoarseTurn::Refused { refusals };
     }
-    // Angle addition IS complex multiplication: (c₁,s₁)·(c₂,s₂) = (c₁c₂ − s₁s₂, c₁s₂ + s₁c₂).
-    // Exact over ℚ, and never an angle anywhere.
-    let mut cosine = Rat::from_integer(BigInt::from(1));
-    let mut sine = Rat::from_integer(BigInt::from(0));
+    // Angle addition IS complex multiplication, now over ℚ(√d₁,√d₂,√d₃):
+    //   (c₁,s₁)·(c₂,s₂) = (c₁c₂ − s₁s₂, c₁s₂ + s₁c₂).
+    // Exact in the field, and never an angle anywhere.
+    let mut cosine = Multiquadratic::one();
+    let mut sine = Multiquadratic::zero();
     for corner in &triangle.corners {
-        let (c, s) = (corner.cosine.clone(), corner.sine.clone().expect("checked"));
-        let next_cosine = &cosine * &c - &sine * &s;
-        let next_sine = &cosine * &s + &sine * &c;
+        let c = Multiquadratic::rational(corner.cosine.clone());
+        let s = corner.sine.as_ref().expect("checked above");
+        let next_cosine = match (cosine.multiply(&c, aperture), sine.multiply(s, aperture)) {
+            (Ok(left), Ok(right)) => match left.subtract(&right, aperture) {
+                Ok(value) => value,
+                Err(refusal) => return CoarseTurn::Refused { refusals: vec![(corner.at.clone(), refusal)] },
+            },
+            (Err(refusal), _) | (_, Err(refusal)) => {
+                return CoarseTurn::Refused { refusals: vec![(corner.at.clone(), refusal)] }
+            }
+        };
+        let next_sine = match (cosine.multiply(s, aperture), sine.multiply(&c, aperture)) {
+            (Ok(left), Ok(right)) => match left.add(&right, aperture) {
+                Ok(value) => value,
+                Err(refusal) => return CoarseTurn::Refused { refusals: vec![(corner.at.clone(), refusal)] },
+            },
+            (Err(refusal), _) | (_, Err(refusal)) => {
+                return CoarseTurn::Refused { refusals: vec![(corner.at.clone(), refusal)] }
+            }
+        };
         cosine = next_cosine;
         sine = next_sine;
     }
