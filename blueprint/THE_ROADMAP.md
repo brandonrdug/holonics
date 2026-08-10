@@ -32,11 +32,20 @@ proves harder than it looks, the mathematics still gains a verdict it does not h
 
 ### Phase 1 — give the mathematics already in the tree a verdict
 
-1. **Link mathlib.** `archive/cpp-engine/formal/` holds **2,921 built oleans, toolchain v4.27.0**, and
-   the live `soma/formal` sources are byte-identical to the archived ones. With `LEAN_PATH` pointed at
-   them, **all nine live `elementary-holonics` files check clean in 0.73–1.71 s each, including
-   `RH/Statement.lean` and `RH/Route.lean`.** They receive **no verdict at all** today. A path
-   variable, once.
+1. **Link mathlib — DONE 2026-08-09, `tools/lean_check.sh`.** `archive/cpp-engine/formal/` holds
+   **2,623 mathlib oleans** (2,919 across all packages), toolchain v4.27.0, and all nine live
+   `elementary-holonics` sources are **byte-identical** to the archived ones, verified by `cmp`.
+   **12 of 13 files across all three projects now check clean**, including `RH/Statement.lean` and
+   `RH/Route.lean` at ~1.4 s each; the 13th is a root aggregator needing its own leaves built, which
+   is build order rather than a source defect and the script reports it as `ROOT`.
+
+   **The layout detail that costs an hour:** Lean 4.27 puts oleans under `.lake/build/lib/lean/`, not
+   `.lake/build/lib/`. A path without the trailing `lean` fails with `unknown module prefix
+   'Mathlib'` while the directory plainly exists — which is how this looked like a missing build for
+   two days.
+
+   **The check is not unfailable**, and `--control` proves it: a `theorem deliberately_false :
+   (1 : Nat) = 2 := rfl` appended to `RH/Statement.lean` returns *"Not a definitional equality"*.
 2. **Close the two apparatus defects that would corrupt any later figure.** `soma/kernel/soma.spv`
    **cannot be regenerated at HEAD** and the committed artifact is **stale**; and **ten** binaries run
    from `target/` with no committed source where the record says two, so one `cargo clean` destroys
