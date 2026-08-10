@@ -1,0 +1,8 @@
+# `spirv-builder` runs a nested `cargo build` on the `soma-kernel` crate in this directory, which
+# has its own `[workspace]`, so it writes `soma/kernel/target/`. The root `.gitignore` anchors
+# `/target/` to the repository root and does not cover it. The laboratory carried this file
+# (`a07ff376:src/soma/kernel/.gitignore`, one line, `target/`); the 2026-08-07 import dropped it
+# and committed `soma.spv` instead. `soma.spv` IS tracked deliberately — it is the committed
+# boundary object `soma/surface` `include_bytes!`s — and its provenance is declared in
+# `meta/BOUNDARY_ARTIFACTS.tsv`, checked by `tools/boundary_artifacts.py`.
+target/

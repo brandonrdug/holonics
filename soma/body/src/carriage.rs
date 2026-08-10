@@ -1855,7 +1855,17 @@ impl<S: WordSeam, const FOUNDED: bool, const REGISTERED: bool> FeltLineage<S, FO
     fn required_carrier_depth(&self) -> Option<usize> {
         (manifold::continuation_is_afferent(self.continuation_phase)
             && self.continuation_depth >= self.depth)
-            .then(|| self.continuation_depth.saturating_add(1))
+            // `saturating_add(1)` explicit — the rust-gpu kernel has no saturating intrinsic
+            // (`place.rs:52` is the same excision, same reason). `usize::MAX` is the only
+            // spelling that stays correct across the seam: `usize` is 32-bit on
+            // `spirv-unknown-vulkan1.2` and 64-bit on the host, and a literal would pin one.
+            .then(|| {
+                if self.continuation_depth == usize::MAX {
+                    usize::MAX
+                } else {
+                    self.continuation_depth + 1
+                }
+            })
     }
 
     /// One exact move of the carrier-owned depth-first continuation. AFFERENT, EFFERENT, and

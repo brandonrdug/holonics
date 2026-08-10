@@ -31,15 +31,25 @@
 //!                      retained by name with the obstruction that refused it
 //! ```
 //!
-//! ## The licence law, and it is one law for every species
+//! ## The licence law, and it is TWO conjuncts
 //!
-//! **Every composition species names the pair of identifiers it brings into contact, and the
-//! morphology must hold that pair together.** That is the same mechanism
+//! **The contact.** Every composition species names the pair of identifiers it brings into contact,
+//! and the morphology must hold that pair together. That is the same mechanism
 //! `conditioned_derivation::derive` licenses a bridge by — two identifiers sharing a committed
 //! founded stem under [`FoundedMorphology::cover`]'s maximality — lifted from the proof body to the
 //! statement. A body exposed to nothing commits no stem, covers nothing, holds no pair together, and
 //! therefore admits **no** composed statement. The conditioning is on the causal path here for
 //! exactly the reason it is there, and the unconditioned null is the control that shows it.
+//!
+//! **The place**, and it was missing until 2026-08-09. The contact licence admits
+//! `(P : Prop) (h : P) : exactCarrier apply` because `P` and `apply` share the founded letter `p`,
+//! and `(a b : nlinarith) : a = b` for the same reason. It could not do otherwise: it is a statement
+//! about two identifiers and never about the **slot**. [`StatementPositionEcology`] is the second
+//! conjunct — where the material's own reading places each identifier, and which declarations share
+//! a shape — and with both on the causal path the composition returns statements whose names resolve
+//! against declarations the material wrote. The two settings are a declared gauge,
+//! [`PositionGate`], and `the_statement_is_founded` runs both over one candidate population so the
+//! orbit is exhibited rather than assumed.
 //!
 //! ## Admission is a population, never a filter
 //!
@@ -70,11 +80,17 @@
 //!
 //! ## What is not claimed
 //!
-//! Nothing here is submitted to a kernel, and a composed passage is production read as structure
-//! exactly as the deposited artifacts are — the deposit itself carries `theorem carrier_transport
-//! ... := Nat.zero`, which no kernel accepts and which the atlas reads all the same. A composed
-//! statement is a statement this deposit's own grammar and morphology reach; it is not asserted to
-//! be true, provable, or well-typed. Nothing here bears on any Millennium result.
+//! Nothing here is submitted to a kernel and nothing may be: a foreign process deciding what the
+//! body may construct is `G_authored` (`CLAUDE.md` §13 rule 2). What [`compose_in_scope`] adds is
+//! narrower and is stated exactly: an artifact carries the founding lines **the material itself
+//! wrote** for the names its own statement uses, so a *batch* grade of the returned population is
+//! possible at all. That is name resolution and it is not type correctness — the population
+//! contains `(P : P) (h : P) : exactCarrier P`, whose every name resolves and which no elaborator
+//! will take. A composed passage is production read as structure exactly as the deposited artifacts
+//! are; the deposit itself carries `theorem carrier_transport ... := Nat.zero`, which no kernel
+//! accepts and which the atlas reads all the same. A composed statement is one this deposit's own
+//! grammar, morphology and position ecology reach; it is not asserted to be true or provable, and
+//! the composed **body** is not a proof. Nothing here bears on any Millennium result.
 
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -85,6 +101,7 @@ use crate::conditioned_derivation::{
 };
 use crate::derivation_atlas::{read_derivation, statement_vertex_key};
 use crate::derivation_skein::{passage_interior, DerivationMove, MoveSpecies};
+use crate::lean_development::{DevelopmentReading, PREAMBLE_FORMS};
 use crate::skein::Substitution;
 use crate::statement_grammar::{
     recover, BodyReading, GrammarAperture, RecoveredStatementGrammar, SlotSpecies, Span,
@@ -214,6 +231,19 @@ pub enum StatementObstruction {
     /// The analogue of `EmittedPassageMissedItsStatement` for this species, retained as a candidate
     /// obstruction rather than raised, so one malformed composition cannot void a population.
     ReadBackMissedTheComposition { wanted: String, read: String },
+    /// The material never stood this identifier — nor any member of its declared-shape cohort — in
+    /// the slot species the composition puts it in.
+    ///
+    /// **The position licence, and the second conjunct of the conditioning.** The stem licence says
+    /// two identifiers belong together; this one says the brought identifier belongs *there*. Both
+    /// the places the material did stand it and its cohort are carried, so the refusal can be
+    /// checked rather than believed.
+    IdentifierNeverStoodInThisPosition {
+        brought: String,
+        slot: SlotSpecies,
+        stood_in: Vec<ConductPosition>,
+        cohort: Vec<String>,
+    },
 }
 
 impl std::fmt::Display for StatementObstruction {
@@ -250,6 +280,24 @@ impl std::fmt::Display for StatementObstruction {
                 formatter,
                 "the composed artifact was read reaching {read:?} rather than {wanted:?}"
             ),
+            Self::IdentifierNeverStoodInThisPosition {
+                brought,
+                slot,
+                stood_in,
+                cohort,
+            } => {
+                let places: Vec<String> = stood_in.iter().map(ToString::to_string).collect();
+                let places = if places.is_empty() {
+                    "nowhere the reading placed it".to_owned()
+                } else {
+                    places.join(", ")
+                };
+                write!(
+                    formatter,
+                    "the material never stood {brought} in {} position; it stands at {places}, and its declared-shape cohort is {cohort:?}",
+                    slot.name()
+                )
+            }
         }
     }
 }
@@ -265,6 +313,9 @@ impl StatementObstruction {
             Self::BinderListLengthIsUnfounded { .. } => "binder-list-length-is-unfounded",
             Self::ComposedStatementIsUnchanged { .. } => "composed-statement-is-unchanged",
             Self::ReadBackMissedTheComposition { .. } => "read-back-missed-the-composition",
+            Self::IdentifierNeverStoodInThisPosition { .. } => {
+                "identifier-never-stood-in-this-position"
+            }
         }
     }
 }
@@ -279,6 +330,10 @@ pub enum StatementAdmission {
         /// What the recovered grammar does **not** certify about this composition. Carried with the
         /// admission rather than erased by it.
         carried_aperture: Vec<GrammarAperture>,
+        /// Where the material stood the brought identifier, when the position gate was applied.
+        /// The admission carries its own second licence exactly as it carries the first. Empty when
+        /// the gate was withheld or when the composition placed no identifier into a slot.
+        stood_in: Vec<ConductPosition>,
     },
     Refused(StatementObstruction),
 }
@@ -319,6 +374,10 @@ pub struct AdmittedStatements {
     /// The statements the body was mounted on, carried so a caller can check a founding without
     /// re-deriving the deposit.
     pub standing: BTreeSet<String>,
+    /// Whether the position ecology was on the causal path for this adjudication. The declared gauge
+    /// setting, carried with its own return so an orbit is never read off two populations whose
+    /// settings were not recorded.
+    pub gate: PositionGate,
 }
 
 impl AdmittedStatements {
@@ -696,6 +755,534 @@ fn residue_substitutions(
 }
 
 // -------------------------------------------------------------------------------------------------
+// The position ecology -- the second conjunct of the conditioning
+// -------------------------------------------------------------------------------------------------
+
+/// Where the material was witnessed **placing** an identifier.
+///
+/// Every member is a population [`crate::lean_development`] already returns, or a slot
+/// [`crate::statement_grammar`] already recovers. None of them is a judgement about what an
+/// identifier *is*: `apply` is not called a tactic here because tactics are a category, it is
+/// recorded as having stood in tactic position because that is where the reading found it, and the
+/// same token standing in a statement slot elsewhere would carry both.
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub enum ConductPosition {
+    /// It stood in this recovered slot of some declaration's own statement.
+    Slot(SlotSpecies),
+    /// The material declares it, under this former.
+    Declared { former: String },
+    /// It was named in term position of a proof body — [`crate::lean_development::DeclaredForm`]'s
+    /// `recruited`.
+    Term,
+    /// It stood as the leading identifier of a proof step — that carrier's `tactics`.
+    Tactic,
+    /// A binding tactic founded it inside a proof body — that carrier's `local_bindings`.
+    LocalBinding,
+    /// It was named on a file-scope preamble line.
+    Preamble,
+    /// It named a `namespace`/`section` scope.
+    Scoping,
+}
+
+impl std::fmt::Display for ConductPosition {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Slot(species) => write!(formatter, "slot:{}", species.name()),
+            Self::Declared { former } => write!(formatter, "declared-by:{former}"),
+            Self::Term => write!(formatter, "term"),
+            Self::Tactic => write!(formatter, "tactic"),
+            Self::LocalBinding => write!(formatter, "local-binding"),
+            Self::Preamble => write!(formatter, "preamble"),
+            Self::Scoping => write!(formatter, "scoping"),
+        }
+    }
+}
+
+/// One **declared shape** and every declaration that has it.
+///
+/// The skeleton is the declaration's own statement with each binder-name token replaced by the
+/// ordinal of the binder that founded it, so `(P : Prop) : Prop` and `(Q : Prop) : Prop` are one
+/// shape and `(h : P) : exactCarrier P` is another. The rewrite is not an authored alpha-equivalence:
+/// it uses exactly the `BinderName` slots the recovered grammar returns, and those exist because
+/// `lean_development` reads a binder group's names as **founded** and its type as **recruited**.
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub struct DeclaredShape {
+    pub skeleton: String,
+    /// The declarations carrying it, in the order the reading founded them.
+    pub members: Vec<String>,
+}
+
+/// The founding lines a composed artifact must carry for its own names to resolve, read verbatim out
+/// of the material.
+#[derive(Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
+pub struct ComposedScope {
+    /// `import` lines, which Lean's own file law puts before everything else.
+    pub imports: Vec<String>,
+    /// Every other founding line — the declarations the statement's names transitively need, then
+    /// the preamble lines founding what no declaration does — in the order the material carries them.
+    pub founding: Vec<String>,
+    /// Founding lines whose declaration does not finish on the line that opens it. **The scope is
+    /// incomplete when this is non-empty** and says so rather than emitting a truncated declaration
+    /// as though it were whole.
+    pub incomplete: Vec<String>,
+}
+
+impl ComposedScope {
+    pub fn is_empty(&self) -> bool {
+        self.imports.is_empty() && self.founding.is_empty()
+    }
+
+    /// The scope carries every name it was asked for, whole.
+    pub fn is_complete(&self) -> bool {
+        self.incomplete.is_empty()
+    }
+}
+
+/// Whether the position ecology is on the causal path.
+///
+/// **A declared gauge whose orbit is the evidence.** `CLAUDE.md` §8: a gauge whose group acts
+/// trivially on the declared material is not a gauge, so the two settings are run over one candidate
+/// population and the difference between the two admitted populations is exhibited rather than
+/// assumed.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum PositionGate {
+    /// The composition must place an identifier where the material places one.
+    Applied,
+    /// The gate is withheld. This is the rule as it stood before the ecology was built, and it is
+    /// the control.
+    Withheld,
+}
+
+impl PositionGate {
+    pub const fn name(self) -> &'static str {
+        match self {
+            Self::Applied => "position-gate-applied",
+            Self::Withheld => "position-gate-withheld",
+        }
+    }
+}
+
+/// A character a token may be made of. `statement_grammar`'s own rule, restated because that one is
+/// private and a composed statement must be tokenized exactly as a deposited one is.
+const fn is_token_character(symbol: char) -> bool {
+    symbol.is_ascii_alphanumeric() || symbol == '_' || symbol == '.'
+}
+
+/// The whole-token population of one line of material.
+fn tokens_of(text: &str) -> Vec<String> {
+    let mut found = Vec::new();
+    let mut carried = String::new();
+    for symbol in text.chars() {
+        if is_token_character(symbol) {
+            carried.push(symbol);
+            continue;
+        }
+        if !carried.is_empty() {
+            found.push(std::mem::take(&mut carried));
+        }
+    }
+    if !carried.is_empty() {
+        found.push(carried);
+    }
+    found
+        .into_iter()
+        .filter(|token| token.chars().next().is_some_and(|first| first.is_ascii_alphabetic() || first == '_'))
+        .collect()
+}
+
+/// One statement with every binder-name token replaced by the ordinal of the binder that founded it.
+fn alpha_normalized(reading: &StatementReading) -> String {
+    let slots = reading.slots();
+    let mut ordinal: BTreeMap<String, usize> = BTreeMap::new();
+    for slot in &slots {
+        if slot.species == SlotSpecies::BinderName && !ordinal.contains_key(&slot.occupant) {
+            let next = ordinal.len();
+            ordinal.insert(slot.occupant.clone(), next);
+        }
+    }
+    let mut rewritten = String::with_capacity(reading.statement.len());
+    let mut carried = String::new();
+    for symbol in reading.statement.chars() {
+        if is_token_character(symbol) {
+            carried.push(symbol);
+            continue;
+        }
+        if !carried.is_empty() {
+            push_normalized(&mut rewritten, &carried, &ordinal);
+            carried.clear();
+        }
+        rewritten.push(symbol);
+    }
+    if !carried.is_empty() {
+        push_normalized(&mut rewritten, &carried, &ordinal);
+    }
+    rewritten
+}
+
+fn push_normalized(into: &mut String, token: &str, ordinal: &BTreeMap<String, usize>) {
+    match ordinal.get(token) {
+        Some(at) => {
+            into.push('#');
+            into.push_str(&at.to_string());
+        }
+        None => into.push_str(token),
+    }
+}
+
+/// **The conditioning.** Where the material's own reading places each identifier, and which
+/// declarations share a shape.
+///
+/// The composition it conditions was founded from **formal grammar with nothing conditioning it**:
+/// `compose_candidates` puts every recruited identifier into every recovered slot, so
+/// `exactCarrier apply` and `(a b : nlinarith) : a = b` are composed with the same standing as
+/// anything else, and the stem licence admits them because `P` and `apply` share the founded letter
+/// `p`. The stem licence is a licence on the **contact** — that these two identifiers belong
+/// together. It says nothing about the **place**, and the place is what the deposit's own reading
+/// already knows: `apply` was only ever the head of a proof step, `Soma` only ever named a scope,
+/// `Nat.zero` only ever stood in term position of a body, and `exactCarrier` is the only identifier
+/// the material ever put in the first position of a statement's trailing region.
+///
+/// Two things are read and neither is authored:
+///
+/// - **The position census.** Every population [`crate::lean_development`] returns, plus the slot
+///   species [`crate::statement_grammar`] recovers over **every** declaration's statement rather than
+///   over the theorem statements alone.
+/// - **The declared-shape cohort.** `def exactCarrier (P : Prop) : Prop` and
+///   `abbrev ExactRelay (Q : Prop) : Prop` normalize to one skeleton, so the material's own reading
+///   cannot tell the two apart, and an identifier may stand where any member of its cohort stands.
+///   That is what lets a declaration the material never *used* in a statement position be composed
+///   into one — which is the whole difference between reciting the deposit and reaching past it.
+///
+/// The grain is [`crate::lean_development::DeclarationGrain::EveryTopLevelDeclaration`], and the
+/// widening is the point: `read_derivation` opens one declaration per artifact, so
+/// `def exactCarrier` and `abbrev ExactRelay` were **invisible** to the composition that was
+/// supposed to be conditioned on them.
+#[derive(Clone, Debug)]
+pub struct StatementPositionEcology {
+    conduct: BTreeMap<String, BTreeSet<ConductPosition>>,
+    shapes: BTreeMap<String, DeclaredShape>,
+    shape_of: BTreeMap<String, String>,
+    founding: BTreeMap<String, (usize, String, String)>,
+    preamble_lines: Vec<(String, String)>,
+    declaration_grammar: RecoveredStatementGrammar,
+    unread: BTreeSet<String>,
+}
+
+impl StatementPositionEcology {
+    /// Found the ecology from one joined development reading and the source texts it was read from.
+    ///
+    /// `sources` is `(whole, text)` — the same lineage carrier `Exposure` uses — and is read only to
+    /// recover each founding line **verbatim**, so a composed artifact can carry the declarations its
+    /// own names need. Nothing is parsed out of it that the reading did not already found.
+    pub fn found(
+        reading: &DevelopmentReading,
+        sources: &[(String, String)],
+    ) -> Result<Self, StatementGrammarRefusal> {
+        let statements: BTreeSet<String> = reading
+            .declarations
+            .iter()
+            .map(|form| form.statement.clone())
+            .filter(|statement| !statement.trim().is_empty())
+            .collect();
+        let declaration_grammar = recover(&statements)?;
+
+        let mut conduct: BTreeMap<String, BTreeSet<ConductPosition>> = BTreeMap::new();
+        for statement_reading in declaration_grammar.readings() {
+            for slot in statement_reading.slots() {
+                conduct
+                    .entry(slot.occupant.clone())
+                    .or_default()
+                    .insert(ConductPosition::Slot(slot.species));
+            }
+        }
+
+        let mut shapes: BTreeMap<String, DeclaredShape> = BTreeMap::new();
+        let mut shape_of: BTreeMap<String, String> = BTreeMap::new();
+        let mut unread: BTreeSet<String> = BTreeSet::new();
+        for form in &reading.declarations {
+            conduct
+                .entry(form.name.clone())
+                .or_default()
+                .insert(ConductPosition::Declared {
+                    former: form.former.clone(),
+                });
+            for named in form.recruited.keys() {
+                conduct
+                    .entry(named.clone())
+                    .or_default()
+                    .insert(ConductPosition::Term);
+            }
+            for named in form.tactics.keys() {
+                conduct
+                    .entry(named.clone())
+                    .or_default()
+                    .insert(ConductPosition::Tactic);
+            }
+            for named in form.local_bindings.keys() {
+                conduct
+                    .entry(named.clone())
+                    .or_default()
+                    .insert(ConductPosition::LocalBinding);
+            }
+            match declaration_grammar.reading(&form.statement) {
+                Some(statement_reading) => {
+                    let skeleton = alpha_normalized(statement_reading);
+                    shape_of.insert(form.name.clone(), skeleton.clone());
+                    let shape = shapes
+                        .entry(skeleton.clone())
+                        .or_insert_with(|| DeclaredShape {
+                            skeleton,
+                            members: Vec::new(),
+                        });
+                    if !shape.members.contains(&form.name) {
+                        shape.members.push(form.name.clone());
+                    }
+                }
+                None => {
+                    unread.insert(form.name.clone());
+                }
+            }
+        }
+        for named in reading.preamble.keys() {
+            conduct
+                .entry(named.clone())
+                .or_default()
+                .insert(ConductPosition::Preamble);
+        }
+        for named in reading.scoping.keys() {
+            conduct
+                .entry(named.clone())
+                .or_default()
+                .insert(ConductPosition::Scoping);
+        }
+
+        let declared: BTreeSet<(String, String)> = reading
+            .declarations
+            .iter()
+            .map(|form| (form.former.clone(), form.name.clone()))
+            .collect();
+        let mut founding: BTreeMap<String, (usize, String, String)> = BTreeMap::new();
+        let mut preamble_lines: Vec<(String, String)> = Vec::new();
+        let mut order = 0usize;
+        for (whole, text) in sources {
+            for line in text.lines() {
+                let trimmed = line.trim();
+                let mut parts = trimmed.split_whitespace();
+                let Some(former) = parts.next() else {
+                    continue;
+                };
+                if PREAMBLE_FORMS.contains(&former) {
+                    if !preamble_lines.iter().any(|(_, carried)| carried == trimmed) {
+                        preamble_lines.push((whole.clone(), trimmed.to_owned()));
+                    }
+                    continue;
+                }
+                let Some(head) = parts.next() else {
+                    continue;
+                };
+                let name: String = head.chars().take_while(|c| is_token_character(*c)).collect();
+                if name.is_empty()
+                    || founding.contains_key(&name)
+                    || !declared.contains(&(former.to_owned(), name.clone()))
+                {
+                    continue;
+                }
+                founding.insert(name, (order, whole.clone(), trimmed.to_owned()));
+                order += 1;
+            }
+        }
+
+        Ok(Self {
+            conduct,
+            shapes,
+            shape_of,
+            founding,
+            preamble_lines,
+            declaration_grammar,
+            unread,
+        })
+    }
+
+    /// Every identifier the reading placed anywhere.
+    ///
+    /// **This is the recruited population the composition should have been drawing on.**
+    /// `ConditionedBody::recruited_population` is `read_derivation`'s, which opens one declaration
+    /// per artifact and therefore never saw `ExactRelay` or the binder `Q` at all.
+    pub fn recruited(&self) -> BTreeSet<String> {
+        self.conduct.keys().cloned().collect()
+    }
+
+    /// Where the material placed one identifier, in canonical order. Empty for a token the reading
+    /// never placed.
+    pub fn stood_in(&self, identifier: &str) -> Vec<ConductPosition> {
+        self.conduct
+            .get(identifier)
+            .map(|carried| carried.iter().cloned().collect())
+            .unwrap_or_default()
+    }
+
+    /// The declarations sharing one identifier's declared shape, itself included. Empty when the
+    /// material declares no such name.
+    pub fn cohort(&self, identifier: &str) -> Vec<String> {
+        self.shape_of
+            .get(identifier)
+            .and_then(|skeleton| self.shapes.get(skeleton))
+            .map(|shape| shape.members.clone())
+            .unwrap_or_default()
+    }
+
+    /// **The gate.** Did the material stand this identifier, or any member of its declared-shape
+    /// cohort, in this slot species?
+    pub fn admits(&self, identifier: &str, slot: SlotSpecies) -> bool {
+        let wanted = ConductPosition::Slot(slot);
+        if self
+            .conduct
+            .get(identifier)
+            .is_some_and(|carried| carried.contains(&wanted))
+        {
+            return true;
+        }
+        self.cohort(identifier).iter().any(|member| {
+            self.conduct
+                .get(member)
+                .is_some_and(|carried| carried.contains(&wanted))
+        })
+    }
+
+    /// Every identifier the gate admits into one slot species, with the cohort member that carried
+    /// it there.
+    pub fn admitted_into(&self, slot: SlotSpecies) -> BTreeMap<String, String> {
+        let wanted = ConductPosition::Slot(slot);
+        let mut carried = BTreeMap::new();
+        for identifier in self.conduct.keys() {
+            if self.conduct[identifier].contains(&wanted) {
+                carried.insert(identifier.clone(), identifier.clone());
+                continue;
+            }
+            if let Some(member) = self.cohort(identifier).into_iter().find(|member| {
+                self.conduct
+                    .get(member)
+                    .is_some_and(|places| places.contains(&wanted))
+            }) {
+                carried.insert(identifier.clone(), member);
+            }
+        }
+        carried
+    }
+
+    /// The grammar recovered over **every** declaration's statement.
+    pub const fn declaration_grammar(&self) -> &RecoveredStatementGrammar {
+        &self.declaration_grammar
+    }
+
+    /// Every declared shape with more than one member — the cohorts that do any work.
+    pub fn cohorts(&self) -> Vec<&DeclaredShape> {
+        self.shapes
+            .values()
+            .filter(|shape| shape.members.len() > 1)
+            .collect()
+    }
+
+    /// Every declared shape, including the singletons.
+    pub fn shapes(&self) -> Vec<&DeclaredShape> {
+        self.shapes.values().collect()
+    }
+
+    /// Declarations whose statement the grammar could not read. Retained, never dropped.
+    pub const fn unread(&self) -> &BTreeSet<String> {
+        &self.unread
+    }
+
+    /// The whole position census, for a reader.
+    pub fn census(&self) -> BTreeMap<String, Vec<ConductPosition>> {
+        self.conduct
+            .iter()
+            .map(|(identifier, places)| (identifier.clone(), places.iter().cloned().collect()))
+            .collect()
+    }
+
+    /// The founding lines a composed statement's own names need, transitively closed, verbatim.
+    ///
+    /// A name the material declares pulls the line that declares it, and that line's own names pull
+    /// theirs. What no declaration founds is looked for on the preamble lines, and what neither
+    /// founds is simply left free — the scope states what it carries and never invents a declaration.
+    pub fn scope_for(&self, statement: &str) -> ComposedScope {
+        let mut wanted: BTreeSet<String> = BTreeSet::new();
+        let mut frontier: Vec<String> = tokens_of(statement);
+        while let Some(name) = frontier.pop() {
+            let Some((_, _, line)) = self.founding.get(&name) else {
+                continue;
+            };
+            if !wanted.insert(name) {
+                continue;
+            }
+            for token in tokens_of(line) {
+                if self.founding.contains_key(&token) && !wanted.contains(&token) {
+                    frontier.push(token);
+                }
+            }
+        }
+        let mut ordered: Vec<(usize, String)> = wanted
+            .iter()
+            .filter_map(|name| {
+                self.founding
+                    .get(name)
+                    .map(|(order, _, line)| (*order, line.clone()))
+            })
+            .collect();
+        ordered.sort();
+
+        let mut imports: Vec<String> = Vec::new();
+        let mut founding: Vec<String> = Vec::new();
+        let mut incomplete: Vec<String> = Vec::new();
+        for (_, line) in ordered {
+            if declaration_finishes_on_its_own_line(&line) {
+                founding.push(line);
+            } else {
+                incomplete.push(line);
+            }
+        }
+
+        // Whatever the declarations do not found, the preamble may.
+        let founded_here: BTreeSet<String> = founding
+            .iter()
+            .chain(incomplete.iter())
+            .flat_map(|line| tokens_of(line))
+            .collect();
+        let free: BTreeSet<String> = tokens_of(statement)
+            .into_iter()
+            .filter(|token| !self.founding.contains_key(token))
+            .chain(founded_here.into_iter().filter(|token| !self.founding.contains_key(token)))
+            .collect();
+        for (_, line) in &self.preamble_lines {
+            if !tokens_of(line).iter().any(|token| free.contains(token)) {
+                continue;
+            }
+            if line.starts_with("import") {
+                imports.push(line.clone());
+            } else {
+                founding.insert(0, line.clone());
+            }
+        }
+
+        ComposedScope {
+            imports,
+            founding,
+            incomplete,
+        }
+    }
+}
+
+/// Does a declaration line carry its own body? A one-line lookup cannot recover a declaration whose
+/// body runs on, and saying so is the difference between an incomplete scope and a truncated one.
+fn declaration_finishes_on_its_own_line(line: &str) -> bool {
+    match line.split_once(":=") {
+        Some((_, right)) => !right.trim().is_empty() && right.trim() != "by",
+        None => false,
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
 // The admission rule
 // -------------------------------------------------------------------------------------------------
 
@@ -714,9 +1301,38 @@ pub fn composed_name(declaration: &str, stem: &str, brought: &str, site: &str) -
 /// the contact pair**, so the licence that founded the statement is visible in the circuit as
 /// recruitment rather than carried only in prose. No import line and no tactic name is written.
 pub fn compose_artifact(name: &str, statement: &str, held: &str, brought: &str) -> String {
-    format!(
-        "namespace Soma\ntheorem {name} {statement} := by\n  have founded := {held}\n  have brought := {brought}\nend Soma\n"
-    )
+    compose_artifact_in_scope(name, statement, held, brought, &ComposedScope::default())
+}
+
+/// The same artifact carrying the founding lines its own names need, verbatim from the material.
+///
+/// **This is what separates a composed string from something a batch grader could be asked about.**
+/// The unscoped form emits a theorem naming `ExactRelay` with nothing declaring `ExactRelay`, so no
+/// kernel could elaborate it whatever the statement said. Nothing here is *authored*: every line is
+/// one the material wrote, recovered by [`StatementPositionEcology::scope_for`], and the composed
+/// theorem stays the last `theorem` line so `read_derivation` reads back the composition and not a
+/// carried declaration.
+pub fn compose_artifact_in_scope(
+    name: &str,
+    statement: &str,
+    held: &str,
+    brought: &str,
+    scope: &ComposedScope,
+) -> String {
+    let mut text = String::new();
+    for line in &scope.imports {
+        text.push_str(line);
+        text.push('\n');
+    }
+    text.push_str("namespace Soma\n");
+    for line in &scope.founding {
+        text.push_str(line);
+        text.push('\n');
+    }
+    text.push_str(&format!(
+        "theorem {name} {statement} := by\n  have founded := {held}\n  have brought := {brought}\nend Soma\n"
+    ));
+    text
 }
 
 /// Every committed founded stem that holds two identifiers together, with the offsets it stands at.
@@ -763,6 +1379,24 @@ pub fn adjudicate(
     grammar: &RecoveredStatementGrammar,
     morphology: &FoundedMorphology,
     standing: &BTreeSet<String>,
+) -> Result<StatementAdmission, ConditionedDerivationRefusal> {
+    adjudicate_conditioned(candidate, grammar, morphology, standing, None)
+}
+
+/// [`adjudicate`] with the position ecology on the causal path.
+///
+/// The gate is the **last** one and it is a conjunct, never a widener: a candidate the stem licence
+/// refuses is refused whatever the ecology says, so `Applied` can only ever return a subpopulation of
+/// `Withheld`. It fires only where the composition **places an identifier into a recovered slot** —
+/// `candidate.slot` — because a binder withdrawal or extension moves a whole group the population
+/// already witnessed and puts nothing anywhere new, so there is no place for a position licence to
+/// be about.
+pub fn adjudicate_conditioned(
+    candidate: &CandidateStatement,
+    grammar: &RecoveredStatementGrammar,
+    morphology: &FoundedMorphology,
+    standing: &BTreeSet<String>,
+    ecology: Option<&StatementPositionEcology>,
 ) -> Result<StatementAdmission, ConditionedDerivationRefusal> {
     // 1. what the grammar cannot place
     if candidate.species == CompositionSpecies::ResidueSubstitution {
@@ -847,7 +1481,23 @@ pub fn adjudicate(
         ));
     }
 
-    // 6. the read-back, which is the composer being held to the reading
+    // 6. the position licence, which is the second conjunct of the conditioning
+    let mut stood_in: Vec<ConductPosition> = Vec::new();
+    if let (Some(ecology), Some(slot)) = (ecology, candidate.slot) {
+        if !ecology.admits(&candidate.brought, slot) {
+            return Ok(StatementAdmission::Refused(
+                StatementObstruction::IdentifierNeverStoodInThisPosition {
+                    brought: candidate.brought.clone(),
+                    slot,
+                    stood_in: ecology.stood_in(&candidate.brought),
+                    cohort: ecology.cohort(&candidate.brought),
+                },
+            ));
+        }
+        stood_in = ecology.stood_in(&candidate.brought);
+    }
+
+    // 7. the read-back, which is the composer being held to the reading
     let probe = compose_artifact(
         "composition_probe",
         &candidate.statement,
@@ -891,6 +1541,7 @@ pub fn adjudicate(
     Ok(StatementAdmission::Admitted {
         licences: found,
         carried_aperture,
+        stood_in,
     })
 }
 
@@ -901,9 +1552,21 @@ pub fn admit(
     morphology: &FoundedMorphology,
     standing: BTreeSet<String>,
 ) -> Result<AdmittedStatements, StatementCompositionRefusal> {
+    admit_conditioned(candidates, grammar, morphology, standing, None)
+}
+
+/// [`admit`] under a declared position gate.
+pub fn admit_conditioned(
+    candidates: Vec<CandidateStatement>,
+    grammar: RecoveredStatementGrammar,
+    morphology: &FoundedMorphology,
+    standing: BTreeSet<String>,
+    ecology: Option<&StatementPositionEcology>,
+) -> Result<AdmittedStatements, StatementCompositionRefusal> {
     let mut adjudicated = Vec::with_capacity(candidates.len());
     for candidate in candidates {
-        let admission = adjudicate(&candidate, &grammar, morphology, &standing)?;
+        let admission =
+            adjudicate_conditioned(&candidate, &grammar, morphology, &standing, ecology)?;
         adjudicated.push(AdjudicatedCandidate {
             candidate,
             admission,
@@ -913,6 +1576,11 @@ pub fn admit(
         grammar,
         adjudicated,
         standing,
+        gate: if ecology.is_some() {
+            PositionGate::Applied
+        } else {
+            PositionGate::Withheld
+        },
     })
 }
 
@@ -932,6 +1600,28 @@ pub fn found_statements(
     let reaching = declarations_reaching(body);
     let candidates = compose_candidates(&grammar, &recruited, &reaching);
     admit(candidates, grammar, body.morphology(), standing)
+}
+
+/// **The conditioned entry point.** The same composition, drawing on the population the development
+/// reading recruits, adjudicated under a declared position gate.
+///
+/// Both settings compose the **same** candidates, which is what makes the pair an orbit rather than
+/// two runs: the recruited population comes from the ecology in both, and only the gate moves.
+pub fn found_statements_under(
+    body: &ConditionedBody,
+    ecology: &StatementPositionEcology,
+    gate: PositionGate,
+) -> Result<AdmittedStatements, StatementCompositionRefusal> {
+    let standing = body.standing_statements();
+    let grammar = recover(&standing)?;
+    let recruited = ecology.recruited();
+    let reaching = declarations_reaching(body);
+    let candidates = compose_candidates(&grammar, &recruited, &reaching);
+    let applied = match gate {
+        PositionGate::Applied => Some(ecology),
+        PositionGate::Withheld => None,
+    };
+    admit_conditioned(candidates, grammar, body.morphology(), standing, applied)
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -959,6 +1649,11 @@ pub struct ComposedPassage {
     pub rule: String,
     /// What the grammar does not certify about it.
     pub carried_aperture: Vec<GrammarAperture>,
+    /// Where the material stood the brought identifier, when the position gate was applied.
+    pub stood_in: Vec<ConductPosition>,
+    /// The founding lines the artifact carries so its own names resolve. Empty when composed
+    /// without an ecology.
+    pub scope: ComposedScope,
     pub text: String,
 }
 
@@ -971,15 +1666,27 @@ pub struct ComposedPassage {
 pub fn compose(
     admitted: &AdmittedStatements,
 ) -> Result<Vec<ComposedPassage>, StatementCompositionRefusal> {
+    compose_in_scope(admitted, None)
+}
+
+/// [`compose`], with every artifact carrying the founding lines its own names need.
+pub fn compose_in_scope(
+    admitted: &AdmittedStatements,
+    ecology: Option<&StatementPositionEcology>,
+) -> Result<Vec<ComposedPassage>, StatementCompositionRefusal> {
     let mut composed = Vec::new();
     for entry in admitted.admitted() {
         let StatementAdmission::Admitted {
             licences,
             carried_aperture,
+            stood_in,
         } = &entry.admission
         else {
             continue;
         };
+        let scope = ecology.map_or_else(ComposedScope::default, |ecology| {
+            ecology.scope_for(&entry.candidate.statement)
+        });
         for declaration in &entry.candidate.declarations {
             for licence in licences {
                 let name = composed_name(
@@ -988,11 +1695,12 @@ pub fn compose(
                     &entry.candidate.brought,
                     &entry.candidate.site,
                 );
-                let text = compose_artifact(
+                let text = compose_artifact_in_scope(
                     &name,
                     &entry.candidate.statement,
                     &entry.candidate.held,
                     &entry.candidate.brought,
+                    &scope,
                 );
                 let derivation = read_derivation(&text).ok_or(
                     StatementCompositionRefusal::ComposedPassageDeclaresNothing { name: name.clone() },
@@ -1019,6 +1727,8 @@ pub fn compose(
                     wholes: licence.wholes.clone(),
                     rule: entry.candidate.rule.clone(),
                     carried_aperture: carried_aperture.clone(),
+                    stood_in: stood_in.clone(),
+                    scope: scope.clone(),
                     text,
                 });
             }
@@ -1252,6 +1962,16 @@ pub fn ablate_stem_for_statements(
     body: &ConditionedBody,
     stem: &str,
 ) -> Result<StatementStemAblation, StatementCompositionRefusal> {
+    ablate_stem_for_statements_under(body, stem, None)
+}
+
+/// [`ablate_stem_for_statements`] under a declared position gate. `None` is the unconditioned rule
+/// and reproduces [`ablate_stem_for_statements`] exactly.
+pub fn ablate_stem_for_statements_under(
+    body: &ConditionedBody,
+    stem: &str,
+    ecology: Option<&StatementPositionEcology>,
+) -> Result<StatementStemAblation, StatementCompositionRefusal> {
     let founded = body.morphology().stem(stem).ok_or(
         ConditionedDerivationRefusal::StemWasNeverFounded {
             stem: stem.to_owned(),
@@ -1264,8 +1984,13 @@ pub fn ablate_stem_for_statements(
             stem: stem.to_owned(),
         })?;
 
-    let before = found_statements(body)?;
-    let after = found_statements(&ablated)?;
+    let (before, after) = match ecology {
+        Some(ecology) => (
+            found_statements_under(body, ecology, PositionGate::Applied)?,
+            found_statements_under(&ablated, ecology, PositionGate::Applied)?,
+        ),
+        None => (found_statements(body)?, found_statements(&ablated)?),
+    };
     let carried_before = licensed_by_statement(&before);
     let carried_after = licensed_by_statement(&after);
 
@@ -1684,5 +2409,250 @@ mod tests {
         let passages = passages_with_composed(&body, &composed).expect("passages");
         let aperture = MoveAperture::morphemic(&passages, 4);
         assert!(aperture.stems.contains("exact"), "{:?}", aperture.stems);
+    }
+
+    // ---------------------------------------------------------------------------------------------
+    // The position ecology
+    // ---------------------------------------------------------------------------------------------
+
+    /// The same three statements, in artifacts that also carry the **definitional** declarations the
+    /// narrow reading drops: a `def` and an `abbrev` of the same declared shape, and a proof body
+    /// whose head is the tactic `exact`.
+    fn scoped_deposit() -> Vec<(String, String)> {
+        vec![
+            (
+                "carry".to_owned(),
+                "namespace Soma\ndef exactCarrier (P : Prop) : Prop := P\n\
+                 theorem carrier_transport (P : Prop) (h : P) : exactCarrier P := by\n  \
+                 exact formal_carry\nend Soma\n"
+                    .to_owned(),
+            ),
+            (
+                "relay".to_owned(),
+                "namespace Soma\nabbrev ExactRelay (Q : Prop) : Prop := exactCarrier Q\n\
+                 theorem carrier_relay (h : P) : exactCarrier P := by\n  \
+                 have step := formal_carry\nend Soma\n"
+                    .to_owned(),
+            ),
+            (
+                "agree".to_owned(),
+                "namespace Soma\ntheorem every_receiver_agrees (a b : Nat) : a = b := by\n  \
+                 have step := Nat.zero\nend Soma\n"
+                    .to_owned(),
+            ),
+        ]
+    }
+
+    fn scoped_body() -> ConditionedBody {
+        let mut body = ConditionedBody::mount(scoped_deposit()).expect("mounts");
+        body.condition(&corpus());
+        body
+    }
+
+    fn scoped_ecology() -> StatementPositionEcology {
+        let deposit = scoped_deposit();
+        let reading = crate::lean_development::join(
+            deposit
+                .iter()
+                .map(|(_, text)| {
+                    crate::lean_development::read_development(
+                        text,
+                        crate::lean_development::DeclarationGrain::EveryTopLevelDeclaration,
+                    )
+                })
+                .collect(),
+        );
+        StatementPositionEcology::found(&reading, &deposit).expect("founds an ecology")
+    }
+
+    #[test]
+    fn the_ecology_records_where_the_material_places_an_identifier_and_never_what_it_is() {
+        let ecology = scoped_ecology();
+        assert_eq!(
+            ecology.stood_in("exact"),
+            vec![ConductPosition::Tactic],
+            "`exact` heads a proof step and stands nowhere else"
+        );
+        assert_eq!(ecology.stood_in("Soma"), vec![ConductPosition::Scoping]);
+        assert!(ecology
+            .stood_in("exactCarrier")
+            .contains(&ConductPosition::Slot(SlotSpecies::BodyHead)));
+        assert!(ecology
+            .stood_in("exactCarrier")
+            .contains(&ConductPosition::Declared {
+                former: "def".to_owned()
+            }));
+        // and the census is a population, not a classification: `Prop` carries four places at once
+        assert!(ecology.stood_in("Prop").len() >= 2);
+    }
+
+    #[test]
+    fn the_wider_reading_recruits_declarations_read_derivation_never_opened() {
+        let ecology = scoped_ecology();
+        let narrow = scoped_body().recruited_population();
+        assert!(
+            !narrow.contains("ExactRelay"),
+            "the narrow grain opens one declaration per artifact and cannot see the abbrev"
+        );
+        assert!(ecology.recruited().contains("ExactRelay"));
+        assert!(ecology.recruited().is_superset(&narrow));
+    }
+
+    #[test]
+    fn two_declarations_the_reading_cannot_tell_apart_are_one_cohort() {
+        let ecology = scoped_ecology();
+        let cohort = ecology.cohort("ExactRelay");
+        assert!(cohort.contains(&"exactCarrier".to_owned()), "{cohort:?}");
+        assert!(cohort.contains(&"ExactRelay".to_owned()), "{cohort:?}");
+        // the cohort is what carries it into a position it was never itself witnessed in
+        assert!(!ecology
+            .stood_in("ExactRelay")
+            .contains(&ConductPosition::Slot(SlotSpecies::BodyHead)));
+        assert!(ecology.admits("ExactRelay", SlotSpecies::BodyHead));
+    }
+
+    #[test]
+    fn a_tactic_is_refused_from_a_statement_slot_and_the_refusal_names_where_it_did_stand() {
+        let body = scoped_body();
+        let ecology = scoped_ecology();
+        let founded =
+            found_statements_under(&body, &ecology, PositionGate::Applied).expect("founds");
+        let refused = founded
+            .refused()
+            .into_iter()
+            .find(|entry| {
+                entry.candidate.brought == "exact"
+                    && entry.candidate.slot == Some(SlotSpecies::BodyHead)
+            })
+            .expect("`exact` is composed into a head slot");
+        let Some(StatementObstruction::IdentifierNeverStoodInThisPosition {
+            slot, stood_in, ..
+        }) = refused.admission.obstruction()
+        else {
+            panic!("expected the position obstruction, got {:?}", refused.admission);
+        };
+        assert_eq!(*slot, SlotSpecies::BodyHead);
+        assert_eq!(stood_in, &vec![ConductPosition::Tactic]);
+        // and the same candidate passes the stem licence, so this is the position gate and not the
+        // contact gate wearing a new name
+        let withheld = adjudicate(&refused.candidate, &founded.grammar, body.morphology(), &founded.standing)
+            .expect("adjudicates");
+        assert!(withheld.is_admitted());
+    }
+
+    #[test]
+    fn the_position_gate_is_a_conjunct_and_never_a_widener() {
+        let body = scoped_body();
+        let ecology = scoped_ecology();
+        let withheld =
+            found_statements_under(&body, &ecology, PositionGate::Withheld).expect("founds");
+        let applied =
+            found_statements_under(&body, &ecology, PositionGate::Applied).expect("founds");
+        assert_eq!(
+            withheld.adjudicated.len(),
+            applied.adjudicated.len(),
+            "the orbit is over ONE candidate population"
+        );
+        assert_eq!(withheld.gate, PositionGate::Withheld);
+        assert_eq!(applied.gate, PositionGate::Applied);
+        assert!(applied
+            .founded_statements()
+            .is_subset(&withheld.founded_statements()));
+    }
+
+    #[test]
+    fn the_gauge_orbit_on_this_material_is_not_trivial() {
+        let body = scoped_body();
+        let ecology = scoped_ecology();
+        let withheld =
+            found_statements_under(&body, &ecology, PositionGate::Withheld).expect("founds");
+        let applied =
+            found_statements_under(&body, &ecology, PositionGate::Applied).expect("founds");
+        let removed: BTreeSet<String> = withheld
+            .founded_statements()
+            .difference(&applied.founded_statements())
+            .cloned()
+            .collect();
+        assert!(
+            !removed.is_empty(),
+            "a gauge whose group acts trivially on the declared material is not a gauge"
+        );
+        assert!(!applied.founded_statements().is_empty());
+        assert!(applied
+            .obstructions()
+            .contains_key("identifier-never-stood-in-this-position"));
+    }
+
+    #[test]
+    fn the_conditioned_composition_reaches_the_declaration_the_material_never_used() {
+        let body = scoped_body();
+        let ecology = scoped_ecology();
+        let founded =
+            found_statements_under(&body, &ecology, PositionGate::Applied).expect("founds");
+        assert!(founded
+            .founded_statements()
+            .contains("(P : Prop) (h : P) : ExactRelay P"));
+        assert!(founded.is_a_population());
+    }
+
+    #[test]
+    fn the_unconditioned_null_founds_nothing_under_the_gate_as_well() {
+        let null = ConditionedBody::mount(scoped_deposit()).expect("mounts");
+        let ecology = scoped_ecology();
+        let founded =
+            found_statements_under(&null, &ecology, PositionGate::Applied).expect("founds");
+        assert!(!founded.adjudicated.is_empty());
+        assert!(founded.admitted().is_empty());
+        assert!(founded.founded_statements().is_empty());
+    }
+
+    #[test]
+    fn a_composed_artifact_carries_the_founding_lines_its_own_names_need() {
+        let body = scoped_body();
+        let ecology = scoped_ecology();
+        let founded =
+            found_statements_under(&body, &ecology, PositionGate::Applied).expect("founds");
+        let composed = compose_in_scope(&founded, Some(&ecology)).expect("composes");
+        let carried = composed
+            .iter()
+            .find(|passage| passage.statement == "(P : Prop) (h : P) : ExactRelay P")
+            .expect("the ExactRelay composition is presented");
+        assert!(carried.scope.is_complete());
+        assert!(carried
+            .scope
+            .founding
+            .iter()
+            .any(|line| line == "def exactCarrier (P : Prop) : Prop := P"));
+        assert!(carried
+            .scope
+            .founding
+            .iter()
+            .any(|line| line == "abbrev ExactRelay (Q : Prop) : Prop := exactCarrier Q"));
+        // the transitive closure is ordered so a name is declared before it is used
+        let at = |needle: &str| {
+            carried
+                .scope
+                .founding
+                .iter()
+                .position(|line| line.contains(needle))
+                .expect("carried")
+        };
+        assert!(at("def exactCarrier") < at("abbrev ExactRelay"));
+        // and the artifact still reads back reaching the composition, not a carried declaration
+        let read = read_derivation(&carried.text).expect("reads");
+        assert_eq!(read.statement, carried.statement);
+    }
+
+    #[test]
+    fn an_unscoped_composition_carries_no_founding_line_and_is_unchanged() {
+        let body = scoped_body();
+        let ecology = scoped_ecology();
+        let founded =
+            found_statements_under(&body, &ecology, PositionGate::Applied).expect("founds");
+        let bare = compose(&founded).expect("composes");
+        assert!(bare.iter().all(|passage| passage.scope.is_empty()));
+        assert!(bare
+            .iter()
+            .all(|passage| passage.text.starts_with("namespace Soma\ntheorem ")));
     }
 }

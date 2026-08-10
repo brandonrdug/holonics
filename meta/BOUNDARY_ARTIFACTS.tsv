@@ -1,0 +1,131 @@
+# Every committed boundary artifact, bound to its content hash AND its closure hash.
+#
+# THE LAW (`CLAUDE.md` section 0, lesson 1): *"Bind every deposit to its content hash AND its
+# closure hash, with a verifier."* The verifier is `tools/boundary_artifacts.py`; it exits non-zero
+# and names what disagreed. Re-seed with `--write` only after a DELIBERATE rebuild, and say so.
+#
+# A boundary artifact is a compiled binary committed into the tree because the host workspace
+# carries the artifact without carrying the toolchain that made it. Nothing in `cargo test`
+# recompiles one, so source and artifact drift SILENTLY. That is not hypothetical:
+#
+#   `soma/kernel/soma.spv` at sha256 9a805973… was NOT produced by this repository at any commit.
+#   It is byte-identical to `a07ff376:src/soma/kernel/soma.spv` in the frozen laboratory, whose last
+#   commit touching that path is e714ebc0, 2026-07-14. `FeltLineage::required_carrier_depth` — the
+#   continuation-depth carrier mechanism the current `carriage.rs` compiles — does not exist at
+#   e714ebc0; it entered at 323522b7, 2026-07-20, six days LATER. The committed artifact therefore
+#   predated the law it was supposed to be an image of, in a tree where nothing could notice.
+#   Recorded in `research/records/2026-08-09_THE_COMMITTED_BOUNDARY_ARTIFACT_IS_STALE_AND_CANNOT_BE_REBUILT.md`.
+#
+# `rebuild_evidence` is PROVENANCE, not a check. It records whether anyone has actually reproduced
+# the committed bytes from the declared closure. `CLAUDE.md` section 8: grade the implementation,
+# not the receipt — so an artifact that has never been reproduced says so in the registry rather
+# than borrowing the authority of the two hashes beside it.
+#
+# Columns: record, artifact, key, value. `consumer` may repeat. `entry` is required by
+# PATH_INCLUDES only. CLOSURE rows carry one source file and its sha256 each; `closure_sha256` is
+# the sha256 over the path-ordered `path<TAB>sha256` table of all of them.
+record	artifact	key	value
+ARTIFACT	soma/kernel/soma.spv	root	soma/kernel
+ARTIFACT	soma/kernel/soma.spv	closure_rule	PATH_INCLUDES
+ARTIFACT	soma/kernel/soma.spv	entry	soma/kernel/src/lib.rs
+ARTIFACT	soma/kernel/soma.spv	sha256	91d9b5c1fa9ce97583f93b952a6c559f715719812fb2077ba3caab61f6435e00
+ARTIFACT	soma/kernel/soma.spv	octets	2556944
+ARTIFACT	soma/kernel/soma.spv	closure_sha256	6fcc1db2b931037e01e01624722d4e46077fd42920d32cceddcebc96e2fd5a7c
+ARTIFACT	soma/kernel/soma.spv	toolchain	nightly-2026-05-22
+ARTIFACT	soma/kernel/soma.spv	builder	soma/kernel/build.sh
+ARTIFACT	soma/kernel/soma.spv	consumer	soma/surface/src/lib.rs
+ARTIFACT	soma/kernel/soma.spv	rebuild_evidence	2026-08-09 soma/kernel/build.sh reproduced these bytes from this closure; spirv-val --target-env vulkan1.2 clean; 10 entry points
+CLOSURE	soma/kernel/soma.spv	soma/body/src/arrow.rs	5be61b779b390ca6b052066770029706a0661a55dc883d9c2edc4c8aaaafcdb1
+CLOSURE	soma/kernel/soma.spv	soma/body/src/boundary.rs	4fc01f7490167c7ff005f4deab47be1d1a9de6fe2a72d97be5c987d610201190
+CLOSURE	soma/kernel/soma.spv	soma/body/src/carriage.rs	56de273b0b8254a3732d011d29a5a884ffe72789c90fe4dc7d2047b5beedb2dc
+CLOSURE	soma/kernel/soma.spv	soma/body/src/carriage/register_chart.rs	46bc85331193ce02e581f6a5058972c20b4b9bc691466af5b5961e0ebee0b140
+CLOSURE	soma/kernel/soma.spv	soma/body/src/channel.rs	97f1fb8efd2e5b86c7aa43c2bc4372bdabf3e68c71319a18347586221948fd55
+CLOSURE	soma/kernel/soma.spv	soma/body/src/chart.rs	4a38fcb8e707bbf35485d66c460d554333d5bc8d93e6c282481a82dd34b434ab
+CLOSURE	soma/kernel/soma.spv	soma/body/src/geom.rs	a549d16882ad9cb37598a39e1992f6ac87aa90955b486575a43d71bf65fba889
+CLOSURE	soma/kernel/soma.spv	soma/body/src/law.rs	4639d8a6c24c63685fb963805502d94edcc0d21173d9046b9c7e54c2c1c75719
+CLOSURE	soma/kernel/soma.spv	soma/body/src/manifold.rs	cacb4447dcbe1a4437a492d53295a84bb215126b4689d5b226faf29493dce871
+CLOSURE	soma/kernel/soma.spv	soma/body/src/medium.rs	6c871d5f2ecd1dfc014cd576e4fca1d1200a02264c1863cdf8bed579a5e6e37e
+CLOSURE	soma/kernel/soma.spv	soma/body/src/medium/codec.rs	723ceb20943d0be2b1a40b475eeaa98243277136070684b09c2d4d5984c3b65d
+CLOSURE	soma/kernel/soma.spv	soma/body/src/num.rs	549c43b8aa599f486d5796cb75a85467e6b4707e86fc2ec7d37e9fdd21735f85
+CLOSURE	soma/kernel/soma.spv	soma/body/src/place.rs	e10811d143123113e89f24640d8294677018fad18e214c74f761a3013098f847
+CLOSURE	soma/kernel/soma.spv	soma/body/src/register.rs	4a729ad03d22214f63f506955575708b99b39090232c105740c52285358a8e48
+CLOSURE	soma/kernel/soma.spv	soma/body/src/seam.rs	8fe29f71989d4749a13364de119e9cdb41708fe61d3bbc2c0b7d1deeca5aa898
+CLOSURE	soma/kernel/soma.spv	soma/body/src/soul.rs	57709bcdf5d22adee350cc749378c67035ba57e2a2c664bdae60a9952284cf58
+CLOSURE	soma/kernel/soma.spv	soma/kernel/Cargo.lock	5a8a3405df05dee9cfd1745a415d72b09528541a85a048020c40e7ee29eded74
+CLOSURE	soma/kernel/soma.spv	soma/kernel/Cargo.toml	5d5951d410260e4e3494c7f77b152f00b8b6de5364807eadda27f38688ab1c4a
+CLOSURE	soma/kernel/soma.spv	soma/kernel/build.sh	bf3a987bfbe70ea26a2b84caeaf3eea93f99f0d671878f88929b6248f11dda17
+CLOSURE	soma/kernel/soma.spv	soma/kernel/builder/Cargo.lock	ccc141345d5deca1758a684c569dbac56cfb66576a801bea42e60fd5246bf294
+CLOSURE	soma/kernel/soma.spv	soma/kernel/builder/Cargo.toml	512eaf4f7c60a8d010a123f36e41b2a7b7431155ae661e5d77b3c1bd47af2a30
+CLOSURE	soma/kernel/soma.spv	soma/kernel/builder/src/main.rs	f2e0720575c2098908c4801f6f2edefa148079f5a04040928b255c60e984d768
+CLOSURE	soma/kernel/soma.spv	soma/kernel/rust-toolchain.toml	f840332c0fa90ce3f856d45eea07a185297efbc5eeb20021e39cc4187968080b
+CLOSURE	soma/kernel/soma.spv	soma/kernel/src/lib.rs	ae334941f207ead9c6a61bbe521e690b3d17adfe0d7d3cae9b6c16e2c1377e0d
+ARTIFACT	soma/mount/mount-smoke-kernel/mount_smoke_kernel.ptx	root	soma/mount/mount-smoke-kernel
+ARTIFACT	soma/mount/mount-smoke-kernel/mount_smoke_kernel.ptx	closure_rule	CRATE_DEPS
+ARTIFACT	soma/mount/mount-smoke-kernel/mount_smoke_kernel.ptx	sha256	0310be86a54b08c4234f6a39b69805b72d8610bb55cee5aef7caf387a0c8a2cd
+ARTIFACT	soma/mount/mount-smoke-kernel/mount_smoke_kernel.ptx	octets	1437
+ARTIFACT	soma/mount/mount-smoke-kernel/mount_smoke_kernel.ptx	closure_sha256	ae83972408540e47feac6cd858c1c76ba905a3bf15fd810013b89add776c9cff
+ARTIFACT	soma/mount/mount-smoke-kernel/mount_smoke_kernel.ptx	toolchain	nightly-2026-05-22
+ARTIFACT	soma/mount/mount-smoke-kernel/mount_smoke_kernel.ptx	builder	soma/mount/mount-smoke-kernel/build-ptx.sh
+ARTIFACT	soma/mount/mount-smoke-kernel/mount_smoke_kernel.ptx	consumer	soma/mount/src/lib.rs
+ARTIFACT	soma/mount/mount-smoke-kernel/mount_smoke_kernel.ptx	consumer	soma/mount/src/bin/mount-smoke.rs
+ARTIFACT	soma/mount/mount-smoke-kernel/mount_smoke_kernel.ptx	rebuild_evidence	NOT REPRODUCED but NOT STALE, measured 2026-08-09. mount-smoke-kernel has zero path dependencies, so its closure is its own five files and nothing else; all five and the artifact were last touched by the same commit 06518c3 (2026-08-07), and no closure member has moved since. This is the one boundary artifact whose closure has not drifted. Rebuilding still needs the nvptx64-nvidia-cuda target the host workspace does not carry.
+CLOSURE	soma/mount/mount-smoke-kernel/mount_smoke_kernel.ptx	soma/mount/mount-smoke-kernel/Cargo.lock	b6107418d1b67e05a33c8c73c47100e188e6aed199eceac54a6c82013032f62f
+CLOSURE	soma/mount/mount-smoke-kernel/mount_smoke_kernel.ptx	soma/mount/mount-smoke-kernel/Cargo.toml	cf6fe5c8f933d4426da1209500f4a8a646510bfa2ff407c51dd57cc34739a070
+CLOSURE	soma/mount/mount-smoke-kernel/mount_smoke_kernel.ptx	soma/mount/mount-smoke-kernel/build-ptx.sh	7eacac97bf673e93a815267c89f5b1f7329db5893685c1d7ce7b2a01856a0a97
+CLOSURE	soma/mount/mount-smoke-kernel/mount_smoke_kernel.ptx	soma/mount/mount-smoke-kernel/rust-toolchain.toml	02ee115091191bdd3c02746f1394806f4982d19e05ba145c1723afa7f1a7021a
+CLOSURE	soma/mount/mount-smoke-kernel/mount_smoke_kernel.ptx	soma/mount/mount-smoke-kernel/src/lib.rs	598e5f1fff67bcc9587e9f9dcb01d1a3e57fd2cc6d390a26646e8b82bd61bcc7
+ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	root	soma/mount/soma-kernel-cuda
+ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	closure_rule	CRATE_DEPS
+ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	sha256	04e35f5ee00636b68c0947e2bef8c14023ec1e6186c4dba9578d3466c0c30253
+ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	octets	8776823
+ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	closure_sha256	c34be05dbd87dad19d425e3ea97ec5882d9d26194e121dddaf52fd56065ed22b
+ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	toolchain	nightly-2026-05-22
+ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	builder	soma/mount/soma-kernel-cuda/build-ptx.sh
+ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	consumer	soma/mount/src/lib.rs
+ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	consumer	soma/mount/src/bin/mount-chart-gate.rs
+ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	consumer	soma/mount/src/bin/mount-founded-gate.rs
+ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	consumer	soma/mount/src/bin/mount-link-gate.rs
+ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	consumer	soma/mount/src/bin/mount-register-gate.rs
+ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	consumer	soma/mount/src/bin/mount-register-remount-gate.rs
+ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	consumer	soma/mount/src/bin/mount-scope-gate.rs
+ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	rebuild_evidence	STALE, measured 2026-08-09. Byte-identical to a07ff376:src/soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx in the frozen laboratory, last rebuilt there at a07ff376 (2026-08-03). Committed here at 06518c3 (2026-08-07). FOUR closure members have moved since: soma/body/src/chart.rs (a3f8d31), soma/body/src/law.rs (fe8c368), soma/body/src/manifold.rs (ead11dc), soma/body/src/manifold_tests.rs (ead11dc) — plus soma/body/src/carriage.rs, changed 2026-08-09 to excise saturating_add. The seven mount gates that return EXACT run against these bytes, so they exercise a law six days behind soma/body. The hashes below bind what IS committed; they do not assert it is current. Rebuilding needs the nvptx64-nvidia-cuda target the host workspace does not carry.
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/Cargo.toml	9b64b13d5bb6f026632c5b1c6e7797d03b50fac87214d930bdb1d6feb00bc4e1
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/active.rs	322121d3806fe8d28faed6ed4af6a5297f8c84bd8cb034f7b11a4c6a0f9558a8
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/conduct.rs	803921412f41fa349606e3d5559639602ce2a21f639305b179919c14122038f6
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/contact.rs	0c7549814af7705e7f7c6cbd229c3008df451dbcf9a05ab8ada6403cbbc7e3c4
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/cuda_execution.rs	4085d9dc2c57a7db042d439d73af220eb277799242f8da78f9cde15a87e0d05a
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/current.rs	fcaa6d7b779734e67bf9af840c877f213d4b34516ebe4a62eba0f3744534c62b
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/emission.rs	d01f928ff274ebe7a4a480d4ac4aa65000fd88d410709e9a9d5f22bc2acd2d27
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/holon.rs	aa8611ca4dacda298764076947add9603bc63b9984460f976056651c07164b93
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/lib.rs	9573de777d09a148f025642af9348e0d33b11e69df5fd26fc9d6fa903e3e3370
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/live_event_cuda.rs	b8422312590122a189d5798c9fec0bf48c4d5f402b404d68b137874aee61a139
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/presentation.rs	c8c7e2f075ef8956394bf4aa9a7eb7fcd382b76a6a7b33b05ee079eabbdcfa7a
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/register.rs	0b00fbde9e6831ae7d9018838743adb4a6477f53198a372daf037d1798c355aa
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/tests.rs	02f8d6764b245818d70b4ee578d35c4aaf4c2707f37867ccf2ca5a2aab3cdcb2
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/text_restrict_cuda.rs	d61eeb140f3b50145d0780cc16ddf3d8c11c97553ada4a119bd2d1a9d6ab08d8
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/body/Cargo.toml	9c94c548fb6b610eae6b41676a0de94b12ba5df54e77ec3dcfab09b9a8ca060e
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/body/src/arrow.rs	5be61b779b390ca6b052066770029706a0661a55dc883d9c2edc4c8aaaafcdb1
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/body/src/boundary.rs	4fc01f7490167c7ff005f4deab47be1d1a9de6fe2a72d97be5c987d610201190
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/body/src/carriage.rs	56de273b0b8254a3732d011d29a5a884ffe72789c90fe4dc7d2047b5beedb2dc
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/body/src/carriage/register_chart.rs	46bc85331193ce02e581f6a5058972c20b4b9bc691466af5b5961e0ebee0b140
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/body/src/channel.rs	97f1fb8efd2e5b86c7aa43c2bc4372bdabf3e68c71319a18347586221948fd55
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/body/src/chart.rs	4a38fcb8e707bbf35485d66c460d554333d5bc8d93e6c282481a82dd34b434ab
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/body/src/geom.rs	a549d16882ad9cb37598a39e1992f6ac87aa90955b486575a43d71bf65fba889
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/body/src/incidence.rs	56a2ba4bd92306d96877342372306abf38c12ac177acf9634e0aa80ed461de39
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/body/src/law.rs	4639d8a6c24c63685fb963805502d94edcc0d21173d9046b9c7e54c2c1c75719
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/body/src/lib.rs	461a9b7779eb1ccf2a1325dab99246ef85630750bd2fa65d2b736b8b0c1f3829
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/body/src/manifold.rs	cacb4447dcbe1a4437a492d53295a84bb215126b4689d5b226faf29493dce871
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/body/src/manifold_tests.rs	67891b05876629a80566c13ffcd170208e8d1aa744973c65bdc9ecdffd5b945d
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/body/src/medium.rs	6c871d5f2ecd1dfc014cd576e4fca1d1200a02264c1863cdf8bed579a5e6e37e
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/body/src/medium/codec.rs	723ceb20943d0be2b1a40b475eeaa98243277136070684b09c2d4d5984c3b65d
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/body/src/num.rs	549c43b8aa599f486d5796cb75a85467e6b4707e86fc2ec7d37e9fdd21735f85
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/body/src/place.rs	e10811d143123113e89f24640d8294677018fad18e214c74f761a3013098f847
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/body/src/quest.rs	b38c390042a868216f838cafba1e30d19435d8c23770cdc14efe0ca413f4ef88
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/body/src/register.rs	4a729ad03d22214f63f506955575708b99b39090232c105740c52285358a8e48
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/body/src/seam.rs	8fe29f71989d4749a13364de119e9cdb41708fe61d3bbc2c0b7d1deeca5aa898
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/body/src/soul.rs	57709bcdf5d22adee350cc749378c67035ba57e2a2c664bdae60a9952284cf58
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/mount/soma-kernel-cuda/Cargo.lock	4afc4efadc7c64f40a160f7a7ad50c5426d3614038e2441f1caf59af4f6b4851
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/mount/soma-kernel-cuda/Cargo.toml	8147a2229bcd1a777ce7043ad2c4bbff1b8f6f0d573f4055b027af75e1dc30a4
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/mount/soma-kernel-cuda/build-ptx.sh	134312a45caaec63743493ae0c1eea591ff619e04ac3539efe587360dc3ef906
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/mount/soma-kernel-cuda/rust-toolchain.toml	d072407f6554628c0b87e93aab1fee3fcfe3e68fe149121c7e539a6d0b573fad
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/mount/soma-kernel-cuda/src/lib.rs	eeaa08826d2ab33473f8f8ec67ea8bdf3dc6ff48d69935535561814a3585cb71

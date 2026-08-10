@@ -19,13 +19,42 @@
 //! > composed out of structure recovered from the deposit's own statements, licensed by a word the
 //! > corpus committed — and can the circuit see it?*
 //!
+//! ## The defect this driver now answers, and what closed it
+//!
+//! It could, and what it reached was `exactCarrier apply`, `(a b : nlinarith) : a = b`,
+//! `(P : simpa) (h : P) : exactCarrier P`. Forty-seven statements, all garbage, because the
+//! composition founded from **formal grammar with nothing conditioning it**: every recruited
+//! identifier into every recovered slot, admitted whenever the stem licence found the two in one
+//! founded stem — and `P` and `apply` share the founded letter `p`.
+//!
+//! The stem licence is about the **contact**: these two identifiers belong together. It says nothing
+//! about the **place**. The place is something the deposit's own reading already knows and the
+//! composition was not asking: `apply` was only ever the head of a proof step, `Soma` only ever
+//! named a scope, and `exactCarrier` is the only identifier the material ever stood in first
+//! position of a statement's trailing region.
+//!
+//! `statement_composition::StatementPositionEcology` is that reading, and it is founded from two
+//! things neither of which is authored:
+//!
+//! - **the position census** — every population `lean_development` returns at
+//!   `DeclarationGrain::EveryTopLevelDeclaration`, plus the slot species `statement_grammar`
+//!   recovers over **every** declaration's statement rather than the theorem statements alone;
+//! - **the declared-shape cohort** — `def exactCarrier (P : Prop) : Prop` and
+//!   `abbrev ExactRelay (Q : Prop) : Prop` normalize to one skeleton, so an identifier may stand
+//!   where any member of its cohort stands. That is what carries `ExactRelay` — which the material
+//!   never once put in a statement — into the head position `exactCarrier` occupies.
+//!
+//! The widening matters as much as the gate: `read_derivation` opens **one** declaration per
+//! artifact, so `def exactCarrier` and `abbrev ExactRelay` were invisible to the composition that
+//! was supposed to be conditioned on them.
+//!
 //! ## What is not weakened
 //!
 //! The three sites the record named all still hold and section [2] measures the first of them
 //! directly: `derive` returns the **empty population** on every absent statement, exactly as it did.
 //! Founding a statement is a species **beside** `derive`, never a loosening of it.
 //!
-//! ## The six declared controls. The driver exits non-zero if any fails.
+//! ## The eight declared controls. The driver exits non-zero if any fails.
 //!
 //! ```text
 //!   1  the falsifier still fires: `derive` alone returns the empty population on every absent
@@ -39,15 +68,22 @@
 //!      reopening is accounted for by the maximality the removed stem was exercising
 //!   6  the recovered grammar states its aperture, and a statement in the deposit's own vocabulary
 //!      that it therefore cannot compose is exhibited
+//!   7  the conditioning is a GAUGE and its orbit on this material is non-trivial: the two settings
+//!      run over ONE candidate population and the statements the gate removes are exhibited by name
+//!   8  the position licence is a conjunct and never a widener: every statement the gate admits is
+//!      admitted without it, and the new obstruction species is retained with its material
 //! ```
 //!
 //! ## What is not claimed
 //!
-//! Nothing here is submitted to a kernel. A composed passage is production read as structure exactly
-//! as the deposited artifacts are — the deposit itself carries `theorem carrier_transport ... :=
-//! Nat.zero`, which no kernel accepts and which the atlas reads all the same. A founded statement is
-//! one this deposit's own grammar and morphology reach; it is not asserted to be true, provable, or
-//! well-typed. Nothing here bears on any Millennium result.
+//! Nothing here is submitted to a kernel, and nothing may be: `CLAUDE.md` §13 rule 2 refuses a
+//! foreign process deciding what the body may construct. Section [7] states, structurally and
+//! without shelling anything, which composed artifacts are in a state where a **batch** grade could
+//! be run on them at all — every name resolving against a declaration the material itself wrote —
+//! and it says in the same breath that name resolution is not type correctness and that the composed
+//! body is not a proof. A founded statement is one this deposit's own grammar, morphology and
+//! position ecology reach; it is not asserted to be true or provable. Nothing here bears on any
+//! Millennium result.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
@@ -60,12 +96,14 @@ use holonic_engine::derivation_atlas::{
     route_movement, statement_vertex_key, CircuitAperture,
 };
 use holonic_engine::derivation_skein::{moves_the_production_made, DerivationMove, MoveSpecies};
+use holonic_engine::lean_development::{join, read_development, DeclarationGrain};
 use holonic_engine::statement_composition::{
-    ablate_stem_for_statements, compose, deposits_its_statement_vertex, found_statements,
-    passages_with_composed, statement_composition_moves, AdjudicatedCandidate, AdmittedStatements,
-    ComposedPassage, CompositionSpecies, StatementAdmission,
+    ablate_stem_for_statements_under, compose_in_scope, deposits_its_statement_vertex,
+    found_statements, found_statements_under, passages_with_composed, statement_composition_moves,
+    AdjudicatedCandidate, AdmittedStatements, ComposedPassage, CompositionSpecies, PositionGate,
+    StatementAdmission, StatementPositionEcology,
 };
-use holonic_engine::statement_grammar::BodyReading;
+use holonic_engine::statement_grammar::{recover, BodyReading, SlotSpecies};
 
 const APERTURE: CircuitAperture = CircuitAperture::STATEMENT_INCIDENT;
 
@@ -199,6 +237,7 @@ fn exhibit(
     entry: &AdjudicatedCandidate,
     admitted: &AdmittedStatements,
     composed: &[ComposedPassage],
+    ecology: &StatementPositionEcology,
 ) {
     println!("\n  ({ordinal})  |- {}", entry.candidate.statement);
     println!(
@@ -215,6 +254,7 @@ fn exhibit(
     let StatementAdmission::Admitted {
         licences,
         carried_aperture,
+        stood_in,
     } = &entry.admission
     else {
         return;
@@ -233,6 +273,22 @@ fn exhibit(
             licence.brought_at
         );
         println!("            founded by the corpus wholes: {}", licence.wholes.join(", "));
+    }
+    if !stood_in.is_empty() {
+        let places: Vec<String> = stood_in.iter().map(ToString::to_string).collect();
+        println!(
+            "        the POSITION licence: the material stands {} at {}",
+            entry.candidate.brought,
+            places.join(", ")
+        );
+        if let Some(slot) = entry.candidate.slot {
+            println!(
+                "          and the composition puts it in {} position, which its declared-shape \
+                 cohort {:?} was witnessed in",
+                slot.name(),
+                ecology.cohort(&entry.candidate.brought)
+            );
+        }
     }
     for bound in carried_aperture {
         println!("        the admission CARRIES this, which the grammar does not certify:");
@@ -254,11 +310,32 @@ fn exhibit(
         artifacts.len()
     );
     for artifact in artifacts {
+        if !artifact.scope.is_empty() {
+            println!(
+                "        (the artifact carries {} founding line(s) the material wrote, so its own \
+                 names resolve; complete: {})",
+                artifact.scope.imports.len() + artifact.scope.founding.len(),
+                artifact.scope.is_complete()
+            );
+        }
         for line in artifact.text.lines() {
             println!("        | {line}");
         }
         println!("        |");
     }
+}
+
+/// The whole-token population of one line, by `statement_grammar`'s own orthographic rule.
+fn statement_tokens(text: &str) -> Vec<String> {
+    text.split(|symbol: char| !(symbol.is_ascii_alphanumeric() || symbol == '_' || symbol == '.'))
+        .filter(|token| {
+            token
+                .chars()
+                .next()
+                .is_some_and(|first| first.is_ascii_alphabetic() || first == '_')
+        })
+        .map(str::to_owned)
+        .collect()
 }
 
 fn statement_vertices(circuit: &ConditionedCircuit) -> BTreeSet<String> {
@@ -299,7 +376,20 @@ fn main() {
 
     let mut body = ConditionedBody::mount(deposit.clone()).expect("the deposit declares theorems");
     body.condition(&corpus);
-    let null = ConditionedBody::mount(deposit).expect("the deposit declares theorems");
+    let null = ConditionedBody::mount(deposit.clone()).expect("the deposit declares theorems");
+
+    // The same deposit, read at the grain that opens EVERY top-level declaration rather than one per
+    // artifact. That widening is the whole construction: `def exactCarrier` and `abbrev ExactRelay`
+    // are in the material and were invisible to the composition that was supposed to be conditioned
+    // on it.
+    let development = join(
+        deposit
+            .iter()
+            .map(|(_, text)| read_development(text, DeclarationGrain::EveryTopLevelDeclaration))
+            .collect(),
+    );
+    let ecology = StatementPositionEcology::found(&development, &deposit)
+        .expect("the declarations carry statements a grammar can be recovered from");
 
     let mut controls = Controls::new();
 
@@ -337,7 +427,14 @@ fn main() {
     // ---------------------------------------------------------------------------------------------
     rule("[1]  THE RECOVERED GRAMMAR  --  founded from the deposit's own statements, never authored");
 
-    let founded = found_statements(&body).expect("founds");
+    // Three arms over one material. `historical` is the rule as the roadmap measured it: the narrow
+    // recruited population and no position gate. `withheld` and `applied` share a candidate
+    // population exactly -- the same recruited set, the same grammar, the same compositions -- and
+    // differ only in whether the ecology is on the causal path. That pair is the ORBIT.
+    let historical = found_statements(&body).expect("founds");
+    let withheld =
+        found_statements_under(&body, &ecology, PositionGate::Withheld).expect("founds");
+    let founded = found_statements_under(&body, &ecology, PositionGate::Applied).expect("founds");
     let grammar = &founded.grammar;
 
     println!(
@@ -469,7 +566,102 @@ fn main() {
     );
 
     // ---------------------------------------------------------------------------------------------
-    rule("[3]  THE ADMISSION  --  every candidate, with its verdict, and every refusal retained");
+    rule("[3]  THE POSITION ECOLOGY  --  what conditions the composition, read off the same material");
+
+    println!(
+        "\n  The composition above founds from FORMAL GRAMMAR with nothing conditioning it: every\n  \
+         recruited identifier goes into every recovered slot, and the stem licence admits\n  \
+         `exactCarrier apply` because `P` and `apply` share the founded letter `p`. That licence is\n  \
+         about the CONTACT -- these two identifiers belong together. It says nothing about the PLACE."
+    );
+    println!(
+        "\n  The place is something the deposit's own reading already knows, and the reading that\n  \
+         knows it is the one the composition was not using. `read_derivation` opens ONE declaration\n  \
+         per artifact; `lean_development` at EveryTopLevelDeclaration opens all of them."
+    );
+    println!(
+        "\n    declarations opened at the wider grain     {}",
+        development.declarations.len()
+    );
+    println!(
+        "    declarations the narrow grain never saw    {}",
+        development.declarations.len() - body.standing().len()
+    );
+    println!(
+        "    distinct declaration statements            {}",
+        ecology.declaration_grammar().population().len()
+    );
+    for statement in ecology.declaration_grammar().population() {
+        println!("      |- {statement}");
+    }
+    let narrow = body.recruited_population();
+    let wide = ecology.recruited();
+    let unseen: Vec<String> = wide.difference(&narrow).cloned().collect();
+    println!(
+        "\n    the recruited population the composition was drawing on   {} identifiers",
+        narrow.len()
+    );
+    println!(
+        "    the population the wider reading places                    {} identifiers",
+        wide.len()
+    );
+    println!("    and these {} were invisible to it:", unseen.len());
+    wrapped("      ", &unseen);
+
+    println!("\n  THE POSITION CENSUS  --  where the material places each identifier. Nothing here is");
+    println!("  a category: `apply` is not called a tactic, it is recorded as having stood in tactic");
+    println!("  position, because that is the only place the reading found it.");
+    for (identifier, places) in ecology.census() {
+        let rendered: Vec<String> = places.iter().map(ToString::to_string).collect();
+        println!("    {identifier:<28} {}", rendered.join("  "));
+    }
+
+    println!(
+        "\n  THE DECLARED-SHAPE COHORTS  --  each declaration's own statement with every binder-name\n  \
+         token replaced by the ordinal of the binder that founded it. Two declarations the\n  \
+         material's reading cannot tell apart are ONE cohort, and an identifier may stand where any\n  \
+         member of its cohort stands. That is what lets a declaration the material never USED in a\n  \
+         statement position be composed into one."
+    );
+    for shape in ecology.shapes() {
+        println!("    {:<44} {:?}", shape.skeleton, shape.members);
+    }
+    if !ecology.unread().is_empty() {
+        println!(
+            "    declarations whose statement the grammar could not read, retained: {:?}",
+            ecology.unread()
+        );
+    }
+
+    println!("\n  THE GATE, per recovered slot species -- who the material lets stand there:");
+    for slot in [
+        SlotSpecies::BinderName,
+        SlotSpecies::BinderType,
+        SlotSpecies::BodyHead,
+        SlotSpecies::BodyArgument,
+    ] {
+        let admitted = ecology.admitted_into(slot);
+        let named: Vec<String> = admitted
+            .iter()
+            .map(|(identifier, carrier)| {
+                if identifier == carrier {
+                    identifier.clone()
+                } else {
+                    format!("{identifier}(via cohort member {carrier})")
+                }
+            })
+            .collect();
+        println!("    {:<16} {}", slot.name(), named.join("  "));
+    }
+    println!(
+        "\n  `ExactRelay` is the whole point. The material never once put it in a statement, so no\n  \
+         census of occurrences could license it. Its DECLARED SHAPE is identical to `exactCarrier`'s,\n  \
+         and `exactCarrier` is the only identifier the material ever stood in first position of a\n  \
+         trailing region. The cohort carries it there."
+    );
+
+    // ---------------------------------------------------------------------------------------------
+    rule("[4]  THE ADMISSION  --  every candidate, with its verdict, and every refusal retained");
 
     println!(
         "\n  candidates composed: {}   admitted: {}   refused: {}",
@@ -553,9 +745,9 @@ fn main() {
     );
 
     // ---------------------------------------------------------------------------------------------
-    rule("[4]  THE FOUNDED STATEMENTS  --  reached by the instance, absent from the deposit");
+    rule("[5]  THE FOUNDED STATEMENTS  --  reached by the instance, absent from the deposit");
 
-    let composed = compose(&founded).expect("composes");
+    let composed = compose_in_scope(&founded, Some(&ecology)).expect("composes");
     let statements = founded.founded_statements();
     println!(
         "\n  {} statements founded, none of which the deposit reaches, presented by {} artifacts.",
@@ -581,7 +773,7 @@ fn main() {
     );
 
     for (ordinal, entry) in morphemic.iter().enumerate() {
-        exhibit(ordinal, entry, &founded, &composed);
+        exhibit(ordinal, entry, &founded, &composed, &ecology);
     }
 
     println!(
@@ -612,7 +804,224 @@ fn main() {
     wrapped("    ", &named);
 
     // ---------------------------------------------------------------------------------------------
-    rule("[5]  THE CIRCUIT  --  does the founded statement have a 0-cell, and does the reading see it?");
+    rule("[6]  THE WITHHELD CONDITIONING  --  the same candidates with the gate off. THE ORBIT.");
+
+    println!(
+        "\n  `CLAUDE.md` §8: a gauge whose group acts trivially on the declared material is not a\n  \
+         gauge, and a check whose material cannot vary the property under test wears a passing\n  \
+         result. So the ecology is run as a DECLARED GAUGE with two settings over ONE candidate\n  \
+         population -- same recruited set, same recovered grammar, same {} compositions -- and the\n  \
+         orbit is exhibited rather than asserted.",
+        founded.adjudicated.len()
+    );
+    println!(
+        "\n    {:<34} {:>5} composed   {:>4} admitted   {:>5} refused   {} species",
+        "position-gate-withheld",
+        withheld.adjudicated.len(),
+        withheld.admitted().len(),
+        withheld.refused().len(),
+        withheld.obstructions().len()
+    );
+    println!(
+        "    {:<34} {:>5} composed   {:>4} admitted   {:>5} refused   {} species",
+        "position-gate-applied",
+        founded.adjudicated.len(),
+        founded.admitted().len(),
+        founded.refused().len(),
+        founded.obstructions().len()
+    );
+    println!(
+        "\n  and for reference, the rule as the roadmap measured it -- the NARROW recruited population\n  \
+         `read_derivation` returns, with no gate:"
+    );
+    println!(
+        "    {:<34} {:>5} composed   {:>4} admitted   {:>5} refused   {} species",
+        "narrow-population, no gate",
+        historical.adjudicated.len(),
+        historical.admitted().len(),
+        historical.refused().len(),
+        historical.obstructions().len()
+    );
+
+    let withheld_statements = withheld.founded_statements();
+    let removed: Vec<String> = withheld_statements
+        .difference(&statements)
+        .cloned()
+        .collect();
+    let widened: Vec<String> = statements
+        .difference(&withheld_statements)
+        .cloned()
+        .collect();
+    println!(
+        "\n  WHAT THE GATE REMOVED ({}) -- every one of these is what the composition returns when\n  \
+         the conditioning is withheld, and it is the population the roadmap exhibits:",
+        removed.len()
+    );
+    for statement in &removed {
+        println!("    |- {statement}");
+    }
+    println!(
+        "\n  WHAT THE GATE ADDED ({}) -- must be empty. The position licence is a CONJUNCT and can\n  \
+         only ever return a subpopulation; a gate that widened anything would be a different rule\n  \
+         wearing a gate's name.",
+        widened.len()
+    );
+    for statement in &widened {
+        println!("    |- {statement}");
+    }
+    println!(
+        "\n  WHAT SURVIVED ({}) -- composed under both settings:",
+        statements.len()
+    );
+    for statement in &statements {
+        println!("    |- {statement}");
+    }
+    println!(
+        "\n  and the widening's own contribution: identifiers the narrow reading never recruited now\n  \
+         reach the composition, so the WITHHELD arm founds statements the roadmap's figure never saw."
+    );
+    let widening_only: Vec<String> = withheld_statements
+        .difference(&historical.founded_statements())
+        .cloned()
+        .collect();
+    for statement in &widening_only {
+        println!("    |- {statement}");
+    }
+
+    controls.check(
+        "control 7 -- the conditioning is a gauge whose orbit on this material is non-trivial",
+        !removed.is_empty() && widened.is_empty(),
+        &format!(
+            "the two settings were run over one candidate population of {}. The gate refused {} \
+             statements the withheld setting founds, exhibited above by name, and added none. An \
+             orbit of size one would mean the ecology decides nothing on this material and the \
+             agreement below would be worth nothing.",
+            founded.adjudicated.len(),
+            removed.len()
+        ),
+    );
+
+    controls.check(
+        "control 8 -- the position licence is a conjunct, never a widener",
+        statements.is_subset(&withheld_statements)
+            && founded.adjudicated.len() == withheld.adjudicated.len()
+            && founded
+                .obstructions()
+                .contains_key("identifier-never-stood-in-this-position"),
+        &format!(
+            "every one of the {} statements the gate admits is admitted without it, the candidate \
+             populations are identical at {}, and the {} refusals carrying the new obstruction are \
+             retained with the places the material DID stand each identifier.",
+            statements.len(),
+            founded.adjudicated.len(),
+            founded
+                .obstructions()
+                .get("identifier-never-stood-in-this-position")
+                .map_or(0, Vec::len)
+        ),
+    );
+
+    // ---------------------------------------------------------------------------------------------
+    rule("[7]  WHAT A BATCH GRADER COULD BE ASKED  --  the artifact, whole, and what is NOT claimed");
+
+    println!(
+        "\n  No kernel is in this loop and none may be: `CLAUDE.md` §13 rule 2 refuses a foreign\n  \
+         process deciding what the body may construct. What is returned is the POPULATION, and\n  \
+         grading it is a separate batch pass -- the shape `eros_lean_proof_production` already runs.\n  \
+         This section states, structurally and without shelling anything, which composed artifacts\n  \
+         are in a state where that pass could be run on them at all."
+    );
+    println!(
+        "\n  The two conditions, both checkable here, and NEITHER is type-correctness:\n    \
+         1  the artifact carries a COMPLETE founding line for every declaration its statement needs\n    \
+         2  every token of the composed statement is either bound by the statement's own binders or\n       \
+         founded by a line the artifact carries"
+    );
+
+    let mut submittable: Vec<&ComposedPassage> = Vec::new();
+    for passage in &composed {
+        if !passage.scope.is_complete() {
+            continue;
+        }
+        let Ok(reading) = recover(&BTreeSet::from([passage.statement.clone()])) else {
+            continue;
+        };
+        let Some(read) = reading.reading(&passage.statement) else {
+            continue;
+        };
+        let bound: BTreeSet<String> = read
+            .slots()
+            .into_iter()
+            .filter(|slot| slot.species == SlotSpecies::BinderName)
+            .map(|slot| slot.occupant)
+            .collect();
+        let carried: BTreeSet<String> = passage
+            .scope
+            .imports
+            .iter()
+            .chain(passage.scope.founding.iter())
+            .flat_map(|line| statement_tokens(line))
+            .collect();
+        if statement_tokens(&passage.statement)
+            .into_iter()
+            .all(|token| bound.contains(&token) || carried.contains(&token))
+        {
+            submittable.push(passage);
+        }
+    }
+    let submittable_statements: BTreeSet<String> = submittable
+        .iter()
+        .map(|passage| passage.statement.clone())
+        .collect();
+    println!(
+        "\n  {} of the {} composed artifacts meet both, reaching {} distinct statements:",
+        submittable.len(),
+        composed.len(),
+        submittable_statements.len()
+    );
+    for statement in &submittable_statements {
+        println!("    |- {statement}");
+    }
+    println!(
+        "\n  ONE ARTIFACT PER FOUNDED STATEMENT, WHOLE -- the complete population, nothing selected:"
+    );
+    let mut exhibited: BTreeSet<&str> = BTreeSet::new();
+    for passage in &submittable {
+        if !exhibited.insert(passage.statement.as_str()) {
+            continue;
+        }
+        println!();
+        for line in passage.text.lines() {
+            println!("    | {line}");
+        }
+    }
+    println!(
+        "\n  WHAT IS CLAIMED, precisely: every NAME in these statements resolves against declarations\n  \
+         the material itself wrote, so an elaborator's answer would be about the mathematics rather\n  \
+         than about an unknown identifier. That is what `(P : Prop) (h : P) : exactCarrier apply` --\n  \
+         which the withheld setting founds and this one refuses -- could never reach."
+    );
+    println!(
+        "\n  NAME RESOLUTION IS NOT TYPE CORRECTNESS, and the population itself carries the gap.\n    \
+         |- (P : Prop) (h : P) : ExactRelay P   the carried scope makes `ExactRelay P` reducible to\n       \
+         `exactCarrier P` to `P`, which `h` inhabits -- a statement an elaborator has something to\n       \
+         say about.\n    \
+         |- (P : P) (h : P) : exactCarrier P    every name resolves and the elaborator will still\n       \
+         refuse it. WHICH refusal is not asserted here, because asserting it would mean running the\n       \
+         kernel, and that is the batch pass's job and not this loop's. The population reached a\n       \
+         state where a kernel's answer is ABOUT THE MATHEMATICS, which is what a batch grade needs\n       \
+         and is not the same as being right."
+    );
+    println!(
+        "\n  WHAT IS NOT CLAIMED: the composed BODY is not a proof. `have founded := ...` names both\n  \
+         sides of the contact pair so the licence is visible in the circuit; it closes no goal, so a\n  \
+         batch submission returns `unsolved goals` on even the well-typed statements. Composing a\n  \
+         proof is a different move and is not this one. Nothing here is asserted to be true, and\n  \
+         nothing here bears on any Millennium result."
+    );
+
+    // ---------------------------------------------------------------------------------------------
+    rule("[8]  THE CIRCUIT  --  does the founded statement have a 0-cell, and does the reading see it?");
 
     let before = found_conditioned_circuit(body.standing().to_vec(), APERTURE).expect("founds");
     let after = found_conditioned_circuit(
@@ -681,7 +1090,7 @@ fn main() {
     );
 
     // ---------------------------------------------------------------------------------------------
-    rule("[6]  THE FOURTH MOVE SPECIES  --  separated from the other three by its substitution");
+    rule("[9]  THE FOURTH MOVE SPECIES  --  separated from the other three by its substitution");
 
     let composing = statement_composition_moves(&after, &body.standing_statements());
     let existing = moves_the_production_made(&after);
@@ -749,9 +1158,10 @@ fn main() {
     }
 
     // ---------------------------------------------------------------------------------------------
-    rule("[7]  THE UNCONDITIONED NULL  --  the same species, put to a body exposed to nothing");
+    rule("[10]  THE UNCONDITIONED NULL  --  the same species, put to a body exposed to nothing");
 
-    let null_founded = found_statements(&null).expect("founds");
+    let null_founded =
+        found_statements_under(&null, &ecology, PositionGate::Applied).expect("founds");
     println!(
         "\n  candidates composed: {}   admitted: {}   refused: {}",
         null_founded.adjudicated.len(),
@@ -791,7 +1201,7 @@ fn main() {
     );
 
     // ---------------------------------------------------------------------------------------------
-    rule("[8]  THE ABLATION  --  remove one founded stem and re-found");
+    rule("[11]  THE ABLATION  --  remove one founded stem and re-found");
 
     let licensing: BTreeSet<String> = founded
         .admitted()
@@ -812,7 +1222,8 @@ fn main() {
 
     let mut every_ablation_removes = !licensing.is_empty();
     for stem in &licensing {
-        let ablation = ablate_stem_for_statements(&body, stem).expect("ablates");
+        let ablation =
+            ablate_stem_for_statements_under(&body, stem, Some(&ecology)).expect("ablates");
         every_ablation_removes &= ablation.removes_structure();
         println!(
             "\n    removing the founded stem {:?}, witnessed by the corpus wholes:",
@@ -890,7 +1301,7 @@ fn main() {
     );
 
     // ---------------------------------------------------------------------------------------------
-    rule("[9]  APERTURE HONESTY  --  what the recovered grammar cannot compose, and why");
+    rule("[12]  APERTURE HONESTY  --  what the recovered grammar cannot compose, and why");
 
     println!(
         "\n  A grammar with no stated aperture has not been graded. These are statements in the \

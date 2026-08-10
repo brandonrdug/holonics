@@ -179,9 +179,37 @@ pairs returned **apart**.
 | the residue-stratum atlas — exact ℤ/p cycle, dilation gauge | `output/` (untracked) | `git ls-files output/` → 0 |
 | `runs/dialogue-distractor-scaling/REPORT.json` | `runs/` | `git log --all -- "runs/*"` → empty |
 | the 50,667-occurrence source-departure receipt | `runs/` | owner deleted at `a07ff376`, survives at `93834398` |
-| `zz_smith_cost_probe`, `zz_torsion_width_law` — **they run right now from `target/`** and return real cost laws | sources never committed | `git log --all -- '*zz_*'` → empty |
+| **fifteen** orphan example binaries — **they run right now from `target/`** and return real laws | sources never committed | `git log --all -- "*<name>*"` → 0, for each of the fifteen |
 
-**The two probes' output is now transcribed verbatim** in
+**Corrected 2026-08-09: the row above named two, and the record that found it named ten. There are
+FIFTEEN.** The census is mechanical — every example binary built under the debug and release example
+directories of `target/`, with its hash suffix stripped, that has no `.rs` of that name anywhere in
+`crates/` or `soma/`:
+
+```bash
+comm -23 <(find target -path '*/examples/*' -maxdepth 3 -type f -executable ! -name '*.d' \
+            -printf '%f\n' | sed -E 's/-[0-9a-f]{16}$//' | sort -u) \
+         <(find crates soma -path '*/examples/*.rs' -printf '%f\n' | sed 's/\.rs$//' | sort -u)
+```
+
+`_probe_lean_ecology`, `ron_probe`, `scratch_bring_search`, `scratch_probe_decomposing`,
+`skein_far_probe_tmp`, `window_population_probe`, `witness_depth_probe`, `zz_diag`, `zz_leak`,
+`zz_o2`, `zz_orbit`, `zz_smith_cost_probe`, `zz_torsion_width_law`, `zzy_kernel_teeth_probe`,
+`zzz_adversarial_probe`. Each binary's cargo dep-info still names the source that no longer exists;
+eleven were `crates/holonic-engine/examples/`, four were `soma/life/examples/`.
+
+**All fifteen were run on 2026-08-09 and their returns are transcribed verbatim** in
+[`meta/ORPHAN_BINARY_RETURNS.txt`](../meta/ORPHAN_BINARY_RETURNS.txt), with each binary's sha256,
+mtime, exit code and elapsed time. Fourteen returned; `scratch_bring_search` did not terminate in
+300 s in release and is an aperture-less search. The returns are **ungraded and not citable as
+established** — §8 forbids grading a receipt whose implementation cannot be read, and these
+implementations cannot be read at all. They are recorded so a later session can rebuild the organ
+and compare. Two of them bear directly on standing doctrine and should be read before the rebuild:
+`zzy_kernel_teeth_probe` returns *"C. verdicts with NO Lean project at all (cwd = repo root):
+[KernelAdmitted, Obstructed] … identical to A? true"*, and `zzz_adversarial_probe` runs the
+deliberately-false-goal control on the Lean production star, returning `ADMITTED=0 obstructed=31`.
+
+**The two probes' output is also transcribed verbatim** in
 [`research/records/2026-08-09_TWO_COST_LAWS_RAN_FROM_A_BINARY_WITH_NO_SOURCE_AND_THE_PROFILE_IS_MILLISECONDS.md`](../research/records/2026-08-09_TWO_COST_LAWS_RAN_FROM_A_BINARY_WITH_NO_SOURCE_AND_THE_PROFILE_IS_MILLISECONDS.md),
 so their **figures are citable** — the pivot rule deciding feasibility by more than 390,000× at equal
 rank, and `torsion rank = (w−1)²` with `betti = 6w−3` over Brent–Kung widths 2–6. **Their
