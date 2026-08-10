@@ -20,6 +20,66 @@ above "close the loop", because closing a loop adds no organ. Brandon, direct ru
 > *"this is 'holobrochos', you need to outline the spine of the machine and understand how all of
 > the loops and machinery connects and choreographs information transportation."*
 
+## The ratified order of work, 2026-08-09
+
+**Ratified by Brandon, 2026-08-09**, in those words, for the plan as posed: *"Ratified, deposit, and
+proceed. Our goal is to complete the plan in its entirety."* What was ratified is **this order**, not
+any reading below it.
+
+The order is deliberate. Phase 1 makes every later figure trustworthy; Phase 2 is the only genuine
+construction; Phase 3 is the objective. **Nothing in Phase 2 depends on Phase 3**, so if either edge
+proves harder than it looks, the mathematics still gains a verdict it does not have today.
+
+### Phase 1 — give the mathematics already in the tree a verdict
+
+1. **Link mathlib.** `archive/cpp-engine/formal/` holds **2,921 built oleans, toolchain v4.27.0**, and
+   the live `soma/formal` sources are byte-identical to the archived ones. With `LEAN_PATH` pointed at
+   them, **all nine live `elementary-holonics` files check clean in 0.73–1.71 s each, including
+   `RH/Statement.lean` and `RH/Route.lean`.** They receive **no verdict at all** today. A path
+   variable, once.
+2. **Close the two apparatus defects that would corrupt any later figure.** `soma/kernel/soma.spv`
+   **cannot be regenerated at HEAD** and the committed artifact is **stale**; and **ten** binaries run
+   from `target/` with no committed source where the record says two, so one `cargo clean` destroys
+   evidence. Both are `CLAUDE.md` §0 lesson 1.
+   [The record](../research/records/2026-08-09_THE_COMMITTED_BOUNDARY_ARTIFACT_IS_STALE_AND_CANNOT_BE_REBUILT.md).
+
+### Phase 2 — the one edge, which is the actual construction
+
+3. **Condition statement-founding on the language ecology.** `the_statement_is_founded` founds 47
+   statements from **formal grammar with nothing conditioning it** and declares at its line 46 that it
+   submits nothing to a kernel — the returns are `exactCarrier apply` and `(a b : nlinarith) : a = b`.
+   Meanwhile the three drivers that reach the kernel admit only statements the deposit already
+   carries. **The language side knows what a statement reads like; the formal side knows what
+   type-checks; neither alone produces both.** One edge between two built organs.
+4. **Return the conduct-invariant verdict beside iron.** Measured 2026-08-09 on 1,106,730 tokens:
+   the 510 witnessed iron surfaces are dominated by **formulaic** tokens — `"claymath"`, `"anthropic"`,
+   `"07T17"` — because iron is `distinct_windows == 1`. Brandon's `tensor`/`vector` object is the
+   **opposite pole**: many windows that nonetheless collapse under conduct. `receiver_exact_compression`
+   already computes that partition and no driver returns it.
+
+### Phase 3 — the run
+
+5. Mount papers, records and Lean sources as **one** conditioning. `conditioned_derivation` already
+   takes 103 formal artifacts and 360 documents together, so this is scale, not architecture.
+6. Generate plurally; grade in batch — Lean where well-typed, the language ecology everywhere else —
+   and **retain the obstructions**, which is what makes the negative returns worth as much as the
+   positive.
+
+### What this order forbids, each because a record convicts it
+
+- **No Lean in a construction loop.** It is a foreign governor deciding what the body may construct
+  (§13 rule 2); the ~1 s per candidate is the lesser objection. The lawful shape is batch grading of a
+  returned population, which `eros_lean_proof_production` already runs at 39 organs in 2.75 s with all
+  22 obstructions retained verbatim.
+- **No second GPU path.** A Vulkan mode reopens admission entirely under `μ = (L, ABI, P, D, A, χ)`;
+  `2026-07-26_THE_CONIC_OWNS_THE_FRAME…:257-261` is the precedent for declining a parallelization after
+  measurement.
+- **No new scheduler** (`2026-08-02_THE_HOST_FOREMAN…` gate 3).
+- **No aperture-less organ in the corpus path.** `eros_resonant_corpus_current` SIGKILLs at 10,963 MB
+  on 1,556 lines; `the_iron_tokens_carry_the_field` returns a typed obstruction naming required width
+  **481,197,753** and answers narrower, at 12.3M tokens in 2 GB. That contrast decides which organs go
+  near the real run.
+
 ## Naming
 
 **No movement here is named by an ordinal.** Each is named by the mechanism it changes, and is
