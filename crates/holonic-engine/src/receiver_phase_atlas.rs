@@ -8,6 +8,7 @@
 //! be curvature by itself.
 
 use std::collections::{BTreeMap, BTreeSet};
+use std::num::NonZeroUsize;
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, Zero};
@@ -21,7 +22,47 @@ use crate::{
     ReceiverError,
 };
 
-const CHANNEL_COUNT: usize = 3;
+/// One receiver sample: the exact readings of that receiver's declared channel population, in
+/// declaration order.
+///
+/// This organ authors no channel count. Until 2026-08-09 it carried `const CHANNEL_COUNT: usize =
+/// 3` and eight fixed-size-3 array types beneath it, which made *one receiver's* channel population
+/// — RGB — a property of the law that reads receivers. `canon/THE_AUTHORED_LEVEL.md` §1: *"A level
+/// is either read off the material or declared by the caller. It is never authored inside the
+/// organ."* [`ExactRgb`] is now one instance of this carrier and not the definition of it; a
+/// single-channel and a five-channel receiver are declared the same way and cost nothing extra.
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+pub struct ReceiverChannelSample(pub Vec<u8>);
+
+impl ReceiverChannelSample {
+    /// How many channels this sample carries. A **reading** of the sample, never a declaration
+    /// about the receiver; [`ReceiverPhaseSectionOccurrence::channels`] is the declaration and
+    /// [`ReceiverPhaseAtlasError::ChannelPopulationDisagreement`] is what refuses a sample that
+    /// does not meet it.
+    pub fn population(&self) -> usize {
+        self.0.len()
+    }
+}
+
+impl From<ExactRgb> for ReceiverChannelSample {
+    fn from(value: ExactRgb) -> Self {
+        Self(value.channels().to_vec())
+    }
+}
+
+/// How many channels a `u8` coordinate can address. Every downstream reference to a channel is a
+/// `u8` — `dominant_coordinate` on the germ and its signature, and the coordinate on
+/// `holonic_complex::InternalAnalyticSection` — so this is the carrier's capacity read off
+/// [`u8::MAX`], not a population ceiling this organ picked. It is the one place the channel
+/// population is bounded and it names what would lift it: a wider coordinate carrier.
+const COORDINATE_CARRIER_POPULATION: usize = u8::MAX as usize + 1;
+
+/// The channel population an [`ExactRgb`] receiver declares, read off that carrier's own arity
+/// rather than authored here. This is the exact boundary at which channel generality stops: every
+/// path above it is population-general, and [`crate::ExactRaster`] is dimension three by type.
+fn rgb_channel_population() -> NonZeroUsize {
+    NonZeroUsize::new(ExactRgb::default().channels().len()).expect("an RGB sample has channels")
+}
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct ReceiverPhaseSectionId(pub u64);
@@ -48,9 +89,12 @@ pub struct ReceiverPhaseSectionOccurrence {
     pub receiver: ReceiverId,
     pub rays: RayFamily,
     pub extent: ImageExtent,
+    /// This receiver's declared channel population. Every present sample must carry exactly this
+    /// many channels; one that does not is refused by name rather than truncated or padded.
+    pub channels: NonZeroUsize,
     /// `None` is absent testimony.  It cannot contribute a jet, a maximum, or
     /// a germ.
-    pub samples: Vec<Option<ExactRgb>>,
+    pub samples: Vec<Option<ReceiverChannelSample>>,
 }
 
 impl ReceiverPhaseSectionOccurrence {
@@ -61,24 +105,69 @@ impl ReceiverPhaseSectionOccurrence {
         rays: RayFamily,
         raster: &crate::ExactRaster,
     ) -> Self {
+        Self::from_rgb(
+            source_image,
+            source_lineage,
+            receiver,
+            rays,
+            raster.extent,
+            raster.samples.iter().copied().map(Some).collect(),
+        )
+    }
+
+    /// An RGB receiver, whose channel population is read off [`ExactRgb`]'s own arity. This is a
+    /// convenience for the one carrier this crate happens to own, not the general form; a receiver
+    /// with any other channel population is built by the struct literal.
+    pub fn from_rgb(
+        source_image: Option<ImageSectionId>,
+        source_lineage: u64,
+        receiver: ReceiverId,
+        rays: RayFamily,
+        extent: ImageExtent,
+        samples: Vec<Option<ExactRgb>>,
+    ) -> Self {
         Self {
             source_image,
             source_lineage,
             receiver,
             rays,
-            extent: raster.extent,
-            samples: raster.samples.iter().copied().map(Some).collect(),
+            extent,
+            channels: rgb_channel_population(),
+            samples: samples
+                .into_iter()
+                .map(|sample| sample.map(ReceiverChannelSample::from))
+                .collect(),
         }
     }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ExactReceiverPhaseJet {
-    pub values: [Rat; CHANNEL_COUNT],
+    /// One entry per channel of the receiver that caused this jet, in that receiver's declaration
+    /// order. The extent is the receiver's, never this organ's.
+    pub values: Vec<Rat>,
     /// Exact first derivatives in the receiver's two chart coordinates.
-    pub gradients: [[Rat; 2]; CHANNEL_COUNT],
+    ///
+    /// The inner `2` is the **chart** dimension, not the channel population: this atlas reads a
+    /// two-coordinate receiver chart (`column`, `row`), and every conic, frame, and holonomy below
+    /// is `2 x 2` for the same reason. That is a separate level from the one excised here and it is
+    /// named in the module's own boundary rather than hidden in this one.
+    pub gradients: Vec<[Rat; 2]>,
     /// Exact symmetric Hessians in the same chart.
-    pub hessians: [[[Rat; 2]; 2]; CHANNEL_COUNT],
+    pub hessians: Vec<[[Rat; 2]; 2]>,
+}
+
+impl ExactReceiverPhaseJet {
+    /// The channel population this jet was caused at, read off the jet rather than declared beside
+    /// it. [`validate_standing`] is what refuses a jet whose extent disagrees with the section that
+    /// caused it.
+    pub fn channel_population(&self) -> usize {
+        self.values.len()
+    }
+
+    fn is_rectangular(&self) -> bool {
+        self.gradients.len() == self.values.len() && self.hessians.len() == self.values.len()
+    }
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
@@ -168,7 +257,7 @@ pub struct ReceiverPhaseGerm {
     pub open_radius: Option<u32>,
     pub horizon: u32,
     pub dominant_coordinate: u8,
-    pub level_sets: [Option<HomogeneousConic>; CHANNEL_COUNT],
+    pub level_sets: Vec<Option<HomogeneousConic>>,
     pub signature: ReceiverPhaseGermSignature,
 }
 
@@ -176,17 +265,21 @@ impl ReceiverPhaseGerm {
     /// Restrict this local analytical section at an exact displacement in its
     /// receiver chart. The result is still an exact phase fiber; packing into
     /// a finite display channel belongs to a later terminal membrane.
-    pub fn evaluate_phase(&self, displacement: &[Rat; 2]) -> [Rat; CHANNEL_COUNT] {
+    ///
+    /// The returned extent is the germ's own channel population, so the return states its shape.
+    pub fn evaluate_phase(&self, displacement: &[Rat; 2]) -> Vec<Rat> {
         let [x, y] = displacement;
         let two = rat_i64(2);
-        std::array::from_fn(|channel| {
-            &self.jet.values[channel]
-                + &self.jet.gradients[channel][0] * x
-                + &self.jet.gradients[channel][1] * y
-                + &self.jet.hessians[channel][0][0] * x * x / &two
-                + &self.jet.hessians[channel][0][1] * x * y
-                + &self.jet.hessians[channel][1][1] * y * y / &two
-        })
+        (0..self.jet.channel_population())
+            .map(|channel| {
+                &self.jet.values[channel]
+                    + &self.jet.gradients[channel][0] * x
+                    + &self.jet.gradients[channel][1] * y
+                    + &self.jet.hessians[channel][0][0] * x * x / &two
+                    + &self.jet.hessians[channel][0][1] * x * y
+                    + &self.jet.hessians[channel][1][1] * y * y / &two
+            })
+            .collect()
     }
 }
 
@@ -228,6 +321,9 @@ pub struct ReceiverPhaseSection {
     pub receiver: ReceiverId,
     pub rays: RayFamily,
     pub extent: ImageExtent,
+    /// The channel population this section was received at. The receipt states its own shape; a
+    /// reader never has to know what the organ's default was, because the organ has none.
+    pub channels: NonZeroUsize,
     pub visible_samples: u64,
     pub absent_samples: u64,
     pub germs: BTreeSet<ReceiverPhaseGermId>,
@@ -437,6 +533,26 @@ fn validate_standing(standing: &ReceiverPhaseAtlasStanding) -> Result<(), Receiv
     if addressed != standing.germs.len() {
         return Err(ReceiverPhaseAtlasError::MalformedStanding);
     }
+    // A germ's jet is as wide as the section that caused it, and no wider. Nothing in this organ
+    // knows what that width should be, so this is the only place the two can be compared — and a
+    // standing that disagrees with itself is refused by name rather than indexed into.
+    for germ in standing.germs.values() {
+        let section = standing
+            .sections
+            .get(&germ.section)
+            .ok_or(ReceiverPhaseAtlasError::MalformedStanding)?;
+        if !germ.jet.is_rectangular()
+            || germ.jet.channel_population() != section.channels.get()
+            || germ.level_sets.len() != section.channels.get()
+            || usize::from(germ.dominant_coordinate) >= section.channels.get()
+        {
+            return Err(ReceiverPhaseAtlasError::GermChannelPopulationDisagreement {
+                germ: germ.id,
+                declared: section.channels.get(),
+                caused: germ.jet.channel_population(),
+            });
+        }
+    }
     Ok(())
 }
 
@@ -470,6 +586,38 @@ fn validate_event(
         if !receivers.insert(section.receiver) {
             return Err(ReceiverPhaseAtlasError::DuplicateReceiver(section.receiver));
         }
+        // A channel is addressed downstream by a `u8` — [`ReceiverPhaseGerm::dominant_coordinate`],
+        // [`ReceiverPhaseGermSignature::dominant_coordinate`], and
+        // `holonic_complex::InternalAnalyticSection::coordinate`, whose `u8::try_from` is an
+        // `expect`. Under the excised `CHANNEL_COUNT = 3` that carrier could never be exceeded, so
+        // generalising the population made a previously unreachable panic reachable. This refuses
+        // it at the mouth instead. The bound is the **carrier's**, read off `u8::MAX`; it is not a
+        // level this organ chose, and lifting it means widening the coordinate carrier.
+        if section.channels.get() > COORDINATE_CARRIER_POPULATION {
+            return Err(
+                ReceiverPhaseAtlasError::ChannelPopulationExceedsCoordinateCarrier {
+                    receiver: section.receiver,
+                    declared: section.channels.get(),
+                    carrier: COORDINATE_CARRIER_POPULATION,
+                },
+            );
+        }
+        // The receiver declared its channel population; the material must meet it exactly. A
+        // shorter sample is not padded and a longer one is not truncated, because either would be
+        // this organ deciding a level on the receiver's behalf.
+        for (ordinal, sample) in section.samples.iter().enumerate() {
+            let Some(sample) = sample else {
+                continue;
+            };
+            if sample.population() != section.channels.get() {
+                return Err(ReceiverPhaseAtlasError::ChannelPopulationDisagreement {
+                    receiver: section.receiver,
+                    declared: section.channels.get(),
+                    supplied: sample.population(),
+                    sample: usize_to_u64(ordinal)?,
+                });
+            }
+        }
     }
     Ok(())
 }
@@ -499,6 +647,7 @@ fn admit_section(
         receiver: occurrence.receiver,
         rays: occurrence.rays.clone(),
         extent: occurrence.extent,
+        channels: occurrence.channels,
         visible_samples: usize_to_u64(visible_samples)?,
         absent_samples: usize_to_u64(absent_samples)?,
         germs: BTreeSet::new(),
@@ -551,7 +700,7 @@ struct ExtractedGerm {
     open_radius: Option<u32>,
     horizon: u32,
     dominant_coordinate: u8,
-    level_sets: [Option<HomogeneousConic>; CHANNEL_COUNT],
+    level_sets: Vec<Option<HomogeneousConic>>,
     signature: ReceiverPhaseGermSignature,
 }
 
@@ -682,7 +831,7 @@ type PhaseJetResult = (
     ExactReceiverPhaseJet,
     u32,
     u8,
-    [Option<HomogeneousConic>; CHANNEL_COUNT],
+    Vec<Option<HomogeneousConic>>,
 );
 
 fn phase_jet(
@@ -701,12 +850,13 @@ fn phase_jet(
     {
         return Ok(None);
     }
+    let channels = occurrence.channels.get();
     let step_signed =
         isize::try_from(step).map_err(|_| ReceiverPhaseAtlasError::CarrierOverflow)?;
-    let at = |horizontal: isize, vertical: isize| -> Option<ExactRgb> {
+    let at = |horizontal: isize, vertical: isize| -> Option<&ReceiverChannelSample> {
         let column = column.checked_add_signed(horizontal)?;
         let row = row.checked_add_signed(vertical)?;
-        occurrence.samples[row * width + column]
+        occurrence.samples[row * width + column].as_ref()
     };
     let Some(center) = at(0, 0) else {
         return Ok(None);
@@ -740,22 +890,25 @@ fn phase_jet(
     let step_rat = rat_usize(step);
     let step_squared = &step_rat * &step_rat;
     let mut energy = 0_u32;
-    let mut channel_energies = [0_u32; CHANNEL_COUNT];
-    let mut values = std::array::from_fn(|_| Rat::zero());
-    let mut gradients = std::array::from_fn(|_| std::array::from_fn(|_| Rat::zero()));
-    let mut hessians =
-        std::array::from_fn(|_| std::array::from_fn(|_| std::array::from_fn(|_| Rat::zero())));
-    let mut level_sets: [Option<HomogeneousConic>; CHANNEL_COUNT] = std::array::from_fn(|_| None);
-    for channel in 0..CHANNEL_COUNT {
-        let center = i32::from(center.channels()[channel]);
-        let left = i32::from(left.channels()[channel]);
-        let right = i32::from(right.channels()[channel]);
-        let up = i32::from(up.channels()[channel]);
-        let down = i32::from(down.channels()[channel]);
-        let up_left = i32::from(up_left.channels()[channel]);
-        let up_right = i32::from(up_right.channels()[channel]);
-        let down_left = i32::from(down_left.channels()[channel]);
-        let down_right = i32::from(down_right.channels()[channel]);
+    let mut channel_energies = vec![0_u32; channels];
+    let mut values = vec![Rat::zero(); channels];
+    let mut gradients = vec![[Rat::zero(), Rat::zero()]; channels];
+    let mut hessians = vec![[[Rat::zero(), Rat::zero()], [Rat::zero(), Rat::zero()]]; channels];
+    let mut level_sets: Vec<Option<HomogeneousConic>> = vec![None; channels];
+    // The declared population indexes the samples; a sample too short for it is refused at
+    // `validate_event`, so this cannot silently read a channel the receiver did not declare.
+    let channel_at =
+        |sample: &ReceiverChannelSample, channel: usize| -> i32 { i32::from(sample.0[channel]) };
+    for channel in 0..channels {
+        let center = channel_at(center, channel);
+        let left = channel_at(left, channel);
+        let right = channel_at(right, channel);
+        let up = channel_at(up, channel);
+        let down = channel_at(down, channel);
+        let up_left = channel_at(up_left, channel);
+        let up_right = channel_at(up_right, channel);
+        let down_left = channel_at(down_left, channel);
+        let down_right = channel_at(down_right, channel);
         let gradient_x_numerator = right - left;
         let gradient_y_numerator = down - up;
         let hessian_xx = right - 2 * center + left;
@@ -1123,7 +1276,9 @@ fn usize_to_u64(value: usize) -> Result<u64, ReceiverPhaseAtlasError> {
 pub enum ReceiverPhaseAtlasError {
     #[error("a receiver-phase event must contain at least one section")]
     EmptyEvent,
-    #[error("a germ passage with no germ in it is a key standing for a population that is not there")]
+    #[error(
+        "a germ passage with no germ in it is a key standing for a population that is not there"
+    )]
     EmptyGermPassage,
     #[error("germ {0:?} is filed under a passage that is not the one it carries")]
     GermPassageMismatch(ReceiverPhaseGermId),
@@ -1133,6 +1288,29 @@ pub enum ReceiverPhaseAtlasError {
     NoncausalChronology { previous: u64, supplied: u64 },
     #[error("receiver {0:?} occurs more than once in one receiver-phase event")]
     DuplicateReceiver(ReceiverId),
+    #[error(
+        "receiver {receiver:?} declared {declared} channels and sample {sample} carries {supplied}"
+    )]
+    ChannelPopulationDisagreement {
+        receiver: ReceiverId,
+        declared: usize,
+        supplied: usize,
+        sample: u64,
+    },
+    #[error(
+        "receiver {receiver:?} declares {declared} channels and a channel is addressed by a carrier holding {carrier}"
+    )]
+    ChannelPopulationExceedsCoordinateCarrier {
+        receiver: ReceiverId,
+        declared: usize,
+        carrier: usize,
+    },
+    #[error("germ {germ:?} was caused at {caused} channels in a section declaring {declared}")]
+    GermChannelPopulationDisagreement {
+        germ: ReceiverPhaseGermId,
+        declared: usize,
+        caused: usize,
+    },
     #[error("a receiver-phase section is malformed")]
     MalformedSection,
     #[error("a receiver-phase jet is malformed")]
@@ -1186,14 +1364,286 @@ mod tests {
                 })
             })
             .collect();
+        ReceiverPhaseSectionOccurrence::from_rgb(
+            None,
+            lineage,
+            ReceiverId(receiver),
+            rays(),
+            extent,
+            samples,
+        )
+    }
+
+    /// One geometric scene, read at a **declared** channel population.
+    ///
+    /// Channel `c` carries a compact quadratic bump centred at its own column, so the scene a
+    /// receiver sees is genuinely a function of how many channels it declares: the summed energy
+    /// landscape that decides which addresses survive [`window_maximum`] is built from a different
+    /// number of bumps at each population, and the dominant channel is whichever bump is nearest.
+    /// This is the declared material for the `CHANNEL_COUNT` excision orbit.
+    fn banded_section(
+        receiver: u64,
+        lineage: u64,
+        channels: usize,
+    ) -> ReceiverPhaseSectionOccurrence {
+        let extent = ImageExtent {
+            width: 41,
+            height: 41,
+        };
+        let samples = (0..extent.height)
+            .flat_map(|row| {
+                (0..extent.width).map(move |column| {
+                    Some(ReceiverChannelSample(
+                        (0..channels)
+                            .map(|channel| {
+                                banded_reading(
+                                    i32::try_from(column).unwrap(),
+                                    i32::try_from(row).unwrap(),
+                                    channel,
+                                )
+                            })
+                            .collect(),
+                    ))
+                })
+            })
+            .collect();
         ReceiverPhaseSectionOccurrence {
             source_image: None,
             source_lineage: lineage,
             receiver: ReceiverId(receiver),
             rays: rays(),
             extent,
+            channels: NonZeroUsize::new(channels).expect("a receiver has at least one channel"),
             samples,
         }
+    }
+
+    fn banded_reading(column: i32, row: i32, channel: usize) -> u8 {
+        let ordinal = i32::try_from(channel).expect("channel ordinals fit i32");
+        let horizontal = column - (6 + 7 * ordinal);
+        let vertical = row - 20;
+        let bump = 255 - 5 * (horizontal * horizontal + vertical * vertical);
+        let ripple = 11 * (column * 3 + row * 5 + ordinal * 2).rem_euclid(7);
+        u8::try_from((bump + ripple).clamp(0, 255)).expect("a clamped reading fits u8")
+    }
+
+    fn atlas_of(section: ReceiverPhaseSectionOccurrence) -> ReceiverPhaseAtlasStanding {
+        let law = ReceiverPhaseAtlasLaw;
+        let mut world = CausalWorld::new(law.clone(), law.initial_standing());
+        world
+            .receive(&ReceiverPhaseAtlasEvent {
+                event: EventId(1),
+                chronology: 1,
+                sections: vec![section],
+            })
+            .unwrap();
+        world.standing().clone()
+    }
+
+    fn germ_addresses(standing: &ReceiverPhaseAtlasStanding) -> BTreeSet<(u32, u32)> {
+        standing
+            .germs
+            .values()
+            .map(|germ| (germ.witness.row, germ.witness.column))
+            .collect()
+    }
+
+    /// THE DECLARED CONTROL for the `CHANNEL_COUNT` excision
+    /// (`canon/THE_CONTAMINANT_PROTOCOL.md` §2.5, §4).
+    ///
+    /// One scene, read by five receivers that differ only in the channel population they declare.
+    /// Under the pinned organ four of the five could not be constructed: `ExactReceiverPhaseJet`
+    /// was `[Rat; 3]` by type, so a one-channel and a five-channel receiver were not expressible
+    /// and this test could not have been written.
+    ///
+    /// **The orbit is not trivial and the level was deciding the answer.** Measured 2026-08-09:
+    ///
+    /// ```text
+    ///   channels   germs  signatures  connections  dominant coordinates
+    ///          1       5           3            0  {0}
+    ///          2       5           5            0  {0,1}
+    ///          3       8           7            0  {0,1,2}
+    ///          4      10          10            0  {0,1,2,3}
+    ///          5      12          12            2  {0,1,2,3,4}
+    /// ```
+    ///
+    /// Germ counts are **not** monotone — one and two channels both return five — so this is a
+    /// change of *which* addresses are founded rather than of how many, which is what the
+    /// distinguishing address below exhibits.
+    #[test]
+    fn the_channel_population_is_the_receivers_and_it_moves_the_return() {
+        let populations = [1_usize, 2, 3, 4, 5];
+        let readings =
+            populations.map(|channels| (channels, atlas_of(banded_section(1, 1, channels))));
+
+        let germs = readings
+            .iter()
+            .map(|(_, standing)| standing.germs.len())
+            .collect::<Vec<_>>();
+        let signatures = readings
+            .iter()
+            .map(|(_, standing)| standing.germ_populations.len())
+            .collect::<Vec<_>>();
+        assert_eq!(germs, vec![5, 5, 8, 10, 12]);
+        assert_eq!(signatures, vec![3, 5, 7, 10, 12]);
+
+        for (channels, standing) in &readings {
+            // Every declared channel participates: the dominant coordinate ranges over the whole
+            // declared population and no further. Against a pinned three this assertion is
+            // unwritable at every population but one.
+            let dominants = standing
+                .germs
+                .values()
+                .map(|germ| germ.dominant_coordinate)
+                .collect::<BTreeSet<_>>();
+            assert_eq!(
+                dominants,
+                (0..u8::try_from(*channels).unwrap()).collect::<BTreeSet<_>>(),
+                "the dominant coordinate ranges over the declared population at {channels}"
+            );
+            // The section and every germ it caused state their own shape.
+            for section in standing.sections.values() {
+                assert_eq!(section.channels.get(), *channels);
+            }
+            for germ in standing.germs.values() {
+                assert_eq!(germ.jet.channel_population(), *channels);
+                assert_eq!(germ.jet.gradients.len(), *channels);
+                assert_eq!(germ.jet.hessians.len(), *channels);
+                assert_eq!(germ.level_sets.len(), *channels);
+                assert_eq!(
+                    germ.evaluate_phase(&[Rat::one(), Rat::one()]).len(),
+                    *channels
+                );
+            }
+            standing.validate().unwrap();
+        }
+
+        // No two populations found the same set of addresses on the same scene.
+        for left in 0..readings.len() {
+            for right in left + 1..readings.len() {
+                assert_ne!(
+                    germ_addresses(&readings[left].1),
+                    germ_addresses(&readings[right].1),
+                    "populations {} and {} agreed on the founded addresses",
+                    readings[left].0,
+                    readings[right].0
+                );
+            }
+        }
+
+        // THE DISTINGUISHING WORD, in the sense `canon/THE_CONTAMINANT_PROTOCOL.md` §4 asks for:
+        // the least address on which the one-channel and three-channel receivers disagree.
+        let single = germ_addresses(&readings[0].1);
+        let triple = germ_addresses(&readings[2].1);
+        let separating = single
+            .symmetric_difference(&triple)
+            .copied()
+            .min()
+            .expect("the two readings differ");
+        assert_eq!(separating, (14, 9));
+        assert!(!single.contains(&separating) && triple.contains(&separating));
+    }
+
+    /// The refusal that makes the declaration a declaration rather than a hint. A receiver states
+    /// its channel population and the material must meet it; a shorter sample is not padded and a
+    /// longer one is not truncated.
+    #[test]
+    fn a_sample_that_does_not_meet_the_declared_channel_population_is_refused_by_name() {
+        let law = ReceiverPhaseAtlasLaw;
+        let honest = banded_section(1, 1, 3);
+        let mut world = CausalWorld::new(law.clone(), law.initial_standing());
+        assert!(
+            world
+                .receive(&ReceiverPhaseAtlasEvent {
+                    event: EventId(1),
+                    chronology: 1,
+                    sections: vec![honest],
+                })
+                .is_ok(),
+            "and the honest receiver passes"
+        );
+
+        for supplied in [2_usize, 4] {
+            let mut section = banded_section(1, 1, 3);
+            section.samples[7] = Some(ReceiverChannelSample(vec![9; supplied]));
+            let mut world = CausalWorld::new(law.clone(), law.initial_standing());
+            assert_eq!(
+                world.receive(&ReceiverPhaseAtlasEvent {
+                    event: EventId(1),
+                    chronology: 1,
+                    sections: vec![section],
+                }),
+                Err(ReceiverPhaseAtlasError::ChannelPopulationDisagreement {
+                    receiver: ReceiverId(1),
+                    declared: 3,
+                    supplied,
+                    sample: 7,
+                })
+            );
+        }
+
+        // And the one bound that survives: a channel is addressed by a `u8` downstream, so a
+        // population past that carrier is refused at the mouth rather than panicking in
+        // `holonic_complex`. `256` passes; `257` does not. The bound is the carrier's and the
+        // refusal names it.
+        for (declared, admitted) in [
+            (COORDINATE_CARRIER_POPULATION, true),
+            (COORDINATE_CARRIER_POPULATION + 1, false),
+        ] {
+            let mut section = banded_section(1, 1, 3);
+            section.channels = NonZeroUsize::new(declared).unwrap();
+            section.samples = section
+                .samples
+                .iter()
+                .map(|_| Some(ReceiverChannelSample(vec![7; declared])))
+                .collect();
+            let mut world = CausalWorld::new(law.clone(), law.initial_standing());
+            let returned = world.receive(&ReceiverPhaseAtlasEvent {
+                event: EventId(1),
+                chronology: 1,
+                sections: vec![section],
+            });
+            assert_eq!(
+                returned.is_ok(),
+                admitted,
+                "a {declared}-channel receiver against a carrier holding \
+                 {COORDINATE_CARRIER_POPULATION}"
+            );
+            if !admitted {
+                assert_eq!(
+                    returned,
+                    Err(
+                        ReceiverPhaseAtlasError::ChannelPopulationExceedsCoordinateCarrier {
+                            receiver: ReceiverId(1),
+                            declared,
+                            carrier: COORDINATE_CARRIER_POPULATION,
+                        }
+                    )
+                );
+            }
+        }
+
+        // And a standing whose germ was caused at another population is refused, so the two can
+        // never silently disagree after a remount.
+        let standing = atlas_of(banded_section(1, 1, 3));
+        standing.validate().unwrap();
+        let id = *standing.germs.keys().next().expect("a live control");
+        let mut widened = standing.clone();
+        widened
+            .germs
+            .get_mut(&id)
+            .expect("the germ stands")
+            .jet
+            .values
+            .push(Rat::zero());
+        assert_eq!(
+            widened.validate(),
+            Err(ReceiverPhaseAtlasError::GermChannelPopulationDisagreement {
+                germ: id,
+                declared: 3,
+                caused: 4,
+            })
+        );
     }
 
     #[test]
@@ -1315,8 +1765,7 @@ mod tests {
                 let dominant = usize::from(body.dominant_coordinate);
                 let hessian = &body.jet.hessians[dominant];
                 let trace = &hessian[0][0] + &hessian[1][1];
-                let determinant =
-                    &hessian[0][0] * &hessian[1][1] - &hessian[0][1] * &hessian[1][0];
+                let determinant = &hessian[0][0] * &hessian[1][1] - &hessian[0][1] * &hessian[1][0];
                 assert_eq!(signature.hessian_trace_hand, PhaseHand::of(&trace));
                 assert_eq!(
                     signature.hessian_determinant_hand,
@@ -1360,6 +1809,9 @@ mod tests {
             emptied.validate(),
             Err(ReceiverPhaseAtlasError::EmptyGermPassage)
         ));
-        assert!(standing.validate().is_ok(), "and the honest standing passes");
+        assert!(
+            standing.validate().is_ok(),
+            "and the honest standing passes"
+        );
     }
 }

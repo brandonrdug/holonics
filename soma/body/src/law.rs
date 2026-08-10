@@ -59,16 +59,25 @@ pub const SWEEP_RANK_TEETH: u32 = 32 - FLOW_TEETH - SWEEP_TEETH;
 pub const SWEEP_RANK_MASK: u32 = (1u32 << SWEEP_RANK_TEETH) - 1;
 
 /// the pool slot of a cell's word — the layout in one place, so a layout change flows from here alone.
+///
+/// ★ THE UNMASKED FOLD (2026-08-09, the excision of `POOL_TEETH = 31`). The grip space is the axis's square
+/// (`place::ground` — `band(re)·axis + band(im)`, so `grip ∈ [0, axis²)`), and the pool's extent is the
+/// CALLER's declaration (`manifold::Manifold::over`: "a caller-provided wells pool (`≥ axis²`, zeroed)").
+/// That declaration is the only boundary, and every reader below already enforces it by returning the empty
+/// pole past `pool.len()`.
+///
+/// The retired `& POOL_MASK` was a SECOND boundary, authored here, and it did not refuse — it ALIASED the top
+/// half of the grip space onto the bottom (`0x8000_0003 → 3`), so a place grounding past `2³¹` silently read
+/// and wrote another place's cell. Two distinct constructions landing in one cell is exactly the collision
+/// `place`-not-store disclaims ("never a collision-blind hash"), and at `axis = 2¹⁶` the grip space is the
+/// whole `u32`, so the aliasing region is reachable material rather than a hypothetical.
+///
+/// Where a wrap is wanted it is the AXIS's, one organ upstream — `place::band`'s `& (axis - 1)`, read off the
+/// declared axis. There is no derived quantity here to wrap by.
 #[inline]
 pub fn slot(cell: u32) -> usize {
-    // ★ THE POOL FOLD (2026-07-09, the uncapping): the grip space is the axis's square; the pool folds it by
-    // ONE MASK — the same grain law the band wraps by. For any axis ≤ 2^15 the mask is the identity.
-    ((cell & POOL_MASK) as usize) * (CELL_WORDS as usize) + (W_WELL as usize)
+    (cell as usize) * (CELL_WORDS as usize) + (W_WELL as usize)
 }
-
-/// the pool's reach in teeth — 2^31 cells, the card's own lawful maximum.
-pub const POOL_TEETH: u32 = 31;
-pub const POOL_MASK: u32 = (1u32 << POOL_TEETH) - 1;
 
 /// unpack THE FLOW — the standing grain-1 quanta (the only scalar flow-accounting term of the word).
 #[inline]
@@ -284,6 +293,10 @@ mod tests {
         );
 
         // §3 the guard: a crossing past the reservation is inert.
+        //
+        // NOTE (2026-08-09): cell 999 is below the retired `POOL_MASK`, so this assertion could not have
+        // failed under the masked `slot` either — it is a snapshot, not a control. The control that CAN
+        // fail is `the_grip_past_the_reservation_is_refused_not_aliased` below, which crosses `2³¹`.
         assert_eq!(
             well_of(&pool, 999),
             0,
@@ -358,6 +371,117 @@ mod tests {
             last_sweep > 100,
             "two hundred feeds of 137/20 stand as a deep sweep"
         );
+    }
+
+    /// ★ THE GRIP PAST THE RESERVATION IS REFUSED, NEVER ALIASED — the control the retired `POOL_MASK`
+    /// made unfailable. The mask's only effect was on cells `≥ 2³¹`; the module's own guard assertion uses
+    /// cell 999, which is below it, so no configuration of THAT material could have caught the aliasing.
+    ///
+    /// The material here is `place::ground` at `axis = 2¹⁶`, where the grip space `[0, axis²)` is the whole
+    /// `u32` and the top half is therefore reachable from honest places. Two distinct places whose grips
+    /// differ by exactly `2³¹` are the distinguishing word: the retired mask sent both to ONE slot.
+    #[test]
+    fn the_grip_past_the_reservation_is_refused_not_aliased() {
+        use crate::num::Cog;
+        use crate::place;
+
+        /// the excised level, reproduced here as the thing under test (`law.rs:70`, deleted 2026-08-09).
+        const RETIRED_POOL_MASK: u32 = (1u32 << 31) - 1;
+        /// the one axis at which `axis²` covers the whole `u32` grip space — read off `place::ground`,
+        /// not chosen: `band` returns `[0, axis)` and `ground` returns `band(re)·axis + band(im)`.
+        const AXIS: i64 = 1 << 16;
+
+        // §1 the layout is injective on the whole grip space; the retired mask was not.
+        assert_eq!(slot(3), 3);
+        assert_eq!(slot(0x8000_0003), 0x8000_0003);
+        assert_ne!(
+            slot(0x8000_0003),
+            slot(3),
+            "distinct cells occupy distinct slots"
+        );
+        assert_eq!(
+            0x8000_0003u32 & RETIRED_POOL_MASK,
+            3,
+            "the retired mask aliased the top half onto the bottom"
+        );
+
+        // §2 the aliasing region is REACHED by real places. Scan every literal the band can distinguish at
+        // this axis — `axis` of them, the extent read off the axis rather than chosen — and key each grip
+        // by the slot the retired mask would have handed it.
+        let mut past_reservation = 0usize;
+        let mut colliding: Option<(i64, i64, u32, u32)> = None;
+        let mut seen = std::collections::BTreeMap::<u32, (i64, u32)>::new();
+        for a in 0..AXIS {
+            let grip = place::ground((Cog::lit(a), Cog::lit(0)), AXIS);
+            if grip > RETIRED_POOL_MASK {
+                past_reservation += 1;
+            }
+            match seen.insert(grip & RETIRED_POOL_MASK, (a, grip)) {
+                Some((prior_lit, prior_grip)) if prior_grip != grip && colliding.is_none() => {
+                    colliding = Some((prior_lit, a, prior_grip, grip));
+                }
+                _ => {}
+            }
+        }
+        assert!(
+            past_reservation > 0,
+            "at axis 2^16 the grip space reaches past 2^31 from honest places"
+        );
+        let (low_lit, high_lit, low_grip, high_grip) =
+            colliding.expect("two places whose grips differ by exactly 2^31");
+        // THE ORBIT, stated rather than narrated: over the `axis` literals the real part bands to every
+        // value in `[0, axis)` exactly once, so the grip's bit 31 — which IS the real band's bit 15 — is
+        // set on exactly half of them, and the retired mask collapsed the grip space exactly 2:1.
+        // Measured 2026-08-09: `lit(0)` (the ORIGIN) grounds to grip 2_147_516_416 and `lit(32768)` to
+        // grip 32_768; both were handed slot 32_768.
+        assert_eq!(
+            past_reservation,
+            (AXIS as usize) / 2,
+            "half of every place at this axis grounds past the retired mask"
+        );
+        assert_eq!(
+            seen.len(),
+            (AXIS as usize) / 2,
+            "which the retired mask folded 2:1 onto the bottom half"
+        );
+        assert_ne!(low_lit, high_lit);
+        assert_ne!(low_grip, high_grip, "the two places ground to distinct grips");
+        assert_eq!(
+            low_grip & RETIRED_POOL_MASK,
+            high_grip & RETIRED_POOL_MASK,
+            "and the retired mask sent both to ONE slot"
+        );
+
+        // §3 the orbit: feed the in-reservation grip, then read the aliased one. Under the retired mask
+        // this returned the OTHER place's standing flow; under the caller-declared boundary it is refused.
+        let (inside, outside) = if low_grip < high_grip {
+            (low_grip, high_grip)
+        } else {
+            (high_grip, low_grip)
+        };
+        let mut pool = vec![0u32; (inside as usize) + 1];
+        const Q: u32 = 20;
+        feed(&mut pool, inside, 137, Q);
+        assert_eq!(well_of(&pool, inside), 137, "the reserved cell took the feed");
+        assert_eq!(
+            well_of(&pool, outside),
+            0,
+            "the crossing past the reservation reads the empty pole, not the other place's well"
+        );
+        assert_eq!(
+            (outside & RETIRED_POOL_MASK),
+            inside,
+            "which is exactly the slot the retired mask would have handed it"
+        );
+
+        // and the write direction: an out-of-reservation feed is inert rather than corrupting `inside`.
+        assert_eq!(feed(&mut pool, outside, 999, Q), 0, "feeds nowhere");
+        assert_eq!(
+            well_of(&pool, inside),
+            137,
+            "the reserved cell is untouched by the crossing"
+        );
+        assert_eq!(winding(&mut pool, outside, Q), (0, 0), "and winds nothing");
     }
 
     /// Every interleaving of accrue transitions preserves the same scalar flow accounting. This says nothing

@@ -37,15 +37,6 @@ const PREDICTION_SCHEMA: &str = "holonic-engine.coupled-informant-prediction.v2"
 const GRADE_SCHEMA: &str = "holonic-engine.coupled-informant-grade.v2";
 const RADIATION_SCHEMA: &str = "holonic-engine.coupled-informant-radiation.v2";
 
-pub const COUPLED_PHASE_EXTENT: usize = 18;
-pub const COUPLED_SPECTRAL_BANDS: [SpectralBandId; 5] = [
-    SpectralBandId(8),
-    SpectralBandId(9),
-    SpectralBandId(10),
-    SpectralBandId(11),
-    SpectralBandId(13),
-];
-
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct CoupledInformantPredictionId(pub u64);
 
@@ -76,30 +67,192 @@ pub enum CoupledPhaseCoordinateKind {
     ScanIdentityDifference,
 }
 
-pub fn coupled_phase_coordinate_kinds() -> Vec<CoupledPhaseCoordinateKind> {
-    let mut kinds = (0_u32..4)
-        .map(|coordinate| CoupledPhaseCoordinateKind::OpticalDifference { coordinate })
-        .collect::<Vec<_>>();
-    kinds.extend(
-        COUPLED_SPECTRAL_BANDS
-            .into_iter()
-            .map(|band| CoupledPhaseCoordinateKind::BandTemperatureDifference { band }),
-    );
-    kinds.extend(COUPLED_SPECTRAL_BANDS[..4].iter().copied().map(|band| {
-        CoupledPhaseCoordinateKind::SpectralChordDifference {
-            band,
-            reference: SpectralBandId(13),
+/// The declared comparison membrane: which coordinates this receiver compares, and in what order.
+///
+/// Until 2026-08-09 this organ carried `COUPLED_PHASE_EXTENT: usize = 18` and
+/// `COUPLED_SPECTRAL_BANDS: [SpectralBandId; 5]` — the RELAMPAGO fixture's coordinate count and
+/// GOES-16 ABI band list, welded into the library that reads experiments.
+/// `canon/THE_AUTHORED_LEVEL.md` §5.1 names it: *"one experiment's material fixed into the organ
+/// that reads it."* Nothing here is authored now. The extent is a **reading**:
+///
+/// ```text
+///   extent = optical_arity + bands + (bands - 1) + 5
+/// ```
+///
+/// where the five are the scan departure, the two vertical support endpoints, the vertical extent,
+/// and the scan identity, each of which is one difference by construction rather than by choice.
+/// A caller either declares the chart with [`CoupledPhaseChart::new`] or reads it off the material
+/// with [`CoupledPhaseChart::from_resolution`]; the organ supplies neither and has no `Default`.
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+pub struct CoupledPhaseChart {
+    optical_arity: usize,
+    bands: Vec<SpectralBandId>,
+    chord_reference: SpectralBandId,
+}
+
+/// The scalar difference coordinates every coupled chart carries: one scan departure, two vertical
+/// support endpoints, one vertical extent, one scan identity. Written as a slice so that no number
+/// is written at all — the extent below reads this list rather than being fitted to it, which is
+/// the same repair `CoupledInformantCurrentChannel::ALL` makes one layer out
+/// (`canon/THE_AUTHORED_LEVEL.md` §5.4: a fixed-size array is a level the census cannot see).
+const COUPLED_SCALAR_COORDINATES: &[CoupledPhaseCoordinateKind] = &[
+    CoupledPhaseCoordinateKind::ScanDepartureDifference,
+    CoupledPhaseCoordinateKind::VerticalLowerDifference,
+    CoupledPhaseCoordinateKind::VerticalUpperDifference,
+    CoupledPhaseCoordinateKind::VerticalExtentDifference,
+    CoupledPhaseCoordinateKind::ScanIdentityDifference,
+];
+
+impl CoupledPhaseChart {
+    /// Declare a comparison membrane. The band order is the caller's and is retained; the chord
+    /// reference must be one of the declared bands, because a chord against a band this receiver
+    /// does not read is a coordinate nothing can supply.
+    pub fn new(
+        optical_arity: usize,
+        bands: Vec<SpectralBandId>,
+        chord_reference: SpectralBandId,
+    ) -> Result<Self, CoupledInformantError> {
+        if optical_arity == 0 || bands.is_empty() {
+            return Err(CoupledInformantError::MalformedPhaseChart);
         }
-    }));
-    kinds.extend([
-        CoupledPhaseCoordinateKind::ScanDepartureDifference,
-        CoupledPhaseCoordinateKind::VerticalLowerDifference,
-        CoupledPhaseCoordinateKind::VerticalUpperDifference,
-        CoupledPhaseCoordinateKind::VerticalExtentDifference,
-        CoupledPhaseCoordinateKind::ScanIdentityDifference,
-    ]);
-    debug_assert_eq!(kinds.len(), COUPLED_PHASE_EXTENT);
-    kinds
+        let distinct = bands.iter().copied().collect::<BTreeSet<_>>();
+        if distinct.len() != bands.len() {
+            return Err(CoupledInformantError::MalformedPhaseChart);
+        }
+        if !distinct.contains(&chord_reference) {
+            return Err(CoupledInformantError::ChordReferenceOutsideDeclaredBands(
+                chord_reference,
+            ));
+        }
+        Ok(Self {
+            optical_arity,
+            bands,
+            chord_reference,
+        })
+    }
+
+    /// Read the chart off the material instead of declaring it.
+    ///
+    /// The optical arity is the source prediction's own difference arity, and every candidate
+    /// relation must agree on it. The band population is the **intersection** over every spectral
+    /// occurrence of the bands that arrive with a zero quality flag and a temperature: a band one
+    /// occurrence cannot supply is not in this receiver's chart. The chord reference is the
+    /// resolution's own declared `thermal_band`, which is the one this organ used to spell as the
+    /// literal `SpectralBandId(13)` while the material was carrying it all along.
+    pub fn from_resolution(
+        resolution: &AtmosphericInverseResolution,
+    ) -> Result<Self, CoupledInformantError> {
+        let mut optical_arity: Option<usize> = None;
+        for relation in &resolution.source_prediction.candidate_relations {
+            let arity = relation.difference.0.len();
+            match optical_arity {
+                Some(declared) if declared != arity => {
+                    return Err(CoupledInformantError::MaterialOpticalArityDisagrees {
+                        declared,
+                        supplied: arity,
+                    });
+                }
+                _ => optical_arity = Some(arity),
+            }
+        }
+        let optical_arity = optical_arity.ok_or(CoupledInformantError::MalformedPhaseChart)?;
+        let selections = resolution
+            .contact_selections
+            .iter()
+            .map(|selection| {
+                (
+                    selection.testimony,
+                    selection
+                        .selected_scans
+                        .iter()
+                        .copied()
+                        .collect::<BTreeSet<_>>(),
+                )
+            })
+            .collect::<BTreeMap<_, _>>();
+        let mut common: Option<BTreeSet<SpectralBandId>> = None;
+        for occurrence in &resolution.spectral_occurrences {
+            let selected = selections
+                .get(&occurrence.testimony)
+                .ok_or(CoupledInformantError::MalformedResolution)?;
+            for contact in &occurrence.contacts {
+                if !selected.contains(&contact.scan) {
+                    continue;
+                }
+                let supplied = contact
+                    .brightness_temperature_kelvin
+                    .keys()
+                    .copied()
+                    .filter(|band| contact.data_quality_flags.get(band).copied() == Some(0))
+                    .collect::<BTreeSet<_>>();
+                common = Some(match common {
+                    Some(standing) => standing.intersection(&supplied).copied().collect(),
+                    None => supplied,
+                });
+            }
+        }
+        let bands = common.unwrap_or_default();
+        if bands.is_empty() {
+            return Err(CoupledInformantError::MaterialDeclaresNoSpectralBand);
+        }
+        Self::new(
+            optical_arity,
+            bands.into_iter().collect(),
+            resolution.doctrine.thermal_band,
+        )
+    }
+
+    pub fn optical_arity(&self) -> usize {
+        self.optical_arity
+    }
+
+    pub fn bands(&self) -> &[SpectralBandId] {
+        &self.bands
+    }
+
+    pub fn chord_reference(&self) -> SpectralBandId {
+        self.chord_reference
+    }
+
+    /// The bands a chord is taken over: every declared band except the reference, in declaration
+    /// order. `bands - 1` of them, and that subtraction is the whole reason the extent is not
+    /// twice the band population.
+    pub fn chord_bands(&self) -> impl Iterator<Item = SpectralBandId> + '_ {
+        let reference = self.chord_reference;
+        self.bands
+            .iter()
+            .copied()
+            .filter(move |band| *band != reference)
+    }
+
+    /// The comparison face's coordinate count. A reading of this chart, never a declaration about
+    /// any other.
+    pub fn extent(&self) -> usize {
+        self.optical_arity + self.bands.len() * 2 - 1 + COUPLED_SCALAR_COORDINATES.len()
+    }
+
+    pub fn coordinate_kinds(&self) -> Vec<CoupledPhaseCoordinateKind> {
+        let mut kinds = (0..self.optical_arity)
+            .map(|coordinate| CoupledPhaseCoordinateKind::OpticalDifference {
+                coordinate: coordinate as u32,
+            })
+            .collect::<Vec<_>>();
+        kinds.extend(
+            self.bands
+                .iter()
+                .copied()
+                .map(|band| CoupledPhaseCoordinateKind::BandTemperatureDifference { band }),
+        );
+        kinds.extend(self.chord_bands().map(|band| {
+            CoupledPhaseCoordinateKind::SpectralChordDifference {
+                band,
+                reference: self.chord_reference,
+            }
+        }));
+        kinds.extend(COUPLED_SCALAR_COORDINATES.iter().copied());
+        debug_assert_eq!(kinds.len(), self.extent());
+        kinds
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
@@ -115,8 +268,8 @@ impl CoupledPhaseVector {
                 .all(|(left, right)| left <= right)
     }
 
-    fn validate(&self) -> Result<(), CoupledInformantError> {
-        if self.0.len() != COUPLED_PHASE_EXTENT || self.0.iter().any(Signed::is_negative) {
+    fn validate(&self, chart: &CoupledPhaseChart) -> Result<(), CoupledInformantError> {
+        if self.0.len() != chart.extent() || self.0.iter().any(Signed::is_negative) {
             return Err(CoupledInformantError::MalformedPhaseVector);
         }
         Ok(())
@@ -127,6 +280,11 @@ impl CoupledPhaseVector {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CoupledInformantMorphology {
     pub schema: String,
+    /// The comparison membrane every retained phase vector is indexed by. Two bodies conditioned
+    /// under different charts are not comparable and this is where that is visible.
+    pub chart: CoupledPhaseChart,
+    /// The chart's coordinate kinds, stated rather than implied, so the standing says its own
+    /// shape. [`CoupledInformantMorphology::validate`] refuses one that disagrees with `chart`.
     pub coordinate_kinds: Vec<CoupledPhaseCoordinateKind>,
     pub positive_maxima: Vec<CoupledPhaseVector>,
     /// Exact returned-apart phase fibers.  A repeated equal fiber may conduct
@@ -141,11 +299,14 @@ pub struct CoupledInformantMorphology {
     pub returned_apart_branches: u64,
 }
 
-impl Default for CoupledInformantMorphology {
-    fn default() -> Self {
+impl CoupledInformantMorphology {
+    /// An empty morphology on a declared chart. There is no `Default`: a default chart would be
+    /// this organ picking one experiment's coordinate count again, with a trait in front of it.
+    pub fn new(chart: CoupledPhaseChart) -> Self {
         Self {
             schema: MORPHOLOGY_SCHEMA.to_owned(),
-            coordinate_kinds: coupled_phase_coordinate_kinds(),
+            coordinate_kinds: chart.coordinate_kinds(),
+            chart,
             positive_maxima: Vec::new(),
             negative_witnesses: BTreeMap::new(),
             negative_minima: Vec::new(),
@@ -154,9 +315,7 @@ impl Default for CoupledInformantMorphology {
             returned_apart_branches: 0,
         }
     }
-}
 
-impl CoupledInformantMorphology {
     fn classify(&self, vector: &CoupledPhaseVector) -> CoupledInformantRelationState {
         let positive = self
             .positive_maxima
@@ -177,7 +336,7 @@ impl CoupledInformantMorphology {
 
     fn validate(&self) -> Result<(), CoupledInformantError> {
         if self.schema != MORPHOLOGY_SCHEMA
-            || self.coordinate_kinds != coupled_phase_coordinate_kinds()
+            || self.coordinate_kinds != self.chart.coordinate_kinds()
             || !is_maximal_front(&self.positive_maxima)
             || !is_minimal_front(&self.negative_minima)
             || self
@@ -193,7 +352,7 @@ impl CoupledInformantMorphology {
             .chain(self.negative_witnesses.keys())
             .chain(&self.negative_minima)
         {
-            vector.validate()?;
+            vector.validate(&self.chart)?;
         }
         Ok(())
     }
@@ -289,6 +448,13 @@ pub struct CoupledInformantGrade {
 
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CoupledInformantWork {
+    /// The comparison face's coordinate count, so the receipt says its own shape. A reader of a
+    /// returned work receipt never has to know what the organ's default extent was, because there
+    /// is not one.
+    pub phase_extent: u64,
+    /// The declared optical arity and spectral band population the extent was read from.
+    pub optical_arity: u64,
+    pub spectral_bands: u64,
     pub source_relations: u64,
     pub optical_horizon_relations: u64,
     pub spectral_local_star_relations: u64,
@@ -313,11 +479,14 @@ pub struct CoupledInformantStanding {
     next_grade: u64,
 }
 
-impl Default for CoupledInformantStanding {
-    fn default() -> Self {
+impl CoupledInformantStanding {
+    /// An empty standing on a declared comparison membrane. `Default` is deliberately absent; the
+    /// caller declares the chart or reads it off the material with
+    /// [`CoupledPhaseChart::from_resolution`].
+    pub fn new(chart: CoupledPhaseChart) -> Self {
         Self {
             schema: STANDING_SCHEMA.to_owned(),
-            morphology: CoupledInformantMorphology::default(),
+            morphology: CoupledInformantMorphology::new(chart),
             predictions: BTreeMap::new(),
             grades: BTreeMap::new(),
             admitted_grades: BTreeSet::new(),
@@ -326,9 +495,12 @@ impl Default for CoupledInformantStanding {
             next_grade: 1,
         }
     }
-}
 
-impl CoupledInformantStanding {
+    /// The chart this body is conditioned under. Every retained phase vector is indexed by it.
+    pub fn chart(&self) -> &CoupledPhaseChart {
+        &self.morphology.chart
+    }
+
     pub fn validate(&self) -> Result<(), CoupledInformantError> {
         if self.schema != STANDING_SCHEMA {
             return Err(CoupledInformantError::MalformedStanding);
@@ -346,6 +518,9 @@ impl CoupledInformantStanding {
                 return Err(CoupledInformantError::MalformedStanding);
             }
             prediction.morphology_before.validate()?;
+            if prediction.morphology_before.chart != self.morphology.chart {
+                return Err(CoupledInformantError::MalformedStanding);
+            }
             for relation in &prediction.relations {
                 if relation.branches.is_empty()
                     != (relation.state == CoupledInformantRelationState::MissingSection)
@@ -353,7 +528,7 @@ impl CoupledInformantStanding {
                     return Err(CoupledInformantError::MalformedStanding);
                 }
                 for branch in &relation.branches {
-                    branch.phase.validate()?;
+                    branch.phase.validate(&self.morphology.chart)?;
                 }
             }
         }
@@ -579,8 +754,10 @@ impl ExactEventLaw for CoupledInformantLaw {
 struct OccurrencePhase {
     scan: SpectralScanId,
     vertical_fiber: u64,
-    temperatures: [Rat; 5],
-    chords: [Rat; 4],
+    /// One reading per declared band, in the chart's declaration order.
+    temperatures: Vec<Rat>,
+    /// One chord per declared band except the reference: `bands - 1` of them.
+    chords: Vec<Rat>,
     scan_departure: Rat,
     vertical_lower: Rat,
     vertical_upper: Rat,
@@ -603,7 +780,8 @@ fn generate_prediction(
     morphology: &CoupledInformantMorphology,
     cpu: &CpuExecutor,
 ) -> Result<(CoupledInformantPrediction, CoupledInformantWork), CoupledInformantError> {
-    let phases = Arc::new(index_occurrence_phases(resolution)?);
+    let chart = Arc::new(morphology.chart.clone());
+    let phases = Arc::new(index_occurrence_phases(resolution, &chart)?);
     let morphology = Arc::new(morphology.clone());
     if resolution.spectral_occurrences.is_empty() {
         return Err(CoupledInformantError::EmptyResolution);
@@ -616,7 +794,7 @@ fn generate_prediction(
     if prior.id != resolution.prediction {
         return Err(CoupledInformantError::IncompatibleResolution);
     }
-    let relation_inputs = candidate_relation_inputs(resolution)?;
+    let relation_inputs = candidate_relation_inputs(resolution, &chart)?;
     let optical_horizon_relations = relation_inputs
         .iter()
         .filter(|relation| {
@@ -644,6 +822,7 @@ fn generate_prediction(
         .execute_indexed(&relation_inputs, {
             let phases = Arc::clone(&phases);
             let morphology = Arc::clone(&morphology);
+            let chart = Arc::clone(&chart);
             move |_index, relation| {
                 let mut branches = Vec::new();
                 let left = phases
@@ -656,8 +835,12 @@ fn generate_prediction(
                     .unwrap_or(&[]);
                 for left_phase in left {
                     for right_phase in right {
-                        let phase =
-                            coupled_phase_vector(&relation.difference.0, left_phase, right_phase)?;
+                        let phase = coupled_phase_vector(
+                            &chart,
+                            &relation.difference.0,
+                            left_phase,
+                            right_phase,
+                        )?;
                         let state = morphology.classify(&phase);
                         branches.push(CoupledPhaseBranch {
                             scans: [left_phase.scan, right_phase.scan],
@@ -691,6 +874,9 @@ fn generate_prediction(
         })
         .map_err(map_cpu_error)?;
     let mut work = CoupledInformantWork {
+        phase_extent: usize_to_u64(chart.extent())?,
+        optical_arity: usize_to_u64(chart.optical_arity())?,
+        spectral_bands: usize_to_u64(chart.bands().len())?,
         source_relations: usize_to_u64(relations.len())?,
         optical_horizon_relations: usize_to_u64(optical_horizon_relations)?,
         spectral_local_star_relations: usize_to_u64(spectral_local_star_relations)?,
@@ -727,6 +913,7 @@ fn generate_prediction(
 
 fn candidate_relation_inputs(
     resolution: &AtmosphericInverseResolution,
+    chart: &CoupledPhaseChart,
 ) -> Result<Vec<CandidateRelationInput>, CoupledInformantError> {
     let mut candidates = BTreeMap::<[ReceiverTestimonyId; 2], CandidateRelationInput>::new();
     for relation in &resolution.source_prediction.candidate_relations {
@@ -769,7 +956,7 @@ fn candidate_relation_inputs(
             .ok_or(CoupledInformantError::MalformedResolution)?;
         for contact in &occurrence.contacts {
             if selected.contains(&contact.scan)
-                && COUPLED_SPECTRAL_BANDS.iter().all(|band| {
+                && chart.bands().iter().all(|band| {
                     contact.data_quality_flags.get(band).copied() == Some(0)
                         && contact.brightness_temperature_kelvin.contains_key(band)
                 })
@@ -795,12 +982,23 @@ fn candidate_relation_inputs(
             let right = occurrences
                 .get(&members[1])
                 .ok_or(CoupledInformantError::MalformedResolution)?;
+            // A spectral local star founds its own optical difference out of the exact scalars a
+            // `SpectralReceiverOccurrence` carries. Its arity is that carrier's, not a level: it is
+            // four because the occurrence has four scalar coordinates. Where the declared chart
+            // asks for a different optical arity this origin cannot supply it, and that is returned
+            // by name rather than by padding a vector to fit.
             let difference = ExactDifferenceVector(vec![
                 absolute_difference(&left.latitude_degree, &right.latitude_degree),
                 absolute_difference(&left.longitude_degree, &right.longitude_degree),
                 absolute_difference(&left.clock, &right.clock),
                 absolute_difference(&left.radiant_energy, &right.radiant_energy),
             ]);
+            if difference.0.len() != chart.optical_arity() {
+                return Err(CoupledInformantError::SpectralStarOpticalArity {
+                    declared: chart.optical_arity(),
+                    supplied: difference.0.len(),
+                });
+            }
             match candidates.get_mut(&members) {
                 Some(existing) => {
                     if existing.difference != difference {
@@ -835,6 +1033,7 @@ fn ordered_members(members: [ReceiverTestimonyId; 2]) -> [ReceiverTestimonyId; 2
 
 fn index_occurrence_phases(
     resolution: &AtmosphericInverseResolution,
+    chart: &CoupledPhaseChart,
 ) -> Result<BTreeMap<ReceiverTestimonyId, Vec<OccurrencePhase>>, CoupledInformantError> {
     let selections = resolution
         .contact_selections
@@ -880,19 +1079,23 @@ fn index_occurrence_phases(
         let mut occurrence_phases = Vec::new();
         for contact in &occurrence.contacts {
             if !selected.contains(&contact.scan)
-                || COUPLED_SPECTRAL_BANDS.iter().any(|band| {
+                || chart.bands().iter().any(|band| {
                     contact.data_quality_flags.get(band).copied() != Some(0)
                         || !contact.brightness_temperature_kelvin.contains_key(band)
                 })
             {
                 continue;
             }
-            let temperatures = std::array::from_fn(|index| {
-                contact.brightness_temperature_kelvin[&COUPLED_SPECTRAL_BANDS[index]].clone()
-            });
-            let chords = std::array::from_fn(|index| {
-                &temperatures[index] - &temperatures[COUPLED_SPECTRAL_BANDS.len() - 1]
-            });
+            let temperatures = chart
+                .bands()
+                .iter()
+                .map(|band| contact.brightness_temperature_kelvin[band].clone())
+                .collect::<Vec<_>>();
+            let reference = contact.brightness_temperature_kelvin[&chart.chord_reference()].clone();
+            let chords = chart
+                .chord_bands()
+                .map(|band| &contact.brightness_temperature_kelvin[&band] - &reference)
+                .collect::<Vec<_>>();
             for (fiber, scan, departure, support) in fibers_by_occurrence
                 .get(&occurrence.testimony)
                 .map(Vec::as_slice)
@@ -938,12 +1141,16 @@ fn index_occurrence_phases(
 }
 
 fn coupled_phase_vector(
+    chart: &CoupledPhaseChart,
     optical: &[Rat],
     left: &OccurrencePhase,
     right: &OccurrencePhase,
 ) -> Result<CoupledPhaseVector, CoupledInformantError> {
-    if optical.len() != 4 {
-        return Err(CoupledInformantError::IncompatibleOpticalDifference);
+    if optical.len() != chart.optical_arity() {
+        return Err(CoupledInformantError::IncompatibleOpticalDifference {
+            declared: chart.optical_arity(),
+            supplied: optical.len(),
+        });
     }
     let mut values = optical.to_vec();
     values.extend(
@@ -978,7 +1185,7 @@ fn coupled_phase_vector(
         left.scan != right.scan,
     ))));
     let vector = CoupledPhaseVector(values);
-    vector.validate()?;
+    vector.validate(chart)?;
     Ok(vector)
 }
 
@@ -1264,14 +1471,30 @@ pub enum CoupledInformantError {
     MalformedMorphology,
     #[error("a coupled phase vector is malformed")]
     MalformedPhaseVector,
+    #[error("a coupled phase chart declares no optical coordinate, no band, or a repeated band")]
+    MalformedPhaseChart,
+    #[error("chord reference {0:?} is not one of the declared bands")]
+    ChordReferenceOutsideDeclaredBands(SpectralBandId),
+    #[error(
+        "the material's candidate relations disagree on optical arity: {declared} then {supplied}"
+    )]
+    MaterialOpticalArityDisagrees { declared: usize, supplied: usize },
+    #[error("no spectral band arrives with a zero quality flag in every selected contact")]
+    MaterialDeclaresNoSpectralBand,
+    #[error(
+        "a spectral local star founds {supplied} optical coordinates and the chart declares {declared}"
+    )]
+    SpectralStarOpticalArity { declared: usize, supplied: usize },
     #[error("atmospheric resolution is empty")]
     EmptyResolution,
     #[error("atmospheric resolution is malformed")]
     MalformedResolution,
     #[error("atmospheric resolution and its source prediction disagree")]
     IncompatibleResolution,
-    #[error("the source optical difference is not the declared four-coordinate face")]
-    IncompatibleOpticalDifference,
+    #[error(
+        "the source optical difference carries {supplied} coordinates and the chart declares {declared}"
+    )]
+    IncompatibleOpticalDifference { declared: usize, supplied: usize },
     #[error("optical and spectral receiver charts disagree on a shared occurrence pair")]
     IncompatibleSourceCharts,
     #[error("coupled-informant event {0:?} has already entered standing")]
@@ -1309,12 +1532,35 @@ mod tests {
         )
     }
 
+    fn level(value: i64, chart: &CoupledPhaseChart) -> CoupledPhaseVector {
+        vector(&vec![value; chart.extent()])
+    }
+
+    /// The chart the RELAMPAGO run declares: GOES-16 ABI bands 08/09/10/11/13 against the thermal
+    /// band 13, and GLM's four optical scalars. Until 2026-08-09 this was `COUPLED_PHASE_EXTENT`
+    /// and `COUPLED_SPECTRAL_BANDS` **inside the library**; it is now one fixture among others.
+    fn relampago_chart() -> CoupledPhaseChart {
+        CoupledPhaseChart::new(
+            4,
+            vec![
+                SpectralBandId(8),
+                SpectralBandId(9),
+                SpectralBandId(10),
+                SpectralBandId(11),
+                SpectralBandId(13),
+            ],
+            SpectralBandId(13),
+        )
+        .unwrap()
+    }
+
     #[test]
     fn plural_branches_do_not_force_an_aggregate_when_they_disagree() {
+        let chart = relampago_chart();
         let together = CoupledPhaseBranch {
             scans: [SpectralScanId(1), SpectralScanId(1)],
             vertical_fibers: [0, 1],
-            phase: vector(&[0; COUPLED_PHASE_EXTENT]),
+            phase: level(0, &chart),
             state: CoupledInformantRelationState::ForcedTogether,
         };
         let mut apart = together.clone();
@@ -1327,34 +1573,129 @@ mod tests {
 
     #[test]
     fn morphology_retains_componentwise_positive_and_negative_fronts() {
-        let mut morphology = CoupledInformantMorphology::default();
-        morphology.positive_maxima = canonical_maximal_front(vec![
-            vector(&[1; COUPLED_PHASE_EXTENT]),
-            vector(&[2; COUPLED_PHASE_EXTENT]),
-        ]);
-        morphology.negative_minima = canonical_minimal_front(vec![
-            vector(&[5; COUPLED_PHASE_EXTENT]),
-            vector(&[6; COUPLED_PHASE_EXTENT]),
-        ]);
-        morphology
-            .negative_witnesses
-            .insert(vector(&[5; COUPLED_PHASE_EXTENT]), 2);
+        let chart = relampago_chart();
+        let mut morphology = CoupledInformantMorphology::new(chart.clone());
+        morphology.positive_maxima =
+            canonical_maximal_front(vec![level(1, &chart), level(2, &chart)]);
+        morphology.negative_minima =
+            canonical_minimal_front(vec![level(5, &chart), level(6, &chart)]);
+        morphology.negative_witnesses.insert(level(5, &chart), 2);
         morphology.validate().unwrap();
         assert_eq!(
-            morphology.classify(&vector(&[0; COUPLED_PHASE_EXTENT])),
+            morphology.classify(&level(0, &chart)),
             CoupledInformantRelationState::ForcedTogether
         );
         assert_eq!(
-            morphology.classify(&vector(&[7; COUPLED_PHASE_EXTENT])),
+            morphology.classify(&level(7, &chart)),
             CoupledInformantRelationState::Open
         );
         assert_eq!(
-            morphology.classify(&vector(&[5; COUPLED_PHASE_EXTENT])),
+            morphology.classify(&level(5, &chart)),
             CoupledInformantRelationState::ForcedApart
         );
         assert_eq!(
-            morphology.classify(&vector(&[3; COUPLED_PHASE_EXTENT])),
+            morphology.classify(&level(3, &chart)),
             CoupledInformantRelationState::Open
+        );
+    }
+
+    /// THE DECLARED CONTROL for the `COUPLED_PHASE_EXTENT` excision.
+    ///
+    /// The old organ could represent exactly one comparison face, of exactly eighteen coordinates,
+    /// on exactly five GOES-16 ABI bands. Three charts are declared here and no two agree on the
+    /// extent, so the assertions below **could not be written at all** against the pinned organ,
+    /// and the first one would have been the tautology `18 == 18`.
+    ///
+    /// The orbit is non-trivial by construction: the extents are `18`, `7`, and `28`.
+    #[test]
+    fn the_extent_is_read_off_the_declared_chart_and_no_two_charts_agree() {
+        let relampago = relampago_chart();
+        assert_eq!(relampago.extent(), 18);
+        assert_eq!(relampago.coordinate_kinds().len(), 18);
+
+        // One band, one optical coordinate: a receiver with no chords at all, because the only
+        // band it reads *is* the reference. `bands - 1 = 0` is not a special case here.
+        let single = CoupledPhaseChart::new(1, vec![SpectralBandId(4)], SpectralBandId(4)).unwrap();
+        assert_eq!(single.extent(), 1 + 1 + 0 + 5);
+        assert_eq!(single.chord_bands().count(), 0);
+        assert_eq!(single.coordinate_kinds().len(), single.extent());
+
+        // A nine-band hyperspectral receiver on a six-coordinate optical face.
+        let wide = CoupledPhaseChart::new(
+            6,
+            (20..29).map(SpectralBandId).collect(),
+            SpectralBandId(24),
+        )
+        .unwrap();
+        assert_eq!(wide.extent(), 6 + 9 + 8 + 5);
+        assert_eq!(wide.chord_bands().count(), 8);
+        assert!(wide.chord_bands().all(|band| band != SpectralBandId(24)));
+
+        let extents = [relampago.extent(), single.extent(), wide.extent()];
+        assert_eq!(extents, [18, 7, 28], "the orbit of the excised level");
+
+        // And a morphology is only comparable within its own chart: the same integer level is a
+        // different vector under each, and the standing refuses one that does not fit.
+        for chart in [&relampago, &single, &wide] {
+            let mut morphology = CoupledInformantMorphology::new(chart.clone());
+            morphology.positive_maxima = vec![level(1, chart)];
+            morphology.validate().unwrap();
+            assert_eq!(morphology.chart.extent(), chart.extent());
+
+            let mut foreign = morphology.clone();
+            foreign.positive_maxima = vec![level(1, &relampago_chart_of_other_extent(chart))];
+            assert_eq!(
+                foreign.validate(),
+                Err(CoupledInformantError::MalformedPhaseVector),
+                "a vector of another chart's extent is refused by name"
+            );
+        }
+    }
+
+    /// A chart whose extent differs from `chart`, so the refusal above cannot be satisfied by
+    /// accident on any of the three declarations.
+    fn relampago_chart_of_other_extent(chart: &CoupledPhaseChart) -> CoupledPhaseChart {
+        let candidate = CoupledPhaseChart::new(
+            1,
+            vec![SpectralBandId(1), SpectralBandId(2)],
+            SpectralBandId(1),
+        )
+        .unwrap();
+        if candidate.extent() == chart.extent() {
+            CoupledPhaseChart::new(
+                3,
+                vec![SpectralBandId(1), SpectralBandId(2), SpectralBandId(3)],
+                SpectralBandId(1),
+            )
+            .unwrap()
+        } else {
+            candidate
+        }
+    }
+
+    #[test]
+    fn a_chart_refuses_a_reference_it_does_not_read_and_a_repeated_band() {
+        assert_eq!(
+            CoupledPhaseChart::new(4, vec![SpectralBandId(8)], SpectralBandId(13)),
+            Err(CoupledInformantError::ChordReferenceOutsideDeclaredBands(
+                SpectralBandId(13)
+            ))
+        );
+        assert_eq!(
+            CoupledPhaseChart::new(
+                4,
+                vec![SpectralBandId(8), SpectralBandId(8)],
+                SpectralBandId(8)
+            ),
+            Err(CoupledInformantError::MalformedPhaseChart)
+        );
+        assert_eq!(
+            CoupledPhaseChart::new(0, vec![SpectralBandId(8)], SpectralBandId(8)),
+            Err(CoupledInformantError::MalformedPhaseChart)
+        );
+        assert_eq!(
+            CoupledPhaseChart::new(4, Vec::new(), SpectralBandId(8)),
+            Err(CoupledInformantError::MalformedPhaseChart)
         );
     }
 }

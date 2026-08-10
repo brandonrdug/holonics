@@ -436,11 +436,16 @@ fn receive_theory_sentence(
     tokens: &[String],
     sections: &mut Vec<LaboratorySourceSection>,
 ) -> Result<(), LaboratoryLanguageError> {
-    let words = tokens
+    // A sentence is received when it carries a word.  This is a predicate on the material, not a
+    // length: the retired form was `if !(5..=96).contains(&words) { return Ok(()) }`, two authored
+    // levels that SILENTLY DELETED every theory sentence below five or above ninety-six
+    // alphanumeric tokens.  Nothing derived either bound, and a deletion that returns no receipt is
+    // the species `CLAUDE.md` §9 forbids outright — the artifact is the return.  The sentence
+    // boundary itself is already the source's own (`receive_paragraph_sections`: `.`, `!`, `?`).
+    let carries_a_word = tokens
         .iter()
-        .filter(|token| token.chars().any(char::is_alphanumeric))
-        .count();
-    if !(5..=96).contains(&words) {
+        .any(|token| token.chars().any(char::is_alphanumeric));
+    if !carries_a_word {
         return Ok(());
     }
     let text = render_tokens(tokens.iter().map(String::as_str));
@@ -458,21 +463,39 @@ fn receive_theory_sentence(
 /// Retain Rust as source-native code sections. The atlas does not translate ownership, calls, or
 /// constructor syntax into authored English conclusions; those relations must be enacted by a
 /// receiving codec/current if they matter to a later deed.
+///
+/// The section boundary is read off the source's own delimiters, never counted: a blank line, or
+/// **the brace depth returning to zero**. Both are lexical facts about the file, in the same sense
+/// that `.`/`!`/`?` are the theory sentence's boundary; neither is an authored English conclusion
+/// about what the code means.
+///
+/// Stated exactly, because the code governs the name: the second boundary fires on the line where a
+/// brace group that was opened during or before it closes and leaves the depth at zero. That is a
+/// multi-line item body ending, and it is equally `use a::{b, c};`, whose braces open and close on
+/// one line. No attempt is made to tell those apart — telling them apart is parsing, and the atlas
+/// does not parse.
+///
+/// The retired form carried `const BLOCK_LINES: usize = 24` and cut a blank-line-free run at
+/// twenty-four lines. Nothing derived twenty-four, and it decided the section population and so the
+/// feature incidence a leader recruits over.
 fn receive_native_code_sections(
     source: &str,
     receiver: u64,
     text: &str,
     sections: &mut Vec<LaboratorySourceSection>,
 ) -> Result<(), LaboratoryLanguageError> {
-    const BLOCK_LINES: usize = 24;
+    let closings = rust_item_closings(text);
     let mut block = String::new();
     let mut block_start = 1usize;
-    let mut block_lines = 0usize;
     for (line_at, line) in text.lines().enumerate() {
         let line_number = line_at
             .checked_add(1)
             .ok_or(LaboratoryLanguageError::CarrierExtent)?;
-        let boundary = line.trim().is_empty() || block_lines == BLOCK_LINES;
+        let boundary = line.trim().is_empty()
+            || closings
+                .get(line_at.wrapping_sub(1))
+                .copied()
+                .unwrap_or(false);
         if boundary && !block.is_empty() {
             receive_section(
                 format!("{source}::rust-source::{block_start}"),
@@ -483,7 +506,6 @@ fn receive_native_code_sections(
                 std::mem::take(&mut block),
                 sections,
             )?;
-            block_lines = 0;
         }
         if line.trim().is_empty() {
             continue;
@@ -494,9 +516,6 @@ fn receive_native_code_sections(
             block.push('\n');
         }
         block.push_str(line);
-        block_lines = block_lines
-            .checked_add(1)
-            .ok_or(LaboratoryLanguageError::CarrierExtent)?;
     }
     if !block.is_empty() {
         receive_section(
@@ -510,6 +529,182 @@ fn receive_native_code_sections(
         )?;
     }
     Ok(())
+}
+
+/// One entry per line of `text`: did the brace depth stand positive during this line and return to
+/// zero by its end?
+///
+/// A `}` inside a string, a raw string, a character literal or a comment is not a delimiter, so
+/// those four are consumed as such before any brace is counted — `'{'` and `'}'` are exactly the
+/// case that separates this from a brace counter. The scanner is deliberately not a parser: it
+/// reads the delimiters and nothing about what they enclose.
+fn rust_item_closings(text: &str) -> Vec<bool> {
+    #[derive(Clone, Copy)]
+    enum Mode {
+        Code,
+        LineComment,
+        BlockComment(usize),
+        Str,
+        RawStr(usize),
+    }
+
+    let bytes = text.as_bytes();
+    let mut closings = Vec::new();
+    let mut mode = Mode::Code;
+    let mut depth = 0usize;
+    let mut entered = false;
+    let mut at = 0usize;
+    while at < bytes.len() {
+        let byte = bytes[at];
+        if byte == b'\n' {
+            if let Mode::LineComment = mode {
+                mode = Mode::Code;
+            }
+            closings.push(entered && depth == 0);
+            entered = depth > 0;
+            at += 1;
+            continue;
+        }
+        match mode {
+            Mode::LineComment => at += 1,
+            Mode::BlockComment(nesting) => {
+                if bytes[at..].starts_with(b"*/") {
+                    mode = if nesting <= 1 {
+                        Mode::Code
+                    } else {
+                        Mode::BlockComment(nesting - 1)
+                    };
+                    at += 2;
+                } else if bytes[at..].starts_with(b"/*") {
+                    mode = Mode::BlockComment(nesting + 1);
+                    at += 2;
+                } else {
+                    at += 1;
+                }
+            }
+            Mode::Str => {
+                // an escape consumes the next byte, EXCEPT a newline: a `\`-continued string still
+                // crosses a line, and the line tally must not lose it.
+                if byte == b'\\' && bytes.get(at + 1).is_some_and(|&next| next != b'\n') {
+                    at += 2;
+                } else {
+                    if byte == b'"' {
+                        mode = Mode::Code;
+                    }
+                    at += 1;
+                }
+            }
+            Mode::RawStr(hashes) => {
+                if byte == b'"'
+                    && bytes.len() >= at + 1 + hashes
+                    && bytes[at + 1..at + 1 + hashes].iter().all(|&h| h == b'#')
+                {
+                    mode = Mode::Code;
+                    at += 1 + hashes;
+                } else {
+                    at += 1;
+                }
+            }
+            Mode::Code => {
+                if let Some((width, hashes)) = raw_string_opening(bytes, at) {
+                    mode = Mode::RawStr(hashes);
+                    at += width;
+                } else if bytes[at..].starts_with(b"//") {
+                    mode = Mode::LineComment;
+                    at += 2;
+                } else if bytes[at..].starts_with(b"/*") {
+                    mode = Mode::BlockComment(1);
+                    at += 2;
+                } else if byte == b'"' {
+                    mode = Mode::Str;
+                    at += 1;
+                } else if byte == b'\'' {
+                    at += character_literal_width(bytes, at);
+                } else if byte == b'{' {
+                    depth += 1;
+                    entered = true;
+                    at += 1;
+                } else if byte == b'}' {
+                    depth = depth.saturating_sub(1);
+                    at += 1;
+                } else {
+                    at += 1;
+                }
+            }
+        }
+    }
+    if !bytes.is_empty() && bytes[bytes.len() - 1] != b'\n' {
+        closings.push(entered && depth == 0);
+    }
+    closings
+}
+
+/// The width of a raw-string opening at `at` (`r"`, `r#"`, `br##"`, `cr"`, …) with its hash count,
+/// or `None` where this is not one. A raw string's closing quote is only closing when followed by
+/// as many hashes as it opened with, so the count travels with the mode.
+fn raw_string_opening(bytes: &[u8], at: usize) -> Option<(usize, usize)> {
+    fn is_identifier_byte(byte: u8) -> bool {
+        byte.is_ascii_alphanumeric() || byte == b'_' || byte >= 0x80
+    }
+    if at > 0 && is_identifier_byte(bytes[at - 1]) {
+        return None;
+    }
+    let mut cursor = at;
+    if matches!(bytes.get(cursor), Some(b'b') | Some(b'c')) {
+        cursor += 1;
+    }
+    if bytes.get(cursor) != Some(&b'r') {
+        return None;
+    }
+    cursor += 1;
+    let mut hashes = 0usize;
+    while bytes.get(cursor) == Some(&b'#') {
+        hashes += 1;
+        cursor += 1;
+    }
+    if bytes.get(cursor) != Some(&b'"') {
+        return None;
+    }
+    Some((cursor + 1 - at, hashes))
+}
+
+/// The width of a character literal opening at `at`, or `1` where the quote opens a lifetime
+/// instead. `'{'` and `'}'` are exactly the case that matters here: a naive counter reads them as
+/// delimiters, and `'a` in a signature is not a literal at all.
+fn character_literal_width(bytes: &[u8], at: usize) -> usize {
+    match bytes.get(at + 1) {
+        Some(b'\\') => {
+            let mut cursor = at + 2;
+            while let Some(&byte) = bytes.get(cursor) {
+                if byte == b'\n' {
+                    return 1;
+                }
+                if byte == b'\'' {
+                    return cursor + 1 - at;
+                }
+                cursor += 1;
+            }
+            1
+        }
+        Some(b'\n') => 1,
+        Some(&lead) => {
+            let width = if lead < 0x80 {
+                1
+            } else if lead >> 5 == 0b110 {
+                2
+            } else if lead >> 4 == 0b1110 {
+                3
+            } else {
+                4
+            };
+            if bytes.get(at + 1 + width) == Some(&b'\'') {
+                2 + width
+            } else {
+                1
+            }
+        }
+        None => 1,
+    }
 }
 
 fn receive_section(
@@ -536,4 +731,125 @@ fn receive_section(
         features,
     });
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// The control the delimiter reader has to beat: every `{`/`}` byte, wherever it sits.
+    fn naive_closings(text: &str) -> Vec<bool> {
+        let mut out = Vec::new();
+        let mut depth = 0usize;
+        let mut entered = false;
+        for line in text.split_inclusive('\n') {
+            for byte in line.bytes() {
+                if byte == b'{' {
+                    depth += 1;
+                    entered = true;
+                } else if byte == b'}' {
+                    depth = depth.saturating_sub(1);
+                }
+            }
+            if line.ends_with('\n') {
+                out.push(entered && depth == 0);
+                entered = depth > 0;
+            }
+        }
+        if !text.is_empty() && !text.ends_with('\n') {
+            out.push(entered && depth == 0);
+        }
+        out
+    }
+
+    /// A `}` inside a string, a raw string, a character literal or a comment is not a delimiter.
+    /// Each stanza below is written so a brace counter gets it WRONG — the disagreement is the
+    /// distinguishing word, and it is asserted rather than assumed.
+    #[test]
+    fn a_brace_in_a_literal_or_a_comment_is_not_a_delimiter() {
+        let material = concat!(
+            "fn a() -> char { '{' }\n",             // 1: a char literal open brace
+            "fn b() -> char { '}' }\n",             // 2: a char literal close brace
+            "fn c() -> &'static str { \"}}}\" }\n", // 3: braces in a string, and a lifetime
+            "fn d() { /* } } */ }\n",               // 4: braces in a block comment
+            "fn e() { // }\n",                      // 5: a line comment opens, body continues
+            "}\n",                                  // 6: and closes here
+            "fn f() -> &'static str { r#\"a \" } is not a close\"# }\n", // 7: a raw string
+            "fn g() { /* /* nested */ } */ }\n",    // 8: nested block comments
+            "fn h() -> &'static str { r#\"\n",      // 9: a raw string opening
+            "} not a close\n",                      // 10: whose brace crosses a line
+            "\"# }\n",                              // 11: and closes with the item
+        );
+        let read = rust_item_closings(material);
+        let counted = naive_closings(material);
+        assert_eq!(
+            read.len(),
+            material.lines().count(),
+            "one closing entry per line"
+        );
+        assert_eq!(
+            read,
+            vec![
+                true, true, true, true, false, true, true, true, false, false, true
+            ],
+            "every brace-delimited group closes on the line its delimiter closes on"
+        );
+        assert_ne!(
+            read, counted,
+            "CONTROL REFUSES ITSELF: a brace counter agreed, so this material does not separate them"
+        );
+        let parting = read
+            .iter()
+            .zip(counted.iter())
+            .position(|(a, b)| a != b)
+            .expect("the two readers part somewhere");
+        assert_eq!(parting, 0, "they part on the first character literal");
+    }
+
+    /// A `\`-continued string crosses a line, and the per-line tally must not lose it.
+    #[test]
+    fn a_continued_string_does_not_lose_its_line() {
+        let material = "fn a() -> &'static str {\n    \"one \\\n     two\"\n}\nfn b() {}\n";
+        let read = rust_item_closings(material);
+        assert_eq!(read.len(), material.lines().count());
+        assert_eq!(read, vec![false, false, false, true, true]);
+    }
+
+    /// The retired `BLOCK_LINES = 24` cut a blank-line-free run at twenty-four lines. The live law
+    /// runs to the source's own boundary, so a longer run returns whole.
+    #[test]
+    fn a_blank_line_free_run_is_not_cut_at_a_count() {
+        let mut material = String::from("//! a header with no blank line in it\n");
+        for at in 0..40 {
+            material.push_str(&format!("//! line {at}\n"));
+        }
+        material.push('\n');
+        material.push_str("fn a() {}\n");
+        let mut sections = Vec::new();
+        receive_native_code_sections("declared", 1, &material, &mut sections).expect("sections");
+        assert_eq!(sections.len(), 2, "the header and the item");
+        assert_eq!(
+            sections[0].text.lines().count(),
+            41,
+            "the whole run, not twenty-four of it"
+        );
+    }
+
+    /// The retired `(5..=96)` silently dropped every theory sentence outside it. A sentence is now
+    /// received when it carries a word.
+    #[test]
+    fn a_short_sentence_is_received_and_a_wordless_one_is_not() {
+        let mut sections = Vec::new();
+        receive_theory_sections("declared", 1, "Git is the log.\n", &mut sections)
+            .expect("sections");
+        assert_eq!(sections.len(), 1, "four words is a sentence");
+        assert_eq!(sections[0].text, "Git is the log.");
+
+        let mut wordless = Vec::new();
+        receive_theory_sections("declared", 1, "... !\n", &mut wordless).expect("sections");
+        assert!(
+            wordless.is_empty(),
+            "a sentence with no word in it is not a sentence"
+        );
+    }
 }

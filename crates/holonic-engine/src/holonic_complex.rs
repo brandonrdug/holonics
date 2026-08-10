@@ -1006,14 +1006,14 @@ mod tests {
                 })
             })
             .collect();
-        ReceiverPhaseSectionOccurrence {
-            source_image: None,
-            source_lineage: lineage,
-            receiver: ReceiverId(lineage),
-            rays: rays(),
+        ReceiverPhaseSectionOccurrence::from_rgb(
+            None,
+            lineage,
+            ReceiverId(lineage),
+            rays(),
             extent,
             samples,
-        }
+        )
     }
 
     #[test]

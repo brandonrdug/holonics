@@ -28,17 +28,17 @@ use holonic_engine::{
     CausalBodyRadiation, CausalBodyStanding, CausalCellId, CausalCellReference, CausalOpeningState,
     CausalWorld, ComparativeMultiplicity, CoupledInformantEvent, CoupledInformantGrade,
     CoupledInformantLaw, CoupledInformantPrediction, CoupledInformantRelationState,
-    CoupledInformantStanding, CoupledInformantWork, CoupledPhaseBranch, CoupledRelationOrigin,
-    CpuExecutionError, CpuExecutionReceipt, CpuExecutor, EventBoundaryTerm, EventCellId, EventId,
-    ExactCausalBodyLaw, ExactCoordinateInterval, ExactInterval, ObservationEcologyEvent,
-    ObservationEcologyLaw, ObservationEcologyStanding, ObservationEcologyWork,
-    OpaqueThermalChordDoctrine, ReceiverAffineChart, ReceiverBatch, ReceiverChartId,
-    ReceiverCoordinateFamily, ReceiverCoordinateFamilyId, ReceiverGradeId, ReceiverLineageId,
-    ReceiverRelationGrade, ReceiverRelationPrediction, ReceiverRelationState, ReceiverTestimony,
-    ReceiverTestimonyId, ReturnedAlgorithmId, ReturnedCellCoverage, ReturnedCellId,
-    ReturnedReceiverCell, ReturnedReceiverPartition, SpectralAddressStatus, SpectralBandId,
-    SpectralContactTemporality, SpectralReceiverContact, SpectralReceiverOccurrence,
-    SpectralScanId, TransitionReceipt, VerticalFiberSupport,
+    CoupledInformantStanding, CoupledInformantWork, CoupledPhaseBranch, CoupledPhaseChart,
+    CoupledRelationOrigin, CpuExecutionError, CpuExecutionReceipt, CpuExecutor, EventBoundaryTerm,
+    EventCellId, EventId, ExactCausalBodyLaw, ExactCoordinateInterval, ExactInterval,
+    ObservationEcologyEvent, ObservationEcologyLaw, ObservationEcologyStanding,
+    ObservationEcologyWork, OpaqueThermalChordDoctrine, ReceiverAffineChart, ReceiverBatch,
+    ReceiverChartId, ReceiverCoordinateFamily, ReceiverCoordinateFamilyId, ReceiverGradeId,
+    ReceiverLineageId, ReceiverRelationGrade, ReceiverRelationPrediction, ReceiverRelationState,
+    ReceiverTestimony, ReceiverTestimonyId, ReturnedAlgorithmId, ReturnedCellCoverage,
+    ReturnedCellId, ReturnedReceiverCell, ReturnedReceiverPartition, SpectralAddressStatus,
+    SpectralBandId, SpectralContactTemporality, SpectralReceiverContact,
+    SpectralReceiverOccurrence, SpectralScanId, TransitionReceipt, VerticalFiberSupport,
 };
 use life::coupled_informant_current::CoupledInformantCurrentAdapter;
 use life::exact_world::ExactWorldOrgan;
@@ -67,6 +67,33 @@ const GLM_GROUP_ALGORITHM: ReturnedAlgorithmId = ReturnedAlgorithmId(0x0047_4c4d
 const GLM_RECEIVER: ReceiverId = ReceiverId(16);
 const ABI_RECEIVER: ReceiverId = ReceiverId(19);
 const IGRA_RECEIVER: ReceiverId = ReceiverId(20);
+
+/// **This experiment's** declared material shape, which used to live in the library that reads
+/// experiments as `holonic_engine::COUPLED_SPECTRAL_BANDS` and `COUPLED_PHASE_EXTENT`.
+/// `canon/THE_AUTHORED_LEVEL.md` §5.1 named that defect exactly: *"the RELAMPAGO fixture's
+/// coordinate count — one experiment's material fixed into the organ that reads it."* It is
+/// declared here, by the driver that actually has this material, and the engine now has neither.
+const ABI_BANDS: [SpectralBandId; 5] = [
+    SpectralBandId(8),
+    SpectralBandId(9),
+    SpectralBandId(10),
+    SpectralBandId(11),
+    SpectralBandId(13),
+];
+/// The opaque thermal band every spectral chord is taken against. It is also the resolution's own
+/// `OpaqueThermalChordDoctrine::thermal_band`, which is where `CoupledPhaseChart::from_resolution`
+/// reads it from when a caller derives the chart off the material instead of declaring it.
+const ABI_THERMAL_BAND: SpectralBandId = SpectralBandId(13);
+/// GLM's optical difference arity: latitude, longitude, clock, radiant energy — the four exact
+/// scalars `load_glm_product` reads out of the native chart at `coordinates[0..4]`.
+const GLM_OPTICAL_ARITY: usize = 4;
+
+/// The comparison membrane this run declares. `4 + 5 + 4 + 5 = 18` coordinates, which is the number
+/// the engine used to carry as a constant.
+fn coupled_chart() -> CoupledPhaseChart {
+    CoupledPhaseChart::new(GLM_OPTICAL_ARITY, ABI_BANDS.to_vec(), ABI_THERMAL_BAND)
+        .expect("the declared RELAMPAGO chart is well formed")
+}
 
 const DEFAULT_MANIFEST: &str = concat!(
     env!("CARGO_MANIFEST_DIR"),
@@ -449,7 +476,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let abi_elapsed = abi_started.elapsed();
     let profile = load_igra_profile(&igra)?;
     let doctrine = OpaqueThermalChordDoctrine {
-        thermal_band: SpectralBandId(13),
+        thermal_band: ABI_THERMAL_BAND,
         specific_gas_constant: Rat::new(BigInt::from(28_705), BigInt::from(100)),
         logarithm_terms: 24,
     };
@@ -465,7 +492,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut coupled_world = ExactWorldOrgan::new(
         CausalWorld::new(
             CoupledInformantLaw::multicore(workers),
-            CoupledInformantStanding::default(),
+            CoupledInformantStanding::new(coupled_chart()),
         ),
         CoupledInformantCurrentAdapter::new(),
     );
@@ -487,7 +514,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut coupled_event = 1_u64;
     let mut unconditioned_control_world = CausalWorld::new(
         CoupledInformantLaw::multicore(workers),
-        CoupledInformantStanding::default(),
+        CoupledInformantStanding::new(coupled_chart()),
     );
     let mut unconditioned_control_event = 1_u64;
     let mut prior_optical_grade: Option<ReceiverGradeId> = None;
@@ -1402,13 +1429,7 @@ fn load_abi_contacts(
     occurrences: &[ReceivedOccurrence],
     workers: NonZeroUsize,
 ) -> Result<BTreeMap<ReceiverTestimonyId, Vec<SpectralReceiverContact>>, Box<dyn Error>> {
-    let requested_bands = BTreeSet::from([
-        SpectralBandId(8),
-        SpectralBandId(9),
-        SpectralBandId(10),
-        SpectralBandId(11),
-        SpectralBandId(13),
-    ]);
+    let requested_bands = ABI_BANDS.into_iter().collect::<BTreeSet<_>>();
     let mut scans = BTreeMap::<String, Vec<AbiBandRequest>>::new();
     for entry in fs::read_dir(directory)? {
         let path = entry?.path();
@@ -2412,7 +2433,11 @@ fn write_causal_body_research(
         "typed_phase_relation_sections\t{}",
         research.relation_sections.len()
     )?;
-    writeln!(audit, "phase_coordinates_per_relation\t18")?;
+    writeln!(
+        audit,
+        "phase_coordinates_per_relation\t{}",
+        coupled_chart().extent()
+    )?;
     writeln!(audit, "open_boundary_fibers\t{open_boundaries}")?;
     writeln!(audit, "filled_boundary_fibers\t{filled_boundaries}")?;
     writeln!(
@@ -2485,7 +2510,8 @@ fn write_coupled_relations(
         writer,
         "left_testimony\tright_testimony\treturned_relation\torigin\tbase_state\tcoupled_state\tbranch\tleft_scan\tright_scan\tleft_vertical_fiber\tright_vertical_fiber\tbranch_state"
     )?;
-    for coordinate in 0..holonic_engine::COUPLED_PHASE_EXTENT {
+    let phase_extent = prediction.morphology_before.chart.extent();
+    for coordinate in 0..phase_extent {
         write!(writer, "\tphase_{coordinate:02}")?;
     }
     writeln!(writer)?;
@@ -2510,7 +2536,7 @@ fn write_coupled_relations(
                 relation.base_state,
                 relation.state,
             )?;
-            for _ in 0..holonic_engine::COUPLED_PHASE_EXTENT {
+            for _ in 0..phase_extent {
                 write!(writer, "\t")?;
             }
             writeln!(writer)?;

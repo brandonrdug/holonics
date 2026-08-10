@@ -94,6 +94,17 @@
 //!    a typed refusal, and *not* a leak: no retained hinge touches a rim vertex, so
 //!    [`CurvatureAperture::porous_vertices`] is empty and `read` conducts.
 //!
+//! **The extent of every one of those links is computed rather than remembered**, and that is a
+//! correction. Until 2026-08-09 the `3 n_v` above was an authored `SCAFFOLD_LINK_FOLD: usize = 3`
+//! checked at the derivation's own sites and nowhere else, so the `2|E|` rim vertices the
+//! realization adds carried no extent check at all — only the classification that their link is a
+//! cycle. [`ScaffoldLink`] is the law the construction actually forces, computed from the darts and
+//! the walks **before any face is founded**, and on the rim it is not three: `span + 1` once per
+//! walk, `4` twice, `5` on the rest. [`DerivationCurvatureBody::link_law`] conducts it against
+//! `local_star`'s face-derived link at every realized vertex, and
+//! [`ScaffoldLinkLaw::is_non_constant`] is where a law that had collapsed back to one number would
+//! have to say so.
+//!
 //! The narrowing is the documented lifecycle `HingeWorldStanding` states for its own complex
 //! (`simplicial.rs:826-828`) and the one `curvature_bridge`'s own fixtures use. It cannot be done at
 //! founding: `LocalStarLaw::face_fields` refuses a face boundary edge without a hinge, so every edge
@@ -193,19 +204,173 @@ use crate::discrete_curvature::{
 };
 use crate::{
     CpuExecutor, Edge, EventId, ExactEventLaw, HingeId, HingeTrajectory, HingeTransportNetwork,
-    HingeUnitSystem, HingeWorldLaw, LocalStarError, LocalStarEvent, LocalStarLaw, LocalStarMaterial,
-    LocalStarStanding, QuadraticHingeAction, SimplicialComplex, VertexId,
+    HingeUnitSystem, HingeWorldLaw, LocalCoordinationDefect, LocalStarError, LocalStarEvent,
+    LocalStarLaw, LocalStarMaterial, LocalStarStanding, QuadraticHingeAction, SimplicialComplex,
+    VertexId,
 };
 
-/// The exact ratio between the scaffold's face-derived coordination at a site and the derivation's
-/// own coordination there.
+/// What the scaffold construction forces one realized vertex's simplicial link to be, read off the
+/// **incidence and the ribbon graph's walks** and never off the faces the realization founded.
 ///
-/// Three, and it is derived rather than chosen: each corner of a site contributes two rim vertices
-/// to its link and each neighbour contributes itself, so a site of derivation coordination `n`
-/// links to `n` neighbours and `2n` rim vertices. It is stated as a constant because
-/// [`FrameAgreement`] checks it at every conducted site, and a realization that drifted from the
-/// construction would break the check rather than quietly return a different surface.
-pub const SCAFFOLD_LINK_FOLD: usize = 3;
+/// This replaces an authored `SCAFFOLD_LINK_FOLD: usize = 3` that stood here until 2026-08-09. The
+/// three was a theorem — but only about the derivation's own sites, and only ever checked there,
+/// which left the `2|E|` rim vertices the realization adds carrying no extent check at all. The law
+/// below covers the whole realization, and on the rim it is **not** three: it takes the value
+/// `span + 1` once per face walk, `4` twice, and `5` on the rest. A law that returned one number
+/// everywhere would be the constant wearing a function's clothes, and
+/// [`ScaffoldLinkLaw::extents`] is where it would say so.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum ScaffoldLink {
+    /// A site of the derivation, of degree `neighbours` in the layout.
+    ///
+    /// Its link carries each neighbour once — from the `T` face of the dart joining them — plus the
+    /// rim vertex of every dart **leaving** it, from the corner face at that dart, plus the rim
+    /// vertex of every dart **entering** it, from that dart's own `T` face. The layout refuses a
+    /// self-incidence and a parallel incidence, so an edge at a site contributes exactly one dart
+    /// out and one dart in, and rim vertices are one per dart and therefore all distinct:
+    ///
+    /// ```text
+    ///   extent = neighbours + out_darts + in_darts = 3 * degree
+    /// ```
+    ///
+    /// The threeness is the **return** of that count, not an input to it, and it holds whatever a
+    /// face walk does — including repeating a vertex — because no term of the sum reads a walk.
+    Site {
+        neighbours: usize,
+        out_darts: usize,
+        in_darts: usize,
+    },
+    /// A rim vertex the realization added, at `position` of a face walk of `span` darts.
+    ///
+    /// The rim is where the construction stops being uniform, which is why the excised constant
+    /// could not reach it. For `w_p` in a walk `(d_0 .. d_{span-1})` the faces meeting it are the
+    /// dart's own carry, the two corner faces at either end of the dart, and the rim fan
+    /// `[w_0, w_j, w_{j+1}]` for `j = 1 .. span-2`, which exists only for `span >= 3`:
+    ///
+    /// ```text
+    ///   span = 2                    3          the walk has no fan at all
+    ///   span >= 3,  p = 0           span + 1   w_0 is the fan's apex and meets every other rim
+    ///               p = 1, span-1   4          one fan each
+    ///               otherwise       5          two fans each
+    /// ```
+    ///
+    /// A walk of span one cannot occur: the face permutation sends `(u -> v)` to `(v -> rho_v(u))`,
+    /// which is a fixed point only when `u = v`, and a self-incidence is refused.
+    Rim { span: usize, position: usize },
+}
+
+impl ScaffoldLink {
+    /// How many vertices the construction puts in this vertex's link.
+    ///
+    /// Every number below is a **named count of a founded population**, never a remembered one. At
+    /// a rim vertex `w_p` the terms are: the dart's own two ends, which its carry face joins and
+    /// which a refused self-incidence keeps distinct; the rim vertices `w_{p-1}` and `w_{p+1}` the
+    /// two corner faces at either end of the dart bring in; and whatever the rim fan adds beyond
+    /// those.
+    pub const fn extent(&self) -> usize {
+        match self {
+            Self::Site {
+                neighbours,
+                out_darts,
+                in_darts,
+            } => *neighbours + *out_darts + *in_darts,
+            Self::Rim { span, position } => {
+                let dart_ends = 2;
+                let corner_rims = 2;
+                if *span < 3 {
+                    // A walk of span two founds no fan, and `w_{p-1}` and `w_{p+1}` are the same
+                    // vertex — the walk's only other dart — so the corners bring in one, not two.
+                    dart_ends + 1
+                } else if *position == 0 {
+                    // The apex of the fan. It meets every other rim vertex of its own walk, and
+                    // its two corner neighbours are already among them.
+                    dart_ends + (*span - 1)
+                } else if *position == 1 || *position + 1 == *span {
+                    // One fan, `[w_0, w_1, w_2]` or `[w_0, w_{span-2}, w_{span-1}]`, whose third
+                    // vertex is the apex `w_0` — which at these two positions **is** one of the
+                    // corner neighbours, so the fan adds nothing new.
+                    dart_ends + corner_rims
+                } else {
+                    // Two fans, `[w_0, w_{p-1}, w_p]` and `[w_0, w_p, w_{p+1}]`. Both bring the
+                    // apex, which here is neither corner neighbour, so it adds exactly one.
+                    dart_ends + corner_rims + 1
+                }
+            }
+        }
+    }
+
+    pub const fn is_site(&self) -> bool {
+        matches!(self, Self::Site { .. })
+    }
+}
+
+/// One realized vertex with what the incidence predicted and what the founded faces returned.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ScaffoldLinkPair {
+    pub vertex: VertexId,
+    pub name: String,
+    pub predicted: ScaffoldLink,
+    pub predicted_extent: usize,
+    /// `local_star`'s own face-derived link cardinality, verbatim.
+    pub realized_extent: usize,
+    /// Whether `local_star` classified the link as a cycle at all.
+    pub cycle: bool,
+}
+
+impl ScaffoldLinkPair {
+    pub fn agrees(&self) -> bool {
+        self.cycle && self.predicted_extent == self.realized_extent
+    }
+}
+
+/// The construction's own link law, conducted at **every** vertex of the realization.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ScaffoldLinkLaw {
+    pub schema: String,
+    /// Every realized vertex, in complex order.
+    pub pairs: Vec<ScaffoldLinkPair>,
+    /// The distinct predicted extents and how many vertices carry each. **A law whose orbit is one
+    /// value is a constant**, and this is where that is visible rather than argued.
+    pub extents: BTreeMap<usize, usize>,
+    /// Distinct extents among the derivation's own sites only — which is all the excised constant
+    /// ever covered.
+    pub site_extents: BTreeMap<usize, usize>,
+}
+
+impl ScaffoldLinkLaw {
+    /// Realized vertices where the founded faces did not return what the incidence predicted. Must
+    /// be empty.
+    pub fn disagreements(&self) -> Vec<&ScaffoldLinkPair> {
+        self.pairs.iter().filter(|pair| !pair.agrees()).collect()
+    }
+
+    /// The vertices the excised constant covered: the derivation's own sites.
+    pub fn sites(&self) -> Vec<&ScaffoldLinkPair> {
+        self.pairs
+            .iter()
+            .filter(|pair| pair.predicted.is_site())
+            .collect()
+    }
+
+    /// The vertices it did not: the rim the realization adds.
+    pub fn rim(&self) -> Vec<&ScaffoldLinkPair> {
+        self.pairs
+            .iter()
+            .filter(|pair| !pair.predicted.is_site())
+            .collect()
+    }
+
+    /// The law takes more than one value on this realization, so it is a law and not a constant.
+    pub fn is_non_constant(&self) -> bool {
+        self.extents.len() > 1
+    }
+
+    /// The whole realization agrees, and the law was not vacuous while agreeing.
+    pub fn acts_nontrivially_and_agrees(&self) -> bool {
+        self.is_non_constant() && self.disagreements().is_empty()
+    }
+}
 
 /// The exact scalar every hinge is founded spending along its own edge, unless a caller declares
 /// another.
@@ -650,6 +815,10 @@ pub struct FramePair {
     pub surface_deficit: Rat,
     /// Frame D: `DiscreteCurvatureConfiguration::at_unit_response` over the circuit's 1-cells.
     pub derivation_deficit: Rat,
+    /// What the incidence forced this site's scaffold link to be, computed before any face was
+    /// founded. [`FrameAgreement::fold_holds`] checks `scaffold_coordination` against its extent
+    /// instead of against a remembered multiplier.
+    pub predicted_link: ScaffoldLink,
 }
 
 impl FramePair {
@@ -693,12 +862,25 @@ impl FrameAgreement {
             .collect()
     }
 
-    /// The construction's own law: the scaffold link is exactly `SCAFFOLD_LINK_FOLD` times the
-    /// derivation's coordination at every conducted site.
+    /// The construction's own law at every conducted site: the scaffold link is what the incidence
+    /// forces — the site's neighbours, plus the rim vertex of every dart leaving it, plus the rim
+    /// vertex of every dart entering it. **Nothing here multiplies by a remembered number**; the
+    /// three that comes out is [`Self::folds`], a return.
     pub fn fold_holds(&self) -> bool {
-        self.pairs.iter().all(|pair| {
-            pair.scaffold_coordination == SCAFFOLD_LINK_FOLD * pair.derivation_coordination
-        })
+        self.pairs
+            .iter()
+            .all(|pair| pair.scaffold_coordination == pair.predicted_link.extent())
+    }
+
+    /// The folds the realization returned: `scaffold_coordination / derivation_coordination` at
+    /// every conducted site, as a population rather than as an assertion. On a layout the public
+    /// entry produced this is `{3}`, and it is three because the count came out three.
+    pub fn folds(&self) -> BTreeSet<usize> {
+        self.pairs
+            .iter()
+            .filter(|pair| pair.derivation_coordination > 0)
+            .map(|pair| pair.scaffold_coordination / pair.derivation_coordination)
+            .collect()
     }
 
     /// The gauge acted, and under it the deficits agree. Both halves, in that order.
@@ -827,6 +1009,9 @@ pub struct DerivationCurvatureBody {
     pristine: BTreeMap<HingeId, RatVec3>,
     /// Rim vertices: sites of the realization the derivation does not carry.
     rim: BTreeSet<VertexId>,
+    /// What the incidence and the walks force each realized vertex's link to be, computed before
+    /// any face was founded. See [`ScaffoldLink`].
+    predicted_link: BTreeMap<VertexId, ScaffoldLink>,
     face_walks: usize,
     target: Rat,
 }
@@ -883,6 +1068,36 @@ impl DerivationCurvatureBody {
             let founded = complex.found_vertex(name, founding);
             rim.insert(founded);
             rim_of_dart.push(founded);
+        }
+
+        // The construction's own link law, computed **here** — before a single face is founded —
+        // from the incidence, the dart population and the walks alone. `link_law` then conducts it
+        // against the link `local_star` reads off the faces, which is a disjoint frame on the same
+        // realization. Nothing below multiplies a coordination by a remembered number.
+        let mut out_darts: BTreeMap<VertexId, usize> =
+            layout.sites.keys().map(|site| (*site, 0)).collect();
+        let mut in_darts: BTreeMap<VertexId, usize> =
+            layout.sites.keys().map(|site| (*site, 0)).collect();
+        for (from, into) in &ribbon.darts {
+            *out_darts.entry(*from).or_default() += 1;
+            *in_darts.entry(*into).or_default() += 1;
+        }
+        let mut predicted_link: BTreeMap<VertexId, ScaffoldLink> = BTreeMap::new();
+        for site in layout.sites.values() {
+            predicted_link.insert(
+                site.vertex,
+                ScaffoldLink::Site {
+                    neighbours: ribbon.neighbours.get(&site.vertex).map_or(0, Vec::len),
+                    out_darts: out_darts.get(&site.vertex).copied().unwrap_or(0),
+                    in_darts: in_darts.get(&site.vertex).copied().unwrap_or(0),
+                },
+            );
+        }
+        for walk in &walks {
+            let span = walk.len();
+            for (position, dart) in walk.iter().enumerate() {
+                predicted_link.insert(rim_of_dart[*dart], ScaffoldLink::Rim { span, position });
+            }
         }
 
         // The scaffold faces.
@@ -1015,6 +1230,7 @@ impl DerivationCurvatureBody {
             standing,
             pristine,
             rim,
+            predicted_link,
             face_walks: walks.len(),
             target,
         })
@@ -1033,6 +1249,65 @@ impl DerivationCurvatureBody {
     /// The rim vertices the realization added. Every one of them is refused by the aperture.
     pub fn rim(&self) -> &BTreeSet<VertexId> {
         &self.rim
+    }
+
+    /// What the incidence forces each realized vertex's link to be, computed from the darts and the
+    /// walks before any face was founded.
+    pub fn predicted_link(&self) -> &BTreeMap<VertexId, ScaffoldLink> {
+        &self.predicted_link
+    }
+
+    /// **The construction's own law, conducted at every realized vertex.**
+    ///
+    /// This is what replaced `SCAFFOLD_LINK_FOLD: usize = 3`. That constant checked the derivation's
+    /// own sites, where the answer is three; it could not reach the `2|E|` rim vertices the
+    /// realization adds, where the answer is `span + 1`, `4` or `5` depending on where in a face
+    /// walk the dart sits. [`ScaffoldLinkLaw::extents`] returns the orbit, so a law that had
+    /// collapsed back to one number would say so instead of passing.
+    ///
+    /// The two sides are disjoint frames on one realization: the prediction reads the layout's
+    /// incidence, the dart population and the walks and never a face; the measurement is
+    /// `local_star`'s own `vertex_star_link` cardinality, read off the faces and never the layout.
+    pub fn link_law(&self) -> Result<ScaffoldLinkLaw, DerivationCurvatureRefusal> {
+        let defects = self.scaffold.coordination_defects()?;
+        let mut pairs = Vec::with_capacity(self.predicted_link.len());
+        let mut extents: BTreeMap<usize, usize> = BTreeMap::new();
+        let mut site_extents: BTreeMap<usize, usize> = BTreeMap::new();
+        for (vertex, predicted) in &self.predicted_link {
+            let (realized_extent, cycle) = match defects.get(vertex) {
+                Some(LocalCoordinationDefect::InteriorCycle { coordination, .. }) => {
+                    (*coordination, true)
+                }
+                Some(LocalCoordinationDefect::BoundaryPath { coordination })
+                | Some(LocalCoordinationDefect::Singular { coordination }) => (*coordination, false),
+                Some(LocalCoordinationDefect::Isolated) | None => (0, false),
+            };
+            let predicted_extent = predicted.extent();
+            *extents.entry(predicted_extent).or_default() += 1;
+            if predicted.is_site() {
+                *site_extents.entry(predicted_extent).or_default() += 1;
+            }
+            pairs.push(ScaffoldLinkPair {
+                vertex: *vertex,
+                name: self
+                    .scaffold
+                    .kinematic
+                    .complex
+                    .vertices
+                    .get(vertex)
+                    .map_or_else(|| format!("{vertex:?}"), |carried| carried.name.clone()),
+                predicted: *predicted,
+                predicted_extent,
+                realized_extent,
+                cycle,
+            });
+        }
+        Ok(ScaffoldLinkLaw {
+            schema: "holonic-engine.scaffold-link-law.v1".to_owned(),
+            pairs,
+            extents,
+            site_extents,
+        })
     }
 
     /// How many face walks the ribbon graph traced.
@@ -1102,6 +1377,7 @@ impl DerivationCurvatureBody {
                     derivation_coordination: conducted.incident_hinges,
                     surface_deficit: surface.get(&conducted.vertex).cloned()?,
                     derivation_deficit: derivation.get(&conducted.vertex).cloned()?,
+                    predicted_link: *self.predicted_link.get(&conducted.vertex)?,
                 })
             })
             .collect();
@@ -1614,19 +1890,127 @@ mod tests {
             .expect("the realization carries its links");
         for (vertex, defect) in &defects {
             match defect {
-                crate::LocalCoordinationDefect::InteriorCycle { coordination, .. } => {
-                    if let Some(site) = body.layout.site(*vertex) {
-                        assert_eq!(
-                            *coordination,
-                            SCAFFOLD_LINK_FOLD * body.layout.coordination(site.vertex),
-                            "{}",
-                            site.name
-                        );
-                    }
-                }
+                LocalCoordinationDefect::InteriorCycle { .. } => {}
                 other => panic!("{vertex:?} is {other:?}, not an interior cycle"),
             }
         }
+
+        // The extent of every link, against the law the incidence forced before a face existed.
+        let law = body.link_law().expect("the realization carries its links");
+        assert_eq!(law.pairs.len(), complex.vertices.len());
+        assert!(
+            law.disagreements().is_empty(),
+            "{:?}",
+            law.disagreements()
+                .iter()
+                .map(|pair| (
+                    pair.name.clone(),
+                    pair.predicted_extent,
+                    pair.realized_extent
+                ))
+                .collect::<Vec<_>>()
+        );
+        // The excised constant covered the sites, where the law returns three and nothing else.
+        assert_eq!(law.sites().len(), body.layout.sites().len());
+        assert_eq!(law.site_extents, BTreeMap::from([(6usize, 4usize)]));
+        for pair in law.sites() {
+            let coordination = body.layout.coordination(pair.vertex);
+            assert_eq!(pair.predicted_extent, 3 * coordination, "{}", pair.name);
+        }
+        // It did not cover the rim, where the law is not a multiple of anything the derivation
+        // carries. This population is the orbit the excised constant could not have had.
+        assert_eq!(law.rim().len(), darts);
+        assert!(
+            law.rim().iter().any(|pair| pair.predicted_extent != 6),
+            "the rim must not agree with the sites, or the law is a constant"
+        );
+        assert!(law.is_non_constant(), "{:?}", law.extents);
+        assert!(law.acts_nontrivially_and_agrees());
+    }
+
+    #[test]
+    fn the_link_law_takes_more_values_on_the_rim_than_the_excised_constant_could_reach() {
+        // The excised `SCAFFOLD_LINK_FOLD = 3` was checked at the derivation's own sites and
+        // nowhere else. Across the two fixtures the law returns five distinct extents; the site
+        // population returns two of them and the rim supplies the rest.
+        let mut whole: BTreeSet<usize> = BTreeSet::new();
+        let mut from_sites: BTreeSet<usize> = BTreeSet::new();
+        let mut rim_population = 0usize;
+        for circuit in [four_cycle(), star()] {
+            let body = DerivationCurvatureBody::found(&circuit).expect("realizes");
+            let law = body.link_law().expect("the links read");
+            assert!(law.disagreements().is_empty());
+            whole.extend(law.extents.keys().copied());
+            from_sites.extend(law.site_extents.keys().copied());
+            rim_population += law.rim().len();
+
+            // Every site extent is three times a coordination the layout carries — the theorem,
+            // returned rather than assumed.
+            for pair in law.sites() {
+                assert_eq!(
+                    pair.predicted_extent,
+                    3 * body.layout.coordination(pair.vertex)
+                );
+            }
+            // And every walk contributes exactly one apex, whose extent is its own span plus one.
+            let mut apexes = 0usize;
+            for pair in law.rim() {
+                if let ScaffoldLink::Rim { span, position } = pair.predicted {
+                    if span >= 3 && position == 0 {
+                        apexes += 1;
+                        assert_eq!(pair.predicted_extent, span + 1);
+                    }
+                }
+            }
+            assert!(apexes <= body.face_walks());
+        }
+        assert!(
+            from_sites.len() < whole.len(),
+            "sites {from_sites:?} against the whole realization {whole:?}"
+        );
+        assert!(rim_population > 0);
+        assert!(whole.is_superset(&from_sites));
+        // The star's centre has degree three and its leaves degree one; the four-cycle's sites all
+        // have degree two. Three site extents, and the rim adds what the constant could not see.
+        assert_eq!(from_sites, BTreeSet::from([3usize, 6, 9]));
+        assert_eq!(whole, BTreeSet::from([3usize, 4, 5, 6, 7, 9]));
+        // `4`, `5` and `7` occur nowhere in the site population, so they are extents no multiple of
+        // a derivation coordination could have produced.
+        assert_eq!(
+            whole.difference(&from_sites).copied().collect::<BTreeSet<_>>(),
+            BTreeSet::from([4usize, 5, 7])
+        );
+    }
+
+    #[test]
+    fn the_predicted_link_is_computed_without_the_founded_faces() {
+        // The falsifier for "the prediction is the measurement under another name". The prediction
+        // is a function of the layout's incidence alone, so two realizations of the SAME layout at
+        // different responses must carry byte-identical predictions while the standing they build
+        // differs — and a prediction that had read the standing would have to move with it.
+        let circuit = four_cycle();
+        let unit = DerivationCurvatureBody::found(&circuit).expect("realizes");
+        let raised =
+            DerivationCurvatureBody::found_at_response(&circuit, integer(3)).expect("realizes");
+        assert_eq!(unit.predicted_link(), raised.predicted_link());
+        assert_ne!(unit.target(), raised.target());
+        assert_ne!(
+            unit.reading().expect("conducts").deficits(),
+            raised.reading().expect("conducts").deficits()
+        );
+
+        // And the prediction is not derivable from the coordination alone at a rim vertex: the two
+        // fixtures put rim vertices of equal predicted extent in walks of different span.
+        let law = unit.link_law().expect("the links read");
+        let spans: BTreeSet<usize> = law
+            .rim()
+            .iter()
+            .filter_map(|pair| match pair.predicted {
+                ScaffoldLink::Rim { span, .. } => Some(span),
+                ScaffoldLink::Site { .. } => None,
+            })
+            .collect();
+        assert!(!spans.is_empty(), "the realization founds face walks");
     }
 
     #[test]
@@ -1984,6 +2368,13 @@ mod tests {
             derivation_coordination: derivation,
             surface_deficit: surface,
             derivation_deficit: derived,
+            // The construction's own prediction at a site of this coordination: one neighbour and
+            // two darts per incidence. `fold_holds` compares against this, not against a literal.
+            predicted_link: ScaffoldLink::Site {
+                neighbours: derivation,
+                out_darts: derivation,
+                in_darts: derivation,
+            },
         }
     }
 

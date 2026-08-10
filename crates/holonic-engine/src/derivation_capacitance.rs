@@ -102,6 +102,35 @@
 //! is `end` is skipped, and a `have` line is read only after `:=` — because a location taken on a
 //! line the atlas does not read would measure a distance the circuit does not carry.
 //!
+//! ## The horizon is the law's own fixed point, and it used to be a schedule
+//!
+//! A chronology horizon is a receiver coordinate, so where it comes from is the whole question.
+//! Until 2026-08-09 it came from an authored guess and an authored schedule: start at
+//! `site_count x longest_characteristic_delay`, **double**, and refuse after sixty-four doublings.
+//! Three things were wrong with that and each is checkable.
+//!
+//! - **The guess is not a bound.** `passage_delay = characteristic_delay + service_rounds - 1` and
+//!   `service_rounds` grows with the accumulated branch population, which is multiplicative along
+//!   converging routes. A ladder whose branch population doubles per rung arrives far beyond
+//!   `site_count x longest`, so the guess undershoots by an unbounded factor and the schedule
+//!   silently covers for it.
+//! - **The doubling quantized the return.** The reported horizon could only ever be
+//!   `guess x 2^k`, so two circuits whose true completion chronologies differ report the same
+//!   horizon. The field named as *"declared, because a horizon is a receiver coordinate"* was
+//!   reporting the schedule rather than the material.
+//! - **The refusal could not fire.** `saturating_mul(2)` from any positive start reaches
+//!   `u64::MAX` well inside sixty-four doublings, and at `u64::MAX` every reachable site returns
+//!   or the radiation errors on its own carrier extent. `HorizonExhausted` was dead code and the
+//!   `64` beside it decided nothing.
+//!
+//! What replaces it is stated at [`CapacitanceMapping::grow_to_fixed_point`] and carried in
+//! [`HorizonFixedPoint`]: the law deposits, as deferred testimony, the exact chronology at which
+//! every site it could not return would have arrived, so the growth reads its next horizon off the
+//! law instead of inventing one; the growth terminates because each step returns at least one
+//! further reachable site, which the circuit's own reachable population bounds; and the horizon
+//! finally reported is `max` over the reachable population of the arrival chronology the law
+//! returned — **conducted at, and conducted one below, so that being least is measured**.
+//!
 //! ## Where a reader would have to add a ranking, and why it is not here
 //!
 //! The return of [`CapacitanceMapping::read`] is a **population**: one row per identifier, carrying
@@ -149,13 +178,8 @@ use crate::derivation_atlas::{
 };
 use crate::receiver_current::{
     ExactReceiverCurrentError, ExactReceiverCurrentLaw, ExactReceiverCurrentPassage,
-    ReceiverCurrentPassageId, ReceiverCurrentSiteId,
+    ExactReceiverCurrentRadiation, ReceiverCurrentPassageId, ReceiverCurrentSiteId,
 };
-
-/// How many times the horizon may be doubled before the reading refuses. The horizon is grown
-/// until every site the circuit's own reachability says is reachable has returned; a circuit that
-/// never satisfies that is a refusal, never a silent truncation.
-const HORIZON_DOUBLINGS: u32 = 64;
 
 // ------------------------------------------------------------------ what a site's capacity is
 
@@ -275,14 +299,65 @@ impl DilationClasses {
     }
 }
 
+/// The chronology horizon the reading conducted at, with the two-sided certificate that it is the
+/// **transport law's own fixed point** rather than an arithmetic schedule's stopping place.
+///
+/// A horizon is a receiver coordinate and this is the whole of it. `least_sufficient` is the
+/// smallest chronology at which every site the circuit's own forward reachability names has
+/// returned; the reading refuses unless coverage is complete there and **strictly incomplete one
+/// chronology below**. Both halves are measured by conducting, not asserted.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct HorizonFixedPoint {
+    /// `max` over the reachable population of the arrival chronology the law returned. Below it the
+    /// site carrying that maximum is deferred by the law's own `arrival_chronology > horizon` gate,
+    /// so no smaller horizon covers the circuit.
+    pub least_sufficient: u64,
+    /// The circuit's own forward-reachable population — what a sufficient horizon must return.
+    pub reachable_sites: usize,
+    /// Sites returned at `least_sufficient`. Equal to `reachable_sites`, or the reading refuses.
+    pub returned_at_fixed_point: usize,
+    /// Sites returned one chronology below it. Strictly fewer, or the reading refuses. `None`
+    /// exactly when the fixed point is zero, which is the circuit whose reachable population is its
+    /// own terrain and which therefore departs and arrives at one chronology.
+    pub returned_one_below: Option<usize>,
+    /// Every horizon the growth passed through, in order, starting at zero. **Each entry after the
+    /// first is a chronology the transport law itself deposited** as deferred testimony; nothing
+    /// here invents one.
+    pub grown_through: Vec<u64>,
+    /// Sites returned at each entry of `grown_through`, in step. A growth that returned no further
+    /// site is a defect and the reading refuses rather than growing again.
+    pub returned_at: Vec<usize>,
+    /// The growth bound the **material** supplies. Every growth is required to return at least one
+    /// further reachable site and the terrain returns at chronology zero, so the reachable
+    /// population less one bounds the growths. Exceeding it is a broken theorem, never a budget.
+    pub growth_bound: usize,
+}
+
+impl HorizonFixedPoint {
+    /// Both halves of the certificate: complete at the fixed point, incomplete below it.
+    pub fn is_least(&self) -> bool {
+        self.returned_at_fixed_point == self.reachable_sites
+            && self
+                .returned_one_below
+                .is_none_or(|below| below < self.reachable_sites)
+    }
+
+    /// How many times the horizon was grown before the circuit returned whole.
+    pub fn growths(&self) -> usize {
+        self.grown_through.len().saturating_sub(1)
+    }
+}
+
 /// One radiation of the circuit, read back as a delay population.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct CapacitanceReading {
     pub capacity_law: CapacityLaw,
     pub delay_law: CharacteristicDelayLaw,
-    /// The chronology horizon the reading grew to. Declared, because a horizon is a receiver
-    /// coordinate.
+    /// The chronology horizon the reading conducted at: the transport law's own fixed point, which
+    /// is [`HorizonFixedPoint::least_sufficient`] and carries its certificate there.
     pub horizon: u64,
+    /// What derives that horizon, and the measurement that it is the least one.
+    pub horizon_fixed_point: HorizonFixedPoint,
     /// The sites the current departed from, in the deposit's own name order.
     pub terrain: BTreeSet<String>,
     /// One row per identifier, in name order. The order is lexicographic and carries no claim.
@@ -336,8 +411,39 @@ pub enum DerivationCapacitanceRefusal {
     KeyNotInCircuit(String),
     #[error("identifier {0} is not a site of this circuit")]
     UnknownIdentifier(String),
-    #[error("the horizon was doubled {HORIZON_DOUBLINGS} times and {unreturned} reachable sites still did not return")]
-    HorizonExhausted { unreturned: usize },
+    /// The law returned incomplete coverage and named no chronology at which the missing sites
+    /// would have arrived. A site is unreturned only because its arrival was deferred, and a
+    /// deferred arrival carries its chronology, so an empty testimony contradicts the law.
+    #[error("{unreturned} reachable sites did not return at horizon {horizon} and the law deposited no deferred chronology for any of them")]
+    UnreturnedSiteWithoutTestimony { unreturned: usize, horizon: u64 },
+    /// A growth returned no further site, or the growths exceeded the reachable population. Both
+    /// are the same broken theorem: the largest chronology the law deposited for an unreturned
+    /// reachable site is that site's own earliest arrival, so growing to it must return it.
+    #[error("growth {growths} from horizon {horizon} to {named} returned no further site; the reachable population is {reachable} and bounds the growths")]
+    HorizonGrowthReturnedNothing {
+        reachable: usize,
+        growths: usize,
+        horizon: u64,
+        named: u64,
+    },
+    /// Conducting at the computed fixed point did not return the circuit whole. The fixed point is
+    /// the largest arrival chronology the law itself returned, so this cannot happen unless the
+    /// radiation is not monotone in its horizon.
+    #[error("the fixed point {least_sufficient} returned {returned} of {reachable} reachable sites")]
+    HorizonFixedPointIsNotSufficient {
+        least_sufficient: u64,
+        returned: usize,
+        reachable: usize,
+    },
+    /// Conducting one chronology **below** the fixed point returned the circuit whole, so the
+    /// reported horizon is larger than the material requires. This is the falsifier for the claim
+    /// that the returned horizon is least, and it fires from the law rather than from a foil.
+    #[error("the whole reachable population of {reachable} returned at horizon {below}, one below the reported fixed point {least_sufficient}")]
+    HorizonFixedPointIsNotLeast {
+        least_sufficient: u64,
+        below: u64,
+        reachable: usize,
+    },
     #[error("{0}")]
     Current(#[from] ExactReceiverCurrentError),
 }
@@ -491,6 +597,47 @@ impl CapacitanceMapping {
     pub fn capacity(&self, identifier: &str) -> Option<BigUint> {
         let site = self.site_of.get(identifier)?;
         self.law.site(*site).map(|site| site.capacity.clone())
+    }
+
+    /// Every 0-cell of the circuit, whether or not the current reaches it.
+    pub fn site_count(&self) -> usize {
+        self.site_of.len()
+    }
+
+    /// The population the circuit's own forward walk reaches from its terrain. **This, and not the
+    /// site count, is what a horizon has to cover**, and it is what bounds the growths.
+    pub fn reachable_sites(&self) -> usize {
+        self.reachable.len()
+    }
+
+    /// The largest characteristic delay any founded passage carries. A receiver coordinate of the
+    /// delay law, returned so a caller declaring its own horizon can see the scale it is declaring
+    /// against.
+    pub fn longest_characteristic_delay(&self) -> u64 {
+        self.law
+            .passages()
+            .map(|passage| passage.characteristic_delay)
+            .max()
+            .unwrap_or(0)
+    }
+
+    /// The terrain, as the transport law addresses it.
+    fn source_sites(&self) -> LocalSet<ReceiverCurrentSiteId> {
+        self.terrain.iter().map(|name| self.site_of[name]).collect()
+    }
+
+    /// How many reachable sites return when the **caller** declares the horizon.
+    ///
+    /// This is the receiver-declared face of the same conduct [`Self::read`] performs at the law's
+    /// own fixed point. A caller that wants to know what a horizon of its own choosing costs asks
+    /// here and compares against [`Self::reachable_sites`]; nothing is truncated silently, because
+    /// what did not return is exactly what the difference names.
+    pub fn returned_at_horizon(&self, horizon: u64) -> Result<usize, DerivationCapacitanceRefusal> {
+        Ok(self
+            .law
+            .radiate_to_horizon(self.source_sites(), horizon)?
+            .returned_targets
+            .len())
     }
 
     /// Found the mapping.
@@ -729,35 +876,146 @@ impl CapacitanceMapping {
         Ok(Some((carried, returned)))
     }
 
-    /// Conduct the circuit and read the delay population back.
+    /// Grow the chronology horizon onto the transport law's own fixed point.
     ///
-    /// The horizon is **grown**, not chosen: it starts at one passage-delay per site and doubles
-    /// until every site the mapping's own forward walk says is reachable has returned. A circuit
-    /// that never satisfies that is refused rather than truncated.
-    pub fn read(&self) -> Result<CapacitanceReading, DerivationCapacitanceRefusal> {
-        let sources: LocalSet<ReceiverCurrentSiteId> =
-            self.terrain.iter().map(|name| self.site_of[name]).collect();
+    /// **Nothing here chooses a horizon and nothing doubles one.** The growth starts at zero, where
+    /// only the terrain departs, and every later horizon is a chronology the law itself deposited:
+    /// a reachable site fails to return only because its arrival crossed the
+    /// `arrival_chronology > horizon` gate, and that gate deposits the arrival — with its
+    /// chronology — as deferred testimony. Growing to the largest such chronology therefore returns
+    /// at least the unreturned site whose earliest arrival is smallest, because that site's
+    /// earliest-arrival predecessor has a strictly earlier arrival and so has already returned.
+    ///
+    /// Three properties of `receiver_current::radiate_to_horizon` make this a terminating law
+    /// rather than a budget, and each is a statement about that owner:
+    ///
+    /// ```text
+    ///   every passage delay is positive     characteristic_delay is refused at zero and
+    ///                                       passage_delay = characteristic_delay + rounds - 1
+    ///   so each site departs at most once   the schedule is popped in ascending chronology and a
+    ///                                       recorded arrival is replaced only by a strictly
+    ///                                       earlier one, which is impossible after the pop
+    ///   so the horizon is monotone          a larger horizon reproduces the smaller run exactly
+    ///                                       below it, since the horizon is read only at the two
+    ///                                       `> horizon` comparisons
+    /// ```
+    ///
+    /// Each growth returns at least one further reachable site, so the **material** bounds the
+    /// growths by its own forward-reachable population. Exceeding that bound is a broken theorem
+    /// and returns [`DerivationCapacitanceRefusal::HorizonGrowthReturnedNothing`]; it is not a
+    /// budget overrun and there is no schedule to blame it on.
+    ///
+    /// The horizon the growth stops at is then **contracted** onto the fixed point: the largest
+    /// arrival chronology the law returned over the reachable population. Both sides of that being
+    /// least are conducted rather than argued — complete at the fixed point, strictly incomplete
+    /// one chronology below it.
+    fn grow_to_fixed_point(
+        &self,
+        sources: &LocalSet<ReceiverCurrentSiteId>,
+    ) -> Result<(ExactReceiverCurrentRadiation, HorizonFixedPoint), DerivationCapacitanceRefusal>
+    {
+        let reachable = self.reachable.len();
+        let growth_bound = reachable.saturating_sub(1);
 
-        let longest = self
-            .law
-            .passages()
-            .map(|passage| passage.characteristic_delay)
-            .max()
-            .unwrap_or(1);
-        let mut horizon = (self.site_of.len() as u64).saturating_mul(longest).max(1);
-
+        let mut horizon = 0u64;
         let mut radiation = self.law.radiate_to_horizon(sources.clone(), horizon)?;
-        let mut doublings = 0u32;
-        while radiation.returned_targets.len() < self.reachable.len() {
-            if doublings >= HORIZON_DOUBLINGS {
-                return Err(DerivationCapacitanceRefusal::HorizonExhausted {
-                    unreturned: self.reachable.len() - radiation.returned_targets.len(),
+        let mut grown_through = vec![horizon];
+        let mut returned_at = vec![radiation.returned_targets.len()];
+
+        while radiation.returned_targets.len() < reachable {
+            let named = radiation
+                .deferred_arrivals
+                .iter()
+                .filter(|arrival| !radiation.returned_targets.contains(&arrival.site))
+                .map(|arrival| arrival.chronology)
+                .max();
+            let Some(named) = named else {
+                return Err(DerivationCapacitanceRefusal::UnreturnedSiteWithoutTestimony {
+                    unreturned: reachable - radiation.returned_targets.len(),
+                    horizon,
+                });
+            };
+            let grown = self.law.radiate_to_horizon(sources.clone(), named)?;
+            if named <= horizon
+                || grown.returned_targets.len() <= radiation.returned_targets.len()
+                || grown_through.len() > growth_bound
+            {
+                return Err(DerivationCapacitanceRefusal::HorizonGrowthReturnedNothing {
+                    reachable,
+                    growths: grown_through.len(),
+                    horizon,
+                    named,
                 });
             }
-            horizon = horizon.saturating_mul(2);
-            doublings += 1;
-            radiation = self.law.radiate_to_horizon(sources.clone(), horizon)?;
+            horizon = named;
+            radiation = grown;
+            grown_through.push(horizon);
+            returned_at.push(radiation.returned_targets.len());
         }
+
+        // The fixed point. Every reachable site's arrival chronology is what the law returned, and
+        // the largest of them is the least sufficient horizon exactly: one below it, the site
+        // carrying that maximum crosses the law's own deferral gate and cannot return.
+        let least_sufficient = self
+            .reachable
+            .iter()
+            .filter_map(|name| radiation.arrivals.get(&self.site_of[name]))
+            .map(|arrival| arrival.chronology)
+            .max()
+            .unwrap_or(0);
+
+        let at_fixed_point = self
+            .law
+            .radiate_to_horizon(sources.clone(), least_sufficient)?;
+        let returned_at_fixed_point = at_fixed_point.returned_targets.len();
+        if returned_at_fixed_point != reachable {
+            return Err(DerivationCapacitanceRefusal::HorizonFixedPointIsNotSufficient {
+                least_sufficient,
+                returned: returned_at_fixed_point,
+                reachable,
+            });
+        }
+
+        // The other side, conducted. A horizon law that reported a horizon larger than the material
+        // required would return the whole population here, and this is where it would be caught.
+        let returned_one_below = match least_sufficient.checked_sub(1) {
+            None => None,
+            Some(below) => {
+                let under = self.returned_at_horizon(below)?;
+                if under >= reachable {
+                    return Err(DerivationCapacitanceRefusal::HorizonFixedPointIsNotLeast {
+                        least_sufficient,
+                        below,
+                        reachable,
+                    });
+                }
+                Some(under)
+            }
+        };
+
+        Ok((
+            at_fixed_point,
+            HorizonFixedPoint {
+                least_sufficient,
+                reachable_sites: reachable,
+                returned_at_fixed_point,
+                returned_one_below,
+                grown_through,
+                returned_at,
+                growth_bound,
+            },
+        ))
+    }
+
+    /// Conduct the circuit and read the delay population back.
+    ///
+    /// The horizon is the transport law's own fixed point — see [`Self::grow_to_fixed_point`] —
+    /// and the reading carries the certificate that it is the least sufficient one.
+    pub fn read(&self) -> Result<CapacitanceReading, DerivationCapacitanceRefusal> {
+        let sources = self.source_sites();
+
+        let (radiation, horizon_fixed_point) = self.grow_to_fixed_point(&sources)?;
+        let horizon = horizon_fixed_point.least_sufficient;
 
         // Group the law's own passage receipts by the site that departed and the chronology it
         // departed at. Nothing is recomputed here; the receipts are the return.
@@ -827,6 +1085,7 @@ impl CapacitanceMapping {
             capacity_law: self.capacity_law,
             delay_law: self.delay_law,
             horizon,
+            horizon_fixed_point,
             terrain: self.terrain.clone(),
             sites,
             deferred,
@@ -881,6 +1140,91 @@ pub fn many_result_star(arms: usize) -> Vec<Derivation> {
             )
         })
         .collect()
+}
+
+/// A declared control whose **branch population doubles per rung**, so its completion chronology is
+/// exponential in the rung count while its site count is linear in it.
+///
+/// `base` terrain symbols are recruited by the first rung's two declarations; every later rung's
+/// two declarations recruit the previous rung's two. Every declaration proves the same result, so
+/// the result-receiver separates no onward head and every capacity is one.
+///
+/// Predicted completion chronology, stated from the construction before any material is read. The
+/// terrain departs at chronology zero into a fan-out of two, so rung one arrives at `2` carrying
+/// the whole terrain population; thereafter a rung's co-present demand is twice the population it
+/// carries and its capacity is one, so its whole demand becomes dilation:
+///
+/// ```text
+///   population(rung k) = base * 2^(k-1)
+///   arrival(rung 1)    = 2
+///   arrival(rung k)    = arrival(rung k-1) + 2 * population(rung k-1)
+///                      = 2 + base * (2^k - 2)          =  doubling_ladder_completion
+/// ```
+///
+/// over `base + 2*rungs` sites. **This is the falsifier for `site_count * longest_delay` as a
+/// horizon.** That product was the excised law's starting guess, and here it is smaller than the
+/// chronology the circuit actually needs by a factor that grows without bound in `rungs`.
+pub fn doubling_ladder(base: usize, rungs: usize) -> Vec<Derivation> {
+    let mut population = Vec::new();
+    for rung in 1..=rungs {
+        let recruited: Vec<String> = if rung == 1 {
+            (0..base).map(|at| format!("base{at}")).collect()
+        } else {
+            ['a', 'b']
+                .into_iter()
+                .map(|hand| format!("rung{}{hand}", rung - 1))
+                .collect()
+        };
+        let borrowed: Vec<&str> = recruited.iter().map(String::as_str).collect();
+        for hand in ['a', 'b'] {
+            population.push(control(
+                &format!("rung{rung}{hand}"),
+                "one result",
+                &borrowed,
+            ));
+        }
+    }
+    population
+}
+
+/// The chronology [`doubling_ladder`] is predicted to complete at, computed from the construction
+/// rather than from a reading: `2 + base*(2^rungs - 2)`.
+pub fn doubling_ladder_completion(base: u64, rungs: u32) -> u64 {
+    if rungs == 0 {
+        return 0;
+    }
+    2 + base * (2u64.pow(rungs) - 2)
+}
+
+/// The horizon the **excised** law would have reported: a guess of `site_count * longest_delay`,
+/// doubled until the circuit returns whole.
+///
+/// Carried here, in the module the schedule was cut from, so the difference it made can be
+/// conducted rather than remembered. It takes the coverage predicate as a closure, which is
+/// [`CapacitanceMapping::returned_at_horizon`] against
+/// [`CapacitanceMapping::reachable_sites`] at every call site.
+///
+/// Returns the horizon it stops at and the number of doublings it took, or `None` if sixty-four
+/// doublings did not suffice — which is the state the excised
+/// `HORIZON_DOUBLINGS = 64` refusal was written for and which **cannot occur**: from any positive
+/// guess, `saturating_mul(2)` reaches `u64::MAX` inside sixty-four steps.
+pub fn excised_doubling_schedule(
+    site_count: usize,
+    longest_characteristic_delay: u64,
+    mut covers: impl FnMut(u64) -> bool,
+) -> Option<(u64, u32)> {
+    let mut horizon = (site_count as u64)
+        .saturating_mul(longest_characteristic_delay)
+        .max(1);
+    let mut doublings = 0u32;
+    while !covers(horizon) {
+        if doublings >= 64 {
+            return None;
+        }
+        horizon = horizon.saturating_mul(2);
+        doublings += 1;
+    }
+    Some((horizon, doublings))
 }
 
 /// The null control: `arms` declarations with **no shared terrain** and distinct results.
@@ -1383,6 +1727,255 @@ mod tests {
                 .collect::<BTreeSet<_>>()
         );
         assert!(classes.unreached.is_empty());
+    }
+
+    // ------------------------------------------------------------ the horizon is the law's own
+
+    fn mapping_of(derivations: &[Derivation]) -> CapacitanceMapping {
+        let circuit = circuit_of(derivations, CircuitAperture::DEPOSITED_READER);
+        CapacitanceMapping::found(
+            &circuit,
+            derivations,
+            &[],
+            CapacityLaw::DistinguishableResults,
+            CharacteristicDelayLaw::Uniform,
+        )
+        .expect("the circuit founds")
+    }
+
+    #[test]
+    fn the_horizon_is_the_least_chronology_at_which_the_circuit_returns_whole() {
+        for derivations in [
+            one_result_star(9),
+            many_result_star(5),
+            disjoint_terrain(6),
+            doubling_ladder(2, 5),
+            doubling_ladder(4, 4),
+        ] {
+            let mapping = mapping_of(&derivations);
+            let reading = mapping.read().expect("the current conducts");
+            let fixed = &reading.horizon_fixed_point;
+
+            assert_eq!(reading.horizon, fixed.least_sufficient);
+            assert_eq!(fixed.returned_at_fixed_point, fixed.reachable_sites);
+            assert!(fixed.is_least(), "{fixed:?}");
+
+            // Both halves conducted rather than argued, through the caller-declared face.
+            assert_eq!(
+                mapping
+                    .returned_at_horizon(fixed.least_sufficient)
+                    .expect("conducts"),
+                fixed.reachable_sites
+            );
+            if let Some(below) = fixed.least_sufficient.checked_sub(1) {
+                let under = mapping.returned_at_horizon(below).expect("conducts");
+                assert_eq!(Some(under), fixed.returned_one_below);
+                assert!(
+                    under < fixed.reachable_sites,
+                    "horizon {} is not least: {under} of {} returned at {below}",
+                    fixed.least_sufficient,
+                    fixed.reachable_sites
+                );
+            } else {
+                assert_eq!(fixed.returned_one_below, None);
+            }
+
+            // And the horizon is exactly the largest arrival the reading itself carries, so nothing
+            // outside the returned population decides it.
+            let largest = reading
+                .sites
+                .iter()
+                .filter_map(|site| site.arrival_chronology)
+                .max()
+                .expect("the terrain arrives");
+            assert_eq!(reading.horizon, largest);
+        }
+    }
+
+    #[test]
+    fn every_grown_horizon_is_a_chronology_the_law_itself_deposited_and_each_returns_more() {
+        let derivations = doubling_ladder(3, 4);
+        let mapping = mapping_of(&derivations);
+        let reading = mapping.read().expect("the current conducts");
+        let fixed = &reading.horizon_fixed_point;
+
+        assert_eq!(fixed.grown_through.first(), Some(&0));
+        assert_eq!(fixed.grown_through.len(), fixed.returned_at.len());
+        assert!(
+            fixed.growths() >= 1,
+            "a ladder cannot return whole at horizon zero: {fixed:?}"
+        );
+        assert!(
+            fixed.growths() <= fixed.growth_bound,
+            "the material bounds the growths: {fixed:?}"
+        );
+        for pair in fixed.grown_through.windows(2) {
+            assert!(pair[1] > pair[0], "the growth is strict: {fixed:?}");
+        }
+        for pair in fixed.returned_at.windows(2) {
+            assert!(
+                pair[1] > pair[0],
+                "every growth returns at least one further site: {fixed:?}"
+            );
+        }
+        // Each grown horizon is a chronology at which some site actually arrives — that is what
+        // makes it the law's testimony rather than an invented number.
+        let arrivals: BTreeSet<u64> = reading
+            .sites
+            .iter()
+            .filter_map(|site| site.arrival_chronology)
+            .collect();
+        for grown in &fixed.grown_through {
+            assert!(
+                arrivals.contains(grown),
+                "horizon {grown} is not an arrival chronology of this circuit: {arrivals:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn the_ladder_arrives_exponentially_past_the_site_count_the_excised_guess_used() {
+        // The excised law started at `site_count * longest_characteristic_delay`. The ladder's site
+        // count is linear in its rungs and its completion chronology is exponential in them, so the
+        // guess undershoots by a factor that grows without bound.
+        let mut undershoot = Vec::new();
+        for rungs in 2usize..=7 {
+            let derivations = doubling_ladder(2, rungs);
+            let mapping = mapping_of(&derivations);
+            let reading = mapping.read().expect("the current conducts");
+
+            assert_eq!(
+                reading.horizon,
+                doubling_ladder_completion(2, rungs as u32),
+                "the construction predicted this chronology before the reading was taken"
+            );
+            assert_eq!(mapping.site_count(), 2 + 2 * rungs);
+            assert_eq!(mapping.longest_characteristic_delay(), 1);
+
+            let guess = (mapping.site_count() as u64) * mapping.longest_characteristic_delay();
+            // The crossover is measured rather than assumed: at two rungs the guess is exactly
+            // right, and from three rungs on it is short by a margin that doubles with the rung.
+            if rungs >= 3 {
+                assert!(
+                    guess < reading.horizon,
+                    "rungs={rungs}: guess {guess} did not undershoot {}",
+                    reading.horizon
+                );
+            }
+            undershoot.push(reading.horizon - guess);
+        }
+        assert_eq!(undershoot[0], 0, "two rungs is where the guess is exact");
+        assert!(
+            undershoot.windows(2).all(|pair| pair[1] > pair[0]),
+            "the undershoot must grow with the rung count: {undershoot:?}"
+        );
+        assert_eq!(undershoot, vec![0, 6, 20, 50, 112, 238]);
+    }
+
+    #[test]
+    fn two_circuits_the_excised_schedule_reported_alike_have_different_fixed_points() {
+        // One site count, one longest delay, so the excised law's starting guess and every doubling
+        // of it are identical. The two circuits complete at different chronologies and the schedule
+        // could not say so: it reports the band, and the band is a receiver coordinate of the
+        // schedule rather than of the material.
+        let left = doubling_ladder(2, 5);
+        let right = doubling_ladder(4, 4);
+
+        let left_mapping = mapping_of(&left);
+        let right_mapping = mapping_of(&right);
+        assert_eq!(left_mapping.site_count(), right_mapping.site_count());
+        assert_eq!(
+            left_mapping.longest_characteristic_delay(),
+            right_mapping.longest_characteristic_delay()
+        );
+
+        let schedule = |mapping: &CapacitanceMapping| {
+            excised_doubling_schedule(
+                mapping.site_count(),
+                mapping.longest_characteristic_delay(),
+                |horizon| {
+                    mapping.returned_at_horizon(horizon).expect("conducts")
+                        >= mapping.reachable_sites()
+                },
+            )
+            .expect("sixty-four doublings always suffice")
+        };
+
+        let left_reported = schedule(&left_mapping);
+        let right_reported = schedule(&right_mapping);
+        assert_eq!(
+            left_reported.0, right_reported.0,
+            "the two circuits must be indistinguishable to the excised schedule"
+        );
+
+        let left_fixed = left_mapping.read().expect("conducts").horizon;
+        let right_fixed = right_mapping.read().expect("conducts").horizon;
+        assert_ne!(
+            left_fixed, right_fixed,
+            "the fixed point must separate what the schedule could not"
+        );
+        assert_eq!(left_fixed, doubling_ladder_completion(2, 5));
+        assert_eq!(right_fixed, doubling_ladder_completion(4, 4));
+        assert!(left_reported.0 > left_fixed && left_reported.0 > right_fixed);
+    }
+
+    #[test]
+    fn the_excised_sixty_four_doubling_refusal_could_not_have_fired() {
+        // The refusal was written for a schedule that never covers. `saturating_mul(2)` from any
+        // positive guess reaches `u64::MAX` inside sixty-four steps, and at `u64::MAX` the horizon
+        // gates nothing, so the whole reachable population returns.
+        for guess in [1u64, 3, 22, 121, u64::MAX / 3] {
+            let mut horizon = guess;
+            for _ in 0..64 {
+                horizon = horizon.saturating_mul(2);
+            }
+            assert_eq!(horizon, u64::MAX);
+        }
+        for derivations in [one_result_star(9), doubling_ladder(2, 6)] {
+            let mapping = mapping_of(&derivations);
+            assert_eq!(
+                mapping.returned_at_horizon(u64::MAX).expect("conducts"),
+                mapping.reachable_sites(),
+                "at the saturated horizon nothing can still be missing"
+            );
+            let (_, doublings) = excised_doubling_schedule(
+                mapping.site_count(),
+                mapping.longest_characteristic_delay(),
+                |horizon| {
+                    mapping.returned_at_horizon(horizon).expect("conducts")
+                        >= mapping.reachable_sites()
+                },
+            )
+            .expect("the schedule always covers");
+            assert!(doublings < 64, "{doublings} doublings");
+        }
+    }
+
+    #[test]
+    fn the_caller_declared_horizon_returns_less_than_the_fixed_point_does() {
+        // The control that can fail: a horizon below the fixed point must leave sites unreturned,
+        // and one at or above it must not. A `returned_at_horizon` that ignored its argument, or a
+        // fixed point that overstated the material, breaks this in opposite directions.
+        let derivations = doubling_ladder(2, 4);
+        let mapping = mapping_of(&derivations);
+        let fixed = mapping.read().expect("conducts").horizon;
+        let reachable = mapping.reachable_sites();
+
+        let mut returned: Vec<usize> = Vec::new();
+        for horizon in 0..=fixed {
+            returned.push(mapping.returned_at_horizon(horizon).expect("conducts"));
+        }
+        assert!(returned.windows(2).all(|pair| pair[1] >= pair[0]));
+        assert_eq!(*returned.last().expect("the fixed point"), reachable);
+        assert!(returned[..returned.len() - 1]
+            .iter()
+            .all(|carried| *carried < reachable));
+        assert_eq!(
+            mapping
+                .returned_at_horizon(fixed.saturating_mul(4))
+                .expect("conducts"),
+            reachable
+        );
     }
 
     #[test]

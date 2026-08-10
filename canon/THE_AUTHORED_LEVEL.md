@@ -83,12 +83,17 @@ rung up. Truth status `derived`; checkable by the organ at `k = 2, 3` today.
 ## 4. The population, 2026-08-09
 
 ```text
-  180 authored numeric levels in library code        170 after the first excision wave
-      ABI        149    wire discriminants, layout offsets, CUDA launch geometry, receiver addresses
-      APERTURE     4    declared, returns its outside, and names what would derive it
-      MATERIAL     3    a theorem; `why` names it
-      PIN         24    contaminants                  11 remain
+  180 authored numeric levels in library code   ->   162 after the excisions
+      ABI        149 -> 152   wire discriminants, layout offsets, launch geometry, receiver addresses
+      APERTURE     4 ->   4   declared, returns its outside, and names what would derive it
+      MATERIAL     3 ->   6   a theorem; `why` names it
+      PIN         24 ->   0   the population is closed
 ```
+
+**The pin population is empty as of 2026-08-09.** All twenty-four were excised in two waves, each
+graded by its orbit rather than by a passing suite. The registry is now a ratchet against the *next*
+one rather than a backlog, and §5.0 and §5.4 are what a later reader needs: the orbits that were
+measured, and the levels no census can see.
 
 **MATERIAL is three, and each names its theorem.** `FLAT_COORDINATION = 6` — six equilateral
 triangles tile `2π` exactly, and the angular defect is measured against it. `MAXIMUM_AVL_DEPTH = 128`
@@ -152,35 +157,15 @@ with **no `Default` impl** — a `Default` would reinstate the same number weari
 `DEFAULT_` in the third name was the defect naming itself: **a default is a level the organ picked
 because the caller was never asked.**
 
-### 5.3 Unread — five
+### 5.3 The five that were unread — read and disposed 2026-08-09
 
-`MODES` (`soma/body/src/geom.rs`), `FLOW_TEETH`, `POOL_TEETH`, `SWEEP_TEETH` (`soma/body/src/law.rs`),
-`BLOCK_LINES` (`soma/life/src/laboratory_language/repository.rs`). **Held as contaminants until read** — a level is a pin until someone shows it
-is a theorem, never the reverse. `FLOW_TEETH = 13` and `POOL_TEETH = 31` are both prime and may well
-be a coprimality theorem about gear periods, but saying so without reading `soma/body/src/law.rs`
-would be exactly the excusing this document exists to stop.
+`MODES`, `FLOW_TEETH`, `SWEEP_TEETH` are **ABI**: bit-field widths of one packed `u32`, with
+`13 = (u32::BITS − 6)/2` under the declared equal split, not gear periods — nothing is taken mod 13
+or mod 31. `POOL_TEETH` was a **PIN** and is excised: its mask aliased the top half of the grip space
+into the bottom, and at axis `2^16` **32,768 of 65,536 grips ground past `2^31`**, with `Cog::lit(0)`
+and `Cog::lit(32768)` handed the same slot. `BLOCK_LINES` was a **PIN** and is excised; the boundary
+is now read off the source's own delimiters.
 
-## 5.4 The levels the census cannot see, measured
-
-**A `const` is the easiest kind of level to spell and the least dangerous kind to hold.** Reading the
-five unread rows turned §7's caveat into a measured population: the levels that actually **truncate a
-return** in those files are not constants and carry no name at all.
-
-| site | the level | what it decides |
-|---|---|---|
-| `soma/body/src/geom.rs:50` | bare `while k < 64` in `fold` | `convolve` writes mode-counts at ranks `0..=126`; `fold` reads `0..=63`. **63 of 128 slots are written on every call and read by nothing.** `bond = fold ∘ convolve` is the geometric product, so this is where the product caps. |
-| `soma/body/src/geom.rs:29`, `:31` | two more bare `64` | the shape word's extent, written as a literal rather than `u64::BITS` |
-| `soma/life/.../repository.rs:443` | `if !(5..=96).contains(&words) { return Ok(()) }` | **silently drops** any theory sentence outside 5–96 alphanumeric tokens. Two authored levels deciding what enters the atlas at all. |
-| `crates/holonic-engine/src/arithmetic_monodromy.rs:1109` | `type Permutation5 = [u8; 5]` | the degree, as a type |
-
-Every one is a level by §1 — *a numeric bound that decides how far a construction goes, how much it
-admits, or how many it returns* — and none can be matched by a pattern over `const NAME: type = N;`.
-**Three of the four truncate a returned population, which is the species `CLAUDE.md` §9 forbids
-outright**, and they are less visible than the twenty-four registered pins rather than more.
-
-The reading in `canon/THE_CONTAMINANT_PROTOCOL.md` §3 step 2 is what finds these, and it says so:
-*"Fixed-size arrays, `.take(n)`, and `min`/`max` against a literal are levels; the declaration form is
-irrelevant."*
 
 ## 6. Grading an excision
 

@@ -38,10 +38,6 @@ use crate::current_world::{
 };
 use crate::exact_world::ExactCurrentAdapter;
 
-pub const COUPLED_INFORMANT_CURRENT_CHANNELS: usize = 8;
-pub const COUPLED_INFORMANT_CURRENT_IMAGE_WORDS: usize =
-    COUPLED_INFORMANT_CURRENT_CHANNELS * NATIVE_RELATION_ORGAN_WORDS;
-
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[repr(usize)]
 pub enum CoupledInformantCurrentChannel {
@@ -56,7 +52,14 @@ pub enum CoupledInformantCurrentChannel {
 }
 
 impl CoupledInformantCurrentChannel {
-    pub const ALL: [Self; COUPLED_INFORMANT_CURRENT_CHANNELS] = [
+    /// The declared organ faces of the coupled-informant law, in address order.
+    ///
+    /// This list is the declaration; the extent below is **read off it**. Until 2026-08-09 the
+    /// extent was written first, as `COUPLED_INFORMANT_CURRENT_CHANNELS: usize = 8`, and the list
+    /// was fitted to it — which left `organs[channel as usize]` reachable with an index this array
+    /// does not have, because nothing related the enumeration's discriminants to the array's
+    /// length. See `ORDERED` below for exactly how much of that is now closed and by what.
+    pub const ALL: &'static [Self] = &[
         Self::Optical,
         Self::Spectral,
         Self::Vertical,
@@ -67,10 +70,61 @@ impl CoupledInformantCurrentChannel {
         Self::Morphology,
     ];
 
+    /// This face's address in [`Self::ALL`], and its slot in the organ array.
+    ///
+    /// Written as an exhaustive `match` rather than `self as usize` **so that adding a face is a
+    /// compile error here**. That is the part of the guarantee the language can carry; see
+    /// `ORDERED` below for what it cannot.
+    pub const fn address(self) -> usize {
+        match self {
+            Self::Optical => 0,
+            Self::Spectral => 1,
+            Self::Vertical => 2,
+            Self::Chronology => 3,
+            Self::Prediction => 4,
+            Self::Returned => 5,
+            Self::Grade => 6,
+            Self::Morphology => 7,
+        }
+    }
+
     const fn action(self) -> i64 {
-        0x4355_5200 + self as i64 + 1
+        0x4355_5200 + self.address() as i64 + 1
     }
 }
+
+/// Every face in `ALL` indexes its own slot in the organ array, checked at compile time.
+///
+/// **Stated exactly, because the stronger claim is not available.** Rust cannot enumerate a type's
+/// variants in a `const`, so this does *not* prove `ALL` is total over
+/// [`CoupledInformantCurrentChannel`]. What closes the gap is elsewhere and in two other pieces:
+/// [`CoupledInformantCurrentChannel::address`] is an exhaustive `match`, so a new face fails to
+/// compile until it is given an address; and [`CoupledInformantCurrentAdapter::lineage`] reads the
+/// organ array with `get`, so a face that was given an address and left out of `ALL` returns
+/// `None` instead of panicking on an out-of-bounds slot.
+///
+/// Under the authored `8` none of the three held: `ALL: [Self; 8]` kept its length when a ninth
+/// variant was added, `self as usize` compiled silently for it, and `self.organs[channel as usize]`
+/// panicked at run time.
+const ORDERED: () = {
+    let mut address = 0;
+    while address < CoupledInformantCurrentChannel::ALL.len() {
+        assert!(
+            CoupledInformantCurrentChannel::ALL[address].address() == address,
+            "the coupled-informant face list is not in address order"
+        );
+        address += 1;
+    }
+};
+
+/// How many persistent receiver organs the coupled-informant current carries. A **reading** of
+/// [`CoupledInformantCurrentChannel::ALL`], not a number this module chose.
+pub const COUPLED_INFORMANT_CURRENT_CHANNELS: usize = {
+    let () = ORDERED;
+    CoupledInformantCurrentChannel::ALL.len()
+};
+pub const COUPLED_INFORMANT_CURRENT_IMAGE_WORDS: usize =
+    COUPLED_INFORMANT_CURRENT_CHANNELS * NATIVE_RELATION_ORGAN_WORDS;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct CoupledInformantCurrentAdapterImage {
@@ -137,23 +191,46 @@ impl CoupledInformantCurrentAdapter {
         image: CoupledInformantCurrentAdapterImage,
         machine: &LiveCurrentMachine,
     ) -> Result<Self, CoupledInformantCurrentError> {
-        let organs = image.organs;
+        // The organ population is the declared face list's, walked rather than unrolled: the eight
+        // hand-written indices this replaces were the same authored level wearing a different
+        // spelling, and a search for the constant could not have found them.
+        let mut organs = Vec::new();
+        organs
+            .try_reserve_exact(COUPLED_INFORMANT_CURRENT_CHANNELS)
+            .map_err(|_| CoupledInformantCurrentError::CarrierOverflow)?;
+        for image in image.organs {
+            organs.push(NativeRelationOrgan::recover(image, machine)?);
+        }
         Ok(Self {
-            organs: [
-                NativeRelationOrgan::recover(organs[0], machine)?,
-                NativeRelationOrgan::recover(organs[1], machine)?,
-                NativeRelationOrgan::recover(organs[2], machine)?,
-                NativeRelationOrgan::recover(organs[3], machine)?,
-                NativeRelationOrgan::recover(organs[4], machine)?,
-                NativeRelationOrgan::recover(organs[5], machine)?,
-                NativeRelationOrgan::recover(organs[6], machine)?,
-                NativeRelationOrgan::recover(organs[7], machine)?,
-            ],
+            organs: organs
+                .try_into()
+                .map_err(|_| CoupledInformantCurrentError::InvalidAdapterRest)?,
         })
     }
 
+    /// A face that carries no slot returns `None` rather than indexing past the organ array. This
+    /// is the run-time half of the guarantee `ORDERED` states; it used to be `self.organs[channel
+    /// as usize]`, which panics.
     pub fn lineage(&self, channel: CoupledInformantCurrentChannel) -> Option<CurrentLineage> {
-        self.organs[channel as usize].lineage()
+        self.organs
+            .get(channel.address())
+            .and_then(NativeRelationOrgan::lineage)
+    }
+
+    /// Borrow a named set of organ faces at once, addressed by face rather than by an unrolled
+    /// pattern over the whole array.
+    ///
+    /// The three call sites below used to read `[a, b, c, d, e, _, _, _] = &mut self.organs`,
+    /// which spells the organ population three more times in a shape no search for
+    /// `COUPLED_INFORMANT_CURRENT_CHANNELS` could find — `canon/THE_CONTAMINANT_PROTOCOL.md` §2.6,
+    /// *"the `const` is the pin's shadow, not its body."*
+    fn faces<const N: usize>(
+        &mut self,
+        channels: [CoupledInformantCurrentChannel; N],
+    ) -> Result<[&mut NativeRelationOrgan; N], CoupledInformantCurrentError> {
+        self.organs
+            .get_disjoint_mut(channels.map(CoupledInformantCurrentChannel::address))
+            .map_err(|_| CoupledInformantCurrentError::FaceAddressing)
     }
 
     fn present_generation(
@@ -243,8 +320,14 @@ impl CoupledInformantCurrentAdapter {
             channel_chart(CoupledInformantCurrentChannel::Chronology, &chronology)?;
         let prediction_chart =
             channel_chart(CoupledInformantCurrentChannel::Prediction, &prediction_face)?;
-        let [optical_organ, spectral_organ, vertical_organ, chronology_organ, prediction_organ, _, _, _] =
-            &mut self.organs;
+        let [optical_organ, spectral_organ, vertical_organ, chronology_organ, prediction_organ] =
+            self.faces([
+                CoupledInformantCurrentChannel::Optical,
+                CoupledInformantCurrentChannel::Spectral,
+                CoupledInformantCurrentChannel::Vertical,
+                CoupledInformantCurrentChannel::Chronology,
+                CoupledInformantCurrentChannel::Prediction,
+            ])?;
         let mut currents = [
             NativeEventCurrent::continuing_complex(
                 optical_organ,
@@ -347,7 +430,11 @@ impl CoupledInformantCurrentAdapter {
         let returned_chart =
             channel_chart(CoupledInformantCurrentChannel::Returned, &returned_face)?;
         let grade_chart = channel_chart(CoupledInformantCurrentChannel::Grade, &grade_face)?;
-        let [_, _, _, _, prediction_organ, returned_organ, grade_organ, _] = &mut self.organs;
+        let [prediction_organ, returned_organ, grade_organ] = self.faces([
+            CoupledInformantCurrentChannel::Prediction,
+            CoupledInformantCurrentChannel::Returned,
+            CoupledInformantCurrentChannel::Grade,
+        ])?;
         let mut currents = [
             NativeEventCurrent::continuing_complex(
                 prediction_organ,
@@ -420,7 +507,10 @@ impl CoupledInformantCurrentAdapter {
         let grade_chart = channel_chart(CoupledInformantCurrentChannel::Grade, &grade_face)?;
         let morphology_chart =
             channel_chart(CoupledInformantCurrentChannel::Morphology, &morphology_face)?;
-        let [_, _, _, _, _, _, grade_organ, morphology_organ] = &mut self.organs;
+        let [grade_organ, morphology_organ] = self.faces([
+            CoupledInformantCurrentChannel::Grade,
+            CoupledInformantCurrentChannel::Morphology,
+        ])?;
         let mut currents = [
             NativeEventCurrent::continuing_complex(
                 grade_organ,
@@ -512,6 +602,7 @@ pub enum CoupledInformantCurrentError {
     InvalidAdapterRest,
     NoncanonicalRelation,
     NoncanonicalAction,
+    FaceAddressing,
 }
 
 impl fmt::Display for CoupledInformantCurrentError {
@@ -556,6 +647,9 @@ impl fmt::Display for CoupledInformantCurrentError {
             Self::NoncanonicalAction => {
                 formatter.write_str("a coupled-informant current action is not canonical")
             }
+            Self::FaceAddressing => formatter.write_str(
+                "a coupled-informant organ face is not addressable in the declared face list",
+            ),
         }
     }
 }
@@ -622,14 +716,14 @@ mod tests {
         AtmosphericContactSelection, AtmosphericInverseResolution, AtmosphericInverseWork,
         AtmosphericLayerId, AtmosphericProfileId, AtmosphericReceiverBody, AtmosphericResolutionId,
         AtmosphericVerticalCoordinate, AtmosphericVerticalFiber, CausalWorld,
-        CoupledInformantEvent, CoupledInformantLaw, CoupledInformantStanding,
+        CoupledInformantEvent, CoupledInformantLaw, CoupledInformantStanding, CoupledPhaseChart,
         ExactDifferenceVector, ExactInterval, HydrostaticChordReceipt, LearnedPartitionRelation,
         OpaqueThermalChordDoctrine, PredictedReceiverRelation, ReceiverCoordinateFamilyId,
         ReceiverPredictionId, ReceiverRelationPrediction, ReceiverRelationState,
         ReceiverTestimonyId, ReturnedAlgorithmId, ReturnedCellCoverage, ReturnedCellId,
         ReturnedReceiverCell, ReturnedReceiverPartition, SpectralAddressStatus, SpectralBandId,
         SpectralContactTemporality, SpectralReceiverContact, SpectralReceiverOccurrence,
-        SpectralScanId, VerticalFiberSupport, COUPLED_SPECTRAL_BANDS,
+        SpectralScanId, VerticalFiberSupport,
     };
     use num_bigint::BigInt;
     use relational_geometry::{Rat, ReceiverId};
@@ -646,10 +740,32 @@ mod tests {
         Rat::from_integer(BigInt::from(value))
     }
 
-    fn contact(temperature_offset: i64) -> SpectralReceiverContact {
+    /// This fixture's own declared bands. They used to be `COUPLED_SPECTRAL_BANDS`, a library
+    /// constant holding the GOES-16 ABI list of the one experiment that reads it; a test fixture
+    /// declaring its own material is what replaces it.
+    const FIXTURE_BANDS: [SpectralBandId; 5] = [
+        SpectralBandId(8),
+        SpectralBandId(9),
+        SpectralBandId(10),
+        SpectralBandId(11),
+        SpectralBandId(13),
+    ];
+    const FIXTURE_THERMAL_BAND: SpectralBandId = SpectralBandId(13);
+
+    fn fixture_chart() -> CoupledPhaseChart {
+        chart_over(&FIXTURE_BANDS)
+    }
+
+    /// A chart over any declared band population, with the thermal band as the chord reference.
+    /// The extent is `4 + bands + (bands - 1) + 5`, so five bands give 18 and three give 14.
+    fn chart_over(bands: &[SpectralBandId]) -> CoupledPhaseChart {
+        CoupledPhaseChart::new(4, bands.to_vec(), FIXTURE_THERMAL_BAND).unwrap()
+    }
+
+    fn contact_over(temperature_offset: i64, bands: &[SpectralBandId]) -> SpectralReceiverContact {
         let mut quality = BTreeMap::new();
         let mut temperatures = BTreeMap::new();
-        for (offset, band) in COUPLED_SPECTRAL_BANDS.into_iter().enumerate() {
+        for (offset, band) in bands.iter().copied().enumerate() {
             quality.insert(band, 0);
             temperatures.insert(
                 band,
@@ -684,6 +800,10 @@ mod tests {
     }
 
     fn resolution() -> Arc<AtmosphericInverseResolution> {
+        resolution_over(&FIXTURE_BANDS)
+    }
+
+    fn resolution_over(bands: &[SpectralBandId]) -> Arc<AtmosphericInverseResolution> {
         let family = ReceiverCoordinateFamilyId(71);
         let algorithm = ReturnedAlgorithmId(73);
         let left = ReceiverTestimonyId(1);
@@ -723,7 +843,7 @@ mod tests {
                 longitude_degree: rat(0),
                 clock: rat(0),
                 radiant_energy: rat(0),
-                contacts: vec![contact(0)],
+                contacts: vec![contact_over(0, bands)],
             },
             SpectralReceiverOccurrence {
                 testimony: right,
@@ -732,7 +852,7 @@ mod tests {
                 longitude_degree: rat(2),
                 clock: rat(3),
                 radiant_energy: rat(4),
-                contacts: vec![contact(1)],
+                contacts: vec![contact_over(1, bands)],
             },
         ];
         let profile = AtmosphericProfileId(23);
@@ -783,7 +903,7 @@ mod tests {
             prediction_event: prediction.caused_by,
             source_prediction: prediction,
             doctrine: OpaqueThermalChordDoctrine {
-                thermal_band: SpectralBandId(13),
+                thermal_band: FIXTURE_THERMAL_BAND,
                 specific_gas_constant: rat(287),
                 logarithm_terms: 8,
             },
@@ -855,12 +975,12 @@ mod tests {
         };
         let mut direct = CausalWorld::new(
             CoupledInformantLaw::serial(),
-            CoupledInformantStanding::default(),
+            CoupledInformantStanding::new(fixture_chart()),
         );
         let mut organ = ExactWorldOrgan::new(
             CausalWorld::new(
                 CoupledInformantLaw::serial(),
-                CoupledInformantStanding::default(),
+                CoupledInformantStanding::new(fixture_chart()),
             ),
             CoupledInformantCurrentAdapter::new(),
         );
@@ -877,7 +997,7 @@ mod tests {
         assert_eq!(organ.world().next_ordinal(), 1);
         assert_eq!(
             organ.world().standing(),
-            &CoupledInformantStanding::default()
+            &CoupledInformantStanding::new(fixture_chart())
         );
         assert_eq!(
             [
@@ -993,7 +1113,7 @@ mod tests {
         let mut organ = ExactWorldOrgan::new(
             CausalWorld::new(
                 CoupledInformantLaw::serial(),
-                CoupledInformantStanding::default(),
+                CoupledInformantStanding::new(fixture_chart()),
             ),
             CoupledInformantCurrentAdapter::new(),
         );
@@ -1013,5 +1133,124 @@ mod tests {
             .unwrap();
         assert_eq!(current.currents().len(), 5);
         assert_eq!(current.relations().len(), 4);
+    }
+
+    /// THE DECLARED CONTROL for the `COUPLED_PHASE_EXTENT` excision, driven through the whole
+    /// exact/live-current organ rather than through the chart type alone.
+    ///
+    /// Three band populations, three extents, one law. Under the pinned organ the second and third
+    /// runs were not constructible: the extent was `18` by `const` and `CoupledPhaseVector::validate`
+    /// refused everything else, so an ABI receiver reading three bands or eight could not be
+    /// presented at all. Measured 2026-08-09:
+    ///
+    /// ```text
+    ///   bands   extent   branch phase coordinates
+    ///       1       10                         10
+    ///       3       14                         14
+    ///       5       18                         18      <- what the const used to say
+    ///       8       24                         24
+    /// ```
+    ///
+    /// The orbit is over the **returned** object, not only the declaration: `work.phase_extent`
+    /// and every `CoupledPhaseBranch::phase` move with it, and the standing refuses a vector of
+    /// any other extent.
+    #[test]
+    fn the_coupled_law_runs_at_an_extent_the_caller_declares() {
+        let populations: [&[SpectralBandId]; 4] = [
+            &[SpectralBandId(13)],
+            &[SpectralBandId(8), SpectralBandId(11), SpectralBandId(13)],
+            &FIXTURE_BANDS,
+            &[
+                SpectralBandId(7),
+                SpectralBandId(8),
+                SpectralBandId(9),
+                SpectralBandId(10),
+                SpectralBandId(11),
+                SpectralBandId(12),
+                SpectralBandId(13),
+                SpectralBandId(14),
+            ],
+        ];
+        let mut extents = Vec::new();
+        for bands in populations {
+            let chart = chart_over(bands);
+            let mut organ = ExactWorldOrgan::new(
+                CausalWorld::new(
+                    CoupledInformantLaw::serial(),
+                    CoupledInformantStanding::new(chart.clone()),
+                ),
+                CoupledInformantCurrentAdapter::new(),
+            );
+            let mut machine =
+                LiveCurrentMachine::new(SparseStandingSurface::empty_rank(8).unwrap());
+            organ.found(&mut machine).unwrap();
+            let mut host = HostLiveCurrentExecutor;
+            let (receipt, current) = organ
+                .receive_into(
+                    &CoupledInformantEvent::Generate {
+                        event: holonic_engine::EventId(1),
+                        chronology: 1,
+                        source_grade_precondition: None,
+                        resolution: resolution_over(bands),
+                    },
+                    &mut machine,
+                    &mut host,
+                )
+                .unwrap();
+
+            let work = &receipt.radiation[0].work;
+            assert_eq!(work.phase_extent as usize, chart.extent());
+            assert_eq!(work.spectral_bands as usize, bands.len());
+            assert_eq!(work.optical_arity, 4);
+            let prediction = receipt.radiation[0].prediction.as_deref().unwrap();
+            assert_eq!(prediction.morphology_before.chart, chart);
+            let branches = prediction
+                .relations
+                .iter()
+                .flat_map(|relation| &relation.branches)
+                .collect::<Vec<_>>();
+            assert!(!branches.is_empty(), "a live control");
+            for branch in branches {
+                assert_eq!(branch.phase.0.len(), chart.extent());
+            }
+            // The membrane crosses the same five organ faces at every extent: the phase face is
+            // the law's, the organ population is the adapter's, and they are separate levels.
+            assert_eq!(current.currents().len(), 5);
+            assert_eq!(current.relations().len(), 4);
+            organ.world().standing().validate().unwrap();
+            extents.push(chart.extent());
+        }
+        assert_eq!(
+            extents,
+            vec![10, 14, 18, 24],
+            "the orbit of the excised level"
+        );
+    }
+
+    /// The organ population is a **reading** of the declared face list, and every listed face
+    /// indexes its own slot.
+    ///
+    /// `COUPLED_INFORMANT_CURRENT_CHANNELS` used to be the authored `8` with `ALL` fitted to it, so
+    /// nothing tied the enumeration to the organ array's length: a ninth variant left `ALL: [_; 8]`
+    /// compiling, `self as usize` compiling, and `self.organs[channel as usize]` panicking. This is
+    /// the runtime witness for the three-part repair described at `ORDERED`. It does **not** assert
+    /// that `ALL` is total over the enumeration, because nothing in the language proves that.
+    #[test]
+    fn the_organ_population_is_read_off_the_declared_face_list() {
+        assert_eq!(
+            COUPLED_INFORMANT_CURRENT_CHANNELS,
+            CoupledInformantCurrentChannel::ALL.len()
+        );
+        for (address, channel) in CoupledInformantCurrentChannel::ALL.iter().enumerate() {
+            assert_eq!(channel.address(), address);
+        }
+        let adapter = CoupledInformantCurrentAdapter::new();
+        for channel in CoupledInformantCurrentChannel::ALL {
+            assert!(adapter.lineage(*channel).is_none());
+        }
+        assert_eq!(
+            COUPLED_INFORMANT_CURRENT_IMAGE_WORDS,
+            CoupledInformantCurrentChannel::ALL.len() * NATIVE_RELATION_ORGAN_WORDS
+        );
     }
 }

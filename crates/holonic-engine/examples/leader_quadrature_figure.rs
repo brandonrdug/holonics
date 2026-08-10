@@ -26,7 +26,7 @@ use std::path::PathBuf;
 
 use holonic_engine::leader_quadrature::{
     ExtensionKind, LeaderLaw, LeaderQuadrature, LocalJet, MaterialBoundary, RationalGerm,
-    RideDiscipline, germwise_oracle_area, integrate_by_leaders,
+    RideDiscipline, WitnessDepth, germwise_oracle_area, integrate_by_leaders,
 };
 use relational_geometry::{Rat, format_rat, integer, rat};
 
@@ -41,11 +41,15 @@ struct PathMesh {
 }
 
 /// One declared growth: which law a leader population grows under.
+///
+/// `grain: None` means *the grain the material declares for itself* —
+/// `MaterialBoundary::declared_grain`. `witness_depth` is likewise a declaration of **where the
+/// depth comes from**, not a number: `ReadOffTheJet` is the material's own answer at every tip.
 struct RunDeclaration {
     label: &'static str,
-    grain: Rat,
+    grain: Option<Rat>,
     discipline: RideDiscipline,
-    witness_depth: usize,
+    witness_depth: WitnessDepth,
     /// Whether this run is inside the module's declared aperture.
     inside_aperture: bool,
 }
@@ -174,24 +178,32 @@ fn main() -> Result<(), Box<dyn Error>> {
     let runs = vec![
         RunDeclaration {
             label: "grain-only",
-            grain: rat(1, 4),
+            grain: Some(rat(1, 4)),
             discipline: RideDiscipline::GrainOnly,
-            witness_depth: 1,
+            witness_depth: WitnessDepth::ReadOffTheJet,
             inside_aperture: true,
         },
         RunDeclaration {
             label: "germ-bounded",
-            grain: rat(1, 4),
+            grain: Some(rat(1, 4)),
             discipline: RideDiscipline::GermBounded,
-            witness_depth: 1,
+            witness_depth: WitnessDepth::ReadOffTheJet,
             inside_aperture: true,
         },
         RunDeclaration {
             label: "unclamped-ancestry",
-            grain: rat(1, 4),
+            grain: Some(rat(1, 4)),
             discipline: RideDiscipline::UnclampedAncestry,
-            witness_depth: 1,
+            witness_depth: WitnessDepth::ReadOffTheJet,
             inside_aperture: false,
+        },
+        // The material's own law: both levels off the material, nothing declared here at all.
+        RunDeclaration {
+            label: "material-declared",
+            grain: None,
+            discipline: RideDiscipline::GermBounded,
+            witness_depth: WitnessDepth::ReadOffTheJet,
+            inside_aperture: true,
         },
     ];
 
@@ -224,7 +236,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut summary_tsv = String::new();
     writeln!(
         summary_tsv,
-        "material\trun\tgrain\tdiscipline\twitness_depth\tinside_aperture\tspan\tjet_aperture\t\
+        "material\trun\tgrain\tdiscipline\twitness_depth\tmaterial_witness_depth\t\
+         inside_aperture\tspan\tjet_aperture\t\
          area\toracle_area\thand_figure\tarea_minus_oracle\textensions\tfound\trides\t\
          obstructions\trefused_rides\tscale_witnesses"
     )?;
@@ -233,7 +246,11 @@ fn main() -> Result<(), Box<dyn Error>> {
     for declaration in &materials {
         let oracle = germwise_oracle_area(&declaration.boundary);
         for run in &runs {
-            let law = LeaderLaw::new(run.grain.clone(), run.discipline, run.witness_depth);
+            let grain = run
+                .grain
+                .clone()
+                .unwrap_or_else(|| declaration.boundary.declared_grain());
+            let law = LeaderLaw::new(grain.clone(), run.discipline, run.witness_depth);
             let quadrature: LeaderQuadrature = integrate_by_leaders(&declaration.boundary, &law)?;
 
             for extension in &quadrature.extensions {
@@ -285,12 +302,13 @@ fn main() -> Result<(), Box<dyn Error>> {
             let disagreement = &quadrature.area - &oracle;
             writeln!(
                 summary_tsv,
-                "{}\t{}\t{}\t{:?}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}",
+                "{}\t{}\t{}\t{:?}\t{:?}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}",
                 declaration.label,
                 run.label,
-                format_rat(&run.grain),
+                format_rat(&grain),
                 run.discipline,
                 run.witness_depth,
+                quadrature.material_witness_depth,
                 run.inside_aperture,
                 format_rat(declaration.boundary.span()),
                 quadrature.jet_aperture,
@@ -308,10 +326,12 @@ fn main() -> Result<(), Box<dyn Error>> {
 
             writeln!(
                 console,
-                "{:<20} {:<20} area {:<10} oracle {:<10} hand {:<10} delta {:<8} ext {:<4} \
-                 found {:<4} ride {:<3} obstr {:<3} refused {:<3} witness {}",
+                "{:<20} {:<20} grain {:<7} depth {:<3} area {:<10} oracle {:<10} hand {:<10} \
+                 delta {:<8} ext {:<4} found {:<4} ride {:<3} obstr {:<3} refused {:<3} witness {}",
                 declaration.label,
                 run.label,
+                format_rat(&grain),
+                quadrature.material_witness_depth,
                 format_rat(&quadrature.area),
                 format_rat(&oracle),
                 format_rat(&declaration.hand_figure),

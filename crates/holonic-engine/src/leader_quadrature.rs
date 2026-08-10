@@ -77,8 +77,9 @@
 //! asserted.
 //!
 //! > **Law (self-similarity termination).** Founding stops on a standing germ when the axis founded
-//! > by the extensions already taken has predicted the material exactly for
-//! > [`LeaderLaw::witness_depth`] consecutive extensions. At that tip the founded jet `j` and its
+//! > by the extensions already taken has predicted the material exactly for as many consecutive
+//! > extensions as the material required — [`LocalJet::rebase_movement_depth`], the order at which
+//! > the exact Taylor rebase stops being able to contribute a difference. At that tip the founded jet `j` and its
 //! > founded primitive `J(s) = Σ_i j_i · s^(i+1)/(i+1)` constitute an **axis the founded area
 //! > scales along**: for every rational scale `λ ≥ 1` with `λ·grain` inside the germ's standing
 //! > reach, the content swept by one extension of span `λ·grain` is exactly `J(λ·grain)`, with no
@@ -100,6 +101,29 @@
 //! Note the standing-law reading this obeys, from the deposited record: *"Self-similarity is
 //! restriction and lawful rebase, never return to an identical Place."* Nothing here looks for a
 //! repeating shape. The axis carries because the rebase carries the same phase law.
+//!
+//! ## The witness depth is read off the material, and one is a special case rather than a default
+//!
+//! Ruling 2 above already bans the instantaneous return, and it is the same ban one level down: a
+//! limit is not something a single comparison can certify, and the depth at which a limit *has*
+//! been reached is the depth at which the mechanism transforming the information during transport
+//! stops being able to contribute a difference. `canon/THE_AUTHORED_LEVEL.md` §5.1 names the
+//! excision this module owes on exactly that reading — *"what the material stopped the leader at …
+//! **A leader whose witness depth is one takes a single step; that is not a leader.**"*
+//!
+//! The mechanism that transforms information during transport, here, is the exact Taylor rebase.
+//! [`LocalJet::rebase_movement_depth`] is the order at which it can no longer contribute a
+//! difference — the rank of the jet, by the finite-difference theorem stated there — and that is
+//! the witness depth, **returned by the growth rather than declared into it**
+//! ([`WitnessDepth::ReadOffTheJet`], carried out on every [`Extension`] as
+//! `material_witness_depth`).
+//!
+//! A depth of one is not wrong everywhere; it is exactly right on a **constant** jet, where the
+//! rebase of a constant is itself and one agreement is the complete measurement. It is wrong on
+//! every jet of rank two or more, where the leader is still reading a moving jet when the gate
+//! declares the limit reached. Authored as a constant it could not tell those two cases apart, and
+//! it was authored as a constant: `derivation_integral.rs:135`, `LEADER_WITNESS_DEPTH: usize = 1`,
+//! excised 2026-08-09 for `canon/THE_AUTHORED_LEVEL.md` §5.1.
 //!
 //! **Exact scope of the agreement gate.** Measured, not assumed: replacing the jet-agreement
 //! decision with a constant `true` leaves every returned area exact under
@@ -174,6 +198,16 @@ pub enum LeaderError {
     GrainNotPositive,
     #[error("a witness depth of zero would ride before any axis was founded")]
     WitnessDepthZero,
+    #[error(
+        "at offset {offset} the material carries a jet of rank {required}, so the rebase is still \
+         contributing a difference after {declared} agreement(s); a declared witness depth of \
+         {declared} would certify a limit the jet had not reached"
+    )]
+    WitnessDepthBelowMaterial {
+        offset: Rat,
+        declared: usize,
+        required: usize,
+    },
     #[error("a material boundary must carry at least one standing germ")]
     EmptyMaterial,
     #[error("a standing germ must conduct over a strictly positive extent")]
@@ -194,6 +228,21 @@ fn rat_min<'a>(left: &'a Rat, right: &'a Rat) -> &'a Rat {
         right
     }
 }
+
+/// The least integer strictly greater than one.
+///
+/// This is not a preference and it is not a tuning knob. [`MaterialBoundary::declared_grain`]
+/// carries the derivation: the condition for a RIDE to exist at all — `g < E/(d+1)` — is **open**,
+/// so it names an interval and no coarsest member. The scale of the ride that grain produces is
+/// `E/g − d`, and the admissible grains are exactly those whose scale exceeds one. Taking the
+/// coarsest grain whose scale is a whole number of grains selects the least integer above one, and
+/// `2 = 1 + 1` is that integer by arithmetic. It appears in the grain as `d + 2` and nowhere else.
+///
+/// `the_declared_grain_rides_by_at_least_one_rank_step` measures the consequence: at a material's
+/// own declared grain every ride carries at least two grains — `CLAUDE.md` §2b's octave, one rank
+/// step of magnitude — the bound is attained where the finest extent and the largest rank meet, and
+/// one step coarser that germ stops riding altogether.
+const LEAST_INTEGER_RIDE_SCALE: usize = 2;
 
 // ---------------------------------------------------------------------------------------------
 // the material boundary
@@ -250,6 +299,36 @@ impl LocalJet {
     /// The jet's rank: one more than its degree, and the aperture it declares.
     pub fn rank(&self) -> usize {
         self.coefficients.len()
+    }
+
+    /// **How many consecutive extensions the rebase can still contribute a difference over.**
+    ///
+    /// This is the quantity a witness depth wants, read off the material rather than declared.
+    ///
+    /// > **Theorem.** Let `j` have rank `m` after normalization, and let a leader inside this germ
+    /// > stand at accumulated offsets `σ_0 = 0, σ_1, σ_2, …`. Coefficient `t` of `j.rebase(σ)` is
+    /// > `Σ_{i≥t} C(i,t)·c_i·σ^(i−t)`, a polynomial in `σ` of degree exactly `m−1−t` when
+    /// > `c_{m−1} ≠ 0`. On any arithmetic progression of offsets — which is what a constant grain
+    /// > produces — the `k`-th forward difference of a degree-`n` polynomial vanishes identically
+    /// > for `k > n` and not for `k = n`. So the sequence of rebased jets is annihilated by `Δ^m`
+    /// > and by no lower order: **`m` is exactly the order at which the transport stops being able
+    /// > to contribute a difference.**
+    ///
+    /// Two readings follow, and they are the whole content of this method:
+    ///
+    /// - `m = 1` — a constant jet. The rebase of a constant is itself, so **one** agreement is the
+    ///   complete measurement and nothing further can be learned by extending. This is the one case
+    ///   where a depth of one is honest, and it is the case
+    ///   [`crate::derivation_integral`]'s route material is in.
+    /// - `m ≥ 2` — the jet is still moving after one agreement. A depth of one certifies a limit
+    ///   the material has not reached: it reads a single comparison as though it were an
+    ///   instantaneous measurement.
+    ///
+    /// `the_jet_stops_moving_at_its_own_rank` computes the annihilating difference order directly
+    /// from the rebased sequence and requires it to equal this, and requires order `m−1` **not** to
+    /// annihilate, so the theorem is measured rather than asserted.
+    pub fn rebase_movement_depth(&self) -> usize {
+        self.rank()
     }
 
     pub fn value_at(&self, argument: &Rat) -> Rat {
@@ -422,6 +501,71 @@ impl MaterialBoundary {
             .unwrap_or(0)
     }
 
+    /// The finest standing form this material declares: the least germ extent.
+    ///
+    /// A grain coarser than this is **clamped by the material** on that germ —
+    /// `span = min(grain, reach)` — so it is indistinguishable from this extent there. This is the
+    /// material's own resolution, and no covering finer than it is anything the material asked for.
+    pub fn finest_standing_extent(&self) -> &Rat {
+        self.germs
+            .iter()
+            .map(|germ| &germ.extent)
+            .fold(&self.germs[0].extent, |least, extent| {
+                rat_min(least, extent)
+            })
+    }
+
+    /// **The grain this material declares for itself**, read off it rather than authored.
+    ///
+    /// A leader never crosses a standing form: [`integrate_by_leaders`] takes
+    /// `span = min(grain, reach)`, so the last extension inside a germ is clamped to that germ's
+    /// remaining reach and the leader lands **exactly** on the next germ's start. Every germ is
+    /// therefore entered at its own origin, and the arithmetic below is about one germ at a time.
+    ///
+    /// > **Theorem (when a RIDE exists at all).** A leader entering a germ of extent `E` at its
+    /// > start with no standing agreement, at grain `g` and effective witness depth `d`, FOUNDs `d`
+    /// > extensions before the agreement lineage licenses a ride — the first extension has no
+    /// > founded axis to compare against, so agreement first holds at the second, and the `d`-th
+    /// > agreement lands at extension `d`. [`RideDiscipline::GermBounded`] then rides iff the
+    /// > remaining reach exceeds one grain:
+    /// >
+    /// > ```text
+    /// >    E − d·g > g     ⟺     g < E/(d+1)     and the ride's scale is  E/g − d
+    /// > ```
+    /// >
+    /// > **The bound is open: there is no coarsest admissible grain.** So the material determines
+    /// > an interval and not a number, and a grain cannot be read off it by that condition alone.
+    /// > (A germ entered with agreements already standing — the previous germ's axis predicted it,
+    /// > so no refounding was deposited — rides *earlier*, hence at a strictly larger scale, so the
+    /// > inequality below is safe in that case too.)
+    ///
+    /// What closes it is the scale. `ScaleWitness.scale` is *how many grains the founded axis
+    /// carried in one extension*; admissible grains are exactly those whose scale exceeds one.
+    /// Taking `E_min = ` [`Self::finest_standing_extent`] and `d_max = ` [`Self::jet_aperture`]:
+    ///
+    /// ```text
+    ///    grain = E_min / (d_max + 2)      ⟹    scale at any germ  =  E/g − d
+    ///                                                            ≥  E_min/g − d_max  =  2
+    /// ```
+    ///
+    /// > **This is the coarsest grain at which EVERY standing form of the material rides by at
+    /// > least one whole rank step**, and the bound is attained exactly at a germ that realizes
+    /// > both the finest extent and the largest rank. One step coarser — `E_min/(d_max + 1)` — that
+    /// > germ does not ride at all, which is the open bound above, so `+2` is not slack.
+    ///
+    /// The min and the max are not decoration: under [`WitnessDepth::ReadOffTheJet`] the depth is
+    /// **local**, so a grain derived from the shallowest germ would be clamped in the deepest, and
+    /// one derived from the widest germ would be too coarse for the narrowest.
+    ///
+    /// The returned area does not depend on the grain — that is this module's own self-similarity
+    /// law, measured by `returned_area_is_invariant_under_the_declared_grain` — so this decides the
+    /// **lineage** and never the return.
+    pub fn declared_grain(&self) -> Rat {
+        let depth = self.jet_aperture();
+        self.finest_standing_extent().clone()
+            / Rat::from_integer(BigInt::from(depth + LEAST_INTEGER_RIDE_SCALE))
+    }
+
     /// The one local read a leader is permitted. `None` past the far end of the region.
     ///
     /// Costs `O(log G + m^2)`: a binary search over the germ prefix, then an exact Taylor rebase.
@@ -504,23 +648,69 @@ impl RideDiscipline {
     }
 }
 
+/// Where the witness depth comes from. There is no `Default`: a default here would be the organ
+/// picking a depth because the caller was never asked.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum WitnessDepth {
+    /// **Read at every tip off the jet the leader is standing in**, as
+    /// [`LocalJet::rebase_movement_depth`] — the order at which the exact Taylor rebase stops being
+    /// able to contribute a difference. The depth is therefore a *return* of the growth and not an
+    /// input to it, and it is local: a rank-one germ licenses a ride after one agreement and a
+    /// rank-three germ does not.
+    ReadOffTheJet,
+    /// A depth the caller declares outright.
+    ///
+    /// Lawful **only at or above what the material required**. Declaring deeper than the material
+    /// asks is conservative — the leader founds more and rides later — and is admitted. Declaring
+    /// shallower is refused at the first tip that needed more, by
+    /// [`LeaderError::WitnessDepthBelowMaterial`], which names the offset, the declaration and the
+    /// rank the material carried there. A shallow declaration is exactly the instantaneous
+    /// measurement this module cannot make: it reads one comparison as a limit.
+    Declared(usize),
+}
+
+impl WitnessDepth {
+    /// What this declaration resolves to at a tip whose material required `required`.
+    fn at_a_tip(self, offset: &Rat, required: usize) -> Result<usize, LeaderError> {
+        match self {
+            WitnessDepth::ReadOffTheJet => Ok(required),
+            WitnessDepth::Declared(0) => Err(LeaderError::WitnessDepthZero),
+            WitnessDepth::Declared(declared) if declared < required => {
+                Err(LeaderError::WitnessDepthBelowMaterial {
+                    offset: offset.clone(),
+                    declared,
+                    required,
+                })
+            }
+            WitnessDepth::Declared(declared) => Ok(declared),
+        }
+    }
+}
+
 /// The declared law a leader population grows under.
 ///
-/// `witness_depth` is **not a threshold on the return**. It selects when founding gives way to
-/// riding, and the self-similarity law asserts — and
-/// `witness_depth_cannot_change_the_returned_area` measures — that the returned rational is
-/// identical for every depth and for [`RideDiscipline::GrainOnly`], which rides at no depth at all.
-/// A parameter that provably cannot move the return is a declaration of the lineage, not a gate on
-/// it.
+/// `witness_depth` is **not a threshold on the return** under
+/// [`RideDiscipline::GrainOnly`] or [`RideDiscipline::GermBounded`]: it selects when founding gives
+/// way to riding, and `witness_depth_cannot_change_the_returned_area` measures that the returned
+/// rational is identical across every admissible depth under both.
+///
+/// **Under [`RideDiscipline::UnclampedAncestry`] it is load-bearing on the returned rational**, and
+/// measured to be so: on `reverting_material` at grain one the same organ returns `49/2` at
+/// declared depth 1 or 2 and the true `23` at depth 3 or more. That is not a contradiction of the
+/// previous paragraph — it is the aperture. Riding past the germ that supplied the jet is the one
+/// place where the agreement lineage is the sole gate between the leader and material it has not
+/// read, so the depth stops being a declaration of the lineage and starts deciding the answer.
+/// `depth_one_certifies_a_limit_the_jet_had_not_reached` exhibits it.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct LeaderLaw {
     pub grain: Rat,
     pub discipline: RideDiscipline,
-    pub witness_depth: usize,
+    pub witness_depth: WitnessDepth,
 }
 
 impl LeaderLaw {
-    pub fn new(grain: Rat, discipline: RideDiscipline, witness_depth: usize) -> Self {
+    pub fn new(grain: Rat, discipline: RideDiscipline, witness_depth: WitnessDepth) -> Self {
         Self {
             grain,
             discipline,
@@ -528,11 +718,24 @@ impl LeaderLaw {
         }
     }
 
+    /// **The law this material declares for itself.** Both levels come off the material: the grain
+    /// from [`MaterialBoundary::declared_grain`], the depth from the jet at every tip.
+    ///
+    /// This is the constructor a caller with no reason to declare its own covering scale should
+    /// use. It is not a `Default` — it takes the material, and the material decides.
+    pub fn read_off(material: &MaterialBoundary, discipline: RideDiscipline) -> Self {
+        Self {
+            grain: material.declared_grain(),
+            discipline,
+            witness_depth: WitnessDepth::ReadOffTheJet,
+        }
+    }
+
     pub fn validate(&self) -> Result<(), LeaderError> {
         if !self.grain.is_positive() {
             return Err(LeaderError::GrainNotPositive);
         }
-        if self.witness_depth == 0 {
+        if self.witness_depth == WitnessDepth::Declared(0) {
             return Err(LeaderError::WitnessDepthZero);
         }
         Ok(())
@@ -562,6 +765,10 @@ pub struct Extension {
     pub winding: Rat,
     pub running_sum: Rat,
     pub kind: ExtensionKind,
+    /// **What the material required at this tip**, read off the jet standing there. This is the
+    /// witness depth as a return rather than as an input; under
+    /// [`WitnessDepth::ReadOffTheJet`] it is also the depth the leader used.
+    pub material_witness_depth: usize,
 }
 
 /// The founded axis failed to predict the material at the next tip: a real material change.
@@ -606,7 +813,12 @@ pub struct LeaderQuadrature {
     pub schema: String,
     pub grain: Rat,
     pub discipline: RideDiscipline,
-    pub witness_depth: usize,
+    /// Where the depth came from, as declared.
+    pub witness_depth: WitnessDepth,
+    /// **What the material stopped the leader at**: the deepest requirement any tip returned. Under
+    /// [`WitnessDepth::ReadOffTheJet`] this is the whole of what governed the riding; under
+    /// [`WitnessDepth::Declared`] it is the floor the declaration had to clear.
+    pub material_witness_depth: usize,
     pub jet_aperture: usize,
     pub extensions: Vec<Extension>,
     pub obstructions: Vec<RefoundingObstruction>,
@@ -663,6 +875,7 @@ pub fn integrate_by_leaders(
     let mut area = Rat::zero();
     let mut ancestry = Rat::zero();
     let mut agreements: usize = 0;
+    let mut material_witness_depth: usize = 0;
     let mut founded: Option<(LocalJet, Rat)> = None;
 
     let mut extensions: Vec<Extension> = Vec::new();
@@ -683,11 +896,19 @@ pub fn integrate_by_leaders(
             agreements += 1;
         }
 
+        // The depth is read here, off the jet standing at this tip, before anything decides to
+        // ride. A declaration that is shallower than this is refused rather than clamped: the
+        // material is not negotiable and a truncated depth would certify a limit it had not
+        // reached.
+        let required_depth = returned_jet.rebase_movement_depth();
+        material_witness_depth = material_witness_depth.max(required_depth);
+        let effective_depth = law.witness_depth.at_a_tip(&offset, required_depth)?;
+
         let extension_index = extensions.len();
         let mut span = rat_min(&law.grain, &standing.reach).clone();
         let mut kind = ExtensionKind::Found;
 
-        if agrees && agreements >= law.witness_depth && law.discipline.rides() {
+        if agrees && agreements >= effective_depth && law.discipline.rides() {
             match law.discipline {
                 RideDiscipline::GrainOnly => {}
                 RideDiscipline::GermBounded => {
@@ -765,6 +986,7 @@ pub fn integrate_by_leaders(
             winding,
             running_sum: area.clone(),
             kind,
+            material_witness_depth: required_depth,
         });
 
         ancestry = &ancestry + &span;
@@ -777,6 +999,7 @@ pub fn integrate_by_leaders(
         grain: law.grain.clone(),
         discipline: law.discipline,
         witness_depth: law.witness_depth,
+        material_witness_depth,
         jet_aperture: material.jet_aperture(),
         extensions,
         obstructions,
@@ -812,6 +1035,7 @@ pub fn path_disagreement(left: &LeaderQuadrature, right: &LeaderQuadrature) -> R
 mod tests {
     use super::*;
     use relational_geometry::{integer, rat};
+    use std::collections::BTreeSet;
 
     fn jet(coefficients: &[(i64, i64)]) -> LocalJet {
         LocalJet::new(
@@ -832,11 +1056,16 @@ mod tests {
     }
 
     fn law(grain: Rat, discipline: RideDiscipline, witness_depth: usize) -> LeaderLaw {
-        LeaderLaw::new(grain, discipline, witness_depth)
+        LeaderLaw::new(grain, discipline, WitnessDepth::Declared(witness_depth))
     }
 
+    /// Every run whose depth is not itself under test reads the depth off the material.
     fn run(boundary: &MaterialBoundary, grain: Rat, discipline: RideDiscipline) -> LeaderQuadrature {
-        integrate_by_leaders(boundary, &law(grain, discipline, 1)).expect("a lawful growth")
+        integrate_by_leaders(
+            boundary,
+            &LeaderLaw::new(grain, discipline, WitnessDepth::ReadOffTheJet),
+        )
+        .expect("a lawful growth")
     }
 
     // --- the fixture family -------------------------------------------------------------------
@@ -1035,8 +1264,14 @@ mod tests {
         for (name, boundary, expected) in every_fixture() {
             let oracle = germwise_oracle_area(&boundary);
             assert_eq!(oracle, expected, "{name}: the oracle disagrees with the hand figure");
+            // The declared depth sweeps from what the material required upward: a shallower
+            // declaration is refused rather than silently accepted, which is the whole of the
+            // excision.
+            let floor = boundary.jet_aperture();
             for discipline in [RideDiscipline::GrainOnly, RideDiscipline::GermBounded] {
-                for depth in 1..=4 {
+                let read_off = run(&boundary, rat(2, 5), discipline);
+                assert_eq!(read_off.area, oracle, "{name} under {discipline:?}/read-off");
+                for depth in floor..=floor + 3 {
                     let quadrature =
                         integrate_by_leaders(&boundary, &law(rat(2, 5), discipline, depth))
                             .expect("a lawful growth");
@@ -1059,21 +1294,30 @@ mod tests {
             integer(1_000_000),
             Rat::from_integer(BigInt::from(1_000_000_000_000i64)),
         ];
+        //
+        // `long_ramp` carries `f(x) = x`, a rank-two jet, so the material returns a witness depth
+        // of two: the leader FOUNDs twice before the agreement lineage licenses a ride. Under the
+        // excised `LEADER_WITNESS_DEPTH = 1` it founded once, rode at scale `extent − 1`, and
+        // returned two extensions. The depth read off the jet moves both — `extent − 2` and three
+        // extensions — and moves neither with the size of the region, which is the law under test.
         let mut ridden_counts = Vec::new();
         for extent in &scales {
             let boundary = long_ramp(extent);
+            let depth = Rat::from_integer(BigInt::from(boundary.jet_aperture()));
+            assert_eq!(boundary.jet_aperture(), 2, "f(x) = x carries a rank-two jet");
             let ridden = run(&boundary, Rat::one(), RideDiscipline::GermBounded);
             let expected = (extent * extent) / integer(2);
             assert_eq!(ridden.area, expected, "the scaled area lost accuracy at {extent}");
             assert_eq!(ridden.ride_count(), 1, "the founded axis was not ridden at {extent}");
+            assert_eq!(ridden.material_witness_depth, 2, "the material returned a depth of two");
             let witness = &ridden.scale_witnesses[0];
-            assert_eq!(witness.scale, extent - Rat::one(), "wrong scale witness at {extent}");
+            assert_eq!(witness.scale, extent - &depth, "wrong scale witness at {extent}");
             assert!(witness.scale > Rat::one(), "the witness must record a real scaling");
             ridden_counts.push(ridden.extension_count());
         }
         assert_eq!(
             ridden_counts,
-            vec![2, 2, 2, 2],
+            vec![3, 3, 3, 3],
             "the founded axis did not scale for free: the extension count grew with the region"
         );
 
@@ -1110,13 +1354,19 @@ mod tests {
     }
 
     #[test]
-    fn witness_depth_cannot_change_the_returned_area() {
+    fn witness_depth_cannot_change_the_returned_area_inside_the_aperture() {
         for (name, boundary, expected) in every_fixture() {
-            for depth in 1..=8 {
-                for discipline in [
-                    RideDiscipline::GrainOnly,
-                    RideDiscipline::GermBounded,
-                ] {
+            let floor = boundary.jet_aperture();
+            for discipline in [
+                RideDiscipline::GrainOnly,
+                RideDiscipline::GermBounded,
+            ] {
+                let read_off = run(&boundary, rat(1, 2), discipline);
+                assert_eq!(
+                    read_off.area, expected,
+                    "{name}: the depth read off the material moved the return under {discipline:?}"
+                );
+                for depth in floor..=floor + 7 {
                     let quadrature =
                         integrate_by_leaders(&boundary, &law(rat(1, 2), discipline, depth))
                             .expect("a lawful growth");
@@ -1129,20 +1379,276 @@ mod tests {
         }
         // And the depth must actually be doing something, or the invariance is vacuous.
         let (boundary, _) = unaligned_piecewise();
+        let floor = boundary.jet_aperture();
         let shallow = integrate_by_leaders(
             &boundary,
-            &law(rat(1, 2), RideDiscipline::GermBounded, 1),
+            &law(rat(1, 2), RideDiscipline::GermBounded, floor),
         )
         .unwrap();
         let deep = integrate_by_leaders(
             &boundary,
-            &law(rat(1, 2), RideDiscipline::GermBounded, 8),
+            &law(rat(1, 2), RideDiscipline::GermBounded, floor + 7),
         )
         .unwrap();
         assert!(
             shallow.extension_count() < deep.extension_count(),
             "witness depth did not change the lineage, so its invariance is untested"
         );
+    }
+
+    // --- the depth, read off the material ------------------------------------------------------
+
+    #[test]
+    fn the_jet_stops_moving_at_its_own_rank() {
+        // The theorem `rebase_movement_depth` claims, measured rather than asserted: the sequence
+        // of rebased jets along an arithmetic progression of offsets is annihilated by the
+        // rank-th forward difference and by no lower order.
+        //
+        // The control is the second half. If `Δ^(m-1)` also annihilated, the rank would be an
+        // over-estimate and this test would fail; it is exercised on rank 2, 3, 4 and 5 below.
+        fn coefficients(jet: &LocalJet, rank: usize) -> Vec<Rat> {
+            let mut padded = jet.coefficients().to_vec();
+            padded.resize(rank, Rat::zero());
+            padded
+        }
+
+        fn difference(rows: &[Vec<Rat>]) -> Vec<Vec<Rat>> {
+            rows.windows(2)
+                .map(|pair| {
+                    pair[1]
+                        .iter()
+                        .zip(&pair[0])
+                        .map(|(next, here)| next - here)
+                        .collect()
+                })
+                .collect()
+        }
+
+        fn all_zero(rows: &[Vec<Rat>]) -> bool {
+            rows.iter()
+                .all(|row| row.iter().all(|value| value.is_zero()))
+        }
+
+        let declared = [
+            jet(&[(7, 2)]),
+            jet(&[(-1, 1), (1, 1)]),
+            jet(&[(0, 1), (0, 1), (1, 1)]),
+            jet(&[(1, 1), (1, 1), (1, 1), (1, 1)]),
+            jet(&[(2, 1), (-3, 1), (4, 1), (-5, 1), (6, 1)]),
+        ];
+        for source in declared {
+            let rank = source.rank();
+            assert_eq!(source.rebase_movement_depth(), rank);
+            for (step_numerator, step_denominator) in [(1, 1), (1, 3), (5, 2), (22, 7)] {
+                let step = rat(step_numerator, step_denominator);
+                // Rank + 3 offsets is enough to take rank + 2 differences.
+                let mut offset = Rat::zero();
+                let mut rows: Vec<Vec<Rat>> = Vec::new();
+                for _ in 0..rank + 3 {
+                    rows.push(coefficients(&source.rebase(&offset), rank));
+                    offset = &offset + &step;
+                }
+                let mut order = 0usize;
+                let mut current = rows;
+                while !all_zero(&current) {
+                    current = difference(&current);
+                    order += 1;
+                    assert!(
+                        !current.is_empty(),
+                        "rank {rank} at step {step}: the rebase never stopped moving"
+                    );
+                }
+                assert_eq!(
+                    order, rank,
+                    "rank {rank} at step {step}: the rebase stopped contributing at order {order}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn the_depth_the_material_returns_is_local_and_is_carried_on_every_extension() {
+        // `unaligned_piecewise` carries ranks 2, 1, 2. The returned depth must be 2 inside the
+        // outer germs and 1 inside the constant one — a *local* read, not a global maximum.
+        let (boundary, _) = unaligned_piecewise();
+        let quadrature = run(&boundary, rat(1, 4), RideDiscipline::GrainOnly);
+        assert_eq!(quadrature.material_witness_depth, 2);
+        let by_germ: Vec<(usize, usize)> = quadrature
+            .extensions
+            .iter()
+            .map(|extension| (extension.germ_index, extension.material_witness_depth))
+            .collect();
+        for (germ_index, depth) in &by_germ {
+            let expected = boundary.germs()[*germ_index].jet().rank();
+            assert_eq!(
+                *depth, expected,
+                "germ {germ_index} returned depth {depth} for a rank-{expected} jet"
+            );
+        }
+        // The material must actually carry two different depths, or "local" is untested.
+        let distinct: BTreeSet<usize> = by_germ.iter().map(|(_, depth)| *depth).collect();
+        assert_eq!(
+            distinct,
+            BTreeSet::from([1, 2]),
+            "this fixture must return more than one depth or locality is vacuous"
+        );
+    }
+
+    #[test]
+    fn a_declared_depth_below_what_the_material_required_is_refused_by_name() {
+        // The excision, as a refusal. `linear_ramp` carries a rank-2 jet: after one agreement the
+        // rebase is still contributing a difference, so a declared depth of one is a claim about a
+        // limit that has not been reached, and it is refused rather than accepted.
+        let (boundary, _) = linear_ramp();
+        assert_eq!(boundary.jet_aperture(), 2);
+        assert_eq!(
+            integrate_by_leaders(&boundary, &law(Rat::one(), RideDiscipline::GermBounded, 1)),
+            Err(LeaderError::WitnessDepthBelowMaterial {
+                offset: Rat::zero(),
+                declared: 1,
+                required: 2,
+            })
+        );
+        // At the material's own requirement, and above it, the same declaration is admitted.
+        for depth in 2..=5 {
+            assert!(
+                integrate_by_leaders(&boundary, &law(Rat::one(), RideDiscipline::GermBounded, depth))
+                    .is_ok(),
+                "depth {depth} is at or above what the material required and must be admitted"
+            );
+        }
+        // And the control: a constant jet requires exactly one, so a declared one is NOT refused
+        // there. Without this the refusal above could be a blanket ban on declaring one.
+        let (constant, _) = constant_slab();
+        assert_eq!(constant.jet_aperture(), 1);
+        assert!(
+            integrate_by_leaders(&constant, &law(Rat::one(), RideDiscipline::GermBounded, 1))
+                .is_ok(),
+            "one is the honest depth on a constant jet and must be admitted"
+        );
+    }
+
+    #[test]
+    fn depth_one_certifies_a_limit_the_jet_had_not_reached() {
+        // The material on which the old pin was demonstrably wrong, and the measurement that says
+        // so. `reverting_material`'s first germ carries `f(t) = t`: the jet at offset 0 is `[0,1]`
+        // and at offset 1 it is `[1,1]`. The jet MOVED between extension one and extension two, so
+        // an agreement lineage of length one has not witnessed a limit.
+        let (boundary, truth) = reverting_material();
+        let at_zero = boundary.standing_at(&Rat::zero()).unwrap().jet;
+        let at_one = boundary.standing_at(&Rat::one()).unwrap().jet;
+        assert_ne!(
+            at_zero, at_one,
+            "the separating material must actually move its jet between two extensions"
+        );
+        assert_eq!(at_zero.rebase_movement_depth(), 2);
+
+        // Past the declared aperture, that difference is the whole return. The organ conducted
+        // with an authored depth of one returns 49/2 where the truth is 23; every extra agreement
+        // the material asked for and did not get is the 3/2.
+        let shallow = integrate_by_leaders(
+            &boundary,
+            &LeaderLaw::new(
+                Rat::one(),
+                RideDiscipline::UnclampedAncestry,
+                WitnessDepth::Declared(1),
+            ),
+        );
+        assert_eq!(
+            shallow,
+            Err(LeaderError::WitnessDepthBelowMaterial {
+                offset: Rat::zero(),
+                declared: 1,
+                required: 2,
+            }),
+            "the depth the pin authored is now refused on the material that separates it"
+        );
+
+        // The same growth at depths the material admits, so the movement is exhibited rather than
+        // only refused. Depth 3 is above the requirement and recovers the truth; depth 2 does not.
+        let at_two = integrate_by_leaders(
+            &boundary,
+            &LeaderLaw::new(
+                Rat::one(),
+                RideDiscipline::UnclampedAncestry,
+                WitnessDepth::Declared(2),
+            ),
+        )
+        .expect("two is at the material's requirement");
+        let at_three = integrate_by_leaders(
+            &boundary,
+            &LeaderLaw::new(
+                Rat::one(),
+                RideDiscipline::UnclampedAncestry,
+                WitnessDepth::Declared(3),
+            ),
+        )
+        .expect("three is above the material's requirement");
+        assert_eq!(at_two.area, rat(49, 2));
+        assert_eq!(at_three.area, truth);
+        assert_eq!(path_disagreement(&at_two, &at_three), rat(3, 2));
+    }
+
+    #[test]
+    fn the_declared_grain_rides_by_at_least_one_rank_step() {
+        let one_rank_step = Rat::from_integer(BigInt::from(2));
+
+        // `declared_grain`'s derivation, measured: at the grain the material declares for itself,
+        // EVERY standing form rides by at least one whole rank step.
+        for (name, boundary, expected) in every_fixture() {
+            let grain = boundary.declared_grain();
+            assert!(grain.is_positive(), "{name}");
+            assert_eq!(
+                &grain * Rat::from_integer(BigInt::from(boundary.jet_aperture() + 2)),
+                *boundary.finest_standing_extent(),
+                "{name}: the declared grain is not the finest standing extent over depth + 2"
+            );
+            let quadrature = run(&boundary, grain.clone(), RideDiscipline::GermBounded);
+            assert_eq!(quadrature.area, expected, "{name}");
+            assert!(
+                !quadrature.scale_witnesses.is_empty(),
+                "{name}: the material's own grain founded no ride at all"
+            );
+            for witness in &quadrature.scale_witnesses {
+                assert!(
+                    witness.scale >= one_rank_step,
+                    "{name}: a ride at the declared grain carried {} — less than one rank step",
+                    witness.scale
+                );
+            }
+        }
+
+        // The bound is ATTAINED, not merely respected: on material whose one germ realizes both the
+        // finest extent and the largest rank, the scale is exactly two. Without this the `+ 2`
+        // could be any amount of slack.
+        for (name, boundary, _) in [
+            ("constant_slab", constant_slab().0, ()),
+            ("linear_ramp", linear_ramp().0, ()),
+            ("quadratic_bowl", quadratic_bowl().0, ()),
+            ("cubic_unit", cubic_unit().0, ()),
+            ("quartic_alternating", quartic_alternating().0, ()),
+        ] {
+            assert_eq!(boundary.germ_count(), 1, "{name} must be a single standing form");
+            let quadrature = run(&boundary, boundary.declared_grain(), RideDiscipline::GermBounded);
+            assert_eq!(
+                quadrature.scale_witnesses.len(),
+                1,
+                "{name}: one germ at its own grain founds exactly one ride"
+            );
+            assert_eq!(
+                quadrature.scale_witnesses[0].scale, one_rank_step,
+                "{name}: the bound is not attained, so the derivation has slack in it"
+            );
+
+            // And one step coarser — the open bound E/(d+1) — that germ does not ride at all.
+            let bound = boundary.finest_standing_extent().clone()
+                / Rat::from_integer(BigInt::from(boundary.jet_aperture() + 1));
+            let at_the_bound = run(&boundary, bound.clone(), RideDiscipline::GermBounded);
+            assert!(
+                at_the_bound.scale_witnesses.is_empty(),
+                "{name}: the open bound {bound} rode, so `+ 2` is not the least admissible step"
+            );
+        }
     }
 
     // --- parameter transformation -------------------------------------------------------------
@@ -1290,7 +1796,11 @@ mod tests {
         );
         let refusing = integrate_by_leaders(
             &abrupt,
-            &law(rat(1, 2), RideDiscipline::UnclampedAncestry, 1),
+            &LeaderLaw::new(
+                rat(1, 2),
+                RideDiscipline::UnclampedAncestry,
+                WitnessDepth::ReadOffTheJet,
+            ),
         )
         .expect("a lawful growth");
         assert!(
@@ -1325,11 +1835,17 @@ mod tests {
             "two paths inside the declared aperture must agree exactly"
         );
 
-        // The same organ conducted past its aperture. It appears to return: the growth completes,
-        // every ride it took passed its landing-jet check, and the number is wrong.
+        // The same organ conducted past its aperture, at the depth the material itself returns. It
+        // appears to return: the growth completes, every ride it took passed its landing-jet check,
+        // and the number is wrong. The depth being read off the jet does not rescue this — nothing
+        // does, which is what "past the declared aperture" means.
         let unclamped = integrate_by_leaders(
             &boundary,
-            &law(Rat::one(), RideDiscipline::UnclampedAncestry, 1),
+            &LeaderLaw::new(
+                Rat::one(),
+                RideDiscipline::UnclampedAncestry,
+                WitnessDepth::ReadOffTheJet,
+            ),
         )
         .expect("a lawful growth");
         assert_eq!(

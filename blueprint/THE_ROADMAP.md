@@ -753,10 +753,18 @@ neighbouring prose, return to the same obstruction.*
    (`FaceCoarserThanGrain`) unless it carries a retained tail certificate — a mouth that accepts
    everything has not been built.
 
-3. **`SOURCE.json`.** **24 `eros_*` drivers are inert for want of one input file that exists nowhere
-   in the tree**, including all four built for real pretrained artifacts. `output/` shows eight have
-   run before. This is the external-artifact path, blocked by a missing input rather than a missing
-   organ, and it is the cheapest large capability recovery available.
+3. **`SOURCE.json` — STRUCK 2026-08-09, the premise was false.** 15 are tracked, added at `a91a84f`
+   on 2026-08-08; 19 drivers take an input, 14 are supplied, 12 of 13 run returned exit 0. Only four
+   are genuinely blocked and each needs a **measurement** — Whisper encoder attention, CTC lattices,
+   activation captures — not a manifest. `canon/THE_MEASURED_CAPABILITIES.md` §5 carries the
+   correction and why two independent audits regenerated the same false absence.
+
+   **What replaces it as the cheapest large recovery: link mathlib.** `archive/cpp-engine/formal/`
+   holds **2,921 built oleans, 4.2 GB, toolchain v4.27.0**, and the live `soma/formal` sources are
+   byte-identical to the archived ones. With `LEAN_PATH` pointed at them **all nine live
+   `elementary-holonics` files check clean in 0.73–1.71 s each, including `RH/Statement.lean` and
+   `RH/Route.lean`.** The only real mathematics in the tree currently receives no verdict for want of
+   a path variable.
 
 4. **Two untested invariances of the project's own central claim.** `cross_ratio` is private in
    `relational-geometry`; `ProjectiveTurn` is in `holonic-engine`, which depends on it — so

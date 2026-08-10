@@ -70,11 +70,12 @@
 //! ```
 //!
 //! The leader reading is a genuine second implementation: each step becomes a unit
-//! [`RationalGerm`] carrying a constant jet, and a leader grows over it at grain `1/3` under
-//! [`RideDiscipline::GermBounded`], so every germ costs one FOUND and one RIDE and the founded axis
-//! is refounded exactly where the accumulation changed rate. [`germwise_oracle_area`] grades that
-//! lineage against one antiderivative per germ, which is the cheaper implementation and returns the
-//! same rational.
+//! [`RationalGerm`] carrying a constant jet, and a leader grows over it under
+//! [`RideDiscipline::GermBounded`] at **the law that material declares for itself** — see
+//! [`leader_law`] — so every germ costs one FOUND and one RIDE of exactly one rank step, and the
+//! founded axis is refounded exactly where the accumulation changed rate. [`germwise_oracle_area`]
+//! grades that lineage against one antiderivative per germ, which is the cheaper implementation and
+//! returns the same rational.
 //!
 //! The reflection reading embeds the **pair** as one response: the left route's increments at the
 //! retarded indices `+1..+n`, the right route's at the advanced indices `-1..-n`, and zero at the
@@ -121,18 +122,6 @@ use crate::running_integral::{
     disagreement, found_potential, running_sum, Cochain, Disagreement, Path, PathStep,
     PotentialSearch, RunningIntegral, RunningIntegralError,
 };
-
-/// The leader's grain, as the reciprocal of this integer.
-///
-/// A unit germ under a grain of `1/3` costs exactly one FOUND and one RIDE, so the FOUND/RIDE split
-/// is exercised on every route rather than degenerating to grain-only. The returned area does not
-/// depend on it — that is [`crate::leader_quadrature`]'s own self-similarity law — so this is a
-/// declaration of the lineage and not a gate on the return.
-pub const LEADER_GRAIN_RECIPROCAL: i64 = 3;
-
-/// The witness depth the leader rides at: one agreement is enough, because a unit germ carries one
-/// constant jet and the rebase of a constant is itself.
-pub const LEADER_WITNESS_DEPTH: usize = 1;
 
 // -------------------------------------------------------------------------------------------------
 // the loads
@@ -533,13 +522,24 @@ fn rational(value: &BigInt) -> Rat {
     Rat::from_integer(value.clone())
 }
 
-/// The leader law this module grows every route under.
-pub fn leader_law() -> LeaderLaw {
-    LeaderLaw::new(
-        Rat::new(BigInt::one(), BigInt::from(LEADER_GRAIN_RECIPROCAL)),
-        RideDiscipline::GermBounded,
-        LEADER_WITNESS_DEPTH,
-    )
+/// The leader law one route's material declares for itself.
+///
+/// **Neither level is authored here.** Both were, until 2026-08-09:
+/// `LEADER_GRAIN_RECIPROCAL: i64 = 3` and `LEADER_WITNESS_DEPTH: usize = 1`, excised for
+/// `canon/THE_AUTHORED_LEVEL.md` §5.1.
+///
+/// - The **witness depth** is read at every tip off the jet standing there
+///   ([`crate::leader_quadrature::WitnessDepth::ReadOffTheJet`]). On this module's route material
+///   every germ carries a constant jet, so the rebase of a jet is itself and the material returns a
+///   depth of **one** — the value the pin authored, now derived and now carried on the return as
+///   `material_witness_depth` rather than declared into it. It moves the instant the material does.
+/// - The **grain** is [`MaterialBoundary::declared_grain`]: the finest standing extent over
+///   `jet_aperture + 2`. On unit germs carrying rank-one jets that is `1/3`, which is what the pin
+///   said; the derivation is in `declared_grain`'s own doc and it is what makes every route's
+///   FOUND/RIDE split a ride of exactly one rank step instead of an arrangement that happened to
+///   produce one.
+pub fn leader_law(material: &MaterialBoundary) -> LeaderLaw {
+    LeaderLaw::read_off(material, RideDiscipline::GermBounded)
 }
 
 /// One route as material a leader can grow over: one unit germ per step, carrying that step's
@@ -737,11 +737,12 @@ pub fn compare_routes(
     let left_integral = running_sum(complex, cochain, &left.path)?;
     let right_integral = running_sum(complex, cochain, &right.path)?;
 
-    let law = leader_law();
     let left_material = route_material(&left_integral)?;
     let right_material = route_material(&right_integral)?;
-    let leader_left = integrate_by_leaders(&left_material, &law)?;
-    let leader_right = integrate_by_leaders(&right_material, &law)?;
+    // Each route's own material declares its law. The two agree on this module's material because
+    // both carry unit germs of rank-one jets; they are read separately so that they do not have to.
+    let leader_left = integrate_by_leaders(&left_material, &leader_law(&left_material))?;
+    let leader_right = integrate_by_leaders(&right_material, &leader_law(&right_material))?;
     let oracle_left = germwise_oracle_area(&left_material);
     let oracle_right = germwise_oracle_area(&right_material);
     let leader_residual = path_disagreement(&leader_left, &leader_right);

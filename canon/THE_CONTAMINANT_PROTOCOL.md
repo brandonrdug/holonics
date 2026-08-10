@@ -162,11 +162,17 @@ lawful refusal *shape* (`GaugeApertureExceeded` rather than sampling) and a valu
 `DEFAULT_HORN_LOCAL_SECTION_LIMIT` named the defect in its own prefix: **a default is a level the
 organ picked because the caller was never asked.**
 
-**Still open, and both are the sharpest remaining statements of the condition.**
-`derivation_integral.rs:135` — `LEADER_WITNESS_DEPTH: usize = 1`; **a leader whose witness depth is
-one takes a single step.** `soma/body/src/law.rs:70` — `POOL_TEETH = 31`, whose mask aliases the top
-half of the grip space into the bottom, converting a lawful out-of-reservation refusal into a silent
-wrong return, and whose own test cannot reach the aliasing region.
+**Both of the two that were still open are now excised, and each returned the species' sharpest
+evidence.** `LEADER_WITNESS_DEPTH = 1` was **deciding a return** — declared depth 1 gave area `49/2`
+where the truth is `23` — because one extension is one measurement and nothing can fail to differ.
+`POOL_TEETH = 31`'s mask was a **2:1 collapse of the whole grip space**: at axis `2^16` the origin and
+`Cog::lit(32768)` were handed the same slot, so a lawful out-of-reservation refusal returned another
+place's standing flow instead.
+
+**The pin population is now empty**, and the two lessons that generalise are in §2.6: the `const` is
+the pin's shadow, and a level can be **inert while the unnamed lines beside it decide everything** —
+`HORIZON_DOUBLINGS = 64` was unreachable, so the constant decided nothing while the guess it sat
+beside quantized every returned horizon to a dyadic band.
 
 **The excuse this species generates, named so it is not re-run.** *"A declared aperture that returns
 its outside"* was offered as a third category beside facts and pins. **Refusing past a number you

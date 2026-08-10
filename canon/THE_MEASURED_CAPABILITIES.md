@@ -194,11 +194,31 @@ two frames.
 
 ## 5 · What is inert, and why
 
-**24 `eros_*` drivers refuse for want of a `SOURCE.json` that exists nowhere in the tree** —
-`find . -iname 'SOURCE*.json'` returns nothing. Among them are **all four** built for real pretrained
-artifacts. `output/` shows eight have run before (105 MB `eros_formula_ecology`, 98 MB
-`eros_text_training`). **The external-artifact path is blocked by a missing input file, not a missing
-organ.**
+**STRUCK 2026-08-09. This section read: "24 `eros_*` drivers refuse for want of a `SOURCE.json` that
+exists nowhere in the tree — `find . -iname 'SOURCE*.json'` returns nothing." The premise is false
+and was already false when written.**
+
+**15 `SOURCE.json` files are tracked**, added at `a91a84f`, **2026-08-08 21:44:44 −0700**, whose commit
+message is *"Thirteen real driver sources survive in the laboratory, and fourteen drivers come back to
+life."* This section was edited twice on 2026-08-09, **thirteen hours after that fix landed**, and the
+claim survived both edits.
+
+**Measured 2026-08-09 by running them:** 19 drivers take an `argv[1]` input, 14 are supplied, 13 were
+run and 12 returned exit 0 — including `eros_resonant_generation` against a real OLMo-2 tokenizer whose
+sha256 `73fd5254…` matches its declared digest.
+
+**Only four are genuinely blocked, and none is a manifest away.** `eros_audio_contextual_ecology` needs
+inline **measured Whisper encoder attention**; `eros_audio_ctc_path_fiber` and `eros_ctc_temporal_surface`
+need **measured CTC lattices**; `eros_self_emanated_law` verifies `model.safetensors`' 2,969,854,224
+bytes and then refuses at activation captures never tracked at `a07ff376`. **Those are measurements,
+not manifests**, and `PROVENANCE.md` is right to refuse to fabricate them.
+
+**Why the false claim persisted is the transferable part.** A second audit, run independently the same
+day and *without* being told the `driver-sources/` paths exist, **reproduced the identical stale list**
+— naming ten drivers as unrunnable that had been executed to exit 0 hours earlier. The blocker was
+never the file. It is that **nothing in the tree tells a reader the file exists**, so every audit
+regenerates the same absence claim. `CLAUDE.md` §5's rule applies exactly: an absence claim is a
+measurement and decays like one, and the search pattern is part of the claim.
 
 Five more need external measured data absent from the tree (CDAWeb, GOES-16 GLM/ABI, LibriSpeech +
 room impulse responses, GRID). Three need X11.
