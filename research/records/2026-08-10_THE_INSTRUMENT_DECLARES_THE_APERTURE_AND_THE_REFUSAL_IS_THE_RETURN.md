@@ -462,6 +462,37 @@ real-material order price is unavailable and is **not guessed**. `blueprint/THE_
 prohibition — *"No aperture-less organ in the corpus path"* — already names `eros_resonant_corpus_current`
 SIGKILLing at 10,963 MB; **this is a second instance and it was not on the list.**
 
+### 7b.4 The five cuts, named — roadmap item 5
+
+`crates/holonic-engine/src/spine_cut.rs`. The spine states the chain law and then
+*"circulation `j ≠ 0`, rest, accumulation, leak, and short circuit are distinct cuts"*, with the
+reading rule *"report which of rest, accumulation, leak, or short circuit applies."*
+
+**The missing object was the classifier, not an organ.** Four cuts had owners; naming which one a
+reading is at is a measurement, and nothing was making it.
+
+```text
+r ≠ 0 anywhere                             LEAK
+j = 0                                      REST
+q_n ≠ q_m                                  ACCUMULATION
+j ≠ 0, closed, vanishing on the load       SHORT CIRCUIT
+j ≠ 0, closed, reaching the load           CIRCULATION
+```
+
+The order is stated rather than left implicit: a leak outranks the closed cuts because a body with a
+source is not at one, and accumulation outranks the two closed cases because a stored residual is not
+a circulation however the current is supported.
+
+**A short circuit is defined without resistances or cost.** It is the exact statement that a closed,
+source-free, non-zero current is supported **entirely off the declared load**. The load is the
+caller's declaration and is never inferred, and an **empty load is refused by name** — with no load
+every closed current is trivially a short circuit, which would make the cut a property of the
+declaration rather than of the material. That is `CLAUDE.md` §8's vacuous-gauge defect, refused at
+construction.
+
+Six controls, one of which reaches **all five cuts on one incidence** — a theta graph with the third
+parallel edge as the load — so the return is a classification and not a predicate wearing five names.
+
 ---
 
 ## 8 · Bounds

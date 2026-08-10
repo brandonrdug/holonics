@@ -98,7 +98,15 @@ is deposited in place.
    real-material order price is unavailable and is not guessed. **This is a second instance of the
    prohibition this file already carries** — *"No aperture-less organ in the corpus path"* — which
    named only `eros_resonant_corpus_current`. Diagnosing and bounding it is the open work.
-5. **The short-circuit cut has no owner.**
+5. ~~**The short-circuit cut has no owner.**~~ **CLOSED 2026-08-10.** The missing object was not one
+   organ but the **classifier**: the spine says *"report which of rest, accumulation, leak, or short
+   circuit applies"*, and naming the cut is a measurement no single place was making.
+   `crates/holonic-engine/src/spine_cut.rs` takes a chain reading and a **declared load** and returns
+   which of the five it is, with the evidence that decided it. A short circuit is the exact statement
+   that a closed, source-free, non-zero current is supported **entirely off the declared load** — no
+   resistances, no cost. An **empty load is refused**, because with no load every closed current is
+   trivially a short circuit and the cut would be a property of the declaration rather than of the
+   material. Six controls, including one that reaches all five cuts on one incidence.
 6. **The accumulation cut.** `temper` and `derivation_integral` are built in both directions through
    `Cochain` and still do not reference each other; `supported_realizers::positive_form → inertia` is
    still joined only inside `#[cfg(test)]`. *Falsifier:* `invariant_movement` non-zero **and

@@ -272,6 +272,7 @@ pub mod skein;
 pub mod statement_composition;
 pub mod contact_gluing;
 pub mod multiquadratic;
+pub mod spine_cut;
 pub mod structure_group;
 pub mod statement_grammar;
 // Declared, never glob-exported: `ReceiverId`, `Disagreement`, `Partition`, `Cover`, `Observation`
