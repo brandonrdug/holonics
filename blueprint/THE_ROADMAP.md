@@ -39,10 +39,11 @@ proves harder than it looks, the mathematics still gains a verdict it does not h
    `RH/Route.lean` at ~1.4 s each; the 13th is a root aggregator needing its own leaves built, which
    is build order rather than a source defect and the script reports it as `ROOT`.
 
-   **The layout detail that costs an hour:** Lean 4.27 puts oleans under `.lake/build/lib/lean/`, not
-   `.lake/build/lib/`. A path without the trailing `lean` fails with `unknown module prefix
-   'Mathlib'` while the directory plainly exists — which is how this looked like a missing build for
-   two days.
+   **The layout detail that costs an hour:** Lean 4.27 puts oleans one directory deeper than the
+   obvious guess — under the package's build lib **plus a `lean` component**. A search path without
+   that trailing component fails with `unknown module prefix 'Mathlib'` while the directory plainly
+   exists, which is how this looked like a missing build for two days. `tools/lean_check.sh` derives
+   the path so nobody repeats it.
 
    **The check is not unfailable**, and `--control` proves it: a `theorem deliberately_false :
    (1 : Nat) = 2 := rfl` appended to `RH/Statement.lean` returns *"Not a definitional equality"*.
