@@ -615,4 +615,158 @@
     ],
     source: [Hausdorff measure and dimension.],
   ),
+  entry(
+    id: "H.0471",
+    kind: "Theorem",
+    grade: "proved-standard",
+    title: [Intrinsic curvature and the dispensability of an ambient],
+    depends: ("H.0270", "H.0274"),
+    statement: [
+      *(EGREGIUM)* Gaussian curvature is determined by the first fundamental
+      form alone, hence is invariant under any isometry and computable without
+      reference to an embedding.
+
+      *(NASH)* Every Riemannian manifold admits an isometric embedding into
+      some $RR^N$.
+    ],
+    transformations: [
+      A receiver confined to the surface measures the curvature with no
+      ambient; and since an isometric ambient always exists but is never
+      unique, an embedding is a declared receiver rather than a fact. Only the
+      intrinsic quantities survive changing it.
+    ],
+    boundary: [
+      Intrinsic determination is a statement about curvature, not about every
+      geometric quantity. Extrinsic invariants such as the second fundamental
+      form genuinely depend on the embedding and are not recovered.
+    ],
+    source: [Gauss, Theorema Egregium; Nash embedding theorem.],
+  ),
+  entry(
+    id: "H.0472",
+    kind: "Definition",
+    grade: "proved-standard",
+    title: [Structure-group reduction and the holonomy classification],
+    depends: ("H.0270", "H.0276"),
+    statement: [
+      The frame bundle of an $n$-manifold is a principal $"GL"(n)$-bundle, and
+      a geometric structure is a reduction of its structure group: $"GL"^+$ an
+      orientation, $O(n)$ a metric, $U(n)$ a complex structure, $"Sp"(2n)$ a
+      symplectic form, $"SL"(n)$ a volume.
+
+      *(BERGER)* For an irreducible, non-symmetric Riemannian manifold the
+      holonomy group is one of
+      $
+        "SO"(n),
+        quad U(n),
+        quad "SU"(n),
+        quad "Sp"(n),
+        quad "Sp"(n) dot "Sp"(1),
+        quad G_2,
+        quad "Spin"(7).
+      $
+    ],
+    transformations: [
+      The structure group states exactly which chart-to-chart coercions are
+      admissible, so adding structure is narrowing it. With Ambrose--Singer,
+      the structural content of a geometry is which loops fail to return the
+      identity, and that content is drawn from a finite list.
+    ],
+    boundary: [
+      Berger's list is for irreducible non-symmetric Riemannian holonomy.
+      Reducible, locally symmetric, pseudo-Riemannian, and torsionful
+      connections are outside it, and no statement here bounds them.
+    ],
+    source: [Principal-bundle reduction; Berger's holonomy classification.],
+  ),
+  entry(
+    id: "H.0473",
+    kind: "Theorem",
+    grade: "proved-standard",
+    title: [Distribution integrability and bracket-generated reach],
+    depends: ("H.0270", "H.0271"),
+    statement: [
+      A smooth distribution $D subset T M$ is a field of admissible transport
+      directions.
+
+      *(FROBENIUS)* $D$ is integrable -- tangent to a foliation by leaves --
+      exactly when it is involutive, $[X,Y] in D$ for all $X,Y in D$.
+
+      *(CHOW--RASHEVSKII)* If the iterated brackets of $D$ generate $T_p M$ at
+      every $p$ of a connected $M$, then any two points are joined by a path
+      everywhere tangent to $D$.
+    ],
+    transformations: [
+      A non-involutive channel family reaches, by alternating its channels,
+      what no single channel spans; the new direction is the bracket. An
+      involutive family cannot leave its leaf, so founding is unavailable to
+      it.
+    ],
+    boundary: [
+      Bracket generation gives reachability, not a cost, a geodesic, or a
+      schedule. The sub-Riemannian distance it induces is not the ambient one
+      and is not supplied here.
+    ],
+    source: [Frobenius theorem; Chow--Rashevskii theorem.],
+  ),
+  entry(
+    id: "H.0474",
+    kind: "Theorem",
+    grade: "proved-standard",
+    title: [Ideal fluid motion as geodesic flow on the volume-preserving group],
+    depends: ("H.0274", "H.0275", "H.0282"),
+    statement: [
+      For a compact Riemannian manifold $M$, the Euler equations of an ideal
+      incompressible fluid are the geodesic equations of the right-invariant
+      $L^2$ metric on the group $"SDiff"(M)$ of volume-preserving
+      diffeomorphisms. Kelvin circulation is the conserved momentum of the
+      particle-relabelling symmetry.
+    ],
+    transformations: [
+      A fluid configuration is one point of a manifold and its motion is free;
+      every apparent force is curvature of the group. Circulation is a pairing
+      against a homology class, not against an arbitrary covector.
+    ],
+    boundary: [
+      Arnold's computation of negative sectional curvature for the flat torus
+      bounds predictability by exponential divergence of nearby geodesics; it
+      does not bound existence, uniqueness, or regularity, and says nothing
+      about the viscous three-dimensional Millennium problem.
+    ],
+    source: [Arnold 1966, geodesics on the diffeomorphism group.],
+  ),
+  entry(
+    id: "H.0475",
+    kind: "Theorem",
+    grade: "proved-standard",
+    title: [Regge hinge deficit and the discrete curvature total],
+    depends: ("H.0278", "H.0294"),
+    statement: [
+      In a piecewise-flat simplicial geometry every simplex is flat and all
+      curvature is concentrated on the codimension-two hinges. For a hinge $h$
+      the deficit is
+      $
+        delta(h) = 2 pi - sum_(t supset.eq h) theta_h (t),
+      $
+      the sum running over the simplices containing $h$ with $theta_h (t)$ the
+      dihedral angle of $t$ at $h$. For a closed triangulated surface,
+      $
+        sum_v delta(v) = 2 pi chi.
+      $
+    ],
+    transformations: [
+      Curvature is a property of the hinge between cells and never of a cell's
+      own corners; a single simplex composing to a half turn is the flatness
+      hypothesis, not a measurement.
+    ],
+    boundary: [
+      The total identity is a theorem for closed triangulated surfaces and
+      therefore cannot fail there: it grades as a correctness gate on the angle
+      arithmetic and never as evidence about the material. It does not apply to
+      a complex that is not a closed surface. Deficit angles carry no torsion
+      information: the torus and the Klein bottle share $chi = 0$ and both
+      admit triangulations with every deficit zero.
+    ],
+    source: [Regge calculus; discrete Gauss--Bonnet.],
+  ),
 )

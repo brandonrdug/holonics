@@ -38,6 +38,12 @@ the normalized canon in `../canon/` governs the rebuild.
   `records/2026-08-03_THE_GEOMETRY_COMPUTES_THE_CURRENT_THE_SHADOW_RETURNS_ONLY_ITS_RECEIVER_FIBER.md`
 - **Carrier-neutral correction:**
   `records/2026-08-03_THE_CARRIER_HAS_NO_SEMANTIC_PRIVILEGE_THE_LOCAL_RETURN_REFORMS_THE_ECOLOGY.md`
+- **The manifold, and where curvature lives:**
+  `records/2026-08-10_THE_MANIFOLD_IS_THE_INVARIANT_OF_THE_CURRENTS_NOT_THEIR_CONTAINER_AND_THE_RUNG_IS_THE_HINGE_DEFICIT.md`
+  — charts as types and transition maps as implicit casts; the structure group as the legal casts;
+  Darboux, Liouville, Arnold, Frobenius; and the correction that a triangle's corners composing to a
+  half turn is Regge flatness, so the tower's rung is the hinge deficit. Compressed into
+  `../canon/TABLET_THE_MANIFOLD.md` and `../canon/TABLET_THE_TURN.md` §11.5.
 
 The filenames form a stable chronological atlas. Search their titles before reading entire bodies;
 follow each record's explicit supersession and open-boundary statements.

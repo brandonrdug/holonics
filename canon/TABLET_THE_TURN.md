@@ -101,6 +101,70 @@ Regge deficit is exactly zero, and exactly one has torsion. Deficit angles are b
 the setting where they are *defined*, because the deficit's only topological content is `χ`, `χ` is
 an alternating sum of ranks, and ranks land in a torsion-free group.
 
+### 11.5 The rung is the hinge deficit, and the vacuous triangle was Regge's own hypothesis
+
+**Truth status:** `proved-standard` for Regge calculus; `established-bounded` for the measured
+vacuity; `interpretation` for the siting, which is this project's.
+**Record:** `research/records/2026-08-10_THE_MANIFOLD_IS_THE_INVARIANT_OF_THE_CURRENTS_NOT_THEIR_CONTAINER_AND_THE_RUNG_IS_THE_HINGE_DEFICIT.md`
+
+`contact_gluing::coarse_grain` composes a triangle's three exact corners and returns `e^{iπ} = (−1,0)`
+**identically** — measured 25 of 25 realizable triangles over five distinct weight shapes — and
+`examples/the_tower_climbs.rs` carried that as a declared open falsifier. **The falsifier was pointed
+at the wrong object.**
+
+The laboratory's `src/holobrochos/RESEARCH/THE_MANIFOLD.md` §III, read at `a07ff376` — Brandon's
+design resolved with him 2026-07-08:
+
+> *"**CURVATURE = the FOUNDINGS.** The manifold is curved; a founding is a **deficit angle at a
+> triangular hinge** (a winding); the geometric product is the parallel transport."*
+
+and `reference/holobrochos-a07ff376/src/holobrochos/THEORY/54_THE_DISCRETE_MANIFOLD.md` §3, ratified
+2026-07-05: *"the **curvature at each vertex** is the `C/d` of the arcs meeting there… a **Regge**/
+spin-network geometry."*
+
+In Regge calculus **every simplex is flat** and all curvature concentrates on the codimension-two
+hinges *between* them. Therefore:
+
+> **A triangle's corners composing to `−1` is the machine correctly reporting that a simplex is
+> flat.** `Σθ = π` is Regge's founding hypothesis, not a defect. Under `CLAUDE.md` §8's tautology
+> rule that receipt is `definition`-grade and carries no evidence.
+
+The correction changes the index of summation and nothing else:
+
+```text
+was:  ∏ over the three corners of ONE triangle       ≡ e^{iπ}, always
+is:   ∏ over ONE corner from EACH triangle at a hinge
+      deficit(h) = 2π − Σ_{t ⊇ h} θ_h(t)             ≠ 0 exactly when the hinge is curved
+```
+
+**This is the repair §11.4's refusal names its own cause for.** That refusal turns on
+`DiscreteCurvatureConfiguration` holding *"vertices, edges and one `Rat` per edge — no faces, no
+boundary matrix"*, so its deficit factors through the 1-skeleton. **`contact_gluing` has the
+2-cells**: `ContactTriangle` is a face and `Corner` is the exact angle at a specific
+*(vertex, triangle)* pair, which is precisely the datum a per-edge response cannot express. So the
+metric Regge deficit is available there and structurally unavailable here, and building the join is
+the same *"small, well-posed construction"* §11.3 names for the other pair of owners that never met.
+
+**It does not lift §11.4's refusal**, which is settled outside this body: the torus and the Klein
+bottle both have `χ = 0`, both admit `{3,6}` triangulations with every deficit exactly zero, and
+exactly one has torsion. **Deficit angles are blind to torsion where they are defined**, and the
+tower must not be sold as a torsion instrument.
+
+**The carrier is `multiquadratic.rs`.** Each incident triangle contributes `e^{iθ}` with `cos ∈ ℚ`
+and `sin ∈ ℚ(√d)`; the product over `k` incident triangles lands in `ℚ(√d₁,…,√d_k)`, which the module
+carries as the twisted group algebra of `(ℤ/2)^k`. It is the `U(1)` holonomy carrier of a hinge, and
+its grading is the branch bookkeeping the double cover demands.
+
+**And the invariant is a gate, not evidence.** `Σ_v deficit(v) = 2πχ` is a theorem for closed
+triangulated surfaces, so by §11.4 it is `definition`-grade — worth computing as a check that the
+corner algebra composes, never reportable as a finding. It does not even apply to `contact_graph`,
+which is a graph with `β₁ = 8` and not a surface. **The non-tautological return is the deficit
+population and the link classification**: `L ≅ S^{d−1}` is the regular phase, and a link that is a
+ball, has genus, has several components, or is pinched is respectively a boundary, a handle, a branch
+or a neck — *"that residual geometry is information. It must not be rounded into a sphere"*, from the
+laboratory's `src/soma/RESEARCH/2026-07-26_THE_RECEIVER_IS_ITS_LOCAL_STAR_THE_LINK_IS_ITS_HYPERSPHERICAL_HORIZON.md`
+at `a07ff376`.
+
 ---
 
 ## 12. The polygon carries its n-grams, and capacitance is a population
