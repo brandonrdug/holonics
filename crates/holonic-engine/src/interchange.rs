@@ -1422,3 +1422,132 @@ mod tests {
         assert!(!certificate.lineage_changed_the_verdict());
     }
 }
+
+// -------------------------------------------------------------------------------------------------
+// The price of an order, and whether the receiver family can read what it paid for
+// -------------------------------------------------------------------------------------------------
+
+/// **What it costs to carry an order over `n` items, in bits, exactly.**
+///
+/// There are `n!` orderings, so distinguishing one costs `⌈log₂(n!)⌉` bits. Computed over `BigUint`
+/// with no float and no Stirling approximation: the factorial is built exactly and its bit length is
+/// read off, corrected downward when the factorial is itself a power of two.
+///
+/// # Why this is the right quantity and where it comes from
+///
+/// Devillers and Gandoin, *Geometric compression for progressive transmission* (`arXiv:cs/9909018`),
+/// invert the standard mesh coder: they **discard the topology**, spend the vertex-order entropy on
+/// the coordinates, and reconstruct the topology afterward. Their result, verbatim: *"the gain is
+/// `log₂ n − 2.402` per point… which corresponds exactly to the **order information** over the
+/// points… the algorithm **saves the encoding of the order information**."*
+///
+/// **So an order is not free, and this says what it costs.** `CLAUDE.md` §0's fourth lesson and the
+/// ratified *"apparatus completion order never enters semantic lineage"* were correctness statements;
+/// this is the same statement with a price on it. A front that carries host arrival order into a
+/// returned population and whose receiver family cannot read that order has **paid `⌈log₂(n!)⌉` bits
+/// for nothing** — and that is a measured overpayment, not a suspicion.
+///
+/// The Stirling reading, for scale only and never used in a computation here: `log₂(n!) ≈ n log₂ n`,
+/// which is Devillers–Gandoin's `n log₂ n` gain.
+pub fn order_price_bits(population: usize) -> u64 {
+    if population < 2 {
+        return 0;
+    }
+    let mut factorial = num_bigint::BigUint::from(1u32);
+    for factor in 2..=population {
+        factorial *= num_bigint::BigUint::from(factor);
+    }
+    let bits = factorial.bits();
+    // `⌈log₂ x⌉` is `bits` unless `x` is exactly a power of two, where it is `bits - 1`.
+    if factorial.count_ones() == 1 {
+        bits.saturating_sub(1)
+    } else {
+        bits
+    }
+}
+
+/// **An order's price beside the verdict on whether anything can read it.**
+///
+/// The two halves are kept separate on purpose. The price is arithmetic and is always correct; the
+/// verdict is a measurement against a **declared receiver family**, and a different family may read
+/// what this one cannot. Reporting the price alone would imply a waste that has not been established;
+/// reporting the verdict alone leaves the correctness statement without a magnitude.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct OrderPrice {
+    /// How many items the order ranges over.
+    pub population: usize,
+    /// `⌈log₂(n!)⌉` — the exact cost of distinguishing one ordering.
+    pub bits: u64,
+    /// True when the declared receiver family has **no** distinguishing word for the two orders, so
+    /// the bits above buy nothing that family can read.
+    pub unreadable_by_the_declared_family: bool,
+}
+
+impl OrderPrice {
+    /// The bits paid and not readable. Zero when the order is load-bearing.
+    pub fn overpayment(&self) -> u64 {
+        if self.unreadable_by_the_declared_family {
+            self.bits
+        } else {
+            0
+        }
+    }
+
+    pub fn written(&self) -> String {
+        format!(
+            "{} item(s) · order costs {} bits · {}",
+            self.population,
+            self.bits,
+            if self.unreadable_by_the_declared_family {
+                "UNREADABLE by the declared family — paid for nothing"
+            } else {
+                "readable — the order is load-bearing"
+            }
+        )
+    }
+}
+
+impl InterchangeCertificate {
+    /// Price the order this certificate ruled on.
+    ///
+    /// `Interchange::Unordered` means no receiver in the declared family separates the two orders, so
+    /// the order's bits are unreadable **by that family**. `Interchange::Ordered` carries the
+    /// distinguishing word, so the order is load-bearing and the price is earned.
+    pub fn order_price(&self, population: usize) -> OrderPrice {
+        OrderPrice {
+            population,
+            bits: order_price_bits(population),
+            unreadable_by_the_declared_family: self.is_interchangeable(),
+        }
+    }
+}
+
+#[cfg(test)]
+mod order_price_tests {
+    use super::*;
+
+    /// `⌈log₂(n!)⌉`, checked against hand values. No float, no Stirling.
+    #[test]
+    fn the_order_price_is_the_exact_bits_to_index_a_permutation() {
+        assert_eq!(order_price_bits(0), 0);
+        assert_eq!(order_price_bits(1), 0);
+        assert_eq!(order_price_bits(2), 1); // 2! = 2, a power of two
+        assert_eq!(order_price_bits(3), 3); // 3! = 6 → ⌈log₂6⌉ = 3
+        assert_eq!(order_price_bits(4), 5); // 4! = 24 → ⌈log₂24⌉ = 5
+        assert_eq!(order_price_bits(5), 7); // 5! = 120 → ⌈log₂120⌉ = 7
+        assert_eq!(order_price_bits(8), 16); // 8! = 40320 → ⌈log₂⌉ = 16
+    }
+
+    /// It grows like `n log₂ n`, which is Devillers–Gandoin's gain. Checked as a bound rather than
+    /// asserted as an identity, because Stirling is an asymptotic and this carrier is exact.
+    #[test]
+    fn the_price_is_bounded_by_n_log_n_and_grows_superlinearly() {
+        for population in [4usize, 8, 16, 32, 64] {
+            let bits = order_price_bits(population);
+            let n = population as u64;
+            let log2n = (u64::BITS - (n - 1).leading_zeros()) as u64;
+            assert!(bits <= n * log2n, "n = {population}: {bits} > {n}·{log2n}");
+            assert!(bits > n, "n = {population}: the price must exceed n bits");
+        }
+    }
+}

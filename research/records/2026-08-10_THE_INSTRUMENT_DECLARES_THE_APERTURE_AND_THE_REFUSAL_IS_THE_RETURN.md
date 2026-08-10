@@ -428,6 +428,40 @@ makes it a 2-group automatically. That is Gauss–Wantzel, and it is the reason
 
 **Its first run falsified §1.4** — see the correction there. Roadmap items 1, 2 and 3 are closed.
 
+### 7b.3 The order has a price — roadmap item 4, first half
+
+`interchange::{order_price_bits, OrderPrice}`. An order over `n` items costs **`⌈log₂(n!)⌉` bits**,
+computed exactly over `BigUint` with the factorial built and its bit length read off. No Stirling on
+the path; `n log₂ n` appears only as a scale column.
+
+**The two halves are kept apart on purpose.** The price is arithmetic and always correct. Whether
+those bits buy anything is a measurement against **one declared receiver family**, which
+`interchange.rs` already decides by exhibiting a distinguishing word. `OrderPrice::overpayment()` is
+zero unless the certificate itself says the family is blind.
+
+Measured on four declared materials by `examples/the_order_has_a_price.rs`:
+
+```text
+material                       staged  verdict        bits  overpayment
+TwoGadgets (independent pair)       2  INTERCHANGE       1  1
+TwoGadgets (whole order)            2  ORDERED           1  0
+CoupledJunctions                    1  ORDERED           0  0
+SameEndpointDifferentPath           2  ORDERED           1  0
+```
+
+**So `"apparatus completion order never enters semantic lineage"` now has a magnitude**, and
+Devillers–Gandoin's *"the algorithm saves the encoding of the order information"* is the same
+quantity from the other side: what a coder gains by dropping an order is what a front loses by
+carrying one.
+
+**The second half is BLOCKED, and the blocker is a defect the roadmap already forbids.**
+`examples/the_front_is_ordered_until_a_certificate_unorders_it.rs` runs the certificate on
+`soma/formal` and **SIGKILLs at HEAD — exit 137**, measured 2026-08-10 and confirmed against a clean
+checkout of that file, so it is not caused by this session's work. Until it completes, the
+real-material order price is unavailable and is **not guessed**. `blueprint/THE_ROADMAP.md`'s own
+prohibition — *"No aperture-less organ in the corpus path"* — already names `eros_resonant_corpus_current`
+SIGKILLing at 10,963 MB; **this is a second instance and it was not on the list.**
+
 ---
 
 ## 8 · Bounds

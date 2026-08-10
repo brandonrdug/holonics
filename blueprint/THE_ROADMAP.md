@@ -87,10 +87,17 @@ is deposited in place.
    set to the crystal reading of `2026-08-09_THE_COLOR_IS_A_RECEIVER_QUOTIENT…`. *Falsifier:* the
    pentagon must be **admitted by the compass and refused by the lattice** in the same run. Neither
    aperture contains the other, and a body that reports one verdict has collapsed two instruments.
-4. **Price the order.** Devillers–Gandoin measure the vertex order at `n log₂ n` bits. The front's
-   `merge_witnesses` carries host arrival order into the returned population. *Falsifier:* enact the
-   front at `N` lanes and require the returned output **set** to be identical; the cost of the order
-   is then a measured quantity rather than a suspicion.
+4. **Price the order — FIRST HALF CLOSED, SECOND HALF BLOCKED.** `interchange::order_price_bits`
+   returns `⌈log₂(n!)⌉` exactly over `BigUint`, and `OrderPrice` charges it only where the declared
+   receiver family is blind. Measured on four materials; the independent pair pays and the three
+   ordered ones do not.
+
+   **The second half is blocked by a SIGKILL that was already in the tree.**
+   `examples/the_front_is_ordered_until_a_certificate_unorders_it.rs` runs the certificate on
+   `soma/formal` and exits **137** at HEAD, confirmed against a clean checkout of that file. So the
+   real-material order price is unavailable and is not guessed. **This is a second instance of the
+   prohibition this file already carries** — *"No aperture-less organ in the corpus path"* — which
+   named only `eros_resonant_corpus_current`. Diagnosing and bounding it is the open work.
 5. **The short-circuit cut has no owner.**
 6. **The accumulation cut.** `temper` and `derivation_integral` are built in both directions through
    `Cochain` and still do not reference each other; `supported_realizers::positive_form → inertia` is
