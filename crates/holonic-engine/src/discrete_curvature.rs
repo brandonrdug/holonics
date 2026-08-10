@@ -46,9 +46,25 @@
 //! that makes the total map a reflection instead of a contraction.
 //!
 //! So this organ is a curvature **feedback** with the Ricci shape and a
-//! **reflective** law. A convergent flow is a different `c`, and it is not
-//! built. `canon/TABLET_THE_TURN.md` §11.6 carries the statement and its
-//! bound; neither is claimed here.
+//! **reflective** law.
+//!
+//! **The convergent coefficient is solved, 2026-08-10.** [`total_multiplier`]
+//! proves `Sigma K' = (1 - 2c) Sigma K` in two lines, so `c = 1` is exactly
+//! the multiplier `-1` — a reflection — and `c = 1/2` is the unique
+//! annihilator. `c = 1/2` against `c = 1` is `I - P` against `I - 2P`: the
+//! projection and the reflection it doubles, which is `CLAUDE.md` §2b's half
+//! turn arriving from the curvature side. [`step_at`] takes the coefficient
+//! from the caller and [`coefficient_species`] says exactly what it does.
+//!
+//! Two bounds travel with it. The total and the pointwise amplitude are
+//! independent, and on a **bipartite** incidence the alternating deficit is an
+//! eigenvector with eigenvalue `1` at every coefficient — two-colourability is
+//! the obstruction to convergence, which is this module's own
+//! [`CurvatureFixedPoint::AlternatingTracedDeviation`]. And on a `d`-regular
+//! component at unit response `c = 1/2` flattens in one step *by arithmetic*,
+//! which is a property of the incidence and not of the coefficient.
+//!
+//! `canon/TABLET_THE_TURN.md` §11.6 carries the statement and both bounds.
 //!
 //! # The carrier
 //!
@@ -230,6 +246,106 @@ fn flat_coordination() -> Rat {
 
 fn count(value: usize) -> Rat {
     Rat::from_integer(BigInt::from(value))
+}
+
+// -------------------------------------------------------------------------------------------------
+// The discharge coefficient, and the exact law it obeys on the total
+// -------------------------------------------------------------------------------------------------
+
+/// **`Sigma K' = (1 - 2c) Sigma K`**, exactly, for any discharge coefficient `c`.
+///
+/// # The two-line proof
+///
+/// Let `B` be the unsigned vertex-hinge incidence, `D = diag(n_v)`, `A` the vertex adjacency. Then
+/// `K = F*1 - B r` and `h = D^-1 K`, and the law `r <- r + c B^T h` gives
+///
+/// ```text
+/// K' = F*1 - B r' = K - c B B^T D^-1 K = K - c (D + A) D^-1 K
+/// ```
+///
+/// because `B B^T = D + A` — the diagonal counts a vertex's own hinges and the off-diagonal counts
+/// the one hinge joining two vertices. Summing, `1^T (D + A) = (n_v)^T + (n_v)^T = 2 (n_v)^T`, so
+/// `1^T (D + A) D^-1 = 2 * 1^T` and
+///
+/// ```text
+/// Sigma K' = 1^T K - 2c * 1^T K = (1 - 2c) Sigma K.
+/// ```
+///
+/// # What that settles
+///
+/// The module's derived `c = 1` — the unique coefficient at which a vertex's own discharge annuls
+/// its own deficit — is exactly the coefficient at which this multiplier is `-1`. **The law is a
+/// reflection on the total-curvature functional, and a reflection does not converge.**
+///
+/// `research/records/2026-07-19_THE_RICCI_TRACE_CHANGES_THE_RECEIVER_THE_SINGULAR_NECK_REBASES_THE_BODY.md`
+/// is ratified that *"Ricci flow feeds that receiver quotient back into the metric by which later
+/// continuations are compared"*, and the content of a flow is dissipative approach. So the
+/// multiplier is the discriminant, and it is `1 - 2c`:
+///
+/// ```text
+/// c = 0        multiplier  1     inert
+/// 0 < c < 1/2  in (0, 1)         dissipative
+/// c = 1/2      multiplier  0     ANNIHILATING — the total is zero after one step
+/// 1/2 < c < 1  in (-1, 0)        dissipative, overshooting
+/// c = 1        multiplier -1     REFLECTIVE — the module's derived law
+/// otherwise    |multiplier| > 1  expanding
+/// ```
+///
+/// **`c = 1/2` against `c = 1` is `I - P` against `I - 2P`** — the projection and the reflection it
+/// doubles. `CLAUDE.md` §2b: the involution is a half turn on a magnitude, and the projection is the
+/// half of it. The live law overshoots the dissipative one by exactly a factor of two.
+pub fn total_multiplier(coefficient: &Rat) -> Rat {
+    Rat::from_integer(BigInt::from(1)) - Rat::from_integer(BigInt::from(2)) * coefficient
+}
+
+/// **The unique coefficient that annihilates the total curvature in one step**, `c = 1/2`.
+///
+/// Derived, not chosen: it is the one root of `1 - 2c = 0`. Nothing is authored — the value is a
+/// theorem about [`total_multiplier`], and the module's own `c = 1` is the other distinguished root
+/// of `|1 - 2c| = 1`.
+pub fn dissipative_annihilator() -> Rat {
+    Rat::new(BigInt::from(1), BigInt::from(2))
+}
+
+/// What a declared discharge coefficient does to the total-curvature functional, read off
+/// [`total_multiplier`] exactly and never from a tolerance.
+///
+/// This **classifies and does not refuse**. The coefficient is the caller's declaration; the species
+/// is derived from it. `CLAUDE.md` §13 rule 2 — count freely, report what you count, never let a
+/// count quietly decide.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub enum CoefficientSpecies {
+    /// `c = 0`. Multiplier `1`. Nothing is discharged and nothing moves.
+    Inert,
+    /// `0 < |1 - 2c| < 1`. The total contracts geometrically. This is the flow.
+    Dissipative,
+    /// `c = 1/2`. Multiplier `0`. The total is exactly zero after one step.
+    Annihilating,
+    /// `c = 1`. Multiplier `-1`. An involution: the total alternates and never decays.
+    Reflective,
+    /// `|1 - 2c| > 1`. The total grows.
+    Expanding,
+}
+
+/// Classify a declared coefficient by its exact multiplier.
+pub fn coefficient_species(coefficient: &Rat) -> CoefficientSpecies {
+    let one = Rat::from_integer(BigInt::from(1));
+    let multiplier = total_multiplier(coefficient);
+    if coefficient.is_zero() {
+        return CoefficientSpecies::Inert;
+    }
+    if multiplier.is_zero() {
+        return CoefficientSpecies::Annihilating;
+    }
+    if multiplier == -one.clone() {
+        return CoefficientSpecies::Reflective;
+    }
+    let magnitude = if multiplier < Rat::zero() { -multiplier } else { multiplier };
+    if magnitude < one {
+        CoefficientSpecies::Dissipative
+    } else {
+        CoefficientSpecies::Expanding
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Error)]
@@ -592,11 +708,67 @@ impl DiscreteCurvatureConfiguration {
             .collect()
     }
 
-    /// Apply the update law once, simultaneously to every hinge.
-    pub fn step(&mut self) -> CurvatureFlowStep {
+    /// The increment the law applies to one hinge under a **declared** discharge coefficient:
+    /// `c * (h(u) + h(v))`.
+    pub fn hinge_revision_at(
+        &self,
+        hinge: HingeId,
+        coefficient: &Rat,
+    ) -> Result<Rat, DiscreteCurvatureError> {
+        Ok(coefficient * self.hinge_revision(hinge)?)
+    }
+
+    /// [`Self::revisions`] under a declared discharge coefficient.
+    pub fn revisions_at(&self, coefficient: &Rat) -> BTreeMap<HingeId, Rat> {
+        self.revisions()
+            .into_iter()
+            .map(|(id, revision)| (id, coefficient * revision))
+            .collect()
+    }
+
+    /// The successor deficits in closed form under a declared coefficient,
+    /// `K'(v) = (1 - c) K(v) - c * sum over neighbours of h(w)`.
+    ///
+    /// Like [`Self::predicted_deficits`] this route never reads or writes a response, so it is an
+    /// independent check on [`Self::step_at`]. At `c = 1` it reduces to the closed form the module
+    /// header proves.
+    pub fn predicted_deficits_at(&self, coefficient: &Rat) -> BTreeMap<VertexId, Rat> {
+        let one = Rat::from_integer(BigInt::from(1));
+        let deviations = self.traced_deviations();
+        let deficits = self.deficits();
+        self.vertices()
+            .map(|vertex| {
+                let mut far_shares = Rat::zero();
+                for hinge in &self.incidence[&vertex] {
+                    let far = self.hinges[hinge]
+                        .far_endpoint(vertex)
+                        .expect("an incident hinge names this vertex");
+                    far_shares += &deviations[&far];
+                }
+                let carried = (&one - coefficient) * &deficits[&vertex] - coefficient * far_shares;
+                (vertex, carried)
+            })
+            .collect()
+    }
+
+    /// Apply the update law once under a **declared** discharge coefficient.
+    ///
+    /// The coefficient is the caller's, and [`coefficient_species`] says exactly what it does to the
+    /// total-curvature functional. [`Self::step`] is this at `c = 1`, which is
+    /// [`CoefficientSpecies::Reflective`].
+    pub fn step_at(&mut self, coefficient: &Rat) -> CurvatureFlowStep {
         let deficits_before = self.deficits();
         let traced_deviations = self.traced_deviations();
-        let revisions = self.revisions();
+        let revisions = self.revisions_at(coefficient);
+        self.apply(deficits_before, traced_deviations, revisions)
+    }
+
+    fn apply(
+        &mut self,
+        deficits_before: BTreeMap<VertexId, Rat>,
+        traced_deviations: BTreeMap<VertexId, Rat>,
+        revisions: BTreeMap<HingeId, Rat>,
+    ) -> CurvatureFlowStep {
         for (id, revision) in &revisions {
             let carried = self
                 .hinges
@@ -621,6 +793,30 @@ impl DiscreteCurvatureConfiguration {
             total_deficit_after,
             moved,
         }
+    }
+
+    /// Apply the update law once at the module's derived `c = 1`.
+    pub fn step(&mut self) -> CurvatureFlowStep {
+        self.step_at(&Rat::from_integer(BigInt::from(1)))
+    }
+
+    /// The largest `|K(v)|` over the configuration — the pointwise amplitude the total cannot see.
+    ///
+    /// `Sigma K` is one linear functional. A configuration whose total is zero can still carry
+    /// arbitrarily large opposing deficits, and on a bipartite incidence it does so forever at every
+    /// coefficient. Reporting the total alone would be the receipt-over-implementation defect at the
+    /// level of a convergence claim.
+    pub fn deficit_amplitude(&self) -> Rat {
+        self.deficits()
+            .into_values()
+            .map(|deficit| if deficit < Rat::zero() { -deficit } else { deficit })
+            .fold(Rat::zero(), |carried, magnitude| {
+                if magnitude > carried {
+                    magnitude
+                } else {
+                    carried
+                }
+            })
     }
 
     /// The components and two-colouring of the hinge incidence.
@@ -1467,5 +1663,201 @@ mod tests {
             ],
         );
         assert_eq!(duplicate, Err(DiscreteCurvatureError::DuplicateHinge(hinge(1))));
+    }
+
+    // ---------------------------------------------------------------------------------------------
+    // The discharge coefficient: the total law, the annihilator, and the bipartite obstruction
+    // ---------------------------------------------------------------------------------------------
+
+    /// `Sigma K' = (1 - 2c) Sigma K` holds exactly at every declared coefficient.
+    ///
+    /// This is the theorem the module's `c = 1` is one point of, and it is what makes `c = 1` a
+    /// reflection rather than a flow. Checked on real material at six coefficients, over exact
+    /// rationals, with no tolerance anywhere.
+    #[test]
+    fn the_total_curvature_multiplier_is_exactly_one_minus_two_c() {
+        for (numerator, denominator) in [(0, 1), (1, 4), (1, 2), (3, 4), (1, 1), (2, 1)] {
+            let coefficient = rat(numerator, denominator);
+            let mut configuration =
+                DiscreteCurvatureConfiguration::at_unit_response(bipyramid_hinges())
+                    .expect("the bipyramid founds");
+            let before = configuration.total_deficit();
+            let step = configuration.step_at(&coefficient);
+            let expected = total_multiplier(&coefficient) * &before;
+            assert_eq!(
+                step.total_deficit_after, expected,
+                "coefficient {numerator}/{denominator}"
+            );
+            assert_eq!(step.total_deficit_before, before);
+        }
+    }
+
+    /// The closed form and the response route agree at a general coefficient, not only at `c = 1`.
+    #[test]
+    fn the_predicted_and_enacted_successors_agree_at_every_coefficient() {
+        for (numerator, denominator) in [(1, 3), (1, 2), (1, 1), (5, 4)] {
+            let coefficient = rat(numerator, denominator);
+            let mut configuration =
+                DiscreteCurvatureConfiguration::at_unit_response(bipyramid_hinges())
+                    .expect("the bipyramid founds");
+            let predicted = configuration.predicted_deficits_at(&coefficient);
+            let step = configuration.step_at(&coefficient);
+            assert_eq!(
+                predicted, step.deficits_after,
+                "coefficient {numerator}/{denominator}"
+            );
+        }
+    }
+
+    /// `c = 1/2` annihilates the total in exactly one step, and it is the only coefficient that does.
+    #[test]
+    fn the_derived_annihilator_zeroes_the_total_in_one_step() {
+        let mut configuration = DiscreteCurvatureConfiguration::at_unit_response(bipyramid_hinges())
+            .expect("the bipyramid founds");
+        assert!(!configuration.total_deficit().is_zero(), "the fixture is curved to begin with");
+        let step = configuration.step_at(&dissipative_annihilator());
+        assert!(step.total_deficit_after.is_zero());
+        assert_eq!(
+            coefficient_species(&dissipative_annihilator()),
+            CoefficientSpecies::Annihilating
+        );
+        assert_eq!(
+            coefficient_species(&rat(1, 1)),
+            CoefficientSpecies::Reflective,
+            "the module's own derived law is the reflection"
+        );
+    }
+
+    /// **The flow contracts the total and the reflection does not**, over the same material and the
+    /// same number of steps, exactly and with the ratio exhibited.
+    ///
+    /// Stated on the total and **not** on the pointwise amplitude, because the total is what
+    /// [`total_multiplier`] governs and the amplitude is not. On this fixture the reflective
+    /// amplitude in fact decays even though its total never does — the two quantities are
+    /// independent, and asserting a direction for the amplitude would be a claim this module has
+    /// not derived. The driver reports the amplitude; the theorem is the total.
+    #[test]
+    fn a_dissipative_coefficient_contracts_the_total_and_the_reflective_one_only_alternates() {
+        let steps = 6;
+        let quarter = rat(1, 4);
+        let one = rat(1, 1);
+
+        // c = 1/4 gives multiplier 1/2: the total halves, exactly, every step.
+        let mut dissipative =
+            DiscreteCurvatureConfiguration::at_unit_response(bipyramid_hinges()).expect("founds");
+        let start = dissipative.total_deficit();
+        assert!(!start.is_zero(), "the fixture is curved to begin with");
+        let mut carried = start.clone();
+        for index in 0..steps {
+            dissipative.step_at(&quarter);
+            carried = rat(1, 2) * carried;
+            assert_eq!(dissipative.total_deficit(), carried, "step {index}");
+        }
+        assert_eq!(
+            dissipative.total_deficit(),
+            &start * rat(1, 64),
+            "six halvings, exactly"
+        );
+
+        // c = 1 gives multiplier -1: the magnitude never moves and the sign alternates.
+        let mut reflective =
+            DiscreteCurvatureConfiguration::at_unit_response(bipyramid_hinges()).expect("founds");
+        for index in 0..steps {
+            reflective.step_at(&one);
+            let expected = if index % 2 == 0 { -start.clone() } else { start.clone() };
+            assert_eq!(reflective.total_deficit(), expected, "step {index}");
+        }
+        assert_eq!(reflective.total_deficit().abs(), start.abs());
+
+        // And the annihilator reaches zero in one step and stays.
+        let mut annihilating =
+            DiscreteCurvatureConfiguration::at_unit_response(bipyramid_hinges()).expect("founds");
+        for _ in 0..steps {
+            annihilating.step_at(&dissipative_annihilator());
+            assert!(annihilating.total_deficit().is_zero());
+        }
+    }
+
+    /// **The bipartite obstruction, exactly.** On a single hinge the alternating deficit is an
+    /// eigenvector of the flow with eigenvalue `1` at EVERY coefficient, so no choice of `c`
+    /// dissipates it. Two-colourability is the obstruction to convergence, which is the hand again.
+    #[test]
+    fn an_alternating_deficit_on_a_bipartite_incidence_is_invariant_at_every_coefficient() {
+        for (numerator, denominator) in [(1, 4), (1, 2), (3, 4), (1, 1)] {
+            let coefficient = rat(numerator, denominator);
+            // Two vertices, one hinge. Unequal link sizes are impossible here, so the deficits are
+            // equal and opposite only if the responses make them so: K(u) = 6 - r, K(v) = 6 - r.
+            // Instead take the bipyramid's own two-colouring, which the module already detects.
+            let mut configuration =
+                DiscreteCurvatureConfiguration::at_unit_response(bipartite_hinges())
+                    .expect("the path founds");
+            let before = configuration.deficits();
+            configuration.step_at(&coefficient);
+            let after = configuration.deficits();
+            let alternating_before: Rat = before
+                .iter()
+                .enumerate()
+                .fold(Rat::zero(), |carried, (index, (_, deficit))| {
+                    if index % 2 == 0 { carried + deficit } else { carried - deficit }
+                });
+            let alternating_after: Rat = after
+                .iter()
+                .enumerate()
+                .fold(Rat::zero(), |carried, (index, (_, deficit))| {
+                    if index % 2 == 0 { carried + deficit } else { carried - deficit }
+                });
+            assert_eq!(
+                alternating_before, alternating_after,
+                "the alternating mode is invariant at coefficient {numerator}/{denominator}"
+            );
+        }
+    }
+
+    /// **On a regular component the annihilator reaches exact flatness in one step, and that is a
+    /// property of the incidence rather than of the flow.**
+    ///
+    /// At unit response `K(v) = F - n_v`, so on a `d`-regular component `K` is constant `F - d` and
+    /// `sum over neighbours of K(w)/n_w = d (F - d)/d = K(v)`. Hence at `c = 1/2`
+    /// `K'(v) = (1/2)(K(v) - K(v)) = 0` exactly, everywhere, after one step.
+    ///
+    /// Stated here so that a driver reporting `FLAT after 1 step` on clique-like material cannot be
+    /// read as a discovery about the coefficient. `CLAUDE.md` §8: a receipt that could not have come
+    /// out otherwise carries no evidence. The irregular control is the second half of this test.
+    #[test]
+    fn the_annihilator_flattens_a_regular_component_in_one_step_and_an_irregular_one_not_at_all() {
+        // K4: every vertex has link size 3.
+        let mut regular_hinges = Vec::new();
+        let mut next = 1_u64;
+        for left in 1..=4u64 {
+            for right in (left + 1)..=4u64 {
+                regular_hinges.push((hinge(next), [vertex(left), vertex(right)]));
+                next += 1;
+            }
+        }
+        let mut regular = DiscreteCurvatureConfiguration::at_unit_response(regular_hinges)
+            .expect("the tetrahedron founds");
+        assert!(!regular.is_flat(), "K4 at unit response is curved");
+        regular.step_at(&dissipative_annihilator());
+        assert!(regular.is_flat(), "one step flattens a regular component exactly");
+
+        // The bipyramid is irregular — link sizes 5 and 4 — so the same coefficient zeroes the
+        // total and leaves the configuration curved.
+        let mut irregular = DiscreteCurvatureConfiguration::at_unit_response(bipyramid_hinges())
+            .expect("the bipyramid founds");
+        irregular.step_at(&dissipative_annihilator());
+        assert!(irregular.total_deficit().is_zero(), "the total is annihilated regardless");
+        assert!(
+            !irregular.is_flat(),
+            "but an irregular component is not flattened, so the one-step result is about the \
+             incidence and not about the coefficient"
+        );
+    }
+
+    /// A path on three vertices: bipartite, so it carries the alternating mode above.
+    fn bipartite_hinges() -> Vec<(HingeId, [VertexId; 2])> {
+        vec![
+            (hinge(1), [vertex(1), vertex(2)]),
+            (hinge(2), [vertex(2), vertex(3)]),
+        ]
     }
 }

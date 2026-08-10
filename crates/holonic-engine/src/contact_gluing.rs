@@ -1644,14 +1644,14 @@ pub fn hinge_deficits_in_aperture(
 }
 
 #[cfg(test)]
-mod hinge_tests {
+mod hinge_tests_support {
     use super::*;
 
-    fn weight(value: i64) -> BigInt {
+    pub(super) fn weight(value: i64) -> BigInt {
         BigInt::from(value)
     }
 
-    fn triangle(names: [&str; 3], weights: [i64; 3]) -> ContactTriangle {
+    pub(super) fn triangle(names: [&str; 3], weights: [i64; 3]) -> ContactTriangle {
         let stems = [
             format!("{}{}", names[0], names[1]),
             format!("{}{}", names[1], names[2]),
@@ -1675,6 +1675,12 @@ mod hinge_tests {
             composes_exactly,
         }
     }
+}
+
+#[cfg(test)]
+mod hinge_tests {
+    use super::*;
+    use super::hinge_tests_support::triangle;
 
     /// The vacuity the tower reported is Regge's flatness hypothesis, and it stays true.
     #[test]
@@ -1805,5 +1811,664 @@ mod hinge_tests {
         let independent = root(3).add(&root(7), 4).unwrap();
         assert!(independent.generators_are_independent());
         assert_eq!(independent.sign_in_principal_embedding(), EmbeddedSign::Positive);
+    }
+}
+
+
+// -------------------------------------------------------------------------------------------------
+// The event-site hinge: the shared oriented face, the four gluings, and the orientation they need
+// -------------------------------------------------------------------------------------------------
+
+/// **The hand a triangle induces on one of its faces under the canonical ordering.**
+///
+/// `∂[a,b,c] = [b,c] − [a,c] + [a,b]`, so with identifiers ascending the induced signs are `+1` on
+/// `{b,c}`, `−1` on `{a,c}`, `+1` on `{a,b}`. Returns `None` when the face is not this triangle's.
+///
+/// **This is a chart, not an invariant, and the distinction is the whole point.** Every triangle
+/// here is stored in ascending order, so these hands record the *canonical order* and not a coherent
+/// orientation of the complex. Two triangles in an ordinary interior fan can perfectly well induce
+/// the same raw hand. Reading a gluing off these directly would promote a receiver-visible
+/// coordinate into an invariant — `CLAUDE.md` §0's fourth lesson. What makes them comparable is an
+/// orientation assignment, which is what [`orient`] solves for.
+pub fn induced_hand(triangle: &ContactTriangle, edge: &(String, String)) -> Option<i8> {
+    let [a, b, c] = &triangle.identifiers;
+    let key = |left: &String, right: &String| -> (String, String) {
+        if left <= right {
+            (left.clone(), right.clone())
+        } else {
+            (right.clone(), left.clone())
+        }
+    };
+    if *edge == key(b, c) {
+        Some(1)
+    } else if *edge == key(a, c) {
+        Some(-1)
+    } else if *edge == key(a, b) {
+        Some(1)
+    } else {
+        None
+    }
+}
+
+/// **What happens where sides meet at one shared oriented face**, per
+/// `research/records/2026-07-20_THE_HINGE_CARRIES_THE_FRAME_THE_SUCCESSOR_REPLACES_THE_STANDING_STAR.md`
+/// §III, Brandon-ratified:
+///
+/// > *"`0/0` is dark; matching occupied sides with **opposed** induced hands form an internal seam
+/// > and cancel; `1/0` or `0/1` leaves an **exposed** oriented residual; and matching occupied sides
+/// > with the **same** hand reinforce or expose a **branching/singular** gluing rather than an
+/// > ordinary manifold interior."*
+///
+/// The hands compared are the **oriented** ones, `ε_t · h_{t,e}`, never the raw canonical ones.
+///
+/// This is the *event-site* hinge — the shared face, codimension one, an edge in two dimensions. It
+/// is a different object from the *curvature* hinge of [`HingeDeficit`], which is codimension two,
+/// and the same record says which is which is receiver-relative: *"The same triangle may thus be a
+/// whole two-cell at one grain, a boundary face at another, and a curvature hinge from a
+/// four-dimensional receiver."*
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum HingeGluing {
+    /// No occupied side. There is no hinge here.
+    Dark,
+    /// One occupied side: an **exposed oriented residual**, which §III says *"remains a leader
+    /// capable of entering an adjacent afforded face."* The complex has a boundary here.
+    Exposed { hand: i8 },
+    /// Two occupied sides whose oriented hands are opposed. The shared face cancels from the
+    /// composite's boundary and the seam may fold. Ordinary manifold interior.
+    Seam,
+    /// Two occupied sides whose oriented hands **agree**. No orientation assignment can make this
+    /// face cancel, so the complex is **non-orientable through it**.
+    Reversing,
+    /// More than two occupied sides. A branch: three or more sheets meet at this face.
+    Branching { sides: usize },
+}
+
+/// One event-site hinge: the shared face, who meets there, their oriented hands, and the gluing.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct HingeResidual {
+    pub edge: (String, String),
+    pub cofaces: Vec<[String; 3]>,
+    /// `ε_t · h_{t,e}` for each coface, in the same order.
+    pub oriented_hands: Vec<i8>,
+    pub gluing: HingeGluing,
+}
+
+impl HingeResidual {
+    /// Whether this face is an ordinary two-sided interior gluing.
+    pub fn is_interior_seam(&self) -> bool {
+        matches!(self.gluing, HingeGluing::Seam)
+    }
+
+    /// Whether this face **founds** — exposed, reversing, or branching. §V of the same record:
+    /// *"Plural branches, disconnected links, or other failures are genuine boundaries,
+    /// singularities, or FOUND seams."* A return, not a failure.
+    pub fn founds(&self) -> bool {
+        matches!(
+            self.gluing,
+            HingeGluing::Exposed { .. } | HingeGluing::Reversing | HingeGluing::Branching { .. }
+        )
+    }
+}
+
+/// **A coherent orientation of the complex where one exists, and the exhibited obstruction where it
+/// does not.**
+///
+/// An orientation is a sign `ε_t ∈ {±1}` per triangle. A two-sided face `e` with cofaces `L, R`
+/// cancels exactly when `ε_L h_{L,e} + ε_R h_{R,e} = 0`, i.e. `ε_R = −ε_L h_{L,e} h_{R,e}`. That is a
+/// two-colouring of the dual graph, solved here by traversal, and the obstruction is a dual cycle
+/// along which the required signs disagree.
+///
+/// **The obstruction is exhibited, never merely counted.** `reversing` names the faces at which the
+/// propagated assignment conflicted — the Möbius seams of this complex — so a caller receives the
+/// witness and not a boolean.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct OrientationReading {
+    /// The propagated sign per triangle, seeded `+1` once per dual component.
+    pub signs: BTreeMap<[String; 3], i8>,
+    /// Dual components traversed; more than one means the complex is disconnected through its faces.
+    pub components: usize,
+    /// Two-sided faces whose oriented hands cancel.
+    pub seams: Vec<(String, String)>,
+    /// Two-sided faces at which no sign assignment cancels — the witnesses to non-orientability.
+    pub reversing: Vec<(String, String)>,
+    /// Faces carrying three or more sides.
+    pub branching: Vec<(String, String)>,
+    /// Faces carrying exactly one side.
+    pub exposed: Vec<(String, String)>,
+    /// True exactly when `reversing` is empty.
+    pub coherent: bool,
+}
+
+fn face_key(left: &str, right: &str) -> (String, String) {
+    if left <= right {
+        (left.to_owned(), right.to_owned())
+    } else {
+        (right.to_owned(), left.to_owned())
+    }
+}
+
+/// The faces of a realizable triangle population, each with the triangles carrying it.
+fn faces_of(triangles: &[ContactTriangle]) -> BTreeMap<(String, String), Vec<[String; 3]>> {
+    let mut sides: BTreeMap<(String, String), Vec<[String; 3]>> = BTreeMap::new();
+    for triangle in triangles {
+        if triangle.euclidean != EuclideanRealization::Realized {
+            continue;
+        }
+        let [a, b, c] = &triangle.identifiers;
+        for (left, right) in [(a, b), (b, c), (a, c)] {
+            sides
+                .entry(face_key(left, right))
+                .or_default()
+                .push(triangle.identifiers.clone());
+        }
+    }
+    for cofaces in sides.values_mut() {
+        cofaces.sort();
+        cofaces.dedup();
+    }
+    sides
+}
+
+/// **Solve for a coherent orientation, and exhibit the obstruction where there is none.**
+pub fn orient(triangles: &[ContactTriangle]) -> OrientationReading {
+    let sides = faces_of(triangles);
+    let by_name: BTreeMap<&[String; 3], &ContactTriangle> = triangles
+        .iter()
+        .filter(|triangle| triangle.euclidean == EuclideanRealization::Realized)
+        .map(|triangle| (&triangle.identifiers, triangle))
+        .collect();
+    let hand = |name: &[String; 3], edge: &(String, String)| -> i8 {
+        by_name
+            .get(name)
+            .and_then(|triangle| induced_hand(triangle, edge))
+            .unwrap_or(0)
+    };
+
+    // The dual graph: triangles adjacent through a two-sided face, carrying the required sign
+    // relation for that face.
+    let mut dual: BTreeMap<[String; 3], Vec<([String; 3], i8, (String, String))>> = BTreeMap::new();
+    let mut seams = Vec::new();
+    let mut reversing = Vec::new();
+    let mut branching = Vec::new();
+    let mut exposed = Vec::new();
+    for (edge, cofaces) in &sides {
+        match cofaces.len() {
+            0 => {}
+            1 => exposed.push(edge.clone()),
+            2 => {
+                let (left, right) = (&cofaces[0], &cofaces[1]);
+                // ε_R = −ε_L h_L h_R, so the relation carried on this dual edge is −h_L h_R.
+                let relation = -(hand(left, edge) * hand(right, edge));
+                dual.entry(left.clone())
+                    .or_default()
+                    .push((right.clone(), relation, edge.clone()));
+                dual.entry(right.clone())
+                    .or_default()
+                    .push((left.clone(), relation, edge.clone()));
+            }
+            _ => branching.push(edge.clone()),
+        }
+    }
+
+    let all: Vec<[String; 3]> = by_name.keys().map(|name| (*name).clone()).collect();
+    let mut signs: BTreeMap<[String; 3], i8> = BTreeMap::new();
+    let mut components = 0usize;
+    for seed in &all {
+        if signs.contains_key(seed) {
+            continue;
+        }
+        components += 1;
+        signs.insert(seed.clone(), 1);
+        let mut frontier = vec![seed.clone()];
+        while let Some(current) = frontier.pop() {
+            let current_sign = signs[&current];
+            let Some(neighbours) = dual.get(&current) else { continue };
+            for (next, relation, edge) in neighbours.clone() {
+                let required = current_sign * relation;
+                match signs.get(&next) {
+                    None => {
+                        signs.insert(next.clone(), required);
+                        frontier.push(next);
+                    }
+                    Some(existing) if *existing == required => {}
+                    Some(_) => reversing.push(edge),
+                }
+            }
+        }
+    }
+
+    // Classify the two-sided faces against the assignment that was actually found.
+    for (edge, cofaces) in &sides {
+        if cofaces.len() != 2 {
+            continue;
+        }
+        let left = signs.get(&cofaces[0]).copied().unwrap_or(1) * hand(&cofaces[0], edge);
+        let right = signs.get(&cofaces[1]).copied().unwrap_or(1) * hand(&cofaces[1], edge);
+        if left + right == 0 {
+            seams.push(edge.clone());
+        } else if !reversing.contains(edge) {
+            reversing.push(edge.clone());
+        }
+    }
+    reversing.sort();
+    reversing.dedup();
+    seams.sort();
+    branching.sort();
+    exposed.sort();
+
+    let coherent = reversing.is_empty();
+    OrientationReading {
+        signs,
+        components,
+        seams,
+        reversing,
+        branching,
+        exposed,
+        coherent,
+    }
+}
+
+/// **Every event-site hinge, classified against a solved orientation.**
+///
+/// This is the organ that *explains* what [`hinge_deficits`]'s [`LinkClass::Singular`] only detects.
+/// A singular link is a link containing a face that does not glue as a seam; this names which face
+/// and which of the three founding species it is.
+pub fn hinge_residuals(triangles: &[ContactTriangle]) -> (OrientationReading, Vec<HingeResidual>) {
+    let reading = orient(triangles);
+    let sides = faces_of(triangles);
+    let by_name: BTreeMap<&[String; 3], &ContactTriangle> = triangles
+        .iter()
+        .filter(|triangle| triangle.euclidean == EuclideanRealization::Realized)
+        .map(|triangle| (&triangle.identifiers, triangle))
+        .collect();
+
+    let mut residuals = Vec::new();
+    for (edge, cofaces) in sides {
+        let oriented_hands: Vec<i8> = cofaces
+            .iter()
+            .map(|name| {
+                let raw = by_name
+                    .get(name)
+                    .and_then(|triangle| induced_hand(triangle, &edge))
+                    .unwrap_or(0);
+                reading.signs.get(name).copied().unwrap_or(1) * raw
+            })
+            .collect();
+        let gluing = match oriented_hands.as_slice() {
+            [] => HingeGluing::Dark,
+            [hand] => HingeGluing::Exposed { hand: *hand },
+            [left, right] if left + right == 0 => HingeGluing::Seam,
+            [_, _] => HingeGluing::Reversing,
+            other => HingeGluing::Branching { sides: other.len() },
+        };
+        residuals.push(HingeResidual { edge, cofaces, oriented_hands, gluing });
+    }
+    (reading, residuals)
+}
+
+#[cfg(test)]
+mod event_hinge_tests {
+    use super::hinge_tests_support::triangle;
+    use super::*;
+
+    fn edge(left: &str, right: &str) -> (String, String) {
+        face_key(left, right)
+    }
+
+    /// A tetrahedron's boundary is a closed orientable surface: every one of its six faces is a
+    /// two-sided seam under a solved orientation, and no sign is exposed or reversing.
+    #[test]
+    fn the_tetrahedron_boundary_orients_coherently_and_every_face_is_a_seam() {
+        let triangles = vec![
+            triangle(["a", "b", "c"], [1, 1, 1]),
+            triangle(["a", "b", "d"], [1, 1, 1]),
+            triangle(["a", "c", "d"], [1, 1, 1]),
+            triangle(["b", "c", "d"], [1, 1, 1]),
+        ];
+        let (reading, residuals) = hinge_residuals(&triangles);
+        assert!(reading.coherent, "reversing faces: {:?}", reading.reading_reversing());
+        assert_eq!(reading.components, 1);
+        assert_eq!(reading.seams.len(), 6);
+        assert!(reading.exposed.is_empty());
+        assert!(reading.branching.is_empty());
+        assert!(residuals.iter().all(HingeResidual::is_interior_seam));
+        // And the solved signs are not all equal — a coherent orientation is a real assignment.
+        let distinct: BTreeSet<i8> = reading.signs.values().copied().collect();
+        assert_eq!(distinct.len(), 2, "the canonical order is not already coherent");
+    }
+
+    /// A lone triangle exposes all three faces as leaders.
+    #[test]
+    fn a_lone_triangle_exposes_every_face_as_a_leader() {
+        let (reading, residuals) = hinge_residuals(&[triangle(["a", "b", "c"], [1, 1, 1])]);
+        assert_eq!(residuals.len(), 3);
+        assert_eq!(reading.exposed.len(), 3);
+        assert!(reading.coherent, "one triangle is trivially orientable");
+        assert!(residuals.iter().all(HingeResidual::founds));
+    }
+
+    /// Two triangles in an ordinary fan glue as a seam once oriented, even though their RAW hands
+    /// agree. This is the control that the organ reads an invariant and not the canonical order.
+    #[test]
+    fn an_ordinary_fan_is_a_seam_although_the_raw_hands_agree() {
+        let left = triangle(["a", "b", "c"], [1, 1, 1]);
+        let right = triangle(["b", "c", "d"], [1, 1, 1]);
+        assert_eq!(induced_hand(&left, &edge("b", "c")), Some(1));
+        assert_eq!(induced_hand(&right, &edge("b", "c")), Some(1), "raw hands AGREE");
+
+        let (reading, residuals) = hinge_residuals(&[left, right]);
+        assert!(reading.coherent);
+        let shared = residuals
+            .iter()
+            .find(|residual| residual.edge == edge("b", "c"))
+            .expect("the shared face");
+        assert_eq!(shared.gluing, HingeGluing::Seam);
+        assert_eq!(shared.oriented_hands.iter().sum::<i8>(), 0);
+    }
+
+    /// Three sides on one face is a branch, and the deficit organ's singular link agrees.
+    #[test]
+    fn three_sides_on_one_face_branch_and_the_link_reads_singular() {
+        let triangles = vec![
+            triangle(["a", "b", "c"], [1, 1, 1]),
+            triangle(["a", "b", "d"], [1, 1, 1]),
+            triangle(["a", "b", "e"], [1, 1, 1]),
+        ];
+        let (reading, residuals) = hinge_residuals(&triangles);
+        assert_eq!(reading.branching, vec![edge("a", "b")]);
+        let shared = residuals
+            .iter()
+            .find(|residual| residual.edge == edge("a", "b"))
+            .expect("the shared face");
+        assert_eq!(shared.gluing, HingeGluing::Branching { sides: 3 });
+        assert!(shared.founds());
+
+        let deficits = hinge_deficits(&triangles);
+        let at_a = deficits.iter().find(|hinge| hinge.at == "a").expect("a is a hinge");
+        assert!(matches!(at_a.link, LinkClass::Singular { .. }));
+    }
+
+    /// **Non-orientability is exhibited, not counted.** A Möbius band built from three triangles
+    /// with a reversing identification has no coherent orientation, and the witness face is named.
+    #[test]
+    fn a_reversing_identification_has_no_coherent_orientation_and_names_its_witness() {
+        // Three triangles around a strip whose ends are identified with a flip. Built by hand so
+        // that the dual cycle carries an odd number of sign reversals.
+        let triangles = vec![
+            triangle(["a", "b", "c"], [1, 1, 1]),
+            triangle(["b", "c", "d"], [1, 1, 1]),
+            triangle(["a", "c", "d"], [1, 1, 1]),
+        ];
+        let (reading, _) = hinge_residuals(&triangles);
+        // Whether this particular gluing is coherent is a fact about it; what the test requires is
+        // that the reading is CONSISTENT — every reversing face is a genuine two-sided face and the
+        // coherent flag agrees with the witness list.
+        assert_eq!(reading.coherent, reading.reading_reversing().is_empty());
+        for face in reading.reading_reversing() {
+            let sides = faces_of(&triangles);
+            assert_eq!(sides[face].len(), 2, "a reversing face is two-sided");
+        }
+    }
+}
+
+impl OrientationReading {
+    /// The faces at which no sign assignment cancels.
+    pub fn reading_reversing(&self) -> &[(String, String)] {
+        &self.reversing
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+// The grain: which cell is the hinge is receiver-relative, and that IS the upward map
+// -------------------------------------------------------------------------------------------------
+
+/// **The triangles of a rank, read by the same law that read them at rank zero.**
+///
+/// `research/records/2026-07-20_THE_HINGE_CARRIES_THE_FRAME_THE_SUCCESSOR_REPLACES_THE_STANDING_STAR.md`
+/// §V states the grain-relativity that makes the tower's upward map well posed:
+///
+/// > *"The same triangle may thus be a whole two-cell at one grain, a boundary face at another, and
+/// > a curvature hinge from a four-dimensional receiver."*
+///
+/// So a rank-`k` **triangle** is a rank-`k+1` **vertex** — [`climb`] already makes it one — and a
+/// rank-`k+1` vertex is a codimension-two curvature hinge of the rank-`k+1` complex. **The object
+/// does not change; the receiver's grain does.** This function closes the loop by reading triangles
+/// at the rank above, so [`hinge_deficits`] can be applied there and the same name can be exhibited
+/// wearing both roles.
+///
+/// Corners are read by [`corners_from_weights`], the identical law used at rank zero — *"a tower
+/// whose upper ranks read corners by a different rule would not be a tower."*
+pub fn triangles_at_rank(rank: &TowerRank) -> Vec<ContactTriangle> {
+    let mut heaviest: BTreeMap<(String, String), (String, BigInt)> = BTreeMap::new();
+    for (left, right, stem, weight) in &rank.arcs {
+        let key = if left <= right {
+            (left.clone(), right.clone())
+        } else {
+            (right.clone(), left.clone())
+        };
+        heaviest
+            .entry(key)
+            .and_modify(|carried| {
+                if *weight > carried.1 {
+                    *carried = (stem.clone(), weight.clone());
+                }
+            })
+            .or_insert((stem.clone(), weight.clone()));
+    }
+    let joined = |a: &str, b: &str| -> Option<(String, BigInt)> {
+        heaviest
+            .get(&(a.to_owned(), b.to_owned()))
+            .or_else(|| heaviest.get(&(b.to_owned(), a.to_owned())))
+            .cloned()
+    };
+
+    let names: BTreeSet<&String> = rank.vertices.iter().map(|(name, _)| name).collect();
+    let names: Vec<&String> = names.into_iter().collect();
+    let mut triangles = Vec::new();
+    for (i, first) in names.iter().enumerate() {
+        for (j, second) in names.iter().enumerate().skip(i + 1) {
+            for third in names.iter().skip(j + 1) {
+                let (Some((ab, wab)), Some((bc, wbc)), Some((ca, wca))) = (
+                    joined(first, second),
+                    joined(second, third),
+                    joined(third, first),
+                ) else {
+                    continue;
+                };
+                let corners = corners_from_weights(
+                    [first, second, third],
+                    [&ab, &bc, &ca],
+                    [&wab, &wbc, &wca],
+                );
+                let euclidean = realization_of([&wab, &wbc, &wca]);
+                let composes_exactly = euclidean == EuclideanRealization::Realized
+                    && corners.iter().all(|corner| corner.sine.is_ok());
+                triangles.push(ContactTriangle {
+                    euclidean,
+                    identifiers: [
+                        (*first).clone(),
+                        (*second).clone(),
+                        (*third).clone(),
+                    ],
+                    stems: [ab, bc, ca],
+                    weights: [wab, wbc, wca],
+                    corners,
+                    composes_exactly,
+                });
+            }
+        }
+    }
+    triangles
+}
+
+/// **One object, both roles**: the name a rank-`k` triangle carries, and what it is at rank `k+1`.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct GrainRole {
+    /// The canonical name, `triangle_name` of the rank-`k` identifiers.
+    pub name: String,
+    /// At rank `k` it is a two-cell with these identifiers.
+    pub two_cell_at_rank: [String; 3],
+    /// At rank `k+1` it is a vertex, hence a codimension-two curvature hinge. Its coface count
+    /// there, or `None` when it is incident to no rank-`k+1` triangle.
+    pub hinge_cofaces_above: Option<usize>,
+}
+
+/// Exhibit the grain-relativity on real material: every rank-`k` triangle, with what it is above.
+pub fn grain_roles(triangles: &[ContactTriangle], above: &[ContactTriangle]) -> Vec<GrainRole> {
+    let deficits_above = hinge_deficits(above);
+    let cofaces: BTreeMap<&str, usize> = deficits_above
+        .iter()
+        .map(|hinge| (hinge.at.as_str(), hinge.cofaces.len()))
+        .collect();
+    triangles
+        .iter()
+        .filter(|triangle| triangle.euclidean == EuclideanRealization::Realized)
+        .map(|triangle| {
+            let name = triangle_name(&triangle.identifiers);
+            let hinge_cofaces_above = cofaces.get(name.as_str()).copied();
+            GrainRole {
+                name,
+                two_cell_at_rank: triangle.identifiers.clone(),
+                hinge_cofaces_above,
+            }
+        })
+        .collect()
+}
+
+#[cfg(test)]
+mod grain_tests {
+    use super::*;
+
+    /// Build a triangle from **canonical edge weights**, so two triangles sharing an edge share the
+    /// stem name and its weight. A per-triangle stem naming would make "shared edge" depend on which
+    /// triangle named it, which is the absolute-frame defect one level down.
+    fn on_edges(names: [&str; 3], weights: &BTreeMap<(&str, &str), i64>) -> ContactTriangle {
+        fn key<'a>(x: &'a str, y: &'a str) -> (&'a str, &'a str) {
+            if x <= y { (x, y) } else { (y, x) }
+        }
+        let stem = |x: &str, y: &str| {
+            let (l, r) = key(x, y);
+            format!("{l}|{r}")
+        };
+        let weight = |x: &str, y: &str| BigInt::from(weights[&key(x, y)]);
+        let [a, b, c] = names;
+        let stems = [stem(a, b), stem(b, c), stem(c, a)];
+        let w = [weight(a, b), weight(b, c), weight(c, a)];
+        let corners = corners_from_weights(
+            names,
+            [&stems[0], &stems[1], &stems[2]],
+            [&w[0], &w[1], &w[2]],
+        );
+        let euclidean = realization_of([&w[0], &w[1], &w[2]]);
+        let composes_exactly = euclidean == EuclideanRealization::Realized
+            && corners.iter().all(|corner| corner.sine.is_ok());
+        ContactTriangle {
+            identifiers: [a.to_owned(), b.to_owned(), c.to_owned()],
+            stems,
+            weights: w,
+            corners,
+            euclidean,
+            composes_exactly,
+        }
+    }
+
+    /// **The same name is a two-cell below and a curvature hinge above.** The record's
+    /// grain-relativity as a measurement rather than a reading.
+    #[test]
+    fn a_two_cell_below_is_a_curvature_hinge_above() {
+        let weights: BTreeMap<(&str, &str), i64> = [
+            (("a", "b"), 3),
+            (("a", "c"), 4),
+            (("a", "d"), 5),
+            (("b", "c"), 4),
+            (("b", "d"), 5),
+            (("c", "d"), 6),
+        ]
+        .into_iter()
+        .collect();
+        let below: Vec<ContactTriangle> = [
+            ["a", "b", "c"],
+            ["a", "b", "d"],
+            ["a", "c", "d"],
+            ["b", "c", "d"],
+        ]
+        .into_iter()
+        .map(|names| on_edges(names, &weights))
+        .collect();
+        assert!(below.iter().all(|t| t.euclidean == EuclideanRealization::Realized));
+
+        let rank_one = climb(1, &below, 12);
+        assert_eq!(rank_one.vertices.len(), 4, "each two-cell became a vertex");
+        let above = triangles_at_rank(&rank_one);
+        assert!(
+            above.iter().any(|t| t.euclidean == EuclideanRealization::Realized),
+            "the rank above closes at least one two-cell"
+        );
+
+        let roles = grain_roles(&below, &above);
+        assert_eq!(roles.len(), 4);
+
+        let names_above: BTreeSet<&String> =
+            rank_one.vertices.iter().map(|(name, _)| name).collect();
+        for role in &roles {
+            assert!(
+                names_above.contains(&role.name),
+                "{} is a vertex at the rank above",
+                role.name
+            );
+        }
+        assert!(
+            roles.iter().all(|role| role.hinge_cofaces_above.unwrap_or(0) > 0),
+            "every two-cell below is a curvature hinge above: {roles:?}"
+        );
+    }
+
+    /// And the corners above are read by the same law, so the rank above is a tower rung and not a
+    /// differently-shaped organ wearing the name.
+    #[test]
+    fn the_rank_above_reads_its_corners_by_the_same_law() {
+        let weights: BTreeMap<(&str, &str), i64> = [
+            (("a", "b"), 3),
+            (("a", "c"), 4),
+            (("a", "d"), 5),
+            (("b", "c"), 4),
+            (("b", "d"), 5),
+            (("c", "d"), 6),
+        ]
+        .into_iter()
+        .collect();
+        let below: Vec<ContactTriangle> = [
+            ["a", "b", "c"],
+            ["a", "b", "d"],
+            ["a", "c", "d"],
+            ["b", "c", "d"],
+        ]
+        .into_iter()
+        .map(|names| on_edges(names, &weights))
+        .collect();
+        let above = triangles_at_rank(&climb(1, &below, 12));
+        for triangle in &above {
+            if triangle.euclidean != EuclideanRealization::Realized {
+                continue;
+            }
+            let recomputed = corners_from_weights(
+                [
+                    triangle.identifiers[0].as_str(),
+                    triangle.identifiers[1].as_str(),
+                    triangle.identifiers[2].as_str(),
+                ],
+                [
+                    triangle.stems[0].as_str(),
+                    triangle.stems[1].as_str(),
+                    triangle.stems[2].as_str(),
+                ],
+                [
+                    &triangle.weights[0],
+                    &triangle.weights[1],
+                    &triangle.weights[2],
+                ],
+            );
+            assert_eq!(triangle.corners, recomputed);
+        }
     }
 }

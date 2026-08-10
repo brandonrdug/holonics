@@ -267,6 +267,60 @@ that makes the total-curvature map a reflection instead of a contraction.
 convergent flow is a different `c`. The record naming why convergence is the point — singular
 blow-up, neck surgery, component departure, Poincaré — is live, ratified, and was never cited.
 
+### 11.6.1 The coefficient, solved — and it is the half again
+
+**Truth status:** `proved-derived`, two lines, checked exactly at six coefficients;
+`implemented-exact` at `discrete_curvature::{total_multiplier, coefficient_species,
+dissipative_annihilator, step_at}`.
+**Driver:** `crates/holonic-engine/examples/the_seam_founds_and_the_flow_dissipates.rs`
+
+With `B` the unsigned vertex–hinge incidence, `D = diag(n_v)` and `A` the adjacency,
+`K = F·1 − B r` and `h = D⁻¹K` give `K' = K − c·B Bᵀ D⁻¹K = K − c(D + A)D⁻¹K`, and since
+`1ᵀ(D + A) = 2(n_v)ᵀ`:
+
+```text
+Σ K' = (1 − 2c) Σ K
+```
+
+```text
+c = 0        multiplier  1     inert
+0 < |1−2c| < 1                 DISSIPATIVE
+c = 1/2      multiplier  0     ANNIHILATING — the total is zero after one step
+c = 1        multiplier −1     REFLECTIVE — §11.1's derived law
+|1−2c| > 1                     expanding
+```
+
+> **`c = 1/2` against `c = 1` is `I − P` against `I − 2P`** — the projection and the reflection it
+> doubles. §2b: the involution is a half turn on a magnitude, and the projection is the half of it.
+> **The live law overshoots the dissipative one by exactly a factor of two, and that factor is the
+> half turn.** Another face of the `1/2`, reached from the wrong direction.
+
+**Two bounds, both required.** The total and the pointwise amplitude are independent: on a
+**bipartite** incidence the alternating deficit is an eigenvector with eigenvalue `1` at *every*
+coefficient, so no `c` dissipates it — **two-colourability is the obstruction, which is the hand**,
+and §11.4's own `AlternatingTracedDeviation` fixed point is the same object. And on a `d`-regular
+component at unit response `K` is constant, so `Σ_{w~v} K(w)/n_w = K(v)` identically and `c = 1/2`
+flattens in one step **by arithmetic** — a property of the incidence, not of the coefficient, with an
+irregular control where the same `c` zeroes the total and leaves the body curved.
+
+### 11.6.2 The event-site hinge and the grain, both built
+
+`contact_gluing::{orient, hinge_residuals}` implements §III's four branches — `Dark`, `Exposed`,
+`Seam`, `Reversing`, `Branching` — against a **solved orientation** rather than the canonical order.
+The first cut read the raw induced hands directly and was wrong: `∂[a,b,c]` is taken in each
+triangle's ascending order, so two triangles in an ordinary interior fan induce the *same* raw hand.
+That is `CLAUDE.md` §0's fourth lesson, and the control that prevents it requires the solved signs to
+be genuinely non-constant. Non-orientability is **exhibited** as the conflicting faces, never
+returned as a boolean.
+
+Measured on the tower's material: **25 faces, 5 seams, 20 branching, 0 exposed, 0 reversing,
+coherently orientable**, and **11 of 11 singular links explained by a founding face at that vertex.**
+
+`contact_gluing::{triangles_at_rank, grain_roles}` closes the grain-relativity: **25 of 25** rank-0
+two-cells are rank-1 curvature hinges, corners read by the identical law. That is the tower's upward
+map, which `research/records/2026-08-10_THE_SPINE_ASSESSED_BY_ITS_OWN_LAW…` posed as unbuilt and §V
+had specified three weeks earlier.
+
 ---
 
 ## 12. The polygon carries its n-grams, and capacitance is a population

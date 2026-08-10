@@ -97,8 +97,9 @@ soma/     body               pure law, no_std, zero dependencies
           kernel/soma.spv    committed boundary artifact; its toolchain is excluded
 ```
 
-**Measured 2026-08-10 at `e8e9f45`+dirty:** `cargo test --workspace` **1,970 passed, 0 failed, 14
-ignored**, summed across 42 `test result:` lines. (1,949 at `923b8c5`+dirty; 1,963 at `27fc74d`.) The ten Typst roots under `papers/source/`
+**Measured 2026-08-10 at `f75a81c`+dirty:** `cargo test --workspace` **1,984 passed, 0 failed, 14
+ignored**, summed across 42 `test result:` lines. (1,949 at `923b8c5`+dirty; 1,963 at `27fc74d`;
+1,971 at `51c066f`.) The ten Typst roots under `papers/source/`
 compile and `validate-registry()` passes on **262** unique registry entries and **132**
 `mathematics/` objects. (Earlier: 1,732 at `532ea1b`+1; 1,701 at `fa0f92d`; 1,545 on 2026-08-08
 19:27 at `101882f`; 1,512 at `d91720e`; on 2026-08-07 14:34 it was **730**.)
@@ -340,10 +341,18 @@ concentrated on the codimension-two **hinges between** them — so the `(−1,0)
 *"a founding is a deficit angle at a triangular hinge."* Built as `contact_gluing::hinge_deficits`
 with `multiquadratic::sign_in_principal_embedding` supplying the declared hand a winding needs.
 Measured: `1 → 5` distinct turns, `flat 5 · positive 3 · negative 3`, six hinges moving under a
-non-similar metric and zero under a similarity. **And the finding that outranks it: `interior 0 of
-11` — every link is singular, `3F = 75` against `2E = 50`, so by the star/link record's own bar none
-of these deficits is a curvature and this complex is nowhere a Regge geometry.** A `counterexample`
-that passes its grade. `canon/TABLET_THE_TURN.md` §11.5 and
+non-similar metric and zero under a similarity. **`interior 0 of 11` — every link is singular — which
+is not a wall: `2026-07-20_THE_HINGE_CARRIES_THE_FRAME…` §V rules that plural branches and
+disconnected links are FOUND seams and that the carrier is never required to be a manifold.**
+
+**And that record specified three more necessities, all resolved 2026-08-10.** Its §III hinge law
+`delta_e = a_R|e − G(a_L|e)` is built with all four branches against a **solved orientation** — the
+raw canonical hands are a chart, and reading a gluing off them was §0's fourth lesson caught by a
+failing test. Its §V grain-relativity is built: **25 of 25** rank-0 two-cells are rank-1 curvature
+hinges, which is the tower's upward map. And the curvature flow's coefficient is solved:
+`Σ K' = (1 − 2c) Σ K`, so the module's derived `c = 1` is the **reflection** and `c = 1/2` the unique
+annihilator — **`I − P` against `I − 2P`, the half turn arriving from the curvature side.**
+`canon/TABLET_THE_TURN.md` §§11.5–11.6 and
 `research/records/2026-08-10_THE_MANIFOLD_IS_THE_INVARIANT_OF_THE_CURRENTS…`.
 
 ### `kelvin.rs`: the closure argument is a two-junction accident

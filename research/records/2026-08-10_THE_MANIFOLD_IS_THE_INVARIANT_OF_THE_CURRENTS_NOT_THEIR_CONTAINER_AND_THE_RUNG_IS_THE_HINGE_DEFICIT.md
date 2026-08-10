@@ -711,6 +711,96 @@ matters — singular blow-up, neck surgery, component departure, Poincaré — i
 
 ---
 
+## 9d · THE THREE NECESSITIES, RESOLVED AND MEASURED
+
+**Truth status:** `proved-derived` for the flow law, whose two-line proof is displayed and checked
+exactly; `implemented-exact` for all three organs; `measured` for every figure, from
+`crates/holonic-engine/examples/the_seam_founds_and_the_flow_dissipates.rs` on the material declared
+inline there.
+**Occasion:** Brandon, 2026-08-10: *"Resolve the standing question… you do not get to pick and choose
+what to 'start on' or 'do next', you have clear instructions and documentation about the necessities
+our theory calls for. Be rigorous, thorough, and holistic."*
+
+### 9d.1 The flow: `Σ K' = (1 − 2c) Σ K`, and `c = 1` is the reflection
+
+Let `B` be the unsigned vertex–hinge incidence, `D = diag(n_v)`, `A` the vertex adjacency. Then
+`K = F·1 − B r`, `h = D⁻¹K`, and `r ← r + c·Bᵀh` gives
+
+```text
+K' = F·1 − B r' = K − c·B Bᵀ D⁻¹ K = K − c(D + A)D⁻¹K
+```
+
+because `B Bᵀ = D + A`. Summing, `1ᵀ(D + A) = 2(n_v)ᵀ`, so `1ᵀ(D + A)D⁻¹ = 2·1ᵀ` and
+
+```text
+Σ K' = (1 − 2c) Σ K
+```
+
+**That settles it.** The module's derived `c = 1` — the unique coefficient at which a vertex's own
+discharge annuls its own deficit — is exactly the coefficient at which the multiplier is `−1`. The
+law is a **reflection on the total-curvature functional**, and a reflection does not converge.
+`c = 1/2` is the unique **annihilator**, and `0 < |1 − 2c| < 1` is the dissipative band.
+
+> **`c = 1/2` against `c = 1` is `I − P` against `I − 2P`** — the projection and the reflection it
+> doubles. `CLAUDE.md` §2b: the involution is a half turn on a magnitude, and the projection is the
+> half of it. **The live law overshoots the dissipative one by exactly a factor of two, and that
+> factor is the half turn.** This is another face of §0b's `1/2` and it arrived from the wrong
+> direction, which is what makes it worth carrying.
+
+Measured on 11 vertices and 25 hinges, exact rationals, six coefficients × six steps:
+
+```text
+c      1−2c     species        |Σ K| over the steps
+0      1        inert          16  16  16  16  16  16
+1/4    1/2      DISSIPATIVE     8   4   2   1  1/2  1/4
+1/2    0        ANNIHILATING    0   0   0   0   0   0
+3/4   −1/2      DISSIPATIVE    −8   4  −2   1 −1/2  1/4
+1     −1        REFLECTIVE    −16  16 −16  16 −16   16
+2     −3        expanding     −48 144 −432 1296 −3888 11664
+```
+
+**Two bounds, both stated in the driver rather than left for a reader to find.** First, the total and
+the pointwise amplitude are independent: on a **bipartite** incidence the alternating deficit is an
+eigenvector with eigenvalue `1` at *every* coefficient, so no `c` dissipates it — **two-colourability
+is the obstruction to convergence, which is the hand.** Second, `c = 1/2` reached exact flatness in
+**one step** on this material, and that is a property of the *incidence*, not the coefficient: at
+unit response `K(v) = 6 − n_v`, so on a `d`-regular component `K` is constant and
+`Σ_{w~v} K(w)/n_w = K(v)` identically, whence `K' = 0` by arithmetic. §8's tautology rule, caught in
+the driver, with an irregular control in the module's tests where the same `c` zeroes the total and
+leaves the body curved.
+
+### 9d.2 The event-site hinge: four branches, and the orientation they require
+
+§III's law is built — `Dark / Exposed / Seam / Reversing / Branching` — and the first cut of it was
+**wrong in a way worth recording**. The induced hand `∂[a,b,c] = [b,c] − [a,c] + [a,b]` is read
+against each triangle's *canonical ascending order*, so two triangles in an ordinary interior fan
+induce the *same* raw hand. Reading a gluing off that directly promotes a receiver-visible coordinate
+into an invariant — `CLAUDE.md` §0's fourth lesson — and the first test failed on exactly that.
+
+The correct object is an **orientation assignment** `ε_t ∈ {±1}`, solved by traversal of the dual
+graph, with the gluing read off `ε_L h_L + ε_R h_R`. Non-orientability is then **exhibited** as the
+faces at which the propagation conflicts, never as a boolean. The control that keeps it honest
+requires the solved signs to be genuinely non-constant, which the canonical order is not.
+
+Measured: **25 faces, 3 species — 5 seams, 20 branching, 0 exposed, 0 reversing, coherently
+orientable, 20 dual components**, with every branching face named and its cofaces listed. And the
+join to the deficit organ holds: **11 of 11 singular links are explained by a founding face at that
+vertex.** `LinkClass::Singular` detects; this says which face and why.
+
+### 9d.3 The grain: the same object is a two-cell below and a curvature hinge above
+
+`triangles_at_rank` reads the rank above by `corners_from_weights`, the identical law used at rank
+zero, and `grain_roles` exhibits both roles of one name. Measured: rank 1 has **25 vertices, 158
+arcs, 490 triangles (450 realizable)**, and **25 of 25** rank-0 two-cells are rank-1 curvature hinges,
+each with 36 cofaces there.
+
+**That is the tower's upward map**, which `2026-08-10_THE_SPINE_ASSESSED_BY_ITS_OWN_LAW…` posed as
+genuinely unbuilt and which §V had already specified three weeks earlier: *"The same triangle may
+thus be a whole two-cell at one grain, a boundary face at another, and a curvature hinge from a
+four-dimensional receiver."*
+
+---
+
 ## 10 · Bounds
 
 - Everything in §8 is a **reading of records plus standard Regge calculus**. No rung has been built and
