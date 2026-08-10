@@ -120,8 +120,13 @@ is deposited in place.
    Falsifier met: the movement is non-zero **and attributable**, every moved structure naming the
    deposit inside it, with a `Closed`-structure control that deposits nothing and must not move.
 
-   **Still open:** `supported_realizers::positive_form → inertia` is joined only inside
-   `#[cfg(test)]`, so §2's realization-causes-placement chain is still a test assertion.
+   **Second half CLOSED the same day.** `supported_realizers::induced_placement` joins
+   `positive_form` to `inertia::inertia` on the conduct path, so `CLAUDE.md` §2's
+   realization-causes-placement chain is no longer a test assertion. It returns the **split**, not a
+   verdict — `MᵀM` is positive semi-definite by construction, so the inertia is `(rank, 0, nullity)`
+   and the content is where the rank falls: **the null directions are exactly the realizer
+   combinations that land on nothing**, which is the population §11's demand calls the certified
+   remainder. Controlled on an independent population (nullity 0) and a dependent one (nullity 1).
 7. **The evidence sinks**, now with two cost laws already lost.
 
 **Carried forward from the laboratory and never inherited:** Huffman/Kraft (with

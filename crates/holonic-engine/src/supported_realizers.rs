@@ -270,6 +270,40 @@ pub fn landings_from_classes(
     landings
 }
 
+/// **The placement a realizer population induces, on the conduct path.**
+///
+/// `CLAUDE.md` §2 states the chain this closes:
+///
+/// ```text
+///   an ample divisor class (a supported realizer that paid)
+///     -> a polarization
+///     -> the Rosati involution, POSITIVE
+///     -> positivity of the trace form
+///     -> |alpha| = q^(1/2)          placement, as a RETURN
+/// ```
+///
+/// and its first consequence: *"Do not build modal placement and supported lifting as two organs.
+/// **Derive placement from realization.** A returned placement that no realizer paid for has
+/// smuggled an absolute frame into the engine."*
+///
+/// **The pair was joined only inside `#[cfg(test)]` until 2026-08-10.** [`positive_form`] returned
+/// `MᵀM` and [`crate::inertia::inertia`] returned its signature, and the only place the two met was
+/// an `assert_eq!` in this file's test module — so the chain the project's own doctrine runs through
+/// was a test assertion and not a conduct path. `blueprint/THE_ROADMAP.md` carried it as open work.
+///
+/// **What this returns is the split, not a verdict.** `canon/TABLET_THE_TURN.md` §2b: *"positivity is
+/// not absolute… State the **split** and the **hand** separately."* `MᵀM` is positive semi-definite
+/// by construction, so its inertia is `(rank, 0, nullity)` and the content is **where the rank
+/// falls**: the null directions are exactly the realizer combinations that land on nothing, which is
+/// the population §11's demand calls the certified remainder.
+///
+/// The nullity is therefore the measurement to read, and it is `columns − rank`.
+pub fn induced_placement(incidence: &IntegerMatrix) -> Result<crate::inertia::Inertia, crate::inertia::InertiaError> {
+    let form = positive_form(incidence);
+    let symmetric = crate::inertia::SymmetricForm::from_integer_matrix(&form)?;
+    Ok(crate::inertia::inertia(&symmetric))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -618,5 +652,34 @@ mod tests {
             "reaching the class singly must remove the Z/2, not merely add to it"
         );
         assert!(support.fully_supported());
+    }
+
+    /// **The realization-to-placement chain runs on the conduct path**, not only in an assertion.
+    ///
+    /// `MᵀM` is positive semi-definite by construction, so the return is `(rank, 0, nullity)` and
+    /// the content is where the rank falls. A realizer population with a dependency has a null
+    /// direction, and that direction is the combination landing on nothing.
+    #[test]
+    fn induced_placement_returns_the_split_and_the_nullity_is_the_dependency() {
+        // Two independent realizers over two classes: full rank, no null direction.
+        let mut independent = IntegerMatrix::zeros(2, 2);
+        independent.set(0, 0, BigInt::from(1));
+        independent.set(1, 1, BigInt::from(1));
+        let placed = induced_placement(&independent).expect("the form founds");
+        assert_eq!(placed.negative, 0, "M^T M is positive semi-definite");
+        assert_eq!(placed.zero, 0, "independent realizers leave no null direction");
+        assert_eq!(placed.positive, 2);
+
+        // Three realizers over two classes, the third the sum of the first two: one dependency, so
+        // exactly one null direction.
+        let mut dependent = IntegerMatrix::zeros(2, 3);
+        dependent.set(0, 0, BigInt::from(1));
+        dependent.set(1, 1, BigInt::from(1));
+        dependent.set(0, 2, BigInt::from(1));
+        dependent.set(1, 2, BigInt::from(1));
+        let placed = induced_placement(&dependent).expect("the form founds");
+        assert_eq!(placed.negative, 0);
+        assert_eq!(placed.zero, 1, "the dependency is the null direction");
+        assert_eq!(placed.positive, 2);
     }
 }

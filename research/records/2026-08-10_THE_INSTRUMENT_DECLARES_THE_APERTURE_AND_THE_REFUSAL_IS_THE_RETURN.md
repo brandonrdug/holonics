@@ -524,8 +524,21 @@ choose a correction that would make the outcome its own.
 Falsifier met: the movement is non-zero **and attributable** — every moved structure names the
 deposit inside it — with a `Closed`-structure control that deposits nothing and must not move.
 
-**Still open:** `supported_realizers::positive_form → inertia` is joined only inside `#[cfg(test)]`,
-so §2's realization-causes-placement chain remains a test assertion on the conduct path.
+### 7b.6 Realization causes placement, on the conduct path — roadmap item 6, second half
+
+`supported_realizers::induced_placement`. `positive_form` returned `MᵀM` and `inertia::inertia`
+returned its signature, and **the only place the two met was an `assert_eq!` inside `#[cfg(test)]`** —
+so the chain `CLAUDE.md` §2 says the whole project runs through was a test assertion.
+
+**It returns the split, not a verdict.** §2b: *"positivity is not absolute… State the **split** and
+the **hand** separately."* `MᵀM` is positive semi-definite by construction, so the inertia is
+`(rank, 0, nullity)` and the content is where the rank falls: **the null directions are exactly the
+realizer combinations that land on nothing**, which is the population §11's demand calls the
+certified remainder.
+
+Controlled both ways: two independent realizers over two classes return nullity `0`; three over two
+with the third the sum of the first two return nullity `1`, and that null direction **is** the
+dependency.
 
 ---
 
