@@ -486,7 +486,7 @@ Per the ground rules, absences are reported as first-class results. Each of thes
 |---|---|---|
 | Integer homology exists | `grep -rniE "smith_normal\|hermite_normal\|invariant_factor\|betti\|torsion" crates soma --include="*.rs"` | **1 hit, a doc comment** at `crates/holonic-engine/src/basin.rs:363` |
 | A Rust `ChiPair` exists | `grep -rn "ChiPair\|chi_pair" crates soma --include="*.rs"` | **zero** |
-| The recruitment remedies are implemented | `grep -rniE "mincover\|min_cover\|provisional" soma/life/src` | **zero** |
+| ~~The recruitment remedies are implemented~~ | ~~`grep -rniE "mincover\|min_cover\|provisional" soma/life/src`~~ | **STRUCK 2026-08-09 — the row was false and the same command now returns 4.** Both remedies are live and consumed: `soma/life/src/relational_language/ecology.rs:1365` `clause_region_incidence` (the intersection form, called at `:890`) and `soma/life/src/holonic_training.rs:272` `propose_views` and `:355` `commit_views` (consumed at `agentic_language/answer_continuation.rs:919` and `reflective_codec.rs:57`), plus `soma/membrane/src/live_holon.rs:200` `ProvisionalSettlement`. The pattern could not match the owners' names — the identical artifact `CLAUDE.md` §5 convicts for `fn without_stem`. **An absence claim is a measurement and the search pattern is part of the claim.** |
 | The deposit registry crossed to Rust | `grep -rln "closure_sha256" .` | **only** `archive/cpp-engine/cmake/HolonicDeposit.cmake` and `archive/cpp-engine/standing/MANIFEST.txt` |
 | `lean_mathematics.rs` composes reflection | `grep -c "holonic_language\|Reflect" soma/life/src/lean_mathematics.rs` | **zero** |
 | A Lean project is in the tree | `git ls-files soma/formal` | **7 files, all generated `.lake/agentic-research-kernel/formal_carry-0000{0..6}.lean`**; no `lakefile.toml`, no `lean-toolchain`, no manifest |
@@ -2053,8 +2053,18 @@ missing comprehension, consequence, semantics, relevance, or research-mode subsy
 that, repeatedly and by direct correction. That ban is on the mystical restatements; it is not a bar
 on auditing the measurement.
 
-**What replaces it.** Both remedies are named in that record and **neither is implemented**;
-`grep -rniE "mincover|min_cover|provisional"` over `soma/life/src` returns **zero**.
+**What replaces it. CORRECTED 2026-08-09: both remedies ARE implemented and both are consumed.**
+This read *"neither is implemented; `grep -rniE "mincover|min_cover|provisional"` over `soma/life/src`
+returns zero."* The command now returns **4**, and the owners were always there under names the
+pattern cannot match:
+
+| remedy | owner | consumed at |
+|---|---|---|
+| factor the receptive star, `I(R) = ⋃_K ⋂_{f∈K} I(f)` | `soma/life/src/relational_language/ecology.rs:1365` `clause_region_incidence` | `:890` |
+| provisional contact ≠ continuing cultivation | `soma/life/src/holonic_training.rs:272` `propose_views` / `:355` `commit_views` | `agentic_language/answer_continuation.rs:919`, `reflective_codec.rs:57` |
+| the two-phase primitive | `soma/membrane/src/live_holon.rs:200` `ProvisionalSettlement` | — |
+
+`CLAUDE.md` §5 already carries this correction and the roadmap did not. Same artifact as `without_stem`.
 
 1. *Factor the receptive star*: `I(R) = ⋃_{K ∈ MinCover(R)} ⋂_{f∈K} I(f)`, with `MinCover`
    — verbatim — *"founded by the receiver's clause and entity morphology, not by an externally

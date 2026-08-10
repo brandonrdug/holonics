@@ -270,6 +270,8 @@ pub mod skein;
 // says nothing at the crate root about which surface it belongs to, and `recover` would collide
 // with `codec_recovery::recover`.
 pub mod statement_composition;
+pub mod contact_gluing;
+pub mod structure_group;
 pub mod statement_grammar;
 // Declared, never glob-exported: `ReceiverId`, `Disagreement`, `Partition`, `Cover`, `Observation`
 // and `ItemId` collide across the placement family, and a realizer founded by a substitution must

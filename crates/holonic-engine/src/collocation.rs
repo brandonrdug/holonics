@@ -922,8 +922,15 @@ impl From<CausalAlgebraicError> for CollocationRefusal {
 ///
 /// The rule is [`crate::derivation_atlas::read_derivation`]'s, restated at line granularity because
 /// that reader takes a whole artifact and this organ needs a finer grain. The three exclusions are
-/// the same three and they are taken from the same two public tables, so the vocabularies cannot
+/// the same three and they are taken from the same two public tables, so **the vocabularies** cannot
 /// drift apart; `line_items_agree_with_read_derivation` pins the agreement on real material.
+///
+/// **That sentence was carried as though it covered the tokenizer and it never did.** A shared
+/// public table cannot drift; a hand-copied expression can, and the split rule was hand-copied here
+/// and in `derivation_capacitance::named_lines` while both docs claimed otherwise. It drifted on
+/// 2026-08-09, when [`crate::derivation_atlas::identifier_tokens`] learned `'`, `!` and `?` and
+/// these two copies did not. The tokenizer is now called rather than restated, which is what makes
+/// the claim true instead of merely written.
 pub fn lean_line_items(line: &str) -> BTreeSet<String> {
     let trimmed = line.trim();
     if trimmed == "end" || trimmed.starts_with("end ") {
@@ -940,15 +947,11 @@ pub fn lean_line_items(line: &str) -> BTreeSet<String> {
 
     let mut items = BTreeSet::new();
     let mut founds_next = false;
-    for token in read
-        .split(|c: char| !(c.is_alphanumeric() || c == '_' || c == '.'))
-        .filter(|token| {
-            token
-                .chars()
-                .next()
-                .is_some_and(|first| first.is_alphabetic() || first == '_')
-        })
-    {
+    // The tokenizer is `derivation_atlas`'s, called and not restated. This line carried a hand copy
+    // of the old single-class `split` until 2026-08-09, while the doc above claimed the two readings
+    // "cannot drift apart" — true of the vocabularies, which are shared public tables, and never of
+    // the tokenizer, which was not one. `contrapose!` returned here as `contrapose`.
+    for token in crate::derivation_atlas::identifier_tokens(read) {
         if founds_next {
             founds_next = false;
             continue;
@@ -1304,10 +1307,15 @@ mod tests {
 
     #[test]
     fn line_items_agree_with_read_derivation_on_a_deposited_artifact() {
+        // `contrapose!` and `h'` are in this fixture because it previously carried no `'`, `!` or
+        // `?` at all, so the two readers agreed by carrying one identical defect and the assertion
+        // could not fail. `CLAUDE.md` §8: a check whose material cannot vary the property under test
+        // is the same defect as a check that cannot fail, wearing a passing result.
         let text = "namespace Soma\n\
                     def exactCarrier (P : Prop) : Prop := P\n\
                     variable (P : Prop)\n\
                     theorem formal_carry (h : P) : exactCarrier P := by\n  \
+                      contrapose! h'\n  \
                       apply exact_chart_carry\n  \
                       assumption\n\
                     end Soma\n";
@@ -1321,6 +1329,11 @@ mod tests {
         );
         assert!(collocated.contains("apply"), "an atom is still presented");
         assert!(!collocated.contains("formal_carry"), "the file founds it, it does not recruit it");
+        // The two that make the parity assertion able to fail. Under the hand-copied rule this
+        // reader returned `contrapose` and dropped `h'` to a single glyph, while the artifact
+        // reader returned `contrapose!` and `h'` — the drift, exhibited as its own separating words.
+        assert!(collocated.contains("contrapose!"), "the token carries its own `!`");
+        assert!(collocated.contains("h'"), "a primed binder is one token, not a deleted glyph");
     }
 
     #[test]

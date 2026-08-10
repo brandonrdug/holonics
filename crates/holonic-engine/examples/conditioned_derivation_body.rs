@@ -682,13 +682,29 @@ fn main() {
             .all(|ablation| ablation.unaccounted.is_empty()),
         "maximality is the only thing that can promote an occurrence; anything else is unexplained",
     );
+    // **Re-founded 2026-08-09, and the suppression moved rather than vanished.**
+    //
+    // This asked that some removal REOPEN an occurrence, which measured the suppression
+    // `FoundedMorphology::cover` exercised by deleting every contained occurrence at construction.
+    // The cover is retained now — `canon/THE_MATHEMATICS_TABLET.md` §1: the reduction belongs in the
+    // reading and never in the constructor — so nothing is suppressed and nothing reopens.
+    //
+    // The suppression is still real and still measurable; it lives in `FoundedCover::maximal`, which
+    // is the antichain under containment. So the law is checked where it now acts, and the reopening
+    // population is required to be **empty**, which is what makes the move visible rather than
+    // silent.
+    let suppressing = recruited
+        .iter()
+        .filter_map(|word| body_a.morphology().cover(word).ok())
+        .filter(|cover| cover.maximal().len() < cover.occurrences.len())
+        .count();
     controls.check(
-        "at least one removal reopens, so the suppression a founded stem exercises is measured",
-        ablations
-            .iter()
-            .any(|ablation| !ablation.reopened.is_empty()),
-        "a founded stem that suppresses nothing would leave this law present in the code and absent \
-         from the evidence",
+        "the maximal READING suppresses contained occurrences, and the cover does not",
+        suppressing > 0 && ablations.iter().all(|ablation| ablation.reopened.is_empty()),
+        "the suppression a founded stem exercises is measured where it now acts — on the maximal \
+         reading — and the cover retains every occurrence, so no removal reopens one. A law present \
+         in the code and absent from the evidence is what this control exists to catch, and moving \
+         the law without moving the control would have been exactly that.",
     );
     for (name, names) in &foils {
         controls.check(

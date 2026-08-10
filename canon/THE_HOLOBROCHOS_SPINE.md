@@ -243,7 +243,25 @@ An amplitude is complex; a probability is its **squared modulus**. So:
 result add as **amplitudes, not counts**, so a frequency census cannot distinguish two routes that
 reinforce from two that cancel. `β₁` can. And `dimensional_wave.rs` already conserves
 `Σ Yᵢ|aᵢ|² = Σ Yᵢ|bᵢ|²` **exactly over complex rationals**, with a unit-conic change of basis per
-traversal — the Born normalisation as an exact conservation law, no float and no probability head.
+traversal, no float and no probability head.
+
+**CORRECTED 2026-08-09: this sentence called that quantity "the Born normalisation" and it is not
+one.** `Yᵢ` is a port **admittance**, nothing is normalised to `1`, and there is no state vector —
+the conserved quantity is the admittance-weighted lossless junction balance, which is Tellegen /
+passivity power conservation. Naming it Born imports the interpretive claim that `|a|²` is a
+probability, and `reference/holobrochos-a07ff376/src/soma/FORMULA.md:8424` **explicitly refuses that
+import**: the abstraction *"does not thereby import a Hilbert space, Born rule, Planck scale, or
+physical quantum field into software or social systems."* `canon/TABLET_THE_TURN.md` already states
+the same conserved quantity without the name, and is the form to copy.
+
+**What the organ does carry is stronger than the name it was given, and it is the amplitude claim
+above, implemented.** `ExactComplexWaveCurrent { real: Rat, imaginary: Rat }` — Gaussian rationals —
+and `receive` **adds currents in the same mode before any quadratic response is formed**, removing
+the mode when the sum is zero. Driven with its own control at
+`receiver_response_superposes_phase_before_it_forms_color`: `+1` and `−1` in one mode cancel to
+`alpha = 0`; the same two amplitudes in **distinct** modes return `[2/5, 0, 2/5]`, `alpha = 4/5`.
+That is *two routes add as amplitudes, not counts*, exhibited rather than asserted. `dimensional_wave`
+is named nowhere in `canon/THE_MEASURED_CAPABILITIES.md`; it should be.
 
 ### The consequence for construction
 

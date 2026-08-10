@@ -151,12 +151,18 @@ This is the item that was miscarried as a "recruitment wall" until it was withdr
 It is not a wall. It is a field that exists, is carried, is used in transport, and has never been
 anything but unit.
 
-### 4.4 · The factored receptive star was never ported
+### 4.4 · ~~The factored receptive star was never ported~~ — STRUCK 2026-08-09, it was ported
 
-`I(R) = ⋃_{K} ⋂_{f∈K} I(f)` exists as working laboratory code at
-`src/soma/life/src/relational_language/ecology.rs:1362`, `clause_region_incidence`, with the cover
-founded on the receiver's own clause and entity morphology exactly as required. `grep -rli mincover`
-over `crates/` and `soma/` here returns **zero**. It is a port, not a derivation.
+`I(R) = ⋃_{K} ⋂_{f∈K} I(f)` is **live in this tree** at
+`soma/life/src/relational_language/ecology.rs:1365` `clause_region_incidence`, with the cover founded
+on the receiver's own clause and entity morphology exactly as required, and it is **called** at
+`:890`. Its doc reads *"it is not a corpus scan or a lexical similarity ranking."*
+
+This section claimed otherwise on the evidence that *"`grep -rli mincover` over `crates/` and `soma/`
+returns zero."* It does — because the owner is not called `mincover`. The transition ported the
+library; what it did not port were the **drivers**, which is a different defect and is the one that
+matters. `CLAUDE.md` §5 carries the same correction for `fn without_stem`: **an absence claim is a
+measurement, and the search pattern is part of the claim.**
 
 ### 4.5 · The legs read the circuit but not each other
 

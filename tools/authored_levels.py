@@ -93,11 +93,26 @@ def present() -> list[tuple[str, str, str]]:
         except OSError:
             continue
         in_test = False
+        depth = 0
         for line in text.splitlines():
-            # A `#[cfg(test)]` module owns its own material.
+            # A `#[cfg(test)]` module owns its own material — and the exclusion must END where that
+            # module does. Until 2026-08-09 `in_test` was set once and never reset, so every const
+            # after the FIRST test module in a file was invisible: 58 levels tree-wide, 13 of them in
+            # the language body, including `CODEC_MINIMUM_RECURRENCE` and `CODEC_TEMPLATE_APERTURE`
+            # at `soma/life/src/agentic_language.rs:65-66`, which sit ten lines below the
+            # `#[cfg(test)]` at `:55` and decide when a correction becomes generative.
+            #
+            # `canon/THE_AUTHORED_LEVEL.md` already says the tool is a convenience and never the
+            # authority — *"a level its regex does not match is exactly as much a contaminant as one
+            # it does"* — and this was that failure in its own scanner, reporting `0 failures` over a
+            # population it could not see.
             if line.strip().startswith("#[cfg(test)]"):
                 in_test = True
+                depth = 0
             if in_test:
+                depth += line.count("{") - line.count("}")
+                if depth <= 0 and "}" in line:
+                    in_test = False
                 continue
             matched = CONST.match(line)
             if not matched:

@@ -34,14 +34,16 @@ after a comparative audit. It lives at `archive/cpp-engine/` and nothing there i
 below that speak of headers, deeds, `ctest`, CUDA executors or `R{i}` chains describe that archived
 body and are **provenance**, not the present position.
 
-Read these seven, in order, and nothing else by default:
+Read these nine, in order, and nothing else by default:
 
 | file | what it is |
 |---|---|
 | **this file** | the operating contract. How to work, what is convicted, what is authorized. |
-| `canon/THE_HOLOBROCHOS_SPINE.md` | **the spine — the whole hollow loop.** Two loops, four flows, the two moves that run on them, the three laws, and where every live organ sits. **The roadmap is ordered by it.** Read it before proposing any construction; an organ that no station names is churn. |
+| `canon/THE_HOLOBROCHOS_SPINE.md` | **the spine — the whole hollow loop.** Two loops, four flows, the two moves that run on them, the three laws, and where every live organ sits. **The roadmap is ordered by it.** Read it before proposing any construction; an organ that no station names is churn — and that is one command, `grep -i '<the object>' canon/THE_HOLOBROCHOS_SPINE.md`, which returned **zero** for `lean`, `mathlib` and `kernel` on the day a mathlib plan was posed as Phase 1. |
 | `canon/THE_DOCUMENT_LAW.md` | how a claim travels from conversation to canon, the genres, the grades, how supersession is recorded. |
+| `canon/THE_DIALECT.md` | **how to read Brandon**, measured over 8,935 of his messages. Which vocabulary is his and which the assistant's, the eleven correction archetypes ranked by frequency, his register, and ten inference rules. It **declares itself a prerequisite of `THE_QUOTE_NETWORK.md`** and corrects it — a large part of the vocabulary that network organises is not his. Until 2026-08-09 no governing document named this file, so the prerequisite was not in force; that is why it is here. |
 | `canon/THE_QUOTE_NETWORK.md` | **where every idea came from, in Brandon's words**, themed, with "where this lives now" per theme. Read this before theorising about what he wants. |
+| `canon/THE_EXPLORATIVE_FAILURE.md` | the condition that identifies the recurring escalation — *a construction whose object already has an owner, answered with a new organ beside it rather than a repair inside it* — its trigger, and its enumerated instances. It is checkable **before** the work, which is what the five prior statements of the pattern were not. |
 | `canon/THE_MEASURED_CAPABILITIES.md` | **the evidence index: what the machine has actually done**, from 96 binaries run rather than read. Seven operations, seven causal mechanisms, the bounds, and the unrecoverable figures that may not be cited. Read this before proposing construction — most of what looks unbuilt is built, undriven, or blocked on one missing input file. |
 | `blueprint/THE_ROADMAP.md` | the single active roadmap. **The open work is stated by station** at the top; everything below that is the returned ledger and its provenance. |
 | `CONSTRUCTION_STATE.md` | the position record. What is admitted, what survived the transition, what must be re-established. |
@@ -584,9 +586,29 @@ body that ran it, and it is wrong twice over.
 
 **And the laboratory withdrew the framing itself, twice, before it froze.** 2026-08-01: *"This is not
 evidence that broad recruitment should be reduced."* 2026-08-02: *"Broad recruitment remains
-lawful."* Brandon, 2026-07-29, ruling directly: *"Do not remove chronology. Let informants couple
-through the capacitance they enable about one another, and let sparse lightning-like leaders derive
-a resonant image of the retained patterns."* In that run one germ recruited 1,159 of 1,556
+lawful."*
+
+**CORRECTED 2026-08-09: this paragraph carried a COMPOSITE quotation attributed to Brandon, and §9
+convicts exactly that.** It read *"Do not remove chronology. Let informants couple through the
+capacitance they enable about one another, and let sparse lightning-like leaders derive a resonant
+image of the retained patterns."* That sentence occurs **nowhere** in 13,376 unique messages across
+`~/.claude/history.jsonl`, `~/.codex/history.jsonl` and all 316 Codex rollouts. It was assembled out
+of two real things. Both are restored here verbatim:
+
+> *"Do not remove chronology"* — his, and he confirmed it himself on 2026-08-09: *"The \"Do not remove
+> chronology\" line is from me, I did write that quote, it comes from a Codex conversation."*
+
+> *"you can emergently couple informants by letting dynamics unfold through the capacitance the
+> informants enable about each other. We don't need perfect simulations and data, we just need to
+> couple recurring patterns and let the machine efficiently explore with 'lightning leaders' in order
+> to derive a resonant image of patterns in the information."*
+> — 2026-07-29 19:12, `~/.codex/history.jsonl`
+
+§9 is precise about why this is worse than a wrong figure: *"a fabricated ruling **manufactures
+authority**, and no later reader re-checks a provenance line."* This one sat in the operating contract
+itself, where every later session reads it as law.
+
+In that run one germ recruited 1,159 of 1,556
 informants — 74% — and the record graded it `OPEN` without calling it a defect. Its title is the
 ruling: **the aperture cannot decide the deed.**
 
@@ -610,8 +632,29 @@ passage_delay                = characteristic_delay + (service_rounds - 1)
 
 over `BigUint`, no score, no ranking, later arrivals retained as `deferred_arrivals` rather than
 discarded. `site_capacity` is capacitance and is changed by returned recurrence
-(`set_site_capacity`); `co_present_branch_population` is competing current occupancy. **Only source
-continuity has no term.**
+(`set_site_capacity`); `co_present_branch_population` is competing current occupancy.
+
+**CORRECTED 2026-08-09: the fifth input has a term too, and this paragraph said otherwise for a day.**
+It read *"Only source continuity has no term."* `crates/holonic-engine/src/derivation_capacitance.rs:769`
+carries `CharacteristicDelayLaw::SourceContinuity`, which sets
+
+```text
+characteristic_delay = 1 + (minimal line separation, over the artifacts founding the head,
+                            between the theorem line and the nearest line naming the tail)
+```
+
+**and it is driven with its orbit exhibited**, at
+`crates/holonic-engine/examples/the_terrain_dilates_the_passage.rs:707-745`: the passages the term
+moved are named one by one, and the class count goes **down**, `Uniform → SourceContinuity`, because
+separating arrivals by their source separation *de-congests* the interior site that a uniform delay
+made superpose. The driver states the reading that keeps it honest — *"that is the coupling running
+the other way and it is evidence the term is doing work, not evidence that source continuity improves
+a reading. A capacitance reading is not a quantity to be maximised."* The deferred branches are
+exhibited rather than lost.
+
+**All five inputs are built.** What remains is narrow and is a *different material*: the soma caller
+below still pins its clause-pair edges, and a clause pair has no source lines to separate, so it
+needs its own continuity term rather than this one.
 
 **And "unit cost makes a high-incidence hub artificially fast" is backwards.** A high-incidence hub
 has the most active outgoing passages, so the largest `co_present_branch_population`, so the largest

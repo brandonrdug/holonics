@@ -443,17 +443,31 @@ impl FoundedMorphology {
                 }
             }
         }
-        let occurrences: Vec<StemOccurrence> = all
-            .iter()
-            .filter(|here| {
-                !all.iter().any(|other| {
-                    other.at <= here.at
-                        && here.through <= other.through
-                        && (other.at, other.through) != (here.at, here.through)
-                })
-            })
-            .cloned()
-            .collect();
+        // **The full family is retained. Maximality is a READING, not the constructor's decision.**
+        //
+        // This filter used to run here and `all` was discarded — every occurrence strictly inside
+        // another was deleted before any consumer saw it. `canon/THE_MATHEMATICS_TABLET.md` §1 names
+        // that exactly: *"a carrier that reduces on construction has decided, for every consumer it
+        // will ever have, which distinctions are invisible… the reduction belongs in the reading and
+        // never in the constructor."*
+        //
+        // What the reduction deleted is **containment**, and that is the precise statement: the
+        // filter keeps the antichain under containment, so two crossing spans both survive it and
+        // every stem *inside* another does not. `exactCarrier` kept `exact` and `carrier` while
+        // `act`, `x`, `carry`, `arr`, `car` ceased to exist, though the corpus committed each one.
+        //
+        // The short contained stems are exactly the ones two different identifiers are most likely
+        // to SHARE, so deleting them is deleting contact — and the longer the founded stems get, the
+        // more of them are deleted.
+        //
+        // The measured consequence, on the doubling ladder in
+        // `examples/the_atmosphere_and_the_ground`: as the atmosphere grows from 4 documents to 489
+        // the committed stems grow 30x and the admitted statements fall **42 → 1**, because finer
+        // maximal covers stop meeting. The same mechanism was already visible from the other side —
+        // removing the stem `exact` **reopened six routes**, since the residual letters it had been
+        // suppressing licensed the same contact the moment the word was gone. Maximality suppresses
+        // contact, and at corpus scale that is the dominant effect.
+        let occurrences = all;
         let residue: Vec<usize> = (0..bytes.len())
             .filter(|at| {
                 !occurrences
@@ -481,13 +495,82 @@ pub struct StemOccurrence {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct FoundedCover {
     pub word: String,
-    /// The maximal founded occurrences, in no privileged order beyond the canonical one.
+    /// **Every** founded occurrence at every span, overlaps retained, in canonical order.
+    ///
+    /// This is a cover in the topological sense — a family of spans that overlap — and not a
+    /// partition. [`Self::maximal`] is the partition, offered as one reading among others.
     pub occurrences: Vec<StemOccurrence>,
     /// Byte offsets no founded occurrence covers. The retained obstruction.
     pub residue: Vec<usize>,
 }
 
 impl FoundedCover {
+    /// The reading that keeps only the occurrences no other occurrence contains — the partition.
+    ///
+    /// Correct as a reading and wrong as a constructor: see [`FoundedMorphology::cover`].
+    pub fn maximal(&self) -> Vec<&StemOccurrence> {
+        self.occurrences
+            .iter()
+            .filter(|here| {
+                !self.occurrences.iter().any(|other| {
+                    other.at <= here.at
+                        && here.through <= other.through
+                        && (other.at, other.through) != (here.at, here.through)
+                })
+            })
+            .collect()
+    }
+
+    /// **The crossings.** Pairs of occurrences whose spans overlap without either containing the
+    /// other — the 1-faces of the cover's nerve.
+    ///
+    /// A partition has none by construction, which is why a maximal cover cannot interfere: an
+    /// interference needs two carriers present at one site, and disjoint spans are never both at a
+    /// site. Brandon, 2026-08-09, naming what was missing: *"it should be that stems reflect and
+    /// refract about emergent boundary limits, they intersect, and they interfere. This is why I
+    /// consistently say knot theory, hypergeometry, crossings, faces, and intersections are
+    /// important."*
+    pub fn crossings(&self) -> Vec<(&StemOccurrence, &StemOccurrence)> {
+        let mut crossings = Vec::new();
+        for (index, left) in self.occurrences.iter().enumerate() {
+            for right in self.occurrences.iter().skip(index + 1) {
+                let overlaps = left.at < right.through && right.at < left.through;
+                let contains = (left.at <= right.at && right.through <= left.through)
+                    || (right.at <= left.at && left.through <= right.through);
+                if overlaps && !contains {
+                    crossings.push((left, right));
+                }
+            }
+        }
+        crossings
+    }
+
+    /// **The nerve at one site.** Every occurrence covering byte offset `at` — the face whose
+    /// members are all present there at once, and therefore the carriers that can superpose.
+    pub fn face_at(&self, at: usize) -> Vec<&StemOccurrence> {
+        self.occurrences
+            .iter()
+            .filter(|occurrence| occurrence.at <= at && at < occurrence.through)
+            .collect()
+    }
+
+    /// The occurrences that cross `here` — overlapping it without either containing the other.
+    ///
+    /// A crossing is not a neighbour. Two stems that merely abut can be taken independently; two
+    /// that cross **share letters neither can give up**, so engaging one engages the other. That is
+    /// what makes a crossed contact different in kind from a simple one, and it is the reason the
+    /// licensing carries it rather than reducing it away.
+    pub fn crossings_of(&self, here: &StemOccurrence) -> Vec<&StemOccurrence> {
+        self.occurrences
+            .iter()
+            .filter(|other| {
+                let overlaps = here.at < other.through && other.at < here.through;
+                let contains = (here.at <= other.at && other.through <= here.through)
+                    || (other.at <= here.at && here.through <= other.through);
+                overlaps && !contains
+            })
+            .collect()
+    }
     /// The stems this cover carries, without their offsets.
     pub fn stems(&self) -> BTreeSet<&str> {
         self.occurrences
@@ -839,6 +922,18 @@ impl DerivationQuery {
     }
 }
 
+/// The stems of an occurrence family, in canonical order — the readable name of a face or a
+/// crossing set.
+fn named(occurrences: &[&StemOccurrence]) -> Vec<String> {
+    let mut stems: Vec<String> = occurrences
+        .iter()
+        .map(|occurrence| occurrence.stem.clone())
+        .collect();
+    stems.sort();
+    stems.dedup();
+    stems
+}
+
 /// One founded stem, holding two recruited identifiers together.
 ///
 /// `held` is an identifier the licensing **route** already recruits; `brought` is one it does not.
@@ -861,6 +956,52 @@ pub struct Bridge {
     pub brought: String,
     pub brought_at: usize,
     pub route: String,
+    /// **The face on the held side**: every occurrence co-present at `held_at`, this one included.
+    /// One means the bridging stem is the only carrier at that site; more means the contact is
+    /// superposed and several carriers hold it at once.
+    pub held_face: Vec<String>,
+    /// The face on the brought side.
+    pub brought_face: Vec<String>,
+    /// **The stems the bridging occurrence crosses on the held side** — overlapping it without
+    /// containment, so they share letters neither can give up.
+    pub held_crossings: Vec<String>,
+    /// The stems it crosses on the brought side.
+    pub brought_crossings: Vec<String>,
+}
+
+/// **What kind of contact a bridge is.** A reading of the face and the crossings, not a new
+/// quantity — the three are exhaustive and disjoint by construction, and the constructor decides
+/// none of them.
+///
+/// Brandon, 2026-08-09, on what the licensing was missing: *"it should be that stems reflect and
+/// refract about emergent boundary limits, they intersect, and they interfere. This is why I
+/// consistently say knot theory, hypergeometry, crossings, faces, and intersections are important.
+/// Interference, superposition, entanglement, etc."*
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum ContactSpecies {
+    /// One carrier at the site on both sides, crossing nothing. The contact stands alone.
+    Simple,
+    /// More than one occurrence is present at the site on at least one side. Several carriers hold
+    /// the contact at once — they superpose there, and the bridging stem is not the only reading.
+    Superposed,
+    /// The bridging occurrence crosses another on at least one side. **Entangled**: the crossing
+    /// stem shares letters with it, so the contact cannot be taken without engaging that stem too.
+    Crossed,
+}
+
+impl Bridge {
+    /// The contact's species. `Crossed` dominates `Superposed`, because a crossing is a constraint
+    /// on what else must be engaged while a superposition is only a plurality of carriers.
+    pub fn contact(&self) -> ContactSpecies {
+        if !self.held_crossings.is_empty() || !self.brought_crossings.is_empty() {
+            ContactSpecies::Crossed
+        } else if self.held_face.len() > 1 || self.brought_face.len() > 1 {
+            ContactSpecies::Superposed
+        } else {
+            ContactSpecies::Simple
+        }
+    }
 }
 
 /// One mathematical passage the conditioned body emitted.
@@ -1021,6 +1162,19 @@ pub fn derive(
                                 brought: brought.clone(),
                                 brought_at: brought_occurrence.at,
                                 route: route_key.clone(),
+                                // The face and the crossings are both in hand exactly here, which is
+                                // why they are carried here: this is the one site where a contact is
+                                // formed, and computing them later would need the covers again.
+                                held_face: named(&held_cover.face_at(held_occurrence.at)),
+                                brought_face: named(
+                                    &brought_cover.face_at(brought_occurrence.at),
+                                ),
+                                held_crossings: named(
+                                    &held_cover.crossings_of(held_occurrence),
+                                ),
+                                brought_crossings: named(
+                                    &brought_cover.crossings_of(brought_occurrence),
+                                ),
                             });
                     }
                 }
@@ -1679,22 +1833,49 @@ mod tests {
     }
 
     #[test]
-    fn the_maximal_cover_refuses_an_occurrence_a_longer_founded_stem_contains() {
-        // `act` and `exact` are both committed; only `exact` may stand at offset zero.
+    fn the_cover_carries_the_contained_occurrence_and_the_maximal_reading_refuses_it() {
+        // `act` and `exact` are both committed. Both are PRESENT in the cover; only `exact` stands
+        // in the maximal reading. Re-founded 2026-08-09: this test asserted that `act` was absent
+        // from `cover.occurrences`, which pinned the constructor's reduction as though it were the
+        // law. It is a reading, and the reading is where it now lives.
         let morphology = FoundedMorphology::condition(&[
             expose("one", "exact act"),
             expose("two", "exact act"),
         ]);
         let cover = morphology.cover("exact").expect("ascii");
-        assert_eq!(
-            cover.occurrences,
-            vec![StemOccurrence {
-                stem: "exact".to_owned(),
-                at: 0,
-                through: 5,
-            }]
-        );
+        let exact = StemOccurrence { stem: "exact".to_owned(), at: 0, through: 5 };
+        let act = StemOccurrence { stem: "act".to_owned(), at: 2, through: 5 };
+
+        assert_eq!(cover.occurrences, vec![exact.clone(), act.clone()], "the cover carries both");
+        assert_eq!(cover.maximal(), vec![&exact], "the maximal reading carries one");
         assert!(cover.residue.is_empty(), "{:?}", cover.residue);
+        // Contained, not crossing: `act` sits inside `exact`, so this pair is not a 1-face.
+        assert!(cover.crossings().is_empty());
+        // At offset 2 both are present. That is the face, and it is what can superpose.
+        assert_eq!(cover.face_at(2), vec![&exact, &act]);
+    }
+
+    /// **A real crossing: two committed stems that overlap without either containing the other.**
+    /// This is the object a partition cannot hold and the reason the reduction was removed.
+    #[test]
+    fn two_overlapping_stems_cross_and_the_maximal_reading_keeps_only_one() {
+        let morphology = FoundedMorphology::condition(&[
+            expose("one", "exa xac"),
+            expose("two", "exa xac"),
+        ]);
+        let cover = morphology.cover("exact").expect("ascii");
+        let crossings = cover.crossings();
+        assert_eq!(crossings.len(), 1, "{:?}", cover.occurrences);
+        let (left, right) = crossings[0];
+        assert_eq!((left.stem.as_str(), left.at, left.through), ("exa", 0, 3));
+        assert_eq!((right.stem.as_str(), right.at, right.through), ("xac", 1, 4));
+        // They share offsets 1 and 2 — the overlap is where they interfere.
+        assert_eq!(cover.face_at(1).len(), 2);
+        assert_eq!(cover.face_at(2).len(), 2);
+        // **And the maximal reading keeps BOTH.** Neither contains the other, so neither is
+        // refused: `maximal` is the antichain under containment, not a partition. Crossings always
+        // survived it; what it deleted was containment. This assertion read `<` until it was run.
+        assert_eq!(cover.maximal().len(), cover.occurrences.len());
     }
 
     #[test]
@@ -2177,17 +2358,42 @@ mod tests {
     }
 
     #[test]
-    fn removing_a_stem_reopens_exactly_the_occurrences_its_maximality_had_been_suppressing() {
-        // `carry` and `car` both commit; `car` is invisible inside `carry` until `carry` is gone.
+    /// **Re-founded 2026-08-09. The reopening this test pinned was maximality's own shadow.**
+    ///
+    /// It asserted that removing `carry` *reopens* `car` — true while the constructor deleted every
+    /// contained occurrence, because `car` was invisible until `carry` left. With the cover retained
+    /// both stand from the beginning, so there is nothing to reopen and the return is empty.
+    ///
+    /// That is not a weaker result. A reopening was a **receiver artifact**: the material always had
+    /// `car`, and only the reduction hid it. What survives, and is asserted here, is the real
+    /// property — the cover is over-determined, and an ablation must remove **every occurrence at a
+    /// site** rather than one stem, because the unit of removal has to match the unit of carrying.
+    #[test]
+    fn the_cover_holds_the_contained_stem_from_the_start_so_removal_reopens_nothing() {
         let mut body = ConditionedBody::mount(deposit()).expect("deposit reads");
         body.condition(&[
             expose("one", "an exact transport must carry the carrier by car"),
             expose("two", "exact transport must carry the carrier by car"),
         ]);
         assert!(body.morphology().committed_stems().contains(&"car"));
+
         let before = body.morphology().cover("formal_carry").expect("ascii");
         assert!(before.stems().contains("carry"));
-        assert!(!before.stems().contains("car"), "{}", before.render());
+        assert!(
+            before.stems().contains("car"),
+            "the contained stem stands from the start: {}",
+            before.render()
+        );
+        // Both cover the same site, which is what over-determination means here.
+        let carry_at = before
+            .occurrences
+            .iter()
+            .find(|occurrence| occurrence.stem == "carry")
+            .expect("carry stands");
+        assert!(
+            before.face_at(carry_at.at).len() > 1,
+            "more than one occurrence stands at that site"
+        );
 
         let ablation = ablate_stem(
             &body,
@@ -2197,14 +2403,11 @@ mod tests {
         )
         .expect("carry was founded");
         assert!(
-            !ablation.reopened.is_empty(),
-            "removing `carry` reopened nothing, so `car` never became maximal"
+            ablation.reopened.is_empty(),
+            "nothing was suppressed, so nothing reopens: {:?}",
+            ablation.reopened
         );
         assert!(ablation.unaccounted.is_empty(), "{:?}", ablation.unaccounted);
-        for entry in &ablation.reopened {
-            assert!("carry".contains(&entry.stem) && entry.stem != "carry", "{entry:?}");
-        }
-        assert!(ablation.removes_structure());
     }
 
     #[test]

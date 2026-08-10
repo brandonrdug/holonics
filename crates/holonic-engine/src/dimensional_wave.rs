@@ -696,7 +696,24 @@ impl ExactDimensionalWaveLaw {
         {
             return Err(DimensionalWaveError::MalformedStanding);
         }
-        let energy = standing
+        if standing.energy != self.standing_energy(standing) {
+            return Err(DimensionalWaveError::EnergyStandingMismatch);
+        }
+        Ok(())
+    }
+
+    /// **The second frame on `standing.energy`.** The admittance-weighted sum read off the standing's
+    /// own arrival values, owing nothing to the bookkeeping that maintains the field.
+    ///
+    /// This exists as a method because two callers need it and one of them was computing a
+    /// tautology instead. The event path set `standing.energy = energy_before + total_source_work`
+    /// and then guarded on `standing.energy - energy_before - total_source_work`, which is
+    /// identically zero over `Rat` — a check that could not fail, wearing a passing result
+    /// (`CLAUDE.md` §8). Five driver assertions rode on it as the loudest guard in the run. The
+    /// difference between *this* sum and the bookkept one is a real residual: it moves whenever the
+    /// two frames disagree about what the field holds.
+    fn standing_energy(&self, standing: &ExactDimensionalWaveStanding) -> Rat {
+        standing
             .arrival_values
             .iter()
             .enumerate()
@@ -704,11 +721,7 @@ impl ExactDimensionalWaveLaw {
             .fold(Rat::zero(), |sum, (address, current)| {
                 let port = address % standing.port_count;
                 sum + &self.topology.ports[port].admittance * current.norm_square()
-            });
-        if standing.energy != energy {
-            return Err(DimensionalWaveError::EnergyStandingMismatch);
-        }
-        Ok(())
+            })
     }
 
     /// Constant-time structural guard used by a succession whose standing was
@@ -1078,7 +1091,12 @@ impl ExactDimensionalWaveLaw {
         if standing.energy.is_negative() {
             return Err(DimensionalWaveError::GlobalEnergyFailure);
         }
-        let exact_energy_residual = &standing.energy - &energy_before - &total_source_work;
+        // Two frames, differenced. `standing.energy` is bookkeeping — the running total the event
+        // path maintains; `standing_energy` reads the field itself. Until 2026-08-09 this line read
+        // `&standing.energy - &energy_before - &total_source_work`, which the assignment two lines
+        // above makes identically zero, so neither this guard nor the five driver assertions that
+        // consume the field could ever fire.
+        let exact_energy_residual = &standing.energy - &self.standing_energy(&standing);
         if !exact_energy_residual.is_zero() {
             return Err(DimensionalWaveError::GlobalEnergyFailure);
         }

@@ -41,6 +41,7 @@ the refusal is honest.
 | `transformer-context-recomposition-01/` | RECOVERED, **still blocked** | `eros_self_emanated_law` | `experiments/informant-ecology/results/transformer-context-recomposition-01/manifest.json` |
 | `eros-morphological-language-generation-01/` | **CONSTRUCTED** | `eros_morphological_language_generation` | built by `soma/life/examples/morphological_language/freeze_source.py`, a port of the laboratory's `experiments/causal-language/sidecar/freeze_source.py` |
 | `eros-morphological-language-generation-bounded-01/` | **CONSTRUCTED, bounded** | the same driver, at a declared generation aperture of 2 tokens instead of the laboratory's 256 | same extractor, `--maximum-generated-tokens 2` |
+| `eros-causal-language-generation-01/` | **CONSTRUCTED, bounded** | `eros_causal_language_generation`, recovered 2026-08-09 from `ba8716b5` | same extractor, `--schema soma.causal-language.source.v1 --maximum-generated-tokens 2` |
 | `eros-holonic-constituent-ecology-01/` | RECOVERED, **no owner here** | — | the driver for `eros.holonic-constituent-ecology.source.v1` did not survive the transition |
 | `eros-holonic-execution-paths-01/` | RECOVERED, **no owner here** | — | same, for `eros.holonic-execution-paths.source.v1` |
 | `eros-ordinary-text-ecology-01/` | RECOVERED, **no owner here** | — | same, for `eros.ordinary-text-ecology.source.v1` |

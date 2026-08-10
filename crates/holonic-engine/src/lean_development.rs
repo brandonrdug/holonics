@@ -130,9 +130,19 @@ use crate::derivation_atlas::{Derivation, CODEC_KEYWORDS, DECLARATION_FORMERS};
 /// Lines that situate a file rather than found anything in it.
 ///
 /// Their tokens are returned as [`DevelopmentReading::preamble`] and charged to no declaration.
-pub const PREAMBLE_FORMS: [&str; 6] = [
+///
+/// **The module-system forms are here because their absence made the preamble invisible.** This
+/// mathlib is on Lean's module system: 7,505 of its 7,516 files open with `module` and write
+/// `public import` rather than `import`, so a list carrying only the bare `import` saw the preamble
+/// of eleven files and charged the other 7,505 files' imports to whatever declaration happened to be
+/// open. Measured, not supposed.
+pub const PREAMBLE_FORMS: [&str; 10] = [
     "attribute",
     "import",
+    "public import",
+    "private import",
+    "meta import",
+    "module",
     "open",
     "set_option",
     "universe",
@@ -211,7 +221,14 @@ pub struct DeclaredForm {
     /// The former that opened it.
     pub former: String,
     /// The name as the source writes it, which is also what a body in the same namespace recruits.
+    ///
+    /// When [`Self::anonymous`] is set this is a **positional identity** — `instance@1204` — and not
+    /// a name the source wrote. It is never a join target.
     pub name: String,
+    /// The source founded no name here: `instance : Foo Bar where`. The declaration is returned
+    /// anyway, with a positional identity, because the alternative is that its body is charged to
+    /// whichever declaration happened to precede it.
+    pub anonymous: bool,
     /// The enclosing `namespace`/`section` path at the point of declaration, outermost first.
     pub namespace_path: Vec<String>,
     /// The header up to `:=`, normalized to single spaces.
@@ -471,30 +488,141 @@ impl DevelopmentReading {
             .collect()
     }
 
-    /// Every short name this reading declares.
+    /// Every short name this reading declares. An anonymous declaration carries a positional
+    /// identity rather than a name and is never a join target, so it is not here.
     pub fn declared_names(&self) -> BTreeSet<&str> {
         self.declarations
             .iter()
+            .filter(|form| !form.anonymous)
             .map(|form| form.name.as_str())
             .collect()
     }
 
+    /// Every declaration indexed by its **fully qualified** name, which is the join key.
+    pub fn qualified_index(&self) -> BTreeMap<String, Vec<usize>> {
+        let mut index: BTreeMap<String, Vec<usize>> = BTreeMap::new();
+        for (at, form) in self.declarations.iter().enumerate() {
+            if form.anonymous {
+                continue;
+            }
+            index.entry(form.qualified()).or_default().push(at);
+        }
+        index
+    }
+
+    /// Resolve one recruited symbol against this reading, by Lean's own rule.
+    ///
+    /// Returns the declarations the symbol resolves to. **Empty means the symbol comes from outside
+    /// this reading; more than one means `OPEN`** — the resolved qualified name is declared twice
+    /// and the reading may not choose between them.
+    pub fn resolve(&self, form: &DeclaredForm, symbol: &str) -> Vec<usize> {
+        let index = self.qualified_index();
+        self.resolve_with(&index, form, symbol)
+    }
+
+    /// [`Self::resolve`] against an index the caller already built — the whole-corpus form, where
+    /// rebuilding the index per symbol is the difference between seconds and hours.
+    pub fn resolve_with(
+        &self,
+        index: &BTreeMap<String, Vec<usize>>,
+        form: &DeclaredForm,
+        symbol: &str,
+    ) -> Vec<usize> {
+        for candidate in resolution_candidates(&form.namespace_path, symbol) {
+            if let Some(found) = index.get(&candidate) {
+                return found.clone();
+            }
+        }
+        Vec::new()
+    }
+
     /// Declarations that recruit another declaration of the same reading, with the names recruited.
     ///
-    /// This is the population the elaboration organ can open, and on the generated deposit it has
-    /// exactly one member.
+    /// **The join is on the resolved qualified name, and it did not used to be.** Matching the bare
+    /// short name reads `ext` in one file as a recruitment of the `ext` declared in every other
+    /// file that declares one — mathlib declares `ext` in 14 of 200 sampled files — and measured
+    /// against the transitive import closure, **76% of the cross-file edges a short-name join
+    /// returns land on files the source cannot import.** Against a null that permutes the landings
+    /// over the same target multiset the observed rate is 24.0% against 20.7%: a real signal, and
+    /// almost all of the population is noise around it.
+    ///
+    /// Where the resolved name is declared more than once the edge is **not** returned here. It is
+    /// [`Self::open_recruitment`], because `OPEN` may not be closed by choosing.
     pub fn declared_recruitment(&self) -> BTreeMap<&str, BTreeSet<&str>> {
-        let declared = self.declared_names();
+        let index = self.qualified_index();
         let mut found: BTreeMap<&str, BTreeSet<&str>> = BTreeMap::new();
         for form in &self.declarations {
-            let reached: BTreeSet<&str> = form
-                .recruited
-                .keys()
-                .map(String::as_str)
-                .filter(|symbol| *symbol != form.name && declared.contains(symbol))
-                .collect();
+            if form.anonymous {
+                continue;
+            }
+            let mut reached: BTreeSet<&str> = BTreeSet::new();
+            for symbol in form.recruited.keys() {
+                let landing = self.resolve_with(&index, form, symbol);
+                if landing.len() != 1 {
+                    continue;
+                }
+                let target = &self.declarations[landing[0]];
+                if std::ptr::eq(target, form) {
+                    continue;
+                }
+                reached.insert(target.name.as_str());
+            }
             if !reached.is_empty() {
                 found.insert(form.name.as_str(), reached);
+            }
+        }
+        found
+    }
+
+    /// The same join, returned **qualified on both ends** — the form a corpus-scale population
+    /// needs, because two files' `Nat.add` and `Int.add` are one short name and two declarations.
+    pub fn declared_recruitment_qualified(&self) -> BTreeMap<String, BTreeSet<String>> {
+        let index = self.qualified_index();
+        let mut found: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
+        for form in &self.declarations {
+            if form.anonymous {
+                continue;
+            }
+            let mut reached: BTreeSet<String> = BTreeSet::new();
+            for symbol in form.recruited.keys() {
+                let landing = self.resolve_with(&index, form, symbol);
+                if landing.len() != 1 {
+                    continue;
+                }
+                let target = &self.declarations[landing[0]];
+                if std::ptr::eq(target, form) {
+                    continue;
+                }
+                reached.insert(target.qualified());
+            }
+            if !reached.is_empty() {
+                found.insert(form.qualified(), reached);
+            }
+        }
+        found
+    }
+
+    /// **The `OPEN` half of the join.** A symbol whose resolved qualified name is declared more than
+    /// once, with every candidate returned and none chosen.
+    ///
+    /// This is the same shape as [`Self::open_projections`], and it is a return: a reading that
+    /// picked one of the candidates would be asserting an edge the orthography cannot certify.
+    pub fn open_recruitment(&self) -> BTreeMap<String, BTreeMap<String, Vec<String>>> {
+        let index = self.qualified_index();
+        let mut found: BTreeMap<String, BTreeMap<String, Vec<String>>> = BTreeMap::new();
+        for form in &self.declarations {
+            if form.anonymous {
+                continue;
+            }
+            for symbol in form.recruited.keys() {
+                let landing = self.resolve_with(&index, form, symbol);
+                if landing.len() < 2 {
+                    continue;
+                }
+                found
+                    .entry(form.qualified())
+                    .or_default()
+                    .insert(symbol.clone(), landing.iter().map(|at| format!("{}@{}", self.declarations[*at].qualified(), self.declarations[*at].line)).collect());
             }
         }
         found
@@ -520,6 +648,33 @@ impl DevelopmentReading {
 /// but the **join** must see through the projection, or `semantics_rebase_iff → Semantics` is invisible
 /// and the development reads as one edge poorer than it is. The driver's own printed reconciliation
 /// called that pair a projection "to another namespace"; both sit in `Soma.Holonics.SituatedAlgorithm`.
+
+/// Lean's own name resolution, as a candidate list: **longest enclosing prefix first.**
+///
+/// Inside `namespace A.B`, a body writing `s` means `A.B.s` if that exists, else `A.s`, else `s`.
+/// The dotted segments of each pushed frame are walked individually, because `namespace A.B` and
+/// `namespace A` + `namespace B` are the same scope in Lean and must resolve the same way.
+///
+/// This is the join key. **The bare short name is not**: mathlib declares `ext` in 14 of 200
+/// sampled files, so a short-name join lands a majority of its edges on files the source cannot
+/// even import. Where the resolved name is still declared more than once, the population is `OPEN`
+/// and the candidates are returned rather than one of them being chosen.
+pub fn resolution_candidates(namespace_path: &[String], symbol: &str) -> Vec<String> {
+    let parts: Vec<&str> = namespace_path
+        .iter()
+        .flat_map(|frame| frame.split('.'))
+        .filter(|part| !part.is_empty())
+        .collect();
+    let mut candidates = Vec::with_capacity(parts.len() + 1);
+    for take in (0..=parts.len()).rev() {
+        if take == 0 {
+            candidates.push(symbol.to_owned());
+        } else {
+            candidates.push(format!("{}.{symbol}", parts[..take].join(".")));
+        }
+    }
+    candidates
+}
 
 /// Join two readings of different texts into one development population.
 ///
@@ -561,6 +716,10 @@ fn accumulate(into: &mut BTreeMap<String, u32>, from: BTreeMap<String, u32>) {
 fn ambiguity(declarations: &[DeclaredForm]) -> BTreeMap<String, Vec<Vec<String>>> {
     let mut by_name: BTreeMap<String, Vec<Vec<String>>> = BTreeMap::new();
     for form in declarations {
+        // A positional identity is not a name and cannot be ambiguous with one.
+        if form.anonymous {
+            continue;
+        }
         by_name
             .entry(form.name.clone())
             .or_default()
@@ -639,39 +798,107 @@ fn split_comments(text: &str) -> Vec<SplitLine> {
 /// the defect this whole module exists to remove, arriving one grain further down. `soma/formal`
 /// carries twelve primed identifiers; the generated deposit carries none, so widening moves no
 /// parity figure.
+/// **`?` and `!` are Lean name characters and their absence truncated 249 names.** `getElem?_eq`
+/// came back as `getElem`, `Option.get!` as `Option.get`, and `simp?` was indistinguishable from
+/// `simp`. They are admitted as *continuation* characters and stripped from the *head*, because
+/// `!b` is Bool negation and `?_` is a goal placeholder: without the strip the prefix operator would
+/// swallow the identifier under it.
+///
+/// **`«…»` is Lean's quoting of a name that is otherwise a keyword.** `«forall»` is one identifier
+/// and the reading stopped at the guillemet.
+fn is_identifier_body(c: char) -> bool {
+    c.is_alphanumeric() || c == '_' || c == '.' || c == '\'' || c == '?' || c == '!' || c == '«' || c == '»'
+}
+
 fn identifier_tokens(line: &str) -> impl Iterator<Item = &str> {
-    line.split(|c: char| !(c.is_alphanumeric() || c == '_' || c == '.' || c == '\''))
+    line.split(|c: char| !is_identifier_body(c))
+        .map(|token| token.trim_start_matches(['!', '?']))
         .filter(|token| {
             token
                 .chars()
                 .next()
-                .is_some_and(|first| first.is_alphabetic() || first == '_')
+                .is_some_and(|first| first.is_alphabetic() || first == '_' || first == '«')
         })
 }
 
-/// The former opening this line, if it is a top-level declaration.
+/// Read one Lean identifier off the front of `rest`, returning it with the offset just past it.
 ///
-/// Column zero, and `noncomputable`/`private`/`protected`/`partial`/`unsafe`/`@[…]` modifiers are
+/// Returns an empty name for an anonymous declaration — `instance : Foo Bar where` — which is a
+/// return and not a failure.
+fn leading_identifier(rest: &str) -> (String, usize) {
+    let trimmed = rest.trim_start();
+    let skipped = rest.len() - trimmed.len();
+    if let Some(after) = trimmed.strip_prefix('«') {
+        if let Some(close) = after.find('»') {
+            let name = &trimmed[..'«'.len_utf8() + close + '»'.len_utf8()];
+            return (name.to_owned(), skipped + name.len());
+        }
+    }
+    let end = trimmed
+        .char_indices()
+        .find(|(_, c)| !is_identifier_body(*c))
+        .map_or(trimmed.len(), |(at, _)| at);
+    let name = &trimmed[..end];
+    // A leading `!` or `?` is an operator, never the head of a name.
+    let name = name.trim_start_matches(['!', '?']);
+    if name.is_empty() {
+        return (String::new(), skipped);
+    }
+    (name.to_owned(), skipped + end)
+}
+
+/// The former opening this line, the name it founds, and **the rest of the header after that name**.
+///
+/// Column zero, and [`DECLARATION_MODIFIERS`] plus any number of leading `@[…]` attribute groups are
 /// stepped over so the former under them is found.
-fn top_level_former(line: &str) -> Option<(&'static str, String)> {
+///
+/// **An empty name is a return, not a rejection.** `instance : Foo Bar where` founds no name, and
+/// the previous form of this function fell through to the next former, failed every one, and
+/// returned `None` — so 13,760 anonymous mathlib instances were not declarations at all and their
+/// bodies were charged to whichever declaration preceded them. The caller gives an empty name a
+/// positional identity; see [`DeclaredForm::anonymous`].
+///
+/// The third element is the header remainder **by offset**, not by searching for the name in the
+/// line. Searching cannot work for an anonymous declaration, where `split_once("")` returns the
+/// whole line including the former.
+fn top_level_former(line: &str) -> Option<(&'static str, String, &str)> {
     if line.starts_with(char::is_whitespace) || line.is_empty() {
         return None;
     }
     let mut rest = line.trim_end();
-    // A leading attribute bracket is a modifier of the declaration under it.
-    if let Some(after) = rest.strip_prefix('@') {
-        let Some(close) = after.find(']') else {
+    // Any number of leading attribute brackets are modifiers of the declaration under them.
+    // **Matched by depth, because an attribute argument may be a list.** `@[simp, aesop (rule_sets
+    // := [finiteness]) safe apply] theorem zero_ne_top` closes on the inner `]` under a first-`]`
+    // scan, and the former under it is never reached.
+    loop {
+        let Some(after) = rest.strip_prefix("@[") else {
+            break;
+        };
+        let mut depth = 1usize;
+        let mut close = None;
+        for (at, character) in after.char_indices() {
+            match character {
+                '[' => depth += 1,
+                ']' => {
+                    depth -= 1;
+                    if depth == 0 {
+                        close = Some(at);
+                        break;
+                    }
+                }
+                _ => {}
+            }
+        }
+        let Some(close) = close else {
             return None;
         };
         rest = after[close + 1..].trim_start();
     }
     loop {
-        let stepped = ["noncomputable", "private", "protected", "partial", "unsafe"]
-            .iter()
-            .find_map(|modifier| {
-                rest.strip_prefix(modifier)
-                    .filter(|after| after.starts_with(char::is_whitespace))
-            });
+        let stepped = DECLARATION_MODIFIERS.iter().find_map(|modifier| {
+            rest.strip_prefix(modifier)
+                .filter(|after| after.starts_with(char::is_whitespace))
+        });
         match stepped {
             Some(after) => rest = after.trim_start(),
             None => break,
@@ -679,25 +906,27 @@ fn top_level_former(line: &str) -> Option<(&'static str, String)> {
     }
     for former in DECLARATION_FORMERS {
         // `variable` and `example` found nothing joinable: `variable` is preamble, `example` is
-        // anonymous. Both are declared out here rather than filtered downstream.
+        // anonymous by its own grammar and names nothing a later declaration can reach. Both are
+        // declared out here rather than filtered downstream.
         if former == "variable" || former == "example" {
             continue;
         }
-        if let Some(after) = rest.strip_prefix(former) {
-            if !after.starts_with(char::is_whitespace) {
-                continue;
-            }
-            let name = after
-                .trim_start()
-                .split(|c: char| !(c.is_alphanumeric() || c == '_' || c == '.' || c == '\''))
-                .next()
-                .unwrap_or_default()
-                .to_owned();
-            if name.is_empty() {
-                continue;
-            }
-            return Some((former, name));
+        let Some(after) = rest.strip_prefix(former) else {
+            continue;
+        };
+        // An empty remainder is a former alone on its line — `instance` with its binders on the
+        // next — and rejecting it lost three more anonymous instances after the other 13,757 were
+        // recovered.
+        if !(after.is_empty() || after.starts_with(char::is_whitespace)) {
+            continue;
         }
+        // `class inductive Foo` is one former; the head keyword has already decided it.
+        let after = match after.trim_start().strip_prefix("inductive") {
+            Some(nested) if former == "class" && nested.starts_with(char::is_whitespace) => nested,
+            _ => after,
+        };
+        let (name, offset) = leading_identifier(after);
+        return Some((former, name, &after[offset..]));
     }
     None
 }
@@ -718,8 +947,21 @@ fn is_preamble(line: &str) -> bool {
 
 /// Modifiers that may precede a top-level former. Declaration syntax, recruited by nothing —
 /// measured as terms of `proportionalFlow` and `congestion` before this exclusion existed.
-pub const DECLARATION_MODIFIERS: [&str; 5] =
-    ["noncomputable", "private", "protected", "partial", "unsafe"];
+///
+/// `nonrec` prefixes 635 mathlib declarations and `meta`, `public`, `scoped`, `local` another 377;
+/// each one absent from this list is a declaration head the reader steps past and never opens.
+pub const DECLARATION_MODIFIERS: [&str; 10] = [
+    "noncomputable",
+    "private",
+    "protected",
+    "partial",
+    "unsafe",
+    "nonrec",
+    "meta",
+    "public",
+    "scoped",
+    "local",
+];
 
 /// Top-level commands that scope the declaration *after* them. `omit [Fintype Old] in` is neither a
 /// former nor preamble, so it was appended to the PREVIOUS declaration's lines: measured, `congestion`
@@ -801,21 +1043,34 @@ fn founded_names(lines: &[String]) -> BTreeSet<String> {
         }
 
         // ---------------------------------------------------------------- 2. lambda binders
-        // `fun m hm =>` and `fun {_ _} hstep ↦` found their names. Structural, from the arrow.
+        // `fun m hm =>` and `fun {_ _} hstep ↦` found their names. Structural, from the arrow —
+        // and cut at a `:` as well, because `fun (x : Carrier) => …` founded `Carrier` as a binder
+        // and `binding_position_declared` was built to exhibit exactly that loss. The typed case is
+        // already covered by rule 1: `(x : Carrier)` is a binder group.
         let mut rest = line.as_str();
         while let Some(at) = rest.find("fun ") {
             let after = &rest[at + 4..];
-            let head = after
-                .split("=>")
-                .next()
-                .unwrap_or(after)
-                .split('↦')
-                .next()
-                .unwrap_or(after);
+            let head = cut_at(after, &["=>", "↦", ":"]);
             for token in identifier_tokens(head) {
                 founded.insert(token.to_owned());
             }
             rest = after;
+        }
+
+        // ---------------------------------------------------------------- 2b. quantifier binders
+        // `∀ ε > 0, …` and `∃ n, …` found their names by exactly the rule the arrow uses: the
+        // leading run of plain names, ending at the first thing that is not one. Without this the
+        // reading has no way to tell a quantified variable from an environment name once the
+        // single-glyph filter is gone — and the filter had to go, because it also deleted `ℝ`.
+        for quantifier in ['∀', '∃', 'λ', '∑', '∏'] {
+            let mut rest = line.as_str();
+            while let Some(at) = rest.find(quantifier) {
+                let after = &rest[at + quantifier.len_utf8()..];
+                for token in identifier_tokens(binder_run(after)) {
+                    founded.insert(token.to_owned());
+                }
+                rest = after;
+            }
         }
 
         // ---------------------------------------------------------------- 3. binding tactics
@@ -839,6 +1094,38 @@ fn founded_names(lines: &[String]) -> BTreeSet<String> {
     }
 
     founded
+}
+
+/// The prefix of `text` before the earliest of `markers`.
+fn cut_at<'a>(text: &'a str, markers: &[&str]) -> &'a str {
+    let at = markers
+        .iter()
+        .filter_map(|marker| text.find(marker))
+        .min()
+        .unwrap_or(text.len());
+    &text[..at]
+}
+
+/// The leading run of **plain binder names** after a quantifier.
+///
+/// Runs while the text is names, whitespace, and binder brackets; stops at the first character that
+/// is none of those — `,` `:` `∈` `>` `=` and every other operator. So `∀ ε > 0,` founds `ε` and
+/// not `0`; `∀ x ∈ s,` founds `x` and not `s`; `∀ (n : ℕ),` founds `n` and leaves `ℕ` recruited,
+/// which is the whole point of removing the length filter.
+fn binder_run(text: &str) -> &str {
+    let at = text
+        .char_indices()
+        .find(|(_, c)| {
+            !(c.is_alphanumeric()
+                || *c == '_'
+                || *c == '\''
+                || *c == '?'
+                || *c == '!'
+                || c.is_whitespace()
+                || matches!(*c, '(' | ')' | '{' | '}' | '⦃' | '⦄' | '⟨' | '⟩'))
+        })
+        .map_or(text.len(), |(index, _)| index);
+    &text[..at]
 }
 
 /// Endings that **open a block**, so the next line begins a step whatever else the ending looks
@@ -921,8 +1208,13 @@ fn strip_step_marker(trimmed: &str) -> &str {
 /// development *declares*, and [`DevelopmentReading::single_occurrence_terms`] exhibits every term
 /// occurring in exactly one declaration — the distributional signature of a proof-local name the
 /// structural rule missed.
-fn classify(mut form: DeclaredForm, lines: &[String]) -> DeclaredForm {
-    let founded = founded_names(lines);
+fn classify(
+    mut form: DeclaredForm,
+    lines: &[String],
+    file_scope: &BTreeSet<String>,
+) -> DeclaredForm {
+    let mut founded = founded_names(lines);
+    founded.extend(file_scope.iter().cloned());
     let own = form.name.clone();
 
     let mut in_tactic = false;
@@ -1019,8 +1311,14 @@ fn classify(mut form: DeclaredForm, lines: &[String]) -> DeclaredForm {
                 founds_next = true;
                 continue;
             }
-            if token.chars().count() <= 1
-                || token == own
+            // **The length filter that stood here deleted `ℝ`, `ℕ`, `ℂ`, `ℤ`, `𝕜` and `α`.**
+            // Measured over 2,051,174 lines carrying 35,231 occurrences of `ℝ`, the recruited
+            // population contained it **zero** times. It was there to drop `x`, `y`, `n`, and
+            // POSITION already tells those apart: a single glyph before a binder's `:` is a binder
+            // and `founded` holds it; after the `:` it is a type. A character class cannot make
+            // that distinction — `α` and `x` are both one letter — so the position rule below is
+            // the only test, and the length is not consulted at all.
+            if token == own
                 || DECLARATION_MODIFIERS.contains(&token)
                 || SCOPING_COMMANDS.contains(&token)
             {
@@ -1120,6 +1418,162 @@ fn statement_of(header: &str, name: &str) -> String {
     after_name.split_whitespace().collect::<Vec<_>>().join(" ")
 }
 
+/// **A `where` ends a header exactly as `:=` does, and only one of the two was checked.**
+///
+/// `class Foo (α : Type) extends Bar α where` opens its *fields*, which are a different grain; a
+/// header that runs past it absorbs every field of the class into the statement. Measured against
+/// the grammar, every `class` statement and 87.8% of `structure` statements were wrong for this one
+/// reason. Returns the offset of the terminator, so the caller can also learn that the header is
+/// **closed** — an open header that is never closed is returned empty, which is how a `structure`
+/// with no `:=` anywhere lost its statement entirely.
+fn header_terminator(text: &str) -> Option<usize> {
+    let assignment = text.find(":=");
+    let mut clause: Option<usize> = None;
+    let bytes = text.as_bytes();
+    let mut cursor = 0usize;
+    while let Some(at) = text[cursor..].find("where") {
+        let at = cursor + at;
+        let before_ok = at == 0 || !is_identifier_body(text[..at].chars().next_back().unwrap_or(' '));
+        let after = at + "where".len();
+        let after_ok = after >= bytes.len()
+            || !is_identifier_body(text[after..].chars().next().unwrap_or(' '));
+        if before_ok && after_ok {
+            clause = Some(at);
+            break;
+        }
+        cursor = after;
+    }
+    match (assignment, clause) {
+        (Some(a), Some(w)) => Some(a.min(w)),
+        (Some(a), None) => Some(a),
+        (None, Some(w)) => Some(w),
+        (None, None) => None,
+    }
+}
+
+/// The header remainder cut at its terminator and normalized to single spaces, with whether the
+/// terminator was present.
+fn cut_header(text: &str) -> (String, bool) {
+    match header_terminator(text) {
+        Some(at) => (
+            text[..at].split_whitespace().collect::<Vec<_>>().join(" "),
+            true,
+        ),
+        None => (text.split_whitespace().collect::<Vec<_>>().join(" "), false),
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+// Scope — which level an `end` actually closes
+// -------------------------------------------------------------------------------------------------
+
+/// What an open scope frame is, because **an `end` closes the kind that opened it**.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum ScopeKind {
+    /// `namespace A` — contributes a level to every enclosed declaration's name.
+    Namespace,
+    /// `section`, `section Foo`, `mutual` — closed by `end`, contributes **no** level.
+    Section,
+}
+
+/// One open scope, in source order.
+struct ScopeFrame {
+    kind: ScopeKind,
+    name: String,
+}
+
+/// `section`, `public section`, `noncomputable section` — the head of a section command.
+///
+/// The module system writes `public section` in 1,430 of these files and `noncomputable section` is
+/// how mathlib opens a computationally irrelevant region; a `starts_with("section")` test sees
+/// neither, and each one it misses is a frame the matching `end` tears off a live namespace
+/// instead. `Mathlib/Algebra/Category/ModuleCat/Sheaf/Quasicoherent.lean` lost `SheafOfModules` from
+/// eleven declarations to exactly this.
+fn section_head(trimmed: &str) -> Option<&str> {
+    let mut rest = trimmed;
+    loop {
+        let stepped = DECLARATION_MODIFIERS.iter().find_map(|modifier| {
+            rest.strip_prefix(modifier)
+                .filter(|after| after.starts_with(char::is_whitespace))
+                .map(str::trim_start)
+        });
+        match stepped {
+            Some(after) => rest = after,
+            None => break,
+        }
+    }
+    let after = rest.strip_prefix("section")?;
+    if after.is_empty() || after.starts_with(char::is_whitespace) {
+        Some(after.trim_start())
+    } else {
+        None
+    }
+}
+
+/// Close the frames an `end` closes, **by kind and by name**.
+///
+/// This is the repair the whole reading rested on. The previous form popped the namespace stack on
+/// *any* `end`, so every `section … end` written inside a namespace tore a live namespace level off
+/// and every declaration after it was returned under a shorter path than the source gives it —
+/// 27.9% of the corpus, every error shallower, which is the signature of a stack popped too often.
+///
+/// `end Foo` closes back to the frame whose accumulated name is `Foo`, because `namespace A` then
+/// `namespace B` is closed by a single `end A.B`. A bare `end` closes the innermost frame. An `end`
+/// naming a frame that is not open closes the innermost one, which is what Lean's own error
+/// recovery cannot do but is the only reading that keeps the stack from drifting for the rest of the
+/// file.
+fn close_frames(frames: &mut Vec<ScopeFrame>, closed: &str) {
+    if closed.is_empty() {
+        frames.pop();
+        return;
+    }
+    for cut in (0..frames.len()).rev() {
+        let accumulated = frames[cut..]
+            .iter()
+            .filter(|frame| !frame.name.is_empty())
+            .map(|frame| frame.name.as_str())
+            .collect::<Vec<_>>()
+            .join(".");
+        if accumulated == closed {
+            frames.truncate(cut);
+            return;
+        }
+    }
+    frames.pop();
+}
+
+/// Names the **file** founds for every declaration under it.
+///
+/// `variable {α : Type*} [Fintype α]` and `universe u v` are preamble, so they never reach any
+/// declaration's own text — and a reading that drops the single-glyph filter therefore reads every
+/// section variable as a recruitment of the environment. The binder-group rule is the same one
+/// [`founded_names`] applies inside a declaration; only the scope is wider.
+///
+/// **Declared bound:** section scope is not tracked. A `variable` in one section founds its name for
+/// the whole file, so this over-founds where a file re-uses a binder letter as a global name.
+fn file_scope_bindings(split: &[SplitLine]) -> BTreeSet<String> {
+    let mut founded: BTreeSet<String> = BTreeSet::new();
+    for line in split {
+        let trimmed = line.code.trim_start();
+        if let Some(rest) = trimmed.strip_prefix("universe") {
+            if rest.is_empty() || rest.starts_with(char::is_whitespace) {
+                for token in identifier_tokens(rest) {
+                    founded.insert(token.to_owned());
+                }
+            }
+            continue;
+        }
+        let Some(rest) = trimmed.strip_prefix("variable") else {
+            continue;
+        };
+        if !(rest.is_empty() || rest.starts_with(char::is_whitespace)) {
+            continue;
+        }
+        founded.extend(founded_names(&[rest.to_owned()]));
+    }
+    founded
+}
+
 // -------------------------------------------------------------------------------------------------
 // The reading
 // -------------------------------------------------------------------------------------------------
@@ -1143,7 +1597,12 @@ pub fn read_development(text: &str, grain: DeclarationGrain) -> DevelopmentReadi
     let mut scoping: BTreeMap<String, u32> = BTreeMap::new();
     let mut declarations: Vec<DeclaredForm> = Vec::new();
     let mut unopened: Vec<UnopenedDeclaration> = Vec::new();
-    let mut namespace_path: Vec<String> = Vec::new();
+    let mut frames: Vec<ScopeFrame> = Vec::new();
+
+    // Names the FILE founds for every declaration under it: `variable {α : Type*}` and
+    // `universe u`. They are preamble, so no declaration's own text carries them, and without
+    // this every one of them was read as a recruitment of the environment.
+    let file_scope = file_scope_bindings(&split);
 
     // The declaration currently accumulating: its form, whether its header is still open, the
     // header text so far, and its own lines — collected whole so that position can be decided per
@@ -1151,14 +1610,28 @@ pub fn read_development(text: &str, grain: DeclarationGrain) -> DevelopmentReadi
     // recognisable once the whole declaration is in hand.
     let mut open: Option<(DeclaredForm, bool, String, Vec<String>)> = None;
 
+    /// Close whatever declaration is open, flushing an unterminated header into its statement.
+    ///
+    /// **The flush was missing at three of the four close sites.** A declaration whose header never
+    /// met a `:=` — every `structure`, every `class`, every `axiom` — was pushed with an EMPTY
+    /// statement whenever it was closed by the next former, by a `namespace`, or by an `end`.
+    macro_rules! close_open {
+        ($open:expr, $declarations:expr) => {
+            if let Some((mut form, header_open, header, lines)) = $open.take() {
+                if header_open {
+                    form.statement = header;
+                }
+                $declarations.push(classify(form, &lines, &file_scope));
+            }
+        };
+    }
+
     for (index, line) in split.iter().enumerate() {
         let code = line.code.as_str();
         let trimmed = code.trim();
 
-        if let Some((former, name)) = top_level_former(code) {
-            if let Some((form, _, _, lines)) = open.take() {
-                declarations.push(classify(form, &lines));
-            }
+        if let Some((former, name, after)) = top_level_former(code) {
+            close_open!(open, declarations);
             let already = declarations.len();
             let opens = match grain {
                 DeclarationGrain::EveryTopLevelDeclaration => true,
@@ -1172,10 +1645,22 @@ pub fn read_development(text: &str, grain: DeclarationGrain) -> DevelopmentReadi
                 });
                 continue;
             }
+            let anonymous = name.is_empty();
             let mut form = DeclaredForm {
                 former: former.to_owned(),
-                name: name.clone(),
-                namespace_path: namespace_path.clone(),
+                // A positional identity, carrying `@` so it can never equal a recruited token and
+                // never be joined on by accident.
+                name: if anonymous {
+                    format!("{former}@{}", index + 1)
+                } else {
+                    name.clone()
+                },
+                anonymous,
+                namespace_path: frames
+                    .iter()
+                    .filter(|frame| frame.kind == ScopeKind::Namespace)
+                    .map(|frame| frame.name.clone())
+                    .collect(),
                 statement: String::new(),
                 recruited: BTreeMap::new(),
                 tactics: BTreeMap::new(),
@@ -1183,13 +1668,13 @@ pub fn read_development(text: &str, grain: DeclarationGrain) -> DevelopmentReadi
                 steps: Vec::new(),
                 line: index + 1,
             };
-            let header_open = !code.contains(":=");
-            let mut header = statement_of(code, &name);
-            if !header_open {
-                form.statement = header.clone();
-                header.clear();
+            let (header, closed) = cut_header(after);
+            if closed {
+                form.statement = header;
+                open = Some((form, false, String::new(), vec![code.to_owned()]));
+            } else {
+                open = Some((form, true, header, vec![code.to_owned()]));
             }
-            open = Some((form, header_open, header, vec![code.to_owned()]));
             continue;
         }
 
@@ -1202,41 +1687,60 @@ pub fn read_development(text: &str, grain: DeclarationGrain) -> DevelopmentReadi
             continue;
         }
 
+        // ------------------------------------------------------------------ scoping
         if let Some(rest) = trimmed.strip_prefix("namespace ") {
             if let Some(first) = rest.split_whitespace().next() {
                 let slot = scoping.entry(first.to_owned()).or_insert(0u32);
                 *slot = slot.saturating_add(1);
-                namespace_path.push(first.to_owned());
+                frames.push(ScopeFrame {
+                    kind: ScopeKind::Namespace,
+                    name: first.to_owned(),
+                });
             }
-            if let Some((form, _, _, lines)) = open.take() {
-                declarations.push(classify(form, &lines));
+            close_open!(open, declarations);
+            continue;
+        }
+        if let Some(rest) = section_head(trimmed) {
+            let name = rest.split_whitespace().next().unwrap_or_default();
+            if !name.is_empty() {
+                let slot = scoping.entry(name.to_owned()).or_insert(0u32);
+                *slot = slot.saturating_add(1);
             }
+            frames.push(ScopeFrame {
+                kind: ScopeKind::Section,
+                name: name.to_owned(),
+            });
+            continue;
+        }
+        // A `mutual` block is closed by `end` exactly as a section is, and a frame it never
+        // pushed is a namespace level the matching `end` tore off instead.
+        if trimmed == "mutual" || trimmed.starts_with("mutual ") {
+            frames.push(ScopeFrame {
+                kind: ScopeKind::Section,
+                name: String::new(),
+            });
             continue;
         }
         if trimmed == "end" || trimmed.starts_with("end ") {
-            if let Some(first) = trimmed.strip_prefix("end ").and_then(|rest| rest.split_whitespace().next()) {
-                let slot = scoping.entry(first.to_owned()).or_insert(0u32);
+            let closed = trimmed
+                .strip_prefix("end ")
+                .and_then(|rest| rest.split_whitespace().next())
+                .unwrap_or_default();
+            if !closed.is_empty() {
+                let slot = scoping.entry(closed.to_owned()).or_insert(0u32);
                 *slot = slot.saturating_add(1);
             }
-            namespace_path.pop();
-            if let Some((form, _, _, lines)) = open.take() {
-                declarations.push(classify(form, &lines));
-            }
-            continue;
-        }
-        if trimmed.starts_with("section") {
-            if let Some(first) = trimmed.strip_prefix("section ").and_then(|rest| rest.split_whitespace().next()) {
-                let slot = scoping.entry(first.to_owned()).or_insert(0u32);
-                *slot = slot.saturating_add(1);
-            }
+            close_frames(&mut frames, closed);
+            close_open!(open, declarations);
             continue;
         }
 
         if let Some((form, header_open, header, lines)) = open.as_mut() {
             if *header_open {
-                let extended = format!("{header} {}", trimmed.split(":=").next().unwrap_or(""));
+                let (piece, closed) = cut_header(trimmed);
+                let extended = format!("{header} {piece}");
                 *header = extended.split_whitespace().collect::<Vec<_>>().join(" ");
-                if code.contains(":=") {
+                if closed {
                     *header_open = false;
                     form.statement = header.clone();
                 }
@@ -1245,12 +1749,7 @@ pub fn read_development(text: &str, grain: DeclarationGrain) -> DevelopmentReadi
         }
     }
 
-    if let Some((mut form, header_open, header, lines)) = open.take() {
-        if header_open {
-            form.statement = header.clone();
-        }
-        declarations.push(classify(form, &lines));
-    }
+    close_open!(open, declarations);
 
     let ambiguous_short_names = ambiguity(&declarations);
     DevelopmentReading {

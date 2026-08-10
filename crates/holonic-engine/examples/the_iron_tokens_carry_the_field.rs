@@ -80,8 +80,9 @@ use holonic_engine::surprisal::{
     Grain, Support, SymbolicSurprisal, cross_entropy, read_population,
 };
 use holonic_engine::token_invariance::{
-    AblationReading, ReceiverAxis, SeparationReading, Verdict, ablation_profile, axis_witnesses,
-    cross_check, iron_at, sweep, warping_incidence, window, witnessed_iron_at,
+    AblationReading, ConductAtlas, ReceiverAxis, SeparationReading, Verdict, ablation_profile,
+    axis_witnesses, cross_check, iron_at, reading, sweep, warping_incidence, window,
+    witnessed_iron_at,
 };
 use num_bigint::BigUint;
 
@@ -106,6 +107,9 @@ const DECLARED_CAPACITY: u64 = 8_192;
 const EXCISED_WINDOW_APERTURE: usize = 64;
 /// The separation cap this module carried as an authored constant until 2026-08-09, same purpose.
 const EXCISED_SEPARATION_EXHIBIT: usize = 512;
+/// **The horizon this caller founds the conduct axis at.** `ConductAtlas` holds no default: the
+/// founding horizon and the reading horizon are two declarations and this driver makes both.
+const FOUNDING_HORIZON: usize = 1;
 
 fn main() {
     let root = std::env::args()
@@ -124,6 +128,10 @@ fn main() {
             std::process::exit(1);
         }
     };
+
+    // The fourth declared axis reads what the corpus does with a surface rather than how it is
+    // spelled, and it has to be founded before any window can be read.
+    let atlas = ConductAtlas::found(&census, FOUNDING_HORIZON);
 
     let mut holds: Vec<(String, bool, String)> = Vec::new();
 
@@ -191,36 +199,29 @@ fn main() {
     println!("THE DECLARED RECEIVER FAMILY, AND ITS ORBIT");
     println!("-------------------------------------------");
     println!(
-        "Three receivers, each reading one coordinate of a surface's census signature. `density` \n\
-         is `floor(log2 N)` computed as a bit length -- exact integers, no logarithm evaluated. It \n\
-         is the axis the question asks for: comprehension curving around iron recurrences requires \n\
-         density to be something a RECEIVER can see, not only something a reader tabulates."
+        "Four receivers. Three read one coordinate each of a surface's census signature -- `density` \n\
+         is `floor(log2 N)` computed as a bit length, exact integers, no logarithm evaluated. The \n\
+         fourth, `conduct`, reads what the corpus DID with the surface everywhere else, founded at \n\
+         horizon {FOUNDING_HORIZON}; `examples/the_axis_reads_what_the_neighbour_does` is its driver."
     );
     println!();
-    let witnesses = axis_witnesses(&census);
+    let witnesses = axis_witnesses(&census, &atlas);
     let mut orbit_nontrivial = true;
     for axis in ReceiverAxis::DECLARED {
         match witnesses.get(&axis) {
             Some(witness) => {
-                let left = census.signature(witness.left);
-                let right = census.signature(witness.right);
+                let left = reading(&census, &atlas, witness.left);
+                let right = reading(&census, &atlas, witness.right);
                 let others: Vec<&str> = ReceiverAxis::DECLARED
                     .into_iter()
-                    .filter(|other| {
-                        *other != axis
-                            && match other {
-                                ReceiverAxis::Kind => left.0 != right.0,
-                                ReceiverAxis::Weight => left.1 != right.1,
-                                ReceiverAxis::Density => left.2 != right.2,
-                            }
-                    })
+                    .filter(|other| *other != axis && other.read(left) != other.read(right))
                     .map(|other| other.name())
                     .collect();
                 if !others.is_empty() {
                     orbit_nontrivial = false;
                 }
                 println!(
-                    "  {:<8} separates {:>22} from {:<22} ({} vs {}); the other two agree: {}",
+                    "  {:<8} separates {:>22} from {:<22} ({} vs {}); the other three agree: {}",
                     axis.name(),
                     format!("{:?}", census.surface(witness.left)),
                     format!("{:?}", census.surface(witness.right)),
@@ -240,7 +241,11 @@ fn main() {
          the other two do not"
             .to_owned(),
         orbit_nontrivial,
-        format!("{} of 3 axes exhibited a witness", witnesses.len()),
+        format!(
+            "{} of {} axes exhibited a witness",
+            witnesses.len(),
+            ReceiverAxis::DECLARED.len()
+        ),
     ));
 
     // ---------------------------------------------------------------- the density reading
@@ -316,7 +321,7 @@ fn main() {
     let mut irons: BTreeMap<usize, BTreeSet<SurfaceId>> = BTreeMap::new();
     let mut witnessed: BTreeMap<usize, BTreeSet<SurfaceId>> = BTreeMap::new();
     for horizon in HORIZONS {
-        let reading = sweep(&census, horizon);
+        let reading = sweep(&census, &atlas, horizon);
         irons.insert(horizon, iron_at(&reading));
         witnessed.insert(horizon, witnessed_iron_at(&reading));
         sweeps.insert(horizon, reading);
@@ -418,7 +423,7 @@ fn main() {
     let mut obstructed: Vec<(usize, SurfaceId, BigUint)> = Vec::new();
     for horizon in HORIZONS {
         for surface in sweeps[&horizon].keys() {
-            match cross_check(&census, *surface, horizon, DECLARED_CAPACITY) {
+            match cross_check(&census, &atlas, *surface, horizon, DECLARED_CAPACITY) {
                 Ok(check) => {
                     checked += 1;
                     compared_pairs += BigUint::from(check.organ_pairs);
@@ -490,7 +495,7 @@ fn main() {
         ReceiverAxis::DECLARED.into_iter().map(|axis| (axis, None)).collect();
     let mut refined_anywhere = false;
     for probe in &ablation_probes {
-        for reading in ablation_profile(&census, *probe, 2) {
+        for reading in ablation_profile(&census, &atlas, *probe, 2) {
             if reading.blocks_without > reading.blocks_with {
                 refined_anywhere = true;
             }
@@ -526,7 +531,8 @@ fn main() {
             .to_owned(),
         every_axis_contributes && !refined_anywhere,
         format!(
-            "3 axes over {} probes; refinements observed: {}",
+            "{} axes over {} probes; refinements observed: {}",
+            ReceiverAxis::DECLARED.len(),
             ablation_probes.len(),
             refined_anywhere
         ),
@@ -1316,7 +1322,7 @@ fn main() {
         if row.distinct_windows <= EXCISED_WINDOW_APERTURE {
             continue;
         }
-        let presented = old_aperture_selection(&census, surface, HORIZONS[1], row);
+        let presented = old_aperture_selection(&census, &atlas, surface, HORIZONS[1], row);
         let withheld: Vec<usize> = (0..row.distinct_windows)
             .filter(|class| !presented.contains(class))
             .collect();
@@ -1394,11 +1400,12 @@ fn pairs_of(population: usize) -> BigUint {
 /// not against a description of it. Note what the selection depended on: file traversal order.
 fn old_aperture_selection(
     census: &CorpusCensus,
+    atlas: &ConductAtlas,
     surface: SurfaceId,
     horizon: usize,
     row: &SeparationReading,
 ) -> BTreeSet<usize> {
-    let index: BTreeMap<&Vec<Option<(u64, u64, u64)>>, usize> = row
+    let index: BTreeMap<&holonic_engine::token_invariance::Window, usize> = row
         .complex
         .classes
         .iter()
@@ -1410,7 +1417,7 @@ fn old_aperture_selection(
         if selected.len() >= EXCISED_WINDOW_APERTURE {
             break;
         }
-        let reading = window(census, *whole, *position, horizon);
+        let reading = window(census, atlas, *whole, *position, horizon);
         if let Some(class) = index.get(&reading) {
             selected.insert(*class);
         }

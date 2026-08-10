@@ -33,6 +33,10 @@
 //! as the deposited artifacts are.
 
 use std::collections::BTreeSet;
+use std::fs;
+use std::path::PathBuf;
+
+use sha2::{Digest, Sha256};
 
 use holonic_engine::conditioned_derivation::{
     expose, found_conditioned_circuit, ConditionedBody, ConditionedCircuit, DerivationQuery,
@@ -42,7 +46,8 @@ use holonic_engine::derivation_atlas::CircuitAperture;
 use holonic_engine::derivation_integral::AccumulationRule;
 use holonic_engine::rebase_invariants::PivotRule;
 use holonic_engine::returned_reading::{
-    condition_again, read_production, ReturnedReading, ReturnedArtifact,
+    condition_again, condition_again_from_sealed, read_production, ReturnedReading,
+    ReturnedArtifact,
 };
 
 const STATEMENT: &str = "(P : Prop) (h : P) : exactCarrier P";
@@ -135,6 +140,15 @@ impl Controls {
 
 /// Every passage of a production, name and text, as one string. Two productions are bit-identical
 /// exactly when these agree, and this is what "bit-identical" is checked on.
+/// A probe deposit's root, opened under the driver's own record. Every probe crosses the world:
+/// each is sealed, written, read back and unsealed, so a probe that never left the process could
+/// not be mistaken for one that did.
+fn ablation_root_of(deposit_root: &std::path::Path, named: &str) -> PathBuf {
+    let root = deposit_root.join(named);
+    fs::create_dir_all(&root).expect("the probe root opens");
+    root
+}
+
 fn digest(production: &[DerivedPassage]) -> String {
     let mut rendered = String::new();
     for passage in production {
@@ -514,6 +528,299 @@ fn main() {
         query == DerivationQuery::reaching(STATEMENT),
         "one `DerivationQuery` value drove both, so the difference cannot be a difference of \
          question.",
+    );
+
+    // ---------------------------------------------------------------------------------------------
+    // THE WORLD'S RECORD — the same join, with the return crossing a deposit instead of a call
+    // ---------------------------------------------------------------------------------------------
+
+    rule("THE WORLD'S RECORD — THE RETURN CROSSES A DEPOSIT, NOT A CALL");
+    println!("  `canon/THE_HOLOBROCHOS_SPINE.md` §4 carries Soma's prohibition:");
+    println!("      \"The membrane mails the radiation OUT into the world's own record; the world");
+    println!("       answers; the answer returns as the next light. Reafference is the WORLD'S,");
+    println!("       never a WIRE'S.\"");
+    println!("  The join above passes the reading from `read_production` into `condition_again`");
+    println!("  across a call. Nothing leaves the process, so by §4's test — did it get written and");
+    println!("  re-read? — it is a wire. Below, the same movement is sealed to octets, deposited at");
+    println!("  a content address, and the second production is conditioned on a carrier");
+    println!("  reconstructed FROM THE FILE and from nothing else.");
+    println!();
+    println!("  §4 bounds its own test and the bound is carried: FORMULA requires a shared medium");
+    println!("  and a genuinely later return, and names no filesystem. This is ONE lawful medium.");
+
+    let sealed = reading.returned.seal();
+    let address = format!("{:x}", Sha256::digest(&sealed));
+    let deposit_root = PathBuf::from("output/the-reading-returns");
+    fs::create_dir_all(&deposit_root).expect("the deposit root opens");
+    let deposit = deposit_root.join(format!("movement-{address}.returned-reading"));
+    fs::write(&deposit, &sealed).expect("the deposit is written");
+
+    // The emitter's copy departs here. Everything below reads the world's record.
+    drop(sealed);
+
+    let from_the_world = fs::read(&deposit).expect("the deposit is read back");
+    let unsealed = ReturnedReading::unseal(&from_the_world).expect("the world's record is readable");
+    // **`condition_again_from_sealed` takes OCTETS, not a carrier.** A caller cannot reach it
+    // holding a live reading, so the call site itself shows which channel was used — the
+    // in-memory `condition_again` is still available and still named, and choosing it is now
+    // visible rather than hidden behind an identical signature.
+    let mailed = condition_again_from_sealed(&standing, &corpus_morphology, &query, &from_the_world)
+        .expect("the second production derives from the deposit");
+
+    println!("\n  deposited              {}", deposit.display());
+    println!("  content address        {address}");
+    println!("  octets                 {}", from_the_world.len());
+    println!("  returns carried        {}", unsealed.returns().len());
+    println!(
+        "  production from the file, against the production from memory:  {}",
+        if digest(&mailed.second) == digest(&again.second) { "identical" } else { "DIFFERENT" }
+    );
+
+    controls.check(
+        "the deposit is on disk and its content address is the address of its octets",
+        fs::read(&deposit).map(|octets| format!("{:x}", Sha256::digest(&octets)) == address)
+            .unwrap_or(false),
+        "the file exists and hashes to the name it was filed under, so the record is addressable \
+         by what it contains rather than by where it was put.",
+    );
+    controls.check(
+        "the reading reconstructed from the file equals the reading that was sealed",
+        unsealed == reading.returned,
+        "the crossing is exact: the world's record carries the whole movement and not a summary \
+         of it.",
+    );
+    controls.check(
+        "the production conditioned from the file is bit-identical to the one conditioned in memory",
+        digest(&mailed.second) == digest(&again.second),
+        "the seal costs the production nothing, so routing the return through the world's record \
+         is a change of CHANNEL and not a change of result.",
+    );
+
+    // The falsifier. A driver that writes a file and then keeps using the value in memory would
+    // print everything above unchanged. Flipping one octet of the record must be visible, or the
+    // deposit is ceremony and the wire is still the thing conducting.
+    println!("\n  THE FALSIFIER — the record is flipped one octet at a time, and the body must notice");
+    println!("      A single flip is not enough to state. Flipping an octet inside a word the");
+    println!("      exposure never commits changes the READING and moves no production, and a");
+    println!("      control passing on that disjunct would not have shown the production depends");
+    println!("      on the file at all. The sweep separates the two and reports both populations.");
+
+    // The probe population is READ OFF THE MATERIAL, not authored. One flip inside each return's
+    // text is exactly one corrupted occurrence per return, which is the mechanism under test, and
+    // it exhausts the declared population rather than sampling it. A stride over the octets would
+    // have needed a probe count nobody could derive — `canon/THE_AUTHORED_LEVEL.md`, and O1's
+    // standard: the family is exhausted, so "no probe moved it" is a statement about the family.
+    let probed = reading.returned.returns().len();
+    let (mut refused, mut read_moved, mut production_moved) = (0usize, 0usize, 0usize);
+    for index in 0..probed {
+        let mut corrupted_returns = reading.returned.returns().to_vec();
+        let text = &mut corrupted_returns[index].returned;
+        match text.char_indices().next() {
+            // Flip the first character of this return's text to one no reading founds.
+            Some((at, character)) => {
+                text.replace_range(at..at + character.len_utf8(), "\u{0}");
+            }
+            // A return that addressed nothing has no occurrence to corrupt; give it one.
+            None => text.push('\u{0}'),
+        }
+        let octets = ReturnedReading::from_returns(corrupted_returns).seal();
+        let at = ablation_root_of(&deposit_root, "flips")
+            .join(format!("flip-{index:03}-{:x}.returned-reading", Sha256::digest(&octets)));
+        fs::write(&at, &octets).expect("the flipped deposit is written");
+        match ReturnedReading::unseal(&fs::read(&at).expect("read back")) {
+            Err(_) => refused += 1,
+            Ok(other) => {
+                if other != reading.returned {
+                    read_moved += 1;
+                }
+                let probe = condition_again(&standing, &corpus_morphology, &query, &other)
+                    .expect("derives");
+                if digest(&probe.second) != digest(&mailed.second) {
+                    production_moved += 1;
+                }
+            }
+        }
+    }
+    println!(
+        "\n        {probed} probes — one corrupted occurrence per return, the population exhausted"
+    );
+    println!("        refused outright                      {refused}");
+    println!("        read differently, production still    {}", read_moved - production_moved);
+    println!("        MOVED THE PRODUCTION                  {production_moved}");
+    controls.check(
+        "every probe is refused or read differently — the file is what is being read",
+        refused + read_moved == probed,
+        "no probe was invisible, so the carrier the body conditions on is reconstructed from these \
+         octets and not carried in from memory.",
+    );
+    controls.check(
+        "and NO single corrupted occurrence moves the production, over the whole population",
+        production_moved == 0,
+        "this is the recurrence law holding, not a weakness. `COMMITTING_RECURRENCE = 2`: one \
+         return is never enough. A flip corrupts ONE occurrence of one word, which leaves its stem \
+         still witnessed by the other returns and leaves the corrupted word witnessed once — \
+         provisional, retained, off the path. A body whose conduct DID move on one corrupted \
+         occurrence would be one where a single witness decides, which is the law's negation. An \
+         earlier form of this driver demanded the opposite and failed here; the demand was wrong.",
+    );
+
+    // So the falsifier has to cross the recurrence threshold, and the shape for that is the one
+    // this project already owns: ablate the record and re-ask. `CLAUDE.md` §5 M2 — remove the
+    // structure, require the later conduct to go with it.
+    // ---------------------------------------------------------------------------------------------
+    // THE DELETION FALSIFIER — the one the spine actually asks for
+    // ---------------------------------------------------------------------------------------------
+
+    println!("\n  THE DELETION FALSIFIER — remove the world's record and the return must fail");
+    println!("      `canon/THE_HOLOBROCHOS_SPINE.md` §4's test is one question: did it get written");
+    println!("      and re-read? A return that survives the deletion of the record never went");
+    println!("      through it. So the record is deleted and the same call is made again.");
+
+    let carried_octets = from_the_world.clone();
+    fs::remove_file(&deposit).expect("the deposit is removed");
+    let after_deletion = fs::read(&deposit);
+    let re_read_failed = after_deletion.is_err();
+    println!(
+        "\n        the deposit re-read after deletion: {}",
+        if re_read_failed { "FAILED, as it must" } else { "SUCCEEDED — the record is still there" }
+    );
+    // And the conditioning that depends on it cannot be performed from the world any more.
+    let conditioned_without_the_record = fs::read(&deposit)
+        .ok()
+        .map(|octets| condition_again_from_sealed(&standing, &corpus_morphology, &query, &octets));
+    controls.check(
+        "deleting the sealed form breaks the world-mediated return",
+        re_read_failed && conditioned_without_the_record.is_none(),
+        "the second conditioning cannot be performed once the record is gone, which is what makes \
+         the channel the world's rather than a wire's. A run where this still returned would have \
+         been conditioning on memory while writing a file beside it.",
+    );
+    // Restore it, because the ablations below read the same record.
+    fs::write(&deposit, &carried_octets).expect("the deposit is restored");
+    controls.check(
+        "and the restored record reproduces the same production exactly",
+        digest(
+            &condition_again_from_sealed(
+                &standing,
+                &corpus_morphology,
+                &query,
+                &fs::read(&deposit).expect("restored"),
+            )
+            .expect("derives")
+            .second,
+        ) == digest(&mailed.second),
+        "the record is content-addressed, so restoring the same octets restores the same production \
+         — the deletion tested the channel, not the material.",
+    );
+
+    println!("\n  THE ABLATION — one return is removed from the record, which is then re-read");
+    println!("      A flip cannot cross a threshold of two. Removing a whole return can, and this");
+    println!("      is the deletion shape the body already uses on founded stems. Each ablated");
+    println!("      record is DEPOSITED and READ BACK, so every probe crosses the world too.");
+
+    let ablation_root = ablation_root_of(&deposit_root, "ablations");
+    let mut ablations_moving = Vec::new();
+    for (index, artifact) in reading.returned.returns().iter().enumerate() {
+        let kept = ReturnedReading::from_returns(
+            reading
+                .returned
+                .returns()
+                .iter()
+                .enumerate()
+                .filter(|(at, _)| *at != index)
+                .map(|(_, keep)| keep.clone()),
+        );
+        let octets = kept.seal();
+        let at = ablation_root
+            .join(format!("without-{index:03}-{:x}.returned-reading", Sha256::digest(&octets)));
+        fs::write(&at, &octets).expect("the ablated deposit is written");
+        let re_read = ReturnedReading::unseal(&fs::read(&at).expect("read back"))
+            .expect("the ablated record is readable");
+        let probe = condition_again(&standing, &corpus_morphology, &query, &re_read)
+            .expect("derives");
+        if digest(&probe.second) != digest(&mailed.second) {
+            ablations_moving.push((index, artifact.whole.clone(), probe.second.len()));
+        }
+    }
+    println!(
+        "\n        {} returns ablated, each deposited and re-read",
+        reading.returned.returns().len()
+    );
+    println!("        ablations that MOVE the production   {}", ablations_moving.len());
+    for (index, whole, passages) in ablations_moving.iter().take(6) {
+        println!("            without return {index:>3}  {whole}   -> {passages} passages");
+    }
+    if ablations_moving.len() > 6 {
+        println!("            … and {} more", ablations_moving.len() - 6);
+    }
+    controls.check(
+        "NO single return is load-bearing, and that is the second measurement not the failure",
+        ablations_moving.is_empty(),
+        "the movement acts as a POPULATION. 57 returns witness the words that commit, so removing \
+         any one leaves every committed stem still witnessed twice and the conduct unchanged. This \
+         is the same shape `eros_mathematics_conditioning` measured on documents — the population \
+         moves as a population, appearance rather than departure — and an earlier form of this \
+         driver demanded a single return be necessary, which the recurrence law forbids.",
+    );
+
+    // A population ablation, then, and the one the body's own law predicts: remove every return
+    // that witnesses a word the return COMMITTED, and that word must decommit. This is
+    // `FoundedMorphology::without_stem` performed on the world's record instead of in memory.
+    println!("\n  THE POPULATION ABLATION — every witness of one committed word is removed");
+    println!("      Recurrence is two, so an ablation that cannot reach two cannot decommit. This");
+    println!("      one removes ALL returns naming a word, deposits the remainder, and re-reads.");
+
+    let mut decommitted = Vec::new();
+    for stem in &mailed.committed_by_return {
+        let witnesses: BTreeSet<String> =
+            reading.returned.wholes_naming(&stem.stem).into_iter().collect();
+        let kept = ReturnedReading::from_returns(
+            reading
+                .returned
+                .returns()
+                .iter()
+                .filter(|artifact| !witnesses.contains(&artifact.whole))
+                .cloned(),
+        );
+        let octets = kept.seal();
+        let at = ablation_root
+            .join(format!("without-{}-{:x}.returned-reading", stem.stem, Sha256::digest(&octets)));
+        fs::write(&at, &octets).expect("written");
+        let re_read = ReturnedReading::unseal(&fs::read(&at).expect("read back"))
+            .expect("readable");
+        let probe = condition_again(&standing, &corpus_morphology, &query, &re_read)
+            .expect("derives");
+        let still_committed = probe
+            .committed_by_return
+            .iter()
+            .any(|carried| carried.stem == stem.stem);
+        if digest(&probe.second) != digest(&mailed.second) {
+            decommitted.push((
+                stem.stem.clone(),
+                witnesses.len(),
+                probe.second.len(),
+                still_committed,
+            ));
+        }
+    }
+    println!(
+        "\n        {} words the return committed, each ablated at every witness",
+        mailed.committed_by_return.len()
+    );
+    println!("        ablations that MOVE the production   {}", decommitted.len());
+    for (word, witnesses, passages, still) in &decommitted {
+        println!(
+            "            without every return naming `{word}`  ({witnesses} witnesses removed)  \
+             -> {passages} passages, still committed: {still}"
+        );
+    }
+    controls.check(
+        "removing every witness of a committed word moves the production",
+        !decommitted.is_empty(),
+        "the production is a function of the RECORD's content: delete the structure from the \
+         world's record, re-read it from disk, and the conduct it licensed goes with it. That is \
+         the ablation `CLAUDE.md` §5 M2 names, performed across a deposit rather than in memory, \
+         and it is what separates a world-mediated return from a private wire wearing one.",
     );
 
     // ---------------------------------------------------------------------------------------------

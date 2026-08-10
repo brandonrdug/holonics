@@ -179,7 +179,11 @@ def paragraph_occurrences(text: str) -> list[str]:
     ]
 
 
-def freeze(workspace: Path, aperture: int = LABORATORY_GENERATION_APERTURE) -> dict[str, object]:
+def freeze(
+    workspace: Path,
+    aperture: int = LABORATORY_GENERATION_APERTURE,
+    schema: str = "soma.morphological-language.source.v2",
+) -> dict[str, object]:
     passages: list[dict[str, object]] = []
     files: list[dict[str, object]] = []
     for relative, receiver, lineage in SOURCES:
@@ -246,7 +250,7 @@ def freeze(workspace: Path, aperture: int = LABORATORY_GENERATION_APERTURE) -> d
                 "a `lineage` member reading `recovered` or `SUBSTITUTED:<the laboratory path>`."
             ),
         },
-        "schema": "soma.morphological-language.source.v2",
+        "schema": schema,
         "question": (
             "Can simultaneous recurrent mark, lexical, phrase, clause, occurrence, and source "
             "receivers condition one exact response ecology which composes several caused source "
@@ -287,6 +291,17 @@ def main() -> None:
     parser.add_argument("workspace", type=Path)
     parser.add_argument("output", type=Path)
     parser.add_argument(
+        "--schema",
+        default="soma.morphological-language.source.v2",
+        help=(
+            "the emitted `schema` string. `eros_morphological_language_generation` validates "
+            "`soma.morphological-language.source.v2`; `eros_causal_language_generation` validates "
+            "`soma.causal-language.source.v1`. The two drivers deserialize the SAME field "
+            "structure -- verified by diffing their `struct Source` -- so one extractor feeds "
+            "both and only this string differs."
+        ),
+    )
+    parser.add_argument(
         "--maximum-generated-tokens",
         type=int,
         default=LABORATORY_GENERATION_APERTURE,
@@ -298,7 +313,11 @@ def main() -> None:
     arguments = parser.parse_args()
     if arguments.maximum_generated_tokens < 1:
         parser.error("the generation aperture is at least one token")
-    source = freeze(arguments.workspace.resolve(), arguments.maximum_generated_tokens)
+    source = freeze(
+        arguments.workspace.resolve(),
+        arguments.maximum_generated_tokens,
+        arguments.schema,
+    )
     arguments.output.parent.mkdir(parents=True, exist_ok=True)
     arguments.output.write_text(
         json.dumps(source, indent=2, ensure_ascii=False) + "\n",

@@ -37,22 +37,47 @@
 //! is **iron at that horizon**: the corpus never once used it in a context this family can tell
 //! apart. A surface that shatters is **fuzzy**, and the shortest words say where and how near.
 //!
-//! ## The declared receiver family, and why it is three
+//! ## The declared receiver family: three that read a spelling and one that does not
 //!
-//! [`ReceiverAxis`] declares three receivers, each reading one coordinate of
-//! `CorpusCensus::signature`:
+//! [`ReceiverAxis`] declares four receivers, each reading one coordinate of a [`Reading`]:
 //!
-//! | axis | what it sees |
-//! |---|---|
-//! | `Kind` | the orthographic kind of the surface at the position — six values |
-//! | `Weight` | its length band — five values |
-//! | `Density` | its **density band**, `floor(log2 N)` on the corpus census — exact bit length |
+//! | axis | what it sees | reads the neighbour's |
+//! |---|---|---|
+//! | `Kind` | the orthographic kind of the surface at the position — six values | **spelling** |
+//! | `Weight` | its length band — five values | **spelling** |
+//! | `Density` | its **density band**, `floor(log2 N)` on the corpus census | **spelling** (a count of it) |
+//! | `Conduct` | its [`ConductSignature`] — the orthographic axes the corpus holds constant around it everywhere else, and whether it ever runs out of whole | **conduct** |
 //!
-//! `Density` is the axis Brandon's question actually asks for: comprehension curving around *iron
+//! `Density` is the axis Brandon's question first asks for: comprehension curving around *iron
 //! recurrences (density)* requires density to be something a **receiver can see**, not only
-//! something a reader tabulates. It is derived from `Π` and it measures; it selects nothing, and
+//! something a reader tabulates. It is derived from `Π` and it measures; it selects nothing.
+//!
+//! **`Conduct` exists because the first three are one species and could not answer the question.**
+//! Measured 2026-08-09 on the declared corpus at horizon 2, before this axis: `tensor`, `vector`,
+//! `lemma`, `group`, `field`, `holon`, `receiver` and `exact` were **all** `Varying` — no declared
+//! family held any of them — and the 1,269 surfaces that did collapse were URL components, DOI
+//! fragments and timestamps. The reason was not a missing faculty. `tensor` fails to collapse
+//! because it stands next to markup in one sentence and a word in the next, and `Kind` separates
+//! `markup` from `lower`. **That is typography, not meaning.**
+//!
+//! So the fourth axis reads, of the surface standing at the position, *what the corpus did with that
+//! surface everywhere else*: the block of the down-set lattice its own occurrence population lands
+//! in under `receiver_exact_compression`'s Nerode partition. Two surfaces with nothing orthographic
+//! in common can share the reading, and two spelled alike can differ — which is exactly what
+//! `Kind`, `Weight` and `Density` cannot do.
+//!
+//! **The axis is DECLARED, not founded by `founded_receiver::found_to_exhaustion`, and the
+//! difference is measured rather than asserted.** That organ's two species — `ContinuationAperture`
+//! and `ConductReach` — both read the *system's own successor relation*, and a surface population
+//! has none, so run on one it reaches `FoundingPressure::Congestion` and then refuses
+//! `FoundingRefusal::FoundedNothing`. `examples/the_axis_reads_what_the_neighbour_does` drives that
+//! refusal. What the conduct axis is, in that organ's vocabulary, is a **third species**: the
+//! pressure is congestion — the orthographic panel routing the whole vocabulary through one
+//! distinction — and the engineering answer is another pathway rather than a finer version of the
+//! same one. [`surface_residue`] measures its residue and its capacity under that module's own law.
+//!
 //! [`axis_witnesses`] proves the family's orbit is non-trivial by exhibiting, for each axis, a pair
-//! of surfaces that axis separates and the other two do not.
+//! of surfaces that axis separates and the other three do not.
 //!
 //! ## The separation population is FACTORIZED, and that is why no aperture bounds this reading
 //!
@@ -135,7 +160,7 @@
 //! > sub-family holds them in **one conduct block**.
 //!
 //! The collapsing families form a **down-set with a single maximal element**, so the verdict is not
-//! a search over the eight sub-families. Removing a receiver may only coarsen (H.0016's
+//! a search over the sixteen sub-families. Removing a receiver may only coarsen (H.0016's
 //! transformations clause), so `F` collapses the population exactly when
 //!
 //! ```text
@@ -175,43 +200,50 @@ use crate::receiver_exact_compression::{
     AblatedSystem, InputId, ItemId, Observation, ObservedSystem, ReceiverId, compress,
 };
 
-/// One declared receiver. Each reads exactly one coordinate of the census signature, so each is
-/// separately ablatable and each one's contribution is separately measurable.
+/// One declared receiver. Each reads exactly one coordinate of a [`Reading`], so each is separately
+/// ablatable and each one's contribution is separately measurable.
+///
+/// **Three of the four are orthographic and one is not.** `Kind`, `Weight` and `Density` read the
+/// surface standing at the position — its case class, its length band, its corpus count. `Conduct`
+/// reads what the corpus **does** with that surface, and the difference is the whole content of this
+/// enum; see the module header.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum ReceiverAxis {
     Kind,
     Weight,
     Density,
+    Conduct,
 }
 
 impl ReceiverAxis {
-    pub const DECLARED: [ReceiverAxis; 3] =
+    pub const DECLARED: [ReceiverAxis; 4] = [
+        ReceiverAxis::Kind,
+        ReceiverAxis::Weight,
+        ReceiverAxis::Density,
+        ReceiverAxis::Conduct,
+    ];
+
+    /// The three axes that read the neighbour's **spelling**. The declared panel before the conduct
+    /// axis entered, kept nameable so every reading can be taken at both panels on one material.
+    pub const ORTHOGRAPHIC: [ReceiverAxis; 3] =
         [ReceiverAxis::Kind, ReceiverAxis::Weight, ReceiverAxis::Density];
 
     pub fn id(self) -> ReceiverId {
-        ReceiverId(match self {
-            ReceiverAxis::Kind => 0,
-            ReceiverAxis::Weight => 1,
-            ReceiverAxis::Density => 2,
-        })
+        ReceiverId(self.index() as u64)
     }
 
     pub fn from_id(id: ReceiverId) -> Option<Self> {
-        match id.0 {
-            0 => Some(ReceiverAxis::Kind),
-            1 => Some(ReceiverAxis::Weight),
-            2 => Some(ReceiverAxis::Density),
-            _ => None,
-        }
+        Self::DECLARED.get(id.0 as usize).copied()
     }
 
-    /// This axis's position in [`ReceiverAxis::DECLARED`], which is the bit
-    /// [`ReceiverFamily`] uses for it.
+    /// This axis's position in [`ReceiverAxis::DECLARED`], which is both the coordinate it reads out
+    /// of a [`Reading`] and the bit [`ReceiverFamily`] uses for it.
     pub fn index(self) -> usize {
         match self {
             ReceiverAxis::Kind => 0,
             ReceiverAxis::Weight => 1,
             ReceiverAxis::Density => 2,
+            ReceiverAxis::Conduct => 3,
         }
     }
 
@@ -220,16 +252,18 @@ impl ReceiverAxis {
             ReceiverAxis::Kind => "kind",
             ReceiverAxis::Weight => "weight",
             ReceiverAxis::Density => "density",
+            ReceiverAxis::Conduct => "conduct",
         }
     }
 
-    /// What this axis reads out of a census signature.
-    pub fn read(self, signature: (u64, u64, u64)) -> u64 {
-        match self {
-            ReceiverAxis::Kind => signature.0,
-            ReceiverAxis::Weight => signature.1,
-            ReceiverAxis::Density => signature.2,
-        }
+    /// Whether this axis reads how the neighbour is **written**. `Conduct` is the one that does not.
+    pub fn is_orthographic(self) -> bool {
+        self != ReceiverAxis::Conduct
+    }
+
+    /// What this axis reads out of one position's reading.
+    pub fn read(self, reading: Reading) -> u64 {
+        reading[self.index()]
     }
 
     /// What this axis returned, rendered as the class it names rather than as a bare integer.
@@ -243,6 +277,7 @@ impl ReceiverAxis {
             .unwrap_or_else(|| format!("kind:{reading}")),
             ReceiverAxis::Weight => format!("len {}", weight_band_name(reading)),
             ReceiverAxis::Density => format!("2^{reading}"),
+            ReceiverAxis::Conduct => ConductSignature::decode(reading).to_string(),
         }
     }
 }
@@ -263,8 +298,11 @@ impl ReceiverFamily {
     /// **not** vacuous as a system: a terminus is still a distinction, which is exactly why the
     /// terminus clause is separate.
     pub const EMPTY: ReceiverFamily = ReceiverFamily(0);
-    /// All three declared axes — the family every other reading in this module runs at.
-    pub const FULL: ReceiverFamily = ReceiverFamily(0b111);
+    /// All four declared axes — the family every other reading in this module runs at.
+    pub const FULL: ReceiverFamily = ReceiverFamily(0b1111);
+    /// The three axes that read the neighbour's spelling. The panel this module declared before the
+    /// conduct axis, and the family every "before" figure is taken at.
+    pub const ORTHOGRAPHIC: ReceiverFamily = ReceiverFamily(0b111);
 
     pub fn of(axes: impl IntoIterator<Item = ReceiverAxis>) -> Self {
         ReceiverFamily(axes.into_iter().fold(0u8, |bits, axis| bits | (1 << axis.index())))
@@ -368,13 +406,17 @@ impl Step {
     }
 }
 
+/// What the declared family reads at one position, one coordinate per axis in
+/// [`ReceiverAxis::DECLARED`] order.
+pub type Reading = [u64; 4];
+
 /// The complete information a word of length at most `horizon` can reach from one occurrence,
 /// written **in the order the organ's breadth-first search reaches it**: offset `-1`, `+1`, `-2`,
 /// `+2`, …, with `None` where the whole ends.
 ///
 /// The order is the content. Lexicographic comparison of two windows is Moore refinement of the two
 /// occurrences they belong to, and the first differing index is the round at which they separate.
-pub type Window = Vec<Option<(u64, u64, u64)>>;
+pub type Window = Vec<Option<Reading>>;
 
 /// The `(side, depth)` a window index names. Index `2(k-1)` is `L^k`; index `2(k-1)+1` is `R^k`.
 pub fn step_at(index: usize) -> (Step, usize) {
@@ -390,44 +432,310 @@ pub fn offset_at(index: usize) -> i64 {
     side.offset() * depth as i64
 }
 
-/// The window of the occurrence at `position` in `whole`.
-pub fn window(census: &CorpusCensus, whole: u32, position: u32, horizon: usize) -> Window {
-    let stream = &census.wholes()[whole as usize].stream;
-    let mut reading = Vec::with_capacity(2 * horizon);
-    for index in 0..2 * horizon {
-        let site = position as i64 + offset_at(index);
-        if site < 0 || site >= stream.len() as i64 {
-            reading.push(None);
-        } else {
-            reading.push(Some(census.signature(stream[site as usize])));
-        }
-    }
-    reading
+// -------------------------------------------------------------------------------------------------
+// The conduct axis: what the corpus DOES with a surface, not how the surface is written
+// -------------------------------------------------------------------------------------------------
+
+/// **One surface's conduct signature**: the axes its own whole occurrence population holds constant
+/// under the orthographic panel, and whether that population ever runs out of whole.
+///
+/// This is exactly the pair [`ConductInvariance`] returns — `constant_axes` and `terminus_varies` —
+/// taken at the orthographic panel, which is the **block of the down-set lattice** the surface's
+/// occurrences land in under `receiver_exact_compression`'s Nerode partition. It is a property of
+/// the surface's *usage across the whole corpus*, so two surfaces with nothing orthographic in
+/// common can share it and two spelled alike can differ.
+///
+/// **A surface with one window is iron, and iron is `holds = ORTHOGRAPHIC, terminus = false`** —
+/// nothing varied, so nothing is in the varying set. The two statements are the same statement:
+/// if all three axes and the terminus pattern agree at every offset, every window is the same word.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
+pub struct ConductSignature {
+    /// The orthographic axes this surface's material holds constant at every offset.
+    pub holds: ReceiverFamily,
+    /// Two of its occurrences disagree about whether some offset exists at all.
+    pub terminus_varies: bool,
 }
 
-/// The window of one occurrence under a family with one axis removed. The ablated reading is the
-/// same word with one coordinate deleted, so ablation is a projection of the factorization and
-/// needs no separate refinement.
-fn ablated_window(
+impl ConductSignature {
+    /// The exact token a receiver returns. **Derived, never authored**: the collapsing family's own
+    /// bitmask shifted by the one bit the terminus needs, so the token *is* the lattice point.
+    pub fn encode(self) -> u64 {
+        (u64::from(self.holds.0) << 1) | u64::from(self.terminus_varies)
+    }
+
+    pub fn decode(token: u64) -> Self {
+        Self {
+            holds: ReceiverFamily((token >> 1) as u8 & ReceiverFamily::ORTHOGRAPHIC.0),
+            terminus_varies: token & 1 == 1,
+        }
+    }
+
+    /// The surface's material never distinguished anything the orthographic panel reads, which is
+    /// [`ConductVerdict::Iron`] at that panel.
+    pub fn is_iron(self) -> bool {
+        self.holds == ReceiverFamily::ORTHOGRAPHIC && !self.terminus_varies
+    }
+}
+
+impl std::fmt::Display for ConductSignature {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            formatter,
+            "holds {}{}",
+            self.holds,
+            if self.terminus_varies { " +terminus" } else { "" }
+        )
+    }
+}
+
+/// **The founded conduct axis, as a reading per surface.**
+///
+/// The three declared axes read the neighbour's spelling. This one reads the neighbour's
+/// [`ConductSignature`] — what the corpus did with it everywhere else — so it is the only coordinate
+/// in a [`Reading`] that is not a function of the surface's characters.
+///
+/// **It is founded over EVERY surface, markup included.** `CorpusCensus::sites` records word
+/// surfaces only, because the *measured population* is the words; but a receiver standing next to a
+/// `#` must still read something, and returning a declared outside-value for markup would make the
+/// axis orthographic again at exactly the place the reading is supposed to bite. So the atlas walks
+/// the streams itself and gives markup a conduct signature on the same terms as a word.
+///
+/// **The founding horizon is the caller's**, never this organ's, and it need not be the horizon a
+/// later reading runs at — the two are different declarations and both are carried.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ConductAtlas {
+    founding_horizon: usize,
+    /// One token per `SurfaceId`, indexed by `SurfaceId.0`.
+    tokens: Vec<u64>,
+}
+
+impl ConductAtlas {
+    /// Found the atlas over the whole corpus at a declared horizon.
+    ///
+    /// One pass to collect every surface's occurrences, then one pass per surface comparing every
+    /// occurrence's orthographic window against the first. `O(total tokens · horizon)`; no pair is
+    /// materialized and no aperture participates.
+    pub fn found(census: &CorpusCensus, founding_horizon: usize) -> Self {
+        let population = census.all_surfaces().count();
+        let mut sites: Vec<Vec<(u32, u32)>> = vec![Vec::new(); population];
+        for (whole, record) in census.wholes().iter().enumerate() {
+            for (position, surface) in record.stream.iter().enumerate() {
+                sites[surface.0 as usize].push((whole as u32, position as u32));
+            }
+        }
+        let tokens = sites
+            .iter()
+            .map(|occurrences| {
+                orthographic_signature(census, occurrences, founding_horizon).encode()
+            })
+            .collect();
+        Self {
+            founding_horizon,
+            tokens,
+        }
+    }
+
+    /// The atlas **before** founding: one token for every surface.
+    ///
+    /// A constant axis separates nothing, so its residue is empty and — by `founded_receiver`'s
+    /// capacity law — it takes the minimum capacity and dilates maximally. It is the null the orbit
+    /// is measured against, and it is what the declared panel amounted to before the axis existed.
+    pub fn unfounded(census: &CorpusCensus, founding_horizon: usize) -> Self {
+        Self {
+            founding_horizon,
+            tokens: vec![0; census.all_surfaces().count()],
+        }
+    }
+
+    /// An atlas carrying tokens a caller supplies. The route every declared null takes: the tokens
+    /// are the caller's, the reading machinery is unchanged, and the two are therefore comparable on
+    /// one material.
+    pub fn declaring(founding_horizon: usize, tokens: Vec<u64>) -> Self {
+        Self {
+            founding_horizon,
+            tokens,
+        }
+    }
+
+    pub fn founding_horizon(&self) -> usize {
+        self.founding_horizon
+    }
+
+    /// The token this axis returns for a surface. A surface outside the atlas reads `0`, which is
+    /// the same token [`Self::unfounded`] gives everything — never a sentinel a caller could mistake
+    /// for a founded reading.
+    pub fn token(&self, surface: SurfaceId) -> u64 {
+        self.tokens.get(surface.0 as usize).copied().unwrap_or(0)
+    }
+
+    pub fn signature(&self, surface: SurfaceId) -> ConductSignature {
+        ConductSignature::decode(self.token(surface))
+    }
+
+    pub fn tokens(&self) -> &[u64] {
+        &self.tokens
+    }
+
+    /// How many surfaces carry each token. **The orbit of the axis itself**: an atlas returning one
+    /// token has founded nothing, and one returning a distinct token per surface has founded an
+    /// identity map. Both are reported rather than assumed away.
+    pub fn population(&self) -> BTreeMap<u64, usize> {
+        let mut population: BTreeMap<u64, usize> = BTreeMap::new();
+        for token in &self.tokens {
+            *population.entry(*token).or_default() += 1;
+        }
+        population
+    }
+
+    /// **The atlas with the terminus bit of every reading ablated.**
+    ///
+    /// A [`ConductSignature`] carries two things: which orthographic distinctions the corpus never
+    /// made around the surface, and whether the surface ever stood within the horizon of a **whole's
+    /// edge**. The second is a property of *document length and placement* rather than of how the
+    /// surface is used, so it is the one coordinate of this axis that is arguably the same species
+    /// as the typography the axis exists to get past.
+    ///
+    /// Ablating it is a measurement, not a repair: the ablated axis is strictly coarser, so it
+    /// collapses more, and a coarser axis approaches the constant one whose ceiling is meaningless.
+    /// Both numbers have to be read together, which is why this returns an atlas rather than
+    /// replacing one.
+    pub fn without_terminus(&self) -> Self {
+        Self {
+            founding_horizon: self.founding_horizon,
+            tokens: self.tokens.iter().map(|token| token & !1).collect(),
+        }
+    }
+
+    /// Every surface whose reading satisfies a caller's predicate, complete and in surface order.
+    /// A **stated** sub-population, never a prefix: the caller names the class and receives all of
+    /// it.
+    pub fn surfaces_reading(&self, admits: impl Fn(ConductSignature) -> bool) -> Vec<SurfaceId> {
+        self.tokens
+            .iter()
+            .enumerate()
+            .filter(|(_, token)| admits(ConductSignature::decode(**token)))
+            .map(|(place, _)| SurfaceId(place as u32))
+            .collect()
+    }
+
+    /// The atlas with its tokens **permuted across surfaces** by a caller-declared permutation.
+    ///
+    /// The multiset of readings is preserved exactly, so the axis is *equally coarse* and carries no
+    /// relation whatever to the material. This is the sharpest available null: any collapse that
+    /// survives it is a consequence of the axis's coarseness and not of what it read.
+    pub fn permuted(&self, permutation: &[usize]) -> Self {
+        Self {
+            founding_horizon: self.founding_horizon,
+            tokens: (0..self.tokens.len())
+                .map(|place| {
+                    permutation
+                        .get(place)
+                        .and_then(|from| self.tokens.get(*from))
+                        .copied()
+                        .unwrap_or(0)
+                })
+                .collect(),
+        }
+    }
+}
+
+/// The orthographic conduct signature of one surface's occurrence population.
+///
+/// The same comparison [`SeparationComplex::conduct_invariance`] performs, taken at
+/// [`ReceiverFamily::ORTHOGRAPHIC`] and over raw occurrences rather than window classes. It has to
+/// be stated separately and prior, because the conduct axis is what the founded reading adds and a
+/// coordinate cannot be an input to its own founding.
+///
+/// Comparing every occurrence against the **first** is not weaker than comparing every pair: at one
+/// offset an axis returns one value per occurrence, so all-equal-to-the-first is all-equal.
+fn orthographic_signature(
+    census: &CorpusCensus,
+    occurrences: &[(u32, u32)],
+    horizon: usize,
+) -> ConductSignature {
+    let mut varying = ReceiverFamily::EMPTY;
+    let mut terminus_varies = false;
+    let Some((first_whole, first_position)) = occurrences.first().copied() else {
+        return ConductSignature {
+            holds: ReceiverFamily::ORTHOGRAPHIC,
+            terminus_varies: false,
+        };
+    };
+    let reference: Vec<Option<(u64, u64, u64)>> =
+        orthographic_window(census, first_whole, first_position, horizon);
+    for (whole, position) in &occurrences[1..] {
+        let other = orthographic_window(census, *whole, *position, horizon);
+        for (left, right) in reference.iter().zip(other.iter()) {
+            match (left, right) {
+                (Some(left), Some(right)) => {
+                    for axis in ReceiverAxis::ORTHOGRAPHIC {
+                        let coordinate = match axis {
+                            ReceiverAxis::Kind => (left.0, right.0),
+                            ReceiverAxis::Weight => (left.1, right.1),
+                            _ => (left.2, right.2),
+                        };
+                        if coordinate.0 != coordinate.1 {
+                            varying = varying.with(axis);
+                        }
+                    }
+                }
+                (None, None) => {}
+                _ => terminus_varies = true,
+            }
+        }
+    }
+    ConductSignature {
+        holds: ReceiverFamily(ReceiverFamily::ORTHOGRAPHIC.0 & !varying.0),
+        terminus_varies,
+    }
+}
+
+/// One occurrence's window under the orthographic panel alone. The founding reading.
+fn orthographic_window(
     census: &CorpusCensus,
     whole: u32,
     position: u32,
     horizon: usize,
-    without: ReceiverAxis,
-) -> Vec<Option<(u64, u64)>> {
-    window(census, whole, position, horizon)
-        .into_iter()
-        .map(|reading| {
-            reading.map(|signature| {
-                let kept: Vec<u64> = ReceiverAxis::DECLARED
-                    .into_iter()
-                    .filter(|axis| *axis != without)
-                    .map(|axis| axis.read(signature))
-                    .collect();
-                (kept[0], kept[1])
-            })
+) -> Vec<Option<(u64, u64, u64)>> {
+    let stream = &census.wholes()[whole as usize].stream;
+    (0..2 * horizon)
+        .map(|index| {
+            let site = position as i64 + offset_at(index);
+            if site < 0 || site >= stream.len() as i64 {
+                None
+            } else {
+                Some(census.signature(stream[site as usize]))
+            }
         })
         .collect()
+}
+
+/// What the declared family reads off one surface: three orthographic coordinates and the founded
+/// conduct token.
+pub fn reading(census: &CorpusCensus, atlas: &ConductAtlas, surface: SurfaceId) -> Reading {
+    let (kind, weight, density) = census.signature(surface);
+    [kind, weight, density, atlas.token(surface)]
+}
+
+/// The window of the occurrence at `position` in `whole`.
+pub fn window(
+    census: &CorpusCensus,
+    atlas: &ConductAtlas,
+    whole: u32,
+    position: u32,
+    horizon: usize,
+) -> Window {
+    let stream = &census.wholes()[whole as usize].stream;
+    let mut window = Vec::with_capacity(2 * horizon);
+    for index in 0..2 * horizon {
+        let site = position as i64 + offset_at(index);
+        if site < 0 || site >= stream.len() as i64 {
+            window.push(None);
+        } else {
+            window.push(Some(reading(census, atlas, stream[site as usize])));
+        }
+    }
+    window
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -499,11 +807,16 @@ impl std::error::Error for ExhibitionObstructed {}
 
 impl SeparationComplex {
     /// Build the complex from the surface's whole occurrence population. No aperture participates.
-    pub fn read(census: &CorpusCensus, surface: SurfaceId, horizon: usize) -> Self {
+    pub fn read(
+        census: &CorpusCensus,
+        atlas: &ConductAtlas,
+        surface: SurfaceId,
+        horizon: usize,
+    ) -> Self {
         let mut grouped: BTreeMap<Window, Vec<(u32, u32)>> = BTreeMap::new();
         for (whole, position) in census.sites(surface) {
             grouped
-                .entry(window(census, *whole, *position, horizon))
+                .entry(window(census, atlas, *whole, *position, horizon))
                 .or_default()
                 .push((*whole, *position));
         }
@@ -627,6 +940,66 @@ impl SeparationComplex {
         }
     }
 
+    /// **The shallowest separation a declared sub-family still makes.**
+    ///
+    /// [`Self::shortest_separation`] answers at the full family, so on a four-axis panel it names
+    /// whichever axis comes first in [`ReceiverAxis::DECLARED`] — which is never `Conduct` when an
+    /// orthographic axis also differs. That is the wrong artifact for a family that does *not*
+    /// collapse a population: the question there is what **that family** still sees.
+    ///
+    /// Same factorization, same cost. The projected windows are sorted, the shared-prefix array is
+    /// taken over them, and its minimum is the round at which the family first separates — so this
+    /// is `O(d · horizon · log d)` and materializes no pair. `None` when the family collapses the
+    /// population, which is exactly [`ConductInvariance::collapses`] returning true.
+    pub fn shallowest_within(&self, family: ReceiverFamily) -> Option<FamilySeparation> {
+        let mut projected: Vec<Vec<Option<Vec<u64>>>> = self
+            .classes
+            .iter()
+            .map(|class| project(&class.window, family))
+            .collect();
+        projected.sort();
+        projected.dedup();
+        if projected.len() < 2 {
+            return None;
+        }
+        let (index, left, right) = projected
+            .windows(2)
+            .map(|pair| {
+                let shared = pair[0]
+                    .iter()
+                    .zip(pair[1].iter())
+                    .take_while(|(left, right)| left == right)
+                    .count();
+                (shared, &pair[0], &pair[1])
+            })
+            .min_by_key(|(shared, ..)| *shared)?;
+        let (side, depth) = step_at(index);
+        let axes = family.axes();
+        let (axis, readings, by_terminus) = match (&left[index], &right[index]) {
+            (Some(left), Some(right)) => {
+                let place = left
+                    .iter()
+                    .zip(right.iter())
+                    .position(|(left, right)| left != right)?;
+                (
+                    axes.get(place).copied(),
+                    Some((left[place], right[place])),
+                    false,
+                )
+            }
+            _ => (None, None, true),
+        };
+        Some(FamilySeparation {
+            family,
+            blocks: projected.len(),
+            word: vec![side; depth],
+            offset: offset_at(index),
+            axis,
+            readings,
+            by_terminus,
+        })
+    }
+
     /// The first index at which classes `left < right` differ. `None` when they are the same class.
     pub fn first_difference(&self, left: usize, right: usize) -> Option<usize> {
         let (low, high) = if left <= right {
@@ -739,7 +1112,7 @@ impl SeparationComplex {
         let right_reading = self.classes[right].window[index];
         let left_site = self.classes[left].sites[0];
         let right_site = self.classes[right].sites[0];
-        let landing = |site: (u32, u32), reading: Option<(u64, u64, u64)>| -> Option<SurfaceId> {
+        let landing = |site: (u32, u32), reading: Option<Reading>| -> Option<SurfaceId> {
             reading?;
             let stream = &census.wholes()[site.0 as usize].stream;
             let position = site.1 as i64 + offset;
@@ -802,6 +1175,53 @@ fn choose_two(population: &BigUint) -> BigUint {
         return BigUint::from(0u32);
     }
     population.clone() * (population.clone() - BigUint::from(1u32)) / BigUint::from(2u32)
+}
+
+/// The shallowest separation one declared sub-family still makes over a surface's occurrences.
+///
+/// The artifact for a family that does **not** collapse the population: it names what that family
+/// still sees, rather than what the full panel sees, which on a four-axis reading is almost always a
+/// different axis.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct FamilySeparation {
+    pub family: ReceiverFamily,
+    /// How many blocks the family leaves. Two or more, or there is no separation to name.
+    pub blocks: usize,
+    pub word: Vec<Step>,
+    pub offset: i64,
+    /// The member of `family` that sees it. `None` for a terminus, which is no receiver's.
+    pub axis: Option<ReceiverAxis>,
+    pub readings: Option<(u64, u64)>,
+    pub by_terminus: bool,
+}
+
+impl FamilySeparation {
+    /// The separation, exhibited as text.
+    pub fn exhibit(&self) -> String {
+        let word: String = self
+            .word
+            .iter()
+            .map(|step| match step {
+                Step::Left => "L",
+                Step::Right => "R",
+            })
+            .collect();
+        match (self.axis, self.readings) {
+            (Some(axis), Some((left, right))) => format!(
+                "{} blocks; word {word} (offset {:+}) -> receiver `{}` returned {} vs {}",
+                self.blocks,
+                self.offset,
+                axis.name(),
+                axis.render(left),
+                axis.render(right),
+            ),
+            _ => format!(
+                "{} blocks; word {word} (offset {:+}) -> separated by TERMINUS, which no ablation \
+                 can merge",
+                self.blocks, self.offset,
+            ),
+        }
+    }
 }
 
 /// One exhibited separation: two window classes the one-shot reading held together, the shortest
@@ -1081,15 +1501,22 @@ impl SeparationReading {
     pub fn family_blocks(&self, family: ReceiverFamily) -> usize {
         self.complex.family_blocks(family)
     }
+
+    /// The shallowest separation a declared sub-family still makes — what **that** family sees,
+    /// rather than what the full panel sees. `None` exactly when the family collapses.
+    pub fn shallowest_within(&self, family: ReceiverFamily) -> Option<FamilySeparation> {
+        self.complex.shallowest_within(family)
+    }
 }
 
 /// Read one surface's occurrence population at one declared horizon.
 pub fn separation_reading(
     census: &CorpusCensus,
+    atlas: &ConductAtlas,
     surface: SurfaceId,
     horizon: usize,
 ) -> SeparationReading {
-    let complex = SeparationComplex::read(census, surface, horizon);
+    let complex = SeparationComplex::read(census, atlas, surface, horizon);
     let distinct_windows = complex.distinct_windows();
     let verdict = match complex.first_depth() {
         None => Verdict::Iron,
@@ -1106,11 +1533,15 @@ pub fn separation_reading(
 }
 
 /// The whole measured population, read at one horizon. Every word surface appears.
-pub fn sweep(census: &CorpusCensus, horizon: usize) -> BTreeMap<SurfaceId, SeparationReading> {
+pub fn sweep(
+    census: &CorpusCensus,
+    atlas: &ConductAtlas,
+    horizon: usize,
+) -> BTreeMap<SurfaceId, SeparationReading> {
     census
         .word_surfaces()
         .into_iter()
-        .map(|surface| (surface, separation_reading(census, surface, horizon)))
+        .map(|surface| (surface, separation_reading(census, atlas, surface, horizon)))
         .collect()
 }
 
@@ -1242,14 +1673,20 @@ pub fn collapsing_family_population(
 /// be disagreed with: [`cross_check`] runs both and compares pair for pair.
 pub struct OccurrenceSystem<'a> {
     census: &'a CorpusCensus,
+    atlas: &'a ConductAtlas,
     roots: Vec<(u32, u32)>,
     horizon: usize,
     axes: Vec<ReceiverAxis>,
 }
 
 impl<'a> OccurrenceSystem<'a> {
-    pub fn new(census: &'a CorpusCensus, roots: Vec<(u32, u32)>, horizon: usize) -> Self {
-        Self::restricted(census, roots, horizon, ReceiverFamily::FULL)
+    pub fn new(
+        census: &'a CorpusCensus,
+        atlas: &'a ConductAtlas,
+        roots: Vec<(u32, u32)>,
+        horizon: usize,
+    ) -> Self {
+        Self::restricted(census, atlas, roots, horizon, ReceiverFamily::FULL)
     }
 
     /// The same population presented to a **declared sub-family** of receivers. Everything else —
@@ -1260,12 +1697,14 @@ impl<'a> OccurrenceSystem<'a> {
     /// terminus there. That is not a degenerate case; it is the terminus clause, driven.
     pub fn restricted(
         census: &'a CorpusCensus,
+        atlas: &'a ConductAtlas,
         roots: Vec<(u32, u32)>,
         horizon: usize,
         family: ReceiverFamily,
     ) -> Self {
         Self {
             census,
+            atlas,
             roots,
             horizon,
             axes: family.axes(),
@@ -1337,9 +1776,9 @@ impl ObservedSystem for OccurrenceSystem<'_> {
             // Unreachable for a declared item; a missing site is a terminus, never an observation.
             return Observation(u64::MAX);
         };
-        let signature = self.census.signature(surface);
+        let reading = reading(self.census, self.atlas, surface);
         Observation(match ReceiverAxis::from_id(receiver) {
-            Some(axis) => axis.read(signature),
+            Some(axis) => axis.read(reading),
             None => u64::MAX,
         })
     }
@@ -1390,11 +1829,12 @@ impl CrossCheck {
 /// has; past it this refuses with the width the material required rather than running a subsample.
 pub fn cross_check(
     census: &CorpusCensus,
+    atlas: &ConductAtlas,
     surface: SurfaceId,
     horizon: usize,
     declared_capacity: u64,
 ) -> Result<CrossCheck, ExhibitionObstructed> {
-    let complex = SeparationComplex::read(census, surface, horizon);
+    let complex = SeparationComplex::read(census, atlas, surface, horizon);
     let required = complex.separated_class_pairs();
     if required > BigUint::from(declared_capacity) {
         return Err(ExhibitionObstructed {
@@ -1410,7 +1850,7 @@ pub fn cross_check(
         .map(|class| class.sites[0])
         .collect();
     let presented = roots.len();
-    let system = OccurrenceSystem::new(census, roots, horizon);
+    let system = OccurrenceSystem::new(census, atlas, roots, horizon);
     let compression = compress(&system);
     let root_items: BTreeMap<ItemId, usize> = (0..presented)
         .map(|root| (system.root_item(root), root))
@@ -1498,12 +1938,13 @@ impl FamilyCrossCheck {
 /// verdict itself never needs this route; it is the independent implementation that grades it.
 pub fn cross_check_family(
     census: &CorpusCensus,
+    atlas: &ConductAtlas,
     surface: SurfaceId,
     horizon: usize,
     family: ReceiverFamily,
     declared_capacity: u64,
 ) -> Result<FamilyCrossCheck, ExhibitionObstructed> {
-    let complex = SeparationComplex::read(census, surface, horizon);
+    let complex = SeparationComplex::read(census, atlas, surface, horizon);
     let required = complex.separated_class_pairs();
     if required > BigUint::from(declared_capacity) {
         return Err(ExhibitionObstructed {
@@ -1515,7 +1956,7 @@ pub fn cross_check_family(
     }
     let roots: Vec<(u32, u32)> = complex.classes.iter().map(|class| class.sites[0]).collect();
     let presented = roots.len();
-    let system = OccurrenceSystem::restricted(census, roots, horizon, family);
+    let system = OccurrenceSystem::restricted(census, atlas, roots, horizon, family);
     let root_items: BTreeSet<ItemId> = (0..presented).map(|root| system.root_item(root)).collect();
     let organ_blocks = compress(&system)
         .conduct
@@ -1550,18 +1991,22 @@ pub struct AxisWitness {
 }
 
 /// For each declared axis, find a witness pair from the corpus's own vocabulary.
-pub fn axis_witnesses(census: &CorpusCensus) -> BTreeMap<ReceiverAxis, AxisWitness> {
+pub fn axis_witnesses(
+    census: &CorpusCensus,
+    atlas: &ConductAtlas,
+) -> BTreeMap<ReceiverAxis, AxisWitness> {
     let surfaces = census.word_surfaces();
     let mut witnesses = BTreeMap::new();
     for axis in ReceiverAxis::DECLARED {
-        let mut buckets: BTreeMap<(u64, u64), (u64, SurfaceId)> = BTreeMap::new();
+        let mut buckets: BTreeMap<Vec<u64>, (u64, SurfaceId)> = BTreeMap::new();
         for surface in &surfaces {
-            let (kind, weight, density) = census.signature(*surface);
-            let (held, varying) = match axis {
-                ReceiverAxis::Kind => ((weight, density), kind),
-                ReceiverAxis::Weight => ((kind, density), weight),
-                ReceiverAxis::Density => ((kind, weight), density),
-            };
+            let signature = reading(census, atlas, *surface);
+            let held: Vec<u64> = ReceiverAxis::DECLARED
+                .into_iter()
+                .filter(|other| *other != axis)
+                .map(|other| other.read(signature))
+                .collect();
+            let varying = axis.read(signature);
             match buckets.get(&held) {
                 Some((seen, other)) if *seen != varying => {
                     witnesses.insert(
@@ -1584,6 +2029,140 @@ pub fn axis_witnesses(census: &CorpusCensus) -> BTreeMap<ReceiverAxis, AxisWitne
         }
     }
     witnesses
+}
+
+/// **One axis's residue against a declared family, over the SURFACE population** — and the same
+/// question asked the other way round, which is the arm an added axis can never answer.
+///
+/// `founded_receiver`'s definition, verbatim: `Res(r) = ( ⋂_{s≠r} ≡_s ) ∖ ≡_r`, the pairs every
+/// other receiver identifies and this one separates. An axis with empty residue is **redundant**,
+/// and by that module's capacity law it takes capacity `residue + 1`, so a redundant axis is not
+/// deleted — it becomes the most congested route.
+///
+/// The second arm exists because adding a receiver may only **refine** (H.0016's transformations
+/// clause), so an axis joining a panel can only ever separate. Whether it can *hold together* what
+/// the panel splits is a question about the axis **alone**, and it is the one that decides whether a
+/// coarser reading exists at all.
+///
+/// Both arms are exact and neither materializes a pair: the population is grouped and the count is
+/// `Σ C(n,2)` over the groups.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct SurfaceResidue {
+    pub axis: ReceiverAxis,
+    pub against: ReceiverFamily,
+    pub population: usize,
+    /// Pairs of surfaces `against` identifies.
+    pub identified_by_against: BigUint,
+    /// Of those, the pairs this axis **separates**. `founded_receiver`'s `Res(r)`.
+    pub residue: BigUint,
+    /// A pair witnessing the residue, exhibited rather than counted.
+    pub residue_witness: Option<(SurfaceId, SurfaceId)>,
+    /// Pairs of surfaces this axis alone identifies.
+    pub identified_by_axis: BigUint,
+    /// Of those, the pairs `against` **separates** — what a reading at this axis alone can hold
+    /// together and the declared panel cannot.
+    pub carried_alone: BigUint,
+    /// A pair witnessing that arm.
+    pub carried_witness: Option<(SurfaceId, SurfaceId)>,
+}
+
+impl SurfaceResidue {
+    /// `founded_receiver`'s capacity law, applied: `capacity := |Res(r)| + 1`. The `+ 1` is forced
+    /// because `set_site_capacity` refuses zero, so an empty residue takes the minimum and dilates
+    /// maximally rather than being removed by a chooser.
+    pub fn capacity(&self) -> BigUint {
+        self.residue.clone() + BigUint::from(1u32)
+    }
+
+    /// The axis is redundant in the family: removing it leaves the partition unmoved.
+    pub fn is_redundant(&self) -> bool {
+        self.residue == BigUint::from(0u32)
+    }
+}
+
+/// Compute one axis's two-armed residue against a declared family over the whole surface population.
+pub fn surface_residue(
+    census: &CorpusCensus,
+    atlas: &ConductAtlas,
+    axis: ReceiverAxis,
+    against: ReceiverFamily,
+) -> SurfaceResidue {
+    let surfaces = census.word_surfaces();
+    let mut by_against: BTreeMap<Vec<u64>, Vec<SurfaceId>> = BTreeMap::new();
+    let mut by_axis: BTreeMap<u64, Vec<SurfaceId>> = BTreeMap::new();
+    for surface in &surfaces {
+        let signature = reading(census, atlas, *surface);
+        let key: Vec<u64> = against
+            .axes()
+            .into_iter()
+            .map(|member| member.read(signature))
+            .collect();
+        by_against.entry(key).or_default().push(*surface);
+        by_axis
+            .entry(axis.read(signature))
+            .or_default()
+            .push(*surface);
+    }
+
+    // Both arms are the same shape: a coarse grouping, refined by the other reading, and the
+    // difference of the two pair counts is what the refinement broke apart.
+    let split = |groups: &BTreeMap<Vec<u64>, Vec<SurfaceId>>,
+                 refine: &dyn Fn(SurfaceId) -> Vec<u64>|
+     -> (BigUint, BigUint, Option<(SurfaceId, SurfaceId)>) {
+        let mut coarse = BigUint::from(0u32);
+        let mut broken = BigUint::from(0u32);
+        let mut witness = None;
+        for members in groups.values() {
+            coarse += choose_two(&BigUint::from(members.len()));
+            let mut refined: BTreeMap<Vec<u64>, Vec<SurfaceId>> = BTreeMap::new();
+            for member in members {
+                refined.entry(refine(*member)).or_default().push(*member);
+            }
+            let inside: BigUint = refined
+                .values()
+                .map(|block| choose_two(&BigUint::from(block.len())))
+                .sum();
+            let here = choose_two(&BigUint::from(members.len())) - inside;
+            if here > BigUint::from(0u32) && witness.is_none() && refined.len() > 1 {
+                let mut blocks = refined.values();
+                let left = blocks.next().and_then(|block| block.first()).copied();
+                let right = blocks.next().and_then(|block| block.first()).copied();
+                if let (Some(left), Some(right)) = (left, right) {
+                    witness = Some((left, right));
+                }
+            }
+            broken += here;
+        }
+        (coarse, broken, witness)
+    };
+
+    let (identified_by_against, residue, residue_witness) = split(&by_against, &|surface| {
+        vec![axis.read(reading(census, atlas, surface))]
+    });
+    let by_axis_keyed: BTreeMap<Vec<u64>, Vec<SurfaceId>> = by_axis
+        .into_iter()
+        .map(|(token, members)| (vec![token], members))
+        .collect();
+    let (identified_by_axis, carried_alone, carried_witness) = split(&by_axis_keyed, &|surface| {
+        let signature = reading(census, atlas, surface);
+        against
+            .axes()
+            .into_iter()
+            .map(|member| member.read(signature))
+            .collect()
+    });
+
+    SurfaceResidue {
+        axis,
+        against,
+        population: surfaces.len(),
+        identified_by_against,
+        residue,
+        residue_witness,
+        identified_by_axis,
+        carried_alone,
+        carried_witness,
+    }
 }
 
 /// What one axis's removal costs a surface's reading. H.0016's transformations clause guarantees
@@ -1609,25 +2188,24 @@ impl AblationReading {
 /// [`cross_check_ablation`] runs it against this one.
 pub fn ablation_profile(
     census: &CorpusCensus,
+    atlas: &ConductAtlas,
     surface: SurfaceId,
     horizon: usize,
 ) -> Vec<AblationReading> {
-    let sites = census.sites(surface);
-    let with = sites
+    let windows: Vec<Window> = census
+        .sites(surface)
         .iter()
-        .map(|(whole, position)| window(census, *whole, *position, horizon))
-        .collect::<BTreeSet<_>>()
-        .len();
+        .map(|(whole, position)| window(census, atlas, *whole, *position, horizon))
+        .collect();
+    let with = windows.iter().collect::<BTreeSet<_>>().len();
     ReceiverAxis::DECLARED
         .into_iter()
         .map(|axis| AblationReading {
             axis,
             blocks_with: with,
-            blocks_without: sites
+            blocks_without: windows
                 .iter()
-                .map(|(whole, position)| {
-                    ablated_window(census, *whole, *position, horizon, axis)
-                })
+                .map(|window| project(window, ReceiverFamily::FULL.without(axis)))
                 .collect::<BTreeSet<_>>()
                 .len(),
         })
@@ -1640,11 +2218,12 @@ pub fn ablation_profile(
 /// it with the width the material required.
 pub fn cross_check_ablation(
     census: &CorpusCensus,
+    atlas: &ConductAtlas,
     surface: SurfaceId,
     horizon: usize,
     declared_capacity: u64,
 ) -> Result<Vec<AblationReading>, ExhibitionObstructed> {
-    let complex = SeparationComplex::read(census, surface, horizon);
+    let complex = SeparationComplex::read(census, atlas, surface, horizon);
     let required = complex.separated_class_pairs();
     if required > BigUint::from(declared_capacity) {
         return Err(ExhibitionObstructed {
@@ -1656,7 +2235,7 @@ pub fn cross_check_ablation(
     }
     let roots: Vec<(u32, u32)> = complex.classes.iter().map(|class| class.sites[0]).collect();
     let presented = roots.len();
-    let system = OccurrenceSystem::new(census, roots, horizon);
+    let system = OccurrenceSystem::new(census, atlas, roots, horizon);
     let root_items: BTreeSet<ItemId> = (0..presented).map(|root| system.root_item(root)).collect();
     let block_count = |blocks: &[BTreeSet<ItemId>]| {
         blocks
@@ -1813,6 +2392,14 @@ mod tests {
     /// The declared capacity these fixtures run under. A test is a caller and declares its own.
     const TEST_CAPACITY: u64 = 4_096;
 
+    /// The horizon these fixtures found the conduct atlas at. A caller's declaration, and
+    /// deliberately not the horizon every reading below runs at — the two are separate.
+    const TEST_FOUNDING_HORIZON: usize = 1;
+
+    fn atlas(census: &CorpusCensus) -> ConductAtlas {
+        ConductAtlas::found(census, TEST_FOUNDING_HORIZON)
+    }
+
     fn scratch(name: &str) -> std::path::PathBuf {
         let root = std::env::temp_dir().join(format!("holonic-token-invariance-{name}"));
         let _ = fs::remove_dir_all(&root);
@@ -1856,11 +2443,12 @@ mod tests {
     fn a_surface_used_in_one_construction_is_iron_and_one_used_in_many_is_not() {
         let root = declared_corpus("verdicts");
         let census = CorpusCensus::read(&root).unwrap();
+        let atlas = atlas(&census);
 
         let arxiv = census.lookup("arxiv").expect("the fixture writes it");
         let set = census.lookup("set").expect("the fixture writes it");
 
-        let iron = separation_reading(&census, arxiv, 1);
+        let iron = separation_reading(&census, &atlas, arxiv, 1);
         assert_eq!(iron.distinct_windows, 1, "one construction, one window");
         assert_eq!(iron.verdict, Verdict::Iron);
         assert_eq!(
@@ -1869,7 +2457,7 @@ mod tests {
             "an iron surface has no separations at all"
         );
 
-        let fuzzy = separation_reading(&census, set, 1);
+        let fuzzy = separation_reading(&census, &atlas, set, 1);
         assert!(fuzzy.distinct_windows > 1, "several constructions, several windows");
         assert!(matches!(fuzzy.verdict, Verdict::Separated { .. }));
         let separations = fuzzy.exhibit(&census, TEST_CAPACITY).expect("within capacity");
@@ -1894,8 +2482,9 @@ mod tests {
     fn iron_is_monotone_decreasing_in_the_horizon() {
         let root = declared_corpus("monotone");
         let census = CorpusCensus::read(&root).unwrap();
-        let near = iron_at(&sweep(&census, 1));
-        let far = iron_at(&sweep(&census, 2));
+        let atlas = atlas(&census);
+        let near = iron_at(&sweep(&census, &atlas, 1));
+        let far = iron_at(&sweep(&census, &atlas, 2));
         assert!(
             far.is_subset(&near),
             "iron at horizon 2 must be contained in iron at horizon 1; \
@@ -1911,10 +2500,11 @@ mod tests {
     fn the_factorization_and_the_nerode_refinement_agree_pair_for_pair() {
         let root = declared_corpus("parity");
         let census = CorpusCensus::read(&root).unwrap();
+        let atlas = atlas(&census);
         let mut checked = 0usize;
         for horizon in [1usize, 2] {
             for surface in census.word_surfaces() {
-                let check = cross_check(&census, surface, horizon, TEST_CAPACITY)
+                let check = cross_check(&census, &atlas, surface, horizon, TEST_CAPACITY)
                     .expect("the fixture is inside the declared capacity");
                 assert!(
                     check.agrees(),
@@ -1934,8 +2524,9 @@ mod tests {
     fn the_cross_check_ranges_over_a_non_empty_pair_population() {
         let root = declared_corpus("orbit-of-the-check");
         let census = CorpusCensus::read(&root).unwrap();
+        let atlas = atlas(&census);
         let set = census.lookup("set").unwrap();
-        let check = cross_check(&census, set, 1, TEST_CAPACITY).expect("within capacity");
+        let check = cross_check(&census, &atlas, set, 1, TEST_CAPACITY).expect("within capacity");
         assert!(
             check.organ_pairs > 0 && check.factorized_pairs > 0,
             "a cross-check over zero pairs cannot fail and is not evidence: {check:?}"
@@ -1949,13 +2540,14 @@ mod tests {
     fn each_declared_axis_separates_a_pair_the_others_do_not() {
         let root = declared_corpus("orbit");
         let census = CorpusCensus::read(&root).unwrap();
-        let witnesses = axis_witnesses(&census);
+        let atlas = atlas(&census);
+        let witnesses = axis_witnesses(&census, &atlas);
         for axis in ReceiverAxis::DECLARED {
             let witness = witnesses
                 .get(&axis)
                 .unwrap_or_else(|| panic!("axis {} found no witness", axis.name()));
-            let left = census.signature(witness.left);
-            let right = census.signature(witness.right);
+            let left = reading(&census, &atlas, witness.left);
+            let right = reading(&census, &atlas, witness.right);
             let differing: Vec<ReceiverAxis> = ReceiverAxis::DECLARED
                 .into_iter()
                 .filter(|other| other.read(left) != other.read(right))
@@ -1978,10 +2570,11 @@ mod tests {
     fn ablating_an_axis_never_refines_the_reading_and_both_routes_agree() {
         let root = declared_corpus("ablation");
         let census = CorpusCensus::read(&root).unwrap();
+        let atlas = atlas(&census);
         let set = census.lookup("set").unwrap();
-        let projected = ablation_profile(&census, set, 1);
-        let organ = cross_check_ablation(&census, set, 1, TEST_CAPACITY).expect("within capacity");
-        assert_eq!(projected.len(), 3);
+        let projected = ablation_profile(&census, &atlas, set, 1);
+        let organ = cross_check_ablation(&census, &atlas, set, 1, TEST_CAPACITY).expect("within capacity");
+        assert_eq!(projected.len(), ReceiverAxis::DECLARED.len());
         assert_eq!(
             projected, organ,
             "the projection and `AblatedSystem` are two implementations of one ablation"
@@ -2003,7 +2596,8 @@ mod tests {
     fn the_warping_carries_both_arms_and_they_are_not_the_same_number() {
         let root = declared_corpus("warping");
         let census = CorpusCensus::read(&root).unwrap();
-        let iron = iron_at(&sweep(&census, 1));
+        let atlas = atlas(&census);
+        let iron = iron_at(&sweep(&census, &atlas, 1));
         let incidence = warping_incidence(&census, &iron, 2);
         assert!(incidence.nonzero() > 0, "the iron field must warp something");
 
@@ -2027,7 +2621,8 @@ mod tests {
     fn an_iron_verdict_carries_the_exact_number_of_non_separations_it_survived() {
         let root = declared_corpus("tautology");
         let census = CorpusCensus::read(&root).unwrap();
-        let reading = sweep(&census, 2);
+        let atlas = atlas(&census);
+        let reading = sweep(&census, &atlas, 2);
 
         let arxiv = census.lookup("arxiv").unwrap();
         let witnessed = &reading[&arxiv];
@@ -2061,8 +2656,9 @@ mod tests {
     fn the_separated_occurrence_population_excludes_the_pairs_inside_a_window_class() {
         let root = declared_corpus("occurrence-pairs");
         let census = CorpusCensus::read(&root).unwrap();
+        let atlas = atlas(&census);
         let arxiv = census.lookup("arxiv").unwrap();
-        let reading = separation_reading(&census, arxiv, 1);
+        let reading = separation_reading(&census, &atlas, arxiv, 1);
         assert_eq!(reading.survived_pairs(), BigUint::from(3u32));
         assert_eq!(
             reading.separated_occurrence_pairs(),
@@ -2071,7 +2667,7 @@ mod tests {
         );
 
         let set = census.lookup("set").unwrap();
-        let fuzzy = separation_reading(&census, set, 1);
+        let fuzzy = separation_reading(&census, &atlas, set, 1);
         let exhibited = fuzzy.exhibit(&census, TEST_CAPACITY).expect("within capacity");
         let from_pairs: BigUint = exhibited
             .iter()
@@ -2091,8 +2687,9 @@ mod tests {
     fn an_exceeded_capacity_returns_an_obstruction_and_never_a_prefix() {
         let root = declared_corpus("obstruction");
         let census = CorpusCensus::read(&root).unwrap();
+        let atlas = atlas(&census);
         let set = census.lookup("set").unwrap();
-        let reading = separation_reading(&census, set, 1);
+        let reading = separation_reading(&census, &atlas, set, 1);
         let required = reading.complex.separated_class_pairs();
         assert!(required > BigUint::from(1u32), "the fixture must exceed a capacity of one");
 
@@ -2170,18 +2767,26 @@ mod tests {
     fn a_variously_used_surface_collapses_at_the_family_its_material_holds() {
         let root = conduct_corpus("collapse");
         let census = CorpusCensus::read(&root).unwrap();
+        let atlas = atlas(&census);
 
         let bee = census.lookup("bee").expect("the fixture writes it");
-        let reading = separation_reading(&census, bee, 1);
+        let reading = separation_reading(&census, &atlas, bee, 1);
         let invariance = reading.conduct_invariance();
 
         assert_eq!(reading.distinct_windows, 2, "`bee` stands in two constructions");
         assert!(matches!(reading.verdict, Verdict::Separated { .. }), "not iron");
+        // `aa`/`dddd` and `cc`/`eeee` are all lowercase singletons standing in one construction
+        // each, so `kind`, `density` and `conduct` all agree across the two occurrences and only
+        // the length band moves.
         assert_eq!(
             invariance.verdict,
             ConductVerdict::ConductInvariant {
                 windows: 2,
-                collapsing: ReceiverFamily::of([ReceiverAxis::Kind, ReceiverAxis::Density]),
+                collapsing: ReceiverFamily::of([
+                    ReceiverAxis::Kind,
+                    ReceiverAxis::Density,
+                    ReceiverAxis::Conduct
+                ]),
             },
         );
         assert_eq!(
@@ -2200,12 +2805,16 @@ mod tests {
         // The second surface holds the complementary pair of axes, so between the two every
         // declared axis is both held and varied on this material.
         let pp = census.lookup("pp").expect("the fixture writes it");
-        let other = separation_reading(&census, pp, 1).conduct_invariance();
+        let other = separation_reading(&census, &atlas, pp, 1).conduct_invariance();
         assert_eq!(
             other.verdict,
             ConductVerdict::ConductInvariant {
                 windows: 2,
-                collapsing: ReceiverFamily::of([ReceiverAxis::Weight, ReceiverAxis::Density]),
+                collapsing: ReceiverFamily::of([
+                    ReceiverAxis::Weight,
+                    ReceiverAxis::Density,
+                    ReceiverAxis::Conduct
+                ]),
             },
         );
         let _ = fs::remove_dir_all(&root);
@@ -2218,8 +2827,9 @@ mod tests {
     fn a_terminus_refuses_every_family_including_the_empty_one() {
         let root = conduct_corpus("terminus-family");
         let census = CorpusCensus::read(&root).unwrap();
+        let atlas = atlas(&census);
         let qq = census.lookup("qq").expect("the fixture writes it");
-        let reading = separation_reading(&census, qq, 1);
+        let reading = separation_reading(&census, &atlas, qq, 1);
         let invariance = reading.conduct_invariance();
 
         assert!(invariance.terminus_varies, "`qq` opens its whole exactly once");
@@ -2248,8 +2858,9 @@ mod tests {
     fn a_surface_that_moves_every_axis_collapses_at_no_family() {
         let root = conduct_corpus("varying");
         let census = CorpusCensus::read(&root).unwrap();
+        let atlas = atlas(&census);
         let ww = census.lookup("ww").expect("the fixture writes it");
-        let invariance = separation_reading(&census, ww, 1).conduct_invariance();
+        let invariance = separation_reading(&census, &atlas, ww, 1).conduct_invariance();
         assert!(!invariance.terminus_varies);
         assert_eq!(invariance.constant_axes, ReceiverFamily::EMPTY);
         assert!(matches!(
@@ -2272,11 +2883,12 @@ mod tests {
     fn the_collapsing_families_are_exactly_the_subsets_of_the_constant_axes() {
         let root = conduct_corpus("downset");
         let census = CorpusCensus::read(&root).unwrap();
+        let atlas = atlas(&census);
         let mut collapsing_seen = 0usize;
         let mut refusing_seen = 0usize;
         for horizon in [1usize, 2] {
             for surface in census.word_surfaces() {
-                let reading = separation_reading(&census, surface, horizon);
+                let reading = separation_reading(&census, &atlas, surface, horizon);
                 let invariance = reading.conduct_invariance();
                 for family in ReceiverFamily::FULL.subsets() {
                     let projected = reading.family_blocks(family) == 1;
@@ -2311,12 +2923,13 @@ mod tests {
     fn the_projection_and_the_organ_agree_at_every_declared_sub_family() {
         let root = conduct_corpus("family-parity");
         let census = CorpusCensus::read(&root).unwrap();
+        let atlas = atlas(&census);
         let mut checked = 0usize;
         let mut collapsed = 0usize;
         for horizon in [1usize, 2] {
             for surface in census.word_surfaces() {
                 for family in ReceiverFamily::FULL.subsets() {
-                    let check = cross_check_family(&census, surface, horizon, family, TEST_CAPACITY)
+                    let check = cross_check_family(&census, &atlas, surface, horizon, family, TEST_CAPACITY)
                         .expect("the fixture is inside the declared capacity");
                     assert!(
                         check.agrees(),
@@ -2344,7 +2957,8 @@ mod tests {
     fn the_two_verdicts_partition_the_measured_population_and_agree_on_iron() {
         let root = conduct_corpus("partition");
         let census = CorpusCensus::read(&root).unwrap();
-        let reading = sweep(&census, 1);
+        let atlas = atlas(&census);
+        let reading = sweep(&census, &atlas, 1);
         let partition = invariance_partition(&reading);
 
         assert!(
@@ -2379,9 +2993,10 @@ mod tests {
     fn a_conduct_invariant_verdict_is_never_vacuous_and_never_the_whole_family() {
         let root = conduct_corpus("nonvacuous");
         let census = CorpusCensus::read(&root).unwrap();
+        let atlas = atlas(&census);
         let mut admitted = 0usize;
         for horizon in [1usize, 2] {
-            for (_, reading) in sweep(&census, horizon) {
+            for (_, reading) in sweep(&census, &atlas, horizon) {
                 let invariance = reading.conduct_invariance();
                 let ConductVerdict::ConductInvariant { collapsing, windows } = invariance.verdict
                 else {
@@ -2412,8 +3027,9 @@ mod tests {
     fn a_verdict_is_returned_where_the_exhibition_is_obstructed() {
         let root = conduct_corpus("aperture");
         let census = CorpusCensus::read(&root).unwrap();
+        let atlas = atlas(&census);
         let bee = census.lookup("bee").unwrap();
-        let reading = separation_reading(&census, bee, 1);
+        let reading = separation_reading(&census, &atlas, bee, 1);
         reading
             .exhibit(&census, 0)
             .expect_err("a capacity of zero cannot hold this population");
@@ -2430,9 +3046,10 @@ mod tests {
     fn removing_one_axis_and_reading_its_complement_are_the_same_count() {
         let root = conduct_corpus("ablation-parity");
         let census = CorpusCensus::read(&root).unwrap();
+        let atlas = atlas(&census);
         for surface in census.word_surfaces() {
-            let complex = SeparationComplex::read(&census, surface, 1);
-            for reading in ablation_profile(&census, surface, 1) {
+            let complex = SeparationComplex::read(&census, &atlas, surface, 1);
+            for reading in ablation_profile(&census, &atlas, surface, 1) {
                 assert_eq!(
                     reading.blocks_with,
                     complex.family_blocks(ReceiverFamily::FULL)
@@ -2456,15 +3073,320 @@ mod tests {
     fn a_terminus_is_a_distinction_and_is_named_as_one() {
         let root = declared_corpus("terminus");
         let census = CorpusCensus::read(&root).unwrap();
+        let atlas = atlas(&census);
         let pad = census.lookup("pad").unwrap();
-        let reading = separation_reading(&census, pad, 1);
+        let reading = separation_reading(&census, &atlas, pad, 1);
         let separations = reading.exhibit(&census, TEST_CAPACITY).expect("within capacity");
         assert!(
             separations.iter().any(|separation| separation.by_terminus),
             "the opening `pad` has no left neighbour and every other one does: {separations:?}"
         );
-        let check = cross_check(&census, pad, 1, TEST_CAPACITY).expect("within capacity");
+        let check = cross_check(&census, &atlas, pad, 1, TEST_CAPACITY).expect("within capacity");
         assert!(check.agrees(), "the organ must agree about the terminus too: {check:?}");
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    // ---------------------------------------------------------------------------------------------
+    // The fourth axis
+    // ---------------------------------------------------------------------------------------------
+
+    #[test]
+    fn a_conduct_signature_round_trips_through_the_token_a_receiver_returns() {
+        for holds in ReceiverFamily::ORTHOGRAPHIC.subsets() {
+            for terminus_varies in [false, true] {
+                let signature = ConductSignature {
+                    holds,
+                    terminus_varies,
+                };
+                assert_eq!(ConductSignature::decode(signature.encode()), signature);
+            }
+        }
+        // The token IS the lattice point, so iron — nothing varied — is the top of the down-set
+        // with no terminus, and nothing else is.
+        assert!(
+            ConductSignature {
+                holds: ReceiverFamily::ORTHOGRAPHIC,
+                terminus_varies: false
+            }
+            .is_iron()
+        );
+        assert!(
+            !ConductSignature {
+                holds: ReceiverFamily::ORTHOGRAPHIC,
+                terminus_varies: true
+            }
+            .is_iron()
+        );
+    }
+
+    /// The atlas's own founding routine and the module's [`ConductInvariance`] are two
+    /// implementations of one reading, and they must agree on **every** surface.
+    ///
+    /// Run against the *unfounded* atlas, so the conduct coordinate is constant and the reading is
+    /// genuinely at the orthographic panel — which is the panel the founding is defined over. If
+    /// these disagreed, the axis would be reading something other than what it claims.
+    #[test]
+    fn the_founded_signature_is_the_orthographic_reading_computed_independently() {
+        let root = declared_corpus("founding-parity");
+        let census = CorpusCensus::read(&root).unwrap();
+        let flat = ConductAtlas::unfounded(&census, TEST_FOUNDING_HORIZON);
+        let founded = ConductAtlas::found(&census, TEST_FOUNDING_HORIZON);
+        let mut checked = 0usize;
+        let mut varied = BTreeSet::new();
+        for surface in census.word_surfaces() {
+            let complex =
+                SeparationComplex::read(&census, &flat, surface, TEST_FOUNDING_HORIZON);
+            let reading = complex.conduct_invariance(BigUint::from(census.occurrences(surface)));
+            let signature = founded.signature(surface);
+            assert_eq!(
+                ReceiverFamily(reading.constant_axes.0 & ReceiverFamily::ORTHOGRAPHIC.0),
+                signature.holds,
+                "{:?}: the atlas and the invariance reading disagree about what is held",
+                census.surface(surface)
+            );
+            assert_eq!(
+                reading.terminus_varies,
+                signature.terminus_varies,
+                "{:?}: the two disagree about the terminus",
+                census.surface(surface)
+            );
+            varied.insert(signature);
+            checked += 1;
+        }
+        assert!(checked > 0);
+        assert!(
+            varied.len() > 1,
+            "a parity check over one signature value could not have come out otherwise: {varied:?}"
+        );
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    /// The residue law, both arms, on real declared material.
+    ///
+    /// `founded_receiver`: `Res(r) = ( ⋂_{s≠r} ≡_s ) ∖ ≡_r`, and an axis whose residue is empty is
+    /// redundant. The unfounded atlas is exactly that axis and must measure as one; the founded
+    /// atlas must not. And the second arm — pairs the axis alone identifies that the orthographic
+    /// panel separates — is the one an added receiver can never produce, because adding a receiver
+    /// may only refine.
+    #[test]
+    fn the_conduct_axis_has_a_non_empty_residue_and_an_unfounded_one_is_redundant() {
+        let root = declared_corpus("residue");
+        let census = CorpusCensus::read(&root).unwrap();
+        let founded = ConductAtlas::found(&census, TEST_FOUNDING_HORIZON);
+        let flat = ConductAtlas::unfounded(&census, TEST_FOUNDING_HORIZON);
+
+        let live = surface_residue(
+            &census,
+            &founded,
+            ReceiverAxis::Conduct,
+            ReceiverFamily::ORTHOGRAPHIC,
+        );
+        assert!(
+            live.residue > BigUint::from(0u32),
+            "the axis separates a pair the orthographic panel identifies: {live:?}"
+        );
+        assert!(
+            live.carried_alone > BigUint::from(0u32),
+            "the axis holds together a pair the orthographic panel separates: {live:?}"
+        );
+        assert!(live.residue_witness.is_some() && live.carried_witness.is_some());
+        assert!(!live.is_redundant());
+        assert_eq!(live.capacity(), live.residue.clone() + BigUint::from(1u32));
+
+        // The witnesses are what they claim: one pair agrees orthographically and differs in
+        // conduct, the other differs orthographically and agrees in conduct.
+        let (left, right) = live.residue_witness.expect("a residue witness");
+        assert_eq!(
+            census.signature(left),
+            census.signature(right),
+            "a residue witness must agree on every orthographic coordinate"
+        );
+        assert_ne!(founded.token(left), founded.token(right));
+        let (left, right) = live.carried_witness.expect("a carried witness");
+        assert_ne!(census.signature(left), census.signature(right));
+        assert_eq!(founded.token(left), founded.token(right));
+
+        let null = surface_residue(
+            &census,
+            &flat,
+            ReceiverAxis::Conduct,
+            ReceiverFamily::ORTHOGRAPHIC,
+        );
+        assert!(
+            null.is_redundant(),
+            "a constant axis separates nothing and its residue is empty: {null:?}"
+        );
+        assert_eq!(null.capacity(), BigUint::from(1u32), "the minimum, forced");
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    /// A permutation of the atlas keeps the multiset of readings exactly and destroys the relation
+    /// to the material. It is the null every collapse has to survive.
+    #[test]
+    fn a_permuted_atlas_keeps_the_coarseness_and_loses_the_material() {
+        let root = declared_corpus("permuted");
+        let census = CorpusCensus::read(&root).unwrap();
+        let founded = ConductAtlas::found(&census, TEST_FOUNDING_HORIZON);
+        let population = founded.tokens().len();
+        let reversed: Vec<usize> = (0..population).rev().collect();
+        let permuted = founded.permuted(&reversed);
+        assert_eq!(
+            permuted.population(),
+            founded.population(),
+            "the multiset of readings must be preserved exactly, or the null is a weaker axis"
+        );
+        assert_ne!(
+            permuted.tokens(),
+            founded.tokens(),
+            "the fixture must actually move a reading, or the null could not fail"
+        );
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    /// The shallowest separation a sub-family still makes agrees with that family's block count on
+    /// every surface and every family, and the witness it names is **inside** the family.
+    ///
+    /// Without the last clause the reading would be the full panel's answer wearing a family's name,
+    /// which is exactly the defect it was written to remove.
+    #[test]
+    fn a_sub_familys_own_shallowest_separation_names_a_receiver_inside_that_family() {
+        let root = conduct_corpus("shallowest");
+        let census = CorpusCensus::read(&root).unwrap();
+        let atlas = atlas(&census);
+        let mut separated = 0usize;
+        let mut collapsed = 0usize;
+        let mut by_terminus = 0usize;
+        for horizon in [1usize, 2] {
+            for (_, row) in sweep(&census, &atlas, horizon) {
+                for family in ReceiverFamily::FULL.subsets() {
+                    let blocks = row.family_blocks(family);
+                    match row.shallowest_within(family) {
+                        None => {
+                            assert_eq!(blocks, 1, "no separation named where {family} leaves {blocks}");
+                            collapsed += 1;
+                        }
+                        Some(separation) => {
+                            assert!(blocks > 1);
+                            assert_eq!(separation.blocks, blocks);
+                            assert!(!separation.word.is_empty());
+                            match separation.axis {
+                                Some(axis) => assert!(
+                                    family.contains(axis),
+                                    "{family} named {} which is not in it",
+                                    axis.name()
+                                ),
+                                None => {
+                                    assert!(separation.by_terminus);
+                                    by_terminus += 1;
+                                }
+                            }
+                            separated += 1;
+                        }
+                    }
+                }
+            }
+        }
+        assert!(
+            separated > 0 && collapsed > 0 && by_terminus > 0,
+            "both outcomes and the terminus arm must occur or this proves nothing about itself: \
+             {separated} separated, {collapsed} collapsed, {by_terminus} by terminus"
+        );
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    /// **The object the axis exists for, on material that forces it.**
+    ///
+    /// `alpha` stands in three constructions. Its neighbours differ on **every** orthographic axis —
+    /// `one` against `LONGWORD` against `gg` moves case class, length band and density band — so no
+    /// nonempty orthographic family holds its occurrences together. But all six neighbours were used
+    /// by this corpus in exactly one construction each, so all six carry the **same** conduct
+    /// signature, and the conduct axis alone holds all three occurrences in one block.
+    ///
+    /// That is the collapse the three declared axes could not make: an added receiver may only
+    /// refine, so the coarsening arm is only reachable by an axis that reads something else.
+    fn typography_corpus(name: &str) -> std::path::PathBuf {
+        let root = scratch(name);
+        write(
+            &root,
+            "papers/source/mathematics/a.typ",
+            "zero one alpha two three\n",
+        );
+        write(&root, "canon/a.md", "zero LONGWORD alpha four five\n");
+        write(&root, "research/records/a.md", "pp gg alpha six hh\n");
+        write(&root, "reference/pureholonics-seed/a.md", "pp gg alpha six hh\n");
+        root
+    }
+
+    #[test]
+    fn the_conduct_axis_holds_together_what_typography_splits() {
+        let root = typography_corpus("typography");
+        let census = CorpusCensus::read(&root).unwrap();
+        let atlas = ConductAtlas::found(&census, 1);
+        let alpha = census.lookup("alpha").expect("the fixture writes it");
+        let reading = separation_reading(&census, &atlas, alpha, 1);
+        let invariance = reading.conduct_invariance();
+
+        assert_eq!(reading.distinct_windows, 3, "three constructions");
+        assert_eq!(
+            invariance.verdict,
+            ConductVerdict::ConductInvariant {
+                windows: 3,
+                collapsing: ReceiverFamily::of([ReceiverAxis::Conduct]),
+            },
+            "the conduct axis alone holds the population"
+        );
+
+        // The control: NO nonempty orthographic family collapses it, so the collapse is the fourth
+        // axis's and could not have come from the three.
+        for family in ReceiverFamily::ORTHOGRAPHIC.subsets() {
+            if family.is_empty() {
+                continue;
+            }
+            assert!(
+                reading.family_blocks(family) > 1,
+                "the orthographic family {family} must NOT collapse `alpha`, or the fixture proves \
+                 nothing about the fourth axis"
+            );
+        }
+        assert_eq!(reading.family_blocks(ReceiverFamily::of([ReceiverAxis::Conduct])), 1);
+        assert!(invariance.separations_withstood > BigUint::from(0u32));
+
+        // The six neighbours read alike under conduct and differ under the panel that failed.
+        let neighbours = ["one", "LONGWORD", "gg", "two", "four", "six"];
+        let tokens: BTreeSet<u64> = neighbours
+            .iter()
+            .map(|name| atlas.token(census.lookup(name).expect("written")))
+            .collect();
+        assert_eq!(tokens.len(), 1, "all six were used in one construction each");
+        let signatures: BTreeSet<(u64, u64, u64)> = neighbours
+            .iter()
+            .map(|name| census.signature(census.lookup(name).expect("written")))
+            .collect();
+        assert!(
+            signatures.len() > 1,
+            "the neighbours must differ orthographically or nothing was held together"
+        );
+
+        // **The distinguishing word.** Move ONE surface's conduct token and the collapse goes; the
+        // verdict is a consequence of what the axis read and not of the axis existing.
+        let long = census.lookup("LONGWORD").expect("written");
+        let mut moved: Vec<u64> = atlas.tokens().to_vec();
+        moved[long.0 as usize] += 1;
+        let counterfactual = ConductAtlas::declaring(atlas.founding_horizon(), moved);
+        let after = separation_reading(&census, &counterfactual, alpha, 1);
+        assert_eq!(
+            after.family_blocks(ReceiverFamily::of([ReceiverAxis::Conduct])),
+            2,
+            "one moved reading must break the collapse"
+        );
+        assert!(!after.conduct_invariance().verdict.is_conduct_invariant());
+
+        // And the independent implementation grades the claim at every declared sub-family.
+        for family in ReceiverFamily::FULL.subsets() {
+            let check = cross_check_family(&census, &atlas, alpha, 1, family, TEST_CAPACITY)
+                .expect("the fixture is inside the declared capacity");
+            assert!(check.agrees(), "family {family}: {check:?}");
+        }
         let _ = fs::remove_dir_all(&root);
     }
 }

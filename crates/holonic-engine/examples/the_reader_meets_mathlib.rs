@@ -107,17 +107,21 @@ fn main() {
         for form in &reading.declarations {
             arrivals_total += form.internal_arrivals().len();
             steps_total += form.steps.len();
-            writeln!(
-                stmt,
-                "{path}\t{}\t{}\t{}",
-                form.line,
-                form.name,
-                form.statement.replace('\t', " ")
-            )
-            .unwrap();
+            if !summary_only {
+                writeln!(
+                    stmt,
+                    "{path}\t{}\t{}\t{}",
+                    form.line,
+                    form.name,
+                    form.statement.replace('\t', " ")
+                )
+                .unwrap();
+            }
             for (symbol, count) in &form.recruited {
                 *terms.entry(symbol.clone()).or_insert(0) += *count as u64;
-                writeln!(recruit, "{path}\t{}\t{symbol}\t{count}", form.name).unwrap();
+                if !summary_only {
+                    writeln!(recruit, "{path}\t{}\t{symbol}\t{count}", form.name).unwrap();
+                }
             }
             for (symbol, count) in &form.tactics {
                 *tactic_vocab.entry(symbol.clone()).or_insert(0) += *count as u64;
@@ -185,17 +189,20 @@ fn main() {
             singles.len()
         )
         .unwrap();
-        for (from, to) in reading.declared_recruitment() {
-            for target in to {
-                writeln!(edges, "{path}\t{from}\t{target}").unwrap();
+        if !summary_only {
+            for (from, to) in reading.declared_recruitment() {
+                for target in to {
+                    writeln!(edges, "{path}\t{from}\t{target}").unwrap();
+                }
             }
-        }
-        for (name, holder) in singles {
-            writeln!(single, "{path}\t{name}\t{holder}").unwrap();
+            for (name, holder) in singles {
+                writeln!(single, "{path}\t{name}\t{holder}").unwrap();
+            }
         }
     }
 
     for ((path, _), read) in texts.iter().zip(one.iter()) {
+        if summary_only { break; }
         match read {
             Some(derivation) => writeln!(
                 deriv,

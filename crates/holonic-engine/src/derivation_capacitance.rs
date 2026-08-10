@@ -527,14 +527,11 @@ pub fn named_lines(text: &str) -> BTreeMap<&str, BTreeSet<usize>> {
         } else {
             trimmed
         };
-        for token in read.split(|c: char| !(c.is_alphanumeric() || c == '_' || c == '.')) {
-            if token
-                .chars()
-                .next()
-                .is_some_and(|first| first.is_alphabetic() || first == '_')
-            {
-                located.entry(token).or_default().insert(at);
-            }
+        // The tokenizer is `derivation_atlas`'s, called and not restated. A hand copy of the old
+        // single-class `split` sat here until 2026-08-09, and its measured consequence was that
+        // `source_separation` returned `None` for `contrapose!` while locating `contrapose`.
+        for token in crate::derivation_atlas::identifier_tokens(read) {
+            located.entry(token).or_default().insert(at);
         }
     }
     located

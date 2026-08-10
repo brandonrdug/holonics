@@ -221,6 +221,127 @@ impl ReturnedReading {
             .collect()
     }
 
+    /// **The seal.** This reading as octets, so the return can cross the world's own record instead
+    /// of a call.
+    ///
+    /// `canon/THE_HOLOBROCHOS_SPINE.md` §4 carries Soma's prohibition and this is what it asks for:
+    ///
+    /// > *"The membrane mails the radiation OUT into the world's own record; the world answers; the
+    /// > answer returns as the next light. **Reafference is the world's, never a wire's.**"*
+    ///
+    /// [`condition_again`] hands this carrier from a reading straight into a production across a
+    /// call. Nothing leaves the process, so by §4's test — *did it get written and re-read?* — that
+    /// is the shape the contaminant list names. The seal is the other half: [`Self::unseal`] returns
+    /// a carrier reconstructed **only** from octets, and a production conditioned on it has consumed
+    /// the world's record rather than the emitter's memory.
+    ///
+    /// **The spine bounds its own test and the bound is carried here.** §4 states that the write-and-
+    /// re-read rule is *that file's* `interpretation` and not an entailment from FORMULA, which
+    /// requires a shared medium and a genuinely later return without naming a filesystem. So this is
+    /// **one** lawful medium, not the only one, and its presence does not convict any other.
+    ///
+    /// ## The format, and why it is length-prefixed rather than delimited
+    ///
+    /// A `whole` is a document name and a `returned` is production text; both are arbitrary octets
+    /// and both routinely contain newlines. A delimited encoding would have to escape, and an escape
+    /// is a codec the reader must agree with silently. Lengths cannot disagree:
+    ///
+    /// ```text
+    ///   <schema>\n
+    ///   <count>\n
+    ///   <whole octets> <returned octets>\n      one header line per return
+    ///   <whole bytes><returned bytes>           immediately after its own header
+    /// ```
+    ///
+    /// The population's order is the order the mechanisms returned in and is retained exactly, so
+    /// `unseal(seal(r)) == r` on the nose rather than up to a set.
+    pub fn seal(&self) -> Vec<u8> {
+        let mut octets = Vec::new();
+        octets.extend_from_slice(self.schema.as_bytes());
+        octets.push(b'\n');
+        octets.extend_from_slice(self.returns.len().to_string().as_bytes());
+        octets.push(b'\n');
+        for artifact in &self.returns {
+            let whole = artifact.whole.as_bytes();
+            let returned = artifact.returned.as_bytes();
+            octets.extend_from_slice(whole.len().to_string().as_bytes());
+            octets.push(b' ');
+            octets.extend_from_slice(returned.len().to_string().as_bytes());
+            octets.push(b'\n');
+            octets.extend_from_slice(whole);
+            octets.extend_from_slice(returned);
+        }
+        octets
+    }
+
+    /// **The mouth.** A reading reconstructed from octets and from nothing else.
+    ///
+    /// Every refusal names the material that caused it, so a body that cannot read its own record
+    /// says which octets it could not read rather than returning a shorter population. A truncated
+    /// deposit is not a smaller reading.
+    pub fn unseal(octets: &[u8]) -> Result<Self, ReturnedReadingRefusal> {
+        fn line<'a>(octets: &'a [u8], at: &mut usize) -> Option<&'a str> {
+            let rest = octets.get(*at..)?;
+            let end = rest.iter().position(|octet| *octet == b'\n')?;
+            let read = std::str::from_utf8(&rest[..end]).ok()?;
+            *at += end + 1;
+            Some(read)
+        }
+
+        let mut at = 0usize;
+        let schema = line(octets, &mut at)
+            .ok_or(ReturnedReadingRefusal::SealCarriesNoSchema)?
+            .to_owned();
+        if schema != Self::still().schema {
+            return Err(ReturnedReadingRefusal::SealSchemaUnknown { declared: schema });
+        }
+        let count_line =
+            line(octets, &mut at).ok_or(ReturnedReadingRefusal::SealCarriesNoPopulationCount)?;
+        let count: usize = count_line.parse().map_err(|_| {
+            ReturnedReadingRefusal::SealHeaderMalformed { line: count_line.to_owned() }
+        })?;
+
+        let mut returns = Vec::with_capacity(count);
+        for _ in 0..count {
+            let header = line(octets, &mut at).ok_or(ReturnedReadingRefusal::SealTruncated {
+                expected: count,
+                read: returns.len(),
+            })?;
+            let (whole_len, returned_len) = header.split_once(' ').ok_or_else(|| {
+                ReturnedReadingRefusal::SealHeaderMalformed { line: header.to_owned() }
+            })?;
+            let widths: Result<Vec<usize>, _> =
+                [whole_len, returned_len].iter().map(|read| read.parse::<usize>()).collect();
+            let widths = widths.map_err(|_| ReturnedReadingRefusal::SealHeaderMalformed {
+                line: header.to_owned(),
+            })?;
+            let (whole_len, returned_len) = (widths[0], widths[1]);
+
+            let end = at + whole_len + returned_len;
+            if end > octets.len() {
+                return Err(ReturnedReadingRefusal::SealTruncated {
+                    expected: count,
+                    read: returns.len(),
+                });
+            }
+            let whole = std::str::from_utf8(&octets[at..at + whole_len])
+                .map_err(|_| ReturnedReadingRefusal::SealIsNotText { at })?
+                .to_owned();
+            let returned = std::str::from_utf8(&octets[at + whole_len..end])
+                .map_err(|_| ReturnedReadingRefusal::SealIsNotText { at: at + whole_len })?
+                .to_owned();
+            at = end;
+            returns.push(ReturnedArtifact { whole, returned });
+        }
+
+        if at != octets.len() {
+            return Err(ReturnedReadingRefusal::SealCarriesTrailingOctets {
+                count: octets.len() - at,
+            });
+        }
+        Ok(Self { schema, returns })
+    }
+
     /// **The join.** The standing morphology with this reading's returns witnessed into it.
     ///
     /// The standing population is re-founded from its own stems first, in its own founding order,
@@ -910,6 +1031,40 @@ fn occurrences_taken(
 ///
 /// Nothing about the query moves between the two productions. The only thing that moves is the
 /// morphology, and the only thing that moved it is the return.
+/// **The world-mediated conditioning: the only entry that cannot be handed a wire.**
+///
+/// It takes **octets**, not a carrier. A caller holding a `ReturnedReading` in memory cannot reach
+/// this function without sealing it first, and a caller who sealed to disk and then conditioned on
+/// the memory value would have to call [`condition_again`] by name to do it.
+///
+/// That distinction is the whole content. `canon/THE_HOLOBROCHOS_SPINE.md` §4 quotes Soma's
+/// prohibition — *"Reafference is the world's, never a wire's"* — and its test is one question: *did
+/// it get written and re-read?* A function whose argument is a live carrier cannot answer that
+/// question about itself; one whose argument is octets has already answered it, because octets are
+/// what a world's record is made of.
+///
+/// **The bound the spine states about itself is carried here too:** FORMULA requires a shared medium
+/// and a genuinely later return and names no filesystem, so this is one lawful medium rather than
+/// the only one, and the seal is not an architectural theorem.
+pub fn condition_again_from_sealed(
+    standing: &[Derivation],
+    morphology: &FoundedMorphology,
+    query: &DerivationQuery,
+    sealed: &[u8],
+) -> Result<ConditionedAgain, ConditionedDerivationRefusal> {
+    let returned = ReturnedReading::unseal(sealed)
+        .map_err(|refusal| ConditionedDerivationRefusal::MaterialDeclaresNothing {
+            source: format!("the world's record is unreadable: {refusal}"),
+        })?;
+    condition_again(standing, morphology, query, &returned)
+}
+
+/// The in-memory conditioning. **Retained deliberately, and named so a reader can see which one a
+/// call site chose** — the still and addressed-nothing controls need to construct a reading directly,
+/// and forcing them through a seal would test the codec rather than the no-op.
+///
+/// A production path calling this rather than [`condition_again_from_sealed`] is the private wire
+/// the spine names, and the difference is now visible at the call site instead of in a comment.
 pub fn condition_again(
     standing: &[Derivation],
     morphology: &FoundedMorphology,
@@ -1063,6 +1218,23 @@ pub enum ReturnedReadingRefusal {
     Invariants(String),
     Integral(DerivationIntegralError),
     RunningIntegral(crate::running_integral::RunningIntegralError),
+    /// The octets end before the schema line does.
+    SealCarriesNoSchema,
+    /// The octets declare a schema this carrier does not read. Carried by name so a deposit written
+    /// by a later version is refused rather than partially understood.
+    SealSchemaUnknown { declared: String },
+    /// The schema line stands alone; no population count follows it.
+    SealCarriesNoPopulationCount,
+    /// A header line is not the two octet widths this format declares.
+    SealHeaderMalformed { line: String },
+    /// The octets end inside the declared population. **A truncated deposit is not a smaller
+    /// reading**, so the count read so far is reported beside the count declared rather than
+    /// returned as the answer.
+    SealTruncated { expected: usize, read: usize },
+    /// Octets remain after the declared population is complete.
+    SealCarriesTrailingOctets { count: usize },
+    /// A declared width lands inside a multi-octet character.
+    SealIsNotText { at: usize },
 }
 
 impl std::fmt::Display for ReturnedReadingRefusal {
@@ -1074,6 +1246,27 @@ impl std::fmt::Display for ReturnedReadingRefusal {
             Self::Invariants(refusal) => write!(formatter, "{refusal}"),
             Self::Integral(refusal) => write!(formatter, "{refusal}"),
             Self::RunningIntegral(refusal) => write!(formatter, "{refusal}"),
+            Self::SealCarriesNoSchema => {
+                write!(formatter, "the sealed octets end before the schema line does")
+            }
+            Self::SealSchemaUnknown { declared } => {
+                write!(formatter, "the sealed octets declare the schema `{declared}`, which this carrier does not read")
+            }
+            Self::SealCarriesNoPopulationCount => {
+                write!(formatter, "the sealed octets carry a schema and no population count")
+            }
+            Self::SealHeaderMalformed { line } => {
+                write!(formatter, "the return header `{line}` is not two octet widths")
+            }
+            Self::SealTruncated { expected, read } => {
+                write!(formatter, "the sealed octets end inside the population: {expected} declared, {read} read")
+            }
+            Self::SealCarriesTrailingOctets { count } => {
+                write!(formatter, "{count} octets remain after the declared population is complete")
+            }
+            Self::SealIsNotText { at } => {
+                write!(formatter, "a declared width lands inside a character at octet {at}")
+            }
         }
     }
 }
@@ -1102,6 +1295,108 @@ mod tests {
     use crate::derivation_atlas::CircuitAperture;
 
     const STATEMENT: &str = "(P : Prop) (h : P) : exactCarrier P";
+
+    // --------------------------------------------------------------------------------------------
+    // The seal — the return crossing the world's record instead of a call
+    // --------------------------------------------------------------------------------------------
+
+    /// A reading whose returned text carries newlines, spaces and a trailing blank line, because
+    /// that is what production text is and it is the whole reason the format prefixes lengths.
+    fn awkward() -> ReturnedReading {
+        ReturnedReading::from_returns([
+            ReturnedArtifact {
+                whole: "invariant-movement/grade-1".to_owned(),
+                returned: "theorem carrier_transport : exactCarrier P := by\n  apply exact_chart_carry\n  assumption\n".to_owned(),
+            },
+            ReturnedArtifact {
+                whole: "route-movement/became-plural".to_owned(),
+                returned: "5 3\nnot a header\n\n".to_owned(),
+            },
+            // A mechanism that moved and addressed nothing. Retained, so the seal must carry an
+            // empty return rather than dropping it and shortening the population.
+            ReturnedArtifact {
+                whole: "temper-movement/closed".to_owned(),
+                returned: String::new(),
+            },
+        ])
+    }
+
+    #[test]
+    fn the_seal_round_trips_a_reading_whose_text_would_break_a_delimited_codec() {
+        let reading = awkward();
+        let octets = reading.seal();
+        // The second return's text is itself a well-formed header line followed by a blank line. A
+        // delimited or line-scanning codec reads it as structure; this one reads it as content.
+        assert!(reading.returns()[1].returned.starts_with("5 3\n"));
+        assert_eq!(ReturnedReading::unseal(&octets).expect("the seal is readable"), reading);
+    }
+
+    #[test]
+    fn a_still_reading_seals_and_returns_still() {
+        let octets = ReturnedReading::still().seal();
+        let read = ReturnedReading::unseal(&octets).expect("a still seal is readable");
+        assert!(read.is_still());
+        assert_eq!(read, ReturnedReading::still());
+    }
+
+    #[test]
+    fn the_seal_carries_the_return_that_addressed_nothing() {
+        let read = ReturnedReading::unseal(&awkward().seal()).expect("readable");
+        assert_eq!(read.returns().len(), 3, "an empty return is a return");
+        assert_eq!(read.addressing_nothing().len(), 1);
+    }
+
+    /// **The control that makes the seal load-bearing.** Every octet of a real seal is truncated in
+    /// turn, and each must refuse by name. A truncated deposit that returned a shorter population
+    /// would be a body silently conditioning on less than its own record — the failure the length
+    /// prefix exists to prevent.
+    #[test]
+    fn every_truncation_of_a_seal_refuses_and_none_returns_a_shorter_reading() {
+        let reading = awkward();
+        let octets = reading.seal();
+        for cut in 0..octets.len() {
+            match ReturnedReading::unseal(&octets[..cut]) {
+                Err(_) => {}
+                Ok(read) => panic!(
+                    "truncating to {cut} of {} octets returned a reading of {} returns",
+                    octets.len(),
+                    read.returns().len()
+                ),
+            }
+        }
+        assert_eq!(ReturnedReading::unseal(&octets).expect("whole").returns().len(), 3);
+    }
+
+    #[test]
+    fn a_seal_with_trailing_octets_refuses_by_name() {
+        let mut octets = awkward().seal();
+        octets.push(b'\n');
+        assert!(matches!(
+            ReturnedReading::unseal(&octets),
+            Err(ReturnedReadingRefusal::SealCarriesTrailingOctets { count: 1 })
+        ));
+    }
+
+    #[test]
+    fn a_seal_declaring_another_schema_refuses_rather_than_being_partly_understood() {
+        let octets = awkward().seal();
+        let text = String::from_utf8(octets).expect("the fixture is text");
+        let forged =
+            text.replacen("returned-reading.v1", "returned-reading.v2", 1).into_bytes();
+        match ReturnedReading::unseal(&forged) {
+            Err(ReturnedReadingRefusal::SealSchemaUnknown { declared }) => {
+                assert_eq!(declared, "holonic-engine.returned-reading.v2");
+            }
+            other => panic!("a later schema must be refused by name, got {other:?}"),
+        }
+    }
+
+    /// The seal is a function of the reading and of nothing else — no clock, no path, no ordering
+    /// of a hash map — so two seals of one reading are bit-identical and two checkouts agree.
+    #[test]
+    fn the_seal_is_a_function_of_the_reading_alone() {
+        assert_eq!(awkward().seal(), awkward().seal());
+    }
 
     /// Verbatim from `standing/output/lean-proof-production/`. Real production, quoted rather than
     /// read from disk so the fixture carries no filesystem frame.

@@ -88,7 +88,7 @@ use num_bigint::BigUint;
 
 use holonic_engine::corpus_census::{CorpusCensus, DECLARED_STRATA, Kind, SurfaceId};
 use holonic_engine::token_invariance::{
-    ConductVerdict, ReceiverAxis, ReceiverFamily, SeparationReading,
+    ConductAtlas, ConductVerdict, ReceiverAxis, ReceiverFamily, SeparationReading,
     collapsing_family_population, conduct_invariance_at, cross_check_family, invariance_partition,
     iron_at, sweep, witnessed_iron_at,
 };
@@ -107,6 +107,11 @@ const DECLARED_CAPACITY: u64 = 8_192;
 /// presented population rather than in the separated part. Past this it refuses and the refusal is
 /// counted.
 const FAMILY_CHECK_CAPACITY: u64 = 64;
+
+/// **The horizon this caller founds the conduct axis at.** The fourth declared axis reads what the
+/// corpus does with a surface rather than how it is spelled; `ConductAtlas` holds no default, so the
+/// founding horizon is declared here and the reading horizons separately in [`HORIZONS`].
+const FOUNDING_HORIZON: usize = 1;
 
 /// The default floor above which the conduct-invariant population is written out **complete**.
 /// A presentation capacity the caller declares — the second command-line argument overrides it —
@@ -139,6 +144,8 @@ fn main() {
             std::process::exit(1);
         }
     };
+
+    let atlas = ConductAtlas::found(&census, FOUNDING_HORIZON);
 
     let mut holds: Vec<(String, bool, String)> = Vec::new();
 
@@ -202,7 +209,7 @@ fn main() {
     let mut earlier: BTreeMap<usize, (BTreeSet<SurfaceId>, BTreeSet<SurfaceId>)> = BTreeMap::new();
     let mut retained: Option<(usize, BTreeMap<SurfaceId, SeparationReading>)> = None;
     for (index, horizon) in HORIZONS.into_iter().enumerate() {
-        let reading = sweep(&census, horizon);
+        let reading = sweep(&census, &atlas, horizon);
         let partition = invariance_partition(&reading);
         earlier.insert(
             horizon,
@@ -365,7 +372,10 @@ fn main() {
                         row.verdict.is_conduct_invariant() && row.varying_axes().contains(axis)
                     })
             }),
-        format!("{nonempty_families} of 6 proper nonempty families carry a population"),
+        format!(
+            "{nonempty_families} of {} proper nonempty families carry a population",
+            ReceiverFamily::FULL.subsets().len() - 2
+        ),
     ));
 
     // ------------------------------------------------------------- the population, exhibited
@@ -493,8 +503,9 @@ fn main() {
          family achieves, which is how near the pole the material actually comes.\n"
     );
     println!(
-        "  {:<14} {:>6} {:>8} {:>7} {:>8} {:>9} {:>6}  {}",
-        "surface", "occ", "windows", "{kind}", "{weight}", "{density}", "min", "verdict"
+        "  {:<14} {:>6} {:>8} {:>7} {:>8} {:>9} {:>9} {:>6}  {}",
+        "surface", "occ", "windows", "{kind}", "{weight}", "{density}", "{conduct}", "min",
+        "verdict"
     );
     let mut predicted_hits = 0usize;
     let mut predicted_present = 0usize;
@@ -534,13 +545,14 @@ fn main() {
             .min()
             .unwrap_or(row.distinct_windows);
         println!(
-            "  {:<14} {:>6} {:>8} {:>7} {:>8} {:>9} {:>6}  {}",
+            "  {:<14} {:>6} {:>8} {:>7} {:>8} {:>9} {:>9} {:>6}  {}",
             format!("{name:?}"),
             row.occurrences,
             row.distinct_windows,
             at(ReceiverAxis::Kind),
             at(ReceiverAxis::Weight),
             at(ReceiverAxis::Density),
+            at(ReceiverAxis::Conduct),
             least,
             verdict
         );
@@ -658,7 +670,7 @@ fn main() {
     let mut organ_obstructed = 0usize;
     for surface in reading.keys() {
         for family in ReceiverFamily::FULL.subsets() {
-            match cross_check_family(&census, *surface, horizon, family, FAMILY_CHECK_CAPACITY) {
+            match cross_check_family(&census, &atlas, *surface, horizon, family, FAMILY_CHECK_CAPACITY) {
                 Ok(check) => {
                     checked += 1;
                     if check.organ_blocks == 1 {

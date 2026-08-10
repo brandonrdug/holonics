@@ -96,7 +96,8 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use crate::algebraic::CausalCellId;
 use crate::conditioned_derivation::{
-    ConditionedBody, ConditionedCircuit, ConditionedDerivationRefusal, FoundedMorphology, Passage,
+    ConditionedBody, ConditionedCircuit, ConditionedDerivationRefusal, ContactSpecies,
+    FoundedMorphology, Passage,
     PassageId, PassageOrigin,
 };
 use crate::derivation_atlas::{read_derivation, statement_vertex_key};
@@ -194,6 +195,19 @@ pub struct StatementLicence {
     pub brought_at: usize,
     /// The wholes of linguistic material that witnessed the stem. Lineage, never a tally.
     pub wholes: Vec<String>,
+    /// **What kind of contact this licence is** — simple, superposed, or crossed. Read off the two
+    /// covers at the site where the contact is formed, and carried rather than collapsed.
+    ///
+    /// A licence used to be a stem and two offsets, which says *that* the two identifiers meet and
+    /// nothing about *how*. The face says how many carriers are co-present at the site; the
+    /// crossings say which other stems share letters the bridging one cannot give up.
+    pub contact: ContactSpecies,
+    /// Every occurrence co-present with the bridging stem, on each side.
+    pub held_face: Vec<String>,
+    pub brought_face: Vec<String>,
+    /// The stems the bridging occurrence crosses, on each side.
+    pub held_crossings: Vec<String>,
+    pub brought_crossings: Vec<String>,
 }
 
 /// Why a candidate was refused, with the material that refused it.
@@ -227,6 +241,16 @@ pub enum StatementObstruction {
     },
     /// The composition changed nothing.
     ComposedStatementIsUnchanged { statement: String },
+    /// **The composed statement uses an identifier no earlier binder introduced.** `at` is the slot
+    /// position in span order, so the refusal names where the use is and not merely that there is
+    /// one. The bound/standing distinction is read off the population: an identifier the standing
+    /// statements never put in a binder-name position is a standing declaration and is free to be
+    /// used; one they do bind is a bound variable and must be bound before it is used.
+    IdentifierUsedBeforeItIsBound {
+        statement: String,
+        identifier: String,
+        at: usize,
+    },
     /// The artifact composed for this candidate did not read back reaching the composed statement.
     /// The analogue of `EmittedPassageMissedItsStatement` for this species, retained as a candidate
     /// obstruction rather than raised, so one malformed composition cannot void a population.
@@ -249,6 +273,10 @@ pub enum StatementObstruction {
 impl std::fmt::Display for StatementObstruction {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            Self::IdentifierUsedBeforeItIsBound { statement, identifier, at } => write!(
+                formatter,
+                "`{statement}` uses `{identifier}` at slot {at}, and no earlier binder introduces it"
+            ),
             Self::NoFoundedStemHoldsThem {
                 held,
                 held_cover,
@@ -311,6 +339,7 @@ impl StatementObstruction {
             Self::SlotLiesInGrammarResidue { .. } => "slot-lies-in-grammar-residue",
             Self::GrammarNeverWitnessedTheShape { .. } => "grammar-never-witnessed-the-shape",
             Self::BinderListLengthIsUnfounded { .. } => "binder-list-length-is-unfounded",
+            Self::IdentifierUsedBeforeItIsBound { .. } => "identifier-used-before-it-is-bound",
             Self::ComposedStatementIsUnchanged { .. } => "composed-statement-is-unchanged",
             Self::ReadBackMissedTheComposition { .. } => "read-back-missed-the-composition",
             Self::IdentifierNeverStoodInThisPosition { .. } => {
@@ -1335,6 +1364,17 @@ pub fn compose_artifact_in_scope(
     text
 }
 
+/// The stems of an occurrence family, canonically ordered.
+fn stem_names(occurrences: &[&crate::conditioned_derivation::StemOccurrence]) -> Vec<String> {
+    let mut stems: Vec<String> = occurrences
+        .iter()
+        .map(|occurrence| occurrence.stem.clone())
+        .collect();
+    stems.sort();
+    stems.dedup();
+    stems
+}
+
 /// Every committed founded stem that holds two identifiers together, with the offsets it stands at.
 fn licences(
     morphology: &FoundedMorphology,
@@ -1349,6 +1389,17 @@ fn licences(
             if here.stem != there.stem {
                 continue;
             }
+            let held_face = stem_names(&held_cover.face_at(here.at));
+            let brought_face = stem_names(&brought_cover.face_at(there.at));
+            let held_crossings = stem_names(&held_cover.crossings_of(here));
+            let brought_crossings = stem_names(&brought_cover.crossings_of(there));
+            let contact = if !held_crossings.is_empty() || !brought_crossings.is_empty() {
+                ContactSpecies::Crossed
+            } else if held_face.len() > 1 || brought_face.len() > 1 {
+                ContactSpecies::Superposed
+            } else {
+                ContactSpecies::Simple
+            };
             found.entry(here.stem.clone()).or_insert(StatementLicence {
                 stem: here.stem.clone(),
                 held_at: here.at,
@@ -1357,6 +1408,11 @@ fn licences(
                     .stem(&here.stem)
                     .map(|stem| stem.wholes.clone())
                     .unwrap_or_default(),
+                contact,
+                held_face,
+                brought_face,
+                held_crossings,
+                brought_crossings,
             });
         }
     }
@@ -1391,6 +1447,83 @@ pub fn adjudicate(
 /// `candidate.slot` — because a binder withdrawal or extension moves a whole group the population
 /// already witnessed and puts nothing anywhere new, so there is no place for a position licence to
 /// be about.
+/// The identifiers the standing population ever puts in a **binder-name** position. These are the
+/// bound variables of this material; everything else a statement uses is a standing declaration.
+///
+/// Read off the population and never authored: `Prop` and `Nat` appear only as types and heads, so
+/// they are standing; `P` and `h` appear as binder names, so they are bound and owe an introduction.
+fn population_binds(grammar: &RecoveredStatementGrammar, standing: &BTreeSet<String>) -> BTreeSet<String> {
+    let mut bound = BTreeSet::new();
+    for statement in standing {
+        let Some(reading) = grammar.reading(statement) else {
+            continue;
+        };
+        for slot in reading.slots() {
+            if slot.species == SlotSpecies::BinderName {
+                bound.insert(slot.occupant.clone());
+            }
+        }
+    }
+    bound
+}
+
+/// The first use, in span order, of an identifier the population binds and this statement has not
+/// yet introduced. `None` when every use is either standing or already bound.
+fn first_unbound_use(
+    statement: &str,
+    grammar: &RecoveredStatementGrammar,
+    standing: &BTreeSet<String>,
+) -> Option<(String, usize)> {
+    let binds = population_binds(grammar, standing);
+    // A composed statement is not in the standing population, so the recovered grammar has no
+    // reading of it to look up — it must be READ. Recovering over `standing ∪ {statement}` reads it
+    // under the population's own recovered rule rather than under one this check invented.
+    //
+    // The first form of this check called `grammar.reading(statement)` and got `None` on every
+    // composed candidate, so it returned "no unbound use" for all of them and admitted the same
+    // seven statements it was written to refuse. It fired on 2 candidates out of 437 and looked
+    // like it was working.
+    let owned;
+    let reading = match grammar.reading(statement) {
+        Some(reading) => reading,
+        None => {
+            let mut population = standing.clone();
+            population.insert(statement.to_owned());
+            owned = recover(&population).ok()?;
+            owned.reading(statement)?
+        }
+    };
+    // **Group by group, not slot by slot.** A binder group's carried type is checked against what
+    // EARLIER groups introduced, and only then are this group's own names introduced. Walking the
+    // flattened slot list instead admits `(P : P)` — the name counts as introduced before its own
+    // type is read — and `(P : P)` is a binder typed by itself, which no stratified type theory
+    // permits. This ordering is also the correct rule for dependent binders generally: `(P : Prop)
+    // (h : P)` stands because `P` came from an earlier group.
+    let mut introduced: BTreeSet<String> = BTreeSet::new();
+    let mut at = 0usize;
+    for group in &reading.binders {
+        if let Some(carried) = &group.carried
+            && binds.contains(&carried.occupant)
+            && !introduced.contains(&carried.occupant)
+        {
+            return Some((carried.occupant.clone(), at + group.names.len()));
+        }
+        for name in &group.names {
+            introduced.insert(name.occupant.clone());
+        }
+        at += group.names.len() + usize::from(group.carried.is_some());
+    }
+    if let Some(BodyReading::Applied { head, arguments }) = &reading.body {
+        for slot in std::iter::once(head).chain(arguments.iter()) {
+            if binds.contains(&slot.occupant) && !introduced.contains(&slot.occupant) {
+                return Some((slot.occupant.clone(), at));
+            }
+            at += 1;
+        }
+    }
+    None
+}
+
 pub fn adjudicate_conditioned(
     candidate: &CandidateStatement,
     grammar: &RecoveredStatementGrammar,
@@ -1538,6 +1671,26 @@ pub fn adjudicate_conditioned(
             }
         }
 
+    // LAST. SCOPE. An identifier used in a type, head or argument position must already have been
+    //    introduced by a binder in the same statement, unless the population treats it as a standing
+    //    declaration.
+    //
+    //    **This is not a semantics claim and it needs no grammar of meaning**, which is what an
+    //    earlier reading of this ceiling wrongly said was owed. It is read off the population: an
+    //    identifier the standing statements only ever USE and never BIND is a standing declaration
+    //    (`Prop`, `Nat`, `exactCarrier`); one the population does bind is a bound variable and must
+    //    be bound before it is used. The composition ran without this and admitted
+    //    `|- (h : P) (P : Prop) : exactCarrier P`, which uses `P` a group before introducing it, and
+    //    `|- (h : Prop) : exactCarrier P`, whose target names a `P` nothing binds.
+    if let Some((identifier, at)) = first_unbound_use(&candidate.statement, grammar, standing) {
+        return Ok(StatementAdmission::Refused(
+            StatementObstruction::IdentifierUsedBeforeItIsBound {
+                statement: candidate.statement.clone(),
+                identifier,
+                at,
+            },
+        ));
+    }
     Ok(StatementAdmission::Admitted {
         licences: found,
         carried_aperture,
@@ -2319,15 +2472,19 @@ mod tests {
             stem: "exact".to_owned(),
         }));
 
-        // and every reopened route is accounted for by a proper factor of the removed stem: `exact`
-        // had been suppressing the occurrences it contains, and removing it returns them
-        assert!(!ablation.routes_reopened.is_empty());
-        for reopened in &ablation.routes_reopened {
-            assert!(reopened
-                .stems
-                .iter()
-                .any(|stem| "exact".contains(stem.as_str()) && stem != "exact"));
-        }
+        // **Re-founded 2026-08-09.** This asserted that removing `exact` REOPENS the occurrences it
+        // contains. That held only while `FoundedMorphology::cover` deleted every contained
+        // occurrence at construction: `act` and `x` were invisible until `exact` left. The cover is
+        // retained now, so they stand from the beginning and there is nothing to reopen.
+        //
+        // The removal half is untouched and still asserted above — `removes_structure` holds and the
+        // route departs by name. What is regraded is only the reopening, which was a **receiver
+        // artifact of the reduction** rather than a property of the material.
+        assert!(
+            ablation.routes_reopened.is_empty(),
+            "nothing was suppressed, so nothing reopens: {:?}",
+            ablation.routes_reopened
+        );
 
         // every departed statement was founded before and is not founded after
         for departed in &ablation.statements_departed {
@@ -2352,10 +2509,24 @@ mod tests {
             .routes_departed
             .iter()
             .any(|route| route.statement == statement));
-        assert!(ablation
-            .routes_reopened
-            .iter()
-            .any(|route| route.statement == statement));
+        // Re-founded with its sibling above: the statement survives because several stems reach it,
+        // and that survival is now visible directly — it stands in `statements_after` — rather than
+        // through a reopening the constructor's reduction had manufactured.
+        assert!(ablation.routes_reopened.is_empty());
+        assert!(
+            ablation
+                .routes_departed
+                .iter()
+                .filter(|route| route.statement == statement)
+                .count()
+                < ablation
+                    .statements_before
+                    .iter()
+                    .filter(|carried| carried.as_str() == statement)
+                    .count()
+                    + ablation.routes_departed.len(),
+            "the statement is over-determined: losing one route does not lose it"
+        );
     }
 
     #[test]

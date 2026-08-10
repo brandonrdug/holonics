@@ -167,6 +167,33 @@ pub const DECLARATION_FORMERS: [&str; 12] = [
     "structure", "theorem", "variable",
 ];
 
+/// The formers that can **name** the derivation this reading returns.
+///
+/// Lean makes `lemma` and `theorem` one thing. [`read_derivation`] knows only the second, so a text
+/// declaring more than one member of this list carries derivations the reading cannot name — and
+/// the reading's response to that was to keep whichever `theorem` happened to be last. It is
+/// refused instead; see [`DerivationApertureRefusal::PluralNamingDeclarations`].
+pub const NAMING_FORMERS: [&str; 2] = ["lemma", "theorem"];
+
+/// Modifiers Lean permits between column zero and a former. Declaration syntax, recruited by
+/// nothing, and stepped over when the aperture counts what a text declares.
+pub const NAMING_MODIFIERS: [&str; 6] = [
+    "noncomputable",
+    "private",
+    "protected",
+    "partial",
+    "unsafe",
+    "public",
+];
+
+/// Lean's comment openers. `/--` and `/-!` are `/-` with one further character, so two openers
+/// cover all four forms, and `--` runs to end of line.
+///
+/// **The declared bound: string literals are not tracked.** A `--` inside a string is read as a
+/// comment opener, which is the same bound [`crate::lean_development`] declares for the same
+/// reason — carrying string state is a change to what the reading means.
+pub const COMMENT_OPENERS: [&str; 2] = ["--", "/-"];
+
 /// What one deposited artifact declares.
 ///
 /// `recruited` is a **multiset**: the symbol and the exact number of times the source named it.
@@ -190,25 +217,261 @@ impl Derivation {
     }
 }
 
-/// The identifier tokens of one line, in source order. A token begins with a letter or `_` and
-/// continues through letters, digits, `_` and `.`, so `Nat.zero` is one token and `00012` is none.
-fn identifier_tokens(line: &str) -> impl Iterator<Item = &str> {
-    line.split(|c: char| !(c.is_alphanumeric() || c == '_' || c == '.'))
-        .filter(|token| {
-            token
-                .chars()
-                .next()
-                .is_some_and(|first| first.is_alphabetic() || first == '_')
-        })
+/// The identifier tokens of one line, in source order — **the rule that decides what a recruitment
+/// is**, for this module and for every organ that restates it.
+///
+/// A token **begins** with a letter or `_`. It **continues** through letters, digits, `_`, `'`,
+/// `!`, `?`, and a `.` that stands between two continuation characters. So `Nat.zero` is one token,
+/// `00012` is none, `contrapose!` is one and not `contrapose`, `hab'` is one and not `hab`, and the
+/// `.` of `(f x).1` opens nothing.
+///
+/// **Begin and continue are two classes, and that separation is the repair.** The rule was one
+/// class applied by `split`, which made `'`, `!` and `?` separators: `getElem?_eq` returned as
+/// `getElem` and `hab'` merged with `hab`. Widening the single class instead would have made
+/// `!isEmpty` one token beginning with `!`, which the first-character filter then deletes whole —
+/// so two classes is what the fix requires and not a wider one. Measured on the 103 artifacts this
+/// reading admits, `contrapose!` occurs 5 times and was returned as `contrapose`; the generator
+/// that writes it is `soma/life/src/lean_mathematics/ecology.rs:733`.
+///
+/// **Declared bound: a guillemet identifier `«a b»` is read as its interior words.** Lean permits
+/// spaces inside `«…»` and no line-splitting rule can carry that; a scanner that could is a change
+/// to what the reading means.
+///
+/// **This is `pub` because two organs restate it by hand and one of them claims they cannot
+/// drift.** `collocation::lean_line_items` (`collocation.rs:944`) and
+/// `derivation_capacitance::named_lines` (`derivation_capacitance.rs:530`) each carry a copy of the
+/// old single-class expression; `collocation`'s own documentation says *"the three exclusions are
+/// the same three and they are taken from the same two public tables, so the vocabularies cannot
+/// drift apart"*, which was true of the vocabularies and never of the tokenizer, because the
+/// tokenizer was not a public table. It is one now.
+pub fn identifier_tokens(line: &str) -> impl Iterator<Item = &str> {
+    fn continues(character: char) -> bool {
+        character.is_alphanumeric()
+            || character == '_'
+            || character == '\''
+            || character == '!'
+            || character == '?'
+    }
+
+    let mut tokens = Vec::new();
+    let mut index = 0usize;
+    while index < line.len() {
+        let character = line[index..].chars().next().expect("index is a boundary");
+        if !(character.is_alphabetic() || character == '_') {
+            index += character.len_utf8();
+            continue;
+        }
+        let start = index;
+        loop {
+            while let Some(next) = line[index..].chars().next() {
+                if !continues(next) {
+                    break;
+                }
+                index += next.len_utf8();
+            }
+            if line[index..].starts_with('.')
+                && line[index + 1..].chars().next().is_some_and(continues)
+            {
+                index += 1;
+                continue;
+            }
+            break;
+        }
+        tokens.push(&line[start..index]);
+    }
+    tokens.into_iter()
 }
 
-/// Parse one Lean artifact into what it names and what it recruited.
+/// **The aperture of [`read_derivation`], stated as the population of ways a text can fall outside
+/// it.** Not a doc comment: a value, returned, carrying the material that put it there.
+///
+/// The reading has no comment lexer and one naming former. Against the machine's own export codec
+/// — one artifact, one `theorem`, no comment text — those are not bounds at all, and the reading is
+/// exact. Against a development a person wrote they are the whole story, and until 2026-08-09 the
+/// reading answered anyway: over a 200-file mathlib sample it returned a `Derivation` for 139 of
+/// them, named the file's **last** `theorem` in 137, and charged that one theorem a mean of 289
+/// recruited symbols — up to 1,098 — including `Copyright`, `Authors`, `Apache`, `Released` and
+/// `license` off the copyright header, in all 139.
+///
+/// `CLAUDE.md` §8: *"An organ used past its declared aperture is a defect even when it appears to
+/// return."* It appeared to return. This type is that aperture made refusable.
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, thiserror::Error)]
+#[serde(rename_all = "kebab-case")]
+pub enum DerivationApertureRefusal {
+    /// The text carries comment text, and the reading has no comment lexer — every word inside a
+    /// `/- … -/` or after a `--` enters the recruitment multiset as though the derivation had named
+    /// it. English prose charged to a theorem is not a recruitment population.
+    #[error(
+        "comment text: `{opener}` at line {first_line}, entered {opener_lines} times across \
+         {total_lines} lines; this reading has no comment lexer and would charge that prose to \
+         the theorem as recruitment"
+    )]
+    CommentText {
+        /// The opener that first put the reading inside a comment.
+        opener: String,
+        /// One-based line it sits on.
+        first_line: usize,
+        /// How many lines carry an opener. A four-line `/- … -/` block carries one, so this counts
+        /// **entries into** comment text and never comment lines; the reading has no lexer that
+        /// could tell it where a block ends, which is the clause.
+        opener_lines: usize,
+        /// How many lines the text has, so the share is visible without re-reading it.
+        total_lines: usize,
+    },
+    /// The text declares more than one of [`NAMING_FORMERS`]. The reading names one derivation, so
+    /// the others would be silently absorbed — their statements discarded and their tokens charged
+    /// to whichever survived.
+    #[error(
+        "{} naming declarations ({}); this reading names one and would absorb the rest",
+        names.len(),
+        names.join(", ")
+    )]
+    PluralNamingDeclarations {
+        /// Every `theorem`/`lemma` the text declares, written `line:former name`, in source
+        /// order. The population the reading would have thrown away.
+        names: Vec<String>,
+        /// The one the historical reading would have named: the last `theorem`.
+        would_have_named: Option<String>,
+    },
+    /// The text declares no `theorem` at all. The reading's oldest refusal, given a name.
+    #[error("no theorem is declared")]
+    NoTheoremDeclared,
+}
+
+/// Every way `text` falls outside [`read_derivation`]'s aperture, in the declared order.
+///
+/// All of them, not the first, because a species count taken from a first-obstruction reading is a
+/// measurement of the check order rather than of the material.
+pub fn derivation_aperture_obstructions(text: &str) -> Vec<DerivationApertureRefusal> {
+    let mut refusals = Vec::new();
+
+    let mut comment_lines = 0usize;
+    let mut first_comment: Option<(usize, &str)> = None;
+    let mut total_lines = 0usize;
+    for (index, line) in text.lines().enumerate() {
+        total_lines += 1;
+        let opener = COMMENT_OPENERS
+            .iter()
+            .filter_map(|opener| line.find(opener).map(|at| (at, *opener)))
+            .min();
+        if let Some((_, opener)) = opener {
+            comment_lines += 1;
+            first_comment.get_or_insert((index + 1, opener));
+        }
+    }
+    if let Some((first_line, opener)) = first_comment {
+        refusals.push(DerivationApertureRefusal::CommentText {
+            opener: opener.to_owned(),
+            first_line,
+            opener_lines: comment_lines,
+            total_lines,
+        });
+    }
+
+    let naming = naming_declarations(text);
+    if naming.len() > 1 {
+        refusals.push(DerivationApertureRefusal::PluralNamingDeclarations {
+            would_have_named: naming
+                .iter()
+                .rev()
+                .find(|(_, former, _)| *former == "theorem")
+                .map(|(_, _, name)| name.clone()),
+            names: naming
+                .iter()
+                .map(|(line, former, name)| format!("{line}:{former} {name}"))
+                .collect(),
+        });
+    }
+
+    if !naming.iter().any(|(_, former, _)| *former == "theorem") {
+        refusals.push(DerivationApertureRefusal::NoTheoremDeclared);
+    }
+
+    refusals
+}
+
+/// Every `theorem`/`lemma` the text declares, as `(one-based line, former, name)`.
+///
+/// A leading `@[…]` attribute bracket and the [`NAMING_MODIFIERS`] are stepped over, because a
+/// `@[simp] theorem` is a theorem the reading would absorb exactly as silently as a bare one.
+fn naming_declarations(text: &str) -> Vec<(usize, &'static str, String)> {
+    let mut found = Vec::new();
+    for (index, line) in text.lines().enumerate() {
+        let mut rest = line.trim();
+        if let Some(after) = rest.strip_prefix('@') {
+            let Some(close) = after.find(']') else {
+                continue;
+            };
+            rest = after[close + 1..].trim_start();
+        }
+        loop {
+            let stepped = NAMING_MODIFIERS.iter().find_map(|modifier| {
+                rest.strip_prefix(modifier)
+                    .filter(|after| after.starts_with(char::is_whitespace))
+            });
+            match stepped {
+                Some(after) => rest = after.trim_start(),
+                None => break,
+            }
+        }
+        for former in NAMING_FORMERS {
+            let Some(after) = rest.strip_prefix(former) else {
+                continue;
+            };
+            if !after.starts_with(char::is_whitespace) {
+                continue;
+            }
+            let name = after
+                .trim_start()
+                .split(|c: char| !(c.is_alphanumeric() || c == '_' || c == '.' || c == '\''))
+                .next()
+                .unwrap_or_default()
+                .to_owned();
+            if !name.is_empty() {
+                found.push((index + 1, former, name));
+            }
+            break;
+        }
+    }
+    found
+}
+
+/// Parse one Lean artifact into what it names and what it recruited, **or return the aperture
+/// clause that refuses it**.
 ///
 /// Deliberately structural and shallow: this reads what the file *declares*, not what it means. A
 /// deeper reading would be a semantics claim, and the export codec's job is not to supply one. The
 /// three exclusion rules — codec vocabulary, what the line founds, single-character binders — are
 /// stated in the module documentation and each has a test that fails if it moves.
+///
+/// What is *not* in the module documentation, because a bound stated in prose is a bound nothing
+/// can enforce, is [`DerivationApertureRefusal`]. A text outside the aperture returns the clause
+/// that excludes it and no `Derivation` at all. For a development a person wrote — mathlib, or
+/// `soma/formal` — the reader is [`crate::lean_development::read_development`], which opens every
+/// top-level declaration, separates comment text, and returns what it set aside.
+pub fn read_derivation_within_aperture(
+    text: &str,
+) -> Result<Derivation, DerivationApertureRefusal> {
+    match derivation_aperture_obstructions(text).into_iter().next() {
+        Some(refusal) => Err(refusal),
+        // Inside the aperture the parse cannot fail: the `NoTheoremDeclared` clause has already
+        // established that a `theorem` line is present for it to name.
+        None => parse_within_aperture(text).ok_or(DerivationApertureRefusal::NoTheoremDeclared),
+    }
+}
+
+/// [`read_derivation_within_aperture`] with the clause dropped.
+///
+/// Retained at this name and this signature because twelve drivers and six other modules call it,
+/// almost all over the machine's own deposit, where no clause fires and the reading is exact —
+/// measured at 103 of 103 artifacts under `standing/output`. `None` is now a
+/// **refusal** and never a partial reading: nothing here returns a `Derivation` for material the
+/// aperture excludes.
 pub fn read_derivation(text: &str) -> Option<Derivation> {
+    read_derivation_within_aperture(text).ok()
+}
+
+fn parse_within_aperture(text: &str) -> Option<Derivation> {
     let mut recruited: BTreeMap<String, u32> = BTreeMap::new();
     let mut name = None;
     let mut statement = None;
@@ -1216,6 +1479,240 @@ mod tests {
     #[test]
     fn a_source_declaring_no_theorem_is_not_a_derivation() {
         assert_eq!(read_derivation("namespace Soma\nend Soma\n"), None);
+        assert_eq!(
+            read_derivation_within_aperture("namespace Soma\nend Soma\n"),
+            Err(DerivationApertureRefusal::NoTheoremDeclared)
+        );
+    }
+
+    // ---------------------------------------------------------------- the aperture
+
+    /// `Mathlib/Algebra/Order/Group/Bounds.lean`, byte for byte, from the toolchain this repository
+    /// already vendors. Quoted rather than read from disk so the test carries no filesystem frame,
+    /// exactly as the deposited fixtures above are.
+    ///
+    /// It is here because it is **material that made the reading lie**: a copyright block, a module
+    /// docstring, and four theorems, of which the reading named the fourth and charged it the other
+    /// three plus the header.
+    const MATHLIB_BOUNDS: &str = r#"/-
+Copyright (c) 2017 Johannes Hölzl. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Johannes Hölzl, Yury Kudryashov
+-/
+module
+
+public import Mathlib.Order.Bounds.Basic
+public import Mathlib.Algebra.Order.Monoid.Defs
+public import Mathlib.Algebra.Order.Group.Unbundled.Basic
+
+/-!
+# Least upper bound and the greatest lower bound in linear ordered additive commutative groups
+-/
+
+public section
+
+section LinearOrderedAddCommGroup
+
+variable {α : Type*} [AddCommGroup α] [LinearOrder α] [IsOrderedAddMonoid α] {s : Set α} {a ε : α}
+
+theorem IsGLB.exists_between_self_add (h : IsGLB s a) (hε : 0 < ε) : ∃ b ∈ s, a ≤ b ∧ b < a + ε :=
+  h.exists_between <| lt_add_of_pos_right _ hε
+
+theorem IsGLB.exists_between_self_add' (h : IsGLB s a) (h₂ : a ∉ s) (hε : 0 < ε) :
+    ∃ b ∈ s, a < b ∧ b < a + ε :=
+  h.exists_between' h₂ <| lt_add_of_pos_right _ hε
+
+theorem IsLUB.exists_between_sub_self (h : IsLUB s a) (hε : 0 < ε) : ∃ b ∈ s, a - ε < b ∧ b ≤ a :=
+  h.exists_between <| sub_lt_self _ hε
+
+theorem IsLUB.exists_between_sub_self' (h : IsLUB s a) (h₂ : a ∉ s) (hε : 0 < ε) :
+    ∃ b ∈ s, a - ε < b ∧ b < a :=
+  h.exists_between' h₂ <| sub_lt_self _ hε
+
+end LinearOrderedAddCommGroup
+"#;
+
+    #[test]
+    fn a_real_mathlib_file_is_refused_by_name_rather_than_read_as_its_last_theorem() {
+        assert_eq!(read_derivation(MATHLIB_BOUNDS), None);
+
+        let refusals = derivation_aperture_obstructions(MATHLIB_BOUNDS);
+        assert_eq!(refusals.len(), 2, "{refusals:?}");
+
+        // The copyright block opens on line one and the reading has no lexer for it. Without the
+        // clause, `Copyright`, `Johannes`, `Apache`, `Released`, `LICENSE`, `Authors` and the
+        // module docstring's English entered the recruitment multiset of a theorem.
+        match &refusals[0] {
+            DerivationApertureRefusal::CommentText {
+                opener,
+                first_line,
+                opener_lines,
+                total_lines,
+            } => {
+                assert_eq!(opener, "/-");
+                assert_eq!(*first_line, 1);
+                // The copyright block and the module docstring. A `-/` closer carries neither
+                // opener, which is exactly why the reading cannot be given a comment rule here.
+                assert_eq!(*opener_lines, 2);
+                assert_eq!(*total_lines, 36);
+            }
+            other => panic!("{other:?}"),
+        }
+
+        // Four theorems. The reading names one, and the one it named is exhibited beside the
+        // population it would have absorbed, so the refusal carries the fiction it replaced.
+        match &refusals[1] {
+            DerivationApertureRefusal::PluralNamingDeclarations {
+                names,
+                would_have_named,
+            } => {
+                assert_eq!(
+                    names,
+                    &[
+                        "22:theorem IsGLB.exists_between_self_add".to_owned(),
+                        "25:theorem IsGLB.exists_between_self_add'".to_owned(),
+                        "29:theorem IsLUB.exists_between_sub_self".to_owned(),
+                        "32:theorem IsLUB.exists_between_sub_self'".to_owned(),
+                    ]
+                );
+                assert_eq!(
+                    would_have_named.as_deref(),
+                    Some("IsLUB.exists_between_sub_self'")
+                );
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    /// The distinguishing word, in `CLAUDE.md` §8's sense: one line separates a return from a
+    /// refusal, and the material either side of it is the machine's own deposited artifact. A gate
+    /// that cannot come apart on its declared material has not gated anything.
+    #[test]
+    fn one_comment_line_separates_a_deposited_artifact_from_its_own_refusal() {
+        let admitted = read_derivation_within_aperture(PRODUCTION_ROUTE_A)
+            .expect("the deposit is inside the aperture");
+        assert_eq!(admitted.name, "carrier_transport");
+
+        let commented = format!("-- composed by the export codec\n{PRODUCTION_ROUTE_A}");
+        match read_derivation_within_aperture(&commented) {
+            Err(DerivationApertureRefusal::CommentText {
+                opener, first_line, ..
+            }) => {
+                assert_eq!(opener, "--");
+                assert_eq!(first_line, 1);
+            }
+            other => panic!("{other:?}"),
+        }
+        assert_eq!(read_derivation(&commented), None);
+    }
+
+    #[test]
+    fn a_lemma_beside_a_theorem_is_a_naming_population_this_reading_cannot_name() {
+        // `lemma` and `theorem` are one thing in Lean and this reading knows the second. Two
+        // naming declarations are two derivations; it returns one, so it returns neither.
+        let two = "namespace Soma\nlemma helper (h : P) : P := h\ntheorem carried (h : P) : P := helper h\nend Soma\n";
+        match read_derivation_within_aperture(two) {
+            Err(DerivationApertureRefusal::PluralNamingDeclarations {
+                names,
+                would_have_named,
+            }) => {
+                assert_eq!(
+                    names,
+                    &[
+                        "2:lemma helper".to_owned(),
+                        "3:theorem carried".to_owned()
+                    ]
+                );
+                assert_eq!(would_have_named.as_deref(), Some("carried"));
+            }
+            other => panic!("{other:?}"),
+        }
+
+        // And the control: the same text with the lemma removed is admitted, so the clause is
+        // firing on the plurality and not on anything else in the material.
+        let one = "namespace Soma\ntheorem carried (h : P) : P := helper h\nend Soma\n";
+        assert_eq!(
+            read_derivation_within_aperture(one)
+                .expect("one naming declaration")
+                .name,
+            "carried"
+        );
+    }
+
+    /// An attribute bracket and a modifier do not hide a declaration from the clause. `@[simp]
+    /// theorem` and `private theorem` are theorems the reading would absorb exactly as silently as
+    /// a bare one.
+    #[test]
+    fn an_attribute_or_a_modifier_does_not_hide_a_naming_declaration_from_the_clause() {
+        let decorated = "theorem carried (h : P) : P := h\n@[simp] theorem marked (h : P) : P := h\nprivate theorem hidden (h : P) : P := h\n";
+        match read_derivation_within_aperture(decorated) {
+            Err(DerivationApertureRefusal::PluralNamingDeclarations { names, .. }) => {
+                assert_eq!(names.len(), 3, "{names:?}");
+                assert!(names[1].ends_with("theorem marked"), "{names:?}");
+                assert!(names[2].ends_with("theorem hidden"), "{names:?}");
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    /// The prime, the bang and the question mark are **continuations**, and the witness is the
+    /// machine's own production.
+    ///
+    /// `soma/life/src/lean_mathematics/ecology.rs:733` writes `"by\n  contrapose! {}\n  exact
+    /// {application}"`, so `contrapose!` occurs 5 times across the 103 artifacts under
+    /// `standing/output` and the reading returned `contrapose` for every one of them. The other two
+    /// characters carry no witness in the present deposit and are declared here rather than left to
+    /// be discovered: they are exercised by material this test supplies, so the rule is not a law
+    /// that returns zero.
+    #[test]
+    fn a_prime_a_bang_and_a_question_mark_continue_an_identifier_rather_than_ending_it() {
+        let produced = read(
+            "namespace Soma\ntheorem formal_carry (h : P) : exactCarrier P := by\n  contrapose! exact_chart_carry\n  assumption\nend Soma\n",
+        );
+        assert_eq!(produced.recruited.get("contrapose!"), Some(&1));
+        assert_eq!(produced.recruited.get("contrapose"), None);
+
+        let declared = read(
+            "namespace Soma\ntheorem formal_carry (h : P) : exactCarrier P := by\n  rw [getElem?_eq, hab', hab]\n  assumption\nend Soma\n",
+        );
+        assert_eq!(declared.recruited.get("getElem?_eq"), Some(&1));
+        assert_eq!(declared.recruited.get("getElem"), None);
+        // `hab` and `hab'` are two symbols, not one named twice. Under
+        // `RecruitmentCoefficient::Multiplicity` the difference is a boundary coefficient.
+        assert_eq!(declared.recruited.get("hab'"), Some(&1));
+        assert_eq!(declared.recruited.get("hab"), Some(&1));
+
+        // A token that BEGINS with `!` or `?` is not an identifier, and widening the single split
+        // class rather than separating begin from continue would have deleted the name inside it.
+        let prefixed = identifier_tokens("  exact !isEmpty ?goal").collect::<Vec<_>>();
+        assert_eq!(prefixed, vec!["exact", "isEmpty", "goal"]);
+
+        // And the `.` still joins only between two continuations.
+        let projected = identifier_tokens("(f x).1 Nat.zero trailing.").collect::<Vec<_>>();
+        assert_eq!(projected, vec!["f", "x", "Nat.zero", "trailing"]);
+    }
+
+
+    /// The negative control the clause needs: every artifact the machine's own codec deposits is
+    /// inside the aperture and reads exactly as it always did. A refusal that refused the deposit
+    /// would have replaced a fiction with a silence.
+    #[test]
+    fn every_deposited_artifact_stays_inside_the_declared_aperture() {
+        for artifact in [
+            PRODUCTION_ROUTE_A,
+            PRODUCTION_ROUTE_B,
+            WITNESS_CARRIER_TRANSPORT,
+            RESEARCH_FORMAL_CARRY,
+            WITNESS_EVERY_RECEIVER_AGREES,
+            SELF_RECRUITING_ROUTE,
+        ] {
+            assert_eq!(
+                derivation_aperture_obstructions(artifact),
+                Vec::new(),
+                "{artifact}"
+            );
+            assert!(read_derivation(artifact).is_some(), "{artifact}");
+        }
     }
 
     #[test]

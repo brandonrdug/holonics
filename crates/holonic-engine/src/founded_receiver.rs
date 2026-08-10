@@ -419,6 +419,32 @@ fn first_junction(collapsed: &[CollapsedPair]) -> Option<&CollapsedPair> {
 /// first sweep, which is how [`gyration`] takes a different path through the same material. It is
 /// never a filter on the *result* — a skipped junction is revisited once the skip list is spent.
 pub fn found_to_exhaustion(system: &dyn ObservedSystem, skip: &[(ItemId, ItemId)]) -> FoundedPanel {
+    found_in_order(system, &[], skip)
+}
+
+/// **Found these junctions FIRST, then proceed canonically.**
+///
+/// The difference from a skip list is the whole content and it decides what a gyration can see.
+/// Skipping a junction *removes* it and leaves every other junction in the same canonical scan
+/// order, so two skip-perturbed orders differ by an **omission** and the permutation they induce on
+/// the shared population is the identity — measured 0 of 190 on real corpus material by
+/// `examples/the_junction_returns_a_group_element`. Preferring a junction **moves** it, so the two
+/// orders differ by a genuine reordering and the gyration has a non-trivial group element to return.
+///
+/// This is what `Gyration`'s own claim was always about: `found(a)∘found(b)` against
+/// `found(b)∘found(a)` is a statement about which is taken **first**, not about which is left out.
+pub fn found_preferring(
+    system: &dyn ObservedSystem,
+    prefer: &[(ItemId, ItemId)],
+) -> FoundedPanel {
+    found_in_order(system, prefer, &[])
+}
+
+fn found_in_order(
+    system: &dyn ObservedSystem,
+    prefer: &[(ItemId, ItemId)],
+    skip: &[(ItemId, ItemId)],
+) -> FoundedPanel {
     let declared = system.receivers();
     let items = system.items();
     let bound = items.len().saturating_sub(1);
@@ -432,6 +458,7 @@ pub fn found_to_exhaustion(system: &dyn ObservedSystem, skip: &[(ItemId, ItemId)
         .max()
         .map_or(0u64, |top| top + 1);
     let mut deferred: BTreeSet<(ItemId, ItemId)> = skip.iter().copied().collect();
+    let preferred: BTreeSet<(ItemId, ItemId)> = prefer.iter().copied().collect();
 
     loop {
         let widened = WidenedSystem {
@@ -440,11 +467,18 @@ pub fn found_to_exhaustion(system: &dyn ObservedSystem, skip: &[(ItemId, ItemId)
         };
         let reading = compress(&widened);
 
-        // Deferred junctions are passed over first, then admitted once nothing else stands.
+        // Preferred junctions are taken first — that is what MOVES a junction rather than removing
+        // it, and it is the only perturbation that can produce a reordering. Deferred junctions are
+        // then passed over, and admitted once nothing else stands.
         let junction = reading
             .collapsed
             .iter()
-            .find(|pair| pair.witness.is_none() && !deferred.contains(&(pair.left, pair.right)))
+            .find(|pair| pair.witness.is_none() && preferred.contains(&(pair.left, pair.right)))
+            .or_else(|| {
+                reading.collapsed.iter().find(|pair| {
+                    pair.witness.is_none() && !deferred.contains(&(pair.left, pair.right))
+                })
+            })
             .or_else(|| first_junction(&reading.collapsed));
         let Some(pair) = junction else {
             // BLINDNESS IS EXHAUSTED. The other pressure remains: a block holding many items is an
@@ -867,6 +901,191 @@ impl Gyration {
     }
 }
 
+/// **The gyration read as a group element, which is what this module's own bound asked for.**
+///
+/// The header quotes `papers/source/papers/knot-causal-topology/main.typ:314-332` naming the
+/// object and stating its limit: *"The general object is **connection and holonomy**; the
+/// gyroparallelogram is one exact hyperbolic specialization."* [`Gyration`] returns that holonomy as
+/// three booleans and two lists — a flag. This returns it as an element of a group, and the group is
+/// **read off the material rather than declared**.
+///
+/// ## The derivation, which authors nothing
+///
+/// Both orders found junctions and, when [`Gyration::is_holonomy`] holds, arrive at the same panel.
+/// Out along one order and back along the other is therefore a **closed walk**. Over the junctions
+/// **both** orders founded, the right order is a reordering of the left, and that reordering is a
+/// permutation. It is the identity exactly when the two orders founded the shared population in the
+/// same sequence.
+///
+/// ```text
+///     shared = the junctions BOTH orders founded, in left order
+///     π(i)   = the position, in the right order, of the junction the left order founded i-th
+/// ```
+///
+/// Nothing is chosen: the population is the intersection, the ordering is each panel's own, and the
+/// degree is `shared.len()` — read off, never authored.
+///
+/// ## Why this is worth having, in one line
+///
+/// `[S_n, S_n] = A_n`, so the abelianization of a symmetric group is **exactly the sign**. An
+/// abelian holonomy on this material therefore carries **one bit** — even or odd. The group carries
+/// the **cycle type**, which is the conjugacy class and is basepoint-free, as it must be: which
+/// junction is founded "first" is a receiver-visible coordinate and promoting it into an invariant is
+/// `CLAUDE.md` §0's fourth lesson.
+///
+/// > **The abelian reading keeps the sign and discards the turn.** `CLAUDE.md` §2b, on this body's
+/// > own material: the discarded thing here is the cycle structure of the reordering.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct GyrationHolonomy {
+    /// The junctions both orders founded, in the left order. The walk is over exactly these.
+    pub shared: Vec<(ItemId, ItemId)>,
+    /// The reordering, as a group element over `shared.len()` points.
+    pub permutation: crate::structure_group::GroupElement,
+    /// Its conjugacy class in the symmetric group on `shared`. **The invariant.**
+    pub class: crate::structure_group::GroupElement,
+    /// The cycle type, ascending — the readable name of that class.
+    pub cycle_type: Vec<usize>,
+    /// The abelianized reading: `true` when the permutation is even. **This is the entire content an
+    /// integer or `±` holonomy could have carried on this material.**
+    pub is_even: bool,
+    /// The walk closed carrying nothing: the two orders founded the shared population identically.
+    pub is_trivial: bool,
+    /// Junctions one order founded and the other never did. These are outside the shared walk and
+    /// are retained rather than dropped, because a junction only one order reached is a real
+    /// difference that no permutation of the intersection can express.
+    pub unshared: usize,
+}
+
+/// Read a gyration as a group element. `None` when the two orders share no junction, so there is no
+/// walk to take and the question is not posed.
+pub fn gyration_holonomy(gyration: &Gyration) -> Option<GyrationHolonomy> {
+    use crate::structure_group::GroupElement;
+
+    let right_position: BTreeMap<(ItemId, ItemId), usize> = gyration
+        .right_order
+        .iter()
+        .enumerate()
+        .map(|(at, junction)| (*junction, at))
+        .collect();
+    // The shared population, in the LEFT order — the walk's own departure sequence.
+    let shared: Vec<(ItemId, ItemId)> = gyration
+        .left_order
+        .iter()
+        .filter(|junction| right_position.contains_key(*junction))
+        .copied()
+        .collect();
+    if shared.is_empty() {
+        return None;
+    }
+    // Rank the shared junctions by where the right order put them. Ranking rather than using the
+    // raw right-order index is what makes this a permutation of `shared` and not of `right_order`.
+    let mut by_right: Vec<usize> = (0..shared.len()).collect();
+    by_right.sort_by_key(|at| right_position[&shared[*at]]);
+    let mut permutation = vec![0u8; shared.len()];
+    for (rank, from) in by_right.into_iter().enumerate() {
+        permutation[from] = u8::try_from(rank).ok()?;
+    }
+    let element = GroupElement::Permutation(permutation.clone());
+    let cycle_type = permutation_cycle_type(&permutation);
+
+    // **The class is computed from the cycle type, and the symmetric group is never built.**
+    //
+    // Two permutations are conjugate in `S_n` exactly when their cycle types agree — a theorem, not
+    // a search — so the class has a canonical representative: the cycles laid down consecutively in
+    // ascending length. `structure_group::conjugacy_class` closes over the group's own elements,
+    // which is right for the orders it was written against (`Q_8` at 8, `A_5` at 60) and is a cost
+    // defect the moment a caller hands it a symmetric group. An earlier form of this function did
+    // exactly that and the driver died at `S_19` — 19! elements, from a class the cycle type names
+    // in linear time. `CLAUDE.md` §8: a cost law is a law, and an organ used past its declared
+    // aperture is a defect even when it appears to return.
+    let class = GroupElement::Permutation(canonical_class_representative(&cycle_type));
+    // Parity from the cycle type: a k-cycle is odd exactly when k is even.
+    let is_even = cycle_type.iter().filter(|length| **length % 2 == 0).count() % 2 == 0;
+
+    Some(GyrationHolonomy {
+        is_trivial: element.is_identity(),
+        shared,
+        permutation: element,
+        class,
+        cycle_type,
+        is_even,
+        unshared: gyration.only_left.len() + gyration.only_right.len(),
+    })
+}
+
+/// The canonical member of the conjugacy class a cycle type names: the cycles laid down
+/// consecutively, ascending. Two permutations of one degree are conjugate in `S_n` exactly when
+/// their cycle types agree, so this is a complete invariant of the class and costs `O(n)`.
+fn canonical_class_representative(cycle_type: &[usize]) -> Vec<u8> {
+    let degree: usize = cycle_type.iter().sum();
+    let mut representative = vec![0u8; degree];
+    let mut at = 0usize;
+    for length in cycle_type {
+        for step in 0..*length {
+            representative[at + step] = (at + (step + 1) % length) as u8;
+        }
+        at += length;
+    }
+    representative
+}
+
+/// The cycle type of a one-line permutation, ascending. Written here rather than borrowed because
+/// `arithmetic_monodromy`'s is private to the quintic catalogue and returns `Vec<u32>` over a
+/// different carrier; if a third caller appears, that is the moment to make one of them public
+/// rather than to keep a third copy.
+fn permutation_cycle_type(permutation: &[u8]) -> Vec<usize> {
+    let mut visited = vec![false; permutation.len()];
+    let mut lengths = Vec::new();
+    for start in 0..permutation.len() {
+        if visited[start] {
+            continue;
+        }
+        let mut cursor = start;
+        let mut length = 0usize;
+        while !visited[cursor] {
+            visited[cursor] = true;
+            cursor = usize::from(permutation[cursor]);
+            length += 1;
+        }
+        lengths.push(length);
+    }
+    lengths.sort_unstable();
+    lengths
+}
+
+/// **The population an abelian holonomy collapses on this body's own gyrations.**
+///
+/// Pairs of readings that agree on parity — everything a `±` or integer holonomy carries — and
+/// disagree on cycle type. This is `receiver_exact_compression`'s exact loss at the altitude of a
+/// structure group, and it is the falsifier `crate::structure_group` declares: **a run returning an
+/// empty population here has not shown the group doing anything**, and must say so rather than
+/// presenting agreement as a result.
+pub fn parity_collapsed_pairs(readings: &[GyrationHolonomy]) -> Vec<(usize, usize)> {
+    let mut collapsed = Vec::new();
+    for left in 0..readings.len() {
+        for right in (left + 1)..readings.len() {
+            // **Same degree, or the comparison is not a comparison.** Conjugacy is a relation
+            // *within* one symmetric group, and parity is the sign character *of that group*. Two
+            // readings over different shared populations live in different groups, so calling their
+            // cycle types unequal says only that the walks had different lengths.
+            //
+            // The first form of this function omitted that guard and its driver reported a green
+            // falsifier made entirely of identity permutations on 17, 18 and 19 points. `CLAUDE.md`
+            // §8: a check whose material cannot vary the property under test is the same defect as a
+            // check that cannot fail — this one wore a passing result while measuring length.
+            if readings[left].shared.len() != readings[right].shared.len() {
+                continue;
+            }
+            if readings[left].is_even == readings[right].is_even
+                && readings[left].cycle_type != readings[right].cycle_type
+            {
+                collapsed.push((left, right));
+            }
+        }
+    }
+    collapsed
+}
+
 /// Run the founding twice, taking a different junction first, and return the gyration.
 pub fn gyration(system: &dyn ObservedSystem) -> Gyration {
     let left = found_to_exhaustion(system, &[]);
@@ -901,6 +1120,113 @@ pub fn gyration_of(left: &FoundedPanel, right: &FoundedPanel) -> Gyration {
         only_right: right_set.difference(&left_set).copied().collect(),
         left_order,
         right_order,
+    }
+}
+
+#[cfg(test)]
+mod gyration_holonomy_tests {
+    use super::*;
+
+    fn junction(at: u64) -> (ItemId, ItemId) {
+        (ItemId(at), ItemId(at + 100))
+    }
+
+    /// A gyration carrying two declared founding orders. The founding itself is exercised by the
+    /// module's own tests; what is under test here is the **reading**.
+    fn gyration_over(left: &[u64], right: &[u64]) -> Gyration {
+        let left_order: Vec<_> = left.iter().copied().map(junction).collect();
+        let right_order: Vec<_> = right.iter().copied().map(junction).collect();
+        let left_set: BTreeSet<_> = left_order.iter().copied().collect();
+        let right_set: BTreeSet<_> = right_order.iter().copied().collect();
+        Gyration {
+            divergence: left_order
+                .iter()
+                .zip(right_order.iter())
+                .enumerate()
+                .find(|(_, (a, b))| a != b)
+                .map(|(step, (a, b))| (step, *a, *b)),
+            only_left: left_set.difference(&right_set).copied().collect(),
+            only_right: right_set.difference(&left_set).copied().collect(),
+            founded_agree: left_order == right_order,
+            partitions_agree: true,
+            conduct_agrees: true,
+            left_order,
+            right_order,
+        }
+    }
+
+    #[test]
+    fn two_orders_that_founded_the_same_sequence_return_the_identity() {
+        let reading = gyration_holonomy(&gyration_over(&[1, 2, 3], &[1, 2, 3])).expect("shares");
+        assert!(reading.is_trivial);
+        assert_eq!(reading.cycle_type, vec![1, 1, 1]);
+        assert!(reading.is_even);
+        assert_eq!(reading.unshared, 0);
+    }
+
+    #[test]
+    fn a_reordering_returns_its_cycle_type_and_the_degree_is_read_off_the_shared_population() {
+        // The right order swapped the last two. On two moved points that is a transposition.
+        let reading = gyration_holonomy(&gyration_over(&[1, 2, 3], &[1, 3, 2])).expect("shares");
+        assert!(!reading.is_trivial);
+        assert_eq!(reading.shared.len(), 3, "the degree is the shared population");
+        assert_eq!(reading.cycle_type, vec![1, 2]);
+        assert!(!reading.is_even, "a transposition is odd");
+    }
+
+    #[test]
+    fn junctions_only_one_order_founded_are_outside_the_walk_and_are_retained() {
+        let reading = gyration_holonomy(&gyration_over(&[1, 2, 9], &[2, 1, 7])).expect("shares");
+        assert_eq!(reading.shared, vec![junction(1), junction(2)]);
+        assert_eq!(reading.unshared, 2, "9 and 7 are each founded by one order only");
+        assert_eq!(reading.cycle_type, vec![2]);
+    }
+
+    #[test]
+    fn orders_sharing_no_junction_pose_no_walk() {
+        assert_eq!(gyration_holonomy(&gyration_over(&[1, 2], &[3, 4])), None);
+    }
+
+    /// **The falsifier, on gyrations.** `[S_n, S_n] = A_n`, so parity is the whole abelian reading.
+    /// A 3-cycle and a double transposition are both **even** and are different classes, so an
+    /// abelian holonomy calls them the same and the group does not.
+    #[test]
+    fn parity_collapses_two_readings_the_cycle_type_separates() {
+        let three_cycle =
+            gyration_holonomy(&gyration_over(&[1, 2, 3, 4], &[2, 3, 1, 4])).expect("shares");
+        let double_transposition =
+            gyration_holonomy(&gyration_over(&[1, 2, 3, 4], &[2, 1, 4, 3])).expect("shares");
+        assert_eq!(three_cycle.cycle_type, vec![1, 3]);
+        assert_eq!(double_transposition.cycle_type, vec![2, 2]);
+        assert!(three_cycle.is_even && double_transposition.is_even);
+
+        let collapsed = parity_collapsed_pairs(&[three_cycle, double_transposition]);
+        assert_eq!(collapsed, vec![(0, 1)], "one bit cannot tell these apart");
+    }
+
+    /// **The control.** Readings of different parity are separated by the abelian reading too, so
+    /// they are not in the collapsed population. Without this the test above would pass on an
+    /// instrument that reported every pair.
+    #[test]
+    fn readings_of_different_parity_are_not_collapsed() {
+        let transposition =
+            gyration_holonomy(&gyration_over(&[1, 2, 3], &[2, 1, 3])).expect("shares");
+        let three_cycle =
+            gyration_holonomy(&gyration_over(&[1, 2, 3], &[2, 3, 1])).expect("shares");
+        assert!(!transposition.is_even && three_cycle.is_even);
+        assert!(parity_collapsed_pairs(&[transposition, three_cycle]).is_empty());
+    }
+
+    /// The conjugacy class is basepoint-free where the element is not — the same property
+    /// `structure_group` proves on `Q_8`, holding on this material. Two gyrations that reorder
+    /// different junctions by the same *shape* share a class and differ as elements.
+    #[test]
+    fn the_class_identifies_reorderings_of_the_same_shape_at_different_junctions() {
+        let early = gyration_holonomy(&gyration_over(&[1, 2, 3], &[2, 1, 3])).expect("shares");
+        let late = gyration_holonomy(&gyration_over(&[1, 2, 3], &[1, 3, 2])).expect("shares");
+        assert_ne!(early.permutation, late.permutation, "different elements");
+        assert_eq!(early.class, late.class, "one class");
+        assert_eq!(early.cycle_type, late.cycle_type);
     }
 }
 
