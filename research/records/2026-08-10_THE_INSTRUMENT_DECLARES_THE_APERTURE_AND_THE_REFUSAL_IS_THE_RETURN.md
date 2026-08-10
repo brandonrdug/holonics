@@ -573,6 +573,50 @@ manifest has to exist before the next one happens rather than after.
 An orphan is reported and does not fail the check, because it is a measurement about the corpus and
 not a defect in the tool.
 
+### 7b.8 SELF-AUDIT, same day — what §7b actually established and what it did not
+
+**The summary sentence drifted from its own table, which is the defect §1.4 was corrected for this
+morning.** The closing report of this wave opened *"All seven roadmap items closed, in order"* and
+then listed item 4 as blocked and item 7 with nine orphans open. Twice in one day a summary asserted
+more than the table beneath it. The rule that catches it is cheap and is now stated: **read the table
+before writing the sentence that summarises it.**
+
+| item | exact and complete | necessary-only | stated, not built | undriven |
+|---|---|---|---|---|
+| 1 compass rung | the **refusal** — a non-power-of-two degree is refused structurally | the admission — sufficiency needs a 2-group closure | — | driven, 5 files |
+| 2 neusis rung | the refusal on non-3-smooth degree | the admission | **the arithmetic** — no `{2,3}`-tower carrier exists | driven |
+| 3 lattice rung | both predicates, derived | — | — | driven |
+| 4 order price | `⌈log₂(n!)⌉` | — | — | driven, but at `n = 1..2`, so **0 and 1 bit**: the mechanism is proven and the regime where `n log n` matters is untested |
+| 5 five cuts | the classification, on a theta graph | — | — | **zero drivers** |
+| 6a conducted return | the movement and its attribution | — | — | one fixture, one structure |
+| 6b induced placement | the split | — | — | **no caller**; both test matrices hand-built |
+| 7 closure manifest | 9 orphans of 33, measured | — | — | **nothing runs it** |
+
+**Three structural gaps, all mine:**
+
+1. **`spine_cut.rs` reaches nothing.** It was written to close *"the short-circuit cut has no
+   owner"*, and it now has an owner that no live reading passes through. Its only material is a
+   hand-made theta graph. `CLAUDE.md` §8 is explicit that reach is part of the grade; marking the
+   item closed was an overclaim and the roadmap is corrected.
+2. **Neither manifest checker runs.** `closure_manifest.py` joins `output_manifest.py` and
+   `holonic-architecture-lint` as verifiers nobody invokes. A verifier outside the gate sequence
+   detects nothing, and building the second one without wiring either is the same defect one file
+   wider.
+3. **The closure hash does not bind the input data.** It binds the driver, its crate's sources and
+   that crate's manifest. A driver whose **corpus** changed carries an unchanged closure hash, so it
+   answers *"did the code drift"* and not *"did the material drift"*. The name "closure" promises
+   more than the implementation delivers, and the record and roadmap now say so.
+
+**And one gap between a falsifier's wording and what was built.** Item 2's falsifier said the
+heptagon must *"return at the neusis rung"*. `NeusisVerdict::NecessaryConditionHolds` is not a
+return — nothing is constructed, and no root is produced. The code and its doc say this plainly; the
+`CLOSED` marking did not, and does now.
+
+**What stands unqualified:** the compass and lattice refusals, which are structural and cannot be
+moved by any bound; the `Σ K' = (1−2c) Σ K` derivation and its `c = 1/2` root; the crystallographic
+identification, derived from `niven_value` so the two cannot drift; the 9-of-33 orphan count; and
+both falsifications that fired against my own claims — §1.4's containment and the deposit-site design.
+
 ---
 
 ## 8 · Bounds

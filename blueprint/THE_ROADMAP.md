@@ -98,7 +98,11 @@ is deposited in place.
    real-material order price is unavailable and is not guessed. **This is a second instance of the
    prohibition this file already carries** — *"No aperture-less organ in the corpus path"* — which
    named only `eros_resonant_corpus_current`. Diagnosing and bounding it is the open work.
-5. ~~**The short-circuit cut has no owner.**~~ **CLOSED 2026-08-10.** The missing object was not one
+5. **The short-circuit cut — OWNER BUILT, NOT DRIVEN.** Marked `CLOSED` on first writing and
+   corrected the same day: `spine_cut.rs` has **zero drivers** and its only material is a hand-made
+   theta graph in `#[cfg(test)]`. By this file's own standard that is an organ that reaches nothing,
+   and the cut it names has still never been read off a live chain. **What remains is a driver that
+   classifies a real reading from this body.** The organ below is real; the item is not closed. The missing object was not one
    organ but the **classifier**: the spine says *"report which of rest, accumulation, leak, or short
    circuit applies"*, and naming the cut is a measurement no single place was making.
    `crates/holonic-engine/src/spine_cut.rs` takes a chain reading and a **declared load** and returns
@@ -120,18 +124,24 @@ is deposited in place.
    Falsifier met: the movement is non-zero **and attributable**, every moved structure naming the
    deposit inside it, with a `Closed`-structure control that deposits nothing and must not move.
 
-   **Second half CLOSED the same day.** `supported_realizers::induced_placement` joins
+   **Second half: API BUILT, NO CALLER.** `supported_realizers::induced_placement` joins
    `positive_form` to `inertia::inertia` on the conduct path, so `CLAUDE.md` §2's
    realization-causes-placement chain is no longer a test assertion. It returns the **split**, not a
    verdict — `MᵀM` is positive semi-definite by construction, so the inertia is `(rank, 0, nullity)`
    and the content is where the rank falls: **the null directions are exactly the realizer
    combinations that land on nothing**, which is the population §11's demand calls the certified
-   remainder. Controlled on an independent population (nullity 0) and a dependent one (nullity 1).
+   remainder. Controlled on an independent population (nullity 0) and a dependent one (nullity 1) —
+   but **both are hand-built matrices**, nothing on a conduct path calls `induced_placement`, and no
+   realizer population from `substitution_realizers` has been through it. The assertion moved out of
+   `#[cfg(test)]`; the conduct did not.
 7. **The evidence sinks — CLOSURE HALF CLOSED 2026-08-10, and it measured the sink.**
    `tools/closure_manifest.py` binds every return directory under `output/` to the **closure** that
    produced it — the driver source, every source file of its crate, and that crate's manifest — which
    is `CLAUDE.md` §0 lesson 1's second half, the half `tools/output_manifest.py` says in its own
-   header it does not carry. A content hash answers *"are these the bytes it was"*; only a closure
+   header it does not carry. **Two bounds, both mine and both stated late:** the closure binds the
+   driver, its crate's sources and that crate's manifest — it does **not** bind the input data, so a
+   driver whose corpus moved carries an unchanged closure hash; and **nothing runs the checker**,
+   exactly as nothing runs `output_manifest.py` or `holonic-architecture-lint`. A content hash answers *"are these the bytes it was"*; only a closure
    hash answers *"can this tree still produce them"*.
 
    **Measured on the first run: 9 orphans of 33 return directories.** Over a quarter of the evidence
