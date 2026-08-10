@@ -90,10 +90,36 @@ rung up. Truth status `derived`; checkable by the organ at `k = 2, 3` today.
       PIN         24 ->   0   the population is closed
 ```
 
-**The pin population is empty as of 2026-08-09.** All twenty-four were excised in two waves, each
-graded by its orbit rather than by a passing suite. The registry is now a ratchet against the *next*
-one rather than a backlog, and §5.0 and §5.4 are what a later reader needs: the orbits that were
-measured, and the levels no census can see.
+**The `PIN` population is empty as of 2026-08-09** — all twenty-four excised in two waves, each
+graded by its orbit rather than by a passing suite.
+
+**But "the population is closed" is FALSE, and it was false the day it was written.** The population
+is closed *as the census defines it*, and the census defines it by a regex over `const NAME: type =
+N;`. §5.4 records that blind spot; the instance below shows how large it can be.
+
+**`soma/life/src/lean_mathematics/ecology.rs` has zero `const` declarations, zero registry rows, and
+an entire authored proof generator inside it.** Five inline authored levels the census cannot see:
+
+```text
+:588   for tactic in ["assumption", "nlinarith", "linarith", "ring", "aesop"]
+:647   for projection in [1_u8, 2_u8]
+:653   for prefix in ["exact", "simpa using"]
+:698   for depth in [2_u8, 3_u8]
+:724   .filter(|binder| binder.explicit && binder.name.starts_with('h'))
+```
+
+**This is the organ behind the 9 kernel-admitted proofs cited all day as evidence.** It builds
+`LeanProofCandidate` from seven hand-written `LeanProofMotion` species, and its recursion depth, its
+tactic vocabulary, its projection arity and its prefix set are all authored inline.
+
+**And `:724` is the sharpest of them: an orthographic rule deciding which binders are hypotheses.**
+A binder is treated as a hypothesis because its *name begins with `h`*. That is the identical species
+as the conduct-axis refutation — an organ reading the **spelling** of a thing where it should read
+what the thing does — and it decides what every composed proof may use.
+
+**The reading rule this forces.** A count of dispositioned levels is a statement about the census, not
+about the tree. `PIN = 0` means *no `const` in library code is undispositioned*; it does not mean the
+machine authors no levels. Report it that way.
 
 **MATERIAL is three, and each names its theorem.** `FLAT_COORDINATION = 6` — six equilateral
 triangles tile `2π` exactly, and the angular defect is measured against it. `MAXIMUM_AVL_DEPTH = 128`
