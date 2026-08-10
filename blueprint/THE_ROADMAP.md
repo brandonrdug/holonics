@@ -70,15 +70,20 @@ Two records and one index, none of which builds anything:
 
 Each names the cut it closes and a falsifier. None of it is a new organ beside an existing one.
 
-1. **State `Multiquadratic`'s structural aperture in its own source, and join the two rungs.** The
+**Items 1–3 are CLOSED as of 2026-08-10; see `research/records/2026-08-10_THE_INSTRUMENT_DECLARES_THE_APERTURE…` §7b.**
+Item 3's driver falsified the record's own §1.4 on its first run — the polygon ladder is a **chain**,
+`lattice ⊊ compass ⊆ neusis ⊆ radicals`, not a set of incomparable instruments — and the correction
+is deposited in place.
+
+1. ~~**State `Multiquadratic`'s structural aperture in its own source, and join the two rungs.**~~ **CLOSED.** The
    module's aperture is not `DECLARED_KERNEL_BOUND`; it is `[ℚ(α):ℚ] = 2ⁿ`. *Falsifier:* the joined
    ladder must **refuse `∛2` in the compass chart and return it in the radical chart**, from one
    declared input, with the obstruction named. A ladder that returns everywhere has not been built.
-2. **The neusis rung.** Cube duplication, angle trisection and the regular heptagon are exactly what
+2. ~~**The neusis rung.**~~ **CLOSED** — aperture stated (3-smooth degree), no arithmetic carrier, and all three Greek problems cross. Cube duplication, angle trisection and the regular heptagon are exactly what
    a 2,3-tower reaches and a 2-tower does not. *Falsifier:* the heptagon must refuse at the compass
    rung and return at the neusis rung; MathWorld's only quantitative anchor is
    `8x⁶ − 20x⁴ + 12x² − 1 = 0` for `x = √2·cos(π/7)`.
-3. **Name the crystallographic restriction where it is computed**, and join `winding_inertia`'s Niven
+3. ~~**Name the crystallographic restriction where it is computed**~~ **CLOSED**, and join `winding_inertia`'s Niven
    set to the crystal reading of `2026-08-09_THE_COLOR_IS_A_RECEIVER_QUOTIENT…`. *Falsifier:* the
    pentagon must be **admitted by the compass and refused by the lattice** in the same run. Neither
    aperture contains the other, and a body that reports one verdict has collapsed two instruments.

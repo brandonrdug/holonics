@@ -79,7 +79,7 @@ builds its whole reading on — *"a crystal is not a container light passes thro
 that selects by phase"* — has its admissibility law already computed in a different module, under a
 different name, cross-checked against an independent Sturm isolation.**
 
-### 1.4 The demonstration: neither aperture contains the other
+### 1.4 The demonstration — CORRECTED 2026-08-10 by the driver that tested it
 
 | `n` | straightedge and compass | periodic lattice |
 |---|---|---|
@@ -89,9 +89,28 @@ different name, cross-checked against an independent Sturm isolation.**
 | 17 | admitted | forbidden |
 
 The pentagon is constructible and crystallographically impossible. **Two classical theorems disagree
-about the same object, and both are right, because an aperture belongs to the instrument.** That is
-the framework's own doctrine as two theorems rather than as a stated principle, and it is the
-cheapest available falsifier for anyone who wants to read an aperture as a property of the thing.
+about the same object, and both are right, because an aperture belongs to the instrument.**
+
+**This section read *"neither aperture contains the other"* until
+`examples/the_pentagon_divides_the_instruments.rs` was run and its control FAILED on the first
+attempt.** The claim is false, and provably so: every crystallographic order has `φ(n) ∈ {1,2}`, a
+power of two, so **the lattice aperture is contained in the compass aperture.** The pentagon
+witnesses that the containment is *strict*; there is no witness the other way, and the driver walked
+`n = 3..24` to look for one. Measured: compass-only `[5, 8, 10, 12, 15, 16, 17, 20, 24]`,
+**lattice-only `[]`**, both `[3, 4, 6]`, neither `[7, 9, 11, 13, 14, 18, 19, 21, 22, 23]`.
+
+**The corrected statement is stronger.** With the neusis rung above — every power of two is 3-smooth
+— the polygon ladder is a **chain**:
+
+```text
+   lattice  ⊊  compass  ⊆  neusis  ⊆  radicals
+```
+
+which makes the ladder an actual ladder rather than a set of incomparable instruments, and it is
+`CLAUDE.md` §8's rule working as intended: the control was written to fail, and it did.
+
+**The table above is unaffected** — all four of its rows already showed lattice ⊆ compass, and the
+summary sentence contradicted the table it was summarising.
 
 Quasicrystals are the same sentence one move on: drop periodicity — adjoin a channel — and five-fold
 symmetry is admitted. The instrument changed; the pentagon did not.
@@ -393,8 +412,21 @@ refused by neusis **and** by radicals, for different reasons: 5 is not 3-smooth,
 solvable.
 
 Controls: the neusis rung refuses somewhere and admits somewhere (2 / 7) — a rung that admits
-everything is not a rung; the pentagon does not cross and the heptagon does. Roadmap items 1 and 2
-are closed.
+everything is not a rung; the pentagon does not cross and the heptagon does.
+
+### 7b.2 The lattice rung — roadmap item 3
+
+`winding_inertia::{lattice_admits_order, polygon_turn_degree}`, the first **derived from
+`niven_value`** so the crystallographic restriction and Niven's theorem cannot drift apart, the
+second `φ(n)/2` by trial division with no table. Driven by
+`examples/the_pentagon_divides_the_instruments.rs` over `n = 3..24` against all three rungs.
+
+**The compass test is decisive for polygons and only necessary in general**, and the driver says why:
+a cyclotomic extension is **abelian**, so its Galois group is its own closure and a 2-power degree
+makes it a 2-group automatically. That is Gauss–Wantzel, and it is the reason
+`the_two_instruments_disagree` must report `NECESSARY-ONLY` where this driver may decide.
+
+**Its first run falsified §1.4** — see the correction there. Roadmap items 1, 2 and 3 are closed.
 
 ---
 

@@ -2434,3 +2434,124 @@ mod tests {
         );
     }
 }
+
+// -------------------------------------------------------------------------------------------------
+// The lattice rung: Niven's set is the crystallographic restriction, named where it is computed
+// -------------------------------------------------------------------------------------------------
+
+/// **Whether a periodic lattice admits a rotation of order `n`** — the crystallographic restriction.
+///
+/// # Why this is the same set [`niven_value`] already returns
+///
+/// A rotation of order `n` that preserves a lattice acts on a lattice basis by an **integer** matrix,
+/// so its trace is an integer. In two dimensions that trace is `2cos(2π/n)`, hence
+///
+/// ```text
+///   2cos(2π/n) ∈ ℤ   ⟹   2cos(2π/n) ∈ {2, 1, 0, −1, −2}   ⟹   n ∈ {1, 2, 3, 4, 6}
+/// ```
+///
+/// Niven's theorem gives the **rational** version of the same statement and returns the same five
+/// values — `d = 1 → 2`, `2 → −2`, `3 → −1`, `4 → 0`, `6 → 1` — because a rational algebraic integer
+/// is an integer. `proved-standard`.
+///
+/// **So this module has been computing the crystallographic restriction since it was written, under
+/// Niven's name.** That mattered because
+/// `research/records/2026-08-09_THE_COLOR_IS_A_RECEIVER_QUOTIENT_THE_CRYSTAL_IS_THE_COMPREHENSION…`
+/// builds an entire reading on the crystal as *"a receiver that selects by phase"* whose forbidden
+/// bands are *"the passages that return nothing"* — and its admissibility law was already here,
+/// cross-checked against an independent Sturm isolation, under a different name.
+///
+/// **This is derived from [`niven_value`] and not from a written-out list**, so the two cannot drift.
+pub fn lattice_admits_order(order: usize) -> bool {
+    order != 0 && niven_value(1, order).is_some()
+}
+
+/// Euler's totient, by trial division. Exact; no table.
+fn totient(n: usize) -> usize {
+    if n == 0 {
+        return 0;
+    }
+    let mut remaining = n;
+    let mut result = n;
+    let mut factor = 2usize;
+    while factor * factor <= remaining {
+        if remaining % factor == 0 {
+            while remaining % factor == 0 {
+                remaining /= factor;
+            }
+            result -= result / factor;
+        }
+        factor += 1;
+    }
+    if remaining > 1 {
+        result -= result / remaining;
+    }
+    result
+}
+
+/// **The degree over `ℚ` of a regular `n`-gon's turn coordinate `2cos(2π/n)`.**
+///
+/// `ℚ(ζ_n)` has degree `φ(n)`, and `2cos(2π/n) = ζ_n + ζ_n⁻¹` generates its maximal real subfield,
+/// of index two. So the degree is `φ(n)/2` for `n ≥ 3`, and `1` for `n ∈ {1,2}` where the coordinate
+/// is already rational. `proved-standard`.
+///
+/// **This is the quantity a construction instrument's aperture is applied to.** The regular `n`-gon
+/// is compass-constructible exactly when this degree is a power of two *and* the Galois closure is a
+/// 2-group — and for cyclotomic fields the extension is abelian, so the second condition is automatic
+/// and the degree test alone is decisive. That is Gauss–Wantzel: `φ(n)` a power of two, equivalently
+/// `n = 2^k` times distinct Fermat primes.
+pub fn polygon_turn_degree(sides: usize) -> usize {
+    match sides {
+        0 => 0,
+        1 | 2 => 1,
+        _ => totient(sides) / 2,
+    }
+}
+
+#[cfg(test)]
+mod lattice_rung_tests {
+    use super::*;
+
+    /// The crystallographic restriction, read off the Niven carrier rather than written down.
+    #[test]
+    fn the_lattice_admits_exactly_one_two_three_four_and_six() {
+        let admitted: Vec<usize> = (1..=24).filter(|n| lattice_admits_order(*n)).collect();
+        assert_eq!(admitted, vec![1, 2, 3, 4, 6]);
+        assert!(!lattice_admits_order(0));
+    }
+
+    /// `φ(n)/2`, checked against the values that decide the classical constructions.
+    #[test]
+    fn the_polygon_turn_degree_is_half_the_totient() {
+        assert_eq!(polygon_turn_degree(3), 1);
+        assert_eq!(polygon_turn_degree(4), 1);
+        assert_eq!(polygon_turn_degree(5), 2);
+        assert_eq!(polygon_turn_degree(6), 1);
+        assert_eq!(polygon_turn_degree(7), 3);
+        assert_eq!(polygon_turn_degree(9), 3);
+        assert_eq!(polygon_turn_degree(17), 8);
+        assert_eq!(polygon_turn_degree(257), 128);
+    }
+
+    /// **The pentagon divides the two instruments**, which is the whole content of the lattice rung.
+    #[test]
+    fn the_pentagon_is_compass_constructible_and_crystallographically_forbidden() {
+        use crate::multiquadratic::admits_degree;
+        // 5 is a Fermat prime, so φ(5)/2 = 2 is a power of two.
+        assert!(admits_degree(polygon_turn_degree(5)));
+        // and 5 is not in {1,2,3,4,6}.
+        assert!(!lattice_admits_order(5));
+
+        // The heptagon fails both: φ(7)/2 = 3.
+        assert!(!admits_degree(polygon_turn_degree(7)));
+        assert!(!lattice_admits_order(7));
+
+        // The hexagon passes both.
+        assert!(admits_degree(polygon_turn_degree(6)));
+        assert!(lattice_admits_order(6));
+
+        // And the 17-gon separates them the same way the pentagon does — Gauss's own case.
+        assert!(admits_degree(polygon_turn_degree(17)));
+        assert!(!lattice_admits_order(17));
+    }
+}
