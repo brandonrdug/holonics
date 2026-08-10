@@ -20,7 +20,88 @@ above "close the loop", because closing a loop adds no organ. Brandon, direct ru
 > *"this is 'holobrochos', you need to outline the spine of the machine and understand how all of
 > the loops and machinery connects and choreographs information transportation."*
 
-## The ratified order of work, 2026-08-09
+## WHERE THIS STANDS — revised 2026-08-10 at `9d15666`
+
+**Read this section and §"THE OPEN WORK, BY STATION". Everything between them is the returned ledger
+and its provenance.** Brandon authorised this revision directly: *"Regarding the roadmap document, you
+can authoritatively revise it once you have sufficient context post-analysis campaign."*
+
+**The 2026-08-09 ratified order below is executed.** Its Phase 1 mathlib link, both Phase 2 edges, and
+the front-interchange measurement all have drivers in the tree. It is retained as provenance, not as
+direction, and no item in it is open.
+
+**The frontier list in §"The frontier, ranked" was four-fifths stale on 2026-08-10** and is corrected
+in place. The measurements:
+
+| item | state at 2026-08-10 |
+|---|---|
+| the Tschirnhaus organ | **BUILT** — `crates/holonic-engine/src/quintic_chart.rs`, three drivers; `the_degree_is_a_rung` holds *"the wall is at four and the ladder crosses it"* over twelve inputs at degrees two to seven |
+| the float mouth on `reopening.rs` | **BUILT** — `ExactFace::from_binary_float` at `:492`, driven |
+| `SOURCE.json` | struck 2026-08-09, premise false |
+| `cross_ratio` invariance | **DRIVEN** — now `pub` at `receiver_atlas.rs:664`, driven by `the_swing_is_the_invariant` |
+| the evidence sinks | **STANDS, AND HAS DEGRADED** — `zz_smith_cost_probe` and `zz_torsion_width_law` are now gone from `target/` with their sources still uncommitted. Those cost laws are lost. |
+
+**Four of the spine's five cuts now conduct.** Circulation was dark on 2026-08-10 morning and
+`kelvin.rs` now has two drivers; rest, accumulation and leak carry. **The short-circuit cut still has
+no owner** — named in `canon/THE_HOLOBROCHOS_SPINE.md:70` and `:580`, zero hits in any `src/`.
+
+**Gates at `9d15666`:** `cargo test --workspace` **1,984 passed, 0 failed, 14 ignored** over 42
+`test result:` lines; `authored_levels --check` 0 failures; ten Typst roots compile;
+`resolve_named_paths` 0 failures.
+
+### What the 2026-08-10 analysis round added, and it is not a list of organs
+
+Two records and one index, none of which builds anything:
+
+- `research/records/2026-08-10_THE_MANIFOLD_IS_THE_INVARIANT_OF_THE_CURRENTS…` — the tower's rung is
+  the **hinge deficit**; the event-site hinge law's four branches against a solved orientation; the
+  grain-relative codimension, which is the tower's upward map; and the curvature flow's coefficient,
+  `Σ K' = (1 − 2c) Σ K`, so the derived `c = 1` is a **reflection** and `c = 1/2` the annihilator.
+- `research/records/2026-08-10_THE_INSTRUMENT_DECLARES_THE_APERTURE_AND_THE_REFUSAL_IS_THE_RETURN.md`
+  — **an instrument is a declared receiver family and its aperture is an index condition on a group.**
+  `multiquadratic.rs` **is** the straightedge-and-compass field, unnamed; `winding_inertia.rs:62`
+  computes the **crystallographic restriction** and calls it Niven's theorem; `quintic_chart.rs` is
+  the radical rung. **The two rungs have never met.**
+- `canon/THE_CORRESPONDENCE_ATLAS.md` — 168 correspondence cards across 37 files, collected and keyed
+  by holonic face for the first time. **Three false absences were deposited on 2026-08-10 alone**
+  because the corpus could not be entered by concept.
+
+### The open work this round opened, ranked
+
+Each names the cut it closes and a falsifier. None of it is a new organ beside an existing one.
+
+1. **State `Multiquadratic`'s structural aperture in its own source, and join the two rungs.** The
+   module's aperture is not `DECLARED_KERNEL_BOUND`; it is `[ℚ(α):ℚ] = 2ⁿ`. *Falsifier:* the joined
+   ladder must **refuse `∛2` in the compass chart and return it in the radical chart**, from one
+   declared input, with the obstruction named. A ladder that returns everywhere has not been built.
+2. **The neusis rung.** Cube duplication, angle trisection and the regular heptagon are exactly what
+   a 2,3-tower reaches and a 2-tower does not. *Falsifier:* the heptagon must refuse at the compass
+   rung and return at the neusis rung; MathWorld's only quantitative anchor is
+   `8x⁶ − 20x⁴ + 12x² − 1 = 0` for `x = √2·cos(π/7)`.
+3. **Name the crystallographic restriction where it is computed**, and join `winding_inertia`'s Niven
+   set to the crystal reading of `2026-08-09_THE_COLOR_IS_A_RECEIVER_QUOTIENT…`. *Falsifier:* the
+   pentagon must be **admitted by the compass and refused by the lattice** in the same run. Neither
+   aperture contains the other, and a body that reports one verdict has collapsed two instruments.
+4. **Price the order.** Devillers–Gandoin measure the vertex order at `n log₂ n` bits. The front's
+   `merge_witnesses` carries host arrival order into the returned population. *Falsifier:* enact the
+   front at `N` lanes and require the returned output **set** to be identical; the cost of the order
+   is then a measured quantity rather than a suspicion.
+5. **The short-circuit cut has no owner.**
+6. **The accumulation cut.** `temper` and `derivation_integral` are built in both directions through
+   `Cochain` and still do not reference each other; `supported_realizers::positive_form → inertia` is
+   still joined only inside `#[cfg(test)]`. *Falsifier:* `invariant_movement` non-zero **and
+   attributable**, each moved invariant naming the earlier return that caused it.
+7. **The evidence sinks**, now with two cost laws already lost.
+
+**Carried forward from the laboratory and never inherited:** Huffman/Kraft (with
+`Derive_Eaten.lean`'s *a perfect code reads as a PRIME*), grokking with a **measured** susceptibility
+detector `χ = Var_window(φ)`, and `Derive_Euclidean.lean`'s *the parallel postulate is the abelian
+law, equivalently `gyr = 0`*. All three are `HUNCH`/`OPEN` at their source and may motivate a build,
+never grade one.
+
+---
+
+## The ratified order of work, 2026-08-09 — EXECUTED, retained as provenance
 
 **Ratified by Brandon, 2026-08-09**, in those words, for the plan as posed: *"Ratified, deposit, and
 proceed. Our goal is to complete the plan in its entirety."* What was ratified is **this order**, not
@@ -801,9 +882,13 @@ neighbouring prose, return to the same obstruction.*
 
 ---
 
-### The frontier, ranked, and none of it needs a decision
+### The frontier, ranked — SUPERSEDED 2026-08-10 by §"WHERE THIS STANDS"
 
-1. **The Tschirnhaus organ.** `canon/TABLET_THE_CHART.md:227-289` specifies it; nothing implements
+**Four of these five were stale when re-measured on 2026-08-10.** The corrected statement is at the
+top of this file; the list is retained below as provenance and struck item by item.
+
+1. **The Tschirnhaus organ — BUILT, and this entry was stale.** `crates/holonic-engine/src/quintic_chart.rs`
+   with three drivers. The original text follows. `canon/TABLET_THE_CHART.md:227-289` specifies it; nothing implements
    it. Take a degree-5 input, transport it to Bring form by an **exact rational chart change**,
    return the transported form **and the transport**, and **refuse with the obstruction named** when
    the target chart cannot represent the answer. It is the only construction in the record where
@@ -842,14 +927,21 @@ neighbouring prose, return to the same obstruction.*
    `RH/Route.lean`.** The only real mathematics in the tree currently receives no verdict for want of
    a path variable.
 
-4. **Two untested invariances of the project's own central claim.** `cross_ratio` is private in
+4. **Two untested invariances — STRUCK 2026-08-10.** `cross_ratio` is now `pub` at
+   `crates/relational-geometry/src/receiver_atlas.rs:664` and driven by
+   `crates/holonic-engine/examples/the_swing_is_the_invariant.rs`. The original text follows.
+   `cross_ratio` is private in
    `relational-geometry`; `ProjectiveTurn` is in `holonic-engine`, which depends on it — so
    `cross_ratio(T·p) == cross_ratio(p)` **cannot be written where either lives**. And
    `ProjectiveTurn`'s group laws are untested. *Falsifier:* the orbit must be exhibited —
    `rebase_invariants.rs:1220` is the standard, asserting `walks.len() == 3` *"or their agreement is
    one computation compared with itself twice."*
 
-5. **The evidence sinks.** `meta/OUTPUT_MANIFEST.tsv` now binds 685 artifacts / 217.7 MB under
+5. **The evidence sinks — STANDS, AND HAS DEGRADED.** Re-measured 2026-08-10: `zz_smith_cost_probe`
+   and `zz_torsion_width_law` are no longer present under `target/` and their sources were never
+   committed, so those two cost laws are now unrecoverable. `CLAUDE.md` §0 lesson 1 fired again and
+   nothing caught it. The original text follows.
+   `meta/OUTPUT_MANIFEST.tsv` now binds 685 artifacts / 217.7 MB under
    `output/` to their content addresses, with `python3 tools/output_manifest.py --check` as the
    verifier. **The closure half of `CLAUDE.md` §0 lesson 1 still has no owner**, and two probe
    binaries (`zz_smith_cost_probe`, `zz_torsion_width_law`) run from `target/` returning real cost

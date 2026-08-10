@@ -166,6 +166,7 @@ names this one as its governing document.
 | `canon/TABLET_THE_TURN.md` | Curvature as a linear functional on the hinges, the polygon's n-grams, local substitution preserving a global invariant, fission and fusion as one axis, and friction as the coupling. |
 | `canon/TABLET_THE_FLOW.md` | Why Navier-Stokes is not a distant problem, the zeta distribution as an exact self-similar phase, and ant integration as the exact part of the fundamental theorem. |
 | `canon/TABLET_THE_REALIZER.md` | Hodge-Riemann where it is proved, the holomorphic organ that was already owned, and rendering as a receiver whose missed feature is an obstruction. |
+| `canon/THE_CORRESPONDENCE_ATLAS.md` | **Routing only, asserts nothing.** 168 correspondence cards across 37 records, collected and keyed by holonic face: what other fields call the same thing, and where the `NON-EQUIVALENCE` is recorded. |
 | `canon/TABLET_THE_MANIFOLD.md` | The manifold as the invariant of the currents rather than their container; a chart is a type and a transition map an implicit cast; every geometry is a reduction of the structure group; Darboux classifies a coupling and Liouville makes probability a receiver quotient; holonomy and holomorphy meet at the square root; the intake manifold is the junction law. |
 
 ---
