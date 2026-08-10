@@ -1,4 +1,4 @@
-//! THE TWO INSTRUMENTS DISAGREE — one object, two apertures, and the refusal is the return.
+//! THE TWO INSTRUMENTS DISAGREE — one object, three apertures, and the refusal is the return.
 //!
 //! ```text
 //! cargo run --release -p holonic-engine --example the_two_instruments_disagree
@@ -35,14 +35,19 @@
 //! sufficiency needs the Galois closure to be a 2-group. `CompassVerdict::NecessaryConditionHolds`
 //! says so in its own name and there is no `is_constructible` method to misread.
 //!
-//! Nothing here claims the neusis rung, which is absent from both repositories.
+//! The **neusis rung's aperture** is stated here — a marked ruler reaches `{2,3}`-towers, so a
+//! reachable degree is `2^a·3^b` — but **no arithmetic carrier for it exists in either repository**.
+//! `NeusisVerdict` therefore states an aperture and computes no root, and says so in its own doc.
+//! MathWorld's `NeusisConstruction` names the three problems it settles and **states no degree**, so
+//! the degree condition is asserted on the standard literature (Videla 1997) and not on that page.
 
 use std::error::Error;
 
 use holonic_engine::arithmetic_monodromy::{IntegralQuinticProblem, QuinticProblemId};
 use holonic_engine::multiquadratic::{admits_degree, Multiquadratic, DECLARED_KERNEL_BOUND};
 use holonic_engine::quintic_chart::{
-    read_ladder, read_quintic_charts, CompassVerdict, RadicalChartVerdict,
+    read_ladder, read_quintic_charts, CompassVerdict, NeusisVerdict,
+    RadicalChartVerdict,
 };
 use num_bigint::BigInt;
 use relational_geometry::Rat;
@@ -66,6 +71,13 @@ fn material() -> Vec<(&'static str, Vec<BigInt>)> {
     vec![
         // THE DELIAN PROBLEM. x³ − 2. Degree 3.
         ("x^3 - 2  (the doubled cube)", integers(&[-2, 0, 0, 1])),
+        // THE REGULAR HEPTAGON. The minimal polynomial of 2cos(2π/7) is x³ + x² − 2x − 1: the
+        // 7-gon's constructibility is a question about a degree-THREE number, not a degree-seven
+        // one, because [Q(2cos(2π/n)):Q] = φ(n)/2 and φ(7)/2 = 3. This is the falsifier the roadmap
+        // named for the neusis rung.
+        ("x^3 + x^2 - 2x - 1  (2cos(2pi/7), the heptagon)", integers(&[-1, -2, 1, 1])),
+        // THE REGULAR PENTAGON, φ(5)/2 = 2 — the compass's own, since 5 is a Fermat prime.
+        ("x^2 + x - 1  (2cos(2pi/5), the pentagon)", integers(&[-1, 1, 1])),
         // A cubic that is not the Delian one, so the verdict is not about this single polynomial.
         ("x^3 - 3x - 1  (a trisection cubic)", integers(&[-1, -3, 0, 1])),
         // Degree 2 — the compass's own home.
@@ -123,16 +135,22 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     // ---------------------------------------------------------------------------------------------
 
-    rule("ONE OBJECT, TWO INSTRUMENTS");
+    rule("ONE OBJECT, THREE RUNGS — compass, neusis, radicals");
 
-    println!("  {:<34} {:>3}  {:<16} {:<10}", "polynomial", "deg", "compass", "radical");
-    println!("  {}", "-".repeat(72));
+    println!(
+        "  {:<44} {:>3}  {:<16} {:<16} {:<10}",
+        "polynomial", "deg", "compass", "neusis", "radical"
+    );
+    println!("  {}", "-".repeat(96));
 
     let mut disagreements: Vec<String> = Vec::new();
     let mut compass_refusals = 0usize;
     let mut compass_necessary = 0usize;
     let mut radical_returns = 0usize;
     let mut radical_refusals = 0usize;
+    let mut neusis_refusals = 0usize;
+    let mut neusis_necessary = 0usize;
+    let mut neusis_crossings: Vec<String> = Vec::new();
 
     for (index, (name, coefficients)) in material().into_iter().enumerate() {
         let problem = IntegralQuinticProblem::new(
@@ -153,17 +171,26 @@ fn main() -> Result<(), Box<dyn Error>> {
             RadicalChartVerdict::Refuses(_) => radical_refusals += 1,
             RadicalChartVerdict::Open { .. } => {}
         }
+        match &ladder.neusis {
+            NeusisVerdict::Refuses { .. } => neusis_refusals += 1,
+            NeusisVerdict::NecessaryConditionHolds { .. } => neusis_necessary += 1,
+            NeusisVerdict::Open { .. } => {}
+        }
         if ladder.rungs_disagree() {
             disagreements.push(name.to_owned());
         }
+        if ladder.neusis_crosses_the_compass_wall() {
+            neusis_crossings.push(name.to_owned());
+        }
 
         println!(
-            "  {:<34} {:>3}  {:<16} {:<10} {}",
+            "  {:<44} {:>3}  {:<16} {:<16} {:<10} {}",
             name,
             ladder.degree,
             ladder.compass.label(),
+            ladder.neusis.label(),
             ladder.radical.label(),
-            if ladder.rungs_disagree() { "← RUNGS DISAGREE" } else { "" }
+            if ladder.neusis_crosses_the_compass_wall() { "← NEUSIS CROSSES" } else { "" }
         );
     }
 
@@ -184,6 +211,25 @@ fn main() -> Result<(), Box<dyn Error>> {
         format!("{radical_returns} returned · {radical_refusals} refused"),
     );
     hold(
+        "THE NEUSIS RUNG CROSSES THE COMPASS WALL — the heptagon refuses at compass and holds at neusis",
+        neusis_crossings.iter().any(|name| name.contains("heptagon")),
+        format!("{} crossing(s): {:?}", neusis_crossings.len(), neusis_crossings),
+    );
+    hold(
+        "the neusis rung REFUSES somewhere — a rung that admits everything is not a rung",
+        neusis_refusals > 0 && neusis_necessary > 0,
+        format!("{neusis_refusals} refused · {neusis_necessary} necessary-only; 3-smooth degrees only"),
+    );
+    hold(
+        "the pentagon holds at the compass and the heptagon does not — 5 is a Fermat prime and 7 is not",
+        {
+            let five = neusis_crossings.iter().any(|n| n.contains("pentagon"));
+            let seven = neusis_crossings.iter().any(|n| n.contains("heptagon"));
+            !five && seven
+        },
+        format!("crossings: {neusis_crossings:?}"),
+    );
+    hold(
         "the doubled cube is refused by the compass — the Delian constant is not a Euclidean number",
         disagreements.iter().any(|name| name.contains("doubled cube")),
         format!("disagreements: {disagreements:?}"),
@@ -198,9 +244,12 @@ fn main() -> Result<(), Box<dyn Error>> {
         \x20 A degree-four irreducible with Galois group A₄ or S₄ has power-of-two degree and is NOT\n\
         \x20 constructible; sufficiency needs the Galois closure to be a 2-group, which is not decided\n\
         \x20 here. There is no `is_constructible` method to misread.\n\n\
-        \x20 The NEUSIS rung — the marked ruler, which reaches cubics and would RETURN the doubled\n\
-        \x20 cube, the trisection and the regular heptagon — is absent from both repositories.\n\
-        \x20 Adjoining it is H.0420's purchased channel and it is not purchased here."
+        \x20 The NEUSIS rung states an APERTURE and computes no root: no arithmetic carrier for a\n\
+        \x20 {{2,3}}-tower exists in either repository, so `NECESSARY-ONLY` there is weaker again than\n\
+        \x20 at the compass rung, where `multiquadratic` does the arithmetic exactly.\n\n\
+        \x20 Note x^5 - x - 1: refused by BOTH neusis and radicals, for DIFFERENT reasons — 5 is not\n\
+        \x20 3-smooth, and S5 is not solvable. Two instruments agreeing is not two instruments being\n\
+        \x20 the same instrument."
     );
 
     rule("WHAT THIS RETURNED");
@@ -211,10 +260,14 @@ fn main() -> Result<(), Box<dyn Error>> {
          \x20 2. The two rungs, which had never met, now read one object under one receiver family:\n\
          \x20    {} refused by the compass, {} passing its necessary condition; {} returned by\n\
          \x20    radicals, {} refused.\n\
-         \x20 3. {} object(s) receive OPPOSITE verdicts from the two instruments, and BOTH are\n\
-         \x20    correct. That is the ladder's content: the aperture belongs to the instrument, not\n\
-         \x20    to the object.",
-        compass_refusals, compass_necessary, radical_returns, radical_refusals, disagreements.len()
+         \x20 3. {} object(s) receive OPPOSITE verdicts from compass and radicals, and BOTH are\n\
+         \x20    correct. The aperture belongs to the instrument, not to the object.\n\
+         \x20 4. THE NEUSIS RUNG CROSSES: {} object(s) refused by the compass hold at neusis,\n\
+         \x20    including all three Greek problems of antiquity — the doubled cube, the trisected\n\
+         \x20    angle, and the regular heptagon. MathWorld's NeusisConstruction names exactly those\n\
+         \x20    three as soluble by a marked ruler; here they are computed rather than recited.",
+        compass_refusals, compass_necessary, radical_returns, radical_refusals,
+        disagreements.len(), neusis_crossings.len()
     );
 
     if failures.is_empty() {

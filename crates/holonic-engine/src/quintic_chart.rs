@@ -2702,6 +2702,8 @@ pub fn read_compass_rung(reading: &RadicalChartReading) -> CompassVerdict {
 pub struct LadderReading {
     pub degree: usize,
     pub compass: CompassVerdict,
+    /// The middle rung. Its aperture is stated; its arithmetic is not built here.
+    pub neusis: NeusisVerdict,
     pub radical: RadicalChartVerdict,
 }
 
@@ -2715,11 +2717,19 @@ impl LadderReading {
         self.compass.refuses() && matches!(self.radical, RadicalChartVerdict::Returns(_))
     }
 
+    /// **The compass refuses and the neusis rung does not.** This is the marked ruler's whole
+    /// content: cube duplication, angle trisection and the regular heptagon all sit here.
+    pub fn neusis_crosses_the_compass_wall(&self) -> bool {
+        self.compass.refuses() && !self.neusis.refuses()
+            && !matches!(self.neusis, NeusisVerdict::Open { .. })
+    }
+
     pub fn written(&self) -> String {
         format!(
-            "degree {} — compass {} · radical {}",
+            "degree {} — compass {} · neusis {} · radical {}",
             self.degree,
             self.compass.label(),
+            self.neusis.label(),
             self.radical.label()
         )
     }
@@ -2730,6 +2740,99 @@ pub fn read_ladder(reading: &RadicalChartReading) -> LadderReading {
     LadderReading {
         degree: reading.degree,
         compass: read_compass_rung(reading),
+        neusis: read_neusis_rung(reading),
         radical: reading.verdict.clone(),
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+// The neusis rung: the aperture is stated, the arithmetic is not built, and the difference matters
+// -------------------------------------------------------------------------------------------------
+
+/// **Whether a degree is `2^a · 3^b`** — the neusis rung's necessary condition.
+///
+/// A marked ruler ("verging") lets a construction solve cubics as well as quadratics, so the
+/// neusis-constructible reals are those in a tower `ℚ = F₀ ⊂ … ⊂ F_m` with every step of degree two
+/// **or three**. Hence a reachable root has minimal-polynomial degree of the form `2^a · 3^b`
+/// — a **3-smooth** degree. `proved-standard` (Videla, *On points constructible from conics*, 1997).
+///
+/// MathWorld's `NeusisConstruction` states the reach by naming the three problems it settles and
+/// **does not state a degree**, so the degree condition here is asserted on the standard literature
+/// and not on that page. `research/records/2026-08-10_THE_INSTRUMENT_DECLARES_THE_APERTURE…` §2
+/// carries the caveat.
+///
+/// `0` is not a degree and returns `false`.
+pub fn neusis_admits_degree(degree: usize) -> bool {
+    if degree == 0 {
+        return false;
+    }
+    let mut residue = degree;
+    while residue % 2 == 0 {
+        residue /= 2;
+    }
+    while residue % 3 == 0 {
+        residue /= 3;
+    }
+    residue == 1
+}
+
+/// **What the neusis rung says about a declared polynomial.**
+///
+/// **The asymmetry with [`CompassVerdict`] is deliberate and is the honest part.** The compass rung
+/// has a *carrier* — `crate::multiquadratic` computes in `ℚ(√k₁,…,√kₙ)` exactly. **The neusis rung
+/// has no carrier here.** Nothing in either repository does arithmetic in a `{2,3}`-tower, so this
+/// enum states an *aperture* and computes no root. Reporting it as though a construction had been
+/// performed would be the receipt-over-implementation defect (`CLAUDE.md` §8).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum NeusisVerdict {
+    /// **REFUSED, exactly.** The certified irreducible degree is not `2^a·3^b`, so no root lies in
+    /// any tower of quadratic and cubic steps. Even a marked ruler does not reach it.
+    Refuses { degree: usize, certifying_prime: u64 },
+    /// The degree is `2^a·3^b`. **Necessary only** — sufficiency needs the Galois closure to be a
+    /// `{2,3}`-group — and additionally **no arithmetic carrier exists here**, so this is an
+    /// aperture statement and never a construction.
+    NecessaryConditionHolds { degree: usize, twos: u32, threes: u32 },
+    /// Irreducibility was not certified, so no verdict.
+    Open { degree: usize },
+}
+
+impl NeusisVerdict {
+    pub fn label(&self) -> &'static str {
+        match self {
+            Self::Refuses { .. } => "REFUSES",
+            Self::NecessaryConditionHolds { .. } => "NECESSARY-ONLY",
+            Self::Open { .. } => "OPEN",
+        }
+    }
+
+    pub fn refuses(&self) -> bool {
+        matches!(self, Self::Refuses { .. })
+    }
+}
+
+/// Read the neusis rung on the same certified irreducibility the other rungs use.
+pub fn read_neusis_rung(reading: &RadicalChartReading) -> NeusisVerdict {
+    let degree = reading.degree;
+    match &reading.irreducibility {
+        QuinticIrreducibility::CertifiedByPrime { prime, .. } => {
+            let prime = *prime;
+            if neusis_admits_degree(degree) {
+                let mut residue = degree;
+                let mut twos = 0u32;
+                let mut threes = 0u32;
+                while residue % 2 == 0 {
+                    residue /= 2;
+                    twos += 1;
+                }
+                while residue % 3 == 0 {
+                    residue /= 3;
+                    threes += 1;
+                }
+                NeusisVerdict::NecessaryConditionHolds { degree, twos, threes }
+            } else {
+                NeusisVerdict::Refuses { degree, certifying_prime: prime }
+            }
+        }
+        QuinticIrreducibility::Open => NeusisVerdict::Open { degree },
     }
 }

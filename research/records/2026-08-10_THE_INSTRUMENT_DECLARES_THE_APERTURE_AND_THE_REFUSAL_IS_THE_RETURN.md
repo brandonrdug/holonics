@@ -352,8 +352,49 @@ the same. Neither instrument is better and neither object changed.
 
 Controls: the compass refuses somewhere and not everywhere (5 / 2); the radical wall is real and
 crossed (4 returned / 2 refused); the tower degree is read off a real element rather than declared.
-Open item 1 of the roadmap is closed; item 2, the neusis rung, is not purchased and is stated as
-unpurchased in the driver.
+### 7b.1 The neusis rung — roadmap item 2
+
+A marked ruler reaches `{2,3}`-towers, so a reachable degree is `2^a·3^b` (3-smooth) —
+`proved-standard`, Videla 1997. MathWorld's `NeusisConstruction` names the three problems it settles
+and **states no degree**, so the condition is asserted on the standard literature and not on that
+page.
+
+**The rung's asymmetry with the compass rung is the honest part and is stated in the type.** The
+compass rung has a *carrier* — `multiquadratic` computes in `ℚ(√k₁,…,√kₙ)` exactly. **The neusis rung
+has none**: nothing in either repository does arithmetic in a `{2,3}`-tower, so `NeusisVerdict` states
+an aperture and computes no root, and its doc says so.
+
+Measured on nine declared polynomials, one receiver family, three rungs:
+
+```text
+polynomial                                    deg  compass          neusis           radical
+x^3 - 2   (the doubled cube)                    3  REFUSES          NECESSARY-ONLY   RETURNS  ← crosses
+x^3 + x^2 - 2x - 1  (2cos(2π/7), the heptagon)  3  REFUSES          NECESSARY-ONLY   RETURNS  ← crosses
+x^2 + x - 1  (2cos(2π/5), the pentagon)         2  NECESSARY-ONLY   NECESSARY-ONLY   RETURNS
+x^3 - 3x - 1  (a trisection cubic)              3  REFUSES          NECESSARY-ONLY   RETURNS  ← crosses
+x^2 - 2                                         2  NECESSARY-ONLY   NECESSARY-ONLY   RETURNS
+x^4 - 2                                         4  NECESSARY-ONLY   NECESSARY-ONLY   RETURNS
+x^5 - x - 1                                     5  REFUSES          REFUSES          REFUSES
+x^6 - x - 1                                     6  REFUSES          NECESSARY-ONLY   OPEN     ← crosses
+x^7 - 7x + 3                                    7  REFUSES          REFUSES          REFUSES
+```
+
+**All three Greek problems of antiquity are refused by the compass and admitted by the neusis rung**,
+computed rather than recited: MathWorld's stub names exactly cube duplication, angle trisection and
+the regular heptagon as soluble by a marked ruler, and those are the three that cross.
+
+**The heptagon row is the one that carries the method.** The 7-gon's constructibility is a question
+about a **degree-three** number, not a degree-seven one: `[ℚ(2cos(2π/n)):ℚ] = φ(n)/2`, and
+`φ(7)/2 = 3`. Its minimal polynomial is `x³ + x² − 2x − 1`. The pentagon's is `x² + x − 1`, degree
+`φ(5)/2 = 2`, which is why 5 — a Fermat prime — holds at the compass and 7 does not.
+
+**And two instruments agreeing is not two instruments being the same instrument.** `x⁵ − x − 1` is
+refused by neusis **and** by radicals, for different reasons: 5 is not 3-smooth, and `S₅` is not
+solvable.
+
+Controls: the neusis rung refuses somewhere and admits somewhere (2 / 7) — a rung that admits
+everything is not a rung; the pentagon does not cross and the heptagon does. Roadmap items 1 and 2
+are closed.
 
 ---
 
