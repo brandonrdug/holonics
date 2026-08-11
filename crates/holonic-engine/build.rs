@@ -51,6 +51,7 @@ fn declared_architecture() -> String {
 fn main() {
     println!("cargo:rerun-if-changed=kernels/exact_conic_support.cu");
     println!("cargo:rerun-if-changed=kernels/exact_relation_support.cu");
+    println!("cargo:rerun-if-changed=kernels/refine_shell.cu");
     if env::var("CARGO_CFG_TARGET_OS").as_deref() != Ok("linux") {
         return;
     }
@@ -102,4 +103,20 @@ fn main() {
         relation_status.success(),
         "nvcc refused kernels/exact_relation_support.cu"
     );
+
+    let refine_output = PathBuf::from(env::var_os("OUT_DIR").expect("Cargo supplies OUT_DIR"))
+        .join("refine_shell.ptx");
+    let refine_status = Command::new("nvcc")
+        .args([
+            "--ptx",
+            "-O3",
+            "--std=c++20",
+            &gpu_architecture,
+            "kernels/refine_shell.cu",
+            "-o",
+        ])
+        .arg(&refine_output)
+        .status()
+        .expect("nvcc is required to compile the partition refinement law");
+    assert!(refine_status.success(), "nvcc refused kernels/refine_shell.cu");
 }

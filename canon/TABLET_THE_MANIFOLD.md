@@ -559,6 +559,45 @@ atlas costs `2·C(d,2)` — twice the pair chart it replaces, so reading the atl
 time. And computing each surface's demand by rebuilding its complex re-ran the most expensive
 operation in the organ for a number the sweep was already holding. Each pinned a core for minutes.
 
+### The card refines the front — GPU-first, on the whole corpus
+
+**Deposited 2026-08-10.** Brandon: *"the card's integration is so fucking important and you can't
+just keep punting it… every time we have to go from it not being integrated to integrating it, you
+risk contamination. It's GPU first."* And on the demonstration: *"I don't know why you only show me
+`"the"`… you are still treating the machine like a toy without a purpose."*
+
+`kernels/refine_shell.cu` + `crates/holonic-engine/src/cuda_refine.rs`. One lane per occurrence, one
+crossing per shell. Equality of readings is made equality of **dense identities** once over the whole
+corpus — 550 distinct readings — with identity zero reserved for a terminus *before* any reading is
+assigned one, because a terminus is family-invariant and must be a value no reading can take. A shell
+key is then one `u64`, and the new class is the identity of `(current class, key)`, claimed by
+`atomicCAS`. The atomic is on the **claim**, never on the reading. The table cannot fill: distinct
+pairs are at most occupied occurrences, so a capacity above that always leaves an empty slot —
+derived, no load factor, no number chosen.
+
+Measured on the declared corpus, RTX 4080 SUPER, 1024 threads per block and warp 32 both read off the
+device and the kernel:
+
+| | |
+|---|---|
+| surfaces refined on the card | **18,889** |
+| crossings | **68,647** |
+| partitions agreeing with the host | **18,889 of 18,889** |
+| derived horizons agreeing | **18,889 of 18,889** |
+| idle lanes, named rather than hidden | 18,760,509 |
+| deepest cone | `"a"` at horizon **88** over 19,072 orbits |
+
+**A partition is not a numbering.** The card claims identities in probe order and the host in
+lexicographic window order, so the comparison is of the induced **equivalence** — requiring the
+numbering to match would be requiring a realization coordinate to be causal.
+
+**And the first run disagreed, which is why it was run.** The card returned 1,794 classes for `"of"`
+at shell one against the host's 1,787 — finer, never coarser. The cause was a race of my own making:
+the claim and the key are two stores, and a lane that found its own class in a slot whose key had not
+yet landed walked on and claimed a **second** slot for the same pair. It splits a class in two and
+looks like nothing. The trace shell by shell is what found it; the aggregate said only *"116 horizons
+disagree."*
+
 ### What this section forbids
 
 1. **No receiver reach described as a window, an aperture, or a capacity.** Name the cone, its apex,

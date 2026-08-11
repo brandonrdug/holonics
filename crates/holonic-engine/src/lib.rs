@@ -109,6 +109,8 @@ pub mod coupled_informant;
 #[cfg(target_os = "linux")]
 pub mod cuda_aperture;
 #[cfg(target_os = "linux")]
+pub mod cuda_refine;
+#[cfg(target_os = "linux")]
 pub mod cuda_relation;
 pub mod device;
 pub mod diffusion;
@@ -320,6 +322,8 @@ pub use conic::*;
 pub use coupled_informant::*;
 #[cfg(target_os = "linux")]
 pub use cuda_aperture::*;
+#[cfg(target_os = "linux")]
+pub use cuda_refine::*;
 #[cfg(target_os = "linux")]
 pub use cuda_relation::*;
 pub use device::*;
