@@ -330,3 +330,81 @@ receiver map      the valve, open for a window
 transport         pressure waves at c along runners of declared length
 returned residual volumetric efficiency ≠ 1 — the phase mismatch, exhibited as a beat
 ```
+
+---
+
+## 21. Reflection is the mechanism, and the crossing bears the load
+
+**Truth status:** `proved-standard` for the classical results; `implemented-exact` for the owners;
+`interpretation` for the identification, which is Brandon's and predates this file.
+
+Brandon, 2026-08-10, naming the mechanism this section exists to state:
+*"pay attention to how phase distributions and emergent hypergeometry about manifolds mechanically
+enable integration and differentiation by reflection (reflecting, diffracting, refracting, crossings,
+intersections, section modulus, quantum mechanics)."*
+
+### 21.1 Why reflection is a mechanism and not an image
+
+**The interior is an integral over its boundary, and the kernel is built by reflection.** That is not
+a metaphor for diffusion; it is how the kernel is constructed. The method of images solves a boundary
+value problem by placing a *reflected* source across the boundary so the two cancel on it — so the
+boundary condition is satisfied **by construction** rather than imposed, and the resulting Green's
+function is literally a sum over reflections. `crates/holonic-engine/src/diffusion.rs` carries the
+exact form: the Schur complement `S = M_∂∂ − M_∂I M_II⁻¹ M_I∂` over `Rat`, with a certificate, and the
+interior recoverable as `u_I = −M_II⁻¹ M_I∂ f`.
+[The record](../research/records/2026-08-09_THE_INTERIOR_IS_AN_INTEGRAL_OVER_ITS_BOUNDARY_AND_THE_KERNEL_IS_BUILT_BY_REFLECTION.md).
+
+**And differentiation is the same operation with the sign flipped.** `causal_reflection.rs` states it
+at its own altitude — *"the relation that costs an improper integral on one side costs a negation on
+the other"* — which is why a return stroke riding back against its orientation negates the increment,
+and why `running_integral::holonomy` refuses a walk that does not close.
+
+So: **integration by reflection is a boundary construction, and the half-turn is what the reflection
+costs.** §19's `√z` monodromy is the same `−1`.
+
+### 21.2 The four optical words are four apertures, and each is a declared receiver
+
+| word | what selects | the aperture |
+|---|---|---|
+| **reflection** | the boundary sends the current back | the image source; the residual is what does not cancel |
+| **refraction** | the medium changes the phase velocity | the impedance ratio — §16.1's Möbius `Γ`, the Smith chart |
+| **diffraction** | the *lattice* selects by phase coherence | Bragg: `2d sin θ = nλ`; the reciprocal lattice returns discrete directions |
+| **interference** | two paths meet and their **cross term** decides | `H.0216`'s tower identity: the cosine cross term **is** the interference cross term **is** the Feynman vertex |
+
+**The lattice row is the one that connects to §18's Darboux argument.** A crystal is not a container
+light passes through; it is *a receiver that selects by phase*, and its **band gap is the set of
+passages that return nothing** — the forbidden interval being an aperture of the lattice and not a
+property of the light. §1.3's crystallographic restriction is the same statement about which
+rotations that lattice admits at all.
+
+### 21.3 The crossings bear the load, and that is what section modulus measures
+
+Brandon's own reading: *"In knots it is the crossings that bear the load, this is fundamentally how
+energy distributes in any system."*
+
+**Section modulus** `Z = I/c` is the engineer's statement of exactly that: the bending stress a
+section carries is `σ = M/Z`, so **the geometry of the section — not its mass — decides what load it
+bears.** Two beams of equal area carry wildly different loads depending on where the area sits
+relative to the neutral axis. `H.0219`'s divergence-locality classification is the same distinction
+one altitude up: what a decomposition costs depends on where the coupling sits, not on how much there
+is of it.
+
+In this body the crossing that bears the load is the **hinge**: `TABLET_THE_TURN` §11.5 puts the
+curvature on the codimension-two hinge between cells and never on a cell's own corners, and
+`contact_gluing`'s `HingeGluing` classifies what happens where two sides meet. **A cell carries no
+curvature; the crossing does.**
+
+### 21.4 What quantum mechanics contributes, in this frame
+
+Not a source of randomness. **The observer effect is the receiver declaration**, and the squared
+modulus is the quotient by the phase circle (`H.0217`) — so a probability is what remains after the
+phase is deleted, which is `CLAUDE.md` §0b's fourth carrier of the one deletion.
+
+`2026-08-10_THE_OBJECT_IS_THE_UNRECONSTRUCTABLE_INTERIOR…` makes that measurable: **probability is
+the shadow of an unexhausted candidate set.** Where the machine exhausts — `147456 → 1` candidates
+over 87,380 vertices — the shadow goes and there was never a distribution. Where it cannot, the
+shadow is the honest return.
+
+**Which is why the four optical words matter mechanically rather than decoratively:** each is a way a
+receiver's aperture selects, and every one of them leaves a residual that is *addressable* — a phase,
+an angle, a forbidden band, a cross term. An addressable residual is one the loop can return.

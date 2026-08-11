@@ -12,7 +12,6 @@
 # updated, fix the document.
 
 # --- Genres the document law defines and this repository has not built (§7) ---
-canon/THE_DOCUMENT_LAW.md :: THE_CLAIM_INDEX.md :: the claim index is specified in §1.5 and explicitly "not yet built"
 canon/THE_DOCUMENT_LAW.md :: HOLONIC_OWNERSHIP.md :: the ownership ledger is specified in §1.9 and explicitly "not yet built"
 canon/THE_DOCUMENT_LAW.md :: RESULTS.md :: the observation-result genre filename; §1.8 states the live genre is empty
 canon/THE_DOCUMENT_LAW.md :: evidence/observations/ :: named as the archived location; the live genre is empty by §1.8

@@ -31,7 +31,7 @@ no level may be inferred from a file's length, recency, or confidence of tone.
 | **normative** | Canon | `canon/NN_NAME.md`, `canon/THE_NAME.md` | what the project asserts is true |
 | **construction** | Blueprint | `blueprint/THE_NAME.md`, `blueprint/NAME.md` | what is built next and to what grade |
 | **position** | Position record | `CONSTRUCTION_STATE.md` (one file, no siblings) | what is currently admitted |
-| **index** | Claim index | `THE_CLAIM_INDEX.md` (**not yet built** — §7) | routing only; asserts nothing |
+| **index** | Claim index | `THE_CLAIM_INDEX.md` — **built 2026-08-10, generated** | routing only; asserts nothing |
 | **index** | Record atlas | `research/README.md` | routing only; asserts nothing |
 | **evidence** | Research record | `research/records/YYYY-MM-DD_THE_SENTENCE.md` | deposits a claim with derivation and boundary |
 | **evidence** | Observation result | `observations/<slug>-NN/RESULTS.md` (**not yet built** — §7) | deposits one run's measured return |
@@ -714,7 +714,7 @@ resolves in the live tree. The remaining rows are unchanged and remain `open`.
 
 | Defect | Measurement | Genre affected |
 |---|---|---|
-| No claim index exists | `THE_CLAIM_INDEX.md` absent | §1.5 |
+| ~~No claim index exists~~ | **CLOSED 2026-08-10** — built and generated from the tree, so it cannot drift by hand | §1.5 |
 | No supersession index exists | 3 of 314 records carry a banner; no index rows anywhere | §3.4 |
 | Record atlas is stale by seven | `research/README.md` claims *"all 307 laboratory research deposits present at extraction on 3 August 2026"*; 314 records tracked, 7 dated after 2026-08-03 | §1.6 |
 | Truth-status grades are nearly unused | 5 of 314 records carry a `**Truth status:**` line; 278 carry a bold band in a laboratory vocabulary with no crosswalk | §5 |
