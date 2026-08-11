@@ -4,7 +4,7 @@
 # Regenerate: python3 tools/output_manifest.py
 # Verify:     python3 tools/output_manifest.py --check
 # Listing:    python3 tools/output_manifest.py --files
-# 28 drivers, 14045 returns, 2796328480 bytes.
+# 29 drivers, 14049 returns, 3856878072 bytes.
 sha256	returns	bytes	driver
 855279871852bffe08c83a0e50006b769da3b296934115faa809561b7cbdd304	7	1274	output/agentic-research-kernel
 b90b799580f0c51bd6ffe0009fc0fcd9eb9f20feb54972ca44ad4297b6252430	8	46304	output/analytic-field-transport
@@ -34,3 +34,4 @@ d11c51399696ddf7756ae4eb49df5e70457458f7cb106e57ac7c28ef53f5487c	5	603	output/le
 41226c262a4d2236c665fba37584b93ee3603041f34579aca7da982395c78e94	31	4952	output/lean-proof-production
 cf87fcb7ccdb9cd3649275a1731c3c011ab2fe8db8fd5ca161fd8c82d9331c55	3	5239843	output/reintegrating-elaboration
 d5d4be0ce4e0da0f152d1bc1008f91006fba3e355d75dde239af483f33487e88	58	1443881689	output/source-revival
+0ecbc652c2cf7c861e3ee76cd65fde4a5fa24c4aee483d0f67b9a5497540fe0f	4	1060549592	output/the_material_mouth_seals_the_declared_body

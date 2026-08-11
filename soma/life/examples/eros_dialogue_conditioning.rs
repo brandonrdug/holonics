@@ -6,8 +6,8 @@
 //!
 //! ## What this closes
 //!
-//! `soma/life/src/text_material.rs:221-223` declares two intake species — `TextMaterialInput::{
-//! CodexRollout, ClaudeCode}` — and imports them in parallel at `:258`. **`TextMaterialInput::` is
+//! `soma/life/src/text_material.rs` declares the source-neutral intake faces on
+//! `TextMaterialInput`; **`TextMaterialInput::` is
 //! constructed by no driver in this workspace.** The one caller of `import`,
 //! `examples/eros_mathematics_conditioning.rs:178`, passes `Vec::new()` for that argument and
 //! hardcodes fourteen `.typ` paths instead. The mouth was a live argument receiving an empty vector.
@@ -101,7 +101,7 @@ fn main() {
     if claude.exists() {
         let bytes = std::fs::metadata(&claude).map(|meta| meta.len()).unwrap_or(0);
         println!("  claude history        {:>5} octets  {}", bytes, claude.display());
-        inputs.push(TextMaterialInput::ClaudeCode(claude));
+        inputs.push(TextMaterialInput::ClaudeHistory(claude));
     }
 
     if inputs.is_empty() {

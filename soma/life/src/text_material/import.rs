@@ -13,9 +13,9 @@ use sha2::{Digest, Sha256};
 
 use super::{
     hex_digest, sha256_hex, ParsedTextDocument, TextMaterialContainerReceipt, TextMaterialError,
-    TextMaterialInput, TextMaterialMap, TextMaterialOccurrence, TextMaterialPhase,
-    TextMaterialRole, TextMaterialSet, TextMaterialSourceKind, TextMaterialVector,
-    TextMaterialWitness,
+    TextMaterialIdentitySpecies, TextMaterialInput, TextMaterialMap, TextMaterialOccurrence,
+    TextMaterialPhase, TextMaterialRole, TextMaterialSet, TextMaterialSourceKind,
+    TextMaterialVector, TextMaterialWitness,
 };
 
 #[derive(Clone)]
@@ -51,7 +51,9 @@ pub(super) fn import_parallel(
                 for (local, input) in inputs.iter().enumerate() {
                     let container = match input {
                         TextMaterialInput::CodexRollout(path) => parse_codex(path),
+                        TextMaterialInput::CodexHistory(path) => parse_codex_history(path),
                         TextMaterialInput::ClaudeCode(path) => parse_claude(path),
+                        TextMaterialInput::ClaudeHistory(path) => parse_claude_history(path),
                     }?;
                     parsed.push((start + local, container));
                 }
@@ -85,10 +87,26 @@ fn parse_claude(path: &Path) -> Result<ParsedContainer, TextMaterialError> {
     parse_jsonl(path, TextMaterialSourceKind::ClaudeCode, claude_visible)
 }
 
+fn parse_codex_history(path: &Path) -> Result<ParsedContainer, TextMaterialError> {
+    parse_jsonl(
+        path,
+        TextMaterialSourceKind::CodexHistory,
+        codex_history_visible,
+    )
+}
+
+fn parse_claude_history(path: &Path) -> Result<ParsedContainer, TextMaterialError> {
+    parse_jsonl(
+        path,
+        TextMaterialSourceKind::ClaudeHistory,
+        claude_history_visible,
+    )
+}
+
 fn parse_jsonl(
     path: &Path,
     source_kind: TextMaterialSourceKind,
-    visible: fn(&Value, &Path, u64, Range<u64>) -> Result<VisibleRecord, TextMaterialError>,
+    visible: fn(&Value, &Path, &str, u64, Range<u64>) -> Result<VisibleRecord, TextMaterialError>,
 ) -> Result<ParsedContainer, TextMaterialError> {
     let metadata = path
         .metadata()
@@ -109,13 +127,15 @@ fn parse_jsonl(
     let mut complete_records = 0u64;
     let mut prefix = Sha256::new();
     let mut excluded_control_occurrences = 0usize;
+    let mut founded_identity_occurrences = 0usize;
     let mut occurrences = TextMaterialVector::new();
     let mut conversation = path
         .file_stem()
         .and_then(|stem| stem.to_str())
         .unwrap_or("unidentified-conversation")
         .to_owned();
-    let mut previous = None::<String>;
+    let mut conversations = TextMaterialSet::new();
+    let mut previous = TextMaterialMap::<String, String>::new();
     let mut partial_tail_bytes = 0u64;
     loop {
         raw.clear();
@@ -149,12 +169,10 @@ fn parse_jsonl(
                     path.display()
                 ))
             })?;
-            if source_kind == TextMaterialSourceKind::ClaudeCode {
-                if let Some(session) = value.get("sessionId").and_then(Value::as_str) {
-                    conversation = session.to_owned();
-                }
+            if let Some(session) = record_conversation(source_kind, &value) {
+                conversation = session.to_owned();
             }
-            match visible(&value, path, record, raw_at..raw_end)? {
+            match visible(&value, path, &conversation, record, raw_at..raw_end)? {
                 VisibleRecord::Absent => {}
                 VisibleRecord::Control => {
                     excluded_control_occurrences = excluded_control_occurrences
@@ -162,10 +180,22 @@ fn parse_jsonl(
                         .ok_or(TextMaterialError::CarrierExtent)?;
                 }
                 VisibleRecord::Occurrence(mut occurrence) => {
-                    if let Some(previous) = &previous {
-                        occurrence.caused_by.insert(previous.to_owned());
+                    if occurrence.witness.identity_species
+                        == TextMaterialIdentitySpecies::FoundedFromContainerRecordRange
+                    {
+                        founded_identity_occurrences = founded_identity_occurrences
+                            .checked_add(1)
+                            .ok_or(TextMaterialError::CarrierExtent)?;
                     }
-                    previous = Some(occurrence.native_identity.to_owned());
+                    let occurrence_conversation = occurrence.witness.conversation.to_owned();
+                    conversations.insert(occurrence_conversation.to_owned());
+                    if let Some(prior) = previous.get(&occurrence_conversation) {
+                        occurrence.caused_by.insert(prior.to_owned());
+                    }
+                    previous.insert(
+                        occurrence_conversation,
+                        occurrence.native_identity.to_owned(),
+                    );
                     occurrences.push(occurrence);
                 }
             }
@@ -175,15 +205,25 @@ fn parse_jsonl(
             .checked_add(1)
             .ok_or(TextMaterialError::CarrierExtent)?;
     }
+    let receipt_conversation = match conversations.len() {
+        0 => conversation,
+        1 => conversations
+            .iter()
+            .next()
+            .map(|value| value.to_owned())
+            .unwrap_or(conversation),
+        count => format!("plural:{count}"),
+    };
     Ok(ParsedContainer {
         receipt: TextMaterialContainerReceipt {
             source_kind,
             source: path.display().to_string(),
-            conversation,
+            conversation: receipt_conversation,
             raw_extent: raw_at,
             raw_sha256: hex_digest(&prefix.finalize()),
             complete_records,
             visible_occurrences: occurrences.len(),
+            founded_identity_occurrences,
             excluded_control_occurrences,
             partial_tail_bytes,
         },
@@ -200,6 +240,7 @@ enum VisibleRecord {
 fn codex_visible(
     value: &Value,
     path: &Path,
+    conversation: &str,
     raw_record: u64,
     raw_range: Range<u64>,
 ) -> Result<VisibleRecord, TextMaterialError> {
@@ -257,23 +298,17 @@ fn codex_visible(
         .get("timestamp")
         .and_then(Value::as_str)
         .unwrap_or_default();
-    let turn = payload
-        .get("internal_chat_message_metadata_passthrough")
-        .and_then(|metadata| metadata.get("turn_id"))
-        .and_then(Value::as_str)
-        .unwrap_or_default();
-    let native_identity = if let Some(native) = payload.get("id").and_then(Value::as_str) {
-        format!("codex:{native}")
-    } else if !turn.is_empty() || !timestamp.is_empty() {
-        format!(
-            "codex:unidentified:turn={turn}:time={timestamp}:surface={}",
-            sha256_hex(text.as_bytes())
+    let (native_identity, identity_species) = if let Some(native) =
+        payload.get("id").and_then(Value::as_str)
+    {
+        (
+            format!("codex:{native}"),
+            TextMaterialIdentitySpecies::ProviderSupplied,
         )
     } else {
-        format!(
-            "codex:unidentified:container={}:record={raw_record}:surface={}",
-            path.display(),
-            sha256_hex(text.as_bytes())
+        (
+            founded_record_identity("codex-rollout", path, conversation, raw_record, &raw_range),
+            TextMaterialIdentitySpecies::FoundedFromContainerRecordRange,
         )
     };
     Ok(VisibleRecord::Occurrence(ParsedOccurrence {
@@ -283,13 +318,9 @@ fn codex_visible(
         text,
         witness: TextMaterialWitness {
             source_kind: TextMaterialSourceKind::CodexRollout,
+            identity_species,
             container: path.display().to_string(),
-            conversation: payload
-                .get("internal_chat_message_metadata_passthrough")
-                .and_then(|metadata| metadata.get("turn_id"))
-                .and_then(Value::as_str)
-                .unwrap_or("unaddressed-codex-session")
-                .to_owned(),
+            conversation: conversation.to_owned(),
             raw_record,
             raw_start: raw_range.start,
             raw_end: raw_range.end,
@@ -304,6 +335,7 @@ fn codex_visible(
 fn claude_visible(
     value: &Value,
     path: &Path,
+    conversation: &str,
     raw_record: u64,
     raw_range: Range<u64>,
 ) -> Result<VisibleRecord, TextMaterialError> {
@@ -330,11 +362,18 @@ fn claude_visible(
     if text.trim().len() < 2 {
         return Ok(VisibleRecord::Control);
     }
-    let native = value
-        .get("uuid")
-        .and_then(Value::as_str)
-        .ok_or_else(|| TextMaterialError::Json("Claude dialogue message has no uuid".to_owned()))?;
-    let native_identity = format!("claude-code:{native}");
+    let (native_identity, identity_species) =
+        if let Some(native) = value.get("uuid").and_then(Value::as_str) {
+            (
+                format!("claude-code:{native}"),
+                TextMaterialIdentitySpecies::ProviderSupplied,
+            )
+        } else {
+            (
+                founded_record_identity("claude-code", path, conversation, raw_record, &raw_range),
+                TextMaterialIdentitySpecies::FoundedFromContainerRecordRange,
+            )
+        };
     let parent = value
         .get("parentUuid")
         .and_then(Value::as_str)
@@ -350,12 +389,9 @@ fn claude_visible(
         text,
         witness: TextMaterialWitness {
             source_kind: TextMaterialSourceKind::ClaudeCode,
+            identity_species,
             container: path.display().to_string(),
-            conversation: value
-                .get("sessionId")
-                .and_then(Value::as_str)
-                .unwrap_or("unaddressed-claude-session")
-                .to_owned(),
+            conversation: conversation.to_owned(),
             raw_record,
             raw_start: raw_range.start,
             raw_end: raw_range.end,
@@ -378,6 +414,131 @@ fn claude_visible(
             caused_by
         },
     }))
+}
+
+fn codex_history_visible(
+    value: &Value,
+    path: &Path,
+    conversation: &str,
+    raw_record: u64,
+    raw_range: Range<u64>,
+) -> Result<VisibleRecord, TextMaterialError> {
+    history_visible(
+        value,
+        path,
+        conversation,
+        raw_record,
+        raw_range,
+        TextMaterialSourceKind::CodexHistory,
+        "codex-history",
+        "text",
+        "ts",
+    )
+}
+
+fn claude_history_visible(
+    value: &Value,
+    path: &Path,
+    conversation: &str,
+    raw_record: u64,
+    raw_range: Range<u64>,
+) -> Result<VisibleRecord, TextMaterialError> {
+    history_visible(
+        value,
+        path,
+        conversation,
+        raw_record,
+        raw_range,
+        TextMaterialSourceKind::ClaudeHistory,
+        "claude-history",
+        "display",
+        "timestamp",
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+fn history_visible(
+    value: &Value,
+    path: &Path,
+    conversation: &str,
+    raw_record: u64,
+    raw_range: Range<u64>,
+    source_kind: TextMaterialSourceKind,
+    identity_prefix: &str,
+    text_field: &str,
+    timestamp_field: &str,
+) -> Result<VisibleRecord, TextMaterialError> {
+    let Some(text) = value.get(text_field).and_then(Value::as_str) else {
+        return Ok(VisibleRecord::Absent);
+    };
+    if text.trim().len() < 2 {
+        return Ok(VisibleRecord::Control);
+    }
+    if generated_control_surface(text) || generated_claude_wrapper(text) {
+        return Ok(VisibleRecord::Control);
+    }
+    Ok(VisibleRecord::Occurrence(ParsedOccurrence {
+        native_identity: founded_record_identity(
+            identity_prefix,
+            path,
+            conversation,
+            raw_record,
+            &raw_range,
+        ),
+        role: TextMaterialRole::Human,
+        phase: TextMaterialPhase::Received,
+        text: text.to_owned(),
+        witness: TextMaterialWitness {
+            source_kind,
+            identity_species: TextMaterialIdentitySpecies::FoundedFromContainerRecordRange,
+            container: path.display().to_string(),
+            conversation: conversation.to_owned(),
+            raw_record,
+            raw_start: raw_range.start,
+            raw_end: raw_range.end,
+            timestamp: scalar_text(value.get(timestamp_field)),
+            native_parent: None,
+            sidechain: false,
+        },
+        caused_by: TextMaterialSet::new(),
+    }))
+}
+
+fn founded_record_identity(
+    prefix: &str,
+    path: &Path,
+    conversation: &str,
+    raw_record: u64,
+    raw_range: &Range<u64>,
+) -> String {
+    format!(
+        "{prefix}:founded:container={}:conversation={conversation}:record={raw_record}:raw={}..{}",
+        path.display(),
+        raw_range.start,
+        raw_range.end
+    )
+}
+
+fn scalar_text(value: Option<&Value>) -> String {
+    match value {
+        Some(Value::String(value)) => value.to_owned(),
+        Some(Value::Number(value)) => value.to_string(),
+        _ => String::new(),
+    }
+}
+
+fn record_conversation(kind: TextMaterialSourceKind, value: &Value) -> Option<&str> {
+    match kind {
+        TextMaterialSourceKind::CodexRollout => value
+            .get("payload")
+            .and_then(|payload| payload.get("session_id").or_else(|| payload.get("id")))
+            .and_then(Value::as_str),
+        TextMaterialSourceKind::CodexHistory => value.get("session_id").and_then(Value::as_str),
+        TextMaterialSourceKind::ClaudeCode | TextMaterialSourceKind::ClaudeHistory => {
+            value.get("sessionId").and_then(Value::as_str)
+        }
+        TextMaterialSourceKind::ParsedDocument | TextMaterialSourceKind::SelfEmanated => None,
+    }
 }
 
 pub(super) fn parse_document(
@@ -413,6 +574,7 @@ pub(super) fn parse_document(
             text: text.to_owned(),
             witness: TextMaterialWitness {
                 source_kind: TextMaterialSourceKind::ParsedDocument,
+                identity_species: TextMaterialIdentitySpecies::DeclaredDocument,
                 container: document.source.to_owned(),
                 conversation: document.identity.to_owned(),
                 raw_record: u64::try_from(ordinal).map_err(|_| TextMaterialError::CarrierExtent)?,
@@ -439,6 +601,7 @@ pub(super) fn parse_document(
             complete_records: u64::try_from(document.sections.len())
                 .map_err(|_| TextMaterialError::CarrierExtent)?,
             visible_occurrences: occurrences.len(),
+            founded_identity_occurrences: 0,
             excluded_control_occurrences: document.sections.len() - occurrences.len(),
             partial_tail_bytes: 0,
         },
@@ -483,9 +646,14 @@ pub(super) fn merge_occurrence(
 fn candidate_record(kind: TextMaterialSourceKind, raw: &[u8]) -> bool {
     match kind {
         TextMaterialSourceKind::CodexRollout => {
-            contains(raw, br#""type":"response_item""#)
-                && contains(raw, br#""type":"message""#)
-                && (contains(raw, br#""role":"user""#) || contains(raw, br#""role":"assistant""#))
+            contains(raw, br#""type":"session_meta""#)
+                || (contains(raw, br#""type":"response_item""#)
+                    && contains(raw, br#""type":"message""#)
+                    && (contains(raw, br#""role":"user""#)
+                        || contains(raw, br#""role":"assistant""#)))
+        }
+        TextMaterialSourceKind::CodexHistory => {
+            contains(raw, br#""session_id":"#) && contains(raw, br#""text":"#)
         }
         TextMaterialSourceKind::ClaudeCode => {
             contains(raw, br#""message":"#)
@@ -493,6 +661,9 @@ fn candidate_record(kind: TextMaterialSourceKind, raw: &[u8]) -> bool {
                 && (contains(raw, br#""content":""#)
                     || contains(raw, br#""type":"text""#)
                     || contains(raw, br#""isMeta":true"#))
+        }
+        TextMaterialSourceKind::ClaudeHistory => {
+            contains(raw, br#""sessionId":"#) && contains(raw, br#""display":"#)
         }
         TextMaterialSourceKind::ParsedDocument | TextMaterialSourceKind::SelfEmanated => false,
     }

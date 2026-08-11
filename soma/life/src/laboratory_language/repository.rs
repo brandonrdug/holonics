@@ -50,6 +50,21 @@ pub struct LaboratorySourceAtlas {
     pub(super) receipt: LaboratoryAtlasReceipt,
 }
 
+/// One borrowed source-native reading exposed by the mounted atlas.
+///
+/// This is the atlas's inherited material, not a research return.  Exposing it lets another
+/// existing mouth compose the exact readings without reopening the repository or guessing the
+/// atlas's section law.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct LaboratorySourceReading<'a> {
+    pub identity: &'a str,
+    pub source: &'a str,
+    pub receiver: u64,
+    pub line: usize,
+    pub kind: LaboratorySourceKind,
+    pub text: &'a str,
+}
+
 /// Which roots beneath a repository this atlas mounts, and under which extensions.
 ///
 /// **These are the caller's declaration, not the organ's.** They were authored inside
@@ -208,6 +223,18 @@ impl LaboratorySourceAtlas {
 
     pub const fn receipt(&self) -> &LaboratoryAtlasReceipt {
         &self.receipt
+    }
+
+    /// Read every inherited section in the atlas's deterministic receiver/source order.
+    pub fn source_readings(&self) -> impl ExactSizeIterator<Item = LaboratorySourceReading<'_>> {
+        self.sections.iter().map(|section| LaboratorySourceReading {
+            identity: &section.identity,
+            source: &section.source,
+            receiver: section.receiver,
+            line: section.line,
+            kind: section.kind,
+            text: &section.text,
+        })
     }
 
     pub fn enact(
@@ -369,6 +396,16 @@ fn receive_paths(
     paths: &mut Vec<PathBuf>,
 ) -> Result<(), LaboratoryLanguageError> {
     if !root.exists() {
+        return Ok(());
+    }
+    if root.is_file() {
+        if root
+            .extension()
+            .and_then(|extension| extension.to_str())
+            .is_some_and(|extension| extensions.contains(&extension))
+        {
+            paths.push(root.to_owned());
+        }
         return Ok(());
     }
     let mut entries = fs::read_dir(root)
@@ -890,5 +927,34 @@ mod tests {
             wordless.is_empty(),
             "a sentence with no word in it is not a sentence"
         );
+    }
+
+    #[test]
+    fn an_explicit_file_root_is_received_without_inventing_a_directory() {
+        let serial = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let root = std::env::temp_dir().join(format!(
+            "soma-laboratory-explicit-root-{}-{serial}",
+            std::process::id()
+        ));
+        std::fs::create_dir_all(&root).unwrap();
+        std::fs::write(root.join("authority.md"), "The declared file is material.\n").unwrap();
+        let atlas = LaboratorySourceAtlas::mount_repository_roots(
+            &root,
+            &LaboratorySourceRoots {
+                theory: vec![PathBuf::from("authority.md")],
+                code: Default::default(),
+            },
+            &Default::default(),
+        )
+        .unwrap();
+        assert_eq!(atlas.receipt().source_files, 1);
+        assert_eq!(atlas.receipt().theory_sections, 1);
+        let reading = atlas.source_readings().next().unwrap();
+        assert_eq!(reading.source, "authority.md");
+        assert_eq!(reading.text, "The declared file is material.");
+        std::fs::remove_dir_all(root).unwrap();
     }
 }

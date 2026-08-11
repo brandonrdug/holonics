@@ -1,10 +1,11 @@
 //! Source-neutral text material and its continuing sparse conditioning ecology.
 //!
-//! Codex rollouts, Claude Code sessions, and already parsed documents are different world
-//! containers.  They cross this membrane as the same kind of linguistic occurrence while their
-//! container, byte range, role, chronology, parentage, and exact surface remain inspectable
-//! lineage.  Container syntax, tools, hidden reasoning, generated control wrappers, and
-//! attachments do not become language merely because they share a JSON record with it.
+//! Codex rollouts, Codex history, Claude Code sessions, Claude history, and already parsed
+//! documents are different world containers.  They cross this membrane as the same kind of
+//! linguistic occurrence while their container, byte range, role, chronology, parentage, identity
+//! species, and exact surface remain inspectable lineage.  Container syntax, tools, hidden
+//! reasoning, generated control wrappers, and attachments do not become language merely because
+//! they share a JSON record with it.
 //!
 //! The conditioned atlas is not a detached search service.  Every admitted occurrence changes
 //! its token population, ordered transports, local sections, feature incidence, and recurrence.
@@ -57,14 +58,30 @@ const TEXT_ASSISTANT_PROCESS_RECEIVER: u64 = 40_000_001;
 const TEXT_ASSISTANT_FINAL_RECEIVER: u64 = 40_000_002;
 const TEXT_DOCUMENT_RECEIVER: u64 = 40_000_003;
 const TEXT_EMANATED_RECEIVER: u64 = 40_000_004;
-const REST_SCHEMA: &str = "life.exact-text-material-atlas.v3";
+const REST_SCHEMA: &str = "life.exact-text-material-atlas.v4";
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum TextMaterialSourceKind {
     CodexRollout,
+    CodexHistory,
     ClaudeCode,
+    ClaudeHistory,
     ParsedDocument,
+    SelfEmanated,
+}
+
+/// Which owner supplied an occurrence identity.
+///
+/// Provider identity and a membrane-founded record coordinate are different testimony.  An absent
+/// provider identity never deletes the occurrence and never promotes the membrane coordinate into
+/// a provider claim; the witness carries which species it is.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum TextMaterialIdentitySpecies {
+    ProviderSupplied,
+    FoundedFromContainerRecordRange,
+    DeclaredDocument,
     SelfEmanated,
 }
 
@@ -103,6 +120,7 @@ pub enum TextMaterialError {
 #[serde(deny_unknown_fields)]
 pub struct TextMaterialWitness {
     pub source_kind: TextMaterialSourceKind,
+    pub identity_species: TextMaterialIdentitySpecies,
     pub container: String,
     pub conversation: String,
     pub raw_record: u64,
@@ -184,6 +202,7 @@ pub struct TextMaterialContainerReceipt {
     pub raw_sha256: String,
     pub complete_records: u64,
     pub visible_occurrences: usize,
+    pub founded_identity_occurrences: usize,
     pub excluded_control_occurrences: usize,
     pub partial_tail_bytes: u64,
 }
@@ -201,9 +220,12 @@ pub struct TextMaterialCorpusReceipt {
     pub assistant_occurrences: usize,
     pub document_occurrences: usize,
     pub codex_witnesses: usize,
+    pub codex_history_witnesses: usize,
     pub claude_witnesses: usize,
+    pub claude_history_witnesses: usize,
     pub document_witnesses: usize,
     pub self_emanated_witnesses: usize,
+    pub founded_identity_witnesses: usize,
     pub exact_duplicate_witnesses: usize,
     pub native_version_fibers: usize,
     pub excluded_control_occurrences: usize,
@@ -220,20 +242,27 @@ pub struct ExactTextMaterialCorpus {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum TextMaterialInput {
     CodexRollout(PathBuf),
+    CodexHistory(PathBuf),
     ClaudeCode(PathBuf),
+    ClaudeHistory(PathBuf),
 }
 
 impl TextMaterialInput {
     pub fn path(&self) -> &Path {
         match self {
-            Self::CodexRollout(path) | Self::ClaudeCode(path) => path,
+            Self::CodexRollout(path)
+            | Self::CodexHistory(path)
+            | Self::ClaudeCode(path)
+            | Self::ClaudeHistory(path) => path,
         }
     }
 
     pub const fn source_kind(&self) -> TextMaterialSourceKind {
         match self {
             Self::CodexRollout(_) => TextMaterialSourceKind::CodexRollout,
+            Self::CodexHistory(_) => TextMaterialSourceKind::CodexHistory,
             Self::ClaudeCode(_) => TextMaterialSourceKind::ClaudeCode,
+            Self::ClaudeHistory(_) => TextMaterialSourceKind::ClaudeHistory,
         }
     }
 }
@@ -317,9 +346,12 @@ impl ExactTextMaterialCorpus {
         let mut container_hash = Sha256::new();
         let mut raw_bytes = 0u64;
         let mut codex_witnesses = 0usize;
+        let mut codex_history_witnesses = 0usize;
         let mut claude_witnesses = 0usize;
+        let mut claude_history_witnesses = 0usize;
         let mut document_witnesses = 0usize;
         let mut self_emanated_witnesses = 0usize;
+        let mut founded_identity_witnesses = 0usize;
         for container in &containers {
             raw_bytes = raw_bytes
                 .checked_add(container.raw_extent)
@@ -333,14 +365,23 @@ impl ExactTextMaterialCorpus {
             for witness in &occurrence.witnesses {
                 match witness.source_kind {
                     TextMaterialSourceKind::CodexRollout => codex_witnesses += 1,
+                    TextMaterialSourceKind::CodexHistory => codex_history_witnesses += 1,
                     TextMaterialSourceKind::ClaudeCode => claude_witnesses += 1,
+                    TextMaterialSourceKind::ClaudeHistory => claude_history_witnesses += 1,
                     TextMaterialSourceKind::ParsedDocument => document_witnesses += 1,
                     TextMaterialSourceKind::SelfEmanated => self_emanated_witnesses += 1,
+                }
+                if witness.identity_species
+                    == TextMaterialIdentitySpecies::FoundedFromContainerRecordRange
+                {
+                    founded_identity_witnesses += 1;
                 }
             }
         }
         let exact_witnesses = codex_witnesses
-            .checked_add(claude_witnesses)
+            .checked_add(codex_history_witnesses)
+            .and_then(|count| count.checked_add(claude_witnesses))
+            .and_then(|count| count.checked_add(claude_history_witnesses))
             .and_then(|count| count.checked_add(document_witnesses))
             .and_then(|count| count.checked_add(self_emanated_witnesses))
             .ok_or(TextMaterialError::CarrierExtent)?;
@@ -351,7 +392,7 @@ impl ExactTextMaterialCorpus {
                 .or_default() += 1;
         }
         let receipt = TextMaterialCorpusReceipt {
-            schema: "life.exact-text-material-corpus.v1".to_owned(),
+            schema: "life.exact-text-material-corpus.v2".to_owned(),
             containers: containers.len(),
             raw_bytes,
             raw_container_sha256: hex_digest(&container_hash.finalize()),
@@ -370,9 +411,12 @@ impl ExactTextMaterialCorpus {
                 .filter(|occurrence| occurrence.role == TextMaterialRole::Document)
                 .count(),
             codex_witnesses,
+            codex_history_witnesses,
             claude_witnesses,
+            claude_history_witnesses,
             document_witnesses,
             self_emanated_witnesses,
+            founded_identity_witnesses,
             exact_duplicate_witnesses: exact_witnesses.saturating_sub(occurrences.len()),
             native_version_fibers: native_versions.values().filter(|count| **count > 1).count(),
             excluded_control_occurrences,
@@ -994,6 +1038,7 @@ impl ExactTextMaterialAtlas {
             .map_err(|_| TextMaterialError::CarrierExtent)?;
         let witness = TextMaterialWitness {
             source_kind: TextMaterialSourceKind::SelfEmanated,
+            identity_species: TextMaterialIdentitySpecies::SelfEmanated,
             container: "continuing-text-body".to_owned(),
             conversation: "continuing-text-body".to_owned(),
             raw_record: ordinal,
@@ -1516,9 +1561,11 @@ fn phase_name(phase: &TextMaterialPhase) -> &str {
 const fn source_kind_tag(kind: TextMaterialSourceKind) -> u8 {
     match kind {
         TextMaterialSourceKind::CodexRollout => 1,
-        TextMaterialSourceKind::ClaudeCode => 2,
-        TextMaterialSourceKind::ParsedDocument => 3,
-        TextMaterialSourceKind::SelfEmanated => 4,
+        TextMaterialSourceKind::CodexHistory => 2,
+        TextMaterialSourceKind::ClaudeCode => 3,
+        TextMaterialSourceKind::ClaudeHistory => 4,
+        TextMaterialSourceKind::ParsedDocument => 5,
+        TextMaterialSourceKind::SelfEmanated => 6,
     }
 }
 
@@ -1651,6 +1698,71 @@ mod tests {
         assert_eq!(corpus.occurrences().len(), 1);
         assert_eq!(corpus.occurrences()[0].witnesses.len(), 2);
         assert_eq!(corpus.receipt().exact_duplicate_witnesses, 1);
+        std::fs::remove_file(left).unwrap();
+        std::fs::remove_file(right).unwrap();
+    }
+
+    #[test]
+    fn histories_and_unidentified_rollouts_found_typed_plural_occurrences() {
+        let codex_history = temporary("codex-history");
+        let claude_history = temporary("claude-history");
+        let left = temporary("codex-unidentified-left");
+        let right = temporary("codex-unidentified-right");
+        std::fs::write(
+            &codex_history,
+            concat!(
+                "{\"session_id\":\"history-left\",\"ts\":1,\"text\":\"The same exact surface remains a first occurrence.\"}\n",
+                "{\"session_id\":\"history-right\",\"ts\":2,\"text\":\"The same exact surface remains a first occurrence.\"}\n",
+            ),
+        )
+        .unwrap();
+        std::fs::write(
+            &claude_history,
+            "{\"display\":\"Claude history crosses the same material mouth.\",\"pastedContents\":{},\"project\":\"fixture\",\"sessionId\":\"claude-history\",\"timestamp\":3}\n",
+        )
+        .unwrap();
+        for (path, session) in [(&left, "rollout-left"), (&right, "rollout-right")] {
+            std::fs::write(
+                path,
+                format!(
+                    "{{\"type\":\"session_meta\",\"payload\":{{\"id\":\"{session}\",\"session_id\":\"{session}\"}}}}\n{{\"timestamp\":\"2026-01-01T00:00:00Z\",\"type\":\"response_item\",\"payload\":{{\"type\":\"message\",\"role\":\"user\",\"content\":[{{\"type\":\"input_text\",\"text\":\"An absent provider id does not erase this occurrence.\"}}]}}}}\n"
+                ),
+            )
+            .unwrap();
+        }
+        let corpus = ExactTextMaterialCorpus::import(
+            vec![
+                TextMaterialInput::CodexHistory(codex_history.to_owned()),
+                TextMaterialInput::ClaudeHistory(claude_history.to_owned()),
+                TextMaterialInput::CodexRollout(left.to_owned()),
+                TextMaterialInput::CodexRollout(right.to_owned()),
+            ],
+            &[],
+            2,
+        )
+        .unwrap();
+        assert_eq!(corpus.occurrences().len(), 5);
+        assert_eq!(corpus.receipt().codex_history_witnesses, 2);
+        assert_eq!(corpus.receipt().claude_history_witnesses, 1);
+        assert_eq!(corpus.receipt().codex_witnesses, 2);
+        assert_eq!(corpus.receipt().founded_identity_witnesses, 5);
+        assert!(corpus.occurrences().iter().all(|occurrence| occurrence
+            .witnesses
+            .iter()
+            .all(|witness| witness.identity_species
+                == TextMaterialIdentitySpecies::FoundedFromContainerRecordRange)));
+        assert!(corpus
+            .occurrences()
+            .iter()
+            .any(|occurrence| occurrence.witnesses.iter().any(|witness| witness.conversation
+                == "rollout-left")));
+        assert!(corpus
+            .occurrences()
+            .iter()
+            .any(|occurrence| occurrence.witnesses.iter().any(|witness| witness.conversation
+                == "rollout-right")));
+        std::fs::remove_file(codex_history).unwrap();
+        std::fs::remove_file(claude_history).unwrap();
         std::fs::remove_file(left).unwrap();
         std::fs::remove_file(right).unwrap();
     }
