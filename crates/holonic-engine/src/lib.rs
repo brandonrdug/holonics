@@ -112,6 +112,8 @@ pub mod cuda_aperture;
 pub mod cuda_relation;
 pub mod device;
 pub mod diffusion;
+#[cfg(target_os = "linux")]
+pub mod hardware_cover;
 pub mod derivation_atlas;
 // The deposited derivation circuit conducted as an exact population current: `receiver_current`'s
 // transport law pointed at the atlas's own 0-cells and 1-cells, so that an atom recruited by ninety
@@ -321,6 +323,8 @@ pub use cuda_aperture::*;
 #[cfg(target_os = "linux")]
 pub use cuda_relation::*;
 pub use device::*;
+#[cfg(target_os = "linux")]
+pub use hardware_cover::*;
 pub use diffusion::*;
 pub use dimensional_receiver::*;
 pub use dimensional_wave::*;

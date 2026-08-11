@@ -3296,12 +3296,19 @@ pub unsafe extern "ptx-kernel" fn text_section_restrict(
     }
 }
 
-/// One CUDA thread enacts one current of one contemporary event together with every supplied hand
-/// arriving at that current. All storage is reusable apparatus for this event only. A resource
-/// status reports actual pressure and the host retries from the unchanged live predecessor with a
-/// larger single-current mouth.
-#[no_mangle]
-pub unsafe extern "ptx-kernel" fn lineage_event(
+/// **The law one lane enacts: one current of one contemporary event, together with every supplied
+/// hand arriving at that current.**
+///
+/// This is the body, and it wears two entry shells — [`lineage_event`], which enacts a single
+/// current on lane zero, and [`lineage_event_population`], which enacts a whole co-present
+/// population one lane per current. The crate's own design is stated in its header: *one mouth*,
+/// with only the entry shells re-expressed. Before 2026-08-10 there was one shell and it was the
+/// single-current one, so a contemporary population of `n` currents cost `n` launches of one lane
+/// each and the card ran as a very slow single core.
+///
+/// All storage is reusable apparatus for the current this call enacts. A resource status reports
+/// actual pressure and the host retries from the unchanged live predecessor with a larger mouth.
+unsafe fn enact_one_lineage(
     standing_words: *const u32,
     standing_words_len: usize,
     control_words: *mut u32,
@@ -3325,8 +3332,7 @@ pub unsafe extern "ptx-kernel" fn lineage_event(
     emanation: *mut u32,
     emanation_len: usize,
 ) {
-    let (x, y) = unsafe { global_xy() };
-    if x != 0 || y != 0 || control_words_len != event_cuda::CONTROL_WORDS {
+    if control_words_len != event_cuda::CONTROL_WORDS {
         return;
     }
     let control = slice::from_raw_parts_mut(control_words, control_words_len);
@@ -3653,4 +3659,167 @@ pub unsafe extern "ptx-kernel" fn lineage_event(
     };
     emanation_words.copy_from_slice(&row.words());
     event_status(control, event_cuda::STATUS_COMPLETE);
+}
+
+/// **One current, on lane zero.** The pre-2026-08-10 shape, retained because it is the exact
+/// reference the population shell must agree with: a caller that enacts a population and a caller
+/// that enacts its currents one at a time must obtain the same standing, the same radiation, and
+/// the same carriers.
+#[no_mangle]
+pub unsafe extern "ptx-kernel" fn lineage_event(
+    standing_words: *const u32,
+    standing_words_len: usize,
+    control_words: *mut u32,
+    control_words_len: usize,
+    relation_words: *const u32,
+    relation_words_len: usize,
+    owns: *mut SparseOwnCell,
+    owns_len: usize,
+    carriers: *mut u32,
+    carriers_len: usize,
+    overflow_nodes: *mut u32,
+    overflow_nodes_len: usize,
+    overflow_counts: *mut u32,
+    overflow_counts_len: usize,
+    directed_events: *const u32,
+    directed_events_len: usize,
+    directed_contacts: *mut u32,
+    directed_contacts_len: usize,
+    emissions: *mut u32,
+    emissions_len: usize,
+    emanation: *mut u32,
+    emanation_len: usize,
+) {
+    let (x, y) = unsafe { global_xy() };
+    if x != 0 || y != 0 {
+        return;
+    }
+    unsafe {
+        enact_one_lineage(
+            standing_words, standing_words_len,
+            control_words, control_words_len,
+            relation_words, relation_words_len,
+            owns, owns_len,
+            carriers, carriers_len,
+            overflow_nodes, overflow_nodes_len,
+            overflow_counts, overflow_counts_len,
+            directed_events, directed_events_len,
+            directed_contacts, directed_contacts_len,
+            emissions, emissions_len,
+            emanation, emanation_len,
+        )
+    }
+}
+
+/// **One lane per current: the whole co-present population in one crossing.**
+///
+/// The currents of one contemporary event are independent — that is what makes the event
+/// contemporary, and `research/records/2026-08-01_THE_HARDWARE_IS_A_RECEIVER_COVER…` states the
+/// condition exactly: two events are independent only when their complete exact consequences
+/// commute. Here they do, and disjointly: **every buffer is a contiguous array of `count`
+/// per-current regions, and lane `i` touches only region `i`.** No lane reads or writes another's
+/// region, so there is nothing to synchronize and no atomic anywhere on this path.
+///
+/// **Every stride is derived, not passed.** A region's extent is `len / count` for each buffer, and
+/// a length that does not divide is refused rather than rounded — a partial region would place one
+/// current's carrier inside another's, which is the absolute-frame defect at the level of memory.
+/// The only new datum is `count`, which the host reads off the population it is enacting.
+///
+/// `standing_words` and `relation_words` are **shared and read-only**: standing-before is one
+/// immutable field every current reads, exactly as `regional_contacts` already treats the receiver
+/// row. They are not strided.
+#[no_mangle]
+pub unsafe extern "ptx-kernel" fn lineage_event_population(
+    standing_words: *const u32,
+    standing_words_len: usize,
+    control_words: *mut u32,
+    control_words_len: usize,
+    relation_words: *const u32,
+    relation_words_len: usize,
+    owns: *mut SparseOwnCell,
+    owns_len: usize,
+    carriers: *mut u32,
+    carriers_len: usize,
+    overflow_nodes: *mut u32,
+    overflow_nodes_len: usize,
+    overflow_counts: *mut u32,
+    overflow_counts_len: usize,
+    directed_events: *const u32,
+    directed_events_len: usize,
+    directed_contacts: *mut u32,
+    directed_contacts_len: usize,
+    emissions: *mut u32,
+    emissions_len: usize,
+    emanation: *mut u32,
+    emanation_len: usize,
+    count: usize,
+) {
+    let (x, y) = unsafe { global_xy() };
+    if y != 0 || count == 0 {
+        return;
+    }
+    let lane = x as usize;
+    if lane >= count {
+        return;
+    }
+
+    // Every region is derived. A buffer whose extent does not divide by the population would give
+    // one current a partial region, so it is refused — and refused by every lane, so no lane
+    // proceeds on a body another lane has rejected.
+    let divides = |len: usize| len % count == 0;
+    if !divides(control_words_len)
+        || !divides(owns_len)
+        || !divides(carriers_len)
+        || !divides(overflow_nodes_len)
+        || !divides(overflow_counts_len)
+        || !divides(directed_events_len)
+        || !divides(directed_contacts_len)
+        || !divides(emissions_len)
+        || !divides(emanation_len)
+    {
+        // Lane zero stamps the structural refusal into its own control block so the host reads a
+        // named status rather than an unchanged buffer.
+        if lane == 0 && control_words_len >= event_cuda::CONTROL_WORDS {
+            let control = unsafe { slice::from_raw_parts_mut(control_words, event_cuda::CONTROL_WORDS) };
+            event_status(control, event_cuda::STATUS_STRUCTURE);
+        }
+        return;
+    }
+
+    let control_stride = control_words_len / count;
+    let owns_stride = owns_len / count;
+    let carriers_stride = carriers_len / count;
+    let overflow_nodes_stride = overflow_nodes_len / count;
+    let overflow_counts_stride = overflow_counts_len / count;
+    let directed_events_stride = directed_events_len / count;
+    let directed_contacts_stride = directed_contacts_len / count;
+    let emissions_stride = emissions_len / count;
+    let emanation_stride = emanation_len / count;
+
+    unsafe {
+        enact_one_lineage(
+            standing_words,
+            standing_words_len,
+            control_words.add(lane * control_stride),
+            control_stride,
+            relation_words,
+            relation_words_len,
+            owns.add(lane * owns_stride),
+            owns_stride,
+            carriers.add(lane * carriers_stride),
+            carriers_stride,
+            overflow_nodes.add(lane * overflow_nodes_stride),
+            overflow_nodes_stride,
+            overflow_counts.add(lane * overflow_counts_stride),
+            overflow_counts_stride,
+            directed_events.add(lane * directed_events_stride),
+            directed_events_stride,
+            directed_contacts.add(lane * directed_contacts_stride),
+            directed_contacts_stride,
+            emissions.add(lane * emissions_stride),
+            emissions_stride,
+            emanation.add(lane * emanation_stride),
+            emanation_stride,
+        )
+    }
 }

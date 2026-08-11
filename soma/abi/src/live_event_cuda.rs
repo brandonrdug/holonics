@@ -17,6 +17,12 @@ use body::place::Place;
 use crate::emission::{DeedEmission, DEED_WORDS};
 
 pub const ENTRY_SYMBOL: &str = "lineage_event";
+/// The co-present population mouth: one lane per current of one contemporary event.
+///
+/// Added 2026-08-10. [`ENTRY_SYMBOL`] enacts a single current on lane zero, so a population of `n`
+/// currents cost `n` crossings of one lane each and the card ran as a single core. This entry
+/// enacts the whole population in one crossing, and the two are required to agree exactly.
+pub const POPULATION_ENTRY_SYMBOL: &str = "lineage_event_population";
 pub const REGIONAL_CONTACT_ENTRY_SYMBOL: &str = "regional_contacts";
 pub const LAYOUT_VERSION: u32 = 6;
 

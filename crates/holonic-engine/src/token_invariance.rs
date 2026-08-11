@@ -188,8 +188,16 @@
 //!
 //! And it costs nothing quadratic: [`SeparationComplex::conduct_invariance`] reads the sorted window
 //! classes once, `O(d · horizon)`, and never materializes a pair. A surface whose exhibition is
-//! obstructed still receives a verdict — the route does not go through the population the aperture
-//! law bounds.
+//! obstructed still receives a verdict — the route does not go through the quadratic population at
+//! all.
+//!
+//! **The two costs are different objects and conflating them was a real error.** The reading is
+//! `O(d · horizon)` — the volume of the causal diamond the window enumerates. The *exhibition* is
+//! `C(d, 2)` — the pair product, which is a presentation and not a transport. A caller's declared
+//! capacity guards only the second; it bounds a `Vec` this organ writes out, never the work it does.
+//! An earlier form of this paragraph called that capacity *"the aperture law"*, which promoted an
+//! output-buffer guard to a law and then reasoned from the promotion. See this file's
+//! *"The horizon, read off the material"* section for what actually bounds a receiver.
 
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -1661,6 +1669,280 @@ pub fn collapsing_family_population(
         }
     }
     population
+}
+
+// -------------------------------------------------------------------------------------------------
+// The horizon, read off the material
+// -------------------------------------------------------------------------------------------------
+//
+// **A horizon is not a level and must never be authored.** Brandon, 2026-08-10, on the constant this
+// section removes: *"'horizon' shouldn't be a constant either if it is."* Everything below derives
+// it, and the derivation is exact.
+//
+// # The window is a causal diamond, and the horizon is its radius
+//
+// [`step_at`] writes index `2(k−1)` as `L^k` and `2(k−1)+1` as `R^k`, so a window enumerates the
+// occurrence's neighbourhood **shell by shell** — `−1, +1, −2, +2, …` — in order of `|offset|`.
+// That is a discrete causal diamond around the occurrence: the two sides are the two sheets, the
+// shell index is proper distance along the stream, and `None` is where the whole ends, which is the
+// material's own boundary rather than padding.
+//
+// Two consequences, both used below:
+//
+// - the window at horizon `h` is a **prefix** of the window at `h+1`, so the partition at `h+1`
+//   refines the partition at `h` — *"a deeper horizon only separates more"*, this module's own
+//   statement, now load-bearing rather than decorative;
+// - the first index at which two windows differ is the **shell at which the two occurrences
+//   separate**, which is what the shared-prefix array already reports.
+//
+// # Why the derivation terminates, and it is a theorem about the material
+//
+// No window can reach past the longest whole, so at `bound = max stream length` every window
+// already carries its occurrence's entire whole and no deeper horizon can refine anything. That
+// bound is **read off the census**; nobody declares it.
+//
+// Within `[0, bound]` the class count is monotone non-decreasing, because refinement can only
+// split. And a refinement with the same number of blocks **is** the same partition. So
+//
+// ```text
+//   saturation horizon  =  the least h with  classes(h) == classes(bound)
+// ```
+//
+// is exactly the least horizon whose partition is already final, and monotonicity makes it binary
+// searchable in `O(log bound)` partition builds instead of `bound` of them.
+//
+// # What this is in the ontology
+//
+// The saturation horizon is where the receiver's causal past stops carrying difference: extending
+// the cone past it changes nothing this receiver can distinguish. It is the material's own null
+// boundary for that receiver — `Q(v) = 0`, the vacuous difference — and it is a **relation between
+// a receiver and its material**, never a property either one has alone.
+
+/// The material's own ceiling on any horizon: no window reaches past the longest whole.
+///
+/// Read off the census. A horizon above this refines nothing, because every window already carries
+/// its occurrence's whole entire and every further shell is `None` on both sides.
+pub fn material_horizon_bound(census: &CorpusCensus) -> usize {
+    census
+        .wholes()
+        .iter()
+        .map(|whole| whole.stream.len())
+        .max()
+        .unwrap_or(0)
+}
+
+/// One surface's horizon, derived rather than declared.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct SaturationHorizon {
+    pub surface: SurfaceId,
+    /// The least horizon whose partition is already final.
+    pub horizon: usize,
+    /// The material ceiling the search ran inside, from [`material_horizon_bound`].
+    pub bound: usize,
+    /// The final class count — what the receiver can distinguish at all, at any depth.
+    pub classes: usize,
+    /// The class count at horizon 1, so the orbit of the level this replaces is visible.
+    pub classes_at_one: usize,
+    /// The class count immediately **before** the last split. `classes_before < classes` is the
+    /// proof that the returned horizon is LEAST — one shell shallower was still refining — and it
+    /// costs nothing, because the propagation passes through that state anyway.
+    pub classes_before: usize,
+    /// Shells actually propagated. Stops at the ceiling or when every class is a singleton.
+    pub shells: usize,
+    /// **How the propagation terminated, and only one of the two is a proof.**
+    ///
+    /// `true` — every class became a singleton, so no deeper shell can split anything and the
+    /// horizon is final as a theorem. `false` — the material ceiling was reached with classes still
+    /// plural, so those occurrences are indistinguishable to this receiver at any depth. Reporting
+    /// which is the difference between a checked claim and an assumed one.
+    pub exhausted: bool,
+    /// **The cost, exactly**: occurrences still carrying difference, summed over the shells that
+    /// were propagated. This is the volume of the cone that was still live — not the cone's volume,
+    /// and not a wall-clock reading. `CLAUDE.md` §8: a cost is measured in work, never in elapsed
+    /// time.
+    pub active_total: usize,
+}
+
+impl SaturationHorizon {
+    /// True when horizon 1 — the level this derivation replaces — already saw everything.
+    pub fn one_was_enough(&self) -> bool {
+        self.classes_at_one == self.classes
+    }
+
+    /// The distinctions a horizon of 1 could not reach.
+    pub fn unreached_at_one(&self) -> usize {
+        self.classes - self.classes_at_one
+    }
+
+    /// True when one shell shallower was still refining — the returned horizon is **least**.
+    ///
+    /// Vacuously true at horizon 1, where there is no shallower shell to be refining.
+    pub fn is_least(&self) -> bool {
+        self.horizon <= 1 || self.classes_before < self.classes
+    }
+
+    /// True when at least one shell was propagated past the answer and split nothing. Evidence
+    /// the loop did not simply stop at the first quiet shell — which would be unsound.
+    pub fn walked_past(&self) -> bool {
+        self.shells > self.horizon
+    }
+}
+
+/// What one shell contributes: the two readings at `±k` from a site, or `None` past the whole.
+fn shell(
+    census: &CorpusCensus,
+    atlas: &ConductAtlas,
+    whole: u32,
+    position: u32,
+    depth: usize,
+) -> (Option<Reading>, Option<Reading>) {
+    let stream = &census.wholes()[whole as usize].stream;
+    let at = |offset: i64| {
+        let site = position as i64 + offset;
+        if site < 0 || site >= stream.len() as i64 {
+            None
+        } else {
+            Some(reading(census, atlas, stream[site as usize]))
+        }
+    };
+    (at(-(depth as i64)), at(depth as i64))
+}
+
+/// Derive one surface's horizon by **propagating** the cone one shell at a time.
+///
+/// # This replaced a binary search, and the reason is the whole point
+///
+/// The first implementation binary-searched `[1, bound]` for the least horizon whose class count
+/// matched the count at `bound`. It was correct and it was catastrophic: probing at the ceiling
+/// materializes a window of `2 · bound` readings **per occurrence**, so one probe costs
+/// `occurrences · 2 · bound · 32` octets. Run against this repository's own corpus it reached
+/// **19.6 GB resident on one core in 6m39s with no output** and was halted — the unbounded causal
+/// past, produced by the driver written to explain it.
+///
+/// **A cone is not binary-searched. It propagates.** Light does not sample its way to a horizon; it
+/// advances one shell at a time and stops where the difference dies. So the partition is held and
+/// refined shell by shell, and only classes that are **still non-singleton** are ever touched — a
+/// singleton can never split again, which makes the active population shrink monotonically. The
+/// work is therefore
+///
+/// ```text
+///   Σ_k  (occurrences still carrying difference at shell k)
+/// ```
+///
+/// which is the volume of the cone *that is still carrying difference*, not the volume of the cone.
+/// Memory is `O(occurrences)`; no window is ever materialized.
+///
+/// # Why stopping is a theorem and not a heuristic
+///
+/// A shell that splits nothing does **not** prove saturation: refinement can stall for one shell
+/// and resume — `Z A B C D E` against `W A B C D E`, read at `C`, agree at shells 1 and 2 and
+/// differ at 3. So the loop does not stop on a quiet shell. It stops when **every class is a
+/// singleton**, which is sound because a singleton cannot split at any depth, or at the material
+/// ceiling, past which every shell is `None` on both sides. The returned horizon is the **last
+/// shell that actually split a class** — the least radius whose partition is already final.
+pub fn saturation_horizon(
+    census: &CorpusCensus,
+    atlas: &ConductAtlas,
+    surface: SurfaceId,
+) -> SaturationHorizon {
+    let bound = material_horizon_bound(census).max(1);
+    let sites = census.sites(surface);
+
+    // The partition at shell 0: one class holding every occurrence.
+    let mut classes: Vec<Vec<(u32, u32)>> = vec![sites.to_vec()];
+    let mut last_split = 0usize;
+    let mut classes_at_one = 1usize;
+    let mut classes_before = 1usize;
+    let mut shells = 0usize;
+    let mut active_total = 0usize;
+    let mut exhausted = false;
+
+    for depth in 1..=bound {
+        // Only a non-singleton class can split. This is what keeps the work on the front.
+        let active: usize = classes.iter().filter(|c| c.len() > 1).map(Vec::len).sum();
+        if active == 0 {
+            exhausted = true;
+            break;
+        }
+        let before = classes.len();
+        shells += 1;
+        active_total += active;
+
+        let mut refined: Vec<Vec<(u32, u32)>> = Vec::with_capacity(classes.len());
+        let mut split = false;
+        for class in classes.drain(..) {
+            if class.len() == 1 {
+                refined.push(class);
+                continue;
+            }
+            let mut grouped: BTreeMap<(Option<Reading>, Option<Reading>), Vec<(u32, u32)>> =
+                BTreeMap::new();
+            for (whole, position) in class {
+                grouped
+                    .entry(shell(census, atlas, whole, position, depth))
+                    .or_default()
+                    .push((whole, position));
+            }
+            if grouped.len() > 1 {
+                split = true;
+            }
+            refined.extend(grouped.into_values());
+        }
+        classes = refined;
+        if split {
+            last_split = depth;
+            classes_before = before;
+        }
+        if depth == 1 {
+            classes_at_one = classes.len();
+        }
+    }
+
+    SaturationHorizon {
+        surface,
+        horizon: last_split.max(1),
+        bound,
+        classes: classes.len(),
+        classes_at_one,
+        classes_before,
+        shells,
+        exhausted,
+        active_total,
+    }
+}
+
+/// Every word surface's derived horizon. No level participates anywhere in this call.
+pub fn saturation_horizons(
+    census: &CorpusCensus,
+    atlas: &ConductAtlas,
+) -> BTreeMap<SurfaceId, SaturationHorizon> {
+    census
+        .word_surfaces()
+        .into_iter()
+        .map(|surface| (surface, saturation_horizon(census, atlas, surface)))
+        .collect()
+}
+
+/// The horizon at which **every** surface in the corpus has saturated: the corpus's own reading
+/// horizon, and the honest replacement for a declared one.
+///
+/// Returned with the population that forced it, because a single number over a corpus is a summary
+/// and this organ does not deal in summaries: the forcing surfaces are what a caller should look at
+/// before deciding that one horizon serves the whole material.
+pub fn corpus_horizon(
+    horizons: &BTreeMap<SurfaceId, SaturationHorizon>,
+) -> (usize, BTreeSet<SurfaceId>) {
+    let deepest = horizons
+        .values()
+        .map(|reading| reading.horizon)
+        .max()
+        .unwrap_or(1);
+    let forcing = horizons
+        .iter()
+        .filter(|(_, reading)| reading.horizon == deepest)
+        .map(|(surface, _)| *surface)
+        .collect();
+    (deepest, forcing)
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -3315,6 +3597,170 @@ mod tests {
         write(&root, "research/records/a.md", "pp gg alpha six hh\n");
         write(&root, "reference/pureholonics-seed/a.md", "pp gg alpha six hh\n");
         root
+    }
+
+    /// The horizon is read off the material, and the reading is monotone as the theorem requires.
+    ///
+    /// `arxiv` sits inside `pad ref arxiv . org pad` every time, so it saturates at its own class
+    /// count immediately; `set` occurs in four different neighbourhoods. The two must not derive the
+    /// same horizon, or the derivation is returning a property of the corpus rather than of the
+    /// receiver-material relation.
+    #[test]
+    fn the_horizon_is_read_off_the_material_not_declared() {
+        let root = declared_corpus("saturation-horizon");
+        let census = CorpusCensus::read(&root).unwrap();
+        let atlas = atlas(&census);
+        let bound = material_horizon_bound(&census);
+        assert!(bound > 1, "the fixture must admit more than one shell");
+
+        for surface in census.word_surfaces() {
+            let derived = saturation_horizon(&census, &atlas, surface);
+            assert_eq!(derived.bound, bound, "the ceiling is the material's");
+            assert!(derived.horizon >= 1 && derived.horizon <= bound);
+
+            // Monotone refinement, which is what makes the binary search valid. This is the
+            // property the derivation RESTS on, so it is checked rather than assumed.
+            let mut previous = 0usize;
+            for horizon in 1..=bound {
+                let classes =
+                    SeparationComplex::read(&census, &atlas, surface, horizon).distinct_windows();
+                assert!(
+                    classes >= previous,
+                    "a deeper horizon may only separate more: {surface:?} at {horizon}"
+                );
+                previous = classes;
+            }
+            assert_eq!(previous, derived.classes, "the ceiling count is final");
+
+            // The derived level is the LEAST one that is final -- both halves.
+            assert_eq!(
+                SeparationComplex::read(&census, &atlas, surface, derived.horizon)
+                    .distinct_windows(),
+                derived.classes,
+                "the derived horizon is already final"
+            );
+            if derived.horizon > 1 {
+                assert!(
+                    SeparationComplex::read(&census, &atlas, surface, derived.horizon - 1)
+                        .distinct_windows()
+                        < derived.classes,
+                    "one shell shallower must still be refining, or the level is not least"
+                );
+            }
+
+            // The cone must never be propagated further than the material admits, and the
+            // live population must be bounded by the shells actually walked times the occurrences.
+            assert!(derived.shells <= bound, "{} shells past {bound}", derived.shells);
+            assert!(
+                derived.active_total <= derived.shells * census.sites(surface).len().max(1),
+                "the live population cannot exceed shells x occurrences"
+            );
+        }
+    }
+
+    /// **Refinement stalls, and a loop that stopped at the first quiet shell would be wrong.**
+    ///
+    /// The declared corpus cannot grade this: measured 2026-08-10 over 29,533 real surfaces,
+    /// **zero** ever had a quiet shell before their last split, so `shells == horizon` everywhere
+    /// and a sound loop is indistinguishable from an unsound one on that material. `CLAUDE.md` §8 —
+    /// *when the declared material cannot exercise a law, add a declared control that does.* This
+    /// is that control, and it is built so the unsound loop returns a different answer.
+    ///
+    /// Three wholes, all carrying `c`:
+    ///
+    /// ```text
+    ///     A     k a c b k          shell 1 = (a,b)   shell 2 = (k,k)     shell 3 = (-,-)
+    ///     B     k z c b k          shell 1 = (z,b)
+    ///     C   m k a c b k m        shell 1 = (a,b)   shell 2 = (k,k)     shell 3 = (m,m)
+    /// ```
+    ///
+    /// Shell 1 splits `B` off. **Shell 2 splits nothing** — `A` and `C` still agree and `B` is
+    /// already a singleton. Shell 3 splits `A` from `C`. A loop halting on the quiet shell returns
+    /// horizon 1 and two classes; the correct answer is horizon 3 and three classes.
+    #[test]
+    fn refinement_stalls_and_the_horizon_is_not_the_first_quiet_shell() {
+        // Every declared stratum must be non-empty; the three carrying `c` are the fixture and the
+        // fourth is filler that never writes the surface.
+        let root = scratch("stalled-refinement");
+        write(&root, "papers/source/mathematics/a.typ", "k a c b k\n");
+        write(&root, "canon/a.md", "k z c b k\n");
+        write(&root, "research/records/a.md", "m k a c b k m\n");
+        write(&root, "reference/pureholonics-seed/a.md", "filler only\n");
+        let census = CorpusCensus::read(&root).unwrap();
+        let atlas = atlas(&census);
+        let surface = census.lookup("c").expect("the fixture writes it");
+
+        let derived = saturation_horizon(&census, &atlas, surface);
+        assert_eq!(derived.horizon, 3, "the last split is at shell three: {derived:?}");
+        assert_eq!(derived.classes, 3, "all three occurrences separate");
+        assert_eq!(derived.classes_at_one, 2, "shell one splits B off and nothing else");
+        assert!(derived.walked_past() || derived.exhausted);
+        assert!(derived.is_least(), "shell two was quiet, shell three split");
+
+        // The unsound loop, written out, so the difference is exhibited rather than asserted: stop
+        // at the first shell that splits nothing and it answers 1 where the truth is 3.
+        let mut classes: Vec<Vec<(u32, u32)>> = vec![census.sites(surface).to_vec()];
+        let mut halted_at = 0usize;
+        for depth in 1..=derived.bound {
+            let mut refined: Vec<Vec<(u32, u32)>> = Vec::new();
+            let mut split = false;
+            for class in classes.drain(..) {
+                let mut grouped: BTreeMap<_, Vec<(u32, u32)>> = BTreeMap::new();
+                for (whole, position) in class {
+                    grouped
+                        .entry(shell(&census, &atlas, whole, position, depth))
+                        .or_default()
+                        .push((whole, position));
+                }
+                if grouped.len() > 1 {
+                    split = true;
+                }
+                refined.extend(grouped.into_values());
+            }
+            classes = refined;
+            if !split {
+                halted_at = depth - 1;
+                break;
+            }
+        }
+        assert_eq!(halted_at, 1, "the unsound loop halts on the quiet shell");
+        assert_ne!(
+            halted_at, derived.horizon,
+            "if these agree the fixture does not separate the two loops"
+        );
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    /// The derivation has a non-trivial orbit: the material must disagree with the authored `1`
+    /// somewhere, or replacing the constant changed nothing and the excision is bookkeeping.
+    #[test]
+    fn the_derived_horizon_moves_against_the_level_it_replaces() {
+        let root = declared_corpus("horizon-orbit");
+        let census = CorpusCensus::read(&root).unwrap();
+        let atlas = atlas(&census);
+        let horizons = saturation_horizons(&census, &atlas);
+        assert!(!horizons.is_empty());
+
+        let moved: Vec<_> = horizons.values().filter(|r| !r.one_was_enough()).collect();
+        assert!(
+            !moved.is_empty(),
+            "no surface needs more than one shell, so this fixture cannot grade the excision"
+        );
+        for reading in &moved {
+            assert!(reading.horizon > 1);
+            assert!(reading.unreached_at_one() > 0);
+        }
+
+        // Surfaces genuinely differ in reach: one horizon over the corpus is a summary, and the
+        // organ returns the population that forced it rather than the number alone.
+        let (deepest, forcing) = corpus_horizon(&horizons);
+        assert!(deepest > 1);
+        assert!(!forcing.is_empty());
+        assert!(
+            forcing.len() < horizons.len(),
+            "if every surface forces the corpus horizon the reading carries no information"
+        );
+        let _ = fs::remove_dir_all(&root);
     }
 
     #[test]

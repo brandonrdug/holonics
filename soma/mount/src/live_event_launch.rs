@@ -3,6 +3,7 @@
 use core::ffi::c_void;
 use core::marker::PhantomData;
 
+use crate::cuda::LaunchCensus;
 use crate::{CudaError, DeviceBuffer, Dim3, Function, Module, Result};
 
 fn boundary(context: &'static str, message: impl Into<String>) -> CudaError {
@@ -95,6 +96,54 @@ impl LiveEventArguments<'_> {
 }
 
 pub struct LiveEventKernel<'m>(Function<'m>);
+
+/// The co-present population mouth: one lane per current of one contemporary event.
+pub struct LiveEventPopulationKernel<'m>(Function<'m>);
+
+impl LiveEventPopulationKernel<'_> {
+    pub fn local_size_bytes(&self) -> Result<usize> {
+        self.0.local_size_bytes()
+    }
+
+    /// Enact `count` currents in **one** crossing, one lane each.
+    ///
+    /// **The launch shape is derived, never authored.** `Function::linear_launch` takes it from the
+    /// function's own `CU_FUNC_ATTRIBUTE_MAX_THREADS_PER_BLOCK` and the device's census, folds X
+    /// into Y when X saturates, and refuses rather than clipping. This mouth adds nothing to that:
+    /// the work extent is `count`, which is the material's own population, and every per-current
+    /// stride is derived inside the kernel as `len / count`.
+    pub fn launch(
+        &self,
+        census: LaunchCensus,
+        arguments: LiveEventArguments<'_>,
+        count: usize,
+    ) -> Result<()> {
+        if count == 0 {
+            return Err(boundary(
+                "live event population extent",
+                "a contemporary population carries one or more currents",
+            ));
+        }
+        let launch = self.0.linear_launch(census, count as u64)?;
+        let pairs = arguments.pairs();
+        let mut values = Vec::with_capacity(pairs.len() * 2 + 1);
+        for pair in pairs {
+            values.push(pair.pointer);
+            values.push(u64::try_from(pair.elements).map_err(|_| {
+                boundary(
+                    "live event CUDA argument extent",
+                    "a buffer extent exceeds its 64-bit ABI word",
+                )
+            })?);
+        }
+        values.push(count as u64);
+        let mut arguments: Vec<*mut c_void> = values
+            .iter_mut()
+            .map(|value| value as *mut u64 as *mut c_void)
+            .collect();
+        self.0.launch(launch.grid, launch.block, &mut arguments)
+    }
+}
 
 #[derive(Clone, Copy)]
 pub struct RegionalContactArguments<'a> {
@@ -205,6 +254,11 @@ impl Module {
     pub fn lineage_event(&self) -> Result<LiveEventKernel<'_>> {
         self.function(soma_abi::live_event_cuda::ENTRY_SYMBOL)
             .map(LiveEventKernel)
+    }
+
+    pub fn lineage_event_population(&self) -> Result<LiveEventPopulationKernel<'_>> {
+        self.function(soma_abi::live_event_cuda::POPULATION_ENTRY_SYMBOL)
+            .map(LiveEventPopulationKernel)
     }
 
     pub fn regional_contacts(&self) -> Result<RegionalContactKernel<'_>> {

@@ -29,7 +29,7 @@ cp -f "$BUILT" soma_kernel_cuda.ptx
 echo "=== PTX header ==="
 head -6 soma_kernel_cuda.ptx
 echo "=== entries present ==="
-for e in link_grain link_sum link_finish link_founded_grain link_register_grain link_register_sum link_register_finish link_founded_sum chart_mark chart_register_mark chart_count chart_recast register_own_recast register_own_recast_finish register_carrier_rebase scope_felt scope_founded scope_register scope_register_surface regional_contacts lineage_event text_incidence_select text_section_restrict; do
+for e in link_grain link_sum link_finish link_founded_grain link_register_grain link_register_sum link_register_finish link_founded_sum chart_mark chart_register_mark chart_count chart_recast register_own_recast register_own_recast_finish register_carrier_rebase scope_felt scope_founded scope_register scope_register_surface regional_contacts lineage_event lineage_event_population text_incidence_select text_section_restrict; do
   if grep -q ".entry $e" soma_kernel_cuda.ptx; then echo "  .entry $e: present"; else echo "  .entry $e: MISSING"; exit 1; fi
 done
 echo "=== ptxas -arch=sm_89 validation ==="

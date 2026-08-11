@@ -167,14 +167,14 @@ outside `tools/` that names the verifier — not declared.
 
 | tool | what it checks | invoked by |
 |---|---|---|
-| `tools/authored_levels.py` | Every numeric level authored **inside** an organ, and whether it is dispositioned. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `canon/THE_AUTHORED_LEVEL.md`, and 5 more |
+| `tools/authored_levels.py` | Every numeric level authored **inside** an organ, and whether it is dispositioned. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `canon/THE_AUTHORED_LEVEL.md`, and 6 more |
 | `tools/boundary_artifacts.py` | Every committed boundary artifact is bound to its content hash AND its closure hash. | `meta/BOUNDARY_ARTIFACTS.tsv`, `research/records/2026-08-09_THE_COMMITTED_BOUNDARY_ARTIFACT_IS_STALE_AND_CANNOT_BE_REBUILT.md`, `soma/kernel/.gitignore` |
 | `tools/claim_index.py` | Generate `THE_CLAIM_INDEX.md` from the tree, so the table of contents cannot drift. | `CLAUDE.md`, `CONSTRUCTION_STATE.md` |
 | `tools/closure_manifest.py` | Bind every return under `output/` to the CLOSURE that produced it, not only to its content. | `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, `research/records/2026-08-10_THE_INSTRUMENT_DECLARES_THE_APERTURE_AND_THE_REFUSAL_IS_THE_RETURN.md` |
-| `tools/gates.sh` | The gate sequence. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `blueprint/THE_MACHINE.md`, and 2 more |
+| `tools/gates.sh` | The gate sequence. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `blueprint/THE_MACHINE.md`, and 3 more |
 | `tools/lean_check.sh` | Give the formal sources a verdict. | `blueprint/THE_ROADMAP.md`, `canon/THE_EXPLORATIVE_FAILURE.md`, `research/records/2026-08-09_THE_COMMITTED_BOUNDARY_ARTIFACT_IS_STALE_AND_CANNOT_BE_REBUILT.md` |
 | `tools/output_manifest.py` | Bind every returned artifact under `output/` to its content hash, in a TRACKED file. | `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, `meta/OUTPUT_MANIFEST.tsv`, and 1 more |
-| `tools/resolve_named_paths.py` | Every path a governing document names must resolve in the body that document describes. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, and 9 more |
+| `tools/resolve_named_paths.py` | Every path a governing document names must resolve in the body that document describes. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, and 10 more |
 
 `cargo test --workspace` is the gate that is actually run alongside these.
 
