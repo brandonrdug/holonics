@@ -29,7 +29,7 @@ crates/holonic-engine/src/contact_gluing.rs	.clone()=85	.collect()=31	.into_iter
 crates/holonic-engine/src/corpus_census.rs	.clone()=1	.collect()=15	.into_iter()=6	BTreeMap=11	Vec=46
 crates/holonic-engine/src/coupled_informant.rs	.clone()=22	.collect()=21	.flat_map()=1	.into_iter()=1	BTreeMap=18	BTreeSet=15	Vec=38
 crates/holonic-engine/src/cuda_aperture.rs	.clone()=20	.collect()=10	.into_iter()=9	BTreeMap=11	BTreeSet=12	Vec=12
-crates/holonic-engine/src/cuda_refine.rs	.collect()=3	.flat_map()=1	.into_iter()=1	BTreeMap=5	Vec=14
+crates/holonic-engine/src/cuda_refine.rs	.collect()=5	.flat_map()=1	.into_iter()=1	BTreeMap=13	Vec=21
 crates/holonic-engine/src/cuda_relation.rs	.clone()=9	.collect()=3	.into_iter()=3	Vec=10
 crates/holonic-engine/src/curvature_bridge.rs	.clone()=30	.collect()=31	.flat_map()=5	.into_iter()=1	BTreeMap=43	BTreeSet=37	Vec=9
 crates/holonic-engine/src/derivation_atlas.rs	.clone()=17	.collect()=38	.flat_map()=1	.into_iter()=7	BTreeMap=51	BTreeSet=45	Vec=38
@@ -114,7 +114,7 @@ crates/holonic-engine/src/substitution_realizers.rs	.clone()=22	.collect()=18	.f
 crates/holonic-engine/src/supported_realizers.rs	.clone()=3	.collect()=8	.flat_map()=1	.into_iter()=2	BTreeMap=5	BTreeSet=2	Vec=11
 crates/holonic-engine/src/surprisal.rs	.clone()=24	.collect()=3	BTreeMap=14	Vec=3
 crates/holonic-engine/src/temper.rs	.clone()=7	.collect()=9	.into_iter()=4	BTreeSet=8	Vec=10
-crates/holonic-engine/src/token_invariance.rs	.clone()=27	.collect()=62	.flat_map()=2	.into_iter()=20	BTreeMap=42	BTreeSet=27	Vec=102
+crates/holonic-engine/src/token_invariance.rs	.clone()=27	.collect()=63	.flat_map()=2	.into_iter()=20	BTreeMap=46	BTreeSet=27	Vec=103
 crates/holonic-engine/src/tube.rs	.clone()=59	.collect()=18	.flat_map()=3	.into_iter()=4	BTreeMap=36	BTreeSet=40	Vec=21
 crates/holonic-engine/src/wave_propagation.rs	.clone()=24	.collect()=12	.flat_map()=1	.into_iter()=2	BTreeMap=11	BTreeSet=12	Vec=43
 crates/holonic-engine/src/winding_inertia.rs	.clone()=28	.collect()=22	Vec=57
