@@ -66,6 +66,35 @@ Two records and one index, none of which builds anything:
   by holonic face for the first time. **Three false absences were deposited on 2026-08-10 alone**
   because the corpus could not be entered by concept.
 
+### THE ORDERING PRINCIPLE, corrected 2026-08-10
+
+**This file has been ordered by mechanism debt** — which organ is unwired, which cut has no owner.
+Two sweeps taken 2026-08-10 (a chronological read of 9,693 message entries over ninety-two days, and
+a capability inventory over the driver population) agree that the ordering principle should be
+**distance from the one commitment**, which has not moved since 2026-05-19:
+
+> **the transformation of information between two things that cannot see each other's interiors, with
+> the relation as the unit and never the thing.**
+
+By that measure the order is:
+
+1. **Give the language side the aperture law the iron-token organ already has.** `the_iron_tokens_carry_the_field`
+   scales to **12,339,449 tokens on 2 GB** by refusing past a declared width and answering narrower
+   whole; `eros_resonant_corpus_current` **SIGKILLs at 10,963 MB on 1,556 lines** and
+   `eros_morphological_language_generation` does not return in 35 minutes. This one item unblocks
+   generation, mounting real English, and the founding/checking edge together.
+2. **Point the recovery organs at a real black box.** Four **zero-residual** interior recoveries with
+   held-out exactness already exist — `bit_black_box_reconstruction`, `inverse_transport_reconstruction`,
+   `generative_transport_prediction`, `foreign_codec_intake`. The ambition they serve has been stated
+   without change since 2026-05-19 and **nothing in the tree has ever pointed them at a weight file.**
+3. **Counter-example finding** — the deliverable named 2026-08-06, and the shape the body already
+   demonstrates: exact recovery **plus** typed refusal **plus** retained obstruction.
+
+Record: `research/records/2026-08-10_THE_OBJECT_IS_THE_UNRECONSTRUCTABLE_INTERIOR_AND_THE_MACHINE_HAS_ALREADY_RECOVERED_FOUR.md`.
+
+**The items below are maintenance of a body whose purpose is stated above them**, and are ranked
+against each other, not against the three.
+
 ### The open work this round opened, ranked
 
 Each names the cut it closes and a falsifier. None of it is a new organ beside an existing one.
