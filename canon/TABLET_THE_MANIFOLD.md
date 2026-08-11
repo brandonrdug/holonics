@@ -635,6 +635,67 @@ whatever order its lanes reach them, and requiring two carriers to agree on numb
 requiring a realization coordinate to be causal — the record's own words: a lane, a warp, a block and
 a host thread are realization coordinates and none is a holon.
 
+### Chronology is not seriality — arcs, junctions, and why the card's model is the same law
+
+**Brandon, 2026-08-10, correcting a flattening this section had built on:** *"one receiver's returned
+chronology is not necessarily serial, it's a distribution of arcs, like the lightning leaders… I do
+not know why you don't ontologically understand why events are ever serial in arcs and
+electromagnetic events as opposed to parallel and branching in junctions."*
+
+The distinction, stated so it can be used:
+
+- an **arc** is one conducting channel, so what travels it is ordered;
+- a **junction** is where current distributes, so what leaves it is co-present;
+- **irreversibility and total order are different properties.** Time parity — the arc's asymmetry —
+  is not seriality. *"Do not remove chronology"* forbids deleting the causal order; it does not
+  license asserting a line where the material has a **tree**. Conflating the two is what produced a
+  serial walk over a population that branches.
+
+**And the device's execution model is that law in silicon rather than an analogy for it.** Lanes of
+a warp are co-present exactly while they share a path and the hardware **serializes them when they
+diverge** — arcs serial, junctions branching, enforced by the physics. The many channels exist to
+carry combinatorial binary path distributions, which are `H.0150`'s membership words: the Boolean
+lattice, crossing depth, inclusion–exclusion as its Möbius function. A monitor is a receiver and a
+distribution is a receiver, and the pipeline carrying a triangle through model → world → view → clip
+→ screen is transport of a relation across charts with an interpolation law. The triangle is the
+primitive because it is the smallest carrier of a relation with a hand — the tower, the law of
+cosines, the hinge deficit, and Brandon's own *"in friction triangles are the quantum."*
+
+### One expansion law, because three organs had the same front
+
+```text
+   token_invariance::sweep_covered      surfaces     -> readings
+   morphological_language generation    states       -> successors
+   causal_language leader               branch tips  -> continuations
+```
+
+A covering per organ is the cabinet failure one level down, exactly as a device path per organ is.
+`hardware_cover::expand_front` is the law: the material supplies `cell -> successors`, the law covers
+it by **extent**, and successors are reassembled in the **front's own order** so a lane's completion
+order never becomes chronology. Proved identical at 1, 2, 3, 8 and 64 lanes over a branching front,
+with a failing cell surfacing from any lane.
+
+### What mounting a carrier used to cost, measured
+
+`condition_route_receivers_with_executor` walked receivers in a plain `for`, threading one carrier
+through all of them, while its host twin `condition_route_partition` says outright: *"Parallelism
+lives across independent receiver ecologies; one receiver's returned chronology remains serial."*
+**So mounting a card cost the parallelism** — the device sat resident holding 2 GB at 0% while one
+host core walked the population, which is precisely what was observed.
+
+Repaired: each lane of the receiver cover mounts its own carrier, and the caller's carrier keeps a
+section so a mounted card is never idled. Measured on the bounded corpus:
+
+| | before | after |
+|---|---|---|
+| device utilisation during conditioning | 0 % at 2,066 MiB | **34 % at 6,191 MiB** |
+| conditioning | did not complete under observation | **103.5 s, completed** |
+
+**And the wall that remains is named rather than dressed:** generation does not return on this
+corpus, which is the condition `canon/THE_MEASURED_CAPABILITIES.md` already records — `4 → 55,098 ms`,
+`8 → no return`. Conditioning crossing the card does not move it, and this section does not claim
+otherwise.
+
 ### What this section forbids
 
 1. **No receiver reach described as a window, an aperture, or a capacity.** Name the cone, its apex,

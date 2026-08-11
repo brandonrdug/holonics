@@ -769,6 +769,52 @@ mod tests {
         }
     }
 
+    /// **The front expansion is exact under any cover: lanes may not move a result.**
+    ///
+    /// A branching material, so the front is a tree rather than a line, and the successors of a
+    /// wide cell and a narrow one must land in the front's own order regardless of which lane
+    /// finished first.
+    #[test]
+    fn the_front_expansion_is_canonical_under_every_cover() {
+        let front: Vec<u64> = (0..200).collect();
+        // A branching junction: cell `n` opens `n % 7 + 1` continuations, so extents differ and the
+        // by-extent cover cannot coincide with a by-count one.
+        let expand = |cell: u64| -> Result<Vec<u64>, ()> {
+            Ok((0..(cell % 7 + 1)).map(|branch| cell * 10 + branch).collect())
+        };
+        let serial = expand_front(front.clone(), &HardwareCover::of_charts(vec![
+            Chart::Host(HostDeclaration { lanes: 1 }),
+        ]), |cell| cell % 7 + 1, expand)
+        .expect("serial");
+        for lanes in [2u32, 3, 8, 64] {
+            let covered = expand_front(
+                front.clone(),
+                &HardwareCover::of_charts(vec![Chart::Host(HostDeclaration { lanes })]),
+                |cell| cell % 7 + 1,
+                expand,
+            )
+            .expect("covered");
+            assert_eq!(
+                serial, covered,
+                "a lane is a realization coordinate and may not move a result: {lanes} lanes"
+            );
+        }
+        assert_eq!(serial.len(), (0..200u64).map(|c| (c % 7 + 1) as usize).sum::<usize>());
+    }
+
+    /// A failing cell surfaces its failure rather than being silently dropped by its lane.
+    #[test]
+    fn a_failing_cell_returns_its_failure_from_any_lane() {
+        let front: Vec<u64> = (0..64).collect();
+        let outcome = expand_front(
+            front,
+            &HardwareCover::of_charts(vec![Chart::Host(HostDeclaration { lanes: 8 })]),
+            |_| 1,
+            |cell| if cell == 47 { Err("47") } else { Ok(vec![cell]) },
+        );
+        assert_eq!(outcome, Err("47"));
+    }
+
     /// The mode identity carries the device capability, which the record makes a constituent of
     /// admission. A host-only mode must be distinguishable from a covered one.
     #[test]
@@ -789,4 +835,146 @@ mod tests {
         assert_eq!(with.apparatus, "host+device0");
         assert_eq!(without.apparatus, "host");
     }
+}
+
+// -------------------------------------------------------------------------------------------------
+// The front expansion: the leader's law, one organ
+// -------------------------------------------------------------------------------------------------
+//
+// **A leader is a branching structure with time parity, not a line.** Brandon, 2026-08-10: *"one
+// receiver's returned chronology is not necessarily serial, it's a distribution of arcs, like the
+// lightning leaders… I do not know why you don't ontologically understand why events are ever
+// serial in arcs and electromagnetic events as opposed to parallel and branching in junctions."*
+//
+// The distinction is exact and it is the one this law is built on:
+//
+// - an **arc** is one conducting channel, so what travels it is ordered;
+// - a **junction** is where current distributes, so what leaves it is co-present;
+// - **chronology is not seriality.** Irreversibility — time parity, the arc's asymmetry — is a
+//   different property from being a total order. Deleting the causal order is forbidden; asserting
+//   a total order where the material has a tree is a different error and the one this law removes.
+//
+// **And the card's execution model is that same law in silicon rather than an analogy for it.**
+// Lanes of a warp are co-present exactly while they share a path and the hardware serializes them
+// when they diverge: arcs serial, junctions branching, enforced by the physics of the device. The
+// many channels exist to carry combinatorial binary path distributions, which are `H.0150`'s
+// membership words — the Boolean lattice, crossing depth, inclusion–exclusion as its Möbius
+// function. A monitor is a receiver and a distribution is a receiver.
+//
+// # Why this is one organ and not three coverings
+//
+// Three fronts in this body have exactly this shape and were being covered separately:
+//
+// ```text
+//   token_invariance::sweep_covered        surfaces      -> readings
+//   morphological_language generation      states        -> successors
+//   causal_language leader                 branch tips   -> continuations
+// ```
+//
+// A covering per organ is the cabinet-of-organs failure one level down, the same defect as a device
+// path per organ. The material supplies `cell -> successors`; the law covers it.
+
+/// **Expand one front of co-present cells across the cover.**
+///
+/// The material is the closure: what one cell branches into at its junction. Everything else — the
+/// cover, the sectioning by extent, the canonical reassembly — is this law.
+///
+/// **This is a decomposition and never a schedule.** `H.0219`: flux locality licenses the first and
+/// never the second. Successors are concatenated in **section order over a canonically ordered
+/// front**, so a lane's completion order never becomes chronology.
+///
+/// A lane's panic propagates exactly as it would have serially.
+pub fn expand_front<Cell, Successor, Failure>(
+    front: Vec<Cell>,
+    cover: &HardwareCover,
+    extent_of: impl Fn(&Cell) -> u64 + Sync,
+    expand: impl Fn(Cell) -> Result<Vec<Successor>, Failure> + Sync,
+) -> Result<Vec<Successor>, Failure>
+where
+    Cell: Send,
+    Successor: Send,
+    Failure: Send,
+{
+    let lanes = cover
+        .host()
+        .lanes
+        .max(1)
+        .min(front.len().max(1) as u32) as usize;
+    if lanes <= 1 || front.len() <= 1 {
+        let mut out = Vec::new();
+        for cell in front {
+            out.extend(expand(cell)?);
+        }
+        return Ok(out);
+    }
+
+    // Covered by EXTENT, not by count: a branch tip carrying a thousand continuations and one
+    // carrying two are not one unit each.
+    let mut ordered: Vec<(usize, u64)> = front
+        .iter()
+        .enumerate()
+        .map(|(at, cell)| (at, extent_of(cell).max(1)))
+        .collect();
+    ordered.sort_by_key(|(at, extent)| (std::cmp::Reverse(*extent), *at));
+    let mut placement: Vec<Vec<usize>> = vec![Vec::new(); lanes];
+    let mut carried = vec![0u128; lanes];
+    for (at, extent) in ordered {
+        let lane = carried
+            .iter()
+            .enumerate()
+            .min_by_key(|(lane, load)| (**load, *lane))
+            .map(|(lane, _)| lane)
+            .unwrap_or(0);
+        placement[lane].push(at);
+        carried[lane] += u128::from(extent);
+    }
+    for section in &mut placement {
+        section.sort_unstable();
+    }
+
+    // Each cell is moved into exactly one lane, which is the independence this law needs and which
+    // the placement above guarantees by construction.
+    let mut held: Vec<Option<Cell>> = front.into_iter().map(Some).collect();
+    let mut sections: Vec<Vec<(usize, Cell)>> = Vec::with_capacity(lanes);
+    for section in &placement {
+        let mut taken = Vec::with_capacity(section.len());
+        for at in section {
+            if let Some(cell) = held[*at].take() {
+                taken.push((*at, cell));
+            }
+        }
+        sections.push(taken);
+    }
+
+    let expand = &expand;
+    let gathered = std::thread::scope(|scope| {
+        let handles: Vec<_> = sections
+            .into_iter()
+            .map(|section| {
+                scope.spawn(move || -> Result<Vec<(usize, Vec<Successor>)>, Failure> {
+                    let mut rows = Vec::with_capacity(section.len());
+                    for (at, cell) in section {
+                        rows.push((at, expand(cell)?));
+                    }
+                    Ok(rows)
+                })
+            })
+            .collect();
+        let mut gathered: Vec<(usize, Vec<Successor>)> = Vec::new();
+        for handle in handles {
+            match handle.join() {
+                Ok(rows) => gathered.extend(rows?),
+                Err(payload) => std::panic::resume_unwind(payload),
+            }
+        }
+        Ok::<_, Failure>(gathered)
+    })?;
+
+    // Canonical: the front's own order, never the order lanes finished in.
+    let mut gathered = gathered;
+    gathered.sort_by_key(|(at, _)| *at);
+    Ok(gathered
+        .into_iter()
+        .flat_map(|(_, successors)| successors)
+        .collect())
 }

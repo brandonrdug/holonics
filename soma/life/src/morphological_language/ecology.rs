@@ -775,14 +775,62 @@ impl MorphologicalLanguageEcology {
             let mut successors =
                 BTreeMap::<MorphologicalCurrentState, MorphologicalCurrentPopulation>::new();
             let mut progressed = false;
-            for (current, population) in states {
+            // **The expansion is covered across the host's lanes.**
+            //
+            // Every state's successors depend on that state and on `&self`, which is immutable
+            // here — `begin_phase` and `finish_active_phase` both take `&self` — so the states of
+            // one round are a FRONT: independent cells over a shared immutable body. Walking them
+            // serially pinned one core, which `CLAUDE.md` §9 names a defect rather than a mystery.
+            //
+            // This is a decomposition and never a schedule. Each lane glues into its own map and
+            // the maps are merged in a declared order afterwards, so the returned population and
+            // every counter are identical to the serial walk — a lane is a realization coordinate
+            // and may not move a result.
+            let front: Vec<(MorphologicalCurrentState, MorphologicalCurrentPopulation)> =
+                states.into_iter().collect();
+            let lanes = std::thread::available_parallelism()
+                .map(|lanes| lanes.get())
+                .unwrap_or(1)
+                .min(front.len().max(1));
+            let mut sections: Vec<Vec<(MorphologicalCurrentState, MorphologicalCurrentPopulation)>> =
+                (0..lanes).map(|_| Vec::new()).collect();
+            for (at, cell) in front.into_iter().enumerate() {
+                sections[at % lanes].push(cell);
+            }
+
+            type LaneReturn = Result<
+                (
+                    BTreeMap<MorphologicalCurrentState, MorphologicalCurrentPopulation>,
+                    bool,
+                    [usize; 4],
+                ),
+                MorphologicalLanguageError,
+            >;
+            let gathered: Vec<LaneReturn> = std::thread::scope(|scope| {
+                let handles: Vec<_> = sections
+                    .into_iter()
+                    .map(|section| {
+                        let charge = &charge;
+                        let spec = spec;
+                        scope.spawn(move || -> LaneReturn {
+                            let mut lane_successors = BTreeMap::<
+                                MorphologicalCurrentState,
+                                MorphologicalCurrentPopulation,
+                            >::new();
+                            let mut lane_progressed = false;
+                            let mut lane_conduct_equivalent_states_glued = 0usize;
+                            let mut lane_shared_current_forks = 0usize;
+                            let mut lane_causal_current_states_formed = 0usize;
+                            let mut lane_returned_events_carried = 0usize;
+                            let _ = &spec;
+                            for (current, population) in section {
                 let mut state = MorphologicalGenerationState {
                     current,
                     population,
                 };
                 if state.current.rest.is_some() {
-                    if insert_generation_state(&mut successors, state)? {
-                        conduct_equivalent_states_glued = conduct_equivalent_states_glued
+                    if insert_generation_state(&mut lane_successors, state)? {
+                        lane_conduct_equivalent_states_glued = lane_conduct_equivalent_states_glued
                             .checked_add(1)
                             .ok_or(MorphologicalLanguageError::CarrierExtent)?;
                     }
@@ -794,8 +842,8 @@ impl MorphologicalLanguageEcology {
                         Some(MorphologicalResponseRest::ObservationApertureExhausted {
                             open_obligations: open_face_indices(&state.current.open_faces),
                         });
-                    if insert_generation_state(&mut successors, state)? {
-                        conduct_equivalent_states_glued = conduct_equivalent_states_glued
+                    if insert_generation_state(&mut lane_successors, state)? {
+                        lane_conduct_equivalent_states_glued = lane_conduct_equivalent_states_glued
                             .checked_add(1)
                             .ok_or(MorphologicalLanguageError::CarrierExtent)?;
                     }
@@ -814,18 +862,18 @@ impl MorphologicalLanguageEcology {
                         // An exhausted local frontier is itself a caused obstruction. If another
                         // outer query fiber remains, the next loop may recruit a different local
                         // onset; no global clause-identity ban is installed.
-                        progressed = true;
-                        if insert_generation_state(&mut successors, state)? {
-                            conduct_equivalent_states_glued = conduct_equivalent_states_glued
+                        lane_progressed = true;
+                        if insert_generation_state(&mut lane_successors, state)? {
+                            lane_conduct_equivalent_states_glued = lane_conduct_equivalent_states_glued
                                 .checked_add(1)
                                 .ok_or(MorphologicalLanguageError::CarrierExtent)?;
                         }
                         continue;
                     }
-                    progressed = true;
+                    lane_progressed = true;
                     for event in events {
                         let mut successor = state.fork();
-                        shared_current_forks = shared_current_forks
+                        lane_shared_current_forks = lane_shared_current_forks
                             .checked_add(1)
                             .ok_or(MorphologicalLanguageError::CarrierExtent)?;
                         self.enact_event(
@@ -834,14 +882,14 @@ impl MorphologicalLanguageEcology {
                             event,
                             MorphologicalTransport::RecurrentLexical,
                         )?;
-                        causal_current_states_formed = causal_current_states_formed
+                        lane_causal_current_states_formed = lane_causal_current_states_formed
                             .checked_add(1)
                             .ok_or(MorphologicalLanguageError::CarrierExtent)?;
-                        returned_events_carried = returned_events_carried
+                        lane_returned_events_carried = lane_returned_events_carried
                             .checked_add(1)
                             .ok_or(MorphologicalLanguageError::CarrierExtent)?;
-                        if insert_generation_state(&mut successors, successor)? {
-                            conduct_equivalent_states_glued = conduct_equivalent_states_glued
+                        if insert_generation_state(&mut lane_successors, successor)? {
+                            lane_conduct_equivalent_states_glued = lane_conduct_equivalent_states_glued
                                 .checked_add(1)
                                 .ok_or(MorphologicalLanguageError::CarrierExtent)?;
                         }
@@ -852,33 +900,88 @@ impl MorphologicalLanguageEcology {
                         state.current.rest = Some(MorphologicalResponseRest::Obstructed {
                             open_obligations: open_face_indices(&state.current.open_faces),
                         });
-                        if insert_generation_state(&mut successors, state)? {
-                            conduct_equivalent_states_glued = conduct_equivalent_states_glued
+                        if insert_generation_state(&mut lane_successors, state)? {
+                            lane_conduct_equivalent_states_glued = lane_conduct_equivalent_states_glued
                                 .checked_add(1)
                                 .ok_or(MorphologicalLanguageError::CarrierExtent)?;
                         }
                         continue;
                     }
-                    progressed = true;
+                    lane_progressed = true;
                     for candidate in candidates {
                         let mut successor = state.fork();
-                        shared_current_forks = shared_current_forks
+                        lane_shared_current_forks = lane_shared_current_forks
                             .checked_add(1)
                             .ok_or(MorphologicalLanguageError::CarrierExtent)?;
                         self.begin_phase(&charge, &mut successor, candidate)?;
-                        causal_current_states_formed = causal_current_states_formed
+                        lane_causal_current_states_formed = lane_causal_current_states_formed
                             .checked_add(1)
                             .ok_or(MorphologicalLanguageError::CarrierExtent)?;
-                        returned_events_carried = returned_events_carried
+                        lane_returned_events_carried = lane_returned_events_carried
                             .checked_add(1)
                             .ok_or(MorphologicalLanguageError::CarrierExtent)?;
-                        if insert_generation_state(&mut successors, successor)? {
-                            conduct_equivalent_states_glued = conduct_equivalent_states_glued
+                        if insert_generation_state(&mut lane_successors, successor)? {
+                            lane_conduct_equivalent_states_glued = lane_conduct_equivalent_states_glued
                                 .checked_add(1)
                                 .ok_or(MorphologicalLanguageError::CarrierExtent)?;
                         }
                     }
                 }
+
+                            }
+                            Ok((
+                                lane_successors,
+                                lane_progressed,
+                                [
+                                    lane_conduct_equivalent_states_glued,
+                                    lane_shared_current_forks,
+                                    lane_causal_current_states_formed,
+                                    lane_returned_events_carried,
+                                ],
+                            ))
+                        })
+                    })
+                    .collect();
+                handles
+                    .into_iter()
+                    .map(|handle| match handle.join() {
+                        Ok(returned) => returned,
+                        Err(payload) => std::panic::resume_unwind(payload),
+                    })
+                    .collect()
+            });
+
+            // Merged in lane order, which is the declared order. Gluing is associative on this
+            // map — `merge_witnesses` unions a population — so the merge cannot depend on which
+            // lane happened to reach a state first.
+            for lane in gathered {
+                let (lane_successors, lane_progressed, counters) = lane?;
+                progressed |= lane_progressed;
+                for (current, population) in lane_successors {
+                    if insert_generation_state(
+                        &mut successors,
+                        MorphologicalGenerationState {
+                            current,
+                            population,
+                        },
+                    )? {
+                        conduct_equivalent_states_glued = conduct_equivalent_states_glued
+                            .checked_add(1)
+                            .ok_or(MorphologicalLanguageError::CarrierExtent)?;
+                    }
+                }
+                conduct_equivalent_states_glued = conduct_equivalent_states_glued
+                    .checked_add(counters[0])
+                    .ok_or(MorphologicalLanguageError::CarrierExtent)?;
+                shared_current_forks = shared_current_forks
+                    .checked_add(counters[1])
+                    .ok_or(MorphologicalLanguageError::CarrierExtent)?;
+                causal_current_states_formed = causal_current_states_formed
+                    .checked_add(counters[2])
+                    .ok_or(MorphologicalLanguageError::CarrierExtent)?;
+                returned_events_carried = returned_events_carried
+                    .checked_add(counters[3])
+                    .ok_or(MorphologicalLanguageError::CarrierExtent)?;
             }
             peak_live_current_states = peak_live_current_states.max(successors.len());
             let at_rest = successors.keys().all(|current| current.rest.is_some());

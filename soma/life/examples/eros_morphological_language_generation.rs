@@ -16,6 +16,7 @@ use std::{
 use body::num::Cog;
 use life::{
     causal_language::lexical_tokens,
+    live_current_cuda::CudaLiveCurrentExecutor,
     form_mouth::deposit_form_or_message,
     morphological_language::{
         MorphologicalGeneratedText, MorphologicalGenerationSpec, MorphologicalLanguageEcology,
@@ -25,6 +26,7 @@ use life::{
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use soma_abi::active::ActionCurrent;
+use soma_membrane::live_current::{LiveCurrentExecutor, ParallelHostLiveCurrentExecutor};
 
 /// This driver's name at the plate mouth:
 /// `output/eros_morphological_language_generation/<name>-<sha256>.form`.
@@ -263,9 +265,46 @@ fn run() -> Result<(), String> {
         source.files.len(),
         passages.len()
     );
+    // **The carrier is MOUNTED and threaded, not built privately inside each call.**
+    //
+    // This driver called `condition` and `generate`, both of which construct a private host pool.
+    // The card was therefore unreachable from production — not declined, unreachable — which is
+    // exactly the finding `research/records/2026-08-10_THE_FRONT_IS_THE_PARALLEL_UNIT…` recorded
+    // for the agentic seam and which went unrepaired here. `SOMA_HOST` forces the host carrier so
+    // the two can be compared on the same material; without it the card carries the deed.
+    let mut card;
+    let mut host;
+    let carrier: &mut dyn LiveCurrentExecutor = if std::env::var_os("SOMA_HOST").is_some() {
+        host = ParallelHostLiveCurrentExecutor::new(workers.max(1));
+        eprintln!("eros morphological language generation: carrier = host, {workers} lanes");
+        &mut host
+    } else {
+        match CudaLiveCurrentExecutor::new(0) {
+            Ok(mounted) => {
+                eprintln!(
+                    "eros morphological language generation: carrier = {}",
+                    mounted.device_name()
+                );
+                card = mounted;
+                &mut card
+            }
+            Err(error) => {
+                // Named, never silent. A run that fell back without saying so would report a host
+                // figure as a card figure.
+                eprintln!(
+                    "eros morphological language generation: the card refused to mount ({error}); \
+                     carrying on the host with {workers} lanes"
+                );
+                host = ParallelHostLiveCurrentExecutor::new(workers.max(1));
+                &mut host
+            }
+        }
+    };
+
     let conditioning_started = Instant::now();
     let ecology =
-        MorphologicalLanguageEcology::condition(&passages, action, workers).map_err(debug)?;
+        MorphologicalLanguageEcology::condition_with_executor(&passages, action, workers, carrier)
+            .map_err(debug)?;
     let conditioning_wall_millis = conditioning_started.elapsed().as_millis();
     eprintln!(
         "eros morphological language generation: conditioned in {conditioning_wall_millis} ms"
@@ -275,13 +314,13 @@ fn run() -> Result<(), String> {
     for prompt in source.prompts {
         let inherited = corpus_contains(&corpus, &lexical_tokens(&prompt.text));
         let generation = ecology
-            .generate(
+            .generate_with_executor(
                 &prompt.text,
                 MorphologicalGenerationSpec {
                     maximum_observed_tokens: prompt.maximum_generated_tokens,
                 },
                 action,
-                workers,
+                carrier,
             )
             .map_err(debug)?;
         eprintln!(

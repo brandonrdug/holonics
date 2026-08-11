@@ -456,6 +456,8 @@ impl CausalLanguageEcology {
             return Err(CausalLanguageError::EmptyPrompt);
         }
 
+        // The cover, declared once for this leader.
+        let cover = holonic_engine::hardware_cover::HardwareCover::host_only();
         let initial = self.recruit(&prompt_tokens);
         let initial_hexis = self.recruitment_read(&initial.sources)?;
         let mut states = vec![GenerationState {
@@ -466,11 +468,28 @@ impl CausalLanguageEcology {
         }];
 
         for _ in 0..spec.maximum_generated_tokens {
-            let mut successors = Vec::new();
-            for state in states {
+            // **The leader's front: branch tips are co-present, an arc is serial.**
+            //
+            // `states` is a front of branch tips; `continuations` is the junction each opens; the
+            // successors are the next front. What travels ONE arc is ordered and stays so — the
+            // history a tip carries is untouched — while distinct tips are independent, so they are
+            // co-present and the cover carries them. Chronology is not seriality: a leader is a
+            // branching structure with time parity, and asserting a total order where the material
+            // has a tree is the error this removes.
+            //
+            // The law is `hardware_cover::expand_front`, shared with the separation sweep and the
+            // generation expansion. A covering per organ is the cabinet failure one level down.
+            let successors = holonic_engine::hardware_cover::expand_front(
+                states,
+                &cover,
+                // A tip's extent is what it has already emitted: a long branch opens a wider
+                // junction than a short one, and covering by count would weigh them the same.
+                |state: &GenerationState| state.emitted.len() as u64 + 1,
+                |state: GenerationState| -> Result<Vec<GenerationState>, CausalLanguageError> {
+                    let mut branched = Vec::new();
                 if state.stopped {
-                    successors.push(state);
-                    continue;
+                    branched.push(state);
+                    return Ok(branched);
                 }
                 let mut active_hexis = state.source_hexis.clone();
                 let mut branches = self.continuations(&state.history, &active_hexis)?;
@@ -481,8 +500,8 @@ impl CausalLanguageEcology {
                 if branches.is_empty() {
                     let mut stopped = state;
                     stopped.stopped = true;
-                    successors.push(stopped);
-                    continue;
+                    branched.push(stopped);
+                    return Ok(branched);
                 }
                 for branch in branches {
                     let source_names = branch
@@ -517,14 +536,17 @@ impl CausalLanguageEcology {
                     let stopped = spec.stop_at_sentence_boundary
                         && emitted.len() >= 4
                         && sentence_boundary(&branch.token);
-                    successors.push(GenerationState {
+                    branched.push(GenerationState {
                         history,
                         emitted,
                         source_hexis,
                         stopped,
                     });
                 }
-            }
+
+                    Ok(branched)
+                },
+            )?;
             let all_stopped = successors.iter().all(|state| state.stopped);
             states = successors;
             if all_stopped {
@@ -812,11 +834,76 @@ pub(crate) fn condition_route_receivers_with_executor(
     ),
     CausalLanguageError,
 > {
+    // **Independent receivers are the front, and mounting a carrier must not cost that.**
+    //
+    // This walked `groups` in a plain `for`, threading one executor through every receiver in turn,
+    // while `condition_route_partition` — the host twin — says it outright: *"Parallelism lives
+    // across independent receiver ecologies; one receiver's returned chronology remains serial."*
+    // So mounting a card COST the parallelism: the carrier was handed one receiver at a time, each
+    // legitimately sequential, and the device sat resident at zero utilization holding 2 GB while
+    // one host core walked the population.
+    //
+    // Chronology inside a receiver is untouched — `Do not remove chronology` — and receivers are
+    // independent, so this is a decomposition and never a schedule. A `&mut dyn LiveCurrentExecutor`
+    // cannot be shared across lanes, which is exactly why the serial shape existed; the caller's
+    // carrier takes one section and every other lane mounts its own through `carrier_for_lane`.
+    let mut sections: Vec<Vec<(ReceiverFiberIdentity, Vec<RouteTrainingSection>)>> = Vec::new();
+    let lanes = std::thread::available_parallelism()
+        .map(|lanes| lanes.get())
+        .unwrap_or(1)
+        .min(groups.len().max(1));
+    sections.resize_with(lanes, Vec::new);
+    for (at, group) in groups.into_iter().enumerate() {
+        sections[at % lanes].push(group);
+    }
+
+    // The caller's own carrier keeps the first section, so a mounted card is never idled.
+    let mine = sections.pop().unwrap_or_default();
+    let mut conditioned = std::thread::scope(
+        |scope| -> Result<Vec<ConditionedRouteReceiver>, CausalLanguageError> {
+            let handles: Vec<_> = sections
+                .into_iter()
+                .map(|section| {
+                    scope.spawn(move || -> Result<Vec<ConditionedRouteReceiver>, CausalLanguageError> {
+                        let mut carrier = carrier_for_lane();
+                        let mut rows = Vec::new();
+                        for (feature, receiver_sections) in section {
+                            rows.push(condition_route_receiver(
+                                feature,
+                                receiver_sections,
+                                action,
+                                carrier.as_mut(),
+                            )?);
+                        }
+                        Ok(rows)
+                    })
+                })
+                .collect();
+            let mut conditioned = Vec::new();
+            for (feature, receiver_sections) in mine {
+                conditioned.push(condition_route_receiver(
+                    feature,
+                    receiver_sections,
+                    action,
+                    executor,
+                )?);
+            }
+            for handle in handles {
+                match handle.join() {
+                    Ok(rows) => conditioned.extend(rows?),
+                    Err(payload) => std::panic::resume_unwind(payload),
+                }
+            }
+            Ok(conditioned)
+        },
+    )?;
+    // Canonical order, so a lane's completion order never becomes chronology.
+    conditioned.sort_by(|left, right| left.feature.cmp(&right.feature));
+
     let mut rests = LocalRelations::new();
     let mut routes = BTreeMap::new();
     let mut events = 0usize;
-    for (feature, sections) in groups {
-        let receiver = condition_route_receiver(feature, sections, action, executor)?;
+    for receiver in conditioned {
         events = events
             .checked_add(receiver.events)
             .ok_or(CausalLanguageError::CarrierExtent)?;
@@ -834,6 +921,18 @@ pub(crate) fn condition_route_receivers_with_executor(
         routes,
         events,
     ))
+}
+
+/// **A carrier for one lane of the receiver cover.**
+///
+/// A `&mut dyn LiveCurrentExecutor` cannot cross a thread boundary, so each lane mounts its own.
+/// The card is tried first and the host is the named alternative — never a silent fallback, because
+/// a run that reported a host figure as a card figure would be worse than one that refused.
+fn carrier_for_lane() -> Box<dyn LiveCurrentExecutor> {
+    match crate::live_current_cuda::CudaLiveCurrentExecutor::new(0) {
+        Ok(card) => Box::new(card),
+        Err(_) => Box::new(ParallelHostLiveCurrentExecutor::new(1)),
+    }
 }
 
 fn condition_route_partition(
