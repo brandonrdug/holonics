@@ -266,7 +266,7 @@ impl CudaApertureExecutor {
                 "cuDeviceGetName",
             )?;
             let device_name = CStr::from_ptr(name.as_ptr()).to_string_lossy().into_owned();
-            let mut device_attribute = |selector: i32, operation: &'static str| -> Result<u32, CudaApertureError> {
+            let device_attribute = |selector: i32, operation: &'static str| -> Result<u32, CudaApertureError> {
                 let mut value = 0i32;
                 driver(
                     cuDeviceGetAttribute(&mut value, selector, device),

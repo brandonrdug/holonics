@@ -326,7 +326,7 @@ impl CudaExactRelationExecutor {
                 "cuDeviceGetName",
             )?;
             let device_name = CStr::from_ptr(name.as_ptr()).to_string_lossy().into_owned();
-            let mut attribute = |selector: i32, operation: &'static str| -> Result<u32, CudaRelationError> {
+            let attribute = |selector: i32, operation: &'static str| -> Result<u32, CudaRelationError> {
                 let mut value = 0i32;
                 driver(cuDeviceGetAttribute(&mut value, selector, device), operation)?;
                 Ok(value.max(0) as u32)

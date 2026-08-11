@@ -204,6 +204,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use num_bigint::BigUint;
 
 use crate::corpus_census::{CorpusCensus, Kind, SurfaceId, weight_band_name};
+use crate::hardware_cover::{ChartId, CoverDecomposition, FrontCell, HardwareCover};
 use crate::receiver_exact_compression::{
     AblatedSystem, InputId, ItemId, Observation, ObservedSystem, ReceiverId, compress,
 };
@@ -786,6 +787,87 @@ pub struct SeparationComplex {
     pub shared_prefix: Vec<usize>,
 }
 
+// -------------------------------------------------------------------------------------------------
+// The charts of the separation object, and the atlas that covers the widest one
+// -------------------------------------------------------------------------------------------------
+//
+// **A capacity is not a quantity this organ has any business holding.** Until 2026-08-10 both
+// drivers carried `const DECLARED_CAPACITY: u64 = 8_192` and refused any surface whose separation
+// population exceeded it. Brandon, on that number: *"it's a magic capacity you can't justify… there
+// are hypergeometric higher dimensional causal reasons for capacity demands to grow and change in
+// varying charts and local manifold regions, this is group structures."*
+//
+// He is right, and the arithmetic says so exactly. The classes are **orbits**: the occurrence
+// population quotiented by what the declared receiver family can distinguish inside the cone, so
+// `d = |X/G|`. What the capacity bounded was
+//
+// ```text
+//    C(d,2)  =  rank Λ²(ℚ^{X/G})  =  edges of K_d  =  the 2-faces of the simplex on the orbits
+// ```
+//
+// — one graded piece of the Boolean lattice `Σ_k C(d,k) = 2^d`, which is `H.0150`'s crossing depth
+// with inclusion–exclusion's `(−1)^{k−1}` as its Möbius function. And `C(d,k)` at fixed `k` is a
+// **hypergeometric term** in `d` in the strict sense — `C(d,2)/C(d−1,2) = d/(d−2)` is a rational
+// function of the index — with `Σ_k C(d,k)x^k = (1+x)^d` the degenerate `₂F₁`.
+//
+// `d` moves for two independent reasons, both group data: coarsening the receiver family merges
+// orbits, and deepening the cone refines the partition. So `d` is a **fibre dimension that varies
+// over the base**, and a single constant is a constant section of a bundle that has none. Measured
+// on the declared corpus: `"the"` carries 37,530 classes — `C(d,2) = 704,231,685` — while a rare
+// surface carries 2, where it is 1. Eight orders of magnitude, one law.
+//
+// # The charts, and why the refusal was a wall in front of an atlas
+//
+// The reading lives on the **orbit** chart, `d` points. The exhibition lives on the **pair** chart,
+// `C(d,2)` points. Those are two charts of one object and the transition multiplies dimension by
+// `(d−1)/2`. A capacity was a caller trying to bound the *local degree of a chart transition* with
+// a scalar, which cannot be done: the degree is local and varies over the base.
+//
+// [`SeparationComplex::exhibit_class`] has always returned the **star** of one class — `d−1`
+// separations, transition degree **1**. `K_d` is covered by `d` such stars, each pair lying in
+// exactly two, `d(d−1)/2 = C(d,2)`. Group-theoretically that is the point-stabilizer decomposition
+// of the pair space, and it is an atlas rather than an approximation. So a caller who cannot hold
+// the pair chart does not lose anything: it reads the same object through [`pair_atlas`], `d`
+// charts of degree one. **That is a rebase — `H.0104`, invertible, remainder zero — not a loss.**
+
+/// Which chart of one surface's separation object a caller is reading in.
+///
+/// The caller names the chart; the demand follows from `d` by the transition degree and is
+/// **computed**, never declared.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub enum SeparationChart {
+    /// The orbit chart: the classes themselves, `d` points. Degree 1 over the reading.
+    Orbit,
+    /// The star of one class: `d − 1` separations. Degree 1. `d` of these cover [`Pair`].
+    ///
+    /// [`Pair`]: SeparationChart::Pair
+    Star(usize),
+    /// The pair chart: every separation, `C(d,2)` points, degree `(d−1)/2` over the orbit chart.
+    Pair,
+}
+
+/// What a chart costs to materialize, in the material's own terms. Exact, no metric, no number
+/// authored anywhere.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ChartDemand {
+    pub chart: SeparationChart,
+    /// `d` — the orbit count this receiver family produces at this horizon.
+    pub classes: BigUint,
+    /// Points in this chart.
+    pub extent: BigUint,
+    /// The transition degree over the orbit chart, as an exact ratio `numerator / denominator`.
+    /// `Orbit` and `Star` are `1/1`; `Pair` is `(d−1)/2`.
+    pub degree: (BigUint, BigUint),
+}
+
+impl ChartDemand {
+    /// True when this chart's extent is no larger than the orbit chart's own — the charts of degree
+    /// one. Reading through these never materializes a population wider than the reading itself.
+    pub fn is_degree_one(&self) -> bool {
+        self.degree.0 <= self.degree.1
+    }
+}
+
 /// A materialization the caller's declared capacity cannot hold.
 ///
 /// Standing is preserved: the [`SeparationComplex`] is intact and every figure it carries remains
@@ -1081,6 +1163,81 @@ impl SeparationComplex {
             }
         }
         Ok(separations)
+    }
+
+    /// **The demand of one chart, computed from `d` and the transition degree.**
+    ///
+    /// Nothing is materialized. A caller asks what a chart costs before it asks for the chart, and
+    /// the answer is arithmetic on the orbit count rather than a number anyone chose.
+    pub fn demand(&self, chart: SeparationChart) -> ChartDemand {
+        let d = BigUint::from(self.classes.len());
+        let one = BigUint::from(1u32);
+        let two = BigUint::from(2u32);
+        let (extent, degree) = match chart {
+            SeparationChart::Orbit => (d.clone(), (one.clone(), one.clone())),
+            SeparationChart::Star(_) => (
+                d.clone() - d.clone().min(one.clone()),
+                (one.clone(), one.clone()),
+            ),
+            // `(d−1)/2` exactly, as a ratio: the pair chart's extent over the orbit chart's.
+            SeparationChart::Pair => (
+                choose_two(&d),
+                (d.clone() - d.clone().min(one.clone()), two),
+            ),
+        };
+        ChartDemand {
+            chart,
+            classes: d,
+            extent,
+            degree,
+        }
+    }
+
+    /// **The star atlas covering the pair chart.** `d` charts, each of transition degree one.
+    ///
+    /// Every separation lies in exactly two of them, so folding the atlas visits each pair twice and
+    /// nothing is lost or invented. This is the point-stabilizer decomposition of the pair space,
+    /// and it is what a caller reads when the pair chart is wider than it can hold — a chart change,
+    /// not a truncation.
+    pub fn pair_atlas(&self) -> Vec<SeparationChart> {
+        (0..self.classes.len()).map(SeparationChart::Star).collect()
+    }
+
+    /// Read this surface's separations **in a named chart**.
+    ///
+    /// There is no capacity. `Orbit` returns nothing — the classes are the reading itself and carry
+    /// no separations. `Star(i)` returns that class against every other, `d − 1`. `Pair` returns
+    /// every separation, and a caller asking for it has declared that it can hold `C(d,2)`; if it
+    /// cannot, [`pair_atlas`] covers the same object at degree one.
+    ///
+    /// [`pair_atlas`]: SeparationComplex::pair_atlas
+    pub fn exhibit_in(&self, census: &CorpusCensus, chart: SeparationChart) -> Vec<Separation> {
+        match chart {
+            SeparationChart::Orbit => Vec::new(),
+            SeparationChart::Star(class) => {
+                if class >= self.classes.len() {
+                    return Vec::new();
+                }
+                (0..self.classes.len())
+                    .filter(|other| *other != class)
+                    .filter_map(|other| {
+                        self.separation_between(census, class.min(other), class.max(other))
+                    })
+                    .collect()
+            }
+            SeparationChart::Pair => {
+                let mut separations = Vec::new();
+                for left in 0..self.classes.len() {
+                    for right in left + 1..self.classes.len() {
+                        let index = self
+                            .first_difference(left, right)
+                            .expect("distinct classes differ");
+                        separations.push(self.materialize(census, left, right, index));
+                    }
+                }
+                separations
+            }
+        }
     }
 
     /// Every separation of one named class against the rest, complete. A *stated* sub-population
@@ -1497,6 +1654,21 @@ impl SeparationReading {
         self.complex.exhibit(census, declared_capacity)
     }
 
+    /// Read this surface's separations in a named chart. No capacity participates.
+    pub fn exhibit_in(&self, census: &CorpusCensus, chart: SeparationChart) -> Vec<Separation> {
+        self.complex.exhibit_in(census, chart)
+    }
+
+    /// What a chart costs here, computed from this surface's own orbit count.
+    pub fn demand(&self, chart: SeparationChart) -> ChartDemand {
+        self.complex.demand(chart)
+    }
+
+    /// The star atlas covering this surface's pair chart.
+    pub fn pair_atlas(&self) -> Vec<SeparationChart> {
+        self.complex.pair_atlas()
+    }
+
     /// The **second** verdict, from the **same** reading: conduct-invariance at the coarser declared
     /// families. `O(d · horizon)` off the classes already built, so one [`sweep`] returns both and
     /// they are comparable on the same material by construction.
@@ -1546,11 +1718,131 @@ pub fn sweep(
     atlas: &ConductAtlas,
     horizon: usize,
 ) -> BTreeMap<SurfaceId, SeparationReading> {
-    census
-        .word_surfaces()
-        .into_iter()
-        .map(|surface| (surface, separation_reading(census, atlas, surface, horizon)))
-        .collect()
+    sweep_over(census, atlas, horizon, &HardwareCover::host_only())
+}
+
+/// **The sweep, covered across the charts a caller declares.**
+///
+/// Every surface's reading is independent of every other — they share the census and the atlas
+/// immutably and touch disjoint occurrence sets — so the population of surfaces IS a front, and
+/// `hardware_cover` decomposes it. Until 2026-08-10 this was a serial `map`, which is why driving
+/// it pinned one host core while every other lane and the card stood idle: `CLAUDE.md` §9 names
+/// that state a defect to diagnose, not a mystery to narrate.
+///
+/// **The cover places, and the placement is proved.** Each surface is a cell of the front whose
+/// extent is its own occurrence count; the cover sends it to the coarsest chart whose grain that
+/// extent fills, and `independence` checks that every cell reaches exactly one chart before any
+/// work is issued. A barrier is returned as a serial sweep rather than worked around.
+///
+/// **The device chart is placed and not yet enacted, and that is stated rather than hidden.**
+/// `token_invariance` reaches no executor and no kernel — a window partition is a sort plus a
+/// longest-common-prefix scan, which is GPU-shaped, and building that kernel is its own
+/// construction. Cells placed on a device chart are read on the host today, and
+/// [`SweepCover::device_cells`] reports how many, so the gap is a number rather than an impression.
+pub fn sweep_over(
+    census: &CorpusCensus,
+    atlas: &ConductAtlas,
+    horizon: usize,
+    cover: &HardwareCover,
+) -> BTreeMap<SurfaceId, SeparationReading> {
+    sweep_covered(census, atlas, horizon, cover).readings
+}
+
+/// A covered sweep, with what the cover did to it.
+pub struct SweepCover {
+    pub readings: BTreeMap<SurfaceId, SeparationReading>,
+    /// Cells the cover placed on a device chart. Read on the host today; the count is the debt.
+    pub device_cells: usize,
+    /// Lanes the host section was spread over.
+    pub host_lanes: usize,
+}
+
+/// The covered sweep, returning the placement beside the readings.
+pub fn sweep_covered(
+    census: &CorpusCensus,
+    atlas: &ConductAtlas,
+    horizon: usize,
+    cover: &HardwareCover,
+) -> SweepCover {
+    let surfaces = census.word_surfaces();
+    let front: Vec<FrontCell> = surfaces
+        .iter()
+        .enumerate()
+        .map(|(index, surface)| FrontCell {
+            index,
+            extent: census.sites(*surface).len() as u64,
+        })
+        .collect();
+    let decomposition = CoverDecomposition::of(cover, &front, "separation_reading");
+    let device_cells = decomposition
+        .sections
+        .iter()
+        .filter(|section| matches!(section.chart, ChartId::Device(_)))
+        .map(|section| section.cells.len())
+        .sum();
+    let lanes = cover.host().lanes.max(1) as usize;
+
+    // Independence is checked before any work is issued. A barrier is not worked around: the sweep
+    // falls back to one lane, which is always licensed.
+    let licensed = decomposition.independence(&front).is_ok();
+    let effective_lanes = if licensed { lanes.min(surfaces.len().max(1)) } else { 1 };
+
+    let readings = if effective_lanes <= 1 {
+        surfaces
+            .iter()
+            .map(|surface| (*surface, separation_reading(census, atlas, *surface, horizon)))
+            .collect()
+    } else {
+        // Cover the surfaces by EXTENT, not by count: a surface with a million occurrences and one
+        // with two are not one unit each.
+        let mut by_extent: Vec<&FrontCell> = front.iter().collect();
+        by_extent.sort_by_key(|cell| (std::cmp::Reverse(cell.extent), cell.index));
+        let mut sections: Vec<Vec<usize>> = vec![Vec::new(); effective_lanes];
+        let mut carried = vec![0u128; effective_lanes];
+        for cell in by_extent {
+            let lane = carried
+                .iter()
+                .enumerate()
+                .min_by_key(|(lane, load)| (**load, *lane))
+                .map(|(lane, _)| lane)
+                .unwrap_or(0);
+            sections[lane].push(cell.index);
+            carried[lane] += u128::from(cell.extent);
+        }
+        std::thread::scope(|scope| {
+            let handles: Vec<_> = sections
+                .into_iter()
+                .map(|section| {
+                    let surfaces = &surfaces;
+                    scope.spawn(move || {
+                        section
+                            .into_iter()
+                            .map(|at| {
+                                let surface = surfaces[at];
+                                (
+                                    surface,
+                                    separation_reading(census, atlas, surface, horizon),
+                                )
+                            })
+                            .collect::<Vec<_>>()
+                    })
+                })
+                .collect();
+            handles
+                .into_iter()
+                .flat_map(|handle| match handle.join() {
+                    Ok(section) => section,
+                    Err(payload) => std::panic::resume_unwind(payload),
+                })
+                .collect()
+        })
+    };
+
+    SweepCover {
+        readings,
+        device_cells,
+        host_lanes: effective_lanes,
+    }
 }
 
 /// The iron population at one horizon: every surface whose whole occurrence population survives in
@@ -3597,6 +3889,153 @@ mod tests {
         write(&root, "research/records/a.md", "pp gg alpha six hh\n");
         write(&root, "reference/pureholonics-seed/a.md", "pp gg alpha six hh\n");
         root
+    }
+
+    /// **The star atlas covers the pair chart exactly: a rebase, remainder zero.**
+    ///
+    /// Every separation lies in exactly two stars, so the atlas visits each pair twice and the
+    /// deduplicated union is the pair chart on the nose. If this ever failed, reading through the
+    /// atlas would be a truncation and the capacity it replaces would have been load-bearing.
+    #[test]
+    fn the_star_atlas_covers_the_pair_chart_with_no_remainder() {
+        let root = declared_corpus("star-atlas");
+        let census = CorpusCensus::read(&root).unwrap();
+        let atlas = atlas(&census);
+        let mut covered_any = false;
+        for surface in census.word_surfaces() {
+            let complex = SeparationComplex::read(&census, &atlas, surface, 1);
+            let d = complex.distinct_windows();
+            if d < 2 {
+                continue;
+            }
+            covered_any = true;
+
+            let pairs = complex.exhibit_in(&census, SeparationChart::Pair);
+            let key = |s: &Separation| (s.offset, s.word.clone(), s.left_surface, s.right_surface);
+
+            let mut from_atlas: Vec<_> = complex
+                .pair_atlas()
+                .into_iter()
+                .flat_map(|chart| complex.exhibit_in(&census, chart))
+                .collect();
+            // Each pair is reached from both of its endpoints. That double cover is the atlas's
+            // overlap, and it is exactly two everywhere.
+            assert_eq!(
+                from_atlas.len(),
+                2 * pairs.len(),
+                "every pair lies in exactly two stars: {surface:?}"
+            );
+
+            // Compared as MULTISETS, not deduplicated. Two distinct class pairs can separate on the
+            // same word at the same offset, so a rendered key is not an identity — collapsing on
+            // one is how a covering check quietly becomes weaker than the thing it checks.
+            let mut expected: Vec<_> = pairs.iter().cloned().chain(pairs.iter().cloned()).collect();
+            expected.sort_by_key(key);
+            from_atlas.sort_by_key(key);
+            assert_eq!(
+                from_atlas.len(),
+                expected.len(),
+                "the atlas is the pair chart twice over"
+            );
+            for (through_atlas, direct) in from_atlas.iter().zip(&expected) {
+                assert_eq!(key(through_atlas), key(direct), "no pair invented or lost");
+            }
+        }
+        assert!(covered_any, "the fixture must carry a separated surface");
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    /// **The demand is computed from the orbit count, and the pair chart's degree grows with it.**
+    ///
+    /// This is what the excised constant could not be: a quantity that varies over the base. A
+    /// single number is a constant section of a bundle whose fibre dimension is not constant.
+    #[test]
+    fn the_chart_demand_is_hypergeometric_in_the_orbit_count() {
+        let root = declared_corpus("chart-demand");
+        let census = CorpusCensus::read(&root).unwrap();
+        let atlas = atlas(&census);
+        let mut degrees = BTreeSet::new();
+        let mut widths = BTreeSet::new();
+        for surface in census.word_surfaces() {
+            let complex = SeparationComplex::read(&census, &atlas, surface, 1);
+            let d = complex.distinct_windows();
+            let orbit = complex.demand(SeparationChart::Orbit);
+            let star = complex.demand(SeparationChart::Star(0));
+            let pair = complex.demand(SeparationChart::Pair);
+
+            assert_eq!(orbit.extent, BigUint::from(d));
+            assert_eq!(star.extent, BigUint::from(d.saturating_sub(1)));
+            assert_eq!(pair.extent, choose_two(&BigUint::from(d)));
+            // The two charts of degree one, and the one that is not.
+            assert!(orbit.is_degree_one() && star.is_degree_one());
+            assert_eq!(pair.degree.1, BigUint::from(2u32));
+            assert_eq!(pair.degree.0, BigUint::from(d.saturating_sub(1)));
+            // `extent = classes × degree` exactly: the transition is a dimension multiplier.
+            assert_eq!(
+                pair.extent.clone() * BigUint::from(2u32),
+                orbit.extent.clone() * pair.degree.0.clone(),
+                "the pair chart is the orbit chart times (d−1)/2"
+            );
+            degrees.insert(pair.degree.0.clone());
+            widths.insert(pair.extent.clone());
+        }
+        assert!(
+            degrees.len() > 1 && widths.len() > 1,
+            "the demand must VARY over the base, or a constant could have served: \
+             {degrees:?} {widths:?}"
+        );
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    /// **The covered sweep equals the serial one, cell for cell.** Lanes are a realization
+    /// coordinate; if they could move a reading they would be chronology.
+    #[test]
+    fn the_covered_sweep_equals_the_serial_sweep_and_the_cover_actually_spreads() {
+        let root = declared_corpus("covered-sweep");
+        let census = CorpusCensus::read(&root).unwrap();
+        let atlas = atlas(&census);
+
+        let serial = sweep_covered(&census, &atlas, 1, &HardwareCover::of_charts(vec![
+            crate::hardware_cover::Chart::Host(crate::hardware_cover::HostDeclaration { lanes: 1 }),
+        ]));
+        let wide = sweep_covered(&census, &atlas, 1, &HardwareCover::of_charts(vec![
+            crate::hardware_cover::Chart::Host(crate::hardware_cover::HostDeclaration { lanes: 8 }),
+        ]));
+
+        assert_eq!(serial.host_lanes, 1);
+        assert!(
+            wide.host_lanes > 1,
+            "eight declared lanes over {} surfaces must spread",
+            census.word_surfaces().len()
+        );
+        // `SeparationReading` carries no `PartialEq`, so the comparison is made on every part a
+        // reading returns: the surface set, the verdict, the window count, and the complex itself.
+        let compare = |left: &BTreeMap<SurfaceId, SeparationReading>,
+                       right: &BTreeMap<SurfaceId, SeparationReading>,
+                       why: &str| {
+            assert_eq!(
+                left.keys().collect::<Vec<_>>(),
+                right.keys().collect::<Vec<_>>(),
+                "{why}: surface population"
+            );
+            for (surface, one) in left {
+                let other = &right[surface];
+                assert_eq!(one.verdict, other.verdict, "{why}: verdict at {surface:?}");
+                assert_eq!(
+                    one.distinct_windows, other.distinct_windows,
+                    "{why}: windows at {surface:?}"
+                );
+                assert_eq!(one.occurrences, other.occurrences, "{why}: occurrences");
+                assert_eq!(one.complex, other.complex, "{why}: complex at {surface:?}");
+            }
+        };
+        compare(
+            &serial.readings,
+            &wide.readings,
+            "a lane is a realization coordinate and may not move a reading",
+        );
+        compare(&sweep(&census, &atlas, 1), &serial.readings, "the default entry point");
+        let _ = fs::remove_dir_all(&root);
     }
 
     /// The horizon is read off the material, and the reading is monotone as the theorem requires.

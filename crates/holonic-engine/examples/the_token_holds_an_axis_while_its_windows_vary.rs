@@ -87,10 +87,11 @@ use std::path::PathBuf;
 use num_bigint::BigUint;
 
 use holonic_engine::corpus_census::{CorpusCensus, DECLARED_STRATA, Kind, SurfaceId};
+use holonic_engine::hardware_cover::HardwareCover;
 use holonic_engine::token_invariance::{
     ConductAtlas, ConductVerdict, ReceiverAxis, ReceiverFamily, SeparationReading,
     collapsing_family_population, conduct_invariance_at, cross_check_family, invariance_partition,
-    iron_at, sweep, witnessed_iron_at,
+    iron_at, sweep, witnessed_iron_at, sweep_over, SeparationChart,
 };
 
 /// The declared horizons. Both are taken, but only the **last** sweep is retained: the earlier ones
@@ -99,10 +100,15 @@ const HORIZONS: [usize; 2] = [1, 2];
 
 /// The capacity this caller declares for anything quadratic. Past it the organ refuses with the
 /// width the material required, and the refusal is reported rather than worked around.
-const DECLARED_CAPACITY: u64 = 8_192;
+/// **Excised 2026-08-10.** This driver carried a declared capacity of 8,192 class pairs. What that
+/// bounded is `C(d,2)` over the orbit count, one graded piece of the Boolean lattice on the orbit
+/// space, and `d` varies per surface by orders of magnitude — so a constant is a constant section
+/// of a bundle whose fibre dimension is not constant. The refusal control below now varies the
+/// **chart** instead, which is what the caller was actually choosing all along.
+const EXCISED_DECLARED_CAPACITY: u64 = 8_192;
 
 /// The capacity this caller declares for the **sub-family** cross-check specifically. It is smaller
-/// than [`DECLARED_CAPACITY`] for a stated reason: at [`ReceiverFamily::EMPTY`] the organ's one-shot
+/// than the pair chart's own degree for a stated reason: at [`ReceiverFamily::EMPTY`] the organ's one-shot
 /// partition is a single block containing every item, so its pair search is quadratic in the whole
 /// presented population rather than in the separated part. Past this it refuses and the refusal is
 /// counted.
@@ -145,6 +151,14 @@ fn main() {
         }
     };
 
+    // **The cover, declared once.** Every surface's reading is independent, so the population of
+    // surfaces is a front and the host's own lanes carry it. Driving this serially pinned one core
+    // while fifteen stood idle.
+    let cover = HardwareCover::host_only();
+    println!(
+        "  the cover declares {} host lanes\n",
+        cover.host().lanes
+    );
     let atlas = ConductAtlas::found(&census, FOUNDING_HORIZON);
 
     let mut holds: Vec<(String, bool, String)> = Vec::new();
@@ -209,7 +223,7 @@ fn main() {
     let mut earlier: BTreeMap<usize, (BTreeSet<SurfaceId>, BTreeSet<SurfaceId>)> = BTreeMap::new();
     let mut retained: Option<(usize, BTreeMap<SurfaceId, SeparationReading>)> = None;
     for (index, horizon) in HORIZONS.into_iter().enumerate() {
-        let reading = sweep(&census, &atlas, horizon);
+        let reading = sweep_over(&census, &atlas, horizon, &cover);
         let partition = invariance_partition(&reading);
         earlier.insert(
             horizon,
@@ -582,18 +596,27 @@ fn main() {
     println!();
     let mut obstructed_and_read = 0usize;
     let mut obstructed_exhibited: Vec<(SurfaceId, BigUint)> = Vec::new();
-    // The width is read off the complex in O(1) and the typed refusal is then DRIVEN on exactly the
-    // surfaces that exceed the capacity. Materializing every surface's population merely to discover
-    // it fits would be the aperture law inverted.
-    let capacity = BigUint::from(DECLARED_CAPACITY);
+    // **The chart, not a capacity.** The demand is computed in O(1) from the orbit count, and the
+    // surfaces whose PAIR chart carries a transition degree above one are read through their star
+    // atlas instead — the same object, degree one, no remainder. Materializing every surface's pair
+    // population merely to discover it fits would be the error inverted.
     for (surface, row) in &reading {
-        if row.complex.separated_class_pairs() > capacity {
-            let obstruction = row
-                .exhibit(&census, DECLARED_CAPACITY)
-                .expect_err("a width past the declared capacity must refuse");
+        let demand = row.demand(SeparationChart::Pair);
+        if !demand.is_degree_one() {
+            // **One chart of the atlas, at its own degree-one extent.** The covering identity —
+            // that the `d` stars are the pair chart twice over — is a theorem proved once in
+            // `the_star_atlas_covers_the_pair_chart_with_no_remainder`, not re-materialized per
+            // surface here. Folding the atlas would cost `2·C(d,2)`, twice what the capacity this
+            // replaces refused.
+            let star = row.exhibit_in(&census, SeparationChart::Star(0));
+            assert_eq!(
+                BigUint::from(star.len()),
+                row.demand(SeparationChart::Star(0)).extent,
+                "a star returns d-1 separations whole"
+            );
             obstructed_and_read += 1;
             if obstructed_exhibited.len() < 4 {
-                obstructed_exhibited.push((*surface, obstruction.required.clone()));
+                obstructed_exhibited.push((*surface, demand.extent.clone()));
             }
         }
     }
@@ -603,14 +626,10 @@ fn main() {
     let mut whole_matched = true;
     for surface in ordered.iter().take(32) {
         let row = &reading[surface];
-        match row.exhibit(&census, DECLARED_CAPACITY) {
-            Ok(separations) => {
-                whole_returns += 1;
-                if BigUint::from(separations.len()) != row.complex.separated_class_pairs() {
-                    whole_matched = false;
-                }
-            }
-            Err(_) => {}
+        let separations = row.exhibit_in(&census, SeparationChart::Pair);
+        whole_returns += 1;
+        if BigUint::from(separations.len()) != row.complex.separated_class_pairs() {
+            whole_matched = false;
         }
     }
     for (surface, required) in &obstructed_exhibited {
@@ -636,7 +655,7 @@ fn main() {
     println!();
     println!(
         "  {obstructed_and_read} surfaces cannot have their separation population materialized at \n  \
-         the declared capacity of {DECLARED_CAPACITY} class pairs. Every one of them still carries a\n  \
+         a pair-chart transition degree above one. Every one of them still carries a\n  \
          conduct verdict, because the verdict reads the sorted window classes in O(d * horizon) and\n  \
          never touches a pair. The aperture is neither removed nor widened."
     );
@@ -651,7 +670,7 @@ fn main() {
             && whole_returns > 0
             && whole_matched,
         format!(
-            "{obstructed_and_read} obstructed at capacity {DECLARED_CAPACITY}; {} verdicts returned \
+            "{obstructed_and_read} read through the star atlas; {} verdicts returned \
              over {} surfaces; {whole_returns} populations returned WHOLE at exactly the predicted \
              width",
             invariance.len(),

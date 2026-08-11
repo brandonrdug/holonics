@@ -525,6 +525,40 @@ On `"the"`: **1,838,970 to read against 704,231,685 to exhibit — 383×.** A ca
 capacity guards only the second. Calling it *"the aperture law"* promoted an output-buffer guard to
 a law and then reasoned from the promotion.
 
+### The charts, built — and what the constant was standing in for
+
+`SeparationChart::{Orbit, Star(i), Pair}` with `demand(chart)` computing extent and the exact
+transition degree from `d`, and `pair_atlas()` returning the `d` star charts. Proved: the atlas
+covers the pair chart as a **multiset**, each separation reached from both endpoints, `2·C(d,2)`
+against `C(d,2)` doubled — a rebase with no remainder. And the demand is required to **vary over the
+base**, because a quantity that did not vary is one a constant could have served.
+
+Measured on the declared corpus, at the surface the constant used to refuse:
+
+```text
+  "the"     pair chart   571,608,766 points   over 33,812 orbits   degree 33811/2
+            star chart        33,811 points                        degree 1     ← returned WHOLE
+```
+
+**Both drivers now carry no capacity at all.** The cross-check compares in the degree-one chart:
+31,933 readings, 0 disagreements; 27,171 surfaces whose pair chart is wider are named with the width
+their own material required rather than skipped by a number.
+
+### The same law one altitude up: the sweep is a front
+
+29,533 surfaces, each reading independent of every other — shared immutable census and atlas,
+disjoint occurrences. That is a front, and `sweep_over` covers it across the charts a caller
+declares, by **extent** rather than by count. Driving it serially pinned one host core while
+twenty-three stood idle, which `CLAUDE.md` §9 names a defect to diagnose rather than narrate.
+`the_covered_sweep_equals_the_serial_sweep` requires the readings to be identical: a lane is a
+realization coordinate and may not move a reading.
+
+**Two defects were introduced and removed while building this, and both are one shape:**
+*materializing a population to learn a number the material already carried.* Folding the whole star
+atlas costs `2·C(d,2)` — twice the pair chart it replaces, so reading the atlas means one chart at a
+time. And computing each surface's demand by rebuilding its complex re-ran the most expensive
+operation in the organ for a number the sweep was already holding. Each pinned a core for minutes.
+
 ### What this section forbids
 
 1. **No receiver reach described as a window, an aperture, or a capacity.** Name the cone, its apex,

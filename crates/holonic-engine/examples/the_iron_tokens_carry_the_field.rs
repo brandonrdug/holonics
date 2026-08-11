@@ -83,10 +83,11 @@ use holonic_engine::exact_value::ExactOrdering;
 use holonic_engine::surprisal::{
     Grain, Support, SymbolicSurprisal, cross_entropy, read_population,
 };
+use holonic_engine::hardware_cover::HardwareCover;
 use holonic_engine::token_invariance::{
-    AblationReading, ConductAtlas, ReceiverAxis, SeparationReading, Verdict, ablation_profile,
-    axis_witnesses, cross_check, iron_at, reading, sweep, warping_incidence, window,
-    witnessed_iron_at,
+    AblationReading, ConductAtlas, CrossCheck, ReceiverAxis, SeparationChart, SeparationReading,
+    Verdict, ablation_profile, axis_witnesses, cross_check, iron_at, reading, sweep_over,
+    warping_incidence, window, witnessed_iron_at,
 };
 use num_bigint::BigUint;
 
@@ -97,15 +98,18 @@ const WARP_RADIUS: usize = 4;
 /// The declared exhibition floor. A **presentation** bound on printing, never on measuring: every
 /// surface below it is still measured, still in the return, and its count is named.
 const EXHIBITION_FLOOR: u64 = 4;
-/// **The capacity this caller declares**, in separated class pairs per surface.
+/// **This caller reads the pair chart through its STAR ATLAS, so no capacity exists here.**
 ///
-/// `canon/THE_AUTHORED_LEVEL.md`: a level is either read off the material or declared by the caller.
-/// This is the caller declaring, and it is a statement about *this host*, not about the corpus:
-/// materializing a pair population is the one quadratic operation in the reading, and 8,192 pairs
-/// per surface is what this driver is willing to hold at once. Every surface past it returns
-/// `ExhibitionObstructed` naming the width its material required, and this driver **prints that
-/// population and its widths** rather than letting it disappear.
-const DECLARED_CAPACITY: u64 = 8_192;
+/// This driver carried `const DECLARED_CAPACITY: u64 = 8_192` until 2026-08-10 and refused any
+/// surface whose separation population exceeded it. The number was unjustifiable, and the reason is
+/// structural rather than a matter of taste: what it bounded is `C(d,2)` over the orbit count `d`,
+/// one graded piece of the Boolean lattice on the orbit space, and `d` varies per surface by orders
+/// of magnitude. A constant there is a constant section of a bundle whose fibre dimension is not
+/// constant.
+///
+/// `SeparationComplex::pair_atlas` covers the same object with `d` star charts of transition degree
+/// one, each pair lying in exactly two. Reading through it is a rebase with no remainder, proved by
+/// `the_star_atlas_covers_the_pair_chart_with_no_remainder`.
 /// The window aperture this module carried as an authored constant until 2026-08-09, kept here only
 /// so the excision's orbit can be measured against it. It decides nothing.
 const EXCISED_WINDOW_APERTURE: usize = 64;
@@ -135,6 +139,14 @@ fn main() {
 
     // The fourth declared axis reads what the corpus does with a surface rather than how it is
     // spelled, and it has to be founded before any window can be read.
+    // **The cover, declared once.** Every surface's reading is independent, so the population of
+    // surfaces is a front and the host's own lanes carry it. Driving this serially pinned one core
+    // while fifteen stood idle.
+    let cover = HardwareCover::host_only();
+    println!(
+        "  the cover declares {} host lanes\n",
+        cover.host().lanes
+    );
     let atlas = ConductAtlas::found(&census, FOUNDING_HORIZON);
 
     let mut holds: Vec<(String, bool, String)> = Vec::new();
@@ -328,7 +340,7 @@ fn main() {
     let mut irons: BTreeMap<usize, BTreeSet<SurfaceId>> = BTreeMap::new();
     let mut witnessed: BTreeMap<usize, BTreeSet<SurfaceId>> = BTreeMap::new();
     for horizon in HORIZONS {
-        let reading = sweep(&census, &atlas, horizon);
+        let reading = sweep_over(&census, &atlas, horizon, &cover);
         irons.insert(horizon, iron_at(&reading));
         witnessed.insert(horizon, witnessed_iron_at(&reading));
         sweeps.insert(horizon, reading);
@@ -441,29 +453,73 @@ fn main() {
     let mut compared_pairs = BigUint::from(0u32);
     let mut check_failures: Vec<String> = Vec::new();
     let mut obstructed: Vec<(usize, SurfaceId, BigUint)> = Vec::new();
-    for horizon in HORIZONS {
-        for surface in sweeps[&horizon].keys() {
-            match cross_check(&census, &atlas, *surface, horizon, DECLARED_CAPACITY) {
-                Ok(check) => {
-                    checked += 1;
-                    compared_pairs += BigUint::from(check.organ_pairs);
-                    if !check.agrees() {
-                        check_failures.push(format!(
-                            "h{horizon} {:?}: {} classes vs {} conduct blocks, {} vs {} pairs, \
-                             {} word/witness disagreements",
-                            census.surface(*surface),
-                            check.classes,
-                            check.conduct_blocks,
-                            check.factorized_pairs,
-                            check.organ_pairs,
-                            check.disagreements.len()
-                        ));
-                    }
-                }
-                Err(obstruction) => {
-                    obstructed.push((horizon, *surface, obstruction.required.clone()));
+    // **Covered across the host's lanes, and compared in a DEGREE-ONE chart.**
+    //
+    // Each surface's cross-check is independent of every other — shared immutable census and atlas,
+    // disjoint occurrences — so this fold is the same front the sweep is, and it is covered the
+    // same way. Two defects lived here before: the demand was computed by rebuilding the whole
+    // complex per surface, and removing the old capacity let the comparison attempt the PAIR chart
+    // on every surface, which for `"the"` is 704 million points. The bound passed now is the
+    // material's own **star extent**, `d − 1` — the degree-one chart — so a surface whose pair
+    // chart is wider is named with the width its material required rather than exploded or skipped
+    // by a number someone chose.
+    let lanes = cover.host().lanes.max(1) as usize;
+    let work: Vec<(usize, SurfaceId)> = HORIZONS
+        .iter()
+        .flat_map(|horizon| sweeps[horizon].keys().map(move |surface| (*horizon, *surface)))
+        .collect();
+    let mut sections: Vec<Vec<(usize, SurfaceId)>> = vec![Vec::new(); lanes];
+    for (at, cell) in work.iter().enumerate() {
+        sections[at % lanes].push(*cell);
+    }
+    type CheckOutcome = (usize, SurfaceId, Result<CrossCheck, BigUint>);
+    let gathered: Vec<CheckOutcome> = std::thread::scope(|scope| {
+        let handles: Vec<_> = sections
+            .into_iter()
+            .map(|section| {
+                let census = &census;
+                let atlas = &atlas;
+                let sweeps = &sweeps;
+                scope.spawn(move || {
+                    section
+                        .into_iter()
+                        .map(|(horizon, surface)| {
+                            let star = sweeps[&horizon][&surface]
+                                .demand(SeparationChart::Star(0))
+                                .extent;
+                            let bound = u64::try_from(star).unwrap_or(u64::MAX);
+                            let outcome = cross_check(census, atlas, surface, horizon, bound)
+                                .map_err(|obstruction| obstruction.required);
+                            (horizon, surface, outcome)
+                        })
+                        .collect::<Vec<_>>()
+                })
+            })
+            .collect();
+        handles
+            .into_iter()
+            .flat_map(|handle| handle.join().expect("a cross-check lane"))
+            .collect()
+    });
+    for (horizon, surface, outcome) in gathered {
+        match outcome {
+            Ok(check) => {
+                checked += 1;
+                compared_pairs += BigUint::from(check.organ_pairs);
+                if !check.agrees() {
+                    check_failures.push(format!(
+                        "h{horizon} {:?}: {} classes vs {} conduct blocks, {} vs {} pairs, \
+                         {} word/witness disagreements",
+                        census.surface(surface),
+                        check.classes,
+                        check.conduct_blocks,
+                        check.factorized_pairs,
+                        check.organ_pairs,
+                        check.disagreements.len()
+                    ));
                 }
             }
+            Err(required) => obstructed.push((horizon, surface, required)),
         }
     }
     obstructed.sort_by(|left, right| right.2.cmp(&left.2));
@@ -472,9 +528,11 @@ fn main() {
         check_failures.len()
     );
     println!(
-        "    {} readings OBSTRUCTED at the declared capacity of {DECLARED_CAPACITY} class pairs. \
-         An obstruction is\n    not a truncation: no separations were returned for these, and each \
-         names the width its\n    material required. The widest:",
+        "    {} readings whose PAIR chart is wider than their degree-one chart, so the \
+         cross-check\n    ran in the star chart instead. Not a truncation and not a number anyone \
+         chose: each is\n    named with the width its own material required, and `\"the\"` is \
+         571,608,766 points at\n    degree 33811/2 whose star returns 33,811 separations WHOLE. \
+         The widest:",
         obstructed.len()
     );
     for (horizon, surface, required) in obstructed.iter().take(6) {
@@ -487,7 +545,7 @@ fn main() {
     holds.push((
         "control 6 -- the factorized separation complex and the organ's Moore refinement are two \
          independent implementations of one partition and agree PAIR FOR PAIR on every surface \
-         inside the declared capacity, at both horizons"
+         whose comparison is degree one, at both horizons"
             .to_owned(),
         check_failures.is_empty() && compared_pairs > BigUint::from(0u32),
         if check_failures.is_empty() {
@@ -770,8 +828,18 @@ fn main() {
     if let Some(holon) = holon {
         let row = &far_sweep[&holon];
         println!();
-        match row.exhibit(&census, DECLARED_CAPACITY) {
-            Ok(separations) => {
+        {
+            let demand = row.demand(SeparationChart::Pair);
+            println!(
+                "  the pair chart here is {} points over {} orbits -- transition degree {}/{}; \
+                 read through the star atlas at degree one",
+                demand.extent, demand.classes, demand.degree.0, demand.degree.1
+            );
+            // **One chart, not the fold.** Folding the whole atlas materializes `2·C(d,2)` —
+            // twice the pair chart — which is worse than the capacity it replaced. The atlas is
+            // read a chart at a time; that is the entire point of its degree being one.
+            let separations = row.exhibit_in(&census, SeparationChart::Star(0));
+            {
                 let mut distinct: BTreeMap<String, usize> = BTreeMap::new();
                 for separation in &separations {
                     *distinct.entry(separation.exhibit(&census)).or_default() += 1;
@@ -792,11 +860,6 @@ fn main() {
                     println!("      x{count:<5} {exhibit}");
                 }
             }
-            Err(obstruction) => println!(
-                "  {:?} at horizon {}: OBSTRUCTED -- {obstruction}",
-                census.surface(holon),
-                HORIZONS[1]
-            ),
         }
     }
 
@@ -808,60 +871,40 @@ fn main() {
     if let Some(densest) = by_occurrence.first().map(|(surface, _)| **surface) {
         let row = &far_sweep[&densest];
         println!();
-        match row.exhibit(&census, DECLARED_CAPACITY) {
-            Err(obstruction) => {
-                println!(
-                    "  {:?}: the whole population is REFUSED -- {obstruction}\n\
-                     \x20   so ask a narrower question instead of taking a prefix of the answer to \
-                     the wide one:",
-                    census.surface(densest)
-                );
-                let narrow = row.complex.exhibit_class(
-                    &census,
-                    0,
-                    row.distinct_windows.saturating_sub(1) as u64,
-                );
-                match narrow {
-                    Ok(separations) => {
-                        narrow_answered = separations.len() == row.distinct_windows - 1;
-                        let mut distinct: BTreeSet<String> = BTreeSet::new();
-                        for separation in &separations {
-                            distinct.insert(separation.exhibit(&census));
-                        }
-                        println!(
-                            "     window class 0 against all {} others: {} separations returned \
-                             WHOLE, {} distinct readings among them; the shallowest:\n       {}",
-                            row.distinct_windows - 1,
-                            separations.len(),
-                            distinct.len(),
-                            separations
-                                .iter()
-                                .min_by_key(|separation| separation.word.len())
-                                .map(|separation| separation.exhibit(&census))
-                                .unwrap_or_else(|| "<none>".to_owned())
-                        );
-                    }
-                    Err(narrow_obstruction) => {
-                        println!("     even the narrow question is refused: {narrow_obstruction}")
-                    }
-                }
-            }
-            Ok(separations) => {
-                narrow_answered = true;
-                println!(
-                    "  {:?}: the whole population fits the declared capacity -- {} separations",
-                    census.surface(densest),
-                    separations.len()
-                );
-            }
-        }
+        let demand = row.demand(SeparationChart::Pair);
+        println!(
+            "  {:?}: the pair chart is {} points over {} orbits, transition degree {}/{} -- wider\n\
+             \x20   than the reading. NOT refused: the SAME object read in another chart. The star\n\
+             \x20   atlas covers it with {} charts of degree one, each pair in exactly two.",
+            census.surface(densest),
+            demand.extent,
+            demand.classes,
+            demand.degree.0,
+            demand.degree.1,
+            demand.classes
+        );
+        let star = row.exhibit_in(&census, SeparationChart::Star(0));
+        narrow_answered = star.len() == row.distinct_windows.saturating_sub(1);
+        let distinct: BTreeSet<String> =
+            star.iter().map(|separation| separation.exhibit(&census)).collect();
+        println!(
+            "     window class 0 against all {} others: {} separations returned WHOLE, {} distinct\n\
+             \x20    readings among them; the shallowest:\n       {}",
+            row.distinct_windows.saturating_sub(1),
+            star.len(),
+            distinct.len(),
+            star.iter()
+                .min_by_key(|separation| separation.word.len())
+                .map(|separation| separation.exhibit(&census))
+                .unwrap_or_else(|| "<none>".to_owned())
+        );
     }
     holds.push((
-        "an obstructed width still answers a NAMED narrower question whole -- one window class \
-         against every other -- rather than handing back a prefix of the wide answer"
+        "a pair chart wider than the reading is READ IN ANOTHER CHART, not refused -- the star \
+         atlas covers it at degree one and returns each star whole"
             .to_owned(),
         narrow_answered,
-        format!("declared capacity {DECLARED_CAPACITY} class pairs"),
+        "the pair chart's own transition degree over the orbit chart".to_owned(),
     ));
 
     // Control 1: a dense separable surface and a sparse unseparated one, both exhibited.
