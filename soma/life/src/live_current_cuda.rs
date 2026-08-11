@@ -59,6 +59,10 @@ pub struct CudaLiveCurrentExecutor {
     resident_standing: Option<ResidentStanding>,
     resident_lineages: BTreeMap<CurrentLineage, ResidentCarrier>,
     staged: Option<StagedEvent>,
+    /// **The device's own launch census**, taken once at mount: `μ`'s `D` constituent. The
+    /// population mouth hands it to `Function::linear_launch`, which derives grid and block from it
+    /// together with the function's own attribute. No launch geometry is authored anywhere.
+    launch_census: Option<::mount::cuda::LaunchCensus>,
     context: Context,
 }
 
@@ -66,6 +70,7 @@ impl CudaLiveCurrentExecutor {
     pub fn new(device_ordinal: i32) -> ::mount::Result<Self> {
         ::mount::cuda::init()?;
         let device = Device::get(device_ordinal)?;
+        let launch_census = Some(device.launch_census()?);
         let context = Context::create(&device)?;
         let module = Module::load_ptx(SOMA_PTX)?;
         let local = module.lineage_event()?.local_size_bytes()?;
@@ -100,6 +105,7 @@ impl CudaLiveCurrentExecutor {
             resident_standing: None,
             resident_lineages: BTreeMap::new(),
             staged: None,
+            launch_census,
             context,
         })
     }

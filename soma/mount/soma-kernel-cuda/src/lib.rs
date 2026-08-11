@@ -3725,9 +3725,16 @@ pub unsafe extern "ptx-kernel" fn lineage_event(
 /// current's carrier inside another's, which is the absolute-frame defect at the level of memory.
 /// The only new datum is `count`, which the host reads off the population it is enacting.
 ///
-/// `standing_words` and `relation_words` are **shared and read-only**: standing-before is one
-/// immutable field every current reads, exactly as `regional_contacts` already treats the receiver
-/// row. They are not strided.
+/// `standing_words` is **shared and read-only**: standing-before is one immutable field every
+/// current reads, exactly as `regional_contacts` already treats the receiver row. It is not strided.
+///
+/// `relation_words` **is** strided, at one `COG_WORDS` region per current — a current whose geometry
+/// is a cell carries a relation and one whose geometry is a complex carries none, so the population
+/// is not uniform in this buffer. Each lane's *declared* relation extent is read from its own
+/// control block as `PARAM_RELATIONS * COG_WORDS`, which is exactly what the body checks, so a
+/// complex current is handed a zero extent at its own region's base and a cell current is handed
+/// one whole cog. Padding the region uniformly and declaring the extent per lane keeps the body's
+/// structural check intact rather than relaxing it for the population.
 #[no_mangle]
 pub unsafe extern "ptx-kernel" fn lineage_event_population(
     standing_words: *const u32,
@@ -3767,7 +3774,8 @@ pub unsafe extern "ptx-kernel" fn lineage_event_population(
     // one current a partial region, so it is refused — and refused by every lane, so no lane
     // proceeds on a body another lane has rejected.
     let divides = |len: usize| len % count == 0;
-    if !divides(control_words_len)
+    if !divides(relation_words_len)
+        || !divides(control_words_len)
         || !divides(owns_len)
         || !divides(carriers_len)
         || !divides(overflow_nodes_len)
@@ -3787,6 +3795,7 @@ pub unsafe extern "ptx-kernel" fn lineage_event_population(
     }
 
     let control_stride = control_words_len / count;
+    let relation_stride = relation_words_len / count;
     let owns_stride = owns_len / count;
     let carriers_stride = carriers_len / count;
     let overflow_nodes_stride = overflow_nodes_len / count;
@@ -3796,14 +3805,31 @@ pub unsafe extern "ptx-kernel" fn lineage_event_population(
     let emissions_stride = emissions_len / count;
     let emanation_stride = emanation_len / count;
 
+    // The lane's own declared relation extent, read from the lane's own control block. The body
+    // refuses when the two disagree, and that check is what keeps a complex current from being
+    // handed a cell's cog.
+    if control_stride < event_cuda::CONTROL_PARAMS + event_cuda::PARAM_WORDS {
+        return;
+    }
+    let lane_control =
+        unsafe { slice::from_raw_parts(control_words.add(lane * control_stride), control_stride) };
+    let lane_relations =
+        lane_control[event_cuda::CONTROL_PARAMS + event_cuda::PARAM_RELATIONS] as usize;
+    let Some(lane_relation_words) = lane_relations.checked_mul(COG_WORDS) else {
+        return;
+    };
+    if lane_relation_words > relation_stride {
+        return;
+    }
+
     unsafe {
         enact_one_lineage(
             standing_words,
             standing_words_len,
             control_words.add(lane * control_stride),
             control_stride,
-            relation_words,
-            relation_words_len,
+            relation_words.add(lane * relation_stride),
+            lane_relation_words,
             owns.add(lane * owns_stride),
             owns_stride,
             carriers.add(lane * carriers_stride),

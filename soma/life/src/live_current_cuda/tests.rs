@@ -1664,7 +1664,21 @@ fn program_world_hand_crosses_the_native_cuda_mouth() {
     assert!(card_reverse_world.checkpoint().is_some());
     assert!(card_independent_world.checkpoint().is_some());
     assert_eq!(cuda.directed_contacts(), 2);
-    assert_eq!(cuda.launches(), 6 + cuda.resource_retries());
+    // **The population crosses once per contemporary EVENT, not once per current.**
+    //
+    // This read `6 + resource_retries` until 2026-08-10, when `lineage_event` was launched
+    // `Dim3::x(1)` and `enact` iterated currents serially — six currents, six crossings. The
+    // population mouth enacts a whole contemporary event in one crossing, one lane per current, so
+    // the same six currents now cross five times: one of these events carries two currents and they
+    // are co-present. The strict inequality is the load-bearing half — it fails if the population
+    // path ever degenerates back to one current per crossing.
+    assert!(
+        cuda.launches() < 6 + cuda.resource_retries(),
+        "six currents must cross fewer than six times: {} launches, {} retries",
+        cuda.launches(),
+        cuda.resource_retries()
+    );
+    assert_eq!(cuda.launches(), 5 + cuda.resource_retries());
 
     let forward_contact_cells = card_forward.standing().cells().len();
     let reverse_contact_cells = card_reverse.standing().cells().len();
@@ -1771,7 +1785,15 @@ fn program_world_hand_crosses_the_native_cuda_mouth() {
         card_woken_world.checkpoint()
     );
     assert_eq!(cuda.directed_contacts(), 2);
-    assert_eq!(cuda.launches(), 9 + cuda.resource_retries());
+    // The same correction as above, further along this world: nine currents, and the two that share
+    // a contemporary event now cross together.
+    assert!(
+        cuda.launches() < 9 + cuda.resource_retries(),
+        "nine currents must cross fewer than nine times: {} launches, {} retries",
+        cuda.launches(),
+        cuda.resource_retries()
+    );
+    assert_eq!(cuda.launches(), 7 + cuda.resource_retries());
 
     println!(
             "device={:?} stack={} launches={} retries={} directed_contacts={} before_rank={} before_cells={} forward_contact_cells={} reverse_contact_cells={} independent_contact_cells={} return_currents={} resting_cells={} wait_launches={} wake_cells={} reverse_open={} independent_relations={}",

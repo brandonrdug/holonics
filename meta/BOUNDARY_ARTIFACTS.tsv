@@ -76,9 +76,9 @@ CLOSURE	soma/mount/mount-smoke-kernel/mount_smoke_kernel.ptx	soma/mount/mount-sm
 CLOSURE	soma/mount/mount-smoke-kernel/mount_smoke_kernel.ptx	soma/mount/mount-smoke-kernel/src/lib.rs	598e5f1fff67bcc9587e9f9dcb01d1a3e57fd2cc6d390a26646e8b82bd61bcc7
 ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	root	soma/mount/soma-kernel-cuda
 ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	closure_rule	CRATE_DEPS
-ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	sha256	7abead4fd85c6a2283f97b2cbd6207030175a66469712e1d164ace854f92e82e
-ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	octets	8793384
-ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	closure_sha256	c490f134fe55917a71b999f9cfb6f3c3e79f65bfd984fcdbaeec07b6239563ce
+ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	sha256	a8ba0921808bc0a205fc38be64d2c2bf997c3bdf4cacfdca6efa5c8cdccabe34
+ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	octets	8794156
+ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	closure_sha256	09115bf90472a21b979bb742c449b642192b89639d67661ae84ec76862b67db9
 ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	toolchain	nightly-2026-05-22
 ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	builder	soma/mount/soma-kernel-cuda/build-ptx.sh
 ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	consumer	soma/mount/src/lib.rs
@@ -128,4 +128,4 @@ CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/mount/soma-kernel-
 CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/mount/soma-kernel-cuda/Cargo.toml	8147a2229bcd1a777ce7043ad2c4bbff1b8f6f0d573f4055b027af75e1dc30a4
 CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/mount/soma-kernel-cuda/build-ptx.sh	2132a89bc2a735a4a22925c5de019d156a62371ffb7be4c316cf4ba301c70030
 CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/mount/soma-kernel-cuda/rust-toolchain.toml	d072407f6554628c0b87e93aab1fee3fcfe3e68fe149121c7e539a6d0b573fad
-CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/mount/soma-kernel-cuda/src/lib.rs	66a4931af3d6c2ea9af2f9d04f0dee7b775b09aa171f17a1f1875fa467a4d9c2
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/mount/soma-kernel-cuda/src/lib.rs	cc9fa2c5c290d1e29ab350491b4415ab20324f907c4eedc1880108fc7367a3fb
