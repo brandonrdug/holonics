@@ -1489,17 +1489,25 @@ impl MorphologicalLanguageEcology {
     ) -> Result<(), MorphologicalLanguageError> {
         let generated_at = state.current.reflection.returned_event_count;
         if let Some(support) = event.support.as_ref() {
+            // **FOUND a new tip, or RIDE a section already founded.** This refused the second
+            // encounter as `MalformedFiber`, which treats a RIDE as a malformation and contradicts
+            // the ratified law directly —
+            // `research/records/2026-07-17_THE_LEADER_GROWS_THE_CHANNEL_THE_RETURN_TRAVELS_THE_FOUND_PATH.md`:
+            //
+            //   FOUND grows a locally new conducting axis.
+            //   RIDE conducts through consequential standing form.
+            //   **The same passage can RIDE old sections while FOUNDing a new tip.**
+            //
+            // The refusal is also what made generation exponential. A branch forbidden to ride must
+            // remember every support it founded, so the founded set enters the current's identity
+            // and the reachable population is `2^supports` — a self-avoiding walk, which is a
+            // global constraint on a path and therefore a barrier under `H.0219` rather than a
+            // decomposable law. Riding costs nothing because the terrain already paid.
             let uses = Arc::make_mut(&mut state.current.reflection.recurrent_support_uses);
-            let prior = uses.get(support).copied().unwrap_or(0);
-            if prior >= 1 {
-                return Err(MorphologicalLanguageError::MalformedFiber);
+            let founded = uses.get(support).copied().unwrap_or(0);
+            if founded == 0 {
+                uses.insert(support.clone(), 1);
             }
-            uses.insert(
-                support.clone(),
-                prior
-                    .checked_add(1)
-                    .ok_or(MorphologicalLanguageError::CarrierExtent)?,
-            );
         }
         let generated_germ = token_germs(std::slice::from_ref(&event.token))?
             .into_iter()

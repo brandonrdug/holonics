@@ -83,13 +83,60 @@ struct ActiveResponseWitness {
 /// The operative reflection carried between emitted events. Both suffix currents are local
 /// receiver addresses in the one shared conditioned ecology. A returned event advances them
 /// directly; no complete chronology scan or branch-local body copy is needed.
-#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Debug)]
 struct ReflectiveCurrentFront {
     clause_lexical: ExactSuffixCurrent,
     passage_lexical: ExactSuffixCurrent,
     last_surface: String,
     returned_event_count: usize,
     recurrent_support_uses: Arc<BTreeMap<RecurrentSupportKey, u64>>,
+}
+
+/// **The identity is where the current IS, not which sections it has founded.**
+///
+/// A current's future conduct is decided by its two suffix addresses, its last surface, and the
+/// depth its aperture is measured against. The founded set is **terrain** —
+/// `2026-07-17_THE_LEADER_GROWS_THE_CHANNEL…`: *"Each extension changes the material boundary from
+/// which later extension proceeds… the same passage can RIDE old sections while FOUNDing a new
+/// tip."*
+///
+/// Keeping terrain in the key made two branches that founded different sections permanently
+/// distinct, so the population was `2^supports`: a self-avoiding walk, which `H.0219` names a
+/// **barrier** rather than a decomposable law. Measured before this change: **14,018 response
+/// branches for a two-token prompt.**
+///
+/// Written by hand rather than derived, because a derive puts terrain back in the key. Sound only
+/// because a RIDE is admitted at `ecology.rs::enact_event`; refusing the second encounter while
+/// sharing terrain prunes a sibling that should have ridden.
+impl PartialEq for ReflectiveCurrentFront {
+    fn eq(&self, other: &Self) -> bool {
+        self.conduct_key() == other.conduct_key()
+    }
+}
+
+impl Eq for ReflectiveCurrentFront {}
+
+impl PartialOrd for ReflectiveCurrentFront {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for ReflectiveCurrentFront {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.conduct_key().cmp(&other.conduct_key())
+    }
+}
+
+impl ReflectiveCurrentFront {
+    fn conduct_key(&self) -> (&ExactSuffixCurrent, &ExactSuffixCurrent, &str, usize) {
+        (
+            &self.clause_lexical,
+            &self.passage_lexical,
+            &self.last_surface,
+            self.returned_event_count,
+        )
+    }
 }
 
 /// Terminal testimony retained for an observer. It is deliberately absent from the current key:

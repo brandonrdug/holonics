@@ -95,7 +95,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (54 deposits of 346)
+## 4 · The 2026-08 record line (55 deposits of 347)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -153,6 +153,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-10_PREDICTION_AND_COMPRESSION_ARE_ONE_COIN_AND_CROSS_ENTROPY_IS_THE_TRANSPORT_RESIDUAL.md` | Prediction and compression are one coin, and cross-entropy is the transport residual |
 | `2026-08-10_THE_FRONT_IS_THE_PARALLEL_UNIT_AND_THE_APPARATUS_MOUTH_STOPS_BEFORE_GENERATION.md` | The front is the parallel unit, and the apparatus mouth stops before generation |
 | `2026-08-10_THE_INSTRUMENT_DECLARES_THE_APERTURE_AND_THE_REFUSAL_IS_THE_RETURN.md` | The instrument declares the aperture, and the refusal is the return |
+| `2026-08-10_THE_MACHINE_RETURNS_EVERY_BRANCH_BECAUSE_NOTHING_ATTACHES.md` | The machine returns every branch because nothing attaches, and a RIDE was being refused as a malformation |
 | `2026-08-10_THE_MANIFOLD_IS_THE_INVARIANT_OF_THE_CURRENTS_NOT_THEIR_CONTAINER_AND_THE_RUNG_IS_THE_HINGE_DEFICIT.md` | The manifold is the invariant of the currents, not their container — and the rung is the hinge deficit |
 | `2026-08-10_THE_OBJECT_IS_THE_UNRECONSTRUCTABLE_INTERIOR_AND_THE_MACHINE_HAS_ALREADY_RECOVERED_FOUR.md` | The object is the unreconstructable interior, and the machine has already recovered four of them |
 | `2026-08-10_THE_SPINE_ASSESSED_BY_ITS_OWN_LAW_THE_TOWER_IS_ONE_TYPE_FROM_CLIMBING.md` | The spine assessed by its own law: the tower is one type from climbing, and the front's barrier is a monoid |
