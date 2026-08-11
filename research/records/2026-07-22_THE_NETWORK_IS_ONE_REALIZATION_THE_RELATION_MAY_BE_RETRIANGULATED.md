@@ -1,6 +1,11 @@
 # THE NETWORK IS ONE REALIZATION; THE RELATION MAY BE RETRIANGULATED
 
 **Status:** BRANDON-RATIFIED CORRECTION / DEPOSITED / FIXED-BASIS TRANSFORMER INTERPRETATION
+
+> **Currency note (2026-08-11):** the refusal below to promote an approximate total-active-parameter
+> count was correct when deposited and can now be lifted with a citable source: **104B active**,
+> `arXiv:2607.24653` (Kimi K3 technical report). The refusal's discipline — no approximate count
+> promoted into fact — is retained; only the number's availability changed.
 REGRADED / ARCHITECTURAL REWRITE DERIVED BUT UNSCHEDULED / SOMA INTERIOR UNCHANGED
 
 ## 1. The correction

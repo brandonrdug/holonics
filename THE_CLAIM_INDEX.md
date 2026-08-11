@@ -61,6 +61,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 | `canon/TABLET_THE_CHART.md` | **The chart: coordinates, transport, and what a chart refuses** — A coordinate system is a receiver and the Jacobian is the transport; a radical is a chart that forgets a winding; warp and weft are a reading in a frame. |
 | `canon/TABLET_THE_FLOW.md` | **The flow: fluid dynamics, phases, and parallel integration** — Why Navier-Stokes is not a distant problem, the zeta distribution as an exact self-similar phase, and ant integration as the exact part of the fundamental theorem. |
 | `canon/TABLET_THE_MANIFOLD.md` | **The manifold: charts as types, the structure group as the legal casts, and what a loop returns** — A manifold is the invariant of a population of currents and not their container; a chart is a type and a transition map is an implicit cast; every geometry is a reduction of the structure… |
+| `canon/TABLET_THE_OPERATIONS.md` | **The operations: every classical operation is a construction, a transport, a face, or a quotient** — Every operation of linear algebra, differential equations, and analysis is one of four species — a construction, a transport, a face, or a quotient — and the notation is complete only when… |
 | `canon/TABLET_THE_REALIZER.md` | **The realizer: positivity, the holomorphic half, and rendering** — Hodge-Riemann where it is proved, the holomorphic organ that was already owned, and rendering as a receiver whose missed feature is an obstruction. |
 | `canon/TABLET_THE_RESONANCE.md` | **The resonance: what intelligence is, physically** — Intelligence is a transport and not a faculty; resonance is a microscopic event no operator can locate; production is re-emission and is not a choice; and the machine is an artificial… |
 | `canon/TABLET_THE_TURN.md` | **The turn: curvature, windings, and substitution** — Curvature as a linear functional on the hinges, the polygon's n-grams, local substitution preserving a global invariant, fission and fusion as one axis, and friction as the coupling. |
@@ -96,7 +97,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (55 deposits of 347)
+## 4 · The 2026-08 record line (56 deposits of 348)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -159,6 +160,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-10_THE_OBJECT_IS_THE_UNRECONSTRUCTABLE_INTERIOR_AND_THE_MACHINE_HAS_ALREADY_RECOVERED_FOUR.md` | The object is the unreconstructable interior, and the machine has already recovered four of them |
 | `2026-08-10_THE_SPINE_ASSESSED_BY_ITS_OWN_LAW_THE_TOWER_IS_ONE_TYPE_FROM_CLIMBING.md` | The spine assessed by its own law: the tower is one type from climbing, and the front's barrier is a monoid |
 | `2026-08-10_THE_WIRING_WAVE_AND_WHAT_CONDUCTS.md` | The wiring wave closed six edges, and a return compared against a return cannot witness a transport |
+| `2026-08-11_THE_RUNG_REFUSES_BY_NAME_AND_THE_UNRESOLVED_PAIR_IS_THE_REMAINDER.md` | The rung refuses by name, and the unresolved pair is the remainder |
 
 ---
 
@@ -169,7 +171,7 @@ outside `tools/` that names the verifier — not declared.
 
 | tool | what it checks | invoked by |
 |---|---|---|
-| `tools/authored_levels.py` | Every numeric level authored **inside** an organ, and whether it is dispositioned. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `canon/TABLET_THE_MANIFOLD.md`, and 8 more |
+| `tools/authored_levels.py` | Every numeric level authored **inside** an organ, and whether it is dispositioned. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, and 9 more |
 | `tools/boundary_artifacts.py` | Every committed boundary artifact is bound to its content hash AND its closure hash. | `meta/BOUNDARY_ARTIFACTS.tsv`, `research/records/2026-08-09_THE_COMMITTED_BOUNDARY_ARTIFACT_IS_STALE_AND_CANNOT_BE_REBUILT.md`, `soma/kernel/.gitignore` |
 | `tools/claim_index.py` | Generate `THE_CLAIM_INDEX.md` from the tree, so the table of contents cannot drift. | `CLAUDE.md`, `CONSTRUCTION_STATE.md` |
 | `tools/closure_manifest.py` | Bind every return under `output/` to the CLOSURE that produced it, not only to its content. | `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, `research/records/2026-08-10_THE_INSTRUMENT_DECLARES_THE_APERTURE_AND_THE_REFUSAL_IS_THE_RETURN.md` |

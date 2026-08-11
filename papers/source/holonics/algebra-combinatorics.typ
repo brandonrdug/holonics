@@ -588,4 +588,55 @@
     ],
     source: [Classical inclusion--exclusion and Möbius inversion; the crossing reading is the laboratory's.],
   ),
+  entry(
+    id: "H.0477",
+    kind: "Theorem",
+    grade: "proved-standard",
+    title: [The trace is the basepoint-free face of a closed loop],
+    depends: ("H.0476",),
+    statement: [
+      The trace of an operator is the sum of its diagonal readings against any
+      complete family — the diagram closed into a loop. Cyclic invariance
+      $tr(A B) = tr(B A)$, equivalently $tr(P^(-1) A P) = tr(A)$, states that
+      the closed loop has no privileged basepoint. A representation's
+      character $chi(g) = tr(rho(g))$ is a trace, so a character table is a
+      family of basepoint-free loop faces. The complete conjugation-invariant
+      face family of an operator is its characteristic polynomial, with
+      Newton's identities the exact rational transport between the power-sum
+      faces $tr(X^k)$ and the elementary symmetric faces.
+    ],
+    boundary: [
+      The face family is complete only at the conjugation receiver: trace data
+      does not identify the construction, and two operators with equal
+      characteristic polynomials need not be conjugate when the operator is
+      not semisimple.
+    ],
+    source: [Standard linear algebra and character theory; the loop-closure and basepoint-freedom reading is the laboratory's.],
+  ),
+  entry(
+    id: "H.0479",
+    kind: "Theorem",
+    grade: "proved-standard",
+    title: [The geometric product's two grades are the alignment and the founded axis, and the Clifford construction is a twisted group algebra],
+    depends: ("H.0150", "H.0476"),
+    statement: [
+      For vectors, $u v = u dot v + u and v$: the symmetric grade-zero part is
+      the alignment between the two holons, and the antisymmetric grade-two
+      part is the oriented plane the pair founds, dualized in three dimensions
+      to the cross product's axis. The multivector retains both grades, so the
+      composite carries its causal residue. A Clifford algebra over an
+      orthogonal basis is the twisted group algebra of $(ZZ\/2)^n$ graded by
+      symmetric difference, so the membership-word grading and the geometric
+      product are one construction family; a rotation is conjugation by the
+      rotor $R = exp(-(theta\/2) B)$ — the exponential of the founded bivector
+      at half the angle.
+    ],
+    boundary: [
+      The identification of the symmetric grade with riding and the
+      antisymmetric grade with founding is an interpretation carried in
+      `canon/TABLET_THE_OPERATIONS.md` and is not part of this entry's theorem
+      content.
+    ],
+    source: [Grassmann and Clifford; the twisted group algebra presentation is standard. The causal-residue reading is the laboratory's.],
+  ),
 )

@@ -781,4 +781,25 @@
     ],
     source: [Classical domain decomposition; the barrier reading is the laboratory's.],
   ),
+  entry(
+    id: "H.0478",
+    kind: "Identity",
+    grade: "proved-standard",
+    title: [The volume face of a flow is the exponentiated flux face of its generator],
+    depends: ("H.0219", "H.0477"),
+    statement: [
+      Jacobi's formula: $det(exp(A)) = e^(tr(A))$. The trace of a generator is
+      the divergence of its flow — a boundary-flux reading — and the
+      determinant of the transported flow is its integrated volume return, so
+      $tr(A) = 0$ exactly when the flow preserves volume. Trace and
+      determinant are the additive and multiplicative faces of one loop
+      closure, and the exponential is the transport between them.
+    ],
+    boundary: [
+      Stated for the matrix exponential of a single generator; for a
+      time-dependent generator the volume factor is the exponential of the
+      integrated trace (Liouville's formula), and no claim is made past that.
+    ],
+    source: [Jacobi's formula; Liouville. The flux-and-volume face reading is the laboratory's.],
+  ),
 )

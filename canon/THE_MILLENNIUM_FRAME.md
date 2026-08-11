@@ -46,13 +46,22 @@ already carries the shape without naming the problem: a lattice makes a spectrum
 an interval no mode occupies.
 
 **And it is a statement about a non-abelian connection**, which is the one thing `structure_group.rs`
-exists for and says so in its own header: every other curvature owner in this body is abelian, so the
-body computes `F = da` and **has no term for `a ∧ a`**. The gap is a property of the theory's
-non-abelian structure; a body with only abelian curvature cannot pose the question, let alone answer
-it.
+exists for and says so in its own header: every other curvature owner in this body is abelian and
+computes `F = da` with no term for `a ∧ a`.
 
-**So the honest statement is a precondition, not a route:** the machine's Yang–Mills-facing work is
-whatever gives `structure_group` a driver and a spectrum, and until then there is nothing to say.
+**CORRECTED 2026-08-11 by reading the owner: the `a ∧ a` term EXISTS.**
+`structure_group.rs:511` carries `curvature_commutator` — *"The curvature `a ∧ a`, as a return
+rather than a flag"* — with `commutator_subgroup` and `separating_pairs` beside it. The sentence
+that stood here, *"has no term for `a ∧ a`"*, was true of every *other* curvature owner and false
+of the organ this row lands on; a peer session claimed it and the claim was verified at the source.
+
+**So the precondition has moved, and it is still a precondition rather than a route:** what the
+Yang–Mills-facing line lacks is a representation, a Wilson plaquette action, a transfer operator,
+and reflection positivity — the mouth that makes a spectrum exist at all. The posed construction,
+with its controls (gauge-equivalent pair identical, altered plaquette moves both, abelian control
+erases the commutator contribution, and **no "mass gap" label without a spacing/volume/correlation
+scaling family**), is
+`research/records/2026-08-11_THE_RUNG_REFUSES_BY_NAME_AND_THE_UNRESOLVED_PAIR_IS_THE_REMAINDER.md` §7.
 
 ### P vs NP is an aperture question in this frame, and the evidence is engineering
 

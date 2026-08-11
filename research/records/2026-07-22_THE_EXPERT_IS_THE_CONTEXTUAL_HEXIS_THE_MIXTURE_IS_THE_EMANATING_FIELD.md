@@ -3,6 +3,11 @@
 **Status:** HISTORICAL INTERPRETATION / EXACT FIXED-BASIS MEASUREMENT PRESERVED / SINGLETON-LAW,
 FIVE-LAW-HEXIS, AND COMPRESSION READING SUPERSEDED / SOMA INTERIOR UNCHANGED
 
+> **Currency note (2026-08-11):** the availability claim below — *"Kimi's complete technical report
+> and weights have not yet been released"* — is superseded by events: both are released
+> (`arXiv:2607.24653`; `moonshotai/Kimi-K3` config public). The measurement this record preserves is
+> unaffected.
+
 > **Interpretive correction (2026-07-22):**
 > [`THE NETWORK IS ONE REALIZATION; THE RELATION MAY BE RETRIANGULATED`](2026-07-22_THE_NETWORK_IS_ONE_REALIZATION_THE_RELATION_MAY_BE_RETRIANGULATED.md)
 > is current authority. The exact algebra and run remain evidence. Every “singleton law” below is

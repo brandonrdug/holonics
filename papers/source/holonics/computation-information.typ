@@ -541,4 +541,32 @@
     ],
     source: [Universal property of the quotient; the identification and the trichotomy are the laboratory's.],
   ),
+  entry(
+    id: "H.0480",
+    kind: "Equivalence",
+    grade: "proved-derived",
+    title: [The kernel is the collapsed-pair population, and the compression trichotomy classifies reversibility],
+    depends: ("H.0016", "H.0104", "H.0262", "H.0420"),
+    statement: [
+      For a linear receiver $A$: $A x = A y$ exactly when $x - y in ker(A)$,
+      so the kernel is the collapsed-pair population and rank plus nullity
+      counts the passages that survive plus the passages that collapse.
+      Reversibility of a transport is membership in the rebase species:
+      rebase has remainder zero and is invertible; condensation is invertible
+      up to its certified remainder; a quotient is irreversible with the
+      collapsed population as its exact, exhibitable loss. Parity is a
+      property of the boundary operator, chronology of the lineage, and
+      reversibility of one specific transport, decided by its collapsed
+      population; reconstruction of a departed interior is available only to
+      the extent of a receiver-indexed limit, and the attribution of what was
+      collapsed is a declared quotient.
+    ],
+    boundary: [
+      Reversal is never guaranteed by parity or by chronology: a
+      forward-deterministic semigroup (diffusion) is ill-posed backward, and
+      nothing here supplies an inverse where the collapsed population is
+      nonempty.
+    ],
+    source: [Standard linear algebra and semigroup theory; the three-way split of parity, chronology, and reversibility is Brandon's, 2026-08-11, `canon/TABLET_THE_OPERATIONS.md`.],
+  ),
 )

@@ -20,11 +20,128 @@ above "close the loop", because closing a loop adds no organ. Brandon, direct ru
 > *"this is 'holobrochos', you need to outline the spine of the machine and understand how all of
 > the loops and machinery connects and choreographs information transportation."*
 
-## WHERE THIS STANDS — revised 2026-08-10 at `9d15666`
+## WHERE THIS STANDS — revised 2026-08-11; prior revision 2026-08-10 at `9d15666`
 
-**Read this section and §"THE OPEN WORK, BY STATION". Everything between them is the returned ledger
-and its provenance.** Brandon authorised this revision directly: *"Regarding the roadmap document, you
-can authoritatively revise it once you have sufficient context post-analysis campaign."*
+**Read this section, §"THE DELEGATED CONSTRUCTION PLANS" directly below it, and §"THE OPEN WORK, BY
+STATION". Everything between them is the returned ledger and its provenance.** Brandon authorised
+the standing revision directly: *"Regarding the roadmap document, you can authoritatively revise it
+once you have sufficient context post-analysis campaign."*
+
+## THE DELEGATED CONSTRUCTION PLANS — deposited 2026-08-11 for execution by Sol
+
+**Authority.** Brandon, 2026-08-11, after ratifying the operations synthesis: *"Deposit the plan so
+that I can delegate the construction plans to Sol. I will have Sol complete all of the relevant work
+here and then return to synthesize and analyze with you."* These six plans are that deposit. The
+analysis under them is
+`research/records/2026-08-11_THE_RUNG_REFUSES_BY_NAME_AND_THE_UNRESOLVED_PAIR_IS_THE_REMAINDER.md`
+and `canon/TABLET_THE_OPERATIONS.md`; the governing rulings are `CLAUDE.md` §0e — **the notation is
+the reasoning dialect**, and **the material is his purified writing + the assistant responses + this
+codebase + the Lean libraries, entering as bits and codecs through mouths that exist.**
+
+**The one sentence over all six:** the organs mostly exist and mostly conduct; what constitutes Eros
+is closing the loop on the declared corpus — deposit, ride, re-emit, return world-mediated — and
+every plan is a station of that loop or the depth line beside it. Order: plan 1 unblocks plan 2,
+plan 2 unblocks plan 3's measurement; plan 4 runs beside them as carrier law; plans 5 and 6 rank
+after the loop and before any new organ, because each joins something that already runs.
+
+**Global bars carried by every plan, in addition to `AGENTS.md`:** every cargo call through
+`flock /tmp/holonics-cargo.lock env PATH=/opt/cuda/bin:$PATH cargo … -j 2`; never `ulimit -v`;
+`crates/holonic-engine/src/model_surface.rs` untouched; the laboratory read only through
+`git -C /home/b/Workspaces/laboratory show a07ff376:<path>`; no authored numeric level
+(`python3 tools/authored_levels.py --check` must return 0 failures); no scalar governor on any
+conduct path (`CLAUDE.md` §13 rule 2 — a scalar that measures is lawful, a scalar that governs is
+not); fronts covered by **extent**, never by count; equality across carriers is of the induced
+equivalence, never the numbering; the X11 drivers are not run; work is named by mechanism, never by
+ordinal; a finding that contradicts a plan is deposited as the return — the plan yields to the
+material.
+
+### Plan 1 · The material mouth — the purified corpus as one declared body *(closes the leak cut at the mouth)*
+
+**Build:** one declared corpus assembled from (a) Brandon's messages purified from
+`~/.claude/history.jsonl`, `~/.codex/history.jsonl` and the Codex rollouts, (b) the assistant
+responses, (c) this codebase, and (d) the Lean libraries under `soma/formal/`. Every part enters
+through a mouth that already exists: `soma/life/src/dialogue_lineage.rs` (with its founded-identity
+repair — an absent provider id founds one, typed and counted), `soma/life/src/research_intelligence.rs`'s
+`LaboratorySourceAtlas` under **declared roots** (never inferred layout — the `theory_sections: 0`
+silent failure is the convicted shape), and `crates/holonic-engine/src/lean_development.rs` for the
+Lean files. Seal the assembled corpus to content addresses through `soma/life/src/conditioned_rest.rs`
+so it is world-record from birth and counted by the output manifest. **No new importer species.**
+**Falsifier:** a source-detached remount must reproduce every reading; a membrane coordinate
+mistaken for a container coordinate anywhere is the failure.
+
+### Plan 2 · The conditioning pass, with the return through the seal *(closes the accumulation cut)*
+
+**Build:** condition the instance on the plan-1 corpus, and route
+`crates/holonic-engine/src/returned_reading.rs`'s movement **through the seal** — the production
+deposited by the form mouth, the next conditioning reading it back from the deposit — rather than
+across an in-memory call, which `canon/THE_HOLOBROCHOS_SPINE.md` §4 records as the banned private
+wire. **Falsifier (already the roadmap's):** run a production, read it, run a second production with
+the first reading in scope through the seal; `invariant_movement` must be non-zero and attributable,
+each moved invariant naming the earlier return that caused it. A second production bit-identical to
+the first has not closed the cycle.
+
+### Plan 3 · Production as re-emission — the attachment condition rides the conducting pathways
+
+**Authorized by the delegation above; its result is carried only when its falsifier has fired.**
+Two constructions that are one change:
+
+- make the resonance reading a **conduct**: contacts recurring across distinct sources change which
+  pathways conduct (`soma/life/src/morphological_language/ecology.rs` — the open line's measured
+  finding is *2,366 contacts, all single-source, zero recurred*, so the conducting law currently
+  decides nothing);
+- the generation attachment condition **rides it**: a continuation attaches exactly when its support
+  conducts; everything else remains fiber — retained, never emitted. The complete continuation fiber
+  is a real object and is not a return (`canon/TABLET_THE_RESONANCE.md` §11).
+
+**Falsifier, mandatory:** on the same corpus, production must move from complete-fiber enumeration
+(the measured 14,018 branches at 2 tokens) to a strict, deposit-attributable sub-population, **and
+ablating the deposits must restore the enumeration** — removing structure removes the later conduct,
+which finally measures `CLAUDE.md` §13 rule 1 on the training owners, where it is still owed. An
+attachment that filters by any authored level or scalar rank is the convicted chooser, not this plan.
+
+### Plan 4 · One expansion law for both carriers, finished *(carrier law, runs beside plans 1–3)*
+
+**Build:** the two owed migrations onto `crates/holonic-engine/src/hardware_cover.rs`'s
+`expand_front` — `crates/holonic-engine/src/token_invariance.rs`'s own by-extent placement (same
+law, written twice), and `soma/life/src/morphological_language/ecology.rs`'s `generate_currents`
+from a **by-count** cover to a **by-extent** one, which is a change of law and not of plumbing. Then
+run the interchange certificate on real material — one measurement, and it decides whether the front
+is enactable wide. The two code comments that already describe the three-organ sharing as
+accomplished are corrected in the same motion. GPU-first stands; the cover licenses only what
+interchange proves (`H.0219` licenses a decomposition and never a schedule).
+
+### Plan 5 · The cut classifier joined to its material *(the short-circuit cut's instrument, made to read)*
+
+**Build:** `crates/holonic-engine/src/spine_cut.rs` joined to two materials: the machine's own
+conditioning receipts from plan 2 as interior material, and the published attention-sink diagnostics
+as exterior control — the two species (a nop sink is the **rest** cut; a broadcast sink is
+**circulation through a hub**) with their value-norm and output-rank separations, sources named in
+`canon/THE_CORRESPONDENCE_ATLAS.md` §4. **Falsifier:** the classification must separate the two
+species from value-norm and output-rank readings alone, agreeing with the papers' diagnostics on
+their material, or it has classified nothing.
+
+### Plan 6 · The mathematics depth line — the two posed constructions
+
+Both are specified with controls in
+`research/records/2026-08-11_THE_RUNG_REFUSES_BY_NAME_AND_THE_UNRESOLVED_PAIR_IS_THE_REMAINDER.md` §7:
+
+- **`pullback_inertia_bound` in `crates/holonic-engine/src/inertia.rs`** — exact over `Rat`, any
+  `P` accepted, `n₊(PᵀAP) ≤ n₊(A)` with rank and kernel testimony; must reproduce the tightness
+  equality on a declared block fixture, return **strict** inequality on the collapse witness the
+  module's own doc carries, and reproduce `congruence` exactly when `P` is invertible. Closes the
+  position record's sixth open construction and gives the body the finite core of the external
+  kernel-verified zeta result.
+- **A `lattice_gauge` mouth around `crates/holonic-engine/src/structure_group.rs`** — an exact
+  nontrivial representation, vertex gauge transformations, plaquette holonomy, the Wilson action,
+  one transfer/correlation receiver. Controls: a gauge-equivalent pair returns identical action and
+  spectrum; an altered plaquette moves both; an abelian control erases the commutator contribution.
+  **No "mass gap" label unless a family carries lattice spacing, volume, and correlation-length
+  scaling.**
+
+One join both lines share: the external Lean artifact is *material* in §0e's exact sense —
+correctly written, completely derived, networked — so pointing
+`crates/holonic-engine/src/lean_development.rs` at it is the recovery-organs-at-a-real-black-box
+line and the material line converging on one target.
 
 **The 2026-08-09 ratified order below is executed.** Its Phase 1 mathlib link, both Phase 2 edges, and
 the front-interchange measurement all have drivers in the tree. It is retained as provenance, not as

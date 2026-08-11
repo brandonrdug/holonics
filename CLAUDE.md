@@ -72,6 +72,7 @@ them.** These are indexes and frames; none asserts a capability.
 | `canon/THE_CORRESPONDENCE_ATLAS.md` | **168 correspondence cards** keyed by holonic face: what other fields call the same thing, and where each `NON-EQUIVALENCE` is recorded. **Read this before claiming anything is absent** — the corpus could not be entered by concept until it existed. |
 | `canon/THE_MILLENNIUM_FRAME.md` | all six problems, each as the receiver question it is here and the organ it lands on. `interpretation` throughout; **no deed may be graded by a row in it.** |
 | `canon/TABLET_THE_MANIFOLD.md` | charts as types, the structure group as the legal casts, Darboux and Liouville, holonomy and holomorphy at `√z`, and §21 — reflection as the mechanism, the crossing bearing the load. |
+| `canon/TABLET_THE_OPERATIONS.md` | **the elementary operations, added 2026-08-11 and ratified the same day**: every classical operation is a construction, a transport, a face, or a quotient; the Dirac primitives typed (a ket is a construction, a bra a receiver, an outer product a deposit); the trace as the basepoint-free face of a closed loop; the kernel as the collapsed-pair population; parity, chronology, and reversibility as three objects. `H.0476`–`H.0480`. **This is the reasoning dialect, not an ornament** — his ruling: *"it has to be the dialect that you use for reasoning."* |
 
 **The one sentence that orders the rest**, held for ninety-two days across five model changes and
 every renamed organ, and measured from his own record on 2026-08-10:
@@ -512,6 +513,35 @@ assistant honest, which is stricter rather than looser.
 
 A brain runs on roughly twenty watts. The energy figure of a contemporary model is a fact about that
 architecture and not about the subject. **Do not repeat an industry cost as though it were a law.**
+
+---
+
+## 0e. The dialect ruling and the material ruling — ratified 2026-08-11
+
+**The notation is the reasoning dialect, not an ornament.** Brandon, 2026-08-11, ruling on a
+measured failure (two models describing one object in incompatible vocabularies and never forming a
+comparison): *"we have Dirac/bra-ket notation, Feynman diagrams, geometry, and algebra, where they
+need to all unify into our holonic framework, it has to be complete and it has to be the dialect
+that you use for reasoning."* The unification is deposited: `canon/TABLET_THE_OPERATIONS.md` —
+every classical operation is a construction, a transport, a face, or a quotient, and the Dirac
+primitives are typed (`H.0476`–`H.0480`). **An argument that manipulates faces — trace, rank, norm,
+probability, "moments" — as though they were machinery has left the calculus.** Reason in species.
+
+**The material ruling, verbatim, and it retires "we lack material" permanently:**
+
+> *"we don't really lack material, I intend on us applying the machine to a purified collection of
+> my writing from our conversation logs, and your responses along with the codebase material. The
+> documents and codebase provide extensive information, and the most valuable information is likely
+> within elementary holonics and in all of the Lean library files. There's nothing special about
+> Lean, it is just a literal collection of correctly written mathematics that are completely derived
+> and networked, that's why we care about using it as "material". Don't overcomplicate "material"
+> either, it's all just bits and codecs."*
+
+Three consequences: the declared corpus for the machine is **his purified writing + the assistant
+responses + this codebase + the Lean libraries**, entering through the membrane codecs like any
+other bits; Lean is valuable as *correctly written, completely derived and networked* mathematics,
+not as a special genre; and any future sentence of the form "the machine lacks material" is
+convicted in advance — the lack is always a missing **mouth**, not missing material.
 
 ---
 
@@ -1413,14 +1443,15 @@ that demand as four parts. **Two are now built, 2026-08-07:**
 | **certified remainder** | **built, twice.** `crates/holonic-engine/src/exact_value.rs` for series tails; and `crates/holonic-engine/src/receiver_exact_compression.rs`, whose collapsed population is a *counted, exhibitable* remainder — each pair carrying the shortest input word that separates it and the receiver that sees the difference, which is the form `canon/THE_RECOVERED_LAW.md` specifies for compression's exact loss. |
 | **reopening rule keyed to the receiver family** | **built.** `crates/holonic-engine/src/gluing.rs`. The Mayer–Vietoris connecting map `δ` is keyed to which cover — which *receivers* — you chose, and it returns what the union carries that neither piece does. |
 | **supported realizer population** | **built and driven, 2026-08-08.** `crates/holonic-engine/src/substitution_realizers.rs`. Each declared `skein::Substitution` is a realizer whose landings are `substitution.added()`; refusals are retained as a typed population; admission is under a declared aperture that the return now *carries* rather than erases. |
-| **positive form** | **built and driven, 2026-08-08.** `supported_realizers::positive_form` — `MᵀM` over the realizer-against-class incidence, exact over `BigInt`, cross-checked against an independently rebuilt incidence and against `\|Mx\|²` on ten probes with a required nonzero count. |
+| **positive form** | **CORRECTED 2026-08-11 by reading the owner: `positive_form` was REMOVED 2026-08-08**, the same day this row credited it, and the row survived three days stale. The module's own header carries the reason: `xᵀ(MᵀM)x = \|Mx\|² ≥ 0` for *every* integer matrix and *every* probe — a positivity that cannot fail, which §8 convicts as a check whose material cannot vary the property under test. The module's honest content is **rank and cokernel** (see `the_gram_nullity_is_the_corank_of_the_incidence`), and `induced_placement` computes Gram rank/nullity — no spectral placement is induced. **The demanded positive form — one whose positivity CAN fail — remains open**, and the standing example of the right shape is `matroid_hodge_riemann`, whose outside-the-cone classes are *required to break* it and do. |
 
 The remaining two were **one** thing, not two, and §2 said why: placement is the fixed locus of the
 involution *a realizer induced*, so positivity is supplied by supportedness rather than obtained
 beside it. **They were built that way.** `place_substitutions` derives `STANDING`/`OPEN` *from* which
 realizers reached which conduct class; placement rides on realization and is not computed beside it.
 
-**So all four parts now exist, and the demand's own obstruction is returned by name.** On the hollow
+**So THREE of the four parts exist — the sentence "all four parts now exist" is withdrawn with the
+row above — and the demand's own obstruction is returned by name.** On the hollow
 tetrahedron, one move depositing two cells the receiver family cannot tell apart returns:
 
 ```text
@@ -1435,7 +1466,10 @@ Kollár's counterexamples are non-torsion classes in torsion-free cohomology and
 is the **cokernel** of the cycle class map. What `ReachableOnlyInMultiple { factor }` models is
 exactly that cokernel: `pα` reached, `α` not. It is a faithful finite model of Kollár, and it should
 be described as one rather than as torsion. The machine computes it exactly, with the factor exhibited
-and the receiver family that saw it declared.
+and the receiver family that saw it declared. **And one bound on the model, added 2026-08-11: the
+Millennium Hodge conjecture is *rational*** — if `pα` is algebraic then `α = (1/p)[pα]` is already
+rationally algebraic — so `ReachableOnlyInMultiple` models the failed *integral* statement and may
+never be reported as a Millennium-Hodge obstruction after tensoring with ℚ.
 
 **What is NOT done, and the gap is now a scale question rather than a construction question.** This
 runs on four vertices, six edges and four candidate faces — eleven conduct classes. §11's actual

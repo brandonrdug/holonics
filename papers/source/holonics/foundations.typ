@@ -467,4 +467,31 @@
     ],
     source: [Standard conditional probability with laboratory ontological regrade.],
   ),
+  entry(
+    id: "H.0476",
+    kind: "Definition",
+    grade: "definition",
+    title: [The four operation species: construction, transport, face, quotient],
+    depends: ("H.0016",),
+    statement: [
+      Every elementary operation on holons is exactly one of: a *construction*,
+      composing holons into a holon while retaining the causal residue; a
+      *transport*, carrying a holon between charts, with invertible transport
+      the rebase; a *face*, a declared receiver's reading, which forgets and
+      must say what it forgets; or a *quotient*, a declared receiver's
+      identification, whose exact loss is the collapsed population. The Dirac
+      primitives are typed accordingly: a ket is a construction, a bra a
+      receiver, a bracket a face, an operator a transport, and an outer
+      product a *deposit* — a construction reversed into a receiver, the
+      emanation becoming the pole the next arrival is related from.
+    ],
+    boundary: [
+      A face is not machinery: an argument that composes faces as though they
+      were constructions has left the calculus. The species assignment is
+      relative to the declared receiver family, and one symbol may carry two
+      species distinguished by jurisdiction — a projection read as a quotient
+      and the same object read as terrain.
+    ],
+    source: [The ratified 2026-08-11 operations synthesis; `canon/TABLET_THE_OPERATIONS.md`.],
+  ),
 )
