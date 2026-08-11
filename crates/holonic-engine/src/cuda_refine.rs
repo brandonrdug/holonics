@@ -266,6 +266,8 @@ pub struct CudaRefineExecutor {
     module: CuModule,
     refine: CuFunction,
     claimed: CuFunction,
+    /// The LAW: the material-free quotient every organ with a front shares.
+    claim: CuFunction,
     device_name: String,
     block_x: u32,
     max_grid_x: u32,
@@ -321,9 +323,11 @@ impl CudaRefineExecutor {
             }
             let mut refine = ptr::null_mut();
             let mut claimed = ptr::null_mut();
+            let mut claim = ptr::null_mut();
             for (slot, symbol, operation) in [
                 (&mut refine as *mut CuFunction, c"refine_shell", "cuModuleGetFunction(refine_shell)"),
                 (&mut claimed as *mut CuFunction, c"refine_claimed", "cuModuleGetFunction(refine_claimed)"),
+                (&mut claim as *mut CuFunction, c"claim_identities", "cuModuleGetFunction(claim_identities)"),
             ] {
                 if let Err(error) = driver(
                     cuModuleGetFunction(slot, module, symbol.as_ptr()),
@@ -338,7 +342,7 @@ impl CudaRefineExecutor {
             // The block must fit whichever the kernel and the device admit fewer of, down to a
             // whole warp: a partial warp issues with idle lanes.
             let mut kernel_block = device_block;
-            for function in [refine, claimed] {
+            for function in [refine, claimed, claim] {
                 let mut value = 0i32;
                 driver(
                     cuFuncGetAttribute(&mut value, FUNCTION_MAX_THREADS_PER_BLOCK, function),
@@ -353,6 +357,7 @@ impl CudaRefineExecutor {
                 module,
                 refine,
                 claimed,
+                claim,
                 device_name,
                 block_x,
                 max_grid_x,
@@ -559,4 +564,208 @@ pub fn front_of(census: &CorpusCensus) -> Vec<(SurfaceId, Vec<(u32, u32)>)> {
         .into_iter()
         .map(|surface| (surface, census.sites(surface).to_vec()))
         .collect()
+}
+
+// -------------------------------------------------------------------------------------------------
+// The exact quotient: the law, material-free
+// -------------------------------------------------------------------------------------------------
+//
+// **This is the correction that matters, and it is ontological rather than tactical.** Brandon,
+// 2026-08-10: *"why the fuck do you think you have a choice about 'paths'… why is this not
+// ontologically integrated -> encapsulation and factored in the codebase for streamline networking
+// and interconnections based in how we expect the machine to work according to the theorem."*
+//
+// A device path per organ is the cabinet-of-organs failure one level down. The governing record
+// fixes the ontology — *"CPU/RAM and GPU/VRAM are local charts of the same caused body"* — and
+// `CLAUDE.md` §4 fixes the method: **one operation carries many materials.**
+//
+// So there is ONE quotient. Given a class per cell and an exact key per cell it returns the identity
+// of `(class, key)`. It knows nothing about streams, occurrences, windows, states or language. Every
+// organ with a front expresses its step as `(classes, keys)` and shares this; a new material writes
+// a key law and reuses everything else.
+
+/// Which chart of the cover enacted a quotient. A realization coordinate, never a holon.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum QuotientCarrier {
+    Host,
+    Device,
+}
+
+/// One step of an exact quotient: the dense class of every cell, and how many there are.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Quotient {
+    pub cell_class: Vec<u32>,
+    pub classes: usize,
+    pub carrier: QuotientCarrier,
+}
+
+impl Quotient {
+    /// True when two quotients induce the same equivalence on cells.
+    ///
+    /// **Not the same numbering.** A carrier claims identities in whatever order its lanes reach
+    /// them, and requiring two carriers to agree on numbering would be requiring a realization
+    /// coordinate to be causal.
+    pub fn same_partition_as(&self, other: &Quotient) -> bool {
+        if self.cell_class.len() != other.cell_class.len() || self.classes != other.classes {
+            return false;
+        }
+        let mut forward: BTreeMap<u32, u32> = BTreeMap::new();
+        let mut backward: BTreeMap<u32, u32> = BTreeMap::new();
+        for (mine, theirs) in self.cell_class.iter().zip(&other.cell_class) {
+            if *forward.entry(*mine).or_insert(*theirs) != *theirs
+                || *backward.entry(*theirs).or_insert(*mine) != *mine
+            {
+                return false;
+            }
+        }
+        true
+    }
+}
+
+/// **The exact quotient on the host.** The reference every carrier is required to equal.
+pub fn quotient_on_host(classes: &[u32], keys: &[u64]) -> Quotient {
+    let mut dense: BTreeMap<(u32, u64), u32> = BTreeMap::new();
+    let mut cell_class = Vec::with_capacity(classes.len());
+    for (class, key) in classes.iter().zip(keys) {
+        let next = dense.len() as u32 + 1;
+        cell_class.push(*dense.entry((*class, *key)).or_insert(next));
+    }
+    Quotient {
+        classes: dense.len(),
+        cell_class,
+        carrier: QuotientCarrier::Host,
+    }
+}
+
+impl CudaRefineExecutor {
+    /// **The exact quotient on the card.** Same law, other chart.
+    ///
+    /// The capacity is the next power of two above the cell count, so the table can never fill:
+    /// distinct pairs are at most cells. Derived from the material; no load factor.
+    pub fn quotient_on_device(
+        &mut self,
+        classes: &[u32],
+        keys: &[u64],
+    ) -> Result<Quotient, CudaRefineError> {
+        driver(unsafe { cuCtxSetCurrent(self.context) }, "cuCtxSetCurrent")?;
+        let count = classes.len();
+        if count == 0 || keys.len() != count {
+            return Ok(Quotient {
+                cell_class: Vec::new(),
+                classes: 0,
+                carrier: QuotientCarrier::Device,
+            });
+        }
+        let capacity = (count + 1).next_power_of_two();
+        let mut mask = (capacity - 1) as u32;
+        let device_class = Buffer::of(classes)?;
+        let device_key = Buffer::of(keys)?;
+        let table_pair = Buffer::alloc(capacity * std::mem::size_of::<u64>())?;
+        let table_key = Buffer::alloc(capacity * std::mem::size_of::<u64>())?;
+        table_pair.fill(0xff, capacity * std::mem::size_of::<u64>())?;
+        table_key.fill(0xff, capacity * std::mem::size_of::<u64>())?;
+        let device_next = Buffer::alloc(count * std::mem::size_of::<u32>())?;
+
+        let mut cells = count as u32;
+        let mut arguments: Vec<*mut c_void> = vec![
+            &mut { device_class.pointer } as *mut u64 as *mut c_void,
+            &mut { device_key.pointer } as *mut u64 as *mut c_void,
+            &mut { table_pair.pointer } as *mut u64 as *mut c_void,
+            &mut { table_key.pointer } as *mut u64 as *mut c_void,
+            &mut { device_next.pointer } as *mut u64 as *mut c_void,
+            &mut cells as *mut u32 as *mut c_void,
+            &mut mask as *mut u32 as *mut c_void,
+        ];
+        let grid = self.grid_for(count as u64)?;
+        driver(
+            unsafe {
+                cuLaunchKernel(
+                    self.claim,
+                    grid,
+                    1,
+                    1,
+                    self.block_x,
+                    1,
+                    1,
+                    0,
+                    ptr::null_mut(),
+                    arguments.as_mut_ptr(),
+                    ptr::null_mut(),
+                )
+            },
+            "cuLaunchKernel(claim_identities)",
+        )?;
+        driver(unsafe { cuCtxSynchronize() }, "cuCtxSynchronize")?;
+        self.launches += 1;
+
+        let mut slots = vec![0u32; count];
+        device_next.read(&mut slots)?;
+        let mut dense: BTreeMap<u32, u32> = BTreeMap::new();
+        let mut cell_class = Vec::with_capacity(count);
+        for slot in &slots {
+            let next = dense.len() as u32 + 1;
+            cell_class.push(*dense.entry(*slot).or_insert(next));
+        }
+        Ok(Quotient {
+            classes: dense.len(),
+            cell_class,
+            carrier: QuotientCarrier::Device,
+        })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// **The law is one law.** The host and the card must return the same partition for the same
+    /// `(classes, keys)`, on material built to make the table collide and to make many cells share
+    /// a pair — which is where a claim race shows up and where a wrong probe walks off.
+    ///
+    /// `#[ignore]`d because it requires the mounted card; run with `-- --ignored`.
+    #[test]
+    #[ignore = "requires the RTX CUDA device"]
+    fn the_quotient_is_one_law_on_both_charts() {
+        let mut card = CudaRefineExecutor::new().expect("the card mounts");
+        // Deterministic material with heavy sharing: many cells per pair, several classes, and keys
+        // chosen so distinct pairs land near each other under any probe.
+        for cells in [1usize, 2, 31, 32, 33, 1024, 40_000] {
+            let classes: Vec<u32> = (0..cells).map(|at| (at % 7) as u32 + 1).collect();
+            let keys: Vec<u64> = (0..cells).map(|at| ((at % 11) as u64) << 32 | (at % 5) as u64).collect();
+            let host = quotient_on_host(&classes, &keys);
+            let device = card
+                .quotient_on_device(&classes, &keys)
+                .expect("the card quotients");
+            assert_eq!(
+                host.classes, device.classes,
+                "class count at {cells} cells: host {} device {}",
+                host.classes, device.classes
+            );
+            assert!(
+                host.same_partition_as(&device),
+                "the two charts must induce the same equivalence at {cells} cells"
+            );
+            assert_eq!(host.carrier, QuotientCarrier::Host);
+            assert_eq!(device.carrier, QuotientCarrier::Device);
+        }
+    }
+
+    /// The host law is exact on its own terms, without a card. A partition is an equivalence, so
+    /// this checks the property rather than the numbering.
+    #[test]
+    fn the_host_quotient_separates_exactly_on_the_pair() {
+        let classes = [1u32, 1, 1, 2, 2];
+        let keys = [10u64, 10, 11, 10, 11];
+        let quotient = quotient_on_host(&classes, &keys);
+        assert_eq!(quotient.classes, 4, "(1,10) (1,11) (2,10) (2,11)");
+        assert_eq!(quotient.cell_class[0], quotient.cell_class[1]);
+        assert_ne!(quotient.cell_class[0], quotient.cell_class[2]);
+        assert_ne!(quotient.cell_class[0], quotient.cell_class[3]);
+        assert!(quotient.same_partition_as(&Quotient {
+            // A different numbering of the same partition must compare equal.
+            cell_class: vec![9, 9, 8, 7, 6],
+            classes: 4,
+            carrier: QuotientCarrier::Device,
+        }));
+    }
 }

@@ -3987,6 +3987,67 @@ mod tests {
         let _ = fs::remove_dir_all(&root);
     }
 
+    /// **This organ's key, driven through the SHARED law, equals this organ's own refinement.**
+    ///
+    /// The point of the factoring: `saturation_horizon` and `quotient_on_host` are not two
+    /// implementations to be kept in step — the second is the law and the first supplies a key to
+    /// it. This proves they agree on real material, which is what makes replacing the fused path
+    /// with the shared one safe for every other organ that adopts it.
+    #[test]
+    fn the_shell_key_through_the_shared_quotient_equals_this_organs_own_refinement() {
+        use crate::cuda_refine::{ReadingIdentities, quotient_on_host};
+        let root = declared_corpus("shared-quotient");
+        let census = CorpusCensus::read(&root).unwrap();
+        let atlas = atlas(&census);
+        let identities = ReadingIdentities::of(&census, &atlas);
+        let bound = material_horizon_bound(&census);
+        let mut exercised = 0usize;
+        for surface in census.word_surfaces() {
+            let sites = census.sites(surface);
+            if sites.len() < 2 {
+                continue;
+            }
+            exercised += 1;
+            // Walk the shared law shell by shell, exactly as the organ does.
+            let mut classes = vec![1u32; sites.len()];
+            let mut carried = 1usize;
+            for depth in 1..=bound {
+                if carried == sites.len() {
+                    break;
+                }
+                let keys = shell_keys_of(&census, &identities.per_surface, surface, depth);
+                let step = quotient_on_host(&classes, &keys);
+                classes = step.cell_class;
+                carried = step.classes;
+            }
+            // The organ's own reading of the same material.
+            let mine = SeparationComplex::read(&census, &atlas, surface, bound);
+            assert_eq!(
+                carried,
+                mine.distinct_windows(),
+                "class count for {surface:?} through the shared law"
+            );
+            // And the same equivalence, not the same numbering.
+            let mut where_mine: BTreeMap<(u32, u32), usize> = BTreeMap::new();
+            for (at, class) in mine.classes.iter().enumerate() {
+                for site in &class.sites {
+                    where_mine.insert(*site, at);
+                }
+            }
+            let mut forward: BTreeMap<u32, usize> = BTreeMap::new();
+            for (at, site) in sites.iter().enumerate() {
+                let ours = where_mine[site];
+                assert_eq!(
+                    *forward.entry(classes[at]).or_insert(ours),
+                    ours,
+                    "the shared law and the organ must induce one equivalence"
+                );
+            }
+        }
+        assert!(exercised > 0, "the fixture must carry a separable surface");
+        let _ = fs::remove_dir_all(&root);
+    }
+
     /// **The covered sweep equals the serial one, cell for cell.** Lanes are a realization
     /// coordinate; if they could move a reading they would be chronology.
     #[test]
@@ -4274,4 +4335,59 @@ mod tests {
         }
         let _ = fs::remove_dir_all(&root);
     }
+}
+
+// -------------------------------------------------------------------------------------------------
+// The separation refinement, expressed in the SHARED quotient
+// -------------------------------------------------------------------------------------------------
+//
+// **This organ has no device path of its own, and that is the point.** `saturation_horizon`'s
+// refinement is a quotient by an exact key, which is one law with two charts —
+// `cuda_refine::{quotient_on_host, CudaRefineExecutor::quotient_on_device}`. What belongs to this
+// organ is the KEY: what an occurrence carries at causal shell `k`. Everything after that is shared
+// with every other organ that has a front.
+//
+// Brandon, 2026-08-10, on the alternative: *"why the fuck do you think you have a choice about
+// 'paths'… why is this not ontologically integrated -> encapsulation and factored in the codebase."*
+// A device path per organ is the cabinet-of-organs failure one level down.
+
+/// **This organ's material: the exact key an occurrence carries at causal shell `depth`.**
+///
+/// Two occurrences agree at this shell exactly when they agree at `−depth` and at `+depth`, so the
+/// key is the pair of reading identities, packed. `identity_of` supplies a dense identity per
+/// surface; identity `0` is the terminus and no reading may take it.
+pub fn shell_key(
+    census: &CorpusCensus,
+    identity_of: &[u32],
+    whole: u32,
+    position: u32,
+    depth: usize,
+) -> u64 {
+    let stream = &census.wholes()[whole as usize].stream;
+    let at = |offset: i64| -> u32 {
+        let site = position as i64 + offset;
+        if site < 0 || site >= stream.len() as i64 {
+            0
+        } else {
+            identity_of
+                .get(stream[site as usize].0 as usize)
+                .copied()
+                .unwrap_or(0)
+        }
+    };
+    (u64::from(at(-(depth as i64))) << 32) | u64::from(at(depth as i64))
+}
+
+/// One surface's shell keys, in the census's own site order — what a chart is handed.
+pub fn shell_keys_of(
+    census: &CorpusCensus,
+    identity_of: &[u32],
+    surface: SurfaceId,
+    depth: usize,
+) -> Vec<u64> {
+    census
+        .sites(surface)
+        .iter()
+        .map(|(whole, position)| shell_key(census, identity_of, *whole, *position, depth))
+        .collect()
 }

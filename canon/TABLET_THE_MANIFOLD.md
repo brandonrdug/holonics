@@ -598,6 +598,43 @@ yet landed walked on and claimed a **second** slot for the same pair. It splits 
 looks like nothing. The trace shell by shell is what found it; the aggregate said only *"116 horizons
 disagree."*
 
+### One law, many materials — the factoring, which is the theorem and not a refactor
+
+**Brandon, 2026-08-10, and this is the correction the section above did not yet carry:** *"why the
+fuck do you think you have a choice about 'paths'… why is this not ontologically integrated →
+encapsulation and factored in the codebase for streamline networking and interconnections based in
+how we expect the machine to work according to the theorem."*
+
+A device path per organ is the **cabinet-of-organs failure one level down**. `canon/THE_HOLOBROCHOS_SPINE.md`
+convicts it for organs; it is no better for carriers. And the governing record already fixes the
+ontology — *"CPU/RAM and GPU/VRAM are local charts of the same caused body"* — while `CLAUDE.md` §4
+fixes the method: **one operation carries many materials.**
+
+So the refinement is split at the joint the theory names:
+
+```text
+   MATERIAL   the key an occurrence carries at causal shell k        token_invariance::shell_key
+   LAW        the identity of (class, key)                           cuda_refine::quotient_on_*
+```
+
+The law is **material-free by construction** — its only inputs are a class and a key per cell — so it
+knows nothing of streams, occurrences, windows, states or language. Every organ with a front supplies
+a key law and shares everything else. `kernels/refine_shell.cu` carries the same split: `shell_keys`
+is the material, `claim_identities` is the law.
+
+**Proved on both charts and against the organ:**
+
+| | |
+|---|---|
+| host and card return the same partition | 1 · 2 · 31 · 32 · 33 · 1,024 · 40,000 cells, on the real card |
+| the organ's key through the shared law = the organ's own refinement | every separable surface of the declared fixture |
+| the separation front on the card, unchanged by the factoring | 18,891 surfaces · 68,653 crossings · partitions and horizons 18,891 / 18,891 |
+
+**Equality is of the induced equivalence, never of the numbering.** A carrier claims identities in
+whatever order its lanes reach them, and requiring two carriers to agree on numbering would be
+requiring a realization coordinate to be causal — the record's own words: a lane, a warp, a block and
+a host thread are realization coordinates and none is a holon.
+
 ### What this section forbids
 
 1. **No receiver reach described as a window, an aperture, or a capacity.** Name the cone, its apex,
