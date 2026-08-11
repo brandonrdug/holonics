@@ -62,6 +62,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 | `canon/TABLET_THE_FLOW.md` | **The flow: fluid dynamics, phases, and parallel integration** — Why Navier-Stokes is not a distant problem, the zeta distribution as an exact self-similar phase, and ant integration as the exact part of the fundamental theorem. |
 | `canon/TABLET_THE_MANIFOLD.md` | **The manifold: charts as types, the structure group as the legal casts, and what a loop returns** — A manifold is the invariant of a population of currents and not their container; a chart is a type and a transition map is an implicit cast; every geometry is a reduction of the structure… |
 | `canon/TABLET_THE_REALIZER.md` | **The realizer: positivity, the holomorphic half, and rendering** — Hodge-Riemann where it is proved, the holomorphic organ that was already owned, and rendering as a receiver whose missed feature is an obstruction. |
+| `canon/TABLET_THE_RESONANCE.md` | **The resonance: what intelligence is, physically** — Intelligence is a transport and not a faculty; resonance is a microscopic event no operator can locate; production is re-emission and is not a choice; and the machine is an artificial… |
 | `canon/TABLET_THE_TURN.md` | **The turn: curvature, windings, and substitution** — Curvature as a linear functional on the hinges, the polygon's n-grams, local substitution preserving a global invariant, fission and fusion as one axis, and friction as the coupling. |
 | `canon/THE_AUTHORED_LEVEL.md` | **The authored level** — It states the law, enumerates the population in this tree, and gives the excision per instance. |
 | `canon/THE_CONTAMINANT_PROTOCOL.md` | **The contaminant protocol** — It names a family of contaminant species, gives each the condition that identifies it and a verified instance in this tree, and states the procedure a reader follows by hand before… |
@@ -168,7 +169,7 @@ outside `tools/` that names the verifier — not declared.
 
 | tool | what it checks | invoked by |
 |---|---|---|
-| `tools/authored_levels.py` | Every numeric level authored **inside** an organ, and whether it is dispositioned. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `canon/THE_AUTHORED_LEVEL.md`, and 6 more |
+| `tools/authored_levels.py` | Every numeric level authored **inside** an organ, and whether it is dispositioned. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `canon/TABLET_THE_MANIFOLD.md`, and 8 more |
 | `tools/boundary_artifacts.py` | Every committed boundary artifact is bound to its content hash AND its closure hash. | `meta/BOUNDARY_ARTIFACTS.tsv`, `research/records/2026-08-09_THE_COMMITTED_BOUNDARY_ARTIFACT_IS_STALE_AND_CANNOT_BE_REBUILT.md`, `soma/kernel/.gitignore` |
 | `tools/claim_index.py` | Generate `THE_CLAIM_INDEX.md` from the tree, so the table of contents cannot drift. | `CLAUDE.md`, `CONSTRUCTION_STATE.md` |
 | `tools/closure_manifest.py` | Bind every return under `output/` to the CLOSURE that produced it, not only to its content. | `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, `research/records/2026-08-10_THE_INSTRUMENT_DECLARES_THE_APERTURE_AND_THE_REFUSAL_IS_THE_RETURN.md` |

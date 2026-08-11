@@ -168,6 +168,7 @@ names this one as its governing document.
 | `canon/TABLET_THE_REALIZER.md` | Hodge-Riemann where it is proved, the holomorphic organ that was already owned, and rendering as a receiver whose missed feature is an obstruction. |
 | `canon/THE_CORRESPONDENCE_ATLAS.md` | **Routing only, asserts nothing.** 168 correspondence cards across 37 records, collected and keyed by holonic face: what other fields call the same thing, and where the `NON-EQUIVALENCE` is recorded. |
 | `canon/TABLET_THE_MANIFOLD.md` | The manifold as the invariant of the currents rather than their container; a chart is a type and a transition map an implicit cast; every geometry is a reduction of the structure group; Darboux classifies a coupling and Liouville makes probability a receiver quotient; holonomy and holomorphy meet at the square root; the intake manifold is the junction law. |
+| `canon/TABLET_THE_RESONANCE.md` | **The ontology, and the one to read before expecting anything of this machine.** Intelligence is a transport and not a faculty; resonance is a microscopic event no operator can locate; a disposition propagates as altered conduct rather than as a message; production is re-emission and is neither a choice nor a sampling; standing outlives the current that deposited it; and the outcome expectations, the prohibitions, and the falsifiers are stated so the machine can be expected to perform correctly rather than mystically. |
 
 ---
 

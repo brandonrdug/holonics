@@ -124,10 +124,16 @@ fn main() {
     let mut by_horizon: BTreeMap<usize, usize> = BTreeMap::new();
     let mut live_total = 0usize;
     let mut shells_total = 0usize;
+    let mut own_ceiling_total = 0usize;
+    let mut own_ceiling_below_corpus = 0usize;
     for reading in horizons.values() {
         *by_horizon.entry(reading.horizon).or_default() += 1;
         live_total += reading.active_total;
         shells_total += reading.shells;
+        own_ceiling_total += reading.bound;
+        if reading.bound < bound {
+            own_ceiling_below_corpus += 1;
+        }
     }
     let occurrences: usize = census.wholes().iter().map(|w| w.stream.len()).sum();
 
@@ -135,7 +141,7 @@ fn main() {
         "  derived {} horizons in {:.2}s.\n  \
          COST, in work rather than in a clock: {live_total} occurrence-shells -- the live cone \
          volume,\n  summed over every surface. {shells_total} shells were propagated in total \
-         against a ceiling of {bound}.",
+         against a corpus ceiling of {bound}.",
         horizons.len(),
         deriving_elapsed.as_secs_f64(),
     );
@@ -143,6 +149,20 @@ fn main() {
         "  The ceiling-materializing route would have cost occurrences x 2 x bound = {} readings \
          for\n  ONE probe of ONE surface at the widest. That route reached 19.6 GB and was halted.",
         occurrences.saturating_mul(2).saturating_mul(bound)
+    );
+    println!();
+    println!(
+        "  THE CEILING IS EACH SURFACE'S OWN, not the corpus's. An occurrence at position p of a\n  \
+         whole of length L reaches max(p, L-1-p) shells and reads (None, None) forever after, so\n  \
+         a surface's ceiling is the maximum of that over its OWN sites.\n    \
+         {own_ceiling_below_corpus} of {} surfaces have a ceiling strictly below the corpus's \
+         {bound}\n    \
+         {own_ceiling_total} shells, summed surface-local ceiling\n    \
+         {} shells, what the corpus ceiling would have imposed on the same surfaces\n  \
+         That difference is the bound that binds whenever a surface does NOT exhaust; where every\n  \
+         surface exhausts it costs nothing, and this corpus is entirely of the second kind.",
+        horizons.len(),
+        bound.saturating_mul(horizons.len()),
     );
     println!();
     println!("  the derived horizon population:");
@@ -278,34 +298,83 @@ fn main() {
     // guard it. Every check below is answered from evidence the propagation already carries.
 
     let all_least = horizons.values().all(|reading| reading.is_least());
-    let walked_past = horizons.values().filter(|r| r.walked_past()).count();
+    let stalled = horizons.values().filter(|r| r.stalled()).count();
+    let interior_quiet: usize = horizons.values().map(|r| r.interior_quiet_shells).sum();
     let exhausted = horizons.values().filter(|r| r.exhausted).count();
     let at_ceiling = horizons.len() - exhausted;
+    let never_separated = horizons.values().filter(|r| r.horizon == 0).count();
 
     println!(
         "  termination species -- and only one of the two is a proof:\n    \
          {exhausted:>6} surfaces exhausted to singletons (no deeper shell CAN split: a theorem)\n    \
-         {at_ceiling:>6} surfaces reached the material ceiling with classes still plural\n           \
+         {at_ceiling:>6} surfaces reached their own ceiling with classes still plural\n           \
          (those occurrences are indistinguishable to this receiver at ANY depth)\n"
     );
     println!(
-        "  {walked_past} of {} surfaces had a QUIET shell before their last split.\n  \
-         **THIS MATERIAL CANNOT GRADE THE LOOP'S SOUNDNESS.** Refinement is allowed to stall one \
-         shell and\n  resume, so a loop halting at the first quiet shell would be wrong -- but if \
-         nothing here\n  stalls, a sound loop and an unsound one return the same answer on this \
-         corpus, which is\n  `CLAUDE.md` §8's defect wearing a passing result. The property is \
-         graded on declared\n  material instead: `token_invariance::tests::\
-         refinement_stalls_and_the_horizon_is_not_the_first_quiet_shell`\n  builds the stall and \
-         requires the unsound loop to return 1 where the truth is 3.\n",
+        "  {never_separated} of {} surfaces derive horizon 0 -- NO shell ever split them.\n  \
+         That reading was reported as horizon 1 until 2026-08-11, by a `last_split.max(1)` inside \
+         the\n  organ: an authored floor that no `const` audit could see, and whose unit test was \
+         written\n  `if horizon > 1`, excluding exactly the case the floor decided. A surface with \
+         one\n  occurrence has nothing to separate, and the honest least final radius of the empty \
+         cone is 0.\n",
         horizons.len()
     );
+    println!(
+        "  {stalled} of {} surfaces have an INTERIOR QUIET shell -- one that split nothing and was\n  \
+         followed by a later shell that DID split; {interior_quiet} such shells in total.\n  \
+         **THIS MATERIAL DOES GRADE THE LOOP'S SOUNDNESS, and this line said the opposite until\n  \
+         2026-08-11.** It read `0 of 29587 surfaces had a QUIET shell before their last split` and \
+         then\n  concluded that a sound loop and an unsound one are indistinguishable here. The \
+         zero came\n  from `walked_past()`, which returned `shells > horizon` -- FALSE on every \
+         propagation that\n  exhausts to singletons, because the last shell walked is the last \
+         shell that split. It\n  measured no interior quiet shell at all, so it read zero on \
+         material carrying {interior_quiet} of\n  them, and returned FALSE even on the fixture \
+         built expressly to exhibit one. A loop halting at\n  the first quiet shell would return \
+         the wrong horizon on {stalled} real surfaces of this corpus.\n  The declared control \
+         remains, because it exhibits the WITNESS rather than the count:\n  \
+         `token_invariance::tests::refinement_stalls_and_the_horizon_is_not_the_first_quiet_shell`\n  \
+         writes the unsound loop out and requires it to return 1 where the truth is 3.\n",
+        horizons.len()
+    );
+    // The witnesses, named. A count says a stall happened; these say WHICH two occurrences an
+    // early halt would have failed to tell apart, on this corpus, by whole and position.
+    println!("  the deepest resumptions, with the pair each one separated:");
+    let mut resumptions: Vec<_> = horizons
+        .values()
+        .filter_map(|reading| reading.first_resumption.map(|r| (reading.surface, r)))
+        .collect();
+    resumptions.sort_by_key(|(surface, r)| {
+        (
+            std::cmp::Reverse(r.resumed_at - r.quiet_shell),
+            std::cmp::Reverse(r.classes_after - r.classes_before),
+            *surface,
+        )
+    });
+    for (surface, r) in resumptions.iter().take(8) {
+        println!(
+            "    {:<16} quiet at {:>3}, resumed at {:>3}: classes {} -> {}, separating \
+             (whole {}, position {}) from (whole {}, position {})",
+            format!("{:?}", census.surface(*surface)),
+            r.quiet_shell,
+            r.resumed_at,
+            r.classes_before,
+            r.classes_after,
+            r.separated.0.0,
+            r.separated.0.1,
+            r.separated.1.0,
+            r.separated.1.1,
+        );
+    }
+    println!();
 
     let controls = [
         (
-            "every derived horizon is LEAST -- one shell shallower was still refining",
+            "every derived horizon is LEAST -- one shell shallower was still refining\n       \
+             (definition-grade: this CANNOT come out false, see `SaturationHorizon::is_least`;\n       \
+             leastness is graded independently by the unit test that rebuilds the shallower\n       \
+             partition through `SeparationComplex::read`)",
             all_least,
-            "would fail if: the derivation returned a radius deeper than necessary, which is a \
-             level wearing a derivation.",
+            "would fail if: nothing -- it is a theorem about the loop, reported as what it is.",
         ),
         (
             "the horizon is final by a theorem on some surfaces, not assumed on all",
@@ -324,6 +393,21 @@ fn main() {
             live_total < occurrences.saturating_mul(shells_total.max(1)),
             "would fail if: the propagation touched singleton classes, which cannot split -- the \
              work would then be the whole cone rather than the part still carrying difference.",
+        ),
+        (
+            "this material EXERCISES the stall law rather than merely permitting it",
+            stalled > 0 && interior_quiet >= stalled,
+            "would fail if: no surface here had a quiet shell followed by a splitting one, in \
+             which case a loop halting on the first quiet shell would return the same answer as \
+             the sound one and this corpus could not tell them apart. It reported exactly that \
+             until 2026-08-11, from a gauge that could not see a stall.",
+        ),
+        (
+            "every surface's ceiling is its own and none exceeds the corpus's",
+            own_ceiling_total < bound.saturating_mul(horizons.len())
+                && horizons.values().all(|r| r.bound <= bound),
+            "would fail if: the propagation ran against a corpus-global ceiling, which is one \
+             unrelated long document deciding an unrelated surface's cost.",
         ),
     ];
 

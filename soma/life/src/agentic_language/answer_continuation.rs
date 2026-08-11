@@ -245,6 +245,8 @@ impl AgenticLanguageEcology {
                     .iter()
                     .map(|passage| lexical_tokens(&passage.text))
                     .collect();
+                let (support_conduct, supporting_sources) =
+                    MorphologicalSupportConduct::of(&generated_tokens);
                 answers.push(AnswerCandidate {
                     generated: MorphologicalGeneratedCurrent {
                         text,
@@ -252,6 +254,8 @@ impl AgenticLanguageEcology {
                         phases: vec![phase],
                         rest: MorphologicalResponseRest::Closed,
                         caused_seams: Vec::new(),
+                        support_conduct,
+                        supporting_sources,
                     },
                     episode_identities,
                     evidence_sources,
@@ -266,6 +270,9 @@ impl AgenticLanguageEcology {
                         peak_live_current_states: 1,
                         returned_events_carried: 0,
                         terminal_return_materializations: 0,
+                        dilated_passages: 0,
+                        deepest_dilation: 0,
+                        deepest_chronology: 0,
                     },
                     inherited_surfaces,
                     received_prompt: received_prompt.to_owned(),

@@ -85,13 +85,26 @@ const DEFAULT_QUESTION: &str = "What carries a continuity obstruction for relati
 /// through. Nothing here asserts the second answer must differ; the run reports whether it did.
 const SECOND_QUESTION: &str = "What cultivates contemporary relational morphology?";
 
-/// APERTURE — declared, and small on purpose. `MorphologicalLanguageEcology::generate` branches
-/// super-exponentially in the output aperture: measured at `a91a84f` on a 23-passage corpus,
-/// release build, 1 token 57 ms · 2 tokens 403 ms · 4 tokens 55,098 ms · 8 tokens no return in
-/// 200,000 ms. The laboratory declared 128/64 here and that does not return on this
-/// implementation. These are receiver parameters, not laws, and they are printed in the receipt.
+/// APERTURE — declared, and small on purpose. This is the **only** aperture this driver applies to
+/// generation, and it is a bound on OBSERVATION DEPTH: `morphological_language/ecology.rs:839` rests
+/// a branch with `ObservationApertureExhausted` once its `returned_event_count` reaches this value.
+/// `MorphologicalGenerationSpec` (`soma/life/src/morphological_language.rs:173-176`) has exactly one
+/// field and this is it.
+///
+/// Cost, measured at `a91a84f` on a 23-passage corpus, release build: 1 token 57 ms · 2 tokens
+/// 403 ms · 4 tokens 55,098 ms · 8 tokens no return in 200,000 ms. The laboratory declared 128 here
+/// and that does not return on this implementation. A receiver parameter, not a law, and it is
+/// printed in the receipt.
+///
+/// **NOTHING BOUNDS THE NUMBER OF RETURNED BRANCHES.** Until 2026-08-10 this driver also carried a
+/// `MORPHOLOGICAL_OUTPUT_APERTURE = 3`, stored it, parsed `--output-aperture` into it, and printed
+/// it as `output aperture 3 (DECLARED)`. It was passed to nothing: there is no field to receive it,
+/// so the receipt advertised a bound of three while the organ returned every branch it produced —
+/// `research/records/2026-08-10_THE_MACHINE_RETURNS_EVERY_BRANCH_BECAUSE_NOTHING_ATTACHES.md`
+/// measures 14,018 response branches for one obligation at two tokens. The constant, the field and
+/// the flag are removed rather than annotated; bounding generation is a separate question and this
+/// driver does not decide it.
 const MORPHOLOGICAL_OBSERVATION_APERTURE: usize = 24;
-const MORPHOLOGICAL_OUTPUT_APERTURE: usize = 3;
 
 /// APERTURE — how many sections one leader may encounter before `LaboratoryResearchSpec` refuses.
 ///
@@ -190,7 +203,6 @@ struct Arguments {
     question: Option<String>,
     leader_aperture: usize,
     threads: usize,
-    output_aperture: usize,
     observation_aperture: usize,
     thought_receiver_horizon: u64,
 }
@@ -205,7 +217,6 @@ impl Default for Arguments {
             question: None,
             leader_aperture: DEFAULT_LEADER_APERTURE,
             threads: 2,
-            output_aperture: MORPHOLOGICAL_OUTPUT_APERTURE,
             observation_aperture: MORPHOLOGICAL_OBSERVATION_APERTURE,
             thought_receiver_horizon: 90,
         }
@@ -334,8 +345,15 @@ fn run() -> Result<(), String> {
     println!("\nSTATION 4 — THE CONDITIONED AGENTIC BODY");
     println!("  conditioning         {conditioning_millis} ms, {} workers", arguments.threads);
     println!(
-        "  observation aperture {}   output aperture {}   (DECLARED — see the cost law above)",
-        arguments.observation_aperture, arguments.output_aperture
+        "  observation aperture {}   (DECLARED — the only bound applied to generation: a branch\n\
+         \x20                        rests at this many returned events. Cost at `a91a84f`:\n\
+         \x20                        1 token 57 ms · 2 · 403 ms · 4 · 55,098 ms · 8 · no return.)",
+        arguments.observation_aperture
+    );
+    println!(
+        "  returned branches    UNBOUNDED — no output aperture is applied anywhere on this path.\n\
+         \x20                    `MorphologicalGenerationSpec` carries `maximum_observed_tokens`\n\
+         \x20                    and nothing else, so every branch the ecology produces is returned."
     );
     println!(
         "  relational clauses   {}",
@@ -713,9 +731,9 @@ fn arguments() -> Result<Arguments, String> {
                 arguments.leader_aperture = value()?.parse().map_err(|e| format!("{e}"))?
             }
             "--threads" => arguments.threads = value()?.parse().map_err(|e| format!("{e}"))?,
-            "--output-aperture" => {
-                arguments.output_aperture = value()?.parse().map_err(|e| format!("{e}"))?
-            }
+            // `--output-aperture` is REMOVED, not deprecated. It parsed into a field that was
+            // passed to nothing, so it advertised a bound the organ never applied. An unknown-
+            // argument refusal is honest; silently accepting a number that governs nothing is not.
             "--observation-aperture" => {
                 arguments.observation_aperture = value()?.parse().map_err(|e| format!("{e}"))?
             }

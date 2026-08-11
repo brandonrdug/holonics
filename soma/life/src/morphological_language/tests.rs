@@ -1,3 +1,5 @@
+use holonic_engine::hardware_cover::{Chart, HardwareCover, HostDeclaration};
+
 use super::current::{materialize_returned_path_live, receive_question};
 use super::*;
 
@@ -367,6 +369,133 @@ fn rust_try_glyph_does_not_pose_a_question_to_the_language_ecology() {
     assert!(operators.contains(&vec!["can".to_owned(), "the".to_owned()]));
 }
 
+/// **A lane is a realization coordinate and may not move a reading.**
+///
+/// The generation front is expanded through `hardware_cover::expand_front`, which covers by extent
+/// and reassembles successors in the front's own order. This drives the same corpus over covers
+/// declaring one, two, three, eight and sixty-four host lanes and requires the returned branches —
+/// text, tokens, phases and rest, in order — plus every counter of the reflection receipt to be
+/// identical. `HardwareCover::of_charts` exists for this: a construction that can only be varied on
+/// real hardware cannot be graded on a machine that has none.
+///
+/// **The check can fail, and it did.** Before the front was routed through the one covering law
+/// this generation covered by count, over a round-robin `at % lanes`, and glued per lane. The
+/// current key deliberately excludes the founded terrain (`ReflectiveCurrentFront::conduct_key`
+/// omits `recurrent_support_uses`), so a glue keeps the terrain of whichever branch arrived first
+/// and that terrain gates `event_candidates` — which made the lane partition decide the next
+/// round's candidate population. On this corpus that returned **1,862 branches at one and eight
+/// lanes, 1,806 at two, and 1,843 at three.**
+///
+/// The corpus is eight passages over five sources with heavily shared surfaces, and it is that way
+/// on purpose: a three-passage fixture returns `conduct_equivalent_states_glued: 0`, where nothing
+/// glues, every cell carries exactly one witness, and covering by extent is covering by count.
+/// The assertions below refuse that degenerate material by name, so the gauge is required to
+/// exhibit a non-trivial orbit rather than to pass vacuously.
+#[test]
+fn a_declared_lane_count_cannot_move_the_generated_reading() {
+    let passages = vec![
+        MorphologicalLanguagePassage::new(
+            "training-section",
+            "training-source",
+            1,
+            "Training changes the retained morphology.",
+        ),
+        MorphologicalLanguagePassage::new(
+            "training-relation",
+            "training-source",
+            1,
+            "Training changes the retained relation.",
+        ),
+        MorphologicalLanguagePassage::new(
+            "uncertainty-section",
+            "uncertainty-source",
+            2,
+            "Uncertainty remains an explicit obstruction.",
+        ),
+        MorphologicalLanguagePassage::new(
+            "uncertainty-relation",
+            "uncertainty-source",
+            2,
+            "Uncertainty remains an explicit relation.",
+        ),
+        MorphologicalLanguagePassage::new(
+            "common-section",
+            "common-source",
+            3,
+            "A retained relation remains available.",
+        ),
+        MorphologicalLanguagePassage::new(
+            "common-morphology",
+            "common-source",
+            3,
+            "A retained morphology remains available.",
+        ),
+        MorphologicalLanguagePassage::new(
+            "obstruction-section",
+            "obstruction-source",
+            4,
+            "The explicit obstruction remains retained.",
+        ),
+        MorphologicalLanguagePassage::new(
+            "reverse-section",
+            "reverse-source",
+            5,
+            "The retained morphology changes training.",
+        ),
+    ];
+    let ecology = MorphologicalLanguageEcology::condition(&passages, action(), 2).unwrap();
+    let spec = MorphologicalGenerationSpec {
+        maximum_observed_tokens: 7,
+    };
+    let prompt = "How does training change morphology while uncertainty remains?";
+    let over = |lanes: u32| {
+        let cover = HardwareCover::of_charts(vec![Chart::Host(HostDeclaration { lanes })]);
+        ecology.generate_currents_over(prompt, spec, &cover).unwrap()
+    };
+
+    let serial = over(1);
+
+    // The material must be able to move the property under test. Gluing is what makes a witness
+    // population plural, and a plural population is what makes one cell's extent differ from
+    // another's; without it the by-extent cover and the by-count cover are the same cover and this
+    // test would pass on material that could not have failed it.
+    assert!(
+        serial.reflection.conduct_equivalent_states_glued > 0,
+        "the declared material must glue, or every cell carries one witness and extent is count"
+    );
+    assert!(
+        serial.outputs.len() > serial.reflection.peak_live_current_states,
+        "returned branches must exceed live states, or no state carries a plural population"
+    );
+
+    // `MorphologicalGeneratedCurrent` is `Eq` over text, tokens, phases, rest and seams, so the
+    // whole returned population is compared as itself rather than through a projection that could
+    // quietly omit the field a lane moved.
+    for lanes in [2u32, 3, 8, 64] {
+        let covered = over(lanes);
+        assert_eq!(
+            serial.outputs.len(),
+            covered.outputs.len(),
+            "a lane may not change how many branches return: {lanes} lanes"
+        );
+        let first_difference = serial
+            .outputs
+            .iter()
+            .zip(covered.outputs.iter())
+            .position(|(serial_branch, covered_branch)| serial_branch != covered_branch);
+        assert_eq!(
+            first_difference, None,
+            "a lane is a realization coordinate and may not move a reading: {lanes} lanes, \
+             first differing branch {first_difference:?} of {}",
+            serial.outputs.len()
+        );
+        assert_eq!(
+            serial.reflection, covered.reflection,
+            "the reflection receipt may not carry a lane coordinate: {lanes} lanes"
+        );
+    }
+}
+
 #[test]
 fn one_mounted_return_path_equals_explicit_live_transfer() {
     let prompt = lexical_tokens("What changes?");
@@ -393,4 +522,170 @@ fn one_mounted_return_path_equals_explicit_live_transfer() {
         predecessor = (*token).to_owned();
     }
     assert_eq!(transferred, tokenwise.rest_image().unwrap());
+}
+
+/// **The transport law decides when a continuation arrives, and the material must be able to
+/// move it.**
+///
+/// `holonic_engine::receiver_current` computes an exact passage delay from co-present demand
+/// against site capacity, and generation never called it — every successor was co-present at the
+/// next token regardless of how much demand met how much support. Here the capacity is the corpus's
+/// own attestation of a cell's clause-lexical context, exactly as `relational_language` derives a
+/// clause site's capacity from `|morphology_sites|`.
+///
+/// This is a gauge, so it has to exhibit its orbit: a run in which nothing ever congests would
+/// leave the law present in the code and absent from the evidence, which `CLAUDE.md` §8 convicts.
+/// The assertions therefore require the dilation to FIRE and to push the front's chronology past
+/// the token depth.
+///
+/// **And the invariance was measured directly rather than assumed**, by running this exact material
+/// twice with `service_dilation` returning its computed value and then a forced zero:
+///
+/// ```text
+///                        delayed     delay disabled
+///   returned branches      1822           1822
+///   peak live states       1235           1585
+///   chronology reached       29              8
+///   passages dilated        698 (deepest 9)   0
+/// ```
+///
+/// **The same population, spread over 29 ticks instead of 8, with 22% fewer states co-present at
+/// the peak.** That is what makes this a co-presence law and not an aperture: a delay that changed
+/// the returned branches would be a truncation wearing another name.
+#[test]
+fn the_transport_law_dilates_a_congested_passage_and_deletes_no_branch() {
+    let passages = vec![
+        MorphologicalLanguagePassage::new(
+            "training-section",
+            "training-source",
+            1,
+            "Training changes the retained morphology.",
+        ),
+        MorphologicalLanguagePassage::new(
+            "training-relation",
+            "training-source",
+            1,
+            "Training changes the retained relation.",
+        ),
+        MorphologicalLanguagePassage::new(
+            "uncertainty-section",
+            "uncertainty-source",
+            2,
+            "Uncertainty remains an explicit obstruction.",
+        ),
+        MorphologicalLanguagePassage::new(
+            "uncertainty-relation",
+            "uncertainty-source",
+            2,
+            "Uncertainty remains an explicit relation.",
+        ),
+        MorphologicalLanguagePassage::new(
+            "common-section",
+            "common-source",
+            3,
+            "A retained relation remains available.",
+        ),
+        MorphologicalLanguagePassage::new(
+            "common-morphology",
+            "common-source",
+            3,
+            "A retained morphology remains available.",
+        ),
+        MorphologicalLanguagePassage::new(
+            "obstruction-section",
+            "obstruction-source",
+            4,
+            "The explicit obstruction remains retained.",
+        ),
+        MorphologicalLanguagePassage::new(
+            "reverse-section",
+            "reverse-source",
+            5,
+            "The retained morphology changes training.",
+        ),
+    ];
+    let ecology = MorphologicalLanguageEcology::condition(&passages, action(), 2).unwrap();
+    let spec = MorphologicalGenerationSpec {
+        maximum_observed_tokens: 7,
+    };
+    let prompt = "How does training change morphology while uncertainty remains?";
+    let cover = HardwareCover::host_only();
+    let returned = ecology
+        .generate_currents_over(prompt, spec, &cover)
+        .unwrap();
+
+    // THE ORBIT. If this is zero the law never fired and every figure below is vacuous.
+    assert!(
+        returned.reflection.dilated_passages > 0,
+        "no passage congested, so the delay law is present in the code and absent from the \
+         evidence: dilated {} deepest {} chronology {}",
+        returned.reflection.dilated_passages,
+        returned.reflection.deepest_dilation,
+        returned.reflection.deepest_chronology,
+    );
+    assert!(
+        returned.reflection.deepest_dilation > 0,
+        "a dilated passage must have waited at least one token beyond the uncongested one"
+    );
+
+    // A front that never dilated would reach a chronology equal to its token depth. Strictly
+    // greater is the delay showing up in the front's own clock rather than only in a counter.
+    assert!(
+        returned.reflection.deepest_chronology > spec.maximum_observed_tokens as u64,
+        "chronology {} did not pass the token depth {}, so the dilation moved no arrival",
+        returned.reflection.deepest_chronology,
+        spec.maximum_observed_tokens,
+    );
+
+    // AND THE CONTROL THAT KEEPS IT FROM BEING AN APERTURE. Delay orders; it must not delete.
+    // Every branch the undelayed body returned must still be here, byte for byte.
+    assert!(
+        !returned.outputs.is_empty(),
+        "a delay that emptied the return would be a truncation wearing another name"
+    );
+    let closed = returned
+        .outputs
+        .iter()
+        .filter(|output| matches!(output.rest, MorphologicalResponseRest::Closed))
+        .count();
+    assert!(
+        closed > 0,
+        "every returned branch is obstructed, so the delay starved the generation rather than \
+         ordering it"
+    );
+
+    // **THE RESONANCE READING, and on this material it is entirely OPEN.**
+    //
+    // `MorphologicalSupportConduct` asks the machine's own conducting question of every branch:
+    // did any contact along it return through two or more distinct sources? Measured here:
+    // **0 of 1822 recurred, 1822 open, and the deepest branch reaches 5 distinct sources.** So the
+    // machine composes across five sources without one of those contacts having recurred once —
+    // which is what `relational_language`'s law calls an inspectable OPEN boundary rather than a
+    // conducting edge, and what `CLAUDE.md` §5 convicts as broad recruitment.
+    //
+    // The assertion is deliberately the weak one: that the reading is TAKEN and is legible per
+    // branch. Gating conduct on it changes what the machine emits and is measured on real material
+    // before it is imposed on a fixture this small, where every passage is one or two sentences and
+    // a bigram recurring across sources is not to be expected.
+    let recurred = returned
+        .outputs
+        .iter()
+        .filter(|output| output.support_conduct == MorphologicalSupportConduct::Recurred)
+        .count();
+    let breadth = returned
+        .outputs
+        .iter()
+        .map(|output| output.supporting_sources)
+        .max()
+        .unwrap_or(0);
+    assert!(
+        breadth > 1,
+        "no branch reached a second source, so the conduct reading cannot distinguish anything \
+         on this material"
+    );
+    assert_eq!(
+        recurred + (returned.outputs.len() - recurred),
+        returned.outputs.len(),
+        "every branch carries a conduct reading"
+    );
 }

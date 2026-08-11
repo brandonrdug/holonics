@@ -67,10 +67,11 @@
 //! 6. **The separation the collapsing family deletes is exhibited**, with the receiver that saw it,
 //!    and that receiver must lie **outside** the collapsing family — and must never be a terminus,
 //!    because a terminus is not a receiver's to delete.
-//! 7. **The aperture law is held, not widened.** The verdict is computed off the sorted window
-//!    classes in `O(d · horizon)` and never materializes a pair, so a surface whose exhibition the
-//!    declared capacity refuses still receives a verdict whole. Both halves are shown on the same
-//!    surface.
+//! 7. **The chart is chosen by its own transition degree, and no capacity participates.** The
+//!    verdict is computed off the sorted window classes in `O(d · horizon)` and never materializes
+//!    a pair, so a surface whose PAIR chart carries a transition degree above one is read through
+//!    its star atlas — the same object at degree one, no remainder — and still receives a verdict
+//!    whole. Both halves are shown on the same surface.
 //! 8. **The prediction is declared in advance and reported either way.** `tensor`, `vector`,
 //!    `lemma`, `group`, `field` are looked up by name. A refuted prediction reported honestly is
 //!    worth more than a tuned one.
@@ -98,14 +99,21 @@ use holonic_engine::token_invariance::{
 /// contribute their verdict sets and are dropped, so peak standing is one sweep rather than two.
 const HORIZONS: [usize; 2] = [1, 2];
 
-/// The capacity this caller declares for anything quadratic. Past it the organ refuses with the
-/// width the material required, and the refusal is reported rather than worked around.
-/// **Excised 2026-08-10.** This driver carried a declared capacity of 8,192 class pairs. What that
-/// bounded is `C(d,2)` over the orbit count, one graded piece of the Boolean lattice on the orbit
-/// space, and `d` varies per surface by orders of magnitude — so a constant is a constant section
-/// of a bundle whose fibre dimension is not constant. The refusal control below now varies the
-/// **chart** instead, which is what the caller was actually choosing all along.
-const EXCISED_DECLARED_CAPACITY: u64 = 8_192;
+// **The declared capacity of 8,192 class pairs was excised 2026-08-10, and the constant went with
+// it 2026-08-11 (second pass).** What it bounded is `C(d,2)` over the orbit count, one graded piece
+// of the Boolean lattice on the orbit space, and `d` varies per surface by orders of magnitude — so
+// a constant is a constant section of a bundle whose fibre dimension is not constant. The control
+// below varies the **chart** instead, which is what the caller was actually choosing all along.
+//
+// The first pass left the constant in the file, unread, and left the prose around the control
+// speaking of a capacity that refused and of an exhibition that was OBSTRUCTED. Neither could
+// happen: `SeparationReading::exhibit_in` returns a bare `Vec<Separation>` and is structurally
+// incapable of refusing. A printed refusal on a path that cannot refuse is the same defect as a
+// check that cannot fail, wearing the other face — so the constant, the print and the sentence are
+// all gone. A caller that genuinely needs to bound a presentation still has
+// `SeparationReading::exhibit(census, declared_capacity)`, which returns
+// `Result<_, ExhibitionObstructed>` carrying the required width; that is the caller-declared route
+// and it is unchanged.
 
 /// The capacity this caller declares for the **sub-family** cross-check specifically. It is smaller
 /// than the pair chart's own degree for a stated reason: at [`ReceiverFamily::EMPTY`] the organ's one-shot
@@ -589,13 +597,13 @@ fn main() {
         ),
     ));
 
-    // ------------------------------------------------------------------- the aperture law
+    // ------------------------------------------------------------------- the chart, not a capacity
     println!();
-    println!("THE APERTURE LAW, HELD RATHER THAN WIDENED");
-    println!("------------------------------------------");
+    println!("THE CHART IS CHOSEN BY ITS OWN TRANSITION DEGREE");
+    println!("------------------------------------------------");
     println!();
-    let mut obstructed_and_read = 0usize;
-    let mut obstructed_exhibited: Vec<(SurfaceId, BigUint)> = Vec::new();
+    let mut read_through_the_atlas = 0usize;
+    let mut atlas_read: Vec<(SurfaceId, BigUint)> = Vec::new();
     // **The chart, not a capacity.** The demand is computed in O(1) from the orbit count, and the
     // surfaces whose PAIR chart carries a transition degree above one are read through their star
     // atlas instead — the same object, degree one, no remainder. Materializing every surface's pair
@@ -606,22 +614,21 @@ fn main() {
             // **One chart of the atlas, at its own degree-one extent.** The covering identity —
             // that the `d` stars are the pair chart twice over — is a theorem proved once in
             // `the_star_atlas_covers_the_pair_chart_with_no_remainder`, not re-materialized per
-            // surface here. Folding the atlas would cost `2·C(d,2)`, twice what the capacity this
-            // replaces refused.
+            // surface here. Folding the atlas would cost `2·C(d,2)`.
             let star = row.exhibit_in(&census, SeparationChart::Star(0));
             assert_eq!(
                 BigUint::from(star.len()),
                 row.demand(SeparationChart::Star(0)).extent,
                 "a star returns d-1 separations whole"
             );
-            obstructed_and_read += 1;
-            if obstructed_exhibited.len() < 4 {
-                obstructed_exhibited.push((*surface, demand.extent.clone()));
+            read_through_the_atlas += 1;
+            if atlas_read.len() < 4 {
+                atlas_read.push((*surface, demand.extent.clone()));
             }
         }
     }
-    // The other arm, driven too: a population inside the capacity comes back WHOLE, and its size is
-    // exactly the width the complex predicted. An obstruction organ that never returns is not one.
+    // The other arm, driven too: a degree-one pair chart comes back WHOLE, and its size is exactly
+    // the width the complex predicted.
     let mut whole_returns = 0usize;
     let mut whole_matched = true;
     for surface in ordered.iter().take(32) {
@@ -632,16 +639,17 @@ fn main() {
             whole_matched = false;
         }
     }
-    for (surface, required) in &obstructed_exhibited {
+    for (surface, extent) in &atlas_read {
         let row = &reading[surface];
         let inv = row.conduct_invariance();
         println!(
-            "  {:<16} exhibition OBSTRUCTED, required width {required} over {} distinct windows",
+            "  {:<16} pair chart at extent {extent} over {} distinct windows -- read through the \
+             star atlas",
             format!("{:?}", census.surface(*surface)),
             row.distinct_windows
         );
         println!(
-            "  {:<16} verdict RETURNED anyway: {}",
+            "  {:<16} verdict RETURNED off the classes, no pair materialized: {}",
             "",
             match inv.verdict {
                 ConductVerdict::Iron => "IRON".to_owned(),
@@ -654,23 +662,28 @@ fn main() {
     }
     println!();
     println!(
-        "  {obstructed_and_read} surfaces cannot have their separation population materialized at \n  \
-         a pair-chart transition degree above one. Every one of them still carries a\n  \
-         conduct verdict, because the verdict reads the sorted window classes in O(d * horizon) and\n  \
-         never touches a pair. The aperture is neither removed nor widened."
+        "  {read_through_the_atlas} surfaces carry a pair chart of transition degree above one and \
+         are read\n  through their star atlas instead -- the same object at degree one, no \
+         remainder. Every one\n  of them still carries a conduct verdict, because the verdict reads \
+         the sorted window classes\n  in O(d * horizon) and never touches a pair. NOTHING here \
+         refuses: `exhibit_in` returns a bare\n  population and is structurally incapable of \
+         obstructing, so this block reports a CHART CHANGE\n  and not a refusal. The route that can \
+         refuse is `exhibit(census, declared_capacity)`, which\n  returns the required width in a \
+         typed obstruction, and no caller on this path declares one."
     );
     holds.push((
-        "control 7 -- every surface whose exhibition the declared capacity refuses still carries a \
-         conduct verdict, by a route that materializes no pair"
+        "control 7 -- every surface whose pair chart carries a transition degree above one is read \
+         whole through its star atlas and still carries a conduct verdict, by a route that \
+         materializes no pair"
             .to_owned(),
-        obstructed_and_read > 0
+        read_through_the_atlas > 0
             && reading
                 .keys()
                 .all(|surface| invariance.contains_key(surface))
             && whole_returns > 0
             && whole_matched,
         format!(
-            "{obstructed_and_read} read through the star atlas; {} verdicts returned \
+            "{read_through_the_atlas} read through the star atlas; {} verdicts returned \
              over {} surfaces; {whole_returns} populations returned WHOLE at exactly the predicted \
              width",
             invariance.len(),

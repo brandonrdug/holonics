@@ -38,7 +38,10 @@ use std::time::Instant;
 
 use holonic_engine::corpus_census::CorpusCensus;
 use holonic_engine::cuda_refine::{CudaRefineExecutor, DeviceCorpus, ReadingIdentities};
-use holonic_engine::token_invariance::{ConductAtlas, SeparationComplex, saturation_horizon};
+use holonic_engine::token_invariance::{
+    ConductAtlas, SeparationComplex, material_horizon_bound, saturation_horizon,
+    surface_horizon_bound,
+};
 
 fn main() {
     let root = std::env::args()
@@ -99,19 +102,15 @@ fn main() {
     );
     println!();
 
-    // The material's own ceiling: no window reaches past the longest whole.
-    let ceiling = census
-        .wholes()
-        .iter()
-        .map(|whole| whole.stream.len())
-        .max()
-        .unwrap_or(1)
-        .max(1);
-    println!("  the material's ceiling is {ceiling} shells\n");
+    // The corpus's ceiling: no window reaches past the longest whole. Reported, but NOT what any
+    // one surface is refined against -- each surface's own ceiling is read off its own occurrences
+    // by `surface_horizon_bound`, exactly as the host law does.
+    let ceiling = material_horizon_bound(&census);
+    println!("  the corpus ceiling is {ceiling} shells; each surface is refined against its own\n");
 
     if let Some(at) = std::env::args().position(|a| a == "--trace") {
         if let Some(name) = std::env::args().nth(at + 1) {
-            trace(&census, &atlas, &name, ceiling);
+            trace(&census, &atlas, &name);
             return;
         }
     }
@@ -126,6 +125,12 @@ fn main() {
     let mut horizon_disagreed: Vec<String> = Vec::new();
     let mut idle_lanes_total = 0u64;
     let mut deepest = (0usize, String::new(), 0usize);
+    // The host's shell count over exactly the surfaces the card refined, and the summed ceiling
+    // each carrier was given. A cost law is a law: if the two carriers walk one law they walk the
+    // same number of shells, and neither may be handed a ceiling that is not its surface's own.
+    let mut host_shells_total = 0usize;
+    let mut own_ceiling_total = 0usize;
+    let mut corpus_ceiling_total = 0usize;
 
     let started = Instant::now();
     for surface in &surfaces {
@@ -133,7 +138,8 @@ fn main() {
         if sites.len() < 2 {
             continue;
         }
-        let on_card = match card.saturate(&corpus, &identities, sites, ceiling) {
+        let own_ceiling = surface_horizon_bound(&census, *surface);
+        let on_card = match card.saturate(&corpus, &identities, sites, own_ceiling) {
             Ok(returned) => returned,
             Err(error) => {
                 disagreed.push(format!("{:?}: the card refused -- {error}", census.surface(*surface)));
@@ -147,6 +153,9 @@ fn main() {
         idle_lanes_total += (occupied.div_ceil(block) * block) - occupied;
 
         let on_host = saturation_horizon(&census, &atlas, *surface);
+        host_shells_total += on_host.shells;
+        own_ceiling_total += own_ceiling;
+        corpus_ceiling_total += ceiling;
 
         // A partition is not a numbering. The card claims identities in probe order and the host in
         // lexicographic window order, so the comparison is of the induced EQUIVALENCE: two sites
@@ -227,6 +236,18 @@ fn main() {
         "  deepest cone: {} at horizon {} over {} orbits",
         deepest.1, deepest.0, deepest.2
     );
+    println!(
+        "  crossings on the card {} against {host_shells_total} shells on the host -- one law, one \
+         cost",
+        card.launches()
+    );
+    println!(
+        "  ceiling handed to each carrier: {own_ceiling_total} summed surface-local, against \
+         {corpus_ceiling_total}\n  \
+         the corpus ceiling would have imposed. Both carriers took the surface-local one as of \
+         2026-08-11;\n  the card was handed the corpus figure until then, and `saturate` walks it \
+         shell by shell."
+    );
     for line in disagreed.iter().take(6) {
         println!("  PARTITION DISAGREEMENT: {line}");
     }
@@ -265,6 +286,20 @@ fn main() {
             "would fail if: this were a demonstration on a handful of surfaces rather than \
              production over the declared corpus.",
         ),
+        (
+            "the cost is carrier-independent too, not only the return",
+            card.launches() as usize == host_shells_total,
+            "would fail if: one carrier walked more shells than the other for the same answer -- a \
+             cost law reproduced in its return and not in its work, which CLAUDE.md §8 calls not \
+             porting it at all.",
+        ),
+        (
+            "neither carrier was handed a ceiling that is not its surface's own",
+            own_ceiling_total < corpus_ceiling_total,
+            "would fail if: the card were still handed the longest whole in the census as every \
+             surface's ceiling, which is one unrelated document deciding an unrelated surface's \
+             cost. It was, until 2026-08-11.",
+        ),
     ];
     let mut all = true;
     for (claim, held, why) in controls {
@@ -279,11 +314,13 @@ fn main() {
 /// Trace one named surface shell by shell on both carriers. Invoked as
 /// `the_card_refines_the_front <root> --trace <surface>`; a disagreement in the derived horizon is
 /// a difference in the PATH, and a path is only visible shell by shell.
-fn trace(census: &CorpusCensus, atlas: &ConductAtlas, name: &str, ceiling: usize) {
+fn trace(census: &CorpusCensus, atlas: &ConductAtlas, name: &str) {
     let Some(surface) = census.lookup(name) else {
         println!("  no such surface: {name}");
         return;
     };
+    // This surface's own ceiling, not the corpus's: past it every shell reads `(None, None)`.
+    let ceiling = surface_horizon_bound(census, surface);
     let sites = census.sites(surface);
     println!("  tracing {name}: {} occurrences", sites.len());
     println!("    {:>6}  {:>10}  {:>10}", "shell", "host", "card");

@@ -476,15 +476,44 @@ occurrences separate**, which the shared-prefix array already reports.
 
 ### The horizon is read off the material — and a cone propagates, it is not searched
 
-`saturation_horizon` holds the partition and refines it one shell at a time, touching only cells
-still carrying difference. A singleton can never split again, so the live population shrinks
-monotonically and the work is
+`saturation_horizon` (`crates/holonic-engine/src/token_invariance.rs:2135`) holds the partition and
+refines it one shell at a time, touching only occurrences whose class is **not yet a singleton**
+(`:2154`, `classes.iter().filter(|c| c.len() > 1)`). A singleton can never split again, so that
+population shrinks monotonically and the accumulated work (`:2161`) is
 
 ```text
-   Σ_k  (occurrences still carrying difference at shell k)
+   Σ_k  (occurrences NOT YET SEPARATED at shell k),   k = 1 ..= bound
 ```
 
-— **the volume of the cone that is still live, not the volume of the cone.**
+**Corrected 2026-08-10 by reading the owner. This paragraph said the work was "the volume of the cone
+that is still live, not the volume of the cone", and that is not what the code sums.** Two things
+separate the two readings, and both are in the source:
+
+- **`bound` is census-wide, not surface-local.** `:2140` takes
+  `material_horizon_bound(census).max(1)`, and `material_horizon_bound` (`:2017-2024`) is the length
+  of the **longest whole in the entire census**. A surface's shell loop therefore runs against a
+  ceiling set by material it never touches — a coordinate of the corpus promoted into the cost of
+  reading one surface, which is the absolute-frame defect §0's second lesson names.
+- **Not-yet-separated is not still-carrying-difference.** `shell` (`:2084-2101`) returns `None` on a
+  side once the site leaves its own whole's stream, so past the ends of its material an occurrence
+  reads `(None, None)`. A plural class whose members have all run out of material compares
+  `(None, None)` against `(None, None)` at every remaining shell, cannot split at any depth, and is
+  still counted in `active` at each one — carrying no difference while being summed as though it
+  did. The loop exits early only when `active == 0` (`:2155-2158`), which such a class prevents.
+
+So the honest statement of what `active_total` is today: **the number of occurrence-shells the
+refinement visited, summed over occurrences still sharing a class, out to the whole census's longest
+whole.** It is an **upper bound** on the live cone's volume and is never equal to it — a class that
+is plural at shell `k` and does not split there carried no difference at `k` and was still counted.
+The gap is bounded when every class eventually reaches a singleton, which is what `exhausted`
+reports and what the declared corpus below satisfies at 29,533 of 29,533; it is unbounded when one
+does not, because the shells then run to the census ceiling regardless of the surface.
+
+**The repair is owed in the code, not here.** `token_invariance.rs:2051` carries the same sentence
+as a doc comment on the field (*"The cost, exactly: occurrences still carrying difference"*), so the
+document and the owner are wrong together; the field's name is honest and its description is not.
+What the loop needs is a ceiling read off the **surface's own** reach rather than the census's, and
+a plural class all of whose members are past their material must be recognised as terminal.
 
 **The first implementation binary-searched inside the material's ceiling, and that was the error the
 ontology predicts.** Probing at the ceiling materializes `2 · bound` readings per occurrence; on
@@ -495,24 +524,76 @@ advances one shell at a time and stops where the difference dies.*
 Stopping is a theorem, not a heuristic: a quiet shell does **not** prove saturation, because
 refinement can stall one shell and resume — `Z A B C D E` against `W A B C D E`, read at `C`, agree
 at shells 1 and 2 and differ at 3. The loop stops when every class is a **singleton**, which no
-deeper shell can split, or at the material ceiling.
+deeper shell can split, or at **that surface's own** ceiling.
+
+**The ceiling is the surface's, not the corpus's — corrected 2026-08-11.** An occurrence at position
+`p` of a whole of length `L` reads `max(p, L−1−p)` shells and `(None, None)` forever after, so a
+surface's ceiling is the maximum of that over its **own** sites. Running every surface against the
+longest whole *in the census* let one unrelated long document lengthen an unrelated surface's loop
+for material that had not changed — a corpus-global coordinate deciding a surface-local cost, which
+is §0's second lesson. Measured: summed surface-local ceiling **204,777,453** shells against
+**854,324,625** the corpus ceiling imposed, a 4.17× worst-case bound. It costs nothing where every
+surface exhausts, which this corpus does, and it is the whole cost where one does not — so a declared
+control supplies the material the corpus cannot: two byte-identical wholes, read once beside a short
+filler file and once beside a long one, where the corpus ceiling moves and `bound`, `shells`,
+`active_total` and `classes` do not.
 
 ### Measured on the declared corpus
 
+The corpus grows, so every row carries its clock.
+
+| | 2026-08-10 | 2026-08-11 |
+|---|---|---|
+| corpus ceiling, read off the census | 28,875 shells — the longest whole | 28,875 |
+| word surfaces / occurrences | 29,533 / 1,187,776 | 29,587 / 1,193,603 |
+| `active_total` — occurrence-shells visited, summed over occurrences not yet separated | **1,710,423** | **1,730,964** |
+| surfaces the authored `1` could not see whole | **10,230 of 29,533 — 35%** | **10,265 of 29,587** |
+| distinctions it missed | **423,250** | **426,036** |
+| `"the"` | horizon **49**, 37,530 classes against **3,990** at `h = 1` | horizon **85**, 37,797 against **4,002** |
+| corpus horizon | **51**, forced by exactly one surface: `"that"` | **88**, forced by exactly one: `"a"` |
+| termination | **29,533 of 29,533** exhausted to singletons — final by theorem | **29,587 of 29,587** |
+| surfaces whose least final radius is **0** | not reported — an authored `.max(1)` returned them as `1` | **10,676 of 29,587** |
+
+**The last row is a repair, not corpus growth.** `saturation_horizon` returned `last_split.max(1)`,
+so a surface no shell ever split — each of the 10,676 occurs exactly once, and has nothing to
+separate — reported a least final radius of `1`. The floor was invisible to
+`tools/authored_levels.py` because it is not a `const`, and its unit test was guarded
+`if horizon > 1`, excluding exactly the case the floor decided. The card carried the identical floor
+in `cuda_refine.rs`; both now return `0`, and `the_card_refines_the_front` re-run on an RTX 4080
+SUPER agrees with the host on every surface it reads — **18,911 of 18,911** at the first re-run and
+**18,917 of 18,917** at a later one the same day, with **68,734 crossings on the card against 68,734
+shells on the host: one law, one cost.** The two figures differ because *the corpus grew under the
+measurement* — another session is writing files into it — which is the reason every row above carries
+its clock rather than a bare number.
+
+**And the two carriers are now handed the same ceiling.** 163,023,246 shells surface-local against
+546,228,375 the corpus ceiling imposed, with a declared control that neither carrier is handed a
+foreign one. A cost law that held on the host and not on the card would have been a second frame
+smuggled in as an optimisation.
+
+**WITHDRAWN 2026-08-11: the sentence that stood here was produced by a broken gauge.** It read
+*"The corpus cannot grade the loop's soundness — zero of 29,533 ever stall."* That zero came from
+`SaturationHorizon::walked_past()`, which returned `shells > horizon` — **false on every propagation
+that exhausts to singletons**, because the last shell walked is the last shell that split. It
+measured no quiet shell at all, returned `false` even on the fixture built expressly to exhibit one,
+and its unit test passed only through an `|| exhausted` disjunct, which is `¬e ∨ e`.
+
+Re-measured 2026-08-11 with `interior_quiet_shells` — shells that split nothing **and** were followed
+by one that did:
+
 | | |
 |---|---|
-| ceiling, read off the census | 28,875 shells — the longest whole |
-| word surfaces / occurrences | 29,533 / 1,187,776 |
-| live cone volume | **1,710,423 occurrence-shells** |
-| surfaces the authored `1` could not see whole | **10,230 of 29,533 — 35%** |
-| distinctions it missed | **423,250** |
-| `"the"` | horizon **49**, 37,530 classes against **3,990** at `h = 1` |
-| corpus horizon | **51**, forced by exactly one surface: `"that"` |
-| termination | **29,533 of 29,533** exhausted to singletons — final by theorem |
+| surfaces that stall and resume | **5,008 of 29,587** |
+| interior quiet shells, total | **27,668** |
+| deepest resumption | `"first_depth"`: quiet at shell **1**, resumed at shell **73** |
 
-**The corpus cannot grade the loop's soundness** — zero of 29,533 ever stall — so a declared fixture
-grades it, where the unsound loop returns 1 and the truth is 3. That is `CLAUDE.md` §8: when the
-declared material cannot exercise a law, add declared material that does.
+**So the corpus grades the loop's soundness emphatically.** A loop halting at the first quiet shell
+returns the wrong horizon on 5,008 real surfaces, and on `"first_depth"` it returns 1 where the truth
+is 73. The declared fixture is kept and is now the *stronger* half rather than the only one: it
+exhibits the **witness** — the quiet shell, the resuming shell, and the two occurrences that
+resumption pulled apart, each checked to agree at the quiet shell and differ at the resumption —
+against a second, independently written unsound loop. `CLAUDE.md` §8's rule stands; what failed was
+the measurement that invoked it.
 
 ### The two costs are different objects, and conflating them is what "aperture law" did
 
@@ -618,9 +699,20 @@ So the refinement is split at the joint the theory names:
 ```
 
 The law is **material-free by construction** — its only inputs are a class and a key per cell — so it
-knows nothing of streams, occurrences, windows, states or language. Every organ with a front supplies
-a key law and shares everything else. `kernels/refine_shell.cu` carries the same split: `shell_keys`
-is the material, `claim_identities` is the law.
+knows nothing of streams, occurrences, windows, states or language. `kernels/refine_shell.cu` carries
+the same split: `shell_keys` is the material, `claim_identities` is the law.
+
+**Who conducts through it, stated as reach rather than as intent — measured 2026-08-10.** The
+sentence that stood here, *"every organ with a front supplies a key law and shares everything else"*,
+is the design and not the position. `cuda_refine` has three consumers:
+`crates/holonic-engine/examples/the_card_refines_the_front.rs:40` (the separation front's **card**
+path), `soma/life/src/morphological_language/current.rs:921`
+(`quotient_generation_states`, a second organ's material through the same law), and one test at
+`crates/holonic-engine/src/token_invariance.rs:3998`. **`saturation_horizon`'s own host refinement
+does not call it** — it groups with a `BTreeMap` at `token_invariance.rs:2170-2181`, and the
+agreement with the shared law is established by that test rather than by the call. So the factoring
+carries two materials today, `causal_language` is not among them, and the host-side migration of the
+organ that motivated the factoring is owed.
 
 **Proved on both charts and against the organ:**
 
@@ -661,7 +753,7 @@ distribution is a receiver, and the pipeline carrying a triangle through model �
 primitive because it is the smallest carrier of a relation with a hand — the tower, the law of
 cosines, the hinge deficit, and Brandon's own *"in friction triangles are the quantum."*
 
-### One expansion law, because three organs had the same front
+### One expansion law — built, proved, and conducting for ONE of the three organs
 
 ```text
    token_invariance::sweep_covered      surfaces     -> readings
@@ -670,10 +762,28 @@ cosines, the hinge deficit, and Brandon's own *"in friction triangles are the qu
 ```
 
 A covering per organ is the cabinet failure one level down, exactly as a device path per organ is.
-`hardware_cover::expand_front` is the law: the material supplies `cell -> successors`, the law covers
-it by **extent**, and successors are reassembled in the **front's own order** so a lane's completion
-order never becomes chronology. Proved identical at 1, 2, 3, 8 and 64 lanes over a branching front,
-with a failing cell surfacing from any lane.
+`hardware_cover::expand_front` (`crates/holonic-engine/src/hardware_cover.rs:887`) is the law: the
+material supplies `cell -> successors`, the law covers it by **extent**, and successors are
+reassembled in the **front's own order** so a lane's completion order never becomes chronology.
+Proved identical at 1, 2, 3, 8 and 64 lanes over a branching front (`:778-803`), with a failing cell
+surfacing from any lane (`:807`).
+
+**Corrected 2026-08-10: the migration is one organ of three, and this subsection claimed all three.**
+`expand_front` has **six** occurrences in the tree — the definition, three of its own tests
+(`:785`, `:790`, `:809`), and exactly **one external caller**:
+
+| organ | what it covers with, today |
+|---|---|
+| `causal_language` leader | **`expand_front`** — `soma/life/src/causal_language.rs:482`, with the tip's extent supplied as `emitted.len() + 1`. Migrated. |
+| `token_invariance::sweep_covered` | its **own** by-extent placement, `token_invariance.rs:1796-1811` — the same law, written twice. Not shared. |
+| `morphological_language::generate_currents` | `std::thread::available_parallelism()` directly (`soma/life/src/morphological_language/ecology.rs:791`) and sections the front `sections[at % lanes]` (`:798`) — **by count**, which is the law `sweep_covered`'s own comment names as wrong at `token_invariance.rs:1796`: *"Cover the surfaces by EXTENT, not by count: a surface with a million occurrences and one with two are not one unit each."* Not shared, and covering by a different law. |
+
+So what is established is that the law exists, is proved lane-invariant on a branching front, and
+carries one organ. Two migrations are **owed**, and the second is not a rename: it changes
+`generate_currents` from a by-count cover to a by-extent one, which is a change of law and not of
+plumbing. `hardware_cover.rs:866-875` and `causal_language.rs:480-481` both already describe the
+three-organ sharing as accomplished, so the same overstatement sits in two code comments and is owed
+there too.
 
 ### What mounting a carrier used to cost, measured
 

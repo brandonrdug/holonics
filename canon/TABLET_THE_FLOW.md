@@ -195,6 +195,14 @@ citation, a deposited grade, and a stated four-part debt.
 
 ## 6. Ant integration is the exact part, and it misses exactly what today's finding measured
 
+**Truth status:** `proved-standard` for the FTC split — exact `dη` against a closed non-exact `ω` — in
+its ordinary scope; `interpretation` for the ant/spider reading, which is Brandon's and is a
+correspondence rather than an identity; `implemented-exact` for the named owners
+(`crates/holonic-engine/src/running_integral.rs`, `crates/relational-geometry/src/exact_analysis.rs`,
+`crates/holonic-engine/src/contact_gluing.rs`); `established-bounded` for the measured absence of a
+stigmergy mechanism in the material and for the blindness of a `ℤ`-valued holonomy to torsion.
+`Hom(ℤ/n, ℤ) = 0` is itself `proved-standard`.
+
 **This is the section that changes what is owed, and it is the strongest join in this document.**
 
 ### What it is
@@ -220,11 +228,15 @@ FTC:  the EXACT part  dη            — ∫f′ = f, the flat reconstruction, T
 
 And the operator where the split lives is **modulo**: *remainder = position rebuilt by walking;
 quotient = the integer the loop deposited.* The laboratory named the lawful return type on
-2026-07-11 and it has never been built:
+2026-07-11:
 
 ```text
 ( position re-derived  ;  winding accumulated )
 ```
+
+**This section read *"and it has never been built"* until 2026-08-11.** It is built, on the carrier
+this section names as owed; the owner is `crates/holonic-engine/src/running_integral.rs` and the
+measurement is at the end of this section.
 
 ### Why this is today's finding under another name
 
@@ -236,6 +248,21 @@ multiplicity 2 and not at 1. And the finding attached to it:
 > `Hom(Z/n, ℤ) = 0`. **A `ℤ`-valued holonomy is a homomorphism out of `H₁` and kills every torsion
 > class by construction.** The tree's holonomy instrument is provably blind to the class the tree's
 > invariant instrument just found, and they are in the same crate.
+
+**The finding stands; two of its citations do not, and both are repaired 2026-08-10 by reading the
+owner.** The quotation is left as it was written so that what was claimed remains legible.
+
+- **The line numbers drifted.** Commit `ead11dc` ("The bare signs become passages, and one proposed
+  repair is refused", 2026-08-08) shifted `running_integral.rs`, and the two `pub residual: BigInt`
+  arms now sit at `crates/holonic-engine/src/running_integral.rs:643` — `Disagreement`,
+  `total(left) − total(right)` — and `:793` — the chord obstruction, `declared − implied`. Lines 594
+  and 744 carry unrelated code today.
+- **The owner is `running_integral`, not `derivation_integral`.**
+  `crates/holonic-engine/src/derivation_integral.rs:972` declares `NamedChord`, which re-presents the
+  same three `BigInt` fields with names attached and is filled at `:1035-1046` by copying what
+  `found_potential` already returned. The `ℤ` carrier — and therefore the blindness — belongs to
+  `running_integral`; `derivation_integral` inherits it. A repair applied to the wrapper would move
+  nothing.
 
 **That is precisely the ant/spider split.** The running integral is an ant: it walks the path and
 rebuilds the position exactly, `∫f′ = f`, and it is correct. What it cannot carry is the quotient —
@@ -251,16 +278,82 @@ So four names denote one missing organ:
 | §2b's *"name the windings instead"* | `CLAUDE.md` §2b, standing obligation | 2026-08-08 |
 
 **And one half of it now exists.** `RayCrossings`, built today in
-`relational-geometry/src/exact_analysis.rs`, is exactly this datatype for one carrier: it retains the
-crossing population *by address* and offers `winding()` as a reading. `total()` is the ant's count;
-`winding()` is the spider's integer; `cancels()` is the case where the ant walked and the spider
-deposited nothing. **The pattern is built and driven for the η boundary and for nothing else.**
+`crates/relational-geometry/src/exact_analysis.rs:1079`, is exactly this datatype for one carrier: it
+retains the crossing population *by address* and offers `winding()` (`:1088`) as a reading. `total()`
+(`:1093`) is the ant's count; `winding()` is the spider's integer; `cancels()` (`:1101`) is the case
+where the ant walked and the spider deposited nothing.
 
-The owed construction is therefore concrete rather than a research question: give
-`running_integral`'s chord obstruction the same two-arm shape, with a coefficient group the caller
-declares. A prototype detector already ran — solving over `F₂` for a cocycle pairing to 1 with the
-torsion class returned a support of **size one**, the single arc appearing in one face boundary with
-coefficient 2.
+**This section then read *"the pattern is built and driven for the η boundary and for nothing else."*
+That is STALE rather than wrong, and it decayed twice.** `HingeHolonomy::Exact` landed 2026-08-10 and
+is the more literal instance of the two-arm shape; `germ_populations` was rebuilt into
+`RayCrossings`' form on 2026-08-08 — the same day this section was written, which is why the sentence
+could be composed and be false within hours. An absence claim is a measurement and decays like one.
+The sentence is withdrawn and replaced by the reach, taken by reading the owners:
+
+| carrier | the two arms | driven by |
+|---|---|---|
+| `RayCrossings` — the η boundary | crossing addresses (`total`) ; `winding()` | `polygon_winding`, `crates/relational-geometry/src/exact_analysis.rs:1201`, with its declared control at `:1440` |
+| `HingeHolonomy::Exact` — `crates/holonic-engine/src/contact_gluing.rs:1470` | `cosine`/`sine` as an exact point on the unit circle (the position) ; `half_turns: u32` (the winding) | `crates/holonic-engine/examples/the_hinge_carries_the_curvature.rs`, six declared gates, of which two are the §8 gauge orbit in both directions — a similarity must move nothing (`:436`), a non-similar metric must move the population (`:464`) |
+| `ReceiverPhaseAtlasStanding::germ_populations` — `crates/holonic-engine/src/receiver_phase_atlas.rs:348` | germ **addresses** by signature ; the count demoted to a reading | its own doc at `:347` cites `RayCrossings`' shape as the form it was rebuilt into |
+
+`HingeHolonomy::Exact` is arguably the more faithful instance of `( position re-derived ; winding
+accumulated )` than `RayCrossings` is, because its two arms are literally a position on the circle
+and an integer count of `π`-crossings, and its own doc at `contact_gluing.rs:1474-1477` names
+`CLAUDE.md` §2b's *"name the windings"* obligation as met on the object it was stated for.
+
+**What was owed was narrower than the withdrawn sentence implied:** give `running_integral`'s chord
+obstruction the same two-arm shape, with a coefficient group the caller declares. None of the three
+carriers above is that — they wind in geometry, and the chord winds in a declared coefficient group.
+
+### BUILT 2026-08-11, and the orbit is exhibited
+
+`running_integral::CoefficientGroup` is the declaration — `Integers` or `Cyclic { modulus }`, with a
+non-positive modulus refused by name — and `found_potential_in` takes it. `found_potential` is
+unchanged and still `ℤ`, so no caller moved; **the organ authors no modulus, defaults to none, and
+reads none off the material.** The reduction is a **reading**: every `ChordObstruction` retains
+`declared`, `implied` and `residual` exactly in `ℤ` whatever was declared, and only the *split*
+between the agreeing and retained arms consults the group. That is §1's law — the reduction belongs
+in the reading and never in the constructor — and `PotentialSearch::closes_over_a_live_cycle_population`
+is `RayCrossings::cancels()` on this carrier.
+
+The falsifier is `crates/holonic-engine/examples/the_integer_holonomy_cannot_see_the_torsion_class.rs`,
+19 declared controls, 0 failed. On a wound grown circuit — a tree, its frontier closed into a rim, one
+face attached to `2 × (the rim cycle)`, which `rebase_invariants` in the same crate reads as
+`betti [1, 3, 0]` with `torsion [2]` against an unwound control at `betti [1, 4]`, `torsion []` — with
+`w = 2` on one rim arc and zero elsewhere:
+
+```text
+  declared ℤ     4 chords, 1 retained    rim:root.0.0->root.0.1  OBSTRUCTION  residual 2
+  declared ℤ/2   4 chords, 0 retained    rim:root.0.0->root.0.1  agreeing
+  declared ℤ/3   4 chords, 1 retained    rim:root.0.0->root.0.1  OBSTRUCTION  residual 2
+```
+
+`ℤ/3` is the control that keeps the modulus from reading as a knob: `gcd(2,3) = 1`, so a coprime
+modulus is exactly as blind as `ℤ`. Tree, reached set, chord count and the exact `ℤ` potential are
+identical under all three.
+
+**And the theorem is measured rather than quoted.** Over a declared family of rim values in
+`{−1,0,1}⁴` under two wire frames, 162 readings: **38 `ℤ`-cocycles, 0 of which pair nonzero with the
+torsion class**, against **162 of 162 closed mod 2 and 80 pairing to 1**. That is `Hom(ℤ/2, ℤ) = 0`
+against `Hom(ℤ/2, ℤ/2) = ℤ/2`, on this material, with the open cochains as the control that the check
+can fail — 124 of 124 pair nonzero. The pairing read from the incidence and the pairing read from the
+chord residuals disagreed on **0 of 162**, while the individual residuals moved with the wire frame:
+112 distinct residual vectors over 81 rim words, and the pairing invariant across them.
+
+**Two bounds, both required.** The chord-population orbit alone — obstruction becoming agreeing — is
+available on *any* material carrying an even residual and is not by itself evidence of torsion. What
+requires torsion is the second measurement, where the `ℤ` pairing is *forced* to zero for every
+cocycle. And reduction can only **shrink** the retained population, never grow it, because `ℤ → ℤ/n`
+is a homomorphism; a construction promising movement in both directions was asking for something
+structurally impossible.
+
+**The prototype's return is refined rather than confirmed.** This section recorded a detector
+returning *"a support of size one, the single arc appearing in one face boundary with coefficient 2"*.
+Asserted as a control, it **failed**. On the staggered attachment `4e₁ − 6e₂ + 2e₃` the support-one
+shape reproduces and `e₃` — whose face coefficient *is* 2 — carries a witness, but it is **not the
+only one**: `e₂`, at coefficient `−6`, carries one too. Mod 2 every coefficient of that face is zero,
+so the face constrains nothing and `⟨w, z⟩ = w₂ + w₃` is reached by either arc. The clause *"with
+coefficient 2"* records which arc that run happened to return, not the mechanism.
 
 ### The bound
 

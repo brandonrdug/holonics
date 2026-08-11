@@ -14,6 +14,57 @@ pub struct MorphologicalQueryRegion {
     pub(super) clause_ids: BTreeSet<usize>,
 }
 
+/// **Whether a returned branch's support has RECURRED, or is a single-source coincidence.**
+///
+/// `relational_language::RelationalChannelConduct` states the law and this is the same law on the
+/// generation front: *"A contact is not automatically a conducting edge… A separated coincident
+/// face conducts only after the same complete junction phase has returned through two distinct
+/// source pairs. Until then it remains an inspectable OPEN boundary."* The training body says it
+/// again as `CODEC_MINIMUM_RECURRENCE = 2` — a route is retained but inactive until it recurs
+/// across **distinct** occurrences.
+///
+/// **Generation had no such reading**, so every branch was returned with the same standing whether
+/// its support had returned through six sources or one. Measured on the declared fixture of
+/// `tests::the_transport_law_dilates_a_congested_passage_and_deletes_no_branch`: **2,366 candidates
+/// over 876 recruitments, 2,366 of them single-source, 0 recurred.** Not one contact in that run
+/// was a conducting edge by the law above, and all of them were returned as answers.
+///
+/// This is a **reading, not a filter.** Nothing is deleted and no branch is withheld: an `Open`
+/// branch is returned exactly as before, carrying the count of distinct sources that support it, so
+/// a receiver can tell a resonance from a coincidence instead of being handed both as one kind.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub enum MorphologicalSupportConduct {
+    /// The branch's support returned through two or more distinct sources.
+    Recurred,
+    /// The branch's support was seen in exactly one source. Real, retained, inspectable — and not
+    /// yet a conducting edge.
+    Open,
+}
+
+impl MorphologicalSupportConduct {
+    /// **The reading, taken from the branch's own tokens and nowhere else.**
+    ///
+    /// Returns the conduct and the exact count of distinct sources that supported the branch. One
+    /// law, every caller: a branch built in the agentic layer is read the same way as one the
+    /// morphological front returned, because the condition is a property of the support and not of
+    /// which organ assembled it.
+    pub fn of(tokens: &[MorphologicalGeneratedToken]) -> (Self, usize) {
+        // `LocalSet` is the substrate's own population carrier — ordered, insert-deduplicating,
+        // and the thing `holonic-structure` exists to provide. Reaching past it for a std container
+        // is what the ownership ratchet counts, and it counts it because the machine has its own.
+        let mut supporting = LocalSet::new();
+        let mut recurred = false;
+        for token in tokens {
+            recurred |= token.caused_sources.len() >= 2;
+            for source in &token.caused_sources {
+                supporting.insert(source.as_str());
+            }
+        }
+        let conduct = if recurred { Self::Recurred } else { Self::Open };
+        (conduct, supporting.len())
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct MorphologicalQueryObligation {
     pub features: BTreeSet<String>,
@@ -133,6 +184,11 @@ pub struct MorphologicalGeneratedCurrent {
     pub phases: Vec<MorphologicalResponsePhase>,
     pub rest: MorphologicalResponseRest,
     pub caused_seams: Vec<MorphologicalCausedSeam>,
+    /// Whether this branch's support recurred across distinct sources, or stands on one.
+    pub support_conduct: MorphologicalSupportConduct,
+    /// The exact count of distinct sources supporting this branch. `1` is the coincidence case and
+    /// is retained as testimony rather than reported as a grade.
+    pub supporting_sources: usize,
 }
 
 impl MorphologicalGeneratedCurrent {
@@ -292,12 +348,15 @@ impl MorphologicalGeneratedCurrent {
             .collect::<BTreeSet<_>>()
             .into_iter()
             .collect();
+        let (support_conduct, supporting_sources) = MorphologicalSupportConduct::of(&tokens);
         Ok(Some(Self {
             text: render_tokens(tokens.iter().map(|token| token.token.as_str())),
             tokens,
             phases,
             rest: MorphologicalResponseRest::Closed,
             caused_seams,
+            support_conduct,
+            supporting_sources,
         }))
     }
 }
@@ -324,6 +383,8 @@ impl MorphologicalGeneratedText {
             phases: self.phases.clone(),
             rest: self.rest.clone(),
             caused_seams: self.caused_seams.clone(),
+            support_conduct: MorphologicalSupportConduct::of(&self.tokens).0,
+            supporting_sources: MorphologicalSupportConduct::of(&self.tokens).1,
         }
     }
 

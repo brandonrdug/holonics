@@ -155,12 +155,15 @@ pub(super) fn reflective_codec_answer_candidate(
     if tokens.is_empty() || phases.is_empty() {
         return Err(AgenticLanguageError::NoGroundedLanguageReturn);
     }
+    let (support_conduct, supporting_sources) = MorphologicalSupportConduct::of(&tokens);
     let generated = MorphologicalGeneratedCurrent {
         text: render_tokens(tokens.iter().map(|token| token.token.as_str())),
         tokens,
         phases,
         rest: MorphologicalResponseRest::Closed,
         caused_seams: Vec::new(),
+        support_conduct,
+        supporting_sources,
     };
     let causal_current_states_formed = version
         .input
@@ -184,6 +187,9 @@ pub(super) fn reflective_codec_answer_candidate(
             peak_live_current_states: 1,
             returned_events_carried: 0,
             terminal_return_materializations: 0,
+            dilated_passages: 0,
+            deepest_dilation: 0,
+            deepest_chronology: 0,
         },
         inherited_surfaces: version.output.ordered_regions.iter().cloned().collect(),
         received_prompt: received_prompt.to_owned(),

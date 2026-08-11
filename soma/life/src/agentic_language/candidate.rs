@@ -140,12 +140,15 @@ pub(super) fn relational_thought_answer_candidate(
     if tokens.is_empty() || phases.is_empty() {
         return Err(AgenticLanguageError::NoGroundedLanguageReturn);
     }
+    let (support_conduct, supporting_sources) = MorphologicalSupportConduct::of(&tokens);
     let generated = MorphologicalGeneratedCurrent {
         text: realization.text.clone(),
         tokens,
         phases,
         rest: MorphologicalResponseRest::Closed,
         caused_seams: Vec::new(),
+        support_conduct,
+        supporting_sources,
     };
     let inherited_surfaces = passages
         .iter()
@@ -180,6 +183,9 @@ pub(super) fn relational_thought_answer_candidate(
         peak_live_current_states: thought.realizations.len(),
         returned_events_carried: 0,
         terminal_return_materializations: 0,
+        dilated_passages: 0,
+        deepest_dilation: 0,
+        deepest_chronology: 0,
     };
     Ok(AnswerCandidate {
         generated,
@@ -1026,6 +1032,15 @@ pub(super) fn compose_reflection_receipts(
             .checked_add(right.terminal_return_materializations)
             .and_then(|extent| extent.checked_add(outputs.len()))
             .ok_or(AgenticLanguageError::CarrierExtent)?,
+        // Congestion is a property of one generation's own front, so composing two returns adds
+        // the dilated passages and takes the deeper of the two extremes rather than summing them:
+        // two fronts that each waited three tokens did not between them wait six.
+        dilated_passages: left
+            .dilated_passages
+            .checked_add(right.dilated_passages)
+            .ok_or(AgenticLanguageError::CarrierExtent)?,
+        deepest_dilation: left.deepest_dilation.max(right.deepest_dilation),
+        deepest_chronology: left.deepest_chronology.max(right.deepest_chronology),
     })
 }
 

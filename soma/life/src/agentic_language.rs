@@ -35,6 +35,7 @@ use crate::{
     lean_mathematics::LeanKernelDeedCompletion,
     morphological_language::{
         MorphologicalBoundary, MorphologicalGeneratedCurrent, MorphologicalGeneratedText,
+        MorphologicalSupportConduct,
         MorphologicalGeneratedToken, MorphologicalGenerationSpec, MorphologicalLanguageEcology,
         MorphologicalLanguageError, MorphologicalLanguagePassage, MorphologicalQuestionCharge,
         MorphologicalReflectionReceipt, MorphologicalResponsePhase, MorphologicalResponseRest,

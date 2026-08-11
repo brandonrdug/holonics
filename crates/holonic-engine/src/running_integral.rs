@@ -45,6 +45,43 @@
 //! free, subtree equals interval, and **the departure from a forest is the certified remainder**.
 //! The chord population is that departure and the disagreeing chords are that remainder.
 //!
+//! ## The coefficient group is the caller's, and `Z` is not a neutral choice
+//!
+//! A chord residual is the pairing of the cochain with the fundamental cycle that chord closes, so
+//! the chord population **is** the homomorphism `H_1(1-skeleton) -> G` in the fundamental-cycle
+//! basis, split into its kernel (the agreeing chords) and its complement (the retained
+//! obstructions). Which `G` that is decides what the instrument can see, and it is a theorem that
+//! `Z` cannot see everything:
+//!
+//! ```text
+//!   Hom(Z/n, Z) = 0            an integer-valued holonomy kills every torsion class
+//!   Hom(Z/n, Z/m) = Z/gcd(n,m) a cyclic-valued one sees exactly the part the modulus shares
+//! ```
+//!
+//! `crates/holonic-engine/src/rebase_invariants.rs` computes integral homology **with** torsion in
+//! this same crate, and returned `Z/2` on the wound grown circuit. Until 2026-08-10 this module
+//! hard-wired all three arms of [`ChordObstruction`] to [`BigInt`], so the tree's holonomy
+//! instrument was provably blind to the class the tree's invariant instrument had just found.
+//! `canon/TABLET_THE_FLOW.md` §6 states the defect and §"Why this is today's finding under another
+//! name" states the construction: *give `running_integral`'s chord obstruction the same two-arm
+//! shape, with a coefficient group the caller declares.*
+//!
+//! [`CoefficientGroup`] is that declaration. **This organ never authors a modulus, never defaults
+//! to one, and never reads one off the material** — `found_potential` remains `Z` and
+//! [`found_potential_in`] takes the group as an argument. A caller that wants `Z/2` because
+//! `rebase_invariants` reported a `Z/2` is reading the level off the material and declaring it,
+//! which is the lawful direction; the organ doing that for it would not be.
+//!
+//! And the reduction is a **reading**. Every [`ChordObstruction`] retains `declared`, `implied` and
+//! `residual` exactly in `Z` whatever group was declared, because a carrier that reduces on
+//! construction has decided for every consumer it will ever have which distinctions are invisible.
+//! Only the *split* — agreeing against retained — consults the group.
+//!
+//! One consequence is worth stating because it bounds what the orbit can ever be: `Z -> Z/n` is a
+//! homomorphism, so a residual that vanishes in `Z` vanishes in `Z/n`. **The retained population
+//! over `Z/n` is always a subset of the one over `Z`**; reduction can turn an obstruction into an
+//! agreement and never the reverse.
+//!
 //! ## Carrier and aperture
 //!
 //! Every value is a [`BigInt`] and every operation is exact addition, negation and multiplication
@@ -62,7 +99,7 @@
 use std::collections::{BTreeMap, BTreeSet, VecDeque};
 
 use num_bigint::BigInt;
-use num_traits::{One, Zero};
+use num_traits::{One, Signed, Zero};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -691,7 +728,7 @@ pub fn disagreement(
         return Err(RunningIntegralError::PairIsNotACycle);
     }
 
-    let residual = left_integral.total.clone() - right_integral.total.clone();
+    let residual = &left_integral.total - &right_integral.total;
     Ok(Disagreement {
         schema: "holonic-engine.integral-disagreement.v1".to_owned(),
         start: left_integral.start,
@@ -774,23 +811,121 @@ pub fn enclosed_disagreement(
 }
 
 // ---------------------------------------------------------------------------------------------
+// the coefficient group
+
+/// The group a chord test is read in — **declared by the caller, never by this organ.**
+///
+/// The residuals themselves are computed in `Z` and retained in `Z` whatever is declared here. What
+/// the declaration decides is the single question *does this residual vanish*, which is what splits
+/// the chord population into agreeing and retained. That is the whole of the coupling, and it is
+/// deliberately that narrow: the spanning tree, the walk order, the potential and the exact
+/// residuals are functions of the complex, the cochain and the base alone.
+///
+/// The two groups are not interchangeable and the difference is a theorem rather than a
+/// convenience. A chord residual pairs the cochain with a fundamental cycle, so the population is a
+/// homomorphism out of `H_1`, and `Hom(Z/n, Z) = 0`: **an integer holonomy annihilates every
+/// torsion class by construction.** `Hom(Z/n, Z/m) = Z/gcd(n, m)`, so a declared modulus sees a
+/// torsion class exactly to the extent that it shares a factor with it — declaring `Z/3` against a
+/// `Z/2` is as blind as declaring `Z`.
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum CoefficientGroup {
+    /// `Z`. Nothing is reduced; every residual is its own exact self.
+    Integers,
+    /// `Z/modulus`, for a modulus the caller supplies.
+    Cyclic { modulus: BigInt },
+}
+
+impl CoefficientGroup {
+    /// `Z/modulus` for a positive modulus.
+    ///
+    /// A modulus of zero is refused rather than silently read as `Z`, and a negative one is refused
+    /// rather than silently read as its magnitude: both are a receiver's word about which group it
+    /// wants, and quietly repairing the word would be this organ choosing the group. `Z` is
+    /// declared as [`CoefficientGroup::Integers`].
+    ///
+    /// `Z/1` is admitted. It is the trivial group, in which every chord agrees vacuously — a
+    /// receiver that cannot tell anything apart is a lawful receiver whose return says so, and
+    /// refusing it here would be an authored floor.
+    pub fn cyclic(modulus: BigInt) -> Result<Self, RunningIntegralError> {
+        if !modulus.is_positive() {
+            return Err(RunningIntegralError::ModulusIsNotPositive(modulus));
+        }
+        Ok(Self::Cyclic { modulus })
+    }
+
+    /// The declared modulus, or `None` for `Z`.
+    pub fn modulus(&self) -> Option<&BigInt> {
+        match self {
+            Self::Integers => None,
+            Self::Cyclic { modulus } => Some(modulus),
+        }
+    }
+
+    /// The canonical representative of `value`: `value` itself over `Z`, and the least non-negative
+    /// residue in `Z/n`.
+    pub fn reduce(&self, value: &BigInt) -> BigInt {
+        match self {
+            Self::Integers => value.clone(),
+            Self::Cyclic { modulus } => {
+                let residue = value % modulus;
+                if residue.is_negative() {
+                    residue + modulus
+                } else {
+                    residue
+                }
+            }
+        }
+    }
+
+    /// Whether `value` is this group's zero: zero in `Z`, a multiple of the modulus in `Z/n`.
+    pub fn vanishes(&self, value: &BigInt) -> bool {
+        match self {
+            Self::Integers => value.is_zero(),
+            Self::Cyclic { modulus } => (value % modulus).is_zero(),
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------------------------
 // the potential, and the chords it cannot repair
 
 /// A chord whose declared value disagrees with the potential the spanning tree implies.
 ///
 /// The residual is the holonomy of the fundamental cycle that chord closes. It is retained here
 /// exactly, with its own address, and nothing in this module ever folds it back into the potential.
+///
+/// **All three arms stay in `Z` whatever group the search declared.** The reduction is offered by
+/// [`ChordObstruction::residual_in`] and lives in the reading, never in the constructor: a carrier
+/// that reduces on construction has decided, for every consumer it will ever have, which
+/// distinctions are invisible.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ChordObstruction {
     pub cell: CausalCellId,
     pub tail: CausalCellId,
     pub head: CausalCellId,
-    /// `w(e)`.
+    /// `w(e)`, exact in `Z`.
     pub declared: BigInt,
-    /// `f(head) - f(tail)` from the tree's potential.
+    /// `f(head) - f(tail)` from the tree's potential, exact in `Z`.
     pub implied: BigInt,
-    /// `declared - implied`. Nonzero by construction of this variant.
+    /// `declared - implied`, exact in `Z`. Nonzero **in the group the search declared** — and
+    /// therefore nonzero in `Z` too, since `Z -> Z/n` sends zero to zero.
     pub residual: BigInt,
+}
+
+impl ChordObstruction {
+    /// The residual read in a declared group.
+    pub fn residual_in(&self, group: &CoefficientGroup) -> BigInt {
+        group.reduce(&self.residual)
+    }
+
+    /// Whether this chord agrees in a declared group.
+    ///
+    /// `false` for the group the search itself declared, by construction of this variant. It can be
+    /// `true` for a coarser one, and that difference is the orbit worth exhibiting.
+    pub fn agrees_in(&self, group: &CoefficientGroup) -> bool {
+        group.vanishes(&self.residual)
+    }
 }
 
 /// The search for a 0-cochain whose coboundary is the given 1-cochain, and the remainder it leaves.
@@ -802,7 +937,13 @@ pub struct ChordObstruction {
 pub struct PotentialSearch {
     pub schema: String,
     pub base: CausalCellId,
-    /// Grade-zero, valued zero at the base.
+    /// The coefficient group the caller declared.
+    ///
+    /// The tree, the walk order, the potential and every exact residual are independent of it. The
+    /// **split** between [`PotentialSearch::agreeing_chords`] and
+    /// [`PotentialSearch::retained_obstructions`] is not, and that is the whole of what it decides.
+    pub group: CoefficientGroup,
+    /// Grade-zero, valued zero at the base, exact in `Z` whatever group was declared.
     pub potential: Cochain,
     pub reached: BTreeSet<CausalCellId>,
     pub tree_cells: BTreeSet<CausalCellId>,
@@ -815,35 +956,85 @@ pub struct PotentialSearch {
 }
 
 impl PotentialSearch {
-    /// The cochain is a coboundary on the reached component exactly when nothing was retained.
+    /// The cochain is a coboundary on the reached component **in the declared group** exactly when
+    /// nothing was retained.
     pub fn admits_a_potential(&self) -> bool {
         self.retained_obstructions.is_empty()
     }
 
     /// The number of independent cycles the reached component carries: its departure from a tree.
+    ///
+    /// Group-independent. Only the split of these chords between the two arms moves.
     pub fn cycle_rank(&self) -> usize {
         self.agreeing_chords.len() + self.retained_obstructions.len()
     }
 
-    /// The exact residuals standing after the search, in chord order.
+    /// The exact `Z` residuals standing after the search, in chord order.
     pub fn standing_residuals(&self) -> Vec<BigInt> {
         self.retained_obstructions
             .iter()
             .map(|chord| chord.residual.clone())
             .collect()
     }
+
+    /// The same residuals read in the group this search declared.
+    pub fn residuals_in_group(&self) -> impl Iterator<Item = BigInt> + '_ {
+        self.retained_obstructions
+            .iter()
+            .map(|chord| chord.residual_in(&self.group))
+    }
+
+    /// The potential read in the declared group. The exact `Z` potential is retained beside it.
+    pub fn potential_in_group(&self) -> Cochain {
+        Cochain::from_values(
+            self.potential.grade(),
+            self.potential
+                .values()
+                .iter()
+                .map(|(cell, value)| (*cell, self.group.reduce(value))),
+        )
+    }
+
+    /// Chords exist and every one of them agreed: the ant walked the loops and the spider deposited
+    /// nothing.
+    ///
+    /// This is [`crate::running_integral`]'s reading of `RayCrossings::cancels` in
+    /// `relational-geometry`, and it separates the two cases a bare `admits_a_potential` conflates —
+    /// a structure with no cycles at all, which closes for free and evidences nothing, and one whose
+    /// cycles were tested and agreed.
+    pub fn closes_over_a_live_cycle_population(&self) -> bool {
+        self.cycle_rank() > 0 && self.retained_obstructions.is_empty()
+    }
 }
 
 /// Walk a spanning tree of the 1-skeleton from `base`, assign the only potential it admits, and
-/// test every chord.
+/// test every chord **over `Z`**.
 ///
 /// Deterministic: the incidence lists are built in cell-identity order and the frontier is walked
 /// breadth-first, so the tree, the chord set and the retained residuals are a function of the
 /// complex and the base alone.
+///
+/// This is [`found_potential_in`] with [`CoefficientGroup::Integers`] declared, and it is what every
+/// caller that has not thought about the coefficient group should keep calling. It is also, by the
+/// theorem in this module's header, the reading that cannot see a torsion class.
 pub fn found_potential(
     complex: &GradedCausalComplex,
     cochain: &Cochain,
     base: CausalCellId,
+) -> Result<PotentialSearch, RunningIntegralError> {
+    found_potential_in(complex, cochain, base, CoefficientGroup::Integers)
+}
+
+/// The same search with the coefficient group **declared by the caller**.
+///
+/// The walk is identical and the residuals are identical: only the test `residual vanishes` is
+/// asked in `group` rather than in `Z`. Over [`CoefficientGroup::Integers`] this is
+/// [`found_potential`] exactly, which is why adding the group moved no existing caller.
+pub fn found_potential_in(
+    complex: &GradedCausalComplex,
+    cochain: &Cochain,
+    base: CausalCellId,
+    group: CoefficientGroup,
 ) -> Result<PotentialSearch, RunningIntegralError> {
     if cochain.grade != 1 {
         return Err(RunningIntegralError::NotAOneCochain(cochain.grade));
@@ -901,8 +1092,8 @@ pub fn found_potential(
                         .cloned()
                         .unwrap_or_else(BigInt::zero)
                         - assigned.get(&tail).cloned().unwrap_or_else(BigInt::zero);
-                    let residual = declared.clone() - implied.clone();
-                    if residual.is_zero() {
+                    let residual = &declared - &implied;
+                    if group.vanishes(&residual) {
                         agreeing_chords.insert(cell);
                     } else {
                         retained_obstructions.push(ChordObstruction {
@@ -924,8 +1115,9 @@ pub fn found_potential(
     let unreached_cells = every_cell.difference(&considered).copied().collect();
 
     Ok(PotentialSearch {
-        schema: "holonic-engine.integral-potential-search.v1".to_owned(),
+        schema: "holonic-engine.integral-potential-search.v2".to_owned(),
         base,
+        group,
         potential,
         reached,
         tree_cells,
@@ -984,6 +1176,11 @@ pub enum RunningIntegralError {
     GradeOverflow,
     #[error("the base cell {0:?} is not a grade-zero cell")]
     BaseIsNotAVertex(CausalCellId),
+    #[error(
+        "a modulus is a positive integer and {0} is not one; `Z` is declared as \
+         `CoefficientGroup::Integers`, not as a modulus of zero"
+    )]
+    ModulusIsNotPositive(BigInt),
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -1598,6 +1795,159 @@ mod tests {
             error,
             RunningIntegralError::BaseIsNotAVertex(_)
         ));
+    }
+
+    // -----------------------------------------------------------------------------------------
+    // the declared coefficient group
+
+    /// **The orbit.** One complex, one cochain, three declared groups, three different chord
+    /// populations — and the modulus is what separates them.
+    ///
+    /// `dc` is the square's only chord and its residual is `2`. Over `Z` it obstructs. Over `Z/2`
+    /// it agrees, because `2` is the group's zero. Over `Z/3` it obstructs again, which is the
+    /// point that makes this a gauge rather than a switch: a modulus is not a knob that always
+    /// weakens the test, it sees exactly the part of the residual it shares a factor with.
+    #[test]
+    fn a_declared_modulus_moves_a_chord_between_the_two_arms() {
+        let square = Square::hollow();
+        let w = Cochain::from_values(1, [(square.dc, big(2))]);
+        let two = CoefficientGroup::cyclic(big(2)).unwrap();
+        let three = CoefficientGroup::cyclic(big(3)).unwrap();
+
+        let over_z = found_potential(&square.complex, &w, square.a).unwrap();
+        assert_eq!(over_z.cycle_rank(), 1);
+        assert!(!over_z.admits_a_potential());
+        assert_eq!(over_z.retained_obstructions[0].cell, square.dc);
+        assert_eq!(over_z.retained_obstructions[0].residual, big(2));
+
+        let over_two =
+            found_potential_in(&square.complex, &w, square.a, two.clone()).unwrap();
+        assert_eq!(over_two.cycle_rank(), 1, "the same chord is still tested");
+        assert!(
+            over_two.admits_a_potential(),
+            "2 is the zero of Z/2, so the residual no longer stands"
+        );
+        assert!(over_two.agreeing_chords.contains(&square.dc));
+        assert!(
+            over_two.closes_over_a_live_cycle_population(),
+            "and it closed over a chord that exists, not over an empty cycle population"
+        );
+
+        let over_three = found_potential_in(&square.complex, &w, square.a, three).unwrap();
+        assert!(
+            !over_three.admits_a_potential(),
+            "gcd(2, 3) = 1: Z/3 is exactly as blind to this residual as Z is"
+        );
+        assert_eq!(over_three.retained_obstructions[0].residual, big(2));
+        assert_eq!(
+            over_three.retained_obstructions[0].residual_in(&two),
+            big(0),
+            "and the same retained obstruction reads as agreeing in the other group"
+        );
+    }
+
+    /// The exact `Z` arms survive a declared reduction. The reduction is a reading and the carrier
+    /// still holds what it held.
+    #[test]
+    fn the_exact_integer_arms_are_retained_under_a_declared_reduction() {
+        let square = Square::hollow();
+        let w = Cochain::from_values(1, [(square.dc, big(3))]);
+        let two = CoefficientGroup::cyclic(big(2)).unwrap();
+        let search = found_potential_in(&square.complex, &w, square.a, two.clone()).unwrap();
+
+        let chord = &search.retained_obstructions[0];
+        assert_eq!(chord.declared, big(3), "w(dc) = 3, exactly, in Z");
+        assert_eq!(chord.implied, big(0), "and the tree implied 0, exactly, in Z");
+        assert_eq!(chord.residual, big(3), "the residual is retained in Z");
+        assert_eq!(chord.residual_in(&two), big(1), "and read as 1 in Z/2");
+        assert!(!chord.agrees_in(&two));
+        assert!(chord.agrees_in(&CoefficientGroup::cyclic(big(3)).unwrap()));
+        assert_eq!(search.group, two);
+        assert_eq!(search.residuals_in_group().count(), 1);
+        assert_eq!(search.residuals_in_group().next(), Some(big(1)));
+        assert_eq!(search.standing_residuals(), [big(3)], "and Z beside it");
+    }
+
+    /// `Z -> Z/n` is a homomorphism, so a residual that vanished in `Z` vanishes in `Z/n`. The
+    /// retained population can only shrink, never grow, and this is the assertion that would catch
+    /// a reduction wired in the wrong direction.
+    ///
+    /// The declared control is the second half: on this material the two populations must actually
+    /// **differ** for one of the cochains, or the check above is comparing a thing with itself.
+    #[test]
+    fn the_reduced_population_is_a_subset_of_the_integer_one_and_the_material_can_separate_them() {
+        let square = Square::hollow();
+        let two = CoefficientGroup::cyclic(big(2)).unwrap();
+        let mut separated = false;
+        for value in [-4i64, -3, -2, -1, 0, 1, 2, 3, 4, 6] {
+            let w = Cochain::from_values(1, [(square.dc, big(value))]);
+            let over_z = found_potential(&square.complex, &w, square.a).unwrap();
+            let over_two =
+                found_potential_in(&square.complex, &w, square.a, two.clone()).unwrap();
+            assert!(
+                over_two.retained_obstructions.iter().all(|reduced| {
+                    over_z
+                        .retained_obstructions
+                        .iter()
+                        .any(|exact| exact.cell == reduced.cell)
+                }),
+                "reduction turned an agreement into an obstruction at w(dc) = {value}"
+            );
+            if over_two.retained_obstructions.len() < over_z.retained_obstructions.len() {
+                separated = true;
+            }
+        }
+        assert!(
+            separated,
+            "no declared cochain separated the two groups, so the subset assertion above is \
+             comparing one population with itself"
+        );
+    }
+
+    /// The group decides the split and nothing else. Same tree, same chords, same potential.
+    #[test]
+    fn the_declared_group_moves_neither_the_tree_nor_the_potential() {
+        let square = Square::hollow();
+        let w = Cochain::from_values(1, [(square.ab, big(4)), (square.dc, big(2))]);
+        let over_z = found_potential(&square.complex, &w, square.a).unwrap();
+        let over_two =
+            found_potential_in(&square.complex, &w, square.a, CoefficientGroup::cyclic(big(2))
+                .unwrap())
+            .unwrap();
+
+        assert_eq!(over_z.tree_cells, over_two.tree_cells);
+        assert_eq!(over_z.reached, over_two.reached);
+        assert_eq!(over_z.potential, over_two.potential, "exact in Z either way");
+        assert_eq!(over_z.cycle_rank(), over_two.cycle_rank());
+        assert_ne!(
+            over_z.agreeing_chords, over_two.agreeing_chords,
+            "and the split is the one thing that did move"
+        );
+        assert_eq!(
+            over_two.potential_in_group().value(square.b),
+            big(0),
+            "f(b) = 4 in Z reads as 0 in Z/2, and the reading is where that happens"
+        );
+        assert_eq!(over_two.potential.value(square.b), big(4));
+    }
+
+    /// A modulus is the caller's word and a bad one is refused rather than repaired.
+    #[test]
+    fn a_modulus_that_is_not_positive_is_refused() {
+        for bad in [0i64, -2] {
+            let error = CoefficientGroup::cyclic(big(bad)).unwrap_err();
+            assert!(matches!(
+                error,
+                RunningIntegralError::ModulusIsNotPositive(_)
+            ));
+        }
+        assert!(CoefficientGroup::cyclic(big(1)).is_ok(), "Z/1 is a group");
+        assert_eq!(CoefficientGroup::Integers.modulus(), None);
+        assert_eq!(
+            CoefficientGroup::cyclic(big(5)).unwrap().reduce(&big(-3)),
+            big(2),
+            "the least non-negative residue, not the machine remainder"
+        );
     }
 
     // -----------------------------------------------------------------------------------------

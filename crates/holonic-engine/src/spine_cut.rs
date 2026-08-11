@@ -72,7 +72,59 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use crate::algebraic::{CausalCell, CausalCellId, CausalChain, GradedCausalComplex};
+use crate::running_integral::PotentialSearch;
 use crate::VertexId;
+
+// ---------------------------------------------------------------------------------------------
+// where q comes from
+// ---------------------------------------------------------------------------------------------
+
+/// **The chain law's `q_n − q_m`, read off a potential instead of taken from the caller.**
+///
+/// [`read_the_chain`] takes `potential_change` as a scalar and says of it: *"it is a line integral
+/// of a cochain this module does not carry and must not guess."* That refusal was honest and it
+/// left an edge open — [`crate::running_integral::found_potential_in`], in this same crate, returns
+/// exactly the grade-zero cochain the integral is a difference of, and nothing joined them. This is
+/// the join.
+///
+/// # What the join exposes, which is the reason to build it rather than plumb it
+///
+/// `q_n − q_m` is a difference of a **potential**, and a potential exists exactly when the drive is
+/// a coboundary. Where the drive carries holonomy — a chord whose residual does not vanish in the
+/// declared group — the sum along a walk from `m` to `n` is walk-dependent, so there is no such
+/// difference at all. **The chain law's `q` term presupposes trivial cohomology**, and on a body
+/// with a standing winding the ACCUMULATION cut is not merely unknown but ill-posed until a walk is
+/// declared.
+///
+/// That is the ant and the spider arriving at the spine: the ant rebuilds the position by walking
+/// and the spider carries what the loop deposited, and `q` is the ant's half. Asking for it on
+/// material the spider owns is the error this refusal names, so the return is a `Result` and
+/// [`SpineCutError::PotentialIsPathDependent`] is a first-class answer rather than a failure.
+///
+/// The group is the caller's — it reaches here through the `PotentialSearch` it declared — so a
+/// drive whose only chords are even is path-dependent over `ℤ` and path-*independent* over `ℤ/2`,
+/// and the same material returns a potential change in one declared group and a refusal in the
+/// other. Neither is more true; they are two receivers.
+pub fn potential_change(
+    search: &PotentialSearch,
+    from: CausalCellId,
+    to: CausalCellId,
+) -> Result<Rat, SpineCutError> {
+    if let Some(first) = search.retained_obstructions.first() {
+        return Err(SpineCutError::PotentialIsPathDependent {
+            chords: search.retained_obstructions.len(),
+            first: first.cell,
+        });
+    }
+    for endpoint in [from, to] {
+        if !search.reached.contains(&endpoint) {
+            return Err(SpineCutError::EndpointNotReached(endpoint));
+        }
+    }
+    Ok(Rat::from_integer(
+        search.potential.value(to) - search.potential.value(from),
+    ))
+}
 
 /// An edge of the chain, named by the caller. Local to this module: the tree carries `Edge` as a
 /// vertex pair in `simplicial`, and a cut reading needs an identity independent of its endpoints
@@ -102,6 +154,22 @@ pub enum SpineCutError {
         "cell {0:?} is not a joinable one-cell: a chain reading needs one +1 head and one -1 tail"
     )]
     UnjoinableCell(CausalCellId),
+    /// **`q_n − q_m` was asked of a cochain that admits no potential.** The drive carries at least
+    /// one chord whose residual did not vanish in the declared group, so the sum along a walk from
+    /// `m` to `n` depends on which walk is taken. There is no difference of a potential to return
+    /// and this organ will not pick a walk on the caller's behalf.
+    #[error(
+        "the drive admits no potential in the declared group: {chords} chord(s) stand, the first at \
+         {first:?}, so q_n - q_m depends on the walk"
+    )]
+    PotentialIsPathDependent {
+        chords: usize,
+        first: CausalCellId,
+    },
+    /// An endpoint the potential search never reached. Its `q` is not zero; it is undefined, and
+    /// returning zero would read an unvisited component as one that accumulated nothing.
+    #[error("the potential search never reached {0:?}, so its q is undefined rather than zero")]
+    EndpointNotReached(CausalCellId),
 }
 
 /// One oriented edge of the chain: `tail → head`.
@@ -341,7 +409,113 @@ pub fn name_the_cut(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::EventId;
+    use crate::algebraic::ComparativeMultiplicity;
+    use crate::running_integral::{Cochain, CoefficientGroup, found_potential_in};
     use num_bigint::BigInt;
+
+    /// A hollow square `a→b→c` against `a→d→c`. It has one independent cycle, so a drive on it
+    /// either telescopes or stands, and which one is a property of the drive rather than of the
+    /// shape.
+    fn vertex(complex: &mut GradedCausalComplex, name: &str) -> CausalCellId {
+        complex
+            .found_cell(name, [EventId(1)].into(), 0, CausalChain::default())
+            .expect("a vertex has an empty boundary")
+    }
+
+    fn arc(
+        complex: &mut GradedCausalComplex,
+        name: &str,
+        tail: CausalCellId,
+        head: CausalCellId,
+    ) -> CausalCellId {
+        let mut boundary = CausalChain::default();
+        boundary.add_term(head, ComparativeMultiplicity::positive(1u32));
+        boundary.add_term(tail, ComparativeMultiplicity::negative(1u32));
+        complex
+            .found_cell(name, [EventId(1)].into(), 1, boundary)
+            .expect("an arc joins two vertices")
+    }
+
+    fn square() -> (GradedCausalComplex, [CausalCellId; 4], [CausalCellId; 4]) {
+        let mut complex = GradedCausalComplex::default();
+        let a = vertex(&mut complex, "a");
+        let b = vertex(&mut complex, "b");
+        let c = vertex(&mut complex, "c");
+        let d = vertex(&mut complex, "d");
+        let arcs = [
+            arc(&mut complex, "ab", a, b),
+            arc(&mut complex, "bc", b, c),
+            arc(&mut complex, "ad", a, d),
+            arc(&mut complex, "dc", d, c),
+        ];
+        (complex, [a, b, c, d], arcs)
+    }
+
+    fn drive(arcs: &[CausalCellId; 4], values: [i64; 4]) -> Cochain {
+        Cochain::from_values(
+            1,
+            arcs.iter()
+                .zip(values)
+                .map(|(cell, value)| (*cell, BigInt::from(value))),
+        )
+    }
+
+    /// **`q` is supplied by the potential, and refused where no potential exists.**
+    ///
+    /// The three returns are the whole content: a telescoping drive gives the exact difference; a
+    /// drive carrying a standing chord has no difference to give and says so; and whether it stands
+    /// is a question about the DECLARED GROUP, so the same material answers both ways.
+    #[test]
+    fn the_potential_supplies_q_and_refuses_it_where_the_drive_carries_a_winding() {
+        let (complex, [a, _b, c, _d], arcs) = square();
+
+        // Both walks a->c cost 3, so this drive is a coboundary and q_c - q_a is exact.
+        let telescoping = drive(&arcs, [1, 2, 2, 1]);
+        let search = found_potential_in(&complex, &telescoping, a, CoefficientGroup::Integers)
+            .expect("the drive is a one-cochain and the base is a vertex");
+        assert!(search.retained_obstructions.is_empty());
+        assert_eq!(
+            potential_change(&search, a, c).expect("a coboundary has a potential"),
+            Rat::from_integer(BigInt::from(3))
+        );
+
+        // Now the two walks disagree by 2: the drive carries a winding and q is walk-dependent.
+        let standing = drive(&arcs, [1, 2, 2, 3]);
+        let over_integers = found_potential_in(&complex, &standing, a, CoefficientGroup::Integers)
+            .expect("the drive is a one-cochain and the base is a vertex");
+        assert_eq!(over_integers.retained_obstructions.len(), 1);
+        match potential_change(&over_integers, a, c) {
+            Err(SpineCutError::PotentialIsPathDependent { chords: 1, .. }) => {}
+            other => panic!("a standing chord must refuse q, returned {other:?}"),
+        }
+
+        // The residual is 2, so mod 2 the same drive IS a coboundary and q returns. The group is
+        // the caller's declaration and it decides the question, which is what makes this a
+        // receiver rather than a fact about the material.
+        let over_two = found_potential_in(
+            &complex,
+            &standing,
+            a,
+            CoefficientGroup::cyclic(BigInt::from(2)).expect("2 is a positive modulus"),
+        )
+        .expect("the drive is a one-cochain and the base is a vertex");
+        assert!(over_two.retained_obstructions.is_empty());
+        assert!(
+            potential_change(&over_two, a, c).is_ok(),
+            "the same material returns q in one declared group and refuses it in another"
+        );
+
+        // And an endpoint the walk never reached is undefined, never zero.
+        let (mut apart, _, _) = square();
+        let island = vertex(&mut apart, "island");
+        let search = found_potential_in(&apart, &telescoping, a, CoefficientGroup::Integers)
+            .expect("the drive is a one-cochain and the base is a vertex");
+        match potential_change(&search, a, island) {
+            Err(SpineCutError::EndpointNotReached(cell)) => assert_eq!(cell, island),
+            other => panic!("an unreached endpoint must refuse, returned {other:?}"),
+        }
+    }
 
     fn edge(id: u64, tail: u64, head: u64) -> ChainEdge {
         ChainEdge {

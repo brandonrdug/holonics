@@ -28,6 +28,110 @@ struct SourceStanding {
     receiver: u64,
 }
 
+/// One successor opened by one cell of the generation front, carrying what its own expansion
+/// caused.
+///
+/// `hardware_cover::expand_front` returns a flat vector of successors in the front's own order.
+/// It has no per-lane slot, deliberately: the covering that stood here before kept its tallies per
+/// lane and merged them afterwards, which is exactly the shape in which a realization coordinate
+/// gets into a returned quantity. Anything the round must total therefore rides on the successor
+/// and is totalled once, in the front's order, by the caller.
+struct ExpandedCurrent {
+    state: MorphologicalGenerationState,
+    /// This successor was formed by forking its cell and enacting one event or one phase onset —
+    /// a shared-current fork, a formed causal state and a carried returned event, which are the
+    /// same three occurrences counted three times because the receipt names them separately.
+    forked: bool,
+    /// The cell that opened this successor moved. Every path opens at least one successor, so the
+    /// round's disjunction over successors is the round's disjunction over cells.
+    cell_progressed: bool,
+}
+
+/// **How much of the receiver's own active family a candidate's context must carry.**
+///
+/// The recruitment law is `I(R) = ⋃_K ⋂_{f∈K} I(f)` — the receiver's incidence is the union over
+/// covers of the **intersection** over the faces in each block. `relational_language` implements it
+/// at `clause_region_incidence`, folding `candidates.intersection(carriers)` across a region's
+/// faces so a clause is recruited only when it carries every one; the mark ecology in this same
+/// file implements it at `charge`, intersecting the forward and reverse source families and falling
+/// back to the union only when that intersection is empty.
+///
+/// **`event_candidates` implemented neither.** It admitted a candidate whose context shared ONE
+/// active clause or ONE active passage, which is the singleton cover and nothing else — broad
+/// union-based lexical recruitment, the shape `CLAUDE.md` §5 convicts by name. Every token match
+/// opened a branch, so the machine coupled the whole corpus into every response instead of
+/// resonating with the part of it that carries the receiver's face together.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum ContextCover {
+    /// The maximal block: the candidate's context carries the receiver's **complete** active
+    /// family. This is `⋂_{f∈K} I(f)` with `K` the whole family.
+    Complete,
+    /// The singleton cover: the candidate's context touches the family anywhere. Reached only when
+    /// `Complete` recruited nothing, so a single-face alternative stays lineage rather than being
+    /// declared false — the same fallback the mark intersection already takes.
+    Touching,
+}
+
+/// The front that arrives at one chronology: co-present cells, glued by conduct.
+type ArrivedFront = BTreeMap<MorphologicalCurrentState, MorphologicalCurrentPopulation>;
+
+/// Every front still to arrive, ordered by the chronology it arrives at. A dilated passage lands
+/// in a later entry and is retained there until the loop reaches it.
+type ChronologyFronts = BTreeMap<u64, ArrivedFront>;
+
+/// **One cell's expansion, carrying the demand it presented at its own site.**
+///
+/// `holonic_engine::receiver_current` is the body's transport law and generation never called it.
+/// Its arithmetic is
+///
+/// ```text
+///   co_present_branch_population = branch_population × |active outgoing passages|
+///   service_rounds               = ceil(co_present_branch_population / site_capacity)
+///   passage_delay                = characteristic_delay + (service_rounds − 1)
+/// ```
+///
+/// Both factors of the demand are known exactly at the moment a cell finishes expanding and
+/// nowhere earlier: the branch population is the cell's witness count, and the number of active
+/// outgoing passages is how many successors the expansion actually opened. So the cell reports its
+/// own demand rather than the front guessing it.
+struct ExpandedCell {
+    /// The clause-lexical suffix state the cell sat at — its **site**.
+    site: u32,
+    /// `branch_population × |active outgoing passages|`.
+    co_present: u64,
+    opened: Vec<ExpandedCurrent>,
+}
+
+impl ExpandedCurrent {
+    /// The cell was carried to the next front unchanged or brought to rest: no fork, no movement.
+    const fn carried(state: MorphologicalGenerationState) -> Self {
+        Self {
+            state,
+            forked: false,
+            cell_progressed: false,
+        }
+    }
+
+    /// The cell's local frontier was exhausted, which is itself a caused obstruction and therefore
+    /// movement, but no fork was opened.
+    const fn progressed(state: MorphologicalGenerationState) -> Self {
+        Self {
+            state,
+            forked: false,
+            cell_progressed: true,
+        }
+    }
+
+    /// The cell opened this successor at its junction.
+    const fn forked(state: MorphologicalGenerationState) -> Self {
+        Self {
+            state,
+            forked: true,
+            cell_progressed: true,
+        }
+    }
+}
+
 /// One conditioned intermediate body carrying all language receiver scales concurrently.
 #[derive(Debug)]
 pub struct MorphologicalLanguageEcology {
@@ -703,6 +807,26 @@ impl MorphologicalLanguageEcology {
         prompt: &str,
         spec: MorphologicalGenerationSpec,
     ) -> Result<MorphologicalLanguageCurrentGeneration, MorphologicalLanguageError> {
+        self.generate_currents_over(
+            prompt,
+            spec,
+            &holonic_engine::hardware_cover::HardwareCover::host_only(),
+        )
+    }
+
+    /// Generate over a **declared** cover rather than one this function asked the host for.
+    ///
+    /// `hardware_cover::HardwareCover::of_charts` exists for exactly this reason, and says so:
+    /// *"the determinism controls need to vary the cover without a card present, and a construction
+    /// that can only be built from real hardware cannot be graded on a machine that has none."*
+    /// A lane is a realization coordinate; that it may not move a reading is a claim, and a claim
+    /// that cannot be varied cannot be checked. This is the parameter that varies it.
+    pub fn generate_currents_over(
+        &self,
+        prompt: &str,
+        spec: MorphologicalGenerationSpec,
+        cover: &holonic_engine::hardware_cover::HardwareCover,
+    ) -> Result<MorphologicalLanguageCurrentGeneration, MorphologicalLanguageError> {
         if spec.maximum_observed_tokens == 0 {
             return Err(MorphologicalLanguageError::EmptyObservationAperture);
         }
@@ -741,6 +865,8 @@ impl MorphologicalLanguageEcology {
                         open_obligations: BTreeSet::new(),
                     },
                     caused_seams: Vec::new(),
+                    support_conduct: MorphologicalSupportConduct::Open,
+                    supporting_sources: 0,
                 }],
                 reflection: MorphologicalReflectionReceipt {
                     shared_conditioned_bodies: 1,
@@ -751,6 +877,9 @@ impl MorphologicalLanguageEcology {
                     peak_live_current_states: 1,
                     returned_events_carried: 0,
                     terminal_return_materializations: 1,
+                    dilated_passages: 0,
+                    deepest_dilation: 0,
+                    deepest_chronology: 0,
                 },
             });
         }
@@ -764,234 +893,161 @@ impl MorphologicalLanguageEcology {
             current,
             population,
         } = initial;
-        let mut states = BTreeMap::from([(current, population)]);
+        // **The front is indexed by arrival chronology, because a passage has a delay.**
+        //
+        // Every successor used to be co-present at the next step, which is the assertion that every
+        // passage costs the same regardless of how much demand met how much support. The body owns
+        // a transport law that says otherwise — `holonic_engine::receiver_current` — and generation
+        // was the organ that never called it. Here the front at a chronology is what has actually
+        // arrived by then; a dilated passage lands later and is **retained** in `pending` until it
+        // does. Nothing is discarded, so this is not an aperture: the same population returns, and
+        // what changes is which cells are co-present when.
+        let mut pending = ChronologyFronts::from([(0, ArrivedFront::from([(current, population)]))]);
+        let mut rested = ArrivedFront::new();
         let mut causal_current_states_formed = 1usize;
         let mut shared_current_forks = 0usize;
         let mut conduct_equivalent_states_glued = 0usize;
         let mut peak_live_current_states = 1usize;
         let mut returned_events_carried = 0usize;
+        let mut dilated_passages = 0usize;
+        let mut deepest_dilation = 0u64;
+        let mut deepest_chronology = 0u64;
 
-        loop {
-            let mut successors =
-                BTreeMap::<MorphologicalCurrentState, MorphologicalCurrentPopulation>::new();
-            let mut progressed = false;
-            // **The expansion is covered across the host's lanes.**
+        while let Some((chronology, arrived)) = pending.pop_first() {
+            deepest_chronology = deepest_chronology.max(chronology);
+            // **The front is expanded through the one covering law, and the law is not restated
+            // here.**
             //
-            // Every state's successors depend on that state and on `&self`, which is immutable
-            // here — `begin_phase` and `finish_active_phase` both take `&self` — so the states of
-            // one round are a FRONT: independent cells over a shared immutable body. Walking them
-            // serially pinned one core, which `CLAUDE.md` §9 names a defect rather than a mystery.
+            // `states` is a front of co-present cells. Every cell's successors depend on that cell
+            // and on `&self`, which is immutable here — `phase_candidates`, `begin_phase`,
+            // `event_candidates`, `enact_event` and `finish_active_phase` all take `&self` — so one
+            // round is a JUNCTION and not an arc: what leaves it is co-present. Chronology inside a
+            // single branch is untouched.
             //
-            // This is a decomposition and never a schedule. Each lane glues into its own map and
-            // the maps are merged in a declared order afterwards, so the returned population and
-            // every counter are identical to the serial walk — a lane is a realization coordinate
-            // and may not move a result.
+            // The law is `holonic_engine::hardware_cover::expand_front`, the same organ the causal
+            // leader conducts through. What stood here instead was a covering per organ — a direct
+            // `std::thread::available_parallelism()` call, a round-robin `at % lanes` **by count**,
+            // a per-lane `BTreeMap` and a merge in lane order. That is the cabinet failure one
+            // level down, and covering by count is the law `sweep_covered`'s own comment names as
+            // wrong: *a surface with a million occurrences and one with two are not one unit each.*
+            //
+            // **And it was not lane-invariant.** `ReflectiveCurrentFront::conduct_key` deliberately
+            // excludes `recurrent_support_uses` — the founded terrain — so two currents that
+            // founded different sections GLUE, and `insert_generation_state` keeps the terrain of
+            // whichever arrived first while appending the other's witnesses. Under the round-robin
+            // partition "first" was a lane coordinate, and since that terrain gates
+            // `event_candidates`, the next round's candidate population moved with it: measured on
+            // the corpus of `tests::a_declared_lane_count_cannot_move_the_generated_reading`,
+            // **1,862 returned branches at 1 and 8 lanes, 1,806 at 2, 1,843 at 3.** Gluing in the
+            // front's own order is the serial order at every lane count, which is what
+            // `expand_front` reassembles into.
+            //
+            // **What this repair does NOT fix, and it is a live defect one level down:** which
+            // branch's terrain survives a glue is still decided by arrival order rather than by a
+            // law. Front order is canonical, so the reading is now reproducible; the object it
+            // reproduces still carries a traversal coordinate in a retained field, which is §0's
+            // fourth lesson — a receiver-visible coordinate promoted into standing. Deciding it
+            // lawfully (union the founded terrain, or return the plural fiber) changes what
+            // generation returns and is not this repair's to take.
             let front: Vec<(MorphologicalCurrentState, MorphologicalCurrentPopulation)> =
-                states.into_iter().collect();
-            let lanes = std::thread::available_parallelism()
-                .map(|lanes| lanes.get())
-                .unwrap_or(1)
-                .min(front.len().max(1));
-            let mut sections: Vec<Vec<(MorphologicalCurrentState, MorphologicalCurrentPopulation)>> =
-                (0..lanes).map(|_| Vec::new()).collect();
-            for (at, cell) in front.into_iter().enumerate() {
-                sections[at % lanes].push(cell);
-            }
+                arrived.into_iter().collect();
+            let expanded = holonic_engine::hardware_cover::expand_front(
+                front,
+                cover,
+                // **The extent of a generation cell is its witness population.**
+                //
+                // Every successor a cell opens is `state.fork()`, which clones every witness, and
+                // `begin_phase` / `enact_event` / `finish_active_phase` then rewrite every witness
+                // of the fork in place. So a cell carrying sixty-one witnesses does sixty-one times
+                // the per-successor work of a cell carrying one, and covering by count weighs the
+                // two the same. Measured on the corpus of
+                // `tests::a_declared_lane_count_cannot_move_the_generated_reading`, one front of
+                // 138 cells carried extents from 1 to 61 — the by-extent cover and the by-count
+                // cover are not the same cover on this material.
+                //
+                // The other factor is the candidate population, and it is **not available before
+                // the expansion**: computing it *is* the expansion, so reading it into the extent
+                // would double the work the extent exists to place. It is therefore not in the
+                // measure, and no proxy stands in for it.
+                |(_, population): &(MorphologicalCurrentState, MorphologicalCurrentPopulation)| {
+                    population.witnesses.len() as u64
+                },
+                |(current, population)| {
+                    // Both factors of the law's demand are read here and nowhere else: the branch
+                    // population before the expansion consumes it, and the count of active
+                    // outgoing passages after the expansion opens them.
+                    let branch_population = population.witnesses.len() as u64;
+                    let site = current.reflection.clause_lexical.state();
+                    let opened = self.expand_current(&charge, spec, current, population)?;
+                    let co_present = branch_population.saturating_mul(opened.len() as u64);
+                    // `expand_front` flattens what a cell returns, and the demand is a property of
+                    // the CELL rather than of any one successor — so the cell reports itself as one
+                    // unit and the flattening leaves one entry per cell.
+                    Ok::<_, MorphologicalLanguageError>(vec![ExpandedCell {
+                        site,
+                        co_present,
+                        opened,
+                    }])
+                },
+            )?;
 
-            type LaneReturn = Result<
-                (
-                    BTreeMap<MorphologicalCurrentState, MorphologicalCurrentPopulation>,
-                    bool,
-                    [usize; 4],
-                ),
-                MorphologicalLanguageError,
-            >;
-            let gathered: Vec<LaneReturn> = std::thread::scope(|scope| {
-                let handles: Vec<_> = sections
-                    .into_iter()
-                    .map(|section| {
-                        let charge = &charge;
-                        let spec = spec;
-                        scope.spawn(move || -> LaneReturn {
-                            let mut lane_successors = BTreeMap::<
-                                MorphologicalCurrentState,
-                                MorphologicalCurrentPopulation,
-                            >::new();
-                            let mut lane_progressed = false;
-                            let mut lane_conduct_equivalent_states_glued = 0usize;
-                            let mut lane_shared_current_forks = 0usize;
-                            let mut lane_causal_current_states_formed = 0usize;
-                            let mut lane_returned_events_carried = 0usize;
-                            let _ = &spec;
-                            for (current, population) in section {
-                let mut state = MorphologicalGenerationState {
-                    current,
-                    population,
-                };
-                if state.current.rest.is_some() {
-                    if insert_generation_state(&mut lane_successors, state)? {
-                        lane_conduct_equivalent_states_glued = lane_conduct_equivalent_states_glued
-                            .checked_add(1)
-                            .ok_or(MorphologicalLanguageError::CarrierExtent)?;
-                    }
-                    continue;
+            for cell in expanded {
+                let dilation = self.service_dilation(cell.site, cell.co_present)?;
+                if dilation > 0 {
+                    dilated_passages = dilated_passages
+                        .checked_add(1)
+                        .ok_or(MorphologicalLanguageError::CarrierExtent)?;
+                    deepest_dilation = deepest_dilation.max(dilation);
                 }
-                if state.current.reflection.returned_event_count >= spec.maximum_observed_tokens {
-                    self.finish_active_phase(&charge, &mut state, None)?;
-                    state.current.rest =
-                        Some(MorphologicalResponseRest::ObservationApertureExhausted {
-                            open_obligations: open_face_indices(&state.current.open_faces),
-                        });
-                    if insert_generation_state(&mut lane_successors, state)? {
-                        lane_conduct_equivalent_states_glued = lane_conduct_equivalent_states_glued
-                            .checked_add(1)
-                            .ok_or(MorphologicalLanguageError::CarrierExtent)?;
-                    }
-                    continue;
-                }
-
-                if let Some(active) = state.current.active_phase.as_ref() {
-                    let events = self.event_candidates(&state.current.reflection, active)?;
-                    if events.is_empty() {
-                        self.finish_active_phase(&charge, &mut state, None)?;
-                        if state.current.open_faces.is_empty() {
-                            state.current.rest = Some(MorphologicalResponseRest::Obstructed {
-                                open_obligations: BTreeSet::new(),
-                            })
-                        }
-                        // An exhausted local frontier is itself a caused obstruction. If another
-                        // outer query fiber remains, the next loop may recruit a different local
-                        // onset; no global clause-identity ban is installed.
-                        lane_progressed = true;
-                        if insert_generation_state(&mut lane_successors, state)? {
-                            lane_conduct_equivalent_states_glued = lane_conduct_equivalent_states_glued
-                                .checked_add(1)
-                                .ok_or(MorphologicalLanguageError::CarrierExtent)?;
-                        }
+                for opened in cell.opened {
+                    // **A successor that came to rest, or whose cell could not move, retires.**
+                    //
+                    // The loop this replaces re-expanded such a cell every round until the whole
+                    // front stopped, and broke on `at_rest || !progressed` over ALL of it. Retiring
+                    // per successor reaches the same terminal population — a cell that cannot
+                    // progress returns itself unchanged, so re-expanding it was a no-op — and it is
+                    // what makes a chronology-indexed front terminate: every successor either
+                    // consumes aperture or leaves.
+                    if opened.state.current.rest.is_some() || !opened.cell_progressed {
+                        insert_generation_state(&mut rested, opened.state)?;
                         continue;
                     }
-                    lane_progressed = true;
-                    for event in events {
-                        let mut successor = state.fork();
-                        lane_shared_current_forks = lane_shared_current_forks
-                            .checked_add(1)
-                            .ok_or(MorphologicalLanguageError::CarrierExtent)?;
-                        self.enact_event(
-                            &charge,
-                            &mut successor,
-                            event,
-                            MorphologicalTransport::RecurrentLexical,
-                        )?;
-                        lane_causal_current_states_formed = lane_causal_current_states_formed
-                            .checked_add(1)
-                            .ok_or(MorphologicalLanguageError::CarrierExtent)?;
-                        lane_returned_events_carried = lane_returned_events_carried
-                            .checked_add(1)
-                            .ok_or(MorphologicalLanguageError::CarrierExtent)?;
-                        if insert_generation_state(&mut lane_successors, successor)? {
-                            lane_conduct_equivalent_states_glued = lane_conduct_equivalent_states_glued
-                                .checked_add(1)
-                                .ok_or(MorphologicalLanguageError::CarrierExtent)?;
-                        }
-                    }
-                } else {
-                    let candidates = self.phase_candidates(&charge, &state.current.open_faces)?;
-                    if candidates.is_empty() {
-                        state.current.rest = Some(MorphologicalResponseRest::Obstructed {
-                            open_obligations: open_face_indices(&state.current.open_faces),
-                        });
-                        if insert_generation_state(&mut lane_successors, state)? {
-                            lane_conduct_equivalent_states_glued = lane_conduct_equivalent_states_glued
-                                .checked_add(1)
-                                .ok_or(MorphologicalLanguageError::CarrierExtent)?;
-                        }
-                        continue;
-                    }
-                    lane_progressed = true;
-                    for candidate in candidates {
-                        let mut successor = state.fork();
-                        lane_shared_current_forks = lane_shared_current_forks
-                            .checked_add(1)
-                            .ok_or(MorphologicalLanguageError::CarrierExtent)?;
-                        self.begin_phase(&charge, &mut successor, candidate)?;
-                        lane_causal_current_states_formed = lane_causal_current_states_formed
-                            .checked_add(1)
-                            .ok_or(MorphologicalLanguageError::CarrierExtent)?;
-                        lane_returned_events_carried = lane_returned_events_carried
-                            .checked_add(1)
-                            .ok_or(MorphologicalLanguageError::CarrierExtent)?;
-                        if insert_generation_state(&mut lane_successors, successor)? {
-                            lane_conduct_equivalent_states_glued = lane_conduct_equivalent_states_glued
-                                .checked_add(1)
-                                .ok_or(MorphologicalLanguageError::CarrierExtent)?;
-                        }
-                    }
+                if opened.forked {
+                    shared_current_forks = shared_current_forks
+                        .checked_add(1)
+                        .ok_or(MorphologicalLanguageError::CarrierExtent)?;
+                    causal_current_states_formed = causal_current_states_formed
+                        .checked_add(1)
+                        .ok_or(MorphologicalLanguageError::CarrierExtent)?;
+                    returned_events_carried = returned_events_carried
+                        .checked_add(1)
+                        .ok_or(MorphologicalLanguageError::CarrierExtent)?;
                 }
-
-                            }
-                            Ok((
-                                lane_successors,
-                                lane_progressed,
-                                [
-                                    lane_conduct_equivalent_states_glued,
-                                    lane_shared_current_forks,
-                                    lane_causal_current_states_formed,
-                                    lane_returned_events_carried,
-                                ],
-                            ))
-                        })
-                    })
-                    .collect();
-                handles
-                    .into_iter()
-                    .map(|handle| match handle.join() {
-                        Ok(returned) => returned,
-                        Err(payload) => std::panic::resume_unwind(payload),
-                    })
-                    .collect()
-            });
-
-            // Merged in lane order, which is the declared order. Gluing is associative on this
-            // map — `merge_witnesses` unions a population — so the merge cannot depend on which
-            // lane happened to reach a state first.
-            for lane in gathered {
-                let (lane_successors, lane_progressed, counters) = lane?;
-                progressed |= lane_progressed;
-                for (current, population) in lane_successors {
-                    if insert_generation_state(
-                        &mut successors,
-                        MorphologicalGenerationState {
-                            current,
-                            population,
-                        },
-                    )? {
-                        conduct_equivalent_states_glued = conduct_equivalent_states_glued
-                            .checked_add(1)
-                            .ok_or(MorphologicalLanguageError::CarrierExtent)?;
-                    }
+                // **Where the transport law decides conduct.** An uncongested successor arrives at
+                // the next chronology; a congested one arrives `service_rounds − 1` later and is
+                // retained meanwhile as deferred testimony rather than expanded early. Nothing is
+                // dropped and nothing is chosen: the dilation is `ceil(demand / support)` over the
+                // material, so a continuation the corpus attests widely rides at once and one it
+                // barely attests waits for its turn.
+                let arrival = chronology
+                    .checked_add(1)
+                    .and_then(|next| next.checked_add(dilation))
+                    .ok_or(MorphologicalLanguageError::CarrierExtent)?;
+                if insert_generation_state(
+                    pending.entry(arrival).or_default(),
+                    opened.state,
+                )? {
+                    conduct_equivalent_states_glued = conduct_equivalent_states_glued
+                        .checked_add(1)
+                        .ok_or(MorphologicalLanguageError::CarrierExtent)?;
                 }
-                conduct_equivalent_states_glued = conduct_equivalent_states_glued
-                    .checked_add(counters[0])
-                    .ok_or(MorphologicalLanguageError::CarrierExtent)?;
-                shared_current_forks = shared_current_forks
-                    .checked_add(counters[1])
-                    .ok_or(MorphologicalLanguageError::CarrierExtent)?;
-                causal_current_states_formed = causal_current_states_formed
-                    .checked_add(counters[2])
-                    .ok_or(MorphologicalLanguageError::CarrierExtent)?;
-                returned_events_carried = returned_events_carried
-                    .checked_add(counters[3])
-                    .ok_or(MorphologicalLanguageError::CarrierExtent)?;
+                }
             }
-            peak_live_current_states = peak_live_current_states.max(successors.len());
-            let at_rest = successors.keys().all(|current| current.rest.is_some());
-            states = successors;
-            if at_rest || !progressed {
-                break;
-            }
+            peak_live_current_states = peak_live_current_states
+                .max(pending.values().map(ArrivedFront::len).sum::<usize>() + rested.len());
         }
 
-        let terminal_witnesses = states
+        let terminal_witnesses = rested
             .into_iter()
             .flat_map(|(current, population)| {
                 let rest = current
@@ -1008,12 +1064,19 @@ impl MorphologicalLanguageEcology {
         let observed_paths = terminal_witnesses.len();
         let outputs = terminal_witnesses
             .into_iter()
-            .map(|(emitted, phases, rest)| MorphologicalGeneratedCurrent {
-                text: render_tokens(emitted.iter().map(|token| token.token.as_str())),
-                tokens: emitted,
-                phases,
-                rest,
-                caused_seams: Vec::new(),
+            .map(|(emitted, phases, rest)| {
+                // The resonance reading, taken by the one law and nowhere restated.
+                let (support_conduct, supporting_sources) =
+                    MorphologicalSupportConduct::of(&emitted);
+                MorphologicalGeneratedCurrent {
+                    text: render_tokens(emitted.iter().map(|token| token.token.as_str())),
+                    tokens: emitted,
+                    phases,
+                    rest,
+                    caused_seams: Vec::new(),
+                    support_conduct,
+                    supporting_sources,
+                }
             })
             .collect::<Vec<_>>();
         Ok(MorphologicalLanguageCurrentGeneration {
@@ -1028,8 +1091,119 @@ impl MorphologicalLanguageEcology {
                 peak_live_current_states,
                 returned_events_carried,
                 terminal_return_materializations: observed_paths,
+                dilated_passages,
+                deepest_dilation,
+                deepest_chronology,
             },
         })
+    }
+
+    /// **One cell of the generation front, expanded at its junction.**
+    ///
+    /// This is the whole of what the material supplies to
+    /// `hardware_cover::expand_front`: what one co-present cell branches into. The cover, the
+    /// sectioning by extent and the canonical reassembly are the law's and are not restated here.
+    ///
+    /// Every path returns **at least one** successor, so `cell_progressed` rides on the successors
+    /// without a cell being able to lose it, and every quantity the caller totals rides with them:
+    /// the law returns a flat vector in the front's own order and has nowhere to put a per-lane
+    /// tally, which is the point — a tally kept per lane is a tally the lane count can move.
+    /// **The transport law's service dilation for one cell, read off the material.**
+    ///
+    /// `holonic_engine::receiver_current` states it:
+    /// `service_rounds = ceil(co_present_branch_population / site_capacity)`, and a passage costs
+    /// `characteristic_delay + (service_rounds − 1)`. This returns the second term.
+    ///
+    /// **The capacity is the corpus's own support for the site** — how many distinct sources attest
+    /// the cell's clause-lexical context — which is exactly how `relational_language` derives a
+    /// clause site's capacity, from `|morphology_sites|`. Nothing here authors a level: a widely
+    /// attested context serves its whole demand in one round; a barely attested one takes as many
+    /// rounds as its demand exceeds its attestation. That is the RIDE/FOUND asymmetry as a delay —
+    /// terrain that has already paid carries a branch at once, and terrain that has not makes it
+    /// wait.
+    ///
+    /// **The characteristic delay is one token, and that is material rather than pinned:** an
+    /// uncongested generation passage emits exactly one event, so its chronology is one event. The
+    /// caller adds it.
+    fn service_dilation(
+        &self,
+        site: u32,
+        co_present: u64,
+    ) -> Result<u64, MorphologicalLanguageError> {
+        let capacity = self
+            .clause_lexical_suffix
+            .state_sources(site)
+            .map_or(0, |sources| sources.len() as u64);
+        if capacity == 0 {
+            return Err(MorphologicalLanguageError::UnattestedGenerationSite(site));
+        }
+        Ok(co_present.div_ceil(capacity).saturating_sub(1))
+    }
+
+    fn expand_current(
+        &self,
+        charge: &MorphologicalQuestionCharge,
+        spec: MorphologicalGenerationSpec,
+        current: MorphologicalCurrentState,
+        population: MorphologicalCurrentPopulation,
+    ) -> Result<Vec<ExpandedCurrent>, MorphologicalLanguageError> {
+        let mut state = MorphologicalGenerationState {
+            current,
+            population,
+        };
+        if state.current.rest.is_some() {
+            return Ok(vec![ExpandedCurrent::carried(state)]);
+        }
+        if state.current.reflection.returned_event_count >= spec.maximum_observed_tokens {
+            self.finish_active_phase(charge, &mut state, None)?;
+            state.current.rest = Some(MorphologicalResponseRest::ObservationApertureExhausted {
+                open_obligations: open_face_indices(&state.current.open_faces),
+            });
+            return Ok(vec![ExpandedCurrent::carried(state)]);
+        }
+
+        if let Some(active) = state.current.active_phase.as_ref() {
+            let events = self.event_candidates(&state.current.reflection, active)?;
+            if events.is_empty() {
+                self.finish_active_phase(charge, &mut state, None)?;
+                if state.current.open_faces.is_empty() {
+                    state.current.rest = Some(MorphologicalResponseRest::Obstructed {
+                        open_obligations: BTreeSet::new(),
+                    })
+                }
+                // An exhausted local frontier is itself a caused obstruction. If another
+                // outer query fiber remains, the next loop may recruit a different local
+                // onset; no global clause-identity ban is installed.
+                return Ok(vec![ExpandedCurrent::progressed(state)]);
+            }
+            let mut opened = Vec::with_capacity(events.len());
+            for event in events {
+                let mut successor = state.fork();
+                self.enact_event(
+                    charge,
+                    &mut successor,
+                    event,
+                    MorphologicalTransport::RecurrentLexical,
+                )?;
+                opened.push(ExpandedCurrent::forked(successor));
+            }
+            Ok(opened)
+        } else {
+            let candidates = self.phase_candidates(charge, &state.current.open_faces)?;
+            if candidates.is_empty() {
+                state.current.rest = Some(MorphologicalResponseRest::Obstructed {
+                    open_obligations: open_face_indices(&state.current.open_faces),
+                });
+                return Ok(vec![ExpandedCurrent::carried(state)]);
+            }
+            let mut opened = Vec::with_capacity(candidates.len());
+            for candidate in candidates {
+                let mut successor = state.fork();
+                self.begin_phase(charge, &mut successor, candidate)?;
+                opened.push(ExpandedCurrent::forked(successor));
+            }
+            Ok(opened)
+        }
     }
 
     fn phase_candidates(
@@ -1208,10 +1382,28 @@ impl MorphologicalLanguageEcology {
         )
     }
 
+    /// **Recruit under the maximal cover, and fall back only if it returns nothing.**
+    ///
+    /// This is the union over covers in `I(R) = ⋃_K ⋂_{f∈K} I(f)`, taken with the largest block
+    /// first: a receiver whose whole active family is carried together recruits from that, and only
+    /// a receiver nothing carries whole falls back to the faces it touches.
     fn event_candidates(
         &self,
         reflection: &ReflectiveCurrentFront,
         active: &ActiveResponseCurrent,
+    ) -> Result<Vec<EventCandidate>, MorphologicalLanguageError> {
+        let complete = self.event_candidates_under(reflection, active, ContextCover::Complete)?;
+        if !complete.is_empty() {
+            return Ok(complete);
+        }
+        self.event_candidates_under(reflection, active, ContextCover::Touching)
+    }
+
+    fn event_candidates_under(
+        &self,
+        reflection: &ReflectiveCurrentFront,
+        active: &ActiveResponseCurrent,
+        cover: ContextCover,
     ) -> Result<Vec<EventCandidate>, MorphologicalLanguageError> {
         let mut candidates = BTreeMap::<(String, RecurrentSupportKey), EventCandidate>::new();
         let active_sources = active
@@ -1303,7 +1495,11 @@ impl MorphologicalLanguageEcology {
                             .ok_or(MorphologicalLanguageError::MalformedFiber)
                     })
                     .collect::<Result<BTreeSet<_>, _>>()?;
-                if context_clauses.is_disjoint(&active.clauses) {
+                let carries_the_family = match cover {
+                    ContextCover::Complete => active.clauses.is_subset(&context_clauses),
+                    ContextCover::Touching => !context_clauses.is_disjoint(&active.clauses),
+                };
+                if !carries_the_family {
                     continue;
                 }
                 let context_sources = context_clauses
@@ -1381,10 +1577,16 @@ impl MorphologicalLanguageEcology {
                 let context_passages = branch
                     .context_sources_for_support(support)
                     .ok_or(MorphologicalLanguageError::MalformedFiber)?;
-                if context_passages
-                    .iter()
-                    .all(|passage| !active.passages.contains(passage))
-                {
+                let carries_the_family = match cover {
+                    ContextCover::Complete => active
+                        .passages
+                        .iter()
+                        .all(|passage| context_passages.contains(passage)),
+                    ContextCover::Touching => context_passages
+                        .iter()
+                        .any(|passage| active.passages.contains(passage)),
+                };
+                if !carries_the_family {
                     continue;
                 }
                 if passages
@@ -1476,6 +1678,56 @@ impl MorphologicalLanguageEcology {
         candidates.retain(|_, candidate| {
             !candidate.sources.is_empty()
                 && (!candidate.clause_horizons.is_empty() || !candidate.passage_horizons.is_empty())
+        });
+
+        // **Nondomination, on the exact witnesses — the same law `phase_candidates` already runs.**
+        //
+        // A phase candidate is removed only when another carries every one of its exact witnesses
+        // and at least one strictly stronger, which is the ratified rule: *"No scalar score,
+        // probability, softmax, embedding distance, random sample, or host-written answer selects
+        // the result."* Domination is not ranking — it is a partial order, so incomparable
+        // candidates all survive and plurality is still the return.
+        //
+        // **`event_candidates` ran no such filter.** Its only test was non-emptiness, so a token
+        // reachable through a strictly poorer witness family opened a branch beside the richer one
+        // that subsumes it, and the population multiplied by every such shadow at every step. That
+        // is the difference between a machine that resonates with the structure that carries the
+        // receiver's face and one that couples everything it touched.
+        // Domination is decided in place over the candidate population — nothing is materialized
+        // to ask the question, and `LocalSet` is the substrate's own carrier for the answer.
+        // Positions rather than copied keys: `BTreeMap::retain` visits in the same key order
+        // `iter` does, so the index is the address and nothing is duplicated to remember it.
+        let mut dominated = LocalSet::new();
+        for (at, (key, candidate)) in candidates.iter().enumerate() {
+            let subsumed = candidates.iter().any(|(other_key, other)| {
+                other_key != key
+                    && other.token == candidate.token
+                    && candidate.clause_horizons.is_subset(&other.clause_horizons)
+                    && candidate.passage_horizons.is_subset(&other.passage_horizons)
+                    && candidate
+                        .recurrence_multiplicities
+                        .is_subset(&other.recurrence_multiplicities)
+                    && candidate.clauses.is_subset(&other.clauses)
+                    && candidate.passages.is_subset(&other.passages)
+                    && candidate.sources.is_subset(&other.sources)
+                    // Strictly stronger somewhere. Witness-identical candidates are incomparable
+                    // and both stand: this is a partial order, never a ranking.
+                    && (candidate.clause_horizons != other.clause_horizons
+                        || candidate.passage_horizons != other.passage_horizons
+                        || candidate.recurrence_multiplicities != other.recurrence_multiplicities
+                        || candidate.clauses != other.clauses
+                        || candidate.passages != other.passages
+                        || candidate.sources != other.sources)
+            });
+            if subsumed {
+                dominated.insert(at);
+            }
+        }
+        let mut at = 0usize;
+        candidates.retain(|_, _| {
+            let keep = !dominated.contains(&at);
+            at += 1;
+            keep
         });
         Ok(candidates.into_values().collect())
     }

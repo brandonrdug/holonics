@@ -406,7 +406,9 @@ impl CudaRefineExecutor {
         let count = sites.len();
         if count == 0 {
             return Ok(DeviceSaturation {
-                horizon: 1,
+                // No occurrence, so no shell ever split: the least final radius is 0. This was `1`,
+                // the same authored floor the host law carried at `last_split.max(1)`.
+                horizon: 0,
                 classes: 0,
                 shells: 0,
                 classes_at_one: 0,
@@ -527,7 +529,10 @@ impl CudaRefineExecutor {
         }
 
         Ok(DeviceSaturation {
-            horizon: last_split.max(1),
+            // `0` when no shell ever split, which is the reading and not a floor. The host law's
+            // `SaturationHorizon::horizon` carries the same convention and the two are compared
+            // directly by `the_card_refines_the_front`.
+            horizon: last_split,
             classes: previous_classes,
             shells,
             classes_at_one,

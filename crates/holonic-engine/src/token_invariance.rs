@@ -1780,12 +1780,18 @@ pub fn sweep_covered(
         .filter(|section| matches!(section.chart, ChartId::Device(_)))
         .map(|section| section.cells.len())
         .sum();
-    let lanes = cover.host().lanes.max(1) as usize;
+    // **The caller's declared width, unclamped.** This read `.max(1)`, which silently rewrote a
+    // declaration of zero host lanes into one. The only value it changed was `0`, and `0` and `1`
+    // take the same branch below, so it was an authored floor with no orbit sitting on top of a
+    // caller-declared level — the worse of the two, because it overrode a declaration.
+    let lanes = cover.host().lanes as usize;
 
     // Independence is checked before any work is issued. A barrier is not worked around: the sweep
-    // falls back to one lane, which is always licensed.
+    // falls back to one lane, which is always licensed. A width of zero -- no declared lanes, or no
+    // surfaces to spread over -- lands on the same single section, because there is nothing to
+    // spread.
     let licensed = decomposition.independence(&front).is_ok();
-    let effective_lanes = if licensed { lanes.min(surfaces.len().max(1)) } else { 1 };
+    let effective_lanes = if licensed { lanes.min(surfaces.len()) } else { 1 };
 
     let readings = if effective_lanes <= 1 {
         surfaces
@@ -1989,9 +1995,11 @@ pub fn collapsing_family_population(
 //
 // # Why the derivation terminates, and it is a theorem about the material
 //
-// No window can reach past the longest whole, so at `bound = max stream length` every window
-// already carries its occurrence's entire whole and no deeper horizon can refine anything. That
-// bound is **read off the census**; nobody declares it.
+// An occurrence at position `p` of a whole of length `L` reads shells while `k ≤ max(p, L−1−p)` and
+// `(None, None)` forever after, so a surface's own occurrences fix its ceiling exactly and no deeper
+// horizon can refine anything. That bound is **read off the material this surface occupies**; nobody
+// declares it. The corpus-wide `max stream length` is the ceiling of those ceilings and remains a
+// real reading about the corpus — it is simply not any one surface's cost.
 //
 // Within `[0, bound]` the class count is monotone non-decreasing, because refinement can only
 // split. And a refinement with the same number of blocks **is** the same partition. So
@@ -2023,35 +2031,142 @@ pub fn material_horizon_bound(census: &CorpusCensus) -> usize {
         .unwrap_or(0)
 }
 
+/// **One surface's own ceiling, exactly**, from its own occurrences and nothing else.
+///
+/// An occurrence at position `p` of a whole of length `L` reads `at(−k)` while `k ≤ p` and `at(+k)`
+/// while `k ≤ L−1−p`, so past `max(p, L−1−p)` its shell is `(None, None)` forever. A surface can
+/// therefore separate nothing past the maximum of that over its **own** sites, and that maximum is
+/// read off the material the same way [`material_horizon_bound`] is — only from the part of the
+/// material this surface actually occupies.
+///
+/// **This replaced [`material_horizon_bound`] as the propagation's ceiling.** Using the longest
+/// whole in the *whole census* as every surface's ceiling makes one unrelated long document lengthen
+/// the loop of every surface that never saturates, for identical material: a corpus-global
+/// coordinate deciding a surface-local cost, which is the absolute-frame defect at the level of a
+/// cost law. The corpus-wide figure remains a real reading — it is the ceiling of the ceilings — and
+/// is still what a caller reports about the corpus.
+pub fn surface_horizon_bound(census: &CorpusCensus, surface: SurfaceId) -> usize {
+    let wholes = census.wholes();
+    census
+        .sites(surface)
+        .iter()
+        .map(|(whole, position)| {
+            let length = wholes[*whole as usize].stream.len();
+            let left = *position as usize;
+            let right = length.saturating_sub(1).saturating_sub(left);
+            left.max(right)
+        })
+        .max()
+        .unwrap_or(0)
+}
+
+/// **A refinement that stalled and then resumed, with the witness that proves it.**
+///
+/// This is the object that makes "a quiet shell is not saturation" checkable rather than asserted.
+/// It names three things an early-halting loop gets wrong, and every one of them is read off the
+/// propagation rather than declared:
+///
+/// - `quiet_shell` — the depth at which the unsound loop stops;
+/// - `resumed_at` — a **strictly later** depth that did split, so the stop was premature;
+/// - `separated` — two occurrences that `resumed_at` pulled apart and `quiet_shell` left merged.
+///
+/// The last is the distinguishing word. A count of quiet shells says a stall happened; this says
+/// *which two occurrences an early halt would have failed to tell apart*, which is the same shape
+/// `receiver_exact_compression` returns for a collapsed pair.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Resumption {
+    /// The quiet shell — it split nothing, and an early-halting loop returns it as the horizon.
+    pub quiet_shell: usize,
+    /// The later shell that split. Strictly greater than `quiet_shell`.
+    pub resumed_at: usize,
+    /// Classes entering `resumed_at`, which is what the quiet shell left standing.
+    pub classes_before: usize,
+    /// Classes leaving `resumed_at`. Strictly greater than `classes_before`; the difference is what
+    /// halting at `quiet_shell` would have lost.
+    pub classes_after: usize,
+    /// The two occurrences — `(whole, position)` each — that `resumed_at` first separated. Neither
+    /// is distinguishable from the other at `quiet_shell`.
+    pub separated: ((u32, u32), (u32, u32)),
+}
+
 /// One surface's horizon, derived rather than declared.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct SaturationHorizon {
     pub surface: SurfaceId,
     /// The least horizon whose partition is already final.
+    ///
+    /// **`0` is a reading, not a floor.** It says *no shell ever split*: this surface's occurrences
+    /// were never separated by the cone at any radius the material admits, either because there is
+    /// at most one of them or because they are indistinguishable to this receiver at every depth.
+    /// The field carried `last_split.max(1)` until 2026-08-11, which reported a radius of one for a
+    /// surface whose least final radius is zero — an authored floor, invisible to
+    /// `tools/authored_levels.py` because it is not a `const`, and shielded from its own unit test
+    /// by an `if horizon > 1` guard that excluded exactly the case the floor decided.
     pub horizon: usize,
-    /// The material ceiling the search ran inside, from [`material_horizon_bound`].
+    /// **This surface's own ceiling**, from [`surface_horizon_bound`] — the furthest shell any of
+    /// its own occurrences can still read before both sides are off the end of their whole.
+    ///
+    /// Not [`material_horizon_bound`], which is the corpus's ceiling and was used here until
+    /// 2026-08-11. That made one unrelated long document lengthen every non-saturating surface's
+    /// propagation for material that had not changed.
     pub bound: usize,
     /// The final class count — what the receiver can distinguish at all, at any depth.
     pub classes: usize,
     /// The class count at horizon 1, so the orbit of the level this replaces is visible.
     pub classes_at_one: usize,
-    /// The class count immediately **before** the last split. `classes_before < classes` is the
-    /// proof that the returned horizon is LEAST — one shell shallower was still refining — and it
-    /// costs nothing, because the propagation passes through that state anyway.
+    /// The class count immediately **before** the last split — the partition at `horizon − 1`,
+    /// carried out of the propagation, which passes through that state anyway.
+    ///
+    /// It is **not** evidence that the horizon is least, and was described as that proof until
+    /// 2026-08-11. It is written only on a shell that split, and a shell that split leaves strictly
+    /// more classes than it found, so `classes_before < classes` cannot come out false. What it
+    /// carries is the *amount* the last shell separated, which does vary with the material. See
+    /// [`is_least`].
+    ///
+    /// [`is_least`]: SaturationHorizon::is_least
     pub classes_before: usize,
-    /// Shells actually propagated. Stops at the ceiling or when every class is a singleton.
+    /// Shells actually propagated. Stops at this surface's own ceiling or when every class is a
+    /// singleton.
     pub shells: usize,
+    /// **Interior quiet shells: the evidence that stopping at the first quiet shell is unsound.**
+    ///
+    /// A shell is *interior quiet* when it split nothing **and** a later shell did split. That is
+    /// the exact population an early-halting loop would have mistaken for saturation, and it is
+    /// non-zero precisely on material where the sound loop and the unsound one disagree. Trailing
+    /// quiet shells — the ones after the last split, which every propagation that reaches the
+    /// ceiling walks — are deliberately **not** counted: they are not evidence of anything, because
+    /// halting on them returns the right answer.
+    pub interior_quiet_shells: usize,
+    /// The **first resumption, with its witness**: the quiet shell, the later shell that split, and
+    /// the two occurrences that shell pulled apart.
+    ///
+    /// `CLAUDE.md` §8: *a gauge should be required to exhibit its distinguishing word.* This is it —
+    /// the point at which the sound and the unsound derivation part company on this surface, named
+    /// rather than counted. `None` exactly when [`interior_quiet_shells`] is zero.
+    ///
+    /// [`interior_quiet_shells`]: SaturationHorizon::interior_quiet_shells
+    pub first_resumption: Option<Resumption>,
     /// **How the propagation terminated, and only one of the two is a proof.**
     ///
     /// `true` — every class became a singleton, so no deeper shell can split anything and the
-    /// horizon is final as a theorem. `false` — the material ceiling was reached with classes still
-    /// plural, so those occurrences are indistinguishable to this receiver at any depth. Reporting
-    /// which is the difference between a checked claim and an assumed one.
+    /// horizon is final as a theorem. `false` — this surface's own ceiling was reached with classes
+    /// still plural, so those occurrences are indistinguishable to this receiver at any depth.
+    /// Reporting which is the difference between a checked claim and an assumed one.
+    ///
+    /// It is read off the returned partition. It was a flag set on one of the loop's two exits until
+    /// 2026-08-11, which reported `false` for a surface whose last pair separated exactly at its
+    /// ceiling — the theorem, filed as the assumption.
     pub exhausted: bool,
     /// **The cost, exactly**: occurrences still carrying difference, summed over the shells that
     /// were propagated. This is the volume of the cone that was still live — not the cone's volume,
     /// and not a wall-clock reading. `CLAUDE.md` §8: a cost is measured in work, never in elapsed
     /// time.
+    ///
+    /// It is the propagation's *whole* cost as of 2026-08-11 and was not before: singletons used to
+    /// be drained and re-pushed every shell, so the real per-shell work was `Θ(classes)` while this
+    /// field reported `Θ(active)`. Retiring a singleton into a count the moment it appears made the
+    /// two the same quantity. The number is exact and machine-independent; it reproduces bit for bit
+    /// on any host.
     pub active_total: usize,
 }
 
@@ -2068,15 +2183,28 @@ impl SaturationHorizon {
 
     /// True when one shell shallower was still refining — the returned horizon is **least**.
     ///
-    /// Vacuously true at horizon 1, where there is no shallower shell to be refining.
+    /// **This cannot return `false`, and that is a `definition`-grade receipt rather than a
+    /// control.** `classes_before` is written only on a shell that split, and a shell that split
+    /// leaves strictly more classes than it found; no later shell splits, so the final count is that
+    /// one. `classes_before < classes` is therefore a theorem about the loop, not a measurement of
+    /// the material, and `CLAUDE.md` §8 says a receipt that could not have come out otherwise
+    /// carries no evidence. Leastness **is** graded, independently, by
+    /// `the_horizon_is_read_off_the_material_not_declared`, which rebuilds the partition one shell
+    /// shallower through [`SeparationComplex::read`] and compares — a route that can fail.
     pub fn is_least(&self) -> bool {
-        self.horizon <= 1 || self.classes_before < self.classes
+        self.horizon == 0 || self.classes_before < self.classes
     }
 
-    /// True when at least one shell was propagated past the answer and split nothing. Evidence
-    /// the loop did not simply stop at the first quiet shell — which would be unsound.
-    pub fn walked_past(&self) -> bool {
-        self.shells > self.horizon
+    /// True when the propagation crossed a shell that split nothing and then split again later.
+    ///
+    /// **This replaced `walked_past`, which could not fail.** That method returned
+    /// `shells > horizon`, which is false on every propagation that exhausts to singletons — the
+    /// last shell walked *is* the last shell that split — so it read `false` on the very fixture
+    /// built to exhibit a stall. It measured no interior quiet shell at all; it measured whether the
+    /// loop reached the ceiling with the horizon strictly inside it, which is a restatement of
+    /// `!exhausted` on all but the boundary case `horizon == bound`.
+    pub fn stalled(&self) -> bool {
+        self.interior_quiet_shells > 0
     }
 }
 
@@ -2113,9 +2241,9 @@ fn shell(
 ///
 /// **A cone is not binary-searched. It propagates.** Light does not sample its way to a horizon; it
 /// advances one shell at a time and stops where the difference dies. So the partition is held and
-/// refined shell by shell, and only classes that are **still non-singleton** are ever touched — a
-/// singleton can never split again, which makes the active population shrink monotonically. The
-/// work is therefore
+/// refined shell by shell, and only classes that are **still non-singleton** are ever carried — a
+/// singleton can never split again, so it is retired into a count the moment it appears and is never
+/// looked at again. The work is therefore
 ///
 /// ```text
 ///   Σ_k  (occurrences still carrying difference at shell k)
@@ -2124,49 +2252,76 @@ fn shell(
 /// which is the volume of the cone *that is still carrying difference*, not the volume of the cone.
 /// Memory is `O(occurrences)`; no window is ever materialized.
 ///
+/// **That statement was false until 2026-08-11 and the repair is the retirement.** The loop used to
+/// `drain` the whole class vector every shell and push each singleton straight back, so per-shell
+/// work was `Θ(classes)` — and `classes` grows toward `occurrences` as the partition sharpens, which
+/// is the opposite of the shrinking front the doc claimed. Singletons are now retired into
+/// `settled`, and the only vector walked is the still-plural one.
+///
+/// # The ceiling is this surface's own, not the corpus's
+///
+/// An occurrence at position `p` of a whole of length `L` can reach `p` shells to the left and
+/// `L−1−p` to the right before both sides are off the end, so it contributes exactly
+/// `max(p, L−1−p)` reachable shells and nothing past that shell can ever separate anything. The
+/// surface's ceiling is the maximum of that over its **own** sites — [`surface_horizon_bound`] —
+/// and it is read off the material the same way the corpus-wide ceiling is, only from the part of
+/// the material this surface actually occupies.
+///
 /// # Why stopping is a theorem and not a heuristic
 ///
 /// A shell that splits nothing does **not** prove saturation: refinement can stall for one shell
 /// and resume — `Z A B C D E` against `W A B C D E`, read at `C`, agree at shells 1 and 2 and
 /// differ at 3. So the loop does not stop on a quiet shell. It stops when **every class is a
-/// singleton**, which is sound because a singleton cannot split at any depth, or at the material
-/// ceiling, past which every shell is `None` on both sides. The returned horizon is the **last
-/// shell that actually split a class** — the least radius whose partition is already final.
+/// singleton**, which is sound because a singleton cannot split at any depth, or at this surface's
+/// own ceiling, past which every shell is `None` on both sides. The returned horizon is the **last
+/// shell that actually split a class** — the least radius whose partition is already final — and it
+/// is `0` when no shell ever split.
 pub fn saturation_horizon(
     census: &CorpusCensus,
     atlas: &ConductAtlas,
     surface: SurfaceId,
 ) -> SaturationHorizon {
-    let bound = material_horizon_bound(census).max(1);
     let sites = census.sites(surface);
+    let bound = surface_horizon_bound(census, surface);
 
-    // The partition at shell 0: one class holding every occurrence.
-    let mut classes: Vec<Vec<(u32, u32)>> = vec![sites.to_vec()];
+    // The partition at shell 0: one class holding every occurrence. A class of one is already
+    // settled -- it can never split again -- so it is retired to a count rather than carried.
+    let mut plural = vec![sites.to_vec()];
+    let mut settled = 0usize;
+    if sites.len() <= 1 {
+        plural.clear();
+        settled = 1;
+    }
     let mut last_split = 0usize;
     let mut classes_at_one = 1usize;
     let mut classes_before = 1usize;
     let mut shells = 0usize;
     let mut active_total = 0usize;
-    let mut exhausted = false;
+    let mut interior_quiet_shells = 0usize;
+    let mut first_resumption: Option<Resumption> = None;
+    // Quiet shells since the last split. They become INTERIOR the moment a later shell splits, and
+    // stay uncounted otherwise, because a trailing quiet shell is not evidence of anything.
+    let mut quiet_run = 0usize;
+    let mut first_quiet_in_run: Option<usize> = None;
 
     for depth in 1..=bound {
-        // Only a non-singleton class can split. This is what keeps the work on the front.
-        let active: usize = classes.iter().filter(|c| c.len() > 1).map(Vec::len).sum();
+        // Only a non-singleton class can split, and only those are carried. This is what keeps the
+        // work on the front rather than on the whole partition.
+        let active: usize = plural.iter().map(Vec::len).sum();
         if active == 0 {
-            exhausted = true;
             break;
         }
-        let before = classes.len();
+        let before = settled + plural.len();
         shells += 1;
         active_total += active;
 
-        let mut refined: Vec<Vec<(u32, u32)>> = Vec::with_capacity(classes.len());
+        let mut refined: Vec<Vec<(u32, u32)>> = Vec::with_capacity(plural.len());
         let mut split = false;
-        for class in classes.drain(..) {
-            if class.len() == 1 {
-                refined.push(class);
-                continue;
-            }
+        // The first pair this shell actually pulls apart. Retained, not counted: a resumption's
+        // witness is two occurrences that an early halt would have left merged, and naming them
+        // costs one comparison per splitting class.
+        let mut separated: Option<((u32, u32), (u32, u32))> = None;
+        for class in plural.drain(..) {
             let mut grouped: BTreeMap<(Option<Reading>, Option<Reading>), Vec<(u32, u32)>> =
                 BTreeMap::new();
             for (whole, position) in class {
@@ -2177,29 +2332,70 @@ pub fn saturation_horizon(
             }
             if grouped.len() > 1 {
                 split = true;
+                if separated.is_none() {
+                    let mut groups = grouped.values();
+                    if let (Some(left), Some(right)) = (groups.next(), groups.next()) {
+                        if let (Some(one), Some(other)) = (left.first(), right.first()) {
+                            separated = Some((*one, *other));
+                        }
+                    }
+                }
             }
-            refined.extend(grouped.into_values());
+            for group in grouped.into_values() {
+                if group.len() == 1 {
+                    settled += 1;
+                } else {
+                    refined.push(group);
+                }
+            }
         }
-        classes = refined;
+        plural = refined;
         if split {
             last_split = depth;
             classes_before = before;
+            interior_quiet_shells += quiet_run;
+            if first_resumption.is_none() {
+                if let (Some(quiet_shell), Some(separated)) = (first_quiet_in_run, separated) {
+                    first_resumption = Some(Resumption {
+                        quiet_shell,
+                        resumed_at: depth,
+                        classes_before: before,
+                        classes_after: settled + plural.len(),
+                        separated,
+                    });
+                }
+            }
+            quiet_run = 0;
+            first_quiet_in_run = None;
+        } else {
+            quiet_run += 1;
+            if first_quiet_in_run.is_none() {
+                first_quiet_in_run = Some(depth);
+            }
         }
         if depth == 1 {
-            classes_at_one = classes.len();
+            classes_at_one = settled + plural.len();
         }
     }
 
     SaturationHorizon {
         surface,
-        horizon: last_split.max(1),
+        horizon: last_split,
         bound,
-        classes: classes.len(),
+        classes: settled + plural.len(),
         classes_at_one,
         classes_before,
         shells,
-        exhausted,
+        // **Read off the partition, not off which exit the loop took.** This was a flag set only on
+        // the `active == 0` branch, so a surface that separated its last pair exactly AT its ceiling
+        // fell out of the loop with every class a singleton and reported `exhausted == false` — a
+        // proof reported as an assumption. It never fired while the ceiling was the corpus's,
+        // because there was always another shell to observe the empty front in; tightening the
+        // ceiling to the surface's own made it reachable, and the stall fixture hit it immediately.
+        exhausted: plural.is_empty(),
         active_total,
+        interior_quiet_shells,
+        first_resumption,
     }
 }
 
@@ -2224,11 +2420,13 @@ pub fn saturation_horizons(
 pub fn corpus_horizon(
     horizons: &BTreeMap<SurfaceId, SaturationHorizon>,
 ) -> (usize, BTreeSet<SurfaceId>) {
+    // `0` on an empty population, because no surface forced anything. A `1` here would be the same
+    // authored floor the per-surface horizon carried until 2026-08-11.
     let deepest = horizons
         .values()
         .map(|reading| reading.horizon)
         .max()
-        .unwrap_or(1);
+        .unwrap_or(0);
     let forcing = horizons
         .iter()
         .filter(|(_, reading)| reading.horizon == deepest)
@@ -4110,18 +4308,24 @@ mod tests {
         let root = declared_corpus("saturation-horizon");
         let census = CorpusCensus::read(&root).unwrap();
         let atlas = atlas(&census);
-        let bound = material_horizon_bound(&census);
-        assert!(bound > 1, "the fixture must admit more than one shell");
+        let corpus_bound = material_horizon_bound(&census);
+        assert!(corpus_bound > 1, "the fixture must admit more than one shell");
+        let mut floored = 0usize;
 
         for surface in census.word_surfaces() {
             let derived = saturation_horizon(&census, &atlas, surface);
-            assert_eq!(derived.bound, bound, "the ceiling is the material's");
-            assert!(derived.horizon >= 1 && derived.horizon <= bound);
+            let bound = surface_horizon_bound(&census, surface);
+            assert_eq!(derived.bound, bound, "the ceiling is this surface's own");
+            assert!(
+                bound <= corpus_bound,
+                "a surface's own ceiling cannot exceed the corpus's: {bound} > {corpus_bound}"
+            );
+            assert!(derived.horizon <= bound);
 
-            // Monotone refinement, which is what makes the binary search valid. This is the
+            // Monotone refinement, which is what makes the derivation valid. This is the
             // property the derivation RESTS on, so it is checked rather than assumed.
             let mut previous = 0usize;
-            for horizon in 1..=bound {
+            for horizon in 1..=corpus_bound {
                 let classes =
                     SeparationComplex::read(&census, &atlas, surface, horizon).distinct_windows();
                 assert!(
@@ -4131,6 +4335,13 @@ mod tests {
                 previous = classes;
             }
             assert_eq!(previous, derived.classes, "the ceiling count is final");
+            // The surface's OWN ceiling is already final: nothing past it can separate, because
+            // every shell out there reads `(None, None)` on every one of its occurrences.
+            assert_eq!(
+                SeparationComplex::read(&census, &atlas, surface, bound).distinct_windows(),
+                derived.classes,
+                "this surface's own ceiling is already final; the corpus's adds nothing"
+            );
 
             // The derived level is the LEAST one that is final -- both halves.
             assert_eq!(
@@ -4139,7 +4350,18 @@ mod tests {
                 derived.classes,
                 "the derived horizon is already final"
             );
-            if derived.horizon > 1 {
+            // **No `horizon > 1` guard.** That guard excluded exactly the case the removed
+            // `.max(1)` decided. At horizon 1 the shallower reading is at horizon 0, which is the
+            // one-class partition, so the check is real there rather than skipped; and horizon 0
+            // is the surface saying no shell ever separated anything, which is checkable directly.
+            if derived.horizon == 0 {
+                floored += 1;
+                assert_eq!(
+                    derived.classes, 1,
+                    "horizon 0 means no shell split, so there is exactly one class: {derived:?}"
+                );
+                assert_eq!(derived.classes_before, 1);
+            } else {
                 assert!(
                     SeparationComplex::read(&census, &atlas, surface, derived.horizon - 1)
                         .distinct_windows()
@@ -4148,23 +4370,38 @@ mod tests {
                 );
             }
 
-            // The cone must never be propagated further than the material admits, and the
-            // live population must be bounded by the shells actually walked times the occurrences.
+            // The cone must never be propagated further than this surface's material admits, and
+            // the live population must be bounded by the shells walked times the occurrences.
             assert!(derived.shells <= bound, "{} shells past {bound}", derived.shells);
             assert!(
-                derived.active_total <= derived.shells * census.sites(surface).len().max(1),
+                derived.active_total <= derived.shells * census.sites(surface).len(),
                 "the live population cannot exceed shells x occurrences"
             );
         }
+
+        // The orbit of the excised floor, on the declared fixture: the branch above must be
+        // reached, or the fixture cannot grade the repair and this test is bookkeeping.
+        assert!(
+            floored > 0,
+            "no surface of this fixture reports horizon 0, so the removed `.max(1)` moved nothing \
+             here and the excision is ungraded"
+        );
     }
 
     /// **Refinement stalls, and a loop that stopped at the first quiet shell would be wrong.**
     ///
-    /// The declared corpus cannot grade this: measured 2026-08-10 over 29,533 real surfaces,
-    /// **zero** ever had a quiet shell before their last split, so `shells == horizon` everywhere
-    /// and a sound loop is indistinguishable from an unsound one on that material. `CLAUDE.md` §8 —
-    /// *when the declared material cannot exercise a law, add a declared control that does.* This
-    /// is that control, and it is built so the unsound loop returns a different answer.
+    /// **The premise this test was written under is withdrawn 2026-08-11.** It read: *"The declared
+    /// corpus cannot grade this: measured 2026-08-10 over 29,533 real surfaces, zero ever had a
+    /// quiet shell before their last split."* That zero came from `walked_past()`, which returned
+    /// `shells > horizon` — false on every propagation that exhausts to singletons, since the last
+    /// shell walked is the last shell that split. It measured no quiet shell at all. Re-measured
+    /// with `interior_quiet_shells`, the declared corpus carries **5,008 stalling surfaces and
+    /// 27,668 interior quiet shells**, so a loop halting on the first quiet shell returns the wrong
+    /// horizon on real material and not merely on a fixture.
+    ///
+    /// The control is kept, and it is now the stronger half rather than the only one: it exhibits
+    /// the **witness** — the exact shell the unsound loop halts at — against a second, independently
+    /// written loop, on material small enough to read.
     ///
     /// Three wholes, all carrying `c`:
     ///
@@ -4177,6 +4414,15 @@ mod tests {
     /// Shell 1 splits `B` off. **Shell 2 splits nothing** — `A` and `C` still agree and `B` is
     /// already a singleton. Shell 3 splits `A` from `C`. A loop halting on the quiet shell returns
     /// horizon 1 and two classes; the correct answer is horizon 3 and three classes.
+    ///
+    /// **The assertion this test used to make could not fail, and that was the whole defect.** It
+    /// read `assert!(derived.walked_past() || derived.exhausted)`. `walked_past` was
+    /// `shells > horizon`, which is `false` on every propagation that exhausts — the last shell
+    /// walked is the last shell that split — so on this fixture, built expressly to carry a stall,
+    /// it returned `false` and the disjunct was carried entirely by `exhausted`, which is `true`
+    /// here by construction. The quantity asserted below is `interior_quiet_shells`, which counts
+    /// the shells that split nothing **and were followed by one that did**, and it is non-zero
+    /// exactly on material where the sound and the unsound loop disagree.
     #[test]
     fn refinement_stalls_and_the_horizon_is_not_the_first_quiet_shell() {
         // Every declared stratum must be non-empty; the three carrying `c` are the fixture and the
@@ -4194,8 +4440,40 @@ mod tests {
         assert_eq!(derived.horizon, 3, "the last split is at shell three: {derived:?}");
         assert_eq!(derived.classes, 3, "all three occurrences separate");
         assert_eq!(derived.classes_at_one, 2, "shell one splits B off and nothing else");
-        assert!(derived.walked_past() || derived.exhausted);
-        assert!(derived.is_least(), "shell two was quiet, shell three split");
+
+        // **The stall itself, with its witness, and no disjunction anywhere.** Shell 2 split nothing
+        // and shell 3 split, so exactly one shell is interior quiet; the resumption names shell 2,
+        // shell 3, and the two occurrences shell 3 pulled apart. Every one of these is `0`/`None` on
+        // material that never stalls, which is what makes them assertions and not restatements.
+        assert_eq!(
+            derived.interior_quiet_shells, 1,
+            "shell two split nothing and shell three split: {derived:?}"
+        );
+        let resumption = derived.first_resumption.expect("the fixture stalls and resumes");
+        assert_eq!(resumption.quiet_shell, 2, "the unsound loop halts at shell two");
+        assert_eq!(resumption.resumed_at, 3, "shell three is the resumption");
+        assert!(resumption.quiet_shell < resumption.resumed_at);
+        assert_eq!(resumption.classes_before, 2, "A and C are still one class at shell two");
+        assert_eq!(resumption.classes_after, 3, "shell three separates them");
+
+        // The witness itself: two occurrences of `c` that shell 3 pulled apart. Read them back out
+        // of the corpus and confirm they agree at shell 2 and differ at shell 3 -- the exact
+        // property "a quiet shell is not saturation" asserts, checked on the named pair.
+        let (one, other) = resumption.separated;
+        assert_ne!(one, other);
+        assert_eq!(
+            shell(&census, &atlas, one.0, one.1, resumption.quiet_shell),
+            shell(&census, &atlas, other.0, other.1, resumption.quiet_shell),
+            "the witnesses must be INDISTINGUISHABLE at the quiet shell, or it was not quiet"
+        );
+        assert_ne!(
+            shell(&census, &atlas, one.0, one.1, resumption.resumed_at),
+            shell(&census, &atlas, other.0, other.1, resumption.resumed_at),
+            "the witnesses must SEPARATE at the resumption, or it did not resume"
+        );
+
+        assert!(derived.stalled());
+        assert!(derived.exhausted, "the stall does not prevent exhaustion");
 
         // The unsound loop, written out, so the difference is exhibited rather than asserted: stop
         // at the first shell that splits nothing and it answers 1 where the truth is 3.
@@ -4228,7 +4506,126 @@ mod tests {
             halted_at, derived.horizon,
             "if these agree the fixture does not separate the two loops"
         );
+        // The retained witness and the independently written unsound loop must name the SAME shell:
+        // the loop halts one shell before the first interior quiet one, by its own `depth - 1`.
+        assert_eq!(
+            halted_at + 1,
+            resumption.quiet_shell,
+            "the witness must be the shell the second implementation actually stopped at"
+        );
+
+        // **The negative arm, on the same material.** A quantity that were non-zero everywhere
+        // would grade nothing, so the fixture is required to carry a surface that never stalls.
+        let mut stalling = 0usize;
+        let mut still = 0usize;
+        for surface in census.word_surfaces() {
+            let reading = saturation_horizon(&census, &atlas, surface);
+            if reading.stalled() {
+                stalling += 1;
+            } else {
+                still += 1;
+            }
+            assert_eq!(
+                reading.stalled(),
+                reading.first_resumption.is_some(),
+                "the count and its witness must agree at {surface:?}: {reading:?}"
+            );
+            if let Some(resumption) = reading.first_resumption {
+                assert!(resumption.quiet_shell < resumption.resumed_at);
+                assert!(resumption.classes_before < resumption.classes_after);
+                assert!(resumption.resumed_at <= reading.horizon);
+            }
+        }
+        assert!(
+            stalling > 0 && still > 0,
+            "the fixture must separate stalling from non-stalling surfaces: \
+             {stalling} stall, {still} do not"
+        );
         let _ = fs::remove_dir_all(&root);
+    }
+
+    /// **The surface's ceiling is its own, and one unrelated long whole may not lengthen it.**
+    ///
+    /// `CLAUDE.md` §8 — *when the declared material cannot exercise a law, add a declared control
+    /// that does.* The declared corpus cannot grade this repair: every one of its 29,587 surfaces
+    /// exhausts to singletons long before any ceiling, so the ceiling never binds and the cost is
+    /// identical either way. This fixture builds the case where it does bind — two byte-identical
+    /// wholes, whose two occurrences of `c` are indistinguishable to this receiver at **every**
+    /// depth, so the propagation runs to the ceiling and the ceiling is the entire cost.
+    ///
+    /// The frame is then moved, which is the only way an invariant is visible: an unrelated long
+    /// whole is added that never writes `c`. Under the corpus-wide ceiling the identical material
+    /// costs strictly more; under the surface's own ceiling it costs the same.
+    #[test]
+    fn one_unrelated_long_whole_may_not_lengthen_another_surfaces_cone() {
+        let mut long = String::new();
+        for n in 0..400 {
+            long.push_str(&format!("w{n} "));
+        }
+
+        let build = |name: &str, filler: &str| {
+            let root = scratch(name);
+            // Two byte-identical wholes: `c` sits at the same place in both, so no shell ever
+            // separates the two occurrences and the propagation cannot exhaust.
+            write(&root, "papers/source/mathematics/a.typ", "k a c b k\n");
+            write(&root, "canon/a.md", "k a c b k\n");
+            write(&root, "research/records/a.md", filler);
+            write(&root, "reference/pureholonics-seed/a.md", "filler only\n");
+            root
+        };
+
+        let near = build("surface-local-ceiling-near", "q r s\n");
+        let far = build("surface-local-ceiling-far", &format!("{long}\n"));
+
+        let read_one = |root: &std::path::Path| {
+            let census = CorpusCensus::read(root).unwrap();
+            let atlas = atlas(&census);
+            let surface = census.lookup("c").expect("the fixture writes it");
+            (
+                material_horizon_bound(&census),
+                saturation_horizon(&census, &atlas, surface),
+            )
+        };
+        let (near_corpus_bound, near_reading) = read_one(&near);
+        let (far_corpus_bound, far_reading) = read_one(&far);
+
+        // The frame genuinely moved: the corpus ceiling is far larger in the second reading.
+        assert!(
+            far_corpus_bound > near_corpus_bound,
+            "the added whole must move the corpus ceiling, or this control grades nothing: \
+             {near_corpus_bound} -> {far_corpus_bound}"
+        );
+        // The law binds here: neither reading exhausts, so the ceiling IS the cost.
+        assert!(!near_reading.exhausted && !far_reading.exhausted);
+        assert_eq!(near_reading.horizon, 0, "the two occurrences never separate");
+        assert_eq!(near_reading.classes, 1);
+
+        // And the invariant: the surface's own ceiling, its shells, and its exact work do not move.
+        assert_eq!(near_reading.bound, far_reading.bound);
+        assert_eq!(near_reading.shells, far_reading.shells);
+        assert_eq!(near_reading.active_total, far_reading.active_total);
+        assert_eq!(near_reading.classes, far_reading.classes);
+
+        // What the corpus-wide ceiling would have cost on the SAME material, stated as the number
+        // the repair removed rather than as an impression.
+        let under_corpus_ceiling = far_corpus_bound * census_sites(&far, "c");
+        assert!(
+            under_corpus_ceiling > far_reading.active_total * 8,
+            "the control must exhibit a wide gap or it is not grading a cost law: \
+             {under_corpus_ceiling} against {}",
+            far_reading.active_total
+        );
+
+        let _ = fs::remove_dir_all(&near);
+        let _ = fs::remove_dir_all(&far);
+    }
+
+    /// The occurrence count of one surface in a corpus at `root`. Used by the ceiling control to
+    /// state what the corpus-wide ceiling would have cost.
+    fn census_sites(root: &std::path::Path, word: &str) -> usize {
+        let census = CorpusCensus::read(root).unwrap();
+        let surface = census.lookup(word).expect("the fixture writes it");
+        census.sites(surface).len()
     }
 
     /// The derivation has a non-trivial orbit: the material must disagree with the authored `1`

@@ -19,7 +19,7 @@ use std::{
 };
 
 use body::num::Cog;
-use holonic_structure::BranchLineage;
+use holonic_structure::{BranchLineage, LocalSet};
 use soma_abi::active::{ActionCurrent, RelationAtom};
 use soma_membrane::{
     LiveCurrentExecutor, LiveCurrentMachine, ParallelHostLiveCurrentExecutor,
@@ -55,6 +55,11 @@ pub enum MorphologicalLanguageError {
     EmptyObservationAperture,
     CarrierExtent,
     MalformedFiber,
+    /// A generation cell sat at a clause-lexical site the corpus attests in **no** source, so the
+    /// transport law has no capacity to divide by. Refused by name rather than floored to one:
+    /// zero support is not a small support, and `holonic_engine::receiver_current` itself refuses a
+    /// non-positive capacity.
+    UnattestedGenerationSite(u32),
     Route(CausalLanguageError),
     Resonance(ResonanceEcologyError),
     Suffix(ExactSuffixEcologyError),
@@ -168,6 +173,16 @@ pub struct MorphologicalReflectionReceipt {
     pub peak_live_current_states: usize,
     pub returned_events_carried: usize,
     pub terminal_return_materializations: usize,
+    /// **Passages the transport law dilated**, i.e. cells whose co-present demand exceeded the
+    /// corpus's attestation of their site and which therefore arrived later than the next token.
+    /// Zero here is a finding and not a default: it says the material never congested, so the delay
+    /// law was present in the code and absent from the evidence.
+    pub dilated_passages: usize,
+    /// The largest dilation any one passage took, in tokens beyond the uncongested one.
+    pub deepest_dilation: u64,
+    /// The furthest arrival chronology the front reached. Equal to the token depth exactly when
+    /// nothing dilated; strictly greater as soon as anything did.
+    pub deepest_chronology: u64,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]

@@ -83,60 +83,33 @@ struct ActiveResponseWitness {
 /// The operative reflection carried between emitted events. Both suffix currents are local
 /// receiver addresses in the one shared conditioned ecology. A returned event advances them
 /// directly; no complete chronology scan or branch-local body copy is needed.
-#[derive(Clone, Debug)]
+/// **Everything a later step consults is in the identity, and the founded terrain is consulted.**
+///
+/// A hand-written ordering excluded `recurrent_support_uses` here, on the reading that the founded
+/// set is terrain rather than position and so does not decide where a current *is*. That reading is
+/// wrong for this body as it stands, for a reason that is checkable rather than interpretive:
+/// **the field gates the next step.** `ecology.rs:1248`, `:1337` and `:1429` each ask
+/// `recurrent_support_uses.contains_key(&support_key)` and `continue` when it is present, so two
+/// currents carrying different founded sets do not have the same future — and merging them keeps
+/// whichever map arrived first and discards the other.
+///
+/// Measured, and this is why it is not an argument: under a by-count cover the surviving map was a
+/// function of the **lane count**, so generation returned 1,862 branches at one lane and **1,806 at
+/// two**. A realization coordinate decided which continuations existed, which is the defect
+/// `canon/THE_HOLOBROCHOS_SPINE.md` §6.6 names.
+///
+/// The population is `2^supports` while those three gates stand, and that is a real cost. It is not
+/// paid for here. Bounding the returned population is a construction on the transport law — the
+/// exact delay in `holonic_engine::receiver_current`, which `relational_language` consumes and this
+/// organ does not — and a body that returns too much is recoverable where a body that returns the
+/// wrong thing is not.
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 struct ReflectiveCurrentFront {
     clause_lexical: ExactSuffixCurrent,
     passage_lexical: ExactSuffixCurrent,
     last_surface: String,
     returned_event_count: usize,
     recurrent_support_uses: Arc<BTreeMap<RecurrentSupportKey, u64>>,
-}
-
-/// **The identity is where the current IS, not which sections it has founded.**
-///
-/// A current's future conduct is decided by its two suffix addresses, its last surface, and the
-/// depth its aperture is measured against. The founded set is **terrain** —
-/// `2026-07-17_THE_LEADER_GROWS_THE_CHANNEL…`: *"Each extension changes the material boundary from
-/// which later extension proceeds… the same passage can RIDE old sections while FOUNDing a new
-/// tip."*
-///
-/// Keeping terrain in the key made two branches that founded different sections permanently
-/// distinct, so the population was `2^supports`: a self-avoiding walk, which `H.0219` names a
-/// **barrier** rather than a decomposable law. Measured before this change: **14,018 response
-/// branches for a two-token prompt.**
-///
-/// Written by hand rather than derived, because a derive puts terrain back in the key. Sound only
-/// because a RIDE is admitted at `ecology.rs::enact_event`; refusing the second encounter while
-/// sharing terrain prunes a sibling that should have ridden.
-impl PartialEq for ReflectiveCurrentFront {
-    fn eq(&self, other: &Self) -> bool {
-        self.conduct_key() == other.conduct_key()
-    }
-}
-
-impl Eq for ReflectiveCurrentFront {}
-
-impl PartialOrd for ReflectiveCurrentFront {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
-impl Ord for ReflectiveCurrentFront {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        self.conduct_key().cmp(&other.conduct_key())
-    }
-}
-
-impl ReflectiveCurrentFront {
-    fn conduct_key(&self) -> (&ExactSuffixCurrent, &ExactSuffixCurrent, &str, usize) {
-        (
-            &self.clause_lexical,
-            &self.passage_lexical,
-            &self.last_surface,
-            self.returned_event_count,
-        )
-    }
 }
 
 /// Terminal testimony retained for an observer. It is deliberately absent from the current key:
@@ -634,12 +607,15 @@ pub(super) fn materialize_oriented_returned_seam(
         admissible_seam_population,
         materialized_seam_population,
     });
+    let (support_conduct, supporting_sources) = MorphologicalSupportConduct::of(&tokens);
     Ok(MorphologicalGeneratedCurrent {
         text: render_tokens(tokens.iter().map(|token| token.token.as_str())),
         tokens,
         phases: vec![phase],
         rest: MorphologicalResponseRest::Closed,
         caused_seams: caused_seams.into_iter().collect(),
+        support_conduct,
+        supporting_sources,
     })
 }
 

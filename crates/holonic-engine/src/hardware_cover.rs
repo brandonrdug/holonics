@@ -401,20 +401,28 @@ impl CoverSection {
     /// **Idle lanes are reported, never hidden.** A cell of `n` members on a chart of grain
     /// `g` occupies `ceil(n/g)·g` lanes, of which `ceil(n/g)·g − n` do nothing. That waste is a
     /// property of the placement and belongs in the receipt.
+    /// **Exact from the first addition, not exact at the end.** This accumulated `members` and
+    /// `occupied` in `u64` and converted afterwards, while its own return type's documentation
+    /// said *"`BigUint` throughout"*. `extent.div_ceil(g)·g` can exceed `u64` for a large extent
+    /// — `extent = 2^63` at `g = 32` already does — so the alleged exact carrier was constructed
+    /// out of a quantity that had already wrapped. A carrier that reduces before it is read has
+    /// decided for every consumer which magnitudes are invisible; the reduction belongs in the
+    /// reading and never in the constructor.
     pub fn work(&self, grain: u64) -> SectionWork {
         let grain = grain.max(1);
-        let members: u64 = self.cells.iter().map(|cell| cell.extent).sum();
-        let occupied: u64 = self
-            .cells
-            .iter()
-            .map(|cell| cell.extent.div_ceil(grain) * grain)
-            .sum();
+        let mut members = BigUint::from(0u32);
+        let mut occupied = BigUint::from(0u32);
+        for cell in &self.cells {
+            members += BigUint::from(cell.extent);
+            occupied += BigUint::from(cell.extent.div_ceil(grain)) * BigUint::from(grain);
+        }
         SectionWork {
             chart: self.chart,
             cells: BigUint::from(self.cells.len()),
-            members: BigUint::from(members),
-            occupied_lanes: BigUint::from(occupied),
-            idle_lanes: BigUint::from(occupied - members),
+            // `ceil(n/g)·g >= n` per cell, so the difference never underflows.
+            idle_lanes: &occupied - &members,
+            members,
+            occupied_lanes: occupied,
         }
     }
 }
@@ -435,10 +443,27 @@ pub struct SectionWork {
 /// Why a decomposition is not licensed. A barrier is named; it is never worked around.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Barrier {
-    /// Two sections claim the same cell. Their consequences cannot be shown to commute.
+    /// A cell is claimed more than once. `charts` carries one entry per CLAIM, with multiplicity,
+    /// so two sections reads `[Host(0), Device(0)]` and one section holding an index twice reads
+    /// `[Host(0), Host(0)]`. Counting sections rather than claims made the second invisible.
     SharedCell { cell: usize, charts: Vec<ChartId> },
     /// A cell of the front reached no chart. Silent loss is the failure this catches.
     UnplacedCell { cell: usize },
+    /// A cell was placed under the front's own address carrying a DIFFERENT extent. The placement
+    /// is then not a placement of this front: the work vector charges for material the front does
+    /// not hold, and every index still resolves.
+    ExtentDisagrees {
+        cell: usize,
+        chart: ChartId,
+        declared: u64,
+        placed: u64,
+    },
+    /// A section holds a cell the front never declared. Iterating the front cannot see it — the
+    /// extra cell is enacted, charged for, and reported by nothing.
+    ForeignCell { cell: usize, chart: ChartId },
+    /// The front itself addresses one index twice. Two cells sharing an address cannot be told
+    /// apart by any placement that addresses them by index, so no decomposition of it is provable.
+    RepeatedFrontCell { cell: usize },
 }
 
 impl std::fmt::Display for Barrier {
@@ -456,6 +481,23 @@ impl std::fmt::Display for Barrier {
             ),
             Barrier::UnplacedCell { cell } => {
                 write!(formatter, "cell {cell} reached no chart")
+            }
+            Barrier::ExtentDisagrees {
+                cell,
+                chart,
+                declared,
+                placed,
+            } => write!(
+                formatter,
+                "cell {cell} is declared with extent {declared} and placed on {chart} with extent \
+                 {placed}"
+            ),
+            Barrier::ForeignCell { cell, chart } => write!(
+                formatter,
+                "{chart} holds cell {cell}, which the front does not declare"
+            ),
+            Barrier::RepeatedFrontCell { cell } => {
+                write!(formatter, "the front declares cell {cell} more than once")
             }
         }
     }
@@ -523,27 +565,99 @@ impl CoverDecomposition {
     /// **Prove the decomposition is licensed.** Not asserted — checked.
     ///
     /// Two sections may run concurrently exactly when their consequences commute, and for a refinement
-    /// over disjoint cells that reduces to disjointness of the cells themselves. Every cell of the
-    /// front must reach exactly one chart: a cell claimed twice would be refined twice, and a cell
-    /// claimed zero times would vanish. Both are returned as named [`Barrier`]s.
+    /// over disjoint cells that reduces to disjointness of the cells themselves. The placement must
+    /// therefore be a partition of the front **as a population of `(index, extent)` cells**, and
+    /// every way it can fail to be one is returned as a named [`Barrier`].
+    ///
+    /// **Repaired 2026-08-11. The check licensed constructions it had not examined.** It iterated
+    /// the front and counted how many SECTIONS contained each index, which is blind to four
+    /// distinct ways a decomposition can differ from the front it claims to place:
+    ///
+    /// | not detected | why it matters |
+    /// |---|---|
+    /// | a changed extent under the same index | the work vector charges for material the front does not hold, and every index still resolves |
+    /// | a section cell absent from the front | iterating the front cannot reach it; it is enacted and reported by nothing |
+    /// | one index held twice inside ONE section | `filter(…).map(…)` yields that section once, so the count is 1 |
+    /// | a front that repeats an index | both cells find the same claimants and both pass |
+    ///
+    /// All four pass while the placement and the work have changed, so the certificate was not a
+    /// certificate of the front it named. `CLAUDE.md` §8: a check whose material cannot vary the
+    /// property under test is the same defect as a check that cannot fail — and this one wore a
+    /// passing result on exactly the constructions it existed to refuse.
     pub fn independence(&self, front: &[FrontCell]) -> Result<(), Vec<Barrier>> {
         let mut barriers = Vec::new();
-        for cell in front {
-            let claimants: Vec<ChartId> = self
-                .sections
-                .iter()
-                .filter(|section| section.cells.iter().any(|held| held.index == cell.index))
-                .map(|section| section.chart)
-                .collect();
-            match claimants.len() {
-                0 => barriers.push(Barrier::UnplacedCell { cell: cell.index }),
-                1 => {}
-                _ => barriers.push(Barrier::SharedCell {
-                    cell: cell.index,
-                    charts: claimants,
-                }),
+
+        // Nothing here materializes an index: every question is asked of the front and the
+        // sections directly. The check was already quadratic in the front — one pass per cell over
+        // the sections — so reading them in place costs what the old shape cost and owns nothing
+        // the caller did not already hand over.
+        for (at, cell) in front.iter().enumerate() {
+            // A repeated address is malformed BEFORE any placement is asked about: two cells
+            // sharing one address cannot be told apart by a placement that addresses them by
+            // index, so no decomposition of such a front is provable either way. Reported once,
+            // at the second occurrence.
+            if front[..at].iter().any(|earlier| earlier.index == cell.index) {
+                barriers.push(Barrier::RepeatedFrontCell { cell: cell.index });
+            }
+
+            // Claims are counted with MULTIPLICITY rather than by section, which is what makes an
+            // index held twice inside one section visible.
+            let mut claims = 0usize;
+            let mut first_claim = None;
+            for section in &self.sections {
+                for held in &section.cells {
+                    if held.index == cell.index {
+                        claims += 1;
+                        if first_claim.is_none() {
+                            first_claim = Some((section.chart, held.extent));
+                        }
+                    }
+                }
+            }
+
+            match (claims, first_claim) {
+                (0, _) | (_, None) => barriers.push(Barrier::UnplacedCell { cell: cell.index }),
+                (1, Some((chart, placed))) => {
+                    if placed != cell.extent {
+                        barriers.push(Barrier::ExtentDisagrees {
+                            cell: cell.index,
+                            chart,
+                            declared: cell.extent,
+                            placed,
+                        });
+                    }
+                }
+                _ => {
+                    // One entry per CLAIM, so two sections read `[Host, Device]` and one section
+                    // holding an index twice reads `[Host, Host]`.
+                    let mut charts = Vec::new();
+                    for section in &self.sections {
+                        for held in &section.cells {
+                            if held.index == cell.index {
+                                charts.push(section.chart);
+                            }
+                        }
+                    }
+                    barriers.push(Barrier::SharedCell {
+                        cell: cell.index,
+                        charts,
+                    });
+                }
             }
         }
+
+        // A placed cell the front never declared. The loop above cannot reach it, by construction.
+        for section in &self.sections {
+            for held in &section.cells {
+                if !front.iter().any(|cell| cell.index == held.index) {
+                    barriers.push(Barrier::ForeignCell {
+                        cell: held.index,
+                        chart: section.chart,
+                    });
+                }
+            }
+        }
+
         if barriers.is_empty() {
             Ok(())
         } else {
@@ -767,6 +881,127 @@ mod tests {
             ),
             Ok(()) => panic!("a duplicated cell must be refused"),
         }
+    }
+
+    /// **The four constructions the certificate used to admit, each refused by name.**
+    ///
+    /// Every one of these passed the index-presence check: the extent change and the doubled
+    /// index both leave one section holding the index, the foreign cell is never visited because
+    /// the loop iterated the front, and the repeated front cell resolves to the same claimant
+    /// twice. A certificate that accepts a changed construction is worse than an absent one,
+    /// because a caller reads it as a proof.
+    #[test]
+    fn the_certificate_refuses_a_placement_that_is_not_a_partition_of_its_own_front() {
+        let population = front(&[64, 64]);
+        let cover = HardwareCover::host_only();
+
+        // (1) The same address, a different extent. Index presence is unchanged.
+        let mut restated = CoverDecomposition::of(&cover, &population, "test");
+        restated.sections[0].cells[0].extent = 65;
+        match restated.independence(&population) {
+            Err(barriers) => assert!(barriers.iter().any(|barrier| matches!(
+                barrier,
+                Barrier::ExtentDisagrees {
+                    cell: 0,
+                    declared: 64,
+                    placed: 65,
+                    ..
+                }
+            ))),
+            Ok(()) => panic!("a restated extent must be refused"),
+        }
+
+        // (2) A cell the front never declared, so iterating the front cannot reach it.
+        let mut foreign = CoverDecomposition::of(&cover, &population, "test");
+        foreign.sections[0].cells.push(FrontCell {
+            index: 7,
+            extent: 1,
+        });
+        match foreign.independence(&population) {
+            Err(barriers) => assert!(
+                barriers
+                    .iter()
+                    .any(|barrier| matches!(barrier, Barrier::ForeignCell { cell: 7, .. }))
+            ),
+            Ok(()) => panic!("a foreign cell must be refused"),
+        }
+
+        // (3) One index held twice INSIDE one section. Counting sections yields 1.
+        let mut doubled = CoverDecomposition::of(&cover, &population, "test");
+        doubled.sections[0].cells.push(FrontCell {
+            index: 0,
+            extent: 64,
+        });
+        match doubled.independence(&population) {
+            Err(barriers) => assert!(barriers.iter().any(|barrier| matches!(
+                barrier,
+                Barrier::SharedCell { cell: 0, charts } if charts.len() == 2
+            ))),
+            Ok(()) => panic!("an index held twice in one section must be refused"),
+        }
+
+        // (4) A front addressing one index twice. No placement of it is provable.
+        let ambiguous = vec![
+            FrontCell {
+                index: 0,
+                extent: 64,
+            },
+            FrontCell {
+                index: 0,
+                extent: 8,
+            },
+        ];
+        let placed = CoverDecomposition::of(&cover, &ambiguous, "test");
+        match placed.independence(&ambiguous) {
+            Err(barriers) => assert!(
+                barriers
+                    .iter()
+                    .any(|barrier| matches!(barrier, Barrier::RepeatedFrontCell { cell: 0 }))
+            ),
+            Ok(()) => panic!("a front repeating an address must be refused"),
+        }
+
+        // And the control: the decomposition the law itself produces still passes.
+        let honest = CoverDecomposition::of(&cover, &population, "test");
+        assert!(honest.independence(&population).is_ok());
+    }
+
+    /// **The work vector is exact from its first addition.** `ceil(n/g)·g` for `n = 2^63` at
+    /// `g = 32` is `2^68`, which no `u64` holds; the return type's own documentation said
+    /// `BigUint` throughout while the accumulation was `u64`.
+    #[test]
+    fn the_work_vector_does_not_wrap_before_it_becomes_exact() {
+        let huge = vec![FrontCell {
+            index: 0,
+            extent: 1u64 << 63,
+        }];
+        let section = CoverSection {
+            chart: ChartId::Device(0),
+            cells: huge,
+        };
+        let work = section.work(32);
+        let members = BigUint::from(1u64 << 63);
+        assert_eq!(work.members, members);
+        // Exactly divisible at this grain, so occupied == members and nothing stands idle —
+        // the point is that both are past `u64::MAX / 32` and neither wrapped.
+        assert_eq!(work.occupied_lanes, members);
+        assert_eq!(work.idle_lanes, BigUint::from(0u32));
+
+        // One member past a multiple of the grain: 2^63 + 1 members occupy 2^63 + 32 lanes.
+        let past = CoverSection {
+            chart: ChartId::Device(0),
+            cells: vec![FrontCell {
+                index: 0,
+                extent: (1u64 << 63) + 1,
+            }],
+        };
+        let work = past.work(32);
+        assert_eq!(
+            work.occupied_lanes,
+            BigUint::from((1u64 << 63) + 32),
+            "the ceiling is taken in BigUint, so it may exceed u64::MAX/32 without wrapping"
+        );
+        assert_eq!(work.idle_lanes, BigUint::from(31u32));
     }
 
     /// **The front expansion is exact under any cover: lanes may not move a result.**
