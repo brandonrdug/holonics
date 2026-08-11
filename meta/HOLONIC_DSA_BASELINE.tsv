@@ -113,7 +113,7 @@ crates/holonic-engine/src/substitution_realizers.rs	.clone()=22	.collect()=18	.f
 crates/holonic-engine/src/supported_realizers.rs	.clone()=3	.collect()=8	.flat_map()=1	.into_iter()=2	BTreeMap=5	BTreeSet=2	Vec=11
 crates/holonic-engine/src/surprisal.rs	.clone()=24	.collect()=3	BTreeMap=14	Vec=3
 crates/holonic-engine/src/temper.rs	.clone()=7	.collect()=9	.into_iter()=4	BTreeSet=8	Vec=10
-crates/holonic-engine/src/token_invariance.rs	.clone()=10	.collect()=51	.into_iter()=17	BTreeMap=38	BTreeSet=25	Vec=84
+crates/holonic-engine/src/token_invariance.rs	.clone()=27	.collect()=62	.flat_map()=2	.into_iter()=20	BTreeMap=42	BTreeSet=27	Vec=102
 crates/holonic-engine/src/tube.rs	.clone()=59	.collect()=18	.flat_map()=3	.into_iter()=4	BTreeMap=36	BTreeSet=40	Vec=21
 crates/holonic-engine/src/wave_propagation.rs	.clone()=24	.collect()=12	.flat_map()=1	.into_iter()=2	BTreeMap=11	BTreeSet=12	Vec=43
 crates/holonic-engine/src/winding_inertia.rs	.clone()=28	.collect()=22	Vec=57
