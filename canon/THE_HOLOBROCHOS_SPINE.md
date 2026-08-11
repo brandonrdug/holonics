@@ -416,6 +416,32 @@ reappearing under different names.
   no join at all**, in library or driver. Nothing has handed a matroid's form to the organ that names
   windings.
 
+  **CLOSED 2026-08-10, and the join's reach is one matroid.** The library edge is
+  `ChowRing::cyclic_generator_receiver` (`matroid_chow.rs`), which hands the pairing to
+  `winding_inertia::cyclic_receiver_of_form`; the driver is
+  `crates/holonic-engine/examples/the_matroid_names_its_windings.rs`. The organ takes a **circulant**,
+  and a form's order is a receiver coordinate — `Matroid::flats` sorts by rank then bitmask, which is
+  a reading convention — so the join is a **declared cyclic reading**, transported through
+  `inertia::congruence` so Sylvester's law applies and the split cannot move.
+
+  **What the material returned is mostly a refusal, and the refusal is a theorem.** A circulant
+  carries `c_0` at every diagonal entry, so a cyclic reading needs `deg(x_F²)` constant over the
+  flats. On a simple rank-three matroid `deg(x_L²) = −1` and `deg(x_p²) = 1 − |{lines through p}|`,
+  so constancy puts every point on exactly two lines, which forces `|E| = 3`. **`U(3,3)` is the only
+  simple rank-three matroid whose generator pairing a character group can see**; `U(3,4)`, `M(K4)`,
+  the Fano plane and the non-Pappus matroid are each refused by `DiagonalIsNotConstant` naming the
+  flat, and `U(2,3)`/`U(4,4)` never reach the question because the pairing wants a top grade of two.
+
+  On `U(3,3)` the same form is **refused in the ring's own flat order and admitted in the reading
+  `[0,3,1,5,2,4]`**, where it is `−I + Adj(C₆)`, first row `[−1,1,0,0,0,1]`. Three routes return one
+  split `(1 with, 2 null, 3 against)`: elimination in the flat order, elimination in the reading, and
+  the character route. The two null passages are the conjugate pair at windings `1/6` and `5/6` and
+  they are the ring's own relation ideal — `|E| − 1 = 2`, and `extent − dim A¹ = 2` by an independent
+  row reduction. The single returning direction the Hodge index theorem promises is **character
+  zero, the zero-frequency passage**, star polygon `{1/0}`, cross-checked through the ring's own
+  multiplication as `deg((Σ_F x_F)²) = 6 > 0`. The three against-the-turn passages are named `1/3`,
+  `1/2`, `2/3` rather than counted as three negatives.
+
 ### Written and reaching nothing
 
 **Measured 2026-08-08 by grepping every public type each defines against the whole tree.** The `then`

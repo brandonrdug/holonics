@@ -197,20 +197,28 @@ check — is unbuilt, and it is the same driver that would close both.
 ~29 of the ~41 mutation survivors the adversaries reported were never re-tested. 25 of 33 drivers the
 form-mouth repair touched ran only as far as compiling, because their corpora are not in this tree.
 
-### 4.9 · The ownership ratchet does not run, and the cause is one missing file
+### 4.9 · The ownership ratchet does not run — CLOSED 2026-08-10, and there were two frames
 
-`crates/holonic-architecture-lint` is a workspace member and is not invoked by anything. Running it
-gives the exact cause:
+**This section said the cause was "one missing file." It was two, and the first hid the second.**
+`check_repository` reads the baseline before taking the census, so execution never reached the
+roots, and every report before 2026-08-10 named only the file:
 
 ```text
 holonic architecture lint failed: failed to read
   /home/b/Workspaces/holonics/HOLONIC_DSA_BASELINE.tsv: No such file or directory
 ```
 
-The baseline is a monotone census the ratchet compares against — counts may only fall, and a new
-file starts at zero allowance. The laboratory's own copy is 135 lines over 616 protected files and
-is readable at `git -C /home/b/Workspaces/laboratory show a07ff376:HOLONIC_DSA_BASELINE.tsv`.
-Regenerating it against this tree is what turns the ratchet on.
+The second frame surfaces only under `--emit-baseline`, which skips the baseline read: three of the
+five `PROTECTED_ROOTS` carried the laboratory's `src/soma/` prefix, so **the ratchet covered none of
+`soma/`** — 77 files it now covers and covered zero of. `canon/THE_QUOTE_NETWORK.md` had recorded
+both in more detail than any other file in the tree.
+
+**Both repaired.** The baseline is `meta/HOLONIC_DSA_BASELINE.tsv`, emitted from a **detached
+worktree of the commit** rather than from the working tree — 193 files, 18,203 inherited occurrences
+— so uncommitted work that adds an ownership occurrence shows up red by file and construct. A
+missing protected root is refused by name, and `every_protected_root_resolves_in_this_repository` is
+the test that would have caught the laboratory frame on the day it arrived. It runs as the last gate
+of `tools/gates.sh`.
 
 ### 4.10 · Still absent, from the position record and re-verified today
 

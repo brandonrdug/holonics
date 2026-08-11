@@ -144,7 +144,7 @@ use thiserror::Error;
 use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
 use crate::exact_value::{AlgebraicRoot, ExactInterval, ExactValueError, IntegerPolynomial};
 use crate::grown_cell::GrownComplex;
-use crate::inertia::{Inertia, InertiaError, SymmetricForm};
+use crate::inertia::{Inertia, InertiaError, SymmetricForm, congruence};
 use crate::rational_polynomial::{
     ExactPolynomialError, RootSeparation, interior_split_schedule, nonzero_root_lower_bound,
     root_separation, squared_shrinking_steps, worst_retained_fraction,
@@ -275,6 +275,90 @@ impl SymmetricCirculant {
             *entry /= &content;
         }
         (Rat::new(denominator, content), symbol)
+    }
+
+    /// Read a symmetric form **under a declared cyclic ordering of its directions**.
+    ///
+    /// [`Self::from_symmetric_form`] asks whether a form is circulant *in the order it arrived in*,
+    /// and an order is a receiver coordinate. A form whose directions carry no intrinsic order — the
+    /// generators of a Chow ring are indexed by flats, and [`crate::matroid_chow::Matroid::flats`]
+    /// orders them by rank and then by bitmask, which is a reading convention and nothing more — can
+    /// therefore be refused in one order and admitted in another **while being the same form**.
+    ///
+    /// The reordering is routed through [`crate::inertia::congruence`], which refuses a singular
+    /// change of basis, so this is Sylvester's own operation and not a hand-rolled shuffle: the split
+    /// is invariant across every reading, and only the *nameability of the passages* moves. That is
+    /// the whole content — an invariant is only visible across two frames, and here the two frames
+    /// are two orders on one form.
+    ///
+    /// Nothing is symmetrized, wrapped or averaged. If the declared reading does not make the form
+    /// circulant the refusal is [`WindingError::NotCirculant`] as before, naming the offending entry
+    /// **in reading coordinates**.
+    pub fn read_cyclically(
+        form: &SymmetricForm,
+        reading: &CyclicReading,
+    ) -> Result<Self, WindingError> {
+        if reading.extent() != form.extent() {
+            return Err(WindingError::ReadingExtentMismatch {
+                extent: form.extent(),
+                found: reading.extent(),
+            });
+        }
+        let transported = congruence(form, &reading.basis()?)?;
+        Self::from_symmetric_form(&transported)
+    }
+}
+
+/// A cyclic order on a form's directions: **the receiver that decides whether windings are visible**.
+///
+/// Position `p` of the reading carries direction `order[p]` of the form. Validated at construction to
+/// be a permutation of `0..extent`, because a reading that repeats or skips a direction is not a
+/// change of basis and Sylvester's law would not apply to it.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CyclicReading {
+    order: Vec<usize>,
+}
+
+impl CyclicReading {
+    /// Declare a reading, refusing anything that is not a permutation.
+    pub fn declare(order: Vec<usize>) -> Result<Self, WindingError> {
+        let extent = order.len();
+        if extent == 0 {
+            return Err(WindingError::EmptyCirculant);
+        }
+        let mut seen = vec![false; extent];
+        for (position, direction) in order.iter().enumerate() {
+            if *direction >= extent || seen[*direction] {
+                return Err(WindingError::ReadingIsNotAPermutation { position });
+            }
+            seen[*direction] = true;
+        }
+        Ok(Self { order })
+    }
+
+    /// The reading that changes nothing: direction `i` at position `i`.
+    pub fn native(extent: usize) -> Result<Self, WindingError> {
+        Self::declare((0..extent).collect())
+    }
+
+    pub fn extent(&self) -> usize {
+        self.order.len()
+    }
+
+    pub fn order(&self) -> &[usize] {
+        &self.order
+    }
+
+    /// The permutation matrix `P` with `(P^T A P)_{ij} = A_{order[i], order[j]}`.
+    ///
+    /// Handed to [`crate::inertia::congruence`], which proves it invertible before transporting.
+    pub fn basis(&self) -> Result<ExactRatMatrix, WindingError> {
+        let extent = self.order.len();
+        let mut rows = vec![vec![Rat::zero(); extent]; extent];
+        for (position, direction) in self.order.iter().enumerate() {
+            rows[*direction][position] = Rat::one();
+        }
+        Ok(ExactRatMatrix::new(rows)?)
     }
 }
 
@@ -686,6 +770,123 @@ pub fn cyclic_receiver_of_growth(
         counts[(tail + extent - head) % extent] += 1;
     }
     SymmetricCirculant::from_integers(&counts)
+}
+
+/// A form, the cyclic reading under which it became circulant, and what its own order returned.
+///
+/// The third field is the point. The **same form** is refused in one reading and admitted in
+/// another, so this carries both returns rather than only the one that worked — a receiver that is
+/// blind to a structure is evidence about the receiver, and discarding it would leave the admission
+/// looking like a property of the form.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CyclicReceiver {
+    pub reading: CyclicReading,
+    pub circulant: SymmetricCirculant,
+    /// What [`SymmetricCirculant::from_symmetric_form`] returned on the form's arriving order.
+    /// `None` means that order was already circulant and the walk had nothing to move.
+    pub native_refusal: Option<WindingError>,
+    /// How many placements the walk touched. A measurement of the search, never of the form.
+    pub walked: u64,
+}
+
+/// Search a symmetric form for a cyclic reading that makes it circulant, or refuse by name.
+///
+/// **The refusal is the ordinary return and it is a first-class one.** A form is circulant under some
+/// reading exactly when a cyclic group acts on its directions preserving the pairing, which is a
+/// strong condition; the honest answer for most material is that no such receiver exists, and then
+/// its inertia does not factor through any character group and its passages have no windings to be
+/// named by. This function says which of the two happened and never manufactures the first.
+///
+/// **The diagonal is checked first, and it is a theorem rather than a shortcut.** A circulant's
+/// diagonal is `c_0` at every entry, so a form whose directions do not all self-pair to the same
+/// value is circulant under no reading at all. That check is `O(n)` and it is what refuses every
+/// matroid pairing except one — see [`crate::matroid_chow::ChowRing::cyclic_generator_receiver`].
+///
+/// **The walk fixes direction `0` at position `0`, and loses nothing by it.** Rotating a circulant
+/// reading by `t` sends `form(π_i, π_j) = c_{(j−i) mod n}` to `form(π_{i+t}, π_{j+t}) = c_{(j−i) mod
+/// n}` — the same first row — so if any circulant reading exists, the rotation of it that puts
+/// direction `0` first is one too.
+///
+/// `walk_aperture` is **declared by the caller** and its exhaustion is reported as
+/// [`WindingError::CyclicWalkPastItsAperture`], never as an absence: a search that ran out of
+/// allowance has not established that nothing is there.
+pub fn cyclic_receiver_of_form(
+    form: &SymmetricForm,
+    walk_aperture: u64,
+) -> Result<CyclicReceiver, WindingError> {
+    let extent = form.extent();
+    if extent == 0 {
+        return Err(WindingError::EmptyCirculant);
+    }
+    for direction in 1..extent {
+        if form.at(direction, direction) != form.at(0, 0) {
+            return Err(WindingError::DiagonalIsNotConstant { direction });
+        }
+    }
+    let native_refusal = SymmetricCirculant::from_symmetric_form(form).err();
+    let mut order = vec![0_usize];
+    let mut placed = vec![false; extent];
+    placed[0] = true;
+    let mut walked = 0_u64;
+    if !extend_cyclic_reading(form, &mut order, &mut placed, &mut walked, walk_aperture) {
+        return if walked > walk_aperture {
+            Err(WindingError::CyclicWalkPastItsAperture { walked })
+        } else {
+            Err(WindingError::NoCyclicReceiver { walked })
+        };
+    }
+    let reading = CyclicReading::declare(order)?;
+    let circulant = SymmetricCirculant::read_cyclically(form, &reading)?;
+    Ok(CyclicReceiver {
+        reading,
+        circulant,
+        native_refusal,
+        walked,
+    })
+}
+
+/// One placement of the walk. Every constraint it imposes is already implied by circulance, so the
+/// walk proposes and [`SymmetricCirculant::read_cyclically`] disposes: nothing here decides that a
+/// form is circulant, it only decides which readings are worth handing to the organ that does.
+fn extend_cyclic_reading(
+    form: &SymmetricForm,
+    order: &mut Vec<usize>,
+    placed: &mut [bool],
+    walked: &mut u64,
+    walk_aperture: u64,
+) -> bool {
+    let extent = placed.len();
+    if order.len() == extent {
+        // Circulance of a *symmetric* matrix also demands `c_d = c_{n−d}`; the forward constraints
+        // below only reach the upper triangle, so the reversal is checked once the ring closes.
+        return (1..extent)
+            .all(|step| form.at(order[0], order[step]) == form.at(order[0], order[extent - step]));
+    }
+    let position = order.len();
+    for candidate in 0..extent {
+        if placed[candidate] {
+            continue;
+        }
+        *walked += 1;
+        if *walked > walk_aperture {
+            return false;
+        }
+        // `form(order[i], candidate)` must be the entry at displacement `position − i`, and that
+        // entry is already fixed by the direction sitting at position `position − i`.
+        if (1..position)
+            .any(|index| form.at(order[index], candidate) != form.at(order[0], order[position - index]))
+        {
+            continue;
+        }
+        placed[candidate] = true;
+        order.push(candidate);
+        if extend_cyclic_reading(form, order, placed, walked, walk_aperture) {
+            return true;
+        }
+        order.pop();
+        placed[candidate] = false;
+    }
+    false
 }
 
 // ===============================================================================================
@@ -1397,6 +1598,24 @@ pub enum WindingError {
     NotCirculant { row: usize, column: usize },
     #[error("the cycle C_{extent} is not a simple graph; the cycle family starts at three")]
     CycleTooSmall { extent: usize },
+    #[error(
+        "a cyclic reading must be a permutation of the form's directions; position {position} repeats one or names a direction the form does not carry"
+    )]
+    ReadingIsNotAPermutation { position: usize },
+    #[error("a cyclic reading of a form of extent {extent} carries {found} positions")]
+    ReadingExtentMismatch { extent: usize, found: usize },
+    #[error(
+        "a circulant carries c_0 at every diagonal entry; direction {direction} self-pairs to another value, so this form is circulant under no reading whatsoever"
+    )]
+    DiagonalIsNotConstant { direction: usize },
+    #[error(
+        "no cyclic reading makes this form circulant; the walk closed after {walked} placements, so its inertia factors through no character group and its passages have no windings"
+    )]
+    NoCyclicReceiver { walked: u64 },
+    #[error(
+        "the cyclic-reading walk passed the {walked} placements the caller declared; this is an exhausted allowance and not an absence"
+    )]
+    CyclicWalkPastItsAperture { walked: u64 },
     #[error("the star polynomial should carry {expected} distinct real roots and carries {found}")]
     RootPopulation { expected: usize, found: usize },
     #[error(
@@ -2433,6 +2652,112 @@ mod tests {
             ]
         );
     }
+
+    /// A reading is a change of basis, so a reading that is not a permutation is not one.
+    #[test]
+    fn a_reading_that_is_not_a_permutation_is_refused_by_position() {
+        assert_eq!(
+            CyclicReading::declare(vec![0, 1, 1]),
+            Err(WindingError::ReadingIsNotAPermutation { position: 2 })
+        );
+        assert_eq!(
+            CyclicReading::declare(vec![0, 4, 2]),
+            Err(WindingError::ReadingIsNotAPermutation { position: 1 })
+        );
+        assert_eq!(
+            CyclicReading::declare(Vec::new()),
+            Err(WindingError::EmptyCirculant)
+        );
+        assert!(CyclicReading::native(4).is_ok());
+    }
+
+    /// **The receiver decides whether the windings are visible; the split is untouched by it.**
+    ///
+    /// One form, two orders. The permuted `C_6` adjacency is refused by the direct gate and admitted
+    /// under the reading that undoes the permutation, and the two eliminations return one split.
+    /// The test can fail: a `read_cyclically` that symmetrized or repaired would admit the permuted
+    /// form under the *native* reading too, and the assertion below forbids exactly that.
+    #[test]
+    fn a_form_blind_in_one_reading_names_its_windings_in_another_and_the_split_does_not_move() {
+        let hexagon = cycle_adjacency(6).unwrap();
+        let form = hexagon.as_symmetric_form().unwrap();
+        // An involution, so applying it twice returns the original form.
+        let swap = CyclicReading::declare(vec![0, 2, 1, 3, 4, 5]).unwrap();
+        let scrambled = congruence(&form, &swap.basis().unwrap()).unwrap();
+
+        assert!(
+            matches!(
+                SymmetricCirculant::from_symmetric_form(&scrambled),
+                Err(WindingError::NotCirculant { .. })
+            ),
+            "the permuted hexagon still reads as circulant in its own order, so this fixture \
+             cannot separate the two readings"
+        );
+        assert!(
+            matches!(
+                SymmetricCirculant::read_cyclically(
+                    &scrambled,
+                    &CyclicReading::native(6).unwrap()
+                ),
+                Err(WindingError::NotCirculant { .. })
+            ),
+            "the native reading must return exactly what the direct gate returns"
+        );
+
+        let recovered = SymmetricCirculant::read_cyclically(&scrambled, &swap).unwrap();
+        assert_eq!(recovered, hexagon);
+        assert_eq!(inertia(&scrambled), inertia(&form));
+
+        // And the search finds a reading without being told which one.
+        let receiver = cyclic_receiver_of_form(&scrambled, 10_000).unwrap();
+        assert!(
+            receiver.native_refusal.is_some(),
+            "a receiver whose native order already worked proves nothing about the reading"
+        );
+        assert_eq!(
+            winding_inertia(&receiver.circulant).unwrap().split(),
+            winding_inertia(&hexagon).unwrap().split()
+        );
+        assert!(receiver.walked > 0);
+    }
+
+    /// A circulant carries `c_0` at every diagonal entry, so this is refused before any walk.
+    #[test]
+    fn a_form_whose_directions_self_pair_differently_is_circulant_under_no_reading() {
+        let form = SymmetricForm::from_integers(&[vec![1, 0, 0], vec![0, 1, 0], vec![0, 0, 2]])
+            .unwrap();
+        assert_eq!(
+            cyclic_receiver_of_form(&form, 10_000),
+            Err(WindingError::DiagonalIsNotConstant { direction: 2 })
+        );
+    }
+
+    /// An exhausted allowance and an absence are different returns and must stay distinguishable.
+    #[test]
+    fn an_exhausted_walk_is_reported_as_an_allowance_and_not_as_an_absence() {
+        let form = cycle_adjacency(6).unwrap().as_symmetric_form().unwrap();
+        assert!(matches!(
+            cyclic_receiver_of_form(&form, 1),
+            Err(WindingError::CyclicWalkPastItsAperture { .. })
+        ));
+
+        // A form with a constant diagonal that no reading can make circulant: the walk closes and
+        // returns an absence with its own placement count.
+        let stubborn = SymmetricForm::from_integers(&[
+            vec![0, 1, 1, 0],
+            vec![1, 0, 1, 1],
+            vec![1, 1, 0, 1],
+            vec![0, 1, 1, 0],
+        ])
+        .unwrap();
+        assert!(
+            matches!(
+                cyclic_receiver_of_form(&stubborn, 10_000),
+                Err(WindingError::NoCyclicReceiver { .. })
+            ),
+            "this fixture is supposed to close the walk without finding a reading"
+        );
+    }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -2554,4 +2879,5 @@ mod lattice_rung_tests {
         assert!(admits_degree(polygon_turn_degree(17)));
         assert!(!lattice_admits_order(17));
     }
+
 }

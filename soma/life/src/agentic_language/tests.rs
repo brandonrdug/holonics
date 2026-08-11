@@ -984,3 +984,200 @@ fn remount_refuses_a_body_its_declared_causes_do_not_reproduce() {
         "the departed body is returned so the departure can be read, not only reported"
     );
 }
+
+/// One caller-retained executor which counts what it was asked to realize and forwards every
+/// request to exactly the host carrier the private path would have built.
+struct CountingHostExecutor {
+    host: ParallelHostLiveCurrentExecutor,
+    enactments: usize,
+}
+
+impl LiveCurrentExecutor for CountingHostExecutor {
+    fn enact(
+        &mut self,
+        physical_revision: u64,
+        standing: &soma_membrane::SparseStandingSurface,
+        currents: &[soma_membrane::CurrentExecutionRequest<'_>],
+        relations: &[soma_membrane::DirectedExecutionRequest],
+        regional: &[soma_membrane::RegionalExecutionRequest<'_>],
+    ) -> Result<soma_membrane::ExecutedContemporaryEvent, soma_membrane::LiveCurrentError> {
+        self.enactments += 1;
+        self.host
+            .enact(physical_revision, standing, currents, relations, regional)
+    }
+}
+
+/// One caller-retained executor which refuses every enactment.
+struct RefusingExecutor {
+    consulted: usize,
+}
+
+impl LiveCurrentExecutor for RefusingExecutor {
+    fn enact(
+        &mut self,
+        _physical_revision: u64,
+        _standing: &soma_membrane::SparseStandingSurface,
+        _currents: &[soma_membrane::CurrentExecutionRequest<'_>],
+        _relations: &[soma_membrane::DirectedExecutionRequest],
+        _regional: &[soma_membrane::RegionalExecutionRequest<'_>],
+    ) -> Result<soma_membrane::ExecutedContemporaryEvent, soma_membrane::LiveCurrentError> {
+        self.consulted += 1;
+        Err(soma_membrane::LiveCurrentError::PhysicalSettlement)
+    }
+}
+
+/// A caller-mounted carrier reaches the agentic answer, not only agentic conditioning.
+///
+/// Equality of the returned answer alone would not separate a real twin from one which took the
+/// argument and quietly rebuilt its own host pool. Two frames make it falsifiable: the supplied
+/// executor is the only executor either answer path may reach, so a nonzero count proves it
+/// carried the answer; and a *refusing* carrier must make the answer fail, which no fake twin can
+/// reproduce because it never consults the argument at all.
+#[test]
+fn a_mounted_carrier_reaches_both_agentic_answer_paths() {
+    const DEED_QUESTION: &str = "What did the reflection correction establish?";
+    const GROUNDED_QUESTION: &str = "What does the returned current change in the next passage?";
+    const OBSERVATION: &str = "The reflection correction makes the returned current change the local morphology used by the next passage.";
+
+    fn world_return(deed: String) -> AgenticLanguageWorldReturn {
+        AgenticLanguageWorldReturn::new(
+            deed,
+            vec![MorphologicalLanguagePassage::new(
+                "reflection-observation",
+                "reflection-record",
+                91,
+                OBSERVATION,
+            )],
+        )
+    }
+
+    // The private-host path, which is what every caller had before the answer seam was joined.
+    let mut private_body = body();
+    let question = AgenticLanguageQuestion::new("reflection-question", 90, DEED_QUESTION);
+    let AgenticLanguageConsequence::Deed(deed) = private_body
+        .receive_occurrence(AgenticLanguageOccurrence::Question(&question))
+        .unwrap()
+    else {
+        panic!("the unseen question must emit a deed");
+    };
+    let AgenticLanguageConsequence::Answer(private_world) = private_body
+        .receive_occurrence(AgenticLanguageOccurrence::WorldReturn(&world_return(
+            deed.identity,
+        )))
+        .unwrap()
+    else {
+        panic!("the world return must answer");
+    };
+    let later = AgenticLanguageQuestion::new("later-question", 90, GROUNDED_QUESTION);
+    let AgenticLanguageConsequence::Answer(private_grounded) = private_body
+        .receive_occurrence(AgenticLanguageOccurrence::Question(&later))
+        .unwrap()
+    else {
+        panic!("the grounded follow-up must answer");
+    };
+
+    // The same cycle through one supplied carrier, counted between occurrences.
+    let mut counted_body = body();
+    let mut counting = CountingHostExecutor {
+        host: ParallelHostLiveCurrentExecutor::new(2),
+        enactments: 0,
+    };
+    let AgenticLanguageConsequence::Deed(deed) = counted_body
+        .receive_occurrence_with_executor(
+            AgenticLanguageOccurrence::Question(&question),
+            &mut counting,
+        )
+        .unwrap()
+    else {
+        panic!("the unseen question must emit a deed");
+    };
+    // Deed emission crosses no Swing event; the carrier is carried unused to the world return.
+    assert_eq!(counting.enactments, 0);
+    let AgenticLanguageConsequence::Answer(counted_world) = counted_body
+        .receive_occurrence_with_executor(
+            AgenticLanguageOccurrence::WorldReturn(&world_return(deed.identity)),
+            &mut counting,
+        )
+        .unwrap()
+    else {
+        panic!("the world return must answer");
+    };
+    let after_world_return = counting.enactments;
+    let AgenticLanguageConsequence::Answer(counted_grounded) = counted_body
+        .receive_occurrence_with_executor(
+            AgenticLanguageOccurrence::Question(&later),
+            &mut counting,
+        )
+        .unwrap()
+    else {
+        panic!("the grounded follow-up must answer");
+    };
+
+    assert_eq!(private_world, counted_world);
+    assert_eq!(private_grounded, counted_grounded);
+    assert!(
+        after_world_return > 0,
+        "the world-return answer must cross the supplied carrier"
+    );
+    assert!(
+        counting.enactments > after_world_return,
+        "the locally-grounded answer must cross the supplied carrier too"
+    );
+
+    // The refusal, on both answer paths. A fake twin never consults the argument, so it answers.
+    let mut refused_world_body = body();
+    let mut refusing = RefusingExecutor { consulted: 0 };
+    let AgenticLanguageConsequence::Deed(deed) = refused_world_body
+        .receive_occurrence_with_executor(
+            AgenticLanguageOccurrence::Question(&question),
+            &mut refusing,
+        )
+        .unwrap()
+    else {
+        panic!("the unseen question must emit a deed");
+    };
+    assert!(matches!(
+        refused_world_body.receive_occurrence_with_executor(
+            AgenticLanguageOccurrence::WorldReturn(&world_return(deed.identity)),
+            &mut refusing,
+        ),
+        Err(AgenticLanguageError::Morphology(_))
+    ));
+    assert!(
+        refusing.consulted > 0,
+        "the refusal control is vacuous unless the carrier was reached"
+    );
+
+    let mut refused_grounded_body = body();
+    let mut working = CountingHostExecutor {
+        host: ParallelHostLiveCurrentExecutor::new(2),
+        enactments: 0,
+    };
+    let AgenticLanguageConsequence::Deed(deed) = refused_grounded_body
+        .receive_occurrence_with_executor(
+            AgenticLanguageOccurrence::Question(&question),
+            &mut working,
+        )
+        .unwrap()
+    else {
+        panic!("the unseen question must emit a deed");
+    };
+    refused_grounded_body
+        .receive_occurrence_with_executor(
+            AgenticLanguageOccurrence::WorldReturn(&world_return(deed.identity)),
+            &mut working,
+        )
+        .unwrap();
+    let mut refusing_grounded = RefusingExecutor { consulted: 0 };
+    assert!(matches!(
+        refused_grounded_body.receive_occurrence_with_executor(
+            AgenticLanguageOccurrence::Question(&later),
+            &mut refusing_grounded,
+        ),
+        Err(AgenticLanguageError::Morphology(_))
+    ));
+    assert!(
+        refusing_grounded.consulted > 0,
+        "the refusal control is vacuous unless the carrier was reached"
+    );
+}

@@ -226,9 +226,12 @@ with a `RESULTS.md`. They are `historical` and the live genre is empty (§7).
 keep getting re-implemented in the wrong place. That column is what routes a claim to a file, and
 it is the reason the ledger is a genre rather than a comment.
 
-The executable form of this ledger is `crates/holonic-architecture-lint`, whose baseline path and
-protected roots are both wrong for this layout (§7). The ledger and the lint must agree; where they
-disagree, the code governs and the ledger is corrected.
+The executable form of this ledger is `crates/holonic-architecture-lint`. Its baseline path and
+protected roots were both wrong for this layout, exactly as §7 recorded; **both were repaired
+2026-08-10** and it runs as the last gate of `tools/gates.sh`, against a census emitted from a
+detached worktree of the commit at `meta/HOLONIC_DSA_BASELINE.tsv`. The ledger and the lint must
+agree; where they disagree, the code governs and the ledger is corrected. **The ledger document
+itself is still absent** — that half of §7's row remains open.
 
 ### 1.10 Archive — `archive/`, `reference/`
 
@@ -721,7 +724,7 @@ resolves in the live tree. The remaining rows are unchanged and remain `open`.
 | ~~Two dead canon links~~ **closed 14:30** | `canon/06_ESTABLISHED_CAPABILITIES.md:12` and `:14` pointed at `../evidence/observations/`, which `06518c3` moved under `archive/cpp-engine/`. Both now carry the archive path | §4 |
 | `README.md` reading order is pre-transition | still names `archive/blueprints/COMPLETE_CPP_ENGINE_ROADMAP.md` — now archive-bannered — as the second thing to read. Its `evidence/observations/` and `provenance/` links were repaired at 14:45; its `formal/` link now resolves, to `soma/formal/` | §1.2 |
 | Observation genre is empty | `observations/` absent; 139 directories, 118 with `RESULTS.md`, sit under `archive/cpp-engine/evidence/observations/` | §1.8 |
-| Ownership ledger absent, lint broken | `HOLONIC_OWNERSHIP.md` absent; `crates/holonic-architecture-lint` names a `BASELINE_PATH` that does not exist at the root and `PROTECTED_ROOTS` under `src/soma/`, so its ratchet covers none of `soma/` | §1.9 |
+| Ownership ledger absent; ~~lint broken~~ **lint closed 2026-08-10** | `HOLONIC_OWNERSHIP.md` still absent. The lint half is closed: both frames this row named were real — the `BASELINE_PATH` and the `src/soma/` `PROTECTED_ROOTS` — and the first hid the second, since `check_repository` reads the baseline before taking the census. Repaired; runs as the last gate of `tools/gates.sh` over 193 files and 18,203 inherited occurrences | §1.9 |
 | ~~No archive banners~~ **partly closed 14:12** | eleven `blueprint/` files and `archive/cpp-engine/CONSTRUCTION_STATE.md` now carry the §1.10 banner. Still open: no file directly under `archive/cpp-engine/` or `reference/` carries one | §1.10 |
 | No `//! Record:` doclines | zero owners across 282 `.rs` files name a record | §4.2 |
 

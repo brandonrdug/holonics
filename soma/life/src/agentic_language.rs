@@ -24,7 +24,7 @@ use holonic_language::{
 };
 use holonic_structure::{CausalMembrane, LocalSet};
 use soma_abi::active::ActionCurrent;
-use soma_membrane::LiveCurrentExecutor;
+use soma_membrane::{LiveCurrentExecutor, ParallelHostLiveCurrentExecutor};
 
 use crate::{
     causal_language::{lexical_tokens, render_tokens},

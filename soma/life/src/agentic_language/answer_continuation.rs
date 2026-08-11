@@ -484,13 +484,20 @@ impl AgenticLanguageEcology {
         Ok(answers)
     }
 
-    pub(super) fn prepare_answer(
+    /// Materialize the selected answer current through one caller-retained physical executor.
+    ///
+    /// This is the agentic body's own generation mouth. The selected current's question event and
+    /// every self-emanated return cross the supplied executor, so a caller which mounted a card at
+    /// [`AgenticLanguageEcology::condition_with_executor`] keeps that carrier across the answer
+    /// rather than silently rebuilding a private host pool between conditioning and emanation.
+    pub(super) fn prepare_answer_with_executor(
         &self,
         question: AgenticLanguageQuestion,
         world_deed: Option<String>,
         world_sections: &[MorphologicalLanguagePassage],
         candidates: Vec<AnswerCandidate>,
         world_thought_fibers: &[RelationalThoughtFiber],
+        executor: &mut dyn LiveCurrentExecutor,
     ) -> Result<PreparedWorldAnswer, AgenticLanguageError> {
         let selected = select_answer_candidate(candidates)?;
         if let Some(deed) = world_deed.as_deref() {
@@ -503,10 +510,10 @@ impl AgenticLanguageEcology {
                 return Err(AgenticLanguageError::NoGroundedLanguageReturn);
             }
         }
-        let generated = selected.generated.into_materialized_return(
+        let generated = selected.generated.into_materialized_return_with_executor(
             &selected.received_prompt,
             self.action,
-            self.worker_threads,
+            executor,
         )?;
         let local_identity = format!("episode-{}", self.next_episode);
         let next_episode = self

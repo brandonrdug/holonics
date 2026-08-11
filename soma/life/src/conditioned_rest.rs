@@ -22,25 +22,42 @@
 //! `holonic-engine` and the reverse edge does not exist — the same direction
 //! `conditioned_derivation`'s own header states for `decomposing_codec`.
 //!
-//! # The one seam, and the exactness it forces
+//! # The seam, and the exactness it forces
 //!
-//! `FoundedMorphology` keeps its stem population private and exposes exactly one constructor a
-//! foreign owner may re-found through: [`FoundedMorphology::from_founded_words`], which takes
-//! `(word, wholes, lineage)` and replays the founding. Everything a founded stem carries beyond
-//! that — its `StemId`, its parent — is *derived* by the replay from the order the entries arrive
-//! in.
+//! `FoundedMorphology` keeps its stem population private and exposes two constructors a foreign
+//! owner may come back through. They differ in **who owns the identities**:
 //!
-//! So this codec does not assume the replay reproduces the body. It **checks it, at the seal and
-//! again at the mount**: the records are re-founded through the one public seam and compared field
-//! for field against the records that went in, and a difference is returned as a population of
-//! disagreeing stems ([`ConditionedRestRefusal::MorphologyNotRefoundable`]) rather than absorbed.
-//! A morphology whose founding order the seam cannot reproduce is refused *before* any octet is
-//! written, so a form on disk is never a lossy image of a body.
+//! ```text
+//!   from_founded_words   (word, wholes, lineage)     identity and parent DERIVED from arrival order
+//!   from_founded_stems   Vec<FoundedStem>            identity and parent carried VERBATIM
+//! ```
 //!
-//! The reachable case is not hypothetical: [`FoundedMorphology::without_stem`] retains the surviving
-//! stems' original `StemId`s, so after an ablation the identities no longer agree with the founding
-//! positions and the replay cannot return them. That body is refused by name, and the negative
-//! control in this module's tests is exactly it.
+//! This codec resumes rather than founds, so it comes back through `from_founded_stems`.
+//!
+//! **The founding seam alone could not carry an ablated body, and that is why the second exists.**
+//! [`FoundedMorphology::without_stem`] retains the surviving stems' original `StemId`s, so after an
+//! ablation the identities carry a **gap where the removed stem stood** — which is the record of the
+//! ablation. Replaying such a population in arrival order renumbers the gap away, and this module
+//! refused to seal it rather than write a form that would mount as a different body. The refusal was
+//! correct and the constructor was missing; the constructor is now there, and an ablated body rests
+//! and remounts field for field.
+//!
+//! The gate is unchanged in kind and is still taken **at the seal and again at the mount**. What it
+//! now refuses is a population that is not a founded morphology at all — a stem no whole witnessed,
+//! two stems at one identity, a parent that is not the predecessor, a lookup index that sends a stem
+//! somewhere it does not stand, or **one whole carried twice**, which would commit a stem that only
+//! one source ever witnessed. That is a frequency wearing a recurrence's name and it is refused by
+//! [`ConditionedRestRefusal::NotAFoundedMorphology`] before any octet is written.
+//!
+//! Those populations are reachable, and not only through a corrupt wire: `FoundedMorphology` derives
+//! `serde::Deserialize`, so a body can arrive from foreign octets having never been founded. The
+//! negative controls in this module's tests are exactly those bodies, and
+//! `examples/the_ablated_body_rests_and_remounts.rs` drives them.
+//!
+//! [`ConditionedRestRefusal::MorphologyNotRefoundable`] survives as the narrower check that the
+//! resumption seam carried the population **verbatim**. Its material is the constructor rather than
+//! the wire: `from_founded_stems` returns what it was handed or refuses, so this can only fire if
+//! that stops being true. It is stated here as the regression guard it is and not as a live gate.
 //!
 //! # What the form carries, and what it deliberately does not
 //!
@@ -76,7 +93,8 @@
 //! ```
 
 use holonic_engine::conditioned_derivation::{
-    expose, ConditionedBody, DerivedPassage, FoundedMorphology, PassageOrigin,
+    expose, ConditionedBody, DerivedPassage, FoundedMorphology, FoundedMorphologyRefusal,
+    FoundedStem, PassageOrigin, StemId,
 };
 
 /// The leading octets of this form's wire: the four-octet tag, then the codec's own layout version.
@@ -138,21 +156,32 @@ pub fn records(morphology: &FoundedMorphology) -> Vec<FoundedStemRecord> {
         .collect()
 }
 
-/// Re-found a morphology from its records through the one public seam, and **check that the replay
+/// Re-found a morphology from its records through the resumption seam, and **check that the seam
 /// returned the same body**.
 ///
-/// `from_founded_words` derives each stem's identity and parent from the order the entries arrive
-/// in. That reproduces a morphology founded by exposure exactly; it does not reproduce one whose
-/// identities were assigned under some other order. The difference between "does" and "is assumed
-/// to" is one comparison, and it is taken here.
+/// `from_founded_stems` carries identity and parent verbatim, so this reproduces a morphology
+/// whose identities were assigned under any order a founding or an ablation could have produced —
+/// including the gapped identities [`FoundedMorphology::without_stem`] leaves behind. What it does
+/// not do is *repair*: a population that is not a founded morphology is refused by name, with the
+/// offending stem, and the two conditions that carry real material off a wire are a stem no whole
+/// witnessed and **one whole carried twice**, which would commit a stem one source witnessed.
+///
+/// The field-for-field comparison below is the narrower check that the seam carried the population
+/// verbatim rather than normalising it. Its material is the constructor, not the wire.
 pub fn refound(declared: &[FoundedStemRecord]) -> Result<FoundedMorphology, ConditionedRestRefusal> {
-    let morphology = FoundedMorphology::from_founded_words(declared.iter().map(|record| {
-        (
-            record.stem.clone(),
-            record.wholes.clone(),
-            record.foreign_lineage.clone(),
-        )
-    }));
+    let morphology = FoundedMorphology::from_founded_stems(
+        declared
+            .iter()
+            .map(|record| FoundedStem {
+                id: StemId(record.id),
+                stem: record.stem.clone(),
+                wholes: record.wholes.clone(),
+                parent: record.parent.map(StemId),
+                foreign_lineage: record.foreign_lineage.clone(),
+            })
+            .collect(),
+    )
+    .map_err(|refusal| ConditionedRestRefusal::NotAFoundedMorphology { refusal })?;
     let refounded = records(&morphology);
     let mut differing = Vec::new();
     for (at, record) in declared.iter().enumerate() {
@@ -189,8 +218,14 @@ impl ConditionedRest {
     /// Seal a live body.
     ///
     /// Refuses a standing passage of derived origin — a rest carries what the body was mounted on,
-    /// never what it emitted — and refuses a morphology the one public seam cannot re-found, before
-    /// any octet is composed.
+    /// never what it emitted — and refuses a morphology that is not a founded population, before any
+    /// octet is composed.
+    ///
+    /// The morphology gate is taken **twice, on two different views of the body**. `refoundable`
+    /// runs on the live morphology, which is the only view that includes its private lookup index; a
+    /// body that arrived through `serde` can carry an index that disagrees with its stems, and
+    /// [`records`] cannot see that because the index is not in it. `refound` then runs on the
+    /// records, which is what the wire will carry.
     pub fn seal(body: &ConditionedBody) -> Result<Self, ConditionedRestRefusal> {
         let mut standing = Vec::new();
         for passage in body.standing() {
@@ -211,8 +246,12 @@ impl ConditionedRest {
                 }
             }
         }
+        // the exactness gate, taken at the seal so that no form on disk is ever a lossy image, and
+        // taken first on the view that carries the private lookup index
+        body.morphology()
+            .refoundable()
+            .map_err(|refusal| ConditionedRestRefusal::NotAFoundedMorphology { refusal })?;
         let stems = records(body.morphology());
-        // the exactness gate, taken at the seal so that no form on disk is ever a lossy image
         refound(&stems)?;
         Ok(Self { stems, standing })
     }
@@ -255,23 +294,49 @@ impl ConditionedRest {
     /// Returns the stems that moved: those founded by this whole and those that gained it. An empty
     /// return means the body did not move, and the plate's `present_and_require_change` refuses on
     /// exactly that.
+    ///
+    /// **The identities already carried are not touched.** A new stem takes the next identity after
+    /// the largest one standing, which is the identity the founding would have given it had the
+    /// removed stems never been removed — so a rest sealed from an ablated body goes on receiving
+    /// without the gap in its identities being closed up behind it. Replaying the whole population
+    /// through the founding seam would have closed it, silently, on every further whole.
     pub fn receive_whole(&mut self, whole: &str, text: &str) -> Vec<String> {
         let exposure = expose(whole, text);
         let before: Vec<FoundedStemRecord> = self.stems.clone();
-        let mut entries: Vec<(String, Vec<String>, Vec<String>)> = before
+        let mut standing: std::collections::BTreeMap<String, usize> = before
             .iter()
-            .map(|record| {
-                (
-                    record.stem.clone(),
-                    record.wholes.clone(),
-                    record.foreign_lineage.clone(),
-                )
-            })
+            .enumerate()
+            .map(|(slot, record)| (record.stem.clone(), slot))
             .collect();
+        let mut carried = before.clone();
+        let mut next = carried
+            .iter()
+            .map(|record| record.id)
+            .max()
+            .map_or(0, |largest| largest + 1);
         for word in &exposure.words {
-            entries.push((word.clone(), vec![exposure.whole.clone()], Vec::new()));
+            match standing.get(word).copied() {
+                Some(slot) => {
+                    let record = &mut carried[slot];
+                    if !record.wholes.iter().any(|named| named == whole) {
+                        record.wholes.push(whole.to_owned());
+                    }
+                }
+                None => {
+                    let parent = carried.last().map(|record| record.id);
+                    standing.insert(word.clone(), carried.len());
+                    carried.push(FoundedStemRecord {
+                        id: next,
+                        stem: word.clone(),
+                        wholes: vec![whole.to_owned()],
+                        parent,
+                        foreign_lineage: Vec::new(),
+                    });
+                    next += 1;
+                }
+            }
         }
-        self.stems = records(&FoundedMorphology::from_founded_words(entries));
+        self.stems = carried;
         self.stems
             .iter()
             .filter(|record| !before.contains(record))
@@ -441,8 +506,20 @@ pub fn render_derived_passages(passages: &[DerivedPassage]) -> Vec<u8> {
 /// failed it.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ConditionedRestRefusal {
-    /// The one public re-founding seam did not return the body that was handed to it. Carries every
-    /// disagreeing stem with what came back for it — the whole population, never a count.
+    /// The population is not a founded morphology at all. Carries the engine's own refusal, which
+    /// names the stem and the condition it failed.
+    ///
+    /// **This is the live gate.** A wire — or a `serde` body that was never founded — can present a
+    /// stem no whole witnessed, two stems at one identity, a parent that is not the predecessor, an
+    /// index that sends a stem somewhere it does not stand, or one whole carried twice.
+    NotAFoundedMorphology { refusal: FoundedMorphologyRefusal },
+    /// The re-founding seam did not return the body that was handed to it. Carries every disagreeing
+    /// stem with what came back for it — the whole population, never a count.
+    ///
+    /// **This is a regression guard, not a live gate, and it is stated as one.**
+    /// `FoundedMorphology::from_founded_stems` returns the population verbatim or refuses, so no
+    /// material reaches this: its material is the constructor. Taking the comparison anyway is what
+    /// makes "verbatim" a checked property instead of an asserted one.
     MorphologyNotRefoundable {
         differing: Vec<(FoundedStemRecord, Option<FoundedStemRecord>)>,
     },
@@ -476,10 +553,16 @@ pub enum ConditionedRestRefusal {
 impl core::fmt::Display for ConditionedRestRefusal {
     fn fmt(&self, out: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
+            Self::NotAFoundedMorphology { refusal } => write!(
+                out,
+                "REFUSED: this is not a founded morphology -- {refusal}.\n         A population the \
+                 engine's own founding could not have produced is not sealed as though it could \
+                 be, and is not repaired into one."
+            ),
             Self::MorphologyNotRefoundable { differing } => {
                 writeln!(
                     out,
-                    "REFUSED: re-founding the morphology through `from_founded_words` did not return \
+                    "REFUSED: re-founding the morphology through `from_founded_stems` did not return \
                      the body it was given.\n         The disagreeing stems, whole:"
                 )?;
                 for (declared, returned) in differing {
@@ -491,8 +574,8 @@ impl core::fmt::Display for ConditionedRestRefusal {
                 }
                 write!(
                     out,
-                    "         A morphology whose founding order this seam cannot reproduce is not \
-                     sealed as though it could be."
+                    "         The resumption seam is required to carry a population verbatim; one \
+                     that normalized it would make a form on disk a lossy image of a body."
                 )
             }
             Self::StandingCarriesAnEmission {
@@ -681,6 +764,48 @@ mod tests {
         body
     }
 
+    /// A **foreign** writer of this module's wire, written against the layout in the header and not
+    /// against [`ConditionedRest::encode_native_bytes`].
+    ///
+    /// It exists so that a population no founding could have produced can be presented to the
+    /// decoder, which is the only mouth that takes one. It is checked against the module's own
+    /// encoder on an unchanged population before any forgery is read, so "the forgery was refused"
+    /// cannot mean "the forger is broken".
+    fn forge(stems: &[FoundedStemRecord], standing: &[(String, String)]) -> Vec<u8> {
+        fn run(octets: &mut Vec<u8>, text: &str) {
+            octets.extend_from_slice(&(text.len() as u64).to_le_bytes());
+            octets.extend_from_slice(text.as_bytes());
+        }
+        let mut octets = Vec::new();
+        octets.extend_from_slice(&CONDITIONED_REST_PREFIX);
+        octets.extend_from_slice(&(stems.len() as u64).to_le_bytes());
+        for record in stems {
+            octets.extend_from_slice(&record.id.to_le_bytes());
+            run(&mut octets, &record.stem);
+            match record.parent {
+                None => octets.push(0),
+                Some(parent) => {
+                    octets.push(1);
+                    octets.extend_from_slice(&parent.to_le_bytes());
+                }
+            }
+            octets.extend_from_slice(&(record.wholes.len() as u64).to_le_bytes());
+            for whole in &record.wholes {
+                run(&mut octets, whole);
+            }
+            octets.extend_from_slice(&(record.foreign_lineage.len() as u64).to_le_bytes());
+            for entry in &record.foreign_lineage {
+                run(&mut octets, entry);
+            }
+        }
+        octets.extend_from_slice(&(standing.len() as u64).to_le_bytes());
+        for (source, text) in standing {
+            run(&mut octets, source);
+            run(&mut octets, text);
+        }
+        octets
+    }
+
     #[test]
     fn a_conditioned_body_seals_and_the_wire_reopens_the_same_rest() {
         let body = conditioned();
@@ -825,32 +950,163 @@ mod tests {
         assert_eq!(baseline, render_derived_passages(&derived));
     }
 
-    /// The negative control for the exactness gate, on a body that really occurs.
+    /// **An ablated body rests and remounts field for field, with its identities intact.**
     ///
-    /// `without_stem` keeps the surviving stems' original `StemId`s, so after an ablation the
-    /// identities no longer agree with the founding positions and `from_founded_words` cannot return
-    /// them. That body is refused **at the seal**, with the disagreeing stems exhibited, rather than
-    /// written to disk as a form that would silently mount as a different body.
+    /// `without_stem` keeps the surviving stems' original `StemId`s, so an ablated population is not
+    /// numbered `0..n` and the founding seam would renumber it. The resumption seam carries the
+    /// identities verbatim, so the gap where the removed stem stood survives the wire — and the gap
+    /// is the record of the ablation.
     #[test]
-    fn a_morphology_the_seam_cannot_refound_is_refused_at_the_seal() {
+    fn an_ablated_morphology_rests_and_remounts_with_its_identities_intact() {
         let body = conditioned();
         let first = body.morphology().founded()[0].stem.clone();
         let ablated = body.without_stem(&first).expect("the stem was founded");
-        match ConditionedRest::seal(&ablated) {
-            Err(ConditionedRestRefusal::MorphologyNotRefoundable { differing }) => {
-                assert!(!differing.is_empty());
-                let rendered = ConditionedRestRefusal::MorphologyNotRefoundable {
-                    differing: differing.clone(),
-                }
-                .to_string();
-                assert!(rendered.contains("declared"), "{rendered}");
-                assert!(rendered.contains("refounded"), "{rendered}");
+        let before = records(ablated.morphology());
+
+        let octets = ConditionedRest::seal(&ablated)
+            .expect("an ablated body seals")
+            .encode_native_bytes()
+            .expect("the wire");
+        let remounted = ConditionedRest::decode_native_bytes(&octets)
+            .expect("reopens")
+            .mount()
+            .expect("mounts");
+
+        assert_eq!(ablated.morphology(), remounted.morphology());
+        assert_eq!(before, records(remounted.morphology()));
+        assert!(remounted.morphology().stem(&first).is_none());
+
+        // the material control: this population really is one the founding seam would renumber, so
+        // the equalities above are about the resumption seam and not about a body that never moved
+        assert_ne!(before[0].id, 0);
+        let replayed = FoundedMorphology::from_founded_words(before.iter().map(|record| {
+            (
+                record.stem.clone(),
+                record.wholes.clone(),
+                record.foreign_lineage.clone(),
+            )
+        }));
+        assert_ne!(records(&replayed), before);
+        assert_eq!(records(&replayed)[0].id, 0);
+    }
+
+    /// The negative control for the exactness gate, on populations that genuinely cannot be
+    /// reproduced by any founding — reached through the wire, which is where they occur.
+    ///
+    /// Each forged wire differs from the sound one in exactly one respect, and the sound one is
+    /// required to reopen, so a refusal here is about the defect and not about the fixture.
+    #[test]
+    fn a_population_no_founding_could_have_produced_is_refused() {
+        let sound = ConditionedRest::seal(&conditioned()).expect("a rest");
+        let stems = sound.stems().to_vec();
+        let standing = sound.standing().to_vec();
+        assert!(stems.len() > 3);
+
+        // the positive control on the forger itself: the hand-written wire of the UNCHANGED
+        // population reopens to the same rest, so every refusal below is about the change
+        let forged = forge(&stems, &standing);
+        assert_eq!(
+            ConditionedRest::decode_native_bytes(&forged).expect("the sound forgery reopens"),
+            sound
+        );
+        assert_eq!(forged, sound.encode_native_bytes().expect("the wire"));
+
+        // a whole carried twice: it would COMMIT a stem one source witnessed
+        let provisional = stems
+            .iter()
+            .position(|record| record.wholes.len() == 1)
+            .expect("the fixture holds a provisional stem");
+        let mut repeated = stems.clone();
+        let carried = repeated[provisional].wholes[0].clone();
+        repeated[provisional].wholes.push(carried.clone());
+        match ConditionedRest::decode_native_bytes(&forge(&repeated, &standing)) {
+            Err(ConditionedRestRefusal::NotAFoundedMorphology {
+                refusal: FoundedMorphologyRefusal::WholeWitnessedTwice { stem, whole },
+            }) => {
+                assert_eq!(stem, repeated[provisional].stem);
+                assert_eq!(whole, carried);
             }
-            other => panic!("the exactness gate must fire on an ablated morphology, got {other:?}"),
+            other => panic!("a repeated whole must refuse by name, got {other:?}"),
         }
-        // the positive control: the unablated body of the same fixture does seal, so the refusal
-        // above is about the ablation and not about the fixture
-        assert!(ConditionedRest::seal(&body).is_ok());
+
+        // a parent that is not the predecessor
+        let mut broken = stems.clone();
+        broken[2].parent = Some(broken[0].id);
+        assert!(matches!(
+            ConditionedRest::decode_native_bytes(&forge(&broken, &standing)),
+            Err(ConditionedRestRefusal::NotAFoundedMorphology {
+                refusal: FoundedMorphologyRefusal::ParentIsNotThePredecessor { .. }
+            })
+        ));
+
+        // a stem no whole witnessed
+        let mut unwitnessed = stems.clone();
+        unwitnessed[1].wholes.clear();
+        assert!(matches!(
+            ConditionedRest::decode_native_bytes(&forge(&unwitnessed, &standing)),
+            Err(ConditionedRestRefusal::NotAFoundedMorphology {
+                refusal: FoundedMorphologyRefusal::NoWholeWitnessedTheStem { .. }
+            })
+        ));
+
+        // two stems at one identity
+        let mut collided = stems.clone();
+        collided[2].id = collided[1].id;
+        collided[3].parent = Some(collided[1].id);
+        assert!(matches!(
+            ConditionedRest::decode_native_bytes(&forge(&collided, &standing)),
+            Err(ConditionedRestRefusal::NotAFoundedMorphology {
+                refusal: FoundedMorphologyRefusal::IdentityFoundedTwice { .. }
+            })
+        ));
+
+        let rendered = ConditionedRestRefusal::NotAFoundedMorphology {
+            refusal: FoundedMorphologyRefusal::WholeWitnessedTwice {
+                stem: "carrier".to_owned(),
+                whole: "document:one".to_owned(),
+            },
+        }
+        .to_string();
+        assert!(rendered.contains("carrier"), "{rendered}");
+        assert!(rendered.contains("document:one"), "{rendered}");
+    }
+
+    /// A morphology can arrive through `serde` having never been founded, and such a body can carry
+    /// a stem population and a lookup index that disagree. The seal sees it; the records cannot,
+    /// because the index is not in that view.
+    #[test]
+    fn a_deserialized_morphology_with_a_lying_index_is_refused_at_the_seal() {
+        let body = conditioned();
+        let sound = body.morphology().clone();
+        let json = serde_json::to_string(&sound).expect("serialises");
+        assert_eq!(
+            serde_json::from_str::<FoundedMorphology>(&json).expect("reopens"),
+            sound
+        );
+
+        let second = sound.founded()[1].stem.clone();
+        let lying = json.replace(
+            &format!("\"{second}\":1,"),
+            &format!("\"{second}\":{},", sound.founded().len() + 4),
+        );
+        assert_ne!(lying, json, "the index entry to corrupt was not found");
+        let carried: FoundedMorphology = serde_json::from_str(&lying).expect("reopens");
+
+        // the records are identical, which is exactly why the seal cannot rely on them alone
+        assert_eq!(records(&carried), records(&sound));
+        let mut lying_body = ConditionedBody::mount(deposit()).expect("the deposit mounts");
+        lying_body.carry_morphology(carried);
+        assert!(matches!(
+            ConditionedRest::seal(&lying_body),
+            Err(ConditionedRestRefusal::NotAFoundedMorphology {
+                refusal: FoundedMorphologyRefusal::IndexNamesAnotherSlot { .. }
+            })
+        ));
+
+        // the positive control: the same body carrying the sound morphology seals
+        let mut sound_body = ConditionedBody::mount(deposit()).expect("the deposit mounts");
+        sound_body.carry_morphology(sound);
+        assert!(ConditionedRest::seal(&sound_body).is_ok());
     }
 
     /// A rest carries no emission. Sealing a body whose standing holds a derived passage is refused,

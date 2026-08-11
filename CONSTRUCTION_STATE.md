@@ -461,18 +461,45 @@ was kept.
 
 A figure here without a clock time is a defect. Re-take it.
 
+**They run as one sequence as of 2026-08-10: `bash tools/gates.sh`.** Nine gates in order, one
+summary line each, non-zero exit if any is red. `bash tools/gates.sh --control` perturbs the
+material each gate reads, asserts the gate turns red, and restores; `--list` names them.
+
 | Check | Command | What it falsifies |
 |---|---|---|
+| The whole sequence | `bash tools/gates.sh` | any claim resting on a verifier nobody invoked |
 | Every path a governing document names resolves | `python3 tools/resolve_named_paths.py` | a live document describing a body that is not this one |
 | The gate | `PATH=/opt/cuda/bin:$PATH cargo test --workspace` | any claim resting on the suite |
+| Authored numeric levels | `python3 tools/authored_levels.py --check` | a level pinned inside an organ rather than read off the material |
+| The table of contents agrees with the tree | `python3 tools/claim_index.py --check` | an index that has drifted from the documents it routes to |
+| The content address of every return | `python3 tools/output_manifest.py --check` | a return under `output/` the repository cannot cite |
+| The closure that produced every return | `python3 tools/closure_manifest.py --check` | a return the current tree cannot reproduce |
+| The ten Typst roots | derived by `tools/gates.sh`, never listed | a registry entry or a paper that no longer compiles |
 | Ownership ratchet | `cargo run -p holonic-architecture-lint` | an owner acquiring a responsibility it must not hold |
 
-**The ownership ratchet does not currently run.** Measured 2026-08-07: it exits with
-`failed to read /home/b/Workspaces/holonics/HOLONIC_DSA_BASELINE.tsv: No such file or directory`.
-`BASELINE_PATH` at `crates/holonic-architecture-lint/src/lib.rs:14` is a repository-root-relative
-name inherited from the laboratory layout, and the only copy of that file in this tree is
-`reference/engine-a07ff376/HOLONIC_DSA_BASELINE.tsv`, which is archive material. Listing the check
-above is a statement of what it is for, not a claim that it passes.
+**The ownership ratchet runs as of 2026-08-10, and it had two absolute frames rather than one.**
+This paragraph recorded only the first. `canon/THE_DOCUMENT_LAW.md` §1.9 and §7 recorded both and
+were right: `BASELINE_PATH` named a file that has never existed in this tree — the only copy is
+`reference/engine-a07ff376/HOLONIC_DSA_BASELINE.tsv`, archive material — **and** three of the five
+`PROTECTED_ROOTS` carried the laboratory's `src/soma/` prefix, so the ratchet covered none of
+`soma/`. The first hid the second: `check_repository` reads the baseline before taking the census,
+so execution never reached the roots. Measured by running `--emit-baseline`, which skips the
+baseline read: `failed to read /home/b/Workspaces/holonics/src/soma/body/src: No such file or
+directory`.
+
+Both repaired in `crates/holonic-architecture-lint/src/lib.rs`. The baseline is
+`meta/HOLONIC_DSA_BASELINE.tsv`, emitted from a **detached worktree of the commit** rather than
+from the working tree, so it is a property of what is committed. **193 files, 18,203 inherited
+occurrences** at `d3dc9c3`. A missing protected root is now refused by name instead of surfacing as
+an ordinary I/O error, and `every_protected_root_resolves_in_this_repository` is the test that
+would have caught the laboratory frame on the day it arrived.
+
+**Two of the nine gates are agreement checks between a tracked ledger and an untracked tree, and
+neither can be green on a dirty tree.** `output-manifest` reddens when a driver has *run* since the
+ledger was written; `closure-manifest` reddens when any `src/**.rs` of a crate that owns drivers is
+*edited*, because a closure covers the whole crate — one dirty crate reddens every driver it owns
+at once. Read both against `git status`, and read `departed` — not `moved` or `unrecorded` — as the
+loss the output manifest exists to catch.
 
 **The path check, in one paragraph.** It reads every `.md` at the root, in `canon/`, and in
 `blueprint/`, extracts every backticked or linked path-like token, and resolves each one. A

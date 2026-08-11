@@ -19,9 +19,24 @@ The purity, ownership, apparatus, no-float, and grading requirements this projec
 stated below. They were first written for the archived C++ body in
 `archive/blueprints/CPP_GPU_FOUNDATION.md`, which now carries an archive banner; the requirements survive
 the body that occasioned them and this file carries them. They are meant to be enforced by
-executable audits rather than by cross-reference — `cargo test --workspace` does enforce the
-no-float and determinism gates, and `crates/holonic-architecture-lint` is the ownership ratchet but
-**does not currently run**, for the reason `CONSTRUCTION_STATE.md` records.
+executable audits rather than by cross-reference. **They now run as one sequence: `bash
+tools/gates.sh`** — **nine** gates, one summary line each, non-zero if any is red:
+`tests · authored-levels · named-paths · claim-index · output-manifest · closure-manifest ·
+boundary-artifacts · typst · architecture-lint`. `bash tools/gates.sh --list` prints them and is the
+authority; **do not restate the count in prose without running it** — the first version of this
+paragraph said seven and omitted `boundary-artifacts`, which the same session had just added.
+`bash tools/gates.sh --control` makes each one fail on purpose and restores.
+
+**Two of the nine cannot be green on a dirty tree, by construction, and that is not a defect.**
+`output-manifest` reddens when a driver has *run* since the ledger was written; `closure-manifest`
+reddens when any `src/**.rs` in a driver-owning crate has been *edited*, because a closure covers
+the whole crate — one dirty crate reddens every driver it owns. `git status` is the companion
+reading for both, and neither is a claim about the code.
+
+The ratchet's two absolute frames were repaired 2026-08-10 and the sentence that stood here —
+*"does not currently run"* — is withdrawn. Its baseline is `meta/HOLONIC_DSA_BASELINE.tsv`, emitted
+from a detached worktree of the commit, so uncommitted work that adds an ownership occurrence shows
+up red by file and construct.
 
 This file is an operating contract, not a theory deposit and not a scheduler. It exists to prevent
 the specific recurring failures observed across the Codex sessions of 2026-07-09 through
@@ -103,6 +118,14 @@ python3 tools/resolve_named_paths.py
 
 An archive-bannered document may name archived paths; a live one may not. Run it after editing any
 document at the root, in `canon/`, or in `blueprint/`.
+
+**`THE_CLAIM_INDEX.md` is generated, and the generator is `tools/claim_index.py`.** Run
+`python3 tools/claim_index.py` after adding or retitling a document, `--check` to see whether it has
+drifted. It was deposited 2026-08-10 declaring itself generated with **no generator committed** —
+the `zz_smith_cost_probe` shape, a return whose producer is not in the tree — and that is now closed.
+Every description in it is **copied** from the file it describes: the `# ` title, plus the first
+complete sentence of the first non-metadata paragraph. Nothing in it is summarized and nothing in it
+may be edited by hand.
 
 ### The workspace
 

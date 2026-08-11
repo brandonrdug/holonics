@@ -11,23 +11,45 @@ use std::{
     path::{Path, PathBuf},
 };
 
-pub const BASELINE_PATH: &str = "HOLONIC_DSA_BASELINE.tsv";
+/// Where the committed census lives, relative to the repository root handed to
+/// [`check_repository`]. It sits in `meta/` beside the other tracked ledgers —
+/// `AUTHORED_LEVELS.tsv`, `BOUNDARY_ARTIFACTS.tsv`, `OUTPUT_MANIFEST.tsv`,
+/// `CLOSURE_MANIFEST.tsv` — because it is the same species of object: a tracked address for
+/// something the tree would otherwise be unable to say it had lost.
+///
+/// It read `HOLONIC_DSA_BASELINE.tsv` at the repository root until 2026-08-10, and no such file
+/// has ever existed in this tree; the only copy is `reference/engine-a07ff376/`, which is archive
+/// material for a body with a different layout.
+pub const BASELINE_PATH: &str = "meta/HOLONIC_DSA_BASELINE.tsv";
 
+/// The aperture, INHERITED UNCHANGED from the laboratory and rebased onto this tree's layout.
+///
+/// Five roots, the same five: the engine, the reflective runtime, and soma's body, membrane and
+/// life. The laboratory kept soma under `src/soma/`; this repository keeps it at `soma/`, and
+/// three of these five entries still carried the laboratory prefix. That is `CLAUDE.md` §0
+/// lesson 2 — *no absolute frame in a lineage* — and it was invisible because the missing
+/// baseline aborted [`check_repository`] one statement earlier.
+///
+/// Widening the aperture is a separate decision and is not taken here. `soma/{abi,surface,mount}`,
+/// `crates/holonic-structure/src` and `crates/relational-geometry/src` are outside it, and adding
+/// them would author a scope the source never declared.
 const PROTECTED_ROOTS: &[&str] = &[
     "crates/holonic-engine/src",
     "crates/holonic-language/src",
-    "src/soma/body/src",
-    "src/soma/membrane/src",
-    "src/soma/life/src",
+    "soma/body/src",
+    "soma/membrane/src",
+    "soma/life/src",
 ];
 
 // These files are explicitly classified as historical evidence or reference-only test material
 // in the ownership ledger. They must be migrated or retired deliberately, but they are not a
 // lawful source for new production code and therefore do not define the production ratchet.
-const EXCLUDED_PREFIXES: &[&str] = &[
-    "src/soma/life/src/staging/",
-    "src/soma/body/src/manifold_tests.rs",
-];
+//
+// `soma/life/src/staging/` has no owner in this tree — `find soma -type d -name staging` returns
+// nothing — so it excludes nothing today. It is retained rather than dropped because the
+// exclusion is a statement about a *class* of file, and deleting it would silently admit that
+// class the day it returns.
+const EXCLUDED_PREFIXES: &[&str] = &["soma/life/src/staging/", "soma/body/src/manifold_tests.rs"];
 
 const OWNERSHIP_IDENTIFIERS: &[&str] = &[
     "BTreeMap",
@@ -68,8 +90,15 @@ impl ArchitectureReport {
 pub fn check_repository(root: &Path) -> Result<ArchitectureReport, String> {
     let baseline = read_baseline(&root.join(BASELINE_PATH))?;
     let observed = census_repository(root)?;
+    // `observed` is keyed by (path, construct), so its length is a count of PAIRS. Reporting it
+    // as `protected_files` overstated the file count by roughly five to one — 971 against 193 on
+    // this tree — in the one line the gate prints. Count the distinct paths.
     let mut report = ArchitectureReport {
-        protected_files: observed.len(),
+        protected_files: observed
+            .keys()
+            .map(|(path, _)| path.as_str())
+            .collect::<BTreeSet<_>>()
+            .len(),
         ..ArchitectureReport::default()
     };
     let mut addresses = BTreeSet::new();
@@ -174,7 +203,29 @@ fn read_baseline(path: &Path) -> Result<BTreeMap<(String, String), usize>, Strin
     Ok(baseline)
 }
 
+/// Every protected root that does not resolve under `root`.
+///
+/// A protected root naming a directory that is not there is a frame defect, not a missing file:
+/// the ratchet silently stops guarding whatever that root held. Reported by name so it cannot be
+/// read as an ordinary I/O failure, which is how three laboratory-relative roots survived here
+/// unnoticed.
+pub fn unresolved_protected_roots(root: &Path) -> Vec<String> {
+    PROTECTED_ROOTS
+        .iter()
+        .filter(|protected| !root.join(protected).is_dir())
+        .map(|protected| (*protected).to_owned())
+        .collect()
+}
+
 fn census_repository(root: &Path) -> Result<BTreeMap<(String, String), usize>, String> {
+    let unresolved = unresolved_protected_roots(root);
+    if !unresolved.is_empty() {
+        return Err(format!(
+            "protected roots do not resolve under {}: {} — the ratchet would guard nothing there",
+            root.display(),
+            unresolved.join(", ")
+        ));
+    }
     let mut files = Vec::new();
     for protected in PROTECTED_ROOTS {
         collect_rust_files(&root.join(protected), &mut files)?;
@@ -369,5 +420,43 @@ mod tests {
         assert_eq!(census.get(".into_iter()"), Some(&1));
         assert_eq!(census.get(".collect()"), Some(&1));
         assert_eq!(census.get("VecDeque"), None);
+    }
+
+    /// The control that would have caught the laboratory frame, and the one that catches the next
+    /// layout move. It fails the moment a protected root stops resolving — which is precisely the
+    /// state this crate was in from the day it arrived until 2026-08-10, undetected because the
+    /// baseline read aborted `check_repository` before the census ever ran.
+    ///
+    /// What would make it fail: renaming or moving any of `crates/holonic-engine/src`,
+    /// `crates/holonic-language/src`, `soma/body/src`, `soma/membrane/src`, `soma/life/src`.
+    #[test]
+    fn every_protected_root_resolves_in_this_repository() {
+        let root = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .and_then(Path::parent)
+            .expect("the crate sits two levels under the repository root")
+            .to_path_buf();
+        assert!(
+            root.join("Cargo.toml").is_file(),
+            "{} is not the workspace root",
+            root.display()
+        );
+        assert_eq!(
+            unresolved_protected_roots(&root),
+            Vec::<String>::new(),
+            "a protected root does not resolve; the ratchet guards nothing there"
+        );
+    }
+
+    /// A root with none of the protected directories must be refused by name rather than
+    /// returning an empty, clean census. An empty census against an empty baseline is *clean*,
+    /// so without this the ratchet passes loudest exactly when it is guarding nothing.
+    #[test]
+    fn a_root_without_the_protected_directories_is_refused_rather_than_reported_clean() {
+        let elsewhere = Path::new(env!("CARGO_MANIFEST_DIR")).join("src");
+        let unresolved = unresolved_protected_roots(&elsewhere);
+        assert_eq!(unresolved.len(), PROTECTED_ROOTS.len());
+        let refusal = census_repository(&elsewhere).expect_err("an absent frame must refuse");
+        assert!(refusal.contains("do not resolve"), "{refusal}");
     }
 }

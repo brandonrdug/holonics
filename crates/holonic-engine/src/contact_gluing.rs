@@ -290,13 +290,31 @@ pub fn glue_at_contact(
 // The leader, the integral, and the return stroke
 // -------------------------------------------------------------------------------------------------
 
-/// A declared weight on occurrences. **Both measure; neither governs.**
+/// A declared weight on the cells a leader crosses. **Both measure; neither governs.**
+///
+/// **The two organs cross different cells, so each variant reads on two complexes and the readings
+/// are not the same quantity.** This is stated rather than smoothed over: the doc said *"how many
+/// letters the occurrence carries"* for `SpanLength` until 2026-08-10, which is true of the contact
+/// graph and false of the word line, where the value is the **cardinality of the face**. A gauge
+/// whose name means one thing in one organ and another thing next door is unreadable, and the
+/// separating measurement is that the two disagree numerically on the same stem.
+///
+/// ```text
+///                       word line (`integrate_leader`, cells = unit steps)
+///                       |                                        contact graph (`ride_circuit`, cells = arcs)
+///   SpanLength          |face_over(step)| — how many stems       stem.len() — how many letters
+///                       superpose over this letter               the shared stem carries
+///   WitnessBreadth      Σ over the face of |wholes|              |wholes| of the arc's stem
+/// ```
+///
+/// Both are structural on the left column and `Π` — the lived construction — on the right; neither
+/// is ever allowed to select.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum LeaderCochain {
-    /// How many letters the occurrence carries. Purely structural — no frequency enters.
+    /// Structural: face cardinality on the word line, stem length on the contact graph.
     SpanLength,
-    /// How many distinct wholes witnessed the stem. This is `Π`, the lived construction, reported
-    /// and never allowed to select.
+    /// `Π`, the lived construction: how many distinct wholes witnessed the stem, reported and never
+    /// allowed to select.
     WitnessBreadth,
 }
 
@@ -472,6 +490,15 @@ pub struct Circuit {
 ///
 /// Two identifiers sharing two stems is the smallest genuine cycle this material carries, and it is
 /// common: any pair whose covers meet twice closes one.
+///
+/// **`RunningIntegralError::PathIsNotClosed` cannot be reached through this entry point**, and
+/// saying so is `CLAUDE.md` §8's *unreachable refusals, reported not counted*. Both arcs are
+/// constrained by `find` to lie between the same pair, `contact_graph` stores every arc of a pair
+/// with the same tail and head, and the second is crossed `Against` — so every input this function
+/// accepts describes a walk that closes, including `out_stem == back_stem`, which closes at
+/// holonomy zero. The guard inside [`crate::running_integral::holonomy`] is real and is exercised
+/// by walks built directly on `ContactGraph::complex`; it is not exercised by this caller.
+/// `examples/the_circuit_closes_and_the_face_superposes.rs` exhibits it firing on the same graph.
 pub fn ride_circuit(
     graph: &ContactGraph,
     morphology: &FoundedMorphology,
@@ -516,10 +543,66 @@ pub fn ride_circuit(
     let integral = crate::running_integral::holonomy(&graph.complex, &weights, &path)
         .map_err(ContactGluingRefusal::Integral)?;
 
+    // **The return is read off the traversal, never echoed from the arguments.**
+    //
+    // These three fields were `vec![left, right, left]`, `vec![out_stem, back_stem]` and
+    // `vec![false, true]` — the caller's own arguments, restated as though they were a measurement.
+    // `left` and `right` name an **unordered** pair, because `find` accepts an arc in either order,
+    // so riding the same two arcs with the arguments swapped returned `[right, left, right]` for a
+    // walk that departs and returns at the same vertex either way. The argument order — a
+    // receiver-visible coordinate that no arc carries — was promoted into the return.
+    // `CLAUDE.md` §0's fourth lesson, at the width of three fields.
+    //
+    // The walk itself knows where it went: `RunningIntegral` carries `departed`/`arrived` per step
+    // and the orientation each was crossed at. All three fields are read off it, so a `Circuit` is
+    // now a record of a traversal rather than a restatement of a request.
+    let vertex_name: BTreeMap<CausalCellId, &str> = graph
+        .identifiers
+        .iter()
+        .map(|(name, cell)| (*cell, name.as_str()))
+        .collect();
+    let arc_stem: BTreeMap<CausalCellId, &str> = graph
+        .arcs
+        .iter()
+        .map(|(_, _, stem, cell)| (*cell, stem.as_str()))
+        .collect();
+
+    let mut through = Vec::with_capacity(integral.steps.len() + 1);
+    let mut string = Vec::with_capacity(integral.steps.len());
+    let mut reflected = Vec::with_capacity(integral.steps.len());
+    for (position, step) in integral.steps.iter().enumerate() {
+        let stood_at = |cell: CausalCellId| -> Result<String, ContactGluingRefusal> {
+            vertex_name
+                .get(&cell)
+                .map(|name| (*name).to_owned())
+                .ok_or_else(|| {
+                    ContactGluingRefusal::Algebraic(format!(
+                        "the walk stood at {cell:?}, which this graph names no identifier for"
+                    ))
+                })
+        };
+        if position == 0 {
+            through.push(stood_at(step.departed)?);
+        }
+        through.push(stood_at(step.arrived)?);
+        string.push(
+            arc_stem
+                .get(&step.cell)
+                .map(|stem| (*stem).to_owned())
+                .ok_or_else(|| {
+                    ContactGluingRefusal::Algebraic(format!(
+                        "the walk rode {:?}, which this graph carries no arc for",
+                        step.cell
+                    ))
+                })?,
+        );
+        reflected.push(step.orientation == Orientation::Against);
+    }
+
     Ok(Circuit {
-        through: vec![left.to_owned(), right.to_owned(), left.to_owned()],
-        string: vec![out_stem.to_owned(), back_stem.to_owned()],
-        reflected: vec![false, true],
+        through,
+        string,
+        reflected,
         series: integral.steps.iter().map(|step| step.accumulated.clone()).collect(),
         holonomy: integral.total.clone(),
     })

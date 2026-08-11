@@ -53,15 +53,25 @@
 //! current is trivially a short circuit, which would make the cut a property of the declaration
 //! rather than of the material — `CLAUDE.md` §8's vacuous-gauge defect exactly.
 //!
+//! # The mouth
+//!
+//! [`read_the_chain`] is where a live chain enters: a [`GradedCausalComplex`] supplies `B` and a
+//! [`CausalChain`] over it supplies `j`, and the residual `r = B j` is computed rather than
+//! declared. Until 2026-08-10 this module had no such mouth and its only material was the theta
+//! graph in its own tests, so the cut it names had never been read off anything the body produces.
+//! `examples/the_cut_is_named_on_real_material.rs` drives it over the conditioned derivation circuit
+//! of the deposited Lean production and reaches all five cuts.
+//!
 //! Everything here is exact rational arithmetic. No float, no tolerance, no threshold.
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use num_traits::Zero;
+use num_traits::{One, Zero};
 use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+use crate::algebraic::{CausalCell, CausalCellId, CausalChain, GradedCausalComplex};
 use crate::VertexId;
 
 /// An edge of the chain, named by the caller. Local to this module: the tree carries `Edge` as a
@@ -85,6 +95,13 @@ pub enum SpineCutError {
     /// A declared load edge is not in the incidence.
     #[error("the declared load names edge {0:?}, which the incidence does not carry")]
     LoadEdgeNotCarried(EdgeId),
+    /// A grade-1 cell of a supplied complex does not carry exactly one `+1` head and one `-1` tail,
+    /// so it has no tail and head to read and the chain law cannot be posed over it. Refused by
+    /// name rather than approximated.
+    #[error(
+        "cell {0:?} is not a joinable one-cell: a chain reading needs one +1 head and one -1 tail"
+    )]
+    UnjoinableCell(CausalCellId),
 }
 
 /// One oriented edge of the chain: `tail → head`.
@@ -175,6 +192,83 @@ impl ChainReading {
             .map(|(id, _)| *id)
             .collect()
     }
+}
+
+/// The `-1` face and the `+1` face of a 1-cell, read off the cell's own boundary.
+fn oriented_ends(cell: &CausalCell) -> Result<(VertexId, VertexId), SpineCutError> {
+    let mut tail = None;
+    let mut head = None;
+    for (vertex, coefficient) in cell.boundary.coefficients() {
+        if !coefficient.is_unit_orientation() {
+            return Err(SpineCutError::UnjoinableCell(cell.id));
+        }
+        let slot = if coefficient.difference().is_one() {
+            &mut head
+        } else {
+            &mut tail
+        };
+        if slot.replace(VertexId(vertex.0)).is_some() {
+            return Err(SpineCutError::UnjoinableCell(cell.id));
+        }
+    }
+    match (tail, head) {
+        (Some(tail), Some(head)) => Ok((tail, head)),
+        _ => Err(SpineCutError::UnjoinableCell(cell.id)),
+    }
+}
+
+/// **Read a chain reading off the body's own carriers.**
+///
+/// This module was written against a hand-made incidence and had no mouth onto the chain carrier
+/// every other organ in this crate already conducts through. That is the missing edge and this is
+/// it: a [`GradedCausalComplex`] supplies `B` — every grade-1 cell, its tail and head read off the
+/// cell's own boundary — and a [`CausalChain`] over that complex supplies `j`. A cell address is a
+/// [`CausalCellId`] and carries its own grade, so grade-1 addresses become [`EdgeId`]s and grade-0
+/// addresses become [`VertexId`]s with no renumbering; a vertex offered as a load edge is therefore
+/// refused by [`SpineCutError::LoadEdgeNotCarried`] rather than silently accepted.
+///
+/// **The residual is not a parameter.** At unchanged storage the chain law reads `r = B j`, so it is
+/// computed here from the incidence and the current and cannot be declared into a reading the
+/// material does not support. Hand a cycle and `r` vanishes and the reading reaches the closed cuts;
+/// hand an open path and the source and the sink are returned by name and the cut is a leak. That
+/// asymmetry is the whole of *"no emission without a return edge"*, and it is decided by the
+/// material rather than by the caller.
+///
+/// `potential_change` is `q_n − q_m` and stays the caller's: it is a line integral of a cochain this
+/// module does not carry and must not guess.
+pub fn read_the_chain(
+    complex: &GradedCausalComplex,
+    current: &CausalChain,
+    potential_change: Rat,
+) -> Result<ChainReading, SpineCutError> {
+    let mut edges = Vec::new();
+    for cell in complex.cells().values().filter(|cell| cell.grade == 1) {
+        let (tail, head) = oriented_ends(cell)?;
+        edges.push(ChainEdge {
+            id: EdgeId(cell.id.0),
+            tail,
+            head,
+        });
+    }
+    let carried: BTreeSet<EdgeId> = edges.iter().map(|edge| edge.id).collect();
+
+    let mut flows: BTreeMap<EdgeId, Rat> = BTreeMap::new();
+    for (cell, coefficient) in current.coefficients() {
+        let id = EdgeId(cell.0);
+        if !carried.contains(&id) {
+            return Err(SpineCutError::UnknownEdge(id));
+        }
+        flows.insert(id, Rat::from_integer(coefficient.difference()));
+    }
+
+    let mut reading = ChainReading {
+        edges,
+        current: flows,
+        residual: BTreeMap::new(),
+        potential_change,
+    };
+    reading.residual = reading.divergence();
+    Ok(reading)
 }
 
 /// **Name the cut.** The declared load is the caller's and is never inferred.
@@ -359,5 +453,127 @@ mod tests {
             &BTreeSet::from([EdgeId(99)]),
         );
         assert_eq!(refusal, Err(SpineCutError::LoadEdgeNotCarried(EdgeId(99))));
+    }
+
+    // --- the mouth ------------------------------------------------------------------------------
+
+    mod the_mouth {
+        use super::*;
+        use crate::algebraic::{
+            CausalCellId, CausalChain, ComparativeMultiplicity, GradedCausalComplex,
+        };
+        use crate::causal::EventId;
+
+        fn source() -> BTreeSet<EventId> {
+            BTreeSet::from([EventId(1)])
+        }
+
+        fn zero_cell(complex: &mut GradedCausalComplex, name: &str) -> CausalCellId {
+            complex
+                .found_cell(name, source(), 0, CausalChain::default())
+                .expect("a vertex carries no boundary")
+        }
+
+        fn one_cell(
+            complex: &mut GradedCausalComplex,
+            name: &str,
+            tail: CausalCellId,
+            head: CausalCellId,
+        ) -> CausalCellId {
+            let mut boundary = CausalChain::default();
+            boundary.add_term(head, ComparativeMultiplicity::positive(1u32));
+            boundary.add_term(tail, ComparativeMultiplicity::negative(1u32));
+            complex
+                .found_cell(name, source(), 1, boundary)
+                .expect("an edge closes")
+        }
+
+        /// `a -> b` by two parallel one-cells, so a cycle and an open path live on one incidence.
+        fn two_lane() -> (GradedCausalComplex, CausalCellId, CausalCellId, CausalCellId) {
+            let mut complex = GradedCausalComplex::default();
+            let a = zero_cell(&mut complex, "a");
+            let b = zero_cell(&mut complex, "b");
+            let left = one_cell(&mut complex, "left", a, b);
+            let right = one_cell(&mut complex, "right", a, b);
+            (complex, a, left, right)
+        }
+
+        fn walk(terms: &[(CausalCellId, i8)]) -> CausalChain {
+            let mut chain = CausalChain::default();
+            for (cell, hand) in terms {
+                chain.add_term(
+                    *cell,
+                    ComparativeMultiplicity::from_hand(*hand, 1u32).expect("a unit hand"),
+                );
+            }
+            chain
+        }
+
+        /// **The asymmetry the mouth exists for.** The same two cells: as a cycle the residual the
+        /// mouth computes vanishes and the reading reaches a closed cut; as an open path it does
+        /// not, and the source and the sink are returned by name. Neither residual was supplied.
+        #[test]
+        fn the_residual_is_computed_from_the_incidence_and_not_declared() {
+            let (complex, _, left, right) = two_lane();
+            let load = BTreeSet::from([EdgeId(left.0)]);
+
+            let closed = read_the_chain(&complex, &walk(&[(left, 1), (right, -1)]), Rat::zero())
+                .expect("both cells are joinable");
+            assert!(closed.residual.values().all(Zero::is_zero));
+            assert_eq!(
+                name_the_cut(&closed, &load).unwrap().name(),
+                "circulation j != 0"
+            );
+
+            let open = read_the_chain(&complex, &walk(&[(left, 1)]), Rat::zero())
+                .expect("the cell is joinable");
+            let cut = name_the_cut(&open, &load).unwrap();
+            assert_eq!(cut.name(), "leak");
+            let SpineCut::Leak { at } = &cut else {
+                panic!("the source and the sink are exhibited");
+            };
+            assert_eq!(at.len(), 2, "one source and one sink, both named");
+        }
+
+        /// A grade-0 address offered where a load **edge** is expected is refused. The two carriers
+        /// share one identity space by construction, so this is the check that keeps that safe.
+        #[test]
+        fn a_vertex_address_is_not_a_load_edge() {
+            let (complex, a, left, right) = two_lane();
+            let reading = read_the_chain(&complex, &walk(&[(left, 1), (right, -1)]), Rat::zero())
+                .expect("both cells are joinable");
+            assert_eq!(
+                name_the_cut(&reading, &BTreeSet::from([EdgeId(a.0)])),
+                Err(SpineCutError::LoadEdgeNotCarried(EdgeId(a.0)))
+            );
+        }
+
+        /// A cell whose two ends are the same vertex has no tail and head to read, so the chain law
+        /// cannot be posed over it. Refused by name rather than approximated.
+        #[test]
+        fn a_self_incident_cell_is_refused_by_name() {
+            let mut complex = GradedCausalComplex::default();
+            let a = zero_cell(&mut complex, "a");
+            let mut boundary = CausalChain::default();
+            boundary.add_term(a, ComparativeMultiplicity::positive(1u32));
+            boundary.add_term(a, ComparativeMultiplicity::negative(1u32));
+            let loop_cell = complex
+                .found_cell("loop", source(), 1, boundary)
+                .expect("the cell founds");
+            assert_eq!(
+                read_the_chain(&complex, &CausalChain::default(), Rat::zero()),
+                Err(SpineCutError::UnjoinableCell(loop_cell))
+            );
+        }
+
+        /// A current naming a cell the complex does not carry as a one-cell is refused.
+        #[test]
+        fn a_current_off_the_incidence_is_refused_by_name() {
+            let (complex, a, _, _) = two_lane();
+            assert_eq!(
+                read_the_chain(&complex, &walk(&[(a, 1)]), Rat::zero()),
+                Err(SpineCutError::UnknownEdge(EdgeId(a.0)))
+            );
+        }
     }
 }

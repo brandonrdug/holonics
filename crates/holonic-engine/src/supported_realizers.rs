@@ -290,14 +290,39 @@ pub fn landings_from_classes(
 /// `MᵀM` and [`crate::inertia::inertia`] returned its signature, and the only place the two met was
 /// an `assert_eq!` in this file's test module — so the chain the project's own doctrine runs through
 /// was a test assertion and not a conduct path. `blueprint/THE_ROADMAP.md` carried it as open work.
+/// The caller is `examples/the_realizer_places_itself.rs`, which builds the incidence from
+/// `skein::Substitution` moves read against a real complex rather than typing a matrix out.
 ///
 /// **What this returns is the split, not a verdict.** `canon/TABLET_THE_TURN.md` §2b: *"positivity is
 /// not absolute… State the **split** and the **hand** separately."* `MᵀM` is positive semi-definite
 /// by construction, so its inertia is `(rank, 0, nullity)` and the content is **where the rank
-/// falls**: the null directions are exactly the realizer combinations that land on nothing, which is
-/// the population §11's demand calls the certified remainder.
+/// falls**. The nullity is the measurement to read, and it is `columns − rank`.
 ///
-/// The nullity is therefore the measurement to read, and it is `columns − rank`.
+/// **Which space the null directions live in — corrected 2026-08-10 by driving it.** This doc said
+/// *"the null directions are exactly the realizer combinations that land on nothing"*. That names the
+/// wrong space for the incidence [`incidence`] actually builds, which has **rows = realizers,
+/// columns = classes**:
+///
+/// ```text
+///   induced_placement(M)    MᵀM, indexed by CLASSES
+///                           ker = {x : Mx = 0} — a combination of classes that every declared
+///                           realizer pairs to zero with. Its nullity is the FREE OBSTRUCTION,
+///                           `class_extent − rank`, which is exactly
+///                           `RealizerSupport::free_obstruction`.
+///
+///   induced_placement(Mᵀ)   MMᵀ, indexed by REALIZERS
+///                           ker = {y : yᵀM = 0} — the realizer combinations that land on nothing.
+///                           Nullity `realizer_extent − rank`.
+/// ```
+///
+/// Both are Gram matrices, so **both return `negative == 0`** and a transposed incidence is invisible
+/// to a positivity check. What catches it is the split: on the hollow tetrahedron the two nullities
+/// measured 7 and 3 against one shared rank of 4.
+///
+/// **And the split is a reading over ℚ.** It cannot see this module's own integral content: a family
+/// reaching a class only as `2·c` and a family reaching it once return the **same** inertia, measured
+/// `(1, 10, 0)` for both. The `ℤ/2` is in [`RealizerSupport::torsion_obstruction`] and nowhere in
+/// here.
 pub fn induced_placement(incidence: &IntegerMatrix) -> Result<crate::inertia::Inertia, crate::inertia::InertiaError> {
     let form = positive_form(incidence);
     let symmetric = crate::inertia::SymmetricForm::from_integer_matrix(&form)?;
@@ -657,21 +682,26 @@ mod tests {
     /// **The realization-to-placement chain runs on the conduct path**, not only in an assertion.
     ///
     /// `MᵀM` is positive semi-definite by construction, so the return is `(rank, 0, nullity)` and
-    /// the content is where the rank falls. A realizer population with a dependency has a null
-    /// direction, and that direction is the combination landing on nothing.
+    /// the content is where the rank falls. `MᵀM` is indexed by **classes**, so a null direction is
+    /// a combination of classes every realizer pairs to zero with — see the doc on
+    /// [`induced_placement`], which named the transposed space until 2026-08-10.
+    ///
+    /// Both matrices here are typed out by hand. The population that comes off real
+    /// `skein::Substitution` moves is driven by `examples/the_realizer_places_itself.rs`.
     #[test]
     fn induced_placement_returns_the_split_and_the_nullity_is_the_dependency() {
-        // Two independent realizers over two classes: full rank, no null direction.
+        // Two realizers, one class each: full column rank, no null direction.
         let mut independent = IntegerMatrix::zeros(2, 2);
         independent.set(0, 0, BigInt::from(1));
         independent.set(1, 1, BigInt::from(1));
         let placed = induced_placement(&independent).expect("the form founds");
         assert_eq!(placed.negative, 0, "M^T M is positive semi-definite");
-        assert_eq!(placed.zero, 0, "independent realizers leave no null direction");
+        assert_eq!(placed.zero, 0, "an independent incidence leaves no null direction");
         assert_eq!(placed.positive, 2);
 
-        // Three realizers over two classes, the third the sum of the first two: one dependency, so
-        // exactly one null direction.
+        // Two realizers over THREE classes, where class 2 is reached by both of the realizers that
+        // reach classes 0 and 1: its column is the sum of theirs, so `e0 + e1 - e2` is a class
+        // combination no realizer can separate — exactly one null direction.
         let mut dependent = IntegerMatrix::zeros(2, 3);
         dependent.set(0, 0, BigInt::from(1));
         dependent.set(1, 1, BigInt::from(1));
@@ -681,5 +711,10 @@ mod tests {
         assert_eq!(placed.negative, 0);
         assert_eq!(placed.zero, 1, "the dependency is the null direction");
         assert_eq!(placed.positive, 2);
+        assert_eq!(
+            placed.extent(),
+            3,
+            "the form is indexed by the CLASS family, so a transposed incidence would return 2 here"
+        );
     }
 }

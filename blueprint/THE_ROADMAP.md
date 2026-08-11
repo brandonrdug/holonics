@@ -41,9 +41,13 @@ in place. The measurements:
 | `cross_ratio` invariance | **DRIVEN** — now `pub` at `receiver_atlas.rs:664`, driven by `the_swing_is_the_invariant` |
 | the evidence sinks | **STANDS, AND HAS DEGRADED** — `zz_smith_cost_probe` and `zz_torsion_width_law` are now gone from `target/` with their sources still uncommitted. Those cost laws are lost. |
 
-**Four of the spine's five cuts now conduct.** Circulation was dark on 2026-08-10 morning and
-`kelvin.rs` now has two drivers; rest, accumulation and leak carry. **The short-circuit cut still has
-no owner** — named in `canon/THE_HOLOBROCHOS_SPINE.md:70` and `:580`, zero hits in any `src/`.
+**All five of the spine's cuts now conduct, and all five are named on one live chain.** Circulation
+was dark on 2026-08-10 morning and `kelvin.rs` now has two drivers; rest, accumulation and leak
+carry. The short-circuit cut had no owner at all that morning — named in
+`canon/THE_HOLOBROCHOS_SPINE.md:70` and `:580` and zero hits in any `src/` — then gained
+`spine_cut.rs`, which reached nothing until `read_the_chain` gave it a mouth onto the body's own
+chain carrier and `examples/the_cut_is_named_on_real_material.rs` classified 491 readings off the
+`standing/output` derivation circuit. Item 5 below carries the figures.
 
 **Gates at `9d15666`:** `cargo test --workspace` **1,984 passed, 0 failed, 14 ignored** over 42
 `test result:` lines; `authored_levels --check` 0 failures; ten Typst roots compile;
@@ -127,19 +131,34 @@ is deposited in place.
    real-material order price is unavailable and is not guessed. **This is a second instance of the
    prohibition this file already carries** — *"No aperture-less organ in the corpus path"* — which
    named only `eros_resonant_corpus_current`. Diagnosing and bounding it is the open work.
-5. **The short-circuit cut — OWNER BUILT, NOT DRIVEN.** Marked `CLOSED` on first writing and
-   corrected the same day: `spine_cut.rs` has **zero drivers** and its only material is a hand-made
-   theta graph in `#[cfg(test)]`. By this file's own standard that is an organ that reaches nothing,
-   and the cut it names has still never been read off a live chain. **What remains is a driver that
-   classifies a real reading from this body.** The organ below is real; the item is not closed. The missing object was not one
-   organ but the **classifier**: the spine says *"report which of rest, accumulation, leak, or short
-   circuit applies"*, and naming the cut is a measurement no single place was making.
+5. **The short-circuit cut — DRIVEN ON REAL MATERIAL 2026-08-10.** Marked `CLOSED` on first writing,
+   corrected the same day to `OWNER BUILT, NOT DRIVEN` — `spine_cut.rs` had **zero drivers** and its
+   only material was a hand-made theta graph in `#[cfg(test)]` — and now driven. The missing object
+   was not one organ but the **classifier**: the spine says *"report which of rest, accumulation,
+   leak, or short circuit applies"*, and naming the cut is a measurement no single place was making.
    `crates/holonic-engine/src/spine_cut.rs` takes a chain reading and a **declared load** and returns
    which of the five it is, with the evidence that decided it. A short circuit is the exact statement
    that a closed, source-free, non-zero current is supported **entirely off the declared load** — no
    resistances, no cost. An **empty load is refused**, because with no load every closed current is
    trivially a short circuit and the cut would be a property of the declaration rather than of the
-   material. Six controls, including one that reaches all five cuts on one incidence.
+   material.
+
+   **What closed it was a mouth, not a driver alone.** `spine_cut::read_the_chain` takes the body's
+   own carriers — a `GradedCausalComplex` for `B`, a `CausalChain` for `j` — and **computes `r = B j`
+   rather than accepting it**, so a residual the material does not support cannot be declared into a
+   reading. Hand it a cycle and it closes; hand it an open path and the source and the sink come back
+   by name. `crates/holonic-engine/examples/the_cut_is_named_on_real_material.rs` drives it over the
+   conditioned derivation circuit of the 103-artifact Lean production at `standing/output` — 25
+   vertices, 61 one-cells, the load read off `circuit.reaches()` as the 6 cells that deliver a
+   declaration to its statement — and **reaches all five cuts**, 8 controls, 0 failures.
+
+   Three returns worth carrying. **The ablation moves the cut:** removing the seven artifacts that
+   declare `formal_carry` takes accumulation `27 → 0` under the head-determined rule, which is
+   `derivation_holonomy`'s *"circuit E exact after the ablation"* restated as a cut population.
+   **Under `RecruitmentLoad` nothing in this production returns** — 0 of 491 readings are circulation
+   on the whole circuit and 0 of 329 on the ablated one, every load-crossing loop storing instead.
+   And **the accumulation rule is a live gauge**: 516 loops change cut between the two rules, so the
+   agreement of the two schedules is not vacuous on this material.
 6. **The accumulation cut — FIRST HALF CLOSED 2026-08-10.** `derivation_integral::conduct_return`
    is the edge: `accumulation → TemperedFamily::read → found_on → read again`. The reading's residual
    is written into the shared cochain and the second reading consults it **without being handed it**,
@@ -153,16 +172,36 @@ is deposited in place.
    Falsifier met: the movement is non-zero **and attributable**, every moved structure naming the
    deposit inside it, with a `Closed`-structure control that deposits nothing and must not move.
 
-   **Second half: API BUILT, NO CALLER.** `supported_realizers::induced_placement` joins
-   `positive_form` to `inertia::inertia` on the conduct path, so `CLAUDE.md` §2's
-   realization-causes-placement chain is no longer a test assertion. It returns the **split**, not a
-   verdict — `MᵀM` is positive semi-definite by construction, so the inertia is `(rank, 0, nullity)`
-   and the content is where the rank falls: **the null directions are exactly the realizer
-   combinations that land on nothing**, which is the population §11's demand calls the certified
-   remainder. Controlled on an independent population (nullity 0) and a dependent one (nullity 1) —
-   but **both are hand-built matrices**, nothing on a conduct path calls `induced_placement`, and no
-   realizer population from `substitution_realizers` has been through it. The assertion moved out of
-   `#[cfg(test)]`; the conduct did not.
+   **Second half: DRIVEN 2026-08-10, and driving it moved the reading twice.**
+   `supported_realizers::induced_placement` joins `positive_form` to `inertia::inertia`, so
+   `CLAUDE.md` §2's realization-causes-placement chain is no longer a test assertion. Until this
+   date nothing called it and both its tests typed their matrix out by hand.
+   `crates/holonic-engine/examples/the_realizer_places_itself.rs` is the caller: eight declared
+   `skein::Substitution` moves on the hollow tetrahedron, read against three contexts, placed against
+   the eleven conduct classes a real `ComplexSystem` returns, incidence taken off
+   `realizations_under`. Measured **(positive 4, zero 7, negative 0)** against a Smith-normal-form
+   rank of 4 taken over ℤ by a different algorithm.
+
+   **Correction 1 — the null directions were in the wrong space.** `incidence()` builds `M` with rows
+   = realizers and columns = classes, so `MᵀM` is indexed by **classes** and its kernel is a
+   combination of classes *no declared move can separate*; its nullity **is** the free obstruction.
+   The realizer combinations that land on nothing are the kernel of `MMᵀ`, which is
+   `induced_placement(Mᵀ)`. Both are exhibited and named — the class side returned
+   `+1·[f023] −1·[f123]`, two classes the receivers distinguish and the move population cannot; the
+   realizer side returned `[fill 012] − [fill 013]`, `2·[fill 012] − [fill both]`, and the pure
+   withdrawal alone. Measured nullities **7 and 3 on one shared rank of 4**.
+
+   **Correction 2 — the split cannot see this module's own integral content.** Two families, one
+   reaching a class singly and one reaching it only as `2·c`, return the **identical** inertia
+   `(1, 10, 0)` while their invariant factors are `[1]` and `[2]`. The `ℤ/2` lives in
+   `RealizerSupport::torsion_obstruction` and nowhere in the inertia. A rational split is not an
+   integral obstruction.
+
+   Both Gram matrices return `negative == 0`, so a transposed incidence is invisible to a positivity
+   check; the split catches it, and the driver exhibits the failure rather than asserting it away.
+   Both failure modes were confirmed by breaking the driver: transposing the incidence fires the
+   nullity check (3 against 7), and dropping one row's landings fires the cross-frame rank check
+   (3 against 4).
 7. **The evidence sinks — CLOSURE HALF CLOSED 2026-08-10, and it measured the sink.**
    `tools/closure_manifest.py` binds every return directory under `output/` to the **closure** that
    produced it — the driver source, every source file of its crate, and that crate's manifest — which

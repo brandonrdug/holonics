@@ -95,6 +95,7 @@ use thiserror::Error;
 
 use crate::inertia::{Inertia, InertiaError, SymmetricForm, inertia};
 use crate::rebase_invariants::{IntegerMatrix, PivotRule, smith_normal_form};
+use crate::winding_inertia::{CyclicReceiver, WindingError, cyclic_receiver_of_form};
 
 /// A subset of the ground set, as a bitmask. The ground set is bounded by [`GROUND_APERTURE`], so
 /// one machine word holds every subset and the empty set is `0`.
@@ -1347,6 +1348,40 @@ impl ChowRing {
         Ok(SymmetricForm::from_rows(rows)?)
     }
 
+    /// Hand this ring's generator pairing to the organ that names windings, and return what it says.
+    ///
+    /// [`crate::winding_inertia`] declines to count signs: where a form's inertia factors through a
+    /// character group, every direction has a **name** — how far it winds — and the lawful return is
+    /// the windings rather than a tally of negatives. The condition for that is a cyclic group acting
+    /// on the generators and preserving the pairing, and this asks the material whether one does.
+    ///
+    /// **The flat order is a receiver coordinate, not a property of the matroid.**
+    /// [`Matroid::flats`] sorts by rank and then by bitmask, which is a reading convention; the
+    /// pairing is refused as non-circulant in that order for every fixture measured, including the
+    /// one for which a cyclic reading exists. Both returns are carried, on
+    /// [`crate::winding_inertia::CyclicReceiver::native_refusal`].
+    ///
+    /// **What refuses, and why it is a theorem rather than a limit of this code.** A circulant
+    /// carries `c_0` at every diagonal entry, so a cyclic reading needs `deg(x_F²)` constant over the
+    /// flats. On a simple rank-three matroid `deg(x_L²) = −1` for a rank-two flat `L`, and
+    /// `deg(x_p²) = 1 − |{lines through p}|` for a point, so a constant diagonal forces every point
+    /// onto exactly two lines. Fix such a point `p` with lines `L₁, L₂`; the lines through `p`
+    /// partition `E ∖ {p}`, and a point `q ∈ L₁ ∖ {p}` then lies on `L₁` together with one line to
+    /// each point of `L₂ ∖ {p}`, so `q` is on `|L₂|` lines. Constancy forces `|L₂| = 2`, symmetrically
+    /// `|L₁| = 2`, and `|E| = |L₁ ∪ L₂| = 3`. **`U(3,3)` is the only simple rank-three matroid whose
+    /// generator pairing a character group can see**, and every other one is refused at the diagonal
+    /// with [`crate::winding_inertia::WindingError::DiagonalIsNotConstant`] naming the flat.
+    ///
+    /// `walk_aperture` is the caller's declaration, and its exhaustion is reported as an exhausted
+    /// allowance rather than as an absence.
+    pub fn cyclic_generator_receiver(
+        &self,
+        walk_aperture: u64,
+    ) -> Result<CyclicReceiver, ChowError> {
+        let pairing = self.generator_pairing()?;
+        Ok(cyclic_receiver_of_form(&pairing, walk_aperture)?)
+    }
+
     /// The intersection form of a blown-up projective plane, read off the matroid alone.
     ///
     /// For a simple rank-three matroid the map `x_{{i}} ↦ H − Σ_{G ∋ i} E_G`, `x_G ↦ E_G` on the
@@ -1817,6 +1852,8 @@ pub enum ChowError {
     TopIsNotTwo { top: usize },
     #[error(transparent)]
     Inertia(#[from] InertiaError),
+    #[error(transparent)]
+    Winding(#[from] WindingError),
 }
 
 #[cfg(test)]
@@ -2615,5 +2652,89 @@ mod tests {
                 );
             }
         }
+    }
+
+    /// **One matroid hands its pairing to the winding organ and every other one is refused.**
+    ///
+    /// A sweep that refuses everywhere and a sweep that admits everywhere carry the same evidence,
+    /// which is none, so both sides are required to be non-empty here. The single admission is
+    /// `U(3,3)`, and the reason it is single is the diagonal argument on
+    /// [`ChowRing::cyclic_generator_receiver`] rather than an aperture: a constant `deg(x_F²)` puts
+    /// every point on exactly two lines and forces `|E| = 3`.
+    #[test]
+    fn only_the_boolean_matroid_hands_a_circulant_to_the_organ_that_names_windings() {
+        let mut admitted: Vec<String> = Vec::new();
+        let mut refused_at_the_diagonal: Vec<String> = Vec::new();
+        for matroid in fixtures() {
+            let name = matroid.name().to_string();
+            let ring = ChowRing::new(matroid).expect("the ring builds");
+            if ring.generator_pairing().is_err() {
+                // Not a top grade of two; the winding question is never reached.
+                continue;
+            }
+            match ring.cyclic_generator_receiver(1_000_000) {
+                Ok(receiver) => {
+                    assert!(
+                        receiver.native_refusal.is_some(),
+                        "{name}: the ring's own flat order was already circulant, so the two-frame \
+                         claim would be one frame"
+                    );
+                    let split = crate::winding_inertia::winding_inertia(&receiver.circulant)
+                        .expect("the circulant names its passages")
+                        .split();
+                    assert_eq!(
+                        split,
+                        inertia(&ring.generator_pairing().unwrap()),
+                        "{name}: the character route and the elimination disagree"
+                    );
+                    admitted.push(name);
+                }
+                Err(ChowError::Winding(WindingError::DiagonalIsNotConstant { .. })) => {
+                    refused_at_the_diagonal.push(name);
+                }
+                Err(other) => panic!("{name}: unexpected refusal {other}"),
+            }
+        }
+        assert_eq!(admitted, vec!["U(3,3)".to_string()]);
+        assert_eq!(refused_at_the_diagonal.len(), 4, "{refused_at_the_diagonal:?}");
+    }
+
+    /// The passages `U(3,3)` returns, named rather than counted.
+    ///
+    /// The null cone is the ring's own relation ideal: `|E| − 1 = 2` relations, and the two null
+    /// passages are the conjugate pair at windings `1/6` and `5/6` — the hexagon traversed each way.
+    /// The one returning direction the Hodge index theorem promises is character zero, the
+    /// zero-frequency passage, whose star polygon `{1/0}` is the degenerate point.
+    #[test]
+    fn the_boolean_matroids_null_cone_is_its_relation_ideal_and_the_nulls_have_names() {
+        let ring = ChowRing::new(Matroid::uniform(3, 3).expect("U(3,3)")).expect("the ring builds");
+        let receiver = ring
+            .cyclic_generator_receiver(1_000_000)
+            .expect("U(3,3) admits a cyclic reading");
+        let reading = crate::winding_inertia::winding_inertia(&receiver.circulant).unwrap();
+
+        let nulls = reading.null_windings();
+        assert_eq!(nulls.len(), ring.matroid().ground() - 1);
+        assert_eq!(nulls.len(), receiver.reading.extent() - ring.dimension(1));
+        assert_eq!(
+            nulls,
+            vec![
+                Rat::new(BigInt::from(1), BigInt::from(6)),
+                Rat::new(BigInt::from(5), BigInt::from(6)),
+            ]
+        );
+        assert_eq!(
+            reading.windings_past_the_hand(),
+            vec![
+                Rat::new(BigInt::from(1), BigInt::from(3)),
+                Rat::new(BigInt::from(1), BigInt::from(2)),
+                Rat::new(BigInt::from(2), BigInt::from(3)),
+            ]
+        );
+        assert_eq!(
+            reading.windings_of(crate::winding_inertia::Hand::WithTheTurn),
+            vec![Rat::zero()]
+        );
+        assert_eq!(reading.passage(0).unwrap().star_polygon.label(), "{1/0}");
     }
 }

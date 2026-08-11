@@ -99,6 +99,16 @@
 //! unchanged. That is the laboratory's own join rule: a carrier generic over the application's own
 //! founding plus one narrow entry the application fills, never a universal payload and never a
 //! registry.
+//!
+//! **There are two such seams and they differ in one thing: who owns the identities.**
+//! `from_founded_words` replays a founding, so it *derives* each stem's [`StemId`] and parent from
+//! arrival order. [`FoundedMorphology::from_founded_stems`] carries them **verbatim** and refuses a
+//! population that is not a founded morphology. The second exists because the first cannot express a
+//! *resumption*: [`FoundedMorphology::without_stem`] keeps the surviving stems' original identities,
+//! so an ablated morphology's identities carry the gap where the removed stem stood, and replaying
+//! it in arrival order would renumber that gap away. The gap is the record of the ablation, and
+//! `soma/life/src/conditioned_rest.rs` is the owner that has to put an ablated body back together
+//! after it has been to disk.
 
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -250,11 +260,17 @@ impl FoundedMorphology {
         founded
     }
 
-    /// The seam a foreign conditioner enters by.
+    /// The seam a foreign conditioner enters by **when it is founding**.
     ///
     /// Each entry is a founded word, the wholes that witnessed it, and whatever that conditioner
     /// says founded it — `decomposing_codec` would render its `CollapsedPair` here. The lineage is
     /// carried and never parsed: this module does not know what a collapsed pair is and must not.
+    ///
+    /// **Identity and parent are DERIVED here, from arrival order.** That is right for a conditioner
+    /// that is founding a morphology and wrong for one that is *resuming* an existing one, because a
+    /// resumed body's identities were assigned under an order that is no longer the arrival order —
+    /// [`Self::without_stem`] is exactly that case. [`Self::from_founded_stems`] is the seam for
+    /// resumption; this one is the seam for founding.
     pub fn from_founded_words<W, L>(founded: impl IntoIterator<Item = (String, W, L)>) -> Self
     where
         W: IntoIterator<Item = String>,
@@ -272,6 +288,137 @@ impl FoundedMorphology {
             }
         }
         morphology
+    }
+
+    /// **The seam a foreign owner resumes an existing morphology through.**
+    ///
+    /// [`Self::from_founded_words`] replays a *founding*, so it derives every stem's identity and
+    /// parent from arrival order. A body that was never founded in that order cannot come back
+    /// through it: [`Self::without_stem`] keeps the surviving stems' original [`StemId`]s, so an
+    /// ablated morphology's identities carry the **gap where the removed stem was** — which is the
+    /// record of the ablation, and renumbering them would delete it.
+    ///
+    /// This constructor carries the population **verbatim** and refuses anything that is not a
+    /// founded morphology, by name, with the offending stem. It normalizes nothing: a population it
+    /// admits is returned stem for stem and field for field, so a caller can compare what came back
+    /// against what went in and the comparison is about the caller's material rather than about this
+    /// function's mercy.
+    ///
+    /// The conditions are the invariants every reachable morphology already satisfies, and each one
+    /// is load-bearing rather than tidy. The sharpest is `wholes` being a **set**: `witness`
+    /// never records a whole twice, and [`FoundedStem::standing`] reads the length of that
+    /// population — so a foreign wire that repeats one whole promotes a provisional stem to
+    /// **Committed** and puts a stem on the derivation path that no second source ever witnessed.
+    /// That is a frequency wearing a recurrence's name, and it is refused here rather than absorbed.
+    pub fn from_founded_stems(
+        stems: Vec<FoundedStem>,
+    ) -> Result<Self, FoundedMorphologyRefusal> {
+        let mut index = BTreeMap::new();
+        for (slot, stem) in stems.iter().enumerate() {
+            index.insert(stem.stem.clone(), slot);
+        }
+        let morphology = Self { stems, index };
+        morphology.refoundable()?;
+        Ok(morphology)
+    }
+
+    /// Whether this morphology is a founded population — the check
+    /// [`Self::from_founded_stems`] takes, taken on a body that is already built.
+    ///
+    /// A morphology can reach a caller by a route that never ran `witness`: this type derives
+    /// `serde::Deserialize`, so foreign octets can present one directly, and such a body can carry a
+    /// stem population and a lookup index that disagree. Every constructor in this module produces a
+    /// population that passes; nothing here repairs one that does not.
+    pub fn refoundable(&self) -> Result<(), FoundedMorphologyRefusal> {
+        let mut seen_text: BTreeMap<&str, usize> = BTreeMap::new();
+        let mut seen_identity: BTreeMap<u64, &str> = BTreeMap::new();
+        let mut previous: Option<&FoundedStem> = None;
+        for (slot, stem) in self.stems.iter().enumerate() {
+            if stem.stem.is_empty() {
+                return Err(FoundedMorphologyRefusal::StemIsEmpty { at: slot });
+            }
+            if let Some(also_at) = seen_text.insert(stem.stem.as_str(), slot) {
+                return Err(FoundedMorphologyRefusal::StemFoundedTwice {
+                    stem: stem.stem.clone(),
+                    at: slot,
+                    also_at,
+                });
+            }
+            if let Some(also) = seen_identity.insert(stem.id.0, stem.stem.as_str()) {
+                return Err(FoundedMorphologyRefusal::IdentityFoundedTwice {
+                    identity: stem.id.0,
+                    stem: stem.stem.clone(),
+                    also_carried_by: also.to_owned(),
+                });
+            }
+            if stem.wholes.is_empty() {
+                return Err(FoundedMorphologyRefusal::NoWholeWitnessedTheStem {
+                    stem: stem.stem.clone(),
+                });
+            }
+            let mut wholes: BTreeSet<&str> = BTreeSet::new();
+            for whole in &stem.wholes {
+                if !wholes.insert(whole.as_str()) {
+                    return Err(FoundedMorphologyRefusal::WholeWitnessedTwice {
+                        stem: stem.stem.clone(),
+                        whole: whole.clone(),
+                    });
+                }
+            }
+            let mut lineage: BTreeSet<&str> = BTreeSet::new();
+            for entry in &stem.foreign_lineage {
+                if !lineage.insert(entry.as_str()) {
+                    return Err(FoundedMorphologyRefusal::LineageCarriedTwice {
+                        stem: stem.stem.clone(),
+                        entry: entry.clone(),
+                    });
+                }
+            }
+            match previous {
+                None => {
+                    if let Some(parent) = stem.parent {
+                        return Err(FoundedMorphologyRefusal::FirstStemIsParented {
+                            stem: stem.stem.clone(),
+                            parent: parent.0,
+                        });
+                    }
+                }
+                Some(before) => {
+                    if stem.id <= before.id {
+                        return Err(FoundedMorphologyRefusal::IdentitiesAreNotInFoundingOrder {
+                            stem: stem.stem.clone(),
+                            identity: stem.id.0,
+                            founded_after: before.id.0,
+                        });
+                    }
+                    if stem.parent != Some(before.id) {
+                        return Err(FoundedMorphologyRefusal::ParentIsNotThePredecessor {
+                            stem: stem.stem.clone(),
+                            declared: stem.parent.map(|parent| parent.0),
+                            predecessor: before.id.0,
+                        });
+                    }
+                }
+            }
+            previous = Some(stem);
+        }
+        if self.index.len() != self.stems.len() {
+            return Err(FoundedMorphologyRefusal::IndexDoesNotCoverTheStems {
+                indexed: self.index.len(),
+                founded: self.stems.len(),
+            });
+        }
+        for (slot, stem) in self.stems.iter().enumerate() {
+            let indexed = self.index.get(&stem.stem).copied();
+            if indexed != Some(slot) {
+                return Err(FoundedMorphologyRefusal::IndexNamesAnotherSlot {
+                    stem: stem.stem.clone(),
+                    slot,
+                    indexed,
+                });
+            }
+        }
+        Ok(())
     }
 
     fn witness(&mut self, word: &str, whole: &str, lineage: Vec<String>) {
@@ -349,6 +496,14 @@ impl FoundedMorphology {
     /// successor re-parented onto its parent so the lineage stays a chain.
     ///
     /// Returns `None` when the stem was never founded, so an ablation cannot silently be a no-op.
+    ///
+    /// **The surviving stems keep their original identities, and the gap that leaves is the record
+    /// of the removal.** The population is therefore no longer numbered `0..n`, so it cannot come
+    /// back through [`Self::from_founded_words`], which derives identity from arrival order. It
+    /// comes back through [`Self::from_founded_stems`], which carries identity verbatim. What the
+    /// chain still guarantees, and what makes that possible, is that every stem's parent is the
+    /// identity of its **immediate predecessor in this population** — removing a link re-parents the
+    /// one stem that pointed at it and touches nothing else.
     pub fn without_stem(&self, stem: &str) -> Option<Self> {
         let slot = self.index.get(stem).copied()?;
         let removed = self.stems[slot].id;
@@ -1655,6 +1810,137 @@ pub fn ablate_stem(
 // Refusals
 // -------------------------------------------------------------------------------------------------
 
+/// Why a population of founded stems is not a founded morphology.
+///
+/// Every variant names the stem that failed and what it failed against. There is no variant meaning
+/// "something was wrong": a population this type refuses is refused by a condition a reader can go
+/// and check on the material.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum FoundedMorphologyRefusal {
+    /// A stem with no text. [`FoundedMorphology::witness`] founds nothing for an empty word, so no
+    /// founding produced this.
+    StemIsEmpty { at: usize },
+    /// Two slots carry the same stem text. The lookup index can name only one of them, so the other
+    /// would be founded and permanently unreachable.
+    StemFoundedTwice {
+        stem: String,
+        at: usize,
+        also_at: usize,
+    },
+    /// Two stems carry one identity, which makes every `parent` naming it ambiguous.
+    IdentityFoundedTwice {
+        identity: u64,
+        stem: String,
+        also_carried_by: String,
+    },
+    /// An identity that does not increase along the population. The identity **is** the founding
+    /// ordinal, so a population out of that order is not in founding order.
+    IdentitiesAreNotInFoundingOrder {
+        stem: String,
+        identity: u64,
+        founded_after: u64,
+    },
+    /// A stem no named whole witnessed. Founding requires a witnessing whole and the wholes are the
+    /// stem's lineage, so a stem without one has no provenance at all.
+    NoWholeWitnessedTheStem { stem: String },
+    /// One whole carried twice on one stem. `wholes` is a set of named sources and
+    /// [`FoundedStem::standing`] reads its extent, so a repeat is a **frequency promoted into a
+    /// recurrence** — it would commit a stem that only one source ever witnessed.
+    WholeWitnessedTwice { stem: String, whole: String },
+    /// One foreign lineage entry carried twice on one stem. `witness` never records one twice.
+    LineageCarriedTwice { stem: String, entry: String },
+    /// The first stem carries a parent. Nothing was founded before it.
+    FirstStemIsParented { stem: String, parent: u64 },
+    /// A stem whose parent is not the stem founded immediately before it. `parent` means exactly
+    /// that, and a population where it does not is not a lineage chain.
+    ParentIsNotThePredecessor {
+        stem: String,
+        declared: Option<u64>,
+        predecessor: u64,
+    },
+    /// The lookup index and the stem population have different extents.
+    IndexDoesNotCoverTheStems { indexed: usize, founded: usize },
+    /// The lookup index sends a stem's text somewhere other than the slot it occupies, so
+    /// [`FoundedMorphology::stem`] would return a different stem than the population carries.
+    IndexNamesAnotherSlot {
+        stem: String,
+        slot: usize,
+        indexed: Option<usize>,
+    },
+}
+
+impl std::fmt::Display for FoundedMorphologyRefusal {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::StemIsEmpty { at } => {
+                write!(formatter, "the stem at position {at} has no text")
+            }
+            Self::StemFoundedTwice { stem, at, also_at } => write!(
+                formatter,
+                "the stem {stem:?} is founded at position {at} and again at position {also_at}"
+            ),
+            Self::IdentityFoundedTwice {
+                identity,
+                stem,
+                also_carried_by,
+            } => write!(
+                formatter,
+                "identity {identity} is carried by the stem {stem:?} and by {also_carried_by:?}"
+            ),
+            Self::IdentitiesAreNotInFoundingOrder {
+                stem,
+                identity,
+                founded_after,
+            } => write!(
+                formatter,
+                "the stem {stem:?} carries identity {identity} and stands after identity \
+                 {founded_after}; the identity is the founding ordinal and does not run backwards"
+            ),
+            Self::NoWholeWitnessedTheStem { stem } => write!(
+                formatter,
+                "the stem {stem:?} names no whole that witnessed it"
+            ),
+            Self::WholeWitnessedTwice { stem, whole } => write!(
+                formatter,
+                "the stem {stem:?} carries the whole {whole:?} twice; the wholes are a population of \
+                 DISTINCT named sources and their extent decides whether the stem committed, so a \
+                 repeat would commit a stem one source witnessed"
+            ),
+            Self::LineageCarriedTwice { stem, entry } => write!(
+                formatter,
+                "the stem {stem:?} carries the foreign lineage entry {entry:?} twice"
+            ),
+            Self::FirstStemIsParented { stem, parent } => write!(
+                formatter,
+                "the first stem {stem:?} declares parent {parent}; nothing was founded before it"
+            ),
+            Self::ParentIsNotThePredecessor {
+                stem,
+                declared,
+                predecessor,
+            } => write!(
+                formatter,
+                "the stem {stem:?} declares parent {declared:?} and the stem founded immediately \
+                 before it carries identity {predecessor}"
+            ),
+            Self::IndexDoesNotCoverTheStems { indexed, founded } => write!(
+                formatter,
+                "the lookup index holds {indexed} entries over {founded} founded stems"
+            ),
+            Self::IndexNamesAnotherSlot {
+                stem,
+                slot,
+                indexed,
+            } => write!(
+                formatter,
+                "the stem {stem:?} occupies slot {slot} and the lookup index sends it to {indexed:?}"
+            ),
+        }
+    }
+}
+
+impl std::error::Error for FoundedMorphologyRefusal {}
+
 /// Why a conditioning, a derivation, or a circuit was refused.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ConditionedDerivationRefusal {
@@ -2498,6 +2784,209 @@ mod tests {
         let mut body = ConditionedBody::mount(deposit()).expect("deposit reads");
         body.carry_morphology(morphology);
         assert!(!body.derive(&the_statement()).expect("derives").is_empty());
+    }
+
+    // ---------------------------------------------------------------------------------------------
+    // The resumption seam
+    // ---------------------------------------------------------------------------------------------
+
+    /// Every morphology this module can produce comes back through `from_founded_stems` **verbatim**
+    /// — including the ablated ones, whose identities no longer number `0..n`.
+    ///
+    /// The control that can fail is the last assertion of each round: the returned population is
+    /// compared stem for stem and field for field, so a constructor that renumbered, reordered,
+    /// deduplicated or repaired anything fails here. `from_founded_words` fails it on every ablated
+    /// case, which is the defect this seam exists to close.
+    #[test]
+    fn every_reachable_morphology_comes_back_through_from_founded_stems_verbatim() {
+        let founded = FoundedMorphology::condition(&corpus_with_carrier());
+        let first = founded.founded()[0].stem.clone();
+        let middle = founded.founded()[founded.founded().len() / 2].stem.clone();
+        let last = founded.founded()[founded.founded().len() - 1].stem.clone();
+        let twice = founded
+            .without_stem(&first)
+            .expect("founded")
+            .without_stem(&middle)
+            .expect("founded");
+
+        let population = [
+            ("conditioned", founded.clone()),
+            ("unconditioned", FoundedMorphology::unconditioned()),
+            ("promoted", founded.promoted_provisional()),
+            ("reversed", founded.reversed()),
+            ("without the first", founded.without_stem(&first).expect("f")),
+            (
+                "without the middle",
+                founded.without_stem(&middle).expect("f"),
+            ),
+            ("without the last", founded.without_stem(&last).expect("f")),
+            ("without two", twice),
+        ];
+        for (named, morphology) in population {
+            morphology
+                .refoundable()
+                .unwrap_or_else(|refusal| panic!("{named} is not refoundable: {refusal}"));
+            let returned = FoundedMorphology::from_founded_stems(morphology.founded().to_vec())
+                .unwrap_or_else(|refusal| panic!("{named} was refused: {refusal}"));
+            assert_eq!(returned, morphology, "{named} did not come back verbatim");
+        }
+
+        // the material control: at least one of those populations really is renumbered by the
+        // founding seam, so the round trip above is not vacuous
+        let ablated = founded.without_stem(&first).expect("founded");
+        let replayed = FoundedMorphology::from_founded_words(ablated.founded().iter().map(|stem| {
+            (
+                stem.stem.clone(),
+                stem.wholes.clone(),
+                stem.foreign_lineage.clone(),
+            )
+        }));
+        assert_ne!(
+            replayed, ablated,
+            "the founding seam must renumber an ablated morphology, or this test proves nothing"
+        );
+        assert_eq!(replayed.founded()[0].id, StemId(0));
+        assert_ne!(ablated.founded()[0].id, StemId(0));
+
+        // and the boundary of that, stated exactly: removing the LAST founded stem leaves the
+        // identities contiguous, so the founding seam DOES reproduce it. A driver that ablated the
+        // last stem would prove nothing about the resumption seam, and this is the material that
+        // makes such a driver's control fail.
+        let trailing = founded.without_stem(&last).expect("founded");
+        let trailing_replay =
+            FoundedMorphology::from_founded_words(trailing.founded().iter().map(|stem| {
+                (
+                    stem.stem.clone(),
+                    stem.wholes.clone(),
+                    stem.foreign_lineage.clone(),
+                )
+            }));
+        assert_eq!(trailing_replay, trailing);
+    }
+
+    /// Each defect a foreign population can carry is refused by its own name, and the population
+    /// that differs from it in exactly that one respect is admitted.
+    #[test]
+    fn from_founded_stems_refuses_each_defect_by_name() {
+        let sound = || {
+            vec![
+                FoundedStem {
+                    id: StemId(0),
+                    stem: "carry".to_owned(),
+                    wholes: vec!["one".to_owned(), "two".to_owned()],
+                    parent: None,
+                    foreign_lineage: Vec::new(),
+                },
+                FoundedStem {
+                    id: StemId(3),
+                    stem: "carrier".to_owned(),
+                    wholes: vec!["one".to_owned()],
+                    parent: Some(StemId(0)),
+                    foreign_lineage: vec!["collapsed(9,11)".to_owned()],
+                },
+            ]
+        };
+        // the positive control: the sound population, with a GAP in the identities, is admitted
+        let admitted = FoundedMorphology::from_founded_stems(sound()).expect("sound");
+        assert_eq!(admitted.committed_stems(), vec!["carry"]);
+        assert_eq!(admitted.provisional()[0].stem, "carrier");
+
+        let mut empty = sound();
+        empty[1].stem = String::new();
+        assert_eq!(
+            FoundedMorphology::from_founded_stems(empty),
+            Err(FoundedMorphologyRefusal::StemIsEmpty { at: 1 })
+        );
+
+        let mut twice = sound();
+        twice[1].stem = "carry".to_owned();
+        assert_eq!(
+            FoundedMorphology::from_founded_stems(twice),
+            Err(FoundedMorphologyRefusal::StemFoundedTwice {
+                stem: "carry".to_owned(),
+                at: 1,
+                also_at: 0,
+            })
+        );
+
+        let mut collide = sound();
+        collide[1].id = StemId(0);
+        assert!(matches!(
+            FoundedMorphology::from_founded_stems(collide),
+            Err(FoundedMorphologyRefusal::IdentityFoundedTwice { identity: 0, .. })
+        ));
+
+        let mut backwards = sound();
+        backwards[0].id = StemId(9);
+        backwards[1].parent = Some(StemId(9));
+        assert!(matches!(
+            FoundedMorphology::from_founded_stems(backwards),
+            Err(FoundedMorphologyRefusal::IdentitiesAreNotInFoundingOrder { .. })
+        ));
+
+        let mut unwitnessed = sound();
+        unwitnessed[1].wholes.clear();
+        assert_eq!(
+            FoundedMorphology::from_founded_stems(unwitnessed),
+            Err(FoundedMorphologyRefusal::NoWholeWitnessedTheStem {
+                stem: "carrier".to_owned(),
+            })
+        );
+
+        // the load-bearing one: a repeated whole would COMMIT a stem one source witnessed
+        let mut repeated = sound();
+        repeated[1].wholes.push("one".to_owned());
+        assert_eq!(
+            FoundedMorphology::from_founded_stems(repeated.clone()),
+            Err(FoundedMorphologyRefusal::WholeWitnessedTwice {
+                stem: "carrier".to_owned(),
+                whole: "one".to_owned(),
+            })
+        );
+        assert_eq!(repeated[1].standing(), StemStanding::Committed);
+        assert_eq!(sound()[1].standing(), StemStanding::Provisional);
+
+        let mut lineage = sound();
+        lineage[1].foreign_lineage.push("collapsed(9,11)".to_owned());
+        assert_eq!(
+            FoundedMorphology::from_founded_stems(lineage),
+            Err(FoundedMorphologyRefusal::LineageCarriedTwice {
+                stem: "carrier".to_owned(),
+                entry: "collapsed(9,11)".to_owned(),
+            })
+        );
+
+        let mut parented = sound();
+        parented[0].parent = Some(StemId(7));
+        assert_eq!(
+            FoundedMorphology::from_founded_stems(parented),
+            Err(FoundedMorphologyRefusal::FirstStemIsParented {
+                stem: "carry".to_owned(),
+                parent: 7,
+            })
+        );
+
+        let mut broken = sound();
+        broken[1].parent = Some(StemId(2));
+        assert_eq!(
+            FoundedMorphology::from_founded_stems(broken),
+            Err(FoundedMorphologyRefusal::ParentIsNotThePredecessor {
+                stem: "carrier".to_owned(),
+                declared: Some(2),
+                predecessor: 0,
+            })
+        );
+
+        let mut orphaned = sound();
+        orphaned[1].parent = None;
+        assert_eq!(
+            FoundedMorphology::from_founded_stems(orphaned),
+            Err(FoundedMorphologyRefusal::ParentIsNotThePredecessor {
+                stem: "carrier".to_owned(),
+                declared: None,
+                predecessor: 0,
+            })
+        );
     }
 
     #[test]

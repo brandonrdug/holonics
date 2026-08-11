@@ -765,9 +765,52 @@ impl AgenticLanguageEcology {
         Some((text, identities))
     }
 
+    /// Receive one occurrence through an explicitly mounted physical-current executor.
+    ///
+    /// [`CausalMembrane::receive_occurrence`] cannot carry a carrier argument — its signature is
+    /// fixed by the trait — so this is the outer mouth a caller holding a mounted card conducts
+    /// through. It is the same membrane: the occurrence is retained exactly when it was admitted,
+    /// and the returned consequence is identical. The only difference is that the answer's
+    /// generation crosses the supplied executor instead of a privately constructed host pool.
+    pub fn receive_occurrence_with_executor<'a>(
+        &mut self,
+        occurrence: AgenticLanguageOccurrence<'a>,
+        executor: &mut dyn LiveCurrentExecutor,
+    ) -> Result<AgenticLanguageConsequence, AgenticLanguageError> {
+        let retained = occurrence.owned();
+        let consequence = match occurrence {
+            AgenticLanguageOccurrence::Question(question) => {
+                self.receive_question_with_executor(question, executor)
+            }
+            AgenticLanguageOccurrence::WorldReturn(world_return) => {
+                self.receive_world_return_with_executor(world_return, executor)
+            }
+            AgenticLanguageOccurrence::Feedback(feedback) => self.receive_feedback(feedback),
+            AgenticLanguageOccurrence::FormalReturn(returned) => self
+                .receive_formal_return(returned)
+                .map(AgenticLanguageConsequence::FormalReturn),
+        }?;
+        self.history.push(retained);
+        Ok(consequence)
+    }
+
     pub(super) fn receive_question(
         &mut self,
         question: &AgenticLanguageQuestion,
+    ) -> Result<AgenticLanguageConsequence, AgenticLanguageError> {
+        let mut host = ParallelHostLiveCurrentExecutor::new(self.worker_threads.max(1));
+        self.receive_question_with_executor(question, &mut host)
+    }
+
+    /// Receive one outer question through a caller-retained physical executor.
+    ///
+    /// Question reception may close locally, in which case the answer is materialized here and the
+    /// executor crosses that generation. When the question instead emits a deed, no Swing event is
+    /// reached on this path and the executor is carried unused to the world return.
+    pub(super) fn receive_question_with_executor(
+        &mut self,
+        question: &AgenticLanguageQuestion,
+        executor: &mut dyn LiveCurrentExecutor,
     ) -> Result<AgenticLanguageConsequence, AgenticLanguageError> {
         if let Some(pending) = &self.pending_local_answer {
             if pending.question != *question {
@@ -808,7 +851,14 @@ impl AgenticLanguageEcology {
             let grounded =
                 self.compose_candidate_population(grounded, &question.text, &BTreeSet::new())?;
             if !grounded.is_empty() {
-                let prepared = self.prepare_answer(question.clone(), None, &[], grounded, &[])?;
+                let prepared = self.prepare_answer_with_executor(
+                    question.clone(),
+                    None,
+                    &[],
+                    grounded,
+                    &[],
+                    executor,
+                )?;
                 self.pending_local_answer = Some(PendingLocalAnswer {
                     question: question.clone(),
                     prepared,
@@ -841,8 +891,14 @@ impl AgenticLanguageEcology {
             Vec::new()
         };
         if !formal_return_receives && !contextual_grounded.is_empty() {
-            let prepared =
-                self.prepare_answer(question.clone(), None, &[], contextual_grounded, &[])?;
+            let prepared = self.prepare_answer_with_executor(
+                question.clone(),
+                None,
+                &[],
+                contextual_grounded,
+                &[],
+                executor,
+            )?;
             self.pending_local_answer = Some(PendingLocalAnswer {
                 question: question.clone(),
                 prepared,
@@ -957,6 +1013,20 @@ impl AgenticLanguageEcology {
     pub(super) fn receive_world_return(
         &mut self,
         returned: &AgenticLanguageWorldReturn,
+    ) -> Result<AgenticLanguageConsequence, AgenticLanguageError> {
+        let mut host = ParallelHostLiveCurrentExecutor::new(self.worker_threads.max(1));
+        self.receive_world_return_with_executor(returned, &mut host)
+    }
+
+    /// Receive the deed's returned world sections through a caller-retained physical executor.
+    ///
+    /// This is the production answer path: the returned sections found local organs, the answer
+    /// candidate population is composed, and the selected current is materialized. That
+    /// materialization crosses the supplied executor.
+    pub(super) fn receive_world_return_with_executor(
+        &mut self,
+        returned: &AgenticLanguageWorldReturn,
+        executor: &mut dyn LiveCurrentExecutor,
     ) -> Result<AgenticLanguageConsequence, AgenticLanguageError> {
         let open = self
             .open
@@ -1167,12 +1237,13 @@ impl AgenticLanguageEcology {
                 question,
                 &open_deed.contextual_dialogue,
             )?;
-            let prepared = self.prepare_answer(
+            let prepared = self.prepare_answer_with_executor(
                 open_question.clone(),
                 Some(open_deed.identity.clone()),
                 &returned.sections,
                 candidates,
                 &returned.thought_fibers,
+                executor,
             )?;
             self.open
                 .as_mut()

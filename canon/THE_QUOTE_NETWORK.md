@@ -1924,14 +1924,22 @@ repository.
 > — 2026-08-01 12:32, `CX 2026/07/30`
 
 *Status:* `crates/holonic-language` exists — **932 source lines in a single `lib.rs`, 2 tests** — the
-thinnest crate in the workspace. The enforced blacklist is `crates/holonic-architecture-lint`, and
-`[measured]` **it is non-functional in this layout**: `BASELINE_PATH = "HOLONIC_DSA_BASELINE.tsv"`
-resolves to a file that does not exist at the repository root (the only copy is
-`reference/engine-a07ff376/HOLONIC_DSA_BASELINE.tsv`, 135 lines), and three of its five
-`PROTECTED_ROOTS` are laboratory paths (`src/soma/body/src`, `src/soma/membrane/src`,
-`src/soma/life/src`) that do not exist here — **the ownership ratchet covers none of `soma/`**. The
-crate has one test and it tests the lexer, not the ratchet. Nothing depends on it and it depends on
-nothing.
+thinnest crate in the workspace. The enforced blacklist is `crates/holonic-architecture-lint`.
+
+**This entry recorded both of its broken frames in more detail than any other file in the tree, and
+both were repaired 2026-08-10.** What it measured, and it was right: `BASELINE_PATH =
+"HOLONIC_DSA_BASELINE.tsv"` resolved to a file that has never existed at this repository's root (the
+only copy being `reference/engine-a07ff376/HOLONIC_DSA_BASELINE.tsv`, archive material), **and**
+three of its five `PROTECTED_ROOTS` were laboratory paths — `src/soma/body/src`,
+`src/soma/membrane/src`, `src/soma/life/src` — so **the ownership ratchet covered none of `soma/`**.
+The first hid the second: `check_repository` reads the baseline before taking the census, so
+execution never reached the roots, and every prior report named only the missing file.
+
+**Now:** the baseline is `meta/HOLONIC_DSA_BASELINE.tsv`, emitted from a detached worktree of the
+commit so it is a property of what is committed — **193 files, 18,203 inherited occurrences** — the
+roots resolve, a missing protected root is refused by name rather than surfacing as an ordinary I/O
+error, and the ratchet runs as the last gate of `tools/gates.sh`. Its first act was to convict the
+wave that turned it on. `CONSTRUCTION_STATE.md` carries the measurement.
 
 **A holonic relational database.**
 
