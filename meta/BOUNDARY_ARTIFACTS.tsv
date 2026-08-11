@@ -78,7 +78,7 @@ ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	root	soma/mount/soma-k
 ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	closure_rule	CRATE_DEPS
 ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	sha256	a8ba0921808bc0a205fc38be64d2c2bf997c3bdf4cacfdca6efa5c8cdccabe34
 ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	octets	8794156
-ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	closure_sha256	09115bf90472a21b979bb742c449b642192b89639d67661ae84ec76862b67db9
+ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	closure_sha256	4a3f622c538110ef34a9d20251948caef07690ad52616385c8c8c17901d02cd3
 ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	toolchain	nightly-2026-05-22
 ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	builder	soma/mount/soma-kernel-cuda/build-ptx.sh
 ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	consumer	soma/mount/src/lib.rs
@@ -93,11 +93,10 @@ CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/Cargo.toml	9b6
 CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/active.rs	322121d3806fe8d28faed6ed4af6a5297f8c84bd8cb034f7b11a4c6a0f9558a8
 CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/conduct.rs	803921412f41fa349606e3d5559639602ce2a21f639305b179919c14122038f6
 CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/contact.rs	0c7549814af7705e7f7c6cbd229c3008df451dbcf9a05ab8ada6403cbbc7e3c4
-CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/cuda_execution.rs	4085d9dc2c57a7db042d439d73af220eb277799242f8da78f9cde15a87e0d05a
 CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/current.rs	fcaa6d7b779734e67bf9af840c877f213d4b34516ebe4a62eba0f3744534c62b
 CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/emission.rs	d01f928ff274ebe7a4a480d4ac4aa65000fd88d410709e9a9d5f22bc2acd2d27
 CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/holon.rs	aa8611ca4dacda298764076947add9603bc63b9984460f976056651c07164b93
-CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/lib.rs	9573de777d09a148f025642af9348e0d33b11e69df5fd26fc9d6fa903e3e3370
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/lib.rs	c064e43329f8e52cef3d7e048dc0a8a550867ad55939fe4e28a45f4afc7002df
 CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/live_event_cuda.rs	e8eab373bcc3d294937b467fafa367b03b8ea8415ab9682a2d599cac22306f15
 CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/presentation.rs	c8c7e2f075ef8956394bf4aa9a7eb7fcd382b76a6a7b33b05ee079eabbdcfa7a
 CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/register.rs	0b00fbde9e6831ae7d9018838743adb4a6477f53198a372daf037d1798c355aa

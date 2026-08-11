@@ -41,7 +41,46 @@ use crate::{
 };
 
 const CUDA_SUCCESS: i32 = 0;
-const THREADS_PER_BLOCK: u32 = 128;
+/// **The launch geometry, read off the device and the kernel — never authored.**
+///
+/// This module carried `const THREADS_PER_BLOCK: u32 = 128` until 2026-08-10, dispositioned `ABI`
+/// in `meta/AUTHORED_LEVELS.tsv` with the reason *"CUDA launch geometry, fixed by the device
+/// interface."* **That reason was false.** Launch geometry is queryable, and `soma/mount` has
+/// derived it correctly all along: `min(the function's own MAX_THREADS_PER_BLOCK, the device's)`,
+/// grid from the work extent, refused rather than clipped when it exceeds the grid aperture.
+///
+/// This is a second implementation of that derivation, and the duplication is **forced**, not
+/// chosen: `soma/life` depends on `holonic-engine`, so the engine cannot depend on `soma/mount`
+/// without a Cargo cycle (`blueprint/THE_ASSEMBLY.md` F1). Saying so is better than either
+/// pretending the pin was ABI or pretending the two owners could be one.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct DerivedLaunch {
+    /// Threads per block: the smaller of what the kernel admits and what the device admits, taken
+    /// down to a whole number of warps because a partial warp leaves lanes idle.
+    pub block_x: u32,
+    /// The device's own ceiling on the X grid dimension. A work extent past it is refused by name.
+    pub max_grid_x: u32,
+    /// The device's warp size, as the device stated it.
+    pub warp: u32,
+}
+
+impl DerivedLaunch {
+    /// Grid for one flat work extent, or the refusal naming what could not be covered.
+    fn grid_for(&self, work: u32) -> Result<u32, CudaApertureError> {
+        let blocks = work.div_ceil(self.block_x.max(1));
+        if blocks > self.max_grid_x {
+            return Err(CudaApertureError::ExtentOverflow);
+        }
+        Ok(blocks)
+    }
+}
+
+/// `CUdevice_attribute` and `CUfunction_attribute` selectors from `cuda.h`. THESE are ABI: the
+/// integers are fixed by the foreign interface and a different value asks a different question.
+const DEVICE_MAX_THREADS_PER_BLOCK: i32 = 1;
+const DEVICE_MAX_GRID_DIM_X: i32 = 5;
+const DEVICE_WARP_SIZE: i32 = 10;
+const FUNCTION_MAX_THREADS_PER_BLOCK: i32 = 0;
 const TILE_EDGE: u32 = 16;
 /// Largest exact intermediate carried by the compiled device aperture.
 ///
@@ -64,6 +103,8 @@ unsafe extern "C" {
     fn cuDeviceGetCount(count: *mut i32) -> i32;
     fn cuDeviceGet(device: *mut CuDevice, ordinal: i32) -> i32;
     fn cuDeviceGetName(name: *mut c_char, length: i32, device: CuDevice) -> i32;
+    fn cuDeviceGetAttribute(value: *mut i32, attribute: i32, device: CuDevice) -> i32;
+    fn cuFuncGetAttribute(value: *mut i32, attribute: i32, function: CuFunction) -> i32;
     fn cuCtxCreate_v2(context: *mut CuContext, flags: u32, device: CuDevice) -> i32;
     fn cuCtxSetCurrent(context: CuContext) -> i32;
     fn cuCtxDestroy_v2(context: CuContext) -> i32;
@@ -198,6 +239,8 @@ pub struct CudaApertureExecutor {
     _conic_function_i128: CuFunction,
     _segment_function_i128: CuFunction,
     device_name: String,
+    /// The launch geometry this device and these kernels admit. Derived at mount; nothing authored.
+    launch: DerivedLaunch,
     /// The receiver's declared exchange between kinds of work. `None` means undeclared, and an
     /// undeclared metric admits `CarrierAdmission::Open` — both carriers retained.
     declared_metric: Option<DeclaredCarrierMetric>,
@@ -223,6 +266,18 @@ impl CudaApertureExecutor {
                 "cuDeviceGetName",
             )?;
             let device_name = CStr::from_ptr(name.as_ptr()).to_string_lossy().into_owned();
+            let mut device_attribute = |selector: i32, operation: &'static str| -> Result<u32, CudaApertureError> {
+                let mut value = 0i32;
+                driver(
+                    cuDeviceGetAttribute(&mut value, selector, device),
+                    operation,
+                )?;
+                Ok(value.max(0) as u32)
+            };
+            let device_block =
+                device_attribute(DEVICE_MAX_THREADS_PER_BLOCK, "cuDeviceGetAttribute(MAX_THREADS_PER_BLOCK)")?;
+            let max_grid_x = device_attribute(DEVICE_MAX_GRID_DIM_X, "cuDeviceGetAttribute(MAX_GRID_DIM_X)")?;
+            let warp = device_attribute(DEVICE_WARP_SIZE, "cuDeviceGetAttribute(WARP_SIZE)")?.max(1);
             let mut context = ptr::null_mut();
             driver(cuCtxCreate_v2(&mut context, 0, device), "cuCtxCreate_v2")?;
 
@@ -342,6 +397,26 @@ impl CudaApertureExecutor {
                 _conic_function_i128: conic_function_i128,
                 _segment_function_i128: segment_function_i128,
                 device_name,
+                launch: {
+                    // The kernels launched are the conic and segment pair; the block must fit
+                    // whichever of the two admits fewer threads, and the device's own ceiling.
+                    let mut kernel_block = device_block;
+                    for function in [conic_function, segment_function] {
+                        let mut value = 0i32;
+                        driver(
+                            cuFuncGetAttribute(&mut value, FUNCTION_MAX_THREADS_PER_BLOCK, function),
+                            "cuFuncGetAttribute(MAX_THREADS_PER_BLOCK)",
+                        )?;
+                        kernel_block = kernel_block.min(value.max(0) as u32);
+                    }
+                    // Down to a whole number of warps: a partial warp issues with idle lanes.
+                    let block_x = (kernel_block / warp).max(1) * warp;
+                    DerivedLaunch {
+                        block_x,
+                        max_grid_x,
+                        warp,
+                    }
+                },
                 declared_metric: None,
                 display_frame: DisplayFrame::Undeclared,
             })
@@ -591,10 +666,10 @@ impl CudaApertureExecutor {
                 driver(
                     cuLaunchKernel(
                         conic_function,
-                        conic_work.div_ceil(THREADS_PER_BLOCK),
+                        self.launch.grid_for(conic_work)?,
                         1,
                         1,
-                        THREADS_PER_BLOCK,
+                        self.launch.block_x,
                         1,
                         1,
                         0,
@@ -611,10 +686,10 @@ impl CudaApertureExecutor {
                 driver(
                     cuLaunchKernel(
                         segment_function,
-                        segment_work.div_ceil(THREADS_PER_BLOCK),
+                        self.launch.grid_for(segment_work)?,
                         1,
                         1,
-                        THREADS_PER_BLOCK,
+                        self.launch.block_x,
                         1,
                         1,
                         0,

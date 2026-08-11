@@ -1098,6 +1098,39 @@ impl CudaLiveCurrentExecutor {
                 }
             }
 
+            // **The device states what it has, and the demand is refused BY NAME when it does not
+            // fit.** Running `count` lanes instead of one multiplies the per-thread local-memory
+            // reservation by `count`, so the population's demand genuinely scales with the front --
+            // that is the real cost of the repair, not a hidden one. Without this the driver
+            // returns a bare `CUDA_ERROR_OUT_OF_MEMORY` with no numbers, which is what surfaced
+            // when six card tests ran concurrently, each holding its own context.
+            let free = self.context.memory_info().map_err(substrate)?.free_bytes;
+            let words: usize = checked_mul(count, cuda::CONTROL_WORDS)?
+                + checked_mul(count, COG_WORDS)?
+                + checked_mul(count, carrier_extent)?
+                + checked_mul(count, overflow_extent)?
+                + checked_mul(count, caps.max_depth)?
+                + checked_mul(count, emission_extent)?
+                + checked_mul(count, cuda::EMANATION_WORDS)?;
+            let buffers = checked_mul(words, core::mem::size_of::<u32>())?;
+            let owns = checked_mul(
+                checked_mul(count, caps.own)?,
+                core::mem::size_of::<SparseOwnCell>(),
+            )?;
+            let local = checked_mul(count, self.stack_limit_bytes)?;
+            let demand = buffers
+                .checked_add(owns)
+                .and_then(|value| value.checked_add(local))
+                .ok_or(LiveCurrentError::ResourceReservation)?;
+            if demand > free {
+                return Err(LiveCurrentError::PopulationExceedsDevice {
+                    lanes: count,
+                    demanded_bytes: demand as u64,
+                    free_bytes: free as u64,
+                    per_lane_stack_bytes: self.stack_limit_bytes as u64,
+                });
+            }
+
             // ONE crossing. The shape comes from `Function::linear_launch`, which reads it off the
             // function's own attribute and the device census.
             let census = self.device_census()?;

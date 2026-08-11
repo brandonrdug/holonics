@@ -33,8 +33,23 @@ is visible the day it lands rather than in a hand audit six weeks later.
                number derived; the `why` is what keeps that honest.
     PIN        a contaminant. `why` must carry the excision plan.
 
-Scope is **library code only** — `crates/*/src`, `soma/*/src`. Drivers and tests declare their own
-material and are the right place for a literal.
+# Scope, and the blind spot corrected 2026-08-10
+
+Library code — `crates/*/src`, `soma/*/src` — must **disposition** every level: an undispositioned
+constant there fails the run.
+
+**Drivers are read too, and counted, but not required to disposition.** A driver declares its own
+material and a literal there is lawful; what is not lawful is that the population was **invisible**.
+Measured 2026-08-10: 207 dispositioned levels in library code against **411 unseen `const` levels
+under `examples/`** — the majority of authored levels in this repository, sitting in the blind spot
+of the instrument built to find them, and concentrated exactly where every measured figure is
+produced. Among them `DECLARED_CAPACITY = 8_192`, which several documents had promoted to "the
+aperture law"; `ENUMERATION_APERTURE = 200_000`, literally the word; and `RADIUS = 3` in
+`foreign_codec_intake`, the exhaustion radius of one of the four exact interior recoveries.
+
+`canon/THE_AUTHORED_LEVEL.md` already says this tool is a convenience and never the authority —
+*"a level its regex does not match is exactly as much a contaminant as one it does"*. This was that
+failure in its own scanner for the second time; the first was `#[cfg(test)]` never being un-set.
 """
 
 from __future__ import annotations
@@ -65,6 +80,15 @@ NOT_A_LEVEL = re.compile(
 )
 
 
+def driver_sources() -> list[Path]:
+    """Every driver. Read and counted; a literal here is a declared fixture, not a failure."""
+    found: list[Path] = []
+    for root in ("crates", "soma"):
+        found.extend(sorted((ROOT / root).glob("*/examples/*.rs")))
+        found.extend(sorted((ROOT / root).glob("*/examples/*/*.rs")))
+    return found
+
+
 def library_sources() -> list[Path]:
     """Library code only. A driver's literal is a declared fixture, not an authored level."""
     found: list[Path] = []
@@ -84,10 +108,10 @@ def library_sources() -> list[Path]:
     ]
 
 
-def present() -> list[tuple[str, str, str]]:
-    """Every authored numeric level in library code: (owner, name, value)."""
+def present(sources=None) -> list[tuple[str, str, str]]:
+    """Every authored numeric level in the given sources: (owner, name, value)."""
     found: list[tuple[str, str, str]] = []
-    for path in library_sources():
+    for path in sources if sources is not None else library_sources():
         try:
             text = path.read_text()
         except OSError:
@@ -191,6 +215,15 @@ def main() -> int:
     print(f"{len(found)} authored numeric levels in library code")
     for disposition in sorted(by_disposition):
         print(f"  {disposition:<16} {by_disposition[disposition]}")
+
+    # Drivers are READ and COUNTED. They are not required to disposition — a driver declares its own
+    # material — but a population nothing can see is not a population anyone can audit, and this one
+    # was larger than the library's.
+    driver_levels = present(driver_sources())
+    print(f"{len(driver_levels)} authored numeric levels in DRIVERS (counted, not required to disposition)")
+    widest = sorted(driver_levels, key=lambda row: -int(row[2].replace("_", "")))[:5]
+    for owner, name, value in widest:
+        print(f"  widest  {owner}  {name} = {value}")
 
     for owner, name, value in undispositioned:
         print(f"UNDISPOSITIONED  {owner}  {name} = {value}")

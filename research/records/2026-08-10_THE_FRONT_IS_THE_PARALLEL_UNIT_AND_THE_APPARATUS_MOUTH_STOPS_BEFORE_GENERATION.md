@@ -96,8 +96,27 @@ text_incidence_select  text_section_restrict
 plus two hand-written engine kernels, `crates/holonic-engine/kernels/exact_conic_support.cu` and
 `exact_relation_support.cu`, and a committed `soma/kernel/soma.spv`.
 
-**`CudaLiveCurrentExecutor` enacts a whole contemporary population in two launches**, which is
-exactly the front architecture:
+**CORRECTED 2026-08-10 (later the same day), by reading the launch site rather than the trait.**
+This read *"`CudaLiveCurrentExecutor` enacts a whole contemporary population in two launches, which
+is exactly the front architecture."* **It did not.** `soma/mount/src/live_event_launch.rs:132`
+launched `lineage_event` at `Dim3::x(1), Dim3::x(1)` — one thread — the kernel enforced it with
+`if x != 0 || y != 0 { return }`, and `executor.rs::enact` iterated `for current in currents`
+serially. A contemporary population of `n` currents cost up to `2n` crossings of one lane each, and
+a test agreed with the code rather than with this sentence: `launches() == 11` for eleven
+single-current events.
+
+The claim was read off `LiveCurrentExecutor::enact`'s **signature** — it takes
+`currents: &[CurrentExecutionRequest]` — and a population-shaped signature was mistaken for
+population-shaped conduct. That is `CLAUDE.md` §8's first rule: grade the implementation, not the
+receipt.
+
+**It is true now, and for a different reason.** `lineage_event_population` was added 2026-08-10 as a
+second entry shell over the same unchanged body, one lane per current with every stride derived as
+`len / count`, and `enact` stages the population at uniform capacities and crosses once. Measured on
+the card: six currents `6 → 5` crossings, nine currents `9 → 7`. Do not read the sentence below as
+having described the body when it was written; it described the intent.
+
+What the architecture is, and now does: 
 
 - `regional_contacts` — **`pairs.len()` parallel lanes**, one per directed contact pair, forming
   every receiving current's immutable standing-before field at once

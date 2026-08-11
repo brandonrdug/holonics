@@ -85,7 +85,18 @@ the compass:
   source calls bounded.
 
 A declared aperture that refuses by name is the difference between an organ that scales a
-thousandfold and one that dies. **`[ℚ(α):ℚ] = 2ⁿ` refusing `∛2` and `the_iron_tokens` refusing a
+thousandfold and one that dies.
+
+**BOUNDED 2026-08-10, and the bound matters because this figure was carrying an argument it cannot
+support.** `DECLARED_CAPACITY = 8_192` is an authored constant in a **driver**, and it guards
+`SeparationComplex::exhibit`, which materializes `C(d,2)` pairs into a `Vec`. The *reading* — the
+verdict, `distinct_windows`, `first_depth` — is already complete before that guard runs. So the
+constant bounds a printed population, not the work: the iron organ scales because its reading is
+near-linear in occurrences and it declines to materialize a quadratic **presentation**. The two
+organs that die do so for a reason **nobody has measured**, and this figure may not stand in for
+that measurement. What the pair does establish is real and narrower: an organ that refuses by name
+and answers a narrower question whole survives material that kills organs which do neither.
+ **`[ℚ(α):ℚ] = 2ⁿ` refusing `∛2` and `the_iron_tokens` refusing a
 width are the same law**, and the instrument ladder was not niche mathematics — it was the law the
 body already lives or dies by, written where it could be checked.
 

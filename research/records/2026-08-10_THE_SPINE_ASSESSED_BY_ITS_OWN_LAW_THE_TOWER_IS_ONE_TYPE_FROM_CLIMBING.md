@@ -130,9 +130,14 @@ exponentiating gives you something **diagonal**."* Against that:
 
 ### 3.1 What is built and correct
 
-- **23 PTX entry points.** `CudaLiveCurrentExecutor` enacts an entire contemporary population in
-  **two launches**: `regional_contacts` with one lane per directed contact pair, and `lineage_event`
-  once over the whole carrier population. That is the front architecture, correctly.
+- **24 PTX entry points**, and this bullet is **CORRECTED 2026-08-10**. It read *"enacts an entire
+  contemporary population in two launches… `lineage_event` once over the whole carrier population.
+  That is the front architecture, correctly."* `lineage_event` was launched at `Dim3::x(1)` — one
+  thread — and `enact` iterated currents serially, so `n` currents cost up to `2n` crossings. The
+  claim was inferred from the executor trait's population-shaped **signature**, not from the launch
+  site. `lineage_event_population` (the twenty-fourth entry) makes it true: one lane per current,
+  one crossing, strides derived as `len / count`, measured `6 → 5` and `9 → 7` crossings on the
+  card. `regional_contacts` was always genuinely parallel — one lane per directed contact pair.
 - `LiveCurrentExecutor::enact` is population-shaped by construction — it takes
   `currents: &[CurrentExecutionRequest]`.
 - `text_material_cuda` drives the card independently; `eros_relampago_atmospheric_current` exercises

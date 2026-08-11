@@ -13,7 +13,11 @@ pub mod conduct;
 /// Transient cooperative REGISTER-contact sheet.
 pub mod contact;
 /// Fixed word transport for the consequence of one live event.
-pub mod cuda_execution;
+// `cuda_execution` was removed 2026-08-10. It defined `EventContactRow` / `EVENT_CONTACT_WORDS`
+// with a full pack/validate/unpack round trip, 272 lines, and **nothing on either side of the
+// membrane referenced it** — not the PTX kernel crate, not the host executor, not a driver.
+// `CLAUDE.md` §13 rule 3: superseded production machinery fails closed. It is removed rather than
+// deprecated, and git history is the recovery surface.
 /// One substrate-neutral active event row.
 pub mod current;
 /// Accepted body deeds partitioned at native event boundaries.

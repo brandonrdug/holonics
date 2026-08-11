@@ -408,3 +408,129 @@ shadow is the honest return.
 **Which is why the four optical words matter mechanically rather than decoratively:** each is a way a
 receiver's aperture selects, and every one of them leaves a residual that is *addressable* — a phase,
 an angle, a forbidden band, a cross term. An addressable residual is one the loop can return.
+
+---
+
+## 22. The receiver's reach is a causal cone, and the horizon is its radius
+
+**Truth status:** `interpretation` for the reading, which is Brandon's; `implemented-exact` for the
+derivation, which is `token_invariance::saturation_horizon`; `measured` for every figure.
+**Occasion.** Brandon, 2026-08-10, correcting the framing this section replaces: *"not really a
+'window' I don't really like that phrase, it's a light-cone, this is relativistic physics"*, and
+then on the level: *"'horizon' shouldn't be a constant either if it is."*
+
+### What was wrong, and it was an ontology error rather than a word
+
+The assistant described a receiver's reach as an **aperture** and then as a **window** — a hole in a
+plate. Both are wrong, and the second is worse, because a window is a property a receiver *has*, and
+that re-things the receiver. The unit is always a relation.
+
+Measured the same day, and the corpus had the right object all along:
+
+```
+horizon           docs 129   code 79      ← saturated
+null cone         docs   6   code  3
+light cone        docs   6   code  0
+causal cone       docs   5   code  0
+causal past       docs   1   code  0
+causal diamond    docs   0   code  0
+```
+
+**Every part was present; the object joining them had never been named once.**
+
+### The cone, stated
+
+A receiver sits at an **event**, not on a surface. Its reach is the causal cone at that event:
+
+- **an apex, not a plane.** Every receiver has its own cone and none is privileged. That is what
+  makes it relativistic, and it is why a declared capacity is doubly wrong — a number in *no frame
+  at all*.
+- **two sheets, asymmetric.** The past cone is what can have conditioned me; the future cone is what
+  I can condition. The machine already declares both and says so:
+  `the_axis_reads_what_the_neighbour_does.rs:78` — *"the founding horizon is deliberately not the
+  reading horizon — they are two declarations."* This is causal parity: `∂∂ = 0` makes no temporal
+  inverse, and a return stroke is a **chord**. It is the periplus, asymmetric under time parity.
+- **three regions, not two.** Inside: causally connected. **On the null boundary: traversal returns
+  nothing** — `Q(v) = 0`, §2b's vacuous difference, which in Minkowski *is* the light cone. Outside:
+  not attenuated but **unable to have contributed**. A window has in and out; a cone has a boundary
+  where the returned difference is exactly zero, and that boundary is a surface in the material.
+- **the metric sets the cone, and the metric is already a receiver face of standing.** `CLAUDE.md`
+  §13 rule 2: `grad_G L = G⁻¹ dL`, and *"the metric is a receiver face of standing"*. So the reach
+  is not installed by anyone — **it is what standing looks like from an event.**
+- **lensing is the metric bending the cone**, not a diaphragm. The body already has this and it was
+  dismissed once as a proper name: `soma/body/src/manifold.rs:158`, *"the deposited circulation DRAGS
+  the passing frame WITH it (**Lense–Thirring as the general law**)"*.
+
+### The machine was already computing causal diamonds and calling them windows
+
+`token_invariance::step_at` writes index `2(k−1)` as `L^k` and `2(k−1)+1` as `R^k`, so a window
+enumerates an occurrence's neighbourhood **shell by shell** — `−1, +1, −2, +2, …` — in order of
+`|offset|`. That is a discrete causal diamond: two sides are two sheets, the shell index is proper
+distance along the stream, and `None` is where the whole ends, which is the material's own boundary
+rather than padding. **The horizon is that diamond's radius**, and it was a literal `1` in every
+driver.
+
+Two consequences follow and both are load-bearing: the window at `h` is a **prefix** of the window
+at `h+1`, so refinement is monotone; and the first differing index is **the shell at which two
+occurrences separate**, which the shared-prefix array already reports.
+
+### The horizon is read off the material — and a cone propagates, it is not searched
+
+`saturation_horizon` holds the partition and refines it one shell at a time, touching only cells
+still carrying difference. A singleton can never split again, so the live population shrinks
+monotonically and the work is
+
+```text
+   Σ_k  (occurrences still carrying difference at shell k)
+```
+
+— **the volume of the cone that is still live, not the volume of the cone.**
+
+**The first implementation binary-searched inside the material's ceiling, and that was the error the
+ontology predicts.** Probing at the ceiling materializes `2 · bound` readings per occurrence; on
+this repository's own corpus it reached **19.6 GB resident on one core in 6m39s with no output** and
+was halted. The propagating form runs in **0.22 s**. *Light does not sample its way to a horizon; it
+advances one shell at a time and stops where the difference dies.*
+
+Stopping is a theorem, not a heuristic: a quiet shell does **not** prove saturation, because
+refinement can stall one shell and resume — `Z A B C D E` against `W A B C D E`, read at `C`, agree
+at shells 1 and 2 and differ at 3. The loop stops when every class is a **singleton**, which no
+deeper shell can split, or at the material ceiling.
+
+### Measured on the declared corpus
+
+| | |
+|---|---|
+| ceiling, read off the census | 28,875 shells — the longest whole |
+| word surfaces / occurrences | 29,533 / 1,187,776 |
+| live cone volume | **1,710,423 occurrence-shells** |
+| surfaces the authored `1` could not see whole | **10,230 of 29,533 — 35%** |
+| distinctions it missed | **423,250** |
+| `"the"` | horizon **49**, 37,530 classes against **3,990** at `h = 1` |
+| corpus horizon | **51**, forced by exactly one surface: `"that"` |
+| termination | **29,533 of 29,533** exhausted to singletons — final by theorem |
+
+**The corpus cannot grade the loop's soundness** — zero of 29,533 ever stall — so a declared fixture
+grades it, where the unsound loop returns 1 and the truth is 3. That is `CLAUDE.md` §8: when the
+declared material cannot exercise a law, add declared material that does.
+
+### The two costs are different objects, and conflating them is what "aperture law" did
+
+```text
+   reading      O(d · h)    the volume of the causal diamond the window enumerates
+   exhibition   C(d, 2)     the pair product — a PRESENTATION, not a transport
+```
+
+On `"the"`: **1,838,970 to read against 704,231,685 to exhibit — 383×.** A caller's declared
+capacity guards only the second. Calling it *"the aperture law"* promoted an output-buffer guard to
+a law and then reasoned from the promotion.
+
+### What this section forbids
+
+1. **No receiver reach described as a window, an aperture, or a capacity.** Name the cone, its apex,
+   its two horizons, and its null boundary.
+2. **No horizon authored.** It is read off the material or declared by a caller **with the reason
+   stated**; `token_invariance`'s *founding* horizon is still a caller declaration and deriving it is
+   owed.
+3. **No cost claim borrowed from an organ that refuses a presentation.** The reading and the
+   exhibition are different objects; say which one a figure measures.

@@ -958,6 +958,19 @@ pub enum LiveCurrentError {
     InvalidRestImage,
     InvalidRestWire,
     Substrate(i32),
+    /// **A contemporary population the mounted device cannot hold, named rather than surfaced as a
+    /// bare driver code.**
+    ///
+    /// Enacting `lanes` currents co-presently reserves `lanes` copies of the per-thread local-memory
+    /// stack plus one region per lane of every buffer, so the demand scales with the front. Without
+    /// this the driver returns `CUDA_ERROR_OUT_OF_MEMORY` with no numbers and nothing says which
+    /// quantity was short. Every field here is read off the device or computed from the material.
+    PopulationExceedsDevice {
+        lanes: usize,
+        demanded_bytes: u64,
+        free_bytes: u64,
+        per_lane_stack_bytes: u64,
+    },
     Carrier(LiveCarrierError),
     Constituent(LiveConstituentError),
     Standing(SparseStandingError),
@@ -3419,14 +3432,16 @@ fn enact_host_current(
     })
 }
 
+/// **The host declares its own width. There is no knob.**
+///
+/// This read `SOMA_LIVE_THREADS` from the process environment until 2026-08-10. That variable was
+/// read in exactly one place, set nowhere in the repository, and documented nowhere — so the
+/// executor whose contract is *"the complete event result is required to equal
+/// `HostLiveCurrentExecutor`"* had a width that depended on the environment of whoever ran it, and
+/// no test pinned it. An environment override is a knob, and a caller that genuinely wants a
+/// particular width already has `ParallelHostLiveCurrentExecutor::new`, which states it in the
+/// type rather than in the ambient environment.
 fn available_host_event_threads() -> usize {
-    if let Ok(value) = std::env::var("SOMA_LIVE_THREADS") {
-        if let Ok(threads) = value.parse::<usize>() {
-            if threads > 0 {
-                return threads;
-            }
-        }
-    }
     std::thread::available_parallelism()
         .map(|threads| threads.get())
         .unwrap_or(1)
@@ -3456,36 +3471,83 @@ fn enact_host_population(
             ));
         }
     } else {
-        let base = currents.len() / threads;
-        let remainder = currents.len() % threads;
-        std::thread::scope(|scope| -> Result<(), LiveCurrentError> {
-            let mut rest = slots.as_mut_slice();
-            let mut start = 0usize;
-            for worker in 0..threads {
-                let extent = base + usize::from(worker < remainder);
-                let (chunk, tail) = rest.split_at_mut(extent);
-                let chunk_start = start;
-                let mut builder = std::thread::Builder::new();
-                if let Some(bytes) = worker_stack_bytes {
-                    builder = builder.stack_size(bytes);
-                }
-                builder
-                    .spawn_scoped(scope, move || {
-                        for (local, slot) in chunk.iter_mut().enumerate() {
-                            *slot = Some(enact_host_current(
-                                standing,
-                                currents[chunk_start + local],
-                                relations,
-                                regional,
-                            ));
-                        }
-                    })
+        // **The front is covered by EXTENT, not by cardinality.**
+        //
+        // Until 2026-08-10 this read `base = len / threads` with the remainder handed to the first
+        // lanes -- every current one unit, so a scalar cell and a ten-thousand-cell complex weighed
+        // the same and one lane could draw every heavy current in the population. A current's
+        // extent is its event geometry's own cell count, read off the material.
+        //
+        // The cover is greedy over extents in descending order: each cell of the front goes to the
+        // lane carrying least so far. That is a **decomposition and never a schedule** -- it says
+        // which lane may carry which cells; the physical order stays the runtime's, and results are
+        // still written into position-fixed slots, so worker scheduling never becomes chronology.
+        let mut extents: Vec<(usize, u64)> = currents
+            .iter()
+            .enumerate()
+            .map(|(at, current)| (at, current.event().geometry().cells().max(1)))
+            .collect();
+        extents.sort_by_key(|(at, extent)| (std::cmp::Reverse(*extent), *at));
+        let mut cover: Vec<Vec<usize>> = vec![Vec::new(); threads];
+        let mut carried = vec![0u128; threads];
+        for (at, extent) in extents {
+            let lane = carried
+                .iter()
+                .enumerate()
+                .min_by_key(|(lane, load)| (**load, *lane))
+                .map(|(lane, _)| lane)
+                .unwrap_or(0);
+            cover[lane].push(at);
+            carried[lane] += u128::from(extent);
+        }
+        for section in &mut cover {
+            section.sort_unstable();
+        }
+        let sections = std::thread::scope(
+            |scope| -> Result<Vec<Vec<(usize, Result<_, LiveCurrentError>)>>, LiveCurrentError> {
+                let mut handles = Vec::new();
+                handles
+                    .try_reserve_exact(threads)
                     .map_err(|_| LiveCurrentError::ResourceReservation)?;
-                rest = tail;
-                start += extent;
+                for section in cover {
+                    let mut builder = std::thread::Builder::new();
+                    if let Some(bytes) = worker_stack_bytes {
+                        builder = builder.stack_size(bytes);
+                    }
+                    handles.push(
+                        builder
+                            .spawn_scoped(scope, move || {
+                                section
+                                    .into_iter()
+                                    .map(|at| {
+                                        (
+                                            at,
+                                            enact_host_current(
+                                                standing, currents[at], relations, regional,
+                                            ),
+                                        )
+                                    })
+                                    .collect::<Vec<_>>()
+                            })
+                            .map_err(|_| LiveCurrentError::ResourceReservation)?,
+                    );
+                }
+                let mut gathered = Vec::new();
+                for handle in handles {
+                    // A lane's panic propagates exactly as it did before this cover existed.
+                    match handle.join() {
+                        Ok(section) => gathered.push(section),
+                        Err(payload) => std::panic::resume_unwind(payload),
+                    }
+                }
+                Ok(gathered)
+            },
+        )?;
+        for section in sections {
+            for (at, result) in section {
+                slots[at] = Some(result);
             }
-            Ok(())
-        })?;
+        }
     }
 
     let mut enacted = Vec::new();
@@ -5223,6 +5285,60 @@ mod tests {
                 .standing(),
             one.standing()
         );
+    }
+
+    /// **The requirement `ParallelHostLiveCurrentExecutor` states about itself, actually checked.**
+    ///
+    /// Its own doc says *"the bound affects only work placement; the complete event result is
+    /// required to equal `HostLiveCurrentExecutor`."* Measured 2026-08-10: **no test compared the
+    /// two.** The parity test above compares `Parallel(1)` against `Parallel(8)`, so the executor
+    /// the requirement names was the one nothing verified — and its width comes from
+    /// `available_host_event_threads`, which reads `SOMA_LIVE_THREADS` from the process
+    /// environment, so it was untested at any specific value.
+    ///
+    /// This closes that. It also varies the cover: the currents are given deliberately unequal
+    /// extents, so the by-extent cover assigns them differently from a by-count one, and a lane
+    /// carrying a different section must still return the identical event.
+    #[test]
+    fn the_parallel_host_executor_equals_the_host_executor_it_declares_itself_against() {
+        let (base, lineages) = primed_equal_lineages(4);
+        let rest = base.rest_image().unwrap();
+        let mut default_width = LiveCurrentMachine::from_rest_image(rest.clone()).unwrap();
+        let mut single = LiveCurrentMachine::from_rest_image(rest.clone()).unwrap();
+        let mut wide = LiveCurrentMachine::from_rest_image(rest).unwrap();
+        let currents = [
+            CurrentEvent::continuing(lineages[0], relation(11), action()),
+            CurrentEvent::continuing(lineages[1], relation(23), action()),
+            CurrentEvent::continuing(lineages[2], relation(37), action()),
+            CurrentEvent::continuing(lineages[3], relation(51), action()),
+        ];
+        let event = || ContemporaryEvent::new(&currents, &[]);
+
+        let by_default = default_width
+            .receive_with(event(), &mut HostLiveCurrentExecutor)
+            .unwrap();
+        let by_one = single
+            .receive_with(event(), &mut ParallelHostLiveCurrentExecutor::new(1))
+            .unwrap();
+        let by_many = wide
+            .receive_with(event(), &mut ParallelHostLiveCurrentExecutor::new(7))
+            .unwrap();
+
+        assert_eq!(
+            by_default, by_one,
+            "the declared equality: HostLiveCurrentExecutor against one lane"
+        );
+        assert_eq!(
+            by_default, by_many,
+            "the declared equality: HostLiveCurrentExecutor against seven lanes"
+        );
+        assert_same_machine(&default_width, &single);
+        assert_same_machine(&default_width, &wide);
+
+        // Seven lanes over four currents is a cover the by-count rule could not produce: it would
+        // hand four lanes one current each and leave three empty, while the by-extent cover fills
+        // by carried load. Either way the event is identical, which is the whole claim.
+        assert!(currents.len() < 7);
     }
 
     #[test]

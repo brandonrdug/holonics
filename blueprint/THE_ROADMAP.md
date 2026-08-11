@@ -84,7 +84,9 @@ By that measure the order is:
 
 1. **Give the language side the aperture law the iron-token organ already has.** `the_iron_tokens_carry_the_field`
    scales to **12,339,449 tokens on 2 GB** by refusing past a declared width and answering narrower
-   whole; `eros_resonant_corpus_current` **SIGKILLs at 10,963 MB on 1,556 lines** and
+   whole — **bounded 2026-08-10: that width is an authored constant in a driver guarding a
+   quadratic PRESENTATION, not the work, so this figure does not explain why the other two die and
+   may not be cited as though it did**; `eros_resonant_corpus_current` **SIGKILLs at 10,963 MB on 1,556 lines** and
    `eros_morphological_language_generation` does not return in 35 minutes. This one item unblocks
    generation, mounting real English, and the founding/checking edge together.
 2. **Point the recovery organs at a real black box.** Four **zero-residual** interior recoveries with

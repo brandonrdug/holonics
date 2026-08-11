@@ -17,9 +17,20 @@ use sha2::{Digest, Sha256};
 use thiserror::Error;
 
 const CUDA_SUCCESS: i32 = 0;
-const THREADS_PER_BLOCK: u32 = 128;
-const GRADE_THREADS_PER_BLOCK: u32 = 256;
+/// **Launch geometry is derived here too — see `cuda_aperture::DerivedLaunch` for the statement of
+/// why the previous `ABI` disposition on these constants was false.** The one value that remains is
+/// [`GRADE_ITEMS_PER_THREAD`], and it is not a launch level: it is a **wire constant shared with the
+/// kernel**, which blocks its grade pass by the same factor at
+/// `kernels/exact_relation_support.cu:370` and `:445`. Host and device must agree or the grade
+/// mapping is wrong, and nothing in the build links the two — that is worth carrying as a defect
+/// rather than dissolving into a derivation it is not.
 const GRADE_ITEMS_PER_THREAD: u64 = 8;
+
+/// `CUdevice_attribute` selectors from `cuda.h` — ABI, fixed by the foreign interface.
+const DEVICE_MAX_THREADS_PER_BLOCK: i32 = 1;
+const DEVICE_MAX_GRID_DIM_X: i32 = 5;
+const DEVICE_WARP_SIZE: i32 = 10;
+
 const PTX: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/exact_relation_support.ptx"));
 
 type CuDevice = i32;
@@ -35,6 +46,7 @@ unsafe extern "C" {
     fn cuDeviceGetCount(count: *mut i32) -> i32;
     fn cuDeviceGet(device: *mut CuDevice, ordinal: i32) -> i32;
     fn cuDeviceGetName(name: *mut c_char, length: i32, device: CuDevice) -> i32;
+    fn cuDeviceGetAttribute(value: *mut i32, attribute: i32, device: CuDevice) -> i32;
     fn cuCtxCreate_v2(context: *mut CuContext, flags: u32, device: CuDevice) -> i32;
     fn cuCtxSetCurrent(context: CuContext) -> i32;
     fn cuCtxDestroy_v2(context: CuContext) -> i32;
@@ -260,6 +272,10 @@ impl ReusableDeviceAllocation {
 }
 
 pub struct CudaExactRelationExecutor {
+    /// Threads per block, taken down to a whole number of warps, from the device's own answers.
+    block_x: u32,
+    /// The device's X grid ceiling. Past it the extent is refused by name.
+    max_grid_x: u32,
     context: CuContext,
     module: CuModule,
     all_pairs_function: CuFunction,
@@ -310,6 +326,18 @@ impl CudaExactRelationExecutor {
                 "cuDeviceGetName",
             )?;
             let device_name = CStr::from_ptr(name.as_ptr()).to_string_lossy().into_owned();
+            let mut attribute = |selector: i32, operation: &'static str| -> Result<u32, CudaRelationError> {
+                let mut value = 0i32;
+                driver(cuDeviceGetAttribute(&mut value, selector, device), operation)?;
+                Ok(value.max(0) as u32)
+            };
+            let device_block = attribute(
+                DEVICE_MAX_THREADS_PER_BLOCK,
+                "cuDeviceGetAttribute(MAX_THREADS_PER_BLOCK)",
+            )?;
+            let max_grid_x = attribute(DEVICE_MAX_GRID_DIM_X, "cuDeviceGetAttribute(MAX_GRID_DIM_X)")?;
+            let warp = attribute(DEVICE_WARP_SIZE, "cuDeviceGetAttribute(WARP_SIZE)")?.max(1);
+            let block_x = (device_block / warp).max(1) * warp;
             let mut context = ptr::null_mut();
             driver(cuCtxCreate_v2(&mut context, 0, device), "cuCtxCreate_v2")?;
 
@@ -430,6 +458,8 @@ impl CudaExactRelationExecutor {
                 return Err(error);
             }
             Ok(Self {
+                block_x,
+                max_grid_x,
                 context,
                 module,
                 all_pairs_function,
@@ -549,8 +579,11 @@ impl CudaExactRelationExecutor {
 
         let mut launches = 0_u64;
         if !pairs.is_empty() {
-            let grid = u32::try_from(pair_count.div_ceil(u64::from(THREADS_PER_BLOCK)))
+            let grid = u32::try_from(pair_count.div_ceil(u64::from(self.block_x)))
                 .map_err(|_| CudaRelationError::ExtentOverflow)?;
+            if grid > self.max_grid_x {
+                return Err(CudaRelationError::ExtentOverflow);
+            }
             let mut point_pointer = self.points.pointer;
             let mut pair_pointer = self.pairs.pointer;
             let mut positive_pointer = self.positive_front.pointer;
@@ -578,7 +611,7 @@ impl CudaExactRelationExecutor {
                         grid,
                         1,
                         1,
-                        THREADS_PER_BLOCK,
+                        self.block_x,
                         1,
                         1,
                         0,
@@ -615,8 +648,11 @@ impl CudaExactRelationExecutor {
                 .checked_add(self.counter.copy_from(&zero)?)
                 .ok_or(CudaRelationError::ExtentOverflow)?;
 
-            let grid = u32::try_from(pair_count.div_ceil(u64::from(THREADS_PER_BLOCK)))
+            let grid = u32::try_from(pair_count.div_ceil(u64::from(self.block_x)))
                 .map_err(|_| CudaRelationError::ExtentOverflow)?;
+            if grid > self.max_grid_x {
+                return Err(CudaRelationError::ExtentOverflow);
+            }
             let mut point_pointer = self.points.pointer;
             let mut pair_pointer = self.pairs.pointer;
             let mut positive_pointer = self.positive_front.pointer;
@@ -648,7 +684,7 @@ impl CudaExactRelationExecutor {
                         grid,
                         1,
                         1,
-                        THREADS_PER_BLOCK,
+                        self.block_x,
                         1,
                         1,
                         0,
@@ -781,8 +817,11 @@ impl CudaExactRelationExecutor {
 
         let mut launches = 0_u64;
         if pair_count != 0 {
-            let grid = u32::try_from(pair_count.div_ceil(u64::from(THREADS_PER_BLOCK)))
+            let grid = u32::try_from(pair_count.div_ceil(u64::from(self.block_x)))
                 .map_err(|_| CudaRelationError::ExtentOverflow)?;
+            if grid > self.max_grid_x {
+                return Err(CudaRelationError::ExtentOverflow);
+            }
             let mut point_pointer = self.points.pointer;
             let mut order_pointer = self.order.pointer;
             let mut window_pointer = self.windows.pointer;
@@ -813,7 +852,7 @@ impl CudaExactRelationExecutor {
                         grid,
                         1,
                         1,
-                        THREADS_PER_BLOCK,
+                        self.block_x,
                         1,
                         1,
                         0,
@@ -850,8 +889,11 @@ impl CudaExactRelationExecutor {
                 .checked_add(self.counter.copy_from(&zero)?)
                 .ok_or(CudaRelationError::ExtentOverflow)?;
 
-            let grid = u32::try_from(pair_count.div_ceil(u64::from(THREADS_PER_BLOCK)))
+            let grid = u32::try_from(pair_count.div_ceil(u64::from(self.block_x)))
                 .map_err(|_| CudaRelationError::ExtentOverflow)?;
+            if grid > self.max_grid_x {
+                return Err(CudaRelationError::ExtentOverflow);
+            }
             let mut point_pointer = self.points.pointer;
             let mut order_pointer = self.order.pointer;
             let mut window_pointer = self.windows.pointer;
@@ -886,7 +928,7 @@ impl CudaExactRelationExecutor {
                         grid,
                         1,
                         1,
-                        THREADS_PER_BLOCK,
+                        self.block_x,
                         1,
                         1,
                         0,
@@ -985,7 +1027,7 @@ impl CudaExactRelationExecutor {
         } else {
             u32::try_from(
                 pair_count.div_ceil(
-                    u64::from(GRADE_THREADS_PER_BLOCK)
+                    u64::from(self.block_x)
                         .checked_mul(GRADE_ITEMS_PER_THREAD)
                         .ok_or(CudaRelationError::ExtentOverflow)?,
                 ),
@@ -1023,7 +1065,7 @@ impl CudaExactRelationExecutor {
                         grid,
                         1,
                         1,
-                        GRADE_THREADS_PER_BLOCK,
+                        self.block_x,
                         1,
                         1,
                         0,
@@ -1095,7 +1137,7 @@ impl CudaExactRelationExecutor {
                         grid,
                         1,
                         1,
-                        GRADE_THREADS_PER_BLOCK,
+                        self.block_x,
                         1,
                         1,
                         0,
@@ -1232,7 +1274,7 @@ impl CudaExactRelationExecutor {
         let mut launches = 0_u64;
 
         if output_extent != 0 {
-            let grid = u32::try_from(pair_count_u64.div_ceil(u64::from(THREADS_PER_BLOCK)))
+            let grid = u32::try_from(pair_count_u64.div_ceil(u64::from(self.block_x)))
                 .map_err(|_| CudaRelationError::ExtentOverflow)?;
             match pairs {
                 None => {
@@ -1257,7 +1299,7 @@ impl CudaExactRelationExecutor {
                                 grid,
                                 1,
                                 1,
-                                THREADS_PER_BLOCK,
+                                self.block_x,
                                 1,
                                 1,
                                 0,
@@ -1299,7 +1341,7 @@ impl CudaExactRelationExecutor {
                                 grid,
                                 1,
                                 1,
-                                THREADS_PER_BLOCK,
+                                self.block_x,
                                 1,
                                 1,
                                 0,
