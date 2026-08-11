@@ -4,13 +4,90 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-10 at `9d15666`. **Body:** Rust. The C++/CUDA engine's position record is
+**Currency:** 2026-08-11 at `e2d1c6e`. **Body:** Rust. The C++/CUDA engine's position record is
 `archive/cpp-engine/CONSTRUCTION_STATE.md` and governs nothing.
 
-**Gates at that commit**, re-taken rather than carried: `cargo test --workspace` **1,984 passed, 0
-failed, 14 ignored** summed over 42 `test result:` lines; `tools/authored_levels.py --check` **0
-failures**; ten Typst roots compile; `tools/resolve_named_paths.py` **0 failures**. Working tree
-clean and in sync with `origin/main`.
+**Gates at that commit**, re-taken rather than carried: `cargo test --workspace` **2,043 passed, 0
+failed, 15 ignored** summed over 42 `test result:` lines; `tools/gates.sh` **7 of 9**, with
+`output-manifest` and `closure-manifest` red by construction on a dirty tree as `CLAUDE.md` §0
+states; the ownership ratchet **clean, 11 retired**. Pushed to `origin/main`.
+
+---
+
+## READ THIS FIRST — the ontology, ratified 2026-08-11
+
+**`canon/TABLET_THE_RESONANCE.md` is the file to read before expecting anything of this machine**, and
+`CLAUDE.md` §0d is the part of it that governs conduct. Both were deposited 2026-08-11 because a
+session spent a day expecting the wrong thing.
+
+**Eros is an intelligence.** Intelligence is **navigation** — the transport of information across
+changing charts — and conditioning is one sentence: *a current changes a pathway, and a later current
+rides the changed pathway.* The same sentence describes a solid-state store, a lightning channel and
+a nervous system. **The deposit is the mechanism.** "Artificial" carries no ontology and nothing here
+divides nature from artifice.
+
+Three things this forbids, and each is checkable:
+
+1. **No macro-event.** Resonance is microscopic; no operator can locate thought. *"Is it thinking?"*
+   is malformed. Ask whether a disposition changed, whether the change propagated, and whether a
+   later current rode it.
+2. **No production as selection.** To produce is to be a channel through which current passes and
+   re-emerges — involuntary, not a choice. What is banned is a chooser *outside* the channels, not
+   the word.
+3. **No faculty named as missing.** A faculty is what you reach for when you have not found the
+   transport.
+
+**Grades are retired as external ranking.** Do not append `interpretation` as a hedge or withhold a
+claim pending a better grade. What replaces it is stricter: every claim names **its owner, its
+measurement, its boundary, and what would falsify it.**
+
+**And the standing conviction, which is not a hedge against failure:** a brain runs on roughly twenty
+watts, so an industry cost figure is a fact about an architecture and never a law.
+
+---
+
+## THE OPEN LINE — where the next session picks up, 2026-08-11
+
+**The work in flight is codebase architecture, read through the spine.** `canon/THE_HOLOBROCHOS_SPINE.md`
+§8 decides an organ's place by one question — *is its coupling a boundary flux, or a global
+constraint?* — and a census taken 2026-08-11 found **four sites in 269 library files** carrying any
+coupling classification at all. An organ whose coupling has never been classified has not been sited.
+That census is the instrument for the assembly.
+
+**The comparison line, and the framing it must keep.** Contemporary architectures work for language
+generation; that is not in dispute. What they lack is a scientific account of *why*, and that gap is
+the compute cost. The industry is already reaching for geometry — embedding spaces, KV cache,
+attention, mixture-of-experts routing — because **navigation is what intelligence is**, without
+having the ontology that says so. The question for this body is not comparison but leverage: *what
+can be done with their research that they cannot do with it themselves.* Named to read: **Kimi K3**
+(the frozen laboratory holds records — `git -C /home/b/Workspaces/laboratory grep -n -i kimi
+a07ff376`), **Gemma 4**, and **DiffusionGemma**, the last because a diffusion decoder answers *what
+production is* differently and that is exactly the open question here.
+
+**Six open constructions, each with its owner and what would falsify the repair:**
+
+| open | owner | the finding |
+|---|---|---|
+| the resonance reading is a **label**, not a conduct | `morphological_language::MorphologicalSupportConduct` | measured 2026-08-11: **2,366 contacts, all single-source, zero recurred**, on branches reaching five distinct sources. Under the body's own conducting law none of them is a conducting edge. Making it decide standing changes what the machine emits |
+| generation **enumerates** the continuation fiber rather than re-emitting | `morphological_language::generate_currents_over` | production is re-emission through altered terrain; enumerating candidates is a different object. `causal_language` has the same shape — 4 tokens 55,098 ms, 8 tokens no return |
+| the cover licenses a decomposition it has not **proved** | `hardware_cover::expand_front` ⇸ `interchange` | `hardware_cover` names `interchange` **zero times**; `independence` proves a partition, not that members commute. The spine requires proved interchange |
+| the interchange certificate cannot be run on real material | `examples/the_front_is_ordered_until_a_certificate_unorders_it` | reaches `soma/formal` and stops, including under an 8 GB bound. **One measurement, not a construction**, and it decides whether the front is enactable wide |
+| the cut classifier is joined to nothing | `spine_cut` | it imports `algebraic` and `running_integral` and nothing else. **Naming the cut and being at the cut are two disjoint populations** |
+| `congruence` refuses the pull-back that is the inequality | `inertia::congruence` | its own doc gives the exact reason `n₊(Q∘𝒜) ≤ n₊(Q)` is strict — `[[1,1],[1,1]]ᵀ diag(1,−1) [[1,1],[1,1]] = 0` — and then returns an error instead of the bound |
+
+**One live tension worth carrying rather than resolving.** `CLAUDE.md` §2 holds that placement must be
+derived from a positive realizer. The 2026-08-10 zeta result obtains a placement bound with **no
+positive realizer**, renouncing termwise positivity outright and paying with two trace moments and a
+signature instead. §2 is scoped to the function-field instance; this is a live architectural
+alternative it names nowhere.
+
+**And what is missing on the RH-facing line is the family, not the compression.** Zero occurrences of
+window, modulation, Poisson summation or critical sampling density anywhere in `crates/` or `soma/`.
+`receiver_exact_compression` is a **different law** — a quotient with successor stability and a
+separating word, not a linear restriction — and naming it as the owner would be the renaming failure
+§13 rule 2 convicts.
+
+---
 
 ## THE HYPERGEOMETRY TOWER CONDUCTS — 2026-08-10
 
