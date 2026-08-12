@@ -14,30 +14,28 @@ pub struct MorphologicalQueryRegion {
     pub(super) clause_ids: BTreeSet<usize>,
 }
 
-/// **Whether a returned branch's support has RECURRED, or is a single-source coincidence.**
+/// **Whether every emitted recurrent transition rode an exact deposited support.**
 ///
-/// `relational_language::RelationalChannelConduct` states the law and this is the same law on the
-/// generation front: *"A contact is not automatically a conducting edge… A separated coincident
-/// face conducts only after the same complete junction phase has returned through two distinct
-/// source pairs. Until then it remains an inspectable OPEN boundary."* The training body says it
-/// again as `CODEC_MINIMUM_RECURRENCE = 2` — a route is retained but inactive until it recurs
-/// across **distinct** occurrences.
+/// A contact is not automatically conducting. The generation owner attaches a recurrent event
+/// only after the resident apparatus returns at least one deposited exact-edge incidence. Phase
+/// onset remains query-caused and is not misreported as a recurrent support.
 ///
-/// **Generation had no such reading**, so every branch was returned with the same standing whether
-/// its support had returned through six sources or one. Measured on the declared fixture of
-/// `tests::the_transport_law_dilates_a_congested_passage_and_deletes_no_branch`: **2,366 candidates
-/// over 876 recruitments, 2,366 of them single-source, 0 recurred.** Not one contact in that run
-/// was a conducting edge by the law above, and all of them were returned as answers.
+/// **The two readings are separate and both are non-vacuous on every path.** `Recurred`/`Open` is
+/// read from `conducting_supports`, which names *deposits* — so a branch generated with no conduct
+/// morphology in scope is `Open`, correctly, because nothing rode a deposit. The **breadth** is
+/// read from `conducting_sources`, which is the exterior lineage of the supports that licensed the
+/// transition on whichever path produced it, and is populated at every construction site.
 ///
-/// This is a **reading, not a filter.** Nothing is deleted and no branch is withheld: an `Open`
-/// branch is returned exactly as before, carrying the count of distinct sources that support it, so
-/// a receiver can tell a resonance from a coincidence instead of being handed both as one kind.
+/// Taking both from `conducting_sources` is what made the breadth unconditionally zero on the
+/// complete path, deleting the instrument that measured *2,366 contacts, 2,366 single-source, 0
+/// recurred* on the declared fixture. That reading is restored; what changed is that the deposit
+/// question and the breadth question are now asked of two different fields, because they are two
+/// different questions.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum MorphologicalSupportConduct {
-    /// The branch's support returned through two or more distinct sources.
+    /// Every recurrent lexical transition in the emitted path rode a deposited support.
     Recurred,
-    /// The branch's support was seen in exactly one source. Real, retained, inspectable — and not
-    /// yet a conducting edge.
+    /// No recurrent transition was emitted, or at least one lacks deposited conduct testimony.
     Open,
 }
 
@@ -53,14 +51,22 @@ impl MorphologicalSupportConduct {
         // and the thing `holonic-structure` exists to provide. Reaching past it for a std container
         // is what the ownership ratchet counts, and it counts it because the machine has its own.
         let mut supporting = LocalSet::new();
-        let mut recurred = false;
+        let mut recurrent = 0usize;
+        let mut every_recurrent_attached = true;
         for token in tokens {
-            recurred |= token.caused_sources.len() >= 2;
-            for source in &token.caused_sources {
+            if token.transport == MorphologicalTransport::RecurrentLexical {
+                recurrent += 1;
+                every_recurrent_attached &= !token.conducting_supports.is_empty();
+            }
+            for source in &token.conducting_sources {
                 supporting.insert(source.as_str());
             }
         }
-        let conduct = if recurred { Self::Recurred } else { Self::Open };
+        let conduct = if recurrent > 0 && every_recurrent_attached {
+            Self::Recurred
+        } else {
+            Self::Open
+        };
         (conduct, supporting.len())
     }
 }
@@ -122,6 +128,12 @@ pub struct MorphologicalGeneratedToken {
     /// differs from `caused_sources`, it is the exact seam certificate for the source change.
     pub recurrent_context_sources: BTreeSet<String>,
     pub caused_sources: BTreeSet<String>,
+    /// Exact query-independent deposits which attached this transition before its current forked.
+    /// The target's own `caused_sources` remains separate and may truthfully contain one source.
+    pub conducting_supports: LocalSet<MorphologicalConductEdgeAddress>,
+    /// Exterior source lineage carried by those exact deposits, not a union over the query
+    /// context or the visible token surface.
+    pub conducting_sources: BTreeSet<String>,
     pub caused_passages: BTreeSet<String>,
     pub supporting_clauses: BTreeSet<String>,
     /// Number of self-emanated events already returned in this branch after this token entered.
@@ -377,14 +389,15 @@ impl MorphologicalGeneratedText {
     }
 
     pub fn current(&self) -> MorphologicalGeneratedCurrent {
+        let (support_conduct, supporting_sources) = MorphologicalSupportConduct::of(&self.tokens);
         MorphologicalGeneratedCurrent {
             text: self.text.clone(),
             tokens: self.tokens.clone(),
             phases: self.phases.clone(),
             rest: self.rest.clone(),
             caused_seams: self.caused_seams.clone(),
-            support_conduct: MorphologicalSupportConduct::of(&self.tokens).0,
-            supporting_sources: MorphologicalSupportConduct::of(&self.tokens).1,
+            support_conduct,
+            supporting_sources,
         }
     }
 

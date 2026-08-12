@@ -873,7 +873,9 @@ fn a_rest_image_remounts_an_exact_second_body_without_consuming_the_first() {
         "the image must carry the causes, not merely the standing"
     );
 
-    let remounted = image.remount().expect("the declared causes reproduce the body");
+    let remounted = image
+        .remount()
+        .expect("the declared causes reproduce the body");
     assert_eq!(
         remounted.rest_receipt().unwrap(),
         cultivated.rest_receipt().unwrap(),

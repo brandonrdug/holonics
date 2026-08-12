@@ -116,6 +116,9 @@ pub(super) fn relational_thought_answer_candidate(
                 recurrent_sources: realized.sources.clone(),
                 recurrent_context_sources: all_context_sources.clone(),
                 caused_sources: realized.sources.clone(),
+                conducting_supports: LocalSet::new(),
+                // The exterior lineage the realized relation stands on. Same law, different organ.
+                conducting_sources: realized.sources.clone(),
                 caused_passages: realized.passages.clone(),
                 supporting_clauses: BTreeSet::from([realized.relation_clause.clone()]),
                 returned_event_count,
@@ -203,22 +206,18 @@ pub(super) fn relational_thought_answer_candidate(
         contextual_dialogue: contextual_dialogue.clone(),
         obligation_population: thought.required_entity_regions.len(),
         local_region_fiber: ExactAnswerRegionFiber::from_parts(
-            LocalSet::from_iter(thought
-                .required_entity_regions
-                .iter()
-                .enumerate()
-                .map(|(obligation, _)| AgenticAnswerRegionIdentity {
+            LocalSet::from_iter(thought.required_entity_regions.iter().enumerate().map(
+                |(obligation, _)| AgenticAnswerRegionIdentity {
                     obligation,
                     region: 0,
-                })),
-            LocalSet::from_iter(thought
-                .returned_entity_regions
-                .iter()
-                .copied()
-                .map(|obligation| AgenticAnswerRegionIdentity {
+                },
+            )),
+            LocalSet::from_iter(thought.returned_entity_regions.iter().copied().map(
+                |obligation| AgenticAnswerRegionIdentity {
                     obligation,
                     region: 0,
-                })),
+                },
+            )),
         )?,
         ordered_query_regions,
         revision_horizon,
@@ -773,14 +772,16 @@ pub(super) fn question_regions(charge: &MorphologicalQuestionCharge) -> BTreeSet
 pub(super) fn question_local_regions(
     charge: &MorphologicalQuestionCharge,
 ) -> LocalSet<AgenticAnswerRegionIdentity> {
-    LocalSet::from_iter(charge
-        .obligations
-        .iter()
-        .enumerate()
-        .flat_map(|(obligation, face)| {
-            (0..face.local_regions.len())
-                .map(move |region| AgenticAnswerRegionIdentity { obligation, region })
-        }))
+    LocalSet::from_iter(
+        charge
+            .obligations
+            .iter()
+            .enumerate()
+            .flat_map(|(obligation, face)| {
+                (0..face.local_regions.len())
+                    .map(move |region| AgenticAnswerRegionIdentity { obligation, region })
+            }),
+    )
 }
 
 pub(super) fn index_surfaces(

@@ -19,7 +19,7 @@ use std::{
 };
 
 use body::num::Cog;
-use holonic_structure::{BranchLineage, LocalSet};
+use holonic_structure::{BranchLineage, LocalSequence, LocalSet};
 use soma_abi::active::{ActionCurrent, RelationAtom};
 use soma_membrane::{
     LiveCurrentExecutor, LiveCurrentMachine, ParallelHostLiveCurrentExecutor,
@@ -63,6 +63,8 @@ pub enum MorphologicalLanguageError {
     Route(CausalLanguageError),
     Resonance(ResonanceEcologyError),
     Suffix(ExactSuffixEcologyError),
+    Conduct(conduct::MorphologicalConductRefusal),
+    ConductCuda(conduct_cuda::MorphologicalConductCudaError),
 }
 
 impl From<CausalLanguageError> for MorphologicalLanguageError {
@@ -80,6 +82,18 @@ impl From<ResonanceEcologyError> for MorphologicalLanguageError {
 impl From<ExactSuffixEcologyError> for MorphologicalLanguageError {
     fn from(value: ExactSuffixEcologyError) -> Self {
         Self::Suffix(value)
+    }
+}
+
+impl From<conduct::MorphologicalConductRefusal> for MorphologicalLanguageError {
+    fn from(value: conduct::MorphologicalConductRefusal) -> Self {
+        Self::Conduct(value)
+    }
+}
+
+impl From<conduct_cuda::MorphologicalConductCudaError> for MorphologicalLanguageError {
+    fn from(value: conduct_cuda::MorphologicalConductCudaError) -> Self {
+        Self::ConductCuda(value)
     }
 }
 
@@ -203,6 +217,12 @@ pub use generated::*;
 
 mod current;
 pub use current::MorphologicalLanguageEcology;
+
+mod conduct;
+pub use conduct::*;
+
+mod conduct_cuda;
+pub use conduct_cuda::*;
 
 #[cfg(test)]
 mod tests;

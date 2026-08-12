@@ -34,6 +34,19 @@ struct EventCandidate {
     /// One exact recurrent suffix transport consumed by this event. A recruited phase onset is
     /// caused by query incidence and therefore carries no recurrent support.
     support: Option<RecurrentSupportKey>,
+    /// Exact query-independent material edges capable of attaching this occurrence. These remain
+    /// alternatives until the resident conduct deed returns the active deposited subset.
+    conduct_candidates: LocalSet<MorphologicalConductEdgeAddress>,
+    /// **The exterior source lineage those exact material supports carry**, read off the ecology at
+    /// the moment the support opened the candidate.
+    ///
+    /// This is the population the *material* licenses, and it exists on every construction site
+    /// including the ones no card ever sees. A reading taken only from the deposited path is
+    /// vacuous on the complete path, which is exactly what happened when the branch reading was
+    /// switched to a field one construction site populated.
+    conduct_sources: BTreeSet<ReceiverFiberIdentity>,
+    conducting_supports: LocalSet<MorphologicalConductEdgeAddress>,
+    conducting_sources: BTreeSet<String>,
     clause_horizons: BTreeSet<u32>,
     passage_horizons: BTreeSet<u32>,
     recurrence_multiplicities: BTreeSet<u64>,
@@ -871,14 +884,15 @@ fn state_field_keys(states: &[&MorphologicalCurrentState], field: StateField) ->
         }};
     }
     match field {
-        StateField::Reflection => dense!(|state: &MorphologicalCurrentState| state
-            .reflection
-            .clone()),
-        StateField::ActivePhase => dense!(|state: &MorphologicalCurrentState| state
-            .active_phase
-            .clone()),
-        StateField::OpenFaces => dense!(|state: &MorphologicalCurrentState| (*state.open_faces)
-            .clone()),
+        StateField::Reflection => {
+            dense!(|state: &MorphologicalCurrentState| state.reflection.clone())
+        }
+        StateField::ActivePhase => {
+            dense!(|state: &MorphologicalCurrentState| state.active_phase.clone())
+        }
+        StateField::OpenFaces => {
+            dense!(|state: &MorphologicalCurrentState| (*state.open_faces).clone())
+        }
         StateField::Rest => dense!(|state: &MorphologicalCurrentState| state.rest.clone()),
     }
 }
@@ -888,9 +902,7 @@ fn state_field_keys(states: &[&MorphologicalCurrentState], field: StateField) ->
 /// Returns the dense class of every state. Two states share a class exactly when they are equal —
 /// which is the relation `insert_generation_state`'s `BTreeMap` realizes by identity — reached here
 /// as four `(class, key)` passes, each of which a chart can enact.
-pub(super) fn quotient_generation_states(
-    states: &[&MorphologicalCurrentState],
-) -> Vec<u32> {
+pub(super) fn quotient_generation_states(states: &[&MorphologicalCurrentState]) -> Vec<u32> {
     let mut classes = vec![1u32; states.len()];
     for field in StateField::DECLARED {
         let keys = state_field_keys(states, field);

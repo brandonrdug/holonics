@@ -102,6 +102,42 @@ struct ExpandedCell {
     opened: Vec<ExpandedCurrent>,
 }
 
+/// One cell after its immutable ecological question has been asked but before any alternative
+/// current forks. A deposited conduct deed is therefore able to attach the complete candidate
+/// front here without observing or filtering already-materialized outputs.
+struct PreparedCell {
+    site: u32,
+    branch_population: u64,
+    expansion: PreparedExpansion,
+}
+
+enum PreparedExpansion {
+    Carried(MorphologicalGenerationState),
+    Progressed(MorphologicalGenerationState),
+    Phases {
+        state: MorphologicalGenerationState,
+        candidates: Vec<PhaseCandidate>,
+    },
+    Events {
+        state: MorphologicalGenerationState,
+        candidates: Vec<EventCandidate>,
+    },
+}
+
+enum GenerationConduct<'a> {
+    Complete,
+    Deposited(DepositedGenerationRuntime<'a>),
+}
+
+struct DepositedGenerationRuntime<'a> {
+    morphology: &'a MorphologicalConductMorphology,
+    executor: &'a mut CudaMorphologicalConductExecutor,
+    dispositions: LocalSequence<MorphologicalConductTransitionDisposition>,
+    obstructions: LocalSequence<MorphologicalConductObstruction>,
+    apparatus: LocalSequence<MorphologicalConductCudaReceipt>,
+    next_candidate: u64,
+}
+
 impl ExpandedCurrent {
     /// The cell was carried to the next front unchanged or brought to rest: no fork, no movement.
     const fn carried(state: MorphologicalGenerationState) -> Self {
@@ -506,6 +542,83 @@ impl MorphologicalLanguageEcology {
         &self.census
     }
 
+    /// Found the query-independent recurrent-contact atlas from the two lexical receiver charts.
+    /// Every suffix occurrence is resolved through the ecology's own standing to one exterior
+    /// source; context co-presence is retained but only the exact target relation can deposit
+    /// conduct.
+    pub fn conduct_atlas(&self) -> Result<MorphologicalConductAtlas, MorphologicalLanguageError> {
+        let capacity = self
+            .clause_lexical_suffix
+            .ecology()
+            .material_transition_count()
+            .checked_add(self.lexical_suffix.ecology().material_transition_count())
+            .ok_or(MorphologicalLanguageError::CarrierExtent)?;
+        let mut rows = LocalSequence::with_capacity(capacity);
+        for edge in self.clause_lexical_suffix.material_edges()? {
+            rows.push(MorphologicalConductSupportRow::from_material_edge(
+                MorphologicalConductChart::ClauseLexical,
+                &edge,
+                |occurrence| self.clause_occurrence_source(occurrence),
+            )?);
+        }
+        for edge in self.lexical_suffix.material_edges()? {
+            rows.push(MorphologicalConductSupportRow::from_material_edge(
+                MorphologicalConductChart::PassageLexical,
+                &edge,
+                |occurrence| self.passage_occurrence_source(occurrence),
+            )?);
+        }
+        // **Canonical order is put here, once, rather than assumed of the walk.**
+        //
+        // `material_edges` walks receiver states ascending and their transitions in storage order,
+        // which agrees with address order on a small chart and need not on a large one. The atlas
+        // refuses a non-canonical sequence, so leaving it to the walk makes a correct atlas a
+        // property of how a suffix ecology happens to store transitions. Sorting is not a
+        // rearrangement of the material: the address order is the material's own, and the card
+        // later searches on exactly it (`MorphologicalConductEdgeAddress::key_words`). Duplicates
+        // are still refused by `found`, which is the check that matters.
+        rows.sort_by(|left, right| left.edge().cmp(right.edge()));
+        Ok(MorphologicalConductAtlas::found(rows)?)
+    }
+
+    fn clause_occurrence_source(
+        &self,
+        occurrence: &ReceiverFiberIdentity,
+    ) -> Result<MorphologicalConductSourceAddress, MorphologicalConductRefusal> {
+        let clause = self
+            .clause_labels
+            .get(occurrence)
+            .and_then(|at| self.clauses.get(*at))
+            .ok_or(MorphologicalConductRefusal::UnknownOccurrenceSource)?;
+        self.conduct_source_address(&clause.source)
+    }
+
+    fn passage_occurrence_source(
+        &self,
+        occurrence: &ReceiverFiberIdentity,
+    ) -> Result<MorphologicalConductSourceAddress, MorphologicalConductRefusal> {
+        let passage = self
+            .passages
+            .get(occurrence)
+            .ok_or(MorphologicalConductRefusal::UnknownOccurrenceSource)?;
+        self.conduct_source_address(&passage.source)
+    }
+
+    fn conduct_source_address(
+        &self,
+        source: &ReceiverFiberIdentity,
+    ) -> Result<MorphologicalConductSourceAddress, MorphologicalConductRefusal> {
+        let standing = self
+            .sources
+            .get(source)
+            .ok_or(MorphologicalConductRefusal::UnknownOccurrenceSource)?;
+        MorphologicalConductSourceAddress::new(
+            source.clone(),
+            standing.identity.clone(),
+            standing.receiver,
+        )
+    }
+
     /// The exact ordered question-initial regions whose recurrence and branching were received
     /// during conditioning. Returning these regions makes the learned operator morphology
     /// inspectable without installing a privileged vocabulary in the observer.
@@ -827,6 +940,41 @@ impl MorphologicalLanguageEcology {
         spec: MorphologicalGenerationSpec,
         cover: &holonic_engine::hardware_cover::HardwareCover,
     ) -> Result<MorphologicalLanguageCurrentGeneration, MorphologicalLanguageError> {
+        Ok(self
+            .generate_currents_over_inner(prompt, spec, cover, GenerationConduct::Complete)?
+            .generation)
+    }
+
+    pub(in crate::morphological_language) fn generate_currents_over_conducted(
+        &self,
+        prompt: &str,
+        spec: MorphologicalGenerationSpec,
+        cover: &holonic_engine::hardware_cover::HardwareCover,
+        morphology: &MorphologicalConductMorphology,
+        executor: &mut CudaMorphologicalConductExecutor,
+    ) -> Result<MorphologicalConductedGeneration, MorphologicalLanguageError> {
+        self.generate_currents_over_inner(
+            prompt,
+            spec,
+            cover,
+            GenerationConduct::Deposited(DepositedGenerationRuntime {
+                morphology,
+                executor,
+                dispositions: LocalSequence::new(),
+                obstructions: LocalSequence::new(),
+                apparatus: LocalSequence::new(),
+                next_candidate: 0,
+            }),
+        )
+    }
+
+    fn generate_currents_over_inner(
+        &self,
+        prompt: &str,
+        spec: MorphologicalGenerationSpec,
+        cover: &holonic_engine::hardware_cover::HardwareCover,
+        mut conduct: GenerationConduct<'_>,
+    ) -> Result<MorphologicalConductedGeneration, MorphologicalLanguageError> {
         if spec.maximum_observed_tokens == 0 {
             return Err(MorphologicalLanguageError::EmptyObservationAperture);
         }
@@ -855,32 +1003,47 @@ impl MorphologicalLanguageEcology {
             })
             .collect::<BTreeMap<_, _>>();
         if open_faces.is_empty() {
-            return Ok(MorphologicalLanguageCurrentGeneration {
-                charge,
-                outputs: vec![MorphologicalGeneratedCurrent {
-                    text: String::new(),
-                    tokens: Vec::new(),
-                    phases: Vec::new(),
-                    rest: MorphologicalResponseRest::Obstructed {
-                        open_obligations: BTreeSet::new(),
+            return Ok(MorphologicalConductedGeneration {
+                generation: MorphologicalLanguageCurrentGeneration {
+                    charge,
+                    outputs: vec![MorphologicalGeneratedCurrent {
+                        text: String::new(),
+                        tokens: Vec::new(),
+                        phases: Vec::new(),
+                        rest: MorphologicalResponseRest::Obstructed {
+                            open_obligations: BTreeSet::new(),
+                        },
+                        caused_seams: Vec::new(),
+                        support_conduct: MorphologicalSupportConduct::Open,
+                        supporting_sources: 0,
+                    }],
+                    reflection: MorphologicalReflectionReceipt {
+                        shared_conditioned_bodies: 1,
+                        whole_body_forks: 0,
+                        shared_current_forks: 0,
+                        causal_current_states_formed: 1,
+                        conduct_equivalent_states_glued: 0,
+                        peak_live_current_states: 1,
+                        returned_events_carried: 0,
+                        terminal_return_materializations: 1,
+                        dilated_passages: 0,
+                        deepest_dilation: 0,
+                        deepest_chronology: 0,
                     },
-                    caused_seams: Vec::new(),
-                    support_conduct: MorphologicalSupportConduct::Open,
-                    supporting_sources: 0,
-                }],
-                reflection: MorphologicalReflectionReceipt {
-                    shared_conditioned_bodies: 1,
-                    whole_body_forks: 0,
-                    shared_current_forks: 0,
-                    causal_current_states_formed: 1,
-                    conduct_equivalent_states_glued: 0,
-                    peak_live_current_states: 1,
-                    returned_events_carried: 0,
-                    terminal_return_materializations: 1,
-                    dilated_passages: 0,
-                    deepest_dilation: 0,
-                    deepest_chronology: 0,
                 },
+                semantic: MorphologicalConductGenerationReceipt {
+                    schema: "soma-life.morphological-conduct-generation.v2".to_owned(),
+                    evaluated_transitions: 0,
+                    attached_transitions: 0,
+                    withheld_transitions: 0,
+                    declared_minimum_distinct_sources: 0,
+                    plurality_declared_by: "the charge opened no query face, so no transition was \
+                                            evaluated"
+                        .to_owned(),
+                    dispositions: LocalSequence::new(),
+                    obstructions: LocalSequence::new(),
+                },
+                apparatus: LocalSequence::new(),
             });
         }
         let initial = MorphologicalGenerationState::empty(MorphologicalCurrentState {
@@ -902,7 +1065,8 @@ impl MorphologicalLanguageEcology {
         // arrived by then; a dilated passage lands later and is **retained** in `pending` until it
         // does. Nothing is discarded, so this is not an aperture: the same population returns, and
         // what changes is which cells are co-present when.
-        let mut pending = ChronologyFronts::from([(0, ArrivedFront::from([(current, population)]))]);
+        let mut pending =
+            ChronologyFronts::from([(0, ArrivedFront::from([(current, population)]))]);
         let mut rested = ArrivedFront::new();
         let mut causal_current_states_formed = 1usize;
         let mut shared_current_forks = 0usize;
@@ -951,7 +1115,7 @@ impl MorphologicalLanguageEcology {
             // generation returns and is not this repair's to take.
             let front: Vec<(MorphologicalCurrentState, MorphologicalCurrentPopulation)> =
                 arrived.into_iter().collect();
-            let expanded = holonic_engine::hardware_cover::expand_front(
+            let prepared = holonic_engine::hardware_cover::expand_front(
                 front,
                 cover,
                 // **The extent of a generation cell is its witness population.**
@@ -973,23 +1137,34 @@ impl MorphologicalLanguageEcology {
                     population.witnesses.len() as u64
                 },
                 |(current, population)| {
-                    // Both factors of the law's demand are read here and nowhere else: the branch
-                    // population before the expansion consumes it, and the count of active
-                    // outgoing passages after the expansion opens them.
                     let branch_population = population.witnesses.len() as u64;
                     let site = current.reflection.clause_lexical.state();
-                    let opened = self.expand_current(&charge, spec, current, population)?;
-                    let co_present = branch_population.saturating_mul(opened.len() as u64);
-                    // `expand_front` flattens what a cell returns, and the demand is a property of
-                    // the CELL rather than of any one successor — so the cell reports itself as one
-                    // unit and the flattening leaves one entry per cell.
-                    Ok::<_, MorphologicalLanguageError>(vec![ExpandedCell {
+                    let expansion = self.prepare_current(&charge, spec, current, population)?;
+                    Ok::<_, MorphologicalLanguageError>(vec![PreparedCell {
                         site,
-                        co_present,
-                        opened,
+                        branch_population,
+                        expansion,
                     }])
                 },
             )?;
+
+            let expanded = match &mut conduct {
+                GenerationConduct::Complete => {
+                    let mut expanded = Vec::with_capacity(prepared.len());
+                    for cell in prepared {
+                        let opened = self.materialize_complete(&charge, cell.expansion)?;
+                        expanded.push(ExpandedCell {
+                            site: cell.site,
+                            co_present: cell.branch_population.saturating_mul(opened.len() as u64),
+                            opened,
+                        });
+                    }
+                    expanded
+                }
+                GenerationConduct::Deposited(runtime) => {
+                    self.materialize_deposited_front(&charge, chronology, prepared, runtime)?
+                }
+            };
 
             for cell in expanded {
                 let dilation = self.service_dilation(cell.site, cell.co_present)?;
@@ -1012,35 +1187,32 @@ impl MorphologicalLanguageEcology {
                         insert_generation_state(&mut rested, opened.state)?;
                         continue;
                     }
-                if opened.forked {
-                    shared_current_forks = shared_current_forks
+                    if opened.forked {
+                        shared_current_forks = shared_current_forks
+                            .checked_add(1)
+                            .ok_or(MorphologicalLanguageError::CarrierExtent)?;
+                        causal_current_states_formed = causal_current_states_formed
+                            .checked_add(1)
+                            .ok_or(MorphologicalLanguageError::CarrierExtent)?;
+                        returned_events_carried = returned_events_carried
+                            .checked_add(1)
+                            .ok_or(MorphologicalLanguageError::CarrierExtent)?;
+                    }
+                    // **Where the transport law decides conduct.** An uncongested successor arrives at
+                    // the next chronology; a congested one arrives `service_rounds − 1` later and is
+                    // retained meanwhile as deferred testimony rather than expanded early. Nothing is
+                    // dropped and nothing is chosen: the dilation is `ceil(demand / support)` over the
+                    // material, so a continuation the corpus attests widely rides at once and one it
+                    // barely attests waits for its turn.
+                    let arrival = chronology
                         .checked_add(1)
+                        .and_then(|next| next.checked_add(dilation))
                         .ok_or(MorphologicalLanguageError::CarrierExtent)?;
-                    causal_current_states_formed = causal_current_states_formed
-                        .checked_add(1)
-                        .ok_or(MorphologicalLanguageError::CarrierExtent)?;
-                    returned_events_carried = returned_events_carried
-                        .checked_add(1)
-                        .ok_or(MorphologicalLanguageError::CarrierExtent)?;
-                }
-                // **Where the transport law decides conduct.** An uncongested successor arrives at
-                // the next chronology; a congested one arrives `service_rounds − 1` later and is
-                // retained meanwhile as deferred testimony rather than expanded early. Nothing is
-                // dropped and nothing is chosen: the dilation is `ceil(demand / support)` over the
-                // material, so a continuation the corpus attests widely rides at once and one it
-                // barely attests waits for its turn.
-                let arrival = chronology
-                    .checked_add(1)
-                    .and_then(|next| next.checked_add(dilation))
-                    .ok_or(MorphologicalLanguageError::CarrierExtent)?;
-                if insert_generation_state(
-                    pending.entry(arrival).or_default(),
-                    opened.state,
-                )? {
-                    conduct_equivalent_states_glued = conduct_equivalent_states_glued
-                        .checked_add(1)
-                        .ok_or(MorphologicalLanguageError::CarrierExtent)?;
-                }
+                    if insert_generation_state(pending.entry(arrival).or_default(), opened.state)? {
+                        conduct_equivalent_states_glued = conduct_equivalent_states_glued
+                            .checked_add(1)
+                            .ok_or(MorphologicalLanguageError::CarrierExtent)?;
+                    }
                 }
             }
             peak_live_current_states = peak_live_current_states
@@ -1079,22 +1251,72 @@ impl MorphologicalLanguageEcology {
                 }
             })
             .collect::<Vec<_>>();
-        Ok(MorphologicalLanguageCurrentGeneration {
-            charge,
-            outputs,
-            reflection: MorphologicalReflectionReceipt {
-                shared_conditioned_bodies: 1,
-                whole_body_forks: 0,
-                shared_current_forks,
-                causal_current_states_formed,
-                conduct_equivalent_states_glued,
-                peak_live_current_states,
-                returned_events_carried,
-                terminal_return_materializations: observed_paths,
-                dilated_passages,
-                deepest_dilation,
-                deepest_chronology,
+        let (semantic, apparatus) = match conduct {
+            GenerationConduct::Complete => (
+                MorphologicalConductGenerationReceipt {
+                    schema: "soma-life.morphological-conduct-generation.v2".to_owned(),
+                    evaluated_transitions: 0,
+                    attached_transitions: 0,
+                    withheld_transitions: 0,
+                    declared_minimum_distinct_sources: 0,
+                    plurality_declared_by: "no conduct morphology is in scope: this is the \
+                                            complete continuation fiber, which is a real object \
+                                            and is not a return"
+                        .to_owned(),
+                    dispositions: LocalSequence::new(),
+                    obstructions: LocalSequence::new(),
+                },
+                LocalSequence::new(),
+            ),
+            GenerationConduct::Deposited(runtime) => {
+                let attached_transitions = runtime
+                    .dispositions
+                    .iter()
+                    .filter(|disposition| !disposition.attached_deposits.is_empty())
+                    .count();
+                let evaluated_transitions = runtime.dispositions.len();
+                (
+                    MorphologicalConductGenerationReceipt {
+                        schema: "soma-life.morphological-conduct-generation.v2".to_owned(),
+                        evaluated_transitions,
+                        attached_transitions,
+                        withheld_transitions: evaluated_transitions - attached_transitions,
+                        declared_minimum_distinct_sources: runtime
+                            .morphology
+                            .plurality()
+                            .minimum_distinct_sources(),
+                        plurality_declared_by: runtime
+                            .morphology
+                            .plurality()
+                            .declared_by()
+                            .to_owned(),
+                        dispositions: runtime.dispositions,
+                        obstructions: runtime.obstructions,
+                    },
+                    runtime.apparatus,
+                )
+            }
+        };
+        Ok(MorphologicalConductedGeneration {
+            generation: MorphologicalLanguageCurrentGeneration {
+                charge,
+                outputs,
+                reflection: MorphologicalReflectionReceipt {
+                    shared_conditioned_bodies: 1,
+                    whole_body_forks: 0,
+                    shared_current_forks,
+                    causal_current_states_formed,
+                    conduct_equivalent_states_glued,
+                    peak_live_current_states,
+                    returned_events_carried,
+                    terminal_return_materializations: observed_paths,
+                    dilated_passages,
+                    deepest_dilation,
+                    deepest_chronology,
+                },
             },
+            semantic,
+            apparatus,
         })
     }
 
@@ -1104,10 +1326,9 @@ impl MorphologicalLanguageEcology {
     /// `hardware_cover::expand_front`: what one co-present cell branches into. The cover, the
     /// sectioning by extent and the canonical reassembly are the law's and are not restated here.
     ///
-    /// Every path returns **at least one** successor, so `cell_progressed` rides on the successors
-    /// without a cell being able to lose it, and every quantity the caller totals rides with them:
-    /// the law returns a flat vector in the front's own order and has nowhere to put a per-lane
-    /// tally, which is the point — a tally kept per lane is a tally the lane count can move.
+    /// The complete predecessor returns at least one successor per path. A conducting owner may
+    /// instead retain every unattached event as an open disposition while emitting no successor;
+    /// that happens only after the resident attachment deed, never as a host-side post-filter.
     /// **The transport law's service dilation for one cell, read off the material.**
     ///
     /// `holonic_engine::receiver_current` states it:
@@ -1140,26 +1361,26 @@ impl MorphologicalLanguageEcology {
         Ok(co_present.div_ceil(capacity).saturating_sub(1))
     }
 
-    fn expand_current(
+    fn prepare_current(
         &self,
         charge: &MorphologicalQuestionCharge,
         spec: MorphologicalGenerationSpec,
         current: MorphologicalCurrentState,
         population: MorphologicalCurrentPopulation,
-    ) -> Result<Vec<ExpandedCurrent>, MorphologicalLanguageError> {
+    ) -> Result<PreparedExpansion, MorphologicalLanguageError> {
         let mut state = MorphologicalGenerationState {
             current,
             population,
         };
         if state.current.rest.is_some() {
-            return Ok(vec![ExpandedCurrent::carried(state)]);
+            return Ok(PreparedExpansion::Carried(state));
         }
         if state.current.reflection.returned_event_count >= spec.maximum_observed_tokens {
             self.finish_active_phase(charge, &mut state, None)?;
             state.current.rest = Some(MorphologicalResponseRest::ObservationApertureExhausted {
                 open_obligations: open_face_indices(&state.current.open_faces),
             });
-            return Ok(vec![ExpandedCurrent::carried(state)]);
+            return Ok(PreparedExpansion::Carried(state));
         }
 
         if let Some(active) = state.current.active_phase.as_ref() {
@@ -1174,36 +1395,296 @@ impl MorphologicalLanguageEcology {
                 // An exhausted local frontier is itself a caused obstruction. If another
                 // outer query fiber remains, the next loop may recruit a different local
                 // onset; no global clause-identity ban is installed.
-                return Ok(vec![ExpandedCurrent::progressed(state)]);
+                return Ok(PreparedExpansion::Progressed(state));
             }
-            let mut opened = Vec::with_capacity(events.len());
-            for event in events {
-                let mut successor = state.fork();
-                self.enact_event(
-                    charge,
-                    &mut successor,
-                    event,
-                    MorphologicalTransport::RecurrentLexical,
-                )?;
-                opened.push(ExpandedCurrent::forked(successor));
-            }
-            Ok(opened)
+            Ok(PreparedExpansion::Events {
+                state,
+                candidates: events,
+            })
         } else {
             let candidates = self.phase_candidates(charge, &state.current.open_faces)?;
             if candidates.is_empty() {
                 state.current.rest = Some(MorphologicalResponseRest::Obstructed {
                     open_obligations: open_face_indices(&state.current.open_faces),
                 });
-                return Ok(vec![ExpandedCurrent::carried(state)]);
+                return Ok(PreparedExpansion::Carried(state));
             }
-            let mut opened = Vec::with_capacity(candidates.len());
-            for candidate in candidates {
-                let mut successor = state.fork();
-                self.begin_phase(charge, &mut successor, candidate)?;
-                opened.push(ExpandedCurrent::forked(successor));
-            }
-            Ok(opened)
+            Ok(PreparedExpansion::Phases { state, candidates })
         }
+    }
+
+    fn materialize_complete(
+        &self,
+        charge: &MorphologicalQuestionCharge,
+        prepared: PreparedExpansion,
+    ) -> Result<Vec<ExpandedCurrent>, MorphologicalLanguageError> {
+        match prepared {
+            PreparedExpansion::Carried(state) => Ok(vec![ExpandedCurrent::carried(state)]),
+            PreparedExpansion::Progressed(state) => Ok(vec![ExpandedCurrent::progressed(state)]),
+            PreparedExpansion::Phases { state, candidates } => {
+                let mut opened = Vec::with_capacity(candidates.len());
+                for candidate in candidates {
+                    let mut successor = state.fork();
+                    self.begin_phase(charge, &mut successor, candidate)?;
+                    opened.push(ExpandedCurrent::forked(successor));
+                }
+                Ok(opened)
+            }
+            PreparedExpansion::Events { state, candidates } => {
+                let mut opened = Vec::with_capacity(candidates.len());
+                for event in candidates {
+                    let mut successor = state.fork();
+                    self.enact_event(
+                        charge,
+                        &mut successor,
+                        event,
+                        MorphologicalTransport::RecurrentLexical,
+                    )?;
+                    opened.push(ExpandedCurrent::forked(successor));
+                }
+                Ok(opened)
+            }
+        }
+    }
+
+    fn materialize_deposited_front(
+        &self,
+        charge: &MorphologicalQuestionCharge,
+        chronology: u64,
+        prepared: Vec<PreparedCell>,
+        runtime: &mut DepositedGenerationRuntime<'_>,
+    ) -> Result<Vec<ExpandedCell>, MorphologicalLanguageError> {
+        let candidate_count = prepared
+            .iter()
+            .map(|cell| match &cell.expansion {
+                PreparedExpansion::Events { candidates, .. } => candidates.len(),
+                _ => 0,
+            })
+            .try_fold(0usize, |total, extent| total.checked_add(extent))
+            .ok_or(MorphologicalLanguageError::CarrierExtent)?;
+        if candidate_count == 0 {
+            let mut expanded = Vec::with_capacity(prepared.len());
+            for cell in prepared {
+                let opened = self.materialize_complete(charge, cell.expansion)?;
+                expanded.push(ExpandedCell {
+                    site: cell.site,
+                    co_present: cell.branch_population.saturating_mul(opened.len() as u64),
+                    opened,
+                });
+            }
+            return Ok(expanded);
+        }
+
+        // **Two independently assembled key sheets, and nothing that resembles the answer.**
+        //
+        // The deposit sheet is the conduct morphology's own canonically ordered population, each
+        // row carrying only its activity and its exact transport key. The key sheet is each
+        // candidate's own ordered key set. Which deposit a candidate's key equals is asked on the
+        // card and nowhere here — see `conduct_cuda`'s module doc for what this replaced.
+        //
+        // **The identity width is read off the front, not assumed.** `token_germs` founds a germ
+        // identity from the token's own surface, so identities are of several word counts and the
+        // first version of this assembly refused every real front. The declared width is the widest
+        // identity present in the deposits or in the candidates, and the shorter ones are padded
+        // under a length-prefixed encoding that keeps the padding injective and order-invariant.
+        let mut identity_words = runtime.morphology.identity_word_extent();
+        for cell in &prepared {
+            let PreparedExpansion::Events { candidates, .. } = &cell.expansion else {
+                continue;
+            };
+            for event in candidates {
+                for edge in &event.conduct_candidates {
+                    identity_words = identity_words.max(edge.identity_word_extent());
+                }
+            }
+        }
+        let key_words = MorphologicalConductEdgeAddress::key_word_extent(identity_words);
+        // The card searches this sheet, so it is ordered by the CARD's key order, which is not the
+        // address order the atlas is canonical in — see `MorphologicalConductEdgeAddress::key_words`.
+        // The ordinals the card returns index into exactly this sequence.
+        let deposit_projection = runtime
+            .morphology
+            .card_ordered_deposits()
+            .into_iter()
+            .map(|deposit| {
+                (
+                    deposit.edge().clone(),
+                    deposit
+                        .exterior_sources()
+                        .iter()
+                        .map(|source| source.identity().to_owned())
+                        .collect::<BTreeSet<_>>(),
+                )
+            })
+            .collect::<LocalSequence<_>>();
+        if deposit_projection.is_empty() {
+            return Err(MorphologicalLanguageError::MalformedFiber);
+        }
+        let mut device_deposits = LocalSequence::with_capacity(deposit_projection.len());
+        for (edge, _) in &deposit_projection {
+            device_deposits.push(MorphologicalConductDepositRow::new(
+                true,
+                card_key(edge, identity_words)?,
+            ));
+        }
+
+        let mut device_candidates = LocalSequence::with_capacity(candidate_count);
+        let mut device_keys = LocalSequence::new();
+        let mut candidate_at = 0u32;
+        for cell in &prepared {
+            let PreparedExpansion::Events { candidates, .. } = &cell.expansion else {
+                continue;
+            };
+            for event in candidates {
+                // The candidate's face is the generation site it was opened at — a receiver
+                // coordinate the card returns and the host checks, never a tag invented to make a
+                // guard fire.
+                device_candidates.push(
+                    MorphologicalConductCandidate::new(cell.site)
+                        .ok_or(MorphologicalLanguageError::MalformedFiber)?,
+                );
+                // Ascending in the CARD's key order, which the front and the card both re-check.
+                let mut candidate_keys = event
+                    .conduct_candidates
+                    .iter()
+                    .collect::<LocalSequence<_>>();
+                candidate_keys.sort_by(|left, right| left.card_key_cmp(right));
+                for edge in candidate_keys {
+                    let key = card_key(edge, identity_words)?;
+                    debug_assert_eq!(key.len(), key_words);
+                    device_keys.push(MorphologicalConductCandidateKey::new(candidate_at, key));
+                }
+                candidate_at = candidate_at
+                    .checked_add(1)
+                    .ok_or(MorphologicalLanguageError::CarrierExtent)?;
+            }
+        }
+        if candidate_at as usize != candidate_count {
+            return Err(MorphologicalLanguageError::MalformedFiber);
+        }
+        let front = MorphologicalConductCudaFront::new(
+            key_words,
+            device_candidates,
+            device_deposits,
+            device_keys,
+        )?;
+        let returned = runtime.executor.enact(&front)?;
+        if returned.semantic.candidates.len() != candidate_count {
+            return Err(MorphologicalConductCudaError::InvalidDeviceReturn.into());
+        }
+        runtime.apparatus.push(returned.apparatus);
+        let returned_candidates = returned.semantic.candidates;
+
+        let mut returned_at = 0usize;
+        let mut expanded = Vec::with_capacity(prepared.len());
+        for cell in prepared {
+            let opened = match cell.expansion {
+                PreparedExpansion::Events {
+                    mut state,
+                    candidates,
+                } => {
+                    let witness_population = state.population.witnesses.len();
+                    let mut opened = Vec::with_capacity(candidates.len());
+                    let mut withheld_candidates = LocalSequence::new();
+                    for mut event in candidates {
+                        let returned = returned_candidates
+                            .get(returned_at)
+                            .ok_or(MorphologicalConductCudaError::InvalidDeviceReturn)?;
+                        if returned.candidate as usize != returned_at
+                            || returned.face != cell.site
+                            || returned.key_rows as usize != event.conduct_candidates.len()
+                        {
+                            return Err(MorphologicalConductCudaError::InvalidDeviceReturn.into());
+                        }
+                        let candidate_edges = event
+                            .conduct_candidates
+                            .iter()
+                            .cloned()
+                            .collect::<LocalSequence<_>>();
+                        let mut attached = LocalSequence::new();
+                        let mut attached_set = LocalSet::new();
+                        let mut conducting_sources = BTreeSet::new();
+                        for deposit_at in &returned.active_deposits {
+                            let (edge, sources) = deposit_projection
+                                .get(*deposit_at as usize)
+                                .ok_or(MorphologicalConductCudaError::InvalidDeviceReturn)?;
+                            if !event.conduct_candidates.contains(edge)
+                                || !attached_set.insert(edge.clone())
+                            {
+                                return Err(
+                                    MorphologicalConductCudaError::InvalidDeviceReturn.into()
+                                );
+                            }
+                            attached.push(edge.clone());
+                            conducting_sources.extend(sources.iter().cloned());
+                        }
+                        let candidate = runtime.next_candidate;
+                        runtime.next_candidate = runtime
+                            .next_candidate
+                            .checked_add(1)
+                            .ok_or(MorphologicalLanguageError::CarrierExtent)?;
+                        runtime
+                            .dispositions
+                            .push(MorphologicalConductTransitionDisposition {
+                                chronology,
+                                candidate,
+                                surface: event.token.clone(),
+                                witness_population,
+                                candidate_edges,
+                                attached_deposits: attached,
+                            });
+                        returned_at += 1;
+                        if attached_set.is_empty() {
+                            // Withheld, retained, never emitted. The complete fiber is a real
+                            // object and is not a return.
+                            withheld_candidates.push(candidate);
+                            continue;
+                        }
+                        event.conducting_supports = attached_set;
+                        event.conducting_sources = conducting_sources;
+                        let mut successor = state.fork();
+                        self.enact_event(
+                            charge,
+                            &mut successor,
+                            event,
+                            MorphologicalTransport::RecurrentLexical,
+                        )?;
+                        opened.push(ExpandedCurrent::forked(successor));
+                    }
+                    if opened.is_empty() {
+                        // **Where nothing conducts, the return is the obstruction with its
+                        // address.** This cell's whole current used to be dropped here — it entered
+                        // neither the pending front nor the rested population, so a receiver could
+                        // not tell a branch the deposits refused from one that never existed. It
+                        // now comes to rest as `Obstructed` and is returned among the outputs, and
+                        // the candidates it withheld are named by ordinal in the receipt.
+                        self.finish_active_phase(charge, &mut state, None)?;
+                        state.current.rest =
+                            Some(MorphologicalResponseRest::Obstructed {
+                                open_obligations: open_face_indices(&state.current.open_faces),
+                            });
+                        runtime.obstructions.push(MorphologicalConductObstruction {
+                            chronology,
+                            site: cell.site,
+                            witness_population,
+                            withheld_candidates,
+                        });
+                        opened.push(ExpandedCurrent::carried(state));
+                    }
+                    opened
+                }
+                other => self.materialize_complete(charge, other)?,
+            };
+            expanded.push(ExpandedCell {
+                site: cell.site,
+                co_present: cell.branch_population.saturating_mul(opened.len() as u64),
+                opened,
+            });
+        }
+        if returned_at != candidate_count {
+            return Err(MorphologicalConductCudaError::InvalidDeviceReturn.into());
+        }
+        Ok(expanded)
     }
 
     fn phase_candidates(
@@ -1369,6 +1850,10 @@ impl MorphologicalLanguageEcology {
             EventCandidate {
                 token,
                 support: None,
+                conduct_candidates: LocalSet::new(),
+                conduct_sources: BTreeSet::new(),
+                conducting_supports: LocalSet::new(),
+                conducting_sources: BTreeSet::new(),
                 clause_horizons: BTreeSet::new(),
                 passage_horizons: BTreeSet::new(),
                 recurrence_multiplicities: BTreeSet::new(),
@@ -1445,6 +1930,10 @@ impl MorphologicalLanguageEcology {
                     .or_insert_with(|| EventCandidate {
                         token: token.clone(),
                         support: Some(support_key),
+                        conduct_candidates: LocalSet::new(),
+                        conduct_sources: BTreeSet::from([clause.source.clone()]),
+                        conducting_supports: LocalSet::new(),
+                        conducting_sources: BTreeSet::new(),
                         clause_horizons: BTreeSet::new(),
                         passage_horizons: BTreeSet::new(),
                         recurrence_multiplicities: BTreeSet::from([1]),
@@ -1511,6 +2000,15 @@ impl MorphologicalLanguageEcology {
                             .ok_or(MorphologicalLanguageError::MalformedFiber)
                     })
                     .collect::<Result<BTreeSet<_>, _>>()?;
+                let support_sources = clauses
+                    .iter()
+                    .map(|clause_at| {
+                        self.clauses
+                            .get(*clause_at)
+                            .map(|clause| clause.source.clone())
+                            .ok_or(MorphologicalLanguageError::MalformedFiber)
+                    })
+                    .collect::<Result<BTreeSet<_>, _>>()?;
                 for clause_at in clauses {
                     let clause = self
                         .clauses
@@ -1538,6 +2036,10 @@ impl MorphologicalLanguageEcology {
                             .or_insert_with(|| EventCandidate {
                                 token: token.clone(),
                                 support: Some(support_key),
+                                conduct_candidates: LocalSet::new(),
+                                conduct_sources: BTreeSet::new(),
+                                conducting_supports: LocalSet::new(),
+                                conducting_sources: BTreeSet::new(),
                                 clause_horizons: BTreeSet::new(),
                                 passage_horizons: BTreeSet::new(),
                                 recurrence_multiplicities: BTreeSet::new(),
@@ -1550,6 +2052,17 @@ impl MorphologicalLanguageEcology {
                                 sources: BTreeSet::from([clause.source.clone()]),
                                 context_sources: context_sources.clone(),
                             });
+                        entry.conduct_candidates.insert(
+                            MorphologicalConductEdgeAddress::from_branch_support(
+                                MorphologicalConductChart::ClauseLexical,
+                                branch,
+                                support,
+                            )?,
+                        );
+                        // The support's OWN target occurrences, not this candidate's reached
+                        // position: it is the transport that recurred or did not, and its exterior
+                        // lineage is the same population the conduct atlas founds a deposit from.
+                        entry.conduct_sources.extend(support_sources.iter().cloned());
                         entry.clause_horizons.insert(support.matched_length());
                         entry
                             .recurrence_multiplicities
@@ -1604,6 +2117,15 @@ impl MorphologicalLanguageEcology {
                             .ok_or(MorphologicalLanguageError::MalformedFiber)
                     })
                     .collect::<Result<BTreeSet<_>, _>>()?;
+                let support_sources = passages
+                    .iter()
+                    .map(|passage_fiber| {
+                        self.passages
+                            .get(passage_fiber)
+                            .map(|passage| passage.source.clone())
+                            .ok_or(MorphologicalLanguageError::MalformedFiber)
+                    })
+                    .collect::<Result<BTreeSet<_>, _>>()?;
                 for passage_fiber in passages {
                     let passage = self
                         .passages
@@ -1636,6 +2158,10 @@ impl MorphologicalLanguageEcology {
                                 .or_insert_with(|| EventCandidate {
                                     token: token.clone(),
                                     support: Some(support_key),
+                                    conduct_candidates: LocalSet::new(),
+                                    conduct_sources: BTreeSet::new(),
+                                    conducting_supports: LocalSet::new(),
+                                    conducting_sources: BTreeSet::new(),
                                     clause_horizons: BTreeSet::new(),
                                     passage_horizons: BTreeSet::new(),
                                     recurrence_multiplicities: BTreeSet::new(),
@@ -1648,6 +2174,14 @@ impl MorphologicalLanguageEcology {
                                     sources: BTreeSet::from([passage.source.clone()]),
                                     context_sources: context_sources.clone(),
                                 });
+                            entry.conduct_candidates.insert(
+                                MorphologicalConductEdgeAddress::from_branch_support(
+                                    MorphologicalConductChart::PassageLexical,
+                                    branch,
+                                    support,
+                                )?,
+                            );
+                            entry.conduct_sources.extend(support_sources.iter().cloned());
                             entry.passage_horizons.insert(support.matched_length());
                             entry
                                 .recurrence_multiplicities
@@ -1804,6 +2338,21 @@ impl MorphologicalLanguageEcology {
         let returned_event_count = generated_at
             .checked_add(1)
             .ok_or(MorphologicalLanguageError::CarrierExtent)?;
+        // **The exterior lineage of the supports that licensed this transition, on either path.**
+        //
+        // One law, two paths. Where a deposit attached the transition, the licensing supports are
+        // exactly those deposits and the population is theirs. Where no morphology is in scope,
+        // nothing gates, so every exact support the material opened licensed it and the population
+        // is the one the supports themselves carry — read at the construction site into
+        // `conduct_sources` and never reconstructed from the query context or the token surface.
+        //
+        // Taking this only from the deposited path is what zeroed `supporting_sources` on the
+        // complete path and deleted the instrument that measured the single-source finding.
+        let conducting_sources = if event.conducting_supports.is_empty() {
+            self.source_names(&event.conduct_sources)?
+        } else {
+            event.conducting_sources
+        };
         let returned_token = MorphologicalGeneratedToken {
             token: event.token.clone(),
             transport,
@@ -1813,6 +2362,8 @@ impl MorphologicalLanguageEcology {
             recurrent_sources: caused_sources.clone(),
             recurrent_context_sources,
             caused_sources,
+            conducting_supports: event.conducting_supports,
+            conducting_sources,
             caused_passages,
             supporting_clauses,
             returned_event_count,

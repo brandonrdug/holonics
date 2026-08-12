@@ -26,6 +26,8 @@ pub mod emission;
 pub mod holon;
 /// One contemporary live-current event at the CUDA execution seam.
 pub mod live_event_cuda;
+/// One morphological candidate/deposit attachment at the CUDA execution seam.
+pub mod morphological_conduct_cuda;
 /// One world presentation without a world-specific object model.
 pub mod presentation;
 /// Exact REGISTER status, lane, and entry rows.

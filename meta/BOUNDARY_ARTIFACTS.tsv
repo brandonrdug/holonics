@@ -76,9 +76,9 @@ CLOSURE	soma/mount/mount-smoke-kernel/mount_smoke_kernel.ptx	soma/mount/mount-sm
 CLOSURE	soma/mount/mount-smoke-kernel/mount_smoke_kernel.ptx	soma/mount/mount-smoke-kernel/src/lib.rs	598e5f1fff67bcc9587e9f9dcb01d1a3e57fd2cc6d390a26646e8b82bd61bcc7
 ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	root	soma/mount/soma-kernel-cuda
 ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	closure_rule	CRATE_DEPS
-ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	sha256	75ec197eed8c0f06a1e164eb2f33e5161e276b86c77d958c2ed7d9b15fd6023c
-ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	octets	8819209
-ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	closure_sha256	67a133fddd45e1f7da9337175dd8d5f0e2eadb96b7dc1fa251533fa959999a13
+ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	sha256	967b3747c4a27753bde6911cc5f130c48388939f56d4923f0746f20e99b6ce7f
+ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	octets	8851571
+ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	closure_sha256	f0db0bcd5705c76b009ecf555e10fadd73822b36997da861d239b11bdcc20978
 ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	toolchain	nightly-2026-05-22
 ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	builder	soma/mount/soma-kernel-cuda/build-ptx.sh
 ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	consumer	soma/mount/src/lib.rs
@@ -88,7 +88,7 @@ ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	consumer	soma/mount/sr
 ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	consumer	soma/mount/src/bin/mount-register-gate.rs
 ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	consumer	soma/mount/src/bin/mount-register-remount-gate.rs
 ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	consumer	soma/mount/src/bin/mount-scope-gate.rs
-ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	rebuild_evidence	CURRENT, rebuilt 2026-08-11 by soma/mount/soma-kernel-cuda/build-ptx.sh against this tree; ptxas -arch=sm_89 clean; 25 entries and 251,774 lines. The returned_contact_group entry is exercised by the real RTX 4080 SUPER deed and its two adversarial device tests. STRUCTURALLY reproducible, NOT byte-reproducible: crate disambiguators in mangled symbol names move with the compilation environment, so the same source yields the same entry set with different symbol suffixes.
+ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	rebuild_evidence	CURRENT, rebuilt 2026-08-11 by soma/mount/soma-kernel-cuda/build-ptx.sh against this tree (nightly-2026-05-22, -Z build-std=core,compiler_builtins, sm_89 +ptx78); ptxas -arch=sm_89 clean; 26 entries and 252,709 lines. BYTE-REPRODUCIBLE ON THIS TREE, measured: the script was run once before any kernel edit and reproduced the already-committed artifact at sha256 d72fb4b7 EXACTLY, which withdraws the previous row's claim that crate disambiguators make this build only structurally reproducible -- on this toolchain and this workspace they do not move. It was then run again after the morphological_conduct_group rewrite and these are those bytes. That entry is exercised on a real RTX 4080 SUPER by three device tests in soma/life/src/morphological_language/conduct_cuda.rs, which check the card's own decision against an independent host recomputation of the induced equivalence, and by the driver soma/life/examples/the_deposit_licenses_the_re_emission.rs. NOTE: soma/abi/src/morphological_conduct_cuda.rs entered this closure only when it became tracked -- the closure walks git ls-files, so an untracked source file that IS compiled into the artifact is invisible to the binding, which is the same silent drift this ledger exists to catch.
 CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/Cargo.toml	9b64b13d5bb6f026632c5b1c6e7797d03b50fac87214d930bdb1d6feb00bc4e1
 CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/active.rs	322121d3806fe8d28faed6ed4af6a5297f8c84bd8cb034f7b11a4c6a0f9558a8
 CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/conduct.rs	803921412f41fa349606e3d5559639602ce2a21f639305b179919c14122038f6
@@ -96,8 +96,9 @@ CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/contact.rs
 CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/current.rs	fcaa6d7b779734e67bf9af840c877f213d4b34516ebe4a62eba0f3744534c62b
 CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/emission.rs	d01f928ff274ebe7a4a480d4ac4aa65000fd88d410709e9a9d5f22bc2acd2d27
 CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/holon.rs	aa8611ca4dacda298764076947add9603bc63b9984460f976056651c07164b93
-CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/lib.rs	d25d53ecef1cb440790670c8629a7a9ae8c5a32366b6a423e408b04ea0844752
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/lib.rs	b41afe248e076578c0501922b10e48c5afb39815e3ae02d94755172bcf97404b
 CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/live_event_cuda.rs	e8eab373bcc3d294937b467fafa367b03b8ea8415ab9682a2d599cac22306f15
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/morphological_conduct_cuda.rs	c51c04cdb75dbc38a9a2dc400d13d01fc7ba253ba3e9cb0e938397a5f3037bb1
 CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/presentation.rs	c8c7e2f075ef8956394bf4aa9a7eb7fcd382b76a6a7b33b05ee079eabbdcfa7a
 CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/register.rs	0b00fbde9e6831ae7d9018838743adb4a6477f53198a372daf037d1798c355aa
 CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/returned_contact_cuda.rs	fafa96daaff69f9673fc3156f9b7dc69371e3583d6d742ed4ac00ac904b834b0
@@ -126,6 +127,6 @@ CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/body/src/seam.rs	8
 CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/body/src/soul.rs	57709bcdf5d22adee350cc749378c67035ba57e2a2c664bdae60a9952284cf58
 CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/mount/soma-kernel-cuda/Cargo.lock	4afc4efadc7c64f40a160f7a7ad50c5426d3614038e2441f1caf59af4f6b4851
 CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/mount/soma-kernel-cuda/Cargo.toml	8147a2229bcd1a777ce7043ad2c4bbff1b8f6f0d573f4055b027af75e1dc30a4
-CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/mount/soma-kernel-cuda/build-ptx.sh	02ca85d8efbe807b6e4922559c3fa84462bf65811fd0c607c4be653d588c5888
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/mount/soma-kernel-cuda/build-ptx.sh	c2f962dae5a82dff0efce0bf987df84e133bbe86f1489dc78f48f1e6dbcd0e27
 CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/mount/soma-kernel-cuda/rust-toolchain.toml	d072407f6554628c0b87e93aab1fee3fcfe3e68fe149121c7e539a6d0b573fad
-CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/mount/soma-kernel-cuda/src/lib.rs	d466b9ada8ddaeb318d970dfbcf09990aba18289101754b111ac593595d90ae5
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/mount/soma-kernel-cuda/src/lib.rs	5d8a433cf29a080f04e94b6a949cbcc65dba6eaaf624413e3ac5a61d72d388c2

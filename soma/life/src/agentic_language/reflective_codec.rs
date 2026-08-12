@@ -124,6 +124,12 @@ pub(super) fn reflective_codec_answer_candidate(
                 recurrent_sources: evidence_sources.clone(),
                 recurrent_context_sources: version.output.lineage.clone(),
                 caused_sources: evidence_sources.clone(),
+                conducting_supports: LocalSet::new(),
+                // The exterior lineage that licensed this realization. No deposited morphology is
+                // in scope here, so no `conducting_supports` name a deposit; the population is the
+                // one the evidence itself carries, which is the same law the morphological front
+                // applies to its own supports.
+                conducting_sources: evidence_sources.clone(),
                 caused_passages: BTreeSet::from([passage_identity.clone()]),
                 supporting_clauses: BTreeSet::from([version.identity.clone()]),
                 returned_event_count,
@@ -196,20 +202,18 @@ pub(super) fn reflective_codec_answer_candidate(
         contextual_dialogue: contextual_dialogue.clone(),
         obligation_population: 1,
         local_region_fiber: ExactAnswerRegionFiber::from_parts(
-            LocalSet::from_iter(returned_regions
-                .iter()
-                .copied()
-                .map(|region| AgenticAnswerRegionIdentity {
+            LocalSet::from_iter(returned_regions.iter().copied().map(|region| {
+                AgenticAnswerRegionIdentity {
                     obligation: 0,
                     region,
-                })),
-            LocalSet::from_iter(returned_regions
-                .iter()
-                .copied()
-                .map(|region| AgenticAnswerRegionIdentity {
+                }
+            })),
+            LocalSet::from_iter(returned_regions.iter().copied().map(|region| {
+                AgenticAnswerRegionIdentity {
                     obligation: 0,
                     region,
-                })),
+                }
+            })),
         )?,
         ordered_query_regions: matched_regions,
         revision_horizon: episode.revision,

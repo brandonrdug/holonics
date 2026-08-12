@@ -424,10 +424,7 @@ impl AgenticLanguageEcology {
                     passages: episode.passages.clone(),
                     routing_surfaces: episode.routing_surfaces.clone(),
                     evidence_sources: episode.evidence_sources.clone(),
-                    realized_ecology: episode
-                        .ecology
-                        .as_ref()
-                        .map(|ecology| *ecology.census()),
+                    realized_ecology: episode.ecology.as_ref().map(|ecology| *ecology.census()),
                     relational_thought: episode.relational_thought.clone(),
                     codec_versions: episode.codec_versions.clone(),
                 })

@@ -8,6 +8,55 @@ fn action() -> ActionCurrent {
 }
 
 #[test]
+fn exact_recurrent_edges_deposit_only_across_distinct_exterior_sources() {
+    let plural = MorphologicalLanguageEcology::condition(
+        &[
+            MorphologicalLanguagePassage::new("alpha", "source-a", 1, "Alpha remains open."),
+            MorphologicalLanguagePassage::new("beta", "source-b", 2, "Alpha remains open."),
+        ],
+        action(),
+        2,
+    )
+    .unwrap();
+    let atlas = plural.conduct_atlas().unwrap();
+    assert!(atlas.rows().iter().any(|row| {
+        row.target_sources()
+            .iter()
+            .map(|(_, source)| source.identity())
+            .collect::<BTreeSet<_>>()
+            .len()
+            >= 2
+    }));
+    let plurality = MorphologicalConductPlurality::recurrence_across_two_distinct_wholes();
+    let MorphologicalConductState::Conducting(conducting) = atlas.into_state(&plurality).unwrap()
+    else {
+        panic!("the same exact transport across two sources must deposit");
+    };
+    assert!(conducting.deposit_count() > 0);
+    assert!(conducting
+        .deposits()
+        .all(|deposit| deposit.exterior_sources().len() >= 2));
+
+    let one_source = MorphologicalLanguageEcology::condition(
+        &[
+            MorphologicalLanguagePassage::new("first", "source-a", 1, "Alpha remains open."),
+            MorphologicalLanguagePassage::new("second", "source-a", 1, "Alpha remains open."),
+        ],
+        action(),
+        2,
+    )
+    .unwrap();
+    assert!(matches!(
+        one_source
+            .conduct_atlas()
+            .unwrap()
+            .into_state(&plurality)
+            .unwrap(),
+        MorphologicalConductState::Unconditioned(_)
+    ));
+}
+
+#[test]
 fn simultaneous_scales_compose_two_source_phases_and_close_after_both_return() {
     let passages = vec![
         MorphologicalLanguagePassage::new(
@@ -450,7 +499,9 @@ fn a_declared_lane_count_cannot_move_the_generated_reading() {
     let prompt = "How does training change morphology while uncertainty remains?";
     let over = |lanes: u32| {
         let cover = HardwareCover::of_charts(vec![Chart::Host(HostDeclaration { lanes })]);
-        ecology.generate_currents_over(prompt, spec, &cover).unwrap()
+        ecology
+            .generate_currents_over(prompt, spec, &cover)
+            .unwrap()
     };
 
     let serial = over(1);
@@ -484,7 +535,8 @@ fn a_declared_lane_count_cannot_move_the_generated_reading() {
             .zip(covered.outputs.iter())
             .position(|(serial_branch, covered_branch)| serial_branch != covered_branch);
         assert_eq!(
-            first_difference, None,
+            first_difference,
+            None,
             "a lane is a realization coordinate and may not move a reading: {lanes} lanes, \
              first differing branch {first_difference:?} of {}",
             serial.outputs.len()
@@ -603,8 +655,52 @@ fn the_transport_law_dilates_a_congested_passage_and_deletes_no_branch() {
             5,
             "The retained morphology changes training.",
         ),
+        // **Material that can vary the property under test.**
+        //
+        // The conduct reading asks whether one exact transport returned through two distinct
+        // exterior sources. A fixture in which every recurrence sits inside one source cannot
+        // answer that either way, and a check whose material cannot vary the property is §8's
+        // convicted shape wearing a passing result. These two carry the transport
+        // `retained -> morphology` into a sixth and a seventh source, so the atlas below holds a
+        // plural-source row and the reading has something to separate.
+        MorphologicalLanguagePassage::new(
+            "shared-morphology",
+            "shared-source",
+            6,
+            "The retained morphology remains available.",
+        ),
+        MorphologicalLanguagePassage::new(
+            "echo-morphology",
+            "echo-source",
+            7,
+            "An explicit retained morphology changes training.",
+        ),
     ];
     let ecology = MorphologicalLanguageEcology::condition(&passages, action(), 2).unwrap();
+
+    // THE ORBIT FOR THE CONDUCT READING, taken on the material before anything is generated. If no
+    // exact transport in this corpus reaches two exterior sources, every conduct figure below is
+    // vacuous whatever it returns.
+    let plural_source_transports = ecology
+        .conduct_atlas()
+        .unwrap()
+        .rows()
+        .iter()
+        .filter(|row| {
+            row.target_sources()
+                .iter()
+                .map(|(_, source)| source.identity())
+                .collect::<BTreeSet<_>>()
+                .len()
+                >= 2
+        })
+        .count();
+    assert!(
+        plural_source_transports > 0,
+        "no exact transport in this fixture returned through two distinct sources, so the conduct \
+         reading cannot distinguish anything on it"
+    );
+
     let spec = MorphologicalGenerationSpec {
         maximum_observed_tokens: 7,
     };

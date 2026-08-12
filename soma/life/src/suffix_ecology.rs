@@ -301,6 +301,59 @@ impl ExactLabeledSuffixEmanation {
     }
 }
 
+/// One query-independent material transport in a source-lineaged suffix ecology. The local
+/// receiver states and the complete germ presentation identify the edge. Match horizon and
+/// recurrence multiplicity are testimony about a later encounter; neither is promoted into the
+/// transport's identity.
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub struct ExactLabeledSuffixMaterialEdge {
+    context_state: u32,
+    germ_identity: ReceiverFiberIdentity,
+    germ_phase: [u32; COG_WORDS],
+    target_state: u32,
+    recurrence_multiplicity: u64,
+    sources: LocalSet<SuffixSourceLabel>,
+    context_sources: LocalSet<SuffixSourceLabel>,
+}
+
+impl ExactLabeledSuffixMaterialEdge {
+    pub const fn context_state(&self) -> u32 {
+        self.context_state
+    }
+
+    pub const fn germ_identity(&self) -> &ReceiverFiberIdentity {
+        &self.germ_identity
+    }
+
+    pub const fn germ_phase(&self) -> [u32; COG_WORDS] {
+        self.germ_phase
+    }
+
+    pub const fn target_state(&self) -> u32 {
+        self.target_state
+    }
+
+    pub const fn recurrence_multiplicity(&self) -> u64 {
+        self.recurrence_multiplicity
+    }
+
+    pub const fn sources(&self) -> &LocalSet<SuffixSourceLabel> {
+        &self.sources
+    }
+
+    pub const fn context_sources(&self) -> &LocalSet<SuffixSourceLabel> {
+        &self.context_sources
+    }
+
+    pub fn germ(&self) -> Result<ResonanceGerm, ExactSuffixEcologyError> {
+        GermKey {
+            identity: self.germ_identity.clone(),
+            phase: self.germ_phase,
+        }
+        .germ()
+    }
+}
+
 /// A finite exact suffix-state ecology derived from ordered germ paths. Outer path delivery is
 /// canonicalized; chronology inside every path remains physical.
 #[derive(Debug, PartialEq, Eq)]
@@ -1124,6 +1177,52 @@ impl ExactLabeledSuffixEcology {
             .ok()
     }
 
+    /// Return every material transport which a non-root recurrent receiver can expose, together
+    /// with its exact target and context source faces. This is the stable ecology-owned atlas from
+    /// which a later conduct deposit may be founded; it is not a query result and therefore does
+    /// not carry a matched length or make recurrence multiplicity part of edge identity.
+    pub fn material_edges(
+        &self,
+    ) -> Result<LocalSequence<ExactLabeledSuffixMaterialEdge>, ExactSuffixEcologyError> {
+        let mut edges = LocalSequence::with_capacity(self.ecology.material_transitions);
+        for context in 1..self.ecology.states.len() {
+            for (symbol, target) in self
+                .ecology
+                .transitions
+                .iter(self.ecology.states[context].transitions)?
+            {
+                let SuffixSymbol::Germ(germ) = symbol else {
+                    continue;
+                };
+                let recurrence_multiplicity = self
+                    .ecology
+                    .states
+                    .get(*target)
+                    .ok_or(ExactSuffixEcologyError::InvalidWire)?
+                    .material_end_multiplicity;
+                if recurrence_multiplicity == 0 {
+                    return Err(ExactSuffixEcologyError::InvalidWire);
+                }
+                edges.push(ExactLabeledSuffixMaterialEdge {
+                    context_state: u32::try_from(context)
+                        .map_err(|_| ExactSuffixEcologyError::CarrierExtent)?,
+                    germ_identity: germ.identity.clone(),
+                    germ_phase: germ.phase,
+                    target_state: u32::try_from(*target)
+                        .map_err(|_| ExactSuffixEcologyError::CarrierExtent)?,
+                    recurrence_multiplicity,
+                    sources: self
+                        .source_incidence
+                        .labels(*target, &self.source_catalogue)?,
+                    context_sources: self
+                        .source_incidence
+                        .labels(context, &self.source_catalogue)?,
+                });
+            }
+        }
+        Ok(edges)
+    }
+
     pub fn emanate(
         &self,
         path: &[ResonanceGerm],
@@ -1413,6 +1512,13 @@ mod tests {
         )
     }
 
+    fn phased_germ(identity: u32, phase: i64) -> ResonanceGerm {
+        ResonanceGerm::new(
+            ReceiverFiberIdentity::new(TEST_SCHEMA, [identity]),
+            RelationAtom::new(Cog::lit(phase)).unwrap(),
+        )
+    }
+
     fn source(value: u32) -> ReceiverFiberIdentity {
         ReceiverFiberIdentity::new(0x5352_4345, [value])
     }
@@ -1568,6 +1674,78 @@ mod tests {
         let remounted = ExactLabeledSuffixEcology::from_native_bytes(&wire).unwrap();
         assert_eq!(remounted, ecology);
         assert_eq!(remounted.emanate(&[germ(1), germ(2)]).unwrap(), emanation);
+    }
+
+    #[test]
+    fn material_edge_atlas_retains_state_phase_and_support_specific_lineage() {
+        let first_phase = phased_germ(9, 100);
+        let second_phase = phased_germ(9, 200);
+        let ecology = ExactLabeledSuffixEcology::condition(
+            &[
+                vec![germ(1), first_phase.clone(), germ(3)],
+                vec![germ(1), second_phase.clone(), germ(4)],
+            ],
+            &[source(30), source(40)],
+        )
+        .unwrap();
+        let edges = ecology.material_edges().unwrap();
+        assert!(edges.iter().all(|edge| edge.context_state() != 0));
+        let phased_edges = edges
+            .iter()
+            .filter(|edge| edge.germ_identity().words() == [9])
+            .collect::<LocalSequence<_>>();
+        assert!(phased_edges.len() >= 2);
+        assert_eq!(
+            phased_edges
+                .iter()
+                .map(|edge| edge.germ_phase())
+                .collect::<BTreeSet<_>>(),
+            [first_phase.phase().words(), second_phase.phase().words()]
+                .into_iter()
+                .collect()
+        );
+        assert_eq!(
+            edges
+                .iter()
+                .map(|edge| (
+                    edge.context_state(),
+                    edge.germ_identity().clone(),
+                    edge.germ_phase(),
+                    edge.target_state(),
+                ))
+                .collect::<BTreeSet<_>>()
+                .len(),
+            edges.len()
+        );
+
+        let emanation = ecology.emanate(&[germ(1)]).unwrap();
+        for branch in emanation.branches() {
+            for support in branch.branch().supports() {
+                let edge = edges
+                    .iter()
+                    .find(|edge| {
+                        edge.context_state() == support.state()
+                            && edge.target_state() == support.target_state()
+                            && edge.germ_identity() == branch.branch().germ().identity()
+                            && edge.germ_phase() == branch.branch().germ().phase().words()
+                    })
+                    .unwrap();
+                assert_eq!(
+                    edge.recurrence_multiplicity(),
+                    support.recurrence_multiplicity()
+                );
+                assert_eq!(Some(edge.sources()), branch.sources_for_support(support));
+                assert_eq!(
+                    Some(edge.context_sources()),
+                    branch.context_sources_for_support(support)
+                );
+            }
+        }
+
+        let remounted =
+            ExactLabeledSuffixEcology::from_native_bytes(&ecology.encode_native_bytes().unwrap())
+                .unwrap();
+        assert_eq!(remounted.material_edges().unwrap(), edges);
     }
 
     #[test]

@@ -70,6 +70,7 @@ use body::register;
 use body::seam::SliceWordSeam;
 use soma_abi::emission::{DeedEmission, DEED_WORDS};
 use soma_abi::live_event_cuda as event_cuda;
+use soma_abi::morphological_conduct_cuda as morph_cuda;
 use soma_abi::returned_contact_cuda as returned_cuda;
 use soma_abi::text_restrict_cuda as text_cuda;
 use soma_abi::{contact as contact_abi, register as register_abi};
@@ -4113,5 +4114,342 @@ pub unsafe extern "ptx-kernel" fn returned_contact_group(
         returned_cuda::STATUS_INVALID
     } else {
         returned_cuda::STATUS_COMPLETE
+    };
+}
+
+// --- morphological-conduct attachment -----------------------------------------------------------
+
+#[derive(Clone, Copy)]
+struct MorphologicalConductShape {
+    epoch: u32,
+    candidates: usize,
+    deposits: usize,
+    key_rows: usize,
+    key_words: usize,
+    max_candidate_keys: usize,
+    deposit_row_words: usize,
+    key_row_words: usize,
+    candidate_row_words: usize,
+    output_words: usize,
+}
+
+#[inline(always)]
+fn morphological_conduct_shape(
+    control: &[u32],
+    candidate_words_len: usize,
+    deposit_words_len: usize,
+    key_row_words_len: usize,
+    output_words_len: usize,
+) -> Option<MorphologicalConductShape> {
+    if control.len() != morph_cuda::CONTROL_WORDS
+        || control[morph_cuda::CONTROL_VERSION] != morph_cuda::LAYOUT_VERSION
+        || control[morph_cuda::CONTROL_EPOCH] == 0
+        || control[morph_cuda::CONTROL_TOTAL_WORDS] as usize != morph_cuda::CONTROL_WORDS
+    {
+        return None;
+    }
+    let candidates = control[morph_cuda::CONTROL_CANDIDATES] as usize;
+    let deposits = control[morph_cuda::CONTROL_DEPOSITS] as usize;
+    let key_rows = control[morph_cuda::CONTROL_KEY_ROWS] as usize;
+    let key_words = control[morph_cuda::CONTROL_KEY_WORDS] as usize;
+    let max_candidate_keys = control[morph_cuda::CONTROL_MAX_CANDIDATE_KEYS] as usize;
+    if key_words == 0 || max_candidate_keys > key_rows {
+        return None;
+    }
+    let candidate_total_words = candidates.checked_mul(morph_cuda::CANDIDATE_WORDS)?;
+    let deposit_row_words = morph_cuda::deposit_row_words(key_words)?;
+    let deposit_total_words = deposits.checked_mul(deposit_row_words)?;
+    let key_row_words = morph_cuda::key_row_words(key_words)?;
+    let key_row_total_words = key_rows.checked_mul(key_row_words)?;
+    let candidate_row_words = morph_cuda::candidate_row_words(max_candidate_keys)?;
+    let output_words = morph_cuda::output_words(candidates, max_candidate_keys)?;
+    if control[morph_cuda::CONTROL_CANDIDATE_WORDS] as usize != morph_cuda::CANDIDATE_WORDS
+        || control[morph_cuda::CONTROL_CANDIDATE_TOTAL_WORDS] as usize != candidate_total_words
+        || control[morph_cuda::CONTROL_DEPOSIT_ROW_WORDS] as usize != deposit_row_words
+        || control[morph_cuda::CONTROL_DEPOSIT_TOTAL_WORDS] as usize != deposit_total_words
+        || control[morph_cuda::CONTROL_KEY_ROW_WORDS] as usize != key_row_words
+        || control[morph_cuda::CONTROL_KEY_ROW_TOTAL_WORDS] as usize != key_row_total_words
+        || control[morph_cuda::CONTROL_OUTPUT_ROW_WORDS] as usize != candidate_row_words
+        || control[morph_cuda::CONTROL_OUTPUT_TOTAL_WORDS] as usize != output_words
+        || candidate_words_len != candidate_total_words
+        || deposit_words_len != deposit_total_words
+        || key_row_words_len != key_row_total_words
+        || output_words_len != output_words
+    {
+        return None;
+    }
+    Some(MorphologicalConductShape {
+        epoch: control[morph_cuda::CONTROL_EPOCH],
+        candidates,
+        deposits,
+        key_rows,
+        key_words,
+        max_candidate_keys,
+        deposit_row_words,
+        key_row_words,
+        candidate_row_words,
+        output_words,
+    })
+}
+
+#[inline(always)]
+fn morphological_deposit_key(
+    deposits: &[u32],
+    shape: MorphologicalConductShape,
+    deposit: usize,
+) -> &[u32] {
+    let at = deposit * shape.deposit_row_words + morph_cuda::DEPOSIT_KEY_AT;
+    &deposits[at..at + shape.key_words]
+}
+
+#[inline(always)]
+fn morphological_key_row_key(
+    key_rows: &[u32],
+    shape: MorphologicalConductShape,
+    row: usize,
+) -> &[u32] {
+    let at = row * shape.key_row_words + morph_cuda::KEY_ROW_KEY_AT;
+    &key_rows[at..at + shape.key_words]
+}
+
+/// **The card's own decision: which deposit, if any, carries this exact key.**
+///
+/// A binary search over the validated ascending deposit sheet. The host ships two independently
+/// assembled key sheets and never the answer; this function is where membership is decided.
+#[inline(always)]
+fn morphological_deposit_of_key(
+    deposits: &[u32],
+    shape: MorphologicalConductShape,
+    key: &[u32],
+) -> Option<usize> {
+    let mut low = 0usize;
+    let mut high = shape.deposits;
+    while low < high {
+        let middle = low + (high - low) / 2;
+        let candidate = morphological_deposit_key(deposits, shape, middle);
+        if morph_cuda::key_equals(candidate, key) {
+            return Some(middle);
+        }
+        if morph_cuda::key_precedes(candidate, key) {
+            low = middle + 1;
+        } else {
+            high = middle;
+        }
+    }
+    None
+}
+
+/// Attach candidate fronts to the exact deposits whose transport keys they carry.
+///
+/// Lane zero validates that both key sheets are strictly ascending in their declared order — the
+/// property the search relies on, refused rather than assumed — counts the active deposits, and
+/// returns the header. Each later lane owns one candidate, binary-searches the deposit sheet for
+/// each of that candidate's keys, and writes only the ordinals it found. No relation sheet enters
+/// and none returns.
+#[no_mangle]
+pub unsafe extern "ptx-kernel" fn morphological_conduct_group(
+    control_words: *const u32,
+    control_words_len: usize,
+    candidate_words: *const u32,
+    candidate_words_len: usize,
+    deposit_words: *const u32,
+    deposit_words_len: usize,
+    key_row_words: *const u32,
+    key_row_words_len: usize,
+    output_words: *mut u32,
+    output_words_len: usize,
+    x_stride: u32,
+) {
+    let (x, y) = unsafe { global_xy() };
+    let lane = x as usize + y as usize * x_stride as usize;
+    if control_words_len != morph_cuda::CONTROL_WORDS
+        || output_words_len < morph_cuda::OUTPUT_HEADER_WORDS
+    {
+        return;
+    }
+    let control = unsafe { slice::from_raw_parts(control_words, control_words_len) };
+    let Some(shape) = morphological_conduct_shape(
+        control,
+        candidate_words_len,
+        deposit_words_len,
+        key_row_words_len,
+        output_words_len,
+    ) else {
+        if lane == 0 {
+            let output =
+                unsafe { slice::from_raw_parts_mut(output_words, morph_cuda::OUTPUT_HEADER_WORDS) };
+            output[morph_cuda::OUTPUT_STATUS] = morph_cuda::STATUS_INVALID;
+            output[morph_cuda::OUTPUT_INVALID_KEY_ROW] = morph_cuda::OPEN_KEY_ROW;
+        }
+        return;
+    };
+    let work = match 1usize.checked_add(shape.candidates) {
+        Some(work) => work,
+        None => return,
+    };
+    if lane >= work {
+        return;
+    }
+
+    let candidates = unsafe { slice::from_raw_parts(candidate_words, candidate_words_len) };
+    let deposits = unsafe { slice::from_raw_parts(deposit_words, deposit_words_len) };
+    let key_rows = unsafe { slice::from_raw_parts(key_row_words, key_row_words_len) };
+    let output = unsafe { slice::from_raw_parts_mut(output_words, output_words_len) };
+
+    if lane == 0 {
+        output[morph_cuda::OUTPUT_VERSION] = morph_cuda::LAYOUT_VERSION;
+        output[morph_cuda::OUTPUT_EPOCH] = shape.epoch;
+        output[morph_cuda::OUTPUT_CANDIDATES] = shape.candidates as u32;
+        output[morph_cuda::OUTPUT_DEPOSITS] = shape.deposits as u32;
+        output[morph_cuda::OUTPUT_KEY_ROWS] = shape.key_rows as u32;
+        output[morph_cuda::OUTPUT_MAX_CANDIDATE_KEYS] = shape.max_candidate_keys as u32;
+        output[morph_cuda::OUTPUT_CANDIDATE_ROW_WORDS] = shape.candidate_row_words as u32;
+        output[morph_cuda::OUTPUT_CANDIDATE_ROWS_AT] = morph_cuda::OUTPUT_HEADER_WORDS as u32;
+        output[morph_cuda::OUTPUT_TOTAL_WORDS] = shape.output_words as u32;
+        output[morph_cuda::OUTPUT_INVALID_KEY_ROW] = morph_cuda::OPEN_KEY_ROW;
+
+        let mut active = 0u32;
+        let mut deposit = 0usize;
+        while deposit < shape.deposits {
+            let at = deposit * shape.deposit_row_words;
+            if deposits[at + morph_cuda::DEPOSIT_ACTIVE] > 1 {
+                output[morph_cuda::OUTPUT_STATUS] = morph_cuda::STATUS_INVALID;
+                return;
+            }
+            if deposit > 0 {
+                let earlier = morphological_deposit_key(deposits, shape, deposit - 1);
+                let here = morphological_deposit_key(deposits, shape, deposit);
+                if !morph_cuda::key_precedes(earlier, here) {
+                    output[morph_cuda::OUTPUT_STATUS] = morph_cuda::STATUS_INVALID;
+                    return;
+                }
+            }
+            if deposits[at + morph_cuda::DEPOSIT_ACTIVE] == 1 {
+                active = match active.checked_add(1) {
+                    Some(next) => next,
+                    None => {
+                        output[morph_cuda::OUTPUT_STATUS] = morph_cuda::STATUS_INVALID;
+                        return;
+                    }
+                };
+            }
+            deposit += 1;
+        }
+        let mut candidate = 0usize;
+        while candidate < shape.candidates {
+            if candidates[candidate * morph_cuda::CANDIDATE_WORDS + morph_cuda::CANDIDATE_FACE]
+                == morph_cuda::OPEN_FACE
+            {
+                output[morph_cuda::OUTPUT_STATUS] = morph_cuda::STATUS_INVALID;
+                return;
+            }
+            candidate += 1;
+        }
+        output[morph_cuda::OUTPUT_ACTIVE_DEPOSITS] = active;
+
+        let mut row = 0usize;
+        while row < shape.key_rows {
+            let at = row * shape.key_row_words;
+            let owner = key_rows[at + morph_cuda::KEY_ROW_CANDIDATE] as usize;
+            if owner >= shape.candidates {
+                output[morph_cuda::OUTPUT_INVALID_KEY_ROW] = row as u32;
+                output[morph_cuda::OUTPUT_STATUS] = morph_cuda::STATUS_INVALID;
+                return;
+            }
+            if row > 0 {
+                let earlier_at = (row - 1) * shape.key_row_words;
+                let earlier_owner = key_rows[earlier_at + morph_cuda::KEY_ROW_CANDIDATE] as usize;
+                let ascending = if earlier_owner == owner {
+                    morph_cuda::key_precedes(
+                        morphological_key_row_key(key_rows, shape, row - 1),
+                        morphological_key_row_key(key_rows, shape, row),
+                    )
+                } else {
+                    earlier_owner < owner
+                };
+                if !ascending {
+                    output[morph_cuda::OUTPUT_INVALID_KEY_ROW] = row as u32;
+                    output[morph_cuda::OUTPUT_STATUS] = morph_cuda::STATUS_INVALID;
+                    return;
+                }
+            }
+            row += 1;
+        }
+        output[morph_cuda::OUTPUT_STATUS] = morph_cuda::STATUS_COMPLETE;
+        return;
+    }
+
+    let candidate = lane - 1;
+    let row_at = morph_cuda::OUTPUT_HEADER_WORDS + candidate * shape.candidate_row_words;
+    output[row_at + morph_cuda::CANDIDATE_EPOCH] = shape.epoch;
+    output[row_at + morph_cuda::CANDIDATE_ORDINAL] = candidate as u32;
+    let candidate_face =
+        candidates[candidate * morph_cuda::CANDIDATE_WORDS + morph_cuda::CANDIDATE_FACE];
+    output[row_at + morph_cuda::CANDIDATE_OUTPUT_FACE] = candidate_face;
+    let mut slot = 0usize;
+    while slot < shape.max_candidate_keys {
+        output[row_at + morph_cuda::CANDIDATE_MATCH_AT + slot] = morph_cuda::OPEN_DEPOSIT;
+        slot += 1;
+    }
+
+    let mut invalid = candidate_face == morph_cuda::OPEN_FACE;
+    let mut seen_key_rows = 0u32;
+    let mut matched = 0usize;
+    let mut previous = morph_cuda::OPEN_DEPOSIT;
+    // The key sheet is validated ascending by owner, so this lane's block is contiguous and its
+    // start is found rather than scanned to. Without this every lane reads the whole sheet and the
+    // front costs `candidates × key_rows`, which is the cost law the by-extent cover exists to
+    // avoid one level up.
+    let mut low = 0usize;
+    let mut high = shape.key_rows;
+    while low < high {
+        let middle = low + (high - low) / 2;
+        if (key_rows[middle * shape.key_row_words + morph_cuda::KEY_ROW_CANDIDATE] as usize)
+            < candidate
+        {
+            low = middle + 1;
+        } else {
+            high = middle;
+        }
+    }
+    let mut row = low;
+    while row < shape.key_rows {
+        let at = row * shape.key_row_words;
+        if key_rows[at + morph_cuda::KEY_ROW_CANDIDATE] as usize != candidate {
+            break;
+        }
+        seen_key_rows = match seen_key_rows.checked_add(1) {
+            Some(next) => next,
+            None => {
+                invalid = true;
+                seen_key_rows
+            }
+        };
+        let key = morphological_key_row_key(key_rows, shape, row);
+        if let Some(deposit) = morphological_deposit_of_key(deposits, shape, key) {
+            let deposit_at = deposit * shape.deposit_row_words;
+            if deposits[deposit_at + morph_cuda::DEPOSIT_ACTIVE] == 1 {
+                // The key sheet is validated ascending per candidate and the deposit sheet is
+                // validated ascending, so a later key can only land on a later deposit. A match
+                // that does not advance is a violated invariant, not a duplicate to absorb.
+                if previous != morph_cuda::OPEN_DEPOSIT && deposit as u32 <= previous {
+                    invalid = true;
+                } else if matched < shape.max_candidate_keys {
+                    output[row_at + morph_cuda::CANDIDATE_MATCH_AT + matched] = deposit as u32;
+                    matched += 1;
+                    previous = deposit as u32;
+                } else {
+                    invalid = true;
+                }
+            }
+        }
+        row += 1;
+    }
+    output[row_at + morph_cuda::CANDIDATE_KEY_ROWS] = seen_key_rows;
+    output[row_at + morph_cuda::CANDIDATE_ACTIVE_DEPOSITS] = matched as u32;
+    output[row_at + morph_cuda::CANDIDATE_STATUS] = if invalid {
+        morph_cuda::STATUS_INVALID
+    } else {
+        morph_cuda::STATUS_COMPLETE
     };
 }

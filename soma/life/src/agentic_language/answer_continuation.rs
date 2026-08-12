@@ -211,6 +211,9 @@ impl AgenticLanguageEcology {
                             recurrent_sources: evidence_sources.clone(),
                             recurrent_context_sources: version_lineage.clone(),
                             caused_sources: evidence_sources.clone(),
+                            conducting_supports: LocalSet::new(),
+                            // The exterior lineage the cultivated route stands on.
+                            conducting_sources: evidence_sources.clone(),
                             caused_passages: caused_passages.clone(),
                             supporting_clauses: version_lineage.clone(),
                             returned_event_count: at
@@ -656,8 +659,11 @@ impl AgenticLanguageEcology {
             .count();
         let required_local_regions = selected.local_region_fiber.required;
         let returned_local_region_identities = selected.local_region_fiber.returned;
-        let required_obligations =
-            LocalSet::from_iter(required_local_regions.iter().map(|region| region.obligation));
+        let required_obligations = LocalSet::from_iter(
+            required_local_regions
+                .iter()
+                .map(|region| region.obligation),
+        );
         let closed_by_returned_obligations = generated.rest == MorphologicalResponseRest::Closed
             && discharged_obligations == required_obligations
             && returned_local_region_identities == required_local_regions

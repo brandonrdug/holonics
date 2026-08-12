@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Build the PTX payload for CONFIGURATION FOLD ⊕ M5 FOUNDED ⊕ §XXXII-b CHART ⊕ §XXVIII-b SCOPE
 # ⊕ the CUDA-only §XXXII-c REGISTER entry ⊕ contemporary live-current, resident text,
-# and returned-contact mouths.
+# returned-contact, and morphological-conduct mouths.
 # Deterministic, offline, explicit. Emits the artifact
 # next to this script
 # (the artifact include_bytes!'d by mount-link-gate / mount-founded-gate / mount-chart-gate /
@@ -30,7 +30,7 @@ cp -f "$BUILT" soma_kernel_cuda.ptx
 echo "=== PTX header ==="
 head -6 soma_kernel_cuda.ptx
 echo "=== entries present ==="
-for e in link_grain link_sum link_finish link_founded_grain link_register_grain link_register_sum link_register_finish link_founded_sum chart_mark chart_register_mark chart_count chart_recast register_own_recast register_own_recast_finish register_carrier_rebase scope_felt scope_founded scope_register scope_register_surface regional_contacts lineage_event lineage_event_population text_incidence_select text_section_restrict returned_contact_group; do
+for e in link_grain link_sum link_finish link_founded_grain link_register_grain link_register_sum link_register_finish link_founded_sum chart_mark chart_register_mark chart_count chart_recast register_own_recast register_own_recast_finish register_carrier_rebase scope_felt scope_founded scope_register scope_register_surface regional_contacts lineage_event lineage_event_population text_incidence_select text_section_restrict returned_contact_group morphological_conduct_group; do
   if grep -q ".entry $e" soma_kernel_cuda.ptx; then echo "  .entry $e: present"; else echo "  .entry $e: MISSING"; exit 1; fi
 done
 echo "=== ptxas -arch=sm_89 validation ==="

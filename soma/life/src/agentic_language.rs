@@ -35,11 +35,10 @@ use crate::{
     lean_mathematics::LeanKernelDeedCompletion,
     morphological_language::{
         MorphologicalBoundary, MorphologicalGeneratedCurrent, MorphologicalGeneratedText,
-        MorphologicalSupportConduct,
         MorphologicalGeneratedToken, MorphologicalGenerationSpec, MorphologicalLanguageEcology,
         MorphologicalLanguageError, MorphologicalLanguagePassage, MorphologicalQuestionCharge,
         MorphologicalReflectionReceipt, MorphologicalResponsePhase, MorphologicalResponseRest,
-        MorphologicalScaleCensus, MorphologicalTransport,
+        MorphologicalScaleCensus, MorphologicalSupportConduct, MorphologicalTransport,
     },
     relational_language::{
         ExactRelationalLanguageEcology, RelationalLanguageError, RelationalThoughtCurrent,
@@ -802,10 +801,7 @@ impl AgenticLanguageRestImage {
     ///
     /// Ablating by *species* rather than by prefix is what separates "the body needs its returns"
     /// from "the body needs its most recent occurrence".
-    pub fn without_causes(
-        &self,
-        struck: impl Fn(&AgenticOwnedLanguageOccurrence) -> bool,
-    ) -> Self {
+    pub fn without_causes(&self, struck: impl Fn(&AgenticOwnedLanguageOccurrence) -> bool) -> Self {
         let mut ablated = self.clone();
         ablated.history.retain(|cause| !struck(cause));
         ablated
@@ -824,9 +820,7 @@ impl AgenticLanguageRestImage {
     ///
     /// This is the measurement [`Self::remount`] makes into a refusal. A caller studying *where*
     /// a body departs from its causes needs the departed body itself, not an error.
-    pub fn remount_departed(
-        &self,
-    ) -> Result<(AgenticLanguageEcology, bool), AgenticLanguageError> {
+    pub fn remount_departed(&self) -> Result<(AgenticLanguageEcology, bool), AgenticLanguageError> {
         let replayed = self.replay()?;
         let reproduced = replayed.rest_receipt()? == self.receipt;
         Ok((replayed, reproduced))
