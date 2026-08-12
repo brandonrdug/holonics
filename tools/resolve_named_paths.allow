@@ -110,5 +110,7 @@ canon/THE_MEASURED_CAPABILITIES.md :: runs/ :: the untracked laboratory director
 canon/THE_QUOTE_NETWORK.md :: target/debug/deps :: quoted from a build path in a transcript; an artifact location, never a source
 blueprint/THE_ROADMAP.md :: target/ :: the cargo build directory, named as where a driver's binary is found
 
+CONSTRUCTION_STATE.md :: output/the_deposit_licenses_the_re_emission :: a runtime artifact directory; `/output/` is gitignored by design, and the re-emission grades are cited by their content addresses in the output manifest rather than tracked
+
 # --- Struck by direct ruling, named so the striking is legible ---
 canon/THE_CONTAMINANT_PROTOCOL.md :: tools/verify_quotes.py :: deleted 2026-08-09 by Brandon's direct ruling; §6 names it to record that reading the quotes is the replacement
