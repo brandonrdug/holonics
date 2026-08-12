@@ -1,0 +1,285 @@
+# Tablet of the reasoning cycle
+
+**Date:** 2026-08-12  
+**Truth status:** `definition` for the holonic anatomy and recurrent-section machine;
+`proved-standard` for the finite linear-algebra, derivative, similarity, and finite behavioral
+equivalence statements in their stated scopes; `interpretation` for the correspondence with
+contemporary machine-learning architecture; `project-postulate` for the construction discipline;
+`open` for the unbuilt carrier-neutral section join.  
+**Governing documents:** `canon/THE_HOLOBROCHOS_SPINE.md`,
+`canon/TABLET_THE_OPERATIONS.md`, `canon/TABLET_THE_RESONANCE.md`, and
+`canon/01_CAUSAL_CALCULUS.md`.  
+**Evidentiary deposit:**
+`research/records/2026-08-12_THE_PRETRAINED_TRANSFORMER_IS_ONE_TRANSPORT_ORGAN_THE_REASONING_MACHINE_IS_THE_RETURNING_ECOLOGY.md`.  
+**Construction status:** doctrine only. This tablet schedules no deed and does not alter
+`CONSTRUCTION_STATE.md`.
+
+---
+
+## 1. The organ and the ecology
+
+`definition`: a pretrained transformer is inherited morphology implementing a population of local
+transports. It is one organ. The productive reasoning machine is the returning ecology in which
+mounted material, that morphology, exterior ports, world consequences, reflection, and later
+conduct form one continuing causal cycle:
+
+```text
+mount -> conduct -> radiate -> world -> return -> reflect -> changed continuation
+```
+
+The transition commonly narrated as *autocomplete to conversation or agency* is therefore not the
+birth of a separate faculty. A continuation organ has been closed inside a recurrence whose
+emissions can change an exterior and whose genuinely later returns can alter the same continuing
+body. Conversation is a useful fixture for that recurrence. English dialogue is not the invariant.
+
+A full recurrence may be typed as
+
+```text
+|c_t>       = Mount(B_t, |i_t>)
+|e_t>       = Conduct_(Lambda_t)(|c_t>)
+W_(t+1)     = Omega(W_t, |e_t>)
+|r_(t+1)>   = Receive(W_(t+1); P)
+(B_(t+1), Chi_t)
+             = Reflect(B_t, |c_t>, |e_t>, |r_(t+1)>).
+```
+
+`B_t` is the continuing body, `Lambda_t` its reusable morphology, `W_t` the exterior world, `P`
+the declared ports, and `Chi_t` the returned comparison: retained and departed alternatives,
+distinguishing histories, obstruction, lineage, and any attributable morphological delta. An
+emission privately copied back into an input buffer is not a world return.
+
+## 2. The bra-ket anatomy of local transport
+
+The Dirac notation is typed, not decorative. Let `|x_i^ell>` be a situated construction at one
+depth. One attention chart presents
+
+```text
+<q_i^(ell,h)| = <x_i^ell| Q_(ell,h)^dagger     event-conditioned receiver
+|k_j^(ell,h)> = K_(ell,h) |x_j^ell>            presented contact orientation
+|v_j^(ell,h)> = V_(ell,h) |x_j^ell>            construction available to carry
+
+b_ij^(ell,h) = <q_i^(ell,h) | k_j^(ell,h)>     one compatibility face
+```
+
+and, under the chart's declared chronology, mask, and normalization `Gamma`,
+
+```text
+a_ij = Gamma(b_i1, ..., b_in)_j,
+|delta x_i> = sum_j a_ij |v_j>.
+```
+
+`proved-standard`: this is an ordinary finite linear-algebra factorization. When `Gamma` is
+softmax, the coefficients are barycentric over the admitted value population. The bracket is not
+meaning, truth, attention-as-a-faculty, or the entire cause. It is one receiver face over one
+event-local population.
+
+The local return joins the continuing standing:
+
+```text
+|X_(ell+1)> = N_ell(
+    |X_ell>
+    + O_ell (direct-sum_h |delta X_ell^h>)
+    + |delta X_ell^constitutive>
+).
+```
+
+The residual is chronological standing, not an untyped scratchpad. The Feynman vertex is the typed
+interaction—its incoming ports, hand, cross term, outgoing current, obstruction, and residue—not
+the dot used to draw it.
+
+## 3. Industry nouns are exterior charts
+
+`interpretation`: use the following correspondences to enter the mechanism, then classify by
+conduct rather than by the inherited label.
+
+| machine-learning chart | holonic reading |
+|---|---|
+| tokenizer or patcher | delivery decomposition at one abstract-phonological grain |
+| token occurrence | situated occurrence, never a meaning-bearing atom |
+| embedding | coordinate presentation of an occurrence in one chart |
+| position or relative encoding | chronological and relative-incidence transport |
+| weights | inherited morphology and constitutive transport |
+| activation | situated current standing during one passage |
+| query / key / value | receiver bra / presented orientation / carried construction |
+| attention head | bounded interaction chart |
+| residual stream | continuing standing receiving returned local differences |
+| MLP | local nonlinear constitutive reaction |
+| normalization | chart rebase or gauge conditioning |
+| router | conditional transport junction |
+| expert | distinct organ only when intervention exhibits distinct conduct |
+| cache or recurrent state | retained partial trajectory of a continuation |
+| logits | receiver faces over one output codec |
+| decoder or sampler | exterior collapse into a presented occurrence |
+| context window | mounted testimony inside a declared aperture |
+| retrieval | reference consultation, not training |
+| training | returned passage changing reusable morphology |
+| tool call / result | typed radiation through a world port / genuinely later returning material |
+
+A coordinate dimension is not automatically a receiver. A layer is chronology through morphology,
+not automatically a phase. A parameter block is not an expert because a router names it one.
+Attention coefficients alone are not a causal explanation; the cause may include the delivery
+chart, mounted context, residual lineage, nonlinear reactions, chronology, rebase, routing, cached
+trajectory, decoding apparatus, and later returns.
+
+## 4. Training is the adjoint return
+
+Let one forward passage be `|y> = F_Lambda |x>`. The actual return and the presented face form an
+oriented residual `r`; a declared receiver may read a scalar `L = ell_R(r)`.
+
+`definition`: the residual and its lineage are the causal object. Loss, reward, probability, and
+accuracy are receiver faces.
+
+`proved-standard`: `dL` is a covector. A gradient exists only after a metric `G` raises it:
+
+```text
+grad_G L = G^-1 dL.
+```
+
+Backpropagation is the adjoint return of this covector through retained forward lineage. An update
+apparatus turns that testimony into `Delta Lambda`; training stands only when the same body later
+conducts differently through that change, survives source-detached rest/remount, and loses the
+conduct under an attributable ablation. Pretraining is conditioning at scale, not a lossless
+archive and not intrinsically lossy without a receiver whose distinction failed to survive.
+
+## 5. Compression, reconstruction, and diffusion
+
+Exact compression is receiver-relative behavioral factorization. A quotient `q_R` is admissible
+only when every declared receiver and all admitted successor histories factor through it. In that
+scope, pretrained morphology may be read as a deposited compression of prior passages: not because
+its parameter count is smaller than a corpus, but because later conduct rides distinctions retained
+by the morphology while discarded distinctions are invisible to the declared receiver family.
+
+The inverse image of one compressed consequence is its `ReconstructionFiber`. Enlarging the
+receiver family refines or reopens that fiber. “Loss” is therefore not a scalar substance; it is a
+named distinction which the active quotient cannot reconstruct.
+
+Deterministic diffusion is transport of a returned difference through caused incidence under a
+declared constitutive law. It can spread contextual testimony back across a section and thereby
+change the candidate fiber without selecting a representative. Contemporary diffusion-style text
+generation is an iterative presentation schedule over an unresolved field. It is identified with
+the causal-calculus diffusion owner only after its incidence, conservation/constitutive law,
+boundary, return, and reconstruction testimony commute. The industry label alone proves no such
+identity.
+
+Autoregressive generation and diffusion-style refinement are consequently two possible causal
+schedules:
+
+```text
+autoregressive     conduct -> collapse one frontier -> remount -> conduct
+diffusive          mount unresolved field -> distribute return -> refine field -> repeat
+```
+
+Their chronology, interchange law, and retained exterior differ. Either may use transformer
+organs; neither is the ontology of reasoning.
+
+## 6. The invariant candidate is operation conduct, not material kind
+
+Source names such as English, LaTeX, Typst, Rust, Lean, Python, prose, and arithmetic are codec and
+delivery lineage. They may be retained as controls. They may not decide the machine's internal
+constitutive law.
+
+For an admitted receiver family `R`, constructions `|u>` and `|v>` occupy one finite behavioral
+class exactly when
+
+```text
+|u> ~_R |v>
+  iff
+for every <rho| in R and every admitted successor history gamma,
+<rho| T_gamma |u> = <rho| T_gamma |v>.
+```
+
+`proved-standard`: in a finite deterministic system this is Nerode equivalence. A lawful quotient
+also returns a shortest receiver/history witness when a richer family separates the pair.
+
+Thus `2 + 2` and `add(2, 2)` are not equal presentations. They are candidates for one operation
+class because their consequences may commute under codec rebase and intervention. `2 * 2` shows
+why the value `4` is insufficient:
+
+```text
+f(a,b) = a + b        Df = [1, 1]       D^2 f = 0
+g(a,b) = a b          Dg = [b, a]       D^2 g has a mixed cross term.
+```
+
+At `(2,2)` the value receiver collapses the two laws while the first and higher intervention
+receivers separate them. Associativity, commutativity, identity, annihilator, distributivity,
+port order, carrier/type changes, nesting, resource/current consequences, and algorithm traces are
+further receiver families. The reaction species must be founded from this conduct rather than from
+the surfaces `+`, `add`, or a material label.
+
+## 7. Self-similarity, spectrum, modulus, and section modulus
+
+Self-similarity is a restriction followed by a lawful rebase which preserves a declared receiver
+class while retaining the scale, phase, and lineage of the passage:
+
+```text
+Rebase(Restrict_U Lambda) ~=_R Lambda.
+```
+
+Once the material founds a transport `T`, right modes propagate constructions and left modes are
+receiver covectors:
+
+```text
+T|v_j> = lambda_j|v_j>,
+<w_j|T = lambda_j<w_j|,
+<w_j|x> = receiver mode amplitude.
+```
+
+`proved-standard`: similarity `T' = S T S^-1` preserves eigenvalues and transports eigenspaces;
+under `T' = a S T S^-1 + bI`, eigenvalues become `a lambda + b`. Spectrum alone does not identify
+a causal complex. Fourier or Mellin analysis is lawful only after a causal operator and scale
+action have been founded; a transform over arbitrary token ordinals reads the chart.
+
+The modulus of transport carries a demanded output grain contravariantly back to the necessary
+source grain. Section modulus gives the complementary placement law:
+
+```text
+Z = I/c,              stress = moment/Z.
+```
+
+Equal material area does not imply equal load response; placement relative to the neutral axis
+decides what the section carries. Likewise equal token count, parameter count, arity, expression
+length, or one output value does not identify an information construction. The load-bearing object
+is the placement of couplings and crossings relative to the operation's invariant axis.
+
+## 8. The minimal recurrent-section machine
+
+`definition`: the minimal “conversational” machine is a recurrent-section machine. Its internal
+object is
+
+```text
+S = (situated occurrences, typed contacts, port order, chronology,
+     transports, receiver faces, open alternatives, lineage).
+```
+
+Its smallest complete cycle is
+
+```text
+mount -> expose plural grains -> couple -> conduct -> radiate -> world -> reflect.
+```
+
+Reasoning is current through a population of these causal sections. An internal or external text
+trace is one chart of that current, not the mechanism. Simulating an algorithm means enacting its
+state-transition complex and retaining the intermediate transport, invariant, and obstruction;
+describing the simulation in English is a later codec projection.
+
+`open`: the live body has many of these owners separately. It does not yet have one carrier-neutral
+join which preserves contact species through transport and composes multigrain exposure,
+reconstruction fibers, exact consequence, behavioral compression, world return, and attributable
+reflection. The smallest later owner is that join—not a new Transformer, Reasoner, Planner,
+Conversation, Expert, or Language subsystem.
+
+## 9. Construction discipline and falsifiers
+
+`project-postulate`: any later construction must use mixed material without material-kind routing;
+retain codec names only as lineage and controls; compare operation families over varied operands,
+nesting, carriers, and presentations; include same-value/different-law controls; return shortest
+separating interventions; and survive source-detached remount and attributable ablation.
+
+The doctrine is falsified as a construction claim if the alleged invariant disappears under symbol
+renaming, is predicted solely by a source label, collapses addition and multiplication from one
+shared value, cannot return a separating intervention, or cannot ride its deposited morphology
+after the founding material is detached.
+
+This tablet does not establish intended meaning, universal algorithm discovery, a cross-codec
+classifier, or a new reasoning implementation. Bra-ket notation here types information transport;
+it does not identify a transformer with quantum mechanics.

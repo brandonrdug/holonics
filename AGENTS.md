@@ -103,6 +103,39 @@ construction merely because its current implementation is being replaced.
   organs enter through existing typed ports; unknown interaction remains an obstruction until a
   returned passage founds it.
 
+## Pretrained organs and cross-codec reasoning
+
+- `canon/TABLET_THE_REASONING_CYCLE.md` governs the model ontology. A pretrained transformer is one
+  inherited transport organ; the productive model is the complete recurrence of mount, conduct,
+  emission, world consequence, genuine return, reflection, and changed continuation.
+- Use the typed Dirac reading when analyzing transformer-like mechanisms: a query is a receiver
+  bra, a key a presented contact orientation, a value a transported construction, a bracket one
+  compatibility face, and the residual continuing standing. This notation types information
+  transport; it does not assert quantum physical identity.
+- `attention`, `token`, `embedding`, `layer`, `expert`, `router`, `reasoner`, and `conversation` are
+  exterior implementation or application charts. Admit an internal phase or organ only when
+  intervention, transport, and returned consequence exhibit it.
+- Conversation is a recurrence fixture, not the target invariant. Reasoning is current through
+  causal sections; an English thought trace is one optional codec projection.
+- Corpus labels such as prose, arithmetic, LaTeX, Typst, Rust, Lean, and Python are delivery lineage
+  and experimental controls. They must not route the internal constitutive law or become semantic
+  taxa.
+- Cross-codec identity requires stable receiver consequences over admitted successor histories and
+  interventions. One output value is insufficient: `2+2` and `2*2` agree at one value while their
+  derivative and higher-intervention sections differ. Return the shortest separating receiver and
+  history whenever a richer family reopens a quotient.
+- Mathematics and algorithms are studied as operation and state-transition complexes which may be
+  self-similarly presented through many codecs. Surface renaming, formatting, and material-kind
+  labels must not carry the result. Spectrum, Fourier, or Mellin faces are admitted only after a
+  causal transport and scale action have been founded; spectrum alone never identifies the body.
+- Autoregressive and diffusion-style generation are causal schedules, not reasoning ontologies.
+  Identify a diffusion-labeled architecture with causal-calculus diffusion only when its caused
+  incidence, constitutive law, boundary, return, and reconstruction testimony commute. Treat
+  pretrained morphology as exact compression only for receiver families whose complete successor
+  histories provably factor through it.
+- These clauses constrain the design of any later reasoning construction. They do not schedule one
+  and never displace the live roadmap or `CONSTRUCTION_STATE.md`.
+
 ## Mathematical production boundary
 
 - Mathematics is exact local algebraic/categorical incidence carried by the same engine. It is not

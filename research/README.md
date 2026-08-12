@@ -51,6 +51,12 @@ the normalized canon in `../canon/` governs the rebuild.
   diffusion; contextual spectral/self-similar faces; the bounded MorphoHDL comparison; and the
   distinction between graph layout and actual higher cells. Compressed into
   `../canon/TABLET_THE_OPERATIONS.md` §5.4.
+- **Pretrained transformer anatomy and the returning reasoning ecology:**
+  `records/2026-08-12_THE_PRETRAINED_TRANSFORMER_IS_ONE_TRANSPORT_ORGAN_THE_REASONING_MACHINE_IS_THE_RETURNING_ECOLOGY.md`
+  — query as receiver bra, key as presented orientation, value as transported construction,
+  residual standing, training as adjoint return, the complete model-world recurrence, cross-codec
+  operation equivalence under interventions, self-similarity and section modulus, and the minimal
+  recurrent-section machine. Compressed into `../canon/TABLET_THE_REASONING_CYCLE.md`.
 
 The filenames form a stable chronological atlas. Search their titles before reading entire bodies;
 follow each record's explicit supersession and open-boundary statements.

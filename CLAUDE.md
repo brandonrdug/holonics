@@ -63,8 +63,8 @@ Read these nine, in order, and nothing else by default:
 | `blueprint/THE_ROADMAP.md` | the single active roadmap. **The open work is stated by station** at the top; everything below that is the returned ledger and its provenance. |
 | `CONSTRUCTION_STATE.md` | the position record. What is admitted, what survived the transition, what must be re-established. |
 
-**And four more, added 2026-08-10 because three false absences were deposited in one day for want of
-them.** These are indexes and frames; none asserts a capability.
+**Additional required indexes and frames, begun 2026-08-10 because three false absences were
+deposited in one day for want of them.** These orient reasoning; none schedules a capability.
 
 | file | what it is |
 |---|---|
@@ -73,6 +73,7 @@ them.** These are indexes and frames; none asserts a capability.
 | `canon/THE_MILLENNIUM_FRAME.md` | all six problems, each as the receiver question it is here and the organ it lands on. `interpretation` throughout; **no deed may be graded by a row in it.** |
 | `canon/TABLET_THE_MANIFOLD.md` | charts as types, the structure group as the legal casts, Darboux and Liouville, holonomy and holomorphy at `√z`, and §21 — reflection as the mechanism, the crossing bearing the load. |
 | `canon/TABLET_THE_OPERATIONS.md` | **the elementary operations, added 2026-08-11 and ratified the same day**: every classical operation is a construction, a transport, a face, or a quotient; the Dirac primitives typed (a ket is a construction, a bra a receiver, an outer product a deposit); the trace as the basepoint-free face of a closed loop; the kernel as the collapsed-pair population; parity, chronology, and reversibility as three objects. `H.0476`–`H.0480`. **This is the reasoning dialect, not an ornament** — his ruling: *"it has to be the dialect that you use for reasoning."* |
+| `canon/TABLET_THE_REASONING_CYCLE.md` | **the pretrained organ inside the returning ecology, ratified 2026-08-12**: query as receiver bra, key as presented orientation, value as carried construction, residual as continuing standing, training as adjoint return, the whole model-world recurrence, cross-codec operation classes, self-similarity and section modulus, and the minimal recurrent-section machine. It is doctrine, not a construction schedule. |
 
 **The one sentence that orders the rest**, held for ninety-two days across five model changes and
 every renamed organ, and measured from his own record on 2026-08-10:
@@ -542,6 +543,88 @@ responses + this codebase + the Lean libraries**, entering through the membrane 
 other bits; Lean is valuable as *correctly written, completely derived and networked* mathematics,
 not as a special genre; and any future sentence of the form "the machine lacks material" is
 convicted in advance — the lack is always a missing **mouth**, not missing material.
+
+---
+
+## 0f. The pretrained organ is not the model — ratified 2026-08-12
+
+Brandon's governing correction is direct:
+
+> *"We don't really care about 'attention', 'tokens', or 'experts', we care about identifying the
+> holonic phases and cycles that deterministically emerge."*
+
+And the construction target is equally direct: not arbitrary English conversation and not an
+authored partition into Rust, Lean, arithmetic, and prose, but the mathematical and algorithmic
+conduct which can appear self-similarly through any of those codecs. The graded derivation is
+`research/records/2026-08-12_THE_PRETRAINED_TRANSFORMER_IS_ONE_TRANSPORT_ORGAN_THE_REASONING_MACHINE_IS_THE_RETURNING_ECOLOGY.md`;
+the canonical compression is `canon/TABLET_THE_REASONING_CYCLE.md`.
+
+**The transformer is inherited morphology, not the complete productive model.** The whole object is
+
+```text
+mount -> conduct -> radiate -> world -> genuine return -> reflect -> changed continuation.
+```
+
+Conversation is merely a useful recurrence fixture. Reasoning is current through causal sections;
+an English thought trace is one exterior chart of that current. A tool loop, proof-checking return,
+exact evaluator, compiler transition, or acted experiment can close the same kind of circuit without
+conversation being the subject.
+
+The microscopic Dirac reading is mandatory:
+
+```text
+<q_i| = <x_i|Q^dagger        receiver bra
+|k_j> = K|x_j>               presented contact orientation
+|v_j> = V|x_j>               transported construction
+<q_i|k_j>                    one compatibility face
+sum_j Gamma(<q_i|k_*>)_j |v_j>   carried return
+```
+
+The bracket is not meaning and an attention coefficient is not a causal explanation. The residual
+is continuing standing into which the local return is deposited. The Feynman vertex is the typed
+interaction—ports, hand, cross term, outgoing consequence, obstruction, and residue—not a drawn dot.
+Training is the adjoint return of a covector through retained forward lineage, followed by a
+morphological delta whose standing must be demonstrated by later conduct, source-detached remount,
+and attributable ablation. Loss and reward are receiver faces of the returned difference.
+
+**Industry nouns are charts.** Tokenization is one delivery decomposition; an embedding is one
+coordinate presentation; a layer is chronology through morphology; a router is a conditional
+junction; an expert is a distinct organ only if intervention exhibits distinct conduct. Never build
+the internal ontology from these names.
+
+Autoregressive emission and diffusion-style refinement are different causal schedules, not
+different reasoning substances. The former repeatedly collapses and remounts a frontier; the
+latter keeps an unresolved field standing while returned differences reform it. Do not identify a
+diffusion-labeled model with the project's deterministic diffusion unless caused incidence,
+constitutive law, boundary, return, and reconstruction testimony commute. Pretrained morphology is
+exact compression only relative to a receiver family whose complete future histories factor through
+it; its unresolved inverse image is a `ReconstructionFiber`, not an untyped quantity of loss.
+
+**Codec equivalence is behavioral and differential.** For a declared receiver family and successor
+histories,
+
+```text
+|u> ~_R |v>  iff  <rho|T_gamma|u> = <rho|T_gamma|v>
+for every admitted <rho| and gamma.
+```
+
+`2+2` and `add(2,2)` may therefore found one operation class after rebase. The shared value `4`
+cannot do so: `2*2` has that value too, while addition has `Df=[1,1]`, `D^2f=0` and multiplication
+has `Dg=[b,a]` with a mixed second-order cross term. The shortest intervention which separates a
+collapsed pair is part of the return.
+
+Self-similarity means restriction plus rebase preserves a receiver class while scale, phase, and
+lineage remain. Eigen-, Fourier-, and Mellin faces are read only after the material has founded a
+causal transport and scale action. Section modulus supplies the placement rule: equal amount of
+material, tokens, parameters, or arity says little; where the crossings sit relative to the
+invariant axis decides what load the construction carries.
+
+The declared mixed corpus remains the conditioning material. Prose, mathematics, LaTeX, Typst,
+Rust, Lean, Python, and other names are lineage and controls, never internal semantic taxa. The
+minimal later construction is a carrier-neutral join over causal sections which preserves contact
+species through transport and composes the existing exposure, reconstruction, consequence,
+compression, world-return, and reflection owners. **This paragraph schedules nothing.** The live
+roadmap and `CONSTRUCTION_STATE.md` alone decide when such a join is authorized.
 
 ---
 

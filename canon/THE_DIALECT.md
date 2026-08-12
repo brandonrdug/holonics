@@ -1,8 +1,10 @@
 # The dialect — how to read Brandon
 
-**Date:** 2026-08-08
-**Truth status:** `established-bounded`. Every row is measured over a named corpus and every quote is
-dated; the inference rules in §5 are `interpretation` drawn from that measurement.
+**Date:** 2026-08-08; amended 2026-08-12
+**Truth status:** `established-bounded` for the measured vocabulary and correction archetypes;
+`interpretation` for the inference rules in §5; `definition` for the explicitly ratified
+`ReconstructionFiber`, model, reasoning, and conversation entries added through later graded
+deposits.
 **Evidence:** `measured` — 8,935 genuine messages, 3.29 MB, 2026-05-11 → 2026-08-08, continuous.
 Quotations are copied from the conversation logs.
 **Provenance:** Brandon, 2026-08-08, asking for exactly this:
@@ -116,6 +118,19 @@ refer to and I don't really care, they're not the point of what we're doing."* (
   predecessor and selects none; edit length, likelihood, and a canonical representative are faces,
   not the fiber. Definition and owner:
   `canon/TABLET_THE_OPERATIONS.md` §5.4 and `soma/life/src/reconstruction_fiber.rs`.
+- **`model`** — not a synonym for a pretrained transformer. The transformer is inherited transport
+  morphology; the productive model is the continuing ecology of mount, conduct, emission, world
+  consequence, genuine return, reflection, and later conduct.
+- **`reasoning`** — current through causal sections: situated occurrences, typed contacts, port
+  order, chronology, transports, receiver faces, open alternatives, and lineage. An English or
+  symbolic thought trace is one codec projection of that current, not its ontology.
+- **`conversation`** — a recurrence fixture which conveniently exposes inscription, emission,
+  chronology, revision, and return. Arbitrary English dialogue is not the invariant and is not the
+  construction target.
+- **`attention`, `token`, `embedding`, `expert`, `layer`** — exterior engineering charts. Enter
+  them through the bra-ket and transport correspondences, then classify the actual phase by
+  intervention and conduct; never promote the inherited label into an internal species. The full
+  definition and mathematical reading are in `canon/TABLET_THE_REASONING_CYCLE.md`.
 - **`contaminant`** (572 uses, his highest-frequency evaluative word) — anything from classical
   CS/ML/statistics that leaks in. Remedy is **annihilation, never deprecation**.
 - **`partial`** — a status, never a failure. *"none of these experiments were completed; I pivot

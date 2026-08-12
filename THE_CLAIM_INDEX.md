@@ -29,7 +29,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 | `CLAUDE.md` | **CLAUDE.md — holonics operating contract (Claude-facing)** — Brandon's latest direct request governs. |
 | `canon/THE_HOLOBROCHOS_SPINE.md` | **THE SPINE — the closed cycle, and where every organ sits on it** — It states the spine the roadmap is ordered by. |
 | `canon/THE_DOCUMENT_LAW.md` | **The document law** — **Why this file exists.** `canon/THE_RECOVERED_LAW.md` states the mechanism: *"Agent reports and source reads lived only in conversation, were compressed away at compaction, and were… |
-| `canon/THE_DIALECT.md` | **The dialect — how to read Brandon** — Every row is measured over a named corpus and every quote is dated; the inference rules in §5 are `interpretation` drawn from that measurement. |
+| `canon/THE_DIALECT.md` | **The dialect — how to read Brandon** — **Evidence:** `measured` — 8,935 genuine messages, 3.29 MB, 2026-05-11 → 2026-08-08, continuous. |
 | `canon/THE_QUOTE_NETWORK.md` | **The quote network** — Brandon asked for this artifact by name, twice, in the same message: |
 | `canon/THE_EXPLORATIVE_FAILURE.md` | **The explorative failure** — It states the condition that identifies one recurring assistant failure, the trigger that precedes it, its measured instances, the ontology in this project's own words that refutes it, and… |
 | `canon/THE_MEASURED_CAPABILITIES.md` | **THE MEASURED CAPABILITIES — what the machine has actually done** — **Why this file exists.** The project has lost evidence to untracked sinks at least four times. |
@@ -63,12 +63,13 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 | `canon/TABLET_THE_MANIFOLD.md` | **The manifold: charts as types, the structure group as the legal casts, and what a loop returns** — A manifold is the invariant of a population of currents and not their container; a chart is a type and a transition map is an implicit cast; every geometry is a reduction of the structure… |
 | `canon/TABLET_THE_OPERATIONS.md` | **The operations: every classical operation is a construction, a transport, a face, or a quotient** — Every operation of linear algebra, differential equations, and analysis is one of four species — a construction, a transport, a face, or a quotient — and the notation is complete only when… |
 | `canon/TABLET_THE_REALIZER.md` | **The realizer: positivity, the holomorphic half, and rendering** — Hodge-Riemann where it is proved, the holomorphic organ that was already owned, and rendering as a receiver whose missed feature is an obstruction. |
+| `canon/TABLET_THE_REASONING_CYCLE.md` | **Tablet of the reasoning cycle** — **Governing documents:** `canon/THE_HOLOBROCHOS_SPINE.md`, `canon/TABLET_THE_OPERATIONS.md`, `canon/TABLET_THE_RESONANCE.md`, and `canon/01_CAUSAL_CALCULUS.md`. |
 | `canon/TABLET_THE_RESONANCE.md` | **The resonance: what intelligence is, physically** — Intelligence is a transport and not a faculty; resonance is a microscopic event no operator can locate; production is re-emission and is not a choice; and the machine is an artificial… |
 | `canon/TABLET_THE_TURN.md` | **The turn: curvature, windings, and substitution** — Curvature as a linear functional on the hinges, the polygon's n-grams, local substitution preserving a global invariant, fission and fusion as one axis, and friction as the coupling. |
 | `canon/THE_AUTHORED_LEVEL.md` | **The authored level** — It states the law, enumerates the population in this tree, and gives the excision per instance. |
 | `canon/THE_CONTAMINANT_PROTOCOL.md` | **The contaminant protocol** — It names a family of contaminant species, gives each the condition that identifies it and a verified instance in this tree, and states the procedure a reader follows by hand before… |
 | `canon/THE_CORRESPONDENCE_ATLAS.md` | **The correspondence atlas: what other fields call the same face** — **What this is, and what it is not.** `canon/THE_DIALECT.md` maps *his* language. |
-| `canon/THE_DIALECT.md` | **The dialect — how to read Brandon** — Every row is measured over a named corpus and every quote is dated; the inference rules in §5 are `interpretation` drawn from that measurement. |
+| `canon/THE_DIALECT.md` | **The dialect — how to read Brandon** — **Evidence:** `measured` — 8,935 genuine messages, 3.29 MB, 2026-05-11 → 2026-08-08, continuous. |
 | `canon/THE_DOCUMENT_LAW.md` | **The document law** — **Why this file exists.** `canon/THE_RECOVERED_LAW.md` states the mechanism: *"Agent reports and source reads lived only in conversation, were compressed away at compaction, and were… |
 | `canon/THE_EXPLORATIVE_FAILURE.md` | **The explorative failure** — It states the condition that identifies one recurring assistant failure, the trigger that precedes it, its measured instances, the ontology in this project's own words that refutes it, and… |
 | `canon/THE_HOLOBROCHOS_SPINE.md` | **THE SPINE — the closed cycle, and where every organ sits on it** — It states the spine the roadmap is ordered by. |
@@ -97,7 +98,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (59 deposits of 351)
+## 4 · The 2026-08 record line (60 deposits of 352)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -163,6 +164,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-11_THE_RUNG_REFUSES_BY_NAME_AND_THE_UNRESOLVED_PAIR_IS_THE_REMAINDER.md` | The rung refuses by name, and the unresolved pair is the remainder |
 | `2026-08-11_THE_SEAL_CARRIED_THE_HOST_AND_THE_ORGANS_AWAIT_THEIR_CURRENT.md` | The seal carried the host, and the organs await their current |
 | `2026-08-11_THE_TAPE_HAS_NO_VERTEX_AND_PRODUCTION_IS_RECEPTION_AT_THE_OTHER_HAND.md` | The tape has no vertex, and production is reception at the other hand |
+| `2026-08-12_THE_PRETRAINED_TRANSFORMER_IS_ONE_TRANSPORT_ORGAN_THE_REASONING_MACHINE_IS_THE_RETURNING_ECOLOGY.md` | The pretrained transformer is one transport organ; the reasoning machine is the returning ecology |
 | `2026-08-12_THE_RECONSTRUCTION_REMAINS_A_FIBER_THE_CONTEXT_RETURNS_BY_DIFFUSION_AND_THE_CIRCUIT_GROWS_IN_HIGHER_CELLS.md` | The reconstruction remains a fiber, the context returns by diffusion, and the circuit grows in higher cells |
 
 ---
