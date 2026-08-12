@@ -20,6 +20,11 @@ pub mod current_world;
 pub mod decomposing_codec;
 pub mod dialogue_lineage;
 pub mod exact_world;
+// The codec of a real material, recovered from exposure alone. `holonic-engine`'s `codec_recovery`
+// recovers a tokenizer from an oracle it may call; this recovers one from octets that merely
+// happened, with `occurs` and `recurs` as the only contact. It lives here because it assembles
+// `holonic-engine`'s `RecoveredCodec` carrier around material that only `life` has a mouth for.
+pub mod exposure_codec;
 pub mod form_mouth;
 pub mod holonic_training;
 // Production on the oriented incidence complex rather than on a tape chart. It consumes
