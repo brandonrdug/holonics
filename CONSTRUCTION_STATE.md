@@ -4,19 +4,22 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-11, the conditioning return crossed the seal over predecessor `28028c1`; its
-passing continuing rest is `45084ed2f0baa6da742f2ab82e9ba86122a6c4dd2f029436b070e20665f12cde`
-and its passing grade is
-`8125caa246414eac1042a60d0c2d889959a8fcc7f3a60e87ffc865f2d265c59a`. **Body:** Rust. The
+**Currency:** 2026-08-11 at `a51e529`, after the six-plan wave and its repair. The sealed corpus is
+`a6fb9343b4fb23399ddf50fb0769465e29a311889c49b0afa307a8d26739e971` — **the first corpus in this
+project's history that carries no coordinate of the machine that sealed it.** The addresses in the
+paragraph this replaces (`28028c1`, rest `45084ed2…`, grade `8125caa2…`) are the **superseded**
+host-dependent seal and are retained on disk as the before-arm of that repair. **Body:** Rust. The
 C++/CUDA engine under `archive/cpp-engine/` governs nothing.
 
-**Gates re-taken on the admitted tree:** `cargo test --workspace` **2,068 passed, 0 failed, 17
-ignored** summed over 42 `test result:` lines; `tools/gates.sh` **7 of 9**; authored levels, named
-paths, claim index, boundary artifacts, all ten Typst roots, and the ownership ratchet pass. The
-ratchet is clean over **195 files, 18,567 inherited occurrences, 21 retired**; the production cone
-added no float. `output-manifest` retains its admitted pre-existing **0 departed, 1 moved, 5
-unrecorded** baseline and `closure-manifest` its admitted pre-existing **24 moved** baseline; both
-bind the conditioning-return driver and its twelve final returns.
+**Gates re-taken at `a51e529`:** `cargo test --workspace` **2,120 passed, 0 failed, 17 ignored**
+summed over 42 `test result:` lines; `tools/gates.sh` **8 of 9** — tests, authored levels (0
+failures), named paths (0 over 1,452 tokens), claim index, **output-manifest 0 departed / 0 moved /
+0 unrecorded**, boundary artifacts (all agree, including the closure member that was invisible
+because it was untracked), ten Typst roots, and the ownership ratchet, **clean over 198 files,
+18,788 inherited occurrences, 0 retired**, its baseline re-emitted from a detached worktree of the
+commit. `closure-manifest` is the ninth and reddens whenever a `soma/life` driver is edited; it is
+current as of this writing and will move again under live work, which is the documented dirty-tree
+behaviour and not a claim about the code.
 
 ---
 
@@ -53,6 +56,20 @@ watts, so an industry cost figure is a fact about an architecture and never a la
 ---
 
 ## THE MATERIAL MOUTH STANDS — 2026-08-11
+
+> **SUPERSEDED IN ITS ADDRESSES, 2026-08-11, and the reason is the finding.** Every address in this
+> section belongs to the **first** seal, which folded this machine's home directory into the body in
+> four places: the founded occurrence identity, the witness container, the container receipt, and —
+> found only by the repair, named in no audit — `standing()`, which put the host path into the
+> sealed conditioned body. Measured before and after: host coordinates in identity fields
+> **16,149 → 0**, witness containers **29,145 → 0**, container receipts **34 → 0**, conditioned body
+> **103 → 0**. The mechanism this section describes is unchanged and stands; **its addresses are
+> the before-arm.** The live corpus is
+> `a6fb9343b4fb23399ddf50fb0769465e29a311889c49b0afa307a8d26739e971`, whose identities are
+> container-relative (`{kind}-record/{container}/{conversation}/{record}/{start}-{end}`) and
+> therefore reproducible from the container on any machine. A relocation control imports one
+> container from two host paths and requires an identical sealed address; it fails against the old
+> law, which is what makes it a control.
 
 **Truth status:** `established-bounded`. **Evidence:** `implemented-exact`, `computational-witness`,
 `measured`. **Owner:** `ExactTextMaterialAtlas`; construction driver:
@@ -132,22 +149,98 @@ world-mediated, typed, ablatable returned passage that changes reusable morpholo
 conduct. It does not establish Plan 3's plural-source selectivity or make the language-generation
 attachment condition ride that conduct.
 
-## THE OPEN LINE — production must ride plural-source conduct
+## THE DEPOSIT LICENSES THE RE-EMISSION — 2026-08-11
 
-**Truth status:** `open`. **Next deed:** Plan 3 in `blueprint/THE_ROADMAP.md`. Make the resonance
-reading a conduct in which contact recurring across distinct sources changes which pathways conduct,
-then make a continuation attach exactly when its support conducts. The complete continuation fiber
-remains retained standing and is never itself treated as a return.
+**Truth status:** `established-bounded`. **Evidence:** `implemented-exact`, `computational-witness`,
+`measured`; the falsifier fired on two independent families and was **reproduced by a second reader
+against the same artifacts.** **Owners:** `morphological_language::{conduct, ecology}`,
+`soma/abi::morphological_conduct_cuda`; driver
+`soma/life/examples/the_deposit_licenses_the_re_emission.rs`; grades under
+`output/the_deposit_licenses_the_re_emission`.
 
-The exact baseline is the source-revival morphological-language report, SHA-256
-`25aeb841d103084fdd8270e983b1de164bbdd7bfbd88ba8dcfece83b6343f920`, over source address
-`f30e2504619bf3b3fde4fab8412dc4a7f1fa1c87edb75c283cf0e33bdbf97861`: 17 sources, 984 delivery
-occurrences, and 14,018 two-token outputs for the declared first prompt. The measured contact owner
-currently returns 2,366 contacts, all single-source, with zero recurred conduct.
+**Production is re-emission through altered terrain, not enumeration of a candidate population.** A
+continuation attaches exactly when its support conducts — recurrence across distinct sources, a
+plurality the **caller declares with its reason** rather than a level authored in the organ. The
+predicate is set membership against a canonically ordered deposit relation: no ranking, no argmax,
+no capacity, no chooser outside the channels.
 
-**Falsifier:** on the same corpus, the 14,018-member complete-fiber enumeration must become a strict,
-deposit-attributable sub-population, and ablating the deposits must restore the exact enumeration.
-Any authored level, scalar rank, or exterior chooser in the attachment path fails the deed.
+| receipt | family A (4 sources) | family B (6 sources) |
+|---|---|---|
+| complete fiber | 123 | 201 |
+| conducted | **24**, strictly smaller | **38** |
+| attached continuations, each naming its licensing deposits | 22 | 31 |
+| withheld transitions / candidate edges, retained and never emitted | 101 / 188 | 170 / 310 |
+| obstruction rows | 2 | 7 |
+| targeted ablation removed exactly what it **solely** licensed | true | true |
+| full ablation restores the enumeration bit-exactly | 123 | 201 |
+
+**Two defects the falsifier found in its own measurement, and both are law rather than plumbing.**
+Ablating one of several licences correctly removes nothing, so attribution must name the **sole**
+licence — and only **2 of 548** deposits are sole licences, so nearly every attached transition
+stands on plural deposits. And **a path is not a branch**: two distinct currents can emit one surface
+sequence, so the measure is a multiset with multiplicity.
+
+**A branch that conducts nowhere now rests as `Obstructed` with its address and its withheld
+candidates.** The prior silent skip dropped the whole cell, making a branch the deposits refused
+indistinguishable from one that never existed — `canon/TABLET_THE_RESONANCE.md` §11 must-do 6.
+
+**The card decides, and parity is possible because of it.** Two independently assembled key sheets;
+membership decided on device by binary search; parity against an independent host merge **on the
+induced equivalence, never on ordinals**. A returned row can be well-formed and still fail parity,
+and a test proves it does.
+
+**Bounded, and the bound is named.** The declared families are 124 and 197 passages. The
+14,018-branch material is not yet reached, and the reason is the cost law in the open line below —
+**not a capacity.** One test at a declared front larger than any the corpus has produced currently
+refuses; that refusal is unnamed on the device side (one `None` for ~20 agreements) and is being
+repaired, and it is an operator defect in a membrane's reporting, not a limit of the carrier.
+
+## THE OPEN LINE — the cost law is owed, and it is not a ceiling
+
+**Production now rides plural-source conduct. The line that was open here is closed** and the deed
+is recorded below under "The deposit licenses the re-emission". The falsifier this section demanded
+fired on two independent families and was reproduced by a second reader:
+`123 → 24` and `201 → 38`, strictly smaller, each attached continuation naming its licensing
+deposits, the withheld fiber retained and never emitted, targeted ablation removing exactly what its
+deposit **solely** licensed, and full ablation restoring the enumeration bit-exactly.
+
+**Truth status:** `open`. **Next deed:** the work law of
+`MorphologicalLanguageEcology::condition`, counted and not timed.
+
+**Why this is the line.** Three reports in one day — two agents and this file's author — named
+`condition` a wall using **elapsed time**. `CLAUDE.md` §8 forbids exactly that: *a cost is measured
+in work, never in elapsed time; a clock may measure, it may never select*, and
+`canon/THE_MEASURED_CAPABILITIES.md` §4 already records that **every timing figure in this
+repository has one frame and none is falsifiable.** Those figures are withdrawn. The corpus's own
+instrument is the exact work vector over `BigUint` and the order price `⌈log₂(n!)⌉`, whose argument
+is **overpayment**: work spent beyond the information content of the return is measured waste.
+
+**The derivation, from reading the owner rather than watching it.** Two superlinear terms:
+
+- **A transpose done as a scan** (`morphological_language/ecology.rs:356-373`). `clause_routes`
+  is built by iterating `features × passages × clauses` and testing membership, while the inverse
+  relation `ClauseStanding.features` is **already materialized at `:300`, before the loop**. Work is
+  `Σ_f P_f·C̄`; the return's own information content is `I`, the actual incidences, reachable by one
+  pass at `Θ(I)`. The overpayment is `Σ_f P_f·C̄ / I`. Under `H.0219` the transpose is per-clause
+  local — a boundary flux coverable over any partition — while the scan consults
+  `passages_standing.len()` corpus-wide. **This term is the barrier.**
+- **A presentation materialized to learn a support relation** (`:397-405`). Every prefix of every
+  question clause becomes a map key: `Θ(L²)` words cloned, `Θ(L² log N)` comparisons per clause,
+  where `ExactLabeledSuffixEcology` — built a few lines below on the same tokens — carries the same
+  support in `Θ(Σ L)`. This is `canon/TABLET_THE_MANIFOLD.md` §22's reading-versus-exhibition
+  distinction.
+
+**Falsifier, and it can kill the derivation:** instrument before repairing, in exact integers that
+reproduce on any machine — membership tests **attempted** against inserts that **fired**, at two or
+more corpus extents. Attempted must scale as `F·P·C̄` while fired scales far below it. If the two
+track each other, the recruitment reading is wrong and the repair must not proceed toward it. A
+repair is admitted only if `clause_routes` is **bit-identical** to the scan's output and all five
+re-emission receipts are unmoved; a cost repair that moves a receipt is not a cost repair.
+
+**What this line does not say.** It does not say the machine is bounded, and no figure here is a
+capacity. A wall in this project has so far always been an operator's mis-derived extent or an
+unnamed refusal, never a limit of what can be carried — see the correction banner on
+`research/records/2026-08-11_THE_SEAL_CARRIED_THE_HOST_AND_THE_ORGANS_AWAIT_THEIR_CURRENT.md`.
 
 ---
 
