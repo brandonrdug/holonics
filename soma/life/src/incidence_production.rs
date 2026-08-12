@@ -67,6 +67,40 @@
 //! `∂` and the corpus's `caused_by` founds `⪯`, and the two are exhibited apart by
 //! [`IncidenceComplex::dependency_disagrees_with_storage`].
 //!
+//! # Differentiation, and response to later material
+//!
+//! Closure runs one way: `complete_{F,Q,k}(C_k) → (n_{k+1}, ρ_k)`, a completed compound hands up
+//! one successor at grain `k+1` and its internal boundary **departs**. [`IncidenceComplex::differentiate`]
+//! is the formal partner, and the two are adjoint:
+//!
+//! ```text
+//!     differentiate_k(n_{k+1}) → (∂Σ, r_Σ, supp_Σ)          ⟨w, ∂Σ⟩  =  ⟨dw, Σ⟩
+//! ```
+//!
+//! The right-hand side is `holonic_engine::running_integral::coboundary` on the engine's own
+//! carrier, reached through [`IncidenceComplex::engine_view`]; no second complex and no second
+//! validator is built here. `w(e) = sheet(e) · contact_winding(e)` is the **additive** reading of
+//! the same two material numbers the multiplicative transport uses, and the two are not the same
+//! map — `PhaseChart::rotation` is not a homomorphism out of `(ℤ,+)` — so their agreement on
+//! flatness is a measurement and never an assumption.
+//!
+//! [`IncidenceComplex::admit_later`] is the response. It derives the arrival's place in `⪯` from
+//! the family's own `caused_by`, founds its cells, and returns an [`ArrivalResponse`] carrying the
+//! before and after emissions with a [`ClosureVerdict`] per standing closed boundary. **Three
+//! things are measured and they are three different questions**, which the first statement of this
+//! law conflated:
+//!
+//! | question | predictor | measured |
+//! |---|---|---|
+//! | does the **closed boundary** move? | — | **never.** Adding cells to a graph cannot destroy a cycle; a closed boundary is permanent, which is what *closed* means. |
+//! | does the **valence** `Γ` move? | a passage that did not exist lands on a constituent of `∂Σ` that is not already `Both` | 21 of 21 across three declared arrivals |
+//! | what does the compound **hand forward**? | `r_Σ`, through `r(Σ' − Σ) = r(Σ') − r(Σ)` | exact; a saturated compound hands forward zero |
+//!
+//! The third is what makes the residual causal rather than reported, and it is a theorem about the
+//! linearity of `⟨w, ·⟩` on the cycle space rather than a rule authored here.
+//! [`IncidenceComplex::withdraw`] is the inverse of admission **on the admitted complex**, so a
+//! retained multiplicity or a retained `⪯` edge shows up as a non-bit-exact restoration.
+//!
 //! # Boundary: the body owns two port species, the law names three
 //!
 //! `body::incidence::EventPortKind` is `{Ingress, Exposed}`. The ratified law's `Γ_t` names
@@ -85,8 +119,12 @@ use body::{
     num::Cog,
 };
 use holonic_engine::{
-    DimensionalWaveModeId, ExactComplexWaveCurrent, ExactReceiverPhasePopulation,
-    ExactWavePhaseTransport,
+    running_integral::{
+        coboundary, found_potential_in, ChordObstruction, Cochain, CoefficientGroup,
+    },
+    CausalCellId, CausalChain, ComparativeMultiplicity, DimensionalWaveModeId, EventId,
+    ExactComplexWaveCurrent, ExactReceiverPhasePopulation, ExactWavePhaseTransport,
+    GradedCausalComplex,
 };
 use num_bigint::BigInt;
 use num_rational::BigRational;
@@ -113,6 +151,15 @@ pub enum IncidenceProductionError {
     /// retained because the engine's constructor can say so and this module must not assume.
     NonUnitRotation,
     Extent,
+    /// `holonic_engine::algebraic::GradedCausalComplex` refused a cell. This is its own `∂∂ = 0`
+    /// verdict, taken independently of `body::incidence`'s.
+    Engine(String),
+    /// `holonic_engine::running_integral` refused a pairing, a coboundary or a potential search.
+    Integral(String),
+    /// The arrival names a cause that is not in the declared family, so its place in `⪯` cannot be
+    /// derived. It is refused rather than given rank zero, which would silently make a caused
+    /// occurrence a root.
+    ArrivalCauseIsOutsideTheFamily(String),
 }
 
 /// One occurrence of the declared material, as the corpus carries it.
@@ -448,22 +495,7 @@ impl IncidenceComplex {
             return Err(IncidenceProductionError::NoContact);
         }
 
-        // `⪯`: one constituent recurring at a later causal rank. This is the corpus's own causal
-        // order carried into the complex; nothing here consults storage position.
-        let mut by_surface = BTreeMap::<&str, Vec<usize>>::new();
-        for (at, site) in sites.iter().enumerate() {
-            by_surface.entry(site.surface.as_str()).or_default().push(at);
-        }
-        let mut dependencies = Vec::new();
-        for occurrences_of in by_surface.values() {
-            let mut ordered = occurrences_of.clone();
-            ordered.sort_by_key(|at| sites[*at].causal_rank);
-            for pair in ordered.windows(2) {
-                if sites[pair[0]].causal_rank < sites[pair[1]].causal_rank {
-                    dependencies.push((pair[0], pair[1]));
-                }
-            }
-        }
+        let dependencies = derive_dependencies(&sites);
 
         Self::assemble(
             0,
@@ -1248,6 +1280,814 @@ impl IncidenceComplex {
         next.self_contacts_refused = incoherent;
         Ok((emissions, next))
     }
+
+    /// Why the tower stopped: the census of every candidate pair [`Self::next_grain`] considered.
+    ///
+    /// A pair may be refused for one of exactly three reasons, and they are different findings.
+    /// `refused_by_causal_rank` is a **law** refusal — the method requires two compounds to sit at
+    /// the same rank in `⪯` before it will even look at their boundaries. `refused_unbonded` is a
+    /// **material** refusal: the two closed boundaries neither share a face nor are joined by a
+    /// contact of this complex. Reporting one as the other is how a construction question gets
+    /// mistaken for a scale question.
+    pub fn next_grain_census(&self) -> NextGrainCensus {
+        let boundary = self
+            .compounds
+            .iter()
+            .map(|compound| {
+                let mut hands = BTreeMap::new();
+                for (at, hand) in compound.bonds.iter().zip(compound.hands.iter()) {
+                    hands.insert(*at, *hand);
+                }
+                (
+                    compound.sites.iter().copied().collect::<BTreeSet<_>>(),
+                    hands,
+                )
+            })
+            .collect::<Vec<_>>();
+
+        let mut census = NextGrainCensus {
+            compounds: self.compounds.len(),
+            ..NextGrainCensus::default()
+        };
+        for (left, donor) in boundary.iter().enumerate() {
+            for (right, acceptor) in boundary.iter().enumerate() {
+                if left == right {
+                    continue;
+                }
+                census.pairs_considered += 1;
+                let same_rank =
+                    self.compounds[left].causal_rank == self.compounds[right].causal_rank;
+                let mut glued = false;
+                for (at, hand) in donor.1.iter() {
+                    if let Some(other) = acceptor.1.get(at) {
+                        if *hand == other.reversed() {
+                            glued |= hand.coefficient() > 0;
+                        } else if same_rank {
+                            census.incoherent += 1;
+                        }
+                    }
+                }
+                let crossing = self.bonds.iter().enumerate().any(|(at, bond)| {
+                    !donor.1.contains_key(&at)
+                        && !acceptor.1.contains_key(&at)
+                        && donor.0.contains(&bond.from)
+                        && acceptor.0.contains(&bond.to)
+                });
+                if !same_rank {
+                    census.refused_by_causal_rank += 1;
+                    // The counterfactual, and it is a pure measurement of the boundaries that are
+                    // already there: how many of the pairs the rank guard refused **before looking**
+                    // would have bonded had it looked. Non-zero means the guard is the binding
+                    // constraint and the tower's ceiling is in the LAW. Zero means the material had
+                    // nothing there anyway and the ceiling is in the MATERIAL. Nothing here changes
+                    // what `next_grain` does; the counterfactual is reported, never conducted.
+                    if glued || crossing {
+                        census.would_bond_across_rank += 1;
+                    }
+                    continue;
+                }
+                census.same_rank += 1;
+                if glued {
+                    census.glued += 1;
+                }
+                if crossing {
+                    census.crossing += 1;
+                }
+                if glued || crossing {
+                    census.bonded += 1;
+                } else {
+                    census.refused_unbonded += 1;
+                }
+            }
+        }
+        census
+    }
+
+    // -----------------------------------------------------------------------------------------
+    // Differentiation — the formal partner of closure
+    // -----------------------------------------------------------------------------------------
+
+    /// The same cells, handed to `holonic_engine::algebraic::GradedCausalComplex`.
+    ///
+    /// A second complex is not built: the sites, contacts and closed boundaries are the ones this
+    /// module already carries, presented in the engine's carrier so that
+    /// `holonic_engine::running_integral` can act on them. `found_cell` re-checks `∂∂ = 0` on
+    /// construction, so this is a **third independent frame** on the same law —
+    /// `body::incidence::EventComplex` is the second — and a disagreement between any two of them
+    /// is a defect in this module rather than a fact about the material.
+    pub fn engine_view(&self) -> Result<EngineView, IncidenceProductionError> {
+        let mut complex = GradedCausalComplex::default();
+        let mut site_cells = Vec::with_capacity(self.sites.len());
+        for site in &self.sites {
+            let id = complex
+                .found_cell(
+                    site.surface.clone(),
+                    BTreeSet::from([EventId(u64::from(site.causal_rank))]),
+                    0,
+                    CausalChain::default(),
+                )
+                .map_err(|error| IncidenceProductionError::Engine(format!("{error}")))?;
+            site_cells.push(id);
+        }
+        let mut bond_cells = Vec::with_capacity(self.bonds.len());
+        for bond in &self.bonds {
+            // `∂bond = to − from`, exactly as `event_parts` presents it to the body.
+            let mut chain = CausalChain::default();
+            chain.add_term(
+                site_cells[bond.to],
+                ComparativeMultiplicity::positive(1u32),
+            );
+            chain.add_term(
+                site_cells[bond.from],
+                ComparativeMultiplicity::negative(1u32),
+            );
+            let id = complex
+                .found_cell(
+                    format!(
+                        "{} ⟶ {}",
+                        self.sites[bond.from].surface, self.sites[bond.to].surface
+                    ),
+                    BTreeSet::from([EventId(u64::from(bond.causal_rank))]),
+                    1,
+                    chain,
+                )
+                .map_err(|error| IncidenceProductionError::Engine(format!("{error}")))?;
+            bond_cells.push(id);
+        }
+        let mut compound_cells = Vec::with_capacity(self.compounds.len());
+        for compound in &self.compounds {
+            let mut chain = CausalChain::default();
+            for (at, hand) in compound.bonds.iter().zip(compound.hands.iter()) {
+                chain.add_term(
+                    bond_cells[*at],
+                    match hand {
+                        IncidenceHand::With => ComparativeMultiplicity::positive(1u32),
+                        IncidenceHand::Against => ComparativeMultiplicity::negative(1u32),
+                    },
+                );
+            }
+            let id = complex
+                .found_cell(
+                    self.compound_surface(compound),
+                    BTreeSet::from([EventId(u64::from(compound.causal_rank))]),
+                    2,
+                    chain,
+                )
+                .map_err(|error| IncidenceProductionError::Engine(format!("{error}")))?;
+            compound_cells.push(id);
+        }
+        complex
+            .validate()
+            .map_err(|error| IncidenceProductionError::Engine(format!("{error}")))?;
+        Ok(EngineView {
+            complex,
+            sites: site_cells,
+            bonds: bond_cells,
+            compounds: compound_cells,
+        })
+    }
+
+    /// The declared 1-cochain: `w(e) = sheet(e) · contact_winding(e)`, exact in `ℤ`.
+    ///
+    /// This is the **additive** reading of the same two material numbers the multiplicative
+    /// transport uses — how far the contact crosses, and onto which sheet. It is a different
+    /// reading of the same contact, not a second material: `PhaseChart::rotation` is not a
+    /// homomorphism out of `(ℤ,+)`, so the additive residual and the multiplicative holonomy are
+    /// two frames on one closed boundary and their agreement is a measurement, never an assumption.
+    pub fn winding_cochain(&self, view: &EngineView) -> Cochain {
+        Cochain::from_values(
+            1,
+            self.bonds.iter().enumerate().map(|(at, bond)| {
+                (
+                    view.bonds[at],
+                    BigInt::from(i64::from(bond.sheet) * i64::from(bond.contact_winding)),
+                )
+            }),
+        )
+    }
+
+    fn compound_surface(&self, compound: &Compound) -> String {
+        let mut surface = String::new();
+        for (position, site) in compound.sites.iter().enumerate() {
+            if position != 0 {
+                surface.push(' ');
+            }
+            surface.push_str(&self.sites[*site].surface);
+        }
+        surface
+    }
+
+    /// `differentiate_k(n_{k+1}) → (∂Σ, r_Σ, supp_Σ)`.
+    ///
+    /// Closure suppressed a compound's internal boundary: `hand_up` names those contacts as
+    /// **departed** and the higher-grain constituent stands in their place. Differentiation
+    /// restores them. It is the formal partner of closure in the strict sense, because the two are
+    /// adjoint:
+    ///
+    /// ```text
+    ///     ⟨w, ∂Σ⟩  =  ⟨dw, Σ⟩
+    /// ```
+    ///
+    /// The left side is this module walking the closed boundary in traversal order; the right side
+    /// is `holonic_engine::running_integral::coboundary` summing over the engine's own unordered
+    /// boundary chain. [`Differentiation::stokes_holds`] is that identity taken as a check.
+    ///
+    /// `supp_Σ` is the part of `∂Σ` the residual is **supported on** — the contacts carrying a
+    /// non-zero winding. It is where a later arrival can reach this compound, and it is strictly
+    /// narrower than the boundary: a contact crossing zero bits carries no potential difference and
+    /// nothing composes there.
+    pub fn differentiate(
+        &self,
+        at: usize,
+        chart: PhaseChart,
+        view: &EngineView,
+        cochain: &Cochain,
+    ) -> Result<Differentiation, IncidenceProductionError> {
+        let compound = self
+            .compounds
+            .get(at)
+            .ok_or(IncidenceProductionError::Extent)?;
+        let (chain_gauge, holonomy) = self.holonomy(at, chart)?;
+
+        let mut reexposed = Vec::with_capacity(compound.bonds.len());
+        let mut residual = BigInt::from(0);
+        let mut support = BTreeSet::new();
+        let mut support_contacts = Vec::new();
+        for (position, (bond_at, hand)) in compound
+            .bonds
+            .iter()
+            .zip(compound.hands.iter())
+            .enumerate()
+        {
+            let bond = &self.bonds[*bond_at];
+            let carried = i64::from(bond.sheet) * i64::from(bond.contact_winding);
+            residual += BigInt::from(hand.coefficient() * carried);
+            if carried != 0 {
+                support.insert(bond.from);
+                support.insert(bond.to);
+                support_contacts.push(*bond_at);
+            }
+            reexposed.push(ReexposedContact {
+                position,
+                bond: *bond_at,
+                from: self.sites[bond.from].surface.clone(),
+                to: self.sites[bond.to].surface.clone(),
+                hand: *hand,
+                carried,
+            });
+        }
+
+        // `(dw)(Σ) = w(∂Σ)`: the engine evaluates the cochain on its own boundary chain for this
+        // one cell. [`Self::differentiate_all`] takes the whole coboundary at once and overwrites
+        // this, so both the per-cell pairing and the total `d` are exercised.
+        let cell = view
+            .complex
+            .cell(view.compounds[at])
+            .map_err(|error| IncidenceProductionError::Engine(format!("{error}")))?;
+        let coboundary_reading = cochain
+            .evaluate(&view.complex, &cell.boundary)
+            .map_err(|error| IncidenceProductionError::Integral(format!("{error}")))?;
+
+        Ok(Differentiation {
+            compound: at,
+            surface: self.compound_surface(compound),
+            causal_rank: compound.causal_rank,
+            reexposed,
+            residual,
+            coboundary_reading,
+            chain_gauge,
+            holonomy,
+            support: support.into_iter().collect(),
+            support_contacts,
+        })
+    }
+
+    /// [`Self::differentiate`] over every closed boundary, with the engine view built once.
+    pub fn differentiate_all(
+        &self,
+        chart: PhaseChart,
+    ) -> Result<Vec<Differentiation>, IncidenceProductionError> {
+        let view = self.engine_view()?;
+        let cochain = self.winding_cochain(&view);
+        let differentiated = coboundary(&view.complex, &cochain)
+            .map_err(|error| IncidenceProductionError::Integral(format!("{error}")))?;
+        let mut found = Vec::with_capacity(self.compounds.len());
+        for at in 0..self.compounds.len() {
+            let mut one = self.differentiate(at, chart, &view, &cochain)?;
+            one.coboundary_reading = differentiated.value(view.compounds[at]);
+            found.push(one);
+        }
+        Ok(found)
+    }
+
+    /// The chord population the **engine's** spanning tree finds, over every component.
+    ///
+    /// This module's [`fundamental_cycles`] and `running_integral`'s `found_potential_in` walk two
+    /// independently built spanning forests, so the two chord sets are different bases of the same
+    /// cycle space. What must agree across them is not the basis — a basis is a receiver-visible
+    /// coordinate — but the **image of the holonomy homomorphism `H₁ → ℤ`**, which is the subgroup
+    /// generated by the residuals and is therefore named by their gcd. That is the two-frame check
+    /// `CLAUDE.md` §0's fourth lesson asks for, and it can fail.
+    pub fn chord_population(
+        &self,
+        group: &CoefficientGroup,
+    ) -> Result<ChordPopulation, IncidenceProductionError> {
+        let view = self.engine_view()?;
+        let cochain = self.winding_cochain(&view);
+        let mut reached = BTreeSet::<CausalCellId>::new();
+        let mut retained = Vec::<ChordObstruction>::new();
+        let mut agreeing = 0usize;
+        let mut bases = Vec::new();
+        for (at, cell) in view.sites.iter().enumerate() {
+            if reached.contains(cell) {
+                continue;
+            }
+            let search = found_potential_in(&view.complex, &cochain, *cell, group.clone())
+                .map_err(|error| IncidenceProductionError::Integral(format!("{error}")))?;
+            reached.extend(search.reached.iter().copied());
+            agreeing += search.agreeing_chords.len();
+            retained.extend(search.retained_obstructions.iter().cloned());
+            bases.push((at, self.sites[at].surface.clone(), search.cycle_rank()));
+        }
+        let mut image = BigInt::from(0);
+        for chord in &retained {
+            image = exact_gcd(&image, &chord.residual);
+        }
+        Ok(ChordPopulation {
+            components: bases.len(),
+            bases,
+            cycle_rank: agreeing + retained.len(),
+            agreeing,
+            retained,
+            image,
+        })
+    }
+
+    /// `⟨w, Σ nᵢ ∂Σᵢ⟩` — the residual of a `ℤ`-combination of closed boundaries, evaluated by
+    /// `holonic_engine::running_integral::Cochain::evaluate` on the combined 1-chain.
+    ///
+    /// **This is what makes the residual causal rather than reported.** The pairing is linear on
+    /// the cycle space, so when a later arrival founds a new closed boundary `Σ'` through a
+    /// standing one `Σ`, the two are related by
+    ///
+    /// ```text
+    ///     r(Σ' − Σ)  =  r(Σ') − r(Σ)
+    /// ```
+    ///
+    /// and therefore `Σ` hands its **whole** obstruction into every cycle it enters, while a
+    /// **saturated** compound — `r_Σ = 0` — hands forward exactly nothing. That is
+    /// `canon/THE_MEASURED_CAPABILITIES.md` M7, *a complete obstruction causes the next
+    /// construction*, together with its converse: a vanishing obstruction causes nothing, and
+    /// neither half is authored here. The left-hand side is computed by the engine on a chain this
+    /// module never sums; the right-hand side by this module walking two boundaries. They are two
+    /// frames on one number.
+    pub fn residual_of_combination(
+        &self,
+        terms: &[(usize, i64)],
+    ) -> Result<BigInt, IncidenceProductionError> {
+        let view = self.engine_view()?;
+        self.residual_of_combination_in(terms, &view)
+    }
+
+    /// [`Self::residual_of_combination`] with the engine view built once by the caller.
+    pub fn residual_of_combination_in(
+        &self,
+        terms: &[(usize, i64)],
+        view: &EngineView,
+    ) -> Result<BigInt, IncidenceProductionError> {
+        let cochain = self.winding_cochain(view);
+        let mut chain = CausalChain::default();
+        for (at, coefficient) in terms {
+            let compound = self
+                .compounds
+                .get(*at)
+                .ok_or(IncidenceProductionError::Extent)?;
+            for (bond_at, hand) in compound.bonds.iter().zip(compound.hands.iter()) {
+                let signed = coefficient.saturating_mul(hand.coefficient());
+                if signed == 0 {
+                    continue;
+                }
+                let magnitude = signed.unsigned_abs();
+                chain.add_term(
+                    view.bonds[*bond_at],
+                    if signed > 0 {
+                        ComparativeMultiplicity::positive(magnitude)
+                    } else {
+                        ComparativeMultiplicity::negative(magnitude)
+                    },
+                );
+            }
+        }
+        cochain
+            .evaluate(&view.complex, &chain)
+            .map_err(|error| IncidenceProductionError::Integral(format!("{error}")))
+    }
+
+    /// The same image, read off **this module's own** fundamental-cycle basis.
+    pub fn holonomy_image(
+        &self,
+        chart: PhaseChart,
+    ) -> Result<BigInt, IncidenceProductionError> {
+        let mut image = BigInt::from(0);
+        for differentiation in self.differentiate_all(chart)? {
+            image = exact_gcd(&image, &differentiation.residual);
+        }
+        Ok(image)
+    }
+
+    // -----------------------------------------------------------------------------------------
+    // Response to later material
+    // -----------------------------------------------------------------------------------------
+
+    /// The arrival's place in `⪯`, derived from the declared family's own `caused_by` relation.
+    ///
+    /// Nothing chooses it. An arrival whose causes are all present at rank `r` sits at `r+1`; an
+    /// arrival with no cause inside the family sits at rank zero, **co-present with the roots**. An
+    /// arrival naming a cause the family does not carry is refused rather than silently made a
+    /// root, because that would turn a caused occurrence into an uncaused one to keep a method
+    /// total.
+    pub fn arrival_rank(
+        &self,
+        arrival: &DeclaredOccurrence,
+    ) -> Result<u32, IncidenceProductionError> {
+        let mut rank = 0u32;
+        for cause in &arrival.caused_by {
+            let found = self
+                .causal_ranks
+                .iter()
+                .find(|(identity, _, _)| identity == cause)
+                .ok_or_else(|| {
+                    IncidenceProductionError::ArrivalCauseIsOutsideTheFamily(cause.clone())
+                })?;
+            rank = rank.max(found.2.saturating_add(1));
+        }
+        Ok(rank)
+    }
+
+    /// **The reopening law**, as stated, and then as the run corrected it.
+    ///
+    /// ```text
+    ///   Σ REOPENS  ⟺  the arrival founds a passage incident to a constituent of supp_Σ
+    ///                 AND  r_Σ ≠ 0  in the declared coefficient group
+    /// ```
+    ///
+    /// `reopened`, `saturated` and `untouched` partition the standing closed boundaries by that
+    /// rule. **What the rule turned out to predict is not what it was written to predict**, and
+    /// each verdict carries both readings so the difference stays visible:
+    ///
+    /// - It does **not** predict that a closed boundary moves, because none ever does. Adding
+    ///   cells to a graph cannot destroy a cycle, so a completed compound is permanent under any
+    ///   arrival. [`ClosureVerdict::moved`] is measured every run and is a constant `false`; that
+    ///   is what *closed* means and it is the honest content of `complete_{F,Q,k}` being a
+    ///   completion rather than a stage.
+    /// - **Reaching** predicts the **valence**: [`ClosureVerdict::predicted_valence_move`] fires
+    ///   where a passage that did not exist lands on a constituent of `∂Σ` not already at
+    ///   [`ExposedPolarity::Both`], and it was right on every closed boundary of all three declared
+    ///   arrivals.
+    /// - The **residual** predicts the **transport**. `⟨w, ·⟩` is linear on the cycle space, so
+    ///   `r(Σ' − Σ) = r(Σ') − r(Σ)`: a compound hands its whole obstruction into every cycle the
+    ///   arrival founds through it, and a **saturated** one hands forward exactly nothing. That is
+    ///   `canon/THE_MEASURED_CAPABILITIES.md` M7 — *a complete obstruction causes the next
+    ///   construction* — with its converse made checkable, and both halves are theorems rather than
+    ///   rules authored here. [`Self::residual_of_combination`] computes the left-hand side through
+    ///   the engine.
+    ///
+    /// The complete re-derivation is taken every run and compared against the prediction, because a
+    /// differential update whose prediction is never checked is a claim about code rather than a
+    /// measurement of it (`CLAUDE.md` §8). Cost is counted in cells, never in elapsed time.
+    pub fn admit_later(
+        &self,
+        arrival: &DeclaredOccurrence,
+        chart: PhaseChart,
+        group: &CoefficientGroup,
+    ) -> Result<ArrivalResponse, IncidenceProductionError> {
+        if self.patch_extent == 0 {
+            // A complex above grain zero carries no inscription aperture, so an arrival has no
+            // patches to found. Refused rather than silently admitted as an empty occurrence.
+            return Err(IncidenceProductionError::Extent);
+        }
+        if self
+            .causal_ranks
+            .iter()
+            .any(|(identity, _, _)| identity == &arrival.identity)
+        {
+            // Admitting one identity twice would double its deposit and make the withdrawal a
+            // partial inverse, which is exactly the accumulation the falsifier is looking for.
+            return Err(IncidenceProductionError::EmptyOccurrence(
+                arrival.identity.clone(),
+            ));
+        }
+        let rank = self.arrival_rank(arrival)?;
+        let before = self.hand_up(chart)?;
+        let differentiated = self.differentiate_all(chart)?;
+
+        let mut sites = self.sites.clone();
+        let mut bonds = self.bonds.clone();
+        let mut site_index = BTreeMap::<(u32, String), usize>::new();
+        for (at, site) in sites.iter().enumerate() {
+            site_index.insert((site.causal_rank, site.surface.clone()), at);
+        }
+        let mut bond_index = BTreeMap::<(usize, usize), usize>::new();
+        for (at, bond) in bonds.iter().enumerate() {
+            bond_index.insert((bond.from, bond.to), at);
+        }
+        let base_sites = sites.len();
+        let base_bonds = bonds.len();
+
+        let complete = arrival.text.split_whitespace().count();
+        if complete == 0 {
+            return Err(IncidenceProductionError::EmptyOccurrence(
+                arrival.identity.clone(),
+            ));
+        }
+        let mut trace = ArrivalTrace {
+            identity: arrival.identity.clone(),
+            rank,
+            base_sites,
+            base_bonds,
+            base_patches_outside_extent: self.patches_outside_extent,
+            base_self_contacts_refused: self.self_contacts_refused,
+            site_occurrence_delta: BTreeMap::new(),
+            bond_multiplicity_delta: BTreeMap::new(),
+        };
+
+        let mut previous: Option<usize> = None;
+        let mut self_contacts = self.self_contacts_refused;
+        for patch in arrival.text.split_whitespace().take(self.patch_extent) {
+            let key = (rank, patch.to_owned());
+            let at_site = match site_index.get(&key) {
+                Some(found) => {
+                    sites[*found].occurrences = sites[*found]
+                        .occurrences
+                        .checked_add(1)
+                        .ok_or(IncidenceProductionError::Extent)?;
+                    *trace.site_occurrence_delta.entry(*found).or_default() += 1;
+                    *found
+                }
+                None => {
+                    let ordinal = sites.len();
+                    sites.push(Site {
+                        id: EventCellId::new(0),
+                        surface: patch.to_owned(),
+                        causal_rank: rank,
+                        grain: self.grain,
+                        octet_winding: octet_winding(patch.as_bytes()),
+                        occurrences: 1,
+                    });
+                    site_index.insert(key, ordinal);
+                    ordinal
+                }
+            };
+            if let Some(prior) = previous {
+                if prior == at_site {
+                    self_contacts += 1;
+                } else {
+                    let existing = bond_index.get(&(prior, at_site)).copied();
+                    found_bond(
+                        &mut bonds,
+                        &mut bond_index,
+                        &sites,
+                        prior,
+                        at_site,
+                        rank,
+                        self.grain,
+                    )?;
+                    if let Some(found) = existing {
+                        *trace.bond_multiplicity_delta.entry(found).or_default() += 1;
+                    }
+                }
+            }
+            previous = Some(at_site);
+        }
+
+        let dependencies = derive_dependencies(&sites);
+        let base_dependencies = self.dependencies.iter().copied().collect::<BTreeSet<_>>();
+        let new_dependencies = dependencies
+            .iter()
+            .copied()
+            .filter(|edge| !base_dependencies.contains(edge))
+            .collect::<Vec<_>>();
+
+        // Every constituent a new passage touches. A `⪯` edge is a passage: the arrival reaches an
+        // earlier compound along the corpus's own causal order, which is exactly the relation §I
+        // insists is distinct from adjacency.
+        //
+        // The two species are kept apart because they do different work, which the run measured.
+        // `touched_by_new_cell` is a constituent that acquired a passage it did not have; that is
+        // what can change a valence. A **re-tread** raises `Π` on a contact that was already there
+        // and adds no port, so it reaches the compound without changing what it exposes.
+        let mut touched_by_new_cell = BTreeSet::<usize>::new();
+        for bond in bonds.iter().skip(base_bonds) {
+            touched_by_new_cell.insert(bond.from);
+            touched_by_new_cell.insert(bond.to);
+        }
+        for (before_at, after_at) in &new_dependencies {
+            touched_by_new_cell.insert(*before_at);
+            touched_by_new_cell.insert(*after_at);
+        }
+        let mut touched = touched_by_new_cell.clone();
+        for at in trace.bond_multiplicity_delta.keys() {
+            touched.insert(bonds[*at].from);
+            touched.insert(bonds[*at].to);
+        }
+
+        let mut reached = Vec::new();
+        let mut reopened = Vec::new();
+        let mut saturated = Vec::new();
+        let mut untouched = Vec::new();
+        for differentiation in &differentiated {
+            let meets = differentiation
+                .support
+                .iter()
+                .any(|site| touched.contains(site));
+            if !meets {
+                untouched.push(differentiation.compound);
+                continue;
+            }
+            reached.push(differentiation.compound);
+            if group.vanishes(&differentiation.residual) {
+                saturated.push(differentiation.compound);
+            } else {
+                reopened.push(differentiation.compound);
+            }
+        }
+
+        let mut causal_ranks = self.causal_ranks.clone();
+        causal_ranks.push((arrival.identity.clone(), arrival.storage_ordinal, rank));
+        let admitted = Self::assemble(
+            self.grain,
+            sites,
+            bonds,
+            dependencies,
+            self.patch_extent,
+            self.patches_outside_extent
+                .checked_add(complete.saturating_sub(self.patch_extent) as u64)
+                .ok_or(IncidenceProductionError::Extent)?,
+            self_contacts,
+            causal_ranks,
+        )?;
+
+        let after = admitted.hand_up(chart)?;
+
+        // The law made a prediction per closed boundary. It is now checked against the complete
+        // re-derivation, every run. `CLAUDE.md` §8: a check whose material cannot vary the property
+        // under test is the same defect as a check that cannot fail — so the prediction is
+        // recorded first and compared second, and the confusion matrix is the return.
+        let mut standing = BTreeMap::<Vec<(String, String)>, usize>::new();
+        for at in 0..after.len() {
+            standing.insert(admitted.closed_boundary_address(at), at);
+        }
+        let mut verdicts = Vec::with_capacity(before.len());
+        let mut founded_addresses = standing.keys().cloned().collect::<BTreeSet<_>>();
+        for (at, emission) in before.iter().enumerate() {
+            let address = self.closed_boundary_address(at);
+            founded_addresses.remove(&address);
+            let predicted_to_transport = reopened.contains(&at);
+            // The valence prediction is a different question and consults a different set: a
+            // constituent of the whole closed boundary, touched by a passage that did not exist,
+            // **and not already at `Both`**. Polarity is a three-valued reading of the ports a
+            // constituent presents, so a constituent already donating and accepting cannot move by
+            // acquiring a further passage. Predicting without that clause scored 8 of 10 twice, in
+            // both cases on a compound whose only touched constituent was the recurring function
+            // word, and the two misses were the same miss.
+            let standing_polarity = emission
+                .residual
+                .exposed
+                .iter()
+                .cloned()
+                .collect::<BTreeMap<_, _>>();
+            let predicted_valence_move = self.compounds[at].sites.iter().any(|site| {
+                touched_by_new_cell.contains(site)
+                    && standing_polarity.get(&self.sites[*site].surface)
+                        != Some(&ExposedPolarity::Both)
+            });
+            let (moved, valence_moved, after_emission) = match standing.get(&address) {
+                None => (true, true, None),
+                Some(found) => (
+                    after[*found].closed_boundary_reading() != emission.closed_boundary_reading(),
+                    after[*found].frame_reading().1 != emission.frame_reading().1,
+                    Some(after[*found].clone()),
+                ),
+            };
+            verdicts.push(ClosureVerdict {
+                compound: at,
+                surface: emission.surface.clone(),
+                predicted_to_transport,
+                predicted_valence_move,
+                moved,
+                valence_moved,
+                before: emission.clone(),
+                after: after_emission,
+            });
+        }
+        let founded = founded_addresses
+            .iter()
+            .filter_map(|address| standing.get(address))
+            .map(|at| after[*at].clone())
+            .collect::<Vec<_>>();
+        let dissolved = verdicts
+            .iter()
+            .filter(|verdict| verdict.after.is_none())
+            .map(|verdict| verdict.before.clone())
+            .collect::<Vec<_>>();
+
+        Ok(ArrivalResponse {
+            arrival: arrival.identity.clone(),
+            arrival_rank: rank,
+            arrival_is_co_present: self
+                .causal_ranks
+                .iter()
+                .any(|(_, _, existing)| *existing == rank),
+            reached,
+            reopened,
+            saturated,
+            untouched,
+            before,
+            after,
+            founded,
+            dissolved,
+            verdicts,
+            new_contacts: admitted.bonds.len() - base_bonds,
+            new_constituents: admitted.sites.len() - base_sites,
+            new_dependencies: new_dependencies.len(),
+            complex: admitted,
+            trace,
+        })
+    }
+
+    /// The closed boundary's address, independent of the spanning forest that found it and of any
+    /// storage position: the sorted multiset of its oriented contacts, named by surface and rank.
+    ///
+    /// Two complexes agree on a compound exactly when they agree on this, which is what lets a
+    /// differential update recognise the cell it is carrying.
+    pub fn closed_boundary_address(&self, at: usize) -> Vec<(String, String)> {
+        let Some(compound) = self.compounds.get(at) else {
+            return Vec::new();
+        };
+        let mut address = compound
+            .bonds
+            .iter()
+            .map(|bond_at| {
+                let bond = &self.bonds[*bond_at];
+                (
+                    format!(
+                        "{}@{}",
+                        self.sites[bond.from].surface, self.sites[bond.from].causal_rank
+                    ),
+                    format!(
+                        "{}@{}",
+                        self.sites[bond.to].surface, self.sites[bond.to].causal_rank
+                    ),
+                )
+            })
+            .collect::<Vec<_>>();
+        address.sort();
+        address
+    }
+
+    /// Withdraw an admitted arrival: remove exactly the cells and multiplicities it deposited.
+    ///
+    /// This is the inverse of [`Self::admit_later`] on the **admitted** complex, not a re-founding
+    /// from the original material. It therefore tests something a re-founding cannot: that nothing
+    /// accumulated. If a multiplicity, an occurrence count or a `⪯` edge were retained, the
+    /// withdrawn complex would emit differently from the base and the falsifier fires.
+    pub fn withdraw(&self, trace: &ArrivalTrace) -> Result<Self, IncidenceProductionError> {
+        let mut sites = self.sites.clone();
+        let mut bonds = self.bonds.clone();
+        for (at, delta) in &trace.site_occurrence_delta {
+            let site = sites.get_mut(*at).ok_or(IncidenceProductionError::Extent)?;
+            site.occurrences = site
+                .occurrences
+                .checked_sub(*delta)
+                .ok_or(IncidenceProductionError::Extent)?;
+        }
+        for (at, delta) in &trace.bond_multiplicity_delta {
+            let bond = bonds.get_mut(*at).ok_or(IncidenceProductionError::Extent)?;
+            bond.multiplicity = bond
+                .multiplicity
+                .checked_sub(*delta)
+                .ok_or(IncidenceProductionError::Extent)?;
+        }
+        sites.truncate(trace.base_sites);
+        bonds.truncate(trace.base_bonds);
+        let dependencies = derive_dependencies(&sites);
+        let causal_ranks = self
+            .causal_ranks
+            .iter()
+            .filter(|(identity, _, _)| identity != &trace.identity)
+            .cloned()
+            .collect::<Vec<_>>();
+        Self::assemble(
+            self.grain,
+            sites,
+            bonds,
+            dependencies,
+            self.patch_extent,
+            trace.base_patches_outside_extent,
+            trace.base_self_contacts_refused,
+            causal_ranks,
+        )
+    }
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -1370,6 +2210,298 @@ impl Emission {
     pub fn holonomy_text(&self) -> String {
         format!("({}, {})", self.holonomy.cosine, self.holonomy.sine)
     }
+
+    /// **What closure fixed.** The closed boundary itself: its traversal, its transport, its
+    /// enclosed contacts. Only a reopening changes any of this.
+    pub fn closed_boundary_reading(&self) -> (&str, &ExactWavePhaseTransport, i8, usize, usize, &[String]) {
+        (
+            &self.surface,
+            &self.holonomy,
+            self.chain_gauge,
+            self.residual.internal_contacts,
+            self.residual.sites_departed,
+            &self.residual.departed_contacts,
+        )
+    }
+
+    /// **What is a present-frame reading, and always refreshes.**
+    ///
+    /// `Π`, the lived construction — `carried_multiplicity` — is frequency, and `CLAUDE.md` §13
+    /// rule 2 is explicit that frequency *"is apart of the machine's mechanics"* and not the
+    /// assistant's to gate. `Γ`, the exposed boundary with its polarities, is valence, and the
+    /// ratified law §IV says valence *"is receiver-relative, not a permanent integer stored on an
+    /// information object."* Neither is fixed by closure, so neither is evidence that a compound
+    /// reopened, and reading a refreshed count as a reopening would be exactly the count-standing-
+    /// in-for-a-return the tape record convicted.
+    pub fn frame_reading(&self) -> (u64, &[(String, ExposedPolarity)]) {
+        (
+            self.residual.carried_multiplicity,
+            &self.residual.exposed,
+        )
+    }
+}
+
+// ---------------------------------------------------------------------------------------------
+// Differentiation
+// ---------------------------------------------------------------------------------------------
+
+/// The same cells in `holonic_engine`'s algebraic carrier, with this module's indices mapped over.
+#[derive(Clone, Debug)]
+pub struct EngineView {
+    complex: GradedCausalComplex,
+    sites: Vec<CausalCellId>,
+    bonds: Vec<CausalCellId>,
+    compounds: Vec<CausalCellId>,
+}
+
+impl EngineView {
+    pub fn complex(&self) -> &GradedCausalComplex {
+        &self.complex
+    }
+    pub fn site(&self, at: usize) -> Option<CausalCellId> {
+        self.sites.get(at).copied()
+    }
+    pub fn bond(&self, at: usize) -> Option<CausalCellId> {
+        self.bonds.get(at).copied()
+    }
+    pub fn compound(&self, at: usize) -> Option<CausalCellId> {
+        self.compounds.get(at).copied()
+    }
+}
+
+/// One contact of a closed boundary, restored by differentiation.
+///
+/// `hand_up` named this contact as **departed**: closure enclosed it and the higher-grain
+/// constituent stands in its place. This is that contact handed back, oriented as the boundary
+/// crossed it.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ReexposedContact {
+    /// Where in the closed boundary's own traversal this crossing sits.
+    pub position: usize,
+    pub bond: usize,
+    pub from: String,
+    pub to: String,
+    pub hand: IncidenceHand,
+    /// `w(e) = sheet(e) · contact_winding(e)`, the additive reading of the turn the contact carries.
+    pub carried: i64,
+}
+
+impl ReexposedContact {
+    /// The declared contact, the hand the closed boundary crossed it at, and the turn it carries.
+    ///
+    /// The contact's own orientation and the traversal's hand are printed apart on purpose: `∂bond
+    /// = to − from` is a property of the cell, while the crossing is a property of the walk, and
+    /// collapsing them is how a chain gauge gets read as an invariant.
+    pub fn text(&self) -> String {
+        format!(
+            "{} ⟶ {}   crossed {:<7}  w = {:+}",
+            self.from,
+            self.to,
+            match self.hand {
+                IncidenceHand::With => "with",
+                IncidenceHand::Against => "against",
+            },
+            self.carried
+        )
+    }
+}
+
+/// `differentiate_k(n_{k+1}) → (∂Σ, r_Σ, supp_Σ)`: what closure suppressed, handed back.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Differentiation {
+    pub compound: usize,
+    pub surface: String,
+    pub causal_rank: u32,
+    /// `∂Σ` — the oriented internal boundary, restored contact by contact.
+    pub reexposed: Vec<ReexposedContact>,
+    /// `⟨w, ∂Σ⟩`, summed by this module along the boundary's own traversal.
+    pub residual: BigInt,
+    /// `⟨dw, Σ⟩`, returned by `holonic_engine::running_integral::coboundary` over the engine's own
+    /// unordered boundary chain. Stokes says these are one number.
+    pub coboundary_reading: BigInt,
+    pub chain_gauge: i8,
+    pub holonomy: ExactWavePhaseTransport,
+    /// The constituents the residual is supported on: endpoints of contacts carrying `w ≠ 0`.
+    /// This is **where the compound can reopen**.
+    pub support: Vec<usize>,
+    pub support_contacts: Vec<usize>,
+}
+
+impl Differentiation {
+    /// `⟨w, ∂Σ⟩ = ⟨dw, Σ⟩`, taken as a check across two frames.
+    pub fn stokes_holds(&self) -> bool {
+        self.residual == self.coboundary_reading
+    }
+
+    /// The multiplicative reading: the closed boundary returned the identity.
+    pub fn holonomy_is_flat(&self) -> bool {
+        self.holonomy == ExactWavePhaseTransport::identity()
+    }
+
+    /// The additive reading: the residual vanishes in the declared group.
+    pub fn residual_vanishes(&self, group: &CoefficientGroup) -> bool {
+        group.vanishes(&self.residual)
+    }
+
+    /// A compound with nothing for a later arrival to act on: transporting around it returns no
+    /// potential difference, so the arrival reaches it and nothing is caused.
+    pub fn is_saturated(&self, group: &CoefficientGroup) -> bool {
+        self.residual_vanishes(group)
+    }
+}
+
+/// The chord population the engine's own spanning forest returns, over every component.
+#[derive(Clone, Debug)]
+pub struct ChordPopulation {
+    pub components: usize,
+    /// `(site index, surface, cycle rank of that component)` for each base the sweep declared.
+    pub bases: Vec<(usize, String, usize)>,
+    pub cycle_rank: usize,
+    pub agreeing: usize,
+    pub retained: Vec<ChordObstruction>,
+    /// The generator of the image of `H₁ → ℤ`: basis-free, and the invariant two frames must share.
+    pub image: BigInt,
+}
+
+// ---------------------------------------------------------------------------------------------
+// Response to later material
+// ---------------------------------------------------------------------------------------------
+
+/// Exactly what a later arrival deposited, so that it can be taken back out again.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ArrivalTrace {
+    pub identity: String,
+    pub rank: u32,
+    pub base_sites: usize,
+    pub base_bonds: usize,
+    pub base_patches_outside_extent: u64,
+    pub base_self_contacts_refused: u64,
+    /// Existing constituents whose occurrence count the arrival raised, and by how much.
+    pub site_occurrence_delta: BTreeMap<usize, u64>,
+    /// Existing contacts whose multiplicity the arrival raised, and by how much.
+    pub bond_multiplicity_delta: BTreeMap<usize, u64>,
+}
+
+/// What the reopening law predicted for one closed boundary, and what the material did.
+///
+/// The two are recorded separately and compared, because a differential update whose prediction is
+/// never checked against the complete re-derivation is a claim about code rather than a
+/// measurement of it.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ClosureVerdict {
+    pub compound: usize,
+    pub surface: String,
+    /// The law said this compound hands its obstruction into whatever the arrival founds through
+    /// it: it was reached at the support of its residual, and that residual does not vanish.
+    pub predicted_to_transport: bool,
+    /// The law said this compound's **valence** changes: a passage that did not exist now lands on
+    /// a constituent of its closed boundary.
+    pub predicted_valence_move: bool,
+    /// Its closed boundary actually moved, or vanished entirely.
+    ///
+    /// **This can only ever be `false` for an arrival.** Adding cells to a graph never destroys a
+    /// cycle, so a closed boundary is permanent under later material — which is what *closed*
+    /// means, and it is a theorem rather than a limit of this implementation. It is measured
+    /// anyway, every run, because a theorem asserted is not a theorem checked.
+    pub moved: bool,
+    /// Its **valence** moved: the exposed ports it presents, or their polarity, are different.
+    /// This is `Γ_t`, and §IV is explicit that it is *receiver-relative, not a permanent integer*.
+    pub valence_moved: bool,
+    pub before: Emission,
+    /// `None` when the closed boundary no longer exists: the arrival's contact split it.
+    pub after: Option<Emission>,
+}
+
+impl ClosureVerdict {
+    /// The valence half of the law, scored.
+    pub fn valence_law_was_right(&self) -> bool {
+        self.predicted_valence_move == self.valence_moved
+    }
+}
+
+/// What a later arrival did to a standing complex.
+#[derive(Clone, Debug)]
+pub struct ArrivalResponse {
+    pub arrival: String,
+    pub arrival_rank: u32,
+    /// The arrival's derived rank coincides with a rank the family already carries, so it shares
+    /// constituents and can found a contact **inside** an earlier closed boundary. An arrival at a
+    /// new rank reaches back only along `⪯`.
+    pub arrival_is_co_present: bool,
+    /// Compounds a new passage touched at the support of their residual.
+    pub reached: Vec<usize>,
+    /// Of those, the ones whose residual does not vanish: these reopen.
+    pub reopened: Vec<usize>,
+    /// Reached, and saturated. The arrival got there and nothing was caused.
+    pub saturated: Vec<usize>,
+    pub untouched: Vec<usize>,
+    pub before: Vec<Emission>,
+    pub after: Vec<Emission>,
+    /// Closed boundaries that did not exist before the arrival.
+    pub founded: Vec<Emission>,
+    /// Closed boundaries that no longer exist: the arrival's contact split them.
+    pub dissolved: Vec<Emission>,
+    /// One per standing closed boundary: what the law predicted, and what happened.
+    pub verdicts: Vec<ClosureVerdict>,
+    pub new_contacts: usize,
+    pub new_constituents: usize,
+    pub new_dependencies: usize,
+    pub complex: IncidenceComplex,
+    pub trace: ArrivalTrace,
+}
+
+impl ArrivalResponse {
+    /// The load-bearing claim: a **named** earlier successor moved.
+    pub fn moved(&self) -> Vec<&ClosureVerdict> {
+        self.verdicts.iter().filter(|verdict| verdict.moved).collect()
+    }
+
+    /// The valence half of the law, scored over every standing closed boundary: `(right, wrong)`.
+    pub fn valence_law_agreement(&self) -> (usize, usize) {
+        let right = self
+            .verdicts
+            .iter()
+            .filter(|verdict| verdict.valence_law_was_right())
+            .count();
+        (right, self.verdicts.len() - right)
+    }
+
+    /// Nothing about the standing body changed at all. This is what the saturated control returns.
+    pub fn nothing_was_caused(&self) -> bool {
+        self.before == self.after && self.founded.is_empty() && self.dissolved.is_empty()
+    }
+
+    /// No **closed boundary** moved.
+    ///
+    /// This is a theorem and not a hope: adding cells to a graph never destroys a cycle, so a
+    /// closed boundary is permanent under any arrival. A count, a port polarity and the population
+    /// of closed boundaries beside it may all still have moved — `Π` is the lived construction,
+    /// `Γ` is a present-frame reading, and a newly founded cycle is the region growing. None of
+    /// them is closure's to fix.
+    pub fn no_closed_boundary_moved(&self) -> bool {
+        self.verdicts.iter().all(|verdict| !verdict.moved)
+    }
+}
+
+/// Why the tower stopped, per candidate pair of closed boundaries.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct NextGrainCensus {
+    pub compounds: usize,
+    pub pairs_considered: usize,
+    /// Refused before their boundaries were consulted, because the two compounds sit at different
+    /// ranks in `⪯`. A **law** refusal.
+    pub refused_by_causal_rank: usize,
+    /// Of those, the pairs that would have bonded had the guard looked. This is the counterfactual
+    /// that separates a law ceiling from a material ceiling, and it is measured rather than
+    /// conducted: `next_grain` still refuses every one of them.
+    pub would_bond_across_rank: usize,
+    pub same_rank: usize,
+    pub glued: usize,
+    pub crossing: usize,
+    pub bonded: usize,
+    /// Same rank, and neither species fired. A **material** refusal.
+    pub refused_unbonded: usize,
+    pub incoherent: usize,
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -1420,6 +2552,50 @@ pub fn sheet_of(inscription: &[u8]) -> i8 {
     } else {
         -1
     }
+}
+
+/// `⪯`: one constituent recurring at a later causal rank.
+///
+/// This is the corpus's own causal order carried into the complex; nothing here consults storage
+/// position. It is a pure function of the constituent population, which is what lets a later
+/// arrival's dependency edges be derived and withdrawn rather than accumulated.
+fn derive_dependencies(sites: &[Site]) -> Vec<(usize, usize)> {
+    let mut by_surface = BTreeMap::<&str, Vec<usize>>::new();
+    for (at, site) in sites.iter().enumerate() {
+        by_surface.entry(site.surface.as_str()).or_default().push(at);
+    }
+    let mut dependencies = Vec::new();
+    for occurrences_of in by_surface.values() {
+        let mut ordered = occurrences_of.clone();
+        ordered.sort_by_key(|at| sites[*at].causal_rank);
+        for pair in ordered.windows(2) {
+            if sites[pair[0]].causal_rank < sites[pair[1]].causal_rank {
+                dependencies.push((pair[0], pair[1]));
+            }
+        }
+    }
+    dependencies
+}
+
+/// The exact non-negative generator of the subgroup of `ℤ` two integers generate.
+///
+/// Euclid, on `BigInt`, with no float and no library that would import one. `gcd(0, 0) = 0`, which
+/// is the correct reading: the trivial subgroup is generated by zero, and a cycle space every one
+/// of whose residuals vanishes has a **zero** holonomy image rather than an undefined one.
+fn exact_gcd(left: &BigInt, right: &BigInt) -> BigInt {
+    let zero = BigInt::from(0);
+    let mut a = if *left < zero { -left.clone() } else { left.clone() };
+    let mut b = if *right < zero {
+        -right.clone()
+    } else {
+        right.clone()
+    };
+    while b != zero {
+        let remainder = &a % &b;
+        a = b;
+        b = remainder;
+    }
+    a
 }
 
 fn rat(value: i64) -> Rat {
@@ -1883,6 +3059,261 @@ mod tests {
             // two closed boundaries, so it can never exceed the contact population below it.
             assert!(next.bonds().len() <= complex.bonds().len());
         }
+    }
+
+    // ------------------------------------------------------------------------------------
+    // Differentiation, and the response to later material
+    // ------------------------------------------------------------------------------------
+
+    #[test]
+    fn the_engine_admits_the_same_complex_the_body_admits() {
+        let complex = complex();
+        complex.validate_with_body(true).expect("the body admits");
+        let view = complex.engine_view().expect("the engine admits");
+        let f_vector = view.complex().f_vector();
+        assert_eq!(f_vector.get(&0).copied(), Some(complex.sites().len()));
+        assert_eq!(f_vector.get(&1).copied(), Some(complex.bonds().len()));
+        assert_eq!(f_vector.get(&2).copied(), Some(complex.compounds().len()));
+    }
+
+    #[test]
+    fn stokes_holds_on_every_closed_boundary() {
+        let complex = complex();
+        let differentiated = complex.differentiate_all(PhaseChart::WindingAdjacent).unwrap();
+        assert!(!differentiated.is_empty());
+        for one in &differentiated {
+            assert!(
+                one.stokes_holds(),
+                "⟨w, ∂Σ⟩ = {} against ⟨dw, Σ⟩ = {} on {:?}",
+                one.residual,
+                one.coboundary_reading,
+                one.surface
+            );
+        }
+        // The falsifier must be able to fail: some closed boundary must carry a non-zero residual,
+        // or the identity is being checked on `0 = 0` everywhere.
+        assert!(differentiated
+            .iter()
+            .any(|one| one.residual != BigInt::from(0)));
+    }
+
+    #[test]
+    fn differentiation_returns_exactly_what_closure_departed() {
+        let complex = complex();
+        let chart = PhaseChart::WindingAdjacent;
+        let emissions = complex.hand_up(chart).unwrap();
+        let differentiated = complex.differentiate_all(chart).unwrap();
+        assert_eq!(emissions.len(), differentiated.len());
+        for (emission, one) in emissions.iter().zip(differentiated.iter()) {
+            let departed = emission
+                .residual
+                .departed_contacts
+                .iter()
+                .cloned()
+                .collect::<BTreeSet<_>>();
+            let restored = one
+                .reexposed
+                .iter()
+                .map(|contact| format!("{} ⟶ {}", contact.from, contact.to))
+                .collect::<BTreeSet<_>>();
+            assert_eq!(departed, restored, "on {:?}", one.surface);
+        }
+    }
+
+    #[test]
+    fn the_two_cycle_bases_agree_on_the_image_of_the_holonomy_homomorphism() {
+        // The bases differ — this module's fundamental cycles and `found_potential_in`'s spanning
+        // forest are built independently — so what must agree is the subgroup of ℤ they generate,
+        // never the basis. A basis is a receiver-visible coordinate.
+        let complex = complex();
+        let group = CoefficientGroup::Integers;
+        let chords = complex.chord_population(&group).unwrap();
+        let module = complex.holonomy_image(PhaseChart::WindingAdjacent).unwrap();
+        assert_eq!(chords.cycle_rank, complex.compounds().len());
+        assert_eq!(module, chords.image);
+        assert_ne!(module, BigInt::from(0));
+    }
+
+    #[test]
+    fn the_residual_of_a_combination_is_linear() {
+        let complex = complex();
+        let differentiated = complex.differentiate_all(PhaseChart::WindingAdjacent).unwrap();
+        assert!(differentiated.len() >= 2);
+        for left in 0..differentiated.len() {
+            for right in (left + 1)..differentiated.len() {
+                let difference = complex
+                    .residual_of_combination(&[(left, 1), (right, -1)])
+                    .unwrap();
+                assert_eq!(
+                    difference,
+                    &differentiated[left].residual - &differentiated[right].residual
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn a_later_arrival_changes_a_named_earlier_compound() {
+        let complex = complex();
+        let chart = PhaseChart::WindingAdjacent;
+        let group = CoefficientGroup::Integers;
+        let arrival = DeclaredOccurrence {
+            identity: "arrival".to_owned(),
+            storage_ordinal: 7,
+            caused_by: BTreeSet::from(["a".to_owned()]),
+            text: "the bends carry arc the".to_owned(),
+        };
+        let response = complex.admit_later(&arrival, chart, &group).unwrap();
+        assert!(response.arrival_is_co_present);
+        assert_eq!(response.arrival_rank, 1);
+        assert!(!response.reached.is_empty());
+        assert!(!response.reopened.is_empty());
+        assert!(!response.saturated.is_empty());
+        assert!(!response.untouched.is_empty());
+
+        // A closed boundary is permanent: adding cells to a graph never destroys a cycle. This is
+        // a theorem and it is checked rather than assumed.
+        assert!(response.no_closed_boundary_moved());
+        assert!(response.dissolved.is_empty());
+        // And the region grew: closed boundaries exist that did not before.
+        assert!(!response.founded.is_empty());
+        // What DID move on a named standing compound is its valence, and the law predicts it
+        // exactly.
+        assert!(response.verdicts.iter().any(|verdict| verdict.valence_moved));
+        let (right, wrong) = response.valence_law_agreement();
+        assert_eq!(wrong, 0, "the valence law was wrong {wrong} times");
+        assert_eq!(right, response.verdicts.len());
+    }
+
+    #[test]
+    fn withdrawing_the_arrival_restores_the_original_bit_exactly() {
+        let complex = complex();
+        let chart = PhaseChart::WindingAdjacent;
+        let group = CoefficientGroup::Integers;
+        let arrival = DeclaredOccurrence {
+            identity: "arrival".to_owned(),
+            storage_ordinal: 7,
+            caused_by: BTreeSet::from(["a".to_owned()]),
+            text: "the bends carry arc the".to_owned(),
+        };
+        let response = complex.admit_later(&arrival, chart, &group).unwrap();
+        assert_ne!(response.before, response.after);
+        let withdrawn = response.complex.withdraw(&response.trace).unwrap();
+        assert_eq!(withdrawn.sites().len(), complex.sites().len());
+        assert_eq!(withdrawn.bonds().len(), complex.bonds().len());
+        assert_eq!(withdrawn.hand_up(chart).unwrap(), response.before);
+        // The withdrawal is an inverse on the admitted complex, so a retained multiplicity would
+        // show up here and nowhere else.
+        assert!(!response.trace.bond_multiplicity_delta.is_empty());
+        for (at, delta) in &response.trace.bond_multiplicity_delta {
+            assert_eq!(
+                withdrawn.bonds()[*at].multiplicity + delta,
+                response.complex.bonds()[*at].multiplicity
+            );
+        }
+    }
+
+    #[test]
+    fn a_saturated_compound_is_reached_and_hands_forward_nothing() {
+        // The control: the closed boundary's residual is exactly zero, the arrival reaches it with
+        // genuinely new cells, and the cycle it founds through the compound carries the compound's
+        // whole contribution — which is nothing.
+        let material = vec![DeclaredOccurrence {
+            identity: "saturated".to_owned(),
+            storage_ordinal: 0,
+            caused_by: BTreeSet::new(),
+            text: "ab cc ab".to_owned(),
+        }];
+        let complex = IncidenceComplex::found(&material, 8).unwrap();
+        let chart = PhaseChart::WindingAdjacent;
+        let group = CoefficientGroup::Integers;
+        let differentiated = complex.differentiate_all(chart).unwrap();
+        assert_eq!(differentiated.len(), 1);
+        assert_eq!(differentiated[0].residual, BigInt::from(0));
+        assert!(differentiated[0].holonomy_is_flat());
+        assert!(differentiated[0].is_saturated(&group));
+
+        let arrival = DeclaredOccurrence {
+            identity: "saturated:arrival".to_owned(),
+            storage_ordinal: 1,
+            caused_by: BTreeSet::new(),
+            text: "ab ee cc ab".to_owned(),
+        };
+        let response = complex.admit_later(&arrival, chart, &group).unwrap();
+        assert_eq!(response.reached.len(), 1);
+        assert!(response.reopened.is_empty(), "a saturated compound reopened");
+        assert_eq!(response.saturated.len(), 1);
+        assert!(response.no_closed_boundary_moved());
+
+        // The transport half: `r(Σ' − Σ) = r(Σ') − 0 = r(Σ')`, with `r(Σ')` non-zero so the
+        // statement is visible rather than `0 = 0`.
+        let admitted = response.complex.differentiate_all(chart).unwrap();
+        let standing = admitted
+            .iter()
+            .position(|one| one.residual == BigInt::from(0))
+            .expect("the saturated compound survives");
+        let founded = admitted
+            .iter()
+            .position(|one| one.residual != BigInt::from(0))
+            .expect("the arrival founded a cycle with a residual");
+        let difference = response
+            .complex
+            .residual_of_combination(&[(founded, 1), (standing, -1)])
+            .unwrap();
+        assert_eq!(difference, admitted[founded].residual);
+        assert_ne!(difference, BigInt::from(0));
+    }
+
+    #[test]
+    fn the_causally_later_arrival_reaches_only_along_the_dependency_relation() {
+        let complex = complex();
+        let chart = PhaseChart::WindingAdjacent;
+        let group = CoefficientGroup::Integers;
+        let arrival = DeclaredOccurrence {
+            identity: "later".to_owned(),
+            storage_ordinal: 400,
+            caused_by: BTreeSet::from(["c".to_owned()]),
+            text: "the channel returns the arc".to_owned(),
+        };
+        let response = complex.admit_later(&arrival, chart, &group).unwrap();
+        assert!(!response.arrival_is_co_present);
+        assert_eq!(response.arrival_rank, 3);
+        assert!(response.new_dependencies > 0, "no ⪯ edge reached back");
+        assert!(response.no_closed_boundary_moved());
+        assert!(response.verdicts.iter().any(|verdict| verdict.valence_moved));
+        let (_, wrong) = response.valence_law_agreement();
+        assert_eq!(wrong, 0);
+    }
+
+    #[test]
+    fn an_arrival_naming_a_cause_outside_the_family_is_refused() {
+        let complex = complex();
+        let arrival = DeclaredOccurrence {
+            identity: "orphan".to_owned(),
+            storage_ordinal: 0,
+            caused_by: BTreeSet::from(["not-in-the-family".to_owned()]),
+            text: "the leader".to_owned(),
+        };
+        assert!(matches!(
+            complex.arrival_rank(&arrival),
+            Err(IncidenceProductionError::ArrivalCauseIsOutsideTheFamily(_))
+        ));
+    }
+
+    #[test]
+    fn the_causal_rank_guard_refuses_nothing_the_boundaries_would_have_admitted() {
+        // The tower's ceiling is not the `⪯` guard on this material, and that is a measurement
+        // rather than an assumption. `would_bond_across_rank` is the counterfactual: pairs the
+        // guard refused before looking, which the boundary test would have admitted.
+        let complex = complex();
+        let census = complex.next_grain_census();
+        assert!(census.refused_by_causal_rank > 0, "the guard never fired");
+        assert_eq!(census.would_bond_across_rank, 0);
+        assert_eq!(
+            census.same_rank + census.refused_by_causal_rank,
+            census.pairs_considered
+        );
+        assert_eq!(census.bonded + census.refused_unbonded, census.same_rank);
     }
 
     #[test]

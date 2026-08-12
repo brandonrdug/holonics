@@ -29,6 +29,12 @@ pub mod holonic_training;
 pub mod incidence_production;
 pub mod laboratory_language;
 pub mod lean_mathematics;
+// The source-native oriented incidence atlas each material already carries, handed to
+// `incidence_production`'s complex through one intake seam rather than as byte patches. It lives
+// here because it consumes `holonic-engine`'s Lean reader, `laboratory_language`'s Rust sectioner
+// and `incidence_production`'s complex at once, and only `life` depends on all three.
+// `research/records/2026-07-19_THE_INCIDENCE_REACTS_THE_COMPOUND_EXPOSES_ITS_BOUNDARY_THE_REGION_CARRIES_THE_FIELD.md` §I.
+pub mod material_incidence;
 pub mod live_current_cuda;
 pub mod morphological_language;
 pub mod relational_language;
