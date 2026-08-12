@@ -4,22 +4,26 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-11 at `a51e529`, after the six-plan wave and its repair. The sealed corpus is
+**Currency:** 2026-08-12 after the resident bounded recurrent-section return. Brandon's apparatus
+correction terminated the attempted host full-corpus work run without a grade. Returns 2–3 of the
+authorized construction now stand on the mandatory generic CUDA quotient; returns 1 and 4 remain
+open because the five suffix charts and question-prefix atlas do not yet have a mandatory resident
+conditioner. The sealed corpus is
 `a6fb9343b4fb23399ddf50fb0769465e29a311889c49b0afa307a8d26739e971` — **the first corpus in this
 project's history that carries no coordinate of the machine that sealed it.** The addresses in the
 paragraph this replaces (`28028c1`, rest `45084ed2…`, grade `8125caa2…`) are the **superseded**
 host-dependent seal and are retained on disk as the before-arm of that repair. **Body:** Rust. The
 C++/CUDA engine under `archive/cpp-engine/` governs nothing.
 
-**Gates re-taken at `a51e529`:** `cargo test --workspace` **2,120 passed, 0 failed, 17 ignored**
-summed over 42 `test result:` lines; `tools/gates.sh` **8 of 9** — tests, authored levels (0
-failures), named paths (0 over 1,452 tokens), claim index, **output-manifest 0 departed / 0 moved /
-0 unrecorded**, boundary artifacts (all agree, including the closure member that was invisible
-because it was untracked), ten Typst roots, and the ownership ratchet, **clean over 198 files,
-18,788 inherited occurrences, 0 retired**, its baseline re-emitted from a detached worktree of the
-commit. `closure-manifest` is the ninth and reddens whenever a `soma/life` driver is edited; it is
-current as of this writing and will move again under live work, which is the documented dirty-tree
-behaviour and not a claim about the code.
+**Gates re-taken at `d4e5f13`:** `cargo test --workspace` **2,179 passed, 0 failed, 18 ignored**
+summed over 42 `test result:` lines; `tools/gates.sh` **9 of 9** — authored levels (0 failures),
+named paths (0 failures over 1,485 tokens), current claim index, **output-manifest 0 departed / 0
+moved / 0 unrecorded**, current closure manifest, three boundary artifacts, ten Typst roots, and the
+ownership ratchet **clean over 206 files, 19,516 inherited occurrences, 0 retired**, its baseline
+re-emitted from the committed implementation. The two required CUDA gates were also run directly:
+the generic quotient agreed with the host partition over extents through 40,000 cells, the complete
+section reading agreed with the host admission reading, and compute-sanitizer reported zero errors
+for the release production deed.
 
 ---
 
@@ -195,7 +199,35 @@ and a test proves it does.
 refuses; that refusal is unnamed on the device side (one `None` for ~20 agreements) and is being
 repaired, and it is an operator defect in a membrane's reporting, not a limit of the carrier.
 
-## THE OPEN LINE — the cost law is owed, and it is not a ceiling
+## THE BOUNDED RECURRENT SECTION STANDS — the contact crosses and conduct founds the class
+
+**Truth status:** `established-bounded`. **Evidence:** `implemented-exact`,
+`computational-witness`. **Owners:** `incidence_production::DeclaredContactFace`,
+`causal_section::CausalSectionEcology`, `receiver_exact_compression::compress_on_device`, and the
+shared `cuda_refine::claim_identities` quotient. **Driver:**
+`soma/life/examples/the_operation_survives_the_codec.rs`. **Passing grade:**
+`output/the_operation_survives_the_codec/causal-section-grade-dd936adf….form`.
+
+Seven exterior presentations found 28 exact consequence states. Value-only reading returned root
+block sizes `[2,5]`; complete receiver/history conduct returned `[1,1,2,3]`: three sum codecs in one
+fiber, two product codecs in another, and the two subtraction hands distinct. `raise-left` is the
+one-step witness both for sum versus same-value product and for the reversed noncommuting port.
+Ablating `value` coarsens to one seven-member block; renaming every surface preserves the complete
+shape; every contact face survives; no material label governs; no reconstruction representative is
+selected; the outside population remains OPEN.
+
+Production has no host reading default. The RTX 4080 SUPER returned the quotient in 34 launches at
+the device/kernel-derived 1,024 threads per block, with `host_semantic_replay: false`.
+Compute-sanitizer reported zero errors, and a separate ignored apparatus test returned the complete
+host admission reading exactly. The first real launch repaired a SIMT deadlock and a release-only
+CUDA argument-lifetime defect in the generic quotient rather than growing a section-specific
+kernel.
+
+**The bound:** the consequence sections are exterior fixtures. This result does not infer
+arithmetic from the corpus, condition reusable mixed-corpus morphology, or establish detached
+remount and attributable ablation.
+
+## THE OPEN LINE — the mandatory resident morphological conditioner is owed
 
 **Production now rides plural-source conduct. The line that was open here is closed** and the deed
 is recorded below under "The deposit licenses the re-emission". The falsifier this section demanded
@@ -204,8 +236,12 @@ fired on two independent families and was reproduced by a second reader:
 deposits, the withheld fiber retained and never emitted, targeted ablation removing exactly what its
 deposit **solely** licensed, and full ablation restoring the enumeration bit-exactly.
 
-**Truth status:** `open`. **Next deed:** the work law of
-`MorphologicalLanguageEcology::condition`, counted and not timed.
+**Truth status:** `open`. **Next deed:** returns 1 and 4 of the recurrent-section construction in
+`blueprint/THE_ROADMAP.md` §"THE RECURRENT-SECTION CONSTRUCTION", under its apparatus correction.
+Build the concrete `CudaMorphologicalConditioner`; it must found the five suffix charts and
+question-prefix incidence on the resident device, refuse rather than fall back, return counted
+semantic work separately from apparatus telemetry, and agree with the host conditioner only in an
+offline admission gate. Then condition, detach, remount, and ablate the recurrent section.
 
 **Why this is the line.** Three reports in one day — two agents and this file's author — named
 `condition` a wall using **elapsed time**. `CLAUDE.md` §8 forbids exactly that: *a cost is measured

@@ -5,12 +5,15 @@
 `proved-standard` for the finite linear-algebra, derivative, similarity, and finite behavioral
 equivalence statements in their stated scopes; `interpretation` for the correspondence with
 contemporary machine-learning architecture; `project-postulate` for the construction discipline;
-`open` for the unbuilt carrier-neutral section join.  
+`established-bounded [implemented-exact]` for the finite carrier-neutral section join; `open` for
+mixed-corpus conditioning, detached remount, and attributable recurrence through that join.
 **Governing documents:** `canon/THE_HOLOBROCHOS_SPINE.md`,
 `canon/TABLET_THE_OPERATIONS.md`, `canon/TABLET_THE_RESONANCE.md`, and
 `canon/01_CAUSAL_CALCULUS.md`.  
 **Evidentiary deposit:**
 `research/records/2026-08-12_THE_PRETRAINED_TRANSFORMER_IS_ONE_TRANSPORT_ORGAN_THE_REASONING_MACHINE_IS_THE_RETURNING_ECOLOGY.md`.  
+**Construction evidence:**
+`research/records/2026-08-12_THE_CONTACT_FACE_CROSSES_THE_BOND_CONDUCT_NOT_THE_CODEC_FOUNDS_THE_SECTION_CLASS.md`.
 **Construction status:** doctrine only. This tablet schedules no deed and does not alter
 `CONSTRUCTION_STATE.md`.
 
@@ -262,11 +265,23 @@ trace is one chart of that current, not the mechanism. Simulating an algorithm m
 state-transition complex and retaining the intermediate transport, invariant, and obstruction;
 describing the simulation in English is a later codec projection.
 
-`open`: the live body has many of these owners separately. It does not yet have one carrier-neutral
-join which preserves contact species through transport and composes multigrain exposure,
-reconstruction fibers, exact consequence, behavioral compression, world return, and attributable
-reflection. The smallest later owner is that join—not a new Transformer, Reasoner, Planner,
-Conversation, Expert, or Language subsystem.
+`established-bounded [implemented-exact]`: the live body now has the finite constitutive seam.
+`DeclaredContactFace` survives on every admitted bond as exterior lineage, while
+`CausalSectionEcology` classifies roots only through exact receiver observations and complete
+successor histories. Its production read requires the resident generic CUDA quotient; the host
+reader exists only under test as an admission reference. On seven declared presentations, 34 exact
+device launches return three sum codecs in one stable fiber, two product codecs in another,
+one-step separators for same-value/different-law and reversed-port controls, receiver-ablation
+coarsening, renaming invariance, exact work, and the open exterior. Compute-sanitizer returns zero
+errors and the complete semantic reading equals the independent host admission reading. The
+complete receipt and boundary are in the construction-evidence record above.
+
+`open`: the section consequence complexes in that bounded experiment are exterior fixtures. The
+live body has not yet conditioned this law through the mixed corpus, detached the founding
+material, remounted the resulting morphology, or returned an attributable later classification
+and ablation. It therefore does not yet compose multigrain exposure, world return, and reflection
+into one recurrent corpus-trained ecology. That missing return is not a new Transformer, Reasoner,
+Planner, Conversation, Expert, or Language subsystem.
 
 ## 9. Construction discipline and falsifiers
 
