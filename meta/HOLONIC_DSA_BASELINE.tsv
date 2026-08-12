@@ -143,6 +143,7 @@ soma/life/src/coupled_informant_current.rs	.clone()=2	.collect()=2	.flat_map()=1
 soma/life/src/current_world.rs	.clone()=6	.flat_map()=1	.into_iter()=2	Vec=21
 soma/life/src/decomposing_codec.rs	.clone()=21	.collect()=40	.into_iter()=7	BTreeMap=7	BTreeSet=34	Vec=100
 soma/life/src/dialogue_lineage.rs	.clone()=10	.collect()=2	BTreeSet=4	Vec=4
+soma/life/src/exposure_codec.rs	.clone()=2	.collect()=23	.into_iter()=3	BTreeMap=17	BTreeSet=28	HashMap=4	Vec=51
 soma/life/src/form_mouth.rs	.clone()=3	.collect()=3	Vec=4
 soma/life/src/holonic_training.rs	.clone()=34	.collect()=11	.into_iter()=2	BTreeMap=15	BTreeSet=14	Vec=49
 soma/life/src/incidence_production.rs	.clone()=48	.collect()=23	.into_iter()=2	BTreeMap=19	BTreeSet=28	Vec=113	VecDeque=1
