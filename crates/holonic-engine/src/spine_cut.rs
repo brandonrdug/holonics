@@ -66,12 +66,13 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use num_traits::{One, Zero};
+use num_traits::{One, Signed, Zero};
 use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use crate::algebraic::{CausalCell, CausalCellId, CausalChain, GradedCausalComplex};
+use crate::inertia::{inertia, InertiaError, SymmetricForm};
 use crate::running_integral::PotentialSearch;
 use crate::VertexId;
 
@@ -170,6 +171,46 @@ pub enum SpineCutError {
     /// returning zero would read an unvisited component as one that accumulated nothing.
     #[error("the potential search never reached {0:?}, so its q is undefined rather than zero")]
     EndpointNotReached(CausalCellId),
+    /// **A declared transfer whose population the material does not carry.** Refused rather than
+    /// read as zero, for the same reason [`SpineCutError::EndpointNotReached`] is: an absent count
+    /// and a count of nothing are different readings, and only one of them says the loop closed.
+    #[error(
+        "the transfer {name} names a population the material does not carry, and an absent count \
+         is not a count of zero"
+    )]
+    PopulationNotCarried { edge: EdgeId, name: String },
+    /// An attention reading whose weight and value tables do not meet: `weights` is
+    /// `queries × keys` and `values` is `keys × extent`, and both must agree on the key count.
+    #[error(
+        "the head's tables do not meet: {queries} queries by {keys} keys against {rows} value rows"
+    )]
+    HeadTablesDoNotMeet {
+        queries: usize,
+        keys: usize,
+        rows: usize,
+    },
+    /// The declared sink is not a position of the head.
+    #[error("position {0} is not a position of this head, so it cannot be the declared sink")]
+    PositionOutsideTheHead(usize),
+    /// An attention row that does not sum to one. Refused rather than normalized: a row that is not
+    /// stochastic is not an attention distribution, and normalizing it here would author the
+    /// material the classification is read off.
+    #[error("attention row {query} sums to {total}, and an attention row is stochastic")]
+    AttentionRowIsNotStochastic { query: usize, total: Rat },
+    /// No read position was declared, so the delivery load would be empty and the short-circuit cut
+    /// vacuous — the same refusal [`SpineCutError::LoadNotDeclared`] carries, one level up.
+    #[error("no read position was declared, so the head's delivery load would be vacuous")]
+    ReadPositionsNotDeclared,
+    /// **The declared species is not the species the diagnostics read.** This is the refusal the
+    /// mislabelled control fires: a classifier that cannot disagree with its label has classified
+    /// nothing.
+    #[error("the head was declared {declared:?} and its diagnostics read {read:?}")]
+    SinkSpeciesRefuted {
+        declared: SinkSpecies,
+        read: SinkReading,
+    },
+    #[error(transparent)]
+    Inertia(#[from] InertiaError),
 }
 
 /// One oriented edge of the chain: `tail → head`.
@@ -403,6 +444,458 @@ pub fn name_the_cut(
     Ok(SpineCut::Circulation {
         crossed,
         divergence: reading.divergence(),
+    })
+}
+
+// ---------------------------------------------------------------------------------------------
+// the counted mouth — a chain whose current is a population a receipt states
+// ---------------------------------------------------------------------------------------------
+
+/// One declared transfer between two counted stations.
+///
+/// The **stations and the edges between them are the caller's declared reading**; the population is
+/// the material's. That split is the whole discipline of this mouth: a reading that both declares
+/// the structure and supplies the numbers has measured nothing.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CountedTransfer {
+    pub id: EdgeId,
+    pub tail: VertexId,
+    pub head: VertexId,
+    /// What the caller calls this transfer, used only to name a refusal.
+    pub name: String,
+    /// The population the material states this transfer carried. `None` is a refusal, never a zero.
+    pub population: Option<Rat>,
+}
+
+/// **A chain reading whose current is a counted population, refusing an absent count by name.**
+///
+/// [`read_the_chain`] reads a current off a [`CausalChain`] the body already carries. This is the
+/// other mouth: material that states its own populations — a sealed receipt, a census, a returned
+/// ledger — where the chain is a reading *of* those numbers and the closure is a question about
+/// them.
+///
+/// The refusal is the point. A station whose figure the receipt does not carry must not enter as a
+/// zero, because a zero is a claim that nothing crossed and an absence is a claim that nothing is
+/// known. Reading the second as the first is how a chain comes out closed for want of a field, and
+/// it is the same defect [`SpineCutError::EndpointNotReached`] already refuses one level down.
+///
+/// The residual is computed, never declared, exactly as in [`read_the_chain`].
+pub fn read_counted_transfers(
+    transfers: impl IntoIterator<Item = CountedTransfer>,
+    potential_change: Rat,
+) -> Result<ChainReading, SpineCutError> {
+    let mut edges = Vec::new();
+    let mut current = BTreeMap::new();
+    for transfer in transfers {
+        let population = transfer.population.ok_or(SpineCutError::PopulationNotCarried {
+            edge: transfer.id,
+            name: transfer.name.clone(),
+        })?;
+        edges.push(ChainEdge {
+            id: transfer.id,
+            tail: transfer.tail,
+            head: transfer.head,
+        });
+        current.insert(transfer.id, population);
+    }
+    let mut reading = ChainReading {
+        edges,
+        current,
+        residual: BTreeMap::new(),
+        potential_change,
+    };
+    reading.residual = reading.divergence();
+    Ok(reading)
+}
+
+// ---------------------------------------------------------------------------------------------
+// the exterior control — an attention sink as a named cut
+// ---------------------------------------------------------------------------------------------
+
+/// The two published sink species, `canon/THE_CORRESPONDENCE_ATLAS.md` §4 *"the sink as a named
+/// cut"*.
+///
+/// - **`Nop`** — `arXiv:2605.08453`, which proves a sink is a **hard attention switch**: attention
+///   concentrates on a null position whose value contributes nothing, and the head's output is
+///   identically zero. Nothing is transported.
+/// - **`Broadcast`** — `arXiv:2606.08105`: the sink **aggregates** from the context and
+///   **redistributes** the aggregate to the queries, which is why the outputs come out low rank.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum SinkSpecies {
+    Nop,
+    Broadcast,
+}
+
+/// What the two structural diagnostics read, **including the refusal to name a species**.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum SinkReading {
+    Species(SinkSpecies),
+    /// The diagnostics match neither published species, and the reason is named. A classifier with
+    /// no such return would assign one of two labels to every head it was ever handed, which is a
+    /// check whose material cannot vary the property under test.
+    Neither { why: &'static str },
+}
+
+/// **The two published diagnostics, and nothing else.**
+///
+/// The falsifier the atlas row states is that the species must be separated *from value-norm and
+/// output-rank readings alone*. Both are here, both exact:
+///
+/// - **the value mass** `Σ_i |v[i]|`, the `ℓ¹` norm. `ℓ²` is used in the papers and is not rational,
+///   and the diagnostic only ever asks whether the norm is **negligible** — which for an exact
+///   carrier means zero, and zero is the same set in every norm. So `ℓ¹` loses nothing the
+///   diagnostic uses and keeps the reading exact.
+/// - **the output rank** of `O = A·V`, computed as the rank of `OᵀO` by [`crate::inertia`]'s exact
+///   elimination. `rank(OᵀO) = rank(O)` over an ordered field, so no separate rank organ is founded.
+///
+/// [`SinkDiagnostics::full_rank_bound`] is `min(queries, value extent)` — read off the material —
+/// so "low rank" is a strict inequality against what this head could have reached and never against
+/// an authored level.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct SinkDiagnostics {
+    pub sink: usize,
+    /// `‖v_sink‖₁`. The nop diagnostic is that this is negligible.
+    pub sink_value_mass: Rat,
+    /// `‖v_k‖₁` at every position, so a reader can see the sink against its context rather than
+    /// alone.
+    pub value_masses: Vec<Rat>,
+    /// `rank(A·V)`. The broadcast diagnostic is that this is strictly below the bound.
+    pub output_rank: usize,
+    /// `min(queries, value extent)` — what this head's output could have reached.
+    pub full_rank_bound: usize,
+    /// The share of the whole attention mass that lands on the sink. A measurement, never a
+    /// decider: no branch below consults it.
+    pub attention_on_sink: Rat,
+}
+
+impl SinkDiagnostics {
+    /// **The species, from the two diagnostics alone.** No branch here reads the attention
+    /// concentration, the declared label, or the chain.
+    pub fn species(&self) -> SinkReading {
+        let silent = self.sink_value_mass.is_zero();
+        match (silent, self.output_rank) {
+            (true, 0) => SinkReading::Species(SinkSpecies::Nop),
+            (true, _) => SinkReading::Neither {
+                why: "the sink carries no value mass and the output is not identically zero",
+            },
+            (false, 0) => SinkReading::Neither {
+                why: "the sink carries value mass and the output is identically zero",
+            },
+            (false, rank) if rank < self.full_rank_bound => {
+                SinkReading::Species(SinkSpecies::Broadcast)
+            }
+            (false, _) => SinkReading::Neither {
+                why: "the output reaches the full rank this head could carry, so nothing is \
+                      redistributed through one position",
+            },
+        }
+    }
+}
+
+/// **One attention head's declared readings, exact over the rationals.**
+///
+/// A fixture, and it is declared material: the weights and the value vectors are the caller's, the
+/// classification is not. Construction refuses a table that does not meet, a row that is not
+/// stochastic, and an undeclared read set.
+///
+/// # The chain this becomes, and the one reading it declares
+///
+/// The incidence is the head's own connectivity — every ordered pair of distinct positions is an
+/// edge, whether or not it carries. Self-attention is **not** an edge: a cell whose two ends are
+/// one vertex has no tail and head, which [`oriented_ends`] already refuses one level down, and a
+/// position attending itself transports nothing between positions.
+///
+/// The current is the **transported value mass**, and the sink's two directions are read
+/// separately because they are two different transports:
+///
+/// ```text
+///   k -> sink     A[sink][k] · ‖v_k‖₁          what k contributes to the sink's aggregate
+///   sink -> q     γ_q · ‖v_sink‖₁              q's SHARE of the sink's value mass,
+///                   γ_q = A[q][sink] / Σ_p A[p][sink]
+///   k -> q        A[q][k] · ‖v_k‖₁             direct transport between context positions
+/// ```
+///
+/// **The share is the reading, and it is declared rather than obvious.** A broadcast fans **one**
+/// object out to many receivers; counting the copies would make every fan-out a source and every
+/// broadcast a leak by arithmetic rather than by the material. The share is the receiver-relative
+/// reading in which the hub conserves, and its total out is `‖v_sink‖₁` exactly once. The other
+/// reading — copies — is lawful and is a different receiver; it is named here so that the choice is
+/// visible instead of built in.
+///
+/// # What closure then means, and it is a property of the head rather than of this code
+///
+/// Under that reading the divergence at the sink is `Σ_k A[sink][k]‖v_k‖₁ − ‖v_sink‖₁`, which
+/// vanishes exactly when the sink's value carries the mass it aggregated; and at a context position
+/// it vanishes exactly when the share it receives back equals what it contributed. Those two
+/// conditions **are** *"aggregates and redistributes"*, stated so they can fail — and a head that
+/// fails either is a **leak**, with the source and the sink named. That is the honest reading of a
+/// general head: content enters and leaves a layer, and only the two sink species close.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct AttentionHead {
+    weights: Vec<Vec<Rat>>,
+    values: Vec<Vec<Rat>>,
+    sink: usize,
+    read: BTreeSet<usize>,
+}
+
+impl AttentionHead {
+    /// Declare a head. `weights` is `positions × positions`, row-stochastic; `values` is
+    /// `positions × extent`; `read` is the population of query positions whose output the caller
+    /// actually consumes, which is what the delivery load is built from.
+    pub fn declare(
+        weights: Vec<Vec<Rat>>,
+        values: Vec<Vec<Rat>>,
+        sink: usize,
+        read: impl IntoIterator<Item = usize>,
+    ) -> Result<Self, SpineCutError> {
+        let positions = weights.len();
+        let keys = weights.first().map_or(0, Vec::len);
+        if keys != positions || values.len() != positions {
+            return Err(SpineCutError::HeadTablesDoNotMeet {
+                queries: positions,
+                keys,
+                rows: values.len(),
+            });
+        }
+        let extent = values.first().map_or(0, Vec::len);
+        for row in &values {
+            if row.len() != extent {
+                return Err(SpineCutError::HeadTablesDoNotMeet {
+                    queries: positions,
+                    keys,
+                    rows: values.len(),
+                });
+            }
+        }
+        for (query, row) in weights.iter().enumerate() {
+            if row.len() != positions {
+                return Err(SpineCutError::HeadTablesDoNotMeet {
+                    queries: positions,
+                    keys: row.len(),
+                    rows: values.len(),
+                });
+            }
+            let total = row.iter().fold(Rat::zero(), |sum, weight| sum + weight);
+            if total != Rat::one() {
+                return Err(SpineCutError::AttentionRowIsNotStochastic { query, total });
+            }
+        }
+        if sink >= positions {
+            return Err(SpineCutError::PositionOutsideTheHead(sink));
+        }
+        let read: BTreeSet<usize> = read.into_iter().collect();
+        if read.is_empty() {
+            return Err(SpineCutError::ReadPositionsNotDeclared);
+        }
+        if let Some(outside) = read.iter().find(|position| **position >= positions) {
+            return Err(SpineCutError::PositionOutsideTheHead(*outside));
+        }
+        Ok(Self { weights, values, sink, read })
+    }
+
+    pub fn positions(&self) -> usize {
+        self.weights.len()
+    }
+
+    pub const fn sink(&self) -> usize {
+        self.sink
+    }
+
+    /// `‖v_k‖₁`, exactly.
+    pub fn value_mass(&self, position: usize) -> Result<Rat, SpineCutError> {
+        let row = self
+            .values
+            .get(position)
+            .ok_or(SpineCutError::PositionOutsideTheHead(position))?;
+        Ok(row
+            .iter()
+            .fold(Rat::zero(), |sum, entry| sum + entry.abs()))
+    }
+
+    /// `O = A·V`, exactly.
+    pub fn output(&self) -> Vec<Vec<Rat>> {
+        let extent = self.values.first().map_or(0, Vec::len);
+        self.weights
+            .iter()
+            .map(|row| {
+                (0..extent)
+                    .map(|column| {
+                        row.iter().zip(&self.values).fold(
+                            Rat::zero(),
+                            |sum, (weight, value)| sum + weight * &value[column],
+                        )
+                    })
+                    .collect()
+            })
+            .collect()
+    }
+
+    /// `rank(O)`, by `rank(OᵀO)` through the exact inertia elimination.
+    pub fn output_rank(&self) -> Result<usize, SpineCutError> {
+        let output = self.output();
+        let extent = output.first().map_or(0, Vec::len);
+        let gram: Vec<Vec<Rat>> = (0..extent)
+            .map(|left| {
+                (0..extent)
+                    .map(|right| {
+                        output.iter().fold(Rat::zero(), |sum, row| {
+                            sum + &row[left] * &row[right]
+                        })
+                    })
+                    .collect()
+            })
+            .collect();
+        Ok(inertia(&SymmetricForm::from_rows(gram)?).rank())
+    }
+
+    /// The two diagnostics, together with the measurements a reader needs to see them in context.
+    pub fn diagnose(&self) -> Result<SinkDiagnostics, SpineCutError> {
+        let positions = self.positions();
+        let value_masses = (0..positions)
+            .map(|position| self.value_mass(position))
+            .collect::<Result<Vec<Rat>, SpineCutError>>()?;
+        let attention_on_sink = self
+            .weights
+            .iter()
+            .fold(Rat::zero(), |sum, row| sum + &row[self.sink])
+            / Rat::from_integer(num_bigint::BigInt::from(positions as i64));
+        Ok(SinkDiagnostics {
+            sink: self.sink,
+            sink_value_mass: value_masses[self.sink].clone(),
+            value_masses,
+            output_rank: self.output_rank()?,
+            full_rank_bound: positions.min(self.values.first().map_or(0, Vec::len)),
+            attention_on_sink,
+        })
+    }
+
+    /// The identity of the edge `tail → head`, in this head's own numbering.
+    pub fn edge(&self, tail: usize, head: usize) -> EdgeId {
+        EdgeId((tail * self.positions() + head) as u64)
+    }
+
+    /// **The delivery load**: every edge whose head is a declared read position. That is what the
+    /// head exists to do — deliver content to the positions someone consumes — and it is read off
+    /// the declaration rather than inferred from where the current happened to go.
+    pub fn delivery_load(&self) -> BTreeSet<EdgeId> {
+        let positions = self.positions();
+        let mut load = BTreeSet::new();
+        for tail in 0..positions {
+            for head in &self.read {
+                if tail != *head {
+                    load.insert(self.edge(tail, *head));
+                }
+            }
+        }
+        load
+    }
+
+    /// The chain reading. See this type's head for what the current is and why.
+    pub fn read_the_head(&self) -> Result<ChainReading, SpineCutError> {
+        let positions = self.positions();
+        let masses = (0..positions)
+            .map(|position| self.value_mass(position))
+            .collect::<Result<Vec<Rat>, SpineCutError>>()?;
+        let attending_the_sink = (0..positions)
+            .filter(|query| *query != self.sink)
+            .fold(Rat::zero(), |sum, query| {
+                sum + &self.weights[query][self.sink]
+            });
+
+        let mut edges = Vec::new();
+        let mut current = BTreeMap::new();
+        for tail in 0..positions {
+            for head in 0..positions {
+                if tail == head {
+                    continue;
+                }
+                let flow = if tail == self.sink {
+                    // The share, never a copy: `γ_q · ‖v_sink‖₁`.
+                    if attending_the_sink.is_zero() {
+                        Rat::zero()
+                    } else {
+                        &self.weights[head][self.sink] / &attending_the_sink * &masses[self.sink]
+                    }
+                } else {
+                    &self.weights[head][tail] * &masses[tail]
+                };
+                let id = self.edge(tail, head);
+                edges.push(ChainEdge {
+                    id,
+                    tail: VertexId(tail as u64),
+                    head: VertexId(head as u64),
+                });
+                if !flow.is_zero() {
+                    current.insert(id, flow);
+                }
+            }
+        }
+        let mut reading = ChainReading {
+            edges,
+            current,
+            // **No storage term.** A single head's attention map does not carry the residual stream,
+            // which is where a transformer stores, so declaring a `q_n − q_m` here would be the
+            // guess `potential_change` refuses to make. The accumulation cut is therefore not
+            // reachable on this material, and that is a property of the material.
+            residual: BTreeMap::new(),
+            potential_change: Rat::zero(),
+        };
+        reading.residual = reading.divergence();
+        Ok(reading)
+    }
+}
+
+/// What classifying one head returns: the species the diagnostics read, the cut the chain is at,
+/// and the diagnostics themselves.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct SinkVerdict {
+    pub read: SinkReading,
+    pub cut: SpineCut,
+    pub diagnostics: SinkDiagnostics,
+}
+
+impl SinkVerdict {
+    /// **Whether the cut and the species agree.** A nop transports nothing, so its cut is rest; a
+    /// broadcast transports through one position, so its cut is closed — circulation when the hub
+    /// reaches the declared load and a short circuit when it does not.
+    ///
+    /// This is a measured agreement between two independent readings of one head — the diagnostics
+    /// never see the chain and the chain never sees the diagnostics — so it can fail, which is what
+    /// makes it evidence.
+    pub fn agrees(&self) -> bool {
+        match (&self.read, &self.cut) {
+            (SinkReading::Species(SinkSpecies::Nop), SpineCut::Rest) => true,
+            (
+                SinkReading::Species(SinkSpecies::Broadcast),
+                SpineCut::Circulation { .. } | SpineCut::ShortCircuit { .. },
+            ) => true,
+            _ => false,
+        }
+    }
+}
+
+/// **Classify a head against the species it was declared to be, refusing a mislabel by name.**
+///
+/// The diagnostics are computed from the material and never consult `declared`; the declaration is
+/// compared afterwards. That order is the whole content: a classifier that read the label first
+/// could not disagree with it, and `CLAUDE.md` §8 — *a check whose material cannot vary the property
+/// under test is the same defect as a check that cannot fail* — convicts exactly that.
+pub fn classify_sink(
+    head: &AttentionHead,
+    declared: SinkSpecies,
+) -> Result<SinkVerdict, SpineCutError> {
+    let diagnostics = head.diagnose()?;
+    let read = diagnostics.species();
+    if read != SinkReading::Species(declared) {
+        return Err(SpineCutError::SinkSpeciesRefuted { declared, read });
+    }
+    let reading = head.read_the_head()?;
+    Ok(SinkVerdict {
+        cut: name_the_cut(&reading, &head.delivery_load())?,
+        read,
+        diagnostics,
     })
 }
 
@@ -747,6 +1240,356 @@ mod tests {
             assert_eq!(
                 read_the_chain(&complex, &walk(&[(a, 1)]), Rat::zero()),
                 Err(SpineCutError::UnknownEdge(EdgeId(a.0)))
+            );
+        }
+    }
+
+    // --- the counted mouth ------------------------------------------------------------------
+
+    mod counted {
+        use super::*;
+
+        fn transfer(id: u64, tail: u64, head: u64, population: Option<i64>) -> CountedTransfer {
+            CountedTransfer {
+                id: EdgeId(id),
+                tail: VertexId(tail),
+                head: VertexId(head),
+                name: format!("station {tail} -> station {head}"),
+                population: population.map(rat),
+            }
+        }
+
+        /// A counted loop that closes: what one station emits is what the next receives, and the
+        /// last returns to the first. The residual is computed from the declared reading, never
+        /// supplied.
+        #[test]
+        fn a_counted_loop_closes_when_the_populations_agree() {
+            let reading = read_counted_transfers(
+                [
+                    transfer(1, 1, 2, Some(223)),
+                    transfer(2, 2, 3, Some(223)),
+                    transfer(3, 3, 1, Some(223)),
+                ],
+                rat(0),
+            )
+            .expect("every population is carried");
+            assert!(reading.residual.values().all(Zero::is_zero));
+            let cut = name_the_cut(&reading, &BTreeSet::from([EdgeId(2)])).unwrap();
+            assert_eq!(cut.name(), "circulation j != 0");
+
+            // And a station that does not pass on what it received is a leak, named at the vertex.
+            let leaking = read_counted_transfers(
+                [
+                    transfer(1, 1, 2, Some(223)),
+                    transfer(2, 2, 3, Some(218)),
+                    transfer(3, 3, 1, Some(223)),
+                ],
+                rat(0),
+            )
+            .expect("every population is carried");
+            let cut = name_the_cut(&leaking, &BTreeSet::from([EdgeId(2)])).unwrap();
+            assert_eq!(cut.name(), "leak");
+            let SpineCut::Leak { at } = &cut else {
+                panic!("the source and the sink are exhibited");
+            };
+            assert_eq!(at.get(&VertexId(2)), Some(&rat(5)));
+        }
+
+        /// **An absent population is refused, never read as zero.** A receipt that does not carry a
+        /// figure is not a receipt that carries nothing crossing, and reading the second as the
+        /// first is how a chain comes out closed for want of a field.
+        #[test]
+        fn a_transfer_whose_population_the_material_does_not_carry_is_refused_by_name() {
+            let refusal = read_counted_transfers(
+                [transfer(1, 1, 2, Some(223)), transfer(2, 2, 1, None)],
+                rat(0),
+            );
+            match refusal {
+                Err(SpineCutError::PopulationNotCarried { edge, name }) => {
+                    assert_eq!(edge, EdgeId(2));
+                    assert_eq!(name, "station 2 -> station 1");
+                }
+                other => panic!("an absent population must refuse, returned {other:?}"),
+            }
+        }
+    }
+
+    // --- the exterior control: attention sinks ------------------------------------------------
+
+    mod the_sink {
+        use super::*;
+        use num_bigint::BigInt;
+
+        fn ratio(numerator: i64, denominator: i64) -> Rat {
+            Rat::new(BigInt::from(numerator), BigInt::from(denominator))
+        }
+
+        fn row(entries: &[(i64, i64)]) -> Vec<Rat> {
+            entries
+                .iter()
+                .map(|(numerator, denominator)| ratio(*numerator, *denominator))
+                .collect()
+        }
+
+        /// **The nop fixture.** Four positions, the sink at `3`. Every query routes its whole
+        /// attention to the sink; the sink is a null token that attends itself and carries no value
+        /// mass. `arXiv:2605.08453`: the output is identically zero.
+        fn nop() -> AttentionHead {
+            let to_sink = row(&[(0, 1), (0, 1), (0, 1), (1, 1)]);
+            AttentionHead::declare(
+                vec![to_sink.clone(), to_sink.clone(), to_sink.clone(), to_sink],
+                vec![
+                    row(&[(1, 1), (0, 1), (0, 1)]),
+                    row(&[(0, 1), (1, 1), (0, 1)]),
+                    row(&[(0, 1), (0, 1), (1, 1)]),
+                    row(&[(0, 1), (0, 1), (0, 1)]),
+                ],
+                3,
+                [0, 1, 2],
+            )
+            .expect("the fixture is stochastic and meets")
+        }
+
+        /// **The broadcast fixture.** The same four positions. The sink aggregates uniformly from
+        /// the context — its value **is** the aggregate — and every query reads it back.
+        /// `arXiv:2606.08105`: the outputs come out low rank.
+        fn broadcast() -> AttentionHead {
+            let to_sink = row(&[(0, 1), (0, 1), (0, 1), (1, 1)]);
+            let aggregate = row(&[(1, 3), (1, 3), (1, 3), (0, 1)]);
+            AttentionHead::declare(
+                vec![to_sink.clone(), to_sink.clone(), to_sink, aggregate],
+                vec![
+                    row(&[(1, 1), (0, 1), (0, 1)]),
+                    row(&[(0, 1), (1, 1), (0, 1)]),
+                    row(&[(0, 1), (0, 1), (1, 1)]),
+                    row(&[(1, 3), (1, 3), (1, 3)]),
+                ],
+                3,
+                [0, 1, 2],
+            )
+            .expect("the fixture is stochastic and meets")
+        }
+
+        /// **The nop is the rest cut**, and the two diagnostics say so before the chain is built.
+        #[test]
+        fn a_nop_sink_carries_no_value_mass_returns_a_zero_output_and_is_at_rest() {
+            let head = nop();
+            let diagnostics = head.diagnose().expect("the head reads");
+            assert_eq!(diagnostics.sink_value_mass, rat(0));
+            assert_eq!(diagnostics.output_rank, 0);
+            assert_eq!(diagnostics.full_rank_bound, 3);
+            assert_eq!(diagnostics.species(), SinkReading::Species(SinkSpecies::Nop));
+
+            let verdict = classify_sink(&head, SinkSpecies::Nop).expect("the label agrees");
+            assert_eq!(verdict.cut.name(), "rest");
+            assert!(!verdict.cut.returns());
+            assert!(verdict.agrees());
+        }
+
+        /// **The broadcast is circulation through the hub**: closed, non-zero, and crossing the
+        /// delivery load. Every current on the chain passes through position `3`.
+        #[test]
+        fn a_broadcast_sink_redistributes_a_low_rank_output_and_circulates_through_the_hub() {
+            let head = broadcast();
+            let diagnostics = head.diagnose().expect("the head reads");
+            assert_eq!(diagnostics.sink_value_mass, rat(1));
+            assert_eq!(diagnostics.output_rank, 1, "every query receives one aggregate");
+            assert_eq!(diagnostics.full_rank_bound, 3);
+            assert_eq!(
+                diagnostics.species(),
+                SinkReading::Species(SinkSpecies::Broadcast)
+            );
+
+            let reading = head.read_the_head().expect("the head reads");
+            assert!(
+                reading.residual.values().all(Zero::is_zero),
+                "the hub returns exactly what it aggregated: {:?}",
+                reading.residual
+            );
+            let verdict = classify_sink(&head, SinkSpecies::Broadcast).expect("the label agrees");
+            assert_eq!(verdict.cut.name(), "circulation j != 0");
+            assert!(verdict.cut.returns());
+            assert!(verdict.agrees());
+
+            // Every carried edge touches the sink. That is what "through a hub" means, and it is
+            // exhibited rather than asserted in prose.
+            let SpineCut::Circulation { crossed, .. } = &verdict.cut else {
+                panic!("the crossing is exhibited");
+            };
+            assert_eq!(crossed.len(), 3, "one delivery per read position");
+            for edge in reading.carrying() {
+                let raw = edge.0 as usize;
+                let (tail, head_position) = (raw / 4, raw % 4);
+                assert!(tail == 3 || head_position == 3, "edge {tail} -> {head_position}");
+            }
+        }
+
+        /// **The mislabelled control.** The same broadcast head, declared a nop, is refused by name.
+        /// A classifier that cannot disagree with its label has classified nothing.
+        #[test]
+        fn a_head_declared_as_the_wrong_species_is_refused_by_name() {
+            assert_eq!(
+                classify_sink(&broadcast(), SinkSpecies::Nop),
+                Err(SpineCutError::SinkSpeciesRefuted {
+                    declared: SinkSpecies::Nop,
+                    read: SinkReading::Species(SinkSpecies::Broadcast),
+                })
+            );
+            assert_eq!(
+                classify_sink(&nop(), SinkSpecies::Broadcast),
+                Err(SpineCutError::SinkSpeciesRefuted {
+                    declared: SinkSpecies::Broadcast,
+                    read: SinkReading::Species(SinkSpecies::Nop),
+                })
+            );
+        }
+
+        /// **A head that is neither species is named neither.** Three positions each attending
+        /// themselves: the output is the value table, its rank is full, and nothing is
+        /// redistributed through one position. Without this return the classifier would assign one
+        /// of two labels to every head it was ever handed.
+        #[test]
+        fn a_head_that_routes_content_directly_is_neither_species() {
+            let head = AttentionHead::declare(
+                vec![
+                    row(&[(1, 1), (0, 1), (0, 1)]),
+                    row(&[(0, 1), (1, 1), (0, 1)]),
+                    row(&[(0, 1), (0, 1), (1, 1)]),
+                ],
+                vec![
+                    row(&[(1, 1), (0, 1), (0, 1)]),
+                    row(&[(0, 1), (1, 1), (0, 1)]),
+                    row(&[(0, 1), (0, 1), (1, 1)]),
+                ],
+                0,
+                [0, 1, 2],
+            )
+            .expect("the fixture is stochastic and meets");
+            let diagnostics = head.diagnose().expect("the head reads");
+            assert_eq!(diagnostics.output_rank, 3);
+            assert_eq!(diagnostics.full_rank_bound, 3);
+            assert!(matches!(diagnostics.species(), SinkReading::Neither { .. }));
+            assert!(matches!(
+                classify_sink(&head, SinkSpecies::Broadcast),
+                Err(SpineCutError::SinkSpeciesRefuted { .. })
+            ));
+        }
+
+        /// **The two readings can disagree, and this is the head where they do.** The sink's value
+        /// carries three times the mass it aggregated — it looks like a broadcast to both published
+        /// diagnostics and it is a **leak** on the chain, with the excess named at the hub. That is
+        /// the falsifier for the agreement asserted above: the diagnostics never see the chain, so
+        /// the agreement in the two fixtures is evidence rather than construction.
+        #[test]
+        fn a_hub_that_emits_more_than_it_aggregated_reads_as_a_broadcast_and_leaks() {
+            let to_sink = row(&[(0, 1), (0, 1), (0, 1), (1, 1)]);
+            let aggregate = row(&[(1, 3), (1, 3), (1, 3), (0, 1)]);
+            let head = AttentionHead::declare(
+                vec![to_sink.clone(), to_sink.clone(), to_sink, aggregate],
+                vec![
+                    row(&[(1, 1), (0, 1), (0, 1)]),
+                    row(&[(0, 1), (1, 1), (0, 1)]),
+                    row(&[(0, 1), (0, 1), (1, 1)]),
+                    row(&[(1, 1), (1, 1), (1, 1)]),
+                ],
+                3,
+                [0, 1, 2],
+            )
+            .expect("the fixture is stochastic and meets");
+            let diagnostics = head.diagnose().expect("the head reads");
+            assert_eq!(diagnostics.sink_value_mass, rat(3));
+            assert_eq!(diagnostics.output_rank, 1);
+            assert_eq!(
+                diagnostics.species(),
+                SinkReading::Species(SinkSpecies::Broadcast),
+                "the published diagnostics cannot see the imbalance"
+            );
+
+            let verdict = classify_sink(&head, SinkSpecies::Broadcast).expect("the label agrees");
+            assert_eq!(verdict.cut.name(), "leak");
+            assert!(!verdict.agrees(), "the chain refuses what the diagnostics accepted");
+            let SpineCut::Leak { at } = &verdict.cut else {
+                panic!("the source is exhibited");
+            };
+            assert_eq!(at.get(&VertexId(3)), Some(&rat(-2)), "the hub is the source");
+        }
+
+        /// **The short-circuit cut on this material**: a broadcast whose hub never delivers to the
+        /// position the caller reads. The loop closes, the current is non-zero, and the load is not
+        /// crossed. Position `3` attends only itself, so nothing reaches it.
+        #[test]
+        fn a_broadcast_that_never_reaches_the_read_position_is_a_short_circuit() {
+            let to_sink = row(&[(0, 1), (0, 1), (0, 1), (0, 1), (1, 1)]);
+            let apart = row(&[(0, 1), (0, 1), (0, 1), (1, 1), (0, 1)]);
+            let aggregate = row(&[(1, 3), (1, 3), (1, 3), (0, 1), (0, 1)]);
+            let head = AttentionHead::declare(
+                vec![to_sink.clone(), to_sink.clone(), to_sink, apart, aggregate],
+                vec![
+                    row(&[(1, 1), (0, 1), (0, 1)]),
+                    row(&[(0, 1), (1, 1), (0, 1)]),
+                    row(&[(0, 1), (0, 1), (1, 1)]),
+                    row(&[(1, 1), (0, 1), (0, 1)]),
+                    row(&[(1, 3), (1, 3), (1, 3)]),
+                ],
+                4,
+                [3],
+            )
+            .expect("the fixture is stochastic and meets");
+            let verdict = classify_sink(&head, SinkSpecies::Broadcast).expect("the label agrees");
+            assert_eq!(verdict.cut.name(), "short circuit");
+            assert!(!verdict.cut.returns());
+            assert!(verdict.agrees(), "a short circuit is still a closed broadcast");
+            let SpineCut::ShortCircuit { bypass, declared_load } = &verdict.cut else {
+                panic!("the bypass is exhibited");
+            };
+            assert!(bypass.is_disjoint(declared_load));
+        }
+
+        /// The construction refusals. Each is a reading the material could carry and this organ
+        /// must not: a row that is not a distribution, a sink outside the head, an undeclared read
+        /// set, and tables that do not meet.
+        #[test]
+        fn a_head_that_is_not_an_attention_map_is_refused_by_name() {
+            let values = vec![row(&[(1, 1)]), row(&[(0, 1)])];
+            assert!(matches!(
+                AttentionHead::declare(
+                    vec![row(&[(1, 2), (1, 4)]), row(&[(1, 2), (1, 2)])],
+                    values.clone(),
+                    0,
+                    [0],
+                ),
+                Err(SpineCutError::AttentionRowIsNotStochastic { query: 0, .. })
+            ));
+            assert_eq!(
+                AttentionHead::declare(
+                    vec![row(&[(1, 1), (0, 1)]), row(&[(0, 1), (1, 1)])],
+                    values.clone(),
+                    9,
+                    [0],
+                ),
+                Err(SpineCutError::PositionOutsideTheHead(9))
+            );
+            assert_eq!(
+                AttentionHead::declare(
+                    vec![row(&[(1, 1), (0, 1)]), row(&[(0, 1), (1, 1)])],
+                    values,
+                    0,
+                    [],
+                ),
+                Err(SpineCutError::ReadPositionsNotDeclared)
+            );
+            assert_eq!(
+                AttentionHead::declare(
+                    vec![row(&[(1, 1), (0, 1)]), row(&[(0, 1), (1, 1)])],
+                    vec![row(&[(1, 1)])],
+                    0,
+                    [0],
+                ),
+                Err(SpineCutError::HeadTablesDoNotMeet {
+                    queries: 2,
+                    keys: 2,
+                    rows: 1
+                })
             );
         }
     }

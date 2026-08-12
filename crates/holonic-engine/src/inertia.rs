@@ -66,7 +66,7 @@
 //! is returned. That is measurement, not governance.
 
 use num_bigint::BigInt;
-use num_traits::{Signed, Zero};
+use num_traits::{One, Signed, Zero};
 use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
@@ -536,6 +536,253 @@ pub fn congruence(
     )
 }
 
+// -------------------------------------------------------------------------------------------
+// the pull-back — what congruence refuses, returned as a bound instead of an error
+
+/// **The pull-back of a form along an arbitrary linear map, with the inertia bound it obeys.**
+///
+/// # Why this exists
+///
+/// [`congruence`] refuses a singular `P` by name, and that refusal is correct **for Sylvester's
+/// law**: the law is a statement about invertible changes of basis and a singular `P` genuinely does
+/// move the inertia. But refusing is not the only lawful return, and it is not the interesting one.
+/// A singular `P` is a **restriction of the form to a subspace composed with a collapse**, and the
+/// restriction of a form to a subspace satisfies a theorem of its own:
+///
+/// ```text
+///   n₊(PᵀAP) ≤ n₊(A)        and        n₋(PᵀAP) ≤ n₋(A)
+/// ```
+///
+/// for **every** `P`, invertible or not. The reason is one line: a subspace on which `PᵀAP` is
+/// positive definite maps forward under `P` to a subspace on which `A` is positive definite (if
+/// `xᵀPᵀAPx > 0` then `Px ≠ 0`, and `P` is injective on such a subspace because a kernel vector
+/// there would give `0 > 0`), so `n₊(A)` is at least as large. The same argument with the sign
+/// reversed gives the negative bound. Nothing here needs `P` square.
+///
+/// **`congruence` is the equality case and is subsumed**: when `P` is invertible the map is onto,
+/// both inequalities are equalities, and the return is Sylvester's law with the bound saturated.
+/// The existing organ keeps its refusal — a caller who asks for *a congruence* and hands a singular
+/// matrix has a bug — and this one answers the different question.
+///
+/// # The collapsed population is the testimony
+///
+/// `ker P` is exactly the population the pull-back cannot see: every `x` with `Px = 0` satisfies
+/// `(PᵀAP)x = 0` whatever `A` was, so those directions arrive in the radical no matter what the form
+/// says about their images. That is the same return species as
+/// [`crate::receiver_exact_compression`]'s collapsed pairs — the pairs a declared receiver family
+/// identifies — carried here as a basis of the kernel rather than as a count, so a caller can
+/// exhibit *which* directions were lost rather than being told how many.
+///
+/// The strictness of the bound and the collapse are **not the same statement** and this return
+/// separates them: `[[1,1],[1,1]]` against `diag(1,−1)` collapses a one-dimensional kernel and drops
+/// **both** `n₊` and `n₋` by one, so a rank-one collapse cost two directions.
+///
+/// # Exactness
+///
+/// `Rat` throughout. The kernel is computed by exact reduced row echelon form, the pull-back by
+/// exact multiplication, and both inertias by the elimination above. No float, no tolerance, no
+/// rank threshold.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct PullbackInertia {
+    /// `n₊(A), n₀(A), n₋(A)` — the source form's own reading.
+    pub source: Inertia,
+    /// `n₊(PᵀAP), n₀(PᵀAP), n₋(PᵀAP)` — the pulled-back reading, which the bound governs.
+    pub pulled_back: Inertia,
+    /// `PᵀAP` itself, returned rather than described.
+    pub form: SymmetricForm,
+    /// `rank P`, read off the echelon form and not from a determinant.
+    pub basis_rank: usize,
+    /// A basis of `ker P`, exactly. Empty when `P` is injective.
+    pub kernel: Vec<Vec<Rat>>,
+}
+
+impl PullbackInertia {
+    /// Both bounds. A theorem, and it can fail — which is why it is a computed method rather than a
+    /// stored flag.
+    pub const fn bounds_hold(&self) -> bool {
+        self.pulled_back.positive <= self.source.positive
+            && self.pulled_back.negative <= self.source.negative
+    }
+
+    /// Whether the positive bound is **strict**. The collapse witness must return `true` here; an
+    /// invertible `P` must return `false`.
+    pub const fn positive_is_strict(&self) -> bool {
+        self.pulled_back.positive < self.source.positive
+    }
+
+    pub const fn negative_is_strict(&self) -> bool {
+        self.pulled_back.negative < self.source.negative
+    }
+
+    /// The dimension of `ker P` — the extent of the collapsed population, exhibited by
+    /// [`PullbackInertia::kernel`] rather than only counted.
+    pub fn collapsed_extent(&self) -> usize {
+        self.kernel.len()
+    }
+
+    /// `rank A − rank PᵀAP`: how many directions of the form the pull-back lost. Distinct from
+    /// [`PullbackInertia::collapsed_extent`], and the collapse witness is where they differ.
+    pub const fn rank_lost(&self) -> usize {
+        self.source.rank() - self.pulled_back.rank()
+    }
+
+    /// Whether `P` was injective, so that the pull-back is a genuine restriction with no collapse.
+    pub fn is_injective(&self) -> bool {
+        self.kernel.is_empty()
+    }
+}
+
+/// **`PᵀAP` and its inertia, for any `P` whatever.**
+///
+/// `P` is `extent × k` — it maps a `k`-dimensional space into the form's own — and `k` is free: the
+/// pull-back of a rank-ten lattice along a two-column map is a two-dimensional form. Only the row
+/// count is constrained, because that is what the product has to meet.
+///
+/// See [`PullbackInertia`] for the theorem, the collapse testimony, and why [`congruence`] keeps its
+/// refusal rather than being replaced.
+pub fn pullback_inertia_bound(
+    form: &SymmetricForm,
+    basis: &ExactRatMatrix,
+) -> Result<PullbackInertia, InertiaError> {
+    if basis.rows() != form.extent() {
+        return Err(InertiaError::PullbackRowsMismatch {
+            extent: form.extent(),
+            rows: basis.rows(),
+        });
+    }
+    let transported = basis
+        .transpose()?
+        .multiply(&form.as_matrix()?)?
+        .multiply(basis)?;
+    // Routed back through the validating constructor for the same reason `congruence` is: `PᵀAP` is
+    // symmetric as mathematics, so an asymmetric arrival is a wrong multiplication and must say so.
+    let pulled = SymmetricForm::from_rows(
+        (0..transported.rows())
+            .map(|row| transported.row(row).map(<[Rat]>::to_vec))
+            .collect::<Result<Vec<Vec<Rat>>, ExactLinearError>>()?,
+    )?;
+    let kernel = kernel_basis(basis)?;
+    Ok(PullbackInertia {
+        source: inertia(form),
+        pulled_back: inertia(&pulled),
+        form: pulled,
+        basis_rank: basis.columns() - kernel.len(),
+        kernel,
+    })
+}
+
+/// A basis of `{x : M x = 0}`, exactly, by reduced row echelon form over `Rat`.
+///
+/// One vector per free column, in column order, each carrying `1` in its own free column and the
+/// negated echelon entries in the pivot columns. Deterministic, and the empty vector when `M` is
+/// injective.
+fn kernel_basis(matrix: &ExactRatMatrix) -> Result<Vec<Vec<Rat>>, InertiaError> {
+    let (rows, columns) = (matrix.rows(), matrix.columns());
+    let mut working: Vec<Vec<Rat>> = (0..rows)
+        .map(|row| matrix.row(row).map(<[Rat]>::to_vec))
+        .collect::<Result<Vec<Vec<Rat>>, ExactLinearError>>()?;
+
+    let mut pivot_row_of_column: Vec<Option<usize>> = vec![None; columns];
+    let mut cursor = 0usize;
+    for column in 0..columns {
+        if cursor == rows {
+            break;
+        }
+        let Some(found) = (cursor..rows).find(|row| !working[*row][column].is_zero()) else {
+            continue;
+        };
+        working.swap(cursor, found);
+        let divisor = working[cursor][column].clone();
+        for entry in &mut working[cursor] {
+            *entry /= &divisor;
+        }
+        let pivot = working[cursor].clone();
+        for row in 0..rows {
+            if row == cursor || working[row][column].is_zero() {
+                continue;
+            }
+            let factor = working[row][column].clone();
+            for (entry, pivot_entry) in working[row].iter_mut().zip(&pivot) {
+                *entry -= &factor * pivot_entry;
+            }
+        }
+        pivot_row_of_column[column] = Some(cursor);
+        cursor += 1;
+    }
+
+    let mut kernel = Vec::new();
+    for free in 0..columns {
+        if pivot_row_of_column[free].is_some() {
+            continue;
+        }
+        let mut vector = vec![Rat::zero(); columns];
+        vector[free] = Rat::one();
+        for (column, pivot) in pivot_row_of_column.iter().enumerate() {
+            if let Some(row) = pivot {
+                vector[column] = -working[*row][free].clone();
+            }
+        }
+        kernel.push(vector);
+    }
+    Ok(kernel)
+}
+
+// -------------------------------------------------------------------------------------------
+// the rank–trace defect — the finite identity the external certificate is tight on
+
+/// **`2c·tr(A) − ‖A‖²_F`, exactly.**
+///
+/// The one scalar the external kernel-verified zeta certificate is built from, restated as a
+/// computation over `Rat`. `research/records/2026-08-11_THE_RUNG_REFUSES_BY_NAME_…` §1 records the
+/// certificate's finite core as the rank–trace inequality
+///
+/// ```text
+///   2c·tr(P+Q) − ‖P+Q‖²_F  ≥  Σⱼ k_c(mⱼ)        with equality  Σⱼ k_c(mⱼ) + c²·b
+/// ```
+///
+/// and the identity underneath it is elementary and exact: for a symmetric `A` with eigenvalues
+/// `λ_i`, `‖A‖²_F = tr(A²) = Σ λ_i²`, so
+///
+/// ```text
+///   2c·tr(A) − ‖A‖²_F = Σ_i (2c·λ_i − λ_i²) = Σ_i (c² − (c − λ_i)²)
+/// ```
+///
+/// — a sum of per-direction terms, each of which is `c²` exactly at `λ_i = c`, `0` exactly at
+/// `λ_i ∈ {0, 2c}`, and negative outside `[0, 2c]`. **That is what makes the quantity a placement
+/// reading rather than a size**: it counts how far each direction sits from the declared `c`, and a
+/// direction at the declared level pays the full `c²` while a direction at rest pays nothing.
+///
+/// This is computed from the **matrix**, never from a spectrum: `tr(A²) = Σ_{ij} a_ij a_ji`, which
+/// for a symmetric form is `Σ_{ij} a_ij²`. No eigenvalue is required and none is approximated.
+///
+/// # Boundary
+///
+/// The identification of `k_c` with the external artifact's own `k_c` is `interpretation`, read from
+/// the record's restatement and not from the Lean source. What is `implemented-exact` here is the
+/// arithmetic identity [`block_defect`] discharges on a declared block form.
+pub fn rank_trace_defect(form: &SymmetricForm, at: &Rat) -> Rat {
+    let mut trace = Rat::zero();
+    let mut frobenius = Rat::zero();
+    for index in 0..form.extent() {
+        trace += form.at(index, index);
+    }
+    for row in 0..form.extent() {
+        for column in 0..form.extent() {
+            frobenius += form.at(row, column) * form.at(row, column);
+        }
+    }
+    (Rat::from_integer(BigInt::from(2)) * at) * trace - frobenius
+}
+
+/// **`k_c(m) = 2cm − m²`**, one direction's contribution to [`rank_trace_defect`].
+///
+/// Equivalently `c² − (c − m)²`. Both forms are computed and compared by
+/// `the_block_defect_is_the_completed_square`, because an identity that is only ever written one way
+/// is an identity nothing checks.
+pub fn block_defect(at: &Rat, level: &Rat) -> Rat {
+    Rat::from_integer(BigInt::from(2)) * at * level - level * level
+}
+
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
 pub enum InertiaError {
     #[error("a symmetric form must be square: row {row} carries {found} entries, extent is {extent}")]
@@ -556,6 +803,13 @@ pub enum InertiaError {
     },
     #[error("Sylvester's law holds only for an invertible change of basis; this one is singular")]
     SingularChangeOfBasis,
+    /// A pull-back `PᵀAP` needs only that `P`'s **rows** meet the form's extent; its column count is
+    /// free and is the extent of the space being pulled back from. This is the one shape constraint
+    /// the product cannot do without.
+    #[error(
+        "a pull-back matrix must carry one row per direction of the form's extent {extent}; this one has {rows}"
+    )]
+    PullbackRowsMismatch { extent: usize, rows: usize },
     #[error(transparent)]
     Linear(#[from] ExactLinearError),
 }
@@ -1108,6 +1362,246 @@ mod tests {
         assert_eq!(
             SymmetricForm::from_integer_matrix(&matrix),
             Err(InertiaError::NotSymmetric { row: 0, column: 1 })
+        );
+    }
+
+    // -----------------------------------------------------------------------------------------
+    // the pull-back
+
+    fn rectangular(rows: &[Vec<i64>]) -> ExactRatMatrix {
+        ExactRatMatrix::new(
+            rows.iter()
+                .map(|row| {
+                    row.iter()
+                        .map(|entry| Rat::from_integer(BigInt::from(*entry)))
+                        .collect()
+                })
+                .collect(),
+        )
+        .expect("fixture is rectangular")
+    }
+
+    fn rat(value: i64) -> Rat {
+        Rat::from_integer(BigInt::from(value))
+    }
+
+    /// **The collapse witness the module's own doc already carried, answered instead of refused.**
+    ///
+    /// `[[1,1],[1,1]]ᵀ · diag(1,−1) · [[1,1],[1,1]] = 0`. [`congruence`] refuses it — correctly,
+    /// because Sylvester's law is about invertible maps — and the lawful return for the same
+    /// material is the **strict** bound with the collapsed direction exhibited. Both are asserted
+    /// here so the two organs cannot drift into disagreeing about the same input.
+    #[test]
+    fn the_collapse_witness_returns_a_strict_bound_where_congruence_refuses() {
+        let form = diagonal(&[1, -1]);
+        let singular = rectangular(&[vec![1, 1], vec![1, 1]]);
+
+        assert_eq!(
+            congruence(&form, &basis(&[vec![(1, 1), (1, 1)], vec![(1, 1), (1, 1)]])),
+            Err(InertiaError::SingularChangeOfBasis),
+            "the invertible-only organ keeps its refusal"
+        );
+
+        let pullback = pullback_inertia_bound(&form, &singular).expect("the shapes meet");
+        assert_eq!(pullback.form, SymmetricForm::zeros(2), "PᵀAP is the zero form");
+        assert_eq!(pullback.source, Inertia { positive: 1, zero: 0, negative: 1 });
+        assert_eq!(pullback.pulled_back, Inertia { positive: 0, zero: 2, negative: 0 });
+        assert!(pullback.bounds_hold());
+        assert!(pullback.positive_is_strict(), "0 < 1 on the positive side");
+        assert!(pullback.negative_is_strict(), "0 < 1 on the negative side");
+
+        // A rank-one collapse cost two directions: the kernel is one-dimensional and the rank fell
+        // by two. Strictness and collapse are different statements and this is where they part.
+        assert_eq!(pullback.collapsed_extent(), 1);
+        assert_eq!(pullback.rank_lost(), 2);
+        assert_eq!(pullback.basis_rank, 1);
+        assert_eq!(pullback.kernel, vec![vec![rat(-1), rat(1)]]);
+    }
+
+    /// The kernel is testimony, not decoration: every returned vector is annihilated by `P` and by
+    /// `PᵀAP`, checked here against the matrices themselves rather than trusted.
+    #[test]
+    fn the_kernel_is_exhibited_and_annihilates_both_the_map_and_the_pulled_back_form() {
+        // Rank two, three columns: one free direction, and the echelon form has to find it in the
+        // third column rather than the first.
+        let map = rectangular(&[vec![1, 0, 2], vec![0, 1, 3], vec![1, 1, 5]]);
+        let form = integers(&[vec![2, 1, 0], vec![1, 2, 1], vec![0, 1, 2]]);
+        let pullback = pullback_inertia_bound(&form, &map).expect("the shapes meet");
+
+        assert_eq!(pullback.basis_rank, 2);
+        assert_eq!(pullback.collapsed_extent(), 1);
+        assert!(!pullback.is_injective());
+        for vector in &pullback.kernel {
+            assert!(
+                map.apply(vector).expect("the extents meet").iter().all(Zero::is_zero),
+                "a kernel vector must be annihilated by P"
+            );
+            for row in 0..pullback.form.extent() {
+                let value = (0..pullback.form.extent()).fold(Rat::zero(), |sum, column| {
+                    sum + pullback.form.at(row, column) * &vector[column]
+                });
+                assert!(value.is_zero(), "ker P lands in the radical of PᵀAP whatever A was");
+            }
+        }
+        assert!(pullback.bounds_hold());
+    }
+
+    /// **Invertible `P` reproduces [`congruence`] exactly** — Sylvester's law as the equality case of
+    /// the bound. The fixtures are the ones the congruence test already uses, so the two organs are
+    /// held to the same material and not to two convenient ones.
+    #[test]
+    fn an_invertible_pullback_reproduces_congruence_and_saturates_the_bound() {
+        let forms = [
+            diagonal(&[1, -1]),
+            hyperbolic_plane(),
+            integers(&[vec![2, 1], vec![1, 2]]),
+            integers(&[vec![1, 1], vec![1, 1]]),
+        ];
+        let bases = [
+            basis(&[vec![(1, 1), (1, 1)], vec![(0, 1), (1, 1)]]),
+            basis(&[vec![(2, 1), (0, 1)], vec![(0, 1), (3, 1)]]),
+            basis(&[vec![(1, 1), (2, 1)], vec![(3, 1), (4, 1)]]),
+            basis(&[vec![(1, 2), (1, 3)], vec![(1, 1), (1, 1)]]),
+        ];
+        for form in &forms {
+            for change in &bases {
+                let by_congruence = congruence(form, change).expect("the basis is invertible");
+                let pullback = pullback_inertia_bound(form, change).expect("the shapes meet");
+                assert_eq!(pullback.form, by_congruence, "the same PᵀAP either way");
+                assert_eq!(
+                    pullback.pulled_back,
+                    inertia(&by_congruence),
+                    "Sylvester: the bound is an equality for an invertible P"
+                );
+                assert!(pullback.is_injective(), "an invertible P collapses nothing");
+                assert!(!pullback.positive_is_strict() && !pullback.negative_is_strict());
+                assert_eq!(pullback.rank_lost(), 0);
+                assert_eq!(pullback.basis_rank, form.extent());
+            }
+        }
+    }
+
+    /// An **injective, non-surjective** `P`: a genuine restriction with no collapse at all. It
+    /// separates strictness from collapse in the other direction from the witness above — the
+    /// negative bound is strict while the kernel is empty, so a strict bound is not evidence of a
+    /// collapsed direction and this fixture is what says so.
+    #[test]
+    fn an_injective_restriction_can_tighten_one_side_with_an_empty_kernel() {
+        let form = diagonal(&[1, -1]);
+        let restriction = rectangular(&[vec![1], vec![0]]);
+        let pullback = pullback_inertia_bound(&form, &restriction).expect("the shapes meet");
+        assert!(pullback.is_injective());
+        assert_eq!(pullback.pulled_back, Inertia { positive: 1, zero: 0, negative: 0 });
+        assert!(!pullback.positive_is_strict());
+        assert!(pullback.negative_is_strict());
+        assert!(pullback.bounds_hold());
+    }
+
+    /// The bound on a rank-ten indefinite lattice under a rectangular map, so the theorem is not
+    /// only exercised at extent two. `E10` has signature `(1, 9)`; a three-column pull-back cannot
+    /// exceed it on either side, and the fixture is chosen to be rank-deficient so the kernel is
+    /// non-empty here as well.
+    #[test]
+    fn the_bound_holds_on_e10_under_a_rectangular_map() {
+        let lattice = e10();
+        let mut columns = vec![vec![0i64; 3]; 10];
+        columns[0][0] = 1;
+        columns[1][0] = 1;
+        columns[2][1] = 1;
+        columns[5][1] = -2;
+        // The third column repeats the first, so the map is rank two with a one-dimensional kernel.
+        columns[0][2] = 1;
+        columns[1][2] = 1;
+        let map = rectangular(&columns);
+        let pullback = pullback_inertia_bound(&lattice, &map).expect("the shapes meet");
+        assert_eq!(pullback.source.signature(), (1, 9));
+        assert!(pullback.bounds_hold(), "{:?}", pullback.pulled_back);
+        assert_eq!(pullback.basis_rank, 2);
+        assert_eq!(pullback.collapsed_extent(), 1);
+    }
+
+    #[test]
+    fn a_pullback_whose_rows_miss_the_extent_is_refused_by_name() {
+        let form = diagonal(&[1, -1, 1]);
+        assert_eq!(
+            pullback_inertia_bound(&form, &rectangular(&[vec![1], vec![0]])),
+            Err(InertiaError::PullbackRowsMismatch { extent: 3, rows: 2 })
+        );
+    }
+
+    // -----------------------------------------------------------------------------------------
+    // the rank–trace defect
+
+    /// `k_c(m) = 2cm − m²` and `c² − (c − m)²` are the same number. Written twice on purpose: an
+    /// identity that is only ever written one way is an identity nothing checks.
+    #[test]
+    fn the_block_defect_is_the_completed_square() {
+        for at in [-3i64, 0, 1, 4, 7] {
+            for level in [-5i64, -1, 0, 3, 4, 8] {
+                let completed = &rat(at) * &rat(at) - (rat(at) - rat(level)) * (rat(at) - rat(level));
+                assert_eq!(block_defect(&rat(at), &rat(level)), completed, "c={at} m={level}");
+            }
+        }
+        // The two levels where the term vanishes and the one where it is maximal, named.
+        assert_eq!(block_defect(&rat(4), &rat(0)), rat(0));
+        assert_eq!(block_defect(&rat(4), &rat(8)), rat(0));
+        assert_eq!(block_defect(&rat(4), &rat(4)), rat(16));
+    }
+
+    /// **The tightness fixture.** On a declared block structure the rank–trace equality
+    /// `2c·tr(M) − ‖M‖²_F = Σⱼ k_c(mⱼ) + c²·b` holds exactly over `Rat`.
+    ///
+    /// The fixture is built so the equality cannot come out by accident: the `mⱼ` are distinct from
+    /// `c` and from each other, **one of them is negative** so the identity is not resting on
+    /// positive semidefiniteness, `b` is nonzero so the `c²·b` term carries, and there are directions
+    /// at rest so the zero block is exercised too.
+    #[test]
+    fn the_declared_block_structure_discharges_the_rank_trace_equality() {
+        let at = rat(4);
+        let levels = [rat(3), rat(5), rat(-2)];
+        let repeats = 2usize;
+        let at_rest = 2usize;
+
+        let mut diagonal_entries: Vec<Rat> = levels.to_vec();
+        diagonal_entries.extend(std::iter::repeat_n(at.clone(), repeats));
+        diagonal_entries.extend(std::iter::repeat_n(Rat::zero(), at_rest));
+        let block = SymmetricForm::from_diagonal(diagonal_entries);
+
+        let expected = levels
+            .iter()
+            .map(|level| block_defect(&at, level))
+            .fold(Rat::zero(), |sum, term| sum + term)
+            + &at * &at * Rat::from_integer(BigInt::from(repeats as i64));
+        assert_eq!(rank_trace_defect(&block, &at), expected);
+        assert_eq!(expected, rat(42), "the fixture's own number, so a silent drift is visible");
+
+        // The same identity survives a pull-back that keeps one level, one repeat, and one rest
+        // direction — the restriction is the operation the bound above is about, so the two are
+        // exercised on one fixture rather than side by side.
+        let mut columns = vec![vec![0i64; 3]; block.extent()];
+        columns[0][0] = 1;
+        columns[3][1] = 1;
+        columns[5][2] = 1;
+        let pullback = pullback_inertia_bound(&block, &rectangular(&columns)).expect("shapes meet");
+        assert_eq!(
+            rank_trace_defect(&pullback.form, &at),
+            block_defect(&at, &levels[0]) + &at * &at,
+            "the surviving block reproduces the equality on its own levels"
+        );
+        assert!(pullback.bounds_hold());
+        assert!(pullback.positive_is_strict(), "three positive directions became two");
+    }
+
+    /// The defect is computed from the **matrix**, so a form whose eigenvalues are not rational must
+    /// still return an exact rational. The hyperbolic plane's are `±1` and its trace is zero, which
+    /// makes it the shortest fixture where the Frobenius term is the whole answer.
+    #[test]
+    fn the_defect_needs_no_spectrum_and_reads_an_off_diagonal_form() {
+        assert_eq!(rank_trace_defect(&hyperbolic_plane(), &rat(4)), rat(-2));
+        // `2c·0 − (0+1+1+0) = −2`, and by the spectrum `k_4(1) + k_4(−1) = 7 + (−9) = −2`.
+        assert_eq!(
+            block_defect(&rat(4), &rat(1)) + block_defect(&rat(4), &rat(-1)),
+            rat(-2)
         );
     }
 

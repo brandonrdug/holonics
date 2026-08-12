@@ -198,6 +198,11 @@ pub mod live_presentation;
 // covector. Reached explicitly: `MaterialLoop` and `circulation` say nothing at the crate root
 // about which field they belong to.
 pub mod kelvin;
+// A lattice gauge configuration read through `structure_group`: an exact integral representation,
+// plaquette holonomy, the Wilson action in character form, and one transfer operator whose spectrum
+// is exact. Declared, never glob-exported: `Link`, `Lattice` and `Plaquette` are deliberately
+// general words that say nothing at the crate root about which incidence they belong to.
+pub mod lattice_gauge;
 pub mod local_star;
 // The Chow ring of a matroid. Reached explicitly: its forms are indefinite by construction and a
 // caller who wanted a Gram matrix must not arrive here by accident.

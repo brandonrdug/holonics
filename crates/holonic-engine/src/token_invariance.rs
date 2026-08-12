@@ -200,11 +200,14 @@
 //! *"The horizon, read off the material"* section for what actually bounds a receiver.
 
 use std::collections::{BTreeMap, BTreeSet};
+use std::convert::Infallible;
 
 use num_bigint::BigUint;
 
 use crate::corpus_census::{CorpusCensus, Kind, SurfaceId, weight_band_name};
-use crate::hardware_cover::{ChartId, CoverDecomposition, FrontCell, HardwareCover};
+use crate::hardware_cover::{
+    Chart, ChartId, CoverDecomposition, FrontCell, HardwareCover, HostDeclaration, expand_front,
+};
 use crate::receiver_exact_compression::{
     AblatedSystem, InputId, ItemId, Observation, ObservedSystem, ReceiverId, compress,
 };
@@ -1793,56 +1796,36 @@ pub fn sweep_covered(
     let licensed = decomposition.independence(&front).is_ok();
     let effective_lanes = if licensed { lanes.min(surfaces.len()) } else { 1 };
 
-    let readings = if effective_lanes <= 1 {
-        surfaces
-            .iter()
-            .map(|surface| (*surface, separation_reading(census, atlas, *surface, horizon)))
-            .collect()
+    // **The expansion law is not restated here.** Until 2026-08-11 this function carried its own
+    // by-extent placement — sort by `(Reverse(extent), index)`, greedy onto the least-carried lane,
+    // `std::thread::scope`, reassemble — which is `hardware_cover::expand_front` written a second
+    // time. Two copies of one law are the cabinet failure one level down, and the copy is where the
+    // two drift apart. What is local to this organ is exactly two things and they stay here: the
+    // front's extent (a surface's own occurrence-site population) and the refusal (an unlicensed
+    // decomposition falls back to one lane rather than being worked around).
+    let expansion_cover = if licensed {
+        cover.clone()
     } else {
+        HardwareCover::of_charts(vec![Chart::Host(HostDeclaration { lanes: 1 })])
+    };
+    let surfaces_by_index = &surfaces;
+    let readings = expand_front(
+        front.clone(),
+        &expansion_cover,
         // Cover the surfaces by EXTENT, not by count: a surface with a million occurrences and one
         // with two are not one unit each.
-        let mut by_extent: Vec<&FrontCell> = front.iter().collect();
-        by_extent.sort_by_key(|cell| (std::cmp::Reverse(cell.extent), cell.index));
-        let mut sections: Vec<Vec<usize>> = vec![Vec::new(); effective_lanes];
-        let mut carried = vec![0u128; effective_lanes];
-        for cell in by_extent {
-            let lane = carried
-                .iter()
-                .enumerate()
-                .min_by_key(|(lane, load)| (**load, *lane))
-                .map(|(lane, _)| lane)
-                .unwrap_or(0);
-            sections[lane].push(cell.index);
-            carried[lane] += u128::from(cell.extent);
-        }
-        std::thread::scope(|scope| {
-            let handles: Vec<_> = sections
-                .into_iter()
-                .map(|section| {
-                    let surfaces = &surfaces;
-                    scope.spawn(move || {
-                        section
-                            .into_iter()
-                            .map(|at| {
-                                let surface = surfaces[at];
-                                (
-                                    surface,
-                                    separation_reading(census, atlas, surface, horizon),
-                                )
-                            })
-                            .collect::<Vec<_>>()
-                    })
-                })
-                .collect();
-            handles
-                .into_iter()
-                .flat_map(|handle| match handle.join() {
-                    Ok(section) => section,
-                    Err(payload) => std::panic::resume_unwind(payload),
-                })
-                .collect()
-        })
-    };
+        |cell: &FrontCell| cell.extent,
+        |cell: FrontCell| -> Result<Vec<(SurfaceId, SeparationReading)>, Infallible> {
+            let surface = surfaces_by_index[cell.index];
+            Ok(vec![(
+                surface,
+                separation_reading(census, atlas, surface, horizon),
+            )])
+        },
+    )
+    .unwrap_or_else(|never: Infallible| match never {})
+    .into_iter()
+    .collect();
 
     SweepCover {
         readings,
@@ -4254,12 +4237,15 @@ mod tests {
         let census = CorpusCensus::read(&root).unwrap();
         let atlas = atlas(&census);
 
-        let serial = sweep_covered(&census, &atlas, 1, &HardwareCover::of_charts(vec![
-            crate::hardware_cover::Chart::Host(crate::hardware_cover::HostDeclaration { lanes: 1 }),
-        ]));
-        let wide = sweep_covered(&census, &atlas, 1, &HardwareCover::of_charts(vec![
-            crate::hardware_cover::Chart::Host(crate::hardware_cover::HostDeclaration { lanes: 8 }),
-        ]));
+        let at_lanes = |lanes: u32| {
+            sweep_covered(&census, &atlas, 1, &HardwareCover::of_charts(vec![
+                crate::hardware_cover::Chart::Host(crate::hardware_cover::HostDeclaration {
+                    lanes,
+                }),
+            ]))
+        };
+        let serial = at_lanes(1);
+        let wide = at_lanes(8);
 
         assert_eq!(serial.host_lanes, 1);
         assert!(
@@ -4288,11 +4274,17 @@ mod tests {
                 assert_eq!(one.complex, other.complex, "{why}: complex at {surface:?}");
             }
         };
-        compare(
-            &serial.readings,
-            &wide.readings,
-            "a lane is a realization coordinate and may not move a reading",
-        );
+        // The whole declared width, not one wide case: 1, 2, 3, 8, 64 — the same lane population
+        // `hardware_cover`'s own expansion parity carries, now that this organ conducts through
+        // that law rather than through a second copy of it.
+        for lanes in [2u32, 3, 8, 64] {
+            let covered = at_lanes(lanes);
+            compare(
+                &serial.readings,
+                &covered.readings,
+                &format!("a lane is a realization coordinate and may not move a reading: {lanes}"),
+            );
+        }
         compare(&sweep(&census, &atlas, 1), &serial.readings, "the default entry point");
         let _ = fs::remove_dir_all(&root);
     }

@@ -36,7 +36,47 @@
 //!    certificate compares it as the successor's logical resource, so the arrow now exists in
 //!    library code.
 //!
-//! Run: `the_front_is_ordered_until_a_certificate_unorders_it [development-root]`
+//! ## The material, and why this driver did not return before 2026-08-11
+//!
+//! `canon/TABLET_THE_MANIFOLD.md` recorded that this driver *"reaches soma/formal and stops,
+//! including under an 8 GB bound."* The diagnosis is not a cost defect in the certificate. It is
+//! the material: `lean_paths` walked **every** `.lean` under the root, and `soma/formal` carries a
+//! Lake package cache — **8,612 files and 91,167,882 octets** of vendored mathlib, batteries and
+//! plausible against **13 files and 27,980 octets** of soma's own development. The certificate was
+//! being asked about mathlib. Refusing `.lake` by name returns the whole run, all sixteen
+//! controls, in **0.21 s**.
+//!
+//! The cost wall is real and is now measured rather than hit, on caller-declared slices of that
+//! same cache (argv[2], debug profile, one host core):
+//!
+//! ```text
+//!   files   items   collapsed pairs   junctions   compress    certify_founding_orders   peak RSS
+//!       4       5                 2           2    42.3 µs                   256.6 µs
+//!       8      48               253         216   984.7 µs                  11.13  ms
+//!      16      63               499         372     1.80 ms                  19.59  ms
+//!      32     212             4,850       2,575    33.01 ms                 380.7   ms
+//!      64     341            12,718       6,005   117.5  ms                   1.164 s
+//!     128     873            85,496      25,415     2.180 s                  16.578 s   0.051 GiB
+//!     256   1,880           327,054      52,387    17.98  s                 139.915 s   0.170 GiB
+//!     512   4,484         1,623,179     183,569   194.55  s               1,437.19  s   0.640 GiB
+//! ```
+//!
+//! `certify_founding_orders` grows as **items^2.7** and holds that exponent across every doubling
+//! measured — ×2.56 in items → ×14.2 in work, ×2.15 → ×8.44, ×2.385 → ×10.27 — which the owner
+//! explains exactly: `founded_receiver::found_in_order` loops bounded by `items − 1` and calls
+//! `compress` over the **whole widened system** once per founded axis, and
+//! `certify_founding_orders` runs that loop twice. The collapsed-pair population is `~items²/12`
+//! and is what `compress` carries; peak resident grows as only `items^1.5`.
+//!
+//! **So the 8 GB bound was never what stopped it, and that is the finding.** Extrapolating the two
+//! measured laws to the whole package cache (≈133,000 items) gives ≈150 days of one core against
+//! ≈115 GiB; 8 GiB is not reached until ≈23,000 items, where the same extrapolation *already*
+//! costs about **34 hours**. Time exhausts more than a day before memory does at every scale, so a
+//! memory bound could never have been the thing observed stopping. The wall is `found_in_order`'s
+//! repeated whole-system `compress`, owner `crates/holonic-engine/src/founded_receiver.rs:443`,
+//! and the resource is **time**. Falsifier: a run that exceeds 8 GiB before it exceeds a day.
+//!
+//! Run: `the_front_is_ordered_until_a_certificate_unorders_it [development-root] [vendored-slice]`
 
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
@@ -415,7 +455,30 @@ fn truncate(text: &str, width: usize) -> String {
     }
 }
 
+/// **The material is declared, and a package cache is not the development.**
+///
+/// This walked every `.lean` under the root, and under `soma/formal` that is **8,625 files and
+/// 91,195,862 octets** — the vendored `.lake/packages/` tree (mathlib, batteries, plausible, …)
+/// against **13 files and 27,980 octets** of soma's own development, a factor of **3,259 in
+/// octets**. Every previous attempt to run this driver on `soma/formal` was therefore running the
+/// certificate over mathlib, which is not the material the header names and is not a development
+/// this repository authored. That is `blueprint/THE_ROADMAP.md` plan 1's convicted shape — an
+/// inferred layout standing in for a declared root — arriving one organ over.
+///
+/// A `.lake` directory is a build artifact by Lake's own convention. It is refused here by name,
+/// and [`vendored_lean_paths`] exists so the vendored corpus can still be entered **as a separately
+/// declared material** when the question is the cost law rather than the development.
 fn lean_paths(root: &Path) -> Vec<PathBuf> {
+    walk_lean(root, false)
+}
+
+/// The same walk, admitting the package cache. Used only where the vendored corpus is the declared
+/// material — the scale sweep below, where the question is where the certificate's cost wall is.
+fn vendored_lean_paths(root: &Path) -> Vec<PathBuf> {
+    walk_lean(root, true)
+}
+
+fn walk_lean(root: &Path, admit_package_cache: bool) -> Vec<PathBuf> {
     let mut found = Vec::new();
     let Ok(entries) = std::fs::read_dir(root) else {
         return found;
@@ -424,12 +487,25 @@ fn lean_paths(root: &Path) -> Vec<PathBuf> {
     here.sort();
     for path in here {
         if path.is_dir() {
-            found.extend(lean_paths(&path));
+            if !admit_package_cache && path.file_name().is_some_and(|name| name == ".lake") {
+                continue;
+            }
+            found.extend(walk_lean(&path, admit_package_cache));
         } else if path.extension().is_some_and(|carried| carried == "lean") {
             found.push(path);
         }
     }
     found
+}
+
+/// The octets a path population carries, which is the material's own extent and the only honest
+/// x-axis for a cost law.
+fn octets(paths: &[PathBuf]) -> u64 {
+    paths
+        .iter()
+        .filter_map(|path| std::fs::metadata(path).ok())
+        .map(|meta| meta.len())
+        .sum()
 }
 
 fn main() {
@@ -649,6 +725,17 @@ fn main() {
 
     section("REAL MATERIAL -- THE WHOLE-ORDER FORM ON soma/formal");
     println!("\n  material  {}", root.display());
+    println!(
+        "  declared  {} .lean files, {} octets — the package cache under `.lake` is REFUSED by name",
+        paths.len(),
+        octets(&paths)
+    );
+    let vendored = vendored_lean_paths(&root);
+    println!(
+        "  refused   {} files, {} octets of vendored `.lake/packages` (mathlib and its deps)",
+        vendored.len() - paths.len(),
+        octets(&vendored).saturating_sub(octets(&paths))
+    );
     let before = compress(&development);
     println!(
         "  items {} | inputs {} | one-shot {} blocks | conduct {} blocks | {} standing junctions",
@@ -855,6 +942,73 @@ fn main() {
             admitted.capacities_agree
         ),
     ));
+
+    // ---------------------------------------------------------------- the cost law, on declared slices
+    //
+    // **Where the wall is, measured rather than narrated.** The certificate returns on soma's own
+    // development in well under a second; it had never returned on `soma/formal` because
+    // `lean_paths` was walking mathlib. That leaves a real question this section answers: at what
+    // material extent does the certificate stop returning, and which phase stops first?
+    //
+    // The slice is a CALLER declaration — argv[2], a count of vendored files to admit — never a
+    // level authored here. Nothing branches on the elapsed figures: the clock measures and the
+    // caller (a shell `timeout` around this process) is what stops a run. `CLAUDE.md` §8.
+    if let Some(slice) = std::env::args().nth(2).and_then(|arg| arg.parse::<usize>().ok()) {
+        section("THE COST LAW -- THE CERTIFICATE ON A CALLER-DECLARED SLICE OF THE PACKAGE CACHE");
+        let mut vendored = vendored_lean_paths(&root);
+        vendored.truncate(slice);
+        println!("\n  slice     {} files, {} octets", vendored.len(), octets(&vendored));
+
+        let clock = std::time::Instant::now();
+        let sliced = join(
+            vendored
+                .iter()
+                .filter_map(|path| std::fs::read_to_string(path).ok())
+                .map(|text| read_development(&text, DeclarationGrain::EveryTopLevelDeclaration))
+                .collect(),
+        );
+        let sliced = Development::read(&sliced);
+        println!(
+            "  read      {} items, {} inputs, {:?}",
+            sliced.names.len(),
+            sliced.width,
+            clock.elapsed()
+        );
+
+        let clock = std::time::Instant::now();
+        let partition = compress(&sliced);
+        println!(
+            "  compress  {} one-shot blocks, {} conduct blocks, {} collapsed pairs, {:?}",
+            partition.one_shot.len(),
+            partition.conduct.len(),
+            partition.collapsed.len(),
+            clock.elapsed()
+        );
+
+        let clock = std::time::Instant::now();
+        let standing_here = standing_junctions(&sliced, &[]);
+        println!(
+            "  junctions {} standing, {:?}",
+            standing_here.len(),
+            clock.elapsed()
+        );
+
+        let clock = std::time::Instant::now();
+        let certified = certify_founding_orders(&sliced);
+        println!(
+            "  certify   {} foundings left / {} right, verdict interchangeable={}, {:?}",
+            certified.orders[0].founded.len(),
+            certified.orders[1].founded.len(),
+            certified.is_interchangeable(),
+            clock.elapsed()
+        );
+        println!(
+            "\n  Every phase above is a measurement. The founding loop is bounded by items-1 in\n  \
+             `founded_receiver::found_in_order` and calls `compress` over the WHOLE widened system\n  \
+             once per founded axis, so the certificate's work is at least items x cost(compress),\n  \
+             and `certify_founding_orders` runs that loop twice."
+        );
+    }
 
     // ---------------------------------------------------------------- the controls
     section("THE CONTROLS");

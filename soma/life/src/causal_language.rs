@@ -477,8 +477,13 @@ impl CausalLanguageEcology {
             // branching structure with time parity, and asserting a total order where the material
             // has a tree is the error this removes.
             //
-            // The law is `hardware_cover::expand_front`, shared with the separation sweep and the
-            // generation expansion. A covering per organ is the cabinet failure one level down.
+            // The law is `hardware_cover::expand_front`. **This comment asserted the sharing before
+            // it was true**: the leader was the law's only external caller until 2026-08-11, when
+            // `morphological_language::generate_currents` moved off a by-count `at % lanes` cover
+            // and `token_invariance::sweep_covered` gave up its own second copy of the by-extent
+            // placement. All three generation fronts conduct through it now. A covering per organ
+            // is the cabinet failure one level down — and the two receiver-conditioning fronts
+            // further down THIS file still section by count, so they are outside that statement.
             let successors = holonic_engine::hardware_cover::expand_front(
                 states,
                 &cover,
@@ -487,62 +492,62 @@ impl CausalLanguageEcology {
                 |state: &GenerationState| state.emitted.len() as u64 + 1,
                 |state: GenerationState| -> Result<Vec<GenerationState>, CausalLanguageError> {
                     let mut branched = Vec::new();
-                if state.stopped {
-                    branched.push(state);
-                    return Ok(branched);
-                }
-                let mut active_hexis = state.source_hexis.clone();
-                let mut branches = self.continuations(&state.history, &active_hexis)?;
-                if branches.is_empty() {
-                    active_hexis = self.recruit(&state.history).sources;
-                    branches = self.continuations(&state.history, &active_hexis)?;
-                }
-                if branches.is_empty() {
-                    let mut stopped = state;
-                    stopped.stopped = true;
-                    branched.push(stopped);
-                    return Ok(branched);
-                }
-                for branch in branches {
-                    let source_names = branch
-                        .sources
-                        .iter()
-                        .map(|source| {
-                            self.passages
-                                .get(source)
-                                .map(|passage| passage.identity.clone())
-                                .ok_or(CausalLanguageError::MalformedFiber)
-                        })
-                        .collect::<Result<BTreeSet<_>, _>>()?;
-                    let source_hexis = branch
-                        .sources
-                        .iter()
-                        .map(|source| {
-                            active_hexis
-                                .get(source)
-                                .cloned()
-                                .map(|support| (source.clone(), support))
-                                .ok_or(CausalLanguageError::MalformedFiber)
-                        })
-                        .collect::<Result<BTreeMap<_, _>, _>>()?;
-                    let mut history = state.history.clone();
-                    history.push(branch.token.clone());
-                    let mut emitted = state.emitted.clone();
-                    emitted.push(CausalGeneratedToken {
-                        token: branch.token.clone(),
-                        matched_horizon: branch.matched_horizon,
-                        sources: source_names,
-                    });
-                    let stopped = spec.stop_at_sentence_boundary
-                        && emitted.len() >= 4
-                        && sentence_boundary(&branch.token);
-                    branched.push(GenerationState {
-                        history,
-                        emitted,
-                        source_hexis,
-                        stopped,
-                    });
-                }
+                    if state.stopped {
+                        branched.push(state);
+                        return Ok(branched);
+                    }
+                    let mut active_hexis = state.source_hexis.clone();
+                    let mut branches = self.continuations(&state.history, &active_hexis)?;
+                    if branches.is_empty() {
+                        active_hexis = self.recruit(&state.history).sources;
+                        branches = self.continuations(&state.history, &active_hexis)?;
+                    }
+                    if branches.is_empty() {
+                        let mut stopped = state;
+                        stopped.stopped = true;
+                        branched.push(stopped);
+                        return Ok(branched);
+                    }
+                    for branch in branches {
+                        let source_names = branch
+                            .sources
+                            .iter()
+                            .map(|source| {
+                                self.passages
+                                    .get(source)
+                                    .map(|passage| passage.identity.clone())
+                                    .ok_or(CausalLanguageError::MalformedFiber)
+                            })
+                            .collect::<Result<BTreeSet<_>, _>>()?;
+                        let source_hexis = branch
+                            .sources
+                            .iter()
+                            .map(|source| {
+                                active_hexis
+                                    .get(source)
+                                    .cloned()
+                                    .map(|support| (source.clone(), support))
+                                    .ok_or(CausalLanguageError::MalformedFiber)
+                            })
+                            .collect::<Result<BTreeMap<_, _>, _>>()?;
+                        let mut history = state.history.clone();
+                        history.push(branch.token.clone());
+                        let mut emitted = state.emitted.clone();
+                        emitted.push(CausalGeneratedToken {
+                            token: branch.token.clone(),
+                            matched_horizon: branch.matched_horizon,
+                            sources: source_names,
+                        });
+                        let stopped = spec.stop_at_sentence_boundary
+                            && emitted.len() >= 4
+                            && sentence_boundary(&branch.token);
+                        branched.push(GenerationState {
+                            history,
+                            emitted,
+                            source_hexis,
+                            stopped,
+                        });
+                    }
 
                     Ok(branched)
                 },
@@ -864,19 +869,21 @@ pub(crate) fn condition_route_receivers_with_executor(
             let handles: Vec<_> = sections
                 .into_iter()
                 .map(|section| {
-                    scope.spawn(move || -> Result<Vec<ConditionedRouteReceiver>, CausalLanguageError> {
-                        let mut carrier = carrier_for_lane();
-                        let mut rows = Vec::new();
-                        for (feature, receiver_sections) in section {
-                            rows.push(condition_route_receiver(
-                                feature,
-                                receiver_sections,
-                                action,
-                                carrier.as_mut(),
-                            )?);
-                        }
-                        Ok(rows)
-                    })
+                    scope.spawn(
+                        move || -> Result<Vec<ConditionedRouteReceiver>, CausalLanguageError> {
+                            let mut carrier = carrier_for_lane();
+                            let mut rows = Vec::new();
+                            for (feature, receiver_sections) in section {
+                                rows.push(condition_route_receiver(
+                                    feature,
+                                    receiver_sections,
+                                    action,
+                                    carrier.as_mut(),
+                                )?);
+                            }
+                            Ok(rows)
+                        },
+                    )
                 })
                 .collect();
             let mut conditioned = Vec::new();

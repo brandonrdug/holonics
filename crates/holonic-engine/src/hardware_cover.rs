@@ -1098,7 +1098,7 @@ mod tests {
 //
 // # Why this is one organ and not three coverings
 //
-// Three fronts in this body have exactly this shape and were being covered separately:
+// Three generation fronts in this body have exactly this shape:
 //
 // ```text
 //   token_invariance::sweep_covered        surfaces      -> readings
@@ -1108,6 +1108,28 @@ mod tests {
 //
 // A covering per organ is the cabinet-of-organs failure one level down, the same defect as a device
 // path per organ. The material supplies `cell -> successors`; the law covers it.
+//
+// **All three conduct through this law as of 2026-08-11. Until that day this comment read "were
+// being covered separately" while two of them still were**, which is the overstatement
+// `canon/TABLET_THE_MANIFOLD.md` convicted in two code comments at once. The order the migration
+// ran in is worth keeping, because the three were not one motion:
+//
+// - `causal_language`'s leader (`soma/life/src/causal_language.rs`) — the law's only external
+//   caller for a day;
+// - `morphological_language::generate_currents` (`soma/life/src/morphological_language/ecology.rs`)
+//   — a change of **law** and not of plumbing: it sectioned `at % lanes` **by count**, and its own
+//   corpus proved that cover was not even lane-invariant;
+// - `token_invariance::sweep_covered` (`crates/holonic-engine/src/token_invariance.rs`) — which
+//   carried a second, independently written copy of the by-extent placement below. Two copies of
+//   one law are where the two drift apart.
+//
+// **And three is the population of GENERATION fronts, not of every front in the body.** Two
+// receiver-conditioning fronts in `soma/life/src/causal_language.rs` —
+// `condition_route_receivers` and `condition_route_receivers_with_executor` — still section
+// `at % lanes` by count. The second cannot conduct through this law as written: it mounts a fresh
+// `&mut dyn LiveCurrentExecutor` per lane, and `expand` here is `Fn + Sync`, so a per-lane mutable
+// carrier has no seat in this signature. That is a declared boundary of this law and not an
+// oversight in that caller.
 
 /// **Expand one front of co-present cells across the cover.**
 ///

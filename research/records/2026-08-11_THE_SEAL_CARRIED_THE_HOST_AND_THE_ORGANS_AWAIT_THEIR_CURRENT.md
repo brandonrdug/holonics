@@ -16,6 +16,29 @@ session that deposits this record.
 PLANS 4–6 UNTOUCHED / SUITE 2078-2-19 ON THE DIRTY TREE / TWO GATES RED / EVERY COUNT BELOW
 RE-MEASURED BEFORE DEPOSIT
 
+> **CORRECTION BANNER, appended 2026-08-11 by the repair wave this record dispatched. The body
+> below is unedited; these three corrections govern where they conflict with it.**
+>
+> 1. **"46,745 occurrence identities" is a STRING count across three fields, not an identity
+>    count.** Re-measured per field on the old rest: `native_identity` **16,149**, `identity`
+>    **16,149**, `caused_by` references **14,447** — summing to exactly 46,745 — plus a separate
+>    **29,145** witness `container` fields and 34 container-receipt `source` fields. The honest
+>    figure is **16,149 founded occurrence identities**, each written three times. The conviction is
+>    unchanged: the corpus content address was a function of this machine. The number was not.
+> 2. **The absolute frame was in FOUR places, not one.** Beyond `founded_record_identity`, the
+>    witness `container` field and the container-receipt `source` field carried it, and — found by
+>    the repair agent, named in no audit — `standing()` folded `path.display()` into every
+>    `PassageOrigin::Standing`, which `conditioned_rest.rs` writes into the sealed body, so the
+>    **plan-2 conditioned-body address was host-dependent too.** Measured: old body **103**
+>    standing host paths and 495,934 total `/home/b`; repaired body **0** and **0**.
+> 3. **This record's author verified a claim with an instrument that could not see it.** The first
+>    check of correction 2 ran `grep -o` against the body rest and returned `0`, appearing to refute
+>    the agent. The body rest is **binary CDER**; `grep` reports nothing for a binary file unless
+>    given `-a`. The corpus rest is JSON text, which is why the identical instrument worked there
+>    and silently failed here. A clean zero from an instrument that cannot address the material is
+>    the defect `CLAUDE.md` §8 convicts, and it occurred in the audit of an audit — **binary-safe
+>    reading is part of the measurement, and a zero must be shown to be a reachable value.**
+
 ---
 
 ## Present question
