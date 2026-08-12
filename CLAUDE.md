@@ -74,6 +74,7 @@ deposited in one day for want of them.** These orient reasoning; none schedules 
 | `canon/TABLET_THE_MANIFOLD.md` | charts as types, the structure group as the legal casts, Darboux and Liouville, holonomy and holomorphy at `√z`, and §21 — reflection as the mechanism, the crossing bearing the load. |
 | `canon/TABLET_THE_OPERATIONS.md` | **the elementary operations, added 2026-08-11 and ratified the same day**: every classical operation is a construction, a transport, a face, or a quotient; the Dirac primitives typed (a ket is a construction, a bra a receiver, an outer product a deposit); the trace as the basepoint-free face of a closed loop; the kernel as the collapsed-pair population; parity, chronology, and reversibility as three objects. `H.0476`–`H.0480`. **This is the reasoning dialect, not an ornament** — his ruling: *"it has to be the dialect that you use for reasoning."* |
 | `canon/TABLET_THE_REASONING_CYCLE.md` | **the pretrained organ inside the returning ecology, ratified 2026-08-12**: query as receiver bra, key as presented orientation, value as carried construction, residual as continuing standing, training as adjoint return, the whole model-world recurrence, cross-codec operation classes, self-similarity and section modulus, and the minimal recurrent-section machine. It is doctrine, not a construction schedule. |
+| `canon/TABLET_THE_CAUSAL_PROFILE.md` | **the computer as causal world-tube and the profiler as a shadow atlas, ratified 2026-08-12**: instruction fibers, observer charts, physical current, caustics and invisible directions, Feynman/knot/folded-dimension readings, complexity and bitwise shadows, and the exact boundary around Quantum Information Dynamics. Counts and clocks are projections, not the body. |
 
 **The one sentence that orders the rest**, held for ninety-two days across five model changes and
 every renamed organ, and measured from his own record on 2026-08-10:
@@ -1764,3 +1765,7 @@ grade that `blueprint/THE_ROADMAP.md` holds open.
    accepted-count tally sites, which it renamed rather than cut; that failure went with the body.
 4. **Grade the implementation, not the receipt** (§8). This section exists because thirty-five
    admitted steps rested on receipts nobody had checked against their owners.
+5. **Profile the causal body, not a scalar shadow.** Counts, elapsed times, work vectors, and energy
+   samples are lawful receiver faces. `canon/TABLET_THE_CAUSAL_PROFILE.md` requires the phase/current
+   field, reconstruction fibers, critical/caustic set, topology, intervention, open exterior, and
+   apparatus frame whenever the deed is claimed as holonic profiling.

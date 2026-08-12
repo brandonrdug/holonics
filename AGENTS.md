@@ -136,6 +136,26 @@ construction merely because its current implementation is being replaced.
 - These clauses constrain the design of any later reasoning construction. They do not schedule one
   and never displace the live roadmap or `CONSTRUCTION_STATE.md`.
 
+## Causal profiling and physical computation
+
+- `canon/TABLET_THE_CAUSAL_PROFILE.md` governs profiling. Treat a computer run as a bounded causal
+  world-tube with local incidence, partial order, ports, constitutive laws, currents, receiver
+  charts, lineage, and an apparatus boundary; never as one privileged clock or instruction list.
+- A holonic profile returns the receiver shadow together with its reconstruction fibers, rank-loss
+  locus/caustic, visible phase directions, loop return, surviving higher incidence, open exterior,
+  and apparatus testimony. Counts, rates, timings, and energy samples are supporting projections,
+  not substitutes for that causal return.
+- CPU, GPU, memory, interconnect, power, thermal, host, and I/O views are charts over one run. A
+  comparison between them requires an explicit transition/calibration receipt; equal final bytes do
+  not establish equal physical or causal geometry.
+- Big-O, work/span, circuit size/depth, Boolean spectra, and telemetry are lawful receiver faces.
+  Preserve the dependency field, fronts, cuts, fanout/reconvergence, phase, topology, intervention,
+  and unresolved fibers from which those faces were taken.
+- “Quantum Information Dynamics” and “Quantum Information Field” are typed project definitions.
+  Do not promote bra-ket notation, path sums, or software traces into physical quantum field theory
+  without the additional operator, composition, dynamics, measurement, domain, and calibrated
+  apparatus structure named by the tablet.
+
 ## Mathematical production boundary
 
 - Mathematics is exact local algebraic/categorical incidence carried by the same engine. It is not

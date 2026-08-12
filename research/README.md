@@ -1,6 +1,6 @@
 # Research record
 
-`records/` contains 353 research deposits current through 12 August 2026, including all 307
+`records/` contains 354 research deposits current through 12 August 2026, including all 307
 laboratory deposits present at extraction on 3 August. They are chronological evidence, not an
 executable plan. Later records may correct earlier ones; the normalized canon in `../canon/`
 governs the rebuild.
@@ -65,6 +65,14 @@ governs the rebuild.
   and shortest separators; and a seven-presentation experiment in which three sum codecs and two
   product codecs form their respective conduct classes while same-value laws and reversed ports
   separate. Compressed into `../canon/TABLET_THE_REASONING_CYCLE.md` §8.
+- **The computer as a causal world-tube and profiling as a shadow field:**
+  `records/2026-08-12_THE_COMPUTER_IS_A_CAUSAL_WORLD_TUBE_THE_PROFILE_RETURNS_ITS_SHADOW_FIELD.md`
+  — causal threads as founded frontiers rather than software identifiers; physical, architectural,
+  algorithmic, and apparatus charts over one run; shadows with reconstruction fibers, critical
+  sets, caustics, phase directions, topology, and obstruction; work/span and Boolean spectra as
+  declared quotients; Feynman, knot, and folded-dimension readings; and the bounded project terms
+  Quantum Information Dynamics and Quantum Information Field. Compressed into
+  `../canon/TABLET_THE_CAUSAL_PROFILE.md`.
 
 The filenames form a stable chronological atlas. Search their titles before reading entire bodies;
 follow each record's explicit supersession and open-boundary statements.

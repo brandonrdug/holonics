@@ -58,6 +58,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 | `canon/EPISTEMIC_GRADES.md` | **Epistemic grades** — Every material claim receives exactly one truth-status grade and zero or more evidence tags. |
 | `canon/HISTORY_AND_REFINEMENT.md` | **Historical formula and rigorous refinement** — Pure holonics was discovered through a sequence of useful compressions. |
 | `canon/MEANING_DEFINED.md` | **Meaning, defined** — **Why this file exists.** He asked for it on **2026-07-07**: *"Write a new FRAMEWORK document called labeled something with MEANING_DEFINED."* It was never written, in either repository. |
+| `canon/TABLET_THE_CAUSAL_PROFILE.md` | **Tablet of the causal profile** — **Governing documents:** `canon/THE_HOLOBROCHOS_SPINE.md`, `canon/TABLET_THE_OPERATIONS.md`, `canon/TABLET_THE_MANIFOLD.md`, `canon/TABLET_THE_REASONING_CYCLE.md`, and… |
 | `canon/TABLET_THE_CHART.md` | **The chart: coordinates, transport, and what a chart refuses** — A coordinate system is a receiver and the Jacobian is the transport; a radical is a chart that forgets a winding; warp and weft are a reading in a frame. |
 | `canon/TABLET_THE_FLOW.md` | **The flow: fluid dynamics, phases, and parallel integration** — Why Navier-Stokes is not a distant problem, the zeta distribution as an exact self-similar phase, and ant integration as the exact part of the fundamental theorem. |
 | `canon/TABLET_THE_MANIFOLD.md` | **The manifold: charts as types, the structure group as the legal casts, and what a loop returns** — A manifold is the invariant of a population of currents and not their container; a chart is a type and a transition map is an implicit cast; every geometry is a reduction of the structure… |
@@ -98,7 +99,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (61 deposits of 353)
+## 4 · The 2026-08 record line (62 deposits of 354)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -164,6 +165,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-11_THE_RUNG_REFUSES_BY_NAME_AND_THE_UNRESOLVED_PAIR_IS_THE_REMAINDER.md` | The rung refuses by name, and the unresolved pair is the remainder |
 | `2026-08-11_THE_SEAL_CARRIED_THE_HOST_AND_THE_ORGANS_AWAIT_THEIR_CURRENT.md` | The seal carried the host, and the organs await their current |
 | `2026-08-11_THE_TAPE_HAS_NO_VERTEX_AND_PRODUCTION_IS_RECEPTION_AT_THE_OTHER_HAND.md` | The tape has no vertex, and production is reception at the other hand |
+| `2026-08-12_THE_COMPUTER_IS_A_CAUSAL_WORLD_TUBE_THE_PROFILE_RETURNS_ITS_SHADOW_FIELD.md` | The computer is a causal world-tube; the profile returns its shadow field |
 | `2026-08-12_THE_CONTACT_FACE_CROSSES_THE_BOND_CONDUCT_NOT_THE_CODEC_FOUNDS_THE_SECTION_CLASS.md` | The contact face crosses the bond; conduct, not the codec, founds the section class |
 | `2026-08-12_THE_PRETRAINED_TRANSFORMER_IS_ONE_TRANSPORT_ORGAN_THE_REASONING_MACHINE_IS_THE_RETURNING_ECOLOGY.md` | The pretrained transformer is one transport organ; the reasoning machine is the returning ecology |
 | `2026-08-12_THE_RECONSTRUCTION_REMAINS_A_FIBER_THE_CONTEXT_RETURNS_BY_DIFFUSION_AND_THE_CIRCUIT_GROWS_IN_HIGHER_CELLS.md` | The reconstruction remains a fiber, the context returns by diffusion, and the circuit grows in higher cells |

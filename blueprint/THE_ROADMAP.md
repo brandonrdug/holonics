@@ -96,6 +96,16 @@ separators, reconstruction fibers, counted work, and the open exterior. A report
 class counts, surface similarity, one shared value, or a hand-authored `Add`/`Multiply` class has
 not returned the deed.
 
+**The integrated profile grade, authorized 2026-08-12.** The full condition-detach-return artifact
+must profile the same causal sections before and after conditioning as receiver shadow fields, not
+as a scalar dashboard. It returns causal-diamond/front testimony, phase-current distributions,
+reconstruction fibers, critical receiver changes and caustics, loop/holonomy or explicit absence,
+scale rebase, shortest interventions, open alternatives, and a separate apparatus/calibration
+receipt. Counts, timings, and contact totals remain support measurements. This sharpens return 4
+without withdrawing the already graded bounded constitutive return, and it does not insert a new
+subsystem before the mandatory `CudaMorphologicalConditioner`. Governing doctrine and exact
+boundary: `canon/TABLET_THE_CAUSAL_PROFILE.md`.
+
 **Falsifiers.** Rename every surface while preserving incidence and consequences; the quotient must
 stand. Hold one value fixed while changing the operation; a successor intervention must separate
 it. Remove the intervention receiver; the quotient may only coarsen. Reverse a noncommuting port;

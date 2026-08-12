@@ -29,6 +29,16 @@ Duplicate keys are intentionally not merged without namespacing.
   construction is <https://github.com/3b1b/videos/blob/master/_2021/shadows.py>. The code contains
   presentation-specific approximations/TODOs; it is evidence for projection derivation, not an
   exact physical shadow engine.
+- NIST Digital Library of Mathematical Functions, Chapter 36, *Integrals with Coalescing Saddles*
+  — canonical catastrophe integrals, bifurcation and Stokes sets, scaling, uniform asymptotics, and
+  caustics: <https://dlmf.nist.gov/36>. This is the standard-function reference for fold/cusp
+  diffraction forms; a transfer to causal profiling requires a founded phase and projection map.
+- Eric Todd Quinto, “Singularities of the X-Ray Transform and Limited Data Tomography in
+  `R^2` and `R^3`” — microlocal visibility and invisible singular directions under restricted
+  acquisition: <https://doi.org/10.1137/0524069>.
+- MIT Imaging and Computing Group, *Mathematics of the Discrete Fourier Transform and projection
+  imaging notes* — Fourier-slice/tomographic projection background:
+  <https://math.mit.edu/icg/resources/notes367.pdf>.
 - Elliott Kaplan and Christopher Hegarty (eds.), *Understanding GPS/GNSS* — satellite ranging,
   time, coordinate frames, receiver estimation, and navigation charts (book; cite by edition).
 - Neil Ashby, “Relativity in the Global Positioning System,” *Living Reviews in Relativity* — why
@@ -64,6 +74,20 @@ Duplicate keys are intentionally not merged without namespacing.
   as declared probabilistic receivers: <https://people.math.harvard.edu/~ctm/home/text/others/shannon/entropy/entropy.pdf>.
 - Rolf Landauer, “Irreversibility and Heat Generation in the Computing Process,” 1961 — physical
   erasure/heat boundary: <https://doi.org/10.1147/rd.53.0183>.
+- Rolf Landauer, “The Physical Nature of Information” — information-bearing degrees of freedom are
+  physically represented and constrained by available parts and laws:
+  <https://research.ibm.com/publications/the-physical-nature-of-information>.
+- Leslie Lamport, “Time, Clocks, and the Ordering of Events in a Distributed System” — causal
+  precedence as a partial order and clocks as order-preserving charts rather than causality:
+  <https://www.microsoft.com/en-us/research/publication/time-clocks-ordering-events-distributed-system/>.
+- Robert D. Blumofe and Charles E. Leiserson, “Space-Efficient Scheduling of Multithreaded
+  Computations” — work, critical path/span, space, and strict-DAG scheduling bounds:
+  <https://doi.org/10.1137/S0097539793259471>. These are exact complexity projections in their
+  declared computation model, not complete physical execution fields.
+- MIT OpenCourseWare, *Advanced Complexity Theory: Fourier Analysis and Inapproximability* —
+  parity characters as an orthonormal basis for functions on the Boolean cube and the corresponding
+  Fourier coefficients:
+  <https://live.ocw.mit.edu/courses/18-405j-advanced-complexity-theory-spring-2016/9fe32c482f180d56da569dc36e18c6bf_MIT18_405JS16_Fourier.pdf>.
 - E. T. Jaynes, “Information Theory and Statistical Mechanics,” 1957 — maximum entropy under
   declared constraints: <https://doi.org/10.1103/PhysRev.106.620>.
 - NVIDIA, *CUDA C++ Programming Guide* — contemporary primary apparatus documentation for SIMT,
