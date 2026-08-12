@@ -41,7 +41,11 @@ pub enum MorphologicalConductCudaError {
     DeviceRefused {
         key_row: Option<u32>,
     },
-    InvalidDeviceReturn,
+    /// The card's return is malformed, and `at` names the exact check that disagreed. An
+    /// opaque refusal at a membrane costs a rebuild-and-rerun cycle to locate; this names it.
+    InvalidDeviceReturn {
+        at: &'static str,
+    },
     /// The card's induced equivalence and the host's independently recomputed one disagree.
     ParityBroken {
         candidate: u32,
@@ -62,8 +66,10 @@ impl PartialEq for MorphologicalConductCudaError {
             | (Self::InvalidFront, Self::InvalidFront)
             | (Self::KeyWidth, Self::KeyWidth)
             | (Self::NoncanonicalSheet, Self::NoncanonicalSheet)
-            | (Self::InvalidDeviceReturn, Self::InvalidDeviceReturn)
             | (Self::PoisonedRealization, Self::PoisonedRealization) => true,
+            (Self::InvalidDeviceReturn { at: left }, Self::InvalidDeviceReturn { at: right }) => {
+                left == right
+            }
             (Self::DeviceRefused { key_row: left }, Self::DeviceRefused { key_row: right }) => {
                 left == right
             }
@@ -84,7 +90,7 @@ impl MorphologicalConductCudaError {
     const fn poisons_realization(&self) -> bool {
         matches!(
             self,
-            Self::Driver(_) | Self::InvalidDeviceReturn | Self::ParityBroken { .. }
+            Self::Driver(_) | Self::InvalidDeviceReturn { .. } | Self::ParityBroken { .. }
         )
     }
 }
@@ -118,10 +124,10 @@ impl std::fmt::Display for MorphologicalConductCudaError {
                     "the card refused the morphological-conduct front"
                 )
             }
-            Self::InvalidDeviceReturn => {
+            Self::InvalidDeviceReturn { at } => {
                 write!(
                     formatter,
-                    "the card returned malformed morphological-conduct attachment"
+                    "the card returned malformed morphological-conduct attachment: {at}"
                 )
             }
             Self::ParityBroken { candidate } => write!(
@@ -357,7 +363,9 @@ impl MorphologicalConductAttachment {
     ) -> Result<(), MorphologicalConductCudaError> {
         let host = front.host_attachment();
         if host.len() != self.candidates.len() {
-            return Err(MorphologicalConductCudaError::InvalidDeviceReturn);
+            return Err(MorphologicalConductCudaError::InvalidDeviceReturn {
+                at: "the parity check received a different candidate population",
+            });
         }
         for (at, returned) in self.candidates.iter().enumerate() {
             let device = returned
@@ -368,7 +376,9 @@ impl MorphologicalConductAttachment {
                         .deposits
                         .get(*deposit as usize)
                         .map(MorphologicalConductDepositRow::key)
-                        .ok_or(MorphologicalConductCudaError::InvalidDeviceReturn)
+                        .ok_or(MorphologicalConductCudaError::InvalidDeviceReturn {
+                            at: "a returned deposit ordinal is outside the shipped sheet",
+                        })
                 })
                 .collect::<Result<LocalSequence<_>, _>>()?;
             if device.len() != host[at].len()
@@ -780,18 +790,28 @@ fn decode_card_output(
     zero_active_ablation: bool,
 ) -> Result<MorphologicalConductAttachment, MorphologicalConductCudaError> {
     if !wire::control_is_canonical(control) || output.len() < wire::OUTPUT_HEADER_WORDS {
-        return Err(MorphologicalConductCudaError::InvalidDeviceReturn);
+        return Err(MorphologicalConductCudaError::InvalidDeviceReturn {
+            at: "control is not canonical, or the returned header is short",
+        });
     }
     let candidates = control[wire::CONTROL_CANDIDATES] as usize;
     let deposits = control[wire::CONTROL_DEPOSITS] as usize;
     let key_rows = control[wire::CONTROL_KEY_ROWS] as usize;
     let max_candidate_keys = control[wire::CONTROL_MAX_CANDIDATE_KEYS] as usize;
-    let row_words = wire::candidate_row_words(max_candidate_keys)
-        .ok_or(MorphologicalConductCudaError::InvalidDeviceReturn)?;
-    let expected_output = wire::output_words(candidates, max_candidate_keys)
-        .ok_or(MorphologicalConductCudaError::InvalidDeviceReturn)?;
+    let row_words = wire::candidate_row_words(max_candidate_keys).ok_or(
+        MorphologicalConductCudaError::InvalidDeviceReturn {
+            at: "the candidate row width is not derivable from the control block",
+        },
+    )?;
+    let expected_output = wire::output_words(candidates, max_candidate_keys).ok_or(
+        MorphologicalConductCudaError::InvalidDeviceReturn {
+            at: "the output extent is not derivable from the control block",
+        },
+    )?;
     if output.len() != expected_output {
-        return Err(MorphologicalConductCudaError::InvalidDeviceReturn);
+        return Err(MorphologicalConductCudaError::InvalidDeviceReturn {
+            at: "the returned extent is not the declared extent",
+        });
     }
     match output[wire::OUTPUT_STATUS] {
         wire::STATUS_INVALID => {
@@ -801,7 +821,11 @@ fn decode_card_output(
             });
         }
         wire::STATUS_COMPLETE => {}
-        _ => return Err(MorphologicalConductCudaError::InvalidDeviceReturn),
+        _ => {
+            return Err(MorphologicalConductCudaError::InvalidDeviceReturn {
+                at: "the status word is neither complete nor invalid",
+            })
+        }
     }
     let active_deposits = output[wire::OUTPUT_ACTIVE_DEPOSITS];
     let header_matches = output[wire::OUTPUT_VERSION] == wire::LAYOUT_VERSION
@@ -816,7 +840,10 @@ fn decode_card_output(
         && output[wire::OUTPUT_TOTAL_WORDS] as usize == expected_output
         && output[wire::OUTPUT_INVALID_KEY_ROW] == wire::OPEN_KEY_ROW;
     if !header_matches || (active_deposits == 0) != zero_active_ablation {
-        return Err(MorphologicalConductCudaError::InvalidDeviceReturn);
+        return Err(MorphologicalConductCudaError::InvalidDeviceReturn {
+            at: "the returned header disagrees with the control block, or the zero-active \
+                 declaration does not match",
+        });
     }
     let mut returned_candidates = LocalSequence::with_capacity(candidates);
     let mut total_key_rows = 0usize;
@@ -833,7 +860,10 @@ fn decode_card_output(
             || carried > max_candidate_keys
             || output[at + wire::CANDIDATE_KEY_ROWS] as usize > key_rows
         {
-            return Err(MorphologicalConductCudaError::InvalidDeviceReturn);
+            return Err(MorphologicalConductCudaError::InvalidDeviceReturn {
+                at: "a candidate row is malformed: status, epoch, ordinal, face, match count, or \
+                     key-row count",
+            });
         }
         total_key_rows = total_key_rows
             .checked_add(output[at + wire::CANDIDATE_KEY_ROWS] as usize)
@@ -847,11 +877,16 @@ fn decode_card_output(
                         .last()
                         .is_some_and(|previous: &u32| *previous >= word)
                 {
-                    return Err(MorphologicalConductCudaError::InvalidDeviceReturn);
+                    return Err(MorphologicalConductCudaError::InvalidDeviceReturn {
+                        at: "a match slot is out of range or the matches are not strictly \
+                             ascending",
+                    });
                 }
                 active.push(word);
             } else if word != wire::OPEN_DEPOSIT {
-                return Err(MorphologicalConductCudaError::InvalidDeviceReturn);
+                return Err(MorphologicalConductCudaError::InvalidDeviceReturn {
+                    at: "an unused match slot carries a deposit",
+                });
             }
         }
         returned_candidates.push(CandidateActiveDeposits {
@@ -866,7 +901,9 @@ fn decode_card_output(
     // sum to the sheet it was given. This is the card saying what it read, checked against what was
     // shipped.
     if total_key_rows != key_rows {
-        return Err(MorphologicalConductCudaError::InvalidDeviceReturn);
+        return Err(MorphologicalConductCudaError::InvalidDeviceReturn {
+            at: "the card's per-candidate key-row readings do not sum to the sheet it was given",
+        });
     }
     Ok(MorphologicalConductAttachment {
         schema: "soma-life.morphological-conduct-attachment.v2".to_owned(),
@@ -1050,7 +1087,7 @@ mod tests {
         forged[first + wire::CANDIDATE_ACTIVE_DEPOSITS] = 2;
         assert!(matches!(
             decode_card_output(&control, forged.as_ref(), false),
-            Err(MorphologicalConductCudaError::InvalidDeviceReturn)
+            Err(MorphologicalConductCudaError::InvalidDeviceReturn { .. })
         ));
 
         // A card that read fewer key rows than were shipped is refused even when every match is
@@ -1059,7 +1096,7 @@ mod tests {
         short[second + wire::CANDIDATE_KEY_ROWS] = 2;
         assert!(matches!(
             decode_card_output(&control, short.as_ref(), false),
-            Err(MorphologicalConductCudaError::InvalidDeviceReturn)
+            Err(MorphologicalConductCudaError::InvalidDeviceReturn { .. })
         ));
 
         // And a well-formed return that attaches the wrong deposit fails parity rather than

@@ -1570,7 +1570,10 @@ impl MorphologicalLanguageEcology {
         )?;
         let returned = runtime.executor.enact(&front)?;
         if returned.semantic.candidates.len() != candidate_count {
-            return Err(MorphologicalConductCudaError::InvalidDeviceReturn.into());
+            return Err(MorphologicalConductCudaError::InvalidDeviceReturn {
+                at: "the card returned a different candidate population than the front shipped",
+            }
+            .into());
         }
         runtime.apparatus.push(returned.apparatus);
         let returned_candidates = returned.semantic.candidates;
@@ -1587,14 +1590,29 @@ impl MorphologicalLanguageEcology {
                     let mut opened = Vec::with_capacity(candidates.len());
                     let mut withheld_candidates = LocalSequence::new();
                     for mut event in candidates {
-                        let returned = returned_candidates
-                            .get(returned_at)
-                            .ok_or(MorphologicalConductCudaError::InvalidDeviceReturn)?;
-                        if returned.candidate as usize != returned_at
-                            || returned.face != cell.site
-                            || returned.key_rows as usize != event.conduct_candidates.len()
-                        {
-                            return Err(MorphologicalConductCudaError::InvalidDeviceReturn.into());
+                        let returned = returned_candidates.get(returned_at).ok_or(
+                            MorphologicalConductCudaError::InvalidDeviceReturn {
+                                at: "the card returned fewer candidate rows than the front shipped",
+                            },
+                        )?;
+                        if returned.candidate as usize != returned_at {
+                            return Err(MorphologicalConductCudaError::InvalidDeviceReturn {
+                                at: "a returned candidate ordinal is out of order",
+                            }
+                            .into());
+                        }
+                        if returned.face != cell.site {
+                            return Err(MorphologicalConductCudaError::InvalidDeviceReturn {
+                                at: "a returned candidate face is not the site it was opened at",
+                            }
+                            .into());
+                        }
+                        if returned.key_rows as usize != event.conduct_candidates.len() {
+                            return Err(MorphologicalConductCudaError::InvalidDeviceReturn {
+                                at: "the card read a different number of keys for a candidate \
+                                     than the front shipped for it",
+                            }
+                            .into());
                         }
                         let candidate_edges = event
                             .conduct_candidates
@@ -1605,15 +1623,19 @@ impl MorphologicalLanguageEcology {
                         let mut attached_set = LocalSet::new();
                         let mut conducting_sources = BTreeSet::new();
                         for deposit_at in &returned.active_deposits {
-                            let (edge, sources) = deposit_projection
-                                .get(*deposit_at as usize)
-                                .ok_or(MorphologicalConductCudaError::InvalidDeviceReturn)?;
+                            let (edge, sources) = deposit_projection.get(*deposit_at as usize).ok_or(
+                                MorphologicalConductCudaError::InvalidDeviceReturn {
+                                    at: "a returned deposit ordinal is outside the shipped sheet",
+                                },
+                            )?;
                             if !event.conduct_candidates.contains(edge)
                                 || !attached_set.insert(edge.clone())
                             {
-                                return Err(
-                                    MorphologicalConductCudaError::InvalidDeviceReturn.into()
-                                );
+                                return Err(MorphologicalConductCudaError::InvalidDeviceReturn {
+                                    at: "the card attached a deposit this candidate did not carry, \
+                                         or attached one twice",
+                                }
+                                .into());
                             }
                             attached.push(edge.clone());
                             conducting_sources.extend(sources.iter().cloned());
@@ -1682,7 +1704,10 @@ impl MorphologicalLanguageEcology {
             });
         }
         if returned_at != candidate_count {
-            return Err(MorphologicalConductCudaError::InvalidDeviceReturn.into());
+            return Err(MorphologicalConductCudaError::InvalidDeviceReturn {
+                at: "the front consumed a different candidate population than it shipped",
+            }
+            .into());
         }
         Ok(expanded)
     }

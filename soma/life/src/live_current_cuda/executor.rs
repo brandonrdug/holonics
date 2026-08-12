@@ -962,7 +962,9 @@ impl CudaLiveCurrentExecutor {
                 .map(|depth| prior.co_present_overflow(depth).map_or(0, <[_]>::len))
                 .max()
                 .unwrap_or(0);
-            caps.own = caps.own.max(resident.map_or(32, |r| r.own_capacity.max(32)));
+            caps.own = caps
+                .own
+                .max(resident.map_or(32, |r| r.own_capacity.max(32)));
             caps.max_depth = caps.max_depth.max(
                 resident
                     .map_or(prior_depth, |r| r.max_depth.max(prior_depth))
@@ -989,9 +991,7 @@ impl CudaLiveCurrentExecutor {
             staged
                 .try_reserve_exact(count)
                 .map_err(|_| LiveCurrentError::ResourceReservation)?;
-            for ((request, resident), contact) in
-                requests.iter().zip(residents).zip(contacts)
-            {
+            for ((request, resident), contact) in requests.iter().zip(residents).zip(contacts) {
                 let source_grain = request.event().geometry().source_grain()?;
                 widest_grain = widest_grain.max(source_grain);
                 staged.push(self.stage_one(
@@ -1008,10 +1008,14 @@ impl CudaLiveCurrentExecutor {
 
             // Concatenate. Every buffer is `count` regions of one uniform extent, which is what
             // makes `len / count` an exact stride inside the kernel.
-            let control_flat: Vec<u32> =
-                staged.iter().flat_map(|s| s.control.iter().copied()).collect();
-            let relation_flat: Vec<u32> =
-                staged.iter().flat_map(|s| s.relation.iter().copied()).collect();
+            let control_flat: Vec<u32> = staged
+                .iter()
+                .flat_map(|s| s.control.iter().copied())
+                .collect();
+            let relation_flat: Vec<u32> = staged
+                .iter()
+                .flat_map(|s| s.relation.iter().copied())
+                .collect();
             let owns_flat: Vec<SparseOwnCell> =
                 staged.iter().flat_map(|s| s.owns.iter().copied()).collect();
             let emissions_flat = vec![0u32; checked_mul(count, emission_extent)?];
@@ -1025,8 +1029,8 @@ impl CudaLiveCurrentExecutor {
             let directed_device = DeviceBuffer::alloc_zeroed(count.max(1)).map_err(substrate)?;
             let contacts_device = DeviceBuffer::alloc_zeroed(count.max(1)).map_err(substrate)?;
 
-            let carriers_device =
-                DeviceBuffer::alloc_zeroed(checked_mul(count, carrier_extent)?).map_err(substrate)?;
+            let carriers_device = DeviceBuffer::alloc_zeroed(checked_mul(count, carrier_extent)?)
+                .map_err(substrate)?;
             let overflow_device = DeviceBuffer::alloc_zeroed(checked_mul(count, overflow_extent)?)
                 .map_err(substrate)?;
             let counts_device = DeviceBuffer::alloc_zeroed(checked_mul(count, caps.max_depth)?)
@@ -1062,7 +1066,10 @@ impl CudaLiveCurrentExecutor {
                             overflow_device
                                 .copy_range_from_buffer(
                                     overflow_at
-                                        + checked_mul(checked_mul(row, caps.overflow)?, NODE_WORDS)?,
+                                        + checked_mul(
+                                            checked_mul(row, caps.overflow)?,
+                                            NODE_WORDS,
+                                        )?,
                                     &resident.overflow,
                                     checked_mul(
                                         checked_mul(row, resident.overflow_capacity)?,
@@ -1402,7 +1409,9 @@ impl CudaLiveCurrentExecutor {
     ) -> Result<Vec<(ExecutedLiveCurrent, ResidentCarrier)>, LiveCurrentError> {
         let count = requests.len();
         let mut owns_all = vec![SparseOwnCell::EMPTY; checked_mul(count, caps.own)?];
-        owns_device.copy_to_slice(&mut owns_all).map_err(substrate)?;
+        owns_device
+            .copy_to_slice(&mut owns_all)
+            .map_err(substrate)?;
         let mut carrier_all = vec![0u32; checked_mul(count, carrier_extent)?];
         carriers_device
             .copy_to_slice(&mut carrier_all)
@@ -1431,7 +1440,8 @@ impl CudaLiveCurrentExecutor {
 
         for (lane, request) in requests.iter().enumerate() {
             let lineage = request.lineage();
-            let control = &control_read[lane * cuda::CONTROL_WORDS..(lane + 1) * cuda::CONTROL_WORDS];
+            let control =
+                &control_read[lane * cuda::CONTROL_WORDS..(lane + 1) * cuda::CONTROL_WORDS];
             let state = cuda::CONTROL_STATE;
             let own_axis = control[state + cuda::STATE_OWN_AXIS];
             let own_live = control[state + cuda::STATE_OWN_LIVE] as usize;

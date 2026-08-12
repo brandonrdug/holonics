@@ -325,16 +325,19 @@ fn build(workspace: &Path, codex_root: &Path, claude_root: &Path) -> Result<(), 
 }
 
 fn detached(form: &Path, expectation: &DetachedExpectation) -> Result<(), String> {
-    let masked = expectation
-        .source_roots
-        .iter()
-        .map(|path| {
-            let empty = std::fs::read_dir(path)
-                .map(|mut entries| entries.next().is_none())
-                .unwrap_or(true);
-            (path.display().to_string(), empty)
-        })
-        .collect::<Vec<_>>();
+    // An unreadable root is not a masked root. Until 2026-08-11 a `read_dir` error here was folded
+    // into `empty: true`, so the one condition the detachment falsifier exists to detect — a root
+    // this child cannot account for — would have been reported as a passing mask. The plan-2
+    // driver's `masked_roots` already propagated it; this is the same law, written twice and
+    // agreeing only on the happy path.
+    let mut masked = Vec::with_capacity(expectation.source_roots.len());
+    for path in &expectation.source_roots {
+        let empty = std::fs::read_dir(path)
+            .map_err(|error| format!("inspect masked source root {}: {error}", path.display()))?
+            .next()
+            .is_none();
+        masked.push((path.display().to_string(), empty));
+    }
     if masked.iter().any(|(_, empty)| !empty) {
         return Err("a declared source root remained reachable after detachment".to_owned());
     }

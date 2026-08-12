@@ -223,16 +223,26 @@ fn build(corpus_form: &Path, source_roots: Vec<PathBuf>) -> Result<(), String> {
     let workspace = source_roots
         .first()
         .ok_or_else(|| "the declared workspace root is absent".to_owned())?;
-    let standing = standing(&workspace.join("standing/output"))?;
+    // The expectation is read off the material, never authored beside it. This line carried
+    // `if standing_artifacts != 103` until 2026-08-11 — a level pinned inside a driver, where the
+    // authored-levels regex cannot see it and no caller can vary it, and one that says nothing
+    // about *which* 103 artifacts stood. What the material itself supplies is the population and
+    // its exact address; what the organ supplies is whether the mount consumed every one of them.
+    // Both are carried into the deposited grade, so a moved standing is legible in the receipt
+    // rather than refused against a number somebody typed.
+    let standing = standing(workspace, &workspace.join("standing/output"))?;
     let standing_artifacts = standing.len();
-    if standing_artifacts != 103 {
-        return Err(format!(
-            "the admitted mathematical standing moved: expected 103 artifacts, opened {standing_artifacts}"
-        ));
-    }
+    let standing_address = content_address(&standing_octets(&standing));
     let query = DerivationQuery::reaching(STATEMENT);
     let mut body = ConditionedBody::mount(standing)
         .map_err(|error| format!("mount mathematical standing: {error}"))?;
+    if body.standing().len() != standing_artifacts {
+        return Err(format!(
+            "the mount did not consume the opened mathematical standing: \
+             {standing_artifacts} artifacts opened, {} passages standing",
+            body.standing().len()
+        ));
+    }
     if !body
         .derive(&query)
         .map_err(|error| format!("derive unconditioned mathematical control: {error}"))?
@@ -574,7 +584,11 @@ fn build(corpus_form: &Path, source_roots: Vec<PathBuf>) -> Result<(), String> {
             "address": corpus_address,
             "receipt": corpus_receipt,
         },
-        "mathematical_standing": {"artifacts": standing_artifacts},
+        "mathematical_standing": {
+            "artifacts": standing_artifacts,
+            "address": standing_address,
+            "mount_consumed_every_artifact": true,
+        },
         "conditioned_body": {"path": body_form.path, "address": body_form.address},
         "first_production": {
             "path": first_form.path,
@@ -1677,7 +1691,15 @@ fn source_occurrence_identity(section: &LaboratoryReturnedSection) -> Result<&st
     Ok(occurrence)
 }
 
-fn standing(root: &Path) -> Result<Vec<(String, String)>, String> {
+/// The declared mathematical standing, addressed relative to the declared workspace.
+///
+/// The source string a passage carries is written verbatim into the sealed `ConditionedRest`
+/// (`conditioned_rest.rs:380`), so an absolute source makes the conditioned body's content address
+/// a function of this machine's filesystem — the same `CLAUDE.md` §0 lesson 2 defect the corpus
+/// membrane carried until 2026-08-11. The workspace is declared on the command line; the artifact
+/// address is taken relative to it, and a path that does not lie under it is refused rather than
+/// silently absolutised.
+fn standing(workspace: &Path, root: &Path) -> Result<Vec<(String, String)>, String> {
     fn lean_artifacts(root: &Path, found: &mut Vec<PathBuf>) -> Result<(), String> {
         let mut entries = std::fs::read_dir(root)
             .map_err(|error| format!("read mathematical standing {}: {error}", root.display()))?
@@ -1716,9 +1738,34 @@ fn standing(root: &Path) -> Result<Vec<(String, String)>, String> {
             let text = std::fs::read_to_string(&path).map_err(|error| {
                 format!("read mathematical artifact {}: {error}", path.display())
             })?;
-            Ok((path.display().to_string(), text))
+            let source = path
+                .strip_prefix(workspace)
+                .map_err(|_| {
+                    format!(
+                        "the mathematical artifact {} does not lie under the declared workspace {}",
+                        path.display(),
+                        workspace.display()
+                    )
+                })?
+                .display()
+                .to_string();
+            Ok((source, text))
         })
         .collect()
+}
+
+/// One exact serialization of the opened standing. The walk that produced it is path-sorted at
+/// every level, so this address is reproducible from the declared root and moves when — and only
+/// when — an artifact is added, removed, renamed, or edited.
+fn standing_octets(standing: &[(String, String)]) -> Vec<u8> {
+    let mut octets = Vec::new();
+    for (source, text) in standing {
+        octets.extend_from_slice(source.as_bytes());
+        octets.push(0);
+        octets.extend_from_slice(text.as_bytes());
+        octets.push(0);
+    }
+    octets
 }
 
 fn sha256_file(path: &Path) -> Result<String, String> {

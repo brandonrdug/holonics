@@ -62,8 +62,8 @@ use std::collections::{BTreeMap, BTreeSet};
 use serde::{Deserialize, Serialize};
 
 use holonic_engine::receiver_exact_compression::{
-    compress, CollapsedPair, InputId, ItemId, Observation, ObservedSystem, ReceiverExactCompression,
-    ReceiverId,
+    compress, CollapsedPair, InputId, ItemId, Observation, ObservedSystem,
+    ReceiverExactCompression, ReceiverId,
 };
 use holonic_language::{
     CodecCrossingError, CodecId, CodecLineageRefusal, CodecObstruction, CodecRevisionRefusal,
@@ -79,9 +79,7 @@ const PASS_SCHEMA: &str = "life.decomposing-codec.pass.v1";
 pub const CLOSES_RECEIVER: u64 = 256;
 
 /// One octet of material. Exact, and never read as a magnitude — only compared and concatenated.
-#[derive(
-    Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize,
-)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct Symbol(pub u8);
 
 impl Symbol {
@@ -167,9 +165,9 @@ impl DecompositionGrain {
     }
 
     fn closes_after(&self, read: &[Symbol]) -> bool {
-        self.cuts.iter().any(|cut| {
-            read.len() >= cut.len() && &read[read.len() - cut.len()..] == cut.as_slice()
-        })
+        self.cuts
+            .iter()
+            .any(|cut| read.len() >= cut.len() && &read[read.len() - cut.len()..] == cut.as_slice())
     }
 }
 
@@ -669,9 +667,9 @@ impl DecomposingBody {
             .runtime
             .found_face(DecompositionFace { wholes })
             .map_err(|(error, _)| DecompositionError::Runtime(error))?;
-        let emission = self
-            .runtime
-            .receive_with(self.continuation, face, &mut DecomposingExecutor)?;
+        let emission =
+            self.runtime
+                .receive_with(self.continuation, face, &mut DecomposingExecutor)?;
         if let Some(reflection) = emission.reflection {
             self.open = Some(OpenReflection { reflection, face });
         }
@@ -921,8 +919,10 @@ mod tests {
         match pair.witness {
             Some((receiver, left, right)) => format!(
                 "{} {}|{}",
-                u8::try_from(receiver.0)
-                    .map_or_else(|_| "closes".to_owned(), |symbol| render_word(&[Symbol(symbol)])),
+                u8::try_from(receiver.0).map_or_else(
+                    |_| "closes".to_owned(),
+                    |symbol| render_word(&[Symbol(symbol)])
+                ),
                 left.0,
                 right.0
             ),
@@ -1013,10 +1013,9 @@ mod tests {
         let (Some(here), Some(there)) = (here, there) else {
             return false;
         };
-        system
-            .receivers()
-            .into_iter()
-            .any(|receiver| system.observation(here, receiver) != system.observation(there, receiver))
+        system.receivers().into_iter().any(|receiver| {
+            system.observation(here, receiver) != system.observation(there, receiver)
+        })
     }
 
     /// The shortest separating word by exhaustion. A third opinion: no partition refinement, no
@@ -1059,7 +1058,9 @@ mod tests {
         let grains = [
             origin_grain(),
             origin_grain().with(word("b")).unwrap(),
-            origin_grain().with_all([word("b"), word("s"), word("rs")]).unwrap(),
+            origin_grain()
+                .with_all([word("b"), word("s"), word("rs")])
+                .unwrap(),
             origin_grain()
                 .with_all([word("b"), word("s"), word("rs"), word("k")])
                 .unwrap(),
@@ -1300,14 +1301,54 @@ mod tests {
         assert_eq!(
             exhibited,
             vec![
-                ("a".to_owned(), "c".to_owned(), "b".to_owned(), "y 1|0".to_owned()),
-                ("a".to_owned(), "d".to_owned(), "b".to_owned(), "x 1|0".to_owned()),
-                ("a".to_owned(), "e".to_owned(), "b".to_owned(), "z 0|1".to_owned()),
-                ("c".to_owned(), "d".to_owned(), "b".to_owned(), "x 1|0".to_owned()),
-                ("c".to_owned(), "e".to_owned(), "b".to_owned(), "y 0|1".to_owned()),
-                ("d".to_owned(), "e".to_owned(), "b".to_owned(), "x 0|1".to_owned()),
-                ("p".to_owned(), "q".to_owned(), "rs".to_owned(), "x 1|0".to_owned()),
-                ("pr".to_owned(), "qr".to_owned(), "s".to_owned(), "x 1|0".to_owned()),
+                (
+                    "a".to_owned(),
+                    "c".to_owned(),
+                    "b".to_owned(),
+                    "y 1|0".to_owned()
+                ),
+                (
+                    "a".to_owned(),
+                    "d".to_owned(),
+                    "b".to_owned(),
+                    "x 1|0".to_owned()
+                ),
+                (
+                    "a".to_owned(),
+                    "e".to_owned(),
+                    "b".to_owned(),
+                    "z 0|1".to_owned()
+                ),
+                (
+                    "c".to_owned(),
+                    "d".to_owned(),
+                    "b".to_owned(),
+                    "x 1|0".to_owned()
+                ),
+                (
+                    "c".to_owned(),
+                    "e".to_owned(),
+                    "b".to_owned(),
+                    "y 0|1".to_owned()
+                ),
+                (
+                    "d".to_owned(),
+                    "e".to_owned(),
+                    "b".to_owned(),
+                    "x 0|1".to_owned()
+                ),
+                (
+                    "p".to_owned(),
+                    "q".to_owned(),
+                    "rs".to_owned(),
+                    "x 1|0".to_owned()
+                ),
+                (
+                    "pr".to_owned(),
+                    "qr".to_owned(),
+                    "s".to_owned(),
+                    "x 1|0".to_owned()
+                ),
             ]
         );
         // Three different receivers name the eight differences, in both orientations. A family in
@@ -1332,7 +1373,10 @@ mod tests {
                 .collect::<Vec<_>>(),
             vec!["b", "b", "b", "b", "b", "b", "rs", "s"]
         );
-        assert_eq!(distinct_words(&pass), BTreeSet::from(["b".to_owned(), "rs".to_owned(), "s".to_owned()]));
+        assert_eq!(
+            distinct_words(&pass),
+            BTreeSet::from(["b".to_owned(), "rs".to_owned(), "s".to_owned()])
+        );
 
         // Lengths must actually vary, or "shortest" is not a claim this material can refute.
         let lengths: BTreeSet<usize> = pass
@@ -1431,14 +1475,17 @@ mod tests {
     /// One parented codec version per collapsed pair, resumed under their join, with the lineage
     /// recording which pair asked for what.
     #[test]
-    fn every_collapsed_pair_founds_a_parented_codec_version_and_the_pass_resumes_under_their_join() {
+    fn every_collapsed_pair_founds_a_parented_codec_version_and_the_pass_resumes_under_their_join()
+    {
         let mut body = DecomposingBody::mount(origin_grain()).expect("a declared grain");
         assert_eq!(body.codec_population(), 1);
 
         let first = body.receive(batch(BATCH_A)).expect("readable");
         assert_eq!(first.codec, body.origin());
         assert!(matches!(first.state, ContinuationState::Reflected(_)));
-        let reflection = first.reflection.expect("an over-collapsed reading reflects");
+        let reflection = first
+            .reflection
+            .expect("an over-collapsed reading reflects");
 
         // The reflection names the receiver that saw the first difference, and the population it
         // came from rides whole on the standing.
@@ -1490,7 +1537,8 @@ mod tests {
                         .word_symbols(&pair.distinguishing_word)
                         .expect("a word over the alphabet");
                     assert_eq!(
-                        word, &derived,
+                        word,
+                        &derived,
                         "version {at} cuts at {:?} but its own retained pair asks for {:?}",
                         render_word(word),
                         render_word(&derived)
@@ -1626,7 +1674,11 @@ mod tests {
             vec!["ab", "z.", "ab", "w.", "cb", "y.", "cb", "w."]
         );
         assert_eq!(before.concat(), unseen[0]);
-        assert_eq!(after.concat(), unseen[0], "the finer cut still re-integrates");
+        assert_eq!(
+            after.concat(),
+            unseen[0],
+            "the finer cut still re-integrates"
+        );
     }
 
     // -------------------------------------------------------------------------------------------
@@ -1655,10 +1707,16 @@ mod tests {
         ablated.resume_unrevised().expect("an open reflection");
         ablated.receive(batch(BATCH_D)).expect("readable");
 
-        let revised_population: Vec<usize> =
-            revised.passes().iter().map(|pass| pass.collapsed().len()).collect();
-        let ablated_population: Vec<usize> =
-            ablated.passes().iter().map(|pass| pass.collapsed().len()).collect();
+        let revised_population: Vec<usize> = revised
+            .passes()
+            .iter()
+            .map(|pass| pass.collapsed().len())
+            .collect();
+        let ablated_population: Vec<usize> = ablated
+            .passes()
+            .iter()
+            .map(|pass| pass.collapsed().len())
+            .collect();
         assert_eq!(revised_population, vec![8, 1, 0]);
         assert_eq!(ablated_population, vec![8, 17, 10]);
 
@@ -1728,7 +1786,10 @@ mod tests {
         // Present words: the decomposition really did change, and the population did not.
         assert_eq!(present, (17, 53, 21));
         assert_eq!(present.0, baseline.0);
-        assert_ne!(present.1, baseline.1, "the foil must really re-cut the material");
+        assert_ne!(
+            present.1, baseline.1,
+            "the foil must really re-cut the material"
+        );
         // Five cuts, including `k` which the SECOND revision does return, still barely moves it.
         assert_eq!(more, (16, 42, 21));
         assert!(more.0 > revision.0 * 10);
@@ -1771,7 +1832,10 @@ mod tests {
         );
         assert_eq!(reading.parts().len(), 12);
 
-        assert_eq!(pass.reflection, None, "an exact reading opens no reflection");
+        assert_eq!(
+            pass.reflection, None,
+            "an exact reading opens no reflection"
+        );
         assert_eq!(pass.state, ContinuationState::Rested);
         assert_eq!(body.open_reflection(), None);
         assert_eq!(
@@ -1883,7 +1947,9 @@ mod tests {
 
         // What the refusal is protecting: cut everywhere and the reading is exact for free.
         let everywhere = DecompositionGrain::declare(
-            (b'a'..=b'z').chain([b'.']).map(|symbol| vec![Symbol(symbol)]),
+            (b'a'..=b'z')
+                .chain([b'.'])
+                .map(|symbol| vec![Symbol(symbol)]),
         )
         .expect("single-symbol words are non-empty");
         let degenerate = read(&everywhere, &batch(BATCH_C)).expect("readable");
@@ -1929,7 +1995,9 @@ mod tests {
         assert_eq!(declared, second.grain);
 
         let mut from_a_declaration = DecomposingBody::mount(declared.clone()).expect("declared");
-        let rested = from_a_declaration.receive(batch(BATCH_D)).expect("readable");
+        let rested = from_a_declaration
+            .receive(batch(BATCH_D))
+            .expect("readable");
         assert_eq!(from_a_declaration.codec_population(), 1);
         assert_eq!(rested.state, ContinuationState::Rested);
 
@@ -2091,13 +2159,48 @@ mod tests {
         assert_eq!(
             exhibited,
             vec![
-                ("u".to_owned(), "v".to_owned(), "a".to_owned(), "b 1|0".to_owned()),
-                ("uz".to_owned(), "uzz".to_owned(), "z".to_owned(), "b 0|1".to_owned()),
-                ("uz".to_owned(), "vz".to_owned(), "zz".to_owned(), "b 1|0".to_owned()),
-                ("uz".to_owned(), "vzz".to_owned(), "z".to_owned(), "c 0|1".to_owned()),
-                ("uzz".to_owned(), "vz".to_owned(), "z".to_owned(), "b 1|0".to_owned()),
-                ("uzz".to_owned(), "vzz".to_owned(), "z".to_owned(), "b 1|0".to_owned()),
-                ("vz".to_owned(), "vzz".to_owned(), "z".to_owned(), "c 0|1".to_owned()),
+                (
+                    "u".to_owned(),
+                    "v".to_owned(),
+                    "a".to_owned(),
+                    "b 1|0".to_owned()
+                ),
+                (
+                    "uz".to_owned(),
+                    "uzz".to_owned(),
+                    "z".to_owned(),
+                    "b 0|1".to_owned()
+                ),
+                (
+                    "uz".to_owned(),
+                    "vz".to_owned(),
+                    "zz".to_owned(),
+                    "b 1|0".to_owned()
+                ),
+                (
+                    "uz".to_owned(),
+                    "vzz".to_owned(),
+                    "z".to_owned(),
+                    "c 0|1".to_owned()
+                ),
+                (
+                    "uzz".to_owned(),
+                    "vz".to_owned(),
+                    "z".to_owned(),
+                    "b 1|0".to_owned()
+                ),
+                (
+                    "uzz".to_owned(),
+                    "vzz".to_owned(),
+                    "z".to_owned(),
+                    "b 1|0".to_owned()
+                ),
+                (
+                    "vz".to_owned(),
+                    "vzz".to_owned(),
+                    "z".to_owned(),
+                    "c 0|1".to_owned()
+                ),
             ]
         );
 
@@ -2118,7 +2221,10 @@ mod tests {
         // exits have different depths, and a stack reaches the deep one first.
         let left = item_at(&pass.system, "u");
         let right = item_at(&pass.system, "v");
-        assert_eq!((pass.collapsed()[0].left, pass.collapsed()[0].right), (left, right));
+        assert_eq!(
+            (pass.collapsed()[0].left, pass.collapsed()[0].right),
+            (left, right)
+        );
         let depth_first = depth_first_separating_word(&pass.system, left, right)
             .expect("a stack separates them too, further down");
         assert_eq!(render_word(&depth_first), "zzz");

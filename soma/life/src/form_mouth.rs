@@ -135,9 +135,7 @@ pub enum FormMouthRefusal {
     /// A name part was empty. An empty driver name would collapse two levels of the path into one;
     /// an empty form name would produce a file whose whole name is its content address, with
     /// nothing left saying which site sealed it.
-    NameEmpty {
-        part: &'static str,
-    },
+    NameEmpty { part: &'static str },
     /// A name part carries an octet the name law does not declare. `octet` is the first one, in
     /// source order, so the report names a cause rather than a symptom.
     NameUndeclared {
@@ -148,22 +146,13 @@ pub enum FormMouthRefusal {
     /// A name part starts with `_` or `-`. Separators join declared runs; a name that opens with
     /// one has nothing to join, and a leading `-` is read as a flag by every shell tool that would
     /// later carry this path.
-    NameOpensOnSeparator {
-        part: &'static str,
-        name: String,
-    },
+    NameOpensOnSeparator { part: &'static str, name: String },
     /// Zero octets were handed in. Not a small form: the absence of one. No address is composed,
     /// because there is no content to address; the refusal names the directory it would have been
     /// founded under and the site that offered it.
-    FormEmpty {
-        under: PathBuf,
-        name: String,
-    },
+    FormEmpty { under: PathBuf, name: String },
     /// The directory could not be founded, or the write itself failed.
-    WriteRefused {
-        path: PathBuf,
-        detail: String,
-    },
+    WriteRefused { path: PathBuf, detail: String },
     /// The read-back law fired: what came off the disk is not what went to it.
     NotReadBackIdentical {
         path: PathBuf,
@@ -287,11 +276,7 @@ pub fn declared_path_under(
 }
 
 /// Compose the declared, content-addressed path for one form, under [`DEPOSIT_ROOT`].
-pub fn declared_path(
-    driver: &str,
-    name: &str,
-    octets: &[u8],
-) -> Result<PathBuf, FormMouthRefusal> {
+pub fn declared_path(driver: &str, name: &str, octets: &[u8]) -> Result<PathBuf, FormMouthRefusal> {
     declared_path_under(Path::new(DEPOSIT_ROOT), driver, name, octets)
 }
 
@@ -578,8 +563,7 @@ mod tests {
         let driver = scratch_driver("one-site");
         let first = deposit_form_under(&root, &driver, "machine-rest", b"the-longer-earlier-form")
             .expect("first");
-        let second =
-            deposit_form_under(&root, &driver, "machine-rest", b"short").expect("second");
+        let second = deposit_form_under(&root, &driver, "machine-rest", b"short").expect("second");
         assert_ne!(first.path, second.path);
         assert_eq!(
             std::fs::read(&first.path).expect("the first form survived the second"),
@@ -635,8 +619,8 @@ mod tests {
     fn an_empty_form_is_refused_and_no_file_is_founded() {
         let root = scratch("empty");
         let driver = scratch_driver("empty");
-        let refusal =
-            deposit_form_under(&root, &driver, "rest", b"").expect_err("zero octets are not a form");
+        let refusal = deposit_form_under(&root, &driver, "rest", b"")
+            .expect_err("zero octets are not a form");
         match refusal {
             FormMouthRefusal::FormEmpty { under, name } => {
                 assert_eq!(under, root.join(&driver));
@@ -718,7 +702,10 @@ mod tests {
             .expect_err("zero octets are not a form");
         match refusal {
             FormMouthRefusal::FormEmpty { under, name } => {
-                assert_eq!(under, PathBuf::from(DEPOSIT_ROOT).join("eros_text_training"));
+                assert_eq!(
+                    under,
+                    PathBuf::from(DEPOSIT_ROOT).join("eros_text_training")
+                );
                 assert_eq!(under, PathBuf::from("output/eros_text_training"));
                 assert_eq!(name, "machine-rest");
             }

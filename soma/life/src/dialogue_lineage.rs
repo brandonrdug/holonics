@@ -212,9 +212,7 @@ impl ExactDialogueLineage {
                             // the occurrence below, so it founds an identity when the container
                             // supplies none. The species is carried beside it.
                             let (identity, identity_species) = match identity {
-                                Some(supplied) => {
-                                    (supplied, DialogueIdentitySpecies::Supplied)
-                                }
+                                Some(supplied) => (supplied, DialogueIdentitySpecies::Supplied),
                                 None => {
                                     founded_identities = founded_identities
                                         .checked_add(1)
@@ -371,10 +369,7 @@ fn visible_message(
     }
     // An absent `id` is a condition of the container, not a corruption of it. It is returned as
     // `None` and founded from the record address at the push site, where the address is known.
-    let identity = payload
-        .get("id")
-        .and_then(Value::as_str)
-        .map(str::to_owned);
+    let identity = payload.get("id").and_then(Value::as_str).map(str::to_owned);
     let turn = payload
         .get("internal_chat_message_metadata_passthrough")
         .and_then(|metadata| metadata.get("turn_id"))
@@ -583,7 +578,10 @@ mod tests {
             );
         }
         // Distinct records found distinct identities, so chronology and address remain exact.
-        assert_ne!(lineage.occurrences[1].identity, lineage.occurrences[2].identity);
+        assert_ne!(
+            lineage.occurrences[1].identity,
+            lineage.occurrences[2].identity
+        );
         assert_eq!(
             lineage.occurrences[2].addressed.as_deref(),
             Some(lineage.occurrences[1].identity.as_str()),

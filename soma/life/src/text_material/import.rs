@@ -106,7 +106,7 @@ fn parse_claude_history(path: &Path) -> Result<ParsedContainer, TextMaterialErro
 fn parse_jsonl(
     path: &Path,
     source_kind: TextMaterialSourceKind,
-    visible: fn(&Value, &Path, &str, u64, Range<u64>) -> Result<VisibleRecord, TextMaterialError>,
+    visible: fn(&Value, &str, &str, u64, Range<u64>) -> Result<VisibleRecord, TextMaterialError>,
 ) -> Result<ParsedContainer, TextMaterialError> {
     let metadata = path
         .metadata()
@@ -117,6 +117,7 @@ fn parse_jsonl(
             path.display()
         )));
     }
+    let container = container_address(path)?;
     let extent = metadata.len();
     let input = File::open(path)
         .map_err(|error| TextMaterialError::Io(format!("open {}: {error}", path.display())))?;
@@ -129,11 +130,10 @@ fn parse_jsonl(
     let mut excluded_control_occurrences = 0usize;
     let mut founded_identity_occurrences = 0usize;
     let mut occurrences = TextMaterialVector::new();
-    let mut conversation = path
-        .file_stem()
-        .and_then(|stem| stem.to_str())
-        .unwrap_or("unidentified-conversation")
-        .to_owned();
+    // A conversation is a container coordinate, never a message coordinate. When the container
+    // declares none, one is founded from the container's own address exactly as an absent
+    // occurrence identity is — see `founded_container_conversation`.
+    let mut conversation = founded_container_conversation(&container);
     let mut conversations = TextMaterialSet::new();
     let mut previous = TextMaterialMap::<String, String>::new();
     let mut partial_tail_bytes = 0u64;
@@ -172,7 +172,7 @@ fn parse_jsonl(
             if let Some(session) = record_conversation(source_kind, &value) {
                 conversation = session.to_owned();
             }
-            match visible(&value, path, &conversation, record, raw_at..raw_end)? {
+            match visible(&value, &container, &conversation, record, raw_at..raw_end)? {
                 VisibleRecord::Absent => {}
                 VisibleRecord::Control => {
                     excluded_control_occurrences = excluded_control_occurrences
@@ -217,7 +217,7 @@ fn parse_jsonl(
     Ok(ParsedContainer {
         receipt: TextMaterialContainerReceipt {
             source_kind,
-            source: path.display().to_string(),
+            source: container,
             conversation: receipt_conversation,
             raw_extent: raw_at,
             raw_sha256: hex_digest(&prefix.finalize()),
@@ -239,7 +239,7 @@ enum VisibleRecord {
 
 fn codex_visible(
     value: &Value,
-    path: &Path,
+    container: &str,
     conversation: &str,
     raw_record: u64,
     raw_range: Range<u64>,
@@ -298,19 +298,24 @@ fn codex_visible(
         .get("timestamp")
         .and_then(Value::as_str)
         .unwrap_or_default();
-    let (native_identity, identity_species) = if let Some(native) =
-        payload.get("id").and_then(Value::as_str)
-    {
-        (
-            format!("codex:{native}"),
-            TextMaterialIdentitySpecies::ProviderSupplied,
-        )
-    } else {
-        (
-            founded_record_identity("codex-rollout", path, conversation, raw_record, &raw_range),
-            TextMaterialIdentitySpecies::FoundedFromContainerRecordRange,
-        )
-    };
+    let (native_identity, identity_species) =
+        if let Some(native) = payload.get("id").and_then(Value::as_str) {
+            (
+                format!("codex:{native}"),
+                TextMaterialIdentitySpecies::ProviderSupplied,
+            )
+        } else {
+            (
+                founded_record_identity(
+                    "codex-rollout",
+                    container,
+                    conversation,
+                    raw_record,
+                    &raw_range,
+                ),
+                TextMaterialIdentitySpecies::FoundedFromContainerRecordRange,
+            )
+        };
     Ok(VisibleRecord::Occurrence(ParsedOccurrence {
         native_identity,
         role,
@@ -319,7 +324,7 @@ fn codex_visible(
         witness: TextMaterialWitness {
             source_kind: TextMaterialSourceKind::CodexRollout,
             identity_species,
-            container: path.display().to_string(),
+            container: container.to_owned(),
             conversation: conversation.to_owned(),
             raw_record,
             raw_start: raw_range.start,
@@ -334,7 +339,7 @@ fn codex_visible(
 
 fn claude_visible(
     value: &Value,
-    path: &Path,
+    container: &str,
     conversation: &str,
     raw_record: u64,
     raw_range: Range<u64>,
@@ -370,7 +375,13 @@ fn claude_visible(
             )
         } else {
             (
-                founded_record_identity("claude-code", path, conversation, raw_record, &raw_range),
+                founded_record_identity(
+                    "claude-code",
+                    container,
+                    conversation,
+                    raw_record,
+                    &raw_range,
+                ),
                 TextMaterialIdentitySpecies::FoundedFromContainerRecordRange,
             )
         };
@@ -390,7 +401,7 @@ fn claude_visible(
         witness: TextMaterialWitness {
             source_kind: TextMaterialSourceKind::ClaudeCode,
             identity_species,
-            container: path.display().to_string(),
+            container: container.to_owned(),
             conversation: conversation.to_owned(),
             raw_record,
             raw_start: raw_range.start,
@@ -418,14 +429,14 @@ fn claude_visible(
 
 fn codex_history_visible(
     value: &Value,
-    path: &Path,
+    container: &str,
     conversation: &str,
     raw_record: u64,
     raw_range: Range<u64>,
 ) -> Result<VisibleRecord, TextMaterialError> {
     history_visible(
         value,
-        path,
+        container,
         conversation,
         raw_record,
         raw_range,
@@ -438,14 +449,14 @@ fn codex_history_visible(
 
 fn claude_history_visible(
     value: &Value,
-    path: &Path,
+    container: &str,
     conversation: &str,
     raw_record: u64,
     raw_range: Range<u64>,
 ) -> Result<VisibleRecord, TextMaterialError> {
     history_visible(
         value,
-        path,
+        container,
         conversation,
         raw_record,
         raw_range,
@@ -459,7 +470,7 @@ fn claude_history_visible(
 #[allow(clippy::too_many_arguments)]
 fn history_visible(
     value: &Value,
-    path: &Path,
+    container: &str,
     conversation: &str,
     raw_record: u64,
     raw_range: Range<u64>,
@@ -480,7 +491,7 @@ fn history_visible(
     Ok(VisibleRecord::Occurrence(ParsedOccurrence {
         native_identity: founded_record_identity(
             identity_prefix,
-            path,
+            container,
             conversation,
             raw_record,
             &raw_range,
@@ -491,7 +502,7 @@ fn history_visible(
         witness: TextMaterialWitness {
             source_kind,
             identity_species: TextMaterialIdentitySpecies::FoundedFromContainerRecordRange,
-            container: path.display().to_string(),
+            container: container.to_owned(),
             conversation: conversation.to_owned(),
             raw_record,
             raw_start: raw_range.start,
@@ -504,18 +515,51 @@ fn history_visible(
     }))
 }
 
+/// The container's own address, which is its name in whatever store holds it.
+///
+/// **This is never the host path.**  Until 2026-08-11 every founded identity and every witness
+/// carried `path.display()`, so 46,745 occurrence identities in the sealed corpus began
+/// `founded:container=/home/b`, and the corpus content address was therefore a function of this
+/// machine's home directory.  That is `CLAUDE.md` §0 lesson 2 — *no absolute frame in a lineage* —
+/// and the owner it should have adopted was already in the tree: `dialogue_lineage` founds
+/// `codex-record/{record}/{start}-{end}`, an address reproducible from the container alone.
+///
+/// A corpus merges many containers, so the name discriminates them; a store that presents two
+/// distinct containers of one kind under one name is refused at `ExactTextMaterialCorpus::import`
+/// rather than resolved by reaching back to the host path.
+fn container_address(path: &Path) -> Result<String, TextMaterialError> {
+    path.file_name()
+        .map(|name| name.to_string_lossy().into_owned())
+        .ok_or_else(|| {
+            TextMaterialError::Io(format!(
+                "{} carries no container name of its own",
+                path.display()
+            ))
+        })
+}
+
+/// A conversation founded from the container when the container declares none.
+///
+/// The species is legible in the string: nothing that reads `founded-conversation/…` was supplied
+/// by a provider, and no message identity may ever occupy this coordinate.
+fn founded_container_conversation(container: &str) -> String {
+    format!("founded-conversation/{container}")
+}
+
+/// `dialogue_lineage`'s law, carried into the corpus membrane: the record address founds the
+/// identity when the container supplies none.  Container name, conversation, record ordinal and
+/// byte range are all read *out of the container*, so the identity reproduces wherever the
+/// container is mounted.
 fn founded_record_identity(
     prefix: &str,
-    path: &Path,
+    container: &str,
     conversation: &str,
     raw_record: u64,
     raw_range: &Range<u64>,
 ) -> String {
     format!(
-        "{prefix}:founded:container={}:conversation={conversation}:record={raw_record}:raw={}..{}",
-        path.display(),
-        raw_range.start,
-        raw_range.end
+        "{prefix}-record/{container}/{conversation}/{raw_record}/{}-{}",
+        raw_range.start, raw_range.end
     )
 }
 
@@ -527,12 +571,29 @@ fn scalar_text(value: Option<&Value>) -> String {
     }
 }
 
+/// The conversation a record declares, or `None` when it declares none.
+///
+/// **A message identity is not a conversation identity.**  Until 2026-08-11 the rollout arm read
+/// `payload.session_id` *or else* `payload.id`, and only the container's opening `session_meta`
+/// record carries `session_id` while every `response_item` carries `id` — so each message
+/// overwrote the conversation with its own identity, 11,266 of 11,282 codex witnesses came to rest
+/// carrying `"conversation":"msg_…"`, every one of them was its own conversation, and the
+/// per-conversation predecessor map therefore chained nothing: `caused_by` was empty across the
+/// 6.87 GB source.  Chronology inside the largest container was deleted, against Brandon's own
+/// standing ruling *"Do not remove chronology"*.  The rollout conversation now comes from the
+/// `session_meta` record alone; a container without one founds its conversation from its own
+/// address at the call site.
 fn record_conversation(kind: TextMaterialSourceKind, value: &Value) -> Option<&str> {
     match kind {
-        TextMaterialSourceKind::CodexRollout => value
-            .get("payload")
-            .and_then(|payload| payload.get("session_id").or_else(|| payload.get("id")))
-            .and_then(Value::as_str),
+        TextMaterialSourceKind::CodexRollout => (value.get("type").and_then(Value::as_str)
+            == Some("session_meta"))
+        .then(|| {
+            value
+                .get("payload")
+                .and_then(|payload| payload.get("session_id"))
+                .and_then(Value::as_str)
+        })
+        .flatten(),
         TextMaterialSourceKind::CodexHistory => value.get("session_id").and_then(Value::as_str),
         TextMaterialSourceKind::ClaudeCode | TextMaterialSourceKind::ClaudeHistory => {
             value.get("sessionId").and_then(Value::as_str)

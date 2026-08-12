@@ -865,9 +865,7 @@ mod tests {
         );
         assert_eq!(
             read,
-            vec![
-                true, true, true, true, false, true, true, true, false, false, true
-            ],
+            vec![true, true, true, true, false, true, true, true, false, false, true],
             "every brace-delimited group closes on the line its delimiter closes on"
         );
         assert_ne!(
@@ -940,7 +938,11 @@ mod tests {
             std::process::id()
         ));
         std::fs::create_dir_all(&root).unwrap();
-        std::fs::write(root.join("authority.md"), "The declared file is material.\n").unwrap();
+        std::fs::write(
+            root.join("authority.md"),
+            "The declared file is material.\n",
+        )
+        .unwrap();
         let atlas = LaboratorySourceAtlas::mount_repository_roots(
             &root,
             &LaboratorySourceRoots {

@@ -7,6 +7,15 @@
 //! reasoning, generated control wrappers, and attachments do not become language merely because
 //! they share a JSON record with it.
 //!
+//! **Every coordinate this membrane retains is read out of the container, never off the host.**
+//! A container is addressed by its own name in whatever store holds it, an occurrence identity is
+//! founded from that address plus the record ordinal and byte range, and a conversation is the
+//! container's declared session — never a message identity.  The two defects that law exists to
+//! close were both measured on the sealed corpus of 2026-08-11: 46,745 occurrence identities
+//! carrying this machine's home directory, so the corpus content address was a function of one
+//! filesystem; and 11,266 of 11,282 rollout witnesses carrying their own message identity as a
+//! conversation, so the largest container in the body entered with its chronology deleted.
+//!
 //! The conditioned atlas is not a detached search service.  Every admitted occurrence changes
 //! its token population, ordered transports, local sections, feature incidence, and recurrence.
 //! A receiver question restricts that standing to a finite local star; a generated answer may be
@@ -58,7 +67,11 @@ const TEXT_ASSISTANT_PROCESS_RECEIVER: u64 = 40_000_001;
 const TEXT_ASSISTANT_FINAL_RECEIVER: u64 = 40_000_002;
 const TEXT_DOCUMENT_RECEIVER: u64 = 40_000_003;
 const TEXT_EMANATED_RECEIVER: u64 = 40_000_004;
-const REST_SCHEMA: &str = "life.exact-text-material-atlas.v4";
+/// `v5` because the occurrence identity law changed on 2026-08-11 and a `v4` rest is not the same
+/// body under a new name: every founded identity in a `v4` rest carries the absolute host path it
+/// was read at, so it is a lineage in an absolute frame. Refusing it at the schema is the point.
+const REST_SCHEMA: &str = "life.exact-text-material-atlas.v5";
+const CORPUS_SCHEMA: &str = "life.exact-text-material-corpus.v3";
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
@@ -114,6 +127,11 @@ pub enum TextMaterialError {
     InvalidRest,
     CarrierExtent,
     WorkerPanicked,
+    /// Two distinct containers of one source kind presented one container address.
+    ///
+    /// The membrane will not disambiguate them by reaching back to the host path, because that is
+    /// the absolute frame this identity law exists to remove. The ambiguity is returned instead.
+    ContainerAddressCollision(String),
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
@@ -121,6 +139,9 @@ pub enum TextMaterialError {
 pub struct TextMaterialWitness {
     pub source_kind: TextMaterialSourceKind,
     pub identity_species: TextMaterialIdentitySpecies,
+    /// The container's own address — its name in whatever store holds it — and never the host
+    /// path it was mounted from. A witness is retained testimony; folding the filesystem into it
+    /// makes the whole sealed body a function of one machine.
     pub container: String,
     pub conversation: String,
     pub raw_record: u64,
@@ -342,6 +363,19 @@ impl ExactTextMaterialCorpus {
             (left.source_kind, left.source.as_str())
                 .cmp(&(right.source_kind, right.source.as_str()))
         });
+        // A container address must separate the containers it addresses. Two of one kind under one
+        // address is an ambiguity, and the membrane returns it rather than reaching back to the
+        // host path that used to separate them.
+        for pair in containers.windows(2) {
+            if (pair[0].source_kind, pair[0].source.as_str())
+                == (pair[1].source_kind, pair[1].source.as_str())
+            {
+                return Err(TextMaterialError::ContainerAddressCollision(format!(
+                    "{:?} presents two containers addressed {}",
+                    pair[0].source_kind, pair[0].source
+                )));
+            }
+        }
 
         let mut container_hash = Sha256::new();
         let mut raw_bytes = 0u64;
@@ -392,7 +426,7 @@ impl ExactTextMaterialCorpus {
                 .or_default() += 1;
         }
         let receipt = TextMaterialCorpusReceipt {
-            schema: "life.exact-text-material-corpus.v2".to_owned(),
+            schema: CORPUS_SCHEMA.to_owned(),
             containers: containers.len(),
             raw_bytes,
             raw_container_sha256: hex_digest(&container_hash.finalize()),
@@ -1596,6 +1630,19 @@ mod tests {
         ))
     }
 
+    fn temporary_directory(label: &str) -> PathBuf {
+        let serial = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let root = std::env::temp_dir().join(format!(
+            "soma-text-material-{label}-{}-{serial}",
+            std::process::id()
+        ));
+        std::fs::create_dir_all(&root).unwrap();
+        root
+    }
+
     #[test]
     fn codex_and_claude_cross_as_one_text_species_with_distinct_lineage() {
         let codex = temporary("codex");
@@ -1751,20 +1798,178 @@ mod tests {
             .iter()
             .all(|witness| witness.identity_species
                 == TextMaterialIdentitySpecies::FoundedFromContainerRecordRange)));
-        assert!(corpus
-            .occurrences()
+        assert!(corpus.occurrences().iter().any(|occurrence| occurrence
+            .witnesses
             .iter()
-            .any(|occurrence| occurrence.witnesses.iter().any(|witness| witness.conversation
-                == "rollout-left")));
-        assert!(corpus
-            .occurrences()
+            .any(|witness| witness.conversation == "rollout-left")));
+        assert!(corpus.occurrences().iter().any(|occurrence| occurrence
+            .witnesses
             .iter()
-            .any(|occurrence| occurrence.witnesses.iter().any(|witness| witness.conversation
-                == "rollout-right")));
+            .any(|witness| witness.conversation == "rollout-right")));
         std::fs::remove_file(codex_history).unwrap();
         std::fs::remove_file(claude_history).unwrap();
         std::fs::remove_file(left).unwrap();
         std::fs::remove_file(right).unwrap();
+    }
+
+    /// The rollout fixture that carries `payload.id` on every message record.
+    ///
+    /// The 2026-08-11 audit convicted the older fixture for omitting it: the defect under test —
+    /// a message identity occupying the conversation coordinate — could not fire on material that
+    /// carried no message identity at all, so the test wore a passing result over a deleted
+    /// chronology. `CLAUDE.md` §8: a check whose material cannot vary the property under test is
+    /// the same defect as a check that cannot fail.
+    const ROLLOUT_CARRYING_MESSAGE_IDENTITIES: &str = concat!(
+        "{\"type\":\"session_meta\",\"payload\":{\"id\":\"019f-meta\",\"session_id\":\"019f-session\"}}\n",
+        "{\"timestamp\":\"2026-01-01T00:00:00Z\",\"type\":\"response_item\",\"payload\":{\"type\":\"message\",\"role\":\"user\",\"id\":\"msg_0\",\"content\":[{\"type\":\"input_text\",\"text\":\"The first received current opens the container.\"}]}}\n",
+        "{\"timestamp\":\"2026-01-01T00:00:01Z\",\"type\":\"response_item\",\"payload\":{\"type\":\"message\",\"role\":\"assistant\",\"phase\":\"final_answer\",\"id\":\"msg_1\",\"content\":[{\"type\":\"output_text\",\"text\":\"The returned answer follows the received current.\"}]}}\n",
+        "{\"timestamp\":\"2026-01-01T00:00:02Z\",\"type\":\"response_item\",\"payload\":{\"type\":\"message\",\"role\":\"user\",\"id\":\"msg_2\",\"content\":[{\"type\":\"input_text\",\"text\":\"The second received current follows that answer.\"}]}}\n",
+    );
+
+    #[test]
+    fn a_rollout_conversation_is_the_session_and_never_a_message_identity() {
+        let rollout = temporary("rollout-chronology");
+        std::fs::write(&rollout, ROLLOUT_CARRYING_MESSAGE_IDENTITIES).unwrap();
+        let corpus = ExactTextMaterialCorpus::import(
+            vec![TextMaterialInput::CodexRollout(rollout.clone())],
+            &[],
+            1,
+        )
+        .unwrap();
+        assert_eq!(corpus.occurrences().len(), 3);
+        for occurrence in corpus.occurrences() {
+            for witness in &occurrence.witnesses {
+                assert_eq!(
+                    witness.conversation, "019f-session",
+                    "the conversation is the container's session, not the message identity"
+                );
+            }
+        }
+        // Chronology inside the container: each visible occurrence names the one before it.
+        assert!(corpus.occurrences()[0].caused_by.is_empty());
+        assert_eq!(
+            corpus.occurrences()[1].caused_by,
+            BTreeSet::from(["codex:msg_0".to_owned()])
+        );
+        assert_eq!(
+            corpus.occurrences()[2].caused_by,
+            BTreeSet::from(["codex:msg_1".to_owned()])
+        );
+        std::fs::remove_file(rollout).unwrap();
+    }
+
+    /// The same container with **no** `payload.id` on any message record, so every identity in it
+    /// is founded by the membrane rather than supplied by the container. The relocation control
+    /// carries both species: a supplied identity is container-independent for free, and proves
+    /// nothing about the founding law.
+    const ROLLOUT_WITHOUT_MESSAGE_IDENTITIES: &str = concat!(
+        "{\"type\":\"session_meta\",\"payload\":{\"id\":\"019e-meta\",\"session_id\":\"019e-session\"}}\n",
+        "{\"timestamp\":\"2026-01-02T00:00:00Z\",\"type\":\"response_item\",\"payload\":{\"type\":\"message\",\"role\":\"user\",\"content\":[{\"type\":\"input_text\",\"text\":\"An absent provider identity founds one from the record.\"}]}}\n",
+        "{\"timestamp\":\"2026-01-02T00:00:01Z\",\"type\":\"response_item\",\"payload\":{\"type\":\"message\",\"role\":\"assistant\",\"phase\":\"final_answer\",\"content\":[{\"type\":\"output_text\",\"text\":\"The founded identity is the record address itself.\"}]}}\n",
+    );
+
+    #[test]
+    fn one_container_read_at_two_host_paths_founds_one_identical_body() {
+        // The relocation control. A corpus address which moves when the container moves is a
+        // lineage in an absolute frame — `CLAUDE.md` §0 lesson 2 — and no hash comparison can see
+        // it, because both frames hash consistently inside themselves.
+        let left_root = temporary_directory("relocation-left");
+        let right_root = temporary_directory("relocation-right");
+        let supplied = "rollout-2026-01-01T00-00-00-supplied.jsonl";
+        let founded = "rollout-2026-01-02T00-00-00-founded.jsonl";
+        for root in [&left_root, &right_root] {
+            std::fs::write(root.join(supplied), ROLLOUT_CARRYING_MESSAGE_IDENTITIES).unwrap();
+            std::fs::write(root.join(founded), ROLLOUT_WITHOUT_MESSAGE_IDENTITIES).unwrap();
+        }
+
+        let read = |root: &Path| {
+            let corpus = ExactTextMaterialCorpus::import(
+                vec![
+                    TextMaterialInput::CodexRollout(root.join(supplied)),
+                    TextMaterialInput::CodexRollout(root.join(founded)),
+                ],
+                &[],
+                2,
+            )
+            .unwrap();
+            assert_eq!(
+                corpus.receipt().founded_identity_witnesses,
+                2,
+                "the relocation control must exercise the founding law, not only supplied ids"
+            );
+            let identities = corpus
+                .occurrences()
+                .iter()
+                .map(|occurrence| occurrence.identity.clone())
+                .collect::<Vec<_>>();
+            let containers = corpus
+                .containers()
+                .iter()
+                .map(|container| container.source.clone())
+                .collect::<Vec<_>>();
+            let rest = ExactTextMaterialAtlas::condition(corpus)
+                .unwrap()
+                .encode_native_bytes()
+                .unwrap();
+            (identities, containers, rest)
+        };
+        let (left_identities, left_containers, left_rest) = read(&left_root);
+        let (right_identities, right_containers, right_rest) = read(&right_root);
+
+        assert_eq!(
+            sha256_hex(&left_rest),
+            sha256_hex(&right_rest),
+            "the sealed content address must not move when the container moves"
+        );
+        assert_eq!(left_identities, right_identities);
+        assert_eq!(
+            left_containers,
+            vec![supplied.to_owned(), founded.to_owned()]
+        );
+        assert_eq!(left_containers, right_containers);
+
+        // And neither host frame survives anywhere inside the body it was read into.
+        let sealed = String::from_utf8(left_rest).unwrap();
+        for root in [&left_root, &right_root] {
+            assert!(
+                !sealed.contains(root.to_str().unwrap()),
+                "a host coordinate reached the sealed body"
+            );
+        }
+
+        for root in [&left_root, &right_root] {
+            std::fs::remove_file(root.join(supplied)).unwrap();
+            std::fs::remove_file(root.join(founded)).unwrap();
+            std::fs::remove_dir(root).unwrap();
+        }
+    }
+
+    #[test]
+    fn two_containers_of_one_kind_under_one_address_are_refused() {
+        let left_root = temporary_directory("collision-left");
+        let right_root = temporary_directory("collision-right");
+        let name = "rollout-2026-01-01T00-00-00-collision.jsonl";
+        let left = left_root.join(name);
+        let right = right_root.join(name);
+        std::fs::write(&left, ROLLOUT_CARRYING_MESSAGE_IDENTITIES).unwrap();
+        std::fs::write(&right, ROLLOUT_CARRYING_MESSAGE_IDENTITIES).unwrap();
+        let refusal = ExactTextMaterialCorpus::import(
+            vec![
+                TextMaterialInput::CodexRollout(left.clone()),
+                TextMaterialInput::CodexRollout(right.clone()),
+            ],
+            &[],
+            2,
+        )
+        .expect_err("one address cannot separate two containers");
+        assert!(matches!(
+            refusal,
+            TextMaterialError::ContainerAddressCollision(_)
+        ));
+        std::fs::remove_file(left).unwrap();
+        std::fs::remove_file(right).unwrap();
+        std::fs::remove_dir(left_root).unwrap();
+        std::fs::remove_dir(right_root).unwrap();
     }
 
     #[test]

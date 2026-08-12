@@ -128,7 +128,10 @@ impl std::fmt::Display for ReintegrationRefusal {
             }
             Self::NoRootsDeclared => write!(formatter, "no root was declared"),
             Self::EmptyBoundaryWord { .. } => {
-                write!(formatter, "a collapsed pair returned an empty separating word")
+                write!(
+                    formatter,
+                    "a collapsed pair returned an empty separating word"
+                )
             }
             Self::Grain(error) => write!(formatter, "{error}"),
         }
@@ -157,9 +160,7 @@ pub struct NameAlphabet {
 }
 
 impl NameAlphabet {
-    pub fn declare(
-        names: impl IntoIterator<Item = String>,
-    ) -> Result<Self, ReintegrationRefusal> {
+    pub fn declare(names: impl IntoIterator<Item = String>) -> Result<Self, ReintegrationRefusal> {
         let ordered: BTreeSet<String> = names.into_iter().collect();
         if ordered.len() > usize::from(u8::MAX) + 1 {
             return Err(ReintegrationRefusal::AlphabetExceedsTheOctetCarrier {
@@ -230,7 +231,10 @@ impl NameAlphabet {
         u8::try_from(receiver)
             .ok()
             .and_then(|octet| self.name(Symbol(octet)))
-            .map_or_else(|| format!("?{receiver}"), |name| format!("continues:{name}"))
+            .map_or_else(
+                || format!("?{receiver}"),
+                |name| format!("continues:{name}"),
+            )
     }
 }
 
@@ -274,7 +278,9 @@ impl MeaningGrain {
     /// The same grain with one more boundary. Monotone: a grain never loses a word.
     pub fn with(&self, word: Vec<Symbol>) -> Result<Self, ReintegrationRefusal> {
         if word.is_empty() {
-            return Err(ReintegrationRefusal::Grain(DecompositionError::EmptyCutWord));
+            return Err(ReintegrationRefusal::Grain(
+                DecompositionError::EmptyCutWord,
+            ));
         }
         Ok(match self {
             Self::Unbounded => Self::Bounded(DecompositionGrain::declare([word])?),
@@ -596,7 +602,11 @@ impl ReintegrationPass {
         self.compression
             .collapsed
             .iter()
-            .map(|pair| self.system.word_symbols(&pair.distinguishing_word).map_err(Into::into))
+            .map(|pair| {
+                self.system
+                    .word_symbols(&pair.distinguishing_word)
+                    .map_err(Into::into)
+            })
             .collect()
     }
 }
@@ -1279,7 +1289,10 @@ mod tests {
             8,
         )
         .expect("a run");
-        let movement = run.turns[0].movement.as_ref().expect("the first turn moved");
+        let movement = run.turns[0]
+            .movement
+            .as_ref()
+            .expect("the first turn moved");
         assert!(!movement.new_places.is_empty());
         // Every place the first pass had began at one of its roots. A place the second pass has and
         // the first did not is a shared tail, and it is rooted at no declared root.
@@ -1305,7 +1318,11 @@ mod tests {
         // The bounded aperture names what it stopped at: `helper` is openable and was not opened,
         // and what opening it would have brought is exhibited by name.
         assert_eq!(
-            first.unopened().keys().cloned().collect::<BTreeSet<String>>(),
+            first
+                .unopened()
+                .keys()
+                .cloned()
+                .collect::<BTreeSet<String>>(),
             BTreeSet::from(["deep".to_owned(), "further".to_owned()])
         );
         assert!(!first.constituents().contains("deep"));
@@ -1452,9 +1469,7 @@ mod tests {
         // boundary no collapse asked for.
         let foil_word = vec![alphabet.symbol("left#0").expect("declared")];
         assert!(!revision.added.contains(&foil_word));
-        let foil = MeaningGrain::origin()
-            .with(foil_word)
-            .expect("a boundary");
+        let foil = MeaningGrain::origin().with(foil_word).expect("a boundary");
         let foil_pass = ReintegrationPass::read(
             &deposit,
             &alphabet,

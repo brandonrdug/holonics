@@ -591,11 +591,14 @@ fn execute_quintic(spec: &ExactQuinticResearchSpec) -> Result<ExactQuinticResear
     const PROBLEM_EVENT: EventId = EventId(8_000_000_000);
     const RECEIVER_EVENT: EventId = EventId(8_000_000_001);
     let started = Instant::now();
-    let law = ArithmeticMonodromyLaw::with_horn_local_section_limit(1, spec.horn_local_section_limit)
-        .map_err(|error| error.to_string())?;
-    let standing =
-        ArithmeticMonodromyStanding::with_horn_local_section_limit(1, spec.horn_local_section_limit)
+    let law =
+        ArithmeticMonodromyLaw::with_horn_local_section_limit(1, spec.horn_local_section_limit)
             .map_err(|error| error.to_string())?;
+    let standing = ArithmeticMonodromyStanding::with_horn_local_section_limit(
+        1,
+        spec.horn_local_section_limit,
+    )
+    .map_err(|error| error.to_string())?;
     let mut world = CausalWorld::new(law, standing);
     world
         .receive(&ArithmeticMonodromyEvent::InheritQuintic {
