@@ -70,6 +70,7 @@ use body::register;
 use body::seam::SliceWordSeam;
 use soma_abi::emission::{DeedEmission, DEED_WORDS};
 use soma_abi::live_event_cuda as event_cuda;
+use soma_abi::returned_contact_cuda as returned_cuda;
 use soma_abi::text_restrict_cuda as text_cuda;
 use soma_abi::{contact as contact_abi, register as register_abi};
 
@@ -3848,4 +3849,269 @@ pub unsafe extern "ptx-kernel" fn lineage_event_population(
             emanation_stride,
         )
     }
+}
+
+// --- returned-contact grouping ------------------------------------------------------------------
+
+#[derive(Clone, Copy)]
+struct ReturnedContactShape {
+    epoch: u32,
+    targets: usize,
+    occurrences: usize,
+    relations: usize,
+    mask_words: usize,
+    target_row_words: usize,
+    occurrence_rows_at: usize,
+    output_words: usize,
+}
+
+#[inline(always)]
+fn returned_contact_shape(
+    control: &[u32],
+    relation_words_len: usize,
+    output_words_len: usize,
+) -> Option<ReturnedContactShape> {
+    if control.len() != returned_cuda::CONTROL_WORDS
+        || control[returned_cuda::CONTROL_VERSION] != returned_cuda::LAYOUT_VERSION
+        || control[returned_cuda::CONTROL_EPOCH] == 0
+        || control[returned_cuda::CONTROL_TOTAL_WORDS] as usize != returned_cuda::CONTROL_WORDS
+    {
+        return None;
+    }
+    let targets = control[returned_cuda::CONTROL_TARGETS] as usize;
+    let occurrences = control[returned_cuda::CONTROL_OCCURRENCES] as usize;
+    let relations = control[returned_cuda::CONTROL_RELATIONS] as usize;
+    let mask_words = returned_cuda::mask_words(occurrences);
+    let target_row_words = returned_cuda::target_row_words(occurrences)?;
+    let relation_words = relations.checked_mul(returned_cuda::RELATION_WORDS)?;
+    let occurrence_rows_at = returned_cuda::occurrence_rows_at(targets, occurrences)?;
+    let output_words = returned_cuda::output_words(targets, occurrences)?;
+    if control[returned_cuda::CONTROL_OCCURRENCE_MASK_WORDS] as usize != mask_words
+        || control[returned_cuda::CONTROL_RELATION_WORDS] as usize != returned_cuda::RELATION_WORDS
+        || control[returned_cuda::CONTROL_RELATION_TOTAL_WORDS] as usize != relation_words
+        || control[returned_cuda::CONTROL_TARGET_ROW_WORDS] as usize != target_row_words
+        || control[returned_cuda::CONTROL_TARGET_ROWS_AT] as usize
+            != returned_cuda::OUTPUT_HEADER_WORDS
+        || control[returned_cuda::CONTROL_OCCURRENCE_ROW_WORDS] as usize
+            != returned_cuda::OCCURRENCE_ROW_WORDS
+        || control[returned_cuda::CONTROL_OCCURRENCE_ROWS_AT] as usize != occurrence_rows_at
+        || control[returned_cuda::CONTROL_OUTPUT_TOTAL_WORDS] as usize != output_words
+        || relation_words_len != relation_words
+        || output_words_len != output_words
+    {
+        return None;
+    }
+    Some(ReturnedContactShape {
+        epoch: control[returned_cuda::CONTROL_EPOCH],
+        targets,
+        occurrences,
+        relations,
+        mask_words,
+        target_row_words,
+        occurrence_rows_at,
+        output_words,
+    })
+}
+
+#[inline(always)]
+fn returned_relation_is_valid(row: &[u32], shape: ReturnedContactShape) -> bool {
+    let before = row[returned_cuda::RELATION_STOOD_BEFORE];
+    let after = row[returned_cuda::RELATION_STANDS_AFTER];
+    (row[returned_cuda::RELATION_TARGET] as usize) < shape.targets
+        && (row[returned_cuda::RELATION_OCCURRENCE] as usize) < shape.occurrences
+        && before <= 1
+        && after <= 1
+        && before != after
+}
+
+/// Group exact returned local movements on the card.
+///
+/// Lane zero validates and returns the dynamic layout.  The next `targets` lanes each own one
+/// complete target row and write its two exact occurrence masks.  The final `occurrences` lanes
+/// independently return the disposition of one occurrence over every target.  No intermediate
+/// pair matrix leaves the device, and no lane needs an inter-lane barrier or an authored launch
+/// extent.
+#[no_mangle]
+pub unsafe extern "ptx-kernel" fn returned_contact_group(
+    control_words: *const u32,
+    control_words_len: usize,
+    relation_words: *const u32,
+    relation_words_len: usize,
+    output_words: *mut u32,
+    output_words_len: usize,
+    x_stride: u32,
+) {
+    let (x, y) = unsafe { global_xy() };
+    let lane = x as usize + y as usize * x_stride as usize;
+    if control_words_len != returned_cuda::CONTROL_WORDS
+        || output_words_len < returned_cuda::OUTPUT_HEADER_WORDS
+    {
+        return;
+    }
+    let control = unsafe { slice::from_raw_parts(control_words, control_words_len) };
+    let Some(shape) = returned_contact_shape(control, relation_words_len, output_words_len) else {
+        if lane == 0 {
+            let output = unsafe {
+                slice::from_raw_parts_mut(output_words, returned_cuda::OUTPUT_HEADER_WORDS)
+            };
+            output[returned_cuda::OUTPUT_STATUS] = returned_cuda::STATUS_INVALID;
+            output[returned_cuda::OUTPUT_INVALID_RELATION] = returned_cuda::OPEN_RELATION;
+        }
+        return;
+    };
+    let work = match 1usize
+        .checked_add(shape.targets)
+        .and_then(|extent| extent.checked_add(shape.occurrences))
+    {
+        Some(work) => work,
+        None => return,
+    };
+    if lane >= work {
+        return;
+    }
+    let relations = unsafe { slice::from_raw_parts(relation_words, relation_words_len) };
+    let output = unsafe { slice::from_raw_parts_mut(output_words, output_words_len) };
+
+    if lane == 0 {
+        output[returned_cuda::OUTPUT_VERSION] = returned_cuda::LAYOUT_VERSION;
+        output[returned_cuda::OUTPUT_EPOCH] = shape.epoch;
+        output[returned_cuda::OUTPUT_TARGETS] = shape.targets as u32;
+        output[returned_cuda::OUTPUT_OCCURRENCES] = shape.occurrences as u32;
+        output[returned_cuda::OUTPUT_RELATIONS] = shape.relations as u32;
+        output[returned_cuda::OUTPUT_OCCURRENCE_MASK_WORDS] = shape.mask_words as u32;
+        output[returned_cuda::OUTPUT_TARGET_ROW_WORDS] = shape.target_row_words as u32;
+        output[returned_cuda::OUTPUT_TARGET_ROWS_AT] = returned_cuda::OUTPUT_HEADER_WORDS as u32;
+        output[returned_cuda::OUTPUT_OCCURRENCE_ROW_WORDS] =
+            returned_cuda::OCCURRENCE_ROW_WORDS as u32;
+        output[returned_cuda::OUTPUT_OCCURRENCE_ROWS_AT] = shape.occurrence_rows_at as u32;
+        output[returned_cuda::OUTPUT_TOTAL_WORDS] = shape.output_words as u32;
+        output[returned_cuda::OUTPUT_INVALID_RELATION] = returned_cuda::OPEN_RELATION;
+        let mut relation = 0usize;
+        while relation < shape.relations {
+            let at = relation * returned_cuda::RELATION_WORDS;
+            let row = &relations[at..at + returned_cuda::RELATION_WORDS];
+            if !returned_relation_is_valid(row, shape) {
+                output[returned_cuda::OUTPUT_INVALID_RELATION] = relation as u32;
+                output[returned_cuda::OUTPUT_STATUS] = returned_cuda::STATUS_INVALID;
+                return;
+            }
+            relation += 1;
+        }
+        output[returned_cuda::OUTPUT_STATUS] = returned_cuda::STATUS_COMPLETE;
+        return;
+    }
+
+    if lane <= shape.targets {
+        let target = lane - 1;
+        let row_at = returned_cuda::OUTPUT_HEADER_WORDS + target * shape.target_row_words;
+        let founded_mask_at = returned_cuda::TARGET_WITHDRAWN_MASK_AT + shape.mask_words;
+        output[row_at + returned_cuda::TARGET_EPOCH] = shape.epoch;
+        output[row_at + returned_cuda::TARGET_ORDINAL] = target as u32;
+        let mut mask = 0usize;
+        while mask < shape.mask_words * 2 {
+            output[row_at + returned_cuda::TARGET_WITHDRAWN_MASK_AT + mask] = 0;
+            mask += 1;
+        }
+        let mut withdrawn = 0u32;
+        let mut founded = 0u32;
+        let mut invalid = false;
+        let mut relation = 0usize;
+        while relation < shape.relations {
+            let at = relation * returned_cuda::RELATION_WORDS;
+            let row = &relations[at..at + returned_cuda::RELATION_WORDS];
+            if !returned_relation_is_valid(row, shape) {
+                invalid = true;
+                relation += 1;
+                continue;
+            }
+            if row[returned_cuda::RELATION_TARGET] as usize != target {
+                relation += 1;
+                continue;
+            }
+            let occurrence = row[returned_cuda::RELATION_OCCURRENCE] as usize;
+            let word = occurrence / u32::BITS as usize;
+            let bit = 1u32 << (occurrence % u32::BITS as usize);
+            let withdrawn_at = row_at + returned_cuda::TARGET_WITHDRAWN_MASK_AT + word;
+            let founded_at = row_at + founded_mask_at + word;
+            if output[withdrawn_at] & bit != 0 || output[founded_at] & bit != 0 {
+                // Two rows cannot claim one local target/occurrence movement.
+                invalid = true;
+                relation += 1;
+                continue;
+            }
+            if row[returned_cuda::RELATION_STOOD_BEFORE] == 1 {
+                output[withdrawn_at] |= bit;
+                withdrawn = match withdrawn.checked_add(1) {
+                    Some(count) => count,
+                    None => {
+                        invalid = true;
+                        withdrawn
+                    }
+                };
+            } else {
+                output[founded_at] |= bit;
+                founded = match founded.checked_add(1) {
+                    Some(count) => count,
+                    None => {
+                        invalid = true;
+                        founded
+                    }
+                };
+            }
+            relation += 1;
+        }
+        output[row_at + returned_cuda::TARGET_WITHDRAWN] = withdrawn;
+        output[row_at + returned_cuda::TARGET_FOUNDED] = founded;
+        output[row_at + returned_cuda::TARGET_STATUS] = if invalid {
+            returned_cuda::STATUS_INVALID
+        } else {
+            returned_cuda::STATUS_COMPLETE
+        };
+        return;
+    }
+
+    let occurrence = lane - 1 - shape.targets;
+    let row_at = shape.occurrence_rows_at + occurrence * returned_cuda::OCCURRENCE_ROW_WORDS;
+    output[row_at + returned_cuda::OCCURRENCE_EPOCH] = shape.epoch;
+    output[row_at + returned_cuda::OCCURRENCE_ORDINAL] = occurrence as u32;
+    let mut withdrawn = 0u32;
+    let mut founded = 0u32;
+    let mut invalid = false;
+    let mut relation = 0usize;
+    while relation < shape.relations {
+        let at = relation * returned_cuda::RELATION_WORDS;
+        let row = &relations[at..at + returned_cuda::RELATION_WORDS];
+        if !returned_relation_is_valid(row, shape) {
+            invalid = true;
+            relation += 1;
+            continue;
+        }
+        if row[returned_cuda::RELATION_OCCURRENCE] as usize == occurrence {
+            if row[returned_cuda::RELATION_STOOD_BEFORE] == 1 {
+                withdrawn = match withdrawn.checked_add(1) {
+                    Some(count) => count,
+                    None => {
+                        invalid = true;
+                        withdrawn
+                    }
+                };
+            } else {
+                founded = match founded.checked_add(1) {
+                    Some(count) => count,
+                    None => {
+                        invalid = true;
+                        founded
+                    }
+                };
+            }
+        }
+        relation += 1;
+    }
+    output[row_at + returned_cuda::OCCURRENCE_WITHDRAWN_TARGETS] = withdrawn;
+    output[row_at + returned_cuda::OCCURRENCE_FOUNDED_TARGETS] = founded;
+    output[row_at + returned_cuda::OCCURRENCE_STATUS] = if invalid {
+        returned_cuda::STATUS_INVALID
+    } else {
+        returned_cuda::STATUS_COMPLETE
+    };
 }

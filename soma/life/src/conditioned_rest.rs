@@ -93,9 +93,10 @@
 //! ```
 
 use holonic_engine::conditioned_derivation::{
-    expose, ConditionedBody, DerivedPassage, FoundedMorphology, FoundedMorphologyRefusal,
+    expose, Bridge, ConditionedBody, DerivedPassage, FoundedMorphology, FoundedMorphologyRefusal,
     FoundedStem, PassageOrigin, StemId,
 };
+use holonic_structure::LocalSequence;
 
 /// The leading octets of this form's wire: the four-octet tag, then the codec's own layout version.
 ///
@@ -107,7 +108,7 @@ pub const CONDITIONED_REST_PREFIX: [u8; 8] = *b"CDER\0\0\0\x01";
 pub const CONDITIONED_REST_VERSION: u32 = CONDITIONED_REST_PREFIX[7] as u32;
 
 /// The leading octets of the passage rendering [`render_derived_passages`] returns.
-pub const DERIVED_PASSAGE_RENDERING_PREFIX: [u8; 8] = *b"CDPS\0\0\0\x01";
+pub const DERIVED_PASSAGE_RENDERING_PREFIX: [u8; 8] = *b"CDPS\0\0\0\x02";
 
 // -------------------------------------------------------------------------------------------------
 // The record — one founded stem as the wire carries it
@@ -168,7 +169,9 @@ pub fn records(morphology: &FoundedMorphology) -> Vec<FoundedStemRecord> {
 ///
 /// The field-for-field comparison below is the narrower check that the seam carried the population
 /// verbatim rather than normalising it. Its material is the constructor, not the wire.
-pub fn refound(declared: &[FoundedStemRecord]) -> Result<FoundedMorphology, ConditionedRestRefusal> {
+pub fn refound(
+    declared: &[FoundedStemRecord],
+) -> Result<FoundedMorphology, ConditionedRestRefusal> {
     let morphology = FoundedMorphology::from_founded_stems(
         declared
             .iter()
@@ -450,7 +453,10 @@ impl ConditionedRest {
             ("provisional_stems", morphology.provisional().len() as u64),
             ("witnessing_wholes", wholes.len() as u64),
             ("standing_passages", body.standing().len() as u64),
-            ("standing_statements", body.standing_statements().len() as u64),
+            (
+                "standing_statements",
+                body.standing_statements().len() as u64,
+            ),
             (
                 "recruited_identifiers",
                 body.recruited_population().len() as u64,
@@ -493,9 +499,88 @@ pub fn render_derived_passages(passages: &[DerivedPassage]) -> Vec<u8> {
             }
             octets.extend_from_slice(&(bridge.held_at as u64).to_le_bytes());
             octets.extend_from_slice(&(bridge.brought_at as u64).to_le_bytes());
+            for population in [
+                &bridge.held_face,
+                &bridge.brought_face,
+                &bridge.held_crossings,
+                &bridge.brought_crossings,
+            ] {
+                octets.extend_from_slice(&(population.len() as u64).to_le_bytes());
+                for member in population {
+                    octets.extend_from_slice(&(member.len() as u64).to_le_bytes());
+                    octets.extend_from_slice(member.as_bytes());
+                }
+            }
         }
     }
     octets
+}
+
+/// Reopen one exact derived-passage population.
+///
+/// This is the far side of [`render_derived_passages`], used when a production has crossed the form
+/// mouth and must found its circuit from the deposited artifact rather than from the emitter's live
+/// population. No field is reconstructed from another: names, theorem text, offsets, faces,
+/// crossings, and route lineage all come off the wire.
+pub fn decode_derived_passages(
+    octets: &[u8],
+) -> Result<LocalSequence<DerivedPassage>, ConditionedRestRefusal> {
+    fn population(
+        cursor: &mut Cursor<'_>,
+        field: &'static str,
+    ) -> Result<LocalSequence<String>, ConditionedRestRefusal> {
+        let extent = cursor.extent()?;
+        let mut members = LocalSequence::with_capacity(extent.min(1 << 16));
+        for _ in 0..extent {
+            members.push(cursor.utf8(field)?);
+        }
+        Ok(members)
+    }
+
+    let mut cursor = Cursor::new(octets);
+    let opened = cursor.take(DERIVED_PASSAGE_RENDERING_PREFIX.len())?;
+    if opened != DERIVED_PASSAGE_RENDERING_PREFIX {
+        return Err(ConditionedRestRefusal::NotThisForm {
+            opened: opened.to_vec(),
+        });
+    }
+    let passage_extent = cursor.extent()?;
+    let mut passages = LocalSequence::with_capacity(passage_extent.min(1 << 16));
+    for _ in 0..passage_extent {
+        let name = cursor.utf8("a passage name")?;
+        let statement = cursor.utf8("a passage statement")?;
+        let reaches = cursor.utf8("a reached declaration")?;
+        let brought = cursor.utf8("a brought identifier")?;
+        let stem = cursor.utf8("a licensing stem")?;
+        let text = cursor.utf8("a passage artifact")?;
+        let bridge_extent = cursor.extent()?;
+        let mut bridges = LocalSequence::with_capacity(bridge_extent.min(1 << 16));
+        for _ in 0..bridge_extent {
+            bridges.push(Bridge {
+                stem: cursor.utf8("a bridge stem")?,
+                held: cursor.utf8("a held identifier")?,
+                brought: cursor.utf8("a bridge's brought identifier")?,
+                route: cursor.utf8("a licensing route")?,
+                held_at: cursor.extent()?,
+                brought_at: cursor.extent()?,
+                held_face: population(&mut cursor, "a held face member")?.into_inner(),
+                brought_face: population(&mut cursor, "a brought face member")?.into_inner(),
+                held_crossings: population(&mut cursor, "a held crossing")?.into_inner(),
+                brought_crossings: population(&mut cursor, "a brought crossing")?.into_inner(),
+            });
+        }
+        passages.push(DerivedPassage {
+            name,
+            statement,
+            reaches,
+            brought,
+            stem,
+            bridges: bridges.into_inner(),
+            text,
+        });
+    }
+    cursor.finish()?;
+    Ok(passages)
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -640,7 +725,8 @@ fn put_extent(
 ) -> Result<(), ConditionedRestRefusal> {
     put_u64(
         octets,
-        u64::try_from(extent).map_err(|_| ConditionedRestRefusal::ExtentExceedsCarrier { field })?,
+        u64::try_from(extent)
+            .map_err(|_| ConditionedRestRefusal::ExtentExceedsCarrier { field })?,
     );
     Ok(())
 }
@@ -666,7 +752,10 @@ impl<'a> Cursor<'a> {
     }
 
     fn take(&mut self, extent: usize) -> Result<&'a [u8], ConditionedRestRefusal> {
-        let end = self.at.checked_add(extent).filter(|end| *end <= self.octets.len());
+        let end = self
+            .at
+            .checked_add(extent)
+            .filter(|end| *end <= self.octets.len());
         let Some(end) = end else {
             return Err(ConditionedRestRefusal::EndedInsideAField {
                 field: "a declared run",
@@ -922,17 +1011,22 @@ mod tests {
         }
     }
 
-    /// The rendering must be lossless where it matters: two passage populations differing only in a
-    /// bridge's offset, or only in one route, must render to different octets. A rendering over the
-    /// names alone passes every other test in this module and fails here.
+    /// The production form must be lossless: every bridge field crosses it and the far mouth returns
+    /// the same passage population, not merely the same names and theorem text.
     #[test]
-    fn the_passage_rendering_moves_when_a_bridge_moves() {
+    fn the_passage_form_reopens_exactly_and_moves_when_any_bridge_face_moves() {
         let body = conditioned();
         let derived = body
             .derive(&DerivationQuery::reaching("(h : P) : exactCarrier P"))
             .expect("derives");
         assert!(!derived.is_empty());
         let baseline = render_derived_passages(&derived);
+        assert_eq!(
+            decode_derived_passages(&baseline)
+                .expect("the production form reopens")
+                .as_ref(),
+            derived.as_slice()
+        );
 
         let mut offset_moved = derived.clone();
         offset_moved[0].bridges[0].held_at += 1;
@@ -946,8 +1040,27 @@ mod tests {
         text_moved[0].text.push(' ');
         assert_ne!(baseline, render_derived_passages(&text_moved));
 
+        text_moved[0].text.pop();
+        text_moved[0].bridges[0]
+            .held_face
+            .push("another-carrier".to_owned());
+        assert_ne!(baseline, render_derived_passages(&text_moved));
+
+        text_moved[0].bridges[0].held_face.pop();
+        text_moved[0].bridges[0]
+            .brought_crossings
+            .push("a-crossing".to_owned());
+        assert_ne!(baseline, render_derived_passages(&text_moved));
+
         // and identical populations render identically, so the assertions above are about the move
         assert_eq!(baseline, render_derived_passages(&derived));
+
+        let mut retired_version = baseline;
+        retired_version[DERIVED_PASSAGE_RENDERING_PREFIX.len() - 1] = 1;
+        assert!(matches!(
+            decode_derived_passages(&retired_version),
+            Err(ConditionedRestRefusal::NotThisForm { .. })
+        ));
     }
 
     /// **An ablated body rests and remounts field for field, with its identities intact.**

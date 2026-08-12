@@ -112,6 +112,7 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
+use holonic_structure::LocalSequence;
 use serde::{Deserialize, Serialize};
 
 use crate::algebraic::CausalCellId;
@@ -253,9 +254,22 @@ impl FoundedMorphology {
     pub fn condition(exposures: &[Exposure]) -> Self {
         let mut founded = Self::default();
         for exposure in exposures {
-            for word in &exposure.words {
-                founded.witness(word, &exposure.whole, Vec::new());
-            }
+            founded.receive_exposure(exposure);
+        }
+        founded
+    }
+
+    /// Condition from a succession of named text wholes without retaining a second corpus-sized
+    /// population of [`Exposure`] values.
+    ///
+    /// This is the same founding law as [`Self::condition`]: every whole crosses [`expose`] and is
+    /// then released before the next arrives.  The distinction is ownership at the mouth, not a
+    /// second tokenizer or a reduced reading.  It matters when the inherited body is already a
+    /// sealed corpus whose occurrence surfaces are owned elsewhere.
+    pub fn condition_wholes<'a>(wholes: impl IntoIterator<Item = (&'a str, &'a str)>) -> Self {
+        let mut founded = Self::default();
+        for (whole, text) in wholes {
+            founded.receive_exposure(&expose(whole, text));
         }
         founded
     }
@@ -449,6 +463,12 @@ impl FoundedMorphology {
                     foreign_lineage: lineage,
                 });
             }
+        }
+    }
+
+    fn receive_exposure(&mut self, exposure: &Exposure) {
+        for word in &exposure.words {
+            self.witness(word, &exposure.whole, Vec::new());
         }
     }
 
@@ -1235,6 +1255,23 @@ impl DerivedPassage {
             .map(|bridge| bridge.route.as_str())
             .collect()
     }
+
+    /// Materialize one further occurrence of this exact passage under a distinct declaration name.
+    ///
+    /// The returned-conduct owner supplies the identity.  This owner retains the artifact codec:
+    /// statement, reached declaration, licensing stem, brought identifier, and the complete local
+    /// bridge population are unchanged, while the theorem text is composed afresh from those fields.
+    pub(crate) fn reemitted_as(&self, name: String) -> Self {
+        Self {
+            text: compose_passage(&name, &self.statement, &self.brought),
+            name,
+            statement: self.statement.to_owned(),
+            reaches: self.reaches.to_owned(),
+            brought: self.brought.to_owned(),
+            stem: self.stem.to_owned(),
+            bridges: self.bridges.to_owned(),
+        }
+    }
 }
 
 /// Compose the Lean-shaped artifact one bridge licenses.
@@ -1569,6 +1606,11 @@ impl ConditionedBody {
         self.morphology = FoundedMorphology::condition(exposures);
     }
 
+    /// Condition on named wholes one at a time, retaining only the founded morphology.
+    pub fn condition_wholes<'a>(&mut self, wholes: impl IntoIterator<Item = (&'a str, &'a str)>) {
+        self.morphology = FoundedMorphology::condition_wholes(wholes);
+    }
+
     /// Carry a morphology a foreign conditioner founded.
     pub fn carry_morphology(&mut self, morphology: FoundedMorphology) {
         self.morphology = morphology;
@@ -1615,8 +1657,52 @@ impl ConditionedBody {
         &self,
         query: &DerivationQuery,
     ) -> Result<Vec<Passage>, ConditionedDerivationRefusal> {
-        let mut passages = self.standing.clone();
-        for derived in self.derive(query)? {
+        let derived = self.derive(query)?;
+        Ok(self.open_passages(derived)?.into_inner())
+    }
+
+    /// Read a production returned through an exterior deposit back onto this body's standing.
+    ///
+    /// Unlike [`Self::passages`], this does not derive the population it receives.  Every artifact
+    /// is nevertheless reread by `derivation_atlas` and required to reach its declared statement
+    /// and recruit its declared bridge before it can found a circuit.  This is the engine-side seam
+    /// for a form mouth: the caller owns the codec and the deposit; this owner validates the
+    /// mathematical passages that came back through it.
+    pub fn passages_from_production(
+        &self,
+        query: &DerivationQuery,
+        derived: impl IntoIterator<Item = DerivedPassage>,
+    ) -> Result<LocalSequence<Passage>, ConditionedDerivationRefusal> {
+        let mut opened = LocalSequence::new();
+        for passage in derived {
+            opened.push(passage);
+        }
+        let expected = self.derive(query)?;
+        if opened.as_ref() != expected.as_slice() {
+            let common = opened.len().min(expected.len());
+            let mut first_difference = 0usize;
+            while first_difference < common
+                && opened[first_difference] == expected[first_difference]
+            {
+                first_difference += 1;
+            }
+            return Err(ConditionedDerivationRefusal::DepositedProductionDisagrees {
+                expected: expected.len(),
+                opened: opened.len(),
+                first_difference,
+                expected_passage: expected.get(first_difference).cloned(),
+                opened_passage: opened.get(first_difference).cloned(),
+            });
+        }
+        self.open_passages(opened)
+    }
+
+    pub(crate) fn open_passages(
+        &self,
+        derived: impl IntoIterator<Item = DerivedPassage>,
+    ) -> Result<LocalSequence<Passage>, ConditionedDerivationRefusal> {
+        let mut passages = LocalSequence::from_slice(&self.standing);
+        for derived in derived {
             let derivation = read_derivation(&derived.text).ok_or(
                 ConditionedDerivationRefusal::EmittedPassageDeclaresNothing {
                     name: derived.name.clone(),
@@ -1660,6 +1746,19 @@ impl ConditionedBody {
         aperture: CircuitAperture,
     ) -> Result<ConditionedCircuit, ConditionedDerivationRefusal> {
         found_conditioned_circuit(self.passages(query)?, aperture)
+    }
+
+    /// Found a circuit from a production that has already crossed an exterior deposit.
+    pub fn circuit_from_production(
+        &self,
+        query: &DerivationQuery,
+        production: impl IntoIterator<Item = DerivedPassage>,
+        aperture: CircuitAperture,
+    ) -> Result<ConditionedCircuit, ConditionedDerivationRefusal> {
+        found_conditioned_circuit(
+            self.passages_from_production(query, production)?.into_inner(),
+            aperture,
+        )
     }
 
     /// The gauge orbit of this body's conditioning over its own recruited identifiers.
@@ -1963,6 +2062,15 @@ pub enum ConditionedDerivationRefusal {
     /// The passage was read back without the identifier its bridge brought. The licence would be
     /// invisible in the circuit.
     EmittedPassageDroppedItsBridge { name: String, brought: String },
+    /// A deposited production differs from what this body emits for the declared query. Refused
+    /// before any of its self-declared provenance can enter a circuit.
+    DepositedProductionDisagrees {
+        expected: usize,
+        opened: usize,
+        first_difference: usize,
+        expected_passage: Option<DerivedPassage>,
+        opened_passage: Option<DerivedPassage>,
+    },
     /// An ablation named a stem the morphology never founded.
     StemWasNeverFounded { stem: String },
     /// The circuit refused the population.
@@ -1990,6 +2098,18 @@ impl std::fmt::Display for ConditionedDerivationRefusal {
                 formatter,
                 "the composed passage {name} was read without recruiting {brought}, so its licence \
                  is invisible in the circuit"
+            ),
+            Self::DepositedProductionDisagrees {
+                expected,
+                opened,
+                first_difference,
+                expected_passage,
+                opened_passage,
+            } => write!(
+                formatter,
+                "the deposited production carries {opened} passages rather than the exact \
+                 {expected}-passage emission; first difference {first_difference}: expected \
+                 {expected_passage:?}, opened {opened_passage:?}"
             ),
             Self::StemWasNeverFounded { stem } => {
                 write!(formatter, "the morphology never founded the stem {stem:?}")
@@ -2093,6 +2213,22 @@ mod tests {
         assert!(committed.contains(&"exact"), "{committed:?}");
         assert!(committed.contains(&"carry"), "{committed:?}");
         assert!(!committed.contains(&"carrier"), "{committed:?}");
+    }
+
+    #[test]
+    fn conditioning_named_wholes_one_at_a_time_is_the_same_founding() {
+        let wholes = [
+            ("one", "exact carrier crosses one boundary"),
+            ("two", "the carrier returns through an exact mouth"),
+        ];
+        let exposures = [
+            expose(wholes[0].0, wholes[0].1),
+            expose(wholes[1].0, wholes[1].1),
+        ];
+        let streamed = FoundedMorphology::condition_wholes(wholes);
+        let retained = FoundedMorphology::condition(&exposures);
+
+        assert_eq!(streamed, retained);
     }
 
     #[test]
@@ -2531,6 +2667,124 @@ mod tests {
             );
             assert!(!circuit.cell_names().is_empty());
         }
+    }
+
+    #[test]
+    fn a_deposited_production_refounds_the_same_circuit_as_the_live_emission() {
+        let mut body = ConditionedBody::mount(deposit()).expect("deposit reads");
+        body.condition(&corpus_with_carrier());
+        let query = the_statement();
+        let production = body.derive(&query).expect("derives");
+        let live = body
+            .circuit(&query, CircuitAperture::STATEMENT_INCIDENT)
+            .expect("live circuit");
+        let returned = body
+            .circuit_from_production(
+                &query,
+                production,
+                CircuitAperture::STATEMENT_INCIDENT,
+            )
+            .expect("deposited circuit");
+
+        assert_eq!(returned.passages, live.passages);
+        assert_eq!(returned.cell_names(), live.cell_names());
+        assert_eq!(returned.provenance, live.provenance);
+        assert_eq!(returned.unclaimed, live.unclaimed);
+    }
+
+    #[test]
+    fn a_deposit_cannot_self_declare_any_population_or_bridge_difference() {
+        fn refused(
+            body: &ConditionedBody,
+            query: &DerivationQuery,
+            production: LocalSequence<DerivedPassage>,
+        ) -> bool {
+            matches!(
+                body.circuit_from_production(
+                    query,
+                    production,
+                    CircuitAperture::STATEMENT_INCIDENT,
+                ),
+                Err(ConditionedDerivationRefusal::DepositedProductionDisagrees { .. })
+            )
+        }
+
+        fn altered(
+            exact: &[DerivedPassage],
+            change: impl FnOnce(&mut LocalSequence<DerivedPassage>),
+        ) -> LocalSequence<DerivedPassage> {
+            let mut returned = LocalSequence::from_slice(exact);
+            change(&mut returned);
+            returned
+        }
+
+        let mut body = ConditionedBody::mount(deposit()).expect("deposit reads");
+        body.condition(&corpus_with_carrier());
+        let query = the_statement();
+        let exact = body.derive(&query).expect("derives");
+        assert!(exact.len() > 1);
+        assert!(!exact[0].bridges.is_empty());
+
+        assert!(refused(
+            &body,
+            &query,
+            altered(&exact, |moved| moved[0].name.push_str("_forged")),
+        ));
+        assert!(refused(
+            &body,
+            &query,
+            altered(&exact, |moved| moved[0].reaches.push_str("_forged")),
+        ));
+        assert!(refused(
+            &body,
+            &query,
+            altered(&exact, |moved| moved[0].stem.push_str("_forged")),
+        ));
+        assert!(refused(
+            &body,
+            &query,
+            altered(&exact, |moved| moved[0].bridges[0].route.push_str("/forged")),
+        ));
+        assert!(refused(
+            &body,
+            &query,
+            altered(&exact, |moved| moved[0].bridges[0].held_at += 1),
+        ));
+        assert!(refused(
+            &body,
+            &query,
+            altered(&exact, |moved| {
+                moved[0].bridges[0]
+                    .held_face
+                    .push("another-carrier".to_owned());
+            }),
+        ));
+        assert!(refused(
+            &body,
+            &query,
+            altered(&exact, |moved| {
+                moved[0].bridges[0]
+                    .brought_crossings
+                    .push("another-crossing".to_owned());
+            }),
+        ));
+        assert!(refused(
+            &body,
+            &query,
+            altered(&exact, |omitted| {
+                omitted.remove(0);
+            }),
+        ));
+        assert!(refused(
+            &body,
+            &query,
+            altered(&exact, |duplicated| duplicated.push(exact[0].to_owned())),
+        ));
+        assert!(refused(
+            &body,
+            &query,
+            altered(&exact, |reordered| reordered.swap(0, 1)),
+        ));
     }
 
     #[test]

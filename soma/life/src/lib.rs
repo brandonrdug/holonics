@@ -34,6 +34,8 @@ pub mod relational_language;
 pub mod reintegrating_elaboration;
 pub mod research_intelligence;
 pub mod resonance_ecology;
+pub mod returned_conduct;
+pub mod returned_contact_cuda;
 pub mod suffix_ecology;
 pub mod synchronized_occurrence;
 pub mod text_material;

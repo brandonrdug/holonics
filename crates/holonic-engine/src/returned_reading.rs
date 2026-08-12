@@ -115,11 +115,13 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
+use holonic_structure::{LocalSequence, LocalSet};
 use num_bigint::BigInt;
+use serde::Serialize;
 
 use crate::algebraic::CausalCellId;
 use crate::conditioned_derivation::{
-    derive, expose, ConditionedCircuit, ConditionedDerivationRefusal, DerivationQuery,
+    derive, expose, Bridge, ConditionedCircuit, ConditionedDerivationRefusal, DerivationQuery,
     DerivedPassage, Exposure, FoundedMorphology, StemStanding,
 };
 use crate::derivation_atlas::{
@@ -924,14 +926,87 @@ pub struct TakenOccurrence {
     pub taken_at: usize,
 }
 
+/// The part of a bridge that does not change when its local face or crossing population moves.
+///
+/// `route` is present deliberately.  Two contacts carrying the same stem at the same offsets but
+/// licensed by different deposited routes are two local occurrences, not one pooled carrier.
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize)]
+pub struct BridgeAddress {
+    pub route: String,
+    pub stem: String,
+    pub held: String,
+    pub held_at: usize,
+    pub brought: String,
+    pub brought_at: usize,
+}
+
+impl BridgeAddress {
+    fn of(bridge: &Bridge) -> Self {
+        Self {
+            route: bridge.route.to_owned(),
+            stem: bridge.stem.to_owned(),
+            held: bridge.held.to_owned(),
+            held_at: bridge.held_at,
+            brought: bridge.brought.to_owned(),
+            brought_at: bridge.brought_at,
+        }
+    }
+
+    fn names(&self, bridge: &Bridge) -> bool {
+        self.route == bridge.route
+            && self.stem == bridge.stem
+            && self.held == bridge.held
+            && self.held_at == bridge.held_at
+            && self.brought == bridge.brought
+            && self.brought_at == bridge.brought_at
+    }
+}
+
+/// Which receiver-local population of one bridge moved.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum BridgeSite {
+    HeldFace,
+    BroughtFace,
+    HeldCrossings,
+    BroughtCrossings,
+}
+
+impl BridgeSite {
+    const DECLARED: [Self; 4] = [
+        Self::HeldFace,
+        Self::BroughtFace,
+        Self::HeldCrossings,
+        Self::BroughtCrossings,
+    ];
+}
+
+/// One carrier entering or leaving one exact bridge site.
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize)]
+pub struct CarrierMovement {
+    pub carrier: String,
+    pub stood_before: bool,
+    pub stands_after: bool,
+    /// Earlier return mechanisms which named this exact entering or leaving carrier.
+    pub caused_by: LocalSet<String>,
+}
+
+/// The exact difference at one site of one route-local bridge.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct BridgeSiteMovement {
+    pub bridge: BridgeAddress,
+    pub site: BridgeSite,
+    /// Only the local symmetric difference, never the unchanged carrier population.
+    pub carriers: LocalSequence<CarrierMovement>,
+}
+
 /// One passage present in both productions whose licensing lineage moved.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct RelicensedPassage {
     pub passage: String,
     pub stem: String,
-    /// The routes that licensed it before, and after. Both kept.
-    pub routes_before: Vec<String>,
-    pub routes_after: Vec<String>,
+    /// Every moved bridge site.  Empty means no relicensing occurred.
+    pub bridge_movements: LocalSequence<BridgeSiteMovement>,
 }
 
 /// Two productions on one standing and one query, the second conducted through the morphology the
@@ -960,15 +1035,14 @@ impl ConditionedAgain {
         self.first != self.second
     }
 
-    /// Every moved passage names at least one earlier return.
-    pub fn every_movement_is_attributed(&self) -> bool {
-        self.founded_passages
-            .iter()
-            .all(|passage| !passage.caused_by.is_empty())
-            && self
-                .withdrawn_passages
-                .iter()
-                .all(|passage| !passage.caused_by.is_empty())
+    /// The supplied receipt is the exact difference of the two production populations, and every
+    /// local difference names a return.
+    ///
+    /// This is deliberately stronger than an `all` over the receipt rows.  It refuses duplicate
+    /// passage or receipt identities, a missing or surplus row, non-canonical order, and a bridge
+    /// movement whose carriers have been pooled across routes or sites.
+    pub fn movement_is_exactly_attributed(&self) -> bool {
+        movement_receipt_is_exact(self)
     }
 
     /// The recurrence law refused something: some returned word was contacted once and stayed
@@ -982,12 +1056,369 @@ fn passage_key(passage: &DerivedPassage) -> (String, String) {
     (passage.name.clone(), passage.text.clone())
 }
 
-fn routes_of(passage: &DerivedPassage) -> Vec<String> {
-    passage
-        .routes()
-        .into_iter()
-        .map(str::to_owned)
-        .collect()
+fn same_passage(left: &DerivedPassage, right: &DerivedPassage) -> bool {
+    left.name == right.name && left.text == right.text
+}
+
+fn bridge_at<'a>(passage: &'a DerivedPassage, address: &BridgeAddress) -> Option<&'a Bridge> {
+    passage.bridges.iter().find(|bridge| address.names(bridge))
+}
+
+fn carriers_at(bridge: Option<&Bridge>, site: BridgeSite) -> &[String] {
+    let Some(bridge) = bridge else {
+        return &[];
+    };
+    match site {
+        BridgeSite::HeldFace => &bridge.held_face,
+        BridgeSite::BroughtFace => &bridge.brought_face,
+        BridgeSite::HeldCrossings => &bridge.held_crossings,
+        BridgeSite::BroughtCrossings => &bridge.brought_crossings,
+    }
+}
+
+/// Every bridge/site difference between two occurrences of one passage.
+fn bridge_site_movements(
+    before: &DerivedPassage,
+    after: &DerivedPassage,
+    causes_of: &impl Fn(&str) -> LocalSet<String>,
+) -> LocalSequence<BridgeSiteMovement> {
+    let mut addresses = LocalSet::new();
+    for bridge in &before.bridges {
+        addresses.insert(BridgeAddress::of(bridge));
+    }
+    for bridge in &after.bridges {
+        addresses.insert(BridgeAddress::of(bridge));
+    }
+
+    let mut movements = LocalSequence::new();
+    for address in addresses {
+        let before_bridge = bridge_at(before, &address);
+        let after_bridge = bridge_at(after, &address);
+        for site in BridgeSite::DECLARED {
+            let before_carriers = carriers_at(before_bridge, site);
+            let after_carriers = carriers_at(after_bridge, site);
+            let mut carriers = LocalSequence::new();
+            for carrier in before_carriers {
+                if !after_carriers.contains(carrier) {
+                    carriers.push(CarrierMovement {
+                        carrier: carrier.to_owned(),
+                        stood_before: true,
+                        stands_after: false,
+                        caused_by: causes_of(carrier),
+                    });
+                }
+            }
+            for carrier in after_carriers {
+                if !before_carriers.contains(carrier) {
+                    carriers.push(CarrierMovement {
+                        carrier: carrier.to_owned(),
+                        stood_before: false,
+                        stands_after: true,
+                        caused_by: causes_of(carrier),
+                    });
+                }
+            }
+            if !carriers.is_empty() {
+                movements.push(BridgeSiteMovement {
+                    bridge: BridgeAddress {
+                        route: address.route.to_owned(),
+                        stem: address.stem.to_owned(),
+                        held: address.held.to_owned(),
+                        held_at: address.held_at,
+                        brought: address.brought.to_owned(),
+                        brought_at: address.brought_at,
+                    },
+                    site,
+                    carriers,
+                });
+            }
+        }
+    }
+    movements
+}
+
+fn strictly_ordered<T: Ord>(members: &[T]) -> bool {
+    members.windows(2).all(|pair| pair[0] < pair[1])
+}
+
+fn bridge_population_is_canonical(passage: &DerivedPassage) -> bool {
+    if !strictly_ordered(&passage.bridges) {
+        return false;
+    }
+    let mut addresses = LocalSet::new();
+    for bridge in &passage.bridges {
+        if !addresses.insert(BridgeAddress::of(bridge))
+            || !strictly_ordered(&bridge.held_face)
+            || !strictly_ordered(&bridge.brought_face)
+            || !strictly_ordered(&bridge.held_crossings)
+            || !strictly_ordered(&bridge.brought_crossings)
+        {
+            return false;
+        }
+    }
+    true
+}
+
+fn production_is_canonical(production: &[DerivedPassage]) -> bool {
+    let ordered = production.windows(2).all(|pair| {
+        (&pair[0].reaches, &pair[0].stem, &pair[0].brought)
+            < (&pair[1].reaches, &pair[1].stem, &pair[1].brought)
+    });
+    if !ordered {
+        return false;
+    }
+    let mut names = LocalSet::new();
+    for passage in production {
+        if !names.insert(passage.name.as_str()) || !bridge_population_is_canonical(passage) {
+            return false;
+        }
+    }
+    true
+}
+
+fn passage_named<'a>(production: &'a [DerivedPassage], name: &str) -> Option<&'a DerivedPassage> {
+    production.iter().find(|passage| passage.name == name)
+}
+
+fn matching_passage<'a>(
+    production: &'a [DerivedPassage],
+    sought: &DerivedPassage,
+) -> Option<&'a DerivedPassage> {
+    production
+        .iter()
+        .find(|passage| same_passage(passage, sought))
+}
+
+fn returned_stem<'a>(returned: &'a [ReturnedStem], stem: &str) -> Option<&'a ReturnedStem> {
+    returned.iter().find(|candidate| candidate.stem == stem)
+}
+
+fn returned_causes(stem: &ReturnedStem) -> LocalSet<String> {
+    let mut causes = LocalSet::new();
+    for cause in &stem.returns {
+        causes.insert(cause.to_owned());
+    }
+    causes
+}
+
+fn relicensing_structure_is_exact(
+    receipt: &RelicensedPassage,
+    before: &DerivedPassage,
+    after: &DerivedPassage,
+    returned: &[ReturnedStem],
+) -> bool {
+    let no_causes = |_: &str| LocalSet::new();
+    let expected = bridge_site_movements(before, after, &no_causes);
+    if expected.is_empty() || receipt.bridge_movements.len() != expected.len() {
+        return false;
+    }
+
+    let mut seen = LocalSet::new();
+    for movement in &receipt.bridge_movements {
+        if !seen.insert((&movement.bridge, movement.site)) {
+            return false;
+        }
+        let Some(expected_movement) = expected.iter().find(|candidate| {
+            candidate.bridge == movement.bridge && candidate.site == movement.site
+        }) else {
+            return false;
+        };
+        if expected_movement.carriers.len() != movement.carriers.len() {
+            return false;
+        }
+        let mut carriers_seen = LocalSet::new();
+        for carrier in &movement.carriers {
+            let Some(returned_stem) = returned_stem(returned, &carrier.carrier) else {
+                return false;
+            };
+            if !carriers_seen.insert(carrier.carrier.as_str())
+                || carrier.stood_before == carrier.stands_after
+                || carrier.caused_by.is_empty()
+                || carrier.caused_by != returned_causes(returned_stem)
+                || !expected_movement.carriers.iter().any(|expected_carrier| {
+                    expected_carrier.carrier == carrier.carrier
+                        && expected_carrier.stood_before == carrier.stood_before
+                        && expected_carrier.stands_after == carrier.stands_after
+                })
+            {
+                return false;
+            }
+        }
+    }
+    true
+}
+
+/// Recompute the complete movement population and compare it to the supplied causal receipt.
+fn movement_receipt_is_exact(receipt: &ConditionedAgain) -> bool {
+    if !production_is_canonical(&receipt.first) || !production_is_canonical(&receipt.second) {
+        return false;
+    }
+    let mut returned_stems = LocalSet::new();
+    for stem in &receipt.committed_by_return {
+        if !returned_stems.insert(stem.stem.as_str()) || stem.returns.is_empty() {
+            return false;
+        }
+    }
+
+    // One readable passage name must continue to name one artifact.  A text substitution under the
+    // same name is exact movement, but this receipt shape cannot honestly describe it as either a
+    // founding or a withdrawal, so it is refused rather than silently paired.
+    for passage in &receipt.first {
+        if passage_named(&receipt.second, &passage.name)
+            .is_some_and(|later| !same_passage(passage, later))
+        {
+            return false;
+        }
+    }
+
+    let mut founded = LocalSet::new();
+    let mut withdrawn = LocalSet::new();
+    let mut relicensed = LocalSet::new();
+    for passage in &receipt.second {
+        match matching_passage(&receipt.first, passage) {
+            None => {
+                founded.insert(passage.name.to_owned());
+            }
+            Some(earlier) if earlier.bridges != passage.bridges => {
+                relicensed.insert(passage.name.to_owned());
+            }
+            Some(_) => {}
+        }
+    }
+    for passage in &receipt.first {
+        if matching_passage(&receipt.second, passage).is_none() {
+            withdrawn.insert(passage.name.to_owned());
+        }
+    }
+
+    // Equal semantic populations in a different vector or bridge order are not a causal movement.
+    // Canonicality above rejects the moved ordering rather than letting empty receipt rows pass.
+    if receipt.first != receipt.second
+        && founded.is_empty()
+        && withdrawn.is_empty()
+        && relicensed.is_empty()
+    {
+        return false;
+    }
+
+    let mut founded_receipts = LocalSet::new();
+    for passage in &receipt.founded_passages {
+        if !founded_receipts.insert(passage.passage.to_owned())
+            || passage.caused_by.is_empty()
+            || passage.committed_at.is_empty()
+        {
+            return false;
+        }
+        let Some(actual) = passage_named(&receipt.second, &passage.passage) else {
+            return false;
+        };
+        if matching_passage(&receipt.first, actual).is_some()
+            || passage.stem != actual.stem
+            || passage.brought != actual.brought
+        {
+            return false;
+        }
+        let Some(returned) = returned_stem(&receipt.committed_by_return, &passage.stem) else {
+            return false;
+        };
+        if passage.caused_by != returned.returns || passage.committed_at != returned.committed_at {
+            return false;
+        }
+    }
+    if founded != founded_receipts {
+        return false;
+    }
+
+    let mut returned_names = LocalSequence::new();
+    for stem in &receipt.committed_by_return {
+        returned_names.push(stem.stem.as_str());
+    }
+    let mut withdrawn_receipts = LocalSet::new();
+    for passage in &receipt.withdrawn_passages {
+        if !withdrawn_receipts.insert(passage.passage.to_owned())
+            || passage.covered_by.is_empty()
+            || passage.caused_by.is_empty()
+        {
+            return false;
+        }
+        let Some(actual) = passage_named(&receipt.first, &passage.passage) else {
+            return false;
+        };
+        if matching_passage(&receipt.second, actual).is_some() || passage.stem != actual.stem {
+            return false;
+        }
+        let mut expected_covered = LocalSet::new();
+        for bridge in &actual.bridges {
+            for (identifier, at) in [
+                (&bridge.held, bridge.held_at),
+                (&bridge.brought, bridge.brought_at),
+            ] {
+                for taken in occurrences_taken(
+                    identifier,
+                    at,
+                    actual.stem.len(),
+                    &returned_names,
+                ) {
+                    expected_covered.insert(taken);
+                }
+            }
+        }
+        let mut opened_covered = LocalSet::new();
+        for taken in &passage.covered_by {
+            if !opened_covered.insert(taken.to_owned()) {
+                return false;
+            }
+        }
+        if opened_covered != expected_covered {
+            return false;
+        }
+        let mut expected_causes = LocalSet::new();
+        for taken in &expected_covered {
+            let Some(returned) = returned_stem(&receipt.committed_by_return, &taken.taker) else {
+                return false;
+            };
+            for cause in &returned.returns {
+                expected_causes.insert(cause.to_owned());
+            }
+        }
+        let mut opened_causes = LocalSet::new();
+        for cause in &passage.caused_by {
+            if !opened_causes.insert(cause.to_owned()) {
+                return false;
+            }
+        }
+        if opened_causes != expected_causes {
+            return false;
+        }
+    }
+    if withdrawn != withdrawn_receipts {
+        return false;
+    }
+
+    let mut relicensed_receipts = LocalSet::new();
+    for passage in &receipt.relicensed_passages {
+        if !relicensed_receipts.insert(passage.passage.to_owned()) {
+            return false;
+        }
+        let Some(before) = passage_named(&receipt.first, &passage.passage) else {
+            return false;
+        };
+        let Some(after) = passage_named(&receipt.second, &passage.passage) else {
+            return false;
+        };
+        if !same_passage(before, after)
+            || passage.stem != after.stem
+            || !relicensing_structure_is_exact(
+                passage,
+                before,
+                after,
+                &receipt.committed_by_return,
+            )
+        {
+            return false;
+        }
+    }
+    relicensed == relicensed_receipts
 }
 
 /// Every returned stem that **strictly contains** the occurrence `[at, at + length)` in `identifier`,
@@ -1107,6 +1538,13 @@ pub fn condition_again(
     }
 
     let cause_of = |stem: &str| -> Vec<String> { returned.wholes_naming(stem) };
+    let local_causes = |stem: &str| -> LocalSet<String> {
+        let mut causes = LocalSet::new();
+        for cause in returned.wholes_naming(stem) {
+            causes.insert(cause);
+        }
+        causes
+    };
     let committing = |stem: &str| -> Vec<String> {
         carried.stem(stem).map_or_else(Vec::new, |founded| {
             founded
@@ -1177,30 +1615,29 @@ pub fn condition_again(
         })
         .collect();
 
-    let relicensed_passages: Vec<RelicensedPassage> = second
-        .iter()
-        .filter_map(|passage| {
-            let earlier = before.get(&passage_key(passage))?;
-            if earlier.bridges == passage.bridges {
-                return None;
-            }
-            Some(RelicensedPassage {
-                passage: passage.name.clone(),
-                stem: passage.stem.clone(),
-                routes_before: routes_of(earlier),
-                routes_after: routes_of(passage),
-            })
-        })
-        .collect();
+    let mut relicensed_passages = LocalSequence::new();
+    for passage in &second {
+        let Some(earlier) = before.get(&passage_key(passage)) else {
+            continue;
+        };
+        if earlier.bridges == passage.bridges {
+            continue;
+        }
+        relicensed_passages.push(RelicensedPassage {
+            passage: passage.name.to_owned(),
+            stem: passage.stem.to_owned(),
+            bridge_movements: bridge_site_movements(earlier, passage, &local_causes),
+        });
+    }
 
     Ok(ConditionedAgain {
-        schema: "holonic-engine.returned-reading-conditioned-again.v1".to_owned(),
+        schema: "holonic-engine.returned-reading-conditioned-again.v3".to_owned(),
         first,
         second,
         carried,
         founded_passages,
         withdrawn_passages,
-        relicensed_passages,
+        relicensed_passages: relicensed_passages.into_inner(),
         committed_by_return,
         provisional_by_return,
     })
@@ -1451,6 +1888,26 @@ mod tests {
         (before, after)
     }
 
+    fn returned_conditioning() -> ConditionedAgain {
+        let mounted = body();
+        let (before, after) = readings();
+        let reading = read_production(
+            &before,
+            &after,
+            AccumulationRule::RecruitmentLoad,
+            PivotRule::SmallestMagnitude,
+            STATEMENT,
+        )
+        .expect("reads");
+        condition_again(
+            &mounted.standing_derivations(),
+            mounted.morphology(),
+            &DerivationQuery::reaching(STATEMENT),
+            &reading.returned,
+        )
+        .expect("derives")
+    }
+
     #[test]
     fn the_falsifier_fires_before_the_repair() {
         // Two productions on the same standing, the same morphology and the same query are
@@ -1614,9 +2071,27 @@ mod tests {
             "the production moved without founding or withdrawing a passage"
         );
         assert!(
-            again.every_movement_is_attributed(),
+            again.movement_is_exactly_attributed(),
             "a moved passage that names no earlier return is not a return path"
         );
+        assert!(
+            !again.relicensed_passages.is_empty(),
+            "the fixture moved no bridge face or crossing, so relicensing attribution was untested"
+        );
+        for passage in &again.relicensed_passages {
+            assert!(
+                !passage.bridge_movements.is_empty()
+                    && passage
+                        .bridge_movements
+                        .iter()
+                        .all(|movement| movement
+                            .carriers
+                            .iter()
+                            .all(|carrier| !carrier.caused_by.is_empty())),
+                "relicensing {} carried no bridge-local cause",
+                passage.passage
+            );
+        }
         assert!(
             !again.committed_by_return.is_empty(),
             "no stem was committed by the return"
@@ -1625,6 +2100,126 @@ mod tests {
             again.the_recurrence_law_refused_something(),
             "every returned word committed; the recurrence law is decorative here"
         );
+    }
+
+    #[test]
+    fn exact_attribution_refuses_vacuity_duplicates_order_and_a_local_movement_without_cause() {
+        let valid = returned_conditioning();
+        assert!(valid.movement_is_exactly_attributed());
+
+        let mut missing = returned_conditioning();
+        assert!(!missing.founded_passages.is_empty());
+        missing.founded_passages.clear();
+        assert!(
+            !missing.movement_is_exactly_attributed(),
+            "an empty receipt passed over a founded population"
+        );
+
+        let mut duplicate_receipt = returned_conditioning();
+        let mut receipt_donor = returned_conditioning();
+        duplicate_receipt
+            .founded_passages
+            .push(receipt_donor.founded_passages.remove(0));
+        assert!(
+            !duplicate_receipt.movement_is_exactly_attributed(),
+            "a duplicated receipt identity hid the missing bijection"
+        );
+
+        let mut duplicate_passage = returned_conditioning();
+        let mut passage_donor = returned_conditioning();
+        duplicate_passage
+            .second
+            .push(passage_donor.second.remove(0));
+        assert!(
+            !duplicate_passage.movement_is_exactly_attributed(),
+            "a duplicated production occurrence was collapsed"
+        );
+
+        let mounted = body();
+        let mut order_only = condition_again(
+            &mounted.standing_derivations(),
+            mounted.morphology(),
+            &DerivationQuery::reaching(STATEMENT),
+            &ReturnedReading::still(),
+        )
+        .expect("derives");
+        assert!(order_only.movement_is_exactly_attributed());
+        assert!(order_only.second.len() > 1);
+        order_only.second.swap(0, 1);
+        assert!(order_only.the_production_moved());
+        assert!(
+            !order_only.movement_is_exactly_attributed(),
+            "order-only movement passed an empty receipt"
+        );
+
+        let mut uncaused = returned_conditioning();
+        let local =
+            &mut uncaused.relicensed_passages[0].bridge_movements[0].carriers[0];
+        local.caused_by.clear();
+        assert!(
+            !uncaused.movement_is_exactly_attributed(),
+            "a bridge-local movement without a return passed"
+        );
+    }
+
+    #[test]
+    fn one_carrier_moving_between_bridges_cannot_disappear_into_a_pooled_set() {
+        fn pooled(passage: &DerivedPassage) -> LocalSet<String> {
+            let mut carriers = LocalSet::new();
+            for bridge in &passage.bridges {
+                for population in [
+                    &bridge.held_face,
+                    &bridge.brought_face,
+                    &bridge.held_crossings,
+                    &bridge.brought_crossings,
+                ] {
+                    for carrier in population {
+                        carriers.insert(carrier.to_owned());
+                    }
+                }
+            }
+            carriers
+        }
+
+        let mounted = body();
+        let query = DerivationQuery::reaching(STATEMENT);
+        let mut before_population = mounted.derive(&query).expect("derives");
+        let at = before_population
+            .iter()
+            .position(|passage| {
+                passage.bridges.len() > 1
+                    && BridgeAddress::of(&passage.bridges[0])
+                        != BridgeAddress::of(&passage.bridges[1])
+            })
+            .expect("the fixture has two local bridges");
+        let mut before = before_population.remove(at);
+        let mut after_population = mounted.derive(&query).expect("derives again");
+        let mut after = after_population.remove(at);
+        let carrier = "zzzzzz-local-carrier";
+        before.bridges[0].held_face.push(carrier.to_owned());
+        after.bridges[1].held_face.push(carrier.to_owned());
+
+        assert_eq!(
+            pooled(&before),
+            pooled(&after),
+            "the control must be invisible to the retired pooled reading"
+        );
+        let causes = |stem: &str| {
+            let mut named = LocalSet::new();
+            if stem == carrier {
+                named.insert("the addressed return".to_owned());
+            }
+            named
+        };
+        let movements = bridge_site_movements(&before, &after, &causes);
+        assert_eq!(movements.len(), 2);
+        assert_ne!(movements[0].bridge, movements[1].bridge);
+        assert!(movements.iter().all(|movement| {
+            movement.site == BridgeSite::HeldFace
+                && movement.carriers.len() == 1
+                && movement.carriers[0].carrier == carrier
+                && !movement.carriers[0].caused_by.is_empty()
+        }));
     }
 
     #[test]

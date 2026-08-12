@@ -239,6 +239,9 @@ pub mod temper;
 // it as material. Joins `derivation_atlas`'s movement and the `temper`/`derivation_integral`
 // cochain circuit, neither of which had a consumer.
 pub mod returned_reading;
+// A returned circuit difference founded as reusable, passage-local conduct.  Declared rather than
+// glob-exported: its occurrence, cell, and passage addresses are meaningful only at this boundary.
+pub mod returned_conduct;
 // The Tschirnhaus organ: transport a quintic to another chart, exhibit the transport, and refuse
 // with the obstruction named when the target chart cannot represent the answer.
 // `canon/TABLET_THE_CHART.md:280`.

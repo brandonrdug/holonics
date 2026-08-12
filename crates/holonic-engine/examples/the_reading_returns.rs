@@ -466,10 +466,19 @@ fn main() {
         println!("        none");
     }
     for passage in &again.relicensed_passages {
-        println!(
-            "        {}   routes {:?} -> {:?}",
-            passage.passage, passage.routes_before, passage.routes_after
-        );
+        println!("        {}", passage.passage);
+        for movement in &passage.bridge_movements {
+            println!("              {:?} at {:?}", movement.bridge, movement.site);
+            for carrier in &movement.carriers {
+                println!(
+                    "                {:?}  {} -> {}",
+                    carrier.carrier, carrier.stood_before, carrier.stands_after
+                );
+                for cause in &carrier.caused_by {
+                    println!("                  caused by  {cause}");
+                }
+            }
+        }
     }
 
     println!("\n  THE ARTIFACT — every founded passage, whole");
@@ -513,9 +522,10 @@ fn main() {
     );
     controls.check(
         "every moved passage names the earlier return that caused it",
-        again.every_movement_is_attributed(),
-        "attribution is carried by the type: a passage names its licensing stem, and that stem's \
-         wholes are the returns that founded it.",
+        again.movement_is_exactly_attributed(),
+        "attribution is carried by the type: founded and withdrawn passages name their causal \
+         stems; relicensed passages name the bridge carriers that moved and the returns that \
+         witnessed them.",
     );
     controls.check(
         "the recurrence law refused something",

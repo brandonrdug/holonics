@@ -30,6 +30,8 @@ pub mod live_event_cuda;
 pub mod presentation;
 /// Exact REGISTER status, lane, and entry rows.
 pub mod register;
+/// Exact returned-contact grouping at the CUDA execution seam.
+pub mod returned_contact_cuda;
 /// Sparse exact text-section restriction at the CUDA execution seam.
 pub mod text_restrict_cuda;
 

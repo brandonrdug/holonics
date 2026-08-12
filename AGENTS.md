@@ -3,23 +3,26 @@
 The latest direct user request governs. This repository is a clean construction, not a migration
 target for Soma application code.
 
-Do not use sub-agents unless Brandon explicitly permits them. Do not read or create a `CLAUDE.md`
-as a source of authority. Historical records, commit messages, and status prose are evidence only;
-they never schedule work.
+Brandon explicitly permitted sub-agents for review, audit, synthesis, and parallel construction on
+2026-08-11. Use them where they materially improve the work, while the primary agent remains
+responsible for reading the governing files and integrating the result. `CLAUDE.md` and Brandon's
+direct-message records may be read when Brandon names them as context or material; they are evidence
+and reasoning context, not construction schedulers. Historical records, commit messages, and status
+prose are evidence only; they never schedule work.
 
 ## Fresh-session pickup
 
-The sole current construction authority is
-`archive/blueprints/COMPLETE_CPP_ENGINE_ROADMAP.md`. The admitted position and next deed are in
-`CONSTRUCTION_STATE.md`; that file is the only current-position record and must be updated as gates
-pass. Do not substitute a Lean fixture, language experiment, CPU reference implementation,
-visualization, or isolated capability proof for its named next deed.
+The sole current construction authority is `blueprint/THE_ROADMAP.md`. The admitted position and
+next deed are in `CONSTRUCTION_STATE.md`; that file is the only current-position record and must be
+updated as gates pass. The C++/CUDA body and its roadmaps under `archive/` are superseded provenance
+and never schedule work. Do not substitute a Lean fixture, language experiment, CPU reference
+implementation, visualization, or isolated capability proof for the live roadmap's named next deed.
 
 Read only:
 
 1. this file;
 2. `CONSTRUCTION_STATE.md`;
-3. the complete roadmap;
+3. the complete live roadmap, `blueprint/THE_ROADMAP.md`;
 4. the canon and blueprint files named in its fresh-session pickup; and
 5. the smallest evidence paths required by the active phase.
 
@@ -29,16 +32,18 @@ phase returns its required artifact and passes its grade.
 ## Authority and evidence
 
 `canon/` is normative doctrine. `blueprint/THE_ROADMAP.md` is the ordered construction authority;
-the other blueprint files contain contracts it composes, and eleven of them now carry an archive
-banner and schedule nothing — `archive/blueprints/COMPLETE_CPP_ENGINE_ROADMAP.md`, named here as the
-authority until 2026-08-07, is one of them.
+the other live blueprint files contain contracts it composes. Files carrying a superseded/archive
+banner schedule nothing. In particular, `archive/blueprints/COMPLETE_CPP_ENGINE_ROADMAP.md` and
+`archive/cpp-engine/CONSTRUCTION_STATE.md` describe the retired C++ body and may be consulted only
+as provenance or mechanism evidence.
 `research/`, `papers/`, and `soma/formal/` are evidence in their declared contexts; the C++ body's
 `evidence/` moved to `archive/cpp-engine/evidence/`.
 `reference/` is non-authoritative historical material. Status prose inside imported records never
 schedules work.
 
-**This file has not otherwise been audited for the Rust transition.** `CLAUDE.md` was; this is the
-Codex-facing twin and is not authority here.
+**This file was corrected for the Rust transition on 2026-08-11 after its stale C++ clauses diverted
+an agent from the live plan.** This is the Codex-facing operating contract; the roadmap and root
+construction state remain the scheduling and position authorities.
 
 Every material claim must carry exactly one truth-status grade and any applicable evidence tags
 defined in `canon/EPISTEMIC_GRADES.md`. Never promote an interpretation, visualization, numerical
@@ -108,16 +113,17 @@ construction merely because its current implementation is being replaced.
   internal ontology.
 - Kernel acceptance/rejection is a returned occurrence attached to one generated passage, not an
   accepted-count gate. Rejection remains useful obstruction.
-- The terminal construction is R16: return two actual theorem/proof artifacts conversationally;
-  the first kernel return changes source-detached reusable morphology and the second proof depends
-  on that returned fiber under exact ablation. Counts, topology, hashes, diagnostics, or a single
-  familiar fixture cannot substitute for this deed.
+- Mathematical production is scheduled only where the live roadmap and root construction state
+  place it. Historical C++ labels such as R16 are regression evidence, not present phase names.
+  Counts, topology, hashes, diagnostics, or a single familiar fixture cannot substitute for a live
+  plan's requested deed.
 
 ## Apparatus
 
-- The ratified production realization is C++23 plus CUDA C++. Rust is historical reference only;
-  do not create a compatibility port or dual implementation. Establish the restricted C++
-  ownership/type subset in `archive/blueprints/CPP_GPU_FOUNDATION.md` before domain code.
+- The live production body is the Rust workspace at the repository root, with CUDA as its resident
+  apparatus where the active deed requires it. The retired C++23/CUDA body under `archive/cpp-engine/`
+  is historical evidence only; do not revive it, port the live plan into it, or create a dual
+  implementation.
 - The GPU is the primary resident workhorse. The CPU handles process/apparatus boundaries, durable
   rest/I/O, narrow exterior codecs, and offline admission audits; it does not own the hot deed,
   semantic phase selection, or a fallback implementation.
@@ -146,10 +152,10 @@ abstraction or a hidden foreman. Stop and rederive before extending it.
 Every phase must:
 
 1. name the existing owners being composed and the new consequence emitted;
-2. run the architecture/no-float/ownership/build audits before and after construction (R0 begins
-   with direct inspection and creates the executable audit);
-3. for every executable phase, execute the real GPU-resident deed and inspect its actual returned
-   artifact; R0 instead returns its compile/audit artifacts;
+2. run the architecture/no-float/ownership/build audits required by the active plan before and after
+   construction;
+3. for every executable phase, execute the real deed on its declared apparatus, including the
+   GPU-resident deed where required, and inspect its actual returned artifact;
 4. keep deterministic semantic receipts separate from physical telemetry;
 5. delete superseded implementation after evidence is committed;
 6. update the construction state only on a passing grade; and

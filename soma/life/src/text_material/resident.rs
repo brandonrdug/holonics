@@ -213,6 +213,22 @@ impl CudaResidentTextMaterialAtlas {
         }
     }
 
+    /// End the exterior CUDA placement and return the one continuing host ecology.
+    ///
+    /// This is an ownership transfer, not a clone and not a fallback execution path: the resident
+    /// allocation is destroyed and the exact host authority that founded it continues.  A caller
+    /// that needs a later device deed must mount that same returned owner again.
+    pub fn unmount_into_host(self) -> ExactTextMaterialAtlas {
+        let Self {
+            host,
+            card,
+            device_ordinal: _,
+            resident_equality_certified: _,
+        } = self;
+        drop(card);
+        host
+    }
+
     /// Suspend by ownership transfer. Device storage is destroyed; only the exact native host
     /// body and apparatus address survive for a later fresh remount.
     pub fn into_native_rest(

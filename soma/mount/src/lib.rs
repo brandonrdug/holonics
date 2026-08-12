@@ -77,7 +77,7 @@ mod tests {
     }
 
     #[test]
-    fn soma_ptx_artifact_is_sm89_with_all_twenty_four_entries_and_required_atomics() {
+    fn soma_ptx_artifact_is_sm89_with_all_twenty_five_entries_and_required_atomics() {
         let text = std::str::from_utf8(SOMA_PTX).expect("the soma PTX artifact is text");
         assert!(text.contains(".target sm_89"), "soma PTX must target sm_89");
         for entry in [
@@ -105,6 +105,7 @@ mod tests {
             "lineage_event_population",
             "text_incidence_select",
             "text_section_restrict",
+            "returned_contact_group",
         ] {
             assert!(
                 text.contains(&format!(".entry {entry}")),
@@ -155,6 +156,33 @@ mod tests {
                 entry.cuda_parameter_words(),
                 "{} PTX parameter count remains the shared typed mouth",
                 entry.symbol(),
+            );
+        }
+
+        let returned_mouth = ".entry returned_contact_group(";
+        let returned = text
+            .split_once(returned_mouth)
+            .expect("PTX carries returned_contact_group")
+            .1;
+        let returned_signature = returned
+            .split_once(')')
+            .expect("PTX closes returned_contact_group signature")
+            .0;
+        assert_eq!(
+            returned_signature
+                .lines()
+                .filter(|line| line.contains(".param "))
+                .count(),
+            7,
+            "the returned-contact entry retains three pointer/extent pairs plus x_stride",
+        );
+        let returned_body = returned
+            .split_once("\n.visible .entry ")
+            .map_or(returned, |(body, _)| body);
+        for float_spelling in [".f16", ".f32", ".f64"] {
+            assert!(
+                !returned_body.contains(float_spelling),
+                "returned_contact_group carries forbidden {float_spelling}"
             );
         }
     }

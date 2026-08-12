@@ -4,17 +4,19 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-11, the material-mouth phase admitted over predecessor `dcf4a07`; its passing
-native rest is `633f9ab6effe465f…`. **Body:** Rust. The C++/CUDA engine's position record is
-`archive/cpp-engine/CONSTRUCTION_STATE.md` and governs nothing.
+**Currency:** 2026-08-11, the conditioning return crossed the seal over predecessor `28028c1`; its
+passing continuing rest is `45084ed2f0baa6da742f2ab82e9ba86122a6c4dd2f029436b070e20665f12cde`
+and its passing grade is
+`8125caa246414eac1042a60d0c2d889959a8fcc7f3a60e87ffc865f2d265c59a`. **Body:** Rust. The
+C++/CUDA engine under `archive/cpp-engine/` governs nothing.
 
-**Gates re-taken on the admitted tree:** `cargo test --workspace` **2,045 passed, 0 failed, 15
+**Gates re-taken on the admitted tree:** `cargo test --workspace` **2,068 passed, 0 failed, 17
 ignored** summed over 42 `test result:` lines; `tools/gates.sh` **7 of 9**; authored levels, named
 paths, claim index, boundary artifacts, all ten Typst roots, and the ownership ratchet pass. The
-ratchet is clean over **195 files, 18,567 inherited occurrences, 11 retired**; the production cone
-added no float. `output-manifest` remains at its pre-phase **0 departed, 1 moved, 5 unrecorded**
-baseline and `closure-manifest` at its pre-phase **24 moved** baseline; both ledgers contain and
-accept the new driver and its four returns.
+ratchet is clean over **195 files, 18,567 inherited occurrences, 21 retired**; the production cone
+added no float. `output-manifest` retains its admitted pre-existing **0 departed, 1 moved, 5
+unrecorded** baseline and `closure-manifest` its admitted pre-existing **24 moved** baseline; both
+bind the conditioning-return driver and its twelve final returns.
 
 ---
 
@@ -85,19 +87,67 @@ seal Plan 1 would make the required source-detached reproduction impossible and 
 therefore remains owned by `ExactTextMaterialAtlas`; `ConditionedRest` remains the correct owner for
 the next deed.
 
-## THE OPEN LINE — the conditioning return must cross the seal
+## THE CONDITIONING RETURN CROSSES THE SEAL — 2026-08-11
 
-**Truth status:** `open`. **Next deed:** Plan 2 in `blueprint/THE_ROADMAP.md`, unchanged by the Plan 1
-finding. Condition the instance on the admitted corpus, deposit the first production through the
-form mouth, read that deposited production back as the next conditioning occurrence, and only then
-produce again. The existing owners are `ConditionedBody`, `ConditionedRest`, `returned_reading`, and
-the form mouth; the new consequence is a source-free remount whose second production carries
-non-zero, attributable invariant movement caused by the first deposited return.
+**Truth status:** `established-bounded`. **Evidence:** `implemented-exact`,
+`computational-witness`, `measured`. **Owners:** `ConditionedBody`, `ConditionedRest`,
+`returned_reading`, `ReturnedContactForm`, `ReturnedContactMorphology`,
+`ReturnedCompositeRest`, `CudaReturnedContactExecutor`, and the form mouth. **Driver:**
+`soma/life/examples/the_conditioning_return_crosses_the_seal.rs`; **passing grade:**
+`output/the_conditioning_return_crosses_the_seal/conditioning-return-grade-8125caa246414eac….form`.
 
-**Falsifier:** the private in-memory edge remains the control and must return a bit-identical second
-production. The sealed route must move, each moved invariant must name the earlier deposited return
-that caused it, and removing that deposit must remove the movement. A count, a hash, or an in-memory
-call does not pass.
+The admitted Plan-1 corpus `633f9ab6effe465f…` conditioned the actual 103-artifact mathematical
+standing. Its resident GPU factorization returned 1,588,440 sections as 64,405 complete occurrence
+wholes, covering all 18 recruited identifiers with zero omissions. The first production deposited
+223 passages as `CDPS/v2`; the separately deposited returned reading carried 688 returned artifacts.
+The private lexical return and the explicit still return both remained bit-identical controls.
+
+The lawful return crosses four addressed forms: `CDER/v1`, `CDPS/v2`, `ReturnedReading/v1`, and
+`RTCF/v1`. The conductor rereads every form, verifies its schema, occurrence, content address, and
+complete typed contact population, and asks the resident CUDA deed to group 223 targets, 1,115
+occurrences, and 1,115 relations. Three NVIDIA GeForce RTX 4080 SUPER launches each execute one
+kernel and return zero intermediate relation words; semantic testimony and apparatus telemetry are
+deposited separately.
+
+The resulting `CRST/v1` continuing rest carries the predecessor morphology plus 223 minimal local
+contact records, not the source corpus, first-production passages, query, full returned-reading form,
+or validation sheet. With the workspace, `.codex`, `.claude`, and the dedicated transit and return
+coordinates masked, a successor mounting only that CRST returned 223 base passages plus exactly one
+stable returned companion per contacted site: 446 passages total, with no returned-route ladder.
+The invariant movement is 1,115 founded cells and zero withdrawn cells: 223 grade-0 cells moving
+`Cells` and `FillingRank`, and 892 grade-1 cells moving `Cells`, `BoundaryRank`, and `Betti`.
+Every cell names its exact returned occurrence, founded route, contact cell, companion, and deposited
+reading address.
+
+All three falsifiers fired. Removing one site removes its one companion and exactly five cells while
+all unrelated companions remain identical. Removing all 223 sites removes every returned route and
+restores the first production exactly. Deleting the sole staged returned-reading form makes the next
+conduct refuse at that exact path before a fourth CUDA launch. An independent source-detached CRST
+remount is bit-identical, re-encodes identically, leaves the continuing rest unchanged, and produces
+no `returned_returned_` ladder.
+
+**The bound:** this Plan-2 contact is intentionally nonselective at the declared statement aperture
+`(h : P) : exactCarrier P`: every contacted base site receives one companion. It establishes a
+world-mediated, typed, ablatable returned passage that changes reusable morphology and later
+conduct. It does not establish Plan 3's plural-source selectivity or make the language-generation
+attachment condition ride that conduct.
+
+## THE OPEN LINE — production must ride plural-source conduct
+
+**Truth status:** `open`. **Next deed:** Plan 3 in `blueprint/THE_ROADMAP.md`. Make the resonance
+reading a conduct in which contact recurring across distinct sources changes which pathways conduct,
+then make a continuation attach exactly when its support conducts. The complete continuation fiber
+remains retained standing and is never itself treated as a return.
+
+The exact baseline is the source-revival morphological-language report, SHA-256
+`25aeb841d103084fdd8270e983b1de164bbdd7bfbd88ba8dcfece83b6343f920`, over source address
+`f30e2504619bf3b3fde4fab8412dc4a7f1fa1c87edb75c283cf0e33bdbf97861`: 17 sources, 984 delivery
+occurrences, and 14,018 two-token outputs for the declared first prompt. The measured contact owner
+currently returns 2,366 contacts, all single-source, with zero recurred conduct.
+
+**Falsifier:** on the same corpus, the 14,018-member complete-fiber enumeration must become a strict,
+deposit-attributable sub-population, and ablating the deposits must restore the exact enumeration.
+Any authored level, scalar rank, or exterior chooser in the attachment path fails the deed.
 
 ---
 
