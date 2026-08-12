@@ -97,7 +97,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (56 deposits of 348)
+## 4 · The 2026-08 record line (57 deposits of 349)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -161,6 +161,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-10_THE_SPINE_ASSESSED_BY_ITS_OWN_LAW_THE_TOWER_IS_ONE_TYPE_FROM_CLIMBING.md` | The spine assessed by its own law: the tower is one type from climbing, and the front's barrier is a monoid |
 | `2026-08-10_THE_WIRING_WAVE_AND_WHAT_CONDUCTS.md` | The wiring wave closed six edges, and a return compared against a return cannot witness a transport |
 | `2026-08-11_THE_RUNG_REFUSES_BY_NAME_AND_THE_UNRESOLVED_PAIR_IS_THE_REMAINDER.md` | The rung refuses by name, and the unresolved pair is the remainder |
+| `2026-08-11_THE_SEAL_CARRIED_THE_HOST_AND_THE_ORGANS_AWAIT_THEIR_CURRENT.md` | The seal carried the host, and the organs await their current |
 
 ---
 

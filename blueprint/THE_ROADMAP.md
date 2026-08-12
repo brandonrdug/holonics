@@ -31,7 +31,22 @@ once you have sufficient context post-analysis campaign."*
 
 **Authority.** Brandon, 2026-08-11, after ratifying the operations synthesis: *"Deposit the plan so
 that I can delegate the construction plans to Sol. I will have Sol complete all of the relevant work
-here and then return to synthesize and analyze with you."* These six plans are that deposit. The
+here and then return to synthesize and analyze with you."* These six plans are that deposit.
+
+**EXECUTION STATE — updated 2026-08-11 after Sol's run, audited.** Sol executed until usage ran out
+and Brandon ruled *"Sol won't be working anymore, so it's just us"*: the remainder is executed by
+Opus 5 agents under Fable 5 orchestration. The audited state, with every count re-verified —
+full statement and repair order in
+`research/records/2026-08-11_THE_SEAL_CARRIED_THE_HOST_AND_THE_ORGANS_AWAIT_THEIR_CURRENT.md`:
+
+| plan | state |
+|---|---|
+| 1 · material mouth | **committed (`28028c1`), convicted twice, re-seal required**: 46,745 occurrence identities embed the absolute host path (the corpus address is a function of this machine); the rollout `session_id` fallback deleted chronology (11,266 of 11,282 codex witnesses, `caused_by` empty). Both fixtures authored too small to fire. |
+| 2 · return through the seal | **committed (`85a03bb`); the edge is genuine and load-bearing** (deletion refuses conduct before the card; ablation restores the first production exactly); the movement is nonselective **by construction** and the receipt says so — selective conditioning is plan 3's burden. Chain re-runs after the re-seal. |
+| 3 · production as re-emission | **organs built, clean of the chooser, conducting nothing**: zero external callers, falsifier cannot fire; silent skip at `ecology.rs:1572`; conduct reading zeroed on the complete path; card is an echo; plurality literal unparameterized; two gates red (`authored-levels` 28, `boundary-artifacts` 6). |
+| 4 · one expansion law | untouched by the run; `generate_currents` already rode `expand_front` before it — the `token_invariance` migration, the interchange certificate, and the two stale comments remain. |
+| 5 · cut classifier | untouched. |
+| 6 · mathematics depth line | untouched. | The
 analysis under them is
 `research/records/2026-08-11_THE_RUNG_REFUSES_BY_NAME_AND_THE_UNRESOLVED_PAIR_IS_THE_REMAINDER.md`
 and `canon/TABLET_THE_OPERATIONS.md`; the governing rulings are `CLAUDE.md` §0e — **the notation is
