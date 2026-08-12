@@ -43,6 +43,11 @@ pub mod material_incidence;
 pub mod live_current_cuda;
 pub mod morphological_language;
 pub mod relational_language;
+// The receiver-relative preimage population of a presented token occurrence. It lives here because
+// it composes `holonic-engine`'s corpus/conduct, exact compression, and diffusion owners at one
+// textual mouth; the engine has no dependency on this material carrier. It selects no correction.
+// `research/records/2026-08-12_THE_RECONSTRUCTION_REMAINS_A_FIBER_THE_CONTEXT_RETURNS_BY_DIFFUSION_AND_THE_CIRCUIT_GROWS_IN_HIGHER_CELLS.md`.
+pub mod reconstruction_fiber;
 // The join `research/records/2026-08-08_FACES_GROW_FROM_COLLOCATION_AND_THE_ATOM_IS_NOT_EMPTY.md`
 // §4(v) names as owed: `holonic-engine`'s `name_elaboration` decomposes a name and never recomposes,
 // `decomposing_codec` revises its grain at what its own reading collapsed, and the two had never

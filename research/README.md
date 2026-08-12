@@ -44,6 +44,13 @@ the normalized canon in `../canon/` governs the rebuild.
   Darboux, Liouville, Arnold, Frobenius; and the correction that a triangle's corners composing to a
   half turn is Regge flatness, so the tower's rung is the hinge deficit. Compressed into
   `../canon/TABLET_THE_MANIFOLD.md` and `../canon/TABLET_THE_TURN.md` §11.5.
+- **ReconstructionFiber, deterministic diffusion, and higher-dimensional circuitry:**
+  `records/2026-08-12_THE_RECONSTRUCTION_REMAINS_A_FIBER_THE_CONTEXT_RETURNS_BY_DIFFUSION_AND_THE_CIRCUIT_GROWS_IN_HIGHER_CELLS.md`
+  — reconstruction as the complete preimage of a stable receiver quotient; edit routes as retained
+  testimony rather than a selection score; retrospective refinement; exact Schur-boundary
+  diffusion; contextual spectral/self-similar faces; the bounded MorphoHDL comparison; and the
+  distinction between graph layout and actual higher cells. Compressed into
+  `../canon/TABLET_THE_OPERATIONS.md` §5.4.
 
 The filenames form a stable chronological atlas. Search their titles before reading entire bodies;
 follow each record's explicit supersession and open-boundary statements.

@@ -172,6 +172,9 @@ soma/life/src/relational_language/ecology.rs	.clone()=17	.collect()=24	.flat_map
 soma/life/src/relational_language/tests.rs	.clone()=3	.collect()=10	.flat_map()=1	BTreeSet=17	Vec=9
 soma/life/src/relational_language/transport.rs	.clone()=28	.collect()=8	.into_iter()=1	BTreeMap=3	BTreeSet=23	Vec=31
 soma/life/src/relational_language/types.rs	BTreeMap=3	BTreeSet=23	Vec=22
+soma/life/src/reconstruction_fiber.rs	.clone()=6	.collect()=12	.flat_map()=1	BTreeMap=2	BTreeSet=14	Vec=17
+soma/life/src/reconstruction_fiber/edit.rs	.clone()=3	.collect()=4	BTreeSet=5	Vec=4
+soma/life/src/reconstruction_fiber/tests.rs	.clone()=2	BTreeMap=3	BTreeSet=4
 soma/life/src/research_intelligence.rs	.clone()=14	.collect()=9	.into_iter()=2	BTreeMap=6	BTreeSet=16	Vec=18
 soma/life/src/resonance_ecology.rs	.clone()=13	.collect()=3	.into_iter()=2	BTreeMap=3	BTreeSet=3	Vec=47
 soma/life/src/resonance_ecology/ecology.rs	.clone()=22	.collect()=6	.into_iter()=3	BTreeMap=3	BTreeSet=2	Vec=12

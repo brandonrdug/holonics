@@ -111,6 +111,11 @@ refer to and I don't really care, they're not the point of what we're doing."* (
 - **`codec`** — face plus method-of-reading, inseparable. **`codec recovery`** is reverse-engineering
   an existing artefact into pivotable structure, *not* black-box inversion from nothing: *"It's like
   Fourier Analysis."* (2026-08-08)
+- **`ReconstructionFiber`** — the complete lineage-bearing preimage of one stable
+  receiver-consequence class under a declared presentation law. It retains every compatible
+  predecessor and selects none; edit length, likelihood, and a canonical representative are faces,
+  not the fiber. Definition and owner:
+  `canon/TABLET_THE_OPERATIONS.md` §5.4 and `soma/life/src/reconstruction_fiber.rs`.
 - **`contaminant`** (572 uses, his highest-frequency evaluative word) — anything from classical
   CS/ML/statistics that leaks in. Remedy is **annihilation, never deprecation**.
 - **`partial`** — a status, never a failure. *"none of these experiments were completed; I pivot

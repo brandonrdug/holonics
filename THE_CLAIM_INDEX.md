@@ -97,7 +97,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (58 deposits of 350)
+## 4 · The 2026-08 record line (59 deposits of 351)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -163,6 +163,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-11_THE_RUNG_REFUSES_BY_NAME_AND_THE_UNRESOLVED_PAIR_IS_THE_REMAINDER.md` | The rung refuses by name, and the unresolved pair is the remainder |
 | `2026-08-11_THE_SEAL_CARRIED_THE_HOST_AND_THE_ORGANS_AWAIT_THEIR_CURRENT.md` | The seal carried the host, and the organs await their current |
 | `2026-08-11_THE_TAPE_HAS_NO_VERTEX_AND_PRODUCTION_IS_RECEPTION_AT_THE_OTHER_HAND.md` | The tape has no vertex, and production is reception at the other hand |
+| `2026-08-12_THE_RECONSTRUCTION_REMAINS_A_FIBER_THE_CONTEXT_RETURNS_BY_DIFFUSION_AND_THE_CIRCUIT_GROWS_IN_HIGHER_CELLS.md` | The reconstruction remains a fiber, the context returns by diffusion, and the circuit grows in higher cells |
 
 ---
 

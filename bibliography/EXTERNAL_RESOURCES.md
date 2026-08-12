@@ -69,6 +69,23 @@ Duplicate keys are intentionally not merged without namespacing.
 - NVIDIA, *CUDA C++ Programming Guide* — contemporary primary apparatus documentation for SIMT,
   memory, synchronization, and execution geometry: <https://docs.nvidia.com/cuda/cuda-c-programming-guide/>.
 
+## Morphogenetic circuitry
+
+- Alexander Mordvintsev, *MorphoHDL: a minimalistic language for growing circuits* — official
+  experimental repository and authored article, audited at commit
+  `3ff923f9fafcb5b97ad2ef393795c96710ed00ea` on 2026-08-12:
+  <https://github.com/paradigms-of-intelligence/morpho> and
+  <https://github.com/paradigms-of-intelligence/morpho/blob/3ff923f9fafcb5b97ad2ef393795c96710ed00ea/article.md>.
+  Cells with typed ports recursively rewrite into wired subcells; variable-width buses split and
+  concatenate until material exhaustion invokes a fallback. The bundled reference implementation
+  and finite sampled circuit tests are
+  <https://github.com/paradigms-of-intelligence/morpho/blob/3ff923f9fafcb5b97ad2ef393795c96710ed00ea/tiny_morpho.py>.
+  This is `established-bounded [computational-witness]` evidence that authored local bit laws and
+  recursive composition can grow logical connectivity and presented geometry together. It is not
+  evidence of unknown-codec reconstruction. Its current artifact is a feed-forward graph and layout
+  chart, not a higher cellular complex; higher cells, `partial partial = 0`, homology, recurrence,
+  and layout-dependent logic are outside the implemented prototype.
+
 ## Knots, strings, and higher-dimensional physics
 
 - C. N. Yang and C. P. Mills, gauge/connection foundations; Ambrose–Singer holonomy; Reidemeister,

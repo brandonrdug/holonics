@@ -178,8 +178,11 @@ Named here so their absence is legible rather than silent, per §7 and §8.
 
 - **Illicium** — *"the illicium is itself the frame… the arrow of time, the arrow of entropy, in the
   active system."* Collection in progress.
-- **MorphoHDL and grown circuitry** — partly discharged: `grown_cell.rs` grows by exhaustion of
-  material with no counter, and §3 of this tablet's cost finding came out of it. What remains is the
-  translation table's own claim — that the expansion schedule is a receiver and the invariants are
-  Betti numbers, torsion, and hinge deficit — read against §11.4, which refuses the third of those
-  three.
+- **MorphoHDL and grown circuitry** — bounded and routed by
+  `research/records/2026-08-12_THE_RECONSTRUCTION_REMAINS_A_FIBER_THE_CONTEXT_RETURNS_BY_DIFFUSION_AND_THE_CIRCUIT_GROWS_IN_HIGHER_CELLS.md`
+  §7 and `bibliography/EXTERNAL_RESOURCES.md` §Morphogenetic circuitry. MorphoHDL establishes
+  recursive authored graph growth and exact bitwise examples, not reconstruction or higher cells.
+  The local `grown_cell.rs` lift derives lineage/reconvergence 2-cells; arbitrary grades and
+  `partial partial = 0` belong to `algebraic.rs`. The expansion schedule remains a receiver chart;
+  Betti and torsion are exact returned faces after incidence exists, while hinge deficit is a
+  separate geometric receiver and may not be inferred from the first two.

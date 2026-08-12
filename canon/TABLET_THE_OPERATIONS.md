@@ -247,7 +247,59 @@ likely to have come from"* is `Q` against `Π` exactly (`CLAUDE.md` §13 rule 2)
 trajectory happened one way; the reconstruction distribution is the receiver's quotient over
 interiors no longer reachable.
 
-### 5.4 `exp` and series
+### 5.4 ReconstructionFiber: the preimage of a stable receiver quotient
+
+**Record:**
+`research/records/2026-08-12_THE_RECONSTRUCTION_REMAINS_A_FIBER_THE_CONTEXT_RETURNS_BY_DIFFUSION_AND_THE_CIRCUIT_GROWS_IN_HIGHER_CELLS.md`.
+
+Let `D_K : X_K -> Y` be one deterministic presentation law under candidate structure `K`, and let
+`q_R^*` be the stable successor-conduct quotient for a declared receiver family `R`.
+
+```text
+    RF(D_K, R; [y]) = (q_R^* o D_K)^-1([y]).
+```
+
+**`definition`: ReconstructionFiber is the lineage-bearing population of predecessor occurrences
+compatible with one observed future-behavior class.** Where `K` itself is unresolved, the object is
+the disjoint union of these fibers over every admitted candidate codec/incidence structure. It is
+not a probability, nearest-neighbour result, edit-distance winner, or selected representative.
+
+This makes compression and reconstruction the two hands of one exact object:
+
+```text
+    compression       q_R^* : X -> X / ~_R
+    reconstruction    RF_R([x]) = (q_R^*)^-1([x]).
+```
+
+Adding a receiver or successor history refines the quotient, so on fixed standing the later fiber
+is a subset of the earlier one (`proved-standard`, finite deterministic Nerode equivalence). The
+removed population, the shortest history that separates it, the returned informant, and the prior
+passage identity are the reflection receipt. That receipt is the exact form of rereading a
+misspelled or otherwise broken presentation. An edit path is retained testimony; its scalar length
+is a face and may not govern candidate admission.
+
+Diffusion supplies a second face of the same reconstruction question. The live finite owner solves
+
+```text
+    (C + tau L) phi_after = content_before + source
+```
+
+over exact rationals and returns currents, balances, conservation, and the certified Schur boundary
+operator. Reconstruction from its boundary is the fiber of interiors compatible with that response.
+At the complete declared finite carrier, positive `C` makes this operator algebraically invertible
+and the owner returns inverse residuals (`established-bounded [implemented-exact]`). Irreversibility
+therefore belongs to an actual receiver quotient, omitted aperture, or separately declared
+continuum limit—not to the word “diffusion” by itself. A diffusion current cannot select a member of
+a reconstruction fiber.
+
+The first bounded textual owner is `soma/life/src/reconstruction_fiber.rs`. It composes
+`CorpusCensus`, `ConductAtlas`, `receiver_exact_compression`, and an optional caller-declared exact
+diffusion passage. It returns every contextual candidate and every minimal local edit route and
+selects none (`established-bounded [implemented-exact]`). The same definition applies to visual,
+acoustic, circuit, molecular, and other caused carriers only after their own incidence, ports,
+transport, and receivers are declared (`interpretation`; the general cross-modal owner is `open`).
+
+### 5.5 `exp` and series
 
 `exp(A)` is the generator-to-transport map (Lie algebra to Lie group), always invertible — which
 is §4.2's identity again, since `det(exp A) = e^{tr A} ≠ 0`. The tree's exact carrier for the
@@ -281,6 +333,8 @@ exact rational remainder interval. Floats are not needed and are not real here.
 | the discrete `a ∧ a`; basepoint-free holonomy class | `crates/holonic-engine/src/structure_group.rs` |
 | characters — traces — naming passages by winding | `crates/holonic-engine/src/winding_inertia.rs` |
 | the collapsed-pair population with separating words | `crates/holonic-engine/src/receiver_exact_compression.rs` |
+| the contextual preimage population and retrospective refinement receipt | `soma/life/src/reconstruction_fiber.rs` |
+| exact finite current and certified Schur boundary transport | `crates/holonic-engine/src/diffusion.rs` |
 | what survives rebase: Smith normal form, Betti, torsion | `crates/holonic-engine/src/rebase_invariants.rs` |
 | exact series remainder — `exp` without floats | `crates/holonic-engine/src/exact_value.rs` |
 | the route-space homology of the machine's own proofs | `crates/holonic-engine/src/derivation_atlas.rs` |
@@ -288,7 +342,9 @@ exact rational remainder interval. Floats are not needed and are not real here.
 
 ## What this does not establish
 
-It does not build anything; every owner above predates it. It does not claim the geometric product
-replaces the tree's carriers — `multiquadratic` is already the construction, and the claim is
-recognition, not port. The RIDE/FOUND grade-identification (§3.2) is the assistant's
-`interpretation` and no deed may rest on it. Nothing here bears on any Millennium problem.
+Except for the bounded textual ReconstructionFiber named in §5.4, this tablet builds nothing; its
+other owners predate it. That owner does not select intended meaning or establish a general
+cross-modal reconstruction engine. This tablet does not claim the geometric product replaces the
+tree's carriers — `multiquadratic` is already the construction, and the claim is recognition, not
+port. The RIDE/FOUND grade-identification (§3.2) is the assistant's `interpretation` and no deed may
+rest on it. Nothing here bears on any Millennium problem.
