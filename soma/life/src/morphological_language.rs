@@ -171,6 +171,16 @@ pub struct MorphologicalScaleCensus {
     pub returned_route_receptors: usize,
     pub returned_route_relations: usize,
     pub conditioning_events: usize,
+    /// **The recruitment transpose's work, counted rather than timed.**
+    ///
+    /// `CLAUDE.md` §8: a cost is measured in work, never in elapsed time. These are exact integers
+    /// derived from the material, reproducing bit-for-bit on any machine, and they are the evidence
+    /// for or against the claim that clause recruitment is a scan where a transpose was in hand.
+    /// `attempted` counts every feature-membership test the recruitment performed; `fired` counts
+    /// the incidences it actually returned. The overpayment is their ratio, and if the two track
+    /// each other the scan reading is wrong.
+    pub recruitment_membership_tests: u64,
+    pub recruitment_incidences: u64,
 }
 
 /// Resource and causal-connection receipt of one generated current population. Whole-body forks

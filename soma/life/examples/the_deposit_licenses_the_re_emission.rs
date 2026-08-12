@@ -110,6 +110,11 @@ struct Report {
     prompt: String,
     maximum_observed_tokens: usize,
     conditioning_wall_millis: u128,
+    /// **Conditioning's recruitment cost as WORK, not as a clock.** Membership tests attempted
+    /// against incidences returned; their ratio is the overpayment.
+    recruitment_membership_tests: u64,
+    recruitment_incidences: u64,
+    recruitment_overpayment_numerator: u64,
 
     atlas_rows: usize,
     atlas_plural_source_rows: usize,
@@ -152,7 +157,11 @@ struct Report {
     branches_solely_licensed: usize,
     branches_strictly_attributable: usize,
     branches_removed_by_the_ablation: usize,
-    ablation_removed_exactly_what_it_licensed: bool,
+    /// **Three states, not two.** A boolean here reported `true` when the target solely licensed
+    /// nothing, because `0 removed == 0 expected` — a receipt that could not have come out
+    /// otherwise, which is `CLAUDE.md` §8's tautology rule firing on this driver's own return. A
+    /// vacuous arm says so instead of wearing a pass.
+    ablation_receipt: &'static str,
 
     full_ablation_population: usize,
     full_ablation_restores_enumeration_bit_exactly: bool,
@@ -298,7 +307,12 @@ fn run() -> Result<(), String> {
     let ecology = MorphologicalLanguageEcology::condition(&passages, action, workers)
         .map_err(|error| format!("condition the declared family: {error:?}"))?;
     let conditioning_wall_millis = conditioning_started.elapsed().as_millis();
-    eprintln!("conditioned in {conditioning_wall_millis} ms");
+    let recruitment_membership_tests = ecology.census().recruitment_membership_tests;
+    let recruitment_incidences = ecology.census().recruitment_incidences;
+    eprintln!(
+        "conditioned in {conditioning_wall_millis} ms; recruitment work: \
+         {recruitment_membership_tests} membership tests, {recruitment_incidences} incidences"
+    );
 
     // --- the deposits ---------------------------------------------------------------------------
     let atlas = ecology
@@ -479,7 +493,8 @@ fn run() -> Result<(), String> {
     let mut branches_solely_licensed = 0usize;
     let mut branches_strictly_attributable = 0usize;
     let mut branches_removed_by_the_ablation = 0usize;
-    let mut ablation_removed_exactly_what_it_licensed = false;
+    let mut ablation_receipt = "the targeted ablation did not fire: no deposit licensed an emitted \
+                                continuation";
     let conducted_texts = branch_paths(&conducted.generation);
 
     let state = if let Some(target) = target {
@@ -526,8 +541,15 @@ fn run() -> Result<(), String> {
                 let ablated_texts = branch_paths(&ablated.generation);
                 let removed = multiset_difference(&conducted_texts, &ablated_texts);
                 branches_removed_by_the_ablation = multiset_extent(&removed);
-                ablation_removed_exactly_what_it_licensed = removed == strictly_attributable;
-                if !ablation_removed_exactly_what_it_licensed {
+                ablation_receipt = if branches_solely_licensed == 0 {
+                    "VACUOUS: the target solely licensed nothing, so nothing could be removed and \
+                     the arm proves nothing about this material"
+                } else if removed == strictly_attributable {
+                    "the ablation removed exactly the continuations the target solely licensed"
+                } else {
+                    "DISAGREED: see findings"
+                };
+                if branches_solely_licensed > 0 && removed != strictly_attributable {
                     let unexpected = multiset_extent(&multiset_difference(
                         &removed,
                         &strictly_attributable,
@@ -596,6 +618,10 @@ fn run() -> Result<(), String> {
         prompt: arguments.prompt.clone(),
         maximum_observed_tokens: arguments.tokens,
         conditioning_wall_millis,
+        recruitment_membership_tests,
+        recruitment_incidences,
+        recruitment_overpayment_numerator: recruitment_membership_tests
+            .saturating_sub(recruitment_incidences),
         atlas_rows,
         atlas_plural_source_rows,
         declared_minimum_distinct_sources,
@@ -630,7 +656,7 @@ fn run() -> Result<(), String> {
         branches_solely_licensed,
         branches_strictly_attributable,
         branches_removed_by_the_ablation,
-        ablation_removed_exactly_what_it_licensed,
+        ablation_receipt,
         full_ablation_population,
         full_ablation_restores_enumeration_bit_exactly,
         full_ablation_is_type_state_true: true,

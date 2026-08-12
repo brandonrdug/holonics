@@ -604,6 +604,74 @@ fn one_mounted_return_path_equals_explicit_live_transfer() {
 /// **The same population, spread over 29 ticks instead of 8, with 22% fewer states co-present at
 /// the peak.** That is what makes this a co-presence law and not an aperture: a delay that changed
 /// the returned branches would be a truncation wearing another name.
+/// **The recruitment transpose returns exactly what the scan returned.**
+///
+/// `condition` recruited clauses by walking `route_sections × passage_targets × clauses` and asking
+/// each whether it carried the feature. That is the inverse of a relation `ClauseStanding.features`
+/// already holds, and it is now taken as a transpose. The repair is only admissible if the returned
+/// relation is unchanged, so this rebuilds the scan here — over the SAME conditioned standing, from
+/// the ecology's own returned routes — and requires the two to agree exactly.
+///
+/// It also exhibits the work: the transpose's own counters must show strictly fewer membership
+/// tests than the scan performs, on material where both return the same relation. A repair that
+/// returns the same thing for the same work has not repaired anything.
+#[test]
+fn recruitment_transposes_the_relation_the_scan_walked_and_returns_it_unchanged() {
+    let passages = vec![
+        MorphologicalLanguagePassage::new(
+            "alpha-training",
+            "source-a",
+            1,
+            "Training changes the retained morphology. What does training change?",
+        ),
+        MorphologicalLanguagePassage::new(
+            "beta-training",
+            "source-b",
+            2,
+            "Training changes the retained relation. The retained morphology remains available.",
+        ),
+        MorphologicalLanguagePassage::new(
+            "gamma-uncertainty",
+            "source-c",
+            3,
+            "Uncertainty remains an explicit obstruction. How does uncertainty remain?",
+        ),
+        MorphologicalLanguagePassage::new(
+            "delta-common",
+            "source-c",
+            3,
+            "A retained relation remains available and explicit.",
+        ),
+    ];
+    let ecology = MorphologicalLanguageEcology::condition(&passages, action(), 2).unwrap();
+
+    let (transposed, scanned, scan_tests) = ecology.recruitment_audit();
+
+    // THE ORBIT. If the recruitment returned nothing there is no relation to compare and the
+    // assertion below would hold vacuously.
+    assert!(
+        !transposed.is_empty(),
+        "no feature recruited a clause, so this fixture cannot separate a transpose from a scan"
+    );
+    assert_eq!(
+        transposed, scanned,
+        "the transpose must return the relation the scan returned, exactly"
+    );
+
+    // And it must cost strictly less on material where both return the same thing.
+    let transposed_tests = ecology.census().recruitment_membership_tests;
+    assert!(
+        transposed_tests < scan_tests,
+        "the transpose performed {transposed_tests} membership tests against the scan's \
+         {scan_tests}: same relation, no less work"
+    );
+    assert_eq!(
+        ecology.census().recruitment_incidences,
+        transposed.len() as u64,
+        "the counted incidences are the returned relation's own extent"
+    );
+}
+
 #[test]
 fn the_transport_law_dilates_a_congested_passage_and_deletes_no_branch() {
     let passages = vec![

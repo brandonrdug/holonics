@@ -4,7 +4,7 @@
 # Regenerate: python3 tools/output_manifest.py
 # Verify:     python3 tools/output_manifest.py --check
 # Listing:    python3 tools/output_manifest.py --files
-# 36 drivers, 14412 returns, 9984688239 bytes.
+# 36 drivers, 14421 returns, 9984722204 bytes.
 sha256	returns	bytes	driver
 855279871852bffe08c83a0e50006b769da3b296934115faa809561b7cbdd304	7	1274	output/agentic-research-kernel
 b90b799580f0c51bd6ffe0009fc0fcd9eb9f20feb54972ca44ad4297b6252430	8	46304	output/analytic-field-transport
@@ -38,7 +38,7 @@ d5d4be0ce4e0da0f152d1bc1008f91006fba3e355d75dde239af483f33487e88	58	1443881689	o
 bcb7bd027c399a57a2f7acf8de054227fc251736109b2a9ec3b596712d424510	256	5229153	output/the-reading-returns
 ac2db061771351762738a74fe2e3a21095d452838475314090b023d348673951	1	383027	output/the_ablated_body_rests_and_remounts
 949fdbf07010903074dbfb914a9e08c66717076290565ec53eb6ab45add0ccf9	21	4950388929	output/the_conditioning_return_crosses_the_seal
-e74500003b719387e5d95ce19cd6c5ffbf673b4a6a1fa62792c9dd21993191c4	5	18330	output/the_deposit_licenses_the_re_emission
+162f6e8689e0de8630af40b4201e146187bd222409b4c4c8aeb386e7cdd2bc55	14	52295	output/the_deposit_licenses_the_re_emission
 7ca8b7191a2e03f9733f4cf7f448b25882b920d166bdb73e0cefc69fdddb5383	8	2123819733	output/the_material_mouth_seals_the_declared_body
 51b28f16aa0ebb686f45b26fc872784a3ac2c56d3970ab5dca095b097a35b9e6	5	694	output/zzy-kernel-teeth-probe
 fa918b668cc305d8275de0d95c12cd2b7d78d16edb963410a7326eebf489e12a	62	9800	output/zzz-adversarial-probe

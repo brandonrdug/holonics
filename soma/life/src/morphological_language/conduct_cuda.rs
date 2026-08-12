@@ -41,6 +41,17 @@ pub enum MorphologicalConductCudaError {
     DeviceRefused {
         key_row: Option<u32>,
     },
+    /// The card declined the front before starting, and named which agreement failed. `declared`
+    /// and `found` are the two extents where the check is an equality of extents.
+    DeviceRefusedShape {
+        cause: &'static str,
+        declared: u32,
+        found: u32,
+    },
+    /// No lane wrote a status word. This is NOT a disagreement about any field — it is the card
+    /// having written nothing at all, and reporting it as a field disagreement is what sent one
+    /// reader chasing a capacity that did not exist.
+    DeviceWroteNothing,
     /// The card's return is malformed, and `at` names the exact check that disagreed. An
     /// opaque refusal at a membrane costs a rebuild-and-rerun cycle to locate; this names it.
     InvalidDeviceReturn {
@@ -74,6 +85,11 @@ impl PartialEq for MorphologicalConductCudaError {
                 left == right
             }
             (
+                Self::DeviceRefusedShape { cause: left, .. },
+                Self::DeviceRefusedShape { cause: right, .. },
+            ) => left == right,
+            (Self::DeviceWroteNothing, Self::DeviceWroteNothing) => true,
+            (
                 Self::ParityBroken { candidate: left },
                 Self::ParityBroken {
                     candidate: right, ..
@@ -90,7 +106,10 @@ impl MorphologicalConductCudaError {
     const fn poisons_realization(&self) -> bool {
         matches!(
             self,
-            Self::Driver(_) | Self::InvalidDeviceReturn { .. } | Self::ParityBroken { .. }
+            Self::Driver(_)
+                | Self::InvalidDeviceReturn { .. }
+                | Self::DeviceWroteNothing
+                | Self::ParityBroken { .. }
         )
     }
 }
@@ -124,6 +143,19 @@ impl std::fmt::Display for MorphologicalConductCudaError {
                     "the card refused the morphological-conduct front"
                 )
             }
+            Self::DeviceRefusedShape {
+                cause,
+                declared,
+                found,
+            } => write!(
+                formatter,
+                "the card declined the morphological-conduct front: {cause} (declared {declared}, \
+                 found {found})"
+            ),
+            Self::DeviceWroteNothing => write!(
+                formatter,
+                "the card wrote no morphological-conduct status word"
+            ),
             Self::InvalidDeviceReturn { at } => {
                 write!(
                     formatter,
@@ -423,6 +455,8 @@ pub struct MorphologicalConductCudaReceipt {
     pub device_to_host_words: usize,
     pub kernel_launches: u32,
     pub device_zero_operations: u32,
+    /// Default-stream barriers taken so a null-stream memset cannot race the launch stream.
+    pub default_stream_barriers: u32,
     pub transient_allocation_operations: usize,
     pub grid: [u32; 3],
     pub block: [u32; 3],
@@ -609,6 +643,18 @@ impl CudaMorphologicalConductExecutor {
             }
         }
 
+        // **The card is told what was UPLOADED, not what was declared.**
+        //
+        // These lengths used to be the declared extents, computed from the same control block the
+        // card compares them against — so the card's sheet-extent agreements could not fail, and a
+        // front whose keys were narrower than its declared width sailed through with the buffer's
+        // zeroed tail read as key words. Passing the assembled length makes the agreement a real
+        // check on a real quantity, and `card_names_the_agreement_it_declined_on` is the control
+        // that proves the refusal reachable.
+        let candidate_extent = candidate_words.len();
+        let deposit_extent = deposit_words.len();
+        let key_row_extent = key_row_words_sheet.len();
+
         let mut transient_allocation_operations = 0usize;
         if grow_buffer(&mut self.candidates, candidate_extent)? {
             transient_allocation_operations += 1;
@@ -636,6 +682,27 @@ impl CudaMorphologicalConductExecutor {
                 .copy_range_from_slice(0, key_row_words_sheet.as_ref())?;
         }
         self.output.zero()?;
+        // **The barrier between the null stream and the launch stream, and it is load-bearing.**
+        //
+        // `DeviceBuffer::zero` is `cuMemsetD32` on the context's DEFAULT stream, and this executor
+        // launches on a stream created `CU_STREAM_NON_BLOCKING` — which by construction does not
+        // synchronize with the default stream. The host-to-device copies above are `cuMemcpyHtoD`
+        // on pageable memory and block the host until they land, so they need no barrier; the
+        // memset does not, and without this the zeroing RACES the kernel.
+        //
+        // **Measured, and it is why this comment is here.** At two candidates and four deposits the
+        // output is 12 to 48 words, the memset finishes instantly, and every small test passed. At
+        // 4,096 candidates and 8,192 deposits the output is 73,740 words and the memset was still
+        // running while lane 0 wrote the header: the card returned
+        // `[1, 0, 0, 0, 0, 0, 5461, 0, 0, 0, 0, 0]` — status and active-deposit count intact
+        // because lane 0 writes those AFTER its validation loops, and every straight-line header
+        // word written before them zeroed back out. A silent wrong answer, invisible at the scale
+        // the card tests used, which is `CLAUDE.md` §8's convicted shape exactly.
+        //
+        // `soma/life/src/returned_contact_cuda.rs:321` carries the same `zero()`-then-launch pattern
+        // on a non-blocking stream and is outside this change's ownership; it is reported rather
+        // than repaired here.
+        self.context.synchronize()?;
         let prepare_and_ingress_nanoseconds = started.elapsed().as_nanos();
 
         let function = self.module.function(wire::ENTRY_SYMBOL)?;
@@ -735,6 +802,7 @@ impl CudaMorphologicalConductExecutor {
             device_to_host_words: output_extent,
             kernel_launches: 1,
             device_zero_operations: 1,
+            default_stream_barriers: 1,
             transient_allocation_operations,
             grid: dimension_words(launch.grid),
             block: dimension_words(launch.block),
@@ -815,34 +883,86 @@ fn decode_card_output(
     }
     match output[wire::OUTPUT_STATUS] {
         wire::STATUS_INVALID => {
+            // A shape refusal names its own cause; a later refusal names the key row. They are
+            // different returns and the host must not collapse them.
+            let cause = output[wire::OUTPUT_REFUSAL_CAUSE];
+            if cause != wire::REFUSAL_NONE {
+                return Err(MorphologicalConductCudaError::DeviceRefusedShape {
+                    cause: wire::refusal_cause_name(cause),
+                    declared: output[wire::OUTPUT_REFUSAL_DECLARED],
+                    found: output[wire::OUTPUT_REFUSAL_FOUND],
+                });
+            }
             let key_row = output[wire::OUTPUT_INVALID_KEY_ROW];
             return Err(MorphologicalConductCudaError::DeviceRefused {
                 key_row: (key_row != wire::OPEN_KEY_ROW).then_some(key_row),
             });
         }
         wire::STATUS_COMPLETE => {}
+        wire::STATUS_INCOMPLETE => return Err(MorphologicalConductCudaError::DeviceWroteNothing),
         _ => {
             return Err(MorphologicalConductCudaError::InvalidDeviceReturn {
-                at: "the status word is neither complete nor invalid",
+                at: "the status word is not a declared status",
             })
         }
     }
     let active_deposits = output[wire::OUTPUT_ACTIVE_DEPOSITS];
-    let header_matches = output[wire::OUTPUT_VERSION] == wire::LAYOUT_VERSION
-        && output[wire::OUTPUT_EPOCH] == control[wire::CONTROL_EPOCH]
-        && output[wire::OUTPUT_CANDIDATES] as usize == candidates
-        && output[wire::OUTPUT_DEPOSITS] as usize == deposits
-        && output[wire::OUTPUT_KEY_ROWS] as usize == key_rows
-        && active_deposits as usize <= deposits
-        && output[wire::OUTPUT_MAX_CANDIDATE_KEYS] as usize == max_candidate_keys
-        && output[wire::OUTPUT_CANDIDATE_ROW_WORDS] as usize == row_words
-        && output[wire::OUTPUT_CANDIDATE_ROWS_AT] as usize == wire::OUTPUT_HEADER_WORDS
-        && output[wire::OUTPUT_TOTAL_WORDS] as usize == expected_output
-        && output[wire::OUTPUT_INVALID_KEY_ROW] == wire::OPEN_KEY_ROW;
-    if !header_matches || (active_deposits == 0) != zero_active_ablation {
+    // **Named field by field, because one boolean over eleven checks costs a rebuild to locate.**
+    // This is the same reason the refusal carries `at` at all: a membrane that says only "malformed"
+    // makes every disagreement equally expensive, and at material scale that is where the defects
+    // are.
+    let header: [(&'static str, bool); 11] = [
+        (
+            "returned layout version",
+            output[wire::OUTPUT_VERSION] == wire::LAYOUT_VERSION,
+        ),
+        (
+            "returned epoch",
+            output[wire::OUTPUT_EPOCH] == control[wire::CONTROL_EPOCH],
+        ),
+        (
+            "returned candidate population",
+            output[wire::OUTPUT_CANDIDATES] as usize == candidates,
+        ),
+        (
+            "returned deposit population",
+            output[wire::OUTPUT_DEPOSITS] as usize == deposits,
+        ),
+        (
+            "returned key-row population",
+            output[wire::OUTPUT_KEY_ROWS] as usize == key_rows,
+        ),
+        (
+            "returned active-deposit count exceeds the deposit population",
+            active_deposits as usize <= deposits,
+        ),
+        (
+            "returned maximum candidate keys",
+            output[wire::OUTPUT_MAX_CANDIDATE_KEYS] as usize == max_candidate_keys,
+        ),
+        (
+            "returned candidate row width",
+            output[wire::OUTPUT_CANDIDATE_ROW_WORDS] as usize == row_words,
+        ),
+        (
+            "returned candidate rows offset",
+            output[wire::OUTPUT_CANDIDATE_ROWS_AT] as usize == wire::OUTPUT_HEADER_WORDS,
+        ),
+        (
+            "returned total words",
+            output[wire::OUTPUT_TOTAL_WORDS] as usize == expected_output,
+        ),
+        (
+            "returned invalid-key-row slot is not open",
+            output[wire::OUTPUT_INVALID_KEY_ROW] == wire::OPEN_KEY_ROW,
+        ),
+    ];
+    if let Some((at, _)) = header.iter().find(|(_, agrees)| !agrees) {
+        return Err(MorphologicalConductCudaError::InvalidDeviceReturn { at });
+    }
+    if (active_deposits == 0) != zero_active_ablation {
         return Err(MorphologicalConductCudaError::InvalidDeviceReturn {
-            at: "the returned header disagrees with the control block, or the zero-active \
-                 declaration does not match",
+            at: "the zero-active-ablation declaration does not match what the card counted",
         });
     }
     let mut returned_candidates = LocalSequence::with_capacity(candidates);
@@ -1147,6 +1267,130 @@ mod tests {
         let second = cuda.enact(&front).expect("card reuses executor");
         assert_eq!(second.apparatus.launch_ordinal, 2);
         assert_eq!(second.semantic, returned.semantic);
+    }
+
+    /// **A declared front larger than any the corpus has produced.**
+    ///
+    /// The three extents below are **authored by this test**, not read off anything: no material
+    /// supplied 8,192 deposits or 4,096 candidates, and the largest real front measured so far
+    /// carries 548 deposits. Calling them "material scale" would put the word that justifies a
+    /// level on a level that has not earned it, so the name says what they are — a caller's
+    /// declaration, chosen larger than the corpus reaches.
+    ///
+    /// It exists because the card tests above run two candidates against four deposits, and a card
+    /// path proved at two candidates is proved at two candidates. It caught a real defect on its
+    /// first run: `DeviceBuffer::zero` is a default-stream memset and the launch stream is
+    /// non-blocking, so at 12 output words the zeroing landed first and at 73,740 it was still
+    /// running while lane 0 wrote the header. See the barrier in `enact_inner`.
+    #[test]
+    fn card_carries_a_declared_front_larger_than_the_corpus_has_produced() {
+        const KEY_WORDS: usize = 17;
+        const DEPOSITS: usize = 8192;
+        const CANDIDATES: usize = 4096;
+
+        let key_of = |ordinal: u32| {
+            let mut key = LocalSequence::with_capacity(KEY_WORDS);
+            key.push(ordinal >> 16);
+            key.push(ordinal & 0xffff);
+            for word in 2..KEY_WORDS {
+                key.push(word as u32);
+            }
+            key
+        };
+        let mut deposits = LocalSequence::with_capacity(DEPOSITS);
+        for ordinal in 0..DEPOSITS {
+            // Two thirds active, so the inactive ones are a real population rather than a corner.
+            deposits.push(MorphologicalConductDepositRow::new(
+                ordinal % 3 != 0,
+                key_of(ordinal as u32 * 2),
+            ));
+        }
+        let mut candidates = LocalSequence::with_capacity(CANDIDATES);
+        let mut key_rows = LocalSequence::new();
+        for candidate in 0..CANDIDATES {
+            candidates.push(
+                MorphologicalConductCandidate::new(1000 + candidate as u32).expect("face"),
+            );
+            // Each candidate's keys are GENERATED ascending and distinct rather than sorted after
+            // the fact: `LocalSet`/`LocalSequence` are the substrate's carriers and reaching for a
+            // `Vec` to sort and dedup is what the ownership ratchet counts. Some keys land on a
+            // deposit and some on nothing, because a candidate edge that is not deposited is the
+            // ordinary case.
+            let carried = candidate % 13;
+            for step in 0..carried {
+                // Strictly ascending in `step` and inside the key sheet's addressable range, so no
+                // wrap can unsort a candidate's block. Deposits sit at even targets and 601 is odd,
+                // so roughly half of these land on one and half on nothing.
+                let target = candidate + step * 601;
+                key_rows.push(MorphologicalConductCandidateKey::new(
+                    candidate as u32,
+                    key_of(target as u32),
+                ));
+            }
+        }
+
+        let front = MorphologicalConductCudaFront::new(KEY_WORDS, candidates, deposits, key_rows)
+            .expect("a front at material scale is well formed");
+        assert!(front.max_candidate_keys() >= 12);
+        assert!(front.key_rows().len() > 20_000);
+
+        let Ok(mut cuda) = CudaMorphologicalConductExecutor::new(0) else {
+            eprintln!("no CUDA device: the material-scale card test did not run");
+            return;
+        };
+        let returned = cuda.enact(&front).expect("the card carries a front at material scale");
+        assert_eq!(returned.semantic.candidates.len(), CANDIDATES);
+        assert!(returned.apparatus.host_parity_checked);
+        returned
+            .semantic
+            .agrees_with(&front)
+            .expect("card and host agree on the induced equivalence at scale");
+        // And the population it attached is neither empty nor everything, so the return separates.
+        let attached: usize = returned
+            .semantic
+            .candidates
+            .iter()
+            .map(|candidate| candidate.active_deposits.len())
+            .sum();
+        assert!(attached > 0 && attached < front.key_rows().len());
+    }
+
+    /// **The named shape refusal, proved reachable rather than assumed.**
+    ///
+    /// A refusal nothing can reach is a check that cannot fail. This ships a front whose declared
+    /// key width disagrees with the sheets it carries, which is a disagreement only the card can
+    /// see, and requires the card to name it.
+    #[test]
+    fn card_names_the_agreement_it_declined_on() {
+        let Ok(mut cuda) = CudaMorphologicalConductExecutor::new(0) else {
+            eprintln!("no CUDA device: the named-refusal control did not run");
+            return;
+        };
+        // Declared key width 4, sheets carrying 3-word keys. The host front type is bypassed
+        // deliberately: its own `KeyWidth` guard would refuse this before the card saw it, and the
+        // point is what the CARD says.
+        let forged = MorphologicalConductCudaFront {
+            key_words: 4,
+            max_candidate_keys: 1,
+            candidates: LocalSequence::from([candidate(FACE_A)]),
+            deposits: LocalSequence::from([deposit(true, [1, 0, 0])]),
+            key_rows: LocalSequence::from([key_row(0, [1, 0, 0])]),
+            zero_active_ablation: false,
+        };
+        let refusal = cuda.enact(&forged).expect_err("the card declines this front");
+        let MorphologicalConductCudaError::DeviceRefusedShape {
+            cause,
+            declared,
+            found,
+        } = refusal
+        else {
+            panic!("the card must NAME the agreement it declined on, returned {refusal:?}");
+        };
+        assert_eq!(cause, "the deposit sheet the card received is not the declared extent");
+        assert_eq!(declared, 5);
+        assert_eq!(found, 4);
+        // A declined front does not poison the executor: the refusal is a return, not a fault.
+        assert!(!cuda.is_poisoned());
     }
 
     #[test]

@@ -188,6 +188,10 @@ pub struct ReturnedContactCudaReceipt {
     pub retained_streams: u32,
     pub stream_nonblocking: bool,
     pub stream_synchronizations: u32,
+    /// Barriers taken against the **default** stream, where `DeviceBuffer::zero` runs. The launch
+    /// stream is non-blocking and does not order against it, so this names the barrier that keeps
+    /// the zero from erasing the kernel's header at a large return.
+    pub default_stream_barriers: u32,
     pub prepare_and_ingress_nanoseconds: u128,
     pub kernel_and_stream_nanoseconds: u128,
     pub return_egress_nanoseconds: u128,
@@ -319,6 +323,19 @@ impl CudaReturnedContactExecutor {
                 .copy_range_from_slice(0, relation_words.as_ref())?;
         }
         self.output.zero()?;
+        // **The zero runs on the default stream; the launch does not.**
+        //
+        // `DeviceBuffer::zero` is `cuMemsetD32_v2` on the context's default stream, while
+        // `Stream::create` opens a `CU_STREAM_NON_BLOCKING` stream, which by construction does not
+        // synchronise with the default one. The host-to-device copies above are `cuMemcpyHtoD` on
+        // pageable memory and block the host, so they need no barrier — the memset does not. At a
+        // small return the zero lands before the kernel; at a large one it is still running while
+        // lane zero writes the header, and it erases the straight-line words written before the
+        // kernel's own loops. That race was found in `morphological_language::conduct_cuda` by a
+        // front larger than the corpus has produced, and this owner carried it identically.
+        //
+        // A barrier here, not a stream ordering, because the memset has no stream to order against.
+        self.context.synchronize()?;
         let prepare_and_ingress_nanoseconds = started.elapsed().as_nanos();
 
         let function = self.module.function(wire::ENTRY_SYMBOL)?;
@@ -404,6 +421,7 @@ impl CudaReturnedContactExecutor {
             retained_streams: 1,
             stream_nonblocking: self.stream.is_nonblocking(),
             stream_synchronizations: 1,
+            default_stream_barriers: 1,
             prepare_and_ingress_nanoseconds,
             kernel_and_stream_nanoseconds,
             return_egress_nanoseconds,

@@ -4133,6 +4133,29 @@ struct MorphologicalConductShape {
     output_words: usize,
 }
 
+/// A shape refusal: which agreement failed, and the two extents that disagreed where the check is
+/// an equality of extents. Answering roughly twenty agreements with one status word made every
+/// decline look alike to the host.
+#[derive(Clone, Copy)]
+struct MorphologicalConductShapeRefusal {
+    cause: u32,
+    declared: u32,
+    found: u32,
+}
+
+#[inline(always)]
+const fn morphological_shape_refusal(
+    cause: u32,
+    declared: usize,
+    found: usize,
+) -> MorphologicalConductShapeRefusal {
+    MorphologicalConductShapeRefusal {
+        cause,
+        declared: declared as u32,
+        found: found as u32,
+    }
+}
+
 #[inline(always)]
 fn morphological_conduct_shape(
     control: &[u32],
@@ -4140,45 +4163,147 @@ fn morphological_conduct_shape(
     deposit_words_len: usize,
     key_row_words_len: usize,
     output_words_len: usize,
-) -> Option<MorphologicalConductShape> {
-    if control.len() != morph_cuda::CONTROL_WORDS
-        || control[morph_cuda::CONTROL_VERSION] != morph_cuda::LAYOUT_VERSION
-        || control[morph_cuda::CONTROL_EPOCH] == 0
-        || control[morph_cuda::CONTROL_TOTAL_WORDS] as usize != morph_cuda::CONTROL_WORDS
-    {
-        return None;
+) -> Result<MorphologicalConductShape, MorphologicalConductShapeRefusal> {
+    if control.len() != morph_cuda::CONTROL_WORDS {
+        return Err(morphological_shape_refusal(
+            morph_cuda::REFUSAL_CONTROL_EXTENT,
+            morph_cuda::CONTROL_WORDS,
+            control.len(),
+        ));
+    }
+    if control[morph_cuda::CONTROL_VERSION] != morph_cuda::LAYOUT_VERSION {
+        return Err(morphological_shape_refusal(
+            morph_cuda::REFUSAL_CONTROL_VERSION,
+            morph_cuda::LAYOUT_VERSION as usize,
+            control[morph_cuda::CONTROL_VERSION] as usize,
+        ));
+    }
+    if control[morph_cuda::CONTROL_EPOCH] == 0 {
+        return Err(morphological_shape_refusal(
+            morph_cuda::REFUSAL_CONTROL_EPOCH_ZERO,
+            0,
+            0,
+        ));
+    }
+    if control[morph_cuda::CONTROL_TOTAL_WORDS] as usize != morph_cuda::CONTROL_WORDS {
+        return Err(morphological_shape_refusal(
+            morph_cuda::REFUSAL_CONTROL_TOTAL_WORDS,
+            morph_cuda::CONTROL_WORDS,
+            control[morph_cuda::CONTROL_TOTAL_WORDS] as usize,
+        ));
     }
     let candidates = control[morph_cuda::CONTROL_CANDIDATES] as usize;
     let deposits = control[morph_cuda::CONTROL_DEPOSITS] as usize;
     let key_rows = control[morph_cuda::CONTROL_KEY_ROWS] as usize;
     let key_words = control[morph_cuda::CONTROL_KEY_WORDS] as usize;
     let max_candidate_keys = control[morph_cuda::CONTROL_MAX_CANDIDATE_KEYS] as usize;
-    if key_words == 0 || max_candidate_keys > key_rows {
-        return None;
+    if key_words == 0 {
+        return Err(morphological_shape_refusal(
+            morph_cuda::REFUSAL_KEY_WORDS_ZERO,
+            0,
+            0,
+        ));
     }
-    let candidate_total_words = candidates.checked_mul(morph_cuda::CANDIDATE_WORDS)?;
-    let deposit_row_words = morph_cuda::deposit_row_words(key_words)?;
-    let deposit_total_words = deposits.checked_mul(deposit_row_words)?;
-    let key_row_words = morph_cuda::key_row_words(key_words)?;
-    let key_row_total_words = key_rows.checked_mul(key_row_words)?;
-    let candidate_row_words = morph_cuda::candidate_row_words(max_candidate_keys)?;
-    let output_words = morph_cuda::output_words(candidates, max_candidate_keys)?;
-    if control[morph_cuda::CONTROL_CANDIDATE_WORDS] as usize != morph_cuda::CANDIDATE_WORDS
-        || control[morph_cuda::CONTROL_CANDIDATE_TOTAL_WORDS] as usize != candidate_total_words
-        || control[morph_cuda::CONTROL_DEPOSIT_ROW_WORDS] as usize != deposit_row_words
-        || control[morph_cuda::CONTROL_DEPOSIT_TOTAL_WORDS] as usize != deposit_total_words
-        || control[morph_cuda::CONTROL_KEY_ROW_WORDS] as usize != key_row_words
-        || control[morph_cuda::CONTROL_KEY_ROW_TOTAL_WORDS] as usize != key_row_total_words
-        || control[morph_cuda::CONTROL_OUTPUT_ROW_WORDS] as usize != candidate_row_words
-        || control[morph_cuda::CONTROL_OUTPUT_TOTAL_WORDS] as usize != output_words
-        || candidate_words_len != candidate_total_words
-        || deposit_words_len != deposit_total_words
-        || key_row_words_len != key_row_total_words
-        || output_words_len != output_words
-    {
-        return None;
+    if max_candidate_keys > key_rows {
+        return Err(morphological_shape_refusal(
+            morph_cuda::REFUSAL_MAX_CANDIDATE_KEYS,
+            key_rows,
+            max_candidate_keys,
+        ));
     }
-    Some(MorphologicalConductShape {
+    let overflow = morphological_shape_refusal(morph_cuda::REFUSAL_EXTENT_OVERFLOW, 0, 0);
+    let Some(candidate_total_words) = candidates.checked_mul(morph_cuda::CANDIDATE_WORDS) else {
+        return Err(overflow);
+    };
+    let Some(deposit_row_words) = morph_cuda::deposit_row_words(key_words) else {
+        return Err(overflow);
+    };
+    let Some(deposit_total_words) = deposits.checked_mul(deposit_row_words) else {
+        return Err(overflow);
+    };
+    let Some(key_row_words) = morph_cuda::key_row_words(key_words) else {
+        return Err(overflow);
+    };
+    let Some(key_row_total_words) = key_rows.checked_mul(key_row_words) else {
+        return Err(overflow);
+    };
+    let Some(candidate_row_words) = morph_cuda::candidate_row_words(max_candidate_keys) else {
+        return Err(overflow);
+    };
+    let Some(output_words) = morph_cuda::output_words(candidates, max_candidate_keys) else {
+        return Err(overflow);
+    };
+    let agreements: [(u32, usize, usize); 12] = [
+        (
+            morph_cuda::REFUSAL_CONTROL_CANDIDATE_WORDS,
+            morph_cuda::CANDIDATE_WORDS,
+            control[morph_cuda::CONTROL_CANDIDATE_WORDS] as usize,
+        ),
+        (
+            morph_cuda::REFUSAL_CONTROL_CANDIDATE_TOTAL_WORDS,
+            candidate_total_words,
+            control[morph_cuda::CONTROL_CANDIDATE_TOTAL_WORDS] as usize,
+        ),
+        (
+            morph_cuda::REFUSAL_CONTROL_DEPOSIT_ROW_WORDS,
+            deposit_row_words,
+            control[morph_cuda::CONTROL_DEPOSIT_ROW_WORDS] as usize,
+        ),
+        (
+            morph_cuda::REFUSAL_CONTROL_DEPOSIT_TOTAL_WORDS,
+            deposit_total_words,
+            control[morph_cuda::CONTROL_DEPOSIT_TOTAL_WORDS] as usize,
+        ),
+        (
+            morph_cuda::REFUSAL_CONTROL_KEY_ROW_WORDS,
+            key_row_words,
+            control[morph_cuda::CONTROL_KEY_ROW_WORDS] as usize,
+        ),
+        (
+            morph_cuda::REFUSAL_CONTROL_KEY_ROW_TOTAL_WORDS,
+            key_row_total_words,
+            control[morph_cuda::CONTROL_KEY_ROW_TOTAL_WORDS] as usize,
+        ),
+        (
+            morph_cuda::REFUSAL_CONTROL_OUTPUT_ROW_WORDS,
+            candidate_row_words,
+            control[morph_cuda::CONTROL_OUTPUT_ROW_WORDS] as usize,
+        ),
+        (
+            morph_cuda::REFUSAL_CONTROL_OUTPUT_TOTAL_WORDS,
+            output_words,
+            control[morph_cuda::CONTROL_OUTPUT_TOTAL_WORDS] as usize,
+        ),
+        (
+            morph_cuda::REFUSAL_CANDIDATE_SHEET_EXTENT,
+            candidate_total_words,
+            candidate_words_len,
+        ),
+        (
+            morph_cuda::REFUSAL_DEPOSIT_SHEET_EXTENT,
+            deposit_total_words,
+            deposit_words_len,
+        ),
+        (
+            morph_cuda::REFUSAL_KEY_ROW_SHEET_EXTENT,
+            key_row_total_words,
+            key_row_words_len,
+        ),
+        (
+            morph_cuda::REFUSAL_OUTPUT_SHEET_EXTENT,
+            output_words,
+            output_words_len,
+        ),
+    ];
+    let mut at = 0usize;
+    while at < agreements.len() {
+        let (cause, declared, found) = agreements[at];
+        if declared != found {
+            return Err(morphological_shape_refusal(cause, declared, found));
+        }
+        at += 1;
+    }
+    Ok(MorphologicalConductShape {
         epoch: control[morph_cuda::CONTROL_EPOCH],
         candidates,
         deposits,
@@ -4268,20 +4393,31 @@ pub unsafe extern "ptx-kernel" fn morphological_conduct_group(
         return;
     }
     let control = unsafe { slice::from_raw_parts(control_words, control_words_len) };
-    let Some(shape) = morphological_conduct_shape(
+    let shape = match morphological_conduct_shape(
         control,
         candidate_words_len,
         deposit_words_len,
         key_row_words_len,
         output_words_len,
-    ) else {
-        if lane == 0 {
-            let output =
-                unsafe { slice::from_raw_parts_mut(output_words, morph_cuda::OUTPUT_HEADER_WORDS) };
-            output[morph_cuda::OUTPUT_STATUS] = morph_cuda::STATUS_INVALID;
-            output[morph_cuda::OUTPUT_INVALID_KEY_ROW] = morph_cuda::OPEN_KEY_ROW;
+    ) {
+        Ok(shape) => shape,
+        Err(refusal) => {
+            if lane == 0 {
+                let output = unsafe {
+                    slice::from_raw_parts_mut(output_words, morph_cuda::OUTPUT_HEADER_WORDS)
+                };
+                // The version is written even on the decline path, so a host can tell "the card
+                // refused" from "the card did not write" instead of reporting the first unwritten
+                // header word as the disagreement.
+                output[morph_cuda::OUTPUT_VERSION] = morph_cuda::LAYOUT_VERSION;
+                output[morph_cuda::OUTPUT_REFUSAL_CAUSE] = refusal.cause;
+                output[morph_cuda::OUTPUT_REFUSAL_DECLARED] = refusal.declared;
+                output[morph_cuda::OUTPUT_REFUSAL_FOUND] = refusal.found;
+                output[morph_cuda::OUTPUT_INVALID_KEY_ROW] = morph_cuda::OPEN_KEY_ROW;
+                output[morph_cuda::OUTPUT_STATUS] = morph_cuda::STATUS_INVALID;
+            }
+            return;
         }
-        return;
     };
     let work = match 1usize.checked_add(shape.candidates) {
         Some(work) => work,
@@ -4307,12 +4443,17 @@ pub unsafe extern "ptx-kernel" fn morphological_conduct_group(
         output[morph_cuda::OUTPUT_CANDIDATE_ROWS_AT] = morph_cuda::OUTPUT_HEADER_WORDS as u32;
         output[morph_cuda::OUTPUT_TOTAL_WORDS] = shape.output_words as u32;
         output[morph_cuda::OUTPUT_INVALID_KEY_ROW] = morph_cuda::OPEN_KEY_ROW;
+        output[morph_cuda::OUTPUT_REFUSAL_CAUSE] = morph_cuda::REFUSAL_NONE;
+        output[morph_cuda::OUTPUT_REFUSAL_DECLARED] = 0;
+        output[morph_cuda::OUTPUT_REFUSAL_FOUND] = 0;
 
         let mut active = 0u32;
         let mut deposit = 0usize;
         while deposit < shape.deposits {
             let at = deposit * shape.deposit_row_words;
             if deposits[at + morph_cuda::DEPOSIT_ACTIVE] > 1 {
+                output[morph_cuda::OUTPUT_REFUSAL_CAUSE] = morph_cuda::REFUSAL_DEPOSIT_ACTIVITY_WORD;
+                output[morph_cuda::OUTPUT_REFUSAL_FOUND] = deposit as u32;
                 output[morph_cuda::OUTPUT_STATUS] = morph_cuda::STATUS_INVALID;
                 return;
             }
@@ -4320,6 +4461,9 @@ pub unsafe extern "ptx-kernel" fn morphological_conduct_group(
                 let earlier = morphological_deposit_key(deposits, shape, deposit - 1);
                 let here = morphological_deposit_key(deposits, shape, deposit);
                 if !morph_cuda::key_precedes(earlier, here) {
+                    output[morph_cuda::OUTPUT_REFUSAL_CAUSE] =
+                        morph_cuda::REFUSAL_DEPOSIT_SHEET_UNSORTED;
+                    output[morph_cuda::OUTPUT_REFUSAL_FOUND] = deposit as u32;
                     output[morph_cuda::OUTPUT_STATUS] = morph_cuda::STATUS_INVALID;
                     return;
                 }
@@ -4328,6 +4472,8 @@ pub unsafe extern "ptx-kernel" fn morphological_conduct_group(
                 active = match active.checked_add(1) {
                     Some(next) => next,
                     None => {
+                        output[morph_cuda::OUTPUT_REFUSAL_CAUSE] =
+                            morph_cuda::REFUSAL_ACTIVE_DEPOSIT_OVERFLOW;
                         output[morph_cuda::OUTPUT_STATUS] = morph_cuda::STATUS_INVALID;
                         return;
                     }
@@ -4340,6 +4486,8 @@ pub unsafe extern "ptx-kernel" fn morphological_conduct_group(
             if candidates[candidate * morph_cuda::CANDIDATE_WORDS + morph_cuda::CANDIDATE_FACE]
                 == morph_cuda::OPEN_FACE
             {
+                output[morph_cuda::OUTPUT_REFUSAL_CAUSE] = morph_cuda::REFUSAL_CANDIDATE_FACE_OPEN;
+                output[morph_cuda::OUTPUT_REFUSAL_FOUND] = candidate as u32;
                 output[morph_cuda::OUTPUT_STATUS] = morph_cuda::STATUS_INVALID;
                 return;
             }

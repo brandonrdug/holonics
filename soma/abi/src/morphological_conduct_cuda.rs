@@ -18,7 +18,7 @@
 //! relies on for the search is a validated input rather than an assumption.
 
 pub const ENTRY_SYMBOL: &str = "morphological_conduct_group";
-pub const LAYOUT_VERSION: u32 = 2;
+pub const LAYOUT_VERSION: u32 = 3;
 
 pub const STATUS_INCOMPLETE: u32 = 0;
 pub const STATUS_COMPLETE: u32 = 1;
@@ -73,7 +73,78 @@ pub const OUTPUT_CANDIDATE_ROW_WORDS: usize = 8;
 pub const OUTPUT_CANDIDATE_ROWS_AT: usize = 9;
 pub const OUTPUT_TOTAL_WORDS: usize = 10;
 pub const OUTPUT_INVALID_KEY_ROW: usize = 11;
-pub const OUTPUT_HEADER_WORDS: usize = 12;
+/// **Why the card declined, by name.**
+///
+/// The shape agreement the card performs before it starts is roughly twenty separate checks, and
+/// it used to answer all of them with one status word. A host reading that could say only "the card
+/// refused" — and worse, on the decline path the card never reaches the header fields, so a host
+/// walking them reported the first unwritten word as the disagreement. These three words carry the
+/// cause ordinal and, where the check is an equality of extents, the two extents that disagreed.
+pub const OUTPUT_REFUSAL_CAUSE: usize = 12;
+pub const OUTPUT_REFUSAL_DECLARED: usize = 13;
+pub const OUTPUT_REFUSAL_FOUND: usize = 14;
+pub const OUTPUT_HEADER_WORDS: usize = 15;
+
+/// No shape refusal was recorded.
+pub const REFUSAL_NONE: u32 = 0;
+pub const REFUSAL_CONTROL_EXTENT: u32 = 1;
+pub const REFUSAL_CONTROL_VERSION: u32 = 2;
+pub const REFUSAL_CONTROL_EPOCH_ZERO: u32 = 3;
+pub const REFUSAL_CONTROL_TOTAL_WORDS: u32 = 4;
+pub const REFUSAL_KEY_WORDS_ZERO: u32 = 5;
+pub const REFUSAL_MAX_CANDIDATE_KEYS: u32 = 6;
+pub const REFUSAL_EXTENT_OVERFLOW: u32 = 7;
+pub const REFUSAL_CONTROL_CANDIDATE_WORDS: u32 = 8;
+pub const REFUSAL_CONTROL_CANDIDATE_TOTAL_WORDS: u32 = 9;
+pub const REFUSAL_CONTROL_DEPOSIT_ROW_WORDS: u32 = 10;
+pub const REFUSAL_CONTROL_DEPOSIT_TOTAL_WORDS: u32 = 11;
+pub const REFUSAL_CONTROL_KEY_ROW_WORDS: u32 = 12;
+pub const REFUSAL_CONTROL_KEY_ROW_TOTAL_WORDS: u32 = 13;
+pub const REFUSAL_CONTROL_OUTPUT_ROW_WORDS: u32 = 14;
+pub const REFUSAL_CONTROL_OUTPUT_TOTAL_WORDS: u32 = 15;
+pub const REFUSAL_CANDIDATE_SHEET_EXTENT: u32 = 16;
+pub const REFUSAL_DEPOSIT_SHEET_EXTENT: u32 = 17;
+pub const REFUSAL_KEY_ROW_SHEET_EXTENT: u32 = 18;
+pub const REFUSAL_OUTPUT_SHEET_EXTENT: u32 = 19;
+pub const REFUSAL_DEPOSIT_ACTIVITY_WORD: u32 = 20;
+pub const REFUSAL_DEPOSIT_SHEET_UNSORTED: u32 = 21;
+pub const REFUSAL_CANDIDATE_FACE_OPEN: u32 = 22;
+pub const REFUSAL_ACTIVE_DEPOSIT_OVERFLOW: u32 = 23;
+
+/// The name of a refusal ordinal. One table, on the host side of the same wire the card writes.
+pub const fn refusal_cause_name(cause: u32) -> &'static str {
+    match cause {
+        REFUSAL_NONE => "no shape refusal was recorded",
+        REFUSAL_CONTROL_EXTENT => "the control block is not the declared word count",
+        REFUSAL_CONTROL_VERSION => "the control block declares a different layout version",
+        REFUSAL_CONTROL_EPOCH_ZERO => "the control block declares epoch zero",
+        REFUSAL_CONTROL_TOTAL_WORDS => "the control block's own total-words word disagrees",
+        REFUSAL_KEY_WORDS_ZERO => "the control block declares a key of zero words",
+        REFUSAL_MAX_CANDIDATE_KEYS => {
+            "the declared maximum candidate keys exceeds the key-row population"
+        }
+        REFUSAL_EXTENT_OVERFLOW => "a derived sheet extent overflowed",
+        REFUSAL_CONTROL_CANDIDATE_WORDS => "the control block's candidate row width disagrees",
+        REFUSAL_CONTROL_CANDIDATE_TOTAL_WORDS => {
+            "the control block's candidate sheet extent disagrees"
+        }
+        REFUSAL_CONTROL_DEPOSIT_ROW_WORDS => "the control block's deposit row width disagrees",
+        REFUSAL_CONTROL_DEPOSIT_TOTAL_WORDS => "the control block's deposit sheet extent disagrees",
+        REFUSAL_CONTROL_KEY_ROW_WORDS => "the control block's key row width disagrees",
+        REFUSAL_CONTROL_KEY_ROW_TOTAL_WORDS => "the control block's key sheet extent disagrees",
+        REFUSAL_CONTROL_OUTPUT_ROW_WORDS => "the control block's output row width disagrees",
+        REFUSAL_CONTROL_OUTPUT_TOTAL_WORDS => "the control block's output extent disagrees",
+        REFUSAL_CANDIDATE_SHEET_EXTENT => "the candidate sheet the card received is not the declared extent",
+        REFUSAL_DEPOSIT_SHEET_EXTENT => "the deposit sheet the card received is not the declared extent",
+        REFUSAL_KEY_ROW_SHEET_EXTENT => "the key sheet the card received is not the declared extent",
+        REFUSAL_OUTPUT_SHEET_EXTENT => "the output sheet the card received is not the declared extent",
+        REFUSAL_DEPOSIT_ACTIVITY_WORD => "a deposit carries an activity word that is neither zero nor one",
+        REFUSAL_DEPOSIT_SHEET_UNSORTED => "the deposit sheet is not strictly ascending by key",
+        REFUSAL_CANDIDATE_FACE_OPEN => "a candidate carries the reserved open face",
+        REFUSAL_ACTIVE_DEPOSIT_OVERFLOW => "the active deposit count overflowed",
+        _ => "the card recorded a refusal ordinal this host does not name",
+    }
+}
 
 pub const CANDIDATE_STATUS: usize = 0;
 pub const CANDIDATE_EPOCH: usize = 1;
@@ -258,6 +329,25 @@ mod tests {
     }
 
     #[test]
+    fn every_refusal_ordinal_is_named_and_the_unknown_one_says_so() {
+        // A cause the host cannot name is worse than no cause, so the table is required to cover
+        // every ordinal the card can write and to say plainly when it does not.
+        for cause in REFUSAL_NONE..=REFUSAL_ACTIVE_DEPOSIT_OVERFLOW {
+            let name = refusal_cause_name(cause);
+            assert!(!name.is_empty());
+            assert_ne!(
+                name,
+                refusal_cause_name(REFUSAL_ACTIVE_DEPOSIT_OVERFLOW + 1),
+                "ordinal {cause} falls through to the unknown arm"
+            );
+        }
+        assert_eq!(
+            refusal_cause_name(u32::MAX),
+            "the card recorded a refusal ordinal this host does not name"
+        );
+    }
+
+    #[test]
     fn dynamic_layout_is_exact_at_declared_key_and_match_widths() {
         assert_eq!(deposit_row_words(0), None);
         assert_eq!(key_row_words(0), None);
@@ -265,7 +355,7 @@ mod tests {
         assert_eq!(key_row_words(11), Some(12));
         assert_eq!(candidate_row_words(0), Some(6));
         assert_eq!(candidate_row_words(3), Some(9));
-        assert_eq!(output_words(4, 3), Some(48));
+        assert_eq!(output_words(4, 3), Some(51));
 
         let row = control(5, 4, 33, 7, 11, 3).unwrap();
         assert!(control_is_canonical(&row));
@@ -273,7 +363,7 @@ mod tests {
         assert_eq!(row[CONTROL_DEPOSIT_ROW_WORDS], 12);
         assert_eq!(row[CONTROL_KEY_ROW_WORDS], 12);
         assert_eq!(row[CONTROL_OUTPUT_ROW_WORDS], 9);
-        assert_eq!(row[CONTROL_OUTPUT_TOTAL_WORDS], 48);
+        assert_eq!(row[CONTROL_OUTPUT_TOTAL_WORDS], 51);
 
         let mut forged = row;
         forged[CONTROL_OUTPUT_ROW_WORDS] += 1;

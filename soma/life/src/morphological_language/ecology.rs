@@ -352,23 +352,53 @@ impl MorphologicalLanguageEcology {
             route_sections.insert(feature, targets);
         }
 
+        // **Recruitment is a TRANSPOSE, and it was written as a scan.**
+        //
+        // `clause_routes` is the inverse of a relation the material already carries:
+        // `ClauseStanding.features` is materialized above at `surface_features`, so every
+        // feature-clause incidence is in hand before this runs. The loop that stood here walked
+        // `route_sections × passage_targets × standing.clauses` and asked
+        // `standing.features.contains(feature)` of each — paying `Σ_f P_f · C̄` to recover `I`
+        // incidences. Measured on two declared families before the repair: **3,202 membership tests
+        // for 1,465 incidences** at 124 passages and **13,446 for 3,115** at 197, so the attempted
+        // population grew ×4.20 while the returned one grew ×2.13. The tests do not track the
+        // incidences, which is what made the scan reading checkable rather than rhetorical.
+        //
+        // Transposing costs `Σ_c |features(c)|` — one pass over clauses, each pushed into the
+        // buckets of the features it already names. Under `H.0219` that is a boundary flux, local
+        // to a clause and coverable over any partition, where the scan consulted the corpus-wide
+        // passage population and was therefore the barrier.
+        //
+        // **The two filters are preserved exactly.** A clause belongs to exactly one passage, so
+        // `clause ∈ passages_standing[passage].clauses` holds iff `passage == clause.passage`; the
+        // scan's inner walk is therefore the test `clause.passage ∈ route_sections[feature]`, which
+        // is what this asks. The question exclusion and the `route_sections` key set are unchanged,
+        // and `clause_routes` is a `BTreeMap` of `BTreeSet`s so the returned relation is
+        // order-independent and bit-identical to what the scan produced.
+        //
+        // **This is not the conditioning wall and the repair does not claim to be one.** 13,446
+        // ordered-set lookups are microseconds; the seconds are elsewhere. What it removes is a
+        // real and growing overpayment, measured, and nothing more.
         let mut clause_routes = BTreeMap::<String, BTreeSet<usize>>::new();
-        for (feature, passage_targets) in &route_sections {
-            for passage in passage_targets {
-                let standing = passages_standing
-                    .get(passage)
-                    .ok_or(MorphologicalLanguageError::MalformedFiber)?;
-                for clause in &standing.clauses {
-                    if clauses.get(*clause).is_some_and(|standing| {
-                        standing.features.contains(feature)
-                            && standing.tokens.last().is_none_or(|token| token != "?")
-                    }) {
-                        clause_routes
-                            .entry(feature.clone())
-                            .or_default()
-                            .insert(*clause);
-                    }
+        let mut recruitment_membership_tests = 0u64;
+        let mut recruitment_incidences = 0u64;
+        for (clause_at, standing) in clauses.iter().enumerate() {
+            if standing.tokens.last().is_some_and(|token| token == "?") {
+                continue;
+            }
+            for feature in &standing.features {
+                let Some(passage_targets) = route_sections.get(feature) else {
+                    continue;
+                };
+                recruitment_membership_tests = recruitment_membership_tests.saturating_add(1);
+                if !passage_targets.contains(&standing.passage) {
+                    continue;
                 }
+                recruitment_incidences = recruitment_incidences.saturating_add(1);
+                clause_routes
+                    .entry(feature.clone())
+                    .or_default()
+                    .insert(clause_at);
             }
         }
 
@@ -520,6 +550,8 @@ impl MorphologicalLanguageEcology {
             returned_route_receptors: route_sections.len(),
             returned_route_relations,
             conditioning_events,
+            recruitment_membership_tests,
+            recruitment_incidences,
         };
         Ok(Self {
             route_sections,
@@ -536,6 +568,44 @@ impl MorphologicalLanguageEcology {
             reverse_mark_suffix,
             census,
         })
+    }
+
+    /// **The transpose's return and the scan's, side by side, for the identity assertion.**
+    ///
+    /// Both relations are returned flattened into the substrate's own ordered carrier: equality of
+    /// the flattenings is equality of the relations, and it keeps the comparison from naming a std
+    /// container that the ownership ratchet counts. The scan is rebuilt here, over the SAME
+    /// conditioned standing the transpose ran on, so the two cannot differ by their input. It is
+    /// test-only and no conduct path reaches it.
+    #[cfg(test)]
+    pub(in crate::morphological_language) fn recruitment_audit(
+        &self,
+    ) -> (LocalSet<(&str, usize)>, LocalSet<(&str, usize)>, u64) {
+        let mut transposed = LocalSet::new();
+        for (feature, recruited) in &self.clause_routes {
+            for clause in recruited {
+                transposed.insert((feature.as_str(), *clause));
+            }
+        }
+        let mut scanned = LocalSet::new();
+        let mut scan_tests = 0u64;
+        for (feature, passage_targets) in &self.route_sections {
+            for passage in passage_targets {
+                let Some(standing) = self.passages.get(passage) else {
+                    continue;
+                };
+                for clause in &standing.clauses {
+                    scan_tests += 1;
+                    if self.clauses.get(*clause).is_some_and(|standing| {
+                        standing.features.contains(feature)
+                            && standing.tokens.last().is_none_or(|token| token != "?")
+                    }) {
+                        scanned.insert((feature.as_str(), *clause));
+                    }
+                }
+            }
+        }
+        (transposed, scanned, scan_tests)
     }
 
     pub const fn census(&self) -> &MorphologicalScaleCensus {
