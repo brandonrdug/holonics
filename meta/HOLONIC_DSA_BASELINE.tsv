@@ -145,6 +145,7 @@ soma/life/src/decomposing_codec.rs	.clone()=21	.collect()=40	.into_iter()=7	BTre
 soma/life/src/dialogue_lineage.rs	.clone()=10	.collect()=2	BTreeSet=4	Vec=4
 soma/life/src/form_mouth.rs	.clone()=3	.collect()=3	Vec=4
 soma/life/src/holonic_training.rs	.clone()=34	.collect()=11	.into_iter()=2	BTreeMap=15	BTreeSet=14	Vec=49
+soma/life/src/incidence_production.rs	.clone()=21	.collect()=9	.into_iter()=1	BTreeMap=10	BTreeSet=11	Vec=71	VecDeque=1
 soma/life/src/laboratory_language.rs	.clone()=36	.collect()=46	.flat_map()=5	.into_iter()=7	BTreeMap=5	BTreeSet=33	Vec=43
 soma/life/src/laboratory_language/repository.rs	.clone()=7	.collect()=3	.into_iter()=1	BTreeMap=3	BTreeSet=8	Vec=22
 soma/life/src/lean_mathematics.rs	.clone()=1	.collect()=1	.into_iter()=1	BTreeSet=9	Vec=3
@@ -158,7 +159,7 @@ soma/life/src/live_current_cuda/tests.rs	.clone()=14	.into_iter()=3	Vec=4
 soma/life/src/morphological_language.rs	BTreeMap=1	BTreeSet=1
 soma/life/src/morphological_language/conduct.rs	.clone()=15	.collect()=5	.into_iter()=2
 soma/life/src/morphological_language/conduct_cuda.rs	.clone()=2	.collect()=1
-soma/life/src/morphological_language/current.rs	.clone()=16	.collect()=15	.flat_map()=3	.into_iter()=3	BTreeMap=13	BTreeSet=47	Vec=22
+soma/life/src/morphological_language/current.rs	.clone()=12	.collect()=15	.flat_map()=3	.into_iter()=3	BTreeMap=12	BTreeSet=47	Vec=19
 soma/life/src/morphological_language/ecology.rs	.clone()=95	.collect()=57	.flat_map()=9	.into_iter()=10	BTreeMap=35	BTreeSet=96	Vec=59
 soma/life/src/morphological_language/generated.rs	.clone()=8	.collect()=5	.into_iter()=3	BTreeMap=3	BTreeSet=33	Vec=19
 soma/life/src/morphological_language/tests.rs	.clone()=2	.collect()=10	.flat_map()=3	.into_iter()=4	BTreeSet=6	Vec=3
