@@ -171,6 +171,8 @@ soma/life/src/morphological_language/tests.rs	.clone()=2	.collect()=10	.flat_map
 soma/life/src/reconstruction_fiber.rs	.clone()=6	.collect()=12	.flat_map()=1	BTreeMap=2	BTreeSet=14	Vec=17
 soma/life/src/reconstruction_fiber/edit.rs	.clone()=3	.collect()=4	BTreeSet=5	Vec=4
 soma/life/src/reconstruction_fiber/tests.rs	.clone()=2	BTreeMap=3	BTreeSet=4
+soma/life/src/recurrent_section.rs	.clone()=7	.collect()=17	.into_iter()=2	BTreeMap=11	BTreeSet=12	Vec=42
+soma/life/src/recurrent_section_cuda.rs	.clone()=1	.into_iter()=2	Vec=8
 soma/life/src/reintegrating_elaboration.rs	.clone()=26	.collect()=23	.flat_map()=1	.into_iter()=9	BTreeMap=8	BTreeSet=32	Vec=81
 soma/life/src/relational_language.rs	BTreeMap=1	BTreeSet=1
 soma/life/src/relational_language/codec.rs	.clone()=34	.collect()=18	.into_iter()=11	BTreeSet=17	Vec=26

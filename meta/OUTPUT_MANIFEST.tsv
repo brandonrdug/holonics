@@ -4,7 +4,7 @@
 # Regenerate: python3 tools/output_manifest.py
 # Verify:     python3 tools/output_manifest.py --check
 # Listing:    python3 tools/output_manifest.py --files
-# 37 drivers, 14424 returns, 9994394516 bytes.
+# 38 drivers, 14426 returns, 9994758248 bytes.
 sha256	returns	bytes	driver
 855279871852bffe08c83a0e50006b769da3b296934115faa809561b7cbdd304	7	1274	output/agentic-research-kernel
 b90b799580f0c51bd6ffe0009fc0fcd9eb9f20feb54972ca44ad4297b6252430	8	46304	output/analytic-field-transport
@@ -37,6 +37,7 @@ cf87fcb7ccdb9cd3649275a1731c3c011ab2fe8db8fd5ca161fd8c82d9331c55	3	5239843	outpu
 d5d4be0ce4e0da0f152d1bc1008f91006fba3e355d75dde239af483f33487e88	58	1443881689	output/source-revival
 bcb7bd027c399a57a2f7acf8de054227fc251736109b2a9ec3b596712d424510	256	5229153	output/the-reading-returns
 ac2db061771351762738a74fe2e3a21095d452838475314090b023d348673951	1	383027	output/the_ablated_body_rests_and_remounts
+f5334896fa342e21b7f669d011fab545c6fd4a7299cd358472a1594e2a944cc8	2	363732	output/the_conditioned_section_returns_after_detachment
 949fdbf07010903074dbfb914a9e08c66717076290565ec53eb6ab45add0ccf9	21	4950388929	output/the_conditioning_return_crosses_the_seal
 cc1e4532897a6734e33a897c4fd7ed71eb08be73b5724b21b01811cb600c1237	16	9711887	output/the_deposit_licenses_the_re_emission
 7ca8b7191a2e03f9733f4cf7f448b25882b920d166bdb73e0cefc69fdddb5383	8	2123819733	output/the_material_mouth_seals_the_declared_body

@@ -5,14 +5,17 @@
 Dynamics, and Quantum Information Field; `proved-standard` for the named event-order, work/span,
 Boolean, projection, microlocal, stationary-phase, circuit, and thermodynamic results in their
 ordinary scopes; `interpretation` for their typed transfer into holonic profiling;
-`project-postulate` for the grading discipline; `open` for the integrated return.
+`project-postulate` for the grading discipline; `established-bounded [implemented-exact]` for the
+integrated recurrent-section return; `open` for an unrestricted cross-material profiler.
 **Governing documents:** `canon/THE_HOLOBROCHOS_SPINE.md`,
 `canon/TABLET_THE_OPERATIONS.md`, `canon/TABLET_THE_MANIFOLD.md`,
 `canon/TABLET_THE_REASONING_CYCLE.md`, and `canon/01_CAUSAL_CALCULUS.md`.
 **Evidentiary deposit:**
 `research/records/2026-08-12_THE_COMPUTER_IS_A_CAUSAL_WORLD_TUBE_THE_PROFILE_RETURNS_ITS_SHADOW_FIELD.md`.
-**Construction status:** doctrine and active-grade refinement only. This tablet schedules no deed
-and does not alter `CONSTRUCTION_STATE.md`.
+**Construction evidence:**
+`research/records/2026-08-12_THE_RECURRENT_LAW_CROSSES_THE_CORPUS_DEPARTURE_THE_UNSEEN_SECTION_RIDES_ITS_DEPOSIT.md`.
+**Construction status:** doctrine and bounded construction compression. This tablet schedules no
+deed and does not alter `CONSTRUCTION_STATE.md`.
 
 ---
 
@@ -156,15 +159,32 @@ theory. That stronger claim requires a declared Hilbert/operator algebra, tensor
 commutation, dynamical/unitary or open-system law, Born receiver, domain, and calibrated apparatus.
 The term names a precise project calculus and keeps the distinction testable.
 
-## 8. The integrated return remains open
+## 8. The bounded integrated return stands
 
-`open`: the active recurrent-section experiment has bounded exact owners for causal sections,
-receiver quotients, reconstruction fibers, phase jets, holonomy, diffusion, higher incidence,
-work, and apparatus testimony, but no one owner returns the complete profile above for one
-condition-detach-remount recurrence. The full experiment must return causal-diamond, shadow-fiber,
-caustic, phase-current, holonomy/braid, scale-rebase, intervention, and apparatus receipts before
-and after conditioning. This sharpens the final artifact and does not withdraw the already graded
-bounded constitutive return.
+`established-bounded [implemented-exact]`: one condition-detach-remount recurrence now returns the
+required receiver shadow field. Before activation, 28 later section states occupy one OPEN
+reconstruction fiber and carry phase-current distribution `{0:28}`. After exact native remount,
+all 28 ride a deposited transformation law, the distribution becomes `{1:28}`, and the quotient
+splits into fibers of widths 3, 2, 1, and 1. Seventeen presentation pairs cross the resulting
+caustic. The causal-front distribution `{0:7,1:14,2:7}` and interaction-arity distribution
+`{0:7,1:14,2:7}` remain fixed across the phase change.
+
+The local transformation phase is explicit: five presentations carry mixed coefficient `cxy=0`
+and the two product presentations carry `cxy=1`. All seven two-path causal diamonds reconverge on
+one exact later state and therefore return flat holonomy at this aperture; nontrivial loop phase is
+not fabricated. Shortest interventions separate same-value laws and reversed hands. Removing the
+value receiver coarsens the population, one addressed deposit ablation reopens only its section,
+and scale restriction returns the exact intersection of the full partition. Semantic receipts are
+separate from the RTX 4080 SUPER conditioner, law-founding, attachment, law-evaluation, and quotient
+launch testimony.
+
+`open`: this profile is exact only for the declared finite bi-affine law family and section
+population. A general multigrain profile joining diffusion, nontrivial holonomy/braid, higher
+incidence, calibrated physical telemetry, and arbitrary unknown-codec contact reconstruction
+remains unbuilt.
 
 Complete derivation, external references, controls, and implementation boundary:
 `research/records/2026-08-12_THE_COMPUTER_IS_A_CAUSAL_WORLD_TUBE_THE_PROFILE_RETURNS_ITS_SHADOW_FIELD.md`.
+
+Complete bounded construction, falsifiers, and returned artifacts:
+`research/records/2026-08-12_THE_RECURRENT_LAW_CROSSES_THE_CORPUS_DEPARTURE_THE_UNSEEN_SECTION_RIDES_ITS_DEPOSIT.md`.

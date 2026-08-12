@@ -1,3 +1,4 @@
+//! Record: research/records/2026-08-12_THE_RECURRENT_LAW_CROSSES_THE_CORPUS_DEPARTURE_THE_UNSEEN_SECTION_RIDES_ITS_DEPOSIT.md
 //! THE CONFIGURATION FOLD — the CUDA/PTX port of the M4a-accepted entry family
 //! (`FORMULA §XXVIII`): `link_grain` · `link_sum` · `link_finish`. The light-end product of one
 //! configuration of co-present lineages, folded ONCE per touched place.
@@ -72,6 +73,7 @@ use soma_abi::emission::{DeedEmission, DEED_WORDS};
 use soma_abi::live_event_cuda as event_cuda;
 use soma_abi::morphological_condition_cuda as morph_condition_cuda;
 use soma_abi::morphological_conduct_cuda as morph_cuda;
+use soma_abi::recurrent_law_cuda;
 use soma_abi::returned_contact_cuda as returned_cuda;
 use soma_abi::text_restrict_cuda as text_cuda;
 use soma_abi::{contact as contact_abi, register as register_abi};
@@ -166,6 +168,22 @@ unsafe fn global_xy() -> (u32, u32) {
     let y =
         nvptx::_block_idx_y() as u32 * nvptx::_block_dim_y() as u32 + nvptx::_thread_idx_y() as u32;
     (x, y)
+}
+
+#[inline(always)]
+fn recurrent_read_i64(words: &[u32], at: usize) -> Option<i64> {
+    recurrent_law_cuda::decode_i64(words, at)
+}
+
+#[inline(always)]
+fn recurrent_write_i64(words: &mut [u32], at: usize, value: i64) -> bool {
+    if at > words.len() || recurrent_law_cuda::I64_WORDS > words.len() - at {
+        return false;
+    }
+    let encoded = recurrent_law_cuda::encode_i64(value);
+    words[at] = encoded[0];
+    words[at + 1] = encoded[1];
+    true
 }
 
 extern "C" {
@@ -3699,17 +3717,28 @@ pub unsafe extern "ptx-kernel" fn lineage_event(
     }
     unsafe {
         enact_one_lineage(
-            standing_words, standing_words_len,
-            control_words, control_words_len,
-            relation_words, relation_words_len,
-            owns, owns_len,
-            carriers, carriers_len,
-            overflow_nodes, overflow_nodes_len,
-            overflow_counts, overflow_counts_len,
-            directed_events, directed_events_len,
-            directed_contacts, directed_contacts_len,
-            emissions, emissions_len,
-            emanation, emanation_len,
+            standing_words,
+            standing_words_len,
+            control_words,
+            control_words_len,
+            relation_words,
+            relation_words_len,
+            owns,
+            owns_len,
+            carriers,
+            carriers_len,
+            overflow_nodes,
+            overflow_nodes_len,
+            overflow_counts,
+            overflow_counts_len,
+            directed_events,
+            directed_events_len,
+            directed_contacts,
+            directed_contacts_len,
+            emissions,
+            emissions_len,
+            emanation,
+            emanation_len,
         )
     }
 }
@@ -3791,7 +3820,8 @@ pub unsafe extern "ptx-kernel" fn lineage_event_population(
         // Lane zero stamps the structural refusal into its own control block so the host reads a
         // named status rather than an unchanged buffer.
         if lane == 0 && control_words_len >= event_cuda::CONTROL_WORDS {
-            let control = unsafe { slice::from_raw_parts_mut(control_words, event_cuda::CONTROL_WORDS) };
+            let control =
+                unsafe { slice::from_raw_parts_mut(control_words, event_cuda::CONTROL_WORDS) };
             event_status(control, event_cuda::STATUS_STRUCTURE);
         }
         return;
@@ -4371,16 +4401,12 @@ fn suffix_find_transition(
     symbol: u32,
     reads: &mut u64,
 ) -> Option<(usize, u32)> {
-    let mut edge = states[suffix_state_at(
-        state,
-        morph_condition_cuda::SUFFIX_STATE_TRANSITION_HEAD,
-    )?] as usize;
+    let mut edge = states
+        [suffix_state_at(state, morph_condition_cuda::SUFFIX_STATE_TRANSITION_HEAD)?]
+        as usize;
     while edge != morph_condition_cuda::OPEN as usize {
         *reads = reads.wrapping_add(1);
-        let symbol_at = suffix_transition_at(
-            edge,
-            morph_condition_cuda::SUFFIX_TRANSITION_SYMBOL,
-        )?;
+        let symbol_at = suffix_transition_at(edge, morph_condition_cuda::SUFFIX_TRANSITION_SYMBOL)?;
         if *transitions.get(symbol_at)? == symbol {
             let target = *transitions.get(suffix_transition_at(
                 edge,
@@ -4414,10 +4440,8 @@ fn suffix_add_transition(
     {
         return false;
     }
-    let Some(head_at) = suffix_state_at(
-        state,
-        morph_condition_cuda::SUFFIX_STATE_TRANSITION_HEAD,
-    ) else {
+    let Some(head_at) = suffix_state_at(state, morph_condition_cuda::SUFFIX_STATE_TRANSITION_HEAD)
+    else {
         return false;
     };
     transitions[base + morph_condition_cuda::SUFFIX_TRANSITION_STATE] = state as u32;
@@ -4430,12 +4454,7 @@ fn suffix_add_transition(
 }
 
 #[inline(always)]
-fn suffix_init_state(
-    states: &mut [u32],
-    state: usize,
-    maximum_length: u32,
-    suffix: u32,
-) -> bool {
+fn suffix_init_state(states: &mut [u32], state: usize, maximum_length: u32, suffix: u32) -> bool {
     let Some(base) = suffix_state_at(state, 0) else {
         return false;
     };
@@ -4446,10 +4465,8 @@ fn suffix_init_state(
     states[base + morph_condition_cuda::SUFFIX_STATE_SUFFIX] = suffix;
     states[base + morph_condition_cuda::SUFFIX_STATE_MULTIPLICITY_LO] = 0;
     states[base + morph_condition_cuda::SUFFIX_STATE_MULTIPLICITY_HI] = 0;
-    states[base + morph_condition_cuda::SUFFIX_STATE_TRANSITION_HEAD] =
-        morph_condition_cuda::OPEN;
-    states[base + morph_condition_cuda::SUFFIX_STATE_DIRECT_SOURCE] =
-        morph_condition_cuda::OPEN;
+    states[base + morph_condition_cuda::SUFFIX_STATE_TRANSITION_HEAD] = morph_condition_cuda::OPEN;
+    states[base + morph_condition_cuda::SUFFIX_STATE_DIRECT_SOURCE] = morph_condition_cuda::OPEN;
     states[base + morph_condition_cuda::SUFFIX_STATE_SPAN_START] = 0;
     states[base + morph_condition_cuda::SUFFIX_STATE_SPAN_LEN] = 0;
     true
@@ -4488,10 +4505,8 @@ pub unsafe extern "ptx-kernel" fn morphological_suffix_condition(
     }
     let control = unsafe { slice::from_raw_parts(control_words, control_words_len) };
     let inputs = control[morph_condition_cuda::SUFFIX_CONTROL_INPUTS] as usize;
-    let material_symbols =
-        control[morph_condition_cuda::SUFFIX_CONTROL_MATERIAL_SYMBOLS] as usize;
-    let state_capacity =
-        control[morph_condition_cuda::SUFFIX_CONTROL_STATE_CAPACITY] as usize;
+    let material_symbols = control[morph_condition_cuda::SUFFIX_CONTROL_MATERIAL_SYMBOLS] as usize;
+    let state_capacity = control[morph_condition_cuda::SUFFIX_CONTROL_STATE_CAPACITY] as usize;
     let transition_capacity =
         control[morph_condition_cuda::SUFFIX_CONTROL_TRANSITION_CAPACITY] as usize;
     let occurrence_capacity =
@@ -4506,16 +4521,17 @@ pub unsafe extern "ptx-kernel" fn morphological_suffix_condition(
         output[morph_condition_cuda::SUFFIX_OUTPUT_STATUS] = morph_condition_cuda::STATUS_INVALID;
         return;
     };
-    let Some(transition_extent) = transition_capacity
-        .checked_mul(morph_condition_cuda::SUFFIX_TRANSITION_WORDS)
+    let Some(transition_extent) =
+        transition_capacity.checked_mul(morph_condition_cuda::SUFFIX_TRANSITION_WORDS)
     else {
         output[morph_condition_cuda::SUFFIX_OUTPUT_STATUS] = morph_condition_cuda::STATUS_INVALID;
         return;
     };
-    let Some(required_scratch) = inputs
-        .checked_add(1)
-        .and_then(|count| state_capacity.checked_mul(6).and_then(|states| count.checked_add(states)))
-    else {
+    let Some(required_scratch) = inputs.checked_add(1).and_then(|count| {
+        state_capacity
+            .checked_mul(6)
+            .and_then(|states| count.checked_add(states))
+    }) else {
         output[morph_condition_cuda::SUFFIX_OUTPUT_STATUS] = morph_condition_cuda::STATUS_INVALID;
         return;
     };
@@ -4536,8 +4552,7 @@ pub unsafe extern "ptx-kernel" fn morphological_suffix_condition(
     }
     let input = unsafe { slice::from_raw_parts(input_words, input_words_len) };
     let states = unsafe { slice::from_raw_parts_mut(state_words, state_words_len) };
-    let transitions =
-        unsafe { slice::from_raw_parts_mut(transition_words, transition_words_len) };
+    let transitions = unsafe { slice::from_raw_parts_mut(transition_words, transition_words_len) };
     let occurrences =
         unsafe { slice::from_raw_parts_mut(occurrence_sources, occurrence_sources_len) };
     let scratch = unsafe { slice::from_raw_parts_mut(scratch_words, scratch_words_len) };
@@ -4559,30 +4574,37 @@ pub unsafe extern "ptx-kernel" fn morphological_suffix_condition(
         let source = input[row + morph_condition_cuda::SUFFIX_INPUT_SOURCE];
         let material = input[row + morph_condition_cuda::SUFFIX_INPUT_MATERIAL];
         if material > 1
-            || (material == 1 && (symbol as usize >= material_symbols || source == morph_condition_cuda::OPEN))
-            || (material == 0 && ((symbol as usize) < material_symbols || source != morph_condition_cuda::OPEN))
+            || (material == 1
+                && (symbol as usize >= material_symbols || source == morph_condition_cuda::OPEN))
+            || (material == 0
+                && ((symbol as usize) < material_symbols || source != morph_condition_cuda::OPEN))
             || state_count >= state_capacity
         {
-            output[morph_condition_cuda::SUFFIX_OUTPUT_STATUS] = morph_condition_cuda::STATUS_INVALID;
+            output[morph_condition_cuda::SUFFIX_OUTPUT_STATUS] =
+                morph_condition_cuda::STATUS_INVALID;
             return;
         }
         let current = state_count;
         state_count += 1;
-        let Some(current_length) = states[suffix_state_at(
-            last,
-            morph_condition_cuda::SUFFIX_STATE_MAXIMUM_LENGTH,
-        ).unwrap_or(usize::MAX)].checked_add(1) else {
-            output[morph_condition_cuda::SUFFIX_OUTPUT_STATUS] = morph_condition_cuda::STATUS_INVALID;
+        let Some(current_length) =
+            states[suffix_state_at(last, morph_condition_cuda::SUFFIX_STATE_MAXIMUM_LENGTH)
+                .unwrap_or(usize::MAX)]
+            .checked_add(1)
+        else {
+            output[morph_condition_cuda::SUFFIX_OUTPUT_STATUS] =
+                morph_condition_cuda::STATUS_INVALID;
             return;
         };
         if !suffix_init_state(states, current, current_length, morph_condition_cuda::OPEN) {
-            output[morph_condition_cuda::SUFFIX_OUTPUT_STATUS] = morph_condition_cuda::STATUS_INVALID;
+            output[morph_condition_cuda::SUFFIX_OUTPUT_STATUS] =
+                morph_condition_cuda::STATUS_INVALID;
             return;
         }
         let mut cursor = last as u32;
         loop {
             if cursor == morph_condition_cuda::OPEN {
-                states[suffix_state_at(current, morph_condition_cuda::SUFFIX_STATE_SUFFIX).unwrap()] = 0;
+                states[suffix_state_at(current, morph_condition_cuda::SUFFIX_STATE_SUFFIX)
+                    .unwrap()] = 0;
                 break;
             }
             let state = cursor as usize;
@@ -4592,16 +4614,21 @@ pub unsafe extern "ptx-kernel" fn morphological_suffix_condition(
                 let next_length = states[suffix_state_at(
                     state,
                     morph_condition_cuda::SUFFIX_STATE_MAXIMUM_LENGTH,
-                ).unwrap()].wrapping_add(1);
+                )
+                .unwrap()]
+                .wrapping_add(1);
                 let target_length = states[suffix_state_at(
                     target as usize,
                     morph_condition_cuda::SUFFIX_STATE_MAXIMUM_LENGTH,
-                ).unwrap()];
+                )
+                .unwrap()];
                 if next_length == target_length {
-                    states[suffix_state_at(current, morph_condition_cuda::SUFFIX_STATE_SUFFIX).unwrap()] = target;
+                    states[suffix_state_at(current, morph_condition_cuda::SUFFIX_STATE_SUFFIX)
+                        .unwrap()] = target;
                 } else {
                     if state_count >= state_capacity {
-                        output[morph_condition_cuda::SUFFIX_OUTPUT_STATUS] = morph_condition_cuda::STATUS_INVALID;
+                        output[morph_condition_cuda::SUFFIX_OUTPUT_STATUS] =
+                            morph_condition_cuda::STATUS_INVALID;
                         return;
                     }
                     let clone = state_count;
@@ -4610,25 +4637,30 @@ pub unsafe extern "ptx-kernel" fn morphological_suffix_condition(
                     let target_suffix = states[suffix_state_at(
                         target as usize,
                         morph_condition_cuda::SUFFIX_STATE_SUFFIX,
-                    ).unwrap()];
+                    )
+                    .unwrap()];
                     if !suffix_init_state(states, clone, next_length, target_suffix) {
-                        output[morph_condition_cuda::SUFFIX_OUTPUT_STATUS] = morph_condition_cuda::STATUS_INVALID;
+                        output[morph_condition_cuda::SUFFIX_OUTPUT_STATUS] =
+                            morph_condition_cuda::STATUS_INVALID;
                         return;
                     }
                     let mut edge = states[suffix_state_at(
                         target as usize,
                         morph_condition_cuda::SUFFIX_STATE_TRANSITION_HEAD,
-                    ).unwrap()];
+                    )
+                    .unwrap()];
                     while edge != morph_condition_cuda::OPEN {
                         let edge_at = edge as usize;
                         let edge_symbol = transitions[suffix_transition_at(
                             edge_at,
                             morph_condition_cuda::SUFFIX_TRANSITION_SYMBOL,
-                        ).unwrap()];
+                        )
+                        .unwrap()];
                         let edge_target = transitions[suffix_transition_at(
                             edge_at,
                             morph_condition_cuda::SUFFIX_TRANSITION_TARGET,
-                        ).unwrap()];
+                        )
+                        .unwrap()];
                         if !suffix_add_transition(
                             states,
                             transitions,
@@ -4637,13 +4669,15 @@ pub unsafe extern "ptx-kernel" fn morphological_suffix_condition(
                             edge_symbol,
                             edge_target,
                         ) {
-                            output[morph_condition_cuda::SUFFIX_OUTPUT_STATUS] = morph_condition_cuda::STATUS_INVALID;
+                            output[morph_condition_cuda::SUFFIX_OUTPUT_STATUS] =
+                                morph_condition_cuda::STATUS_INVALID;
                             return;
                         }
                         edge = transitions[suffix_transition_at(
                             edge_at,
                             morph_condition_cuda::SUFFIX_TRANSITION_NEXT,
-                        ).unwrap()];
+                        )
+                        .unwrap()];
                     }
                     let mut rewrite = cursor;
                     while rewrite != morph_condition_cuda::OPEN {
@@ -4663,14 +4697,21 @@ pub unsafe extern "ptx-kernel" fn morphological_suffix_condition(
                         transitions[suffix_transition_at(
                             edge,
                             morph_condition_cuda::SUFFIX_TRANSITION_TARGET,
-                        ).unwrap()] = clone as u32;
+                        )
+                        .unwrap()] = clone as u32;
                         rewrite = states[suffix_state_at(
                             rewrite as usize,
                             morph_condition_cuda::SUFFIX_STATE_SUFFIX,
-                        ).unwrap()];
+                        )
+                        .unwrap()];
                     }
-                    states[suffix_state_at(target as usize, morph_condition_cuda::SUFFIX_STATE_SUFFIX).unwrap()] = clone as u32;
-                    states[suffix_state_at(current, morph_condition_cuda::SUFFIX_STATE_SUFFIX).unwrap()] = clone as u32;
+                    states[suffix_state_at(
+                        target as usize,
+                        morph_condition_cuda::SUFFIX_STATE_SUFFIX,
+                    )
+                    .unwrap()] = clone as u32;
+                    states[suffix_state_at(current, morph_condition_cuda::SUFFIX_STATE_SUFFIX)
+                        .unwrap()] = clone as u32;
                 }
                 break;
             }
@@ -4682,19 +4723,20 @@ pub unsafe extern "ptx-kernel" fn morphological_suffix_condition(
                 symbol,
                 current as u32,
             ) {
-                output[morph_condition_cuda::SUFFIX_OUTPUT_STATUS] = morph_condition_cuda::STATUS_INVALID;
+                output[morph_condition_cuda::SUFFIX_OUTPUT_STATUS] =
+                    morph_condition_cuda::STATUS_INVALID;
                 return;
             }
             suffix_crosses = suffix_crosses.wrapping_add(1);
-            cursor = states[suffix_state_at(
-                state,
-                morph_condition_cuda::SUFFIX_STATE_SUFFIX,
-            ).unwrap()];
+            cursor =
+                states[suffix_state_at(state, morph_condition_cuda::SUFFIX_STATE_SUFFIX).unwrap()];
         }
         last = current;
         if material == 1 {
-            states[suffix_state_at(current, morph_condition_cuda::SUFFIX_STATE_DIRECT_SOURCE).unwrap()] = source;
-            states[suffix_state_at(current, morph_condition_cuda::SUFFIX_STATE_MULTIPLICITY_LO).unwrap()] = 1;
+            states[suffix_state_at(current, morph_condition_cuda::SUFFIX_STATE_DIRECT_SOURCE)
+                .unwrap()] = source;
+            states[suffix_state_at(current, morph_condition_cuda::SUFFIX_STATE_MULTIPLICITY_LO)
+                .unwrap()] = 1;
             material_occurrences += 1;
         }
         input_at += 1;
@@ -4716,7 +4758,9 @@ pub unsafe extern "ptx-kernel" fn morphological_suffix_condition(
     }
     at = 0;
     while at < state_count {
-        let length = states[suffix_state_at(at, morph_condition_cuda::SUFFIX_STATE_MAXIMUM_LENGTH).unwrap()] as usize;
+        let length = states
+            [suffix_state_at(at, morph_condition_cuda::SUFFIX_STATE_MAXIMUM_LENGTH).unwrap()]
+            as usize;
         scratch[length] = scratch[length].wrapping_add(1);
         at += 1;
     }
@@ -4728,7 +4772,9 @@ pub unsafe extern "ptx-kernel" fn morphological_suffix_condition(
     at = state_count;
     while at > 0 {
         at -= 1;
-        let length = states[suffix_state_at(at, morph_condition_cuda::SUFFIX_STATE_MAXIMUM_LENGTH).unwrap()] as usize;
+        let length = states
+            [suffix_state_at(at, morph_condition_cuda::SUFFIX_STATE_MAXIMUM_LENGTH).unwrap()]
+            as usize;
         scratch[length] -= 1;
         let slot = scratch[length] as usize;
         scratch[order_base + slot] = at as u32;
@@ -4737,20 +4783,34 @@ pub unsafe extern "ptx-kernel" fn morphological_suffix_condition(
     while at > 1 {
         at -= 1;
         let state = scratch[order_base + at] as usize;
-        let suffix = states[suffix_state_at(state, morph_condition_cuda::SUFFIX_STATE_SUFFIX).unwrap()] as usize;
+        let suffix = states
+            [suffix_state_at(state, morph_condition_cuda::SUFFIX_STATE_SUFFIX).unwrap()]
+            as usize;
         if suffix >= state_count {
-            output[morph_condition_cuda::SUFFIX_OUTPUT_STATUS] = morph_condition_cuda::STATUS_INVALID;
+            output[morph_condition_cuda::SUFFIX_OUTPUT_STATUS] =
+                morph_condition_cuda::STATUS_INVALID;
             return;
         }
         let state_base = suffix_state_at(state, 0).unwrap();
         let suffix_base = suffix_state_at(suffix, 0).unwrap();
-        let carried = condition_u64(states, state_base + morph_condition_cuda::SUFFIX_STATE_MULTIPLICITY_LO);
-        let standing = condition_u64(states, suffix_base + morph_condition_cuda::SUFFIX_STATE_MULTIPLICITY_LO);
+        let carried = condition_u64(
+            states,
+            state_base + morph_condition_cuda::SUFFIX_STATE_MULTIPLICITY_LO,
+        );
+        let standing = condition_u64(
+            states,
+            suffix_base + morph_condition_cuda::SUFFIX_STATE_MULTIPLICITY_LO,
+        );
         let Some(total) = standing.checked_add(carried) else {
-            output[morph_condition_cuda::SUFFIX_OUTPUT_STATUS] = morph_condition_cuda::STATUS_INVALID;
+            output[morph_condition_cuda::SUFFIX_OUTPUT_STATUS] =
+                morph_condition_cuda::STATUS_INVALID;
             return;
         };
-        condition_put_u64(states, suffix_base + morph_condition_cuda::SUFFIX_STATE_MULTIPLICITY_LO, total);
+        condition_put_u64(
+            states,
+            suffix_base + morph_condition_cuda::SUFFIX_STATE_MULTIPLICITY_LO,
+            total,
+        );
     }
 
     // The suffix-link tree's exact descendant order and source spans.
@@ -4762,9 +4822,11 @@ pub unsafe extern "ptx-kernel" fn morphological_suffix_condition(
     }
     at = 1;
     while at < state_count {
-        let parent = states[suffix_state_at(at, morph_condition_cuda::SUFFIX_STATE_SUFFIX).unwrap()] as usize;
+        let parent = states[suffix_state_at(at, morph_condition_cuda::SUFFIX_STATE_SUFFIX).unwrap()]
+            as usize;
         if parent >= state_count || parent == at {
-            output[morph_condition_cuda::SUFFIX_OUTPUT_STATUS] = morph_condition_cuda::STATUS_INVALID;
+            output[morph_condition_cuda::SUFFIX_OUTPUT_STATUS] =
+                morph_condition_cuda::STATUS_INVALID;
             return;
         }
         scratch[next_base + at] = scratch[first_base + parent];
@@ -4782,14 +4844,14 @@ pub unsafe extern "ptx-kernel" fn morphological_suffix_condition(
         if child != morph_condition_cuda::OPEN {
             let child_at = child as usize;
             scratch[stack_child_base + slot] = scratch[next_base + child_at];
-            let direct = states[suffix_state_at(
-                child_at,
-                morph_condition_cuda::SUFFIX_STATE_DIRECT_SOURCE,
-            ).unwrap()];
+            let direct =
+                states[suffix_state_at(child_at, morph_condition_cuda::SUFFIX_STATE_DIRECT_SOURCE)
+                    .unwrap()];
             let child_start = occurrence_count;
             if direct != morph_condition_cuda::OPEN {
                 if occurrence_count >= occurrence_capacity {
-                    output[morph_condition_cuda::SUFFIX_OUTPUT_STATUS] = morph_condition_cuda::STATUS_INVALID;
+                    output[morph_condition_cuda::SUFFIX_OUTPUT_STATUS] =
+                        morph_condition_cuda::STATUS_INVALID;
                     return;
                 }
                 occurrences[occurrence_count] = direct;
@@ -4802,8 +4864,11 @@ pub unsafe extern "ptx-kernel" fn morphological_suffix_condition(
         } else {
             let state = scratch[stack_state_base + slot] as usize;
             let start = scratch[stack_start_base + slot];
-            states[suffix_state_at(state, morph_condition_cuda::SUFFIX_STATE_SPAN_START).unwrap()] = start;
-            states[suffix_state_at(state, morph_condition_cuda::SUFFIX_STATE_SPAN_LEN).unwrap()] = occurrence_count as u32 - start;
+            states
+                [suffix_state_at(state, morph_condition_cuda::SUFFIX_STATE_SPAN_START).unwrap()] =
+                start;
+            states[suffix_state_at(state, morph_condition_cuda::SUFFIX_STATE_SPAN_LEN).unwrap()] =
+                occurrence_count as u32 - start;
             depth -= 1;
         }
     }
@@ -4814,7 +4879,11 @@ pub unsafe extern "ptx-kernel" fn morphological_suffix_condition(
     let mut material_transitions = 0u32;
     at = 0;
     while at < transition_count {
-        if (transitions[suffix_transition_at(at, morph_condition_cuda::SUFFIX_TRANSITION_SYMBOL).unwrap()] as usize) < material_symbols {
+        if (transitions
+            [suffix_transition_at(at, morph_condition_cuda::SUFFIX_TRANSITION_SYMBOL).unwrap()]
+            as usize)
+            < material_symbols
+        {
             material_transitions = material_transitions.wrapping_add(1);
         }
         at += 1;
@@ -4825,14 +4894,23 @@ pub unsafe extern "ptx-kernel" fn morphological_suffix_condition(
     output[morph_condition_cuda::SUFFIX_OUTPUT_MATERIAL_TRANSITIONS] = material_transitions;
     output[morph_condition_cuda::SUFFIX_OUTPUT_EXTENSIONS] = inputs as u32;
     output[morph_condition_cuda::SUFFIX_OUTPUT_CLONES] = clones;
-    condition_put_u64(output, morph_condition_cuda::SUFFIX_OUTPUT_SUFFIX_CROSSES_LO, suffix_crosses);
-    condition_put_u64(output, morph_condition_cuda::SUFFIX_OUTPUT_TRANSITION_READS_LO, transition_reads);
+    condition_put_u64(
+        output,
+        morph_condition_cuda::SUFFIX_OUTPUT_SUFFIX_CROSSES_LO,
+        suffix_crosses,
+    );
+    condition_put_u64(
+        output,
+        morph_condition_cuda::SUFFIX_OUTPUT_TRANSITION_READS_LO,
+        transition_reads,
+    );
     output[morph_condition_cuda::SUFFIX_OUTPUT_STATUS] = morph_condition_cuda::STATUS_COMPLETE;
 }
 
 #[inline(always)]
 fn prefix_node_at(node: usize, field: usize) -> Option<usize> {
-    node.checked_mul(morph_condition_cuda::PREFIX_NODE_WORDS)?.checked_add(field)
+    node.checked_mul(morph_condition_cuda::PREFIX_NODE_WORDS)?
+        .checked_add(field)
 }
 
 /// Found the boundary-anchored question-prefix incidence on the resident card.
@@ -4870,7 +4948,8 @@ pub unsafe extern "ptx-kernel" fn morphological_prefix_condition(
         || path_words_len != paths.saturating_mul(morph_condition_cuda::PREFIX_PATH_WORDS)
         || token_words_len != tokens
         || node_words_len != node_capacity.saturating_mul(morph_condition_cuda::PREFIX_NODE_WORDS)
-        || support_words_len != support_capacity.saturating_mul(morph_condition_cuda::PREFIX_SUPPORT_WORDS)
+        || support_words_len
+            != support_capacity.saturating_mul(morph_condition_cuda::PREFIX_SUPPORT_WORDS)
         || node_capacity == 0
     {
         output[morph_condition_cuda::PREFIX_OUTPUT_STATUS] = morph_condition_cuda::STATUS_INVALID;
@@ -4905,8 +4984,10 @@ pub unsafe extern "ptx-kernel" fn morphological_prefix_condition(
         let start = path_rows[row + morph_condition_cuda::PREFIX_PATH_START] as usize;
         let len = path_rows[row + morph_condition_cuda::PREFIX_PATH_LEN] as usize;
         let source = path_rows[row + morph_condition_cuda::PREFIX_PATH_SOURCE];
-        if len < 2 || start > tokens || len > tokens - start || source == morph_condition_cuda::OPEN {
-            output[morph_condition_cuda::PREFIX_OUTPUT_STATUS] = morph_condition_cuda::STATUS_INVALID;
+        if len < 2 || start > tokens || len > tokens - start || source == morph_condition_cuda::OPEN
+        {
+            output[morph_condition_cuda::PREFIX_OUTPUT_STATUS] =
+                morph_condition_cuda::STATUS_INVALID;
             return;
         }
         let mut node = 0usize;
@@ -4914,19 +4995,28 @@ pub unsafe extern "ptx-kernel" fn morphological_prefix_condition(
         while depth + 1 < len {
             let token = token_rows[start + depth];
             let continuation = token_rows[start + depth + 1];
-            let mut child = nodes[prefix_node_at(node, morph_condition_cuda::PREFIX_NODE_FIRST_CHILD).unwrap()];
+            let mut child =
+                nodes[prefix_node_at(node, morph_condition_cuda::PREFIX_NODE_FIRST_CHILD).unwrap()];
             let mut found = morph_condition_cuda::OPEN;
             while child != morph_condition_cuda::OPEN {
                 edge_reads = edge_reads.wrapping_add(1);
-                if nodes[prefix_node_at(child as usize, morph_condition_cuda::PREFIX_NODE_TOKEN).unwrap()] == token {
+                if nodes[prefix_node_at(child as usize, morph_condition_cuda::PREFIX_NODE_TOKEN)
+                    .unwrap()]
+                    == token
+                {
                     found = child;
                     break;
                 }
-                child = nodes[prefix_node_at(child as usize, morph_condition_cuda::PREFIX_NODE_NEXT_SIBLING).unwrap()];
+                child = nodes[prefix_node_at(
+                    child as usize,
+                    morph_condition_cuda::PREFIX_NODE_NEXT_SIBLING,
+                )
+                .unwrap()];
             }
             if found == morph_condition_cuda::OPEN {
                 if node_count >= node_capacity {
-                    output[morph_condition_cuda::PREFIX_OUTPUT_STATUS] = morph_condition_cuda::STATUS_INVALID;
+                    output[morph_condition_cuda::PREFIX_OUTPUT_STATUS] =
+                        morph_condition_cuda::STATUS_INVALID;
                     return;
                 }
                 let new_node = node_count;
@@ -4934,26 +5024,34 @@ pub unsafe extern "ptx-kernel" fn morphological_prefix_condition(
                 let base = prefix_node_at(new_node, 0).unwrap();
                 nodes[base + morph_condition_cuda::PREFIX_NODE_PARENT] = node as u32;
                 nodes[base + morph_condition_cuda::PREFIX_NODE_TOKEN] = token;
-                nodes[base + morph_condition_cuda::PREFIX_NODE_FIRST_CHILD] = morph_condition_cuda::OPEN;
-                nodes[base + morph_condition_cuda::PREFIX_NODE_NEXT_SIBLING] = nodes[prefix_node_at(node, morph_condition_cuda::PREFIX_NODE_FIRST_CHILD).unwrap()];
+                nodes[base + morph_condition_cuda::PREFIX_NODE_FIRST_CHILD] =
+                    morph_condition_cuda::OPEN;
+                nodes[base + morph_condition_cuda::PREFIX_NODE_NEXT_SIBLING] = nodes
+                    [prefix_node_at(node, morph_condition_cuda::PREFIX_NODE_FIRST_CHILD).unwrap()];
                 nodes[base + morph_condition_cuda::PREFIX_NODE_OCCURRENCES] = 0;
-                nodes[base + morph_condition_cuda::PREFIX_NODE_FIRST_CONTINUATION] = morph_condition_cuda::OPEN;
+                nodes[base + morph_condition_cuda::PREFIX_NODE_FIRST_CONTINUATION] =
+                    morph_condition_cuda::OPEN;
                 nodes[base + morph_condition_cuda::PREFIX_NODE_DIVERGENT] = 0;
                 nodes[base + morph_condition_cuda::PREFIX_NODE_ACTIVE] = 0;
-                nodes[prefix_node_at(node, morph_condition_cuda::PREFIX_NODE_FIRST_CHILD).unwrap()] = new_node as u32;
+                nodes[prefix_node_at(node, morph_condition_cuda::PREFIX_NODE_FIRST_CHILD)
+                    .unwrap()] = new_node as u32;
                 found = new_node as u32;
             }
             node = found as usize;
-            let occurrences_at = prefix_node_at(node, morph_condition_cuda::PREFIX_NODE_OCCURRENCES).unwrap();
+            let occurrences_at =
+                prefix_node_at(node, morph_condition_cuda::PREFIX_NODE_OCCURRENCES).unwrap();
             nodes[occurrences_at] = nodes[occurrences_at].wrapping_add(1);
-            let continuation_at = prefix_node_at(node, morph_condition_cuda::PREFIX_NODE_FIRST_CONTINUATION).unwrap();
+            let continuation_at =
+                prefix_node_at(node, morph_condition_cuda::PREFIX_NODE_FIRST_CONTINUATION).unwrap();
             if nodes[continuation_at] == morph_condition_cuda::OPEN {
                 nodes[continuation_at] = continuation;
             } else if nodes[continuation_at] != continuation {
-                nodes[prefix_node_at(node, morph_condition_cuda::PREFIX_NODE_DIVERGENT).unwrap()] = 1;
+                nodes[prefix_node_at(node, morph_condition_cuda::PREFIX_NODE_DIVERGENT).unwrap()] =
+                    1;
             }
             if support_count >= support_capacity {
-                output[morph_condition_cuda::PREFIX_OUTPUT_STATUS] = morph_condition_cuda::STATUS_INVALID;
+                output[morph_condition_cuda::PREFIX_OUTPUT_STATUS] =
+                    morph_condition_cuda::STATUS_INVALID;
                 return;
             }
             let support_at = support_count * morph_condition_cuda::PREFIX_SUPPORT_WORDS;
@@ -4969,15 +5067,22 @@ pub unsafe extern "ptx-kernel" fn morphological_prefix_condition(
     let mut returned_tokens = 0u64;
     let mut node = 1usize;
     while node < node_count {
-        let active = nodes[prefix_node_at(node, morph_condition_cuda::PREFIX_NODE_OCCURRENCES).unwrap()] >= 2
-            && nodes[prefix_node_at(node, morph_condition_cuda::PREFIX_NODE_DIVERGENT).unwrap()] == 1;
+        let active = nodes
+            [prefix_node_at(node, morph_condition_cuda::PREFIX_NODE_OCCURRENCES).unwrap()]
+            >= 2
+            && nodes[prefix_node_at(node, morph_condition_cuda::PREFIX_NODE_DIVERGENT).unwrap()]
+                == 1;
         if active {
             nodes[prefix_node_at(node, morph_condition_cuda::PREFIX_NODE_ACTIVE).unwrap()] = 1;
             let mut depth = 0u64;
             let mut cursor = node as u32;
             while cursor != 0 {
                 depth = depth.wrapping_add(1);
-                cursor = nodes[prefix_node_at(cursor as usize, morph_condition_cuda::PREFIX_NODE_PARENT).unwrap()];
+                cursor = nodes[prefix_node_at(
+                    cursor as usize,
+                    morph_condition_cuda::PREFIX_NODE_PARENT,
+                )
+                .unwrap()];
             }
             returned_tokens = returned_tokens.wrapping_add(depth);
         }
@@ -4985,11 +5090,227 @@ pub unsafe extern "ptx-kernel" fn morphological_prefix_condition(
     }
     output[morph_condition_cuda::PREFIX_OUTPUT_NODE_COUNT] = node_count as u32;
     output[morph_condition_cuda::PREFIX_OUTPUT_SUPPORT_COUNT] = support_count as u32;
-    condition_put_u64(output, morph_condition_cuda::PREFIX_OUTPUT_CROSSINGS_LO, crossings);
-    condition_put_u64(output, morph_condition_cuda::PREFIX_OUTPUT_LEGACY_CLONES_LO, legacy_clones);
-    condition_put_u64(output, morph_condition_cuda::PREFIX_OUTPUT_RETURNED_TOKENS_LO, returned_tokens);
-    condition_put_u64(output, morph_condition_cuda::PREFIX_OUTPUT_EDGE_READS_LO, edge_reads);
+    condition_put_u64(
+        output,
+        morph_condition_cuda::PREFIX_OUTPUT_CROSSINGS_LO,
+        crossings,
+    );
+    condition_put_u64(
+        output,
+        morph_condition_cuda::PREFIX_OUTPUT_LEGACY_CLONES_LO,
+        legacy_clones,
+    );
+    condition_put_u64(
+        output,
+        morph_condition_cuda::PREFIX_OUTPUT_RETURNED_TOKENS_LO,
+        returned_tokens,
+    );
+    condition_put_u64(
+        output,
+        morph_condition_cuda::PREFIX_OUTPUT_EDGE_READS_LO,
+        edge_reads,
+    );
     output[morph_condition_cuda::PREFIX_OUTPUT_STATUS] = morph_condition_cuda::STATUS_COMPLETE;
+}
+
+/// Found one exact local bi-affine law from a complete rectangular intervention face.
+///
+/// One lane owns one founding row. The card returns the Newton coefficients and the lattice chart;
+/// no section name, operation tag, or later query crosses this entry.
+#[no_mangle]
+pub unsafe extern "ptx-kernel" fn recurrent_law_found(
+    input_words: *const u32,
+    input_words_len: usize,
+    output_words: *mut u32,
+    output_words_len: usize,
+    x_stride: u32,
+) {
+    let (x, y) = unsafe { global_xy() };
+    let lane = x as usize + y as usize * x_stride as usize;
+    if input_words_len % recurrent_law_cuda::FOUND_INPUT_WORDS != 0
+        || output_words_len % recurrent_law_cuda::FOUND_OUTPUT_WORDS != 0
+    {
+        return;
+    }
+    let rows = input_words_len / recurrent_law_cuda::FOUND_INPUT_WORDS;
+    if output_words_len / recurrent_law_cuda::FOUND_OUTPUT_WORDS != rows || lane >= rows {
+        return;
+    }
+    let input = unsafe { slice::from_raw_parts(input_words, input_words_len) };
+    let output = unsafe { slice::from_raw_parts_mut(output_words, output_words_len) };
+    let input_at = lane * recurrent_law_cuda::FOUND_INPUT_WORDS;
+    let output_at = lane * recurrent_law_cuda::FOUND_OUTPUT_WORDS;
+    output[output_at + recurrent_law_cuda::FOUND_OUTPUT_VERSION] =
+        recurrent_law_cuda::LAYOUT_VERSION;
+    let mut values = [0i64; recurrent_law_cuda::FOUND_VALUES];
+    let mut value = 0usize;
+    while value < values.len() {
+        let Some(decoded) =
+            recurrent_read_i64(input, input_at + value * recurrent_law_cuda::I64_WORDS)
+        else {
+            output[output_at + recurrent_law_cuda::FOUND_OUTPUT_STATUS] =
+                recurrent_law_cuda::STATUS_INVALID;
+            return;
+        };
+        values[value] = decoded;
+        value += 1;
+    }
+    let [x0, x1, y0, y1, f00, f10, f01, f11] = values;
+    let Some(dx) = x1.checked_sub(x0) else {
+        output[output_at + recurrent_law_cuda::FOUND_OUTPUT_STATUS] =
+            recurrent_law_cuda::STATUS_OVERFLOW;
+        return;
+    };
+    let Some(dy) = y1.checked_sub(y0) else {
+        output[output_at + recurrent_law_cuda::FOUND_OUTPUT_STATUS] =
+            recurrent_law_cuda::STATUS_OVERFLOW;
+        return;
+    };
+    if dx == 0 || dy == 0 {
+        output[output_at + recurrent_law_cuda::FOUND_OUTPUT_STATUS] =
+            recurrent_law_cuda::STATUS_INVALID;
+        return;
+    }
+    let Some(cx) = f10.checked_sub(f00) else {
+        output[output_at + recurrent_law_cuda::FOUND_OUTPUT_STATUS] =
+            recurrent_law_cuda::STATUS_OVERFLOW;
+        return;
+    };
+    let Some(cy) = f01.checked_sub(f00) else {
+        output[output_at + recurrent_law_cuda::FOUND_OUTPUT_STATUS] =
+            recurrent_law_cuda::STATUS_OVERFLOW;
+        return;
+    };
+    let Some(cxy) = f11
+        .checked_sub(f10)
+        .and_then(|v| v.checked_sub(f01))
+        .and_then(|v| v.checked_add(f00))
+    else {
+        output[output_at + recurrent_law_cuda::FOUND_OUTPUT_STATUS] =
+            recurrent_law_cuda::STATUS_OVERFLOW;
+        return;
+    };
+    let law = [x0, y0, dx, dy, f00, cx, cy, cxy];
+    let mut coordinate = 0usize;
+    while coordinate < law.len() {
+        if !recurrent_write_i64(
+            output,
+            output_at
+                + recurrent_law_cuda::FOUND_OUTPUT_LAW_AT
+                + coordinate * recurrent_law_cuda::I64_WORDS,
+            law[coordinate],
+        ) {
+            output[output_at + recurrent_law_cuda::FOUND_OUTPUT_STATUS] =
+                recurrent_law_cuda::STATUS_INVALID;
+            return;
+        }
+        coordinate += 1;
+    }
+    output[output_at + recurrent_law_cuda::FOUND_OUTPUT_STATUS] =
+        recurrent_law_cuda::STATUS_COMPLETE;
+}
+
+/// Evaluate a remounted exact local law at a later lattice coordinate.
+///
+/// One lane owns one query. Every multiplication and addition is checked; an off-lattice query or
+/// finite-carrier overflow remains a returned obstruction.
+#[no_mangle]
+pub unsafe extern "ptx-kernel" fn recurrent_law_evaluate(
+    input_words: *const u32,
+    input_words_len: usize,
+    output_words: *mut u32,
+    output_words_len: usize,
+    x_stride: u32,
+) {
+    let (x, y) = unsafe { global_xy() };
+    let lane = x as usize + y as usize * x_stride as usize;
+    if input_words_len % recurrent_law_cuda::EVALUATE_INPUT_WORDS != 0
+        || output_words_len % recurrent_law_cuda::EVALUATE_OUTPUT_WORDS != 0
+    {
+        return;
+    }
+    let rows = input_words_len / recurrent_law_cuda::EVALUATE_INPUT_WORDS;
+    if output_words_len / recurrent_law_cuda::EVALUATE_OUTPUT_WORDS != rows || lane >= rows {
+        return;
+    }
+    let input = unsafe { slice::from_raw_parts(input_words, input_words_len) };
+    let output = unsafe { slice::from_raw_parts_mut(output_words, output_words_len) };
+    let input_at = lane * recurrent_law_cuda::EVALUATE_INPUT_WORDS;
+    let output_at = lane * recurrent_law_cuda::EVALUATE_OUTPUT_WORDS;
+    output[output_at + recurrent_law_cuda::EVALUATE_OUTPUT_VERSION] =
+        recurrent_law_cuda::LAYOUT_VERSION;
+    let mut values = [0i64; recurrent_law_cuda::LAW_VALUES + 2];
+    let mut coordinate = 0usize;
+    while coordinate < values.len() {
+        let Some(decoded) =
+            recurrent_read_i64(input, input_at + coordinate * recurrent_law_cuda::I64_WORDS)
+        else {
+            output[output_at + recurrent_law_cuda::EVALUATE_OUTPUT_STATUS] =
+                recurrent_law_cuda::STATUS_INVALID;
+            return;
+        };
+        values[coordinate] = decoded;
+        coordinate += 1;
+    }
+    let [x0, y0, dx, dy, c0, cx, cy, cxy, query_x, query_y] = values;
+    if dx == 0 || dy == 0 {
+        output[output_at + recurrent_law_cuda::EVALUATE_OUTPUT_STATUS] =
+            recurrent_law_cuda::STATUS_INVALID;
+        return;
+    }
+    let Some(relative_x) = query_x.checked_sub(x0) else {
+        output[output_at + recurrent_law_cuda::EVALUATE_OUTPUT_STATUS] =
+            recurrent_law_cuda::STATUS_OVERFLOW;
+        return;
+    };
+    let Some(relative_y) = query_y.checked_sub(y0) else {
+        output[output_at + recurrent_law_cuda::EVALUATE_OUTPUT_STATUS] =
+            recurrent_law_cuda::STATUS_OVERFLOW;
+        return;
+    };
+    if relative_x.checked_rem(dx) != Some(0) || relative_y.checked_rem(dy) != Some(0) {
+        output[output_at + recurrent_law_cuda::EVALUATE_OUTPUT_STATUS] =
+            recurrent_law_cuda::STATUS_OUTSIDE_LATTICE;
+        return;
+    }
+    let Some(u) = relative_x.checked_div(dx) else {
+        output[output_at + recurrent_law_cuda::EVALUATE_OUTPUT_STATUS] =
+            recurrent_law_cuda::STATUS_OVERFLOW;
+        return;
+    };
+    let Some(v) = relative_y.checked_div(dy) else {
+        output[output_at + recurrent_law_cuda::EVALUATE_OUTPUT_STATUS] =
+            recurrent_law_cuda::STATUS_OVERFLOW;
+        return;
+    };
+    let Some(value) = u
+        .checked_mul(cx)
+        .and_then(|x_term| {
+            v.checked_mul(cy)
+                .and_then(|y_term| x_term.checked_add(y_term))
+        })
+        .and_then(|linear| {
+            u.checked_mul(v)
+                .and_then(|uv| uv.checked_mul(cxy))
+                .and_then(|mixed| linear.checked_add(mixed))
+        })
+        .and_then(|delta| c0.checked_add(delta))
+    else {
+        output[output_at + recurrent_law_cuda::EVALUATE_OUTPUT_STATUS] =
+            recurrent_law_cuda::STATUS_OVERFLOW;
+        return;
+    };
+    if !recurrent_write_i64(
+        output,
+        output_at + recurrent_law_cuda::EVALUATE_OUTPUT_VALUE_AT,
+        value,
+    ) {
+        output[output_at + recurrent_law_cuda::EVALUATE_OUTPUT_STATUS] =
+            recurrent_law_cuda::STATUS_INVALID;
+        return;
+    }
+    output[output_at + recurrent_law_cuda::EVALUATE_OUTPUT_STATUS] =
+        recurrent_law_cuda::STATUS_COMPLETE;
 }
 
 /// **The card's own decision: which deposit, if any, carries this exact key.**
@@ -5107,7 +5428,8 @@ pub unsafe extern "ptx-kernel" fn morphological_conduct_group(
         while deposit < shape.deposits {
             let at = deposit * shape.deposit_row_words;
             if deposits[at + morph_cuda::DEPOSIT_ACTIVE] > 1 {
-                output[morph_cuda::OUTPUT_REFUSAL_CAUSE] = morph_cuda::REFUSAL_DEPOSIT_ACTIVITY_WORD;
+                output[morph_cuda::OUTPUT_REFUSAL_CAUSE] =
+                    morph_cuda::REFUSAL_DEPOSIT_ACTIVITY_WORD;
                 output[morph_cuda::OUTPUT_REFUSAL_FOUND] = deposit as u32;
                 output[morph_cuda::OUTPUT_STATUS] = morph_cuda::STATUS_INVALID;
                 return;

@@ -197,6 +197,18 @@ ABI	soma/abi/src/register.rs	LANE_RAW_COUNT	1	wire-format discriminant or event 
 ABI	soma/abi/src/register.rs	STATUS_KIND	0	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
 ABI	soma/abi/src/register.rs	STATUS_NEW_AXIS	2	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
 ABI	soma/abi/src/register.rs	STATUS_OLD_AXIS	1	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
+ABI	soma/abi/src/recurrent_law_cuda.rs	EVALUATE_COORDINATES	2	wire-format coordinate population at the declared GPU boundary; `soma/abi` is the ABI and the integer names the two axes carried by this exact bi-affine law family
+ABI	soma/abi/src/recurrent_law_cuda.rs	EVALUATE_OUTPUT_STATUS	0	wire-format position at the declared GPU boundary; `soma/abi` is the ABI
+ABI	soma/abi/src/recurrent_law_cuda.rs	EVALUATE_OUTPUT_VALUE_AT	2	wire-format position at the declared GPU boundary; `soma/abi` is the ABI
+ABI	soma/abi/src/recurrent_law_cuda.rs	FOUND_OUTPUT_LAW_AT	2	wire-format position at the declared GPU boundary; `soma/abi` is the ABI
+ABI	soma/abi/src/recurrent_law_cuda.rs	FOUND_OUTPUT_STATUS	0	wire-format position at the declared GPU boundary; `soma/abi` is the ABI
+ABI	soma/abi/src/recurrent_law_cuda.rs	FOUND_VALUES	8	wire-format width of the declared rectangular intervention face at the GPU boundary; `soma/abi` is the ABI
+ABI	soma/abi/src/recurrent_law_cuda.rs	LAW_VALUES	8	wire-format width of the declared bi-affine Newton law at the GPU boundary; `soma/abi` is the ABI
+ABI	soma/abi/src/recurrent_law_cuda.rs	STATUS_COMPLETE	1	wire-format status discriminant at the declared GPU boundary; `soma/abi` is the ABI
+ABI	soma/abi/src/recurrent_law_cuda.rs	STATUS_INVALID	2	wire-format status discriminant at the declared GPU boundary; `soma/abi` is the ABI
+ABI	soma/abi/src/recurrent_law_cuda.rs	STATUS_OUTSIDE_LATTICE	4	wire-format status discriminant at the declared GPU boundary; `soma/abi` is the ABI
+ABI	soma/abi/src/recurrent_law_cuda.rs	STATUS_OVERFLOW	3	wire-format status discriminant at the declared GPU boundary; `soma/abi` is the ABI
+ABI	soma/abi/src/recurrent_law_cuda.rs	STATUS_UNWRITTEN	0	wire-format status discriminant at the declared GPU boundary; `soma/abi` is the ABI
 ABI	soma/abi/src/returned_contact_cuda.rs	CONTROL_EPOCH	1	wire-format position at the declared GPU boundary; `soma/abi` is the ABI
 ABI	soma/abi/src/returned_contact_cuda.rs	CONTROL_OCCURRENCES	3	wire-format position at the declared GPU boundary; `soma/abi` is the ABI
 ABI	soma/abi/src/returned_contact_cuda.rs	CONTROL_OCCURRENCE_ROWS_AT	11	wire-format position at the declared GPU boundary; `soma/abi` is the ABI

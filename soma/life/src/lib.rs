@@ -52,6 +52,12 @@ pub mod relational_language;
 // textual mouth; the engine has no dependency on this material carrier. It selects no correction.
 // `research/records/2026-08-12_THE_RECONSTRUCTION_REMAINS_A_FIBER_THE_CONTEXT_RETURNS_BY_DIFFUSION_AND_THE_CIRCUIT_GROWS_IN_HIGHER_CELLS.md`.
 pub mod reconstruction_fiber;
+// Source-detached recurrent section morphology. The full corpus may license its exact route
+// population, but only receiver-local COPY/FOUND paths, contact testimony, and anonymous CUDA
+// conduct witnesses cross the rest seam. Later consequence graphs are re-formed through the
+// resident conduct join and classified by `causal_section`'s resident quotient.
+pub mod recurrent_section;
+pub mod recurrent_section_cuda;
 // The join `research/records/2026-08-08_FACES_GROW_FROM_COLLOCATION_AND_THE_ATOM_IS_NOT_EMPTY.md`
 // §4(v) names as owed: `holonic-engine`'s `name_elaboration` decomposes a name and never recomposes,
 // `decomposing_codec` revises its grain at what its own reading collapsed, and the two had never

@@ -5,16 +5,19 @@
 `proved-standard` for the finite linear-algebra, derivative, similarity, and finite behavioral
 equivalence statements in their stated scopes; `interpretation` for the correspondence with
 contemporary machine-learning architecture; `project-postulate` for the construction discipline;
-`established-bounded [implemented-exact]` for the finite carrier-neutral section join; `open` for
-mixed-corpus conditioning, detached remount, and attributable recurrence through that join.
+`established-bounded [implemented-exact]` for the finite carrier-neutral section join and its
+mixed-corpus-conditioned, source-detached, generative recurrent-law remount; `open` for unrestricted
+law-family and unknown-codec reconstruction.
 **Governing documents:** `canon/THE_HOLOBROCHOS_SPINE.md`,
 `canon/TABLET_THE_OPERATIONS.md`, `canon/TABLET_THE_RESONANCE.md`, and
 `canon/01_CAUSAL_CALCULUS.md`.  
 **Evidentiary deposit:**
 `research/records/2026-08-12_THE_PRETRAINED_TRANSFORMER_IS_ONE_TRANSPORT_ORGAN_THE_REASONING_MACHINE_IS_THE_RETURNING_ECOLOGY.md`.  
 **Construction evidence:**
-`research/records/2026-08-12_THE_CONTACT_FACE_CROSSES_THE_BOND_CONDUCT_NOT_THE_CODEC_FOUNDS_THE_SECTION_CLASS.md`.
-**Construction status:** doctrine only. This tablet schedules no deed and does not alter
+`research/records/2026-08-12_THE_CONTACT_FACE_CROSSES_THE_BOND_CONDUCT_NOT_THE_CODEC_FOUNDS_THE_SECTION_CLASS.md`
+and
+`research/records/2026-08-12_THE_RECURRENT_LAW_CROSSES_THE_CORPUS_DEPARTURE_THE_UNSEEN_SECTION_RIDES_ITS_DEPOSIT.md`.
+**Construction status:** doctrine and construction compression. This tablet schedules no deed and does not alter
 `CONSTRUCTION_STATE.md`.
 
 ---
@@ -276,12 +279,23 @@ coarsening, renaming invariance, exact work, and the open exterior. Compute-sani
 errors and the complete semantic reading equals the independent host admission reading. The
 complete receipt and boundary are in the construction-evidence record above.
 
-`open`: the section consequence complexes in that bounded experiment are exterior fixtures. The
-live body has not yet conditioned this law through the mixed corpus, detached the founding
-material, remounted the resulting morphology, or returned an attributable later classification
-and ablation. It therefore does not yet compose multigrain exposure, world return, and reflection
-into one recurrent corpus-trained ecology. That missing return is not a new Transformer, Reasoner,
-Planner, Conversation, Expert, or Language subsystem.
+`established-bounded [implemented-exact]`: the fourth return now carries the finite constitutive seam
+through the mandatory mixed-corpus CUDA conditioner. Seven anonymous recurring presentation faces
+found four exact bi-affine transformation laws on the card. `RLAW/v1` retains the anonymous conduct
+keys and exact coefficients, with no source, section identity, founding coordinate, or founding
+answer field. After the corpus, founding samples, conditioner, conduct atlas, and founding-law
+executor depart, a fresh remount evaluates all 28 later consequences on `{0,1}²`, disjoint from the
+founding `{2,3}²`, through a second CUDA entry. The stable quotient returns sum fibers of width
+three, product fibers of width two, and the two ordered-difference singleton fibers. The two product
+presentations alone carry mixed phase `cxy = 1`; the remaining five carry `cxy = 0`. Targeted
+ablation reopens only the addressed presentation, and nontrivial restriction/rebase returns the
+exact intersection of the full partition.
+
+`open`: the later presentation still supplies its exact anonymous material-contact face. The body
+does not yet derive an equivalent contact face from an arbitrary unseen codec surface after corpus
+departure, discover an unrestricted law family, or compose general diffusion with this recurrent
+law. Closing the bounded return creates no Transformer, Reasoner, Planner, Conversation, Expert, or
+Language subsystem.
 
 ## 9. Construction discipline and falsifiers
 
@@ -295,6 +309,9 @@ renaming, is predicted solely by a source label, collapses addition and multipli
 shared value, cannot return a separating intervention, or cannot ride its deposited morphology
 after the founding material is detached.
 
-This tablet does not establish intended meaning, universal algorithm discovery, a cross-codec
-classifier, or a new reasoning implementation. Bra-ket notation here types information transport;
-it does not identify a transformer with quantum mechanics.
+This tablet does not establish intended meaning, universal algorithm discovery, an unrestricted
+cross-codec classifier, or a general reasoning implementation. Bra-ket notation here types
+information transport; it does not identify a transformer with quantum mechanics.
+
+Complete bounded return, controls, and implementation boundary:
+`research/records/2026-08-12_THE_RECURRENT_LAW_CROSSES_THE_CORPUS_DEPARTURE_THE_UNSEEN_SECTION_RIDES_ITS_DEPOSIT.md`.

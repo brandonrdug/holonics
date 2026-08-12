@@ -4,24 +4,24 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-12 after the resident mixed-codec conditioner and full-corpus re-emission
-return. Returns 1–3 of the authorized recurrent-section construction stand on mandatory CUDA
-owners; return 4 remains open because the conditioned morphology has not yet been deposited,
-detached from its founding corpus, remounted, and made to govern a later causal-section reading.
-The sealed corpus is
+**Currency:** 2026-08-12 after the source-detached recurrent-law return. Returns 1–4 of the
+authorized recurrent-section construction stand on mandatory CUDA owners. The fourth return
+conditions on the mixed corpus, founds an exact generative law, deposits only anonymous conduct
+keys and exact coefficients, makes its founding material unreachable, remounts the native rest,
+and governs a later disjoint causal-section reading with exact targeted ablation. The sealed corpus is
 `a6fb9343b4fb23399ddf50fb0769465e29a311889c49b0afa307a8d26739e971` — **the first corpus in this
 project's history that carries no coordinate of the machine that sealed it.** The addresses in the
 paragraph this replaces (`28028c1`, rest `45084ed2…`, grade `8125caa2…`) are the **superseded**
 host-dependent seal and are retained on disk as the before-arm of that repair. **Body:** Rust. The
 C++/CUDA engine under `archive/cpp-engine/` governs nothing.
 
-**Gates re-taken for this coherent phase:** `cargo test --workspace` **2,179 passed, 0 failed,
+**Gates re-taken for this coherent phase:** `cargo test --workspace` **2,182 passed, 0 failed,
 19 ignored** over 42 result lines; `tools/gates.sh` **9 of 9** — authored levels (0 failures),
-named paths (0 failures over 1,497 tokens), current claim index, **output-manifest 0 departed / 0
+named paths (0 failures over 1,501 tokens), current claim index, **output-manifest 0 departed / 0
 moved / 0 unrecorded**, current closure manifest, three boundary artifacts, ten Typst roots, and the
-ownership ratchet **clean over 207 files, 19,610 inherited occurrences, 0 retired**. The resident
-conditioner also passed its independent CUDA/host exact-admission test, the full release production
-deed, and clean PTX assembly for `sm_89`.
+ownership ratchet **clean over 209 files, 19,712 inherited occurrences, 0 retired**. The resident
+conditioner and recurrent law also passed their independent exact tests, the full release production
+deed on the RTX 4080 SUPER, and clean PTX assembly for `sm_89`.
 
 ---
 
@@ -221,19 +221,23 @@ host admission reading exactly. The first real launch repaired a SIMT deadlock a
 CUDA argument-lifetime defect in the generic quotient rather than growing a section-specific
 kernel.
 
-**The bound:** the consequence sections are exterior fixtures. The resident conditioner below now
-conditions reusable mixed-corpus morphology, but that morphology has not yet founded these
-consequence sections or crossed a source-detached remount. Arithmetic inference from the corpus and
-attributable causal-section ablation therefore remain open.
+**The bound:** this predecessor return used exterior consequence fixtures. The completed recurrent
+law return below now crosses the mixed corpus, exact native rest, source detachment, disjoint unseen
+coordinates, and attributable causal-section ablation. Unrestricted arithmetic inference and
+unknown-codec contact recovery remain open.
 
-## THE RESIDENT CONDITIONER STANDS; THE DETACHED SECTION IS OWED
+## THE RECURRENT LAW RETURNS AFTER THE CORPUS DEPARTS
 
-**Truth status:** `established-bounded` for return 1; `open` for return 4. **Owners:**
-`morphological_language::condition_cuda`, `suffix_ecology`, the shared mounted CUDA context, and
-the two `soma_abi::morphological_condition_cuda` entries. **Record:**
-`research/records/2026-08-12_THE_CARD_FOUNDS_THE_MORPHOLOGY_THE_DEPOSIT_STILL_OWES_THE_SECTION.md`.
-**Grade:**
-`output/the_deposit_licenses_the_re_emission/re-emission-grade-dce3a043….form`.
+**Truth status:** `established-bounded` for returns 1 and 4. **Owners:**
+`morphological_language::{condition_cuda,conduct}`, `recurrent_section`,
+`recurrent_section_cuda`, the `recurrent_law_{found,evaluate}` CUDA entries, and
+`causal_section`. **Records:**
+`research/records/2026-08-12_THE_CARD_FOUNDS_THE_MORPHOLOGY_THE_DEPOSIT_STILL_OWES_THE_SECTION.md`
+and
+`research/records/2026-08-12_THE_RECURRENT_LAW_CROSSES_THE_CORPUS_DEPARTURE_THE_UNSEEN_SECTION_RIDES_ITS_DEPOSIT.md`.
+**Grades:**
+`output/the_deposit_licenses_the_re_emission/re-emission-grade-dce3a043….form` and
+`output/the_conditioned_section_returns_after_detachment/recurrent-section-return-grade-1c8ae5c8….form`.
 
 The concrete `CudaMorphologicalConditioner` now founds all five exact suffix ecologies and the
 boundary-anchored question-prefix incidence on the resident RTX 4080 SUPER. It shares one mounted
@@ -254,12 +258,36 @@ ablation restored all 11,594 branches bit-exactly. Its shadow receipt carries lo
 source-fiber-width, and vertex-arity phase strata, clone caustics, and explicit loop absence rather
 than promoting contact totals or elapsed time into the result.
 
-**Next deed:** return 4 of `blueprint/THE_ROADMAP.md` §"THE RECURRENT-SECTION CONSTRUCTION". Deposit
-the smallest morphology that can condition the carrier-neutral causal-section continuation law;
-make the founding corpus unreachable; remount that same owner; classify later presentations by
-stable receiver/history conduct; and require targeted ablation to remove exactly attributable
-section conduct while unrelated fibers remain bit-identical. A serialized corpus, a retained lookup
-table, a host semantic replay, or another bounded language fixture does not return this deed.
+Return 4 now carries seven anonymous presentation/contact faces through the same mandatory mixed
+corpus conditioner and founds four exact bi-affine laws on the card. `RLAW/v1` contains only the
+canonical anonymous conduct keys and `(x0,y0,dx,dy,c0,cx,cy,cxy)` coefficients: zero source,
+section-identity, sample-coordinate, or sample-answer fields. Its address is
+`deb1ef9ff978049f6144068a37a657ff6a64d93b652c9250abe7582c690fbd48`.
+
+The corpus, founding `{2,3}²` sample field, conditioned ecology, conduct atlas, and founding-law
+executor depart before exact decode/re-encode. The remounted card evaluates all 28 consequences on
+the disjoint later field `{0,1}²`; every withheld value agrees. Five presentations carry mixed phase
+`cxy=0`, while the two product presentations carry `cxy=1`. Before activation the 28 states form one
+OPEN fiber with current `{0:28}`; after remount they form conduct blocks `[1,1,2,3]` with current
+`{1:28}`. Seventeen presentation pairs cross the caustic. `raise-left` is the shortest separator for
+same-root-value sum/product and reversed-hand controls. All seven causal diamonds are flat at this
+aperture. Removing the value receiver coarsens to one block; removing the `infix-sum` deposit reopens
+only its four states while every unrelated formation receipt remains bit-identical; scale restriction
+returns the exact intersection of the full partition. No representative is selected and the exterior
+remains OPEN.
+
+The RTX 4080 SUPER owns the semantic path: six mixed-corpus conditioning launches, one law-founding
+launch, four attachment launches, three unseen law-evaluation launches, and 58 stable-quotient
+launches; `host_semantic_replay: false`. The first attempted native rest, which retained known
+consequences behind section licences, was rejected by source audit before commit and replaced by the
+generative law form.
+
+**Next deed:** no further implementation is admitted by this four-return authorization. The next
+session is the requested technical design discussion over how the bounded recurrent law should
+expand toward unknown-codec contact reconstruction, richer exact law families, and diffusion,
+before any one of those distinct constructions is scheduled. The current bound is explicit: the
+later presentation supplies its exact anonymous contact face, and the law family is bi-affine on an
+exact `i64` lattice.
 
 ---
 
