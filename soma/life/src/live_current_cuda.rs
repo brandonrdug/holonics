@@ -39,7 +39,7 @@ use self::mount::*;
 
 /// One resident CUDA context/module.  The context is last so every module/allocation drops first.
 pub struct CudaLiveCurrentExecutor {
-    module: Module,
+    pub(crate) module: Module,
     device_name: String,
     stack_limit_bytes: usize,
     stack_growths: u64,
@@ -63,7 +63,7 @@ pub struct CudaLiveCurrentExecutor {
     /// population mouth hands it to `Function::linear_launch`, which derives grid and block from it
     /// together with the function's own attribute. No launch geometry is authored anywhere.
     launch_census: Option<::mount::cuda::LaunchCensus>,
-    context: Context,
+    pub(crate) context: Context,
 }
 
 impl CudaLiveCurrentExecutor {

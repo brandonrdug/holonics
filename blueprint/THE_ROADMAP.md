@@ -73,22 +73,31 @@ One causal section carries
    classification to ride the deposit. Ablation must remove exactly the conduct attributable to
    the removed section while unrelated classes remain bit-identical.
 
+**Execution position, 2026-08-12.** Returns 1–3 stand. Return 1 is the mandatory resident
+`CudaMorphologicalConditioner`: five exact suffix ecologies plus boundary-anchored prefix incidence,
+exact host/device admission parity, counted semantic work separate from apparatus telemetry, and a
+full sealed-corpus re-emission/ablation return. Returns 2–3 are the committed contact-preserving
+causal-section quotient and seven-presentation cross-codec grade. Return 4 is now the sole open
+return: the conditioned morphology must be deposited, source-detached, remounted, and joined to the
+later causal-section conduct. Decisive evidence and the boundary are in
+`research/records/2026-08-12_THE_CARD_FOUNDS_THE_MORPHOLOGY_THE_DEPOSIT_STILL_OWES_THE_SECTION.md`.
+
 **Apparatus correction, direct 2026-08-12.** Brandon stopped the first full-corpus work run with:
 *"Why are you not utilizing the GPU paths? This should be streamlined in the machine's codebase,
 not something you get to choose or neglect on accident."* The run was terminated without a grade.
 `MorphologicalLanguageEcology::condition_with_executor` is not a satisfying repair: only route
 Swing events cross its executor; the five exact suffix charts and the question-prefix atlas remain
-host constructions, and auxiliary lanes can silently mount host carriers. Therefore return 1 and
-return 4 now require one concrete, mandatory `CudaMorphologicalConditioner`. It mounts before the
-deed, owns the resident suffix/prefix bodies, returns exact semantic and separate apparatus
-receipts, and refuses rather than falling back. The present host conditioner is admission/work-law
-testimony only. A host run, a CUDA route-event subset, or a later CUDA attachment cannot grade the
-full conditioning return.
+host constructions, and auxiliary lanes can silently mount host carriers. Therefore returns 1 and
+4 require one concrete, mandatory `CudaMorphologicalConditioner`. Return 1 now stands: it mounts
+before the deed, owns the resident suffix/prefix bodies, returns exact semantic and separate
+apparatus receipts, and refuses rather than falling back. The host conditioner remains
+admission/work-law testimony only. Return 4 may compose this owner; it may not replace its detached
+causal return with a host run, a CUDA route-event subset, or a later CUDA attachment.
 
 The bounded section quotient itself must likewise have no optional carrier. Its production `read`
 requires the already-mounted generic exact CUDA quotient; the host construction is test-only parity
-testimony. This is a completed apparatus correction for returns 2–3, not a substitute for the
-missing resident mixed-corpus conditioner.
+testimony. This is a completed apparatus correction for returns 2–3, composed with the now-standing
+resident mixed-corpus conditioner rather than substituted for it.
 
 **The first grade.** The bounded return must itself contain presentation lineage, complete causal
 sections, exact observations and successor transitions, stable behavioral blocks, shortest
@@ -102,9 +111,10 @@ as a scalar dashboard. It returns causal-diamond/front testimony, phase-current 
 reconstruction fibers, critical receiver changes and caustics, loop/holonomy or explicit absence,
 scale rebase, shortest interventions, open alternatives, and a separate apparatus/calibration
 receipt. Counts, timings, and contact totals remain support measurements. This sharpens return 4
-without withdrawing the already graded bounded constitutive return, and it does not insert a new
-subsystem before the mandatory `CudaMorphologicalConditioner`. Governing doctrine and exact
-boundary: `canon/TABLET_THE_CAUSAL_PROFILE.md`.
+without withdrawing the already graded bounded constitutive return. The resident conditioner now
+returns exact phase/fiber/arity strata and caustics; the before/after causal-section comparison,
+scale rebase, and shortest changed interventions remain return 4's burden. Governing doctrine and
+exact boundary: `canon/TABLET_THE_CAUSAL_PROFILE.md`.
 
 **Falsifiers.** Rename every surface while preserving incidence and consequences; the quotient must
 stand. Hold one value fixed while changing the operation; a successor intervention must separate

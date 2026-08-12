@@ -535,6 +535,26 @@ pub struct ExactLabeledSuffixEcology {
     source_incidence: SourceIncidence,
 }
 
+/// Card-returned suffix state at the execution membrane. This is an owner-local construction
+/// part, not a second public ecology representation.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) struct DeviceConditionedSuffixState {
+    pub maximum_length: usize,
+    pub suffix: Option<usize>,
+    pub material_end_multiplicity: u64,
+    pub source_span_start: u64,
+    pub source_span_len: u64,
+}
+
+/// Card-returned transition. `symbol < material_symbols.len()` names a germ; later symbols name
+/// the unique path-boundary population in canonical path order.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) struct DeviceConditionedSuffixTransition {
+    pub state: usize,
+    pub symbol: u32,
+    pub target: usize,
+}
+
 impl ExactSuffixEcology {
     pub fn condition(paths: &[Vec<ResonanceGerm>]) -> Result<Self, ExactSuffixEcologyError> {
         let (ecology, _, _) = Self::condition_internal(paths, None)?;
@@ -1147,6 +1167,94 @@ impl SuffixEcologyBuilder {
 }
 
 impl ExactLabeledSuffixEcology {
+    /// Decode one exact resident-card return into the ecology's native owner.
+    ///
+    /// Sorting the returned adjacency into `LocalRelations` is presentation formation only: the
+    /// card has already decided every state, suffix link, transition, recurrence multiplicity,
+    /// and source-tree span. No conditioning law is replayed here.
+    pub(crate) fn from_device_conditioned(
+        material_symbols: &[ResonanceGerm],
+        boundary_count: usize,
+        states: &[DeviceConditionedSuffixState],
+        transitions: &[DeviceConditionedSuffixTransition],
+        source_catalogue: Vec<SuffixSourceLabel>,
+        occurrence_sources: Vec<u32>,
+        declared_material_transitions: usize,
+    ) -> Result<Self, ExactSuffixEcologyError> {
+        if material_symbols.is_empty() || boundary_count == 0 || states.is_empty() {
+            return Err(ExactSuffixEcologyError::InvalidWire);
+        }
+        if states[0].maximum_length != 0 || states[0].suffix.is_some() {
+            return Err(ExactSuffixEcologyError::InvalidWire);
+        }
+        let mut builder = SuffixEcologyBuilder {
+            states: states
+                .iter()
+                .map(|state| SuffixBuilderState {
+                    maximum_length: state.maximum_length,
+                    suffix: state.suffix,
+                    material_end_multiplicity: state.material_end_multiplicity,
+                    transitions: LocalRelations::new(),
+                })
+                .collect(),
+        };
+        let material_count = u32::try_from(material_symbols.len())
+            .map_err(|_| ExactSuffixEcologyError::CarrierExtent)?;
+        let boundary_count_u32 = u32::try_from(boundary_count)
+            .map_err(|_| ExactSuffixEcologyError::CarrierExtent)?;
+        let mut material_transitions = 0usize;
+        for transition in transitions {
+            if transition.state >= states.len() || transition.target >= states.len() {
+                return Err(ExactSuffixEcologyError::InvalidWire);
+            }
+            let symbol = if transition.symbol < material_count {
+                material_transitions = material_transitions
+                    .checked_add(1)
+                    .ok_or(ExactSuffixEcologyError::CarrierExtent)?;
+                SuffixSymbol::Germ(GermKey::from_germ(
+                    material_symbols
+                        .get(transition.symbol as usize)
+                        .ok_or(ExactSuffixEcologyError::InvalidWire)?,
+                ))
+            } else {
+                let boundary = transition
+                    .symbol
+                    .checked_sub(material_count)
+                    .filter(|boundary| *boundary < boundary_count_u32)
+                    .ok_or(ExactSuffixEcologyError::InvalidWire)?;
+                SuffixSymbol::Boundary(boundary as u64)
+            };
+            if builder.states[transition.state]
+                .transitions
+                .try_insert(symbol, transition.target)?
+                .is_some()
+            {
+                return Err(ExactSuffixEcologyError::InvalidWire);
+            }
+        }
+        if material_transitions != declared_material_transitions {
+            return Err(ExactSuffixEcologyError::InvalidWire);
+        }
+        let ecology = builder.freeze(material_transitions)?;
+        let source_incidence = SourceIncidence {
+            state_spans: states
+                .iter()
+                .map(|state| SourceSpan {
+                    start: state.source_span_start,
+                    len: state.source_span_len,
+                })
+                .collect::<Vec<_>>()
+                .into_boxed_slice(),
+            occurrence_sources: occurrence_sources.into_boxed_slice(),
+        };
+        source_incidence.validate(&ecology.states, source_catalogue.len())?;
+        Ok(Self {
+            ecology,
+            source_catalogue,
+            source_incidence,
+        })
+    }
+
     /// Condition one exact source label per ordered path. Equal labels may lawfully occur on
     /// several delivery sections; path boundaries remain explicit while their common source
     /// lineage is retained.

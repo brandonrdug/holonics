@@ -311,7 +311,7 @@ impl MorphologicalLanguageEcology {
         action: ActionCurrent,
         worker_threads: usize,
     ) -> Result<Self, MorphologicalLanguageError> {
-        Self::condition_inner(passages, action, worker_threads, None)
+        Self::condition_inner(passages, action, worker_threads, None, None)
     }
 
     /// Condition the complete morphology through one explicitly mounted physical executor.
@@ -324,7 +324,39 @@ impl MorphologicalLanguageEcology {
         worker_threads: usize,
         executor: &mut dyn LiveCurrentExecutor,
     ) -> Result<Self, MorphologicalLanguageError> {
-        Self::condition_inner(passages, action, worker_threads, Some(executor))
+        Self::condition_inner(passages, action, worker_threads, Some(executor), None)
+    }
+
+    /// Found the complete recurrent-section morphology on the mandatory resident card.
+    /// Exterior token charting stays at the process boundary; route events, five generalized
+    /// suffix ecologies, and question-prefix incidence have no host fallback.
+    pub fn condition_with_cuda(
+        passages: &[MorphologicalLanguagePassage],
+        action: ActionCurrent,
+        conditioner: &mut CudaMorphologicalConditioner,
+    ) -> Result<
+        (
+            Self,
+            MorphologicalConditionSemanticReceipt,
+            MorphologicalConditionApparatusReceipt,
+        ),
+        MorphologicalLanguageError,
+    > {
+        let ecology = Self::condition_inner(
+            passages,
+            action,
+            1,
+            None,
+            Some(&mut *conditioner),
+        )?;
+        let semantic = conditioner
+            .last_semantic_receipt()
+            .ok_or(MorphologicalLanguageError::MalformedFiber)?;
+        let apparatus = conditioner
+            .last_apparatus_receipt()
+            .cloned()
+            .ok_or(MorphologicalLanguageError::MalformedFiber)?;
+        Ok((ecology, semantic, apparatus))
     }
 
     fn condition_inner(
@@ -332,6 +364,7 @@ impl MorphologicalLanguageEcology {
         action: ActionCurrent,
         worker_threads: usize,
         route_executor: Option<&mut dyn LiveCurrentExecutor>,
+        mut conditioner: Option<&mut CudaMorphologicalConditioner>,
     ) -> Result<Self, MorphologicalLanguageError> {
         if passages.is_empty() {
             return Err(MorphologicalLanguageError::EmptyCorpus);
@@ -456,11 +489,36 @@ impl MorphologicalLanguageEcology {
             feature_names.insert(identity.clone(), feature);
             route_groups.insert(identity, sections);
         }
-        let (_, returned_sections, conditioning_events) = match route_executor {
-            Some(executor) => {
-                condition_route_receivers_with_executor(route_groups, action, executor)?
+        let (returned_sections, conditioning_events) = if conditioner.is_some() {
+            // The route groups already ARE the feature-to-passage incidence. The prior card arm
+            // replayed every row through a `ResonanceEcology`, returned the same target set, then
+            // discarded the complete `CausalLanguageRouteRestImage`. On the 2,672-passage sealed
+            // front that echo ran for fifteen minutes without reaching the constitutive charts.
+            // Form the transpose once from its caused rows; CUDA below owns the suffix/prefix
+            // morphology whose returned state is retained and used.
+            let mut returned = BTreeMap::new();
+            let mut events = 0usize;
+            for (feature, sections) in route_groups {
+                events = events
+                    .checked_add(sections.len())
+                    .ok_or(MorphologicalLanguageError::CarrierExtent)?;
+                returned.insert(
+                    feature,
+                    sections
+                        .into_iter()
+                        .map(|section| section.source)
+                        .collect::<BTreeSet<_>>(),
+                );
             }
-            None => condition_route_receivers(route_groups, action, worker_threads)?,
+            (returned, events)
+        } else {
+            let (_, returned, events) = match route_executor {
+                Some(executor) => {
+                    condition_route_receivers_with_executor(route_groups, action, executor)?
+                }
+                None => condition_route_receivers(route_groups, action, worker_threads)?,
+            };
+            (returned, events)
         };
         let mut route_sections = BTreeMap::new();
         for (identity, targets) in returned_sections {
@@ -527,6 +585,7 @@ impl MorphologicalLanguageEcology {
         let mut ordered_region_labels = Vec::new();
         let mut clause_labels = BTreeMap::new();
         let mut question_prefix_atlas = QuestionPrefixAtlas::new();
+        let mut question_paths = Vec::new();
         for (clause_at, clause) in clauses.iter().enumerate() {
             if clause_labels
                 .insert(clause.fiber.clone(), clause_at)
@@ -537,11 +596,15 @@ impl MorphologicalLanguageEcology {
             let ordered_surface = folded_surface_tokens(&clause.tokens);
             let is_question = clause.tokens.last().is_some_and(|token| token == "?");
             if is_question {
-                question_prefix_atlas.admit(
-                    &ordered_surface,
-                    &clause.source,
-                    &clause.fiber,
-                )?;
+                if conditioner.is_some() {
+                    question_paths.push((ordered_surface, clause.source.clone()));
+                } else {
+                    question_prefix_atlas.admit(
+                        &ordered_surface,
+                        &clause.source,
+                        &clause.fiber,
+                    )?;
+                }
             } else if !ordered_surface.is_empty() {
                 clause_lexical_paths.push(token_germs(&clause.tokens)?);
                 clause_lexical_labels.push(clause.fiber.clone());
@@ -549,10 +612,6 @@ impl MorphologicalLanguageEcology {
                 ordered_region_labels.push(clause.fiber.clone());
             }
         }
-        let question_prefix_crossings = question_prefix_atlas.crossings;
-        let question_prefix_legacy_cloned_tokens = question_prefix_atlas.legacy_cloned_tokens;
-        let (question_operator_prefixes, question_prefix_nodes, question_prefix_returned_tokens) =
-            question_prefix_atlas.returned()?;
         let mut mark_paths = Vec::new();
         let mut mark_labels = Vec::new();
         for (surface, labels) in mark_sources {
@@ -576,7 +635,35 @@ impl MorphologicalLanguageEcology {
             ordered_region_suffix,
             forward_mark_suffix,
             reverse_mark_suffix,
-        ) = if worker_threads >= 5 {
+            question_operator_prefixes,
+            question_prefix_crossings,
+            question_prefix_nodes,
+            question_prefix_legacy_cloned_tokens,
+            question_prefix_returned_tokens,
+        ) = if let Some(card) = conditioner.as_deref_mut() {
+            let charts = card.condition_charts(
+                [
+                    ("lexical", &lexical_paths, &lexical_labels),
+                    ("clause-lexical", &clause_lexical_paths, &clause_lexical_labels),
+                    ("ordered-region", &ordered_region_paths, &ordered_region_labels),
+                    ("forward-mark", &mark_paths, &mark_labels),
+                    ("reverse-mark", &reverse_paths, &mark_labels),
+                ],
+                &question_paths,
+            )?;
+            (
+                charts.lexical,
+                charts.clause_lexical,
+                charts.ordered_region,
+                charts.forward_mark,
+                charts.reverse_mark,
+                charts.question_prefixes,
+                charts.question_prefix_crossings,
+                charts.question_prefix_nodes,
+                charts.question_prefix_legacy_cloned_tokens,
+                charts.question_prefix_returned_tokens,
+            )
+        } else if worker_threads >= 5 {
             std::thread::scope(|scope| {
                 let lexical = scope.spawn(|| {
                     ExactLabeledSuffixEcology::condition(&lexical_paths, &lexical_labels)
@@ -597,6 +684,8 @@ impl MorphologicalLanguageEcology {
                     scope.spawn(|| ExactLabeledSuffixEcology::condition(&mark_paths, &mark_labels));
                 let reverse_mark = scope
                     .spawn(|| ExactLabeledSuffixEcology::condition(&reverse_paths, &mark_labels));
+                let (question_operator_prefixes, question_prefix_nodes, question_prefix_returned_tokens) =
+                    question_prefix_atlas.returned()?;
                 Ok::<_, MorphologicalLanguageError>((
                     lexical
                         .join()
@@ -613,9 +702,16 @@ impl MorphologicalLanguageEcology {
                     reverse_mark
                         .join()
                         .map_err(|_| MorphologicalLanguageError::CarrierExtent)??,
+                    question_operator_prefixes,
+                    question_prefix_atlas.crossings,
+                    question_prefix_nodes,
+                    question_prefix_atlas.legacy_cloned_tokens,
+                    question_prefix_returned_tokens,
                 ))
             })?
         } else {
+            let (question_operator_prefixes, question_prefix_nodes, question_prefix_returned_tokens) =
+                question_prefix_atlas.returned()?;
             (
                 ExactLabeledSuffixEcology::condition(&lexical_paths, &lexical_labels)?,
                 ExactLabeledSuffixEcology::condition(
@@ -628,6 +724,11 @@ impl MorphologicalLanguageEcology {
                 )?,
                 ExactLabeledSuffixEcology::condition(&mark_paths, &mark_labels)?,
                 ExactLabeledSuffixEcology::condition(&reverse_paths, &mark_labels)?,
+                question_operator_prefixes,
+                question_prefix_atlas.crossings,
+                question_prefix_nodes,
+                question_prefix_atlas.legacy_cloned_tokens,
+                question_prefix_returned_tokens,
             )
         };
         let census = MorphologicalScaleCensus {
@@ -769,6 +870,34 @@ impl MorphologicalLanguageEcology {
 
     pub const fn census(&self) -> &MorphologicalScaleCensus {
         &self.census
+    }
+
+    /// Offline admission comparison between two conditioning realizations. This is intentionally
+    /// unavailable to production conduct: the card return is not accepted by replaying the host
+    /// after every deed. Tests may compare every retained relation and each native suffix image.
+    #[cfg(test)]
+    pub(in crate::morphological_language) fn exact_conditioning_agreement(
+        &self,
+        other: &Self,
+    ) -> Result<bool, MorphologicalLanguageError> {
+        Ok(self.route_sections == other.route_sections
+            && self.passages == other.passages
+            && self.sources == other.sources
+            && self.clauses == other.clauses
+            && self.clause_routes == other.clause_routes
+            && self.clause_labels == other.clause_labels
+            && self.question_operator_prefixes == other.question_operator_prefixes
+            && self.census == other.census
+            && self.lexical_suffix.encode_native_bytes()?
+                == other.lexical_suffix.encode_native_bytes()?
+            && self.clause_lexical_suffix.encode_native_bytes()?
+                == other.clause_lexical_suffix.encode_native_bytes()?
+            && self.ordered_region_suffix.encode_native_bytes()?
+                == other.ordered_region_suffix.encode_native_bytes()?
+            && self.forward_mark_suffix.encode_native_bytes()?
+                == other.forward_mark_suffix.encode_native_bytes()?
+            && self.reverse_mark_suffix.encode_native_bytes()?
+                == other.reverse_mark_suffix.encode_native_bytes()?)
     }
 
     /// Found the query-independent recurrent-contact atlas from the two lexical receiver charts.

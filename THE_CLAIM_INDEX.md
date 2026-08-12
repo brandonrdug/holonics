@@ -99,7 +99,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (62 deposits of 354)
+## 4 · The 2026-08 record line (63 deposits of 355)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -165,6 +165,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-11_THE_RUNG_REFUSES_BY_NAME_AND_THE_UNRESOLVED_PAIR_IS_THE_REMAINDER.md` | The rung refuses by name, and the unresolved pair is the remainder |
 | `2026-08-11_THE_SEAL_CARRIED_THE_HOST_AND_THE_ORGANS_AWAIT_THEIR_CURRENT.md` | The seal carried the host, and the organs await their current |
 | `2026-08-11_THE_TAPE_HAS_NO_VERTEX_AND_PRODUCTION_IS_RECEPTION_AT_THE_OTHER_HAND.md` | The tape has no vertex, and production is reception at the other hand |
+| `2026-08-12_THE_CARD_FOUNDS_THE_MORPHOLOGY_THE_DEPOSIT_STILL_OWES_THE_SECTION.md` | The card founds the morphology; the deposit still owes the section |
 | `2026-08-12_THE_COMPUTER_IS_A_CAUSAL_WORLD_TUBE_THE_PROFILE_RETURNS_ITS_SHADOW_FIELD.md` | The computer is a causal world-tube; the profile returns its shadow field |
 | `2026-08-12_THE_CONTACT_FACE_CROSSES_THE_BOND_CONDUCT_NOT_THE_CODEC_FOUNDS_THE_SECTION_CLASS.md` | The contact face crosses the bond; conduct, not the codec, founds the section class |
 | `2026-08-12_THE_PRETRAINED_TRANSFORMER_IS_ONE_TRANSPORT_ORGAN_THE_REASONING_MACHINE_IS_THE_RETURNING_ECOLOGY.md` | The pretrained transformer is one transport organ; the reasoning machine is the returning ecology |

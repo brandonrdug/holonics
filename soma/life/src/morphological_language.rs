@@ -28,8 +28,8 @@ use soma_membrane::{
 
 use crate::{
     causal_language::{
-        condition_route_receivers, condition_route_receivers_with_executor, lexical_tokens,
-        render_tokens, route_feature_fiber, token_germs, CausalLanguageError, RouteTrainingSection,
+        condition_route_receivers, condition_route_receivers_with_executor, lexical_tokens, render_tokens,
+        route_feature_fiber, token_germs, CausalLanguageError, RouteTrainingSection,
     },
     resonance_ecology::{
         fiber_from_bytes, ResonanceEcology, ResonanceEcologyError, ResonanceEcologyRestImage,
@@ -65,6 +65,7 @@ pub enum MorphologicalLanguageError {
     Suffix(ExactSuffixEcologyError),
     Conduct(conduct::MorphologicalConductRefusal),
     ConductCuda(conduct_cuda::MorphologicalConductCudaError),
+    ConditionCuda(condition_cuda::MorphologicalConditionCudaError),
 }
 
 impl From<CausalLanguageError> for MorphologicalLanguageError {
@@ -94,6 +95,12 @@ impl From<conduct::MorphologicalConductRefusal> for MorphologicalLanguageError {
 impl From<conduct_cuda::MorphologicalConductCudaError> for MorphologicalLanguageError {
     fn from(value: conduct_cuda::MorphologicalConductCudaError) -> Self {
         Self::ConductCuda(value)
+    }
+}
+
+impl From<condition_cuda::MorphologicalConditionCudaError> for MorphologicalLanguageError {
+    fn from(value: condition_cuda::MorphologicalConditionCudaError) -> Self {
+        Self::ConditionCuda(value)
     }
 }
 
@@ -242,6 +249,9 @@ pub use conduct::*;
 
 mod conduct_cuda;
 pub use conduct_cuda::*;
+
+mod condition_cuda;
+pub use condition_cuda::*;
 
 #[cfg(test)]
 mod tests;

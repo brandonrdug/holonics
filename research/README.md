@@ -73,6 +73,13 @@ governs the rebuild.
   declared quotients; Feynman, knot, and folded-dimension readings; and the bounded project terms
   Quantum Information Dynamics and Quantum Information Field. Compressed into
   `../canon/TABLET_THE_CAUSAL_PROFILE.md`.
+- **Resident mixed-codec morphology and the still-open recurrent-section deposit:**
+  `records/2026-08-12_THE_CARD_FOUNDS_THE_MORPHOLOGY_THE_DEPOSIT_STILL_OWES_THE_SECTION.md`
+  — mandatory CUDA founding of five exact suffix ecologies and the boundary-anchored prefix atlas;
+  no host fallback or semantic replay; exact host/device admission parity; full sealed-corpus
+  plural-source re-emission and attributable ablation; lossless phase/fiber/arity shadow strata;
+  the removal of a measured duplicate transition search; and the explicit boundary that the
+  source-detached causal-section remount remains open.
 
 The filenames form a stable chronological atlas. Search their titles before reading entire bodies;
 follow each record's explicit supersession and open-boundary statements.

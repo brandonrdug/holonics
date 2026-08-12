@@ -4,26 +4,24 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-12 after the resident bounded recurrent-section return. Brandon's apparatus
-correction terminated the attempted host full-corpus work run without a grade. Returns 2–3 of the
-authorized construction now stand on the mandatory generic CUDA quotient; returns 1 and 4 remain
-open because the five suffix charts and question-prefix atlas do not yet have a mandatory resident
-conditioner. The sealed corpus is
+**Currency:** 2026-08-12 after the resident mixed-codec conditioner and full-corpus re-emission
+return. Returns 1–3 of the authorized recurrent-section construction stand on mandatory CUDA
+owners; return 4 remains open because the conditioned morphology has not yet been deposited,
+detached from its founding corpus, remounted, and made to govern a later causal-section reading.
+The sealed corpus is
 `a6fb9343b4fb23399ddf50fb0769465e29a311889c49b0afa307a8d26739e971` — **the first corpus in this
 project's history that carries no coordinate of the machine that sealed it.** The addresses in the
 paragraph this replaces (`28028c1`, rest `45084ed2…`, grade `8125caa2…`) are the **superseded**
 host-dependent seal and are retained on disk as the before-arm of that repair. **Body:** Rust. The
 C++/CUDA engine under `archive/cpp-engine/` governs nothing.
 
-**Gates re-taken at `d4e5f13`:** `cargo test --workspace` **2,179 passed, 0 failed, 18 ignored**
-summed over 42 `test result:` lines; `tools/gates.sh` **9 of 9** — authored levels (0 failures),
-named paths (0 failures over 1,485 tokens), current claim index, **output-manifest 0 departed / 0
+**Gates re-taken for this coherent phase:** `cargo test --workspace` **2,179 passed, 0 failed,
+19 ignored** over 42 result lines; `tools/gates.sh` **9 of 9** — authored levels (0 failures),
+named paths (0 failures over 1,497 tokens), current claim index, **output-manifest 0 departed / 0
 moved / 0 unrecorded**, current closure manifest, three boundary artifacts, ten Typst roots, and the
-ownership ratchet **clean over 206 files, 19,516 inherited occurrences, 0 retired**, its baseline
-re-emitted from the committed implementation. The two required CUDA gates were also run directly:
-the generic quotient agreed with the host partition over extents through 40,000 cells, the complete
-section reading agreed with the host admission reading, and compute-sanitizer reported zero errors
-for the release production deed.
+ownership ratchet **clean over 207 files, 19,610 inherited occurrences, 0 retired**. The resident
+conditioner also passed its independent CUDA/host exact-admission test, the full release production
+deed, and clean PTX assembly for `sm_89`.
 
 ---
 
@@ -223,60 +221,45 @@ host admission reading exactly. The first real launch repaired a SIMT deadlock a
 CUDA argument-lifetime defect in the generic quotient rather than growing a section-specific
 kernel.
 
-**The bound:** the consequence sections are exterior fixtures. This result does not infer
-arithmetic from the corpus, condition reusable mixed-corpus morphology, or establish detached
-remount and attributable ablation.
+**The bound:** the consequence sections are exterior fixtures. The resident conditioner below now
+conditions reusable mixed-corpus morphology, but that morphology has not yet founded these
+consequence sections or crossed a source-detached remount. Arithmetic inference from the corpus and
+attributable causal-section ablation therefore remain open.
 
-## THE OPEN LINE — the mandatory resident morphological conditioner is owed
+## THE RESIDENT CONDITIONER STANDS; THE DETACHED SECTION IS OWED
 
-**Production now rides plural-source conduct. The line that was open here is closed** and the deed
-is recorded below under "The deposit licenses the re-emission". The falsifier this section demanded
-fired on two independent families and was reproduced by a second reader:
-`123 → 24` and `201 → 38`, strictly smaller, each attached continuation naming its licensing
-deposits, the withheld fiber retained and never emitted, targeted ablation removing exactly what its
-deposit **solely** licensed, and full ablation restoring the enumeration bit-exactly.
+**Truth status:** `established-bounded` for return 1; `open` for return 4. **Owners:**
+`morphological_language::condition_cuda`, `suffix_ecology`, the shared mounted CUDA context, and
+the two `soma_abi::morphological_condition_cuda` entries. **Record:**
+`research/records/2026-08-12_THE_CARD_FOUNDS_THE_MORPHOLOGY_THE_DEPOSIT_STILL_OWES_THE_SECTION.md`.
+**Grade:**
+`output/the_deposit_licenses_the_re_emission/re-emission-grade-dce3a043….form`.
 
-**Truth status:** `open`. **Next deed:** returns 1 and 4 of the recurrent-section construction in
-`blueprint/THE_ROADMAP.md` §"THE RECURRENT-SECTION CONSTRUCTION", under its apparatus correction.
-Build the concrete `CudaMorphologicalConditioner`; it must found the five suffix charts and
-question-prefix incidence on the resident device, refuse rather than fall back, return counted
-semantic work separately from apparatus telemetry, and agree with the host conditioner only in an
-offline admission gate. Then condition, detach, remount, and ablate the recurrent section.
+The concrete `CudaMorphologicalConditioner` now founds all five exact suffix ecologies and the
+boundary-anchored question-prefix incidence on the resident RTX 4080 SUPER. It shares one mounted
+context/module, retains its six device bodies, refuses rather than falling back, returns semantic
+work separately from apparatus telemetry, and agrees exactly with the independent host admission
+reading. Production no longer launches the route-rest echo whose complete return it discarded.
 
-**Why this is the line.** Three reports in one day — two agents and this file's author — named
-`condition` a wall using **elapsed time**. `CLAUDE.md` §8 forbids exactly that: *a cost is measured
-in work, never in elapsed time; a clock may measure, it may never select*, and
-`canon/THE_MEASURED_CAPABILITIES.md` §4 already records that **every timing figure in this
-repository has one frame and none is falsifiable.** Those figures are withdrawn. The corpus's own
-instrument is the exact work vector over `BigUint` and the order price `⌈log₂(n!)⌉`, whose argument
-is **overpayment**: work spent beyond the information content of the return is measured waste.
+On 2,672 passages over 17 declared mixed-codec sources the card returned 425,666 suffix extensions,
+81,808 clone caustics, 952,437 suffix crosses, 1,177,067,718 transition reads, 312 prefix crossings,
+and 42 prefix edge reads. Recruitment is the exact local transpose: 44,286 membership tests and
+44,286 returned incidences. The old quadratic prefix presentation would clone 5,886 token words;
+the resident incidence returned two active prefix caustics. Exact CUDA/host parity and clean
+`sm_89` PTX assembly stand.
 
-**The derivation, from reading the owner rather than watching it.** Two superlinear terms:
+The same full-corpus run formed 16,393 plural-source deposits and moved the continuation population
+`11,594 → 6,478`; one targeted ablation removed exactly its one solely licensed branch, and full
+ablation restored all 11,594 branches bit-exactly. Its shadow receipt carries lossless causal-front,
+source-fiber-width, and vertex-arity phase strata, clone caustics, and explicit loop absence rather
+than promoting contact totals or elapsed time into the result.
 
-- **A transpose done as a scan** (`morphological_language/ecology.rs:356-373`). `clause_routes`
-  is built by iterating `features × passages × clauses` and testing membership, while the inverse
-  relation `ClauseStanding.features` is **already materialized at `:300`, before the loop**. Work is
-  `Σ_f P_f·C̄`; the return's own information content is `I`, the actual incidences, reachable by one
-  pass at `Θ(I)`. The overpayment is `Σ_f P_f·C̄ / I`. Under `H.0219` the transpose is per-clause
-  local — a boundary flux coverable over any partition — while the scan consults
-  `passages_standing.len()` corpus-wide. **This term is the barrier.**
-- **A presentation materialized to learn a support relation** (`:397-405`). Every prefix of every
-  question clause becomes a map key: `Θ(L²)` words cloned, `Θ(L² log N)` comparisons per clause,
-  where `ExactLabeledSuffixEcology` — built a few lines below on the same tokens — carries the same
-  support in `Θ(Σ L)`. This is `canon/TABLET_THE_MANIFOLD.md` §22's reading-versus-exhibition
-  distinction.
-
-**Falsifier, and it can kill the derivation:** instrument before repairing, in exact integers that
-reproduce on any machine — membership tests **attempted** against inserts that **fired**, at two or
-more corpus extents. Attempted must scale as `F·P·C̄` while fired scales far below it. If the two
-track each other, the recruitment reading is wrong and the repair must not proceed toward it. A
-repair is admitted only if `clause_routes` is **bit-identical** to the scan's output and all five
-re-emission receipts are unmoved; a cost repair that moves a receipt is not a cost repair.
-
-**What this line does not say.** It does not say the machine is bounded, and no figure here is a
-capacity. A wall in this project has so far always been an operator's mis-derived extent or an
-unnamed refusal, never a limit of what can be carried — see the correction banner on
-`research/records/2026-08-11_THE_SEAL_CARRIED_THE_HOST_AND_THE_ORGANS_AWAIT_THEIR_CURRENT.md`.
+**Next deed:** return 4 of `blueprint/THE_ROADMAP.md` §"THE RECURRENT-SECTION CONSTRUCTION". Deposit
+the smallest morphology that can condition the carrier-neutral causal-section continuation law;
+make the founding corpus unreachable; remount that same owner; classify later presentations by
+stable receiver/history conduct; and require targeted ablation to remove exactly attributable
+section conduct while unrelated fibers remain bit-identical. A serialized corpus, a retained lookup
+table, a host semantic replay, or another bounded language fixture does not return this deed.
 
 ---
 

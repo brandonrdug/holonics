@@ -8,6 +8,53 @@ fn action() -> ActionCurrent {
 }
 
 #[test]
+#[ignore = "requires a CUDA device and the committed morphological conditioning entries"]
+fn cuda_conditioner_returns_the_exact_host_ecology_without_a_production_replay() {
+    let passages = vec![
+        MorphologicalLanguagePassage::new(
+            "math-a",
+            "math",
+            1,
+            "A tensor carries a vector. How does a tensor carry geometry?",
+        ),
+        MorphologicalLanguagePassage::new(
+            "math-b",
+            "math",
+            1,
+            "A matrix carries a vector. How does a matrix carry incidence?",
+        ),
+        MorphologicalLanguagePassage::new(
+            "code-a",
+            "code",
+            2,
+            "The function returns a vector; the caller carries its value.",
+        ),
+        MorphologicalLanguagePassage::new(
+            "prose-a",
+            "prose",
+            3,
+            "A vector points across the field, and the field changes.",
+        ),
+    ];
+    let host = MorphologicalLanguageEcology::condition(&passages, action(), 5).unwrap();
+    let mut conditioner = CudaMorphologicalConditioner::new(0).unwrap();
+    let (card, semantic, apparatus) = MorphologicalLanguageEcology::condition_with_cuda(
+        &passages,
+        action(),
+        &mut conditioner,
+    )
+    .unwrap();
+    assert!(host.exact_conditioning_agreement(&card).unwrap());
+    assert!(semantic.suffix_extensions > 0);
+    assert!(semantic.suffix_crosses > 0);
+    assert!(semantic.prefix_crossings > 0);
+    assert_eq!(apparatus.suffix_launches, 5);
+    assert_eq!(apparatus.prefix_launches, 1);
+    assert_eq!(apparatus.route_launches, 0);
+    assert!(apparatus.resident_words > 0);
+}
+
+#[test]
 fn exact_recurrent_edges_deposit_only_across_distinct_exterior_sources() {
     let plural = MorphologicalLanguageEcology::condition(
         &[

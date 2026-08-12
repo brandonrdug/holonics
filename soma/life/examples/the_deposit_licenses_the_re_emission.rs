@@ -50,7 +50,9 @@ use holonic_engine::hardware_cover::HardwareCover;
 use life::{
     form_mouth::deposit_form_or_message,
     morphological_language::{
-        CudaMorphologicalConductExecutor, MorphologicalConductEdgeAddress, MorphologicalConductGenerationReceipt,
+        CudaMorphologicalConditioner, CudaMorphologicalConductExecutor,
+        MorphologicalConditionSemanticReceipt,
+        MorphologicalConductEdgeAddress, MorphologicalConductGenerationReceipt,
         MorphologicalConductPlurality, MorphologicalConductState, MorphologicalGeneratedCurrent,
         MorphologicalGenerationSpec, MorphologicalLanguageConductState,
         MorphologicalLanguageCurrentGeneration, MorphologicalLanguageEcology,
@@ -63,7 +65,7 @@ use soma_abi::active::ActionCurrent;
 
 const DRIVER: &str = "the_deposit_licenses_the_re_emission";
 const GRADE_FORM: &str = "re-emission-grade";
-const REPORT_SCHEMA: &str = "soma-life.deposit-licenses-re-emission.v2";
+const REPORT_SCHEMA: &str = "soma-life.deposit-licenses-re-emission.v3";
 
 /// **The declared document family of the 14,018-branch measurement**, verbatim from
 /// `soma/life/driver-sources/eros-morphological-language-generation-bounded-01/SOURCE.json`.
@@ -89,7 +91,7 @@ const DECLARED_FAMILY: &[&str] = &[
     "research/records/2026-07-29_THE_RECEIVER_IS_NOT_THE_FRAME_THE_PROJECTION_IS_ONLY_A_MEMBRANE.md",
     "research/records/2026-07-29_THE_SUFFIX_DILATES_THE_CONTEXT_THE_EMANATED_BRANCH_RETURNS_AS_CAUSE.md",
     "soma/life/src/synchronized_occurrence.rs",
-    "standing/README.md",
+    "soma/life/src/morphological_language.rs",
 ];
 
 /// The prompt and depth of the 14,018 measurement, verbatim from the same declared source.
@@ -110,6 +112,18 @@ struct Report {
     prompt: String,
     maximum_observed_tokens: usize,
     conditioning_wall_millis: u128,
+    conditioning_device: String,
+    conditioning_suffix_launches: u64,
+    conditioning_prefix_launches: u64,
+    conditioning_route_launches: u64,
+    conditioning_route_contact_launches: u64,
+    conditioning_resident_words: u64,
+    suffix_extensions: u64,
+    suffix_clones: u64,
+    suffix_crosses: u64,
+    suffix_transition_reads: u64,
+    prefix_edge_reads: u64,
+    conditioning_shadow_profile: MorphologicalConditionSemanticReceipt,
     /// **Conditioning's recruitment cost as WORK, not as a clock.** Membership tests attempted
     /// against incidences returned; their ratio is the overpayment.
     recruitment_membership_tests: u64,
@@ -304,11 +318,11 @@ fn run() -> Result<(), String> {
 
     // --- conditioning ---------------------------------------------------------------------------
     let action = ActionCurrent::new(Cog::lit(1)).ok_or_else(|| "action current is dark".to_owned())?;
-    let workers = std::thread::available_parallelism()
-        .map(|workers| workers.get())
-        .unwrap_or(1);
+    let mut conditioner = CudaMorphologicalConditioner::new(0)
+        .map_err(|error| format!("mount the resident conditioner: {error}"))?;
     let conditioning_started = Instant::now();
-    let ecology = MorphologicalLanguageEcology::condition(&passages, action, workers)
+    let (ecology, conditioning_semantic, conditioning_apparatus) =
+        MorphologicalLanguageEcology::condition_with_cuda(&passages, action, &mut conditioner)
         .map_err(|error| format!("condition the declared family: {error:?}"))?;
     let conditioning_wall_millis = conditioning_started.elapsed().as_millis();
     let recruitment_membership_tests = ecology.census().recruitment_membership_tests;
@@ -319,8 +333,19 @@ fn run() -> Result<(), String> {
         ecology.census().question_prefix_legacy_cloned_tokens;
     let question_prefix_returned_tokens = ecology.census().question_prefix_returned_tokens;
     eprintln!(
-        "conditioned in {conditioning_wall_millis} ms; recruitment work: \
-         {recruitment_membership_tests} membership tests, {recruitment_incidences} incidences"
+        "conditioned on {} in {conditioning_wall_millis} ms; recruitment work: \
+         {recruitment_membership_tests} membership tests, {recruitment_incidences} incidences",
+        conditioning_apparatus.device_name,
+    );
+    eprintln!(
+        "resident morphology: {} suffix extensions, {} clones, {} suffix crosses, {} transition \
+         reads, {} prefix edge reads; {} words remain resident",
+        conditioning_semantic.suffix_extensions,
+        conditioning_semantic.suffix_clones,
+        conditioning_semantic.suffix_crosses,
+        conditioning_semantic.suffix_transition_reads,
+        conditioning_semantic.prefix_edge_reads,
+        conditioning_apparatus.resident_words,
     );
     eprintln!(
         "question-prefix work: {question_prefix_crossings} crossings, {question_prefix_nodes} \
@@ -632,6 +657,18 @@ fn run() -> Result<(), String> {
         prompt: arguments.prompt.clone(),
         maximum_observed_tokens: arguments.tokens,
         conditioning_wall_millis,
+        conditioning_device: conditioning_apparatus.device_name,
+        conditioning_suffix_launches: conditioning_apparatus.suffix_launches,
+        conditioning_prefix_launches: conditioning_apparatus.prefix_launches,
+        conditioning_route_launches: conditioning_apparatus.route_launches,
+        conditioning_route_contact_launches: conditioning_apparatus.route_contact_launches,
+        conditioning_resident_words: conditioning_apparatus.resident_words,
+        suffix_extensions: conditioning_semantic.suffix_extensions,
+        suffix_clones: conditioning_semantic.suffix_clones,
+        suffix_crosses: conditioning_semantic.suffix_crosses,
+        suffix_transition_reads: conditioning_semantic.suffix_transition_reads,
+        prefix_edge_reads: conditioning_semantic.prefix_edge_reads,
+        conditioning_shadow_profile: conditioning_semantic.clone(),
         recruitment_membership_tests,
         recruitment_incidences,
         recruitment_overpayment_numerator: recruitment_membership_tests
