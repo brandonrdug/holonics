@@ -34,7 +34,7 @@
 //! `block = min(function max, device max)` taken down to a whole warp, grid refused by name past
 //! the device's own `MAX_GRID_DIM_X`.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::ffi::{CStr, c_char, c_void};
 use std::ptr;
 
@@ -76,7 +76,8 @@ unsafe extern "C" {
     fn cuCtxSynchronize() -> i32;
     fn cuModuleLoadData(module: *mut CuModule, image: *const c_void) -> i32;
     fn cuModuleUnload(module: CuModule) -> i32;
-    fn cuModuleGetFunction(function: *mut CuFunction, module: CuModule, name: *const c_char) -> i32;
+    fn cuModuleGetFunction(function: *mut CuFunction, module: CuModule, name: *const c_char)
+    -> i32;
     fn cuMemAlloc_v2(pointer: *mut CuDevicePtr, bytes: usize) -> i32;
     fn cuMemFree_v2(pointer: CuDevicePtr) -> i32;
     fn cuMemcpyHtoD_v2(destination: CuDevicePtr, source: *const c_void, bytes: usize) -> i32;
@@ -120,7 +121,9 @@ fn text(query: unsafe extern "C" fn(i32, *mut *const c_char) -> i32, code: i32) 
     let mut out = ptr::null();
     let status = unsafe { query(code, &mut out) };
     if status == CUDA_SUCCESS && !out.is_null() {
-        unsafe { CStr::from_ptr(out) }.to_string_lossy().into_owned()
+        unsafe { CStr::from_ptr(out) }
+            .to_string_lossy()
+            .into_owned()
     } else {
         "<no CUDA driver description>".to_owned()
     }
@@ -147,7 +150,10 @@ struct Buffer {
 impl Buffer {
     fn alloc(bytes: usize) -> Result<Self, CudaRefineError> {
         let mut pointer = 0;
-        driver(unsafe { cuMemAlloc_v2(&mut pointer, bytes.max(1)) }, "cuMemAlloc_v2")?;
+        driver(
+            unsafe { cuMemAlloc_v2(&mut pointer, bytes.max(1)) },
+            "cuMemAlloc_v2",
+        )?;
         Ok(Self { pointer })
     }
 
@@ -175,7 +181,10 @@ impl Buffer {
     }
 
     fn fill(&self, byte: u8, bytes: usize) -> Result<(), CudaRefineError> {
-        driver(unsafe { cuMemsetD8_v2(self.pointer, byte, bytes) }, "cuMemsetD8_v2")
+        driver(
+            unsafe { cuMemsetD8_v2(self.pointer, byte, bytes) },
+            "cuMemsetD8_v2",
+        )
     }
 }
 
@@ -293,17 +302,23 @@ impl CudaRefineExecutor {
             )?;
             let device_name = CStr::from_ptr(raw.as_ptr()).to_string_lossy().into_owned();
 
-            let attribute = |selector: i32, operation: &'static str| -> Result<u32, CudaRefineError> {
-                let mut value = 0i32;
-                driver(cuDeviceGetAttribute(&mut value, selector, device), operation)?;
-                Ok(value.max(0) as u32)
-            };
+            let attribute =
+                |selector: i32, operation: &'static str| -> Result<u32, CudaRefineError> {
+                    let mut value = 0i32;
+                    driver(
+                        cuDeviceGetAttribute(&mut value, selector, device),
+                        operation,
+                    )?;
+                    Ok(value.max(0) as u32)
+                };
             let device_block = attribute(
                 DEVICE_MAX_THREADS_PER_BLOCK,
                 "cuDeviceGetAttribute(MAX_THREADS_PER_BLOCK)",
             )?;
-            let max_grid_x =
-                attribute(DEVICE_MAX_GRID_DIM_X, "cuDeviceGetAttribute(MAX_GRID_DIM_X)")?;
+            let max_grid_x = attribute(
+                DEVICE_MAX_GRID_DIM_X,
+                "cuDeviceGetAttribute(MAX_GRID_DIM_X)",
+            )?;
             let warp = attribute(DEVICE_WARP_SIZE, "cuDeviceGetAttribute(WARP_SIZE)")?.max(1);
 
             let mut context = ptr::null_mut();
@@ -325,9 +340,21 @@ impl CudaRefineExecutor {
             let mut claimed = ptr::null_mut();
             let mut claim = ptr::null_mut();
             for (slot, symbol, operation) in [
-                (&mut refine as *mut CuFunction, c"refine_shell", "cuModuleGetFunction(refine_shell)"),
-                (&mut claimed as *mut CuFunction, c"refine_claimed", "cuModuleGetFunction(refine_claimed)"),
-                (&mut claim as *mut CuFunction, c"claim_identities", "cuModuleGetFunction(claim_identities)"),
+                (
+                    &mut refine as *mut CuFunction,
+                    c"refine_shell",
+                    "cuModuleGetFunction(refine_shell)",
+                ),
+                (
+                    &mut claimed as *mut CuFunction,
+                    c"refine_claimed",
+                    "cuModuleGetFunction(refine_claimed)",
+                ),
+                (
+                    &mut claim as *mut CuFunction,
+                    c"claim_identities",
+                    "cuModuleGetFunction(claim_identities)",
+                ),
             ] {
                 if let Err(error) = driver(
                     cuModuleGetFunction(slot, module, symbol.as_ptr()),
@@ -584,10 +611,11 @@ pub fn front_of(census: &CorpusCensus) -> Vec<(SurfaceId, Vec<(u32, u32)>)> {
 // fixes the ontology — *"CPU/RAM and GPU/VRAM are local charts of the same caused body"* — and
 // `CLAUDE.md` §4 fixes the method: **one operation carries many materials.**
 //
-// So there is ONE quotient. Given a class per cell and an exact key per cell it returns the identity
-// of `(class, key)`. It knows nothing about streams, occurrences, windows, states or language. Every
-// organ with a front expresses its step as `(classes, keys)` and shares this; a new material writes
-// a key law and reuses everything else.
+// So there is ONE quotient. Given a class and one 32-bit key face per cell it returns the identity
+// of `(class, key)`. Wider keys cross as successive exact faces: intersection by high word and then
+// low word is equality of the complete 64-bit key. It knows nothing about streams, occurrences,
+// windows, states or language. Every organ with a front expresses its step as `(classes, keys)` and
+// shares this; a new material writes a key law and reuses everything else.
 
 /// Which chart of the cover enacted a quotient. A realization coordinate, never a holon.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -663,57 +691,66 @@ impl CudaRefineExecutor {
         }
         let capacity = (count + 1).next_power_of_two();
         let mut mask = (capacity - 1) as u32;
-        let device_class = Buffer::of(classes)?;
-        let device_key = Buffer::of(keys)?;
         let table_pair = Buffer::alloc(capacity * std::mem::size_of::<u64>())?;
-        let table_key = Buffer::alloc(capacity * std::mem::size_of::<u64>())?;
-        table_pair.fill(0xff, capacity * std::mem::size_of::<u64>())?;
-        table_key.fill(0xff, capacity * std::mem::size_of::<u64>())?;
-        let device_next = Buffer::alloc(count * std::mem::size_of::<u32>())?;
-
-        let mut cells = count as u32;
-        let mut arguments: Vec<*mut c_void> = vec![
-            &mut { device_class.pointer } as *mut u64 as *mut c_void,
-            &mut { device_key.pointer } as *mut u64 as *mut c_void,
-            &mut { table_pair.pointer } as *mut u64 as *mut c_void,
-            &mut { table_key.pointer } as *mut u64 as *mut c_void,
-            &mut { device_next.pointer } as *mut u64 as *mut c_void,
-            &mut cells as *mut u32 as *mut c_void,
-            &mut mask as *mut u32 as *mut c_void,
-        ];
+        let mut current = classes.to_vec();
         let grid = self.grid_for(count as u64)?;
-        driver(
-            unsafe {
-                cuLaunchKernel(
-                    self.claim,
-                    grid,
-                    1,
-                    1,
-                    self.block_x,
-                    1,
-                    1,
-                    0,
-                    ptr::null_mut(),
-                    arguments.as_mut_ptr(),
-                    ptr::null_mut(),
-                )
-            },
-            "cuLaunchKernel(claim_identities)",
-        )?;
-        driver(unsafe { cuCtxSynchronize() }, "cuCtxSynchronize")?;
-        self.launches += 1;
-
-        let mut slots = vec![0u32; count];
-        device_next.read(&mut slots)?;
-        let mut dense: BTreeMap<u32, u32> = BTreeMap::new();
-        let mut cell_class = Vec::with_capacity(count);
-        for slot in &slots {
-            let next = dense.len() as u32 + 1;
-            cell_class.push(*dense.entry(*slot).or_insert(next));
+        for half in [
+            keys.iter()
+                .map(|key| (key >> 32) as u32)
+                .collect::<Vec<_>>(),
+            keys.iter().map(|key| *key as u32).collect::<Vec<_>>(),
+        ] {
+            table_pair.fill(0xff, capacity * std::mem::size_of::<u64>())?;
+            let device_class = Buffer::of(&current)?;
+            let device_key = Buffer::of(&half)?;
+            let device_next = Buffer::alloc(count * std::mem::size_of::<u32>())?;
+            let mut cells = count as u32;
+            // CUDA receives pointers to the argument values. These locals must live through
+            // `cuLaunchKernel`; taking a raw pointer to a block-expression temporary works by
+            // accident in an unoptimized build and produced address `0x30` in release.
+            let mut class_pointer = device_class.pointer;
+            let mut key_pointer = device_key.pointer;
+            let mut table_pointer = table_pair.pointer;
+            let mut next_pointer = device_next.pointer;
+            let mut arguments: Vec<*mut c_void> = vec![
+                &mut class_pointer as *mut u64 as *mut c_void,
+                &mut key_pointer as *mut u64 as *mut c_void,
+                &mut table_pointer as *mut u64 as *mut c_void,
+                &mut next_pointer as *mut u64 as *mut c_void,
+                &mut cells as *mut u32 as *mut c_void,
+                &mut mask as *mut u32 as *mut c_void,
+            ];
+            driver(
+                unsafe {
+                    cuLaunchKernel(
+                        self.claim,
+                        grid,
+                        1,
+                        1,
+                        self.block_x,
+                        1,
+                        1,
+                        0,
+                        ptr::null_mut(),
+                        arguments.as_mut_ptr(),
+                        ptr::null_mut(),
+                    )
+                },
+                "cuLaunchKernel(claim_identities)",
+            )?;
+            driver(unsafe { cuCtxSynchronize() }, "cuCtxSynchronize")?;
+            self.launches += 1;
+            let mut slots = vec![0u32; count];
+            device_next.read(&mut slots)?;
+            let mut dense: BTreeMap<u32, u32> = BTreeMap::new();
+            for (at, slot) in slots.iter().enumerate() {
+                let next = dense.len() as u32 + 1;
+                current[at] = *dense.entry(*slot).or_insert(next);
+            }
         }
         Ok(Quotient {
-            classes: dense.len(),
-            cell_class,
+            classes: current.iter().copied().collect::<BTreeSet<_>>().len(),
+            cell_class: current,
             carrier: QuotientCarrier::Device,
         })
     }
@@ -736,7 +773,9 @@ mod tests {
         // chosen so distinct pairs land near each other under any probe.
         for cells in [1usize, 2, 31, 32, 33, 1024, 40_000] {
             let classes: Vec<u32> = (0..cells).map(|at| (at % 7) as u32 + 1).collect();
-            let keys: Vec<u64> = (0..cells).map(|at| ((at % 11) as u64) << 32 | (at % 5) as u64).collect();
+            let keys: Vec<u64> = (0..cells)
+                .map(|at| ((at % 11) as u64) << 32 | (at % 5) as u64)
+                .collect();
             let host = quotient_on_host(&classes, &keys);
             let device = card
                 .quotient_on_device(&classes, &keys)

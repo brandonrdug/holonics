@@ -48,14 +48,12 @@
 //! anti-orthography guard: without it, this module would be a way of writing prose that happens to
 //! spell a structure.
 //!
-//! # The boundary, named rather than papered over
+//! # The contact face crosses; the reaction class does not
 //!
-//! [`ContactSpecies`] does **not** cross the seam. `incidence_production::Bond` carries no species
-//! field and this module may not add one. The consequence is measurable and is reported by the
-//! driver: `2 + 2` and `2 · 2` found **isomorphic** complexes, separated only by the constituent's
-//! name — so the operator reaches the transport through the byte chart and not through `∂`.
-//! Carrying the species would need one field on `Bond`, which is the one change to
-//! `incidence_production.rs` this work would ask for.
+//! [`ContactSpecies`] is retained on `incidence_production::Bond` as a [`DeclaredContactFace`]. It
+//! is exterior lineage and decides nothing in that owner. A later receiver/history quotient may
+//! find that faces with different names conduct alike or that equal names separate. This closes the
+//! prior erasure without turning the source atlas into an authored internal chemistry.
 
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -63,7 +61,8 @@ use num_bigint::BigInt;
 use num_rational::BigRational;
 
 use crate::incidence_production::{
-    DeclaredOccurrence, Emission, IncidenceComplex, IncidenceProductionError, PhaseChart,
+    DeclaredContactFace, DeclaredOccurrence, IncidenceComplex, IncidenceProductionError,
+    PhaseChart,
 };
 
 /// The exact rational carrier. No float enters this module at any point.
@@ -429,9 +428,19 @@ impl MaterialAtlas {
         representative: RankRepresentative,
     ) -> Result<IncidenceComplex, MaterialIncidenceError> {
         let occurrences = self.declared_occurrences(representative)?;
+        let contact_faces = self
+            .contacts
+            .iter()
+            .map(|contact| {
+                DeclaredContactFace::new(contact.species.name())
+                    .map(|face| vec![face])
+                    .map_err(MaterialIncidenceError::Complex)
+            })
+            .collect::<Result<Vec<_>, _>>()?;
         // A 1-cell has exactly two boundary 0-cells; the aperture is the contact itself and its
         // outside is empty by construction, which `patches_outside_extent` reports as zero.
-        IncidenceComplex::found(&occurrences, 2).map_err(MaterialIncidenceError::Complex)
+        IncidenceComplex::found_with_contact_faces(&occurrences, 2, &contact_faces)
+            .map_err(MaterialIncidenceError::Complex)
     }
 
     /// The gauge orbit of the rank representative. Every rank must be unmoved.
@@ -468,12 +477,15 @@ impl MaterialAtlas {
         let founded = complex
             .bonds()
             .iter()
-            .map(|bond| {
-                (
-                    complex.sites()[bond.from].causal_rank,
-                    complex.sites()[bond.from].surface.as_str(),
-                    complex.sites()[bond.to].surface.as_str(),
-                )
+            .flat_map(|bond| {
+                bond.contact_faces.iter().map(|face| {
+                    (
+                        complex.sites()[bond.from].causal_rank,
+                        complex.sites()[bond.from].surface.as_str(),
+                        complex.sites()[bond.to].surface.as_str(),
+                        face.name(),
+                    )
+                })
             })
             .collect::<BTreeSet<_>>();
 
@@ -488,7 +500,7 @@ impl MaterialAtlas {
                 refused_self += 1;
                 continue;
             }
-            if founded.contains(&(rank, from, to)) {
+            if founded.contains(&(rank, from, to, contact.species.name())) {
                 present += 1;
             } else if absent.len() < 8 {
                 absent.push(format!("{from} ⟶ {to} at rank {rank}"));
@@ -1792,6 +1804,42 @@ mod tests {
     }
 
     #[test]
+    fn plural_declared_contact_faces_survive_on_one_bond_without_becoming_its_class() {
+        let atlas = MaterialAtlas::new(
+            MaterialKind::Lean,
+            vec!["source".to_owned(), "target".to_owned()],
+            vec![0, 1],
+            vec![
+                StructuralContact {
+                    from: 0,
+                    to: 1,
+                    owner: 0,
+                    species: ContactSpecies::Recruits,
+                },
+                StructuralContact {
+                    from: 0,
+                    to: 1,
+                    owner: 0,
+                    species: ContactSpecies::Conducts,
+                },
+            ],
+            0,
+            1,
+        )
+        .unwrap();
+        let complex = atlas.found(RankRepresentative::Least).unwrap();
+        assert_eq!(complex.bonds().len(), 1, "equal endpoints found one contact");
+        let faces = complex.bonds()[0]
+            .contact_faces
+            .iter()
+            .map(DeclaredContactFace::name)
+            .collect::<BTreeSet<_>>();
+        assert_eq!(faces, BTreeSet::from(["conducts", "recruits"]));
+        assert_eq!(complex.bonds()[0].multiplicity, 2);
+        assert!(atlas.faithfulness(&complex).is_faithful());
+    }
+
+    #[test]
     fn the_rank_representative_is_a_gauge_and_moves_nothing() {
         let family = four();
         let atlas = arithmetic_atlas(&family).unwrap();
@@ -1824,14 +1872,14 @@ mod tests {
             .hand_up(PhaseChart::WindingAdjacent)
             .unwrap()
             .iter()
-            .map(Emission::holonomy_text)
+            .map(crate::incidence_production::Emission::holonomy_text)
             .collect::<BTreeSet<_>>();
         assert!(
             turns.len() > 1,
             "every closed boundary in the family returned one turn: {turns:?}"
         );
-        // `2+2` and `2*2` are the isomorphic pair: the operator reaches the complex only through
-        // the constituent's name, and a route surface is the only thing that can tell them apart.
+        // `2+2` and `2*2` remain the same operand-contact species. Preserving that face honestly
+        // does not invent an operation class; a consequence intervention is still required.
         let pair = quotient
             .separating_words
             .iter()

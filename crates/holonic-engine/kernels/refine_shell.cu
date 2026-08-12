@@ -105,14 +105,13 @@ extern "C" __global__ void shell_keys(
 
 /// **The law: one lane per cell, claiming the identity of `(class, key)`.**
 ///
-/// This is the whole of the exact quotient. It is material-free by construction — its only inputs
-/// are a class and a key per cell — so every organ with a front shares it rather than growing a
-/// device path of its own.
+/// This is the whole of one 32-bit face of the exact quotient. It is material-free by construction
+/// — its only inputs are a class and a key face per cell — so every organ with a front shares it
+/// rather than growing a device path of its own. A wider key crosses as successive exact faces.
 extern "C" __global__ void claim_identities(
     const uint32_t *cell_class,
-    const uint64_t *cell_key,
+    const uint32_t *cell_key,
     uint64_t *table_pair,
-    uint64_t *table_key,
     uint32_t *cell_next_class,
     uint32_t cell_count,
     uint32_t capacity_mask)
@@ -121,42 +120,26 @@ extern "C" __global__ void claim_identities(
     if (at >= cell_count) {
         return;
     }
-    const uint64_t key = cell_key[at];
-    const uint64_t klass = (uint64_t)cell_class[at];
-    uint64_t probe = refine_mix(klass * 0x9e3779b97f4a7c15ULL + key) & (uint64_t)capacity_mask;
+    const uint64_t pair = ((uint64_t)cell_class[at] << 32) | (uint64_t)cell_key[at];
+    uint64_t probe = refine_mix(pair) & (uint64_t)capacity_mask;
     for (;;) {
         const uint64_t seen = ((volatile uint64_t *)table_pair)[probe];
-        if (seen == klass) {
-            // The claim and the key are two stores; a reader can see the first without the second.
-            // Falling through here split one class in two -- measured on `"of"` at shell one, 1,794
-            // classes on the card against 1,787 on the host.
-            while (((volatile uint64_t *)table_key)[probe] == REFINE_EMPTY) {
-            }
-            if (((volatile uint64_t *)table_key)[probe] == key) {
-                cell_next_class[at] = (uint32_t)probe;
-                return;
-            }
-            probe = (probe + 1) & (uint64_t)capacity_mask;
-            continue;
+        if (seen == pair) {
+            cell_next_class[at] = (uint32_t)probe;
+            return;
         }
         if (seen == REFINE_EMPTY) {
             const uint64_t won = atomicCAS(
                 (unsigned long long *)&table_pair[probe],
                 (unsigned long long)REFINE_EMPTY,
-                (unsigned long long)klass);
+                (unsigned long long)pair);
             if (won == REFINE_EMPTY) {
-                table_key[probe] = key;
-                __threadfence();
                 cell_next_class[at] = (uint32_t)probe;
                 return;
             }
-            if (won == klass) {
-                while (((volatile uint64_t *)table_key)[probe] == REFINE_EMPTY) {
-                }
-                if (((volatile uint64_t *)table_key)[probe] == key) {
-                    cell_next_class[at] = (uint32_t)probe;
-                    return;
-                }
+            if (won == pair) {
+                cell_next_class[at] = (uint32_t)probe;
+                return;
             }
         }
         probe = (probe + 1) & (uint64_t)capacity_mask;

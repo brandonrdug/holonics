@@ -20,12 +20,91 @@ above "close the loop", because closing a loop adds no organ. Brandon, direct ru
 > *"this is 'holobrochos', you need to outline the spine of the machine and understand how all of
 > the loops and machinery connects and choreographs information transportation."*
 
-## WHERE THIS STANDS — revised 2026-08-11; prior revision 2026-08-10 at `9d15666`
+## WHERE THIS STANDS — revised 2026-08-12; prior revision 2026-08-11
 
 **Read this section, §"THE DELEGATED CONSTRUCTION PLANS" directly below it, and §"THE OPEN WORK, BY
 STATION". Everything between them is the returned ledger and its provenance.** Brandon authorised
 the standing revision directly: *"Regarding the roadmap document, you can authoritatively revise it
 once you have sufficient context post-analysis campaign."*
+
+## THE RECURRENT-SECTION CONSTRUCTION — authorized 2026-08-12
+
+**Authority.** Brandon, after ratifying the ontology and its technical reading: *"allow this to now
+be the next item on the roadmap ... I would like to proceed with construction and
+experimentation."* The governing doctrine is `canon/TABLET_THE_REASONING_CYCLE.md`; the complete
+derivation and existing-owner audit are in
+`research/records/2026-08-12_THE_PRETRAINED_TRANSFORMER_IS_ONE_TRANSPORT_ORGAN_THE_REASONING_MACHINE_IS_THE_RETURNING_ECOLOGY.md`.
+
+**The deed is one missing edge, not a new language-model cabinet.** Build the smallest
+carrier-neutral causal-section join which preserves interaction testimony across transport and
+lets the standing exact consequence, receiver-compression, reconstruction, return, and remount
+owners read the same continuing object. Conversation is one recurrence fixture; English, Lean,
+Rust, arithmetic, LaTeX, Typst, Python, and prose are codec/delivery lineage and controls, never
+internal semantic taxa or conduct routers.
+
+One causal section carries
+
+```text
+(situated occurrences, plural grains, typed contact testimony, ordered ports, chronology,
+ exact transports/consequences, receiver faces, unresolved alternatives, lineage).
+```
+
+**Order and gates.** These are one construction in four returns:
+
+1. **Full-corpus work gate.** Finish the exact counted work law already named by the position
+   record. The recruitment transpose is repaired and measured; the still-unexamined question-prefix
+   presentation must receive exact attempted/returned work counters before repair, then retain the
+   same relation in one owner-local boundary-anchored incidence atlas without moving any returned
+   relation. This is a real
+   prerequisite to taking the new section ecology over the sealed corpus, not a prerequisite to
+   founding its bounded constitutive law.
+2. **Carrier-neutral section join.** Preserve the contact witness which
+   `material_incidence::ContactSpecies` currently loses before `incidence_production::Bond`, but do
+   not make that exterior face the internal reaction class. A founded class is the stable
+   receiver/history quotient of exact consequences; the raw face remains lineage and an oracle
+   control only.
+3. **Bounded cross-codec experiment.** Present one operation through several renamed/formatted
+   surfaces and compare it against a same-value/different-law control. The machine must collapse
+   presentations whose complete declared conduct agrees, separate the control under the shortest
+   intervention, return the plural reconstruction fibers, and preserve every contact/transition
+   witness. No material-kind branch may participate.
+4. **Condition, detach, and return.** Take the same law through the repaired mixed-corpus path,
+   deposit its morphology, detach the founding material, remount, and require the later
+   classification to ride the deposit. Ablation must remove exactly the conduct attributable to
+   the removed section while unrelated classes remain bit-identical.
+
+**Apparatus correction, direct 2026-08-12.** Brandon stopped the first full-corpus work run with:
+*"Why are you not utilizing the GPU paths? This should be streamlined in the machine's codebase,
+not something you get to choose or neglect on accident."* The run was terminated without a grade.
+`MorphologicalLanguageEcology::condition_with_executor` is not a satisfying repair: only route
+Swing events cross its executor; the five exact suffix charts and the question-prefix atlas remain
+host constructions, and auxiliary lanes can silently mount host carriers. Therefore return 1 and
+return 4 now require one concrete, mandatory `CudaMorphologicalConditioner`. It mounts before the
+deed, owns the resident suffix/prefix bodies, returns exact semantic and separate apparatus
+receipts, and refuses rather than falling back. The present host conditioner is admission/work-law
+testimony only. A host run, a CUDA route-event subset, or a later CUDA attachment cannot grade the
+full conditioning return.
+
+The bounded section quotient itself must likewise have no optional carrier. Its production `read`
+requires the already-mounted generic exact CUDA quotient; the host construction is test-only parity
+testimony. This is a completed apparatus correction for returns 2–3, not a substitute for the
+missing resident mixed-corpus conditioner.
+
+**The first grade.** The bounded return must itself contain presentation lineage, complete causal
+sections, exact observations and successor transitions, stable behavioral blocks, shortest
+separators, reconstruction fibers, counted work, and the open exterior. A report containing only
+class counts, surface similarity, one shared value, or a hand-authored `Add`/`Multiply` class has
+not returned the deed.
+
+**Falsifiers.** Rename every surface while preserving incidence and consequences; the quotient must
+stand. Hold one value fixed while changing the operation; a successor intervention must separate
+it. Remove the intervention receiver; the quotient may only coarsen. Reverse a noncommuting port;
+the hand must move. Erase a contact witness; the transport receipt must name the departure. Route
+by a material label, select one unresolved representative, or let a spectrum stand for the causal
+complex, and the construction is refused.
+
+This authorization supersedes the earlier scheduling sentence which named the work law alone as
+the next deed by **incorporating that law as gate 1**. It does not waive it.
 
 ## THE DELEGATED CONSTRUCTION PLANS — deposited 2026-08-11 for execution by Sol
 

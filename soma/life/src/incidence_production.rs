@@ -160,6 +160,9 @@ pub enum IncidenceProductionError {
     /// derived. It is refused rather than given rank zero, which would silently make a caused
     /// occurrence a root.
     ArrivalCauseIsOutsideTheFamily(String),
+    /// A declared contact-face chart did not have exactly one entry per admitted adjacent patch
+    /// pair, or a face was empty. The relation is refused rather than shifted onto another bond.
+    ContactFaceExtent,
 }
 
 /// One occurrence of the declared material, as the corpus carries it.
@@ -172,6 +175,32 @@ pub struct DeclaredOccurrence {
     pub storage_ordinal: u64,
     pub caused_by: BTreeSet<String>,
     pub text: String,
+}
+
+/// One exterior face of a contact, retained as lineage through transport.
+///
+/// This is deliberately not a reaction class. A source atlas may call a face `operand`, `calls`,
+/// or `adjacency`; a later behavioral quotient decides whether two such faces conduct alike. The
+/// complex keeps the declaration only so that transport cannot erase which contact was supplied.
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub struct DeclaredContactFace(String);
+
+impl DeclaredContactFace {
+    pub fn new(face: impl Into<String>) -> Result<Self, IncidenceProductionError> {
+        let face = face.into();
+        if face.is_empty() {
+            return Err(IncidenceProductionError::ContactFaceExtent);
+        }
+        Ok(Self(face))
+    }
+
+    pub fn name(&self) -> &str {
+        &self.0
+    }
+
+    fn inscription_adjacency() -> Self {
+        Self("inscription-adjacency".to_owned())
+    }
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -213,6 +242,9 @@ pub struct Bond {
     /// The §III sheet the contact lands on: `+1` same sheet, `−1` opposed. The sense of the turn.
     pub sheet: i8,
     pub multiplicity: u64,
+    /// Complete exterior contact-face population which caused this bond. It participates in no
+    /// constitutive decision; it survives so a later receiver can test, ablate, or quotient it.
+    pub contact_faces: BTreeSet<DeclaredContactFace>,
 }
 
 /// A closed internal boundary: dimension 2, one element of the fundamental cycle basis.
@@ -432,8 +464,29 @@ impl IncidenceComplex {
         occurrences: &[DeclaredOccurrence],
         patch_extent: usize,
     ) -> Result<Self, IncidenceProductionError> {
+        Self::found_inner(occurrences, patch_extent, None)
+    }
+
+    /// Found the same complex while retaining one declared exterior face per admitted adjacent
+    /// patch pair. The face is lineage, never the internal reaction class.
+    pub fn found_with_contact_faces(
+        occurrences: &[DeclaredOccurrence],
+        patch_extent: usize,
+        contact_faces: &[Vec<DeclaredContactFace>],
+    ) -> Result<Self, IncidenceProductionError> {
+        Self::found_inner(occurrences, patch_extent, Some(contact_faces))
+    }
+
+    fn found_inner(
+        occurrences: &[DeclaredOccurrence],
+        patch_extent: usize,
+        contact_faces: Option<&[Vec<DeclaredContactFace>]>,
+    ) -> Result<Self, IncidenceProductionError> {
         if occurrences.is_empty() || patch_extent == 0 {
             return Err(IncidenceProductionError::NoDeclaredMaterial);
+        }
+        if contact_faces.is_some_and(|faces| faces.len() != occurrences.len()) {
+            return Err(IncidenceProductionError::ContactFaceExtent);
         }
         let ranks = causal_ranks(occurrences)?;
 
@@ -455,9 +508,19 @@ impl IncidenceComplex {
             patches_outside_extent = patches_outside_extent
                 .checked_add(complete.saturating_sub(patch_extent) as u64)
                 .ok_or(IncidenceProductionError::Extent)?;
+            let expected_faces = complete.min(patch_extent).saturating_sub(1);
+            let declared_faces = contact_faces.map(|faces| &faces[at]);
+            if declared_faces.is_some_and(|faces| faces.len() != expected_faces) {
+                return Err(IncidenceProductionError::ContactFaceExtent);
+            }
 
             let mut previous: Option<usize> = None;
-            for patch in occurrence.text.split_whitespace().take(patch_extent) {
+            for (patch_at, patch) in occurrence
+                .text
+                .split_whitespace()
+                .take(patch_extent)
+                .enumerate()
+            {
                 let key = (rank, patch.to_owned());
                 let at_site = match site_index.get(&key) {
                     Some(found) => {
@@ -485,7 +548,19 @@ impl IncidenceComplex {
                     if prior == at_site {
                         self_contacts_refused += 1;
                     } else {
-                        found_bond(&mut bonds, &mut bond_index, &sites, prior, at_site, rank, 0)?;
+                        let face = declared_faces
+                            .map(|faces| faces[patch_at - 1].clone())
+                            .unwrap_or_else(DeclaredContactFace::inscription_adjacency);
+                        found_bond(
+                            &mut bonds,
+                            &mut bond_index,
+                            &sites,
+                            prior,
+                            at_site,
+                            rank,
+                            0,
+                            BTreeSet::from([face]),
+                        )?;
                     }
                 }
                 previous = Some(at_site);
@@ -1242,10 +1317,14 @@ impl IncidenceComplex {
                 // its hand while the acceptor crosses it against. Equal hands do not glue
                 // coherently; that is a chirality obstruction and is counted, not bonded.
                 let mut glued = false;
+                let mut contact_faces = BTreeSet::new();
                 for (at, hand) in donor.1.iter() {
                     if let Some(other) = acceptor.1.get(at) {
                         if *hand == other.reversed() {
                             glued |= hand.coefficient() > 0;
+                            if hand.coefficient() > 0 {
+                                contact_faces.extend(self.bonds[*at].contact_faces.iter().cloned());
+                            }
                         } else {
                             incoherent += 1;
                         }
@@ -1254,12 +1333,17 @@ impl IncidenceComplex {
                 // Species two: a contact of this complex LEAVES one closed boundary and ARRIVES at
                 // the other, and is internal to neither. §IV: removing or reversing it changes
                 // later lawful transport.
-                let crossing = self.bonds.iter().enumerate().any(|(at, bond)| {
-                    !donor.1.contains_key(&at)
+                let mut crossing = false;
+                for (at, bond) in self.bonds.iter().enumerate() {
+                    if !donor.1.contains_key(&at)
                         && !acceptor.1.contains_key(&at)
                         && donor.0.contains(&bond.from)
                         && acceptor.0.contains(&bond.to)
-                });
+                    {
+                        crossing = true;
+                        contact_faces.extend(bond.contact_faces.iter().cloned());
+                    }
+                }
                 if glued || crossing {
                     found_bond(
                         &mut bonds,
@@ -1269,6 +1353,7 @@ impl IncidenceComplex {
                         right,
                         self.compounds[left].causal_rank,
                         grain,
+                        contact_faces,
                     )?;
                 }
             }
@@ -1851,6 +1936,7 @@ impl IncidenceComplex {
                         at_site,
                         rank,
                         self.grain,
+                        BTreeSet::from([DeclaredContactFace::inscription_adjacency()]),
                     )?;
                     if let Some(found) = existing {
                         *trace.bond_multiplicity_delta.entry(found).or_default() += 1;
@@ -2615,13 +2701,18 @@ fn found_bond(
     to: usize,
     causal_rank: u32,
     grain: u32,
+    contact_faces: BTreeSet<DeclaredContactFace>,
 ) -> Result<(), IncidenceProductionError> {
+    if contact_faces.is_empty() {
+        return Err(IncidenceProductionError::ContactFaceExtent);
+    }
     match index.get(&(from, to)) {
         Some(at) => {
             bonds[*at].multiplicity = bonds[*at]
                 .multiplicity
                 .checked_add(1)
                 .ok_or(IncidenceProductionError::Extent)?;
+            bonds[*at].contact_faces.extend(contact_faces);
         }
         None => {
             index.insert((from, to), bonds.len());
@@ -2637,6 +2728,7 @@ fn found_bond(
                 ),
                 sheet: sheet_of(sites[to].surface.as_bytes()),
                 multiplicity: 1,
+                contact_faces,
             });
         }
     }
@@ -3058,6 +3150,10 @@ mod tests {
             // A grain-one contact is an actual contact of the grain-zero complex crossing between
             // two closed boundaries, so it can never exceed the contact population below it.
             assert!(next.bonds().len() <= complex.bonds().len());
+            assert!(
+                next.bonds().iter().all(|bond| !bond.contact_faces.is_empty()),
+                "a higher-grain contact erased every lower contact face"
+            );
         }
     }
 

@@ -181,6 +181,15 @@ pub struct MorphologicalScaleCensus {
     /// each other the scan reading is wrong.
     pub recruitment_membership_tests: u64,
     pub recruitment_incidences: u64,
+    /// Question-initial prefix incidences crossed once in the boundary-anchored prefix atlas.
+    pub question_prefix_crossings: u64,
+    /// Distinct non-root prefix nodes retained by that atlas.
+    pub question_prefix_nodes: u64,
+    /// Counterfactual token clones performed by the superseded `prefix[..end].to_vec()` chart.
+    /// This is derived exactly from the same admitted question clauses; it is not a clock.
+    pub question_prefix_legacy_cloned_tokens: u64,
+    /// Tokens materialized in the actually returned recurrent-and-branching operator regions.
+    pub question_prefix_returned_tokens: u64,
 }
 
 /// Resource and causal-connection receipt of one generated current population. Whole-body forks

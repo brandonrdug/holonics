@@ -28,6 +28,125 @@ struct SourceStanding {
     receiver: u64,
 }
 
+/// One boundary-anchored question-prefix receiver.
+///
+/// The former representation cloned `tokens[..end]` into a map for every prefix occurrence. That
+/// is a quadratic presentation of a prefix incidence relation: every longer prefix copied all of
+/// its ancestors again. This node retains the relation itself. A token is stored once per distinct
+/// edge; occurrence/source/continuation support crosses the node which already represents the
+/// prefix. A vector is materialized only when that prefix is actually returned.
+#[derive(Debug, Default)]
+struct QuestionPrefixNode {
+    parent: Option<usize>,
+    surface: String,
+    children: BTreeMap<String, usize>,
+    sources: BTreeSet<ReceiverFiberIdentity>,
+    occurrences: BTreeSet<ReceiverFiberIdentity>,
+    continuations: BTreeSet<String>,
+}
+
+#[derive(Debug)]
+struct QuestionPrefixAtlas {
+    nodes: Vec<QuestionPrefixNode>,
+    crossings: u64,
+    legacy_cloned_tokens: u64,
+}
+
+impl QuestionPrefixAtlas {
+    fn new() -> Self {
+        Self {
+            nodes: vec![QuestionPrefixNode::default()],
+            crossings: 0,
+            legacy_cloned_tokens: 0,
+        }
+    }
+
+    fn admit(
+        &mut self,
+        ordered_surface: &[String],
+        source: &ReceiverFiberIdentity,
+        occurrence: &ReceiverFiberIdentity,
+    ) -> Result<(), MorphologicalLanguageError> {
+        let mut node = 0usize;
+        for end in 1..ordered_surface.len() {
+            self.crossings = self
+                .crossings
+                .checked_add(1)
+                .ok_or(MorphologicalLanguageError::CarrierExtent)?;
+            self.legacy_cloned_tokens = self
+                .legacy_cloned_tokens
+                .checked_add(
+                    u64::try_from(end).map_err(|_| MorphologicalLanguageError::CarrierExtent)?,
+                )
+                .ok_or(MorphologicalLanguageError::CarrierExtent)?;
+            let surface = &ordered_surface[end - 1];
+            node = match self.nodes[node].children.get(surface).copied() {
+                Some(found) => found,
+                None => {
+                    let found = self.nodes.len();
+                    self.nodes.push(QuestionPrefixNode {
+                        parent: Some(node),
+                        surface: surface.clone(),
+                        ..QuestionPrefixNode::default()
+                    });
+                    self.nodes[node].children.insert(surface.clone(), found);
+                    found
+                }
+            };
+            self.nodes[node].sources.insert(source.clone());
+            self.nodes[node].occurrences.insert(occurrence.clone());
+            self.nodes[node]
+                .continuations
+                .insert(ordered_surface[end].clone());
+        }
+        Ok(())
+    }
+
+    fn returned(
+        &self,
+    ) -> Result<
+        (
+            BTreeMap<Vec<String>, BTreeSet<ReceiverFiberIdentity>>,
+            u64,
+            u64,
+        ),
+        MorphologicalLanguageError,
+    > {
+        let mut returned = BTreeMap::new();
+        let mut returned_tokens = 0u64;
+        for at in 1..self.nodes.len() {
+            let node = &self.nodes[at];
+            if node.occurrences.len() < 2 || node.continuations.len() < 2 {
+                continue;
+            }
+            let mut reverse = Vec::new();
+            let mut cursor = at;
+            loop {
+                let here = &self.nodes[cursor];
+                reverse.push(here.surface.clone());
+                let Some(parent) = here.parent else {
+                    return Err(MorphologicalLanguageError::MalformedFiber);
+                };
+                if parent == 0 {
+                    break;
+                }
+                cursor = parent;
+            }
+            reverse.reverse();
+            returned_tokens = returned_tokens
+                .checked_add(
+                    u64::try_from(reverse.len())
+                        .map_err(|_| MorphologicalLanguageError::CarrierExtent)?,
+                )
+                .ok_or(MorphologicalLanguageError::CarrierExtent)?;
+            returned.insert(reverse, node.sources.clone());
+        }
+        let nodes = u64::try_from(self.nodes.len().saturating_sub(1))
+            .map_err(|_| MorphologicalLanguageError::CarrierExtent)?;
+        Ok((returned, nodes, returned_tokens))
+    }
+}
+
 /// One successor opened by one cell of the generation front, carrying what its own expansion
 /// caused.
 ///
@@ -407,14 +526,7 @@ impl MorphologicalLanguageEcology {
         let mut ordered_region_paths = Vec::new();
         let mut ordered_region_labels = Vec::new();
         let mut clause_labels = BTreeMap::new();
-        let mut question_prefix_support = BTreeMap::<
-            Vec<String>,
-            (
-                BTreeSet<ReceiverFiberIdentity>,
-                BTreeSet<ReceiverFiberIdentity>,
-                BTreeSet<String>,
-            ),
-        >::new();
+        let mut question_prefix_atlas = QuestionPrefixAtlas::new();
         for (clause_at, clause) in clauses.iter().enumerate() {
             if clause_labels
                 .insert(clause.fiber.clone(), clause_at)
@@ -425,14 +537,11 @@ impl MorphologicalLanguageEcology {
             let ordered_surface = folded_surface_tokens(&clause.tokens);
             let is_question = clause.tokens.last().is_some_and(|token| token == "?");
             if is_question {
-                for end in 1..ordered_surface.len() {
-                    let support = question_prefix_support
-                        .entry(ordered_surface[..end].to_vec())
-                        .or_default();
-                    support.0.insert(clause.source.clone());
-                    support.1.insert(clause.fiber.clone());
-                    support.2.insert(ordered_surface[end].clone());
-                }
+                question_prefix_atlas.admit(
+                    &ordered_surface,
+                    &clause.source,
+                    &clause.fiber,
+                )?;
             } else if !ordered_surface.is_empty() {
                 clause_lexical_paths.push(token_germs(&clause.tokens)?);
                 clause_lexical_labels.push(clause.fiber.clone());
@@ -440,12 +549,10 @@ impl MorphologicalLanguageEcology {
                 ordered_region_labels.push(clause.fiber.clone());
             }
         }
-        let question_operator_prefixes = question_prefix_support
-            .into_iter()
-            .filter_map(|(prefix, (sources, occurrences, continuations))| {
-                (occurrences.len() >= 2 && continuations.len() >= 2).then_some((prefix, sources))
-            })
-            .collect::<BTreeMap<_, _>>();
+        let question_prefix_crossings = question_prefix_atlas.crossings;
+        let question_prefix_legacy_cloned_tokens = question_prefix_atlas.legacy_cloned_tokens;
+        let (question_operator_prefixes, question_prefix_nodes, question_prefix_returned_tokens) =
+            question_prefix_atlas.returned()?;
         let mut mark_paths = Vec::new();
         let mut mark_labels = Vec::new();
         for (surface, labels) in mark_sources {
@@ -552,6 +659,10 @@ impl MorphologicalLanguageEcology {
             conditioning_events,
             recruitment_membership_tests,
             recruitment_incidences,
+            question_prefix_crossings,
+            question_prefix_nodes,
+            question_prefix_legacy_cloned_tokens,
+            question_prefix_returned_tokens,
         };
         Ok(Self {
             route_sections,
@@ -606,6 +717,54 @@ impl MorphologicalLanguageEcology {
             }
         }
         (transposed, scanned, scan_tests)
+    }
+
+    /// The boundary-anchored prefix atlas and the superseded vector-key presentation, over the
+    /// same conditioned standing. This is test-only: the legacy chart may establish equality but
+    /// may never return to a conduct path.
+    #[cfg(test)]
+    pub(in crate::morphological_language) fn question_prefix_audit(
+        &self,
+    ) -> (
+        BTreeMap<Vec<String>, BTreeSet<ReceiverFiberIdentity>>,
+        BTreeMap<Vec<String>, BTreeSet<ReceiverFiberIdentity>>,
+        u64,
+    ) {
+        let mut legacy = BTreeMap::<
+            Vec<String>,
+            (
+                BTreeSet<ReceiverFiberIdentity>,
+                BTreeSet<ReceiverFiberIdentity>,
+                BTreeSet<String>,
+            ),
+        >::new();
+        let mut legacy_cloned_tokens = 0u64;
+        for clause in &self.clauses {
+            if clause.tokens.last().is_none_or(|token| token != "?") {
+                continue;
+            }
+            let ordered_surface = folded_surface_tokens(&clause.tokens);
+            for end in 1..ordered_surface.len() {
+                legacy_cloned_tokens += end as u64;
+                let support = legacy
+                    .entry(ordered_surface[..end].to_vec())
+                    .or_default();
+                support.0.insert(clause.source.clone());
+                support.1.insert(clause.fiber.clone());
+                support.2.insert(ordered_surface[end].clone());
+            }
+        }
+        let legacy = legacy
+            .into_iter()
+            .filter_map(|(prefix, (sources, occurrences, continuations))| {
+                (occurrences.len() >= 2 && continuations.len() >= 2).then_some((prefix, sources))
+            })
+            .collect::<BTreeMap<_, _>>();
+        (
+            self.question_operator_prefixes.clone(),
+            legacy,
+            legacy_cloned_tokens,
+        )
     }
 
     pub const fn census(&self) -> &MorphologicalScaleCensus {

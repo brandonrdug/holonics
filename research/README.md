@@ -1,8 +1,9 @@
 # Research record
 
-`records/` contains all 307 laboratory research deposits present at extraction on 3 August 2026.
-They are chronological evidence, not an executable plan. Later records may correct earlier ones;
-the normalized canon in `../canon/` governs the rebuild.
+`records/` contains 353 research deposits current through 12 August 2026, including all 307
+laboratory deposits present at extraction on 3 August. They are chronological evidence, not an
+executable plan. Later records may correct earlier ones; the normalized canon in `../canon/`
+governs the rebuild.
 
 ## Thematic entry points
 
@@ -57,6 +58,13 @@ the normalized canon in `../canon/` governs the rebuild.
   residual standing, training as adjoint return, the complete model-world recurrence, cross-codec
   operation equivalence under interventions, self-similarity and section modulus, and the minimal
   recurrent-section machine. Compressed into `../canon/TABLET_THE_REASONING_CYCLE.md`.
+- **Contact-preserving causal sections and cross-codec operation conduct:**
+  `records/2026-08-12_THE_CONTACT_FACE_CROSSES_THE_BOND_CONDUCT_NOT_THE_CODEC_FOUNDS_THE_SECTION_CLASS.md`
+  — declared contact faces retained through bonds without governing classification; a finite
+  carrier-neutral section join over exact consequence histories; complete reconstruction fibers
+  and shortest separators; and a seven-presentation experiment in which three sum codecs and two
+  product codecs form their respective conduct classes while same-value laws and reversed ports
+  separate. Compressed into `../canon/TABLET_THE_REASONING_CYCLE.md` §8.
 
 The filenames form a stable chronological atlas. Search their titles before reading entire bodies;
 follow each record's explicit supersession and open-boundary statements.

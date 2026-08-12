@@ -54,6 +54,8 @@ use std::collections::{BTreeMap, BTreeSet, VecDeque};
 
 use serde::{Deserialize, Serialize};
 
+use crate::cuda_refine::{CudaRefineError, CudaRefineExecutor};
+
 /// An item of the source population under compression.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct ItemId(pub u64);
@@ -228,6 +230,84 @@ pub fn compress(system: &dyn ObservedSystem) -> ReceiverExactCompression {
     }
 }
 
+/// Enact the same stable receiver/history quotient through the resident card's material-free
+/// `(current class, exact key)` law.
+///
+/// Receiver observations and successor addresses are the material keys. They cross without a
+/// host-built block assignment. Each receiver and each input refines the standing partition in
+/// turn; a complete input sweep which opens no class is the exact finite fixed point. Sequential
+/// intersections may reach that point in a different number of physical launches than synchronous
+/// Moore rounds, so the semantic `rounds` return is reconstructed from the exhibited shortest
+/// distinguishing words rather than from launch chronology.
+pub fn compress_on_device(
+    system: &dyn ObservedSystem,
+    executor: &mut CudaRefineExecutor,
+) -> Result<ReceiverExactCompression, CudaRefineError> {
+    let items = system.items();
+    let locations = items
+        .iter()
+        .copied()
+        .enumerate()
+        .map(|(at, item)| (item, at))
+        .collect::<BTreeMap<_, _>>();
+    let mut classes = vec![1u32; items.len()];
+
+    // H.0016 one-shot receiver equivalence. Successive exact intersections are the conjunction of
+    // all receiver faces; receiver order can move dense class ordinals but cannot move the
+    // partition.
+    for receiver in system.receivers() {
+        let keys = items
+            .iter()
+            .map(|item| system.observation(*item, receiver).0)
+            .collect::<Vec<_>>();
+        classes = executor.quotient_on_device(&classes, &keys)?.cell_class;
+    }
+    let one_shot = partition_from_device(&items, &classes);
+
+    // Close the partition under every admitted successor. Terminus is identity zero; device class
+    // identities begin at one, so absence cannot collide with a successor block.
+    let inputs = system.inputs();
+    loop {
+        let before = classes.iter().copied().collect::<BTreeSet<_>>().len();
+        for input in &inputs {
+            let keys = items
+                .iter()
+                .map(|item| {
+                    system
+                        .successor(*item, *input)
+                        .and_then(|successor| locations.get(&successor).copied())
+                        .and_then(|at| classes.get(at).copied())
+                        .map_or(0, u64::from)
+                })
+                .collect::<Vec<_>>();
+            classes = executor.quotient_on_device(&classes, &keys)?.cell_class;
+        }
+        let after = classes.iter().copied().collect::<BTreeSet<_>>().len();
+        if after == before {
+            break;
+        }
+    }
+
+    let conduct = partition_from_device(&items, &classes);
+    let collapsed = exhibit_collapsed(system, &one_shot, &conduct);
+    let rounds = collapsed
+        .iter()
+        .map(|pair| pair.distinguishing_word.len())
+        .max()
+        .unwrap_or(0);
+    Ok(ReceiverExactCompression {
+        schema: "holonic-engine.receiver-exact-compression.v1".to_owned(),
+        one_shot,
+        conduct,
+        rounds,
+        collapsed,
+    })
+}
+
+fn partition_from_device(items: &[ItemId], quotient: &[u32]) -> Partition {
+    Partition::from_keys(items.iter().copied().zip(quotient.iter().copied()))
+}
+
 /// For each pair the one-shot reading merged and conduct separates, find the **shortest** input
 /// word that distinguishes them, and the receiver that sees it.
 ///
@@ -276,20 +356,21 @@ fn exhibit_collapsed(
                 && let Some(receiver) = receivers.iter().copied().find(|receiver| {
                     system.observation(here_item, *receiver)
                         != system.observation(there_item, *receiver)
-                }) {
-                    collapsed.push(CollapsedPair {
-                        left,
-                        right,
-                        distinguishing_word: word,
-                        witness: Some((
-                            receiver,
-                            system.observation(here_item, receiver),
-                            system.observation(there_item, receiver),
-                        )),
-                        separated_by_terminus: false,
-                    });
-                    break;
-                }
+                })
+            {
+                collapsed.push(CollapsedPair {
+                    left,
+                    right,
+                    distinguishing_word: word,
+                    witness: Some((
+                        receiver,
+                        system.observation(here_item, receiver),
+                        system.observation(there_item, receiver),
+                    )),
+                    separated_by_terminus: false,
+                });
+                break;
+            }
             for input in &inputs {
                 let next = (
                     system.successor(here_item, *input),
@@ -393,14 +474,19 @@ mod tests {
         fn gcd(a: u64, b: u64) -> u64 {
             if b == 0 { a } else { gcd(b, a % b) }
         }
-        values.iter().fold(1, |acc, value| acc / gcd(acc, *value) * value)
+        values
+            .iter()
+            .fold(1, |acc, value| acc / gcd(acc, *value) * value)
     }
 
     #[test]
     fn the_quotient_is_exact_exactly_when_the_modulus_divides_the_cycle() {
         for n in 2..=24u64 {
             for moduli in [vec![2u64], vec![3], vec![2, 3], vec![4, 6]] {
-                let system = CyclicCounter { n, moduli: moduli.clone() };
+                let system = CyclicCounter {
+                    n,
+                    moduli: moduli.clone(),
+                };
                 let compression = compress(&system);
                 let modulus = lcm(&moduli);
                 let expected = modulus >= n || n % modulus == 0;
@@ -426,10 +512,16 @@ mod tests {
 
     #[test]
     fn when_the_modulus_divides_nothing_is_collapsed_and_the_partition_is_the_residues() {
-        let system = CyclicCounter { n: 12, moduli: vec![2, 3] };
+        let system = CyclicCounter {
+            n: 12,
+            moduli: vec![2, 3],
+        };
         let compression = compress(&system);
         assert!(compression.is_exact());
-        assert_eq!(compression.rounds, 0, "a stable partition needs no refinement");
+        assert_eq!(
+            compression.rounds, 0,
+            "a stable partition needs no refinement"
+        );
         assert_eq!(
             compression.one_shot.len(),
             6,
@@ -442,7 +534,10 @@ mod tests {
     /// says they are not; and the return names the shortest word that shows it.
     #[test]
     fn an_over_collapsed_pair_returns_the_shortest_word_that_separates_it() {
-        let system = CyclicCounter { n: 3, moduli: vec![2] };
+        let system = CyclicCounter {
+            n: 3,
+            moduli: vec![2],
+        };
         let compression = compress(&system);
 
         assert_eq!(compression.one_shot.len(), 2, "even {{0,2}} and odd {{1}}");
@@ -466,17 +561,27 @@ mod tests {
     fn the_shortest_word_length_grows_with_the_depth_of_the_distinction() {
         // n = 5 read only mod 2: {0,2,4} look alike, {1,3} look alike, and separating them takes
         // more than one step because the wrap is further away for some pairs than for others.
-        let system = CyclicCounter { n: 5, moduli: vec![2] };
+        let system = CyclicCounter {
+            n: 5,
+            moduli: vec![2],
+        };
         let compression = compress(&system);
         assert!(!compression.is_exact());
-        assert_eq!(compression.conduct.len(), 5, "every item becomes distinguishable");
+        assert_eq!(
+            compression.conduct.len(),
+            5,
+            "every item becomes distinguishable"
+        );
         let longest = compression
             .collapsed
             .iter()
             .map(|pair| pair.distinguishing_word.len())
             .max()
             .expect("collapsed pairs exist");
-        assert!(longest >= 2, "some pair needs more than one step, got {longest}");
+        assert!(
+            longest >= 2,
+            "some pair needs more than one step, got {longest}"
+        );
         assert!(
             compression.rounds >= longest,
             "refinement rounds bound the longest shortest word: rounds={} longest={longest}",
@@ -660,10 +765,16 @@ mod tests {
     #[test]
     fn ablating_a_receiver_only_coarsens_and_never_refines() {
         for n in 2..=18u64 {
-            let system = CyclicCounter { n, moduli: vec![2, 3, 5] };
+            let system = CyclicCounter {
+                n,
+                moduli: vec![2, 3, 5],
+            };
             let full = compress(&system);
             for receiver in system.receivers() {
-                let ablated = AblatedSystem { inner: &system, without: receiver };
+                let ablated = AblatedSystem {
+                    inner: &system,
+                    without: receiver,
+                };
                 let reduced = compress(&ablated);
                 assert!(
                     reduced.conduct.len() <= full.conduct.len(),
@@ -688,12 +799,22 @@ mod tests {
     /// that returns zero.
     #[test]
     fn ablation_does_change_the_compression_somewhere() {
-        let system = CyclicCounter { n: 12, moduli: vec![2, 3] };
+        let system = CyclicCounter {
+            n: 12,
+            moduli: vec![2, 3],
+        };
         let full = compress(&system);
-        let ablated = AblatedSystem { inner: &system, without: ReceiverId(1) };
+        let ablated = AblatedSystem {
+            inner: &system,
+            without: ReceiverId(1),
+        };
         let reduced = compress(&ablated);
         assert_eq!(full.conduct.len(), 6);
-        assert_eq!(reduced.conduct.len(), 2, "dropping mod 3 leaves only parity");
+        assert_eq!(
+            reduced.conduct.len(),
+            2,
+            "dropping mod 3 leaves only parity"
+        );
         assert!(reduced.conduct.len() < full.conduct.len());
     }
 }

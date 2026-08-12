@@ -390,6 +390,22 @@ fn question_operator_recurrence_is_not_forced_to_the_source_file_scale() {
     assert!(ecology
         .question_operator_regions()
         .contains(&vec!["how".to_owned(), "does".to_owned()]));
+
+    let (anchored, legacy, legacy_cloned_tokens) = ecology.question_prefix_audit();
+    assert_eq!(
+        anchored, legacy,
+        "the boundary-anchored incidence atlas must return exactly the former vector-key relation"
+    );
+    assert_eq!(
+        ecology.census().question_prefix_legacy_cloned_tokens,
+        legacy_cloned_tokens
+    );
+    assert!(
+        ecology.census().question_prefix_returned_tokens < legacy_cloned_tokens,
+        "the fixture must exhibit a presentation larger than the returned operator relation"
+    );
+    assert!(ecology.census().question_prefix_nodes > 0);
+    assert!(ecology.census().question_prefix_crossings > 0);
 }
 
 #[test]

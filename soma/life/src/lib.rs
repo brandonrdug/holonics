@@ -7,6 +7,10 @@
 pub mod agentic_language;
 pub mod agentic_research;
 pub mod causal_language;
+// Carrier-neutral operation sections: oriented incidence plus exact consequence histories, read
+// through receiver-exact compression. Codec/material names remain lineage and never route conduct.
+// `canon/TABLET_THE_REASONING_CYCLE.md` §8.
+pub mod causal_section;
 // The rest wire for `holonic-engine`'s conditioned derivation body. It lives here for the same
 // reason `decomposing_codec` does: `life` depends on `holonic-engine` and the reverse edge does not
 // exist, so the engine's one public re-founding seam can be driven from here and not from there.

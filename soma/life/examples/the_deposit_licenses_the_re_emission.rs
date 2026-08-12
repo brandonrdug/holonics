@@ -63,7 +63,7 @@ use soma_abi::active::ActionCurrent;
 
 const DRIVER: &str = "the_deposit_licenses_the_re_emission";
 const GRADE_FORM: &str = "re-emission-grade";
-const REPORT_SCHEMA: &str = "soma-life.deposit-licenses-re-emission.v1";
+const REPORT_SCHEMA: &str = "soma-life.deposit-licenses-re-emission.v2";
 
 /// **The declared document family of the 14,018-branch measurement**, verbatim from
 /// `soma/life/driver-sources/eros-morphological-language-generation-bounded-01/SOURCE.json`.
@@ -115,6 +115,10 @@ struct Report {
     recruitment_membership_tests: u64,
     recruitment_incidences: u64,
     recruitment_overpayment_numerator: u64,
+    question_prefix_crossings: u64,
+    question_prefix_nodes: u64,
+    question_prefix_legacy_cloned_tokens: u64,
+    question_prefix_returned_tokens: u64,
 
     atlas_rows: usize,
     atlas_plural_source_rows: usize,
@@ -309,9 +313,19 @@ fn run() -> Result<(), String> {
     let conditioning_wall_millis = conditioning_started.elapsed().as_millis();
     let recruitment_membership_tests = ecology.census().recruitment_membership_tests;
     let recruitment_incidences = ecology.census().recruitment_incidences;
+    let question_prefix_crossings = ecology.census().question_prefix_crossings;
+    let question_prefix_nodes = ecology.census().question_prefix_nodes;
+    let question_prefix_legacy_cloned_tokens =
+        ecology.census().question_prefix_legacy_cloned_tokens;
+    let question_prefix_returned_tokens = ecology.census().question_prefix_returned_tokens;
     eprintln!(
         "conditioned in {conditioning_wall_millis} ms; recruitment work: \
          {recruitment_membership_tests} membership tests, {recruitment_incidences} incidences"
+    );
+    eprintln!(
+        "question-prefix work: {question_prefix_crossings} crossings, {question_prefix_nodes} \
+         nodes, {question_prefix_legacy_cloned_tokens} legacy cloned tokens, \
+         {question_prefix_returned_tokens} returned tokens"
     );
 
     // --- the deposits ---------------------------------------------------------------------------
@@ -622,6 +636,10 @@ fn run() -> Result<(), String> {
         recruitment_incidences,
         recruitment_overpayment_numerator: recruitment_membership_tests
             .saturating_sub(recruitment_incidences),
+        question_prefix_crossings,
+        question_prefix_nodes,
+        question_prefix_legacy_cloned_tokens,
+        question_prefix_returned_tokens,
         atlas_rows,
         atlas_plural_source_rows,
         declared_minimum_distinct_sources,
