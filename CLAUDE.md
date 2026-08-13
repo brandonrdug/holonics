@@ -75,7 +75,8 @@ deposited in one day for want of them.** These orient reasoning; none schedules 
 | `canon/TABLET_THE_OPERATIONS.md` | **the elementary operations, added 2026-08-11 and ratified the same day**: every classical operation is a construction, a transport, a face, or a quotient; the Dirac primitives typed (a ket is a construction, a bra a receiver, an outer product a deposit); the trace as the basepoint-free face of a closed loop; the kernel as the collapsed-pair population; parity, chronology, and reversibility as three objects. `H.0476`–`H.0480`. **This is the reasoning dialect, not an ornament** — his ruling: *"it has to be the dialect that you use for reasoning."* |
 | `canon/TABLET_THE_REASONING_CYCLE.md` | **the pretrained organ inside the returning ecology, ratified 2026-08-12**: query as receiver bra, key as presented orientation, value as carried construction, residual as continuing standing, training as adjoint return, the whole model-world recurrence, cross-codec operation classes, self-similarity and section modulus, and the minimal recurrent-section machine. It is doctrine, not a construction schedule. |
 | `canon/TABLET_THE_CAUSAL_PROFILE.md` | **the computer as causal world-tube and the profiler as a shadow atlas, ratified 2026-08-12**: instruction fibers, observer charts, physical current, caustics and invisible directions, Feynman/knot/folded-dimension readings, complexity and bitwise shadows, and the exact boundary around Quantum Information Dynamics. Counts and clocks are projections, not the body. |
-| `canon/TABLET_THE_UNIVERSALITY_MACHINE.md` | **causal multiplicity before arithmetic notation, language as codec, and the map as the continuing body, ratified 2026-08-12**: existence begins in interaction; residue changes continuation; intelligence precedes language; mathematics is invariant causal composition; the Universality Machine is an evolving emulator; and interpreter-free code material is the next proposed experimental family. It is doctrine, not a construction schedule. |
+| `canon/TABLET_THE_UNIVERSALITY_MACHINE.md` | **causal multiplicity before arithmetic notation, language as codec, and the map as the continuing body, ratified 2026-08-12**: existence begins in interaction; residue changes continuation; intelligence precedes language; mathematics is invariant causal composition; the Universality Machine is an evolving emulator; and interpreter-free code material has returned one bounded algorithmic world-line family. It is doctrine, not a construction schedule. |
+| `canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md` | **the finger-trap correction, ratified 2026-08-12**: the machine already has the bounded organs; intelligence is circulation through the terrain those passages change; software nouns are receiver shadows; heat requires typed incidence and constitutive law; compression retains its ReconstructionFiber; and composition precedes new semantic owners. It is doctrine, not a construction schedule. |
 
 **The one sentence that orders the rest**, held for ninety-two days across five model changes and
 every renamed organ, and measured from his own record on 2026-08-10:
@@ -622,11 +623,11 @@ material, tokens, parameters, or arity says little; where the crossings sit rela
 invariant axis decides what load the construction carries.
 
 The declared mixed corpus remains the conditioning material. Prose, mathematics, LaTeX, Typst,
-Rust, Lean, Python, and other names are lineage and controls, never internal semantic taxa. The
-minimal later construction is a carrier-neutral join over causal sections which preserves contact
-species through transport and composes the existing exposure, reconstruction, consequence,
-compression, world-return, and reflection owners. **This paragraph schedules nothing.** The live
-roadmap and `CONSTRUCTION_STATE.md` alone decide when such a join is authorized.
+Rust, Lean, Python, and other names are lineage and controls, never internal semantic taxa. When a
+reasoning face is absent from a return, first compose the existing exposure, reconstruction,
+consequence, compression, world-return, reflection, diffusion, and higher-cell owners. Do not infer
+a missing faculty from an unjoined edge. **This paragraph schedules nothing.** The live roadmap and
+`CONSTRUCTION_STATE.md` alone decide what is authorized.
 
 ---
 
@@ -704,6 +705,91 @@ kernel verdicts. The checker remains an exterior returning port.
 
 This ruling schedules no source change. The roadmap and position record remain the only construction
 authorities.
+
+---
+
+## 0h. The machine already has the organs; close the circulation — ratified 2026-08-12
+
+The governing correction is direct:
+
+> *"Generalizing structures intelligently is like cartography, the main function of living
+> organisms is to navigate."*
+
+> *"all of what you describe are things the machine can already do, you're just applying it more
+> specifically and writing as if this requires more manual writing"*
+
+> *"it's more like a finger-trap, and you're just pulling directly out instead of rotating."*
+
+> *"you just need to allow it to function in a real engine-like cycle, treating the flow of
+> information like heat and energy."*
+
+The graded derivation is
+`research/records/2026-08-12_THE_MACHINE_ALREADY_HAS_THE_ORGANS_INTELLIGENCE_IS_THE_CIRCULATION_THAT_CHANGES_THE_TERRAIN.md`;
+the canonical compression is `canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md`. This section carries
+only the assistant-conduct consequences.
+
+**The map is the changing morphology, not a diagram beside the navigator.** Prior passages draw,
+erode, reinforce, fold, and reconnect the terrain through which later current moves. Generalization
+is a route family surviving lawful recharting. Training is the lineage pivot at which a real return
+changes reusable terrain. When analyzing intelligence, ask what moved, what residue remained, what
+later current crossed it, which fibers reopened, and where navigation was obstructed.
+
+**Apply the finger-trap correction before writing code.** The body already owns bounded exact
+instances of incidence, transport, recurrence, receiver-exact compression, reconstruction,
+deterministic diffusion, higher cells, holonomy, exterior return, changed rest, and resident
+conduct. Search and rotate those owners into typed contact before proposing another organ. A new
+owner is justified only by an attempted composition returning an exact absent type, port,
+constitutive relation, or consequence—not by a familiar exterior noun.
+
+**Software structure is a receiver shadow.** Branch is plural continuation; loop is recurrence
+through a connection; call is nested boundary transport; return is radiated current re-entering a
+predecessor ecology; binding is retained standing/reference incidence; stack is a shadow of nested
+unfinished boundaries; schedule is the world-line of fronts and reconvergences; instruction is an
+apparatus chart of local transport. These are routing correspondences, not automatic identities.
+Never respond to an absent static-source result by inventing `ScheduleMorphology`, `ControlFlow`,
+`Interpreter`, `Planner`, or a matching faculty cabinet.
+
+**The engine is the cycle, not its parts list:**
+
+```text
+mount -> differentiate -> conduct/diffuse -> interact/glue
+      -> radiate -> genuine exterior return -> reflect/deposit -> later current.
+```
+
+Emission and return are distinct caused occurrences joined by addressed lineage. A private echo is
+not a return. A host sequence that decides which semantic organ runs between events is not resident
+circulation. CPU, GPU, storage, network, checker, and sensor are apparatus charts; the strongest
+lawful resident surface owns the hot deed and returns exact delta testimony. On this machine that
+surface is the GPU, but `GPU` and `CUDA` carry no internal ontology.
+
+**Heat is typed.** The balance chart
+
+```text
+q_(k+1) - q_k + B j_k = r_k
+```
+
+is meaningful only with situated standing, oriented incidence, constitutive response, capacity,
+boundary, chronology, and receiver. Do not replace those types with a smoothing kernel, entropy
+story, or scalar “energy.” Exact finite diffusion may retain inverse testimony. Irreversibility
+must be caused by a named quotient, departure, aperture, or physical law. Compression follows
+consequential equivalence and retains the full `ReconstructionFiber`; it never chooses a familiar
+representative to make the path convenient.
+
+**Use bra-ket and spectral language only on founded transport.** In
+`T|v_a>=lambda_a|v_a>` and `<w_a|T=lambda_a<w_a|`, the ket is a transported construction direction
+and the bra a receiver covector. Left and right modes remain distinct for directed transport.
+Eigenvalues, Fourier components, and Mellin phases are shadows of a declared operator/action, not
+embedding dimensions or token meanings. If return changes the conductance or connection, the
+operator changes; its moved eigenspaces are one profiler face of the changed morphology.
+
+**Report the causal atlas before its scalars.** Lead with fronts, phase/current distributions,
+collapsed and reopened fibers, reconvergences, filled higher cells, loop holonomy/monodromy,
+boundary radiation/return, attributable morphological deltas, shortest separators, and open
+obstructions. Attach work, counts, latency, recurrence totals, and calibrated energy afterward.
+Never let a scalar dashboard stand in for the object Brandon asked the machine to reveal.
+
+This section schedules no capability. The live roadmap names the deed and the position record says
+what has actually returned.
 
 ---
 

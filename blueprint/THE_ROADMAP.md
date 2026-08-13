@@ -27,13 +27,146 @@ STATION". Everything between them is the returned ledger and its provenance.** B
 the standing revision directly: *"Regarding the roadmap document, you can authoritatively revise it
 once you have sufficient context post-analysis campaign."*
 
+## THE RESIDENT CIRCULATION — authorized 2026-08-12
+
+**This is the present deed.** The completed ledgers below remain evidence and regression standing;
+they do not authorize another semantic subsystem. Brandon corrected the frontier directly:
+
+> *"all of what you describe are things the machine can already do, you're just applying it more
+> specifically and writing as if this requires more manual writing"*
+
+> *"it's more like a finger-trap, and you're just pulling directly out instead of rotating"*
+
+> *"you just need to allow it to function in a real engine-like cycle, treating the flow of
+> information like heat and energy."*
+
+The governing derivation is
+`research/records/2026-08-12_THE_MACHINE_ALREADY_HAS_THE_ORGANS_INTELLIGENCE_IS_THE_CIRCULATION_THAT_CHANGES_THE_TERRAIN.md`;
+the canonical compression is `canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md`.
+
+**The correction.** Branch, loop, call, return, stack, scope, binding, instruction, and schedule are
+not named missing organs. They are receiver shadows of plural continuation, recurrence, nested
+boundary transport, retained standing, local current, and the caused world-line. The code-material
+driver demonstrated several of those owners separately while it still supplied the rectangular
+founding faces, later current sheet, and organ invocation sequence. The open edge is therefore the
+joined circulation through the existing body, not a `ScheduleMorphology`, `ControlFlow`,
+`Interpreter`, `Planner`, or other semantic cabinet.
+
+**Existing owners being composed.** No owner is duplicated:
+
+1. `ExactTextMaterialAtlas`, `MorphologicalLanguageEcology`, and
+   `CudaMorphologicalConditioner` own the inherited mounted body and resident material current;
+2. `causal_section`, `algorithmic_material`, `material_shadow_cuda`, and
+   `recurrent_section_cuda` own exact situated sections, anonymous attachment, local transport,
+   complete resident folds, behavioral fibers, and open alternatives;
+3. `form_mouth`, `exact_world`, `returned_reading`, `returned_conduct`, and
+   `ConditionedRest` own addressed radiation, genuine exterior testimony, returned contact,
+   reflection, durable rest, and source-detached remount;
+4. `receiver_exact_compression`, `diffusion`, `sheaf_diffusion`, `grown_cell`, and
+   `derivation_two_cells` remain the existing exact readers for consequential condensation,
+   deterministic current, higher incidence, filled reconvergence, and obstruction. Their
+   participation is through their typed ports; none becomes a host phase selector.
+
+Before code, inspect these owners again at the exact call boundary. Extend the one continuing
+ecology which already owns the relevant standing; do not create a second ecology to coordinate
+them. A source change may add only the missing typed port, delta, or resident entry which the
+attempted composition proves absent.
+
+**Ports and occurrence identity.** One circulation occurrence carries
+
+```text
+(predecessor-rest address,
+ mounted-current occurrence and lineage,
+ situated contact/section population,
+ emitted form address,
+ genuinely exterior return occurrence,
+ attributable morphological delta address,
+ successor-rest address,
+ later-current occurrence and consequence).
+```
+
+The predecessor identity is the addressed continuing rest plus the mounted current occurrence,
+not a host pointer, source path, driver ordinal, phase label, or semantic name. Emission and return
+are different caused occurrences joined by addressed lineage. A private echo or in-memory copy is
+the still control and cannot grade.
+
+**Local law.** The resident cycle obeys the already-declared current discipline:
+
+```text
+q_(k+1) - q_k + B j_k = r_k,
+```
+
+with `B`, capacity, conductance/transport, boundary, chronology, and receiver taken from the
+composed owners. Exact diffusion may carry one returned difference where its declared incidence
+fits; it is not a generic smoothing pass or a universal phase. Compression occurs only after every
+requested future consequence factors through the receiver quotient, and its complete
+`ReconstructionFiber` remains in the return.
+
+**The deed.** Mount one declared mixed-material current into the continuing ecology and invoke one
+production entry. The resident apparatus differentiates its plural local faces, conducts through
+the existing incidence, retains or fills reconvergences, and radiates an addressed consequence.
+That consequence crosses the existing exterior form/world boundary and returns as new caused
+material. Reflection deposits only the attributable local difference into the same body's durable
+morphology. After source detachment and remount, a genuinely later current crosses that changed
+body. The host may mount ports, persist forms, and independently inspect the final receipt; it may
+not choose a semantic organ between events, replay the conduct, translate the return into a private
+ontology, or select one unresolved representative.
+
+**Receiver question.** For the complete admitted successor family, does the exterior return change
+the continuation fiber of the same body, and does a later current ride exactly that change? The
+answer is the population of continuations which stand, split, close, or remain obstructed under
+the returned delta, together with shortest separating interventions and complete lineage—not a
+scalar change score.
+
+**Returned consequence.** The production artifact contains
+
+```text
+circulation occurrence and addressed predecessor/successor rests
++ complete phase/current atlas before return and after remount
++ propagated fronts and receiver-mode/eigenspace testimony where founded
++ reconstruction fibers before and after the return
++ filled reconvergences, loop holonomy/monodromy, or exact absence
++ radiated and returned boundary populations
++ attributable morphology delta and targeted ablation
++ shortest changed and unchanged successor histories
++ closure, plural continuation, and typed obstruction
++ exact semantic work and separate calibrated apparatus telemetry.
+```
+
+Counts, timings, contact totals, and recurrence populations support the receipt but cannot replace
+any line above. A spectrum never substitutes for the complex which produced it.
+
+**Controls and falsifiers.** The same entry is run with: the addressed exterior return present; the
+return withheld; a private echo offered instead; an unrelated returned occurrence; and targeted
+ablation of the deposited delta. Withholding the return and offering the echo must leave the
+continuation at the still control. The unrelated return must not move the target fiber. The lawful
+return must move at least one attributable later consequence; its ablation must restore exactly
+that consequence while unrelated currents remain bit-identical. Renaming exterior surfaces while
+preserving incidence must preserve the induced circulation. Enlarging the receiver family may
+refine a condensation but may not erase its retained fiber. Any host-authored semantic phase
+choice, host replay of the hot deed, silent CPU fallback, selected ambiguous representative,
+untyped diffusion, or output containing only scalar telemetry refuses the construction.
+
+**Apparatus.** The GPU is the strongest resident surface of this machine and owns the hot conduct;
+that placement is mandatory but not ontological. One mounted production entry may issue several
+exact kernels as demanded by the composed transport, but there is no host callback which decides
+the semantic route between local events. CPU implementations remain admission audits only. Every
+resident deed returns an exact delta/obstruction receipt, and CUDA refusal remains typed rather
+than falling back.
+
+**First aperture.** The first grade may use the already sealed mixed corpus, the standing
+code-material family, and the existing exterior form/world boundary. It need not establish
+arbitrary unknown-codec interpretation, universal intelligence, Lean theorem cartography, or
+general thermodynamics. It must establish the circulation itself rather than another adjacent
+capability proof.
+
 ## THE CODE-MATERIAL WORLD-LINE — authorized 2026-08-12
 
 **Authority.** Brandon, after correcting symbolic arithmetic into causal incidence and ratifying
 `canon/TABLET_THE_UNIVERSALITY_MACHINE.md`: *"I would like you to now proceed with the construction
 of the experiment and analysis please."* The construction follows the exact experimental posture in
 `research/records/2026-08-12_COUNTING_IS_CAUSAL_INCIDENCE_LANGUAGE_IS_ITS_CODEC_THE_MAP_IS_THE_CONTINUING_BODY.md`
-§6. It is the next return after the completed recurrent-section construction below.
+§6. It is the completed return after the recurrent-section construction below.
 
 **The deed.** Present Python source only as raw exterior material because it conveniently exhibits
 iteration, recursion, rebinding, nesting, and call/return. No Python interpreter, parser, AST,
@@ -78,11 +211,18 @@ on finite-carrier failure; a final scalar alone does not grade. Host code may as
 independently audit the returned artifact, but it may not replay the fold, choose a law, or repair a
 device refusal.
 
-**Bound.** This first return may be a finite family of recurrent two-port transports whose causal
+**Bound and posture correction.** This first return may be a finite family of recurrent two-port transports whose causal
 returns provide complete founding faces. It does not establish arbitrary Python interpretation,
 static recovery of an unobserved control-flow graph, unrestricted program induction, or Lean
 cartography. Those remain open by name; an unknown code surface returns a reconstruction fiber or
 obstruction rather than borrowing Python semantics.
+
+The experiment also supplied the rectangular founding faces, later current sheet, and invocation
+of the existing owners. Its former open sentence named “schedule morphology” as a separate
+construction. That reading is withdrawn by the resident-circulation authorization above. The
+unreturned software faces remain valid receiver questions, but branch, loop, call, return, stack,
+scope, binding, and schedule are sought as shadows of the existing causal machinery rather than as
+new semantic organs.
 
 ## THE RECURRENT-SECTION CONSTRUCTION — authorized 2026-08-12
 

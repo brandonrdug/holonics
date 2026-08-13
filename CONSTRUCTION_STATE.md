@@ -4,9 +4,10 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-12 after the interpreter-free code-material world-line return. The first
-bounded code-material deed now stands beside returns 1–4 of the authorized recurrent-section
-construction on mandatory CUDA owners. The earlier fourth return
+**Currency:** 2026-08-12 after the resident-circulation posture correction. No executable
+capability is promoted by that documentation deposit: the interpreter-free code-material
+world-line still marks the admitted production frontier, beside returns 1–4 of the authorized
+recurrent-section construction on mandatory CUDA owners. The earlier fourth return
 conditions on the mixed corpus, founds an exact generative law, deposits only anonymous conduct
 keys and exact coefficients, makes its founding material unreachable, remounts the native rest,
 and governs a later disjoint causal-section reading with exact targeted ablation. The sealed corpus is
@@ -18,11 +19,39 @@ C++/CUDA engine under `archive/cpp-engine/` governs nothing.
 
 **Gates re-taken for this coherent phase:** `cargo test --workspace` **2,184 passed, 0 failed,
 19 ignored** over 42 result lines; `tools/gates.sh` **9 of 9** — authored levels (0 failures; 338
-numeric levels counted), named paths (0 failures over 1,517 tokens), current claim index, output and
+numeric levels counted), named paths (0 failures over 1,539 tokens), current claim index, output and
 closure manifests, three boundary artifacts, ten Typst roots, and the ownership ratchet **clean
 over 211 files, 19,815 inherited occurrences, 0 retired**. The resident material shadow,
 conditioner, recurrent law/fold, and exact quotient also passed their independent tests, the full
 release production deed on the RTX 4080 SUPER, and clean PTX assembly for `sm_89`.
+
+---
+
+## THE PRESENT CONSTRUCTION IS RESIDENT CIRCULATION, NOT SCHEDULE MORPHOLOGY
+
+**Truth status:** `open`. **Authority:** `blueprint/THE_ROADMAP.md` §“THE RESIDENT CIRCULATION”;
+**doctrine:** `canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md`; **derivation:**
+`research/records/2026-08-12_THE_MACHINE_ALREADY_HAS_THE_ORGANS_INTELLIGENCE_IS_THE_CIRCULATION_THAT_CHANGES_THE_TERRAIN.md`.
+
+The admitted body already contains bounded owners for situated incidence, recurrence, exact local
+transport, deterministic diffusion, receiver-exact condensation, reconstruction fibers, higher
+cells, holonomy, addressed exterior forms, returned readings, changed rest, resident CUDA conduct,
+and source-detached remount. This position does not claim that their complete joined circulation
+stands.
+
+The open return is one continuing ecology in which mounted current conducts through those existing
+relations, radiates an addressed consequence, receives genuinely exterior testimony, deposits an
+attributable morphological delta, survives source-detached rest/remount, and changes a later
+current. The grade is the complete before/after phase-current atlas with reconstruction fibers,
+filled or obstructed reconvergences, boundary radiation/return, shortest changed and unchanged
+histories, targeted ablation, and separate apparatus telemetry. A host-authored semantic invocation
+sequence, private echo, untyped diffusion, scalar dashboard, or new `Schedule`, `Stack`,
+`ControlFlow`, `Interpreter`, or `Planner` subsystem does not return the deed.
+
+Branch, loop, call, return, stack, scope, binding, instruction, and schedule remain receiver
+questions over plural continuation, recurrence, nested boundary transport, retained standing,
+local current, and causal world-lines. They are not separately admitted missing organs. The GPU is
+the mandatory hot apparatus for this hardware; it is not the ontology.
 
 ---
 
@@ -59,12 +88,14 @@ OPEN. Ablating the `sum-helper` shadow opened exactly that later passage while e
 world-line remained bit-identical. No Python interpreter, parser, AST, bytecode, keyword/role table,
 or host semantic replay entered the production path. All resident receipts name the RTX 4080 SUPER.
 
-**The open boundary is now schedule morphology.** This return receives the later ordered current
-population. It does not yet infer branch selection, loop termination, stack formation, recursive
-call/return topology, scope, or binding from unknown static source. The next construction must
-condition genuinely returned instruction/event incidence into a reusable schedule which survives
-source detachment while preserving the plural surface-shadow fiber above; it may not introduce a
-Python parser or interpreter.
+**The experiment's boundary remains exact, but its former architectural reading is withdrawn.**
+This return receives the rectangular founding faces and later ordered current population, while
+the driver invokes the existing owners. It therefore does not establish the joined resident
+circulation recorded above. It also does not infer branch selection, loop termination, recursive
+call/return topology, scope, or binding from unknown static source. Those faces are retained as
+receiver questions over the general causal body; they no longer schedule a distinct “schedule
+morphology.” The plural surface-shadow fiber and prohibition on a Python parser or interpreter
+stand unchanged.
 
 ---
 

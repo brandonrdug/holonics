@@ -78,7 +78,7 @@ ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	root	soma/mount/soma-k
 ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	closure_rule	CRATE_DEPS
 ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	sha256	09ad1bcebc83869535184c939a97703f435e62ee1a404d268c6ca1b21791a3cb
 ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	octets	8998629
-ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	closure_sha256	4cc2cd485d80a9e81fc6346af2f40ed2cf0402bade4bc3c37041efed2a769d23
+ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	closure_sha256	240545748a416ccb0ea15acd6199f15f50c8f5a824ea2fef88674307b3193600
 ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	toolchain	nightly-2026-05-22
 ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	builder	soma/mount/soma-kernel-cuda/build-ptx.sh
 ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	consumer	soma/mount/src/lib.rs
@@ -98,6 +98,7 @@ CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/emission.r
 CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/holon.rs	aa8611ca4dacda298764076947add9603bc63b9984460f976056651c07164b93
 CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/lib.rs	eab2df13a39c4db16a06334725501765dbfadb0011c07223bbdea7b1533abe6b
 CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/live_event_cuda.rs	e8eab373bcc3d294937b467fafa367b03b8ea8415ab9682a2d599cac22306f15
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/material_shadow_cuda.rs	c650ac861b72f23cc1faada7fb10fe3736cbaf6872763f7a48a221d3275e0d25
 CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/morphological_condition_cuda.rs	4e194096a38a9aad549bcaf295294d097aabc31e5dbf2219b93a0cf72cfeb81b
 CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/morphological_conduct_cuda.rs	6bfbf52ea4e648a288a3d81baea535331aa79567ea305faa5b5c5f19f0fb81e7
 CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/presentation.rs	c8c7e2f075ef8956394bf4aa9a7eb7fcd382b76a6a7b33b05ee079eabbdcfa7a

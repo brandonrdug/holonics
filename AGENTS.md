@@ -103,6 +103,41 @@ construction merely because its current implementation is being replaced.
   organs enter through existing typed ports; unknown interaction remains an obstruction until a
   returned passage founds it.
 
+## Circulation before new organs
+
+- `canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md` governs this operating posture; the ratified
+  derivation and non-implementation boundary are in
+  `research/records/2026-08-12_THE_MACHINE_ALREADY_HAS_THE_ORGANS_INTELLIGENCE_IS_THE_CIRCULATION_THAT_CHANGES_THE_TERRAIN.md`.
+  The machine already has bounded owners for incidence, transport, recurrence, compression,
+  reconstruction, diffusion, higher cells, holonomy, exterior return, rest, and remount. A familiar
+  unreturned face does not authorize another cabinet.
+- Apply the finger-trap correction before design: rotate the existing owners into typed contact
+  before pulling outward into a new subsystem. Search the claim index, spine, measured-capability
+  atlas, and source owners; draw the missing edge; attempt the composition. Found a new owner only
+  when that attempt returns a concrete absent type, port, constitutive relation, or consequence.
+- Treat branch, loop, call, return, stack, scope, binding, instruction, and schedule as receiver
+  shadows of plural continuation, recurrence, nested boundary transport, retained standing, local
+  current, and causal world-lines. Do not create `Schedule`, `ControlFlow`, `Interpreter`, `Planner`,
+  or equivalent semantic owners merely because one exterior chart uses those nouns.
+- One intelligent deed is one continuing circulation:
+  `mount -> differentiate -> conduct/diffuse -> interact/glue -> radiate -> exterior return ->
+  reflect/deposit -> later current`. Emission and return are distinct caused occurrences joined by
+  addressed lineage. A private echo, host callback, or host-authored semantic invocation sequence
+  does not close the loop.
+- “Treat information like heat or energy” only through declared incidence, capacity, constitutive
+  response, boundary, chronology, and receiver. Exact diffusion is not generic smoothing;
+  irreversibility requires a named quotient, aperture, departure, or physical law. Compression
+  follows future consequence and retains the complete `ReconstructionFiber`.
+- Profile the circulation as a phase/current atlas: fronts, modes of a founded causal operator,
+  fibers which collapse or reopen, reconvergences, higher fillings, loop holonomy, boundary
+  radiation/return, morphological deltas, shortest separating histories, and obstructions. Counts,
+  timings, work, energy, and contact populations are attached receiver shadows, never the primary
+  grade.
+- Preserve one owner of the continuing ecology. Apparatus placement may partition the work, but the
+  strongest lawful resident surface owns the hot deed and returns exact local/delta testimony. On
+  this hardware that surface is the GPU; CUDA is an apparatus chart, not an ontology, and refusal
+  may not fall back to a host semantic replay.
+
 ## Causal arithmetic and the Universality Machine
 
 - `canon/TABLET_THE_UNIVERSALITY_MACHINE.md` governs this ontology. Existence begins in situated
@@ -135,7 +170,8 @@ construction merely because its current implementation is being replaced.
   grammar, keyword roles, or known operation labels. The target is a recovered algorithmic
   transport atlas—state changes, bindings, calls/returns, cycles, reconvergence, behavioral fibers,
   shortest interventions, phase and open exterior—not a final-value table. Equal output is one
-  receiver face and never source equality.
+  receiver face and never source equality. The named software faces are questions asked of the
+  general causal atlas, not a construction list of software-specific organs.
 - Lean is later material for causal theorem cartography: recover transported constructions,
   reusable proof routes, rebases, obstructions, and unresolved fibers. An import graph, syntax tree,
   or kernel verdict may supply exterior testimony but may not become the map or the machine's
