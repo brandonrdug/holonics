@@ -8,10 +8,11 @@ is the continuing terrain through which later current moves.
 **Truth status:** `project-postulate` for the adopted ontology and construction discipline;
 `proved-standard` for the displayed finite cardinality and finite-difference identities in their
 ordinary scopes; `established-bounded` for the interpreter-free recurrent code-material world-line;
-`open` for universal realization, static control-flow/schedule recovery, and Lean causal cartography.
+`open` for joined resident circulation, universal realization, and Lean causal cartography.
 **Governing documents:** `canon/THE_HOLOBROCHOS_SPINE.md`, `canon/01_CAUSAL_CALCULUS.md`,
 `canon/TABLET_THE_RESONANCE.md`, `canon/TABLET_THE_OPERATIONS.md`, and
-`canon/TABLET_THE_REASONING_CYCLE.md`.
+`canon/TABLET_THE_REASONING_CYCLE.md`, with the architectural correction in
+`canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md`.
 **Construction status:** the first bounded code-material return stands; this tablet schedules no
 further deed and changes no admitted position by itself.
 
@@ -155,12 +156,24 @@ resource current, or a richer history may reopen them. “The machine becomes it
 means material-founded morphology later unfolds the codec after the founding source departs. It
 does not license installing an interpreter inside the body.
 
-`open`: this first return receives the later ordered current population. It does not yet infer
-branch selection, loop termination, stack formation, recursive call/return topology, scope, or
-binding from unknown static source. The next required object is schedule morphology founded from
-genuinely returned instruction/event incidence, while preserving the plural surface-shadow fiber
-above. Complete construction, measurement, and boundary:
-`research/records/2026-08-12_THE_CODE_MATERIAL_RETURNS_ITS_WORLD_LINE_WITHOUT_AN_INTERPRETER.md`.
+`interpretation`: branch, loop, stack, call, return, scope, binding, instruction, and schedule are
+not primitive internal kinds. They are receiver shadows of plural continuation, recurrence,
+nested unfinished boundaries, transported return, retained standing, local transport, and the
+causal world-line. The list above names faces the atlas must be able to return; it does not found a
+separate owner for every familiar software noun.
+
+`open`: this first return receives the later ordered current population, while its driver supplies
+the rectangular founding transition faces and the order in which the existing organs are invoked.
+It therefore does not return autonomous circulation through one continuing ecology. The missing
+relation is emission through typed ports, genuine exterior return, attributable change in reusable
+morphology, and later current through that changed body—with closure, plurality, or obstruction
+returned without host semantic phase choreography. “Schedule morphology” as a proposed semantic
+subsystem is withdrawn.
+
+Complete bounded construction and the subsequent architectural correction:
+`research/records/2026-08-12_THE_CODE_MATERIAL_RETURNS_ITS_WORLD_LINE_WITHOUT_AN_INTERPRETER.md`
+and
+`research/records/2026-08-12_THE_MACHINE_ALREADY_HAS_THE_ORGANS_INTELLIGENCE_IS_THE_CIRCULATION_THAT_CHANGES_THE_TERRAIN.md`.
 
 ## 7. Lean cartography
 

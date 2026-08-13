@@ -10,9 +10,12 @@ mixed-corpus-conditioned, source-detached, generative recurrent-law remount; `op
 law-family and unknown-codec reconstruction.
 **Governing documents:** `canon/THE_HOLOBROCHOS_SPINE.md`,
 `canon/TABLET_THE_OPERATIONS.md`, `canon/TABLET_THE_RESONANCE.md`, and
-`canon/01_CAUSAL_CALCULUS.md`.  
-**Evidentiary deposit:**
-`research/records/2026-08-12_THE_PRETRAINED_TRANSFORMER_IS_ONE_TRANSPORT_ORGAN_THE_REASONING_MACHINE_IS_THE_RETURNING_ECOLOGY.md`.  
+`canon/01_CAUSAL_CALCULUS.md`, with the circulation discipline in
+`canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md`.
+**Evidentiary deposits:**
+`research/records/2026-08-12_THE_PRETRAINED_TRANSFORMER_IS_ONE_TRANSPORT_ORGAN_THE_REASONING_MACHINE_IS_THE_RETURNING_ECOLOGY.md`
+and
+`research/records/2026-08-12_THE_MACHINE_ALREADY_HAS_THE_ORGANS_INTELLIGENCE_IS_THE_CIRCULATION_THAT_CHANGES_THE_TERRAIN.md`.
 **Construction evidence:**
 `research/records/2026-08-12_THE_CONTACT_FACE_CROSSES_THE_BOND_CONDUCT_NOT_THE_CODEC_FOUNDS_THE_SECTION_CLASS.md`
 and
@@ -178,6 +181,13 @@ diffusive          mount unresolved field -> distribute return -> refine field -
 Their chronology, interchange law, and retained exterior differ. Either may use transformer
 organs; neither is the ontology of reasoning.
 
+`project-postulate`: the heat reading is lawful only when incidence, capacity, constitutive
+response, boundary, chronology, and receiver are typed. Diffusion does not mean generic smoothing,
+and irreversibility does not follow merely from the word *diffusion*: the complete finite exact
+carrier may return inverse testimony. An irreversible face requires a named quotient, departure,
+aperture, or separate constitutive hypothesis. Compression follows the declared future
+consequence; it does not steer circulation or erase the reconstruction fiber in advance.
+
 ## 6. The invariant candidate is operation conduct, not material kind
 
 Source names such as English, LaTeX, Typst, Rust, Lean, Python, prose, and arithmetic are codec and
@@ -291,15 +301,29 @@ presentations alone carry mixed phase `cxy = 1`; the remaining five carry `cxy =
 ablation reopens only the addressed presentation, and nontrivial restriction/rebase returns the
 exact intersection of the full partition.
 
+`interpretation`: software categories such as branch, loop, call, return, stack, binding, and
+schedule are receiver shadows of the same `S`: plural continuations, recurrence, nested boundaries,
+retained standing, and causal world-lines. They are not a list of semantic subsystems the machine
+must acquire before it can circulate.
+
 `open`: the later presentation still supplies its exact anonymous material-contact face. The body
 does not yet derive an equivalent contact face from an arbitrary unseen codec surface after corpus
-departure, discover an unrestricted law family, or compose general diffusion with this recurrent
-law. Closing the bounded return creates no Transformer, Reasoner, Planner, Conversation, Expert, or
-Language subsystem.
+departure, discover an unrestricted law family, or return the complete mount-to-reflection cycle
+as one continuing resident ecology. Existing bounded organs separately own incidence, diffusion,
+higher cells, receiver condensation, returned reading, and morphology; their missing relation is
+the joined circulation in which radiation returns, deposits an attributable change, and later
+current rides that changed morphology without host semantic phase choreography. Closing the
+bounded return creates no Transformer, Reasoner, Planner, Conversation, Expert, Language,
+Schedule, Stack, or ControlFlow subsystem.
 
 ## 9. Construction discipline and falsifiers
 
-`project-postulate`: any later construction must use mixed material without material-kind routing;
+`project-postulate`: composition precedes new organs. Before naming a new subsystem, route the
+required consequence through the existing typed owners and exhibit the exact missing port,
+constitutive relation, or return if that composition refuses. A host-authored invocation sequence
+does not close the reasoning cycle.
+
+Any later construction must use mixed material without material-kind routing;
 retain codec names only as lineage and controls; compare operation families over varied operands,
 nesting, carriers, and presentations; include same-value/different-law controls; return shortest
 separating interventions; and survive source-detached remount and attributable ablation.
@@ -315,3 +339,5 @@ information transport; it does not identify a transformer with quantum mechanics
 
 Complete bounded return, controls, and implementation boundary:
 `research/records/2026-08-12_THE_RECURRENT_LAW_CROSSES_THE_CORPUS_DEPARTURE_THE_UNSEEN_SECTION_RIDES_ITS_DEPOSIT.md`.
+The circulation correction and its non-implementation boundary are deposited in
+`research/records/2026-08-12_THE_MACHINE_ALREADY_HAS_THE_ORGANS_INTELLIGENCE_IS_THE_CIRCULATION_THAT_CHANGES_THE_TERRAIN.md`.

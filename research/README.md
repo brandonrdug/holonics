@@ -1,6 +1,6 @@
 # Research record
 
-`records/` contains 358 research deposits current through 12 August 2026, including all 307
+`records/` contains 359 research deposits current through 12 August 2026, including all 307
 laboratory deposits present at extraction on 3 August. They are chronological evidence, not an
 executable plan. Later records may correct earlier ones; the normalized canon in `../canon/`
 governs the rebuild.
@@ -101,8 +101,17 @@ governs the rebuild.
   code material joined to caused transition returns; an anonymous native morphology whose later
   GPU fold returns every intermediate standing; exact `for`/`while`/recursive/helper/method
   behavioral fibers, terminus-versus-world-line separation, a plural `+`/`*` surface-gauge fiber,
-  source detachment, unknown-source openness, and targeted ablation; with static control-flow and
-  call/return schedule recovery retained as the next open boundary.
+  source detachment, unknown-source openness, and targeted ablation; with rectangular founding
+  faces, the later current sheet, and organ invocation still supplied by the driver.
+- **The machine already has the organs; intelligence is the circulation that changes the terrain:**
+  `records/2026-08-12_THE_MACHINE_ALREADY_HAS_THE_ORGANS_INTELLIGENCE_IS_THE_CIRCULATION_THAT_CHANGES_THE_TERRAIN.md`
+  — cartography as continuing morphology; the finger-trap correction from new semantic subsystems
+  to composition of existing owners; branch, loop, call, return, stack, binding, and schedule as
+  receiver shadows; typed heat/current transport; compression with its ReconstructionFiber;
+  causal-operator modes rather than embedding dimensions; phase/current profiling; and the open
+  joined resident circulation without host semantic phase choreography. Compressed into
+  `../canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md`, with corrections in
+  `../canon/TABLET_THE_REASONING_CYCLE.md` and `../canon/TABLET_THE_UNIVERSALITY_MACHINE.md`.
 
 The filenames form a stable chronological atlas. Search their titles before reading entire bodies;
 follow each record's explicit supersession and open-boundary statements.
