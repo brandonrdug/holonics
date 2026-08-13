@@ -1,6 +1,6 @@
 # Research record
 
-`records/` contains 355 research deposits current through 12 August 2026, including all 307
+`records/` contains 357 research deposits current through 12 August 2026, including all 307
 laboratory deposits present at extraction on 3 August. They are chronological evidence, not an
 executable plan. Later records may correct earlier ones; the normalized canon in `../canon/`
 governs the rebuild.
@@ -88,6 +88,13 @@ governs the rebuild.
   post-remount evaluation on a disjoint coordinate field; four receiver/history fibers, mixed-phase
   testimony, shortest interventions, targeted ablation, and scale rebase. Compressed into
   `../canon/TABLET_THE_REASONING_CYCLE.md` §8 and `../canon/TABLET_THE_CAUSAL_PROFILE.md` §8.
+- **Causal counting, codec-independent mathematics, and the continuing map:**
+  `records/2026-08-12_COUNTING_IS_CAUSAL_INCIDENCE_LANGUAGE_IS_ITS_CODEC_THE_MAP_IS_THE_CONTINUING_BODY.md`
+  — discrete event populations and residue preceding symbolic arithmetic and linguistic report;
+  mathematics as invariant causal composition; the Universality Machine as an evolving emulator;
+  the navigated atlas as memory, morphology, and productive terrain; and an unscheduled
+  interpreter-free Python material experiment leading toward Lean causal cartography. Compressed
+  into `../canon/TABLET_THE_UNIVERSALITY_MACHINE.md`.
 
 The filenames form a stable chronological atlas. Search their titles before reading entire bodies;
 follow each record's explicit supersession and open-boundary statements.

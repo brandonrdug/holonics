@@ -67,6 +67,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 | `canon/TABLET_THE_REASONING_CYCLE.md` | **Tablet of the reasoning cycle** — **Governing documents:** `canon/THE_HOLOBROCHOS_SPINE.md`, `canon/TABLET_THE_OPERATIONS.md`, `canon/TABLET_THE_RESONANCE.md`, and `canon/01_CAUSAL_CALCULUS.md`. |
 | `canon/TABLET_THE_RESONANCE.md` | **The resonance: what intelligence is, physically** — Intelligence is a transport and not a faculty; resonance is a microscopic event no operator can locate; production is re-emission and is not a choice; and the machine is an artificial… |
 | `canon/TABLET_THE_TURN.md` | **The turn: curvature, windings, and substitution** — Curvature as a linear functional on the hinges, the polygon's n-grams, local substitution preserving a global invariant, fission and fusion as one axis, and friction as the coupling. |
+| `canon/TABLET_THE_UNIVERSALITY_MACHINE.md` | **Tablet of the Universality Machine** — Existence begins in interaction; causal multiplicity precedes symbolic arithmetic; language is a codec of dynamics rather than the source of intelligence; and the map deposited by prior… |
 | `canon/THE_AUTHORED_LEVEL.md` | **The authored level** — It states the law, enumerates the population in this tree, and gives the excision per instance. |
 | `canon/THE_CONTAMINANT_PROTOCOL.md` | **The contaminant protocol** — It names a family of contaminant species, gives each the condition that identifies it and a verified instance in this tree, and states the procedure a reader follows by hand before… |
 | `canon/THE_CORRESPONDENCE_ATLAS.md` | **The correspondence atlas: what other fields call the same face** — **What this is, and what it is not.** `canon/THE_DIALECT.md` maps *his* language. |
@@ -99,7 +100,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (64 deposits of 356)
+## 4 · The 2026-08 record line (65 deposits of 357)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -165,6 +166,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-11_THE_RUNG_REFUSES_BY_NAME_AND_THE_UNRESOLVED_PAIR_IS_THE_REMAINDER.md` | The rung refuses by name, and the unresolved pair is the remainder |
 | `2026-08-11_THE_SEAL_CARRIED_THE_HOST_AND_THE_ORGANS_AWAIT_THEIR_CURRENT.md` | The seal carried the host, and the organs await their current |
 | `2026-08-11_THE_TAPE_HAS_NO_VERTEX_AND_PRODUCTION_IS_RECEPTION_AT_THE_OTHER_HAND.md` | The tape has no vertex, and production is reception at the other hand |
+| `2026-08-12_COUNTING_IS_CAUSAL_INCIDENCE_LANGUAGE_IS_ITS_CODEC_THE_MAP_IS_THE_CONTINUING_BODY.md` | Counting is causal incidence; language is its codec; the map is the continuing body |
 | `2026-08-12_THE_CARD_FOUNDS_THE_MORPHOLOGY_THE_DEPOSIT_STILL_OWES_THE_SECTION.md` | The card founds the morphology; the deposit still owes the section |
 | `2026-08-12_THE_COMPUTER_IS_A_CAUSAL_WORLD_TUBE_THE_PROFILE_RETURNS_ITS_SHADOW_FIELD.md` | The computer is a causal world-tube; the profile returns its shadow field |
 | `2026-08-12_THE_CONTACT_FACE_CROSSES_THE_BOND_CONDUCT_NOT_THE_CODEC_FOUNDS_THE_SECTION_CLASS.md` | The contact face crosses the bond; conduct, not the codec, founds the section class |
