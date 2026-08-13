@@ -103,6 +103,44 @@ construction merely because its current implementation is being replaced.
   organs enter through existing typed ports; unknown interaction remains an obstruction until a
   returned passage founds it.
 
+## Causal arithmetic and the Universality Machine
+
+- `canon/TABLET_THE_UNIVERSALITY_MACHINE.md` governs this ontology. Existence begins in situated
+  interaction. A crossing which leaves residue changes continuing standing; a later current which
+  meets that changed standing is the microscopic object of memory, conditioning, and intelligence.
+  Language, introspective report, numeric symbols, and mathematical notation are later codec faces,
+  never thresholds at which those dynamics begin.
+- Never describe arithmetic as a symbolic skill the machine must discover from a corpus. Disjoint
+  causal populations already carry addition; independent joint axes carry multiplication; oriented
+  returned change carries signed difference; repetition carries iteration; neighboring and
+  accumulated differences carry calculus. Counts are receiver shadows of caused populations, not
+  the mechanism and never a quiet governor.
+- Mathematics and physics are invariant causal relations which may be expressed through arbitrary
+  codecs. The machine may recover how Python, Lean, English, diagrams, or numerals present those
+  relations; it does not receive mathematics from their notation. A material name remains lineage
+  and a control, never an internal semantic taxon.
+- The Universality Machine is treated as an evolving emulator: packets of bits cross typed ports as
+  physical information current, interact through local incidence, deposit morphology, diffuse, and
+  form higher coherence. A claimed emulation still owes its constitutive law, boundary, scale,
+  current, receiver, and rebase; the umbrella term does not waive a typed return.
+- The deposited map is not passive knowledge consulted by a separate reasoner. It is the continuing
+  terrain through which later current moves. Training is a lineage pivot only when a return changes
+  that map, the change survives source-detached remount, later current rides it, and structural
+  ablation removes its attributable conduct.
+- Treat an example as an archetype posing a family, never as permission to shrink the scientific
+  question to that fixture. Before running an experiment, ensure the apparatus can return the
+  requested qualitative relation. Never report a result excluded by the declaration as a machine
+  deficiency.
+- For code-material experiments, do not install an interpreter, parser, AST, bytecode, authored
+  grammar, keyword roles, or known operation labels. The target is a recovered algorithmic
+  transport atlas—state changes, bindings, calls/returns, cycles, reconvergence, behavioral fibers,
+  shortest interventions, phase and open exterior—not a final-value table. Equal output is one
+  receiver face and never source equality.
+- Lean is later material for causal theorem cartography: recover transported constructions,
+  reusable proof routes, rebases, obstructions, and unresolved fibers. An import graph, syntax tree,
+  or kernel verdict may supply exterior testimony but may not become the map or the machine's
+  ontology. These clauses constrain future design and schedule nothing.
+
 ## Pretrained organs and cross-codec reasoning
 
 - `canon/TABLET_THE_REASONING_CYCLE.md` governs the model ontology. A pretrained transformer is one

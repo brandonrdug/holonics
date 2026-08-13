@@ -78,7 +78,7 @@ ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	root	soma/mount/soma-k
 ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	closure_rule	CRATE_DEPS
 ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	sha256	9d35e3cf1b31966f5ddd3138607c4a23cece4d873e1c743c1586893777d72edb
 ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	octets	8969273
-ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	closure_sha256	cc916276f130ea31cee07efbfafcea6364ecb09022b37d0d1df305a404b645dd
+ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	closure_sha256	bbf764c2d8d99c7bef29b6a683c2d3294db073101df45e464bbbd557a3772dda
 ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	toolchain	nightly-2026-05-22
 ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	builder	soma/mount/soma-kernel-cuda/build-ptx.sh
 ARTIFACT	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	consumer	soma/mount/src/lib.rs
@@ -101,6 +101,7 @@ CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/live_event
 CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/morphological_condition_cuda.rs	4e194096a38a9aad549bcaf295294d097aabc31e5dbf2219b93a0cf72cfeb81b
 CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/morphological_conduct_cuda.rs	6bfbf52ea4e648a288a3d81baea535331aa79567ea305faa5b5c5f19f0fb81e7
 CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/presentation.rs	c8c7e2f075ef8956394bf4aa9a7eb7fcd382b76a6a7b33b05ee079eabbdcfa7a
+CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/recurrent_law_cuda.rs	dbe38980f6a1ce3a9b41fd487ed8d68df0122d980c45bb0a1c83245b1e34ff84
 CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/register.rs	0b00fbde9e6831ae7d9018838743adb4a6477f53198a372daf037d1798c355aa
 CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/returned_contact_cuda.rs	fafa96daaff69f9673fc3156f9b7dc69371e3583d6d742ed4ac00ac904b834b0
 CLOSURE	soma/mount/soma-kernel-cuda/soma_kernel_cuda.ptx	soma/abi/src/tests.rs	02f8d6764b245818d70b4ee578d35c4aaf4c2707f37867ccf2ca5a2aab3cdcb2

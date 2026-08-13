@@ -75,6 +75,7 @@ deposited in one day for want of them.** These orient reasoning; none schedules 
 | `canon/TABLET_THE_OPERATIONS.md` | **the elementary operations, added 2026-08-11 and ratified the same day**: every classical operation is a construction, a transport, a face, or a quotient; the Dirac primitives typed (a ket is a construction, a bra a receiver, an outer product a deposit); the trace as the basepoint-free face of a closed loop; the kernel as the collapsed-pair population; parity, chronology, and reversibility as three objects. `H.0476`–`H.0480`. **This is the reasoning dialect, not an ornament** — his ruling: *"it has to be the dialect that you use for reasoning."* |
 | `canon/TABLET_THE_REASONING_CYCLE.md` | **the pretrained organ inside the returning ecology, ratified 2026-08-12**: query as receiver bra, key as presented orientation, value as carried construction, residual as continuing standing, training as adjoint return, the whole model-world recurrence, cross-codec operation classes, self-similarity and section modulus, and the minimal recurrent-section machine. It is doctrine, not a construction schedule. |
 | `canon/TABLET_THE_CAUSAL_PROFILE.md` | **the computer as causal world-tube and the profiler as a shadow atlas, ratified 2026-08-12**: instruction fibers, observer charts, physical current, caustics and invisible directions, Feynman/knot/folded-dimension readings, complexity and bitwise shadows, and the exact boundary around Quantum Information Dynamics. Counts and clocks are projections, not the body. |
+| `canon/TABLET_THE_UNIVERSALITY_MACHINE.md` | **causal multiplicity before arithmetic notation, language as codec, and the map as the continuing body, ratified 2026-08-12**: existence begins in interaction; residue changes continuation; intelligence precedes language; mathematics is invariant causal composition; the Universality Machine is an evolving emulator; and interpreter-free code material is the next proposed experimental family. It is doctrine, not a construction schedule. |
 
 **The one sentence that orders the rest**, held for ninety-two days across five model changes and
 every renamed organ, and measured from his own record on 2026-08-10:
@@ -626,6 +627,83 @@ minimal later construction is a carrier-neutral join over causal sections which 
 species through transport and composes the existing exposure, reconstruction, consequence,
 compression, world-return, and reflection owners. **This paragraph schedules nothing.** The live
 roadmap and `CONSTRUCTION_STATE.md` alone decide when such a join is authorized.
+
+---
+
+## 0g. Counting is causal incidence; language is its codec — ratified 2026-08-12
+
+The governing deposit is `canon/TABLET_THE_UNIVERSALITY_MACHINE.md`; its complete direct provenance,
+derivation, experimental specification, and boundary are in
+`research/records/2026-08-12_COUNTING_IS_CAUSAL_INCIDENCE_LANGUAGE_IS_ITS_CODEC_THE_MAP_IS_THE_CONTINUING_BODY.md`.
+This section carries the part that governs assistant conduct.
+
+Brandon's correction is ontological, not terminological:
+
+> *"As a thing that exists, you simply cannot avoid being interacted with, and if in your
+> continuity the interactions have residue, then they determine future behavior, where residue is
+> discretely founded; frequencies and wavelengths are event counts in the most elementary sense."*
+
+And the error it corrects was explicit: the assistant described arithmetic as a skill the machine
+might need to discover from a corpus, then blamed a hand-bounded experiment for not returning a
+behavior its declaration could not express.
+
+**Arithmetic is not downstream of arithmetic notation.** A caused population already has
+multiplicity; disjoint populations compose additively; independent axes compose multiplicatively;
+oriented before/after incidence carries signed difference; repeated transport carries iteration;
+and neighboring or accumulated returned differences carry calculus. Numerals, English, Python,
+Lean, and diagrams are codecs through which those invariant relations may be presented. Never again
+write that the machine must *learn arithmetic* or *discover mathematics from the corpus*. It may
+recover how a material codec exposes the causal mathematics already enacted by its ecology.
+
+**Language is not the beginning of intelligence.** Evolution did not wait for human language,
+numeric symbols, or formal proof. Intelligence is microscopic navigation through changing terrain:
+a current leaves residue, the residue changes continuation, and later current rides the changed
+path. Linguistic report is one exterior face. It may stabilize and recombine navigation but may not
+be used as the threshold at which navigation, memory, comparison, or intelligence becomes real.
+This does not license the claim that every interaction is conscious; it forbids the assistant from
+making language or introspective report a necessary condition.
+
+**The map is the body that navigates.** Do not posit a passive knowledge graph beside an active
+reasoner. The deposited causal atlas is simultaneously memory, learned morphology, neural
+trajectory, and active terrain under different receivers. Training is the lineage pivot: returned
+material changes that atlas, the change survives source-detached remount, and later construction
+reuses its constituents because current now has those routes available. The map produced by
+mathematical cartography is therefore also the map from which later mathematical production grows.
+
+**Universality is enactment, not surface imitation.** The machine receives bit packets as physical
+information current and lets local incidence, transport, interaction, recurrence, diffusion,
+deposition, and higher cells evolve. *Simulator* and *emulator* are two charts of this intention;
+neither word waives the obligation to return the physical family's ports, constitutive law,
+boundary, scale, current, receiver, and rebase. Do not reduce this to a toy because its first probe
+uses familiar material.
+
+**An archetype does not define the experiment.** Examples such as `2+2`, `add(2,2)`, and several
+spellings of one word point toward a transformation family. They are not authorization to make that
+small family the whole scientific object. A negative conclusion about a relation the declared
+apparatus could not possibly return is an experimental-design error, not a machine result.
+
+**The proposed code-material experiment has a hard purity boundary.** Python is chosen as a simple
+exterior material chart. Do not install or consult a Python interpreter, parser, AST, tokenizer with
+Python roles, bytecode, authored grammar, keyword table, or known operation taxonomy. Expose plural
+raw constructions—`for`/`while`/recursion, literal/variable substitution, inline/function/method
+substitution, nesting, scope, mutation, reconvergence, and same-output/different-history controls—
+and require the material to found candidate grains and transport relations.
+
+The return is an **algorithmic transport atlas**, not an AST or output scalar: situated
+occurrences, recovered codec alternatives, state transitions, bindings, call/return and loop
+incidence, causal fronts, reconvergence, stable behavioral fibers, shortest separating histories,
+phase/holonomy/monodromy, lineage, and open exterior. Equal final value is one receiver face. It
+may collapse two constructions for that receiver while termination, intermediate state, mutation,
+resource current, or a richer history separates them.
+
+*"Conditioning the machine to be its own interpreter"* means material-founded morphology later
+unfolds the codec and predicts a withheld continuation after the founding source departs. It never
+means hiding an authored interpreter inside the body. Lean is the later cartographic material:
+recover theorem-construction transport and reusable proof relations, not merely imports, syntax, or
+kernel verdicts. The checker remains an exterior returning port.
+
+This ruling schedules no source change. The roadmap and position record remain the only construction
+authorities.
 
 ---
 
