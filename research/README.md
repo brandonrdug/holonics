@@ -1,6 +1,6 @@
 # Research record
 
-`records/` contains 357 research deposits current through 12 August 2026, including all 307
+`records/` contains 358 research deposits current through 12 August 2026, including all 307
 laboratory deposits present at extraction on 3 August. They are chronological evidence, not an
 executable plan. Later records may correct earlier ones; the normalized canon in `../canon/`
 governs the rebuild.
@@ -95,6 +95,14 @@ governs the rebuild.
   the navigated atlas as memory, morphology, and productive terrain; and an unscheduled
   interpreter-free Python material experiment leading toward Lean causal cartography. Compressed
   into `../canon/TABLET_THE_UNIVERSALITY_MACHINE.md`.
+- **Interpreter-free code material and source-detached algorithmic world-lines:**
+  `records/2026-08-12_THE_CODE_MATERIAL_RETURNS_ITS_WORLD_LINE_WITHOUT_AN_INTERPRETER.md`
+  — a byte-bijection-invariant prior-equal-distance shadow on the resident card; plural recurrent
+  code material joined to caused transition returns; an anonymous native morphology whose later
+  GPU fold returns every intermediate standing; exact `for`/`while`/recursive/helper/method
+  behavioral fibers, terminus-versus-world-line separation, a plural `+`/`*` surface-gauge fiber,
+  source detachment, unknown-source openness, and targeted ablation; with static control-flow and
+  call/return schedule recovery retained as the next open boundary.
 
 The filenames form a stable chronological atlas. Search their titles before reading entire bodies;
 follow each record's explicit supersession and open-boundary statements.

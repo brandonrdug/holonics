@@ -4,8 +4,9 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-12 after the source-detached recurrent-law return. Returns 1–4 of the
-authorized recurrent-section construction stand on mandatory CUDA owners. The fourth return
+**Currency:** 2026-08-12 after the interpreter-free code-material world-line return. The first
+bounded code-material deed now stands beside returns 1–4 of the authorized recurrent-section
+construction on mandatory CUDA owners. The earlier fourth return
 conditions on the mixed corpus, founds an exact generative law, deposits only anonymous conduct
 keys and exact coefficients, makes its founding material unreachable, remounts the native rest,
 and governs a later disjoint causal-section reading with exact targeted ablation. The sealed corpus is
@@ -15,13 +16,55 @@ paragraph this replaces (`28028c1`, rest `45084ed2…`, grade `8125caa2…`) are
 host-dependent seal and are retained on disk as the before-arm of that repair. **Body:** Rust. The
 C++/CUDA engine under `archive/cpp-engine/` governs nothing.
 
-**Gates re-taken for this coherent phase:** `cargo test --workspace` **2,182 passed, 0 failed,
-19 ignored** over 42 result lines; `tools/gates.sh` **9 of 9** — authored levels (0 failures),
-named paths (0 failures over 1,501 tokens), current claim index, **output-manifest 0 departed / 0
-moved / 0 unrecorded**, current closure manifest, three boundary artifacts, ten Typst roots, and the
-ownership ratchet **clean over 209 files, 19,712 inherited occurrences, 0 retired**. The resident
-conditioner and recurrent law also passed their independent exact tests, the full release production
-deed on the RTX 4080 SUPER, and clean PTX assembly for `sm_89`.
+**Gates re-taken for this coherent phase:** `cargo test --workspace` **2,184 passed, 0 failed,
+19 ignored** over 42 result lines; `tools/gates.sh` **9 of 9** — authored levels (0 failures; 338
+numeric levels counted), named paths (0 failures over 1,517 tokens), current claim index, output and
+closure manifests, three boundary artifacts, ten Typst roots, and the ownership ratchet **clean
+over 211 files, 19,815 inherited occurrences, 0 retired**. The resident material shadow,
+conditioner, recurrent law/fold, and exact quotient also passed their independent tests, the full
+release production deed on the RTX 4080 SUPER, and clean PTX assembly for `sm_89`.
+
+---
+
+## RAW CODE MATERIAL RETURNS A COMPLETE WORLD-LINE WITHOUT A PYTHON INTERPRETER
+
+**Truth status:** `established-bounded`. **Evidence:** `implemented-exact`,
+`computational-witness`, `measured`. **Owners:** `algorithmic_material`,
+`material_shadow_cuda`, `recurrent_section_cuda`, `causal_section`; **driver:**
+`soma/life/examples/the_code_material_returns_its_world_line.rs`; **grade:**
+`algorithmic-material-world-line-grade-8953449b…form` under the driver's deposited output directory;
+**native rest:** `algorithmic-material-native-rest-f542967f…form`.
+
+The resident card now reads each raw code passage as its complete prior-equal-distance field. That
+shadow is invariant under a bijection of byte surfaces, preserves situated recurrence arcs and
+chronology, and retains no source octet in its anonymous complete length-prefixed key. Caused
+rectangular transition faces founded 13 exact deposited local laws on card, occupying five distinct
+coefficient strata. The resulting 7,164-octet native rest carries only complete equality-shadow
+fields and exact Newton coefficients; it contains no source, path, presentation identity, sample,
+answer, expected result, parser state, or lossless corpus body. The rest is larger than the source
+because exact attachment retains the complete shadow field; its summary hashes never govern
+identity.
+
+After source departure and exact remount, a new resident fold enacted each local law across the
+complete later current and returned every intermediate standing. Seven radically different source
+geometries—`for`, `while`, recursion, helper, method, inline literal, and a coherent byte
+renaming—formed one complete world-line fiber `0,4,5,8,10,15`; their material-shadow cycle ranks
+still ranged from 50 through 141. Two product presentations formed `1,4,4,12,24,120`. A distinct
+affine recurrence also terminated at 15, collapsed with the sum family under a terminus-only
+receiver, and reopened after the shortest history `advance` under the complete receiver.
+
+A `+`/`*` swap whose unique bytes cast one equality shadow returned both compatible laws as a
+plural fiber; the machine did not borrow the glyph to select. An unseen branching surface remained
+OPEN. Ablating the `sum-helper` shadow opened exactly that later passage while every unrelated
+world-line remained bit-identical. No Python interpreter, parser, AST, bytecode, keyword/role table,
+or host semantic replay entered the production path. All resident receipts name the RTX 4080 SUPER.
+
+**The open boundary is now schedule morphology.** This return receives the later ordered current
+population. It does not yet infer branch selection, loop termination, stack formation, recursive
+call/return topology, scope, or binding from unknown static source. The next construction must
+condition genuinely returned instruction/event incidence into a reusable schedule which survives
+source detachment while preserving the plural surface-shadow fiber above; it may not introduce a
+Python parser or interpreter.
 
 ---
 

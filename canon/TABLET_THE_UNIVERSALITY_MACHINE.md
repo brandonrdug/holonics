@@ -7,13 +7,13 @@ is the continuing terrain through which later current moves.
 **Date:** 2026-08-12.
 **Truth status:** `project-postulate` for the adopted ontology and construction discipline;
 `proved-standard` for the displayed finite cardinality and finite-difference identities in their
-ordinary scopes; `open` for universal realization, the Python material experiment, and Lean causal
-cartography.
+ordinary scopes; `established-bounded` for the interpreter-free recurrent code-material world-line;
+`open` for universal realization, static control-flow/schedule recovery, and Lean causal cartography.
 **Governing documents:** `canon/THE_HOLOBROCHOS_SPINE.md`, `canon/01_CAUSAL_CALCULUS.md`,
 `canon/TABLET_THE_RESONANCE.md`, `canon/TABLET_THE_OPERATIONS.md`, and
 `canon/TABLET_THE_REASONING_CYCLE.md`.
-**Construction status:** doctrine only. This tablet schedules no deed and changes no admitted
-position.
+**Construction status:** the first bounded code-material return stands; this tablet schedules no
+further deed and changes no admitted position by itself.
 
 ---
 
@@ -108,12 +108,33 @@ carry the consequence. A universal realization theorem for the live machine rema
 
 ## 6. Code-material interpretation
 
-`open`: the next proposed experimental material is Python source containing plural expressions of
-algorithmic conduct: `for`, `while`, and recursive iteration; literal/variable substitution;
-inline/function/method substitution; nesting, scope, mutation, reconvergence, and same-output
-different-history controls.
+`established-bounded`: Python-shaped source has now served as raw exterior material across plural
+`for`, `while`, recursive, inline, helper, and method presentations, with renaming,
+same-terminus/different-history, noncommuting, mixed, and unknown controls. The production path
+contains no Python interpreter, parser, AST, bytecode, keyword role, operation label, or expected
+answer.
 
-Python is chosen for a comparatively simple exterior chart. The machine may not be given a Python
+The resident material shadow is the prior-equal-distance field
+
+```text
+s_i = 0                                    when b_i has no earlier equal surface,
+s_i = i - max {j < i | b_j = b_i}         otherwise.
+```
+
+It is invariant under a bijection of byte surfaces and returns its complete recurrence arcs. A
+caused rectangular transition face founds an exact local bi-affine law on the card. Native rest
+retains only anonymous shadow keys and exact coefficients. After source departure, the card
+reattaches later raw source, folds the complete later current without host semantic replay, and
+returns every intermediate standing to the exact behavioral quotient.
+
+Seven materially different sum presentations returned one complete world-line fiber; two product
+presentations returned another. A sum and affine recurrence terminating at the same value collapsed
+under the terminus receiver and reopened after one `advance` under complete history. A unique
+`+`/`*` swap cast the same equality shadow and correctly returned both compatible laws as a plural
+fiber. An unseen surface remained OPEN. Targeted ablation opened exactly its attributable later
+passage while unrelated world-lines remained bit-identical.
+
+Python remains a comparatively simple exterior chart. The machine may not be given a Python
 interpreter, parser, AST, bytecode, authored grammar, keyword roles, or operation labels. It must
 found candidate grains and transport relations from arbitrary material, retain alternatives, and
 let later continuation behavior establish receiver-relative algorithm classes.
@@ -134,6 +155,13 @@ resource current, or a richer history may reopen them. “The machine becomes it
 means material-founded morphology later unfolds the codec after the founding source departs. It
 does not license installing an interpreter inside the body.
 
+`open`: this first return receives the later ordered current population. It does not yet infer
+branch selection, loop termination, stack formation, recursive call/return topology, scope, or
+binding from unknown static source. The next required object is schedule morphology founded from
+genuinely returned instruction/event incidence, while preserving the plural surface-shadow fiber
+above. Complete construction, measurement, and boundary:
+`research/records/2026-08-12_THE_CODE_MATERIAL_RETURNS_ITS_WORLD_LINE_WITHOUT_AN_INTERPRETER.md`.
+
 ## 7. Lean cartography
 
 `open`: Lean is a later dense material chart for recovering theorem composition. The target is not
@@ -152,7 +180,7 @@ machine deficiency from a qualitative result the declared apparatus could not re
 substitute familiar arithmetic fixtures for ecological diversity, a final scalar for algorithmic
 transport, or a material label for a founded reaction class.
 
-The Python proposal is falsified as a codec-recovery experiment if classification depends on a
+Any code-material extension is falsified as a codec-recovery experiment if classification depends on a
 Python label, interpreter, parser, authored grammar, keyword, function name, or known answer; if
 renaming moves otherwise identical conduct; if equal final values erase causally distinguishable
 histories; if no shortest separating history is returned; or if the result cannot ride a

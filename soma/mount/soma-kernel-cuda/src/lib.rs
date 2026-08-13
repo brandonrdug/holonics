@@ -71,6 +71,7 @@ use body::register;
 use body::seam::SliceWordSeam;
 use soma_abi::emission::{DeedEmission, DEED_WORDS};
 use soma_abi::live_event_cuda as event_cuda;
+use soma_abi::material_shadow_cuda;
 use soma_abi::morphological_condition_cuda as morph_condition_cuda;
 use soma_abi::morphological_conduct_cuda as morph_cuda;
 use soma_abi::recurrent_law_cuda;
@@ -5113,6 +5114,123 @@ pub unsafe extern "ptx-kernel" fn morphological_prefix_condition(
     output[morph_condition_cuda::PREFIX_OUTPUT_STATUS] = morph_condition_cuda::STATUS_COMPLETE;
 }
 
+/// Read the recurrence shadow of raw material without retaining or interpreting its surfaces.
+///
+/// One lane owns one passage.  Equality is the sole surface relation: at each position the lane
+/// returns the distance to the immediately preceding equal octet.  A bijection of every octet
+/// therefore leaves the complete field and key unchanged.
+#[no_mangle]
+pub unsafe extern "ptx-kernel" fn material_shadow_read(
+    descriptors: *const u32,
+    descriptors_len: usize,
+    material_words: *const u32,
+    material_words_len: usize,
+    output_words: *mut u32,
+    output_words_len: usize,
+    shadow_words: *mut u32,
+    shadow_words_len: usize,
+    x_stride: u32,
+) {
+    let (x, y) = unsafe { global_xy() };
+    let lane = x as usize + y as usize * x_stride as usize;
+    if descriptors_len % material_shadow_cuda::INPUT_WORDS != 0
+        || output_words_len % material_shadow_cuda::OUTPUT_WORDS != 0
+    {
+        return;
+    }
+    let rows = descriptors_len / material_shadow_cuda::INPUT_WORDS;
+    if output_words_len / material_shadow_cuda::OUTPUT_WORDS != rows || lane >= rows {
+        return;
+    }
+    let descriptors = unsafe { slice::from_raw_parts(descriptors, descriptors_len) };
+    let material = unsafe { slice::from_raw_parts(material_words, material_words_len) };
+    let output = unsafe { slice::from_raw_parts_mut(output_words, output_words_len) };
+    let shadows = unsafe { slice::from_raw_parts_mut(shadow_words, shadow_words_len) };
+    let input_at = lane * material_shadow_cuda::INPUT_WORDS;
+    let output_at = lane * material_shadow_cuda::OUTPUT_WORDS;
+    output[output_at + material_shadow_cuda::OUTPUT_VERSION] =
+        material_shadow_cuda::LAYOUT_VERSION;
+    let offset = descriptors[input_at + material_shadow_cuda::INPUT_OFFSET] as usize;
+    let extent = descriptors[input_at + material_shadow_cuda::INPUT_EXTENT] as usize;
+    let shadow_offset =
+        descriptors[input_at + material_shadow_cuda::INPUT_SHADOW_OFFSET] as usize;
+    if extent == 0
+        || offset > material.len()
+        || extent > material.len() - offset
+        || shadow_offset > shadows.len()
+        || extent > shadows.len() - shadow_offset
+    {
+        output[output_at + material_shadow_cuda::OUTPUT_STATUS] =
+            material_shadow_cuda::STATUS_INVALID;
+        return;
+    }
+    let mut distinct = 0u32;
+    let mut recurrent = 0u32;
+    let mut adjacent_equal = 0u32;
+    let mut forward = material_shadow_cuda::FNV_OFFSET;
+    let mut position = 0usize;
+    while position < extent {
+        let surface = material[offset + position];
+        let mut prior = position;
+        let mut gap = 0usize;
+        while prior > 0 {
+            prior -= 1;
+            if material[offset + prior] == surface {
+                gap = position - prior;
+                break;
+            }
+        }
+        let Ok(gap_word) = u32::try_from(gap) else {
+            output[output_at + material_shadow_cuda::OUTPUT_STATUS] =
+                material_shadow_cuda::STATUS_INVALID;
+            return;
+        };
+        shadows[shadow_offset + position] = gap_word;
+        if gap == 0 {
+            let Some(next) = distinct.checked_add(1) else {
+                output[output_at + material_shadow_cuda::OUTPUT_STATUS] =
+                    material_shadow_cuda::STATUS_INVALID;
+                return;
+            };
+            distinct = next;
+        } else {
+            let Some(next) = recurrent.checked_add(1) else {
+                output[output_at + material_shadow_cuda::OUTPUT_STATUS] =
+                    material_shadow_cuda::STATUS_INVALID;
+                return;
+            };
+            recurrent = next;
+            if gap == 1 {
+                let Some(next) = adjacent_equal.checked_add(1) else {
+                    output[output_at + material_shadow_cuda::OUTPUT_STATUS] =
+                        material_shadow_cuda::STATUS_INVALID;
+                    return;
+                };
+                adjacent_equal = next;
+            }
+        }
+        forward = material_shadow_cuda::hash_step(forward, gap_word);
+        position += 1;
+    }
+    let mut reverse = material_shadow_cuda::FNV_OFFSET;
+    let mut remaining = extent;
+    while remaining > 0 {
+        remaining -= 1;
+        reverse = material_shadow_cuda::hash_step(reverse, shadows[shadow_offset + remaining]);
+    }
+    let summary_at = output_at + material_shadow_cuda::OUTPUT_SUMMARY_AT;
+    output[summary_at] = extent as u32;
+    output[summary_at + 1] = distinct;
+    output[summary_at + 2] = recurrent;
+    output[summary_at + 3] = adjacent_equal;
+    output[summary_at + 4] = forward as u32;
+    output[summary_at + 5] = (forward >> 32) as u32;
+    output[summary_at + 6] = reverse as u32;
+    output[summary_at + 7] = (reverse >> 32) as u32;
+    output[output_at + material_shadow_cuda::OUTPUT_STATUS] =
+        material_shadow_cuda::STATUS_COMPLETE;
+}
+
 /// Found one exact local bi-affine law from a complete rectangular intervention face.
 ///
 /// One lane owns one founding row. The card returns the Newton coefficients and the lattice chart;
@@ -5310,6 +5428,186 @@ pub unsafe extern "ptx-kernel" fn recurrent_law_evaluate(
         return;
     }
     output[output_at + recurrent_law_cuda::EVALUATE_OUTPUT_STATUS] =
+        recurrent_law_cuda::STATUS_COMPLETE;
+}
+
+/// Enact one exact local law repeatedly over a later current and return the complete world-line.
+///
+/// One lane owns one passage. The host supplies the law deposit, initial standing, and current
+/// sheet; it never receives a chance to replay the recurrence between events.
+#[no_mangle]
+pub unsafe extern "ptx-kernel" fn recurrent_law_fold(
+    input_words: *const u32,
+    input_words_len: usize,
+    current_words: *const u32,
+    current_words_len: usize,
+    output_words: *mut u32,
+    output_words_len: usize,
+    trace_words: *mut u32,
+    trace_words_len: usize,
+    x_stride: u32,
+) {
+    let (x, y) = unsafe { global_xy() };
+    let lane = x as usize + y as usize * x_stride as usize;
+    if input_words_len % recurrent_law_cuda::FOLD_INPUT_WORDS != 0
+        || output_words_len % recurrent_law_cuda::FOLD_OUTPUT_WORDS != 0
+    {
+        return;
+    }
+    let rows = input_words_len / recurrent_law_cuda::FOLD_INPUT_WORDS;
+    if output_words_len / recurrent_law_cuda::FOLD_OUTPUT_WORDS != rows || lane >= rows {
+        return;
+    }
+    let input = unsafe { slice::from_raw_parts(input_words, input_words_len) };
+    let currents = unsafe { slice::from_raw_parts(current_words, current_words_len) };
+    let output = unsafe { slice::from_raw_parts_mut(output_words, output_words_len) };
+    let traces = unsafe { slice::from_raw_parts_mut(trace_words, trace_words_len) };
+    let input_at = lane * recurrent_law_cuda::FOLD_INPUT_WORDS;
+    let output_at = lane * recurrent_law_cuda::FOLD_OUTPUT_WORDS;
+    output[output_at + recurrent_law_cuda::FOLD_OUTPUT_VERSION] =
+        recurrent_law_cuda::LAYOUT_VERSION;
+    let current_offset =
+        input[input_at + recurrent_law_cuda::FOLD_INPUT_CURRENT_OFFSET] as usize;
+    let current_extent =
+        input[input_at + recurrent_law_cuda::FOLD_INPUT_CURRENT_EXTENT] as usize;
+    let trace_offset = input[input_at + recurrent_law_cuda::FOLD_INPUT_TRACE_OFFSET] as usize;
+    let Some(current_end) = current_offset.checked_add(current_extent) else {
+        output[output_at + recurrent_law_cuda::FOLD_OUTPUT_STATUS] =
+            recurrent_law_cuda::STATUS_INVALID;
+        return;
+    };
+    let Some(trace_extent) = current_extent.checked_add(1) else {
+        output[output_at + recurrent_law_cuda::FOLD_OUTPUT_STATUS] =
+            recurrent_law_cuda::STATUS_INVALID;
+        return;
+    };
+    let Some(trace_end) = trace_offset.checked_add(trace_extent) else {
+        output[output_at + recurrent_law_cuda::FOLD_OUTPUT_STATUS] =
+            recurrent_law_cuda::STATUS_INVALID;
+        return;
+    };
+    if current_end > current_words_len / recurrent_law_cuda::I64_WORDS
+        || trace_end > trace_words_len / recurrent_law_cuda::I64_WORDS
+    {
+        output[output_at + recurrent_law_cuda::FOLD_OUTPUT_STATUS] =
+            recurrent_law_cuda::STATUS_INVALID;
+        return;
+    }
+    let mut law = [0i64; recurrent_law_cuda::LAW_VALUES];
+    let mut coordinate = 0usize;
+    while coordinate < law.len() {
+        let Some(value) = recurrent_read_i64(
+            input,
+            input_at
+                + recurrent_law_cuda::FOLD_INPUT_LAW_AT
+                + coordinate * recurrent_law_cuda::I64_WORDS,
+        ) else {
+            output[output_at + recurrent_law_cuda::FOLD_OUTPUT_STATUS] =
+                recurrent_law_cuda::STATUS_INVALID;
+            return;
+        };
+        law[coordinate] = value;
+        coordinate += 1;
+    }
+    let Some(mut standing) = recurrent_read_i64(
+        input,
+        input_at + recurrent_law_cuda::FOLD_INPUT_INITIAL_AT,
+    ) else {
+        output[output_at + recurrent_law_cuda::FOLD_OUTPUT_STATUS] =
+            recurrent_law_cuda::STATUS_INVALID;
+        return;
+    };
+    if !recurrent_write_i64(
+        traces,
+        trace_offset * recurrent_law_cuda::I64_WORDS,
+        standing,
+    ) {
+        output[output_at + recurrent_law_cuda::FOLD_OUTPUT_STATUS] =
+            recurrent_law_cuda::STATUS_INVALID;
+        return;
+    }
+    let [x0, y0, dx, dy, c0, cx, cy, cxy] = law;
+    if dx == 0 || dy == 0 {
+        output[output_at + recurrent_law_cuda::FOLD_OUTPUT_STATUS] =
+            recurrent_law_cuda::STATUS_INVALID;
+        return;
+    }
+    let mut event = 0usize;
+    while event < current_extent {
+        let Some(current) = recurrent_read_i64(
+            currents,
+            (current_offset + event) * recurrent_law_cuda::I64_WORDS,
+        ) else {
+            output[output_at + recurrent_law_cuda::FOLD_OUTPUT_STATUS] =
+                recurrent_law_cuda::STATUS_INVALID;
+            return;
+        };
+        let Some(relative_x) = standing.checked_sub(x0) else {
+            output[output_at + recurrent_law_cuda::FOLD_OUTPUT_STATUS] =
+                recurrent_law_cuda::STATUS_OVERFLOW;
+            return;
+        };
+        let Some(relative_y) = current.checked_sub(y0) else {
+            output[output_at + recurrent_law_cuda::FOLD_OUTPUT_STATUS] =
+                recurrent_law_cuda::STATUS_OVERFLOW;
+            return;
+        };
+        if relative_x.checked_rem(dx) != Some(0) || relative_y.checked_rem(dy) != Some(0) {
+            output[output_at + recurrent_law_cuda::FOLD_OUTPUT_STATUS] =
+                recurrent_law_cuda::STATUS_OUTSIDE_LATTICE;
+            return;
+        }
+        let Some(u) = relative_x.checked_div(dx) else {
+            output[output_at + recurrent_law_cuda::FOLD_OUTPUT_STATUS] =
+                recurrent_law_cuda::STATUS_OVERFLOW;
+            return;
+        };
+        let Some(v) = relative_y.checked_div(dy) else {
+            output[output_at + recurrent_law_cuda::FOLD_OUTPUT_STATUS] =
+                recurrent_law_cuda::STATUS_OVERFLOW;
+            return;
+        };
+        let Some(next) = u
+            .checked_mul(cx)
+            .and_then(|x_term| {
+                v.checked_mul(cy)
+                    .and_then(|y_term| x_term.checked_add(y_term))
+            })
+            .and_then(|linear| {
+                u.checked_mul(v)
+                    .and_then(|uv| uv.checked_mul(cxy))
+                    .and_then(|mixed| linear.checked_add(mixed))
+            })
+            .and_then(|delta| c0.checked_add(delta))
+        else {
+            output[output_at + recurrent_law_cuda::FOLD_OUTPUT_STATUS] =
+                recurrent_law_cuda::STATUS_OVERFLOW;
+            return;
+        };
+        standing = next;
+        if !recurrent_write_i64(
+            traces,
+            (trace_offset + event + 1) * recurrent_law_cuda::I64_WORDS,
+            standing,
+        ) {
+            output[output_at + recurrent_law_cuda::FOLD_OUTPUT_STATUS] =
+                recurrent_law_cuda::STATUS_INVALID;
+            return;
+        }
+        event += 1;
+    }
+    output[output_at + recurrent_law_cuda::FOLD_OUTPUT_TRACE_OFFSET] = trace_offset as u32;
+    output[output_at + recurrent_law_cuda::FOLD_OUTPUT_TRACE_EXTENT] = trace_extent as u32;
+    if !recurrent_write_i64(
+        output,
+        output_at + recurrent_law_cuda::FOLD_OUTPUT_VALUE_AT,
+        standing,
+    ) {
+        output[output_at + recurrent_law_cuda::FOLD_OUTPUT_STATUS] =
+            recurrent_law_cuda::STATUS_INVALID;
+        return;
+    }
+    output[output_at + recurrent_law_cuda::FOLD_OUTPUT_STATUS] =
         recurrent_law_cuda::STATUS_COMPLETE;
 }
 

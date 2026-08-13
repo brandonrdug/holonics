@@ -12,6 +12,7 @@
 
 pub const FOUND_ENTRY_SYMBOL: &str = "recurrent_law_found";
 pub const EVALUATE_ENTRY_SYMBOL: &str = "recurrent_law_evaluate";
+pub const FOLD_ENTRY_SYMBOL: &str = "recurrent_law_fold";
 pub const LAYOUT_VERSION: u32 = 1;
 
 pub const STATUS_UNWRITTEN: u32 = 0;
@@ -36,6 +37,22 @@ pub const EVALUATE_OUTPUT_STATUS: usize = 0;
 pub const EVALUATE_OUTPUT_VERSION: usize = 1;
 pub const EVALUATE_OUTPUT_VALUE_AT: usize = 2;
 pub const EVALUATE_OUTPUT_WORDS: usize = EVALUATE_OUTPUT_VALUE_AT + I64_WORDS;
+
+/// One fold row carries a law, an initial standing, an offset/extent into the current sheet, and
+/// an offset into the returned world-line sheet.
+pub const FOLD_INPUT_LAW_AT: usize = 0;
+pub const FOLD_INPUT_INITIAL_AT: usize = FOLD_INPUT_LAW_AT + LAW_WORDS;
+pub const FOLD_INPUT_CURRENT_OFFSET: usize = FOLD_INPUT_INITIAL_AT + I64_WORDS;
+pub const FOLD_INPUT_CURRENT_EXTENT: usize = FOLD_INPUT_CURRENT_OFFSET + 1;
+pub const FOLD_INPUT_TRACE_OFFSET: usize = FOLD_INPUT_CURRENT_EXTENT + 1;
+pub const FOLD_INPUT_WORDS: usize = FOLD_INPUT_TRACE_OFFSET + 1;
+
+pub const FOLD_OUTPUT_STATUS: usize = 0;
+pub const FOLD_OUTPUT_VERSION: usize = 1;
+pub const FOLD_OUTPUT_TRACE_OFFSET: usize = 2;
+pub const FOLD_OUTPUT_TRACE_EXTENT: usize = 3;
+pub const FOLD_OUTPUT_VALUE_AT: usize = 4;
+pub const FOLD_OUTPUT_WORDS: usize = FOLD_OUTPUT_VALUE_AT + I64_WORDS;
 
 #[inline]
 pub const fn encode_i64(value: i64) -> [u32; I64_WORDS] {

@@ -100,7 +100,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (65 deposits of 357)
+## 4 · The 2026-08 record line (66 deposits of 358)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -168,6 +168,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-11_THE_TAPE_HAS_NO_VERTEX_AND_PRODUCTION_IS_RECEPTION_AT_THE_OTHER_HAND.md` | The tape has no vertex, and production is reception at the other hand |
 | `2026-08-12_COUNTING_IS_CAUSAL_INCIDENCE_LANGUAGE_IS_ITS_CODEC_THE_MAP_IS_THE_CONTINUING_BODY.md` | Counting is causal incidence; language is its codec; the map is the continuing body |
 | `2026-08-12_THE_CARD_FOUNDS_THE_MORPHOLOGY_THE_DEPOSIT_STILL_OWES_THE_SECTION.md` | The card founds the morphology; the deposit still owes the section |
+| `2026-08-12_THE_CODE_MATERIAL_RETURNS_ITS_WORLD_LINE_WITHOUT_AN_INTERPRETER.md` | The code material returns its world-line without an interpreter |
 | `2026-08-12_THE_COMPUTER_IS_A_CAUSAL_WORLD_TUBE_THE_PROFILE_RETURNS_ITS_SHADOW_FIELD.md` | The computer is a causal world-tube; the profile returns its shadow field |
 | `2026-08-12_THE_CONTACT_FACE_CROSSES_THE_BOND_CONDUCT_NOT_THE_CODEC_FOUNDS_THE_SECTION_CLASS.md` | The contact face crosses the bond; conduct, not the codec, founds the section class |
 | `2026-08-12_THE_PRETRAINED_TRANSFORMER_IS_ONE_TRANSPORT_ORGAN_THE_REASONING_MACHINE_IS_THE_RETURNING_ECOLOGY.md` | The pretrained transformer is one transport organ; the reasoning machine is the returning ecology |
@@ -183,14 +184,14 @@ outside `tools/` that names the verifier — not declared.
 
 | tool | what it checks | invoked by |
 |---|---|---|
-| `tools/authored_levels.py` | Every numeric level authored **inside** an organ, and whether it is dispositioned. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, and 9 more |
-| `tools/boundary_artifacts.py` | Every committed boundary artifact is bound to its content hash AND its closure hash. | `meta/BOUNDARY_ARTIFACTS.tsv`, `research/records/2026-08-09_THE_COMMITTED_BOUNDARY_ARTIFACT_IS_STALE_AND_CANNOT_BE_REBUILT.md`, `soma/kernel/.gitignore` |
-| `tools/claim_index.py` | Generate `THE_CLAIM_INDEX.md` from the tree, so the table of contents cannot drift. | `CLAUDE.md`, `CONSTRUCTION_STATE.md` |
-| `tools/closure_manifest.py` | Bind every return under `output/` to the CLOSURE that produced it, not only to its content. | `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, `research/records/2026-08-10_THE_INSTRUMENT_DECLARES_THE_APERTURE_AND_THE_REFUSAL_IS_THE_RETURN.md` |
+| `tools/authored_levels.py` | Every numeric level authored **inside** an organ, and whether it is dispositioned. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, and 10 more |
+| `tools/boundary_artifacts.py` | Every committed boundary artifact is bound to its content hash AND its closure hash. | `meta/BOUNDARY_ARTIFACTS.tsv`, `research/records/2026-08-09_THE_COMMITTED_BOUNDARY_ARTIFACT_IS_STALE_AND_CANNOT_BE_REBUILT.md`, `soma/kernel/.gitignore`, and 1 more |
+| `tools/claim_index.py` | Generate `THE_CLAIM_INDEX.md` from the tree, so the table of contents cannot drift. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `soma/life/examples/the_code_material_returns_its_world_line.rs` |
+| `tools/closure_manifest.py` | Bind every return under `output/` to the CLOSURE that produced it, not only to its content. | `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, `research/records/2026-08-10_THE_INSTRUMENT_DECLARES_THE_APERTURE_AND_THE_REFUSAL_IS_THE_RETURN.md`, and 1 more |
 | `tools/gates.sh` | The gate sequence. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `blueprint/THE_MACHINE.md`, and 3 more |
 | `tools/lean_check.sh` | Give the formal sources a verdict. | `blueprint/THE_ROADMAP.md`, `canon/THE_EXPLORATIVE_FAILURE.md`, `research/records/2026-08-09_THE_COMMITTED_BOUNDARY_ARTIFACT_IS_STALE_AND_CANNOT_BE_REBUILT.md` |
-| `tools/output_manifest.py` | Bind every returned artifact under `output/` to its content hash, in a TRACKED file. | `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, `meta/OUTPUT_MANIFEST.tsv`, and 1 more |
-| `tools/resolve_named_paths.py` | Every path a governing document names must resolve in the body that document describes. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, and 10 more |
+| `tools/output_manifest.py` | Bind every returned artifact under `output/` to its content hash, in a TRACKED file. | `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, `meta/OUTPUT_MANIFEST.tsv`, and 2 more |
+| `tools/resolve_named_paths.py` | Every path a governing document names must resolve in the body that document describes. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, and 11 more |
 
 `cargo test --workspace` is the gate that is actually run alongside these.
 

@@ -27,6 +27,63 @@ STATION". Everything between them is the returned ledger and its provenance.** B
 the standing revision directly: *"Regarding the roadmap document, you can authoritatively revise it
 once you have sufficient context post-analysis campaign."*
 
+## THE CODE-MATERIAL WORLD-LINE — authorized 2026-08-12
+
+**Authority.** Brandon, after correcting symbolic arithmetic into causal incidence and ratifying
+`canon/TABLET_THE_UNIVERSALITY_MACHINE.md`: *"I would like you to now proceed with the construction
+of the experiment and analysis please."* The construction follows the exact experimental posture in
+`research/records/2026-08-12_COUNTING_IS_CAUSAL_INCIDENCE_LANGUAGE_IS_ITS_CODEC_THE_MAP_IS_THE_CONTINUING_BODY.md`
+§6. It is the next return after the completed recurrent-section construction below.
+
+**The deed.** Present Python source only as raw exterior material because it conveniently exhibits
+iteration, recursion, rebinding, nesting, and call/return. No Python interpreter, parser, AST,
+bytecode, keyword/role table, authored operational semantics, or material-kind branch enters the
+body. Join four existing owners and one missing apparatus entry:
+
+1. `ExactTextMaterialAtlas` and the mandatory `CudaMorphologicalConditioner` found recurrent
+   material conduct across the sealed mixed corpus and plural raw-code presentations;
+2. anonymous, caused state-transition returns attach to that conduct without naming the surface,
+   algorithm, or law;
+3. `CudaRecurrentLawExecutor` founds the exact local two-port transport, and its new owner-local
+   resident **fold** entry enacts a later current as distinct repeated event occurrences without a
+   host semantic replay;
+4. `causal_section` and the resident exact quotient return complete behavioral fibers and shortest
+   separating histories over the resulting world-lines.
+
+The return is one algorithmic transport atlas, not an output-value benchmark:
+
+```text
+(raw presentation lineage, anonymous material conduct, founded local transport,
+ unfolded state world-line, terminus, recurrence phase, source-shadow incidence,
+ stable receiver quotients, shortest separators, reconstruction fibers,
+ source-detachment/ablation testimony, open exterior, apparatus receipt).
+```
+
+**Population and controls.** The bounded experiment must include plural `for`, `while`, recursive,
+inline, helper-call, and method-shaped presentations; literal/variable, renaming, and formatting
+changes; one same-law/different-surface family; one same-terminus/different-intermediate-world-line
+pair; one locally similar/different-law family; a noncommuting hand; nested call/return incidence;
+and a declared unresolved passage. The repository's real Python files participate in conditioning
+as corpus material, not as a `Python` taxon. Archetypal examples establish no exhaustive ontology.
+
+**Gates.** The production deed must run on the resident card and return the actual later trajectories.
+The source corpus, founding samples, founding conditioner, and sample answers must be unreachable
+after remount. The native rest may carry anonymous conduct keys and exact founded coefficients, but
+not source text, source path, presentation identity, expected result, or a lossless corpus encoding.
+Renaming and reformatting must preserve the complete behavioral class where conduct stands. Equal
+termini may collapse only for the terminus receiver and must reopen under the world-line receiver.
+Ablating one deposit must open exactly its attributable later passages while unrelated passages
+remain bit-identical. The card's fold must return every intermediate state and an explicit refusal
+on finite-carrier failure; a final scalar alone does not grade. Host code may assemble I/O and
+independently audit the returned artifact, but it may not replay the fold, choose a law, or repair a
+device refusal.
+
+**Bound.** This first return may be a finite family of recurrent two-port transports whose causal
+returns provide complete founding faces. It does not establish arbitrary Python interpretation,
+static recovery of an unobserved control-flow graph, unrestricted program induction, or Lean
+cartography. Those remain open by name; an unknown code surface returns a reconstruction fiber or
+obstruction rather than borrowing Python semantics.
+
 ## THE RECURRENT-SECTION CONSTRUCTION — authorized 2026-08-12
 
 **Authority.** Brandon, after ratifying the ontology and its technical reading: *"allow this to now

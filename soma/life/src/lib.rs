@@ -6,6 +6,7 @@
 
 pub mod agentic_language;
 pub mod agentic_research;
+pub mod algorithmic_material;
 pub mod causal_language;
 // Carrier-neutral operation sections: oriented incidence plus exact consequence histories, read
 // through receiver-exact compression. Codec/material names remain lineage and never route conduct.
@@ -45,6 +46,7 @@ pub mod lean_mathematics;
 // `research/records/2026-07-19_THE_INCIDENCE_REACTS_THE_COMPOUND_EXPOSES_ITS_BOUNDARY_THE_REGION_CARRIES_THE_FIELD.md` §I.
 pub mod material_incidence;
 pub mod live_current_cuda;
+pub mod material_shadow_cuda;
 pub mod morphological_language;
 pub mod relational_language;
 // The receiver-relative preimage population of a presented token occurrence. It lives here because

@@ -77,7 +77,7 @@ mod tests {
     }
 
     #[test]
-    fn soma_ptx_artifact_is_sm89_with_all_thirty_entries_and_required_atomics() {
+    fn soma_ptx_artifact_is_sm89_with_all_thirty_two_entries_and_required_atomics() {
         let text = std::str::from_utf8(SOMA_PTX).expect("the soma PTX artifact is text");
         assert!(text.contains(".target sm_89"), "soma PTX must target sm_89");
         for entry in [
@@ -103,6 +103,7 @@ mod tests {
             "regional_contacts",
             "lineage_event",
             "lineage_event_population",
+            "material_shadow_read",
             "text_incidence_select",
             "text_section_restrict",
             "returned_contact_group",
@@ -111,6 +112,7 @@ mod tests {
             "morphological_conduct_group",
             "recurrent_law_found",
             "recurrent_law_evaluate",
+            "recurrent_law_fold",
         ] {
             assert!(
                 text.contains(&format!(".entry {entry}")),
