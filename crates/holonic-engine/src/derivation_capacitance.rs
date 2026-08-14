@@ -397,6 +397,27 @@ impl CapacitanceReading {
 
 // ------------------------------------------------------------------ refusals
 
+/// **The routes between two named entities, or the named fact that there are none.**
+///
+/// The two returns are distinct on purpose. `Reached` with an empty `routes` cannot occur — the
+/// population and the enumeration are taken from the same arrival body and must agree — so an
+/// absence of routes is always `Unreached`, and `Unreached` says which pair did not join rather
+/// than handing back a vector the caller has to interpret.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum RouteReading {
+    Reached {
+        from: String,
+        to: String,
+        /// The exact number of minimal-arrival routes, taken from the factorized arrival body
+        /// **without enumerating them**. It is a `BigUint` because a terrain can carry more routes
+        /// than a machine can list, and the count is still exact when the listing is not possible.
+        population: BigUint,
+        /// The routes, each as the identifiers it passes through, source first.
+        routes: Vec<Vec<String>>,
+    },
+    /// The two identifiers lie in different components of the founded terrain.
+    Unreached { from: String, to: String },
+}
 #[derive(Clone, Debug, PartialEq, Eq, Error)]
 pub enum DerivationCapacitanceRefusal {
     #[error(
@@ -633,6 +654,84 @@ impl CapacitanceMapping {
     /// The terrain, as the transport law addresses it.
     fn source_sites(&self) -> LocalSet<ReceiverCurrentSiteId> {
         self.terrain.iter().map(|name| self.site_of[name]).collect()
+    }
+
+    /// The site this identifier is addressed by, and the identifier a site carries.
+    ///
+    /// Both directions, because a route is asked in identifiers and conducted in sites, and a
+    /// returned route that cannot be read back into identifiers is a route the caller cannot use.
+    pub fn site_of(&self, identifier: &str) -> Option<ReceiverCurrentSiteId> {
+        self.site_of.get(identifier).copied()
+    }
+
+    /// The identifier a site carries. Inverse of [`Self::site_of`].
+    pub fn name_of(&self, site: ReceiverCurrentSiteId) -> Option<&str> {
+        self.name_of.get(&site).map(String::as_str)
+    }
+
+    /// **The route between two named entities.**
+    ///
+    /// Both endpoints are named by the caller at call time. The law forms the complete
+    /// reverse-reachable population of `to`, radiates from `from`, and returns the exact number of
+    /// minimal-arrival routes — computed from the factorized arrival body, without enumerating
+    /// them — beside the routes themselves, read back into identifiers.
+    ///
+    /// **The organ this composes has been exact and unreachable since it was built.**
+    /// `ExactReceiverCurrentLaw::radiate` takes arbitrary source *and* target sets and returns
+    /// `witness_paths_to`, `witness_section_to` and `exact_path_population`; measured 2026-08-14,
+    /// every one of its six call sites was inside `#[cfg(test)]`, and the only production caller
+    /// anywhere used the targetless `radiate_to_horizon` and took the **count**. The machine
+    /// computed exactly how many routes reached a target and had never once asked for one.
+    ///
+    /// An endpoint the terrain does not carry is [`DerivationCapacitanceRefusal::UnknownIdentifier`].
+    /// A target the radiation does not return is [`RouteReading::Unreached`], **named** — two
+    /// entities in different components of the founded terrain is a fact about the terrain, and an
+    /// empty vector would report it as an absence of routes rather than an absence of a join.
+    pub fn route(
+        &self,
+        from: &str,
+        to: &str,
+    ) -> Result<RouteReading, DerivationCapacitanceRefusal> {
+        let source = self
+            .site_of(from)
+            .ok_or_else(|| DerivationCapacitanceRefusal::UnknownIdentifier(from.to_owned()))?;
+        let target = self
+            .site_of(to)
+            .ok_or_else(|| DerivationCapacitanceRefusal::UnknownIdentifier(to.to_owned()))?;
+
+        let radiation = self
+            .law
+            .radiate(LocalSet::from([source]), LocalSet::from([target]))?;
+        if !radiation.returned_targets.contains(&target) {
+            return Ok(RouteReading::Unreached {
+                from: from.to_owned(),
+                to: to.to_owned(),
+            });
+        }
+
+        let population = radiation.exact_path_population(target);
+        let routes = radiation
+            .witness_paths_to(target)?
+            .into_iter()
+            .map(|witness| {
+                witness
+                    .sites
+                    .into_iter()
+                    .map(|site| {
+                        self.name_of(site)
+                            .map(str::to_owned)
+                            .unwrap_or_else(|| format!("{site:?}"))
+                    })
+                    .collect()
+            })
+            .collect();
+
+        Ok(RouteReading::Reached {
+            from: from.to_owned(),
+            to: to.to_owned(),
+            population,
+            routes,
+        })
     }
 
     /// How many reachable sites return when the **caller** declares the horizon.
@@ -1283,6 +1382,115 @@ mod tests {
         .expect("the circuit founds a passage ecology")
         .read()
         .expect("the current conducts")
+    }
+
+    // ------------------------------------------------------------ the route between two entities
+
+    /// A chain `alpha -> beta -> gamma`: each derivation recruits the one before it, so the terrain
+    /// runs symbol to derivation and a route from the first to the last must pass through the
+    /// middle. **Both endpoints are named at call time and the route is longer than two steps** —
+    /// the two things every existing route API in this tree could not do.
+    fn chain() -> Vec<Derivation> {
+        vec![
+            control("alpha", "alpha_holds", &[]),
+            control("beta", "beta_holds", &["alpha"]),
+            control("gamma", "gamma_holds", &["beta"]),
+        ]
+    }
+
+    fn chain_mapping(derivations: &[Derivation]) -> CapacitanceMapping {
+        CapacitanceMapping::found(
+            &circuit_of(derivations, CircuitAperture::DEPOSITED_READER),
+            derivations,
+            &[],
+            CapacityLaw::DistinguishableResults,
+            CharacteristicDelayLaw::Uniform,
+        )
+        .expect("the circuit founds a passage ecology")
+    }
+
+    #[test]
+    fn a_route_is_returned_between_two_endpoints_the_caller_names() {
+        let derivations = chain();
+        let mapping = chain_mapping(&derivations);
+
+        let reading = mapping.route("alpha", "gamma").expect("both are sites");
+        let RouteReading::Reached {
+            from,
+            to,
+            population,
+            routes,
+        } = reading
+        else {
+            panic!("alpha and gamma are joined by the chain: {reading:?}");
+        };
+        assert_eq!(from, "alpha");
+        assert_eq!(to, "gamma");
+
+        // The exact count is taken without enumerating, and the enumeration must agree with it.
+        assert_eq!(
+            population,
+            BigUint::from(routes.len()),
+            "the factorized population disagrees with the witnesses it factorizes"
+        );
+        assert!(!routes.is_empty());
+
+        // Longer than two steps, and the constituent it crossed is named rather than supplied.
+        let longest = routes.iter().map(Vec::len).max().unwrap();
+        assert!(
+            longest > 2,
+            "a two-step route is what the existing API already returned: {routes:?}"
+        );
+        for route in &routes {
+            assert_eq!(route.first().map(String::as_str), Some("alpha"));
+            assert_eq!(route.last().map(String::as_str), Some("gamma"));
+            assert!(
+                route.iter().any(|step| step == "beta"),
+                "the route does not name what it crossed: {route:?}"
+            );
+        }
+    }
+
+    /// The control that makes the reading an instrument: two entities in **different components**
+    /// return the fact by name, not an empty vector. Without this the reached case cannot be
+    /// distinguished from a terrain that joins nothing.
+    #[test]
+    fn two_entities_in_different_components_return_unreached_by_name() {
+        let mut derivations = chain();
+        derivations.push(control("island", "island_holds", &[]));
+        let mapping = chain_mapping(&derivations);
+
+        assert!(
+            mapping.site_of("island").is_some(),
+            "the island is a site; it is simply not joined"
+        );
+        assert_eq!(
+            mapping.route("alpha", "island").expect("both are sites"),
+            RouteReading::Unreached {
+                from: "alpha".to_owned(),
+                to: "island".to_owned(),
+            }
+        );
+        // And the joined pair on the same terrain still routes, so the refusal is about the pair.
+        assert!(matches!(
+            mapping.route("alpha", "gamma").unwrap(),
+            RouteReading::Reached { .. }
+        ));
+    }
+
+    #[test]
+    fn an_endpoint_the_terrain_does_not_carry_is_refused_by_name() {
+        let derivations = chain();
+        let mapping = chain_mapping(&derivations);
+        assert!(matches!(
+            mapping.route("alpha", "nowhere"),
+            Err(DerivationCapacitanceRefusal::UnknownIdentifier(name)) if name == "nowhere"
+        ));
+        // And the two directions of the site map are inverse on every site the terrain carries.
+        for name in ["alpha", "beta", "gamma"] {
+            let site = mapping.site_of(name).expect("a site");
+            assert_eq!(mapping.name_of(site), Some(name));
+        }
     }
 
     // ------------------------------------------------------------ the mapping is read, not declared
