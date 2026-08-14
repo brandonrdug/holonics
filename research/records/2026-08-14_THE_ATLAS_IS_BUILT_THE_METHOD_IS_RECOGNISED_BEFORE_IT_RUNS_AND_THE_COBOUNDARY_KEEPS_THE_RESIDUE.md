@@ -203,3 +203,80 @@ derivation-like operator in it remains the formal polynomial derivative.**
 No Millennium movement, and no deed here may be graded by one. The third ranked build —
 hypergeometric finiteness by Beukers–Heckman interlacing against Schwarz's fifteen rows — is not
 begun. This record schedules nothing.
+
+---
+
+## 7. The third build, added the same day: closure decided by sorting integers
+
+`crates/holonic-engine/src/hypergeometric_closure.rs`, driven by
+`examples/the_solution_closes_when_the_marks_take_turns.rs`.
+
+**The object in composable terms**, which is the form Brandon ratified this day and which this
+section is written in: a second-order transport law well behaved everywhere except at **three
+sites** — `0`, `1`, infinity. At each site a solution carried once round a small loop comes back
+**turned**; those three amounts are the **local turn numbers**. Composing loops generates the
+**return group**. *If the return group is finite the solution takes finitely many values and closes;
+if infinite it never closes.* (Classical labels, carried alongside so they remain lookupable: the
+*hypergeometric equation*, its *exponent differences*, its *monodromy group*.)
+
+**What decides it.** Put the dials on a circle. Two families of marks: the **numerator** marks for
+`a` and `b`, and the **denominator** marks for `c` and for `1`, which sits at position zero because
+a whole turn is no turn. **The group is finite exactly when the families take turns round the
+circle** — and must keep taking turns under **every restretching**, meaning every multiplication of
+all marks by a whole number sharing no factor with the circle. (Classically the *Beukers–Heckman
+interlacing criterion*, Invent. Math. 95, 1989; the restretchings are its *Galois conjugates*.)
+
+**Over a common denominator every mark is an integer, so the entire decision is sorting integers and
+checking labels alternate.** No root extracted, no angle taken, no matrix built, no float anywhere.
+
+### What returned
+
+- **Fifteen of fifteen** classically closing turn-number rows recovered **by the alternation test
+  alone**. The classical table (*Schwarz's list*) is present as a `BTreeMap` **control** and is
+  consulted by nothing that decides — a table used to classify its own rows returns the preimage of
+  its own declaration.
+- **Four of four** declared non-closing triples refused, each with the **adjacent pair exhibited**:
+  the elliptic case returns denominator marks `0` and `0` adjacent on a circle of two; all-quarters
+  returns numerator marks `1` and `3` adjacent on a circle of eight.
+- **The restretching loop is load-bearing, measured: 336** dial pairs in one swept family alternate
+  **as drawn** and fail only once spun — `a = 1/30, b = 17/30` alternates as `[1,17]` against
+  `[0,15]` and dies at the eleven-fold spin. Without such material the loop could be deleted with
+  every test still green, and its agreement would prove nothing.
+
+### Two findings the build produced, the second by the driver refuting
+
+**The geometry reading was not symmetric, and that was a defect rather than a convention.** The
+equation is symmetric in `a` and `b`, but the turn at infinity is `a − b`, which flips sign under the
+exchange. A signed sum therefore gave one equation two different geometries depending on which dial
+was written first. **The sum must be taken on absolute turn numbers** — a turn measured the other way
+round is the same turn — and a test now exchanges the dials and requires the reading not to move.
+
+**The flat locus IS the splitting locus.** The driver refuted on a fixture listing a flat triple
+among the refusals. The code was right. Identically,
+
+```text
+λ + μ + ν = 1 − 2b
+```
+
+so a flat sum forces a dial to zero, and a dial at zero lands **on** the denominator family's mark at
+zero — which is exactly the coincidence that splits the equation into simpler pieces. **A flat triple
+is therefore never merely infinite; it is outside the criterion altogether**, and reporting it as a
+refusal reports the wrong species. Confirmed on four flat triples, each splitting at mark zero.
+
+That also sharpens the joint to standing terrain. The flat row is exactly the rotation orders a
+lattice admits, which `winding_inertia::lattice_admits_order` already derives on rational grounds —
+and it is precisely the row where this criterion does not apply, so the two organs meet at a boundary
+rather than overlapping.
+
+### The third outcome is a species, not a fallback
+
+`Splits` is returned by name beside `Closes` and `DoesNotClose`, and a test requires all three to
+occur on the declared material. A reading whose third arm never fires is a two-valued test wearing a
+third label.
+
+### What this does not claim
+
+It decides **finiteness** of the return group. It does not build the group, does not produce the
+algebraic solution, and does not integrate anything. Second order only, rational dials only — the
+alternation machinery is written for `n` marks against `n` so the order can rise later, and nothing
+here drives it above two.

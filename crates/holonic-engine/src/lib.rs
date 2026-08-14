@@ -129,6 +129,11 @@ pub mod hardware_cover;
 // schedules are a gauge whose orbit this module MEASURES rather than assumes, and the class is
 // returned as the Rothstein-Trager resultant with no root extracted anywhere.
 pub mod hermite_reduction;
+// Whether the three-site turning equation's solution closes, decided by integer alternation on a
+// circle under every coprime restretching. The return group is finite exactly when the numerator
+// and denominator marks take turns; nothing is extracted, no angle is taken, and the classical
+// fifteen-row table of closing turn numbers is a CONTROL here and never a decider.
+pub mod hypergeometric_closure;
 // The deposited derivation circuit conducted as an exact population current: `receiver_current`'s
 // transport law pointed at the atlas's own 0-cells and 1-cells, so that an atom recruited by ninety
 // derivations separates from one recruited by two through a dilated passage delay rather than

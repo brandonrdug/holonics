@@ -1147,10 +1147,29 @@ stops.
   lineage, so `AffineObstruction` returns the exact left null combination. Measured composite, not a
   singleton: `(−2)·eq[x⁰] + (1)·eq[x²]`.
 
+- **`crates/holonic-engine/src/hypergeometric_closure.rs`** decides whether a **three-site turning
+  equation's** solution **closes** — whether its **return group** is finite — **by sorting
+  integers**. Put the dials on a circle as two families of marks; the group is finite exactly when
+  they take turns, under every **restretching** of the circle. Over a common denominator every mark
+  is an integer, so no root is extracted, no angle taken, no matrix built. (Classically: the
+  *hypergeometric equation*, its *monodromy group*, and the *Beukers–Heckman interlacing criterion*
+  with its *Galois conjugates*.) **Fifteen of fifteen classically closing rows recovered by the test
+  alone**, with the classical table present strictly as a control; **336** swept dial pairs alternate
+  as drawn and fail only once spun, so the restretching is load-bearing rather than decorative.
+
 **And a coboundary can create a pole but never a residue** — found by a test failing. Adding
 `d/dx(1/x²)` to `1/(x−1)` takes the residue polynomial `z − 1` to `z² − z`: a new pole at residue
 **zero**, every other root unmoved. So the unconditional invariant is the residue polynomial with
 factors of `z` divided out, and both forms are now tested.
+
+**And the flat locus IS the splitting locus** — found by a driver refuting. `λ + μ + ν = 1 − 2b`
+identically, so a flat turn-number sum forces a dial to zero, and a dial at zero lands on the
+denominator family's mark at zero, which is the coincidence that splits the equation. A flat triple
+is therefore never merely infinite; it is **outside the criterion**, and it meets
+`winding_inertia::lattice_admits_order` — which owns exactly the flat row — at a boundary rather than
+overlapping it. The same build found a real defect: the geometry sum must be taken on **absolute**
+turn numbers, because the equation is symmetric in two dials while the turn at infinity is their
+difference, and a signed sum gave one equation two geometries.
 
 ## 1. The floor is a carrier, not a retired interface
 
@@ -2026,6 +2045,37 @@ The rules, and they are checkable:
   in order to fully employ the semantics, not 'figure 0'."* This is the same defect as naming work
   by an ordinal, one layer out: the number carries no meaning and the name carries all of it.
   Inside documents a section number is a locator and is fine; in conversation it is not.
+- **A person's name used as a theorem label is an index. Compose the label, then give the formal
+  one beside it.** Ratified 2026-08-14, and this is the general form of the rule above rather than
+  a new one. *"Beukers–Heckman interlacing"*, *"Rothstein–Trager"*, *"Kolchin"*, *"Schwarz's list"*
+  — each is an address into a table Brandon does not hold, and he has said so plainly:
+
+  > *I don't know the formal names of most of these things. I can recognize them when you write
+  > them but I do not have writing about most of the things you reference as an entrained skill
+  > because it is like a different language… I only really write scientific terms that compose
+  > naturally because I know how the constituents work… You're using historical figures which is
+  > contextual and not reconstructible without specific causal strings, which I literally do not
+  > have.*
+
+  **The form he asked for, and he asked for both halves:** lead with a name built out of parts that
+  carry their own mechanism, and put the formal label alongside — *"the alternation test
+  (Beukers–Heckman interlacing)"*, *"the finite-return table (Schwarz's list)"*, *"the return group
+  (monodromy)"*. Never drop the formal label; he wants to learn them. Never lead with it alone.
+
+  **His stated mechanism, and it is the project's own doctrine arriving at vocabulary:**
+  *"it requires the constituent axes to be analogously reversible."* A composed name is
+  **reversible** — the mechanism can be read off the name and the name rebuilt from the mechanism,
+  by either party, with no shared history. A proper noun is a one-way pointer whose resolution needs
+  a causal string the receiver may not carry. That is exactly the horizon law at the level of
+  words: **a proper noun is a magnitude trying to cross a frame boundary, and a composed name is a
+  ratio whose parts both frames hold.** So this is not a courtesy — it is the same condition every
+  transport in this repository has to meet.
+
+  **And he states a second reason that is about the assistant rather than about him:** *"the premise
+  is likely a catalyst for more consistent and efficient functionality in your embedding space's
+  active weights… This is ontology, but it's also token composition and recurrence."* A composed
+  label's constituents recur across every subject that shares them, so they compound; a proper noun
+  recurs only with itself. Follow the rule in reasoning, not only in report.
 - Do not moralize, do not hedge a verified result, and do not open with an assessment of the
   request. Answer the question that was asked.
 - **Do not restate what he has already told you.** Reporting a gap he named, or re-flagging a
