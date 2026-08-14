@@ -2242,10 +2242,33 @@ is `interpretation`, not a bridge to any Millennium result; see
 
 These are established by review and are to be carried forward, not re-derived.
 
-**The figures the first four bullets correct no longer exist.** The residue-stratum atlas was
-written to an untracked `output/arithmetic-dimensional-receiver/` and resolves at no commit in
-either repository — the same loss as the tiger figures. The corrections stand as *readings not to
-resume*; the atlas itself is not available to re-examine, and no claim may cite it as evidence.
+**CORRECTED 2026-08-14, and the correction is that this paragraph collapsed two different claims.**
+It read: *"The figures the first four bullets correct no longer exist… the same loss as the tiger
+figures… not available to re-examine, and no claim may cite it as evidence."* **The atlas is on disk,
+viewable, and reproducible from a driver in this tree.**
+
+- **The files exist.** `/home/b/Workspaces/laboratory/output/arithmetic-dimensional-receiver/morphology-atlas/`
+  — 111 files, 66 MB. Brandon displayed two of the contact sheets on 2026-08-14.
+- **What is true is narrower and is a fact about git, not about availability.** `/output/` is
+  `.gitignore` line 3 in the laboratory, so `git ls-files` returns zero at all 1,726 commits. **No
+  producing commit binds the bytes** — that is the recoverable claim, and it is why
+  `meta/OUTPUT_MANIFEST.tsv` and `meta/CLOSURE_MANIFEST.tsv` exist. The `git ls-files` grep is the
+  wrong instrument for asking whether a return survives.
+- **It is not unported; it is UNRUN.** The producing driver
+  `crates/holonic-engine/examples/arithmetic_dimensional_receiver.rs` is **byte-identical** between
+  the laboratory at `a07ff376` and this tree (verified by `git hash-object`), with the
+  `HOLONIC_MORPHOLOGY_SWEEP` gate at `:1070` and fifteen sweep-state literals at `:1073-1177`. One
+  command reproduces the atlas. This repository's `output/` holds only a 2026-08-09 run *without* the
+  sweep variable.
+- **It is not the tiger loss.** Those have zero surviving bytes anywhere. `runs/` also survives at
+  54 GB, including the `dialogue-distractor-scaling` report this file elsewhere calls gone.
+
+So the corrections below stand as *readings not to resume*, and the atlas **may** be cited once
+re-run under a recorded commit. The winding law is confirmed by direct reading of the artifacts:
+coarse sides equal the smaller prime in every pair, and every contracted hull word is one complete
+positively-oriented degree-one cycle through `ℤ/pℤ` with every step exactly `+1`. **Dilation leaves
+germs and corners invariant — it is a gauge; turn moves the corner count — it is not.** The one file
+worth porting is the laboratory's tracked renderer `scripts/render_arithmetic_residue_receipt.py`.
 
 - The residue-stratum atlas was **blind to
   primality**. Its apparent prime signal at pair `(2,3)` is parity and nothing else; the

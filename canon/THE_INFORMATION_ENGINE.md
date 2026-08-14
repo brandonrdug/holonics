@@ -40,9 +40,19 @@ It ends at `seam`, the two-operation substrate mouth. **No library module in `bo
 cycles in the entire library graph are six small mutual-recursion clusters, every one of them
 inside a single crate.
 
-**Every closing of the emit → world → return → reflect arc lives in a driver.** There are 167 of
-them. The widest reaches eleven engine modules. **875 of the engine's 4,536 public items are
-reachable only from `examples/`.**
+~~**Every closing of the emit → world → return → reflect arc lives in a driver.** There are 167 of
+them.~~ **CORRECTED 2026-08-14 by re-running the census this file quotes.** The arc closes in
+**library** code in two independent places: `crates/holonic-engine/src/returned_reading.rs`
+(`read_production:667` → `condition_again:1500` → `carried_into:363`) and
+`soma/life/src/agentic_research.rs:643-704` `advance_open_completion`, whose exterior world is an
+injected closure at `:516`. Both landed at `cec1c97`, and
+`examples/the_reading_returns.rs:10-20` states the superseded claim verbatim as the census it
+repaired. The driver population is **182**, not 167. The widest reaches eleven engine modules.
+**875 of the engine's 4,536 public items are reachable only from `examples/`.**
+
+**The standing repair is procedural: no census figure may be quoted from a document. Re-run it, and
+stamp the run with its date.** This paragraph misled a session on 2026-08-14 into naming a closed gap
+as its open frontier.
 
 That is the same defect the spine named as *a missing edge rather than a missing organ*, and the
 same one the blacksmith deposit named as *"the radiation is currently all forge… the cooling half is
@@ -253,8 +263,17 @@ than asserting disjointness.
    gate suite runs without `--include-ignored`, on a machine that has the card. One parity gate does
    run in production, as a mode defaulting to on: the conduct grouping recomputes on the host every
    launch.
-5. **Eleven fully unwired modules** and 145 zero-reference public items, 22 of which are the entire
-   live surface API.
+5. **Seven fully unwired modules** and **905** zero-reference distinctive public items — re-measured
+   2026-08-14. The earlier figures were taken by a module-path grep, which cannot measure this at all:
+   `lib.rs` glob-re-exports 64 modules, so `rg '\batlas::'` returns one hit for a module used
+   everywhere. **Item granularity is the only valid instrument.** The seven: `atlas`, `model_surface`,
+   `realization`, `live_presentation`, `parameter`, `device` (engine) and `scene`
+   (relational-geometry). **Three bear on standing work and should be read before anything of their
+   shape is proposed** — `realization.rs` carries `RealizationWitness`/`ReceiverProgram` while
+   *realization causes placement* is the governing synthesis and `supported_realizers.rs` never names
+   it; `device.rs` states the byte-for-byte parity contract `cuda_aperture.rs` re-implements; and
+   `parameter.rs` carries `CopyLaw`/`RetentionLaw`/`DepartureLaw`, which is the vocabulary
+   source-detachment bookkeeping needs.
 
 ## 5. The mouth — where material enters, and why most of it is already built
 

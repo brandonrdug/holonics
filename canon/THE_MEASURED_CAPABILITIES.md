@@ -296,7 +296,13 @@ unless exactly one root is proved; `SeriesTailCertificate`; and `QuinticTransiti
 `solvable_by_radicals()` — **which is the radical chart's refusal, already typed**, as a fiber of
 admissible groups restricted by observed Frobenius cycle types.
 
-`hypergeom|₂F₁|pochhammer` across the live tree returns **two lines, both negative declarations**.
+~~`hypergeom|₂F₁|pochhammer` across the live tree returns **two lines, both negative declarations**.~~
+**FALSIFIED 2026-08-14 by building the owner.** `crates/holonic-engine/src/hypergeometric_closure.rs`
+decides whether the three-site turning equation's solution closes — whether its return group is finite
+— by integer alternation on a circle under every coprime restretching, with no root extracted and no
+float. Registered at `lib.rs:136`, driven by
+`examples/the_solution_closes_when_the_marks_take_turns.rs`, fifteen of fifteen classically closing
+rows recovered by the test alone. **An absence claim is a measurement and decays like one.**
 And `arithmetic_monodromy.rs` is a **different local system** — `Gal(F̄_p/F_p)` on root sheets, not
 `π₁(ℙ¹∖{0,1,∞})` on solution fibers. Same word, two objects, classical bridge stated in canon and
 joined by no code.

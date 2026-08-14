@@ -29,9 +29,83 @@ STATION". Everything between them is the returned ledger and its provenance.** B
 the standing revision directly: *"Regarding the roadmap document, you can authoritatively revise it
 once you have sufficient context post-analysis campaign."*
 
+## THE EROS CYCLE — ratified 2026-08-14
+
+**This is the present deed.** It composes entirely through the resident circulation's owners named
+directly below; it opens no second ecology. The full audit, every census figure re-taken, and the
+corrections it produced are
+`research/records/2026-08-14_THE_CENSUS_DECAYED_THE_CYCLE_IS_BUILT_AND_THE_OPEN_GRADE_IS_THE_NONIDENTICAL_NEIGHBOURHOOD.md`.
+
+**The object is grade three.** `research/records/2026-07-20_THE_DEPOSIT_BENDS_THE_LATER_CAST_THE_CONSTITUENT_HAS_NOT_YET_ENTERED_THE_LATER_CONTACT.md:53-57`
+deposits three learning grades. Persistence is measured. Associative learning — a controlled
+intervening history changing later **addressed** conduct — is measured. **Transferable developmental
+learning is open**: *"Experience forms a correspondence by which a retained construction changes
+useful conduct in a later **nonidentical** neighborhood."* The 2026-08-13 ride measurement re-admits
+the same material on changed terrain, so it is grade two. **Grade three is the return; everything
+below it is the carrier**, which `CLAUDE.md` §1 admits without limit in that role.
+
+**The compression cycle is already built and needs no new organ.**
+`soma/life/src/decomposing_codec.rs` is the codec pivot the compression tablet defines: `decompose`
+`:189`, the declared decoder `reintegrate` `:183`, the exhibited remainder `collapsed()` `:372`, the
+deposit `revise()` `:698` cutting at each collapsed pair's own word, and the negative control
+`resume_unrevised()` `:774`. Its grain **is** the reusable morphology by its own header. The attempted
+composition returns exactly one absent type: `read` `:409` builds `pooled: Vec<Vec<Symbol>>` and
+`PartSystem::over_parts` collapses it to a `BTreeSet` — **the part multiset is discarded at the moment
+it exists.**
+
+**Two names this deed may not use.** *"Reduced founding cost is compression"* was regraded 2026-07-19
+— it measures recurrence, reuse and amortization, and the exact observations stand while the
+ontological definition does not. And the collapsed-pair exhibit is graded *"the project's sharpest
+instrument"* precisely for converting cost from a **ratio** into an **exhibitable population**;
+returning a number in its place is a regression. **The population is primary and the exact form is its
+magnitude face, reported beside it.**
+
+### The steps
+
+| step | what |
+|---|---|
+| **0** | Three readings before construction: run `surprisal::cross_entropy` on the before/after bodies of the **existing** ride run and read what `SymbolicSurprisal::compare` returns; name the grade the measurement lands in **before** writing the receipt; express the bit/work exchange as a **value at a call site**. Every outcome is information — `S(P) = S(Q)` is decidable and `S(P) < S(Q)` is not, so an `Open` return locates the grain the reading needs. |
+| **1** | The one absent type: a public part multiset and part→id on `DecompositionPass`/`PartSystem`. |
+| **2** | One repair inside an owner: `surprisal::cross_entropy:434` returns `Unsupported` for the **whole** reading on the first unsupported event, discarding the form accumulated over every supported one — so it refuses on exactly the material this deed must score. A `Partial { form_over_supported, unsupported, unsupported_mass }` arm **exhibits instead of collapsing** and smooths nothing. This is the two-part code arriving from a refusal already in the code: the supported half is what the grain carries, the unsupported half is what must be founded, and founding **is** the terrain change. |
+| **3** | The declared exchange: `DeclaredCarrierMetric` (`cuda_aperture.rs:1157`) prices host, device and transfer and not `intermediate_bits`, which `CarrierWork:1068` carries. One coordinate, one term in `cost_of`, passed as a value. `:1112-1114` states the obstruction verbatim. |
+| **4** | The deed: material A revises the grain; material B is **nonidentical**, held out and named as held out before the run, and its events are **not** the ones the deposit founded. The return is the population B reaches under the revised grain that it did not reach under the parent, each member naming the deposit that licensed it. |
+
+### The controls, decided before the run
+
+- **A second held-out body the deposit did not touch, whose reading must not move.** This is
+  simultaneously the grade-three requirement and the keystone anti-tautology: if both move, the
+  deposit was a global normalization rather than changed terrain.
+- Score against the deposited standing with **no further founding**; the residual unsupported
+  population is exhibited. A deed that founds what it is about to measure has measured its own
+  founding.
+- The event table **derived from the union of both emissions**, members returned by name — a returned
+  integer is a receiver coordinate promoted into the artifact.
+- Deposit content varied at **fixed cardinality**, so the reading cannot be a monotone function of a
+  count the deposit incremented.
+- `resume_unrevised()` must move the difference form by **exactly zero**, decided by `is_zero()`.
+- The owner's own foil: cut at an unreturned word of the same length, or the derivation is
+  *"cutting more is better" wearing a lineage*.
+- Recurrence present at 1, 2 and ≥3 that the driver did not place, with the refused population printed.
+- The declared exchange's orbit exhibited, or the declaration is decorative.
+
+### Standing bars
+
+The exact form may be reported, ranked in a report, and compared. **It may never select, prune, gate,
+or route** — the check is whether it reaches a `<`, `min`, `sort` or `argmax` that *discards* a member,
+whether the discarded member is on the receipt, and whether a later caller can decline it. No sentence
+of the form *the machine compressed its own experience*; the lawful form is *a deposit changed the
+terrain and a later current rode it, priced under a declared code with the collapsed population
+exhibited*. **And "in bits" must declare whose bit in the same sentence** — `surprisal.rs:81`
+`LOG_SERIES_BITS = 192` and `cuda_aperture.rs:115` `MAX_DEVICE_INTERMEDIATE_BITS = 384` are both
+authored, the latter deciding at `:542` which primitives count as device work, and both are invisible
+to `tools/authored_levels.py` because `:77` excludes `_BITS$` by name. **That exclusion is a defect and
+is an open item.**
+
+---
+
 ## THE RESIDENT CIRCULATION — authorized 2026-08-12
 
-**This is the present deed.** The completed ledgers below remain evidence and regression standing;
+**The Eros cycle above composes through these owners.** The completed ledgers below remain evidence and regression standing;
 they do not authorize another semantic subsystem. Brandon corrected the frontier directly:
 
 > *"all of what you describe are things the machine can already do, you're just applying it more
