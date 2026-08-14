@@ -31,10 +31,36 @@
 //! ```
 //!
 //! Torsion is the returned artifact this organ exists for. A rational rank computation gives Betti
-//! numbers and **destroys torsion**, which is why `exact_rational_rank` in `algebraic.rs` — the only
-//! prior rank in the tree — cannot answer this question. `CLAUDE.md` §3 states the connection the
-//! project draws from it: the failure of the *integral* Hodge conjecture is torsion, and torsion is
-//! winding that cannot be un-deposited.
+//! numbers and **destroys torsion**, which is why no rank over `Rat` can answer this question.
+//!
+//! **This paragraph named `exact_rational_rank` in `algebraic.rs` as "the only prior rank in the
+//! tree" and that was FALSE ON THE DAY IT WAS WRITTEN.** Two others already stood at `d760584`, the
+//! commit that deposited this file — `receiver_ecology.rs:578` and `sheaf_diffusion.rs:1011`, both
+//! named `exact_rank`, both `fn exact_rank(mut matrix: Vec<Vec<Rat>>) -> usize` — and two more
+//! arrived the next day: `derivation_two_cells.rs:1464`, a **public** second
+//! `exact_rational_rank(&[Vec<Rat>], height)`, and `matroid_chow.rs:807` `rational_rank(&[Vec<Rat>],
+//! columns)`. **Five exact rational ranks, three distinct names, no shared owner.** The claim was an
+//! absence assertion made without the grep that would have refuted it, which is exactly the decay
+//! `CLAUDE.md` §5 records of absence claims: *"An absence claim is a measurement and decays like
+//! one."* What is true of all five, and is the load-bearing half, is that each returns a rank over
+//! `Rat` and therefore each destroys torsion; none of them competes with this organ.
+//!
+//! **The connection to the integral Hodge conjecture is NOT that its obstruction is torsion, and
+//! this comment said so until 2026-08-13.** That reading was withdrawn 2026-08-08 by a Hodge audit
+//! and the operating contract records the withdrawal. There are two independent counterexample
+//! families and only one is about torsion: Atiyah–Hirzebruch/Totaro/Soulé–Voisin, where the
+//! obstruction is the vanishing of odd-degree stable cohomology operations and torsion is the
+//! *habitat* rather than the obstruction; and Kollár 1990/1992, where `H⁴(X,ℤ) ≅ ℤ` is
+//! **torsion-free**, the failing class has **infinite order**, `pα` is algebraic while `α` is not,
+//! and the cokernel is `ℤ/p`.
+//!
+//! **The uniform statement is that the obstruction lives in the COKERNEL of the cycle class map.**
+//! That is what this organ computes and why it is the right organ: the invariant factors above one
+//! are exactly the finite part of that cokernel — `pα` reached and `α` not — which is a faithful
+//! finite model of Kollár. Torsion is what a rational rank destroys, which is why no rank over `Rat`
+//! can answer the question; it is not what the conjecture fails on. And the bound: the Millennium
+//! Hodge conjecture is *rational*, so a class reached only in a multiple may never be reported as a
+//! Millennium-Hodge obstruction after tensoring with ℚ.
 //!
 //! ## No float, no tolerance, no pivot leak
 //!
@@ -156,7 +182,13 @@ impl IntegerMatrix {
     }
 
     /// `row_target -= factor * row_source`. A rebase of the chain group this matrix maps out of.
-    fn reduce_row(&mut self, target: usize, source: usize, factor: &BigInt, work: &mut ReductionWork) {
+    fn reduce_row(
+        &mut self,
+        target: usize,
+        source: usize,
+        factor: &BigInt,
+        work: &mut ReductionWork,
+    ) {
         for column in 0..self.columns {
             let delta = self.at(source, column) * factor;
             let value = self.at(target, column) - delta;
@@ -522,7 +554,11 @@ fn reduce_from(
     let mut trailing = IntegerMatrix::zeros(work_matrix.rows - from, work_matrix.columns - from);
     for row in from..work_matrix.rows {
         for column in from..work_matrix.columns {
-            trailing.set(row - from, column - from, work_matrix.at(row, column).clone());
+            trailing.set(
+                row - from,
+                column - from,
+                work_matrix.at(row, column).clone(),
+            );
         }
     }
     reduce(&trailing, rule, origin + from, schedule).factors
@@ -744,7 +780,9 @@ pub fn rebase_invariants_with_schedule_on(
             cells,
             boundary_rank,
             filling_rank,
-            betti: cells.saturating_sub(boundary_rank).saturating_sub(filling_rank),
+            betti: cells
+                .saturating_sub(boundary_rank)
+                .saturating_sub(filling_rank),
             torsion,
         });
     }
@@ -1008,9 +1046,15 @@ mod tests {
     /// A hollow triangle: three vertices, three edges, no filling. One loop, no torsion.
     fn hollow_triangle() -> GradedCausalComplex {
         let mut complex = GradedCausalComplex::default();
-        let a = complex.found_cell("a", source(), 0, CausalChain::default()).unwrap();
-        let b = complex.found_cell("b", source(), 0, CausalChain::default()).unwrap();
-        let c = complex.found_cell("c", source(), 0, CausalChain::default()).unwrap();
+        let a = complex
+            .found_cell("a", source(), 0, CausalChain::default())
+            .unwrap();
+        let b = complex
+            .found_cell("b", source(), 0, CausalChain::default())
+            .unwrap();
+        let c = complex
+            .found_cell("c", source(), 0, CausalChain::default())
+            .unwrap();
         for (name, from, to) in [("ab", a, b), ("bc", b, c), ("ca", c, a)] {
             let mut boundary = CausalChain::default();
             boundary.add_term(to, ComparativeMultiplicity::positive(1u32));
@@ -1064,15 +1108,21 @@ mod tests {
     #[test]
     fn a_doubled_boundary_returns_torsion_that_a_rational_rank_cannot_see() {
         let mut complex = GradedCausalComplex::default();
-        let a = complex.found_cell("a", source(), 0, CausalChain::default()).unwrap();
+        let a = complex
+            .found_cell("a", source(), 0, CausalChain::default())
+            .unwrap();
         let mut loop_boundary = CausalChain::default();
         loop_boundary.add_term(a, ComparativeMultiplicity::positive(1u32));
         loop_boundary.add_term(a, ComparativeMultiplicity::negative(1u32));
-        let edge = complex.found_cell("loop", source(), 1, loop_boundary).unwrap();
+        let edge = complex
+            .found_cell("loop", source(), 1, loop_boundary)
+            .unwrap();
 
         let mut face_boundary = CausalChain::default();
         face_boundary.add_term(edge, ComparativeMultiplicity::positive(2u32));
-        complex.found_cell("twice", source(), 2, face_boundary).unwrap();
+        complex
+            .found_cell("twice", source(), 2, face_boundary)
+            .unwrap();
 
         let invariants = rebase_invariants(&complex, PivotRule::FirstNonzero).unwrap();
         let torsion = invariants.total_torsion();
@@ -1094,9 +1144,15 @@ mod tests {
         let forward = rebase_invariants(&hollow_triangle(), PivotRule::FirstNonzero).unwrap();
 
         let mut reversed = GradedCausalComplex::default();
-        let c = reversed.found_cell("c", source(), 0, CausalChain::default()).unwrap();
-        let b = reversed.found_cell("b", source(), 0, CausalChain::default()).unwrap();
-        let a = reversed.found_cell("a", source(), 0, CausalChain::default()).unwrap();
+        let c = reversed
+            .found_cell("c", source(), 0, CausalChain::default())
+            .unwrap();
+        let b = reversed
+            .found_cell("b", source(), 0, CausalChain::default())
+            .unwrap();
+        let a = reversed
+            .found_cell("a", source(), 0, CausalChain::default())
+            .unwrap();
         for (name, from, to) in [("ca", c, a), ("bc", b, c), ("ab", a, b)] {
             let mut boundary = CausalChain::default();
             boundary.add_term(to, ComparativeMultiplicity::positive(1u32));
@@ -1128,8 +1184,12 @@ mod tests {
     /// It carries torsion too: `gcd(4, 6, 2) = 2`, so the reduction settles a `Z/2` at grade 1.
     fn staggered_attachment() -> GradedCausalComplex {
         let mut complex = GradedCausalComplex::default();
-        let a = complex.found_cell("a", source(), 0, CausalChain::default()).unwrap();
-        let b = complex.found_cell("b", source(), 0, CausalChain::default()).unwrap();
+        let a = complex
+            .found_cell("a", source(), 0, CausalChain::default())
+            .unwrap();
+        let b = complex
+            .found_cell("b", source(), 0, CausalChain::default())
+            .unwrap();
         let mut edges = Vec::new();
         for name in ["first", "second", "third"] {
             let mut boundary = CausalChain::default();
@@ -1155,8 +1215,12 @@ mod tests {
     /// and the torsion is again a `Z/2` — this time carried by the *second* factor.
     fn twice_staggered_attachment() -> GradedCausalComplex {
         let mut complex = GradedCausalComplex::default();
-        let a = complex.found_cell("a", source(), 0, CausalChain::default()).unwrap();
-        let b = complex.found_cell("b", source(), 0, CausalChain::default()).unwrap();
+        let a = complex
+            .found_cell("a", source(), 0, CausalChain::default())
+            .unwrap();
+        let b = complex
+            .found_cell("b", source(), 0, CausalChain::default())
+            .unwrap();
         let mut edges = Vec::new();
         for name in ["first", "second", "third", "fourth"] {
             let mut boundary = CausalChain::default();
@@ -1173,7 +1237,9 @@ mod tests {
         second.add_term(edges[0], ComparativeMultiplicity::positive(2u32));
         second.add_term(edges[1], ComparativeMultiplicity::positive(3u32));
         second.add_term(edges[3], ComparativeMultiplicity::negative(5u32));
-        complex.found_cell("staggered-again", source(), 2, second).unwrap();
+        complex
+            .found_cell("staggered-again", source(), 2, second)
+            .unwrap();
         complex
     }
 
@@ -1224,7 +1290,10 @@ mod tests {
         let mut walks: BTreeSet<Vec<(u32, Vec<(usize, usize)>)>> = BTreeSet::new();
         for rule in PivotRule::ALL {
             let (reading, schedule) = rebase_invariants_with_schedule(&complex, rule).unwrap();
-            assert_eq!(schedule.rule, rule, "a schedule must name the rule that walked it");
+            assert_eq!(
+                schedule.rule, rule,
+                "a schedule must name the rule that walked it"
+            );
             walks.insert(
                 schedule
                     .per_grade
@@ -1250,7 +1319,11 @@ mod tests {
         // the agreement is on a reading that is itself nontrivial: a Z/2 at grade 1
         let settled = settled.expect("three rules were declared");
         assert_eq!(settled.total_torsion(), vec![BigInt::from(2)]);
-        assert_eq!(settled.betti_vector(), vec![1, 1, 0], "one piece, one unfilled loop");
+        assert_eq!(
+            settled.betti_vector(),
+            vec![1, 1, 0],
+            "one piece, one unfilled loop"
+        );
         assert_eq!(settled.cell_euler_characteristic(), 0, "2 - 3 + 1");
     }
 
@@ -1308,11 +1381,15 @@ mod tests {
             ("hollow_triangle", hollow_triangle()),
             ("doubled_attachment", {
                 let mut complex = GradedCausalComplex::default();
-                let a = complex.found_cell("a", source(), 0, CausalChain::default()).unwrap();
+                let a = complex
+                    .found_cell("a", source(), 0, CausalChain::default())
+                    .unwrap();
                 let mut loop_boundary = CausalChain::default();
                 loop_boundary.add_term(a, ComparativeMultiplicity::positive(1u32));
                 loop_boundary.add_term(a, ComparativeMultiplicity::negative(1u32));
-                let edge = complex.found_cell("loop", source(), 1, loop_boundary).unwrap();
+                let edge = complex
+                    .found_cell("loop", source(), 1, loop_boundary)
+                    .unwrap();
                 let mut face = CausalChain::default();
                 face.add_term(edge, ComparativeMultiplicity::positive(2u32));
                 complex.found_cell("twice", source(), 2, face).unwrap();

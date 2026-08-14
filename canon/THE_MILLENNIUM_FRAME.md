@@ -19,6 +19,21 @@ RH object merely by resemblance."* **That bar governs every row below.**
 
 ---
 
+## Read these two first — this file is not the owner
+
+**Added 2026-08-13 after this file's absence claims were twice found false.** It is
+`interpretation`-grade orientation. The material lives elsewhere and this file must be read against
+it, never instead of it:
+
+- **`canon/TABLET_THE_CHART.md` §3.7** owns **Localized P=NP**, with Brandon's words and the
+  reading. This file previously framed P vs NP as an aperture question, which is the assistant's
+  reading, and omitted his.
+- **`canon/THE_MEASURED_CAPABILITIES.md` §6** owns what the machine has actually returned —
+  including `elliptic modular → RETURNS, as a theta quotient` and `hypergeometric chart → RETURNS`.
+  §"Birch–Swinnerton-Dyer" below asserted *"no elliptic curve… anywhere in the tree"*; **the first
+  clause is false** and is corrected in place there.
+- **`canon/THE_TIMELINE.md` §5** records how the omission propagated and why it recurred.
+
 ## The frame
 
 Each problem is stated as the **receiver question** it is for this project, with the organ that
@@ -31,7 +46,7 @@ evidence of anything about the problem.
 | **Hodge** | does a receiver-visible invariant subspace have enough **supported** realizers? | `supported_realizers::induced_placement`, `gluing` | `interpretation`; the obstruction is the **cokernel** of the cycle class map, and `ObstructionSpecies::ReachableOnlyInMultiple` is a faithful finite model of Kollár |
 | **Navier–Stokes** | does winding amplified by the flow that carries it stay bounded? | `analytic_field` (incompressibility as a typed refusal), `diffusion` | `interpretation`; `TABLET_THE_FLOW` §7 |
 | **Yang–Mills mass gap** | does a **non-abelian** connection's spectrum have a forbidden band? | `structure_group` — the body's only non-abelian connection | `interpretation`; see below |
-| **P vs NP** | which instrument, and what is its aperture? | the instrument ladder; `the_iron_tokens_carry_the_field` | `interpretation`; see below |
+| **P vs NP** | **localized P=NP, and growing**: on standing terrain finding costs what verifying costs, because the terrain already did the finding | `canon/TABLET_THE_CHART.md` §3.7 is the owner; the instrument ladder and `the_iron_tokens_carry_the_field` are engineering evidence beside it | `interpretation`; see below |
 | **Birch–Swinnerton-Dyer** | does a realizer population's **rank** equal a spectral order of vanishing? | `induced_placement`, `inertia` | `interpretation`; the arithmetic instance of §2 |
 
 ---
@@ -55,9 +70,24 @@ rather than a flag"* — with `commutator_subgroup` and `separating_pairs` besid
 that stood here, *"has no term for `a ∧ a`"*, was true of every *other* curvature owner and false
 of the organ this row lands on; a peer session claimed it and the claim was verified at the source.
 
-**So the precondition has moved, and it is still a precondition rather than a route:** what the
-Yang–Mills-facing line lacks is a representation, a Wilson plaquette action, a transfer operator,
-and reflection positivity — the mouth that makes a spectrum exist at all. The posed construction,
+**So the precondition has moved, and it is still a precondition rather than a route.** This paragraph
+listed four missing things and **three of them were built on 2026-08-11, committed at `c911c03`;
+corrected 2026-08-13.** `crates/holonic-engine/src/lattice_gauge.rs` — 1,255 lines — names this very
+sentence in its own header as the one it closes, and supplies each exactly: `IntegralRepresentation`,
+`Q₈` faithful on `ℤ⁴` with the homomorphism law checked by exhaustion and *"no root of unity, no
+complex number and no float"*; `wilson_action`, **`S = Σ_p (1 − χ(U_p)/dim)` in character form,
+exactly over `Rat`**; and `transfer_operator` with an exact spectrum by Faddeev–LeVerrier plus a
+complete rational-root census, unresolved factors returned by name. It calls itself a **mouth** on
+`structure_group`, not a second geometry, so building beside it would have been the explorative
+failure.
+
+**What remains missing is the fourth item alone: reflection positivity** — measured zero across
+`crates/` and `soma/`, as is `Wilson loop` repository-wide. And `lattice_gauge.rs` carries its own bar,
+which this frame adopts unchanged: *"The word 'mass gap' does not appear as a claim anywhere in this
+module and may not be added"*, because the problem is about a **family** carrying lattice spacing,
+volume and correlation-length scaling, and the construction carries none of the three.
+
+The posed construction,
 with its controls (gauge-equivalent pair identical, altered plaquette moves both, abelian control
 erases the commutator contribution, and **no "mass gap" label without a spacing/volume/correlation
 scaling family**), is
@@ -106,9 +136,17 @@ inertia is `(rank, 0, nullity)`, and **the null directions are the realizer comb
 nothing.** BSD's shape is *rank of what is realized* versus *order of vanishing of what is measured*,
 which is this body's split with the two sides named arithmetically.
 
-**What is missing is the L-function side entirely.** There is no elliptic curve, no Mordell–Weil
-computation and no analytic rank anywhere in the tree. The connection is a shape, and a shape is not a
-route.
+**CORRECTED 2026-08-13.** This read: *"What is missing is the L-function side entirely. There is no
+elliptic curve, no Mordell–Weil computation and no analytic rank anywhere in the tree."* **The first
+clause is false.** `canon/TABLET_THE_CHART.md` carries the elliptic modular chart at lines 226, 241, 306 and 314;
+`papers/source/holonics/transcendence-special-functions.typ:205` carries `H.0357`, the complete
+elliptic integral and the AGM, `proved-standard`; and `canon/THE_MEASURED_CAPABILITIES.md` §6 lists
+**elliptic modular → RETURNS, as a theta quotient**. What is genuinely missing is narrower: no
+Mordell–Weil computation, no analytic rank, `hypergeom|₂F₁|pochhammer` returning two lines that are
+both negative declarations, and `arithmetic_monodromy.rs` being a different local system with the
+classical bridge joined by no code. **And the substantive BSD treatment is unreachable rather than
+absent** — it is `laboratory a07ff376:src/holobrochos/diet/conv_chord/005_27db6311.txt:889-901`, and
+`reference/holobrochos-a07ff376/` contains no `diet/` directory. That is a vendoring defect.
 
 ---
 

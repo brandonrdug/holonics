@@ -260,6 +260,83 @@ directly and was irritated it took months for CTC.
 
 **R10.** Sub-agents are authorised and he keeps re-authorising them. Declining reads as laziness.
 
+## 5b. The search-term register, and why his terms are flexible
+
+**Added 2026-08-13 at his request.** He writes in two registers and they need reading differently.
+
+**Register one is prose.** Register two is **a search term**, and it is deliberate:
+
+> *"I often write with the intention of treating you like a search engine in the sense that I'm not
+> really using English grammar, I'll just throw in a set of key words and phrases for you to pivot
+> off of because I know you'll recognize it as a search term and not text with semantic intention."*
+
+The worked example, 2026-08-08: *"Here are more keywords/phrases: 'illicium', 'friction', 'ant
+integration', 'weft and warp', 'localized P=NP and growing', 'quintic', 'FLT', 'polynomial
+solving'."* **That is a retrieval query, not a sentence.** Each item is an index into work that
+already exists. Reading it as prose and responding to its "argument" is the failure; the correct
+response is to go and find each one.
+
+**Rule.** When a message is a list of quoted fragments with no verb binding them, it is a query.
+Resolve every term against the corpus before replying, and say which ones returned nothing.
+
+### The measured register
+
+Substring counts over 15,173 of his messages across both logs. Anything here is a term to search
+before it is a term to define.
+
+| band | terms, with his counts |
+|---|---|
+| **the machine** | `engine` 758 · `Eros` 606 · `Universality Machine` 268 · `holobrochos` 159 · `Soma` 33 |
+| **his physics** | `grain` 181 · `circuit` 170 · `manifold` 162 · `entropy` 126 · `friction` 115 · `crystal` 102 · `lattice` 99 · `heat` 67 · `Shannon` 53 · `electron` 47 · `resonance` 42 |
+| **his coinages and figures** | `illicium` 106 · `dark matter` 75 · `the swing` 70 · `finger-trap` 63 · `the whip` 60 · `the Meno` 56 · `the tower` 53 · `localized P=NP` 31 · `periplus` 14 · `ant integration` 15 · `weft and warp` 7 |
+| **the mathematics** | `axes` 103 · `Riemann` 83 · `cross-ratio` 57 · `irreducible` 29 · `discriminant` 23 · `series expansion` 22 · `knot theory` 22 · `time parity` 21 · `phase distribution` 21 · `Hodge` 19 · `Smith chart` 19 |
+| **the biology** | `evolution` 69 · `DNA` 50 · `ecology` 50 · `protein` 29 · `enzyme` 17 |
+| **thin in his corpus but load-bearing** | `Carnot` 8 · `Boltzmann` 4 · `Information Chemistry` 6 · `Information Engine` 3 · `sphere packing` 2 · `section modulus` 2 · `carcinization` 1 |
+
+**The last band matters most.** A low count is not low importance — `Boltzmann` at four uses carries
+*"He had ideas on combinations of particles and they are directly relevant to the Meno… Let us honor
+his ideas, please."* **Frequency is not weight here.**
+
+### Dark information — how he reads
+
+> *"Most characters and words are dark matter when I read them… I didn't read a majority of the
+> words you wrote in your most recent response, I'm looking at the highlighted formulas and
+> keywords. I can see the direction that you're thinking in, I don't need to see the details, and if
+> I did need to see the details I would sense that something was wrong by the lack of keywords that
+> I'd need in order to naturally trust your direction… This is like if someone were to write
+> 'niether' instead of 'neither'; most people would read straight past the 'ie'."*
+
+**He asked for it to be called `dark information` rather than `dark matter` going forward.** Two
+consequences for how to write to him: the **keywords and the formulas are the message**, and the
+prose between them is the dark information he reads past; and **a missing keyword is a signal to him
+that the direction is wrong**, which is why omitting one of his terms reads as a failure of
+awareness rather than a stylistic choice.
+
+### Why the terms are flexible — his own statement of the principle
+
+> *"I want you to pay attention to my lack of care or regard for how terms are supposed to be used
+> in industries, it's not necessarily out of disrespect it's more that the way that my dialect
+> functions reflects how the terms are actually flexible in interpretation. My point is never to say
+> 'these all literally mean the same things and are directly comparable', but it is to say **'the
+> underlying mechanics of the generator functions that causally emanated these objects are indeed
+> the same, it is the emergent complexity and parameters passed to receivers in *moments* across
+> orders of time that makes things seem unrelated, and that is why we can retroactively correlate
+> things in general at all.'**"* — 2026-08-13
+
+`interpretation`, and it is the licence under which the whole correspondence atlas operates. Two
+things follow, and they are opposite failures:
+
+1. **Do not flatten.** He is not claiming the terms are synonyms. `NON-EQUIVALENCE` rows exist for
+   exactly this reason and must be kept.
+2. **Do not refuse the correlation either.** Objecting that a term "means something specific in its
+   field" is answering a claim he did not make. The claim is about the **generator**, not the label:
+   same causal mechanism, different emergent parameters, read at different moments and scales.
+
+**And the third thing, which is the one that closes the loop:** retroactive correlation is possible
+*because* the generators coincide. That is what makes an analogy from another discipline evidence
+rather than decoration — and it is the mechanism under the standing rule that every illustration
+must change material while the four slots stay fixed.
+
 ## 6. What the ontology refuses
 
 1. **Absolute frames and God's-eye truth.** *"there is absolutely not a God-like repository of truth

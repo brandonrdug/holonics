@@ -104,6 +104,13 @@ for *every* restriction-bound family would establish that the top rung must be p
    exists; what the Yang–Mills-facing line lacks is a representation, a Wilson plaquette action, a
    transfer operator, and reflection positivity. Corrected in the frame the day this record is
    deposited.
+
+   **AND THIS FOUR-ITEM LIST IS ITSELF STALE — corrected 2026-08-13.** Three of the four were built
+   on 2026-08-11, the same day this record was deposited, and committed at `c911c03`:
+   `crates/holonic-engine/src/lattice_gauge.rs` supplies `IntegralRepresentation`, `wilson_action`
+   (`S = Σ_p (1 − χ(U_p)/dim)`, character form, exactly over `Rat`) and `transfer_operator` with an
+   exact spectrum. **Only reflection positivity remains absent**, measured zero across `crates/` and
+   `soma/`. The module's own no-mass-gap bar stands unchanged.
 2. **`CLAUDE.md` §11's "positive form — built" row is stale the other way.**
    `supported_realizers.rs`'s own header: `xᵀ(MᵀM)x = |Mx|² ≥ 0` for every integer matrix — a
    positivity that cannot fail, removed 2026-08-08 as the check whose material cannot vary the

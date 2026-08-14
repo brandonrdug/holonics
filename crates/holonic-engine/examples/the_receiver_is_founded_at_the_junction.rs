@@ -36,13 +36,13 @@ use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 
 use holonic_engine::founded_receiver::{
-    found_to_exhaustion, gyration, FoundedPanel, FoundingPressure,
+    FoundedPanel, FoundingPressure, found_to_exhaustion, gyration,
 };
 use holonic_engine::lean_development::{
-    join, read_development, ConductGrain, DeclarationGrain, DevelopmentReading,
+    ConductGrain, DeclarationGrain, DevelopmentReading, join, read_development,
 };
 use holonic_engine::receiver_exact_compression::{
-    compress, InputId, ItemId, ObservedSystem, Observation, ReceiverId,
+    InputId, ItemId, Observation, ObservedSystem, ReceiverId, compress,
 };
 
 /// The development as a system under observation.
@@ -54,7 +54,6 @@ use holonic_engine::receiver_exact_compression::{
 ///   carried. A reader has these before opening anything.
 struct Development {
     names: Vec<String>,
-    ordinal: BTreeMap<String, usize>,
     /// Per declaration, the declared names it recruits, in canonical order.
     recruits: Vec<Vec<usize>>,
     formers: Vec<u64>,
@@ -109,7 +108,6 @@ impl Development {
         let width = recruits.iter().map(Vec::len).max().unwrap_or(0);
         Self {
             names,
-            ordinal,
             recruits,
             formers,
             depths,
@@ -222,7 +220,10 @@ fn main() {
     // ------------------------------------------------------------------ the material and the panel
     section("THE SYSTEM UNDER OBSERVATION");
     println!("\n  items      {} declarations", system.names.len());
-    println!("  inputs     {} (widest declared recruitment)", system.width);
+    println!(
+        "  inputs     {} (widest declared recruitment)",
+        system.width
+    );
     println!("  receivers  3 declared -- former, namespace depth, carries-a-statement");
     println!(
         "  conduct    the recruitment chain: {} declarations recruit at least one other",
@@ -296,9 +297,10 @@ fn main() {
     // not that the count went up.
     let redundant = panel.redundant();
     let capacities = panel.capacities();
-    let feedback_exact = panel.founded.iter().all(|found| {
-        capacities[&found.id] == num_bigint::BigUint::from(found.residue) + 1u32
-    });
+    let feedback_exact = panel
+        .founded
+        .iter()
+        .all(|found| capacities[&found.id] == num_bigint::BigUint::from(found.residue) + 1u32);
     controls.push((
         panel.founded.iter().all(|found| found.blocks_gained > 0) && feedback_exact,
         "control 4 -- residue is measured, and capacity is the residue".to_owned(),
@@ -313,9 +315,14 @@ fn main() {
 
     // CONTROL 8. Four axes of one species are four fingers. A second species is the thumb.
     let species = panel.species_founded();
-    println!("\n  THE THUMB: {} distinct axis species founded.", species.len());
+    println!(
+        "\n  THE THUMB: {} distinct axis species founded.",
+        species.len()
+    );
     println!("  Founding on blindness alone founds one species repeatedly -- modes of freedom the");
-    println!("  panel already has. Congestion is a DIFFERENT pressure and founds a different axis:");
+    println!(
+        "  panel already has. Congestion is a DIFFERENT pressure and founds a different axis:"
+    );
     println!("  a congested block is not blind, it is undifferentiated, and a sharper aperture");
     println!("  cannot differentiate it. That is what \"uniquely founded axes\" requires.");
     controls.push((
@@ -345,11 +352,16 @@ fn main() {
             .count()
     );
     println!("  foundings: {}", seeing_panel.rounds);
-    println!("\n  A law that founds on ANY input cannot fail. This is the input on which it must not.");
+    println!(
+        "\n  A law that founds on ANY input cannot fail. This is the input on which it must not."
+    );
     controls.push((
         seeing_panel.rounds == 0,
         "control 5 (NULL) -- nothing is founded where nothing is blind".to_owned(),
-        format!("{} foundings on a fully witnessing panel", seeing_panel.rounds),
+        format!(
+            "{} foundings on a fully witnessing panel",
+            seeing_panel.rounds
+        ),
     ));
 
     // ------------------------------------------------------------------ the gyration
@@ -364,8 +376,12 @@ fn main() {
     println!("  founded agree       {}", gyr.founded_agree);
 
     if gyr.orbit_is_trivial() {
-        println!("\n  ORBIT TRIVIAL -- the two orders are one order. `CLAUDE.md` §8: a gauge whose");
-        println!("  group acts trivially on the declared material is not a gauge, so the agreement");
+        println!(
+            "\n  ORBIT TRIVIAL -- the two orders are one order. `CLAUDE.md` §8: a gauge whose"
+        );
+        println!(
+            "  group acts trivially on the declared material is not a gauge, so the agreement"
+        );
         println!("  below is NOT evidence and is reported rather than claimed.");
     } else {
         println!("\n  ORBIT NON-TRIVIAL. gyr[a,b], exhibited:");
@@ -397,8 +413,12 @@ fn main() {
         }
         if gyr.is_holonomy() {
             println!("\n  AND IT IS A HOLONOMY: both orders reach the SAME partition by DIFFERENT");
-            println!("  paths. Equal endpoints do not identify ordered paths -- the project's own law,");
-            println!("  and here the transport under it is real: the founding order is the path and");
+            println!(
+                "  paths. Equal endpoints do not identify ordered paths -- the project's own law,"
+            );
+            println!(
+                "  and here the transport under it is real: the founding order is the path and"
+            );
             println!("  the panel is what is carried along it.");
         }
     }
@@ -406,7 +426,11 @@ fn main() {
         gyr.conduct_agrees,
         format!(
             "control 6 -- the gyration is returned, and the orbit is {}",
-            if gyr.orbit_is_trivial() { "TRIVIAL (reported, not claimed)" } else { "non-trivial" }
+            if gyr.orbit_is_trivial() {
+                "TRIVIAL (reported, not claimed)"
+            } else {
+                "non-trivial"
+            }
         ),
         format!(
             "left {} / right {} foundings, holonomy {}",
@@ -426,7 +450,11 @@ fn main() {
             failed += 1;
         }
     }
-    println!("\n  {} of {} controls held", controls.len() - failed, controls.len());
+    println!(
+        "\n  {} of {} controls held",
+        controls.len() - failed,
+        controls.len()
+    );
     if failed > 0 {
         std::process::exit(1);
     }
@@ -441,7 +469,10 @@ fn report(system: &Development, panel: &FoundedPanel) {
         panel.one_shot_before.len(),
         panel.one_shot_after.len()
     );
-    println!("  conduct          {} blocks (invariant)", panel.conduct.len());
+    println!(
+        "  conduct          {} blocks (invariant)",
+        panel.conduct.len()
+    );
     println!("  unwitnessed      {}", panel.unwitnessed_remaining);
 
     if !panel.founded.is_empty() {
@@ -478,7 +509,10 @@ fn report(system: &Development, panel: &FoundedPanel) {
         println!("    what nothing else carried. `set_site_capacity` refuses zero, so an empty");
         println!("    residue takes capacity 1 -- the MOST congested route, dilating maximally,");
         println!("    never deleted by a chooser.");
-        println!("\n    {:<6} {:<22} {:>9} {:>10}", "axis", "species", "residue", "capacity");
+        println!(
+            "\n    {:<6} {:<22} {:>9} {:>10}",
+            "axis", "species", "residue", "capacity"
+        );
         println!("    {}", "-".repeat(52));
         for (id, capacity) in panel.capacities() {
             let found = panel

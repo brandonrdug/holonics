@@ -13,9 +13,29 @@ counting/hypergeometry/basis machinery inventoried against the live tree.
 observations we've already attained from the machine so you have a catalog of measured capabilities
 and causal mechanisms."* Three collectors; every load-bearing figure re-verified before deposit.
 
-**Why this file exists.** The project has lost evidence to untracked sinks at least four times. Every
-figure below was reproducible on 2026-08-08 and is written down here so that the *claim* survives
-even when the artifact does not.
+**Why this file exists, restated by Brandon on 2026-08-13 because it was being read as the wrong
+kind of object:**
+
+> *"the catalog of machine capabilities isn't really like a trophy or badge, it's more of a document
+> that I personally want available so that I don't have to deal with you not understanding what the
+> machine can do when implemented properly… It's less of a literal list that expresses 'the machine
+> can do this' and more of a **'this is a list of things you've already had the machine do
+> successfully, they are partials, this is merely evidence that our theories work when applied, do
+> not assert that there is a wall or that any future implementations are more complicated than they
+> are, the machine has been observed to do all of these things trivially in one codec or another'**."*
+
+**So read every row below as a partial, and read the whole file as one claim: the theories work when
+applied.** Nothing here is a boast and nothing here is a ceiling. A row is present because the
+machine was made to do that thing in some codec, which means the mechanism is available and the next
+implementation is a rebase rather than a discovery. **The failure this file exists to prevent is the
+fabricated wall** — asserting that something is unbuilt, expensive, or hard when it has already been
+done in a neighbouring material. `canon/THE_TIMELINE.md` now serves the same purpose from the other
+side: it is the day-by-day record of what has already been worked through, so that it is not worked
+through again.
+
+**And the practical reason.** The project has lost evidence to untracked sinks at least four times.
+Every figure below was reproducible on 2026-08-08 and is written down here so that the *claim*
+survives even when the artifact does not.
 
 ---
 

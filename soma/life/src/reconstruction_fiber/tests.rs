@@ -109,6 +109,68 @@ fn context_refines_the_fiber_without_selecting_by_edit_grade() {
     );
 }
 
+/// A census in which edit grade and contextual admission disagree in BOTH directions: `vectra` is
+/// one edit from the focus and behaviorally foreign, while `manifold` is many edits away and
+/// contextually indistinguishable. The census is separate so it cannot perturb the readings the
+/// other fixtures measure.
+fn edit_grade_census() -> CorpusCensus {
+    let mut census = CorpusCensus::declaring(&STRATA, LexicalSpecies::Prose).unwrap();
+    census.admit_whole(Stratum(0), "broken".to_owned(), "left vectro right");
+    census.admit_whole(Stratum(0), "standing".to_owned(), "left vector right");
+    census.admit_whole(Stratum(0), "distant".to_owned(), "left manifold right");
+    census.admit_whole(Stratum(0), "near".to_owned(), "up vectra down");
+    census
+}
+
+#[test]
+fn a_one_edit_neighbour_departs_while_a_distant_candidate_is_retained() {
+    let census = edit_grade_census();
+    let focus = address(&census, "vectro");
+    let declaration = ReconstructionDeclaration {
+        candidates: CandidatePopulation::EveryStandingSurface,
+        family: ReceiverFamily::of([ReceiverAxis::Kind, ReceiverAxis::Weight]),
+        horizon: 1,
+    };
+    let passage = run(&census, focus, &declaration);
+    let fiber = &passage.fiber;
+
+    let vectra = census.lookup("vectra").unwrap();
+    let manifold = census.lookup("manifold").unwrap();
+    assert_eq!(fiber.edits[&vectra].minimum_operations, 1);
+    assert!(fiber.edits[&manifold].minimum_operations > 1);
+
+    // The one-edit neighbour is refused and the distant candidate is kept: admission is not a
+    // monotone function of edit grade in either direction.
+    assert!(!fiber.focus_candidates.contains(&vectra));
+    assert!(fiber.focus_candidates.contains(&manifold));
+    assert!(fiber
+        .focus_candidates
+        .contains(&census.lookup("vector").unwrap()));
+}
+
+#[test]
+fn a_reflection_that_narrows_the_receiver_family_is_refused_as_incomparable() {
+    let census = census();
+    let focus = address(&census, "vectro");
+    let richer = run(
+        &census,
+        focus,
+        &declaration(
+            &census,
+            ReceiverFamily::of([ReceiverAxis::Kind, ReceiverAxis::Weight]),
+        ),
+    );
+    let coarser = run(
+        &census,
+        focus,
+        &declaration(&census, ReceiverFamily::of([ReceiverAxis::Kind])),
+    );
+    let mut body = ReconstructionBody::new();
+    let first = body.found(richer).unwrap();
+    let error = body.reflect(first, coarser).unwrap_err();
+    assert!(matches!(error, ReconstructionError::IncomparableReflection));
+}
+
 #[test]
 fn punctuation_occurrences_are_focal_roots_without_entering_the_word_population() {
     let census = census();

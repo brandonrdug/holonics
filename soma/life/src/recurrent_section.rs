@@ -639,13 +639,14 @@ fn validate_presentations(presentations: &[SectionPresentation]) -> Result<(), S
 }
 
 fn found_incidence(presentation: &SectionPresentation) -> Result<IncidenceComplex, String> {
-    let occurrence = DeclaredOccurrence {
-        identity: format!("{}:later-incidence", presentation.identity),
-        storage_ordinal: 0,
-        caused_by: BTreeSet::new(),
-        text: presentation.incidence_text.clone(),
-    };
-    let patches = presentation.incidence_text.split_whitespace().count();
+    let occurrence = DeclaredOccurrence::from_text(
+        format!("{}:later-incidence", presentation.identity),
+        0,
+        BTreeSet::new(),
+        &presentation.incidence_text,
+    )
+    .map_err(|error| format!("declare section incidence: {error:?}"))?;
+    let patches = occurrence.inscription.len();
     let faces = presentation
         .contact_faces
         .iter()

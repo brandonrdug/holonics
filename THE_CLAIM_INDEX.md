@@ -32,7 +32,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 | `canon/THE_DIALECT.md` | **The dialect — how to read Brandon** — **Evidence:** `measured` — 8,935 genuine messages, 3.29 MB, 2026-05-11 → 2026-08-08, continuous. |
 | `canon/THE_QUOTE_NETWORK.md` | **The quote network** — Brandon asked for this artifact by name, twice, in the same message: |
 | `canon/THE_EXPLORATIVE_FAILURE.md` | **The explorative failure** — It states the condition that identifies one recurring assistant failure, the trigger that precedes it, its measured instances, the ontology in this project's own words that refutes it, and… |
-| `canon/THE_MEASURED_CAPABILITIES.md` | **THE MEASURED CAPABILITIES — what the machine has actually done** — **Why this file exists.** The project has lost evidence to untracked sinks at least four times. |
+| `canon/THE_MEASURED_CAPABILITIES.md` | **THE MEASURED CAPABILITIES — what the machine has actually done** — **Why this file exists, restated by Brandon on 2026-08-13 because it was being read as the wrong kind of object:** |
 | `blueprint/THE_ROADMAP.md` | **The roadmap** — **This is the single active roadmap, and it is ordered by `canon/THE_HOLOBROCHOS_SPINE.md`.** Read the spine first. |
 | `CONSTRUCTION_STATE.md` | **Construction state** — **The position record. One file, no siblings** (`canon/THE_DOCUMENT_LAW.md` §1.4). |
 | `THE_CLAIM_INDEX.md` | **The claim index** — **What it is for.** Four partial indexes existed and none knew about the others: `CLAUDE.md` §0's pickup order, `THE_MATHEMATICS_TABLET` §3's tablet list, `research/README.md` (records… |
@@ -76,11 +76,14 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 | `canon/THE_DOCUMENT_LAW.md` | **The document law** — **Why this file exists.** `canon/THE_RECOVERED_LAW.md` states the mechanism: *"Agent reports and source reads lived only in conversation, were compressed away at compaction, and were… |
 | `canon/THE_EXPLORATIVE_FAILURE.md` | **The explorative failure** — It states the condition that identifies one recurring assistant failure, the trigger that precedes it, its measured instances, the ontology in this project's own words that refutes it, and… |
 | `canon/THE_HOLOBROCHOS_SPINE.md` | **THE SPINE — the closed cycle, and where every organ sits on it** — It states the spine the roadmap is ordered by. |
+| `canon/THE_INFORMATION_ENGINE.md` | **The Information Engine — the cycle, its two strokes, every organ's station, and the surface each runs on** — **Evidence:** `measured` — three independent censuses over the clean tree (498 `.rs` files, 336,005 lines; agent worktrees excluded), a device census over 64 device entries and three… |
 | `canon/THE_MATHEMATICS_TABLET.md` | **The mathematics tablet** — **Quotation convention, and it is load-bearing.** A `>` blockquote is **verbatim source text**, and the sentence introducing it **names the source**. |
-| `canon/THE_MEASURED_CAPABILITIES.md` | **THE MEASURED CAPABILITIES — what the machine has actually done** — **Why this file exists.** The project has lost evidence to untracked sinks at least four times. |
+| `canon/THE_MEASURED_CAPABILITIES.md` | **THE MEASURED CAPABILITIES — what the machine has actually done** — **Why this file exists, restated by Brandon on 2026-08-13 because it was being read as the wrong kind of object:** |
 | `canon/THE_MILLENNIUM_FRAME.md` | **The Millennium frame: six receiver questions, and which organ each one lands on** — **Why this file exists rather than six scattered sections.** `CLAUDE.md` §3 framed two. |
+| `canon/THE_OWNER_ATLAS.md` | **The owner atlas: which owner implements or states this, and where** — **What this is, and what it is not.** `canon/THE_DIALECT.md` maps Brandon's language. |
 | `canon/THE_QUOTE_NETWORK.md` | **The quote network** — Brandon asked for this artifact by name, twice, in the same message: |
 | `canon/THE_RECOVERED_LAW.md` | **The recovered law** — **Why this file exists.** The laboratory's answer to drift was `FORMULA.md`: one canon, read on demand, with a versioned reading rule at the top and per-claim grades — cited 212 times,… |
+| `canon/THE_TIMELINE.md` | **The timeline — every day of this repository, what was asked, what returned, and what was lost** — **Evidence:** `measured`. 259 commits `be93ed3` (2026-08-03 15:38) → `1921b86` (2026-08-12 19:08); 73 records in `research/records/`; Brandon's messages from… |
 | `canon/THE_TRAFFIC_SYSTEM.md` | **The traffic system** — It carries one of Brandon's longest-running analogies, which had **no canon presence at all** until 2026-08-09 — `grep -i 'traffic\\|automobile' canon/` returned zero — while the law it… |
 
 ---
@@ -101,7 +104,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (67 deposits of 359)
+## 4 · The 2026-08 record line (76 deposits of 368)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -176,6 +179,15 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-12_THE_PRETRAINED_TRANSFORMER_IS_ONE_TRANSPORT_ORGAN_THE_REASONING_MACHINE_IS_THE_RETURNING_ECOLOGY.md` | The pretrained transformer is one transport organ; the reasoning machine is the returning ecology |
 | `2026-08-12_THE_RECONSTRUCTION_REMAINS_A_FIBER_THE_CONTEXT_RETURNS_BY_DIFFUSION_AND_THE_CIRCUIT_GROWS_IN_HIGHER_CELLS.md` | The reconstruction remains a fiber, the context returns by diffusion, and the circuit grows in higher cells |
 | `2026-08-12_THE_RECURRENT_LAW_CROSSES_THE_CORPUS_DEPARTURE_THE_UNSEEN_SECTION_RIDES_ITS_DEPOSIT.md` | The recurrent law crosses the corpus departure; the unseen section rides its deposit |
+| `2026-08-13_KIRCHHOFF_IS_TIME_PARITY_THE_CIRCLE_IS_THE_RATIO_PIVOT_AND_THE_ENGINE_IS_THE_CYCLE.md` | Kirchhoff is time parity, the circle is the ratio pivot, and the engine is the cycle |
+| `2026-08-13_SCALING_IS_REPETITION_OF_AN_INVARIANT_UNIT_AND_THE_GENERATOR_IS_THE_COMPACT_REPRESENTATIVE.md` | Scaling is repetition of an invariant unit, and the generator is the compact representative |
+| `2026-08-13_THE_COUPLING_IS_A_FORK_COUNT_TIMES_A_RATIO_AND_THE_REFLECTION_SERIES_TERMINATES_ON_A_CRYSTAL.md` | The coupling is a fork count times a ratio, and the reflection series terminates exactly on a crystal |
+| `2026-08-13_THE_CUT_BECOMES_THE_CODECS_AND_THE_LATER_CURRENT_RIDES_THE_DEPOSIT.md` | The cut becomes the codec's, and the later current rides the deposit |
+| `2026-08-13_THE_DEPOSITED_MAP_IS_READ_BY_RATIO_AND_WINDING_THE_ARCHETYPE_IS_A_FINITE_TYPE_WITH_INFINITE_MODULI.md` | The deposited map is read by Ratio and Winding, and the archetype is a finite type with infinite moduli |
+| `2026-08-13_THE_MAP_DECLARES_ITS_OWN_APERTURES_AND_AN_EMBEDDING_IS_A_DECLARED_RECEIVER.md` | The map declares its own apertures, and an embedding is a declared receiver |
+| `2026-08-13_THE_MOUTH_IS_AN_ACTIVE_LENS_THE_LOCATION_IS_CO_FOUNDED_AND_THE_PASSAGE_MUST_DEPOSIT.md` | The mouth is an active lens, the location is co-founded, and the passage must deposit |
+| `2026-08-13_THE_SEARCH_WAS_IN_THE_WRONG_CHART_AND_THE_CARD_OWNS_THE_QUOTIENT.md` | The search was in the wrong chart, and the card owns the quotient |
+| `2026-08-13_THE_WEIGHT_FILE_IS_A_PREVIOUSLY_RENDERED_MAP_THE_GRAIN_IS_RECURRING_TRANSFORMATION.md` | The weight file is a previously rendered map, and the grain is recurring transformation |
 
 ---
 

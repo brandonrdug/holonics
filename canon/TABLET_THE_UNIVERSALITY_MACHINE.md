@@ -152,9 +152,12 @@ situated occurrences + recovered codec alternatives + state transitions
 
 Equal final values do not identify algorithms. Equivalent complete transport under a declared
 receiver may collapse surface variants; termination, intermediate state, binding, mutation,
-resource current, or a richer history may reopen them. “The machine becomes its own interpreter”
-means material-founded morphology later unfolds the codec after the founding source departs. It
-does not license installing an interpreter inside the body.
+resource current, or a richer history may reopen them. Brandon's phrase is *“conditioning the
+machine to be its own interpreter”* (2026-08-12), and it means material-founded morphology later
+unfolds the codec after the founding source departs. It does not license installing an interpreter
+inside the body. **Corrected 2026-08-13:** this line previously quoted the variant *“the machine
+becomes its own interpreter,”* which was not said and which names a threshold the body crosses —
+exactly the macro-event `CLAUDE.md` §0d forbids. Conditioning is a passage, not an attainment.
 
 `interpretation`: branch, loop, stack, call, return, scope, binding, instruction, and schedule are
 not primitive internal kinds. They are receiver shadows of plural continuation, recurrence,

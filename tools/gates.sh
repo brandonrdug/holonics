@@ -441,7 +441,7 @@ run_controls() {
     printf '                   %-18s what would redden it: one octet changed in soma/kernel/soma.spv\n' ""
     printf '                   %-18s or in either .ptx, or any closure member edited without a re-seed\n' ""
     printf '                   %-18s note: it binds what IS committed and does NOT assert currency —\n' ""
-    printf '                   %-18s soma_kernel_cuda.ptx is BOUND and its own registry note says STALE\n' ""
+    printf '                   %-18s currency is the registry rebuild_evidence column, read it there\n' ""
 
     # typst: a compilation root that does not compile. It is also a control on the DERIVATION —
     # the root list is read off the material, so a new top-level `.typ` must enter it.

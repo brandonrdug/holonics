@@ -124,7 +124,7 @@ construction merely because its current implementation is being replaced.
   reflect/deposit -> later current`. Emission and return are distinct caused occurrences joined by
   addressed lineage. A private echo, host callback, or host-authored semantic invocation sequence
   does not close the loop.
-- “Treat information like heat or energy” only through declared incidence, capacity, constitutive
+- “Treat information like heat and energy” only through declared incidence, capacity, constitutive
   response, boundary, chronology, and receiver. Exact diffusion is not generic smoothing;
   irreversibility requires a named quotient, aperture, departure, or physical law. Compression
   follows future consequence and retains the complete `ReconstructionFiber`.

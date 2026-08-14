@@ -75,12 +75,23 @@ because exact attachment retains the complete shadow field; its summary hashes n
 identity.
 
 After source departure and exact remount, a new resident fold enacted each local law across the
-complete later current and returned every intermediate standing. Seven radically different source
-geometries—`for`, `while`, recursion, helper, method, inline literal, and a coherent byte
-renaming—formed one complete world-line fiber `0,4,5,8,10,15`; their material-shadow cycle ranks
-still ranged from 50 through 141. Two product presentations formed `1,4,4,12,24,120`. A distinct
-affine recurrence also terminated at 15, collapsed with the sum family under a terminus-only
-receiver, and reopened after the shortest history `advance` under the complete receiver.
+complete later current and returned every intermediate standing. Seven source geometries—`for`,
+`while`, recursion, helper, method, inline literal, and a coherent byte renaming—formed one
+complete world-line fiber `0,4,5,8,10,15`; their material-shadow cycle ranks still ranged from 50
+through 141. Two product presentations formed `1,4,4,12,24,120`. A distinct affine recurrence also
+terminated at 15, collapsed with the sum family under a terminus-only receiver, and reopened after
+the shortest history `advance` under the complete receiver.
+
+**That fiber agreement is authored, not measured, and this paragraph previously read it the other
+way.** Six of the seven were declared with the identical founding face `samples: [0, 1, 1, 2]`
+(`the_code_material_returns_its_world_line.rs:637-746`, applied unchanged at `:565`), so one law,
+one initial standing, and one current sheet forced one world-line. **The reconstruction fibers are
+the preimage classes of an authored field** — `CLAUDE.md` §8's tautology, and the same shape as the
+four fibers of the recurrent-section return, which are its four declared `ExteriorLaw` variants.
+The source-side content that *is* measured is exactly two presentations: `sum-for-renamed`, which
+carries no declared face and attaches through ROT13-invariance of the equality shadow alone, and
+`unknown`, which returns `OPEN`. The shadow cycle ranks are real readings of the sources; the
+agreement is a restatement of the input.
 
 A `+`/`*` swap whose unique bytes cast one equality shadow returned both compatible laws as a
 plural fiber; the machine did not borrow the glyph to select. An unseen branching surface remained

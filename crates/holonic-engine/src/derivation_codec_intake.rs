@@ -107,13 +107,13 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use crate::codec_recovery::{
-    recover, Boundary, Emission, Obstruction, OpaqueSymbolCodec, RecoveredCodec, RecoveryApertures,
-    RecoveryError, RecoveryWork, SymbolSeparation,
+    Boundary, Emission, Obstruction, OpaqueSymbolCodec, RecoveredCodec, RecoveryApertures,
+    RecoveryError, RecoveryWork, Symbol, SymbolAlphabet, SymbolSeparation, recover,
 };
 use crate::conditioned_derivation::{
     ConditionedDerivationRefusal, FoundedMorphology, MorphemicIncidence, StemFiring,
 };
-use crate::receiver_exact_compression::{compress, ItemId, ReceiverExactCompression};
+use crate::receiver_exact_compression::{ItemId, ReceiverExactCompression, compress};
 
 /// The name an intake writes onto itself, so a return read back from octets can be checked against
 /// what produced it rather than assumed.
@@ -184,8 +184,8 @@ pub fn present(whole: &str, text: &str, alphabet: &BTreeSet<char>) -> PresentedW
 /// members and not by an index into a table.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct ClassAdjacency {
-    pub left: char,
-    pub right: char,
+    pub left: Symbol,
+    pub right: Symbol,
     pub boundary: Boundary,
 }
 
@@ -198,20 +198,20 @@ pub struct ClassAdjacency {
 pub struct RecoveredRelations {
     pub schema: String,
     /// The declared symbols, in canonical order.
-    pub alphabet: Vec<char>,
+    pub alphabet: Vec<Symbol>,
     /// The longest word the conditioner was asked about. The family was **exhausted**, not sampled.
     pub radius: usize,
     /// The symbol quotient: which symbols the statistics never separate.
-    pub classes: Vec<BTreeSet<char>>,
+    pub classes: Vec<BTreeSet<Symbol>>,
     /// Per class representative, whether a symbol of that class enters the token it is read into.
-    pub emission: Vec<(char, Emission)>,
+    pub emission: Vec<(Symbol, Emission)>,
     /// **The relation.** Each separated pair with the shortest context that separates it and both
     /// returns at it.
     pub separations: Vec<SymbolSeparation>,
     /// The adjacency relation over class representatives, every ordered pair.
     pub adjacency: Vec<ClassAdjacency>,
     /// Adjacency entries no input of any length decides. A freedom, reported rather than hidden.
-    pub gauge_freedom: Vec<(char, char)>,
+    pub gauge_freedom: Vec<(Symbol, Symbol)>,
     pub work: RecoveryWork,
 }
 
@@ -227,7 +227,7 @@ impl RecoveredRelations {
 
     /// The shortest context that placed two symbols apart, or `None` when the statistics hold them
     /// together.
-    pub fn separating_context(&self, left: char, right: char) -> Option<&SymbolSeparation> {
+    pub fn separating_context(&self, left: Symbol, right: Symbol) -> Option<&SymbolSeparation> {
         self.separations.iter().find(|separation| {
             (separation.left, separation.right) == (left, right)
                 || (separation.left, separation.right) == (right, left)
@@ -235,7 +235,7 @@ impl RecoveredRelations {
     }
 
     /// The class a symbol fell in, written as that class's representative.
-    pub fn representative_of(&self, symbol: char) -> Option<char> {
+    pub fn representative_of(&self, symbol: Symbol) -> Option<Symbol> {
         self.classes
             .iter()
             .find(|block| block.contains(&symbol))
@@ -243,7 +243,7 @@ impl RecoveredRelations {
     }
 
     /// The classes the conditioner emits no character for. Material it drops, named.
-    pub fn dropped(&self) -> BTreeSet<char> {
+    pub fn dropped(&self) -> BTreeSet<Symbol> {
         self.emission
             .iter()
             .filter(|(_, emission)| *emission == Emission::Drop)
@@ -277,7 +277,7 @@ pub struct FoundedWordLineage {
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct RetainedObstruction {
     /// Declared symbols the recovered conditioner emits no character for.
-    pub dropped: BTreeSet<char>,
+    pub dropped: BTreeSet<Symbol>,
     /// Per whole, the symbols the declared alphabet does not carry, named.
     pub undeclared: BTreeMap<String, BTreeSet<char>>,
 }
@@ -310,8 +310,10 @@ pub enum IntakeRefusal {
     /// **The declared refusal.** The conditioner's statistics separate no two declared symbols, so
     /// no relation was recovered and there is nothing to condition on. Refused by type rather than
     /// returned as an empty morphology.
-    #[error("the declared statistics separate no two symbols; the quotient is one class {classes:?}")]
-    NoRelationRecovered { classes: Vec<BTreeSet<char>> },
+    #[error(
+        "the declared statistics separate no two symbols; the quotient is one class {classes:?}"
+    )]
+    NoRelationRecovered { classes: Vec<BTreeSet<Symbol>> },
     /// The recovered conditioner founded no word at all on the presented material.
     #[error("no founded word on any of the presented wholes: {wholes:?}")]
     NoFoundedWord { wholes: Vec<String> },
@@ -342,12 +344,16 @@ pub enum IntakeRefusal {
 pub fn intake(
     conditioner: &str,
     target: &OpaqueSymbolCodec,
-    alphabet: &[char],
+    alphabet: &SymbolAlphabet,
     radius: usize,
     apertures: RecoveryApertures,
     material: &[(String, String)],
 ) -> Result<CodecIntake, IntakeRefusal> {
-    let recovery = recover(target, alphabet, radius, apertures)?;
+    // The declared alphabet arrives as a `SymbolAlphabet`; the recovery is asked about its symbols
+    // in declaration order. Text material still enters through `present`, which is the exterior
+    // codec, and is translated into these symbols at the segmentation below.
+    let symbols = alphabet.symbols();
+    let recovery = recover(target, &symbols, radius, apertures)?;
     if !recovery.obstructions.is_empty() {
         return Err(IntakeRefusal::RecoveryObstructed {
             obstructions: recovery.obstructions,
@@ -369,7 +375,7 @@ pub fn intake(
     }
 
     let count = codec.classes.len();
-    let representative: Vec<char> = codec
+    let representative: Vec<Symbol> = codec
         .classes
         .iter()
         .map(|block| {
@@ -417,22 +423,45 @@ pub fn intake(
         work: recovery.work,
     };
 
-    let declared: BTreeSet<char> = recovery.alphabet.iter().copied().collect();
-    let mut order: BTreeMap<String, usize> = BTreeMap::new();
+    let declared: BTreeSet<Symbol> = recovery.alphabet.iter().copied().collect();
+    // **The exterior text codec's chart.** `present` reads text and this organ's material is text,
+    // so the declared symbols are looked up by their identities. A symbol whose identity is not a
+    // single character cannot be reached by `present` at all — it is not projected onto one that
+    // can, it simply never appears in a run, which is the same discipline `present` already applies
+    // to an undeclared character.
+    let declared_text: BTreeSet<char> = declared
+        .iter()
+        .filter_map(|symbol| {
+            let identity = alphabet.identity(*symbol)?;
+            let mut characters = identity.chars();
+            match (characters.next(), characters.next()) {
+                (Some(single), None) => Some(single),
+                _ => None,
+            }
+        })
+        .collect();
+    let mut order: BTreeMap<Vec<Symbol>, usize> = BTreeMap::new();
     let mut founded: Vec<FoundedWordLineage> = Vec::new();
     let mut retained = RetainedObstruction {
         dropped: relations.dropped(),
         undeclared: BTreeMap::new(),
     };
     for (whole, text) in material {
-        let presented = present(whole, text, &declared);
+        let presented = present(whole, text, &declared_text);
         if !presented.undeclared.is_empty() {
             retained
                 .undeclared
                 .insert(whole.clone(), presented.undeclared);
         }
         for run in &presented.runs {
-            for token in codec.segment(run)? {
+            // Text into symbols, at the one seam where the exterior codec meets the recovered one.
+            let word: Vec<Symbol> = run
+                .chars()
+                .filter_map(|character| {
+                    alphabet.symbol_of(character.to_string().as_str())
+                })
+                .collect();
+            for token in codec.segment(&word)? {
                 match order.get(&token).copied() {
                     Some(slot) => {
                         // The `last()` guard is the cost law, not a nicety: material arrives whole
@@ -445,10 +474,11 @@ pub fn intake(
                         }
                     }
                     None => {
-                        let lineage = account_for(&token, &codec, &relations);
+                        let lineage = account_for(&token, &codec, &relations, alphabet);
+                        let spelled = alphabet.render(&token);
                         order.insert(token.clone(), founded.len());
                         founded.push(FoundedWordLineage {
-                            word: token,
+                            word: spelled,
                             wholes: vec![whole.clone()],
                             lineage,
                         });
@@ -494,24 +524,28 @@ pub fn intake(
 /// is parsed downstream — `from_founded_words` carries the lineage and `FoundedStem` declares that
 /// the only field any conduct path reads is the stem text — so this is provenance in the exact sense
 /// `CLAUDE.md` §9 asks for and never a channel.
-fn account_for(word: &str, codec: &RecoveredCodec, relations: &RecoveredRelations) -> Vec<String> {
+fn account_for(
+    word: &[Symbol],
+    codec: &RecoveredCodec,
+    relations: &RecoveredRelations,
+    alphabet: &SymbolAlphabet,
+) -> Vec<String> {
     let mut lineage = Vec::new();
-    let classes: Vec<char> = word
-        .chars()
-        .filter_map(|symbol| relations.representative_of(symbol))
+    let classes: Vec<Symbol> = word
+        .iter()
+        .filter_map(|symbol| relations.representative_of(*symbol))
         .collect();
-    lineage.push(format!(
-        "recovered classes {}",
-        classes.iter().collect::<String>()
-    ));
-    let mut adjacencies: BTreeSet<(char, char)> = BTreeSet::new();
+    lineage.push(format!("recovered classes {}", alphabet.render(&classes)));
+    let mut adjacencies: BTreeSet<(Symbol, Symbol)> = BTreeSet::new();
     for pair in classes.windows(2) {
         adjacencies.insert((pair[0], pair[1]));
     }
     for (left, right) in &adjacencies {
         if let Some(boundary) = codec.boundary_between(*left, *right) {
             lineage.push(format!(
-                "boundary({left},{right}) = {}",
+                "boundary({},{}) = {}",
+                alphabet.identity(*left).unwrap_or("?"),
+                alphabet.identity(*right).unwrap_or("?"),
                 match boundary {
                     Boundary::Join => "Join",
                     Boundary::Cut => "Cut",
@@ -519,15 +553,18 @@ fn account_for(word: &str, codec: &RecoveredCodec, relations: &RecoveredRelation
             ));
         }
     }
-    let mut distinct: BTreeSet<char> = classes.iter().copied().collect();
+    let mut distinct: BTreeSet<Symbol> = classes.iter().copied().collect();
     distinct.extend(relations.dropped().iter().take(1));
-    let members: Vec<char> = distinct.into_iter().collect();
+    let members: Vec<Symbol> = distinct.into_iter().collect();
     for (index, left) in members.iter().enumerate() {
         for right in &members[index + 1..] {
             if let Some(separation) = relations.separating_context(*left, *right) {
                 lineage.push(format!(
-                    "class {left:?} apart from {right:?} by context {:?}^{:?}",
-                    separation.prefix, separation.suffix
+                    "class {:?} apart from {:?} by context {:?}^{:?}",
+                    alphabet.identity(*left).unwrap_or("?"),
+                    alphabet.identity(*right).unwrap_or("?"),
+                    alphabet.render(&separation.prefix),
+                    alphabet.render(&separation.suffix)
                 ));
             }
         }
@@ -688,7 +725,7 @@ mod tests {
 
     use crate::codec_recovery::conform;
     use crate::conditioned_derivation::{
-        derive, expose, ConditionedBody, DerivationQuery, StemStanding,
+        ConditionedBody, DerivationQuery, StemStanding, derive, expose,
     };
 
     /// **What this test body declares as its host capacity.** The apertures moved out of
@@ -744,10 +781,48 @@ mod tests {
     /// The declared alphabet: the twenty-six ASCII letters and three separators the material really
     /// carries. Twenty-nine symbols at radius three is `29 + 841 + 24389` family words, inside the
     /// declared aperture.
-    fn alphabet() -> Vec<char> {
+    fn declared_characters() -> Vec<char> {
         let mut declared: Vec<char> = ('a'..='z').collect();
         declared.extend([' ', '.', '_']);
         declared
+    }
+
+    /// The declared alphabet, as symbols. The fixtures speak text; `intake` speaks symbols, and this
+    /// is the one translation between them.
+    fn alphabet() -> SymbolAlphabet {
+        SymbolAlphabet::from_chars(&declared_characters())
+            .expect("the fixture alphabet carries no repeat")
+    }
+
+    /// A text-speaking conditioner, presented through the declared alphabet.
+    fn text_codec(law: impl Fn(&str) -> Vec<String> + 'static) -> OpaqueSymbolCodec {
+        OpaqueSymbolCodec::over_text(&alphabet(), law)
+    }
+
+    /// A word written over the declared alphabet.
+    fn word(spelling: &str) -> Vec<Symbol> {
+        alphabet().spell(spelling).expect("fixture spellings are declared")
+    }
+
+    /// A segmentation, read back as spellings.
+    fn spelled(segmentation: &[Vec<Symbol>]) -> Vec<String> {
+        let declared = alphabet();
+        segmentation.iter().map(|token| declared.render(token)).collect()
+    }
+
+    fn sym(character: char) -> Symbol {
+        alphabet()
+            .symbol_of(character.to_string().as_str())
+            .expect("every fixture character is declared")
+    }
+
+    /// A class, read back as characters so an assertion says what the quotient is.
+    fn spell_class(block: &BTreeSet<Symbol>) -> BTreeSet<char> {
+        let declared = alphabet();
+        block
+            .iter()
+            .filter_map(|member| declared.identity(*member)?.chars().next())
+            .collect()
     }
 
     fn is_separator(symbol: char) -> bool {
@@ -762,7 +837,7 @@ mod tests {
     /// *Letters agglutinate; separators are dropped and break.* The conditioner whose reading of
     /// real material coincides with the body's own.
     fn word_runs() -> OpaqueSymbolCodec {
-        OpaqueSymbolCodec::new(|input: &str| {
+        text_codec(|input: &str| {
             let mut tokens = Vec::new();
             let mut current = String::new();
             for symbol in input.chars() {
@@ -785,7 +860,7 @@ mod tests {
     /// same symbol quotient and the same emission as [`word_runs`], differing in exactly one
     /// adjacency entry, which is what makes the two comparable as codecs.
     fn characters() -> OpaqueSymbolCodec {
-        OpaqueSymbolCodec::new(|input: &str| {
+        text_codec(|input: &str| {
             input
                 .chars()
                 .filter(|symbol| !is_separator(*symbol))
@@ -797,7 +872,7 @@ mod tests {
     /// *A consonant run opens a token and carries the vowels after it; a vowel followed by a
     /// consonant breaks.* A syllabic conditioner, three classes with one dropped.
     fn syllables() -> OpaqueSymbolCodec {
-        OpaqueSymbolCodec::new(|input: &str| {
+        text_codec(|input: &str| {
             let vowel = |symbol: char| matches!(symbol, 'a' | 'e' | 'i' | 'o' | 'u');
             let mut tokens = Vec::new();
             let mut current = String::new();
@@ -806,7 +881,9 @@ mod tests {
                 let cut = match previous {
                     None => true,
                     Some(before) => {
-                        is_separator(before) || is_separator(symbol) || (vowel(before) && !vowel(symbol))
+                        is_separator(before)
+                            || is_separator(symbol)
+                            || (vowel(before) && !vowel(symbol))
                     }
                 };
                 if cut && !current.is_empty() {
@@ -826,7 +903,7 @@ mod tests {
 
     /// *Everything is one token.* A conditioner whose declared statistics separate no two symbols.
     fn one_class() -> OpaqueSymbolCodec {
-        OpaqueSymbolCodec::new(|input: &str| {
+        text_codec(|input: &str| {
             if input.is_empty() {
                 Vec::new()
             } else {
@@ -838,7 +915,7 @@ mod tests {
     /// A conditioner whose boundary decision is about the token's own length rather than about the
     /// adjacent pair of classes. Outside the declared shape, and refused as such.
     fn capped() -> OpaqueSymbolCodec {
-        OpaqueSymbolCodec::new(|input: &str| {
+        text_codec(|input: &str| {
             let mut tokens = Vec::new();
             let mut current = String::new();
             for symbol in input.chars() {
@@ -873,21 +950,46 @@ mod tests {
     /// recovered relation from a working one.
     #[test]
     fn the_declared_statistics_return_relations_with_the_shortest_context_that_produced_each() {
-        let carried = intake("word-runs", &word_runs(), &alphabet(), 3, TEST_APERTURES, &corpus())
-            .expect("the conditioner is recoverable and founds a committed population");
+        let carried = intake(
+            "word-runs",
+            &word_runs(),
+            &alphabet(),
+            3,
+            TEST_APERTURES,
+            &corpus(),
+        )
+        .expect("the conditioner is recoverable and founds a committed population");
         let relations = &carried.relations;
 
         assert_eq!(relations.classes.len(), 2, "{:?}", relations.classes);
-        assert_eq!(
-            relations.classes,
-            vec![
-                BTreeSet::from([' ', '.', '_']),
-                ('a'..='z').collect::<BTreeSet<char>>(),
-            ]
+        // **Asserted by membership, not by position.** The canonical class order is "by each class's
+        // least member", and until the alphabet was rotated off `char` on 2026-08-13 that made it
+        // ASCII collation -- the separator class came first because a space is 0x20. A `Symbol` is an
+        // ordinal into a *declared* alphabet, so least member now means earliest declared, which is
+        // the caller's statement rather than the encoding's. The classes are unchanged; only their
+        // order is, and an index into a canonical order should never have been load-bearing.
+        let spelled: Vec<BTreeSet<char>> = relations.classes.iter().map(spell_class).collect();
+        assert!(spelled.contains(&BTreeSet::from([' ', '.', '_'])), "{spelled:?}");
+        assert!(
+            spelled.contains(&('a'..='z').collect::<BTreeSet<char>>()),
+            "{spelled:?}"
         );
+        let emission: BTreeSet<(char, Emission)> = relations
+            .emission
+            .iter()
+            .map(|(symbol, emission)| {
+                (
+                    alphabet()
+                        .identity(*symbol)
+                        .and_then(|identity| identity.chars().next())
+                        .unwrap_or('?'),
+                    *emission,
+                )
+            })
+            .collect();
         assert_eq!(
-            relations.emission,
-            vec![(' ', Emission::Drop), ('a', Emission::Emit)]
+            emission,
+            BTreeSet::from([(' ', Emission::Drop), ('a', Emission::Emit)])
         );
 
         // The relation is non-empty and every entry carries its material.
@@ -903,29 +1005,39 @@ mod tests {
         // A dropped symbol against an emitted one is visible in the bare hole, so the shortest
         // context that separates them has length one.
         let separation = relations
-            .separating_context(' ', 'a')
+            .separating_context(sym(' '), sym('a'))
             .expect("a dropped symbol and an emitted one are separated");
         assert_eq!(separation.context_length(), 1);
-        assert_eq!((separation.prefix.as_str(), separation.suffix.as_str()), ("", ""));
+        assert_eq!(
+            (alphabet().render(&separation.prefix).as_str(), alphabet().render(&separation.suffix).as_str()),
+            ("", "")
+        );
 
         // The agglutination relation, read off the structure rather than out of the fixture.
         assert_eq!(
             relations.agglutinating(),
             vec![&ClassAdjacency {
-                left: 'a',
-                right: 'a',
+                left: sym('a'),
+                right: sym('a'),
                 boundary: Boundary::Join
             }]
         );
-        assert_eq!(carried.retained.dropped, BTreeSet::from([' ', '.', '_']));
+        assert_eq!(carried.retained.dropped.iter().filter_map(|s| alphabet().identity(*s)?.chars().next()).collect::<BTreeSet<char>>(), BTreeSet::from([' ', '.', '_']));
     }
 
     /// **The declared control's refusal side.** Statistics that separate nothing supply no relation,
     /// and the intake says so by type rather than handing back an empty morphology.
     #[test]
     fn statistics_that_separate_no_two_symbols_are_refused_by_type_and_not_returned_empty() {
-        let refusal = intake("one-class", &one_class(), &alphabet(), 3, TEST_APERTURES, &corpus())
-            .expect_err("a conditioner that separates nothing supplies no relation");
+        let refusal = intake(
+            "one-class",
+            &one_class(),
+            &alphabet(),
+            3,
+            TEST_APERTURES,
+            &corpus(),
+        )
+        .expect_err("a conditioner that separates nothing supplies no relation");
         let IntakeRefusal::NoRelationRecovered { classes } = refusal else {
             panic!("expected NoRelationRecovered, got {refusal:?}");
         };
@@ -941,8 +1053,15 @@ mod tests {
             ("digits".to_owned(), "0123 4567 89".to_owned()),
             ("more-digits".to_owned(), "9876 5432 10".to_owned()),
         ];
-        let refusal = intake("word-runs", &word_runs(), &alphabet(), 3, TEST_APERTURES, &numerals)
-            .expect_err("no declared letter appears in the material");
+        let refusal = intake(
+            "word-runs",
+            &word_runs(),
+            &alphabet(),
+            3,
+            TEST_APERTURES,
+            &numerals,
+        )
+        .expect_err("no declared letter appears in the material");
         let IntakeRefusal::NoFoundedWord { wholes } = refusal else {
             panic!("expected NoFoundedWord, got {refusal:?}");
         };
@@ -954,8 +1073,15 @@ mod tests {
     #[test]
     fn a_population_that_never_recurs_across_two_wholes_is_refused_by_type() {
         let single = vec![("only".to_owned(), FIRST.to_owned())];
-        let refusal = intake("word-runs", &word_runs(), &alphabet(), 3, TEST_APERTURES, &single)
-            .expect_err("one whole cannot witness a recurrence across distinct wholes");
+        let refusal = intake(
+            "word-runs",
+            &word_runs(),
+            &alphabet(),
+            3,
+            TEST_APERTURES,
+            &single,
+        )
+        .expect_err("one whole cannot witness a recurrence across distinct wholes");
         let IntakeRefusal::NoCommittedStem { founded } = refusal else {
             panic!("expected NoCommittedStem, got {refusal:?}");
         };
@@ -966,8 +1092,15 @@ mod tests {
     /// carried, not approximated by the nearest structure that fits.
     #[test]
     fn a_conditioner_outside_the_declared_shape_carries_the_recovery_obstruction_forward() {
-        let refusal = intake("capped", &capped(), &['a', 'b'], 4, TEST_APERTURES, &corpus())
-            .expect_err("a token-length cap is not an adjacency law");
+        let refusal = intake(
+            "capped",
+            &capped(),
+            &SymbolAlphabet::from_chars(&['a', 'b']).expect("declared"),
+            4,
+            TEST_APERTURES,
+            &corpus(),
+        )
+        .expect_err("a token-length cap is not an adjacency law");
         let IntakeRefusal::RecoveryObstructed { obstructions } = refusal else {
             panic!("expected RecoveryObstructed, got {refusal:?}");
         };
@@ -988,9 +1121,22 @@ mod tests {
     /// prose, exactly the words the body's own reading founds — in order, whole by whole.
     #[test]
     fn the_recovered_conditioner_founds_exactly_the_words_the_bodys_own_reading_founds() {
-        let carried = intake("word-runs", &word_runs(), &alphabet(), 3, TEST_APERTURES, &corpus())
-            .expect("the conditioner is recoverable");
-        let declared: BTreeSet<char> = carried.relations.alphabet.iter().copied().collect();
+        let carried = intake(
+            "word-runs",
+            &word_runs(),
+            &alphabet(),
+            3,
+            TEST_APERTURES,
+            &corpus(),
+        )
+        .expect("the conditioner is recoverable");
+        let spelled = alphabet();
+        let declared: BTreeSet<char> = carried
+            .relations
+            .alphabet
+            .iter()
+            .filter_map(|symbol| spelled.identity(*symbol)?.chars().next())
+            .collect();
 
         for (whole, text) in corpus() {
             let native_words = expose(&whole, &text).words;
@@ -998,7 +1144,16 @@ mod tests {
             let recovered: Vec<String> = presented
                 .runs
                 .iter()
-                .flat_map(|run| carried.codec.segment(run).expect("declared symbols only"))
+                .flat_map(|run| {
+                    let word = spelled.spell(run).expect("a presented run is declared");
+                    carried
+                        .codec
+                        .segment(&word)
+                        .expect("declared symbols only")
+                        .into_iter()
+                        .map(|token| spelled.render(&token))
+                        .collect::<Vec<_>>()
+                })
                 .collect();
             assert_eq!(
                 recovered, native_words,
@@ -1013,13 +1168,30 @@ mod tests {
 
         // A different conditioner over the same alphabet does depart, so the agreement above is a
         // property of this conditioner and not of the comparison.
-        let other = intake("characters", &characters(), &alphabet(), 3, TEST_APERTURES, &corpus())
-            .expect("the conditioner is recoverable");
+        let other = intake(
+            "characters",
+            &characters(),
+            &alphabet(),
+            3,
+            TEST_APERTURES,
+            &corpus(),
+        )
+        .expect("the conditioner is recoverable");
         let presented = present("first", FIRST, &declared);
+        let spelled = alphabet();
         let split: Vec<String> = presented
             .runs
             .iter()
-            .flat_map(|run| other.codec.segment(run).expect("declared symbols only"))
+            .flat_map(|run| {
+                let word = spelled.spell(run).expect("a presented run is declared");
+                other
+                    .codec
+                    .segment(&word)
+                    .expect("declared symbols only")
+                    .into_iter()
+                    .map(|token| spelled.render(&token))
+                    .collect::<Vec<_>>()
+            })
             .collect();
         assert_ne!(split, expose("first", FIRST).words);
     }
@@ -1028,9 +1200,16 @@ mod tests {
     /// **everything any conduct path reads**, and differs exactly in the field none reads.
     #[test]
     fn the_carried_morphology_differs_from_the_native_one_only_in_the_lineage_nothing_reads() {
-        let carried = intake("word-runs", &word_runs(), &alphabet(), 3, TEST_APERTURES, &corpus())
-            .expect("the conditioner is recoverable")
-            .morphology;
+        let carried = intake(
+            "word-runs",
+            &word_runs(),
+            &alphabet(),
+            3,
+            TEST_APERTURES,
+            &corpus(),
+        )
+        .expect("the conditioner is recoverable")
+        .morphology;
         let native = native();
 
         assert_eq!(
@@ -1081,11 +1260,22 @@ mod tests {
             accounted
                 .foreign_lineage
                 .iter()
-                .any(|entry| entry == r#"class ' ' apart from 'a' by context ""^"""#),
+                .any(|entry| {
+                    // Two things the rotation changed, both honest. The pair is written in class
+                    // order, which is now declaration order rather than ASCII collation, so either
+                    // hand may come first. And a symbol is named by its IDENTITY, which is a string
+                    // and renders with double quotes -- a `char` rendered `'a'` and could never have
+                    // named a multi-character symbol at all.
+                    entry == r#"class " " apart from "a" by context ""^"""#
+                        || entry == r#"class "a" apart from " " by context ""^"""#
+                }),
             "{:?}",
             accounted.foreign_lineage
         );
-        assert_ne!(carried, native, "the lineage is carried and is a difference");
+        assert_ne!(
+            carried, native,
+            "the lineage is carried and is a difference"
+        );
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -1098,8 +1288,15 @@ mod tests {
     #[test]
     fn the_body_tells_a_character_conditioner_from_its_own_reading_and_names_the_word() {
         let population = identifiers();
-        let carried = intake("characters", &characters(), &alphabet(), 3, TEST_APERTURES, &corpus())
-            .expect("the conditioner is recoverable");
+        let carried = intake(
+            "characters",
+            &characters(),
+            &alphabet(),
+            3,
+            TEST_APERTURES,
+            &corpus(),
+        )
+        .expect("the conditioner is recoverable");
         let native = native();
 
         let distinction = distinguish(
@@ -1142,11 +1339,29 @@ mod tests {
     #[test]
     fn the_body_tells_a_syllabic_conditioner_apart_as_well() {
         let population = identifiers();
-        let carried = intake("syllables", &syllables(), &alphabet(), 3, TEST_APERTURES, &corpus())
-            .expect("the conditioner is recoverable");
-        assert_eq!(carried.relations.classes.len(), 3, "{:?}", carried.relations.classes);
+        let carried = intake(
+            "syllables",
+            &syllables(),
+            &alphabet(),
+            3,
+            TEST_APERTURES,
+            &corpus(),
+        )
+        .expect("the conditioner is recoverable");
         assert_eq!(
-            carried.relations.classes[1],
+            carried.relations.classes.len(),
+            3,
+            "{:?}",
+            carried.relations.classes
+        );
+        assert_eq!(
+            carried
+                .relations
+                .classes
+                .iter()
+                .map(spell_class)
+                .find(|block| block.contains(&'a'))
+                .expect("the class carrying a vowel is recovered"),
             BTreeSet::from(['a', 'e', 'i', 'o', 'u']),
             "the vowel class is recovered from testimony, never declared"
         );
@@ -1163,7 +1378,7 @@ mod tests {
                 .relations
                 .adjacency
                 .iter()
-                .find(|entry| (entry.left, entry.right) == (left, right))
+                .find(|entry| (entry.left, entry.right) == (sym(left), sym(right)))
                 .map(|entry| entry.boundary)
         };
         assert_eq!(boundary('b', 'a'), Some(Boundary::Join));
@@ -1176,7 +1391,13 @@ mod tests {
             );
         }
         assert_eq!(
-            carried.codec.segment("carrier").unwrap(),
+            carried
+                .codec
+                .segment(&alphabet().spell("carrier").expect("declared"))
+                .unwrap()
+                .iter()
+                .map(|token| alphabet().render(token))
+                .collect::<Vec<_>>(),
             vec!["ca".to_owned(), "rrie".to_owned(), "r".to_owned()],
             "the ordered relation is what makes this segmentation, not its transpose"
         );
@@ -1204,9 +1425,16 @@ mod tests {
             ("native", &native),
             (
                 "characters",
-                &intake("characters", &characters(), &alphabet(), 3, TEST_APERTURES, &corpus())
-                    .expect("recoverable")
-                    .morphology,
+                &intake(
+                    "characters",
+                    &characters(),
+                    &alphabet(),
+                    3,
+                    TEST_APERTURES,
+                    &corpus(),
+                )
+                .expect("recoverable")
+                .morphology,
             ),
         )
         .expect("the identifiers are ASCII");
@@ -1216,8 +1444,15 @@ mod tests {
         );
 
         // Only now is the empty return admissible as evidence.
-        let carried = intake("word-runs", &word_runs(), &alphabet(), 3, TEST_APERTURES, &corpus())
-            .expect("recoverable");
+        let carried = intake(
+            "word-runs",
+            &word_runs(),
+            &alphabet(),
+            3,
+            TEST_APERTURES,
+            &corpus(),
+        )
+        .expect("recoverable");
         let agreement = distinguish(
             &population,
             ("native", &native),
@@ -1254,7 +1489,10 @@ mod tests {
             .into_iter()
             .map(|firing| firing.stem)
             .collect();
-        assert!(!reaching.is_empty(), "no committed stem reaches this material");
+        assert!(
+            !reaching.is_empty(),
+            "no committed stem reaches this material"
+        );
 
         // A committed stem the material never exercises. Removing it is a real difference in the
         // founded population and no difference at all in the reading.
@@ -1281,7 +1519,8 @@ mod tests {
             quiet.left_separates
         );
         assert_eq!(
-            quiet.only_left_reaching, vec![],
+            quiet.only_left_reaching,
+            vec![],
             "a stem that reaches nothing must not be reported as reaching something"
         );
 
@@ -1306,7 +1545,8 @@ mod tests {
             "removing {stem:?} must remove a stem that reached this material"
         );
         assert!(
-            !distinction.witness_stems().is_empty() || !distinction.distinguishing_words().is_empty(),
+            !distinction.witness_stems().is_empty()
+                || !distinction.distinguishing_words().is_empty(),
             "removing {stem:?} moved the reading without exhibiting what shows it"
         );
     }
@@ -1316,10 +1556,24 @@ mod tests {
     /// object.
     #[test]
     fn the_two_conditioners_are_separated_as_codecs_by_a_named_input() {
-        let runs = intake("word-runs", &word_runs(), &alphabet(), 3, TEST_APERTURES, &corpus())
-            .expect("recoverable");
-        let chars = intake("characters", &characters(), &alphabet(), 3, TEST_APERTURES, &corpus())
-            .expect("recoverable");
+        let runs = intake(
+            "word-runs",
+            &word_runs(),
+            &alphabet(),
+            3,
+            TEST_APERTURES,
+            &corpus(),
+        )
+        .expect("recoverable");
+        let chars = intake(
+            "characters",
+            &characters(),
+            &alphabet(),
+            3,
+            TEST_APERTURES,
+            &corpus(),
+        )
+        .expect("recoverable");
 
         assert_eq!(runs.codec.classes, chars.codec.classes);
         assert_eq!(runs.codec.emission, chars.codec.emission);
@@ -1328,14 +1582,14 @@ mod tests {
             .shortest_separating_input(&chars.codec)
             .expect("the two codecs share their classes and emission")
             .expect("some input separates them");
-        assert_eq!(separating.chars().count(), 2, "returned {separating:?}");
+        assert_eq!(separating.len(), 2, "returned {separating:?}");
         assert_ne!(
             runs.codec.segment(&separating).unwrap(),
             chars.codec.segment(&separating).unwrap()
         );
-        assert_eq!(runs.codec.segment("aa").unwrap(), vec!["aa".to_owned()]);
+        assert_eq!(spelled(&runs.codec.segment(&word("aa")).unwrap()), vec!["aa".to_owned()]);
         assert_eq!(
-            chars.codec.segment("aa").unwrap(),
+            spelled(&chars.codec.segment(&word("aa")).unwrap()),
             vec!["a".to_owned(), "a".to_owned()]
         );
     }
@@ -1361,9 +1615,16 @@ mod tests {
         assert!(body.derive(&query).expect("ASCII identifiers").is_empty());
 
         body.carry_morphology(
-            intake("word-runs", &word_runs(), &alphabet(), 3, TEST_APERTURES, &corpus())
-                .expect("recoverable")
-                .morphology,
+            intake(
+                "word-runs",
+                &word_runs(),
+                &alphabet(),
+                3,
+                TEST_APERTURES,
+                &corpus(),
+            )
+            .expect("recoverable")
+            .morphology,
         );
         let carried: Vec<String> = body
             .derive(&query)
@@ -1371,7 +1632,10 @@ mod tests {
             .into_iter()
             .map(|passage| passage.name)
             .collect();
-        assert!(!carried.is_empty(), "the carried morphology produces nothing");
+        assert!(
+            !carried.is_empty(),
+            "the carried morphology produces nothing"
+        );
 
         let own: Vec<String> = derive(&body.standing_derivations(), &native(), &query)
             .expect("ASCII identifiers")
@@ -1381,9 +1645,16 @@ mod tests {
         assert_eq!(carried, own, "the seam must not change the production");
 
         body.carry_morphology(
-            intake("characters", &characters(), &alphabet(), 3, TEST_APERTURES, &corpus())
-                .expect("recoverable")
-                .morphology,
+            intake(
+                "characters",
+                &characters(),
+                &alphabet(),
+                3,
+                TEST_APERTURES,
+                &corpus(),
+            )
+            .expect("recoverable")
+            .morphology,
         );
         let elsewhere: Vec<String> = body
             .derive(&query)
@@ -1406,7 +1677,7 @@ mod tests {
     /// it onto a symbol the conditioner never testified about.
     #[test]
     fn the_presentation_names_the_symbols_the_alphabet_does_not_carry() {
-        let declared: BTreeSet<char> = alphabet().into_iter().collect();
+        let declared: BTreeSet<char> = declared_characters().into_iter().collect();
         let presented = present("mixed", "carry 42, chart; \u{3bb} exact", &declared);
         assert_eq!(
             presented.undeclared,
@@ -1422,8 +1693,15 @@ mod tests {
             ]
         );
 
-        let carried = intake("word-runs", &word_runs(), &alphabet(), 3, TEST_APERTURES, &corpus())
-            .expect("recoverable");
+        let carried = intake(
+            "word-runs",
+            &word_runs(),
+            &alphabet(),
+            3,
+            TEST_APERTURES,
+            &corpus(),
+        )
+        .expect("recoverable");
         assert!(
             carried
                 .retained
@@ -1441,9 +1719,22 @@ mod tests {
     /// testimony.
     #[test]
     fn the_recovered_structure_conforms_with_the_conditioner_on_held_out_real_runs() {
-        let carried = intake("word-runs", &word_runs(), &alphabet(), 3, TEST_APERTURES, &corpus())
-            .expect("recoverable");
-        let declared: BTreeSet<char> = carried.relations.alphabet.iter().copied().collect();
+        let carried = intake(
+            "word-runs",
+            &word_runs(),
+            &alphabet(),
+            3,
+            TEST_APERTURES,
+            &corpus(),
+        )
+        .expect("recoverable");
+        let spelled = alphabet();
+        let declared: BTreeSet<char> = carried
+            .relations
+            .alphabet
+            .iter()
+            .filter_map(|symbol| spelled.identity(*symbol)?.chars().next())
+            .collect();
         let presented = present("second", SECOND, &declared);
         let held_out: Vec<&str> = presented
             .runs
@@ -1456,12 +1747,22 @@ mod tests {
         // returned one token per run would conform under almost any adjacency table.
         let widest = held_out
             .iter()
-            .map(|run| carried.codec.segment(run).expect("declared symbols only").len())
+            .map(|run| {
+                carried
+                    .codec
+                    .segment(&word(run))
+                    .expect("declared symbols only")
+                    .len()
+            })
             .max()
             .expect("the population is not empty");
-        assert!(widest >= 12, "the held-out material returns at most {widest} tokens");
+        assert!(
+            widest >= 12,
+            "the held-out material returns at most {widest} tokens"
+        );
 
-        let conformance = conform(&carried.codec, &word_runs(), &held_out);
+        let held_out_words: Vec<Vec<Symbol>> = held_out.iter().map(|run| word(run)).collect();
+        let conformance = conform(&carried.codec, &word_runs(), &held_out_words);
         assert!(
             conformance.is_exact(),
             "disagreements {:?} refusals {:?}",
@@ -1475,8 +1776,15 @@ mod tests {
     /// distinct wholes witnessed.
     #[test]
     fn the_intake_states_its_cost_and_commits_only_what_recurred_across_wholes() {
-        let carried = intake("word-runs", &word_runs(), &alphabet(), 3, TEST_APERTURES, &corpus())
-            .expect("recoverable");
+        let carried = intake(
+            "word-runs",
+            &word_runs(),
+            &alphabet(),
+            3,
+            TEST_APERTURES,
+            &corpus(),
+        )
+        .expect("recoverable");
         assert_eq!(
             carried.relations.work.declared_family_words,
             29 + 29 * 29 + 29 * 29 * 29
@@ -1506,8 +1814,24 @@ mod tests {
     /// accident.
     #[test]
     fn the_intake_is_deterministic() {
-        let first = intake("word-runs", &word_runs(), &alphabet(), 3, TEST_APERTURES, &corpus()).expect("ok");
-        let second = intake("word-runs", &word_runs(), &alphabet(), 3, TEST_APERTURES, &corpus()).expect("ok");
+        let first = intake(
+            "word-runs",
+            &word_runs(),
+            &alphabet(),
+            3,
+            TEST_APERTURES,
+            &corpus(),
+        )
+        .expect("ok");
+        let second = intake(
+            "word-runs",
+            &word_runs(),
+            &alphabet(),
+            3,
+            TEST_APERTURES,
+            &corpus(),
+        )
+        .expect("ok");
         assert_eq!(first, second);
 
         let population = identifiers();

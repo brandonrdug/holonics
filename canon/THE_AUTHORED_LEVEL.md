@@ -211,3 +211,22 @@ exits nonzero on an undispositioned, moved, or departed level. It is a convenien
 ledger current, not the authority and not a precondition — **recognising a hard-coded magic number in
 a library organ takes reading**, and a level the script's regex does not match is exactly as much a
 contaminant as one it does. `Permutation5 = [u8; 5]` is the standing example.
+
+**Second standing example, added 2026-08-13: the byte grain of the material shadow.**
+`soma/life/src/material_shadow_cuda.rs:144` stages every passage as
+`material.extend(bytes.iter().map(|byte| u32::from(*byte)))`, so the elementary unit over which the
+whole prior-equal-distance field, its recurrence arcs, its cycle rank and its exact attachment key
+are computed is the **eight-bit byte** — an exterior encoding convention that nothing in the
+material derives. The ledger cannot see it: there is no numeric literal, only a type and a cast.
+
+It is the harder species to catch for a second reason, which is why it belongs here beside
+`Permutation5`. A numeric pin usually *looks* arbitrary. A byte does not — it reads as the natural
+floor of "raw material," so an organ founded on it appears grain-free while carrying an authored
+grain throughout. **Bit purity is the standing requirement**, and the disposition is `PIN`: the
+excision is not a wider integer but a grain read off the material or declared by the caller.
+
+Brandon's ruling that produced this entry, 2026-08-13: *"the individual bytes recurring doesn't
+matter, it's recurring transformations and manipulation patterns about passing information."* The
+full conviction, and the finding that a surface-grained key **forces** an authored partition
+downstream of it, is
+`research/records/2026-08-13_THE_WEIGHT_FILE_IS_A_PREVIOUSLY_RENDERED_MAP_THE_GRAIN_IS_RECURRING_TRANSFORMATION.md`.

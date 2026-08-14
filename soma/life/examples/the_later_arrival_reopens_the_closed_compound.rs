@@ -130,7 +130,7 @@ fn run() -> Result<(), String> {
             "  storage {:>4}  caused_by {:?}  {:?}",
             occurrence.storage_ordinal,
             occurrence.caused_by.iter().collect::<Vec<_>>(),
-            occurrence.text
+            occurrence.declared_surface()
         );
     }
     for (identity, ordinal, rank) in complex.causal_ranks() {
@@ -197,7 +197,10 @@ fn run() -> Result<(), String> {
         print_differentiation(differentiation, &emissions[at]);
     }
     if differentiated.len() > PRINTED {
-        println!("  … {} further closed boundaries", differentiated.len() - PRINTED);
+        println!(
+            "  … {} further closed boundaries",
+            differentiated.len() - PRINTED
+        );
     }
     println!();
     println!(
@@ -215,7 +218,10 @@ fn run() -> Result<(), String> {
             .iter()
             .filter(|one| one.residual_vanishes(&group))
             .count(),
-        differentiated.iter().filter(|one| one.holonomy_is_flat()).count(),
+        differentiated
+            .iter()
+            .filter(|one| one.holonomy_is_flat())
+            .count(),
     );
     let both = differentiated
         .iter()
@@ -247,7 +253,10 @@ fn run() -> Result<(), String> {
     println!(
         "  the engine's `found_potential_in`     : {} chords over {} components ({} agreeing, {} \
          retained)",
-        chords.cycle_rank, chords.components, chords.agreeing, chords.retained.len()
+        chords.cycle_rank,
+        chords.components,
+        chords.agreeing,
+        chords.retained.len()
     );
     println!(
         "  β₁ = E − V + C = {} − {} + {} = {}",
@@ -295,7 +304,9 @@ fn run() -> Result<(), String> {
     println!();
 
     // -- A3: the higher-grain successor the earlier compound composes into -------------------
-    println!("  ═══ A3 — THE EARLIER COMPOUND COMPOSES INTO A DIFFERENT HIGHER-GRAIN SUCCESSOR ═══");
+    println!(
+        "  ═══ A3 — THE EARLIER COMPOUND COMPOSES INTO A DIFFERENT HIGHER-GRAIN SUCCESSOR ═══"
+    );
     println!(
         "  the closed boundary is permanent; what a later arrival changes is what it composes \
          WITH. So"
@@ -304,11 +315,16 @@ fn run() -> Result<(), String> {
         "  the different successor with the different residual is one grain up, and that is where \
          the"
     );
-    println!("  conditioning is: a pathway changed, and the next current rides the changed pathway.");
+    println!(
+        "  conditioning is: a pathway changed, and the next current rides the changed pathway."
+    );
     let before_tower = tower(&complex, chart);
     let after_tower = tower(&response.complex, chart);
     println!();
-    println!("    {:>7} {:>26} {:>26}", "grain", "before the arrival", "after the arrival");
+    println!(
+        "    {:>7} {:>26} {:>26}",
+        "grain", "before the arrival", "after the arrival"
+    );
     for grain in 0..before_tower.len().max(after_tower.len()) {
         println!(
             "    {:>7} {:>26} {:>26}",
@@ -480,7 +496,7 @@ fn run() -> Result<(), String> {
         .map_err(|error| format!("flat differentiate: {error:?}"))?;
     println!(
         "  the declared saturated material: {:?}",
-        saturated_material()[0].text
+        saturated_material()[0].declared_surface()
     );
     println!(
         "    `popcount('b'⊕'c') = popcount('c'⊕'a') = 1` — the two contacts cross ONE bit each — \
@@ -500,7 +516,9 @@ fn run() -> Result<(), String> {
         .map_err(|error| format!("flat admit: {error:?}"))?;
     println!(
         "  the arrival {:?} at ⪯ rank {} — co-present: {}",
-        flat_arrival.text, flat_response.arrival_rank, flat_response.arrival_is_co_present
+        flat_arrival.declared_surface(),
+        flat_response.arrival_rank,
+        flat_response.arrival_is_co_present
     );
     println!(
         "    reached {} · reopened {} · saturated {} · untouched {}",
@@ -518,8 +536,16 @@ fn run() -> Result<(), String> {
     println!(
         "  NO CLOSED BOUNDARY MOVED: {}   ·   any compound REOPENED: {}   ·   closed boundaries \
          founded beside it: {}",
-        if flat_response.no_closed_boundary_moved() { "YES" } else { "NO" },
-        if flat_response.reopened.is_empty() { "no" } else { "YES — the residual gate is wrong" },
+        if flat_response.no_closed_boundary_moved() {
+            "YES"
+        } else {
+            "NO"
+        },
+        if flat_response.reopened.is_empty() {
+            "no"
+        } else {
+            "YES — the residual gate is wrong"
+        },
         flat_response.founded.len()
     );
     for verdict in &flat_response.verdicts {
@@ -545,7 +571,9 @@ fn run() -> Result<(), String> {
     println!(
         "    lands on the compound: that is valence, receiver-relative by §IV, and not closure's to"
     );
-    println!("    fix either. What did not move is the closed boundary. And what was NOT caused is");
+    println!(
+        "    fix either. What did not move is the closed boundary. And what was NOT caused is"
+    );
     println!("    any transport out of it:");
     println!();
     exhibit_transport(&flat_response, chart)?;
@@ -590,14 +618,34 @@ fn run() -> Result<(), String> {
             println!(
                 "    {:>28} {:>10} {:>10} {:>10} {:>10}",
                 elide(&verdict.surface, 28),
-                if verdict.predicted_valence_move { "Γ MOVE" } else { "Γ hold" },
-                if verdict.valence_moved { "MOVED" } else { "held" },
-                if verdict.predicted_to_transport { "r CARRY" } else { "r none" },
-                if verdict.moved { "∂Σ MOVED" } else { "∂Σ held" }
+                if verdict.predicted_valence_move {
+                    "Γ MOVE"
+                } else {
+                    "Γ hold"
+                },
+                if verdict.valence_moved {
+                    "MOVED"
+                } else {
+                    "held"
+                },
+                if verdict.predicted_to_transport {
+                    "r CARRY"
+                } else {
+                    "r none"
+                },
+                if verdict.moved {
+                    "∂Σ MOVED"
+                } else {
+                    "∂Σ held"
+                }
             );
         }
         let (right, wrong) = response.valence_law_agreement();
-        let held = response.verdicts.iter().filter(|verdict| !verdict.moved).count();
+        let held = response
+            .verdicts
+            .iter()
+            .filter(|verdict| !verdict.moved)
+            .count();
         println!(
             "    valence law right {right}, wrong {wrong}, of {}   ·   closed boundaries that held: \
              {held} of {}",
@@ -661,14 +709,16 @@ fn run() -> Result<(), String> {
     println!();
     println!(
         "  arrival {:?} caused_by {:?} → ⪯ rank {} — co-present: {}",
-        later.text,
+        later.declared_surface(),
         later.caused_by.iter().collect::<Vec<_>>(),
         later_response.arrival_rank,
         later_response.arrival_is_co_present
     );
     println!(
         "    new constituents {} · new contacts {} · new ⪯ edges {}",
-        later_response.new_constituents, later_response.new_contacts, later_response.new_dependencies
+        later_response.new_constituents,
+        later_response.new_contacts,
+        later_response.new_dependencies
     );
     println!(
         "    reached {} · reopened {} · saturated {} · untouched {}",
@@ -785,10 +835,12 @@ fn exhibit_transport(response: &ArrivalResponse, chart: PhaseChart) -> Result<()
             {
                 continue;
             }
-            let shared = founded
-                .reexposed
-                .iter()
-                .any(|left| standing.reexposed.iter().any(|right| left.bond == right.bond));
+            let shared = founded.reexposed.iter().any(|left| {
+                standing
+                    .reexposed
+                    .iter()
+                    .any(|right| left.bond == right.bond)
+            });
             if !shared {
                 continue;
             }
@@ -1009,7 +1061,11 @@ fn print_differentiation_head(differentiation: &Differentiation) {
         differentiation.coboundary_reading,
         differentiation.holonomy.cosine,
         differentiation.holonomy.sine,
-        if differentiation.stokes_holds() { "✓" } else { "✗" }
+        if differentiation.stokes_holds() {
+            "✓"
+        } else {
+            "✗"
+        }
     );
 }
 
@@ -1059,10 +1115,7 @@ fn print_differentiation(differentiation: &Differentiation, emission: &Emission)
 }
 
 fn report_arrival(response: &ArrivalResponse, differentiated: &[Differentiation]) {
-    println!(
-        "  the arrival: {:?}",
-        response.arrival
-    );
+    println!("  the arrival: {:?}", response.arrival);
     println!(
         "    ⪯ rank {} (derived from `caused_by`, never chosen) — co-present with a standing rank: \
          {}",
@@ -1096,7 +1149,11 @@ fn report_arrival(response: &ArrivalResponse, differentiated: &[Differentiation]
             at,
             elide(&differentiation.surface, 30),
             differentiation.residual,
-            if response.reached.contains(&at) { "yes" } else { "no" },
+            if response.reached.contains(&at) {
+                "yes"
+            } else {
+                "no"
+            },
             verdict
         );
     }
@@ -1179,13 +1236,19 @@ fn print_artifact(response: &ArrivalResponse) {
                 for contact in &after.residual.departed_contacts {
                     println!("                       departed: {contact}");
                 }
-                println!("             exposed   {}", port_text(after.frame_reading().1));
+                println!(
+                    "             exposed   {}",
+                    port_text(after.frame_reading().1)
+                );
             }
         }
     }
     if moved.len() > PRINTED {
         println!();
-        println!("  … {} further moved closed boundaries", moved.len() - PRINTED);
+        println!(
+            "  … {} further moved closed boundaries",
+            moved.len() - PRINTED
+        );
     }
     println!();
     println!("  THE CLOSED BOUNDARIES THE ARRIVAL FOUNDED, WHICH DID NOT EXIST BEFORE:");
@@ -1212,24 +1275,27 @@ fn elide(text: &str, extent: usize) -> String {
 /// The declared material: a causal chain of three whose storage ordinals do not ascend with it.
 fn declared_material() -> Vec<DeclaredOccurrence> {
     vec![
-        DeclaredOccurrence {
-            identity: "declared:b".to_owned(),
-            storage_ordinal: 90,
-            caused_by: BTreeSet::from(["declared:a".to_owned()]),
-            text: "the arc bends the channel and the bends carry the return".to_owned(),
-        },
-        DeclaredOccurrence {
-            identity: "declared:a".to_owned(),
-            storage_ordinal: 91,
-            caused_by: BTreeSet::new(),
-            text: "the leader founds the channel and the channel carries the leader".to_owned(),
-        },
-        DeclaredOccurrence {
-            identity: "declared:c".to_owned(),
-            storage_ordinal: 12,
-            caused_by: BTreeSet::from(["declared:b".to_owned()]),
-            text: "the channel returns the leader and the leader founds the arc".to_owned(),
-        },
+        DeclaredOccurrence::from_text(
+            "declared:b".to_owned(),
+            90,
+            BTreeSet::from(["declared:a".to_owned()]),
+            "the arc bends the channel and the bends carry the return".to_owned(),
+        )
+        .expect("declared text material"),
+        DeclaredOccurrence::from_text(
+            "declared:a".to_owned(),
+            91,
+            BTreeSet::new(),
+            "the leader founds the channel and the channel carries the leader".to_owned(),
+        )
+        .expect("declared text material"),
+        DeclaredOccurrence::from_text(
+            "declared:c".to_owned(),
+            12,
+            BTreeSet::from(["declared:b".to_owned()]),
+            "the channel returns the leader and the leader founds the arc".to_owned(),
+        )
+        .expect("declared text material"),
     ]
 }
 
@@ -1238,32 +1304,35 @@ fn declared_material() -> Vec<DeclaredOccurrence> {
 /// It therefore composes with the SAME constituents: it re-treads standing contacts and founds new
 /// ones between constituents that are already on closed boundaries.
 fn co_present_arrival() -> DeclaredOccurrence {
-    DeclaredOccurrence {
-        identity: "arrival:co-present".to_owned(),
-        storage_ordinal: 7,
-        caused_by: BTreeSet::from(["declared:a".to_owned()]),
-        text: "the bends carry arc the".to_owned(),
-    }
+    DeclaredOccurrence::from_text(
+        "arrival:co-present".to_owned(),
+        7,
+        BTreeSet::from(["declared:a".to_owned()]),
+        "the bends carry arc the".to_owned(),
+    )
+    .expect("declared text material")
 }
 
 /// A later arrival caused by the last occurrence of the chain, so its rank is new.
 fn causally_later_arrival() -> DeclaredOccurrence {
-    DeclaredOccurrence {
-        identity: "arrival:causally-later".to_owned(),
-        storage_ordinal: 400,
-        caused_by: BTreeSet::from(["declared:c".to_owned()]),
-        text: "the channel returns the arc".to_owned(),
-    }
+    DeclaredOccurrence::from_text(
+        "arrival:causally-later".to_owned(),
+        400,
+        BTreeSet::from(["declared:c".to_owned()]),
+        "the channel returns the arc".to_owned(),
+    )
+    .expect("declared text material")
 }
 
 /// The declared saturated material: a closed boundary whose residual is exactly zero.
 fn saturated_material() -> Vec<DeclaredOccurrence> {
-    vec![DeclaredOccurrence {
-        identity: "saturated:a".to_owned(),
-        storage_ordinal: 0,
-        caused_by: BTreeSet::new(),
-        text: "ab cc ab".to_owned(),
-    }]
+    vec![DeclaredOccurrence::from_text(
+        "saturated:a".to_owned(),
+        0,
+        BTreeSet::new(),
+        "ab cc ab".to_owned(),
+    )
+    .expect("declared text material")]
 }
 
 /// An arrival that reaches the saturated compound with genuinely new structure.
@@ -1274,10 +1343,11 @@ fn saturated_material() -> Vec<DeclaredOccurrence> {
 /// statement rather than `0 = 0`. The only thing standing between the arrival and a transport out of
 /// the compound is `r_Σ = 0`, which is exactly what the control is for.
 fn saturated_arrival() -> DeclaredOccurrence {
-    DeclaredOccurrence {
-        identity: "saturated:arrival".to_owned(),
-        storage_ordinal: 1,
-        caused_by: BTreeSet::new(),
-        text: "ab ee cc ab".to_owned(),
-    }
+    DeclaredOccurrence::from_text(
+        "saturated:arrival".to_owned(),
+        1,
+        BTreeSet::new(),
+        "ab ee cc ab".to_owned(),
+    )
+    .expect("declared text material")
 }

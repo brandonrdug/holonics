@@ -35,14 +35,15 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 
 use holonic_engine::codec_recovery::{
-    conform, Boundary, Emission, OpaqueSymbolCodec, RecoveryApertures, SymbolSeparation,
+    Boundary, Emission, OpaqueSymbolCodec, RecoveryApertures, Symbol, SymbolAlphabet,
+    SymbolSeparation, conform,
 };
 use holonic_engine::conditioned_derivation::{
-    derive, expose, ConditionedBody, DerivationQuery, FoundedMorphology, MorphemicIncidence,
+    ConditionedBody, DerivationQuery, FoundedMorphology, MorphemicIncidence, derive, expose,
 };
 use holonic_engine::derivation_codec_intake::{
-    distinguish, intake, present, CodecIntake, IntakeRefusal, MorphologyDistinction,
-    PositionDistinction,
+    CodecIntake, IntakeRefusal, MorphologyDistinction, PositionDistinction, distinguish, intake,
+    present,
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -54,10 +55,16 @@ use holonic_engine::derivation_codec_intake::{
 /// `29 + 841 + 24389 = 25259` family words, inside the aperture this driver declares below, and
 /// radius three is the shortest radius that can decide an adjacency touching a dropped class — a
 /// two-symbol word carries no character for a dropped symbol's boundary to place.
-fn alphabet() -> Vec<char> {
+fn declared_characters() -> Vec<char> {
     let mut declared: Vec<char> = ('a'..='z').collect();
     declared.extend([' ', '.', '_']);
     declared
+}
+
+/// The declared alphabet as symbols. The conditioners under test speak text; the recovery speaks
+/// symbols, and this is the one translation between them.
+fn alphabet() -> SymbolAlphabet {
+    SymbolAlphabet::from_chars(&declared_characters()).expect("the alphabet carries no repeat")
 }
 
 const RADIUS: usize = 3;
@@ -82,7 +89,7 @@ fn is_separator(symbol: char) -> bool {
 
 /// *Letters agglutinate; separators are dropped and break.*
 fn word_runs() -> OpaqueSymbolCodec {
-    OpaqueSymbolCodec::new(|input: &str| {
+    OpaqueSymbolCodec::over_text(&alphabet(), |input: &str| {
         let mut tokens = Vec::new();
         let mut current = String::new();
         for symbol in input.chars() {
@@ -105,7 +112,7 @@ fn word_runs() -> OpaqueSymbolCodec {
 /// emission as [`word_runs`], differing in one adjacency entry — which is what makes the two
 /// comparable as codecs and their separating input exact.
 fn characters() -> OpaqueSymbolCodec {
-    OpaqueSymbolCodec::new(|input: &str| {
+    OpaqueSymbolCodec::over_text(&alphabet(), |input: &str| {
         input
             .chars()
             .filter(|symbol| !is_separator(*symbol))
@@ -117,7 +124,7 @@ fn characters() -> OpaqueSymbolCodec {
 /// *A consonant run opens a token and carries the vowels after it; a vowel followed by a consonant
 /// breaks.* A wholly different architecture: three classes, one of them dropped.
 fn syllables() -> OpaqueSymbolCodec {
-    OpaqueSymbolCodec::new(|input: &str| {
+    OpaqueSymbolCodec::over_text(&alphabet(), |input: &str| {
         let vowel = |symbol: char| matches!(symbol, 'a' | 'e' | 'i' | 'o' | 'u');
         let mut tokens = Vec::new();
         let mut current = String::new();
@@ -126,7 +133,9 @@ fn syllables() -> OpaqueSymbolCodec {
             let cut = match previous {
                 None => true,
                 Some(before) => {
-                    is_separator(before) || is_separator(symbol) || (vowel(before) && !vowel(symbol))
+                    is_separator(before)
+                        || is_separator(symbol)
+                        || (vowel(before) && !vowel(symbol))
                 }
             };
             if cut && !current.is_empty() {
@@ -147,7 +156,7 @@ fn syllables() -> OpaqueSymbolCodec {
 /// *Everything is one token.* Declared statistics that separate no two symbols and therefore supply
 /// no relation.
 fn one_class() -> OpaqueSymbolCodec {
-    OpaqueSymbolCodec::new(|input: &str| {
+    OpaqueSymbolCodec::over_text(&alphabet(), |input: &str| {
         if input.is_empty() {
             Vec::new()
         } else {
@@ -222,9 +231,30 @@ fn shown(text: &str) -> String {
     text.replace(' ', "\u{b7}")
 }
 
+/// One symbol, spelled through the declared alphabet. The organ carries ordinals; a reader needs
+/// the identity, and this is the only place the two meet in this driver.
+fn spell(symbol: Symbol) -> String {
+    shown(alphabet().identity(symbol).unwrap_or("?"))
+}
+
+/// The symbol a declared character stands for.
+fn symbol_for(character: char) -> Symbol {
+    alphabet()
+        .symbol_of(character.to_string().as_str())
+        .expect("the character is declared")
+}
+
+/// A word, spelled.
+fn spell_word(word: &[Symbol]) -> String {
+    word.iter().copied().map(spell).collect()
+}
+
 fn print_relations(carried: &CodecIntake) {
     let relations = &carried.relations;
-    println!("\n  {} -- recovered from testimony alone", carried.conditioner);
+    println!(
+        "\n  {} -- recovered from testimony alone",
+        carried.conditioner
+    );
     println!(
         "    declared family: {} symbols, radius {}, exhausted -- {} words, {} calls",
         relations.alphabet.len(),
@@ -240,10 +270,13 @@ fn print_relations(carried: &CodecIntake) {
             .iter()
             .find(|block| block.contains(representative))
             .expect("every representative names a class");
-        let members: String = block.iter().map(|symbol| shown(&symbol.to_string())).collect();
+        let members: String = block
+            .iter()
+            .map(|symbol| spell(*symbol))
+            .collect();
         println!(
             "      class {:?}  {:<5}  {{{}}}",
-            shown(&representative.to_string()),
+            spell(*representative),
             match emission {
                 Emission::Emit => "Emit",
                 Emission::Drop => "Drop",
@@ -252,9 +285,11 @@ fn print_relations(carried: &CodecIntake) {
         );
     }
 
-    println!("\n    the separation relation -- each pair with the SHORTEST context that separates it");
+    println!(
+        "\n    the separation relation -- each pair with the SHORTEST context that separates it"
+    );
     println!("    grouped by the class pair it lands in; every separated symbol pair is named");
-    let mut species: BTreeMap<(char, char), Vec<&SymbolSeparation>> = BTreeMap::new();
+    let mut species: BTreeMap<(Symbol, Symbol), Vec<&SymbolSeparation>> = BTreeMap::new();
     for separation in &relations.separations {
         let left = relations
             .representative_of(separation.left)
@@ -271,15 +306,15 @@ fn print_relations(carried: &CodecIntake) {
         let first = members[0];
         println!(
             "      class {:?} apart from class {:?}   shortest context {:?}^{:?}",
-            shown(&left.to_string()),
-            shown(&right.to_string()),
-            shown(&first.prefix),
-            shown(&first.suffix)
+            spell(*left),
+            spell(*right),
+            spell_word(&first.prefix),
+            spell_word(&first.suffix)
         );
         println!(
             "        exhibited at {:?}|{:?}  ->  {:?} vs {:?}",
-            shown(&first.left.to_string()),
-            shown(&first.right.to_string()),
+            spell(first.left),
+            spell(first.right),
             first.left_return,
             first.right_return
         );
@@ -288,8 +323,8 @@ fn print_relations(carried: &CodecIntake) {
             .map(|separation| {
                 format!(
                     "{}|{}",
-                    shown(&separation.left.to_string()),
-                    shown(&separation.right.to_string())
+                    spell(separation.left),
+                    spell(separation.right)
                 )
             })
             .collect();
@@ -302,8 +337,8 @@ fn print_relations(carried: &CodecIntake) {
     for entry in &relations.adjacency {
         println!(
             "      {:?} -> {:?}   {}",
-            shown(&entry.left.to_string()),
-            shown(&entry.right.to_string()),
+            spell(entry.left),
+            spell(entry.right),
             match entry.boundary {
                 Boundary::Join => "Join",
                 Boundary::Cut => "Cut",
@@ -317,8 +352,8 @@ fn print_relations(carried: &CodecIntake) {
         for (left, right) in &relations.gauge_freedom {
             println!(
                 "      {:?} -> {:?}",
-                shown(&left.to_string()),
-                shown(&right.to_string())
+                spell(*left),
+                spell(*right)
             );
         }
     }
@@ -330,7 +365,7 @@ fn print_relations(carried: &CodecIntake) {
             .retained
             .dropped
             .iter()
-            .map(|symbol| format!("{:?}", shown(&symbol.to_string())))
+            .map(|symbol| format!("{:?}", spell(*symbol)))
             .collect::<Vec<String>>()
             .join(" ")
     );
@@ -386,12 +421,11 @@ fn exhibit_species(population: &str, entries: &[PositionDistinction]) {
 /// Exhibit a distinction in both directions, with every distinguishing word and every witnessing
 /// stem named.
 fn print_distinction(distinction: &MorphologyDistinction) {
-    println!(
-        "\n  `{}` against `{}`",
-        distinction.left, distinction.right
-    );
+    println!("\n  `{}` against `{}`", distinction.left, distinction.right);
     if distinction.indistinguishable() {
-        println!("    the body's reading of the deposited identifiers separates NOTHING differently");
+        println!(
+            "    the body's reading of the deposited identifiers separates NOTHING differently"
+        );
         println!("    -- no position pair, in either direction");
         return;
     }
@@ -410,13 +444,19 @@ fn print_distinction(distinction: &MorphologyDistinction) {
         .into_iter()
         .map(|word| format!("{:?}", shown(word)))
         .collect();
-    println!("    every distinguishing word exhibited: {}", words.join(" "));
+    println!(
+        "    every distinguishing word exhibited: {}",
+        words.join(" ")
+    );
     let stems: Vec<String> = distinction
         .witness_stems()
         .into_iter()
         .map(|stem| format!("{stem:?}"))
         .collect();
-    println!("    every witnessing stem exhibited:     {}", stems.join(" "));
+    println!(
+        "    every witnessing stem exhibited:     {}",
+        stems.join(" ")
+    );
 
     for (name, population) in [
         ("only the left founded", &distinction.only_left_reaching),
@@ -427,11 +467,7 @@ fn print_distinction(distinction: &MorphologyDistinction) {
         }
         println!("    committed stems {name}, that reach this material:");
         for firing in population.iter().take(12) {
-            println!(
-                "      {:<14} {}",
-                firing.stem,
-                firing.positions.join("  ")
-            );
+            println!("      {:<14} {}", firing.stem, firing.positions.join("  "));
         }
         if population.len() > 12 {
             println!("      ... and the rest are carried in the returned population");
@@ -445,7 +481,10 @@ fn print_refusal(name: &str, refusal: &IntakeRefusal) {
     match refusal {
         IntakeRefusal::NoRelationRecovered { classes } => {
             for block in classes {
-                let members: String = block.iter().map(|symbol| shown(&symbol.to_string())).collect();
+                let members: String = block
+                    .iter()
+                    .map(|symbol| spell(*symbol))
+                    .collect();
                 println!("      the one class it returned: {{{members}}}");
             }
         }
@@ -519,7 +558,7 @@ fn main() {
     );
 
     let declared = alphabet();
-    let declared_set: BTreeSet<char> = declared.iter().copied().collect();
+    let declared_set: BTreeSet<char> = declared_characters().into_iter().collect();
     let mut controls = Controls::new();
 
     rule("FOREIGN CODEC INTAKE -- recovered relations entering the conditioning path");
@@ -545,21 +584,42 @@ fn main() {
     rule("[1]  THE RELATIONS -- derived from each conditioner's own declared statistics");
     // ---------------------------------------------------------------------------------------------
 
-    let runs = match intake("word-runs", &word_runs(), &declared, RADIUS, APERTURES, &corpus) {
+    let runs = match intake(
+        "word-runs",
+        &word_runs(),
+        &declared,
+        RADIUS,
+        APERTURES,
+        &corpus,
+    ) {
         Ok(carried) => carried,
         Err(refusal) => {
             eprintln!("the word-runs conditioner was refused: {refusal}");
             std::process::exit(2);
         }
     };
-    let chars = match intake("characters", &characters(), &declared, RADIUS, APERTURES, &corpus) {
+    let chars = match intake(
+        "characters",
+        &characters(),
+        &declared,
+        RADIUS,
+        APERTURES,
+        &corpus,
+    ) {
         Ok(carried) => carried,
         Err(refusal) => {
             eprintln!("the character conditioner was refused: {refusal}");
             std::process::exit(2);
         }
     };
-    let syllabic = match intake("syllables", &syllables(), &declared, RADIUS, APERTURES, &corpus) {
+    let syllabic = match intake(
+        "syllables",
+        &syllables(),
+        &declared,
+        RADIUS,
+        APERTURES,
+        &corpus,
+    ) {
         Ok(carried) => carried,
         Err(refusal) => {
             eprintln!("the syllabic conditioner was refused: {refusal}");
@@ -594,20 +654,16 @@ fn main() {
             .relations
             .adjacency
             .iter()
-            .find(|entry| (entry.left, entry.right) == (left, right))
+            .find(|entry| (entry.left, entry.right) == (symbol_for(left), symbol_for(right)))
             .map(|entry| entry.boundary)
     };
     controls.check(
         "the-adjacency-relation-is-ordered",
         syllabic_boundary('b', 'a') == Some(Boundary::Join)
             && syllabic_boundary('a', 'b') == Some(Boundary::Cut)
-            && syllabic
-                .relations
-                .adjacency
-                .iter()
-                .all(|entry| {
-                    Some(entry.boundary) == syllabic.codec.boundary_between(entry.left, entry.right)
-                }),
+            && syllabic.relations.adjacency.iter().all(|entry| {
+                Some(entry.boundary) == syllabic.codec.boundary_between(entry.left, entry.right)
+            }),
         "a consonant carries the vowel after it and a vowel breaks before a consonant -- the \
          transpose is a different relation, and the report agrees with the runner",
     );
@@ -618,7 +674,13 @@ fn main() {
                 .relations
                 .classes
                 .iter()
-                .any(|block| *block == BTreeSet::from(['a', 'e', 'i', 'o', 'u'])),
+                .any(|block| {
+                    *block
+                        == ['a', 'e', 'i', 'o', 'u']
+                            .into_iter()
+                            .map(symbol_for)
+                            .collect::<BTreeSet<Symbol>>()
+                }),
         "the syllabic conditioner's vowel class came out of testimony; no vowel was ever named to it",
     );
 
@@ -626,22 +688,37 @@ fn main() {
     rule("[2]  THE REFUSALS -- typed, never an empty return");
     // ---------------------------------------------------------------------------------------------
 
-    let no_relation = intake("one-class", &one_class(), &declared, RADIUS, APERTURES, &corpus);
+    let no_relation = intake(
+        "one-class",
+        &one_class(),
+        &declared,
+        RADIUS,
+        APERTURES,
+        &corpus,
+    );
     match &no_relation {
         Ok(_) => println!("\n  one-class: RECOVERED, which it must not be"),
-        Err(refusal) => print_refusal("one-class -- statistics that separate no two symbols", refusal),
+        Err(refusal) => print_refusal(
+            "one-class -- statistics that separate no two symbols",
+            refusal,
+        ),
     }
     controls.check(
         "refusal-no-relation",
-        matches!(
-            no_relation,
-            Err(IntakeRefusal::NoRelationRecovered { .. })
-        ),
+        matches!(no_relation, Err(IntakeRefusal::NoRelationRecovered { .. })),
         "a conditioner whose statistics separate nothing is refused by type, not returned empty",
     );
 
-    let absent: Vec<char> = vec!['\u{2603}', '\u{2604}', ' '];
-    let no_word = intake("word-runs", &word_runs(), &absent, RADIUS, APERTURES, &corpus);
+    let absent = SymbolAlphabet::from_chars(&['\u{2603}', '\u{2604}', ' '])
+        .expect("the absent alphabet carries no repeat");
+    let no_word = intake(
+        "word-runs",
+        &word_runs(),
+        &absent,
+        RADIUS,
+        APERTURES,
+        &corpus,
+    );
     match &no_word {
         Ok(_) => println!("\n  absent-alphabet: RECOVERED, which it must not be"),
         Err(refusal) => print_refusal(
@@ -656,7 +733,14 @@ fn main() {
     );
 
     let single = corpus[..1].to_vec();
-    let no_commitment = intake("word-runs", &word_runs(), &declared, RADIUS, APERTURES, &single);
+    let no_commitment = intake(
+        "word-runs",
+        &word_runs(),
+        &declared,
+        RADIUS,
+        APERTURES,
+        &single,
+    );
     match &no_commitment {
         Ok(_) => println!("\n  single-whole: RECOVERED, which it must not be"),
         Err(refusal) => print_refusal(
@@ -736,7 +820,15 @@ fn main() {
         let recovered: Vec<String> = presented
             .runs
             .iter()
-            .flat_map(|run| runs.codec.segment(run).expect("declared symbols only"))
+            .flat_map(|run| {
+                let word = declared.spell(run).expect("a presented run is declared");
+                runs.codec
+                    .segment(&word)
+                    .expect("declared symbols only")
+                    .into_iter()
+                    .map(|token| declared.render(&token))
+                    .collect::<Vec<_>>()
+            })
             .collect();
         if recovered != native_words {
             words_agree = false;
@@ -769,7 +861,8 @@ fn main() {
         let own = native.stem(&stem.stem);
         println!(
             "      the natively founded stem of the same word carries lineage: {:?}",
-            own.map(|stem| stem.foreign_lineage.clone()).unwrap_or_default()
+            own.map(|stem| stem.foreign_lineage.clone())
+                .unwrap_or_default()
         );
     }
 
@@ -787,12 +880,20 @@ fn main() {
     );
 
     println!("\n  WHERE THE EVIDENCE ACTUALLY IS, stated because `CLAUDE.md` §8 requires it:");
-    println!("    these two morphologies commit the SAME stems, so `indistinguishable` above could");
-    println!("    not have come out otherwise and carries no evidence by itself. The measurement is");
+    println!(
+        "    these two morphologies commit the SAME stems, so `indistinguishable` above could"
+    );
+    println!(
+        "    not have come out otherwise and carries no evidence by itself. The measurement is"
+    );
     println!("    `words-identical`, one line up: a boundary table recovered from 25259 black-box");
-    println!("    returns cut 945 KB of real prose into the body's own words and could easily have");
+    println!(
+        "    returns cut 945 KB of real prose into the body's own words and could easily have"
+    );
     println!("    failed. The next section is what makes the instrument's empty return mean");
-    println!("    something -- there the populations really differ and it still decides, both ways.");
+    println!(
+        "    something -- there the populations really differ and it still decides, both ways."
+    );
 
     // ---------------------------------------------------------------------------------------------
     rule("[5b] THE DISTINCTION ANSWERS TO STRUCTURE -- one removal each way");
@@ -823,9 +924,7 @@ fn main() {
     });
     match &quiet {
         Some((stem, distinction)) => {
-            println!(
-                "\n  removed a committed stem that reaches nothing here: {stem:?}"
-            );
+            println!("\n  removed a committed stem that reaches nothing here: {stem:?}");
             println!("    the founded populations now differ by that named member");
             println!(
                 "    the reading: {}",
@@ -852,7 +951,9 @@ fn main() {
     match &moved {
         Some((stem, distinction)) => {
             println!("\n  removed a committed stem that does reach here: {stem:?}");
-            println!("    -- the first such stem in canonical order whose removal moves the reading");
+            println!(
+                "    -- the first such stem in canonical order whose removal moves the reading"
+            );
             print_distinction(distinction);
         }
         None => println!("\n  no removal among the first reaching stems moved the reading"),
@@ -888,15 +989,15 @@ fn main() {
         Some(input) => {
             println!(
                 "\n  the shortest input separating `word-runs` from `characters`: {:?}",
-                shown(input)
+                spell_word(input)
             );
             println!(
                 "    word-runs  -> {:?}",
-                runs.codec.segment(input).expect("declared symbols only")
+                runs.codec.segment(input).expect("declared symbols only").iter().map(|token| spell_word(token)).collect::<Vec<_>>()
             );
             println!(
                 "    characters -> {:?}",
-                chars.codec.segment(input).expect("declared symbols only")
+                chars.codec.segment(input).expect("declared symbols only").iter().map(|token| spell_word(token)).collect::<Vec<_>>()
             );
         }
     }
@@ -913,9 +1014,10 @@ fn main() {
     );
     controls.check(
         "codecs-are-distinct",
-        separating.as_ref().is_some_and(|input| {
-            runs.codec.segment(input).ok() != chars.codec.segment(input).ok()
-        }) && self_separating.is_none(),
+        separating
+            .as_ref()
+            .is_some_and(|input| runs.codec.segment(input).ok() != chars.codec.segment(input).ok())
+            && self_separating.is_none(),
         "the agreeing conditioner and the distinguished one are two objects, not one twice",
     );
 
@@ -929,7 +1031,10 @@ fn main() {
                 .filter(|run| run.chars().count() > RADIUS),
         );
     }
-    let borrowed: Vec<&str> = held_out.iter().map(String::as_str).collect();
+    let borrowed: Vec<Vec<Symbol>> = held_out
+        .iter()
+        .map(|run| declared.spell(run).expect("a presented run is declared"))
+        .collect();
     let conformance = conform(&runs.codec, &word_runs(), &borrowed);
     let widest = borrowed
         .iter()
@@ -945,7 +1050,7 @@ fn main() {
         for disagreement in conformance.disagreements.iter().take(4) {
             println!(
                 "    {:?}: conditioner {:?} recovered {:?}",
-                shown(&disagreement.input),
+                spell_word(&disagreement.input),
                 disagreement.target,
                 disagreement.recovered
             );

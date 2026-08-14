@@ -274,6 +274,13 @@ pub struct CudaRefineExecutor {
     context: CuContext,
     module: CuModule,
     refine: CuFunction,
+    /// `refine_claimed` is RESOLVED AND NEVER LAUNCHED: `saturate` densifies the claimed slots on
+    /// the host after reading them back, which supersedes the kernel's device-side compaction. The
+    /// resolution stays because it is what proves the symbol is present in the committed module and
+    /// because `refine_claimed`'s `MAX_THREADS_PER_BLOCK` is one of the three bounds on `block_x`;
+    /// the handle stays in this field so a later launch needs no second resolution. Recorded rather
+    /// than removed: an unlaunched entry point is a measurement of the module, not dead weight.
+    #[allow(dead_code)]
     claimed: CuFunction,
     /// The LAW: the material-free quotient every organ with a front shares.
     claim: CuFunction,
@@ -479,7 +486,7 @@ impl CudaRefineExecutor {
             let mut site_count = count as u32;
             let mut shell_depth = depth as u32;
             let mut capacity_mask = mask;
-            let mut arguments: [*mut c_void; 12] = [
+            let arguments: [*mut c_void; 12] = [
                 &mut { device_whole.pointer } as *mut u64 as *mut c_void,
                 &mut { device_position.pointer } as *mut u64 as *mut c_void,
                 &mut { device_class.pointer } as *mut u64 as *mut c_void,

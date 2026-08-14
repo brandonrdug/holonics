@@ -27,12 +27,8 @@
 //!
 //! Run: `PATH=/opt/cuda/bin:$PATH cargo run -p holonic-engine --example curvature_is_the_adjacency`
 
-use std::collections::BTreeMap;
-
 use holonic_engine::discrete_curvature::{DiscreteCurvatureConfiguration, FLAT_COORDINATION};
-use holonic_engine::winding_inertia::{
-    winding_inertia, Hand, PassageReturn, SymmetricCirculant,
-};
+use holonic_engine::winding_inertia::{Hand, PassageReturn, SymmetricCirculant, winding_inertia};
 use holonic_engine::{HingeId, VertexId};
 use num_bigint::BigInt;
 use relational_geometry::Rat;
@@ -48,10 +44,7 @@ fn cycle_configuration(n: usize) -> DiscreteCurvatureConfiguration {
     let hinges = (0..n).map(|index| {
         (
             HingeId(index as u64),
-            [
-                VertexId(index as u64),
-                VertexId(((index + 1) % n) as u64),
-            ],
+            [VertexId(index as u64), VertexId(((index + 1) % n) as u64)],
             integer(1),
         )
     });
@@ -96,7 +89,9 @@ fn main() {
     println!("THE DEFICIT FUNCTIONAL AND THE ADJACENCY ARE ONE OPERATOR");
     println!("=========================================================\n");
     println!("  Both organs are defined on the cycle C_n and neither has ever consumed the other.");
-    println!("  FLAT_COORDINATION = {FLAT_COORDINATION}, and every vertex of a cycle has link two,");
+    println!(
+        "  FLAT_COORDINATION = {FLAT_COORDINATION}, and every vertex of a cycle has link two,"
+    );
     println!("  so every deficit below is the same number; what differs is the spectrum.\n");
 
     let mut identity_held = 0usize;
@@ -158,7 +153,11 @@ fn main() {
         );
         println!(
             "        I - Bt D^-1 B == -A/2 : {}",
-            if homogeneous == target { "HELD" } else { "BROKE" }
+            if homogeneous == target {
+                "HELD"
+            } else {
+                "BROKE"
+            }
         );
     }
 
@@ -197,13 +196,20 @@ fn main() {
             (split.positive, split.zero, split.negative)
         })
         .collect();
-    let spectrum_varies = splits.iter().collect::<std::collections::BTreeSet<_>>().len() > 1;
+    let spectrum_varies = splits
+        .iter()
+        .collect::<std::collections::BTreeSet<_>>()
+        .len()
+        > 1;
     controls.push((
         "the deficit is constant across the family while the spectrum is not",
         deficit_constant && spectrum_varies,
         format!(
             "deficit constant {deficit_constant}, distinct splits {}",
-            splits.iter().collect::<std::collections::BTreeSet<_>>().len()
+            splits
+                .iter()
+                .collect::<std::collections::BTreeSet<_>>()
+                .len()
         ),
     ));
 

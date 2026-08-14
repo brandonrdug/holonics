@@ -785,7 +785,16 @@ running sum of them. No mesh, no limit, no error."*
 
 **Stale as of `a444d78`, 2026-08-07.** `crates/holonic-engine/src/leader_quadrature.rs` now implements lightning-leader quadrature, with the self-similarity termination law measured. As deposited this line read: *"No Rust owner implements lightning-leader quadrature."* The closest live material is
 `crates/holonic-engine/src/wave_propagation.rs`, `diffusion.rs`, `sheaf_diffusion.rs`, and the
-RELAMPAGO lightning ecologies. Sphere-packing appears nowhere. The self-similarity termination
+RELAMPAGO lightning ecologies. ~~Sphere-packing appears nowhere.~~ **Also stale, corrected
+2026-08-13, and the refutation is substantive rather than incidental:**
+`papers/source/papers/prime-archimedean-formulation-atlas/main.typ` carries the **Bowl of Integers**
+as an Apollonian sphere packing with the Soddy–Gossett relation, whose growth move is
+`x' = Σⱼ aⱼ − x` — *"an integer-preserving reflection. Repeated reflections grow the packing."* That
+is Brandon's *"integration by reflection (lightning arcs; sphere packing)"* keystone with **both**
+halves in one deposit, and it is the non-terminating case of the reflection series. The narrowed
+reading stays true — there is still no **Rust** owner, and `leader_quadrature.rs` deliberately refuses
+the sphere as a carrier (*"No sphere. No metric ball. No radiated field"*), replacing the covering
+with Minkowski content along a founded path. The self-similarity termination
 criterion is **now deposited as a falsifier and measured** at
 `crates/holonic-engine/src/leader_quadrature.rs`: a span of `10^12` rides in the same extension
 count as a span of `10`, returning `10^24/2` exactly.
@@ -2213,7 +2222,7 @@ immediately proceed into construction" (2026-08-07T18:01:03Z), which is what
 | Methodologies as abstract algorithmic structures | §3 | none |
 | MorphoHDL circuitry analysis; triangular hinge-like simplicial complex | §8 | `archive/blueprints/THE_GROWN_CIRCUIT.md` (contract only, no code) |
 | "Relativistic calculus of information topology" | §8 | none |
-| Lightning-leader integration; sphere-packing; self-similarity limit | §9 | `research/records/2026-08-07_THE_INTEGRAL_IS_THE_PAIR…` (no code) |
+| Lightning-leader integration; sphere-packing; self-similarity limit | §9 | `leader_quadrature.rs` (the self-similarity termination law, measured); `papers/source/papers/prime-archimedean-formulation-atlas/main.typ` (the Apollonian packing as an integer reflection orbit) — **row corrected 2026-08-13; it read "no code"** |
 | Skein relations as the certified-remainder condensation | §11 | none — this is `CLAUDE.md` §11's missing organ |
 | His ranking: RH personal, Hodge structurally central | §10 | none |
 | Sevenfold structure in the residue-stratum render | §10 | unchecked against the winding law |

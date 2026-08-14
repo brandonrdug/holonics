@@ -61,8 +61,7 @@ use num_bigint::BigInt;
 use num_rational::BigRational;
 
 use crate::incidence_production::{
-    DeclaredContactFace, DeclaredOccurrence, IncidenceComplex, IncidenceProductionError,
-    PhaseChart,
+    DeclaredContactFace, DeclaredOccurrence, IncidenceComplex, IncidenceProductionError, PhaseChart,
 };
 
 /// The exact rational carrier. No float enters this module at any point.
@@ -408,15 +407,18 @@ impl MaterialAtlas {
                     caused_by.insert(identity(*cause));
                 }
             }
-            occurrences.push(DeclaredOccurrence {
-                identity: identity(at),
-                storage_ordinal: self.storage_ordinal[contact.owner],
-                caused_by,
-                text: format!(
-                    "{} {}",
-                    self.constituents[contact.from], self.constituents[contact.to]
-                ),
-            });
+            occurrences.push(
+                DeclaredOccurrence::from_text(
+                    identity(at),
+                    self.storage_ordinal[contact.owner],
+                    caused_by,
+                    &format!(
+                        "{} {}",
+                        self.constituents[contact.from], self.constituents[contact.to]
+                    ),
+                )
+                .map_err(MaterialIncidenceError::Complex)?,
+            );
         }
         Ok(occurrences)
     }
@@ -1011,11 +1013,7 @@ impl RustItem {
 /// `rust_item_closings`, and the caller hands the section text over. What this adds is the item
 /// head and the identifier population, which is the same reading `lean_development` performs for
 /// Lean and which nothing performed for Rust.
-pub fn rust_items_of_section(
-    module: &str,
-    storage_ordinal: u64,
-    text: &str,
-) -> Vec<RustItem> {
+pub fn rust_items_of_section(module: &str, storage_ordinal: u64, text: &str) -> Vec<RustItem> {
     let mut found = Vec::new();
     let named = rust_identifiers(text);
     for line in text.lines() {
@@ -1110,7 +1108,10 @@ pub fn rust_identifiers(text: &str) -> BTreeSet<String> {
 /// no edge, counted. That is `lean_development::declared_recruitment`'s own measured discipline,
 /// and its reason transfers exactly: this repository declares `fn new` in hundreds of places, and
 /// a short-name join would land almost all of them on the wrong item.
-pub fn rust_atlas(items: &[RustItem], containers: u64) -> Result<MaterialAtlas, MaterialIncidenceError> {
+pub fn rust_atlas(
+    items: &[RustItem],
+    containers: u64,
+) -> Result<MaterialAtlas, MaterialIncidenceError> {
     let mut by_short = BTreeMap::<&str, Vec<usize>>::new();
     for (at, item) in items.iter().enumerate() {
         by_short.entry(item.name.as_str()).or_default().push(at);
@@ -1281,7 +1282,8 @@ impl ArithNode {
         match self {
             Self::Literal(_) => {}
             Self::Negate(inner) => {
-                let child = inner.receive(label, &format!("{path}U"), constituents, storage, contacts);
+                let child =
+                    inner.receive(label, &format!("{path}U"), constituents, storage, contacts);
                 contacts.push(StructuralContact {
                     from: at,
                     to: child,
@@ -1366,7 +1368,10 @@ pub fn arithmetic_atlas(
 /// `factor := unary ('^' factor)?` — right associative — `unary := '-' unary | atom`,
 /// `atom := digits | '(' expr ')'`.
 pub fn parse_arithmetic(text: &str) -> Result<ArithNode, ArithmeticError> {
-    let glyphs = text.chars().filter(|glyph| !glyph.is_whitespace()).collect::<Vec<_>>();
+    let glyphs = text
+        .chars()
+        .filter(|glyph| !glyph.is_whitespace())
+        .collect::<Vec<_>>();
     let mut cursor = 0usize;
     let node = parse_expression(&glyphs, &mut cursor)?;
     if cursor != glyphs.len() {
@@ -1460,7 +1465,9 @@ fn parse_atom(glyphs: &[char], cursor: &mut usize) -> Result<ArithNode, Arithmet
 }
 
 /// Build a family from presentations, labelling each by its position so the labels carry no reading.
-pub fn arithmetic_family(presentations: &[&str]) -> Result<Vec<ArithConstruction>, ArithmeticError> {
+pub fn arithmetic_family(
+    presentations: &[&str],
+) -> Result<Vec<ArithConstruction>, ArithmeticError> {
     let mut family = Vec::with_capacity(presentations.len());
     for (at, presentation) in presentations.iter().enumerate() {
         family.push(ArithConstruction {
@@ -1530,7 +1537,10 @@ pub fn denoted_value_quotient(
 
     let mut faces = BTreeMap::<String, ConstructionFace>::new();
     for construction in family {
-        let own = sites_of.get(&construction.label).cloned().unwrap_or_default();
+        let own = sites_of
+            .get(&construction.label)
+            .cloned()
+            .unwrap_or_default();
         let owned = own.iter().copied().collect::<BTreeSet<_>>();
         let mut routes = BTreeSet::new();
         for source in &own {
@@ -1828,7 +1838,11 @@ mod tests {
         )
         .unwrap();
         let complex = atlas.found(RankRepresentative::Least).unwrap();
-        assert_eq!(complex.bonds().len(), 1, "equal endpoints found one contact");
+        assert_eq!(
+            complex.bonds().len(),
+            1,
+            "equal endpoints found one contact"
+        );
         let faces = complex.bonds()[0]
             .contact_faces
             .iter()
@@ -1861,7 +1875,10 @@ mod tests {
         assert_eq!(quotient.blocks.len(), 1, "six constructions, one value");
         assert_eq!(quotient.blocks[0].1.len(), 6);
         // Every pair in the block is collapsed by the value and separated by the construction.
-        assert_eq!(quotient.separating_words.len() + quotient.indistinguishable.len(), 15);
+        assert_eq!(
+            quotient.separating_words.len() + quotient.indistinguishable.len(),
+            15
+        );
         assert!(
             !quotient.separating_words.is_empty(),
             "the construction receiver separated nothing"
@@ -1884,7 +1901,10 @@ mod tests {
             .separating_words
             .iter()
             .find(|(left, right, _)| left == "2+2" && right == "2*2");
-        assert!(pair.is_some(), "the isomorphic pair was not separated at all");
+        assert!(
+            pair.is_some(),
+            "the isomorphic pair was not separated at all"
+        );
     }
 
     #[test]
@@ -1923,9 +1943,7 @@ mod tests {
         assert!(heights.iter().any(|height| *height == 0));
         assert!(heights.iter().any(|height| *height == 1));
         // The storage ordinal ascends with the walk and the height does not.
-        let storage_ascends = heights
-            .windows(2)
-            .all(|pair| pair[0] <= pair[1]);
+        let storage_ascends = heights.windows(2).all(|pair| pair[0] <= pair[1]);
         assert!(!storage_ascends, "height tracked the walk order exactly");
     }
 
@@ -1946,7 +1964,8 @@ mod tests {
 
     #[test]
     fn a_rust_section_founds_its_item_and_names_what_it_recruits() {
-        let text = "pub fn founds_a_channel(leader: Leader) -> Channel {\n    return_stroke(leader)\n}";
+        let text =
+            "pub fn founds_a_channel(leader: Leader) -> Channel {\n    return_stroke(leader)\n}";
         let items = rust_items_of_section("holonic_engine::probe", 7, text);
         assert_eq!(items.len(), 1);
         assert_eq!(items[0].name, "founds_a_channel");
@@ -1992,6 +2011,10 @@ mod tests {
         ];
         let atlas = rust_atlas(&items, 4).unwrap();
         assert_eq!(atlas.intake_work().open_joins, 1, "`new` must stay OPEN");
-        assert_eq!(atlas.contacts().len(), 1, "only the unique landing is a bond");
+        assert_eq!(
+            atlas.contacts().len(),
+            1,
+            "only the unique landing is a bond"
+        );
     }
 }

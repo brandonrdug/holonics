@@ -508,13 +508,14 @@ fn world_line_section(
 ) -> Result<CausalSection, String> {
     let source = String::from_utf8(presentation.source.clone())
         .map_err(|_| "code material is not an exterior UTF-8 presentation".to_owned())?;
-    let occurrence = DeclaredOccurrence {
-        identity: format!("{}:later-material", presentation.identity),
-        storage_ordinal: 0,
-        caused_by: BTreeSet::new(),
-        text: source.clone(),
-    };
-    let patches = source.split_whitespace().count();
+    let occurrence = DeclaredOccurrence::from_text(
+        format!("{}:later-material", presentation.identity),
+        0,
+        BTreeSet::new(),
+        &source,
+    )
+    .map_err(|error| format!("declare code material: {error:?}"))?;
+    let patches = occurrence.inscription.len();
     let incidence = IncidenceComplex::found(&[occurrence], patches)
         .map_err(|error| format!("found code-material incidence: {error:?}"))?;
     let complete = candidates

@@ -68,9 +68,7 @@ use num_traits::{One, Zero};
 use relational_geometry::Rat;
 
 use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
-use crate::rational_polynomial::{
-    rational_root_census, ExactPolynomialError, RationalPolynomial,
-};
+use crate::rational_polynomial::{ExactPolynomialError, RationalPolynomial, rational_root_census};
 use crate::structure_group::{
     GroupElement, OrientedEdge, SeparatedPair, StructureConnection, StructureGroup,
     StructureGroupRefusal,
@@ -107,7 +105,10 @@ pub enum LatticeGaugeRefusal {
     VertexCarriesNoGaugeElement { vertex: u64 },
     /// The declared representation is not a homomorphism: `rep(a·b) ≠ rep(a)·rep(b)` for the named
     /// pair. Checked by exhaustion at construction.
-    RepresentationIsNotAHomomorphism { left: GroupElement, right: GroupElement },
+    RepresentationIsNotAHomomorphism {
+        left: GroupElement,
+        right: GroupElement,
+    },
     /// The representation sends every element to the same matrix, so its character separates
     /// nothing and no action built on it can read the configuration.
     RepresentationIsConstant,
@@ -126,7 +127,10 @@ impl std::fmt::Display for LatticeGaugeRefusal {
                 "plaquette {plaquette} names link {link}, which the lattice does not carry"
             ),
             Self::PlaquetteDoesNotClose { plaquette, at } => {
-                write!(formatter, "plaquette {plaquette} does not close at step {at}")
+                write!(
+                    formatter,
+                    "plaquette {plaquette} does not close at step {at}"
+                )
             }
             Self::PlaquetteIsEmpty { plaquette } => write!(
                 formatter,
@@ -269,11 +273,9 @@ impl IntegralRepresentation {
                 let product = left
                     .then(right)
                     .ok_or(StructureGroupRefusal::ProductLeftTheCarrier)?;
-                let (Some(image), Some(l), Some(r)) = (
-                    images.get(&product),
-                    images.get(left),
-                    images.get(right),
-                ) else {
+                let (Some(image), Some(l), Some(r)) =
+                    (images.get(&product), images.get(left), images.get(right))
+                else {
                     return Err(LatticeGaugeRefusal::Group(
                         StructureGroupRefusal::ElementIsNotInTheGroup,
                     ));
@@ -297,7 +299,12 @@ impl IntegralRepresentation {
             .enumerate()
             .all(|(index, matrix)| matrices[index + 1..].iter().all(|other| *matrix != *other));
 
-        Ok(Self { dimension, images, characters, faithful })
+        Ok(Self {
+            dimension,
+            images,
+            characters,
+            faithful,
+        })
     }
 
     pub const fn dimension(&self) -> usize {
@@ -420,7 +427,10 @@ impl Lattice {
                 });
             }
         }
-        Ok(Self { links: carried, plaquettes })
+        Ok(Self {
+            links: carried,
+            plaquettes,
+        })
     }
 
     pub fn links(&self) -> impl Iterator<Item = &Link> {
@@ -487,11 +497,14 @@ impl GaugeConfiguration {
     ) -> Result<Self, LatticeGaugeRefusal> {
         let connection = StructureConnection::declare(group, assignment)?;
         for link in lattice.links() {
-            connection.across(OrientedEdge::forward(link.id)).map_err(|_| {
-                LatticeGaugeRefusal::LinkCarriesNothing { link: link.id }
-            })?;
+            connection
+                .across(OrientedEdge::forward(link.id))
+                .map_err(|_| LatticeGaugeRefusal::LinkCarriesNothing { link: link.id })?;
         }
-        Ok(Self { lattice, connection })
+        Ok(Self {
+            lattice,
+            connection,
+        })
     }
 
     pub const fn lattice(&self) -> &Lattice {
@@ -538,9 +551,12 @@ impl GaugeConfiguration {
     ) -> Result<Rat, LatticeGaugeRefusal> {
         let mut action = Rat::zero();
         for holonomy in self.plaquette_holonomies()? {
-            let weight = representation.plaquette_weight(&holonomy).ok_or(
-                LatticeGaugeRefusal::Group(StructureGroupRefusal::ElementIsNotInTheGroup),
-            )?;
+            let weight =
+                representation
+                    .plaquette_weight(&holonomy)
+                    .ok_or(LatticeGaugeRefusal::Group(
+                        StructureGroupRefusal::ElementIsNotInTheGroup,
+                    ))?;
             action += weight;
         }
         Ok(action)
@@ -562,12 +578,12 @@ impl GaugeConfiguration {
         let group = self.connection.group().clone();
         let mut assignment = Vec::new();
         for link in self.lattice.links() {
-            let at_tail = gauge.get(&link.tail).ok_or(
-                LatticeGaugeRefusal::VertexCarriesNoGaugeElement { vertex: link.tail },
-            )?;
-            let at_head = gauge.get(&link.head).ok_or(
-                LatticeGaugeRefusal::VertexCarriesNoGaugeElement { vertex: link.head },
-            )?;
+            let at_tail = gauge
+                .get(&link.tail)
+                .ok_or(LatticeGaugeRefusal::VertexCarriesNoGaugeElement { vertex: link.tail })?;
+            let at_head = gauge
+                .get(&link.head)
+                .ok_or(LatticeGaugeRefusal::VertexCarriesNoGaugeElement { vertex: link.head })?;
             for element in [at_tail, at_head] {
                 if !group.contains(element) {
                     return Err(LatticeGaugeRefusal::Group(
@@ -588,11 +604,7 @@ impl GaugeConfiguration {
 
     /// A configuration with one link's element replaced. The alteration is the caller's declaration
     /// and is refused when the element is not in the group.
-    pub fn with_link(
-        &self,
-        link: u64,
-        element: GroupElement,
-    ) -> Result<Self, LatticeGaugeRefusal> {
+    pub fn with_link(&self, link: u64, element: GroupElement) -> Result<Self, LatticeGaugeRefusal> {
         let group = self.connection.group().clone();
         if !group.contains(&element) {
             return Err(LatticeGaugeRefusal::Group(
@@ -761,7 +773,9 @@ pub fn characteristic_polynomial(
     operator: &ExactRatMatrix,
 ) -> Result<RationalPolynomial, LatticeGaugeRefusal> {
     if !operator.is_square() {
-        return Err(LatticeGaugeRefusal::Linear(ExactLinearError::NonsquareMatrix));
+        return Err(LatticeGaugeRefusal::Linear(
+            ExactLinearError::NonsquareMatrix,
+        ));
     }
     let extent = operator.rows();
     if extent == 0 {
@@ -790,8 +804,106 @@ pub fn characteristic_polynomial(
 
 /// **The exact spectrum of a rational matrix**: the complete rational eigenvalue population with
 /// multiplicities, and the unresolved factor returned by name.
+/// **The rebase: ask the question in a chart where it is cheap, and lift the answer back.**
+///
+/// A rational root of an integer polynomial reduces, modulo any prime that does not divide the
+/// leading coefficient, to a root of the reduced polynomial over `Z/p`. So **one prime at which the
+/// polynomial has no root refutes every rational root at once** — exactly, with no approximation, no
+/// interval, and no search. `Z/p` has `p` elements; the question is answered by looking at all of
+/// them.
+///
+/// This is `H.0104`'s rebase and nothing more: an invertible change of chart with **zero remainder**,
+/// the free stroke. Without it, `rational_root_census` bounds its search by the Cauchy bound
+/// `max |coefficient| + 1` and runs Sturm sequences across it. On a real transport read off a
+/// pretrained map that interval was measured at half-width `2^770` — because a degree-8 polynomial
+/// over 103-bit entries has a constant term near `8 × 103` bits by Hadamard — while the eigenvalues
+/// themselves cannot exceed `2^106`. The census was not wrong; it was asked in the chart where the
+/// magnitudes live, and **a magnitude is the one species the horizon law says does not cross a frame**.
+///
+/// The prime population is **read off the material**: every prime up to twice the degree, skipping
+/// any that divides the leading coefficient. A polynomial of degree `d` has at most `d` roots over
+/// `Z/p`, so primes above `d` are where a refutation becomes likely, and the degree is the
+/// polynomial's own.
+///
+/// Returns the refuting prime when one exists. `None` means *not refuted here* — never *a root
+/// exists* — so the full census still runs and the returned roots are unchanged either way.
+fn refuting_prime(primitive: &crate::exact_value::IntegerPolynomial) -> Option<u64> {
+    let degree = primitive.degree();
+    if degree == 0 {
+        return None;
+    }
+    let leading = primitive.coefficients.last()?;
+    // **The prime population is read off the cost it is avoiding.** A degree-`d` polynomial over
+    // `Z/p` has at most `d` roots, so a single prime refutes only sometimes — measured on a real
+    // transport, primes up to `2·degree` gave six candidates and none refuted. The count that
+    // matters is therefore not the degree but the **width of the search the census would otherwise
+    // run**, which is set by the widest coefficient: the Cauchy bound is `max |coefficient| + 1`, so
+    // that many bits is exactly what a refutation is worth. Each prime costs microseconds against a
+    // census that costs seconds, and the ceiling is the material's own number rather than a choice.
+    let widest = primitive
+        .coefficients
+        .iter()
+        .map(|coefficient| coefficient.bits())
+        .max()
+        .unwrap_or(0);
+    let ceiling = widest.max(2 * degree as u64).max(3);
+    'candidate: for prime in 2..=ceiling {
+        for smaller in 2..prime {
+            if prime % smaller == 0 {
+                continue 'candidate;
+            }
+        }
+        let modulus = BigInt::from(prime);
+        // A prime dividing the leading coefficient can send the degree down and is skipped: the
+        // reduction is only faithful where the leading coefficient survives.
+        if (leading % &modulus).is_zero() {
+            continue;
+        }
+        let reduced: Vec<u64> = primitive
+            .coefficients
+            .iter()
+            .map(|coefficient| {
+                let residue = ((coefficient % &modulus) + &modulus) % &modulus;
+                u64::try_from(&residue).unwrap_or(0)
+            })
+            .collect();
+        let mut rooted = false;
+        for point in 0..prime {
+            // Horner over `Z/p`, descending.
+            let mut value = 0u64;
+            for coefficient in reduced.iter().rev() {
+                value = (value * point + coefficient) % prime;
+            }
+            if value == 0 {
+                rooted = true;
+                break;
+            }
+        }
+        if !rooted {
+            return Some(prime);
+        }
+    }
+    None
+}
+
 pub fn exact_spectrum(operator: &ExactRatMatrix) -> Result<ExactSpectrum, LatticeGaugeRefusal> {
     let characteristic = characteristic_polynomial(operator)?;
+
+    // The rebase, before the search. If a prime refutes, every rational root is refuted and the
+    // whole characteristic polynomial is the unresolved factor — which is exactly what the census
+    // would have returned after isolating over the Cauchy interval.
+    if let Ok(primitive) = characteristic.primitive_integer_form() {
+        if refuting_prime(&primitive).is_some() {
+            return Ok(ExactSpectrum {
+                extent: operator.rows(),
+                characteristic: characteristic.clone(),
+                rational_eigenvalues: Vec::new(),
+                unresolved: characteristic,
+                intervals: Vec::new(),
+            });
+        }
+    }
+
     let census = rational_root_census(&characteristic)?;
     let mut remaining = characteristic.clone();
     let mut placed: Vec<(Rat, usize)> = Vec::new();
@@ -897,10 +1009,7 @@ mod tests {
 
     /// Build a configuration on the `3 × 3` torus from a declared list of non-identity links, every
     /// other link carrying the identity of the group's own carrier.
-    fn configuration(
-        group: StructureGroup,
-        carried: &[(u64, GroupElement)],
-    ) -> GaugeConfiguration {
+    fn configuration(group: StructureGroup, carried: &[(u64, GroupElement)]) -> GaugeConfiguration {
         let lattice = torus(3);
         let identity = group.identity().clone();
         let assignment: Vec<(u64, GroupElement)> = lattice
@@ -953,17 +1062,32 @@ mod tests {
         assert_eq!(representation.dimension(), 4);
         assert!(representation.is_faithful());
         assert_eq!(representation.distinct_character_values(), 3);
-        assert_eq!(*representation.character(&quaternion([1, 0, 0, 0])).unwrap(), rat(4));
-        assert_eq!(*representation.character(&quaternion([-1, 0, 0, 0])).unwrap(), rat(-4));
-        assert_eq!(*representation.character(&quaternion([0, 1, 0, 0])).unwrap(), rat(0));
+        assert_eq!(
+            *representation.character(&quaternion([1, 0, 0, 0])).unwrap(),
+            rat(4)
+        );
+        assert_eq!(
+            *representation
+                .character(&quaternion([-1, 0, 0, 0]))
+                .unwrap(),
+            rat(-4)
+        );
+        assert_eq!(
+            *representation.character(&quaternion([0, 1, 0, 0])).unwrap(),
+            rat(0)
+        );
         // The Wilson weight is zero at the identity and maximal at the half turn -- `-1 = e^{iπ}`
         // as a group element, `CLAUDE.md` §2b.
         assert_eq!(
-            representation.plaquette_weight(&quaternion([1, 0, 0, 0])).unwrap(),
+            representation
+                .plaquette_weight(&quaternion([1, 0, 0, 0]))
+                .unwrap(),
             Rat::zero()
         );
         assert_eq!(
-            representation.plaquette_weight(&quaternion([-1, 0, 0, 0])).unwrap(),
+            representation
+                .plaquette_weight(&quaternion([-1, 0, 0, 0]))
+                .unwrap(),
             rat(2)
         );
     }
@@ -1001,8 +1125,16 @@ mod tests {
     #[test]
     fn a_plaquette_that_does_not_close_is_refused_by_the_step_that_opens_it() {
         let links = [
-            Link { id: 1, tail: 0, head: 1 },
-            Link { id: 2, tail: 1, head: 2 },
+            Link {
+                id: 1,
+                tail: 0,
+                head: 1,
+            },
+            Link {
+                id: 2,
+                tail: 1,
+                head: 2,
+            },
         ];
         let open = Plaquette {
             id: 7,
@@ -1010,14 +1142,26 @@ mod tests {
         };
         assert_eq!(
             Lattice::declare(links, [open]),
-            Err(LatticeGaugeRefusal::PlaquetteDoesNotClose { plaquette: 7, at: 2 })
+            Err(LatticeGaugeRefusal::PlaquetteDoesNotClose {
+                plaquette: 7,
+                at: 2
+            })
         );
-        let unknown = Plaquette { id: 9, walk: vec![OrientedEdge::forward(5)] };
+        let unknown = Plaquette {
+            id: 9,
+            walk: vec![OrientedEdge::forward(5)],
+        };
         assert_eq!(
             Lattice::declare(links, [unknown]),
-            Err(LatticeGaugeRefusal::PlaquetteNamesAnUncarriedLink { plaquette: 9, link: 5 })
+            Err(LatticeGaugeRefusal::PlaquetteNamesAnUncarriedLink {
+                plaquette: 9,
+                link: 5
+            })
         );
-        let empty = Plaquette { id: 11, walk: Vec::new() };
+        let empty = Plaquette {
+            id: 11,
+            walk: Vec::new(),
+        };
         assert_eq!(
             Lattice::declare(links, [empty]),
             Err(LatticeGaugeRefusal::PlaquetteIsEmpty { plaquette: 11 })
@@ -1048,14 +1192,14 @@ mod tests {
             .into_iter()
             .map(|vertex| (vertex, turns[vertex as usize % turns.len()].clone()))
             .collect();
-        let moved = configuration.gauge_transformed(&gauge).expect("every vertex is named");
+        let moved = configuration
+            .gauge_transformed(&gauge)
+            .expect("every vertex is named");
 
         let differing: Vec<u64> = configuration
             .lattice()
             .links()
-            .filter(|link| {
-                configuration.carried(link.id).ok() != moved.carried(link.id).ok()
-            })
+            .filter(|link| configuration.carried(link.id).ok() != moved.carried(link.id).ok())
             .map(|link| link.id)
             .collect();
         assert!(
@@ -1136,8 +1280,14 @@ mod tests {
         );
         let erased = abelian.commutator_contribution().expect("the group closes");
         assert!(erased.group_is_abelian);
-        assert_eq!(erased.pairs_read, contribution.pairs_read, "the same faces are read");
-        assert!(erased.is_empty(), "an abelian group contributes no commutator");
+        assert_eq!(
+            erased.pairs_read, contribution.pairs_read,
+            "the same faces are read"
+        );
+        assert!(
+            erased.is_empty(),
+            "an abelian group contributes no commutator"
+        );
 
         let representation =
             IntegralRepresentation::natural(abelian.connection().group()).expect("the law");
@@ -1181,7 +1331,10 @@ mod tests {
         ])
         .unwrap();
         let spectrum = exact_spectrum(&rational).unwrap();
-        assert_eq!(spectrum.rational_eigenvalues, vec![(rat(-1), 1), (rat(1), 1)]);
+        assert_eq!(
+            spectrum.rational_eigenvalues,
+            vec![(rat(-1), 1), (rat(1), 1)]
+        );
         assert!(spectrum.is_completely_rational());
         assert_eq!(spectrum.intervals, vec![rat(2)]);
 

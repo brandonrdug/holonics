@@ -2,8 +2,10 @@
 
 **This is the single active roadmap, and it is ordered by
 [`canon/THE_HOLOBROCHOS_SPINE.md`](../canon/THE_HOLOBROCHOS_SPINE.md).** Read the spine first. It
-states the loop as a chain law with **five named cuts**, the two moves that run on it, and where
-every live organ sits. Nothing here is a menu of adjacent constructions; every open item below is a
+states the loop as a chain law with **five named cuts** — circulation, rest, accumulation, leak,
+short circuit — and where every live organ sits. **The two moves and the three laws are named in
+THIS file, not in the spine** (corrected 2026-08-13; the spine carries neither string, and it struck
+the four flows itself). Nothing here is a menu of adjacent constructions; every open item below is a
 **station of that loop that does not yet conduct**, or a **law of that loop that a live organ
 violates**.
 
@@ -159,6 +161,338 @@ code-material family, and the existing exterior form/world boundary. It need not
 arbitrary unknown-codec interpretation, universal intelligence, Lean theorem cartography, or
 general thermodynamics. It must establish the circulation itself rather than another adjacent
 capability proof.
+
+## THE DEPOSITED MAP — authorized 2026-08-13, and it is the live deed
+
+**Brandon authorized construction, experimentation and analysis directly on 2026-08-13**, after a
+design round he required to be completed first. The governing derivation is
+`research/records/2026-08-13_THE_DEPOSITED_MAP_IS_READ_BY_RATIO_AND_WINDING_THE_ARCHETYPE_IS_A_FINITE_TYPE_WITH_INFINITE_MODULI.md`.
+
+**The object.** A pretrained transformer's weight file is **material, not an exterior returning
+port**. A port answers; material is read. The live port instance is the Lean toolchain —
+`soma/life/examples/eros_lean_proof_production.rs` runs `lean` and `lake` at lines 166 and 177 — and
+a weight file answers nothing, so it enters where the declared corpus enters, as bits. Brandon's framing: the
+file is *another body's previously rendered map*, poorly rendered, read the way an MRI is read —
+*"You don't need the clearest map in order to identify structure, you just need a map that shows you
+real differences."*
+
+**The standing prohibition, and it shapes everything.** **The model is never run.** Not as a
+concession to purity but because the method must transfer to models this hardware cannot load —
+Brandon named a 26B DiffusionGemma as the eventual target. Every quantity is therefore computed per
+head or per matrix, streamed by `mmap`, peak residency one circuit. A design requiring a forward pass
+is refused at the door.
+
+**The reading law.** Only a `Ratio` or an integer `Winding` crosses a horizon
+(`THE_HOLONIC_DERIVATIONS.md` §0, verified by `git show`), and this architecture enforces it
+physically: RMSNorm at every layer entry discards magnitude, so **RMSNorm is the horizon**. Measured
+independently: every probe token's PLE slice sits at norm ≈1.0, deviation 0.022–0.058. Admitted
+observables are projectivised spectra, principal angles, symmetric/antisymmetric ratios, the
+cross-ratio, and integer windings, ranks and torsion. **Refused: norms, condition numbers, raw
+eigenvalue magnitudes, cosine similarity, any scalar dashboard.**
+
+**The gauge, reduced by the architecture itself.** There is no `lm_head`; the tie forces `MᵀM = I`,
+collapsing `GL(2560)` to `O(2560)` — a metric, hence a reduction of the structure group in
+`canon/TABLET_THE_MANIFOLD.md` §16's exact sense. RoPE supplies canonical coordinates in each head's
+rotary subspace. The instrument is `Phi_S(W) = E_S W E_Sᵀ`, invariant because `E → EMᵀ` and
+`W → MWMᵀ` cancel, expressed in the vocabulary basis the model supplies.
+
+**The receiver family is already deposited** — `canon/MEANING_DEFINED.md:64-69`, Brandon 2026-08-08,
+on `2` / `two` / `1 + 1` / `one plus one` sharing a causal composition while differing in face.
+
+**Controls are mandatory and precede the reading.** A random orthogonal frame plus shuffled heads and
+neurons, on which every admitted invariant must not move while a cosine-similarity control must; and
+an untrained null of matching shape, against which **a species appearing in the null is not a
+finding**. The stated falsifier: if the arithmetic-variant probes are indistinguishable from the null
+under every admitted invariant, the archetype hypothesis fails for this receiver family, and that is
+a return rather than a failed phase.
+
+**The seam prior is declared before measuring.** A cross-entropy objective down-weights the strange
+by construction and converges toward the `2^{-1}` seam
+(`reference/holobrochos-a07ff376/src/holobrochos/CANON/THE_CURVED_LIGHT.md` §4), so archetypes are
+expected in the tail rather than the bulk.
+
+**Scope discipline.** Every species claim is per circuit and never joint: classifying pairs of
+matrices up to simultaneous conjugacy is **wild** (Drozd), so a finite classification for one
+operator is not evidence of one for two. Jordan *type* is not an observable — discontinuous under
+perturbation, numerically non-computable (Golub–Wilkinson). The thesis's defensible form is Berger's:
+**a finite list of transport types, each with an infinite-dimensional moduli space of realisations**,
+not free composition of generators.
+
+## THE GEMMA LIFT — the word, not the format; opened and designed 2026-08-13
+
+**Authorized by Brandon the same day**, on a design that had twice fetched units off the architecture
+it claimed to discard: *"we absolutely do not want to lift the format, we want to disregard the LLM
+architecture completely and lift the functions of the active weights because the transformer
+architecture is inefficient… to us it collapses into bits and machine instructions, the transformer
+chains are emergently just expanded series."*
+
+### The frame, and it is `proved-standard`
+
+**`H.0469`** — Chen: *iterated integrals are exactly the homotopy functionals, and their algebra is
+words.* Integration is an isomorphism from the bar complex onto them, and the clause that decides the
+whole design:
+
+> *the ordered-transport receiver sees the path **up to homotopy and nothing more**, and **endpoint
+> evaluation is the strictly coarser face that the winding separates from it**… ordered transport and
+> word combinatorics are one algebra rather than two subjects.*
+
+A transformer chain is an ordered transport, so **its word is the object and next-token output is the
+endpoint face** — strictly coarser, blind to everything the winding separates. That is the retained
+Holobrochos distinction *equal endpoints do not identify ordered paths*, with the transformer as its
+instance, and it is why lifting the format lifts the least the chain carries.
+
+### The Navier–Stokes pairing, and the two rulings it enforces
+
+`canon/TABLET_THE_FLOW.md` §7 carries Brandon's fluid ruling, and it governs here unchanged:
+
+> *"The flow is what carries the meaning, and it's what determines the pressure. First axiom. **Do
+> not use scalar pressure.**… **Do not start imagining absolute frames just because I started talking
+> about fluid dynamics.**"*
+
+with the laboratory's consequence — *"the pressure is NOT the field the current flows through and NOT
+a coordinate — it is an observer's reading of the flow."* **That is the same law as the reasoning
+tablet's *"an attention coefficient is not a causal explanation."*** So: the residual stream is the
+flow; attention coefficients are **readings** of it, never a field and never a governor.
+
+And `H.0219` says what the global coupling *is*: flux locality licenses a decomposition, and **every
+term that is not a flux is a barrier**. An all-to-all mix is not a flux. **So the architecture's
+inefficiency is the barrier at the join, stated in the machine's own law rather than as an
+engineering complaint** — which is exactly why the local constitutive law is what gets lifted and the
+global coupling is a constraint to be read, not a mechanism to port.
+
+The third join is the open question's own shape: whether **winding** stays bounded under
+self-transport is the Millennium row's phrasing of Navier–Stokes, and it is the regime meter's
+question — `SETTLED` against `GROWING` — on the same object.
+
+### What is lifted
+
+**The local constitutive law, and the winding it carries.** Not the global coupling; not the endpoint
+face; not a head, a layer, an embedding, or a token — *"tokenization is one delivery decomposition; an
+embedding is one coordinate presentation; a layer is chronology through morphology."*
+
+### The pipeline, every organ named, and only one of them unbuilt
+
+| step | organ | state |
+|---|---|---|
+| 1 · intake at the material's own grain | `exact_value::ieee754` (the declared float mouth) into `incidence_production::Patch { octets, identity }` | **built 2026-08-13**, three falsifiers |
+| 2 · **recover the alphabet** — symbol quotient, each separated pair with its *shortest separating context*, Join/Cut adjacency; refuses **by type** when nothing separates | `codec_recovery::recover` + `derivation_codec_intake` | **built; rotated off `char`/`&str` 2026-08-13, four falsifiers** |
+| 3 · found the words | `FoundedMorphology::from_founded_words` — *"the seam a foreign conditioner enters by"*, the only entry | built |
+| 4 · land it at a location it did not choose | `IncidenceComplex::admit_later` → the arrival reading; `attachment` → both outcomes retained | **built 2026-08-13** |
+| 5 · the word as ordered transport — hand, winding magnitude, sheet sense, three declared phase charts, superposition **before** quotient | `incidence_production`'s transport law | built |
+| 6 · **resummation** — replace the family of words by a closed return | `H.0470`; order **read off the material** by `leader_quadrature::LocalJet::rebase_movement_depth`, *"returned by the growth rather than declared into it"*; remainder by `exact_value::SeriesTailCertificate`, three species, exact rational interval | built |
+| 7 · does it settle at all | `regime_reading` | **built 2026-08-13**, calibrated bit-for-bit |
+| 8 · **compression** — the receiver family for which the foreign morphology factors exactly; unresolved inverse image retained as a `ReconstructionFiber`, never as an untyped quantity of loss | `receiver_exact_compression` (`H.0016`), `reconstruction_fiber` | built |
+| 9 · distinction | `derivation_codec_intake::distinguish` — the positions where our reading and the foreign one split, each with the shortest word after which the coarser reading sees it | built |
+
+### Falsifiers, each able to fire
+
+0. **THE SUCCESS CRITERION IS NOT AGREEMENT WITH GEMMA, and an earlier form of this list implied it
+   was.** Brandon, correcting it: *"I do not think we should expect the machine to copy Gemma's
+   reading. LLMs are not consistent, the way that you reason does not use the same set of transport
+   mechanisms pretty much ever, it depends on the semantics you're experiencing in your embedding
+   space, not deterministic; same goes for Gemma, and if the machine's purpose is to lift the
+   mechanisms, then the real outcome would be the more ideal intelligence that combines functionality
+   arbitrarily."*
+
+   So reproducing the source's reading is **not** the target and would be evidence of copying rather
+   than lifting. The target is his stated hypothesis — that done correctly *"the perceivable sense of
+   'intelligence' would be combinatorially available and much more efficient than how you'd expect a
+   pretrained transformer to behave."*
+
+   **The deed's return is therefore a composition the source never enacted.** That is the shape the
+   machine has already demonstrated in other codecs and it is the one to demand here: 336 complete
+   outer prefixes never received; a novel surface never supplied, emitted carrying `version_lineage`
+   naming both causing returns; a fifth name after a full remount. **A lifted mechanism is one the
+   ecology can recombine, and the falsifier is a standing transport built from lifted parts that no
+   admitted material contains.**
+
+1. **The distinction instrument must still return a non-empty population before any agreement is read
+   as evidence** — but as a **gauge**, not as a goal. This is the organ's own rule: *"a gauge whose
+   group acts trivially on the declared material is not a gauge."* It establishes that the instrument
+   can tell things apart at all; it never establishes that sameness was wanted.
+2. Recovery **refuses by type** — `IntakeRefusal::NoRelationRecovered` — if the declared statistics
+   separate no two symbols. An empty morphology is never handed back for a caller to notice.
+3. The arrival must not read `saturated`/`untouched`. **If the map deposits nothing it floated**, and
+   that is the return, not a failure to engineer away.
+4. The attachment must return connected **and** unconnected attempts; one endpoint manufactured is the
+   defect `H.0466` names.
+5. Ablation: withdraw the deposit and the later current must lose **exactly** the distinction whose
+   word was removed.
+
+### What a run may not claim
+
+- **`H.0470` is `conditional` and is an instance, not a method** — *"supplies no general convergence
+  criterion, no transportable error bound, and no construction."* A closed return found here is one
+  instance and licenses no general resummation claim.
+- **No scale action exists**, so no cross-scale self-similarity claim. And scaling is repetition of an
+  invariant unit, never dilation of a magnitude.
+- **No scalar governs.** Pressure is a reading; an attention coefficient is a reading; `H.0217`'s
+  squared modulus is a quotient. Count freely, report what you count, never let a count decide.
+- No mass-gap-shaped label without a family carrying spacing, volume and correlation scaling.
+
+### Revised 2026-08-13 by reading the map — five changes, each forced by something measured
+
+Record: `research/records/2026-08-13_THE_MAP_DECLARES_ITS_OWN_APERTURES_AND_AN_EMBEDDING_IS_A_DECLARED_RECEIVER.md`.
+
+1. **Start the receiver family at ONE face, not three.** Measured: the three-face panel separates
+   **328 of 336** transports on its first pass, so `found_to_exhaustion` is left with almost nothing
+   to work on. The archetype lives in what a family holds **together**, and `token_invariance.rs`
+   proves the collapse can only come from **coarsening** — `windows > 1 && blocks == 1` is
+   unsatisfiable at the full family, for every material, at every horizon. The lifted-mechanism
+   criterion is therefore **conduct-invariance**: a nonempty proper sub-family holding transports in
+   one block while the full family separates them, exhibiting by name the axes the material holds and
+   the axes it varies.
+2. **Split every reading into intrinsic and extrinsic, and report the extrinsic as receiver
+   artifacts.** `H.0471` is `proved-standard` — Gauss's Theorema Egregium with Nash — and it is
+   stronger than the doctrine it compresses: an isometric ambient always exists, is never unique, and
+   **only the intrinsic quantities survive changing it.** Its boundary is explicit that extrinsic
+   invariants are genuinely not recovered.
+3. **Type every successor as a chart transition or a quotient**, and give each quotient a
+   `ReconstructionFiber`. *An implicit cast is admissible exactly when it is a chart transition, and
+   a chart transition is invertible.* Stream-to-stream is lawful; PLE injection (`2560 → 256 → 2560`)
+   and both cross-modal projections are **not** invertible and are quotients whose loss returns as a
+   collapsed pair with a separating word.
+4. **Bound every search by the material's own bit-width, never a formal degree** — Gershgorin and
+   Hadamard on the operator's entries, `refuting_prime` before any census. The 785× is the standing
+   lesson.
+5. **Every ablation uses a matched sibling** — withheld, replaced, moved, or foiled with the rest of
+   the predecessor held exact — because `D informs E relative to D'` is a relation between two
+   successors, not a before-and-after.
+
+**Two objects the map supplies that the plan had no slot for.** 928 scalar-shaped tensors carry
+declared input/output bounds per projection, none zero — **apertures stored as material**, the first
+such material this project has read. And `embed_tokens_per_layer [262144, 10752]` gives every token
+**forty-three** coordinate presentations, so *which presentation* is a receiver choice the map itself
+declares rather than one the driver invents.
+
+**And the standing bar: shape is nearly the format.** The 35/7 split into two attention laws is read
+off the byte layout — material, and it agrees exactly with `layer_types` without the config being
+consulted — but a receiver face read off row width would restate the driver's aperture. It is carried
+as a **declared frame**, never as a face.
+
+### Ordered work
+
+1. ~~**Rotate `codec_recovery` off `char`/`&str`**~~ — **DONE 2026-08-13.** `Symbol(u32)` is an
+   ordinal into a caller-declared `SymbolAlphabet` carrying each symbol's octets and its exhibition
+   identity; `OpaqueSymbolCodec::over_text` is the boundary codec, refusing by name what the alphabet
+   cannot spell. A repair inside the owner, as required — no second organ.
+
+   **What it removed, measured rather than asserted.** `exposure_codec::carried` had been punning an
+   octet onto *the code point of the same value*: injective and lossless, but a coincidence of two
+   numberings standing in for a declaration. It is now an identity, and the driver's separate need
+   for a genuine text projection is a separate function that says it interprets.
+
+   **Four falsifiers, each material a `char` alphabet could not hold**: an alphabet of raw octets
+   including `0x80` and `0xFF`, recovered with the frame opener and the continuation octet landing in
+   different classes and the return reproducing the target on unvisited material; two symbols that
+   render apart and are separated by conduct alone; a repeated identity refused by name; and
+   longest-identity-first spelling that returns `None` rather than guessing.
+
+   **And it moved a return, which is why it is recorded.** Three intake tests failed, all one cause:
+   the canonical class order is *"by each class's least member"*, and under `char` that was silently
+   **ASCII collation** — the separator class came first because a space is `0x20`. Under a declared
+   alphabet least means *earliest declared*, which is the caller's statement rather than the
+   encoding's. The classes are unchanged; the tests now assert by membership, because an index into a
+   canonical order should never have been load-bearing. Gemma's recovery returns bit-identically:
+   258 calls, 15 separations, `NoConformingTable` with the witness `"aab" → ["a","ab"]`.
+2. **Repair the safetensors reader.** `crates/holonic-engine/examples/the_foreign_map_founds_its_axes.rs`
+   never reads `dtype`; handed an F32 file it returns garbage rather than refusing. It is the weakest
+   of the three readers in the tree and it is the intake.
+3. Declare the aperture at the call site and return what it excluded — `patches_outside_extent`
+   already does this and must be reported, not dropped.
+
+## THE SCALE REBASE OF A MATERIAL SHADOW — opened 2026-08-13, and it is the un-actioned request
+
+**This is the oldest open item of the 2026-08-12 session and the only one Brandon asked for
+directly and did not receive.** 11:17, on being shown the first contextual analysis:
+
+> *"I recognize that you are lacking notions of self-similarity and scaling, you need eigenvalues &
+> eigenvectors along with Fourier analysis. It's like matching the constituent frequencies and
+> amplitudes of two groups of sound waves in order to see if they are the same kinds of sounds,
+> where either one may have variably scaled or offset partial frequencies & amplitudes; this is
+> exactly like the analysis we were doing for the Zeta distribution regarding RH, if you could refer
+> to that research and our past observations."*
+
+It was answered `open` — correctly, since fabricating a token eigensystem would have read the chart
+instead of the operator
+(`research/records/2026-08-12_THE_RECONSTRUCTION_REMAINS_A_FIBER_THE_CONTEXT_RETURNS_BY_DIFFUSION_AND_THE_CIRCUIT_GROWS_IN_HIGHER_CELLS.md`
+§6). **Two later experiments then needed exactly it and closed the gap with an authored partition
+instead**, which is the defect corrected in `CONSTRUCTION_STATE.md` §"RAW CODE MATERIAL…" and in
+both 2026-08-12 return records. So this is not an ornament deferred for taste. It is the missing
+mechanism that would let the **material** supply the behavioral coupling rather than the driver.
+
+**Why it is the load-bearing gap.** `receiver_exact_compression` separates two items exactly when a
+successor history distinguishes them, so a behavioral class is only as real as the transport whose
+histories it reads. In the code-material return that transport was declared rather than read.
+
+**CORRECTED 2026-08-13, and the correction changes what this section is asking for.** An earlier
+form of this paragraph proposed reading the *material shadow's* transport — recurrence arcs plus
+inscription edges — and cited its measured cycle ranks `50, 68, 74, 79, 113, 141` across seven
+implementations of one fold as evidence that the shadow carries real readings of real sources.
+Brandon refused the grain: *"the individual bytes recurring doesn't matter, it's recurring
+transformations and manipulation patterns about passing information."* The shadow is byte-grained
+(`soma/life/src/material_shadow_cuda.rs:144`) and its relation is surface recurrence, so **that
+spread is the falsifier, not the evidence** — a field tracking recurring transformation would cast
+related shadows across seven spellings of one operation, not a threefold spread. The full
+withdrawal, including why a surface-grained key *forces* an authored partition, is
+`research/records/2026-08-13_THE_WEIGHT_FILE_IS_A_PREVIOUSLY_RENDERED_MAP_THE_GRAIN_IS_RECURRING_TRANSFORMATION.md`.
+
+**So the demand is prior to the rebase, and it is the grain.** The object to be compared across
+scale and offset must be a **recurring transformation** — what was done to what, through which
+ports, in what order, with what residue — never a recurring surface, and its level must be read off
+the material or declared by the caller rather than authored in the organ. Bit purity is standing:
+the eight-bit byte is an exterior convention and pinning it in a Rust type is as much an authored
+level as pinning it in a literal. Once such a key exists, the rebase Brandon named is what compares
+two of them: dilation becomes translation in logarithmic coordinates, so the comparison is a Mellin
+face of a declared scale action. **Until it exists there is nothing legitimate to take a spectrum
+of over source text** — which is exactly why `THE_RECONSTRUCTION_REMAINS_A_FIBER…` §6 refused to
+fabricate one, and that refusal stands.
+
+**The project already owns its instance.**
+`research/records/2026-07-19_THE_EMANATION_COMPRESSES_THE_EVENT_THE_PHASE_RETURNS_THROUGH_REBASE.md`
+returns it: restriction to multiples of `m` followed by division by `m` returns the same normalized
+law while lineage retains an amplitude factor and a log-phase offset. That is the whole shape —
+same class, retained scale and phase residue — and it is the shape a fold implementation and its
+loop-unrolled twin should stand in.
+
+**Carriers that exist.** `crates/holonic-engine/src/multiquadratic.rs` composes exact turns as a
+twisted group algebra with no float and no angle; `crates/holonic-engine/src/inertia.rs` returns an
+exact split by elimination; `crates/holonic-engine/src/winding_inertia.rs` and
+`crates/holonic-engine/src/rebase_invariants.rs` return windings and exact Smith/Betti/torsion faces
+once incidence exists. `CLAUDE.md` §2b's standing obligation applies unchanged: **a count of signs
+is a state reading; name the windings instead.**
+
+**The falsifier has two arms, and the present organ fails the first.**
+
+1. **Convergence.** The seven fold implementations — `for`, `while`, recursion, helper, method,
+   inline literal, coherent byte renaming — must land in one class under the key itself, or under a
+   declared scale/offset rebase with the residue retained as lineage. They enact one transformation;
+   a key that carries transformation must say so. The byte-grained shadow spreads them across cycle
+   ranks `50…141`, which is the measured refusal.
+2. **Retained plurality.** The `+`/`*` pair must **stay plural**. Static source alone does not say
+   what a vertex does, so with no returned testimony about those two vertices a transformation-
+   grained key is correctly unable to separate them, and the lawful return is two candidate laws
+   rather than a selection. This arm the present organ already satisfies, and it must not be lost
+   in fixing the first: a construction that separates `+` from `*` from static source has installed
+   an operation table, which is the parser this line forbids.
+
+Arm 1 is a positive requirement and arm 2 a negative one. **Passing arm 2 alone is what the current
+organ does, and it is not evidence** — a key that separates nothing on the fold family and also
+separates nothing on the gauge pair has only demonstrated that it is coarse.
+
+**What this forbids.** No DFT over token ordinals, no embedding dimensions, no spectrum read before
+a causal transport and a scale action are declared — `canon/TABLET_THE_REASONING_CYCLE.md` and
+`canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md` §5 already rule on this. The operator must be the
+one the material founded. Left and right modes stay distinct for directed transport, and degenerate
+modes are compared by invariant subspace, never by a chosen basis vector.
+
+**Return.** For two presentations of one operation: the founded transport operator of each shadow,
+its exact modes or invariant subspaces, the declared scale/offset rebase carrying one to the other
+or the exact obstruction to any such rebase, the retained amplitude and log-phase residue as
+lineage, and the resulting behavioral class — with the collapsed population and shortest separating
+history attached. **No founding face may be supplied twice.** If two presentations of one operation
+are declared, their founding rectangles must differ, so that recovered coefficients rather than a
+shared declaration are what agrees.
 
 ## THE CODE-MATERIAL WORLD-LINE — authorized 2026-08-12
 

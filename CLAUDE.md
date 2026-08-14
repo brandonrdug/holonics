@@ -54,12 +54,13 @@ Read these nine, in order, and nothing else by default:
 | file | what it is |
 |---|---|
 | **this file** | the operating contract. How to work, what is convicted, what is authorized. |
-| `canon/THE_HOLOBROCHOS_SPINE.md` | **the spine — the whole hollow loop.** Two loops, four flows, the two moves that run on them, the three laws, and where every live organ sits. **The roadmap is ordered by it.** Read it before proposing any construction; an organ that no station names is churn — and that is one command, `grep -i '<the object>' canon/THE_HOLOBROCHOS_SPINE.md`, which returned **zero** for `lean`, `mathlib` and `kernel` on the day a mathlib plan was posed as Phase 1. |
+| `canon/THE_HOLOBROCHOS_SPINE.md` | **the spine — the whole hollow loop.** It states the loop as a **chain law** (`q_{k+1} − q_k + B j_k = r_k`, so visible current need not balance instantaneously because the residual can be stored) with **five named cuts** — circulation, rest, accumulation, leak, short circuit — and where every live organ sits. **Corrected 2026-08-13:** this row previously read *"Two loops, four flows, the two moves that run on them, the three laws"*, and the spine contains **none of those four strings**. The three laws are the roadmap's own; the four flows were **struck by the spine itself** along with `afference`/`efference`/`reafference` as station names. **The roadmap is ordered by it.** Read it before proposing any construction; an organ that no station names is churn — and that is one command, `grep -i '<the object>' canon/THE_HOLOBROCHOS_SPINE.md`, which returned **zero** for `lean`, `mathlib` and `kernel` on the day a mathlib plan was posed as Phase 1. |
 | `canon/THE_DOCUMENT_LAW.md` | how a claim travels from conversation to canon, the genres, the grades, how supersession is recorded. |
 | `canon/THE_DIALECT.md` | **how to read Brandon**, measured over 8,935 of his messages. Which vocabulary is his and which the assistant's, the eleven correction archetypes ranked by frequency, his register, and ten inference rules. It **declares itself a prerequisite of `THE_QUOTE_NETWORK.md`** and corrects it — a large part of the vocabulary that network organises is not his. Until 2026-08-09 no governing document named this file, so the prerequisite was not in force; that is why it is here. |
 | `canon/THE_QUOTE_NETWORK.md` | **where every idea came from, in Brandon's words**, themed, with "where this lives now" per theme. Read this before theorising about what he wants. |
 | `canon/THE_EXPLORATIVE_FAILURE.md` | the condition that identifies the recurring escalation — *a construction whose object already has an owner, answered with a new organ beside it rather than a repair inside it* — its trigger, and its enumerated instances. It is checkable **before** the work, which is what the five prior statements of the pattern were not. |
-| `canon/THE_MEASURED_CAPABILITIES.md` | **the evidence index: what the machine has actually done**, from 96 binaries run rather than read. Seven operations, seven causal mechanisms, the bounds, and the unrecoverable figures that may not be cited. Read this before proposing construction — most of what looks unbuilt is built, undriven, or blocked on one missing input file. |
+| `canon/THE_MEASURED_CAPABILITIES.md` | **not a trophy list — a list of things the machine has already been made to do, successfully, as partials.** It is evidence that the theories work when applied. Its use is to stop you asserting a wall, or treating a future implementation as harder than it is: the machine has been observed doing all of these trivially, in one codec or another. Read it before proposing construction. |
+| `canon/THE_TIMELINE.md` | **every day of this repository** — who ran it, what Brandon asked for, what returned, what was deposited, and the ten corrections he has had to issue more than once. It also serves the purpose above: it is the record of what has already been worked through, so it is not worked through again. |
 | `blueprint/THE_ROADMAP.md` | the single active roadmap. **The open work is stated by station** at the top; everything below that is the returned ledger and its provenance. |
 | `CONSTRUCTION_STATE.md` | the position record. What is admitted, what survived the transition, what must be re-established. |
 
@@ -70,6 +71,8 @@ deposited in one day for want of them.** These orient reasoning; none schedules 
 |---|---|
 | **`THE_CLAIM_INDEX.md`** | **the table of contents across every genre**, generated from the tree so it cannot drift. Enter here when you do not know which file owns a subject. |
 | `canon/THE_CORRESPONDENCE_ATLAS.md` | **168 correspondence cards** keyed by holonic face: what other fields call the same thing, and where each `NON-EQUIVALENCE` is recorded. **Read this before claiming anything is absent** — the corpus could not be entered by concept until it existed. |
+| **`canon/THE_OWNER_ATLAS.md`** | **which owner implements or states a thing, and at what line.** `index`, asserts nothing. The correspondence atlas lets you enter by *concept*; the claim index is generated from titles and cannot carry a line; **nothing answered "who owns this, where"** until 2026-08-13, when that question cost four full network sweeps in one evening. Its declared aperture is the mouth, Fourier/spectral, spin/charge/mass/gravitas, Einstein/curvature, circuitry, and lightning. **A subject not in it is absent from the atlas, not from the tree.** Every measured absence carries its command and its date. |
+| `canon/THE_INFORMATION_ENGINE.md` | **the cycle, its two strokes, every station's owner with its measured wiring, and the surface each runs on.** Carries the one measurement that orders the engine work — *the body is a descent with no return edge*, 21 modules and 20 hops, with every closing of emit → world → return living in one of 167 drivers — and §5, **the mouth**. |
 | `canon/THE_MILLENNIUM_FRAME.md` | all six problems, each as the receiver question it is here and the organ it lands on. `interpretation` throughout; **no deed may be graded by a row in it.** |
 | `canon/TABLET_THE_MANIFOLD.md` | charts as types, the structure group as the legal casts, Darboux and Liouville, holonomy and holomorphy at `√z`, and §21 — reflection as the mechanism, the crossing bearing the load. |
 | `canon/TABLET_THE_OPERATIONS.md` | **the elementary operations, added 2026-08-11 and ratified the same day**: every classical operation is a construction, a transport, a face, or a quotient; the Dirac primitives typed (a ket is a construction, a bra a receiver, an outer product a deposit); the trace as the basepoint-free face of a closed loop; the kernel as the collapsed-pair population; parity, chronology, and reversibility as three objects. `H.0476`–`H.0480`. **This is the reasoning dialect, not an ornament** — his ruling: *"it has to be the dialect that you use for reasoning."* |
@@ -147,9 +150,10 @@ soma/     body               pure law, no_std, zero dependencies
           kernel/soma.spv    committed boundary artifact; its toolchain is excluded
 ```
 
-**Measured 2026-08-10 at `f75a81c`+dirty:** `cargo test --workspace` **1,984 passed, 0 failed, 14
-ignored**, summed across 42 `test result:` lines. (1,949 at `923b8c5`+dirty; 1,963 at `27fc74d`;
-1,971 at `51c066f`.) The ten Typst roots under `papers/source/`
+**Measured 2026-08-13 06:10 at `1921b86`, clean tree:** `bash tools/gates.sh` **9 of 9**;
+`cargo test --workspace` **2,184 passed, 0 failed, 19 ignored**, summed across 42 `test result:`
+lines. (Earlier: 1,984 at `f75a81c`+dirty on 2026-08-10; 1,949 at `923b8c5`+dirty; 1,963 at
+`27fc74d`; 1,971 at `51c066f`.) The ten Typst roots under `papers/source/`
 compile and `validate-registry()` passes on **262** unique registry entries and **132**
 `mathematics/` objects. (Earlier: 1,732 at `532ea1b`+1; 1,701 at `fa0f92d`; 1,545 on 2026-08-08
 19:27 at `101882f`; 1,512 at `d91720e`; on 2026-08-07 14:34 it was **730**.)
@@ -793,6 +797,77 @@ what has actually returned.
 
 ---
 
+## 0i. The mouth, and four corrections it forced — ratified 2026-08-13
+
+The full derivation is
+`research/records/2026-08-13_THE_MOUTH_IS_AN_ACTIVE_LENS_THE_LOCATION_IS_CO_FOUNDED_AND_THE_PASSAGE_MUST_DEPOSIT.md`;
+the compressed law is `canon/THE_INFORMATION_ENGINE.md` §5; the located owners are
+`canon/THE_OWNER_ATLAS.md`. This section carries only what governs conduct.
+
+**Brandon's ruling, verbatim:** input is *"like if inputting data was akin to throwing objects into
+the ocean, if you're mindlessly throwing data at it it'll just end up floating and doing nothing, but
+if you're throwing real materials and solvents into particular locations then the local ecology would
+certainly be affected and respond."* And the mouth is not peripheral: *"it is a part of the complete
+cycles and won't really be something to analyze without the engine being complete."*
+
+**An input is the source term of the chain law.** Depositing material at a location is setting
+`r ≠ 0` at a site; the fate is read off which term moves. The mouth needs no vocabulary the engine
+lacks, and `IncidenceComplex::admit_later` already returns that reading, with **two distinct ways to
+float** — `saturated` (it arrived and nothing was caused) and `untouched` (it reached nothing).
+
+**Three laws make "it floated" checkable rather than a judgement**, and none is the assistant's: no
+two-body contact, so a mouth that hands material straight to the interior only mirrors; perception is
+landing, so unreached material is not perceived at all; and **the passage must deposit**, whose
+contrapositive is the effectiveness test — *if nothing was deposited, nothing passed.*
+
+**The location is co-founded, never chosen.** *"ground is not a passive terminal selected from
+above"* — the path founds at actual local contact between grown constructions, and a world must
+retain **connected and unconnected outcomes** rather than manufacturing one endpoint (`H.0466`,
+`proved-derived`). Do not design an intake port that arriving material addresses; the site grows
+toward it and the failures are kept.
+
+**Do not call it "the one mouth."** That phrase means `ONE LAW, ONE MOUTH` — host and device
+compiling one law source — and Brandon disclaimed a derived form of it on 2026-07-04 as drift needing
+an audit. The laboratory's name for this object is **the active mouth**.
+
+### The four corrections, each of which a later session would otherwise repeat
+
+1. **The Einstein field equation is live, registered and `proved-standard`** — `H.0460`, with the
+   contracted Bianchi identity in its own statement, so a solution owes `∇^μT_μν = 0`. It is usable as
+   **presented mathematics** through the translation portal `H.0463`, which requires mapping each
+   named structure and proving preservation of the selected laws. **What the spine bars is the
+   Holobrochos slogan-form** — *"the reafference loop IS the field equation"* — graded `HUNCH`/`OPEN`
+   at its source. Hedging the mathematics aims the bar at the wrong object.
+
+2. **Search for the mechanism, never the phrase.** Two independent sweeps returned *reflection
+   coefficient: absent* while `crates/holonic-engine/src/analytic_field.rs:1142` computes exactly
+   that, exactly over `Rat`, with a retained `energy_residual` and a three-way admission fiber —
+   because the field is named `reflection`. This is §5's convicted `fn without_stem` defect
+   recurring, on a different subject, four days later. **Grep the operation, then read the module.**
+   An absence claim from a grep over names is not a measurement.
+
+3. **A grain error is not an uncertainty cost.** There is no uncertainty relation, Heisenberg, Gabor
+   or time-bandwidth statement anywhere in the tree — measured — and the framing is *refused* rather
+   than merely absent: the corpus's replacement is **the collapsed-pair population of a declared
+   receiver family**, with the route being to climb rungs, never to turn a scalar dial inside one.
+   The last construction promoted into an *"aperture law"* was withdrawn for mistaking a caller's
+   output-buffer guard for a transport bound. Importing the uncertainty relation by resemblance is
+   the failure this rule prevents, and it was committed once this session and withdrawn.
+
+4. **`ArrivalResponse` is the shape a reading should have**, and it is worth imitating outside the
+   mouth: plural lists rather than counts, per-boundary **predicted-versus-happened** rather than a
+   verdict, what the aperture excluded reported rather than dropped, and an exact inverse beside it.
+
+### The horizon law governs every crossing
+
+Across a frame boundary only a **`Ratio`** — carried as a pair `(num, den)`, never divided — or an
+integer **`Winding`** survives. `Reach`, `Flow` and `Rank` are frame-relative. **Magnitudes do not
+cross.** The mouth is a frame boundary, so an arrival reading may return ratios and windings and no
+magnitudes; and an occurrence must carry the five items the quantum-property record demands — the
+transformation, phase and hand **before** the quotient, composite incidence and sector multiplicity,
+the receiver pivot actually held, and the returned consequence with its residual. Mass **weighs and
+never gates** (`soma/body/src/arrow.rs:15-26`); the cohere face gates.
+
 ## 1. The floor is a carrier, not a retired interface
 
 **The single most damaging defect in the inherited authority was an admission rule that made the
@@ -985,7 +1060,20 @@ property of the form rather than of a declared side. State the **split** and the
 circulant symmetry its inertia factors through the character group and every negative direction has
 a name — its winding number — so the lawful return is *these nine passages, each labelled by how far
 it winds*, never *nine negative directions*. `inertia.rs` computes the split correctly by elimination
-and does **not** yet name the passages. That is owed.
+and does not itself name the passages.
+
+**CORRECTED 2026-08-13: the naming organ EXISTS and this paragraph called it owed for four days.**
+`crates/holonic-engine/src/winding_inertia.rs` is 2,883 lines and its opening states exactly this
+obligation as its occasion — *"Inertia returned as **windings**: every passage of a circulant form
+named by how far it turns… This module declines to delete it."* For a symmetric circulant
+`λ_k = Σ_j c_j ω^{jk}`, so the inertia **factors through the character group**: the sign of a
+direction is determined by `k` alone, and `k` is a winding. It reaches exactness by a Dickson
+polynomial with exact Sturm bisection, Niven's theorem for the rational cases cross-checked against
+Sturm, nullity decided algebraically by cyclotomic divisibility, and an `AlgebraicRoot::isolate`
+certificate against a Faddeev–LeVerrier characteristic polynomial.
+`canon/TABLET_THE_TURN.md` and `canon/TABLET_THE_OPERATIONS.md` both already credit it as the owner.
+What remains true is the division of labour: `inertia.rs` returns the split, `winding_inertia.rs`
+names the passages, and a return that quotes the first without the second is still a state reading.
 
 And the audit this implies, which nobody has run: **every bare sign stored on a conduct path has done
 what a float does.** Find each `-` that is retained state rather than traversal and ask whether the
@@ -1353,6 +1441,28 @@ The grading discipline in `canon/EPISTEMIC_GRADES.md` stands. Three additions:
   populations equidistributed mod `p` to within one, which is a *theorem about contiguous integer
   intervals*, not a discovered property of the construction. Mark such receipts
   `definition`/`historical`, not `established-bounded`.
+- **A returned partition may not be the preimage of a field the driver authored.** The sharpest
+  form of the rule above, added 2026-08-13 because the general form did not catch it. When a deed
+  returns a *classification* — fibers, blocks, families, equivalence classes — trace the classifying
+  quantity back to its origin. If two items land together because the driver handed them the same
+  declared value, the class population is a restatement of the declaration table and carries no
+  evidence about the material, however exact the apparatus between them.
+
+  Measured instance, and it is the reason this is a rule: on 2026-08-12 two returns headlined
+  fiber agreement. `the_code_material_returns_its_world_line.rs:637-746` gave six of seven Python
+  presentations the identical founding face `[0, 1, 1, 2]`; `the_conditioned_section_returns_after_detachment.rs:731-780`
+  declared seven presentations over four `ExteriorLaw` variants. Seven-into-one and seven-into-four
+  were forced at declaration. The apparatus — resident CUDA attachment, source departure, exact
+  remount, disjoint coordinates, targeted ablation — was real and remains graded; only the
+  *partition* was authored, and that was the part being quoted.
+
+  **The check is one question asked before the receipt is written: which declared input, if I varied
+  it across two members of the same returned class, would move them apart?** If the answer is "the
+  one I set equal for both," the class is authored. Brandon stated the general form on 2026-08-12 at
+  17:14 — *"it is absolutely foolish that you would establish the parameters of the experiment and
+  then be surprised when you did not run an experiment that would invoke that kind of behavior"* —
+  and §0g deposited it as *"an archetype does not define the experiment"* at 17:37. The next
+  experiment carried the same shape at 18:36, which is why the abstract statement was not enough.
 - **A falsification is a first-class return.** A deed that proves its own receiver family cannot
   see what it was built to see has returned real evidence and passes its grade. Record it as a
   `counterexample` or `open` with the exact blindness proved, and do not treat the phase as failed.
@@ -1607,6 +1717,15 @@ The rules, and they are checkable:
   is right and the record disagrees, fix the record.
 - Distinguish his direct rulings from assistant interpretation in every deposit, as the research
   records already do. His corrections are provenance and they govern.
+- **Never refer to a document by an index.** No "section 8", no "figure 0", no "rule 2", no
+  "§3.7" — in conversation with him, name the thing in words so the semantics travel with the
+  reference. Say *the rule that a cost is measured in work and never in elapsed time*, not the
+  number that points at it. An index is an address; he does not hold the address book, and a
+  reference he has to resolve is a reference that failed. Brandon, 2026-08-13: *"if you want to
+  make a reference to a policy or idea we employ in protocols, you refer to it completely in text
+  in order to fully employ the semantics, not 'figure 0'."* This is the same defect as naming work
+  by an ordinal, one layer out: the number carries no meaning and the name carries all of it.
+  Inside documents a section number is a locator and is fine; in conversation it is not.
 - Do not moralize, do not hedge a verified result, and do not open with an assessment of the
   request. Answer the question that was asked.
 - **Do not restate what he has already told you.** Reporting a gap he named, or re-flagging a

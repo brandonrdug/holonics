@@ -36,7 +36,7 @@ use std::fs::File;
 use std::path::{Path, PathBuf};
 
 use holonic_engine::codec_recovery::{
-    conform, Boundary, Conformance, OpaqueSymbolCodec, RecoveredCodec,
+    conform, Boundary, Conformance, OpaqueSymbolCodec, RecoveredCodec, Symbol,
 };
 use holonic_engine::codec_system::{
     cross_check, cross_check_over, CodecIndexReceiver, CodecSystem, ReversedInputOrder,
@@ -132,9 +132,15 @@ fn run() -> Result<(), String> {
 
     println!("\n=== [2b] THE DIRECT QUOTIENT, BY A SECOND ALGORITHM ===");
     println!("  The quotient above is iterated refinement over contexts drawn from the exhausted");
-    println!("  family. This recomputes it in one pass by adjacency signature — every octet keyed by");
-    println!("  exactly which octets follow it and which precede it — and the two must land on the");
-    println!("  same partition. The signature route cannot be coarser than the refinement, because a");
+    println!(
+        "  family. This recomputes it in one pass by adjacency signature — every octet keyed by"
+    );
+    println!(
+        "  exactly which octets follow it and which precede it — and the two must land on the"
+    );
+    println!(
+        "  same partition. The signature route cannot be coarser than the refinement, because a"
+    );
     println!("  one-hole context of length two *is* the signature, so agreement pins both.");
     let signature = signature_quotient(&material, &recovery.alphabet);
     let refined: BTreeSet<BTreeSet<u8>> = recovery.direct_quotient.iter().cloned().collect();
@@ -151,7 +157,10 @@ fn run() -> Result<(), String> {
     );
     if refined != signed {
         for block in refined.symmetric_difference(&signed).take(6) {
-            println!("      only one route holds {}", render_octets(&block.iter().copied().collect::<Vec<_>>()));
+            println!(
+                "      only one route holds {}",
+                render_octets(&block.iter().copied().collect::<Vec<_>>())
+            );
         }
         return Err("the two quotient routes disagreed".to_owned());
     }
@@ -172,22 +181,29 @@ fn run() -> Result<(), String> {
         "  implementation of the same decomposition. The answer key is Rust's own decoder; it is"
     );
     println!("  consulted here for grading only and no part of the recovery ever called it.");
-    let population: Vec<String> = held_out.iter().map(|octets| carried(octets)).collect();
-    let borrowed: Vec<&str> = population.iter().map(String::as_str).collect();
+    let population: Vec<Vec<Symbol>> = held_out.iter().map(|octets| carried(octets)).collect();
+    let borrowed: Vec<Vec<Symbol>> = population.clone();
     let key = answer_key();
     let conformance = conform(&codec, &key, &borrowed);
     exhibit_conformance("held out", &conformance);
     // and on the material it was founded on, because a codec that disagrees with the key where it
     // *did* look is a different finding from one that disagrees only where it did not.
-    let founding_population: Vec<String> = founding.iter().map(|octets| carried(octets)).collect();
-    let founding_borrowed: Vec<&str> = founding_population.iter().map(String::as_str).collect();
+    let founding_population: Vec<Vec<Symbol>> =
+        founding.iter().map(|octets| carried(octets)).collect();
+    let founding_borrowed: Vec<Vec<Symbol>> = founding_population.clone();
     let founding_conformance = conform(&codec, &key, &founding_borrowed);
     exhibit_conformance("founding", &founding_conformance);
 
     println!("\n=== [4] THREE DECLARED WRONG READINGS ===");
-    println!("  Each keeps the recovered classes and changes only where the unit breaks. Each must");
-    println!("  be separated from the recovery by an exhibited word, and the two independent routes");
-    println!("  to that word — the joint automaton and Moore refinement — must return the same one.");
+    println!(
+        "  Each keeps the recovered classes and changes only where the unit breaks. Each must"
+    );
+    println!(
+        "  be separated from the recovery by an exhibited word, and the two independent routes"
+    );
+    println!(
+        "  to that word — the joint automaton and Moore refinement — must return the same one."
+    );
     let wrong = wrong_readings(&codec);
     let mut separated = 0usize;
     for (name, reading) in &wrong {
@@ -305,33 +321,33 @@ fn run() -> Result<(), String> {
             let met = match frame {
                 "declared order" => check.agrees(),
                 "reversed input order" => {
-                    check.disagreements.iter().all(|species| {
-                        *species == SeparationSpecies::TieBrokenDifferently
-                    }) && check
-                        .nerode
-                        .as_ref()
-                        .zip(check.joint_automaton.as_ref())
-                        .is_none_or(|((_, left), right)| {
-                            left.chars().count() == right.chars().count()
-                        })
+                    check
+                        .disagreements
+                        .iter()
+                        .all(|species| *species == SeparationSpecies::TieBrokenDifferently)
+                        && check
+                            .nerode
+                            .as_ref()
+                            .zip(check.joint_automaton.as_ref())
+                            .is_none_or(|((_, left), right)| {
+                                left.len() == right.len()
+                            })
                 }
                 _ => {
                     check.compression.collapsed.is_empty()
                         && check.nerode.is_none()
-                        && check.disagreements.contains(
-                            &SeparationSpecies::NerodeSeparatedWithoutExhibitingAWord,
-                        )
+                        && check
+                            .disagreements
+                            .contains(&SeparationSpecies::NerodeSeparatedWithoutExhibitingAWord)
                 }
             };
-            println!(
-                "      the frame did what it declared: {met}"
-            );
+            println!("      the frame did what it declared: {met}");
             if !met {
                 return Err(format!("{frame} did not do what it declared"));
             }
             if let Some((_, word)) = &check.nerode {
                 words.insert(render(word));
-                lengths.insert(word.chars().count());
+                lengths.insert(word.len());
             }
         }
         println!(
@@ -394,7 +410,12 @@ fn run() -> Result<(), String> {
     );
     println!("  refused for the caller's aperture and reported as though it had returned nothing.");
     for (name, exposures) in controls(&founding) {
-        control(&name, exposures, settings.radius, full_octet_family(settings.radius));
+        control(
+            &name,
+            exposures,
+            settings.radius,
+            full_octet_family(settings.radius),
+        );
     }
 
     println!("\n=== [8] THE EXPOSURE LADDER ===");
@@ -474,9 +495,7 @@ fn run() -> Result<(), String> {
         );
         println!(
             "  over the rungs that RETURNED a codec, the internal class grows monotonically: {}",
-            rungs
-                .windows(2)
-                .all(|pair| pair[0].1.is_subset(&pair[1].1))
+            rungs.windows(2).all(|pair| pair[0].1.is_subset(&pair[1].1))
         );
         match refused_below {
             Some(extent) => println!(
@@ -526,7 +545,9 @@ fn report(recovery: &ExposureRecovery, extent: u64) {
             extent / row.admitted.max(1)
         );
     }
-    println!("\n  the refusal law — what the material's own recurring factors license and it refuses");
+    println!(
+        "\n  the refusal law — what the material's own recurring factors license and it refuses"
+    );
     if recovery.refusals.is_empty() {
         println!("    empty. the material refuses nothing; there is no codec at this radius.");
     } else {
@@ -652,10 +673,11 @@ fn report(recovery: &ExposureRecovery, extent: u64) {
         }
         if let Some(codec) = &recovery.codec {
             println!("\n    the boundary table   (Cut opens a unit, Join continues one)");
-            let present: Vec<UnitRole> = [UnitRole::Standing, UnitRole::Demanding, UnitRole::Internal]
-                .into_iter()
-                .filter(|role| recovery.roles.values().any(|carried| carried == role))
-                .collect();
+            let present: Vec<UnitRole> =
+                [UnitRole::Standing, UnitRole::Demanding, UnitRole::Internal]
+                    .into_iter()
+                    .filter(|role| recovery.roles.values().any(|carried| carried == role))
+                    .collect();
             print!("      {:<12}", "from \\ to");
             for role in &present {
                 print!("{:>11}", role.name());
@@ -746,7 +768,7 @@ fn exhibit_conformance(name: &str, conformance: &Conformance) {
     for refusal in conformance.refusals.iter().take(3) {
         println!(
             "    refused an exposure carrying {} — an octet the founding exposure never showed",
-            render_octet(refusal.symbol as u32 as u8)
+            render_octet(refusal.symbol.0 as u8)
         );
     }
 }
@@ -762,7 +784,7 @@ fn exhibit_conformance(name: &str, conformance: &Conformance) {
 /// character's octets, re-carried — so a disagreement is a disagreement about **where the units
 /// break** and about nothing else.
 fn answer_key() -> OpaqueSymbolCodec {
-    OpaqueSymbolCodec::new(|input: &str| {
+    OpaqueSymbolCodec::new(|input: &[Symbol]| {
         let Some(octets) = octets_of(input) else {
             return Vec::new();
         };
@@ -787,17 +809,11 @@ fn wrong_readings(codec: &RecoveredCodec) -> Vec<(String, RecoveredCodec)> {
 
     let mut every_cut = codec.clone();
     every_cut.boundary = vec![vec![Boundary::Cut; classes]; classes];
-    readings.push((
-        "every octet is its own unit".to_owned(),
-        every_cut,
-    ));
+    readings.push(("every octet is its own unit".to_owned(), every_cut));
 
     let mut every_join = codec.clone();
     every_join.boundary = vec![vec![Boundary::Join; classes]; classes];
-    readings.push((
-        "the whole exposure is one unit".to_owned(),
-        every_join,
-    ));
+    readings.push(("the whole exposure is one unit".to_owned(), every_join));
 
     let mut inverted = codec.clone();
     inverted.boundary = codec
@@ -852,7 +868,13 @@ fn controls(founding: &[Vec<u8>]) -> Vec<(String, Vec<Vec<u8>>)> {
     // the honest reading is that every octet stands.
     let stripped: Vec<Vec<u8>> = founding
         .iter()
-        .map(|exposure| exposure.iter().copied().filter(|octet| *octet < 0x80).collect())
+        .map(|exposure| {
+            exposure
+                .iter()
+                .copied()
+                .filter(|octet| *octet < 0x80)
+                .collect()
+        })
         .filter(|exposure: &Vec<u8>| !exposure.is_empty())
         .collect();
     controls.push((
@@ -948,7 +970,10 @@ fn control(name: &str, exposures: Vec<Vec<u8>>, radius: usize, family_words: u64
             if recovery.obstructions.is_empty() {
                 println!(
                     "    a codec over {} classes",
-                    recovery.codec.as_ref().map_or(0, RecoveredCodec::class_count)
+                    recovery
+                        .codec
+                        .as_ref()
+                        .map_or(0, RecoveredCodec::class_count)
                 );
             } else {
                 for obstruction in &recovery.obstructions {
@@ -974,7 +999,9 @@ fn obstruction_name(obstruction: &ExposureObstruction) -> String {
         ExposureObstruction::NothingStands {
             internal,
             demanding,
-        } => format!("NothingStands — {internal} internal, {demanding} demanding, nothing standing"),
+        } => {
+            format!("NothingStands — {internal} internal, {demanding} demanding, nothing standing")
+        }
     }
 }
 
@@ -1020,7 +1047,9 @@ fn answer_key_comparison(codec: &RecoveredCodec, held_out: &[Vec<u8>]) {
     println!(
         "    exposure at this radius recovered **none** of the authored token grammar, and the"
     );
-    println!("    reason is exact rather than a shortfall: the declared family reaches two adjacent");
+    println!(
+        "    reason is exact rather than a shortfall: the declared family reaches two adjacent"
+    );
     println!("    octets, and no item of that vocabulary is two octets long.");
 
     println!("\n  direction B — what exposure recovered that the authored reader does not have");
@@ -1035,8 +1064,12 @@ fn answer_key_comparison(codec: &RecoveredCodec, held_out: &[Vec<u8>]) {
         "    of {total} held-out octets, {grouped} are not units by themselves — they belong to a"
     );
     println!("    group the recovered codec found and the authored reader is simply handed.");
-    println!("    The authored reader takes `&str`. It never recovers the grouping; it inherits it.");
-    println!("    Ablating exactly that inheritance — reading the same octets with each octet as its");
+    println!(
+        "    The authored reader takes `&str`. It never recovers the grouping; it inherits it."
+    );
+    println!(
+        "    Ablating exactly that inheritance — reading the same octets with each octet as its"
+    );
     println!("    own unit — is what the following measures.");
     println!(
         "\n    {:<28} {:>12} {:>12} {:>10}",
@@ -1060,7 +1093,7 @@ fn answer_key_comparison(codec: &RecoveredCodec, held_out: &[Vec<u8>]) {
                     Err(_) => continue,
                 }
             } else {
-                carried(exposure)
+                latin1(exposure)
             };
             let reading = read_development(&text, DeclarationGrain::EveryTopLevelDeclaration);
             declarations += reading.declarations.len();
@@ -1122,7 +1155,10 @@ fn from_sealed_rest(path: &Path, prefix: &str) -> Result<Vec<Vec<u8>>, String> {
             .or_default()
             .extend_from_slice(occurrence.text.as_bytes());
     }
-    Ok(by_identity.into_values().filter(|e| !e.is_empty()).collect())
+    Ok(by_identity
+        .into_values()
+        .filter(|e| !e.is_empty())
+        .collect())
 }
 
 fn from_directory(root: &Path, extension: &str) -> Result<Vec<Vec<u8>>, String> {
@@ -1188,17 +1224,32 @@ fn render_octets(octets: &[u8]) -> String {
         .join(" ")
 }
 
-fn render(carried_word: &str) -> String {
+/// Octets projected onto text one-for-one, for the authored reader this driver grades against.
+///
+/// **This is not [`carried`] and the difference is the point.** `carried` injects octets into the
+/// codec's own symbol alphabet, where nothing is interpreted; this projection hands the same octets
+/// to a reader that expects characters, which is an interpretation and is declared here as one. The
+/// two were the same function until the alphabet was rotated off `char`, and that they were the same
+/// is exactly what the rotation removed.
+fn latin1(octets: &[u8]) -> String {
+    octets.iter().map(|octet| *octet as char).collect()
+}
+
+fn render(carried_word: &[Symbol]) -> String {
     render_octets(&octets_of(carried_word).unwrap_or_default())
 }
 
-fn render_tokens(tokens: &[String]) -> String {
+fn render_tokens(tokens: &[Vec<Symbol>]) -> String {
     tokens
         .iter()
         .map(|token| {
             let octets = octets_of(token).unwrap_or_default();
             if octets.len() > 8 {
-                format!("[{} … {} octets]", render_octets(&octets[..8]), octets.len())
+                format!(
+                    "[{} … {} octets]",
+                    render_octets(&octets[..8]),
+                    octets.len()
+                )
             } else {
                 format!("[{}]", render_octets(&octets))
             }
@@ -1209,7 +1260,10 @@ fn render_tokens(tokens: &[String]) -> String {
 
 /// The window around the first unit at which two segmentations part, so a divergence is exhibited
 /// where it happens rather than from the beginning of a file.
-fn divergence_window(target: &[String], recovered: &[String]) -> (Vec<String>, Vec<String>) {
+fn divergence_window(
+    target: &[Vec<Symbol>],
+    recovered: &[Vec<Symbol>],
+) -> (Vec<Vec<Symbol>>, Vec<Vec<Symbol>>) {
     let first = target
         .iter()
         .zip(recovered)
@@ -1248,7 +1302,9 @@ fn arguments() -> Result<Settings, String> {
             "--extension" => settings.extension = value,
             "--identity-prefix" => settings.identity_prefix = value,
             "--radius" => {
-                settings.radius = value.parse().map_err(|_| "--radius wants a number".to_owned())?
+                settings.radius = value
+                    .parse()
+                    .map_err(|_| "--radius wants a number".to_owned())?
             }
             "--family-words" => {
                 settings.family_words = value

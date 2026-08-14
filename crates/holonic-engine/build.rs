@@ -1,4 +1,4 @@
-//! Compile the engine's two exact CUDA laws to PTX.
+//! Compile the engine's exact CUDA laws to PTX.
 //!
 //! **The virtual architecture is read off the device present at build time, not authored.** This
 //! script pinned `--gpu-architecture=compute_75` — Turing — until 2026-08-10, while the machine it
@@ -52,6 +52,7 @@ fn main() {
     println!("cargo:rerun-if-changed=kernels/exact_conic_support.cu");
     println!("cargo:rerun-if-changed=kernels/exact_relation_support.cu");
     println!("cargo:rerun-if-changed=kernels/refine_shell.cu");
+    println!("cargo:rerun-if-changed=kernels/exact_embedding_fiber.cu");
     if env::var("CARGO_CFG_TARGET_OS").as_deref() != Ok("linux") {
         return;
     }
@@ -104,6 +105,25 @@ fn main() {
         "nvcc refused kernels/exact_relation_support.cu"
     );
 
+    let fiber_output = PathBuf::from(env::var_os("OUT_DIR").expect("Cargo supplies OUT_DIR"))
+        .join("exact_embedding_fiber.ptx");
+    let fiber_status = Command::new("nvcc")
+        .args([
+            "--ptx",
+            "-O3",
+            "--std=c++20",
+            &gpu_architecture,
+            "kernels/exact_embedding_fiber.cu",
+            "-o",
+        ])
+        .arg(&fiber_output)
+        .status()
+        .expect("nvcc is required to compile the exact readout-score law");
+    assert!(
+        fiber_status.success(),
+        "nvcc refused kernels/exact_embedding_fiber.cu"
+    );
+
     let refine_output = PathBuf::from(env::var_os("OUT_DIR").expect("Cargo supplies OUT_DIR"))
         .join("refine_shell.ptx");
     let refine_status = Command::new("nvcc")
@@ -118,5 +138,8 @@ fn main() {
         .arg(&refine_output)
         .status()
         .expect("nvcc is required to compile the partition refinement law");
-    assert!(refine_status.success(), "nvcc refused kernels/refine_shell.cu");
+    assert!(
+        refine_status.success(),
+        "nvcc refused kernels/refine_shell.cu"
+    );
 }

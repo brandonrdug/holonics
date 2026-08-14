@@ -27,15 +27,15 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::error::Error;
 
 use holonic_engine::codec_recovery::{
-    recover, Boundary, CodecRecovery, Obstruction, OpaqueSymbolCodec, RecoveredCodec,
-    RecoveryApertures, SymbolClass,
+    Boundary, CodecRecovery, Obstruction, OpaqueSymbolCodec, RecoveredCodec, RecoveryApertures,
+    Symbol, SymbolAlphabet, SymbolClass, recover,
 };
 use holonic_engine::codec_system::{
-    cross_check, cross_check_over, CodecIndexReceiver, CodecSystem, JointCarrier, JointReading,
-    PushEventSystem, ReversedInputOrder, SeparationCrossCheck, StepReturn, ThePushEventAutomaton,
-    TheJointAutomaton, CROSS_CHECK_SCHEMA,
+    CROSS_CHECK_SCHEMA, CodecIndexReceiver, CodecSystem, JointCarrier, JointReading,
+    PushEventSystem, ReversedInputOrder, SeparationCrossCheck, StepReturn, TheJointAutomaton,
+    ThePushEventAutomaton, cross_check, cross_check_over,
 };
-use holonic_engine::receiver_exact_compression::{compress, InputId, ItemId, ObservedSystem};
+use holonic_engine::receiver_exact_compression::{InputId, ItemId, ObservedSystem, compress};
 
 /// **The apertures this driver declares.** They moved out of `codec_recovery` on 2026-08-09
 /// (`canon/THE_AUTHORED_LEVEL.md` §5.2): neither is derivable from the material, both are statements
@@ -51,7 +51,7 @@ const APERTURES: RecoveryApertures = RecoveryApertures {
 /// flushes, `.`/`-` are a run class, `,`/`;` are a solo class. The recovery is told the alphabet and
 /// nothing else.
 fn tokenizer() -> OpaqueSymbolCodec {
-    OpaqueSymbolCodec::new(|input: &str| {
+    OpaqueSymbolCodec::over_text(&alphabet(), |input: &str| {
         #[derive(Clone, Copy, PartialEq)]
         enum Kind {
             Word,
@@ -101,7 +101,7 @@ const TOKENIZER_ALPHABET: [char; 11] = ['a', 'b', 'q', '0', '1', ' ', '\t', '.',
 /// declared family provably cannot see through it, and the recovery returns two genuinely
 /// inequivalent codecs together with the word it was not allowed to ask.
 fn soft_join() -> OpaqueSymbolCodec {
-    OpaqueSymbolCodec::new(|input: &str| {
+    OpaqueSymbolCodec::over_text(&alphabet(), |input: &str| {
         let token: String = input.chars().filter(|symbol| *symbol != '_').collect();
         if token.is_empty() {
             Vec::new()
@@ -122,16 +122,35 @@ fn flipped(codec: &RecoveredCodec, left: usize, right: usize) -> RecoveredCodec 
     variant
 }
 
-fn spell(symbol: char) -> String {
-    match symbol {
-        ' ' => "␠".to_owned(),
-        '\t' => "␉".to_owned(),
-        other => other.to_string(),
+/// The declared alphabet, once. `codec_recovery` speaks symbols; this driver's fixtures speak text,
+/// and this is the translation between them.
+fn alphabet() -> SymbolAlphabet {
+    SymbolAlphabet::from_chars(&TOKENIZER_ALPHABET).expect("the declared alphabet carries no repeat")
+}
+
+fn symbols(characters: &[char]) -> Vec<Symbol> {
+    let declared = alphabet();
+    characters
+        .iter()
+        .map(|character| {
+            declared
+                .symbol_of(character.to_string().as_str())
+                .expect("every declared character is in the alphabet")
+        })
+        .collect()
+}
+
+fn spell(symbol: Symbol) -> String {
+    match alphabet().identity(symbol) {
+        Some(" ") => "␠".to_owned(),
+        Some("\t") => "␉".to_owned(),
+        Some(other) => other.to_owned(),
+        None => "?".to_owned(),
     }
 }
 
-fn spell_word(word: &str) -> String {
-    word.chars().map(spell).collect()
+fn spell_word(word: &[Symbol]) -> String {
+    word.iter().copied().map(spell).collect()
 }
 
 fn spell_class(codec: &RecoveredCodec, class: SymbolClass) -> String {
@@ -147,7 +166,7 @@ fn show_recovery(recovery: &CodecRecovery, label: &str) {
     println!("== the recovered structure: {label} ==");
     println!(
         "  alphabet {}  radius {}  family {} words  target calls {}",
-        spell_word(&recovery.alphabet.iter().collect::<String>()),
+        spell_word(&recovery.alphabet),
         recovery.radius,
         recovery.work.declared_family_words,
         recovery.work.target_calls,
@@ -192,11 +211,11 @@ fn show_recovery(recovery: &CodecRecovery, label: &str) {
 }
 
 /// The shortest word over the class representatives that reaches each item, breadth-first from rest.
-fn reaching_words(system: &CodecSystem<'_>) -> BTreeMap<ItemId, String> {
-    let mut found: BTreeMap<ItemId, String> = BTreeMap::new();
+fn reaching_words(system: &CodecSystem<'_>) -> BTreeMap<ItemId, Vec<Symbol>> {
+    let mut found: BTreeMap<ItemId, Vec<Symbol>> = BTreeMap::new();
     let rest = system.rest_state(0).expect("a system rests");
     let mut frontier = std::collections::VecDeque::from([(rest, Vec::<InputId>::new())]);
-    found.insert(rest, String::new());
+    found.insert(rest, Vec::<Symbol>::new());
     while let Some((item, word)) = frontier.pop_front() {
         for input in system.inputs() {
             if let Some(next) = system.successor(item, input)
@@ -246,7 +265,12 @@ fn show_states(codec: &RecoveredCodec, system: &CodecSystem<'_>) {
                 StepReturn::OpenedToken => "opened",
                 StepReturn::ExtendedToken => "extended",
             },
-            codec.segment(word).expect("declared symbols only"),
+            codec
+                .segment(word)
+                .expect("declared symbols only")
+                .iter()
+                .map(|token| spell_word(token))
+                .collect::<Vec<_>>(),
         );
     }
 }
@@ -293,7 +317,10 @@ fn show_congruence(codec: &RecoveredCodec, system: &CodecSystem<'_>) {
         let how = match pair.witness {
             None => "a terminus one reaches and the other does not".to_owned(),
             Some((receiver, here, there)) => {
-                format!("receiver {} returns {} against {}", receiver.0, here.0, there.0)
+                format!(
+                    "receiver {} returns {} against {}",
+                    receiver.0, here.0, there.0
+                )
             }
         };
         println!(
@@ -308,18 +335,22 @@ fn show_congruence(codec: &RecoveredCodec, system: &CodecSystem<'_>) {
             if *reached == "(rest)" {
                 continue;
             }
-            let plain: String = words
+            let plain: Vec<Symbol> = words
                 .values()
                 .find(|candidate| spell_word(candidate) == *reached)
                 .cloned()
                 .unwrap_or_default();
+            let whole: Vec<Symbol> = plain.iter().chain(word.iter()).copied().collect();
             println!(
                 "        segment({}{}) = {:?}",
                 spell_word(&plain),
                 spell_word(&word),
                 codec
-                    .segment(&format!("{plain}{word}"))
-                    .expect("declared symbols only"),
+                    .segment(&whole)
+                    .expect("declared symbols only")
+                    .iter()
+                    .map(|token| spell_word(token))
+                    .collect::<Vec<_>>(),
             );
         }
     }
@@ -333,9 +364,9 @@ fn show_cross_check(label: &str, check: &SeparationCrossCheck) {
         "     {} against {}",
         check.nerode_reading, check.joint_reading
     );
-    let word = |named: &Option<String>| match named {
+    let word = |named: &Option<Vec<Symbol>>| match named {
         None => "NONE — no input of any length separates them".to_owned(),
-        Some(input) => format!("{:?} ({} symbols)", spell_word(input), input.chars().count()),
+        Some(input) => format!("{:?} ({} symbols)", spell_word(input), input.len()),
     };
     println!(
         "     congruence: {}",
@@ -374,7 +405,7 @@ fn show_cross_check(label: &str, check: &SeparationCrossCheck) {
 
 fn main() -> Result<(), Box<dyn Error>> {
     let target = tokenizer();
-    let recovery = recover(&target, &TOKENIZER_ALPHABET, 3, APERTURES)?;
+    let recovery = recover(&target, &symbols(&TOKENIZER_ALPHABET), 3, APERTURES)?;
     show_recovery(&recovery, "an opaque tokenizer, from testimony alone");
     let codec = recovery.codec.as_ref().expect("the codec is recovered");
 
@@ -388,7 +419,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     // The second target, at the radius that leaves it undetermined: two codecs a real recovery
     // retained and could not choose between, and the word it was not allowed to ask.
     println!();
-    let blind = recover(&soft_join(), &['a', 'b', '_'], 2, APERTURES)?;
+    let blind = recover(&soft_join(), &symbols(&['a', 'b', '_']), 2, APERTURES)?;
     let Some(Obstruction::UndeterminedCodec {
         left,
         right,
@@ -404,7 +435,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         "  the family reached {} symbols; the word that would have decided is {:?} at {} symbols",
         blind.radius,
         spell_word(separating_input),
-        separating_input.chars().count(),
+        separating_input.len(),
     );
     println!("  left  returns {left_return:?}");
     println!("  right returns {right_return:?}");
@@ -416,9 +447,9 @@ fn main() -> Result<(), Box<dyn Error>> {
         &cross_check(left, right)?,
     );
 
-    let word = codec.class_of('a').ok_or("the word class is recovered")?;
-    let digit = codec.class_of('0').ok_or("the digit class is recovered")?;
-    let space = codec.class_of(' ').ok_or("the space class is recovered")?;
+    let word = codec.class_of(symbols(&['a'])[0]).ok_or("the word class is recovered")?;
+    let digit = codec.class_of(symbols(&['0'])[0]).ok_or("the digit class is recovered")?;
+    let space = codec.class_of(symbols(&[' '])[0]).ok_or("the space class is recovered")?;
     let gauge = flipped(codec, word.0 as usize, space.0 as usize);
     let mut across = flipped(codec, word.0 as usize, space.0 as usize);
     across = flipped(&across, space.0 as usize, word.0 as usize);
@@ -477,9 +508,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     take(
         "REVERSED INPUT ORDER — right about the quantity, different about the word",
         cross_check_over(
-            &ReversedInputOrder {
-                inner: &real_twice,
-            },
+            &ReversedInputOrder { inner: &real_twice },
             &TheJointAutomaton,
             codec,
             &twice,
@@ -519,8 +548,14 @@ fn main() -> Result<(), Box<dyn Error>> {
     };
     println!();
     println!("== what every reading refuses, on one malformed value ==");
-    println!("  CodecSystem::joint      {:?}", CodecSystem::joint(&[&malformed]).err());
-    println!("  PushEventSystem::joint  {:?}", PushEventSystem::joint(&[&malformed]).err());
+    println!(
+        "  CodecSystem::joint      {:?}",
+        CodecSystem::joint(&[&malformed]).err()
+    );
+    println!(
+        "  PushEventSystem::joint  {:?}",
+        PushEventSystem::joint(&[&malformed]).err()
+    );
     println!(
         "  joint automaton         {:?}",
         TheJointAutomaton
@@ -535,7 +570,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     );
     println!(
         "  segment                 {:?}",
-        malformed.segment("a").err()
+        malformed.segment(&symbols(&['a'])).err()
     );
     let single = CodecSystem::new(codec)?;
     println!(

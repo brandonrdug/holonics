@@ -90,9 +90,9 @@ use num_bigint::BigUint;
 use holonic_engine::corpus_census::{CorpusCensus, DECLARED_STRATA, Kind, SurfaceId};
 use holonic_engine::hardware_cover::HardwareCover;
 use holonic_engine::token_invariance::{
-    ConductAtlas, ConductVerdict, ReceiverAxis, ReceiverFamily, SeparationReading,
+    ConductAtlas, ConductVerdict, ReceiverAxis, ReceiverFamily, SeparationChart, SeparationReading,
     collapsing_family_population, conduct_invariance_at, cross_check_family, invariance_partition,
-    iron_at, sweep, witnessed_iron_at, sweep_over, SeparationChart,
+    iron_at, sweep_over, witnessed_iron_at,
 };
 
 /// The declared horizons. Both are taken, but only the **last** sweep is retained: the earlier ones
@@ -140,12 +140,19 @@ const PREDICTED: [&str; 10] = [
 ];
 
 /// The project's own dialect, from `canon/THE_DIALECT.md`, as a second frame on the same question.
-const DIALECT: [&str; 6] = ["holon", "receiver", "current", "passage", "residual", "exact"];
+const DIALECT: [&str; 6] = [
+    "holon", "receiver", "current", "passage", "residual", "exact",
+];
 
 fn main() {
-    let root = std::env::args().nth(1).map(PathBuf::from).unwrap_or_else(|| {
-        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("..").join("..")
-    });
+    let root = std::env::args()
+        .nth(1)
+        .map(PathBuf::from)
+        .unwrap_or_else(|| {
+            PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+                .join("..")
+                .join("..")
+        });
     let exhibit_floor: u64 = std::env::args()
         .nth(2)
         .and_then(|value| value.parse().ok())
@@ -163,10 +170,7 @@ fn main() {
     // surfaces is a front and the host's own lanes carry it. Driving this serially pinned one core
     // while fifteen stood idle.
     let cover = HardwareCover::host_only();
-    println!(
-        "  the cover declares {} host lanes\n",
-        cover.host().lanes
-    );
+    println!("  the cover declares {} host lanes\n", cover.host().lanes);
     let atlas = ConductAtlas::found(&census, FOUNDING_HORIZON);
 
     let mut holds: Vec<(String, bool, String)> = Vec::new();
@@ -254,10 +258,7 @@ fn main() {
     println!("THE THREE-WAY PARTITION OF THE MEASURED POPULATION, AT HORIZON {horizon}");
     println!("--------------------------------------------------------------");
     println!();
-    println!(
-        "  {:<26} {:>9}   {}",
-        "verdict", "surfaces", "what it says"
-    );
+    println!("  {:<26} {:>9}   {}", "verdict", "surfaces", "what it says");
     println!(
         "  {:<26} {:>9}   {}",
         "IRON, witnessed",
@@ -286,7 +287,15 @@ fn main() {
 
     let varying_by_terminus = invariance
         .values()
-        .filter(|row| matches!(row.verdict, ConductVerdict::Varying { terminus_varies: true, .. }))
+        .filter(|row| {
+            matches!(
+                row.verdict,
+                ConductVerdict::Varying {
+                    terminus_varies: true,
+                    ..
+                }
+            )
+        })
         .count();
     println!();
     println!(
@@ -341,7 +350,10 @@ fn main() {
     println!("--------------------------------------------------------------");
     println!();
     let population = collapsing_family_population(&reading);
-    println!("  {:<22} {:>9}   {}", "collapsing family", "surfaces", "axes the material MOVED");
+    println!(
+        "  {:<22} {:>9}   {}",
+        "collapsing family", "surfaces", "axes the material MOVED"
+    );
     let mut nonempty_families = 0usize;
     for family in ReceiverFamily::FULL.subsets() {
         if family.is_empty() || family == ReceiverFamily::FULL {
@@ -368,7 +380,10 @@ fn main() {
 
     // Per-axis: how often each axis is the thing held, and how often it is the thing moved.
     println!();
-    println!("  {:<10} {:>16} {:>16}", "axis", "held (collapsing)", "moved");
+    println!(
+        "  {:<10} {:>16} {:>16}",
+        "axis", "held (collapsing)", "moved"
+    );
     for axis in ReceiverAxis::DECLARED {
         let held = invariance
             .values()
@@ -387,12 +402,11 @@ fn main() {
             .to_owned(),
         nonempty_families >= 2
             && ReceiverAxis::DECLARED.into_iter().all(|axis| {
-                invariance
-                    .values()
-                    .any(|row| row.verdict.is_conduct_invariant() && row.constant_axes.contains(axis))
-                    && invariance.values().any(|row| {
-                        row.verdict.is_conduct_invariant() && row.varying_axes().contains(axis)
-                    })
+                invariance.values().any(|row| {
+                    row.verdict.is_conduct_invariant() && row.constant_axes.contains(axis)
+                }) && invariance.values().any(|row| {
+                    row.verdict.is_conduct_invariant() && row.varying_axes().contains(axis)
+                })
             }),
         format!(
             "{nonempty_families} of {} proper nonempty families carry a population",
@@ -409,7 +423,9 @@ fn main() {
     // The complete occurrence distribution first, so nothing below the exhibition floor is hidden.
     let mut distribution: BTreeMap<u64, usize> = BTreeMap::new();
     for surface in &partition.conduct_invariant {
-        *distribution.entry(census.occurrences(*surface)).or_default() += 1;
+        *distribution
+            .entry(census.occurrences(*surface))
+            .or_default() += 1;
     }
     println!("  The COMPLETE occurrence distribution of the population (nothing is cut here):");
     println!();
@@ -452,7 +468,10 @@ fn main() {
             census.surface(*surface).to_owned(),
         )
     });
-    for surface in ordered.iter().filter(|s| census.occurrences(**s) >= exhibit_floor) {
+    for surface in ordered
+        .iter()
+        .filter(|s| census.occurrences(**s) >= exhibit_floor)
+    {
         let row = &invariance[surface];
         println!(
             "  {:<20} {:>5} {:>8} {:>13}  {:<20} {}",
@@ -526,7 +545,14 @@ fn main() {
     );
     println!(
         "  {:<14} {:>6} {:>8} {:>7} {:>8} {:>9} {:>9} {:>6}  {}",
-        "surface", "occ", "windows", "{kind}", "{weight}", "{density}", "{conduct}", "min",
+        "surface",
+        "occ",
+        "windows",
+        "{kind}",
+        "{weight}",
+        "{density}",
+        "{conduct}",
+        "min",
         "verdict"
     );
     let mut predicted_hits = 0usize;
@@ -550,7 +576,9 @@ fn main() {
                 }
                 format!("CONDUCT-INVARIANT at {collapsing}")
             }
-            ConductVerdict::Varying { terminus_varies, .. } => {
+            ConductVerdict::Varying {
+                terminus_varies, ..
+            } => {
                 if terminus_varies {
                     "varying (by TERMINUS -- no family can)".to_owned()
                 } else {
@@ -583,7 +611,10 @@ fn main() {
     println!(
         "  {predicted_hits} of the {} predicted mathematical surfaces present in this corpus \
          returned CONDUCT-INVARIANT.",
-        PREDICTED.into_iter().filter(|name| census.lookup(name).is_some()).count()
+        PREDICTED
+            .into_iter()
+            .filter(|name| census.lookup(name).is_some())
+            .count()
     );
     holds.push((
         "control 8 -- the declared prediction was looked up by name and reported whichever way it \
@@ -655,8 +686,9 @@ fn main() {
                 ConductVerdict::Iron => "IRON".to_owned(),
                 ConductVerdict::ConductInvariant { collapsing, .. } =>
                     format!("CONDUCT-INVARIANT at {collapsing}"),
-                ConductVerdict::Varying { terminus_varies, .. } =>
-                    format!("varying (terminus_varies={terminus_varies})"),
+                ConductVerdict::Varying {
+                    terminus_varies, ..
+                } => format!("varying (terminus_varies={terminus_varies})"),
             }
         );
     }
@@ -702,7 +734,14 @@ fn main() {
     let mut organ_obstructed = 0usize;
     for surface in reading.keys() {
         for family in ReceiverFamily::FULL.subsets() {
-            match cross_check_family(&census, &atlas, *surface, horizon, family, FAMILY_CHECK_CAPACITY) {
+            match cross_check_family(
+                &census,
+                &atlas,
+                *surface,
+                horizon,
+                family,
+                FAMILY_CHECK_CAPACITY,
+            ) {
                 Ok(check) => {
                     checked += 1;
                     if check.organ_blocks == 1 {
@@ -808,7 +847,9 @@ fn main() {
         .map(|surface| (surface, reading[surface].survived_pairs()))
         .collect();
     iron_ordered.sort_by(|left, right| right.1.cmp(&left.1).then(left.0.cmp(right.0)));
-    println!("  The witnessed IRON verdicts that withstood the most refutations (presentation only):");
+    println!(
+        "  The witnessed IRON verdicts that withstood the most refutations (presentation only):"
+    );
     for (surface, survived) in iron_ordered.iter().take(6) {
         println!(
             "    {:<18} {} occurrences, 1 window, {survived} non-separations withstood",

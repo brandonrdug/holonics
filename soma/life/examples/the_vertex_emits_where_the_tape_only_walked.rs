@@ -95,7 +95,7 @@ fn run() -> Result<(), String> {
             "    storage {:>8}  caused_by {:>2}  {:?}",
             occurrence.storage_ordinal,
             occurrence.caused_by.len(),
-            elide(&occurrence.text, 96)
+            elide(&occurrence.declared_surface(), 96)
         );
     }
     println!();
@@ -161,7 +161,9 @@ fn run() -> Result<(), String> {
     let (extent, complex) = match chosen {
         Some(chosen) => chosen,
         None => {
-            let extent = *DECLARED_EXTENTS.last().expect("the sweep declares an extent");
+            let extent = *DECLARED_EXTENTS
+                .last()
+                .expect("the sweep declares an extent");
             println!();
             println!(
                 "  NO DECLARED EXTENT MADE CANCELLATION CHART-INVARIANT. Continuing at {extent} \
@@ -273,7 +275,9 @@ fn run() -> Result<(), String> {
 
     // -- FALSIFIER 1 — cancellation ------------------------------------------------------------
     println!("FALSIFIER 1 — TWO ROUTES TO ONE CONSTITUENT CANCEL");
-    println!("  amplitudes are superposed by `holonic_engine::ExactReceiverPhasePopulation::receive`,");
+    println!(
+        "  amplitudes are superposed by `holonic_engine::ExactReceiverPhasePopulation::receive`,"
+    );
     println!("  which sums in mode BEFORE any quadratic response. A count cannot produce this.");
     println!(
         "  TWO readings are taken. The PAIR is §IV's own unit — *opposed contributions in one \
@@ -345,7 +349,10 @@ fn run() -> Result<(), String> {
         fibers_per_chart.insert(chart.name(), fibers);
     }
     println!();
-    println!("  {:>18} {:>18} {:>22}", "chart", "annihilating pairs", "complete fibers at zero");
+    println!(
+        "  {:>18} {:>18} {:>22}",
+        "chart", "annihilating pairs", "complete fibers at zero"
+    );
     for chart in PhaseChart::ALL {
         println!(
             "  {:>18} {:>18} {:>22}",
@@ -488,9 +495,9 @@ fn run() -> Result<(), String> {
             "  and the body REFUSES the same contact at the flipped traversal hand inside its \
              closed boundary: {refusal:?}"
         ),
-        Err(IncidenceProductionError::Body(_)) => println!(
-            "  THE BODY ADMITTED A FLIPPED TRAVERSAL HAND — ∂∂ = 0 is not being enforced"
-        ),
+        Err(IncidenceProductionError::Body(_)) => {
+            println!("  THE BODY ADMITTED A FLIPPED TRAVERSAL HAND — ∂∂ = 0 is not being enforced")
+        }
         Err(error) => println!("  the flip could not be presented: {error:?}"),
     }
     println!();
@@ -512,11 +519,7 @@ fn run() -> Result<(), String> {
             .iter()
             .filter(|emission| emission.terrain_is_flat())
             .count();
-        println!(
-            "  {chart:>18} {:>10} {:>10}",
-            flat,
-            emissions.len() - flat
-        );
+        println!("  {chart:>18} {:>10} {:>10}", flat, emissions.len() - flat);
     }
     let adjacent = &by_chart[PhaseChart::WindingAdjacent.name()];
     let half_turn = &by_chart[PhaseChart::HalfTurnOnly.name()];
@@ -598,7 +601,10 @@ fn run() -> Result<(), String> {
     );
     for (at, emission) in adjacent.iter().take(PRINTED_EMISSIONS).enumerate() {
         println!();
-        println!("  [{at:>3}] grain {}  causal rank {}", emission.grain, emission.causal_rank);
+        println!(
+            "  [{at:>3}] grain {}  causal rank {}",
+            emission.grain, emission.causal_rank
+        );
         println!("        surface   {:?}", emission.surface);
         println!(
             "        residual  holonomy {}   {}",
@@ -793,24 +799,27 @@ fn elide(text: &str, extent: usize) -> String {
 /// storage order can be seen apart even here.
 fn driver_declared_material() -> Vec<DeclaredOccurrence> {
     vec![
-        DeclaredOccurrence {
-            identity: "declared:b".to_owned(),
-            storage_ordinal: 90,
-            caused_by: BTreeSet::from(["declared:a".to_owned()]),
-            text: "the arc bends the channel and the bends carry the return".to_owned(),
-        },
-        DeclaredOccurrence {
-            identity: "declared:a".to_owned(),
-            storage_ordinal: 91,
-            caused_by: BTreeSet::new(),
-            text: "the leader founds the channel and the channel carries the leader".to_owned(),
-        },
-        DeclaredOccurrence {
-            identity: "declared:c".to_owned(),
-            storage_ordinal: 12,
-            caused_by: BTreeSet::from(["declared:b".to_owned()]),
-            text: "the channel returns the leader and the leader founds the arc".to_owned(),
-        },
+        DeclaredOccurrence::from_text(
+            "declared:b".to_owned(),
+            90,
+            BTreeSet::from(["declared:a".to_owned()]),
+            "the arc bends the channel and the bends carry the return".to_owned(),
+        )
+        .expect("declared text material"),
+        DeclaredOccurrence::from_text(
+            "declared:a".to_owned(),
+            91,
+            BTreeSet::new(),
+            "the leader founds the channel and the channel carries the leader".to_owned(),
+        )
+        .expect("declared text material"),
+        DeclaredOccurrence::from_text(
+            "declared:c".to_owned(),
+            12,
+            BTreeSet::from(["declared:b".to_owned()]),
+            "the channel returns the leader and the leader founds the arc".to_owned(),
+        )
+        .expect("declared text material"),
     ]
 }
 
@@ -821,23 +830,25 @@ fn driver_declared_material() -> Vec<DeclaredOccurrence> {
 /// and the two turns are exact inverses. The closed boundary returns the identity while neither
 /// turn is the identity.
 fn flat_material() -> Vec<DeclaredOccurrence> {
-    vec![DeclaredOccurrence {
-        identity: "flat:a".to_owned(),
-        storage_ordinal: 0,
-        caused_by: BTreeSet::new(),
-        text: "ab cc ab".to_owned(),
-    }]
+    vec![DeclaredOccurrence::from_text(
+        "flat:a".to_owned(),
+        0,
+        BTreeSet::new(),
+        "ab cc ab".to_owned(),
+    )
+    .expect("declared text material")]
 }
 
 /// The declared negative control: every constituent distinct, so the contact graph is a forest.
 /// A forest condenses for free and its remainder is empty — no cycle, no closure, no cancellation.
 fn control_material() -> Vec<DeclaredOccurrence> {
-    vec![DeclaredOccurrence {
-        identity: "control:a".to_owned(),
-        storage_ordinal: 0,
-        caused_by: BTreeSet::new(),
-        text: "alpha bravo charlie delta echo foxtrot golf hotel india".to_owned(),
-    }]
+    vec![DeclaredOccurrence::from_text(
+        "control:a".to_owned(),
+        0,
+        BTreeSet::new(),
+        "alpha bravo charlie delta echo foxtrot golf hotel india".to_owned(),
+    )
+    .expect("declared text material")]
 }
 
 /// The declared cut taken from the corpus: one causal chain of `DECLARED_OCCURRENCES` messages.
@@ -907,10 +918,12 @@ fn declared_material_from_corpus(
                 }
             }
         }
-        let Some(root) = group
-            .iter()
-            .find(|entry| entry.2.iter().all(|cause| !present.contains(cause.as_str())))
-        else {
+        let Some(root) = group.iter().find(|entry| {
+            entry
+                .2
+                .iter()
+                .all(|cause| !present.contains(cause.as_str()))
+        }) else {
             continue;
         };
         let mut chain = Vec::new();
@@ -920,12 +933,15 @@ fn declared_material_from_corpus(
             if entry.3.split_whitespace().count() < 2 {
                 break;
             }
-            chain.push(DeclaredOccurrence {
-                identity: entry.1.clone(),
-                storage_ordinal: entry.0,
-                caused_by: entry.2.clone(),
-                text: entry.3.clone(),
-            });
+            chain.push(
+                DeclaredOccurrence::from_text(
+                    entry.1.clone(),
+                    entry.0,
+                    entry.2.clone(),
+                    entry.3.clone(),
+                )
+                .expect("declared text material"),
+            );
             if chain.len() == DECLARED_OCCURRENCES {
                 break;
             }

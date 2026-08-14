@@ -70,8 +70,46 @@ completed source-free cycle with `q_n = q_m` returns an integrated current cycle
 > *"circulation `j ≠ 0`, **rest**, **accumulation**, **leak**, and **short circuit** are distinct
 > cuts."*
 
-Five distinct cuts, not one pass/fail. A body that emits and never returns is not *failing to
-close*; it is at a **specific named cut**, and which one is a measurement.
+`canon/02_INFORMATION_PHYSICS.md` lists **six** — *"Rest, accumulation, leak, circulation,
+**reflection**, and short circuit are distinct receiver cuts."* An earlier form of this paragraph
+recorded that difference as `UNRECONCILED` and asked the Information Engine campaign to settle it by
+ruling. **That was the wrong shape of question and it is withdrawn 2026-08-13.** Brandon, directly:
+*"you're just talking about how energy physically propagates. It's not really a mode or cut, it's not
+a decision for us to make, that's just how physical dynamics work, you're just outlining
+classifications of identifiable parts of cycles."*
+
+**Neither list was derived. Both were transcribed, which is why one has five entries and one has six
+and neither could say why.** The chain law above already states the classification, and read off it
+the names fall into two families rather than one list.
+
+**Three are readings of which term is non-zero:**
+
+```text
+   j = 0        rest            no current
+   Δq ≠ 0       accumulation    the residual is stored
+   r ≠ 0        leak            the residual crosses the declared boundary
+```
+
+**The others are readings of where the current sits in the incidence, which is why they never fit
+beside the first three:**
+
+- **Circulation** is `Bj = 0` traversing the interior.
+- **Short circuit** is `Bj = 0` on a cycle that bypasses the interior — so it is *circulation at the
+  body's receiver and rest at the interior's, simultaneously*. A composite of two readings at two
+  receivers, never a single term.
+- **Reflection is not a sixth item beside short circuit. Reflection is what a termination does, and
+  short circuit is one of the two terminations.** At a shorted end `v = 0` and the current reflects
+  with reversed hand; at an open end `j = 0` and it reflects with the same hand while the potential
+  doubles. Those are the primal and dual faces of one phenomenon, and this section already carries
+  both laws — the current law above and `v = B*φ` below.
+
+So the five-entry list named one termination and not its dual; the six-entry list named the
+phenomenon and not the second termination. **Both are partial readings of one law, and reading them
+off the law makes each a measurement rather than an entry.** Neither list is struck; both are
+superseded by the law they were enumerating.
+
+Distinct conditions, not one pass/fail. A body that emits and never returns is not *failing to
+close*; it is at a **specific named condition**, and which one is a measurement.
 
 The dual law gives voltage closure `v = B*φ`, `Bc = 0 ⟹ ⟨v, c⟩ = 0`; and for a general connection,
 

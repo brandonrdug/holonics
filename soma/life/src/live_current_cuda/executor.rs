@@ -196,6 +196,11 @@ impl CudaLiveCurrentExecutor {
         })
     }
 
+    /// The per-current shell, SUPERSEDED BY `enact` (and the `enact_population` crossing it calls),
+    /// which crosses the whole contemporary population once instead of once per current. Retained
+    /// rather than deleted: it is the single-lane reading `enact_population`'s doc-comment compares
+    /// itself against, and it is the control that says what the population crossing changed.
+    #[allow(dead_code)]
     fn enact_one(
         &mut self,
         standing_axis: u32,

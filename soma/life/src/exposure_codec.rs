@@ -91,7 +91,9 @@
 use std::cell::Cell;
 use std::collections::{BTreeMap, BTreeSet, HashMap};
 
-use holonic_engine::codec_recovery::{Boundary, Emission, RecoveredCodec};
+use holonic_engine::codec_recovery::{
+    Boundary, Emission, RecoveredCodec, Symbol, SymbolAlphabet,
+};
 use serde::{Deserialize, Serialize};
 
 const RECOVERY_SCHEMA: &str = "life.exposure-codec-recovery.v1";
@@ -190,7 +192,9 @@ impl ExposedMaterial {
             for start in 0..exposure.len() {
                 let reach = radius.min(exposure.len() - start);
                 for length in 1..=reach {
-                    let slot = factors.entry(pack(&exposure[start..start + length])).or_insert(0);
+                    let slot = factors
+                        .entry(pack(&exposure[start..start + length]))
+                        .or_insert(0);
                     if *slot < 2 {
                         *slot += 1;
                     }
@@ -649,8 +653,20 @@ pub fn recover(
         .copied()
         .filter(|octet| material.closes(*octet))
         .collect();
-    let opening_frame = unit_reading(&alphabet, &follows, &precedes, &openings, "exposure-openings");
-    let closing_frame = unit_reading(&alphabet, &follows, &precedes, &closings, "exposure-closings");
+    let opening_frame = unit_reading(
+        &alphabet,
+        &follows,
+        &precedes,
+        &openings,
+        "exposure-openings",
+    );
+    let closing_frame = unit_reading(
+        &alphabet,
+        &follows,
+        &precedes,
+        &closings,
+        "exposure-closings",
+    );
     work.fixed_point_rounds = opening_frame.rounds + closing_frame.rounds;
 
     // 5. The obstructions, in the order a reader needs them.
@@ -745,7 +761,11 @@ fn direct_quotient(
                 for position in (0..length - 1).rev() {
                     let digit = alphabet[(rest % symbols as u64) as usize];
                     rest /= symbols as u64;
-                    filled[if position < hole { position } else { position + 1 }] = digit;
+                    filled[if position < hole {
+                        position
+                    } else {
+                        position + 1
+                    }] = digit;
                 }
                 let occurred: Vec<bool> = (0..symbols)
                     .map(|symbol| {
@@ -865,13 +885,13 @@ fn assemble(
         .into_iter()
         .filter(|role| roles.values().any(|carried| carried == role))
         .collect();
-    let classes: Vec<BTreeSet<char>> = present
+    let classes: Vec<BTreeSet<Symbol>> = present
         .iter()
         .map(|role| {
             alphabet
                 .iter()
                 .filter(|octet| roles.get(octet) == Some(role))
-                .map(|octet| *octet as char)
+                .map(|octet| Symbol(u32::from(*octet)))
                 .collect()
         })
         .collect();
@@ -921,26 +941,53 @@ fn assemble(
     )
 }
 
-/// Write octets as a string the [`RecoveredCodec`] carrier can run on.
+/// Write octets as a word the [`RecoveredCodec`] carrier runs on.
 ///
-/// The carrier is written over `char`, so each octet is carried by the code point of the same value.
-/// The map is injective and its inverse is [`octets_of`], so nothing is lost and no encoding is
-/// implied — an octet is carried, not interpreted.
-pub fn carried(octets: &[u8]) -> String {
-    octets.iter().map(|octet| *octet as char).collect()
+/// **This used to be a pun and is now an identity.** Until the alphabet was rotated off `char` on
+/// 2026-08-13 the carrier was written over Unicode scalars, so an octet had to travel as *the code
+/// point of the same value* — injective, invertible, and lossless, but a coincidence of two
+/// numberings rather than a statement about the material. A [`Symbol`] is an opaque ordinal into a
+/// declared alphabet, so an octet is now simply one, and nothing is being reinterpreted.
+pub fn carried(octets: &[u8]) -> Vec<Symbol> {
+    octets.iter().map(|octet| Symbol(u32::from(*octet))).collect()
 }
 
-/// The inverse of [`carried`]. Returns `None` at the first code point outside octet range.
-pub fn octets_of(carried: &str) -> Option<Vec<u8>> {
+/// The inverse of [`carried`]. Returns `None` at the first ordinal outside octet range.
+pub fn octets_of(carried: &[Symbol]) -> Option<Vec<u8>> {
     carried
-        .chars()
-        .map(|point| u8::try_from(point as u32).ok())
+        .iter()
+        .map(|symbol| u8::try_from(symbol.0).ok())
         .collect()
+}
+
+/// The alphabet an octet material declares: 256 symbols, each identified by its own ordinal.
+///
+/// Carried so a return can be exhibited. It is **not** consulted by the recovery, and nothing here
+/// asserts that an octet means a character.
+pub fn octet_alphabet() -> SymbolAlphabet {
+    SymbolAlphabet::declared(
+        (0u16..256)
+            .map(|ordinal| (format!("{ordinal:02x}"), vec![ordinal as u8]))
+            .collect(),
+    )
+    .expect("the octet alphabet carries no repeat")
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// A returned segmentation, read back as the octet strings it stands for. The carrier holds
+    /// ordinals; a fixture asserts about the material, so this is where the two meet.
+    fn as_text(segmentation: &[Vec<Symbol>]) -> Vec<String> {
+        segmentation
+            .iter()
+            .map(|token| {
+                String::from_utf8(octets_of(token).expect("every ordinal is an octet"))
+                    .expect("the fixture material is ascii")
+            })
+            .collect()
+    }
 
     /// A material built from a made-up two-octet code: `H` heads a unit, `p` and `q` can only appear
     /// inside one, `a` and `b` stand alone. Every exposure opens and closes on a standing octet,
@@ -996,8 +1043,8 @@ mod tests {
 
     #[test]
     fn the_alphabet_is_recovered_by_exhausting_every_octet_value() {
-        let material =
-            ExposedMaterial::expose(vec![b"abcabc".to_vec(), b"bcabca".to_vec()], 3).expect("exposes");
+        let material = ExposedMaterial::expose(vec![b"abcabc".to_vec(), b"bcabca".to_vec()], 3)
+            .expect("exposes");
         let recovery =
             recover(&material, ExposureApertures::declared(3, 100_000)).expect("recovers");
         assert_eq!(recovery.alphabet, vec![b'a', b'b', b'c']);
@@ -1062,7 +1109,7 @@ mod tests {
         assert_eq!(recovery.roles[&b'b'], UnitRole::Standing);
         let codec = recovery.codec.as_ref().expect("a codec");
         assert_eq!(
-            codec.segment(&carried(b"aHpbHq")).expect("segments"),
+            as_text(&codec.segment(&carried(b"aHpbHq")).expect("segments")),
             vec![
                 "a".to_owned(),
                 "Hp".to_owned(),
@@ -1072,7 +1119,7 @@ mod tests {
         );
         // and it runs on a unit sequence the exposure never carried
         assert_eq!(
-            codec.segment(&carried(b"HqHqa")).expect("segments"),
+            as_text(&codec.segment(&carried(b"HqHqa")).expect("segments")),
             vec!["Hq".to_owned(), "Hq".to_owned(), "a".to_owned()]
         );
     }
@@ -1099,7 +1146,7 @@ mod tests {
         let codec = recovery.codec.as_ref().expect("a codec");
         assert_eq!(codec.class_count(), 1);
         assert_eq!(
-            codec.segment(&carried(b"-.-.")).expect("segments"),
+            as_text(&codec.segment(&carried(b"-.-.")).expect("segments")),
             vec![
                 "-".to_owned(),
                 ".".to_owned(),
@@ -1208,9 +1255,8 @@ mod tests {
 
     #[test]
     fn a_word_past_the_exposed_radius_costs_a_scan_and_is_counted_as_one() {
-        let material =
-            ExposedMaterial::expose(vec![b"abcdef".to_vec(), b"abcdef".to_vec()], 3)
-                .expect("exposes");
+        let material = ExposedMaterial::expose(vec![b"abcdef".to_vec(), b"abcdef".to_vec()], 3)
+            .expect("exposes");
         assert_eq!(material.deep_scans(), 0);
         assert!(material.occurs(b"abcde"));
         assert_eq!(material.deep_scans(), 1);

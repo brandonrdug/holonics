@@ -201,7 +201,10 @@ fn run() -> Result<(), String> {
                 carried = next;
             }
             Err(error) => {
-                println!("  grain {} founded nothing above it: {error:?}", carried.grain() + 1);
+                println!(
+                    "  grain {} founded nothing above it: {error:?}",
+                    carried.grain() + 1
+                );
                 break;
             }
         }
@@ -305,17 +308,20 @@ fn declared_material(count: usize) -> Vec<DeclaredOccurrence> {
         "the leader carries the arc and the return founds the channel",
     ];
     (0..count)
-        .map(|at| DeclaredOccurrence {
-            identity: format!("declared:{at}"),
-            // Storage deliberately descends while `⪯` ascends, so the two orders are never
-            // confusable on this material.
-            storage_ordinal: (count - at) as u64,
-            caused_by: if at == 0 {
-                BTreeSet::new()
-            } else {
-                BTreeSet::from([format!("declared:{}", at - 1)])
-            },
-            text: SENTENCES[at % SENTENCES.len()].to_owned(),
+        .map(|at| {
+            DeclaredOccurrence::from_text(
+                format!("declared:{at}"),
+                // Storage deliberately descends while `⪯` ascends, so the two orders are never
+                // confusable on this material.
+                (count - at) as u64,
+                if at == 0 {
+                    BTreeSet::new()
+                } else {
+                    BTreeSet::from([format!("declared:{}", at - 1)])
+                },
+                SENTENCES[at % SENTENCES.len()],
+            )
+            .expect("declared text material")
         })
         .collect()
 }

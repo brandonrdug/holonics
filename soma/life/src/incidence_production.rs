@@ -141,6 +141,9 @@ pub enum IncidenceProductionError {
     CausalCycle,
     /// An occurrence carried no inscription patch at the declared extent.
     EmptyOccurrence(String),
+    /// A declared patch carried no octets or no identity. A patch with no carrier has no boundary
+    /// and cannot carry a winding, so it is not a constituent.
+    EmptyPatch,
     /// No contact survived: every patch pair was a self-contact, or every occurrence was one patch.
     NoContact,
     /// The complex declared no exposed boundary, so nothing can hand up.
@@ -165,16 +168,120 @@ pub enum IncidenceProductionError {
     ContactFaceExtent,
 }
 
+/// One patch of inscription, as the material's own codec cut it.
+///
+/// **The cut is the codec's and never this organ's.** Until 2026-08-13 the organ cut every
+/// occurrence with `split_whitespace()` and keyed each site on the resulting `String`, so the mouth
+/// admitted exactly one material — whitespace-delimited UTF-8 compared by byte equality — and the
+/// two authored decisions sat where no caller could vary them. That is the level rule
+/// (`CLAUDE.md` §8: *a level is either read off the material or declared by the caller — never
+/// authored inside the organ*) and it is also `33_THE_NECK.md` §1's ruling, deposited 2026-07-04:
+/// *"meaning lives in the relating-web BETWEEN encapsulations, never inside one — a glyph's meaning
+/// is not its bits, which is the deepest form of why text-as-byte-stream was never the
+/// communication medium."*
+///
+/// So a patch carries two things that were previously one:
+///
+/// - [`Patch::octets`] — the material's **own carrier** at this position, unnormalized. Adjacency
+///   between consecutive patches founds `∂`; the octets found the §III windings. For text these are
+///   UTF-8 bytes, for a weight file they are the datum's own words, and nothing converts between
+///   them.
+/// - [`Patch::identity`] — what the codec declares makes two patches **the same patch**. Two
+///   patches at one causal rank found one site exactly when their identities are equal.
+///
+/// For the text codec ([`DeclaredOccurrence::from_text`]) identity is the surface, which reproduces
+/// the previous behaviour exactly. A codec whose material has no meaningful surface equality — a
+/// weight file, a sampled signal — declares an identity that is a **transformation class**, and the
+/// mouth then founds sites on recurring transformation rather than on recurring bytes.
+///
+/// The founding identity is the codec's; the **revision** is behavioural, and is not this type's
+/// job: `crate::decomposing_codec` compresses the reading and re-cuts at the collapsed pair's own
+/// separating word. Founding under conduct would be circular — the complex must exist before its
+/// conduct partition does — so the codec declares, and the returned collapse revises.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Patch {
+    octets: Vec<u8>,
+    identity: String,
+}
+
+impl Patch {
+    /// Declare a patch. Refuses an empty carrier: a patch with no octets has no boundary and could
+    /// not carry a winding, so it is not a constituent.
+    pub fn new(
+        octets: Vec<u8>,
+        identity: impl Into<String>,
+    ) -> Result<Self, IncidenceProductionError> {
+        let identity = identity.into();
+        if octets.is_empty() || identity.is_empty() {
+            return Err(IncidenceProductionError::EmptyPatch);
+        }
+        Ok(Self { octets, identity })
+    }
+
+    /// The material's own carrier at this patch.
+    pub fn octets(&self) -> &[u8] {
+        &self.octets
+    }
+
+    /// What the codec declares makes two patches the same patch.
+    pub fn identity(&self) -> &str {
+        &self.identity
+    }
+}
+
 /// One occurrence of the declared material, as the corpus carries it.
 ///
 /// `storage_ordinal` is present **only so that `⪯` can be shown not to be it**. Nothing in this
 /// module reads it except [`IncidenceComplex::dependency_disagrees_with_storage`].
+///
+/// `inscription` is the codec's cut. See [`Patch`] for why the organ no longer performs it.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct DeclaredOccurrence {
     pub identity: String,
     pub storage_ordinal: u64,
     pub caused_by: BTreeSet<String>,
-    pub text: String,
+    pub inscription: Vec<Patch>,
+}
+
+impl DeclaredOccurrence {
+    /// **The text codec, declared rather than authored.**
+    ///
+    /// Cuts on whitespace and takes the surface as the identity — bit-for-bit what the organ did
+    /// internally before 2026-08-13. It is now one codec among possible codecs, named at the call
+    /// site, and a caller that wants a different grain supplies its own patches instead.
+    pub fn from_text(
+        identity: impl Into<String>,
+        storage_ordinal: u64,
+        caused_by: BTreeSet<String>,
+        text: impl AsRef<str>,
+    ) -> Result<Self, IncidenceProductionError> {
+        let mut inscription = Vec::new();
+        for patch in text.as_ref().split_whitespace() {
+            inscription.push(Patch::new(patch.as_bytes().to_vec(), patch)?);
+        }
+        Ok(Self {
+            identity: identity.into(),
+            storage_ordinal,
+            caused_by,
+            inscription,
+        })
+    }
+
+    /// The inscription rendered as its declared patch identities, space-joined.
+    ///
+    /// **Exhibition only.** This is a face — it forgets the octets and the cut — and no
+    /// construction may read it. It exists because a driver printing what it declared should print
+    /// the codec's own names for the patches, not a re-encoding of them.
+    pub fn declared_surface(&self) -> String {
+        let mut surface = String::new();
+        for patch in &self.inscription {
+            if !surface.is_empty() {
+                surface.push(' ');
+            }
+            surface.push_str(patch.identity());
+        }
+        surface
+    }
 }
 
 /// One exterior face of a contact, retained as lineage through transport.
@@ -214,7 +321,14 @@ impl DeclaredContactFace {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Site {
     pub id: EventCellId,
+    /// The codec's declared identity for this constituent: what made these patches one site.
+    /// For the text codec this is the word, which is why every prior reading is unchanged.
     pub surface: String,
+    /// The material's **own octets** at this constituent, retained unnormalized as lineage and as
+    /// the carrier every §III winding is taken over. Before 2026-08-13 the windings were taken over
+    /// `surface.as_bytes()`, so a non-text material's windings would have been read off a UTF-8
+    /// encoding of its identity rather than off the material.
+    pub octets: Vec<u8>,
     pub causal_rank: u32,
     pub grain: u32,
     /// §III: the number of adjacent bit transitions across this constituent's own octet stream.
@@ -262,6 +376,51 @@ pub struct Compound {
     /// The non-tree contact that forced this cycle. The spanning forest condenses for free; the
     /// chords are the remainder (`CLAUDE.md` §11).
     pub chord: usize,
+}
+
+/// One upward attempt: a standing constituent reaching toward an arriving one.
+///
+/// **The attachment is two-sided, and this type exists because it was one-sided.** Until
+/// 2026-08-13 an arrival landed on the standing complex by identity coincidence alone — its patches
+/// founded constituents, and any that happened to key equal to a standing constituent at the same
+/// causal rank became that constituent. The terrain contributed nothing. That is exactly the
+/// picture the one ratified law in this corpus about arrival refuses,
+/// `research/records/2026-07-17_THE_LEADER_GROWS_THE_CHANNEL_THE_RETURN_TRAVELS_THE_FOUND_PATH.md`
+/// Card D, registered as `H.0466`:
+///
+/// > *"The continuous cloud-ground path FOUNDs at actual local contact between grown constructions;
+/// > ground is not a passive terminal selected from above."*
+///
+/// with the requirement that *"A lightning world must admit plural upward leaders and retain
+/// connected and unconnected outcomes instead of manufacturing one ground endpoint."*
+///
+/// So every exposed standing constituent reaches toward every arriving one, and **whether the two
+/// meet is decided by both sides**: §IV's law is that donor and acceptor are *opposed* boundary
+/// roles, so a pair connects exactly when their polarities are opposed and refuses when they are
+/// the same. Neither side chooses the attachment point; the pair does. And the attempts that do not
+/// meet are returned rather than dropped, because an unconnected upward leader is a real occurrence
+/// and deleting it would manufacture the single endpoint the law forbids.
+///
+/// **Both polarities are read off the complex's own bonds and dependencies**, which come from the
+/// material's inscription — so this classification is not the preimage of a field a driver
+/// authored, and varying the material moves it.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct AttachmentAttempt {
+    /// The standing constituent that reached.
+    pub terrain_site: usize,
+    pub terrain_surface: String,
+    pub terrain_polarity: ExposedPolarity,
+    /// The arriving constituent it reached toward.
+    pub arrival_site: usize,
+    pub arrival_surface: String,
+    pub arrival_polarity: ExposedPolarity,
+    /// §III, the material's own reading of the gap: how far the contact would cross, and which
+    /// sheet it would land on. Retained on every attempt, connected or not, so an unconnected one
+    /// is inspectable rather than a bare refusal.
+    pub contact_winding: u32,
+    pub sheet: i8,
+    /// Whether the two grown constructions actually met.
+    pub connected: bool,
 }
 
 /// §IV: donor and acceptor are opposed boundary roles, not absolute labels.
@@ -316,7 +475,11 @@ pub enum PhaseChart {
 }
 
 impl PhaseChart {
-    pub const ALL: [Self; 3] = [Self::HalfTurnOnly, Self::WindingAdjacent, Self::WindingSpread];
+    pub const ALL: [Self; 3] = [
+        Self::HalfTurnOnly,
+        Self::WindingAdjacent,
+        Self::WindingSpread,
+    ];
 
     pub const fn name(self) -> &'static str {
         match self {
@@ -336,7 +499,10 @@ impl PhaseChart {
     }
 
     /// The exact rational rotation this chart assigns to a material winding number.
-    pub fn rotation(self, winding: u32) -> Result<ExactWavePhaseTransport, IncidenceProductionError> {
+    pub fn rotation(
+        self,
+        winding: u32,
+    ) -> Result<ExactWavePhaseTransport, IncidenceProductionError> {
         let (numerator, denominator) = self.half_angle(winding);
         let p = BigInt::from(numerator);
         let q = BigInt::from(denominator);
@@ -408,6 +574,82 @@ impl IncidenceComplex {
     pub fn exposed(&self) -> &[usize] {
         &self.exposed
     }
+    /// §IV's boundary role for one constituent, read off this complex's own bonds and `⪯` edges.
+    ///
+    /// `None` when the constituent participates in neither, which is an isolated cell and exposes
+    /// no role at all. This is the same law `hand_up` applies per compound, taken globally so an
+    /// arrival can be met.
+    pub fn site_polarity(&self, at: usize) -> Option<ExposedPolarity> {
+        let mut donates = false;
+        let mut accepts = false;
+        for bond in &self.bonds {
+            if bond.from == at {
+                donates = true;
+            }
+            if bond.to == at {
+                accepts = true;
+            }
+        }
+        for (before, after) in &self.dependencies {
+            if *before == at {
+                donates = true;
+            }
+            if *after == at {
+                accepts = true;
+            }
+        }
+        match (donates, accepts) {
+            (true, true) => Some(ExposedPolarity::Both),
+            (true, false) => Some(ExposedPolarity::Donor),
+            (false, true) => Some(ExposedPolarity::Acceptor),
+            (false, false) => None,
+        }
+    }
+
+    /// **The two-sided attachment.** Every standing constituent that exposes a role reaches toward
+    /// every constituent the arrival founded, and the pair decides whether they meet.
+    ///
+    /// Read on the complex *after* admission, with `trace` naming which constituents are the
+    /// arrival's: anything at or beyond [`ArrivalTrace::base_sites`] was founded by it. Both
+    /// outcomes are returned. See [`AttachmentAttempt`] for the law and why the unconnected ones
+    /// may not be dropped.
+    pub fn attachment(&self, trace: &ArrivalTrace) -> Vec<AttachmentAttempt> {
+        let mut attempts = Vec::new();
+        for terrain_site in 0..trace.base_sites.min(self.sites.len()) {
+            let Some(terrain_polarity) = self.site_polarity(terrain_site) else {
+                continue;
+            };
+            for arrival_site in trace.base_sites..self.sites.len() {
+                let Some(arrival_polarity) = self.site_polarity(arrival_site) else {
+                    continue;
+                };
+                let connected = match (terrain_polarity, arrival_polarity) {
+                    // A constituent exposing both roles can meet either.
+                    (ExposedPolarity::Both, _) | (_, ExposedPolarity::Both) => true,
+                    // Opposed roles meet; equal roles have no direction between them.
+                    (ExposedPolarity::Donor, ExposedPolarity::Acceptor)
+                    | (ExposedPolarity::Acceptor, ExposedPolarity::Donor) => true,
+                    _ => false,
+                };
+                attempts.push(AttachmentAttempt {
+                    terrain_site,
+                    terrain_surface: self.sites[terrain_site].surface.clone(),
+                    terrain_polarity,
+                    arrival_site,
+                    arrival_surface: self.sites[arrival_site].surface.clone(),
+                    arrival_polarity,
+                    contact_winding: contact_winding(
+                        &self.sites[terrain_site].octets,
+                        &self.sites[arrival_site].octets,
+                    ),
+                    sheet: sheet_of(&self.sites[arrival_site].octets),
+                    connected,
+                });
+            }
+        }
+        attempts
+    }
+
     pub fn ingress_was_declared(&self) -> bool {
         self.ingress_was_declared
     }
@@ -499,7 +741,7 @@ impl IncidenceComplex {
 
         for (at, occurrence) in occurrences.iter().enumerate() {
             let rank = ranks[at];
-            let complete = occurrence.text.split_whitespace().count();
+            let complete = occurrence.inscription.len();
             if complete == 0 {
                 return Err(IncidenceProductionError::EmptyOccurrence(
                     occurrence.identity.clone(),
@@ -515,13 +757,8 @@ impl IncidenceComplex {
             }
 
             let mut previous: Option<usize> = None;
-            for (patch_at, patch) in occurrence
-                .text
-                .split_whitespace()
-                .take(patch_extent)
-                .enumerate()
-            {
-                let key = (rank, patch.to_owned());
+            for (patch_at, patch) in occurrence.inscription.iter().take(patch_extent).enumerate() {
+                let key = (rank, patch.identity().to_owned());
                 let at_site = match site_index.get(&key) {
                     Some(found) => {
                         sites[*found].occurrences = sites[*found]
@@ -534,10 +771,11 @@ impl IncidenceComplex {
                         let ordinal = sites.len();
                         sites.push(Site {
                             id: EventCellId::new(0),
-                            surface: patch.to_owned(),
+                            surface: patch.identity().to_owned(),
+                            octets: patch.octets().to_vec(),
                             causal_rank: rank,
                             grain: 0,
-                            octet_winding: octet_winding(patch.as_bytes()),
+                            octet_winding: octet_winding(patch.octets()),
                             occurrences: 1,
                         });
                         site_index.insert(key, ordinal);
@@ -584,7 +822,11 @@ impl IncidenceComplex {
                 .iter()
                 .enumerate()
                 .map(|(at, occurrence)| {
-                    (occurrence.identity.clone(), occurrence.storage_ordinal, ranks[at])
+                    (
+                        occurrence.identity.clone(),
+                        occurrence.storage_ordinal,
+                        ranks[at],
+                    )
                 })
                 .collect(),
         )
@@ -678,7 +920,8 @@ impl IncidenceComplex {
         &self,
         sorted: bool,
     ) -> (Vec<EventCell>, Vec<OrientedIncidence>, Vec<EventPort>) {
-        let mut cells = Vec::with_capacity(self.sites.len() + self.bonds.len() + self.compounds.len());
+        let mut cells =
+            Vec::with_capacity(self.sites.len() + self.bonds.len() + self.compounds.len());
         for site in &self.sites {
             cells.push(EventCell::situated(
                 site.id,
@@ -723,12 +966,7 @@ impl IncidenceComplex {
             ));
         }
         for compound in &self.compounds {
-            for (slot, (at, hand)) in compound
-                .bonds
-                .iter()
-                .zip(compound.hands.iter())
-                .enumerate()
-            {
+            for (slot, (at, hand)) in compound.bonds.iter().zip(compound.hands.iter()).enumerate() {
                 incidences.push(OrientedIncidence::boundary(
                     self.bonds[*at].id,
                     compound.id,
@@ -769,12 +1007,7 @@ impl IncidenceComplex {
         if sorted {
             cells.sort_by_key(|cell| cell.id().ordinal());
             incidences.sort_by_key(|incidence| (incidence.to().ordinal(), incidence.slot()));
-            ports.sort_by_key(|port| {
-                (
-                    matches!(port.kind(), EventPortKind::Exposed),
-                    port.slot(),
-                )
-            });
+            ports.sort_by_key(|port| (matches!(port.kind(), EventPortKind::Exposed), port.slot()));
         } else {
             cells.reverse();
             incidences.reverse();
@@ -794,9 +1027,11 @@ impl IncidenceComplex {
     /// The outer grain the body reads off the declared exposed boundary. Always `grain + 1`.
     pub fn body_outer_grain(&self) -> Result<u32, IncidenceProductionError> {
         let (cells, incidences, ports) = self.event_parts(true);
-        let complex =
-            EventComplex::new(&cells, &incidences, &ports).map_err(IncidenceProductionError::Body)?;
-        complex.outer_grain().map_err(IncidenceProductionError::Body)
+        let complex = EventComplex::new(&cells, &incidences, &ports)
+            .map_err(IncidenceProductionError::Body)?;
+        complex
+            .outer_grain()
+            .map_err(IncidenceProductionError::Body)
     }
 
     /// The two exposed-boundary readings `body::incidence` supplies, under both storage orders.
@@ -853,7 +1088,10 @@ impl IncidenceComplex {
             .compounds
             .get(compound)
             .ok_or(IncidenceProductionError::Extent)?;
-        let bond = *target.bonds.get(edge).ok_or(IncidenceProductionError::Extent)?;
+        let bond = *target
+            .bonds
+            .get(edge)
+            .ok_or(IncidenceProductionError::Extent)?;
         let hand = target.hands[edge];
         let bond_id = self.bonds[bond].id;
         let mut flipped = false;
@@ -1109,7 +1347,10 @@ impl IncidenceComplex {
     pub fn interfere_all(&self, routes: &[Route], mode: u64) -> Vec<Interference> {
         let mut by_target = BTreeMap::<usize, Vec<Route>>::new();
         for route in routes {
-            by_target.entry(route.target).or_default().push(route.clone());
+            by_target
+                .entry(route.target)
+                .or_default()
+                .push(route.clone());
         }
         let mut found = Vec::with_capacity(by_target.len());
         for (target, arriving) in by_target {
@@ -1279,6 +1520,10 @@ impl IncidenceComplex {
             sites.push(Site {
                 id: EventCellId::new(0),
                 surface: emission.surface.clone(),
+                // A grade-`k+1` constituent is founded from the emission handed up by a completed
+                // compound, not from exterior material, so its own carrier is that emission's
+                // surface. The codec's cut applies at grade 0 only.
+                octets: emission.surface.as_bytes().to_vec(),
                 causal_rank: emission.causal_rank,
                 grain,
                 octet_winding: octet_winding(emission.surface.as_bytes()),
@@ -1478,10 +1723,7 @@ impl IncidenceComplex {
         for bond in &self.bonds {
             // `∂bond = to − from`, exactly as `event_parts` presents it to the body.
             let mut chain = CausalChain::default();
-            chain.add_term(
-                site_cells[bond.to],
-                ComparativeMultiplicity::positive(1u32),
-            );
+            chain.add_term(site_cells[bond.to], ComparativeMultiplicity::positive(1u32));
             chain.add_term(
                 site_cells[bond.from],
                 ComparativeMultiplicity::negative(1u32),
@@ -1598,11 +1840,8 @@ impl IncidenceComplex {
         let mut residual = BigInt::from(0);
         let mut support = BTreeSet::new();
         let mut support_contacts = Vec::new();
-        for (position, (bond_at, hand)) in compound
-            .bonds
-            .iter()
-            .zip(compound.hands.iter())
-            .enumerate()
+        for (position, (bond_at, hand)) in
+            compound.bonds.iter().zip(compound.hands.iter()).enumerate()
         {
             let bond = &self.bonds[*bond_at];
             let carried = i64::from(bond.sheet) * i64::from(bond.contact_winding);
@@ -1769,10 +2008,7 @@ impl IncidenceComplex {
     }
 
     /// The same image, read off **this module's own** fundamental-cycle basis.
-    pub fn holonomy_image(
-        &self,
-        chart: PhaseChart,
-    ) -> Result<BigInt, IncidenceProductionError> {
+    pub fn holonomy_image(&self, chart: PhaseChart) -> Result<BigInt, IncidenceProductionError> {
         let mut image = BigInt::from(0);
         for differentiation in self.differentiate_all(chart)? {
             image = exact_gcd(&image, &differentiation.residual);
@@ -1879,7 +2115,7 @@ impl IncidenceComplex {
         let base_sites = sites.len();
         let base_bonds = bonds.len();
 
-        let complete = arrival.text.split_whitespace().count();
+        let complete = arrival.inscription.len();
         if complete == 0 {
             return Err(IncidenceProductionError::EmptyOccurrence(
                 arrival.identity.clone(),
@@ -1898,8 +2134,8 @@ impl IncidenceComplex {
 
         let mut previous: Option<usize> = None;
         let mut self_contacts = self.self_contacts_refused;
-        for patch in arrival.text.split_whitespace().take(self.patch_extent) {
-            let key = (rank, patch.to_owned());
+        for patch in arrival.inscription.iter().take(self.patch_extent) {
+            let key = (rank, patch.identity().to_owned());
             let at_site = match site_index.get(&key) {
                 Some(found) => {
                     sites[*found].occurrences = sites[*found]
@@ -1913,10 +2149,11 @@ impl IncidenceComplex {
                     let ordinal = sites.len();
                     sites.push(Site {
                         id: EventCellId::new(0),
-                        surface: patch.to_owned(),
+                        surface: patch.identity().to_owned(),
+                        octets: patch.octets().to_vec(),
                         causal_rank: rank,
                         grain: self.grain,
-                        octet_winding: octet_winding(patch.as_bytes()),
+                        octet_winding: octet_winding(patch.octets()),
                         occurrences: 1,
                     });
                     site_index.insert(key, ordinal);
@@ -2299,7 +2536,9 @@ impl Emission {
 
     /// **What closure fixed.** The closed boundary itself: its traversal, its transport, its
     /// enclosed contacts. Only a reopening changes any of this.
-    pub fn closed_boundary_reading(&self) -> (&str, &ExactWavePhaseTransport, i8, usize, usize, &[String]) {
+    pub fn closed_boundary_reading(
+        &self,
+    ) -> (&str, &ExactWavePhaseTransport, i8, usize, usize, &[String]) {
         (
             &self.surface,
             &self.holonomy,
@@ -2320,10 +2559,7 @@ impl Emission {
     /// reopened, and reading a refreshed count as a reopening would be exactly the count-standing-
     /// in-for-a-return the tape record convicted.
     pub fn frame_reading(&self) -> (u64, &[(String, ExposedPolarity)]) {
-        (
-            self.residual.carried_multiplicity,
-            &self.residual.exposed,
-        )
+        (self.residual.carried_multiplicity, &self.residual.exposed)
     }
 }
 
@@ -2539,7 +2775,10 @@ pub struct ArrivalResponse {
 impl ArrivalResponse {
     /// The load-bearing claim: a **named** earlier successor moved.
     pub fn moved(&self) -> Vec<&ClosureVerdict> {
-        self.verdicts.iter().filter(|verdict| verdict.moved).collect()
+        self.verdicts
+            .iter()
+            .filter(|verdict| verdict.moved)
+            .collect()
     }
 
     /// The valence half of the law, scored over every standing closed boundary: `(right, wrong)`.
@@ -2648,7 +2887,10 @@ pub fn sheet_of(inscription: &[u8]) -> i8 {
 fn derive_dependencies(sites: &[Site]) -> Vec<(usize, usize)> {
     let mut by_surface = BTreeMap::<&str, Vec<usize>>::new();
     for (at, site) in sites.iter().enumerate() {
-        by_surface.entry(site.surface.as_str()).or_default().push(at);
+        by_surface
+            .entry(site.surface.as_str())
+            .or_default()
+            .push(at);
     }
     let mut dependencies = Vec::new();
     for occurrences_of in by_surface.values() {
@@ -2670,7 +2912,11 @@ fn derive_dependencies(sites: &[Site]) -> Vec<(usize, usize)> {
 /// of whose residuals vanishes has a **zero** holonomy image rather than an undefined one.
 fn exact_gcd(left: &BigInt, right: &BigInt) -> BigInt {
     let zero = BigInt::from(0);
-    let mut a = if *left < zero { -left.clone() } else { left.clone() };
+    let mut a = if *left < zero {
+        -left.clone()
+    } else {
+        left.clone()
+    };
     let mut b = if *right < zero {
         -right.clone()
     } else {
@@ -2722,11 +2968,8 @@ fn found_bond(
                 to,
                 causal_rank,
                 grain,
-                contact_winding: contact_winding(
-                    sites[from].surface.as_bytes(),
-                    sites[to].surface.as_bytes(),
-                ),
-                sheet: sheet_of(sites[to].surface.as_bytes()),
+                contact_winding: contact_winding(&sites[from].octets, &sites[to].octets),
+                sheet: sheet_of(&sites[to].octets),
                 multiplicity: 1,
                 contact_faces,
             });
@@ -2740,9 +2983,7 @@ fn found_bond(
 /// This is `⪯_t`. It consults no ordinal, no timestamp and no slice position. An occurrence whose
 /// causes all lie outside the declared family is a root of the declared cut, which is the honest
 /// reading: the cut is bounded and its outside is not present.
-fn causal_ranks(
-    occurrences: &[DeclaredOccurrence],
-) -> Result<Vec<u32>, IncidenceProductionError> {
+fn causal_ranks(occurrences: &[DeclaredOccurrence]) -> Result<Vec<u32>, IncidenceProductionError> {
     let mut index = BTreeMap::new();
     for (at, occurrence) in occurrences.iter().enumerate() {
         index.insert(occurrence.identity.as_str(), at);
@@ -2898,31 +3139,291 @@ fn fundamental_cycles(
 mod tests {
     use super::*;
 
+    /// One occurrence whose patches are declared directly, bypassing the text codec.
+    fn declared_patches(
+        identity: &str,
+        patches: &[(&[u8], &str)],
+    ) -> Result<DeclaredOccurrence, IncidenceProductionError> {
+        let mut inscription = Vec::new();
+        for (octets, patch_identity) in patches {
+            inscription.push(Patch::new(octets.to_vec(), *patch_identity)?);
+        }
+        Ok(DeclaredOccurrence {
+            identity: identity.to_owned(),
+            storage_ordinal: 0,
+            caused_by: BTreeSet::new(),
+            inscription,
+        })
+    }
+
+    /// **The mouth admits a material whose carrier is not UTF-8 words, and reads its windings off
+    /// the material's own octets.**
+    ///
+    /// Before 2026-08-13 this was not expressible: the organ cut `occurrence.text` on whitespace
+    /// and took `octet_winding(patch.as_bytes())`, so any material had to present as a UTF-8 string
+    /// and its windings were read off that presentation. Here the octets are two-octet words that
+    /// are not valid text, and the identity is a short declared name whose own bytes carry a
+    /// *different* winding — so a reading that had quietly fallen back to the identity would return
+    /// the wrong number rather than merely failing.
+    #[test]
+    fn a_material_that_is_not_text_admits_and_its_windings_come_from_its_own_octets() {
+        // 0xAA 0x55 alternates every bit: 7 transitions inside each octet, 0 across the join.
+        let alternating: &[u8] = &[0xAA, 0x55];
+        // The identity's own bytes carry 6, so the two readings are distinguishable.
+        assert_eq!(octet_winding(alternating), 14);
+        assert_eq!(octet_winding(b"w0"), 6);
+
+        let occurrence = declared_patches(
+            "weights:0",
+            &[
+                (alternating, "w0"),
+                (&[0x00, 0xFF], "w1"),
+                (alternating, "w0"),
+            ],
+        )
+        .expect("declared patches");
+        let complex = IncidenceComplex::found(&[occurrence], 3).expect("found a non-text complex");
+
+        // Two distinct sites: the third patch is the first one recurring.
+        assert_eq!(complex.sites().len(), 2);
+        let first = complex
+            .sites()
+            .iter()
+            .find(|site| site.surface == "w0")
+            .expect("the declared identity names the site");
+        assert_eq!(first.occurrences, 2);
+        // The winding is the material's, not the identity's.
+        assert_eq!(first.octet_winding, 14);
+        assert_eq!(first.octets, alternating);
+    }
+
+    /// **The identity is the codec's, and declaring a different one founds a different complex.**
+    ///
+    /// This is the falsifier for the whole change. The same octets are admitted twice: once under a
+    /// codec whose identity is the surface — which is what the organ used to hardcode — and once
+    /// under a codec that declares two distinct surfaces to be one patch. If the identity were
+    /// still byte equality on the surface, the two readings would be identical and this test could
+    /// not fail; because it is the codec's, the second reading merges a pair the first separated,
+    /// and the merge is visible as a site the material recurs at.
+    #[test]
+    fn declaring_a_different_patch_identity_founds_a_different_complex() {
+        let by_surface = declared_patches(
+            "material",
+            &[(b"alpha", "alpha"), (b"beta", "beta"), (b"alpha", "alpha")],
+        )
+        .expect("declared patches");
+        // A codec that reads both surfaces as one transformation class.
+        let by_class = declared_patches(
+            "material",
+            &[
+                (b"alpha", "class:a"),
+                (b"beta", "class:a"),
+                (b"alpha", "class:a"),
+            ],
+        )
+        .expect("declared patches");
+
+        let surface_complex =
+            IncidenceComplex::found(&[by_surface], 3).expect("found under surface identity");
+        assert_eq!(surface_complex.sites().len(), 2);
+
+        // Under the coarser identity every patch is one site, so every contact is a self-contact
+        // and the complex is refused for carrying no contact at all — which is the honest return:
+        // a codec that collapses everything has founded no relation, and the organ says so rather
+        // than returning a one-site complex that looks like a reading.
+        let class_error = IncidenceComplex::found(&[by_class], 3)
+            .expect_err("a total collapse founds no contact");
+        assert_eq!(class_error, IncidenceProductionError::NoContact);
+
+        // And a codec that merges exactly one pair, leaving a third apart, founds a strictly
+        // coarser complex than the surface reading rather than refusing.
+        let partial = declared_patches(
+            "material",
+            &[
+                (b"alpha", "class:a"),
+                (b"beta", "class:a"),
+                (b"gamma", "gamma"),
+            ],
+        )
+        .expect("declared patches");
+        let partial_complex =
+            IncidenceComplex::found(&[partial], 3).expect("found under the partial identity");
+        assert_eq!(partial_complex.sites().len(), 2);
+        assert_eq!(
+            partial_complex
+                .sites()
+                .iter()
+                .find(|site| site.surface == "class:a")
+                .expect("the merged class is a site")
+                .occurrences,
+            2
+        );
+    }
+
+    /// **The attachment is two-sided, plural, and retains both outcomes.**
+    ///
+    /// `H.0466` requires that a world *"admit plural upward leaders and retain connected and
+    /// unconnected outcomes instead of manufacturing one ground endpoint."* This is that
+    /// requirement as a check that can fail: if every attempt connected, the terrain would be a
+    /// passive terminal after all; if only one did, the single endpoint would have been
+    /// manufactured; and if the outcome did not follow from **both** polarities, the arrival would
+    /// still be choosing where it lands.
+    #[test]
+    fn the_attachment_is_two_sided_and_retains_the_unconnected_attempts() {
+        let base_material =
+            vec![
+                DeclaredOccurrence::from_text("terrain", 0, BTreeSet::new(), "alpha beta gamma")
+                    .expect("declared text material"),
+            ];
+        let base = IncidenceComplex::found(&base_material, 8).expect("found the terrain");
+
+        // The terrain's own chain gives one pure donor, one pure acceptor, and one of each role.
+        let role = |surface: &str| {
+            let at = base
+                .sites()
+                .iter()
+                .position(|site| site.surface == surface)
+                .expect("the terrain carries this constituent");
+            base.site_polarity(at)
+        };
+        assert_eq!(role("alpha"), Some(ExposedPolarity::Donor));
+        assert_eq!(role("beta"), Some(ExposedPolarity::Both));
+        assert_eq!(role("gamma"), Some(ExposedPolarity::Acceptor));
+
+        let arrival = DeclaredOccurrence::from_text("arrival", 1, BTreeSet::new(), "delta epsilon")
+            .expect("declared text material");
+        let response = base
+            .admit_later(
+                &arrival,
+                PhaseChart::HalfTurnOnly,
+                &CoefficientGroup::Integers,
+            )
+            .expect("admit the arrival");
+        let attempts = response.complex.attachment(&response.trace);
+
+        // Plural: every exposed terrain constituent reached toward every arriving one.
+        assert_eq!(attempts.len(), 6);
+        let connected = attempts.iter().filter(|a| a.connected).count();
+        let unconnected = attempts.len() - connected;
+        // BOTH outcomes are present. Neither is manufactured away.
+        assert!(connected > 0, "no attempt met: the terrain is inert");
+        assert!(
+            unconnected > 0,
+            "every attempt met: the outcome cannot vary, so it tests nothing"
+        );
+        assert_eq!(connected, 4);
+        assert_eq!(unconnected, 2);
+
+        // And the outcome follows from BOTH polarities, never from one side.
+        for attempt in &attempts {
+            let opposed = matches!(
+                (attempt.terrain_polarity, attempt.arrival_polarity),
+                (ExposedPolarity::Both, _)
+                    | (_, ExposedPolarity::Both)
+                    | (ExposedPolarity::Donor, ExposedPolarity::Acceptor)
+                    | (ExposedPolarity::Acceptor, ExposedPolarity::Donor)
+            );
+            assert_eq!(
+                attempt.connected,
+                opposed,
+                "{} ({:?}) → {} ({:?})",
+                attempt.terrain_surface,
+                attempt.terrain_polarity,
+                attempt.arrival_surface,
+                attempt.arrival_polarity
+            );
+        }
+
+        // The two that did not meet are the same-role pairs, and each is inspectable rather than a
+        // bare refusal: it carries the material's own reading of the gap it could not cross.
+        for attempt in attempts.iter().filter(|a| !a.connected) {
+            assert_eq!(attempt.terrain_polarity, attempt.arrival_polarity);
+            assert!(attempt.contact_winding > 0);
+        }
+    }
+
+    /// **The gauge check: the material moves the attachment.**
+    ///
+    /// A classification whose material cannot vary the property under test is the defect `CLAUDE.md`
+    /// §8 convicts, wearing a passing result. Here the same arrival is met by a terrain whose own
+    /// inscription gives its constituents different roles, and the outcome must move.
+    #[test]
+    fn changing_the_terrains_material_moves_which_attempts_meet() {
+        let arrival = DeclaredOccurrence::from_text("arrival", 1, BTreeSet::new(), "delta epsilon")
+            .expect("declared text material");
+
+        let meet = |text: &str| {
+            let material = vec![
+                DeclaredOccurrence::from_text("terrain", 0, BTreeSet::new(), text)
+                    .expect("declared text material"),
+            ];
+            let base = IncidenceComplex::found(&material, 8).expect("found the terrain");
+            let response = base
+                .admit_later(
+                    &arrival,
+                    PhaseChart::HalfTurnOnly,
+                    &CoefficientGroup::Integers,
+                )
+                .expect("admit the arrival");
+            let attempts = response.complex.attachment(&response.trace);
+            let connected = attempts.iter().filter(|a| a.connected).count();
+            (attempts.len(), connected)
+        };
+
+        // A three-constituent chain: one donor, one both, one acceptor.
+        let chain = meet("alpha beta gamma");
+        // A closed cycle on the same three: every constituent both donates and accepts, so every
+        // attempt meets. The terrain's own material changed what the identical arrival could reach.
+        let cycle = meet("alpha beta gamma alpha");
+        assert_eq!(chain, (6, 4));
+        assert_eq!(cycle, (6, 6));
+        assert_ne!(chain.1, cycle.1);
+    }
+
+    /// The control: the text codec reproduces exactly what the organ used to do internally, so
+    /// nothing above this change reads differently.
+    #[test]
+    fn the_text_codec_reproduces_the_previous_internal_cut() {
+        let text = "the arc bends the channel";
+        let occurrence =
+            DeclaredOccurrence::from_text("t", 0, BTreeSet::new(), text).expect("text codec");
+        let mut cut = text.split_whitespace();
+        for patch in &occurrence.inscription {
+            assert_eq!(Some(patch.identity()), cut.next());
+            assert_eq!(patch.octets(), patch.identity().as_bytes());
+        }
+        assert_eq!(cut.next(), None);
+        assert_eq!(occurrence.declared_surface(), text);
+    }
+
     fn material() -> Vec<DeclaredOccurrence> {
         // A causal chain of three, whose storage ordinals deliberately do NOT ascend with it.
         vec![
-            DeclaredOccurrence {
-                identity: "b".to_owned(),
-                storage_ordinal: 90,
-                caused_by: BTreeSet::from(["a".to_owned()]),
-                // Carries both `bends ⟶ the` and `the ⟶ bends`: the two contacts cross the same
-                // number of bits (`popcount('s'⊕'t') = popcount('e'⊕'b') = 3`) and land on
-                // opposed sheets (`popcount('t')` even, `popcount('b')` odd), so their transports
-                // are exact inverses and the two routes through them cancel in EVERY chart.
-                text: "the arc bends the channel and the bends carry the return".to_owned(),
-            },
-            DeclaredOccurrence {
-                identity: "a".to_owned(),
-                storage_ordinal: 91,
-                caused_by: BTreeSet::new(),
-                text: "the leader founds the channel and the channel carries the leader".to_owned(),
-            },
-            DeclaredOccurrence {
-                identity: "c".to_owned(),
-                storage_ordinal: 12,
-                caused_by: BTreeSet::from(["b".to_owned()]),
-                text: "the channel returns the leader and the leader founds the arc".to_owned(),
-            },
+            // Carries both `bends ⟶ the` and `the ⟶ bends`: the two contacts cross the same
+            // number of bits (`popcount('s'⊕'t') = popcount('e'⊕'b') = 3`) and land on
+            // opposed sheets (`popcount('t')` even, `popcount('b')` odd), so their transports
+            // are exact inverses and the two routes through them cancel in EVERY chart.
+            DeclaredOccurrence::from_text(
+                "b".to_owned(),
+                90,
+                BTreeSet::from(["a".to_owned()]),
+                "the arc bends the channel and the bends carry the return",
+            )
+            .expect("declared text material"),
+            DeclaredOccurrence::from_text(
+                "a".to_owned(),
+                91,
+                BTreeSet::new(),
+                "the leader founds the channel and the channel carries the leader".to_owned(),
+            )
+            .expect("declared text material"),
+            DeclaredOccurrence::from_text(
+                "c".to_owned(),
+                12,
+                BTreeSet::from(["b".to_owned()]),
+                "the channel returns the leader and the leader founds the arc".to_owned(),
+            )
+            .expect("declared text material"),
         ]
     }
 
@@ -2986,7 +3487,9 @@ mod tests {
             .expect("reversing one hand founds a lawful complex");
         let reversed_endpoints = (
             reversed.sites()[reversed.bonds()[bond].to].surface.clone(),
-            reversed.sites()[reversed.bonds()[bond].from].surface.clone(),
+            reversed.sites()[reversed.bonds()[bond].from]
+                .surface
+                .clone(),
         );
         assert_eq!(endpoints, reversed_endpoints);
 
@@ -2997,9 +3500,10 @@ mod tests {
         let after = reversed
             .routes_from(source, 4, PhaseChart::WindingAdjacent)
             .unwrap();
-        let moved = before.iter().zip(after.iter()).any(|(left, right)| {
-            left.sites == right.sites && left.amplitude != right.amplitude
-        }) || before.len() != after.len();
+        let moved =
+            before.iter().zip(after.iter()).any(|(left, right)| {
+                left.sites == right.sites && left.amplitude != right.amplitude
+            }) || before.len() != after.len();
         assert!(moved, "reversing a hand left every composition unchanged");
     }
 
@@ -3045,12 +3549,13 @@ mod tests {
     fn the_control_material_cannot_cancel() {
         // The falsifier must be able to fail. Every constituent distinct means the contact graph
         // is a forest: one route per arrival, so nothing can interfere with anything.
-        let control = vec![DeclaredOccurrence {
-            identity: "control".to_owned(),
-            storage_ordinal: 0,
-            caused_by: BTreeSet::new(),
-            text: "alpha bravo charlie delta echo foxtrot golf".to_owned(),
-        }];
+        let control = vec![DeclaredOccurrence::from_text(
+            "control".to_owned(),
+            0,
+            BTreeSet::new(),
+            "alpha bravo charlie delta echo foxtrot golf".to_owned(),
+        )
+        .expect("declared text material")];
         let complex = IncidenceComplex::found(&control, 32).unwrap();
         assert!(complex.compounds().is_empty());
         for chart in PhaseChart::ALL {
@@ -3111,12 +3616,13 @@ mod tests {
         // `popcount('a')` is odd. The two turns are exact inverses and the boundary returns the
         // identity while neither turn is the identity. So `curved` is a measurement of the
         // material and not a property of the chart.
-        let material = vec![DeclaredOccurrence {
-            identity: "flat".to_owned(),
-            storage_ordinal: 0,
-            caused_by: BTreeSet::new(),
-            text: "ab cc ab".to_owned(),
-        }];
+        let material = vec![DeclaredOccurrence::from_text(
+            "flat".to_owned(),
+            0,
+            BTreeSet::new(),
+            "ab cc ab".to_owned(),
+        )
+        .expect("declared text material")];
         let complex = IncidenceComplex::found(&material, 8).unwrap();
         let emissions = complex.hand_up(PhaseChart::WindingAdjacent).unwrap();
         assert!(!emissions.is_empty());
@@ -3126,10 +3632,7 @@ mod tests {
         );
         // And the turns that cancelled were not themselves the identity: a boundary of identities
         // would prove nothing.
-        assert!(complex
-            .bonds()
-            .iter()
-            .all(|bond| bond.contact_winding != 0));
+        assert!(complex.bonds().iter().all(|bond| bond.contact_winding != 0));
     }
 
     #[test]
@@ -3151,7 +3654,9 @@ mod tests {
             // two closed boundaries, so it can never exceed the contact population below it.
             assert!(next.bonds().len() <= complex.bonds().len());
             assert!(
-                next.bonds().iter().all(|bond| !bond.contact_faces.is_empty()),
+                next.bonds()
+                    .iter()
+                    .all(|bond| !bond.contact_faces.is_empty()),
                 "a higher-grain contact erased every lower contact face"
             );
         }
@@ -3175,7 +3680,9 @@ mod tests {
     #[test]
     fn stokes_holds_on_every_closed_boundary() {
         let complex = complex();
-        let differentiated = complex.differentiate_all(PhaseChart::WindingAdjacent).unwrap();
+        let differentiated = complex
+            .differentiate_all(PhaseChart::WindingAdjacent)
+            .unwrap();
         assert!(!differentiated.is_empty());
         for one in &differentiated {
             assert!(
@@ -3233,7 +3740,9 @@ mod tests {
     #[test]
     fn the_residual_of_a_combination_is_linear() {
         let complex = complex();
-        let differentiated = complex.differentiate_all(PhaseChart::WindingAdjacent).unwrap();
+        let differentiated = complex
+            .differentiate_all(PhaseChart::WindingAdjacent)
+            .unwrap();
         assert!(differentiated.len() >= 2);
         for left in 0..differentiated.len() {
             for right in (left + 1)..differentiated.len() {
@@ -3253,12 +3762,13 @@ mod tests {
         let complex = complex();
         let chart = PhaseChart::WindingAdjacent;
         let group = CoefficientGroup::Integers;
-        let arrival = DeclaredOccurrence {
-            identity: "arrival".to_owned(),
-            storage_ordinal: 7,
-            caused_by: BTreeSet::from(["a".to_owned()]),
-            text: "the bends carry arc the".to_owned(),
-        };
+        let arrival = DeclaredOccurrence::from_text(
+            "arrival".to_owned(),
+            7,
+            BTreeSet::from(["a".to_owned()]),
+            "the bends carry arc the".to_owned(),
+        )
+        .expect("declared text material");
         let response = complex.admit_later(&arrival, chart, &group).unwrap();
         assert!(response.arrival_is_co_present);
         assert_eq!(response.arrival_rank, 1);
@@ -3275,7 +3785,10 @@ mod tests {
         assert!(!response.founded.is_empty());
         // What DID move on a named standing compound is its valence, and the law predicts it
         // exactly.
-        assert!(response.verdicts.iter().any(|verdict| verdict.valence_moved));
+        assert!(response
+            .verdicts
+            .iter()
+            .any(|verdict| verdict.valence_moved));
         let (right, wrong) = response.valence_law_agreement();
         assert_eq!(wrong, 0, "the valence law was wrong {wrong} times");
         assert_eq!(right, response.verdicts.len());
@@ -3286,12 +3799,13 @@ mod tests {
         let complex = complex();
         let chart = PhaseChart::WindingAdjacent;
         let group = CoefficientGroup::Integers;
-        let arrival = DeclaredOccurrence {
-            identity: "arrival".to_owned(),
-            storage_ordinal: 7,
-            caused_by: BTreeSet::from(["a".to_owned()]),
-            text: "the bends carry arc the".to_owned(),
-        };
+        let arrival = DeclaredOccurrence::from_text(
+            "arrival".to_owned(),
+            7,
+            BTreeSet::from(["a".to_owned()]),
+            "the bends carry arc the".to_owned(),
+        )
+        .expect("declared text material");
         let response = complex.admit_later(&arrival, chart, &group).unwrap();
         assert_ne!(response.before, response.after);
         let withdrawn = response.complex.withdraw(&response.trace).unwrap();
@@ -3314,12 +3828,13 @@ mod tests {
         // The control: the closed boundary's residual is exactly zero, the arrival reaches it with
         // genuinely new cells, and the cycle it founds through the compound carries the compound's
         // whole contribution — which is nothing.
-        let material = vec![DeclaredOccurrence {
-            identity: "saturated".to_owned(),
-            storage_ordinal: 0,
-            caused_by: BTreeSet::new(),
-            text: "ab cc ab".to_owned(),
-        }];
+        let material = vec![DeclaredOccurrence::from_text(
+            "saturated".to_owned(),
+            0,
+            BTreeSet::new(),
+            "ab cc ab".to_owned(),
+        )
+        .expect("declared text material")];
         let complex = IncidenceComplex::found(&material, 8).unwrap();
         let chart = PhaseChart::WindingAdjacent;
         let group = CoefficientGroup::Integers;
@@ -3329,15 +3844,19 @@ mod tests {
         assert!(differentiated[0].holonomy_is_flat());
         assert!(differentiated[0].is_saturated(&group));
 
-        let arrival = DeclaredOccurrence {
-            identity: "saturated:arrival".to_owned(),
-            storage_ordinal: 1,
-            caused_by: BTreeSet::new(),
-            text: "ab ee cc ab".to_owned(),
-        };
+        let arrival = DeclaredOccurrence::from_text(
+            "saturated:arrival".to_owned(),
+            1,
+            BTreeSet::new(),
+            "ab ee cc ab".to_owned(),
+        )
+        .expect("declared text material");
         let response = complex.admit_later(&arrival, chart, &group).unwrap();
         assert_eq!(response.reached.len(), 1);
-        assert!(response.reopened.is_empty(), "a saturated compound reopened");
+        assert!(
+            response.reopened.is_empty(),
+            "a saturated compound reopened"
+        );
         assert_eq!(response.saturated.len(), 1);
         assert!(response.no_closed_boundary_moved());
 
@@ -3365,18 +3884,22 @@ mod tests {
         let complex = complex();
         let chart = PhaseChart::WindingAdjacent;
         let group = CoefficientGroup::Integers;
-        let arrival = DeclaredOccurrence {
-            identity: "later".to_owned(),
-            storage_ordinal: 400,
-            caused_by: BTreeSet::from(["c".to_owned()]),
-            text: "the channel returns the arc".to_owned(),
-        };
+        let arrival = DeclaredOccurrence::from_text(
+            "later".to_owned(),
+            400,
+            BTreeSet::from(["c".to_owned()]),
+            "the channel returns the arc".to_owned(),
+        )
+        .expect("declared text material");
         let response = complex.admit_later(&arrival, chart, &group).unwrap();
         assert!(!response.arrival_is_co_present);
         assert_eq!(response.arrival_rank, 3);
         assert!(response.new_dependencies > 0, "no ⪯ edge reached back");
         assert!(response.no_closed_boundary_moved());
-        assert!(response.verdicts.iter().any(|verdict| verdict.valence_moved));
+        assert!(response
+            .verdicts
+            .iter()
+            .any(|verdict| verdict.valence_moved));
         let (_, wrong) = response.valence_law_agreement();
         assert_eq!(wrong, 0);
     }
@@ -3384,12 +3907,13 @@ mod tests {
     #[test]
     fn an_arrival_naming_a_cause_outside_the_family_is_refused() {
         let complex = complex();
-        let arrival = DeclaredOccurrence {
-            identity: "orphan".to_owned(),
-            storage_ordinal: 0,
-            caused_by: BTreeSet::from(["not-in-the-family".to_owned()]),
-            text: "the leader".to_owned(),
-        };
+        let arrival = DeclaredOccurrence::from_text(
+            "orphan".to_owned(),
+            0,
+            BTreeSet::from(["not-in-the-family".to_owned()]),
+            "the leader".to_owned(),
+        )
+        .expect("declared text material");
         assert!(matches!(
             complex.arrival_rank(&arrival),
             Err(IncidenceProductionError::ArrivalCauseIsOutsideTheFamily(_))

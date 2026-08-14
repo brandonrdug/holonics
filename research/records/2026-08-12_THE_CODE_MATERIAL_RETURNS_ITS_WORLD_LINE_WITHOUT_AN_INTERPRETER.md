@@ -140,10 +140,38 @@ The decisive trajectories were:
 | unknown | unseen branching surface | `OPEN` |
 
 The seven translation presentations have materially different source shadows. Their shadow cycle
-ranks include `50, 68, 74, 79, 113, 141`; nevertheless the complete receiver/history quotient
-places all seven in one reconstruction fiber because their enacted world-lines agree. This is the
+ranks include `50, 68, 74, 79, 113, 141`, and the complete receiver/history quotient places all
+seven in one reconstruction fiber.
+
+**CORRECTED 2026-08-13, and the sentence this replaces is withdrawn.** It read: *"This is the
 experiment's strongest cross-codec result: material geometry is retained as lineage while exact
-transport, not surface resemblance, founds the behavioral class.
+transport, not surface resemblance, founds the behavioral class."* Six of those seven were declared
+with the **identical** founding face `samples: [0, 1, 1, 2]` at
+`soma/life/examples/the_code_material_returns_its_world_line.rs:637-746`, placed on the unit
+rectangle unchanged at `:565`. Same law, same initial standing, same current sheet, therefore the
+same world-line — the receipt could not have come out otherwise, which is the tautology `CLAUDE.md`
+§8 convicts. **The reconstruction fibers of this experiment are the preimage classes of an authored
+field.** The agreement measures that attachment is a function of the deposited law. It does not
+measure that the machine recognised seven implementations of one fold.
+
+Brandon had already ruled on this shape three hours before this experiment was built, on the
+preceding one: *"it is absolutely foolish that you would establish the parameters of the experiment
+and then be surprised when you did not run an experiment that would invoke that kind of behavior
+and show you those kinds of results."* (2026-08-12 17:14.) That ruling was deposited as `CLAUDE.md`
+§0g *"An archetype does not define the experiment"* at 17:37 and this driver was committed at 18:36.
+
+**Two of the fifteen presentations carry inference from the material, and they are the entire
+source-side content of the return:**
+
+- `sum-for-renamed` is declared with **no** founding face. It attaches through ROT13-invariance of
+  the prior-equal-distance field alone and returns the translation world-line.
+- `unknown` attaches to nothing and returns `OPEN`.
+
+The shadow cycle ranks are genuine measurements of the sources; the fiber agreement is a
+restatement of the input. Converting the agreement into a measurement requires the founding
+rectangle to **differ** across presentations of one operation — `BiaffineLaw` already carries
+`origin` and `step`, and this driver pins both to `[0,0]`/`[1,1]` for all thirteen declarations —
+so that the recovered Newton coefficients rather than the declared array are what agrees.
 
 The product `for` and recursive presentations form their own two-member complete fiber. The
 surface-gauge pair forms one two-member presentation fiber carrying two candidate laws, not a
@@ -215,12 +243,24 @@ presentation.
 It also did not recover a Python control-flow graph from static source. The later current sheet
 supplies the ordered event population, and the experiment studies the transport enacted at those
 events. The rectangular founding faces are complete exterior transition testimony, not facts the
-source shadow independently inferred. Consequently the result does not yet establish unknown-code
-execution, branch selection, loop termination, stack formation, recursive call/return geometry,
-scope/binding reconstruction, arbitrary source generalization, or Lean theorem cartography.
+source shadow independently inferred — **and, per §3, one identical face was supplied to every
+presentation of a given operation, so the behavioral partition returned here is authored rather
+than recovered.** Consequently the result does not yet establish unknown-code execution, branch
+selection, loop termination, stack formation, recursive call/return geometry, scope/binding
+reconstruction, arbitrary source generalization, or Lean theorem cartography.
 
-The next structural question is now exact: can genuinely returned instruction/event incidence
-condition a source shadow into a reusable **schedule morphology**, so that a later remount founds
-the event population and its call/return or branch topology instead of receiving that population as
-the current sheet? That deed must preserve the plural shadow fiber demonstrated here; it may not
-answer the `+`/`*` gauge with a Python keyword or parser.
+**The deed Brandon actually asked for is therefore still open in full.** His specification, 17:28
+the same day: *"this needs to be about arbitrary material and founding the transport algorithmic
+transport mechanisms by having the machine reverse engineer the codec it was structured with."*
+This return does not reverse-engineer the codec. It computes a bijection-invariant key from the
+source and retrieves a law deposited beside it. `CONSTRUCTION_STATE.md` calls this the admitted
+production frontier, which is correct as a statement about apparatus and must not be read as a
+statement about codec recovery.
+
+**Superseded 2026-08-12, later the same day.** This section closed by naming a **schedule
+morphology** as the next structural question. `canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md` and
+`research/records/2026-08-12_THE_MACHINE_ALREADY_HAS_THE_ORGANS_INTELLIGENCE_IS_THE_CIRCULATION_THAT_CHANGES_THE_TERRAIN.md`
+§7 withdrew that name — schedule is a receiver shadow of the caused world-line, not a missing
+subsystem — and the live open object is the resident circulation. The surviving obligations from
+the withdrawn sentence stand: a later deed must preserve the plural shadow fiber demonstrated here,
+and it may not answer the `+`/`*` gauge with a Python keyword or parser.

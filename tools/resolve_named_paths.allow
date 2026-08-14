@@ -114,3 +114,8 @@ CONSTRUCTION_STATE.md :: output/the_deposit_licenses_the_re_emission :: a runtim
 
 # --- Struck by direct ruling, named so the striking is legible ---
 canon/THE_CONTAMINANT_PROTOCOL.md :: tools/verify_quotes.py :: deleted 2026-08-09 by Brandon's direct ruling; §6 names it to record that reading the quotes is the replacement
+
+# --- The timeline names the three C++ conditioning owners as deleted (THE_TIMELINE.md §2) ---
+canon/THE_TIMELINE.md :: conditioning_law.hpp :: deleted at 2b562c8; §2 names that commit
+canon/THE_TIMELINE.md :: conditioning_schema.hpp :: deleted at 2b562c8; §2 names that commit
+canon/THE_TIMELINE.md :: returned_fiber_exclusion_law.hpp :: deleted at 2b562c8; §2 names that commit

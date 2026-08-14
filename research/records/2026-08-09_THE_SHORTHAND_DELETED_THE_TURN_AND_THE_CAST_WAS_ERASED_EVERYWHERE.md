@@ -175,10 +175,17 @@ The construction is small and its pieces exist:
 | exact symmetric form with signature, indefinite branch included | **built** — `inertia.rs` |
 | Smith normal form: rank and invariant factors | **built** — `rebase_invariants::smith_normal_form` |
 | exact kernel over `Rat` | **built** — `matroid_chow.rs:788` |
-| a `Dimension` as a vector in the free abelian group on declared base units | **not built** |
-| a `Quantity = (exact value, Dimension)` whose addition **refuses by type** on mismatch and whose multiplication adds exponent vectors | **not built** |
-| `c` as a **declared** cast rather than an erased one | **not built** |
-| the Buckingham π count and the π-group basis, from the dimension matrix | **not built** — but it is `n − rank(M)` and `ker M`, so it is a driver over two existing organs |
+| a `Dimension` as a vector in the free abelian group on declared base units | **BUILT** — `crates/holonic-engine/src/quantity.rs:232`, and **widened `ℤ → ℚ`**, argued at `:17-22` rather than done silently: the geometric mean of a length and a time has dimension `L^(1/2) T^(1/2)`, which is not in `ℤ^k` at all. The integral word is read off at `:307` `integral()` |
+| a `Quantity = (exact value, Dimension)` whose addition **refuses by type** on mismatch and whose multiplication adds exponent vectors | **BUILT** — `quantity.rs:353`; `sum` at `:414` refuses on mismatch **naming both dimensions**, doc: *"This is the type check, not a convention."* `product` at `:444` |
+| `c` as a **declared** cast rather than an erased one | **BUILT** — `quantity.rs:504` `Cast`, `:557` `CastApplication`; `declare` refuses a dimensionless cast, which is the *"`c = 1` must not be the default"* rule made checkable |
+| the Buckingham π count and the π-group basis, from the dimension matrix | **BUILT and exceeded** — `quantity.rs:589` `DimensionMatrix`, `:720` `buckingham`; the independent group count is `extent − rank`, with the kernel basis, a primitive basis, the left kernel, and Smith invariant factors. `c = 1` is **computed as a left kernel** rather than assumed |
+
+**THE FOUR ROWS ABOVE READ `not built` UNTIL 2026-08-13 AND ALL FOUR ARE CLOSED.** `quantity.rs` is
+1,855 lines; its header is *"A quantity carries its dimension, and `c` is a declared cast rather than
+an erased one"* — this section's own demand, as a module. This record's §7 closing sentence that the
+construction *"is not run by any code"* is likewise withdrawn: the driver is
+`crates/holonic-engine/examples/the_shorthand_is_one_angle.rs`, which prints
+`"beta = 0 returns t = 0 exactly. E = mc^2 IS theta = 0."`
 
 **The four-state ordering is already the right carrier for the refusal.** `exact_value.rs:64`
 `ExactOrdering { Less, Equal, Greater, Open }` — two quantities of **different dimension are not

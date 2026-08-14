@@ -816,15 +816,16 @@ fn terminus_sections(
             };
             let source = String::from_utf8(presentation.source.clone())
                 .map_err(|_| "later code material is not UTF-8".to_owned())?;
-            let occurrence = DeclaredOccurrence {
-                identity: format!("{}:terminus", presentation.identity),
-                storage_ordinal: 0,
-                caused_by: BTreeSet::new(),
-                text: source.clone(),
-            };
-            let incidence =
-                IncidenceComplex::found(&[occurrence], source.split_whitespace().count())
-                    .map_err(|error| format!("found terminus incidence: {error:?}"))?;
+            let occurrence = DeclaredOccurrence::from_text(
+                format!("{}:terminus", presentation.identity),
+                0,
+                BTreeSet::new(),
+                &source,
+            )
+            .map_err(|error| format!("declare terminus material: {error:?}"))?;
+            let patches = occurrence.inscription.len();
+            let incidence = IncidenceComplex::found(&[occurrence], patches)
+                .map_err(|error| format!("found terminus incidence: {error:?}"))?;
             Ok(CausalSection {
                 identity: presentation.identity.clone(),
                 lineage: presentation.lineage.clone(),

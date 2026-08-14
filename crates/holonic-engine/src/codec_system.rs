@@ -135,9 +135,11 @@ use std::collections::{BTreeMap, BTreeSet, VecDeque};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::codec_recovery::{Boundary, Emission, RecoveredCodec, RecoveryError, SymbolClass};
+use crate::codec_recovery::{
+    Boundary, Emission, RecoveredCodec, RecoveryError, Symbol, SymbolClass,
+};
 use crate::receiver_exact_compression::{
-    compress, InputId, ItemId, Observation, ObservedSystem, ReceiverExactCompression, ReceiverId,
+    InputId, ItemId, Observation, ObservedSystem, ReceiverExactCompression, ReceiverId, compress,
 };
 
 /// The name a [`SeparationCrossCheck`] writes onto itself, so a return read back from octets can be
@@ -213,7 +215,8 @@ fn admit(codecs: &[&RecoveredCodec]) -> Result<usize, AdaptationError> {
             return Err(RecoveryError::IncomparableCodecs.into());
         }
         let columns = codec.boundary.first().map_or(0, Vec::len);
-        if codec.boundary.len() != classes || codec.boundary.iter().any(|row| row.len() != classes) {
+        if codec.boundary.len() != classes || codec.boundary.iter().any(|row| row.len() != classes)
+        {
             return Err(AdaptationError::MalformedBoundary {
                 codec: position,
                 rows: codec.boundary.len(),
@@ -227,7 +230,7 @@ fn admit(codecs: &[&RecoveredCodec]) -> Result<usize, AdaptationError> {
 
 /// Write a word of class indices over the recovered alphabet, with each class's least member — the
 /// canonical witness [`RecoveredCodec::shortest_separating_input`] writes its own answer with.
-fn write_classes(codec: &RecoveredCodec, word: &[usize]) -> Result<String, AdaptationError> {
+fn write_classes(codec: &RecoveredCodec, word: &[usize]) -> Result<Vec<Symbol>, AdaptationError> {
     word.iter()
         .map(|class| {
             codec
@@ -342,7 +345,7 @@ impl<'a> CodecSystem<'a> {
     /// Write a word of inputs as an actual string over the recovered alphabet, using each class's
     /// least member — the same canonical witness
     /// [`RecoveredCodec::shortest_separating_input`] writes its answer with.
-    pub fn word_string(&self, word: &[InputId]) -> Result<String, AdaptationError> {
+    pub fn word_string(&self, word: &[InputId]) -> Result<Vec<Symbol>, AdaptationError> {
         let classes: Vec<usize> = word
             .iter()
             .map(|input| usize::try_from(input.0).unwrap_or(usize::MAX))
@@ -433,7 +436,7 @@ pub trait JointCarrier {
     /// The two codecs' items before any symbol, or `None` when this carrier does not hold two.
     fn rest_pair(&self) -> Option<(ItemId, ItemId)>;
     /// A word of this carrier's inputs, written over the recovered alphabet.
-    fn write_word(&self, word: &[InputId]) -> Result<String, AdaptationError>;
+    fn write_word(&self, word: &[InputId]) -> Result<Vec<Symbol>, AdaptationError>;
     /// What this carrier observes, named. Carried onto the return so a cross-check says which two
     /// readings it compared rather than leaving the reader to assume the production pair.
     fn reading(&self) -> &'static str;
@@ -452,7 +455,7 @@ impl JointCarrier for CodecSystem<'_> {
         (self.rest.len() == 2).then(|| (self.rest[0], self.rest[1]))
     }
 
-    fn write_word(&self, word: &[InputId]) -> Result<String, AdaptationError> {
+    fn write_word(&self, word: &[InputId]) -> Result<Vec<Symbol>, AdaptationError> {
         self.word_string(word)
     }
 
@@ -472,7 +475,7 @@ pub trait JointReading {
         &self,
         left: &RecoveredCodec,
         right: &RecoveredCodec,
-    ) -> Result<Option<String>, AdaptationError>;
+    ) -> Result<Option<Vec<Symbol>>, AdaptationError>;
 }
 
 /// The production joint-automaton route: [`RecoveredCodec::shortest_separating_input`].
@@ -488,7 +491,7 @@ impl JointReading for TheJointAutomaton {
         &self,
         left: &RecoveredCodec,
         right: &RecoveredCodec,
-    ) -> Result<Option<String>, AdaptationError> {
+    ) -> Result<Option<Vec<Symbol>>, AdaptationError> {
         Ok(left.shortest_separating_input(right)?)
     }
 }
@@ -629,7 +632,9 @@ impl ObservedSystem for PushEventSystem<'_> {
         if class >= self.classes {
             return None;
         }
-        self.index.get(&push_step(&self.codecs, state, class)).copied()
+        self.index
+            .get(&push_step(&self.codecs, state, class))
+            .copied()
     }
 }
 
@@ -646,7 +651,7 @@ impl JointCarrier for PushEventSystem<'_> {
         (self.rest.len() == 2).then(|| (self.rest[0], self.rest[1]))
     }
 
-    fn write_word(&self, word: &[InputId]) -> Result<String, AdaptationError> {
+    fn write_word(&self, word: &[InputId]) -> Result<Vec<Symbol>, AdaptationError> {
         let classes: Vec<usize> = word
             .iter()
             .map(|input| usize::try_from(input.0).unwrap_or(usize::MAX))
@@ -673,7 +678,7 @@ impl JointReading for ThePushEventAutomaton {
         &self,
         left: &RecoveredCodec,
         right: &RecoveredCodec,
-    ) -> Result<Option<String>, AdaptationError> {
+    ) -> Result<Option<Vec<Symbol>>, AdaptationError> {
         let classes = admit(&[left, right])?;
         let codecs = [left, right];
         let rest = |codec: usize| PushEventState {
@@ -756,7 +761,7 @@ impl JointCarrier for ReversedInputOrder<'_> {
         self.inner.rest_pair()
     }
 
-    fn write_word(&self, word: &[InputId]) -> Result<String, AdaptationError> {
+    fn write_word(&self, word: &[InputId]) -> Result<Vec<Symbol>, AdaptationError> {
         self.inner.write_word(word)
     }
 
@@ -831,7 +836,7 @@ impl JointCarrier for CodecIndexReceiver<'_> {
         self.inner.rest_pair()
     }
 
-    fn write_word(&self, word: &[InputId]) -> Result<String, AdaptationError> {
+    fn write_word(&self, word: &[InputId]) -> Result<Vec<Symbol>, AdaptationError> {
         self.inner.write_word(word)
     }
 
@@ -883,13 +888,13 @@ pub struct SeparationCrossCheck {
     /// Whether the refinement placed those two states in different blocks.
     pub rest_states_separated: bool,
     /// What `compress` exhibited for that pair: the word, and it written over the alphabet.
-    pub nerode: Option<(Vec<InputId>, String)>,
+    pub nerode: Option<(Vec<InputId>, Vec<Symbol>)>,
     /// What `RecoveredCodec::shortest_separating_input` returned.
-    pub joint_automaton: Option<String>,
+    pub joint_automaton: Option<Vec<Symbol>>,
     /// Both codecs' segmentations at the Nerode word. The artifact, never a rate.
-    pub nerode_returns: Option<(Vec<String>, Vec<String>)>,
+    pub nerode_returns: Option<(Vec<Vec<Symbol>>, Vec<Vec<Symbol>>)>,
     /// Both codecs' segmentations at the joint-automaton word.
-    pub joint_automaton_returns: Option<(Vec<String>, Vec<String>)>,
+    pub joint_automaton_returns: Option<(Vec<Vec<Symbol>>, Vec<Vec<Symbol>>)>,
     pub disagreements: Vec<SeparationSpecies>,
 }
 
@@ -956,7 +961,7 @@ pub fn cross_check_over(
     };
     let joint_automaton = joint.shortest_separating_input(left, right)?;
 
-    let segmentations = |input: &str| -> Result<(Vec<String>, Vec<String>), AdaptationError> {
+    let segmentations = |input: &[Symbol]| -> Result<(Vec<Vec<Symbol>>, Vec<Vec<Symbol>>), AdaptationError> {
         Ok((left.segment(input)?, right.segment(input)?))
     };
     let nerode_returns = match &nerode {
@@ -988,7 +993,7 @@ pub fn cross_check_over(
             disagreements.push(SeparationSpecies::ExistenceDisagreed);
         }
         (Some((_, written)), Some(input)) => {
-            if written.chars().count() != input.chars().count() {
+            if written.len() != input.len() {
                 disagreements.push(SeparationSpecies::LengthDisagreed);
             } else if written != input {
                 disagreements.push(SeparationSpecies::TieBrokenDifferently);
@@ -1013,10 +1018,44 @@ pub fn cross_check_over(
 
 #[cfg(test)]
 mod tests {
+
+    /// The fixture alphabet, declared once. `codec_recovery` speaks symbols; these fixtures speak
+    /// text, and this is the translation — the same shape as that module's own test universe.
+    fn universe() -> SymbolAlphabet {
+        SymbolAlphabet::from_chars(&[
+            ' ', ',', '-', '.', '0', '1', ';', '\t', '_', 'a', 'b', 'q',
+        ])
+        .expect("the fixture alphabet carries no repeat")
+    }
+
+    fn text_codec(law: impl Fn(&str) -> Vec<String> + 'static) -> OpaqueSymbolCodec {
+        OpaqueSymbolCodec::over_text(&universe(), law)
+    }
+
+    /// Two words concatenated. A word is a sequence of symbols, so joining is not string formatting.
+    fn joined(left: &[Symbol], right: &[Symbol]) -> Vec<Symbol> {
+        left.iter().chain(right).copied().collect()
+    }
+
+    fn sym(character: char) -> Symbol {
+        chars_as_symbols(&[character])[0]
+    }
+
+    fn chars_as_symbols(characters: &[char]) -> Vec<Symbol> {
+        let alphabet = universe();
+        characters
+            .iter()
+            .map(|character| {
+                alphabet
+                    .symbol_of(character.to_string().as_str())
+                    .expect("every fixture character is declared")
+            })
+            .collect()
+    }
     use super::*;
 
     use crate::codec_recovery::{
-        recover, CodecRecovery, Obstruction, OpaqueSymbolCodec, RecoveryApertures,
+        CodecRecovery, Obstruction, OpaqueSymbolCodec, RecoveryApertures, SymbolAlphabet, recover,
     };
 
     /// **What this test body declares as its host capacity**, since `codec_recovery` no longer
@@ -1032,7 +1071,7 @@ mod tests {
     /// agglutinate only with each other, whitespace is dropped and flushes, `.`/`-` are a run
     /// class, `,`/`;` are a solo class.
     fn tokenizer() -> OpaqueSymbolCodec {
-        OpaqueSymbolCodec::new(|input: &str| {
+        text_codec(|input: &str| {
             #[derive(Clone, Copy, PartialEq)]
             enum Kind {
                 Word,
@@ -1081,7 +1120,7 @@ mod tests {
     /// A codec whose dropped symbol **joins**. At radius two the declared family provably cannot
     /// see through it and the recovery returns two genuinely inequivalent codecs.
     fn soft_join() -> OpaqueSymbolCodec {
-        OpaqueSymbolCodec::new(|input: &str| {
+        text_codec(|input: &str| {
             let token: String = input.chars().filter(|symbol| *symbol != '_').collect();
             if token.is_empty() {
                 Vec::new()
@@ -1092,7 +1131,8 @@ mod tests {
     }
 
     fn tokenizer_recovery() -> CodecRecovery {
-        recover(&tokenizer(), &TOKENIZER_ALPHABET, 3, TEST_APERTURES).expect("the family is admissible")
+        recover(&tokenizer(), &chars_as_symbols(&TOKENIZER_ALPHABET), 3, TEST_APERTURES)
+            .expect("the family is admissible")
     }
 
     /// Real recovered codecs, from two different opaque targets, with materially different shapes:
@@ -1101,11 +1141,11 @@ mod tests {
     /// open across a dropped symbol, which is exactly the conduct the whole adaptation turns on.
     fn real_codecs() -> Vec<(&'static str, RecoveredCodec)> {
         let tokenizer_codec = tokenizer_recovery().codec.expect("the codec is recovered");
-        let soft = recover(&soft_join(), &['a', 'b', '_'], 4, TEST_APERTURES)
+        let soft = recover(&soft_join(), &chars_as_symbols(&['a', 'b', '_']), 4, TEST_APERTURES)
             .expect("the family is admissible")
             .codec
             .expect("the codec is recovered");
-        assert_eq!(soft.boundary_between('a', '_'), Some(Boundary::Join));
+        assert_eq!(soft.boundary_between(sym('a'), sym('_')), Some(Boundary::Join));
         let (left, right, _) = undetermined(2);
         vec![
             ("tokenizer", tokenizer_codec),
@@ -1117,9 +1157,9 @@ mod tests {
 
     /// The two inequivalent codecs the `soft_join` recovery itself exhibits, and the input it named
     /// as separating them. Real recovered material, not hand-written tables.
-    fn undetermined(radius: usize) -> (RecoveredCodec, RecoveredCodec, String) {
-        let recovery =
-            recover(&soft_join(), &['a', 'b', '_'], radius, TEST_APERTURES).expect("the family is admissible");
+    fn undetermined(radius: usize) -> (RecoveredCodec, RecoveredCodec, Vec<Symbol>) {
+        let recovery = recover(&soft_join(), &chars_as_symbols(&['a', 'b', '_']), radius, TEST_APERTURES)
+            .expect("the family is admissible");
         let Some(Obstruction::UndeterminedCodec {
             left,
             right,
@@ -1135,8 +1175,8 @@ mod tests {
     /// Every word over the class representatives, shortest first then in class order — the same
     /// order both organs under test enumerate in, computed here by brute force so it can act as a
     /// third and trivially independent minimality oracle.
-    fn words_up_to(codec: &RecoveredCodec, length: usize) -> Vec<String> {
-        let letters: Vec<char> = (0..codec.classes.len())
+    fn words_up_to(codec: &RecoveredCodec, length: usize) -> Vec<Vec<Symbol>> {
+        let letters: Vec<Symbol> = (0..codec.classes.len())
             .map(|class| {
                 codec
                     .class_representative(SymbolClass(class as u32))
@@ -1153,7 +1193,7 @@ mod tests {
                     word[position] = letters[(rest % letters.len() as u64) as usize];
                     rest /= letters.len() as u64;
                 }
-                words.push(word.into_iter().collect());
+                words.push(word);
             }
         }
         words
@@ -1165,7 +1205,7 @@ mod tests {
         left: &RecoveredCodec,
         right: &RecoveredCodec,
         length: usize,
-    ) -> Option<String> {
+    ) -> Option<Vec<Symbol>> {
         words_up_to(left, length)
             .into_iter()
             .find(|word| left.segment(word).unwrap() != right.segment(word).unwrap())
@@ -1181,16 +1221,13 @@ mod tests {
     /// ```
     ///
     /// Neither identity mentions `token_open`, `boundary`, or either organ under test.
-    fn final_step(codec: &RecoveredCodec, prefix: &str, suffix: &str) -> StepReturn {
-        let whole = format!("{prefix}{suffix}");
-        let mut shorter: Vec<char> = whole.chars().collect();
+    fn final_step(codec: &RecoveredCodec, prefix: &[Symbol], suffix: &[Symbol]) -> StepReturn {
+        let whole: Vec<Symbol> = prefix.iter().chain(suffix).copied().collect();
+        let mut shorter = whole.clone();
         shorter.pop().expect("the word is not empty");
-        let before = codec
-            .segment(&shorter.into_iter().collect::<String>())
-            .expect("declared symbols only");
+        let before = codec.segment(&shorter).expect("declared symbols only");
         let after = codec.segment(&whole).expect("declared symbols only");
-        let characters =
-            |tokens: &[String]| -> usize { tokens.iter().map(|token| token.chars().count()).sum() };
+        let characters = |tokens: &[Vec<Symbol>]| -> usize { tokens.iter().map(Vec::len).sum() };
         if characters(&after) == characters(&before) {
             StepReturn::Silent
         } else if after.len() > before.len() {
@@ -1202,7 +1239,7 @@ mod tests {
 
     /// The shortest word over the class representatives that reaches an item of a single-codec
     /// system, breadth-first from rest.
-    fn reaching_word(system: &CodecSystem<'_>, target: ItemId) -> Option<String> {
+    fn reaching_word(system: &CodecSystem<'_>, target: ItemId) -> Option<Vec<Symbol>> {
         let rest = system.rest_state(0)?;
         let mut seen = BTreeSet::from([rest]);
         let mut frontier = VecDeque::from([(rest, Vec::<InputId>::new())]);
@@ -1302,10 +1339,10 @@ mod tests {
             let mut exercised: BTreeSet<StepReturn> = BTreeSet::new();
 
             for word in words_up_to(&codec, 4) {
-                let symbols: Vec<char> = word.chars().collect();
-                let prefix: String = symbols[..symbols.len() - 1].iter().collect();
-                let last: String = symbols[symbols.len() - 1..].iter().collect();
-                let expected = final_step(&codec, &prefix, &last);
+                let symbols: Vec<Symbol> = word.clone();
+                let prefix = &symbols[..symbols.len() - 1];
+                let last = &symbols[symbols.len() - 1..];
+                let expected = final_step(&codec, prefix, last);
                 exercised.insert(expected);
 
                 let mut item = rest;
@@ -1316,7 +1353,8 @@ mod tests {
                 }
                 let state = system.state_of(item).expect("an item of this system");
                 assert_eq!(
-                    state.last, expected,
+                    state.last,
+                    expected,
                     "{name}: after {word:?} segment returns {:?} against {:?}",
                     codec.segment(&word).expect("declared symbols only"),
                     codec.segment(&prefix).expect("declared symbols only")
@@ -1468,30 +1506,35 @@ mod tests {
                 if here.previous != there.previous || here.previous.is_none() {
                     continue;
                 }
-                let reaching =
-                    |item: ItemId| reaching_word(&system, item).expect("a reachable state has a word");
+                let reaching = |item: ItemId| {
+                    reaching_word(&system, item).expect("a reachable state has a word")
+                };
                 let (before_here, before_there) = (reaching(pair.left), reaching(pair.right));
                 assert_ne!(before_here, before_there);
                 let suffix = system
                     .word_string(&pair.distinguishing_word)
                     .expect("the word is over the recovered alphabet");
-                assert!(!suffix.is_empty(), "{name}: the empty word is the rest reading");
+                assert!(
+                    !suffix.is_empty(),
+                    "{name}: the empty word is the rest reading"
+                );
 
                 // The refutation, taken from `segment` and from nothing else: the last step of the
                 // two extended words differs in what it put into the token stream.
                 let step_here = final_step(codec, &before_here, &suffix);
                 let step_there = final_step(codec, &before_there, &suffix);
                 assert_ne!(
-                    step_here, step_there,
+                    step_here,
+                    step_there,
                     "{name}: {before_here:?} and {before_there:?} both end in class {:?}; \
                      after {suffix:?} segment returns {:?} against {:?}",
                     here.previous,
-                    codec.segment(&format!("{before_here}{suffix}")).unwrap(),
-                    codec.segment(&format!("{before_there}{suffix}")).unwrap(),
+                    codec.segment(&joined(&before_here, &suffix)).unwrap(),
+                    codec.segment(&joined(&before_there, &suffix)).unwrap(),
                 );
                 assert_eq!(
-                    codec.class_of(before_here.chars().last().expect("a non-empty word")),
-                    codec.class_of(before_there.chars().last().expect("a non-empty word")),
+                    codec.class_of(*before_here.last().expect("a non-empty word")),
+                    codec.class_of(*before_there.last().expect("a non-empty word")),
                     "{name}: the two reaching words must end in one class or the design is not \
                      being refuted"
                 );
@@ -1534,15 +1577,18 @@ mod tests {
                 .joint_automaton
                 .clone()
                 .expect("the joint automaton separates them");
-            assert_eq!(joint_input, named, "radius {radius}: the recovery's own word");
-            assert_eq!(nerode_input.chars().count(), expected_length);
+            assert_eq!(
+                joint_input, named,
+                "radius {radius}: the recovery's own word"
+            );
+            assert_eq!(nerode_input.len(), expected_length);
             assert_eq!(nerode_input, joint_input);
 
             // The third opinion: shortest by exhaustion, independent of both organs.
             let brute = brute_force_separator(&left, &right, expected_length + 1)
                 .expect("some word separates them");
             assert_eq!(
-                brute.chars().count(),
+                brute.len(),
                 expected_length,
                 "radius {radius}: brute force found {brute:?}"
             );
@@ -1579,7 +1625,11 @@ mod tests {
     fn the_two_implementations_agree_across_a_gauge_sweep_that_contains_both_answers() {
         let recovery = tokenizer_recovery();
         let codec = recovery.codec.as_ref().expect("the codec is recovered");
-        assert_eq!(recovery.gauge_freedom.len(), 9, "the sweep needs its material");
+        assert_eq!(
+            recovery.gauge_freedom.len(),
+            9,
+            "the sweep needs its material"
+        );
 
         let mut population = vec![codec.clone()];
         for (left, right) in &recovery.gauge_freedom {
@@ -1590,9 +1640,9 @@ mod tests {
         // a token be held open across a dropped symbol, which no retained table does, and separate
         // at length three. A determined entry separates at length two. Without both the sweep
         // could not refute a length claim and could not distinguish the two implementations at all.
-        let word = codec.class_of('a').expect("the word class is recovered");
-        let digit = codec.class_of('0').expect("the digit class is recovered");
-        let space = codec.class_of(' ').expect("the space class is recovered");
+        let word = codec.class_of(sym('a')).expect("the word class is recovered");
+        let digit = codec.class_of(sym('0')).expect("the digit class is recovered");
+        let space = codec.class_of(sym(' ')).expect("the space class is recovered");
         for held in [word, digit] {
             let mut across = flipped(codec, held.0 as usize, space.0 as usize);
             across = flipped(&across, space.0 as usize, held.0 as usize);
@@ -1625,14 +1675,14 @@ mod tests {
                     }
                     Some(input) => {
                         separable += 1;
-                        lengths.insert(input.chars().count());
+                        lengths.insert(input.len());
                         assert!(check.rest_states_separated);
                         // The third opinion again, on every separable pair in the sweep.
-                        let brute = brute_force_separator(left, right, input.chars().count() + 1)
+                        let brute = brute_force_separator(left, right, input.len() + 1)
                             .expect("the returned word says one exists");
                         assert_eq!(
-                            brute.chars().count(),
-                            input.chars().count(),
+                            brute.len(),
+                            input.len(),
                             "returned {input:?} but exhaustion found {brute:?}"
                         );
                         let (returned_left, returned_right) =
@@ -1641,7 +1691,7 @@ mod tests {
                         // The Nerode side's own word, exhibited and checked to be a separator of
                         // the same minimal length rather than merely reported as agreeing.
                         let (word, written) = check.nerode.clone().expect("a separated pair");
-                        assert_eq!(word.len(), input.chars().count());
+                        assert_eq!(word.len(), input.len());
                         let (nerode_left, nerode_right) =
                             check.nerode_returns.clone().expect("a separator");
                         assert_ne!(
@@ -1728,8 +1778,8 @@ mod tests {
     fn the_push_event_shadow_manufactures_a_separation_a_gauge_pair_does_not_have() {
         let recovery = tokenizer_recovery();
         let codec = recovery.codec.as_ref().expect("the codec is recovered");
-        let word = codec.class_of('a').expect("the word class is recovered");
-        let space = codec.class_of(' ').expect("the space class is recovered");
+        let word = codec.class_of(sym('a')).expect("the word class is recovered");
+        let space = codec.class_of(sym(' ')).expect("the space class is recovered");
         let gauge = flipped(codec, word.0 as usize, space.0 as usize);
 
         // The production pair, on this exact material: nothing to report.
@@ -1741,8 +1791,8 @@ mod tests {
 
         // The same two codecs through the same shape, with the shadow on the congruence side.
         let shadow = PushEventSystem::joint(&[codec, &gauge]).expect("comparable");
-        let check = cross_check_over(&shadow, &TheJointAutomaton, codec, &gauge)
-            .expect("comparable");
+        let check =
+            cross_check_over(&shadow, &TheJointAutomaton, codec, &gauge).expect("comparable");
         assert_eq!(check.nerode_reading, "push-event-shadow");
         assert!(!check.agrees());
         assert_eq!(
@@ -1759,8 +1809,10 @@ mod tests {
         let (claimed, written) = check.nerode.clone().expect("the shadow claims a separator");
         assert_eq!(claimed.len(), 2, "the shadow separates at {written:?}");
         assert!(check.joint_automaton.is_none());
-        let (returned_left, returned_right) =
-            check.nerode_returns.clone().expect("the word was segmented");
+        let (returned_left, returned_right) = check
+            .nerode_returns
+            .clone()
+            .expect("the word was segmented");
         assert_eq!(
             returned_left, returned_right,
             "if the shadow's word really separated them this control would prove nothing"
@@ -1785,8 +1837,8 @@ mod tests {
     fn the_push_event_shadow_disagrees_about_the_length_where_a_token_is_held_across_a_drop() {
         let recovery = tokenizer_recovery();
         let codec = recovery.codec.as_ref().expect("the codec is recovered");
-        let word = codec.class_of('a').expect("the word class is recovered");
-        let space = codec.class_of(' ').expect("the space class is recovered");
+        let word = codec.class_of(sym('a')).expect("the word class is recovered");
+        let space = codec.class_of(sym(' ')).expect("the space class is recovered");
         let mut across = flipped(codec, word.0 as usize, space.0 as usize);
         across = flipped(&across, space.0 as usize, word.0 as usize);
 
@@ -1796,7 +1848,7 @@ mod tests {
             .joint_automaton
             .clone()
             .expect("the two tables are separable");
-        assert_eq!(truth.chars().count(), 3, "the real separator is {truth:?}");
+        assert_eq!(truth.len(), 3, "the real separator is {truth:?}");
 
         let shadow = PushEventSystem::joint(&[codec, &across]).expect("comparable");
         let check =
@@ -1812,7 +1864,7 @@ mod tests {
         let (claimed, written) = check.nerode.clone().expect("the shadow claims a separator");
         assert_eq!(claimed.len(), 2);
         assert!(
-            claimed.len() < truth.chars().count(),
+            claimed.len() < truth.len(),
             "the shadow over-distinguishes, so its word is the shorter one"
         );
         let (returned_left, returned_right) = check.nerode_returns.clone().expect("segmented");
@@ -1835,13 +1887,13 @@ mod tests {
     fn the_push_event_automaton_is_caught_by_the_refusal_that_guards_the_automaton_side() {
         let recovery = tokenizer_recovery();
         let codec = recovery.codec.as_ref().expect("the codec is recovered");
-        let word = codec.class_of('a').expect("the word class is recovered");
-        let space = codec.class_of(' ').expect("the space class is recovered");
+        let word = codec.class_of(sym('a')).expect("the word class is recovered");
+        let space = codec.class_of(sym(' ')).expect("the space class is recovered");
         let gauge = flipped(codec, word.0 as usize, space.0 as usize);
 
         let system = CodecSystem::joint(&[codec, &gauge]).expect("comparable");
-        let check = cross_check_over(&system, &ThePushEventAutomaton, codec, &gauge)
-            .expect("comparable");
+        let check =
+            cross_check_over(&system, &ThePushEventAutomaton, codec, &gauge).expect("comparable");
         assert_eq!(check.nerode_reading, "segmentation-opening");
         assert_eq!(check.joint_reading, "push-event-shadow-automaton");
         assert!(!check.agrees());
@@ -1856,8 +1908,11 @@ mod tests {
             .joint_automaton
             .clone()
             .expect("the shadow automaton claims a separator");
-        assert_eq!(claimed.chars().count(), 2);
-        assert!(check.nerode.is_none(), "the congruence proved there is none");
+        assert_eq!(claimed.len(), 2);
+        assert!(
+            check.nerode.is_none(),
+            "the congruence proved there is none"
+        );
         let (returned_left, returned_right) =
             check.joint_automaton_returns.clone().expect("segmented");
         assert_eq!(returned_left, returned_right);
@@ -1865,10 +1920,10 @@ mod tests {
         // The two shadow faces are one error stated twice: the congruence over the push event and
         // the breadth-first search over it name a word of the same length.
         let congruence = PushEventSystem::joint(&[codec, &gauge]).expect("comparable");
-        let other_face = cross_check_over(&congruence, &TheJointAutomaton, codec, &gauge)
-            .expect("comparable");
+        let other_face =
+            cross_check_over(&congruence, &TheJointAutomaton, codec, &gauge).expect("comparable");
         let (_, shadow_word) = other_face.nerode.clone().expect("a claimed separator");
-        assert_eq!(shadow_word.chars().count(), claimed.chars().count());
+        assert_eq!(shadow_word.len(), claimed.len());
     }
 
     /// A tie is reported as a tie. The reversed-order carrier is right about the quantity and names
@@ -1881,8 +1936,8 @@ mod tests {
     fn a_reversed_input_order_names_a_different_equally_short_word_and_is_reported_as_a_tie() {
         let recovery = tokenizer_recovery();
         let codec = recovery.codec.as_ref().expect("the codec is recovered");
-        let word = codec.class_of('a').expect("the word class is recovered");
-        let digit = codec.class_of('0').expect("the digit class is recovered");
+        let word = codec.class_of(sym('a')).expect("the word class is recovered");
+        let digit = codec.class_of(sym('0')).expect("the digit class is recovered");
         let mut twice = flipped(codec, word.0 as usize, word.0 as usize);
         twice = flipped(&twice, digit.0 as usize, digit.0 as usize);
 
@@ -1904,8 +1959,8 @@ mod tests {
         let (_, written) = check.nerode.clone().expect("a separated pair");
         assert_ne!(written, named, "a tie needs two different words");
         assert_eq!(
-            written.chars().count(),
-            named.chars().count(),
+            written.len(),
+            named.len(),
             "a tie needs them equally short"
         );
         // Both really separate: this is a tie-break, not a wrong answer, and the return says so by
@@ -1965,9 +2020,18 @@ mod tests {
             let first = *block.iter().next().expect("a block is not empty");
             let sides: BTreeSet<usize> = block
                 .iter()
-                .map(|item| system.state_of(*item).expect("an item of this system").codec)
+                .map(|item| {
+                    system
+                        .state_of(*item)
+                        .expect("an item of this system")
+                        .codec
+                })
                 .collect();
-            assert_eq!(sides.len(), 1, "a block of the frame spans both codecs: {block:?}");
+            assert_eq!(
+                sides.len(),
+                1,
+                "a block of the frame spans both codecs: {block:?}"
+            );
             assert!(
                 block
                     .iter()
@@ -1985,9 +2049,9 @@ mod tests {
     fn every_separation_species_is_produced_by_a_declared_control() {
         let recovery = tokenizer_recovery();
         let codec = recovery.codec.as_ref().expect("the codec is recovered");
-        let word = codec.class_of('a').expect("the word class is recovered");
-        let digit = codec.class_of('0').expect("the digit class is recovered");
-        let space = codec.class_of(' ').expect("the space class is recovered");
+        let word = codec.class_of(sym('a')).expect("the word class is recovered");
+        let digit = codec.class_of(sym('0')).expect("the digit class is recovered");
+        let space = codec.class_of(sym(' ')).expect("the space class is recovered");
         let gauge = flipped(codec, word.0 as usize, space.0 as usize);
         let mut across = flipped(codec, word.0 as usize, space.0 as usize);
         across = flipped(&across, space.0 as usize, word.0 as usize);
@@ -2022,9 +2086,7 @@ mod tests {
         let real_twice = CodecSystem::joint(&[codec, &twice]).expect("comparable");
         record(
             cross_check_over(
-                &ReversedInputOrder {
-                    inner: &real_twice,
-                },
+                &ReversedInputOrder { inner: &real_twice },
                 &TheJointAutomaton,
                 codec,
                 &twice,
@@ -2066,7 +2128,10 @@ mod tests {
         let (left, right, _) = undetermined(2);
         let check = cross_check(&left, &right).expect("comparable");
         assert_eq!(check.schema, CROSS_CHECK_SCHEMA);
-        assert_eq!(check.schema, "holonic-engine.codec-separation-cross-check.v1");
+        assert_eq!(
+            check.schema,
+            "holonic-engine.codec-separation-cross-check.v1"
+        );
 
         let written = ron::ser::to_string(&check).expect("the return is serializable");
         let read_back: SeparationCrossCheck =
@@ -2083,7 +2148,11 @@ mod tests {
         let written = ron::ser::to_string(states.states()).expect("states are serializable");
         let read_back: Vec<CodecState> = ron::from_str(&written).expect("the octets are states");
         assert_eq!(read_back, states.states());
-        assert!(read_back.iter().any(|state| state.last == StepReturn::OpenedToken));
+        assert!(
+            read_back
+                .iter()
+                .any(|state| state.last == StepReturn::OpenedToken)
+        );
     }
 
     /// Both organs must refuse the same populations. A cross-check between two organs that disagree
@@ -2218,10 +2287,7 @@ mod tests {
         let (left, right, _) = undetermined(2);
         let system = CodecSystem::joint(&[&left, &right]).expect("comparable");
         let full = compress(&system);
-        let rest = (
-            system.rest_state(0).unwrap(),
-            system.rest_state(1).unwrap(),
-        );
+        let rest = (system.rest_state(0).unwrap(), system.rest_state(1).unwrap());
         assert_ne!(
             full.conduct.block_of(rest.0),
             full.conduct.block_of(rest.1),
@@ -2258,7 +2324,6 @@ mod tests {
             }
         }
     }
-
 }
 
 // A determinism test stood here until 2026-08-08 and was deleted rather than repaired. It compared

@@ -123,8 +123,19 @@ and delivery-boundary insertion/deletion. The path is carried; a scalar minimum 
 that complex.
 
 Candidate admission is independent of edit grade. A distant presentation may be contextually
-indistinguishable while a one-edit neighbor is behaviorally foreign. The machine must therefore
-return:
+indistinguishable while a one-edit neighbor is behaviorally foreign.
+
+**Both directions are now exhibited; only one was when this was written.** The original fixture
+showed a distant candidate retained (`tensor`, four edits, held under a coarse receiver family) and
+nothing showed the converse, so the independence claim was half-measured — a check whose material
+could not vary the property under test in one direction, which is the family `CLAUDE.md` §8
+convicts. `a_one_edit_neighbour_departs_while_a_distant_candidate_is_retained`
+(`soma/life/src/reconstruction_fiber/tests.rs`) supplies the missing arm on its own census:
+`vectra` is one edit from the focus and **departs** the fiber, while `manifold` is many edits away
+and is **retained**, under the same receiver family in the same pass. Admission is therefore
+non-monotone in edit grade in both directions on declared material.
+
+The machine must therefore return:
 
 - the full declared candidate population;
 - every minimal edit route, preferably as a shared directed acyclic complex rather than an
@@ -306,7 +317,20 @@ The four linguistic faces are:
   including punctuation, case, timing, spatial cell, port, amplitude, or bit pattern, without
   privileging acoustics.
 
-The familiar grammar labels provide candidate operation faces, not fixed meanings:
+The familiar grammar labels provide candidate operation faces, not fixed meanings.
+
+**This taxonomy is Brandon's, and the provenance was missing until 2026-08-13.** He wrote the
+eleven rows out himself in the opening message of 2026-08-12, under the heading *"instead of the
+arbitrary lexical tags we mean to refer to fundamental primitive data types and structural
+operations holonically"* — nouns as object declarations (pointers), pronouns as dynamic pointers,
+verbs as functions/operators/state changes, adjectives and adverbs as parameter tuning,
+prepositions as spatial-temporal coordinate vectors and **landmarks**, conjunctions as logic gates,
+interjections as interrupt handlers and rerouting, determiners as selection matrix/tensor and scope
+assertion, auxiliaries and modals as likelihood and temporal reality, complementizers as
+encapsulation and scope, particles as sub-routine nesting toward a landmark. He named it *"a
+keystone."* The table below is his taxonomy in this document's vocabulary; the rows are direct
+provenance and not assistant synthesis. The four faces above — syntax, morphology, semantics,
+abstract phonology — are likewise his, from the same message.
 
 | lexical face | candidate holonic operation face |
 |---|---|

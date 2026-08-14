@@ -21,12 +21,13 @@ fn section(
     faces: [&str; 2],
     law: ExteriorLaw,
 ) -> CausalSection {
-    let occurrence = DeclaredOccurrence {
-        identity: format!("{identity}:incidence"),
-        storage_ordinal: 0,
-        caused_by: BTreeSet::new(),
-        text: surfaces.join(" "),
-    };
+    let occurrence = DeclaredOccurrence::from_text(
+        format!("{identity}:incidence"),
+        0,
+        BTreeSet::new(),
+        surfaces.join(" "),
+    )
+    .expect("declared text material");
     let contact_faces = vec![faces
         .into_iter()
         .map(|face| DeclaredContactFace::new(face).unwrap())

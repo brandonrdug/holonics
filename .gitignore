@@ -43,3 +43,10 @@ __pycache__/
 # and these are not this project's material to redistribute: they are working sources, cited in short
 # attributed fragments by the records that use them and never carried in the tree.
 reference/external/3b1b-compression-*
+
+# Agent worktrees. The harness mounts a full checkout per isolated agent under `.claude/worktrees/`,
+# each with its own `target/`. Measured 2026-08-13: four abandoned worktrees from 08-10 and 08-11
+# holding 223 GB inside the repository, untracked and NOT ignored — one `git add -A` from being
+# staged. They are scratch: what an agent returns is its report, and any edit it made belongs in
+# the main tree or nowhere. Remove them with `git worktree remove`, never by deleting the directory.
+.claude/

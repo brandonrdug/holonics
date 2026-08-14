@@ -41,15 +41,15 @@
 //! counts are supporting receipts and never substitutes.
 
 use std::collections::{BTreeMap, BTreeSet};
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::time::Instant;
 
 use holonic_engine::conditioned_derivation::{
-    expose, ConditionedBody, ContactSpecies, Exposure, FoundedMorphology,
+    ConditionedBody, ContactSpecies, Exposure, FoundedMorphology, expose,
 };
-use holonic_engine::contact_gluing::{glue_at_contact, integrate_leader, LeaderCochain};
+use holonic_engine::contact_gluing::{LeaderCochain, glue_at_contact, integrate_leader};
 use holonic_engine::rebase_invariants::PivotRule;
-use holonic_engine::statement_composition::{found_statements, StatementAdmission};
+use holonic_engine::statement_composition::{StatementAdmission, found_statements};
 
 /// The declared atmosphere. Roots and extensions only — every file under each is read whole, and
 /// the population is whatever is there. `corpus_census::DECLARED_STRATA` declares the same three
@@ -249,7 +249,10 @@ fn main() {
     rule("THE COST LAW");
 
     println!("  A cost law is a law (`CLAUDE.md` §8), and it is stated against the rung below.\n");
-    println!("    {:>6}  {:>8}  {:>9}  {:>8}  {:>8}", "docs", "stems x", "composed x", "time x", "MB");
+    println!(
+        "    {:>6}  {:>8}  {:>9}  {:>8}  {:>8}",
+        "docs", "stems x", "composed x", "time x", "MB"
+    );
     for pair in climbed.windows(2) {
         let (below, here) = (&pair[0], &pair[1]);
         let ratio = |now: f64, was: f64| if was > 0.0 { now / was } else { f64::NAN };
@@ -285,7 +288,9 @@ fn main() {
     println!("\n  THE CONTACTS carrying those admissions, by species:");
     println!("      simple      one carrier at the site on both sides, crossing nothing");
     println!("      superposed  several occurrences co-present at the site — they superpose there");
-    println!("      crossed     the bridging stem overlaps another without containment, so the two");
+    println!(
+        "      crossed     the bridging stem overlaps another without containment, so the two"
+    );
     println!("                  share letters neither can give up: taking one engages the other");
     for (species, count) in &top.contacts {
         println!("    {species:<44} {count:>7}");
@@ -295,7 +300,10 @@ fn main() {
     }
 
     println!("\n  and how the contact population moved up the ladder:");
-    println!("    {:>6}  {:>9}  {:>12}  {:>9}", "docs", "simple", "superposed", "crossed");
+    println!(
+        "    {:>6}  {:>9}  {:>12}  {:>9}",
+        "docs", "simple", "superposed", "crossed"
+    );
     for rung in &climbed {
         println!(
             "    {:>6}  {:>9}  {:>12}  {:>9}",
@@ -354,8 +362,12 @@ fn main() {
     rule("THE GLUING — what the union carries that neither stem carries alone");
 
     println!("  Every contact site is a COVER: the word's offsets are 0-cells, its founded stem");
-    println!("  occurrences are 1-cells, and two occurrences meet exactly when they share an offset.");
-    println!("  `gluing::read_cover` returns the rank of the connecting map per grade — the classes");
+    println!(
+        "  occurrences are 1-cells, and two occurrences meet exactly when they share an offset."
+    );
+    println!(
+        "  `gluing::read_cover` returns the rank of the connecting map per grade — the classes"
+    );
     println!("  `A∪B` carries that neither `A` nor `B` does.\n");
 
     let exposures: Vec<Exposure> = atmosphere
@@ -371,12 +383,19 @@ fn main() {
     let mut connecting = 0usize;
     let mut shown = 0usize;
     for word in body.recruited_population() {
-        let Ok(cover) = morphology.cover(&word) else { continue };
+        let Ok(cover) = morphology.cover(&word) else {
+            continue;
+        };
         let crossings = cover.crossings();
-        let Some((left, right)) = crossings.first() else { continue };
-        let Ok((_, reading)) =
-            glue_at_contact(&cover, &left.stem, &right.stem, PivotRule::SmallestMagnitude)
-        else {
+        let Some((left, right)) = crossings.first() else {
+            continue;
+        };
+        let Ok((_, reading)) = glue_at_contact(
+            &cover,
+            &left.stem,
+            &right.stem,
+            PivotRule::SmallestMagnitude,
+        ) else {
             continue;
         };
         glued += 1;
@@ -401,14 +420,24 @@ fn main() {
 
     rule("THE RETURN STROKE — the leader integrated, absorbed as a causal string");
 
-    println!("  A leader is a walk along founded occurrences; integrating it is an exact running sum");
-    println!("  over `BigInt` with no tolerance. The stroke is that walk READ BACK AS A STRING — the");
-    println!("  ordered stems it rode — with the series retained term by term rather than collapsed.\n");
+    println!(
+        "  A leader is a walk along founded occurrences; integrating it is an exact running sum"
+    );
+    println!(
+        "  over `BigInt` with no tolerance. The stroke is that walk READ BACK AS A STRING — the"
+    );
+    println!(
+        "  ordered stems it rode — with the series retained term by term rather than collapsed.\n"
+    );
 
     let mut strokes = 0usize;
     for word in body.recruited_population().into_iter().take(400) {
-        let Ok(cover) = morphology.cover(&word) else { continue };
-        let Some(first) = cover.occurrences.first() else { continue };
+        let Ok(cover) = morphology.cover(&word) else {
+            continue;
+        };
+        let Some(first) = cover.occurrences.first() else {
+            continue;
+        };
         let Ok((_, stroke)) =
             integrate_leader(&cover, &morphology, &first.stem, LeaderCochain::SpanLength)
         else {
@@ -428,7 +457,11 @@ fn main() {
     }
 
     rule("BOUNDS");
-    println!("  - The ladder stopped at {} of {} documents.", top.documents, atmosphere.len());
+    println!(
+        "  - The ladder stopped at {} of {} documents.",
+        top.documents,
+        atmosphere.len()
+    );
     println!("  - Every figure has one frame and no timing here is falsifiable (`CLAUDE.md` §8).");
     println!("  - Nothing is submitted to a kernel. A founded statement is production read as");
     println!("    structure; whether it type-checks is a separate receiver and is not claimed.");

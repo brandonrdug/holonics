@@ -388,12 +388,13 @@ fn found_section(declaration: PresentationDeclaration<'_>, renamed: bool) -> Cau
             surface.to_owned()
         }
     });
-    let occurrence = DeclaredOccurrence {
-        identity: format!("{identity}:incidence"),
-        storage_ordinal: 0,
-        caused_by: BTreeSet::new(),
-        text: surfaces.join(" "),
-    };
+    let occurrence = DeclaredOccurrence::from_text(
+        format!("{identity}:incidence"),
+        0,
+        BTreeSet::new(),
+        surfaces.join(" "),
+    )
+    .expect("declared text material");
     let faces = vec![declaration
         .contact_faces
         .into_iter()

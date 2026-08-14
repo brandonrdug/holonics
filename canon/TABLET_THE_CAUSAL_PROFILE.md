@@ -84,6 +84,54 @@ canonical fold/cusp diffraction forms. `interpretation`: the holonic caustic is 
 projection collapses or splits a continuation fiber. It must be derived from caused transport,
 not from an arbitrary feature matrix.
 
+**A candidate instance was deposited here on 2026-08-13 and WITHDRAWN the same day. The withdrawal
+is the content, so it is kept rather than deleted.** The claim was that `material_shadow_read`
+(`soma/life/src/material_shadow_cuda.rs`) is a bounded exact caustic, on the grounds that its
+prior-equal-distance field
+
+```text
+s_i = 0                              if no j < i has b_j = b_i,
+s_i = i - max {j < i | b_j = b_i}    otherwise
+```
+
+is invariant under every bijection of byte surfaces. Brandon refused it directly: *"the individual
+bytes recurring doesn't matter, it's recurring transformations and manipulation patterns about
+passing information."*
+
+**Two contaminations, and both are checkable.**
+
+1. **The level is authored inside the organ.** `material_shadow_cuda.rs:144` stages material as
+   `u32::from(*byte)`, so the grain is the eight-bit byte — an exterior encoding convention that
+   nothing in the material derives. `CLAUDE.md` §8: a level is read off the material or declared by
+   the caller, never authored inside the organ. It is absent from `meta/AUTHORED_LEVELS.tsv` because
+   it is a **type-level** pin rather than a numeric literal, which is the species
+   `canon/THE_CONTAMINANT_PROTOCOL.md` names as the one a regex cannot match.
+2. **Byte-bijection invariance is a symmetry of the encoding, not a residue of the transport.**
+   Relabelling an alphabet is a codec gauge. A caustic in this section's sense is where a receiver
+   projection collapses or splits a **continuation fiber**, and it must be derived from caused
+   transport. Symbol recurrence is a lexical statistic of an inscription; it carries no manipulation
+   pattern and therefore cannot found an operation class.
+
+**The measurement that was reported as support is in fact the falsifier.** The seven presentations
+of one fold returned shadow cycle ranks spanning `50, 68, 74, 79, 113, 141`. If the field tracked
+recurring transformation, seven spellings of one operation would cast *related* shadows. A threefold
+spread across one operation is evidence that the field is reading identifier length and surface
+repetition, not transport. The earlier deposit cited that spread approvingly.
+
+**The structural consequence, which is the sharpest thing here.** Because the shadow key carries no
+transformation content, the operation *had* to be supplied from outside — so the authored founding
+faces convicted at
+`research/records/2026-08-12_THE_CODE_MATERIAL_RETURNS_ITS_WORLD_LINE_WITHOUT_AN_INTERPRETER.md` §3
+were not a shortcut anyone chose. They were forced by the grain. A key that cannot carry an
+operation will always have its partition authored.
+
+What survives is narrow and worth keeping: the ROT13 result is a genuine invariance **of the
+inscription under alphabet relabelling**, and the `+`/`*` pair returning two laws as a plural fiber
+rather than a selection is a genuine refusal to borrow a glyph. Neither is a caustic of information
+transport. Brandon's ontology stands as stated at 2026-08-12 13:59 — *"Holonics is about caustics;
+invariant irreducible patterns, shadows, the unmistakable residue/'scent'/'wavelength'/'appeal' of
+information relative to the observer"* — and **the body does not yet own an instance of it.**
+
 `project-postulate`: counts, durations, energy samples, and rates are supporting receiver
 measurements. A holonic profile grades only when they are attached to a returned phase/current
 distribution, causal cut, reconstruction fiber, caustic, topology, intervention, or obstruction.
@@ -147,6 +195,11 @@ MorphoHDL demonstrates bounded authored recursive circuit growth; it does not in
 itself provide higher cellular topology.
 
 ## 7. Quantum Information Dynamics is a typed project term
+
+**Both terms are Brandon's coinage, 2026-08-12, and the provenance was missing until 2026-08-13:**
+*"I guess if we want to be specific we can call it Quantum Information Dynamics because that is
+what we're doing with Information Theory and General Relativity, we indeed have Quantum Information
+Fields."* The definitions below are the assistant's typing of his terms.
 
 `definition`: **Quantum Information Dynamics** is the receiver-indexed calculus of indivisible
 situated events, coherent plural paths, typed vertices, connections, phase-current transport, and

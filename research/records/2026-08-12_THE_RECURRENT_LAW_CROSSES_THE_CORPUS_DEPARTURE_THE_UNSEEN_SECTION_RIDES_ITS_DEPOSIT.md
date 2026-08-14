@@ -33,6 +33,23 @@ coordinate, or founding answer. After round-trip remount, the card evaluated all
 coordinates disjoint from the founding coordinates. The stable receiver/history quotient then
 formed the expected four reconstruction fibers without an operation tag or material-kind branch.
 
+**BOUNDED 2026-08-13, and the word "expected" above is load-bearing.** The four fibers are the four
+distinct `ExteriorLaw` variants declared in the driver —
+`soma/life/examples/the_conditioned_section_returns_after_detachment.rs:731-780` declares
+`Sum, Sum, Sum, Product, Product, Difference, ReverseDifference` — and each founding face is that
+declared law enacted on the shared rectangle `(2,3) × (2,3)` at `:641-652`. Two presentations
+carrying one `ExteriorLaw` therefore return byte-identical faces, so their fiber agreement is
+determined at declaration and could not have come out otherwise (`CLAUDE.md` §8). **The fiber count
+is a restatement of the declaration table, not a discovered classification.**
+
+What the return does establish, and it is not small: the founding coordinates depart, the rest
+carries no answer, the remount is exact, and the card evaluates the recovered Newton coefficients
+at coordinates `(2,3)²` never supplied — so the *law recovery and its source-detached survival* are
+measured. Only the *partition* is authored. The same correction and the route out of it are stated
+at `research/records/2026-08-12_THE_CODE_MATERIAL_RETURNS_ITS_WORLD_LINE_WITHOUT_AN_INTERPRETER.md`
+§3: vary the founding rectangle across presentations of one operation so that recovered
+coefficients rather than a shared declaration are what agrees.
+
 This is the completed fourth return of `blueprint/THE_ROADMAP.md` §“THE RECURRENT-SECTION
 CONSTRUCTION.” It is not unrestricted arithmetic discovery, an English conversation model, or a
 general unknown-codec reader.
