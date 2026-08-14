@@ -433,3 +433,90 @@ Nothing is withdrawn. Two things are reordered and one is added:
   which is what makes it an instrument rather than a formality.
 - **Step 4's material selection is now decided by measurement rather than by taste**: the disjoint
   body is not an afterthought control, it is the discriminator, and it must be run at every reading.
+
+---
+
+## 9. STEPS 1, 1b, 2, 3 AND 4 BUILT. The crossing holds, and its margins are thin
+
+### What was built
+
+| step | owner | what |
+|---|---|---|
+| **2** | `crates/holonic-engine/src/surprisal.rs` | `CrossEntropyFiber::{Supported, Partial, Unsupported}` and `cross_entropy_fiber`. `cross_entropy` is retained as its **face** and delegates. The `Partial` arm carries the form over the supported part **weighted by the whole population**, both masses (summing to one exactly), and every unsupported event **by name**. Nothing smooths. |
+| **1b** | `soma/life/src/decomposing_codec.rs` | `RevisionAperture` and `revise_within`. The caller declares a threshold; **the material decides which words clear it**. Excluded words return by name with how many pairs asked. `revise()` delegates at `every_pair()`. An aperture nothing clears refuses by name. |
+| **1** | same | `DecompositionPass::part_population` (the multiset `read` builds and the part system discards) and `part_count` beside `parts().len()`. |
+| **3** | `crates/holonic-engine/src/cuda_aperture.rs` | `DeclaredCarrierMetric::intermediate_bit_cost` — **the description axis**. A width is a description length. Declared as a value at a call site; zero reproduces the inherited reading. |
+
+Each carries its own orbit control. The aperture's: three declared thresholds must reach different
+grains and the grains must be monotone under narrowing. The exchange's: a busy narrow carrier and a
+quiet wide one **order one way with no width price and the other way with one**, so the declaration
+is a frame and not a decoration.
+
+### Step 4, and the first design was refuted by its own first run
+
+The deed first ran with a one-sided control — a subject-disjoint *later* body required not to move.
+**It moved, at every aperture**, and the reason is legible in the admitted words: at the widest
+aperture that cleared the threshold the cuts were `(`, `)`, `*`, `,`, `-`, `.`, `/`, `:`, `;`.
+
+> **The words the most collapsed pairs ask for are punctuation — the least material-specific cuts
+> there are. Recurrence across pairs IS generality, so an aperture keyed on it selects against
+> attribution.**
+
+So a one-sided control cannot reach grade three: *any* refinement helps *any* later body, and asking
+whether the later body improved is the wrong question. The right one is **whether it improved because
+of THIS conditioning body**, which is a difference between two *deposits*, not between two grains.
+
+**The design became a crossing.** Two conditioning bodies on different subjects — circulation
+(`TABLET_THE_CIRCULATING_CARTOGRAPHER` + `TABLET_THE_REASONING_CYCLE`) and geometry
+(`TABLET_THE_MANIFOLD` + `TABLET_THE_TURN`) — and two later bodies, one near each:
+`TABLET_THE_COMPRESSION` near circulation, `TABLET_THE_CHART` near geometry. Both later bodies are
+nonidentical to both conditioning bodies and condition nothing.
+
+### What returned
+
+```text
+deposits        A (circulation) 105 cut words   C (geometry) 285
+                shared 104   only A 1   only C 181
+
+reach           B through A 106 kinds     B through C  99
+                D through A 125           D through C 134
+
+attributable    B reaches 45 kinds only through A, 38 only through C     ->  B favours A by +7
+                D reaches 63 kinds only through A, 72 only through C     ->  D favours C by +9
+
+controls        aperture orbit non-trivial              YES
+                the two deposits genuinely differ       YES
+                the no-op moved EXACTLY ZERO            YES
+                the foil crosses                        NO  (B +9, D -23)
+```
+
+**The crossing holds in sign: each later body favours its own neighbour's deposit.** And the foil —
+a grain of the same shape built from words the collapsed population did **not** return — does not
+reproduce it.
+
+### Three things this result is not, stated plainly
+
+**The margins are thin and the crossing is carried by one arm.** `B` favours `A` by `+7` against
+attributable populations of 45 and 38 — and `B` favours the **foil** over `C` by `+9`, which is
+larger. **On `B` alone the derived cut is indistinguishable from the foil.** What separates them is
+`D`, where the foil scores `−23` against the derived cut's `+9`. So the deed's discrimination rests
+on the geometry arm, and saying it rests on both would be false.
+
+**The two deposits are not symmetric.** `A` has exactly **one** cut word `C` does not, and `C` has
+181 that `A` does not — `A` is very nearly a subset of `C`. So the crossing is driven more by what
+`C` adds than by what `A` distinctively contributes, and a symmetric pair of conditioning bodies is
+owed before the sign is read as more than a sign.
+
+**The foil control was malformed on its first run and reported the opposite.** It compared a set size
+(71) against a net preference (+7) — two different quantities — and printed *"FOIL DOES AS WELL, the
+cut is decorative."* Recomputed by running the whole crossing statistic with the foil standing in for
+`A`, it does not cross. **A control that measures a different quantity than the thing it controls is
+not a control**, and this one was caught only because its verdict was surprising.
+
+### What the deed does not claim
+
+Not compression — the regrade of 2026-07-19 stands. Not intelligence — that step is where
+machine-independence is known not to extend. The population is the object throughout and the exact
+form is its magnitude face, printed beside it. Two conditioning bodies and two later bodies is a
+crossing of **four readings**, not a population of experiments; nothing here is a rate and no figure
+is an average.
