@@ -356,3 +356,80 @@ No Millennium movement. No claim that compression is intelligence — that remai
 stopping point named. It does not claim grade three is reached; it states that grade three is the deed
 and that the grades below it are the carrier. It schedules nothing beyond the plan in §5, which the
 roadmap now carries.
+
+---
+
+## 8. STEP 0, TAKEN. The keystone control fires, and the deposit's aperture is the object
+
+Driver: `soma/life/examples/the_grain_is_read_as_a_code.rs`. Material: three records of this
+repository as conditioning; `canon/TABLET_THE_COMPRESSION.md` held out; `canon/TABLET_THE_MANIFOLD.md`
+held out and subject-disjoint. Origin grain: close a part after a space — one cut word, and the only
+authored thing in the run.
+
+### What returned
+
+```text
+                              parts   distinct   collapsed pairs   unsupported
+parent grain (1 cut word)
+  held out, COMPRESSION        1320        700           123 944           250   form UNSUPPORTED
+  held out, MANIFOLD           8333       2925         1 304 986          2306   form UNSUPPORTED
+
+the deposit: 1 448 456 founded codec versions; grain 1 -> 1775 cut words
+
+revised grain (1775 cut words)
+  held out, COMPRESSION        8380        105                 0             0   form RETURNS
+  held out, MANIFOLD          49838        171                39            59   form UNSUPPORTED
+```
+
+The one form that returned is exact and symbolic — a ℚ-linear form over `log₂` of the primes to
+2957, thirty-four terms, `+ log₂(107)` at coefficient one. No float, no evaluation.
+
+### Four findings, and the third is the one that changes the deed
+
+**1 · Step 2 is a precondition, not an optimisation.** Three of the four readings returned
+`Unsupported` **for the whole reading** while the supported majority had already been accumulated —
+250 novel events out of 700 distinct, and the aggregate discards the other 450. The comparison the
+plan's headline needs **cannot be taken on real held-out material** until `cross_entropy` carries a
+`Partial` arm. This was posed as a repair and is measured as a gate.
+
+**2 · The naive byte reading is refuted on this material, again.** Parts went **up** under the
+revised grain — 1320 → 8380 and 8333 → 49838 — because a finer grain cuts more. That is
+`skein_far_condensation`'s 254 → 378 recurring on different material, and it is why *"reduced founding
+cost"* was never the right name.
+
+**But the code itself shrank, and this is the two-part account appearing without being asked for.**
+Distinct parts fell **700 → 105** and **2925 → 171** while covering the same material. **The model got
+smaller and the parse got longer** — exactly the split the two-part code describes, arriving out of
+the grain rather than out of a principle.
+
+**3 · The keystone control FIRES, and it names the real object.** The subject-disjoint body improved
+as much as the held-out one — unsupported `2306 → 59`, collapsed `1 304 986 → 39`. **Both moved.** By
+the control declared before the run, that means the revision was a **global normalisation, not changed
+terrain.**
+
+The cause is legible in the deposit itself: `revise()` founds one codec version **per collapsed pair**,
+and this pass returned **1,448,456** of them, driving the grain to 1775 cut words over a 
+small alphabet. At that fineness the parts are short and near-universal, so *any* material becomes
+supported. **The deposit saturates.**
+
+**So the object the deed must carry is the deposit's aperture.** Not a new organ — the aperture is
+already the framework's own vocabulary, and `revise()` already returns its population by name rather
+than by count. What is absent is a *declared* extent on the revision that the **material** decides,
+so that a deposit founded by material A cuts where A's collapsed pairs ask and not everywhere at once.
+Until that exists, "the deposit changed the terrain" and "the grain became maximally fine" are the
+same sentence on this material, and no held-out reading can separate them.
+
+**4 · The grade is confirmed as two, by construction.** The later material is identical across the two
+grains. Grade three needs a nonidentical neighbourhood, and this reading does not reach for one.
+
+### What Step 0 changes about the plan
+
+Nothing is withdrawn. Two things are reordered and one is added:
+
+- **Step 2 moves ahead of Step 1** — the `Partial` arm gates every reading, and the part multiset is
+  reachable today through `DecompositionPass::decomposed`, so Step 1 is a convenience.
+- **A new Step 1b: the deposit's declared aperture**, read off the collapsed population rather than
+  authored, with its orbit exhibited. The keystone control is the falsifier and it already fired once,
+  which is what makes it an instrument rather than a formality.
+- **Step 4's material selection is now decided by measurement rather than by taste**: the disjoint
+  body is not an afterthought control, it is the discriminator, and it must be run at every reading.

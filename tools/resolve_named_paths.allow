@@ -21,7 +21,6 @@ canon/THE_DOCUMENT_LAW.md :: evidence/observations/ :: named as the archived loc
 # is not a claim about this tree.
 
 # --- Named permanent losses. These resolve at no commit in either repository. ---
-CLAUDE.md :: output/arithmetic-dimensional-receiver/ :: the residue-stratum atlas, written to an untracked output directory and lost; §12 says so in the sentence that names it
 CONSTRUCTION_STATE.md :: output/arithmetic-dimensional-receiver/ :: same loss, recorded in the verified-position section as the third of its kind
 canon/THE_RECOVERED_LAW.md :: src/soma/runs/ :: the untracked laboratory directory that took the tiger figures and the semantics theorem with it; the citation is the point
 
