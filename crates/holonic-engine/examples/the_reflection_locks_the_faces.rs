@@ -1,8 +1,15 @@
 //! The reflection locks the faces, and the rational circle has exactly four points on it.
 //!
 //! `crates/holonic-engine/src/causal_reflection.rs` is the discrete Kramers-Kronig face lock — the
-//! dispersive/absorptive decomposition that **is** integration by reflection. It has one library
-//! caller and **no direct driver**. This file conducts through it.
+//! dispersive/absorptive decomposition that **is** integration by reflection. This file is its
+//! driver, and `derivation_integral` is its library caller.
+//!
+//! **The sentence that stood here until 2026-08-14 read *"It has one library caller and no direct
+//! driver"* — printed by the file that IS the driver.** It was true for the minutes before this
+//! example existed and false from the commit that added it. Three sessions read it, believed it,
+//! and reported `causal_reflection` as built-and-undriven in governing documents. A module's
+//! reach is a measurement and decays like one; a driver may not describe its own organ as
+//! undriven.
 //!
 //! The module closes
 //! `research/records/2026-08-05_THE_RECEIVER_QUOTIENTS_THE_SPECTRUM_CAUSALITY_LOCKS_ITS_FACES.md`
@@ -297,7 +304,7 @@ fn main() {
     println!("evidence=computational-witness");
     println!("law=the two faces lock exactly when the response vanishes before the stimulus");
     println!(
-        "organ=crates/holonic-engine/src/causal_reflection.rs   (one library caller, no driver)"
+        "organ=crates/holonic-engine/src/causal_reflection.rs   (library caller: derivation_integral; driver: this file)"
     );
 
     let mut holds: Vec<(&str, bool, String)> = Vec::new();

@@ -254,19 +254,122 @@ this body before this session:
 | the hand carried, not deleted into a magnitude | `ReachedBy::hand`, `CausalTransportHand` | absent |
 | the orientation admitting the traversal | the reach 1-cell's boundary sign | refused, and invisible to every invariant |
 
-## 10. What is owed, as couplings rather than organs
+## 10. What is owed — CORRECTED THE SAME DAY, and two of the three claims were wrong
 
-1. **No composition of interfaces.** `exact_refraction_fiber` computes one interface and stops.
-   Nothing feeds a transmitted or reflected covector into a second interface, and nothing accumulates
-   a running phase or optical path across more than one. The junction law is exact and does not chain
-   — which is the same defect as a route organ that returns a cardinality.
-2. **No crossing between the lattice and the interface.** `lattice_gauge` holds plaquette holonomy,
-   the Wilson action and an exact transfer spectrum over `Rat`; `analytic_field` holds interface
-   transport. The module that would supply `G` and the module that consumes `k_parallel` share no
-   type.
-3. **The causality lock is stated and its exercise is unverified.** The Kramers–Kronig organ has been
-   described repeatedly as built and undriven; that description is being re-measured rather than
-   repeated, because this project's "built and undriven" claims have a history of being partly wrong.
+The first version of this section named three couplings. A sweep of the composition surface
+refuted two of them within the hour. Both errors are kept, because both have a cause worth carrying.
+
+### 10a. The chain already exists — in the amplitude channel
+
+*"No composition of interfaces"* was **false as stated.**
+`crates/holonic-engine/src/dimensional_wave.rs:883` `enact_wave` already feeds one junction's
+departure into another junction's arrival, for as many ticks as it is enacted:
+
+```text
+   :962-978   v = 2 (sum_j Y_j a_j) / (sum_j Y_j)      the junction solve
+   :1001      b_i = v - a_i                            each port's departure
+   :1011-1012 transported = b_i.rotate(cos, sin)       the propagation phase
+   :1013-1015 refuses if the rotation moved the norm   NonunitPhaseTransport
+   :1018-1028 schedule_arrival(cursor + port.delay) at the OPPOSITE port
+   :997-1000  it re-enters as `incoming` at the next junction
+```
+
+Measured: `wave_arcs=10 wave_modes=3 ticks=24 final_energy=25`, every residual exactly zero, with a
+two-frame energy ledger and a `PassiveEnergyFailure` refusal.
+
+**And the two laws are one law.** At a two-port junction with a single incoming `a_1`:
+
+```text
+   b_1 = a_1 (Y_i - Y_t)/(Y_i + Y_t) = r a_1
+   b_2 = 2 Y_i a_1 /(Y_i + Y_t)      = t a_1
+```
+
+`exact_scalar_interface_coefficients` is **the closed form of the chained law's two-port special
+case**. The composition is a join between two owners, not a construction.
+
+**What is actually a leaf is the GEOMETRIC channel.** `exact_refraction_fiber` returns a reflected
+covector and a transmitted regime and **nothing consumes either** — its one consumer outside its own
+tests is `examples/analytic_field_transport.rs:508`, which loops three modes over one overlap with a
+hardcoded incident covector `(3,4,0)` and writes the result to a TSV. The chained law carries
+`ExactComplexWaveCurrent { real, imaginary }` and a scalar admittance: no covector, no normal, no
+wave number, no regime, no hand.
+
+**And the transmitted direction is withheld on purpose**, because its square root is irrational over
+`Rat`. Chaining two interfaces therefore needs either a declared quadratic extension — and
+`multiquadratic.rs` is this body's existing carrier for exactly that, `sqrt(d)` with `d` rational,
+as the twisted group algebra of `(Z/2)^n` — or a formulation that never needs the direction itself.
+
+### 10b. A seam defect at that boundary, and two tautological receipts
+
+**Two independently declared admittance tables describe the same physics and are never checked to
+agree:** `ExactAnalyticFieldMode::interface_admittance` per material germ (`analytic_field.rs:371`,
+read by `interface_optics`) and `ExactAnalyticFieldArc::admittance` per arc (`:386`, compiled into
+the chained law's port admittance). Validation at `:1557-1605` checks each is positive and correctly
+keyed and never compares them. The reading and the conducting can use different numbers for one
+material.
+
+**Two receipts in this module could not have come out otherwise**, and by the tautology rule they are
+`definition` grade rather than evidence:
+
+- `incident_dispersion_residual` is stored at `:1089`, but construction returns `Err` at `:1067`
+  unless it is zero — **the field is identically zero in every value that exists.**
+- `energy_residual` at `:1152-1154` expands to
+  `Y_i [1 - ((Y_i-Y_t)^2 + 4 Y_i Y_t)/(Y_i+Y_t)^2] = 0` for **every** positive pair.
+
+The honest content of the module is the three-way fiber — `Traveling`, `GrazingOpen`,
+`EvanescentOpen` — which holds the non-propagating regimes open instead of fabricating a transmitted
+section, and refuses `NonpropagatingModeAdmitted`. That one can fail and does.
+
+### 10c. The lattice crossing is blocked by a measured theorem, not a missing function
+
+`lattice_gauge`'s lattice is **purely combinatorial** — `Link { id, tail, head }`, `Plaquette { id,
+walk }`, `OrientedEdge { edge, forward }`. No coordinate, no position, no metric, no embedding. An
+incident covector has nothing to address, and only `lib.rs` names both modules.
+
+The real obstruction is arithmetic. The analytic phase `ExactWavePhaseTransport { cosine, sine }`
+generates **SO(2, Q)**, which is infinite; a `StructureGroup` is finite. **The only elements of
+SO(2, Q) of finite order are the four Niven points** — and `causal_reflection`'s driver has already
+*measured* exactly this: **4 of 88 distinct rational circle points are roots of unity, of orders
+1, 2, 4, 4.** So the entire finite part an exact rational phase can hand a gauge group is `Z/4`.
+Anything richer needs `Q(zeta_N)`, which that module's own bounds block states nothing here supplies.
+
+This is a named, already-measured obstruction sitting between the two modules — and it is the same
+carrier `winding_inertia::lattice_admits_order` uses to derive the **crystallographic restriction**
+from `niven_value` rather than hardcoding `{1,2,3,4,6}`.
+
+### 10d. THE CAUSALITY LOCK IS DRIVEN, AND THE ERROR HAS A NAMED CAUSE
+
+The first version of this section said the Kramers-Kronig organ's exercise was unverified. **It is
+driven, and driven hard.** `examples/the_reflection_locks_the_faces.rs` returns **18 declared
+controls, 0 failed**: the lock biconditional decided over **3,238 exhaustively enumerated responses**
+at three apertures with 0 law failures and 11,856 standing residual addresses; exactly 4 of 88
+rational circle points are roots of unity; two lattices refused by name with their exact miss; 24
+regrained readings bit-identical; 10 of 10 refusals firing by name; and the aliasing failure past the
+four-point aperture **exhibited rather than asserted**. `derivation_integral` reaches it on every
+route pair, and two further drivers conduct through it. Public reach is essentially total — exactly
+one item is test-only.
+
+**The cause of the error is a sentence the driver printed about itself.** Its header read *"It has
+one library caller and no direct driver. This file conducts through it,"* and it printed
+`(one library caller, no driver)` in its own output. **The file declaring the absence was the
+driver.** True for the minutes before it existed, false from the commit that added it, and read by
+three sessions since — including into a governing document earlier today.
+
+Repaired at the source 2026-08-14, with the reason written where the next reader meets it. **A
+module's reach is a measurement and decays like one; a driver may not describe its own organ as
+undriven.**
+
+### 10e. What is genuinely absent, measured
+
+`diffract`, `bragg`, `brillouin`, `structure_factor`, `unit_cell`, `bloch` return **zero code hits**.
+`grating` matches 35 files and **every one is a false positive** — `integrating` and
+`reintegrating`. `Hamiltonian`, `symplectic`, `poisson_bracket`, `eikonal`, `group_velocity` have
+**no hits in any Rust file** anywhere; all 27 are prose. `reciprocal` is never the reciprocal
+lattice; it is the reciprocal Ihara zeta and plain multiplicative inverse.
+
+The one structurally symplectic owner carries none of the vocabulary:
+`ExactAnalyticAdvectionLaw` (`analytic_field.rs:1180`) states `A^T Omega + Omega A = 0` with a Cayley
+successor preserving the `Omega` form exactly, and a grep for "symplectic" will never find it.
 
 ## What this record does not claim
 
