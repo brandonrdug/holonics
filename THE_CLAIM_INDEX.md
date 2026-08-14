@@ -105,7 +105,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (78 deposits of 370)
+## 4 · The 2026-08 record line (79 deposits of 371)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -191,6 +191,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-13_THE_SEARCH_WAS_IN_THE_WRONG_CHART_AND_THE_CARD_OWNS_THE_QUOTIENT.md` | The search was in the wrong chart, and the card owns the quotient |
 | `2026-08-13_THE_WEIGHT_FILE_IS_A_PREVIOUSLY_RENDERED_MAP_THE_GRAIN_IS_RECURRING_TRANSFORMATION.md` | The weight file is a previously rendered map, and the grain is recurring transformation |
 | `2026-08-14_THE_APERTURE_IS_AN_INTERACTION_HAMILTONIAN_AND_A_PHASE_OBJECT_IS_INVISIBLE_TO_THE_MAGNITUDE_FACE.md` | The aperture is an interaction Hamiltonian, and a phase object is invisible to the magnitude face |
+| `2026-08-14_THE_METHOD_IS_A_CHART_TRANSITION_OR_A_COBOUNDARY_MOVE_AND_ONLY_THE_FINITE_STRATA_ARE_TABLES.md` | The method is a chart transition or a coboundary move, and only the finite strata are tables |
 
 ---
 
