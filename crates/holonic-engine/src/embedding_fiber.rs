@@ -64,16 +64,25 @@ use std::ffi::{CStr, c_char, c_void};
 use num_bigint::BigInt;
 use thiserror::Error;
 
+use crate::cuda_aperture::DerivedLaunch;
 use crate::exact_value::ieee754::decode_bfloat16_bits;
 
 const PTX: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/exact_embedding_fiber.ptx"));
 const CUDA_SUCCESS: i32 = 0;
 
+/// `CUdevice_attribute` and `CUfunction_attribute` selectors from `cuda.h`. ABI: the integers are
+/// fixed by the foreign interface and a different value asks a different question.
 const DEVICE_MAX_THREADS_PER_BLOCK: i32 = 1;
 const DEVICE_MAX_GRID_DIM_X: i32 = 5;
+const DEVICE_WARP_SIZE: i32 = 10;
+const FUNCTION_MAX_THREADS_PER_BLOCK: i32 = 0;
 
 /// The exact carrier the kernel accumulates in. Read off `__int128`, not chosen.
 const CARRIER_OCTAVES: u32 = 128;
+
+/// The magnitude octaves a signed 64-bit word holds. Read off `i64`, not chosen: `i64::BITS` is 64
+/// and one of them is the hand, so a magnitude may occupy 63 and no more.
+const SIGNED_WORD_OCTAVES: u32 = i64::BITS - 1;
 
 type CuDevice = i32;
 type CuContext = *mut c_void;
@@ -89,6 +98,7 @@ unsafe extern "C" {
     fn cuDeviceGet(device: *mut CuDevice, ordinal: i32) -> i32;
     fn cuDeviceGetName(name: *mut c_char, length: i32, device: CuDevice) -> i32;
     fn cuDeviceGetAttribute(value: *mut i32, attribute: i32, device: CuDevice) -> i32;
+    fn cuFuncGetAttribute(value: *mut i32, attribute: i32, function: CuFunction) -> i32;
     fn cuCtxCreate_v2(context: *mut CuContext, flags: u32, device: CuDevice) -> i32;
     fn cuCtxSetCurrent(context: CuContext) -> i32;
     fn cuCtxDestroy_v2(context: CuContext) -> i32;
@@ -149,6 +159,23 @@ pub enum FiberError {
     ExtentOverflow { rows: usize },
     #[error("the declared alignment spread {spread} exceeds the exact word carrier")]
     AlignmentSpread { spread: u32 },
+    /// An entry's own magnitude plus the spread it must be raised through exceeds the signed word.
+    ///
+    /// **This is a separate refusal from [`FiberError::AlignmentSpread`] because it has a separate
+    /// cause.** A spread of 40 is admissible for a one-octave entry and inadmissible for a
+    /// twenty-four-octave one; the spread alone cannot decide it. Reporting both as
+    /// `AlignmentSpread` would name the wrong quantity, and the guard that only looked at the
+    /// spread is what let the shift wrap silently — see the note on the alignment loop.
+    #[error(
+        "an entry of {octaves} octaves raised through a spread of {spread} needs {needed} octaves, \
+         past the {carrier}-octave signed word"
+    )]
+    AlignmentOverflows {
+        octaves: u32,
+        spread: u32,
+        needed: u32,
+        carrier: u32,
+    },
     #[error("the float mouth refused an entry: {reason}")]
     MouthRefused { reason: String },
     #[error("the addressed population names row {row} of a {rows}-row readout")]
@@ -231,8 +258,26 @@ pub fn align_bfloat16(words: &[u16]) -> Result<AlignedMaterial, FiberError> {
         }
         let spread = u32::try_from(exponent - lowest)
             .map_err(|_| FiberError::AlignmentSpread { spread: u32::MAX })?;
-        if spread >= 63 {
+        if spread >= SIGNED_WORD_OCTAVES {
             return Err(FiberError::AlignmentSpread { spread });
+        }
+        // The demand is the entry's OWN octaves plus the spread, and the spread alone cannot decide
+        // it. `checked_shl` refuses only an out-of-range shift AMOUNT — it does not look at the
+        // value — so `spread < 63` admitted shifts that wrapped through the sign bit and returned
+        // `Some`: measured, a positive significand comes back negative at spread 56 and a negative
+        // one comes back positive at spread 60. **The hand flipped and nothing refused**, on a
+        // conduct path, in a body whose standing law is that a sign is a passage and never a state.
+        // The parity test between the resident and serial charts could not catch it either: both
+        // consume the same already-wrapped `AlignedMaterial`, so they agree on the wrong value.
+        let octaves = significand.unsigned_abs().ilog2() + 1;
+        let needed = octaves + spread;
+        if needed > SIGNED_WORD_OCTAVES {
+            return Err(FiberError::AlignmentOverflows {
+                octaves,
+                spread,
+                needed,
+                carrier: SIGNED_WORD_OCTAVES,
+            });
         }
         let aligned: i64 = significand
             .checked_shl(spread)
@@ -316,9 +361,19 @@ pub struct ResidentReadout {
     scores: CuFunction,
     scores_addressed: CuFunction,
     octaves: CuFunction,
+    scores_batched: CuFunction,
     device_name: String,
-    max_threads: u32,
-    max_grid_x: u32,
+    /// Block and grid, derived from what this device and these kernels admit. Never authored here.
+    launch: DerivedLaunch,
+}
+
+/// The frame a mounted readout carries into a score: what the map's own entries cost in octaves,
+/// and the power of two they are aligned to. Both are the readout's, not the query's, and a score
+/// is meaningless without them — which is why they are kept beside the device pointer rather than
+/// re-derived from a matrix that is no longer on this chart.
+struct ReadoutFrame {
+    entry_octaves: u32,
+    exponent: i32,
 }
 
 impl ResidentReadout {
@@ -366,11 +421,18 @@ impl ResidentReadout {
                 return Err(error);
             }
 
-            let mut loaded = [std::ptr::null_mut(); 3];
+            let mut warp = 0i32;
+            checked(
+                cuDeviceGetAttribute(&mut warp, DEVICE_WARP_SIZE, device),
+                "cuDeviceGetAttribute(warp size)",
+            )?;
+
+            let mut loaded = [std::ptr::null_mut(); 4];
             for (slot, symbol) in loaded.iter_mut().zip([
                 c"exact_readout_scores",
                 c"exact_readout_scores_addressed",
                 c"exact_score_octaves",
+                c"exact_readout_scores_batched",
             ]) {
                 if let Err(error) = checked(
                     cuModuleGetFunction(slot, module, symbol.as_ptr()),
@@ -388,9 +450,37 @@ impl ResidentReadout {
                 scores: loaded[0],
                 scores_addressed: loaded[1],
                 octaves: loaded[2],
+                scores_batched: loaded[3],
                 device_name,
-                max_threads: max_threads.max(1) as u32,
-                max_grid_x: max_grid_x.max(1) as u32,
+                launch: {
+                    // Every kernel this module launches must fit the block, so the block is the
+                    // smallest admission among them and the device's own ceiling, taken down to a
+                    // whole warp. `DerivedLaunch::from_admissions` owns that rule.
+                    let device_block = max_threads.max(1) as u32;
+                    let mut kernel_block = device_block;
+                    for function in loaded {
+                        let mut value = 0i32;
+                        if let Err(error) = checked(
+                            cuFuncGetAttribute(
+                                &mut value,
+                                FUNCTION_MAX_THREADS_PER_BLOCK,
+                                function,
+                            ),
+                            "cuFuncGetAttribute(MAX_THREADS_PER_BLOCK)",
+                        ) {
+                            let _ = cuModuleUnload(module);
+                            let _ = cuCtxDestroy_v2(context);
+                            return Err(error);
+                        }
+                        kernel_block = kernel_block.min(value.max(0) as u32);
+                    }
+                    DerivedLaunch::from_admissions(
+                        device_block,
+                        kernel_block,
+                        max_grid_x.max(1) as u32,
+                        warp.max(1) as u32,
+                    )
+                },
             })
         }
     }
@@ -411,24 +501,21 @@ impl ResidentReadout {
             .saturating_add(1)
     }
 
-    /// **The deed.** Every exact score of one query against every declared row.
+    /// **Lay the readout down on the card and leave it there.** The map is the invariant; a query
+    /// is the question asked of it. Crossing the invariant on every question is the defect this
+    /// exists to remove.
     ///
-    /// `addresses` names the rows to score; `None` scores all of them. A row the caller did not name
-    /// is not scored, not defaulted, and not silently included — so an aperture can report what it
-    /// excluded rather than dropping it.
-    pub fn score(
-        &self,
+    /// Measured 2026-08-13, before it existed: a driver asking 4,096 questions of one 84 MB readout
+    /// pushed roughly **343 GB** across the bus — the same matrix, 4,096 times — at a sustained
+    /// 13–15 GB/s, while the arithmetic it was paying for was worth milliseconds. Nothing about the
+    /// kernel was wrong; the operand simply had no residency. `cuda_refine.rs` already owned the
+    /// shape (`Buffer`, `DeviceCorpus` — *"the whole corpus, laid out once for the device"*), and
+    /// this is that shape here.
+    pub fn mount<'chart>(
+        &'chart self,
         readout: &AlignedMaterial,
-        query: &AlignedMaterial,
         dim: usize,
-        addresses: Option<&[u32]>,
-    ) -> Result<ScorePopulation, FiberError> {
-        if query.entries.len() != dim {
-            return Err(FiberError::WidthDisagrees {
-                query: query.entries.len(),
-                dim,
-            });
-        }
+    ) -> Result<MountedReadout<'chart>, FiberError> {
         if dim == 0 || readout.entries.len() % dim != 0 {
             return Err(FiberError::RaggedReadout {
                 words: readout.entries.len(),
@@ -436,10 +523,103 @@ impl ResidentReadout {
             });
         }
         let rows = readout.entries.len() / dim;
+        let bytes = std::mem::size_of_val(readout.entries.as_slice());
+        unsafe {
+            checked(cuCtxSetCurrent(self.context), "cuCtxSetCurrent")?;
+            let mut resident: CuDevicePtr = 0;
+            checked(cuMemAlloc_v2(&mut resident, bytes), "cuMemAlloc(readout)")?;
+            if let Err(error) = checked(
+                cuMemcpyHtoD_v2(resident, readout.entries.as_ptr().cast(), bytes),
+                "cuMemcpy(readout)",
+            ) {
+                let _ = cuMemFree_v2(resident);
+                return Err(error);
+            }
+            Ok(MountedReadout {
+                chart: self,
+                resident,
+                rows,
+                dim,
+                entry_octaves: readout.entry_octaves,
+                exponent: readout.exponent,
+                octets: bytes,
+            })
+        }
+    }
+
+    /// **The deed, for a caller with one question.** Every exact score of one query against every
+    /// declared row.
+    ///
+    /// `addresses` names the rows to score; `None` scores all of them. A row the caller did not name
+    /// is not scored, not defaulted, and not silently included — so an aperture can report what it
+    /// excluded rather than dropping it.
+    ///
+    /// **This mounts, asks, and unmounts.** A caller with many questions must
+    /// [`mount`](Self::mount) once and ask the mounted readout, or the operand crosses the bus once
+    /// per question.
+    pub fn score(
+        &self,
+        readout: &AlignedMaterial,
+        query: &AlignedMaterial,
+        dim: usize,
+        addresses: Option<&[u32]>,
+    ) -> Result<ScorePopulation, FiberError> {
+        self.mount(readout, dim)?.score(query, addresses)
+    }
+}
+
+/// A readout resident on the card, with the questions a caller may ask of it.
+///
+/// The device allocation is owned here and released on drop. It borrows the chart, so the context
+/// it was allocated against outlives it by construction.
+pub struct MountedReadout<'chart> {
+    chart: &'chart ResidentReadout,
+    resident: CuDevicePtr,
+    rows: usize,
+    dim: usize,
+    entry_octaves: u32,
+    exponent: i32,
+    octets: usize,
+}
+
+impl MountedReadout<'_> {
+    /// Rows the mounted map carries.
+    pub fn rows(&self) -> usize {
+        self.rows
+    }
+
+    /// The width the map declared. Read off the material, never authored.
+    pub fn dim(&self) -> usize {
+        self.dim
+    }
+
+    /// Octets the map occupies on the card — the operand that now crosses once instead of per query.
+    pub fn resident_octets(&self) -> usize {
+        self.octets
+    }
+
+    /// Every exact score of one query against every declared row of the mounted map.
+    pub fn score(
+        &self,
+        query: &AlignedMaterial,
+        addresses: Option<&[u32]>,
+    ) -> Result<ScorePopulation, FiberError> {
+        let dim = self.dim;
+        let rows = self.rows;
+        if query.entries.len() != dim {
+            return Err(FiberError::WidthDisagrees {
+                query: query.entries.len(),
+                dim,
+            });
+        }
+        let readout = ReadoutFrame {
+            entry_octaves: self.entry_octaves,
+            exponent: self.exponent,
+        };
 
         // The headroom check, before anything is dispatched. Refused, never truncated.
         let entry_octaves = readout.entry_octaves.max(query.entry_octaves);
-        let needed = Self::needed_octaves(entry_octaves, dim);
+        let needed = ResidentReadout::needed_octaves(entry_octaves, dim);
         if needed > CARRIER_OCTAVES {
             return Err(FiberError::CarrierTooNarrow {
                 dim,
@@ -467,32 +647,33 @@ impl ResidentReadout {
                 readout_exponent: readout.exponent,
                 query_exponent: query.exponent,
                 exact_multiply_accumulates: 0,
-                resident_chart: self.device_name.clone(),
+                resident_chart: self.chart.device_name.clone(),
             });
         }
 
-        let block = self.max_threads.min(256).max(1);
-        let grid = count.div_ceil(block as usize);
-        if grid as u64 > u64::from(self.max_grid_x) {
-            return Err(FiberError::ExtentOverflow { rows: count });
-        }
+        // The block is what the device and the kernels admit, down to a whole warp — derived by
+        // `cuda_aperture::DerivedLaunch`, the owner of that rule. It read `max_threads.min(256)`
+        // until 2026-08-13: a level authored inside this organ, blind to the warp and blind to what
+        // its own kernels admit.
+        let block = self.chart.launch.block_x;
+        let work = u32::try_from(count).map_err(|_| FiberError::ExtentOverflow { rows: count })?;
+        let grid = self
+            .chart
+            .launch
+            .grid_for(work)
+            .map_err(|_| FiberError::ExtentOverflow { rows: count })?;
 
         unsafe {
-            checked(cuCtxSetCurrent(self.context), "cuCtxSetCurrent")?;
+            checked(cuCtxSetCurrent(self.chart.context), "cuCtxSetCurrent")?;
 
-            let readout_bytes = std::mem::size_of_val(readout.entries.as_slice());
             let query_bytes = std::mem::size_of_val(query.entries.as_slice());
-            let mut device_readout: CuDevicePtr = 0;
+            let mut device_readout: CuDevicePtr = self.resident;
             let mut device_query: CuDevicePtr = 0;
             let mut device_low: CuDevicePtr = 0;
             let mut device_high: CuDevicePtr = 0;
             let mut device_octaves: CuDevicePtr = 0;
             let mut device_addresses: CuDevicePtr = 0;
 
-            checked(
-                cuMemAlloc_v2(&mut device_readout, readout_bytes),
-                "cuMemAlloc(readout)",
-            )?;
             checked(
                 cuMemAlloc_v2(&mut device_query, query_bytes),
                 "cuMemAlloc(query)",
@@ -507,14 +688,7 @@ impl ResidentReadout {
                 "cuMemAlloc(octaves)",
             )?;
 
-            checked(
-                cuMemcpyHtoD_v2(
-                    device_readout,
-                    readout.entries.as_ptr().cast(),
-                    readout_bytes,
-                ),
-                "cuMemcpy(readout)",
-            )?;
+            // The readout does not cross here. It crossed once, at mount.
             checked(
                 cuMemcpyHtoD_v2(device_query, query.entries.as_ptr().cast(), query_bytes),
                 "cuMemcpy(query)",
@@ -543,7 +717,7 @@ impl ResidentReadout {
                 ];
                 checked(
                     cuLaunchKernel(
-                        self.scores_addressed,
+                        self.chart.scores_addressed,
                         grid as u32,
                         1,
                         1,
@@ -568,7 +742,7 @@ impl ResidentReadout {
                 ];
                 checked(
                     cuLaunchKernel(
-                        self.scores,
+                        self.chart.scores,
                         grid as u32,
                         1,
                         1,
@@ -593,7 +767,7 @@ impl ResidentReadout {
             ];
             checked(
                 cuLaunchKernel(
-                    self.octaves,
+                    self.chart.octaves,
                     grid as u32,
                     1,
                     1,
@@ -625,7 +799,6 @@ impl ResidentReadout {
                 "cuMemcpy(octaves)",
             )?;
 
-            let _ = cuMemFree_v2(device_readout);
             let _ = cuMemFree_v2(device_query);
             let _ = cuMemFree_v2(device_low);
             let _ = cuMemFree_v2(device_high);
@@ -647,8 +820,209 @@ impl ResidentReadout {
                 readout_exponent: readout.exponent,
                 query_exponent: query.exponent,
                 exact_multiply_accumulates: (count as u64).saturating_mul(dim as u64),
-                resident_chart: self.device_name.clone(),
+                resident_chart: self.chart.device_name.clone(),
             })
+        }
+    }
+
+    /// **A whole declared query population against the mounted map, in one grid.**
+    ///
+    /// `queries × rows` scores from one launch. The readout does not move, the queries cross once
+    /// together, and each query gets its own complete score population — nothing is compared across
+    /// queries and nothing is ranked, exactly as for a single query.
+    ///
+    /// This is the shape the 4,096-question driver wanted. It is not a different deed: `dim` was
+    /// already a stride in the kernel, so the batched form is the same arithmetic indexed by
+    /// `blockIdx.y`.
+    pub fn score_many(
+        &self,
+        queries: &[&AlignedMaterial],
+    ) -> Result<Vec<ScorePopulation>, FiberError> {
+        let dim = self.dim;
+        let rows = self.rows;
+        if queries.is_empty() || rows == 0 {
+            return Ok(Vec::new());
+        }
+        let mut entry_octaves = self.entry_octaves;
+        for query in queries {
+            if query.entries.len() != dim {
+                return Err(FiberError::WidthDisagrees {
+                    query: query.entries.len(),
+                    dim,
+                });
+            }
+            entry_octaves = entry_octaves.max(query.entry_octaves);
+        }
+        let needed = ResidentReadout::needed_octaves(entry_octaves, dim);
+        if needed > CARRIER_OCTAVES {
+            return Err(FiberError::CarrierTooNarrow {
+                dim,
+                entry_octaves,
+                needed,
+                carrier: CARRIER_OCTAVES,
+            });
+        }
+
+        let count = queries.len();
+        let slots = rows
+            .checked_mul(count)
+            .ok_or(FiberError::ExtentOverflow { rows })?;
+        let block = self.chart.launch.block_x;
+        let work = u32::try_from(rows).map_err(|_| FiberError::ExtentOverflow { rows })?;
+        let grid_x = self
+            .chart
+            .launch
+            .grid_for(work)
+            .map_err(|_| FiberError::ExtentOverflow { rows })?;
+        // The query population is the grid's second dimension, so it is bounded by the device's own
+        // `MAX_GRID_DIM_Y`. This module reads only X; rather than assume the two are equal, refuse
+        // past the ceiling it did read. A caller past it splits its population and asks twice.
+        let grid_y =
+            u32::try_from(count).map_err(|_| FiberError::ExtentOverflow { rows: count })?;
+        if grid_y > self.chart.launch.max_grid_x {
+            return Err(FiberError::ExtentOverflow { rows: count });
+        }
+
+        let mut flattened: Vec<i64> = Vec::with_capacity(slots);
+        for query in queries {
+            flattened.extend_from_slice(&query.entries);
+        }
+
+        unsafe {
+            checked(cuCtxSetCurrent(self.chart.context), "cuCtxSetCurrent")?;
+            let query_bytes = std::mem::size_of_val(flattened.as_slice());
+            let mut device_queries: CuDevicePtr = 0;
+            let mut device_low: CuDevicePtr = 0;
+            let mut device_high: CuDevicePtr = 0;
+            let mut device_octaves: CuDevicePtr = 0;
+            checked(
+                cuMemAlloc_v2(&mut device_queries, query_bytes),
+                "cuMemAlloc(queries)",
+            )?;
+            checked(cuMemAlloc_v2(&mut device_low, slots * 8), "cuMemAlloc(low)")?;
+            checked(
+                cuMemAlloc_v2(&mut device_high, slots * 8),
+                "cuMemAlloc(high)",
+            )?;
+            checked(
+                cuMemAlloc_v2(&mut device_octaves, slots * 4),
+                "cuMemAlloc(octaves)",
+            )?;
+            checked(
+                cuMemcpyHtoD_v2(device_queries, flattened.as_ptr().cast(), query_bytes),
+                "cuMemcpy(queries)",
+            )?;
+
+            let mut readout = self.resident;
+            let mut rows_wire = work;
+            let mut dim_wire = dim as u32;
+            let mut count_wire = grid_y;
+            let mut parameters: [*mut c_void; 7] = [
+                (&raw mut readout).cast(),
+                (&raw mut device_queries).cast(),
+                (&raw mut rows_wire).cast(),
+                (&raw mut dim_wire).cast(),
+                (&raw mut count_wire).cast(),
+                (&raw mut device_low).cast(),
+                (&raw mut device_high).cast(),
+            ];
+            checked(
+                cuLaunchKernel(
+                    self.chart.scores_batched,
+                    grid_x,
+                    grid_y,
+                    1,
+                    block,
+                    1,
+                    1,
+                    0,
+                    std::ptr::null_mut(),
+                    parameters.as_mut_ptr(),
+                    std::ptr::null_mut(),
+                ),
+                "cuLaunchKernel(exact_readout_scores_batched)",
+            )?;
+
+            let mut octave_count = u32::try_from(slots).unwrap_or(u32::MAX);
+            let mut octave_parameters: [*mut c_void; 4] = [
+                (&raw mut device_low).cast(),
+                (&raw mut device_high).cast(),
+                (&raw mut octave_count).cast(),
+                (&raw mut device_octaves).cast(),
+            ];
+            let octave_grid = self
+                .chart
+                .launch
+                .grid_for(octave_count)
+                .map_err(|_| FiberError::ExtentOverflow { rows: slots })?;
+            checked(
+                cuLaunchKernel(
+                    self.chart.octaves,
+                    octave_grid,
+                    1,
+                    1,
+                    block,
+                    1,
+                    1,
+                    0,
+                    std::ptr::null_mut(),
+                    octave_parameters.as_mut_ptr(),
+                    std::ptr::null_mut(),
+                ),
+                "cuLaunchKernel(exact_score_octaves)",
+            )?;
+            checked(cuCtxSynchronize(), "cuCtxSynchronize")?;
+
+            let mut low = vec![0u64; slots];
+            let mut high = vec![0i64; slots];
+            let mut octaves = vec![0u32; slots];
+            checked(
+                cuMemcpyDtoH_v2(low.as_mut_ptr().cast(), device_low, slots * 8),
+                "cuMemcpy(low)",
+            )?;
+            checked(
+                cuMemcpyDtoH_v2(high.as_mut_ptr().cast(), device_high, slots * 8),
+                "cuMemcpy(high)",
+            )?;
+            checked(
+                cuMemcpyDtoH_v2(octaves.as_mut_ptr().cast(), device_octaves, slots * 4),
+                "cuMemcpy(octaves)",
+            )?;
+            let _ = cuMemFree_v2(device_queries);
+            let _ = cuMemFree_v2(device_low);
+            let _ = cuMemFree_v2(device_high);
+            let _ = cuMemFree_v2(device_octaves);
+
+            Ok(queries
+                .iter()
+                .enumerate()
+                .map(|(which, query)| {
+                    let span = which * rows..(which + 1) * rows;
+                    ScorePopulation {
+                        scores: low[span.clone()]
+                            .iter()
+                            .zip(&high[span.clone()])
+                            .map(|(low, high)| {
+                                ((*high as i128) << 64) | (*low as i128 & 0xFFFF_FFFF_FFFF_FFFF)
+                            })
+                            .collect(),
+                        octaves: octaves[span].to_vec(),
+                        readout_exponent: self.exponent,
+                        query_exponent: query.exponent,
+                        exact_multiply_accumulates: (rows as u64).saturating_mul(dim as u64),
+                        resident_chart: self.chart.device_name.clone(),
+                    }
+                })
+                .collect())
+        }
+    }
+}
+
+impl Drop for MountedReadout<'_> {
+    fn drop(&mut self) {
+        unsafe {
+            let _ = cuCtxSetCurrent(self.chart.context);
+            let _ = cuMemFree_v2(self.resident);
         }
     }
 }
@@ -780,14 +1154,52 @@ mod tests {
         let words = [0x3F80u16, 0x4000, 0x3F00, 0xBFC0];
         let aligned = align_bfloat16(&words).expect("the mouth admits these");
         assert_eq!(aligned.negatives, 1);
-        for (entry, expected) in aligned.entries.iter().zip([1.0f64, 2.0, 0.5, -1.5]) {
-            let reproduced = *entry as f64 * 2f64.powi(aligned.exponent);
-            assert_eq!(
-                reproduced, expected,
-                "entry {entry} exponent {}",
-                aligned.exponent
-            );
+        // The rebase is checked against the decoded pair, in exact integers, with no division:
+        // `entry * 2^aligned.exponent == signed * 2^datum.ulp_exponent` becomes a left shift by the
+        // spread. **This was checked in `f64` until 2026-08-13** — the only machine-float arithmetic
+        // in any library `src/` in this workspace, evaluating a zero-remainder claim in the very
+        // carrier the module exists to avoid.
+        for (word, entry) in words.iter().zip(&aligned.entries) {
+            let datum = decode_bfloat16_bits(*word).expect("the mouth admits these");
+            let magnitude =
+                u64::try_from(&datum.significand).expect("a BF16 significand is one word") as i64;
+            let signed = if datum.negative {
+                -magnitude
+            } else {
+                magnitude
+            };
+            let spread = u32::try_from(datum.ulp_exponent - aligned.exponent)
+                .expect("every entry aligns downward onto the lowest exponent");
+            assert_eq!(*entry, signed << spread, "word {word:#06x}");
         }
+    }
+
+    /// **The falsifier the parity test could not supply.** The guard read only the spread and then
+    /// called `checked_shl`, which refuses an out-of-range shift *amount* and never looks at the
+    /// value — so a shift that carried the magnitude through the sign bit returned `Some` and the
+    /// hand came back flipped. Both charts consumed the same wrapped material, so they agreed.
+    ///
+    /// `1.0` and `2^56` as BF16: significands of 8 octaves, ulp exponents `-7` and `49`, so the
+    /// second aligns through a spread of 56 and demands 64 octaves of a 63-octave signed word.
+    #[test]
+    fn an_entry_whose_octaves_plus_spread_overflow_the_signed_word_is_refused() {
+        let words = [0x3F80u16, 0x5B80];
+        match align_bfloat16(&words) {
+            Err(FiberError::AlignmentOverflows {
+                octaves,
+                spread,
+                needed,
+                carrier,
+            }) => {
+                assert_eq!((octaves, spread, needed, carrier), (8, 56, 64, 63));
+            }
+            other => panic!("the wrapping shift was admitted: {other:?}"),
+        }
+
+        // What the old guard did instead, kept as the evidence rather than the assertion: the
+        // shift amount is in range, so `checked_shl` returns `Some` — of a negative number.
+        let wrapped = 128i64.checked_shl(56).expect("the amount is in range");
+        assert!(wrapped < 0, "the magnitude carried into the hand");
     }
 
     /// A zero material aligns without inventing an exponent.
@@ -864,6 +1276,80 @@ mod tests {
         for (slot, row) in named.iter().enumerate() {
             assert_eq!(addressed.scores[slot], carried.scores[*row as usize]);
         }
+    }
+
+    /// **Mounting once and asking many is the same arithmetic as asking one at a time.**
+    ///
+    /// The residency and the batched grid exist to stop the invariant crossing the bus per
+    /// question; neither may change a single returned integer. Three queries, so a batch that
+    /// silently scored only the first — or indexed its output by row and overwrote across
+    /// queries — fails here rather than at map scale.
+    #[test]
+    fn the_batched_grid_returns_exactly_what_one_query_at_a_time_returns() {
+        let Ok(resident) = ResidentReadout::new() else {
+            eprintln!("no resident chart answered; the batch parity check did not run");
+            return;
+        };
+        let dim = 48usize;
+        let rows = 300usize;
+        let entries: Vec<i64> = (0..rows * dim)
+            .map(|at| ((at as i64 * 1_000_003) % 977) - 488)
+            .collect();
+        let readout = AlignedMaterial {
+            entry_octaves: entries
+                .iter()
+                .map(|e| e.unsigned_abs().max(1).ilog2() + 1)
+                .max()
+                .unwrap_or(0),
+            negatives: entries.iter().filter(|e| **e < 0).count() as u64,
+            entries,
+            exponent: -11,
+        };
+        let queries: Vec<AlignedMaterial> = (0..3)
+            .map(|which| {
+                let entries: Vec<i64> = (0..dim)
+                    .map(|at| ((at as i64 * (31 + which * 17)) % 211) - 105)
+                    .collect();
+                AlignedMaterial {
+                    entry_octaves: entries
+                        .iter()
+                        .map(|e| e.unsigned_abs().max(1).ilog2() + 1)
+                        .max()
+                        .unwrap_or(0),
+                    negatives: entries.iter().filter(|e| **e < 0).count() as u64,
+                    entries,
+                    // Distinct exponents, so a batch that carried one query's frame to all of them
+                    // is caught by the returned frame and not only by the integers.
+                    exponent: -3 - which as i32,
+                }
+            })
+            .collect();
+
+        let mounted = resident.mount(&readout, dim).expect("the map mounts");
+        assert_eq!(mounted.rows(), rows);
+        assert_eq!(mounted.dim(), dim);
+        assert_eq!(mounted.resident_octets(), rows * dim * 8);
+
+        let borrowed: Vec<&AlignedMaterial> = queries.iter().collect();
+        let batched = mounted.score_many(&borrowed).expect("admissible");
+        assert_eq!(batched.len(), queries.len());
+        for (which, query) in queries.iter().enumerate() {
+            let one = mounted.score(query, None).expect("admissible");
+            assert_eq!(batched[which].scores, one.scores, "query {which}");
+            assert_eq!(batched[which].octaves, one.octaves, "query {which}");
+            assert_eq!(batched[which].query_exponent, query.exponent);
+            assert_eq!(batched[which].readout_exponent, readout.exponent);
+            // And against the independent serial chart, so agreement is not two forms of one bug.
+            let serial = score_serially(&readout, query, dim, None).expect("well-formed");
+            assert_eq!(
+                batched[which].scores, serial,
+                "query {which} against serial"
+            );
+        }
+        // Distinct queries must return distinct populations, or the batch scored one of them three
+        // times and the agreement above would be vacuous.
+        assert_ne!(batched[0].scores, batched[1].scores);
+        assert_ne!(batched[1].scores, batched[2].scores);
     }
 
     /// **Nothing in this module returns a winner**, which is the deposit's bar made checkable: the

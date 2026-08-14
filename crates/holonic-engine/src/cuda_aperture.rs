@@ -65,8 +65,33 @@ pub struct DerivedLaunch {
 }
 
 impl DerivedLaunch {
+    /// **The derivation itself, as one owner.** The block is the smaller of what the device admits
+    /// and what the kernel admits, taken down to a whole number of warps because a partial warp
+    /// issues with idle lanes. Every input is read from the device or the compiled function; nothing
+    /// here is chosen.
+    ///
+    /// Lifted out of this module's constructor 2026-08-13. `embedding_fiber` had written its own
+    /// geometry as `max_threads.min(256).max(1)` — a level authored inside the organ, blind to the
+    /// warp and blind to what its own kernels admit — while this derivation sat one module away.
+    /// The FFI stays local to each module because each declares its own `extern` block; the *rule*
+    /// is here, once.
+    pub(crate) fn from_admissions(
+        device_block: u32,
+        kernel_block: u32,
+        max_grid_x: u32,
+        warp: u32,
+    ) -> Self {
+        let warp = warp.max(1);
+        let admitted = device_block.min(kernel_block);
+        Self {
+            block_x: (admitted / warp).max(1) * warp,
+            max_grid_x,
+            warp,
+        }
+    }
+
     /// Grid for one flat work extent, or the refusal naming what could not be covered.
-    fn grid_for(&self, work: u32) -> Result<u32, CudaApertureError> {
+    pub(crate) fn grid_for(&self, work: u32) -> Result<u32, CudaApertureError> {
         let blocks = work.div_ceil(self.block_x.max(1));
         if blocks > self.max_grid_x {
             return Err(CudaApertureError::ExtentOverflow);
@@ -420,13 +445,7 @@ impl CudaApertureExecutor {
                         )?;
                         kernel_block = kernel_block.min(value.max(0) as u32);
                     }
-                    // Down to a whole number of warps: a partial warp issues with idle lanes.
-                    let block_x = (kernel_block / warp).max(1) * warp;
-                    DerivedLaunch {
-                        block_x,
-                        max_grid_x,
-                        warp,
-                    }
+                    DerivedLaunch::from_admissions(device_block, kernel_block, max_grid_x, warp)
                 },
                 declared_metric: None,
                 display_frame: DisplayFrame::Undeclared,

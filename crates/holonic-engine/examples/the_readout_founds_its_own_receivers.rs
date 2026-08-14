@@ -53,6 +53,10 @@ const ROW_APERTURE: usize = 4_096;
 /// How many rank slots the successor relation retains. **Every one is kept**: this is the region,
 /// and a single slot would be the committed replacement the deposits refuse.
 const RANK_SLOTS: usize = 4;
+/// Octets this driver is willing to hold in one returned score population. The **band** of queries
+/// per grid is computed from it and `rows`; it bounds what comes back, never what is asked. Every
+/// row is scored against every row either way.
+const RETURN_OCTET_BUDGET: usize = 64 << 20;
 
 fn main() {
     if let Err(error) = run() {
@@ -65,7 +69,6 @@ struct Entry {
     dtype: String,
     shape: Vec<usize>,
     start: u64,
-    end: u64,
 }
 
 fn header(file: &mut File) -> Result<(BTreeMap<String, Entry>, u64), String> {
@@ -100,7 +103,6 @@ fn header(file: &mut File) -> Result<(BTreeMap<String, Entry>, u64), String> {
                     .map(|d| d.as_u64().unwrap_or(0) as usize)
                     .collect(),
                 start: offsets[0].as_u64().unwrap_or(0),
-                end: offsets[1].as_u64().unwrap_or(0),
             },
         );
     }
@@ -174,40 +176,71 @@ fn run() -> Result<(), String> {
     // ---------------------------------------------------------------------------------------
     // The successor relation, read off the map. Every rank slot retained; nothing committed.
     // ---------------------------------------------------------------------------------------
+    // The map is the invariant and crosses ONCE. Until 2026-08-13 this loop called `score`, which
+    // mounts and unmounts per call, so the same 84 MB readout crossed the bus 4,096 times — about
+    // 343 GB, measured at a sustained 13–15 GB/s, for arithmetic worth milliseconds.
+    let mounting = std::time::Instant::now();
+    let mounted = resident
+        .mount(&readout, dim)
+        .map_err(|e| format!("the card refused the map: {e}"))?;
+    println!(
+        "  map mounted once: {} octets resident, {} rows x {dim}  [{:?}]",
+        mounted.resident_octets(),
+        mounted.rows(),
+        mounting.elapsed()
+    );
+
     let transporting = std::time::Instant::now();
-    let all: Vec<u32> = (0..rows as u32).collect();
+    let queries: Vec<AlignedMaterial> = (0..rows)
+        .map(|item| {
+            let base_at = item * dim;
+            let entries_of = &readout.entries[base_at..base_at + dim];
+            AlignedMaterial {
+                entry_octaves: entries_of
+                    .iter()
+                    .map(|e| e.unsigned_abs().max(1).ilog2() + 1)
+                    .max()
+                    .unwrap_or(0),
+                negatives: entries_of.iter().filter(|e| **e < 0).count() as u64,
+                entries: entries_of.to_vec(),
+                exponent: readout.exponent,
+            }
+        })
+        .collect();
+    // The returned population is `band x rows` exact `i128` scores plus a `u32` octave each — 20
+    // octets per score — so the band is the largest one whose return fits the declared budget,
+    // computed from `rows` rather than authored. It bounds the RETURN, not the material: every row
+    // is still scored against every row.
+    let query_band = (RETURN_OCTET_BUDGET / (rows * 20).max(1)).max(1);
     let mut successor = Vec::with_capacity(rows);
     let mut self_in_region = Vec::with_capacity(rows);
-    for item in 0..rows {
-        let base_at = item * dim;
-        let entries_of = &readout.entries[base_at..base_at + dim];
-        let query = AlignedMaterial {
-            entry_octaves: entries_of
-                .iter()
-                .map(|e| e.unsigned_abs().max(1).ilog2() + 1)
-                .max()
-                .unwrap_or(0),
-            negatives: entries_of.iter().filter(|e| **e < 0).count() as u64,
-            entries: entries_of.to_vec(),
-            exponent: readout.exponent,
-        };
-        let population = resident
-            .score(&readout, &query, dim, Some(&all))
-            .map_err(|e| format!("the card refused item {item}: {e}"))?;
-        // The rank order, exact. Ties break by row so the relation is a function of the material.
-        let mut order: Vec<usize> = (0..rows).collect();
-        order.sort_by(|a, b| {
-            population.scores[*b]
-                .cmp(&population.scores[*a])
-                .then(a.cmp(b))
-        });
-        let region: Vec<usize> = order.into_iter().take(RANK_SLOTS).collect();
-        self_in_region.push(u64::from(region.contains(&item)));
-        successor.push(region.into_iter().map(Some).collect());
+    // One grid per band rather than one per query. The band exists only so the returned score
+    // population — `band x rows` exact `i128` values — stays inside memory; it is not an aperture on
+    // the material and no query is compared to another.
+    for (band, queried) in queries.chunks(query_band).enumerate() {
+        let borrowed: Vec<&AlignedMaterial> = queried.iter().collect();
+        let populations = mounted
+            .score_many(&borrowed)
+            .map_err(|e| format!("the card refused band {band}: {e}"))?;
+        for (within, population) in populations.iter().enumerate() {
+            let item = band * query_band + within;
+            // The rank order, exact. Ties break by row so the relation is a function of the
+            // material.
+            let mut order: Vec<usize> = (0..rows).collect();
+            order.sort_by(|a, b| {
+                population.scores[*b]
+                    .cmp(&population.scores[*a])
+                    .then(a.cmp(b))
+            });
+            let region: Vec<usize> = order.into_iter().take(RANK_SLOTS).collect();
+            self_in_region.push(u64::from(region.contains(&item)));
+            successor.push(region.into_iter().map(Some).collect());
+        }
     }
     println!(
-        "  {} constructions transported, region of {RANK_SLOTS} retained each  [{:?}]",
+        "  {} constructions transported in {} grid(s), region of {RANK_SLOTS} retained each  [{:?}]",
         rows,
+        rows.div_ceil(query_band),
         transporting.elapsed()
     );
     println!(

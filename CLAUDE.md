@@ -144,7 +144,8 @@ crates/   holonic-structure  substrate: ordinal and relation atlases, local popu
                              branch lineage, typed atomic membrane
           relational-geometry exact projective geometry over BigRational, Sturm-certified roots
           holonic-engine     the receiver-relative geometry and physics body, ~95k lines,
-                             float-free, no Bevy, no wgpu, two hand-written CUDA kernels
+                             float-free, no Bevy, no wgpu, FOUR hand-written CUDA kernels
+                             (it said two until 2026-08-13; `ls crates/holonic-engine/kernels/`)
           holonic-language   the reflective runtime: reify, absorb, resume
           holonic-architecture-lint  the monotone ownership ratchet
 soma/     body               pure law, no_std, zero dependencies
@@ -152,9 +153,11 @@ soma/     body               pure law, no_std, zero dependencies
           kernel/soma.spv    committed boundary artifact; its toolchain is excluded
 ```
 
-**Measured 2026-08-13 06:10 at `1921b86`, clean tree:** `bash tools/gates.sh` **9 of 9**;
-`cargo test --workspace` **2,184 passed, 0 failed, 19 ignored**, summed across 42 `test result:`
-lines. (Earlier: 1,984 at `f75a81c`+dirty on 2026-08-10; 1,949 at `923b8c5`+dirty; 1,963 at
+**Measured 2026-08-13 21:4x after the audit and its repairs:** `cargo test --workspace`
+**2,209 passed, 0 failed, 19 ignored**, summed across 42 `test result:` lines; `bash tools/gates.sh`
+**8 of 9 — `architecture-lint` is RED**, 27 new ownership occurrences of which 20 are in existing
+owners, and that is an open item rather than a dirty-tree artifact. (Earlier: 2,184 at `1921b86`
+06:10 with 9 of 9; 1,984 at `f75a81c`+dirty on 2026-08-10; 1,949 at `923b8c5`+dirty; 1,963 at
 `27fc74d`; 1,971 at `51c066f`.) The ten Typst roots under `papers/source/`
 compile and `validate-registry()` passes on **262** unique registry entries and **132**
 `mathematics/` objects. (Earlier: 1,732 at `532ea1b`+1; 1,701 at `fa0f92d`; 1,545 on 2026-08-08

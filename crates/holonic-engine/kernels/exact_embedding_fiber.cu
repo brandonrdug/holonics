@@ -74,6 +74,43 @@ extern "C" __global__ void exact_readout_scores(
     score_high[row] = split.high;
 }
 
+// **The same deed for a whole declared query population, in one grid.**
+//
+// `queries x rows` scores, `blockIdx.y` selecting the query. Added 2026-08-13 because the caller
+// that asks 4,096 questions of one readout was issuing 4,096 separate launches, each re-uploading
+// the same 84 MB operand -- about 343 GB across the bus for a matrix that never changed. That is
+// not a kernel problem and it was not fixed by writing a different kernel: `dim` was already a
+// stride, so the deed for many queries is the deed for one, indexed.
+//
+// The readout is the invariant and stays resident; the query population crosses once. Nothing here
+// ranks across queries either -- each query gets its own full score population, and no query is
+// compared to another.
+extern "C" __global__ void exact_readout_scores_batched(
+    const int64_t *readout,   // rows x dim, row-major
+    const int64_t *queries,   // count x dim, row-major
+    uint32_t rows,
+    uint32_t dim,
+    uint32_t count,
+    uint64_t *score_low,      // count x rows
+    int64_t *score_high       // count x rows
+) {
+    uint32_t row = blockIdx.x * blockDim.x + threadIdx.x;
+    uint32_t which = blockIdx.y;
+    if (row >= rows || which >= count) {
+        return;
+    }
+    const int64_t *entries = readout + (size_t)row * (size_t)dim;
+    const int64_t *query = queries + (size_t)which * (size_t)dim;
+    __int128 accumulated = 0;
+    for (uint32_t at = 0; at < dim; ++at) {
+        accumulated += (__int128)entries[at] * (__int128)query[at];
+    }
+    SplitScore split = split_of(accumulated);
+    size_t slot = (size_t)which * (size_t)rows + (size_t)row;
+    score_low[slot] = split.low;
+    score_high[slot] = split.high;
+}
+
 // The same deed against a **declared subpopulation** of rows.
 //
 // The caller declares which rows it is asking about; the kernel asks about those and no others. A

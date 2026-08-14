@@ -105,7 +105,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (76 deposits of 368)
+## 4 · The 2026-08 record line (77 deposits of 369)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -185,6 +185,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-13_THE_COUPLING_IS_A_FORK_COUNT_TIMES_A_RATIO_AND_THE_REFLECTION_SERIES_TERMINATES_ON_A_CRYSTAL.md` | The coupling is a fork count times a ratio, and the reflection series terminates exactly on a crystal |
 | `2026-08-13_THE_CUT_BECOMES_THE_CODECS_AND_THE_LATER_CURRENT_RIDES_THE_DEPOSIT.md` | The cut becomes the codec's, and the later current rides the deposit |
 | `2026-08-13_THE_DEPOSITED_MAP_IS_READ_BY_RATIO_AND_WINDING_THE_ARCHETYPE_IS_A_FINITE_TYPE_WITH_INFINITE_MODULI.md` | The deposited map is read by Ratio and Winding, and the archetype is a finite type with infinite moduli |
+| `2026-08-13_THE_DOCUMENTS_DESCRIBED_A_BODY_THEY_HAD_NOT_OPENED_AND_THE_OPERAND_HAD_NO_RESIDENCY.md` | The documents described a body they had not opened, and the operand had no residency |
 | `2026-08-13_THE_MAP_DECLARES_ITS_OWN_APERTURES_AND_AN_EMBEDDING_IS_A_DECLARED_RECEIVER.md` | The map declares its own apertures, and an embedding is a declared receiver |
 | `2026-08-13_THE_MOUTH_IS_AN_ACTIVE_LENS_THE_LOCATION_IS_CO_FOUNDED_AND_THE_PASSAGE_MUST_DEPOSIT.md` | The mouth is an active lens, the location is co-founded, and the passage must deposit |
 | `2026-08-13_THE_SEARCH_WAS_IN_THE_WRONG_CHART_AND_THE_CARD_OWNS_THE_QUOTIENT.md` | The search was in the wrong chart, and the card owns the quotient |
