@@ -1777,6 +1777,34 @@ fn validate_modes_and_arcs(
             .ok_or(AnalyticFieldError::UnknownJunction(arc.to))?;
         arc.geometry.validate(field)?;
         let germ = arc.geometry.germ();
+        // **The two admittance declarations must agree, and until 2026-08-14 nothing compared them.**
+        //
+        // A mode declares `interface_admittance` per material germ, and `interface_optics` reads it
+        // to price a boundary. An arc declares `modal_admittance` per mode, and it is compiled into
+        // the port admittance the chained junction law conducts through. An arc lies in exactly one
+        // germ, so for every mode the arc admits, those are two names for one number: what this
+        // material presents to this mode.
+        //
+        // Validation checked each was positive and correctly keyed and never that they agreed, so
+        // the reading and the conducting could price the same material differently with nothing
+        // joining them. That is the seam between the interface law and the chain that composes it,
+        // and a disagreement there makes the composition unsound without making either side wrong.
+        for (mode_id, arc_admittance) in &arc.modal_admittance {
+            let mode = modes
+                .get(mode_id)
+                .ok_or(AnalyticFieldError::UnknownMode(*mode_id))?;
+            let mode_admittance = mode
+                .interface_admittance
+                .get(&germ)
+                .ok_or(AnalyticFieldError::MalformedMode(*mode_id))?;
+            if arc_admittance != mode_admittance {
+                return Err(AnalyticFieldError::AdmittanceDeclarationsDisagree {
+                    arc: arc.id,
+                    mode: *mode_id,
+                    germ,
+                });
+            }
+        }
         let body = field
             .germs
             .get(&germ)
@@ -2092,6 +2120,20 @@ pub enum AnalyticFieldError {
     IncidentDispersionFailure,
     #[error("a scalar wave interface requires positive admittance")]
     NonpositiveAdmittance,
+    /// An arc's modal admittance and its mode's interface admittance name one number differently.
+    ///
+    /// The arc conducts through the first and the interface law prices through the second, so a
+    /// disagreement makes the composition of the two unsound while leaving either side internally
+    /// consistent. Refused at declaration rather than discovered as a residual.
+    #[error(
+        "arc {arc:?} declares a modal admittance for mode {mode:?} that disagrees with the mode's \
+         interface admittance for germ {germ:?}: one material, two prices"
+    )]
+    AdmittanceDeclarationsDisagree {
+        arc: AnalyticFieldArcId,
+        mode: DimensionalWaveModeId,
+        germ: FieldGermId,
+    },
     #[error("the declared analytic interface interaction does not meet its overlap")]
     MalformedInterfaceInteraction,
     #[error("the incident analytic section does not admit this mode")]
@@ -2507,6 +2549,130 @@ mod tests {
             .unwrap();
         let overlap = *successor.radiation[0].overlaps.iter().next().unwrap();
         (successor.standing_after, first, second, overlap)
+    }
+
+    /// **The seam between the interface law and the chain that composes it.**
+    ///
+    /// A mode declares `interface_admittance` per material germ and the interface law prices a
+    /// boundary with it; an arc declares `modal_admittance` per mode and the chained junction law
+    /// conducts through it. An arc lies in exactly one germ, so those are two names for one number.
+    /// Validation checked each was positive and correctly keyed and **never that they agreed**
+    /// until 2026-08-14, so the reading and the conducting could price one material differently
+    /// with nothing joining them and neither side internally wrong.
+    ///
+    /// The committed material never disagreed — `analytic_field_transport` runs unchanged — so this
+    /// is the control that makes the refusal fire, because a check no material has ever exercised
+    /// has not shown that it can.
+    #[test]
+    fn one_material_priced_twice_is_refused_by_name() {
+        let (field, first_germ, second_germ, _overlap) = two_torus_field();
+        let local_first = AnalyticFieldJunctionId(1);
+        let shared = AnalyticFieldJunctionId(2);
+        let local_second = AnalyticFieldJunctionId(3);
+        let mode = DimensionalWaveModeId(1);
+        let outer_longitude = |germ| ExactAnalyticOrbitGeometry::TorusLongitude {
+            germ,
+            frame: torus_frame(),
+            meridian: phase(1, 0),
+        };
+        let quarter = ExactUnitConicPhase::new(Rat::zero(), Rat::one()).unwrap();
+        let identity = ExactUnitConicPhase::identity();
+        let clockwise = transport(Rat::zero(), -Rat::one());
+        let counterclockwise = transport(Rat::zero(), Rat::one());
+        let interior_quarter = transport(Rat::zero(), Rat::one());
+
+        // The mode prices the first germ at 1. The arc on that germ is handed `declared`.
+        let build = |declared: Rat| {
+            ExactAnalyticFieldWaveLaw::new(
+                field.clone(),
+                vec![
+                    ExactAnalyticFieldJunction {
+                        id: local_first,
+                        name: "first torus local port".to_owned(),
+                        point: RatVec3::from_i64(0, 4, 0),
+                        origin: AnalyticFieldJunctionOrigin::LocalSupport { germ: first_germ },
+                    },
+                    ExactAnalyticFieldJunction {
+                        id: shared,
+                        name: "declared interacting overlap".to_owned(),
+                        point: RatVec3::from_i64(4, 0, 0),
+                        origin: AnalyticFieldJunctionOrigin::InteractingOverlap {
+                            overlap: _overlap,
+                        },
+                    },
+                    ExactAnalyticFieldJunction {
+                        id: local_second,
+                        name: "second torus local port".to_owned(),
+                        point: RatVec3::from_i64(0, 4, 0),
+                        origin: AnalyticFieldJunctionOrigin::LocalSupport { germ: second_germ },
+                    },
+                ],
+                vec![
+                    ExactAnalyticFieldArc {
+                        id: AnalyticFieldArcId(1),
+                        name: "first quarter orbit".to_owned(),
+                        source_event: EventId(1),
+                        from: local_first,
+                        to: shared,
+                        geometry: outer_longitude(first_germ),
+                        start_phase: quarter.clone(),
+                        geometric_step: clockwise.clone(),
+                        delay: 1,
+                        admittance: Rat::one(),
+                        modal_admittance: BTreeMap::from([(mode, declared.clone())]),
+                        modal_phase_step: BTreeMap::from([(mode, interior_quarter.clone())]),
+                    },
+                    ExactAnalyticFieldArc {
+                        id: AnalyticFieldArcId(2),
+                        name: "second quarter orbit".to_owned(),
+                        source_event: EventId(1),
+                        from: shared,
+                        to: local_second,
+                        geometry: outer_longitude(second_germ),
+                        start_phase: identity.clone(),
+                        geometric_step: counterclockwise.clone(),
+                        delay: 1,
+                        admittance: integer(2),
+                        modal_admittance: BTreeMap::new(),
+                        modal_phase_step: BTreeMap::from([(
+                            mode,
+                            ExactWavePhaseTransport::identity(),
+                        )]),
+                    },
+                ],
+                vec![ExactAnalyticFieldMode {
+                    id: mode,
+                    name: "coherent interface current".to_owned(),
+                    coherence_lineage: BTreeSet::from([EventId(1), EventId(2)]),
+                    frequency_square: Rat::one(),
+                    wave_number_square: BTreeMap::from([
+                        (first_germ, Rat::one()),
+                        (second_germ, Rat::one()),
+                    ]),
+                    interface_admittance: BTreeMap::from([
+                        (first_germ, Rat::one()),
+                        (second_germ, integer(2)),
+                    ]),
+                }],
+            )
+        };
+
+        // Agreeing: the arc prices the first germ exactly as its mode does.
+        assert!(build(Rat::one()).is_ok(), "one price, admitted");
+
+        // Disagreeing: the same material, two numbers. Refused by name, naming all three.
+        match build(integer(5)) {
+            Err(AnalyticFieldError::AdmittanceDeclarationsDisagree {
+                arc,
+                mode: named,
+                germ,
+            }) => {
+                assert_eq!(arc, AnalyticFieldArcId(1));
+                assert_eq!(named, mode);
+                assert_eq!(germ, first_germ);
+            }
+            other => panic!("one material priced twice was admitted: {other:?}"),
+        }
     }
 
     #[test]
