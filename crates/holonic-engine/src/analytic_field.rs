@@ -1146,6 +1146,14 @@ pub struct ExactStratifiedLayer {
     pub wave_number_square: Rat,
     /// The layer's admittance, `Y = 1/Z`. Must be positive.
     pub admittance: Rat,
+    /// **The phase this layer's propagation applies, declared.**
+    ///
+    /// It is not derived from a thickness, because the phase a layer applies is
+    /// `k_normal * d` and `k_normal` is the irrational the stack exists to avoid. The declared
+    /// form is the same choice `dimensional_wave` makes for a port, and for the same reason: a
+    /// phase is a caused transport a receiver declares, never one inferred from a rendered angle.
+    /// [`ExactWavePhaseTransport::new`] refuses anything off the exact unit conic.
+    pub phase_transport: ExactWavePhaseTransport,
 }
 
 /// One crossing in a stack: which boundary, what regime it admitted, what amplitude it returned.
@@ -1181,6 +1189,13 @@ pub struct ExactStratifiedStackReading {
     /// `|k_parallel|^2`, the constant of the motion through the stack.
     pub tangential_square: Rat,
     pub crossings: Vec<ExactStratifiedCrossing>,
+    /// **The phase the traversal accumulated**, composed over every layer the current reached.
+    ///
+    /// This is the coordinate the whole structure lives in and the one an intensity reading cannot
+    /// see. A stack whose layers carry different phase profiles returns identical regimes and
+    /// identical amplitudes and a **different** accumulated phase — which is Zernike's situation
+    /// occurring inside this machine, and is why the phase is carried rather than summarized.
+    pub accumulated_phase: ExactWavePhaseTransport,
     /// The first evanescent boundary, if the stack turns. `None` when the stack transmits whole.
     pub turning_point: Option<usize>,
     /// Layers the current never reached, because the stack turned before them.
@@ -1229,6 +1244,8 @@ pub fn exact_stratified_stack(
 
     let mut crossings = Vec::new();
     let mut turning_point = None;
+    // The incident medium's own propagation is applied before the first boundary is met.
+    let mut accumulated_phase = layers[0].phase_transport.clone();
     for at in 0..layers.len() - 1 {
         let normal_numerator = &layers[at + 1].wave_number_square - &tangential_square;
         let regime = if normal_numerator.is_positive() {
@@ -1273,12 +1290,15 @@ pub fn exact_stratified_stack(
             turning_point = Some(at);
             break;
         }
+        // The current crossed into the next layer, so that layer's propagation composes on.
+        accumulated_phase = accumulated_phase.compose(&layers[at + 1].phase_transport);
     }
 
     let reached_boundaries = crossings.len();
     Ok(ExactStratifiedStackReading {
         tangential_covector,
         tangential_square,
+        accumulated_phase,
         crossings,
         turning_point,
         unreached_layers: layers.len() - 1 - reached_boundaries,
@@ -2118,10 +2138,108 @@ pub enum AnalyticFieldError {
 mod tests {
 
     fn layer(k2: i64, y: i64) -> ExactStratifiedLayer {
+        phased_layer(k2, y, ExactWavePhaseTransport::identity())
+    }
+
+    fn phased_layer(
+        k2: i64,
+        y: i64,
+        phase_transport: ExactWavePhaseTransport,
+    ) -> ExactStratifiedLayer {
         ExactStratifiedLayer {
             wave_number_square: Rat::from_integer(k2.into()),
             admittance: Rat::from_integer(y.into()),
+            phase_transport,
         }
+    }
+
+    /// The 3-4-5 rational rotation: a point of the exact unit conic that is not the identity.
+    fn quarter_ish() -> ExactWavePhaseTransport {
+        ExactWavePhaseTransport::new(Rat::new(3.into(), 5.into()), Rat::new(4.into(), 5.into()))
+            .expect("3/5, 4/5 lies on the unit conic")
+    }
+
+    /// **ZERNIKE'S SITUATION, INSIDE THE MACHINE.** A stack is a phase object: changing the phase
+    /// profile of its layers moves the accumulated phase and leaves every regime and every
+    /// amplitude **bit-identical**, because those depend only on wave numbers and admittances. An
+    /// intensity-only receiver measures nothing at all while the whole structure changes.
+    ///
+    /// This is `CLAUDE.md` section 0j's theorem occurring in this body rather than being cited: if
+    /// the intensity reading were to move, the phase would be leaking into the magnitude and the
+    /// two faces would not be separate.
+    #[test]
+    fn a_phase_profile_moves_the_phase_and_leaves_the_intensity_reading_untouched() {
+        let incident = RatVec3::from_i64(3, 4, 0);
+        let normal = RatVec3::from_i64(0, 0, 1);
+
+        let flat = [layer(25, 1), layer(41, 2), layer(30, 3), layer(26, 4)];
+        let phased = [
+            phased_layer(25, 1, ExactWavePhaseTransport::identity()),
+            phased_layer(41, 2, quarter_ish()),
+            phased_layer(30, 3, quarter_ish()),
+            phased_layer(26, 4, quarter_ish()),
+        ];
+
+        let without = exact_stratified_stack(
+            incident.clone(),
+            normal.clone(),
+            &flat,
+            ExactRefractionHand::AlongNormal,
+        )
+        .unwrap();
+        let with =
+            exact_stratified_stack(incident, normal, &phased, ExactRefractionHand::AlongNormal)
+                .unwrap();
+
+        // The magnitude face cannot tell them apart.
+        assert_eq!(
+            without.crossings, with.crossings,
+            "the intensity face MOVED"
+        );
+        assert_eq!(without.tangential_covector, with.tangential_covector);
+        assert_eq!(without.turning_point, with.turning_point);
+        assert_eq!(without.unreached_layers, with.unreached_layers);
+
+        // The phase face sees nothing else.
+        assert_eq!(
+            without.accumulated_phase,
+            ExactWavePhaseTransport::identity()
+        );
+        assert_ne!(
+            with.accumulated_phase,
+            ExactWavePhaseTransport::identity(),
+            "the phase profile did not accumulate"
+        );
+        // Three layers past the incident one, each applying the same rotation: the cube.
+        assert_eq!(with.accumulated_phase, quarter_ish().pow(3));
+        assert!(with.accumulated_phase.is_unit(), "the conic is preserved");
+    }
+
+    /// The accumulation stops where the current does. A stack that turns must not compose the phase
+    /// of layers nothing propagated to — otherwise the phase would record a passage that never
+    /// happened.
+    #[test]
+    fn the_phase_stops_accumulating_where_the_stack_turns() {
+        let incident = RatVec3::from_i64(3, 4, 0);
+        let normal = RatVec3::from_i64(0, 0, 1);
+        let layers = [
+            phased_layer(25, 1, ExactWavePhaseTransport::identity()),
+            phased_layer(41, 2, quarter_ish()),
+            phased_layer(20, 3, quarter_ish()),
+            phased_layer(99, 4, quarter_ish()),
+        ];
+        let reading =
+            exact_stratified_stack(incident, normal, &layers, ExactRefractionHand::AlongNormal)
+                .unwrap();
+
+        assert_eq!(
+            reading.turning_point,
+            Some(1),
+            "20 is below the constant 25"
+        );
+        // Layer 0 and layer 1 were traversed; layers 2 and 3 were not.
+        assert_eq!(reading.accumulated_phase, quarter_ish());
+        assert_eq!(reading.unreached_layers, 1);
     }
 
     /// **The falsifier that makes the chain a chain.** The tangential covector is a constant of the
