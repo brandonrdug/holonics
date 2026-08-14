@@ -318,6 +318,74 @@ impl RationalPolynomial {
         Ok(self.divided_exactly_by(&gcd)?.made_monic())
     }
 
+    /// The squarefree decomposition, with multiplicities.
+    ///
+    /// Returns the monic pairwise-coprime squarefree `V_i` with
+    /// `p = leading · ∏ V_i^i`, indexed so the returned pair `(V, i)` carries
+    /// the multiplicity `i ≥ 1` directly. Factors of multiplicity `i` that are
+    /// constant are omitted rather than returned as trivial rows.
+    ///
+    /// `squarefree_part` returns the radical and forgets how deep each root
+    /// sits. Every reduction that has to *descend* a pole order needs the depth,
+    /// which is why this exists beside it. Musser's algorithm, exactly over `ℚ`.
+    pub fn squarefree_decomposition(&self) -> Result<Vec<(Self, u32)>, ExactPolynomialError> {
+        if self.is_zero() {
+            return Err(ExactPolynomialError::ZeroPolynomial);
+        }
+        let monic = self.made_monic();
+        let common = monic.monic_gcd(&monic.derivative())?;
+        // `w` carries every distinct root once; `y` carries what remains after
+        // one order has been peeled off each.
+        let mut w = monic.divided_exactly_by(&common)?;
+        let mut y = common;
+        let mut decomposition = Vec::new();
+        let mut multiplicity = 1_u32;
+        while w.degree().map(|degree| degree > 0).unwrap_or(false) {
+            let z = w.monic_gcd(&y)?;
+            let factor = w.divided_exactly_by(&z)?;
+            if factor.degree().map(|degree| degree > 0).unwrap_or(false) {
+                decomposition.push((factor.made_monic(), multiplicity));
+            }
+            y = y.divided_exactly_by(&z)?;
+            w = z;
+            multiplicity = multiplicity
+                .checked_add(1)
+                .ok_or(ExactPolynomialError::DegreeTooLarge)?;
+        }
+        Ok(decomposition)
+    }
+
+    /// The extended Euclidean relation `s·self + t·other = gcd`, monic gcd.
+    ///
+    /// Returned as `(gcd, s, t)`. A reduction that must split a numerator
+    /// across two coprime denominators is exactly this identity, and computing
+    /// it is what lets the split be *derived* rather than searched for.
+    pub fn extended_monic_gcd(
+        &self,
+        other: &Self,
+    ) -> Result<(Self, Self, Self), ExactPolynomialError> {
+        let (mut old_remainder, mut remainder) = (self.clone(), other.clone());
+        let (mut old_s, mut s) = (Self::new(vec![Rat::one()]), Self::zero());
+        let (mut old_t, mut t) = (Self::zero(), Self::new(vec![Rat::one()]));
+        while !remainder.is_zero() {
+            let (quotient, next) = old_remainder.divided_by(&remainder)?;
+            old_remainder = std::mem::replace(&mut remainder, next);
+            let next_s = old_s.minus(&quotient.times(&s));
+            old_s = std::mem::replace(&mut s, next_s);
+            let next_t = old_t.minus(&quotient.times(&t));
+            old_t = std::mem::replace(&mut t, next_t);
+        }
+        let Some(leading) = old_remainder.leading().cloned() else {
+            return Err(ExactPolynomialError::ZeroPolynomial);
+        };
+        let inverse = Rat::one() / leading;
+        Ok((
+            old_remainder.scaled(&inverse),
+            old_s.scaled(&inverse),
+            old_t.scaled(&inverse),
+        ))
+    }
+
     /// The primitive integer representative: denominators cleared, integer content removed, sign
     /// fixed so the leading coefficient is positive.
     ///

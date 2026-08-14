@@ -115,9 +115,20 @@ pub mod cuda_relation;
 pub mod derivation_atlas;
 pub mod device;
 pub mod diffusion;
+// Whether an exponential integrand closes in the elementary chart, decided as the consistency of
+// one exact rational linear system. The candidate realizer's degree is forced a priori, so the
+// candidate population is finite and exhaustible and non-elementarity returns as a rank deficiency
+// with an exhibited annihilating combination rather than as a search that gave up.
+pub mod elementary_chart;
 pub mod embedding_fiber;
 #[cfg(target_os = "linux")]
 pub mod hardware_cover;
+// The coboundary move, as distinct from a chart transition. Hermite reduction changes the
+// representative of a rational integrand by an exact term and leaves the residues untouched, which
+// is why it is a lawful move at all — the integral depends only on the class. The two declared
+// schedules are a gauge whose orbit this module MEASURES rather than assumes, and the class is
+// returned as the Rothstein-Trager resultant with no root extracted anywhere.
+pub mod hermite_reduction;
 // The deposited derivation circuit conducted as an exact population current: `receiver_current`'s
 // transport law pointed at the atlas's own 0-cells and 1-cells, so that an atom recruited by ninety
 // derivations separates from one recruited by two through a dilated passage delay rather than

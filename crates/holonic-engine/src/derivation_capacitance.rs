@@ -174,7 +174,7 @@ use thiserror::Error;
 
 use crate::algebraic::CausalCellId;
 use crate::derivation_atlas::{
-    CircuitAperture, Derivation, DerivationCircuit, DerivationIdentity, ReachOrientation,
+    CircuitAperture, Derivation, DerivationCircuit, DerivationIdentity,
     statement_vertex_key,
 };
 use crate::receiver_current::{

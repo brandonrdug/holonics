@@ -81,6 +81,7 @@ deposited in one day for want of them.** These orient reasoning; none schedules 
 | `canon/TABLET_THE_REASONING_CYCLE.md` | **the pretrained organ inside the returning ecology, ratified 2026-08-12**: query as receiver bra, key as presented orientation, value as carried construction, residual as continuing standing, training as adjoint return, the whole model-world recurrence, cross-codec operation classes, self-similarity and section modulus, and the minimal recurrent-section machine. It is doctrine, not a construction schedule. |
 | `canon/TABLET_THE_CAUSAL_PROFILE.md` | **the computer as causal world-tube and the profiler as a shadow atlas, ratified 2026-08-12**: instruction fibers, observer charts, physical current, caustics and invisible directions, Feynman/knot/folded-dimension readings, complexity and bitwise shadows, and the exact boundary around Quantum Information Dynamics. Counts and clocks are projections, not the body. |
 | `canon/TABLET_THE_UNIVERSALITY_MACHINE.md` | **causal multiplicity before arithmetic notation, language as codec, and the map as the continuing body, ratified 2026-08-12**: existence begins in interaction; residue changes continuation; intelligence precedes language; mathematics is invariant causal composition; the Universality Machine is an evolving emulator; and interpreter-free code material has returned one bounded algorithmic world-line family. It is doctrine, not a construction schedule. |
+| `canon/TABLET_THE_COMPRESSION.md` | **what compression is, ratified 2026-08-14**: a codec pivot carrying a declared decoder, the three species by remainder, the linear ceiling and the four hypotheses it needs, and the cost as a second axis. **Its governing correction is that the invariance is ADDITIVE** — a difference against a declared machine, never a ratio — so a compression figure quoted without its decoder is the absolute-volume violation, and it names the 2024 result that is commonly quoted in violation of it. |
 | `canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md` | **the finger-trap correction, ratified 2026-08-12**: the machine already has the bounded organs; intelligence is circulation through the terrain those passages change; software nouns are receiver shadows; heat requires typed incidence and constitutive law; compression retains its ReconstructionFiber; and composition precedes new semantic owners. It is doctrine, not a construction schedule. |
 
 **The one sentence that orders the rest**, held for ninety-two days across five model changes and
@@ -1080,6 +1081,76 @@ traversal.
 microscopic steps and rotations… contribute to the images of the Holonic Interaction's lightning
 patterns."* The interior micro-steps are the collapsed population, the exterior face is the lightning
 image, and the compression is lawful exactly when the separating word is retained.
+
+## 0k. Compression, and the atlas that is now built — ratified 2026-08-14
+
+The law is `canon/TABLET_THE_COMPRESSION.md`; the derivation and every citation are
+`research/records/2026-08-14_COMPRESSION_IS_A_CODEC_PIVOT_THE_INVARIANCE_IS_ADDITIVE_AND_NOTHING_PRICES_BOTH_AXES.md`.
+This section carries only what governs conduct.
+
+**A compression is a codec pivot carrying a declared decoder.** It is never the shrinking of one
+entity: there is no form of information not already encoded by some codec, so the composition
+patterns are derived, the material is re-presented in a second chart, and the first chart's face
+returns only by **running an algorithm**. Brandon's own earlier hypothesis states it from the
+geometry side and is the origin — *compression is gauge-fixing the flat directions and keeping the
+curvature* — with the corollary **an absolute volume is the gauge violation**.
+
+**The governing correction, and the assistant got it wrong in conversation before getting it right.**
+A byte count *is* an absolute volume, so `|encoded| < |original|` is not well formed until the
+decoder crosses with it — that much holds. **But the exchange law is ADDITION, not a ratio.** The
+invariance theorem (`H.0410`, `proved-standard`, already registered) gives
+`|K_U(x) − K_V(x)| ≤ c_{U,V}`, so the **difference against a declared machine** is the invariant and
+the **ratio** — what every compression benchmark reports — is the frame-dependent quantity.
+`H.0410`'s own transformations field is the sentence to carry: *"invariance is additive, not identity
+of programs."* Three further breaks: declaring a null is not enough, the **machine** must be declared
+(for any `x` some universal `U` has `K_U(x) ≤ 1`); the universal machines are a **groupoid with an
+additive cocycle**, not a group, so nothing corresponds to holonomy; and the rule catches a live
+defect — an ICLR 2024 result reporting a language model beating PNG and FLAC is routinely quoted
+without its 70-billion-parameter decoder, while the Hutter Prize already refuses that by rule.
+
+**Two clauses are refused and one analogy is bounded.** *"Combinatorial"* is too weak for `K`, which
+is uncomputable and past a constant Chaitin-unprovable — and it is exactly right for `K^t`, so
+**bounding the runtime is precisely what converts the uncomputable question into a combinatorial
+one**; those are one statement, not two. *"There is no optimal compressor"* must be split: none among
+effective compressors, but the universal machine **is** optimal among descriptions up to an additive
+constant, and the gap between those sentences is the uncomputability. And the space/time trade is
+**not a relativistic interval**: Levin's `Kt = |p| + log t` is the real carrier, but `|p|` enters
+linearly and `t` logarithmically, there is no group, no attained barrier (Blum's speedup theorem
+gives functions with no fastest program), and `log t` is a **declaration** rather than a law. This is
+the same species of move as importing the uncertainty relation by resemblance, which this file
+already refuses; grade it `interpretation` with those breaks attached.
+
+**Where it holds as an identity:** by Kraft and Shannon source coding, minimizing expected
+cross-entropy **is** minimizing expected description length, with the excess equal to the KL
+divergence. **Where it stops:** *compression is prediction* is a theorem (Solomonoff dominance);
+*compression is intelligence* is a thesis, and Leike–Hutter (COLT 2015) is the precise reason — the
+invariance theorems hold for `K` and Solomonoff induction and **no invariance theorem is known for
+AIXI**. The step from prediction to intelligence is exactly the step at which machine-independence
+stops.
+
+### The atlas: two of the three ranked builds are standing
+
+`research/records/2026-08-14_THE_ATLAS_IS_BUILT_THE_METHOD_IS_RECOGNISED_BEFORE_IT_RUNS_AND_THE_COBOUNDARY_KEEPS_THE_RESIDUE.md`.
+
+- **`crates/holonic-engine/src/elementary_chart.rs`** decides `∫R e^g` by the consistency of one
+  exact rational linear system. **Non-elementarity returns as a rank deficiency with an exhibited
+  annihilating combination**, never as a search that gave up, because `deg a = deg R − deg g + 1` is
+  forced and the candidate population is therefore finite and exhaustible. Two refusal species, not
+  one: a simple pole obstructs **structurally, with no system built**; otherwise the system refuses
+  and names the monomial.
+- **`crates/holonic-engine/src/hermite_reduction.rs`** is the **coboundary move** — it changes the
+  representative by an exact term and leaves the residues untouched, which is *why* it is lawful. Two
+  declared schedules form a gauge whose orbit is **measured** before agreement is read as evidence,
+  and the class returns as the Rothstein–Trager resultant with **no root extracted**.
+- **`inverse_transport.rs`'s obstructed admission now names its material.** The fiber proved
+  inconsistency and discarded the combination that witnessed it; each reduced row now carries its
+  lineage, so `AffineObstruction` returns the exact left null combination. Measured composite, not a
+  singleton: `(−2)·eq[x⁰] + (1)·eq[x²]`.
+
+**And a coboundary can create a pole but never a residue** — found by a test failing. Adding
+`d/dx(1/x²)` to `1/(x−1)` takes the residue polynomial `z − 1` to `z² − z`: a new pole at residue
+**zero**, every other root unmoved. So the unconditional invariant is the residue polynomial with
+factors of `z` divided out, and both forms are now tested.
 
 ## 1. The floor is a carrier, not a retired interface
 

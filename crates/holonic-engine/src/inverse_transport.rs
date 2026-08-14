@@ -13,7 +13,7 @@
 //! passive diffusion topology only after the world returns the complete
 //! operator basis.
 
-use std::collections::{BTreeSet, VecDeque};
+use std::collections::{BTreeMap, BTreeSet, VecDeque};
 
 use num_traits::{One, Signed, Zero};
 use relational_geometry::Rat;
@@ -117,6 +117,41 @@ pub struct ExactAffineFiberRow {
     pub pivot: usize,
     pub coefficients: Vec<Rat>,
     pub response: Rat,
+    /// Which admitted equations, and in what exact combination, produced this
+    /// reduced row.
+    ///
+    /// Keys are admission ordinals; the map is sparse because a reduced row
+    /// generally involves few of the equations admitted before it. Reduction
+    /// destroys the identity of the rows it consumes, and a refusal that cannot
+    /// name its material is the defect this field exists to close: with the
+    /// lineage retained, an obstructed admission returns the exact left null
+    /// combination that annihilates the operator while leaving the response
+    /// standing.
+    #[serde(default)]
+    pub lineage: BTreeMap<usize, Rat>,
+}
+
+/// The exhibited witness of an inconsistent affine system.
+///
+/// `combination` is a left null vector: weighting the admitted equations by it
+/// annihilates every coefficient, so the operator says nothing about it, while
+/// the same weighting of the responses returns `response`, which is not zero.
+/// That pair is the refusal's material — the contradiction written out rather
+/// than asserted.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct AffineObstruction {
+    pub schema: String,
+    /// Admission ordinal to its exact weight in the annihilating combination.
+    pub combination: BTreeMap<usize, Rat>,
+    /// What the same combination of responses returns. Never zero.
+    pub response: Rat,
+}
+
+impl AffineObstruction {
+    /// The equations the witness actually consults, in admission order.
+    pub fn admitted_equations(&self) -> Vec<usize> {
+        self.combination.keys().copied().collect()
+    }
 }
 
 /// Canonical reduced-row representation of an exact affine version fiber.
@@ -129,6 +164,25 @@ pub struct ExactAffineVersionFiber {
     pub schema: String,
     variable_count: usize,
     rows: Vec<ExactAffineFiberRow>,
+    /// How many equations have been admitted, including the redundant and the
+    /// obstructed. This is the address space of every row lineage.
+    #[serde(default)]
+    admitted: usize,
+    /// The witness of the most recent obstructed admission, retained so the
+    /// refusal can be read rather than merely detected.
+    #[serde(default)]
+    obstruction: Option<AffineObstruction>,
+}
+
+/// `into -= factor * from`, sparsely, dropping the terms that cancel exactly.
+fn combine_lineage(into: &mut BTreeMap<usize, Rat>, from: &BTreeMap<usize, Rat>, factor: &Rat) {
+    for (ordinal, weight) in from {
+        let combined = into.entry(*ordinal).or_insert_with(Rat::zero);
+        *combined -= factor * weight;
+        if combined.is_zero() {
+            into.remove(ordinal);
+        }
+    }
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
@@ -168,7 +222,23 @@ impl ExactAffineVersionFiber {
             schema: "holonic-engine.exact-affine-version-fiber.v1".to_owned(),
             variable_count,
             rows: Vec::new(),
+            admitted: 0,
+            obstruction: None,
         })
+    }
+
+    /// How many equations have been admitted, obstructed ones included.
+    pub fn admitted_equations(&self) -> usize {
+        self.admitted
+    }
+
+    /// The witness of the most recent obstructed admission.
+    ///
+    /// `AffineFiberObstructed` says only that the system is inconsistent. This
+    /// returns the exact left null combination that proves it, so a caller can
+    /// report which equations disagree rather than that some do.
+    pub fn obstruction(&self) -> Option<&AffineObstruction> {
+        self.obstruction.as_ref()
     }
 
     pub fn variable_count(&self) -> usize {
@@ -273,6 +343,16 @@ impl ExactAffineVersionFiber {
         let mut response = response;
         let mut exact_row_eliminations = 0_u64;
 
+        // The incoming equation begins as itself: one unit of its own ordinal.
+        // Every elimination below subtracts the lineage of the row it reduces
+        // against, so the combination stays exact through the whole descent.
+        let ordinal = self.admitted;
+        self.admitted = self
+            .admitted
+            .checked_add(1)
+            .ok_or(InverseTransportError::CarrierOverflow)?;
+        let mut lineage: BTreeMap<usize, Rat> = BTreeMap::from([(ordinal, Rat::one())]);
+
         for row in &self.rows {
             let factor = coefficients[row.pivot].clone();
             if factor.is_zero() {
@@ -281,7 +361,8 @@ impl ExactAffineVersionFiber {
             for (coefficient, row_coefficient) in coefficients.iter_mut().zip(&row.coefficients) {
                 *coefficient -= &factor * row_coefficient;
             }
-            response -= factor * &row.response;
+            response -= &factor * &row.response;
+            combine_lineage(&mut lineage, &row.lineage, &factor);
             exact_row_eliminations = exact_row_eliminations
                 .checked_add(1)
                 .ok_or(InverseTransportError::CarrierOverflow)?;
@@ -294,6 +375,14 @@ impl ExactAffineVersionFiber {
                     rank_increased: false,
                 });
             }
+            // Every coefficient was annihilated and the response was not. The
+            // lineage now IS the left null combination, so retain it instead of
+            // discarding the one thing that says what the contradiction is.
+            self.obstruction = Some(AffineObstruction {
+                schema: "holonic-engine.affine-obstruction.v1".to_owned(),
+                combination: lineage,
+                response,
+            });
             return Err(InverseTransportError::AffineFiberObstructed);
         };
 
@@ -301,7 +390,10 @@ impl ExactAffineVersionFiber {
         for coefficient in &mut coefficients[pivot..] {
             *coefficient /= &divisor;
         }
-        response /= divisor;
+        response /= &divisor;
+        for weight in lineage.values_mut() {
+            *weight /= &divisor;
+        }
 
         for row in &mut self.rows {
             let factor = row.coefficients[pivot].clone();
@@ -311,7 +403,8 @@ impl ExactAffineVersionFiber {
             for (coefficient, new_coefficient) in row.coefficients.iter_mut().zip(&coefficients) {
                 *coefficient -= &factor * new_coefficient;
             }
-            row.response -= factor * &response;
+            row.response -= &factor * &response;
+            combine_lineage(&mut row.lineage, &lineage, &factor);
             exact_row_eliminations = exact_row_eliminations
                 .checked_add(1)
                 .ok_or(InverseTransportError::CarrierOverflow)?;
@@ -321,6 +414,7 @@ impl ExactAffineVersionFiber {
             pivot,
             coefficients,
             response,
+            lineage,
         };
         let insertion = self
             .rows

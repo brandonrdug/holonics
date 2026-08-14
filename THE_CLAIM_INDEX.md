@@ -62,6 +62,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 | `canon/TABLET_THE_CAUSAL_PROFILE.md` | **Tablet of the causal profile** — **Governing documents:** `canon/THE_HOLOBROCHOS_SPINE.md`, `canon/TABLET_THE_OPERATIONS.md`, `canon/TABLET_THE_MANIFOLD.md`, `canon/TABLET_THE_REASONING_CYCLE.md`, and… |
 | `canon/TABLET_THE_CHART.md` | **The chart: coordinates, transport, and what a chart refuses** — A coordinate system is a receiver and the Jacobian is the transport; a radical is a chart that forgets a winding; warp and weft are a reading in a frame. |
 | `canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md` | **Tablet of the circulating cartographer** — The map is the changing terrain; intelligence is navigation through it; and the present construction frontier is circulation through the machine's existing organs rather than another… |
+| `canon/TABLET_THE_COMPRESSION.md` | **TABLET — THE COMPRESSION** — **Ratified:** 2026-08-14. **Derivation and every citation:** `research/records/2026-08-14_COMPRESSION_IS_A_CODEC_PIVOT_THE_INVARIANCE_IS_ADDITIVE_AND_NOTHING_PRICES_BOTH_AXES.md`. |
 | `canon/TABLET_THE_FLOW.md` | **The flow: fluid dynamics, phases, and parallel integration** — Why Navier-Stokes is not a distant problem, the zeta distribution as an exact self-similar phase, and ant integration as the exact part of the fundamental theorem. |
 | `canon/TABLET_THE_MANIFOLD.md` | **The manifold: charts as types, the structure group as the legal casts, and what a loop returns** — A manifold is the invariant of a population of currents and not their container; a chart is a type and a transition map is an implicit cast; every geometry is a reduction of the structure… |
 | `canon/TABLET_THE_OPERATIONS.md` | **The operations: every classical operation is a construction, a transport, a face, or a quotient** — Every operation of linear algebra, differential equations, and analysis is one of four species — a construction, a transport, a face, or a quotient — and the notation is complete only when… |
@@ -105,7 +106,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (79 deposits of 371)
+## 4 · The 2026-08 record line (81 deposits of 373)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -190,7 +191,9 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-13_THE_MOUTH_IS_AN_ACTIVE_LENS_THE_LOCATION_IS_CO_FOUNDED_AND_THE_PASSAGE_MUST_DEPOSIT.md` | The mouth is an active lens, the location is co-founded, and the passage must deposit |
 | `2026-08-13_THE_SEARCH_WAS_IN_THE_WRONG_CHART_AND_THE_CARD_OWNS_THE_QUOTIENT.md` | The search was in the wrong chart, and the card owns the quotient |
 | `2026-08-13_THE_WEIGHT_FILE_IS_A_PREVIOUSLY_RENDERED_MAP_THE_GRAIN_IS_RECURRING_TRANSFORMATION.md` | The weight file is a previously rendered map, and the grain is recurring transformation |
+| `2026-08-14_COMPRESSION_IS_A_CODEC_PIVOT_THE_INVARIANCE_IS_ADDITIVE_AND_NOTHING_PRICES_BOTH_AXES.md` | Compression is a codec pivot, the invariance is additive, and nothing in this tree prices both axes |
 | `2026-08-14_THE_APERTURE_IS_AN_INTERACTION_HAMILTONIAN_AND_A_PHASE_OBJECT_IS_INVISIBLE_TO_THE_MAGNITUDE_FACE.md` | The aperture is an interaction Hamiltonian, and a phase object is invisible to the magnitude face |
+| `2026-08-14_THE_ATLAS_IS_BUILT_THE_METHOD_IS_RECOGNISED_BEFORE_IT_RUNS_AND_THE_COBOUNDARY_KEEPS_THE_RESIDUE.md` | The atlas is built: the method is recognised before it runs, and the coboundary keeps the residue |
 | `2026-08-14_THE_METHOD_IS_A_CHART_TRANSITION_OR_A_COBOUNDARY_MOVE_AND_ONLY_THE_FINITE_STRATA_ARE_TABLES.md` | The method is a chart transition or a coboundary move, and only the finite strata are tables |
 
 ---
