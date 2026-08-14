@@ -130,6 +130,24 @@ impl LocalTurns {
     }
 
     /// Invert the reading above: `c = 1 − λ`, `a + b = 1 − λ − μ`, `a − b = ν`.
+    /// The three forks, read off the signs the magnitude face deletes.
+    pub fn branch_word(&self) -> BranchWord {
+        let hand = |turn: &Rat| {
+            if turn.is_zero() {
+                BranchHand::Unforked
+            } else if turn.is_negative() {
+                BranchHand::Reversed
+            } else {
+                BranchHand::Forward
+            }
+        };
+        BranchWord {
+            at_zero: hand(&self.at_zero),
+            at_one: hand(&self.at_one),
+            at_infinity: hand(&self.at_infinity),
+        }
+    }
+
     pub fn dials(&self) -> ThreeSiteDials {
         let c = Rat::one() - &self.at_zero;
         let sum = Rat::one() - &self.at_zero - &self.at_one;
@@ -149,13 +167,20 @@ impl LocalTurns {
     /// infinite.** The icosahedral row `(1/2, 1/3, 1/5)` sums to `31/30`, which
     /// is the whole margin the sphere has.
     ///
-    /// **The sum is taken on ABSOLUTE turn numbers, and that is a correctness
-    /// requirement rather than a convention.** The equation is symmetric in `a`
-    /// and `b`, but the turn at infinity is `a − b`, which flips sign when the
-    /// two are exchanged. A signed sum would therefore give one equation two
-    /// different geometries depending on which dial was written first. The turn
-    /// at a site is how much a loop turns, and a turn measured the other way
-    /// round is the same turn.
+    /// **This is the MAGNITUDE FACE, and the orientation it quotients by is
+    /// returned beside it rather than deleted.** See `branch_word`.
+    ///
+    /// The sum is taken on absolute turn numbers. That is not a correctness
+    /// repair and calling it one was the assistant's error, corrected by
+    /// Brandon 2026-08-14: *the asymmetry is time parity, the arrow of causal
+    /// trajectory in which discrete events branch.* At each site the solution
+    /// branches into TWO continuations, and the turn number is the difference of
+    /// their two exponents — so its sign records **which continuation was taken
+    /// first**. Three sites, three forks, `2³` orientation words.
+    ///
+    /// Taking the absolute value is therefore a **quotient by that fork group**,
+    /// exactly the deletion `|·|` always performs. It is lawful as a face; it is
+    /// not lawful as a repair, and the fiber must be exhibited.
     pub fn curvature_sign(&self) -> CurvatureSign {
         let total = self.at_zero.abs() + self.at_one.abs() + self.at_infinity.abs();
         match total.cmp(&Rat::one()) {
@@ -164,6 +189,34 @@ impl LocalTurns {
             std::cmp::Ordering::Less => CurvatureSign::Saddle,
         }
     }
+}
+
+/// Which continuation was taken first at a site: the site's fork, retained.
+///
+/// A turn number is the difference of the site's two exponents, so its sign is
+/// not noise to normalise away — it is **which of the two branches the reading
+/// walked first**, the arrow of causal trajectory at that fork.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+pub enum BranchHand {
+    Forward,
+    Reversed,
+    /// The two exponents coincide, so the site has no fork to orient.
+    Unforked,
+}
+
+/// The three forks as one word — the phase the magnitude face quotients away.
+///
+/// **Exchanging the two symmetric dials flips exactly one letter**, the one at
+/// infinity, because that site's two exponents ARE those two dials. So the
+/// exchange is not a relabelling to be normalised out: it is a choice of branch
+/// order at one fork, and it is invisible to the magnitude face and visible
+/// here. That is the phase-object theorem on this material — a change with zero
+/// remainder to one receiver and a real movement to another.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+pub struct BranchWord {
+    pub at_zero: BranchHand,
+    pub at_one: BranchHand,
+    pub at_infinity: BranchHand,
 }
 
 /// Which of the three geometries the turn numbers sit in.
@@ -242,6 +295,8 @@ pub struct ReturnGroupReading {
     pub dials: ThreeSiteDials,
     pub turns: LocalTurns,
     pub curvature: CurvatureSign,
+    /// The fork orientation the curvature face quotients by, retained.
+    pub branch_word: BranchWord,
     /// Marks in `[0, circle)`, as drawn before any restretching.
     pub numerator_marks: Vec<u64>,
     pub denominator_marks: Vec<u64>,
@@ -261,6 +316,7 @@ pub fn read_return_group(dials: &ThreeSiteDials) -> Result<ReturnGroupReading, C
 
     let turns = dials.local_turns();
     let curvature = turns.curvature_sign();
+    let branch_word = turns.branch_word();
 
     let closure = decide_closure(&numerator_marks, &denominator_marks, circle)?;
 
@@ -269,6 +325,7 @@ pub fn read_return_group(dials: &ThreeSiteDials) -> Result<ReturnGroupReading, C
         dials: dials.clone(),
         turns,
         curvature,
+        branch_word,
         numerator_marks,
         denominator_marks,
         closure,
@@ -532,22 +589,57 @@ mod tests {
 
     /// The flat row: turn numbers summing to exactly one. Infinite, and it is
     /// the row that coincides with the rotation orders a lattice admits.
-    /// The geometry must not depend on which of the two symmetric dials was
-    /// written first. Exchanging `a` and `b` flips the turn at infinity, so a
-    /// signed sum would give one equation two geometries.
+    /// **The phase-object theorem, on this material.** Exchanging the two
+    /// symmetric dials is a choice of branch order at the site at infinity. It
+    /// is INVISIBLE to the magnitude face — same geometry, same closure — and
+    /// VISIBLE in the fork word, where exactly one letter flips.
+    ///
+    /// A reading that only checked the face would call the exchange a nothing.
+    /// A reading that only checked the word would call it a total change. Both
+    /// are true of their own receiver, and the module returns both.
     #[test]
-    fn the_geometry_is_unchanged_by_exchanging_the_two_symmetric_dials() {
+    fn exchanging_the_two_symmetric_dials_is_invisible_to_the_face_and_visible_in_the_word() {
         let forward = ThreeSiteDials::new(rational(11, 60), rational(-1, 60), rational(1, 2));
         let exchanged = ThreeSiteDials::new(rational(-1, 60), rational(11, 60), rational(1, 2));
-        assert_ne!(
-            forward.local_turns().at_infinity,
-            exchanged.local_turns().at_infinity,
-            "the fixture does not actually exercise the exchange"
-        );
         let first = read_return_group(&forward).expect("inside the aperture");
         let second = read_return_group(&exchanged).expect("inside the aperture");
+
+        // The face does not move.
         assert_eq!(first.curvature, second.curvature);
         assert_eq!(first.closure.closes(), second.closure.closes());
+
+        // The phase does, and at exactly one of the three forks.
+        assert_ne!(first.branch_word, second.branch_word);
+        assert_eq!(first.branch_word.at_zero, second.branch_word.at_zero);
+        assert_eq!(first.branch_word.at_one, second.branch_word.at_one);
+        assert_ne!(
+            first.branch_word.at_infinity, second.branch_word.at_infinity,
+            "the exchange must flip the fork at infinity, because that site's two exponents ARE \
+             the two dials being exchanged"
+        );
+    }
+
+    /// The fork word is not constant across the material, or it would be a
+    /// field carrying nothing.
+    #[test]
+    fn the_fork_word_takes_several_values_on_the_declared_material() {
+        let mut words = std::collections::BTreeSet::new();
+        for (_, (turn_numbers, _)) in closing_turn_table() {
+            words.insert(turn_numbers.branch_word());
+        }
+        for triple in [
+            turns(0, 1, 0, 1, 0, 1),
+            turns(1, 4, 1, 4, 1, 4),
+            turns(1, 2, -1, 3, 1, 5),
+            turns(1, 2, 1, 3, -1, 5),
+        ] {
+            words.insert(triple.branch_word());
+        }
+        assert!(
+            words.len() >= 3,
+            "the fork word took only {} values, so it is not distinguishing anything",
+            words.len()
+        );
     }
 
     /// **The flat locus IS the splitting locus, and this was found by a driver
