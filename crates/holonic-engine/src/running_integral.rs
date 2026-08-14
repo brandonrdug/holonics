@@ -103,6 +103,8 @@ use num_traits::{One, Signed, Zero};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+use crate::causal_body::CausalTransportHand;
+
 use crate::algebraic::{
     CausalAlgebraicError, CausalCellId, CausalChain, ComparativeMultiplicity, GradedCausalComplex,
 };
@@ -930,6 +932,36 @@ impl ChordObstruction {
     }
 }
 
+/// **How one vertex was reached: from where, carried by what, crossed which way.**
+///
+/// A pointer is not an address, it is a relative orientation — *from here, that way* — and the same
+/// species as `opposite`/`adjacent` at a chosen vertex of a triangle. Which one is "the parent" is
+/// decided by where the base was put, exactly as which side is "opposite" is decided by which angle
+/// you stand at. Relabel the standpoint and the relation permutes; the tree does not move.
+///
+/// The hand is [`crate::causal_body::CausalTransportHand`] rather than a second spelling of it,
+/// because it is the same object: `Reverse` is the half turn, and
+/// `causal_body::RootedTreeIndex::path` reverses exactly this on the ascending leg when it climbs
+/// to a least common ancestor.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ReachedBy {
+    /// The vertex this one was reached from — the tail of the step. Its own [`ReachedBy`]
+    /// continues the route.
+    pub from: CausalCellId,
+    /// The vertex reached — the head of the step, and the key this entry is stored under.
+    ///
+    /// Both ends are named because both are the relation. Storing only the tail and recovering the
+    /// head from the key works until the route is reversed, and a route between two vertices is
+    /// half reversed by construction.
+    pub to: CausalCellId,
+    /// The 1-cell that carried the step. It is a member of [`PotentialSearch::tree_cells`].
+    pub carrier: CausalCellId,
+    /// `Forward` when the walk crossed tail to head, `Reverse` when head to tail — which is the
+    /// sign the potential took: `w = df` means `w(e) = f(head) − f(tail)`, so a reversed crossing
+    /// subtracts where a forward one adds.
+    pub hand: CausalTransportHand,
+}
+
 /// The search for a 0-cochain whose coboundary is the given 1-cochain, and the remainder it leaves.
 ///
 /// A spanning tree determines the potential uniquely once a base is fixed. Every remaining chord is
@@ -948,6 +980,15 @@ pub struct PotentialSearch {
     /// Grade-zero, valued zero at the base, exact in `Z` whatever group was declared.
     pub potential: Cochain,
     pub reached: BTreeSet<CausalCellId>,
+    /// **How each reached vertex was reached** — the vertex it came from, the 1-cell that carried
+    /// it, and the hand that cell was crossed with.
+    ///
+    /// This is the head/tail relation of the spanning tree, and the search computes every part of
+    /// it in order to walk at all. [`PotentialSearch::reached`] is this map's keys and
+    /// [`PotentialSearch::tree_cells`] is its carriers; **both are faces of this, and until
+    /// 2026-08-14 only the two faces were returned.** The base is the one reached vertex with no
+    /// entry here, which is what makes it the base.
+    pub parents: BTreeMap<CausalCellId, ReachedBy>,
     pub tree_cells: BTreeSet<CausalCellId>,
     /// Chords whose declared value already matched the tree's potential.
     pub agreeing_chords: BTreeSet<CausalCellId>,
@@ -962,6 +1003,89 @@ impl PotentialSearch {
     /// nothing was retained.
     pub fn admits_a_potential(&self) -> bool {
         self.retained_obstructions.is_empty()
+    }
+
+    /// **The route from `vertex` back to the base**, as ordered steps, read off the relation the
+    /// walk already built.
+    ///
+    /// `None` when the vertex was never reached, which is a different return from an empty route:
+    /// the base itself is reached and its route is empty, because it is where routes end. `None`
+    /// also returns for a **malformed** parent relation — one carrying a cycle, which a spanning
+    /// tree cannot — rather than walking it forever.
+    ///
+    /// This costs one step per hop and no search. Before the parent relation was kept, a caller
+    /// wanting this had to re-walk a tree the search had already walked — the whole defect in one
+    /// sentence.
+    pub fn route_to_base(&self, vertex: CausalCellId) -> Option<Vec<ReachedBy>> {
+        if !self.reached.contains(&vertex) {
+            return None;
+        }
+        let mut route = Vec::new();
+        let mut at = vertex;
+        // Bounded by the relation's own size, and the bound is exact rather than authored: a tree
+        // with `k` parent entries has depth at most `k`, so a walk that takes more than `k` steps
+        // has entered a cycle and the relation is not a tree. `PotentialSearch` derives
+        // `Deserialize` and carries public fields, so a malformed map is reachable from outside
+        // this module — and without this the walk does not fail, it hangs. Measured 2026-08-14 by
+        // deliberately swapping head and tail at the founding site: the test process did not
+        // assert, it was killed.
+        while let Some(step) = self.parents.get(&at) {
+            if route.len() == self.parents.len() {
+                return None;
+            }
+            route.push(*step);
+            at = step.from;
+        }
+        Some(route)
+    }
+
+    /// The route between **two** reached vertices, through their least common ancestor in the
+    /// spanning tree, with the hand reversed on the ascending leg.
+    ///
+    /// `None` when either endpoint is unreached — the two are then in different components of the
+    /// walked terrain and no route exists, which is a returned fact rather than an empty vector.
+    ///
+    /// The reversal is the content: traversing a relation backwards is the half turn, so a route
+    /// between two entities is a composition of forward and reversed transports and the reversal
+    /// **is** a sign. `causal_body::RootedTreeIndex::path` does the same climb over a different
+    /// standing; this is that reading made available wherever a potential was founded.
+    pub fn route_between(
+        &self,
+        source: CausalCellId,
+        target: CausalCellId,
+    ) -> Option<Vec<ReachedBy>> {
+        let up = self.route_to_base(source)?;
+        let down = self.route_to_base(target)?;
+        // Both routes end at the base, so their common suffix — compared from the base end — is the
+        // shared ascent. What remains of each is its own leg, and the meeting point is the least
+        // common ancestor.
+        let shared = up
+            .iter()
+            .rev()
+            .zip(down.iter().rev())
+            .take_while(|(left, right)| left.carrier == right.carrier)
+            .count();
+        let mut route = Vec::with_capacity(up.len() + down.len() - 2 * shared);
+        // **The ascending leg is the reversed one.** A parent entry reads *this vertex was reached
+        // from that one*, which points away from the base; climbing towards the base traverses it
+        // backwards, and traversing a relation backwards is the half turn.
+        for step in &up[..up.len() - shared] {
+            route.push(ReachedBy {
+                from: step.to,
+                to: step.from,
+                carrier: step.carrier,
+                hand: match step.hand {
+                    CausalTransportHand::Forward => CausalTransportHand::Reverse,
+                    CausalTransportHand::Reverse => CausalTransportHand::Forward,
+                },
+            });
+        }
+        // The descending leg already points away from the base, which is the direction of travel
+        // once the ancestor is passed. Only the order reverses.
+        for step in down[..down.len() - shared].iter().rev() {
+            route.push(*step);
+        }
+        Some(route)
     }
 
     /// The number of independent cycles the reached component carries: its departure from a tree.
@@ -1063,6 +1187,7 @@ pub fn found_potential_in(
 
     let mut assigned: BTreeMap<CausalCellId, BigInt> = BTreeMap::new();
     assigned.insert(base, BigInt::zero());
+    let mut parents: BTreeMap<CausalCellId, ReachedBy> = BTreeMap::new();
     let mut tree_cells = BTreeSet::new();
     let mut agreeing_chords = BTreeSet::new();
     let mut retained_obstructions = Vec::new();
@@ -1092,6 +1217,27 @@ pub fn found_potential_in(
                 None => {
                     assigned.insert(far, implied_there);
                     tree_cells.insert(cell);
+                    // The head/tail relation, kept. At this instant the walk knows all three parts
+                    // — which vertex `far` was reached FROM, which 1-cell carried it, and which way
+                    // that cell was crossed — because it needed all three to compute the potential
+                    // one line above. Until 2026-08-14 all three were dropped here and the search
+                    // returned two populations instead: `reached`, the potential map's keys
+                    // collected into a set, and `tree_cells`, the carrying cells collected into
+                    // another. A caller wanting the route from a vertex back to the base had to
+                    // re-search a tree that had already been walked.
+                    parents.insert(
+                        far,
+                        ReachedBy {
+                            from: vertex,
+                            to: far,
+                            carrier: cell,
+                            hand: if vertex == tail {
+                                CausalTransportHand::Forward
+                            } else {
+                                CausalTransportHand::Reverse
+                            },
+                        },
+                    );
                     frontier.push_back(far);
                 }
                 Some(_) => {
@@ -1125,6 +1271,7 @@ pub fn found_potential_in(
         group,
         potential,
         reached,
+        parents,
         tree_cells,
         agreeing_chords,
         retained_obstructions,
@@ -1846,6 +1993,141 @@ mod tests {
     ///
     /// `dc` is the square's only chord and its residual is `2`. Over `Z` it obstructs. Over `Z/2`
     /// it agrees, because `2` is the group's zero. Over `Z/3` it obstructs again, which is the
+    /// **The falsifier for the parent relation.** A route is only the route if walking it
+    /// reproduces the potential the same search returned: summing each carried value with the
+    /// hand's sign must land exactly on the vertex's potential. A fabricated, stale, or
+    /// wrongly-handed parent map fails this at the first vertex deeper than one step.
+    #[test]
+    fn every_route_to_base_reproduces_the_potential_it_was_walked_beside() {
+        // **The walk must cross at least one edge against its orientation, or this test cannot
+        // fail.** `cb` points c -> b, so reaching c from b traverses it head-to-tail and stores
+        // `Reverse`. Measured 2026-08-14 on the hollow square, whose every edge the walk crosses
+        // tail-to-head: pinning the stored hand to `Forward` left the entire module green. The
+        // fixture was the defect, not the assertion.
+        let mut complex = GradedCausalComplex::default();
+        let a = vertex(&mut complex, "a");
+        let b = vertex(&mut complex, "b");
+        let c = vertex(&mut complex, "c");
+        let d = vertex(&mut complex, "d");
+        let ab = edge(&mut complex, "ab", a, b);
+        let cb = edge(&mut complex, "cb", c, b);
+        let ad = edge(&mut complex, "ad", a, d);
+        let w = Cochain::from_values(1, [(ab, big(3)), (cb, big(5)), (ad, big(2))]);
+        let search = found_potential(&complex, &w, a).unwrap();
+
+        let hands: Vec<CausalTransportHand> =
+            search.parents.values().map(|step| step.hand).collect();
+        assert!(hands.contains(&CausalTransportHand::Forward));
+        assert!(
+            hands.contains(&CausalTransportHand::Reverse),
+            "the material must exercise both hands or the sign below is never read"
+        );
+        assert!(search.reached.len() > 2, "and must reach past one step");
+
+        for vertex in &search.reached {
+            let route = search
+                .route_to_base(*vertex)
+                .expect("a reached vertex has a route");
+            let mut carried = BigInt::zero();
+            for step in &route {
+                match step.hand {
+                    CausalTransportHand::Forward => carried += w.value(step.carrier),
+                    CausalTransportHand::Reverse => carried -= w.value(step.carrier),
+                }
+            }
+            assert_eq!(
+                carried,
+                search.potential.value(*vertex),
+                "route for {vertex:?} does not carry its own potential"
+            );
+        }
+        // c sits behind a reversed crossing, so its potential is the one a Forward-only reading
+        // would get wrong: 3 - 5, not 3 + 5.
+        assert_eq!(search.potential.value(c), big(-2));
+
+        // Reached-with-an-empty-route and never-reached are different returns, and the base is the
+        // one vertex that is the first.
+        assert!(search.route_to_base(a).unwrap().is_empty());
+        assert_eq!(
+            search.route_to_base(ad),
+            None,
+            "a 1-cell was never a reached vertex"
+        );
+
+        // And the two populations that used to be returned alone are faces of this one.
+        let carriers: BTreeSet<CausalCellId> =
+            search.parents.values().map(|step| step.carrier).collect();
+        assert_eq!(
+            carriers, search.tree_cells,
+            "tree_cells is the carrier face"
+        );
+        let mut keys: BTreeSet<CausalCellId> = search.parents.keys().copied().collect();
+        keys.insert(search.base);
+        assert_eq!(
+            keys, search.reached,
+            "reached is the key face, plus the base"
+        );
+        let _ = d;
+    }
+
+    /// A route between two vertices climbs to their least common ancestor and comes back down, and
+    /// **the ascending leg carries the opposite hand** — the half turn, which is the whole content
+    /// of a route being a composition of transports rather than a list of vertices.
+    #[test]
+    fn a_route_between_two_vertices_reverses_the_hand_on_the_ascending_leg() {
+        let square = Square::hollow();
+        let w = Cochain::from_values(1, [(square.ab, big(3)), (square.bc, big(5))]);
+        let search = found_potential(&square.complex, &w, square.a).unwrap();
+
+        let route = search
+            .route_between(square.c, square.d)
+            .expect("both are reached");
+        // c climbs to b, then to the base a, then descends to d. Three steps, and only the last is
+        // travelled in the direction its parent entry was recorded in.
+        assert_eq!(route.len(), 3);
+        assert_eq!(route[0].hand, CausalTransportHand::Reverse);
+        assert_eq!(route[1].hand, CausalTransportHand::Reverse);
+        assert_eq!(route[2].hand, CausalTransportHand::Forward);
+        assert_eq!(route[2].carrier, square.ad);
+
+        // The steps chain end to end, which is what makes it a route and not a set of edges.
+        assert_eq!(route[0].from, square.c);
+        for pair in route.windows(2) {
+            assert_eq!(pair[0].to, pair[1].from, "the route breaks");
+        }
+        assert_eq!(route[route.len() - 1].to, square.d);
+
+        // Reversing the endpoints reverses every hand and the order.
+        let back = search.route_between(square.d, square.c).unwrap();
+        assert_eq!(back.len(), route.len());
+        for (there, here) in route.iter().rev().zip(&back) {
+            assert_eq!(there.carrier, here.carrier);
+            assert_ne!(there.hand, here.hand, "the return trip is the other hand");
+        }
+    }
+
+    /// Two vertices in different components return **no route**, by name, rather than an empty one.
+    #[test]
+    fn an_unreached_endpoint_returns_no_route_rather_than_an_empty_one() {
+        let mut complex = GradedCausalComplex::default();
+        let a = vertex(&mut complex, "a");
+        let b = vertex(&mut complex, "b");
+        let island = vertex(&mut complex, "island");
+        let ab = edge(&mut complex, "ab", a, b);
+        let w = Cochain::from_values(1, [(ab, big(1))]);
+        let search = found_potential(&complex, &w, a).unwrap();
+
+        assert!(search.reached.contains(&b));
+        assert!(!search.reached.contains(&island));
+        assert_eq!(search.route_between(b, island), None);
+        assert_eq!(search.route_between(island, b), None);
+        assert_eq!(search.route_to_base(island), None);
+        assert!(
+            search.route_between(a, b).is_some(),
+            "and the reachable pair still routes"
+        );
+    }
+
     /// point that makes this a gauge rather than a switch: a modulus is not a knob that always
     /// weakens the test, it sees exactly the part of the residual it shares a factor with.
     #[test]
