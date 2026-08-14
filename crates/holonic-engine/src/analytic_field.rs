@@ -1386,13 +1386,41 @@ pub struct ExactAnalyticCirculationProbe {
     pub coefficients: BTreeMap<AnalyticFieldArcId, Rat>,
 }
 
-/// A finite exact conservative advection chart.
+/// A finite exact conservative advection chart — **and it is a Hamiltonian generator with a
+/// symplectic integrator, which nothing said until 2026-08-14.**
 ///
 /// If `AᵀΩ+ΩA=0` and `A1=0`, the Cayley successor preserves the Ω quadratic
 /// form and the Ω-weighted total exactly. Declared circulation covectors must
 /// additionally be left-fixed by the successor. Coefficients are signed
 /// chart values; positivity of material parcels requires a separate parcel
 /// standing.
+///
+/// # What this is, in the registered vocabulary
+///
+/// `AᵀΩ + ΩA = 0` is exactly the condition that `A` is **Ω-skew**, i.e. the generator of a flow
+/// preserving the symplectic form `Ω` — a Hamiltonian vector field in the linear case. The Cayley
+/// transform `(I − τA/2)⁻¹(I + τA/2)` is the standard **symplectic integrator** for such a
+/// generator, and it preserves the form *exactly* rather than to an order, which is why this law
+/// can refuse a non-zero residual instead of tolerating one.
+///
+/// - `H.0281` *Symplectic structure and Darboux chart*, `proved-standard`
+/// - `H.0282` *Hamiltonian flow and Liouville preservation*, `proved-standard`
+///
+/// Both are registered and neither was joined to this owner.
+///
+/// # The near-miss, recorded because it is the convicted defect
+///
+/// Measured 2026-08-14: **`Hamiltonian`, `symplectic`, `poisson_bracket`, `Liouville`, `Darboux`
+/// and `eikonal` have zero hits in every `.rs` file in this workspace.** A sweep for any of those
+/// words returns nothing while this law sits here computing the thing. That is `CLAUDE.md` §0i's
+/// rule firing on the very concept the Holonic Interaction account was built from — *search the
+/// operation, then read the module; an absence claim from a grep over names is not a measurement* —
+/// and it is the same shape as `fn without_stem`, which a grep for `fn remove|fn prune|fn ablate`
+/// could not match.
+///
+/// **The organ is unchanged by this note.** Nothing new is claimed: no Poisson bracket is computed,
+/// no Darboux chart is constructed, and the nonlinear case is untouched. What changes is that the
+/// name is now where the mechanism is.
 #[derive(Clone, Debug)]
 pub struct ExactAnalyticAdvectionLaw {
     arcs: Vec<AnalyticFieldArcId>,
