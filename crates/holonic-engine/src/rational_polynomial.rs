@@ -321,14 +321,18 @@ impl RationalPolynomial {
     /// The squarefree decomposition, with multiplicities.
     ///
     /// Returns the monic pairwise-coprime squarefree `V_i` with
-    /// `p = leading · ∏ V_i^i`, indexed so the returned pair `(V, i)` carries
-    /// the multiplicity `i ≥ 1` directly. Factors of multiplicity `i` that are
-    /// constant are omitted rather than returned as trivial rows.
+    /// `p = leading · ∏ V_i^i`, **keyed by the multiplicity `i ≥ 1`**. Each
+    /// multiplicity carries at most one factor — `V_i` is by construction the
+    /// product of every irreducible factor occurring exactly `i` times — so
+    /// multiplicity is a genuine index rather than a field beside one, and the
+    /// map is the honest carrier. Constant factors are omitted.
     ///
     /// `squarefree_part` returns the radical and forgets how deep each root
     /// sits. Every reduction that has to *descend* a pole order needs the depth,
     /// which is why this exists beside it. Musser's algorithm, exactly over `ℚ`.
-    pub fn squarefree_decomposition(&self) -> Result<Vec<(Self, u32)>, ExactPolynomialError> {
+    pub fn squarefree_decomposition(
+        &self,
+    ) -> Result<std::collections::BTreeMap<u32, Self>, ExactPolynomialError> {
         if self.is_zero() {
             return Err(ExactPolynomialError::ZeroPolynomial);
         }
@@ -338,13 +342,13 @@ impl RationalPolynomial {
         // one order has been peeled off each.
         let mut w = monic.divided_exactly_by(&common)?;
         let mut y = common;
-        let mut decomposition = Vec::new();
+        let mut decomposition = std::collections::BTreeMap::new();
         let mut multiplicity = 1_u32;
         while w.degree().map(|degree| degree > 0).unwrap_or(false) {
             let z = w.monic_gcd(&y)?;
             let factor = w.divided_exactly_by(&z)?;
             if factor.degree().map(|degree| degree > 0).unwrap_or(false) {
-                decomposition.push((factor.made_monic(), multiplicity));
+                decomposition.insert(multiplicity, factor.made_monic());
             }
             y = y.divided_exactly_by(&z)?;
             w = z;

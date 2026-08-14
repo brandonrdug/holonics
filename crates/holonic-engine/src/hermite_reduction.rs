@@ -272,26 +272,26 @@ pub fn reduce(
     let derived_step_bound: usize = current_denominator
         .squarefree_decomposition()?
         .iter()
-        .map(|(factor, multiplicity)| {
+        .map(|(multiplicity, factor)| {
             (*multiplicity as usize).saturating_sub(1) * factor.degree().unwrap_or(0)
         })
         .sum();
 
     loop {
         let decomposition = current_denominator.squarefree_decomposition()?;
+        // The decomposition is keyed by multiplicity and BTreeMap is ordered,
+        // so the two schedules are the two ends of the same range. Neither
+        // scans, and neither imposes an order the material does not have.
         let target = match schedule {
-            ReductionSchedule::HighestMultiplicityFirst => decomposition
-                .iter()
-                .filter(|(_, multiplicity)| *multiplicity >= 2)
-                .max_by_key(|(_, multiplicity)| *multiplicity),
-            ReductionSchedule::LowestMultiplicityFirst => decomposition
-                .iter()
-                .filter(|(_, multiplicity)| *multiplicity >= 2)
-                .min_by_key(|(_, multiplicity)| *multiplicity),
+            ReductionSchedule::HighestMultiplicityFirst => {
+                decomposition.range(2..).next_back()
+            }
+            ReductionSchedule::LowestMultiplicityFirst => decomposition.range(2..).next(),
         };
-        let Some((factor, multiplicity)) = target.cloned() else {
+        let Some((multiplicity, factor)) = target else {
             break;
         };
+        let (multiplicity, factor) = (*multiplicity, factor.clone());
 
         // D = U · V^m
         let mut power = RationalPolynomial::new(vec![Rat::one()]);
@@ -362,8 +362,8 @@ pub fn reduce(
     let remaining_denominator_is_squarefree = remaining
         .denominator
         .squarefree_decomposition()?
-        .iter()
-        .all(|(_, multiplicity)| *multiplicity == 1);
+        .keys()
+        .all(|multiplicity| *multiplicity == 1);
 
     Ok(HermiteReading {
         schema: SCHEMA.to_owned(),
@@ -675,17 +675,13 @@ mod tests {
             .squarefree_decomposition()
             .expect("a nonzero polynomial");
         let mut rebuilt = polynomial(&[1]);
-        for (factor, multiplicity) in &decomposition {
+        for (multiplicity, factor) in &decomposition {
             for _ in 0..*multiplicity {
                 rebuilt = rebuilt.times(factor);
             }
         }
         assert_eq!(rebuilt, source.made_monic());
-        let mut multiplicities: Vec<u32> = decomposition
-            .iter()
-            .map(|(_, multiplicity)| *multiplicity)
-            .collect();
-        multiplicities.sort_unstable();
+        let multiplicities: Vec<u32> = decomposition.keys().copied().collect();
         assert_eq!(multiplicities, vec![2, 3]);
     }
 
@@ -722,7 +718,7 @@ mod tests {
             .squarefree_decomposition()
             .expect("nonzero")
             .iter()
-            .map(|(factor, multiplicity)| {
+            .map(|(multiplicity, factor)| {
                 ((*multiplicity as usize) - 1) * factor.degree().unwrap_or(0)
             })
             .sum();
