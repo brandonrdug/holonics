@@ -17,6 +17,57 @@ PREDICTION IS THE LICENCE / ONE OPERATOR IS NOT TWO / NO FORWARD PASS / NO NEW O
 
 ---
 
+## ERRATA — audited 2026-08-13, the day of deposit. Read this before any figure below.
+
+**The reading was real and the instrument was outside the machine.** `analysis/deposited_map/` is
+1,043 lines of numpy; the engine performed none of the statistics below. That was declared, and it is
+not the finding. These four are:
+
+1. **The population statistics are taken over units that are not independent.** `read_map.py:81`
+   computes the KV group as `head // (nq // nkv)` — grouped-query attention — so four heads share one
+   `W_V`. There are **84** distinct value maps, 2 per layer × 42, not 336. Every per-head figure
+   below (`187/336`, `100.0% of 336`, `80/280`, `17/56`, `48.8% of 336`) counts correlated units as
+   independent, and the seam is visible in the data: `quotient.json` at L3 gives H0–H3 as
+   `0.509/0.506/0.511/0.519` and H4–H7 as `0.372/0.374/0.381/0.378`. The line reading *"peaking at
+   `L3 H0–H3` (all four heads of layer 3)"* is wrong twice: that layer has eight heads, and those
+   four are one group.
+
+2. **Three load-bearing control figures have no producer in the tree.** `quotient.json` carries
+   exactly `{layer, head, species, within, between, sep}`. The matched-null column, the `0.3160` raw
+   baseline, `76.8%` and `62.5%` are computed by no committed script; the same holds for the
+   20,000-shuffle permutation test and the per-layer sign test, and no seed was deposited. They were
+   independently reproduced to ±0.013, so the numbers are genuine — **the producer is absent**, which
+   is the `zz_smith_cost_probe` shape recurring on the paragraph this record leans hardest on
+   ("the control is the finding"). Treat every one of them as unfalsifiable until its script is
+   committed.
+
+3. **The Winding — the one type this record's own law says crosses a horizon whole — is a float
+   threshold.** `read_map.py:114`, `winding_census(evals, tol=1e-9)`, classifying LAPACK float64
+   eigenvalues by whether an imaginary part clears `1e-9 × scale`. Every winding here rests on it.
+   The regrade elsewhere in this record demotes the *ratios* to floating apparatus and explicitly
+   exempts the windings as *"a count and never a percentage"*. That exemption does not hold.
+
+4. **Four undeclared authored levels decide headline returns:** the `1e-9` above;
+   `np.percentile(G[off], 95)` (`run_quotient.py:83`) selecting the 262 quotients;
+   `0.75 * null_pr` (`run_sweep.py:80`) deciding tail membership; and `limit=8000`
+   (`run_transport.py:40`) fixing the artifact's vocabulary to the first 8,000 of 262,144 token ids —
+   in a BPE vocabulary, the most frequent pieces, i.e. **the bulk, where this record's own §7 says
+   archetypes are not expected.**
+
+**Reported and not verified by the auditing session**, so carried as open rather than as fact: that a
+matched random operator separates the two faces in 400 of 400 draws at a median *above* the
+transported median reported here, and that the raw embedding with no operator produces a cleaner
+archetype than the layer-13 head headlined below. If either holds, the corresponding claim is not
+merely overstated but inverted. **Both are checkable and neither is checked.**
+
+**What survives the audit intact:** `run_exact.py` is exact end to end — one float operation in the
+file, in a function whose docstring marks it as for the reader's eye with the pair above it as the
+value — and every figure it produces reproduces digit for digit. The three declared gauge controls
+reproduce. The model-artifact facts check against the header and `config.json`. The mass census and
+the architecture reading are unaffected by all four items above.
+
+---
+
 ## Present question
 
 Given a pretrained transformer's weight file and a standing prohibition on ever running it — because

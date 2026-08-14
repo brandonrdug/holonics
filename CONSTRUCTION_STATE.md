@@ -726,13 +726,18 @@ modules and 97 drivers — `use` edges, `mod`-path calls, root-glob-resolved `cr
 split-impl files, 3,657 edges — rather than by grep:
 
 - **107 of 225 library modules are touched by no driver.**
-- **In-degree zero from everything**, each verified by grepping every public type it defines against
-  the whole tree: `kelvin` (642 lines), `communication` (400), `soma/abi::cuda_execution` (273),
-  `soma/life::research_intelligence` (772, out-degree 8, one call site short of reachable —
-  **that call site was built 2026-08-10** and the module is driven).
+- **In-degree zero from everything at that census**, each verified by grepping every public type it
+  defines against the whole tree: `kelvin` (644 lines), `communication` (400),
+  `soma/abi::cuda_execution` (273), `soma/life::research_intelligence` (772, out-degree 8, one call
+  site short of reachable — **that call site was built 2026-08-10** and the module is driven).
   `surprisal` and `temper` were on this list and were wired **by the instance's joins rather than by
-  a sweep**, which is the intended order. **`kelvin` is still unreached and is not on the active
-  line**; it gets a driver or removal on its own terms.
+  a sweep**, which is the intended order. **Re-measured 2026-08-13, two of those entries are no
+  longer true and were stated as current for three days:** `kelvin` is driven by
+  `crates/holonic-engine/examples/the_loop_carries_its_circulation.rs:58` as of `27fc74d`
+  (2026-08-10), and `soma/abi::cuda_execution` **was deleted** the same day —
+  `soma/abi/src/lib.rs:16` records it and the file is gone. Only `communication` remains in-degree
+  zero. The census carries its date; the `now` reading did not, and was copied into this file, the
+  roadmap and the spine unchanged.
 - **Every large `soma/life` learning organ named in the capability record is undriven** —
   `agentic_language` and all six submodules, `relational_language` and all five, `text_material`
   (until `e429c22`), `laboratory_language`, `agentic_research`, `dialogue_lineage`. They ran only

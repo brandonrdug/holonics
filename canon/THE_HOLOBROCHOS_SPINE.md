@@ -485,11 +485,11 @@ reappearing under different names.
 **Measured 2026-08-08 by grepping every public type each defines against the whole tree.** The `then`
 column is what that census returned; `now` records what the instance's joins have since wired.
 
-| module | lines | then | now |
+| module | lines | then | now (re-measured 2026-08-13) |
 |---|---|---|---|
-| `communication` | 400 | 0 | **0** |
-| `kelvin` | 642 | 0 | **0** |
-| `soma/abi::cuda_execution` | 273 | 0 | **0** |
+| `communication` | 400 | 0 | **0** — the one that is still true |
+| `kelvin` | **644** | 0 | **driven** — `examples/the_loop_carries_its_circulation.rs:58`, `27fc74d`, 2026-08-10 |
+| ~~`soma/abi::cuda_execution`~~ | ~~273~~ | ~~0~~ | **DELETED 2026-08-10**, `soma/abi/src/lib.rs:16` |
 | `soma/life::research_intelligence` | 772 | 0 | **driven 2026-08-10** — `eros_heterogeneous_research_world`; and it could not have run before, see below |
 | `surprisal` | 593 | 0 | **consumed on a library path** by `situated_residual.rs`, through `use crate::surprisal::{…}` at `:84` |
 | `temper` | 597 | 0 | wired by the return join — see `blueprint/THE_ROADMAP.md` |
@@ -498,8 +498,11 @@ column is what that census returned; `now` records what the instance's joins hav
 exact symbolic measure and the material loop carrying its circulation — §1's `j ≠ 0` cut. Both were
 unreachable when deposited. A deposit that names an organ built and does not state its reach has not
 graded it; `CLAUDE.md` §8 says reach is part of the grade, and neither was measured against it at the
-time. **`kelvin` is still unreached**, is not on the instance line, and gets a driver or removal on
-its own terms.
+time. **`kelvin` got its driver on 2026-08-10** and the sentence that stood here — *"`kelvin` is
+still unreached, is not on the instance line, and gets a driver or removal on its own terms"* — is
+withdrawn 2026-08-13. It was false in three live documents simultaneously, and in the same table as a
+module that had been deleted, because the `now` column of a 2026-08-08 census was copied forward
+three times without re-running the census.
 
 **And the reach instrument was itself the defect it names.** The first attempt at measuring
 `surprisal`'s new reach matched bare item names, counted `Grain` inside `ReceiverGrainId` and

@@ -178,17 +178,25 @@ than asserting disjointness.
 
 ## 4. What the engine is missing, measured
 
-0. **No regime reading — added 2026-08-13, and it is upstream of every item below.** §1.1 shows the
-   cooling stroke's middle row has a termination condition set by the material, and this body carries
-   no organ that reads it. The instrument exists as a **measured partial and has no live owner**: the
-   frozen laboratory's `d̂ = rank(span)/rank(|S|)`, carried as a rank pair of exact integers with the
-   verdict taken by integer compare and the decimal cast only at the print, calibrated on eight
-   deterministic walks of known dimension and then turned on the machine's own lattice. Its
-   float-purity discipline exists because Brandon caught the first draft dividing in floating point.
-   **Live measurement, 2026-08-13:** zero Rust owners across `crates/` and `soma/` for `fractal`,
-   `hausdorff`, `box.count`, `mandelbrot`, `julia`, `hutchinson`, `iterated.function`. The registry
-   owns the mathematics — `H.0295` Hausdorff measure and fractal dimension, `H.0256` the Hutchinson
-   map — so this is a missing **organ**, not a missing theory.
+0. ~~**No regime reading**~~ — **CLOSED THE SAME DAY IT WAS WRITTEN, and the pair is kept because it
+   is the defect this whole file is about.** §1.1 shows the cooling stroke's middle row has a
+   termination condition set by the material. The paragraph that stood here read *"this body carries
+   no organ that reads it"* and reported a **live measurement dated 2026-08-13: zero Rust owners
+   across `crates/` and `soma/` for `fractal`, `hausdorff`, `box.count`, `mandelbrot`, `julia`,
+   `hutchinson`, `iterated.function`.* By the end of that day `crates/holonic-engine/src/regime_reading.rs`
+   existed, cited *this passage* as the gap it closes, and the same grep returned ten hits — all in
+   it. The absence claim was true when taken and false in the tree this file was committed into, and
+   nothing in the deposit machinery noticed, because an absence is a measurement and this one carried
+   its date but not its expiry.
+
+   The organ is the frozen laboratory's `d̂ = rank(span)/rank(|S|)`, carried as a rank pair of exact
+   integers with the verdict taken by integer compare and the decimal cast only at the print,
+   calibrated on eight deterministic walks of known dimension and then turned on the machine's own
+   lattice. Its float-purity discipline exists because Brandon caught the first draft dividing in
+   floating point. The registry owns the mathematics — `H.0295` Hausdorff measure and fractal
+   dimension, `H.0256` the Hutchinson map. **What remains open is not the organ but its reach:** the
+   module is one day old and its calibration is against declared walks, not against the machine's
+   own cooling stroke, which is what §1.1 actually asks for.
 
 0b. **The engine cannot do scale, and its own coupling is a scale invariance.** `dilation.rs` is a
    receiver horizon (`horizon ≥ covering → GAUGE`, `horizon < covering → RESTRICTION`), not a group

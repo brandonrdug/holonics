@@ -85,6 +85,11 @@ SPINE = [
     "canon/THE_QUOTE_NETWORK.md",
     "canon/THE_EXPLORATIVE_FAILURE.md",
     "canon/THE_MEASURED_CAPABILITIES.md",
+    # Inserted 2026-08-13. It was added to CLAUDE.md's pickup table the same day and omitted here,
+    # and `--check` could not catch it: the check compares the index against this list, never this
+    # list against CLAUDE.md. A generator that declares itself a copy of another file's order and is
+    # never compared to it is exactly the receipt-versus-implementation gap the contract convicts.
+    "canon/THE_TIMELINE.md",
     "blueprint/THE_ROADMAP.md",
     "CONSTRUCTION_STATE.md",
     "THE_CLAIM_INDEX.md",

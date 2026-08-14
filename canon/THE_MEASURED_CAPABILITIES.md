@@ -139,7 +139,7 @@ Each has a live owner, verified by one grep.
 | # | mechanism | owner |
 |---|---|---|
 | **M1** | conditioning changes what can be derived; withholding it removes conduct | `conditioned_derivation.rs` |
-| **M2** | removing structure removes later conduct **and reopens what maximality suppressed** | `without_stem` at `conditioned_derivation.rs:352`, driven with both controls at `derivation_codec_intake.rs:1250` |
+| **M2** | removing structure removes later conduct **and reopens what maximality suppressed** | `without_stem` at `conditioned_derivation.rs:525` and `:1758` (re-measured 2026-08-13; `:352` was stale), driven with both controls at `derivation_codec_intake.rs:1250` |
 | **M3** | withholding structure **increases** plurality | `derivation_atlas.rs:2012`, `substitution_realizers.rs:1179` |
 | **M4** | an exact quotient's loss is exhibitable as a **separating word** | `receiver_exact_compression.rs:445` |
 | **M5** | two receivers disagreeing founds an invariant **neither holds** | `gluing.rs:518` |
@@ -301,13 +301,22 @@ And `arithmetic_monodromy.rs` is a **different local system** — `Gal(F̄_p/F_p
 `π₁(ℙ¹∖{0,1,∞})` on solution fibers. Same word, two objects, classical bridge stated in canon and
 joined by no code.
 
-**Two untested invariances of the project's own central claim.** `cross_ratio` is a **private** fn in
-`relational-geometry`; `ProjectiveTurn` is in `holonic-engine`, which depends on it — so
-`cross_ratio(T·p) == cross_ratio(p)` **cannot be written where either currently lives**. And
-`ProjectiveTurn`'s own group laws are untested: nothing asserts
-`T.followed_by(T.inverse()).is_projective_identity()`, nor associativity.
+~~**Two untested invariances of the project's own central claim.** `cross_ratio` is a **private** fn
+in `relational-geometry`… so `cross_ratio(T·p) == cross_ratio(p)` **cannot be written where either
+currently lives**.~~ **WITHDRAWN 2026-08-13 by opening the file.** `cross_ratio` is
+`pub fn` at `crates/relational-geometry/src/receiver_atlas.rs:664`, exported through
+`lib.rs:12`, imported at `crates/holonic-engine/examples/the_swing_is_the_invariant.rs:64`, and that
+driver prints exactly `cross_ratio(T.p) == cross_ratio(p)`; its own header records that *"the seam
+was closed by publishing the reading."* What stands: `ProjectiveTurn`'s group laws are still
+untested — nothing asserts `T.followed_by(T.inverse()).is_projective_identity()`, nor associativity.
 
-**The gauge standard to copy**, and the one that fails it: `rebase_invariants.rs:1220` collects three
-pivot walks into a set and **asserts `walks.len() == 3`** — *"or their agreement is one computation
-compared with itself twice."* `receiver_atlas.rs:693` asserts `receiver_values.len() == 2`, which
-counts **receivers, not distinct projections**. One assertion from being a real gauge test.
+**The gauge standard to copy:** `rebase_invariants.rs:1361` collects three pivot walks into a set and
+**asserts `walks.len() == 3`** — *"or their agreement is one computation compared with itself
+twice."* (`:1220` is the test's name, not the assertion.) The counter-example this paragraph used to
+name — *"`receiver_atlas.rs:693` asserts `receiver_values.len() == 2`, one assertion from being a
+real gauge test"* — is **stale, and it cited the file to the wrong crate**: no `receiver_atlas`
+module exists under `holonic-engine` at all, and the real owner at
+`crates/relational-geometry/src/receiver_atlas.rs:746-762` records that it
+asserted only the count *until 2026-08-08*, and now takes the orbit first and requires the two
+receivers to differ at every mark. **The defect was repaired the same day this file was deposited
+naming it.**

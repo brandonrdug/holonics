@@ -4,7 +4,9 @@
 **Truth status:** `established-bounded` — every row is git, a record on disk, or a verbatim message
 in a conversation log, each with its location.
 **Evidence:** `measured`. 259 commits `be93ed3` (2026-08-03 15:38) → `1921b86` (2026-08-12 19:08);
-73 records in `research/records/`; Brandon's messages from
+**368 records in `research/records/`, all tracked** — of which 63 are dated 08-03 or later and 52
+were added by commits after the 08-03 import, which is the number this line meant. It said **73**,
+a figure that matches no reading of the directory (corrected 2026-08-13). Brandon's messages from
 `~/.claude/projects/-home-b-Workspaces-holonics/*.jsonl` (5 sessions, 90 MB streamed),
 `~/.claude/history.jsonl`, and `~/.codex/sessions/2026/08/**` (main threads only, subagent
 rollouts excluded).
@@ -45,7 +47,7 @@ entered 08-05 16:54 and ran 08-06 → 08-11 and 08-13. Fable 5 took session `f8d
 | **08-10** | Claude | 36 | 9 | unification/notation deposit; tower → multiquadratic → hinge deficit; correspondence atlas + claim index + **Millennium frame**; GPU/device repair wave | bra-ket and Feynman as **tools, not ornament**; compression as non-commutation; the manifold; **hardware is physical, not analogy** |
 | **08-11** | Claude → Fable | 21 | 3 | intelligence ontology; operations dialect; corpus seal, host-identity excision `16,149 → 0` | *"Intelligence does not cost gigawatts"*; **grades retired**; the material ruling; **the Millennium scope ruling** |
 | **08-12** | Sol | 12 | 9 | reconstruction fiber; recurrent sections on the card; causal profiling; source-detached recurrent law; interpreter-free code-material | geometry is innate; industry nouns are charts; **caustics**; Quantum Information Dynamics; the Python experiment; **the finger-trap** |
-| **08-13** | Claude | **0** | 2 (untracked) | Gemma-4-E4B read exactly; `exact_spectrum` on foreign weights; this campaign | weight files as poorly-rendered maps; lightning and structure groups; **finite elementary set / infinite moduli**; the cargo-plane joke |
+| **08-13** | Claude | **0 until 23:0x, then 3** | **9** | Gemma-4-E4B read exactly; `exact_spectrum` rebased `Z/p`, 93.1 s → 0.118 s; the active mouth; the audit that closed the day | weight files as poorly-rendered maps; lightning and structure groups; **finite elementary set / infinite moduli**; the cargo-plane joke; scale is not linear; the CPU is not "the host" |
 
 **Gate figures, in order:** 543 (08-07 13:12, the import) → 953 → 1,121 → 1,512 → 1,629 → 1,701 →
 1,717 → 2,015 (08-10) → 2,033 (08-11) → 2,184 (08-12) → 2,186 (08-13).

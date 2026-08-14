@@ -33,6 +33,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 | `canon/THE_QUOTE_NETWORK.md` | **The quote network** — Brandon asked for this artifact by name, twice, in the same message: |
 | `canon/THE_EXPLORATIVE_FAILURE.md` | **The explorative failure** — It states the condition that identifies one recurring assistant failure, the trigger that precedes it, its measured instances, the ontology in this project's own words that refutes it, and… |
 | `canon/THE_MEASURED_CAPABILITIES.md` | **THE MEASURED CAPABILITIES — what the machine has actually done** — **Why this file exists, restated by Brandon on 2026-08-13 because it was being read as the wrong kind of object:** |
+| `canon/THE_TIMELINE.md` | **The timeline — every day of this repository, what was asked, what returned, and what was lost** — **Evidence:** `measured`. 259 commits `be93ed3` (2026-08-03 15:38) → `1921b86` (2026-08-12 19:08); **368 records in `research/records/`, all tracked** — of which 63 are dated 08-03 or later… |
 | `blueprint/THE_ROADMAP.md` | **The roadmap** — **This is the single active roadmap, and it is ordered by `canon/THE_HOLOBROCHOS_SPINE.md`.** Read the spine first. |
 | `CONSTRUCTION_STATE.md` | **Construction state** — **The position record. One file, no siblings** (`canon/THE_DOCUMENT_LAW.md` §1.4). |
 | `THE_CLAIM_INDEX.md` | **The claim index** — **What it is for.** Four partial indexes existed and none knew about the others: `CLAUDE.md` §0's pickup order, `THE_MATHEMATICS_TABLET` §3's tablet list, `research/README.md` (records… |
@@ -83,7 +84,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 | `canon/THE_OWNER_ATLAS.md` | **The owner atlas: which owner implements or states this, and where** — **What this is, and what it is not.** `canon/THE_DIALECT.md` maps Brandon's language. |
 | `canon/THE_QUOTE_NETWORK.md` | **The quote network** — Brandon asked for this artifact by name, twice, in the same message: |
 | `canon/THE_RECOVERED_LAW.md` | **The recovered law** — **Why this file exists.** The laboratory's answer to drift was `FORMULA.md`: one canon, read on demand, with a versioned reading rule at the top and per-claim grades — cited 212 times,… |
-| `canon/THE_TIMELINE.md` | **The timeline — every day of this repository, what was asked, what returned, and what was lost** — **Evidence:** `measured`. 259 commits `be93ed3` (2026-08-03 15:38) → `1921b86` (2026-08-12 19:08); 73 records in `research/records/`; Brandon's messages from… |
+| `canon/THE_TIMELINE.md` | **The timeline — every day of this repository, what was asked, what returned, and what was lost** — **Evidence:** `measured`. 259 commits `be93ed3` (2026-08-03 15:38) → `1921b86` (2026-08-12 19:08); **368 records in `research/records/`, all tracked** — of which 63 are dated 08-03 or later… |
 | `canon/THE_TRAFFIC_SYSTEM.md` | **The traffic system** — It carries one of Brandon's longest-running analogies, which had **no canon presence at all** until 2026-08-09 — `grep -i 'traffic\\|automobile' canon/` returned zero — while the law it… |
 
 ---
@@ -205,7 +206,7 @@ outside `tools/` that names the verifier — not declared.
 | `tools/gates.sh` | The gate sequence. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `blueprint/THE_MACHINE.md`, and 3 more |
 | `tools/lean_check.sh` | Give the formal sources a verdict. | `blueprint/THE_ROADMAP.md`, `canon/THE_EXPLORATIVE_FAILURE.md`, `research/records/2026-08-09_THE_COMMITTED_BOUNDARY_ARTIFACT_IS_STALE_AND_CANNOT_BE_REBUILT.md` |
 | `tools/output_manifest.py` | Bind every returned artifact under `output/` to its content hash, in a TRACKED file. | `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, `meta/OUTPUT_MANIFEST.tsv`, and 2 more |
-| `tools/resolve_named_paths.py` | Every path a governing document names must resolve in the body that document describes. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, and 11 more |
+| `tools/resolve_named_paths.py` | Every path a governing document names must resolve in the body that document describes. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, and 12 more |
 
 `cargo test --workspace` is the gate that is actually run alongside these.
 

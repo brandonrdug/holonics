@@ -17,6 +17,15 @@ so. `THE_CLAIM_INDEX.md` is generated from titles and therefore cannot carry a l
 **None of them answers "which owner does this, and at what line."** That question was asked four
 times in one evening and each answer cost a full sweep. This file is that answer, written down.
 
+**Every line number here binds to `f4af044`, and a line number is the most perishable thing an index
+can carry.** Audited 2026-08-13, the day of deposit: thirteen citations sampled, **thirteen of
+thirteen resolve exactly at the commit, ten of thirteen already fail against the working tree** —
+because twelve of the nineteen files this atlas cites were edited the same day. That is not a defect
+in the sampling; it is the standing condition of the genre. **Read a citation here as `file` plus a
+hint, and confirm the construct with `grep -n` before quoting it.** When the two disagree the code
+governs, and the repair is to re-take the line rather than to trust it. The atlas earns its keep by
+naming *which file owns the thing* — that answer survives edits; the address does not.
+
 ## 0 · The aperture, declared
 
 **This atlas covers the subjects swept on 2026-08-13 and no others.** Those subjects are: the intake

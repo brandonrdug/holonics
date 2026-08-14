@@ -49,7 +49,9 @@ after a comparative audit. It lives at `archive/cpp-engine/` and nothing there i
 below that speak of headers, deeds, `ctest`, CUDA executors or `R{i}` chains describe that archived
 body and are **provenance**, not the present position.
 
-Read these nine, in order, and nothing else by default:
+Read these **ten**, in order, and nothing else by default. (It said "nine" over a table of ten from
+2026-08-13, when the timeline was inserted without recounting — the same defect as the paragraph
+below that convicts itself for saying "seven" gates. **Count the rows; do not carry the word.**)
 
 | file | what it is |
 |---|---|
@@ -355,9 +357,12 @@ join.
 - **The whip is gear ratios, not amplification.** *"It doesn't amplify it. Gear ratios."* The
   2026-07-31 deposit grounds it in Goriely–McMillen: the effect is *"a consequence of changing local
   **impedance** and geometry"*, which puts the whip on the same transport law as the Smith chart.
-- **Two authored-level line citations in this file were wrong** and are corrected in place:
-  `ConditionedBody::without_stem` is at `conditioned_derivation.rs:1516`, and the Schur elimination
-  is `diffusion.rs:470-500`.
+- **Two authored-level line citations in this file were wrong** and were corrected in place on
+  2026-08-10 to `conditioned_derivation.rs:1516` and `diffusion.rs:470-500`. **The first has drifted
+  again and is now `:1758`** (measured 2026-08-13). A line number is the most perishable thing a
+  document can carry: it is invalidated by any edit above it, and this one has now been wrong twice
+  in four days. **Cite the construct, and let the line be a hint** — `grep -n 'fn without_stem'`
+  costs nothing and cannot go stale.
 
 ---
 
@@ -1196,8 +1201,9 @@ target.**
 
   **The fourth — deleting a founded fiber and re-querying — WAS said here to have no implementation
   anywhere. That is false of the body, and corrected 2026-08-08.** It exists as
-  `FoundedMorphology::without_stem` (`conditioned_derivation.rs:352`) and
-  `ConditionedBody::without_stem` (`:1516`), and it is driven **with both controls** at
+  `FoundedMorphology::without_stem` (`conditioned_derivation.rs:525`) and
+  `ConditionedBody::without_stem` (`:1758`) — both re-measured 2026-08-13, previously cited as
+  `:352` and `:1516` — and it is driven **with both controls** at
   `derivation_codec_intake.rs:1250-1300`: a committed stem the material never exercises, whose
   removal must leave the reading **indistinguishable**; and then, *in canonical order rather than
   chosen*, the first reaching stem whose removal **moves** the reading, required to exhibit the
@@ -1639,8 +1645,23 @@ The grading discipline in `canon/EPISTEMIC_GRADES.md` stands. Three additions:
      claim is narrow: **a quotation deposited during a session whose transcript survives, and absent
      from it, is fabricated.**
 - **The GPU owns the deed.** The CPU handles process boundaries, durable rest, narrow exterior
-  codecs, and offline audits. A run that pins one host core while the card idles is a defect to
+  codecs, and offline audits. A run that pins one core while the card idles is a defect to
   diagnose, not a mystery to narrate.
+
+  **Do not call the CPU "the host."** Brandon, direct ruling 2026-08-13: *"stop calling the CPU the
+  'host', it's just a misnomer. It's a bottleneck in a literal sense if anything, it's a light-cone,
+  a pathway. Same for the GPU, they're just paths that work differently."* The word imports an
+  ownership the physics does not have — a host has guests, and neither surface hosts the other.
+  Measured the day of the ruling: **746 occurrences across 117 Rust files and 87 in governing
+  documents**, so this is a standing sweep, not a one-line fix. Where a CUDA API name contains it,
+  the API name is a foreign codec and stays; the project's own prose does not.
+
+  **And diagnose before you conclude.** The same day, three drivers were reported as pinning one
+  core at 16 MB with the card idle. None of them had a gate holding current at the CPU: their
+  declared material was 8 to 13 items, and there was nothing for a card to carry. *"No GPU
+  activity"* is a symptom with at least three distinct causes — an aperture that cut real material
+  to a toy, a bulk reduction left on the wrong surface, and a device call with no residency that
+  spends its time re-uploading an invariant operand. **Measure which one before repairing.**
 - **Return the artifact.** A generated proof, text, image, classification, or obstruction must
   itself be returned and inspected. Counts, morphology totals, atlases, and diagnostics are
   supporting receipts and never substitutes.
@@ -1810,7 +1831,7 @@ that demand as four parts. **Two are now built, 2026-08-07:**
 | **certified remainder** | **built, twice.** `crates/holonic-engine/src/exact_value.rs` for series tails; and `crates/holonic-engine/src/receiver_exact_compression.rs`, whose collapsed population is a *counted, exhibitable* remainder — each pair carrying the shortest input word that separates it and the receiver that sees the difference, which is the form `canon/THE_RECOVERED_LAW.md` specifies for compression's exact loss. |
 | **reopening rule keyed to the receiver family** | **built.** `crates/holonic-engine/src/gluing.rs`. The Mayer–Vietoris connecting map `δ` is keyed to which cover — which *receivers* — you chose, and it returns what the union carries that neither piece does. |
 | **supported realizer population** | **built and driven, 2026-08-08.** `crates/holonic-engine/src/substitution_realizers.rs`. Each declared `skein::Substitution` is a realizer whose landings are `substitution.added()`; refusals are retained as a typed population; admission is under a declared aperture that the return now *carries* rather than erases. |
-| **positive form** | **CORRECTED 2026-08-11 by reading the owner: `positive_form` was REMOVED 2026-08-08**, the same day this row credited it, and the row survived three days stale. The module's own header carries the reason: `xᵀ(MᵀM)x = \|Mx\|² ≥ 0` for *every* integer matrix and *every* probe — a positivity that cannot fail, which §8 convicts as a check whose material cannot vary the property under test. The module's honest content is **rank and cokernel** (see `the_gram_nullity_is_the_corank_of_the_incidence`), and `induced_placement` computes Gram rank/nullity — no spectral placement is induced. **The demanded positive form — one whose positivity CAN fail — remains open**, and the standing example of the right shape is `matroid_hodge_riemann`, whose outside-the-cone classes are *required to break* it and do. |
+| **positive form** | **RE-CORRECTED 2026-08-13 by opening the file: `positive_form` is LIVE.** It is `crates/holonic-engine/src/supported_realizers.rs:173`, called from `induced_placement` at `:333`, and imported by three drivers — `substitution_realizer_placement.rs:47`, `derivation_moves.rs:54`, `the_realizer_places_itself.rs:82`. The 2026-08-11 row said it *"was REMOVED 2026-08-08"* and that was a **misparse of the module's own sentence**: the header reads *"A test asserting it was removed 2026-08-08"*, whose subject is **the test**, not the function. What was removed is the assertion that `MᵀM` is positive semi-definite — rightly, because `xᵀ(MᵀM)x = \|Mx\|² ≥ 0` for *every* integer matrix and *every* probe, a positivity that cannot fail, which the tautology rule convicts as a check whose material cannot vary the property under test. **What stands unchanged is the open item:** the module's honest content is rank and cokernel (`the_gram_nullity_is_the_corank_of_the_incidence`), `induced_placement` computes Gram rank/nullity, no spectral placement is induced, and **the demanded positive form — one whose positivity CAN fail — remains open.** The standing example of the right shape is `matroid_hodge_riemann`, whose outside-the-cone classes are *required to break* it and do. **Carry the misparse, not just the repair:** a correction that convicted a live organ, deposited in the file every session reads first, survived two days and would have caused the next session to rebuild what it already owns. |
 
 The remaining two were **one** thing, not two, and §2 said why: placement is the fixed locus of the
 involution *a realizer induced*, so positivity is supplied by supportedness rather than obtained

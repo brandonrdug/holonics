@@ -1909,11 +1909,15 @@ missing object is an **edge**.
   take one. **Neither file references the other.** `temper` has in-degree 0 from everything. This is
   the closest thing in the workspace to a return path built on both sides with no caller between
   them.
-- **`supported_realizers::positive_form` → `inertia::from_integer_matrix`.** Joined by an
+- ~~**`supported_realizers::positive_form` → `inertia::from_integer_matrix`.** Joined by an
   `assert_eq!` at `supported_realizers.rs:276`, inside the `#[cfg(test)]` module opened at `:273`,
-  and by nothing on any conduct path. `CLAUDE.md` §2's realization-causes-placement chain runs
-  through exactly this pair, so the chain the project's own doctrine names is currently a test
-  assertion.
+  and by nothing on any conduct path.~~ **CLOSED, and this row was wrong in every particular —
+  struck 2026-08-13 by opening the file.** The `#[cfg(test)]` module opens at `:338`, not `:273`;
+  `:276` is inside a `landings` loop; and the module's own doc at `:293-297` records that the pair
+  was joined only inside `#[cfg(test)]` **until 2026-08-10**, naming its conduct-path caller
+  `examples/the_realizer_places_itself.rs`. The chain the project's doctrine names has run on a
+  conduct path for three days. What remains open is not this join but the **positive form whose
+  positivity can fail** — see the open-work table.
 
 **What replaces it.** One conducted return, built at the `temper`/`derivation_integral` pair because
 both halves already exist and the type already matches: the movement between two readings enters the
@@ -1935,21 +1939,33 @@ result is *which cut moved*.
 **Measured, in-degree zero from everything, each verified by grepping every public type it defines
 against the whole tree:**
 
-| module | lines | at the census | now |
+| module | lines | at the census | now (re-measured 2026-08-13) |
 |---|---|---|---|
-| `crates/holonic-engine/src/kelvin.rs` | 642 | **0** | **0** |
-| `crates/holonic-engine/src/communication.rs` | 400 | **0** | **0** |
+| `crates/holonic-engine/src/kelvin.rs` | **644** | **0** | **driven** — `examples/the_loop_carries_its_circulation.rs:58`, committed `27fc74d` 2026-08-10 |
+| `crates/holonic-engine/src/communication.rs` | 400 | **0** | **0** — still the one true entry |
 | `soma/life/src/research_intelligence.rs` | 772 | **0**, out-degree 8 | **driven 2026-08-10** |
-| `soma/abi/src/cuda_execution.rs` | 273 | **0** | **0** |
+| ~~`soma/abi/src/cuda_execution.rs`~~ | ~~273~~ | ~~**0**~~ | **DELETED 2026-08-10** — `soma/abi/src/lib.rs:16` records the removal; the file does not exist |
 | `crates/holonic-engine/src/surprisal.rs` | 593 | **0** | **consumed** — `situated_residual.rs`, library path |
 | `crates/holonic-engine/src/temper.rs` | 597 | **0** | wired by the return join |
+
+**Two of those six rows were false for three days, and the census is why.** The "now" column was
+carried forward from a mechanical sweep taken 2026-08-08 and never re-run, so a module that acquired
+a driver on 08-10 and a module that was deleted on 08-10 both still read as unreached on 08-13. A
+census is a measurement and decays like one. **Re-run it before quoting it**, and note that the
+named-path gate did not catch the deleted file because a mirror copy sits under
+`reference/engine-a07ff376/`, so a live document naming a deleted live path resolved against an
+archived one.
 
 **`surprisal` and `kelvin` were built here within two days of that census** — the exact symbolic
 measure and the material loop carrying its circulation, which *is* the spine's `j ≠ 0` cut — and
 neither was reachable when deposited. `CLAUDE.md` §8 states that **reach is part of the grade**; those
 deposits did not state it, and this row is the correction. `surprisal` and `temper` were wired by the
-instance's joins rather than by a sweep, which is the intended order. **`kelvin` is still unreached**
-and is not on the instance line.
+instance's joins rather than by a sweep, which is the intended order. **`kelvin` acquired its driver
+on 2026-08-10** — `the_loop_carries_its_circulation.rs` — and the sentence that stood here until
+2026-08-13, *"`kelvin` is still unreached and is not on the instance line"*, is withdrawn. The
+operating contract had already recorded driving it, including the measured nine-of-nine junction
+result, while this file went on calling it unreached; two live documents disagreeing about one
+module for three days is the defect, not the module.
 
 **`research_intelligence.rs` was fully constructed and one call site short of reachable, and that
 call site now exists.** `soma/life/examples/eros_heterogeneous_research_world.rs` mounts the atlas,
