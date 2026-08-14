@@ -97,6 +97,48 @@ const LATER_NEAR_GEOMETRY: &str = "canon/TABLET_THE_CHART.md";
 /// reading is believed.
 const DECLARED_APERTURES: [usize; 2] = [1, 64];
 
+/// **Every body is truncated to a declared common extent, and this is a control
+/// rather than a convenience.**
+///
+/// The first run of this deed used the bodies at their natural sizes: the
+/// conditioning bodies were 371 and 1,131 lines and the later bodies 106 and 321
+/// — a factor of three in the same direction on both axes. The aperture
+/// threshold is an **absolute** count of asking pairs, so a larger body clears it
+/// more easily, and the crossing could have been a size effect wearing a subject
+/// effect. Under the natural sizes grain `A` had exactly one cut word grain `C`
+/// did not, while `C` had 181 that `A` did not.
+///
+/// So the extents are declared and equal. The reading is taken at both, and the
+/// question is whether the crossing survives the balance.
+const CONDITIONING_EXTENT: usize = 340;
+const LATER_EXTENT: usize = 100;
+
+/// A declared common extent, sampled by **stride across the whole body** rather
+/// than taken from its head.
+///
+/// Head truncation was the first balance and it is the wrong one: a tablet's
+/// first hundred lines are its preamble, and preambles are far more alike across
+/// documents than bodies are. Balancing that way equalises size and destroys the
+/// subject signal at the same time, so a null result cannot be read. Measured:
+/// under head truncation both later bodies favoured the same deposit, which is
+/// what a washed-out subject looks like.
+///
+/// A stride spans the whole document, so every body contributes material from
+/// end to end at a declared common extent. The stride is derived from the body's
+/// own length and the declared extent; nothing here is tuned.
+fn balanced(paths: &[&str], extent: usize) -> Vec<Vec<Symbol>> {
+    let whole: Vec<Vec<Symbol>> = paths.iter().flat_map(|path| lines_of(path)).collect();
+    if whole.len() <= extent {
+        return whole;
+    }
+    let stride = whole.len() / extent;
+    whole
+        .into_iter()
+        .step_by(stride.max(1))
+        .take(extent)
+        .collect()
+}
+
 /// The grain a conditioning body's own collapsed pairs derive, at a declared
 /// aperture. Nothing here is authored but the threshold, and its orbit is shown.
 fn derive_grain(
@@ -231,12 +273,21 @@ fn main() {
     println!("{}", "=".repeat(104));
     println!();
 
-    let circulation: Vec<Vec<Symbol>> = CIRCULATION_BODY.iter().flat_map(|p| lines_of(p)).collect();
-    let geometry: Vec<Vec<Symbol>> = GEOMETRY_BODY.iter().flat_map(|p| lines_of(p)).collect();
-    let near_circulation = lines_of(LATER_NEAR_CIRCULATION);
-    let near_geometry = lines_of(LATER_NEAR_GEOMETRY);
+    let circulation = balanced(&CIRCULATION_BODY, CONDITIONING_EXTENT);
+    let geometry = balanced(&GEOMETRY_BODY, CONDITIONING_EXTENT);
+    let near_circulation = balanced(&[LATER_NEAR_CIRCULATION], LATER_EXTENT);
+    let near_geometry = balanced(&[LATER_NEAR_GEOMETRY], LATER_EXTENT);
+    assert_eq!(
+        circulation.len(),
+        geometry.len(),
+        "the conditioning bodies must be the same declared extent or the aperture is not \
+         comparable across them"
+    );
+    assert_eq!(near_circulation.len(), near_geometry.len());
 
     println!("  THE CROSSING -- two conditioning bodies, two later bodies, one near each.");
+    println!("  Every body sampled by STRIDE to a DECLARED COMMON EXTENT, so the absolute aperture");
+    println!("  threshold is comparable and the sample spans each body end to end.");
     println!();
     println!("  conditioning A (circulation)  {:>5} lines   {:?}", circulation.len(), CIRCULATION_BODY);
     println!("  conditioning C (geometry)     {:>5} lines   {:?}", geometry.len(), GEOMETRY_BODY);

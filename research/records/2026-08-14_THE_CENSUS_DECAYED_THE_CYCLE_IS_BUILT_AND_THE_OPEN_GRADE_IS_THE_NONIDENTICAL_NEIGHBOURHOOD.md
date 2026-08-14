@@ -520,3 +520,55 @@ machine-independence is known not to extend. The population is the object throug
 form is its magnitude face, printed beside it. Two conditioning bodies and two later bodies is a
 crossing of **four readings**, not a population of experiments; nothing here is a rate and no figure
 is an average.
+
+---
+
+## 10. The size confound, controlled — and the crossing survives it
+
+§9 named the asymmetry as owed: the conditioning bodies were 371 and 1,131 lines and the later bodies
+106 and 321 — **a factor of three in the same direction on both axes** — while the aperture threshold
+is an *absolute* count of asking pairs, so a larger body clears it more easily. The crossing could
+have been a size effect wearing a subject effect.
+
+Three readings were taken. **The order they were taken in is part of the evidence and is stated
+first**, because the difference between the second and the third is a degree of freedom in how a
+common extent is sampled, and choosing the sampling that returns a result would be a dial turned
+inside one rung.
+
+| # | how the extent was set | B favours | D favours | crossing |
+|---|---|---|---|---|
+| 1 | **natural sizes** — no balance | A by `+7` | C by `+9` | **holds**, confounded by size |
+| 2 | **head-truncated** to a common extent | **C** by `7` | C by `+26` | **does not hold** |
+| 3 | **stride-sampled** to a common extent | A by `+11` | C by `+9` | **holds** |
+
+**Reading 2's null was diagnosed before reading 3 was run, and the diagnosis is checkable.** A
+tablet's first hundred lines are its *preamble*, and preambles are far more alike across documents
+than bodies are — head truncation equalises size and destroys the subject signal in the same
+operation, so a null there cannot be read as a refutation. The symptom is in the numbers: under head
+truncation **both** later bodies favoured the same deposit, which is what a washed-out subject looks
+like rather than what an absent effect looks like.
+
+A stride spans each body end to end at the declared extent, so it balances size while keeping
+subject. Under it the deposits are `A` 103 cut words and `C` 135, sharing 94, with **9 only to `A`
+and 41 only to `C`** — far more symmetric than the natural sizes' `1` against `181`.
+
+**And the foil does not cross under the balance either** — `B +8`, `D −4` against the derived cut's
+`+11` and `+9` — so the derived cut is distinguishable from a same-shape cut at words the collapsed
+population did not return, on both arms this time rather than on one.
+
+### What the three readings jointly support, and what they do not
+
+They support: **a deposit derived from one body's own collapsed pairs changes what a later,
+nonidentical body reaches, and the change is attributable to that body rather than to refinement in
+general** — because a deposit from an unrelated body does not produce it, and a foil of the same
+shape does not produce it, under a size control that the effect survives.
+
+They do not support any statement about compression, about intelligence, or about a rate. Four
+readings under three balances is twelve numbers, not a population, and none of them is an average.
+The margins remain small — `+11` and `+9` against attributable populations near 100 — and the
+correct reading of a small exact margin is that it is small and exact, not that it is weak evidence
+of something larger.
+
+**The remaining honest gap:** the sampling of a common extent is a declared receiver coordinate, and
+this record carries three of them. A fourth would be worth having only if it were declared before it
+was run.
