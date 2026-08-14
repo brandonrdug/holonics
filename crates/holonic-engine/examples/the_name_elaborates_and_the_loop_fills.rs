@@ -40,7 +40,9 @@
 use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
 
-use holonic_engine::derivation_atlas::{CircuitAperture, Derivation, read_derivation};
+use holonic_engine::derivation_atlas::{
+    CircuitAperture, Derivation, ReachOrientation, read_derivation,
+};
 use holonic_engine::derivation_two_cells::{
     AgreementCriterion, RouteFilling, TwoCellRefusal, betti_at, fill_routes, torsion_at,
 };
@@ -562,6 +564,7 @@ fn the_fillings(derivations: &[Derivation]) -> Vec<Reading> {
             CircuitAperture {
                 identity: holonic_engine::derivation_atlas::DerivationIdentity::ByRoute,
                 coefficient: holonic_engine::derivation_atlas::RecruitmentCoefficient::Incidence,
+                reach: ReachOrientation::IntoDerivation,
                 statements: holonic_engine::derivation_atlas::StatementIncidence::Founded,
             },
         ),

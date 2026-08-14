@@ -49,8 +49,8 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 
 use holonic_engine::derivation_atlas::{
-    CircuitAperture, Derivation, DerivationIdentity, RecruitmentCoefficient, StatementIncidence,
-    read_derivation,
+    CircuitAperture, Derivation, DerivationIdentity, ReachOrientation, RecruitmentCoefficient,
+    StatementIncidence, read_derivation,
 };
 use holonic_engine::derivation_two_cells::{
     AgreementCriterion, AgreementShape, MeaningDirection, RouteFilling, TwoCellRefusal, betti_at,
@@ -608,6 +608,7 @@ struct Reading {
 const BY_ROUTE: CircuitAperture = CircuitAperture {
     identity: DerivationIdentity::ByRoute,
     coefficient: RecruitmentCoefficient::Incidence,
+    reach: ReachOrientation::IntoDerivation,
     statements: StatementIncidence::Founded,
 };
 

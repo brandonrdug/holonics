@@ -23,7 +23,8 @@ use holonic_engine::{
         DerivedPassage,
     },
     derivation_atlas::{
-        CircuitAperture, DerivationIdentity, RecruitmentCoefficient, StatementIncidence,
+        CircuitAperture, DerivationIdentity, ReachOrientation, RecruitmentCoefficient,
+        StatementIncidence,
     },
     derivation_integral::AccumulationRule,
     rebase_invariants::PivotRule,
@@ -1202,6 +1203,14 @@ fn put_aperture(octets: &mut LocalSequence<u8>, aperture: CircuitAperture) {
         StatementIncidence::Withheld => 0,
         StatementIncidence::Founded => 1,
     });
+    // The reach orientation is on the wire, not defaulted on decode. A default would silently
+    // collapse `OutOfDerivation` into the inherited convention on every round trip — the axis
+    // would be carried by the type and lost by the boundary, which is the same shape as a
+    // magnitude crossing a horizon.
+    octets.push(match aperture.reach {
+        ReachOrientation::IntoDerivation => 0,
+        ReachOrientation::OutOfDerivation => 1,
+    });
 }
 
 fn put_accumulation_rule(octets: &mut LocalSequence<u8>, rule: AccumulationRule) {
@@ -1373,10 +1382,21 @@ impl<'a> Cursor<'a> {
                 })
             }
         };
+        let reach = match self.byte("reach orientation")? {
+            0 => ReachOrientation::IntoDerivation,
+            1 => ReachOrientation::OutOfDerivation,
+            tag => {
+                return Err(ReturnedConductBoundaryRefusal::UnknownWireTag {
+                    field: "reach orientation",
+                    tag,
+                })
+            }
+        };
         Ok(CircuitAperture {
             identity,
             coefficient,
             statements,
+            reach,
         })
     }
 

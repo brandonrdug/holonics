@@ -40,7 +40,7 @@ use std::path::{Path, PathBuf};
 use holonic_engine::conditioned_derivation::{
     ConditionedBody, ConditionedCircuit, DerivationQuery, Exposure, expose,
 };
-use holonic_engine::derivation_atlas::CircuitAperture;
+use holonic_engine::derivation_atlas::{CircuitAperture, ReachOrientation};
 use holonic_engine::derivation_curvature::{
     DerivationCurvatureBody, ScaffoldLink, ScaffoldLinkLaw,
 };
@@ -93,6 +93,7 @@ fn declared(deposit: Vec<(String, String)>) -> ConditionedCircuit {
             CircuitAperture {
                 identity: holonic_engine::derivation_atlas::DerivationIdentity::ByDeclaration,
                 coefficient: holonic_engine::derivation_atlas::RecruitmentCoefficient::Incidence,
+                reach: ReachOrientation::IntoDerivation,
                 statements: holonic_engine::derivation_atlas::StatementIncidence::Withheld,
             },
         )
