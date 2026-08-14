@@ -969,6 +969,31 @@ link is a rebase with zero remainder and the crack is the composed ratio. That i
 amplify it. Gear ratios."* as a theorem. **An abrupt step is a compression, and the reflected wave is
 its remainder** — reflection is not loss, it is the retained fiber of a junction that did not match.
 
+### The orientation axis, and why it is the imaginary one
+
+**Brandon's ruling, 2026-08-14, and it decides what an aperture axis is:** the reach orientation
+*"is likely the same 'imaginary' axis I am referring to within the Holonic Interaction. In general
+that is what the complex axis and the complex plane is attained by; an orthogonal axis that in
+classical terms seems 'imaginary' and not implicit, but in holonics it is indeed implicit, and it is
+not really 'complex' or 'imaginary', it is just how things work, **nothing is causally represented
+along only one axis**."*
+
+So an axis is not an optional extra frame a reading may declare. **Representing something along one
+axis is the error**, and the second axis is recovered rather than added. `derivation_atlas` founded
+a reach 1-cell with the same sign as a recruitment cell, so the statement a derivation *proved* was
+an input to it, no vertex ever had both an in-edge and an out-edge, every route was one hop, and
+theorem chaining could not form — measured across four committed deposit directories.
+
+`ReachOrientation::{IntoDerivation, OutOfDerivation}` is that axis, with the inherited convention as
+the default so nothing that stands moves. Measured on committed deposits: **14 joined at longest 2
+against 29 joined at longest 3**, four distinct readings over five declared apertures, and the
+three-step route `KernelWitness → carrier_transport → |- (P : Prop) (h : P) : exactCarrier P`
+returning where none existed before. The falsifier is theorem chaining itself — one proof reaching
+the proof that uses its theorem — and it returns `Unreached` under the inherited orientation and a
+route through the theorem under the other. **On a pure recruitment chain the two are a symmetry**,
+which is asserted rather than assumed: an axis that moved every reading would be suspicious, and
+this one moves exactly the join a theorem sits in.
+
 ### What reversibility is, and what it is not
 
 *"the reversed path can be reconstructed, but it is not certain… they can only reconstruct an

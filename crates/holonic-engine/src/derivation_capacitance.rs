@@ -174,7 +174,8 @@ use thiserror::Error;
 
 use crate::algebraic::CausalCellId;
 use crate::derivation_atlas::{
-    CircuitAperture, Derivation, DerivationCircuit, DerivationIdentity, statement_vertex_key,
+    CircuitAperture, Derivation, DerivationCircuit, DerivationIdentity, ReachOrientation,
+    statement_vertex_key,
 };
 use crate::receiver_current::{
     ExactReceiverCurrentError, ExactReceiverCurrentLaw, ExactReceiverCurrentPassage,
@@ -1422,6 +1423,117 @@ mod tests {
         .expect("the circuit founds a passage ecology")
     }
 
+    /// **The orientation is the second axis, and the material that exhibits it is theorem
+    /// chaining itself.**
+    ///
+    /// `alpha` proves `S`; `beta` recruits `S` and proves `T`. Under the inherited
+    /// `IntoDerivation` convention the statement is a SOURCE feeding both proofs, so `alpha` and
+    /// `beta` are unrelated and no route joins them: the proof that established `S` and the proof
+    /// that uses it are disconnected, which is exactly the join a dependency tree of mathematics
+    /// is made of. Under `OutOfDerivation` the proof produces what it proved, so
+    /// `alpha -> |- S -> beta` is a route through the theorem.
+    ///
+    /// The flip is a unimodular basis change, so no vertex moves and no invariant may move; only
+    /// transport does.
+    #[test]
+    fn a_proof_reaches_the_proof_that_uses_its_theorem_only_when_the_reach_points_out() {
+        // beta recruits the STATEMENT alpha proved, which is the 0-cell `|- S`.
+        let derivations = vec![
+            control("alpha", "S", &[]),
+            control("beta", "T", &[&statement_vertex_key("S")]),
+        ];
+
+        let found = |aperture| {
+            CapacitanceMapping::found(
+                &circuit_of(&derivations, aperture),
+                &derivations,
+                &[],
+                CapacityLaw::DistinguishableResults,
+                CharacteristicDelayLaw::Uniform,
+            )
+            .expect("founds")
+        };
+        let into = found(CircuitAperture::STATEMENT_INCIDENT);
+        let out_of = found(CircuitAperture::STATEMENT_PRODUCED);
+
+        // An orientation moves no vertex.
+        assert_eq!(into.site_count(), out_of.site_count());
+        assert_eq!(into.identifiers(), out_of.identifiers());
+
+        // Into the derivation: the statement feeds both proofs and the chain does not form.
+        assert_eq!(
+            into.route("alpha", "beta").expect("both are sites"),
+            RouteReading::Unreached {
+                from: "alpha".to_owned(),
+                to: "beta".to_owned(),
+            },
+            "under the inherited convention a proof cannot reach the proof that uses its theorem"
+        );
+
+        // Out of the derivation: the route exists, passes THROUGH the theorem, and names it.
+        let RouteReading::Reached { routes, .. } =
+            out_of.route("alpha", "beta").expect("both are sites")
+        else {
+            panic!("orienting the reach out of the derivation must join alpha to beta");
+        };
+        assert!(!routes.is_empty());
+        for route in &routes {
+            assert_eq!(route.first().map(String::as_str), Some("alpha"));
+            assert_eq!(route.last().map(String::as_str), Some("beta"));
+            assert!(
+                route.iter().any(|step| step == &statement_vertex_key("S")),
+                "the route must pass through the theorem it chains on: {route:?}"
+            );
+            assert!(route.len() > 2, "and it is longer than one hop: {route:?}");
+        }
+
+        // And the terrain differs: a statement stops being a source when the proof produces it.
+        assert_ne!(into.terrain().len(), out_of.terrain().len());
+    }
+
+    /// **And the axis acts only where a statement mediates.** On a pure recruitment chain —
+    /// derivations naming each other directly — the two orientations return the SAME joined
+    /// population and the same longest route. That is worth asserting rather than assuming: an
+    /// axis that moved every reading would be suspicious, and this one moves exactly the join a
+    /// theorem sits in.
+    #[test]
+    fn on_a_pure_recruitment_chain_the_orientation_is_a_symmetry() {
+        let derivations = chain();
+        let joined = |aperture| {
+            let mapping = CapacitanceMapping::found(
+                &circuit_of(&derivations, aperture),
+                &derivations,
+                &[],
+                CapacityLaw::DistinguishableResults,
+                CharacteristicDelayLaw::Uniform,
+            )
+            .expect("founds");
+            let sites: Vec<String> = mapping
+                .identifiers()
+                .into_iter()
+                .map(str::to_owned)
+                .collect();
+            let mut count = 0usize;
+            let mut longest = 0usize;
+            for from in &sites {
+                for to in &sites {
+                    if from != to
+                        && let Ok(RouteReading::Reached { routes, .. }) = mapping.route(from, to)
+                    {
+                        count += 1;
+                        longest = longest.max(routes.iter().map(Vec::len).max().unwrap_or(0));
+                    }
+                }
+            }
+            (count, longest)
+        };
+        assert_eq!(
+            joined(CircuitAperture::STATEMENT_INCIDENT),
+            joined(CircuitAperture::STATEMENT_PRODUCED),
+            "on a pure recruitment chain the orientation must be a symmetry"
+        );
+    }
+
     #[test]
     fn a_route_is_returned_between_two_endpoints_the_caller_names() {
         let derivations = chain();
@@ -1942,6 +2054,7 @@ mod tests {
             CircuitAperture {
                 identity: DerivationIdentity::ByDeclaration,
                 coefficient: RecruitmentCoefficient::Incidence,
+                reach: ReachOrientation::IntoDerivation,
                 statements: StatementIncidence::Founded,
             },
         );

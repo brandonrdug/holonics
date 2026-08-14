@@ -610,12 +610,46 @@ pub fn statement_vertex_key(statement: &str) -> String {
     format!("|- {statement}")
 }
 
+/// **Which way the statement a derivation proved is oriented.**
+///
+/// A recruitment 1-cell runs `symbol -> derivation`: the proof consumes what it stood on, and that
+/// is not in question. A reach 1-cell was founded with the identical sign, so the statement a
+/// derivation **proved** was oriented as another input to it — and then no vertex in the circuit
+/// ever has both an in-edge and an out-edge, every route is exactly one hop, and theorem chaining
+/// cannot form at all. Measured 2026-08-13 on four committed deposit directories: every route
+/// length 2, under every aperture.
+///
+/// **Flipping it destructively is not the repair.** The flip is a unimodular basis change, so it is
+/// a rebase with zero remainder for homology — `rebase_invariants` 16/16 and `derivation_atlas`
+/// 39/39 are unmoved by it — and a total loss for transport, failing 24 tests that traverse and
+/// moving every committed capacitance figure. The aperture is a **reopenable** quotient with
+/// declared axes; the orientation was a fixed convention whose only record was the boundary sign,
+/// so it had no fiber. This axis is that fiber.
+///
+/// Brandon's ruling, 2026-08-14, and it is why this is not merely one more declared frame: this is
+/// the same axis the Holonic Interaction calls imaginary — *"an orthogonal axis that in classical
+/// terms seems 'imaginary' and not implicit, but in holonics it is indeed implicit… nothing is
+/// causally represented along only one axis."* Representing the reach edge along one axis was the
+/// error; both readings are the object.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+pub enum ReachOrientation {
+    /// `statement -> derivation`. The convention every reading before 2026-08-14 used, retained as
+    /// the default so nothing that stands moves.
+    IntoDerivation,
+    /// `derivation -> statement`. The proof produces what it proved, so a derivation can be an
+    /// intermediate and a chain can pass through a theorem.
+    OutOfDerivation,
+}
+
 /// The declared aperture of one reading.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct CircuitAperture {
     pub identity: DerivationIdentity,
     pub coefficient: RecruitmentCoefficient,
     pub statements: StatementIncidence,
+    /// Read only under [`StatementIncidence::Founded`]; a withheld statement has no reach cell to
+    /// orient.
+    pub reach: ReachOrientation,
 }
 
 impl CircuitAperture {
@@ -624,6 +658,7 @@ impl CircuitAperture {
         identity: DerivationIdentity::ByDeclaration,
         coefficient: RecruitmentCoefficient::Incidence,
         statements: StatementIncidence::Withheld,
+        reach: ReachOrientation::IntoDerivation,
     };
 
     /// The same reading with the statements founded: the only aperture pair in which the routes to
@@ -632,6 +667,7 @@ impl CircuitAperture {
         identity: DerivationIdentity::ByDeclaration,
         coefficient: RecruitmentCoefficient::Incidence,
         statements: StatementIncidence::Founded,
+        reach: ReachOrientation::IntoDerivation,
     };
 
     /// One 0-cell per artifact.
@@ -639,6 +675,7 @@ impl CircuitAperture {
         identity: DerivationIdentity::ByRoute,
         coefficient: RecruitmentCoefficient::Incidence,
         statements: StatementIncidence::Withheld,
+        reach: ReachOrientation::IntoDerivation,
     };
 
     /// One 0-cell per artifact, coefficients carrying the occurrence counts: the reading in which
@@ -647,13 +684,25 @@ impl CircuitAperture {
         identity: DerivationIdentity::ByRoute,
         coefficient: RecruitmentCoefficient::Multiplicity,
         statements: StatementIncidence::Withheld,
+        reach: ReachOrientation::IntoDerivation,
     };
 
-    pub const DECLARED: [Self; 4] = [
+    /// The statement-founded reading with the reach oriented the other way: the only aperture in
+    /// which a derivation is not a sink, so the only one in which a route can pass through a
+    /// theorem.
+    pub const STATEMENT_PRODUCED: Self = Self {
+        identity: DerivationIdentity::ByDeclaration,
+        coefficient: RecruitmentCoefficient::Incidence,
+        statements: StatementIncidence::Founded,
+        reach: ReachOrientation::OutOfDerivation,
+    };
+
+    pub const DECLARED: [Self; 5] = [
         Self::DEPOSITED_READER,
         Self::STATEMENT_INCIDENT,
         Self::PER_ROUTE,
         Self::PER_ROUTE_MULTIPLICITY,
+        Self::STATEMENT_PRODUCED,
     ];
 }
 
@@ -1076,9 +1125,20 @@ pub fn found_circuit(
     let mut reaches: BTreeMap<(String, String), CausalCellId> = BTreeMap::new();
     for (key, statement) in &reached {
         let target = &vertices[&statement_vertex_key(statement)];
+        // The boundary is a difference `head - tail`, so the declared orientation IS this sign.
         let mut boundary = CausalChain::default();
-        boundary.add_term(vertices[key], ComparativeMultiplicity::positive(1u32));
-        boundary.add_term(*target, ComparativeMultiplicity::negative(1u32));
+        let (derivation_side, statement_side) = match aperture.reach {
+            ReachOrientation::IntoDerivation => (
+                ComparativeMultiplicity::positive(1u32),
+                ComparativeMultiplicity::negative(1u32),
+            ),
+            ReachOrientation::OutOfDerivation => (
+                ComparativeMultiplicity::negative(1u32),
+                ComparativeMultiplicity::positive(1u32),
+            ),
+        };
+        boundary.add_term(vertices[key], derivation_side);
+        boundary.add_term(*target, statement_side);
         occasion += 1;
         let id = complex.found_cell(
             format!("{key}|-{statement}"),
@@ -1126,6 +1186,7 @@ pub fn route_cycle_agreement(
             identity,
             coefficient: RecruitmentCoefficient::Incidence,
             statements: StatementIncidence::Withheld,
+            reach: ReachOrientation::IntoDerivation,
         },
     )?;
     let founded = found_circuit(
@@ -1134,6 +1195,7 @@ pub fn route_cycle_agreement(
             identity,
             coefficient: RecruitmentCoefficient::Incidence,
             statements: StatementIncidence::Founded,
+            reach: ReachOrientation::IntoDerivation,
         },
     )?;
     let blind = withheld.invariants(rule)?;
@@ -2157,6 +2219,7 @@ end LinearOrderedAddCommGroup
             CircuitAperture {
                 identity: DerivationIdentity::ByDeclaration,
                 coefficient: RecruitmentCoefficient::Multiplicity,
+                reach: ReachOrientation::IntoDerivation,
                 statements: StatementIncidence::Withheld,
             },
         );
@@ -2321,6 +2384,7 @@ end LinearOrderedAddCommGroup
             CircuitAperture {
                 identity: DerivationIdentity::ByDeclaration,
                 coefficient: RecruitmentCoefficient::Multiplicity,
+                reach: ReachOrientation::IntoDerivation,
                 statements: StatementIncidence::Withheld,
             },
         );
@@ -2346,6 +2410,7 @@ end LinearOrderedAddCommGroup
             CircuitAperture {
                 identity: DerivationIdentity::ByDeclaration,
                 coefficient: RecruitmentCoefficient::Multiplicity,
+                reach: ReachOrientation::IntoDerivation,
                 statements: StatementIncidence::Withheld,
             },
         );
