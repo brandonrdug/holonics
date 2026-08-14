@@ -285,7 +285,24 @@ its Sturm certificate proves exactly one root in the interval, and `implicit.rs:
 certified real-root population at a declared **quartic** aperture. *Root isolation and obstruction
 detection are built; root solving by chart transport is not.*
 
-**Owed, and it is a well-posed construction rather than a research question:** a Tschirnhaus organ.
+~~**Owed, and it is a well-posed construction rather than a research question:**~~ **BUILT, and this
+row was stale — corrected 2026-08-14 by opening the file.** `crates/holonic-engine/src/quintic_chart.rs`
+is **2,875 lines** and driven by `examples/the_chart_refuses_or_returns.rs` and
+`examples/the_two_instruments_disagree.rs`. `blueprint/THE_ROADMAP.md` already recorded the
+correction and this tablet did not. What it returns is below, measured; what follows the strike is
+the specification it was written against.
+
+The transport is `F(y) = Res_x(f(x), y − g(x))` from Newton power sums — **no root is ever taken** —
+independently recomputed by fraction-free Bareiss elimination on the Sylvester matrix, with the two
+required to agree coefficient for coefficient and a third check `F(g(x)) ≡ 0 mod f(x)`. The cost law
+is **derived rather than asserted**: killing `k` coefficients leaves `k−1` homogeneous conditions of
+degrees `2..k`, so by Bezout `k!` points — `k=1 → 1`, `k=2 → 2`, `k=3 → 6 = 2·3`, which is exactly
+why the classical Bring reduction costs a square root and a cube root. `EliminantExceedsBezoutBound`
+is that law firing **as a falsifier**, not as a resource refusal. Eight obstruction species each
+carry their evidence, including `ChartUndefinedAtDegree` — *a cubic has no Bring chart in the same
+way a point has no tangent line: nothing failed.*
+
+The original specification, retained as provenance:** a Tschirnhaus organ.
 Take a degree-5 input, transport it to Bring form by an exact rational chart change, return the
 transported form **and the transport**, and refuse — with the obstruction named — when the target
 chart cannot represent the answer. That is `FOUND`/`RIDE`/`OPEN` on a polynomial, and every piece of
