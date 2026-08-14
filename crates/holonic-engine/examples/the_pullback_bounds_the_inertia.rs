@@ -43,8 +43,8 @@ use relational_geometry::Rat;
 
 use holonic_engine::exact_linear::ExactRatMatrix;
 use holonic_engine::inertia::{
-    block_defect, congruence, inertia, pullback_inertia_bound, rank_trace_defect, InertiaError,
-    PullbackInertia, SymmetricForm,
+    InertiaError, PullbackInertia, SymmetricForm, block_defect, congruence, inertia,
+    pullback_inertia_bound, rank_trace_defect,
 };
 
 fn rat(value: i64) -> Rat {
@@ -190,7 +190,10 @@ fn main() {
     let left = rank_trace_defect(&block, &at);
     println!("  M = diag(3, 5, -2) (+) 4·I_2 (+) 0_2,   c = {at},  b = {repeats}");
     println!("  2c·tr(M) - ||M||^2_F        = {left}");
-    println!("  sum_j k_c(m_j) + c^2·b      = {right}     [{}]", terms.join(", "));
+    println!(
+        "  sum_j k_c(m_j) + c^2·b      = {right}     [{}]",
+        terms.join(", ")
+    );
     println!("  equality holds exactly: {}", left == right);
     println!(
         "  the fixture is not resting on positivity: one level is negative, k_c(-2) = {}",

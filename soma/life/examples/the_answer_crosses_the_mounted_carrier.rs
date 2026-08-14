@@ -43,8 +43,9 @@ use body::num::Cog;
 use holonic_structure::CausalMembrane;
 use life::agentic_language::{
     AgenticLanguageAnswer, AgenticLanguageCapability, AgenticLanguageConsequence,
-    AgenticLanguageEcology, AgenticLanguageError, AgenticLanguageOccurrence, AgenticLanguageQuestion,
-    AgenticLanguageSpec, AgenticLanguageTrajectory, AgenticLanguageWorldReturn,
+    AgenticLanguageEcology, AgenticLanguageError, AgenticLanguageOccurrence,
+    AgenticLanguageQuestion, AgenticLanguageSpec, AgenticLanguageTrajectory,
+    AgenticLanguageWorldReturn,
 };
 use life::morphological_language::MorphologicalLanguagePassage;
 use soma_abi::active::ActionCurrent;
@@ -265,7 +266,10 @@ fn main() {
 
     let later = AgenticLanguageQuestion::new("later-question", 90, GROUNDED_QUESTION);
     let counted_grounded_answer = match counted_body
-        .receive_occurrence_with_executor(AgenticLanguageOccurrence::Question(&later), &mut counting)
+        .receive_occurrence_with_executor(
+            AgenticLanguageOccurrence::Question(&later),
+            &mut counting,
+        )
         .unwrap()
     {
         AgenticLanguageConsequence::Answer(answer) => answer,
@@ -397,7 +401,9 @@ fn main() {
     let grounded_crossing = after_grounded - after_world_return;
     report(
         grounded_crossing > 0,
-        &format!("the grounded answer crossed the supplied carrier ({grounded_crossing} enactments)"),
+        &format!(
+            "the grounded answer crossed the supplied carrier ({grounded_crossing} enactments)"
+        ),
         "receive_question_with_executor's local answer path built its own pool.",
     );
 
@@ -442,13 +448,34 @@ fn main() {
         && refusing_grounded.consulted > 0;
     println!("ALL CONTROLS HELD: {all}");
 
-    assert!(same_world, "the world-return twin must return what the private path did");
-    assert!(same_grounded, "the grounded twin must return what the private path did");
-    assert!(world_crossing > 0, "the world-return answer must cross the supplied carrier");
-    assert!(grounded_crossing > 0, "the grounded answer must cross the supplied carrier");
-    assert!(deed_crossing == 0, "deed emission must cross no Swing event");
-    assert!(world_refused, "a refusing carrier must refuse the world-return answer");
-    assert!(grounded_refused, "a refusing carrier must refuse the grounded answer");
+    assert!(
+        same_world,
+        "the world-return twin must return what the private path did"
+    );
+    assert!(
+        same_grounded,
+        "the grounded twin must return what the private path did"
+    );
+    assert!(
+        world_crossing > 0,
+        "the world-return answer must cross the supplied carrier"
+    );
+    assert!(
+        grounded_crossing > 0,
+        "the grounded answer must cross the supplied carrier"
+    );
+    assert!(
+        deed_crossing == 0,
+        "deed emission must cross no Swing event"
+    );
+    assert!(
+        world_refused,
+        "a refusing carrier must refuse the world-return answer"
+    );
+    assert!(
+        grounded_refused,
+        "a refusing carrier must refuse the grounded answer"
+    );
     assert!(
         refusing_world.consulted > 0 && refusing_grounded.consulted > 0,
         "the refusal controls are vacuous unless the carrier was reached"

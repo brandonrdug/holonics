@@ -326,16 +326,23 @@ impl CudaExactRelationExecutor {
                 "cuDeviceGetName",
             )?;
             let device_name = CStr::from_ptr(name.as_ptr()).to_string_lossy().into_owned();
-            let attribute = |selector: i32, operation: &'static str| -> Result<u32, CudaRelationError> {
-                let mut value = 0i32;
-                driver(cuDeviceGetAttribute(&mut value, selector, device), operation)?;
-                Ok(value.max(0) as u32)
-            };
+            let attribute =
+                |selector: i32, operation: &'static str| -> Result<u32, CudaRelationError> {
+                    let mut value = 0i32;
+                    driver(
+                        cuDeviceGetAttribute(&mut value, selector, device),
+                        operation,
+                    )?;
+                    Ok(value.max(0) as u32)
+                };
             let device_block = attribute(
                 DEVICE_MAX_THREADS_PER_BLOCK,
                 "cuDeviceGetAttribute(MAX_THREADS_PER_BLOCK)",
             )?;
-            let max_grid_x = attribute(DEVICE_MAX_GRID_DIM_X, "cuDeviceGetAttribute(MAX_GRID_DIM_X)")?;
+            let max_grid_x = attribute(
+                DEVICE_MAX_GRID_DIM_X,
+                "cuDeviceGetAttribute(MAX_GRID_DIM_X)",
+            )?;
             let warp = attribute(DEVICE_WARP_SIZE, "cuDeviceGetAttribute(WARP_SIZE)")?.max(1);
             let block_x = (device_block / warp).max(1) * warp;
             let mut context = ptr::null_mut();

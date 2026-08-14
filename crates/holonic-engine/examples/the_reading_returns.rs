@@ -39,15 +39,15 @@ use std::path::PathBuf;
 use sha2::{Digest, Sha256};
 
 use holonic_engine::conditioned_derivation::{
-    expose, found_conditioned_circuit, ConditionedBody, ConditionedCircuit, DerivationQuery,
-    DerivedPassage, Exposure, FoundedMorphology,
+    ConditionedBody, ConditionedCircuit, DerivationQuery, DerivedPassage, Exposure,
+    FoundedMorphology, expose, found_conditioned_circuit,
 };
 use holonic_engine::derivation_atlas::CircuitAperture;
 use holonic_engine::derivation_integral::AccumulationRule;
 use holonic_engine::rebase_invariants::PivotRule;
 use holonic_engine::returned_reading::{
-    condition_again, condition_again_from_sealed, read_production, ReturnedReading,
-    ReturnedArtifact,
+    ReturnedArtifact, ReturnedReading, condition_again, condition_again_from_sealed,
+    read_production,
 };
 
 const STATEMENT: &str = "(P : Prop) (h : P) : exactCarrier P";
@@ -182,10 +182,7 @@ fn committed(morphology: &FoundedMorphology) -> Vec<&str> {
     morphology.committed_stems()
 }
 
-fn circuit_of(
-    body: &ConditionedBody,
-    query: &DerivationQuery,
-) -> ConditionedCircuit {
+fn circuit_of(body: &ConditionedBody, query: &DerivationQuery) -> ConditionedCircuit {
     body.circuit(query, APERTURE)
         .expect("the production founds a circuit")
 }
@@ -204,8 +201,14 @@ fn main() {
     rule("THE MATERIAL");
     println!("  deposited artifacts        {}", standing.len());
     println!("  statement queried          |- {STATEMENT}");
-    println!("  recruited population       {:?}", mounted.recruited_population());
-    println!("  corpus-committed stems     {:?}", committed(&corpus_morphology));
+    println!(
+        "  recruited population       {:?}",
+        mounted.recruited_population()
+    );
+    println!(
+        "  corpus-committed stems     {:?}",
+        committed(&corpus_morphology)
+    );
     println!(
         "  corpus-provisional stems   {:?}",
         corpus_morphology
@@ -228,8 +231,16 @@ fn main() {
 
     let unjoined_first = mounted.derive(&query).expect("derives");
     let unjoined_second = mounted.derive(&query).expect("derives");
-    println!("\n  first production   {} passages  {:?}", unjoined_first.len(), names(&unjoined_first));
-    println!("  second production  {} passages  {:?}", unjoined_second.len(), names(&unjoined_second));
+    println!(
+        "\n  first production   {} passages  {:?}",
+        unjoined_first.len(),
+        names(&unjoined_first)
+    );
+    println!(
+        "  second production  {} passages  {:?}",
+        unjoined_second.len(),
+        names(&unjoined_second)
+    );
     println!(
         "  digest agreement   {}",
         if digest(&unjoined_first) == digest(&unjoined_second) {
@@ -266,8 +277,12 @@ fn main() {
         RULE.named(),
         reading.after.base
     );
-    println!("  derivation_integral::accumulation  ->  a 1-cochain over {} cells", reading.after.accumulated.assigned().len());
-    println!("  temper::TemperedFamily::read       ->  {} structures, {} condensing, {} expanded",
+    println!(
+        "  derivation_integral::accumulation  ->  a 1-cochain over {} cells",
+        reading.after.accumulated.assigned().len()
+    );
+    println!(
+        "  temper::TemperedFamily::read       ->  {} structures, {} condensing, {} expanded",
         reading.after.temper.twists.len(),
         reading.after.condensing().len(),
         reading.after.leaking.len(),
@@ -286,7 +301,9 @@ fn main() {
             chord.residual, chord.cell, chord.declared, chord.implied
         );
     }
-    println!("  temper::found_on                   ->  the remainder deposited back onto the cochain");
+    println!(
+        "  temper::found_on                   ->  the remainder deposited back onto the cochain"
+    );
     println!(
         "  temper::TemperedFamily::read again ->  population leak {}",
         reading.after.tempered_again.population_leak()
@@ -326,13 +343,19 @@ fn main() {
             deposited.standing().len()
         );
         println!("  route pairs whose residual moved when the remainder was returned: {moved}");
-        println!("  BOTH lineages are retained. The pair is the return; choosing one would resolve an OPEN by choosing.");
+        println!(
+            "  BOTH lineages are retained. The pair is the return; choosing one would resolve an OPEN by choosing."
+        );
     } else if let Some(refusal) = &reading.lineage_refusal {
         println!("\n  the statement lineage was refused: {refusal}");
     }
 
     rule("THE MOVEMENT BETWEEN THE TWO READINGS");
-    println!("  invariant movement   grades {:?}   fields {:?}", reading.movement.grades_moved(), reading.movement.fields_moved());
+    println!(
+        "  invariant movement   grades {:?}   fields {:?}",
+        reading.movement.grades_moved(),
+        reading.movement.fields_moved()
+    );
     for grade in reading.movement.moved() {
         println!(
             "        grade {}  cells {:?} -> {:?}   betti {:?} -> {:?}   torsion {:?} -> {:?}",
@@ -346,23 +369,32 @@ fn main() {
         );
     }
     println!("  route movement");
-    println!("        statements founded   {:?}", reading.routes.founded_statements());
-    println!("        became plural        {:?}", reading.routes.became_plural());
+    println!(
+        "        statements founded   {:?}",
+        reading.routes.founded_statements()
+    );
+    println!(
+        "        became plural        {:?}",
+        reading.routes.became_plural()
+    );
     for (statement, reaching) in reading.routes.founded_routes() {
         println!("        routes founded to |- {statement}");
         for vertex in reaching {
             println!("              {vertex}");
         }
     }
-    println!("  temper movement      {} structures moved", reading.twists.len());
+    println!(
+        "  temper movement      {} structures moved",
+        reading.twists.len()
+    );
     for moved in &reading.twists {
-        println!(
-            "        {}  opened: {}",
-            moved.structure,
-            moved.opened()
-        );
+        println!("        {}  opened: {}", moved.structure, moved.opened());
     }
-    println!("  remainder movement   {} chords founded, {} withdrawn", reading.remainder_founded.len(), reading.remainder_withdrawn.len());
+    println!(
+        "  remainder movement   {} chords founded, {} withdrawn",
+        reading.remainder_founded.len(),
+        reading.remainder_withdrawn.len()
+    );
 
     rule("THE CARRIER — the movement, in the form a production consumes its material in");
     println!(
@@ -394,7 +426,9 @@ fn main() {
     let again = condition_again(&standing, &corpus_morphology, &query, &reading.returned)
         .expect("the second production derives");
 
-    rule("THE JOIN — the same standing, the same query, conducted through what the reading returned");
+    rule(
+        "THE JOIN — the same standing, the same query, conducted through what the reading returned",
+    );
     println!("  stems the return COMMITTED, with the returns that witnessed each:");
     for stem in &again.committed_by_return {
         println!("        {}", stem.stem);
@@ -418,8 +452,16 @@ fn main() {
     );
 
     rule("CONTROL 2 — THE MOVED PRODUCTION, AND THE EARLIER RETURN THAT CAUSED EACH MOVEMENT");
-    println!("  first production   {} passages  {:?}", again.first.len(), names(&again.first));
-    println!("  second production  {} passages  {:?}", again.second.len(), names(&again.second));
+    println!(
+        "  first production   {} passages  {:?}",
+        again.first.len(),
+        names(&again.first)
+    );
+    println!(
+        "  second production  {} passages  {:?}",
+        again.second.len(),
+        names(&again.second)
+    );
 
     println!(
         "\n  PASSAGES FOUNDED — present in the second production and not in the first.\n  \
@@ -504,7 +546,12 @@ fn main() {
         for bridge in founded.licensing() {
             println!(
                 "              stem {:?}  {}@{} <-> {}@{}  routes {:?}",
-                bridge.stem, bridge.held, bridge.held_at, bridge.brought, bridge.brought_at, bridge.routes
+                bridge.stem,
+                bridge.held,
+                bridge.held_at,
+                bridge.brought,
+                bridge.brought_at,
+                bridge.routes
             );
         }
     }
@@ -550,8 +597,12 @@ fn main() {
     println!("       answers; the answer returns as the next light. Reafference is the WORLD'S,");
     println!("       never a WIRE'S.\"");
     println!("  The join above passes the reading from `read_production` into `condition_again`");
-    println!("  across a call. Nothing leaves the process, so by §4's test — did it get written and");
-    println!("  re-read? — it is a wire. Below, the same movement is sealed to octets, deposited at");
+    println!(
+        "  across a call. Nothing leaves the process, so by §4's test — did it get written and"
+    );
+    println!(
+        "  re-read? — it is a wire. Below, the same movement is sealed to octets, deposited at"
+    );
     println!("  a content address, and the second production is conditioned on a carrier");
     println!("  reconstructed FROM THE FILE and from nothing else.");
     println!();
@@ -569,13 +620,15 @@ fn main() {
     drop(sealed);
 
     let from_the_world = fs::read(&deposit).expect("the deposit is read back");
-    let unsealed = ReturnedReading::unseal(&from_the_world).expect("the world's record is readable");
+    let unsealed =
+        ReturnedReading::unseal(&from_the_world).expect("the world's record is readable");
     // **`condition_again_from_sealed` takes OCTETS, not a carrier.** A caller cannot reach it
     // holding a live reading, so the call site itself shows which channel was used — the
     // in-memory `condition_again` is still available and still named, and choosing it is now
     // visible rather than hidden behind an identical signature.
-    let mailed = condition_again_from_sealed(&standing, &corpus_morphology, &query, &from_the_world)
-        .expect("the second production derives from the deposit");
+    let mailed =
+        condition_again_from_sealed(&standing, &corpus_morphology, &query, &from_the_world)
+            .expect("the second production derives from the deposit");
 
     println!("\n  deposited              {}", deposit.display());
     println!("  content address        {address}");
@@ -583,12 +636,17 @@ fn main() {
     println!("  returns carried        {}", unsealed.returns().len());
     println!(
         "  production from the file, against the production from memory:  {}",
-        if digest(&mailed.second) == digest(&again.second) { "identical" } else { "DIFFERENT" }
+        if digest(&mailed.second) == digest(&again.second) {
+            "identical"
+        } else {
+            "DIFFERENT"
+        }
     );
 
     controls.check(
         "the deposit is on disk and its content address is the address of its octets",
-        fs::read(&deposit).map(|octets| format!("{:x}", Sha256::digest(&octets)) == address)
+        fs::read(&deposit)
+            .map(|octets| format!("{:x}", Sha256::digest(&octets)) == address)
             .unwrap_or(false),
         "the file exists and hashes to the name it was filed under, so the record is addressable \
          by what it contains rather than by where it was put.",
@@ -609,7 +667,9 @@ fn main() {
     // The falsifier. A driver that writes a file and then keeps using the value in memory would
     // print everything above unchanged. Flipping one octet of the record must be visible, or the
     // deposit is ceremony and the wire is still the thing conducting.
-    println!("\n  THE FALSIFIER — the record is flipped one octet at a time, and the body must notice");
+    println!(
+        "\n  THE FALSIFIER — the record is flipped one octet at a time, and the body must notice"
+    );
     println!("      A single flip is not enough to state. Flipping an octet inside a word the");
     println!("      exposure never commits changes the READING and moves no production, and a");
     println!("      control passing on that disjunct would not have shown the production depends");
@@ -634,8 +694,10 @@ fn main() {
             None => text.push('\u{0}'),
         }
         let octets = ReturnedReading::from_returns(corrupted_returns).seal();
-        let at = ablation_root_of(&deposit_root, "flips")
-            .join(format!("flip-{index:03}-{:x}.returned-reading", Sha256::digest(&octets)));
+        let at = ablation_root_of(&deposit_root, "flips").join(format!(
+            "flip-{index:03}-{:x}.returned-reading",
+            Sha256::digest(&octets)
+        ));
         fs::write(&at, &octets).expect("the flipped deposit is written");
         match ReturnedReading::unseal(&fs::read(&at).expect("read back")) {
             Err(_) => refused += 1,
@@ -655,7 +717,10 @@ fn main() {
         "\n        {probed} probes — one corrupted occurrence per return, the population exhausted"
     );
     println!("        refused outright                      {refused}");
-    println!("        read differently, production still    {}", read_moved - production_moved);
+    println!(
+        "        read differently, production still    {}",
+        read_moved - production_moved
+    );
     println!("        MOVED THE PRODUCTION                  {production_moved}");
     controls.check(
         "every probe is refused or read differently — the file is what is being read",
@@ -682,7 +747,9 @@ fn main() {
     // ---------------------------------------------------------------------------------------------
 
     println!("\n  THE DELETION FALSIFIER — remove the world's record and the return must fail");
-    println!("      `canon/THE_HOLOBROCHOS_SPINE.md` §4's test is one question: did it get written");
+    println!(
+        "      `canon/THE_HOLOBROCHOS_SPINE.md` §4's test is one question: did it get written"
+    );
     println!("      and re-read? A return that survives the deletion of the record never went");
     println!("      through it. So the record is deleted and the same call is made again.");
 
@@ -692,7 +759,11 @@ fn main() {
     let re_read_failed = after_deletion.is_err();
     println!(
         "\n        the deposit re-read after deletion: {}",
-        if re_read_failed { "FAILED, as it must" } else { "SUCCEEDED — the record is still there" }
+        if re_read_failed {
+            "FAILED, as it must"
+        } else {
+            "SUCCEEDED — the record is still there"
+        }
     );
     // And the conditioning that depends on it cannot be performed from the world any more.
     let conditioned_without_the_record = fs::read(&deposit)
@@ -741,13 +812,15 @@ fn main() {
                 .map(|(_, keep)| keep.clone()),
         );
         let octets = kept.seal();
-        let at = ablation_root
-            .join(format!("without-{index:03}-{:x}.returned-reading", Sha256::digest(&octets)));
+        let at = ablation_root.join(format!(
+            "without-{index:03}-{:x}.returned-reading",
+            Sha256::digest(&octets)
+        ));
         fs::write(&at, &octets).expect("the ablated deposit is written");
         let re_read = ReturnedReading::unseal(&fs::read(&at).expect("read back"))
             .expect("the ablated record is readable");
-        let probe = condition_again(&standing, &corpus_morphology, &query, &re_read)
-            .expect("derives");
+        let probe =
+            condition_again(&standing, &corpus_morphology, &query, &re_read).expect("derives");
         if digest(&probe.second) != digest(&mailed.second) {
             ablations_moving.push((index, artifact.whole.clone(), probe.second.len()));
         }
@@ -756,7 +829,10 @@ fn main() {
         "\n        {} returns ablated, each deposited and re-read",
         reading.returned.returns().len()
     );
-    println!("        ablations that MOVE the production   {}", ablations_moving.len());
+    println!(
+        "        ablations that MOVE the production   {}",
+        ablations_moving.len()
+    );
     for (index, whole, passages) in ablations_moving.iter().take(6) {
         println!("            without return {index:>3}  {whole}   -> {passages} passages");
     }
@@ -782,8 +858,11 @@ fn main() {
 
     let mut decommitted = Vec::new();
     for stem in &mailed.committed_by_return {
-        let witnesses: BTreeSet<String> =
-            reading.returned.wholes_naming(&stem.stem).into_iter().collect();
+        let witnesses: BTreeSet<String> = reading
+            .returned
+            .wholes_naming(&stem.stem)
+            .into_iter()
+            .collect();
         let kept = ReturnedReading::from_returns(
             reading
                 .returned
@@ -793,13 +872,16 @@ fn main() {
                 .cloned(),
         );
         let octets = kept.seal();
-        let at = ablation_root
-            .join(format!("without-{}-{:x}.returned-reading", stem.stem, Sha256::digest(&octets)));
+        let at = ablation_root.join(format!(
+            "without-{}-{:x}.returned-reading",
+            stem.stem,
+            Sha256::digest(&octets)
+        ));
         fs::write(&at, &octets).expect("written");
-        let re_read = ReturnedReading::unseal(&fs::read(&at).expect("read back"))
-            .expect("readable");
-        let probe = condition_again(&standing, &corpus_morphology, &query, &re_read)
-            .expect("derives");
+        let re_read =
+            ReturnedReading::unseal(&fs::read(&at).expect("read back")).expect("readable");
+        let probe =
+            condition_again(&standing, &corpus_morphology, &query, &re_read).expect("derives");
         let still_committed = probe
             .committed_by_return
             .iter()
@@ -817,7 +899,10 @@ fn main() {
         "\n        {} words the return committed, each ablated at every witness",
         mailed.committed_by_return.len()
     );
-    println!("        ablations that MOVE the production   {}", decommitted.len());
+    println!(
+        "        ablations that MOVE the production   {}",
+        decommitted.len()
+    );
     for (word, witnesses, passages, still) in &decommitted {
         println!(
             "            without every return naming `{word}`  ({witnesses} witnesses removed)  \
@@ -839,8 +924,8 @@ fn main() {
 
     rule("CONTROL 3 — THE NO-OP: A READING THAT MOVED NOTHING MOVES NO PRODUCTION");
     let still = ReturnedReading::still();
-    let still_again = condition_again(&standing, &corpus_morphology, &query, &still)
-        .expect("derives");
+    let still_again =
+        condition_again(&standing, &corpus_morphology, &query, &still).expect("derives");
     println!(
         "  a still reading            {} returned artifacts   morphology equal: {}   production equal: {}",
         still.returns().len(),
@@ -881,8 +966,8 @@ fn main() {
     // does return on it, and that return must not reach the carrier, because the production did not
     // move. The deposit's own circuit would not do here: it is a star and admits a potential, so the
     // founding would have nothing to return and the stillness would carry no evidence.
-    let against_itself = read_production(&circuit_after, &circuit_after, RULE, PIVOT, STATEMENT)
-        .expect("reads");
+    let against_itself =
+        read_production(&circuit_after, &circuit_after, RULE, PIVOT, STATEMENT).expect("reads");
     let alone = &against_itself.before;
     let itself_again = condition_again(
         &standing,
@@ -927,8 +1012,8 @@ fn main() {
     );
 
     let mut morphology = corpus_morphology.clone();
-    let mut earlier_circuit = found_conditioned_circuit(mounted.standing().to_vec(), APERTURE)
-        .expect("founds");
+    let mut earlier_circuit =
+        found_conditioned_circuit(mounted.standing().to_vec(), APERTURE).expect("founds");
     let mut productions: Vec<Vec<DerivedPassage>> = Vec::new();
     let mut turns: Vec<(usize, usize, usize, bool)> = Vec::new();
 
@@ -936,8 +1021,8 @@ fn main() {
         let body = mounted.with_morphology(morphology.clone());
         let production = body.derive(&query).expect("derives");
         let circuit = circuit_of(&body, &query);
-        let turn_reading = read_production(&earlier_circuit, &circuit, RULE, PIVOT, STATEMENT)
-            .expect("reads");
+        let turn_reading =
+            read_production(&earlier_circuit, &circuit, RULE, PIVOT, STATEMENT).expect("reads");
         let carried = turn_reading.returned.carried_into(&morphology);
         let committed_now = committed(&carried).len();
         let moved = productions
@@ -1036,7 +1121,9 @@ fn main() {
     if controls.failed.is_empty() {
         println!("  every declared control holds.");
         println!("\n  BEFORE: leak.        The reading returned and nothing retained it.");
-        println!("  AFTER:  accumulation. The movement between two readings re-enters the production");
+        println!(
+            "  AFTER:  accumulation. The movement between two readings re-enters the production"
+        );
         println!("          that caused it, the production moves, every movement names the return");
         println!("          that caused it, and a still reading moves nothing.");
     } else {

@@ -34,9 +34,9 @@ use num_bigint::BigInt;
 use serde::{Deserialize, Serialize};
 
 use crate::receiver_exact_compression::{
-    compress, ItemId, ObservedSystem, ReceiverExactCompression,
+    ItemId, ObservedSystem, ReceiverExactCompression, compress,
 };
-use crate::supported_realizers::{decide_support, Realization, RealizerId, RealizerSupport};
+use crate::supported_realizers::{Realization, RealizerId, RealizerSupport, decide_support};
 
 /// A class a realizer paid for.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -105,8 +105,8 @@ pub fn discharge(before: &Placement, after: &Placement) -> Discharge {
     if before.open.is_empty() || after.open.len() >= before.open.len() {
         return Discharge::Nothing;
     }
-    let coarsened = after.receiver_extent < before.receiver_extent
-        || after.class_extent < before.class_extent;
+    let coarsened =
+        after.receiver_extent < before.receiver_extent || after.class_extent < before.class_extent;
     let founded = after.support.realizer_extent > before.support.realizer_extent;
     match (coarsened, founded) {
         (true, true) => Discharge::Both,
@@ -253,7 +253,10 @@ mod tests {
         assert!(placed.every_standing_class_was_paid_for());
         for open in &placed.open {
             assert!(
-                placed.standing.iter().all(|standing| standing.class != open.class),
+                placed
+                    .standing
+                    .iter()
+                    .all(|standing| standing.class != open.class),
                 "an OPEN class must never also stand"
             );
         }
@@ -278,14 +281,21 @@ mod tests {
     /// indistinguishable from founding, which is exactly why the reading carries its aperture.
     #[test]
     fn coarsening_closes_it_too_and_is_named_as_coarsening() {
-        let before = place(&Four { receivers: 1 }, &[RealizerId(0), RealizerId(1)], |r| {
-            vec![ItemId(r.0)]
-        });
+        let before = place(
+            &Four { receivers: 1 },
+            &[RealizerId(0), RealizerId(1)],
+            |r| vec![ItemId(r.0)],
+        );
         // Receiver 1 sees only parity, so items 0,2 and 1,3 merge into two classes, both reached.
-        let after = place(&Four { receivers: 0 }, &[RealizerId(0), RealizerId(1)], |r| {
-            vec![ItemId(r.0)]
-        });
-        assert!(before.open.len() > after.open.len(), "the obstruction was discharged");
+        let after = place(
+            &Four { receivers: 0 },
+            &[RealizerId(0), RealizerId(1)],
+            |r| vec![ItemId(r.0)],
+        );
+        assert!(
+            before.open.len() > after.open.len(),
+            "the obstruction was discharged"
+        );
         assert_eq!(discharge(&before, &after), Discharge::Coarsened);
         assert_ne!(
             discharge(&before, &after),

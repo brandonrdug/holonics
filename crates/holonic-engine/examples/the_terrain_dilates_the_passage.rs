@@ -25,11 +25,11 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 
 use holonic_engine::derivation_atlas::{
-    found_circuit, read_derivation, CircuitAperture, Derivation, DerivationCircuit,
+    CircuitAperture, Derivation, DerivationCircuit, found_circuit, read_derivation,
 };
 use holonic_engine::derivation_capacitance::{
-    disjoint_terrain, many_result_star, one_result_star, orient_passages, CapacitanceMapping,
-    CapacitanceReading, CapacityLaw, CharacteristicDelayLaw, DilationClasses,
+    CapacitanceMapping, CapacitanceReading, CapacityLaw, CharacteristicDelayLaw, DilationClasses,
+    disjoint_terrain, many_result_star, one_result_star, orient_passages,
 };
 use holonic_engine::name_elaboration::ElaborationDeposit;
 use num_bigint::BigUint;
@@ -142,16 +142,16 @@ fn print_delay_population(reading: &CapacitanceReading) {
 fn print_classes(classes: &DilationClasses) {
     for (rounds, members) in &classes.by_service_rounds {
         println!("    service rounds {rounds}");
-        println!(
-            "{}",
-            population("      ", members.iter().cloned())
-        );
+        println!("{}", population("      ", members.iter().cloned()));
     }
     println!("    terminal — no onward passage, capacity inert, no service round");
     println!("{}", population("      ", classes.terminal.iter().cloned()));
     if !classes.unreached.is_empty() {
         println!("    unreached within the grown horizon");
-        println!("{}", population("      ", classes.unreached.iter().cloned()));
+        println!(
+            "{}",
+            population("      ", classes.unreached.iter().cloned())
+        );
     }
 }
 
@@ -172,11 +172,7 @@ fn read(mapping: &CapacitanceMapping) -> CapacitanceReading {
 
 /// The service-round class of one identifier, as a single value when it departed once.
 fn rounds_of(reading: &CapacitanceReading, identifier: &str) -> Option<BigUint> {
-    reading
-        .site(identifier)?
-        .service_rounds()
-        .first()
-        .cloned()
+    reading.site(identifier)?.service_rounds().first().cloned()
 }
 
 fn main() {
@@ -231,7 +227,9 @@ fn main() {
     println!("                       receiver — the RESULT REACHED — can tell apart");
     println!("  branch population    accumulated by the transport law, not computed here");
     println!("  competing occupancy  branch population x active onward passages, the law's own");
-    println!("  source continuity    NOT in the circuit. `Derivation` carries no file, no line, no");
+    println!(
+        "  source continuity    NOT in the circuit. `Derivation` carries no file, no line, no"
+    );
     println!("                       position. Supplied instead by the deposited source: one plus");
     println!("                       the minimal line separation between the theorem line and the");
     println!("                       nearest line naming the recruited identifier");
@@ -267,13 +265,16 @@ fn main() {
     println!("  one_result_star(n)   predicted  shared terrain n rounds, every private symbol 1");
     println!("  many_result_star(n)  predicted  FLAT — every onward head is distinguishable");
     println!("  disjoint_terrain(n)  predicted  FLAT — there is no shared terrain to congest");
-    println!("  occurrence capacity  predicted  FLAT at the source layer, by theorem: every onward");
+    println!(
+        "  occurrence capacity  predicted  FLAT at the source layer, by theorem: every onward"
+    );
     println!("                                  head named the identifier at least once, so the");
     println!("                                  occurrence total is never below the fan-out");
 
     for arms in [3usize, 7] {
         let control = one_result_star(arms);
-        let circuit = found_circuit(&control, CircuitAperture::DEPOSITED_READER).expect("admissible");
+        let circuit =
+            found_circuit(&control, CircuitAperture::DEPOSITED_READER).expect("admissible");
         let reading = read(&found(
             &circuit,
             &control,
@@ -288,7 +289,11 @@ fn main() {
             "  one_result_star({arms})    shared {:?} rounds, private0 {:?} rounds  -> {}",
             shared.clone().map(|rounds| rounds.to_string()),
             private.clone().map(|rounds| rounds.to_string()),
-            if predicted { "as predicted" } else { "DISAGREES" }
+            if predicted {
+                "as predicted"
+            } else {
+                "DISAGREES"
+            }
         );
         holds.push((
             "one_result_star dilates the shared terrain by exactly its fan-out",
@@ -301,7 +306,8 @@ fn main() {
         ("many_result_star(7)", many_result_star(7)),
         ("disjoint_terrain(7)", disjoint_terrain(7)),
     ] {
-        let circuit = found_circuit(&control, CircuitAperture::DEPOSITED_READER).expect("admissible");
+        let circuit =
+            found_circuit(&control, CircuitAperture::DEPOSITED_READER).expect("admissible");
         let reading = read(&found(
             &circuit,
             &control,
@@ -381,11 +387,7 @@ fn main() {
     );
     let route_reading = read(&by_route);
     // Every route vertex is terminal here, so the departing population is exactly the terrain.
-    let route_terrain: Vec<&str> = route_reading
-        .terrain
-        .iter()
-        .map(String::as_str)
-        .collect();
+    let route_terrain: Vec<&str> = route_reading.terrain.iter().map(String::as_str).collect();
     println!(
         "  capacity law {:?}   delay law {:?}   horizon {}",
         route_reading.capacity_law, route_reading.delay_law, route_reading.horizon
@@ -409,7 +411,10 @@ fn main() {
         );
     }
     let route_classes = route_reading.dilation_classes();
-    println!("\n  the classes this dilation induces (the {} route vertices are terminal)", route_classes.terminal.len());
+    println!(
+        "\n  the classes this dilation induces (the {} route vertices are terminal)",
+        route_classes.terminal.len()
+    );
     for (rounds, members) in &route_classes.by_service_rounds {
         println!("    service rounds {rounds}");
         println!("{}", population("      ", members.iter().cloned()));
@@ -469,9 +474,14 @@ fn main() {
         atoms.len(),
         route_terrain.len()
     );
-    println!("  the downward recruitment closure of each is EMPTY and an elaboration reading cannot");
+    println!(
+        "  the downward recruitment closure of each is EMPTY and an elaboration reading cannot"
+    );
     println!("  tell any two of them apart");
-    println!("{}", population("    ", atoms.iter().map(|atom| (*atom).to_owned())));
+    println!(
+        "{}",
+        population("    ", atoms.iter().map(|atom| (*atom).to_owned()))
+    );
 
     let mut atom_classes: BTreeMap<BigUint, BTreeSet<&str>> = BTreeMap::new();
     for atom in &atoms {
@@ -504,9 +514,7 @@ fn main() {
         else {
             continue;
         };
-        println!(
-            "\n  {left} and {right} are both atoms with empty closures, and they separate:"
-        );
+        println!("\n  {left} and {right} are both atoms with empty closures, and they separate:");
         for site in [left_site, right_site] {
             let departure = &site.departures[0];
             println!(
@@ -529,13 +537,21 @@ fn main() {
 
     println!("\nCONTROL — NOTHING IS RANKED, AND WHERE A READER WOULD HAVE TO ADD ONE");
     println!("---------------------------------------------------------------------");
-    println!("  The return is a population and a partition. The class index is an exact BigUint and");
+    println!(
+        "  The return is a population and a partition. The class index is an exact BigUint and"
+    );
     println!("  the classes are presented in the integer's own order, which is the order of the");
-    println!("  naturals and not an order of importance. A RANKING APPEARS AT EXACTLY ONE STEP AND");
-    println!("  THAT STEP IS NOT IN THIS CODE: a reader who reads the class index as a magnitude of");
+    println!(
+        "  naturals and not an order of importance. A RANKING APPEARS AT EXACTLY ONE STEP AND"
+    );
+    println!(
+        "  THAT STEP IS NOT IN THIS CODE: a reader who reads the class index as a magnitude of"
+    );
     println!("  importance and takes the largest class has built an inverse-document weight.");
     println!();
-    println!("  The reading resists that step measurably rather than by exhortation. If the service");
+    println!(
+        "  The reading resists that step measurably rather than by exhortation. If the service"
+    );
     println!("  round were the recruitment count in disguise it would be monotone in the fan-out.");
     println!("  It is not:");
 
@@ -545,8 +561,10 @@ fn main() {
             let (Some(a), Some(b)) = (route_reading.site(left), route_reading.site(right)) else {
                 continue;
             };
-            let (Some(ra), Some(rb)) = (rounds_of(&route_reading, left), rounds_of(&route_reading, right))
-            else {
+            let (Some(ra), Some(rb)) = (
+                rounds_of(&route_reading, left),
+                rounds_of(&route_reading, right),
+            ) else {
                 continue;
             };
             if a.onward_passages > b.onward_passages && ra < rb {
@@ -561,12 +579,17 @@ fn main() {
         println!("    {inversion}");
     }
     if inversions.is_empty() {
-        println!("    (none — on this material the dilation happens to be monotone in the fan-out)");
+        println!(
+            "    (none — on this material the dilation happens to be monotone in the fan-out)"
+        );
     }
     holds.push((
         "the service-round class is not monotone in how often an identifier was recruited",
         !inversions.is_empty(),
-        format!("{} inversions against the recruitment count", inversions.len()),
+        format!(
+            "{} inversions against the recruitment count",
+            inversions.len()
+        ),
     ));
 
     let mut same_class_different_count = Vec::new();
@@ -597,8 +620,12 @@ fn main() {
     println!("--------------------------------------------------------------------------------");
     println!("  A capacity that never changes is a constant, not a capacitance. The returned");
     println!("  occurrence used here is the circuit's own: the co-present branch population the");
-    println!("  radiation DELIVERED to the site. `set_site_capacity` re-founds the capacity on that");
-    println!("  return without re-founding the site and without rewriting prior passage testimony.");
+    println!(
+        "  radiation DELIVERED to the site. `set_site_capacity` re-founds the capacity on that"
+    );
+    println!(
+        "  return without re-founding the site and without rewriting prior passage testimony."
+    );
 
     let mut conditioned = found(
         &deposited,
@@ -612,8 +639,7 @@ fn main() {
         .sites
         .iter()
         .find(|site| {
-            !site.departures.is_empty()
-                && !declaration_reading.terrain.contains(&site.identifier)
+            !site.departures.is_empty() && !declaration_reading.terrain.contains(&site.identifier)
         })
         .map(|site| site.identifier.clone());
 
@@ -649,8 +675,12 @@ fn main() {
         let after = after_reading.site(&interior).expect("a row");
         println!(
             "    returned occurrence: capacity {} -> {}",
-            moved.as_ref().map_or("-".to_owned(), |(was, _)| was.to_string()),
-            moved.as_ref().map_or("-".to_owned(), |(_, now)| now.to_string())
+            moved
+                .as_ref()
+                .map_or("-".to_owned(), |(was, _)| was.to_string()),
+            moved
+                .as_ref()
+                .map_or("-".to_owned(), |(_, now)| now.to_string())
         );
         println!(
             "    after    capacity {}   branch population {}   co-present {}   service rounds {}",
@@ -698,8 +728,12 @@ fn main() {
     println!("  multiset, and NO source coordinate at all. The circuit therefore supplies nothing");
     println!("  that could serve as source continuity, and a mapping restricted to it must report");
     println!("  the term absent. The deposit on disk does carry one: an artifact is a continuous");
-    println!("  source and its lines are ordered. What is used, declared exactly: the characteristic");
-    println!("  delay of a passage is ONE PLUS THE MINIMAL LINE SEPARATION, over the artifacts that");
+    println!(
+        "  source and its lines are ordered. What is used, declared exactly: the characteristic"
+    );
+    println!(
+        "  delay of a passage is ONE PLUS THE MINIMAL LINE SEPARATION, over the artifacts that"
+    );
     println!("  founded the head, between the theorem line and the nearest line naming the tail.");
 
     let situated_mapping = found(
@@ -732,10 +766,18 @@ fn main() {
         declaration_classes.by_service_rounds.len(),
         situated_classes.by_service_rounds.len()
     );
-    println!("  Under a uniform delay the interior site's terrain all arrives at one chronology and");
-    println!("  superposes; separating the arrivals by their source separation DE-CONGESTS it. That");
-    println!("  is the coupling running the other way and it is evidence the term is doing work, not");
-    println!("  evidence that source continuity improves a reading. A capacitance reading is not a");
+    println!(
+        "  Under a uniform delay the interior site's terrain all arrives at one chronology and"
+    );
+    println!(
+        "  superposes; separating the arrivals by their source separation DE-CONGESTS it. That"
+    );
+    println!(
+        "  is the coupling running the other way and it is evidence the term is doing work, not"
+    );
+    println!(
+        "  evidence that source continuity improves a reading. A capacitance reading is not a"
+    );
     println!("  quantity to be maximised.");
     println!("\n  and the branches that no longer superpose are retained, not lost:");
     for (site, chronologies) in &situated.deferred {
@@ -755,9 +797,15 @@ fn main() {
 
     println!("\nTHE ALTERNATIVE CAPACITY THAT WAS PREDICTED FLAT, RUN RATHER THAN ASSERTED");
     println!("--------------------------------------------------------------------------");
-    println!("  Capacity = the exact number of times the deposit named the identifier. Every onward");
-    println!("  head named it at least once, so the occurrence total is never below the fan-out and");
-    println!("  a unit branch population can never require a second round. Predicted: one class at");
+    println!(
+        "  Capacity = the exact number of times the deposit named the identifier. Every onward"
+    );
+    println!(
+        "  head named it at least once, so the occurrence total is never below the fan-out and"
+    );
+    println!(
+        "  a unit branch population can never require a second round. Predicted: one class at"
+    );
     println!("  the source layer, so any non-unit class can only come from an interior site where");
     println!("  the branch population accumulated.");
     let occurrence = read(&found(

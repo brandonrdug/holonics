@@ -76,8 +76,12 @@ fn fixtures() -> Vec<(Matroid, &'static str)> {
             "four general lines in P^2; wonderful model Bl_6 P^2",
         ),
         (
-            Matroid::graphic("M(K4)", 4, &[(0, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 3)])
-                .expect("M(K4)"),
+            Matroid::graphic(
+                "M(K4)",
+                4,
+                &[(0, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 3)],
+            )
+            .expect("M(K4)"),
             "the graphic matroid of K_4: six lines in P^2 with four triple points and three double \
              points; wonderful model Bl_7 P^2, Picard rank 8",
         ),
@@ -189,7 +193,11 @@ fn report_matroid(matroid: Matroid, note: &str, failures: &mut Vec<String>) {
             ring.dimension(degree),
             ring.chain_monomial_count(degree),
             ring.relation_row_count(degree),
-            if integral { "certified" } else { "NOT CERTIFIED" }
+            if integral {
+                "certified"
+            } else {
+                "NOT CERTIFIED"
+            }
         );
         let basis: Vec<String> = ring
             .monomial_basis(degree)
@@ -234,7 +242,10 @@ fn report_matroid(matroid: Matroid, note: &str, failures: &mut Vec<String>) {
     let verdict = ring.submodularity_verdict(ample_law);
     println!();
     println!("  the ample class ω = Σ_F c_F x_F with c(S) = |S|·(|E| − |S|):");
-    println!("    coefficients: {}", render_coefficients(&ring, ample_law));
+    println!(
+        "    coefficients: {}",
+        render_coefficients(&ring, ample_law)
+    );
     println!("    cone verdict: {}", render_verdict(&verdict));
     if !verdict.is_ample() {
         failures.push(format!(
@@ -369,7 +380,9 @@ fn report_matroid(matroid: Matroid, note: &str, failures: &mut Vec<String>) {
         }
     }
     if !log_concave {
-        failures.push(format!("{name}: the reduced characteristic is not log-concave"));
+        failures.push(format!(
+            "{name}: the reduced characteristic is not log-concave"
+        ));
     }
 
     // ---- the falsifiers ----
@@ -590,7 +603,10 @@ fn print_report(
         }
     );
     if let Some(factors) = &report.lefschetz_invariant_factors {
-        let rendered: Vec<String> = factors.iter().map(std::string::ToString::to_string).collect();
+        let rendered: Vec<String> = factors
+            .iter()
+            .map(std::string::ToString::to_string)
+            .collect();
         println!(
             "      Smith invariant factors over Z: [{}]",
             wrap(&rendered.join(" "), 68, 8)
@@ -654,7 +670,9 @@ fn print_report(
 
 fn report_degenerate_refusals(failures: &mut Vec<String>) {
     println!("degenerate material, refused by type rather than silently computed:");
-    let ranks: Vec<u32> = (0..4usize).map(|subset| u32::from(subset & 1 != 0)).collect();
+    let ranks: Vec<u32> = (0..4usize)
+        .map(|subset| u32::from(subset & 1 != 0))
+        .collect();
     match Matroid::from_rank_table("a loop", 2, ranks) {
         Err(error) => println!("  a loop:              refused — {error}"),
         Ok(_) => failures.push("a matroid with a loop was accepted".to_owned()),
@@ -830,7 +848,11 @@ fn render_polynomial(coefficients: &[num_bigint::BigInt]) -> String {
         } else {
             terms.push(format!(
                 "{} {body}",
-                if coefficient.is_negative() { "−" } else { "+" }
+                if coefficient.is_negative() {
+                    "−"
+                } else {
+                    "+"
+                }
             ));
         }
     }

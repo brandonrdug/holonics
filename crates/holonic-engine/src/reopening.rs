@@ -346,11 +346,9 @@ impl fmt::Display for ApertureSource {
             Self::NoDeletion => write!(formatter, "no deletion"),
             Self::RetainedSeriesTail => write!(formatter, "a retained series tail"),
             Self::AnalyticWidth => write!(formatter, "an analytic enclosure width"),
-            Self::UnitInTheLastPlace { species, ulp_bits } => write!(
-                formatter,
-                "one {} ulp, 2^-{ulp_bits}",
-                species.name()
-            ),
+            Self::UnitInTheLastPlace { species, ulp_bits } => {
+                write!(formatter, "one {} ulp, 2^-{ulp_bits}", species.name())
+            }
             Self::DeclaredTruncation { bits } => {
                 write!(formatter, "a declared truncation at {bits} bits")
             }
@@ -685,9 +683,9 @@ fn dot_integers(left: &[BigInt], right: &[BigInt]) -> BigInt {
 }
 
 fn dot_rational_integer(left: &[Rat], right: &[BigInt]) -> Rat {
-    left.iter()
-        .zip(right)
-        .fold(Rat::zero(), |sum, (a, b)| sum + a * Rat::from_integer(b.clone()))
+    left.iter().zip(right).fold(Rat::zero(), |sum, (a, b)| {
+        sum + a * Rat::from_integer(b.clone())
+    })
 }
 
 struct Orthogonalisation {
@@ -1276,9 +1274,7 @@ pub fn reopen_with_frames(
 
     let basis: Vec<String> = faces.iter().map(|face| face.name.clone()).collect();
     let first = probes[0].coefficients.clone();
-    let agreed = probes
-        .iter()
-        .all(|probe| probe.coefficients == first);
+    let agreed = probes.iter().all(|probe| probe.coefficients == first);
 
     let verdict = if !agreed {
         ReopeningVerdict::FrameDependent {
@@ -1403,8 +1399,14 @@ mod tests {
         assert_eq!(dyadic_scale(&integer(2)), Some(1));
         assert_eq!(dyadic_scale(&integer(3)), Some(1));
         assert_eq!(dyadic_scale(&integer(4)), Some(2));
-        assert_eq!(dyadic_scale(&Rat::new(BigInt::one(), BigInt::from(8))), Some(-3));
-        assert_eq!(dyadic_scale(&Rat::new(BigInt::one(), BigInt::from(7))), Some(-3));
+        assert_eq!(
+            dyadic_scale(&Rat::new(BigInt::one(), BigInt::from(8))),
+            Some(-3)
+        );
+        assert_eq!(
+            dyadic_scale(&Rat::new(BigInt::one(), BigInt::from(7))),
+            Some(-3)
+        );
         assert_eq!(dyadic_scale(&Rat::zero()), None);
     }
 
@@ -1516,11 +1518,8 @@ mod tests {
         )
         .expect("an ordered combination");
 
-        let euler = reopen(
-            &[a2.clone(), a3.clone(), machin_pi],
-            &grain_pair(),
-        )
-        .expect("a probeable basis");
+        let euler =
+            reopen(&[a2.clone(), a3.clone(), machin_pi], &grain_pair()).expect("a probeable basis");
         let candidate = euler.verdict.candidate().expect("Euler's identity");
         assert_eq!(
             candidate.coefficients,
@@ -1539,7 +1538,11 @@ mod tests {
     fn a_relation_free_basis_returns_nothing() {
         // `a log2 + b log3 + c log5 = 0` iff `2^a 3^b 5^c = 1` iff `a = b = c = 0`, by unique
         // factorisation. There is no relation to find and the instrument must say so.
-        let faces = vec![log_face(2, 80, 96), log_face(3, 80, 96), log_face(5, 80, 96)];
+        let faces = vec![
+            log_face(2, 80, 96),
+            log_face(3, 80, 96),
+            log_face(5, 80, 96),
+        ];
         let reopening = reopen(&faces, &grain_pair()).expect("a probeable basis");
         assert!(
             reopening.verdict.returned_nothing(),
@@ -1579,11 +1582,8 @@ mod tests {
 
         // Machin's relation has height 16 over three faces, so it is reachable only when the grain
         // modulus comfortably exceeds 16^3 = 4096.
-        let coarse = reopen(
-            &faces,
-            &[DeclaredGrain::bits(6), DeclaredGrain::bits(8)],
-        )
-        .expect("a probeable basis");
+        let coarse = reopen(&faces, &[DeclaredGrain::bits(6), DeclaredGrain::bits(8)])
+            .expect("a probeable basis");
         assert!(
             coarse.verdict.returned_nothing(),
             "the relation is not reachable below its own height: {:?}",
@@ -1665,7 +1665,10 @@ mod tests {
         )
         .expect("an ordered residual");
         assert!(residual.lower <= Rat::zero() && residual.upper >= Rat::zero());
-        assert!(!residual.is_point(), "no finite enclosure proves a real sum is zero");
+        assert!(
+            !residual.is_point(),
+            "no finite enclosure proves a real sum is zero"
+        );
     }
 
     #[test]
@@ -1675,7 +1678,10 @@ mod tests {
         let odd = arctan_unit_fraction(5, 9).expect("a folded arctangent");
         let a = even.enclosure();
         let b = odd.enclosure();
-        assert!(a.lower <= b.upper && b.lower <= a.upper, "{a:?} and {b:?} must overlap");
+        assert!(
+            a.lower <= b.upper && b.lower <= a.upper,
+            "{a:?} and {b:?} must overlap"
+        );
         // And the tighter fold is strictly inside the looser one.
         assert!(b.lower >= a.lower && b.upper <= a.upper);
     }
@@ -1686,7 +1692,11 @@ mod tests {
         // cannot silently return. Collapsed to exactly the grain, the faces cannot refute a
         // spurious vector -- the enclosure is one lattice unit wide -- and two adjacent grains are
         // not two frames, so grain-only framing agreed with itself and returned a false relation.
-        let sources = [log_face(2, 120, 210), log_face(3, 120, 210), log_face(5, 120, 210)];
+        let sources = [
+            log_face(2, 120, 210),
+            log_face(3, 120, 210),
+            log_face(5, 120, 210),
+        ];
         let collapsed: Vec<ExactFace> = sources
             .iter()
             .map(|face| ExactFace::collapsed(format!("{} collapsed", face.name), face, 96))
@@ -1940,7 +1950,10 @@ mod tests {
                 )
             })
             .collect();
-        assert_eq!(finest_admissible_grain(&measurements), CertifiedBits::Bits(12));
+        assert_eq!(
+            finest_admissible_grain(&measurements),
+            CertifiedBits::Bits(12)
+        );
         let measured = reopen(
             &measurements,
             &[DeclaredGrain::bits(11), DeclaredGrain::bits(12)],

@@ -398,7 +398,10 @@ fn main() {
         .map(|record| record.id)
         .filter(|id| id.saturating_add(3) >= removed_identity.0 && *id <= removed_identity.0 + 3)
         .collect();
-    println!("    ... {neighbourhood:?} ...   with {} absent", removed_identity.0);
+    println!(
+        "    ... {neighbourhood:?} ...   with {} absent",
+        removed_identity.0
+    );
 
     // ---------------------------------------------------------------------------------------------
     rule("[3]  THE FOUNDING SEAM CANNOT CARRY IT -- and that is why this driver is not vacuous");
@@ -435,7 +438,9 @@ fn main() {
     );
 
     // ---------------------------------------------------------------------------------------------
-    rule("[4]  THE SEAL AND THE DEPARTURE -- the ablated body to octets, then out of the repository");
+    rule(
+        "[4]  THE SEAL AND THE DEPARTURE -- the ablated body to octets, then out of the repository",
+    );
 
     let rest = match ConditionedRest::seal(&ablated) {
         Ok(rest) => rest,
@@ -457,7 +462,11 @@ fn main() {
     println!("\n  the ablated body sealed:");
     println!("    founded stems      {}", rest.stems().len());
     println!("    standing artifacts {}", rest.standing().len());
-    println!("    {} octets   address {}", octets.len(), deposited.address);
+    println!(
+        "    {} octets   address {}",
+        octets.len(),
+        deposited.address
+    );
     println!("    {}", sealed_path.display());
     println!("\n  the census of the sealed form, recomputed by mounting it");
     for (field, value) in rest.census_rows().expect("a census") {

@@ -83,17 +83,19 @@ use num_bigint::BigInt;
 use serde::{Deserialize, Serialize};
 
 use crate::algebraic::{CausalAlgebraicError, CausalCellId};
-use crate::complex_system::{cell as cell_of_item, item as item_of_cell, AddressReading, ComplexSystem, ComplexSystemError};
+use crate::complex_system::{
+    AddressReading, ComplexSystem, ComplexSystemError, cell as cell_of_item, item as item_of_cell,
+};
 use crate::conditioned_derivation::{ConditionedCircuit, Passage, PassageId, PassageOrigin};
-use crate::derivation_atlas::{statement_vertex_key, DerivationIdentity};
-use crate::dilation::{dilate, Horizon, WalkOrder};
+use crate::derivation_atlas::{DerivationIdentity, statement_vertex_key};
+use crate::dilation::{Horizon, WalkOrder, dilate};
 use crate::placement::Placement;
 use crate::rebase_invariants::PivotRule;
 use crate::receiver_exact_compression::{ItemId, ObservedSystem};
 use crate::skein::Substitution;
 use crate::substitution_realizers::{
-    place_substitutions, read_and_realize, RealizerAdmission, SubstitutionPlacement,
-    SubstitutionRealizers,
+    RealizerAdmission, SubstitutionPlacement, SubstitutionRealizers, place_substitutions,
+    read_and_realize,
 };
 use crate::supported_realizers::RealizerId;
 
@@ -273,10 +275,7 @@ pub fn passage_frame(circuit: &ConditionedCircuit, passage: &Passage) -> BTreeSe
 }
 
 /// The cells one passage founded: its own 0-cell, its recruitment 1-cells and its reach 1-cell.
-pub fn passage_interior(
-    circuit: &ConditionedCircuit,
-    passage: &Passage,
-) -> BTreeSet<CausalCellId> {
+pub fn passage_interior(circuit: &ConditionedCircuit, passage: &Passage) -> BTreeSet<CausalCellId> {
     let key = vertex_key(circuit, passage);
     let mut interior = BTreeSet::new();
     if let Some(cell) = circuit.circuit.vertices().get(&key) {
@@ -602,7 +601,12 @@ pub fn declare_receivers(
     let complex = circuit.circuit.complex();
     let mut receivers = Vec::new();
     for focus in receiver_foci(circuit) {
-        receivers.push(dilate(complex, focus, Horizon::Unbounded, WalkOrder::Breadth)?);
+        receivers.push(dilate(
+            complex,
+            focus,
+            Horizon::Unbounded,
+            WalkOrder::Breadth,
+        )?);
     }
     if receivers.is_empty() {
         return Err(DerivationSkeinRefusal::ProductionFoundedNothing);
@@ -865,12 +869,10 @@ pub fn class_of(placement: &Placement, cell: CausalCellId) -> Option<usize> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::conditioned_derivation::{
-        expose, ConditionedBody, DerivationQuery, Exposure,
-    };
+    use crate::conditioned_derivation::{ConditionedBody, DerivationQuery, Exposure, expose};
     use crate::derivation_atlas::CircuitAperture;
-    use crate::rebase_invariants::{smith_normal_form, IntegerMatrix};
-    use crate::substitution_realizers::{discharge_substitutions, SubstitutionDischarge};
+    use crate::rebase_invariants::{IntegerMatrix, smith_normal_form};
+    use crate::substitution_realizers::{SubstitutionDischarge, discharge_substitutions};
     use crate::supported_realizers::{incidence, positive_form, quadratic_value};
     use num_traits::Zero;
 
@@ -970,9 +972,7 @@ mod tests {
 
     fn circuit() -> ConditionedCircuit {
         let body = body();
-        let passages = body
-            .passages(&query())
-            .expect("the production reads back");
+        let passages = body.passages(&query()).expect("the production reads back");
         let aperture = MoveAperture::morphemic(&passages, 4);
         crate::conditioned_derivation::found_conditioned_circuit(
             passages_under(&passages, &aperture),
@@ -1005,7 +1005,8 @@ mod tests {
     /// second statement, which is what makes an unreachable class possible. Without either, half
     /// this file would be unfalsifiable rather than merely unpaid.
     #[test]
-    fn the_fixture_holds_a_three_member_bridge_group_and_a_statement_the_production_never_reaches() {
+    fn the_fixture_holds_a_three_member_bridge_group_and_a_statement_the_production_never_reaches()
+    {
         let circuit = circuit();
         let groups = bridge_groups(&circuit.passages);
         let widest = groups
@@ -1117,7 +1118,10 @@ mod tests {
 
         // The conduct aperture holds the deposit's edges and none of the production's.
         let admitted: BTreeSet<CausalCellId> = conduct_aperture(&circuit).into_iter().collect();
-        assert!(!admitted.is_empty(), "no conduct step at all is not an aperture");
+        assert!(
+            !admitted.is_empty(),
+            "no conduct step at all is not an aperture"
+        );
         for passage in circuit.passages.iter().filter(|p| p.is_derived()) {
             for cell in passage_interior(&circuit, passage) {
                 assert!(
@@ -1309,9 +1313,11 @@ mod tests {
                         !reached_by.is_empty(),
                         "a class reached only in multiple must name what reached it"
                     );
-                    assert!(reached_by
-                        .iter()
-                        .all(|naming| naming.species == MoveSpecies::LemmaSplit));
+                    assert!(
+                        reached_by
+                            .iter()
+                            .all(|naming| naming.species == MoveSpecies::LemmaSplit)
+                    );
                 }
                 MoveObstruction::NoMoveReached => panic!("filtered above"),
             }
@@ -1495,7 +1501,10 @@ mod tests {
             "no standing class holds a cell the production founded"
         );
         for class in &from_production {
-            assert!(!class.paid_by.is_empty(), "a standing class is never unpaid");
+            assert!(
+                !class.paid_by.is_empty(),
+                "a standing class is never unpaid"
+            );
             for naming in &class.paid_by {
                 assert!(
                     !naming.deposits.is_empty(),
@@ -1630,7 +1639,11 @@ mod tests {
             (0..extent)
                 .map(|index| {
                     let magnitude = (index as i64) + 2;
-                    BigInt::from(if index % 2 == 0 { magnitude } else { -magnitude })
+                    BigInt::from(if index % 2 == 0 {
+                        magnitude
+                    } else {
+                        -magnitude
+                    })
                 })
                 .collect(),
         ];
@@ -1690,7 +1703,11 @@ mod tests {
             assert_eq!(rank, placement.support.supported_rank);
             ranks.insert(rank);
         }
-        assert_eq!(ranks.len(), 2, "the two apertures must not have the same rank");
+        assert_eq!(
+            ranks.len(),
+            2,
+            "the two apertures must not have the same rank"
+        );
     }
 
     // ---------------------------------------------------------------------------------------

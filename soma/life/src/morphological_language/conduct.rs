@@ -166,7 +166,11 @@ impl MorphologicalConductEdgeAddress {
         self.chart
             .cmp(&other.chart)
             .then_with(|| self.context_state.cmp(&other.context_state))
-            .then_with(|| self.germ_identity.schema().cmp(&other.germ_identity.schema()))
+            .then_with(|| {
+                self.germ_identity
+                    .schema()
+                    .cmp(&other.germ_identity.schema())
+            })
             .then_with(|| {
                 self.germ_identity
                     .words()
@@ -625,7 +629,6 @@ impl ConductingMorphologicalLanguageEcology {
             removed: ablated.removed,
         }
     }
-
 }
 
 pub struct MorphologicalLanguageTargetConductAblation {

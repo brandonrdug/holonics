@@ -44,7 +44,7 @@ use holonic_engine::interchange::declared_material::{
     CoupledJunctions, SameEndpointDifferentPath, TwoGadgets,
 };
 use holonic_engine::interchange::{
-    certify_founding_orders, certify_pair, order_price_bits, StagedFootprint,
+    StagedFootprint, certify_founding_orders, certify_pair, order_price_bits,
 };
 use holonic_engine::receiver_exact_compression::ItemId;
 
@@ -71,12 +71,24 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     rule("THE PRICE — exact, over BigUint, with no Stirling anywhere on the path");
 
-    println!("  {:>6}  {:>14}  {:>16}", "n", "ceil(log2 n!)", "n·log2(n) [scale]");
+    println!(
+        "  {:>6}  {:>14}  {:>16}",
+        "n", "ceil(log2 n!)", "n·log2(n) [scale]"
+    );
     println!("  {}", "-".repeat(42));
     for population in TABULATED {
         let n = population as u64;
-        let scale = if n < 2 { 0 } else { n * (u64::BITS - (n - 1).leading_zeros()) as u64 };
-        println!("  {:>6}  {:>14}  {:>16}", population, order_price_bits(population), scale);
+        let scale = if n < 2 {
+            0
+        } else {
+            n * (u64::BITS - (n - 1).leading_zeros()) as u64
+        };
+        println!(
+            "  {:>6}  {:>14}  {:>16}",
+            population,
+            order_price_bits(population),
+            scale
+        );
     }
 
     hold(
@@ -112,8 +124,14 @@ fn main() -> Result<(), Box<dyn Error>> {
                 StagedFootprint::at(ItemId(4), ItemId(5)),
             ),
         ),
-        ("TwoGadgets (whole order)", certify_founding_orders(&TwoGadgets)),
-        ("CoupledJunctions", certify_founding_orders(&CoupledJunctions)),
+        (
+            "TwoGadgets (whole order)",
+            certify_founding_orders(&TwoGadgets),
+        ),
+        (
+            "CoupledJunctions",
+            certify_founding_orders(&CoupledJunctions),
+        ),
         (
             "SameEndpointDifferentPath",
             certify_founding_orders(&SameEndpointDifferentPath),
@@ -124,7 +142,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut load_bearing = 0usize;
     let mut total_overpayment = 0u64;
 
-    println!("  {:<28} {:>7}  {:<14}  {:>8}  {}", "material", "staged", "verdict", "bits", "overpayment");
+    println!(
+        "  {:<28} {:>7}  {:<14}  {:>8}  {}",
+        "material", "staged", "verdict", "bits", "overpayment"
+    );
     println!("  {}", "-".repeat(80));
     for (name, certificate) in &certificates {
         let price = certificate.order_price(certificate.staged.len());
@@ -138,7 +159,11 @@ fn main() -> Result<(), Box<dyn Error>> {
             "  {:<28} {:>7}  {:<14}  {:>8}  {}",
             name,
             price.population,
-            if certificate.is_interchangeable() { "INTERCHANGE" } else { "ORDERED" },
+            if certificate.is_interchangeable() {
+                "INTERCHANGE"
+            } else {
+                "ORDERED"
+            },
             price.bits,
             price.overpayment()
         );
@@ -148,7 +173,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     hold(
         "THE PRICE IS CHARGED ONLY WHERE THE FAMILY IS BLIND — an ordered front pays nothing",
         load_bearing > 0 && certificates.len() > load_bearing,
-        format!("{unreadable} unreadable · {load_bearing} load-bearing over {} materials", certificates.len()),
+        format!(
+            "{unreadable} unreadable · {load_bearing} load-bearing over {} materials",
+            certificates.len()
+        ),
     );
     hold(
         "the two halves are separable — a material exists on each side",

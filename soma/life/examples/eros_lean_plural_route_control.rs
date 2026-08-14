@@ -159,16 +159,13 @@ fn forest_agrees(circuit: &DerivationCircuit) -> bool {
 fn recruitment_classes(population: &[Derivation]) -> BTreeMap<&str, BTreeSet<Vec<(String, u32)>>> {
     let mut classes: BTreeMap<&str, BTreeSet<Vec<(String, u32)>>> = BTreeMap::new();
     for derivation in population {
-        classes
-            .entry(derivation.name.as_str())
-            .or_default()
-            .insert(
-                derivation
-                    .recruited
-                    .iter()
-                    .map(|(symbol, count)| (symbol.clone(), *count))
-                    .collect(),
-            );
+        classes.entry(derivation.name.as_str()).or_default().insert(
+            derivation
+                .recruited
+                .iter()
+                .map(|(symbol, count)| (symbol.clone(), *count))
+                .collect(),
+        );
     }
     classes
 }
@@ -385,8 +382,13 @@ fn main() {
         "the conditioned body composes a proof family for the statement the reading selected",
     );
     if let Some(refusal) = unreachable {
-        println!("\n    the reading selected {target}\n    and the conditioned body returned {refusal}");
-        eprintln!("\nFAILED — {} declared control(s) did not hold:", failures.0.len());
+        println!(
+            "\n    the reading selected {target}\n    and the conditioned body returned {refusal}"
+        );
+        eprintln!(
+            "\nFAILED — {} declared control(s) did not hold:",
+            failures.0.len()
+        );
         for claim in &failures.0 {
             eprintln!("  - {claim}");
         }
@@ -614,7 +616,10 @@ fn main() {
         "the movement names grade 1 and names the betti field",
     );
     failures.require(
-        routes.became_plural().iter().any(|statement| *statement == target),
+        routes
+            .became_plural()
+            .iter()
+            .any(|statement| *statement == target),
         "the route movement names the selected statement as become-plural, as a population",
     );
     failures.require(
@@ -630,8 +635,12 @@ fn main() {
         "the production ADDED an independent route to a result, by both accounts",
     );
     failures.require(
-        !before_circuit.plural_vertex_statements().contains(target.as_str())
-            && after_circuit.plural_vertex_statements().contains(target.as_str()),
+        !before_circuit
+            .plural_vertex_statements()
+            .contains(target.as_str())
+            && after_circuit
+                .plural_vertex_statements()
+                .contains(target.as_str()),
         "the statement the reading selected was un-cross-checked before and is cross-checked after",
     );
 
@@ -640,13 +649,19 @@ fn main() {
     let refused_artifact = families
         .iter()
         .flat_map(|(problem, returns)| {
-            returns.members().iter().map(move |returned| (problem, returned))
+            returns
+                .members()
+                .iter()
+                .map(move |returned| (problem, returned))
         })
         .find(|(_, returned)| returned.outcome() == LeanKernelOutcome::Obstructed);
     let admitted_artifact = families
         .iter()
         .flat_map(|(problem, returns)| {
-            returns.members().iter().map(move |returned| (problem, returned))
+            returns
+                .members()
+                .iter()
+                .map(move |returned| (problem, returned))
         })
         .find(|(_, returned)| returned.outcome() == LeanKernelOutcome::KernelAdmitted);
     if let (Some((refused_problem, refused_return)), Some((admitted_problem, admitted_return))) =
@@ -666,7 +681,12 @@ fn main() {
         }
         println!(
             "    the kernel said: {}",
-            refused_return.diagnostic().trim().lines().next().unwrap_or("")
+            refused_return
+                .diagnostic()
+                .trim()
+                .lines()
+                .next()
+                .unwrap_or("")
         );
         println!(
             "\n    the atlas reads the refused artifact as   name {:?} statement {:?}\n\
@@ -699,11 +719,23 @@ fn main() {
     // ------------------------------------------------------ the return
     println!("\n=== the return");
     println!("    target selected from the reading  {target}");
-    println!("    artifacts deposited               {}", control_paths.len());
+    println!(
+        "    artifacts deposited               {}",
+        control_paths.len()
+    );
     println!("    kernel admitted / refused         {admitted} / {refused}");
-    println!("    betti at grade 1, historical      {}", betti_at(&production, 1));
-    println!("    betti at grade 1, this control    {}", betti_at(&control, 1));
-    println!("    scratch                           {}", scratch_root.display());
+    println!(
+        "    betti at grade 1, historical      {}",
+        betti_at(&production, 1)
+    );
+    println!(
+        "    betti at grade 1, this control    {}",
+        betti_at(&control, 1)
+    );
+    println!(
+        "    scratch                           {}",
+        scratch_root.display()
+    );
 
     if failures.0.is_empty() {
         println!(
@@ -715,7 +747,10 @@ fn main() {
              independent route to one result by two disjoint computations."
         );
     } else {
-        eprintln!("\nFAILED — {} declared control(s) did not hold:", failures.0.len());
+        eprintln!(
+            "\nFAILED — {} declared control(s) did not hold:",
+            failures.0.len()
+        );
         for claim in &failures.0 {
             eprintln!("  - {claim}");
         }

@@ -44,12 +44,12 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 
 use holonic_engine::collocation::{
-    lean_artifact_items, lean_line_items, CoPresentation, CollocationDeposit, ComplexAperture,
-    ForcedPassage, NullBindScope, Presentation,
+    CoPresentation, CollocationDeposit, ComplexAperture, ForcedPassage, NullBindScope,
+    Presentation, lean_artifact_items, lean_line_items,
 };
-use holonic_engine::derivation_atlas::{read_derivation, Derivation};
+use holonic_engine::derivation_atlas::{Derivation, read_derivation};
 use holonic_engine::name_elaboration::{ElaborationAperture, ElaborationDeposit};
-use holonic_engine::rebase_invariants::{rebase_invariants, PivotRule};
+use holonic_engine::rebase_invariants::{PivotRule, rebase_invariants};
 
 /// The declared enumeration aperture: the co-presented population any one reading may walk. A
 /// reading that exceeds it is **refused with the bound**, never truncated.
@@ -205,11 +205,7 @@ fn verdict(number: usize, title: &str, held: bool) -> bool {
 fn passage_line(passage: &ForcedPassage, reproduced: bool) {
     println!(
         "    {:<10} {:<18} ==> {:<18} |ext|={:<4} refusing={:<4} sources={} Q={}/{}",
-        if reproduced {
-            "re-paired"
-        } else {
-            "SURVIVES "
-        },
+        if reproduced { "re-paired" } else { "SURVIVES " },
         passage.from,
         passage.to,
         passage.extent_from,
@@ -251,7 +247,9 @@ struct Reading {
 
 fn read_invariants(reading: &CoPresentation) -> Reading {
     let (link, _) = reading.without_universal();
-    let f_vector = link.f_vector(ENUMERATION_APERTURE).expect("declared aperture");
+    let f_vector = link
+        .f_vector(ENUMERATION_APERTURE)
+        .expect("declared aperture");
     let built = link
         .complex(COMPLEX_APERTURE, ENUMERATION_APERTURE)
         .expect("declared aperture");
@@ -263,7 +261,9 @@ fn read_invariants(reading: &CoPresentation) -> Reading {
     } else {
         COMPLEX_APERTURE
             .exact_to_grade()
-            .map_or(carried.len(), |grade| (grade as usize + 1).min(carried.len()))
+            .map_or(carried.len(), |grade| {
+                (grade as usize + 1).min(carried.len())
+            })
     };
     Reading {
         facets: link.facets().len(),
@@ -367,7 +367,10 @@ fn main() {
     let mut control_one = true;
     let mut founds_forcings: Vec<(String, usize, usize, usize, usize, usize)> = Vec::new();
     for (reading, deposit) in readings.iter().zip(&deposits) {
-        section(&format!("grain: {} -- the pairing destroyed", reading.grain()));
+        section(&format!(
+            "grain: {} -- the pairing destroyed",
+            reading.grain()
+        ));
         let real = read_invariants(reading);
         let real_passages = reading.forced_passages();
         println!(
@@ -563,7 +566,9 @@ fn main() {
     // CONTROL 2 -- the atom
     // ---------------------------------------------------------------------------------------------
 
-    rule_line("CONTROL 2 -- an atom's recruitment closure is empty and its collocation face is not");
+    rule_line(
+        "CONTROL 2 -- an atom's recruitment closure is empty and its collocation face is not",
+    );
 
     let derivations: Vec<Derivation> = artifacts
         .iter()
@@ -676,7 +681,10 @@ fn main() {
             closed.len()
         );
         for facet in facets.iter().take(6) {
-            println!("      facet {:?}", facet.iter().cloned().collect::<Vec<_>>());
+            println!(
+                "      facet {:?}",
+                facet.iter().cloned().collect::<Vec<_>>()
+            );
         }
         if facets.len() > 6 {
             println!("      ... and {} more, all in the return", facets.len() - 6);
@@ -744,7 +752,9 @@ fn main() {
     }
     let survives_every_grain: Vec<String> = by_grain["artifact"]
         .iter()
-        .filter(|passage| by_grain["line"].contains(passage) && by_grain["founding"].contains(passage))
+        .filter(|passage| {
+            by_grain["line"].contains(passage) && by_grain["founding"].contains(passage)
+        })
         .map(|(from, to)| format!("{from} => {to}"))
         .collect();
     println!(
@@ -775,7 +785,9 @@ fn main() {
     // CONTROL 5 -- nothing dropped
     // ---------------------------------------------------------------------------------------------
 
-    rule_line("CONTROL 5 -- nothing dropped silently; every bound declared and what fell outside named");
+    rule_line(
+        "CONTROL 5 -- nothing dropped silently; every bound declared and what fell outside named",
+    );
 
     let mut nothing_dropped = true;
     for (reading, deposit) in readings.iter().zip(&deposits) {
@@ -813,7 +825,9 @@ fn main() {
             );
         }
 
-        let whole = link.f_vector(ENUMERATION_APERTURE).expect("declared aperture");
+        let whole = link
+            .f_vector(ENUMERATION_APERTURE)
+            .expect("declared aperture");
         let built = link
             .complex(COMPLEX_APERTURE, ENUMERATION_APERTURE)
             .expect("declared aperture");

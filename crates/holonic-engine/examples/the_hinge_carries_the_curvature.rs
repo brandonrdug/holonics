@@ -56,11 +56,10 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use holonic_engine::conditioned_derivation::{expose, Exposure, FoundedMorphology};
+use holonic_engine::conditioned_derivation::{Exposure, FoundedMorphology, expose};
 use holonic_engine::contact_gluing::{
-    coarse_grain_in_aperture, contact_graph, contact_triangles, hinge_deficits,
     CoarseTurn, ContactTriangle, DeficitSpecies, EuclideanRealization, HingeDeficit, HingeHolonomy,
-    LinkClass,
+    LinkClass, coarse_grain_in_aperture, contact_graph, contact_triangles, hinge_deficits,
 };
 use holonic_engine::multiquadratic::Multiquadratic;
 use num_bigint::BigInt;
@@ -123,27 +122,90 @@ fn species_name(species: DeficitSpecies) -> &'static str {
 /// The declared material, identical to `the_tower_climbs` so the two drivers are comparable.
 fn atmosphere() -> Vec<(String, String)> {
     [
-        ("carriage", "the carriage carries the charge and the carrier carries the carriage"),
-        ("carrier", "the carrier carries the charge the carriage carried"),
-        ("carries", "the carries of the carriage carry the charge the carrier carries"),
-        ("charges", "the charges charge the carriage and the charges charge the carrier"),
-        ("charged", "the charged carriage charged the charged carrier with charges"),
-        ("charger", "the charger charges the charged carrier and the charger charges"),
-        ("discharge", "the discharge discharges the charged carriage and the charger"),
-        ("recharge", "the recharge recharges the charger and the charged carrier"),
-        ("conductor", "the conductor conducts the charge the carriage carried"),
-        ("conducted", "the conducted charge conducted the conductor and the carrier"),
-        ("conduction", "the conduction of the conducted charge conducts the conductor"),
-        ("transport", "the transport transports the charge the conductor conducted"),
-        ("transporter", "the transporter transports the transported charge and the transport"),
-        ("transported", "the transported charge transports the transporter and the conductor"),
-        ("transpose", "the transpose transposes the transported charge and the transport"),
-        ("transposed", "the transposed transpose transposed the transporter and the transport"),
-        ("port", "the port ports the charge and the transport ports the carrier"),
-        ("ported", "the ported charge ported the port and the transporter ports"),
-        ("porter", "the porter ports the ported charge and the transporter ports"),
-        ("charter", "the charter charters the charge and the charger charters the porter"),
-        ("chartered", "the chartered charter chartered the charger and the ported charge"),
+        (
+            "carriage",
+            "the carriage carries the charge and the carrier carries the carriage",
+        ),
+        (
+            "carrier",
+            "the carrier carries the charge the carriage carried",
+        ),
+        (
+            "carries",
+            "the carries of the carriage carry the charge the carrier carries",
+        ),
+        (
+            "charges",
+            "the charges charge the carriage and the charges charge the carrier",
+        ),
+        (
+            "charged",
+            "the charged carriage charged the charged carrier with charges",
+        ),
+        (
+            "charger",
+            "the charger charges the charged carrier and the charger charges",
+        ),
+        (
+            "discharge",
+            "the discharge discharges the charged carriage and the charger",
+        ),
+        (
+            "recharge",
+            "the recharge recharges the charger and the charged carrier",
+        ),
+        (
+            "conductor",
+            "the conductor conducts the charge the carriage carried",
+        ),
+        (
+            "conducted",
+            "the conducted charge conducted the conductor and the carrier",
+        ),
+        (
+            "conduction",
+            "the conduction of the conducted charge conducts the conductor",
+        ),
+        (
+            "transport",
+            "the transport transports the charge the conductor conducted",
+        ),
+        (
+            "transporter",
+            "the transporter transports the transported charge and the transport",
+        ),
+        (
+            "transported",
+            "the transported charge transports the transporter and the conductor",
+        ),
+        (
+            "transpose",
+            "the transpose transposes the transported charge and the transport",
+        ),
+        (
+            "transposed",
+            "the transposed transpose transposed the transporter and the transport",
+        ),
+        (
+            "port",
+            "the port ports the charge and the transport ports the carrier",
+        ),
+        (
+            "ported",
+            "the ported charge ported the port and the transporter ports",
+        ),
+        (
+            "porter",
+            "the porter ports the ported charge and the transporter ports",
+        ),
+        (
+            "charter",
+            "the charter charters the charge and the charger charters the porter",
+        ),
+        (
+            "chartered",
+            "the chartered charter chartered the charger and the ported charge",
+        ),
     ]
     .into_iter()
     .map(|(identity, text)| (identity.to_owned(), text.to_owned()))
@@ -188,7 +250,11 @@ fn turns(deficits: &[HingeDeficit]) -> BTreeMap<String, String> {
         .iter()
         .map(|hinge| {
             let value = match &hinge.holonomy {
-                HingeHolonomy::Exact { cosine, sine, half_turns } => {
+                HingeHolonomy::Exact {
+                    cosine,
+                    sine,
+                    half_turns,
+                } => {
                     format!("({}, {}) m={half_turns}", render(cosine), render(sine))
                 }
                 HingeHolonomy::Refused { refusals } => format!("refused×{}", refusals.len()),
@@ -217,7 +283,10 @@ fn main() {
         .map(|(identity, text)| expose(identity, text))
         .collect();
     let morphology = FoundedMorphology::condition(&exposures);
-    let population: Vec<String> = material.iter().map(|(identity, _)| identity.clone()).collect();
+    let population: Vec<String> = material
+        .iter()
+        .map(|(identity, _)| identity.clone())
+        .collect();
     println!("  words          {}", population.len());
     println!("  stems founded  {}", morphology.founded().len());
 
@@ -235,7 +304,11 @@ fn main() {
         .collect();
     println!("  vertices       {}", graph.identifiers.len());
     println!("  arcs           {}", graph.arcs.len());
-    println!("  triangles      {} ({} realizable)", triangles.len(), realized.len());
+    println!(
+        "  triangles      {} ({} realizable)",
+        triangles.len(),
+        realized.len()
+    );
 
     // ---------------------------------------------------------------------------------------------
 
@@ -249,11 +322,19 @@ fn main() {
             simplex_turns.insert(format!("({}, {})", render(&cosine), render(&sine)));
         }
     }
-    println!("  distinct per-simplex turns over {} triangles: {:?}", realized.len(), simplex_turns);
+    println!(
+        "  distinct per-simplex turns over {} triangles: {:?}",
+        realized.len(),
+        simplex_turns
+    );
     hold(
         "a simplex's own three corners compose to ONE value — Regge flatness, not a defect",
         simplex_turns.len() == 1,
-        format!("{} distinct value(s): {:?}", simplex_turns.len(), simplex_turns),
+        format!(
+            "{} distinct value(s): {:?}",
+            simplex_turns.len(),
+            simplex_turns
+        ),
     );
     println!(
         "  GRADE  `definition`. Σθ = π per planar triangle is the founding hypothesis of a\n\
@@ -293,17 +374,20 @@ fn main() {
     println!("\n  every hinge, with its link, its coface shapes, and its exact composed turn:");
     for hinge in &deficits {
         let turn = match &hinge.holonomy {
-            HingeHolonomy::Exact { cosine, sine, half_turns } => format!(
-                "m={half_turns}  ({}, {})",
-                render(cosine),
-                render(sine)
-            ),
+            HingeHolonomy::Exact {
+                cosine,
+                sine,
+                half_turns,
+            } => format!("m={half_turns}  ({}, {})", render(cosine), render(sine)),
             HingeHolonomy::Refused { refusals } => {
                 format!("refused: {:?}", refusals.iter().take(2).collect::<Vec<_>>())
             }
         };
-        let shapes: BTreeSet<&Vec<BigInt>> =
-            hinge.cofaces.iter().filter_map(|face| shape_of.get(face)).collect();
+        let shapes: BTreeSet<&Vec<BigInt>> = hinge
+            .cofaces
+            .iter()
+            .filter_map(|face| shape_of.get(face))
+            .collect();
         let equilateral = shapes.len() == 1
             && shapes
                 .iter()
@@ -324,8 +408,11 @@ fn main() {
     let tiling: Vec<&str> = deficits
         .iter()
         .filter(|hinge| {
-            let shapes: BTreeSet<&Vec<BigInt>> =
-                hinge.cofaces.iter().filter_map(|face| shape_of.get(face)).collect();
+            let shapes: BTreeSet<&Vec<BigInt>> = hinge
+                .cofaces
+                .iter()
+                .filter_map(|face| shape_of.get(face))
+                .collect();
             hinge.species == DeficitSpecies::Flat
                 && hinge.cofaces.len() == 6
                 && shapes.len() == 1
@@ -341,7 +428,10 @@ fn main() {
         tiling
     );
 
-    let distinct = turns(&deficits).values().cloned().collect::<BTreeSet<String>>();
+    let distinct = turns(&deficits)
+        .values()
+        .cloned()
+        .collect::<BTreeSet<String>>();
     hold(
         "THE RUNG CARRIES INFORMATION — hinges do not all compose to one value",
         distinct.len() > 1,
@@ -375,7 +465,11 @@ fn main() {
     hold(
         "the link classifier separates species rather than declaring every hinge regular",
         by_link.len() > 1 || !deficits.iter().all(|h| h.link.is_regular_interior()),
-        format!("{} distinct link classes: {:?}", by_link.len(), by_link.keys().collect::<Vec<_>>()),
+        format!(
+            "{} distinct link classes: {:?}",
+            by_link.len(),
+            by_link.keys().collect::<Vec<_>>()
+        ),
     );
 
     // ---------------------------------------------------------------------------------------------
@@ -386,7 +480,9 @@ fn main() {
     // DECLARED change of receiver, not a change of material: the identifiers, the arcs and the
     // incidence are identical, and only the lengths differ. CLAUDE.md §8 requires a gauge to
     // exhibit its own orbit before agreement may be read as evidence.
-    let rescale = |triangle: &ContactTriangle, law: &dyn Fn(&BigInt) -> BigInt| -> ContactTriangle {
+    let rescale = |triangle: &ContactTriangle,
+                   law: &dyn Fn(&BigInt) -> BigInt|
+     -> ContactTriangle {
         let weights = [
             law(&triangle.weights[0]),
             law(&triangle.weights[1]),
@@ -407,11 +503,8 @@ fn main() {
             stems,
             [&weights[0], &weights[1], &weights[2]],
         );
-        let euclidean = holonic_engine::contact_gluing::realization_of([
-            &weights[0],
-            &weights[1],
-            &weights[2],
-        ]);
+        let euclidean =
+            holonic_engine::contact_gluing::realization_of([&weights[0], &weights[1], &weights[2]]);
         let composes_exactly = euclidean == EuclideanRealization::Realized
             && corners.iter().all(|corner| corner.sine.is_ok());
         ContactTriangle {
@@ -431,16 +524,11 @@ fn main() {
         .iter()
         .map(|t| rescale(t, &|w: &BigInt| w * BigInt::from(3)))
         .collect();
-    let dilated_deficits =
-        hinge_deficits(&dilated);
+    let dilated_deficits = hinge_deficits(&dilated);
     hold(
         "CONTROL — a uniform dilation is a similarity and must leave every hinge turn unchanged",
         turns(&dilated_deficits) == turns(&deficits),
-        format!(
-            "census {:?} vs {:?}",
-            census(&dilated_deficits),
-            tally
-        ),
+        format!("census {:?} vs {:?}", census(&dilated_deficits), tally),
     );
 
     // FRAME 2 — a non-uniform law. `w ↦ w + 1` changes the RATIOS, hence the corners, hence the
@@ -449,15 +537,18 @@ fn main() {
         .iter()
         .map(|t| rescale(t, &|w: &BigInt| w + BigInt::from(1)))
         .collect();
-    let shifted_deficits =
-        hinge_deficits(&shifted);
+    let shifted_deficits = hinge_deficits(&shifted);
     let shifted_turns = turns(&shifted_deficits);
     let base_turns = turns(&deficits);
     let moved: Vec<&String> = base_turns
         .keys()
         .filter(|at| shifted_turns.get(*at) != base_turns.get(*at))
         .collect();
-    println!("  hinges whose turn moved under `w ↦ w+1`: {} of {}", moved.len(), base_turns.len());
+    println!(
+        "  hinges whose turn moved under `w ↦ w+1`: {} of {}",
+        moved.len(),
+        base_turns.len()
+    );
     println!("    {:?}", moved.iter().take(12).collect::<Vec<_>>());
     println!("  census before {:?}", tally);
     println!("  census after  {:?}", census(&shifted_deficits));
@@ -473,7 +564,11 @@ fn main() {
         "  REPORTED, not graded: the species census {} under this metric change. One material,\n\
          \x20 one law — that the turns move while the trichotomy does not is a measurement here and\n\
          \x20 is asserted of nothing else.",
-        if census_moved { "MOVED" } else { "did NOT move" }
+        if census_moved {
+            "MOVED"
+        } else {
+            "did NOT move"
+        }
     );
 
     // ---------------------------------------------------------------------------------------------
@@ -497,9 +592,16 @@ fn main() {
     let faces = realized.len();
     let is_surface = 3 * faces == 2 * edges.len();
     println!("  V {vertices}   E {}   F {faces}", edges.len());
-    println!("  χ = V − E + F = {}", vertices as i64 - edges.len() as i64 + faces as i64);
-    println!("  closed-surface condition 3F = 2E: {} vs {}  →  {}",
-        3 * faces, 2 * edges.len(), if is_surface { "HOLDS" } else { "FAILS" });
+    println!(
+        "  χ = V − E + F = {}",
+        vertices as i64 - edges.len() as i64 + faces as i64
+    );
+    println!(
+        "  closed-surface condition 3F = 2E: {} vs {}  →  {}",
+        3 * faces,
+        2 * edges.len(),
+        if is_surface { "HOLDS" } else { "FAILS" }
+    );
     println!(
         "\n  TABLET_THE_TURN §11.4: \"The one row where Σδ = 6χ holds requires F = 2E/3 and is\n\
          \x20 CLAUDE.md §8's tautology rule firing, with its falsifier one aperture away.\"\n\
@@ -512,14 +614,21 @@ fn main() {
     hold(
         "the surface condition is MEASURED rather than assumed before any total is read",
         true,
-        format!("3F = {} , 2E = {} , surface = {is_surface}", 3 * faces, 2 * edges.len()),
+        format!(
+            "3F = {} , 2E = {} , surface = {is_surface}",
+            3 * faces,
+            2 * edges.len()
+        ),
     );
 
     // ---------------------------------------------------------------------------------------------
 
     rule("WHAT THIS RETURNED");
 
-    let regular = deficits.iter().filter(|h| h.link.is_regular_interior()).count();
+    let regular = deficits
+        .iter()
+        .filter(|h| h.link.is_regular_interior())
+        .count();
     println!(
         "  1. A simplex composes to one value over all {} realizable triangles. That is Regge's\n\
          \x20    flatness hypothesis and it is `definition`-grade. `the_tower_climbs`'s open\n\

@@ -75,13 +75,9 @@ fn junction(index: u64) -> AnalyticFieldJunctionId {
 
 fn theta_incidence() -> ArcIncidence {
     let (j0, j1) = (junction(0), junction(1));
-    [
-        (arc(0), (j0, j1)),
-        (arc(1), (j0, j1)),
-        (arc(2), (j0, j1)),
-    ]
-    .into_iter()
-    .collect()
+    [(arc(0), (j0, j1)), (arc(1), (j0, j1)), (arc(2), (j0, j1))]
+        .into_iter()
+        .collect()
 }
 
 /// Capacity-skew (`w_i A_ij = -w_j A_ji`) with zero row sums, on capacities `diag(1, 2, 3)`.
@@ -149,12 +145,7 @@ fn chain_law() -> ExactAnalyticAdvectionLaw {
     ]
     .into_iter()
     .collect();
-    let skew: [[i64; 4]; 4] = [
-        [0, 1, 1, -2],
-        [-1, 0, 3, -2],
-        [-1, -3, 0, 4],
-        [2, 2, -4, 0],
-    ];
+    let skew: [[i64; 4]; 4] = [[0, 1, 1, -2], [-1, 0, 3, -2], [-1, -3, 0, 4], [2, 2, -4, 0]];
     let weights = [1i64, 2, 3, 4];
     let generator = ExactRatMatrix::new(
         (0..4)
@@ -276,13 +267,21 @@ fn main() {
         "  arc order   {:?}",
         order.iter().map(|arc| arc.0).collect::<Vec<_>>()
     );
-    print_matrix("  ", "successor U (exact Cayley transform of the generator)", law.successor());
+    print_matrix(
+        "  ",
+        "successor U (exact Cayley transform of the generator)",
+        law.successor(),
+    );
     let inverse_transpose = law
         .successor()
         .transpose()
         .and_then(|transposed| transposed.inverse())
         .expect("the successor is invertible by construction");
-    print_matrix("  ", "material covector transport (U^T)^-1", &inverse_transpose);
+    print_matrix(
+        "  ",
+        "material covector transport (U^T)^-1",
+        &inverse_transpose,
+    );
 
     let ones = vec![integer(1); 3];
     let divergence_free = law.successor().apply(&ones).expect("square") == ones;
@@ -296,7 +295,9 @@ fn main() {
     println!("\n\n2. CONTROL — DOES THE MATERIAL SEPARATE THE TWO TRANSPORTS AT ALL?");
     println!("------------------------------------------------------------------");
     println!("  A gauge whose group acts trivially on the declared material is not a gauge. The");
-    println!("  two transports here are `U` (naive) and `(U^T)^-1` (material). On equal capacities");
+    println!(
+        "  two transports here are `U` (naive) and `(U^T)^-1` (material). On equal capacities"
+    );
     println!("  they COLLAPSE, and every reading below would pass without testing anything.");
 
     let equal = equal_capacity_law();
@@ -320,7 +321,8 @@ fn main() {
     // ===========================================================================================
     println!("\n\n3. REFUSALS — WHAT `MaterialLoop::found` WILL NOT ADMIT");
     println!("-------------------------------------------------------");
-    let open_chain = MaterialLoop::found(&arcs, "open", [(arc(0), integer(1))].into_iter().collect());
+    let open_chain =
+        MaterialLoop::found(&arcs, "open", [(arc(0), integer(1))].into_iter().collect());
     let empty = MaterialLoop::found(&arcs, "empty", BTreeMap::new());
     let outside = MaterialLoop::found(
         &arcs,
@@ -404,9 +406,13 @@ fn main() {
     println!("  its coefficients sum to 6, so it is not closed.");
     println!();
     println!("  And the left-fixed SPACE is exactly that one line, computed rather than asserted.");
-    println!("  U^T c = c  <=>  Omega^-1 c is in ker A, because U is Omega-orthogonal with U.1 = 1.");
+    println!(
+        "  U^T c = c  <=>  Omega^-1 c is in ker A, because U is Omega-orthogonal with U.1 = 1."
+    );
     println!("  A . 1 = 0 gives rank A <= 2; one nonvanishing 2x2 minor gives rank A >= 2. So");
-    println!("  dim ker A = 1, ker A = span{{1}}, and the left-fixed covectors are span{{Omega . 1}}.");
+    println!(
+        "  dim ker A = 1, ker A = span{{1}}, and the left-fixed covectors are span{{Omega . 1}}."
+    );
     let generator = ExactRatMatrix::new(vec![
         vec![Rat::zero(), integer(1), integer(-1)],
         vec![rat(-1, 2), Rat::zero(), rat(1, 2)],
@@ -425,7 +431,9 @@ fn main() {
         format_rat(&minor),
         !minor.is_zero()
     );
-    println!("  Every nonzero covector on that line has coefficient sum 6k != 0, so the left-fixed");
+    println!(
+        "  Every nonzero covector on that line has coefficient sum 6k != 0, so the left-fixed"
+    );
     println!("  line meets the closed subspace only at zero:");
     println!("  ON THIS FIXTURE THE FIXED-PROBE APPARATUS CAN CERTIFY NO CIRCULATION AT ALL.");
     holds.push((
@@ -465,16 +473,22 @@ fn main() {
             .collect::<Vec<_>>()
             .join(" ")
     );
-    println!("  field before            {}", render_standing(&before, &order));
-    println!("  field after             {}", render_standing(&after, &order));
+    println!(
+        "  field before            {}",
+        render_standing(&before, &order)
+    );
+    println!(
+        "  field after             {}",
+        render_standing(&after, &order)
+    );
     println!(
         "  loop c(0)               {}",
         render_coefficients(material.coefficients(), &order)
     );
 
     let held = read_fixed_step(&material, &before, &after);
-    let (carried, receipt) =
-        read_material_step(&arcs, &law, &material, &before, &after).expect("the carried loop closes");
+    let (carried, receipt) = read_material_step(&arcs, &law, &material, &before, &after)
+        .expect("the carried loop closes");
     println!(
         "  loop c(1) = (U^T)^-1 c  {}",
         render_coefficients(carried.coefficients(), &order)
@@ -495,8 +509,12 @@ fn main() {
         receipt.loop_moved,
         receipt.field_moved
     );
-    println!("\n  The conserved residual is NOT the evidence. <c(t+1), v(t+1)> = <c(t), v(t)> is an");
-    println!("  identity in `(U^T)^-1` and could not have come out otherwise; it is stated here and");
+    println!(
+        "\n  The conserved residual is NOT the evidence. <c(t+1), v(t+1)> = <c(t), v(t)> is an"
+    );
+    println!(
+        "  identity in `(U^T)^-1` and could not have come out otherwise; it is stated here and"
+    );
     println!("  not counted. What is evidence is that the held reading MOVED, so the two readings");
     println!("  are distinguishable on this material at all.");
     holds.push((
@@ -506,7 +524,10 @@ fn main() {
     ));
     holds.push((
         "carried materially, the same loop moved and its circulation did not",
-        receipt.loop_moved && receipt.field_moved && receipt.conserved() && held.after != receipt.after,
+        receipt.loop_moved
+            && receipt.field_moved
+            && receipt.conserved()
+            && held.after != receipt.after,
         format!(
             "carried residual {}, held after {} against carried after {}",
             format_rat(&receipt.residual),
@@ -521,7 +542,10 @@ fn main() {
     let mut material = MaterialLoop::found(&arcs, "theta", theta_loop.clone()).expect("closed");
     let mut field = standing_of(&law, &[(0, 5), (1, 2), (2, -1)]);
     let founding = material.circulation(&field);
-    println!("  founding Gamma = <c(0), v(0)> = {}", format_rat(&founding));
+    println!(
+        "  founding Gamma = <c(0), v(0)> = {}",
+        format_rat(&founding)
+    );
     println!(
         "\n  {:>4}  {:^38}  {:^38}  {:>8}  {:>10}",
         "step", "loop c(t)", "field v(t)", "Gamma", "residual"
@@ -648,9 +672,13 @@ fn main() {
     println!("-----------------------------------------------------------------");
     println!("  `kelvin.rs`'s own explanation of why a carried loop stays closed is:");
     println!("      1^T (U^T)^-1 c = (U^-1 1)^T c = 1^T c,  because U . 1 = 1");
-    println!("  That preserves the TOTAL SUM of the covector. On the theta graph closedness IS the");
+    println!(
+        "  That preserves the TOTAL SUM of the covector. On the theta graph closedness IS the"
+    );
     println!("  vanishing of that sum, so the argument closes. It does not close in general: for");
-    println!("  |V| junctions the cycle space has dimension |E| - |V| + 1, and only at |V| = 2 does");
+    println!(
+        "  |V| junctions the cycle space has dimension |E| - |V| + 1, and only at |V| = 2 does"
+    );
     println!("  it fill the sum-zero hyperplane.");
     println!();
     println!("  incidence B: arcs 10,11: j0 -> j1 and arcs 12,13: j1 -> j2");
@@ -736,7 +764,9 @@ fn main() {
             Some(KelvinError::CarriedLoopNotClosed { .. })
         ));
     }
-    println!("\n  So the third thing the module says it re-checks is the one that fires. The pairing");
+    println!(
+        "\n  So the third thing the module says it re-checks is the one that fires. The pairing"
+    );
     println!("  <c, v> is still conserved on incidence B — that identity does not care about the");
     println!("  incidence — but the carried covector is no longer a LOOP, so what is conserved is");
     println!("  not a circulation. The refusal is the honest return and the module makes it.");
@@ -762,9 +792,13 @@ fn main() {
     println!("\n\n9. THE TWO REFUSALS THAT CANNOT BE REACHED THROUGH THE PUBLIC CONSTRUCTOR");
     println!("--------------------------------------------------------------------------");
     println!("  `KelvinError` carries six variants. Four are exercised above. The other two are");
-    println!("  unreachable so long as the loop is carried against an `ExactAnalyticAdvectionLaw`:");
+    println!(
+        "  unreachable so long as the loop is carried against an `ExactAnalyticAdvectionLaw`:"
+    );
     println!();
-    println!("    LoopCollapsed  needs (U^T)^-1 c = 0 for c != 0. `ExactAnalyticAdvectionLaw::new`");
+    println!(
+        "    LoopCollapsed  needs (U^T)^-1 c = 0 for c != 0. `ExactAnalyticAdvectionLaw::new`"
+    );
     println!("                   already inverted the successor at construction, so the transport");
     println!("                   is a bijection and no nonzero loop can collapse.");
     println!("    Linear         needs the transpose or the inverse to fail. Same reason.");
@@ -777,7 +811,9 @@ fn main() {
     // ===========================================================================================
     println!("\n\nBOUNDS");
     println!("------");
-    println!("  - This is not Navier-Stokes, not existence, not smoothness, not viscosity, and not");
+    println!(
+        "  - This is not Navier-Stokes, not existence, not smoothness, not viscosity, and not"
+    );
     println!("    a fluid solver. It is one exact finite conservative advection chart with a");
     println!("    covector carried on it. The host module's bound stands unsoftened.");
     println!("  - `Gamma` conservation is an ALGEBRAIC IDENTITY here, not a measurement. It is");
@@ -785,9 +821,13 @@ fn main() {
     println!("    setting where the flow is not a declared linear successor.");
     println!("  - The horizon is eight steps on one initial field on one incidence. Nothing is");
     println!("    established about longer horizons, other fields, or other incidences.");
-    println!("  - Section 8 exhibits ONE three-junction incidence on which closure breaks. It does");
+    println!(
+        "  - Section 8 exhibits ONE three-junction incidence on which closure breaks. It does"
+    );
     println!("    not establish that closure breaks on every incidence with |V| > 2, and it does");
-    println!("    not exhibit a |V| > 2 incidence on which a nontrivial loop survives — whether one");
+    println!(
+        "    not exhibit a |V| > 2 incidence on which a nontrivial loop survives — whether one"
+    );
     println!("    exists for this generator family is not decided here.");
     println!("  - `read_material_step` does not check that `after_standing` is the transport of");
     println!("    `before_standing`; this driver supplies the transport and the caller owns that");

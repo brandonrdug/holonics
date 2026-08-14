@@ -424,7 +424,12 @@ impl Path {
     /// The same traversal walked backwards.
     pub fn reversed(&self) -> Self {
         Self {
-            steps: self.steps.iter().rev().map(|step| step.reversed()).collect(),
+            steps: self
+                .steps
+                .iter()
+                .rev()
+                .map(|step| step.reversed())
+                .collect(),
         }
     }
 
@@ -469,10 +474,7 @@ impl Path {
         standing.ok_or(RunningIntegralError::EmptyPath)
     }
 
-    pub fn is_closed(
-        &self,
-        complex: &GradedCausalComplex,
-    ) -> Result<bool, RunningIntegralError> {
+    pub fn is_closed(&self, complex: &GradedCausalComplex) -> Result<bool, RunningIntegralError> {
         let (start, end) = self.endpoints(complex)?;
         Ok(start == end)
     }
@@ -1049,8 +1051,14 @@ pub fn found_potential_in(
     for cell in complex.cells().values().filter(|cell| cell.grade == 1) {
         let (tail, head) = oriented_edge_ends(complex, cell.id)?;
         every_cell.insert(cell.id);
-        incident.entry(tail).or_default().push((cell.id, tail, head));
-        incident.entry(head).or_default().push((cell.id, tail, head));
+        incident
+            .entry(tail)
+            .or_default()
+            .push((cell.id, tail, head));
+        incident
+            .entry(head)
+            .or_default()
+            .push((cell.id, tail, head));
     }
 
     let mut assigned: BTreeMap<CausalCellId, BigInt> = BTreeMap::new();
@@ -1087,10 +1095,7 @@ pub fn found_potential_in(
                     frontier.push_back(far);
                 }
                 Some(_) => {
-                    let implied = assigned
-                        .get(&head)
-                        .cloned()
-                        .unwrap_or_else(BigInt::zero)
+                    let implied = assigned.get(&head).cloned().unwrap_or_else(BigInt::zero)
                         - assigned.get(&tail).cloned().unwrap_or_else(BigInt::zero);
                     let residual = &declared - &implied;
                     if group.vanishes(&residual) {
@@ -1350,7 +1355,10 @@ mod tests {
         let square = Square::hollow();
         let silent = Cochain::new(1);
         let spoken = Cochain::from_values(1, [(square.ab, big(0))]);
-        assert!(silent.is_zero() && spoken.is_zero(), "both are zero cochains");
+        assert!(
+            silent.is_zero() && spoken.is_zero(),
+            "both are zero cochains"
+        );
         assert!(
             silent.assigns_the_same_values(&spoken),
             "and they pair identically against every chain"
@@ -1551,7 +1559,11 @@ mod tests {
         let left = square.left();
         let right = square.right();
 
-        assert_ne!(left.chain(), right.chain(), "the traversals differ as chains");
+        assert_ne!(
+            left.chain(),
+            right.chain(),
+            "the traversals differ as chains"
+        );
         assert_eq!(
             left.endpoints(&square.complex).unwrap(),
             right.endpoints(&square.complex).unwrap(),
@@ -1607,7 +1619,9 @@ mod tests {
 
         assert_eq!(holonomy(&square.complex, &w, &twice).unwrap().total, big(2));
         assert_eq!(
-            holonomy(&square.complex, &w, &once.reversed()).unwrap().total,
+            holonomy(&square.complex, &w, &once.reversed())
+                .unwrap()
+                .total,
             big(-1)
         );
         assert_eq!(
@@ -1627,9 +1641,14 @@ mod tests {
         let (square, face) = Square::filled();
         let w = square.standing();
         let region = CausalChain::single(face, ComparativeMultiplicity::positive(1u32));
-        let enclosed =
-            enclosed_disagreement(&square.complex, &w, &square.left(), &square.right(), &region)
-                .unwrap();
+        let enclosed = enclosed_disagreement(
+            &square.complex,
+            &w,
+            &square.left(),
+            &square.right(),
+            &region,
+        )
+        .unwrap();
 
         assert_eq!(enclosed.disagreement.residual, big(1));
         assert_eq!(enclosed.boundary_residual, big(1));
@@ -1649,9 +1668,14 @@ mod tests {
         let (square, face) = Square::filled();
         let w = square.exact();
         let region = CausalChain::single(face, ComparativeMultiplicity::positive(1u32));
-        let enclosed =
-            enclosed_disagreement(&square.complex, &w, &square.left(), &square.right(), &region)
-                .unwrap();
+        let enclosed = enclosed_disagreement(
+            &square.complex,
+            &w,
+            &square.left(),
+            &square.right(),
+            &region,
+        )
+        .unwrap();
 
         assert_eq!(enclosed.disagreement.residual, big(0));
         assert_eq!(enclosed.boundary_residual, big(0));
@@ -1677,7 +1701,10 @@ mod tests {
     fn the_coboundary_of_a_coboundary_is_zero() {
         let (square, _face) = Square::filled();
         let d_f = coboundary(&square.complex, &square.potential()).unwrap();
-        assert!(!d_f.is_zero(), "d f itself is nonzero, so this is not vacuous");
+        assert!(
+            !d_f.is_zero(),
+            "d f itself is nonzero, so this is not vacuous"
+        );
         let d_d_f = coboundary(&square.complex, &d_f).unwrap();
         assert!(
             d_d_f.is_zero(),
@@ -1690,9 +1717,14 @@ mod tests {
         let (square, face) = Square::filled();
         let w = square.standing();
         let doubled = CausalChain::single(face, ComparativeMultiplicity::positive(2u32));
-        let error =
-            enclosed_disagreement(&square.complex, &w, &square.left(), &square.right(), &doubled)
-                .unwrap_err();
+        let error = enclosed_disagreement(
+            &square.complex,
+            &w,
+            &square.left(),
+            &square.right(),
+            &doubled,
+        )
+        .unwrap_err();
         assert!(
             matches!(error, RunningIntegralError::RegionDoesNotEnclose),
             "a doubled region bounds twice the cycle: {error:?}"
@@ -1730,9 +1762,17 @@ mod tests {
 
         assert!(search.admits_a_potential());
         assert!(search.retained_obstructions.is_empty());
-        assert_eq!(search.cycle_rank(), 1, "the square has one independent cycle");
+        assert_eq!(
+            search.cycle_rank(),
+            1,
+            "the square has one independent cycle"
+        );
         assert_eq!(search.agreeing_chords.len(), 1, "and its chord agreed");
-        assert_eq!(search.tree_cells.len(), 3, "four vertices, three tree cells");
+        assert_eq!(
+            search.tree_cells.len(),
+            3,
+            "four vertices, three tree cells"
+        );
         assert_eq!(search.reached.len(), 4);
         assert!(search.unreached_cells.is_empty());
 
@@ -1764,7 +1804,11 @@ mod tests {
         let chord = &search.retained_obstructions[0];
         assert_eq!(chord.cell, square.dc, "dc closes the fundamental cycle");
         assert_eq!(chord.declared, big(0), "w(dc) = 0");
-        assert_eq!(chord.implied, big(1), "but the tree implies f(c) - f(d) = 1");
+        assert_eq!(
+            chord.implied,
+            big(1),
+            "but the tree implies f(c) - f(d) = 1"
+        );
         assert_eq!(chord.residual, big(-1));
         assert!(!chord.residual.is_zero(), "the remainder is nonzero");
 
@@ -1791,10 +1835,7 @@ mod tests {
     fn the_search_refuses_a_base_that_is_not_a_vertex() {
         let square = Square::hollow();
         let error = found_potential(&square.complex, &square.standing(), square.ab).unwrap_err();
-        assert!(matches!(
-            error,
-            RunningIntegralError::BaseIsNotAVertex(_)
-        ));
+        assert!(matches!(error, RunningIntegralError::BaseIsNotAVertex(_)));
     }
 
     // -----------------------------------------------------------------------------------------
@@ -1820,8 +1861,7 @@ mod tests {
         assert_eq!(over_z.retained_obstructions[0].cell, square.dc);
         assert_eq!(over_z.retained_obstructions[0].residual, big(2));
 
-        let over_two =
-            found_potential_in(&square.complex, &w, square.a, two.clone()).unwrap();
+        let over_two = found_potential_in(&square.complex, &w, square.a, two.clone()).unwrap();
         assert_eq!(over_two.cycle_rank(), 1, "the same chord is still tested");
         assert!(
             over_two.admits_a_potential(),
@@ -1857,7 +1897,11 @@ mod tests {
 
         let chord = &search.retained_obstructions[0];
         assert_eq!(chord.declared, big(3), "w(dc) = 3, exactly, in Z");
-        assert_eq!(chord.implied, big(0), "and the tree implied 0, exactly, in Z");
+        assert_eq!(
+            chord.implied,
+            big(0),
+            "and the tree implied 0, exactly, in Z"
+        );
         assert_eq!(chord.residual, big(3), "the residual is retained in Z");
         assert_eq!(chord.residual_in(&two), big(1), "and read as 1 in Z/2");
         assert!(!chord.agrees_in(&two));
@@ -1882,8 +1926,7 @@ mod tests {
         for value in [-4i64, -3, -2, -1, 0, 1, 2, 3, 4, 6] {
             let w = Cochain::from_values(1, [(square.dc, big(value))]);
             let over_z = found_potential(&square.complex, &w, square.a).unwrap();
-            let over_two =
-                found_potential_in(&square.complex, &w, square.a, two.clone()).unwrap();
+            let over_two = found_potential_in(&square.complex, &w, square.a, two.clone()).unwrap();
             assert!(
                 over_two.retained_obstructions.iter().all(|reduced| {
                     over_z
@@ -1910,14 +1953,20 @@ mod tests {
         let square = Square::hollow();
         let w = Cochain::from_values(1, [(square.ab, big(4)), (square.dc, big(2))]);
         let over_z = found_potential(&square.complex, &w, square.a).unwrap();
-        let over_two =
-            found_potential_in(&square.complex, &w, square.a, CoefficientGroup::cyclic(big(2))
-                .unwrap())
-            .unwrap();
+        let over_two = found_potential_in(
+            &square.complex,
+            &w,
+            square.a,
+            CoefficientGroup::cyclic(big(2)).unwrap(),
+        )
+        .unwrap();
 
         assert_eq!(over_z.tree_cells, over_two.tree_cells);
         assert_eq!(over_z.reached, over_two.reached);
-        assert_eq!(over_z.potential, over_two.potential, "exact in Z either way");
+        assert_eq!(
+            over_z.potential, over_two.potential,
+            "exact in Z either way"
+        );
         assert_eq!(over_z.cycle_rank(), over_two.cycle_rank());
         assert_ne!(
             over_z.agreeing_chords, over_two.agreeing_chords,
@@ -1980,10 +2029,7 @@ mod tests {
             "the backtrack is two more passages over `bc` and the chain retains both"
         );
         assert!(
-            direct
-                .chain()
-                .minus(&detoured.chain())
-                .difference_is_zero(),
+            direct.chain().minus(&detoured.chain()).difference_is_zero(),
             "they differ by a cancelling pair, so they are one cycle and carry one integral"
         );
 
@@ -2067,8 +2113,7 @@ mod tests {
             "a 0-cochain cannot be integrated over 1-cells: {error:?}"
         );
 
-        let error =
-            running_sum(&square.complex, &square.potential(), &square.left()).unwrap_err();
+        let error = running_sum(&square.complex, &square.potential(), &square.left()).unwrap_err();
         assert!(matches!(error, RunningIntegralError::NotAOneCochain(0)));
     }
 
@@ -2126,7 +2171,8 @@ mod tests {
         assert_eq!(doubled.value(square.ab), big(2));
         assert!(w.minus(&w).unwrap().is_zero(), "exact cancellation");
 
-        let pair = disagreement(&square.complex, &doubled, &square.left(), &square.right()).unwrap();
+        let pair =
+            disagreement(&square.complex, &doubled, &square.left(), &square.right()).unwrap();
         assert_eq!(
             pair.residual,
             big(2),

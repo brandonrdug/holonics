@@ -96,11 +96,11 @@ use crate::algebraic::{CausalCellId, GradedCausalComplex};
 // rather than re-declared so there is never a second implementation of one conversion to keep in
 // agreement. It is deliberately not an `impl From` in `algebraic.rs`.
 use crate::complex_system::item as item_of_cell;
-use crate::placement::{place, Placement};
+use crate::placement::{Placement, place};
 use crate::rebase_invariants::PivotRule;
 use crate::receiver_exact_compression::{ItemId, ObservedSystem, Partition};
-use crate::skein::{read_substitution, GradeRemainder, SkeinReading, SkeinRefusal, Substitution};
-use crate::supported_realizers::{landings_from_classes, Realization, RealizerId};
+use crate::skein::{GradeRemainder, SkeinReading, SkeinRefusal, Substitution, read_substitution};
+use crate::supported_realizers::{Realization, RealizerId, landings_from_classes};
 
 /// Which of the read substitutions are handed to `place` as realizers.
 ///
@@ -133,8 +133,12 @@ pub enum SubstitutionRefusal {
     /// The declared boundary is not contained in both fillings.
     BoundaryNotShared,
     /// A filling or a context is not closed under boundary.
-    NotASubcomplex { which: String },
-    Algebraic { reported: String },
+    NotASubcomplex {
+        which: String,
+    },
+    Algebraic {
+        reported: String,
+    },
 }
 
 impl From<SkeinRefusal> for SubstitutionRefusal {
@@ -534,10 +538,10 @@ mod tests {
     use crate::causal::EventId;
     // The reverse leg of the bijection, needed only by the round-trip contract test. The module
     // proper only ever converts cells into items.
-    use crate::complex_system::{cell as cell_of_item, AddressReading, ComplexSystem};
-    use crate::dilation::{dilate, Horizon, WalkOrder};
-    use crate::placement::{discharge, Discharge};
-    use crate::rebase_invariants::{smith_normal_form, IntegerMatrix};
+    use crate::complex_system::{AddressReading, ComplexSystem, cell as cell_of_item};
+    use crate::dilation::{Horizon, WalkOrder, dilate};
+    use crate::placement::{Discharge, discharge};
+    use crate::rebase_invariants::{IntegerMatrix, smith_normal_form};
     use crate::supported_realizers::{incidence, positive_form, quadratic_value};
     use num_bigint::BigInt;
     use num_traits::Zero;
@@ -755,9 +759,7 @@ mod tests {
     }
 
     fn circle(world: &Triangle) -> BTreeSet<CausalCellId> {
-        BTreeSet::from([
-            world.a, world.b, world.c, world.ab, world.bc, world.ca,
-        ])
+        BTreeSet::from([world.a, world.b, world.c, world.ab, world.bc, world.ca])
     }
 
     /// Three contexts that are three different readings, not one counted three times.
@@ -824,7 +826,10 @@ mod tests {
             RealizerAdmission::EveryRead,
         );
         let placement = &placed.placement;
-        assert_eq!(placement.receiver_extent, 2, "two dilated sections, two frames");
+        assert_eq!(
+            placement.receiver_extent, 2,
+            "two dilated sections, two frames"
+        );
         assert_eq!(placement.class_extent, 8);
         assert_eq!(
             class_of(placement, world.t1),
@@ -859,7 +864,10 @@ mod tests {
     #[test]
     fn the_cell_item_conversion_this_module_depends_on_is_a_bijection() {
         for raw in [0u64, 1, 2, 7, 65_535, u64::MAX] {
-            assert_eq!(cell_of_item(item_of_cell(CausalCellId(raw))), CausalCellId(raw));
+            assert_eq!(
+                cell_of_item(item_of_cell(CausalCellId(raw))),
+                CausalCellId(raw)
+            );
             assert_eq!(item_of_cell(cell_of_item(ItemId(raw))), ItemId(raw));
         }
     }
@@ -891,9 +899,11 @@ mod tests {
             founded.reaches_under(RealizerAdmission::Visible, RealizerId(1)),
             vec![item_of_cell(world.t1)]
         );
-        assert!(founded
-            .reaches_under(RealizerAdmission::Visible, RealizerId(0))
-            .is_empty());
+        assert!(
+            founded
+                .reaches_under(RealizerAdmission::Visible, RealizerId(0))
+                .is_empty()
+        );
         assert!(
             founded
                 .reaches_under(RealizerAdmission::EveryRead, RealizerId(9))
@@ -1122,7 +1132,10 @@ mod tests {
         );
 
         // Named, not counted.
-        assert_eq!(a_before.declared, vec![DeclaredSubstitution::from(&three[0])]);
+        assert_eq!(
+            a_before.declared,
+            vec![DeclaredSubstitution::from(&three[0])]
+        );
         assert_eq!(a_after.declared.len(), 3);
         assert_eq!(
             b_before.declared, b_after.declared,
@@ -1155,7 +1168,10 @@ mod tests {
         let before = place_substitutions(&system(&world), &unlooked, RealizerAdmission::Invisible);
         let after = place_substitutions(&system(&world), &looked, RealizerAdmission::Invisible);
 
-        assert!(before.admitted.is_empty(), "a move nobody looked at is not invisible");
+        assert!(
+            before.admitted.is_empty(),
+            "a move nobody looked at is not invisible"
+        );
         assert_eq!(after.admitted, vec![RealizerId(0)]);
         assert_eq!(before.admission, after.admission, "the filter did not move");
         assert_eq!(before.declared, after.declared, "and nothing was declared");
@@ -1411,8 +1427,8 @@ mod tests {
         let placed = place_substitutions(&system(&world), &founded, RealizerAdmission::EveryRead);
         let placement = &placed.placement;
         let extent = placement.class_extent;
-        let realizations =
-            founded.realizations_under(RealizerAdmission::EveryRead, &placement.compression.conduct);
+        let realizations = founded
+            .realizations_under(RealizerAdmission::EveryRead, &placement.compression.conduct);
         let form = positive_form(&incidence(&realizations, extent));
 
         // The independent frame: the incidence rebuilt here from the declarations themselves.
@@ -1439,7 +1455,11 @@ mod tests {
             (0..extent)
                 .map(|index| {
                     let magnitude = (index as i64) + 2;
-                    BigInt::from(if index % 2 == 0 { magnitude } else { -magnitude })
+                    BigInt::from(if index % 2 == 0 {
+                        magnitude
+                    } else {
+                        -magnitude
+                    })
                 })
                 .collect(),
         ];
@@ -1519,7 +1539,11 @@ mod tests {
                 assert_eq!(column, expected[class], "class {class} under {admission:?}");
             }
         }
-        assert_eq!(ranks.len(), 2, "the two apertures must not have the same rank");
+        assert_eq!(
+            ranks.len(),
+            2,
+            "the two apertures must not have the same rank"
+        );
     }
 
     // ---------------------------------------------------------------------------------------
@@ -1538,7 +1562,11 @@ mod tests {
             &[],
             PivotRule::FirstNonzero,
         );
-        assert_eq!(founded.realizers.len(), 3, "all three were read without refusal");
+        assert_eq!(
+            founded.realizers.len(),
+            3,
+            "all three were read without refusal"
+        );
         assert!(founded.ids_under(RealizerAdmission::Invisible).is_empty());
         assert!(founded.ids_under(RealizerAdmission::Visible).is_empty());
 
@@ -1570,13 +1598,19 @@ mod tests {
         assert!(!still.admitted_under(RealizerAdmission::Visible));
         assert!(still.admitted_under(RealizerAdmission::EveryRead));
         assert!(still.remainder().is_empty());
-        assert!(still.reaches().is_empty(), "and it can never pay for a class");
+        assert!(
+            still.reaches().is_empty(),
+            "and it can never pay for a class"
+        );
 
         let every = founded.ids_under(RealizerAdmission::EveryRead).len();
         let split = founded.ids_under(RealizerAdmission::Invisible).len()
             + founded.ids_under(RealizerAdmission::Visible).len();
         assert_eq!(every, 3);
-        assert_eq!(split, 2, "the two apertures do not cover the declared population");
+        assert_eq!(
+            split, 2,
+            "the two apertures do not cover the declared population"
+        );
     }
 
     /// A declared substitution that is not one is refused, retained, and never becomes a realizer.
@@ -1591,13 +1625,20 @@ mod tests {
         };
         let founded = read_and_realize(
             &world.complex,
-            &[open_filling.clone(), swap_faces(&world), unshared_boundary(&world)],
+            &[
+                open_filling.clone(),
+                swap_faces(&world),
+                unshared_boundary(&world),
+            ],
             &contexts(&world),
             PivotRule::FirstNonzero,
         );
 
         assert_eq!(founded.realizers.len(), 1);
-        assert_eq!(founded.realizers[0].declared, 1, "the good one keeps its position");
+        assert_eq!(
+            founded.realizers[0].declared, 1,
+            "the good one keeps its position"
+        );
         assert_eq!(founded.refused.len(), 2);
         assert_eq!(founded.declared_extent(), 3);
         assert!(matches!(
@@ -1697,12 +1738,7 @@ mod tests {
         let declared = [swap_faces(&world), grow_edge(&world), grow_vertex(&world)];
         // The face without the edges it is attached to.
         let broken = vec![BTreeSet::from([world.a, world.t1])];
-        let refused = read_and_realize(
-            &world.complex,
-            &declared,
-            &broken,
-            PivotRule::FirstNonzero,
-        );
+        let refused = read_and_realize(&world.complex, &declared, &broken, PivotRule::FirstNonzero);
 
         assert!(refused.realizers.is_empty(), "not one of them was read");
         assert_eq!(refused.refused.len(), 3);
@@ -1716,7 +1752,10 @@ mod tests {
                 "the refusal names the context and not the filling"
             );
         }
-        assert_eq!(refused.contexts, broken, "the malformed family is in the deposit");
+        assert_eq!(
+            refused.contexts, broken,
+            "the malformed family is in the deposit"
+        );
 
         let read = read_and_realize(
             &world.complex,
@@ -1773,7 +1812,11 @@ mod tests {
             &contexts(&world),
             PivotRule::FirstNonzero,
         );
-        assert_eq!(founded.refused.len(), 1, "a refusal must be in the resting form too");
+        assert_eq!(
+            founded.refused.len(),
+            1,
+            "a refusal must be in the resting form too"
+        );
 
         let rested = ron::to_string(&founded).expect("the deposit rests");
         let remounted: SubstitutionRealizers = ron::from_str(&rested).expect("and remounts");

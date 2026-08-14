@@ -883,7 +883,10 @@ impl std::fmt::Display for CollocationRefusal {
                 write!(formatter, "region {region} is named twice")
             }
             Self::EmptyNullBindSchedule => {
-                write!(formatter, "a null-bind schedule with no stride re-pairs nothing")
+                write!(
+                    formatter,
+                    "a null-bind schedule with no stride re-pairs nothing"
+                )
             }
             Self::NullBindMovedMarginals { what } => write!(
                 formatter,
@@ -1077,9 +1080,11 @@ mod tests {
             "two maximal co-presented sets, derived from four regions"
         );
         // The Moore family: the two facets, their intersection, and the full item set.
-        assert!(reading
-            .closed_regions()
-            .contains(&BTreeSet::from(["u".to_owned()])));
+        assert!(
+            reading
+                .closed_regions()
+                .contains(&BTreeSet::from(["u".to_owned()]))
+        );
     }
 
     #[test]
@@ -1156,7 +1161,10 @@ mod tests {
         let bound = deposit
             .null_bind(&[1, 2, 3, 5], NullBindScope::WholeDeposit)
             .expect("declared schedule");
-        assert!(bound.applied > 0, "a null-bind that swaps nothing is not a control");
+        assert!(
+            bound.applied > 0,
+            "a null-bind that swaps nothing is not a control"
+        );
         assert!(bound.regions_moved > 0);
         let after = CoPresentation::read(bound.deposit());
         assert_ne!(
@@ -1180,7 +1188,10 @@ mod tests {
             assert_eq!(before.source, after.source);
         }
         // `two` carries one region, so no within-source swap is legal there and `r3` cannot move.
-        assert_eq!(deposit.presentations()[3], bound.deposit().presentations()[3]);
+        assert_eq!(
+            deposit.presentations()[3],
+            bound.deposit().presentations()[3]
+        );
     }
 
     #[test]
@@ -1241,7 +1252,10 @@ mod tests {
     fn deleting_the_universal_item_leaves_the_link_and_names_what_emptied() {
         let reading = CoPresentation::read(&paired());
         let (link, emptied) = reading.without_universal();
-        assert!(emptied.is_empty(), "every region carried more than the cone point");
+        assert!(
+            emptied.is_empty(),
+            "every region carried more than the cone point"
+        );
         assert!(link.universal().is_empty());
         assert_eq!(link.items().len(), 4);
         // The cone is contractible; the link is two disjoint edges.
@@ -1298,11 +1312,22 @@ mod tests {
         .expect("declared");
         let coarse = CoPresentation::read(&coarse);
         let fine = CoPresentation::read(&fine);
-        assert_eq!(coarse.universal().len(), 3, "one region makes everything universal");
+        assert_eq!(
+            coarse.universal().len(),
+            3,
+            "one region makes everything universal"
+        );
         assert!(coarse.face("a").is_empty());
-        assert!(fine.face("a").is_empty(), "a occurs with b and with c, forcing neither");
+        assert!(
+            fine.face("a").is_empty(),
+            "a occurs with b and with c, forcing neither"
+        );
         assert_eq!(coarse.facets().len(), 1);
-        assert_eq!(fine.facets().len(), 3, "the fine grain founds three facets, not one");
+        assert_eq!(
+            fine.facets().len(),
+            3,
+            "the fine grain founds three facets, not one"
+        );
     }
 
     #[test]
@@ -1319,8 +1344,8 @@ mod tests {
                       apply exact_chart_carry\n  \
                       assumption\n\
                     end Soma\n";
-        let derivation =
-            crate::derivation_atlas::read_derivation(text).expect("the artifact declares a theorem");
+        let derivation = crate::derivation_atlas::read_derivation(text)
+            .expect("the artifact declares a theorem");
         let collocated = lean_artifact_items(text);
         let recruited: BTreeSet<String> = derivation.recruited.keys().cloned().collect();
         assert_eq!(
@@ -1328,12 +1353,21 @@ mod tests {
             "the line reader and the artifact reader must not drift apart"
         );
         assert!(collocated.contains("apply"), "an atom is still presented");
-        assert!(!collocated.contains("formal_carry"), "the file founds it, it does not recruit it");
+        assert!(
+            !collocated.contains("formal_carry"),
+            "the file founds it, it does not recruit it"
+        );
         // The two that make the parity assertion able to fail. Under the hand-copied rule this
         // reader returned `contrapose` and dropped `h'` to a single glyph, while the artifact
         // reader returned `contrapose!` and `h'` — the drift, exhibited as its own separating words.
-        assert!(collocated.contains("contrapose!"), "the token carries its own `!`");
-        assert!(collocated.contains("h'"), "a primed binder is one token, not a deleted glyph");
+        assert!(
+            collocated.contains("contrapose!"),
+            "the token carries its own `!`"
+        );
+        assert!(
+            collocated.contains("h'"),
+            "a primed binder is one token, not a deleted glyph"
+        );
     }
 
     #[test]
@@ -1359,6 +1393,10 @@ mod tests {
         let bound = deposit
             .null_bind(&[1, 2, 3, 5, 7], NullBindScope::WholeDeposit)
             .expect("declared");
-        assert!(CoPresentation::read(bound.deposit()).closure("a").contains("u"));
+        assert!(
+            CoPresentation::read(bound.deposit())
+                .closure("a")
+                .contains("u")
+        );
     }
 }

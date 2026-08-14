@@ -110,7 +110,10 @@ fn exhibit(label: &str, pass: &DecompositionPass) {
         .collect();
     println!(
         "  reintegrate {:?}",
-        rebuilt.iter().map(|whole| render_word(whole)).collect::<Vec<_>>()
+        rebuilt
+            .iter()
+            .map(|whole| render_word(whole))
+            .collect::<Vec<_>>()
     );
     println!(
         "  refused    {:?}",
@@ -132,13 +135,20 @@ fn main() {
     // --- the crossing --------------------------------------------------------------------------
     let mut body = DecomposingBody::mount(origin.clone()).expect("a declared grain");
     body.receive(batch(BATCH_A)).expect("readable");
-    exhibit("pass one, under the declared origin grain", &body.passes()[0]);
+    exhibit(
+        "pass one, under the declared origin grain",
+        &body.passes()[0],
+    );
     let first = body.revise().expect("a collapsed population revises");
     println!(
         "\n  revision one founds {} parented codec versions over {} distinct words {:?}",
         first.founded.len(),
         first.words.len(),
-        first.words.iter().map(|w| render_word(w)).collect::<Vec<_>>()
+        first
+            .words
+            .iter()
+            .map(|w| render_word(w))
+            .collect::<Vec<_>>()
     );
     for founded in &first.founded {
         let version = body.runtime().codec(founded.codec).expect("it stands");
@@ -186,11 +196,18 @@ fn main() {
     println!(
         "\n  revision two founds {} version(s) over {:?}, parented on the first revision's join",
         second.founded.len(),
-        second.words.iter().map(|w| render_word(w)).collect::<Vec<_>>()
+        second
+            .words
+            .iter()
+            .map(|w| render_word(w))
+            .collect::<Vec<_>>()
     );
 
     let third = body.receive(batch(BATCH_D)).expect("readable");
-    exhibit("pass three, under the twice-revised grain", &body.passes()[2]);
+    exhibit(
+        "pass three, under the twice-revised grain",
+        &body.passes()[2],
+    );
     println!(
         "\n  the reading rested rather than reflecting: {:?}, reflection {:?}",
         third.state, third.reflection
@@ -240,7 +257,11 @@ fn main() {
                     DecompositionProgram::Origin(grain) => format!(
                         "codec {} origin {:?}",
                         version.id.0,
-                        grain.cuts().iter().map(|cut| render_word(cut)).collect::<Vec<_>>()
+                        grain
+                            .cuts()
+                            .iter()
+                            .map(|cut| render_word(cut))
+                            .collect::<Vec<_>>()
                     ),
                     DecompositionProgram::CutAtDistinguishingWord { word, .. } =>
                         format!("codec {} cuts '{}'", version.id.0, render_word(word)),

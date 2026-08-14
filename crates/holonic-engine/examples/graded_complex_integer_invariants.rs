@@ -368,7 +368,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // ---- the fixture, derived exhaustively -------------------------------------------------
     let surfaces = closed_surfaces_on_six_vertices();
-    println!("closed surfaces on {VERTICES} vertices with {TRIANGLES} triangles: {}", surfaces.len());
+    println!(
+        "closed surfaces on {VERTICES} vertices with {TRIANGLES} triangles: {}",
+        surfaces.len()
+    );
     let Some(selection) = surfaces.first() else {
         println!("REFUSED: the exhaustive search found no closed surface; nothing to read.");
         return Ok(());
@@ -398,7 +401,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     let (founded, edge_total, refusals) = hinge_refusals(&source);
-    println!("hinges founded: {founded} of {edge_total}; refusals: {}", refusals.len());
+    println!(
+        "hinges founded: {founded} of {edge_total}; refusals: {}",
+        refusals.len()
+    );
     for refusal in &refusals {
         println!("  REFUSED {refusal}");
     }
@@ -406,7 +412,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let receipt = SimplicialIncidenceReceipt::realize(&source)?;
     let complex = receipt.incidence;
     complex.validate()?;
-    let top = complex.dimension().expect("a founded complex carries a grade");
+    let top = complex
+        .dimension()
+        .expect("a founded complex carries a grade");
     println!("f-vector: {:?}", complex.f_vector());
 
     // ---- the invariants, and the falsifier that they do not move ---------------------------
@@ -427,7 +435,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("betti vector: {:?}", reference.betti_vector());
     println!(
         "total torsion: {:?}",
-        reference.total_torsion().iter().map(exact_big).collect::<Vec<_>>()
+        reference
+            .total_torsion()
+            .iter()
+            .map(exact_big)
+            .collect::<Vec<_>>()
     );
     println!(
         "euler characteristic from betti: {} ; from cells: {}",
@@ -448,7 +460,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     for (grade, factors, divides) in &ladders {
         println!(
             "d_{grade} invariant factors: [{}] (divisibility holds: {divides})",
-            factors.iter().map(exact_big).collect::<Vec<_>>().join(" | ")
+            factors
+                .iter()
+                .map(exact_big)
+                .collect::<Vec<_>>()
+                .join(" | ")
         );
     }
     let filling = boundary_matrix(&complex, top)?;
@@ -464,7 +480,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     for (key, value) in [
         ("schema", complex.schema.clone()),
         ("invariant_schema", reference.schema.clone()),
-        ("grading", "single (chain degree k); no (p,q) bigrading exists in this repository".to_owned()),
+        (
+            "grading",
+            "single (chain degree k); no (p,q) bigrading exists in this repository".to_owned(),
+        ),
         ("vertices", exact(VERTICES as u64)),
         ("closed_surfaces_found", exact(surfaces.len() as u64)),
         ("coherent_orientations", exact(coherent as u64)),
@@ -474,7 +493,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         ("edges", exact(edge_total as u64)),
         ("pivot_rules_agree", agreed.to_string()),
         ("euler_cross_check", euler_agrees.to_string()),
-        ("euler_characteristic", exact(reference.euler_characteristic())),
+        (
+            "euler_characteristic",
+            exact(reference.euler_characteristic()),
+        ),
         (
             "betti_vector",
             reference

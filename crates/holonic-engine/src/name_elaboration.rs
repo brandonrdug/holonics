@@ -146,7 +146,7 @@ use crate::algebraic::{
     CausalAlgebraicError, CausalCellId, CausalChain, ComparativeMultiplicity, GradedCausalComplex,
 };
 use crate::causal::EventId;
-use crate::derivation_atlas::{statement_vertex_key, Derivation};
+use crate::derivation_atlas::{Derivation, statement_vertex_key};
 
 /// The separator between a declaration name and its ordinal in a route key. `derivation_atlas`
 /// writes `format!("{}#{ordinal}", derivation.name)` and a Lean identifier cannot carry `#`, so the
@@ -785,10 +785,7 @@ impl ElaborationDeposit {
                 .entry(derivation.name.clone())
                 .or_default()
                 .push(ordinal);
-            let pooled = deposit
-                .pooled
-                .entry(derivation.name.clone())
-                .or_default();
+            let pooled = deposit.pooled.entry(derivation.name.clone()).or_default();
             for (symbol, count) in &derivation.recruited {
                 let slot = pooled.entry(symbol.clone()).or_insert(0u32);
                 *slot = slot.saturating_add(*count);
@@ -1354,7 +1351,10 @@ fn retained_cycles(nodes: &[&str], passages: &[(&str, &str)]) -> Vec<RetainedCyc
         }
         out[*from].insert(*to);
     }
-    let adjacency: Vec<Vec<usize>> = out.into_iter().map(|set| set.into_iter().collect()).collect();
+    let adjacency: Vec<Vec<usize>> = out
+        .into_iter()
+        .map(|set| set.into_iter().collect())
+        .collect();
 
     const UNSET: usize = usize::MAX;
     let mut number = vec![UNSET; nodes.len()];
@@ -1407,7 +1407,8 @@ fn retained_cycles(nodes: &[&str], passages: &[(&str, &str)]) -> Vec<RetainedCyc
 
     let mut cycles: Vec<RetainedCycle> = Vec::new();
     for component in components {
-        let carries_cycle = component.len() > 1 || component.iter().any(|at| self_loops.contains(at));
+        let carries_cycle =
+            component.len() > 1 || component.iter().any(|at| self_loops.contains(at));
         if !carries_cycle {
             continue;
         }
@@ -1558,7 +1559,12 @@ mod tests {
         // `deep` is in the meaning of `top` and `top` does not name it, in either sense: it is not
         // recruited and it is not a substring.
         assert!(meaning.constructed().contains("deep"));
-        assert!(!deposit.recruitment("top").expect("declared").contains_key("deep"));
+        assert!(
+            !deposit
+                .recruitment("top")
+                .expect("declared")
+                .contains_key("deep")
+        );
         assert!(!"top".contains("deep"));
 
         assert_eq!(
@@ -1578,7 +1584,10 @@ mod tests {
         let meaning = deposit
             .elaborate("top", ElaborationAperture::Exhausted)
             .expect("top is declared");
-        assert_eq!(meaning.construction_path("top"), Some(vec!["top".to_owned()]));
+        assert_eq!(
+            meaning.construction_path("top"),
+            Some(vec!["top".to_owned()])
+        );
         assert_eq!(meaning.construction_path("nowhere"), None);
     }
 
@@ -1605,7 +1614,10 @@ mod tests {
             .expect("top is declared");
         assert_eq!(bounded.reach(), 1);
         // `middle` was reached and not opened; `visible` is an atom and could not have been.
-        assert_eq!(bounded.beyond_depth(), &BTreeSet::from(["middle".to_owned()]));
+        assert_eq!(
+            bounded.beyond_depth(),
+            &BTreeSet::from(["middle".to_owned()])
+        );
         assert_eq!(
             bounded.unopened(),
             &BTreeSet::from(["bottom".to_owned(), "halfway".to_owned()])
@@ -1635,7 +1647,8 @@ mod tests {
     }
 
     #[test]
-    fn an_undeclared_recruitment_is_an_atom_and_is_the_permanent_outside_of_the_deposits_aperture() {
+    fn an_undeclared_recruitment_is_an_atom_and_is_the_permanent_outside_of_the_deposits_aperture()
+    {
         let deposit = ElaborationDeposit::read(&chained_deposit());
         let meaning = deposit
             .elaborate("top", ElaborationAperture::Exhausted)
@@ -1679,7 +1692,11 @@ mod tests {
         let ping = &meaning.constituents()["ping"];
         assert_eq!(ping.entered_at, 0);
         assert_eq!(ping.depths, BTreeSet::from([0usize, 2usize]));
-        assert!(meaning.edges().contains_key(&("pong".to_owned(), "ping".to_owned())));
+        assert!(
+            meaning
+                .edges()
+                .contains_key(&("pong".to_owned(), "ping".to_owned()))
+        );
     }
 
     #[test]
@@ -1822,7 +1839,10 @@ mod tests {
     fn the_statement_key_prefix_is_the_one_the_atlas_writes() {
         // A drift here would make every statement node look like an atom and the upward walk would
         // try to open it. Pinned against the atlas rather than asserted in prose.
-        assert_eq!(statement_vertex_key("X"), format!("{STATEMENT_KEY_PREFIX}X"));
+        assert_eq!(
+            statement_vertex_key("X"),
+            format!("{STATEMENT_KEY_PREFIX}X")
+        );
         assert!(statement_vertex_key("(h : P) : Q").starts_with(STATEMENT_KEY_PREFIX));
     }
 
@@ -1837,11 +1857,17 @@ mod tests {
 
         assert!(meaning.antecedent_is_empty());
         assert_eq!(meaning.antecedent().constituents().len(), 1);
-        assert_eq!(meaning.antecedent().atoms(), &BTreeSet::from(["deep".to_owned()]));
+        assert_eq!(
+            meaning.antecedent().atoms(),
+            &BTreeSet::from(["deep".to_owned()])
+        );
 
         assert!(!meaning.consequent_is_empty());
         assert_eq!(meaning.shape(), MeaningShape::ConsequentOnly);
-        assert_eq!(meaning.consequent().at_depth(1), BTreeSet::from(["bottom#2"]));
+        assert_eq!(
+            meaning.consequent().at_depth(1),
+            BTreeSet::from(["bottom#2"])
+        );
         assert_eq!(
             meaning.consequent().at_depth(2),
             BTreeSet::from(["bottom", "|- U"])
@@ -1925,7 +1951,10 @@ mod tests {
             .consequents("deep", ElaborationAperture::ToDepth(1))
             .expect("deep is recruited");
         assert_eq!(bounded.reach(), 1);
-        assert_eq!(bounded.beyond_depth(), &BTreeSet::from(["bottom#2".to_owned()]));
+        assert_eq!(
+            bounded.beyond_depth(),
+            &BTreeSet::from(["bottom#2".to_owned()])
+        );
         assert_eq!(
             bounded.unopened(),
             &BTreeSet::from(["bottom".to_owned(), "|- U".to_owned()])
@@ -1950,7 +1979,11 @@ mod tests {
         assert_eq!(top.antecedent().reach(), 3);
         assert_eq!(top.consequent().reach(), 1);
         assert_eq!(
-            top.consequent().signature().keys().copied().collect::<BTreeSet<_>>(),
+            top.consequent()
+                .signature()
+                .keys()
+                .copied()
+                .collect::<BTreeSet<_>>(),
             BTreeSet::from(["top", "|- S"])
         );
         // And the direction is genuine rather than nominal: the declaration `top` does not walk
@@ -1982,19 +2015,25 @@ mod tests {
     #[test]
     fn an_acyclic_deposit_returns_no_upward_cycle_which_is_what_makes_the_detector_falsifiable() {
         let deposit = ElaborationDeposit::read(&chained_deposit());
-        assert!(deposit
-            .consequents("deep", ElaborationAperture::Exhausted)
-            .expect("recruited")
-            .cycles()
-            .is_empty());
+        assert!(
+            deposit
+                .consequents("deep", ElaborationAperture::Exhausted)
+                .expect("recruited")
+                .cycles()
+                .is_empty()
+        );
     }
 
     #[test]
     fn a_key_the_deposit_carries_nowhere_is_refused_in_both_directions() {
         let deposit = ElaborationDeposit::read(&chained_deposit());
         for refusal in [
-            deposit.elaborate("absent", ElaborationAperture::Exhausted).unwrap_err(),
-            deposit.consequents("absent", ElaborationAperture::Exhausted).unwrap_err(),
+            deposit
+                .elaborate("absent", ElaborationAperture::Exhausted)
+                .unwrap_err(),
+            deposit
+                .consequents("absent", ElaborationAperture::Exhausted)
+                .unwrap_err(),
         ] {
             assert_eq!(
                 refusal,
@@ -2029,7 +2068,11 @@ mod tests {
                 "|- (h : P) : exactCarrier P".to_owned(),
             ])
         );
-        assert!(closure.of_species(ConsequentSpecies::Declaration).contains("carrier_transport"));
+        assert!(
+            closure
+                .of_species(ConsequentSpecies::Declaration)
+                .contains("carrier_transport")
+        );
         assert_eq!(
             closure.consequence_path("carrier_transport"),
             Some(vec![

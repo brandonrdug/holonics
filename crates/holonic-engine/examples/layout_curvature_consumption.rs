@@ -30,8 +30,8 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use holonic_engine::curvature_bridge::{
-    declare_aperture, read, revise, revise_partially, step, step_partially, ApertureRefusal,
-    CurvatureBridgeError,
+    ApertureRefusal, CurvatureBridgeError, declare_aperture, read, revise, revise_partially, step,
+    step_partially,
 };
 use holonic_engine::{
     CpuExecutor, Edge, EventId, HingeId, HingeTrajectory, HingeTransportNetwork, HingeUnitSystem,
@@ -39,7 +39,7 @@ use holonic_engine::{
     SimplicialComplex, VertexId,
 };
 use num_traits::Zero;
-use relational_geometry::{integer, rat, Rat, RatVec3};
+use relational_geometry::{Rat, RatVec3, integer, rat};
 
 // ---------------------------------------------------------------------------
 // Exact display. Nothing here rounds, and no value is ordered by magnitude.
@@ -54,7 +54,12 @@ fn show(value: &Rat) -> String {
 }
 
 fn show_vector(value: &RatVec3) -> String {
-    format!("({}, {}, {})", show(&value.x), show(&value.y), show(&value.z))
+    format!(
+        "({}, {}, {})",
+        show(&value.x),
+        show(&value.y),
+        show(&value.z)
+    )
 }
 
 struct Names {
@@ -90,9 +95,7 @@ impl Names {
     }
 
     fn vertex(&self, vertex: VertexId) -> &str {
-        self.vertices
-            .get(&vertex)
-            .map_or("?", |name| name.as_str())
+        self.vertices.get(&vertex).map_or("?", |name| name.as_str())
     }
 
     fn hinge(&self, hinge: HingeId) -> &str {
@@ -321,7 +324,9 @@ fn pinched_octahedra() -> LocalStarStanding {
         (free, RatVec3::from_i64(20, 20, 20)),
     ]);
     for edge in face_edges(&complex) {
-        complex.found_hinge("pinched hinge", founding, edge).unwrap();
+        complex
+            .found_hinge("pinched hinge", founding, edge)
+            .unwrap();
     }
     standing_from(complex, positions, |_, vector| {
         response_projecting_to(vector, &integer(1))
@@ -504,7 +509,10 @@ fn a_charged_layout_moves() {
             founding_charges,
             "the combinatorial charge moved while the complex stood still"
         );
-        seen.push(print_deficits(&standing, &format!("after step {}", index + 1)));
+        seen.push(print_deficits(
+            &standing,
+            &format!("after step {}", index + 1),
+        ));
         totals.push(reading.total_deficit());
     }
     print!("  the total deficit across the run —");
@@ -609,21 +617,25 @@ fn the_flow_does_not_drive_the_deficit_to_zero() {
     );
     assert!(reading.total_deficit().is_zero());
     assert!(!reading.is_flat());
-    assert!(reading
-        .deficits()
-        .values()
-        .all(|deficit| !deficit.is_zero()));
+    assert!(
+        reading
+            .deficits()
+            .values()
+            .all(|deficit| !deficit.is_zero())
+    );
     for _ in 0..8 {
         let applied = revise(&mut narrowed).expect("the narrowed octahedron conducts");
         assert!(
             !applied.flow.moved,
             "an unbalanced bipartite aperture is FIXED at a nonzero deficit"
         );
-        assert!(applied
-            .flow
-            .deficits_after
-            .values()
-            .all(|deficit| !deficit.is_zero()));
+        assert!(
+            applied
+                .flow
+                .deficits_after
+                .values()
+                .all(|deficit| !deficit.is_zero())
+        );
     }
     println!("  eight further steps move nothing and flatten nothing");
     println!();

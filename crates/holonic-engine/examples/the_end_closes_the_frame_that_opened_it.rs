@@ -30,7 +30,7 @@ use std::fs;
 use std::io::Write;
 use std::time::Instant;
 
-use holonic_engine::lean_development::{resolution_candidates, DeclarationGrain, read_development};
+use holonic_engine::lean_development::{DeclarationGrain, read_development, resolution_candidates};
 
 /// One declaration, reduced to what the six measurements need.
 struct Record {
@@ -201,7 +201,8 @@ fn main() {
             anonymous_returned += 1;
         }
         seen[record.file as usize].insert(record.line);
-        let Some((former, name, namespace, statement)) = truth[record.file as usize].get(&record.line)
+        let Some((former, name, namespace, statement)) =
+            truth[record.file as usize].get(&record.line)
         else {
             phantom += 1;
             if phantom_rows.len() < 400 {
@@ -229,7 +230,11 @@ fn main() {
             *statement_past_where.entry(former.clone()).or_insert(0) += 1;
         }
         // An anonymous head agrees when the grammar also calls it anonymous.
-        let reader_name = if record.anonymous { "" } else { record.name.as_str() };
+        let reader_name = if record.anonymous {
+            ""
+        } else {
+            record.name.as_str()
+        };
         if reader_name == name {
             name_agree += 1;
         } else {
@@ -254,7 +259,11 @@ fn main() {
             if wrong_namespace_rows.len() < 400 {
                 wrong_namespace_rows.push(format!(
                     "{}\t{}\t{}\t{}\t{}",
-                    paths[record.file as usize], record.line, record.name, namespace, record.namespace
+                    paths[record.file as usize],
+                    record.line,
+                    record.name,
+                    namespace,
+                    record.namespace
                 ));
             }
         }
@@ -371,7 +380,10 @@ fn main() {
         } else {
             format!("{}.{}", record.namespace, record.name)
         };
-        qualified_files.entry(qualified).or_default().insert(record.file);
+        qualified_files
+            .entry(qualified)
+            .or_default()
+            .insert(record.file);
     }
 
     let mut target_count: Vec<u64> = vec![0u64; paths.len()];
@@ -395,7 +407,15 @@ fn main() {
             }
         }
     }
-    let short_null = analytic_null(&records, &short_files, &symbol_text, &target_count, words, &closure, paths.len());
+    let short_null = analytic_null(
+        &records,
+        &short_files,
+        &symbol_text,
+        &target_count,
+        words,
+        &closure,
+        paths.len(),
+    );
 
     // Qualified join: Lean's own resolution, longest enclosing prefix first, and an OPEN return
     // where the resolved name is still declared in more than one file.
@@ -426,7 +446,11 @@ fn main() {
                 qualified_unresolved += 1;
                 continue;
             };
-            let elsewhere: Vec<u32> = landing.iter().copied().filter(|f| *f != record.file).collect();
+            let elsewhere: Vec<u32> = landing
+                .iter()
+                .copied()
+                .filter(|f| *f != record.file)
+                .collect();
             if elsewhere.is_empty() {
                 continue;
             }
@@ -476,17 +500,26 @@ fn main() {
     say("cost.parse_nanos", parse_nanos.to_string());
 
     say("truth.heads", truth_total.to_string());
-    say("truth.heads_without_example", truth_without_example.to_string());
+    say(
+        "truth.heads_without_example",
+        truth_without_example.to_string(),
+    );
     say("truth.anonymous", truth_anonymous.to_string());
     say("reader.heads", records.len().to_string());
     say("reader.anonymous", anonymous_returned.to_string());
     say("reader.steps", steps_total.to_string());
     say("heads.hit", head_hit.to_string());
-    say("heads.hit_without_example", head_hit_without_example.to_string());
+    say(
+        "heads.hit_without_example",
+        head_hit_without_example.to_string(),
+    );
     say("heads.phantom", phantom.to_string());
     say(
         "heads.recovered_bp",
-        basis_points(head_hit_without_example as u64, truth_without_example as u64),
+        basis_points(
+            head_hit_without_example as u64,
+            truth_without_example as u64,
+        ),
     );
     for (former, count) in &missed_by_former {
         say(&format!("heads.missed.{former}"), count.to_string());
@@ -536,7 +569,10 @@ fn main() {
         .map(|(id, _)| symbol_occurrences[id])
         .sum();
     say("glyph.single_kinds", single_glyph_kinds.to_string());
-    say("glyph.single_occurrences", single_glyph_occurrences.to_string());
+    say(
+        "glyph.single_occurrences",
+        single_glyph_occurrences.to_string(),
+    );
     say("vocab.kinds", symbol_text.len().to_string());
     say("preamble.kinds", preamble_kinds.to_string());
     say("preamble.occurrences", preamble_occurrences.to_string());
@@ -561,7 +597,10 @@ fn main() {
 
     say("edges.short.total", short_total.to_string());
     say("edges.short.inside", short_inside.to_string());
-    say("edges.short.inside_bp", basis_points(short_inside, short_total));
+    say(
+        "edges.short.inside_bp",
+        basis_points(short_inside, short_total),
+    );
     say("edges.short.null_bp", short_null);
     say("edges.qualified.total", qualified_total.to_string());
     say("edges.qualified.inside", qualified_inside.to_string());
@@ -578,7 +617,10 @@ fn main() {
         },
     );
     say("edges.qualified.open", qualified_open.to_string());
-    say("edges.qualified.unresolved", qualified_unresolved.to_string());
+    say(
+        "edges.qualified.unresolved",
+        qualified_unresolved.to_string(),
+    );
 
     fs::write(format!("{prefix}.summary.tsv"), out).unwrap();
     write_rows(&format!("{prefix}.phantom.tsv"), &phantom_rows);

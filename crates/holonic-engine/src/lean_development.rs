@@ -125,7 +125,7 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use serde::{Deserialize, Serialize};
 
-use crate::derivation_atlas::{Derivation, CODEC_KEYWORDS, DECLARATION_FORMERS};
+use crate::derivation_atlas::{CODEC_KEYWORDS, DECLARATION_FORMERS, Derivation};
 
 /// Lines that situate a file rather than found anything in it.
 ///
@@ -619,10 +619,19 @@ impl DevelopmentReading {
                 if landing.len() < 2 {
                     continue;
                 }
-                found
-                    .entry(form.qualified())
-                    .or_default()
-                    .insert(symbol.clone(), landing.iter().map(|at| format!("{}@{}", self.declarations[*at].qualified(), self.declarations[*at].line)).collect());
+                found.entry(form.qualified()).or_default().insert(
+                    symbol.clone(),
+                    landing
+                        .iter()
+                        .map(|at| {
+                            format!(
+                                "{}@{}",
+                                self.declarations[*at].qualified(),
+                                self.declarations[*at].line
+                            )
+                        })
+                        .collect(),
+                );
             }
         }
         found
@@ -807,7 +816,14 @@ fn split_comments(text: &str) -> Vec<SplitLine> {
 /// **`«…»` is Lean's quoting of a name that is otherwise a keyword.** `«forall»` is one identifier
 /// and the reading stopped at the guillemet.
 fn is_identifier_body(c: char) -> bool {
-    c.is_alphanumeric() || c == '_' || c == '.' || c == '\'' || c == '?' || c == '!' || c == '«' || c == '»'
+    c.is_alphanumeric()
+        || c == '_'
+        || c == '.'
+        || c == '\''
+        || c == '?'
+        || c == '!'
+        || c == '«'
+        || c == '»'
 }
 
 fn identifier_tokens(line: &str) -> impl Iterator<Item = &str> {
@@ -1083,10 +1099,7 @@ fn founded_names(lines: &[String]) -> BTreeSet<String> {
         }
         let after = trimmed[head.len()..].trim_start();
         // The pattern runs to the first `:`, `:=` or `with`, whichever comes first.
-        let pattern = split_before_with(after)
-            .split(":=")
-            .next()
-            .unwrap_or(after);
+        let pattern = split_before_with(after).split(":=").next().unwrap_or(after);
         let pattern = pattern.split(':').next().unwrap_or(pattern);
         for token in identifier_tokens(pattern).filter(|name| *name != "with") {
             founded.insert(token.to_owned());
@@ -1258,17 +1271,16 @@ fn classify(
         // tactic; `_ = ∑ m : New, …` begins with Lean's placeholder and heads every later `calc`
         // step. Reading either as a head put `calc`'s own relation steps into tactic position.
         if opens_step && stripped.starts_with(char::is_alphabetic) && !in_calc {
-            head = identifier_tokens(stripped).next().filter(|name| !SCOPING_COMMANDS.contains(name));
+            head = identifier_tokens(stripped)
+                .next()
+                .filter(|name| !SCOPING_COMMANDS.contains(name));
             if let Some(name) = head {
                 let slot = form.tactics.entry(name.to_owned()).or_insert(0u32);
                 *slot = slot.saturating_add(1);
 
                 if BINDING_TACTICS.contains(&name) {
                     let after = stripped[name.len()..].trim_start();
-                    let pattern = split_before_with(after)
-                        .split(":=")
-                        .next()
-                        .unwrap_or(after);
+                    let pattern = split_before_with(after).split(":=").next().unwrap_or(after);
                     let pattern = pattern.split(':').next().unwrap_or(pattern);
                     let statement = statement_of(after, pattern.trim());
                     // A destructuring pattern founds several names together; each becomes its own
@@ -1433,7 +1445,8 @@ fn header_terminator(text: &str) -> Option<usize> {
     let mut cursor = 0usize;
     while let Some(at) = text[cursor..].find("where") {
         let at = cursor + at;
-        let before_ok = at == 0 || !is_identifier_body(text[..at].chars().next_back().unwrap_or(' '));
+        let before_ok =
+            at == 0 || !is_identifier_body(text[..at].chars().next_back().unwrap_or(' '));
         let after = at + "where".len();
         let after_ok = after >= bytes.len()
             || !is_identifier_body(text[after..].chars().next().unwrap_or(' '));
@@ -1906,7 +1919,8 @@ end Soma
 
     #[test]
     fn a_modifier_does_not_hide_the_former() {
-        let text = "@[simp]\nnoncomputable def held : Nat := 0\nprivate theorem kept : True := trivial\n";
+        let text =
+            "@[simp]\nnoncomputable def held : Nat := 0\nprivate theorem kept : True := trivial\n";
         let read = read_development(text, DeclarationGrain::EveryTopLevelDeclaration);
         let names: Vec<&str> = read
             .declarations
@@ -1921,7 +1935,10 @@ end Soma
         let text = "theorem wide\n    (a : Nat)\n    (b : Nat) :\n    a = b := by\n  omega\n";
         let read = read_development(text, DeclarationGrain::EveryTopLevelDeclaration);
         assert_eq!(read.declarations.len(), 1);
-        assert_eq!(read.declarations[0].statement, "(a : Nat) (b : Nat) : a = b");
+        assert_eq!(
+            read.declarations[0].statement,
+            "(a : Nat) (b : Nat) : a = b"
+        );
     }
 
     #[test]
@@ -2015,7 +2032,10 @@ end Soma
     fn a_tactic_head_is_returned_beside_the_terms_and_never_inside_them() {
         let form = proof();
         for head in ["classical", "apply", "intro", "have", "exact"] {
-            assert!(form.tactics.contains_key(head), "{head} is in tactic position");
+            assert!(
+                form.tactics.contains_key(head),
+                "{head} is in tactic position"
+            );
             assert!(!form.recruited.contains_key(head), "{head} is not a term");
         }
         // A tactic's ARGUMENT stays a term: `apply Finset.sum_nonneg`.
@@ -2045,8 +2065,16 @@ end Soma
         let form = proof();
         // `hcap_pos` recruits `hcap`, which an EARLIER step founded. That is the leader inside one
         // declaration, and the flat reading charged both to the theorem as a depth-one star.
-        let hcap = form.steps.iter().position(|step| step.binder == "hcap").unwrap();
-        let hcap_pos = form.steps.iter().position(|step| step.binder == "hcap_pos").unwrap();
+        let hcap = form
+            .steps
+            .iter()
+            .position(|step| step.binder == "hcap")
+            .unwrap();
+        let hcap_pos = form
+            .steps
+            .iter()
+            .position(|step| step.binder == "hcap_pos")
+            .unwrap();
         assert!(form.internal_arrivals().contains(&(hcap, hcap_pos)));
         assert_eq!(form.internal_depth(), vec![hcap, hcap_pos]);
     }

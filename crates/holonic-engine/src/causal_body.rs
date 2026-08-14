@@ -811,7 +811,11 @@ impl CausalBodyStanding {
         if !boundary.support().is_subset(&self.active_cells) {
             return Err(CausalBodyError::OpeningOutsideActiveBody);
         }
-        if !self.incidence.boundary_of_chain(&boundary)?.difference_is_zero() {
+        if !self
+            .incidence
+            .boundary_of_chain(&boundary)?
+            .difference_is_zero()
+        {
             return Err(CausalBodyError::OpeningBoundaryNotClosed);
         }
         let boundary_grade = self
@@ -1000,7 +1004,11 @@ impl CausalBodyStanding {
                 };
                 cycle.add_term(carrier, coefficient);
             }
-            if !self.incidence.boundary_of_chain(&cycle)?.difference_is_zero() {
+            if !self
+                .incidence
+                .boundary_of_chain(&cycle)?
+                .difference_is_zero()
+            {
                 return Err(CausalBodyError::FundamentalCycleNotClosed(edge));
             }
             result.push((edge, canonical_chain(&cycle)));
@@ -1069,7 +1077,11 @@ impl CausalBodyStanding {
                 loop_boundary.add_term(carrier, coefficient);
                 ordered_steps.push(CausalTransportStep { carrier, hand });
             }
-            if !self.incidence.boundary_of_chain(&loop_boundary)?.difference_is_zero() {
+            if !self
+                .incidence
+                .boundary_of_chain(&loop_boundary)?
+                .difference_is_zero()
+            {
                 return Err(CausalBodyError::FundamentalCycleNotClosed(
                     connection.carrier,
                 ));
@@ -1178,11 +1190,12 @@ impl CausalBodyStanding {
             if let Some(old) = previous
                 .as_ref()
                 .and_then(|old| old.diffusion.content.values.get(cell))
-                && old.len() == sheaf.stalk_dimension(*cell)? {
-                    values.insert(*cell, old.clone());
-                    carried.insert(*cell);
-                    continue;
-                }
+                && old.len() == sheaf.stalk_dimension(*cell)?
+            {
+                values.insert(*cell, old.clone());
+                carried.insert(*cell);
+                continue;
+            }
             expected_entering.insert(*cell);
             let supplied = entering_content
                 .get(cell)
@@ -1468,13 +1481,14 @@ fn bind_source_vertex(
     causal: CausalCellId,
 ) -> Result<(), CausalBodyError> {
     if let Some(existing) = bindings.insert(source, causal)
-        && existing != causal {
-            return Err(CausalBodyError::ProjectionSourceVertexInconsistent {
-                source_vertex: source,
-                first: existing,
-                second: causal,
-            });
-        }
+        && existing != causal
+    {
+        return Err(CausalBodyError::ProjectionSourceVertexInconsistent {
+            source_vertex: source,
+            first: existing,
+            second: causal,
+        });
+    }
     Ok(())
 }
 

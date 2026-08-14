@@ -195,8 +195,8 @@ fn main() -> Result<(), Box<dyn Error>> {
         let alternate = render(&face, &chart, &permuted);
 
         // FALSIFIER TWO, run on real emitted material rather than a fixture.
-        let gauge_invariant = structural_residue(&document, &declared)
-            == structural_residue(&alternate, &permuted);
+        let gauge_invariant =
+            structural_residue(&document, &declared) == structural_residue(&alternate, &permuted);
         assert!(
             gauge_invariant,
             "{}: the palette moved a structural byte",
@@ -215,10 +215,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         // THE READ-BACK. Re-open both artifacts and recover their content from the files alone.
         let recovered_census = read_rows_back(&rows_path)?;
         let memory_census = mark_census(&face);
-        let stations_agree = recovered_census.get("station").copied().unwrap_or(0)
-            == memory_census["stations"];
-        let features_agree = recovered_census.get("feature").copied().unwrap_or(0)
-            == memory_census["features"];
+        let stations_agree =
+            recovered_census.get("station").copied().unwrap_or(0) == memory_census["stations"];
+        let features_agree =
+            recovered_census.get("feature").copied().unwrap_or(0) == memory_census["features"];
         let obstructions_agree = recovered_census.get("obstruction").copied().unwrap_or(0)
             == memory_census["obstructions"];
 
@@ -246,7 +246,10 @@ fn main() -> Result<(), Box<dyn Error>> {
             .sum();
 
         println!("-- {} --", station.title);
-        println!("   certified distinct features : {}", face.certified_feature_count);
+        println!(
+            "   certified distinct features : {}",
+            face.certified_feature_count
+        );
         println!("   located exactly             : {}", face.features.len());
         println!("   returned as obstruction     : {unresolved}");
         println!("   naive sampled sign changes  : {naive}");
@@ -274,7 +277,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
         println!("   read back from file          : {read_back_ok}");
         println!("   palette permutation invariant: {gauge_invariant}");
-        println!("   marks placed                 : {}", place(&face, &chart).len());
+        println!(
+            "   marks placed                 : {}",
+            place(&face, &chart).len()
+        );
         println!();
 
         summary.push_str(&format!(

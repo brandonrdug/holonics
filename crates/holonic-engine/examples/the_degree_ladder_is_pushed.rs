@@ -50,7 +50,9 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!("=============================");
     println!();
     println!("The organ is `quintic_chart::read_quintic_charts`, driven past the degrees any");
-    println!("committed driver reaches. prime limit {PRIME_LIMIT}, horn limit {HORN_LOCAL_SECTION_LIMIT}.");
+    println!(
+        "committed driver reaches. prime limit {PRIME_LIMIT}, horn limit {HORN_LOCAL_SECTION_LIMIT}."
+    );
     println!();
 
     println!("--- THE BEZOUT COST LAW, WHICH IS INDEPENDENT OF THE SOURCE DEGREE ---");
@@ -71,7 +73,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         let problem = match IntegralQuinticProblem::new(
             QuinticProblemId(index as u64 + 1),
             Box::leak(name.clone().into_boxed_str()),
-            coefficients.iter().map(|value| BigInt::from(*value)).collect(),
+            coefficients
+                .iter()
+                .map(|value| BigInt::from(*value))
+                .collect(),
         ) {
             Ok(problem) => problem,
             Err(error) => {

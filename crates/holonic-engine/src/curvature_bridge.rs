@@ -595,8 +595,14 @@ pub fn declare_aperture(
         .map(|vertex| (*vertex, BTreeSet::new()))
         .collect();
     for hinge in complex.hinges.values() {
-        incident.entry(hinge.edge.lower).or_default().insert(hinge.id);
-        incident.entry(hinge.edge.upper).or_default().insert(hinge.id);
+        incident
+            .entry(hinge.edge.lower)
+            .or_default()
+            .insert(hinge.id);
+        incident
+            .entry(hinge.edge.upper)
+            .or_default()
+            .insert(hinge.id);
     }
 
     let mut conducted = BTreeMap::new();
@@ -838,7 +844,9 @@ pub fn step(standing: &LocalStarStanding) -> Result<CurvatureBridgeStep, Curvatu
 /// This is the consumption `local_star.rs:2301` does not perform. It is a
 /// caller's deed rather than an event-law side effect, so a standing only
 /// receives its own curvature when something asks it to.
-pub fn revise(standing: &mut LocalStarStanding) -> Result<CurvatureBridgeStep, CurvatureBridgeError> {
+pub fn revise(
+    standing: &mut LocalStarStanding,
+) -> Result<CurvatureBridgeStep, CurvatureBridgeError> {
     let applied = step(standing)?;
     standing.geometry_responses = applied.revised_geometry_responses.clone();
     Ok(applied)
@@ -1147,12 +1155,7 @@ mod tests {
                 .expect("the fixture names its vertices")
                 .id
         };
-        let (a, b, c, d) = (
-            named_in("a"),
-            named_in("b"),
-            named_in("c"),
-            named_in("d"),
-        );
+        let (a, b, c, d) = (named_in("a"), named_in("b"), named_in("c"), named_in("d"));
         let expanding = Edge::new(a, b).unwrap();
         let contracting = Edge::new(c, d).unwrap();
         assert_eq!(
@@ -1193,8 +1196,7 @@ mod tests {
 
         // And the refused reduction cannot separate them.
         assert_eq!(
-            up.direction_blind_norm_squared,
-            down.direction_blind_norm_squared,
+            up.direction_blind_norm_squared, down.direction_blind_norm_squared,
             "`norm_squared` returns the same value for both, which is exactly \
              why the bridge does not use it"
         );
@@ -1370,7 +1372,10 @@ mod tests {
             );
         }
         assert!(!reading.configuration.carries_odd_hinge_cycle());
-        assert_eq!(reading.configuration.forced_component_scale()[&a], rat(3, 4));
+        assert_eq!(
+            reading.configuration.forced_component_scale()[&a],
+            rat(3, 4)
+        );
         assert!(matches!(
             reading.fixed_point(),
             CurvatureFixedPoint::AlternatingTracedDeviation { .. }
@@ -1404,11 +1409,13 @@ mod tests {
         for _ in 0..10 {
             let applied = revise(&mut carried).expect("the narrowed octahedron conducts");
             assert!(!applied.flow.moved);
-            assert!(applied
-                .flow
-                .deficits_after
-                .values()
-                .all(|deficit| !deficit.is_zero()));
+            assert!(
+                applied
+                    .flow
+                    .deficits_after
+                    .values()
+                    .all(|deficit| !deficit.is_zero())
+            );
         }
         assert_eq!(carried.geometry_responses, standing.geometry_responses);
     }
@@ -1616,7 +1623,10 @@ mod tests {
 
         // And the reading refuses with the WHOLE population, not the one vertex
         // the carrier happens to name first.
-        assert_eq!(read(&standing), Err(CurvatureBridgeError::AperturePorous { leaks }));
+        assert_eq!(
+            read(&standing),
+            Err(CurvatureBridgeError::AperturePorous { leaks })
+        );
     }
 
     #[test]
@@ -1702,7 +1712,10 @@ mod tests {
             leaks.len() > 1,
             "the population must carry more than the total-loss vertex"
         );
-        assert_eq!(read(&standing), Err(CurvatureBridgeError::AperturePorous { leaks }));
+        assert_eq!(
+            read(&standing),
+            Err(CurvatureBridgeError::AperturePorous { leaks })
+        );
 
         // And this is exactly the case the carrier would have called isolated.
         let projections =
@@ -1804,10 +1817,9 @@ mod tests {
         // conducting aperture PLUS one refused hinge, which no whole-hinge
         // standing can present.
         retire_hinges(&mut standing, |edge| {
-            let joins_the_pinch = (edge.lower == a && edge.upper == b)
-                || (edge.lower == b && edge.upper == a);
-            let touches_the_pinch =
-                [edge.lower, edge.upper].iter().any(|v| *v == a || *v == b);
+            let joins_the_pinch =
+                (edge.lower == a && edge.upper == b) || (edge.lower == b && edge.upper == a);
+            let touches_the_pinch = [edge.lower, edge.upper].iter().any(|v| *v == a || *v == b);
             joins_the_pinch || !touches_the_pinch
         });
         assert_eq!(standing.kinematic.complex.hinges.len(), 10);
@@ -2378,14 +2390,10 @@ mod tests {
                     );
                     assert!(!record.requested.is_zero());
                     assert_eq!(
-                        record.response_direction,
-                        standing.geometry_responses[&hinge],
+                        record.response_direction, standing.geometry_responses[&hinge],
                         "the refusal carries the geometry, not only the name"
                     );
-                    assert!(record
-                        .response_direction
-                        .dot(&record.edge_vector)
-                        .is_zero());
+                    assert!(record.response_direction.dot(&record.edge_vector).is_zero());
                 }
             }
             other => panic!("expected an orthogonality refusal, got {other:?}"),
@@ -2419,9 +2427,15 @@ mod tests {
         // The deposit is complete: ten hinges moved, two are verbatim.
         for hinge in standing.geometry_responses.keys() {
             if applied.unlifted.contains_key(hinge) {
-                assert_eq!(moved.geometry_responses[hinge], standing.geometry_responses[hinge]);
+                assert_eq!(
+                    moved.geometry_responses[hinge],
+                    standing.geometry_responses[hinge]
+                );
             } else {
-                assert_ne!(moved.geometry_responses[hinge], standing.geometry_responses[hinge]);
+                assert_ne!(
+                    moved.geometry_responses[hinge],
+                    standing.geometry_responses[hinge]
+                );
             }
         }
         // It is NOT a no-op: the deficit population actually moved.
@@ -2607,10 +2621,7 @@ mod tests {
     fn every_deposit_names_the_schema_a_later_reader_will_key_on() {
         let standing = octahedron(|_| integer(1));
         let reading = read(&standing).expect("the octahedron conducts");
-        assert_eq!(
-            reading.schema,
-            "holonic-engine.curvature-bridge-reading.v1"
-        );
+        assert_eq!(reading.schema, "holonic-engine.curvature-bridge-reading.v1");
         assert_eq!(
             reading.aperture.schema,
             "holonic-engine.curvature-bridge-aperture.v1"

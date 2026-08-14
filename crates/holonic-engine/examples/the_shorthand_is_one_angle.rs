@@ -34,10 +34,10 @@
 //! `M`, `L`, `T` occur only in this file's fixture and in the module's tests. The organ names no
 //! unit.
 
+use holonic_engine::exact_value::ExactOrdering;
 use holonic_engine::quantity::{
     BaseUnits, Cast, Dimension, DimensionMatrix, PiGroup, PiGroups, Quantity, QuantityError,
 };
-use holonic_engine::exact_value::ExactOrdering;
 use num_bigint::BigInt;
 use num_traits::{One, Zero};
 use relational_geometry::{Rat, format_rat};
@@ -74,12 +74,8 @@ impl Mechanics {
     fn declare(order: [&str; 3]) -> Self {
         let base = BaseUnits::declare(order).expect("the declared base is well formed");
         let by = |mass: i64, length: i64, time: i64| {
-            base.dimension_of(&[
-                ("M", whole(mass)),
-                ("L", whole(length)),
-                ("T", whole(time)),
-            ])
-            .expect("every symbol is declared")
+            base.dimension_of(&[("M", whole(mass)), ("L", whole(length)), ("T", whole(time))])
+                .expect("every symbol is declared")
         };
         Self {
             energy: by(1, 2, -2),
@@ -250,7 +246,14 @@ fn main() {
         failures.push("the rank or the count moved under a relabelling".to_owned());
     }
     // (E, m, c, p) -> (p, c, m, E) sends the word (a,b,c,d) to (d,c,b,a).
-    let permute = |values: &[Rat]| vec![values[3].clone(), values[2].clone(), values[1].clone(), values[0].clone()];
+    let permute = |values: &[Rat]| {
+        vec![
+            values[3].clone(),
+            values[2].clone(),
+            values[1].clone(),
+            values[0].clone(),
+        ]
+    };
     if !membership(&permuted_groups, "E/mc^2", &permute(&over_rest)) {
         failures.push("E/mc^2 left the span under a relabelling".to_owned());
     }
@@ -269,7 +272,8 @@ fn main() {
         failures.push("the rank moved when the base units were relabelled".to_owned());
     }
     if rebased_groups.basis != groups.basis {
-        failures.push("the pi-group basis moved when only the base units were relabelled".to_owned());
+        failures
+            .push("the pi-group basis moved when only the base units were relabelled".to_owned());
     }
     // A gauge whose group acts trivially on the declared material is not a gauge. Permuting the
     // ROWS cannot move the kernel — that is the invariance being read — so the frame is only
@@ -362,9 +366,18 @@ fn main() {
 
     println!("\n=== 5. the controls that can fail ===\n");
     let base = mechanics.base.clone();
-    let mass_column = ("m".to_owned(), base.dimension_of(&[("M", whole(1))]).unwrap());
-    let length_column = ("l".to_owned(), base.dimension_of(&[("L", whole(1))]).unwrap());
-    let time_column = ("t".to_owned(), base.dimension_of(&[("T", whole(1))]).unwrap());
+    let mass_column = (
+        "m".to_owned(),
+        base.dimension_of(&[("M", whole(1))]).unwrap(),
+    );
+    let length_column = (
+        "l".to_owned(),
+        base.dimension_of(&[("L", whole(1))]).unwrap(),
+    );
+    let time_column = (
+        "t".to_owned(),
+        base.dimension_of(&[("T", whole(1))]).unwrap(),
+    );
     let speed_column = ("c".to_owned(), mechanics.speed.clone());
     let energy_column = ("E".to_owned(), mechanics.energy.clone());
     let mut columns = vec![mass_column, length_column, time_column];
@@ -398,7 +411,9 @@ fn main() {
         counts.push(swept.independent_group_count);
     }
     if counts != vec![0, 1, 2] {
-        failures.push(format!("the count sweep returned {counts:?}, not [0, 1, 2]"));
+        failures.push(format!(
+            "the count sweep returned {counts:?}, not [0, 1, 2]"
+        ));
     }
     println!(
         "    the count moved {counts:?} with the material — a full-rank matrix returns ZERO groups."
@@ -406,8 +421,11 @@ fn main() {
 
     println!("\n=== 6. the relation, exact over Q ===\n");
     let cast = mechanics.cast();
-    println!("    the cast, declared:  {}  with dimension [{}]",
-        cast.quantity(), cast.dimension());
+    println!(
+        "    the cast, declared:  {}  with dimension [{}]",
+        cast.quantity(),
+        cast.dimension()
+    );
     let mass_four = Quantity::new(whole(4), mechanics.mass.clone());
     let application = cast.apply(&mass_four, &whole(2)).expect("applies");
     println!("    {}\n", application.render());
@@ -421,9 +439,13 @@ fn main() {
         (7, 0, 7, Rat::zero()),
         (4, 3, 6, rational(3, 5)), // the perturbed control: E is wrong on purpose
     ] {
-        let perturbed = energy_value * energy_value != mass * mass + momentum_value * momentum_value;
+        let perturbed =
+            energy_value * energy_value != mass * mass + momentum_value * momentum_value;
         let rest = cast
-            .apply(&Quantity::new(whole(mass), mechanics.mass.clone()), &whole(2))
+            .apply(
+                &Quantity::new(whole(mass), mechanics.mass.clone()),
+                &whole(2),
+            )
             .expect("applies")
             .returned;
         let carried = cast
@@ -437,8 +459,18 @@ fn main() {
         assert_eq!(rest.dimension(), total.dimension(), "mc^2 is an energy");
         assert_eq!(carried.dimension(), total.dimension(), "pc is an energy");
 
-        let cosine = rest.ratio(&total).expect("lawful").rational().expect("dimensionless").clone();
-        let sine = carried.ratio(&total).expect("lawful").rational().expect("dimensionless").clone();
+        let cosine = rest
+            .ratio(&total)
+            .expect("lawful")
+            .rational()
+            .expect("dimensionless")
+            .clone();
+        let sine = carried
+            .ratio(&total)
+            .expect("lawful")
+            .rational()
+            .expect("dimensionless")
+            .clone();
         let norm = &cosine * &cosine + &sine * &sine;
         let half_turn = &sine / (Rat::one() + &cosine);
         let gamma = Rat::one() / &cosine;
@@ -453,7 +485,11 @@ fn main() {
             format_rat(carried.parts().0),
             format_rat(&norm),
             format_rat(&half_turn),
-            if perturbed { "   <- PERTURBED CONTROL" } else { "" }
+            if perturbed {
+                "   <- PERTURBED CONTROL"
+            } else {
+                ""
+            }
         );
         if perturbed {
             if norm.is_one() {
@@ -492,7 +528,9 @@ fn main() {
          \x20   beta = 0 returns t = 0 exactly. E = mc^2 IS theta = 0."
     );
 
-    println!("\n    and the second group leaves the chart there, which is why the shorthand looks total:");
+    println!(
+        "\n    and the second group leaves the chart there, which is why the shorthand looks total:"
+    );
     let at_rest = vec![
         Quantity::new(whole(7), mechanics.energy.clone()),
         Quantity::new(whole(7), mechanics.mass.clone()),
@@ -539,7 +577,10 @@ fn main() {
         Quantity::new(whole(3), mechanics.momentum.clone()),
     ];
     match groups.basis[0].evaluate(&values) {
-        Ok(returned) => println!("      {} -> {returned}", groups.basis[0].render(&groups.quantities)),
+        Ok(returned) => println!(
+            "      {} -> {returned}",
+            groups.basis[0].render(&groups.quantities)
+        ),
         Err(refusal) => println!(
             "      {:<28} REFUSED: {refusal}",
             groups.basis[0].render(&groups.quantities)

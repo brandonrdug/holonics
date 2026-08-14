@@ -178,9 +178,8 @@ pub fn place(face: &CertifiedFace, chart: &CanvasChart) -> Vec<PlacedMark> {
     };
     // The canvas ordinate grows downward, so the exact value is reflected in the chart rather than
     // negated in the source. The reflection belongs to the chart, not to the mathematics.
-    let place_y = |ordinate: &Rat| -> Rat {
-        &margin + &inner_height * (&high - ordinate) / &ordinate_span
-    };
+    let place_y =
+        |ordinate: &Rat| -> Rat { &margin + &inner_height * (&high - ordinate) / &ordinate_span };
 
     let mut marks = Vec::new();
     for station in &face.stations {
@@ -498,8 +497,15 @@ mod tests {
         // Octet coordinates are integers and source values are n or n/d. A decimal point would
         // mean a float reached the codec.
         let face = sample_face();
-        let document = render(&face, &CanvasChart::new(640, 400, 40), &DisplayGauge::declared());
-        for line in document.lines().filter(|line| line.contains("data-abscissa")) {
+        let document = render(
+            &face,
+            &CanvasChart::new(640, 400, 40),
+            &DisplayGauge::declared(),
+        );
+        for line in document
+            .lines()
+            .filter(|line| line.contains("data-abscissa"))
+        {
             assert!(
                 !line.contains('.'),
                 "a decimal expansion reached the emitted document: {line}"
@@ -615,7 +621,11 @@ mod tests {
         let window = ReceiverWindow::new(integer(-1), integer(1), 1, 0).expect("window");
         let face = certify_face(&narrow, &window).expect("face");
         assert!(!face.obstructions.is_empty(), "the fixture must obstruct");
-        let document = render(&face, &CanvasChart::new(400, 300, 30), &DisplayGauge::declared());
+        let document = render(
+            &face,
+            &CanvasChart::new(400, 300, 30),
+            &DisplayGauge::declared(),
+        );
         assert!(
             document.contains(r#"data-role="obstruction""#),
             "the obstruction was not drawn"

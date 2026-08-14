@@ -135,10 +135,7 @@ impl DeviceDeclaration {
 
     /// The compute capability as `nvcc` names it: `compute_XY`.
     pub fn virtual_architecture(&self) -> String {
-        format!(
-            "compute_{}{}",
-            self.capability_major, self.capability_minor
-        )
+        format!("compute_{}{}", self.capability_major, self.capability_minor)
     }
 }
 
@@ -596,7 +593,10 @@ impl CoverDecomposition {
             // sharing one address cannot be told apart by a placement that addresses them by
             // index, so no decomposition of such a front is provable either way. Reported once,
             // at the second occurrence.
-            if front[..at].iter().any(|earlier| earlier.index == cell.index) {
+            if front[..at]
+                .iter()
+                .any(|earlier| earlier.index == cell.index)
+            {
                 barriers.push(Barrier::RepeatedFrontCell { cell: cell.index });
             }
 
@@ -670,10 +670,7 @@ impl CoverDecomposition {
         self.sections
             .iter()
             .map(|section| {
-                let grain = cover
-                    .chart(section.chart)
-                    .map(Chart::grain)
-                    .unwrap_or(1);
+                let grain = cover.chart(section.chart).map(Chart::grain).unwrap_or(1);
                 section.work(grain)
             })
             .collect()
@@ -1015,11 +1012,16 @@ mod tests {
         // A branching junction: cell `n` opens `n % 7 + 1` continuations, so extents differ and the
         // by-extent cover cannot coincide with a by-count one.
         let expand = |cell: u64| -> Result<Vec<u64>, ()> {
-            Ok((0..(cell % 7 + 1)).map(|branch| cell * 10 + branch).collect())
+            Ok((0..(cell % 7 + 1))
+                .map(|branch| cell * 10 + branch)
+                .collect())
         };
-        let serial = expand_front(front.clone(), &HardwareCover::of_charts(vec![
-            Chart::Host(HostDeclaration { lanes: 1 }),
-        ]), |cell| cell % 7 + 1, expand)
+        let serial = expand_front(
+            front.clone(),
+            &HardwareCover::of_charts(vec![Chart::Host(HostDeclaration { lanes: 1 })]),
+            |cell| cell % 7 + 1,
+            expand,
+        )
         .expect("serial");
         for lanes in [2u32, 3, 8, 64] {
             let covered = expand_front(
@@ -1034,7 +1036,10 @@ mod tests {
                 "a lane is a realization coordinate and may not move a result: {lanes} lanes"
             );
         }
-        assert_eq!(serial.len(), (0..200u64).map(|c| (c % 7 + 1) as usize).sum::<usize>());
+        assert_eq!(
+            serial.len(),
+            (0..200u64).map(|c| (c % 7 + 1) as usize).sum::<usize>()
+        );
     }
 
     /// A failing cell surfaces its failure rather than being silently dropped by its lane.
@@ -1045,7 +1050,13 @@ mod tests {
             front,
             &HardwareCover::of_charts(vec![Chart::Host(HostDeclaration { lanes: 8 })]),
             |_| 1,
-            |cell| if cell == 47 { Err("47") } else { Ok(vec![cell]) },
+            |cell| {
+                if cell == 47 {
+                    Err("47")
+                } else {
+                    Ok(vec![cell])
+                }
+            },
         );
         assert_eq!(outcome, Err("47"));
     }
@@ -1152,11 +1163,7 @@ where
     Successor: Send,
     Failure: Send,
 {
-    let lanes = cover
-        .host()
-        .lanes
-        .max(1)
-        .min(front.len().max(1) as u32) as usize;
+    let lanes = cover.host().lanes.max(1).min(front.len().max(1) as u32) as usize;
     if lanes <= 1 || front.len() <= 1 {
         let mut out = Vec::new();
         for cell in front {

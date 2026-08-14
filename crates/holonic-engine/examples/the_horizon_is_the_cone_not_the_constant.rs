@@ -88,7 +88,11 @@ fn main() {
     println!("  wholes                 {}", census.wholes().len());
     println!(
         "  occurrences            {}",
-        census.wholes().iter().map(|w| w.stream.len()).sum::<usize>()
+        census
+            .wholes()
+            .iter()
+            .map(|w| w.stream.len())
+            .sum::<usize>()
     );
     println!();
 

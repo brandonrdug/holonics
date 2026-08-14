@@ -29,8 +29,8 @@ use std::fs;
 use std::path::Path;
 
 use holonic_engine::derivation_atlas::{
-    derivation_aperture_obstructions, read_derivation, read_derivation_within_aperture,
-    DerivationApertureRefusal,
+    DerivationApertureRefusal, derivation_aperture_obstructions, read_derivation,
+    read_derivation_within_aperture,
 };
 
 fn species(refusal: &DerivationApertureRefusal) -> &'static str {
@@ -74,9 +74,7 @@ fn read(paths: &[String], exhibit: usize) -> Reading {
         let Ok(text) = fs::read_to_string(path) else {
             continue;
         };
-        let historically = text
-            .lines()
-            .any(|line| line.trim().starts_with("theorem "));
+        let historically = text.lines().any(|line| line.trim().starts_with("theorem "));
         if historically {
             carried.would_have_returned += 1;
         }
@@ -105,9 +103,7 @@ fn read(paths: &[String], exhibit: usize) -> Reading {
                     "a refused text returns no Derivation: {path}"
                 );
                 if carried.exhibited.len() < exhibit {
-                    carried
-                        .exhibited
-                        .push((path.clone(), format!("{first}")));
+                    carried.exhibited.push((path.clone(), format!("{first}")));
                 }
             }
         }
@@ -154,7 +150,10 @@ fn main() {
     println!("    files                                {}", far.files);
     println!("    returned a Derivation                {}", far.returned);
     println!("    refused by the aperture              {}", far.refused);
-    println!("    top-level derivations it absorbed    {}", far.absorbed_declarations);
+    println!(
+        "    top-level derivations it absorbed    {}",
+        far.absorbed_declarations
+    );
     println!("    clauses that fired, by species:");
     for (name, count) in &far.by_species {
         println!("      {name:<16} {count:>6}");

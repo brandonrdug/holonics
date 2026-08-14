@@ -758,9 +758,7 @@ impl ProjectivePencil {
             .map(|parameter| {
                 turn.apply(parameter)
                     .map(|image| self.place(&image))
-                    .ok_or_else(|| {
-                        SimplicialError::TurnSendsParameterToInfinity(parameter.clone())
-                    })
+                    .ok_or_else(|| SimplicialError::TurnSendsParameterToInfinity(parameter.clone()))
             })
             .collect()
     }
@@ -1576,7 +1574,9 @@ pub enum HingeWorldError {
 
 #[cfg(test)]
 mod tests {
-    use relational_geometry::{Construction, CrossRatioRefusal, RatVec3, cross_ratio, integer, rat};
+    use relational_geometry::{
+        Construction, CrossRatioRefusal, RatVec3, cross_ratio, integer, rat,
+    };
 
     use super::*;
     use crate::{CausalWorld, ConicClass};

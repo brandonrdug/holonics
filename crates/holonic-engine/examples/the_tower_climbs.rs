@@ -41,10 +41,10 @@
 
 use std::collections::BTreeSet;
 
-use holonic_engine::conditioned_derivation::{expose, Exposure, FoundedMorphology};
+use holonic_engine::conditioned_derivation::{Exposure, FoundedMorphology, expose};
 use holonic_engine::contact_gluing::{
-    climb, coarse_grain, contact_graph, contact_triangles, corners_from_weights, realization_of,
-    CoarseTurn, ContactTriangle, EuclideanRealization,
+    CoarseTurn, ContactTriangle, EuclideanRealization, climb, coarse_grain, contact_graph,
+    contact_triangles, corners_from_weights, realization_of,
 };
 use holonic_engine::multiquadratic::Multiquadratic;
 use num_bigint::BigInt;
@@ -96,27 +96,90 @@ fn render(value: &Multiquadratic) -> String {
 /// `sin = √(2112)/49 = 8√33/49` — irrational, generator 33. That is the case the field exists for.
 fn atmosphere() -> Vec<(String, String)> {
     [
-        ("carriage", "the carriage carries the charge and the carrier carries the carriage"),
-        ("carrier", "the carrier carries the charge the carriage carried"),
-        ("carries", "the carries of the carriage carry the charge the carrier carries"),
-        ("charges", "the charges charge the carriage and the charges charge the carrier"),
-        ("charged", "the charged carriage charged the charged carrier with charges"),
-        ("charger", "the charger charges the charged carrier and the charger charges"),
-        ("discharge", "the discharge discharges the charged carriage and the charger"),
-        ("recharge", "the recharge recharges the charger and the charged carrier"),
-        ("conductor", "the conductor conducts the charge the carriage carried"),
-        ("conducted", "the conducted charge conducted the conductor and the carrier"),
-        ("conduction", "the conduction of the conducted charge conducts the conductor"),
-        ("transport", "the transport transports the charge the conductor conducted"),
-        ("transporter", "the transporter transports the transported charge and the transport"),
-        ("transported", "the transported charge transports the transporter and the conductor"),
-        ("transpose", "the transpose transposes the transported charge and the transport"),
-        ("transposed", "the transposed transpose transposed the transporter and the transport"),
-        ("port", "the port ports the charge and the transport ports the carrier"),
-        ("ported", "the ported charge ported the port and the transporter ported"),
-        ("porter", "the porter ports the ported charge and the transporter ports"),
-        ("charter", "the charter charters the charge and the charger charters the porter"),
-        ("chartered", "the chartered charter chartered the charger and the ported charge"),
+        (
+            "carriage",
+            "the carriage carries the charge and the carrier carries the carriage",
+        ),
+        (
+            "carrier",
+            "the carrier carries the charge the carriage carried",
+        ),
+        (
+            "carries",
+            "the carries of the carriage carry the charge the carrier carries",
+        ),
+        (
+            "charges",
+            "the charges charge the carriage and the charges charge the carrier",
+        ),
+        (
+            "charged",
+            "the charged carriage charged the charged carrier with charges",
+        ),
+        (
+            "charger",
+            "the charger charges the charged carrier and the charger charges",
+        ),
+        (
+            "discharge",
+            "the discharge discharges the charged carriage and the charger",
+        ),
+        (
+            "recharge",
+            "the recharge recharges the charger and the charged carrier",
+        ),
+        (
+            "conductor",
+            "the conductor conducts the charge the carriage carried",
+        ),
+        (
+            "conducted",
+            "the conducted charge conducted the conductor and the carrier",
+        ),
+        (
+            "conduction",
+            "the conduction of the conducted charge conducts the conductor",
+        ),
+        (
+            "transport",
+            "the transport transports the charge the conductor conducted",
+        ),
+        (
+            "transporter",
+            "the transporter transports the transported charge and the transport",
+        ),
+        (
+            "transported",
+            "the transported charge transports the transporter and the conductor",
+        ),
+        (
+            "transpose",
+            "the transpose transposes the transported charge and the transport",
+        ),
+        (
+            "transposed",
+            "the transposed transpose transposed the transporter and the transport",
+        ),
+        (
+            "port",
+            "the port ports the charge and the transport ports the carrier",
+        ),
+        (
+            "ported",
+            "the ported charge ported the port and the transporter ported",
+        ),
+        (
+            "porter",
+            "the porter ports the ported charge and the transporter ports",
+        ),
+        (
+            "charter",
+            "the charter charters the charge and the charger charters the porter",
+        ),
+        (
+            "chartered",
+            "the chartered charter chartered the charger and the ported charge",
+        ),
     ]
     .into_iter()
     .map(|(identity, text)| (identity.to_owned(), text.to_owned()))
@@ -147,7 +210,10 @@ fn main() {
         .map(|(identity, text)| expose(identity, text))
         .collect();
     let morphology = FoundedMorphology::condition(&exposures);
-    let population: Vec<String> = material.iter().map(|(identity, _)| identity.clone()).collect();
+    let population: Vec<String> = material
+        .iter()
+        .map(|(identity, _)| identity.clone())
+        .collect();
     println!("  words          {}", population.len());
     println!("  stems founded  {}", morphology.founded().len());
     println!("  stems committed{:>3}", morphology.committed_stems().len());
@@ -171,7 +237,11 @@ fn main() {
         .iter()
         .filter(|t| t.euclidean == EuclideanRealization::Realized)
         .collect();
-    println!("  triangles              {} ({} realizable)", triangles.len(), realized.len());
+    println!(
+        "  triangles              {} ({} realizable)",
+        triangles.len(),
+        realized.len()
+    );
     let mut weight_shapes: BTreeSet<Vec<BigInt>> = BTreeSet::new();
     for triangle in &realized {
         let mut sides = triangle.weights.clone().to_vec();
@@ -183,7 +253,11 @@ fn main() {
     hold(
         "the material closes triangles at all — a tower over an acyclic graph would be vacuous",
         !realized.is_empty(),
-        format!("{} realizable triangles over {} identifiers", realized.len(), graph.identifiers.len()),
+        format!(
+            "{} realizable triangles over {} identifiers",
+            realized.len(),
+            graph.identifiers.len()
+        ),
     );
 
     // ---------------------------------------------------------------------------------------------
@@ -230,7 +304,10 @@ fn main() {
             }
             CoarseTurn::Refused { refusals } => {
                 refused += 1;
-                println!("  {:<28} REFUSED {refusals:?}", triangle.identifiers.join("+"));
+                println!(
+                    "  {:<28} REFUSED {refusals:?}",
+                    triangle.identifiers.join("+")
+                );
             }
             CoarseTurn::NotRealizable { .. } => {}
         }
@@ -253,22 +330,37 @@ fn main() {
     hold(
         "every realizable triangle composes exactly, with no refusal",
         refused == 0 && exact == realized.len(),
-        format!("{exact} exact, {refused} refused, of {} realizable", realized.len()),
+        format!(
+            "{exact} exact, {refused} refused, of {} realizable",
+            realized.len()
+        ),
     );
 
     println!();
-    println!("  distinct composed turns over all {exact} realizable triangles: {composed_shapes:?}");
+    println!(
+        "  distinct composed turns over all {exact} realizable triangles: {composed_shapes:?}"
+    );
     println!();
-    println!("  **THE FINDING.** Every realizable triangle composes to the SAME turn, and it must:");
+    println!(
+        "  **THE FINDING.** Every realizable triangle composes to the SAME turn, and it must:"
+    );
     println!("  a planar triangle's angles sum to π, so the product of its three corner turns is");
-    println!("  e^{{iπ}} = (−1, 0) identically. `coarse_grain` composes all three corners, so as a");
-    println!("  rung it returns a constant — `CLAUDE.md` §8's receipt that could not have come out");
-    println!("  otherwise. The angle-sum identity is real mathematics and the rung is real code, and");
+    println!(
+        "  e^{{iπ}} = (−1, 0) identically. `coarse_grain` composes all three corners, so as a"
+    );
+    println!(
+        "  rung it returns a constant — `CLAUDE.md` §8's receipt that could not have come out"
+    );
+    println!(
+        "  otherwise. The angle-sum identity is real mathematics and the rung is real code, and"
+    );
     println!("  the defect is that the rung was specified to compute the one product that is a");
     println!("  theorem rather than a reading of the material.");
     println!();
     println!("  Brandon's own statement of the object says what the rung should be: *the tower is");
-    println!("  the INTERACTION, a Feynman vertex A,B→C, C relative to the {{A,B}} frame*. A vertex");
+    println!(
+        "  the INTERACTION, a Feynman vertex A,B→C, C relative to the {{A,B}} frame*. A vertex"
+    );
     println!("  is TWO in and ONE out. Composing two corners and returning the third relative to");
     println!("  them is the Law of Cosines' actual content and is not constant. That is a theory");
     println!("  decision, not a patch, and it is left open here rather than guessed at.");
@@ -300,7 +392,11 @@ fn main() {
     // A rank is itself a graph, so the next rung is read by the SAME law: `corners_from_weights`
     // and `realization_of` are the rank-0 reading, reused verbatim. A tower whose upper ranks read
     // corners differently would not be a tower.
-    let names: Vec<String> = rank_one.vertices.iter().map(|(name, _)| name.clone()).collect();
+    let names: Vec<String> = rank_one
+        .vertices
+        .iter()
+        .map(|(name, _)| name.clone())
+        .collect();
     let mut rank_two_triangles: Vec<ContactTriangle> = Vec::new();
     for (i, a) in names.iter().enumerate() {
         for (j, b) in names.iter().enumerate().skip(i + 1) {
@@ -377,18 +473,25 @@ fn main() {
     println!();
     println!("  Both populations are EMPTY, and that is the same finding one level up: the rung's");
     println!("  output is always (−1, 0), which is rational, so no generator ever reaches a rank");
-    println!("  above rank 0. The corners carry {} generators between them and the climb carries", corner_generators.len());
+    println!(
+        "  above rank 0. The corners carry {} generators between them and the climb carries",
+        corner_generators.len()
+    );
     println!("  none of them. A control asserting `rank 1 retains rank 0's generators` would hold");
     println!("  on two empty sets and prove nothing, so it is not asserted.");
 
     println!();
-    println!("  ANSWERED 2026-08-10, and not by a new carrier. A planar triangle's angles sum to π,");
+    println!(
+        "  ANSWERED 2026-08-10, and not by a new carrier. A planar triangle's angles sum to π,"
+    );
     println!("  so composing ONE simplex's own three corners is constant BY HYPOTHESIS — that is");
     println!("  Regge calculus' founding assumption, every simplex flat and all curvature");
     println!("  concentrated on the codimension-two hinges BETWEEN them. Under CLAUDE.md §8 the");
     println!("  (−1,0) receipt is `definition`-grade: it could not have come out otherwise.");
     println!("  The object that carries curvature is the HINGE: one corner from each incident");
-    println!("  triangle, deficit = 2π − Σθ. Measured by `the_hinge_carries_the_curvature` on this");
+    println!(
+        "  triangle, deficit = 2π − Σθ. Measured by `the_hinge_carries_the_curvature` on this"
+    );
     println!("  same material: 5 distinct hinge turns over 11 hinges against 1 over 25 triangles,");
     println!("  generators {{3, 7, 1463}} reached, and 6 of 11 hinges moving under a non-similar");
     println!("  metric while 0 move under a similarity.");
@@ -417,18 +520,28 @@ fn main() {
     hold(
         "the rank composes an accumulated turn at all, so there is something for a climb to move",
         accumulated.is_some(),
-        format!("{} of {} rank-1 vertices exact", rank_one.exact_vertices(), rank_one.vertices.len()),
+        format!(
+            "{} of {} rank-1 vertices exact",
+            rank_one.exact_vertices(),
+            rank_one.vertices.len()
+        ),
     );
 
     rule("BOUNDS");
     println!("  - The rank-1 graph is built from shared stems and NOTHING is declared: the arcs'");
     println!("    weights are the shared stems' own weights, so no new level enters at any rank.");
     println!("  - **No invariance across ranks is claimed.** This driver reports the generator");
-    println!("    populations and the accumulated turn per rank; whether any quantity is PRESERVED");
+    println!(
+        "    populations and the accumulated turn per rank; whether any quantity is PRESERVED"
+    );
     println!("    by a climb is a further measurement and is not made here.");
-    println!("  - The declared generator aperture is {GENERATOR_APERTURE}; the basis is 2^n wide and");
+    println!(
+        "  - The declared generator aperture is {GENERATOR_APERTURE}; the basis is 2^n wide and"
+    );
     println!("    exceeding it is refused by name rather than held.");
-    println!("  - One material, small and stated. A tower over other material may refuse where this");
+    println!(
+        "  - One material, small and stated. A tower over other material may refuse where this"
+    );
     println!("    one composes, and that would be a real return about the material.");
 
     println!();
@@ -436,7 +549,10 @@ fn main() {
     println!("---------------------------------------------");
     for (claim, evidence) in &open_falsifiers {
         let met = !rank_one_generators.is_empty();
-        println!("  [{}] {claim}\n            {evidence}", if met { "MET  " } else { "OPEN " });
+        println!(
+            "  [{}] {claim}\n            {evidence}",
+            if met { "MET  " } else { "OPEN " }
+        );
     }
 
     println!();

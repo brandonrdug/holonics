@@ -49,12 +49,12 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 
 use holonic_engine::derivation_atlas::{
-    read_derivation, CircuitAperture, Derivation, DerivationIdentity, RecruitmentCoefficient,
-    StatementIncidence,
+    CircuitAperture, Derivation, DerivationIdentity, RecruitmentCoefficient, StatementIncidence,
+    read_derivation,
 };
 use holonic_engine::derivation_two_cells::{
-    betti_at, fill_routes, AgreementCriterion, AgreementShape, MeaningDirection, RouteFilling,
-    TwoCellRefusal,
+    AgreementCriterion, AgreementShape, MeaningDirection, RouteFilling, TwoCellRefusal, betti_at,
+    fill_routes,
 };
 use holonic_engine::name_elaboration::{
     ConsequentClosure, ConsequentSpecies, ElaborationAperture, ElaborationDeposit, NameMeaning,
@@ -348,10 +348,7 @@ fn control_one_the_consequent_is_non_empty_where_the_antecedent_is_not(
     }
 
     section("every atom whose antecedent closure is empty and whose consequent closure is not");
-    names(
-        "  ",
-        both_ways.iter().map(|(name, _)| name.clone()),
-    );
+    names("  ", both_ways.iter().map(|(name, _)| name.clone()));
 
     // The named candidates the task singles out, exhibited whole.
     for wanted in ["apply", "assumption", "rw", "simpa"] {
@@ -553,7 +550,9 @@ fn control_two_the_atoms_recruitment_cannot_separate(
                     "one-sided containment"
                 }
             );
-            println!("    both antecedent closures: the root alone. Recruitment cannot separate them.");
+            println!(
+                "    both antecedent closures: the root alone. Recruitment cannot separate them."
+            );
             println!("    consequents only `{left}` reaches:");
             names_capped("      ", only_left.iter().cloned(), 16);
             println!("    consequents only `{right}` reaches:");
@@ -730,11 +729,7 @@ fn control_three_a_pair_held_open_that_crosses(readings: &[Reading], controls: &
             println!(
                 "    of those, {} are CONSTRUCTED crossings (neither side named them): {}",
                 constructed.len(),
-                constructed
-                    .keys()
-                    .copied()
-                    .collect::<Vec<_>>()
-                    .join(" ")
+                constructed.keys().copied().collect::<Vec<_>>().join(" ")
             );
         }
         if exhibited == 0 {
@@ -963,7 +958,12 @@ fn control_five_betti_under_each_criterion(readings: &[Reading], controls: &mut 
                     MeaningDirection::Consequent => held.consequent_disagreement.render(),
                     _ => held.disagreement.render(),
                 };
-                format!("{} vs {} [{}]", held.left, held.right, clip(&obstruction, 180))
+                format!(
+                    "{} vs {} [{}]",
+                    held.left,
+                    held.right,
+                    clip(&obstruction, 180)
+                )
             }),
             8,
         );
@@ -978,7 +978,11 @@ fn control_five_betti_under_each_criterion(readings: &[Reading], controls: &mut 
              normal form on {}",
             moved.len(),
             moved,
-            if ranks_agree { "every one" } else { "NOT every one" },
+            if ranks_agree {
+                "every one"
+            } else {
+                "NOT every one"
+            },
         ),
     );
 }
@@ -1021,14 +1025,13 @@ fn control_six_the_four_apertures(
     let down = deposit
         .elaborate(&downward_root, ElaborationAperture::Exhausted)
         .expect("the root is in the deposit");
-    println!("  root {downward_root}, aperture Exhausted, reach {}", down.reach());
+    println!(
+        "  root {downward_root}, aperture Exhausted, reach {}",
+        down.reach()
+    );
     println!("  reached and permanently unopenable -- the environment's own vocabulary:");
     names("    ", down.atoms().iter().cloned());
-    outside.push((
-        "deposit / downward",
-        down.atoms().len(),
-        "atoms".to_owned(),
-    ));
+    outside.push(("deposit / downward", down.atoms().len(), "atoms".to_owned()));
 
     section("aperture two -- a DECLARED DEPTH, downward");
     let bounded_down = deposit
@@ -1048,11 +1051,16 @@ fn control_six_the_four_apertures(
         format!("unopened past depth {BOUNDED_DEPTH}"),
     ));
 
-    section("aperture three -- the DEPOSIT, upward: a statement is terminal and a summit has nothing above it");
+    section(
+        "aperture three -- the DEPOSIT, upward: a statement is terminal and a summit has nothing above it",
+    );
     let up = deposit
         .consequents(&upward_root, ElaborationAperture::Exhausted)
         .expect("the root is in the deposit");
-    println!("  root {upward_root}, aperture Exhausted, reach {}", up.reach());
+    println!(
+        "  root {upward_root}, aperture Exhausted, reach {}",
+        up.reach()
+    );
     println!(
         "  TERMINAL STATEMENTS -- nothing recruits a statement, so the walk stops here permanently:"
     );

@@ -314,7 +314,10 @@ pub struct ClosedWord {
 #[derive(Clone, Debug, PartialEq, Eq, Error)]
 pub enum ParcelError {
     #[error("the field returned a negative weight on passage {passage:?} out of site {site:?}")]
-    NegativeWeight { site: ParcelSite, passage: PassageId },
+    NegativeWeight {
+        site: ParcelSite,
+        passage: PassageId,
+    },
     #[error("the field returned a negative dissipation at site {site:?}")]
     NegativeDissipation { site: ParcelSite },
     #[error(
@@ -357,7 +360,9 @@ fn total_mass(population: &BTreeMap<(usize, ParcelSite), ParcelMass>) -> Rat {
         .fold(Rat::zero(), |sum, entry| sum + &entry.mass)
 }
 
-fn mass_by_site(population: &BTreeMap<(usize, ParcelSite), ParcelMass>) -> BTreeMap<ParcelSite, Rat> {
+fn mass_by_site(
+    population: &BTreeMap<(usize, ParcelSite), ParcelMass>,
+) -> BTreeMap<ParcelSite, Rat> {
     let mut folded = BTreeMap::new();
     for ((_, site), entry) in population {
         let slot = folded.entry(*site).or_insert_with(Rat::zero);
@@ -798,14 +803,14 @@ pub fn harmonic_measure(
                 .iter()
                 .enumerate()
                 .map(|(column, target)| {
-                    let value = interior_ordinals
-                        .iter()
-                        .enumerate()
-                        .fold(Rat::zero(), |sum, (index, interior)| {
+                    let value = interior_ordinals.iter().enumerate().fold(
+                        Rat::zero(),
+                        |sum, (index, interior)| {
                             let coupling =
                                 &certificate.operator[*interior][boundary_ordinals[column]];
                             sum + &certificate.interior_inverse[row][index] * coupling
-                        });
+                        },
+                    );
                     (ParcelSite(target.0), -value)
                 })
                 .collect::<BTreeMap<_, _>>();
@@ -1052,11 +1057,8 @@ mod tests {
         let interval = integer(1);
         let certificate = declared_certificate(&complex, interval.clone());
         let eulerian = harmonic_measure(&certificate);
-        let field = DiffusionCarriedField::new(
-            &complex,
-            interval,
-            [CurrentNodeId(10), CurrentNodeId(11)],
-        );
+        let field =
+            DiffusionCarriedField::new(&complex, interval, [CurrentNodeId(10), CurrentNodeId(11)]);
         let boundary = field.boundary().to_vec();
 
         for release in field.interior() {
@@ -1100,19 +1102,11 @@ mod tests {
         let moved = DiffusionComplex::new(complex.nodes().values().cloned(), moved_branches)
             .expect("the moved complex is well formed");
         let eulerian = harmonic_measure(&declared_certificate(&moved, interval.clone()));
-        let field = DiffusionCarriedField::new(
-            &complex,
-            interval,
-            [CurrentNodeId(10), CurrentNodeId(11)],
-        );
+        let field =
+            DiffusionCarriedField::new(&complex, interval, [CurrentNodeId(10), CurrentNodeId(11)]);
         let boundary = field.boundary().to_vec();
-        let cohort = ParcelCohort::advanced_to(
-            &field,
-            ParcelSite(1),
-            4,
-            u64::from(u16::MAX),
-        )
-        .expect("the declared width holds this frontier");
+        let cohort = ParcelCohort::advanced_to(&field, ParcelSite(1), 4, u64::from(u16::MAX))
+            .expect("the declared width holds this frontier");
         let reading = boundary_integral_reading(&cohort, &boundary, &eulerian);
         assert!(!reading.exact());
         assert!(reading.terms.iter().all(|term| !term.residual.is_zero()));
@@ -1163,17 +1157,17 @@ mod tests {
     fn an_oversized_frontier_is_refused_by_name_and_the_cohort_survives() {
         let complex = declared_complex();
         let interval = integer(1);
-        let field = DiffusionCarriedField::new(
-            &complex,
-            interval,
-            [CurrentNodeId(10), CurrentNodeId(11)],
-        );
+        let field =
+            DiffusionCarriedField::new(&complex, interval, [CurrentNodeId(10), CurrentNodeId(11)]);
         let cohort = ParcelCohort::advanced_to(&field, ParcelSite(1), 3, u64::from(u16::MAX))
             .expect("the declared width holds this frontier");
         let standing = cohort.clone();
         let required = BigUint::from(cohort.advanced(&field, u64::MAX).unwrap().frontier_width());
         match cohort.advanced(&field, 1) {
-            Err(ParcelError::TerminalWidthExceeded { required: named, declared }) => {
+            Err(ParcelError::TerminalWidthExceeded {
+                required: named,
+                declared,
+            }) => {
                 assert_eq!(named, required);
                 assert_eq!(declared, 1);
             }
@@ -1299,7 +1293,11 @@ mod tests {
         assert_eq!(cohort.stalled_mass(), Rat::one());
         assert_eq!(cohort.open_mass(), Rat::zero());
         assert_eq!(
-            cohort.stalled().keys().map(|(_, site)| *site).collect::<Vec<_>>(),
+            cohort
+                .stalled()
+                .keys()
+                .map(|(_, site)| *site)
+                .collect::<Vec<_>>(),
             vec![ParcelSite(2)]
         );
         let reading = boundary_integral_reading(&cohort, &[], &BTreeMap::new());

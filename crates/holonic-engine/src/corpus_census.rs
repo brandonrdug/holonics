@@ -370,7 +370,12 @@ impl CorpusCensus {
         for declaration in strata {
             let stratum_root = root.join(declaration.relative_root);
             let mut paths = Vec::new();
-            collect(&stratum_root, declaration.extension, declaration.recursive, &mut paths)?;
+            collect(
+                &stratum_root,
+                declaration.extension,
+                declaration.recursive,
+                &mut paths,
+            )?;
             paths.sort();
             if paths.is_empty() {
                 return Err(CensusError::EmptyStratum {
@@ -379,8 +384,9 @@ impl CorpusCensus {
                 });
             }
             for path in paths {
-                let text = fs::read_to_string(&path)
-                    .map_err(|error| CensusError::Unreadable(path.display().to_string(), error.to_string()))?;
+                let text = fs::read_to_string(&path).map_err(|error| {
+                    CensusError::Unreadable(path.display().to_string(), error.to_string())
+                })?;
                 let relative = path
                     .strip_prefix(root)
                     .unwrap_or(&path)
@@ -456,7 +462,10 @@ impl CorpusCensus {
         let mut stream = Vec::new();
         for token in tokenize_as(text, self.species) {
             if token.commentary {
-                let slot = self.comment_counts.entry(token.text.to_owned()).or_insert(0);
+                let slot = self
+                    .comment_counts
+                    .entry(token.text.to_owned())
+                    .or_insert(0);
                 *slot += 1;
                 self.comment_occurrences += 1;
                 continue;
@@ -642,8 +651,9 @@ impl CorpusCensus {
             }
             for surface in &whole.stream {
                 if self.kind(*surface).is_word() {
-                    *population.entry(surface.0 as u64).or_insert_with(BigUint::default) +=
-                        BigUint::from(1u32);
+                    *population
+                        .entry(surface.0 as u64)
+                        .or_insert_with(BigUint::default) += BigUint::from(1u32);
                 }
             }
         }
@@ -938,7 +948,10 @@ pub fn classify(surface: &str) -> Kind {
     if lower == 0 {
         return Kind::AllCaps;
     }
-    let first_upper = surface.bytes().next().is_some_and(|b| b.is_ascii_uppercase());
+    let first_upper = surface
+        .bytes()
+        .next()
+        .is_some_and(|b| b.is_ascii_uppercase());
     if first_upper && upper == 1 {
         Kind::Capitalised
     } else {
@@ -1005,8 +1018,9 @@ fn collect(
         CensusError::Unreadable(directory.display().to_string(), error.to_string())
     })?;
     for entry in entries {
-        let entry =
-            entry.map_err(|error| CensusError::Unreadable(directory.display().to_string(), error.to_string()))?;
+        let entry = entry.map_err(|error| {
+            CensusError::Unreadable(directory.display().to_string(), error.to_string())
+        })?;
         let path = entry.path();
         if path.is_dir() {
             if recursive {
@@ -1053,7 +1067,9 @@ mod tests {
     fn the_tokenizer_splits_word_runs_from_markup_runs_and_drops_whitespace() {
         assert_eq!(
             tokenize("arxiv.org/abs/2607.01 **holon**"),
-            vec!["arxiv", ".", "org", "/", "abs", "/", "2607", ".", "01", "**", "holon", "**"]
+            vec![
+                "arxiv", ".", "org", "/", "abs", "/", "2607", ".", "01", "**", "holon", "**"
+            ]
         );
         assert_eq!(tokenize("   \n\t "), Vec::<&str>::new());
     }
@@ -1143,8 +1159,14 @@ mod tests {
         assert!(!code.contains(&"₁"), "{code:?}");
 
         // comment awareness. `--`, `/--`, `-/` and the English between them leave the stream.
-        assert!(prose.contains(&"The") && prose.contains(&"close"), "{prose:?}");
-        assert!(!code.contains(&"The") && !code.contains(&"close"), "{code:?}");
+        assert!(
+            prose.contains(&"The") && prose.contains(&"close"),
+            "{prose:?}"
+        );
+        assert!(
+            !code.contains(&"The") && !code.contains(&"close"),
+            "{code:?}"
+        );
         let commentary: Vec<&str> = lean
             .iter()
             .filter(|token| token.commentary)
@@ -1196,14 +1218,21 @@ mod tests {
     /// A nested `/- /- … -/ -/` closes at its own depth and not at the first `-/`.
     #[test]
     fn a_nested_block_comment_closes_at_its_own_depth() {
-        let carried = tokenize_as("/- outer /- inner -/ still -/ code", LexicalSpecies::LeanSource);
+        let carried = tokenize_as(
+            "/- outer /- inner -/ still -/ code",
+            LexicalSpecies::LeanSource,
+        );
         let code: Vec<&str> = carried
             .iter()
             .filter(|token| !token.commentary)
             .map(|token| token.text)
             .collect();
         assert_eq!(code, vec!["code"]);
-        assert!(carried.iter().any(|token| token.text == "still" && token.commentary));
+        assert!(
+            carried
+                .iter()
+                .any(|token| token.text == "still" && token.commentary)
+        );
     }
 
     // ------------------------------------------------------------------ the caller's corpus
@@ -1234,10 +1263,12 @@ mod tests {
         assert!(census.lookup("close").is_none());
         let bound = census.comment_bound(64);
         assert!(bound.comment_occurrences > BigUint::from(0u32));
-        assert!(bound
-            .exhibited
-            .iter()
-            .any(|(surface, _)| surface == "close"));
+        assert!(
+            bound
+                .exhibited
+                .iter()
+                .any(|(surface, _)| surface == "close")
+        );
     }
 
     #[test]
@@ -1328,7 +1359,10 @@ mod tests {
         for length in 1..200usize {
             seen[weight_band(length) as usize] += 1;
         }
-        assert!(seen.iter().all(|count| *count > 0), "every band is reachable: {seen:?}");
+        assert!(
+            seen.iter().all(|count| *count > 0),
+            "every band is reachable: {seen:?}"
+        );
         assert_eq!(weight_band(1), 0);
         assert_eq!(weight_band(3), 1);
         assert_eq!(weight_band(6), 2);

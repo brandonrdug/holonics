@@ -24,8 +24,8 @@ use holonic_engine::diffusion::{
     DiffusionNode, ExactDiffusionLaw,
 };
 use holonic_engine::parcel::{
-    BoundaryIntegralReading, DiffusionCarriedField, Letter, ParcelCohort, ParcelError,
-    ParcelSite, WordSeparation, boundary_integral_reading, harmonic_measure, separating_word,
+    BoundaryIntegralReading, DiffusionCarriedField, Letter, ParcelCohort, ParcelError, ParcelSite,
+    WordSeparation, boundary_integral_reading, harmonic_measure, separating_word,
 };
 use holonic_engine::{CurrentBranchId, CurrentNodeId};
 use num_bigint::{BigInt, BigUint};
@@ -121,11 +121,8 @@ fn split_complex() -> (DiffusionComplex, BTreeMap<CurrentBranchId, Letter>) {
 
 /// Run one declared event so `diffusion.rs` compiles and certifies its own boundary transfer.
 fn certify(complex: &DiffusionComplex, interval: &Rat) -> DiffusionBoundaryTransferCertificate {
-    let law = ExactDiffusionLaw::with_boundary(
-        complex.clone(),
-        BOUNDARY.map(CurrentNodeId),
-    )
-    .expect("the diffusion law admits the declared boundary");
+    let law = ExactDiffusionLaw::with_boundary(complex.clone(), BOUNDARY.map(CurrentNodeId))
+        .expect("the diffusion law admits the declared boundary");
     let standing = law
         .initial_standing(
             complex
@@ -160,7 +157,10 @@ fn render_word(word: &[Letter]) -> String {
 fn print_reading(reading: &BoundaryIntegralReading) {
     println!(
         "  release {:?}  steps {}  open mass {}  dissipated {}  stalled {}",
-        reading.release.0, reading.steps, reading.open_mass, reading.dissipated_mass,
+        reading.release.0,
+        reading.steps,
+        reading.open_mass,
+        reading.dissipated_mass,
         reading.stalled_mass
     );
     for term in &reading.terms {
@@ -207,7 +207,11 @@ fn main() {
         } else {
             "interior"
         };
-        println!("  {:>4}   {:>10}    {role}", node.node.0, node.capacity.to_string());
+        println!(
+            "  {:>4}   {:>10}    {role}",
+            node.node.0,
+            node.capacity.to_string()
+        );
     }
     println!("  branch  from -> to    conductance   letter");
     for branch in complex.branches().values() {
@@ -229,8 +233,14 @@ fn main() {
         .chain(certificate.boundary_inverse_residual.iter().flatten())
         .all(Zero::is_zero);
     println!("  diffusion.rs's own inverse residuals identically zero: {residual_is_zero}");
-    println!("  the assembled operator M = C + tau*L, in node order {:?}",
-        certificate.node_order.iter().map(|node| node.0).collect::<Vec<_>>());
+    println!(
+        "  the assembled operator M = C + tau*L, in node order {:?}",
+        certificate
+            .node_order
+            .iter()
+            .map(|node| node.0)
+            .collect::<Vec<_>>()
+    );
     for (row, node) in certificate.node_order.iter().enumerate() {
         println!(
             "    {:>4} | {}",
@@ -258,7 +268,9 @@ fn main() {
         );
     }
 
-    println!("\nIII. THE RETAINED WORDS  --  the complete landed population at horizon 4 from site 1");
+    println!(
+        "\nIII. THE RETAINED WORDS  --  the complete landed population at horizon 4 from site 1"
+    );
     let short = ParcelCohort::advanced_to(&field, ParcelSite(1), 4, declared_width)
         .expect("the declared width holds this frontier");
     println!(
@@ -284,8 +296,12 @@ fn main() {
         print_reading(&boundary_integral_reading(&cohort, &boundary, &eulerian));
     }
 
-    println!("\nV. THE ORBIT  --  the retained remainder shrinks and the identity holds at each horizon");
-    println!("  horizon   frontier width   distinct words   open mass (exact)                       residuals");
+    println!(
+        "\nV. THE ORBIT  --  the retained remainder shrinks and the identity holds at each horizon"
+    );
+    println!(
+        "  horizon   frontier width   distinct words   open mass (exact)                       residuals"
+    );
     let mut cohort = ParcelCohort::release(&field, ParcelSite(1));
     for horizon in 0..=10 {
         let reading = boundary_integral_reading(&cohort, &boundary, &eulerian);
@@ -294,7 +310,11 @@ fn main() {
             cohort.frontier_width(),
             cohort.distinct_words(),
             reading.open_mass.to_string(),
-            if reading.exact() { "all zero" } else { "NONZERO" }
+            if reading.exact() {
+                "all zero"
+            } else {
+                "NONZERO"
+            }
         );
         cohort = cohort
             .advanced(&field, declared_width)
@@ -302,8 +322,12 @@ fn main() {
     }
 
     println!("\nVI. THE CONTROL AND ITS ORBIT");
-    println!("  The identity is asserted against an Eulerian atlas built from a complex whose branch 5");
-    println!("  carries conductance 9/2 instead of 4. Nothing else moves. Every residual must leave zero.");
+    println!(
+        "  The identity is asserted against an Eulerian atlas built from a complex whose branch 5"
+    );
+    println!(
+        "  carries conductance 9/2 instead of 4. Nothing else moves. Every residual must leave zero."
+    );
     let mut moved_branches = complex.branches().values().cloned().collect::<Vec<_>>();
     for branch in &mut moved_branches {
         if branch.branch == CurrentBranchId(5) {
@@ -315,14 +339,24 @@ fn main() {
     let moved_eulerian = harmonic_measure(&certify(&moved, &interval));
     let control = ParcelCohort::advanced_to(&field, ParcelSite(1), 8, declared_width)
         .expect("the declared width holds this frontier");
-    print_reading(&boundary_integral_reading(&control, &boundary, &moved_eulerian));
+    print_reading(&boundary_integral_reading(
+        &control,
+        &boundary,
+        &moved_eulerian,
+    ));
     println!("  (the same cohort against the unmoved atlas, for the orbit:)");
     print_reading(&boundary_integral_reading(&control, &boundary, &eulerian));
     println!();
-    println!("  The two checks are NOT equally sharp, and the difference is measurable. The identity");
-    println!("  refuses the moved atlas at every horizon; the enclosure cannot see the move until the");
+    println!(
+        "  The two checks are NOT equally sharp, and the difference is measurable. The identity"
+    );
+    println!(
+        "  refuses the moved atlas at every horizon; the enclosure cannot see the move until the"
+    );
     println!("  retained remainder is narrower than it. Where the enclosure first closes past it:");
-    println!("  horizon   open mass                                    identity exact   enclosure contains");
+    println!(
+        "  horizon   open mass                                    identity exact   enclosure contains"
+    );
     let mut control_cohort = ParcelCohort::advanced_to(&field, ParcelSite(1), 6, declared_width)
         .expect("the declared width holds this frontier");
     for horizon in 6..=16 {
@@ -366,7 +400,9 @@ fn main() {
     }
     let fork = ParcelCohort::advanced_to(&field, ParcelSite(1), 2, declared_width).unwrap();
     let riding = fork.riding_words();
-    println!("  the fork itself, at horizon 2 from site 1 -- every admissible continuation retained:");
+    println!(
+        "  the fork itself, at horizon 2 from site 1 -- every admissible continuation retained:"
+    );
     for (word, site, carried) in &riding {
         println!(
             "    {:<16} riding at site {:>2}   mass {:>26}   paths {}",
@@ -456,7 +492,10 @@ fn main() {
     let census = closed.primitive_closed_word_census();
     println!(
         "  primitive closed word census by length (index 0 is length one): {:?}",
-        census.iter().map(|count| count.to_string()).collect::<Vec<_>>()
+        census
+            .iter()
+            .map(|count| count.to_string())
+            .collect::<Vec<_>>()
     );
     println!(
         "  {} closed words of which {} primitive; the complete primitive population at length <= 3:",
@@ -484,7 +523,9 @@ fn main() {
     for word in repeated {
         println!("    {}", render_word(&word.word));
     }
-    println!("  Note b1 b1: a parcel retracing the branch it just took spells a SQUARE, so half of");
+    println!(
+        "  Note b1 b1: a parcel retracing the branch it just took spells a SQUARE, so half of"
+    );
     println!("  Ihara's non-backtracking condition arrives from the word rather than from a rule.");
     println!(
         "  comparable in shape to relational_geometry::IharaSignature::primitive_oriented_cycles,"

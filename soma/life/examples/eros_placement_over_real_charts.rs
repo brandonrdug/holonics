@@ -108,7 +108,11 @@ impl Charts {
     /// the horizon it sees nothing, which is what lets two surfaces look alike to it.
     fn state(&self, surface: &str, receiver: ReceiverId) -> u32 {
         let (reversed, horizon) = APERTURES[receiver.0 as usize];
-        let ecology = if reversed { &self.reverse } else { &self.forward };
+        let ecology = if reversed {
+            &self.reverse
+        } else {
+            &self.forward
+        };
         let mut path = germs(surface, reversed);
         path.truncate(horizon);
         if path.is_empty() {
@@ -183,9 +187,7 @@ fn report(placed: &Placement, charts: &Charts) {
             .collect();
         println!(
             "    collapsed  {:<14} {:<14}  separated by {:?}",
-            charts.surfaces[pair.left.0 as usize],
-            charts.surfaces[pair.right.0 as usize],
-            word
+            charts.surfaces[pair.left.0 as usize], charts.surfaces[pair.right.0 as usize], word
         );
     }
     for open in placed.open.iter().take(3) {
@@ -280,7 +282,11 @@ fn main() {
             charts.state(surface, ReceiverId(0)) != charts.state(surface, ReceiverId(1))
                 || charts.state(surface, ReceiverId(0)) != charts.state(surface, ReceiverId(2))
         }),
-        format!("{} apertures over {} surfaces", APERTURES.len(), charts.surfaces.len()),
+        format!(
+            "{} apertures over {} surfaces",
+            APERTURES.len(),
+            charts.surfaces.len()
+        ),
     ));
     holds.push((
         "CONTROL the receivers do NOT already separate everything, so refinement has work",

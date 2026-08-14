@@ -60,9 +60,9 @@ use relational_geometry::Rat;
 use crate::algebraic::{CausalCellId, CausalChain, ComparativeMultiplicity, GradedCausalComplex};
 use crate::causal::EventId;
 use crate::conditioned_derivation::{FoundedCover, FoundedMorphology};
-use crate::gluing::{read_cover, Cover, GluingReading, GluingRefusal};
+use crate::gluing::{Cover, GluingReading, GluingRefusal, read_cover};
 use crate::multiquadratic::{
-    EmbeddedSign, Multiquadratic, MultiquadraticRefusal, DECLARED_KERNEL_BOUND,
+    DECLARED_KERNEL_BOUND, EmbeddedSign, Multiquadratic, MultiquadraticRefusal,
 };
 
 /// **The generator aperture a triangle's own corners require**, read off the material.
@@ -88,16 +88,20 @@ pub fn required_aperture(triangle: &ContactTriangle) -> usize {
 }
 use crate::rebase_invariants::PivotRule;
 use crate::running_integral::{
-    running_sum, Cochain, Orientation, Path, PathStep, RunningIntegralError,
+    Cochain, Orientation, Path, PathStep, RunningIntegralError, running_sum,
 };
 
 /// Why a contact could not be read as a cover.
 #[derive(Debug)]
 pub enum ContactGluingRefusal {
     /// The cover carries no occurrence of the named stem, so there is no subcomplex to glue.
-    StemStandsNowhere { stem: String },
+    StemStandsNowhere {
+        stem: String,
+    },
     /// A walk named an occurrence the complex does not carry.
-    WalkLeavesTheCover { stem: String },
+    WalkLeavesTheCover {
+        stem: String,
+    },
     Gluing(GluingRefusal),
     Integral(RunningIntegralError),
     Algebraic(String),
@@ -110,7 +114,10 @@ impl std::fmt::Display for ContactGluingRefusal {
                 write!(formatter, "the stem `{stem}` stands nowhere in this cover")
             }
             Self::WalkLeavesTheCover { stem } => {
-                write!(formatter, "the walk names `{stem}`, which this cover does not carry")
+                write!(
+                    formatter,
+                    "the walk names `{stem}`, which this cover does not carry"
+                )
             }
             Self::Gluing(refusal) => write!(formatter, "{refusal:?}"),
             Self::Integral(refusal) => write!(formatter, "{refusal:?}"),
@@ -154,7 +161,9 @@ impl ContactComplex {
             }
         }
         if section.is_empty() {
-            return Err(ContactGluingRefusal::StemStandsNowhere { stem: stem.to_owned() });
+            return Err(ContactGluingRefusal::StemStandsNowhere {
+                stem: stem.to_owned(),
+            });
         }
         Ok(section)
     }
@@ -172,12 +181,17 @@ impl ContactComplex {
             }
         }
         if covered.is_empty() {
-            return Err(ContactGluingRefusal::WalkLeavesTheCover { stem: stem.to_owned() });
+            return Err(ContactGluingRefusal::WalkLeavesTheCover {
+                stem: stem.to_owned(),
+            });
         }
         let steps: Vec<PathStep> = covered
             .into_iter()
             .filter_map(|at| self.steps.get(&at).copied())
-            .map(|cell| PathStep { cell, orientation: Orientation::Along })
+            .map(|cell| PathStep {
+                cell,
+                orientation: Orientation::Along,
+            })
             .collect();
         Ok(Path::new(steps))
     }
@@ -239,8 +253,14 @@ pub fn contact_complex(cover: &FoundedCover) -> Result<ContactComplex, ContactGl
     for at in 0..extent {
         let (tail, head) = (offsets[&at], offsets[&(at + 1)]);
         let mut boundary = CausalChain::default();
-        boundary.add_term(head, ComparativeMultiplicity::new(BigUint::from(1u32), BigUint::from(0u32)));
-        boundary.add_term(tail, ComparativeMultiplicity::new(BigUint::from(0u32), BigUint::from(1u32)));
+        boundary.add_term(
+            head,
+            ComparativeMultiplicity::new(BigUint::from(1u32), BigUint::from(0u32)),
+        );
+        boundary.add_term(
+            tail,
+            ComparativeMultiplicity::new(BigUint::from(0u32), BigUint::from(1u32)),
+        );
         let cell = complex
             .found_cell(
                 format!("step@{at}"),
@@ -259,10 +279,18 @@ pub fn contact_complex(cover: &FoundedCover) -> Result<ContactComplex, ContactGl
             occurrence.through,
             // The occurrence's own first step, kept so a caller can name it; the span is what
             // `section` reads.
-            steps.get(&occurrence.at).copied().unwrap_or(CausalCellId(0)),
+            steps
+                .get(&occurrence.at)
+                .copied()
+                .unwrap_or(CausalCellId(0)),
         ));
     }
-    Ok(ContactComplex { complex, occurrences, offsets, steps })
+    Ok(ContactComplex {
+        complex,
+        occurrences,
+        offsets,
+        steps,
+    })
 }
 
 /// **The gluing at a contact.** Two stems standing in one word, read as a cover.
@@ -281,8 +309,8 @@ pub fn glue_at_contact(
         left: contact.section(left_stem)?,
         right: contact.section(right_stem)?,
     };
-    let reading = read_cover(&contact.complex, &cover_pair, rule)
-        .map_err(ContactGluingRefusal::Gluing)?;
+    let reading =
+        read_cover(&contact.complex, &cover_pair, rule).map_err(ContactGluingRefusal::Gluing)?;
     Ok((contact, reading))
 }
 
@@ -348,8 +376,8 @@ pub fn integrate_leader(
     let contact = contact_complex(cover)?;
     let weights = declare_cochain(&contact, morphology, cochain);
     let path = contact.walk(stem)?;
-    let integral = running_sum(&contact.complex, &weights, &path)
-        .map_err(ContactGluingRefusal::Integral)?;
+    let integral =
+        running_sum(&contact.complex, &weights, &path).map_err(ContactGluingRefusal::Integral)?;
 
     // **The causal string is the sequence of FACES the leader rode**, one per step: what stood over
     // each letter as it was crossed. A step where two stems superpose contributes both, joined by
@@ -404,7 +432,9 @@ pub fn contact_graph(
 
     let mut covers: BTreeMap<&String, FoundedCover> = BTreeMap::new();
     for word in population {
-        let Ok(cover) = morphology.cover(word) else { continue };
+        let Ok(cover) = morphology.cover(word) else {
+            continue;
+        };
         covers.insert(word, cover);
     }
     for (ordinal, word) in covers.keys().enumerate() {
@@ -448,16 +478,15 @@ pub fn contact_graph(
                         boundary,
                     )
                     .map_err(|refusal| ContactGluingRefusal::Algebraic(format!("{refusal:?}")))?;
-                arcs.push((
-                    (*left).clone(),
-                    (*right).clone(),
-                    stem.to_owned(),
-                    cell,
-                ));
+                arcs.push(((*left).clone(), (*right).clone(), stem.to_owned(), cell));
             }
         }
     }
-    Ok(ContactGraph { complex, identifiers, arcs })
+    Ok(ContactGraph {
+        complex,
+        identifiers,
+        arcs,
+    })
 }
 
 /// **A closed circuit: the leader out, and the return stroke back along the reflected arc.**
@@ -513,11 +542,12 @@ pub fn ride_circuit(
             .arcs
             .iter()
             .find(|(a, b, carried, _)| {
-                carried == stem
-                    && ((a == left && b == right) || (a == right && b == left))
+                carried == stem && ((a == left && b == right) || (a == right && b == left))
             })
             .map(|(_, _, _, cell)| *cell)
-            .ok_or(ContactGluingRefusal::WalkLeavesTheCover { stem: stem.to_owned() })
+            .ok_or(ContactGluingRefusal::WalkLeavesTheCover {
+                stem: stem.to_owned(),
+            })
     };
     let out = find(out_stem)?;
     let back = find(back_stem)?;
@@ -537,8 +567,14 @@ pub fn ride_circuit(
 
     // Out along one arc, back along the other AGAINST its orientation. The walk closes.
     let path = Path::new([
-        PathStep { cell: out, orientation: Orientation::Along },
-        PathStep { cell: back, orientation: Orientation::Against },
+        PathStep {
+            cell: out,
+            orientation: Orientation::Along,
+        },
+        PathStep {
+            cell: back,
+            orientation: Orientation::Against,
+        },
     ]);
     let integral = crate::running_integral::holonomy(&graph.complex, &weights, &path)
         .map_err(ContactGluingRefusal::Integral)?;
@@ -603,7 +639,11 @@ pub fn ride_circuit(
         through,
         string,
         reflected,
-        series: integral.steps.iter().map(|step| step.accumulated.clone()).collect(),
+        series: integral
+            .steps
+            .iter()
+            .map(|step| step.accumulated.clone())
+            .collect(),
         holonomy: integral.total.clone(),
     })
 }
@@ -695,9 +735,8 @@ mod tests {
     fn a_leader_integrates_into_a_causal_string_with_its_series() {
         let morphology = morphology();
         let cover = morphology.cover("exactcarry").expect("ascii");
-        let (_, stroke) =
-            integrate_leader(&cover, &morphology, "exact", LeaderCochain::SpanLength)
-                .expect("integrates");
+        let (_, stroke) = integrate_leader(&cover, &morphology, "exact", LeaderCochain::SpanLength)
+            .expect("integrates");
         // **The string is the face at each step, not a name repeated.** `exact` spans offsets 0..5
         // and `act` sits inside it from 2, so the first two steps carry one stem and the last three
         // carry both — the superposition is IN the string rather than resolved out of it.
@@ -730,7 +769,10 @@ mod tests {
         let (_, by_breadth) =
             integrate_leader(&cover, &morphology, "exact", LeaderCochain::WitnessBreadth)
                 .expect("integrates");
-        assert_eq!(by_span.string, by_breadth.string, "one walk, two measurements");
+        assert_eq!(
+            by_span.string, by_breadth.string,
+            "one walk, two measurements"
+        );
         assert_ne!(
             by_span.integral, by_breadth.integral,
             "the gauge's orbit is non-trivial on this material"
@@ -748,9 +790,11 @@ mod tests {
         for word in ["exactcarry", "carriercarrier", "exactcarrier"] {
             let cover = morphology.cover(word).expect("ascii");
             let contact = contact_complex(&cover).expect("reads");
-            let invariants =
-                crate::rebase_invariants::rebase_invariants(&contact.complex, PivotRule::SmallestMagnitude)
-                    .expect("invariants");
+            let invariants = crate::rebase_invariants::rebase_invariants(
+                &contact.complex,
+                PivotRule::SmallestMagnitude,
+            )
+            .expect("invariants");
             let betti: Vec<usize> = invariants.grades.iter().map(|grade| grade.betti).collect();
             assert_eq!(betti, vec![1, 0], "{word} carries a cycle it should not");
         }
@@ -764,12 +808,12 @@ mod tests {
     #[test]
     fn an_equilateral_contact_triangle_returns_one_half_at_every_corner() {
         let half = Rat::new(BigInt::from(1), BigInt::from(2));
-        let cosine = law_of_cosines(&BigInt::from(5), &BigInt::from(5), &BigInt::from(5))
-            .expect("a corner");
+        let cosine =
+            law_of_cosines(&BigInt::from(5), &BigInt::from(5), &BigInt::from(5)).expect("a corner");
         assert_eq!(cosine, half);
         // And a right angle is exactly zero — Pythagoras is the `cos = 0` case of the same law.
-        let square = law_of_cosines(&BigInt::from(3), &BigInt::from(4), &BigInt::from(5))
-            .expect("a corner");
+        let square =
+            law_of_cosines(&BigInt::from(3), &BigInt::from(4), &BigInt::from(5)).expect("a corner");
         assert!(square.is_zero(), "3-4-5 is a right triangle: {square}");
     }
 
@@ -914,7 +958,10 @@ mod tests {
             .iter()
             .map(|(_, _, stem, _)| stem.clone())
             .collect();
-        assert!(shared.len() >= 2, "two identifiers share two stems: {shared:?}");
+        assert!(
+            shared.len() >= 2,
+            "two identifiers share two stems: {shared:?}"
+        );
 
         let circuit = ride_circuit(
             &graph,
@@ -927,8 +974,16 @@ mod tests {
         )
         .expect("the circuit closes");
 
-        assert_eq!(circuit.through.first(), circuit.through.last(), "the walk returns");
-        assert_eq!(circuit.reflected, vec![false, true], "the return arm is reflected");
+        assert_eq!(
+            circuit.through.first(),
+            circuit.through.last(),
+            "the walk returns"
+        );
+        assert_eq!(
+            circuit.reflected,
+            vec![false, true],
+            "the return arm is reflected"
+        );
         assert_eq!(circuit.series.len(), 2);
         // Out is positive, back is negated: the second partial sum is the first minus the second
         // arc's weight, so the reflected arm subtracts rather than adds.
@@ -1032,7 +1087,11 @@ pub enum EuclideanRealization {
     Realized,
     /// The triangle inequality fails: the two named sides do not reach across the third, so no
     /// planar triangle has these sides and the cosines the formula returns are not corners.
-    Degenerate { short: BigInt, other: BigInt, long: BigInt },
+    Degenerate {
+        short: BigInt,
+        other: BigInt,
+        long: BigInt,
+    },
 }
 
 /// `cos C = (a² + b² − c²) / (2ab)`, exactly. `None` when a weight is zero and the corner is not a
@@ -1166,11 +1225,7 @@ pub fn contact_triangles(graph: &ContactGraph) -> Vec<ContactTriangle> {
                     && corners.iter().all(|corner| corner.sine.is_ok());
                 triangles.push(ContactTriangle {
                     euclidean,
-                    identifiers: [
-                        (*first).clone(),
-                        (*second).clone(),
-                        (*third).clone(),
-                    ],
+                    identifiers: [(*first).clone(), (*second).clone(), (*third).clone()],
                     stems: [ab, bc, ca],
                     weights: [wab, wbc, wca],
                     corners,
@@ -1264,13 +1319,20 @@ pub fn climb(rank: usize, triangles: &[ContactTriangle], aperture: usize) -> Tow
 
     let mut arcs = Vec::new();
     for (stem, holders) in &by_stem {
-        let weight = weight_of_stem.get(stem).cloned().unwrap_or_else(|| BigInt::from(0));
+        let weight = weight_of_stem
+            .get(stem)
+            .cloned()
+            .unwrap_or_else(|| BigInt::from(0));
         for (position, left) in holders.iter().enumerate() {
             for right in holders.iter().skip(position + 1) {
                 if left == right {
                     continue;
                 }
-                let (a, b) = if left <= right { (left, right) } else { (right, left) };
+                let (a, b) = if left <= right {
+                    (left, right)
+                } else {
+                    (right, left)
+                };
                 arcs.push((a.clone(), b.clone(), stem.clone(), weight.clone()));
             }
         }
@@ -1358,7 +1420,11 @@ pub enum CoarseTurn {
         refusals: Vec<(String, MultiquadraticRefusal)>,
     },
     /// The three weights do not realize a planar triangle, so there is no turn to compose.
-    NotRealizable { short: BigInt, other: BigInt, long: BigInt },
+    NotRealizable {
+        short: BigInt,
+        other: BigInt,
+        long: BigInt,
+    },
 }
 
 /// Compose a triangle's three corners into the single turn it contributes upward, under the
@@ -1401,19 +1467,31 @@ pub fn coarse_grain_in_aperture(triangle: &ContactTriangle, aperture: usize) -> 
         let next_cosine = match (cosine.multiply(&c, aperture), sine.multiply(s, aperture)) {
             (Ok(left), Ok(right)) => match left.subtract(&right, aperture) {
                 Ok(value) => value,
-                Err(refusal) => return CoarseTurn::Refused { refusals: vec![(corner.at.clone(), refusal)] },
+                Err(refusal) => {
+                    return CoarseTurn::Refused {
+                        refusals: vec![(corner.at.clone(), refusal)],
+                    };
+                }
             },
             (Err(refusal), _) | (_, Err(refusal)) => {
-                return CoarseTurn::Refused { refusals: vec![(corner.at.clone(), refusal)] }
+                return CoarseTurn::Refused {
+                    refusals: vec![(corner.at.clone(), refusal)],
+                };
             }
         };
         let next_sine = match (cosine.multiply(s, aperture), sine.multiply(&c, aperture)) {
             (Ok(left), Ok(right)) => match left.add(&right, aperture) {
                 Ok(value) => value,
-                Err(refusal) => return CoarseTurn::Refused { refusals: vec![(corner.at.clone(), refusal)] },
+                Err(refusal) => {
+                    return CoarseTurn::Refused {
+                        refusals: vec![(corner.at.clone(), refusal)],
+                    };
+                }
             },
             (Err(refusal), _) | (_, Err(refusal)) => {
-                return CoarseTurn::Refused { refusals: vec![(corner.at.clone(), refusal)] }
+                return CoarseTurn::Refused {
+                    refusals: vec![(corner.at.clone(), refusal)],
+                };
             }
         };
         cosine = next_cosine;
@@ -1578,10 +1656,17 @@ fn link_of(at: &str, cofaces: &[[String; 3]]) -> LinkClass {
         return LinkClass::Components { count: components };
     }
 
-    let ends = adjacency.values().filter(|neighbours| neighbours.len() == 1).count();
+    let ends = adjacency
+        .values()
+        .filter(|neighbours| neighbours.len() == 1)
+        .count();
     match ends {
-        0 => LinkClass::Sphere { length: adjacency.len() },
-        2 => LinkClass::Ball { length: adjacency.len() },
+        0 => LinkClass::Sphere {
+            length: adjacency.len(),
+        },
+        2 => LinkClass::Ball {
+            length: adjacency.len(),
+        },
         // One endpoint, or more than two, in a single connected component with max degree two is
         // not a graph shape a path or cycle can have; report it rather than force it into one.
         other => LinkClass::Singular { max_degree: other },
@@ -1666,10 +1751,14 @@ pub fn hinge_deficits_in_aperture(
             let composed = (|| {
                 let next_cosine = cosine
                     .multiply(&corner_cosine, generator_aperture)?
-                    .subtract(&sine.multiply(corner_sine, generator_aperture)?, generator_aperture)?;
-                let next_sine = cosine
-                    .multiply(corner_sine, generator_aperture)?
-                    .add(&sine.multiply(&corner_cosine, generator_aperture)?, generator_aperture)?;
+                    .subtract(
+                        &sine.multiply(corner_sine, generator_aperture)?,
+                        generator_aperture,
+                    )?;
+                let next_sine = cosine.multiply(corner_sine, generator_aperture)?.add(
+                    &sine.multiply(&corner_cosine, generator_aperture)?,
+                    generator_aperture,
+                )?;
                 Ok::<_, MultiquadraticRefusal>((next_cosine, next_sine))
             })();
             match composed {
@@ -1714,14 +1803,27 @@ pub fn hinge_deficits_in_aperture(
                 _ => DeficitSpecies::Negative,
             };
             (
-                HingeHolonomy::Exact { cosine, sine, half_turns },
+                HingeHolonomy::Exact {
+                    cosine,
+                    sine,
+                    half_turns,
+                },
                 species,
             )
         } else {
-            (HingeHolonomy::Refused { refusals }, DeficitSpecies::Unreadable)
+            (
+                HingeHolonomy::Refused { refusals },
+                DeficitSpecies::Unreadable,
+            )
         };
 
-        deficits.push(HingeDeficit { at, cofaces: incident, link, holonomy, species });
+        deficits.push(HingeDeficit {
+            at,
+            cofaces: incident,
+            link,
+            holonomy,
+            species,
+        });
     }
     deficits
 }
@@ -1750,7 +1852,11 @@ mod hinge_tests_support {
         let composes_exactly = euclidean == EuclideanRealization::Realized
             && corners.iter().all(|corner| corner.sine.is_ok());
         ContactTriangle {
-            identifiers: [names[0].to_owned(), names[1].to_owned(), names[2].to_owned()],
+            identifiers: [
+                names[0].to_owned(),
+                names[1].to_owned(),
+                names[2].to_owned(),
+            ],
             stems,
             weights: w,
             corners,
@@ -1762,8 +1868,8 @@ mod hinge_tests_support {
 
 #[cfg(test)]
 mod hinge_tests {
-    use super::*;
     use super::hinge_tests_support::triangle;
+    use super::*;
 
     /// The vacuity the tower reported is Regge's flatness hypothesis, and it stays true.
     #[test]
@@ -1773,7 +1879,10 @@ mod hinge_tests {
             panic!("the equilateral triangle composes");
         };
         // e^{iπ} = (−1, 0): Σθ = π, per simplex, always.
-        assert_eq!(cosine, Multiquadratic::rational(Rat::from_integer(BigInt::from(-1))));
+        assert_eq!(
+            cosine,
+            Multiquadratic::rational(Rat::from_integer(BigInt::from(-1)))
+        );
         assert_eq!(sine, Multiquadratic::zero());
     }
 
@@ -1785,10 +1894,18 @@ mod hinge_tests {
             .map(|index| triangle(["hub", rim[index], rim[(index + 1) % 6]], [1, 1, 1]))
             .collect();
         let deficits = hinge_deficits(&triangles);
-        let hub = deficits.iter().find(|hinge| hinge.at == "hub").expect("the hub is a hinge");
+        let hub = deficits
+            .iter()
+            .find(|hinge| hinge.at == "hub")
+            .expect("the hub is a hinge");
         assert_eq!(hub.link, LinkClass::Sphere { length: 6 });
         assert_eq!(hub.species, DeficitSpecies::Flat);
-        let HingeHolonomy::Exact { half_turns, cosine, sine } = &hub.holonomy else {
+        let HingeHolonomy::Exact {
+            half_turns,
+            cosine,
+            sine,
+        } = &hub.holonomy
+        else {
             panic!("the hub composes");
         };
         assert_eq!(*half_turns, 2, "Σθ = 2π crosses π and 2π");
@@ -1805,7 +1922,10 @@ mod hinge_tests {
             .map(|index| triangle(["hub", rim[index], rim[(index + 1) % 5]], [1, 1, 1]))
             .collect();
         let deficits = hinge_deficits(&triangles);
-        let hub = deficits.iter().find(|hinge| hinge.at == "hub").expect("the hub is a hinge");
+        let hub = deficits
+            .iter()
+            .find(|hinge| hinge.at == "hub")
+            .expect("the hub is a hinge");
         assert_eq!(hub.link, LinkClass::Sphere { length: 5 });
         assert_eq!(hub.species, DeficitSpecies::Positive);
         let HingeHolonomy::Exact { half_turns, .. } = &hub.holonomy else {
@@ -1822,7 +1942,10 @@ mod hinge_tests {
             .map(|index| triangle(["hub", rim[index], rim[(index + 1) % 7]], [1, 1, 1]))
             .collect();
         let deficits = hinge_deficits(&triangles);
-        let hub = deficits.iter().find(|hinge| hinge.at == "hub").expect("the hub is a hinge");
+        let hub = deficits
+            .iter()
+            .find(|hinge| hinge.at == "hub")
+            .expect("the hub is a hinge");
         assert_eq!(hub.species, DeficitSpecies::Negative);
         let HingeHolonomy::Exact { half_turns, .. } = &hub.holonomy else {
             panic!("the hub composes");
@@ -1838,7 +1961,10 @@ mod hinge_tests {
             triangle(["hub", "r1", "r2"], [1, 1, 1]),
         ];
         let deficits = hinge_deficits(&triangles);
-        let hub = deficits.iter().find(|hinge| hinge.at == "hub").expect("the hub is a hinge");
+        let hub = deficits
+            .iter()
+            .find(|hinge| hinge.at == "hub")
+            .expect("the hub is a hinge");
         assert_eq!(hub.link, LinkClass::Ball { length: 3 });
         assert!(!hub.link.is_regular_interior());
     }
@@ -1852,7 +1978,10 @@ mod hinge_tests {
             triangle(["hub", "r0", "r3"], [1, 1, 1]),
         ];
         let deficits = hinge_deficits(&triangles);
-        let hub = deficits.iter().find(|hinge| hinge.at == "hub").expect("the hub is a hinge");
+        let hub = deficits
+            .iter()
+            .find(|hinge| hinge.at == "hub")
+            .expect("the hub is a hinge");
         assert_eq!(hub.link, LinkClass::Singular { max_degree: 3 });
         assert!(!hub.link.is_regular_interior());
     }
@@ -1860,14 +1989,27 @@ mod hinge_tests {
     /// The declared embedding reads a sign, and zero needs no embedding at all.
     #[test]
     fn the_principal_embedding_reads_the_sign_and_zero_is_structural() {
-        let three = Multiquadratic::square_root(&Rat::from_integer(BigInt::from(3)), DECLARED_KERNEL_BOUND).unwrap();
+        let three =
+            Multiquadratic::square_root(&Rat::from_integer(BigInt::from(3)), DECLARED_KERNEL_BOUND)
+                .unwrap();
         assert_eq!(three.sign_in_principal_embedding(), EmbeddedSign::Positive);
-        assert_eq!(three.negated().sign_in_principal_embedding(), EmbeddedSign::Negative);
-        assert_eq!(Multiquadratic::zero().sign_in_principal_embedding(), EmbeddedSign::Zero);
+        assert_eq!(
+            three.negated().sign_in_principal_embedding(),
+            EmbeddedSign::Negative
+        );
+        assert_eq!(
+            Multiquadratic::zero().sign_in_principal_embedding(),
+            EmbeddedSign::Zero
+        );
         // √2 − √3 < 0, and no rational coefficient makes that visible without the enclosure.
-        let two = Multiquadratic::square_root(&Rat::from_integer(BigInt::from(2)), DECLARED_KERNEL_BOUND).unwrap();
+        let two =
+            Multiquadratic::square_root(&Rat::from_integer(BigInt::from(2)), DECLARED_KERNEL_BOUND)
+                .unwrap();
         let difference = two.subtract(&three, 4).unwrap();
-        assert_eq!(difference.sign_in_principal_embedding(), EmbeddedSign::Negative);
+        assert_eq!(
+            difference.sign_in_principal_embedding(),
+            EmbeddedSign::Negative
+        );
     }
 
     /// **The dependency guard fires**, and it guards a real unsoundness rather than a hypothetical.
@@ -1879,11 +2021,17 @@ mod hinge_tests {
     #[test]
     fn a_multiplicatively_dependent_generator_set_is_refused_rather_than_answered() {
         let root = |value: i64| {
-            Multiquadratic::square_root(&Rat::from_integer(BigInt::from(value)), DECLARED_KERNEL_BOUND)
-                .expect("a squarefree root")
+            Multiquadratic::square_root(
+                &Rat::from_integer(BigInt::from(value)),
+                DECLARED_KERNEL_BOUND,
+            )
+            .expect("a squarefree root")
         };
         let dependent = root(3).add(&root(7), 4).unwrap().add(&root(21), 4).unwrap();
-        assert_eq!(dependent.generators(), &[BigInt::from(3), BigInt::from(7), BigInt::from(21)]);
+        assert_eq!(
+            dependent.generators(),
+            &[BigInt::from(3), BigInt::from(7), BigInt::from(21)]
+        );
         assert!(!dependent.generators_are_independent());
         assert_eq!(
             dependent.sign_in_principal_embedding(),
@@ -1893,10 +2041,12 @@ mod hinge_tests {
         // And the ordinary case is independent, so the guard is not refusing everything.
         let independent = root(3).add(&root(7), 4).unwrap();
         assert!(independent.generators_are_independent());
-        assert_eq!(independent.sign_in_principal_embedding(), EmbeddedSign::Positive);
+        assert_eq!(
+            independent.sign_in_principal_embedding(),
+            EmbeddedSign::Positive
+        );
     }
 }
-
 
 // -------------------------------------------------------------------------------------------------
 // The event-site hinge: the shared oriented face, the four gluings, and the orientation they need
@@ -2105,7 +2255,9 @@ pub fn orient(triangles: &[ContactTriangle]) -> OrientationReading {
         let mut frontier = vec![seed.clone()];
         while let Some(current) = frontier.pop() {
             let current_sign = signs[&current];
-            let Some(neighbours) = dual.get(&current) else { continue };
+            let Some(neighbours) = dual.get(&current) else {
+                continue;
+            };
             for (next, relation, edge) in neighbours.clone() {
                 let required = current_sign * relation;
                 match signs.get(&next) {
@@ -2184,7 +2336,12 @@ pub fn hinge_residuals(triangles: &[ContactTriangle]) -> (OrientationReading, Ve
             [_, _] => HingeGluing::Reversing,
             other => HingeGluing::Branching { sides: other.len() },
         };
-        residuals.push(HingeResidual { edge, cofaces, oriented_hands, gluing });
+        residuals.push(HingeResidual {
+            edge,
+            cofaces,
+            oriented_hands,
+            gluing,
+        });
     }
     (reading, residuals)
 }
@@ -2209,7 +2366,11 @@ mod event_hinge_tests {
             triangle(["b", "c", "d"], [1, 1, 1]),
         ];
         let (reading, residuals) = hinge_residuals(&triangles);
-        assert!(reading.coherent, "reversing faces: {:?}", reading.reading_reversing());
+        assert!(
+            reading.coherent,
+            "reversing faces: {:?}",
+            reading.reading_reversing()
+        );
         assert_eq!(reading.components, 1);
         assert_eq!(reading.seams.len(), 6);
         assert!(reading.exposed.is_empty());
@@ -2217,7 +2378,11 @@ mod event_hinge_tests {
         assert!(residuals.iter().all(HingeResidual::is_interior_seam));
         // And the solved signs are not all equal — a coherent orientation is a real assignment.
         let distinct: BTreeSet<i8> = reading.signs.values().copied().collect();
-        assert_eq!(distinct.len(), 2, "the canonical order is not already coherent");
+        assert_eq!(
+            distinct.len(),
+            2,
+            "the canonical order is not already coherent"
+        );
     }
 
     /// A lone triangle exposes all three faces as leaders.
@@ -2237,7 +2402,11 @@ mod event_hinge_tests {
         let left = triangle(["a", "b", "c"], [1, 1, 1]);
         let right = triangle(["b", "c", "d"], [1, 1, 1]);
         assert_eq!(induced_hand(&left, &edge("b", "c")), Some(1));
-        assert_eq!(induced_hand(&right, &edge("b", "c")), Some(1), "raw hands AGREE");
+        assert_eq!(
+            induced_hand(&right, &edge("b", "c")),
+            Some(1),
+            "raw hands AGREE"
+        );
 
         let (reading, residuals) = hinge_residuals(&[left, right]);
         assert!(reading.coherent);
@@ -2267,7 +2436,10 @@ mod event_hinge_tests {
         assert!(shared.founds());
 
         let deficits = hinge_deficits(&triangles);
-        let at_a = deficits.iter().find(|hinge| hinge.at == "a").expect("a is a hinge");
+        let at_a = deficits
+            .iter()
+            .find(|hinge| hinge.at == "a")
+            .expect("a is a hinge");
         assert!(matches!(at_a.link, LinkClass::Singular { .. }));
     }
 
@@ -2368,11 +2540,7 @@ pub fn triangles_at_rank(rank: &TowerRank) -> Vec<ContactTriangle> {
                     && corners.iter().all(|corner| corner.sine.is_ok());
                 triangles.push(ContactTriangle {
                     euclidean,
-                    identifiers: [
-                        (*first).clone(),
-                        (*second).clone(),
-                        (*third).clone(),
-                    ],
+                    identifiers: [(*first).clone(), (*second).clone(), (*third).clone()],
                     stems: [ab, bc, ca],
                     weights: [wab, wbc, wca],
                     corners,
@@ -2478,13 +2646,19 @@ mod grain_tests {
         .into_iter()
         .map(|names| on_edges(names, &weights))
         .collect();
-        assert!(below.iter().all(|t| t.euclidean == EuclideanRealization::Realized));
+        assert!(
+            below
+                .iter()
+                .all(|t| t.euclidean == EuclideanRealization::Realized)
+        );
 
         let rank_one = climb(1, &below, 12);
         assert_eq!(rank_one.vertices.len(), 4, "each two-cell became a vertex");
         let above = triangles_at_rank(&rank_one);
         assert!(
-            above.iter().any(|t| t.euclidean == EuclideanRealization::Realized),
+            above
+                .iter()
+                .any(|t| t.euclidean == EuclideanRealization::Realized),
             "the rank above closes at least one two-cell"
         );
 
@@ -2501,7 +2675,9 @@ mod grain_tests {
             );
         }
         assert!(
-            roles.iter().all(|role| role.hinge_cofaces_above.unwrap_or(0) > 0),
+            roles
+                .iter()
+                .all(|role| role.hinge_cofaces_above.unwrap_or(0) > 0),
             "every two-cell below is a curvature hinge above: {roles:?}"
         );
     }

@@ -283,9 +283,9 @@ pub enum KelvinError {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::EventId;
     use crate::analytic_field::ExactAnalyticAdvectionLaw;
     use crate::exact_linear::ExactRatMatrix;
-    use crate::EventId;
     use num_bigint::BigInt;
     use std::collections::BTreeSet;
 
@@ -528,7 +528,10 @@ mod tests {
 
         for _ in 0..6 {
             let sum: Rat = material.coefficients().values().cloned().sum();
-            assert!(sum.is_zero(), "closedness on a theta graph is a vanishing sum");
+            assert!(
+                sum.is_zero(),
+                "closedness on a theta graph is a vanishing sum"
+            );
             material = material.carried(&arcs, &law).expect("stays closed");
         }
         assert_eq!(material.carried_steps, 6);

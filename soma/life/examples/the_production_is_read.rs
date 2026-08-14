@@ -179,7 +179,9 @@ fn run() -> Result<(), String> {
         conducted.generation.outputs.len(),
         executor.device_name()
     );
-    println!("  (a continuation is emitted only where its support recurred across distinct wholes)");
+    println!(
+        "  (a continuation is emitted only where its support recurred across distinct wholes)"
+    );
     let mut by_breadth: BTreeMap<usize, Vec<&str>> = BTreeMap::new();
     for output in &conducted.generation.outputs {
         by_breadth

@@ -361,7 +361,10 @@ pub fn inertia_with_order(form: &SymmetricForm, order: PivotOrder) -> Inertia {
 ///
 /// [`inertia`] and [`inertia_with_order`] delegate here rather than the reverse, so the schedule is
 /// the schedule the elimination actually walked and cannot drift from it.
-pub fn inertia_with_schedule(form: &SymmetricForm, order: PivotOrder) -> (Inertia, InertiaSchedule) {
+pub fn inertia_with_schedule(
+    form: &SymmetricForm,
+    order: PivotOrder,
+) -> (Inertia, InertiaSchedule) {
     let mut working = form.rows();
     let mut alive: Vec<usize> = (0..form.extent()).collect();
     let mut tally = Inertia::default();
@@ -785,7 +788,9 @@ pub fn block_defect(at: &Rat, level: &Rat) -> Rat {
 
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
 pub enum InertiaError {
-    #[error("a symmetric form must be square: row {row} carries {found} entries, extent is {extent}")]
+    #[error(
+        "a symmetric form must be square: row {row} carries {found} entries, extent is {extent}"
+    )]
     RaggedForm {
         row: usize,
         found: usize,
@@ -1292,7 +1297,10 @@ mod tests {
             for row in 0..form.extent() {
                 for column in 0..form.extent() {
                     let entry = form.at(row, column);
-                    assert!(entry.is_integer(), "this cross-check runs over integral forms");
+                    assert!(
+                        entry.is_integer(),
+                        "this cross-check runs over integral forms"
+                    );
                     matrix.set(row, column, entry.to_integer());
                 }
             }
@@ -1403,9 +1411,27 @@ mod tests {
         );
 
         let pullback = pullback_inertia_bound(&form, &singular).expect("the shapes meet");
-        assert_eq!(pullback.form, SymmetricForm::zeros(2), "PᵀAP is the zero form");
-        assert_eq!(pullback.source, Inertia { positive: 1, zero: 0, negative: 1 });
-        assert_eq!(pullback.pulled_back, Inertia { positive: 0, zero: 2, negative: 0 });
+        assert_eq!(
+            pullback.form,
+            SymmetricForm::zeros(2),
+            "PᵀAP is the zero form"
+        );
+        assert_eq!(
+            pullback.source,
+            Inertia {
+                positive: 1,
+                zero: 0,
+                negative: 1
+            }
+        );
+        assert_eq!(
+            pullback.pulled_back,
+            Inertia {
+                positive: 0,
+                zero: 2,
+                negative: 0
+            }
+        );
         assert!(pullback.bounds_hold());
         assert!(pullback.positive_is_strict(), "0 < 1 on the positive side");
         assert!(pullback.negative_is_strict(), "0 < 1 on the negative side");
@@ -1433,14 +1459,20 @@ mod tests {
         assert!(!pullback.is_injective());
         for vector in &pullback.kernel {
             assert!(
-                map.apply(vector).expect("the extents meet").iter().all(Zero::is_zero),
+                map.apply(vector)
+                    .expect("the extents meet")
+                    .iter()
+                    .all(Zero::is_zero),
                 "a kernel vector must be annihilated by P"
             );
             for row in 0..pullback.form.extent() {
                 let value = (0..pullback.form.extent()).fold(Rat::zero(), |sum, column| {
                     sum + pullback.form.at(row, column) * &vector[column]
                 });
-                assert!(value.is_zero(), "ker P lands in the radical of PᵀAP whatever A was");
+                assert!(
+                    value.is_zero(),
+                    "ker P lands in the radical of PᵀAP whatever A was"
+                );
             }
         }
         assert!(pullback.bounds_hold());
@@ -1491,7 +1523,14 @@ mod tests {
         let restriction = rectangular(&[vec![1], vec![0]]);
         let pullback = pullback_inertia_bound(&form, &restriction).expect("the shapes meet");
         assert!(pullback.is_injective());
-        assert_eq!(pullback.pulled_back, Inertia { positive: 1, zero: 0, negative: 0 });
+        assert_eq!(
+            pullback.pulled_back,
+            Inertia {
+                positive: 1,
+                zero: 0,
+                negative: 0
+            }
+        );
         assert!(!pullback.positive_is_strict());
         assert!(pullback.negative_is_strict());
         assert!(pullback.bounds_hold());
@@ -1538,8 +1577,13 @@ mod tests {
     fn the_block_defect_is_the_completed_square() {
         for at in [-3i64, 0, 1, 4, 7] {
             for level in [-5i64, -1, 0, 3, 4, 8] {
-                let completed = &rat(at) * &rat(at) - (rat(at) - rat(level)) * (rat(at) - rat(level));
-                assert_eq!(block_defect(&rat(at), &rat(level)), completed, "c={at} m={level}");
+                let completed =
+                    &rat(at) * &rat(at) - (rat(at) - rat(level)) * (rat(at) - rat(level));
+                assert_eq!(
+                    block_defect(&rat(at), &rat(level)),
+                    completed,
+                    "c={at} m={level}"
+                );
             }
         }
         // The two levels where the term vanishes and the one where it is maximal, named.
@@ -1573,7 +1617,11 @@ mod tests {
             .fold(Rat::zero(), |sum, term| sum + term)
             + &at * &at * Rat::from_integer(BigInt::from(repeats as i64));
         assert_eq!(rank_trace_defect(&block, &at), expected);
-        assert_eq!(expected, rat(42), "the fixture's own number, so a silent drift is visible");
+        assert_eq!(
+            expected,
+            rat(42),
+            "the fixture's own number, so a silent drift is visible"
+        );
 
         // The same identity survives a pull-back that keeps one level, one repeat, and one rest
         // direction — the restriction is the operation the bound above is about, so the two are
@@ -1589,7 +1637,10 @@ mod tests {
             "the surviving block reproduces the equality on its own levels"
         );
         assert!(pullback.bounds_hold());
-        assert!(pullback.positive_is_strict(), "three positive directions became two");
+        assert!(
+            pullback.positive_is_strict(),
+            "three positive directions became two"
+        );
     }
 
     /// The defect is computed from the **matrix**, so a form whose eigenvalues are not rational must

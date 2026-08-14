@@ -6,6 +6,7 @@ use std::time::{Duration, Instant};
 
 use body::incidence::IncidenceHand;
 use body::num::Cog;
+use life::form_mouth::deposit_form_or_message;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
@@ -16,7 +17,6 @@ use soma_membrane::{
     ParallelHostLiveCurrentExecutor, RegionalRelationArc, RegionalRelationCell,
     SparseStandingSurface,
 };
-use life::form_mouth::deposit_form_or_message;
 
 /// This driver's name at the plate mouth: `output/eros_residual_chart_cultivation/<name>-<sha256>.form`.
 const FORM_DRIVER: &str = "eros_residual_chart_cultivation";

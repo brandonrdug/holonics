@@ -79,28 +79,43 @@ fn response(half_extent: u32, values: &[(i64, i64)]) -> CausalResponse {
 
 /// `M = 3`, causal, two-sided retarded tail, nonzero instantaneous value.
 fn causal_tail() -> CausalResponse {
-    response(3, &[(0, 1), (0, 1), (0, 1), (5, 2), (-3, 1), (7, 4), (1, 1)])
+    response(
+        3,
+        &[(0, 1), (0, 1), (0, 1), (5, 2), (-3, 1), (7, 4), (1, 1)],
+    )
 }
 
 /// `M = 3`, causal and instantaneous-free: `h[0] = 0`, so the subtraction constant is zero and the
 /// absorptive reading is **not** blind on this material.
 fn causal_without_instantaneous() -> CausalResponse {
-    response(3, &[(0, 1), (0, 1), (0, 1), (0, 1), (4, 1), (-1, 3), (2, 1)])
+    response(
+        3,
+        &[(0, 1), (0, 1), (0, 1), (0, 1), (4, 1), (-1, 3), (2, 1)],
+    )
 }
 
 /// `M = 3`, **not** causal: one nonzero value at `n = -2`.
 fn advanced_leak() -> CausalResponse {
-    response(3, &[(0, 1), (9, 5), (0, 1), (5, 2), (-3, 1), (7, 4), (1, 1)])
+    response(
+        3,
+        &[(0, 1), (9, 5), (0, 1), (5, 2), (-3, 1), (7, 4), (1, 1)],
+    )
 }
 
 /// `M = 3`, not causal, and **even**: its absorptive face is identically zero. The symmetric trap.
 fn even_response() -> CausalResponse {
-    response(3, &[(2, 1), (-1, 1), (3, 1), (5, 1), (3, 1), (-1, 1), (2, 1)])
+    response(
+        3,
+        &[(2, 1), (-1, 1), (3, 1), (5, 1), (3, 1), (-1, 1), (2, 1)],
+    )
 }
 
 /// `M = 3`, not causal, and **odd**: its dispersive face is identically zero.
 fn odd_response() -> CausalResponse {
-    response(3, &[(-2, 1), (1, 1), (-3, 1), (0, 1), (3, 1), (-1, 1), (2, 1)])
+    response(
+        3,
+        &[(-2, 1), (1, 1), (-3, 1), (0, 1), (3, 1), (-1, 1), (2, 1)],
+    )
 }
 
 /// `M = 2`, causal, supported only at the stimulus. **Cannot exercise the pairing** — the signature
@@ -250,8 +265,8 @@ fn sweep(half_extent: u32, alphabet: &[Rat]) -> Sweep {
                 alphabet[digit].clone()
             })
             .collect();
-        let fixture =
-            CausalResponse::new(half_extent, grain(), values.clone()).expect("a lawful declaration");
+        let fixture = CausalResponse::new(half_extent, grain(), values.clone())
+            .expect("a lawful declaration");
         let lock = causality_lock(&fixture).expect("a lawful lock");
         if !lock.law_holds() {
             result.law_failures.push(values);
@@ -281,7 +296,9 @@ fn main() {
     println!("truth_status=established-bounded");
     println!("evidence=computational-witness");
     println!("law=the two faces lock exactly when the response vanishes before the stimulus");
-    println!("organ=crates/holonic-engine/src/causal_reflection.rs   (one library caller, no driver)");
+    println!(
+        "organ=crates/holonic-engine/src/causal_reflection.rs   (one library caller, no driver)"
+    );
 
     let mut holds: Vec<(&str, bool, String)> = Vec::new();
 
@@ -314,13 +331,20 @@ fn main() {
         every_fixture().len() - causal_count
     );
     println!("  tested on both sides rather than confirmed on one.");
-    println!("  `instantaneous_only` is retained precisely BECAUSE it cannot exercise the pairing:");
+    println!(
+        "  `instantaneous_only` is retained precisely BECAUSE it cannot exercise the pairing:"
+    );
     println!("  a fixture whose only coordinate the signature annihilates would lock whatever the");
-    println!("  response was, and a family without such a member could not name that failure mode.");
+    println!(
+        "  response was, and a family without such a member could not name that failure mode."
+    );
     holds.push((
         "every fixture's declared causality and exercisability match what the organ returns",
         declarations_agree && causal_count >= 3 && every_fixture().len() - causal_count >= 3,
-        format!("{causal_count} causal against {} acausal", every_fixture().len() - causal_count),
+        format!(
+            "{causal_count} causal against {} acausal",
+            every_fixture().len() - causal_count
+        ),
     ));
 
     // ===========================================================================================
@@ -345,7 +369,9 @@ fn main() {
                 !fixture.dispersive_face().is_zero() && !fixture.absorptive_face().is_zero();
         }
     }
-    println!("\n  `even_response` and `odd_response` are the degenerate traps: one has a vanishing");
+    println!(
+        "\n  `even_response` and `odd_response` are the degenerate traps: one has a vanishing"
+    );
     println!("  absorptive face and the other a vanishing dispersive face, and BOTH must still be");
     println!("  refused. A nonzero response with a mirror symmetry cannot be causal.");
     holds.push((
@@ -358,8 +384,12 @@ fn main() {
     println!("\n\n3. THE LAW, DECIDED BY EXHAUSTION AT THREE APERTURES");
     println!("----------------------------------------------------");
     println!("  The biconditional `locks() == is_causal()` is decided over every response on the");
-    println!("  declared lattice with values from the declared alphabet. A sweep whose causal class");
-    println!("  or acausal class had collapsed would be a check that could not fail, so both counts");
+    println!(
+        "  declared lattice with values from the declared alphabet. A sweep whose causal class"
+    );
+    println!(
+        "  or acausal class had collapsed would be a check that could not fail, so both counts"
+    );
     println!("  are printed and both are required non-zero.");
     let sweeps = [
         sweep(1, &[integer(-2), Rat::zero(), integer(3)]),
@@ -389,7 +419,9 @@ fn main() {
             reading.standing_seen
         );
     }
-    println!("\n  Every causal declaration locked, no acausal declaration locked, and the standing");
+    println!(
+        "\n  Every causal declaration locked, no acausal declaration locked, and the standing"
+    );
     println!("  column is the number of standing residual ADDRESSES the acausal half returned —");
     println!("  non-zero, so the acausal half is evidence and not an empty class.");
     println!(
@@ -413,7 +445,9 @@ fn main() {
     println!("\n\n4. THE RESIDUAL IS THE ACAUSAL VALUE AT ITS OWN ADDRESS");
     println!("-------------------------------------------------------");
     println!("  The return is never a norm and never a fit. For a response with an occupied");
-    println!("  pre-stimulus region the residual at `n < 0` is exactly `h[n]`, and at `n > 0` it is");
+    println!(
+        "  pre-stimulus region the residual at `n < 0` is exactly `h[n]`, and at `n > 0` it is"
+    );
     println!("  exactly `-h[-n]` for the dispersive reading and `+h[-n]` for the absorptive one.");
     let leak = advanced_leak();
     let leak_lock = causality_lock(&leak).expect("a lawful lock");
@@ -446,7 +480,11 @@ fn main() {
     }
     holds.push((
         "every residual equals the acausal value at that address or its mirror, exactly",
-        addresses_exact && !leak_lock.dispersive_to_absorptive.standing_indices.is_empty(),
+        addresses_exact
+            && !leak_lock
+                .dispersive_to_absorptive
+                .standing_indices
+                .is_empty(),
         format!(
             "{} standing addresses on advanced_leak",
             leak_lock.dispersive_to_absorptive.standing_indices.len()
@@ -458,9 +496,13 @@ fn main() {
     println!("-----------------------------------------------------------------");
     println!("  dispersive -> absorptive is exact at EVERY index, the fixed point included.");
     println!("  absorptive -> dispersive is exact everywhere EXCEPT the fixed point, where it is");
-    println!("  blind — and the datum it cannot supply is exactly the instantaneous response h[0].");
+    println!(
+        "  blind — and the datum it cannot supply is exactly the instantaneous response h[0]."
+    );
     println!("  This is not a discretization defect. It is the discrete form of the fact that an");
-    println!("  UNSUBTRACTED dispersion relation does not determine Re chi; the physical statement");
+    println!(
+        "  UNSUBTRACTED dispersion relation does not determine Re chi; the physical statement"
+    );
     println!("  needs chi_infinity supplied separately, and a SUBTRACTED relation is what carries");
     println!("  it. Here the constant is exhibited exactly, with its address.");
     let tail = causal_tail();
@@ -495,7 +537,9 @@ fn main() {
         format_rat(&clean_lock.dispersive_to_absorptive.residual_at(0)),
         format_rat(&clean_lock.absorptive_to_dispersive.residual_at(0))
     );
-    println!("\n  So the blindness is a property of the MATERIAL, not of the law: on a response with");
+    println!(
+        "\n  So the blindness is a property of the MATERIAL, not of the law: on a response with"
+    );
     println!("  no instantaneous value nothing is lost, and the pair of readings above is what");
     println!("  makes that a measurement rather than an assertion.");
     holds.push((
@@ -526,8 +570,7 @@ fn main() {
         .expect("a distinct instantaneous value");
     print_response("left  (h[0] = 5/2)", &left);
     print_response("right (h[0] = -19/7)", &right);
-    let separation =
-        left.dispersive_face().value(0) - right.dispersive_face().value(0);
+    let separation = left.dispersive_face().value(0) - right.dispersive_face().value(0);
     println!(
         "\n  identical absorptive faces : {}",
         left.absorptive_face() == right.absorptive_face()
@@ -542,9 +585,7 @@ fn main() {
         causality_lock(&left).expect("lawful").locks(),
         causality_lock(&right).expect("lawful").locks()
     );
-    println!(
-        "  a metamer needs two members: replacing h[0] by 5/2, the value already standing,",
-    );
+    println!("  a metamer needs two members: replacing h[0] by 5/2, the value already standing,",);
     println!(
         "                               returns {:?}",
         left.instantaneous_metamer(rat(5, 2))
@@ -569,9 +610,13 @@ fn main() {
     println!("  theorem. That is a claim about which spectral lattices exist inside the exact");
     println!("  rational carrier at all, and it is measured here rather than asserted.");
     println!();
-    println!("  `RationalCirclePoint::from_slope(s)` is the stereographic parametrization from -1;");
+    println!(
+        "  `RationalCirclePoint::from_slope(s)` is the stereographic parametrization from -1;"
+    );
     println!("  it reaches every rational point of the unit circle except -1 itself, which");
-    println!("  `RationalCirclePoint::new` takes directly. A spectral lattice of resolution N needs");
+    println!(
+        "  `RationalCirclePoint::new` takes directly. A spectral lattice of resolution N needs"
+    );
     println!("  `z` with `z^N = 1`. Every point of a declared family is powered exactly and asked");
     println!("  whether it ever returns.");
 
@@ -597,8 +642,8 @@ fn main() {
     let mut roots: Vec<(String, u32)> = Vec::new();
     let mut on_the_circle = true;
     for (key, point) in &family {
-        on_the_circle &= point.real() * point.real() + point.imaginary() * point.imaginary()
-            == Rat::one();
+        on_the_circle &=
+            point.real() * point.real() + point.imaginary() * point.imaginary() == Rat::one();
         for order in 1..=horizon {
             let (real, imaginary) = point.power(order as i64);
             if real.is_one() && imaginary.is_zero() {
@@ -627,7 +672,9 @@ fn main() {
         family.len() - roots.len(),
         family.len()
     );
-    println!("\n  Four points, of orders 1, 2, 4 and 4. Their orders generate exactly {{1, 2, 4}},");
+    println!(
+        "\n  Four points, of orders 1, 2, 4 and 4. Their orders generate exactly {{1, 2, 4}},"
+    );
     println!("  which is the module's declared spectral aperture — reached by exact powering and");
     println!("  not by citing the theorem. And the missing lattices are refused BY NAME, with the");
     println!("  exact miss, rather than being unimplemented:");
@@ -667,7 +714,10 @@ fn main() {
         "exactly four points of the rational unit circle are roots of unity, of orders 1, 2, 4, 4",
         on_the_circle
             && roots.len() == 4
-            && roots.iter().map(|(_, order)| *order).collect::<BTreeSet<_>>()
+            && roots
+                .iter()
+                .map(|(_, order)| *order)
+                .collect::<BTreeSet<_>>()
                 == BTreeSet::from([1, 2, 4])
             && family.len() > 4,
         format!(
@@ -687,7 +737,9 @@ fn main() {
     println!("------------------------------------------------------------");
     println!("  On the unit circle `z^-1 = conj z`, so at any rational circle point the transfer");
     println!("  function `chi(z) = sum_n h[n] z^-n` has both parts in Q, computed by exact");
-    println!("  Gaussian-rational powering with no transcendental anywhere. The claim under test is");
+    println!(
+        "  Gaussian-rational powering with no transcendental anywhere. The claim under test is"
+    );
     println!("  that the even face carries Re chi and NOTHING else, and the odd face Im chi and");
     println!("  nothing else.");
     let probe_points: Vec<RationalCirclePoint> = [(0, 1), (1, 2), (-3, 5), (7, 3)]
@@ -786,7 +838,9 @@ fn main() {
     // ===========================================================================================
     println!("\n\n9. THE FOUR-POINT SPECTRAL RELATION, AND WHAT IT COSTS TO LEAVE ITS APERTURE");
     println!("----------------------------------------------------------------------------");
-    println!("  At N = 4 the circular Hilbert kernel `(2/N)cot(pi m/N)` is `[0, 1/2, 0, -1/2]` and");
+    println!(
+        "  At N = 4 the circular Hilbert kernel `(2/N)cot(pi m/N)` is `[0, 1/2, 0, -1/2]` and"
+    );
     println!("  the relation collapses to a three-point stencil:");
     println!("      Im chi[k] =  ( Re chi[k+1] - Re chi[k-1] ) / 2");
     println!("      Re chi[k] = -( Im chi[k+1] - Im chi[k-1] ) / 2  +  h_e[0]  +  h_e[2] (-1)^k");
@@ -801,10 +855,22 @@ fn main() {
         inside.within_four_point_aperture()
     );
     println!("    fold[j]              {}", render_four(&spectral.folded));
-    println!("    Re chi  (measured)   {}", render_four(&spectral.dispersive));
-    println!("    Re chi  (derived)    {}", render_four(&spectral.derived_dispersive));
-    println!("    Im chi  (measured)   {}", render_four(&spectral.absorptive));
-    println!("    Im chi  (derived)    {}", render_four(&spectral.derived_absorptive));
+    println!(
+        "    Re chi  (measured)   {}",
+        render_four(&spectral.dispersive)
+    );
+    println!(
+        "    Re chi  (derived)    {}",
+        render_four(&spectral.derived_dispersive)
+    );
+    println!(
+        "    Im chi  (measured)   {}",
+        render_four(&spectral.absorptive)
+    );
+    println!(
+        "    Im chi  (derived)    {}",
+        render_four(&spectral.derived_absorptive)
+    );
     println!(
         "    residuals            {}   /   {}",
         render_four(&spectral.dispersive_residual),
@@ -818,8 +884,7 @@ fn main() {
         spectral.locks()
     );
     let unsubtracted: [Rat; 4] = std::array::from_fn(|k| {
-        (spectral.absorptive[(k + 3) % 4].clone() - &spectral.absorptive[(k + 1) % 4])
-            / integer(2)
+        (spectral.absorptive[(k + 3) % 4].clone() - &spectral.absorptive[(k + 1) % 4]) / integer(2)
     });
     println!(
         "    the UNSUBTRACTED stencil would return {}",
@@ -847,7 +912,13 @@ fn main() {
         let fixture = CausalResponse::new(
             2,
             grain(),
-            vec![Rat::zero(), value.clone(), rat(5, 2), integer(-3), rat(7, 4)],
+            vec![
+                Rat::zero(),
+                value.clone(),
+                rat(5, 2),
+                integer(-3),
+                rat(7, 4),
+            ],
         )
         .expect("a lawful declaration");
         let reading = fixture.four_point_spectral_reflection();
@@ -855,12 +926,7 @@ fn main() {
         leak_residuals_exact &= reading.folded_advanced == value
             && !reading.locks()
             && reading.absorptive_residual
-                == [
-                    Rat::zero(),
-                    doubled.clone(),
-                    Rat::zero(),
-                    -doubled.clone(),
-                ]
+                == [Rat::zero(), doubled.clone(), Rat::zero(), -doubled.clone()]
             && reading.dispersive_residual
                 == [doubled.clone(), Rat::zero(), -doubled.clone(), Rat::zero()]
             && !doubled.is_zero();
@@ -878,7 +944,9 @@ fn main() {
     ));
 
     println!("\n  THE APERTURE IS MEASURED, NOT ASSERTED. Conducted past it the organ APPEARS TO");
-    println!("  RETURN: a single nonzero value at `n = -2` folds onto the causal arc's slot 2, and");
+    println!(
+        "  RETURN: a single nonzero value at `n = -2` folds onto the causal arc's slot 2, and"
+    );
     println!("  every spectral residual is zero on material that is not causal.");
     let outside = response(2, &[(6, 1), (0, 1), (5, 2), (-3, 1), (7, 4)]);
     let outside_spectral = outside.four_point_spectral_reflection();
@@ -1035,14 +1103,12 @@ fn main() {
     println!(
         "    the gauge ACTS on the carrier: comparing across grains returns {across_grains:?}"
     );
-    println!("    and it moves nothing in the law over 6 fixtures x 4 grains: {grain_moves_nothing}");
+    println!(
+        "    and it moves nothing in the law over 6 fixtures x 4 grains: {grain_moves_nothing}"
+    );
     holds.push((
         "the grain acts on the carrier and moves no lock, no residual and no subtraction constant",
-        grain_moves_nothing
-            && matches!(
-                across_grains,
-                Err(CausalReflectionError::LatticesDiffer)
-            ),
+        grain_moves_nothing && matches!(across_grains, Err(CausalReflectionError::LatticesDiffer)),
         "24 regrained readings, all bit-identical; cross-grain comparison refused".to_owned(),
     ));
 
@@ -1052,7 +1118,9 @@ fn main() {
     println!("  `chi(z) = sum_n h[n] z^-n` is a Laurent polynomial. A nonzero pre-stimulus value");
     println!("  `h[-m]` is the coefficient of `z^+m`, a pole at infinity. So a response is causal");
     println!("  exactly when its transfer function has no advanced part, exactly when it extends");
-    println!("  holomorphically over the exterior chart including infinity, where its value is the");
+    println!(
+        "  holomorphically over the exterior chart including infinity, where its value is the"
+    );
     println!("  instantaneous response. No half-plane, no contour, no limit.");
     println!(
         "\n  {:<30} {:>10} {:>12} {:>18} {:>28}",
@@ -1202,7 +1270,8 @@ fn main() {
         ),
     ));
 
-    let short_retarded = CausalResponse::from_retarded_values(2, grain(), &[integer(1), integer(1)]);
+    let short_retarded =
+        CausalResponse::from_retarded_values(2, grain(), &[integer(1), integer(1)]);
     refusals.push((
         "a retarded declaration of the wrong width",
         format!("{:?}", short_retarded.as_ref().err()),
@@ -1237,12 +1306,16 @@ fn main() {
     println!("    exact rational coefficients. There is no resonance, no pole off the origin, no");
     println!("    line shape, no Lorentzian, and no analytic continuation.");
     println!("  - The spectral relation at N > 4 is not implemented and is not implementable in");
-    println!("    this carrier. Section 7 measures WHY over a declared finite family of 136 slopes");
+    println!(
+        "    this carrier. Section 7 measures WHY over a declared finite family of 136 slopes"
+    );
     println!("    and a horizon of 24; it does not prove Niven's theorem, which is cited. A body");
     println!("    wanting N > 4 must declare the real cyclotomic field Q(zeta_N)+, which neither");
     println!("    this module nor `exact_value.rs`'s Sturm-certified `AlgebraicRoot` supplies —");
     println!("    an enclosure of an algebraic number is not arithmetic in a number field.");
-    println!("  - NO RECEIVER IS MEASURED. The record's open conjecture asks whether the continuing");
+    println!(
+        "  - NO RECEIVER IS MEASURED. The record's open conjecture asks whether the continuing"
+    );
     println!("    body's own declared response is causal in the required sense. Nothing here");
     println!("    answers that; this module is the apparatus that would, and this driver runs the");
     println!("    apparatus on declared fixtures.");

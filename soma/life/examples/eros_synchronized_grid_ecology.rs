@@ -25,6 +25,7 @@ use holonic_engine::{
     receive_phase_transport_spectrum, ExactPhaseCurrentSection, PhaseCurrentLineageId,
     PhaseCurrentReceiverId,
 };
+use life::form_mouth::deposit_form_or_message;
 use life::synchronized_occurrence::{
     relation_atom, ExactClockTransport, ExactSynchronizedOccurrence, SynchronizedCandidateId,
     SynchronizedCellId, SynchronizedCellOrigin, SynchronizedEcology, SynchronizedInteraction,
@@ -37,7 +38,6 @@ use serde_json::Value;
 use sha2::{Digest, Sha256};
 use soma_abi::active::ActionCurrent;
 use soma_membrane::{LiveCurrentMachine, ReceiverChartIdentity, SparseStandingSurface};
-use life::form_mouth::deposit_form_or_message;
 
 /// This driver's name at the plate mouth: `output/eros_synchronized_grid_ecology/<name>-<sha256>.form`.
 const FORM_DRIVER: &str = "eros_synchronized_grid_ecology";

@@ -37,14 +37,14 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use holonic_engine::conditioned_derivation::{expose, Exposure, FoundedMorphology};
+use holonic_engine::conditioned_derivation::{Exposure, FoundedMorphology, expose};
 use holonic_engine::contact_gluing::{
-    climb, contact_graph, contact_triangles, grain_roles, hinge_deficits, hinge_residuals,
-    triangles_at_rank, ContactTriangle, EuclideanRealization, HingeGluing,
+    ContactTriangle, EuclideanRealization, HingeGluing, climb, contact_graph, contact_triangles,
+    grain_roles, hinge_deficits, hinge_residuals, triangles_at_rank,
 };
 use holonic_engine::discrete_curvature::{
-    coefficient_species, dissipative_annihilator, total_multiplier, CoefficientSpecies,
-    DiscreteCurvatureConfiguration,
+    CoefficientSpecies, DiscreteCurvatureConfiguration, coefficient_species,
+    dissipative_annihilator, total_multiplier,
 };
 use holonic_engine::{HingeId, VertexId};
 use num_bigint::BigInt;
@@ -86,27 +86,90 @@ fn species_name(species: CoefficientSpecies) -> &'static str {
 /// The declared material, identical to `the_tower_climbs` and `the_hinge_carries_the_curvature`.
 fn atmosphere() -> Vec<(String, String)> {
     [
-        ("carriage", "the carriage carries the charge and the carrier carries the carriage"),
-        ("carrier", "the carrier carries the charge the carriage carried"),
-        ("carries", "the carries of the carriage carry the charge the carrier carries"),
-        ("charges", "the charges charge the carriage and the charges charge the carrier"),
-        ("charged", "the charged carriage charged the charged carrier with charges"),
-        ("charger", "the charger charges the charged carrier and the charger charges"),
-        ("discharge", "the discharge discharges the charged carriage and the charger"),
-        ("recharge", "the recharge recharges the charger and the charged carrier"),
-        ("conductor", "the conductor conducts the charge the carriage carried"),
-        ("conducted", "the conducted charge conducted the conductor and the carrier"),
-        ("conduction", "the conduction of the conducted charge conducts the conductor"),
-        ("transport", "the transport transports the charge the conductor conducted"),
-        ("transporter", "the transporter transports the transported charge and the transport"),
-        ("transported", "the transported charge transports the transporter and the conductor"),
-        ("transpose", "the transpose transposes the transported charge and the transport"),
-        ("transposed", "the transposed transpose transposed the transporter and the transport"),
-        ("port", "the port ports the charge and the transport ports the carrier"),
-        ("ported", "the ported charge ported the port and the transporter ports"),
-        ("porter", "the porter ports the ported charge and the transporter ports"),
-        ("charter", "the charter charters the charge and the charger charters the porter"),
-        ("chartered", "the chartered charter chartered the charger and the ported charge"),
+        (
+            "carriage",
+            "the carriage carries the charge and the carrier carries the carriage",
+        ),
+        (
+            "carrier",
+            "the carrier carries the charge the carriage carried",
+        ),
+        (
+            "carries",
+            "the carries of the carriage carry the charge the carrier carries",
+        ),
+        (
+            "charges",
+            "the charges charge the carriage and the charges charge the carrier",
+        ),
+        (
+            "charged",
+            "the charged carriage charged the charged carrier with charges",
+        ),
+        (
+            "charger",
+            "the charger charges the charged carrier and the charger charges",
+        ),
+        (
+            "discharge",
+            "the discharge discharges the charged carriage and the charger",
+        ),
+        (
+            "recharge",
+            "the recharge recharges the charger and the charged carrier",
+        ),
+        (
+            "conductor",
+            "the conductor conducts the charge the carriage carried",
+        ),
+        (
+            "conducted",
+            "the conducted charge conducted the conductor and the carrier",
+        ),
+        (
+            "conduction",
+            "the conduction of the conducted charge conducts the conductor",
+        ),
+        (
+            "transport",
+            "the transport transports the charge the conductor conducted",
+        ),
+        (
+            "transporter",
+            "the transporter transports the transported charge and the transport",
+        ),
+        (
+            "transported",
+            "the transported charge transports the transporter and the conductor",
+        ),
+        (
+            "transpose",
+            "the transpose transposes the transported charge and the transport",
+        ),
+        (
+            "transposed",
+            "the transposed transpose transposed the transporter and the transport",
+        ),
+        (
+            "port",
+            "the port ports the charge and the transport ports the carrier",
+        ),
+        (
+            "ported",
+            "the ported charge ported the port and the transporter ports",
+        ),
+        (
+            "porter",
+            "the porter ports the ported charge and the transporter ports",
+        ),
+        (
+            "charter",
+            "the charter charters the charge and the charger charters the porter",
+        ),
+        (
+            "chartered",
+            "the chartered charter chartered the charger and the ported charge",
+        ),
     ]
     .into_iter()
     .map(|(identity, text)| (identity.to_owned(), text.to_owned()))
@@ -153,9 +216,7 @@ fn curvature_configuration(
     let hinges: Vec<(HingeId, [VertexId; 2])> = edges
         .iter()
         .enumerate()
-        .map(|(ordinal, (left, right))| {
-            (HingeId(ordinal as u64 + 1), [index[left], index[right]])
-        })
+        .map(|(ordinal, (left, right))| (HingeId(ordinal as u64 + 1), [index[left], index[right]]))
         .collect();
     DiscreteCurvatureConfiguration::at_unit_response(hinges)
         .ok()
@@ -181,7 +242,10 @@ fn main() {
         .map(|(identity, text)| expose(identity, text))
         .collect();
     let morphology = FoundedMorphology::condition(&exposures);
-    let population: Vec<String> = material.iter().map(|(identity, _)| identity.clone()).collect();
+    let population: Vec<String> = material
+        .iter()
+        .map(|(identity, _)| identity.clone())
+        .collect();
     let graph = match contact_graph(&morphology, &population) {
         Ok(graph) => graph,
         Err(refusal) => {
@@ -194,8 +258,14 @@ fn main() {
         .iter()
         .filter(|t| t.euclidean == EuclideanRealization::Realized)
         .collect();
-    println!("  words {}   vertices {}   arcs {}   triangles {} ({} realizable)",
-        population.len(), graph.identifiers.len(), graph.arcs.len(), triangles.len(), realized.len());
+    println!(
+        "  words {}   vertices {}   arcs {}   triangles {} ({} realizable)",
+        population.len(),
+        graph.identifiers.len(),
+        graph.arcs.len(),
+        triangles.len(),
+        realized.len()
+    );
 
     // ---------------------------------------------------------------------------------------------
 
@@ -238,17 +308,29 @@ fn main() {
     hold(
         "the law separates seams from foundings rather than reporting one species",
         census.len() > 1,
-        format!("{} species over {} faces; {} faces found", census.len(), residuals.len(), founding.len()),
+        format!(
+            "{} species over {} faces; {} faces found",
+            census.len(),
+            residuals.len(),
+            founding.len()
+        ),
     );
 
     println!("\n  every branching face, named — these are the FOUND seams §V speaks of:");
-    for residual in residuals.iter().filter(|r| matches!(r.gluing, HingeGluing::Branching { .. })) {
+    for residual in residuals
+        .iter()
+        .filter(|r| matches!(r.gluing, HingeGluing::Branching { .. }))
+    {
         println!(
             "    {:<28} {} sides  hands {:?}  {:?}",
             format!("{}—{}", residual.edge.0, residual.edge.1),
             residual.cofaces.len(),
             residual.oriented_hands,
-            residual.cofaces.iter().map(|c| c.join("|")).collect::<Vec<_>>()
+            residual
+                .cofaces
+                .iter()
+                .map(|c| c.join("|"))
+                .collect::<Vec<_>>()
         );
     }
 
@@ -271,7 +353,10 @@ fn main() {
     hold(
         "every singular link is explained by a founding face at that vertex",
         explained == singular.len(),
-        format!("{explained} of {} singular links carry a founding face", singular.len()),
+        format!(
+            "{explained} of {} singular links carry a founding face",
+            singular.len()
+        ),
     );
 
     // ---------------------------------------------------------------------------------------------
@@ -286,14 +371,21 @@ fn main() {
         .count();
     println!("  rank 1 vertices        {}", rank_one.vertices.len());
     println!("  rank 1 arcs            {}", rank_one.arcs.len());
-    println!("  rank 1 triangles       {} ({} realizable)", above.len(), realized_above);
+    println!(
+        "  rank 1 triangles       {} ({} realizable)",
+        above.len(),
+        realized_above
+    );
 
     let roles = grain_roles(&triangles, &above);
     let promoted = roles
         .iter()
         .filter(|role| role.hinge_cofaces_above.unwrap_or(0) > 0)
         .count();
-    println!("\n  two-cells below that are curvature hinges above: {promoted} of {}", roles.len());
+    println!(
+        "\n  two-cells below that are curvature hinges above: {promoted} of {}",
+        roles.len()
+    );
     for role in roles.iter().take(8) {
         println!(
             "    {:<28} 2-cell {:?}   hinge cofaces above {:?}",
@@ -303,7 +395,10 @@ fn main() {
     hold(
         "THE GRAIN IS RELATIVE — a rank-0 two-cell is a rank-1 curvature hinge",
         promoted > 0,
-        format!("{promoted} of {} two-cells carry cofaces one grain up", roles.len()),
+        format!(
+            "{promoted} of {} two-cells carry cofaces one grain up",
+            roles.len()
+        ),
     );
 
     let deficits_above = hinge_deficits(&above);
@@ -325,9 +420,19 @@ fn main() {
         println!("  the curvature configuration refused on this incidence");
         std::process::exit(1);
     };
-    println!("  vertices {}   hinges {}", configuration.vertices().count(), configuration.hinges().count());
-    println!("  total deficit at unit response  {}", configuration.total_deficit());
-    println!("  deficit amplitude               {}", configuration.deficit_amplitude());
+    println!(
+        "  vertices {}   hinges {}",
+        configuration.vertices().count(),
+        configuration.hinges().count()
+    );
+    println!(
+        "  total deficit at unit response  {}",
+        configuration.total_deficit()
+    );
+    println!(
+        "  deficit amplitude               {}",
+        configuration.deficit_amplitude()
+    );
 
     let coefficients = [
         Rat::new(BigInt::from(0), BigInt::from(1)),
@@ -338,7 +443,10 @@ fn main() {
         Rat::new(BigInt::from(2), BigInt::from(1)),
     ];
 
-    println!("\n  {:<8} {:<12} {:<14} {}", "c", "1 − 2c", "species", "|Σ K| over the steps");
+    println!(
+        "\n  {:<8} {:<12} {:<14} {}",
+        "c", "1 − 2c", "species", "|Σ K| over the steps"
+    );
     let mut law_holds = true;
     let mut dissipated = false;
     let mut reflected = false;
@@ -364,8 +472,8 @@ fn main() {
             reflected = true;
             // The reflection's magnitude is constant; the sign alternates.
             let start = configuration.total_deficit();
-            let magnitude_held = carried.total_deficit() == start
-                || carried.total_deficit() == -start.clone();
+            let magnitude_held =
+                carried.total_deficit() == start || carried.total_deficit() == -start.clone();
             if !magnitude_held {
                 law_holds = false;
             }
@@ -381,7 +489,10 @@ fn main() {
     hold(
         "Σ K' = (1 − 2c) Σ K holds exactly at every declared coefficient, over every step",
         law_holds,
-        format!("{} coefficients × {FLOW_STEPS} steps, exact rationals", coefficients.len()),
+        format!(
+            "{} coefficients × {FLOW_STEPS} steps, exact rationals",
+            coefficients.len()
+        ),
     );
     hold(
         "the module's own derived c = 1 is the REFLECTION, and a dissipative c exists",
@@ -410,7 +521,10 @@ fn main() {
     // How many steps each coefficient needs to reach EXACT flatness, if it ever does. This is the
     // payoff the total alone cannot state: a flat configuration is a fixed point of the law on any
     // incidence, so reaching it is convergence in the strong sense and not an asymptote.
-    println!("\n  steps to EXACT flatness (every K(v) = 0), within {} steps:", FLOW_STEPS * 4);
+    println!(
+        "\n  steps to EXACT flatness (every K(v) = 0), within {} steps:",
+        FLOW_STEPS * 4
+    );
     for coefficient in &coefficients {
         let mut carried = configuration.clone();
         let mut reached = None;

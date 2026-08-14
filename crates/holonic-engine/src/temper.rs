@@ -408,7 +408,11 @@ mod tests {
         );
         let twist = Twist::read(&complex, &cochain, vertices[0], &whole(&edges)).expect("a read");
         assert!(!twist.may_condense());
-        assert_eq!(twist.leak(), BigInt::from(3), "the residual is |-5 - (-2)| = 3");
+        assert_eq!(
+            twist.leak(),
+            BigInt::from(3),
+            "the residual is |-5 - (-2)| = 3"
+        );
         let Twist::Open { obstructions, .. } = &twist else {
             panic!("expected an open coil, got {twist:?}");
         };
@@ -417,7 +421,10 @@ mod tests {
         // incident edges (e0 and e2) before crossing the ring, so e1 is what closes the cycle. The
         // leak's address is a property of the spanning tree, and pinning it here is what makes a
         // change in that walk visible rather than silent.
-        assert_eq!(obstructions[0].cell, edges[1], "the leak carries its address");
+        assert_eq!(
+            obstructions[0].cell, edges[1],
+            "the leak carries its address"
+        );
         // The obstruction is kept whole. The leak is a reading of it, never a replacement.
         assert_eq!(
             obstructions[0].declared.clone() - obstructions[0].implied.clone(),
@@ -521,7 +528,10 @@ mod tests {
         assert_eq!(quiet, closed, "an unchanged value is an unchanged cochain");
         let silent = Cochain::new(1);
         let spoken = found_on(&silent, edges[0], BigInt::zero());
-        assert!(silent.is_zero() && spoken.is_zero(), "both are zero cochains");
+        assert!(
+            silent.is_zero() && spoken.is_zero(),
+            "both are zero cochains"
+        );
         assert!(silent.assigns_nothing() && !spoken.assigns_nothing());
     }
 
@@ -540,7 +550,8 @@ mod tests {
             "a single tree edge closes no cycle; nothing was tested"
         );
         // And the contrast, on the same complex and the same cochain: the whole ring IS tested.
-        let over_all = Twist::read(&complex, &cochain, vertices[0], &whole(&edges)).expect("a read");
+        let over_all =
+            Twist::read(&complex, &cochain, vertices[0], &whole(&edges)).expect("a read");
         assert!(!over_all.closure_is_vacuous());
     }
 
@@ -557,7 +568,10 @@ mod tests {
             ],
         );
         let family = vec![
-            ("the tree".to_owned(), [edges[0], edges[1]].into_iter().collect()),
+            (
+                "the tree".to_owned(),
+                [edges[0], edges[1]].into_iter().collect(),
+            ),
             ("the ring".to_owned(), whole(&edges)),
         ];
         let tempered =
@@ -566,7 +580,11 @@ mod tests {
         let expanded = tempered.expanded();
         assert_eq!(expanded.len(), 1);
         assert_eq!(expanded[0].0, "the ring");
-        assert_eq!(expanded[0].1, BigInt::from(5), "|-11 - (-6)| = 5, named with its structure");
+        assert_eq!(
+            expanded[0].1,
+            BigInt::from(5),
+            "|-11 - (-6)| = 5, named with its structure"
+        );
         assert!(
             !expanded.is_empty() && !tempered.condensing().is_empty(),
             "both halves present: neither 'everything condenses' nor 'nothing does' can pass here"
@@ -588,7 +606,10 @@ mod tests {
         let ring_only = vec![("the ring".to_owned(), whole(&edges))];
         let with_a_tree = vec![
             ("the ring".to_owned(), whole(&edges)),
-            ("the tree".to_owned(), [edges[0], edges[1]].into_iter().collect()),
+            (
+                "the tree".to_owned(),
+                [edges[0], edges[1]].into_iter().collect(),
+            ),
         ];
         let alone = TemperedFamily::read(&complex, &cochain, vertices[0], &ring_only)
             .expect("a read")

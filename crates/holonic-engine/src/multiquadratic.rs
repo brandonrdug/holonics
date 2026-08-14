@@ -300,7 +300,11 @@ impl Multiquadratic {
     pub fn negated(&self) -> Self {
         Self {
             generators: self.generators.clone(),
-            coefficients: self.coefficients.iter().map(|value| -value.clone()).collect(),
+            coefficients: self
+                .coefficients
+                .iter()
+                .map(|value| -value.clone())
+                .collect(),
         }
     }
 
@@ -551,34 +555,55 @@ mod tests {
     #[test]
     fn a_root_squared_returns_to_the_rationals_exactly() {
         // The algebra closes: √3 · √3 = 3, with no generator left standing.
-        let root = Multiquadratic::square_root(&Rat::from_integer(BigInt::from(3)), DECLARED_KERNEL_BOUND).unwrap();
+        let root =
+            Multiquadratic::square_root(&Rat::from_integer(BigInt::from(3)), DECLARED_KERNEL_BOUND)
+                .unwrap();
         let squared = root.multiply(&root, APERTURE).unwrap();
-        assert_eq!(squared.as_rational(), Some(Rat::from_integer(BigInt::from(3))));
+        assert_eq!(
+            squared.as_rational(),
+            Some(Rat::from_integer(BigInt::from(3)))
+        );
         assert_eq!(squared.generators().len(), 0);
     }
 
     #[test]
     fn distinct_generators_multiply_into_the_joint_word() {
         // √2 · √3 = √6 as the {0,1} basis monomial, and squaring it returns 6.
-        let two = Multiquadratic::square_root(&Rat::from_integer(BigInt::from(2)), DECLARED_KERNEL_BOUND).unwrap();
-        let three = Multiquadratic::square_root(&Rat::from_integer(BigInt::from(3)), DECLARED_KERNEL_BOUND).unwrap();
+        let two =
+            Multiquadratic::square_root(&Rat::from_integer(BigInt::from(2)), DECLARED_KERNEL_BOUND)
+                .unwrap();
+        let three =
+            Multiquadratic::square_root(&Rat::from_integer(BigInt::from(3)), DECLARED_KERNEL_BOUND)
+                .unwrap();
         let product = two.multiply(&three, APERTURE).unwrap();
         assert_eq!(product.generators(), &[BigInt::from(2), BigInt::from(3)]);
         // the coefficient sits on the both-generators word, index 0b11
         assert_eq!(product.coefficients()[3], Rat::one());
         let squared = product.multiply(&product, APERTURE).unwrap();
-        assert_eq!(squared.as_rational(), Some(Rat::from_integer(BigInt::from(6))));
+        assert_eq!(
+            squared.as_rational(),
+            Some(Rat::from_integer(BigInt::from(6)))
+        );
     }
 
     #[test]
     fn a_square_radicand_reduces_rather_than_founding_a_redundant_generator() {
         // √12 must be 2√3, not a generator "12": otherwise 2√3 and √12 would compare unequal.
-        let twelve = Multiquadratic::square_root(&Rat::from_integer(BigInt::from(12)), DECLARED_KERNEL_BOUND).unwrap();
+        let twelve = Multiquadratic::square_root(
+            &Rat::from_integer(BigInt::from(12)),
+            DECLARED_KERNEL_BOUND,
+        )
+        .unwrap();
         assert_eq!(twelve.generators(), &[BigInt::from(3)]);
         assert_eq!(twelve.coefficients()[1], Rat::from_integer(BigInt::from(2)));
-        let three = Multiquadratic::square_root(&Rat::from_integer(BigInt::from(3)), DECLARED_KERNEL_BOUND).unwrap();
+        let three =
+            Multiquadratic::square_root(&Rat::from_integer(BigInt::from(3)), DECLARED_KERNEL_BOUND)
+                .unwrap();
         let doubled = three
-            .multiply(&Multiquadratic::rational(Rat::from_integer(BigInt::from(2))), APERTURE)
+            .multiply(
+                &Multiquadratic::rational(Rat::from_integer(BigInt::from(2))),
+                APERTURE,
+            )
             .unwrap();
         assert_eq!(twelve, doubled, "√12 and 2√3 must be the same element");
     }
@@ -615,7 +640,10 @@ mod tests {
         let composed_sine = cosine
             .multiply(&sine, APERTURE)
             .unwrap()
-            .multiply(&Multiquadratic::rational(Rat::from_integer(BigInt::from(2))), APERTURE)
+            .multiply(
+                &Multiquadratic::rational(Rat::from_integer(BigInt::from(2))),
+                APERTURE,
+            )
             .unwrap();
         assert_eq!(composed_cosine.as_rational(), Some(rat(-1, 2)));
         assert_eq!(composed_sine.generators(), &[BigInt::from(3)]);
@@ -637,12 +665,19 @@ mod tests {
     #[test]
     fn the_generator_aperture_is_a_real_resource_statement() {
         // The basis is 2^n wide, so exceeding the declared aperture is refused rather than held.
-        let two = Multiquadratic::square_root(&Rat::from_integer(BigInt::from(2)), DECLARED_KERNEL_BOUND).unwrap();
-        let three = Multiquadratic::square_root(&Rat::from_integer(BigInt::from(3)), DECLARED_KERNEL_BOUND).unwrap();
+        let two =
+            Multiquadratic::square_root(&Rat::from_integer(BigInt::from(2)), DECLARED_KERNEL_BOUND)
+                .unwrap();
+        let three =
+            Multiquadratic::square_root(&Rat::from_integer(BigInt::from(3)), DECLARED_KERNEL_BOUND)
+                .unwrap();
         let refusal = two.multiply(&three, 1);
         assert!(matches!(
             refusal,
-            Err(MultiquadraticRefusal::GeneratorApertureExhausted { generators: 2, aperture: 1 })
+            Err(MultiquadraticRefusal::GeneratorApertureExhausted {
+                generators: 2,
+                aperture: 1
+            })
         ));
     }
 }

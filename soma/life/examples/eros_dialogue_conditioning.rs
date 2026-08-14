@@ -40,8 +40,8 @@ use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
 use std::time::Instant;
 
-use life::text_material::{ExactTextMaterialCorpus, TextMaterialInput};
 use holonic_engine::conditioned_derivation::{expose, Exposure, FoundedMorphology};
+use life::text_material::{ExactTextMaterialCorpus, TextMaterialInput};
 
 /// Every Codex rollout on disk, in a stable order.
 fn codex_rollouts(root: &Path) -> Vec<PathBuf> {
@@ -99,8 +99,14 @@ fn main() {
 
     let claude = home.join(".claude/history.jsonl");
     if claude.exists() {
-        let bytes = std::fs::metadata(&claude).map(|meta| meta.len()).unwrap_or(0);
-        println!("  claude history        {:>5} octets  {}", bytes, claude.display());
+        let bytes = std::fs::metadata(&claude)
+            .map(|meta| meta.len())
+            .unwrap_or(0);
+        println!(
+            "  claude history        {:>5} octets  {}",
+            bytes,
+            claude.display()
+        );
         inputs.push(TextMaterialInput::ClaudeHistory(claude));
     }
 
@@ -175,17 +181,27 @@ fn main() {
 
     rule("THE ARTIFACT — what the dialogue corpus committed");
 
-    println!("  {containers} containers, {} stems founded, {} committed.\n", morphology.founded().len(), committed.len());
+    println!(
+        "  {containers} containers, {} stems founded, {} committed.\n",
+        morphology.founded().len(),
+        committed.len()
+    );
     let longest: Vec<&String> = {
         let mut by_length: Vec<&String> = committed.iter().collect();
         by_length.sort_by_key(|stem| (std::cmp::Reverse(stem.len()), (*stem).clone()));
         by_length.into_iter().take(40).collect()
     };
-    println!("  the forty longest committed stems — these are WORDS the corpus recurred, not letters:");
+    println!(
+        "  the forty longest committed stems — these are WORDS the corpus recurred, not letters:"
+    );
     for chunk in longest.chunks(6) {
         println!(
             "    {}",
-            chunk.iter().map(|stem| stem.as_str()).collect::<Vec<_>>().join("  ")
+            chunk
+                .iter()
+                .map(|stem| stem.as_str())
+                .collect::<Vec<_>>()
+                .join("  ")
         );
     }
 
@@ -193,12 +209,9 @@ fn main() {
 
     rule("THE ASCII APERTURE — what departed, counted rather than silent");
 
-    let corpus = ExactTextMaterialCorpus::import(
-        inputs.iter().take(containers).cloned().collect(),
-        &[],
-        2,
-    )
-    .expect("the rung imported once already");
+    let corpus =
+        ExactTextMaterialCorpus::import(inputs.iter().take(containers).cloned().collect(), &[], 2)
+            .expect("the rung imported once already");
     let passages = corpus.passages();
     let mut non_ascii_surfaces: BTreeSet<String> = BTreeSet::new();
     let mut non_ascii_octets = 0usize;
@@ -214,7 +227,10 @@ fn main() {
         "  `conditioned_derivation::expose` keeps only `is_ascii_alphabetic` runs, so every surface\n  \
          below departs before a stem can be founded from it.\n"
     );
-    println!("  distinct non-ASCII surfaces   {}", non_ascii_surfaces.len());
+    println!(
+        "  distinct non-ASCII surfaces   {}",
+        non_ascii_surfaces.len()
+    );
     println!("  octets they carry             {non_ascii_octets}");
     println!("  a sample, verbatim:");
     for surface in non_ascii_surfaces.iter().take(12) {
@@ -227,7 +243,9 @@ fn main() {
 
     rule("BOUNDS");
     println!("  - This driver conditions and reports. It does not generate: `generate` branches");
-    println!("    super-exponentially in its token aperture and belongs behind its own declared one.");
+    println!(
+        "    super-exponentially in its token aperture and belongs behind its own declared one."
+    );
     println!("  - Every figure has one frame; no timing here is falsifiable (`CLAUDE.md` §8).");
     println!("  - The morphology is the corpus's own: no stem is authored by this file.");
 }

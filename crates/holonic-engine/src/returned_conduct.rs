@@ -19,10 +19,10 @@ use serde::{Deserialize, Serialize};
 use crate::{
     algebraic::{CausalCellId, ComparativeMultiplicity},
     conditioned_derivation::{
-        found_conditioned_circuit, ConditionedBody, ConditionedCircuit,
-        ConditionedDerivationRefusal, DerivationQuery, DerivedPassage, Passage, PassageOrigin,
+        ConditionedBody, ConditionedCircuit, ConditionedDerivationRefusal, DerivationQuery,
+        DerivedPassage, Passage, PassageOrigin, found_conditioned_circuit,
     },
-    derivation_atlas::{route_movement, CircuitAperture, RouteMovement},
+    derivation_atlas::{CircuitAperture, RouteMovement, route_movement},
 };
 
 /// One member of a normalized cell boundary.
@@ -1787,10 +1787,12 @@ mod tests {
             ablated_production.returned().len() + 1,
             full_production.returned().len()
         );
-        assert!(ablated_production
-            .returned()
-            .iter()
-            .all(|route| route.site != target));
+        assert!(
+            ablated_production
+                .returned()
+                .iter()
+                .all(|route| route.site != target)
+        );
         for route in ablated_production.returned() {
             assert!(full_production.returned().contains(route));
         }
@@ -1865,10 +1867,12 @@ mod tests {
             .materialize(&fixture.body, &fixture.query)
             .expect("third turn");
         assert_eq!(second, third);
-        assert!(third
-            .returned()
-            .iter()
-            .all(|route| !route.passage.name.starts_with("returned_returned_")));
+        assert!(
+            third
+                .returned()
+                .iter()
+                .all(|route| !route.passage.name.starts_with("returned_returned_"))
+        );
         let mut sites = LocalSet::new();
         for route in third.returned() {
             sites.insert(route.site.to_owned());

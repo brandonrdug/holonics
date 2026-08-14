@@ -48,7 +48,8 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let start = Instant::now();
     let law = ArithmeticMonodromyLaw::with_horn_local_section_limit(1, HORN_LOCAL_SECTION_LIMIT)?;
-    let standing = ArithmeticMonodromyStanding::with_horn_local_section_limit(1, HORN_LOCAL_SECTION_LIMIT)?;
+    let standing =
+        ArithmeticMonodromyStanding::with_horn_local_section_limit(1, HORN_LOCAL_SECTION_LIMIT)?;
     let mut world = CausalWorld::new(law, standing);
     world.receive(&ArithmeticMonodromyEvent::InheritQuintic {
         event: PROBLEM_EVENT,
@@ -101,8 +102,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     }
     world.standing().validate()?;
 
-    let alternate_law = ArithmeticMonodromyLaw::with_horn_local_section_limit(1, HORN_LOCAL_SECTION_LIMIT)?;
-    let alternate_standing = ArithmeticMonodromyStanding::with_horn_local_section_limit(1, HORN_LOCAL_SECTION_LIMIT)?;
+    let alternate_law =
+        ArithmeticMonodromyLaw::with_horn_local_section_limit(1, HORN_LOCAL_SECTION_LIMIT)?;
+    let alternate_standing =
+        ArithmeticMonodromyStanding::with_horn_local_section_limit(1, HORN_LOCAL_SECTION_LIMIT)?;
     let mut alternate = CausalWorld::new(alternate_law, alternate_standing);
     admit_through(&mut alternate, limit)?;
     alternate.receive(&ArithmeticMonodromyEvent::InheritQuintic {

@@ -62,16 +62,15 @@ use std::path::PathBuf;
 
 use num_bigint::BigUint;
 
-use holonic_engine::corpus_census::{
-    CorpusCensus, DECLARED_STRATA, LexicalSpecies, SurfaceId,
-};
+use holonic_engine::corpus_census::{CorpusCensus, DECLARED_STRATA, LexicalSpecies, SurfaceId};
 use holonic_engine::founded_receiver::{FoundingRefusal, found_to_exhaustion};
 use holonic_engine::receiver_exact_compression::{
     InputId, ItemId, Observation, ObservedSystem, ReceiverId,
 };
 use holonic_engine::token_invariance::{
-    ConductAtlas, ConductSignature, ConductVerdict, ReceiverAxis, ReceiverFamily, SeparationReading,
-    cross_check_family, invariance_partition, reading, separation_reading, surface_residue, sweep,
+    ConductAtlas, ConductSignature, ConductVerdict, ReceiverAxis, ReceiverFamily,
+    SeparationReading, cross_check_family, invariance_partition, reading, separation_reading,
+    surface_residue, sweep,
 };
 
 /// **The horizon the conduct axis is founded at.** A caller's declaration; `ConductAtlas` holds no
@@ -106,7 +105,11 @@ fn main() {
     let root = std::env::args()
         .nth(1)
         .map(PathBuf::from)
-        .unwrap_or_else(|| PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("..").join(".."));
+        .unwrap_or_else(|| {
+            PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+                .join("..")
+                .join("..")
+        });
 
     let census = match CorpusCensus::read(&root) {
         Ok(census) => census,
@@ -174,7 +177,9 @@ fn main() {
     println!();
     let declared_population: Vec<SurfaceId> = EIGHT
         .into_iter()
-        .chain(["current", "passage", "residual", "holonic", "passages", "surface"])
+        .chain([
+            "current", "passage", "residual", "holonic", "passages", "surface",
+        ])
         .filter_map(|name| census.lookup(name))
         .collect();
     let flat = ConductAtlas::unfounded(&census, FOUNDING_HORIZON);
@@ -341,9 +346,7 @@ fn main() {
         surface_orbit && null_residue.is_redundant(),
         format!(
             "Res = {}, carried alone = {}; the unfounded null is redundant ({})",
-            residue.residue,
-            residue.carried_alone,
-            null_residue.residue
+            residue.residue, residue.carried_alone, null_residue.residue
         ),
     ));
 
@@ -505,7 +508,10 @@ fn main() {
          {:<22}orthographic panel splits them:                  {coarsened}",
         ""
     );
-    for (label, witness) in [("refinement", refined_witness), ("coarsening", coarsened_witness)] {
+    for (label, witness) in [
+        ("refinement", refined_witness),
+        ("coarsening", coarsened_witness),
+    ] {
         let Some(surface) = witness else {
             println!("    {label:<12} NO WITNESS -- this arm of the orbit is empty");
             continue;
@@ -539,12 +545,17 @@ fn main() {
     println!("THE THREE-WAY PARTITION, AND WHERE THE COLLAPSES NOW SIT");
     println!("--------------------------------------------------------");
     println!();
+    println!("  {:<26} {:>9}", "verdict at horizon 2", "surfaces");
     println!(
         "  {:<26} {:>9}",
-        "verdict at horizon 2", "surfaces"
+        "IRON, witnessed",
+        partition.witnessed_iron.len()
     );
-    println!("  {:<26} {:>9}", "IRON, witnessed", partition.witnessed_iron.len());
-    println!("  {:<26} {:>9}", "IRON, vacuous", partition.vacuously_iron.len());
+    println!(
+        "  {:<26} {:>9}",
+        "IRON, vacuous",
+        partition.vacuously_iron.len()
+    );
     println!(
         "  {:<26} {:>9}",
         "CONDUCT-INVARIANT",
@@ -556,7 +567,10 @@ fn main() {
     println!(
         "  The COMPLETE collapsing-family population. A family at zero is printed, not omitted.\n"
     );
-    println!("  {:<28} {:>9}   {}", "collapsing family", "surfaces", "axes the material MOVED");
+    println!(
+        "  {:<28} {:>9}   {}",
+        "collapsing family", "surfaces", "axes the material MOVED"
+    );
     let mut by_family: BTreeMap<ReceiverFamily, usize> = BTreeMap::new();
     for surface in &partition.conduct_invariant {
         if let ConductVerdict::ConductInvariant { collapsing, .. } =
@@ -609,7 +623,14 @@ fn main() {
         println!("  horizon {horizon}");
         println!(
             "  {:<12} {:>6} {:>8} {:>7} {:>8} {:>9} {:>9} {:>5}  {}",
-            "surface", "occ", "windows", "{kind}", "{weight}", "{density}", "{conduct}", "min",
+            "surface",
+            "occ",
+            "windows",
+            "{kind}",
+            "{weight}",
+            "{density}",
+            "{conduct}",
+            "min",
             "verdict"
         );
         for name in EIGHT {
@@ -630,7 +651,9 @@ fn main() {
                     }
                     format!("CONDUCT-INVARIANT at {collapsing}")
                 }
-                ConductVerdict::Varying { terminus_varies, .. } => {
+                ConductVerdict::Varying {
+                    terminus_varies, ..
+                } => {
                     if terminus_varies {
                         "varying (by TERMINUS -- no family can)".to_owned()
                     } else {
@@ -672,7 +695,9 @@ fn main() {
     );
     let conduct_alone = ReceiverFamily::of([ReceiverAxis::Conduct]);
     for name in EIGHT {
-        let Some(surface) = census.lookup(name).and_then(|id| reading.get(&id).map(|r| (id, r)))
+        let Some(surface) = census
+            .lookup(name)
+            .and_then(|id| reading.get(&id).map(|r| (id, r)))
         else {
             continue;
         };
@@ -881,9 +906,7 @@ fn main() {
 
 /// The surfaces whose maximal collapsing family contains `conduct` and holds **no** orthographic
 /// axis: a collapse no declared orthographic family could have made.
-fn moved_population(
-    reading: &BTreeMap<SurfaceId, SeparationReading>,
-) -> BTreeSet<SurfaceId> {
+fn moved_population(reading: &BTreeMap<SurfaceId, SeparationReading>) -> BTreeSet<SurfaceId> {
     reading
         .iter()
         .filter(|(_, row)| {
@@ -941,7 +964,11 @@ fn shuffled_null(census: &CorpusCensus) -> (CorpusCensus, ConductAtlas) {
         }
         // Whitespace separates and produces nothing, so joining with a space reproduces exactly
         // this token sequence under the declared tokenizer and merges nothing.
-        shuffled.admit_whole(whole.stratum, whole.relative_path.clone(), &tokens.join(" "));
+        shuffled.admit_whole(
+            whole.stratum,
+            whole.relative_path.clone(),
+            &tokens.join(" "),
+        );
     }
     let atlas = ConductAtlas::found(&shuffled, FOUNDING_HORIZON);
     (shuffled, atlas)

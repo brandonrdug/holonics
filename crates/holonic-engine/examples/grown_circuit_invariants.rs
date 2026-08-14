@@ -57,9 +57,9 @@ use holonic_engine::algebraic::{
     CausalCellId, CausalChain, ComparativeMultiplicity, GradedCausalComplex,
 };
 use holonic_engine::causal::EventId;
-use holonic_engine::dilation::{covering_horizon, dilate, euler_reading, Horizon, WalkOrder};
+use holonic_engine::dilation::{Horizon, WalkOrder, covering_horizon, dilate, euler_reading};
 use holonic_engine::rebase_invariants::{
-    invariants_agree, rebase_invariants, rebase_invariants_on, PivotRule, RebaseInvariants,
+    PivotRule, RebaseInvariants, invariants_agree, rebase_invariants, rebase_invariants_on,
 };
 
 // -------------------------------------------------------------------------------------------
@@ -181,7 +181,12 @@ fn grow(schedule: Schedule, depth: u32, split: u32, closure: Closure) -> Growth 
         for child in 0..split {
             let label = format!("{}.{child}", site.label);
             let vertex = complex
-                .found_cell(label.clone(), event(&mut counter), 0, CausalChain::default())
+                .found_cell(
+                    label.clone(),
+                    event(&mut counter),
+                    0,
+                    CausalChain::default(),
+                )
                 .expect("a vertex has no boundary");
             let mut boundary = CausalChain::default();
             boundary.add_term(vertex, ComparativeMultiplicity::positive(1u32));
@@ -379,13 +384,8 @@ fn dilation_sweep(holds: &mut Vec<(&'static str, bool, String)>) {
 
     for horizon in 0..=covering + 2 {
         for order in WalkOrder::ALL {
-            let section = dilate(
-                &growth.complex,
-                growth.root,
-                Horizon::Steps(horizon),
-                order,
-            )
-            .expect("a dilation from a founded focus resolves");
+            let section = dilate(&growth.complex, growth.root, Horizon::Steps(horizon), order)
+                .expect("a dilation from a founded focus resolves");
             let seen = rebase_invariants_on(
                 &growth.complex,
                 Some(section.support()),
@@ -456,7 +456,10 @@ fn dilation_sweep(holds: &mut Vec<(&'static str, bool, String)>) {
     holds.push((
         "DILATION above the covering horizon does not move the invariants",
         above_agree,
-        format!("covering {covering}, betti {:?}", above_settled.unwrap_or_default()),
+        format!(
+            "covering {covering}, betti {:?}",
+            above_settled.unwrap_or_default()
+        ),
     ));
     holds.push((
         "the walk order produced distinct charts above covering, so that is not a self-comparison",
@@ -498,9 +501,24 @@ fn main() {
 
     let mut holds: Vec<(&str, bool, String)> = Vec::new();
 
-    let tree = sweep("A grown tree (fallback= terminates every branch)", 3, 2, Closure::Tree);
-    let cyclic = sweep("The same growth with its frontier closed into a rim", 3, 2, Closure::Rim);
-    let wound = sweep("The same rim with a face attached to it TWICE", 3, 2, Closure::Wound);
+    let tree = sweep(
+        "A grown tree (fallback= terminates every branch)",
+        3,
+        2,
+        Closure::Tree,
+    );
+    let cyclic = sweep(
+        "The same growth with its frontier closed into a rim",
+        3,
+        2,
+        Closure::Rim,
+    );
+    let wound = sweep(
+        "The same rim with a face attached to it TWICE",
+        3,
+        2,
+        Closure::Wound,
+    );
 
     // -- the claim ---------------------------------------------------------------------------
 
@@ -533,7 +551,11 @@ fn main() {
         holds.push((
             "every schedule produced a DISTINCT chart, so the agreement is not a self-comparison",
             charts.len() == readings.len(),
-            format!("{name}: {} distinct layouts of {}", charts.len(), readings.len()),
+            format!(
+                "{name}: {} distinct layouts of {}",
+                charts.len(),
+                readings.len()
+            ),
         ));
 
         let same_size = readings.iter().all(|reading| reading.cells == first.cells);
@@ -550,7 +572,10 @@ fn main() {
         holds.push((
             "Euler characteristic from Betti numbers equals it from cell counts",
             euler,
-            format!("{name}: chi = {}", first.invariants.cell_euler_characteristic()),
+            format!(
+                "{name}: chi = {}",
+                first.invariants.cell_euler_characteristic()
+            ),
         ));
     }
 
@@ -653,7 +678,10 @@ fn main() {
     if failed == 0 {
         println!("HELD — {} declared controls, 0 failed", holds.len());
     } else {
-        println!("FAILED — {failed} of {} declared controls did not hold", holds.len());
+        println!(
+            "FAILED — {failed} of {} declared controls did not hold",
+            holds.len()
+        );
         std::process::exit(1);
     }
 }

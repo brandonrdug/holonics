@@ -14,11 +14,11 @@ use std::{
 };
 
 use body::num::Cog;
+use life::form_mouth::deposit_form_or_message;
 use life::resonance_ecology::{
     ResonanceConstituentRead, ResonanceEcology, ResonanceEcologyRestImage, ResonanceGerm,
     ResonanceOccurrence, ResonanceOccurrenceOrigin,
 };
-use life::form_mouth::deposit_form_or_message;
 use life::suffix_ecology::{ExactSuffixEcology, SuffixBranchSupport};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};

@@ -165,16 +165,16 @@ use serde::{Deserialize, Serialize};
 use crate::algebraic::{
     CausalAlgebraicError, CausalCellId, CausalChain, ComparativeMultiplicity, GradedCausalComplex,
 };
-use crate::derivation_atlas::{
-    found_circuit, CircuitAperture, Derivation, DerivationAtlasRefusal, DerivationCircuit,
-    SpanningForestReading, StatementIncidence,
-};
 use crate::derivation_atlas::statement_vertex_key;
+use crate::derivation_atlas::{
+    CircuitAperture, Derivation, DerivationAtlasRefusal, DerivationCircuit, SpanningForestReading,
+    StatementIncidence, found_circuit,
+};
 use crate::name_elaboration::{
     ConsequentClosure, Elaboration, ElaborationAperture, ElaborationDeposit, ElaborationRefusal,
     NameMeaning, RetainedCycle, STATEMENT_KEY_PREFIX,
 };
-use crate::rebase_invariants::{rebase_invariants, PivotRule, RebaseInvariants};
+use crate::rebase_invariants::{PivotRule, RebaseInvariants, rebase_invariants};
 
 /// Which half of a meaning a criterion reads. A comparison or a [`Crossing`] never carries
 /// [`Self::Both`]; only a criterion does.
@@ -496,7 +496,9 @@ impl ElaborationDisagreement {
     pub fn render(&self) -> String {
         let mut parts: Vec<String> = Vec::new();
         for (name, depth) in &self.contains_other_root {
-            parts.push(format!("{name} is a constituent at depth {depth} and a root at depth 0"));
+            parts.push(format!(
+                "{name} is a constituent at depth {depth} and a root at depth 0"
+            ));
         }
         for (name, (left, right)) in &self.depth_disagreement {
             parts.push(format!("{name} at depth {left} vs {right}"));
@@ -1014,7 +1016,6 @@ impl RouteFilling {
         }
         exact_rational_rank(&columns, basis.non_tree.len())
     }
-
 }
 
 /// Every derivation vertex to the symbols it recruits, read from the circuit's own 1-cells rather
@@ -1114,12 +1115,7 @@ pub fn fill_routes(
                 );
                 let every: BTreeMap<AgreementCriterion, bool> = AgreementCriterion::EVERY
                     .into_iter()
-                    .map(|declared| {
-                        (
-                            declared,
-                            agrees_under(&antecedent, &consequent, declared),
-                        )
-                    })
+                    .map(|declared| (declared, agrees_under(&antecedent, &consequent, declared)))
                     .collect();
                 let agrees = every[&criterion];
                 agreement.insert((statement.clone(), a.clone(), b.clone()), agrees);
@@ -1170,12 +1166,18 @@ pub fn fill_routes(
     let mut by_key: BTreeMap<(String, String, String, String), CausalCellId> = BTreeMap::new();
     for (statement, a, b, shared) in &agreeing {
         for symbol in shared {
-            let (Some(left_recruits), Some(right_recruits), Some(left_reaches), Some(right_reaches)) = (
+            let (
+                Some(left_recruits),
+                Some(right_recruits),
+                Some(left_reaches),
+                Some(right_reaches),
+            ) = (
                 circuit.recruitments().get(&(a.clone(), symbol.clone())),
                 circuit.recruitments().get(&(b.clone(), symbol.clone())),
                 circuit.reaches().get(&(a.clone(), statement.clone())),
                 circuit.reaches().get(&(b.clone(), statement.clone())),
-            ) else {
+            )
+            else {
                 continue;
             };
             let mut boundary = CausalChain::default();
@@ -1193,12 +1195,7 @@ pub fn fill_routes(
             let name = format!("[{a}={b}]@{symbol}|-{statement}");
             let cell = filled.found_cell(name.clone(), caused, 2, boundary)?;
             by_key.insert(
-                (
-                    statement.clone(),
-                    a.clone(),
-                    b.clone(),
-                    symbol.clone(),
-                ),
+                (statement.clone(), a.clone(), b.clone(), symbol.clone()),
                 cell,
             );
             squares.push(FilledSquare {
@@ -1525,9 +1522,15 @@ pub enum TwoCellRefusal {
     /// on and "two routes to one result" is not a question the reading can ask.
     StatementsWithheld,
     /// The declared square aperture was exceeded. The population is named rather than truncated.
-    SquarePopulationExceedsAperture { squares: usize, declared: usize },
+    SquarePopulationExceedsAperture {
+        squares: usize,
+        declared: usize,
+    },
     /// The declared triple aperture was exceeded.
-    TriplePopulationExceedsAperture { triples: usize, declared: usize },
+    TriplePopulationExceedsAperture {
+        triples: usize,
+        declared: usize,
+    },
     Elaboration(ElaborationRefusal),
     Atlas(DerivationAtlasRefusal),
     Algebra(CausalAlgebraicError),
@@ -1597,10 +1600,7 @@ mod tests {
         }
     }
 
-    fn fill(
-        derivations: &[Derivation],
-        criterion: AgreementCriterion,
-    ) -> RouteFilling {
+    fn fill(derivations: &[Derivation], criterion: AgreementCriterion) -> RouteFilling {
         fill_routes(
             derivations,
             CircuitAperture::STATEMENT_INCIDENT,
@@ -1657,8 +1657,14 @@ mod tests {
         assert_eq!(exact.squares().len(), 0);
         assert_eq!(exact.held_open().len(), 1);
         let held = &exact.held_open()[0];
-        assert_eq!(held.disagreement.only_left.keys().collect::<Vec<_>>(), vec!["only_alpha"]);
-        assert_eq!(held.disagreement.only_right.keys().collect::<Vec<_>>(), vec!["only_beta"]);
+        assert_eq!(
+            held.disagreement.only_left.keys().collect::<Vec<_>>(),
+            vec!["only_alpha"]
+        );
+        assert_eq!(
+            held.disagreement.only_right.keys().collect::<Vec<_>>(),
+            vec!["only_beta"]
+        );
         assert!(held.disagreement.depth_disagreement.is_empty());
         // The square it refused is named, not merely absent.
         assert_eq!(held.refused_symbols, BTreeSet::from(["shared".to_owned()]));
@@ -1733,8 +1739,12 @@ mod tests {
     #[test]
     fn filling_lowers_betti_one_and_both_populations_are_returned_beside_the_two_numbers() {
         let filling = fill(&identical_routes(), AgreementCriterion::Exact);
-        let before = filling.invariants_before(PivotRule::FirstNonzero).expect("reads");
-        let after = filling.invariants_after(PivotRule::FirstNonzero).expect("reads");
+        let before = filling
+            .invariants_before(PivotRule::FirstNonzero)
+            .expect("reads");
+        let after = filling
+            .invariants_after(PivotRule::FirstNonzero)
+            .expect("reads");
         // alpha, beta, shared, also, |- S  == 5 vertices; 4 recruitments + 2 reaches == 6 edges.
         assert_eq!(betti_at(&before, 1), 2);
         assert_eq!(betti_at(&after, 1), 0);
@@ -1748,8 +1758,12 @@ mod tests {
         for population in [identical_routes(), overlapping_routes(), nested_routes()] {
             for criterion in AgreementCriterion::DECLARED {
                 let filling = fill(&population, criterion);
-                let before = filling.invariants_before(PivotRule::FirstNonzero).expect("reads");
-                let after = filling.invariants_after(PivotRule::FirstNonzero).expect("reads");
+                let before = filling
+                    .invariants_before(PivotRule::FirstNonzero)
+                    .expect("reads");
+                let after = filling
+                    .invariants_after(PivotRule::FirstNonzero)
+                    .expect("reads");
                 let moved = betti_at(&before, 1) - betti_at(&after, 1);
                 assert_eq!(
                     moved,
@@ -1764,7 +1778,9 @@ mod tests {
     #[test]
     fn the_spanning_forest_and_the_smith_normal_form_agree_on_betti_one_before_filling() {
         let filling = fill(&overlapping_routes(), AgreementCriterion::OnOverlap);
-        let before = filling.invariants_before(PivotRule::FirstNonzero).expect("reads");
+        let before = filling
+            .invariants_before(PivotRule::FirstNonzero)
+            .expect("reads");
         assert_eq!(betti_at(&before, 1), filling.spanning_forest().betti_1());
     }
 
@@ -1825,10 +1841,14 @@ mod tests {
         assert_eq!(triple.verified_relations, triple.common_symbols);
 
         // The dependency is grade-2 homology, and a graph betti-1 cannot carry it.
-        let after = filling.invariants_after(PivotRule::FirstNonzero).expect("reads");
+        let after = filling
+            .invariants_after(PivotRule::FirstNonzero)
+            .expect("reads");
         assert_eq!(betti_at(&after, 2), 1);
         // Two of the three squares already killed everything the third could.
-        let before = filling.invariants_before(PivotRule::FirstNonzero).expect("reads");
+        let before = filling
+            .invariants_before(PivotRule::FirstNonzero)
+            .expect("reads");
         assert_eq!(betti_at(&before, 1) - betti_at(&after, 1), 2);
         assert_eq!(filling.independent_filling_rank(), 2);
     }
@@ -2049,8 +2069,12 @@ mod tests {
     fn a_constructed_crossing_is_a_meeting_neither_side_named_and_the_two_shapes_separate() {
         let deposit = ElaborationDeposit::read(&crossing_only_in_construction());
         let deep = compare(
-            &deposit.elaborate("alpha", ElaborationAperture::Exhausted).expect("declared"),
-            &deposit.elaborate("beta", ElaborationAperture::Exhausted).expect("declared"),
+            &deposit
+                .elaborate("alpha", ElaborationAperture::Exhausted)
+                .expect("declared"),
+            &deposit
+                .elaborate("beta", ElaborationAperture::Exhausted)
+                .expect("declared"),
         );
         assert!(deep.agrees(AgreementShape::Crossing));
         assert!(deep.agrees(AgreementShape::ConstructedCrossing));
@@ -2064,12 +2088,19 @@ mod tests {
         let shallow_population = overlapping_routes();
         let shallow_deposit = ElaborationDeposit::read(&shallow_population);
         let shallow = compare(
-            &shallow_deposit.elaborate("alpha", ElaborationAperture::Exhausted).expect("declared"),
-            &shallow_deposit.elaborate("beta", ElaborationAperture::Exhausted).expect("declared"),
+            &shallow_deposit
+                .elaborate("alpha", ElaborationAperture::Exhausted)
+                .expect("declared"),
+            &shallow_deposit
+                .elaborate("beta", ElaborationAperture::Exhausted)
+                .expect("declared"),
         );
         assert!(shallow.agrees(AgreementShape::Crossing));
         assert!(!shallow.agrees(AgreementShape::ConstructedCrossing));
-        assert_eq!(shallow.crossing.at_one_depth, BTreeMap::from([("shared".to_owned(), 1usize)]));
+        assert_eq!(
+            shallow.crossing.at_one_depth,
+            BTreeMap::from([("shared".to_owned(), 1usize)])
+        );
     }
 
     /// Two pairs whose two directions disagree in **opposite** ways. `alpha`/`beta` have identical
@@ -2089,7 +2120,10 @@ mod tests {
     fn two_routes_may_agree_on_antecedents_and_disagree_on_consequents_and_the_reverse() {
         // **Item 3, measured.** One reading, one deposit, both combinations present. Neither
         // direction is the other's refinement and neither is preferred.
-        let filling = fill(&both_directions_disagree_oppositely(), AgreementCriterion::Exact);
+        let filling = fill(
+            &both_directions_disagree_oppositely(),
+            AgreementCriterion::Exact,
+        );
 
         let same_recruitment = filling
             .pairs()
@@ -2100,10 +2134,12 @@ mod tests {
         assert!(!same_recruitment.agrees(AgreementCriterion::ConsequentExact));
         assert!(!same_recruitment.agrees(AgreementCriterion::BothExact));
         // And what differs upward is named: `alpha` is recruited and `beta` is not.
-        assert!(same_recruitment
-            .consequent
-            .only_left
-            .contains_key("cites_alpha"));
+        assert!(
+            same_recruitment
+                .consequent
+                .only_left
+                .contains_key("cites_alpha")
+        );
 
         let same_consequents = filling
             .pairs()
@@ -2146,7 +2182,10 @@ mod tests {
         // `CLAUDE.md` §8: a gauge whose group acts trivially on the declared material is not a
         // gauge. Here the orbit is exhibited rather than assumed -- four criteria, four different
         // admitted populations, from the pairs of ONE reading.
-        let filling = fill(&both_directions_disagree_oppositely(), AgreementCriterion::Exact);
+        let filling = fill(
+            &both_directions_disagree_oppositely(),
+            AgreementCriterion::Exact,
+        );
         let mut populations: BTreeSet<BTreeSet<(&str, &str, &str)>> = BTreeSet::new();
         for criterion in AgreementCriterion::EVERY {
             populations.insert(filling.admitted_by(criterion));
@@ -2161,14 +2200,19 @@ mod tests {
             filling.admitted_by(AgreementCriterion::Exact),
             filling.admitted_by(AgreementCriterion::ConsequentExact)
         );
-        assert!(filling
-            .admitted_by(AgreementCriterion::BothExact)
-            .is_empty());
+        assert!(
+            filling
+                .admitted_by(AgreementCriterion::BothExact)
+                .is_empty()
+        );
     }
 
     #[test]
     fn every_pair_carries_a_verdict_for_every_declared_criterion() {
-        let filling = fill(&both_directions_disagree_oppositely(), AgreementCriterion::OnOverlap);
+        let filling = fill(
+            &both_directions_disagree_oppositely(),
+            AgreementCriterion::OnOverlap,
+        );
         assert_eq!(filling.pairs().len(), filling.pairs_examined());
         for pair in filling.pairs() {
             assert_eq!(pair.verdicts.len(), AgreementCriterion::EVERY.len());
@@ -2181,10 +2225,7 @@ mod tests {
                 assert_eq!(
                     pair.agrees(AgreementCriterion::of(MeaningDirection::Both, shape)),
                     pair.agrees(AgreementCriterion::of(MeaningDirection::Antecedent, shape))
-                        && pair.agrees(AgreementCriterion::of(
-                            MeaningDirection::Consequent,
-                            shape
-                        ))
+                        && pair.agrees(AgreementCriterion::of(MeaningDirection::Consequent, shape))
                 );
             }
         }
@@ -2192,7 +2233,10 @@ mod tests {
 
     #[test]
     fn a_held_open_pair_returns_both_halves_whichever_half_refused_it() {
-        let filling = fill(&both_directions_disagree_oppositely(), AgreementCriterion::Exact);
+        let filling = fill(
+            &both_directions_disagree_oppositely(),
+            AgreementCriterion::Exact,
+        );
         let held = filling
             .held_open()
             .iter()
@@ -2220,8 +2264,12 @@ mod tests {
         ] {
             for criterion in AgreementCriterion::EVERY {
                 let filling = fill(&population, criterion);
-                let before = filling.invariants_before(PivotRule::FirstNonzero).expect("reads");
-                let after = filling.invariants_after(PivotRule::FirstNonzero).expect("reads");
+                let before = filling
+                    .invariants_before(PivotRule::FirstNonzero)
+                    .expect("reads");
+                let after = filling
+                    .invariants_after(PivotRule::FirstNonzero)
+                    .expect("reads");
                 let moved = betti_at(&before, 1) - betti_at(&after, 1);
                 assert_eq!(
                     moved,

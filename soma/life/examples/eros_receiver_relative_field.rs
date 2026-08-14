@@ -4,6 +4,7 @@ use std::path::PathBuf;
 use body::incidence::IncidenceHand;
 use body::manifold::FeltDeed;
 use body::num::Cog;
+use life::form_mouth::deposit_form_or_message;
 use serde::Serialize;
 use sha2::{Digest, Sha256};
 use soma_abi::active::{ActionCurrent, RelationAtom};
@@ -13,7 +14,6 @@ use soma_membrane::{
     LiveCurrentMachine, LiveCurrentRestImage, LiveMemory, ParallelHostLiveCurrentExecutor,
     RegionalRelationArc, RegionalRelationCell, SparseStandingSurface,
 };
-use life::form_mouth::deposit_form_or_message;
 
 /// This driver's name at the plate mouth: `output/eros_receiver_relative_field/<name>-<sha256>.form`.
 const FORM_DRIVER: &str = "eros_receiver_relative_field";

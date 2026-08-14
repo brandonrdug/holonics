@@ -51,11 +51,11 @@ use num_bigint::BigInt;
 use num_traits::Zero;
 use relational_geometry::Rat;
 
-use holonic_engine::spine_cut::{
-    classify_sink, name_the_cut, read_counted_transfers, AttentionHead, CountedTransfer, EdgeId,
-    SinkReading, SinkSpecies, SpineCut, SpineCutError,
-};
 use holonic_engine::VertexId;
+use holonic_engine::spine_cut::{
+    AttentionHead, CountedTransfer, EdgeId, SinkReading, SinkSpecies, SpineCut, SpineCutError,
+    classify_sink, name_the_cut, read_counted_transfers,
+};
 
 // -------------------------------------------------------------------------------------------------
 // a boundary codec: the receipts are JSON and this crate carries no JSON reader
@@ -124,8 +124,8 @@ impl<'a> Reader<'a> {
                         b'b' => out.push('\u{8}'),
                         b'f' => out.push('\u{c}'),
                         b'u' => {
-                            let hex = std::str::from_utf8(self.bytes.get(self.at..self.at + 4)?)
-                                .ok()?;
+                            let hex =
+                                std::str::from_utf8(self.bytes.get(self.at..self.at + 4)?).ok()?;
                             self.at += 4;
                             out.push(char::from_u32(u32::from_str_radix(hex, 16).ok()?)?);
                         }
@@ -202,7 +202,9 @@ impl<'a> Reader<'a> {
                     self.at += 1;
                 }
                 Some(Json::Number(
-                    std::str::from_utf8(&self.bytes[start..self.at]).ok()?.to_string(),
+                    std::str::from_utf8(&self.bytes[start..self.at])
+                        .ok()?
+                        .to_string(),
                 ))
             }
         }
@@ -380,7 +382,12 @@ fn rows() -> Vec<Row> {
             title: "the ablation",
             parts: vec![(
                 "routes after ablation",
-                vec!["attribution", "conduct", "all_ablation", "returned_routes_after"],
+                vec![
+                    "attribution",
+                    "conduct",
+                    "all_ablation",
+                    "returned_routes_after",
+                ],
             )],
             whole: ("returned routes", successor("returned_routes")),
             load: Load::Return,
@@ -391,7 +398,12 @@ fn rows() -> Vec<Row> {
             title: "after the ablation",
             parts: vec![(
                 "routes after ablation",
-                vec!["attribution", "conduct", "all_ablation", "returned_routes_after"],
+                vec![
+                    "attribution",
+                    "conduct",
+                    "all_ablation",
+                    "returned_routes_after",
+                ],
             )],
             whole: ("withdrawn cells", successor("withdrawn_cells")),
             load: Load::Return,
@@ -404,7 +416,10 @@ fn rows() -> Vec<Row> {
                 ("returned routes", successor("returned_routes")),
                 ("a population nobody sealed", conduct("no_such_population")),
             ],
-            whole: ("rest records", vec!["attribution", "conduct", "rest", "records"]),
+            whole: (
+                "rest records",
+                vec!["attribution", "conduct", "rest", "records"],
+            ),
             load: Load::Return,
             stored: None,
             why: "THE NEGATIVE CONTROL: an absent count must refuse, never arrive as a zero",
@@ -673,7 +688,11 @@ fn main() {
                                 row.stored.as_ref().map_or("", |(label, _)| label)
                             );
                         }
-                        if let SpineCut::ShortCircuit { bypass, declared_load } = &cut {
+                        if let SpineCut::ShortCircuit {
+                            bypass,
+                            declared_load,
+                        } = &cut
+                        {
                             println!(
                                 "  {:<38} {} edges carry, none of them the declared load {:?}",
                                 "",
@@ -711,7 +730,11 @@ fn main() {
                 "  no readable receipt pair under {} (grade {}, attribution {})",
                 root.display(),
                 if grade.is_some() { "found" } else { "absent" },
-                if attribution.is_some() { "found" } else { "absent" }
+                if attribution.is_some() {
+                    "found"
+                } else {
+                    "absent"
+                }
             );
             println!(
                 "  the addresses are content hashes and move on every re-seal; pass the directory \
@@ -730,8 +753,16 @@ fn main() {
     for (label, head, declared) in [
         ("nop sink", nop_head(), SinkSpecies::Nop),
         ("broadcast sink", broadcast_head(), SinkSpecies::Broadcast),
-        ("broadcast off the load", bypassing_head(), SinkSpecies::Broadcast),
-        ("hub emitting excess", imbalanced_head(), SinkSpecies::Broadcast),
+        (
+            "broadcast off the load",
+            bypassing_head(),
+            SinkSpecies::Broadcast,
+        ),
+        (
+            "hub emitting excess",
+            imbalanced_head(),
+            SinkSpecies::Broadcast,
+        ),
     ] {
         match print_head(label, &head, declared) {
             Some(true) => agreed += 1,
@@ -741,8 +772,16 @@ fn main() {
     }
     println!();
     println!("  -- the refusals, which are what make the four above evidence --");
-    print_head("broadcast declared nop", &broadcast_head(), SinkSpecies::Nop);
-    print_head("nop declared broadcast", &nop_head(), SinkSpecies::Broadcast);
+    print_head(
+        "broadcast declared nop",
+        &broadcast_head(),
+        SinkSpecies::Nop,
+    );
+    print_head(
+        "nop declared broadcast",
+        &nop_head(),
+        SinkSpecies::Broadcast,
+    );
     print_head("direct routing", &routing_head(), SinkSpecies::Broadcast);
 
     println!();

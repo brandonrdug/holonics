@@ -47,7 +47,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::algebraic::{CausalAlgebraicError, CausalCellId, GradedCausalComplex};
 use crate::rebase_invariants::{
-    rebase_invariants_with_schedule_on, PivotRule, RebaseInvariants, ReductionWork,
+    PivotRule, RebaseInvariants, ReductionWork, rebase_invariants_with_schedule_on,
 };
 
 /// Two fillings of one hole, and the boundary they share.
@@ -322,7 +322,10 @@ mod tests {
         let mut faces = Vec::new();
         for (at, (edge, multiplicity)) in attachments.iter().enumerate() {
             let mut boundary = CausalChain::default();
-            boundary.add_term(edges[*edge], ComparativeMultiplicity::positive(*multiplicity));
+            boundary.add_term(
+                edges[*edge],
+                ComparativeMultiplicity::positive(*multiplicity),
+            );
             faces.push(
                 complex
                     .found_cell(format!("f{at}"), source(), 2, boundary)
@@ -348,20 +351,28 @@ mod tests {
             after: BTreeSet::from([world.vertex, world.loops[0], world.faces[1]]),
         };
         let contexts = vec![BTreeSet::from([world.vertex])];
-        let reading =
-            read_substitution(&world.complex, &substitution, &contexts, PivotRule::FirstNonzero)
-                .unwrap();
+        let reading = read_substitution(
+            &world.complex,
+            &substitution,
+            &contexts,
+            PivotRule::FirstNonzero,
+        )
+        .unwrap();
 
         assert_eq!(reading.removed_extent, 1);
         assert_eq!(reading.added_extent, 1);
-        assert!(reading.compresses(), "{:?}", reading.distinguishing_contexts());
+        assert!(
+            reading.compresses(),
+            "{:?}",
+            reading.distinguishing_contexts()
+        );
     }
 
     /// Replacing a singly-attached face by a doubly-attached one is **not** a compression: the
     /// replacement deposits torsion the original did not carry, and the remainder names it.
     #[test]
     fn replacing_a_single_attachment_by_a_double_one_is_refused_and_the_remainder_names_the_torsion()
-    {
+     {
         let world = bouquet(1, &[(0, 1), (0, 2)]);
         let substitution = Substitution {
             boundary: BTreeSet::from([world.vertex, world.loops[0]]),
@@ -369,9 +380,13 @@ mod tests {
             after: BTreeSet::from([world.vertex, world.loops[0], world.faces[1]]),
         };
         let contexts = vec![BTreeSet::from([world.vertex])];
-        let reading =
-            read_substitution(&world.complex, &substitution, &contexts, PivotRule::FirstNonzero)
-                .unwrap();
+        let reading = read_substitution(
+            &world.complex,
+            &substitution,
+            &contexts,
+            PivotRule::FirstNonzero,
+        )
+        .unwrap();
 
         assert!(!reading.compresses());
         assert_eq!(reading.distinguishing_contexts(), vec![0]);
@@ -416,7 +431,10 @@ mod tests {
             !reading.verdicts[1].invariant_here(),
             "with the first loop already in context they do not"
         );
-        assert!(!reading.compresses(), "one distinguishing context is enough to refuse");
+        assert!(
+            !reading.compresses(),
+            "one distinguishing context is enough to refuse"
+        );
         assert_eq!(reading.distinguishing_contexts(), vec![1]);
     }
 

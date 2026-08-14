@@ -65,8 +65,8 @@ use holonic_engine::exact_value::ieee754::{
     decode_f32, decode_f64, encode_f32, encode_f64,
 };
 use holonic_engine::reopening::{
-    CertifiedBits, DeclaredGrain, ExactFace, Reopening, ReopeningError,
-    ReopeningVerdict, dyadic_scale, finest_admissible_grain, probe_at_grain, reopen,
+    CertifiedBits, DeclaredGrain, ExactFace, Reopening, ReopeningError, ReopeningVerdict,
+    dyadic_scale, finest_admissible_grain, probe_at_grain, reopen,
 };
 use relational_geometry::exact::{Rat, integer};
 use relational_geometry::exact_analysis::log_rational_interval;
@@ -174,9 +174,21 @@ const DECLARED_BFLOAT16: [(&str, u16); 4] = [
 
 /// The patterns that name no ratio and must be refused by name rather than mapped to a sentinel.
 const DECLARED_REFUSALS: [(&str, BinaryFloatSpecies, u64); 7] = [
-    ("+infinity", BinaryFloatSpecies::Binary64, 0x7ff0_0000_0000_0000),
-    ("-infinity", BinaryFloatSpecies::Binary64, 0xfff0_0000_0000_0000),
-    ("a quiet NaN", BinaryFloatSpecies::Binary64, 0x7ff8_0000_0000_0000),
+    (
+        "+infinity",
+        BinaryFloatSpecies::Binary64,
+        0x7ff0_0000_0000_0000,
+    ),
+    (
+        "-infinity",
+        BinaryFloatSpecies::Binary64,
+        0xfff0_0000_0000_0000,
+    ),
+    (
+        "a quiet NaN",
+        BinaryFloatSpecies::Binary64,
+        0x7ff8_0000_0000_0000,
+    ),
     (
         "a signalling NaN",
         BinaryFloatSpecies::Binary64,
@@ -281,15 +293,15 @@ fn safetensors_extent(
     }
     let record = &rest[..close];
 
-    let dtype = scan_string(record, "dtype")
-        .ok_or_else(|| format!("tensor {tensor} declares a dtype"))?;
+    let dtype =
+        scan_string(record, "dtype").ok_or_else(|| format!("tensor {tensor} declares a dtype"))?;
     if dtype != expected_dtype {
         return Err(format!(
             "tensor {tensor} is {dtype} and this reader was declared for {expected_dtype}"
         ));
     }
-    let shape = scan_numbers(record, "shape")
-        .ok_or_else(|| format!("tensor {tensor} declares a shape"))?;
+    let shape =
+        scan_numbers(record, "shape").ok_or_else(|| format!("tensor {tensor} declares a shape"))?;
     let offsets = scan_numbers(record, "data_offsets")
         .ok_or_else(|| format!("tensor {tensor} declares data offsets"))?;
     if offsets.len() != 2 {
@@ -511,7 +523,11 @@ fn report_verdict(reopening: &Reopening) {
             );
         }
     }
-    let refuted = reopening.probes.iter().filter(|probe| probe.refuted).count();
+    let refuted = reopening
+        .probes
+        .iter()
+        .filter(|probe| probe.refuted)
+        .count();
     println!(
         "    {} probes, {refuted} refuted by the faces' own enclosures",
         reopening.probes.len()
@@ -621,7 +637,10 @@ fn control_the_mouth_refuses_and_admits() -> bool {
             true
         }
         Err(other) => {
-            println!("    at grain 2^{}: refused, but not by the aperture law: {other}", ceiling + 1);
+            println!(
+                "    at grain 2^{}: refused, but not by the aperture law: {other}",
+                ceiling + 1
+            );
             false
         }
         Ok(_) => {
@@ -655,7 +674,10 @@ fn control_the_mouth_refuses_and_admits() -> bool {
         .map(|(face, _)| face)
         .collect();
     println!();
-    report_faces("the same three patterns read as EXACT BIT PATTERNS", &points);
+    report_faces(
+        "the same three patterns read as EXACT BIT PATTERNS",
+        &points,
+    );
     let deep = probe_at_grain(&points, DeclaredGrain::bits(4096)).is_ok();
     println!(
         "    at grain 2^4096: {}",
@@ -739,7 +761,10 @@ fn control_the_decode_is_a_bijection() -> bool {
         match decode_bits(species, bits) {
             Err(error) => println!("    {:<9} {name:<34} refused: {error}", species.name()),
             Ok(_) => {
-                println!("    {:<9} {name:<34} ACCEPTED -- and it must not be", species.name());
+                println!(
+                    "    {:<9} {name:<34} ACCEPTED -- and it must not be",
+                    species.name()
+                );
                 held = false;
             }
         }
@@ -779,15 +804,18 @@ fn open_real_material() -> Vec<RealMaterial> {
             );
             continue;
         };
-        let extent =
-            match safetensors_extent(&path, artifact.tensor, artifact.dtype, artifact.element_bytes)
-            {
-                Ok(extent) => extent,
-                Err(error) => {
-                    println!("    {}: {error}", artifact.label);
-                    continue;
-                }
-            };
+        let extent = match safetensors_extent(
+            &path,
+            artifact.tensor,
+            artifact.dtype,
+            artifact.element_bytes,
+        ) {
+            Ok(extent) => extent,
+            Err(error) => {
+                println!("    {}: {error}", artifact.label);
+                continue;
+            }
+        };
         let coordinates: Vec<u64> = (0..4).collect();
         let words = match read_words(&path, &extent, artifact.element_bytes, &coordinates) {
             Ok(words) => words,
@@ -828,7 +856,9 @@ fn control_the_organ_on_real_material(material: &[RealMaterial]) -> bool {
     println!("   Trained network weights, read straight out of safetensors payloads by the reader");
     println!("   shape of soma/life/examples/eros_self_emanated_law.rs. Nobody chose these words;");
     println!("   they are the residue of an optimisation over real data.\n");
-    println!("   A stored weight is read as an EXACT BIT PATTERN, because it is one: the number in");
+    println!(
+        "   A stored weight is read as an EXACT BIT PATTERN, because it is one: the number in"
+    );
     println!("   the file IS m*2^e and nothing rounded it at this boundary.\n");
 
     if material.is_empty() {
@@ -854,7 +884,10 @@ fn control_the_organ_on_real_material(material: &[RealMaterial]) -> bool {
             source.digest
         );
         for (index, datum) in source.data.iter().enumerate() {
-            println!("      {}", describe_datum(&format!("weight[{index}]"), datum));
+            println!(
+                "      {}",
+                describe_datum(&format!("weight[{index}]"), datum)
+            );
         }
 
         for width in [3usize, 4usize] {
@@ -1018,7 +1051,9 @@ fn control_the_negative_control_survives() -> bool {
 
 fn control_the_distinction_is_load_bearing(material: &[RealMaterial]) -> bool {
     println!("-- control 5: the distinction is load-bearing, not decorative --\n");
-    println!("   The SAME bits, admitted as a point and as an enclosure. If the two readings never");
+    println!(
+        "   The SAME bits, admitted as a point and as an enclosure. If the two readings never"
+    );
     println!("   differ, the type distinction added here is doing no work and this driver must");
     println!("   say so rather than claim a mechanism it does not have.\n");
 
@@ -1067,9 +1102,7 @@ fn control_the_distinction_is_load_bearing(material: &[RealMaterial]) -> bool {
             return false;
         }
     };
-    println!(
-        "\n    as measurements the ceiling is 2^{ceiling}; the grains the patterns used are"
-    );
+    println!("\n    as measurements the ceiling is 2^{ceiling}; the grains the patterns used are");
     println!("    refused by name:");
     match probe_at_grain(&measurements, point_grains[0]) {
         Err(error) => println!("      {error}"),
@@ -1078,7 +1111,10 @@ fn control_the_distinction_is_load_bearing(material: &[RealMaterial]) -> bool {
             return false;
         }
     }
-    let measured_grains = [DeclaredGrain::bits(ceiling - 1), DeclaredGrain::bits(ceiling)];
+    let measured_grains = [
+        DeclaredGrain::bits(ceiling - 1),
+        DeclaredGrain::bits(ceiling),
+    ];
     println!(
         "\n    as measurements, grains 2^{} / 2^{ceiling} (the finest the ulps allow):",
         ceiling - 1
@@ -1099,7 +1135,9 @@ fn control_the_distinction_is_load_bearing(material: &[RealMaterial]) -> bool {
             "    The same {} bits carry an exact integer relation when the file's number is",
             width as u32 * source.data[0].species.width_bits()
         );
-        println!("    taken to be the datum, and carry nothing when it is taken to be a rounding of");
+        println!(
+            "    taken to be the datum, and carry nothing when it is taken to be a rounding of"
+        );
         println!("    something else. The reading is the object, not a label on it.");
     } else {
         println!("    The two readings agreed. On this material the distinction is doing no work,");
@@ -1114,11 +1152,15 @@ fn control_the_distinction_is_load_bearing(material: &[RealMaterial]) -> bool {
 
 fn main() {
     println!("== a float is a dyadic and a deleted tail ==\n");
-    println!("A float is not a bad approximation of a ratio. It is the ratio's series expansion in");
+    println!(
+        "A float is not a bad approximation of a ratio. It is the ratio's series expansion in"
+    );
     println!("base two, TRUNCATED, with the remainder discarded -- and the truncated expansion is");
     println!("itself exact: an IEEE-754 value is precisely m*2^e over the integers. What was");
     println!("destroyed is the tail, and the tail is exactly one unit in the last place wide.\n");
-    println!("So the honest face of a float is a POINT or an ENCLOSURE of width one ulp, and which");
+    println!(
+        "So the honest face of a float is a POINT or an ENCLOSURE of width one ulp, and which"
+    );
     println!("one it is is NOT a property of the bits. It is a declaration the caller must make,");
     println!("and reopening.rs's admission law separates the two without a new rule.\n");
     println!("The float enters at exact_value::ieee754 and nowhere else: four functions, each one");
@@ -1161,7 +1203,10 @@ fn main() {
         ("4  the negative control survives the mouth", four),
         ("5  point and enclosure give different verdicts", five),
     ] {
-        println!("   control {label:<48} {}", if held { "HELD" } else { "FAILED" });
+        println!(
+            "   control {label:<48} {}",
+            if held { "HELD" } else { "FAILED" }
+        );
     }
     println!();
 

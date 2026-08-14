@@ -197,7 +197,10 @@ impl std::fmt::Display for StructureGroupRefusal {
         match self {
             Self::NoGeneratorDeclared => write!(formatter, "no generator was declared"),
             Self::CarriersDisagree => {
-                write!(formatter, "the declared generators do not share one carrier")
+                write!(
+                    formatter,
+                    "the declared generators do not share one carrier"
+                )
             }
             Self::ProductLeftTheCarrier => write!(
                 formatter,
@@ -208,16 +211,28 @@ impl std::fmt::Display for StructureGroupRefusal {
                 "the closure reached {reached} elements past the caller's bound of {bound}"
             ),
             Self::ElementIsNotInTheGroup => {
-                write!(formatter, "an edge carries an element outside the declared group")
+                write!(
+                    formatter,
+                    "an edge carries an element outside the declared group"
+                )
             }
             Self::WalkNamesAnUncarriedEdge(edge) => {
-                write!(formatter, "the walk names edge {edge:?}, which the connection does not carry")
+                write!(
+                    formatter,
+                    "the walk names edge {edge:?}, which the connection does not carry"
+                )
             }
             Self::CentreIsNotAnInvolution => {
-                write!(formatter, "the declared centre element is not central of order two")
+                write!(
+                    formatter,
+                    "the declared centre element is not central of order two"
+                )
             }
             Self::CoverIsNotDouble { kernel_order } => {
-                write!(formatter, "the cover's kernel has order {kernel_order}, not 2")
+                write!(
+                    formatter,
+                    "the cover's kernel has order {kernel_order}, not 2"
+                )
             }
         }
     }
@@ -275,7 +290,11 @@ impl StructureGroup {
                 }
             }
         }
-        Ok(Self { elements, generators, identity })
+        Ok(Self {
+            elements,
+            generators,
+            identity,
+        })
     }
 
     pub fn order(&self) -> usize {
@@ -302,9 +321,9 @@ impl StructureGroup {
     /// group can do anything an integer holonomy cannot, and it is checked rather than assumed.
     pub fn is_abelian(&self) -> bool {
         self.elements.iter().all(|left| {
-            self.elements.iter().all(|right| {
-                left.then(right) == right.then(left)
-            })
+            self.elements
+                .iter()
+                .all(|right| left.then(right) == right.then(left))
         })
     }
 
@@ -347,10 +366,7 @@ impl StructureGroup {
         element: &GroupElement,
         derived: &BTreeSet<GroupElement>,
     ) -> Option<GroupElement> {
-        derived
-            .iter()
-            .filter_map(|d| element.then(d))
-            .min()
+        derived.iter().filter_map(|d| element.then(d)).min()
     }
 
     /// The conjugacy class of `element`, named by its least member.
@@ -385,15 +401,24 @@ pub struct OrientedEdge {
 
 impl OrientedEdge {
     pub const fn forward(edge: u64) -> Self {
-        Self { edge, forward: true }
+        Self {
+            edge,
+            forward: true,
+        }
     }
 
     pub const fn backward(edge: u64) -> Self {
-        Self { edge, forward: false }
+        Self {
+            edge,
+            forward: false,
+        }
     }
 
     pub const fn reversed(self) -> Self {
-        Self { edge: self.edge, forward: !self.forward }
+        Self {
+            edge: self.edge,
+            forward: !self.forward,
+        }
     }
 }
 
@@ -477,7 +502,10 @@ impl StructureConnection {
     }
 
     /// The basepoint-free invariant of a declared cycle.
-    pub fn holonomy_class(&self, walk: &[OrientedEdge]) -> Result<GroupElement, StructureGroupRefusal> {
+    pub fn holonomy_class(
+        &self,
+        walk: &[OrientedEdge],
+    ) -> Result<GroupElement, StructureGroupRefusal> {
         let element = self.holonomy(walk)?;
         self.group
             .conjugacy_class(&element)
@@ -499,7 +527,12 @@ impl StructureConnection {
             .group
             .abelianized_class(&holonomy, derived)
             .ok_or(StructureGroupRefusal::ProductLeftTheCarrier)?;
-        Ok(CycleReturn { is_trivial: holonomy.is_identity(), holonomy, class, abelianized })
+        Ok(CycleReturn {
+            is_trivial: holonomy.is_identity(),
+            holonomy,
+            class,
+            abelianized,
+        })
     }
 
     /// **The curvature `a ∧ a`, as a return rather than a flag.**
@@ -620,7 +653,9 @@ impl CentralDoubleCover {
         }
         let kernel = BTreeSet::from([total.identity().clone(), centre.clone()]);
         if kernel.len() != 2 {
-            return Err(StructureGroupRefusal::CoverIsNotDouble { kernel_order: kernel.len() });
+            return Err(StructureGroupRefusal::CoverIsNotDouble {
+                kernel_order: kernel.len(),
+            });
         }
         Ok(Self { total, centre })
     }
@@ -766,7 +801,10 @@ mod tests {
         for group in [alternating_five(), quaternion_eight(), cyclic_five()] {
             for element in group.elements() {
                 let inverse = element.inverse().expect("an inverse exists");
-                assert!(group.contains(&inverse), "the closure is closed under inverse");
+                assert!(
+                    group.contains(&inverse),
+                    "the closure is closed under inverse"
+                );
                 assert!(
                     element.then(&inverse).expect("composes").is_identity(),
                     "g g^-1 = e"
@@ -797,10 +835,7 @@ mod tests {
         let j = GroupElement::Quaternion([0, 0, 1, 0]);
         let minus_one = GroupElement::Quaternion([-1, 0, 0, 0]);
         assert_eq!(group.commutator(&i, &j), Some(minus_one.clone()));
-        assert!(group
-            .commutator(&i, &i)
-            .expect("composes")
-            .is_identity());
+        assert!(group.commutator(&i, &i).expect("composes").is_identity());
         // ijk = -1, the defining relation, so the carrier is Q_8 and not something that merely has
         // eight elements.
         let k = GroupElement::Quaternion([0, 0, 0, 1]);
@@ -809,15 +844,14 @@ mod tests {
 
     /// Two triangles sharing an edge. The connection carries `i` and `j` on the two chords, so the
     /// two loops' holonomies do not commute.
-    fn two_loops_over(group: StructureGroup, left: GroupElement, right: GroupElement)
-        -> (StructureConnection, Vec<Vec<OrientedEdge>>) {
+    fn two_loops_over(
+        group: StructureGroup,
+        left: GroupElement,
+        right: GroupElement,
+    ) -> (StructureConnection, Vec<Vec<OrientedEdge>>) {
         let connection = StructureConnection::declare(
             group.clone(),
-            [
-                (0, left),
-                (1, right),
-                (2, group.identity().clone()),
-            ],
+            [(0, left), (1, right), (2, group.identity().clone())],
         )
         .expect("declares");
         let cycles = vec![
@@ -851,18 +885,19 @@ mod tests {
         let rotation = GroupElement::Permutation(vec![1, 2, 3, 4, 0]);
         let twice = rotation.then(&rotation).expect("composes");
         let (connection, cycles) = two_loops_over(group, rotation, twice);
-        assert!(connection
-            .curvature_commutator(&cycles[0], &cycles[1])
-            .expect("composes")
-            .is_identity());
+        assert!(
+            connection
+                .curvature_commutator(&cycles[0], &cycles[1])
+                .expect("composes")
+                .is_identity()
+        );
     }
 
     #[test]
     fn reversing_a_walk_inverts_its_holonomy_and_the_hand_is_not_stored_twice() {
         let group = quaternion_eight();
         let i = GroupElement::Quaternion([0, 1, 0, 0]);
-        let connection =
-            StructureConnection::declare(group, [(0, i.clone())]).expect("declares");
+        let connection = StructureConnection::declare(group, [(0, i.clone())]).expect("declares");
         let forward = connection
             .holonomy(&[OrientedEdge::forward(0)])
             .expect("composes");
@@ -870,10 +905,7 @@ mod tests {
             .holonomy(&[OrientedEdge::backward(0)])
             .expect("composes");
         assert_eq!(backward, i.inverse().expect("inverts"));
-        assert!(forward
-            .then(&backward)
-            .expect("composes")
-            .is_identity());
+        assert!(forward.then(&backward).expect("composes").is_identity());
     }
 
     /// **The falsifier, on non-abelian material — and the population it returns is the spin pair.**
@@ -911,7 +943,10 @@ mod tests {
             .collect();
         assert!(readings[0].is_trivial);
         assert!(!readings[1].is_trivial);
-        assert_eq!(readings[1].holonomy, GroupElement::Quaternion([-1, 0, 0, 0]));
+        assert_eq!(
+            readings[1].holonomy,
+            GroupElement::Quaternion([-1, 0, 0, 0])
+        );
 
         let separated = connection
             .separating_pairs(&cycles, &derived)
@@ -927,12 +962,12 @@ mod tests {
         );
 
         // And the same two cycles at the cover: closed, against returning the centre.
-        let cover = CentralDoubleCover::declare(
-            group,
-            GroupElement::Quaternion([-1, 0, 0, 0]),
-        )
-        .expect("declares");
-        assert_eq!(cover.lift(&readings[0].holonomy).expect("lifts"), Lift::Closed);
+        let cover = CentralDoubleCover::declare(group, GroupElement::Quaternion([-1, 0, 0, 0]))
+            .expect("declares");
+        assert_eq!(
+            cover.lift(&readings[0].holonomy).expect("lifts"),
+            Lift::Closed
+        );
         assert_eq!(
             cover.lift(&readings[1].holonomy).expect("lifts"),
             Lift::ReturnsCentre
@@ -946,7 +981,11 @@ mod tests {
     fn an_abelian_group_separates_nothing_because_there_is_nothing_to_separate() {
         let group = cyclic_five();
         let derived = group.commutator_subgroup().expect("closes");
-        assert_eq!(derived.len(), 1, "an abelian group has trivial derived subgroup");
+        assert_eq!(
+            derived.len(),
+            1,
+            "an abelian group has trivial derived subgroup"
+        );
         let rotation = GroupElement::Permutation(vec![1, 2, 3, 4, 0]);
         let connection = StructureConnection::declare(
             group,
@@ -960,10 +999,12 @@ mod tests {
             vec![OrientedEdge::forward(0)],
             vec![OrientedEdge::forward(1)],
         ];
-        assert!(connection
-            .separating_pairs(&cycles, &derived)
-            .expect("reads")
-            .is_empty());
+        assert!(
+            connection
+                .separating_pairs(&cycles, &derived)
+                .expect("reads")
+                .is_empty()
+        );
     }
 
     #[test]
@@ -1021,7 +1062,11 @@ mod tests {
             .filter_map(|element| cover.project(element))
             .collect();
         assert_eq!(cover.total().order(), 8);
-        assert_eq!(below.len(), 4, "Q_8 / {{+-1}} has order four — the Klein group");
+        assert_eq!(
+            below.len(),
+            4,
+            "Q_8 / {{+-1}} has order four — the Klein group"
+        );
     }
 
     /// The conjugacy class does not move when the loop is re-based, and the raw holonomy does.

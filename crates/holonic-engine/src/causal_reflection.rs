@@ -325,8 +325,7 @@ impl ExactResponseFace {
         };
         let extent = face.half_extent as i64;
         for index in 1..=extent {
-            let violation =
-                face.value(index) - signed(&face.value(-index), parity.mirror_sign());
+            let violation = face.value(index) - signed(&face.value(-index), parity.mirror_sign());
             if !violation.is_zero() {
                 return Err(CausalReflectionError::FaceParityViolated {
                     parity,
@@ -1069,8 +1068,9 @@ impl FourPointSpectralReflection {
             })
         });
 
-        let derived_absorptive: [Rat; 4] =
-            std::array::from_fn(|k| halved(dispersive[(k + 1) % 4].clone() - &dispersive[(k + 3) % 4]));
+        let derived_absorptive: [Rat; 4] = std::array::from_fn(|k| {
+            halved(dispersive[(k + 1) % 4].clone() - &dispersive[(k + 3) % 4])
+        });
         let absorptive_residual: [Rat; 4] =
             std::array::from_fn(|k| &absorptive[k] - &derived_absorptive[k]);
 
@@ -1158,7 +1158,10 @@ mod tests {
     /// the absorptive reading is *not* blind on this material. Retained as the control that shows
     /// the blindness in [`causal_tail`] is a property of the response, not of the reflection.
     fn causal_without_instantaneous() -> CausalResponse {
-        response(3, &[(0, 1), (0, 1), (0, 1), (0, 1), (4, 1), (-1, 3), (2, 1)])
+        response(
+            3,
+            &[(0, 1), (0, 1), (0, 1), (0, 1), (4, 1), (-1, 3), (2, 1)],
+        )
     }
 
     /// `M = 3`. **Not** causal: one nonzero value at `n = -2`.
@@ -1172,7 +1175,10 @@ mod tests {
     /// `M = 3`. Not causal, and **even**: `h[-n] = h[n]`. The symmetric-fixture trap named in the
     /// brief — its absorptive face is identically zero, and it must still be refused.
     fn even_response() -> CausalResponse {
-        response(3, &[(2, 1), (-1, 1), (3, 1), (5, 1), (3, 1), (-1, 1), (2, 1)])
+        response(
+            3,
+            &[(2, 1), (-1, 1), (3, 1), (5, 1), (3, 1), (-1, 1), (2, 1)],
+        )
     }
 
     /// `M = 3`. Not causal, and **odd**: its dispersive face is identically zero.
@@ -1197,7 +1203,10 @@ mod tests {
     fn every_fixture() -> Vec<(&'static str, CausalResponse)> {
         vec![
             ("causal_tail", causal_tail()),
-            ("causal_without_instantaneous", causal_without_instantaneous()),
+            (
+                "causal_without_instantaneous",
+                causal_without_instantaneous(),
+            ),
             ("advanced_leak", advanced_leak()),
             ("even_response", even_response()),
             ("odd_response", odd_response()),
@@ -1223,7 +1232,9 @@ mod tests {
         })
         .collect();
         // The one rational circle point the stereographic chart from -1 cannot reach.
-        points.push(RationalCirclePoint::new(integer(-1), Rat::zero()).expect("(-1, 0) is on the circle"));
+        points.push(
+            RationalCirclePoint::new(integer(-1), Rat::zero()).expect("(-1, 0) is on the circle"),
+        );
         points
     }
 
@@ -1389,7 +1400,10 @@ mod tests {
                 lock.advanced_support.is_empty(),
                 "{name}: a causal response has an advanced support"
             );
-            for reflection in [&lock.dispersive_to_absorptive, &lock.absorptive_to_dispersive] {
+            for reflection in [
+                &lock.dispersive_to_absorptive,
+                &lock.absorptive_to_dispersive,
+            ] {
                 for residual in &reflection.residuals {
                     if lattice_signature(residual.index) == 0 {
                         continue;
@@ -1404,9 +1418,7 @@ mod tests {
             }
             // The dispersive reading is exact at the fixed point too; only the absorptive is blind.
             assert!(
-                lock.dispersive_to_absorptive
-                    .residual_at(0)
-                    .is_zero(),
+                lock.dispersive_to_absorptive.residual_at(0).is_zero(),
                 "{name}: h_o[0] is zero on every response, so this residual cannot stand"
             );
         }
@@ -1506,9 +1518,15 @@ mod tests {
         }
 
         assert_eq!(causal + acausal, 1_024);
-        assert_eq!(causal, 64, "responses vanishing at both pre-stimulus indices");
+        assert_eq!(
+            causal, 64,
+            "responses vanishing at both pre-stimulus indices"
+        );
         assert_eq!(acausal, 960);
-        assert_eq!(exercised, 1_020, "only the four fixed-point-only declarations are vacuous");
+        assert_eq!(
+            exercised, 1_020,
+            "only the four fixed-point-only declarations are vacuous"
+        );
         assert!(
             standing_seen > 0,
             "no residual ever stood, so the acausal half proved nothing"
@@ -1558,7 +1576,10 @@ mod tests {
             .expect("a distinct instantaneous value");
 
         assert_ne!(left, right, "the pair must be two distinct responses");
-        assert!(right.is_causal(), "the collision is inside the causal class");
+        assert!(
+            right.is_causal(),
+            "the collision is inside the causal class"
+        );
         assert_eq!(
             left.absorptive_face(),
             right.absorptive_face(),
@@ -1754,7 +1775,12 @@ mod tests {
         // The subtracted direction genuinely needs its constants: they are nonzero here, and the
         // three-point stencil alone would miss them.
         assert_eq!(spectral.subtraction_constants, [rat(5, 2), rat(7, 4)]);
-        assert!(spectral.subtraction_constants.iter().all(|constant| !constant.is_zero()));
+        assert!(
+            spectral
+                .subtraction_constants
+                .iter()
+                .all(|constant| !constant.is_zero())
+        );
         let unsubtracted: [Rat; 4] = std::array::from_fn(|k| {
             halved(spectral.absorptive[(k + 3) % 4].clone() - &spectral.absorptive[(k + 1) % 4])
         });
@@ -1785,12 +1811,7 @@ mod tests {
             let doubled = integer(2) * &leak;
             assert_eq!(
                 spectral.absorptive_residual,
-                [
-                    Rat::zero(),
-                    doubled.clone(),
-                    Rat::zero(),
-                    -doubled.clone()
-                ]
+                [Rat::zero(), doubled.clone(), Rat::zero(), -doubled.clone()]
             );
             assert_eq!(
                 spectral.dispersive_residual,
@@ -1819,7 +1840,13 @@ mod tests {
             let fixture = CausalResponse::new(
                 2,
                 grain(),
-                vec![Rat::zero(), values[0].clone(), values[1].clone(), values[2].clone(), values[3].clone()],
+                vec![
+                    Rat::zero(),
+                    values[0].clone(),
+                    values[1].clone(),
+                    values[2].clone(),
+                    values[3].clone(),
+                ],
             )
             .expect("a lawful declaration");
             let spectral = fixture.four_point_spectral_reflection();
@@ -1862,7 +1889,10 @@ mod tests {
             spectral.locks(),
             "this fixture exists to exhibit an aperture violation that passes every check"
         );
-        assert!(spectral.folded_advanced.is_zero(), "the leak aliased into slot 2");
+        assert!(
+            spectral.folded_advanced.is_zero(),
+            "the leak aliased into slot 2"
+        );
         assert!(!spectral.is_vacuous());
 
         // The response-domain law, which has no aperture limit, refuses it.
@@ -1945,12 +1975,9 @@ mod tests {
             Err(CausalReflectionError::LatticesDiffer)
         );
 
-        let regrained = CausalResponse::new(
-            narrow.half_extent(),
-            integer(5),
-            narrow.values().to_vec(),
-        )
-        .unwrap();
+        let regrained =
+            CausalResponse::new(narrow.half_extent(), integer(5), narrow.values().to_vec())
+                .unwrap();
         assert_eq!(
             narrow
                 .dispersive_face()
@@ -2061,7 +2088,12 @@ mod tests {
         assert!(!lock.subtraction_constants[0].value.is_zero());
 
         // The holomorphy witness.
-        assert!(!acausal.holomorphy_witness().advanced_coefficients.is_empty());
+        assert!(
+            !acausal
+                .holomorphy_witness()
+                .advanced_coefficients
+                .is_empty()
+        );
         assert!(acausal.holomorphy_witness().pole_order_at_infinity() > 0);
 
         // The spectral faces at a point that is neither real nor a Gaussian unit.

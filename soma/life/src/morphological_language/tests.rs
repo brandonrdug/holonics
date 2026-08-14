@@ -38,12 +38,9 @@ fn cuda_conditioner_returns_the_exact_host_ecology_without_a_production_replay()
     ];
     let host = MorphologicalLanguageEcology::condition(&passages, action(), 5).unwrap();
     let mut conditioner = CudaMorphologicalConditioner::new(0).unwrap();
-    let (card, semantic, apparatus) = MorphologicalLanguageEcology::condition_with_cuda(
-        &passages,
-        action(),
-        &mut conditioner,
-    )
-    .unwrap();
+    let (card, semantic, apparatus) =
+        MorphologicalLanguageEcology::condition_with_cuda(&passages, action(), &mut conditioner)
+            .unwrap();
     assert!(host.exact_conditioning_agreement(&card).unwrap());
     assert!(semantic.suffix_extensions > 0);
     assert!(semantic.suffix_crosses > 0);

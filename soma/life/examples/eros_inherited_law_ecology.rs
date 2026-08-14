@@ -9,6 +9,7 @@ use life::current_world::{
     NativePathChart, NativeRegionalArc, NativeRegionalRelation, NativeRelationOrgan,
     NativeRelationOrganImage,
 };
+use life::form_mouth::deposit_form_or_message;
 use serde::Serialize;
 use sha2::{Digest, Sha256};
 use soma_abi::active::{ActionCurrent, RelationAtom};
@@ -17,7 +18,6 @@ use soma_membrane::{
     LiveBoundaryTransition, LiveConstituent, LiveCurrentMachine, LiveCurrentRestImage,
     SparseStandingSurface,
 };
-use life::form_mouth::deposit_form_or_message;
 
 /// This driver's name at the plate mouth: `output/eros_inherited_law_ecology/<name>-<sha256>.form`.
 const FORM_DRIVER: &str = "eros_inherited_law_ecology";

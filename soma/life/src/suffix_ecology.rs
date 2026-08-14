@@ -1200,8 +1200,8 @@ impl ExactLabeledSuffixEcology {
         };
         let material_count = u32::try_from(material_symbols.len())
             .map_err(|_| ExactSuffixEcologyError::CarrierExtent)?;
-        let boundary_count_u32 = u32::try_from(boundary_count)
-            .map_err(|_| ExactSuffixEcologyError::CarrierExtent)?;
+        let boundary_count_u32 =
+            u32::try_from(boundary_count).map_err(|_| ExactSuffixEcologyError::CarrierExtent)?;
         let mut material_transitions = 0usize;
         for transition in transitions {
             if transition.state >= states.len() || transition.target >= states.len() {

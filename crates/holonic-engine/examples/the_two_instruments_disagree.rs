@@ -44,10 +44,9 @@
 use std::error::Error;
 
 use holonic_engine::arithmetic_monodromy::{IntegralQuinticProblem, QuinticProblemId};
-use holonic_engine::multiquadratic::{admits_degree, Multiquadratic, DECLARED_KERNEL_BOUND};
+use holonic_engine::multiquadratic::{DECLARED_KERNEL_BOUND, Multiquadratic, admits_degree};
 use holonic_engine::quintic_chart::{
-    read_ladder, read_quintic_charts, CompassVerdict, NeusisVerdict,
-    RadicalChartVerdict,
+    CompassVerdict, NeusisVerdict, RadicalChartVerdict, read_ladder, read_quintic_charts,
 };
 use num_bigint::BigInt;
 use relational_geometry::Rat;
@@ -75,11 +74,20 @@ fn material() -> Vec<(&'static str, Vec<BigInt>)> {
         // 7-gon's constructibility is a question about a degree-THREE number, not a degree-seven
         // one, because [Q(2cos(2π/n)):Q] = φ(n)/2 and φ(7)/2 = 3. This is the falsifier the roadmap
         // named for the neusis rung.
-        ("x^3 + x^2 - 2x - 1  (2cos(2pi/7), the heptagon)", integers(&[-1, -2, 1, 1])),
+        (
+            "x^3 + x^2 - 2x - 1  (2cos(2pi/7), the heptagon)",
+            integers(&[-1, -2, 1, 1]),
+        ),
         // THE REGULAR PENTAGON, φ(5)/2 = 2 — the compass's own, since 5 is a Fermat prime.
-        ("x^2 + x - 1  (2cos(2pi/5), the pentagon)", integers(&[-1, 1, 1])),
+        (
+            "x^2 + x - 1  (2cos(2pi/5), the pentagon)",
+            integers(&[-1, 1, 1]),
+        ),
         // A cubic that is not the Delian one, so the verdict is not about this single polynomial.
-        ("x^3 - 3x - 1  (a trisection cubic)", integers(&[-1, -3, 0, 1])),
+        (
+            "x^3 - 3x - 1  (a trisection cubic)",
+            integers(&[-1, -3, 0, 1]),
+        ),
         // Degree 2 — the compass's own home.
         ("x^2 - 2", integers(&[-2, 0, 1])),
         // Degree 4 — power of two, so the compass rung can only say NECESSARY-ONLY.
@@ -107,12 +115,18 @@ fn main() -> Result<(), Box<dyn Error>> {
     rule("THE COMPASS RUNG'S APERTURE IS A DEGREE CONDITION, NOT A DECLARED BOUND");
 
     println!("  ℚ(√k₁,…,√kₙ) has degree 2ⁿ over ℚ, so every element's minimal polynomial has");
-    println!("  degree dividing 2ⁿ. DECLARED_KERNEL_BOUND = {DECLARED_KERNEL_BOUND} bounds a SEARCH;");
+    println!(
+        "  degree dividing 2ⁿ. DECLARED_KERNEL_BOUND = {DECLARED_KERNEL_BOUND} bounds a SEARCH;"
+    );
     println!("  the aperture below bounds the FIELD, and no bound can move it.\n");
     for degree in 1..=8usize {
         println!(
             "    degree {degree}  {}",
-            if admits_degree(degree) { "power of two — the necessary condition holds" } else { "NOT a power of two — refused, structurally" }
+            if admits_degree(degree) {
+                "power of two — the necessary condition holds"
+            } else {
+                "NOT a power of two — refused, structurally"
+            }
         );
     }
 
@@ -121,7 +135,9 @@ fn main() -> Result<(), Box<dyn Error>> {
         Multiquadratic::square_root(&Rat::from_integer(BigInt::from(n)), DECLARED_KERNEL_BOUND)
             .expect("a squarefree integer root")
     };
-    let joined = root(2).add(&root(3), 4).expect("two generators are inside the aperture");
+    let joined = root(2)
+        .add(&root(3), 4)
+        .expect("two generators are inside the aperture");
     println!(
         "\n  √2 + √3 carries {} generators, so its ambient tower degree is {}",
         joined.generators().len(),
@@ -130,7 +146,12 @@ fn main() -> Result<(), Box<dyn Error>> {
     hold(
         "the tower degree is 2^n, read off the element rather than declared",
         joined.tower_degree() == 4,
-        format!("{} generators → 2^{} = {}", joined.generators().len(), joined.generators().len(), joined.tower_degree()),
+        format!(
+            "{} generators → 2^{} = {}",
+            joined.generators().len(),
+            joined.generators().len(),
+            joined.tower_degree()
+        ),
     );
 
     // ---------------------------------------------------------------------------------------------
@@ -153,11 +174,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut neusis_crossings: Vec<String> = Vec::new();
 
     for (index, (name, coefficients)) in material().into_iter().enumerate() {
-        let problem = IntegralQuinticProblem::new(
-            QuinticProblemId(index as u64 + 1),
-            name,
-            coefficients,
-        )?;
+        let problem =
+            IntegralQuinticProblem::new(QuinticProblemId(index as u64 + 1), name, coefficients)?;
         let atlas = read_quintic_charts(&problem, PRIME_LIMIT, HORN_LOCAL_SECTION_LIMIT)?;
         let ladder = read_ladder(&atlas.radical);
 
@@ -190,7 +208,11 @@ fn main() -> Result<(), Box<dyn Error>> {
             ladder.compass.label(),
             ladder.neusis.label(),
             ladder.radical.label(),
-            if ladder.neusis_crosses_the_compass_wall() { "← NEUSIS CROSSES" } else { "" }
+            if ladder.neusis_crosses_the_compass_wall() {
+                "← NEUSIS CROSSES"
+            } else {
+                ""
+            }
         );
     }
 
@@ -198,7 +220,11 @@ fn main() -> Result<(), Box<dyn Error>> {
     hold(
         "THE RUNGS DISAGREE — at least one object is refused by one instrument and returned by the other",
         !disagreements.is_empty(),
-        format!("{} disagreement(s): {:?}", disagreements.len(), disagreements),
+        format!(
+            "{} disagreement(s): {:?}",
+            disagreements.len(),
+            disagreements
+        ),
     );
     hold(
         "the compass rung REFUSES somewhere and does not refuse everywhere",
@@ -212,13 +238,21 @@ fn main() -> Result<(), Box<dyn Error>> {
     );
     hold(
         "THE NEUSIS RUNG CROSSES THE COMPASS WALL — the heptagon refuses at compass and holds at neusis",
-        neusis_crossings.iter().any(|name| name.contains("heptagon")),
-        format!("{} crossing(s): {:?}", neusis_crossings.len(), neusis_crossings),
+        neusis_crossings
+            .iter()
+            .any(|name| name.contains("heptagon")),
+        format!(
+            "{} crossing(s): {:?}",
+            neusis_crossings.len(),
+            neusis_crossings
+        ),
     );
     hold(
         "the neusis rung REFUSES somewhere — a rung that admits everything is not a rung",
         neusis_refusals > 0 && neusis_necessary > 0,
-        format!("{neusis_refusals} refused · {neusis_necessary} necessary-only; 3-smooth degrees only"),
+        format!(
+            "{neusis_refusals} refused · {neusis_necessary} necessary-only; 3-smooth degrees only"
+        ),
     );
     hold(
         "the pentagon holds at the compass and the heptagon does not — 5 is a Fermat prime and 7 is not",
@@ -231,7 +265,9 @@ fn main() -> Result<(), Box<dyn Error>> {
     );
     hold(
         "the doubled cube is refused by the compass — the Delian constant is not a Euclidean number",
-        disagreements.iter().any(|name| name.contains("doubled cube")),
+        disagreements
+            .iter()
+            .any(|name| name.contains("doubled cube")),
         format!("disagreements: {disagreements:?}"),
     );
 
@@ -266,8 +302,12 @@ fn main() -> Result<(), Box<dyn Error>> {
          \x20    including all three Greek problems of antiquity — the doubled cube, the trisected\n\
          \x20    angle, and the regular heptagon. MathWorld's NeusisConstruction names exactly those\n\
          \x20    three as soluble by a marked ruler; here they are computed rather than recited.",
-        compass_refusals, compass_necessary, radical_returns, radical_refusals,
-        disagreements.len(), neusis_crossings.len()
+        compass_refusals,
+        compass_necessary,
+        radical_returns,
+        radical_refusals,
+        disagreements.len(),
+        neusis_crossings.len()
     );
 
     if failures.is_empty() {

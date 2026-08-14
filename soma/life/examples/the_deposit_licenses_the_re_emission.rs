@@ -51,12 +51,12 @@ use life::{
     form_mouth::deposit_form_or_message,
     morphological_language::{
         CudaMorphologicalConditioner, CudaMorphologicalConductExecutor,
-        MorphologicalConditionSemanticReceipt,
-        MorphologicalConductEdgeAddress, MorphologicalConductGenerationReceipt,
-        MorphologicalConductPlurality, MorphologicalConductState, MorphologicalGeneratedCurrent,
-        MorphologicalGenerationSpec, MorphologicalLanguageConductState,
-        MorphologicalLanguageCurrentGeneration, MorphologicalLanguageEcology,
-        MorphologicalLanguagePassage, MorphologicalResponseRest, MorphologicalSupportConduct,
+        MorphologicalConditionSemanticReceipt, MorphologicalConductEdgeAddress,
+        MorphologicalConductGenerationReceipt, MorphologicalConductPlurality,
+        MorphologicalConductState, MorphologicalGeneratedCurrent, MorphologicalGenerationSpec,
+        MorphologicalLanguageConductState, MorphologicalLanguageCurrentGeneration,
+        MorphologicalLanguageEcology, MorphologicalLanguagePassage, MorphologicalResponseRest,
+        MorphologicalSupportConduct,
     },
     text_material::{ExactTextMaterialAtlas, TextMaterialRole},
 };
@@ -270,7 +270,8 @@ fn run() -> Result<(), String> {
         }
         let Some(declared) = arguments.family.iter().find(|declared| {
             occurrence.witnesses.iter().any(|witness| {
-                witness.container == **declared || witness.container.ends_with(&format!("/{declared}"))
+                witness.container == **declared
+                    || witness.container.ends_with(&format!("/{declared}"))
             })
         }) else {
             continue;
@@ -317,13 +318,14 @@ fn run() -> Result<(), String> {
     );
 
     // --- conditioning ---------------------------------------------------------------------------
-    let action = ActionCurrent::new(Cog::lit(1)).ok_or_else(|| "action current is dark".to_owned())?;
+    let action =
+        ActionCurrent::new(Cog::lit(1)).ok_or_else(|| "action current is dark".to_owned())?;
     let mut conditioner = CudaMorphologicalConditioner::new(0)
         .map_err(|error| format!("mount the resident conditioner: {error}"))?;
     let conditioning_started = Instant::now();
     let (ecology, conditioning_semantic, conditioning_apparatus) =
         MorphologicalLanguageEcology::condition_with_cuda(&passages, action, &mut conditioner)
-        .map_err(|error| format!("condition the declared family: {error:?}"))?;
+            .map_err(|error| format!("condition the declared family: {error:?}"))?;
     let conditioning_wall_millis = conditioning_started.elapsed().as_millis();
     let recruitment_membership_tests = ecology.census().recruitment_membership_tests;
     let recruitment_incidences = ecology.census().recruitment_incidences;
@@ -422,14 +424,17 @@ fn run() -> Result<(), String> {
     eprintln!("arm (a): {complete_fiber_population} branches in {complete_wall_millis} ms");
 
     // --- receipts (b) and (c): the conducted sub-population and the withheld fiber ---------------
-    let MorphologicalLanguageConductState::Conducting(conducting) = ecology.receive_conduct(
-        MorphologicalConductState::Conducting(morphology),
-    ) else {
+    let MorphologicalLanguageConductState::Conducting(conducting) =
+        ecology.receive_conduct(MorphologicalConductState::Conducting(morphology))
+    else {
         return Err("a conducting morphology did not produce a conducting ecology".to_owned());
     };
     let mut executor = CudaMorphologicalConductExecutor::new(0)
         .map_err(|error| format!("mount the conduct card: {error}"))?;
-    eprintln!("arm (b): the conducted sub-population on {}", executor.device_name());
+    eprintln!(
+        "arm (b): the conducted sub-population on {}",
+        executor.device_name()
+    );
     let conducted_started = Instant::now();
     let conducted = conducting
         .generate_currents_over(&arguments.prompt, spec, &cover, &mut executor)
@@ -472,7 +477,12 @@ fn run() -> Result<(), String> {
         .generation
         .outputs
         .iter()
-        .filter(|output| output.tokens.iter().any(|token| !token.conducting_supports.is_empty()))
+        .filter(|output| {
+            output
+                .tokens
+                .iter()
+                .any(|token| !token.conducting_supports.is_empty())
+        })
         .count();
     let attached_continuations_naming_deposits = conducted
         .generation
@@ -532,7 +542,8 @@ fn run() -> Result<(), String> {
     let mut branches_solely_licensed = 0usize;
     let mut branches_strictly_attributable = 0usize;
     let mut branches_removed_by_the_ablation = 0usize;
-    let mut ablation_receipt = "the targeted ablation did not fire: no deposit licensed an emitted \
+    let mut ablation_receipt =
+        "the targeted ablation did not fire: no deposit licensed an emitted \
                                 continuation";
     let conducted_texts = branch_paths(&conducted.generation);
 
@@ -589,14 +600,10 @@ fn run() -> Result<(), String> {
                     "DISAGREED: see findings"
                 };
                 if branches_solely_licensed > 0 && removed != strictly_attributable {
-                    let unexpected = multiset_extent(&multiset_difference(
-                        &removed,
-                        &strictly_attributable,
-                    ));
-                    let unremoved = multiset_extent(&multiset_difference(
-                        &strictly_attributable,
-                        &removed,
-                    ));
+                    let unexpected =
+                        multiset_extent(&multiset_difference(&removed, &strictly_attributable));
+                    let unremoved =
+                        multiset_extent(&multiset_difference(&strictly_attributable, &removed));
                     findings.push(format!(
                         "the targeted ablation removed {} branches where exactly {} were solely \
                          licensed by the removed deposit: {unexpected} removed that it did not \
@@ -717,8 +724,8 @@ fn run() -> Result<(), String> {
         full_ablation_is_type_state_true: true,
         findings,
     };
-    let octets = serde_json::to_vec_pretty(&report)
-        .map_err(|error| format!("encode the grade: {error}"))?;
+    let octets =
+        serde_json::to_vec_pretty(&report).map_err(|error| format!("encode the grade: {error}"))?;
     let deposited = deposit_form_or_message(DRIVER, GRADE_FORM, &octets)?;
     println!("{}", String::from_utf8_lossy(&octets));
     println!("grade deposited at {}", deposited.path.display());
@@ -828,8 +835,9 @@ fn sha256_file(path: &Path) -> Result<String, String> {
     use std::io::Read;
 
     use sha2::{Digest, Sha256};
-    let mut reader =
-        BufReader::new(File::open(path).map_err(|error| format!("open {}: {error}", path.display()))?);
+    let mut reader = BufReader::new(
+        File::open(path).map_err(|error| format!("open {}: {error}", path.display()))?,
+    );
     let mut hasher = Sha256::new();
     let mut window = vec![0u8; 1 << 20];
     loop {

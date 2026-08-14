@@ -103,13 +103,12 @@ use holonic_engine::algebraic::{
 };
 use holonic_engine::causal::EventId;
 use holonic_engine::grown_cell::{
-    found_complex, grow, standard_cells, ComplexAperture, NetId, Schedule,
+    ComplexAperture, NetId, Schedule, found_complex, grow, standard_cells,
 };
 use holonic_engine::rebase_invariants::{
-    rebase_invariants_with_schedule_on, PivotRule, ReadingSchedule, RebaseInvariants,
-    ReductionWork,
+    PivotRule, ReadingSchedule, RebaseInvariants, ReductionWork, rebase_invariants_with_schedule_on,
 };
-use holonic_engine::skein::{read_substitution, GradeRemainder, SkeinReading, Substitution};
+use holonic_engine::skein::{GradeRemainder, SkeinReading, Substitution, read_substitution};
 
 // ===============================================================================================
 // declarations
@@ -707,7 +706,11 @@ fn condense(
 // ===============================================================================================
 // hand-built witnesses
 
-fn found_graph(label: &str, names: &[&str], arrows: &[(usize, usize)]) -> (GradedCausalComplex, Incidence) {
+fn found_graph(
+    label: &str,
+    names: &[&str],
+    arrows: &[(usize, usize)],
+) -> (GradedCausalComplex, Incidence) {
     let mut complex = GradedCausalComplex::default();
     let mut counter = 0u64;
     let mut node_cell = Vec::new();
@@ -852,7 +855,8 @@ fn main() {
         refusals.push("the sweep holds no forest, so the empty case never fired".to_owned());
     }
     if !sweep.iter().any(|(_, cyclomatic, _)| *cyclomatic > 0) {
-        refusals.push("the sweep holds no cyclic cone, so the non-empty case never fired".to_owned());
+        refusals
+            .push("the sweep holds no cyclic cone, so the non-empty case never fired".to_owned());
     }
 
     println!();
@@ -937,7 +941,9 @@ fn the_witness_that_corrects_the_record(refusals: &mut Vec<String>) {
             "the walk-order gauge acts trivially on the witness, so it shows nothing".to_owned(),
         );
     } else {
-        println!("  NON-TRIVIAL: the interval remainder is a receiver coordinate, not an invariant.");
+        println!(
+            "  NON-TRIVIAL: the interval remainder is a receiver coordinate, not an invariant."
+        );
     }
     if !orbit.contains(&0) {
         refusals.push(
@@ -1040,7 +1046,10 @@ fn the_far_populations(refusals: &mut Vec<String>, sweep: &mut Vec<(String, i64,
         let grown = match found_complex(&growth, ComplexAperture::DIVISION) {
             Ok(grown) => grown,
             Err(refusal) => {
-                refusals.push(format!("{}: complex refused {refusal:?}", declaration.label));
+                refusals.push(format!(
+                    "{}: complex refused {refusal:?}",
+                    declaration.label
+                ));
                 continue;
             }
         };
@@ -1370,11 +1379,7 @@ fn report(
     if declaration.aperture.admits_faces() {
         // With 2-cells present the departure from a forest is discharged rather than only counted,
         // and the identity below says exactly where it went.
-        let grade_one_before = verdict
-            .before
-            .grades
-            .iter()
-            .find(|entry| entry.grade == 1);
+        let grade_one_before = verdict.before.grades.iter().find(|entry| entry.grade == 1);
         let Some(entry) = grade_one_before else {
             refusals.push(format!("{}: the reading has no grade 1", declaration.label));
             return;
@@ -1454,8 +1459,7 @@ fn report(
         refusals.push(format!(
             "{}: -betti_change(grade 1) = {} but the departure from a forest is {cyclomatic}. \
              The remainder is not in proportion.",
-            declaration.label,
-            -grade_one
+            declaration.label, -grade_one
         ));
     } else {
         println!(

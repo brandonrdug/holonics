@@ -182,12 +182,7 @@ impl CertifiedFace {
     pub fn station_rows(&self) -> Vec<(String, String)> {
         self.stations
             .iter()
-            .map(|station| {
-                (
-                    format_rat(&station.abscissa),
-                    format_rat(&station.ordinate),
-                )
-            })
+            .map(|station| (format_rat(&station.abscissa), format_rat(&station.ordinate)))
             .collect()
     }
 }
@@ -657,8 +652,7 @@ mod tests {
                 (cells + 1) as usize,
                 "a station is a declared cell boundary and nothing else"
             );
-            let source_items =
-                face.features.len() + face.obstructions.len() + (cells + 1) as usize;
+            let source_items = face.features.len() + face.obstructions.len() + (cells + 1) as usize;
             let total_marks: usize = census.values().sum();
             assert!(
                 total_marks <= source_items,

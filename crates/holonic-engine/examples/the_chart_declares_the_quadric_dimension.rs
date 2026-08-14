@@ -183,9 +183,7 @@ fn show(label: &str, reading: &Reading) {
 }
 
 fn coefficients(quadric: &ExactQuadric3) -> String {
-    let names = [
-        "x^2", "y^2", "z^2", "xy", "xz", "yz", "x", "y", "z", "1",
-    ];
+    let names = ["x^2", "y^2", "z^2", "xy", "xz", "yz", "x", "y", "z", "1"];
     quadric
         .coefficients
         .iter()
@@ -361,8 +359,7 @@ fn the_phase_law_has_the_same_orbit() {
         standing.declare_region_chart(region, declared).unwrap();
         let mut samples = coplanar_circle_samples(region);
         for sample in &mut samples {
-            let value =
-                integer(3) * &sample.point.x + integer(5) * &sample.point.y + integer(7);
+            let value = integer(3) * &sample.point.x + integer(5) * &sample.point.y + integer(7);
             sample.phase = BTreeMap::from([(channel, value)]);
         }
         let event = CausalFieldEvent {
@@ -520,10 +517,7 @@ fn the_refusals() {
     println!(
         "  the same source torus in a region declaring the ambient chart -> {}",
         match law.enact(&ambient_standing, &torus_event) {
-            Ok(successor) => format!(
-                "admitted, {} germ",
-                successor.standing_after.germs.len()
-            ),
+            Ok(successor) => format!("admitted, {} germ", successor.standing_after.germs.len()),
             Err(error) => format!("REFUSED — {error}"),
         }
     );

@@ -9,11 +9,11 @@ use body::incidence::IncidenceHand;
 use body::manifold::FeltDeed;
 use body::num::Cog;
 use exact_pcm::{ButterflyAtlas, ExactPathChart, PcmWave};
-use life::form_mouth::deposit_form_or_message;
 use life::current_world::{
     present_native_event_with_regional, NativeEventCurrent, NativeRegionalArc,
     NativeRegionalRelation, NativeRelationOrgan, NativeRelationOrganImage,
 };
+use life::form_mouth::deposit_form_or_message;
 use serde::Serialize;
 use sha2::{Digest, Sha256};
 use soma_abi::active::ActionCurrent;
@@ -317,7 +317,8 @@ impl AudioWorld {
         // and still reported; these are the same octets reaching the plate's mouth instead of being
         // hashed and dropped. This runs at every acoustic event; the address is the content, so
         // every distinct rest is deposited at its own address rather than overwriting the previous.
-        let deposited = deposit_form_or_message(FORM_DRIVER, SUCCESSOR_REST_FORM, &successor_rest_octets)?;
+        let deposited =
+            deposit_form_or_message(FORM_DRIVER, SUCCESSOR_REST_FORM, &successor_rest_octets)?;
         eprintln!("form deposited: {}", deposited.path.display());
         Ok(AcousticEventRead {
             role,
@@ -607,7 +608,8 @@ fn preflight(source: &Path) -> Result<PreflightReport, String> {
     let rest = machine.rest_image().map_err(debug)?;
     let preflight_rest_octets = rest.encode_native_bytes().map_err(debug)?;
     // THE_ASSEMBLY.md step 5, loop (d): *the signal is the octets*. The hash below is untouched.
-    let deposited = deposit_form_or_message(FORM_DRIVER, PREFLIGHT_REST_FORM, &preflight_rest_octets)?;
+    let deposited =
+        deposit_form_or_message(FORM_DRIVER, PREFLIGHT_REST_FORM, &preflight_rest_octets)?;
     eprintln!("form deposited: {}", deposited.path.display());
 
     Ok(PreflightReport {

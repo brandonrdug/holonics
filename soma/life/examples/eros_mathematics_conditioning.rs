@@ -266,7 +266,10 @@ fn exhibit(passage: &DerivedPassage, morphology: &FoundedMorphology) {
         "      licensed by stem {:?}   brought {}   reaches {}",
         passage.stem, passage.brought, passage.reaches
     );
-    println!("      stem founded by corpus documents: {}", witnessing.join(" "));
+    println!(
+        "      stem founded by corpus documents: {}",
+        witnessing.join(" ")
+    );
     for bridge in passage.licensing() {
         let routes = if bridge.routes.len() <= 3 {
             bridge.routes.join(" ")
@@ -289,7 +292,10 @@ fn exhibit(passage: &DerivedPassage, morphology: &FoundedMorphology) {
 }
 
 fn names(passages: &[DerivedPassage]) -> BTreeSet<String> {
-    passages.iter().map(|passage| passage.name.clone()).collect()
+    passages
+        .iter()
+        .map(|passage| passage.name.clone())
+        .collect()
 }
 
 /// Exhibit why a passage appeared or departed as a **cover change**, never as an assertion.
@@ -373,10 +379,7 @@ fn main() {
     for path in &corpus_intake.documents {
         println!(
             "  {path:<74} {:>3} occurrences",
-            per_document
-                .get(path.as_str())
-                .copied()
-                .unwrap_or_default()
+            per_document.get(path.as_str()).copied().unwrap_or_default()
         );
     }
 
@@ -453,7 +456,9 @@ fn main() {
     }
 
     // ---------------------------------------------------------------------------------------------
-    rule("[2]  THE PRODUCTION -- the declared query, put to the conditioned body and to the control");
+    rule(
+        "[2]  THE PRODUCTION -- the declared query, put to the conditioned body and to the control",
+    );
 
     if !statements.contains(QUERY) {
         eprintln!("the declared query is not a statement this deposit reaches: {QUERY}");
@@ -577,8 +582,14 @@ fn main() {
             document,
             departed: founded_names.difference(&after).cloned().collect(),
             appeared: after.difference(&founded_names).cloned().collect(),
-            decommitted: committed_now.difference(&committed_after).cloned().collect(),
-            newly_committed: committed_after.difference(&committed_now).cloned().collect(),
+            decommitted: committed_now
+                .difference(&committed_after)
+                .cloned()
+                .collect(),
+            newly_committed: committed_after
+                .difference(&committed_now)
+                .cloned()
+                .collect(),
             derived,
             morphology: body.morphology().clone(),
         });
@@ -600,7 +611,9 @@ fn main() {
         );
     }
 
-    println!("\n  the difference, as a population, for every document whose withholding moved one:\n");
+    println!(
+        "\n  the difference, as a population, for every document whose withholding moved one:\n"
+    );
     let mut moved = 0usize;
     for withholding in &withholdings {
         if withholding.departed.is_empty() && withholding.appeared.is_empty() {
@@ -707,9 +720,7 @@ fn main() {
             } else {
                 println!("\n    the passages that departed, exhibited whole as they stood BEFORE:");
                 for name in &withholding.departed {
-                    if let Some(passage) =
-                        production.iter().find(|passage| &passage.name == name)
-                    {
+                    if let Some(passage) = production.iter().find(|passage| &passage.name == name) {
                         exhibit(passage, &morphology);
                     }
                 }
@@ -759,14 +770,12 @@ fn main() {
         &match named.first() {
             Some((stem, documents)) => format!(
                 "stem {stem:?} founded by {}",
-                documents
-                    .iter()
-                    .copied()
-                    .collect::<Vec<&str>>()
-                    .join(", ")
+                documents.iter().copied().collect::<Vec<&str>>().join(", ")
             ),
-            None => "no licensing stem longer than three characters resolved to a declared document"
-                .to_owned(),
+            None => {
+                "no licensing stem longer than three characters resolved to a declared document"
+                    .to_owned()
+            }
         },
     );
     controls.check(
@@ -790,9 +799,9 @@ fn main() {
     );
     controls.check(
         "at least one withholding moved the passage population",
-        withholdings
-            .iter()
-            .any(|withholding| !withholding.departed.is_empty() || !withholding.appeared.is_empty()),
+        withholdings.iter().any(|withholding| {
+            !withholding.departed.is_empty() || !withholding.appeared.is_empty()
+        }),
         "otherwise the corpus is decorative: report that plainly rather than adjusting the corpus",
     );
 

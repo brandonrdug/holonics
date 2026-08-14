@@ -79,9 +79,9 @@
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 
-use holonic_engine::derivation_atlas::{read_derivation, Derivation};
+use holonic_engine::derivation_atlas::{Derivation, read_derivation};
 use holonic_engine::lean_development::{
-    join, read_development, ConductGrain, DeclarationGrain, DevelopmentReading,
+    ConductGrain, DeclarationGrain, DevelopmentReading, join, read_development,
 };
 use holonic_engine::name_elaboration::{ElaborationAperture, ElaborationDeposit};
 
@@ -137,20 +137,21 @@ fn independent_former_count(text: &str) -> usize {
     text.lines()
         .filter(|line| {
             let line = line.strip_prefix('@').map_or(*line, |after| {
-                after.find(']').map_or(after, |close| after[close + 1..].trim_start())
+                after
+                    .find(']')
+                    .map_or(after, |close| after[close + 1..].trim_start())
             });
-            prefixes.iter().any(|prefix| line.starts_with(prefix.as_str()))
+            prefixes
+                .iter()
+                .any(|prefix| line.starts_with(prefix.as_str()))
         })
         .count()
 }
 
 fn main() {
     let mut arguments = std::env::args().skip(1);
-    let development_root = PathBuf::from(
-        arguments
-            .next()
-            .unwrap_or_else(|| "soma/formal".to_owned()),
-    );
+    let development_root =
+        PathBuf::from(arguments.next().unwrap_or_else(|| "soma/formal".to_owned()));
     let generated_root = PathBuf::from(
         arguments
             .next()
@@ -169,8 +170,14 @@ fn main() {
         std::process::exit(2);
     }
 
-    let plural = read_all(&development_paths, DeclarationGrain::EveryTopLevelDeclaration);
-    let historical = read_all(&development_paths, DeclarationGrain::OneArtifactOneDeclaration);
+    let plural = read_all(
+        &development_paths,
+        DeclarationGrain::EveryTopLevelDeclaration,
+    );
+    let historical = read_all(
+        &development_paths,
+        DeclarationGrain::OneArtifactOneDeclaration,
+    );
 
     let mut controls: Vec<(bool, String, String)> = Vec::new();
 
@@ -244,10 +251,7 @@ fn the_reading(paths: &[PathBuf], plural: &DevelopmentReading, historical: &Deve
     section("THE SAME MATERIAL, AT TWO DECLARED GRAINS");
 
     println!("\n  {} files read", paths.len());
-    println!(
-        "\n  {:<34} {:>12} {:>12}",
-        "", "one-artifact", "every-decl"
-    );
+    println!("\n  {:<34} {:>12} {:>12}", "", "one-artifact", "every-decl");
     println!(
         "  {:<34} {:>12} {:>12}",
         "declarations opened",
@@ -287,18 +291,30 @@ fn the_reading(paths: &[PathBuf], plural: &DevelopmentReading, historical: &Deve
     println!(
         "    commentary tokens   {:>6} distinct, {} occurrences",
         plural.commentary.len(),
-        plural.commentary.values().map(|count| *count as u64).sum::<u64>()
+        plural
+            .commentary
+            .values()
+            .map(|count| *count as u64)
+            .sum::<u64>()
     );
     println!(
         "    preamble tokens     {:>6} distinct, {} occurrences",
         plural.preamble.len(),
-        plural.preamble.values().map(|count| *count as u64).sum::<u64>()
+        plural
+            .preamble
+            .values()
+            .map(|count| *count as u64)
+            .sum::<u64>()
     );
 
     if plural.ambiguous_short_names.is_empty() {
         println!("\n  ambiguous short names: NONE across the development.");
-        println!("  A law that returns zero proves nothing about itself -- the join is exercised by");
-        println!("  `ambiguity_across_a_joined_development_is_returned_not_resolved`, which builds a");
+        println!(
+            "  A law that returns zero proves nothing about itself -- the join is exercised by"
+        );
+        println!(
+            "  `ambiguity_across_a_joined_development_is_returned_not_resolved`, which builds a"
+        );
         println!("  collision and requires both namespaces back.");
     } else {
         println!("\n  ambiguous short names, returned and NOT resolved");
@@ -341,10 +357,7 @@ fn control_one_the_chain(plural: &DevelopmentReading, controls: &mut Vec<(bool, 
         }
     }
 
-    println!(
-        "\n  {:<40} {:>8} {:>8} {:>8}",
-        "", "probe", "organ", "held"
-    );
+    println!("\n  {:<40} {:>8} {:>8} {:>8}", "", "probe", "organ", "held");
     let rows = [
         (
             "top-level declarations",
@@ -377,14 +390,22 @@ fn control_one_the_chain(plural: &DevelopmentReading, controls: &mut Vec<(bool, 
             "NO"
         }
     );
-    println!("\n  Where the probe and the organ differ, the probe is wrong and the reason is named:");
-    println!("    +1 declaration   the probe's former list omitted `inductive`; `inductive Trace`.");
-    println!("    +2 edges         `(hxy i).trans` and `(A.rebase e).Semantics` are DOT PROJECTIONS.");
+    println!(
+        "\n  Where the probe and the organ differ, the probe is wrong and the reason is named:"
+    );
+    println!(
+        "    +1 declaration   the probe's former list omitted `inductive`; `inductive Trace`."
+    );
+    println!(
+        "    +2 edges         `(hxy i).trans` and `(A.rebase e).Semantics` are DOT PROJECTIONS."
+    );
     println!("                     The probe joined them to same-named declarations in OTHER");
     println!("                     namespaces; the organ's token rule needs a leading letter and");
     println!("                     refuses to found the edge.");
     println!("    three-link       matches the probe's original 48 FOR THE WRONG REASON -- the");
-    println!("                     omitted `inductive` cost three chains and the two spurious edges");
+    println!(
+        "                     omitted `inductive` cost three chains and the two spurious edges"
+    );
     println!("                     added three. A figure that agrees is not evidence on its own.");
 
     println!("\n  every declared -> declared edge, in canonical order");
@@ -465,7 +486,10 @@ fn control_two_the_aperture(
     controls.push((
         held,
         "control 2 -- every declaration the narrow aperture skipped is handed back".to_owned(),
-        format!("{accounted} accounted against {}", plural.declarations.len()),
+        format!(
+            "{accounted} accounted against {}",
+            plural.declarations.len()
+        ),
     ));
 }
 
@@ -485,7 +509,10 @@ fn control_three_the_commentary(
         .flat_map(|form| form.recruited.keys().map(String::as_str))
         .collect();
 
-    println!("\n  {:<20} {:>10} {:>18}", "token", "in comment", "recruited by any");
+    println!(
+        "\n  {:<20} {:>10} {:>18}",
+        "token", "in comment", "recruited by any"
+    );
     println!("  {}", "-".repeat(52));
     let mut all_present = true;
     let mut none_recruited = true;
@@ -524,8 +551,12 @@ fn control_three_the_commentary(
 fn control_eight_position(plural: &DevelopmentReading, controls: &mut Vec<(bool, String, String)>) {
     section("CONTROL 8 -- POSITION, AND THE EDGES IT MUST NOT MOVE");
 
-    println!("\n  `FORMULA.md` §XVI: the illicium is friction, and `medium.rs`: \"Many faces from one");
-    println!("  point IS the illicium and friction\". A reading with one face per point feels nothing.");
+    println!(
+        "\n  `FORMULA.md` §XVI: the illicium is friction, and `medium.rs`: \"Many faces from one"
+    );
+    println!(
+        "  point IS the illicium and friction\". A reading with one face per point feels nothing."
+    );
     println!("  Every name now carries a POSITION read from Lean's own grammar -- inside a binder");
     println!("  group the names before the `:` are founded and the type after it is recruited.\n");
 
@@ -560,7 +591,10 @@ fn control_eight_position(plural: &DevelopmentReading, controls: &mut Vec<(bool,
     println!("  {}", "-".repeat(76));
     let mut binders_clean = true;
     let mut tactics_clean = true;
-    for (population, expect_binding) in [(&BINDER_CONTAMINANTS[..], true), (&TACTIC_CONTAMINANTS[..], false)] {
+    for (population, expect_binding) in [
+        (&BINDER_CONTAMINANTS[..], true),
+        (&TACTIC_CONTAMINANTS[..], false),
+    ] {
         for name in population {
             let place = if bindings.contains(name) {
                 "local binding"
@@ -579,9 +613,15 @@ fn control_eight_position(plural: &DevelopmentReading, controls: &mut Vec<(bool,
             // declares a STRUCTURE FIELD named `exact`. The same surface is a tactic in one frame
             // and a field in another, so `exact` in term position there is correct and the control
             // requires exactly that holder and no other.
-            let reconciled: &[&str] = if *name == "exact" { &["Compression"] } else { &[] };
-            let unexplained: Vec<&&str> =
-                held.iter().filter(|holder| !reconciled.contains(holder)).collect();
+            let reconciled: &[&str] = if *name == "exact" {
+                &["Compression"]
+            } else {
+                &[]
+            };
+            let unexplained: Vec<&&str> = held
+                .iter()
+                .filter(|holder| !reconciled.contains(holder))
+                .collect();
             if expect_binding {
                 binders_clean &= placed && unexplained.is_empty();
             } else {
@@ -599,7 +639,9 @@ fn control_eight_position(plural: &DevelopmentReading, controls: &mut Vec<(bool,
     }
 
     println!("\n  RECONCILED, and it is the position law demonstrating itself on real material:");
-    println!("  `structure Compression … where … exact : ∀ i x, factor i (quotient x) = receiver i x`");
+    println!(
+        "  `structure Compression … where … exact : ∀ i x, factor i (quotient x) = receiver i x`"
+    );
     println!("  declares a FIELD named `exact`. The same surface is a tactic in one frame and a");
     println!("  field in another, which is what it means for position to be relative to a frame.");
 
@@ -625,16 +667,28 @@ fn control_eight_position(plural: &DevelopmentReading, controls: &mut Vec<(bool,
 
     println!("\n  THE ORBIT, before the null is read");
     println!("  ---------------------------------");
-    println!("    declared names in tactic position   {}", tactic_declared.len());
-    println!("    declared names in binding position  {}", binding_declared.len());
+    println!(
+        "    declared names in tactic position   {}",
+        tactic_declared.len()
+    );
+    println!(
+        "    declared names in binding position  {}",
+        binding_declared.len()
+    );
     if orbit == 0 {
         println!("\n    ORBIT TRIVIAL -- and this REFUSES the edge-count null as evidence.");
         println!("    No declared name lands in either moved population, so `edges == {EDGES}` is");
         println!("    structurally immune to position and could not have come out otherwise.");
-        println!("    `CLAUDE.md` §8: \"a gauge whose group acts trivially on the declared material");
-        println!("    is not a gauge\". The check below is a REGRESSION SNAPSHOT, not a null, and it");
+        println!(
+            "    `CLAUDE.md` §8: \"a gauge whose group acts trivially on the declared material"
+        );
+        println!(
+            "    is not a gauge\". The check below is a REGRESSION SNAPSHOT, not a null, and it"
+        );
         println!("    is reported as one. Position does delete edges on material that varies the");
-        println!("    property -- `fun (x : Carrier) => ...` founds `Carrier` as a binder -- which is");
+        println!(
+            "    property -- `fun (x : Carrier) => ...` founds `Carrier` as a binder -- which is"
+        );
         println!("    what `binding_position_declared` exists to catch and why it was built.");
     }
     println!("\n    declared -> declared edges  {edges}  against control 1's {EDGES}  (snapshot)");
@@ -647,7 +701,9 @@ fn control_eight_position(plural: &DevelopmentReading, controls: &mut Vec<(bool,
         }
     }
     println!("    `htrace.map` really is the declared `Trace.map`; `(hxy i).trans` is mathlib's");
-    println!("    `Eq.trans` and NOT this development's `trans`, though the spelling is identical.");
+    println!(
+        "    `Eq.trans` and NOT this development's `trans`, though the spelling is identical."
+    );
     println!("    Telling them apart needs the receiver's TYPE. Returned OPEN, never joined.");
 
     println!("\n  the two bounding instruments, each returned rather than acted on");
@@ -666,13 +722,19 @@ fn control_eight_position(plural: &DevelopmentReading, controls: &mut Vec<(bool,
         singular.len()
     );
     println!("      (environment lemmas used once are indistinguishable from a missed local");
-    println!("       binding without a second frame, so the population is returned, not subtracted)");
+    println!(
+        "       binding without a second frame, so the population is returned, not subtracted)"
+    );
 
     controls.push((
         binders_clean && tactics_clean && edges == EDGES,
         format!(
             "control 8 -- binders and tactics leave the term population (edge equality is a {} )",
-            if orbit == 0 { "SNAPSHOT: orbit trivial" } else { "null: orbit non-trivial" }
+            if orbit == 0 {
+                "SNAPSHOT: orbit trivial"
+            } else {
+                "null: orbit non-trivial"
+            }
         ),
         format!(
             "{} terms, {} tactics, {} bindings, {edges} edges, orbit {orbit}",
@@ -690,13 +752,25 @@ fn control_nine_sub_illicium(
 ) {
     section("CONTROL 9 -- THE SUB-ILLICIUM: A COMPLETION IS AN ARRIVAL ONE GRAIN UP");
 
-    println!("\n  `soma/body/src/manifold.rs`, W9: \"the sub-illicium -- the atom-grain traversal given");
-    println!("  the SAME live law, so the walk FEELS the standing terrain instead of dead reckoning.");
-    println!("  Its completions are THE FOLDS -- handed up as the word grain's arrivals.\" And the");
-    println!("  carrier law: \"a completion at depth k is an arrival at depth k+1 -- the same node,");
+    println!(
+        "\n  `soma/body/src/manifold.rs`, W9: \"the sub-illicium -- the atom-grain traversal given"
+    );
+    println!(
+        "  the SAME live law, so the walk FEELS the standing terrain instead of dead reckoning."
+    );
+    println!(
+        "  Its completions are THE FOLDS -- handed up as the word grain's arrivals.\" And the"
+    );
+    println!(
+        "  carrier law: \"a completion at depth k is an arrival at depth k+1 -- the same node,"
+    );
     println!("  the same verb.\"\n");
 
-    let steps: usize = plural.declarations.iter().map(|form| form.steps.len()).sum();
+    let steps: usize = plural
+        .declarations
+        .iter()
+        .map(|form| form.steps.len())
+        .sum();
     let arrivals: usize = plural
         .declarations
         .iter()
@@ -706,7 +780,10 @@ fn control_nine_sub_illicium(
 
     println!("  proof steps founded across the development   {steps:>5}");
     println!("  internal arrivals (step recruits step)       {arrivals:>5}");
-    println!("  declarations with an internal depth > 1      {:>5}", depths.len());
+    println!(
+        "  declarations with an internal depth > 1      {:>5}",
+        depths.len()
+    );
 
     println!("\n  every declaration whose proof body carries its own depth");
     println!("  --------------------------------------------------------");
@@ -714,7 +791,9 @@ fn control_nine_sub_illicium(
         println!("    {name:<44} {}", chain.join("  ->  "));
     }
 
-    println!("\n  The flat reading charged every one of these bodies to its theorem as a DEPTH-ONE");
+    println!(
+        "\n  The flat reading charged every one of these bodies to its theorem as a DEPTH-ONE"
+    );
     println!("  STAR, so a declaration's own depth was zero by construction. This is the leader");
     println!("  inside one declaration: each step changes the material the next step reads.");
 
@@ -744,7 +823,9 @@ fn control_nine_sub_illicium(
     println!("    founded by the same tactic (simultaneous)   {same_cohort}");
     println!("    founded on the same source line             {same_line}");
     println!("    crossing a sibling `·` focus block          {crossed_focus}");
-    println!("    A destructuring pattern founds its names in ONE act. Reading their token order as");
+    println!(
+        "    A destructuring pattern founds its names in ONE act. Reading their token order as"
+    );
     println!("    a causal chain promotes source layout into an invariant, which is the species");
     println!("    `CLAUDE.md` §0 lesson 4 convicts. Lean's `·` goal scopes are disjoint, so an");
     println!("    arrival across siblings is a leak. Both are now excluded by construction and");
@@ -798,7 +879,9 @@ fn control_four_no_over_parsing(
     }
     println!("\n  The second scanner is a literal `modifier x former` prefix table asked with");
     println!("  `starts_with`; the organ steps modifiers off in a loop. They share no code. The");
-    println!("  scanner does not strip comments, so a former at column zero inside a block comment");
+    println!(
+        "  scanner does not strip comments, so a former at column zero inside a block comment"
+    );
     println!("  would be counted there and not here -- neither material contains one.");
 
     controls.push((
@@ -854,9 +937,14 @@ fn control_five_and_seven_the_generated_deposit(
         reached_names.iter().copied().collect::<Vec<_>>().join(", ")
     );
     println!("\n  The four-relation record §7 reads: \"exactly one recruited identifier in 103");
-    println!("  artifacts is declared\". It is {}. `exactCarrier` is a `def`, declared in this very", reached_names.len());
+    println!(
+        "  artifacts is declared\". It is {}. `exactCarrier` is a `def`, declared in this very",
+        reached_names.len()
+    );
     println!("  deposit and read as an ATOM by a former list that founded only `theorem`. So is");
-    println!("  `abbrev ExactRelay`, which nothing here recruits and which is therefore a declared");
+    println!(
+        "  `abbrev ExactRelay`, which nothing here recruits and which is therefore a declared"
+    );
     println!("  name absent from the openable set rather than a second correction. The record's");
     println!("  material bound was measured THROUGH the same defect it was reporting, on its own");
     println!("  deposit and not only on soma/formal.");
@@ -1008,10 +1096,9 @@ fn control_six_the_elaboration_deepens(
             past_one += 1;
         }
         let size = meaning.constituents().len();
-        if deepest
-            .as_ref()
-            .is_none_or(|(_, best, best_size)| depth > *best || (depth == *best && size > *best_size))
-        {
+        if deepest.as_ref().is_none_or(|(_, best, best_size)| {
+            depth > *best || (depth == *best && size > *best_size)
+        }) {
             deepest = Some((root.clone(), depth, size));
         }
     }

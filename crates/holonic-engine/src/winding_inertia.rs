@@ -873,9 +873,9 @@ fn extend_cyclic_reading(
         }
         // `form(order[i], candidate)` must be the entry at displacement `position − i`, and that
         // entry is already fixed by the direction sitting at position `position − i`.
-        if (1..position)
-            .any(|index| form.at(order[index], candidate) != form.at(order[0], order[position - index]))
-        {
+        if (1..position).any(|index| {
+            form.at(order[index], candidate) != form.at(order[0], order[position - index])
+        }) {
             continue;
         }
         placed[candidate] = true;
@@ -1193,9 +1193,10 @@ fn certify(
 ) -> Option<AlgebraicRoot> {
     let two = Rat::from_integer(BigInt::from(2));
     if !enclosure.is_point()
-        && let Ok(root) = AlgebraicRoot::isolate(polynomial.clone(), enclosure.clone()) {
-            return Some(root);
-        }
+        && let Ok(root) = AlgebraicRoot::isolate(polynomial.clone(), enclosure.clone())
+    {
+        return Some(root);
+    }
     let width = &enclosure.upper - &enclosure.lower;
     let room = separation.squared_lower_bound().cloned();
     if let Some(square) = &room
@@ -1214,7 +1215,8 @@ fn certify(
         }
     }
     for _ in 0..2 * polynomial.degree() + 1 {
-        let candidate = ExactInterval::new(&enclosure.lower - &pad, &enclosure.upper + &pad).ok()?;
+        let candidate =
+            ExactInterval::new(&enclosure.lower - &pad, &enclosure.upper + &pad).ok()?;
         if let Ok(root) = AlgebraicRoot::isolate(polynomial.clone(), candidate) {
             return Some(root);
         }
@@ -1250,11 +1252,7 @@ fn refinements_the_material_allows(
 ) -> Result<u64, WindingError> {
     let extent = symbol.len();
     let mut coefficient_sum = Rat::zero();
-    for coefficient in symbol
-        .iter()
-        .take(extent.saturating_sub(1) / 2 + 1)
-        .skip(1)
-    {
+    for coefficient in symbol.iter().take(extent.saturating_sub(1) / 2 + 1).skip(1) {
         coefficient_sum += Rat::from_integer(coefficient.abs());
     }
     let initial_width = coefficient_sum * table.widest_inexact_width();
@@ -2445,7 +2443,9 @@ mod tests {
         let (_, symbol) = form.integral_symbol();
         let mut table = StarTable::found(form.extent()).expect("the star table founds");
         for taken in 0..=cap {
-            let enclosure = table.enclose(&symbol, character).expect("the symbol encloses");
+            let enclosure = table
+                .enclose(&symbol, character)
+                .expect("the symbol encloses");
             if enclosure.lower.is_positive() || enclosure.upper.is_negative() {
                 return Some(taken);
             }
@@ -2695,10 +2695,7 @@ mod tests {
         );
         assert!(
             matches!(
-                SymmetricCirculant::read_cyclically(
-                    &scrambled,
-                    &CyclicReading::native(6).unwrap()
-                ),
+                SymmetricCirculant::read_cyclically(&scrambled, &CyclicReading::native(6).unwrap()),
                 Err(WindingError::NotCirculant { .. })
             ),
             "the native reading must return exactly what the direct gate returns"
@@ -2724,8 +2721,8 @@ mod tests {
     /// A circulant carries `c_0` at every diagonal entry, so this is refused before any walk.
     #[test]
     fn a_form_whose_directions_self_pair_differently_is_circulant_under_no_reading() {
-        let form = SymmetricForm::from_integers(&[vec![1, 0, 0], vec![0, 1, 0], vec![0, 0, 2]])
-            .unwrap();
+        let form =
+            SymmetricForm::from_integers(&[vec![1, 0, 0], vec![0, 1, 0], vec![0, 0, 2]]).unwrap();
         assert_eq!(
             cyclic_receiver_of_form(&form, 10_000),
             Err(WindingError::DiagonalIsNotConstant { direction: 2 })
@@ -2879,5 +2876,4 @@ mod lattice_rung_tests {
         assert!(admits_degree(polygon_turn_degree(17)));
         assert!(!lattice_admits_order(17));
     }
-
 }

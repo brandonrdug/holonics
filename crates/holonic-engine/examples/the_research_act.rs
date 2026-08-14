@@ -64,20 +64,20 @@ use num_bigint::BigInt;
 
 use holonic_engine::algebraic::{CausalCellId, CausalChain, ComparativeMultiplicity};
 use holonic_engine::conditioned_derivation::{
-    ablate_stem, expose, found_conditioned_circuit, ConditionedBody, ConditionedCircuit,
-    DerivationQuery, DerivedPassage, Exposure, FoundedMorphology, Passage,
+    ConditionedBody, ConditionedCircuit, DerivationQuery, DerivedPassage, Exposure,
+    FoundedMorphology, Passage, ablate_stem, expose, found_conditioned_circuit,
 };
 use holonic_engine::derivation_atlas::{
-    route_cycle_agreement, route_movement, statement_vertex_key, CircuitAperture, Derivation,
-    DerivationIdentity,
+    CircuitAperture, Derivation, DerivationIdentity, route_cycle_agreement, route_movement,
+    statement_vertex_key,
 };
 use holonic_engine::derivation_integral::AccumulationRule;
 use holonic_engine::derivation_skein::{
-    declared_contexts, moves_the_production_made, passages_under, MoveAperture, MoveSpecies,
+    MoveAperture, MoveSpecies, declared_contexts, moves_the_production_made, passages_under,
 };
 use holonic_engine::rebase_invariants::{PivotRule, RebaseInvariants};
 use holonic_engine::returned_reading::{condition_again, read_production};
-use holonic_engine::situated_residual::{emission_reaching, situate, Frame};
+use holonic_engine::situated_residual::{Frame, emission_reaching, situate};
 use holonic_engine::skein::read_substitution;
 use holonic_engine::surprisal::Grain;
 
@@ -178,7 +178,10 @@ fn control_corpus() -> Vec<Exposure> {
             "control/one",
             "an alpha carrier and a beta carrier share the carrier",
         ),
-        expose("control/two", "the carrier of alpha and the carrier of beta"),
+        expose(
+            "control/two",
+            "the carrier of alpha and the carrier of beta",
+        ),
     ]
 }
 
@@ -357,7 +360,10 @@ fn exhibit_outside(outside: &[DerivedPassage]) {
     if outside.is_empty() {
         println!("    (none)");
     }
-    let stems: BTreeSet<&str> = outside.iter().map(|passage| passage.stem.as_str()).collect();
+    let stems: BTreeSet<&str> = outside
+        .iter()
+        .map(|passage| passage.stem.as_str())
+        .collect();
     println!("\n  the stems that licensed them: {stems:?}");
 }
 
@@ -453,7 +459,10 @@ fn run_act(body: &ConditionedBody, query: &DerivationQuery) -> Act {
     let aperture = MoveAperture::morphemic(&whole, MORPHEMIC_LETTERS);
     let passages = passages_under(&whole, &aperture);
     let after = found_conditioned_circuit(passages.clone(), APERTURE).expect("the circuit founds");
-    let invariants = after.circuit.invariants(PIVOT).expect("the invariants read");
+    let invariants = after
+        .circuit
+        .invariants(PIVOT)
+        .expect("the invariants read");
     let (production, outside): (Vec<DerivedPassage>, Vec<DerivedPassage>) = all
         .iter()
         .cloned()
@@ -527,8 +536,16 @@ fn main() {
          {MORPHEMIC_LETTERS} characters.\n  It is part of the question. The population outside it \
          is exhibited by name in [3b] and is\n  recoverable by declaring those stems."
     );
-    println!("\n  the mathematical deposit   {:<44} {} artifacts", deposit_root.display(), deposit.len());
-    println!("  the linguistic corpus      {:<44} {} wholes", corpus_root.display(), corpus.len());
+    println!(
+        "\n  the mathematical deposit   {:<44} {} artifacts",
+        deposit_root.display(),
+        deposit.len()
+    );
+    println!(
+        "  the linguistic corpus      {:<44} {} wholes",
+        corpus_root.display(),
+        corpus.len()
+    );
     println!("\n  the deposit reaches these statements:");
     for statement in body.standing_statements() {
         let routes = standing
@@ -543,7 +560,9 @@ fn main() {
     }
 
     // ---------------------------------------------------------------------------------------------
-    rule("[1]  THE CONDITIONING  --  reusable morphology founded by exposure to linguistic material");
+    rule(
+        "[1]  THE CONDITIONING  --  reusable morphology founded by exposure to linguistic material",
+    );
 
     let morphology = body.morphology().clone();
     println!(
@@ -568,7 +587,11 @@ fn main() {
         let returned = null
             .derive(&DerivationQuery::reaching(&statement))
             .expect("the null derives");
-        println!("    |- {:<54} returned {} passages", statement, returned.len());
+        println!(
+            "    |- {:<54} returned {} passages",
+            statement,
+            returned.len()
+        );
         null_returns_empty &= returned.is_empty();
         null_queries.push(statement);
     }
@@ -595,7 +618,9 @@ fn main() {
     );
 
     // ---------------------------------------------------------------------------------------------
-    rule("[3]  THE PRODUCTION  --  every returned passage, in full, with the bridge that licensed it");
+    rule(
+        "[3]  THE PRODUCTION  --  every returned passage, in full, with the bridge that licensed it",
+    );
 
     let act = run_act(&body, &query);
     println!(
@@ -610,11 +635,15 @@ fn main() {
     }
 
     // ---------------------------------------------------------------------------------------------
-    rule("[3b]  THE POPULATION OUTSIDE THE DECLARED APERTURE  --  named in full, never counted away");
+    rule(
+        "[3b]  THE POPULATION OUTSIDE THE DECLARED APERTURE  --  named in full, never counted away",
+    );
     exhibit_outside(&act.outside);
 
     // ---------------------------------------------------------------------------------------------
-    rule("[4]  THE CIRCUIT  --  the production as a GradedCausalComplex, read as integer invariants");
+    rule(
+        "[4]  THE CIRCUIT  --  the production as a GradedCausalComplex, read as integer invariants",
+    );
 
     let before = found_conditioned_circuit(body.standing().to_vec(), APERTURE)
         .expect("the deposit founds a circuit");
@@ -673,7 +702,9 @@ fn main() {
     );
 
     // ---------------------------------------------------------------------------------------------
-    rule("[4a]  TWO INDEPENDENT ROUTES TO ONE RESULT  --  both routes printed, and the cycle they close");
+    rule(
+        "[4a]  TWO INDEPENDENT ROUTES TO ONE RESULT  --  both routes printed, and the cycle they close",
+    );
 
     let all_passages = act.passages.clone();
     let route_vertices = routes_to(&act.after, STATEMENT);
@@ -747,7 +778,8 @@ fn main() {
     let mut exhibited_cycle = false;
     let mut cycle_boundary_vanishes = false;
     let mut second_cycle = false;
-    if let (Some(deposited), true) = (deposited_routes.first().cloned(), derived_routes.len() >= 2) {
+    if let (Some(deposited), true) = (deposited_routes.first().cloned(), derived_routes.len() >= 2)
+    {
         let (derived_one, derived_two) = (derived_routes[0].clone(), derived_routes[1].clone());
         print_route(&all_passages, "ROUTE ONE -- deposited", &deposited);
         print_route(
@@ -818,7 +850,9 @@ fn main() {
     }
 
     // ---------------------------------------------------------------------------------------------
-    rule("[4b]  THE DECLARED beta_1 = 0 CONTROL  --  the identical act, on material where beta_1 comes out zero");
+    rule(
+        "[4b]  THE DECLARED beta_1 = 0 CONTROL  --  the identical act, on material where beta_1 comes out zero",
+    );
 
     let mut control_body =
         ConditionedBody::mount(control_deposit()).expect("the control deposit declares theorems");
@@ -837,8 +871,8 @@ fn main() {
             .collect::<Vec<&str>>()
     );
     let control_query = DerivationQuery::reaching("(h : P) : Q h");
-    let control_before = found_conditioned_circuit(control_body.standing().to_vec(), APERTURE)
-        .expect("founds");
+    let control_before =
+        found_conditioned_circuit(control_body.standing().to_vec(), APERTURE).expect("founds");
     let control_before_invariants = control_before.circuit.invariants(PIVOT).expect("reads");
     let control_act = run_act(&control_body, &control_query);
 
@@ -954,7 +988,10 @@ fn main() {
                     );
                     for verdict in &reading.verdicts {
                         if verdict.invariant_here() {
-                            println!("    context {}  invariant -- no declared receiver sees the replacement", verdict.context);
+                            println!(
+                                "    context {}  invariant -- no declared receiver sees the replacement",
+                                verdict.context
+                            );
                         } else {
                             println!("    context {}  the remainder:", verdict.context);
                             for moved in &verdict.remainder {
@@ -990,10 +1027,12 @@ fn main() {
     }
 
     // ---------------------------------------------------------------------------------------------
-    rule("[6]  THE READING RETURNS  --  the movement between two readings, back into the production");
+    rule(
+        "[6]  THE READING RETURNS  --  the movement between two readings, back into the production",
+    );
 
-    let production_reading = read_production(&before, &act.after, RULE, PIVOT, STATEMENT)
-        .expect("the production reads");
+    let production_reading =
+        read_production(&before, &act.after, RULE, PIVOT, STATEMENT).expect("the production reads");
     println!(
         "\n  the movement returned {} artifacts, {} of which addressed material:",
         production_reading.returned.returns().len(),
@@ -1046,8 +1085,13 @@ fn main() {
             .the_returned_remainder_closes_the_coil()
     );
 
-    let again = condition_again(&standing, body.morphology(), &query, &production_reading.returned)
-        .expect("the second production founds");
+    let again = condition_again(
+        &standing,
+        body.morphology(),
+        &query,
+        &production_reading.returned,
+    )
+    .expect("the second production founds");
     println!(
         "\n  first production {} passages   second production {} passages   moved {}",
         again.first.len(),
@@ -1210,7 +1254,10 @@ fn main() {
         open.len()
     );
     for entry in &open {
-        println!("      {:<22} vs {:<22} -> {:?}", entry.left, entry.right, entry.verdict);
+        println!(
+            "      {:<22} vs {:<22} -> {:?}",
+            entry.left, entry.right, entry.verdict
+        );
     }
     println!(
         "\n  and the first two written out whole, so the retention is visible rather than \
@@ -1247,7 +1294,9 @@ fn main() {
     );
 
     // ---------------------------------------------------------------------------------------------
-    rule("[8]  IS THE RETURNED PASSAGE IN THE DEPOSIT?  --  checked by content against every artifact");
+    rule(
+        "[8]  IS THE RETURNED PASSAGE IN THE DEPOSIT?  --  checked by content against every artifact",
+    );
 
     let mut byte_identical: Vec<(String, String)> = Vec::new();
     let mut name_collisions: Vec<(String, String)> = Vec::new();
@@ -1284,8 +1333,14 @@ fn main() {
         act.all.len(),
         deposit.len()
     );
-    println!("    byte-identical to a deposited artifact          {} matches", byte_identical.len());
-    println!("    declares a name a deposited artifact declares   {} matches", name_collisions.len());
+    println!(
+        "    byte-identical to a deposited artifact          {} matches",
+        byte_identical.len()
+    );
+    println!(
+        "    declares a name a deposited artifact declares   {} matches",
+        name_collisions.len()
+    );
     println!(
         "    reads back to a deposited (statement, recruitment)  {} matches",
         reading_identical.len()
@@ -1324,8 +1379,11 @@ fn main() {
 
     let withheld = body.with_morphology(FoundedMorphology::unconditioned());
     let ablated = run_act(&withheld, &query);
-    let before_names: BTreeSet<&str> =
-        act.all.iter().map(|passage| passage.name.as_str()).collect();
+    let before_names: BTreeSet<&str> = act
+        .all
+        .iter()
+        .map(|passage| passage.name.as_str())
+        .collect();
     let after_names: BTreeSet<&str> = ablated
         .all
         .iter()
@@ -1370,9 +1428,7 @@ fn main() {
         println!("    {name}");
     }
     let (_, ablated_betti_1, _) = grade_of(&ablated.invariants, 1);
-    println!(
-        "\n  beta_1 with the conditioning withheld: {ablated_betti_1}   (with it: {betti_1})"
-    );
+    println!("\n  beta_1 with the conditioning withheld: {ablated_betti_1}   (with it: {betti_1})");
 
     // The finer ablation: delete ONE founded stem and re-query.
     println!("\n  and the finer shape -- delete ONE founded stem and re-query:");
@@ -1433,7 +1489,9 @@ fn main() {
     );
 
     // ---------------------------------------------------------------------------------------------
-    rule("[10]  CAN THE INSTANCE REACH A STATEMENT ABSENT FROM THE DEPOSIT?  --  determined by construction");
+    rule(
+        "[10]  CAN THE INSTANCE REACH A STATEMENT ABSENT FROM THE DEPOSIT?  --  determined by construction",
+    );
 
     println!(
         "\n  (a) absent statements, put to the CONDITIONED instance. Each is written in the \
@@ -1483,7 +1541,10 @@ fn main() {
             movement.founded_routes().len()
         );
     }
-    println!("\n      statements the deposit reaches : {:?}", body.standing_statements());
+    println!(
+        "\n      statements the deposit reaches : {:?}",
+        body.standing_statements()
+    );
     println!("      statements the instance emitted: {emitted_statements:?}");
     println!(
         "      the two populations are equal  : {}",

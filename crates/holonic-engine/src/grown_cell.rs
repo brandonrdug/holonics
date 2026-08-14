@@ -463,7 +463,9 @@ pub enum GrowthRefusal {
         kind: &'static str,
         widths: Vec<usize>,
     },
-    #[error("the material supplied is {supplied} buses of widths {widths:?}, and the growth takes {expected}")]
+    #[error(
+        "the material supplied is {supplied} buses of widths {widths:?}, and the growth takes {expected}"
+    )]
     MaterialArity {
         supplied: usize,
         expected: usize,
@@ -473,7 +475,9 @@ pub enum GrowthRefusal {
     CombinationalLoop,
     #[error("net {net} carries no value, so the evaluation is incomplete")]
     UnvaluedNet { net: u64 },
-    #[error("the reconvergence family would carry {faces} faces, past the declared aperture {aperture}")]
+    #[error(
+        "the reconvergence family would carry {faces} faces, past the declared aperture {aperture}"
+    )]
     FaceApertureExceeded { faces: usize, aperture: usize },
     #[error("founding the complex: {0}")]
     Algebraic(String),
@@ -515,7 +519,11 @@ impl Schedule {
         }
     }
 
-    fn take(self, pending: &mut Vec<InstanceId>, material: &dyn Fn(InstanceId) -> usize) -> Option<InstanceId> {
+    fn take(
+        self,
+        pending: &mut Vec<InstanceId>,
+        material: &dyn Fn(InstanceId) -> usize,
+    ) -> Option<InstanceId> {
         if pending.is_empty() {
             return None;
         }
@@ -672,9 +680,7 @@ impl Body<'_, '_> {
         let arguments: Vec<Bus> = arguments.iter().map(|bus| (*bus).clone()).collect();
         let mut outputs = Vec::with_capacity(declared.len());
         for shape in declared {
-            let width = shape
-                .width(&arguments)
-                .map_err(BodyStop::Refused)?;
+            let width = shape.width(&arguments).map_err(BodyStop::Refused)?;
             outputs.push(self.grower.fresh_bus(width));
         }
         let id = InstanceId(self.grower.instances.len() as u64 + 1);
@@ -750,11 +756,7 @@ impl Growth {
     pub fn rule_reuse(&self) -> BTreeMap<(RuleName, usize), usize> {
         let mut table = BTreeMap::new();
         for instance in &self.instances {
-            let width = instance
-                .inputs
-                .first()
-                .map(Bus::width)
-                .unwrap_or(0);
+            let width = instance.inputs.first().map(Bus::width).unwrap_or(0);
             *table.entry((instance.fired, width)).or_insert(0) += 1;
         }
         table
@@ -859,11 +861,7 @@ pub fn grow(
         .clone()
         .into_iter()
         .map(|gate| Gate {
-            inputs: gate
-                .inputs
-                .iter()
-                .map(|net| grower.root_of(*net))
-                .collect(),
+            inputs: gate.inputs.iter().map(|net| grower.root_of(*net)).collect(),
             output: grower.root_of(gate.output),
             ..gate
         })
@@ -972,8 +970,7 @@ fn expand(
                         declared: rule.outs.len(),
                     });
                 }
-                for (position, (given, slot)) in
-                    returned.iter().zip(&declared_outputs).enumerate()
+                for (position, (given, slot)) in returned.iter().zip(&declared_outputs).enumerate()
                 {
                     if given.width() != slot.width() {
                         return Err(GrowthRefusal::OutShapeContract {
@@ -1031,9 +1028,7 @@ fn expand(
                                 declared: declared_outputs[0].width(),
                             });
                         }
-                        for (left, right) in
-                            declared_outputs[0].nets().iter().zip(source.nets())
-                        {
+                        for (left, right) in declared_outputs[0].nets().iter().zip(source.nets()) {
                             grower.unify(*left, *right);
                         }
                         let instance = &mut grower.instances[index];
@@ -1083,14 +1078,22 @@ fn brent_kung_recursive_body(body: &mut Body<'_, '_>, args: &[Bus]) -> Result<Ve
     let (a_low, a_high) = split(&args[0])?;
     let (b_low, b_high) = split(&args[1])?;
     let low = body.call("low", "brent-kung-recursive", &[&a_low, &b_low, &args[2]])?;
-    let middle = body.call("middle-carry", "carry-operator", &[&low[1], &low[2], &args[2]])?;
+    let middle = body.call(
+        "middle-carry",
+        "carry-operator",
+        &[&low[1], &low[2], &args[2]],
+    )?;
     let high = body.call(
         "high",
         "brent-kung-recursive",
         &[&a_high, &b_high, &middle[0]],
     )?;
     let propagate = body.gate("propagate", GateKind::And, &[&low[1], &high[1]])?;
-    let generate = body.call("group-carry", "carry-operator", &[&high[1], &high[2], &low[2]])?;
+    let generate = body.call(
+        "group-carry",
+        "carry-operator",
+        &[&high[1], &high[2], &low[2]],
+    )?;
     Ok(vec![
         cat(&[&low[0], &high[0]]),
         propagate,
@@ -1104,7 +1107,11 @@ fn brent_kung_adder_body(body: &mut Body<'_, '_>, args: &[Bus]) -> Result<Vec<Bu
         "brent-kung-recursive",
         &[&args[0], &args[1], &args[2]],
     )?;
-    let carry = body.call("carry-out", "carry-operator", &[&group[1], &group[2], &args[2]])?;
+    let carry = body.call(
+        "carry-out",
+        "carry-operator",
+        &[&group[1], &group[2], &args[2]],
+    )?;
     Ok(vec![group[0].clone(), carry[0].clone()])
 }
 
@@ -1152,13 +1159,21 @@ pub fn standard_cells() -> RuleTable {
     });
     table.insert(Rule {
         name: "brent-kung-base",
-        outs: &[OutShape::LikeArg(0), OutShape::LikeArg(2), OutShape::LikeArg(2)],
+        outs: &[
+            OutShape::LikeArg(0),
+            OutShape::LikeArg(2),
+            OutShape::LikeArg(2),
+        ],
         fallback: None,
         body: brent_kung_base_body,
     });
     table.insert(Rule {
         name: "brent-kung-recursive",
-        outs: &[OutShape::LikeArg(0), OutShape::LikeArg(2), OutShape::LikeArg(2)],
+        outs: &[
+            OutShape::LikeArg(0),
+            OutShape::LikeArg(2),
+            OutShape::LikeArg(2),
+        ],
         fallback: Some(Fallback::Rule("brent-kung-base")),
         body: brent_kung_recursive_body,
     });
@@ -1231,12 +1246,7 @@ pub fn canonical_netlist(growth: &Growth) -> Result<CanonicalNetlist, GrowthRefu
                 }
                 Some(gate) => {
                     if gate.inputs.iter().all(|pin| level.contains_key(pin)) {
-                        let deepest = gate
-                            .inputs
-                            .iter()
-                            .map(|pin| level[pin])
-                            .max()
-                            .unwrap_or(0);
+                        let deepest = gate.inputs.iter().map(|pin| level[pin]).max().unwrap_or(0);
                         level.insert(*net, deepest + 1);
                         settled += 1;
                         progressed = true;
@@ -1261,17 +1271,11 @@ pub fn canonical_netlist(growth: &Growth) -> Result<CanonicalNetlist, GrowthRefu
             }
             let definition = match driver.get(net) {
                 Some(gate) => {
-                    let pins: Vec<String> = gate
-                        .inputs
-                        .iter()
-                        .map(|pin| form[pin].clone())
-                        .collect();
+                    let pins: Vec<String> =
+                        gate.inputs.iter().map(|pin| form[pin].clone()).collect();
                     format!("{}({})", gate.kind.name(), pins.join(","))
                 }
-                None => port
-                    .get(net)
-                    .cloned()
-                    .unwrap_or_else(|| "float".to_owned()),
+                None => port.get(net).cloned().unwrap_or_else(|| "float".to_owned()),
             };
             definitions.push((*net, definition));
         }
@@ -1441,7 +1445,10 @@ struct LocalGraph {
 }
 
 impl LocalGraph {
-    fn build(nodes: BTreeSet<NetId>, edges: Vec<(NetId, NetId, usize)>) -> Result<Self, GrowthRefusal> {
+    fn build(
+        nodes: BTreeSet<NetId>,
+        edges: Vec<(NetId, NetId, usize)>,
+    ) -> Result<Self, GrowthRefusal> {
         let nodes: Vec<NetId> = nodes.into_iter().collect();
         let index: BTreeMap<NetId, usize> = nodes
             .iter()
@@ -1450,15 +1457,15 @@ impl LocalGraph {
             .collect();
         let edges: Vec<(usize, usize, usize)> = edges
             .into_iter()
-            .filter_map(|(tail, head, arc)| {
-                Some((*index.get(&tail)?, *index.get(&head)?, arc))
-            })
+            .filter_map(|(tail, head, arc)| Some((*index.get(&tail)?, *index.get(&head)?, arc)))
             .collect();
         let mut indegree = vec![0usize; nodes.len()];
         for (_, head, _) in &edges {
             indegree[*head] += 1;
         }
-        let mut queue: Vec<usize> = (0..nodes.len()).filter(|node| indegree[*node] == 0).collect();
+        let mut queue: Vec<usize> = (0..nodes.len())
+            .filter(|node| indegree[*node] == 0)
+            .collect();
         let mut order = Vec::with_capacity(nodes.len());
         while let Some(node) = queue.pop() {
             order.push(node);
@@ -1625,7 +1632,11 @@ pub fn found_complex(
                 if source == target {
                     continue;
                 }
-                if graph.index.get(target).is_some_and(|node| reach.contains(node)) {
+                if graph
+                    .index
+                    .get(target)
+                    .is_some_and(|node| reach.contains(node))
+                {
                     pairs.push((tail, head));
                 }
             }
@@ -1643,7 +1654,10 @@ pub fn found_complex(
                     continue;
                 }
                 let mut boundary = CausalChain::default();
-                boundary.add_term(net_cells[&gate.output], ComparativeMultiplicity::positive(1u32));
+                boundary.add_term(
+                    net_cells[&gate.output],
+                    ComparativeMultiplicity::positive(1u32),
+                );
                 boundary.add_term(net_cells[net], ComparativeMultiplicity::negative(1u32));
                 let name = format!("pin:g{}#{pin}:{}", gate.id.0, gate.kind.name());
                 let cell = complex.found_cell(name.clone(), event(&mut counter), 1, boundary)?;
@@ -1748,10 +1762,7 @@ pub fn found_complex(
                     if weight > largest {
                         largest = weight.clone();
                     }
-                    boundary.add_term(
-                        arcs[*arc].cell,
-                        ComparativeMultiplicity::negative(weight),
-                    );
+                    boundary.add_term(arcs[*arc].cell, ComparativeMultiplicity::negative(weight));
                 }
                 if boundary.difference_is_zero() {
                     continue;
@@ -1962,12 +1973,17 @@ fn gcd(left: BigInt, right: BigInt) -> BigInt {
 mod tests {
     use super::*;
     use crate::rebase_invariants::{
-        invariants_agree, rebase_invariants, rebase_invariants_with_schedule, PivotRule,
+        PivotRule, invariants_agree, rebase_invariants, rebase_invariants_with_schedule,
     };
 
     fn adder(width: usize, schedule: Schedule) -> Growth {
-        grow(&standard_cells(), "ripple-adder", &[width, width, 1], schedule)
-            .expect("the ripple adder grows")
+        grow(
+            &standard_cells(),
+            "ripple-adder",
+            &[width, width, 1],
+            schedule,
+        )
+        .expect("the ripple adder grows")
     }
 
     fn bits(value: u32, width: usize) -> Vec<u8> {
@@ -2014,8 +2030,13 @@ mod tests {
     #[test]
     fn a_cell_whose_material_exhausts_immediately_returns_the_fallback_and_grows_nothing() {
         // The negative pole. A multiplexer with no select bits selects the only thing it has.
-        let growth = grow(&standard_cells(), "multiplexer", &[1, 0], Schedule::Instantiation)
-            .expect("the pole grows");
+        let growth = grow(
+            &standard_cells(),
+            "multiplexer",
+            &[1, 0],
+            Schedule::Instantiation,
+        )
+        .expect("the pole grows");
         assert_eq!(growth.gate_count(), 0);
         assert_eq!(growth.instance_count(), 1);
         assert!(growth.instances[0].grew_nothing);
@@ -2024,7 +2045,10 @@ mod tests {
         // The output net IS the input net; the identity fallback is an alias, not a wire.
         assert_eq!(growth.root_outputs[0], growth.primary_inputs[0]);
         // And it still evaluates.
-        assert_eq!(evaluate(&growth, &[vec![1], vec![]]).unwrap(), vec![vec![1]]);
+        assert_eq!(
+            evaluate(&growth, &[vec![1], vec![]]).unwrap(),
+            vec![vec![1]]
+        );
     }
 
     #[test]
@@ -2091,7 +2115,11 @@ mod tests {
             .expect_err("a half-width sum does not honour LikeArg(0)");
         assert!(matches!(
             refusal,
-            GrowthRefusal::OutShapeContract { returned: 2, declared: 4, .. }
+            GrowthRefusal::OutShapeContract {
+                returned: 2,
+                declared: 4,
+                ..
+            }
         ));
     }
 
@@ -2134,8 +2162,13 @@ mod tests {
         // the whole residue range rather than a corner of it.
         for width in [1usize, 2, 3, 4, 6, 9] {
             let table = standard_cells();
-            let ripple = grow(&table, "ripple-adder", &[width, width, 1], Schedule::Instantiation)
-                .expect("ripple grows");
+            let ripple = grow(
+                &table,
+                "ripple-adder",
+                &[width, width, 1],
+                Schedule::Instantiation,
+            )
+            .expect("ripple grows");
             let kung = grow(
                 &table,
                 "brent-kung-adder",
@@ -2188,11 +2221,8 @@ mod tests {
             .expect("the multiplexer grows");
             for data in 0..(1u32 << width) {
                 for index in 0..width {
-                    let out = evaluate(
-                        &growth,
-                        &[bits(data, width), bits(index as u32, select)],
-                    )
-                    .expect("the multiplexer evaluates");
+                    let out = evaluate(&growth, &[bits(data, width), bits(index as u32, select)])
+                        .expect("the multiplexer evaluates");
                     assert_eq!(out[0][0], ((data >> index) & 1) as u8, "select {index}");
                 }
             }
@@ -2231,7 +2261,8 @@ mod tests {
     }
 
     #[test]
-    fn widest_first_coincides_with_instantiation_order_at_balanced_widths_and_that_is_the_material() {
+    fn widest_first_coincides_with_instantiation_order_at_balanced_widths_and_that_is_the_material()
+    {
         // A power-of-two bus halves evenly at every level, so every pending instance carries the
         // same material and widest-first has nothing to prefer. The gauge degenerating here is a
         // property of the CIRCUIT, and the third schedule is why the sweep still has content.
@@ -2287,7 +2318,10 @@ mod tests {
     #[test]
     fn a_schedule_is_deterministic() {
         for schedule in Schedule::ALL {
-            assert_eq!(adder(5, schedule).trace_lines(), adder(5, schedule).trace_lines());
+            assert_eq!(
+                adder(5, schedule).trace_lines(),
+                adder(5, schedule).trace_lines()
+            );
         }
     }
 
@@ -2300,8 +2334,13 @@ mod tests {
         let mut gates = Vec::new();
         let mut sites = BTreeSet::new();
         for width in 2..=9usize {
-            let growth = grow(&table, "ripple-adder", &[width, width, 1], Schedule::Instantiation)
-                .expect("grows");
+            let growth = grow(
+                &table,
+                "ripple-adder",
+                &[width, width, 1],
+                Schedule::Instantiation,
+            )
+            .expect("grows");
             gates.push(growth.gate_count());
             sites.insert(growth.sites.len());
         }
@@ -2334,9 +2373,14 @@ mod tests {
         let mut kung = Vec::new();
         for width in [4usize, 8, 16] {
             ripple.push(
-                grow(&table, "ripple-adder", &[width, width, 1], Schedule::Instantiation)
-                    .unwrap()
-                    .depth(),
+                grow(
+                    &table,
+                    "ripple-adder",
+                    &[width, width, 1],
+                    Schedule::Instantiation,
+                )
+                .unwrap()
+                .depth(),
             );
             kung.push(
                 grow(
@@ -2351,7 +2395,10 @@ mod tests {
         }
         // Both lineages are logarithmic in the width; the difference the article names is the
         // GATE depth of the carry, which is what the complex sees as a long chain of arcs.
-        assert!(ripple.windows(2).all(|pair| pair[0] < pair[1]), "{ripple:?}");
+        assert!(
+            ripple.windows(2).all(|pair| pair[0] < pair[1]),
+            "{ripple:?}"
+        );
         assert!(kung.windows(2).all(|pair| pair[0] < pair[1]), "{kung:?}");
     }
 
@@ -2420,9 +2467,13 @@ mod tests {
             reconvergence: true,
             face_aperture: 1,
         };
-        let refusal = found_complex(&growth, tight).expect_err("seven faces past an aperture of one");
+        let refusal =
+            found_complex(&growth, tight).expect_err("seven faces past an aperture of one");
         assert!(
-            matches!(refusal, GrowthRefusal::FaceApertureExceeded { aperture: 1, .. }),
+            matches!(
+                refusal,
+                GrowthRefusal::FaceApertureExceeded { aperture: 1, .. }
+            ),
             "{refusal:?}"
         );
     }
@@ -2434,7 +2485,10 @@ mod tests {
         let vector = grown.complex.f_vector();
         assert!(vector.get(&0).copied().unwrap_or(0) > 0);
         assert!(vector.get(&1).copied().unwrap_or(0) > 0);
-        assert!(vector.get(&2).copied().unwrap_or(0) > 0, "no 2-cells: {vector:?}");
+        assert!(
+            vector.get(&2).copied().unwrap_or(0) > 0,
+            "no 2-cells: {vector:?}"
+        );
     }
 
     #[test]
@@ -2494,8 +2548,14 @@ mod tests {
                     rebase_invariants(&grown.complex, PivotRule::FirstNonzero).unwrap()
                 })
                 .collect();
-            assert!(invariants_agree(&readings[0], &readings[1]), "width {width}");
-            assert!(invariants_agree(&readings[0], &readings[2]), "width {width}");
+            assert!(
+                invariants_agree(&readings[0], &readings[1]),
+                "width {width}"
+            );
+            assert!(
+                invariants_agree(&readings[0], &readings[2]),
+                "width {width}"
+            );
         }
     }
 
@@ -2558,7 +2618,11 @@ mod tests {
         let grown = found_complex(&growth, ComplexAperture::DIVISION).unwrap();
         let schedules: Vec<_> = PivotRule::ALL
             .iter()
-            .map(|rule| rebase_invariants_with_schedule(&grown.complex, *rule).unwrap().1)
+            .map(|rule| {
+                rebase_invariants_with_schedule(&grown.complex, *rule)
+                    .unwrap()
+                    .1
+            })
             .collect();
         assert_ne!(schedules[0].per_grade, schedules[1].per_grade);
         assert_ne!(schedules[0].per_grade, schedules[2].per_grade);
@@ -2588,8 +2652,14 @@ mod tests {
                 sections.push(section);
             }
             // ...and what it sees is still schedule-independent.
-            assert!(invariants_agree(&sections[0], &sections[1]), "width {width}");
-            assert!(invariants_agree(&sections[0], &sections[2]), "width {width}");
+            assert!(
+                invariants_agree(&sections[0], &sections[1]),
+                "width {width}"
+            );
+            assert!(
+                invariants_agree(&sections[0], &sections[2]),
+                "width {width}"
+            );
         }
     }
 
@@ -2613,14 +2683,22 @@ mod tests {
         let grown = found_complex(&growth, ComplexAperture::DIVISION).unwrap();
         let pins = grown.arcs.iter().filter(|arc| arc.gate.is_some()).count();
         let boxes = grown.arcs.iter().filter(|arc| arc.gate.is_none()).count();
-        assert_eq!(pins, growth.gates.iter().map(|g| g.inputs.len()).sum::<usize>());
+        assert_eq!(
+            pins,
+            growth.gates.iter().map(|g| g.inputs.len()).sum::<usize>()
+        );
         assert!(boxes > 0, "no lineage arcs");
     }
 
     #[test]
     fn the_negative_pole_founds_a_complex_with_no_arcs_at_all() {
-        let growth = grow(&standard_cells(), "multiplexer", &[1, 0], Schedule::Instantiation)
-            .expect("the pole grows");
+        let growth = grow(
+            &standard_cells(),
+            "multiplexer",
+            &[1, 0],
+            Schedule::Instantiation,
+        )
+        .expect("the pole grows");
         let grown = found_complex(&growth, ComplexAperture::BOTH).expect("it founds");
         assert!(grown.arcs.is_empty());
         assert_eq!(grown.division_faces, 0);

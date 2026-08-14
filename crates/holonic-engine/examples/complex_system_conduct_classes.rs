@@ -27,12 +27,12 @@ use holonic_engine::algebraic::{
     CausalCellId, CausalChain, ComparativeMultiplicity, GradedCausalComplex,
 };
 use holonic_engine::causal::EventId;
-use holonic_engine::complex_system::{cell, item, AddressReading, ComplexSystem};
-use holonic_engine::dilation::{covering_horizon, dilate, Horizon, WalkOrder};
+use holonic_engine::complex_system::{AddressReading, ComplexSystem, cell, item};
+use holonic_engine::dilation::{Horizon, WalkOrder, covering_horizon, dilate};
 use holonic_engine::placement::place;
 use holonic_engine::receiver_exact_compression::{
-    compress, InputId, ItemId, Observation, ObservedSystem, Partition, ReceiverExactCompression,
-    ReceiverId,
+    InputId, ItemId, Observation, ObservedSystem, Partition, ReceiverExactCompression, ReceiverId,
+    compress,
 };
 use holonic_engine::supported_realizers::RealizerId;
 
@@ -148,7 +148,10 @@ fn name(complex: &GradedCausalComplex, id: CausalCellId) -> String {
 }
 
 fn spell(complex: &GradedCausalComplex, block: &BTreeSet<ItemId>) -> String {
-    let members: Vec<String> = block.iter().map(|held| name(complex, cell(*held))).collect();
+    let members: Vec<String> = block
+        .iter()
+        .map(|held| name(complex, cell(*held)))
+        .collect();
     format!("{{{}}}", members.join(" "))
 }
 
@@ -268,7 +271,10 @@ fn show_receiver(complex: &GradedCausalComplex, system: &ComplexSystem, index: u
 
     let mut by_address: BTreeMap<u64, Vec<String>> = BTreeMap::new();
     for (id, Observation(address)) in system.addresses(ReceiverId(index as u64)) {
-        by_address.entry(address).or_default().push(name(complex, id));
+        by_address
+            .entry(address)
+            .or_default()
+            .push(name(complex, id));
     }
     for (address, held) in &by_address {
         let label = if *address == 0 {
@@ -347,7 +353,9 @@ fn main() {
         receivers.clone(),
         every_edge.clone(),
     )
-    .expect("every declared input is a 1-cell of this complex and every section was measured on it");
+    .expect(
+        "every declared input is a 1-cell of this complex and every section was measured on it",
+    );
     let reading = compress(&system);
 
     println!("\n== the receiver family, read metrically ==");
@@ -424,8 +432,8 @@ fn main() {
     //
     // Receiver 1 walks depth-first at horizon four. Re-walk it breadth-first and read both ways.
     let depth = receivers[1].clone();
-    let breadth = dilate(complex, far_corner, Horizon::Steps(4), WalkOrder::Breadth)
-        .expect("corner dilates");
+    let breadth =
+        dilate(complex, far_corner, Horizon::Steps(4), WalkOrder::Breadth).expect("corner dilates");
     println!("\n== the gauge: what the walk order moves and what it does not ==");
     println!(
         "  one focus ({}), one horizon (4 steps), two orders. The charts differ: {}",
@@ -433,9 +441,13 @@ fn main() {
         depth.lineage.reached != breadth.lineage.reached,
     );
     for reading_kind in [AddressReading::Metric, AddressReading::Chart] {
-        let by_depth =
-            ComplexSystem::declare(complex, reading_kind, vec![depth.clone()], every_edge.clone())
-                .expect("the section was measured on this complex");
+        let by_depth = ComplexSystem::declare(
+            complex,
+            reading_kind,
+            vec![depth.clone()],
+            every_edge.clone(),
+        )
+        .expect("the section was measured on this complex");
         let by_breadth = ComplexSystem::declare(
             complex,
             reading_kind,
@@ -471,13 +483,19 @@ fn main() {
     show_pairs(
         complex,
         "held together by the metric reading and split by the chart",
-        &metric_pairs.difference(&chart_pairs).copied().collect::<Vec<_>>(),
+        &metric_pairs
+            .difference(&chart_pairs)
+            .copied()
+            .collect::<Vec<_>>(),
     );
     show_pairs(
         complex,
         "held together by the chart reading and split by the metric — a walk position refines a \
          distance, so this must be empty",
-        &chart_pairs.difference(&metric_pairs).copied().collect::<Vec<_>>(),
+        &chart_pairs
+            .difference(&metric_pairs)
+            .copied()
+            .collect::<Vec<_>>(),
     );
 
     // Placement, against a realizer population that is a SECOND frame. The receivers are dilated

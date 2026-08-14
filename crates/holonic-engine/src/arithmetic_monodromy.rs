@@ -61,10 +61,10 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use crate::{
-    ArithmeticFiberEvent, CausalMaterialKind, EventId,
-    EventSuccessor, ExactEventLaw, IntegerPolynomialProbe, PolynomialFiberSignature,
-    PolynomialPrimeFiber, PolynomialProbeId, PrimeEcologyError, PrimeEcologyEvent,
-    PrimeEcologyGeometryReceipt, PrimeEcologyLaw, PrimeEcologyRadiation, PrimeEcologyStanding,
+    ArithmeticFiberEvent, CausalMaterialKind, EventId, EventSuccessor, ExactEventLaw,
+    IntegerPolynomialProbe, PolynomialFiberSignature, PolynomialPrimeFiber, PolynomialProbeId,
+    PrimeEcologyError, PrimeEcologyEvent, PrimeEcologyGeometryReceipt, PrimeEcologyLaw,
+    PrimeEcologyRadiation, PrimeEcologyStanding,
 };
 
 /// The lowest degree at which this organ's own material exists.
@@ -1162,8 +1162,7 @@ fn derive_prime_section(
     fiber: &PolynomialPrimeFiber,
 ) -> Result<QuinticPrimeSection, ArithmeticMonodromyError> {
     fiber.validate()?;
-    let expected =
-        u32::try_from(degree).map_err(|_| ArithmeticMonodromyError::CarrierOverflow)?;
+    let expected = u32::try_from(degree).map_err(|_| ArithmeticMonodromyError::CarrierOverflow)?;
     if fiber.signature.degree != expected {
         return Err(ArithmeticMonodromyError::FiberDegreeMismatch {
             problem,
@@ -1252,15 +1251,16 @@ fn initial_galois_fiber(
     let degree = normalized.degree();
     // Parity is degree-general: `disc(f)` is a square in `Q` exactly when `G <= A_n`. The
     // catalogue is not, so it is filtered only at its own degree.
-    let transitive_candidates = if normalized.discriminant.is_zero() || degree != catalogued_transitive_degree() {
-        BTreeSet::new()
-    } else {
-        let square = normalized.discriminant_square_root.is_some();
-        quintic_group_catalogue()?
-            .iter()
-            .filter_map(|(group, entry)| (entry.all_even == square).then_some(*group))
-            .collect()
-    };
+    let transitive_candidates =
+        if normalized.discriminant.is_zero() || degree != catalogued_transitive_degree() {
+            BTreeSet::new()
+        } else {
+            let square = normalized.discriminant_square_root.is_some();
+            quintic_group_catalogue()?
+                .iter()
+                .filter_map(|(group, entry)| (entry.all_even == square).then_some(*group))
+                .collect()
+        };
     let mut galois = QuinticGaloisFiber {
         schema: "holonic-engine.quintic-galois-fiber.v1".to_owned(),
         degree,
@@ -1512,10 +1512,7 @@ fn quintic_group_catalogue()
         {
             return Err(ArithmeticMonodromyError::InvalidGroupCatalogue(group));
         }
-        let cycle_types = elements
-            .iter()
-            .map(permutation_cycle_type)
-            .collect();
+        let cycle_types = elements.iter().map(permutation_cycle_type).collect();
         let all_even = elements.iter().all(permutation_is_even);
         catalogue.insert(
             group,
@@ -2042,7 +2039,10 @@ mod tests {
             );
             for cycle_type in &types {
                 let total: u32 = cycle_type.iter().sum();
-                assert_eq!(total as usize, prime, "{cycle_type:?} does not partition {prime}");
+                assert_eq!(
+                    total as usize, prime,
+                    "{cycle_type:?} does not partition {prime}"
+                );
             }
             assert!(types.contains(&vec![prime as u32]));
             assert!(types.contains(&vec![1_u32; prime]));
@@ -2079,8 +2079,7 @@ mod tests {
     #[test]
     fn the_permutation_carrier_generates_at_a_degree_other_than_five() {
         // S_3 from a transposition and a three-cycle.
-        let symmetric_three =
-            generated_permutation_group(&[vec![1, 0, 2], vec![1, 2, 0]]).unwrap();
+        let symmetric_three = generated_permutation_group(&[vec![1, 0, 2], vec![1, 2, 0]]).unwrap();
         assert_eq!(symmetric_three.len(), 6);
         assert_eq!(
             symmetric_three
@@ -2186,8 +2185,14 @@ mod tests {
 
     #[test]
     fn a5_fibers_drive_the_same_galois_and_euler_standing_across_chronologies() {
-        let law = ArithmeticMonodromyLaw::with_horn_local_section_limit(1, TEST_HORN_LOCAL_SECTION_LIMIT).unwrap();
-        let standing = ArithmeticMonodromyStanding::with_horn_local_section_limit(1, TEST_HORN_LOCAL_SECTION_LIMIT).unwrap();
+        let law =
+            ArithmeticMonodromyLaw::with_horn_local_section_limit(1, TEST_HORN_LOCAL_SECTION_LIMIT)
+                .unwrap();
+        let standing = ArithmeticMonodromyStanding::with_horn_local_section_limit(
+            1,
+            TEST_HORN_LOCAL_SECTION_LIMIT,
+        )
+        .unwrap();
         let mut early = CausalWorld::new(law, standing);
         early
             .receive(&ArithmeticMonodromyEvent::InheritQuintic {
@@ -2205,8 +2210,14 @@ mod tests {
             .unwrap();
         admit_through(&mut early, 61).unwrap();
 
-        let law = ArithmeticMonodromyLaw::with_horn_local_section_limit(1, TEST_HORN_LOCAL_SECTION_LIMIT).unwrap();
-        let standing = ArithmeticMonodromyStanding::with_horn_local_section_limit(1, TEST_HORN_LOCAL_SECTION_LIMIT).unwrap();
+        let law =
+            ArithmeticMonodromyLaw::with_horn_local_section_limit(1, TEST_HORN_LOCAL_SECTION_LIMIT)
+                .unwrap();
+        let standing = ArithmeticMonodromyStanding::with_horn_local_section_limit(
+            1,
+            TEST_HORN_LOCAL_SECTION_LIMIT,
+        )
+        .unwrap();
         let mut late = CausalWorld::new(law, standing);
         admit_through(&mut late, 61).unwrap();
         late.receive(&ArithmeticMonodromyEvent::InheritQuintic {
@@ -2241,8 +2252,14 @@ mod tests {
 
     #[test]
     fn certified_a5_future_cycle_fiber_rejects_every_odd_partition() {
-        let law = ArithmeticMonodromyLaw::with_horn_local_section_limit(1, TEST_HORN_LOCAL_SECTION_LIMIT).unwrap();
-        let standing = ArithmeticMonodromyStanding::with_horn_local_section_limit(1, TEST_HORN_LOCAL_SECTION_LIMIT).unwrap();
+        let law =
+            ArithmeticMonodromyLaw::with_horn_local_section_limit(1, TEST_HORN_LOCAL_SECTION_LIMIT)
+                .unwrap();
+        let standing = ArithmeticMonodromyStanding::with_horn_local_section_limit(
+            1,
+            TEST_HORN_LOCAL_SECTION_LIMIT,
+        )
+        .unwrap();
         let mut world = CausalWorld::new(law, standing);
         world
             .receive(&ArithmeticMonodromyEvent::InheritQuintic {
@@ -2266,8 +2283,14 @@ mod tests {
 
     #[test]
     fn nonsquare_control_closes_as_s5_from_caused_prime_sections() {
-        let law = ArithmeticMonodromyLaw::with_horn_local_section_limit(1, TEST_HORN_LOCAL_SECTION_LIMIT).unwrap();
-        let standing = ArithmeticMonodromyStanding::with_horn_local_section_limit(1, TEST_HORN_LOCAL_SECTION_LIMIT).unwrap();
+        let law =
+            ArithmeticMonodromyLaw::with_horn_local_section_limit(1, TEST_HORN_LOCAL_SECTION_LIMIT)
+                .unwrap();
+        let standing = ArithmeticMonodromyStanding::with_horn_local_section_limit(
+            1,
+            TEST_HORN_LOCAL_SECTION_LIMIT,
+        )
+        .unwrap();
         let mut world = CausalWorld::new(law, standing);
         let problem = IntegralQuinticProblem::new(
             PROBLEM,

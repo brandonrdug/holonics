@@ -485,21 +485,39 @@ fn main() {
         .all(|pairings| pairings.len() == 1);
     println!(
         "  <w, R> per rim word, across both wire frames: {} value each   {pairing_is_frame_free}",
-        if pairing_is_frame_free { "one" } else { "MORE THAN one" }
+        if pairing_is_frame_free {
+            "one"
+        } else {
+            "MORE THAN one"
+        }
     );
     println!();
-    println!("  over Z    closed cochains {closed_over_z:>4}, of which <w,R> != 0 : {closed_over_z_pairing_nonzero}");
-    println!("            open   cochains {open_over_z:>4}, of which <w,R> != 0 : {open_over_z_pairing_nonzero}");
-    println!("  over Z/2  closed cochains {mod_two_closed:>4}, of which <w,R> != 0 : {mod_two_pairing_one}");
+    println!(
+        "  over Z    closed cochains {closed_over_z:>4}, of which <w,R> != 0 : {closed_over_z_pairing_nonzero}"
+    );
+    println!(
+        "            open   cochains {open_over_z:>4}, of which <w,R> != 0 : {open_over_z_pairing_nonzero}"
+    );
+    println!(
+        "  over Z/2  closed cochains {mod_two_closed:>4}, of which <w,R> != 0 : {mod_two_pairing_one}"
+    );
     println!();
-    println!("  Every Z-cocycle is forced to pair to ZERO with [R], because 2<w,R> = <w,dF> = 0 in");
-    println!("  a group with no 2-torsion. Mod 2 the face imposes NO condition at all — dF = 2R is");
-    println!("  identically zero there — so the whole family is closed and the pairing runs free.\n");
+    println!(
+        "  Every Z-cocycle is forced to pair to ZERO with [R], because 2<w,R> = <w,dF> = 0 in"
+    );
+    println!(
+        "  a group with no 2-torsion. Mod 2 the face imposes NO condition at all — dF = 2R is"
+    );
+    println!(
+        "  identically zero there — so the whole family is closed and the pairing runs free.\n"
+    );
 
     holds.push((
         "Hom(Z/2, Z) = 0 MEASURED: no Z-cocycle in the declared family pairs nonzero with [R]",
         closed_over_z > 0 && closed_over_z_pairing_nonzero == 0,
-        format!("{closed_over_z} Z-cocycles, {closed_over_z_pairing_nonzero} with a nonzero pairing"),
+        format!(
+            "{closed_over_z} Z-cocycles, {closed_over_z_pairing_nonzero} with a nonzero pairing"
+        ),
     ));
     holds.push((
         "CONTROL the pairing is NOT identically zero on the family, so the line above is not vacuous",
@@ -561,7 +579,10 @@ fn main() {
     holds.push((
         "CONTROL and it is not a Z-cocycle, which is exactly why Z cannot carry it",
         !witness_d.is_zero() && cyclic.vanishes(&witness_d.value(face)),
-        format!("d w* on the face = {} — zero mod 2, nonzero in Z", witness_d.value(face)),
+        format!(
+            "d w* on the face = {} — zero mod 2, nonzero in Z",
+            witness_d.value(face)
+        ),
     ));
 
     // -- 5. THE ORBIT: one cochain, three declared groups, three chord populations ------------
@@ -767,8 +788,12 @@ fn main() {
         }
     }
     println!("\n  declared family: all cochains with values in [-3, 3]^3 — 343 readings");
-    println!("  over Z    cocycles {stagger_z_cocycles:>4}, of which <w, z> != 0 : {stagger_z_sighted}");
-    println!("  over Z/2  cocycles {stagger_two_cocycles:>4}, of which <w, z> != 0 : {stagger_two_sighted}");
+    println!(
+        "  over Z    cocycles {stagger_z_cocycles:>4}, of which <w, z> != 0 : {stagger_z_sighted}"
+    );
+    println!(
+        "  over Z/2  cocycles {stagger_two_cocycles:>4}, of which <w, z> != 0 : {stagger_two_sighted}"
+    );
 
     let coefficient_of = |arc: CausalCellId| {
         stagger_face_boundary
@@ -795,9 +820,15 @@ fn main() {
         "\n  TABLET_THE_FLOW.md recorded the prototype's return as *\"a support of size one, the"
     );
     println!("  single arc appearing in one face boundary with coefficient 2\"*. The support-one");
-    println!("  shape reproduces, and {coefficient_two_arc} — the arc whose face coefficient IS 2 —");
-    println!("  is one of the carriers. It is NOT the only one, and that refines the record: mod 2");
-    println!("  every face coefficient here (4, -6, 2) is zero, so the face constrains nothing and");
+    println!(
+        "  shape reproduces, and {coefficient_two_arc} — the arc whose face coefficient IS 2 —"
+    );
+    println!(
+        "  is one of the carriers. It is NOT the only one, and that refines the record: mod 2"
+    );
+    println!(
+        "  every face coefficient here (4, -6, 2) is zero, so the face constrains nothing and"
+    );
     println!("  <w, z> = w2 + w3 is reached by either arc. The clause \"with coefficient 2\" is a");
     println!("  fact about which arc that run happened to return, not about the mechanism.");
 
@@ -823,7 +854,10 @@ fn main() {
         "REFINEMENT the support-one witness is NOT unique on this material, so the recorded \
          \"coefficient 2\" clause is a coincidence of presentation rather than the mechanism",
         support_one_arcs.len() > 1,
-        format!("{} arcs carry one: {support_one_arcs:?}", support_one_arcs.len()),
+        format!(
+            "{} arcs carry one: {support_one_arcs:?}",
+            support_one_arcs.len()
+        ),
     ));
 
     // the chord population on the staggered material, all three groups, on the coefficient-2 arc

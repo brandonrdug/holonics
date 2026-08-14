@@ -237,8 +237,11 @@ impl ReceiverAxis {
 
     /// The three axes that read the neighbour's **spelling**. The declared panel before the conduct
     /// axis entered, kept nameable so every reading can be taken at both panels on one material.
-    pub const ORTHOGRAPHIC: [ReceiverAxis; 3] =
-        [ReceiverAxis::Kind, ReceiverAxis::Weight, ReceiverAxis::Density];
+    pub const ORTHOGRAPHIC: [ReceiverAxis; 3] = [
+        ReceiverAxis::Kind,
+        ReceiverAxis::Weight,
+        ReceiverAxis::Density,
+    ];
 
     pub fn id(self) -> ReceiverId {
         ReceiverId(self.index() as u64)
@@ -281,12 +284,10 @@ impl ReceiverAxis {
     /// What this axis returned, rendered as the class it names rather than as a bare integer.
     pub fn render(self, reading: u64) -> String {
         match self {
-            ReceiverAxis::Kind => [
-                "lower", "Capital", "ALLCAPS", "Mixed", "numeral", "markup",
-            ]
-            .get(reading as usize)
-            .map(|name| (*name).to_owned())
-            .unwrap_or_else(|| format!("kind:{reading}")),
+            ReceiverAxis::Kind => ["lower", "Capital", "ALLCAPS", "Mixed", "numeral", "markup"]
+                .get(reading as usize)
+                .map(|name| (*name).to_owned())
+                .unwrap_or_else(|| format!("kind:{reading}")),
             ReceiverAxis::Weight => format!("len {}", weight_band_name(reading)),
             ReceiverAxis::Density => format!("2^{reading}"),
             ReceiverAxis::Conduct => ConductSignature::decode(reading).to_string(),
@@ -317,7 +318,10 @@ impl ReceiverFamily {
     pub const ORTHOGRAPHIC: ReceiverFamily = ReceiverFamily(0b111);
 
     pub fn of(axes: impl IntoIterator<Item = ReceiverAxis>) -> Self {
-        ReceiverFamily(axes.into_iter().fold(0u8, |bits, axis| bits | (1 << axis.index())))
+        ReceiverFamily(
+            axes.into_iter()
+                .fold(0u8, |bits, axis| bits | (1 << axis.index())),
+        )
     }
 
     pub fn contains(self, axis: ReceiverAxis) -> bool {
@@ -433,7 +437,11 @@ pub type Window = Vec<Option<Reading>>;
 /// The `(side, depth)` a window index names. Index `2(k-1)` is `L^k`; index `2(k-1)+1` is `R^k`.
 pub fn step_at(index: usize) -> (Step, usize) {
     (
-        if index % 2 == 0 { Step::Left } else { Step::Right },
+        if index % 2 == 0 {
+            Step::Left
+        } else {
+            Step::Right
+        },
         index / 2 + 1,
     )
 }
@@ -495,7 +503,11 @@ impl std::fmt::Display for ConductSignature {
             formatter,
             "holds {}{}",
             self.holds,
-            if self.terminus_varies { " +terminus" } else { "" }
+            if self.terminus_varies {
+                " +terminus"
+            } else {
+                ""
+            }
         )
     }
 }
@@ -1794,7 +1806,11 @@ pub fn sweep_covered(
     // surfaces to spread over -- lands on the same single section, because there is nothing to
     // spread.
     let licensed = decomposition.independence(&front).is_ok();
-    let effective_lanes = if licensed { lanes.min(surfaces.len()) } else { 1 };
+    let effective_lanes = if licensed {
+        lanes.min(surfaces.len())
+    } else {
+        1
+    };
 
     // **The expansion law is not restated here.** Until 2026-08-11 this function carried its own
     // by-extent placement — sort by `(Reverse(extent), index)`, greedy onto the least-carried lane,
@@ -1912,9 +1928,7 @@ impl InvariancePartition {
 }
 
 /// Split a sweep by verdict.
-pub fn invariance_partition(
-    sweep: &BTreeMap<SurfaceId, SeparationReading>,
-) -> InvariancePartition {
+pub fn invariance_partition(sweep: &BTreeMap<SurfaceId, SeparationReading>) -> InvariancePartition {
     let mut partition = InvariancePartition::default();
     for (surface, reading) in sweep {
         match reading.conduct_invariance().verdict {
@@ -2599,11 +2613,7 @@ pub fn cross_check(
             required,
         });
     }
-    let roots: Vec<(u32, u32)> = complex
-        .classes
-        .iter()
-        .map(|class| class.sites[0])
-        .collect();
+    let roots: Vec<(u32, u32)> = complex.classes.iter().map(|class| class.sites[0]).collect();
     let presented = roots.len();
     let system = OccurrenceSystem::new(census, atlas, roots, horizon);
     let compression = compress(&system);
@@ -3190,7 +3200,11 @@ mod tests {
         );
         write(&root, "canon/a.md", "the set of points\n");
         write(&root, "research/records/a.md", "a set with members\n");
-        write(&root, "reference/pureholonics-seed/a.md", "set members here and set again\n");
+        write(
+            &root,
+            "reference/pureholonics-seed/a.md",
+            "set members here and set again\n",
+        );
         root
     }
 
@@ -3207,22 +3221,30 @@ mod tests {
         assert_eq!(iron.distinct_windows, 1, "one construction, one window");
         assert_eq!(iron.verdict, Verdict::Iron);
         assert_eq!(
-            iron.exhibit(&census, TEST_CAPACITY).expect("within capacity"),
+            iron.exhibit(&census, TEST_CAPACITY)
+                .expect("within capacity"),
             Vec::new(),
             "an iron surface has no separations at all"
         );
 
         let fuzzy = separation_reading(&census, &atlas, set, 1);
-        assert!(fuzzy.distinct_windows > 1, "several constructions, several windows");
+        assert!(
+            fuzzy.distinct_windows > 1,
+            "several constructions, several windows"
+        );
         assert!(matches!(fuzzy.verdict, Verdict::Separated { .. }));
-        let separations = fuzzy.exhibit(&census, TEST_CAPACITY).expect("within capacity");
+        let separations = fuzzy
+            .exhibit(&census, TEST_CAPACITY)
+            .expect("within capacity");
         assert_eq!(
             BigUint::from(separations.len()),
             fuzzy.complex.separated_class_pairs(),
             "the exhibition is the WHOLE population or it is an obstruction"
         );
         assert!(
-            separations.iter().all(|separation| !separation.word.is_empty()),
+            separations
+                .iter()
+                .all(|separation| !separation.word.is_empty()),
             "an empty word is the one-shot reading, which held every occurrence together"
         );
 
@@ -3245,7 +3267,10 @@ mod tests {
             "iron at horizon 2 must be contained in iron at horizon 1; \
              near={near:?} far={far:?}"
         );
-        assert!(!near.is_empty(), "the fixture founds at least one iron surface");
+        assert!(
+            !near.is_empty(),
+            "the fixture founds at least one iron surface"
+        );
         let _ = fs::remove_dir_all(&root);
     }
 
@@ -3328,7 +3353,8 @@ mod tests {
         let atlas = atlas(&census);
         let set = census.lookup("set").unwrap();
         let projected = ablation_profile(&census, &atlas, set, 1);
-        let organ = cross_check_ablation(&census, &atlas, set, 1, TEST_CAPACITY).expect("within capacity");
+        let organ =
+            cross_check_ablation(&census, &atlas, set, 1, TEST_CAPACITY).expect("within capacity");
         assert_eq!(projected.len(), ReceiverAxis::DECLARED.len());
         assert_eq!(
             projected, organ,
@@ -3354,15 +3380,25 @@ mod tests {
         let atlas = atlas(&census);
         let iron = iron_at(&sweep(&census, &atlas, 1));
         let incidence = warping_incidence(&census, &iron, 2);
-        assert!(incidence.nonzero() > 0, "the iron field must warp something");
+        assert!(
+            incidence.nonzero() > 0,
+            "the iron field must warp something"
+        );
 
         let org = census.lookup("org").expect("the fixture writes it");
         assert!(iron.contains(&org), "`org` only ever follows `arxiv .`");
         let pad = census.lookup("pad").expect("the fixture writes it");
-        assert!(!iron.contains(&pad), "`pad` stands in many places and is not iron");
+        assert!(
+            !iron.contains(&pad),
+            "`pad` stands in many places and is not iron"
+        );
         let row = incidence.row(pad);
         assert!(!row.is_empty(), "`pad` sits within two steps of `org`");
-        let recruitment = &row.iter().find(|(id, _)| *id == org).expect("`org` is in reach").1;
+        let recruitment = &row
+            .iter()
+            .find(|(id, _)| *id == org)
+            .expect("`org` is in reach")
+            .1;
         assert_ne!(
             recruitment.recruits, recruitment.recruited_by,
             "the two arms are directions, not one number counted twice"
@@ -3392,7 +3428,10 @@ mod tests {
         let abcde = census.lookup("abcde").unwrap();
         let vacuous = &reading[&abcde];
         assert!(vacuous.verdict.is_iron());
-        assert!(vacuous.vacuously_iron(), "one occurrence has no pair to separate");
+        assert!(
+            vacuous.vacuously_iron(),
+            "one occurrence has no pair to separate"
+        );
         assert_eq!(vacuous.survived_pairs(), BigUint::from(0u32));
 
         let iron = iron_at(&reading);
@@ -3423,7 +3462,9 @@ mod tests {
 
         let set = census.lookup("set").unwrap();
         let fuzzy = separation_reading(&census, &atlas, set, 1);
-        let exhibited = fuzzy.exhibit(&census, TEST_CAPACITY).expect("within capacity");
+        let exhibited = fuzzy
+            .exhibit(&census, TEST_CAPACITY)
+            .expect("within capacity");
         let from_pairs: BigUint = exhibited
             .iter()
             .map(|separation| separation.occurrence_pairs())
@@ -3446,7 +3487,10 @@ mod tests {
         let set = census.lookup("set").unwrap();
         let reading = separation_reading(&census, &atlas, set, 1);
         let required = reading.complex.separated_class_pairs();
-        assert!(required > BigUint::from(1u32), "the fixture must exceed a capacity of one");
+        assert!(
+            required > BigUint::from(1u32),
+            "the fixture must exceed a capacity of one"
+        );
 
         let obstruction = reading
             .exhibit(&census, 1)
@@ -3512,7 +3556,11 @@ mod tests {
             "research/records/a.md",
             "alpha ww Beta zz ww 12345 gamma ww ee\n",
         );
-        write(&root, "reference/pureholonics-seed/a.md", "Kk pp ll tt pp Nn\n");
+        write(
+            &root,
+            "reference/pureholonics-seed/a.md",
+            "Kk pp ll tt pp Nn\n",
+        );
         root
     }
 
@@ -3528,8 +3576,14 @@ mod tests {
         let reading = separation_reading(&census, &atlas, bee, 1);
         let invariance = reading.conduct_invariance();
 
-        assert_eq!(reading.distinct_windows, 2, "`bee` stands in two constructions");
-        assert!(matches!(reading.verdict, Verdict::Separated { .. }), "not iron");
+        assert_eq!(
+            reading.distinct_windows, 2,
+            "`bee` stands in two constructions"
+        );
+        assert!(
+            matches!(reading.verdict, Verdict::Separated { .. }),
+            "not iron"
+        );
         // `aa`/`dddd` and `cc`/`eeee` are all lowercase singletons standing in one construction
         // each, so `kind`, `density` and `conduct` all agree across the two occurrences and only
         // the length band moves.
@@ -3587,7 +3641,10 @@ mod tests {
         let reading = separation_reading(&census, &atlas, qq, 1);
         let invariance = reading.conduct_invariance();
 
-        assert!(invariance.terminus_varies, "`qq` opens its whole exactly once");
+        assert!(
+            invariance.terminus_varies,
+            "`qq` opens its whole exactly once"
+        );
         assert_eq!(
             invariance.verdict,
             ConductVerdict::Varying {
@@ -3684,8 +3741,15 @@ mod tests {
         for horizon in [1usize, 2] {
             for surface in census.word_surfaces() {
                 for family in ReceiverFamily::FULL.subsets() {
-                    let check = cross_check_family(&census, &atlas, surface, horizon, family, TEST_CAPACITY)
-                        .expect("the fixture is inside the declared capacity");
+                    let check = cross_check_family(
+                        &census,
+                        &atlas,
+                        surface,
+                        horizon,
+                        family,
+                        TEST_CAPACITY,
+                    )
+                    .expect("the fixture is inside the declared capacity");
                     assert!(
                         check.agrees(),
                         "horizon {horizon}, {:?}: {check:?}",
@@ -3753,7 +3817,10 @@ mod tests {
         for horizon in [1usize, 2] {
             for (_, reading) in sweep(&census, &atlas, horizon) {
                 let invariance = reading.conduct_invariance();
-                let ConductVerdict::ConductInvariant { collapsing, windows } = invariance.verdict
+                let ConductVerdict::ConductInvariant {
+                    collapsing,
+                    windows,
+                } = invariance.verdict
                 else {
                     continue;
                 };
@@ -3831,13 +3898,18 @@ mod tests {
         let atlas = atlas(&census);
         let pad = census.lookup("pad").unwrap();
         let reading = separation_reading(&census, &atlas, pad, 1);
-        let separations = reading.exhibit(&census, TEST_CAPACITY).expect("within capacity");
+        let separations = reading
+            .exhibit(&census, TEST_CAPACITY)
+            .expect("within capacity");
         assert!(
             separations.iter().any(|separation| separation.by_terminus),
             "the opening `pad` has no left neighbour and every other one does: {separations:?}"
         );
         let check = cross_check(&census, &atlas, pad, 1, TEST_CAPACITY).expect("within capacity");
-        assert!(check.agrees(), "the organ must agree about the terminus too: {check:?}");
+        assert!(
+            check.agrees(),
+            "the organ must agree about the terminus too: {check:?}"
+        );
         let _ = fs::remove_dir_all(&root);
     }
 
@@ -3889,8 +3961,7 @@ mod tests {
         let mut checked = 0usize;
         let mut varied = BTreeSet::new();
         for surface in census.word_surfaces() {
-            let complex =
-                SeparationComplex::read(&census, &flat, surface, TEST_FOUNDING_HORIZON);
+            let complex = SeparationComplex::read(&census, &flat, surface, TEST_FOUNDING_HORIZON);
             let reading = complex.conduct_invariance(BigUint::from(census.occurrences(surface)));
             let signature = founded.signature(surface);
             assert_eq!(
@@ -4017,7 +4088,10 @@ mod tests {
                     let blocks = row.family_blocks(family);
                     match row.shallowest_within(family) {
                         None => {
-                            assert_eq!(blocks, 1, "no separation named where {family} leaves {blocks}");
+                            assert_eq!(
+                                blocks, 1,
+                                "no separation named where {family} leaves {blocks}"
+                            );
                             collapsed += 1;
                         }
                         Some(separation) => {
@@ -4068,7 +4142,11 @@ mod tests {
         );
         write(&root, "canon/a.md", "zero LONGWORD alpha four five\n");
         write(&root, "research/records/a.md", "pp gg alpha six hh\n");
-        write(&root, "reference/pureholonics-seed/a.md", "pp gg alpha six hh\n");
+        write(
+            &root,
+            "reference/pureholonics-seed/a.md",
+            "pp gg alpha six hh\n",
+        );
         root
     }
 
@@ -4238,11 +4316,14 @@ mod tests {
         let atlas = atlas(&census);
 
         let at_lanes = |lanes: u32| {
-            sweep_covered(&census, &atlas, 1, &HardwareCover::of_charts(vec![
-                crate::hardware_cover::Chart::Host(crate::hardware_cover::HostDeclaration {
-                    lanes,
-                }),
-            ]))
+            sweep_covered(
+                &census,
+                &atlas,
+                1,
+                &HardwareCover::of_charts(vec![crate::hardware_cover::Chart::Host(
+                    crate::hardware_cover::HostDeclaration { lanes },
+                )]),
+            )
         };
         let serial = at_lanes(1);
         let wide = at_lanes(8);
@@ -4285,7 +4366,11 @@ mod tests {
                 &format!("a lane is a realization coordinate and may not move a reading: {lanes}"),
             );
         }
-        compare(&sweep(&census, &atlas, 1), &serial.readings, "the default entry point");
+        compare(
+            &sweep(&census, &atlas, 1),
+            &serial.readings,
+            "the default entry point",
+        );
         let _ = fs::remove_dir_all(&root);
     }
 
@@ -4301,7 +4386,10 @@ mod tests {
         let census = CorpusCensus::read(&root).unwrap();
         let atlas = atlas(&census);
         let corpus_bound = material_horizon_bound(&census);
-        assert!(corpus_bound > 1, "the fixture must admit more than one shell");
+        assert!(
+            corpus_bound > 1,
+            "the fixture must admit more than one shell"
+        );
         let mut floored = 0usize;
 
         for surface in census.word_surfaces() {
@@ -4364,7 +4452,11 @@ mod tests {
 
             // The cone must never be propagated further than this surface's material admits, and
             // the live population must be bounded by the shells walked times the occurrences.
-            assert!(derived.shells <= bound, "{} shells past {bound}", derived.shells);
+            assert!(
+                derived.shells <= bound,
+                "{} shells past {bound}",
+                derived.shells
+            );
             assert!(
                 derived.active_total <= derived.shells * census.sites(surface).len(),
                 "the live population cannot exceed shells x occurrences"
@@ -4429,9 +4521,15 @@ mod tests {
         let surface = census.lookup("c").expect("the fixture writes it");
 
         let derived = saturation_horizon(&census, &atlas, surface);
-        assert_eq!(derived.horizon, 3, "the last split is at shell three: {derived:?}");
+        assert_eq!(
+            derived.horizon, 3,
+            "the last split is at shell three: {derived:?}"
+        );
         assert_eq!(derived.classes, 3, "all three occurrences separate");
-        assert_eq!(derived.classes_at_one, 2, "shell one splits B off and nothing else");
+        assert_eq!(
+            derived.classes_at_one, 2,
+            "shell one splits B off and nothing else"
+        );
 
         // **The stall itself, with its witness, and no disjunction anywhere.** Shell 2 split nothing
         // and shell 3 split, so exactly one shell is interior quiet; the resumption names shell 2,
@@ -4441,11 +4539,19 @@ mod tests {
             derived.interior_quiet_shells, 1,
             "shell two split nothing and shell three split: {derived:?}"
         );
-        let resumption = derived.first_resumption.expect("the fixture stalls and resumes");
-        assert_eq!(resumption.quiet_shell, 2, "the unsound loop halts at shell two");
+        let resumption = derived
+            .first_resumption
+            .expect("the fixture stalls and resumes");
+        assert_eq!(
+            resumption.quiet_shell, 2,
+            "the unsound loop halts at shell two"
+        );
         assert_eq!(resumption.resumed_at, 3, "shell three is the resumption");
         assert!(resumption.quiet_shell < resumption.resumed_at);
-        assert_eq!(resumption.classes_before, 2, "A and C are still one class at shell two");
+        assert_eq!(
+            resumption.classes_before, 2,
+            "A and C are still one class at shell two"
+        );
         assert_eq!(resumption.classes_after, 3, "shell three separates them");
 
         // The witness itself: two occurrences of `c` that shell 3 pulled apart. Read them back out
@@ -4589,7 +4695,10 @@ mod tests {
         );
         // The law binds here: neither reading exhausts, so the ceiling IS the cost.
         assert!(!near_reading.exhausted && !far_reading.exhausted);
-        assert_eq!(near_reading.horizon, 0, "the two occurrences never separate");
+        assert_eq!(
+            near_reading.horizon, 0,
+            "the two occurrences never separate"
+        );
         assert_eq!(near_reading.classes, 1);
 
         // And the invariant: the surface's own ceiling, its shells, and its exact work do not move.
@@ -4683,7 +4792,10 @@ mod tests {
                  nothing about the fourth axis"
             );
         }
-        assert_eq!(reading.family_blocks(ReceiverFamily::of([ReceiverAxis::Conduct])), 1);
+        assert_eq!(
+            reading.family_blocks(ReceiverFamily::of([ReceiverAxis::Conduct])),
+            1
+        );
         assert!(invariance.separations_withstood > BigUint::from(0u32));
 
         // The six neighbours read alike under conduct and differ under the panel that failed.
@@ -4692,7 +4804,11 @@ mod tests {
             .iter()
             .map(|name| atlas.token(census.lookup(name).expect("written")))
             .collect();
-        assert_eq!(tokens.len(), 1, "all six were used in one construction each");
+        assert_eq!(
+            tokens.len(),
+            1,
+            "all six were used in one construction each"
+        );
         let signatures: BTreeSet<(u64, u64, u64)> = neighbours
             .iter()
             .map(|name| census.signature(census.lookup(name).expect("written")))

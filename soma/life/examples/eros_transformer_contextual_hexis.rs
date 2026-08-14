@@ -5,6 +5,7 @@ use std::path::PathBuf;
 
 use body::incidence::IncidenceHand;
 use body::num::Cog;
+use life::form_mouth::deposit_form_or_message;
 use num_bigint::BigInt;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -15,7 +16,6 @@ use soma_membrane::{
     InterfaceCapability, LiveConstituent, LiveCurrentMachine, LiveCurrentRestImage, LiveMemory,
     RegionalRelationArc, RegionalRelationCell, SparseStandingSurface,
 };
-use life::form_mouth::deposit_form_or_message;
 
 /// This driver's name at the plate mouth: `output/eros_transformer_contextual_hexis/<name>-<sha256>.form`.
 const FORM_DRIVER: &str = "eros_transformer_contextual_hexis";

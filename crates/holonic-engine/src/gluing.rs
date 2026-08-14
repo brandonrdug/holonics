@@ -51,7 +51,7 @@ use num_bigint::BigInt;
 use serde::{Deserialize, Serialize};
 
 use crate::algebraic::{CausalAlgebraicError, CausalCellId, GradedCausalComplex};
-use crate::rebase_invariants::{rebase_invariants_on, PivotRule, RebaseInvariants};
+use crate::rebase_invariants::{PivotRule, RebaseInvariants, rebase_invariants_on};
 
 /// Two sections offered as a cover. Neither is required to be proper, and neither is required to
 /// cover the whole complex — a cover of *its own union* is what Mayer–Vietoris needs.
@@ -123,7 +123,10 @@ impl GluingReading {
     /// The cover exhibits a class neither receiver sees.
     pub fn exhibits_obstruction(&self) -> bool {
         self.obstruction.iter().any(|delta| *delta != 0)
-            || self.torsion_obstruction.iter().any(|grade| !grade.is_empty())
+            || self
+                .torsion_obstruction
+                .iter()
+                .any(|grade| !grade.is_empty())
     }
 
     /// The grades at which the union and the pieces disagree, with the amount.
@@ -272,9 +275,9 @@ pub fn read_cover(
         torsion_obstruction.push(unmatched);
     }
 
-    let euler_defect = union.euler_characteristic() - left.euler_characteristic()
-        - right.euler_characteristic()
-        + overlap.euler_characteristic();
+    let euler_defect =
+        union.euler_characteristic() - left.euler_characteristic() - right.euler_characteristic()
+            + overlap.euler_characteristic();
 
     Ok(GluingReading {
         left,
@@ -434,8 +437,13 @@ mod tests {
             "the loop's face relation names v — this is what the cancellation used to erase"
         );
 
-        let cover = cover_by_vertices(&complex, &BTreeSet::from([w]), &BTreeSet::from([v])).unwrap();
-        assert_eq!(cover.left, BTreeSet::from([w]), "w alone supports nothing else");
+        let cover =
+            cover_by_vertices(&complex, &BTreeSet::from([w]), &BTreeSet::from([v])).unwrap();
+        assert_eq!(
+            cover.left,
+            BTreeSet::from([w]),
+            "w alone supports nothing else"
+        );
         assert_eq!(
             cover.right,
             BTreeSet::from([v, edge, face]),
@@ -456,9 +464,7 @@ mod tests {
         let mut loop_boundary = CausalChain::default();
         loop_boundary.add_term(vertex, ComparativeMultiplicity::positive(1u32));
         loop_boundary.add_term(vertex, ComparativeMultiplicity::negative(1u32));
-        let edge = complex
-            .found_cell("e", source(), 1, loop_boundary)
-            .unwrap();
+        let edge = complex.found_cell("e", source(), 1, loop_boundary).unwrap();
         let mut face = CausalChain::default();
         face.add_term(edge, ComparativeMultiplicity::positive(p));
         complex.found_cell("face", source(), 2, face).unwrap();
@@ -529,7 +535,10 @@ mod tests {
             let cover = cover_by_vertices(&complex, &left, &right).unwrap();
             let reading = read_cover(&complex, &cover, PivotRule::FirstNonzero).unwrap();
 
-            assert_eq!(reading.euler_defect, 0, "Mayer-Vietoris rank exactness at n={length}");
+            assert_eq!(
+                reading.euler_defect, 0,
+                "Mayer-Vietoris rank exactness at n={length}"
+            );
             assert!(reading.rank_bound_holds);
 
             assert_eq!(
@@ -598,9 +607,18 @@ mod tests {
         };
         let reading = read_cover(&complex, &cover, PivotRule::FirstNonzero).unwrap();
 
-        assert!(reading.left.total_torsion().is_empty(), "the band is torsion-free");
-        assert!(reading.right.total_torsion().is_empty(), "the disc is torsion-free");
-        assert!(reading.overlap.total_torsion().is_empty(), "the circle is torsion-free");
+        assert!(
+            reading.left.total_torsion().is_empty(),
+            "the band is torsion-free"
+        );
+        assert!(
+            reading.right.total_torsion().is_empty(),
+            "the disc is torsion-free"
+        );
+        assert!(
+            reading.overlap.total_torsion().is_empty(),
+            "the circle is torsion-free"
+        );
         assert_eq!(
             reading.union.total_torsion(),
             vec![BigInt::from(2)],
@@ -639,7 +657,11 @@ mod tests {
             "the identity overlap glues with nothing left over: {:?}",
             reading.obstructed_grades()
         );
-        assert_eq!(betti_at(&reading.overlap, 0), 1, "the overlap is the whole rim");
+        assert_eq!(
+            betti_at(&reading.overlap, 0),
+            1,
+            "the overlap is the whole rim"
+        );
     }
 
     /// Mayer–Vietoris as the second route: over many covers of one structure, the union reading

@@ -196,12 +196,12 @@ impl BaseUnits {
     pub fn dimension_of(&self, terms: &[(&str, Rat)]) -> Result<Dimension, QuantityError> {
         let mut exponents = vec![Rat::zero(); self.arity()];
         for (symbol, exponent) in terms {
-            let position =
-                self.position(symbol)
-                    .ok_or_else(|| QuantityError::UnknownBaseUnit {
-                        symbol: (*symbol).to_owned(),
-                        declared: self.symbols.join(", "),
-                    })?;
+            let position = self
+                .position(symbol)
+                .ok_or_else(|| QuantityError::UnknownBaseUnit {
+                    symbol: (*symbol).to_owned(),
+                    declared: self.symbols.join(", "),
+                })?;
             exponents[position] = &exponents[position] + exponent;
         }
         Ok(Dimension {
@@ -420,7 +420,12 @@ impl Quantity {
         self.combine(other, "subtraction", false)
     }
 
-    fn combine(&self, other: &Self, operation: &'static str, add: bool) -> Result<Self, QuantityError> {
+    fn combine(
+        &self,
+        other: &Self,
+        operation: &'static str,
+        add: bool,
+    ) -> Result<Self, QuantityError> {
         self.dimension.require_same_base(&other.dimension)?;
         if self.dimension != other.dimension {
             return Err(QuantityError::DimensionMismatch {
@@ -1280,9 +1285,18 @@ mod tests {
                     "E".to_owned(),
                     base.integer_dimension(&[1, 2, -2]).expect("E"),
                 ),
-                ("m".to_owned(), base.integer_dimension(&[1, 0, 0]).expect("m")),
-                ("c".to_owned(), base.integer_dimension(&[0, 1, -1]).expect("c")),
-                ("p".to_owned(), base.integer_dimension(&[1, 1, -1]).expect("p")),
+                (
+                    "m".to_owned(),
+                    base.integer_dimension(&[1, 0, 0]).expect("m"),
+                ),
+                (
+                    "c".to_owned(),
+                    base.integer_dimension(&[0, 1, -1]).expect("c"),
+                ),
+                (
+                    "p".to_owned(),
+                    base.integer_dimension(&[1, 1, -1]).expect("p"),
+                ),
             ],
         )
         .expect("the declared matrix is well formed")
@@ -1290,8 +1304,13 @@ mod tests {
 
     #[test]
     fn the_energy_momentum_matrix_has_rank_two_and_two_pi_groups() {
-        let groups = energy_momentum().buckingham().expect("the pi groups return");
-        assert_eq!(groups.rank, 2, "row T is minus row L, so the rank is 2 not 3");
+        let groups = energy_momentum()
+            .buckingham()
+            .expect("the pi groups return");
+        assert_eq!(
+            groups.rank, 2,
+            "row T is minus row L, so the rank is 2 not 3"
+        );
         assert_eq!(groups.rank_by_smith_normal_form, 2);
         assert_eq!(groups.rank_by_transpose, 2);
         assert_eq!(groups.independent_group_count, 2);
@@ -1316,7 +1335,9 @@ mod tests {
 
     #[test]
     fn the_two_physically_named_groups_lie_in_the_returned_span() {
-        let groups = energy_momentum().buckingham().expect("the pi groups return");
+        let groups = energy_momentum()
+            .buckingham()
+            .expect("the pi groups return");
         // E / m c^2
         let over_rest = word(&[1, -1, -2, 0]);
         // E / p c
@@ -1335,7 +1356,9 @@ mod tests {
 
     #[test]
     fn a_kernel_basis_is_a_receiver_coordinate_and_the_span_is_the_invariant() {
-        let groups = energy_momentum().buckingham().expect("the pi groups return");
+        let groups = energy_momentum()
+            .buckingham()
+            .expect("the pi groups return");
         // The elimination returns half-integer words; the primitive normalisation returns the
         // integer word the record exhibits by hand. Both are the same kernel.
         assert_eq!(
@@ -1349,7 +1372,9 @@ mod tests {
 
     #[test]
     fn a_word_that_is_not_dimensionless_is_not_in_the_span() {
-        let groups = energy_momentum().buckingham().expect("the pi groups return");
+        let groups = energy_momentum()
+            .buckingham()
+            .expect("the pi groups return");
         // E / m is not dimensionless.
         assert_eq!(groups.coordinates_of(&word(&[1, -1, 0, 0])), None);
         assert!(!groups.contains(&word(&[1, 0, 0, 0])));
@@ -1406,7 +1431,9 @@ mod tests {
 
     #[test]
     fn the_left_kernel_names_the_rescaling_that_erases_the_cast() {
-        let groups = energy_momentum().buckingham().expect("the pi groups return");
+        let groups = energy_momentum()
+            .buckingham()
+            .expect("the pi groups return");
         assert_eq!(groups.undetectable_rescaling_count, 1);
         assert_eq!(groups.undetectable_base_rescalings.len(), 1);
         // Rescaling L and T together leaves every one of E, m, c, p dimensionally unmoved. That is
@@ -1482,7 +1509,9 @@ mod tests {
         let base = mechanics();
         let area = base.integer_dimension(&[0, 2, 0]).unwrap();
         let square = Quantity::integer(4, area.clone());
-        let side = square.powed(&rational(1, 2)).expect("4 has a rational root");
+        let side = square
+            .powed(&rational(1, 2))
+            .expect("4 has a rational root");
         assert_eq!(side.parts().0, &whole(2));
         assert_eq!(side.dimension().exponents(), word(&[0, 1, 0]));
 
@@ -1613,10 +1642,7 @@ mod tests {
         // (beta, gamma, m) triples chosen so every figure is an exact integer.
         for (mass, momentum, energy) in [(4_i64, 3_i64, 5_i64), (12, 5, 13), (7, 0, 7)] {
             let rest = cast
-                .apply(
-                    &Quantity::integer(mass, base.unit("M").unwrap()),
-                    &whole(2),
-                )
+                .apply(&Quantity::integer(mass, base.unit("M").unwrap()), &whole(2))
                 .unwrap()
                 .returned;
             let carried = cast
@@ -1727,9 +1753,10 @@ mod tests {
             vec![("a".to_owned(), base.integer_dimension(&[1]).unwrap())],
         )
         .unwrap();
-        assert_eq!(plain.buckingham().unwrap().invariant_factors, vec![
-            BigInt::one()
-        ]);
+        assert_eq!(
+            plain.buckingham().unwrap().invariant_factors,
+            vec![BigInt::one()]
+        );
     }
 
     #[test]
@@ -1751,11 +1778,10 @@ mod tests {
         )
         .unwrap();
         let groups = matrix.buckingham().unwrap();
-        assert_eq!(groups.column_scales, vec![
-            BigInt::from(2),
-            BigInt::one(),
-            BigInt::one()
-        ]);
+        assert_eq!(
+            groups.column_scales,
+            vec![BigInt::from(2), BigInt::one(), BigInt::one()]
+        );
         assert_eq!(groups.rank, 2);
         assert_eq!(groups.rank_by_smith_normal_form, 2);
         assert_eq!(groups.independent_group_count, 1);
@@ -1813,7 +1839,10 @@ mod tests {
             Some(BigInt::from(2))
         );
         assert_eq!(exact_integer_root(&BigInt::from(1023), 10), None);
-        assert_eq!(exact_integer_root(&BigInt::from(-27), 3), Some(BigInt::from(-3)));
+        assert_eq!(
+            exact_integer_root(&BigInt::from(-27), 3),
+            Some(BigInt::from(-3))
+        );
         assert_eq!(exact_integer_root(&BigInt::from(-27), 2), None);
         assert_eq!(exact_integer_root(&BigInt::zero(), 5), Some(BigInt::zero()));
         assert_eq!(exact_integer_root(&BigInt::one(), 7), Some(BigInt::one()));
@@ -1835,7 +1864,12 @@ mod tests {
                 .render(),
             "L^1/2 T^1/2"
         );
-        let names = vec!["E".to_owned(), "m".to_owned(), "c".to_owned(), "p".to_owned()];
+        let names = vec![
+            "E".to_owned(),
+            "m".to_owned(),
+            "c".to_owned(),
+            "p".to_owned(),
+        ];
         assert_eq!(
             PiGroup::new(word(&[1, -1, -2, 0])).render(&names),
             "E m^-1 c^-2"

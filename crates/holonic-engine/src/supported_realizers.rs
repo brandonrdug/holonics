@@ -73,7 +73,7 @@ use num_bigint::BigInt;
 use num_traits::{One, Zero};
 use serde::{Deserialize, Serialize};
 
-use crate::rebase_invariants::{smith_normal_form, IntegerMatrix, PivotRule};
+use crate::rebase_invariants::{IntegerMatrix, PivotRule, smith_normal_form};
 use crate::receiver_exact_compression::ItemId;
 
 /// One thing the machine can actually produce.
@@ -217,7 +217,11 @@ pub fn decide_support(realizations: &[Realization], class_extent: usize) -> Real
             species: ObstructionSpecies::Unreachable { free_rank },
         });
     }
-    for factor in form.factors.iter().filter(|factor| **factor > BigInt::one()) {
+    for factor in form
+        .factors
+        .iter()
+        .filter(|factor| **factor > BigInt::one())
+    {
         obstructions.push(SupportObstruction {
             classes: Vec::new(),
             species: ObstructionSpecies::ReachableOnlyInMultiple {
@@ -323,7 +327,9 @@ pub fn landings_from_classes(
 /// reaching a class only as `2·c` and a family reaching it once return the **same** inertia, measured
 /// `(1, 10, 0)` for both. The `ℤ/2` is in [`RealizerSupport::torsion_obstruction`] and nowhere in
 /// here.
-pub fn induced_placement(incidence: &IntegerMatrix) -> Result<crate::inertia::Inertia, crate::inertia::InertiaError> {
+pub fn induced_placement(
+    incidence: &IntegerMatrix,
+) -> Result<crate::inertia::Inertia, crate::inertia::InertiaError> {
     let form = positive_form(incidence);
     let symmetric = crate::inertia::SymmetricForm::from_integer_matrix(&form)?;
     Ok(crate::inertia::inertia(&symmetric))
@@ -576,9 +582,15 @@ mod tests {
     fn the_form_has_the_same_rank_as_the_incidence_it_came_from() {
         for realizations in [
             vec![realization(0, &[(0, 1)]), realization(1, &[(1, 1)])],
-            vec![realization(0, &[(0, 2), (1, 4)]), realization(1, &[(0, 1), (1, 2)])],
+            vec![
+                realization(0, &[(0, 2), (1, 4)]),
+                realization(1, &[(0, 1), (1, 2)]),
+            ],
             vec![realization(0, &[(0, 6)]), realization(1, &[(0, 10)])],
-            vec![realization(0, &[(0, 1), (1, 1)]), realization(1, &[(0, 1), (1, -1)])],
+            vec![
+                realization(0, &[(0, 1), (1, 1)]),
+                realization(1, &[(0, 1), (1, -1)]),
+            ],
         ] {
             let matrix = incidence(&realizations, 2);
             let form = positive_form(&matrix);
@@ -631,7 +643,10 @@ mod tests {
         let b = decide_support(&without, 2);
         assert_eq!(a.supported_rank, b.supported_rank);
         assert_eq!(a.invariant_factors, b.invariant_factors);
-        assert_ne!(a.realizer_extent, b.realizer_extent, "the ghost is still counted as present");
+        assert_ne!(
+            a.realizer_extent, b.realizer_extent,
+            "the ghost is still counted as present"
+        );
     }
 
     /// Adding realizers may only increase support. If it ever decreased, the incidence would not
@@ -696,7 +711,10 @@ mod tests {
         independent.set(1, 1, BigInt::from(1));
         let placed = induced_placement(&independent).expect("the form founds");
         assert_eq!(placed.negative, 0, "M^T M is positive semi-definite");
-        assert_eq!(placed.zero, 0, "an independent incidence leaves no null direction");
+        assert_eq!(
+            placed.zero, 0,
+            "an independent incidence leaves no null direction"
+        );
         assert_eq!(placed.positive, 2);
 
         // Two realizers over THREE classes, where class 2 is reached by both of the realizers that

@@ -436,7 +436,9 @@ pub fn euclidean_resultant(
     let mut steps = 0_u64;
     loop {
         let first_degree = first.degree().ok_or(ExactPolynomialError::ZeroPolynomial)?;
-        let second_degree = second.degree().ok_or(ExactPolynomialError::ZeroPolynomial)?;
+        let second_degree = second
+            .degree()
+            .ok_or(ExactPolynomialError::ZeroPolynomial)?;
         if second_degree > first_degree {
             if (first_degree * second_degree) % 2 == 1 {
                 accumulated = -accumulated;
@@ -447,7 +449,8 @@ pub fn euclidean_resultant(
         }
         if second_degree == 0 {
             let constant = second.coefficient(0);
-            let power = u32::try_from(first_degree).map_err(|_| ExactPolynomialError::DegreeTooLarge)?;
+            let power =
+                u32::try_from(first_degree).map_err(|_| ExactPolynomialError::DegreeTooLarge)?;
             return Ok((accumulated * constant.pow(power as i32), steps));
         }
         let (_, remainder) = first.divided_by(&second)?;
@@ -455,7 +458,9 @@ pub fn euclidean_resultant(
         if remainder.is_zero() {
             return Ok((Rat::zero(), steps));
         }
-        let remainder_degree = remainder.degree().expect("a nonzero remainder has a degree");
+        let remainder_degree = remainder
+            .degree()
+            .expect("a nonzero remainder has a degree");
         if (first_degree * second_degree) % 2 == 1 {
             accumulated = -accumulated;
         }
@@ -483,7 +488,10 @@ pub fn integer_discriminant(
     }
     let rational = RationalPolynomial::from_integer_polynomial(polynomial);
     let (resultant, steps) = euclidean_resultant(&rational, &rational.derivative())?;
-    let leading = rational.leading().expect("a nonzero polynomial leads").clone();
+    let leading = rational
+        .leading()
+        .expect("a nonzero polynomial leads")
+        .clone();
     let mut value = resultant / leading;
     if (degree * (degree - 1) / 2) % 2 == 1 {
         value = -value;
@@ -513,7 +521,9 @@ pub struct RootSeparationBound {
 pub enum RootSeparation {
     /// Degree below two. There is no pair of roots, so no interval can hold two of them and no
     /// split can ever be required. This is a statement about the polynomial, not a missing bound.
-    NothingToSeparate { degree: usize },
+    NothingToSeparate {
+        degree: usize,
+    },
     Bounded(RootSeparationBound),
 }
 
@@ -583,8 +593,7 @@ pub fn root_separation(
         .sum::<BigInt>();
     let exponent = u32::try_from(degree + 2).map_err(|_| ExactPolynomialError::DegreeTooLarge)?;
     let power = u32::try_from(degree - 1).map_err(|_| ExactPolynomialError::DegreeTooLarge)?;
-    let denominator =
-        BigInt::from(degree).pow(exponent) * coefficient_norm_squared.pow(power);
+    let denominator = BigInt::from(degree).pow(exponent) * coefficient_norm_squared.pow(power);
     let squared_lower_bound = Rat::new(BigInt::from(3) * discriminant.abs(), denominator);
     Ok(RootSeparation::Bounded(RootSeparationBound {
         degree,
@@ -685,8 +694,8 @@ pub fn squared_shrinking_steps(
     let step_numerator = retained.numer().clone();
     let step_denominator = retained.denom().clone();
     let reached = |steps: u64| -> Result<bool, ExactPolynomialError> {
-        let exponent =
-            u32::try_from(steps.saturating_mul(2)).map_err(|_| ExactPolynomialError::DegreeTooLarge)?;
+        let exponent = u32::try_from(steps.saturating_mul(2))
+            .map_err(|_| ExactPolynomialError::DegreeTooLarge)?;
         Ok(&left_constant * step_numerator.pow(exponent)
             <= &right_constant * step_denominator.pow(exponent))
     };
@@ -1597,12 +1606,12 @@ mod tests {
     fn the_two_resultant_routes_agree_and_reproduce_the_classical_discriminants() {
         // disc(x^n + a) = (-1)^(n(n-1)/2) n^n a^(n-1), plus the two textbook small cases.
         let family: [(Vec<i64>, i64); 6] = [
-            (vec![-2, 0, 1], 8),          // x^2 - 2
-            (vec![-1, -1, 1], 5),         // x^2 - x - 1
-            (vec![-2, 0, 0, 1], -108),    // x^3 - 2
-            (vec![-6, 11, -6, 1], 4),     // (x-1)(x-2)(x-3)
-            (vec![1, 0, 0, 0, 1], 256),   // x^4 + 1
-            (vec![-8, 12, -6, 1], 0),     // (x-2)^3, not squarefree
+            (vec![-2, 0, 1], 8),        // x^2 - 2
+            (vec![-1, -1, 1], 5),       // x^2 - x - 1
+            (vec![-2, 0, 0, 1], -108),  // x^3 - 2
+            (vec![-6, 11, -6, 1], 4),   // (x-1)(x-2)(x-3)
+            (vec![1, 0, 0, 0, 1], 256), // x^4 + 1
+            (vec![-8, 12, -6, 1], 0),   // (x-2)^3, not squarefree
         ];
         let mut saw_a_vanishing_discriminant = false;
         let mut saw_both_signs = (false, false);
@@ -1626,8 +1635,7 @@ mod tests {
             )
             .unwrap();
             let degree = integral.degree();
-            let mut by_sylvester =
-                sylvester.coefficient(0) / rational.leading().unwrap().clone();
+            let mut by_sylvester = sylvester.coefficient(0) / rational.leading().unwrap().clone();
             if (degree * (degree - 1) / 2) % 2 == 1 {
                 by_sylvester = -by_sylvester;
             }
@@ -1761,7 +1769,11 @@ mod tests {
             let schedule = interior_split_schedule(degree);
             assert_eq!(schedule.len(), degree + 1);
             let distinct: std::collections::BTreeSet<_> = schedule.iter().cloned().collect();
-            assert_eq!(distinct.len(), degree + 1, "the candidates must be distinct");
+            assert_eq!(
+                distinct.len(),
+                degree + 1,
+                "the candidates must be distinct"
+            );
             for fraction in &schedule {
                 assert!(fraction.is_positive() && fraction < &Rat::one());
             }
@@ -1793,8 +1805,14 @@ mod tests {
             squared_shrinking_steps(&integer(1), &half, &rat(1, 1_048_576)).unwrap(),
             10
         );
-        assert_eq!(squared_shrinking_steps(&integer(1), &half, &integer(1)).unwrap(), 0);
-        assert_eq!(squared_shrinking_steps(&integer(1), &half, &integer(4)).unwrap(), 0);
+        assert_eq!(
+            squared_shrinking_steps(&integer(1), &half, &integer(1)).unwrap(),
+            0
+        );
+        assert_eq!(
+            squared_shrinking_steps(&integer(1), &half, &integer(4)).unwrap(),
+            0
+        );
         // A retained fraction nearer one costs proportionally more steps, which is exactly why the
         // schedule's worst case has to be read off rather than assumed to be a half.
         let slow = squared_shrinking_steps(&integer(1), &rat(6, 7), &rat(1, 1_048_576)).unwrap();

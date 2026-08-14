@@ -147,7 +147,7 @@ use crate::algebraic::{
     CausalAlgebraicError, CausalCellId, CausalChain, ComparativeMultiplicity, GradedCausalComplex,
 };
 use crate::causal::EventId;
-use crate::rebase_invariants::{rebase_invariants, GradeInvariants, PivotRule, RebaseInvariants};
+use crate::rebase_invariants::{GradeInvariants, PivotRule, RebaseInvariants, rebase_invariants};
 
 /// The export codec's own structural vocabulary. These words are how a Lean file is written; they
 /// name nothing the derivation recruited from its environment.
@@ -156,15 +156,48 @@ use crate::rebase_invariants::{rebase_invariants, GradeInvariants, PivotRule, Re
 /// are declarations the environment supplies and the proof depends on, and reading them as
 /// recruitments is what makes the reading depend on which proof body the machine composed.
 pub const CODEC_KEYWORDS: [&str; 26] = [
-    "at", "attribute", "by", "calc", "deriving", "do", "else", "end", "from", "fun", "have", "if",
-    "import", "in", "let", "match", "mutual", "namespace", "open", "section", "set_option", "show",
-    "suffices", "then", "using", "where",
+    "at",
+    "attribute",
+    "by",
+    "calc",
+    "deriving",
+    "do",
+    "else",
+    "end",
+    "from",
+    "fun",
+    "have",
+    "if",
+    "import",
+    "in",
+    "let",
+    "match",
+    "mutual",
+    "namespace",
+    "open",
+    "section",
+    "set_option",
+    "show",
+    "suffices",
+    "then",
+    "using",
+    "where",
 ];
 
 /// Forms after which the next identifier is **founded by this file**, not recruited.
 pub const DECLARATION_FORMERS: [&str; 12] = [
-    "abbrev", "axiom", "class", "def", "example", "inductive", "instance", "lemma", "opaque",
-    "structure", "theorem", "variable",
+    "abbrev",
+    "axiom",
+    "class",
+    "def",
+    "example",
+    "inductive",
+    "instance",
+    "lemma",
+    "opaque",
+    "structure",
+    "theorem",
+    "variable",
 ];
 
 /// The formers that can **name** the derivation this reading returns.
@@ -295,7 +328,9 @@ pub fn identifier_tokens(line: &str) -> impl Iterator<Item = &str> {
 ///
 /// `CLAUDE.md` §8: *"An organ used past its declared aperture is a defect even when it appears to
 /// return."* It appeared to return. This type is that aperture made refusable.
-#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, thiserror::Error)]
+#[derive(
+    Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, thiserror::Error,
+)]
 #[serde(rename_all = "kebab-case")]
 pub enum DerivationApertureRefusal {
     /// The text carries comment text, and the reading has no comment lexer — every word inside a
@@ -628,7 +663,10 @@ pub enum DerivationAtlasRefusal {
     /// `Multiplicity` under `ByDeclaration` where the named declaration carries more than one
     /// artifact: merging them onto one vertex sums their occurrence counts, folding the deposited
     /// artifact population into a boundary coefficient.
-    MultiplicityWouldSumRoutes { declaration: String, artifacts: usize },
+    MultiplicityWouldSumRoutes {
+        declaration: String,
+        artifacts: usize,
+    },
     /// The complex refused a cell.
     Algebra(CausalAlgebraicError),
 }
@@ -1016,7 +1054,10 @@ pub fn found_circuit(
                 continue;
             }
             let mut boundary = CausalChain::default();
-            boundary.add_term(vertices[key], ComparativeMultiplicity::positive(coefficient));
+            boundary.add_term(
+                vertices[key],
+                ComparativeMultiplicity::positive(coefficient),
+            );
             boundary.add_term(
                 vertices[symbol],
                 ComparativeMultiplicity::negative(coefficient),
@@ -1205,7 +1246,10 @@ impl InvariantMovement {
 /// visible as a founded grade rather than as a silent re-alignment. The law this owes:
 /// `movement.is_still()` and `rebase_invariants::invariants_agree` must return the same verdict,
 /// and `movement_and_agreement_are_one_quantity` is what holds it there.
-pub fn invariant_movement(before: &RebaseInvariants, after: &RebaseInvariants) -> InvariantMovement {
+pub fn invariant_movement(
+    before: &RebaseInvariants,
+    after: &RebaseInvariants,
+) -> InvariantMovement {
     let mut left: BTreeMap<u32, &GradeInvariants> = BTreeMap::new();
     for grade in &before.grades {
         left.insert(grade.grade, grade);
@@ -1289,7 +1333,10 @@ impl RouteMovement {
     }
 }
 
-fn lineage_multiplicity<'a>(circuit: &'a DerivationCircuit, statement: &str) -> BTreeMap<&'a str, usize> {
+fn lineage_multiplicity<'a>(
+    circuit: &'a DerivationCircuit,
+    statement: &str,
+) -> BTreeMap<&'a str, usize> {
     let mut carried: BTreeMap<&str, usize> = BTreeMap::new();
     for vertex in circuit.route_lineage(statement) {
         *carried.entry(vertex.as_str()).or_default() += 1;
@@ -1618,10 +1665,7 @@ end LinearOrderedAddCommGroup
             }) => {
                 assert_eq!(
                     names,
-                    &[
-                        "2:lemma helper".to_owned(),
-                        "3:theorem carried".to_owned()
-                    ]
+                    &["2:lemma helper".to_owned(), "3:theorem carried".to_owned()]
                 );
                 assert_eq!(would_have_named.as_deref(), Some("carried"));
             }
@@ -1691,7 +1735,6 @@ end LinearOrderedAddCommGroup
         let projected = identifier_tokens("(f x).1 Nat.zero trailing.").collect::<Vec<_>>();
         assert_eq!(projected, vec!["f", "x", "Nat.zero", "trailing"]);
     }
-
 
     /// The negative control the clause needs: every artifact the machine's own codec deposits is
     /// inside the aperture and reads exactly as it always did. A refusal that refused the deposit
@@ -1790,7 +1833,9 @@ end LinearOrderedAddCommGroup
         // The reading's one orthographic rule, pinned from BOTH sides on deposited material, so
         // neither loosening nor tightening it passes. `rw` is two characters and is a declaration
         // the proof recruited; `P` and `h` are one character and are Lean's binder convention.
-        let carried = read("namespace Soma\ntheorem formal_carry (h : P) : exactCarrier P := by\n  rw [exact_chart_carry]\n  assumption\nend Soma\n");
+        let carried = read(
+            "namespace Soma\ntheorem formal_carry (h : P) : exactCarrier P := by\n  rw [exact_chart_carry]\n  assumption\nend Soma\n",
+        );
         assert_eq!(carried.recruited.get("rw"), Some(&1));
         assert_eq!(carried.recruited.get("P"), None);
         assert_eq!(carried.recruited.get("h"), None);
@@ -1805,11 +1850,15 @@ end LinearOrderedAddCommGroup
         // `exactCarrier` is founded on the `def` line and recruited once, in the theorem statement.
         assert_eq!(defined.recruited.get("exactCarrier"), Some(&1));
 
-        let bound = read("namespace Soma\ntheorem formal_carry (h : P) : exactCarrier P := by\n  have generated := exact_chart_carry P\n  assumption\nend Soma\n");
+        let bound = read(
+            "namespace Soma\ntheorem formal_carry (h : P) : exactCarrier P := by\n  have generated := exact_chart_carry P\n  assumption\nend Soma\n",
+        );
         assert_eq!(bound.recruited.get("generated"), None);
         assert_eq!(bound.recruited.get("exact_chart_carry"), Some(&1));
 
-        let relayed = read("import KernelWitness\nnamespace Soma\nabbrev ExactRelay (Q : Prop) : Prop := exactCarrier Q\ntheorem carrier_transport_relayed (P : Prop) (h : P) : exactCarrier P := by\n  assumption\nend Soma\n");
+        let relayed = read(
+            "import KernelWitness\nnamespace Soma\nabbrev ExactRelay (Q : Prop) : Prop := exactCarrier Q\ntheorem carrier_transport_relayed (P : Prop) (h : P) : exactCarrier P := by\n  assumption\nend Soma\n",
+        );
         assert_eq!(relayed.recruited.get("ExactRelay"), None);
         assert_eq!(relayed.recruited.get("Prop"), Some(&3));
         assert_eq!(relayed.recruited.get("exactCarrier"), Some(&2));
@@ -1978,9 +2027,13 @@ end LinearOrderedAddCommGroup
         ];
         let mut nonzero = 0;
         for population in &populations {
-            for identity in [DerivationIdentity::ByDeclaration, DerivationIdentity::ByRoute] {
-                let agreement = route_cycle_agreement(population, identity, PivotRule::FirstNonzero)
-                    .expect("an incidence reading is admissible under either identity");
+            for identity in [
+                DerivationIdentity::ByDeclaration,
+                DerivationIdentity::ByRoute,
+            ] {
+                let agreement =
+                    route_cycle_agreement(population, identity, PivotRule::FirstNonzero)
+                        .expect("an incidence reading is admissible under either identity");
                 assert!(
                     agreement.holds(),
                     "{identity:?} disagreed: {agreement:?} on {population:?}"
@@ -2050,7 +2103,10 @@ end LinearOrderedAddCommGroup
         let statement = "(P : Prop) (h : P) : exactCarrier P";
         assert_eq!(circuit.route_lineage(statement).len(), 3);
         assert_eq!(circuit.vertices_reaching(statement).len(), 1);
-        assert_eq!(circuit.plural_route_statements(), BTreeSet::from([statement]));
+        assert_eq!(
+            circuit.plural_route_statements(),
+            BTreeSet::from([statement])
+        );
         assert!(circuit.plural_vertex_statements().is_empty());
     }
 
@@ -2128,9 +2184,11 @@ end LinearOrderedAddCommGroup
         assert_eq!(carried.recruited.get("formal_carry"), Some(&1));
 
         let circuit = circuit_of(&[carried], CircuitAperture::DEPOSITED_READER);
-        assert!(!circuit
-            .recruitments()
-            .contains_key(&("formal_carry".to_owned(), "formal_carry".to_owned())));
+        assert!(
+            !circuit
+                .recruitments()
+                .contains_key(&("formal_carry".to_owned(), "formal_carry".to_owned()))
+        );
         assert_eq!(circuit.vertices().len(), 6);
         assert_eq!(circuit.recruitments().len(), 5);
         let invariants = circuit
@@ -2294,12 +2352,16 @@ end LinearOrderedAddCommGroup
         let invariants = circuit
             .invariants(PivotRule::FirstNonzero)
             .expect("the atlas reads");
-        assert!(circuit
-            .recruitments()
-            .contains_key(&("carrier_transport".to_owned(), "Prop".to_owned())));
-        assert!(circuit
-            .recruitments()
-            .contains_key(&("formal_carry".to_owned(), "Prop".to_owned())));
+        assert!(
+            circuit
+                .recruitments()
+                .contains_key(&("carrier_transport".to_owned(), "Prop".to_owned()))
+        );
+        assert!(
+            circuit
+                .recruitments()
+                .contains_key(&("formal_carry".to_owned(), "Prop".to_owned()))
+        );
         assert_eq!(torsion_at(&invariants, 0), vec![BigInt::from(3)]);
     }
 
@@ -2343,7 +2405,10 @@ end LinearOrderedAddCommGroup
                 }
             }
         }
-        assert!(agreed > 0 && differed > 0, "the sweep exercised one branch only");
+        assert!(
+            agreed > 0 && differed > 0,
+            "the sweep exercised one branch only"
+        );
     }
 
     #[test]
@@ -2373,8 +2438,16 @@ end LinearOrderedAddCommGroup
         // passed the whole module. These two readings differ in the torsion field and in NOTHING
         // else -- same cells, same ranks, same Betti numbers -- so the assertion is an equality
         // against a one-element set and cannot be satisfied by accident.
-        let quiet = [derivation("alpha", "one statement", &[("Beta", 1), ("Gamma", 1)])];
-        let twice = [derivation("alpha", "one statement", &[("Beta", 1), ("Gamma", 2)])];
+        let quiet = [derivation(
+            "alpha",
+            "one statement",
+            &[("Beta", 1), ("Gamma", 1)],
+        )];
+        let twice = [derivation(
+            "alpha",
+            "one statement",
+            &[("Beta", 1), ("Gamma", 2)],
+        )];
         let before = invariants_of(&quiet, CircuitAperture::PER_ROUTE_MULTIPLICITY);
         let after = invariants_of(&twice, CircuitAperture::PER_ROUTE_MULTIPLICITY);
         assert!(before.total_torsion().is_empty());
@@ -2451,7 +2524,10 @@ end LinearOrderedAddCommGroup
         let after = circuit_of(&after_population, CircuitAperture::DEPOSITED_READER);
 
         // nothing the support can see moved
-        assert_eq!(before.vertices().keys().collect::<Vec<_>>(), after.vertices().keys().collect::<Vec<_>>());
+        assert_eq!(
+            before.vertices().keys().collect::<Vec<_>>(),
+            after.vertices().keys().collect::<Vec<_>>()
+        );
         assert_eq!(
             before.recruitments().keys().collect::<Vec<_>>(),
             after.recruitments().keys().collect::<Vec<_>>()

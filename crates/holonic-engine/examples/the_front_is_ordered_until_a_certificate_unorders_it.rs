@@ -81,15 +81,17 @@
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 
-use holonic_engine::founded_receiver::{standing_junctions, FoundingRefusal};
+use holonic_engine::founded_receiver::{FoundingRefusal, standing_junctions};
 use holonic_engine::interchange::{
+    Coherence, DistinguishingWord, Interchange, InterchangeCertificate, StagedFootprint,
     bare_junctions, certify_founding_orders, certify_pair, certify_set,
     declared_material::{CoupledJunctions, SameEndpointDifferentPath, ThreeGadgets, TwoGadgets},
-    Coherence, DistinguishingWord, Interchange, InterchangeCertificate, StagedFootprint,
 };
-use holonic_engine::lean_development::{join, read_development, DeclarationGrain, DevelopmentReading};
+use holonic_engine::lean_development::{
+    DeclarationGrain, DevelopmentReading, join, read_development,
+};
 use holonic_engine::receiver_exact_compression::{
-    compress, InputId, ItemId, ObservedSystem, Observation, ReceiverId,
+    InputId, ItemId, Observation, ObservedSystem, ReceiverId, compress,
 };
 
 /// The development as a system under observation — the same reading
@@ -216,7 +218,10 @@ fn report(certificate: &InterchangeCertificate, name: Naming<'_>) {
     );
     println!("  staged           {} footprints", certificate.staged.len());
     for footprint in &certificate.staged {
-        println!("                     {}", junction_label(footprint.junction, name));
+        println!(
+            "                     {}",
+            junction_label(footprint.junction, name)
+        );
     }
 
     println!(
@@ -252,19 +257,45 @@ fn report(certificate: &InterchangeCertificate, name: Naming<'_>) {
     }
 
     println!("\n  THE TWO COMPARISONS");
-    println!("    conduct invariant (law)          {}", certificate.conduct_agrees);
-    println!("    ENDPOINT  one-shot partitions    {}", certificate.endpoints_agree);
-    println!("    ENDPOINT  equivalence on items   {}", certificate.identified_agrees);
-    println!("    LINEAGE   content-keyed delta    {}", certificate.combined_delta.is_some());
-    println!("    LINEAGE   capacities per axis    {}", certificate.capacities_agree);
-    println!("    mint ordinal moved across orders {}", certificate.minted_ids_differ);
+    println!(
+        "    conduct invariant (law)          {}",
+        certificate.conduct_agrees
+    );
+    println!(
+        "    ENDPOINT  one-shot partitions    {}",
+        certificate.endpoints_agree
+    );
+    println!(
+        "    ENDPOINT  equivalence on items   {}",
+        certificate.identified_agrees
+    );
+    println!(
+        "    LINEAGE   content-keyed delta    {}",
+        certificate.combined_delta.is_some()
+    );
+    println!(
+        "    LINEAGE   capacities per axis    {}",
+        certificate.capacities_agree
+    );
+    println!(
+        "    mint ordinal moved across orders {}",
+        certificate.minted_ids_differ
+    );
     println!(
         "\n    endpoint-only verdict  {}",
-        if certificate.endpoint_only_verdict() { "INTERCHANGEABLE" } else { "ORDERED" }
+        if certificate.endpoint_only_verdict() {
+            "INTERCHANGEABLE"
+        } else {
+            "ORDERED"
+        }
     );
     println!(
         "    certificate verdict    {}",
-        if certificate.is_interchangeable() { "INTERCHANGEABLE" } else { "ORDERED" }
+        if certificate.is_interchangeable() {
+            "INTERCHANGEABLE"
+        } else {
+            "ORDERED"
+        }
     );
     if certificate.lineage_changed_the_verdict() {
         println!("\n    >>> LINEAGE COMPARISON CHANGED THE VERDICT. A certificate comparing only");
@@ -275,8 +306,12 @@ fn report(certificate: &InterchangeCertificate, name: Naming<'_>) {
 
     match &certificate.verdict {
         Interchange::Interchangeable => {
-            println!("\n  ADMITTED. No receiver in the founded family has a distinguishing word for");
-            println!("  these two orders, both rebased lawfully, and the combined delta is canonical:");
+            println!(
+                "\n  ADMITTED. No receiver in the founded family has a distinguishing word for"
+            );
+            println!(
+                "  these two orders, both rebased lawfully, and the combined delta is canonical:"
+            );
             if let Some(delta) = &certificate.combined_delta {
                 for axis in delta {
                     println!(
@@ -312,7 +347,9 @@ fn report(certificate: &InterchangeCertificate, name: Naming<'_>) {
                 "\n  COHERENCE: ALL ORDERS. {occurrences} occurrences, {orders_compared} permutations \
                  rebased, {orders_lawful} lawful, agreed {agreed}."
             );
-            println!("  Every permutation of the DECLARED set was compared -- strictly stronger than");
+            println!(
+                "  Every permutation of the DECLARED set was compared -- strictly stronger than"
+            );
             println!("  pairwise, which is what `canon/01_CAUSAL_CALCULUS.md:88` asks for.");
         }
     }
@@ -329,7 +366,9 @@ fn exhibit(word: &DistinguishingWord, name: Naming<'_>) {
             separating_observations,
             collapsed_under_identifying_order,
         } => {
-            println!("    species  ReceiverSeparates -- the family HAS a word for these two orders");
+            println!(
+                "    species  ReceiverSeparates -- the family HAS a word for these two orders"
+            );
             println!("    pair     {} | {}", name(pair.0), name(pair.1));
             println!(
                 "    order {separating_order} separates it; order {identifying_order} identifies it"
@@ -342,7 +381,7 @@ fn exhibit(word: &DistinguishingWord, name: Naming<'_>) {
             );
             println!(
                 "    returns  {:#x} against {:#x}",
-                separating_observations.0 .0, separating_observations.1 .0
+                separating_observations.0.0, separating_observations.1.0
             );
             match collapsed_under_identifying_order {
                 Some(collapsed) => {
@@ -400,7 +439,9 @@ fn exhibit(word: &DistinguishingWord, name: Naming<'_>) {
                         right.0,
                         word.iter().map(|input| input.0).collect::<Vec<_>>()
                     );
-                    println!("    That receiver did not exist over the predecessor. The first founding");
+                    println!(
+                        "    That receiver did not exist over the predecessor. The first founding"
+                    );
                     println!("    made it, and it sees what the panel could not -- so the two");
                     println!("    occurrences are not independent and the front stays ordered.");
                 }
@@ -422,8 +463,12 @@ fn exhibit(word: &DistinguishingWord, name: Naming<'_>) {
                     );
                 }
             }
-            println!("    Equal endpoints do not identify ordered paths. `CLAUDE.md` §0 lesson 4 and");
-            println!("    `canon/01_CAUSAL_CALCULUS.md:85`: the isomorphism must preserve complete");
+            println!(
+                "    Equal endpoints do not identify ordered paths. `CLAUDE.md` §0 lesson 4 and"
+            );
+            println!(
+                "    `canon/01_CAUSAL_CALCULUS.md:85`: the isomorphism must preserve complete"
+            );
             println!("    successor incidence AND morphology, not just the returned state.");
         }
         DistinguishingWord::ResourcesDiffer {
@@ -440,8 +485,12 @@ fn exhibit(word: &DistinguishingWord, name: Naming<'_>) {
             );
         }
         DistinguishingWord::ConductMoved { orders } => {
-            println!("    species  ConductMoved -- THE LAW MOVED. Orders {orders:?} disagree on the");
-            println!("    Nerode congruence, which founding may not touch. This is a defect report,");
+            println!(
+                "    species  ConductMoved -- THE LAW MOVED. Orders {orders:?} disagree on the"
+            );
+            println!(
+                "    Nerode congruence, which founding may not touch. This is a defect report,"
+            );
             println!("    not a verdict.");
         }
     }
@@ -606,8 +655,12 @@ fn main() {
 
     // ---------------------------------------------------------------- 3. the whole-order form
     section("CONTROL 5 -- THE WHOLE-ORDER FORM ON THE COUPLED MATERIAL");
-    println!("\n  `certify_founding_orders` runs `found_to_exhaustion` twice, deferring the junction");
-    println!("  the first order took first. The two runs may found DIFFERENT SETS of axes, which is");
+    println!(
+        "\n  `certify_founding_orders` runs `found_to_exhaustion` twice, deferring the junction"
+    );
+    println!(
+        "  the first order took first. The two runs may found DIFFERENT SETS of axes, which is"
+    );
     println!("  where endpoint comparison and lineage comparison can part company.");
     let whole = certify_founding_orders(&CoupledJunctions);
     report(&whole, &ordinal);
@@ -615,14 +668,22 @@ fn main() {
         println!("\n  the gyration it consumed");
         println!("    partitions agree  {}", gyration.partitions_agree);
         println!("    conduct agrees    {}", gyration.conduct_agrees);
-        println!("    founded agree     {}  <- the ORDERED SEQUENCE, which is the wrong test here:", gyration.founded_agree);
-        println!("                          the sequence differing is the premise of the question.");
+        println!(
+            "    founded agree     {}  <- the ORDERED SEQUENCE, which is the wrong test here:",
+            gyration.founded_agree
+        );
+        println!(
+            "                          the sequence differing is the premise of the question."
+        );
         println!("    is_holonomy       {}", gyration.is_holonomy());
         println!("    only left  {:?}", gyration.only_left);
         println!("    only right {:?}", gyration.only_right);
     }
     controls.push((
-        whole.gyration.as_ref().is_some_and(|gyr| gyr.conduct_agrees),
+        whole
+            .gyration
+            .as_ref()
+            .is_some_and(|gyr| gyr.conduct_agrees),
         "control 5a -- founding order does not move the Nerode congruence".to_owned(),
         format!(
             "conduct blocks {} across both orders",
@@ -632,16 +693,23 @@ fn main() {
 
     // ---------------------------------------------------------------- 2b. the complete aperture
     section("CONTROL 10 -- APERTURE-COMPLETE: EVERY UNORDERED PAIR OF STANDING JUNCTIONS");
-    println!("\n  A verdict measured on one hand-chosen pair per material is a reading of that pair.");
+    println!(
+        "\n  A verdict measured on one hand-chosen pair per material is a reading of that pair."
+    );
     println!("  Both fixtures are small enough to exhaust: every unordered pair of the junctions");
-    println!("  standing over the bare panel is certified, and the split is reported. The aperture is");
+    println!(
+        "  standing over the bare panel is certified, and the split is reported. The aperture is"
+    );
     println!("  the material's whole standing junction population, not a window.");
     let mut sweep_rows: Vec<(&str, usize, usize, usize)> = Vec::new();
     for (label, system) in [
         ("TwoGadgets", &TwoGadgets as &dyn ObservedSystem),
         ("ThreeGadgets", &ThreeGadgets as &dyn ObservedSystem),
         ("CoupledJunctions", &CoupledJunctions as &dyn ObservedSystem),
-        ("SameEndpointDifferentPath", &SameEndpointDifferentPath as &dyn ObservedSystem),
+        (
+            "SameEndpointDifferentPath",
+            &SameEndpointDifferentPath as &dyn ObservedSystem,
+        ),
     ] {
         let standing = bare_junctions(system);
         let mut admitted_here = 0usize;
@@ -662,18 +730,29 @@ fn main() {
                 }
                 println!(
                     "    ({},{}) x ({},{})  {}   endpoint-only {}",
-                    left.0 .0,
-                    left.1 .0,
-                    right.0 .0,
-                    right.1 .0,
-                    if certificate.is_interchangeable() { "ADMITTED" } else { "ORDERED " },
-                    if certificate.endpoint_only_verdict() { "ADMITTED" } else { "ORDERED" }
+                    left.0.0,
+                    left.1.0,
+                    right.0.0,
+                    right.1.0,
+                    if certificate.is_interchangeable() {
+                        "ADMITTED"
+                    } else {
+                        "ORDERED "
+                    },
+                    if certificate.endpoint_only_verdict() {
+                        "ADMITTED"
+                    } else {
+                        "ORDERED"
+                    }
                 );
             }
         }
         sweep_rows.push((label, standing.len(), admitted_here, refused_here));
     }
-    println!("\n  {:<28} {:>10} {:>10} {:>10}", "material", "junctions", "admitted", "ordered");
+    println!(
+        "\n  {:<28} {:>10} {:>10} {:>10}",
+        "material", "junctions", "admitted", "ordered"
+    );
     println!("  {}", "-".repeat(62));
     for (label, junctions, admitted_here, refused_here) in &sweep_rows {
         println!("  {label:<28} {junctions:>10} {admitted_here:>10} {refused_here:>10}");
@@ -689,7 +768,9 @@ fn main() {
     // ---------------------------------------------------------------- 3b. same endpoint, other path
     section("CONTROL 5c -- SAME ENDPOINT, DIFFERENT PATH, ON EIGHT ITEMS");
     println!("\n  `CoupledJunctions` with item 4's successor removed. The two complete founding");
-    println!("  orders reach ONE partition and get there by founding different axes. An endpoint-only");
+    println!(
+        "  orders reach ONE partition and get there by founding different axes. An endpoint-only"
+    );
     println!("  comparator ADMITS; the certificate REFUSES on lineage. This is the same shape");
     println!("  soma/formal returns, reproduced without the filesystem so the finding is not a");
     println!("  property of one corpus.");
@@ -710,7 +791,10 @@ fn main() {
     // ---------------------------------------------------------------- 4. real material
     let paths = lean_paths(&root);
     if paths.is_empty() {
-        eprintln!("no .lean under {} -- the real-material sections are skipped", root.display());
+        eprintln!(
+            "no .lean under {} -- the real-material sections are skipped",
+            root.display()
+        );
         std::process::exit(2);
     }
     let reading = join(
@@ -816,8 +900,12 @@ fn main() {
 
     // ---------------------------------------------------------------- 6. the declared set
     section("CONTROL 7 -- A DECLARED SET, OVER EVERY PERMUTATION");
-    println!("\n  Pairwise interchange does not compose. A pair certificate returns PairwiseOnly and");
-    println!("  names what a triple would require; `certify_set` rebases n! orders of the CALLER's");
+    println!(
+        "\n  Pairwise interchange does not compose. A pair certificate returns PairwiseOnly and"
+    );
+    println!(
+        "  names what a triple would require; `certify_set` rebases n! orders of the CALLER's"
+    );
     println!("  declared set and requires all of them to agree.");
     let triple: Vec<StagedFootprint> = standing
         .iter()
@@ -828,7 +916,13 @@ fn main() {
         let set = certify_set(&development, &[], &triple);
         report(&set, &named);
         controls.push((
-            matches!(set.coherence, Coherence::AllOrders { orders_compared: 6, .. }),
+            matches!(
+                set.coherence,
+                Coherence::AllOrders {
+                    orders_compared: 6,
+                    ..
+                }
+            ),
             "control 7 -- a declared triple is certified over all 3! = 6 orders".to_owned(),
             format!("{:?}", set.coherence),
         ));
@@ -853,7 +947,9 @@ fn main() {
     ));
 
     section("CONTROL 7c -- A TRIPLE THAT ACTUALLY AGREES, OVER ALL 3! = 6 ORDERS");
-    println!("\n  A coherence check that has only ever returned a refusal has not been shown to be");
+    println!(
+        "\n  A coherence check that has only ever returned a refusal has not been shown to be"
+    );
     println!("  able to admit. Three gadgets, each conducting under exactly one input, so each");
     println!("  founded reading terminates at step 0 on the other two gadgets' items.");
     println!(
@@ -914,10 +1010,16 @@ fn main() {
 
     // ---------------------------------------------------------------- 7. capacities
     section("CONTROL 8 -- capacities() NOW HAS A LIBRARY CONSUMER");
-    println!("\n  `canon/THE_CONTAMINANT_PROTOCOL.md` §2.1, the verified instance of the unconsumed");
-    println!("  return: `founded_receiver.rs:238 capacities()`, whose only call sites were a driver");
+    println!(
+        "\n  `canon/THE_CONTAMINANT_PROTOCOL.md` §2.1, the verified instance of the unconsumed"
+    );
+    println!(
+        "  return: `founded_receiver.rs:238 capacities()`, whose only call sites were a driver"
+    );
     println!("  and a test. The certificate reads it as the successor's logical resource -- the");
-    println!("  blueprint's \"equivalence of all other successor standing/consequences/obstruction/");
+    println!(
+        "  blueprint's \"equivalence of all other successor standing/consequences/obstruction/"
+    );
     println!("  logical resources\" -- re-keyed off the mint ordinal onto the axis content.");
     println!("\n  consumer: crates/holonic-engine/src/interchange.rs, `order_from_panel`.");
     println!("\n  the capacity vector each order carried, on the admitted material:");
@@ -925,7 +1027,7 @@ fn main() {
         for (axis, capacity) in &order.capacities {
             println!(
                 "    order {index}  axis {}|{}  capacity {capacity}",
-                axis.junction.0 .0, axis.junction.1 .0
+                axis.junction.0.0, axis.junction.1.0
             );
         }
     }
@@ -953,11 +1055,18 @@ fn main() {
     // The slice is a CALLER declaration — argv[2], a count of vendored files to admit — never a
     // level authored here. Nothing branches on the elapsed figures: the clock measures and the
     // caller (a shell `timeout` around this process) is what stops a run. `CLAUDE.md` §8.
-    if let Some(slice) = std::env::args().nth(2).and_then(|arg| arg.parse::<usize>().ok()) {
+    if let Some(slice) = std::env::args()
+        .nth(2)
+        .and_then(|arg| arg.parse::<usize>().ok())
+    {
         section("THE COST LAW -- THE CERTIFICATE ON A CALLER-DECLARED SLICE OF THE PACKAGE CACHE");
         let mut vendored = vendored_lean_paths(&root);
         vendored.truncate(slice);
-        println!("\n  slice     {} files, {} octets", vendored.len(), octets(&vendored));
+        println!(
+            "\n  slice     {} files, {} octets",
+            vendored.len(),
+            octets(&vendored)
+        );
 
         let clock = std::time::Instant::now();
         let sliced = join(

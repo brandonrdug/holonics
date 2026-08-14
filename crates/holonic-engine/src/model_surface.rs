@@ -607,7 +607,13 @@ mod tests {
     #[test]
     fn the_decade_brackets_its_own_value() {
         // The defining property, checked rather than assumed: 10^k <= |v| < 10^(k+1).
-        for value in [rat(1, 7), rat(22, 7), integer(1234), rat(-5, 3), rat(1, 999)] {
+        for value in [
+            rat(1, 7),
+            rat(22, 7),
+            integer(1234),
+            rat(-5, 3),
+            rat(1, 999),
+        ] {
             let decade = integer_decade(&value).expect("nonzero");
             let ten = Rat::from_integer(10.into());
             let mut lower = Rat::from_integer(1.into());
@@ -702,7 +708,13 @@ mod tests {
     #[test]
     fn the_face_records_the_options_it_was_produced_under() {
         let face = read_model(&unit_loop(), &ModelOptions::default());
-        for key in ["value_reading", "phase_reading", "scaling", "region", "stations"] {
+        for key in [
+            "value_reading",
+            "phase_reading",
+            "scaling",
+            "region",
+            "stations",
+        ] {
             assert!(
                 face.options.contains_key(key),
                 "the artifact does not record its own {key}"
@@ -724,6 +736,10 @@ mod tests {
         let value = ExactReading::SquaredModulus
             .read(&integer(1), &integer(1))
             .expect("defined");
-        assert_eq!(value, integer(2), "|1+i|^2 = 2, exactly; |1+i| is not rational");
+        assert_eq!(
+            value,
+            integer(2),
+            "|1+i|^2 = 2, exactly; |1+i| is not rational"
+        );
     }
 }

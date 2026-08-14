@@ -34,7 +34,8 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let probes = probes()?;
     let law = PrimeEcologyLaw::with_horn_local_section_limit(2, HORN_LOCAL_SECTION_LIMIT)?;
-    let standing = PrimeEcologyStanding::with_horn_local_section_limit(2, HORN_LOCAL_SECTION_LIMIT)?;
+    let standing =
+        PrimeEcologyStanding::with_horn_local_section_limit(2, HORN_LOCAL_SECTION_LIMIT)?;
     let mut world = CausalWorld::new(law, standing);
     admit_integers(&mut world, 2, 5)?;
 
@@ -97,8 +98,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         ],
     )?;
 
-    let alternate_law = PrimeEcologyLaw::with_horn_local_section_limit(2, HORN_LOCAL_SECTION_LIMIT)?;
-    let alternate_standing = PrimeEcologyStanding::with_horn_local_section_limit(2, HORN_LOCAL_SECTION_LIMIT)?;
+    let alternate_law =
+        PrimeEcologyLaw::with_horn_local_section_limit(2, HORN_LOCAL_SECTION_LIMIT)?;
+    let alternate_standing =
+        PrimeEcologyStanding::with_horn_local_section_limit(2, HORN_LOCAL_SECTION_LIMIT)?;
     let mut alternate = CausalWorld::new(alternate_law, alternate_standing);
     for (event, probe) in probes {
         alternate.receive(&PrimeEcologyEvent::InheritPolynomial { event, probe })?;

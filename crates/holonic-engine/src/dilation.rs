@@ -260,7 +260,13 @@ pub fn covering_horizon(
     focus: CausalCellId,
 ) -> Result<u32, CausalAlgebraicError> {
     let section = dilate(complex, focus, Horizon::Unbounded, WalkOrder::Breadth)?;
-    Ok(section.lineage.distance.values().copied().max().unwrap_or(0))
+    Ok(section
+        .lineage
+        .distance
+        .values()
+        .copied()
+        .max()
+        .unwrap_or(0))
 }
 
 /// Betti numbers of a graph-like section by the Euler route, independent of any homology reduction.
@@ -335,7 +341,7 @@ mod tests {
     use super::*;
     use crate::algebraic::{CausalChain, ComparativeMultiplicity};
     use crate::causal::EventId;
-    use crate::rebase_invariants::{rebase_invariants_on, PivotRule};
+    use crate::rebase_invariants::{PivotRule, rebase_invariants_on};
 
     fn source() -> BTreeSet<EventId> {
         BTreeSet::from([EventId(1)])
@@ -404,15 +410,30 @@ mod tests {
         assert!(covering > 1, "a path of five is not covered in one step");
 
         let short = dilate(&complex, vertices[0], Horizon::Steps(1), WalkOrder::Breadth).unwrap();
-        assert!(!short.lineage.is_covering(), "a short horizon must restrict");
+        assert!(
+            !short.lineage.is_covering(),
+            "a short horizon must restrict"
+        );
 
-        let full =
-            dilate(&complex, vertices[0], Horizon::Steps(covering), WalkOrder::Breadth).unwrap();
-        assert!(full.lineage.is_covering(), "the covering horizon must cover");
+        let full = dilate(
+            &complex,
+            vertices[0],
+            Horizon::Steps(covering),
+            WalkOrder::Breadth,
+        )
+        .unwrap();
+        assert!(
+            full.lineage.is_covering(),
+            "the covering horizon must cover"
+        );
 
-        let beyond =
-            dilate(&complex, vertices[0], Horizon::Steps(covering + 3), WalkOrder::Breadth)
-                .unwrap();
+        let beyond = dilate(
+            &complex,
+            vertices[0],
+            Horizon::Steps(covering + 3),
+            WalkOrder::Breadth,
+        )
+        .unwrap();
         assert_eq!(
             full.support, beyond.support,
             "dilating past covering is the Retained case: nothing moves"
@@ -588,7 +609,10 @@ mod tests {
         }
         for index in 0..5 {
             let mut boundary = CausalChain::default();
-            boundary.add_term(vertices[(index + 1) % 5], ComparativeMultiplicity::positive(1u32));
+            boundary.add_term(
+                vertices[(index + 1) % 5],
+                ComparativeMultiplicity::positive(1u32),
+            );
             boundary.add_term(vertices[index], ComparativeMultiplicity::negative(1u32));
             complex
                 .found_cell(format!("e{index}"), source(), 1, boundary)

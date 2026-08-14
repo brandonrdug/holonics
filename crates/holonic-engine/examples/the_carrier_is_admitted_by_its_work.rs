@@ -231,7 +231,9 @@ fn main() {
 
     println!("truth_status=established-bounded");
     println!("evidence=computational-witness");
-    println!("law=a carrier is admitted on its exact work vector; a clock may measure, never select");
+    println!(
+        "law=a carrier is admitted on its exact work vector; a clock may measure, never select"
+    );
     println!("convicted=cuda_aperture.rs — `if authority_nanoseconds < candidate_nanoseconds`");
     println!("declared_frame={}", render_frame(frame));
 
@@ -239,8 +241,12 @@ fn main() {
     rule("THE DECLARED APERTURES");
     // ---------------------------------------------------------------------------------------------
     println!("  work vector      host_evaluations, device_evaluations, transfer_bytes,");
-    println!("                   intermediate_bits — every coordinate a BigUint read off the receipt");
-    println!("                   the carrier already produced, all derived from the material and the");
+    println!(
+        "                   intermediate_bits — every coordinate a BigUint read off the receipt"
+    );
+    println!(
+        "                   the carrier already produced, all derived from the material and the"
+    );
     println!("                   declared aperture, all reproducing bit-for-bit on any machine.");
     println!("  admission law 1  CarrierWork::order_against — the metric-free PRODUCT order, four");
     println!("                   states, returning exact_value::ExactOrdering. Decides only on");
@@ -249,7 +255,9 @@ fn main() {
     println!("                   kinds of work. §13 rule 2: the metric is a receiver face of");
     println!("                   standing, never a modelling convenience.");
     println!("  retained         Open retains BOTH carriers. `trace_through` conducts either.");
-    println!("  live aperture    {APERTURE_WIDTH} x {APERTURE_HEIGHT} finite members, 3 conics, 2 receivers");
+    println!(
+        "  live aperture    {APERTURE_WIDTH} x {APERTURE_HEIGHT} finite members, 3 conics, 2 receivers"
+    );
 
     // ---------------------------------------------------------------------------------------------
     rule("SECTION 1 — WHAT THE WORK VECTOR RETURNS WITH NOTHING DECLARED");
@@ -325,7 +333,8 @@ fn main() {
                 "    retained    both — is_open()={}, and a declared metric DOES separate the same",
                 admission.is_open()
             );
-            let separated = CarrierAdmission::under(&metric(1, 1, 1), &pair.authority, &pair.candidate);
+            let separated =
+                CarrierAdmission::under(&metric(1, 1, 1), &pair.authority, &pair.candidate);
             println!(
                 "                two vectors: {}\n                so Open is a refusal, not an inability.",
                 render_admission(&separated)
@@ -598,17 +607,32 @@ fn live_section(
     }
     println!();
     println!("  THE FRAME-INVARIANT HALF — what the admission was taken on");
-    println!("    authority work  {}", render_work(&receipt.authority_work));
-    println!("    candidate work  {}", render_work(&receipt.candidate_work));
+    println!(
+        "    authority work  {}",
+        render_work(&receipt.authority_work)
+    );
+    println!(
+        "    candidate work  {}",
+        render_work(&receipt.candidate_work)
+    );
     println!(
         "    work_ordering   {}  (candidate against authority, nothing declared)",
         render_ordering(receipt.work_ordering)
     );
-    println!("    admission       {}", render_admission(&receipt.admission));
-    println!("    conducts        {:?}", receipt.admission.conducts_through());
+    println!(
+        "    admission       {}",
+        render_admission(&receipt.admission)
+    );
+    println!(
+        "    conducts        {:?}",
+        receipt.admission.conducts_through()
+    );
     println!();
     println!("  THE FRAME-DEPENDENT HALF — retained as measurement, selecting nothing");
-    println!("    display_frame   {}", render_frame(receipt.display_frame));
+    println!(
+        "    display_frame   {}",
+        render_frame(receipt.display_frame)
+    );
     println!(
         "    candidate       {} ns   authority {} ns",
         receipt.admission_candidate_nanoseconds, receipt.admission_authority_nanoseconds

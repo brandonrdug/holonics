@@ -40,7 +40,7 @@ use std::collections::{BTreeMap, BTreeSet, VecDeque};
 use serde::{Deserialize, Serialize};
 
 use crate::algebraic::{CausalCellId, GradedCausalComplex};
-use crate::gluing::{read_cover, Cover, GluingRefusal};
+use crate::gluing::{Cover, GluingRefusal, read_cover};
 use crate::rebase_invariants::PivotRule;
 
 /// One receiver's section. Communication happens only where sections meet.
@@ -226,17 +226,15 @@ mod tests {
     ) -> Neighbourhood {
         let sections = (0..count)
             .map(|start| {
-                let held: BTreeSet<CausalCellId> =
-                    vertices[start..(start + width).min(vertices.len())]
-                        .iter()
-                        .copied()
-                        .collect();
+                let held: BTreeSet<CausalCellId> = vertices
+                    [start..(start + width).min(vertices.len())]
+                    .iter()
+                    .copied()
+                    .collect();
                 complex
                     .cells()
                     .values()
-                    .filter(|cell| {
-                        cell.grade > 0 && cell.boundary.support().is_subset(&held)
-                    })
+                    .filter(|cell| cell.grade > 0 && cell.boundary.support().is_subset(&held))
                     .map(|cell| cell.id)
                     .chain(held.iter().copied())
                     .collect()
@@ -251,7 +249,11 @@ mod tests {
         let neighbourhood = stretches(&complex, &vertices, 3, 6);
         let reading = spread(&complex, &neighbourhood, 0, PivotRule::FirstNonzero).unwrap();
 
-        assert_eq!(reading.reach(), 6, "every stretch is reachable along the path");
+        assert_eq!(
+            reading.reach(),
+            6,
+            "every stretch is reachable along the path"
+        );
         assert!(reading.unobstructed());
         assert_eq!(reading.degrees[&0], 0);
         // Stretches 0..2 all share vertices with stretch 0, so they are one hop; further ones take
@@ -319,9 +321,8 @@ mod tests {
         }
 
         let arc = |from: usize, to: usize| -> BTreeSet<CausalCellId> {
-            let held: BTreeSet<CausalCellId> = (from..=to)
-                .map(|index| vertices[index % length])
-                .collect();
+            let held: BTreeSet<CausalCellId> =
+                (from..=to).map(|index| vertices[index % length]).collect();
             complex
                 .cells()
                 .values()
@@ -344,9 +345,15 @@ mod tests {
         assert_eq!(reading.frontier.len(), 1);
         assert_eq!(reading.frontier[0].from, 0);
         assert_eq!(reading.frontier[0].to, 1);
-        assert!(reading.frontier[0].overlap_extent > 0, "they are in contact");
         assert!(
-            reading.frontier[0].obstruction.iter().any(|rank| *rank != 0),
+            reading.frontier[0].overlap_extent > 0,
+            "they are in contact"
+        );
+        assert!(
+            reading.frontier[0]
+                .obstruction
+                .iter()
+                .any(|rank| *rank != 0),
             "and the contact carries a real connecting map"
         );
         assert_eq!(
@@ -354,7 +361,10 @@ mod tests {
             1,
             "growth stopped, and the origin's own local truth still stands"
         );
-        assert!(reading.out_of_contact.is_empty(), "this is disagreement, not silence");
+        assert!(
+            reading.out_of_contact.is_empty(),
+            "this is disagreement, not silence"
+        );
     }
 
     /// Reach depends on where you start. If it did not, the construction would be measuring a

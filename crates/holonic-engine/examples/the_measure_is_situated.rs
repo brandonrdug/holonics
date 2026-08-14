@@ -25,15 +25,15 @@ use std::path::{Path, PathBuf};
 
 use holonic_engine::algebraic::CausalCellId;
 use holonic_engine::conditioned_derivation::{
-    expose, ConditionedBody, DerivationQuery, Exposure, PassageId,
+    ConditionedBody, DerivationQuery, Exposure, PassageId, expose,
 };
 use holonic_engine::derivation_atlas::CircuitAperture;
 use holonic_engine::exact_value::ExactOrdering;
-use holonic_engine::gluing::{read_cover, Cover};
+use holonic_engine::gluing::{Cover, read_cover};
 use holonic_engine::rebase_invariants::PivotRule;
 use holonic_engine::situated_residual::{
-    emission_reaching, one_body_read, situate, Emission, Frame, ResidualArm, Situation,
-    SituatedReading,
+    Emission, Frame, ResidualArm, SituatedReading, Situation, emission_reaching, one_body_read,
+    situate,
 };
 use holonic_engine::surprisal::{Grain, Support};
 
@@ -474,10 +474,7 @@ fn main() {
             .orderings_at(grain)
             .expect("the enclosure is available");
         let opens = relation.iter().filter(|entry| entry.is_open()).count();
-        println!(
-            "  {grain:<28} {} pair(s), {opens} Open",
-            relation.len()
-        );
+        println!("  {grain:<28} {} pair(s), {opens} Open", relation.len());
         for entry in &relation {
             println!(
                 "        [{}] {:<20} vs {:<20} -> {:?}",
@@ -503,7 +500,9 @@ fn main() {
         println!("  {}", entry.render());
         println!(
             "\n  both members are still on the reading: {} and {}",
-            conditioned_against_null.event_names().contains(left.as_str()),
+            conditioned_against_null
+                .event_names()
+                .contains(left.as_str()),
             conditioned_against_null
                 .event_names()
                 .contains(right.as_str())
@@ -534,7 +533,10 @@ fn main() {
         Support::Supported(form) => form,
         Support::Unsupported => panic!("a non-empty emission supports itself"),
     };
-    println!("\n  situated read (null against null) : returns_zero = {}", null_against_null.returns_zero());
+    println!(
+        "\n  situated read (null against null) : returns_zero = {}",
+        null_against_null.returns_zero()
+    );
     println!(
         "      members {}, founded {}, withheld {}, separating {}",
         null_against_null.members.len(),
@@ -542,7 +544,10 @@ fn main() {
         null_against_null.withheld().len(),
         null_against_null.separating().len()
     );
-    println!("  one-body read of the SAME emission : {}", one_body_null.named());
+    println!(
+        "  one-body read of the SAME emission : {}",
+        one_body_null.named()
+    );
     println!("      is_zero = {}", one_body_null.is_zero());
 
     controls.check(
@@ -576,7 +581,9 @@ fn main() {
 
     rule("CONTROL 2 — `Open` IS REACHABLE, OCCURS, AND RETAINS BOTH MEMBERS");
     let retained = open_seen.iter().all(|(_, left, right)| {
-        conditioned_against_null.event_names().contains(left.as_str())
+        conditioned_against_null
+            .event_names()
+            .contains(left.as_str())
             && conditioned_against_null
                 .event_names()
                 .contains(right.as_str())
@@ -718,10 +725,7 @@ fn main() {
 
     rule("CONTROL 4 — REACH, FROM A LIBRARY PATH");
     let sites = library_reach_of_surprisal();
-    let code: Vec<&ReachSite> = sites
-        .iter()
-        .filter(|site| !site.is_documentation)
-        .collect();
+    let code: Vec<&ReachSite> = sites.iter().filter(|site| !site.is_documentation).collect();
     let documentation = sites.len() - code.len();
     let code_files: BTreeSet<&str> = code.iter().map(|site| site.file.as_str()).collect();
     println!(

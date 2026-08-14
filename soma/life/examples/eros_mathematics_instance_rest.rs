@@ -62,7 +62,9 @@ use std::path::{Path, PathBuf};
 use holonic_engine::conditioned_derivation::{
     expose, ConditionedBody, DerivationQuery, DerivedPassage, Exposure, FoundedMorphology,
 };
-use life::conditioned_rest::{records, render_derived_passages, ConditionedRest, FoundedStemRecord};
+use life::conditioned_rest::{
+    records, render_derived_passages, ConditionedRest, FoundedStemRecord,
+};
 use life::form_mouth::{deposit_form, DepositedForm};
 use life::text_material::{ExactTextMaterialAtlas, ExactTextMaterialCorpus, ParsedTextDocument};
 
@@ -302,9 +304,8 @@ fn passage_differences(before: &[DerivedPassage], after: &[DerivedPassage]) -> V
                     ("text", &earlier.text, &later.text),
                 ] {
                     if was != now {
-                        differing.push(format!(
-                            "position {at}: {field} was {was:?} and is {now:?}"
-                        ));
+                        differing
+                            .push(format!("position {at}: {field} was {was:?} and is {now:?}"));
                     }
                 }
                 if earlier.bridges != later.bridges {
@@ -329,10 +330,7 @@ fn passage_differences(before: &[DerivedPassage], after: &[DerivedPassage]) -> V
 }
 
 /// Every stem record that differs across the rest, exhibited whole.
-fn record_differences(
-    before: &[FoundedStemRecord],
-    after: &[FoundedStemRecord],
-) -> Vec<String> {
+fn record_differences(before: &[FoundedStemRecord], after: &[FoundedStemRecord]) -> Vec<String> {
     let mut differing = Vec::new();
     for (at, earlier) in before.iter().enumerate() {
         match after.get(at) {
@@ -402,7 +400,9 @@ fn main() {
     );
 
     // ---------------------------------------------------------------------------------------------
-    rule("[1]  THE CONDITIONING -- identical to the run, and the last thing the corpus is read for");
+    rule(
+        "[1]  THE CONDITIONING -- identical to the run, and the last thing the corpus is read for",
+    );
 
     let mut conditioned = match ConditionedBody::mount(deposit.clone()) {
         Ok(body) => body,
@@ -605,7 +605,9 @@ fn main() {
          offset and route."
     );
     if differences.is_empty() {
-        println!("\n  the two populations differ in nothing. The whole difference population is empty.");
+        println!(
+            "\n  the two populations differ in nothing. The whole difference population is empty."
+        );
     } else {
         println!("\n  the difference population, whole:");
         for difference in &differences {
@@ -673,7 +675,8 @@ fn main() {
     // ---------------------------------------------------------------------------------------------
     rule("[7]  THE MORPHOLOGY -- committed set, provisional set, and every cover, as populations");
 
-    let committed_before: BTreeSet<&str> = morphology_before.committed_stems().into_iter().collect();
+    let committed_before: BTreeSet<&str> =
+        morphology_before.committed_stems().into_iter().collect();
     let committed_after: BTreeSet<&str> = morphology_after.committed_stems().into_iter().collect();
     let provisional_before: BTreeSet<&str> = morphology_before
         .provisional()
@@ -741,7 +744,8 @@ fn main() {
             morphology_before.cover(&record.stem),
             morphology_after.cover(&record.stem),
         ) else {
-            stem_cover_differences.push(format!("{}: a cover was refused on one side", record.stem));
+            stem_cover_differences
+                .push(format!("{}: a cover was refused on one side", record.stem));
             continue;
         };
         if was.render() != now.render() {
@@ -779,7 +783,10 @@ fn main() {
         let documents = documents_witnessing(&morphology_after, stem);
         println!("      stem {stem:?}");
         for path in &documents {
-            println!("        founded by  {path}   [reachable: {}]", Path::new(path).exists());
+            println!(
+                "        founded by  {path}   [reachable: {}]",
+                Path::new(path).exists()
+            );
         }
     }
 
@@ -884,11 +891,7 @@ fn main() {
                 .and_then(|name| name.to_str())
                 .is_some_and(|name| name.contains(&deposited.address))
             && reopened == rest,
-        &format!(
-            "{} octets at {}",
-            from_disk.len(),
-            sealed_path.display()
-        ),
+        &format!("{} octets at {}", from_disk.len(), sealed_path.display()),
     );
     controls.check(
         "the resumed body goes on receiving: a further whole moves the form",

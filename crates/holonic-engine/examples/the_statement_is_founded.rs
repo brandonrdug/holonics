@@ -89,21 +89,19 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 
 use holonic_engine::conditioned_derivation::{
-    expose, found_conditioned_circuit, ConditionedBody, ConditionedCircuit, DerivationQuery,
-    Exposure,
+    ConditionedBody, ConditionedCircuit, DerivationQuery, Exposure, expose,
+    found_conditioned_circuit,
 };
-use holonic_engine::derivation_atlas::{
-    route_movement, statement_vertex_key, CircuitAperture,
-};
-use holonic_engine::derivation_skein::{moves_the_production_made, DerivationMove, MoveSpecies};
-use holonic_engine::lean_development::{join, read_development, DeclarationGrain};
+use holonic_engine::derivation_atlas::{CircuitAperture, route_movement, statement_vertex_key};
+use holonic_engine::derivation_skein::{DerivationMove, MoveSpecies, moves_the_production_made};
+use holonic_engine::lean_development::{DeclarationGrain, join, read_development};
 use holonic_engine::statement_composition::{
-    ablate_stem_for_statements_under, compose_in_scope, deposits_its_statement_vertex,
-    found_statements, found_statements_under, passages_with_composed, statement_composition_moves,
     AdjudicatedCandidate, AdmittedStatements, ComposedPassage, CompositionSpecies, PositionGate,
-    StatementAdmission, StatementPositionEcology,
+    StatementAdmission, StatementPositionEcology, ablate_stem_for_statements_under,
+    compose_in_scope, deposits_its_statement_vertex, found_statements, found_statements_under,
+    passages_with_composed, statement_composition_moves,
 };
-use holonic_engine::statement_grammar::{recover, BodyReading, SlotSpecies};
+use holonic_engine::statement_grammar::{BodyReading, SlotSpecies, recover};
 
 const APERTURE: CircuitAperture = CircuitAperture::STATEMENT_INCIDENT;
 
@@ -272,7 +270,10 @@ fn exhibit(
             entry.candidate.brought,
             licence.brought_at
         );
-        println!("            founded by the corpus wholes: {}", licence.wholes.join(", "));
+        println!(
+            "            founded by the corpus wholes: {}",
+            licence.wholes.join(", ")
+        );
     }
     if !stood_in.is_empty() {
         let places: Vec<String> = stood_in.iter().map(ToString::to_string).collect();
@@ -425,15 +426,16 @@ fn main() {
     );
 
     // ---------------------------------------------------------------------------------------------
-    rule("[1]  THE RECOVERED GRAMMAR  --  founded from the deposit's own statements, never authored");
+    rule(
+        "[1]  THE RECOVERED GRAMMAR  --  founded from the deposit's own statements, never authored",
+    );
 
     // Three arms over one material. `historical` is the rule as the roadmap measured it: the narrow
     // recruited population and no position gate. `withheld` and `applied` share a candidate
     // population exactly -- the same recruited set, the same grammar, the same compositions -- and
     // differ only in whether the ecology is on the causal path. That pair is the ORBIT.
     let historical = found_statements(&body).expect("founds");
-    let withheld =
-        found_statements_under(&body, &ecology, PositionGate::Withheld).expect("founds");
+    let withheld = found_statements_under(&body, &ecology, PositionGate::Withheld).expect("founds");
     let founded = found_statements_under(&body, &ecology, PositionGate::Applied).expect("founds");
     let grammar = &founded.grammar;
 
@@ -489,8 +491,10 @@ fn main() {
                         .map(|slot| slot.occupant.as_str())
                         .collect::<Vec<&str>>()
                 ),
-                Some(BodyReading::Undecomposed { span, .. }) =>
-                    format!("UNDECOMPOSED, retained whole: {:?}", span.text(&reading.statement)),
+                Some(BodyReading::Undecomposed { span, .. }) => format!(
+                    "UNDECOMPOSED, retained whole: {:?}",
+                    span.text(&reading.statement)
+                ),
                 None => "not read".to_owned(),
             }
         );
@@ -515,7 +519,9 @@ fn main() {
         println!("      {head:<20} {arities:?}");
     }
 
-    println!("\n  THE APERTURE  --  what this grammar CANNOT do, with the material that bounds it:");
+    println!(
+        "\n  THE APERTURE  --  what this grammar CANNOT do, with the material that bounds it:"
+    );
     for bound in grammar.aperture() {
         println!("    * {bound}");
     }
@@ -542,7 +548,10 @@ fn main() {
             .derive(&DerivationQuery::reaching(absent))
             .expect("derives");
         derive_on_absent += returned.len();
-        println!("    |- {absent:<52} derive returned {} passages", returned.len());
+        println!(
+            "    |- {absent:<52} derive returned {} passages",
+            returned.len()
+        );
     }
     let mut derive_on_standing = 0usize;
     println!("\n  and on the statements the deposit does reach, the same organ still returns:");
@@ -551,7 +560,10 @@ fn main() {
             .derive(&DerivationQuery::reaching(&statement))
             .expect("derives");
         derive_on_standing += returned.len();
-        println!("    |- {statement:<52} derive returned {} passages", returned.len());
+        println!(
+            "    |- {statement:<52} derive returned {} passages",
+            returned.len()
+        );
     }
 
     controls.check(
@@ -566,7 +578,9 @@ fn main() {
     );
 
     // ---------------------------------------------------------------------------------------------
-    rule("[3]  THE POSITION ECOLOGY  --  what conditions the composition, read off the same material");
+    rule(
+        "[3]  THE POSITION ECOLOGY  --  what conditions the composition, read off the same material",
+    );
 
     println!(
         "\n  The composition above founds from FORMAL GRAMMAR with nothing conditioning it: every\n  \
@@ -608,8 +622,12 @@ fn main() {
     println!("    and these {} were invisible to it:", unseen.len());
     wrapped("      ", &unseen);
 
-    println!("\n  THE POSITION CENSUS  --  where the material places each identifier. Nothing here is");
-    println!("  a category: `apply` is not called a tactic, it is recorded as having stood in tactic");
+    println!(
+        "\n  THE POSITION CENSUS  --  where the material places each identifier. Nothing here is"
+    );
+    println!(
+        "  a category: `apply` is not called a tactic, it is recorded as having stood in tactic"
+    );
     println!("  position, because that is the only place the reading found it.");
     for (identifier, places) in ecology.census() {
         let rendered: Vec<String> = places.iter().map(ToString::to_string).collect();
@@ -707,7 +725,9 @@ fn main() {
         wrapped("      ", &named);
     }
 
-    println!("\n  ONE REFUSAL PER SPECIES, IN FULL, so the obstruction can be checked rather than believed:");
+    println!(
+        "\n  ONE REFUSAL PER SPECIES, IN FULL, so the obstruction can be checked rather than believed:"
+    );
     let mut seen: BTreeSet<&str> = BTreeSet::new();
     for entry in founded.refused() {
         let Some(obstruction) = entry.admission.obstruction() else {
@@ -784,7 +804,9 @@ fn main() {
          atlas reads all the same. What separates the population above from\n  the one below is \
          the licence: a whole word the corpus committed, against a residual letter."
     );
-    println!("\n  the compositions outside the declared aperture, by name, with their licensing stems:");
+    println!(
+        "\n  the compositions outside the declared aperture, by name, with their licensing stems:"
+    );
     let named: Vec<String> = residual
         .iter()
         .map(|entry| {
@@ -922,7 +944,9 @@ fn main() {
     );
 
     // ---------------------------------------------------------------------------------------------
-    rule("[7]  WHAT A BATCH GRADER COULD BE ASKED  --  the artifact, whole, and what is NOT claimed");
+    rule(
+        "[7]  WHAT A BATCH GRADER COULD BE ASKED  --  the artifact, whole, and what is NOT claimed",
+    );
 
     println!(
         "\n  No kernel is in this loop and none may be: `CLAUDE.md` §13 rule 2 refuses a foreign\n  \
@@ -1021,7 +1045,9 @@ fn main() {
     );
 
     // ---------------------------------------------------------------------------------------------
-    rule("[8]  THE CIRCUIT  --  does the founded statement have a 0-cell, and does the reading see it?");
+    rule(
+        "[8]  THE CIRCUIT  --  does the founded statement have a 0-cell, and does the reading see it?",
+    );
 
     let before = found_conditioned_circuit(body.standing().to_vec(), APERTURE).expect("founds");
     let after = found_conditioned_circuit(
@@ -1036,7 +1062,10 @@ fn main() {
         .difference(&before_vertices)
         .cloned()
         .collect();
-    println!("\n  statement 0-cells of the deposit alone: {}", before_vertices.len());
+    println!(
+        "\n  statement 0-cells of the deposit alone: {}",
+        before_vertices.len()
+    );
     for vertex in &before_vertices {
         println!("    {vertex}");
     }
@@ -1062,9 +1091,10 @@ fn main() {
     );
     println!(
         "  and every founded statement's 0-cell key resolves in the circuit: {}",
-        statements
-            .iter()
-            .all(|statement| after.circuit.vertices().contains_key(&statement_vertex_key(statement)))
+        statements.iter().all(|statement| after
+            .circuit
+            .vertices()
+            .contains_key(&statement_vertex_key(statement)))
     );
     println!(
         "  provenance is total (every cell named by a passage): {}",
@@ -1242,7 +1272,10 @@ fn main() {
             ablation.routes_departed.len()
         );
         for route in &ablation.routes_departed {
-            println!("        |- {}   under stem {:?}", route.statement, route.stem);
+            println!(
+                "        |- {}   under stem {:?}",
+                route.statement, route.stem
+            );
         }
         println!(
             "      the ROUTES its removal REOPENED -- occurrences it had been suppressing by \
@@ -1275,7 +1308,10 @@ fn main() {
                 reopened.statement, reopened.stems
             );
         }
-        println!("      unaccounted reopenings: {}", ablation.unaccounted.len());
+        println!(
+            "      unaccounted reopenings: {}",
+            ablation.unaccounted.len()
+        );
         if ablation.statements_departed.is_empty() && !ablation.routes_departed.is_empty() {
             println!(
                 "      READING: the statement is OVER-DETERMINED and the route is not. Removing \
@@ -1395,7 +1431,9 @@ fn main() {
         );
     }
 
-    println!("\n  and the arities the population does not found, which admissions CARRY rather than erase:");
+    println!(
+        "\n  and the arities the population does not found, which admissions CARRY rather than erase:"
+    );
     let carrying: Vec<String> = founded
         .admitted()
         .into_iter()

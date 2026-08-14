@@ -376,11 +376,8 @@ impl CudaRecurrentLawExecutor {
                             })
                         })
                         .collect::<Result<Vec<_>, _>>()?;
-                    let terminus = wire::decode_i64(
-                        &returned,
-                        at + wire::FOLD_OUTPUT_VALUE_AT,
-                    )
-                    .ok_or_else(|| "the recurrent-fold omitted its terminus".to_owned())?;
+                    let terminus = wire::decode_i64(&returned, at + wire::FOLD_OUTPUT_VALUE_AT)
+                        .ok_or_else(|| "the recurrent-fold omitted its terminus".to_owned())?;
                     if trace.last().copied() != Some(terminus) {
                         return Err("the recurrent-fold trace and terminus disagree".to_owned());
                     }

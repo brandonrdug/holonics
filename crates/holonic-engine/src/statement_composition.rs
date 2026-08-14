@@ -97,16 +97,15 @@ use std::collections::{BTreeMap, BTreeSet};
 use crate::algebraic::CausalCellId;
 use crate::conditioned_derivation::{
     ConditionedBody, ConditionedCircuit, ConditionedDerivationRefusal, ContactSpecies,
-    FoundedMorphology, Passage,
-    PassageId, PassageOrigin,
+    FoundedMorphology, Passage, PassageId, PassageOrigin,
 };
 use crate::derivation_atlas::{read_derivation, statement_vertex_key};
-use crate::derivation_skein::{passage_interior, DerivationMove, MoveSpecies};
+use crate::derivation_skein::{DerivationMove, MoveSpecies, passage_interior};
 use crate::lean_development::{DevelopmentReading, PREAMBLE_FORMS};
 use crate::skein::Substitution;
 use crate::statement_grammar::{
-    recover, BodyReading, GrammarAperture, RecoveredStatementGrammar, SlotSpecies, Span,
-    StatementGrammarRefusal, StatementReading,
+    BodyReading, GrammarAperture, RecoveredStatementGrammar, SlotSpecies, Span,
+    StatementGrammarRefusal, StatementReading, recover,
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -273,7 +272,11 @@ pub enum StatementObstruction {
 impl std::fmt::Display for StatementObstruction {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::IdentifierUsedBeforeItIsBound { statement, identifier, at } => write!(
+            Self::IdentifierUsedBeforeItIsBound {
+                statement,
+                identifier,
+                at,
+            } => write!(
                 formatter,
                 "`{statement}` uses `{identifier}` at slot {at}, and no earlier binder introduces it"
             ),
@@ -302,7 +305,10 @@ impl std::fmt::Display for StatementObstruction {
                 "a leading region of {length} groups is unfounded; the population witnesses {witnessed:?}"
             ),
             Self::ComposedStatementIsUnchanged { statement } => {
-                write!(formatter, "the composition returned {statement:?} unchanged")
+                write!(
+                    formatter,
+                    "the composition returned {statement:?} unchanged"
+                )
             }
             Self::ReadBackMissedTheComposition { wanted, read } => write!(
                 formatter,
@@ -335,7 +341,9 @@ impl StatementObstruction {
     pub const fn species(&self) -> &'static str {
         match self {
             Self::NoFoundedStemHoldsThem { .. } => "no-founded-stem-holds-them",
-            Self::ComposedStatementIsAlreadyStanding { .. } => "composed-statement-is-already-standing",
+            Self::ComposedStatementIsAlreadyStanding { .. } => {
+                "composed-statement-is-already-standing"
+            }
             Self::SlotLiesInGrammarResidue { .. } => "slot-lies-in-grammar-residue",
             Self::GrammarNeverWitnessedTheShape { .. } => "grammar-never-witnessed-the-shape",
             Self::BinderListLengthIsUnfounded { .. } => "binder-list-length-is-unfounded",
@@ -437,7 +445,10 @@ impl AdmittedStatements {
         let mut grouped: BTreeMap<&'static str, Vec<&AdjudicatedCandidate>> = BTreeMap::new();
         for entry in self.refused() {
             if let Some(obstruction) = entry.admission.obstruction() {
-                grouped.entry(obstruction.species()).or_default().push(entry);
+                grouped
+                    .entry(obstruction.species())
+                    .or_default()
+                    .push(entry);
             }
         }
         grouped
@@ -496,7 +507,9 @@ pub enum StatementCompositionRefusal {
     Conditioned(ConditionedDerivationRefusal),
     /// A composed artifact could not be read back at all. The composer and the reading disagree,
     /// which is a defect in the composer and never a property of the material.
-    ComposedPassageDeclaresNothing { name: String },
+    ComposedPassageDeclaresNothing {
+        name: String,
+    },
     /// A composed artifact was read back reaching a different statement. The route would land on the
     /// wrong 0-cell — the same refusal `ConditionedBody::passages` makes for a derived passage, made
     /// here for a composed one, and neither weakens the other.
@@ -617,7 +630,10 @@ fn slot_substitutions(
 
 /// The identifiers a statement already carries in a position the grammar recovered, as possible
 /// partners for a group being moved in or out.
-fn carried_identifiers(reading: &StatementReading, except: Option<Span>) -> Vec<(SlotSpecies, String)> {
+fn carried_identifiers(
+    reading: &StatementReading,
+    except: Option<Span>,
+) -> Vec<(SlotSpecies, String)> {
     reading
         .slots()
         .into_iter()
@@ -627,7 +643,9 @@ fn carried_identifiers(reading: &StatementReading, except: Option<Span>) -> Vec<
                 SlotSpecies::BinderType | SlotSpecies::BodyHead
             )
         })
-        .filter(|slot| except.is_none_or(|span| slot.span.at < span.at || slot.span.at >= span.through))
+        .filter(|slot| {
+            except.is_none_or(|span| slot.span.at < span.at || slot.span.at >= span.through)
+        })
         .map(|slot| (slot.species, slot.occupant))
         .collect()
 }
@@ -915,7 +933,12 @@ fn tokens_of(text: &str) -> Vec<String> {
     }
     found
         .into_iter()
-        .filter(|token| token.chars().next().is_some_and(|first| first.is_ascii_alphabetic() || first == '_'))
+        .filter(|token| {
+            token
+                .chars()
+                .next()
+                .is_some_and(|first| first.is_ascii_alphabetic() || first == '_')
+        })
         .collect()
 }
 
@@ -1109,7 +1132,10 @@ impl StatementPositionEcology {
                 let Some(head) = parts.next() else {
                     continue;
                 };
-                let name: String = head.chars().take_while(|c| is_token_character(*c)).collect();
+                let name: String = head
+                    .chars()
+                    .take_while(|c| is_token_character(*c))
+                    .collect();
                 if name.is_empty()
                     || founding.contains_key(&name)
                     || !declared.contains(&(former.to_owned(), name.clone()))
@@ -1281,7 +1307,11 @@ impl StatementPositionEcology {
         let free: BTreeSet<String> = tokens_of(statement)
             .into_iter()
             .filter(|token| !self.founding.contains_key(token))
-            .chain(founded_here.into_iter().filter(|token| !self.founding.contains_key(token)))
+            .chain(
+                founded_here
+                    .into_iter()
+                    .filter(|token| !self.founding.contains_key(token)),
+            )
             .collect();
         for (_, line) in &self.preamble_lines {
             if !tokens_of(line).iter().any(|token| free.contains(token)) {
@@ -1452,7 +1482,10 @@ pub fn adjudicate(
 ///
 /// Read off the population and never authored: `Prop` and `Nat` appear only as types and heads, so
 /// they are standing; `P` and `h` appear as binder names, so they are bound and owe an introduction.
-fn population_binds(grammar: &RecoveredStatementGrammar, standing: &BTreeSet<String>) -> BTreeSet<String> {
+fn population_binds(
+    grammar: &RecoveredStatementGrammar,
+    standing: &BTreeSet<String>,
+) -> BTreeSet<String> {
     let mut bound = BTreeSet::new();
     for statement in standing {
         let Some(reading) = grammar.reading(statement) else {
@@ -1542,7 +1575,9 @@ pub fn adjudicate_conditioned(
                 residue: candidate.held.clone(),
                 refused_by: residue
                     .map(|residue| residue.refused_by)
-                    .unwrap_or_else(|| "the grammar recovered no reading of this statement".to_owned()),
+                    .unwrap_or_else(|| {
+                        "the grammar recovered no reading of this statement".to_owned()
+                    }),
             },
         ));
     }
@@ -1552,13 +1587,14 @@ pub fn adjudicate_conditioned(
                 bound,
                 GrammarAperture::ArgumentPositionNeverCarriedAnApplication { .. }
             )
-        }) {
-            return Ok(StatementAdmission::Refused(
-                StatementObstruction::GrammarNeverWitnessedTheShape {
-                    bound: bound.clone(),
-                },
-            ));
-        }
+        })
+    {
+        return Ok(StatementAdmission::Refused(
+            StatementObstruction::GrammarNeverWitnessedTheShape {
+                bound: bound.clone(),
+            },
+        ));
+    }
 
     // 2. the lengths the population founds
     if matches!(
@@ -1602,7 +1638,8 @@ pub fn adjudicate_conditioned(
     }
 
     // 5. the licence, which is the conditioning
-    let (found, held_cover, brought_cover) = licences(morphology, &candidate.held, &candidate.brought)?;
+    let (found, held_cover, brought_cover) =
+        licences(morphology, &candidate.held, &candidate.brought)?;
     if found.is_empty() {
         return Ok(StatementAdmission::Refused(
             StatementObstruction::NoFoundedStemHoldsThem {
@@ -1660,16 +1697,17 @@ pub fn adjudicate_conditioned(
     // what the grammar does not certify about the admission, carried rather than erased
     let mut carried_aperture = Vec::new();
     if let Some(reading) = grammar.reading(&candidate.from)
-        && let Some(BodyReading::Applied { head, .. }) = &reading.body {
-            let composed_head = if candidate.slot == Some(SlotSpecies::BodyHead) {
-                candidate.brought.clone()
-            } else {
-                head.occupant.clone()
-            };
-            if let Some(bound) = grammar.unfounded_head_arity(&composed_head) {
-                carried_aperture.push(bound);
-            }
+        && let Some(BodyReading::Applied { head, .. }) = &reading.body
+    {
+        let composed_head = if candidate.slot == Some(SlotSpecies::BodyHead) {
+            candidate.brought.clone()
+        } else {
+            head.occupant.clone()
+        };
+        if let Some(bound) = grammar.unfounded_head_arity(&composed_head) {
+            carried_aperture.push(bound);
         }
+    }
 
     // LAST. SCOPE. An identifier used in a type, head or argument position must already have been
     //    introduced by a binder in the same statement, unless the population treats it as a standing
@@ -1856,7 +1894,9 @@ pub fn compose_in_scope(
                     &scope,
                 );
                 let derivation = read_derivation(&text).ok_or(
-                    StatementCompositionRefusal::ComposedPassageDeclaresNothing { name: name.clone() },
+                    StatementCompositionRefusal::ComposedPassageDeclaresNothing {
+                        name: name.clone(),
+                    },
                 )?;
                 if derivation.statement != entry.candidate.statement {
                     return Err(
@@ -2125,17 +2165,18 @@ pub fn ablate_stem_for_statements_under(
     stem: &str,
     ecology: Option<&StatementPositionEcology>,
 ) -> Result<StatementStemAblation, StatementCompositionRefusal> {
-    let founded = body.morphology().stem(stem).ok_or(
-        ConditionedDerivationRefusal::StemWasNeverFounded {
-            stem: stem.to_owned(),
-        },
-    )?;
+    let founded =
+        body.morphology()
+            .stem(stem)
+            .ok_or(ConditionedDerivationRefusal::StemWasNeverFounded {
+                stem: stem.to_owned(),
+            })?;
     let wholes = founded.wholes.clone();
-    let ablated = body
-        .without_stem(stem)
-        .ok_or(ConditionedDerivationRefusal::StemWasNeverFounded {
-            stem: stem.to_owned(),
-        })?;
+    let ablated =
+        body.without_stem(stem)
+            .ok_or(ConditionedDerivationRefusal::StemWasNeverFounded {
+                stem: stem.to_owned(),
+            })?;
 
     let (before, after) = match ecology {
         Some(ecology) => (
@@ -2205,9 +2246,11 @@ pub fn ablate_stem_for_statements_under(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::conditioned_derivation::{expose, found_conditioned_circuit, DerivationQuery, Exposure};
-    use crate::derivation_atlas::{route_movement, CircuitAperture};
-    use crate::derivation_skein::{deposit_moves, MoveAperture};
+    use crate::conditioned_derivation::{
+        DerivationQuery, Exposure, expose, found_conditioned_circuit,
+    };
+    use crate::derivation_atlas::{CircuitAperture, route_movement};
+    use crate::derivation_skein::{MoveAperture, deposit_moves};
 
     const APERTURE: CircuitAperture = CircuitAperture::STATEMENT_INCIDENT;
 
@@ -2266,9 +2309,11 @@ mod tests {
         for entry in founded.refused() {
             assert!(entry.admission.obstruction().is_some());
         }
-        assert!(founded
-            .obstructions()
-            .contains_key("no-founded-stem-holds-them"));
+        assert!(
+            founded
+                .obstructions()
+                .contains_key("no-founded-stem-holds-them")
+        );
     }
 
     #[test]
@@ -2353,7 +2398,10 @@ mod tests {
             .unwrap_or_default();
         assert!(!refused.is_empty());
         for entry in refused {
-            assert_eq!(entry.candidate.species, CompositionSpecies::BinderWithdrawal);
+            assert_eq!(
+                entry.candidate.species,
+                CompositionSpecies::BinderWithdrawal
+            );
         }
     }
 
@@ -2385,8 +2433,7 @@ mod tests {
         let body = conditioned();
         let founded = found_statements(&body).expect("founds");
         let composed = compose(&founded).expect("composes");
-        let before =
-            found_conditioned_circuit(body.standing().to_vec(), APERTURE).expect("founds");
+        let before = found_conditioned_circuit(body.standing().to_vec(), APERTURE).expect("founds");
         let after = found_conditioned_circuit(
             passages_with_composed(&body, &composed).expect("passages"),
             APERTURE,
@@ -2401,14 +2448,18 @@ mod tests {
             "the organ built to see a founded statement must see exactly the founded population"
         );
         for statement in movement.founded_statements() {
-            assert!(after
-                .circuit
-                .vertices()
-                .contains_key(&statement_vertex_key(statement)));
-            assert!(!before
-                .circuit
-                .vertices()
-                .contains_key(&statement_vertex_key(statement)));
+            assert!(
+                after
+                    .circuit
+                    .vertices()
+                    .contains_key(&statement_vertex_key(statement))
+            );
+            assert!(
+                !before
+                    .circuit
+                    .vertices()
+                    .contains_key(&statement_vertex_key(statement))
+            );
         }
     }
 
@@ -2422,16 +2473,21 @@ mod tests {
             "(P : Prop) (h : P) : exact_chart_carry P",
             "(P : Prop) : exactCarrier P",
         ] {
-            assert!(body
-                .derive(&DerivationQuery::reaching(absent))
-                .expect("derives")
-                .is_empty());
+            assert!(
+                body.derive(&DerivationQuery::reaching(absent))
+                    .expect("derives")
+                    .is_empty()
+            );
         }
         // and it still returns a population on a statement the deposit does reach
-        assert!(!body
-            .derive(&DerivationQuery::reaching("(P : Prop) (h : P) : exactCarrier P"))
-            .expect("derives")
-            .is_empty());
+        assert!(
+            !body
+                .derive(&DerivationQuery::reaching(
+                    "(P : Prop) (h : P) : exactCarrier P"
+                ))
+                .expect("derives")
+                .is_empty()
+        );
     }
 
     #[test]
@@ -2505,10 +2561,12 @@ mod tests {
         let statement = "(P : Prop) (h : P) : exact_chart_carry P";
         assert!(ablation.statements_before.contains(statement));
         assert!(ablation.statements_after.contains(statement));
-        assert!(ablation
-            .routes_departed
-            .iter()
-            .any(|route| route.statement == statement));
+        assert!(
+            ablation
+                .routes_departed
+                .iter()
+                .any(|route| route.statement == statement)
+        );
         // Re-founded with its sibling above: the statement survives because several stems reach it,
         // and that survival is now visible directly — it stands in `statements_after` — rather than
         // through a reopening the constructor's reduction had manufactured.
@@ -2557,9 +2615,11 @@ mod tests {
         else {
             unreachable!()
         };
-        assert!(carried_aperture.contains(&GrammarAperture::HeadArityIsUnfounded {
-            identifier: "exact_chart_carry".to_owned()
-        }));
+        assert!(
+            carried_aperture.contains(&GrammarAperture::HeadArityIsUnfounded {
+                identifier: "exact_chart_carry".to_owned()
+            })
+        );
     }
 
     #[test]
@@ -2645,14 +2705,18 @@ mod tests {
             "`exact` heads a proof step and stands nowhere else"
         );
         assert_eq!(ecology.stood_in("Soma"), vec![ConductPosition::Scoping]);
-        assert!(ecology
-            .stood_in("exactCarrier")
-            .contains(&ConductPosition::Slot(SlotSpecies::BodyHead)));
-        assert!(ecology
-            .stood_in("exactCarrier")
-            .contains(&ConductPosition::Declared {
-                former: "def".to_owned()
-            }));
+        assert!(
+            ecology
+                .stood_in("exactCarrier")
+                .contains(&ConductPosition::Slot(SlotSpecies::BodyHead))
+        );
+        assert!(
+            ecology
+                .stood_in("exactCarrier")
+                .contains(&ConductPosition::Declared {
+                    former: "def".to_owned()
+                })
+        );
         // and the census is a population, not a classification: `Prop` carries four places at once
         assert!(ecology.stood_in("Prop").len() >= 2);
     }
@@ -2676,9 +2740,11 @@ mod tests {
         assert!(cohort.contains(&"exactCarrier".to_owned()), "{cohort:?}");
         assert!(cohort.contains(&"ExactRelay".to_owned()), "{cohort:?}");
         // the cohort is what carries it into a position it was never itself witnessed in
-        assert!(!ecology
-            .stood_in("ExactRelay")
-            .contains(&ConductPosition::Slot(SlotSpecies::BodyHead)));
+        assert!(
+            !ecology
+                .stood_in("ExactRelay")
+                .contains(&ConductPosition::Slot(SlotSpecies::BodyHead))
+        );
         assert!(ecology.admits("ExactRelay", SlotSpecies::BodyHead));
     }
 
@@ -2700,14 +2766,22 @@ mod tests {
             slot, stood_in, ..
         }) = refused.admission.obstruction()
         else {
-            panic!("expected the position obstruction, got {:?}", refused.admission);
+            panic!(
+                "expected the position obstruction, got {:?}",
+                refused.admission
+            );
         };
         assert_eq!(*slot, SlotSpecies::BodyHead);
         assert_eq!(stood_in, &vec![ConductPosition::Tactic]);
         // and the same candidate passes the stem licence, so this is the position gate and not the
         // contact gate wearing a new name
-        let withheld = adjudicate(&refused.candidate, &founded.grammar, body.morphology(), &founded.standing)
-            .expect("adjudicates");
+        let withheld = adjudicate(
+            &refused.candidate,
+            &founded.grammar,
+            body.morphology(),
+            &founded.standing,
+        )
+        .expect("adjudicates");
         assert!(withheld.is_admitted());
     }
 
@@ -2726,9 +2800,11 @@ mod tests {
         );
         assert_eq!(withheld.gate, PositionGate::Withheld);
         assert_eq!(applied.gate, PositionGate::Applied);
-        assert!(applied
-            .founded_statements()
-            .is_subset(&withheld.founded_statements()));
+        assert!(
+            applied
+                .founded_statements()
+                .is_subset(&withheld.founded_statements())
+        );
     }
 
     #[test]
@@ -2749,9 +2825,11 @@ mod tests {
             "a gauge whose group acts trivially on the declared material is not a gauge"
         );
         assert!(!applied.founded_statements().is_empty());
-        assert!(applied
-            .obstructions()
-            .contains_key("identifier-never-stood-in-this-position"));
+        assert!(
+            applied
+                .obstructions()
+                .contains_key("identifier-never-stood-in-this-position")
+        );
     }
 
     #[test]
@@ -2760,9 +2838,11 @@ mod tests {
         let ecology = scoped_ecology();
         let founded =
             found_statements_under(&body, &ecology, PositionGate::Applied).expect("founds");
-        assert!(founded
-            .founded_statements()
-            .contains("(P : Prop) (h : P) : ExactRelay P"));
+        assert!(
+            founded
+                .founded_statements()
+                .contains("(P : Prop) (h : P) : ExactRelay P")
+        );
         assert!(founded.is_a_population());
     }
 
@@ -2789,16 +2869,20 @@ mod tests {
             .find(|passage| passage.statement == "(P : Prop) (h : P) : ExactRelay P")
             .expect("the ExactRelay composition is presented");
         assert!(carried.scope.is_complete());
-        assert!(carried
-            .scope
-            .founding
-            .iter()
-            .any(|line| line == "def exactCarrier (P : Prop) : Prop := P"));
-        assert!(carried
-            .scope
-            .founding
-            .iter()
-            .any(|line| line == "abbrev ExactRelay (Q : Prop) : Prop := exactCarrier Q"));
+        assert!(
+            carried
+                .scope
+                .founding
+                .iter()
+                .any(|line| line == "def exactCarrier (P : Prop) : Prop := P")
+        );
+        assert!(
+            carried
+                .scope
+                .founding
+                .iter()
+                .any(|line| line == "abbrev ExactRelay (Q : Prop) : Prop := exactCarrier Q")
+        );
         // the transitive closure is ordered so a name is declared before it is used
         let at = |needle: &str| {
             carried
@@ -2822,8 +2906,9 @@ mod tests {
             found_statements_under(&body, &ecology, PositionGate::Applied).expect("founds");
         let bare = compose(&founded).expect("composes");
         assert!(bare.iter().all(|passage| passage.scope.is_empty()));
-        assert!(bare
-            .iter()
-            .all(|passage| passage.text.starts_with("namespace Soma\ntheorem ")));
+        assert!(
+            bare.iter()
+                .all(|passage| passage.text.starts_with("namespace Soma\ntheorem "))
+        );
     }
 }

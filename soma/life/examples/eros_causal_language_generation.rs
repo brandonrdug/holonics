@@ -481,9 +481,7 @@ fn corpus_contains(corpus_tokens: &[Vec<String>], needle: &[String]) -> bool {
     }
     corpus_tokens.iter().any(|passage| {
         passage.len() >= needle.len()
-            && passage
-                .windows(needle.len())
-                .any(|window| window == needle)
+            && passage.windows(needle.len()).any(|window| window == needle)
     })
 }
 

@@ -342,13 +342,7 @@ impl MorphologicalLanguageEcology {
         ),
         MorphologicalLanguageError,
     > {
-        let ecology = Self::condition_inner(
-            passages,
-            action,
-            1,
-            None,
-            Some(&mut *conditioner),
-        )?;
+        let ecology = Self::condition_inner(passages, action, 1, None, Some(&mut *conditioner))?;
         let semantic = conditioner
             .last_semantic_receipt()
             .ok_or(MorphologicalLanguageError::MalformedFiber)?;
@@ -599,11 +593,7 @@ impl MorphologicalLanguageEcology {
                 if conditioner.is_some() {
                     question_paths.push((ordered_surface, clause.source.clone()));
                 } else {
-                    question_prefix_atlas.admit(
-                        &ordered_surface,
-                        &clause.source,
-                        &clause.fiber,
-                    )?;
+                    question_prefix_atlas.admit(&ordered_surface, &clause.source, &clause.fiber)?;
                 }
             } else if !ordered_surface.is_empty() {
                 clause_lexical_paths.push(token_germs(&clause.tokens)?);
@@ -644,8 +634,16 @@ impl MorphologicalLanguageEcology {
             let charts = card.condition_charts(
                 [
                     ("lexical", &lexical_paths, &lexical_labels),
-                    ("clause-lexical", &clause_lexical_paths, &clause_lexical_labels),
-                    ("ordered-region", &ordered_region_paths, &ordered_region_labels),
+                    (
+                        "clause-lexical",
+                        &clause_lexical_paths,
+                        &clause_lexical_labels,
+                    ),
+                    (
+                        "ordered-region",
+                        &ordered_region_paths,
+                        &ordered_region_labels,
+                    ),
                     ("forward-mark", &mark_paths, &mark_labels),
                     ("reverse-mark", &reverse_paths, &mark_labels),
                 ],
@@ -684,8 +682,11 @@ impl MorphologicalLanguageEcology {
                     scope.spawn(|| ExactLabeledSuffixEcology::condition(&mark_paths, &mark_labels));
                 let reverse_mark = scope
                     .spawn(|| ExactLabeledSuffixEcology::condition(&reverse_paths, &mark_labels));
-                let (question_operator_prefixes, question_prefix_nodes, question_prefix_returned_tokens) =
-                    question_prefix_atlas.returned()?;
+                let (
+                    question_operator_prefixes,
+                    question_prefix_nodes,
+                    question_prefix_returned_tokens,
+                ) = question_prefix_atlas.returned()?;
                 Ok::<_, MorphologicalLanguageError>((
                     lexical
                         .join()
@@ -710,8 +711,11 @@ impl MorphologicalLanguageEcology {
                 ))
             })?
         } else {
-            let (question_operator_prefixes, question_prefix_nodes, question_prefix_returned_tokens) =
-                question_prefix_atlas.returned()?;
+            let (
+                question_operator_prefixes,
+                question_prefix_nodes,
+                question_prefix_returned_tokens,
+            ) = question_prefix_atlas.returned()?;
             (
                 ExactLabeledSuffixEcology::condition(&lexical_paths, &lexical_labels)?,
                 ExactLabeledSuffixEcology::condition(
@@ -847,9 +851,7 @@ impl MorphologicalLanguageEcology {
             let ordered_surface = folded_surface_tokens(&clause.tokens);
             for end in 1..ordered_surface.len() {
                 legacy_cloned_tokens += end as u64;
-                let support = legacy
-                    .entry(ordered_surface[..end].to_vec())
-                    .or_default();
+                let support = legacy.entry(ordered_surface[..end].to_vec()).or_default();
                 support.0.insert(clause.source.clone());
                 support.1.insert(clause.fiber.clone());
                 support.2.insert(ordered_surface[end].clone());
@@ -1948,11 +1950,12 @@ impl MorphologicalLanguageEcology {
                     let mut opened = Vec::with_capacity(candidates.len());
                     let mut withheld_candidates = LocalSequence::new();
                     for mut event in candidates {
-                        let returned = returned_candidates.get(returned_at).ok_or(
-                            MorphologicalConductCudaError::InvalidDeviceReturn {
+                        let returned =
+                            returned_candidates
+                                .get(returned_at)
+                                .ok_or(MorphologicalConductCudaError::InvalidDeviceReturn {
                                 at: "the card returned fewer candidate rows than the front shipped",
-                            },
-                        )?;
+                            })?;
                         if returned.candidate as usize != returned_at {
                             return Err(MorphologicalConductCudaError::InvalidDeviceReturn {
                                 at: "a returned candidate ordinal is out of order",
@@ -1981,16 +1984,17 @@ impl MorphologicalLanguageEcology {
                         let mut attached_set = LocalSet::new();
                         let mut conducting_sources = BTreeSet::new();
                         for deposit_at in &returned.active_deposits {
-                            let (edge, sources) = deposit_projection.get(*deposit_at as usize).ok_or(
-                                MorphologicalConductCudaError::InvalidDeviceReturn {
+                            let (edge, sources) = deposit_projection
+                                .get(*deposit_at as usize)
+                                .ok_or(MorphologicalConductCudaError::InvalidDeviceReturn {
                                     at: "a returned deposit ordinal is outside the shipped sheet",
-                                },
-                            )?;
+                                })?;
                             if !event.conduct_candidates.contains(edge)
                                 || !attached_set.insert(edge.clone())
                             {
                                 return Err(MorphologicalConductCudaError::InvalidDeviceReturn {
-                                    at: "the card attached a deposit this candidate did not carry, \
+                                    at:
+                                        "the card attached a deposit this candidate did not carry, \
                                          or attached one twice",
                                 }
                                 .into());
@@ -2039,10 +2043,9 @@ impl MorphologicalLanguageEcology {
                         // now comes to rest as `Obstructed` and is returned among the outputs, and
                         // the candidates it withheld are named by ordinal in the receipt.
                         self.finish_active_phase(charge, &mut state, None)?;
-                        state.current.rest =
-                            Some(MorphologicalResponseRest::Obstructed {
-                                open_obligations: open_face_indices(&state.current.open_faces),
-                            });
+                        state.current.rest = Some(MorphologicalResponseRest::Obstructed {
+                            open_obligations: open_face_indices(&state.current.open_faces),
+                        });
                         runtime.obstructions.push(MorphologicalConductObstruction {
                             chronology,
                             site: cell.site,
@@ -2445,7 +2448,9 @@ impl MorphologicalLanguageEcology {
                         // The support's OWN target occurrences, not this candidate's reached
                         // position: it is the transport that recurred or did not, and its exterior
                         // lineage is the same population the conduct atlas founds a deposit from.
-                        entry.conduct_sources.extend(support_sources.iter().cloned());
+                        entry
+                            .conduct_sources
+                            .extend(support_sources.iter().cloned());
                         entry.clause_horizons.insert(support.matched_length());
                         entry
                             .recurrence_multiplicities
@@ -2564,7 +2569,9 @@ impl MorphologicalLanguageEcology {
                                     support,
                                 )?,
                             );
-                            entry.conduct_sources.extend(support_sources.iter().cloned());
+                            entry
+                                .conduct_sources
+                                .extend(support_sources.iter().cloned());
                             entry.passage_horizons.insert(support.matched_length());
                             entry
                                 .recurrence_multiplicities

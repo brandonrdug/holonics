@@ -16,8 +16,8 @@ use std::{
 use body::num::Cog;
 use life::{
     causal_language::lexical_tokens,
-    live_current_cuda::CudaLiveCurrentExecutor,
     form_mouth::deposit_form_or_message,
+    live_current_cuda::CudaLiveCurrentExecutor,
     morphological_language::{
         MorphologicalGeneratedText, MorphologicalGenerationSpec, MorphologicalLanguageEcology,
         MorphologicalLanguageGeneration, MorphologicalLanguagePassage, MorphologicalResponseRest,

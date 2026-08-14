@@ -79,9 +79,13 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     rule("THE LATTICE RUNG IS NIVEN'S SET, DERIVED AND NOT WRITTEN DOWN");
 
-    let admitted: Vec<usize> = (1..=POLYGON_WALK).filter(|n| lattice_admits_order(*n)).collect();
+    let admitted: Vec<usize> = (1..=POLYGON_WALK)
+        .filter(|n| lattice_admits_order(*n))
+        .collect();
     println!("  orders a periodic lattice admits, walked to {POLYGON_WALK}: {admitted:?}");
-    println!("  reason: a lattice-preserving rotation has an INTEGER matrix in a lattice basis, so");
+    println!(
+        "  reason: a lattice-preserving rotation has an INTEGER matrix in a lattice basis, so"
+    );
     println!("  its trace 2cos(2π/n) is an integer, so 2cos(2π/n) ∈ {{2,1,0,−1,−2}}.");
     hold(
         "the crystallographic restriction is derived from the Niven carrier, not carried beside it",
@@ -139,7 +143,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     hold(
         "THE PENTAGON DIVIDES THE INSTRUMENTS — admitted by the compass, refused by the lattice",
         compass_only.contains(&5),
-        format!("5: degree {} is a power of two; 5 ∉ {{1,2,3,4,6}}", polygon_turn_degree(5)),
+        format!(
+            "5: degree {} is a power of two; 5 ∉ {{1,2,3,4,6}}",
+            polygon_turn_degree(5)
+        ),
     );
     hold(
         "the 17-gon divides them the same way — Gauss's own case, φ(17)/2 = 8",
@@ -172,7 +179,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     hold(
         "the neusis rung admits the heptagon where the compass refuses it",
         neusis_admits_degree(polygon_turn_degree(7)) && !admits_degree(polygon_turn_degree(7)),
-        format!("7: degree {} is 3-smooth and not a power of two", polygon_turn_degree(7)),
+        format!(
+            "7: degree {} is 3-smooth and not a power of two",
+            polygon_turn_degree(7)
+        ),
     );
 
     // ---------------------------------------------------------------------------------------------

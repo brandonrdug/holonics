@@ -265,8 +265,10 @@ fn report(declared: &Declared, atlas: &QuinticChartAtlas) {
         "    irreducibility          {}",
         match &atlas.radical.irreducibility {
             QuinticIrreducibility::Open => "OPEN".to_owned(),
-            QuinticIrreducibility::CertifiedByPrime { prime, .. } =>
-                format!("certified at prime {prime} by a full {}-cycle", atlas.degree),
+            QuinticIrreducibility::CertifiedByPrime { prime, .. } => format!(
+                "certified at prime {prime} by a full {}-cycle",
+                atlas.degree
+            ),
         }
     );
     println!(
@@ -361,10 +363,7 @@ fn report(declared: &Declared, atlas: &QuinticChartAtlas) {
             "  {} CHART   kills {}   transform degree {}   Bezout {}",
             chart.name().to_uppercase(),
             if killed.is_empty() {
-                format!(
-                    "— (undefined below degree {})",
-                    chart.least_source_degree()
-                )
+                format!("— (undefined below degree {})", chart.least_source_degree())
             } else {
                 format!("{killed:?}")
             },
@@ -445,7 +444,9 @@ fn control_the_wall_is_at_four(
     println!(
         "  all, so every row below degree five and above it is a return that did not previously"
     );
-    println!("  exist. What would make this fail: the organ returning at every degree, or refusing");
+    println!(
+        "  exist. What would make this fail: the organ returning at every degree, or refusing"
+    );
     println!("  at every degree — either would mean the verdict carries no information.");
     println!();
     let mut low_returning = 0_usize;
@@ -455,10 +456,7 @@ fn control_the_wall_is_at_four(
         let label = atlas.radical.verdict.label();
         println!(
             "  degree {}  {:38} {:8} residual {}",
-            atlas.degree,
-            declared.name,
-            label,
-            atlas.radical.residual_degree_after_deflation
+            atlas.degree, declared.name, label, atlas.radical.residual_degree_after_deflation
         );
         if atlas.degree <= 4 {
             if matches!(atlas.radical.verdict, RadicalChartVerdict::Returns(_)) {
@@ -572,9 +570,9 @@ fn control_certificates_hold_at_every_rung(
     let mut falsified_at = BTreeSet::new();
     for (_, atlas) in atlases {
         if let Some(transport) = atlas.depressed.transport() {
-            let wrong = transport
-                .transport
-                .plus(&holonic_engine::rational_polynomial::RationalPolynomial::constant(Rat::one()));
+            let wrong = transport.transport.plus(
+                &holonic_engine::rational_polynomial::RationalPolynomial::constant(Rat::one()),
+            );
             let composed = transport.transported.composed_with(&wrong);
             let (_, residue) = composed.divided_by(&transport.source)?;
             if !residue.is_zero() {
@@ -636,7 +634,9 @@ fn control_the_chart_family_has_a_floor(
         for (chart, outcome) in atlas.outcomes() {
             let floor = chart.least_source_degree();
             let undefined = matches!(
-                outcome.obstruction().map(|obstruction| &obstruction.species),
+                outcome
+                    .obstruction()
+                    .map(|obstruction| &obstruction.species),
                 Some(ChartObstructionSpecies::ChartUndefinedAtDegree { .. })
             );
             if atlas.degree < floor {
@@ -824,9 +824,7 @@ fn control_the_two_routes_agree(
     println!(
         "  Route B: Galois's theorem on solvable equations of PRIME degree — G <= AGL(1,p), whose"
     );
-    println!(
-        "  element cycle types are derived from the divisors of p-1. Every prime degree."
-    );
+    println!("  element cycle types are derived from the divisors of p-1. Every prime degree.");
     println!();
     let mut compared = 0_usize;
     let mut agreed = 0_usize;
@@ -863,7 +861,9 @@ fn control_the_two_routes_agree(
         }
     }
     println!();
-    println!("  THE DISTINGUISHING WORD — what the criterion refused on, and the prime that saw it:");
+    println!(
+        "  THE DISTINGUISHING WORD — what the criterion refused on, and the prime that saw it:"
+    );
     let mut witnessed = 0_usize;
     for (declared, atlas) in atlases {
         if let SolvabilityConstraint::NotSolvable {
@@ -894,7 +894,8 @@ fn control_the_two_routes_agree(
     }
     if witnessed == 0 {
         failures.push(
-            "control 5: the criterion refuted nothing, so its refusal branch is untested".to_owned(),
+            "control 5: the criterion refuted nothing, so its refusal branch is untested"
+                .to_owned(),
         );
     }
     println!();

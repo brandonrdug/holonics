@@ -138,9 +138,7 @@ use thiserror::Error;
 
 use crate::algebraic::{CausalCellId, GradedCausalComplex};
 use crate::dilation::DilatedSection;
-use crate::receiver_exact_compression::{
-    InputId, ItemId, Observation, ObservedSystem, ReceiverId,
-};
+use crate::receiver_exact_compression::{InputId, ItemId, Observation, ObservedSystem, ReceiverId};
 
 /// A cell, named as an item of the population under compression.
 ///
@@ -198,10 +196,7 @@ pub enum ComplexSystemError {
         "receiver {receiver} reads {cell:?}, which is not a cell of this complex; the section was \
          measured on another one and its addresses are coordinates from another frame"
     )]
-    ReceiverSectionForeign {
-        receiver: usize,
-        cell: CausalCellId,
-    },
+    ReceiverSectionForeign { receiver: usize, cell: CausalCellId },
 }
 
 /// A graded causal complex, a declared receiver family, a declared reading, and a declared conduct
@@ -411,9 +406,9 @@ mod tests {
     use super::*;
     use crate::algebraic::{CausalChain, ComparativeMultiplicity};
     use crate::causal::EventId;
-    use crate::dilation::{dilate, Horizon, WalkOrder};
+    use crate::dilation::{Horizon, WalkOrder, dilate};
     use crate::placement::place;
-    use crate::receiver_exact_compression::{compress, Partition};
+    use crate::receiver_exact_compression::{Partition, compress};
     use crate::supported_realizers::RealizerId;
 
     fn source() -> BTreeSet<EventId> {
@@ -587,9 +582,13 @@ mod tests {
         assert_eq!(section.lineage.reached, vec![points[0], edges[0]]);
         assert!(section.support.contains(&points[1]));
 
-        let by_metric =
-            ComplexSystem::declare(&complex, AddressReading::Metric, vec![section.clone()], vec![])
-                .unwrap();
+        let by_metric = ComplexSystem::declare(
+            &complex,
+            AddressReading::Metric,
+            vec![section.clone()],
+            vec![],
+        )
+        .unwrap();
         let by_chart =
             ComplexSystem::declare(&complex, AddressReading::Chart, vec![section], vec![]).unwrap();
 
@@ -630,10 +629,18 @@ mod tests {
             let seen = system.observation(item(*id), ReceiverId(0));
             if held {
                 inside += 1;
-                assert_ne!(seen, Observation(0), "cell {id:?} is held and must have an address");
+                assert_ne!(
+                    seen,
+                    Observation(0),
+                    "cell {id:?} is held and must have an address"
+                );
             } else {
                 outside += 1;
-                assert_eq!(seen, Observation(0), "cell {id:?} is not held and must read zero");
+                assert_eq!(
+                    seen,
+                    Observation(0),
+                    "cell {id:?} is not held and must read zero"
+                );
             }
         }
         assert!(inside > 0, "the restricted section must hold something");
@@ -650,13 +657,20 @@ mod tests {
         let (complex, points, _) = path(6);
         let system = metric(
             &complex,
-            vec![unbounded(&complex, points[0]), unbounded(&complex, points[5])],
+            vec![
+                unbounded(&complex, points[0]),
+                unbounded(&complex, points[5]),
+            ],
             Vec::new(),
         );
 
         let near = system.observation(item(points[1]), ReceiverId(0));
         let far = system.observation(item(points[1]), ReceiverId(1));
-        assert_eq!(near, Observation(3), "one graph step is two incidence steps");
+        assert_eq!(
+            near,
+            Observation(3),
+            "one graph step is two incidence steps"
+        );
         assert_eq!(far, Observation(9), "four graph steps from the other end");
         assert_ne!(near, far, "the address is not a coordinate in the complex");
 
@@ -668,7 +682,10 @@ mod tests {
                     != system.observation(item(**id), ReceiverId(1))
             })
             .count();
-        assert!(disagreements > 0, "the two frames must actually differ somewhere");
+        assert!(
+            disagreements > 0,
+            "the two frames must actually differ somewhere"
+        );
     }
 
     /// `addresses` returns the population whole, **including the cells the receiver cannot see**.
@@ -751,7 +768,9 @@ mod tests {
             "the population is still whole; it is the addresses that are empty of content"
         );
         assert!(
-            addresses.iter().all(|(_, address)| *address == Observation(0)),
+            addresses
+                .iter()
+                .all(|(_, address)| *address == Observation(0)),
             "an undeclared receiver must not fabricate a row: {addresses:?}"
         );
         assert_eq!(
@@ -980,14 +999,22 @@ mod tests {
                     elsewhere.cell(cell).is_ok(),
                     "the refusal names a cell of the complex the section was measured on"
                 );
-                assert!(here.cell(cell).is_err(), "and not one of the complex it was handed to");
+                assert!(
+                    here.cell(cell).is_err(),
+                    "and not one of the complex it was handed to"
+                );
             }
             other => panic!("a foreign section must be refused, got {other:?}"),
         }
 
         let absent = unbounded(&elsewhere, elsewhere_points[8]);
         assert_eq!(
-            ComplexSystem::declare(&here, AddressReading::Metric, vec![absent], here_edges.clone()),
+            ComplexSystem::declare(
+                &here,
+                AddressReading::Metric,
+                vec![absent],
+                here_edges.clone()
+            ),
             Err(ComplexSystemError::ReceiverFocusAbsent {
                 receiver: 0,
                 focus: elsewhere_points[8],
@@ -1150,7 +1177,11 @@ mod tests {
     #[test]
     fn the_mirror_vertices_are_separated_by_conduct_and_the_mirror_edges_are_not() {
         let (complex, points, edges) = cycle(6);
-        let system = metric(&complex, vec![unbounded(&complex, points[0])], edges.clone());
+        let system = metric(
+            &complex,
+            vec![unbounded(&complex, points[0])],
+            edges.clone(),
+        );
         let compression = compress(&system);
 
         assert_eq!(
@@ -1170,7 +1201,11 @@ mod tests {
         );
 
         assert!(!compression.is_exact(), "the reading loses something");
-        assert_eq!(compression.refinement(), 2, "two vertex pairs split, no edge pair");
+        assert_eq!(
+            compression.refinement(),
+            2,
+            "two vertex pairs split, no edge pair"
+        );
         assert_eq!(compression.conduct.len(), 9);
 
         let separated: BTreeSet<(ItemId, ItemId)> = compression
@@ -1214,7 +1249,8 @@ mod tests {
         );
         let step = system.inputs[mirror.distinguishing_word[0].0 as usize];
         assert!(
-            system.crossing(points[1], step).is_some() != system.crossing(points[5], step).is_some(),
+            system.crossing(points[1], step).is_some()
+                != system.crossing(points[5], step).is_some(),
             "the returned word must actually be a step one side takes and the other does not"
         );
     }
@@ -1236,7 +1272,11 @@ mod tests {
             "the widest aperture is the complex's own 1-cells, in the order it founded them"
         );
 
-        let narrow = metric(&complex, vec![unbounded(&complex, points[0])], near_aperture);
+        let narrow = metric(
+            &complex,
+            vec![unbounded(&complex, points[0])],
+            near_aperture,
+        );
         let narrow_reading = compress(&narrow);
 
         for far in &points[3..6] {
@@ -1264,7 +1304,11 @@ mod tests {
             "an identification conduct cannot break is not a loss and must not be reported as one"
         );
 
-        let wide = metric(&complex, vec![unbounded(&complex, points[0])], wide_aperture);
+        let wide = metric(
+            &complex,
+            vec![unbounded(&complex, points[0])],
+            wide_aperture,
+        );
         let wide_reading = compress(&wide);
         assert_ne!(
             block_of(&wide_reading.conduct, points[3]),
@@ -1307,7 +1351,10 @@ mod tests {
         let (complex, points, edges) = cycle(5);
         let system = metric(
             &complex,
-            vec![unbounded(&complex, points[0]), unbounded(&complex, points[1])],
+            vec![
+                unbounded(&complex, points[0]),
+                unbounded(&complex, points[1]),
+            ],
             edges.clone(),
         );
 
@@ -1323,7 +1370,10 @@ mod tests {
                 .collect()
         });
 
-        assert!(!placed.standing.is_empty(), "the vertices are reached by their edges");
+        assert!(
+            !placed.standing.is_empty(),
+            "the vertices are reached by their edges"
+        );
         assert!(
             !placed.open.is_empty(),
             "no edge is an end of an edge, so every edge class is OPEN"
@@ -1358,12 +1408,21 @@ mod tests {
             .iter()
             .flat_map(|class| class.members.iter().copied().map(cell))
             .collect();
-        assert!(standing_cells.is_disjoint(&open_cells), "a class stands or is OPEN, never both");
+        assert!(
+            standing_cells.is_disjoint(&open_cells),
+            "a class stands or is OPEN, never both"
+        );
         for vertex in &points {
-            assert!(standing_cells.contains(vertex), "vertex {vertex:?} was reached");
+            assert!(
+                standing_cells.contains(vertex),
+                "vertex {vertex:?} was reached"
+            );
         }
         for edge in &edges {
-            assert!(open_cells.contains(edge), "edge {edge:?} was reached by nothing");
+            assert!(
+                open_cells.contains(edge),
+                "edge {edge:?} was reached by nothing"
+            );
         }
         assert_eq!(
             standing_cells.len() + open_cells.len(),
@@ -1422,7 +1481,8 @@ mod tests {
 
             let expected = if length % 2 == 1 { length } else { length - 1 };
             assert_eq!(
-                placed.support.supported_rank, expected,
+                placed.support.supported_rank,
+                expected,
                 "a {length}-cycle is {}bipartite and must have rank {expected}, got {}",
                 if length % 2 == 0 { "" } else { "not " },
                 placed.support.supported_rank,
@@ -1491,7 +1551,8 @@ mod tests {
     /// that cannot be un-deposited, and `place` must return it OPEN with the factor exhibited rather
     /// than standing.
     #[test]
-    fn a_class_two_ends_of_one_edge_share_is_reached_only_in_multiple_and_the_factor_is_exhibited() {
+    fn a_class_two_ends_of_one_edge_share_is_reached_only_in_multiple_and_the_factor_is_exhibited()
+    {
         let (complex, points, edges) = cycle(3);
         let system = metric(&complex, vec![unbounded(&complex, points[0])], Vec::new());
         let reading = compress(&system);
@@ -1549,7 +1610,10 @@ mod tests {
         let placed = place(&system, &[], |_| Vec::new());
         assert!(placed.standing.is_empty());
         assert_eq!(placed.open.len(), placed.class_extent);
-        assert!(placed.class_extent > 1, "the classes must be plural or this proves nothing");
+        assert!(
+            placed.class_extent > 1,
+            "the classes must be plural or this proves nothing"
+        );
     }
 
     /// The seam is the identity on representations, the round trip is exact, and both returned
@@ -1579,7 +1643,11 @@ mod tests {
             "and the widest aperture is the 1-cells in that same order"
         );
         assert_eq!(
-            system.items().into_iter().map(cell).collect::<BTreeSet<_>>(),
+            system
+                .items()
+                .into_iter()
+                .map(cell)
+                .collect::<BTreeSet<_>>(),
             complex.cells().keys().copied().collect::<BTreeSet<_>>()
         );
         assert_eq!(system.items().len(), points.len() + edges.len());

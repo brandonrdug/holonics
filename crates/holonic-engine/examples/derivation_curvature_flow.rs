@@ -39,7 +39,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 
 use holonic_engine::conditioned_derivation::{
-    expose, ConditionedBody, ConditionedCircuit, DerivationQuery, Exposure,
+    ConditionedBody, ConditionedCircuit, DerivationQuery, Exposure, expose,
 };
 use holonic_engine::derivation_atlas::CircuitAperture;
 use holonic_engine::derivation_curvature::{
@@ -47,7 +47,7 @@ use holonic_engine::derivation_curvature::{
 };
 use holonic_engine::discrete_curvature::CurvatureFixedPoint;
 use num_traits::Zero;
-use relational_geometry::{integer, Rat, RatVec3};
+use relational_geometry::{Rat, RatVec3, integer};
 
 // -------------------------------------------------------------------------------------------------
 // Material
@@ -313,7 +313,10 @@ fn main() {
 
     let mut realized = DerivationCurvatureBody::found(&circuit).expect("the layout realizes");
     let complex = &realized.scaffold().kinematic.complex;
-    println!("\n  the ribbon graph's face walks   {}", realized.face_walks());
+    println!(
+        "\n  the ribbon graph's face walks   {}",
+        realized.face_walks()
+    );
     println!(
         "  scaffold vertices               {}  ({} derivation sites + {} rim vertices, one per dart)",
         complex.vertices.len(),
@@ -341,7 +344,11 @@ fn main() {
     );
     println!(
         "  the aperture leaks at: {:?}",
-        reading.aperture.porous_vertices().keys().collect::<Vec<_>>()
+        reading
+            .aperture
+            .porous_vertices()
+            .keys()
+            .collect::<Vec<_>>()
     );
 
     controls.check(
@@ -366,8 +373,12 @@ fn main() {
 
     let agreement = realized.frame_agreement().expect("both frames read");
     let orbit = agreement.coordination_orbit();
-    println!("\n  frame D   the circuit's own 1-cells at unit response; no face, no position, no projection");
-    println!("  frame S   curvature_bridge over the realized standing; scalar per hinge = response . edge_vector");
+    println!(
+        "\n  frame D   the circuit's own 1-cells at unit response; no face, no position, no projection"
+    );
+    println!(
+        "  frame S   curvature_bridge over the realized standing; scalar per hinge = response . edge_vector"
+    );
     println!(
         "\n  the orbit: conducted sites the two frames read differently -- {} of {}",
         orbit.len(),
@@ -483,14 +494,16 @@ fn main() {
     let after = realized.reading().expect("still conducts");
     let charges_after = after.combinatorial_charges();
 
-    println!("\n  the combinatorial charge, before and after two steps: {}",
+    println!(
+        "\n  the combinatorial charge, before and after two steps: {}",
         if charges_before == charges_after {
             "identical at every site"
         } else {
             "MOVED -- which would mean the circuit changed"
         }
     );
-    println!("  the deficit, before and after two steps:              {}",
+    println!(
+        "  the deficit, before and after two steps:              {}",
         if reading.deficits() == after.deficits() {
             "identical -- the flow returned nothing"
         } else {
@@ -561,12 +574,18 @@ fn main() {
         .keys()
         .next()
         .expect("an incidence");
-    let foil = foiled.refuse_one_lift(foil_hinge).expect("the incidence exists");
-    println!("\n  the declared foil: {} carries a response orthogonal to its own edge", foil.name);
+    let foil = foiled
+        .refuse_one_lift(foil_hinge)
+        .expect("the incidence exists");
+    println!(
+        "\n  the declared foil: {} carries a response orthogonal to its own edge",
+        foil.name
+    );
     println!("        founded by {}", passages(&foil.passages));
     let foil_step = foiled.flow(1).expect("the flow applies");
     let deposited = &foil_step[0].unlifted;
-    println!("\n  the partial arm lifted {} incidences and deposited {}:",
+    println!(
+        "\n  the partial arm lifted {} incidences and deposited {}:",
         foil_step[0].revised.len(),
         deposited.len()
     );
@@ -590,9 +609,7 @@ fn main() {
         !foil_step[0].whole
             && deposited.len() == 1
             && foil_step[0].revised.len() == foiled.layout.incidences().len() - 1
-            && deposited
-                .iter()
-                .all(|refused| !refused.passages.is_empty()),
+            && deposited.iter().all(|refused| !refused.passages.is_empty()),
         "gate on the boolean, deposit the population: one incidence refused whole, every other \
          conducted incidence revised, and the refusal named by its passages",
     );
@@ -699,10 +716,16 @@ fn main() {
     let flat_reading = flat_layout.reading().expect("conducts");
     let flat_before = flat_layout.consumed_responses().clone();
     let flat_walk = flat_layout.flow(2).expect("the flow applies");
-    println!("\n  a flat region: two declarations recruiting the same two identifiers (a four-cycle)");
+    println!(
+        "\n  a flat region: two declarations recruiting the same two identifiers (a four-cycle)"
+    );
     println!(
         "    every deficit {}   fixed-point class {}",
-        if flat_reading.is_flat() { "= 0" } else { "NOT zero" },
+        if flat_reading.is_flat() {
+            "= 0"
+        } else {
+            "NOT zero"
+        },
         class(&flat_reading.configuration.fixed_point())
     );
     println!(
@@ -796,7 +819,10 @@ fn class(fixed: &CurvatureFixedPoint) -> String {
         CurvatureFixedPoint::Flat => "flat".to_owned(),
         CurvatureFixedPoint::AlternatingTracedDeviation { component_scale } => format!(
             "alternating traced deviation, scale {:?}",
-            component_scale.values().map(Rat::to_string).collect::<Vec<_>>()
+            component_scale
+                .values()
+                .map(Rat::to_string)
+                .collect::<Vec<_>>()
         ),
         CurvatureFixedPoint::Moving { revisions } => {
             format!("moving, {} incidences revised", revisions.len())

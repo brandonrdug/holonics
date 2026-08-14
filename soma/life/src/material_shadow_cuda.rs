@@ -277,7 +277,13 @@ mod tests {
         assert_eq!(shorter.padded_words(4).unwrap(), vec![2, 0, 1, 0]);
         assert_eq!(longer.padded_words(4).unwrap(), vec![3, 0, 1, 0]);
         assert_eq!(moved.padded_words(4).unwrap(), vec![3, 0, 1, 2]);
-        assert_ne!(shorter.padded_words(4).unwrap(), longer.padded_words(4).unwrap());
-        assert_ne!(longer.padded_words(4).unwrap(), moved.padded_words(4).unwrap());
+        assert_ne!(
+            shorter.padded_words(4).unwrap(),
+            longer.padded_words(4).unwrap()
+        );
+        assert_ne!(
+            longer.padded_words(4).unwrap(),
+            moved.padded_words(4).unwrap()
+        );
     }
 }

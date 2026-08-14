@@ -43,7 +43,8 @@ fn probes() -> Result<Vec<(EventId, IntegerPolynomialProbe)>, Box<dyn Error>> {
 
 fn main() -> Result<(), Box<dyn Error>> {
     let law = PrimeEcologyLaw::with_horn_local_section_limit(3, HORN_LOCAL_SECTION_LIMIT)?;
-    let standing = PrimeEcologyStanding::with_horn_local_section_limit(3, HORN_LOCAL_SECTION_LIMIT)?;
+    let standing =
+        PrimeEcologyStanding::with_horn_local_section_limit(3, HORN_LOCAL_SECTION_LIMIT)?;
     let mut world = CausalWorld::new(law, standing);
     for value in 2..=7 {
         world.receive(&PrimeEcologyEvent::AdmitInteger(ArithmeticFiberEvent {
@@ -118,11 +119,13 @@ fn main() -> Result<(), Box<dyn Error>> {
     }
     let homologous_paths_are_exact = homologous.values().all(|branches| {
         branches.len() == 2
-            && branches[0].torsors(HORN_LOCAL_SECTION_LIMIT).is_ok_and(|left| {
-                branches[1]
-                    .torsors(HORN_LOCAL_SECTION_LIMIT)
-                    .is_ok_and(|right| left == right)
-            })
+            && branches[0]
+                .torsors(HORN_LOCAL_SECTION_LIMIT)
+                .is_ok_and(|left| {
+                    branches[1]
+                        .torsors(HORN_LOCAL_SECTION_LIMIT)
+                        .is_ok_and(|right| left == right)
+                })
     });
     let family_receipts = homologous
         .iter()

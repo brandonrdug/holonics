@@ -82,7 +82,7 @@ use serde::{Deserialize, Serialize};
 use crate::conditioned_derivation::Passage;
 use crate::exact_value::ExactOrdering;
 use crate::surprisal::{
-    entropy, read_population, Grain, Support, SurprisalError, SymbolicSurprisal,
+    Grain, Support, SurprisalError, SymbolicSurprisal, entropy, read_population,
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -140,7 +140,10 @@ impl Emission {
     }
 
     pub fn occurrences(&self, event: &str) -> BigUint {
-        self.counts.get(event).cloned().unwrap_or_else(BigUint::zero)
+        self.counts
+            .get(event)
+            .cloned()
+            .unwrap_or_else(BigUint::zero)
     }
 
     /// The total occurrence count. **A denominator, never a verdict** — it is what a probability is
@@ -157,9 +160,7 @@ impl Emission {
     fn on_axis(&self, table: &EventTable) -> BTreeMap<u64, BigUint> {
         self.counts
             .iter()
-            .filter_map(|(event, count)| {
-                table.id(event).map(|id| (id, count.clone()))
-            })
+            .filter_map(|(event, count)| table.id(event).map(|id| (id, count.clone())))
             .collect()
     }
 }
@@ -328,9 +329,13 @@ impl SituatedMember {
 
     pub fn situating_form_named(&self) -> &'static str {
         match &self.situation {
-            Situation::Founded { .. } => "the depth the reference takes on when it FOUNDs this event",
+            Situation::Founded { .. } => {
+                "the depth the reference takes on when it FOUNDs this event"
+            }
             Situation::Shared { .. } => "S_body - S_reference",
-            Situation::Withheld { .. } => "the depth the reference carries and the body did not emit",
+            Situation::Withheld { .. } => {
+                "the depth the reference carries and the body did not emit"
+            }
         }
     }
 
@@ -479,10 +484,7 @@ impl SituatedReading {
     }
 
     /// The pairs the declared grain could not order, both members carried on every entry.
-    pub fn open_orderings_at(
-        &self,
-        grain: Grain,
-    ) -> Result<Vec<SituatedOrdering>, SurprisalError> {
+    pub fn open_orderings_at(&self, grain: Grain) -> Result<Vec<SituatedOrdering>, SurprisalError> {
         Ok(self
             .orderings_at(grain)?
             .into_iter()
@@ -574,7 +576,7 @@ pub fn situate(
             _ => {
                 return Err(SituatedRefusal::EventStandsInNeitherBody {
                     event: table.name(id).to_owned(),
-                })
+                });
             }
         };
 
@@ -626,7 +628,12 @@ pub fn one_body_read(emission: &Emission) -> Result<Support, SurprisalError> {
 /// `crates/holonic-engine` contains zero module cycles and that its analyses terminate in `stdout`;
 /// putting this seam in the library rather than in a driver is the difference between an emission
 /// that returns and one that does not.
-pub fn emission_reaching(body: &str, material: &str, passages: &[Passage], statement: &str) -> Emission {
+pub fn emission_reaching(
+    body: &str,
+    material: &str,
+    passages: &[Passage],
+    statement: &str,
+) -> Emission {
     let mut emission = Emission::by(body, material);
     for passage in passages {
         if passage.derivation.statement != statement {
@@ -656,10 +663,14 @@ pub enum SituatedRefusal {
     },
     /// A FOUND left the event without support. Structurally impossible — `found` inserts a positive
     /// count — and returned by name rather than asserted away.
-    FoundingDidNotSupport { event: String },
+    FoundingDidNotSupport {
+        event: String,
+    },
     /// An event of the declared material stood in neither body. Structurally impossible, since the
     /// material is the union of the two emissions.
-    EventStandsInNeitherBody { event: String },
+    EventStandsInNeitherBody {
+        event: String,
+    },
     Surprisal(SurprisalError),
 }
 
@@ -720,10 +731,17 @@ mod tests {
     /// comparison, and treating it as one is the dropped third.
     #[test]
     fn a_body_read_against_itself_returns_zero_and_the_one_body_read_does_not() {
-        let alone = emission("the body", &[("alpha", 3), ("beta", 3), ("gamma", 3), ("delta", 1)]);
+        let alone = emission(
+            "the body",
+            &[("alpha", 3), ("beta", 3), ("gamma", 3), ("delta", 1)],
+        );
         let reading = situate(&alone, &alone, &frame()).unwrap();
 
-        assert_eq!(reading.members.len(), 4, "every event of the material is a member");
+        assert_eq!(
+            reading.members.len(),
+            4,
+            "every event of the material is a member"
+        );
         assert!(reading.founded().is_empty());
         assert!(reading.withheld().is_empty());
         assert!(reading.separating().is_empty());
@@ -732,7 +750,11 @@ mod tests {
             let Situation::Shared { separation, .. } = &member.situation else {
                 unreachable!("every member is shared here");
             };
-            assert!(separation.is_zero(), "{} separated from itself", member.event);
+            assert!(
+                separation.is_zero(),
+                "{} separated from itself",
+                member.event
+            );
             assert_eq!(
                 member.against_zero(Grain::at(1, 4)).unwrap(),
                 ExactOrdering::Equal,
@@ -774,7 +796,11 @@ mod tests {
         // The reference's standing was a single event; founding this one makes it 1 of 2.
         assert_eq!(after_found.named(), "log2(2)");
         assert!(!reading.returns_zero());
-        assert_eq!(reading.separating().len(), 2, "the FOUND, and alpha's moved depth");
+        assert_eq!(
+            reading.separating().len(),
+            2,
+            "the FOUND, and alpha's moved depth"
+        );
     }
 
     /// **The residual is oriented.** Swapping the two bodies moves every founded member to withheld
@@ -788,19 +814,35 @@ mod tests {
         let backward = situate(&reference, &body, &frame()).unwrap();
 
         assert_eq!(
-            forward.founded().iter().map(|m| m.event.as_str()).collect::<Vec<_>>(),
+            forward
+                .founded()
+                .iter()
+                .map(|m| m.event.as_str())
+                .collect::<Vec<_>>(),
             vec!["novel"]
         );
         assert_eq!(
-            forward.withheld().iter().map(|m| m.event.as_str()).collect::<Vec<_>>(),
+            forward
+                .withheld()
+                .iter()
+                .map(|m| m.event.as_str())
+                .collect::<Vec<_>>(),
             vec!["held"]
         );
         assert_eq!(
-            backward.founded().iter().map(|m| m.event.as_str()).collect::<Vec<_>>(),
+            backward
+                .founded()
+                .iter()
+                .map(|m| m.event.as_str())
+                .collect::<Vec<_>>(),
             vec!["held"]
         );
         assert_eq!(
-            backward.withheld().iter().map(|m| m.event.as_str()).collect::<Vec<_>>(),
+            backward
+                .withheld()
+                .iter()
+                .map(|m| m.event.as_str())
+                .collect::<Vec<_>>(),
             vec!["novel"]
         );
 
@@ -838,9 +880,15 @@ mod tests {
         // here are `5/3` and `1`. That is the same separation `surprisal`'s own control shows a
         // coarse grain cannot resolve, reached through the emission counts rather than written down.
         let body = emission("the body", &[("wide", 3), ("narrow", 2), ("filler", 2)]);
-        let reference = emission("the reference", &[("wide", 5), ("narrow", 2), ("filler", 1)]);
+        let reference = emission(
+            "the reference",
+            &[("wide", 5), ("narrow", 2), ("filler", 1)],
+        );
         let reading = situate(&body, &reference, &frame()).unwrap();
-        assert!(!reading.returns_zero(), "every member separates on this material");
+        assert!(
+            !reading.returns_zero(),
+            "every member separates on this material"
+        );
 
         let coarse = Grain::at(1, 4);
         let open = reading.open_orderings_at(coarse).unwrap();
@@ -849,7 +897,10 @@ mod tests {
             "a four-state ordering that never returns Open has not been exercised"
         );
         for entry in &open {
-            assert_eq!(entry.grain, coarse, "the receipt carries the grain that reached it");
+            assert_eq!(
+                entry.grain, coarse,
+                "the receipt carries the grain that reached it"
+            );
             // Both members retained: on the entry, and on the reading.
             assert!(reading.event_names().contains(entry.left.as_str()));
             assert!(reading.event_names().contains(entry.right.as_str()));
@@ -873,7 +924,11 @@ mod tests {
         // The relation is complete and within-arm: three shared members give three pairs.
         let relation = reading.orderings().unwrap();
         assert_eq!(relation.len(), 3);
-        assert!(relation.iter().all(|entry| entry.arm == ResidualArm::Shared));
+        assert!(
+            relation
+                .iter()
+                .all(|entry| entry.arm == ResidualArm::Shared)
+        );
     }
 
     /// A reading across two materials is refused rather than taken. The frame is structural.
@@ -900,7 +955,10 @@ mod tests {
     fn an_echo_and_a_founding_emission_differ_as_populations_with_nothing_scored() {
         let reference = emission("the reference", &[("alpha", 2), ("beta", 1)]);
         let echo = emission("the echo", &[("alpha", 2), ("beta", 1)]);
-        let founding = emission("the founding body", &[("alpha", 2), ("beta", 1), ("novel", 1)]);
+        let founding = emission(
+            "the founding body",
+            &[("alpha", 2), ("beta", 1), ("novel", 1)],
+        );
 
         let echoed = situate(&echo, &reference, &frame()).unwrap();
         assert!(echoed.returns_zero());

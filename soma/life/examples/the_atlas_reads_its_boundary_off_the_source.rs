@@ -275,7 +275,11 @@ fn main() {
                 section.line + section.lines - 1
             );
             println!("    line {:>5}  {}", cut_at - 1, section.line_at(24 - 1));
-            println!("    line {:>5}  {}   <- the retired cut", cut_at, section.line_at(24));
+            println!(
+                "    line {:>5}  {}   <- the retired cut",
+                cut_at,
+                section.line_at(24)
+            );
             println!(
                 "    line {:>5}  {}   <- the live boundary",
                 section.line + section.lines - 1,
@@ -316,7 +320,8 @@ fn main() {
                 );
                 println!(
                     "    line {:>5}  {}   <- depth returns to zero",
-                    last, lines[last - 1]
+                    last,
+                    lines[last - 1]
                 );
                 println!(
                     "    line {:>5}  {}   <- the next section opens here",
@@ -337,7 +342,10 @@ fn main() {
          give, so only the blank line is doing work on this material"
     );
     // the widest live section, named — the material's own answer to what the retired count capped.
-    if let Some(widest) = live_rust.iter().max_by_key(|s| (s.lines, s.identity.clone())) {
+    if let Some(widest) = live_rust
+        .iter()
+        .max_by_key(|s| (s.lines, s.identity.clone()))
+    {
         println!(
             "  the widest live section is {} lines: {} — the retired law returned it as {} pieces",
             widest.lines,
@@ -414,8 +422,14 @@ fn main() {
         .iter()
         .map(|s| s.identity.clone())
         .collect::<BTreeSet<_>>();
-    let only_lexical = lexical_ids.difference(&naive_ids).cloned().collect::<Vec<_>>();
-    let only_naive = naive_ids.difference(&lexical_ids).cloned().collect::<Vec<_>>();
+    let only_lexical = lexical_ids
+        .difference(&naive_ids)
+        .cloned()
+        .collect::<Vec<_>>();
+    let only_naive = naive_ids
+        .difference(&lexical_ids)
+        .cloned()
+        .collect::<Vec<_>>();
     println!(
         "  sections               lexical {}   naive {}   lexical-only {}   naive-only {}",
         lexical_ids.len(),
@@ -863,7 +877,10 @@ fn union_population(
 /// reaches all of them is a leader whose region is every feature the driver saw, with no aperture.
 /// The caller checks that this region really did reach all of them against the atlas' own receipt,
 /// so a region that under-reaches cannot be mistaken for agreement.
-fn atlas_identities(atlas: &LaboratorySourceAtlas, region: BTreeSet<String>) -> (BTreeSet<String>, usize) {
+fn atlas_identities(
+    atlas: &LaboratorySourceAtlas,
+    region: BTreeSet<String>,
+) -> (BTreeSet<String>, usize) {
     let leader = LaboratoryResearchLeader {
         identity: "the-whole-atlas".to_owned(),
         question: "every section".to_owned(),

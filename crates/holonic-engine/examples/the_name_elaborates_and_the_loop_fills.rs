@@ -40,13 +40,11 @@
 use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
 
-use holonic_engine::derivation_atlas::{read_derivation, CircuitAperture, Derivation};
+use holonic_engine::derivation_atlas::{CircuitAperture, Derivation, read_derivation};
 use holonic_engine::derivation_two_cells::{
-    betti_at, fill_routes, torsion_at, AgreementCriterion, RouteFilling, TwoCellRefusal,
+    AgreementCriterion, RouteFilling, TwoCellRefusal, betti_at, fill_routes, torsion_at,
 };
-use holonic_engine::name_elaboration::{
-    Elaboration, ElaborationAperture, ElaborationDeposit,
-};
+use holonic_engine::name_elaboration::{Elaboration, ElaborationAperture, ElaborationDeposit};
 use holonic_engine::rebase_invariants::PivotRule;
 
 /// The declared square population any one reading may found. Exceeding it **refuses the reading
@@ -419,7 +417,10 @@ fn control_five_the_aperture_and_what_lies_outside_it(
     };
 
     section("aperture one: the DEPOSIT's own -- a name it does not declare cannot be opened");
-    println!("  root {root}, aperture Exhausted, reach {}", exhausted.reach());
+    println!(
+        "  root {root}, aperture Exhausted, reach {}",
+        exhausted.reach()
+    );
     println!("  constituents it reached and cannot open, by name:");
     names("    ", exhausted.atoms().iter().cloned());
     println!(
@@ -427,11 +428,16 @@ fn control_five_the_aperture_and_what_lies_outside_it(
          remove them: the aperture is the deposit, and it is permanent."
     );
 
-    section("aperture two: a DECLARED DEPTH -- what it stopped at, and what that would have brought");
+    section(
+        "aperture two: a DECLARED DEPTH -- what it stopped at, and what that would have brought",
+    );
     let bounded = deposit
         .elaborate(&root, ElaborationAperture::ToDepth(1))
         .expect("the root is in the deposit");
-    println!("  root {root}, aperture ToDepth(1), reach {}", bounded.reach());
+    println!(
+        "  root {root}, aperture ToDepth(1), reach {}",
+        bounded.reach()
+    );
     println!("  openable and not opened:");
     names("    ", bounded.beyond_depth().iter().cloned());
     println!("  what opening it would have brought and this reading does not carry:");
@@ -482,9 +488,7 @@ fn control_four_the_cycles(deposit: &ElaborationDeposit, controls: &mut Controls
         println!(
             "  The declaration digraph of this deposit is: carrier_transport, carrier_transport_direct"
         );
-        println!(
-            "  and carrier_transport_relayed each name formal_carry; formal_carry and"
-        );
+        println!("  and carrier_transport_relayed each name formal_carry; formal_carry and");
         println!(
             "  every_receiver_agrees name no declaration at all. That is a forest, and a forest\n  carries no cycle."
         );
@@ -605,7 +609,9 @@ fn control_two_filling_must_be_able_to_not_happen(readings: &[Reading], controls
             Ok(filling) => filling,
             Err(refusal) => {
                 println!("  REFUSED: {refusal}");
-                println!("  The population is named rather than truncated; the reading is not run.");
+                println!(
+                    "  The population is named rather than truncated; the reading is not run."
+                );
                 continue;
             }
         };
@@ -975,7 +981,10 @@ fn control_six_the_triple_overlaps(readings: &[Reading], controls: &mut Controls
             );
         }
         if here_agreeing.len() > 2 {
-            println!("    ... and {} further pairwise-agreeing triples", here_agreeing.len() - 2);
+            println!(
+                "    ... and {} further pairwise-agreeing triples",
+                here_agreeing.len() - 2
+            );
         }
 
         // A non-transitive triple, with the pair that broke transitivity named.

@@ -66,15 +66,15 @@ pub mod bit_causal;
 pub mod category;
 pub mod causal;
 pub mod causal_body;
-pub mod causal_state_grammar;
 pub mod causal_reflection;
+pub mod causal_state_grammar;
 pub mod codec_recovery;
 // The adapter from a recovered codec to `receiver_exact_compression::ObservedSystem`, and the
 // cross-check between its Nerode congruence and `RecoveredCodec::shortest_separating_input`.
 // Declared, never glob-exported: `ItemId`, `Observation`, `ReceiverId` and `Disagreement` collide
 // across the engine's receiver modules and must be named at every call site.
-pub mod codec_system;
 pub mod causal_traversal;
+pub mod codec_system;
 // Reached explicitly rather than glob-exported for the same reason as
 // `discrete_curvature`: the bridge names `read`, `step` and `revise`, and a glob would put those
 // verbs in the crate root where nothing says what they read or step. `blueprint/THE_ASSEMBLY.md`.
@@ -110,13 +110,14 @@ pub mod coupled_informant;
 pub mod cuda_aperture;
 #[cfg(target_os = "linux")]
 pub mod cuda_refine;
+pub mod embedding_fiber;
 #[cfg(target_os = "linux")]
 pub mod cuda_relation;
+pub mod derivation_atlas;
 pub mod device;
 pub mod diffusion;
 #[cfg(target_os = "linux")]
 pub mod hardware_cover;
-pub mod derivation_atlas;
 // The deposited derivation circuit conducted as an exact population current: `receiver_current`'s
 // transport law pointed at the atlas's own 0-cells and 1-cells, so that an atom recruited by ninety
 // derivations separates from one recruited by two through a dilated passage delay rather than
@@ -231,11 +232,11 @@ pub mod presentation;
 pub mod quantity;
 // The declared display gauge and the body's one vector codec. Not glob-exported for the same
 // reason as `certified_face`: colour is a gauge and must be named as one at every call site.
+pub mod discrete_curvature;
+pub mod leader_quadrature;
 pub mod presentation_gauge;
 pub mod prime_ecology;
 pub mod realization;
-pub mod leader_quadrature;
-pub mod discrete_curvature;
 pub mod running_integral;
 // The temper: founding and decay as one property of a structure's own twist. No glob — `Twist`
 // and `Temper` are deliberately narrow names and must be reached through the module.
@@ -263,10 +264,11 @@ pub mod receiver_exact_compression;
 // `DeclaredGrain`, and `ExactFace` collides in meaning with `certified_face`'s presentation face
 // while `reopen` says nothing at the crate root about what is being reopened. `CLAUDE.md` §2b and
 // `canon/THE_MATHEMATICS_TABLET.md` §1, "one deletion, three carriers".
-pub mod reopening;
 pub mod receiver_current;
 pub mod receiver_ecology;
 pub mod receiver_phase_atlas;
+pub mod regime_reading;
+pub mod reopening;
 pub mod resource;
 pub mod sheaf_diffusion;
 pub mod simplicial;
@@ -281,21 +283,21 @@ pub mod skein;
 // glob-exported: they name `Span`, `Slot`, `recover`, `normalize` and `admit`, every one of which
 // says nothing at the crate root about which surface it belongs to, and `recover` would collide
 // with `codec_recovery::recover`.
-pub mod statement_composition;
 pub mod contact_gluing;
 pub mod multiquadratic;
 pub mod spine_cut;
-pub mod structure_group;
+pub mod statement_composition;
 pub mod statement_grammar;
+pub mod structure_group;
 // Declared, never glob-exported: `ReceiverId`, `Disagreement`, `Partition`, `Cover`, `Observation`
 // and `ItemId` collide across the placement family, and a realizer founded by a substitution must
 // be reached by naming which organ founded it. `blueprint/THE_ASSEMBLY.md` step 2.
 // Surprisal as an exact symbolic form. Reached explicitly, never glob-exported: `Support` and
 // `entropy` say nothing at the crate root about which carrier they belong to, and a caller wanting a
 // number must be made to ask for an enclosure. `canon/THE_RECOVERED_LAW.md` §1 and §3.
-pub mod surprisal;
 pub mod substitution_realizers;
 pub mod supported_realizers;
+pub mod surprisal;
 // Which tokens a corpus treats as invariant objects: a surface's occurrence population presented to
 // `receiver_exact_compression` as positions under a declared receiver family, so an unseparated
 // population is iron and a shattered one exhibits the shortest word that shattered it. Declared,
@@ -335,8 +337,6 @@ pub use cuda_refine::*;
 #[cfg(target_os = "linux")]
 pub use cuda_relation::*;
 pub use device::*;
-#[cfg(target_os = "linux")]
-pub use hardware_cover::*;
 pub use diffusion::*;
 pub use dimensional_receiver::*;
 pub use dimensional_wave::*;
@@ -349,6 +349,8 @@ pub use executor::*;
 pub use field_atlas::*;
 pub use generative_transport::*;
 pub use graph_receiver::*;
+#[cfg(target_os = "linux")]
+pub use hardware_cover::*;
 pub use holonic_complex::*;
 pub use image::*;
 pub use implicit::*;

@@ -237,7 +237,10 @@ fn run() -> Result<(), String> {
     // ── STATION 1 — the inherited language body ─────────────────────────────────────────────
     let inherited = inherited_language_body(&root)?;
     println!("STATION 1 — THE INHERITED LANGUAGE BODY");
-    println!("  records              {}", INHERITED_LANGUAGE_RECORDS.len());
+    println!(
+        "  records              {}",
+        INHERITED_LANGUAGE_RECORDS.len()
+    );
     println!(
         "  passages             {} ({} octets)",
         inherited.len(),
@@ -308,7 +311,10 @@ fn run() -> Result<(), String> {
     for (live, mapped) in &fixture_map {
         println!("    {mapped:<28} -> {live}");
     }
-    println!("  source_files         {}", repository.receipt().source_files);
+    println!(
+        "  source_files         {}",
+        repository.receipt().source_files
+    );
     println!(
         "  theory_sections      {}",
         repository.receipt().theory_sections
@@ -343,7 +349,10 @@ fn run() -> Result<(), String> {
     .map_err(|e| format!("condition continuing agentic body: {e:?}"))?;
     let conditioning_millis = conditioning_started.elapsed().as_millis();
     println!("\nSTATION 4 — THE CONDITIONED AGENTIC BODY");
-    println!("  conditioning         {conditioning_millis} ms, {} workers", arguments.threads);
+    println!(
+        "  conditioning         {conditioning_millis} ms, {} workers",
+        arguments.threads
+    );
     println!(
         "  observation aperture {}   (DECLARED — the only bound applied to generation: a branch\n\
          \x20                        rests at this many returned events. Cost at `a91a84f`:\n\
@@ -376,9 +385,12 @@ fn run() -> Result<(), String> {
 
     // ── STATION 5 — the resident card and the composed world ────────────────────────────────
     let cuda_started = Instant::now();
-    let resident = atlas
-        .mount_cuda(0)
-        .map_err(|refusal| format!("mount resident exact CUDA text ecology: {:?}", refusal.error()))?;
+    let resident = atlas.mount_cuda(0).map_err(|refusal| {
+        format!(
+            "mount resident exact CUDA text ecology: {:?}",
+            refusal.error()
+        )
+    })?;
     let cuda_millis = cuda_started.elapsed().as_millis();
     let device = resident.device_name().to_owned();
     let mut world = MountedResearchInformantWorld::new(repository, resident, arguments.threads)
@@ -388,11 +400,8 @@ fn run() -> Result<(), String> {
     println!("  cuda mount           {cuda_millis} ms");
     println!("  ports                RepositorySource + ResidentTextCard, one contact front");
 
-    let mut session = AgenticResearchSession::new(
-        agent,
-        RESEARCH_CAPABILITY,
-        research_spec(&arguments),
-    );
+    let mut session =
+        AgenticResearchSession::new(agent, RESEARCH_CAPABILITY, research_spec(&arguments));
 
     // ── STATION 6 — the first question, and the artifact ────────────────────────────────────
     let question = arguments
@@ -403,7 +412,9 @@ fn run() -> Result<(), String> {
     println!("  you> {question}");
     let started = Instant::now();
     let first = session
-        .converse_with_world_front(90, &question, |requests| world.enact_contact_front(requests))
+        .converse_with_world_front(90, &question, |requests| {
+            world.enact_contact_front(requests)
+        })
         .map_err(|e| format!("first agentic research passage: {e:?}"))?;
     let first_millis = started.elapsed().as_millis();
     print_answer("FIRST", &first, first_millis);
@@ -418,7 +429,10 @@ fn run() -> Result<(), String> {
         AgenticLanguageFeedbackKind::Correction,
         correction_text.clone(),
     );
-    println!("  you> [correction on {}]", first.answer.answer_episode_identity);
+    println!(
+        "  you> [correction on {}]",
+        first.answer.answer_episode_identity
+    );
     println!("       {correction_text}");
     let standing_before = session.agent().standing().reflective_codec_training_events;
     let feedback_receipt = match session
@@ -435,7 +449,10 @@ fn run() -> Result<(), String> {
             None
         }
     };
-    match feedback_receipt.as_ref().and_then(|r| r.committed_codec_version.as_ref()) {
+    match feedback_receipt
+        .as_ref()
+        .and_then(|r| r.committed_codec_version.as_ref())
+    {
         Some(version) => {
             println!("  committed codec      {}", version.identity);
             println!(
@@ -457,10 +474,9 @@ fn run() -> Result<(), String> {
     println!("\nSTATION 8 — THE SECOND QUESTION, AFTER THE CORRECTION");
     println!("  you> {SECOND_QUESTION}");
     let started = Instant::now();
-    match session
-        .converse_with_world_front(90, SECOND_QUESTION, |requests| {
-            world.enact_contact_front(requests)
-        }) {
+    match session.converse_with_world_front(90, SECOND_QUESTION, |requests| {
+        world.enact_contact_front(requests)
+    }) {
         Ok(second) => {
             let millis = started.elapsed().as_millis();
             print_answer("SECOND", &second, millis);
@@ -482,9 +498,18 @@ fn run() -> Result<(), String> {
     match session.into_native_rest() {
         Ok(rest) => match rest.remount() {
             Ok((_, receipt)) => {
-                println!("  agent_native_rest_exact     {}", receipt.agent_native_rest_exact);
-                println!("  research_native_rest_exact  {}", receipt.research_native_rest_exact);
-                println!("  source_replay_performed     {}", receipt.source_replay_performed);
+                println!(
+                    "  agent_native_rest_exact     {}",
+                    receipt.agent_native_rest_exact
+                );
+                println!(
+                    "  research_native_rest_exact  {}",
+                    receipt.research_native_rest_exact
+                );
+                println!(
+                    "  source_replay_performed     {}",
+                    receipt.source_replay_performed
+                );
                 println!("  remount                     EXACT");
             }
             Err(refusal) => println!("  remount REFUSED {:?}", refusal.error),
@@ -504,7 +529,10 @@ fn print_answer(label: &str, answer: &AgenticResearchAnswer, millis: u128) {
     println!("\n  ── {label} ANSWER — THE ARTIFACT ──");
     println!("  eros> {}", answer.answer.text);
     println!("\n  causes and lineage");
-    println!("    episode            {}", answer.answer.answer_episode_identity);
+    println!(
+        "    episode            {}",
+        answer.answer.answer_episode_identity
+    );
     println!("    world deed         {:?}", answer.answer.world_deed);
     println!(
         "    novel contiguous   {}",
@@ -515,7 +543,10 @@ fn print_answer(label: &str, answer: &AgenticResearchAnswer, millis: u128) {
     for cause in causes.iter().take(12) {
         println!("      {cause}");
     }
-    println!("    evidence sources   {}", answer.answer.evidence_sources.len());
+    println!(
+        "    evidence sources   {}",
+        answer.answer.evidence_sources.len()
+    );
     for source in answer.answer.evidence_sources.iter().take(8) {
         println!("      {source}");
     }
@@ -653,7 +684,10 @@ fn build_declared_fixture(
             .map_err(|e| format!("link {} -> {}: {e}", into.display(), from.display()))?;
         mapped.push((
             named.to_owned(),
-            format!("{at}/{}", Path::new(named).file_name().unwrap().to_string_lossy()),
+            format!(
+                "{at}/{}",
+                Path::new(named).file_name().unwrap().to_string_lossy()
+            ),
         ));
     }
     Ok(mapped)
@@ -724,7 +758,9 @@ fn arguments() -> Result<Arguments, String> {
                 arguments.whole_repository = match named.as_str() {
                     "declared" => false,
                     "repository" => true,
-                    other => return Err(format!("--world takes declared|repository, not {other:?}")),
+                    other => {
+                        return Err(format!("--world takes declared|repository, not {other:?}"))
+                    }
                 };
             }
             "--leader-aperture" => {

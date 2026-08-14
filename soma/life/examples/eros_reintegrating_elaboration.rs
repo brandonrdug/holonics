@@ -55,7 +55,10 @@ fn artifact_paths(root: &Path) -> Vec<PathBuf> {
     for path in here {
         if path.is_dir() {
             found.extend(artifact_paths(&path));
-        } else if path.extension().is_some_and(|extension| extension == "lean") {
+        } else if path
+            .extension()
+            .is_some_and(|extension| extension == "lean")
+        {
             found.push(path);
         }
     }
@@ -115,7 +118,8 @@ fn exhibit(
 fn indistinguishable_names(places: &[CollapsedPlace]) -> BTreeMap<(String, String), Vec<String>> {
     let mut carried: BTreeMap<(String, String), Vec<String>> = BTreeMap::new();
     for place in places {
-        let (Some(left), Some(right)) = (place.left_root.as_ref(), place.right_root.as_ref()) else {
+        let (Some(left), Some(right)) = (place.left_root.as_ref(), place.right_root.as_ref())
+        else {
             continue;
         };
         if left == right {
@@ -200,7 +204,8 @@ fn main() {
 
     let population = read_deposit(Path::new(&root));
     let deposit = ElaborationDeposit::read(&population);
-    let alphabet = NameAlphabet::over_deposit(&deposit).expect("the deposit fits the octet carrier");
+    let alphabet =
+        NameAlphabet::over_deposit(&deposit).expect("the deposit fits the octet carrier");
     let roots: Vec<String> = match root_aperture.as_str() {
         "declarations" => deposit.declarations().keys().cloned().collect(),
         _ => deposit.route_keys().to_vec(),
@@ -251,10 +256,7 @@ fn main() {
         .pass
         .collapsed_places(&alphabet)
         .expect("names for every place");
-    let collapse: Vec<String> = leader_places
-        .iter()
-        .map(CollapsedPlace::exhibit)
-        .collect();
+    let collapse: Vec<String> = leader_places.iter().map(CollapsedPlace::exhibit).collect();
     let collapse_artifact = exhibit(
         "THE COLLAPSE -- every pair the re-integration merged, with its own separating passage",
         &collapse,
@@ -520,7 +522,9 @@ fn main() {
         ),
     ));
 
-    controls.push(foil_control(&deposit, &alphabet, &roots, aperture, revision));
+    controls.push(foil_control(
+        &deposit, &alphabet, &roots, aperture, revision,
+    ));
 
     report(&run, &controls);
 }

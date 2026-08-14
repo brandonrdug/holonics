@@ -37,7 +37,9 @@
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 
-use holonic_engine::conditioned_derivation::{expose, ConditionedBody, ConditionedCircuit, DerivationQuery, Exposure};
+use holonic_engine::conditioned_derivation::{
+    ConditionedBody, ConditionedCircuit, DerivationQuery, Exposure, expose,
+};
 use holonic_engine::derivation_atlas::CircuitAperture;
 use holonic_engine::derivation_curvature::{
     DerivationCurvatureBody, ScaffoldLink, ScaffoldLinkLaw,
@@ -171,21 +173,35 @@ fn main() {
 
     println!("truth_status=established-bounded");
     println!("evidence=computational-witness");
-    println!("law=a scaffold link extent is counted from the darts, never multiplied by a constant");
+    println!(
+        "law=a scaffold link extent is counted from the darts, never multiplied by a constant"
+    );
     println!("excised=SCAFFOLD_LINK_FOLD: usize = 3  (derivation_curvature.rs:208 at 085a9ab)");
 
     println!("\nWHAT DERIVES THE EXTENT NOW");
     println!("---------------------------");
     println!("  site  extent = |N(v)| + |out-darts(v)| + |in-darts(v)|");
-    println!("        Every neighbour enters the link from the carry face of the dart joining them;");
-    println!("        every dart LEAVING v brings its rim vertex from the corner face at that dart;");
-    println!("        every dart ENTERING v brings its rim vertex from that dart's own carry face.");
-    println!("        A self-incidence and a parallel incidence are refused, so an incident edge is");
-    println!("        exactly one dart out and one dart in, and the three terms are each the degree.");
+    println!(
+        "        Every neighbour enters the link from the carry face of the dart joining them;"
+    );
+    println!(
+        "        every dart LEAVING v brings its rim vertex from the corner face at that dart;"
+    );
+    println!(
+        "        every dart ENTERING v brings its rim vertex from that dart's own carry face."
+    );
+    println!(
+        "        A self-incidence and a parallel incidence are refused, so an incident edge is"
+    );
+    println!(
+        "        exactly one dart out and one dart in, and the three terms are each the degree."
+    );
     println!("        The THREE is what that sum returns; it is not what the sum is told.");
     println!();
     println!("  rim   span = 2                 3       the walk founds no rim fan at all");
-    println!("        span >= 3, position 0     span+1  the apex of the fan, adjacent to every rim");
+    println!(
+        "        span >= 3, position 0     span+1  the apex of the fan, adjacent to every rim"
+    );
     println!("                   1 or span-1    4       one fan each");
     println!("                   otherwise      5       two fans each");
     println!();
@@ -234,7 +250,11 @@ fn main() {
             arguments[0],
             deposit.len()
         );
-        println!("  linguistic   {} wholes over {} roots", exposures.len(), arguments.len() - 1);
+        println!(
+            "  linguistic   {} wholes over {} roots",
+            exposures.len(),
+            arguments.len() - 1
+        );
         if deposit.is_empty() || exposures.is_empty() {
             println!("  the material is absent; the declared fixtures above still stand");
         } else {
@@ -261,7 +281,11 @@ fn main() {
         holds.push((
             "the incidence's prediction agrees with local_star's face-derived link everywhere",
             law.disagreements().is_empty(),
-            format!("{name}: {} of {} vertices", law.pairs.len(), law.pairs.len()),
+            format!(
+                "{name}: {} of {} vertices",
+                law.pairs.len(),
+                law.pairs.len()
+            ),
         ));
         holds.push((
             "the law takes more than one value, so it is a law and not a constant",

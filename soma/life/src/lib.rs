@@ -44,8 +44,8 @@ pub mod lean_mathematics;
 // here because it consumes `holonic-engine`'s Lean reader, `laboratory_language`'s Rust sectioner
 // and `incidence_production`'s complex at once, and only `life` depends on all three.
 // `research/records/2026-07-19_THE_INCIDENCE_REACTS_THE_COMPOUND_EXPOSES_ITS_BOUNDARY_THE_REGION_CARRIES_THE_FIELD.md` §I.
-pub mod material_incidence;
 pub mod live_current_cuda;
+pub mod material_incidence;
 pub mod material_shadow_cuda;
 pub mod morphological_language;
 pub mod relational_language;

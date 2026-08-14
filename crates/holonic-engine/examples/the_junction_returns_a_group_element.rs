@@ -52,11 +52,10 @@
 
 use std::collections::BTreeSet;
 
-use holonic_engine::conditioned_derivation::{expose, FoundedMorphology, MorphemicIncidence};
+use holonic_engine::conditioned_derivation::{FoundedMorphology, MorphemicIncidence, expose};
 use holonic_engine::founded_receiver::{
-    found_preferring, found_to_exhaustion, gyration_holonomy, gyration_of,
-    parity_collapsed_pairs, Gyration,
-    GyrationHolonomy,
+    Gyration, GyrationHolonomy, found_preferring, found_to_exhaustion, gyration_holonomy,
+    gyration_of, parity_collapsed_pairs,
 };
 use holonic_engine::receiver_exact_compression::{ItemId, ObservedSystem};
 use holonic_engine::structure_group::GroupElement;
@@ -112,7 +111,10 @@ struct Controls {
 
 impl Controls {
     fn check(&mut self, name: &str, holds: bool, saying: &str) {
-        println!("  [{}] {name}\n        {saying}", if holds { "holds" } else { "FAILS" });
+        println!(
+            "  [{}] {name}\n        {saying}",
+            if holds { "holds" } else { "FAILS" }
+        );
         if !holds {
             self.failed.push(name.to_owned());
         }
@@ -135,7 +137,10 @@ fn main() {
 
     rule("THE MATERIAL — real corpus stems, founded by recurrence across distinct wholes");
 
-    let exposures: Vec<_> = WHOLES.iter().map(|(name, text)| expose(name, text)).collect();
+    let exposures: Vec<_> = WHOLES
+        .iter()
+        .map(|(name, text)| expose(name, text))
+        .collect();
     let morphology = FoundedMorphology::condition(&exposures);
     let identifiers: BTreeSet<String> = RECRUITED.iter().map(|s| (*s).to_owned()).collect();
     let incidence = match MorphemicIncidence::over(&identifiers, &morphology) {
@@ -167,8 +172,12 @@ fn main() {
 
     let baseline = found_to_exhaustion(&incidence, &[]);
     let baseline_order = baseline.order();
-    println!("  baseline founded      {} junctions in {} rounds (bound {})",
-        baseline_order.len(), baseline.rounds, baseline.bound);
+    println!(
+        "  baseline founded      {} junctions in {} rounds (bound {})",
+        baseline_order.len(),
+        baseline.rounds,
+        baseline.bound
+    );
 
     // One founding order per junction the baseline founded, then EVERY PAIR of those orders.
     // Comparing each order against the baseline only would compare a special case: a gyration is
@@ -182,7 +191,7 @@ fn main() {
         // Preferring MOVES it to the front, which is what `found(a) then found(b)` versus
         // `found(b) then found(a)` actually means.
         panels.push((
-            format!("({},{})", junction.0 .0, junction.1 .0),
+            format!("({},{})", junction.0.0, junction.1.0),
             found_preferring(&incidence, std::slice::from_ref(junction)),
         ));
     }
@@ -209,8 +218,16 @@ fn main() {
         readings.len()
     );
 
-    println!("    {:<26} {:<14} {:<8} {}", "orders compared", "cycle type", "parity", "unshared");
-    for (at, reading) in readings.iter().enumerate().filter(|(_, r)| !r.is_trivial).take(12) {
+    println!(
+        "    {:<26} {:<14} {:<8} {}",
+        "orders compared", "cycle type", "parity", "unshared"
+    );
+    for (at, reading) in readings
+        .iter()
+        .enumerate()
+        .filter(|(_, r)| !r.is_trivial)
+        .take(12)
+    {
         println!(
             "    {:<26} {:<14} {:<8} {}",
             deferred_names[at],
@@ -234,8 +251,14 @@ fn main() {
          a statement about the family rather than about a sample.",
     );
 
-    let moved = readings.iter().filter(|reading| !reading.is_trivial).count();
-    println!("\n  gyrations returning a NON-IDENTITY permutation: {moved} of {}", readings.len());
+    let moved = readings
+        .iter()
+        .filter(|reading| !reading.is_trivial)
+        .count();
+    println!(
+        "\n  gyrations returning a NON-IDENTITY permutation: {moved} of {}",
+        readings.len()
+    );
     // **The perturbation is PREFERENCE, and that is what makes the orbit non-trivial.**
     //
     // An earlier form of this driver deferred a junction instead of preferring one, and returned
@@ -244,11 +267,16 @@ fn main() {
     // sequence. Two skip-perturbed orders therefore differ by an omission, and an omission induces
     // the identity. `Gyration`'s own claim — `found(a)∘found(b)` against `found(b)∘found(a)` — is
     // about which junction is taken FIRST, and only `found_preferring` expresses that.
-    println!("\n  non-identity readings          {moved} of {}", readings.len());
+    println!(
+        "\n  non-identity readings          {moved} of {}",
+        readings.len()
+    );
     let unshared_total: usize = readings.iter().map(|reading| reading.unshared).sum();
     println!("  total unshared junctions       {unshared_total}");
-    let shapes_seen: BTreeSet<Vec<usize>> =
-        readings.iter().map(|reading| reading.cycle_type.clone()).collect();
+    let shapes_seen: BTreeSet<Vec<usize>> = readings
+        .iter()
+        .map(|reading| reading.cycle_type.clone())
+        .collect();
     println!("  distinct cycle types           {}", shapes_seen.len());
     controls.check(
         "the group's orbit on this material is non-trivial",
@@ -266,7 +294,9 @@ fn main() {
     rule("THE FALSIFIER — what the abelian reading collapses");
 
     println!("  `[S_n, S_n] = A_n`, so the abelianization of a symmetric group IS the sign.");
-    println!("  An integer or `+/-` holonomy on this material therefore carries ONE BIT. The group");
+    println!(
+        "  An integer or `+/-` holonomy on this material therefore carries ONE BIT. The group"
+    );
     println!("  carries the cycle type. Below is the population that one bit cannot separate.\n");
 
     let collapsed = parity_collapsed_pairs(&readings);
@@ -278,7 +308,11 @@ fn main() {
             "    orders {} vs orders {}\n         both {:<5}  cycle types {:?} vs {:?}",
             deferred_names[*left],
             deferred_names[*right],
-            if readings[*left].is_even { "even" } else { "odd" },
+            if readings[*left].is_even {
+                "even"
+            } else {
+                "odd"
+            },
             readings[*left].cycle_type,
             readings[*right].cycle_type,
         );
@@ -324,10 +358,16 @@ fn main() {
     };
     let left = gyration_holonomy(&three_cycle).expect("shares");
     let right = gyration_holonomy(&transposition).expect("shares");
-    println!("\n    a 3-cycle      cycle type {:?}   {}", left.cycle_type,
-        if left.is_even { "even" } else { "odd" });
-    println!("    a transposition cycle type {:?}   {}", right.cycle_type,
-        if right.is_even { "even" } else { "odd" });
+    println!(
+        "\n    a 3-cycle      cycle type {:?}   {}",
+        left.cycle_type,
+        if left.is_even { "even" } else { "odd" }
+    );
+    println!(
+        "    a transposition cycle type {:?}   {}",
+        right.cycle_type,
+        if right.is_even { "even" } else { "odd" }
+    );
     controls.check(
         "a constructed reordering returns a non-identity element with its cycle type",
         !left.is_trivial && !right.is_trivial && left.cycle_type != right.cycle_type,
@@ -347,7 +387,10 @@ fn main() {
         .flat_map(|left| ((left + 1)..readings.len()).map(move |right| (left, right)))
         .filter(|(left, right)| readings[*left].is_even != readings[*right].is_even)
         .collect();
-    println!("\n  pairs of DIFFERENT parity: {} — none of them is reported collapsed", differing.len());
+    println!(
+        "\n  pairs of DIFFERENT parity: {} — none of them is reported collapsed",
+        differing.len()
+    );
     controls.check(
         "the instrument does not report every pair",
         differing.iter().all(|pair| !collapsed.contains(pair)),
@@ -363,7 +406,10 @@ fn main() {
 
     let mut shapes: std::collections::BTreeMap<Vec<usize>, Vec<usize>> = Default::default();
     for (at, reading) in readings.iter().enumerate() {
-        shapes.entry(reading.cycle_type.clone()).or_default().push(at);
+        shapes
+            .entry(reading.cycle_type.clone())
+            .or_default()
+            .push(at);
     }
     let mut distinct_elements_sharing_a_class = 0usize;
     for members in shapes.values() {
@@ -396,8 +442,16 @@ fn main() {
     };
     let rebased = gyration_holonomy(&rebased).expect("shares");
     println!("  the same 3-cycle over a different junction set:");
-    println!("      element  {} vs {}", render(&left.permutation), render(&rebased.permutation));
-    println!("      class    {} vs {}", render(&left.class), render(&rebased.class));
+    println!(
+        "      element  {} vs {}",
+        render(&left.permutation),
+        render(&rebased.permutation)
+    );
+    println!(
+        "      class    {} vs {}",
+        render(&left.class),
+        render(&rebased.class)
+    );
     controls.check(
         "the class is basepoint-free where the element is not",
         left.class == rebased.class && left.cycle_type == rebased.cycle_type,
@@ -414,8 +468,12 @@ fn main() {
     if controls.failed.is_empty() {
         println!("  every declared control holds.\n");
         println!("  BEFORE: the junction's disagreement was three booleans and two lists.");
-        println!("  AFTER:  it is a group element, with a basepoint-free class, and the population");
-        println!("          an abelian holonomy would have collapsed is returned rather than lost.");
+        println!(
+            "  AFTER:  it is a group element, with a basepoint-free class, and the population"
+        );
+        println!(
+            "          an abelian holonomy would have collapsed is returned rather than lost."
+        );
     } else {
         println!("  CONTROLS FAILED:");
         for name in &controls.failed {

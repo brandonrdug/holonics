@@ -235,10 +235,7 @@ struct Entry {
     reading: ConductReading,
 }
 
-fn found_entry(
-    extent: usize,
-    atlas: &MaterialAtlas,
-) -> Result<Entry, MaterialIncidenceError> {
+fn found_entry(extent: usize, atlas: &MaterialAtlas) -> Result<Entry, MaterialIncidenceError> {
     let work = atlas.intake_work();
     stage(atlas.kind(), extent, "atlas read");
     let complex = atlas.found(RankRepresentative::Least)?;
@@ -250,8 +247,7 @@ fn found_entry(
     // `EventComplex::cells_indexed = false` and makes its validator fall back to a LINEAR scan per
     // cell and per incidence — quadratic. At 72 constituents that is invisible; here it is the
     // wall, so it is taken under a declared budget in counted work and its outside is reported.
-    let cells =
-        (complex.sites().len() + complex.bonds().len() + complex.compounds().len()) as u128;
+    let cells = (complex.sites().len() + complex.bonds().len() + complex.compounds().len()) as u128;
     let incidences = (2 * complex.bonds().len() + complex.dependencies().len()) as u128
         + complex
             .compounds()
@@ -309,12 +305,10 @@ fn stage(kind: MaterialKind, extent: usize, what: &str) {
 }
 
 fn nearest(swept: &Swept, target: usize) -> Option<&Entry> {
-    swept.entries.iter().min_by_key(|entry| {
-        entry
-            .reading
-            .constituents
-            .abs_diff(target)
-    })
+    swept
+        .entries
+        .iter()
+        .min_by_key(|entry| entry.reading.constituents.abs_diff(target))
 }
 
 /// The complex's own conduct shape as one word, so "do they differ" is checkable rather than eyed.
@@ -331,7 +325,11 @@ fn shape_word(reading: &ConductReading) -> String {
         } else {
             "mixed".to_owned()
         },
-        if reading.plural_arrivals == 0 { "none" } else { "some" },
+        if reading.plural_arrivals == 0 {
+            "none"
+        } else {
+            "some"
+        },
         reading.grain_reached,
         reading.greatest_multiplicity,
         if reading.greatest_incident_degree > 1000 {
@@ -478,7 +476,10 @@ fn print_sweep(swept: &Swept) {
                 " — A RANK MOVED, so the intake is reading its own bookkeeping"
             }
         );
-        println!("    at the widest admitted extent: {}", last.reading.grain_stop);
+        println!(
+            "    at the widest admitted extent: {}",
+            last.reading.grain_stop
+        );
     }
 }
 
@@ -493,7 +494,10 @@ fn print_emissions(entry: &Entry) {
         reading.emissions.len()
     );
     if reading.emissions.is_empty() {
-        println!("     NOTHING CLOSED, SO NOTHING HANDED UP. {}", reading.grain_stop);
+        println!(
+            "     NOTHING CLOSED, SO NOTHING HANDED UP. {}",
+            reading.grain_stop
+        );
         return;
     }
     for (at, emission) in reading.emissions.iter().take(PRINTED_EMISSIONS).enumerate() {
@@ -577,14 +581,8 @@ fn lean_sweep(workspace: &Path) -> Result<Swept, String> {
         // Tactic position is deliberately NOT joined. `lean_development::tactic_position_declared`
         // is documented as a *bounding instrument*: a declared name in tactic position is probably
         // a step-head misread, so joining it would manufacture edges the reading refuses.
-        let atlas = lean_atlas(
-            &recruitment,
-            &BTreeMap::new(),
-            &order,
-            open,
-            extent as u64,
-        )
-        .map_err(|error| format!("lean atlas at {extent}: {error:?}"))?;
+        let atlas = lean_atlas(&recruitment, &BTreeMap::new(), &order, open, extent as u64)
+            .map_err(|error| format!("lean atlas at {extent}: {error:?}"))?;
         match found_entry(extent, &atlas) {
             Ok(entry) => {
                 println!(
@@ -681,9 +679,7 @@ fn rust_sweep(workspace: &Path) -> Result<Swept, String> {
 }
 
 fn module_of(source: &str) -> String {
-    source
-        .trim_end_matches(".rs")
-        .replace(['/', '-'], "·")
+    source.trim_end_matches(".rs").replace(['/', '-'], "·")
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -696,10 +692,8 @@ fn declared_family() -> Result<Vec<ArithConstruction>, String> {
     let presentations = [
         // denoting 4
         "4", "2+2", "2*2", "2^2", "6-2", "8/2", "1+1+2", "2*(1+1)", "(3-1)*2", "16/(2^2)", "-(-4)",
-        "1+3", "3+1", "12/3",
-        // denoting 5
-        "5", "2+3", "3+2", "10/2", "7-2", "1+4", "(2+3)*1",
-        // denoting 6
+        "1+3", "3+1", "12/3", // denoting 5
+        "5", "2+3", "3+2", "10/2", "7-2", "1+4", "(2+3)*1", // denoting 6
         "6", "2*3", "3*2", "2+4", "12/2", "8-2", "2^3-2", "(1+2)*2",
     ];
     arithmetic_family(&presentations).map_err(|error| format!("the family: {error:?}"))
@@ -719,10 +713,7 @@ fn generated_family() -> Result<Vec<ArithConstruction>, String> {
             }
         }
     }
-    let borrowed = presentations
-        .iter()
-        .map(String::as_str)
-        .collect::<Vec<_>>();
+    let borrowed = presentations.iter().map(String::as_str).collect::<Vec<_>>();
     let family = arithmetic_family(&borrowed).map_err(|error| format!("{error:?}"))?;
     // The exact evaluator refuses what it must; a refused construction is not admitted.
     Ok(family
@@ -853,9 +844,7 @@ fn arithmetic_soul() -> Result<(), String> {
         "    denoted-value equality  {} blocks — the quotient",
         quotient.blocks.len()
     );
-    println!(
-        "    receiver equality       the founded complex, read per construction"
-    );
+    println!("    receiver equality       the founded complex, read per construction");
     println!();
     println!("  THE CONSTRUCTIONS, PER DENOTED VALUE, AS THE COMPLEX FOUNDS THEM");
     println!(
@@ -960,12 +949,20 @@ fn construction_readings(
             .unwrap_or(0);
         let holonomy = emissions
             .iter()
-            .find(|emission| emission.surface.contains(&format!("#{}", construction.label)))
+            .find(|emission| {
+                emission
+                    .surface
+                    .contains(&format!("#{}", construction.label))
+            })
             .map(|emission| {
                 format!(
                     "{} {}",
                     emission.holonomy_text(),
-                    if emission.terrain_is_flat() { "flat" } else { "CURVED" }
+                    if emission.terrain_is_flat() {
+                        "flat"
+                    } else {
+                        "CURVED"
+                    }
                 )
             })
             .unwrap_or_else(|| "— nothing closed".to_owned());

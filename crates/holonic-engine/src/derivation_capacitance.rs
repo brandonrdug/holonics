@@ -174,7 +174,7 @@ use thiserror::Error;
 
 use crate::algebraic::CausalCellId;
 use crate::derivation_atlas::{
-    statement_vertex_key, CircuitAperture, Derivation, DerivationCircuit, DerivationIdentity,
+    CircuitAperture, Derivation, DerivationCircuit, DerivationIdentity, statement_vertex_key,
 };
 use crate::receiver_current::{
     ExactReceiverCurrentError, ExactReceiverCurrentLaw, ExactReceiverCurrentPassage,
@@ -369,9 +369,7 @@ pub struct CapacitanceReading {
 
 impl CapacitanceReading {
     pub fn site(&self, identifier: &str) -> Option<&SiteDelayReading> {
-        self.sites
-            .iter()
-            .find(|site| site.identifier == identifier)
+        self.sites.iter().find(|site| site.identifier == identifier)
     }
 
     pub fn dilation_classes(&self) -> DilationClasses {
@@ -401,25 +399,35 @@ impl CapacitanceReading {
 
 #[derive(Clone, Debug, PartialEq, Eq, Error)]
 pub enum DerivationCapacitanceRefusal {
-    #[error("the circuit carries no site with an empty incidence: there is no terrain to radiate from")]
+    #[error(
+        "the circuit carries no site with an empty incidence: there is no terrain to radiate from"
+    )]
     NoTerrain,
     #[error("1-cell {0:?} does not carry an oriented two-ended boundary and is not a passage")]
     UnorientedPassage(CausalCellId),
-    #[error("the source population carries {sources} artifacts and the circuit was founded from {derivations}")]
+    #[error(
+        "the source population carries {sources} artifacts and the circuit was founded from {derivations}"
+    )]
     SourceDoesNotMatchCircuit { sources: usize, derivations: usize },
-    #[error("artifact {0} declares a key the circuit does not carry: the aperture key rule has drifted")]
+    #[error(
+        "artifact {0} declares a key the circuit does not carry: the aperture key rule has drifted"
+    )]
     KeyNotInCircuit(String),
     #[error("identifier {0} is not a site of this circuit")]
     UnknownIdentifier(String),
     /// The law returned incomplete coverage and named no chronology at which the missing sites
     /// would have arrived. A site is unreturned only because its arrival was deferred, and a
     /// deferred arrival carries its chronology, so an empty testimony contradicts the law.
-    #[error("{unreturned} reachable sites did not return at horizon {horizon} and the law deposited no deferred chronology for any of them")]
+    #[error(
+        "{unreturned} reachable sites did not return at horizon {horizon} and the law deposited no deferred chronology for any of them"
+    )]
     UnreturnedSiteWithoutTestimony { unreturned: usize, horizon: u64 },
     /// A growth returned no further site, or the growths exceeded the reachable population. Both
     /// are the same broken theorem: the largest chronology the law deposited for an unreturned
     /// reachable site is that site's own earliest arrival, so growing to it must return it.
-    #[error("growth {growths} from horizon {horizon} to {named} returned no further site; the reachable population is {reachable} and bounds the growths")]
+    #[error(
+        "growth {growths} from horizon {horizon} to {named} returned no further site; the reachable population is {reachable} and bounds the growths"
+    )]
     HorizonGrowthReturnedNothing {
         reachable: usize,
         growths: usize,
@@ -429,7 +437,9 @@ pub enum DerivationCapacitanceRefusal {
     /// Conducting at the computed fixed point did not return the circuit whole. The fixed point is
     /// the largest arrival chronology the law itself returned, so this cannot happen unless the
     /// radiation is not monotone in its horizon.
-    #[error("the fixed point {least_sufficient} returned {returned} of {reachable} reachable sites")]
+    #[error(
+        "the fixed point {least_sufficient} returned {returned} of {reachable} reachable sites"
+    )]
     HorizonFixedPointIsNotSufficient {
         least_sufficient: u64,
         returned: usize,
@@ -438,7 +448,9 @@ pub enum DerivationCapacitanceRefusal {
     /// Conducting one chronology **below** the fixed point returned the circuit whole, so the
     /// reported horizon is larger than the material requires. This is the falsifier for the claim
     /// that the returned horizon is least, and it fires from the law rather than from a foil.
-    #[error("the whole reachable population of {reachable} returned at horizon {below}, one below the reported fixed point {least_sufficient}")]
+    #[error(
+        "the whole reachable population of {reachable} returned at horizon {below}, one below the reported fixed point {least_sufficient}"
+    )]
     HorizonFixedPointIsNotLeast {
         least_sufficient: u64,
         below: u64,
@@ -690,12 +702,7 @@ impl CapacitanceMapping {
         for (tail, heads) in &onward {
             let classes = heads
                 .iter()
-                .map(|head| {
-                    results_of
-                        .get(head.as_str())
-                        .cloned()
-                        .unwrap_or_default()
-                })
+                .map(|head| results_of.get(head.as_str()).cloned().unwrap_or_default())
                 .collect();
             distinguishable.insert(tail.clone(), classes);
         }
@@ -716,15 +723,12 @@ impl CapacitanceMapping {
             // law refuses a zero capacity, so an inert capacity is one, and this is declared rather
             // than silently defaulted.
             let capacity = match capacity_law {
-                CapacityLaw::DistinguishableResults => distinguishable
-                    .get(name)
-                    .map_or(0, BTreeSet::len)
-                    .max(1),
-                CapacityLaw::OccurrenceMultiplicity => occurrences
-                    .get(name.as_str())
-                    .copied()
-                    .unwrap_or(0)
-                    .max(1) as usize,
+                CapacityLaw::DistinguishableResults => {
+                    distinguishable.get(name).map_or(0, BTreeSet::len).max(1)
+                }
+                CapacityLaw::OccurrenceMultiplicity => {
+                    occurrences.get(name.as_str()).copied().unwrap_or(0).max(1) as usize
+                }
             };
             let id = ReceiverCurrentSiteId(cell.0);
             law.found_site(id, BigUint::from(capacity))?;
@@ -831,10 +835,9 @@ impl CapacitanceMapping {
         identifier: &str,
         capacity: BigUint,
     ) -> Result<(), DerivationCapacitanceRefusal> {
-        let site = *self
-            .site_of
-            .get(identifier)
-            .ok_or_else(|| DerivationCapacitanceRefusal::UnknownIdentifier(identifier.to_owned()))?;
+        let site = *self.site_of.get(identifier).ok_or_else(|| {
+            DerivationCapacitanceRefusal::UnknownIdentifier(identifier.to_owned())
+        })?;
         self.law.set_site_capacity(site, capacity)?;
         Ok(())
     }
@@ -854,9 +857,9 @@ impl CapacitanceMapping {
         reading: &CapacitanceReading,
         identifier: &str,
     ) -> Result<Option<(BigUint, BigUint)>, DerivationCapacitanceRefusal> {
-        let carried = self
-            .capacity(identifier)
-            .ok_or_else(|| DerivationCapacitanceRefusal::UnknownIdentifier(identifier.to_owned()))?;
+        let carried = self.capacity(identifier).ok_or_else(|| {
+            DerivationCapacitanceRefusal::UnknownIdentifier(identifier.to_owned())
+        })?;
         let Some(site) = reading.site(identifier) else {
             return Err(DerivationCapacitanceRefusal::UnknownIdentifier(
                 identifier.to_owned(),
@@ -927,10 +930,12 @@ impl CapacitanceMapping {
                 .map(|arrival| arrival.chronology)
                 .max();
             let Some(named) = named else {
-                return Err(DerivationCapacitanceRefusal::UnreturnedSiteWithoutTestimony {
-                    unreturned: reachable - radiation.returned_targets.len(),
-                    horizon,
-                });
+                return Err(
+                    DerivationCapacitanceRefusal::UnreturnedSiteWithoutTestimony {
+                        unreturned: reachable - radiation.returned_targets.len(),
+                        horizon,
+                    },
+                );
             };
             let grown = self.law.radiate_to_horizon(sources.clone(), named)?;
             if named <= horizon
@@ -966,11 +971,13 @@ impl CapacitanceMapping {
             .radiate_to_horizon(sources.clone(), least_sufficient)?;
         let returned_at_fixed_point = at_fixed_point.returned_targets.len();
         if returned_at_fixed_point != reachable {
-            return Err(DerivationCapacitanceRefusal::HorizonFixedPointIsNotSufficient {
-                least_sufficient,
-                returned: returned_at_fixed_point,
-                reachable,
-            });
+            return Err(
+                DerivationCapacitanceRefusal::HorizonFixedPointIsNotSufficient {
+                    least_sufficient,
+                    returned: returned_at_fixed_point,
+                    reachable,
+                },
+            );
         }
 
         // The other side, conducted. A horizon law that reported a horizon larger than the material
@@ -1244,7 +1251,9 @@ pub fn disjoint_terrain(arms: usize) -> Vec<Derivation> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::derivation_atlas::{found_circuit, read_derivation, RecruitmentCoefficient, StatementIncidence};
+    use crate::derivation_atlas::{
+        RecruitmentCoefficient, StatementIncidence, found_circuit, read_derivation,
+    };
 
     /// `standing/output/lean-proof-production/carrier-transport-00000.lean`, byte for byte. The
     /// preamble is two lines above the theorem line, which is what the source-continuity term
@@ -1279,8 +1288,8 @@ mod tests {
     // ------------------------------------------------------------ the mapping is read, not declared
 
     #[test]
-    fn the_passage_orientation_is_read_from_the_founded_boundary_and_agrees_with_the_recruitment_key(
-    ) {
+    fn the_passage_orientation_is_read_from_the_founded_boundary_and_agrees_with_the_recruitment_key()
+     {
         let derivations = one_result_star(3);
         let circuit = circuit_of(&derivations, CircuitAperture::STATEMENT_INCIDENT);
         let passages = orient_passages(&circuit).expect("every 1-cell is oriented");
@@ -1297,9 +1306,11 @@ mod tests {
         // And every reach key `(derivation, statement)` as statement -> derivation.
         for (derivation, statement) in circuit.reaches().keys() {
             let vertex = statement_vertex_key(statement);
-            assert!(passages
-                .iter()
-                .any(|passage| passage.tail == vertex && &passage.head == derivation));
+            assert!(
+                passages
+                    .iter()
+                    .any(|passage| passage.tail == vertex && &passage.head == derivation)
+            );
         }
         assert_eq!(
             passages.len(),
@@ -1346,15 +1357,26 @@ mod tests {
                 CircuitAperture::DEPOSITED_READER,
                 CapacityLaw::DistinguishableResults,
             );
-            let shared = reading.site("sharedTerrain").expect("the shared terrain is a site");
+            let shared = reading
+                .site("sharedTerrain")
+                .expect("the shared terrain is a site");
             assert_eq!(shared.service_rounds(), vec![BigUint::from(arms)]);
-            let private = reading.site("private0").expect("a private symbol is a site");
+            let private = reading
+                .site("private0")
+                .expect("a private symbol is a site");
             assert_eq!(private.service_rounds(), vec![BigUint::one()]);
 
             let classes = reading.dilation_classes();
-            assert!(!classes.is_vacuous(), "the prediction is two classes at arms={arms}");
+            assert!(
+                !classes.is_vacuous(),
+                "the prediction is two classes at arms={arms}"
+            );
             assert_eq!(
-                classes.by_service_rounds.keys().cloned().collect::<Vec<_>>(),
+                classes
+                    .by_service_rounds
+                    .keys()
+                    .cloned()
+                    .collect::<Vec<_>>(),
                 vec![BigUint::one(), BigUint::from(arms)]
             );
         }
@@ -1371,7 +1393,11 @@ mod tests {
         let classes = reading.dilation_classes();
         assert!(classes.is_vacuous());
         assert_eq!(
-            classes.by_service_rounds.keys().cloned().collect::<Vec<_>>(),
+            classes
+                .by_service_rounds
+                .keys()
+                .cloned()
+                .collect::<Vec<_>>(),
             vec![BigUint::one()]
         );
     }
@@ -1437,11 +1463,7 @@ mod tests {
                 .collect(),
         }];
         for arm in 0..3 {
-            derivations.push(control(
-                &format!("head{arm}"),
-                "one result",
-                &["relay"],
-            ));
+            derivations.push(control(&format!("head{arm}"), "one result", &["relay"]));
         }
         let reading = read(
             &derivations,
@@ -1475,11 +1497,7 @@ mod tests {
             ));
         }
         for arm in 0..3 {
-            derivations.push(control(
-                &format!("tight{arm}"),
-                "one result",
-                &["narrow"],
-            ));
+            derivations.push(control(&format!("tight{arm}"), "one result", &["narrow"]));
         }
         let reading = read(
             &derivations,
@@ -1539,14 +1557,20 @@ mod tests {
     fn source_continuity_reads_the_line_separation_the_deposited_artifact_carries() {
         // `import KernelWitness` is two lines above the theorem line; `namespace Soma` is one;
         // `Prop` and `exactCarrier` are on the theorem line itself; `assumption` is one below.
-        assert_eq!(source_separation(PRODUCTION_ROUTE, "KernelWitness"), Some(2));
+        assert_eq!(
+            source_separation(PRODUCTION_ROUTE, "KernelWitness"),
+            Some(2)
+        );
         assert_eq!(source_separation(PRODUCTION_ROUTE, "Soma"), Some(1));
         assert_eq!(source_separation(PRODUCTION_ROUTE, "Prop"), Some(0));
         assert_eq!(source_separation(PRODUCTION_ROUTE, "exactCarrier"), Some(0));
         assert_eq!(source_separation(PRODUCTION_ROUTE, "assumption"), Some(1));
         // `end Soma` is skipped exactly as the atlas skips it, so the closing line never supplies a
         // nearer location than `namespace Soma` does.
-        assert_eq!(source_separation(RESEARCH_ROUTE, "exact_chart_carry"), Some(1));
+        assert_eq!(
+            source_separation(RESEARCH_ROUTE, "exact_chart_carry"),
+            Some(1)
+        );
         assert_eq!(source_separation(RESEARCH_ROUTE, "Soma"), Some(3));
     }
 
@@ -1964,9 +1988,11 @@ mod tests {
         }
         assert!(returned.windows(2).all(|pair| pair[1] >= pair[0]));
         assert_eq!(*returned.last().expect("the fixed point"), reachable);
-        assert!(returned[..returned.len() - 1]
-            .iter()
-            .all(|carried| *carried < reachable));
+        assert!(
+            returned[..returned.len() - 1]
+                .iter()
+                .all(|carried| *carried < reachable)
+        );
         assert_eq!(
             mapping
                 .returned_at_horizon(fixed.saturating_mul(4))

@@ -80,10 +80,10 @@ use holonic_engine::corpus_census::{
     CorpusCensus, DECLARED_STRATA, DensityRow, Stratum, SurfaceId, density_band,
 };
 use holonic_engine::exact_value::ExactOrdering;
+use holonic_engine::hardware_cover::HardwareCover;
 use holonic_engine::surprisal::{
     Grain, Support, SymbolicSurprisal, cross_entropy, read_population,
 };
-use holonic_engine::hardware_cover::HardwareCover;
 use holonic_engine::token_invariance::{
     AblationReading, ConductAtlas, CrossCheck, ReceiverAxis, SeparationChart, SeparationReading,
     Verdict, ablation_profile, axis_witnesses, cross_check, iron_at, reading, sweep_over,
@@ -143,10 +143,7 @@ fn main() {
     // surfaces is a front and the host's own lanes carry it. Driving this serially pinned one core
     // while fifteen stood idle.
     let cover = HardwareCover::host_only();
-    println!(
-        "  the cover declares {} host lanes\n",
-        cover.host().lanes
-    );
+    println!("  the cover declares {} host lanes\n", cover.host().lanes);
     let atlas = ConductAtlas::found(&census, FOUNDING_HORIZON);
 
     let mut holds: Vec<(String, bool, String)> = Vec::new();
@@ -189,7 +186,10 @@ fn main() {
         census.word_occurrences(),
         census.total_occurrences() - census.word_occurrences()
     );
-    println!("  measured population {} distinct word surfaces", word_surfaces.len());
+    println!(
+        "  measured population {} distinct word surfaces",
+        word_surfaces.len()
+    );
 
     // The one bound on the measured population, named rather than silent.
     let markup = census.markup_bound(8);
@@ -251,7 +251,10 @@ fn main() {
             }
             None => {
                 orbit_nontrivial = false;
-                println!("  {:<8} FOUND NO WITNESS -- this axis is not acting", axis.name());
+                println!(
+                    "  {:<8} FOUND NO WITNESS -- this axis is not acting",
+                    axis.name()
+                );
             }
         }
     }
@@ -401,7 +404,10 @@ fn main() {
             .collect();
         survived.sort_by(|left, right| right.1.cmp(&left.1).then(left.0.cmp(right.0)));
         println!();
-        println!("  The iron verdicts that survived the most refutations, at horizon {}:", HORIZONS[1]);
+        println!(
+            "  The iron verdicts that survived the most refutations, at horizon {}:",
+            HORIZONS[1]
+        );
         for (surface, pairs) in survived.iter().take(6) {
             println!(
                 "    {:<24} {} occurrences across {} wholes -> {} pairwise non-separations",
@@ -466,7 +472,11 @@ fn main() {
     let lanes = cover.host().lanes.max(1) as usize;
     let work: Vec<(usize, SurfaceId)> = HORIZONS
         .iter()
-        .flat_map(|horizon| sweeps[horizon].keys().map(move |surface| (*horizon, *surface)))
+        .flat_map(|horizon| {
+            sweeps[horizon]
+                .keys()
+                .map(move |surface| (*horizon, *surface))
+        })
         .collect();
     let mut sections: Vec<Vec<(usize, SurfaceId)>> = vec![Vec::new(); lanes];
     for (at, cell) in work.iter().enumerate() {
@@ -555,7 +565,11 @@ fn main() {
                 obstructed.len()
             )
         } else {
-            format!("{} disagreements, first: {}", check_failures.len(), check_failures[0])
+            format!(
+                "{} disagreements, first: {}",
+                check_failures.len(),
+                check_failures[0]
+            )
         },
     ));
 
@@ -570,7 +584,10 @@ fn main() {
         .map(|(surface, _)| **surface)
         .collect();
     let mut contributed: BTreeMap<ReceiverAxis, Option<(SurfaceId, AblationReading)>> =
-        ReceiverAxis::DECLARED.into_iter().map(|axis| (axis, None)).collect();
+        ReceiverAxis::DECLARED
+            .into_iter()
+            .map(|axis| (axis, None))
+            .collect();
     let mut refined_anywhere = false;
     for probe in &ablation_probes {
         for reading in ablation_profile(&census, &atlas, *probe, 2) {
@@ -782,7 +799,11 @@ fn main() {
             row.occurrences,
             row.distinct_wholes,
             far_sweep[surface].survived_pairs(),
-            row.strata.iter().map(|s| s.name()).collect::<Vec<_>>().join(","),
+            row.strata
+                .iter()
+                .map(|s| s.name())
+                .collect::<Vec<_>>()
+                .join(","),
             render_support(&row.surprisal)
         );
     }
@@ -795,7 +816,9 @@ fn main() {
 
     // ------------------------------------------------- CONTROL 1 + 5: the readings come apart
     println!();
-    println!("  THE FUZZY POPULATION -- the densest surfaces, with their shortest separating words.");
+    println!(
+        "  THE FUZZY POPULATION -- the densest surfaces, with their shortest separating words."
+    );
     println!();
     let mut every_dense_separates = true;
     for (surface, _) in by_occurrence.iter().take(10) {
@@ -855,7 +878,8 @@ fn main() {
                     distinct.len()
                 );
                 let mut by_multiplicity: Vec<(&String, &usize)> = distinct.iter().collect();
-                by_multiplicity.sort_by(|left, right| right.1.cmp(left.1).then(left.0.cmp(right.0)));
+                by_multiplicity
+                    .sort_by(|left, right| right.1.cmp(left.1).then(left.0.cmp(right.0)));
                 for (exhibit, count) in by_multiplicity.iter().take(8) {
                     println!("      x{count:<5} {exhibit}");
                 }
@@ -885,8 +909,10 @@ fn main() {
         );
         let star = row.exhibit_in(&census, SeparationChart::Star(0));
         narrow_answered = star.len() == row.distinct_windows.saturating_sub(1);
-        let distinct: BTreeSet<String> =
-            star.iter().map(|separation| separation.exhibit(&census)).collect();
+        let distinct: BTreeSet<String> = star
+            .iter()
+            .map(|separation| separation.exhibit(&census))
+            .collect();
         println!(
             "     window class 0 against all {} others: {} separations returned WHOLE, {} distinct\n\
              \x20    readings among them; the shallowest:\n       {}",
@@ -999,7 +1025,11 @@ fn main() {
         };
         let row = &far_sweep[&surface];
         let actual = row.verdict.is_iron();
-        let verdict = if actual == expected_iron { "HELD" } else { "REFUTED" };
+        let verdict = if actual == expected_iron {
+            "HELD"
+        } else {
+            "REFUTED"
+        };
         println!(
             "  {name:<8} expected {:<5} -> measured {:<5} [{verdict}]\n           occ {}, {} \
              conduct blocks at horizon {}\n           basis: {basis}",
@@ -1129,7 +1159,10 @@ fn main() {
          supports in the iron field"
             .to_owned(),
         widths.iter().collect::<BTreeSet<_>>().len() > 1 && warping.nonzero() > 0,
-        format!("support widths {widths:?} over {} nonzero entries", warping.nonzero()),
+        format!(
+            "support widths {widths:?} over {} nonzero entries",
+            warping.nonzero()
+        ),
     ));
 
     // ---------------------------------------------------------------- the surprisal carrier
@@ -1171,8 +1204,8 @@ fn main() {
     println!(
         "  H(seed, canon) before FOUND: {}",
         match &cross_before {
-            Support::Unsupported => "Unsupported -- the typed refusal, not a smoothing constant"
-                .to_owned(),
+            Support::Unsupported =>
+                "Unsupported -- the typed refusal, not a smoothing constant".to_owned(),
             Support::Supported(form) => render_form(form),
         }
     );
@@ -1263,8 +1296,12 @@ fn main() {
         && let (Support::Supported(left_form), Support::Supported(right_form)) =
             (&density[&left].surprisal, &density[&right].surprisal)
     {
-        let fine = left_form.compare_grain(right_form, Grain::DECLARED).expect("exact");
-        let coarse = left_form.compare_grain(right_form, Grain::at(1, 4)).expect("exact");
+        let fine = left_form
+            .compare_grain(right_form, Grain::DECLARED)
+            .expect("exact");
+        let coarse = left_form
+            .compare_grain(right_form, Grain::at(1, 4))
+            .expect("exact");
         println!(
             "    S({:?}) at {left_count} occ vs S({:?}) at {right_count} occ: {:?} at {}, {:?} at {}",
             census.surface(left),
@@ -1287,7 +1324,9 @@ fn main() {
              forms are far enough, so `Open` is about the PAIR and the grain together",
             census.surface(left),
             census.surface(right),
-            left_form.compare_grain(right_form, Grain::at(1, 4)).expect("exact"),
+            left_form
+                .compare_grain(right_form, Grain::at(1, 4))
+                .expect("exact"),
             Grain::at(1, 4)
         );
     }
@@ -1304,7 +1343,9 @@ fn main() {
         && let (Support::Supported(left_form), Support::Supported(right_form)) =
             (&density[&left].surprisal, &density[&right].surprisal)
     {
-        let verdict = left_form.compare_grain(right_form, Grain::at(1, 4)).expect("exact");
+        let verdict = left_form
+            .compare_grain(right_form, Grain::at(1, 4))
+            .expect("exact");
         println!(
             "    S({:?}) vs S({:?}), both at {count} occurrences: {:?} at the COARSEST grain -- \
              equality is decided on coefficients before any enclosure",

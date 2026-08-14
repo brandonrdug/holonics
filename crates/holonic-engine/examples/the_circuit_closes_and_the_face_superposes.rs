@@ -56,14 +56,14 @@
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::Path as FsPath;
 
-use holonic_engine::conditioned_derivation::{expose, Exposure, FoundedMorphology};
+use holonic_engine::conditioned_derivation::{Exposure, FoundedMorphology, expose};
 use holonic_engine::contact_gluing::{
-    contact_complex, contact_graph, ride_circuit, Circuit, ContactGluingRefusal, ContactGraph,
-    LeaderCochain,
+    Circuit, ContactGluingRefusal, ContactGraph, LeaderCochain, contact_complex, contact_graph,
+    ride_circuit,
 };
-use holonic_engine::rebase_invariants::{rebase_invariants, PivotRule};
+use holonic_engine::rebase_invariants::{PivotRule, rebase_invariants};
 use holonic_engine::running_integral::{
-    holonomy, Cochain, Orientation, Path, PathStep, RunningIntegralError,
+    Cochain, Orientation, Path, PathStep, RunningIntegralError, holonomy,
 };
 use num_bigint::BigInt;
 
@@ -158,7 +158,10 @@ fn main() {
 
     println!("  atmosphere documents   {}", atmosphere.len());
     println!("  stems founded          {}", morphology.founded().len());
-    println!("  stems committed        {}", morphology.committed_stems().len());
+    println!(
+        "  stems committed        {}",
+        morphology.committed_stems().len()
+    );
     println!("  ground files           {}", ground.len());
     println!("  population (words)     {}", population.len());
 
@@ -242,8 +245,12 @@ fn main() {
     let mut total_steps = 0usize;
     let mut face_widths: BTreeMap<usize, usize> = BTreeMap::new();
     for word in &covered_population {
-        let Ok(cover) = morphology.cover(word) else { continue };
-        let Ok(contact) = contact_complex(&cover) else { continue };
+        let Ok(cover) = morphology.cover(word) else {
+            continue;
+        };
+        let Ok(contact) = contact_complex(&cover) else {
+            continue;
+        };
         for at in contact.steps.keys() {
             let face = contact.face_over(*at);
             total_steps += 1;
@@ -273,7 +280,10 @@ fn main() {
             .ok()
             .and_then(|cover| contact_complex(&cover).ok())
             .is_some_and(|contact| {
-                contact.steps.keys().any(|at| contact.face_over(*at).len() > 1)
+                contact
+                    .steps
+                    .keys()
+                    .any(|at| contact.face_over(*at).len() > 1)
             })
     }) {
         let cover = morphology.cover(word).expect("covered");
@@ -281,16 +291,15 @@ fn main() {
         println!("\n  the full face string of `{word}`, letter by letter:");
         for at in contact.steps.keys() {
             let letter = word.as_bytes()[*at].to_ascii_lowercase() as char;
-            println!("    @{at} `{letter}`  {}", contact.face_over(*at).join(" + "));
+            println!(
+                "    @{at} `{letter}`  {}",
+                contact.face_over(*at).join(" + ")
+            );
         }
         // Past the extent there is no letter and no face, and the organ says so by returning
         // nothing rather than by refusing.
         let past = contact.face_over(word.len() + 1);
-        println!(
-            "    @{} (past the extent) -> {:?}",
-            word.len() + 1,
-            past
-        );
+        println!("    @{} (past the extent) -> {:?}", word.len() + 1, past);
         organ(
             "`face_over` past the word's extent returns an empty face rather than a refusal",
             past.is_empty(),
@@ -318,11 +327,19 @@ fn main() {
     let mut refusals_by_name = 0usize;
     let mut section_shown = 0usize;
     for word in covered_population.iter().take(64) {
-        let Ok(cover) = morphology.cover(word) else { continue };
-        let Ok(contact) = contact_complex(&cover) else { continue };
+        let Ok(cover) = morphology.cover(word) else {
+            continue;
+        };
+        let Ok(contact) = contact_complex(&cover) else {
+            continue;
+        };
         let carried: Vec<String> = cover.stems().iter().map(|s| (*s).to_owned()).collect();
-        let Some(present) = carried.first() else { continue };
-        let Ok(section) = contact.section(present) else { continue };
+        let Some(present) = carried.first() else {
+            continue;
+        };
+        let Ok(section) = contact.section(present) else {
+            continue;
+        };
         sectioned += 1;
 
         // The absent stem is chosen CANONICALLY — the first committed stem this word does not
@@ -390,7 +407,10 @@ fn main() {
         .filter(|(_, stems)| stems.len() >= 2)
         .map(|(pair, stems)| (pair.clone(), stems.clone()))
         .collect();
-    println!("  pairs sharing >= 2 stems (circuits available) {}", bigons.len());
+    println!(
+        "  pairs sharing >= 2 stems (circuits available) {}",
+        bigons.len()
+    );
 
     hold(
         "the material closes circuits at all — a circulation over an acyclic graph is vacuous",
@@ -439,7 +459,11 @@ fn main() {
             }
         }
     }
-    println!("  circuits ridden {}   refused {}", rides.len(), ride_refusals);
+    println!(
+        "  circuits ridden {}   refused {}",
+        rides.len(),
+        ride_refusals
+    );
     for (_, out, back, circuit) in rides.iter().take(8) {
         println!(
             "    through {:?}\n      string {:?}  reflected {:?}  series {:?}  holonomy {}   (`{out}` out, `{back}` back)",
@@ -592,7 +616,11 @@ fn main() {
             separated.push(line);
         }
     }
-    println!("  separated by the gauge {}   collapsed {}", separated.len(), collapsed.len());
+    println!(
+        "  separated by the gauge {}   collapsed {}",
+        separated.len(),
+        collapsed.len()
+    );
     for line in separated.iter().take(4) {
         println!("    separated  {line}");
     }
@@ -617,8 +645,12 @@ fn main() {
 
     rule("THE REFUSAL — `holonomy` refuses a walk that does not close, exhibited on this graph");
 
-    println!("  `ride_circuit` CANNOT produce this refusal. Both arcs are constrained by `find` to");
-    println!("  lie between the same pair, `contact_graph` stores every arc of a pair with the same");
+    println!(
+        "  `ride_circuit` CANNOT produce this refusal. Both arcs are constrained by `find` to"
+    );
+    println!(
+        "  lie between the same pair, `contact_graph` stores every arc of a pair with the same"
+    );
     println!("  tail and head, and the second is crossed Against — so every input it accepts");
     println!("  describes a walk that closes, `out_stem == back_stem` included (holonomy zero).");
     println!("  That is an unreachable refusal, reported and not counted (`CLAUDE.md` §8). The");
@@ -643,8 +675,14 @@ fn main() {
                 continue;
             }
             let path = Path::new([
-                PathStep { cell: *first, orientation: Orientation::Along },
-                PathStep { cell: *second, orientation: Orientation::Along },
+                PathStep {
+                    cell: *first,
+                    orientation: Orientation::Along,
+                },
+                PathStep {
+                    cell: *second,
+                    orientation: Orientation::Along,
+                },
             ]);
             match holonomy(&graph.complex, &weights, &path) {
                 Err(RunningIntegralError::PathIsNotClosed { start, end }) => {
@@ -668,11 +706,21 @@ fn main() {
                 continue;
             }
             let path = Path::new([
-                PathStep { cell: *first, orientation: Orientation::Along },
-                PathStep { cell: *second, orientation: Orientation::Along },
+                PathStep {
+                    cell: *first,
+                    orientation: Orientation::Along,
+                },
+                PathStep {
+                    cell: *second,
+                    orientation: Orientation::Along,
+                },
             ]);
             match holonomy(&graph.complex, &weights, &path) {
-                Err(RunningIntegralError::PathDoesNotJoin { index, standing_at, departs }) => {
+                Err(RunningIntegralError::PathDoesNotJoin {
+                    index,
+                    standing_at,
+                    departs,
+                }) => {
                     println!(
                         "  DISJOINT     {a}->{b} then {c}->{d}\n    refused: PathDoesNotJoin \
                          {{ index: {index}, standing_at: {standing_at:?}, departs: {departs:?} }}"
@@ -714,7 +762,8 @@ fn main() {
     hold(
         "and the same guard ADMITS a closed circuit on that graph — it is not refusing everything",
         closed_exhibited == Some(true),
-        "a guard that refused every walk would be indistinguishable from a broken organ.".to_owned(),
+        "a guard that refused every walk would be indistinguishable from a broken organ."
+            .to_owned(),
     );
 
     // ---------------------------------------------------------------------------------------------
@@ -723,7 +772,9 @@ fn main() {
 
     println!("  MOVED");
     println!("    - `Circuit::through`, `::string` and `::reflected` are read off the traversal.");
-    println!("      Before: the caller's arguments restated. Measured by reverting the return block");
+    println!(
+        "      Before: the caller's arguments restated. Measured by reverting the return block"
+    );
     println!("      and re-running this driver: the swapped-order control went 0/708 -> 708/708.");
     println!("      That is the repair's orbit, exhibited, and not a claim about the corpus.");
     println!("    - `LeaderCochain`'s doc named one reading where the code has two: face");
@@ -737,7 +788,9 @@ fn main() {
     println!("      properties of the organ that this material cannot vary.");
     println!();
     println!("  STILL OPEN");
-    println!("    - `ride_circuit` rides only a BIGON: two arcs between one pair. The contact graph");
+    println!(
+        "    - `ride_circuit` rides only a BIGON: two arcs between one pair. The contact graph"
+    );
     println!("      carries triangles (`contact_triangles` reads them) and longer cycles, and no");
     println!("      organ rides them, so the holonomy of anything but a two-arc loop is unowned.");
     println!("      A general circuit over a declared vertex sequence would be a NEW organ and is");

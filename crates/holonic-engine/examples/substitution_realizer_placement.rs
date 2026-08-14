@@ -34,15 +34,15 @@ use holonic_engine::algebraic::{
     CausalCellId, CausalChain, ComparativeMultiplicity, GradedCausalComplex,
 };
 use holonic_engine::causal::EventId;
-use holonic_engine::complex_system::{cell as cell_of_item, AddressReading, ComplexSystem};
-use holonic_engine::dilation::{dilate, Horizon, WalkOrder};
-use holonic_engine::placement::{discharge, Discharge, Placement};
+use holonic_engine::complex_system::{AddressReading, ComplexSystem, cell as cell_of_item};
+use holonic_engine::dilation::{Horizon, WalkOrder, dilate};
+use holonic_engine::placement::{Discharge, Placement, discharge};
 use holonic_engine::rebase_invariants::PivotRule;
 use holonic_engine::receiver_exact_compression::ReceiverId;
 use holonic_engine::skein::Substitution;
 use holonic_engine::substitution_realizers::{
-    discharge_substitutions, place_substitutions, read_and_realize, RealizerAdmission,
-    SubstitutionDischarge, SubstitutionPlacement, SubstitutionRealizers,
+    RealizerAdmission, SubstitutionDischarge, SubstitutionPlacement, SubstitutionRealizers,
+    discharge_substitutions, place_substitutions, read_and_realize,
 };
 use holonic_engine::supported_realizers::{incidence, positive_form};
 
@@ -96,8 +96,14 @@ fn tetrahedron() -> Tetrahedron {
         .map(|(low, mid, high)| {
             let mut boundary = CausalChain::default();
             boundary.add_term(edge_of(*low, *mid), ComparativeMultiplicity::positive(1u32));
-            boundary.add_term(edge_of(*mid, *high), ComparativeMultiplicity::positive(1u32));
-            boundary.add_term(edge_of(*low, *high), ComparativeMultiplicity::negative(1u32));
+            boundary.add_term(
+                edge_of(*mid, *high),
+                ComparativeMultiplicity::positive(1u32),
+            );
+            boundary.add_term(
+                edge_of(*low, *high),
+                ComparativeMultiplicity::negative(1u32),
+            );
             complex
                 .found_cell(format!("f{low}{mid}{high}"), source(), 2, boundary)
                 .expect("e_lm + e_mh - e_lh is a cycle")
@@ -114,7 +120,11 @@ fn tetrahedron() -> Tetrahedron {
 
 impl Tetrahedron {
     fn skeleton(&self) -> BTreeSet<CausalCellId> {
-        self.vertices.iter().chain(self.edges.iter()).copied().collect()
+        self.vertices
+            .iter()
+            .chain(self.edges.iter())
+            .copied()
+            .collect()
     }
 
     fn edge(&self, left: usize, right: usize) -> CausalCellId {
@@ -126,9 +136,16 @@ impl Tetrahedron {
     }
 
     /// The closed subcomplex carrying one triangle and everything it is attached to.
-    fn disc(&self, face: usize, corners: [usize; 3], sides: [(usize, usize); 3]) -> BTreeSet<CausalCellId> {
-        let mut support: BTreeSet<CausalCellId> =
-            corners.iter().map(|corner| self.vertices[*corner]).collect();
+    fn disc(
+        &self,
+        face: usize,
+        corners: [usize; 3],
+        sides: [(usize, usize); 3],
+    ) -> BTreeSet<CausalCellId> {
+        let mut support: BTreeSet<CausalCellId> = corners
+            .iter()
+            .map(|corner| self.vertices[*corner])
+            .collect();
         for (left, right) in sides {
             support.insert(self.edge(left, right));
         }
@@ -137,8 +154,10 @@ impl Tetrahedron {
     }
 
     fn rim(&self, corners: [usize; 3], sides: [(usize, usize); 3]) -> BTreeSet<CausalCellId> {
-        let mut support: BTreeSet<CausalCellId> =
-            corners.iter().map(|corner| self.vertices[*corner]).collect();
+        let mut support: BTreeSet<CausalCellId> = corners
+            .iter()
+            .map(|corner| self.vertices[*corner])
+            .collect();
         for (left, right) in sides {
             support.insert(self.edge(left, right));
         }
@@ -152,10 +171,7 @@ fn name(complex: &GradedCausalComplex, cell: CausalCellId) -> String {
         .map_or_else(|_| format!("{cell:?}"), |body| body.name.clone())
 }
 
-fn names(
-    complex: &GradedCausalComplex,
-    cells: impl IntoIterator<Item = CausalCellId>,
-) -> String {
+fn names(complex: &GradedCausalComplex, cells: impl IntoIterator<Item = CausalCellId>) -> String {
     let listed: Vec<String> = cells.into_iter().map(|cell| name(complex, cell)).collect();
     if listed.is_empty() {
         "-".to_owned()
@@ -301,9 +317,13 @@ fn print_conduct(complex: &GradedCausalComplex, placement: &Placement) {
         );
     }
     if placement.compression.collapsed.is_empty() {
-        println!("  conduct is exact on this material: nothing the one-shot reading merged survived it");
+        println!(
+            "  conduct is exact on this material: nothing the one-shot reading merged survived it"
+        );
     } else {
-        println!("  cells the receivers merged and conduct then separated, each with the word that did it:");
+        println!(
+            "  cells the receivers merged and conduct then separated, each with the word that did it:"
+        );
         for pair in &placement.compression.collapsed {
             println!(
                 "    {} ~ {}   word {:?}   by-terminus {}",
@@ -321,12 +341,12 @@ fn print_population(
     labels: &[&str],
     founded: &SubstitutionRealizers,
 ) {
-    println!("the declared population, read against {} contexts:", founded.contexts.len());
+    println!(
+        "the declared population, read against {} contexts:",
+        founded.contexts.len()
+    );
     for realizer in &founded.realizers {
-        println!(
-            "  [{}] {}",
-            realizer.declared, labels[realizer.declared]
-        );
+        println!("  [{}] {}", realizer.declared, labels[realizer.declared]);
         println!(
             "        realizer {:?}   deposits {}   withdraws {}",
             realizer.realizer,
@@ -441,10 +461,8 @@ fn print_incidence(
     founded: &SubstitutionRealizers,
     placed: &SubstitutionPlacement,
 ) {
-    let realizations = founded.realizations_under(
-        placed.admission,
-        &placed.placement.compression.conduct,
-    );
+    let realizations =
+        founded.realizations_under(placed.admission, &placed.placement.compression.conduct);
     let matrix = incidence(&realizations, placed.placement.class_extent);
     let form = positive_form(&matrix);
     println!("the realizer-against-class incidence, exact:");
@@ -489,10 +507,20 @@ fn main() {
 
     // ------------------------------------------------------------------ step 1: the receivers
     let receivers = vec![
-        dilate(complex, world.vertices[0], Horizon::Unbounded, WalkOrder::Breadth)
-            .expect("v0 is a cell"),
-        dilate(complex, world.vertices[1], Horizon::Unbounded, WalkOrder::Breadth)
-            .expect("v1 is a cell"),
+        dilate(
+            complex,
+            world.vertices[0],
+            Horizon::Unbounded,
+            WalkOrder::Breadth,
+        )
+        .expect("v0 is a cell"),
+        dilate(
+            complex,
+            world.vertices[1],
+            Horizon::Unbounded,
+            WalkOrder::Breadth,
+        )
+        .expect("v1 is a cell"),
     ];
     println!("\n================ step 1: the receivers ================");
     for (index, section) in receivers.iter().enumerate() {
@@ -529,8 +557,10 @@ fn main() {
     // ------------------------------------------------------------------ step 2: the moves
     let moves = declared(&world);
     let labels: Vec<&str> = moves.iter().map(|(label, _)| *label).collect();
-    let substitutions: Vec<Substitution> =
-        moves.iter().map(|(_, move_made)| move_made.clone()).collect();
+    let substitutions: Vec<Substitution> = moves
+        .iter()
+        .map(|(_, move_made)| move_made.clone())
+        .collect();
 
     let narrow = read_and_realize(
         complex,
@@ -541,7 +571,10 @@ fn main() {
 
     println!("\n================ step 2: the declared population ================");
     for (index, context) in narrow.contexts.iter().enumerate() {
-        println!("  context {index}: {}", names(complex, context.iter().copied()));
+        println!(
+            "  context {index}: {}",
+            names(complex, context.iter().copied())
+        );
     }
     print_population(complex, &labels, &narrow);
 
@@ -665,7 +698,10 @@ fn main() {
         c_after.contexts.len(),
         c_before.contexts.len()
     );
-    println!("  admitted {:?} -> {:?}", c_before.admitted, c_after.admitted);
+    println!(
+        "  admitted {:?} -> {:?}",
+        c_before.admitted, c_after.admitted
+    );
     println!(
         "  placement::discharge          C {:?}",
         discharge(&c_before.placement, &c_after.placement)
@@ -678,9 +714,18 @@ fn main() {
     // The driver is falsifiable, not decorative: if the composition regresses, this exits nonzero.
     assert_eq!(a_before.placement, b_before.placement);
     assert_eq!(a_after.placement, b_after.placement);
-    assert_eq!(discharge(&a_before.placement, &a_after.placement), Discharge::Founded);
-    assert_eq!(discharge(&b_before.placement, &b_after.placement), Discharge::Founded);
-    assert_eq!(discharge(&c_before.placement, &c_after.placement), Discharge::Founded);
+    assert_eq!(
+        discharge(&a_before.placement, &a_after.placement),
+        Discharge::Founded
+    );
+    assert_eq!(
+        discharge(&b_before.placement, &b_after.placement),
+        Discharge::Founded
+    );
+    assert_eq!(
+        discharge(&c_before.placement, &c_after.placement),
+        Discharge::Founded
+    );
     assert_eq!(
         discharge_substitutions(&a_before, &a_after),
         SubstitutionDischarge::Founded

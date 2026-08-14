@@ -179,7 +179,10 @@ fn run() -> Result<(), String> {
         "  rust_source_sections {}",
         atlas.receipt().rust_source_sections
     );
-    println!("  indexed_features     {}", atlas.receipt().indexed_features);
+    println!(
+        "  indexed_features     {}",
+        atlas.receipt().indexed_features
+    );
     println!("  mount                {mount_millis} ms");
     println!("  excluded             {GRADING_RECORD}");
 
@@ -251,10 +254,7 @@ rather than truncating a return; it is a lawful refusal, not a failure)"
     }
 
     println!("\nSTATION 3 — THE CONTINUING BODY");
-    println!(
-        "  conditioned_passages {}",
-        ecology.conditioned_passages()
-    );
+    println!("  conditioned_passages {}", ecology.conditioned_passages());
     println!("  relational_clauses   {}", ecology.relational_clauses());
     Ok(())
 }
@@ -307,9 +307,16 @@ fn print_deliberation(deliberation: &LaboratoryResearchDeliberation, millis: u12
         .iter()
         .map(|r| r.complete_population)
         .sum();
-    let omitted: usize = deliberation.returns.iter().map(|r| r.omitted_population).sum();
+    let omitted: usize = deliberation
+        .returns
+        .iter()
+        .map(|r| r.omitted_population)
+        .sum();
     println!("    complete / omitted {complete} / {omitted}");
-    println!("    thought steps      {}", deliberation.thought_steps.len());
+    println!(
+        "    thought steps      {}",
+        deliberation.thought_steps.len()
+    );
     for step in deliberation.thought_steps.iter().take(4) {
         println!(
             "      wave {} generation {} sections {} newly_conditioned {} clauses {} -> {}",
@@ -359,10 +366,7 @@ fn declared_fixture(root: &Path, fixture: &Path) -> Result<Vec<(String, String)>
         let into = directory.join(leaf);
         std::os::unix::fs::symlink(&from, &into)
             .map_err(|e| format!("link {}: {e}", into.display()))?;
-        mapped.push((
-            named.to_owned(),
-            format!("{at}/{}", leaf.to_string_lossy()),
-        ));
+        mapped.push((named.to_owned(), format!("{at}/{}", leaf.to_string_lossy())));
     }
     Ok(mapped)
 }

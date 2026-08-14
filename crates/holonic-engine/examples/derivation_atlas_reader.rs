@@ -62,10 +62,10 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 
 use holonic_engine::derivation_atlas::{
-    found_circuit, invariant_movement, read_derivation, route_cycle_agreement, route_movement,
     CircuitAperture, Derivation, DerivationCircuit, DerivationIdentity, RecruitmentCoefficient,
+    found_circuit, invariant_movement, read_derivation, route_cycle_agreement, route_movement,
 };
-use holonic_engine::rebase_invariants::{invariants_agree, PivotRule, RebaseInvariants};
+use holonic_engine::rebase_invariants::{PivotRule, RebaseInvariants, invariants_agree};
 
 /// Every `.lean` artifact under `root`, in a stable filename order. Recursive, so a standing that
 /// holds several foundings side by side reads as one deposit.
@@ -265,7 +265,9 @@ fn main() {
     println!("\n  the target population a later production selects from, ranked by its lineage");
     let ranked = deposited.single_vertex_statements_by_lineage();
     if ranked.is_empty() {
-        println!("    (empty — every statement here is already reached by more than one declaration)");
+        println!(
+            "    (empty — every statement here is already reached by more than one declaration)"
+        );
     }
     for (statement, lineage) in &ranked {
         println!("    {} artifacts   {statement}", lineage.len());
@@ -292,16 +294,13 @@ fn main() {
     println!("------------------------------------------------");
     let mut classes: BTreeMap<&str, BTreeSet<Vec<(String, u32)>>> = BTreeMap::new();
     for derivation in &derivations {
-        classes
-            .entry(derivation.name.as_str())
-            .or_default()
-            .insert(
-                derivation
-                    .recruited
-                    .iter()
-                    .map(|(symbol, count)| (symbol.clone(), *count))
-                    .collect(),
-            );
+        classes.entry(derivation.name.as_str()).or_default().insert(
+            derivation
+                .recruited
+                .iter()
+                .map(|(symbol, count)| (symbol.clone(), *count))
+                .collect(),
+        );
     }
     let mut declarations_with_plural_recruitment = 0;
     for (declaration, distinct) in &classes {
@@ -369,7 +368,10 @@ fn main() {
     println!("\nTHE INDEPENDENT ROUTES TO ONE RESULT, COMPUTED TWO WAYS");
     println!("-------------------------------------------------------");
     let mut agreements = Vec::new();
-    for identity in [DerivationIdentity::ByDeclaration, DerivationIdentity::ByRoute] {
+    for identity in [
+        DerivationIdentity::ByDeclaration,
+        DerivationIdentity::ByRoute,
+    ] {
         let agreement = route_cycle_agreement(&derivations, identity, PivotRule::SmallestMagnitude)
             .expect("an incidence reading is admissible under either identity");
         println!(

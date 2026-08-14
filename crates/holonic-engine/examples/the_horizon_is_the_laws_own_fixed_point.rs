@@ -35,11 +35,11 @@
 use std::path::{Path, PathBuf};
 
 use holonic_engine::derivation_atlas::{
-    found_circuit, read_derivation, CircuitAperture, Derivation, DerivationCircuit,
+    CircuitAperture, Derivation, DerivationCircuit, found_circuit, read_derivation,
 };
 use holonic_engine::derivation_capacitance::{
-    disjoint_terrain, doubling_ladder, doubling_ladder_completion, excised_doubling_schedule,
-    many_result_star, one_result_star, CapacitanceMapping, CapacityLaw, CharacteristicDelayLaw,
+    CapacitanceMapping, CapacityLaw, CharacteristicDelayLaw, disjoint_terrain, doubling_ladder,
+    doubling_ladder_completion, excised_doubling_schedule, many_result_star, one_result_star,
 };
 
 /// Every `.lean` artifact under `root`, in a stable filename order. The same walk
@@ -67,7 +67,9 @@ fn excised(mapping: &CapacitanceMapping) -> (u64, u32) {
         mapping.site_count(),
         mapping.longest_characteristic_delay(),
         |horizon| {
-            mapping.returned_at_horizon(horizon).expect("the current conducts")
+            mapping
+                .returned_at_horizon(horizon)
+                .expect("the current conducts")
                 >= mapping.reachable_sites()
         },
     )
@@ -124,8 +126,10 @@ fn print_row(row: &Row) {
         row.fixed,
         row.growths,
         row.growth_bound,
-        row.below
-            .map_or_else(|| "n/a".to_owned(), |below| format!("{below}/{}", row.reachable)),
+        row.below.map_or_else(
+            || "n/a".to_owned(),
+            |below| format!("{below}/{}", row.reachable)
+        ),
     );
 }
 
@@ -178,35 +182,63 @@ fn main() {
 
     println!("\nWHAT DERIVES THE HORIZON NOW");
     println!("----------------------------");
-    println!("  Three properties of `receiver_current::radiate_to_horizon`, each a statement about");
+    println!(
+        "  Three properties of `receiver_current::radiate_to_horizon`, each a statement about"
+    );
     println!("  that owner rather than about this one:");
     println!();
-    println!("    every passage delay is positive     `characteristic_delay` is refused at zero and");
+    println!(
+        "    every passage delay is positive     `characteristic_delay` is refused at zero and"
+    );
     println!("                                        delay = characteristic_delay + rounds - 1");
-    println!("    so each site departs at most once   the schedule is popped in ascending chronology");
-    println!("                                        and a recorded arrival is replaced only by a");
-    println!("                                        strictly earlier one, impossible after the pop");
-    println!("    so the horizon is monotone          the horizon is read at exactly two `> horizon`");
+    println!(
+        "    so each site departs at most once   the schedule is popped in ascending chronology"
+    );
+    println!(
+        "                                        and a recorded arrival is replaced only by a"
+    );
+    println!(
+        "                                        strictly earlier one, impossible after the pop"
+    );
+    println!(
+        "    so the horizon is monotone          the horizon is read at exactly two `> horizon`"
+    );
     println!("                                        comparisons, so a larger one reproduces the");
     println!("                                        smaller run exactly below it");
     println!();
-    println!("  A reachable site fails to return only because its arrival crossed the deferral gate,");
-    println!("  and that gate DEPOSITS the arrival with its chronology. So the growth reads its next");
+    println!(
+        "  A reachable site fails to return only because its arrival crossed the deferral gate,"
+    );
+    println!(
+        "  and that gate DEPOSITS the arrival with its chronology. So the growth reads its next"
+    );
     println!("  horizon off the law; each growth returns at least one further site, because the");
-    println!("  smallest unreturned arrival's own predecessor arrived strictly earlier and therefore");
+    println!(
+        "  smallest unreturned arrival's own predecessor arrived strictly earlier and therefore"
+    );
     println!("  already returned; and the circuit's REACHABLE POPULATION bounds the growths.");
     println!();
-    println!("  The horizon finally reported is `max` over the reachable population of the arrival");
-    println!("  chronology the law returned. Both sides of it being least are CONDUCTED: complete at");
+    println!(
+        "  The horizon finally reported is `max` over the reachable population of the arrival"
+    );
+    println!(
+        "  chronology the law returned. Both sides of it being least are CONDUCTED: complete at"
+    );
     println!("  the fixed point, strictly incomplete one chronology below.");
 
     // ---------------------------------------------------------------------------------------------
     // CLAIM 1 — the guess is not a bound
     // ---------------------------------------------------------------------------------------------
 
-    println!("\nCLAIM 1 — `site_count * longest_delay` IS NOT A BOUND, AND MISSES BY AN UNBOUNDED MARGIN");
-    println!("-------------------------------------------------------------------------------------------");
-    println!("  doubling_ladder(2, rungs): 2 + 2*rungs sites, completion predicted BEFORE the reading");
+    println!(
+        "\nCLAIM 1 — `site_count * longest_delay` IS NOT A BOUND, AND MISSES BY AN UNBOUNDED MARGIN"
+    );
+    println!(
+        "-------------------------------------------------------------------------------------------"
+    );
+    println!(
+        "  doubling_ladder(2, rungs): 2 + 2*rungs sites, completion predicted BEFORE the reading"
+    );
     println!("  at 2 + 2*(2^rungs - 2) by the construction's own recurrence.");
     header();
     let mut margins: Vec<i128> = Vec::new();
@@ -218,7 +250,10 @@ fn main() {
         let predicted = doubling_ladder_completion(2, rungs as u32);
         if row.fixed != predicted {
             predictions_hold = false;
-            println!("      DISAGREES: predicted {predicted}, returned {}", row.fixed);
+            println!(
+                "      DISAGREES: predicted {predicted}, returned {}",
+                row.fixed
+            );
         }
         margins.push(i128::from(row.fixed) - i128::from(row.guess));
         print_row(&row);
@@ -244,7 +279,9 @@ fn main() {
 
     println!("\nCLAIM 2 — THE DISTINGUISHING WORD: ONE REPORT, TWO MATERIALS");
     println!("------------------------------------------------------------");
-    println!("  One site count and one longest delay, so the excised schedule's starting guess and");
+    println!(
+        "  One site count and one longest delay, so the excised schedule's starting guess and"
+    );
     println!("  every doubling of it are IDENTICAL. What the two circuits do is not.");
     header();
     let left = doubling_ladder(2, 5);
@@ -278,7 +315,9 @@ fn main() {
     // CLAIM 3 — the refusal could not fire
     // ---------------------------------------------------------------------------------------------
 
-    println!("\nCLAIM 3 — THE SIXTY-FOUR-DOUBLING REFUSAL WAS GUARDING A STATE NO MATERIAL REACHES");
+    println!(
+        "\nCLAIM 3 — THE SIXTY-FOUR-DOUBLING REFUSAL WAS GUARDING A STATE NO MATERIAL REACHES"
+    );
     println!("-----------------------------------------------------------------------------------");
     let mut saturates = true;
     for guess in [1u64, 3, 22, 121, u64::MAX / 3] {
@@ -359,11 +398,21 @@ fn main() {
         for (name, mapping) in [
             (
                 "by declaration, uniform",
-                deposit_mapping(&deposited, &derivations, &[], CharacteristicDelayLaw::Uniform),
+                deposit_mapping(
+                    &deposited,
+                    &derivations,
+                    &[],
+                    CharacteristicDelayLaw::Uniform,
+                ),
             ),
             (
                 "by route, uniform",
-                deposit_mapping(&per_route, &derivations, &[], CharacteristicDelayLaw::Uniform),
+                deposit_mapping(
+                    &per_route,
+                    &derivations,
+                    &[],
+                    CharacteristicDelayLaw::Uniform,
+                ),
             ),
             (
                 "by declaration, situated",
@@ -395,10 +444,9 @@ fn main() {
         .chain(deposit_rows.iter())
         .chain([&left_row, &right_row])
         .collect();
-    let two_sided = every_row.iter().all(|row| {
-        row.below
-            .is_none_or(|below| below < row.reachable)
-    });
+    let two_sided = every_row
+        .iter()
+        .all(|row| row.below.is_none_or(|below| below < row.reachable));
     let bounded = every_row.iter().all(|row| row.growths <= row.growth_bound);
     let never_over = every_row.iter().all(|row| row.fixed <= row.reported);
     println!("    two-sided at every row      {two_sided}");

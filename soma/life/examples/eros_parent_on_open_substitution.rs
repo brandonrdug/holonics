@@ -7,6 +7,7 @@ use std::time::{Duration, Instant};
 
 use body::incidence::IncidenceHand;
 use body::num::Cog;
+use life::form_mouth::deposit_form_or_message;
 use num_bigint::{BigInt, Sign};
 use num_rational::BigRational;
 use serde::{Deserialize, Serialize};
@@ -19,7 +20,6 @@ use soma_membrane::{
     ParallelHostLiveCurrentExecutor, RegionalRelationArc, RegionalRelationCell,
     SparseStandingSurface,
 };
-use life::form_mouth::deposit_form_or_message;
 
 /// This driver's name at the plate mouth: `output/eros_parent_on_open_substitution/<name>-<sha256>.form`.
 const FORM_DRIVER: &str = "eros_parent_on_open_substitution";

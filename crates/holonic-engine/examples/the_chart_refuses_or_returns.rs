@@ -124,7 +124,10 @@ fn main() -> Result<(), Box<dyn Error>> {
                 .map(|value| BigInt::from(*value))
                 .collect(),
         )?;
-        atlases.push((declared, read_quintic_charts(&problem, PRIME_LIMIT, HORN_LOCAL_SECTION_LIMIT)?));
+        atlases.push((
+            declared,
+            read_quintic_charts(&problem, PRIME_LIMIT, HORN_LOCAL_SECTION_LIMIT)?,
+        ));
     }
 
     println!("THE CHART REFUSES OR RETURNS");
@@ -173,10 +176,7 @@ fn report(declared: &Declared, atlas: &QuinticChartAtlas) {
         atlas.root_scale,
         atlas.root_scale
     );
-    println!(
-        "  degree       {}",
-        atlas.degree
-    );
+    println!("  degree       {}", atlas.degree);
     println!(
         "  power sums   s_0..s_{} = [{}]",
         atlas.degree,

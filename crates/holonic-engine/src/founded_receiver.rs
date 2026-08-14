@@ -72,7 +72,7 @@ use num_bigint::BigUint;
 use num_traits::One;
 
 use crate::receiver_exact_compression::{
-    compress, CollapsedPair, InputId, ItemId, ObservedSystem, Observation, Partition, ReceiverId,
+    CollapsedPair, InputId, ItemId, Observation, ObservedSystem, Partition, ReceiverId, compress,
 };
 
 /// **Why an axis was founded.** Two pressures, and the second is the traffic law.
@@ -250,12 +250,7 @@ impl FoundedPanel {
     pub fn capacities(&self) -> BTreeMap<ReceiverId, BigUint> {
         self.founded
             .iter()
-            .map(|found| {
-                (
-                    found.id,
-                    BigUint::from(found.residue) + BigUint::one(),
-                )
-            })
+            .map(|found| (found.id, BigUint::from(found.residue) + BigUint::one()))
             .collect()
     }
 }
@@ -289,11 +284,7 @@ pub fn continuation_aperture(system: &dyn ObservedSystem, item: ItemId) -> Obser
 ///
 /// Following the word may terminate early. That is not a failure to read: **where a path stops is a
 /// distinction**, and it is encoded as the step it stopped at, disjoint from every aperture value.
-pub fn aperture_after(
-    system: &dyn ObservedSystem,
-    item: ItemId,
-    word: &[InputId],
-) -> Observation {
+pub fn aperture_after(system: &dyn ObservedSystem, item: ItemId, word: &[InputId]) -> Observation {
     let mut here = item;
     for (step, input) in word.iter().enumerate() {
         match system.successor(here, *input) {
@@ -433,10 +424,7 @@ pub fn found_to_exhaustion(system: &dyn ObservedSystem, skip: &[(ItemId, ItemId)
 ///
 /// This is what `Gyration`'s own claim was always about: `found(a)∘found(b)` against
 /// `found(b)∘found(a)` is a statement about which is taken **first**, not about which is left out.
-pub fn found_preferring(
-    system: &dyn ObservedSystem,
-    prefer: &[(ItemId, ItemId)],
-) -> FoundedPanel {
+pub fn found_preferring(system: &dyn ObservedSystem, prefer: &[(ItemId, ItemId)]) -> FoundedPanel {
     found_in_order(system, prefer, &[])
 }
 
@@ -654,7 +642,10 @@ fn found_in_order(
                 declared: system,
                 founded: &trial,
             };
-            compress(&widened).one_shot.len().saturating_sub(reading.one_shot.len())
+            compress(&widened)
+                .one_shot
+                .len()
+                .saturating_sub(reading.one_shot.len())
         };
 
         founded.push(FoundedReceiver {
@@ -1090,7 +1081,12 @@ pub fn parity_collapsed_pairs(readings: &[GyrationHolonomy]) -> Vec<(usize, usiz
 pub fn gyration(system: &dyn ObservedSystem) -> Gyration {
     let left = found_to_exhaustion(system, &[]);
     // Defer the junction the first order took first, so the second order must take another.
-    let deferred: Vec<(ItemId, ItemId)> = left.founded.first().map(|f| f.junction).into_iter().collect();
+    let deferred: Vec<(ItemId, ItemId)> = left
+        .founded
+        .first()
+        .map(|f| f.junction)
+        .into_iter()
+        .collect();
     let right = found_to_exhaustion(system, &deferred);
     gyration_of(&left, &right)
 }
@@ -1169,7 +1165,11 @@ mod gyration_holonomy_tests {
         // The right order swapped the last two. On two moved points that is a transposition.
         let reading = gyration_holonomy(&gyration_over(&[1, 2, 3], &[1, 3, 2])).expect("shares");
         assert!(!reading.is_trivial);
-        assert_eq!(reading.shared.len(), 3, "the degree is the shared population");
+        assert_eq!(
+            reading.shared.len(),
+            3,
+            "the degree is the shared population"
+        );
         assert_eq!(reading.cycle_type, vec![1, 2]);
         assert!(!reading.is_even, "a transposition is odd");
     }
@@ -1178,7 +1178,10 @@ mod gyration_holonomy_tests {
     fn junctions_only_one_order_founded_are_outside_the_walk_and_are_retained() {
         let reading = gyration_holonomy(&gyration_over(&[1, 2, 9], &[2, 1, 7])).expect("shares");
         assert_eq!(reading.shared, vec![junction(1), junction(2)]);
-        assert_eq!(reading.unshared, 2, "9 and 7 are each founded by one order only");
+        assert_eq!(
+            reading.unshared, 2,
+            "9 and 7 are each founded by one order only"
+        );
         assert_eq!(reading.cycle_type, vec![2]);
     }
 
@@ -1326,7 +1329,10 @@ mod tests {
                 "a founded reading is the material's, read from where the junction is"
             );
         }
-        assert!(found.blocks_gained > 0, "a founding that founds nothing is refused");
+        assert!(
+            found.blocks_gained > 0,
+            "a founding that founds nothing is refused"
+        );
     }
 
     #[test]
@@ -1416,7 +1422,10 @@ mod tests {
                     }
                 }
             }
-            assert_eq!(found.residue, counted, "the residue is the definition, recomputed");
+            assert_eq!(
+                found.residue, counted,
+                "the residue is the definition, recomputed"
+            );
         }
     }
 
@@ -1504,7 +1513,11 @@ mod tests {
             BigUint::from(panel.founded[0].residue) + BigUint::one(),
             "capacity is the residue measured over the settled family, plus the forced one"
         );
-        assert_eq!(panel.conduct, compress(&BlindPanel).conduct, "conduct is invariant");
+        assert_eq!(
+            panel.conduct,
+            compress(&BlindPanel).conduct,
+            "conduct is invariant"
+        );
     }
 
     #[test]
@@ -1521,7 +1534,10 @@ mod tests {
             assert_eq!(gyr.divergence, None);
             assert!(gyr.only_left.is_empty() && gyr.only_right.is_empty());
         } else {
-            assert!(gyr.divergence.is_some(), "a non-trivial orbit diverges somewhere");
+            assert!(
+                gyr.divergence.is_some(),
+                "a non-trivial orbit diverges somewhere"
+            );
         }
     }
 }

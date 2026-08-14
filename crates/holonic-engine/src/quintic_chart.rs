@@ -1815,7 +1815,9 @@ fn radical_chart(
             && (admitted_groups.contains(&QuinticTransitiveGroup::Alternating5)
                 || admitted_groups.contains(&QuinticTransitiveGroup::Symmetric5))
         {
-            named.push("A_5 is simple: the winding does not factor into single-hand steps".to_owned());
+            named.push(
+                "A_5 is simple: the winding does not factor into single-hand steps".to_owned(),
+            );
         }
         if solvability.refutes_solvability() {
             named.push(solvability.written());
@@ -1966,7 +1968,10 @@ mod tests {
     fn the_bring_chart_is_undefined_at_degree_three_and_the_refusal_names_why() {
         let problem = degree_problem("x^3-2", &[-2, 0, 0, 1]);
         let atlas = read_quintic_charts(&problem, 41, TEST_HORN_LOCAL_SECTION_LIMIT).unwrap();
-        let obstruction = atlas.bring.obstruction().expect("no Bring chart at degree 3");
+        let obstruction = atlas
+            .bring
+            .obstruction()
+            .expect("no Bring chart at degree 3");
         let ChartObstructionSpecies::ChartUndefinedAtDegree {
             source_degree,
             killed_count,
@@ -1975,7 +1980,10 @@ mod tests {
         else {
             panic!("the refusal must be typed, not an aperture excuse");
         };
-        assert_eq!((*source_degree, *killed_count, *least_source_degree), (3, 3, 4));
+        assert_eq!(
+            (*source_degree, *killed_count, *least_source_degree),
+            (3, 3, 4)
+        );
         // And it is two-sided: the same chart is entered one rung up.
         let quartic = degree_problem("x^4-2", &[-2, 0, 0, 0, 1]);
         let quartic_atlas =
@@ -2075,7 +2083,11 @@ mod tests {
                 refutes,
                 "{name}"
             );
-            assert_eq!(atlas.radical.solvable_admitted.is_empty(), refutes, "{name}");
+            assert_eq!(
+                atlas.radical.solvable_admitted.is_empty(),
+                refutes,
+                "{name}"
+            );
         }
         // Degree six: composite, so the criterion states nothing and the catalogue does not apply.
         let sextic = degree_problem("(x^2-2)(x^4-2)", &[4, 0, -2, 0, -2, 0, 1]);
@@ -2159,7 +2171,11 @@ mod tests {
                     chart.name()
                 );
                 for (killed, value) in &transport.killed {
-                    assert!(value.is_zero(), "{name} / {}: y^{killed} alive", chart.name());
+                    assert!(
+                        value.is_zero(),
+                        "{name} / {}: y^{killed} alive",
+                        chart.name()
+                    );
                 }
                 assert_eq!(transport.source_degree, atlas.degree);
             }
@@ -2175,7 +2191,10 @@ mod tests {
     fn the_degree_five_witness_is_unmoved_by_the_ladder() {
         let problem = degree_problem("x^5-2x^3+x-1", &[-1, 1, 0, -2, 0, 1]);
         let atlas = read_quintic_charts(&problem, 41, TEST_HORN_LOCAL_SECTION_LIMIT).unwrap();
-        let transport = atlas.bring.transport().expect("the cubic sub-chart returns");
+        let transport = atlas
+            .bring
+            .transport()
+            .expect("the cubic sub-chart returns");
         assert_eq!(transport.transport, monic(&[0, -1, 0, 1]));
         assert_eq!(transport.transported, monic(&[-1, -1, 0, 0, 0, 1]));
         assert!(transport.certificate.holds());
@@ -2642,7 +2661,10 @@ pub enum CompassVerdict {
     /// **REFUSED, exactly and completely.** The polynomial is certified irreducible of a degree that
     /// is not a power of two, so no root of it lies in any tower of quadratic extensions. No bound
     /// this body declares can move this: it is a property of the field, not of a search.
-    Refuses { degree: usize, certifying_prime: u64 },
+    Refuses {
+        degree: usize,
+        certifying_prime: u64,
+    },
     /// **The necessary condition holds, and that is all this says.** The degree is a power of two.
     /// Sufficiency requires the Galois closure to be a 2-group, which this function does not decide
     /// — a degree-four irreducible with Galois group `A₄` or `S₄` passes here and is *not*
@@ -2720,7 +2742,8 @@ impl LadderReading {
     /// **The compass refuses and the neusis rung does not.** This is the marked ruler's whole
     /// content: cube duplication, angle trisection and the regular heptagon all sit here.
     pub fn neusis_crosses_the_compass_wall(&self) -> bool {
-        self.compass.refuses() && !self.neusis.refuses()
+        self.compass.refuses()
+            && !self.neusis.refuses()
             && !matches!(self.neusis, NeusisVerdict::Open { .. })
     }
 
@@ -2787,11 +2810,18 @@ pub fn neusis_admits_degree(degree: usize) -> bool {
 pub enum NeusisVerdict {
     /// **REFUSED, exactly.** The certified irreducible degree is not `2^a·3^b`, so no root lies in
     /// any tower of quadratic and cubic steps. Even a marked ruler does not reach it.
-    Refuses { degree: usize, certifying_prime: u64 },
+    Refuses {
+        degree: usize,
+        certifying_prime: u64,
+    },
     /// The degree is `2^a·3^b`. **Necessary only** — sufficiency needs the Galois closure to be a
     /// `{2,3}`-group — and additionally **no arithmetic carrier exists here**, so this is an
     /// aperture statement and never a construction.
-    NecessaryConditionHolds { degree: usize, twos: u32, threes: u32 },
+    NecessaryConditionHolds {
+        degree: usize,
+        twos: u32,
+        threes: u32,
+    },
     /// Irreducibility was not certified, so no verdict.
     Open { degree: usize },
 }
@@ -2828,9 +2858,16 @@ pub fn read_neusis_rung(reading: &RadicalChartReading) -> NeusisVerdict {
                     residue /= 3;
                     threes += 1;
                 }
-                NeusisVerdict::NecessaryConditionHolds { degree, twos, threes }
+                NeusisVerdict::NecessaryConditionHolds {
+                    degree,
+                    twos,
+                    threes,
+                }
             } else {
-                NeusisVerdict::Refuses { degree, certifying_prime: prime }
+                NeusisVerdict::Refuses {
+                    degree,
+                    certifying_prime: prime,
+                }
             }
         }
         QuinticIrreducibility::Open => NeusisVerdict::Open { degree },

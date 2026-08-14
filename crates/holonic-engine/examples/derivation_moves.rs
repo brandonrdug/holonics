@@ -35,21 +35,21 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 
 use holonic_engine::conditioned_derivation::{
-    expose, found_conditioned_circuit, ConditionedBody, DerivationQuery, Exposure, PassageId,
+    ConditionedBody, DerivationQuery, Exposure, PassageId, expose, found_conditioned_circuit,
 };
 use holonic_engine::derivation_atlas::CircuitAperture;
 use holonic_engine::derivation_skein::{
-    class_of, conduct_aperture, declare_receivers, declared_contexts, deposit_moves,
-    exchange_moves, moves_the_production_made, passage_interior, passages_under, place_moves,
-    split_moves, DerivationMove, MoveAperture, MoveObstruction, MoveSpecies, OpenClass, PlacedMoves,
-    SupportedClass,
+    DerivationMove, MoveAperture, MoveObstruction, MoveSpecies, OpenClass, PlacedMoves,
+    SupportedClass, class_of, conduct_aperture, declare_receivers, declared_contexts,
+    deposit_moves, exchange_moves, moves_the_production_made, passage_interior, passages_under,
+    place_moves, split_moves,
 };
-use holonic_engine::placement::{discharge, Discharge};
-use holonic_engine::rebase_invariants::{smith_normal_form, IntegerMatrix, PivotRule};
+use holonic_engine::placement::{Discharge, discharge};
+use holonic_engine::rebase_invariants::{IntegerMatrix, PivotRule, smith_normal_form};
 use holonic_engine::receiver_exact_compression::ReceiverId;
 use holonic_engine::skein::read_substitution;
 use holonic_engine::substitution_realizers::{
-    discharge_substitutions, RealizerAdmission, SubstitutionDischarge,
+    RealizerAdmission, SubstitutionDischarge, discharge_substitutions,
 };
 use holonic_engine::supported_realizers::{incidence, positive_form, quadratic_value};
 
@@ -297,7 +297,11 @@ fn positive_form_agrees(placed: &PlacedMoves) -> (bool, usize) {
         (0..extent)
             .map(|index| {
                 let magnitude = (index as i64) + 2;
-                BigInt::from(if index % 2 == 0 { magnitude } else { -magnitude })
+                BigInt::from(if index % 2 == 0 {
+                    magnitude
+                } else {
+                    -magnitude
+                })
             })
             .collect(),
     ];
@@ -387,7 +391,9 @@ fn main() {
         .expect("the deposit reached a statement");
     let the_query = DerivationQuery::reaching(&query);
 
-    let whole = body.passages(&the_query).expect("the production reads back");
+    let whole = body
+        .passages(&the_query)
+        .expect("the production reads back");
     let aperture = MoveAperture::morphemic(&whole, MORPHEMIC);
     let restricted = passages_under(&whole, &aperture);
     let circuit = match found_conditioned_circuit(restricted, CircuitAperture::STATEMENT_INCIDENT) {
@@ -447,7 +453,9 @@ fn main() {
         "\n  {} receivers, one dilated section per 0-cell the production recruits, plus the",
         system.receivers.len()
     );
-    println!("  statement vertex. Each reads the METRIC address -- the invariant, never the walk order.\n");
+    println!(
+        "  statement vertex. Each reads the METRIC address -- the invariant, never the walk order.\n"
+    );
     let complex = circuit.circuit.complex();
     for (index, section) in system.receivers.iter().enumerate() {
         let focus = complex
@@ -506,7 +514,10 @@ fn main() {
         .count();
     println!("    cells the production founded and the aperture admits: {leaked}");
 
-    println!("\n  {} declared contexts, each a closed subcomplex:", contexts.len());
+    println!(
+        "\n  {} declared contexts, each a closed subcomplex:",
+        contexts.len()
+    );
     for (index, context) in contexts.iter().enumerate() {
         println!("    context {index}  {} cells", context.len());
     }
@@ -520,13 +531,18 @@ fn main() {
     let every_move = moves_the_production_made(&circuit);
     println!("\n  by species: {:?}", tally(&every_move));
 
-    println!("\n  every lemma split -- one passage replaced by the two carrying its bridge elsewhere");
+    println!(
+        "\n  every lemma split -- one passage replaced by the two carrying its bridge elsewhere"
+    );
     for (position, declared) in splits.iter().enumerate() {
         println!("{}", move_line(declared, position));
     }
     println!("\n  every recruitment exchange -- one brought identifier replaced by another");
     for (position, declared) in exchanges.iter().enumerate() {
-        println!("{}", move_line(declared, splits.len() + deposits.len() + position));
+        println!(
+            "{}",
+            move_line(declared, splits.len() + deposits.len() + position)
+        );
     }
     println!("\n  every deposit -- the frame carrying one passage's own cells");
     for (position, declared) in deposits.iter().enumerate() {
@@ -537,8 +553,13 @@ fn main() {
     let refused: Vec<String> = every_move
         .iter()
         .filter(|declared| {
-            read_substitution(complex, &declared.substitution, &contexts, PivotRule::SmallestMagnitude)
-                .is_err()
+            read_substitution(
+                complex,
+                &declared.substitution,
+                &contexts,
+                PivotRule::SmallestMagnitude,
+            )
+            .is_err()
         })
         .map(|declared| declared.deposits.join(" "))
         .collect();
@@ -566,10 +587,7 @@ fn main() {
         split_only.supported.len(),
         split_only.open.len()
     );
-    println!(
-        "  invariant factors above one: {:?}",
-        split_only.torsion()
-    );
+    println!("  invariant factors above one: {:?}", split_only.torsion());
 
     let doubled = split_only.reached_only_in_multiple();
     println!(
@@ -694,10 +712,7 @@ fn main() {
         "    Invisible admits {} moves -- the ones no declared context can see",
         narrow.placed.admitted.len()
     );
-    println!(
-        "    EveryRead admits {} moves",
-        wide.placed.admitted.len()
-    );
+    println!("    EveryRead admits {} moves", wide.placed.admitted.len());
     println!(
         "    open classes            {} -> {}",
         narrow.placed.placement.open.len(),
@@ -708,7 +723,9 @@ fn main() {
     println!("\n    discharge_substitutions  {widening:?}");
     println!("    placement::discharge     {miscalled:?}   <- the convicted reading");
 
-    println!("\n  the moves the invisible aperture admits -- real substitutions no declared context");
+    println!(
+        "\n  the moves the invisible aperture admits -- real substitutions no declared context"
+    );
     println!("  can tell apart, which is what a compression is here:");
     for realizer in &narrow.placed.admitted {
         let position = realizer.0 as usize;
@@ -749,7 +766,10 @@ fn main() {
         "  the unreached population above it: many moves land identically, so the {} rows span a",
         every_move.len()
     );
-    println!("  space of dimension {}.", wide.placed.placement.support.supported_rank);
+    println!(
+        "  space of dimension {}.",
+        wide.placed.placement.support.supported_rank
+    );
     println!("\n  a passage name marked * was derived by the conditioned body.");
 
     println!("\n  SUPPORTED");
@@ -877,14 +897,19 @@ fn main() {
     );
 
     let contexts_disagree = split_and_deposit.iter().any(|declared| {
-        read_substitution(complex, &declared.substitution, &contexts, PivotRule::SmallestMagnitude)
-            .map(|reading| {
-                reading
-                    .verdicts
-                    .windows(2)
-                    .any(|pair| pair[0].remainder != pair[1].remainder)
-            })
-            .unwrap_or(false)
+        read_substitution(
+            complex,
+            &declared.substitution,
+            &contexts,
+            PivotRule::SmallestMagnitude,
+        )
+        .map(|reading| {
+            reading
+                .verdicts
+                .windows(2)
+                .any(|pair| pair[0].remainder != pair[1].remainder)
+        })
+        .unwrap_or(false)
     });
     controls.check(
         "two declared contexts return different remainders for the same move",

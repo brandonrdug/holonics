@@ -141,7 +141,12 @@ fn main() {
         let mut ranked: Vec<_> = table.iter().collect();
         ranked.sort_by(|a, b| b.1.cmp(a.1).then(a.0.cmp(b.0)));
         let occ: u64 = table.values().sum();
-        writeln!(vocab, "#{label}\tdistinct\t{}\toccurrences\t{occ}", table.len()).unwrap();
+        writeln!(
+            vocab,
+            "#{label}\tdistinct\t{}\toccurrences\t{occ}",
+            table.len()
+        )
+        .unwrap();
         for (symbol, count) in ranked.iter().take(120) {
             writeln!(vocab, "{label}\t{symbol}\t{count}").unwrap();
         }
@@ -169,7 +174,12 @@ fn main() {
             .unwrap();
         }
         for lost in &reading.unopened {
-            writeln!(unopened, "{path}\t{}\t{}\t{}", lost.line, lost.former, lost.name).unwrap();
+            writeln!(
+                unopened,
+                "{path}\t{}\t{}\t{}",
+                lost.line, lost.former, lost.name
+            )
+            .unwrap();
         }
         let commentary_occ: u32 = reading.commentary.values().sum();
         let preamble_occ: u32 = reading.preamble.values().sum();
@@ -202,7 +212,9 @@ fn main() {
     }
 
     for ((path, _), read) in texts.iter().zip(one.iter()) {
-        if summary_only { break; }
+        if summary_only {
+            break;
+        }
         match read {
             Some(derivation) => writeln!(
                 deriv,

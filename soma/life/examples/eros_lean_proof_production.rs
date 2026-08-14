@@ -280,10 +280,7 @@ fn main() {
     println!("\n=== the corpus that crossed");
     let corpus = collect_lean_documents(&corpus_root).expect("the formal corpus reads");
     let corpus_bytes: usize = corpus.iter().map(|document| document.text.len()).sum();
-    println!(
-        "    {} Lean documents, {corpus_bytes} bytes",
-        corpus.len()
-    );
+    println!("    {} Lean documents, {corpus_bytes} bytes", corpus.len());
     for document in &corpus {
         println!("      {}", document.path);
     }
@@ -303,14 +300,23 @@ fn main() {
         "      retained source surfaces  {}",
         receipt.retained_source_surfaces
     );
-    println!("      declaration organs        {}", receipt.declaration_organs);
+    println!(
+        "      declaration organs        {}",
+        receipt.declaration_organs
+    );
     println!("      binder charts             {}", receipt.binder_charts);
     println!(
         "      declaration relations     {}",
         receipt.declaration_relations
     );
-    println!("      mounted codecs            {:?}", receipt.mounted_codecs);
-    println!("      tactic species            {:?}", receipt.tactic_species);
+    println!(
+        "      mounted codecs            {:?}",
+        receipt.mounted_codecs
+    );
+    println!(
+        "      tactic species            {:?}",
+        receipt.tactic_species
+    );
 
     let native = ecology.to_native_bytes().expect("standing rests natively");
     let native_text = String::from_utf8_lossy(&native).into_owned();
@@ -346,13 +352,22 @@ fn main() {
                 mathlib.theorem_header.lines().next().unwrap_or_default()
             );
             println!("    source scope       {:?}", mathlib.source_scope);
-            println!("    declaration star   {:?}", reached.iter().collect::<Vec<_>>());
+            println!(
+                "    declaration star   {:?}",
+                reached.iter().collect::<Vec<_>>()
+            );
             println!("    proof paths        {}", candidates.len());
             println!("    two generated paths, verbatim:");
-            for candidate in candidates.iter().filter(|candidate| {
-                !candidate.declaration_lineage.is_empty()
-            }).take(2) {
-                println!("      --- ordinal {} lineage {:?}", candidate.ordinal, lineage(candidate));
+            for candidate in candidates
+                .iter()
+                .filter(|candidate| !candidate.declaration_lineage.is_empty())
+                .take(2)
+            {
+                println!(
+                    "      --- ordinal {} lineage {:?}",
+                    candidate.ordinal,
+                    lineage(candidate)
+                );
                 println!("{}", indent(&candidate.proof, "          "));
             }
             failures.require(
@@ -463,10 +478,12 @@ fn main() {
     );
 
     // ---------------------------------------------------------------- partial ablation
-    println!("\n=== control: partial structural ablation — one declaration removed from the corpus");
+    println!(
+        "\n=== control: partial structural ablation — one declaration removed from the corpus"
+    );
     let ablated_corpus = ablate_corpus(&corpus, ABLATED_DECLARATION);
-    let ablated = LeanMathematicsEcology::condition(&ablated_corpus)
-        .expect("the ablated corpus conditions");
+    let ablated =
+        LeanMathematicsEcology::condition(&ablated_corpus).expect("the ablated corpus conditions");
     let present_before = ecology
         .declarations()
         .any(|organ| organ.name == ABLATED_DECLARATION);
@@ -568,7 +585,10 @@ fn main() {
 
     // ---------------------------------------------------------------- the return
     println!("\n=== the return");
-    println!("    conditioned declaration organs   {}", receipt.declaration_organs);
+    println!(
+        "    conditioned declaration organs   {}",
+        receipt.declaration_organs
+    );
     println!("    proof paths generated            {}", candidates.len());
     println!(
         "    kernel-admitted                  {}",
@@ -579,7 +599,10 @@ fn main() {
         returns.obstruction_extent()
     );
     println!("    admitted with recruited organ    {admitted_with_lineage}");
-    println!("    scratch                          {}", scratch_root.display());
+    println!(
+        "    scratch                          {}",
+        scratch_root.display()
+    );
     let kernel_millis: u64 = returns
         .members()
         .iter()
@@ -600,7 +623,10 @@ fn main() {
              others. Removing that organ removed exactly that admitted conduct."
         );
     } else {
-        eprintln!("\nFAILED — {} declared control(s) did not hold:", failures.0.len());
+        eprintln!(
+            "\nFAILED — {} declared control(s) did not hold:",
+            failures.0.len()
+        );
         for claim in &failures.0 {
             eprintln!("  - {claim}");
         }

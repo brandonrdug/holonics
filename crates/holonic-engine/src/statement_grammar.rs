@@ -267,7 +267,10 @@ impl StatementReading {
 /// It is `read_derivation`'s own normalization, restated here because a composed statement must be
 /// in the same form as a deposited one or the two could never be compared.
 pub fn normalize(statement: &str) -> String {
-    statement.split_whitespace().collect::<Vec<&str>>().join(" ")
+    statement
+        .split_whitespace()
+        .collect::<Vec<&str>>()
+        .join(" ")
 }
 
 /// What the recovered grammar cannot do, with the material that witnesses each bound.
@@ -299,7 +302,10 @@ pub enum GrammarAperture {
     ArgumentPositionNeverCarriedAnApplication { arguments: BTreeSet<String> },
     /// One token stood in first position of a decomposable region with two different token counts
     /// after it, so its arity is not a property of the population.
-    HeadArityConflicts { head: String, arities: BTreeSet<usize> },
+    HeadArityConflicts {
+        head: String,
+        arities: BTreeSet<usize>,
+    },
     /// The population never witnessed a leading region with no bracket group in it, so the empty
     /// list is unfounded and a composition may not produce one.
     EmptyBinderListNeverWitnessed { witnessed: BTreeSet<usize> },
@@ -320,7 +326,10 @@ impl std::fmt::Display for GrammarAperture {
                 admitted.join(", ")
             ),
             Self::NoBracketPairBalances => {
-                write!(formatter, "no ordered punctuation pair balances; the population exhibits no nesting")
+                write!(
+                    formatter,
+                    "no ordered punctuation pair balances; the population exhibits no nesting"
+                )
             }
             Self::SeparatorIsNotUnique { admitted } => write!(
                 formatter,
@@ -715,11 +724,7 @@ fn depths(statement: &str, open: char, close: char) -> Option<Vec<usize>> {
             }
         }
     }
-    if depth == 0 {
-        Some(profile)
-    } else {
-        None
-    }
+    if depth == 0 { Some(profile) } else { None }
 }
 
 /// Recover a statement grammar from a statement population.
@@ -761,9 +766,7 @@ pub fn recover(
             let balances = statements
                 .iter()
                 .all(|statement| depths(statement, *open, *close).is_some());
-            let opens = statements
-                .iter()
-                .any(|statement| statement.contains(*open));
+            let opens = statements.iter().any(|statement| statement.contains(*open));
             if balances && opens {
                 balanced_pairs.push((*open, *close));
             }
@@ -860,7 +863,8 @@ pub fn recover(
                     }
                     if symbol == open && depth[at] == 0 {
                         let mut through = at + 1;
-                        while through < leading.through && !(bytes[through] as char == close && depth[through] == 1)
+                        while through < leading.through
+                            && !(bytes[through] as char == close && depth[through] == 1)
                         {
                             through += 1;
                         }
@@ -930,10 +934,7 @@ pub fn recover(
                     token: token.clone(),
                 };
                 aperture.push(refused.clone());
-                let span = Span::new(
-                    carried[0].0.at,
-                    carried[carried.len() - 1].0.through,
-                );
+                let span = Span::new(carried[0].0.at, carried[carried.len() - 1].0.through);
                 body = Some(BodyReading::Undecomposed {
                     span,
                     refused_by: refused.to_string(),
@@ -958,12 +959,10 @@ pub fn recover(
                     })
                     .collect();
                 if let Some((open, _)) = bracket
-                    && arguments
-                        .iter()
-                        .any(|slot| slot.occupant.starts_with(open))
-                    {
-                        argument_carried_a_group = true;
-                    }
+                    && arguments.iter().any(|slot| slot.occupant.starts_with(open))
+                {
+                    argument_carried_a_group = true;
+                }
                 heads
                     .entry(head.occupant.clone())
                     .or_default()
@@ -975,7 +974,8 @@ pub fn recover(
             residue.push(GrammarResidue {
                 span: whole,
                 text: statement.clone(),
-                refused_by: "no separator was recovered, so the statement founds no split".to_owned(),
+                refused_by: "no separator was recovered, so the statement founds no split"
+                    .to_owned(),
             });
         }
 
@@ -1128,10 +1128,7 @@ mod tests {
         assert_eq!(grammar.balanced_pairs(), &[('(', ')')]);
         // the reversed pair goes negative at the first character of the first statement
         assert!(!grammar.balanced_pairs().contains(&(')', '(')));
-        assert_eq!(
-            grammar.punctuation(),
-            &BTreeSet::from(['(', ')', ':', '='])
-        );
+        assert_eq!(grammar.punctuation(), &BTreeSet::from(['(', ')', ':', '=']));
     }
 
     #[test]
@@ -1176,7 +1173,11 @@ mod tests {
         assert_eq!(reading.binders[0].text(&reading.statement), "(P : Prop)");
         assert_eq!(reading.binders[0].names[0].occupant, "P");
         assert_eq!(
-            reading.binders[0].carried.as_ref().expect("carried").occupant,
+            reading.binders[0]
+                .carried
+                .as_ref()
+                .expect("carried")
+                .occupant,
             "Prop"
         );
         assert_eq!(reading.binders[1].text(&reading.statement), "(h : P)");
@@ -1201,10 +1202,12 @@ mod tests {
         assert!(grammar.sequence_is_founded());
         assert!(grammar.binder_length_is_founded(3));
         assert!(!grammar.binder_length_is_founded(0));
-        assert!(grammar.aperture().iter().any(|bound| matches!(
-            bound,
-            GrammarAperture::EmptyBinderListNeverWitnessed { .. }
-        )));
+        assert!(
+            grammar.aperture().iter().any(|bound| matches!(
+                bound,
+                GrammarAperture::EmptyBinderListNeverWitnessed { .. }
+            ))
+        );
     }
 
     #[test]
@@ -1236,7 +1239,10 @@ mod tests {
     #[test]
     fn no_argument_position_in_the_population_ever_carried_a_group_and_the_grammar_says_so() {
         let grammar = recover(&deposited()).expect("recovers");
-        assert_eq!(grammar.witnessed_arguments(), BTreeSet::from(["P".to_owned()]));
+        assert_eq!(
+            grammar.witnessed_arguments(),
+            BTreeSet::from(["P".to_owned()])
+        );
         assert!(grammar.aperture().iter().any(|bound| matches!(
             bound,
             GrammarAperture::ArgumentPositionNeverCarriedAnApplication { .. }
@@ -1318,9 +1324,11 @@ mod tests {
         let population: BTreeSet<String> = ["a : b".to_owned(), "c : d".to_owned()].into();
         let grammar = recover(&population).expect("recovers");
         assert_eq!(grammar.bracket(), None);
-        assert!(grammar
-            .aperture()
-            .contains(&GrammarAperture::NoBracketPairBalances));
+        assert!(
+            grammar
+                .aperture()
+                .contains(&GrammarAperture::NoBracketPairBalances)
+        );
         // the split is still recovered: `:` occurs once at depth zero in both
         assert_eq!(grammar.separator(), Some(':'));
     }
@@ -1338,9 +1346,11 @@ mod tests {
         assert_eq!(grammar.bracket(), Some((':', '=')));
         // and having spent both characters on the bracket, nothing is left to split on
         assert_eq!(grammar.separator(), None);
-        assert!(grammar
-            .aperture()
-            .contains(&GrammarAperture::NoSeparatorOccursOnceAtDepthZeroInEveryStatement));
+        assert!(
+            grammar
+                .aperture()
+                .contains(&GrammarAperture::NoSeparatorOccursOnceAtDepthZeroInEveryStatement)
+        );
         for reading in grammar.readings() {
             assert_eq!(reading.residue.len(), 1);
             assert_eq!(reading.residue[0].text, reading.statement);
@@ -1358,15 +1368,19 @@ mod tests {
         let grammar = recover(&population).expect("recovers");
         assert_eq!(grammar.bracket(), None);
         assert!(grammar.balanced_pairs().len() > 1);
-        assert!(grammar.aperture().iter().any(|bound| matches!(
-            bound,
-            GrammarAperture::BracketPairIsNotUnique { .. }
-        )));
+        assert!(
+            grammar
+                .aperture()
+                .iter()
+                .any(|bound| matches!(bound, GrammarAperture::BracketPairIsNotUnique { .. }))
+        );
         assert_eq!(grammar.separator(), None);
-        assert!(grammar.aperture().iter().any(|bound| matches!(
-            bound,
-            GrammarAperture::SeparatorIsNotUnique { .. }
-        )));
+        assert!(
+            grammar
+                .aperture()
+                .iter()
+                .any(|bound| matches!(bound, GrammarAperture::SeparatorIsNotUnique { .. }))
+        );
         for reading in grammar.readings() {
             assert_eq!(reading.residue.len(), 1);
             assert_eq!(reading.residue[0].text, reading.statement);

@@ -146,7 +146,11 @@ impl FieldChart {
     /// order.
     pub fn quadric_monomials(&self) -> Vec<FieldQuadricMonomial> {
         let mut monomials = Vec::with_capacity(self.quadric_coefficient_count());
-        monomials.extend(self.axes.iter().map(|axis| FieldQuadricMonomial::Square(*axis)));
+        monomials.extend(
+            self.axes
+                .iter()
+                .map(|axis| FieldQuadricMonomial::Square(*axis)),
+        );
         for (position, left) in self.axes.iter().enumerate() {
             for right in &self.axes[position + 1..] {
                 monomials.push(FieldQuadricMonomial::Cross(
@@ -155,7 +159,11 @@ impl FieldChart {
                 ));
             }
         }
-        monomials.extend(self.axes.iter().map(|axis| FieldQuadricMonomial::Linear(*axis)));
+        monomials.extend(
+            self.axes
+                .iter()
+                .map(|axis| FieldQuadricMonomial::Linear(*axis)),
+        );
         monomials.push(FieldQuadricMonomial::Constant);
         monomials
     }
@@ -989,11 +997,7 @@ fn admit_source_torus(
             chart,
         });
     }
-    if let Some(law) = occurrence
-        .phases
-        .values()
-        .find(|law| *law.chart() != chart)
-    {
+    if let Some(law) = occurrence.phases.values().find(|law| *law.chart() != chart) {
         return Err(FieldAtlasError::PhaseLawChartMismatch {
             region: occurrence.region,
             declared: chart,
@@ -1962,7 +1966,9 @@ pub enum FieldAtlasError {
         region: FieldRegionId,
         chart: FieldChart,
     },
-    #[error("region {region:?} declares chart {declared:?}; the supplied phase law reads {supplied:?}")]
+    #[error(
+        "region {region:?} declares chart {declared:?}; the supplied phase law reads {supplied:?}"
+    )]
     PhaseLawChartMismatch {
         region: FieldRegionId,
         declared: FieldChart,
@@ -2117,8 +2123,7 @@ mod tests {
                 "the enumerated monomials must be exactly C(n+2,2)"
             );
             assert_eq!(chart.affine_coefficient_count(), affine);
-            let tangents =
-                chart_tangent_basis(&chart, &RatVec3::from_i64(1, 1, 1)).unwrap();
+            let tangents = chart_tangent_basis(&chart, &RatVec3::from_i64(1, 1, 1)).unwrap();
             assert_eq!(
                 tangents.len(),
                 dimension - 1,
@@ -2129,7 +2134,10 @@ mod tests {
 
     #[test]
     fn a_declared_chart_refuses_an_empty_or_repeated_coordinate_list() {
-        assert_eq!(FieldChart::new(Vec::new()), Err(FieldAtlasError::EmptyChart));
+        assert_eq!(
+            FieldChart::new(Vec::new()),
+            Err(FieldAtlasError::EmptyChart)
+        );
         assert_eq!(
             FieldChart::new(vec![FieldChartAxis::X, FieldChartAxis::X]),
             Err(FieldAtlasError::RepeatedChartAxis)
@@ -2183,9 +2191,7 @@ mod tests {
         let region = FieldRegionId(11);
         let channel = FieldPhaseChannel::Declared(1);
         // `3x + 5y + 7`, read on material that never leaves the plane z = 0.
-        let phase_of = |point: &RatVec3| {
-            integer(3) * &point.x + integer(5) * &point.y + integer(7)
-        };
+        let phase_of = |point: &RatVec3| integer(3) * &point.x + integer(5) * &point.y + integer(7);
         let samples = || {
             coplanar_circle_samples(region)
                 .into_iter()
@@ -2213,9 +2219,8 @@ mod tests {
             "coplanar material can never pivot the ambient chart's fourth coordinate"
         );
 
-        let (plane_variables, plane_law) = resolved_phase(
-            FieldChart::new(vec![FieldChartAxis::X, FieldChartAxis::Y]).unwrap(),
-        );
+        let (plane_variables, plane_law) =
+            resolved_phase(FieldChart::new(vec![FieldChartAxis::X, FieldChartAxis::Y]).unwrap());
         assert_eq!(plane_variables, 3);
         let plane_law = plane_law.expect("the same material resolves the affine law in its plane");
         assert_eq!(
@@ -2281,7 +2286,9 @@ mod tests {
             receiver_contact: None,
         };
         let mut standing = law.initial_standing();
-        standing.declare_region_chart(region, chart.clone()).unwrap();
+        standing
+            .declare_region_chart(region, chart.clone())
+            .unwrap();
 
         let mut refused = empty_event(1, 1);
         refused.oriented_samples = vec![sample(RatVec3::from_i64(0, 0, 1))];
@@ -2304,7 +2311,10 @@ mod tests {
         let region = FieldRegionId(9);
         let mut event = empty_event(1, 1);
         event.oriented_samples = sphere_samples(region);
-        let mut standing = law.enact(&law.initial_standing(), &event).unwrap().standing_after;
+        let mut standing = law
+            .enact(&law.initial_standing(), &event)
+            .unwrap()
+            .standing_after;
         assert_eq!(
             standing.declare_region_chart(
                 region,
@@ -2398,7 +2408,9 @@ mod tests {
         let region = FieldRegionId(2);
         let chart = FieldChart::new(vec![FieldChartAxis::X, FieldChartAxis::Y]).unwrap();
         let mut standing = law.initial_standing();
-        standing.declare_region_chart(region, chart.clone()).unwrap();
+        standing
+            .declare_region_chart(region, chart.clone())
+            .unwrap();
         let mut event = empty_event(1, 1);
         event.source_tori.push(SourceTorusOccurrence {
             region,

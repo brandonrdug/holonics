@@ -102,7 +102,9 @@ fn describe(separation: &RootSeparation) -> String {
 /// Station 1. The bound, held against separations that are known exactly.
 fn the_bound_against_what_is_known() {
     rule("station 1 — Mahler's bound against separations known exactly");
-    println!("  f                          disc      ||f||_2^2   S                     sep^2   S < sep^2");
+    println!(
+        "  f                          disc      ||f||_2^2   S                     sep^2   S < sep^2"
+    );
     let family: [(&str, Vec<i64>, Rat); 5] = [
         ("x^2 - 2", vec![-2, 0, 1], integer(8)),
         ("x^2 - x - 1", vec![-1, -1, 1], integer(5)),
@@ -127,7 +129,9 @@ fn the_bound_against_what_is_known() {
         );
     }
 
-    println!("\n  scale invariance — disc moves by c^(2n-2), the norm by c^2, the bound by nothing");
+    println!(
+        "\n  scale invariance — disc moves by c^(2n-2), the norm by c^2, the bound by nothing"
+    );
     let base = RationalPolynomial::new(vec![integer(-6), integer(11), integer(-6), integer(1)]);
     for factor in [1_i64, 2, 3, 5] {
         let scaled = holonic_engine::exact_value::IntegerPolynomial::new(
@@ -149,7 +153,9 @@ fn the_bound_against_what_is_known() {
     println!(
         "\n  two routes to the same discriminant, and both their costs (CLAUDE.md §8: where an"
     );
-    println!("  independent implementation exists, state both costs — measured in work, never in time)");
+    println!(
+        "  independent implementation exists, state both costs — measured in work, never in time)"
+    );
     println!("  f                          disc            Euclidean steps   Sylvester/Bareiss");
     let cost_family: [(&str, Vec<i64>); 4] = [
         ("x^2 - 2", vec![-2, 0, 1]),
@@ -175,7 +181,8 @@ fn the_bound_against_what_is_known() {
             resultant_in_eliminated_variable(&lift(&rational), &lift(&rational.derivative()))
                 .expect("both have positive degree");
         let degree = integral.degree();
-        let mut by_sylvester = sylvester.coefficient(0) / rational.leading().expect("leads").clone();
+        let mut by_sylvester =
+            sylvester.coefficient(0) / rational.leading().expect("leads").clone();
         if (degree * (degree - 1) / 2) % 2 == 1 {
             by_sylvester = -by_sylvester;
         }
@@ -293,15 +300,13 @@ fn near_cancelling(index: usize) -> SymmetricCirculant {
 
 /// The excised aperture, replayed against the public star table: the refinements needed to put an
 /// enclosure strictly on one side of zero, refusing at `cap` exactly as `REFINEMENT_APERTURE` did.
-fn refinements_to_decide(
-    form: &SymmetricCirculant,
-    character: usize,
-    cap: usize,
-) -> Option<usize> {
+fn refinements_to_decide(form: &SymmetricCirculant, character: usize, cap: usize) -> Option<usize> {
     let (_, symbol) = form.integral_symbol();
     let mut table = StarTable::found(form.extent()).expect("the star table founds");
     for taken in 0..=cap {
-        let enclosure = table.enclose(&symbol, character).expect("the symbol encloses");
+        let enclosure = table
+            .enclose(&symbol, character)
+            .expect("the symbol encloses");
         if enclosure.lower.is_positive() || enclosure.upper.is_negative() {
             return Some(taken);
         }
@@ -319,7 +324,9 @@ fn the_winding_orbit() {
     println!(
         "  circ(-p, q, 0, 0, 0, 0, 0, q) on eight characters. lambda_1 = q sqrt2 - p, whose size is"
     );
-    println!("  1/(p + q sqrt2) against coefficients of size q, so the refinements grow like log(q^2).");
+    println!(
+        "  1/(p + q sqrt2) against coefficients of size q, so the refinements grow like log(q^2)."
+    );
     println!(
         "\n  index   q                      |lambda_1| ~   refinements   replay at the excised {EXCISED_REFINEMENT_APERTURE}"
     );
@@ -407,14 +414,20 @@ fn the_ceiling_nothing_reaches() {
     println!(
         "\n  Nothing reaches it. The star values are 2cos(2*pi*m/n) and their smallest gap is"
     );
-    println!("  4 sin^2(pi/n) ~ 4*pi^2/n^2, so a descent of {EXCISED_ISOLATION_APERTURE} splits from width 6 needs a gap under");
-    println!("  6*2^-{EXCISED_ISOLATION_APERTURE}, hence an extent past about 10^10 — at which `StarTable::found` would first");
+    println!(
+        "  4 sin^2(pi/n) ~ 4*pi^2/n^2, so a descent of {EXCISED_ISOLATION_APERTURE} splits from width 6 needs a gap under"
+    );
+    println!(
+        "  6*2^-{EXCISED_ISOLATION_APERTURE}, hence an extent past about 10^10 — at which `StarTable::found` would first"
+    );
     println!("  have to allocate n/2 + 1 isolating intervals. That is the material that would hit");
     println!("  this level, and it is not reachable.");
     println!(
         "\n  The excision therefore moves no return here, and the reachable population is not even"
     );
-    println!("  uniformly larger: the derived depth is TIGHTER than 64 at small extents (9 at C_3)");
+    println!(
+        "  uniformly larger: the derived depth is TIGHTER than 64 at small extents (9 at C_3)"
+    );
     println!("  and looser at large ones. What changes is what the refusal means — from an");
     println!("  exhausted allowance to a contradiction between Sturm and the discriminant.");
 }

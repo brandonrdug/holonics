@@ -253,7 +253,10 @@ fn main() -> Result<(), String> {
         .nth(1)
         .and_then(|read| read.parse().ok())
         .unwrap_or(32 * 1024 * 1024);
-    let above_cap = rollouts.iter().filter(|(octets, _)| *octets > rollout_cap).count();
+    let above_cap = rollouts
+        .iter()
+        .filter(|(octets, _)| *octets > rollout_cap)
+        .count();
     let (octets, rollout) = match named_rollout {
         Some(named) => {
             let octets = std::fs::metadata(&named)
@@ -265,20 +268,23 @@ fn main() -> Result<(), String> {
             .iter()
             .find(|(octets, _)| *octets <= rollout_cap)
             .cloned()
-            .ok_or_else(|| format!("every rollout on disk exceeds the declared cap {rollout_cap}"))?,
+            .ok_or_else(|| {
+                format!("every rollout on disk exceeds the declared cap {rollout_cap}")
+            })?,
     };
     println!("  rollouts on disk      {:>5}", rollouts.len());
     println!(
         "  above the cap         {above_cap:>5}   (cap {rollout_cap} octets, largest {})",
         rollouts[0].0
     );
-    println!("  the one taken         {} ({octets} octets)", rollout.display());
+    println!(
+        "  the one taken         {} ({octets} octets)",
+        rollout.display()
+    );
 
     let began = Instant::now();
-    let dialogue = ExactDialogueLineage::import_codex_rollout(
-        &rollout,
-        &CodexDialogueImportSpec::default(),
-    )?;
+    let dialogue =
+        ExactDialogueLineage::import_codex_rollout(&rollout, &CodexDialogueImportSpec::default())?;
     let receipt = dialogue.receipt();
     println!("\n  raw extent            {:>9}", receipt.raw_extent);
     println!("  raw prefix sha256     {}", receipt.raw_prefix_sha256);
@@ -310,7 +316,10 @@ fn main() -> Result<(), String> {
             "                                  BEFORE 2026-08-10 THIS CONTAINER WAS REFUSED WHOLE."
         );
     }
-    println!("  imported in           {:.2}s", began.elapsed().as_secs_f64());
+    println!(
+        "  imported in           {:.2}s",
+        began.elapsed().as_secs_f64()
+    );
 
     rule("THE REPOSITORY ATLAS — the second material");
 
@@ -359,13 +368,7 @@ fn main() -> Result<(), String> {
         )?,
     ];
 
-    let mut world = ExactResearchWorld::new(
-        &root,
-        &repository,
-        &dialogue,
-        quintic,
-        rust_specs,
-    )?;
+    let mut world = ExactResearchWorld::new(&root, &repository, &dialogue, quintic, rust_specs)?;
     println!(
         "  dialogue conditioned occurrences  {:>6}",
         world.dialogue_conditioned_occurrences()
@@ -398,9 +401,7 @@ fn main() -> Result<(), String> {
         "  region                {:?}",
         inert.region.iter().collect::<Vec<_>>()
     );
-    println!(
-        "  aperture ladder       refused at {inert_refused:?}, admitted at {inert_aperture}"
-    );
+    println!("  aperture ladder       refused at {inert_refused:?}, admitted at {inert_aperture}");
     println!("  sections returned     {:>6}", inert_return.sections.len());
     split_by_material(&inert_return).report("control/inert");
     println!(
@@ -415,10 +416,7 @@ fn main() -> Result<(), String> {
             "absent   <-- no leader anchored on it, so it does not exist"
         }
     );
-    println!(
-        "  code receipts         {}",
-        world.rust_receipts().len()
-    );
+    println!("  code receipts         {}", world.rust_receipts().len());
     if world.quintic_receipt().is_some() || !world.rust_receipts().is_empty() {
         return Err(
             "an exterior deed was enacted for a leader whose region anchored nothing".to_owned(),
@@ -490,7 +488,9 @@ fn main() -> Result<(), String> {
             occurrence.speaker == life::dialogue_lineage::DialogueSpeaker::User
                 && occurrence.text.split_whitespace().count() > 12
         })
-        .ok_or_else(|| "the container carried no user occurrence to read a region off".to_owned())?;
+        .ok_or_else(|| {
+            "the container carried no user occurrence to read a region off".to_owned()
+        })?;
     let region_words: Vec<String> = user_occurrence
         .text
         .split_whitespace()
@@ -500,14 +500,12 @@ fn main() -> Result<(), String> {
         .into_iter()
         .collect();
     let region: Vec<&str> = region_words.iter().map(String::as_str).collect();
-    println!("  the occurrence        {} ({:?})", user_occurrence.identity, user_occurrence.identity_species);
-    println!("  its region, verbatim  {region:?}");
-    let dialogue_leader = leader(
-        "leader/dialogue",
-        &user_occurrence.text,
-        &region,
-        3,
+    println!(
+        "  the occurrence        {} ({:?})",
+        user_occurrence.identity, user_occurrence.identity_species
     );
+    println!("  its region, verbatim  {region:?}");
+    let dialogue_leader = leader("leader/dialogue", &user_occurrence.text, &region, 3);
     let (dialogue_return, dialogue_aperture, dialogue_refused) =
         enact_at_admitting_aperture(&mut world, &repository, &dialogue_leader)?;
     println!(

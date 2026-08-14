@@ -69,17 +69,17 @@ use holonic_engine::algebraic::{
     CausalCellId, CausalChain, ComparativeMultiplicity, GradedCausalComplex,
 };
 use holonic_engine::causal::EventId;
-use holonic_engine::complex_system::{cell as cell_of_item, AddressReading, ComplexSystem};
-use holonic_engine::dilation::{dilate, Horizon, WalkOrder};
-use holonic_engine::inertia::{inertia, inertia_with_schedule, Inertia, PivotOrder, SymmetricForm};
+use holonic_engine::complex_system::{AddressReading, ComplexSystem, cell as cell_of_item};
+use holonic_engine::dilation::{Horizon, WalkOrder, dilate};
+use holonic_engine::inertia::{Inertia, PivotOrder, SymmetricForm, inertia, inertia_with_schedule};
 use holonic_engine::placement::Placement;
-use holonic_engine::rebase_invariants::{smith_normal_form, IntegerMatrix, PivotRule};
+use holonic_engine::rebase_invariants::{IntegerMatrix, PivotRule, smith_normal_form};
 use holonic_engine::skein::Substitution;
 use holonic_engine::substitution_realizers::{
-    place_substitutions, read_and_realize, RealizerAdmission, SubstitutionRealizers,
+    RealizerAdmission, SubstitutionRealizers, place_substitutions, read_and_realize,
 };
 use holonic_engine::supported_realizers::{
-    incidence, induced_placement, positive_form, quadratic_value, Realization,
+    Realization, incidence, induced_placement, positive_form, quadratic_value,
 };
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
@@ -142,8 +142,14 @@ fn tetrahedron() -> Tetrahedron {
         .map(|(low, mid, high)| {
             let mut boundary = CausalChain::default();
             boundary.add_term(edge_of(*low, *mid), ComparativeMultiplicity::positive(1u32));
-            boundary.add_term(edge_of(*mid, *high), ComparativeMultiplicity::positive(1u32));
-            boundary.add_term(edge_of(*low, *high), ComparativeMultiplicity::negative(1u32));
+            boundary.add_term(
+                edge_of(*mid, *high),
+                ComparativeMultiplicity::positive(1u32),
+            );
+            boundary.add_term(
+                edge_of(*low, *high),
+                ComparativeMultiplicity::negative(1u32),
+            );
             complex
                 .found_cell(format!("f{low}{mid}{high}"), source(), 2, boundary)
                 .expect("e_lm + e_mh - e_lh is a cycle")
@@ -176,15 +182,22 @@ impl Tetrahedron {
 
     /// The closed rim of one triangle: its three corners and its three sides, without the triangle.
     fn rim(&self, corners: [usize; 3], sides: [(usize, usize); 3]) -> BTreeSet<CausalCellId> {
-        let mut support: BTreeSet<CausalCellId> =
-            corners.iter().map(|corner| self.vertices[*corner]).collect();
+        let mut support: BTreeSet<CausalCellId> = corners
+            .iter()
+            .map(|corner| self.vertices[*corner])
+            .collect();
         for (left, right) in sides {
             support.insert(self.edge(left, right));
         }
         support
     }
 
-    fn filled(&self, face: usize, corners: [usize; 3], sides: [(usize, usize); 3]) -> BTreeSet<CausalCellId> {
+    fn filled(
+        &self,
+        face: usize,
+        corners: [usize; 3],
+        sides: [(usize, usize); 3],
+    ) -> BTreeSet<CausalCellId> {
         let mut support = self.rim(corners, sides);
         support.insert(self.faces[face]);
         support
@@ -561,10 +574,20 @@ fn main() {
 
     // ------------------------------------------------------------------ the receivers
     let receivers = vec![
-        dilate(complex, world.vertices[0], Horizon::Unbounded, WalkOrder::Breadth)
-            .expect("v0 is a cell"),
-        dilate(complex, world.vertices[1], Horizon::Unbounded, WalkOrder::Breadth)
-            .expect("v1 is a cell"),
+        dilate(
+            complex,
+            world.vertices[0],
+            Horizon::Unbounded,
+            WalkOrder::Breadth,
+        )
+        .expect("v0 is a cell"),
+        dilate(
+            complex,
+            world.vertices[1],
+            Horizon::Unbounded,
+            WalkOrder::Breadth,
+        )
+        .expect("v1 is a cell"),
     ];
     let system = ComplexSystem::declare(
         complex,
@@ -577,8 +600,7 @@ fn main() {
     // ------------------------------------------------------------------ the moves
     let moves = declared(&world);
     let labels: Vec<&str> = moves.iter().map(|(label, _)| *label).collect();
-    let substitutions: Vec<Substitution> =
-        moves.iter().map(|(_, made)| made.clone()).collect();
+    let substitutions: Vec<Substitution> = moves.iter().map(|(_, made)| made.clone()).collect();
     let founded: SubstitutionRealizers = read_and_realize(
         complex,
         &substitutions,
@@ -728,7 +750,9 @@ fn main() {
     );
 
     // ------------------------------------------------------------------ control 1, exhibited
-    println!("\n================ control: the transposed incidence, which is the way this is built wrong ================");
+    println!(
+        "\n================ control: the transposed incidence, which is the way this is built wrong ================"
+    );
     println!(
         "  handing `induced_placement` the transposed incidence returns a split of extent {} rather \
          than {}, and a nullity of {} where the corank of the class family is {}.",
@@ -746,22 +770,26 @@ fn main() {
         placement.class_extent - rank_over_integers,
         "which is exactly the assertion above that would have fired"
     );
-    println!("  the `negative == 0` check does NOT catch it: both are Gram matrices and both return");
+    println!(
+        "  the `negative == 0` check does NOT catch it: both are Gram matrices and both return"
+    );
     println!(
         "  negative {} — which is why positivity is not the evidence and the SPLIT is.",
         realizer_split.negative
     );
 
     // ------------------------------------------------------------------ control 2: the hand flips
-    let symmetric =
-        SymmetricForm::from_integer_matrix(&form).expect("a Gram matrix is symmetric");
+    let symmetric = SymmetricForm::from_integer_matrix(&form).expect("a Gram matrix is symmetric");
     let flipped = inertia(&symmetric.negated());
     println!("\n================ control: the hand flips, the split does not ================");
     print_split("MᵀM", split);
     print_split("−(MᵀM)", flipped);
     assert_eq!(flipped.positive, split.negative);
     assert_eq!(flipped.negative, split.positive);
-    assert_eq!(flipped.zero, split.zero, "the split is what no frame touches");
+    assert_eq!(
+        flipped.zero, split.zero,
+        "the split is what no frame touches"
+    );
     assert!(
         flipped.negative > 0,
         "the elimination must be able to return negatives, or `negative == 0` above is vacuous"
@@ -810,11 +838,10 @@ fn main() {
         RealizerAdmission::Invisible,
     ] {
         let elsewhere = place_substitutions(&system, &founded, aperture);
-        let their_realizations = founded
-            .realizations_under(aperture, &elsewhere.placement.compression.conduct);
+        let their_realizations =
+            founded.realizations_under(aperture, &elsewhere.placement.compression.conduct);
         let their_matrix = incidence(&their_realizations, elsewhere.placement.class_extent);
-        let their_split =
-            induced_placement(&their_matrix).expect("a Gram matrix is symmetric");
+        let their_split = induced_placement(&their_matrix).expect("a Gram matrix is symmetric");
         println!(
             "  {aperture:?}: {} admitted   {}",
             elsewhere.admitted.len(),
@@ -883,9 +910,16 @@ fn main() {
     // an invariant of the incidence over ℤ. So the split is BLIND to it, and two populations with
     // genuinely different integral support return the same placement. That is a bound on this join
     // and it is exhibited rather than stated.
-    println!("\n================ the bound: the split is rational and the obstruction is integral ================");
+    println!(
+        "\n================ the bound: the split is rational and the obstruction is integral ================"
+    );
     let alone = |family: &[Substitution]| {
-        let read = read_and_realize(complex, family, &contexts(&world), PivotRule::SmallestMagnitude);
+        let read = read_and_realize(
+            complex,
+            family,
+            &contexts(&world),
+            PivotRule::SmallestMagnitude,
+        );
         let placed_alone = place_substitutions(&system, &read, RealizerAdmission::EveryRead);
         let their_realizations = read.realizations_under(
             RealizerAdmission::EveryRead,
@@ -899,7 +933,11 @@ fn main() {
     let (doubled, doubled_split) = alone(&substitutions[3..4]);
     for (label, placed_alone, their_split) in [
         ("fill the rim 012 once", &single, single_split),
-        ("fill the skeleton with BOTH at once", &doubled, doubled_split),
+        (
+            "fill the skeleton with BOTH at once",
+            &doubled,
+            doubled_split,
+        ),
     ] {
         println!(
             "  {label:<38}  split (positive {}, zero {}, negative {})   invariant factors {:?}   \

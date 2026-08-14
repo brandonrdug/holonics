@@ -499,7 +499,9 @@ pub enum MatroidError {
     RankZero,
     #[error("element {element} is a loop; this construction is stated for simple matroids")]
     Loop { element: usize },
-    #[error("elements {left} and {right} are parallel; this construction is stated for simple matroids")]
+    #[error(
+        "elements {left} and {right} are parallel; this construction is stated for simple matroids"
+    )]
     ParallelPair { left: usize, right: usize },
     #[error("(t − 1) failed to divide the characteristic polynomial; remainder {remainder}")]
     CharacteristicRemainder { remainder: String },
@@ -572,7 +574,10 @@ impl FlagMonomial {
 ///
 /// This is the instrument that lets an aperture wall be stated with counts. `Vámos` is refused as a
 /// ring by [`ChowRing::new`] only because this census says what it would cost.
-pub fn chain_monomial_census(matroid: &Matroid, degree: usize) -> Result<(usize, usize), ChowError> {
+pub fn chain_monomial_census(
+    matroid: &Matroid,
+    degree: usize,
+) -> Result<(usize, usize), ChowError> {
     let flats = matroid.proper_flats();
     let containment = strict_containment(&flats);
     let top = matroid.rank().saturating_sub(1);
@@ -609,7 +614,11 @@ fn composition_count(total: usize, parts: usize) -> usize {
 
 fn compositions(total: usize, parts: usize) -> Vec<Vec<usize>> {
     if parts == 0 {
-        return if total == 0 { vec![Vec::new()] } else { Vec::new() };
+        return if total == 0 {
+            vec![Vec::new()]
+        } else {
+            Vec::new()
+        };
     }
     let mut out = Vec::new();
     let ceiling = total.saturating_sub(parts - 1);
@@ -638,9 +647,7 @@ fn comparability(flats: &[Subset]) -> Vec<Vec<bool>> {
     (0..flats.len())
         .map(|left| {
             (0..flats.len())
-                .map(|right| {
-                    flats[left] & !flats[right] == 0 || flats[right] & !flats[left] == 0
-                })
+                .map(|right| flats[left] & !flats[right] == 0 || flats[right] & !flats[left] == 0)
                 .collect()
         })
         .collect()
@@ -662,9 +669,10 @@ fn extend_chains(
     let start = current.last().map_or(0, |last| last + 1);
     for next in start..containment.len() {
         if let Some(last) = current.last()
-            && !containment[*last][next] {
-                continue;
-            }
+            && !containment[*last][next]
+        {
+            continue;
+        }
         current.push(next);
         out.push(current.clone());
         if current.len() < max_length {
@@ -740,11 +748,7 @@ fn row_reduce(rows: &mut Vec<Vec<Rat>>, columns: usize) -> Vec<usize> {
 ///
 /// Exact throughout. The zero-skip in the inner loop is a cost decision and can never change what is
 /// returned: skipping a multiplication by zero is skipping a subtraction of zero.
-fn row_reduce_ordered(
-    rows: &mut Vec<Vec<Rat>>,
-    columns: usize,
-    sequence: &[usize],
-) -> Vec<usize> {
+fn row_reduce_ordered(rows: &mut Vec<Vec<Rat>>, columns: usize, sequence: &[usize]) -> Vec<usize> {
     let mut pivots = Vec::new();
     let mut cursor = 0usize;
     for column in sequence.iter().copied() {
@@ -996,7 +1000,9 @@ impl ChowRing {
     }
 
     pub fn dimensions(&self) -> Vec<usize> {
-        (0..=self.top).map(|degree| self.dimension(degree)).collect()
+        (0..=self.top)
+            .map(|degree| self.dimension(degree))
+            .collect()
     }
 
     pub fn chain_monomial_count(&self, degree: usize) -> usize {
@@ -1115,7 +1121,10 @@ impl ChowRing {
 
     /// The coefficients a set function assigns to the proper flats.
     pub fn coefficients_from_set_function(&self, value: impl Fn(Subset) -> i64) -> Vec<Rat> {
-        self.flats.iter().map(|flat| rational(value(*flat))).collect()
+        self.flats
+            .iter()
+            .map(|flat| rational(value(*flat)))
+            .collect()
     }
 
     /// `c(S) = |S| · (|E| − |S|)`, strictly submodular, hence an ample class.
@@ -1143,8 +1152,7 @@ impl ChowRing {
                 if left & !right == 0 || right & !left == 0 {
                     continue;
                 }
-                let slack =
-                    value(left) + value(right) - value(left | right) - value(left & right);
+                let slack = value(left) + value(right) - value(left | right) - value(left & right);
                 if slack < 0 {
                     return SubmodularVerdict::Violated {
                         left,
@@ -1304,7 +1312,10 @@ impl ChowRing {
         let power = self
             .top
             .checked_sub(2 * degree)
-            .ok_or(ChowError::DegreeAboveTheMiddle { degree, top: self.top })?;
+            .ok_or(ChowError::DegreeAboveTheMiddle {
+                degree,
+                top: self.top,
+            })?;
         let raised = self.power(class, power)?;
         let mut carried: Vec<Element> = Vec::with_capacity(extent);
         for column in 0..extent {
@@ -1662,11 +1673,7 @@ fn build_grade_with(
             }
             for composition in compositions(degree, chain.len()) {
                 collected.push(FlagMonomial {
-                    factors: chain
-                        .iter()
-                        .copied()
-                        .zip(composition.into_iter())
-                        .collect(),
+                    factors: chain.iter().copied().zip(composition.into_iter()).collect(),
                 });
             }
         }
@@ -1724,8 +1731,7 @@ fn build_grade_with(
     let mut kept: Option<(BasisOrder, Vec<usize>, Vec<Vec<Rat>>)> = None;
     let mut fallback: Option<(BasisOrder, Vec<usize>, Vec<Vec<Rat>>)> = None;
     for order in orders.iter().copied() {
-        let (basis, reduction, integral) =
-            reduce_to_basis(&rows, &monomials, columns, order);
+        let (basis, reduction, integral) = reduce_to_basis(&rows, &monomials, columns, order);
         dimension_by_order.push((order, basis.len()));
         if integral {
             kept = Some((order, basis, reduction));
@@ -1828,7 +1834,9 @@ pub enum ChowError {
     Matroid(#[from] MatroidError),
     #[error("rank {rank} is outside the declared aperture of {aperture}")]
     RankOutsideAperture { rank: usize, aperture: usize },
-    #[error("a matroid of rank {rank} has no proper nonempty flat, hence no generator and no class")]
+    #[error(
+        "a matroid of rank {rank} has no proper nonempty flat, hence no generator and no class"
+    )]
     NoProperFlats { rank: usize },
     #[error("the top grade must be free of rank one; this one has dimension {dimension}")]
     TopGradeNotOneDimensional { dimension: usize },
@@ -2102,7 +2110,9 @@ mod tests {
                     .iter()
                     .position(|flat| ring.matroid().rank_of(*flat) == step)
                     .expect("a flat of every rank exists");
-                flag = ring.multiply(&flag, &ring.generator(index).unwrap()).unwrap();
+                flag = ring
+                    .multiply(&flag, &ring.generator(index).unwrap())
+                    .unwrap();
             }
             // The flag just built is a chain only if each chosen flat contains the previous one;
             // when it is not, the product is zero and the degree is zero. Accept either, but a
@@ -2696,7 +2706,11 @@ mod tests {
             }
         }
         assert_eq!(admitted, vec!["U(3,3)".to_string()]);
-        assert_eq!(refused_at_the_diagonal.len(), 4, "{refused_at_the_diagonal:?}");
+        assert_eq!(
+            refused_at_the_diagonal.len(),
+            4,
+            "{refused_at_the_diagonal:?}"
+        );
     }
 
     /// The passages `U(3,3)` returns, named rather than counted.

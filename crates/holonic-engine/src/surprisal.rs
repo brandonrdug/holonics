@@ -68,8 +68,8 @@ use std::collections::BTreeMap;
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, Zero};
-use relational_geometry::exact_analysis::log_rational_interval;
 use relational_geometry::Rat;
+use relational_geometry::exact_analysis::log_rational_interval;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -399,7 +399,8 @@ pub fn read_population(
             None => Support::Unsupported,
             Some(count) if count.is_zero() => Support::Unsupported,
             Some(count) => {
-                let probability = Rat::new(BigInt::from(count.clone()), BigInt::from(total.clone()));
+                let probability =
+                    Rat::new(BigInt::from(count.clone()), BigInt::from(total.clone()));
                 Support::Supported(SymbolicSurprisal::of_probability(&probability)?)
             }
         };
@@ -563,7 +564,10 @@ mod tests {
 
         // H(P,Q) - H(P) = D_KL(P || Q) >= 0, and it is STRICT here because P != Q.
         let divergence = through_q.minus(&own);
-        assert!(!divergence.is_zero(), "P and Q differ, so the divergence does");
+        assert!(
+            !divergence.is_zero(),
+            "P and Q differ, so the divergence does"
+        );
         assert_eq!(
             divergence.compare(&SymbolicSurprisal::zero()).unwrap(),
             ExactOrdering::Greater,
@@ -611,11 +615,16 @@ mod tests {
         let log_five = SymbolicSurprisal::term(5, Rat::one()).unwrap();
 
         let fine = log_five.compare(&log_three).unwrap();
-        assert_eq!(fine, ExactOrdering::Greater, "log2(5) > log2(3) at the declared grain");
+        assert_eq!(
+            fine,
+            ExactOrdering::Greater,
+            "log2(5) > log2(3) at the declared grain"
+        );
 
         let coarse = log_five.compare_at(&log_three, 1, 4).unwrap();
         assert_eq!(
-            coarse, ExactOrdering::Open,
+            coarse,
+            ExactOrdering::Open,
             "at a grain too coarse to separate them the carrier declines to decide, and THAT is \
              the four-state ordering doing work rather than decorating a two-state answer"
         );
@@ -643,7 +652,10 @@ mod tests {
         // S(1/3) = log2(3) ~ 1.5849625007...
         let form = SymbolicSurprisal::of_probability(&rat(1, 3)).unwrap();
         let enclosure = form.enclosure().unwrap();
-        assert!(enclosure.lower < enclosure.upper, "an irrational form encloses, never points");
+        assert!(
+            enclosure.lower < enclosure.upper,
+            "an irrational form encloses, never points"
+        );
         assert!(enclosure.lower > rat(158, 100) && enclosure.upper < rat(159, 100));
     }
 
@@ -675,12 +687,19 @@ mod tests {
                 "member {event} must agree with the single-event read"
             );
         }
-        assert_eq!(read.get(&7), Some(&Support::Unsupported), "retained in place, by name");
+        assert_eq!(
+            read.get(&7),
+            Some(&Support::Unsupported),
+            "retained in place, by name"
+        );
         assert!(matches!(read.get(&1), Some(Support::Supported(_))));
 
         // An empty standing supports nothing, and says so per member rather than erroring.
         let none = read_population(&emitted, &BTreeMap::new()).unwrap();
-        assert!(none.values().all(|support| *support == Support::Unsupported));
+        assert!(
+            none.values()
+                .all(|support| *support == Support::Unsupported)
+        );
     }
 
     /// The grain carried as one receiver coordinate is the same reading as the two loose arguments.

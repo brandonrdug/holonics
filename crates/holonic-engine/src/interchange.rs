@@ -64,11 +64,11 @@ use num_bigint::BigUint;
 use serde::{Deserialize, Serialize};
 
 use crate::founded_receiver::{
-    found_at, found_to_exhaustion, gyration_of, panel_from_founded, AxisSpecies, FoundedPanel,
-    FoundedReceiver, FoundingRefusal, Gyration, WidenedSystem,
+    AxisSpecies, FoundedPanel, FoundedReceiver, FoundingRefusal, Gyration, WidenedSystem, found_at,
+    found_to_exhaustion, gyration_of, panel_from_founded,
 };
 use crate::receiver_exact_compression::{
-    compress, CollapsedPair, InputId, ItemId, ObservedSystem, Observation, Partition, ReceiverId,
+    CollapsedPair, InputId, ItemId, Observation, ObservedSystem, Partition, ReceiverId, compress,
 };
 
 /// One staged occurrence, named by the junction it founds a receiver at.
@@ -367,7 +367,14 @@ fn rebase(
     }
 
     let panel = panel_from_founded(system, standing, Vec::new());
-    order_from_panel(&panel, prefix.len(), sequence.to_vec(), taken, minted, refusal)
+    order_from_panel(
+        &panel,
+        prefix.len(),
+        sequence.to_vec(),
+        taken,
+        minted,
+        refusal,
+    )
 }
 
 /// Close a settled panel into a comparable order.
@@ -404,7 +411,10 @@ fn order_from_panel(
             .map(|found| (FoundedAxis::of(found), found.id))
             .collect(),
         delta: staged_axes.iter().map(FoundedAxis::of).collect(),
-        blocks_gained: staged_axes.iter().map(|found| found.blocks_gained).collect(),
+        blocks_gained: staged_axes
+            .iter()
+            .map(|found| found.blocks_gained)
+            .collect(),
         capacities,
         receivers: panel.founded.clone(),
         refusal,
@@ -592,7 +602,9 @@ fn assemble(
     let predecessor = predecessor_of(system, prefix);
 
     let all_rebased = orders.iter().all(RebasedOrder::rebased);
-    let conduct_agrees = orders.windows(2).all(|pair| pair[0].conduct == pair[1].conduct);
+    let conduct_agrees = orders
+        .windows(2)
+        .all(|pair| pair[0].conduct == pair[1].conduct);
     let endpoints_agree = orders
         .windows(2)
         .all(|pair| pair[0].one_shot == pair[1].one_shot);
@@ -703,9 +715,7 @@ fn decide(
 
     // 3. Does any receiver in the family have a distinguishing word for the orders? A pair one order
     //    separates and another identifies is exactly that, and it is Nerode pointed at orders.
-    if !identified_agrees
-        && let Some(word) = separating_pair(system, prefix, orders)
-    {
+    if !identified_agrees && let Some(word) = separating_pair(system, prefix, orders) {
         return Interchange::Ordered { because: word };
     }
 
@@ -748,7 +758,8 @@ fn decide(
     if !capacities_agree {
         for (i, left) in orders.iter().enumerate() {
             for (j, right) in orders.iter().enumerate().skip(i + 1) {
-                for ((axis, mine), (_, theirs)) in left.capacities.iter().zip(right.capacities.iter())
+                for ((axis, mine), (_, theirs)) in
+                    left.capacities.iter().zip(right.capacities.iter())
                 {
                     if mine != theirs {
                         return Interchange::Ordered {
@@ -796,8 +807,16 @@ fn witness_for(
         .map(|found| {
             (
                 found.id,
-                found.reads.get(&junction.0).copied().unwrap_or(Observation(0)),
-                found.reads.get(&junction.1).copied().unwrap_or(Observation(0)),
+                found
+                    .reads
+                    .get(&junction.0)
+                    .copied()
+                    .unwrap_or(Observation(0)),
+                found
+                    .reads
+                    .get(&junction.1)
+                    .copied()
+                    .unwrap_or(Observation(0)),
                 Vec::new(),
             )
         })
@@ -862,7 +881,7 @@ fn separating_pair(
 /// `CLAUDE.md` §8: a certificate that admits everything has measured nothing, and so has one that
 /// refuses everything. These are the two inputs on which it must return opposite verdicts.
 pub mod declared_material {
-    use super::{InputId, ItemId, ObservedSystem, Observation, ReceiverId};
+    use super::{InputId, ItemId, Observation, ObservedSystem, ReceiverId};
 
     /// **Two gadgets that never meet — the junctions ARE independent.**
     ///
@@ -1076,7 +1095,8 @@ mod tests {
     fn independent_junctions_interchange_and_the_certificate_admits() {
         let standing = junctions(&TwoGadgets);
         assert!(
-            standing.contains(&(ItemId(0), ItemId(1))) && standing.contains(&(ItemId(4), ItemId(5))),
+            standing.contains(&(ItemId(0), ItemId(1)))
+                && standing.contains(&(ItemId(4), ItemId(5))),
             "the fixture must present both junctions or the admission is vacuous: {standing:?}"
         );
         let certificate = certify_pair(
@@ -1127,7 +1147,8 @@ mod tests {
     fn coupled_junctions_are_refused_and_the_refusal_exhibits_its_witness() {
         let standing = junctions(&CoupledJunctions);
         assert!(
-            standing.contains(&(ItemId(0), ItemId(1))) && standing.contains(&(ItemId(0), ItemId(2))),
+            standing.contains(&(ItemId(0), ItemId(1)))
+                && standing.contains(&(ItemId(0), ItemId(2))),
             "both staged junctions must stand over the bare panel: {standing:?}"
         );
         let certificate = certify_pair(
@@ -1270,7 +1291,10 @@ mod tests {
             } => {
                 assert_eq!(occurrences, 3);
                 assert_eq!(orders_compared, 6, "3! orders");
-                assert_eq!(orders_lawful, 6, "every order must rebase, or the triple is vacuous");
+                assert_eq!(
+                    orders_lawful, 6,
+                    "every order must rebase, or the triple is vacuous"
+                );
                 assert!(agreed, "refused: {:?}", certificate.because());
             }
             other => panic!("expected AllOrders, got {other:?}"),
@@ -1304,7 +1328,11 @@ mod tests {
             certificate.all_rebased,
             "the two remaining junctions must still stand over the founded prefix"
         );
-        assert!(certificate.is_interchangeable(), "{:?}", certificate.because());
+        assert!(
+            certificate.is_interchangeable(),
+            "{:?}",
+            certificate.because()
+        );
         // The delta is the STAGED part only — the prefix is the predecessor, not the delta.
         assert_eq!(certificate.orders[0].delta.len(), 2);
     }

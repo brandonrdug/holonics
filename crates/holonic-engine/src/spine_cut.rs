@@ -71,10 +71,10 @@ use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::algebraic::{CausalCell, CausalCellId, CausalChain, GradedCausalComplex};
-use crate::inertia::{inertia, InertiaError, SymmetricForm};
-use crate::running_integral::PotentialSearch;
 use crate::VertexId;
+use crate::algebraic::{CausalCell, CausalCellId, CausalChain, GradedCausalComplex};
+use crate::inertia::{InertiaError, SymmetricForm, inertia};
+use crate::running_integral::PotentialSearch;
 
 // ---------------------------------------------------------------------------------------------
 // where q comes from
@@ -163,10 +163,7 @@ pub enum SpineCutError {
         "the drive admits no potential in the declared group: {chords} chord(s) stand, the first at \
          {first:?}, so q_n - q_m depends on the walk"
     )]
-    PotentialIsPathDependent {
-        chords: usize,
-        first: CausalCellId,
-    },
+    PotentialIsPathDependent { chords: usize, first: CausalCellId },
     /// An endpoint the potential search never reached. Its `q` is not zero; it is undefined, and
     /// returning zero would read an unvisited component as one that accumulated nothing.
     #[error("the potential search never reached {0:?}, so its q is undefined rather than zero")]
@@ -281,7 +278,11 @@ impl ChainReading {
     pub fn divergence(&self) -> BTreeMap<VertexId, Rat> {
         let mut divergence: BTreeMap<VertexId, Rat> = BTreeMap::new();
         for edge in &self.edges {
-            let flow = self.current.get(&edge.id).cloned().unwrap_or_else(Rat::zero);
+            let flow = self
+                .current
+                .get(&edge.id)
+                .cloned()
+                .unwrap_or_else(Rat::zero);
             if flow.is_zero() {
                 divergence.entry(edge.tail).or_insert_with(Rat::zero);
                 divergence.entry(edge.head).or_insert_with(Rat::zero);
@@ -487,10 +488,12 @@ pub fn read_counted_transfers(
     let mut edges = Vec::new();
     let mut current = BTreeMap::new();
     for transfer in transfers {
-        let population = transfer.population.ok_or(SpineCutError::PopulationNotCarried {
-            edge: transfer.id,
-            name: transfer.name.clone(),
-        })?;
+        let population = transfer
+            .population
+            .ok_or(SpineCutError::PopulationNotCarried {
+                edge: transfer.id,
+                name: transfer.name.clone(),
+            })?;
         edges.push(ChainEdge {
             id: transfer.id,
             tail: transfer.tail,
@@ -535,7 +538,9 @@ pub enum SinkReading {
     /// The diagnostics match neither published species, and the reason is named. A classifier with
     /// no such return would assign one of two labels to every head it was ever handed, which is a
     /// check whose material cannot vary the property under test.
-    Neither { why: &'static str },
+    Neither {
+        why: &'static str,
+    },
 }
 
 /// **The two published diagnostics, and nothing else.**
@@ -692,7 +697,12 @@ impl AttentionHead {
         if let Some(outside) = read.iter().find(|position| **position >= positions) {
             return Err(SpineCutError::PositionOutsideTheHead(*outside));
         }
-        Ok(Self { weights, values, sink, read })
+        Ok(Self {
+            weights,
+            values,
+            sink,
+            read,
+        })
     }
 
     pub fn positions(&self) -> usize {
@@ -709,9 +719,7 @@ impl AttentionHead {
             .values
             .get(position)
             .ok_or(SpineCutError::PositionOutsideTheHead(position))?;
-        Ok(row
-            .iter()
-            .fold(Rat::zero(), |sum, entry| sum + entry.abs()))
+        Ok(row.iter().fold(Rat::zero(), |sum, entry| sum + entry.abs()))
     }
 
     /// `O = A·V`, exactly.
@@ -722,10 +730,11 @@ impl AttentionHead {
             .map(|row| {
                 (0..extent)
                     .map(|column| {
-                        row.iter().zip(&self.values).fold(
-                            Rat::zero(),
-                            |sum, (weight, value)| sum + weight * &value[column],
-                        )
+                        row.iter()
+                            .zip(&self.values)
+                            .fold(Rat::zero(), |sum, (weight, value)| {
+                                sum + weight * &value[column]
+                            })
                     })
                     .collect()
             })
@@ -740,9 +749,9 @@ impl AttentionHead {
             .map(|left| {
                 (0..extent)
                     .map(|right| {
-                        output.iter().fold(Rat::zero(), |sum, row| {
-                            sum + &row[left] * &row[right]
-                        })
+                        output
+                            .iter()
+                            .fold(Rat::zero(), |sum, row| sum + &row[left] * &row[right])
                     })
                     .collect()
             })
@@ -1035,7 +1044,10 @@ mod tests {
         ChainReading {
             edges: theta(),
             current: current.iter().map(|(e, v)| (EdgeId(*e), rat(*v))).collect(),
-            residual: residual.iter().map(|(v, r)| (VertexId(*v), rat(*r))).collect(),
+            residual: residual
+                .iter()
+                .map(|(v, r)| (VertexId(*v), rat(*r)))
+                .collect(),
             potential_change: rat(change),
         }
     }
@@ -1058,7 +1070,11 @@ mod tests {
         let cut = name_the_cut(&reading(&[(3, 1), (2, 1)], &[], 0), &load()).unwrap();
         assert_eq!(cut.name(), "circulation j != 0");
         assert!(cut.returns());
-        let SpineCut::Circulation { crossed, divergence } = &cut else {
+        let SpineCut::Circulation {
+            crossed,
+            divergence,
+        } = &cut
+        else {
             panic!("the crossing is exhibited");
         };
         assert_eq!(*crossed, BTreeSet::from([EdgeId(3)]));
@@ -1085,7 +1101,13 @@ mod tests {
         ];
         assert_eq!(
             names,
-            vec!["rest", "leak", "accumulation", "short circuit", "circulation j != 0"]
+            vec![
+                "rest",
+                "leak",
+                "accumulation",
+                "short circuit",
+                "circulation j != 0"
+            ]
         );
         // and exactly one of them returns.
         assert_eq!(
@@ -1115,10 +1137,7 @@ mod tests {
     /// A load edge the incidence does not carry is refused by name.
     #[test]
     fn a_load_edge_outside_the_incidence_is_refused_by_name() {
-        let refusal = name_the_cut(
-            &reading(&[(1, 1)], &[], 0),
-            &BTreeSet::from([EdgeId(99)]),
-        );
+        let refusal = name_the_cut(&reading(&[(1, 1)], &[], 0), &BTreeSet::from([EdgeId(99)]));
         assert_eq!(refusal, Err(SpineCutError::LoadEdgeNotCarried(EdgeId(99))));
     }
 
@@ -1156,7 +1175,12 @@ mod tests {
         }
 
         /// `a -> b` by two parallel one-cells, so a cycle and an open path live on one incidence.
-        fn two_lane() -> (GradedCausalComplex, CausalCellId, CausalCellId, CausalCellId) {
+        fn two_lane() -> (
+            GradedCausalComplex,
+            CausalCellId,
+            CausalCellId,
+            CausalCellId,
+        ) {
             let mut complex = GradedCausalComplex::default();
             let a = zero_cell(&mut complex, "a");
             let b = zero_cell(&mut complex, "b");
@@ -1378,7 +1402,10 @@ mod tests {
             assert_eq!(diagnostics.sink_value_mass, rat(0));
             assert_eq!(diagnostics.output_rank, 0);
             assert_eq!(diagnostics.full_rank_bound, 3);
-            assert_eq!(diagnostics.species(), SinkReading::Species(SinkSpecies::Nop));
+            assert_eq!(
+                diagnostics.species(),
+                SinkReading::Species(SinkSpecies::Nop)
+            );
 
             let verdict = classify_sink(&head, SinkSpecies::Nop).expect("the label agrees");
             assert_eq!(verdict.cut.name(), "rest");
@@ -1393,7 +1420,10 @@ mod tests {
             let head = broadcast();
             let diagnostics = head.diagnose().expect("the head reads");
             assert_eq!(diagnostics.sink_value_mass, rat(1));
-            assert_eq!(diagnostics.output_rank, 1, "every query receives one aggregate");
+            assert_eq!(
+                diagnostics.output_rank, 1,
+                "every query receives one aggregate"
+            );
             assert_eq!(diagnostics.full_rank_bound, 3);
             assert_eq!(
                 diagnostics.species(),
@@ -1420,7 +1450,10 @@ mod tests {
             for edge in reading.carrying() {
                 let raw = edge.0 as usize;
                 let (tail, head_position) = (raw / 4, raw % 4);
-                assert!(tail == 3 || head_position == 3, "edge {tail} -> {head_position}");
+                assert!(
+                    tail == 3 || head_position == 3,
+                    "edge {tail} -> {head_position}"
+                );
             }
         }
 
@@ -1507,11 +1540,18 @@ mod tests {
 
             let verdict = classify_sink(&head, SinkSpecies::Broadcast).expect("the label agrees");
             assert_eq!(verdict.cut.name(), "leak");
-            assert!(!verdict.agrees(), "the chain refuses what the diagnostics accepted");
+            assert!(
+                !verdict.agrees(),
+                "the chain refuses what the diagnostics accepted"
+            );
             let SpineCut::Leak { at } = &verdict.cut else {
                 panic!("the source is exhibited");
             };
-            assert_eq!(at.get(&VertexId(3)), Some(&rat(-2)), "the hub is the source");
+            assert_eq!(
+                at.get(&VertexId(3)),
+                Some(&rat(-2)),
+                "the hub is the source"
+            );
         }
 
         /// **The short-circuit cut on this material**: a broadcast whose hub never delivers to the
@@ -1538,8 +1578,15 @@ mod tests {
             let verdict = classify_sink(&head, SinkSpecies::Broadcast).expect("the label agrees");
             assert_eq!(verdict.cut.name(), "short circuit");
             assert!(!verdict.cut.returns());
-            assert!(verdict.agrees(), "a short circuit is still a closed broadcast");
-            let SpineCut::ShortCircuit { bypass, declared_load } = &verdict.cut else {
+            assert!(
+                verdict.agrees(),
+                "a short circuit is still a closed broadcast"
+            );
+            let SpineCut::ShortCircuit {
+                bypass,
+                declared_load,
+            } = &verdict.cut
+            else {
                 panic!("the bypass is exhibited");
             };
             assert!(bypass.is_disjoint(declared_load));

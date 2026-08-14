@@ -12,11 +12,11 @@ use body::incidence::IncidenceHand;
 use body::manifold::FeltDeed;
 use body::num::Cog;
 use exact_pcm::{ExactPathChart, PcmWave};
-use life::form_mouth::deposit_form_or_message;
 use life::current_world::{
     present_native_event_with_regional, NativeEventCurrent, NativeRegionalArc,
     NativeRegionalRelation, NativeRelationOrgan,
 };
+use life::form_mouth::deposit_form_or_message;
 use num_bigint::BigUint;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};

@@ -130,10 +130,7 @@ fn abbreviate(vector: &[BigInt]) -> String {
             let text = entry.to_string();
             if text.len() > 22 {
                 let sign = if entry.is_negative() { "-" } else { "" };
-                format!(
-                    "{sign}~2^{}",
-                    entry.magnitude().bits().saturating_sub(1)
-                )
+                format!("{sign}~2^{}", entry.magnitude().bits().saturating_sub(1))
             } else {
                 text
             }
@@ -163,7 +160,10 @@ fn describe_provenance(face: &ExactFace) -> String {
                 SeriesTailCertificate::AbsoluteGeometric { .. } => "AbsoluteGeometric",
                 SeriesTailCertificate::ExactTail { .. } => "ExactTail",
             };
-            format!("CertifiedSeries/{species}, {} terms folded", series.terms_folded)
+            format!(
+                "CertifiedSeries/{species}, {} terms folded",
+                series.terms_folded
+            )
         }
         FaceProvenance::AnalyticEnclosure { carrier } => format!("exact_analysis::{carrier}"),
         FaceProvenance::IntegerCombination { parts } => {
@@ -233,9 +233,15 @@ fn report(reopening: &Reopening) {
     match &reopening.verdict {
         ReopeningVerdict::Candidate(candidate) => {
             println!("    RETURNED  {candidate}");
-            println!("      coefficients  {}", vector_text(&candidate.coefficients));
+            println!(
+                "      coefficients  {}",
+                vector_text(&candidate.coefficients)
+            );
             println!("      height        {}", candidate.height);
-            println!("      residual      {}", describe_enclosure(&candidate.residual));
+            println!(
+                "      residual      {}",
+                describe_enclosure(&candidate.residual)
+            );
             println!(
                 "      chance popn   {}  (expected coincidences in the searched population; \
                  admission needs < 1)",
@@ -372,13 +378,15 @@ fn main() {
         spurious += usize::from(three_returned) + usize::from(four_returned);
         println!(
             "      grains 2^{coarse:<3} / 2^{fine:<3}   three logs: {:<9} four logs: {}",
-            if three_returned { "RELATION" } else { "nothing" },
+            if three_returned {
+                "RELATION"
+            } else {
+                "nothing"
+            },
             if four_returned { "RELATION" } else { "nothing" }
         );
     }
-    println!(
-        "    spurious relations over 16 relation-free searches: {spurious}\n"
-    );
+    println!("    spurious relations over 16 relation-free searches: {spurious}\n");
 
     println!("-- control 3: precision dependence, exhibited twice --\n");
     println!("   3a. Starve the LATTICE. Machin's relation has height 16 over three faces, so it");
@@ -409,7 +417,9 @@ fn main() {
     );
 
     println!("\n   3b. Starve the TAIL. Same basis, same identity, but the arctangent series is");
-    println!("       folded to four terms instead of {ARCTAN_TERMS}. The discarded tail is what sets the");
+    println!(
+        "       folded to four terms instead of {ARCTAN_TERMS}. The discarded tail is what sets the"
+    );
     println!("       grain ceiling, so a starved tail cannot reach the grain the relation needs.");
     let coarse_a2 = arctan_face(2, 4);
     let coarse_a3 = arctan_face(3, 4);
@@ -425,7 +435,9 @@ fn main() {
     let ceiling = finest_admissible_grain(&coarse_basis);
     match ceiling {
         CertifiedBits::Bits(bits) => {
-            println!("       the tail permits at most 2^{bits}; asking for more is refused by name:");
+            println!(
+                "       the tail permits at most 2^{bits}; asking for more is refused by name:"
+            );
             let refusal = probe_at_grain(&coarse_basis, DeclaredGrain::bits(bits + 1))
                 .expect_err("past the aperture");
             println!("         {refusal}");
@@ -469,7 +481,9 @@ fn main() {
 
     println!("\n-- the reachability crossover, measured rather than assumed --");
     println!("   A relation of height A over n faces sits in a lattice whose spurious shortest");
-    println!("   vector has height about 2^(g/n), so the relation is the shortest vector only once");
+    println!(
+        "   vector has height about 2^(g/n), so the relation is the shortest vector only once"
+    );
     println!("   2^g exceeds A^n. For Machin that is 16^3 = 2^12. Sweeping the grain finds where");
     println!("   the crossover actually is:");
     let mut crossover: Option<u32> = None;
@@ -537,18 +551,24 @@ fn main() {
          {survived_count} survived it.",
         refuted_count + survived_count
     );
-    println!("   The algebra says why. A spurious vector has |sum a_i x_i| ~ 2^(g/n - g) while the");
-    println!("   enclosure half-width is ~2^(g/n - W), so the two cross at W = g -- and the aperture");
+    println!(
+        "   The algebra says why. A spurious vector has |sum a_i x_i| ~ 2^(g/n - g) while the"
+    );
+    println!(
+        "   enclosure half-width is ~2^(g/n - W), so the two cross at W = g -- and the aperture"
+    );
     println!("   rule already forces W >= g. So on faces whose tail was RETAINED past the grain,");
-    println!("   gate 1 alone carries the negative control. That is not a defence of gates 2 and 3;");
+    println!(
+        "   gate 1 alone carries the negative control. That is not a defence of gates 2 and 3;"
+    );
     println!("   it is the measurement refusing them here. A gate has to be shown load-bearing");
     println!("   somewhere or it is a check that cannot fail (`CLAUDE.md` §8).");
-    println!("\n   So: collapse the same faces to EXACTLY the grain, which is what a float does, and");
+    println!(
+        "\n   So: collapse the same faces to EXACTLY the grain, which is what a float does, and"
+    );
     println!("   watch the gates fall over one at a time. This is the movement's thesis at its");
     println!("   sharpest -- the discarded tail is precisely what gate 1 was spending.");
-    println!(
-        "     collapsed to   probed at   height        gate 1 refutes?   gate 3 population"
-    );
+    println!("     collapsed to   probed at   height        gate 1 refutes?   gate 3 population");
     let mut blind_probes = 0usize;
     let mut frames_disagreed = 0usize;
     for collapse_bits in [96u32, 120, 144] {
@@ -570,12 +590,18 @@ fn main() {
             }
             // Gate 2, exhibited: do the enclosure endpoints move the lattice, and do they move the
             // returned vector? Those are different questions and only the second is the gauge.
-            let lower =
-                probe_at_frame(&collapsed_logs, DeclaredGrain::bits(grain_bits), EnclosureFrame::Lower)
-                    .expect("within the aperture");
-            let upper =
-                probe_at_frame(&collapsed_logs, DeclaredGrain::bits(grain_bits), EnclosureFrame::Upper)
-                    .expect("within the aperture");
+            let lower = probe_at_frame(
+                &collapsed_logs,
+                DeclaredGrain::bits(grain_bits),
+                EnclosureFrame::Lower,
+            )
+            .expect("within the aperture");
+            let upper = probe_at_frame(
+                &collapsed_logs,
+                DeclaredGrain::bits(grain_bits),
+                EnclosureFrame::Upper,
+            )
+            .expect("within the aperture");
             let lattice_moved = lower.shortest_row.last() != upper.shortest_row.last();
             let return_moved = lower.coefficients != upper.coefficients;
             if return_moved {
@@ -590,7 +616,11 @@ fn main() {
             println!(
                 "                                          gate 2: lattice moved {}, return moved {}",
                 if lattice_moved { "yes" } else { "no" },
-                if return_moved { "yes" } else { "NO -- orbit trivial" }
+                if return_moved {
+                    "yes"
+                } else {
+                    "NO -- orbit trivial"
+                }
             );
         }
         let pair = [
@@ -625,13 +655,17 @@ fn main() {
     }
     println!("   probes where gate 1 went blind: {blind_probes}.");
     println!("   probes where gate 2's ENDPOINT sub-gauge moved the return: {frames_disagreed}.");
-    println!("   Gate 2's GRAIN sub-gauge did fire once above (2^119 vs 2^120 returned different
+    println!(
+        "   Gate 2's GRAIN sub-gauge did fire once above (2^119 vs 2^120 returned different
    vectors). Its ENDPOINT sub-gauge never did: it moves the lattice and does not move
-   the answer, because a spurious vector's last");
+   the answer, because a spurious vector's last"
+    );
     println!("   coordinate is already of its own height's order, so a one-unit endpoint shift is");
     println!("   an O(1) relative perturbation. It was tried as the repair and it failed; it is");
     println!("   reported rather than deleted, and it is not counted as a gate here.");
-    println!("   Gate 3 is what returns nothing on collapsed faces, and it is not a threshold: the");
+    println!(
+        "   Gate 3 is what returns nothing on collapsed faces, and it is not a threshold: the"
+    );
     println!("   bar is one expected coincidence in the population the search actually swept.");
 
     println!("\n-- summary --");

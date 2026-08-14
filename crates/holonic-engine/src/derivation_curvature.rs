@@ -188,17 +188,17 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use num_traits::Zero;
-use relational_geometry::{integer, rat, Rat, RatVec3};
+use relational_geometry::{Rat, RatVec3, integer, rat};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use crate::algebraic::CausalCellId;
 use crate::conditioned_derivation::ConditionedCircuit;
 use crate::curvature_bridge::{
-    read as read_standing, revise_partially, ApertureRefusal, CurvatureAperture,
-    CurvatureBridgeError, CurvatureBridgeReading, OrthogonalHinge,
+    ApertureRefusal, CurvatureAperture, CurvatureBridgeError, CurvatureBridgeReading,
+    OrthogonalHinge, read as read_standing, revise_partially,
 };
-use crate::derivation_atlas::{statement_vertex_key, DerivationIdentity};
+use crate::derivation_atlas::{DerivationIdentity, statement_vertex_key};
 use crate::discrete_curvature::{
     CurvatureFixedPoint, DiscreteCurvatureConfiguration, DiscreteCurvatureError,
 };
@@ -467,7 +467,8 @@ impl DerivationLayout {
                 .iter()
                 .map(|passage| passage.derivation.name.clone())
                 .collect();
-            let derived_only = !founding.is_empty() && founding.iter().all(|carried| carried.is_derived());
+            let derived_only =
+                !founding.is_empty() && founding.iter().all(|carried| carried.is_derived());
             (names, derived_only)
         };
 
@@ -604,7 +605,9 @@ impl DerivationLayout {
     }
 
     pub fn site_of_cell(&self, cell: CausalCellId) -> Option<&LayoutSite> {
-        self.site_of_cell.get(&cell).and_then(|at| self.sites.get(at))
+        self.site_of_cell
+            .get(&cell)
+            .and_then(|at| self.sites.get(at))
     }
 
     /// The derivation's own coordination at a site: how many of the circuit's 1-cells meet it.
@@ -651,8 +654,11 @@ impl RibbonGraph {
     /// one is chosen because it is canonical, so the scaffold is a function of the circuit and
     /// carries no hidden choice.
     fn over(layout: &DerivationLayout) -> Self {
-        let mut adjacency: BTreeMap<VertexId, BTreeSet<VertexId>> =
-            layout.sites.keys().map(|site| (*site, BTreeSet::new())).collect();
+        let mut adjacency: BTreeMap<VertexId, BTreeSet<VertexId>> = layout
+            .sites
+            .keys()
+            .map(|site| (*site, BTreeSet::new()))
+            .collect();
         for incidence in layout.incidences.values() {
             let [lower, upper] = incidence.endpoints;
             adjacency.entry(lower).or_default().insert(upper);
@@ -1174,9 +1180,8 @@ impl DerivationCurvatureBody {
         let mut materials = BTreeMap::new();
         for hinge in complex.hinges.values() {
             let vector = positions[&hinge.edge.upper].subtract(&positions[&hinge.edge.lower]);
-            let geometry_response = response_spending(&vector, &target).ok_or(
-                DerivationCurvatureRefusal::DegenerateRealization { hinge: hinge.id },
-            )?;
+            let geometry_response = response_spending(&vector, &target)
+                .ok_or(DerivationCurvatureRefusal::DegenerateRealization { hinge: hinge.id })?;
             materials.insert(
                 hinge.id,
                 LocalStarMaterial {
@@ -1207,13 +1212,15 @@ impl DerivationCurvatureBody {
             })
             .collect();
 
-        let kinematic = HingeWorldLaw::new(complex, HingeTransportNetwork::default(), Vec::new())
-            .map_err(|error| DerivationCurvatureRefusal::HingeWorld(error.to_string()))?;
+        let kinematic =
+            HingeWorldLaw::new(complex, HingeTransportNetwork::default(), Vec::new())
+                .map_err(|error| DerivationCurvatureRefusal::HingeWorld(error.to_string()))?;
         let kinematic_standing = kinematic
             .initial_standing(parameters)
             .map_err(|error| DerivationCurvatureRefusal::HingeWorld(error.to_string()))?;
         let law = LocalStarLaw::new(kinematic, materials, Vec::new(), CpuExecutor::serial())?;
-        let scaffold = law.initial_standing(kinematic_standing, trajectories, positions, Vec::new())?;
+        let scaffold =
+            law.initial_standing(kinematic_standing, trajectories, positions, Vec::new())?;
 
         let pristine = scaffold.geometry_responses.clone();
         let mut standing = scaffold.clone();
@@ -1279,7 +1286,9 @@ impl DerivationCurvatureBody {
                     (*coordination, true)
                 }
                 Some(LocalCoordinationDefect::BoundaryPath { coordination })
-                | Some(LocalCoordinationDefect::Singular { coordination }) => (*coordination, false),
+                | Some(LocalCoordinationDefect::Singular { coordination }) => {
+                    (*coordination, false)
+                }
                 Some(LocalCoordinationDefect::Isolated) | None => (0, false),
             };
             let predicted_extent = predicted.extent();
@@ -1326,10 +1335,7 @@ impl DerivationCurvatureBody {
     }
 
     /// Every conducted site's deficit, named by the passages that founded the cell it is.
-    pub fn named_deficits(
-        &self,
-        reading: &CurvatureBridgeReading,
-    ) -> Vec<NamedDeficit> {
+    pub fn named_deficits(&self, reading: &CurvatureBridgeReading) -> Vec<NamedDeficit> {
         reading
             .aperture
             .conducted
@@ -1610,8 +1616,8 @@ impl DerivationCurvatureBody {
             .ok_or(LocalStarError::MissingSpatialEdge(edge))?
             .vector
             .clone();
-        let orthogonal = off_edge(&vector)
-            .ok_or(DerivationCurvatureRefusal::DegenerateRealization { hinge })?;
+        let orthogonal =
+            off_edge(&vector).ok_or(DerivationCurvatureRefusal::DegenerateRealization { hinge })?;
         self.standing
             .geometry_responses
             .insert(hinge, orthogonal.clone());
@@ -1716,7 +1722,8 @@ mod tests {
             ),
             (
                 "beta".to_owned(),
-                "theorem beta : P := by\n  have one := carryOne\n  have two := carryTwo\n".to_owned(),
+                "theorem beta : P := by\n  have one := carryOne\n  have two := carryTwo\n"
+                    .to_owned(),
             ),
         ]
     }
@@ -1977,7 +1984,10 @@ mod tests {
         // `4`, `5` and `7` occur nowhere in the site population, so they are extents no multiple of
         // a derivation coordination could have produced.
         assert_eq!(
-            whole.difference(&from_sites).copied().collect::<BTreeSet<_>>(),
+            whole
+                .difference(&from_sites)
+                .copied()
+                .collect::<BTreeSet<_>>(),
             BTreeSet::from([4usize, 5, 7])
         );
     }
@@ -2049,7 +2059,10 @@ mod tests {
         assert_eq!(centre.coordination, 3);
         assert_eq!(centre.deficit, integer(3));
         assert_eq!(centre.combinatorial_charge, 3);
-        for leaf in deficits.iter().filter(|named| named.kind == SiteKind::Symbol) {
+        for leaf in deficits
+            .iter()
+            .filter(|named| named.kind == SiteKind::Symbol)
+        {
             assert_eq!(leaf.coordination, 1);
             assert_eq!(leaf.deficit, integer(5));
         }
@@ -2095,8 +2108,8 @@ mod tests {
         // three and frame S goes flat while frame D does not move at all, so the two must disagree
         // at every conducted site. A `frame_agreement` that read the standing twice would report
         // agreement here and this test would fail.
-        let body =
-            DerivationCurvatureBody::found_at_response(&four_cycle(), integer(3)).expect("realizes");
+        let body = DerivationCurvatureBody::found_at_response(&four_cycle(), integer(3))
+            .expect("realizes");
         let agreement = body.frame_agreement().expect("both frames read");
         assert_eq!(
             agreement.deficit_disagreements().len(),
@@ -2179,7 +2192,10 @@ mod tests {
             .find(|named| named.name == "star")
             .expect("the centre");
         assert_eq!(centre.deficit, integer(-6));
-        for leaf in deficits.iter().filter(|named| named.kind == SiteKind::Symbol) {
+        for leaf in deficits
+            .iter()
+            .filter(|named| named.kind == SiteKind::Symbol)
+        {
             assert_eq!(leaf.deficit, integer(2));
         }
         assert!(!reading.is_flat());
@@ -2269,11 +2285,7 @@ mod tests {
         let unmoved = body
             .consume_into_geometry(hinge, integer(1))
             .expect("the event enacts");
-        assert!(
-            !unmoved.moved_the_geometry(),
-            "{:?}",
-            unmoved.displaced
-        );
+        assert!(!unmoved.moved_the_geometry(), "{:?}", unmoved.displaced);
 
         body.flow(1).expect("the flow applies");
         assert!(!body.consumption_population().is_empty());
@@ -2319,7 +2331,12 @@ mod tests {
         // responses have been revised. A test that only ever saw motion could not tell the
         // consumption from the enactment.
         let mut body = DerivationCurvatureBody::found(&four_cycle()).expect("realizes");
-        let hinge = *body.layout.incidences().keys().next().expect("an incidence");
+        let hinge = *body
+            .layout
+            .incidences()
+            .keys()
+            .next()
+            .expect("an incidence");
         body.flow(1).expect("the flow applies");
         let quiet = body
             .consume_into_geometry(hinge, integer(0))

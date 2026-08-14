@@ -73,21 +73,21 @@ use num_bigint::BigInt;
 use num_traits::Zero;
 use relational_geometry::Rat;
 
+use holonic_engine::VertexId;
 use holonic_engine::algebraic::CausalChain;
 use holonic_engine::conditioned_derivation::{
-    found_conditioned_circuit, ConditionedBody, ConditionedCircuit,
+    ConditionedBody, ConditionedCircuit, found_conditioned_circuit,
 };
 use holonic_engine::derivation_atlas::CircuitAperture;
 use holonic_engine::derivation_integral::{
-    accumulation, circuit_loads, compare_routes, recruited_declaration_family,
-    recruited_declarations, route_via_recruitment, shared_recruitments, statement_lineage,
-    without_declarations, AccumulationRule, RouteDisagreement,
+    AccumulationRule, RouteDisagreement, accumulation, circuit_loads, compare_routes,
+    recruited_declaration_family, recruited_declarations, route_via_recruitment,
+    shared_recruitments, statement_lineage, without_declarations,
 };
-use holonic_engine::running_integral::{running_sum, Cochain, Path as Walk, PathStep};
+use holonic_engine::running_integral::{Cochain, Path as Walk, PathStep, running_sum};
 use holonic_engine::spine_cut::{
-    name_the_cut, read_the_chain, ChainReading, EdgeId, SpineCut, SpineCutError,
+    ChainReading, EdgeId, SpineCut, SpineCutError, name_the_cut, read_the_chain,
 };
-use holonic_engine::VertexId;
 
 // -------------------------------------------------------------------------------------------------
 // the material
@@ -272,9 +272,7 @@ fn shared_identifier_family(
     let mut compared = Vec::new();
     for (index, from) in declarations.iter().enumerate() {
         for to in declarations.iter().skip(index + 1) {
-            let shared: Vec<String> = shared_recruitments(&loads, from, to)
-                .into_iter()
-                .collect();
+            let shared: Vec<String> = shared_recruitments(&loads, from, to).into_iter().collect();
             for (first, left_symbol) in shared.iter().enumerate() {
                 for right_symbol in shared.iter().skip(first + 1) {
                     let (Some(left), Some(right)) = (
@@ -559,10 +557,7 @@ fn render_reading(
                 let _ = writeln!(out, "      load    {}", names.edge(*id));
             }
             // Counted, not asserted: the variant carries `B j` and this reads it.
-            let standing = divergence
-                .values()
-                .filter(|value| !value.is_zero())
-                .count();
+            let standing = divergence.values().filter(|value| !value.is_zero()).count();
             let _ = writeln!(
                 out,
                 "    the retained divergence carries {} vertices, of which {standing} are \
@@ -596,9 +591,8 @@ fn main() {
         }
     };
 
-    let found = |aperture: CircuitAperture| {
-        found_conditioned_circuit(body.standing().to_vec(), aperture)
-    };
+    let found =
+        |aperture: CircuitAperture| found_conditioned_circuit(body.standing().to_vec(), aperture);
     let whole = match found(CircuitAperture::STATEMENT_INCIDENT) {
         Ok(circuit) => circuit,
         Err(refusal) => {
@@ -631,10 +625,7 @@ fn main() {
 
     let names = read_names(&whole);
     let load = declared_load(&whole);
-    println!(
-        "\n  aperture {:?}",
-        CircuitAperture::STATEMENT_INCIDENT
-    );
+    println!("\n  aperture {:?}", CircuitAperture::STATEMENT_INCIDENT);
     println!(
         "  vertices {}   one-cells {}",
         names.vertex_name.len(),
@@ -653,7 +644,9 @@ fn main() {
         load.len(),
         names.one_cells
     );
-    println!("\n  the declared load, read off `circuit.reaches()` -- what the production exists to cross:");
+    println!(
+        "\n  the declared load, read off `circuit.reaches()` -- what the production exists to cross:"
+    );
     for id in &load {
         println!("    load cell  {}", names.edge(*id));
     }
@@ -686,7 +679,10 @@ fn main() {
     for (material, circuit) in &materials {
         let material_names = read_names(circuit);
         let material_load = declared_load(circuit);
-        for accumulation_rule in [AccumulationRule::RouteLoad, AccumulationRule::RecruitmentLoad] {
+        for accumulation_rule in [
+            AccumulationRule::RouteLoad,
+            AccumulationRule::RecruitmentLoad,
+        ] {
             let cochain = accumulation(circuit, accumulation_rule);
             let mut readings: Vec<Reading> = Vec::new();
 
@@ -805,29 +801,21 @@ fn main() {
     let withheld_names = read_names(&withheld);
     let withheld_load = declared_load(&withheld);
     let withheld_cochain = accumulation(&withheld, AccumulationRule::RouteLoad);
-    let withheld_readings = shared_identifier_family(
-        &withheld,
-        &withheld_cochain,
-        AccumulationRule::RouteLoad,
-    );
-    println!(
-        "\n  aperture {:?}",
-        CircuitAperture::DEPOSITED_READER
-    );
+    let withheld_readings =
+        shared_identifier_family(&withheld, &withheld_cochain, AccumulationRule::RouteLoad);
+    println!("\n  aperture {:?}", CircuitAperture::DEPOSITED_READER);
     println!(
         "  vertices {}   one-cells {}   reach cells founded: {}",
         withheld_names.vertex_name.len(),
         withheld_names.one_cells,
         withheld_load.len()
     );
-    let withheld_reading = withheld_readings
-        .first()
-        .map(|pair| {
-            (
-                pair.named(),
-                chain_reading(&withheld, &from_pair("shared identifier", pair)),
-            )
-        });
+    let withheld_reading = withheld_readings.first().map(|pair| {
+        (
+            pair.named(),
+            chain_reading(&withheld, &from_pair("shared identifier", pair)),
+        )
+    });
     let empty_load_refused = match withheld_reading {
         Some((named, Ok(built))) => match name_the_cut(&built, &withheld_load) {
             Ok(cut) => {

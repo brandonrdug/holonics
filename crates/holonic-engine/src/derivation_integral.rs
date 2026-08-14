@@ -106,21 +106,21 @@ use thiserror::Error;
 
 use crate::algebraic::CausalCellId;
 use crate::causal_reflection::{
-    causality_lock, CausalReflectionError, CausalResponse, CausalityLock, FaceParity,
-    HolomorphyWitness,
+    CausalReflectionError, CausalResponse, CausalityLock, FaceParity, HolomorphyWitness,
+    causality_lock,
 };
 use crate::conditioned_derivation::{
-    found_conditioned_circuit, ConditionedCircuit, ConditionedDerivationRefusal, Passage, PassageId,
-    PassageOrigin,
+    ConditionedCircuit, ConditionedDerivationRefusal, Passage, PassageId, PassageOrigin,
+    found_conditioned_circuit,
 };
 use crate::derivation_atlas::{DerivationIdentity, RecruitmentCoefficient};
 use crate::leader_quadrature::{
-    germwise_oracle_area, integrate_by_leaders, path_disagreement, LeaderError, LeaderLaw,
-    LeaderQuadrature, LocalJet, MaterialBoundary, RationalGerm, RideDiscipline,
+    LeaderError, LeaderLaw, LeaderQuadrature, LocalJet, MaterialBoundary, RationalGerm,
+    RideDiscipline, germwise_oracle_area, integrate_by_leaders, path_disagreement,
 };
 use crate::running_integral::{
-    disagreement, found_potential, running_sum, Cochain, Disagreement, Path, PathStep,
-    PotentialSearch, RunningIntegral, RunningIntegralError,
+    Cochain, Disagreement, Path, PathStep, PotentialSearch, RunningIntegral, RunningIntegralError,
+    disagreement, found_potential, running_sum,
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -215,7 +215,9 @@ pub fn circuit_loads(circuit: &ConditionedCircuit) -> CircuitLoads {
         .map(|(key, carried)| {
             (
                 key.clone(),
-                carried.values().fold(BigInt::zero(), |sum, count| sum + count),
+                carried
+                    .values()
+                    .fold(BigInt::zero(), |sum, count| sum + count),
             )
         })
         .collect();
@@ -499,10 +501,7 @@ pub fn passage_label(passage: &Passage) -> String {
     }
 }
 
-fn provenance(
-    circuit: &ConditionedCircuit,
-    integral: &RunningIntegral,
-) -> Vec<CellProvenance> {
+fn provenance(circuit: &ConditionedCircuit, integral: &RunningIntegral) -> Vec<CellProvenance> {
     integral
         .steps
         .iter()
@@ -551,12 +550,7 @@ pub fn route_material(integral: &RunningIntegral) -> Result<MaterialBoundary, Le
     let germs = integral
         .steps
         .iter()
-        .map(|step| {
-            RationalGerm::new(
-                Rat::one(),
-                LocalJet::new(vec![rational(&step.increment)])?,
-            )
-        })
+        .map(|step| RationalGerm::new(Rat::one(), LocalJet::new(vec![rational(&step.increment)])?))
         .collect::<Result<Vec<_>, LeaderError>>()?;
     MaterialBoundary::new(germs)
 }
@@ -789,18 +783,12 @@ pub struct HolonomyPopulation {
 impl HolonomyPopulation {
     /// The pairs whose residual stands: the holonomy.
     pub fn standing(&self) -> Vec<&RouteDisagreement> {
-        self.compared
-            .iter()
-            .filter(|pair| pair.stands())
-            .collect()
+        self.compared.iter().filter(|pair| pair.stands()).collect()
     }
 
     /// The pairs whose two routes returned the same sum.
     pub fn agreeing(&self) -> Vec<&RouteDisagreement> {
-        self.compared
-            .iter()
-            .filter(|pair| !pair.stands())
-            .collect()
+        self.compared.iter().filter(|pair| !pair.stands()).collect()
     }
 
     /// The residual values this family carries, each with every pair that returned it, named.
@@ -1090,7 +1078,9 @@ mod tests {
     fn artifact(name: &str, body: &str) -> (String, String) {
         (
             format!("fixture/{name}.lean"),
-            format!("namespace Soma\ntheorem {name} (P : Prop) : exactCarrier P := by\n{body}end Soma\n"),
+            format!(
+                "namespace Soma\ntheorem {name} (P : Prop) : exactCarrier P := by\n{body}end Soma\n"
+            ),
         )
     }
 
@@ -1154,7 +1144,10 @@ mod tests {
         // opener is a recruitment and the load carries it.
         assert_eq!(loads.recruitment_load("alpha", "Soma"), BigInt::from(1));
         assert_eq!(loads.recruitment_load("alpha", "Prop"), BigInt::from(1));
-        assert_eq!(loads.recruitment_load("alpha", "exactCarrier"), BigInt::from(1));
+        assert_eq!(
+            loads.recruitment_load("alpha", "exactCarrier"),
+            BigInt::from(1)
+        );
         assert_eq!(loads.recruitment_load("alpha", "helper"), BigInt::from(1));
         assert_eq!(loads.recruitment_load("alpha", "other"), BigInt::zero());
         assert_eq!(loads.route_load("alpha"), BigInt::from(4));
@@ -1271,14 +1264,18 @@ mod tests {
         let potential =
             potential_over(&founded, &cochain, AccumulationRule::RouteLoad, &base).expect("walks");
         assert!(!potential.admits_a_potential());
-        assert!(potential
-            .retained
-            .iter()
-            .all(|chord| chord.tail == "alpha" || chord.head == "alpha"));
-        assert!(potential
-            .retained
-            .iter()
-            .all(|chord| !chord.founding_passages.is_empty()));
+        assert!(
+            potential
+                .retained
+                .iter()
+                .all(|chord| chord.tail == "alpha" || chord.head == "alpha")
+        );
+        assert!(
+            potential
+                .retained
+                .iter()
+                .all(|chord| !chord.founding_passages.is_empty())
+        );
     }
 
     #[test]
@@ -1359,15 +1356,17 @@ mod tests {
     fn a_compared_pair_names_the_passages_that_founded_every_cell_it_crossed() {
         let pair = winding_pair();
         assert!(!pair.left_founding.is_empty());
-        assert!(pair
-            .left_founding
-            .iter()
-            .chain(&pair.right_founding)
-            .all(|carried| !carried.passages.is_empty()));
-        assert!(pair
-            .left_founding
-            .iter()
-            .any(|carried| carried.passages.iter().any(|name| name.contains("delta"))));
+        assert!(
+            pair.left_founding
+                .iter()
+                .chain(&pair.right_founding)
+                .all(|carried| !carried.passages.is_empty())
+        );
+        assert!(
+            pair.left_founding
+                .iter()
+                .any(|carried| carried.passages.iter().any(|name| name.contains("delta")))
+        );
     }
 
     #[test]
@@ -1388,7 +1387,10 @@ mod tests {
     fn every_route_material_both_founds_and_rides() {
         let pair = winding_pair();
         assert!(pair.leader_founds_and_rides());
-        assert_eq!(pair.leader_left.found_count(), pair.leader_left.ride_count());
+        assert_eq!(
+            pair.leader_left.found_count(),
+            pair.leader_left.ride_count()
+        );
         assert!(!pair.leader_left.scale_witnesses.is_empty());
     }
 
@@ -1408,7 +1410,10 @@ mod tests {
     fn the_reflection_recovers_the_residual_from_the_odd_face_alone() {
         let pair = winding_pair();
         assert!(pair.response.instantaneous_value().is_zero());
-        assert_eq!(residual_from_reflection(&pair.response), pair.leader_residual);
+        assert_eq!(
+            residual_from_reflection(&pair.response),
+            pair.leader_residual
+        );
     }
 
     #[test]
@@ -1437,9 +1442,13 @@ mod tests {
     fn a_population_separates_standing_from_agreeing_and_names_both() {
         let founded = circuit(with_a_recruited_declaration());
         let cochain = accumulation(&founded, AccumulationRule::RecruitmentLoad);
-        let population =
-            statement_lineage(&founded, &cochain, AccumulationRule::RecruitmentLoad, STATEMENT)
-                .expect("traverses");
+        let population = statement_lineage(
+            &founded,
+            &cochain,
+            AccumulationRule::RecruitmentLoad,
+            STATEMENT,
+        )
+        .expect("traverses");
         assert!(!population.is_empty());
         assert!(population.every_pair_is_distinct());
         assert!(population.winds(), "{:?}", population.residual_classes());
@@ -1472,13 +1481,15 @@ mod tests {
     fn the_recruited_declaration_family_is_empty_exactly_when_no_declaration_is_a_resource() {
         let separated = circuit(head_separated());
         let separated_cochain = accumulation(&separated, AccumulationRule::RouteLoad);
-        assert!(recruited_declaration_family(
-            &separated,
-            &separated_cochain,
-            AccumulationRule::RouteLoad
-        )
-        .expect("family")
-        .is_empty());
+        assert!(
+            recruited_declaration_family(
+                &separated,
+                &separated_cochain,
+                AccumulationRule::RouteLoad
+            )
+            .expect("family")
+            .is_empty()
+        );
 
         let collided = circuit(with_a_recruited_declaration());
         let collided_cochain = accumulation(&collided, AccumulationRule::RouteLoad);
@@ -1599,7 +1610,9 @@ mod tests {
   deposits {:?}
   before {:?}
   after {:?}",
-            returned.deposits, returned.before, returned.after
+            returned.deposits,
+            returned.before,
+            returned.after
         );
         // And every movement must name the deposit that caused it.
         assert!(
@@ -1627,8 +1640,15 @@ mod tests {
         let returned = conduct_return(&circuit, AccumulationRule::RecruitmentLoad, base, &empty)
             .expect("the fixture reads");
 
-        assert!(returned.deposits.is_empty(), "a closed structure returned something");
-        assert!(!returned.moved_at_all(), "movement with no deposit: {:?}", returned.moved);
+        assert!(
+            returned.deposits.is_empty(),
+            "a closed structure returned something"
+        );
+        assert!(
+            !returned.moved_at_all(),
+            "movement with no deposit: {:?}",
+            returned.moved
+        );
         assert_eq!(returned.before, returned.after);
     }
 }
@@ -1722,7 +1742,7 @@ pub fn conduct_return(
     base: CausalCellId,
     family: &[(String, BTreeSet<CausalCellId>)],
 ) -> Result<ConductedReturn, RunningIntegralError> {
-    use crate::temper::{found_on, TemperedFamily, Twist};
+    use crate::temper::{TemperedFamily, Twist, found_on};
 
     let complex = circuit.circuit.complex();
     let cochain = accumulation(circuit, rule);
@@ -1731,7 +1751,9 @@ pub fn conduct_return(
     let mut founded = cochain.clone();
     let mut deposits = Vec::new();
     for (name, twist) in &before.twists {
-        let Twist::Open { obstructions, .. } = twist else { continue };
+        let Twist::Open { obstructions, .. } = twist else {
+            continue;
+        };
         for obstruction in obstructions {
             founded = found_on(&founded, obstruction.cell, obstruction.residual.clone());
             deposits.push(ReturnedDeposit {

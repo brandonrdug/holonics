@@ -13,11 +13,11 @@ use algorithm_organ::{
 };
 use body::incidence::IncidenceHand;
 use body::num::Cog;
+use life::form_mouth::deposit_form_or_message;
 use serde::Deserialize;
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 use soma_abi::active::{ActionCurrent, RelationAtom};
-use life::form_mouth::deposit_form_or_message;
 use soma_membrane::{
     ContemporaryEvent, CurrentBoundaryPort, CurrentEvent, CurrentGeometry, CurrentLineage,
     InterfaceCapability, LiveConstituent, LiveCurrentMachine, LiveMemory, RegionalRelationArc,

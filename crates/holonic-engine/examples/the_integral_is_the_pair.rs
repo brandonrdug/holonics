@@ -204,7 +204,10 @@ fn print_search(complex: &GradedCausalComplex, label: &str, search: &PotentialSe
         name_of(complex, search.base),
         search.admits_a_potential()
     );
-    println!("    potential f   {}", render_cochain(complex, &search.potential));
+    println!(
+        "    potential f   {}",
+        render_cochain(complex, &search.potential)
+    );
     println!(
         "    reached {}   tree cells {}",
         names(complex, search.reached.iter().copied()),
@@ -398,8 +401,12 @@ fn main() {
     println!("========================");
     println!("truth_status=established-bounded");
     println!("evidence=computational-witness");
-    println!("law=the integral is the running sum WITH its path; the disagreement of two paths stands");
-    println!("organ=crates/holonic-engine/src/running_integral.rs   (four library callers, no driver)");
+    println!(
+        "law=the integral is the running sum WITH its path; the disagreement of two paths stands"
+    );
+    println!(
+        "organ=crates/holonic-engine/src/running_integral.rs   (four library callers, no driver)"
+    );
 
     let mut holds: Vec<(&str, bool, String)> = Vec::new();
 
@@ -490,8 +497,12 @@ fn main() {
         println!("  {label:<26} {closed:>12} {coboundary_flag:>12} {winding:>14}");
     }
     println!();
-    println!("  Row 2 is the whole content: CLOSED and NOT a coboundary, with a holonomy of 1. The");
-    println!("  hollow square has no 2-cell that could obstruct any 1-cochain, so closedness there");
+    println!(
+        "  Row 2 is the whole content: CLOSED and NOT a coboundary, with a holonomy of 1. The"
+    );
+    println!(
+        "  hollow square has no 2-cell that could obstruct any 1-cochain, so closedness there"
+    );
     println!("  is vacuous and the winding is entirely free. That gap is H^1 != 0.");
     println!("  Row 4 is the other half: filling the hole makes the same cochain NOT closed, and");
     println!("  `d w` now names the face that witnesses the winding.");
@@ -535,7 +546,9 @@ fn main() {
         potential.value(square.a),
         potential.value(square.c) - potential.value(square.a)
     );
-    println!("  Equal totals, DIFFERENT lineages. Collapsing the return to the scalar would discard");
+    println!(
+        "  Equal totals, DIFFERENT lineages. Collapsing the return to the scalar would discard"
+    );
     println!("  the path, and the path is the thing the deposit says must be kept.");
     holds.push((
         "two traversals return the same total by different lineages, and both are retained",
@@ -597,8 +610,14 @@ fn main() {
     let undone = once.then(&once.reversed());
     let doubled_cochain = standing.plus(&standing).expect("same grade");
     let readings = [
-        ("once", holonomy(&square.complex, &standing, &once).unwrap().total),
-        ("twice", holonomy(&square.complex, &standing, &twice).unwrap().total),
+        (
+            "once",
+            holonomy(&square.complex, &standing, &once).unwrap().total,
+        ),
+        (
+            "twice",
+            holonomy(&square.complex, &standing, &twice).unwrap().total,
+        ),
         (
             "reversed",
             holonomy(&square.complex, &standing, &once.reversed())
@@ -611,7 +630,9 @@ fn main() {
         ),
         (
             "2w, once",
-            holonomy(&square.complex, &doubled_cochain, &once).unwrap().total,
+            holonomy(&square.complex, &doubled_cochain, &once)
+                .unwrap()
+                .total,
         ),
     ];
     for (label, value) in &readings {
@@ -636,9 +657,15 @@ fn main() {
     // ===========================================================================================
     println!("\n\n5. THREE INDEPENDENT READINGS OF ONE RESIDUAL");
     println!("---------------------------------------------");
-    println!("  On the FILLED square the pair bounds a region. `enclosed_disagreement` computes the");
-    println!("  same integer three ways: the difference of two running sums, `<w, boundary region>`,");
-    println!("  and `<d w, region>`. The two region readings traverse different data, so a sign or");
+    println!(
+        "  On the FILLED square the pair bounds a region. `enclosed_disagreement` computes the"
+    );
+    println!(
+        "  same integer three ways: the difference of two running sums, `<w, boundary region>`,"
+    );
+    println!(
+        "  and `<d w, region>`. The two region readings traverse different data, so a sign or"
+    );
     println!("  grade error in either shows up as a disagreement here.");
     let region = CausalChain::single(face, ComparativeMultiplicity::positive(1u32));
     let enclosed = enclosed_disagreement(
@@ -653,9 +680,18 @@ fn main() {
         "\n    difference of running sums   {}",
         enclosed.disagreement.residual
     );
-    println!("    <w, boundary region>         {}", enclosed.boundary_residual);
-    println!("    <d w, region>                {}", enclosed.coboundary_residual);
-    println!("    readings agree               {}", enclosed.readings_agree());
+    println!(
+        "    <w, boundary region>         {}",
+        enclosed.boundary_residual
+    );
+    println!(
+        "    <d w, region>                {}",
+        enclosed.coboundary_residual
+    );
+    println!(
+        "    readings agree               {}",
+        enclosed.readings_agree()
+    );
     let enclosed_exact = enclosed_disagreement(
         &filled.complex,
         &filled.exact(),
@@ -702,7 +738,11 @@ fn main() {
     println!();
     print_search(&square.complex, "against d f              ", &search_exact);
     println!();
-    print_search(&square.complex, "against the standing form", &search_standing);
+    print_search(
+        &square.complex,
+        "against the standing form",
+        &search_standing,
+    );
     let rebuilt = coboundary(&square.complex, &search_exact.potential).expect("gradeable");
     let failed_rebuild =
         coboundary(&square.complex, &search_standing.potential).expect("gradeable");
@@ -747,7 +787,9 @@ fn main() {
     println!("\n\n7. THE BASE IS A GAUGE — MEASURE ITS ORBIT, DO NOT ASSUME IT");
     println!("------------------------------------------------------------");
     println!("  `found_potential` fixes `f(base) = 0` by declaration. Four bases are available on");
-    println!("  the hollow square. If all four returned one tree and one chord the base would be a");
+    println!(
+        "  the hollow square. If all four returned one tree and one chord the base would be a"
+    );
     println!("  gauge whose group acts trivially, and every reading above would be base-blind by");
     println!("  accident rather than by law. The orbit is taken:");
     let mut trees = BTreeSet::new();
@@ -803,10 +845,7 @@ fn main() {
     println!("  law measured only at one is not measured; this fixture carries two independent");
     println!("  holes with DIFFERENT holonomies, so the remainder has to be plural and unequal.");
     let ladder_w = ladder.standing();
-    println!(
-        "\n  w = {}",
-        render_cochain(&ladder.complex, &ladder_w)
-    );
+    println!("\n  w = {}", render_cochain(&ladder.complex, &ladder_w));
     let left_cycle = holonomy(&ladder.complex, &ladder_w, &ladder.left_cycle()).expect("closed");
     let right_cycle = holonomy(&ladder.complex, &ladder_w, &ladder.right_cycle()).expect("closed");
     println!(
@@ -819,8 +858,8 @@ fn main() {
         render_path(&ladder.complex, &ladder.right_cycle()),
         right_cycle.total
     );
-    let unconjugated = holonomy(&ladder.complex, &ladder_w, &ladder.right_cycle_at_v1())
-        .expect("closed at v1");
+    let unconjugated =
+        holonomy(&ladder.complex, &ladder_w, &ladder.right_cycle_at_v1()).expect("closed at v1");
     println!(
         "  the same hole based at v1, unconjugated: {}   holonomy {}   (conjugation moved nothing)",
         render_path(&ladder.complex, &ladder.right_cycle_at_v1()),
@@ -830,7 +869,9 @@ fn main() {
     let differenced = ladder.left_cycle().then(&ladder.right_cycle().reversed());
     println!(
         "  left then right          holonomy {}   (predicted {} + {} = {})",
-        holonomy(&ladder.complex, &ladder_w, &combined).expect("closed").total,
+        holonomy(&ladder.complex, &ladder_w, &combined)
+            .expect("closed")
+            .total,
         left_cycle.total,
         right_cycle.total,
         left_cycle.total.clone() + right_cycle.total.clone()
@@ -874,7 +915,9 @@ fn main() {
     ));
     holds.push((
         "the holonomy is additive over concatenated cycles and blind to conjugation",
-        holonomy(&ladder.complex, &ladder_w, &combined).expect("closed").total
+        holonomy(&ladder.complex, &ladder_w, &combined)
+            .expect("closed")
+            .total
             == left_cycle.total.clone() + right_cycle.total.clone()
             && holonomy(&ladder.complex, &ladder_w, &differenced)
                 .expect("closed")
@@ -886,7 +929,9 @@ fn main() {
             "left {} right {} sum {} difference {}",
             left_cycle.total,
             right_cycle.total,
-            holonomy(&ladder.complex, &ladder_w, &combined).expect("closed").total,
+            holonomy(&ladder.complex, &ladder_w, &combined)
+                .expect("closed")
+                .total,
             holonomy(&ladder.complex, &ladder_w, &differenced)
                 .expect("closed")
                 .total
@@ -896,7 +941,9 @@ fn main() {
     // ===========================================================================================
     println!("\n\n9. A POPULATION THAT IS EMPTY EVERYWHERE ELSE — `unreached_cells`");
     println!("-----------------------------------------------------------------");
-    println!("  `PotentialSearch` returns the 1-cells the walked component never touched. On every");
+    println!(
+        "  `PotentialSearch` returns the 1-cells the walked component never touched. On every"
+    );
     println!("  connected fixture that population is empty, and a field that is always empty is a");
     println!("  law returning zero about itself. A severed complex forces it non-empty:");
     let mut severed = GradedCausalComplex::default();
@@ -919,8 +966,12 @@ fn main() {
     println!();
     print_search(&severed, "from e", &from_e);
     println!("\n  The two components are two different questions and the organ answers the one it");
-    println!("  was asked. From `a` the `ef` winding is UNREACHED, not zero, and the return says so");
-    println!("  by name; from `e` the whole square is unreached and the cochain admits a potential");
+    println!(
+        "  was asked. From `a` the `ef` winding is UNREACHED, not zero, and the return says so"
+    );
+    println!(
+        "  by name; from `e` the whole square is unreached and the cochain admits a potential"
+    );
     println!("  on the component that was walked.");
     holds.push((
         "an unwalked component is returned as unreached rather than silently read as zero",
@@ -940,7 +991,9 @@ fn main() {
     println!("-----------------------------------------------------");
     println!("  A tree admits two genuinely different traversals of `a -> c`, but only by");
     println!("  backtracking — and a backtrack cancels in the chain. The residual is therefore");
-    println!("  FORCED to zero by the material for every cochain, including the nonzero ones. This");
+    println!(
+        "  FORCED to zero by the material for every cochain, including the nonzero ones. This"
+    );
     println!("  is a check that could not have come out otherwise and it is NOT counted as a");
     println!("  control; it is here to name why the square is the fixture that carries the");
     println!("  falsifier.");
@@ -976,7 +1029,9 @@ fn main() {
             pair.left.total.to_string()
         );
     }
-    println!("\n  The traversals differ as chains — the backtrack deposits two opposed passages the");
+    println!(
+        "\n  The traversals differ as chains — the backtrack deposits two opposed passages the"
+    );
     println!("  carrier retains — but they are ONE CYCLE, and it is the cycle that decides.");
 
     // ===========================================================================================
@@ -984,7 +1039,11 @@ fn main() {
     println!("-------------------------------------------");
     let mut refusals: Vec<(&str, String, bool)> = Vec::new();
 
-    let broken = running_sum(&square.complex, &standing, &Path::along([square.ab, square.dc]));
+    let broken = running_sum(
+        &square.complex,
+        &standing,
+        &Path::along([square.ab, square.dc]),
+    );
     refusals.push((
         "a traversal whose steps do not join",
         format!("{:?}", broken.as_ref().err()),
@@ -1059,7 +1118,8 @@ fn main() {
         ),
     ));
 
-    let wrong_grade_region = CausalChain::single(filled.ab, ComparativeMultiplicity::positive(1u32));
+    let wrong_grade_region =
+        CausalChain::single(filled.ab, ComparativeMultiplicity::positive(1u32));
     let region_grade = enclosed_disagreement(
         &filled.complex,
         &filled.standing(),
@@ -1162,7 +1222,9 @@ fn main() {
     println!("  `PairIsNotACycle` guards `boundary(chain(left) - chain(right)) != 0`. But");
     println!("  `disagreement` has already refused unequal endpoints three lines above, and the");
     println!("  boundary of a joined traversal from `s` to `t` is exactly `t - s`, so the guarded");
-    println!("  difference is a cycle whenever control reaches the guard. It is a correct assertion");
+    println!(
+        "  difference is a cycle whenever control reaches the guard. It is a correct assertion"
+    );
     println!("  about an invariant the preceding check establishes, and no input can trip it.");
 
     // ===========================================================================================
@@ -1184,13 +1246,17 @@ fn main() {
         ("ladder / v0", &ladder.complex, &ladder_w, ladder.at("v0")),
         ("severed / a", &severed, &severed_w, sa),
         ("severed / e", &severed, &severed_w, se),
-        ("path / a", &path_complex, &Cochain::from_values(1, [(pab, big(5))]), pa),
+        (
+            "path / a",
+            &path_complex,
+            &Cochain::from_values(1, [(pab, big(5))]),
+            pa,
+        ),
     ] {
         let search = found_potential(complex, cochain, base).expect("a lawful search");
         let walked = search.tree_cells.len() + search.cycle_rank();
         let tree_is_spanning = search.tree_cells.len() + 1 == search.reached.len();
-        let rank_is_the_departure =
-            search.cycle_rank() == walked + 1 - search.reached.len();
+        let rank_is_the_departure = search.cycle_rank() == walked + 1 - search.reached.len();
         identity_holds &= tree_is_spanning && rank_is_the_departure;
         println!(
             "    {label:<22} {:>8} {:>7} {:>7} {:>7} {:>10} {:>10}",
@@ -1212,8 +1278,12 @@ fn main() {
     println!("\n\n13. A CELL ASSIGNED ZERO IS NOT A CELL NEVER ASSIGNED");
     println!("-----------------------------------------------------");
     println!("  `CLAUDE.md` §2b at the level of a carrier: the reading kept and the deposit");
-    println!("  discarded. `coboundary` is TOTAL on its grade — every cell one grade up is visited");
-    println!("  and its value deposited, including the zeros — so the return can say WHERE `d w` was");
+    println!(
+        "  discarded. `coboundary` is TOTAL on its grade — every cell one grade up is visited"
+    );
+    println!(
+        "  and its value deposited, including the zeros — so the return can say WHERE `d w` was"
+    );
     println!("  evaluated and not only where it stands.");
     let d_exact = coboundary(&filled.complex, &filled.exact()).expect("gradeable");
     println!(
@@ -1268,21 +1338,31 @@ fn main() {
     println!("------");
     println!("  - Nothing here is a continuum integral. No mesh, no limit, no error term, no");
     println!("    refinement, and no convergence of any lattice statement to a continuum one is");
-    println!("    claimed or tested. The organ integrates a 1-cochain along a traversal of 1-cells");
+    println!(
+        "    claimed or tested. The organ integrates a 1-cochain along a traversal of 1-cells"
+    );
     println!("    and that is its whole content.");
     println!("  - The carrier is `Z`. A rational cochain is an integer cochain after clearing");
     println!("    denominators, which rescales every returned holonomy by the cleared factor and");
     println!("    moves no zero off zero — but nothing below runs a rational cochain, so that");
     println!("    sentence is inherited from the module and not measured here.");
     println!("  - Four complexes, at most seven 1-cells and cycle rank at most two. Nothing is");
-    println!("    established about large complexes, about the cost of the spanning walk, or about");
+    println!(
+        "    established about large complexes, about the cost of the spanning walk, or about"
+    );
     println!("    any complex whose 1-skeleton is not simple.");
     println!("  - `H^1 != 0` is exhibited on ONE complex with ONE hole and on ONE with two. No");
     println!("    cohomology group is computed; `found_potential` decides whether a cochain is a");
-    println!("    coboundary on the walked component and returns the chords, which is strictly less");
+    println!(
+        "    coboundary on the walked component and returns the chords, which is strictly less"
+    );
     println!("    than computing `H^1`.");
-    println!("  - The base gauge orbit is taken over the four vertices of one square. It shows the");
-    println!("    gauge acts on that material; it does not establish that it acts on every complex,");
+    println!(
+        "  - The base gauge orbit is taken over the four vertices of one square. It shows the"
+    );
+    println!(
+        "    gauge acts on that material; it does not establish that it acts on every complex,"
+    );
     println!("    and a complex where it did not would make the base-invariance readings vacuous");
     println!("    there.");
     println!("  - No claim is made about the Hodge conjecture, about any Millennium problem, or");

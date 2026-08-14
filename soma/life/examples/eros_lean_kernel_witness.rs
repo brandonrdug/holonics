@@ -217,9 +217,9 @@ fn main() {
         &false_returns,
     );
 
-    let admitted = carrier_returns.kernel_admitted_extent() + false_returns.kernel_admitted_extent();
-    let obstructed =
-        carrier_returns.obstruction_extent() + false_returns.obstruction_extent();
+    let admitted =
+        carrier_returns.kernel_admitted_extent() + false_returns.kernel_admitted_extent();
+    let obstructed = carrier_returns.obstruction_extent() + false_returns.obstruction_extent();
     println!("\n=== the return");
     println!("    submitted   {}", admitted + obstructed);
     println!("    admitted    {admitted}");

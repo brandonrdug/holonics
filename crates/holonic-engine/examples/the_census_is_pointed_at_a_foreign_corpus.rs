@@ -131,7 +131,10 @@ fn measure(census: &CorpusCensus, species: &'static str) -> Reading {
         dot_rank: dot_rank.map(|at| at + 1),
         bare_subscript_occurrences,
         bare_subscript_surfaces,
-        one_subscript: census.lookup("\u{2081}").map(|id| census.occurrences(id)).unwrap_or(0),
+        one_subscript: census
+            .lookup("\u{2081}")
+            .map(|id| census.occurrences(id))
+            .unwrap_or(0),
         bare_subscripts: {
             bare_subscripts.sort_by(|left, right| right.1.cmp(&left.1).then(left.0.cmp(&right.0)));
             bare_subscripts
@@ -220,11 +223,23 @@ fn main() {
     );
     let rows: [(&str, Box<dyn Fn(&Reading) -> String>); 11] = [
         ("wholes", Box::new(|r: &Reading| r.wholes.to_string())),
-        ("tokens in the stream", Box::new(|r: &Reading| r.total.to_string())),
+        (
+            "tokens in the stream",
+            Box::new(|r: &Reading| r.total.to_string()),
+        ),
         ("word tokens", Box::new(|r: &Reading| r.word.to_string())),
-        ("markup tokens", Box::new(|r: &Reading| r.markup.to_string())),
-        ("markup share", Box::new(|r: &Reading| percent(r.markup, r.total))),
-        ("distinct surfaces", Box::new(|r: &Reading| r.distinct.to_string())),
+        (
+            "markup tokens",
+            Box::new(|r: &Reading| r.markup.to_string()),
+        ),
+        (
+            "markup share",
+            Box::new(|r: &Reading| percent(r.markup, r.total)),
+        ),
+        (
+            "distinct surfaces",
+            Box::new(|r: &Reading| r.distinct.to_string()),
+        ),
         (
             "`.` occurrences (rank)",
             Box::new(|r: &Reading| match r.dot_rank {
@@ -239,7 +254,10 @@ fn main() {
         (
             "bare-subscript occurrences",
             Box::new(|r: &Reading| {
-                format!("{} / {}", r.bare_subscript_occurrences, r.bare_subscript_surfaces)
+                format!(
+                    "{} / {}",
+                    r.bare_subscript_occurrences, r.bare_subscript_surfaces
+                )
             }),
         ),
         (
@@ -260,7 +278,10 @@ fn main() {
     }
 
     println!("\n  the most recurrent surfaces, each species in its own order");
-    println!("    {:<34} {:<34}", readings[0].species, readings[1].species);
+    println!(
+        "    {:<34} {:<34}",
+        readings[0].species, readings[1].species
+    );
     for index in 0..12 {
         let left = readings[0]
             .top
@@ -278,7 +299,10 @@ fn main() {
     println!("\n  what moved");
     println!(
         "    the `.` was surface #{} under prose and is {} under lean-source",
-        readings[0].dot_rank.map(|r| r.to_string()).unwrap_or_else(|| "-".to_owned()),
+        readings[0]
+            .dot_rank
+            .map(|r| r.to_string())
+            .unwrap_or_else(|| "-".to_owned()),
         match readings[1].dot_rank {
             Some(rank) => format!("#{rank}"),
             None => "absent from the corpus".to_owned(),

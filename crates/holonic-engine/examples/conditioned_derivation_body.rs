@@ -38,8 +38,8 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 
 use holonic_engine::conditioned_derivation::{
-    ablate_stem, expose, ConditionedBody, ConditionedCircuit, DerivationQuery, DerivedPassage,
-    Exposure, FoundedMorphology, PassageOrigin, StemAblation,
+    ConditionedBody, ConditionedCircuit, DerivationQuery, DerivedPassage, Exposure,
+    FoundedMorphology, PassageOrigin, StemAblation, ablate_stem, expose,
 };
 use holonic_engine::derivation_atlas::CircuitAperture;
 use holonic_engine::rebase_invariants::PivotRule;
@@ -168,9 +168,12 @@ fn main() {
             .cloned()
             .unwrap_or_else(|| "standing/output".to_owned()),
     );
-    let frame_a = PathBuf::from(arguments.get(1).cloned().unwrap_or_else(|| {
-        "reference/pureholonics-seed/src/pureholonics".to_owned()
-    }));
+    let frame_a = PathBuf::from(
+        arguments
+            .get(1)
+            .cloned()
+            .unwrap_or_else(|| "reference/pureholonics-seed/src/pureholonics".to_owned()),
+    );
     let frame_b = PathBuf::from(
         arguments
             .get(2)
@@ -249,9 +252,7 @@ fn main() {
     }
 
     println!("\n  the founded cover of every recruited identifier, in both frames");
-    println!(
-        "  a residue character is bracketed: material the corpus committed no stem for.\n"
-    );
+    println!("  a residue character is bracketed: material the corpus committed no stem for.\n");
     println!("    {:<26} {:<34} {}", "identifier", "frame A", "frame B");
     let mut covers_differ = false;
     let mut residue_a: Vec<String> = Vec::new();
@@ -286,7 +287,13 @@ fn main() {
     let orbit_a = body_a.frame_orbit().expect("ascii identifiers");
     println!(
         "\n  item population: the character positions of the recruited identifiers -- {} items",
-        orbit_a.conditioned.one_shot.blocks.iter().map(BTreeSet::len).sum::<usize>()
+        orbit_a
+            .conditioned
+            .one_shot
+            .blocks
+            .iter()
+            .map(BTreeSet::len)
+            .sum::<usize>()
     );
     println!(
         "  unconditioned family: 1 receiver (has this identifier ended)      one-shot blocks {}",
@@ -373,9 +380,7 @@ fn main() {
     rule("[4]  THE CIRCUIT -- that production as a GradedCausalComplex, cell by passage");
 
     let aperture = CircuitAperture::STATEMENT_INCIDENT;
-    let before = unconditioned
-        .circuit(&the_query, aperture)
-        .expect("founds");
+    let before = unconditioned.circuit(&the_query, aperture).expect("founds");
     let after = body_a.circuit(&the_query, aperture).expect("founds");
 
     println!("\n  aperture: {aperture:?}\n");
@@ -438,7 +443,10 @@ fn main() {
             .into_iter()
             .map(|passage| match &passage.origin {
                 PassageOrigin::Derived { stem, brought, .. } => {
-                    format!("{} [stem {stem:?} brought {brought}]", passage.derivation.name)
+                    format!(
+                        "{} [stem {stem:?} brought {brought}]",
+                        passage.derivation.name
+                    )
                 }
                 PassageOrigin::Standing { source } => format!("standing {source}"),
             })
@@ -482,7 +490,9 @@ fn main() {
     println!(
         "\n  a removal both removes and REOPENS: a founded stem suppresses, by maximality, every"
     );
-    println!("  founded occurrence it contains, and deleting it returns that suppressed population.");
+    println!(
+        "  founded occurrence it contains, and deleting it returns that suppressed population."
+    );
     println!(
         "\n    {:<12} {:>8} {:>8} {:>8} {:>9} {:>12}   wholes witnessing",
         "stem", "before", "after", "absent", "reopened", "unaccounted"
@@ -522,9 +532,7 @@ fn main() {
 
     if let Some(exhibited) = ablations
         .iter()
-        .find(|ablation| {
-            ablation.stem.chars().count() >= 4 && !ablation.passages_absent.is_empty()
-        })
+        .find(|ablation| ablation.stem.chars().count() >= 4 && !ablation.passages_absent.is_empty())
         .or_else(|| ablations.first())
     {
         println!(

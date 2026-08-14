@@ -344,7 +344,10 @@ impl MorphologicalConductCudaFront {
     }
 
     pub fn active_deposits(&self) -> usize {
-        self.deposits.iter().filter(|deposit| deposit.active).count()
+        self.deposits
+            .iter()
+            .filter(|deposit| deposit.active)
+            .count()
     }
 
     /// **The independent host implementation of the same question, for parity only.**
@@ -746,8 +749,11 @@ impl CudaMorphologicalConductExecutor {
         let mut returned = LocalSequence::with_capacity(output_extent);
         returned.resize_with(output_extent, || 0);
         self.output.copy_range_to_slice(0, &mut returned)?;
-        let semantic =
-            decode_card_output(&control_words, returned.as_ref(), front.zero_active_ablation)?;
+        let semantic = decode_card_output(
+            &control_words,
+            returned.as_ref(),
+            front.zero_active_ablation,
+        )?;
         let return_egress_nanoseconds = egress_started.elapsed().as_nanos();
 
         let host_parity_checked =
@@ -1308,9 +1314,8 @@ mod tests {
         let mut candidates = LocalSequence::with_capacity(CANDIDATES);
         let mut key_rows = LocalSequence::new();
         for candidate in 0..CANDIDATES {
-            candidates.push(
-                MorphologicalConductCandidate::new(1000 + candidate as u32).expect("face"),
-            );
+            candidates
+                .push(MorphologicalConductCandidate::new(1000 + candidate as u32).expect("face"));
             // Each candidate's keys are GENERATED ascending and distinct rather than sorted after
             // the fact: `LocalSet`/`LocalSequence` are the substrate's carriers and reaching for a
             // `Vec` to sort and dedup is what the ownership ratchet counts. Some keys land on a
@@ -1338,7 +1343,9 @@ mod tests {
             eprintln!("no CUDA device: the material-scale card test did not run");
             return;
         };
-        let returned = cuda.enact(&front).expect("the card carries a front at material scale");
+        let returned = cuda
+            .enact(&front)
+            .expect("the card carries a front at material scale");
         assert_eq!(returned.semantic.candidates.len(), CANDIDATES);
         assert!(returned.apparatus.host_parity_checked);
         returned
@@ -1377,7 +1384,9 @@ mod tests {
             key_rows: LocalSequence::from([key_row(0, [1, 0, 0])]),
             zero_active_ablation: false,
         };
-        let refusal = cuda.enact(&forged).expect_err("the card declines this front");
+        let refusal = cuda
+            .enact(&forged)
+            .expect_err("the card declines this front");
         let MorphologicalConductCudaError::DeviceRefusedShape {
             cause,
             declared,
@@ -1386,7 +1395,10 @@ mod tests {
         else {
             panic!("the card must NAME the agreement it declined on, returned {refusal:?}");
         };
-        assert_eq!(cause, "the deposit sheet the card received is not the declared extent");
+        assert_eq!(
+            cause,
+            "the deposit sheet the card received is not the declared extent"
+        );
         assert_eq!(declared, 5);
         assert_eq!(found, 4);
         // A declined front does not poison the executor: the refusal is a return, not a fault.

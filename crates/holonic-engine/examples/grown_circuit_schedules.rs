@@ -24,12 +24,12 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use holonic_engine::grown_cell::{
-    canonical_netlist, evaluate, found_complex, grow, primitive_section, split, standard_cells, Bus,
-    ComplexAperture, Growth, NetId, RuleName, Schedule,
+    Bus, ComplexAperture, Growth, NetId, RuleName, Schedule, canonical_netlist, evaluate,
+    found_complex, grow, primitive_section, split, standard_cells,
 };
 use holonic_engine::rebase_invariants::{
-    invariants_agree, rebase_invariants_on, rebase_invariants_with_schedule, PivotRule,
-    RebaseInvariants,
+    PivotRule, RebaseInvariants, invariants_agree, rebase_invariants_on,
+    rebase_invariants_with_schedule,
 };
 use num_bigint::BigUint;
 use num_traits::One;
@@ -51,18 +51,18 @@ fn main() {
         table.description().0,
         table.description().1
     );
-    println!("  no rule names a width; `split` refuses fewer than two and the refusal is the base case.\n");
+    println!(
+        "  no rule names a width; `split` refuses fewer than two and the refusal is the base case.\n"
+    );
 
     let cells: [(RuleName, &str, fn(usize) -> Vec<usize>); 4] = [
-        ("ripple-adder", "carry chain, linear depth", |w| vec![w, w, 1]),
-        (
-            "brent-kung-adder",
-            "prefix adder, logarithmic depth",
-            |w| vec![w, w, 1],
-        ),
-        ("multiplexer", "selection tree", |w| {
-            vec![1usize << w, w]
+        ("ripple-adder", "carry chain, linear depth", |w| {
+            vec![w, w, 1]
         }),
+        ("brent-kung-adder", "prefix adder, logarithmic depth", |w| {
+            vec![w, w, 1]
+        }),
+        ("multiplexer", "selection tree", |w| vec![1usize << w, w]),
         ("parity-tree", "reduction tree", |w| vec![w]),
     ];
 
@@ -108,7 +108,10 @@ fn main() {
                 .entry(rule)
                 .or_default()
                 .extend(growth.sites.iter().copied());
-            gate_growth.entry(rule).or_default().push(growth.gate_count());
+            gate_growth
+                .entry(rule)
+                .or_default()
+                .push(growth.gate_count());
         }
         println!();
     }
@@ -140,7 +143,9 @@ fn main() {
             (*rule, counts.last().copied().unwrap_or(0) / sites)
         })
         .collect();
-    println!("  `split` first succeeds at width {divides_from}, which is where a description of division begins.");
+    println!(
+        "  `split` first succeeds at width {divides_from}, which is where a description of division begins."
+    );
     println!("  gates per emission site at the widest growth above: {ratios:?}\n");
     controls.push(Control {
         name: "description length constant while gate count grows",
@@ -161,8 +166,8 @@ fn main() {
 
     // -- the negative pole ---------------------------------------------------------------------
     banner("the negative pole: material that exhausts at once");
-    let pole = grow(&table, "multiplexer", &[1, 0], Schedule::Instantiation)
-        .expect("the pole grows");
+    let pole =
+        grow(&table, "multiplexer", &[1, 0], Schedule::Instantiation).expect("the pole grows");
     println!(
         "  multiplexer with no select bits: {} instances, {} gates, {} nets, grew_nothing = {}",
         pole.instance_count(),
@@ -188,13 +193,22 @@ fn main() {
             && pole.instances[0].grew_nothing
             && pole.root_outputs[0] == pole.primary_inputs[0]
             && pole_complex.arcs.is_empty(),
-        detail: format!("{} gates, {} arcs", pole.gate_count(), pole_complex.arcs.len()),
+        detail: format!(
+            "{} gates, {} arcs",
+            pole.gate_count(),
+            pole_complex.arcs.len()
+        ),
     });
 
     // -- the rule-reuse table --------------------------------------------------------------------
     banner("rule reuse: the same rule firing at several widths on different material");
-    let wide = grow(&table, "ripple-adder", &[11, 11, 1], Schedule::Instantiation)
-        .expect("width eleven grows");
+    let wide = grow(
+        &table,
+        "ripple-adder",
+        &[11, 11, 1],
+        Schedule::Instantiation,
+    )
+    .expect("width eleven grows");
     println!("  ripple-adder at width 11 (an odd width, so `split` is unbalanced throughout)\n");
     println!("  {:<24} {:>10} {:>10}", "rule", "in-width", "instances");
     for ((rule, width), count) in wide.rule_reuse() {
@@ -216,9 +230,7 @@ fn main() {
     let odd = 5usize;
     let growths: Vec<Growth> = Schedule::ALL
         .iter()
-        .map(|schedule| {
-            grow(&table, "ripple-adder", &[odd, odd, 1], *schedule).expect("grows")
-        })
+        .map(|schedule| grow(&table, "ripple-adder", &[odd, odd, 1], *schedule).expect("grows"))
         .collect();
     for growth in &growths {
         println!("\n  schedule {}", growth.schedule.name());
@@ -230,10 +242,9 @@ fn main() {
         }
     }
     let traces: Vec<Vec<String>> = growths.iter().map(Growth::trace_lines).collect();
-    let pairwise_distinct = traces[0] != traces[1] && traces[0] != traces[2] && traces[1] != traces[2];
-    println!(
-        "\n  three traces pairwise distinct at width {odd}: {pairwise_distinct}"
-    );
+    let pairwise_distinct =
+        traces[0] != traces[1] && traces[0] != traces[2] && traces[1] != traces[2];
+    println!("\n  three traces pairwise distinct at width {odd}: {pairwise_distinct}");
 
     // Where the gauge degenerates, and why. A power-of-two bus halves evenly at every level, so
     // widest-first has nothing to prefer. That is a property of the CIRCUIT, exhibited rather than
@@ -276,17 +287,16 @@ fn main() {
     );
     println!("  first eight gate-output identifiers per schedule (the symbols that moved):");
     for (schedule, ids) in Schedule::ALL.iter().zip(&identifiers) {
-        println!(
-            "    {:<14} {:?}",
-            schedule.name(),
-            &ids[..ids.len().min(8)]
-        );
+        println!("    {:<14} {:?}", schedule.name(), &ids[..ids.len().min(8)]);
     }
     let symbols_moved = identifiers[0] != identifiers[1] || identifiers[0] != identifiers[2];
     controls.push(Control {
         name: "the schedules grow one netlist under different symbols",
         holds: forms[0] == forms[1] && forms[0] == forms[2] && symbols_moved,
-        detail: format!("forms agree = {}, symbols moved = {symbols_moved}", forms[0] == forms[1]),
+        detail: format!(
+            "forms agree = {}, symbols moved = {symbols_moved}",
+            forms[0] == forms[1]
+        ),
     });
 
     // The circuit is right, not merely consistent.
@@ -310,7 +320,9 @@ fn main() {
     // -- the complex and its invariants ------------------------------------------------------------
     banner("the 2-complex the growth founds");
     println!("  0-cells nets; 1-cells conduction arcs (gate pins and lineage boxes);");
-    println!("  2-cells cell division -- a parent's coarse arc against the refinement that replaced it,");
+    println!(
+        "  2-cells cell division -- a parent's coarse arc against the refinement that replaced it,"
+    );
     println!("  attached by the lineage with no embedding search and no choice.\n");
     println!(
         "  {:<20} {:>3} {:>6} {:>5} {:>6} {:>6} {:>6} {:>6} {:>6} {:>8} {:>8}",
@@ -348,8 +360,13 @@ fn main() {
     banner("one grown division face, in full");
     println!("  Counts are supporting receipts. This is the cell.\n");
     {
-        let growth = grow(&table, "brent-kung-adder", &[2, 2, 1], Schedule::Instantiation)
-            .expect("grows");
+        let growth = grow(
+            &table,
+            "brent-kung-adder",
+            &[2, 2, 1],
+            Schedule::Instantiation,
+        )
+        .expect("grows");
         let grown = found_complex(&growth, ComplexAperture::DIVISION).expect("founds");
         let names: BTreeMap<_, _> = grown
             .complex
@@ -387,26 +404,54 @@ fn main() {
                 for (name, coefficient) in terms {
                     println!("      {coefficient:>4} * {name}");
                 }
-                println!("\n    The parent's coarse arc carries the path count; each child arc carries");
-                println!("    paths(source -> its tail) * paths(its head -> target). The sum telescopes,");
-                println!("    so the face closes -- and `found_cell` refuses `dd != 0`, which is what");
-                println!("    verifies the two dynamic programs rather than a comment claiming they are right.");
+                println!(
+                    "\n    The parent's coarse arc carries the path count; each child arc carries"
+                );
+                println!(
+                    "    paths(source -> its tail) * paths(its head -> target). The sum telescopes,"
+                );
+                println!(
+                    "    so the face closes -- and `found_cell` refuses `dd != 0`, which is what"
+                );
+                println!(
+                    "    verifies the two dynamic programs rather than a comment claiming they are right."
+                );
             }
-            None => println!("  NO FACE WITH MULTIPLICITY -- the exhibit did not reach its material."),
+            None => {
+                println!("  NO FACE WITH MULTIPLICITY -- the exhibit did not reach its material.")
+            }
         }
     }
 
     banner("what survives every schedule and every pivot rule");
-    println!("  A cost law, and this file declared a FALSE one until 2026-08-08. It said the Smith");
-    println!("  reduction is `cubic in the cell count`. Measured on the grade-two boundary map of a");
-    println!("  width-3 Brent-Kung adder, [143 x 101], the three pivot rules -- which the uniqueness");
-    println!("  theorem forces to return the SAME factors -- came in at 1 ms, 8 ms, and over 390 s.");
+    println!(
+        "  A cost law, and this file declared a FALSE one until 2026-08-08. It said the Smith"
+    );
+    println!(
+        "  reduction is `cubic in the cell count`. Measured on the grade-two boundary map of a"
+    );
+    println!(
+        "  width-3 Brent-Kung adder, [143 x 101], the three pivot rules -- which the uniqueness"
+    );
+    println!(
+        "  theorem forces to return the SAME factors -- came in at 1 ms, 8 ms, and over 390 s."
+    );
     println!("  A spread of 390,000x at FIXED dimension. The cost is carried by the rule, through");
-    println!("  intermediate expression swell, and a bound that does not name the rule is not a bound.");
-    println!("  `SmallestMagnitude` is the mitigation and is what every single-rule site now passes.");
-    println!("  The readings below still run all three rules, because the gauge is the point: what is");
-    println!("  claimed is that the RETURNS do not move. They do not. The costs do, by five orders of");
-    println!("  magnitude, and nothing in the suite compares costs. Elapsed milliseconds are printed");
+    println!(
+        "  intermediate expression swell, and a bound that does not name the rule is not a bound."
+    );
+    println!(
+        "  `SmallestMagnitude` is the mitigation and is what every single-rule site now passes."
+    );
+    println!(
+        "  The readings below still run all three rules, because the gauge is the point: what is"
+    );
+    println!(
+        "  claimed is that the RETURNS do not move. They do not. The costs do, by five orders of"
+    );
+    println!(
+        "  magnitude, and nothing in the suite compares costs. Elapsed milliseconds are printed"
+    );
     println!("  with each reading rather than hidden.\n");
 
     let readings: Vec<(&str, &str, usize, ComplexAperture)> = vec![
@@ -502,10 +547,10 @@ fn main() {
                     .iter()
                     .map(|factor| format!("Z/{factor}"))
                     .collect();
-                torsion_seen
-                    .entry(grade.grade)
-                    .or_default()
-                    .push(format!("{rule}/{aperture_name}/w{width}: {}", rendered.join(" + ")));
+                torsion_seen.entry(grade.grade).or_default().push(format!(
+                    "{rule}/{aperture_name}/w{width}: {}",
+                    rendered.join(" + ")
+                ));
                 rendered.join(" + ")
             };
             println!(
@@ -545,8 +590,12 @@ fn main() {
 
     // -- the aperture axis: a receiver that sees the netlist and not the lineage --------------------
     banner("two apertures on one grown complex");
-    println!("  `derivation_atlas` reads one deposit under several declared incidences. The analogue");
-    println!("  here is the SECTION: nets and gate pins only -- the netlist a receiver holds when it");
+    println!(
+        "  `derivation_atlas` reads one deposit under several declared incidences. The analogue"
+    );
+    println!(
+        "  here is the SECTION: nets and gate pins only -- the netlist a receiver holds when it"
+    );
     println!("  cannot see the lineage -- read with `rebase_invariants_on`, against the whole.\n");
     let mut section_agreement = true;
     let mut section_differs = false;
@@ -569,7 +618,8 @@ fn main() {
             }
             if schedule == Schedule::Instantiation {
                 let whole =
-                    rebase_invariants_on(&grown.complex, None, PivotRule::SmallestMagnitude).unwrap();
+                    rebase_invariants_on(&grown.complex, None, PivotRule::SmallestMagnitude)
+                        .unwrap();
                 println!(
                     "  {rule} width {width}: section {} of {} cells",
                     support.len(),
@@ -643,7 +693,9 @@ fn main() {
     println!();
     println!("  A ripple-carry adder built from three-input primitives never reconverges: every");
     println!("  net's fan-out enters disjoint cones, so every division face carries k = 1 and the");
-    println!("  boundary is an incidence matrix. Brent-Kung reconverges, because the propagate and");
+    println!(
+        "  boundary is an incidence matrix. Brent-Kung reconverges, because the propagate and"
+    );
     println!("  the generate of one half both reach the same group carry -- so k > 1 appears from");
     println!("  the CIRCUIT and from nothing the reading chose.");
 

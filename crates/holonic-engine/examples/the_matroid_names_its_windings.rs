@@ -123,8 +123,12 @@ fn fixtures() -> Vec<(Matroid, &'static str)> {
             "four general lines in P^2",
         ),
         (
-            Matroid::graphic("M(K4)", 4, &[(0, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 3)])
-                .expect("M(K4)"),
+            Matroid::graphic(
+                "M(K4)",
+                4,
+                &[(0, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 3)],
+            )
+            .expect("M(K4)"),
             "the graphic matroid of K_4",
         ),
         (
@@ -332,9 +336,15 @@ fn report_matroid(matroid: Matroid, note: &str, failures: &mut Vec<String>) -> V
             // any disagreement between exact elimination and exact character theory shows up here.
             let characters = reading.split();
             println!();
-            println!("    elimination, flat order:    {}", show_split(&elimination));
+            println!(
+                "    elimination, flat order:    {}",
+                show_split(&elimination)
+            );
             println!("    elimination, cyclic reading: {}", show_split(&after));
-            println!("    character route:             {}", show_split(&characters));
+            println!(
+                "    character route:             {}",
+                show_split(&characters)
+            );
             if elimination != after || after != characters {
                 failures.push(format!(
                     "{name}: three routes to one split disagree: {} / {} / {}",
@@ -474,7 +484,10 @@ fn report_reading_refusals(failures: &mut Vec<String>) {
         vec![1, 1, 1, 0],
     ])
     .expect("symmetric, and deliberately not circulant");
-    for (form, label) in [(&cycle, "the C_4 adjacency"), (&scrambled, "one entry moved")] {
+    for (form, label) in [
+        (&cycle, "the C_4 adjacency"),
+        (&scrambled, "one entry moved"),
+    ] {
         let native = CyclicReading::native(form.extent()).expect("extent four");
         let direct = SymmetricCirculant::from_symmetric_form(form).err();
         let read = SymmetricCirculant::read_cyclically(form, &native).err();

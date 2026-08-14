@@ -222,11 +222,7 @@ pub enum LeaderError {
 // exact rational helpers
 
 fn rat_min<'a>(left: &'a Rat, right: &'a Rat) -> &'a Rat {
-    if left <= right {
-        left
-    } else {
-        right
-    }
+    if left <= right { left } else { right }
 }
 
 /// The least integer strictly greater than one.
@@ -616,10 +612,7 @@ impl MaterialBoundary {
                 return Err(LeaderError::GermExtentNotPositive);
             }
             germs.push(RationalGerm::new(at.clone(), germ.jet.clone())?);
-            germs.push(RationalGerm::new(
-                &germ.extent - at,
-                germ.jet.rebase(at),
-            )?);
+            germs.push(RationalGerm::new(&germ.extent - at, germ.jet.rebase(at))?);
         }
         Self::new(germs)
     }
@@ -885,9 +878,7 @@ pub fn integrate_by_leaders(
 
     while let Some(standing) = material.standing_at(&offset) {
         let returned_jet = standing.jet;
-        let predicted_jet = founded
-            .as_ref()
-            .map(|(axis, taken)| axis.rebase(taken));
+        let predicted_jet = founded.as_ref().map(|(axis, taken)| axis.rebase(taken));
         let agrees = predicted_jet
             .as_ref()
             .map(|predicted| *predicted == returned_jet)
@@ -1060,7 +1051,11 @@ mod tests {
     }
 
     /// Every run whose depth is not itself under test reads the depth off the material.
-    fn run(boundary: &MaterialBoundary, grain: Rat, discipline: RideDiscipline) -> LeaderQuadrature {
+    fn run(
+        boundary: &MaterialBoundary,
+        grain: Rat,
+        discipline: RideDiscipline,
+    ) -> LeaderQuadrature {
         integrate_by_leaders(
             boundary,
             &LeaderLaw::new(grain, discipline, WitnessDepth::ReadOffTheJet),
@@ -1075,15 +1070,15 @@ mod tests {
 
     /// `f(t) = 3` over an extent of 2. Area 6.
     fn constant_slab() -> (MaterialBoundary, Rat) {
-        (
-            material(vec![germ(integer(2), &[(3, 1)])]),
-            integer(6),
-        )
+        (material(vec![germ(integer(2), &[(3, 1)])]), integer(6))
     }
 
     /// `f(t) = 5t` over an extent of 3. Area `5·9/2 = 45/2`.
     fn linear_ramp() -> (MaterialBoundary, Rat) {
-        (material(vec![germ(integer(3), &[(0, 1), (5, 1)])]), rat(45, 2))
+        (
+            material(vec![germ(integer(3), &[(0, 1), (5, 1)])]),
+            rat(45, 2),
+        )
     }
 
     /// `f(t) = t^2` over an extent of 2. Area `8/3`.
@@ -1097,10 +1092,7 @@ mod tests {
     /// `f(t) = 1 + t + t^2 + t^3` over an extent of 1. Area `1 + 1/2 + 1/3 + 1/4 = 25/12`.
     fn cubic_unit() -> (MaterialBoundary, Rat) {
         (
-            material(vec![germ(
-                integer(1),
-                &[(1, 1), (1, 1), (1, 1), (1, 1)],
-            )]),
+            material(vec![germ(integer(1), &[(1, 1), (1, 1), (1, 1), (1, 1)])]),
             rat(25, 12),
         )
     }
@@ -1263,19 +1255,28 @@ mod tests {
     fn oracle_conformance_across_every_fixture() {
         for (name, boundary, expected) in every_fixture() {
             let oracle = germwise_oracle_area(&boundary);
-            assert_eq!(oracle, expected, "{name}: the oracle disagrees with the hand figure");
+            assert_eq!(
+                oracle, expected,
+                "{name}: the oracle disagrees with the hand figure"
+            );
             // The declared depth sweeps from what the material required upward: a shallower
             // declaration is refused rather than silently accepted, which is the whole of the
             // excision.
             let floor = boundary.jet_aperture();
             for discipline in [RideDiscipline::GrainOnly, RideDiscipline::GermBounded] {
                 let read_off = run(&boundary, rat(2, 5), discipline);
-                assert_eq!(read_off.area, oracle, "{name} under {discipline:?}/read-off");
+                assert_eq!(
+                    read_off.area, oracle,
+                    "{name} under {discipline:?}/read-off"
+                );
                 for depth in floor..=floor + 3 {
                     let quadrature =
                         integrate_by_leaders(&boundary, &law(rat(2, 5), discipline, depth))
                             .expect("a lawful growth");
-                    assert_eq!(quadrature.area, oracle, "{name} under {discipline:?}/{depth}");
+                    assert_eq!(
+                        quadrature.area, oracle,
+                        "{name} under {discipline:?}/{depth}"
+                    );
                 }
             }
         }
@@ -1304,15 +1305,36 @@ mod tests {
         for extent in &scales {
             let boundary = long_ramp(extent);
             let depth = Rat::from_integer(BigInt::from(boundary.jet_aperture()));
-            assert_eq!(boundary.jet_aperture(), 2, "f(x) = x carries a rank-two jet");
+            assert_eq!(
+                boundary.jet_aperture(),
+                2,
+                "f(x) = x carries a rank-two jet"
+            );
             let ridden = run(&boundary, Rat::one(), RideDiscipline::GermBounded);
             let expected = (extent * extent) / integer(2);
-            assert_eq!(ridden.area, expected, "the scaled area lost accuracy at {extent}");
-            assert_eq!(ridden.ride_count(), 1, "the founded axis was not ridden at {extent}");
-            assert_eq!(ridden.material_witness_depth, 2, "the material returned a depth of two");
+            assert_eq!(
+                ridden.area, expected,
+                "the scaled area lost accuracy at {extent}"
+            );
+            assert_eq!(
+                ridden.ride_count(),
+                1,
+                "the founded axis was not ridden at {extent}"
+            );
+            assert_eq!(
+                ridden.material_witness_depth, 2,
+                "the material returned a depth of two"
+            );
             let witness = &ridden.scale_witnesses[0];
-            assert_eq!(witness.scale, extent - &depth, "wrong scale witness at {extent}");
-            assert!(witness.scale > Rat::one(), "the witness must record a real scaling");
+            assert_eq!(
+                witness.scale,
+                extent - &depth,
+                "wrong scale witness at {extent}"
+            );
+            assert!(
+                witness.scale > Rat::one(),
+                "the witness must record a real scaling"
+            );
             ridden_counts.push(ridden.extension_count());
         }
         assert_eq!(
@@ -1328,7 +1350,10 @@ mod tests {
             let boundary = long_ramp(&extent);
             let founded = run(&boundary, Rat::one(), RideDiscipline::GrainOnly);
             let ridden = run(&boundary, Rat::one(), RideDiscipline::GermBounded);
-            assert_eq!(founded.area, ridden.area, "riding moved the sum at {extent}");
+            assert_eq!(
+                founded.area, ridden.area,
+                "riding moved the sum at {extent}"
+            );
             assert_eq!(founded.area, (&extent * &extent) / integer(2));
             grain_only_counts.push(founded.extension_count());
         }
@@ -1343,13 +1368,23 @@ mod tests {
         //
         // j(t) = 1 + 2t + 3t^2  =>  J(s) = s + s^2 + s^3.
         let founded = jet(&[(1, 1), (2, 1), (3, 1)]);
-        for (numerator, denominator) in
-            [(1, 1), (7, 1), (1, 3), (13, 5), (101, 2), (1, 128), (9_999, 7)]
-        {
+        for (numerator, denominator) in [
+            (1, 1),
+            (7, 1),
+            (1, 3),
+            (13, 5),
+            (101, 2),
+            (1, 128),
+            (9_999, 7),
+        ] {
             let span = rat(numerator, denominator);
             let square = &span * &span;
             let expected = &span + &square + &square * &span;
-            assert_eq!(founded.swept(&span), expected, "scale {numerator}/{denominator}");
+            assert_eq!(
+                founded.swept(&span),
+                expected,
+                "scale {numerator}/{denominator}"
+            );
         }
     }
 
@@ -1357,10 +1392,7 @@ mod tests {
     fn witness_depth_cannot_change_the_returned_area_inside_the_aperture() {
         for (name, boundary, expected) in every_fixture() {
             let floor = boundary.jet_aperture();
-            for discipline in [
-                RideDiscipline::GrainOnly,
-                RideDiscipline::GermBounded,
-            ] {
+            for discipline in [RideDiscipline::GrainOnly, RideDiscipline::GermBounded] {
                 let read_off = run(&boundary, rat(1, 2), discipline);
                 assert_eq!(
                     read_off.area, expected,
@@ -1512,8 +1544,11 @@ mod tests {
         // At the material's own requirement, and above it, the same declaration is admitted.
         for depth in 2..=5 {
             assert!(
-                integrate_by_leaders(&boundary, &law(Rat::one(), RideDiscipline::GermBounded, depth))
-                    .is_ok(),
+                integrate_by_leaders(
+                    &boundary,
+                    &law(Rat::one(), RideDiscipline::GermBounded, depth)
+                )
+                .is_ok(),
                 "depth {depth} is at or above what the material required and must be admitted"
             );
         }
@@ -1628,8 +1663,16 @@ mod tests {
             ("cubic_unit", cubic_unit().0, ()),
             ("quartic_alternating", quartic_alternating().0, ()),
         ] {
-            assert_eq!(boundary.germ_count(), 1, "{name} must be a single standing form");
-            let quadrature = run(&boundary, boundary.declared_grain(), RideDiscipline::GermBounded);
+            assert_eq!(
+                boundary.germ_count(),
+                1,
+                "{name} must be a single standing form"
+            );
+            let quadrature = run(
+                &boundary,
+                boundary.declared_grain(),
+                RideDiscipline::GermBounded,
+            );
             assert_eq!(
                 quadrature.scale_witnesses.len(),
                 1,
@@ -1720,7 +1763,10 @@ mod tests {
         assert_eq!(germwise_oracle_area(&redeclared), expected);
 
         let after = run(&redeclared, rat(1, 4), RideDiscipline::GrainOnly);
-        assert_eq!(after.area, expected, "a redeclaration moved the returned area");
+        assert_eq!(
+            after.area, expected,
+            "a redeclaration moved the returned area"
+        );
         assert_eq!(
             after.obstructions.len(),
             plain.obstructions.len(),
@@ -1771,7 +1817,10 @@ mod tests {
         assert!(ridden.extension_count() > 0, "no extension was founded");
         assert!(ridden.found_count() > 0, "nothing was FOUNDed");
         assert!(ridden.ride_count() > 0, "nothing was RIDden");
-        assert!(!ridden.obstructions.is_empty(), "no obstruction was retained");
+        assert!(
+            !ridden.obstructions.is_empty(),
+            "no obstruction was retained"
+        );
         assert!(!ridden.scale_witnesses.is_empty(), "no scale was witnessed");
         assert!(
             ridden
@@ -1827,8 +1876,14 @@ mod tests {
 
         let grain_only = run(&boundary, Rat::one(), RideDiscipline::GrainOnly);
         let germ_bounded = run(&boundary, Rat::one(), RideDiscipline::GermBounded);
-        assert_eq!(grain_only.area, truth, "grain-only founding is inside the aperture");
-        assert_eq!(germ_bounded.area, truth, "germ-bounded riding is inside the aperture");
+        assert_eq!(
+            grain_only.area, truth,
+            "grain-only founding is inside the aperture"
+        );
+        assert_eq!(
+            germ_bounded.area, truth,
+            "germ-bounded riding is inside the aperture"
+        );
         assert_eq!(
             path_disagreement(&grain_only, &germ_bounded),
             Rat::zero(),
@@ -1908,7 +1963,10 @@ mod tests {
     fn a_padded_declaration_is_the_same_material() {
         let plain = jet(&[(1, 1), (2, 1)]);
         let padded = jet(&[(1, 1), (2, 1), (0, 1), (0, 1)]);
-        assert_eq!(plain, padded, "trailing zeros must not read as a material change");
+        assert_eq!(
+            plain, padded,
+            "trailing zeros must not read as a material change"
+        );
         assert_eq!(plain.rank(), 2);
     }
 
@@ -1928,10 +1986,7 @@ mod tests {
         );
         // A span that is not a grain and a coefficient family that is not integral.
         // ∫_0^{3/5} (7/2 - 4/3 t) dt = (7/2)(3/5) - (4/3)(9/50)  = 21/10 - 6/25 = 105/50 - 12/50.
-        assert_eq!(
-            jet(&[(7, 2), (-4, 3)]).swept(&rat(3, 5)),
-            rat(93, 50)
-        );
+        assert_eq!(jet(&[(7, 2), (-4, 3)]).swept(&rat(3, 5)), rat(93, 50));
     }
 
     // --- refusals -----------------------------------------------------------------------------
@@ -1951,7 +2006,10 @@ mod tests {
             integrate_by_leaders(&boundary, &law(Rat::one(), RideDiscipline::GrainOnly, 0)),
             Err(LeaderError::WitnessDepthZero)
         );
-        assert_eq!(MaterialBoundary::new(Vec::new()), Err(LeaderError::EmptyMaterial));
+        assert_eq!(
+            MaterialBoundary::new(Vec::new()),
+            Err(LeaderError::EmptyMaterial)
+        );
         assert_eq!(
             RationalGerm::new(Rat::zero(), jet(&[(1, 1)])),
             Err(LeaderError::GermExtentNotPositive)
@@ -1973,7 +2031,11 @@ mod tests {
         assert_eq!(boundary.span(), &(rat(7, 3) + rat(4, 5) + rat(3, 2)));
         assert!(boundary.standing_at(&integer(-1)).is_none());
         assert!(boundary.standing_at(boundary.span()).is_none());
-        assert!(boundary.standing_at(&(boundary.span() - rat(1, 1000))).is_some());
+        assert!(
+            boundary
+                .standing_at(&(boundary.span() - rat(1, 1000)))
+                .is_some()
+        );
 
         let at_zero = boundary.standing_at(&Rat::zero()).unwrap();
         assert_eq!(at_zero.germ_index, 0);
@@ -2004,12 +2066,22 @@ mod tests {
         let mut offset = Rat::zero();
         for extension in &quadrature.extensions {
             assert_eq!(extension.base_offset, offset, "the lineage has a gap");
-            assert!(extension.span > Rat::zero(), "a null extension was deposited");
+            assert!(
+                extension.span > Rat::zero(),
+                "a null extension was deposited"
+            );
             running = &running + &extension.winding;
-            assert_eq!(extension.running_sum, running, "the running sum is not running");
+            assert_eq!(
+                extension.running_sum, running,
+                "the running sum is not running"
+            );
             offset = &offset + &extension.span;
         }
-        assert_eq!(offset, *boundary.span(), "the lineage did not reach the far boundary");
+        assert_eq!(
+            offset,
+            *boundary.span(),
+            "the lineage did not reach the far boundary"
+        );
         assert_eq!(running, expected);
         assert_eq!(
             quadrature.extensions.last().unwrap().running_sum,

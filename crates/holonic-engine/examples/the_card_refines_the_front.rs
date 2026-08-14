@@ -142,7 +142,10 @@ fn main() {
         let on_card = match card.saturate(&corpus, &identities, sites, own_ceiling) {
             Ok(returned) => returned,
             Err(error) => {
-                disagreed.push(format!("{:?}: the card refused -- {error}", census.surface(*surface)));
+                disagreed.push(format!(
+                    "{:?}: the card refused -- {error}",
+                    census.surface(*surface)
+                ));
                 continue;
             }
         };
@@ -334,7 +337,10 @@ fn trace(census: &CorpusCensus, atlas: &ConductAtlas, name: &str) {
             .expect("the card refines")
             .classes;
         if host != on_card || depth <= 3 {
-            println!("    {depth:>6}  {host:>10}  {on_card:>10}{}", if host == on_card { "" } else { "   <-- differ" });
+            println!(
+                "    {depth:>6}  {host:>10}  {on_card:>10}{}",
+                if host == on_card { "" } else { "   <-- differ" }
+            );
         }
     }
 }

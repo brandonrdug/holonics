@@ -266,18 +266,25 @@ impl CudaApertureExecutor {
                 "cuDeviceGetName",
             )?;
             let device_name = CStr::from_ptr(name.as_ptr()).to_string_lossy().into_owned();
-            let device_attribute = |selector: i32, operation: &'static str| -> Result<u32, CudaApertureError> {
-                let mut value = 0i32;
-                driver(
-                    cuDeviceGetAttribute(&mut value, selector, device),
-                    operation,
-                )?;
-                Ok(value.max(0) as u32)
-            };
-            let device_block =
-                device_attribute(DEVICE_MAX_THREADS_PER_BLOCK, "cuDeviceGetAttribute(MAX_THREADS_PER_BLOCK)")?;
-            let max_grid_x = device_attribute(DEVICE_MAX_GRID_DIM_X, "cuDeviceGetAttribute(MAX_GRID_DIM_X)")?;
-            let warp = device_attribute(DEVICE_WARP_SIZE, "cuDeviceGetAttribute(WARP_SIZE)")?.max(1);
+            let device_attribute =
+                |selector: i32, operation: &'static str| -> Result<u32, CudaApertureError> {
+                    let mut value = 0i32;
+                    driver(
+                        cuDeviceGetAttribute(&mut value, selector, device),
+                        operation,
+                    )?;
+                    Ok(value.max(0) as u32)
+                };
+            let device_block = device_attribute(
+                DEVICE_MAX_THREADS_PER_BLOCK,
+                "cuDeviceGetAttribute(MAX_THREADS_PER_BLOCK)",
+            )?;
+            let max_grid_x = device_attribute(
+                DEVICE_MAX_GRID_DIM_X,
+                "cuDeviceGetAttribute(MAX_GRID_DIM_X)",
+            )?;
+            let warp =
+                device_attribute(DEVICE_WARP_SIZE, "cuDeviceGetAttribute(WARP_SIZE)")?.max(1);
             let mut context = ptr::null_mut();
             driver(cuCtxCreate_v2(&mut context, 0, device), "cuCtxCreate_v2")?;
 
@@ -404,7 +411,11 @@ impl CudaApertureExecutor {
                     for function in [conic_function, segment_function] {
                         let mut value = 0i32;
                         driver(
-                            cuFuncGetAttribute(&mut value, FUNCTION_MAX_THREADS_PER_BLOCK, function),
+                            cuFuncGetAttribute(
+                                &mut value,
+                                FUNCTION_MAX_THREADS_PER_BLOCK,
+                                function,
+                            ),
                             "cuFuncGetAttribute(MAX_THREADS_PER_BLOCK)",
                         )?;
                         kernel_block = kernel_block.min(value.max(0) as u32);
@@ -1917,7 +1928,10 @@ mod tests {
         // executor is constructed in, so it is the state every caller gets by default.
         let authority = work(1_000, 0, 0);
         let candidate = work(10, 900, 4_096);
-        assert_ne!(authority, candidate, "the fixture must give the law something to separate");
+        assert_ne!(
+            authority, candidate,
+            "the fixture must give the law something to separate"
+        );
         let admission = CarrierAdmission::Open;
         assert!(admission.is_open());
         assert_eq!(admission.dilation(), None);
@@ -1936,15 +1950,33 @@ mod tests {
         // host 1 : device 1 : transfer 1 -> authority 1000, candidate 264
         let admission = CarrierAdmission::under(&metric(1, 1, 1), &authority, &candidate);
         let dilation = admission.dilation().expect("the metric separated them");
-        assert_eq!(dilation.arc, BigUint::from(264_u32), "C, the candidate's walk");
-        assert_eq!(dilation.chord, BigUint::from(1_000_u32), "d, the direct crossing");
+        assert_eq!(
+            dilation.arc,
+            BigUint::from(264_u32),
+            "C, the candidate's walk"
+        );
+        assert_eq!(
+            dilation.chord,
+            BigUint::from(1_000_u32),
+            "d, the direct crossing"
+        );
         assert!(!dilation.is_mirror(), "the arc left the diagonal");
-        assert_eq!(admission.conducts_through(), ApertureExecutionBackend::HybridCuda);
+        assert_eq!(
+            admission.conducts_through(),
+            ApertureExecutionBackend::HybridCuda
+        );
         // The pair survives whole. Nothing on this path forms 264/1000, and `8/2` and `4/1` must
         // stay distinguishable -- that is the whole point of holding it holonic.
-        let scaled = CarrierDilation { arc: BigUint::from(528_u32), chord: BigUint::from(2_000_u32) };
+        let scaled = CarrierDilation {
+            arc: BigUint::from(528_u32),
+            chord: BigUint::from(2_000_u32),
+        };
         assert_ne!(*dilation, scaled, "equal quotient, different holonic state");
-        assert_eq!(dilation.cmp_against(&scaled), Ordering::Equal, "and yet the same ratio");
+        assert_eq!(
+            dilation.cmp_against(&scaled),
+            Ordering::Equal,
+            "and yet the same ratio"
+        );
     }
 
     #[test]
@@ -1956,11 +1988,21 @@ mod tests {
         let candidate = work(100, 100, 64);
         let cheap_host = CarrierAdmission::under(&metric(1, 20, 1), &authority, &candidate);
         let dilation = cheap_host.dilation().expect("the metric separated them");
-        assert_eq!(dilation.arc, BigUint::from(2_164_u32), "device work priced at 20");
+        assert_eq!(
+            dilation.arc,
+            BigUint::from(2_164_u32),
+            "device work priced at 20"
+        );
         assert_eq!(dilation.chord, BigUint::from(1_000_u32));
-        assert_eq!(cheap_host.conducts_through(), ApertureExecutionBackend::ExactHost);
+        assert_eq!(
+            cheap_host.conducts_through(),
+            ApertureExecutionBackend::ExactHost
+        );
         let cheap_device = CarrierAdmission::under(&metric(1, 1, 1), &authority, &candidate);
-        assert_eq!(cheap_device.conducts_through(), ApertureExecutionBackend::HybridCuda);
+        assert_eq!(
+            cheap_device.conducts_through(),
+            ApertureExecutionBackend::HybridCuda
+        );
         assert_ne!(
             cheap_host.conducts_through(),
             cheap_device.conducts_through(),
@@ -1975,11 +2017,17 @@ mod tests {
         let authority = work(200, 0, 0);
         let candidate = work(100, 50, 50);
         let admission = CarrierAdmission::under(&metric(1, 1, 1), &authority, &candidate);
-        assert!(admission.is_open(), "200 == 100 + 50 + 50 -- C = d, the mirror");
+        assert!(
+            admission.is_open(),
+            "200 == 100 + 50 + 50 -- C = d, the mirror"
+        );
         assert_eq!(admission.dilation(), None);
         assert!(
-            CarrierDilation { arc: BigUint::from(200_u32), chord: BigUint::from(200_u32) }
-                .is_mirror(),
+            CarrierDilation {
+                arc: BigUint::from(200_u32),
+                chord: BigUint::from(200_u32)
+            }
+            .is_mirror(),
             "the arc never left the diagonal, so it founded nothing"
         );
     }
@@ -2104,9 +2152,8 @@ mod tests {
         receipt.device_exact_support_evaluations = BigUint::zero();
         receipt.device_output_bytes = BigUint::zero();
         assert_eq!(
-            CarrierWork::of_candidate(&receipt).order_against(&CarrierWork::of_host_authority(
-                &receipt
-            )),
+            CarrierWork::of_candidate(&receipt)
+                .order_against(&CarrierWork::of_host_authority(&receipt)),
             ExactOrdering::Equal,
         );
     }

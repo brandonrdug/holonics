@@ -45,12 +45,14 @@
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 
-use holonic_engine::conditioned_derivation::{expose, ConditionedBody, ConditionedCircuit, DerivationQuery, Exposure};
+use holonic_engine::conditioned_derivation::{
+    ConditionedBody, ConditionedCircuit, DerivationQuery, Exposure, expose,
+};
 use holonic_engine::derivation_atlas::CircuitAperture;
 use holonic_engine::derivation_integral::{
-    accumulation, circuit_loads, loads_agree_with_the_boundary, potential_over,
-    recruited_declaration_family, recruited_declarations, statement_lineage, without_declarations,
-    AccumulationRule, HolonomyPopulation, NamedPotential, RouteDisagreement,
+    AccumulationRule, HolonomyPopulation, NamedPotential, RouteDisagreement, accumulation,
+    circuit_loads, loads_agree_with_the_boundary, potential_over, recruited_declaration_family,
+    recruited_declarations, statement_lineage, without_declarations,
 };
 
 fn material(root: &Path, extension: &str) -> Vec<PathBuf> {
@@ -394,7 +396,9 @@ fn main() {
         "\n  every declaration vertex some OTHER declaration recruited, with the load it carries:"
     );
     if recruited.is_empty() {
-        println!("    (none -- this circuit is head-separated and the head-determined rule cannot wind)");
+        println!(
+            "    (none -- this circuit is head-separated and the head-determined rule cannot wind)"
+        );
     }
     for declaration in &recruited {
         println!(
@@ -493,7 +497,9 @@ fn main() {
     }
 
     // ---------------------------------------------------------------------------------------------
-    rule("[3]  THE HOLONOMY -- reaching a derivation as a resource against reaching it as a result");
+    rule(
+        "[3]  THE HOLONOMY -- reaching a derivation as a resource against reaching it as a result",
+    );
 
     let whole_route_load = accumulation(&whole, AccumulationRule::RouteLoad);
     let collision_family = match recruited_declaration_family(
@@ -620,8 +626,7 @@ fn main() {
 
     controls.check(
         "the deposit carries a declaration that is itself recruited",
-        !recruited.is_empty()
-            && recruiting.values().all(|carried| !carried.is_empty()),
+        !recruited.is_empty() && recruiting.values().all(|carried| !carried.is_empty()),
         "without one, nothing here can wind and the winding half of this control is unreachable",
     );
     controls.check(
@@ -653,9 +658,10 @@ fn main() {
         "every retained chord of circuit W sits at the recruited declaration",
         route_load_w.is_some_and(|potential| {
             !potential.retained.is_empty()
-                && potential.retained.iter().all(|chord| {
-                    recruited.contains(&chord.tail) || recruited.contains(&chord.head)
-                })
+                && potential
+                    .retained
+                    .iter()
+                    .all(|chord| recruited.contains(&chord.tail) || recruited.contains(&chord.head))
         }),
         "the winding is located, not merely present",
     );
@@ -682,14 +688,17 @@ fn main() {
     );
     controls.check(
         "every pair of the collision family stands, at exactly minus the load reached",
-        collision_family.compared.iter().all(|pair| {
-            pair.stands() && *pair.residual() == -loads.route_load(&pair.left.to)
-        }),
+        collision_family
+            .compared
+            .iter()
+            .all(|pair| pair.stands() && *pair.residual() == -loads.route_load(&pair.left.to)),
         "the holonomy is the load of the derivation being used as a resource",
     );
     controls.check(
         "the statement lineage exhibits BOTH a standing pair and an agreeing pair",
-        lineage_w.is_some_and(|lineage| !lineage.standing().is_empty() && !lineage.agreeing().is_empty()),
+        lineage_w.is_some_and(|lineage| {
+            !lineage.standing().is_empty() && !lineage.agreeing().is_empty()
+        }),
         "neither 'always winds' nor 'never winds' can pass on this material",
     );
     controls.check(

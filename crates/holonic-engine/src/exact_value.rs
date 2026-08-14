@@ -632,9 +632,7 @@ pub mod ieee754 {
     /// same meanings and the same subnormal convention, so one decode covers all three. It is here
     /// because it is the format the material arrives in: a transformer weight file is `BF16`, and
     /// `soma/life/examples/eros_self_emanated_law.rs` refuses every other dtype by name.
-    #[derive(
-        Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize,
-    )]
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
     pub enum BinaryFloatSpecies {
         /// 1 sign, 8 exponent, 7 stored significand bits. Same exponent range as `binary32`, eight
         /// significand bits of ratio.
@@ -1139,7 +1137,8 @@ mod tests {
         assert!(matches!(
             decode_bits(BinaryFloatSpecies::Binary64, 0x7ff0_0000_0000_0000),
             Err(ExactValueError::InfiniteFloat {
-                negative: false, ..
+                negative: false,
+                ..
             })
         ));
         assert!(matches!(

@@ -340,7 +340,11 @@ pub fn coefficient_species(coefficient: &Rat) -> CoefficientSpecies {
     if multiplier == -one.clone() {
         return CoefficientSpecies::Reflective;
     }
-    let magnitude = if multiplier < Rat::zero() { -multiplier } else { multiplier };
+    let magnitude = if multiplier < Rat::zero() {
+        -multiplier
+    } else {
+        multiplier
+    };
     if magnitude < one {
         CoefficientSpecies::Dissipative
     } else {
@@ -371,9 +375,7 @@ pub enum DiscreteCurvatureError {
     /// (`LocalCoordinationDefect::Isolated`) and carry no doctrine here either.
     #[error("vertex {0:?} is incident to no hinge, so its traced deviation is undefined")]
     IsolatedVertex(VertexId),
-    #[error(
-        "vertex {vertex:?} declares link size {declared} but is incident to {incident} hinges"
-    )]
+    #[error("vertex {vertex:?} declares link size {declared} but is incident to {incident} hinges")]
     DeclaredLinkSizeDisagreesWithIncidence {
         vertex: VertexId,
         declared: usize,
@@ -638,7 +640,9 @@ impl DiscreteCurvatureConfiguration {
     /// `sum over v of K(v)`. At unit response on a closed triangulated surface
     /// this is the discrete Gauss-Bonnet total `6 chi`.
     pub fn total_deficit(&self) -> Rat {
-        self.deficits().values().fold(Rat::zero(), |sum, deficit| sum + deficit)
+        self.deficits()
+            .values()
+            .fold(Rat::zero(), |sum, deficit| sum + deficit)
     }
 
     pub fn is_flat(&self) -> bool {
@@ -809,7 +813,13 @@ impl DiscreteCurvatureConfiguration {
     pub fn deficit_amplitude(&self) -> Rat {
         self.deficits()
             .into_values()
-            .map(|deficit| if deficit < Rat::zero() { -deficit } else { deficit })
+            .map(|deficit| {
+                if deficit < Rat::zero() {
+                    -deficit
+                } else {
+                    deficit
+                }
+            })
             .fold(Rat::zero(), |carried, magnitude| {
                 if magnitude > carried {
                     magnitude
@@ -1014,8 +1024,7 @@ mod tests {
                 }),
             bipyramid_hinges().into_iter().map(|(id, endpoints)| {
                 let apexes = bipyramid_apexes();
-                let touches_apex =
-                    endpoints.iter().any(|v| apexes.contains(v));
+                let touches_apex = endpoints.iter().any(|v| apexes.contains(v));
                 let response = if touches_apex { rat(6, 5) } else { rat(9, 5) };
                 (id, endpoints, response)
             }),
@@ -1244,7 +1253,10 @@ mod tests {
             .map(|v| configuration.link_size(v).expect("carried"))
             .collect::<BTreeSet<_>>();
         assert_eq!(link_sizes, BTreeSet::from([4, 5]));
-        let responses = configuration.responses().into_values().collect::<BTreeSet<_>>();
+        let responses = configuration
+            .responses()
+            .into_values()
+            .collect::<BTreeSet<_>>();
         assert_eq!(responses, BTreeSet::from([rat(6, 5), rat(9, 5)]));
 
         assert!(configuration.is_flat());
@@ -1286,9 +1298,11 @@ mod tests {
         assert_eq!(founding_total, integer(12));
 
         let mut totals = vec![founding_total.clone()];
-        let mut apex_deficits = vec![configuration
-            .deficit(bipyramid_apexes()[0])
-            .expect("carried")];
+        let mut apex_deficits = vec![
+            configuration
+                .deficit(bipyramid_apexes()[0])
+                .expect("carried"),
+        ];
         for _ in 0..6 {
             let step = configuration.step();
             assert_eq!(
@@ -1371,7 +1385,10 @@ mod tests {
             );
         }
         assert!(!configuration.is_flat());
-        assert_eq!(configuration.deficit(vertex(1)).expect("carried"), integer(1));
+        assert_eq!(
+            configuration.deficit(vertex(1)).expect("carried"),
+            integer(1)
+        );
         assert_eq!(
             configuration.deficit(vertex(4)).expect("carried"),
             rat(-3, 2)
@@ -1477,9 +1494,18 @@ mod tests {
     #[test]
     fn a_charged_odd_cycle_moves_and_returns_the_predicted_deficits() {
         let mut configuration = triangle([integer(3), integer(3), integer(4)]);
-        assert_eq!(configuration.deficit(vertex(1)).expect("carried"), integer(-1));
-        assert_eq!(configuration.deficit(vertex(2)).expect("carried"), Rat::zero());
-        assert_eq!(configuration.deficit(vertex(3)).expect("carried"), integer(-1));
+        assert_eq!(
+            configuration.deficit(vertex(1)).expect("carried"),
+            integer(-1)
+        );
+        assert_eq!(
+            configuration.deficit(vertex(2)).expect("carried"),
+            Rat::zero()
+        );
+        assert_eq!(
+            configuration.deficit(vertex(3)).expect("carried"),
+            integer(-1)
+        );
         assert_eq!(configuration.total_deficit(), integer(-2));
         let step = configuration.step();
         assert!(step.moved);
@@ -1662,7 +1688,10 @@ mod tests {
                 (hinge(1), [vertex(2), vertex(1)], integer(1)),
             ],
         );
-        assert_eq!(duplicate, Err(DiscreteCurvatureError::DuplicateHinge(hinge(1))));
+        assert_eq!(
+            duplicate,
+            Err(DiscreteCurvatureError::DuplicateHinge(hinge(1)))
+        );
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -1712,9 +1741,13 @@ mod tests {
     /// `c = 1/2` annihilates the total in exactly one step, and it is the only coefficient that does.
     #[test]
     fn the_derived_annihilator_zeroes_the_total_in_one_step() {
-        let mut configuration = DiscreteCurvatureConfiguration::at_unit_response(bipyramid_hinges())
-            .expect("the bipyramid founds");
-        assert!(!configuration.total_deficit().is_zero(), "the fixture is curved to begin with");
+        let mut configuration =
+            DiscreteCurvatureConfiguration::at_unit_response(bipyramid_hinges())
+                .expect("the bipyramid founds");
+        assert!(
+            !configuration.total_deficit().is_zero(),
+            "the fixture is curved to begin with"
+        );
         let step = configuration.step_at(&dissipative_annihilator());
         assert!(step.total_deficit_after.is_zero());
         assert_eq!(
@@ -1764,7 +1797,11 @@ mod tests {
             DiscreteCurvatureConfiguration::at_unit_response(bipyramid_hinges()).expect("founds");
         for index in 0..steps {
             reflective.step_at(&one);
-            let expected = if index % 2 == 0 { -start.clone() } else { start.clone() };
+            let expected = if index % 2 == 0 {
+                -start.clone()
+            } else {
+                start.clone()
+            };
             assert_eq!(reflective.total_deficit(), expected, "step {index}");
         }
         assert_eq!(reflective.total_deficit().abs(), start.abs());
@@ -1794,18 +1831,28 @@ mod tests {
             let before = configuration.deficits();
             configuration.step_at(&coefficient);
             let after = configuration.deficits();
-            let alternating_before: Rat = before
-                .iter()
-                .enumerate()
-                .fold(Rat::zero(), |carried, (index, (_, deficit))| {
-                    if index % 2 == 0 { carried + deficit } else { carried - deficit }
-                });
-            let alternating_after: Rat = after
-                .iter()
-                .enumerate()
-                .fold(Rat::zero(), |carried, (index, (_, deficit))| {
-                    if index % 2 == 0 { carried + deficit } else { carried - deficit }
-                });
+            let alternating_before: Rat =
+                before
+                    .iter()
+                    .enumerate()
+                    .fold(Rat::zero(), |carried, (index, (_, deficit))| {
+                        if index % 2 == 0 {
+                            carried + deficit
+                        } else {
+                            carried - deficit
+                        }
+                    });
+            let alternating_after: Rat =
+                after
+                    .iter()
+                    .enumerate()
+                    .fold(Rat::zero(), |carried, (index, (_, deficit))| {
+                        if index % 2 == 0 {
+                            carried + deficit
+                        } else {
+                            carried - deficit
+                        }
+                    });
             assert_eq!(
                 alternating_before, alternating_after,
                 "the alternating mode is invariant at coefficient {numerator}/{denominator}"
@@ -1838,14 +1885,20 @@ mod tests {
             .expect("the tetrahedron founds");
         assert!(!regular.is_flat(), "K4 at unit response is curved");
         regular.step_at(&dissipative_annihilator());
-        assert!(regular.is_flat(), "one step flattens a regular component exactly");
+        assert!(
+            regular.is_flat(),
+            "one step flattens a regular component exactly"
+        );
 
         // The bipyramid is irregular — link sizes 5 and 4 — so the same coefficient zeroes the
         // total and leaves the configuration curved.
         let mut irregular = DiscreteCurvatureConfiguration::at_unit_response(bipyramid_hinges())
             .expect("the bipyramid founds");
         irregular.step_at(&dissipative_annihilator());
-        assert!(irregular.total_deficit().is_zero(), "the total is annihilated regardless");
+        assert!(
+            irregular.total_deficit().is_zero(),
+            "the total is annihilated regardless"
+        );
         assert!(
             !irregular.is_flat(),
             "but an irregular component is not flattened, so the one-step result is about the \

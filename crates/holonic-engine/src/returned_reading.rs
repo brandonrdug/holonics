@@ -121,19 +121,19 @@ use serde::Serialize;
 
 use crate::algebraic::CausalCellId;
 use crate::conditioned_derivation::{
-    derive, expose, Bridge, ConditionedCircuit, ConditionedDerivationRefusal, DerivationQuery,
-    DerivedPassage, Exposure, FoundedMorphology, StemStanding,
+    Bridge, ConditionedCircuit, ConditionedDerivationRefusal, DerivationQuery, DerivedPassage,
+    Exposure, FoundedMorphology, StemStanding, derive, expose,
 };
 use crate::derivation_atlas::{
-    invariant_movement, route_movement, Derivation, InvariantMovement, MovedField, RouteMovement,
+    Derivation, InvariantMovement, MovedField, RouteMovement, invariant_movement, route_movement,
 };
 use crate::derivation_integral::{
-    accumulation, potential_over, statement_lineage, AccumulationRule, DerivationIntegralError,
-    HolonomyPopulation, NamedChord, NamedPotential,
+    AccumulationRule, DerivationIntegralError, HolonomyPopulation, NamedChord, NamedPotential,
+    accumulation, potential_over, statement_lineage,
 };
 use crate::rebase_invariants::{PivotRule, RebaseInvariants};
 use crate::running_integral::Cochain;
-use crate::temper::{found_on, TemperedFamily, Twist};
+use crate::temper::{TemperedFamily, Twist, found_on};
 
 // -------------------------------------------------------------------------------------------------
 // The carrier
@@ -299,9 +299,12 @@ impl ReturnedReading {
         }
         let count_line =
             line(octets, &mut at).ok_or(ReturnedReadingRefusal::SealCarriesNoPopulationCount)?;
-        let count: usize = count_line.parse().map_err(|_| {
-            ReturnedReadingRefusal::SealHeaderMalformed { line: count_line.to_owned() }
-        })?;
+        let count: usize =
+            count_line
+                .parse()
+                .map_err(|_| ReturnedReadingRefusal::SealHeaderMalformed {
+                    line: count_line.to_owned(),
+                })?;
 
         let mut returns = Vec::with_capacity(count);
         for _ in 0..count {
@@ -310,10 +313,14 @@ impl ReturnedReading {
                 read: returns.len(),
             })?;
             let (whole_len, returned_len) = header.split_once(' ').ok_or_else(|| {
-                ReturnedReadingRefusal::SealHeaderMalformed { line: header.to_owned() }
+                ReturnedReadingRefusal::SealHeaderMalformed {
+                    line: header.to_owned(),
+                }
             })?;
-            let widths: Result<Vec<usize>, _> =
-                [whole_len, returned_len].iter().map(|read| read.parse::<usize>()).collect();
+            let widths: Result<Vec<usize>, _> = [whole_len, returned_len]
+                .iter()
+                .map(|read| read.parse::<usize>())
+                .collect();
             let widths = widths.map_err(|_| ReturnedReadingRefusal::SealHeaderMalformed {
                 line: header.to_owned(),
             })?;
@@ -527,12 +534,19 @@ impl TwistMovement {
     /// It closed before — or did not exist — and leaks now.
     pub fn opened(&self) -> bool {
         let closed_before = self.before.as_ref().is_none_or(Twist::may_condense);
-        closed_before && self.after.as_ref().is_some_and(|twist| !twist.may_condense())
+        closed_before
+            && self
+                .after
+                .as_ref()
+                .is_some_and(|twist| !twist.may_condense())
     }
 
     /// It leaked before and closes now, or is gone.
     pub fn closed(&self) -> bool {
-        let leaked_before = self.before.as_ref().is_some_and(|twist| !twist.may_condense());
+        let leaked_before = self
+            .before
+            .as_ref()
+            .is_some_and(|twist| !twist.may_condense());
         leaked_before && self.after.as_ref().is_none_or(Twist::may_condense)
     }
 }
@@ -815,11 +829,7 @@ pub fn read_production(
                 "the remainder movement: the chord {} was retained, residual {}",
                 chord.cell, chord.residual
             ),
-            returned: lines([
-                chord.cell.clone(),
-                chord.tail.clone(),
-                chord.head.clone(),
-            ]),
+            returned: lines([chord.cell.clone(), chord.tail.clone(), chord.head.clone()]),
         });
     }
     if !remainder_withdrawn.is_empty() {
@@ -1353,12 +1363,7 @@ fn movement_receipt_is_exact(receipt: &ConditionedAgain) -> bool {
                 (&bridge.held, bridge.held_at),
                 (&bridge.brought, bridge.brought_at),
             ] {
-                for taken in occurrences_taken(
-                    identifier,
-                    at,
-                    actual.stem.len(),
-                    &returned_names,
-                ) {
+                for taken in occurrences_taken(identifier, at, actual.stem.len(), &returned_names) {
                     expected_covered.insert(taken);
                 }
             }
@@ -1408,12 +1413,7 @@ fn movement_receipt_is_exact(receipt: &ConditionedAgain) -> bool {
         };
         if !same_passage(before, after)
             || passage.stem != after.stem
-            || !relicensing_structure_is_exact(
-                passage,
-                before,
-                after,
-                &receipt.committed_by_return,
-            )
+            || !relicensing_structure_is_exact(passage, before, after, &receipt.committed_by_return)
         {
             return false;
         }
@@ -1483,10 +1483,11 @@ pub fn condition_again_from_sealed(
     query: &DerivationQuery,
     sealed: &[u8],
 ) -> Result<ConditionedAgain, ConditionedDerivationRefusal> {
-    let returned = ReturnedReading::unseal(sealed)
-        .map_err(|refusal| ConditionedDerivationRefusal::MaterialDeclaresNothing {
+    let returned = ReturnedReading::unseal(sealed).map_err(|refusal| {
+        ConditionedDerivationRefusal::MaterialDeclaresNothing {
             source: format!("the world's record is unreadable: {refusal}"),
-        })?;
+        }
+    })?;
     condition_again(standing, morphology, query, &returned)
 }
 
@@ -1659,50 +1660,85 @@ pub enum ReturnedReadingRefusal {
     SealCarriesNoSchema,
     /// The octets declare a schema this carrier does not read. Carried by name so a deposit written
     /// by a later version is refused rather than partially understood.
-    SealSchemaUnknown { declared: String },
+    SealSchemaUnknown {
+        declared: String,
+    },
     /// The schema line stands alone; no population count follows it.
     SealCarriesNoPopulationCount,
     /// A header line is not the two octet widths this format declares.
-    SealHeaderMalformed { line: String },
+    SealHeaderMalformed {
+        line: String,
+    },
     /// The octets end inside the declared population. **A truncated deposit is not a smaller
     /// reading**, so the count read so far is reported beside the count declared rather than
     /// returned as the answer.
-    SealTruncated { expected: usize, read: usize },
+    SealTruncated {
+        expected: usize,
+        read: usize,
+    },
     /// Octets remain after the declared population is complete.
-    SealCarriesTrailingOctets { count: usize },
+    SealCarriesTrailingOctets {
+        count: usize,
+    },
     /// A declared width lands inside a multi-octet character.
-    SealIsNotText { at: usize },
+    SealIsNotText {
+        at: usize,
+    },
 }
 
 impl std::fmt::Display for ReturnedReadingRefusal {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::CircuitCarriesNoVertex => {
-                write!(formatter, "the circuit carries no 0-cell to found a potential from")
+                write!(
+                    formatter,
+                    "the circuit carries no 0-cell to found a potential from"
+                )
             }
             Self::Invariants(refusal) => write!(formatter, "{refusal}"),
             Self::Integral(refusal) => write!(formatter, "{refusal}"),
             Self::RunningIntegral(refusal) => write!(formatter, "{refusal}"),
             Self::SealCarriesNoSchema => {
-                write!(formatter, "the sealed octets end before the schema line does")
+                write!(
+                    formatter,
+                    "the sealed octets end before the schema line does"
+                )
             }
             Self::SealSchemaUnknown { declared } => {
-                write!(formatter, "the sealed octets declare the schema `{declared}`, which this carrier does not read")
+                write!(
+                    formatter,
+                    "the sealed octets declare the schema `{declared}`, which this carrier does not read"
+                )
             }
             Self::SealCarriesNoPopulationCount => {
-                write!(formatter, "the sealed octets carry a schema and no population count")
+                write!(
+                    formatter,
+                    "the sealed octets carry a schema and no population count"
+                )
             }
             Self::SealHeaderMalformed { line } => {
-                write!(formatter, "the return header `{line}` is not two octet widths")
+                write!(
+                    formatter,
+                    "the return header `{line}` is not two octet widths"
+                )
             }
             Self::SealTruncated { expected, read } => {
-                write!(formatter, "the sealed octets end inside the population: {expected} declared, {read} read")
+                write!(
+                    formatter,
+                    "the sealed octets end inside the population: {expected} declared, {read} read"
+                )
             }
             Self::SealCarriesTrailingOctets { count } => {
-                write!(formatter, "{count} octets remain after the declared population is complete")
+                write!(
+                    formatter,
+                    "{count} octets remain after the declared population is complete"
+                )
             }
             Self::SealIsNotText { at } => {
-                write!(formatter, "a declared width lands inside a character at octet {at}")
+                write!(
+                    formatter,
+                    "a declared width lands inside a character at octet {at}"
+                )
             }
         }
     }
@@ -1765,7 +1801,10 @@ mod tests {
         // The second return's text is itself a well-formed header line followed by a blank line. A
         // delimited or line-scanning codec reads it as structure; this one reads it as content.
         assert!(reading.returns()[1].returned.starts_with("5 3\n"));
-        assert_eq!(ReturnedReading::unseal(&octets).expect("the seal is readable"), reading);
+        assert_eq!(
+            ReturnedReading::unseal(&octets).expect("the seal is readable"),
+            reading
+        );
     }
 
     #[test]
@@ -1801,7 +1840,13 @@ mod tests {
                 ),
             }
         }
-        assert_eq!(ReturnedReading::unseal(&octets).expect("whole").returns().len(), 3);
+        assert_eq!(
+            ReturnedReading::unseal(&octets)
+                .expect("whole")
+                .returns()
+                .len(),
+            3
+        );
     }
 
     #[test]
@@ -1818,8 +1863,9 @@ mod tests {
     fn a_seal_declaring_another_schema_refuses_rather_than_being_partly_understood() {
         let octets = awkward().seal();
         let text = String::from_utf8(octets).expect("the fixture is text");
-        let forged =
-            text.replacen("returned-reading.v1", "returned-reading.v2", 1).into_bytes();
+        let forged = text
+            .replacen("returned-reading.v1", "returned-reading.v2", 1)
+            .into_bytes();
         match ReturnedReading::unseal(&forged) {
             Err(ReturnedReadingRefusal::SealSchemaUnknown { declared }) => {
                 assert_eq!(declared, "holonic-engine.returned-reading.v2");
@@ -1916,8 +1962,14 @@ mod tests {
         let query = DerivationQuery::reaching(STATEMENT);
         let first = mounted.derive(&query).expect("derives");
         let second = mounted.derive(&query).expect("derives");
-        assert_eq!(first, second, "the unjoined body cannot move on its own return");
-        assert!(!first.is_empty(), "a still production of nothing proves nothing");
+        assert_eq!(
+            first, second,
+            "the unjoined body cannot move on its own return"
+        );
+        assert!(
+            !first.is_empty(),
+            "a still production of nothing proves nothing"
+        );
     }
 
     #[test]
@@ -1954,14 +2006,21 @@ mod tests {
         }]);
         assert!(!empty.is_still());
         assert_eq!(empty.addressing_nothing().len(), 1);
-        assert_eq!(&empty.carried_into(mounted.morphology()), mounted.morphology());
+        assert_eq!(
+            &empty.carried_into(mounted.morphology()),
+            mounted.morphology()
+        );
     }
 
     #[test]
     fn the_temper_and_the_integral_are_called_in_sequence_and_the_remainder_closes_the_coil() {
         let (_, after) = readings();
-        let reading = read_circuit(&after, AccumulationRule::RecruitmentLoad, PivotRule::SmallestMagnitude)
-            .expect("reads");
+        let reading = read_circuit(
+            &after,
+            AccumulationRule::RecruitmentLoad,
+            PivotRule::SmallestMagnitude,
+        )
+        .expect("reads");
         assert!(
             reading.the_closure_was_tested(),
             "a remainder that was already empty closes for free and proves nothing"
@@ -1970,8 +2029,14 @@ mod tests {
             reading.the_returned_remainder_closes_the_coil(),
             "the deposited remainder must close every chord it addressed"
         );
-        assert_ne!(reading.accumulated, reading.founded, "the founding deposited something");
-        assert!(!reading.leaking.is_empty(), "the raw accumulation leaks somewhere");
+        assert_ne!(
+            reading.accumulated, reading.founded,
+            "the founding deposited something"
+        );
+        assert!(
+            !reading.leaking.is_empty(),
+            "the raw accumulation leaks somewhere"
+        );
     }
 
     #[test]
@@ -1982,8 +2047,12 @@ mod tests {
         // because the production did not move. The deposit's own circuit would not do here: it is a
         // star, it admits a potential, and the founding would have nothing to return.
         let (_, after) = readings();
-        let alone = read_circuit(&after, AccumulationRule::RecruitmentLoad, PivotRule::SmallestMagnitude)
-            .expect("reads");
+        let alone = read_circuit(
+            &after,
+            AccumulationRule::RecruitmentLoad,
+            PivotRule::SmallestMagnitude,
+        )
+        .expect("reads");
         assert!(
             !alone.potential.admits_a_potential() && alone.potential.cycle_rank() > 0,
             "a circuit that already admits a potential makes this control vacuous"
@@ -2065,7 +2134,10 @@ mod tests {
         )
         .expect("derives");
 
-        assert!(again.the_production_moved(), "the return did not reach the production");
+        assert!(
+            again.the_production_moved(),
+            "the return did not reach the production"
+        );
         assert!(
             !again.founded_passages.is_empty() || !again.withdrawn_passages.is_empty(),
             "the production moved without founding or withdrawing a passage"
@@ -2081,13 +2153,10 @@ mod tests {
         for passage in &again.relicensed_passages {
             assert!(
                 !passage.bridge_movements.is_empty()
-                    && passage
-                        .bridge_movements
+                    && passage.bridge_movements.iter().all(|movement| movement
+                        .carriers
                         .iter()
-                        .all(|movement| movement
-                            .carriers
-                            .iter()
-                            .all(|carrier| !carrier.caused_by.is_empty())),
+                        .all(|carrier| !carrier.caused_by.is_empty())),
                 "relicensing {} carried no bridge-local cause",
                 passage.passage
             );
@@ -2153,8 +2222,7 @@ mod tests {
         );
 
         let mut uncaused = returned_conditioning();
-        let local =
-            &mut uncaused.relicensed_passages[0].bridge_movements[0].carriers[0];
+        let local = &mut uncaused.relicensed_passages[0].bridge_movements[0].carriers[0];
         local.caused_by.clear();
         assert!(
             !uncaused.movement_is_exactly_attributed(),
@@ -2246,10 +2314,12 @@ mod tests {
         .expect("derives");
         assert_eq!(query, DerivationQuery::reaching(STATEMENT));
         // And the standing did not move either: every passage of the deposit is still standing.
-        assert!(mounted
-            .standing()
-            .iter()
-            .all(|passage| matches!(passage.origin, PassageOrigin::Standing { .. })));
+        assert!(
+            mounted
+                .standing()
+                .iter()
+                .all(|passage| matches!(passage.origin, PassageOrigin::Standing { .. }))
+        );
         assert!(again.the_production_moved());
     }
 
@@ -2258,7 +2328,8 @@ mod tests {
         // The one rule about what a return says. The mechanism's name carries `movement`, `route`,
         // `the`, `at` and `to`; none of them may be founded as a stem.
         let returned = ReturnedReading::from_returns([ReturnedArtifact {
-            whole: "the route movement: routes founded to |- (P : Prop) : exactCarrier P".to_owned(),
+            whole: "the route movement: routes founded to |- (P : Prop) : exactCarrier P"
+                .to_owned(),
             returned: "carrier_transport\n".to_owned(),
         }]);
         let words: BTreeSet<String> = returned
@@ -2271,7 +2342,10 @@ mod tests {
             BTreeSet::from(["carrier".to_owned(), "transport".to_owned()])
         );
         for prose in ["the", "route", "movement", "routes", "founded", "to", "at"] {
-            assert!(!words.contains(prose), "the mechanism's prose reached the material");
+            assert!(
+                !words.contains(prose),
+                "the mechanism's prose reached the material"
+            );
         }
     }
 

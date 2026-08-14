@@ -117,11 +117,11 @@ use serde::{Deserialize, Serialize};
 
 use crate::algebraic::CausalCellId;
 use crate::derivation_atlas::{
-    found_circuit, read_derivation, statement_vertex_key, CircuitAperture, Derivation,
-    DerivationAtlasRefusal, DerivationCircuit, DerivationIdentity, StatementIncidence,
+    CircuitAperture, Derivation, DerivationAtlasRefusal, DerivationCircuit, DerivationIdentity,
+    StatementIncidence, found_circuit, read_derivation, statement_vertex_key,
 };
 use crate::receiver_exact_compression::{
-    compress, InputId, ItemId, Observation, ObservedSystem, ReceiverExactCompression, ReceiverId,
+    InputId, ItemId, Observation, ObservedSystem, ReceiverExactCompression, ReceiverId, compress,
 };
 
 /// The number of **distinct** wholes that must witness a word before it commits.
@@ -324,9 +324,7 @@ impl FoundedMorphology {
     /// population — so a foreign wire that repeats one whole promotes a provisional stem to
     /// **Committed** and puts a stem on the derivation path that no second source ever witnessed.
     /// That is a frequency wearing a recurrence's name, and it is refused here rather than absorbed.
-    pub fn from_founded_stems(
-        stems: Vec<FoundedStem>,
-    ) -> Result<Self, FoundedMorphologyRefusal> {
+    pub fn from_founded_stems(stems: Vec<FoundedStem>) -> Result<Self, FoundedMorphologyRefusal> {
         let mut index = BTreeMap::new();
         for (slot, stem) in stems.iter().enumerate() {
             index.insert(stem.stem.clone(), slot);
@@ -558,7 +556,10 @@ impl FoundedMorphology {
             for repeat in 0..COMMITTING_RECURRENCE {
                 foil.witness(
                     &stem.stem,
-                    &format!("{}#promoted-{repeat}", stem.wholes.first().map_or("", String::as_str)),
+                    &format!(
+                        "{}#promoted-{repeat}",
+                        stem.wholes.first().map_or("", String::as_str)
+                    ),
                     stem.foreign_lineage.clone(),
                 );
             }
@@ -782,13 +783,7 @@ impl FoundedCover {
         let mut ordered: Vec<(usize, usize, String)> = self
             .occurrences
             .iter()
-            .map(|occurrence| {
-                (
-                    occurrence.at,
-                    occurrence.through,
-                    occurrence.stem.clone(),
-                )
-            })
+            .map(|occurrence| (occurrence.at, occurrence.through, occurrence.stem.clone()))
             .collect();
         ordered.extend(self.residue.iter().filter_map(|at| {
             self.folded_at(*at)
@@ -964,9 +959,8 @@ impl ObservedSystem for MorphemicIncidence {
 
     fn receivers(&self) -> Vec<ReceiverId> {
         let mut receivers = vec![ReceiverId(AT_END_RECEIVER)];
-        receivers.extend(
-            (0..self.stems.len()).map(|at| ReceiverId(STEM_RECEIVER_BASE + at as u64)),
-        );
+        receivers
+            .extend((0..self.stems.len()).map(|at| ReceiverId(STEM_RECEIVER_BASE + at as u64)));
         receivers
     }
 
@@ -1281,7 +1275,9 @@ impl DerivedPassage {
 /// import line and no tactic name is written, so every symbol the reading recovers from this text is
 /// either the queried statement's own or the brought identifier.
 fn compose_passage(name: &str, statement: &str, brought: &str) -> String {
-    format!("namespace Soma\ntheorem {name} {statement} := by\n  have bridged := {brought}\nend Soma\n")
+    format!(
+        "namespace Soma\ntheorem {name} {statement} := by\n  have bridged := {brought}\nend Soma\n"
+    )
 }
 
 /// A Lean-legal declaration name for a passage. `.` is the only character a recruited identifier
@@ -1358,12 +1354,8 @@ pub fn derive(
                                 // why they are carried here: this is the one site where a contact is
                                 // formed, and computing them later would need the covers again.
                                 held_face: named(&held_cover.face_at(held_occurrence.at)),
-                                brought_face: named(
-                                    &brought_cover.face_at(brought_occurrence.at),
-                                ),
-                                held_crossings: named(
-                                    &held_cover.crossings_of(held_occurrence),
-                                ),
+                                brought_face: named(&brought_cover.face_at(brought_occurrence.at)),
+                                held_crossings: named(&held_cover.crossings_of(held_occurrence)),
                                 brought_crossings: named(
                                     &brought_cover.crossings_of(brought_occurrence),
                                 ),
@@ -1524,19 +1516,13 @@ pub fn found_conditioned_circuit(
             if let Some(cell) = circuit.vertices().get(symbol) {
                 claim(*cell, passage.id);
             }
-            if let Some(cell) = circuit
-                .recruitments()
-                .get(&(key.clone(), symbol.clone()))
-            {
+            if let Some(cell) = circuit.recruitments().get(&(key.clone(), symbol.clone())) {
                 claim(*cell, passage.id);
             }
         }
         if aperture.statements == StatementIncidence::Founded {
             let statement = &passage.derivation.statement;
-            if let Some(cell) = circuit
-                .vertices()
-                .get(&statement_vertex_key(statement))
-            {
+            if let Some(cell) = circuit.vertices().get(&statement_vertex_key(statement)) {
                 claim(*cell, passage.id);
             }
             if let Some(cell) = circuit.reaches().get(&(key.clone(), statement.clone())) {
@@ -1584,10 +1570,11 @@ impl ConditionedBody {
     ) -> Result<Self, ConditionedDerivationRefusal> {
         let mut standing = Vec::new();
         for (source, text) in deposit {
-            let derivation = read_derivation(&text)
-                .ok_or(ConditionedDerivationRefusal::MaterialDeclaresNothing {
+            let derivation = read_derivation(&text).ok_or(
+                ConditionedDerivationRefusal::MaterialDeclaresNothing {
                     source: source.clone(),
-                })?;
+                },
+            )?;
             standing.push(Passage {
                 id: PassageId(standing.len() as u64),
                 origin: PassageOrigin::Standing { source },
@@ -1756,7 +1743,8 @@ impl ConditionedBody {
         aperture: CircuitAperture,
     ) -> Result<ConditionedCircuit, ConditionedDerivationRefusal> {
         found_conditioned_circuit(
-            self.passages_from_production(query, production)?.into_inner(),
+            self.passages_from_production(query, production)?
+                .into_inner(),
             aperture,
         )
     }
@@ -1852,17 +1840,18 @@ pub fn ablate_stem(
     query: &DerivationQuery,
     aperture: CircuitAperture,
 ) -> Result<StemAblation, ConditionedDerivationRefusal> {
-    let founded = body.morphology().stem(stem).ok_or(
-        ConditionedDerivationRefusal::StemWasNeverFounded {
-            stem: stem.to_owned(),
-        },
-    )?;
+    let founded =
+        body.morphology()
+            .stem(stem)
+            .ok_or(ConditionedDerivationRefusal::StemWasNeverFounded {
+                stem: stem.to_owned(),
+            })?;
     let wholes = founded.wholes.clone();
-    let ablated = body
-        .without_stem(stem)
-        .ok_or(ConditionedDerivationRefusal::StemWasNeverFounded {
-            stem: stem.to_owned(),
-        })?;
+    let ablated =
+        body.without_stem(stem)
+            .ok_or(ConditionedDerivationRefusal::StemWasNeverFounded {
+                stem: stem.to_owned(),
+            })?;
 
     let before = body.derive(query)?;
     let after = ablated.derive(query)?;
@@ -2260,16 +2249,30 @@ mod tests {
         // in the maximal reading. Re-founded 2026-08-09: this test asserted that `act` was absent
         // from `cover.occurrences`, which pinned the constructor's reduction as though it were the
         // law. It is a reading, and the reading is where it now lives.
-        let morphology = FoundedMorphology::condition(&[
-            expose("one", "exact act"),
-            expose("two", "exact act"),
-        ]);
+        let morphology =
+            FoundedMorphology::condition(&[expose("one", "exact act"), expose("two", "exact act")]);
         let cover = morphology.cover("exact").expect("ascii");
-        let exact = StemOccurrence { stem: "exact".to_owned(), at: 0, through: 5 };
-        let act = StemOccurrence { stem: "act".to_owned(), at: 2, through: 5 };
+        let exact = StemOccurrence {
+            stem: "exact".to_owned(),
+            at: 0,
+            through: 5,
+        };
+        let act = StemOccurrence {
+            stem: "act".to_owned(),
+            at: 2,
+            through: 5,
+        };
 
-        assert_eq!(cover.occurrences, vec![exact.clone(), act.clone()], "the cover carries both");
-        assert_eq!(cover.maximal(), vec![&exact], "the maximal reading carries one");
+        assert_eq!(
+            cover.occurrences,
+            vec![exact.clone(), act.clone()],
+            "the cover carries both"
+        );
+        assert_eq!(
+            cover.maximal(),
+            vec![&exact],
+            "the maximal reading carries one"
+        );
         assert!(cover.residue.is_empty(), "{:?}", cover.residue);
         // Contained, not crossing: `act` sits inside `exact`, so this pair is not a 1-face.
         assert!(cover.crossings().is_empty());
@@ -2281,16 +2284,17 @@ mod tests {
     /// This is the object a partition cannot hold and the reason the reduction was removed.
     #[test]
     fn two_overlapping_stems_cross_and_the_maximal_reading_keeps_only_one() {
-        let morphology = FoundedMorphology::condition(&[
-            expose("one", "exa xac"),
-            expose("two", "exa xac"),
-        ]);
+        let morphology =
+            FoundedMorphology::condition(&[expose("one", "exa xac"), expose("two", "exa xac")]);
         let cover = morphology.cover("exact").expect("ascii");
         let crossings = cover.crossings();
         assert_eq!(crossings.len(), 1, "{:?}", cover.occurrences);
         let (left, right) = crossings[0];
         assert_eq!((left.stem.as_str(), left.at, left.through), ("exa", 0, 3));
-        assert_eq!((right.stem.as_str(), right.at, right.through), ("xac", 1, 4));
+        assert_eq!(
+            (right.stem.as_str(), right.at, right.through),
+            ("xac", 1, 4)
+        );
         // They share offsets 1 and 2 — the overlap is where they interfere.
         assert_eq!(cover.face_at(1).len(), 2);
         assert_eq!(cover.face_at(2).len(), 2);
@@ -2339,7 +2343,8 @@ mod tests {
     // ---------------------------------------------------------------------------------------------
 
     #[test]
-    fn the_conditioned_and_unconditioned_readings_are_distinct_frames_and_the_orbit_carries_words() {
+    fn the_conditioned_and_unconditioned_readings_are_distinct_frames_and_the_orbit_carries_words()
+    {
         let body = {
             let mut body = ConditionedBody::mount(deposit()).expect("deposit reads");
             body.condition(&corpus_with_carrier());
@@ -2410,9 +2415,11 @@ mod tests {
         assert_eq!(bare.stem_receivers(), 0);
         assert_eq!(bare.receivers(), vec![ReceiverId(AT_END_RECEIVER)]);
 
-        let conditioned =
-            MorphemicIncidence::over(&population, &FoundedMorphology::condition(&corpus_with_carrier()))
-                .expect("ascii");
+        let conditioned = MorphemicIncidence::over(
+            &population,
+            &FoundedMorphology::condition(&corpus_with_carrier()),
+        )
+        .expect("ascii");
         assert!(conditioned.stem_receivers() > 0);
         assert!(conditioned.receivers().len() > bare.receivers().len());
     }
@@ -2448,7 +2455,10 @@ mod tests {
                 }
             }
         }
-        assert_eq!(advanced, "exactcarrier".len() + "prop".len() + "exact_chart_carry".len());
+        assert_eq!(
+            advanced,
+            "exactcarrier".len() + "prop".len() + "exact_chart_carry".len()
+        );
     }
 
     #[test]
@@ -2468,10 +2478,7 @@ mod tests {
     #[test]
     fn an_unconditioned_body_returns_no_passage_and_a_conditioned_one_returns_a_named_population() {
         let bare = ConditionedBody::mount(deposit()).expect("deposit reads");
-        assert!(bare
-            .derive(&the_statement())
-            .expect("derives")
-            .is_empty());
+        assert!(bare.derive(&the_statement()).expect("derives").is_empty());
 
         let mut conditioned = ConditionedBody::mount(deposit()).expect("deposit reads");
         conditioned.condition(&corpus_with_carrier());
@@ -2483,7 +2490,11 @@ mod tests {
             .iter()
             .filter(|passage| passage.stem == "carry")
             .collect();
-        assert!(!carry.is_empty(), "{:?}", derived.iter().map(|p| &p.stem).collect::<Vec<_>>());
+        assert!(
+            !carry.is_empty(),
+            "{:?}",
+            derived.iter().map(|p| &p.stem).collect::<Vec<_>>()
+        );
         for passage in carry {
             assert!(!passage.bridges.is_empty());
             for bridge in &passage.bridges {
@@ -2518,7 +2529,11 @@ mod tests {
                     )
                 })
                 .collect();
-            assert_eq!(keys.len(), grouped.len(), "an occurrence pair appeared twice");
+            assert_eq!(
+                keys.len(),
+                grouped.len(),
+                "an occurrence pair appeared twice"
+            );
             assert!(!passage.routes().is_empty());
         }
         // The material must be able to vary the property: some occurrence pair is licensed by more
@@ -2582,10 +2597,11 @@ mod tests {
     fn a_query_for_a_statement_the_deposit_never_reached_returns_nothing() {
         let mut body = ConditionedBody::mount(deposit()).expect("deposit reads");
         body.condition(&corpus_with_carrier());
-        assert!(body
-            .derive(&DerivationQuery::reaching("(Q : Prop) : neverReached Q"))
-            .expect("derives")
-            .is_empty());
+        assert!(
+            body.derive(&DerivationQuery::reaching("(Q : Prop) : neverReached Q"))
+                .expect("derives")
+                .is_empty()
+        );
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -2679,11 +2695,7 @@ mod tests {
             .circuit(&query, CircuitAperture::STATEMENT_INCIDENT)
             .expect("live circuit");
         let returned = body
-            .circuit_from_production(
-                &query,
-                production,
-                CircuitAperture::STATEMENT_INCIDENT,
-            )
+            .circuit_from_production(&query, production, CircuitAperture::STATEMENT_INCIDENT)
             .expect("deposited circuit");
 
         assert_eq!(returned.passages, live.passages);
@@ -2743,7 +2755,9 @@ mod tests {
         assert!(refused(
             &body,
             &query,
-            altered(&exact, |moved| moved[0].bridges[0].route.push_str("/forged")),
+            altered(&exact, |moved| moved[0].bridges[0]
+                .route
+                .push_str("/forged")),
         ));
         assert!(refused(
             &body,
@@ -2825,11 +2839,10 @@ mod tests {
             before.circuit.lineage_route_excess(),
             after.circuit.lineage_route_excess()
         );
-        assert!(after
-            .circuit
-            .vertices_reaching(&query.statement)
-            .len()
-            > before.circuit.vertices_reaching(&query.statement).len());
+        assert!(
+            after.circuit.vertices_reaching(&query.statement).len()
+                > before.circuit.vertices_reaching(&query.statement).len()
+        );
     }
 
     #[test]
@@ -2891,10 +2904,12 @@ mod tests {
             assert_eq!(passage.stem, "carry");
             assert!(!passage.text.is_empty());
         }
-        assert!(ablation
-            .cells_absent
-            .iter()
-            .any(|name| name.contains("_via_carry_")));
+        assert!(
+            ablation
+                .cells_absent
+                .iter()
+                .any(|name| name.contains("_via_carry_"))
+        );
     }
 
     /// **Re-founded 2026-08-09. The reopening this test pinned was maximality's own shadow.**
@@ -2946,7 +2961,11 @@ mod tests {
             "nothing was suppressed, so nothing reopens: {:?}",
             ablation.reopened
         );
-        assert!(ablation.unaccounted.is_empty(), "{:?}", ablation.unaccounted);
+        assert!(
+            ablation.unaccounted.is_empty(),
+            "{:?}",
+            ablation.unaccounted
+        );
     }
 
     #[test]
@@ -3068,7 +3087,10 @@ mod tests {
             ("unconditioned", FoundedMorphology::unconditioned()),
             ("promoted", founded.promoted_provisional()),
             ("reversed", founded.reversed()),
-            ("without the first", founded.without_stem(&first).expect("f")),
+            (
+                "without the first",
+                founded.without_stem(&first).expect("f"),
+            ),
             (
                 "without the middle",
                 founded.without_stem(&middle).expect("f"),
@@ -3088,13 +3110,14 @@ mod tests {
         // the material control: at least one of those populations really is renumbered by the
         // founding seam, so the round trip above is not vacuous
         let ablated = founded.without_stem(&first).expect("founded");
-        let replayed = FoundedMorphology::from_founded_words(ablated.founded().iter().map(|stem| {
-            (
-                stem.stem.clone(),
-                stem.wholes.clone(),
-                stem.foreign_lineage.clone(),
-            )
-        }));
+        let replayed =
+            FoundedMorphology::from_founded_words(ablated.founded().iter().map(|stem| {
+                (
+                    stem.stem.clone(),
+                    stem.wholes.clone(),
+                    stem.foreign_lineage.clone(),
+                )
+            }));
         assert_ne!(
             replayed, ablated,
             "the founding seam must renumber an ablated morphology, or this test proves nothing"
@@ -3201,7 +3224,9 @@ mod tests {
         assert_eq!(sound()[1].standing(), StemStanding::Provisional);
 
         let mut lineage = sound();
-        lineage[1].foreign_lineage.push("collapsed(9,11)".to_owned());
+        lineage[1]
+            .foreign_lineage
+            .push("collapsed(9,11)".to_owned());
         assert_eq!(
             FoundedMorphology::from_founded_stems(lineage),
             Err(FoundedMorphologyRefusal::LineageCarriedTwice {

@@ -154,11 +154,8 @@ fn main() {
     // ---------------------------------------------------------------------------------------
     println!();
     println!("-- the group and its exact integral representation --");
-    let group = StructureGroup::close(
-        [quaternion([0, 1, 0, 0]), quaternion([0, 0, 1, 0])],
-        8,
-    )
-    .expect("Q8 closes at order eight");
+    let group = StructureGroup::close([quaternion([0, 1, 0, 0]), quaternion([0, 0, 1, 0])], 8)
+        .expect("Q8 closes at order eight");
     println!(
         "  <i, j> closes at order {}, abelian {}",
         group.order(),
@@ -175,7 +172,10 @@ fn main() {
         representation.is_faithful(),
         representation.distinct_character_values()
     );
-    println!("  the homomorphism law was checked over all {} pairs at construction", group.order() * group.order());
+    println!(
+        "  the homomorphism law was checked over all {} pairs at construction",
+        group.order() * group.order()
+    );
     let mut seen = BTreeSet::new();
     for element in group.elements() {
         let class = group.conjugacy_class(element).expect("the class exists");
@@ -185,7 +185,9 @@ fn main() {
         println!(
             "    class {:<6} chi = {:<4} Wilson weight 1 - chi/dim = {}",
             written(&class),
-            representation.character(element).expect("the character exists"),
+            representation
+                .character(element)
+                .expect("the character exists"),
             representation
                 .plaquette_weight(element)
                 .expect("the weight exists")
@@ -213,9 +215,17 @@ fn main() {
     let classes = twisted.plaquette_classes().expect("the walks close");
     let written_holonomies: Vec<String> = holonomies.iter().map(written).collect();
     let written_classes: Vec<String> = classes.iter().map(written).collect();
-    println!("  plaquette holonomies (frame-relative) [{}]", written_holonomies.join(", "));
-    println!("  their conjugacy classes (the invariant) [{}]", written_classes.join(", "));
-    let action = twisted.wilson_action(&representation).expect("the weights exist");
+    println!(
+        "  plaquette holonomies (frame-relative) [{}]",
+        written_holonomies.join(", ")
+    );
+    println!(
+        "  their conjugacy classes (the invariant) [{}]",
+        written_classes.join(", ")
+    );
+    let action = twisted
+        .wilson_action(&representation)
+        .expect("the weights exist");
     println!("  the Wilson action S = sum_p (1 - chi(U_p)/dim) = {action}");
 
     let contribution = twisted.commutator_contribution().expect("the group closes");
@@ -251,7 +261,9 @@ fn main() {
         .map(|(class, share)| format!("{} {share}", written(class)))
         .collect();
     println!("  the empirical class distribution: {}", shares.join(", "));
-    let spectrum = twisted.transfer_spectrum().expect("the operator diagonalizes");
+    let spectrum = twisted
+        .transfer_spectrum()
+        .expect("the operator diagonalizes");
     print_spectrum("the configuration", &spectrum);
     println!(
         "  NOT a gap claim: one lattice, no spacing parameter, no volume family, no correlation \
@@ -274,7 +286,9 @@ fn main() {
         .into_iter()
         .map(|vertex| (vertex, turns[vertex as usize % turns.len()].clone()))
         .collect();
-    let moved = twisted.gauge_transformed(&gauge).expect("every vertex is named");
+    let moved = twisted
+        .gauge_transformed(&gauge)
+        .expect("every vertex is named");
     let differing: Vec<u64> = twisted
         .lattice()
         .links()
@@ -293,18 +307,25 @@ fn main() {
         .iter()
         .map(written)
         .collect();
-    println!("  the holonomies themselves moved: [{}]", moved_holonomies.join(", "));
+    println!(
+        "  the holonomies themselves moved: [{}]",
+        moved_holonomies.join(", ")
+    );
     println!(
         "  the classes did not: {}",
         moved.plaquette_classes().expect("the walks close") == classes
     );
-    let moved_action = moved.wilson_action(&representation).expect("the weights exist");
-    let moved_spectrum = moved.transfer_spectrum().expect("the operator diagonalizes");
-    println!("  action {action} against {moved_action}   equal {}", action == moved_action);
+    let moved_action = moved
+        .wilson_action(&representation)
+        .expect("the weights exist");
+    let moved_spectrum = moved
+        .transfer_spectrum()
+        .expect("the operator diagonalizes");
     println!(
-        "  spectrum equal {}",
-        spectrum == moved_spectrum
+        "  action {action} against {moved_action}   equal {}",
+        action == moved_action
     );
+    println!("  spectrum equal {}", spectrum == moved_spectrum);
 
     // ---------------------------------------------------------------------------------------
     println!();
@@ -312,15 +333,22 @@ fn main() {
     let altered = twisted
         .with_link(200, quaternion([0, 1, 0, 0]))
         .expect("i is in Q8");
-    let altered_action = altered.wilson_action(&representation).expect("the weights exist");
-    let altered_spectrum = altered.transfer_spectrum().expect("the operator diagonalizes");
+    let altered_action = altered
+        .wilson_action(&representation)
+        .expect("the weights exist");
+    let altered_spectrum = altered
+        .transfer_spectrum()
+        .expect("the operator diagonalizes");
     let altered_holonomies: Vec<String> = altered
         .plaquette_holonomies()
         .expect("the walks close")
         .iter()
         .map(written)
         .collect();
-    println!("  link 200 set to i; holonomies [{}]", altered_holonomies.join(", "));
+    println!(
+        "  link 200 set to i; holonomies [{}]",
+        altered_holonomies.join(", ")
+    );
     println!(
         "  action {action} -> {altered_action}   moved {}",
         action != altered_action
@@ -368,7 +396,10 @@ fn main() {
         "  and the reading is not erased with it: S = {abelian_action}, non-zero {}",
         !abelian_action.is_zero()
     );
-    print_spectrum("the abelian control", &abelian.transfer_spectrum().expect("it diagonalizes"));
+    print_spectrum(
+        "the abelian control",
+        &abelian.transfer_spectrum().expect("it diagonalizes"),
+    );
 
     // ---------------------------------------------------------------------------------------
     println!();
@@ -379,7 +410,18 @@ fn main() {
         twisted.gauge_transformed(&partial).err()
     );
     let open = Lattice::declare(
-        [Link { id: 1, tail: 0, head: 1 }, Link { id: 2, tail: 1, head: 2 }],
+        [
+            Link {
+                id: 1,
+                tail: 0,
+                head: 1,
+            },
+            Link {
+                id: 2,
+                tail: 1,
+                head: 2,
+            },
+        ],
         [Plaquette {
             id: 7,
             walk: vec![OrientedEdge::forward(1), OrientedEdge::forward(2)],
@@ -401,7 +443,10 @@ fn main() {
     println!("-- the transfer operator itself --");
     let (order, operator) = twisted.transfer_operator().expect("the operator builds");
     let names: Vec<String> = order.iter().map(written).collect();
-    println!("  rows and columns in the group's own order: [{}]", names.join(", "));
+    println!(
+        "  rows and columns in the group's own order: [{}]",
+        names.join(", ")
+    );
     for row in 0..operator.rows() {
         let entries: Vec<String> = operator
             .row(row)

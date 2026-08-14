@@ -58,12 +58,12 @@
 use std::error::Error;
 
 use holonic_engine::leader_quadrature::{
-    germwise_oracle_area, integrate_by_leaders, path_disagreement, LeaderError, LeaderLaw, LocalJet,
-    MaterialBoundary, RationalGerm, RideDiscipline, WitnessDepth,
+    LeaderError, LeaderLaw, LocalJet, MaterialBoundary, RationalGerm, RideDiscipline, WitnessDepth,
+    germwise_oracle_area, integrate_by_leaders, path_disagreement,
 };
 use num_bigint::BigInt;
 use num_traits::{One, Zero};
-use relational_geometry::{format_rat, integer, rat, Rat};
+use relational_geometry::{Rat, format_rat, integer, rat};
 
 // ---------------------------------------------------------------------------------------------
 // declared material
@@ -276,7 +276,11 @@ fn the_theorem(controls: &mut Controls) {
             println!(
                 "     {name:<34} {rank:>5} {:>7} {order:>11} {:>13}",
                 format_rat(&step),
-                if survives_below { "survives" } else { "VANISHED" }
+                if survives_below {
+                    "survives"
+                } else {
+                    "VANISHED"
+                }
             );
         }
     }
@@ -397,11 +401,19 @@ fn where_the_depth_decides_the_answer(controls: &mut Controls) {
     println!("\n     the separating material, exhibited:");
     println!(
         "       jet at extension 1 (offset 0)   {:?}",
-        at_zero.coefficients().iter().map(format_rat).collect::<Vec<_>>()
+        at_zero
+            .coefficients()
+            .iter()
+            .map(format_rat)
+            .collect::<Vec<_>>()
     );
     println!(
         "       jet at extension 2 (offset 1)   {:?}",
-        at_one.coefficients().iter().map(format_rat).collect::<Vec<_>>()
+        at_one
+            .coefficients()
+            .iter()
+            .map(format_rat)
+            .collect::<Vec<_>>()
     );
     println!(
         "       they differ: {}     rebase_movement_depth: {}",

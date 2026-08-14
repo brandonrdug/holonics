@@ -985,7 +985,10 @@ fn main() -> Result<(), String> {
         return Err("held-out codec face was not a source-independent generated deed".to_owned());
     }
 
-    phase!("novel cultivated face generated: {}", novel_cultivated_answer.text);
+    phase!(
+        "novel cultivated face generated: {}",
+        novel_cultivated_answer.text
+    );
     let codec_training_native = agent
         .codec_training_native_bytes()
         .map_err(|error| format!("form native cultivated codec body: {error:?}"))?;
@@ -1009,7 +1012,10 @@ fn main() -> Result<(), String> {
     if !cultivated_agent_rest_remount_exact {
         return Err("cultivated agent rest receipt was not stable".to_owned());
     }
-    phase!("cultivated codec body sealed: {} octets", codec_training_native.len());
+    phase!(
+        "cultivated codec body sealed: {} octets",
+        codec_training_native.len()
+    );
     let remounted_cultivated_question = AgenticLanguageQuestion::new(
         "projective-light-remounted-question",
         90,

@@ -73,11 +73,7 @@ fn quadruple(points: &[RatVec2]) -> String {
 }
 
 fn parameters_of(values: &[Rat]) -> String {
-    values
-        .iter()
-        .map(format_rat)
-        .collect::<Vec<_>>()
-        .join(", ")
+    values.iter().map(format_rat).collect::<Vec<_>>().join(", ")
 }
 
 /// Carry plane marks through a planar homography acting on `(x,y,1)` and dehomogenize.  A mark on
@@ -86,13 +82,9 @@ fn carry_through_plane(homography: &RatMat3, points: &[RatVec2]) -> Option<Vec<R
     points
         .iter()
         .map(|point| {
-            let image = homography.apply(&RatVec3::new(
-                point.x.clone(),
-                point.y.clone(),
-                integer(1),
-            ));
-            (image.z != integer(0))
-                .then(|| RatVec2::new(&image.x / &image.z, &image.y / &image.z))
+            let image =
+                homography.apply(&RatVec3::new(point.x.clone(), point.y.clone(), integer(1)));
+            (image.z != integer(0)).then(|| RatVec2::new(&image.x / &image.z, &image.y / &image.z))
         })
         .collect()
 }
@@ -258,10 +250,7 @@ fn main() {
                 orbit.insert(coordinates(&image));
                 println!("    {turn_name}");
                 println!("      AFTER   {}", quadruple(&image));
-                println!(
-                    "      moved   {moved} of {} marks",
-                    source.len()
-                );
+                println!("      moved   {moved} of {} marks", source.len());
                 println!(
                     "      X       {}   {}",
                     format_rat(&image_ratio),
@@ -349,8 +338,17 @@ fn main() {
             }
             println!("\n  pencil    {pencil_name}");
             println!("  t         [{}]", parameters_of(&parameters));
-            println!("  BEFORE    {}   reduced on {source_axis}   X {}", quadruple(&source), format_rat(&source_ratio));
-            println!("  AFTER  H  {}   reduced on {image_axis}   X {}   {}", quadruple(&image), format_rat(&image_ratio), if stood { "== source" } else { "!= SOURCE" });
+            println!(
+                "  BEFORE    {}   reduced on {source_axis}   X {}",
+                quadruple(&source),
+                format_rat(&source_ratio)
+            );
+            println!(
+                "  AFTER  H  {}   reduced on {image_axis}   X {}   {}",
+                quadruple(&image),
+                format_rat(&image_ratio),
+                if stood { "== source" } else { "!= SOURCE" }
+            );
             println!(
                 "  the line  {}",
                 if line_moved {
@@ -362,8 +360,7 @@ fn main() {
         }
     }
     holds.push((
-        "a planar homography moves the line off itself and the cross-ratio still stands"
-            .to_owned(),
+        "a planar homography moves the line off itself and the cross-ratio still stands".to_owned(),
         every_line_moved && every_planar_ratio_stood,
         "four (pencil, quadruple) pairs, every image line distinct from its source".to_owned(),
     ));
@@ -627,7 +624,8 @@ fn main() {
             focal_distance: integer(7),
         },
     );
-    perspective.orientation = ReceiverOrientation::from_cayley_xyz(rat(1, 5), rat(-1, 4), rat(1, 3));
+    perspective.orientation =
+        ReceiverOrientation::from_cayley_xyz(rat(1, 5), rat(-1, 4), rat(1, 3));
     let receivers = vec![
         GrainedReceiver {
             receiver: Receiver::new(
@@ -667,7 +665,8 @@ fn main() {
         faces.insert(coordinates(&points));
     }
     let pointwise_distinct = atlas.occurrences.iter().all(|joint| {
-        joint.faces[&ReceiverId(1)].projected.rational != joint.faces[&ReceiverId(2)].projected.rational
+        joint.faces[&ReceiverId(1)].projected.rational
+            != joint.faces[&ReceiverId(2)].projected.rational
     });
     let swing = atlas.swing(1).unwrap();
     println!(

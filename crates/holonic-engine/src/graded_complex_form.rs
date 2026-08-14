@@ -207,9 +207,7 @@ pub fn encode_native_bytes(
 ///
 /// Every cell goes through [`GradedCausalComplex::found_cell`], so a form whose incidence does not
 /// close does not become a complex.
-pub fn decode_native_bytes(
-    octets: &[u8],
-) -> Result<GradedCausalComplex, GradedComplexFormError> {
+pub fn decode_native_bytes(octets: &[u8]) -> Result<GradedCausalComplex, GradedComplexFormError> {
     if octets.len() < HEAD_OCTETS {
         return Err(GradedComplexFormError::ExtentOverruns {
             field: "head",
@@ -246,9 +244,8 @@ pub fn decode_native_bytes(
         }
         let name = cursor.utf8("cell name")?;
         let grade = cursor.u64("grade")?;
-        let grade = u32::try_from(grade).map_err(|_| GradedComplexFormError::GradeOverruns {
-            grade,
-        })?;
+        let grade =
+            u32::try_from(grade).map_err(|_| GradedComplexFormError::GradeOverruns { grade })?;
 
         let event_count = cursor.u64("source_events")?;
         if event_count == 0 {
@@ -259,13 +256,14 @@ pub fn decode_native_bytes(
         for _ in 0..event_count {
             let event = cursor.u64("source event")?;
             if let Some(previous) = previous
-                && event <= previous {
-                    return Err(GradedComplexFormError::NotAscending {
-                        field: "source events",
-                        previous,
-                        found: event,
-                    });
-                }
+                && event <= previous
+            {
+                return Err(GradedComplexFormError::NotAscending {
+                    field: "source events",
+                    previous,
+                    found: event,
+                });
+            }
             previous = Some(event);
             source_events.insert(EventId(event));
         }
@@ -276,13 +274,14 @@ pub fn decode_native_bytes(
         for _ in 0..term_count {
             let face = cursor.u64("term cell")?;
             if let Some(previous) = previous
-                && face <= previous {
-                    return Err(GradedComplexFormError::NotAscending {
-                        field: "boundary terms",
-                        previous,
-                        found: face,
-                    });
-                }
+                && face <= previous
+            {
+                return Err(GradedComplexFormError::NotAscending {
+                    field: "boundary terms",
+                    previous,
+                    found: face,
+                });
+            }
             previous = Some(face);
             let positive = cursor.magnitude("positive")?;
             let negative = cursor.magnitude("negative")?;
@@ -322,12 +321,7 @@ pub fn decode_native_bytes(
 fn next_identity(complex: &GradedCausalComplex) -> u64 {
     let mut probe = complex.clone();
     probe
-        .found_cell(
-            "",
-            BTreeSet::from([EventId(1)]),
-            0,
-            CausalChain::default(),
-        )
+        .found_cell("", BTreeSet::from([EventId(1)]), 0, CausalChain::default())
         .expect("a grade-zero cell with an empty boundary and one source event is always founded")
         .0
 }
@@ -421,7 +415,7 @@ impl<'a> Cursor<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::rebase_invariants::{rebase_invariants, PivotRule};
+    use crate::rebase_invariants::{PivotRule, rebase_invariants};
     use num_bigint::BigInt;
 
     fn source() -> BTreeSet<EventId> {
@@ -438,13 +432,20 @@ mod tests {
             .found_cell("b", source(), 0, CausalChain::default())
             .expect("a vertex");
         let c = complex
-            .found_cell("c", BTreeSet::from([EventId(1), EventId(9)]), 0, CausalChain::default())
+            .found_cell(
+                "c",
+                BTreeSet::from([EventId(1), EventId(9)]),
+                0,
+                CausalChain::default(),
+            )
             .expect("a vertex");
         for (name, from, to) in [("ab", a, b), ("bc", b, c), ("ca", c, a)] {
             let mut boundary = CausalChain::default();
             boundary.add_term(to, ComparativeMultiplicity::positive(1u32));
             boundary.add_term(from, ComparativeMultiplicity::negative(1u32));
-            complex.found_cell(name, source(), 1, boundary).expect("an edge");
+            complex
+                .found_cell(name, source(), 1, boundary)
+                .expect("an edge");
         }
         complex
     }
@@ -541,9 +542,15 @@ mod tests {
         for (label, complex) in bodies() {
             let form = encode_native_bytes(&complex).expect("a form");
             let mounted = decode_native_bytes(&form).expect("a mount");
-            assert_eq!(mounted, complex, "{label}: the mounted complex is not the one encoded");
+            assert_eq!(
+                mounted, complex,
+                "{label}: the mounted complex is not the one encoded"
+            );
             let retaken = encode_native_bytes(&mounted).expect("a form");
-            assert_eq!(retaken, form, "{label}: re-taking the form did not return the octets");
+            assert_eq!(
+                retaken, form,
+                "{label}: re-taking the form did not return the octets"
+            );
         }
     }
 
@@ -824,10 +831,16 @@ mod tests {
             .expect("a vertex");
         let text = ron::to_string(&complex).expect("ron");
         let faithful: GradedCausalComplex = ron::from_str(&text).expect("ron");
-        assert_eq!(faithful, complex, "the ron round trip must be faithful first");
+        assert_eq!(
+            faithful, complex,
+            "the ron round trip must be faithful first"
+        );
 
         let shifted = text.replace("(1)", "(7)");
-        assert_ne!(shifted, text, "the serialized spelling of an identity moved");
+        assert_ne!(
+            shifted, text,
+            "the serialized spelling of an identity moved"
+        );
         let permuted: GradedCausalComplex = ron::from_str(&shifted).expect("ron");
         assert_eq!(
             permuted.cells().keys().copied().collect::<Vec<_>>(),
@@ -865,10 +878,16 @@ mod tests {
             .expect("a vertex");
         let text = ron::to_string(&complex).expect("ron");
         let faithful: GradedCausalComplex = ron::from_str(&text).expect("ron");
-        assert_eq!(faithful, complex, "the ron round trip must be faithful first");
+        assert_eq!(
+            faithful, complex,
+            "the ron round trip must be faithful first"
+        );
 
         let drifted = text.replace("next_cell:2", "next_cell:99");
-        assert_ne!(drifted, text, "the serialized spelling of `next_cell` moved");
+        assert_ne!(
+            drifted, text,
+            "the serialized spelling of `next_cell` moved"
+        );
         let drifted: GradedCausalComplex = ron::from_str(&drifted).expect("ron");
         assert_eq!(
             drifted.cells().keys().copied().collect::<Vec<_>>(),
@@ -1011,8 +1030,8 @@ mod tests {
     #[test]
     fn the_reading_over_a_mounted_form_is_the_reading_over_the_body_that_founded_it() {
         for (label, complex) in bodies() {
-            let mounted =
-                decode_native_bytes(&encode_native_bytes(&complex).expect("a form")).expect("mount");
+            let mounted = decode_native_bytes(&encode_native_bytes(&complex).expect("a form"))
+                .expect("mount");
             for rule in PivotRule::ALL {
                 let founded = rebase_invariants(&complex, rule).expect("a reading");
                 let remounted = rebase_invariants(&mounted, rule).expect("a reading");
