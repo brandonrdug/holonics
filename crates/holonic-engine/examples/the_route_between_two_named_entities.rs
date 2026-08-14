@@ -120,7 +120,7 @@ fn main() {
             continue;
         };
 
-        let sites = sites_of(&mapping, &derivations);
+        let sites = sites_of(&mapping);
         let mut reached = 0usize;
         let mut unreached = 0usize;
         let mut longest: Vec<String> = Vec::new();
@@ -241,7 +241,7 @@ fn main() {
     println!("\n{}", "-".repeat(96));
     println!("THE CONTROLS");
     println!("{}", "-".repeat(96));
-    let sites = sites_of(&mapping, &derivations);
+    let sites = sites_of(&mapping);
     let unjoined = orbit
         .iter()
         .find(|(held, ..)| held == &name)
@@ -271,17 +271,17 @@ fn main() {
     println!("{}", "=".repeat(96));
 }
 
-/// Every site the mapping carries, read off the material rather than written here. A driver that
-/// names its own endpoints has authored the experiment.
-fn sites_of(mapping: &CapacitanceMapping, derivations: &[Derivation]) -> Vec<String> {
-    let mut sites: Vec<String> = mapping.terrain().iter().cloned().collect();
-    for derivation in derivations {
-        sites.extend(derivation.recruited.keys().cloned());
-        sites.push(derivation.name.clone());
-        sites.push(derivation.statement.clone());
-    }
-    sites.sort();
-    sites.dedup();
-    sites.retain(|name| mapping.site_of(name).is_some());
-    sites
+/// Every site the mapping carries, **read off the mapping**.
+///
+/// This reconstructed candidate names from the `Derivation` fields until 2026-08-14 and kept the
+/// ones that resolved. That silently dropped every 0-cell whose key the aperture rewrote — all 31
+/// route-keyed cells under `ByRoute`, whose keys are `name#ordinal` — and then reported the
+/// surviving 14 symbols, which link to nothing, as `0 joined`. The driver had authored its own site
+/// set and read the result as a property of the circuit.
+fn sites_of(mapping: &CapacitanceMapping) -> Vec<String> {
+    mapping
+        .identifiers()
+        .into_iter()
+        .map(str::to_owned)
+        .collect()
 }

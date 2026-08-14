@@ -664,6 +664,19 @@ impl CapacitanceMapping {
         self.site_of.get(identifier).copied()
     }
 
+    /// **Every identifier the mapping carries**, in canonical order.
+    ///
+    /// Read the sites off the mapping; do not reconstruct them from the material. The 0-cell key is
+    /// the aperture's, not the caller's — under `DerivationIdentity::ByRoute` it is
+    /// `name#ordinal`, and under a founded statement incidence a statement carries a transformed
+    /// key. A driver that rebuilds candidate names from `Derivation` fields and keeps the ones that
+    /// resolve **silently drops every cell whose key the aperture rewrote**, and then reports the
+    /// remainder as a reading of the circuit. Measured 2026-08-14: doing exactly that made two of
+    /// four declared apertures return `0 joined` out of a site population it never asked about.
+    pub fn identifiers(&self) -> Vec<&str> {
+        self.site_of.keys().map(String::as_str).collect()
+    }
+
     /// The identifier a site carries. Inverse of [`Self::site_of`].
     pub fn name_of(&self, site: ReceiverCurrentSiteId) -> Option<&str> {
         self.name_of.get(&site).map(String::as_str)
