@@ -1139,6 +1139,152 @@ pub struct ExactAnalyticCycleHolonomyReceipt {
     pub admits_nonzero_fixed_current: bool,
 }
 
+/// One layer of a stratified stack: what the medium admits, and what it presents at a boundary.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ExactStratifiedLayer {
+    /// `|k|^2` in this layer. The index of refraction lives here, squared, so no root is taken.
+    pub wave_number_square: Rat,
+    /// The layer's admittance, `Y = 1/Z`. Must be positive.
+    pub admittance: Rat,
+}
+
+/// One crossing in a stack: which boundary, what regime it admitted, what amplitude it returned.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ExactStratifiedCrossing {
+    /// The boundary between layer `at` and layer `at + 1`.
+    pub at: usize,
+    pub regime: ExactRefractionRegime,
+    pub amplitude: ExactAnalyticInterfaceAmplitudeFiber,
+}
+
+/// **A chain of interfaces, composed — and the conserved quantity is what carries it.**
+///
+/// The tangential covector is conserved across *every* boundary of a parallel stack, because each
+/// boundary is translation-invariant along itself and they share one normal. That is Snell's law
+/// stated as a constant of the motion through the whole stack rather than as an angle at each
+/// interface, and it is why this composition is exact over `Rat` with **no root taken anywhere**:
+/// each layer's normal component enters only as `|k_j|^2 - |k_parallel|^2`, which is rational.
+///
+/// [`exact_refraction_fiber`] withholds the transmitted *direction* because its square root is
+/// generally irrational. **The chain does not need it.** Composing by the conserved quantity avoids
+/// the extension entirely; a caller wanting the direction in a particular layer must declare one.
+///
+/// **The turning point is the return.** The first boundary whose regime is evanescent is where the
+/// stack stops transmitting — total internal reflection occurring *inside* the stack, at a depth the
+/// material decides. Layers past it are reported as unreached rather than scored, because nothing
+/// propagates to them.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ExactStratifiedStackReading {
+    /// Conserved across every boundary. Computed once, and equality at each boundary is the
+    /// falsifier that the chain is a chain.
+    pub tangential_covector: RatVec3,
+    /// `|k_parallel|^2`, the constant of the motion through the stack.
+    pub tangential_square: Rat,
+    pub crossings: Vec<ExactStratifiedCrossing>,
+    /// The first evanescent boundary, if the stack turns. `None` when the stack transmits whole.
+    pub turning_point: Option<usize>,
+    /// Layers the current never reached, because the stack turned before them.
+    pub unreached_layers: usize,
+}
+
+impl ExactStratifiedStackReading {
+    /// The stack transmitted to its far side without turning.
+    pub fn transmits_whole(&self) -> bool {
+        self.turning_point.is_none() && self.unreached_layers == 0
+    }
+}
+
+/// Compose a stack of parallel interfaces, exactly.
+///
+/// `layers[0]` is the incident medium; the incident covector must lie on its dispersion shell. One
+/// crossing is returned per boundary reached, in order, and the walk stops at the first evanescent
+/// boundary with the remaining layers reported unreached.
+pub fn exact_stratified_stack(
+    incident_covector: RatVec3,
+    interface_normal: RatVec3,
+    layers: &[ExactStratifiedLayer],
+    hand: ExactRefractionHand,
+) -> Result<ExactStratifiedStackReading, AnalyticFieldError> {
+    if layers.len() < 2 {
+        return Err(AnalyticFieldError::MalformedRefractionDoctrine);
+    }
+    for layer in layers {
+        if !layer.admittance.is_positive() {
+            return Err(AnalyticFieldError::NonpositiveAdmittance);
+        }
+    }
+
+    // The first boundary is taken through the existing owner, so the dispersion shell is checked and
+    // the tangential covector is founded by the same law a single interface uses. Every later
+    // boundary rides the constant it established.
+    let first = exact_refraction_fiber(
+        incident_covector,
+        interface_normal,
+        layers[0].wave_number_square.clone(),
+        layers[1].wave_number_square.clone(),
+        hand,
+    )?;
+    let tangential_covector = first.tangential_covector.clone();
+    let tangential_square = tangential_covector.dot(&tangential_covector);
+
+    let mut crossings = Vec::new();
+    let mut turning_point = None;
+    for at in 0..layers.len() - 1 {
+        let normal_numerator = &layers[at + 1].wave_number_square - &tangential_square;
+        let regime = if normal_numerator.is_positive() {
+            ExactRefractionRegime::Propagating {
+                normal_coefficient_square: normal_numerator,
+                hand,
+            }
+        } else if normal_numerator.is_zero() {
+            ExactRefractionRegime::Grazing
+        } else {
+            ExactRefractionRegime::Evanescent {
+                normal_coefficient_square_deficit: -normal_numerator,
+            }
+        };
+        let amplitude = match &regime {
+            ExactRefractionRegime::Propagating { .. } => {
+                ExactAnalyticInterfaceAmplitudeFiber::Traveling(
+                    exact_scalar_interface_coefficients(
+                        layers[at].admittance.clone(),
+                        layers[at + 1].admittance.clone(),
+                    )?,
+                )
+            }
+            ExactRefractionRegime::Grazing => ExactAnalyticInterfaceAmplitudeFiber::GrazingOpen {
+                incident_admittance: layers[at].admittance.clone(),
+                transmitted_admittance: layers[at + 1].admittance.clone(),
+            },
+            ExactRefractionRegime::Evanescent { .. } => {
+                ExactAnalyticInterfaceAmplitudeFiber::EvanescentOpen {
+                    incident_admittance: layers[at].admittance.clone(),
+                    transmitted_admittance: layers[at + 1].admittance.clone(),
+                }
+            }
+        };
+        let turned = matches!(regime, ExactRefractionRegime::Evanescent { .. });
+        crossings.push(ExactStratifiedCrossing {
+            at,
+            regime,
+            amplitude,
+        });
+        if turned {
+            turning_point = Some(at);
+            break;
+        }
+    }
+
+    let reached_boundaries = crossings.len();
+    Ok(ExactStratifiedStackReading {
+        tangential_covector,
+        tangential_square,
+        crossings,
+        turning_point,
+        unreached_layers: layers.len() - 1 - reached_boundaries,
+    })
+}
+
 pub fn exact_scalar_interface_coefficients(
     incident_admittance: Rat,
     transmitted_admittance: Rat,
@@ -1970,6 +2116,194 @@ pub enum AnalyticFieldError {
 
 #[cfg(test)]
 mod tests {
+
+    fn layer(k2: i64, y: i64) -> ExactStratifiedLayer {
+        ExactStratifiedLayer {
+            wave_number_square: Rat::from_integer(k2.into()),
+            admittance: Rat::from_integer(y.into()),
+        }
+    }
+
+    /// **The falsifier that makes the chain a chain.** The tangential covector is a constant of the
+    /// motion through the whole stack, so every boundary must agree on it — and the regime at each
+    /// boundary must be exactly what that one constant plus that layer's own wave number decide.
+    /// A composition that re-derived the tangential part per boundary, or lost it, fails here.
+    #[test]
+    fn one_conserved_tangential_covector_carries_every_boundary_of_the_stack() {
+        // Incident covector (3,4,0) on the shell |k|^2 = 25, normal along z, so k_parallel = (3,4,0)
+        // and |k_parallel|^2 = 25 exactly. Layers must then be read against 25 and nothing else.
+        let incident = RatVec3::from_i64(3, 4, 0);
+        let normal = RatVec3::from_i64(0, 0, 1);
+        let layers = [layer(25, 1), layer(41, 2), layer(30, 3), layer(26, 4)];
+        let reading = exact_stratified_stack(
+            incident.clone(),
+            normal,
+            &layers,
+            ExactRefractionHand::AlongNormal,
+        )
+        .expect("the incident covector is on its own shell");
+
+        assert_eq!(reading.tangential_covector, incident, "z is the normal");
+        assert_eq!(reading.tangential_square, Rat::from_integer(25.into()));
+        assert_eq!(reading.crossings.len(), 3, "three boundaries, all reached");
+        assert!(reading.transmits_whole());
+        assert_eq!(reading.turning_point, None);
+
+        // Each boundary's normal square is that layer's own wave number minus the ONE constant.
+        for (crossing, expected) in reading.crossings.iter().zip([16, 5, 1]) {
+            match &crossing.regime {
+                ExactRefractionRegime::Propagating {
+                    normal_coefficient_square,
+                    ..
+                } => assert_eq!(
+                    *normal_coefficient_square,
+                    Rat::from_integer(expected.into()),
+                    "boundary {}",
+                    crossing.at
+                ),
+                other => panic!("boundary {} is {other:?}", crossing.at),
+            }
+        }
+
+        // And the amplitude at each boundary is the two-port law on that pair of admittances.
+        for (crossing, (yi, yt)) in reading.crossings.iter().zip([(1, 2), (2, 3), (3, 4)]) {
+            let ExactAnalyticInterfaceAmplitudeFiber::Traveling(coefficients) = &crossing.amplitude
+            else {
+                panic!("a propagating boundary must return a traveling amplitude");
+            };
+            let expected = exact_scalar_interface_coefficients(
+                Rat::from_integer(yi.into()),
+                Rat::from_integer(yt.into()),
+            )
+            .unwrap();
+            assert_eq!(coefficients.reflection, expected.reflection);
+            assert_eq!(coefficients.transmission, expected.transmission);
+        }
+    }
+
+    /// **The stack turns, and the depth is the material's.** A layer whose wave number falls below
+    /// the conserved tangential square cannot carry a propagating normal component: that is total
+    /// internal reflection occurring INSIDE the stack. Layers past it are reported unreached rather
+    /// than scored, because nothing propagates to them.
+    #[test]
+    fn the_stack_turns_where_the_material_decides_and_the_rest_is_unreached() {
+        let incident = RatVec3::from_i64(3, 4, 0);
+        let normal = RatVec3::from_i64(0, 0, 1);
+        //                  k^2 = 25   41      30      20 <- below 25, turns    99 never reached
+        let layers = [
+            layer(25, 1),
+            layer(41, 2),
+            layer(30, 3),
+            layer(20, 4),
+            layer(99, 5),
+        ];
+        let reading =
+            exact_stratified_stack(incident, normal, &layers, ExactRefractionHand::AlongNormal)
+                .expect("on shell");
+
+        assert_eq!(reading.turning_point, Some(2));
+        assert_eq!(reading.crossings.len(), 3, "the walk stops at the turn");
+        assert_eq!(reading.unreached_layers, 1);
+        assert!(!reading.transmits_whole());
+        match &reading.crossings[2].regime {
+            ExactRefractionRegime::Evanescent {
+                normal_coefficient_square_deficit,
+            } => assert_eq!(
+                *normal_coefficient_square_deficit,
+                Rat::from_integer(5.into()),
+                "25 - 20"
+            ),
+            other => panic!("the turning boundary is {other:?}"),
+        }
+        assert!(matches!(
+            reading.crossings[2].amplitude,
+            ExactAnalyticInterfaceAmplitudeFiber::EvanescentOpen { .. }
+        ));
+    }
+
+    /// The grazing boundary is the exact equality, and it is held OPEN rather than transmitted.
+    /// Without this the two inequalities could be swapped and nothing would notice.
+    #[test]
+    fn a_layer_at_exact_equality_grazes_and_is_held_open() {
+        let incident = RatVec3::from_i64(3, 4, 0);
+        let normal = RatVec3::from_i64(0, 0, 1);
+        let layers = [layer(25, 1), layer(25, 2)];
+        let reading =
+            exact_stratified_stack(incident, normal, &layers, ExactRefractionHand::AlongNormal)
+                .expect("on shell");
+        assert_eq!(reading.crossings[0].regime, ExactRefractionRegime::Grazing);
+        assert!(matches!(
+            reading.crossings[0].amplitude,
+            ExactAnalyticInterfaceAmplitudeFiber::GrazingOpen { .. }
+        ));
+        assert_eq!(reading.turning_point, None, "grazing is not a turn");
+    }
+
+    /// The stack refuses what a single interface refuses: an incident covector off its own shell,
+    /// a non-positive admittance, and a stack with no boundary at all.
+    #[test]
+    fn the_stack_refuses_by_name_what_one_interface_refuses() {
+        let normal = RatVec3::from_i64(0, 0, 1);
+        assert!(matches!(
+            exact_stratified_stack(
+                RatVec3::from_i64(3, 4, 1),
+                normal.clone(),
+                &[layer(25, 1), layer(41, 2)],
+                ExactRefractionHand::AlongNormal
+            ),
+            Err(AnalyticFieldError::IncidentDispersionFailure)
+        ));
+        assert!(matches!(
+            exact_stratified_stack(
+                RatVec3::from_i64(3, 4, 0),
+                normal.clone(),
+                &[layer(25, 1), layer(41, 0)],
+                ExactRefractionHand::AlongNormal
+            ),
+            Err(AnalyticFieldError::NonpositiveAdmittance)
+        ));
+        assert!(matches!(
+            exact_stratified_stack(
+                RatVec3::from_i64(3, 4, 0),
+                normal,
+                &[layer(25, 1)],
+                ExactRefractionHand::AlongNormal
+            ),
+            Err(AnalyticFieldError::MalformedRefractionDoctrine)
+        ));
+    }
+
+    /// **The composition agrees with the single-interface owner it composes.** A two-layer stack
+    /// must return exactly what `exact_refraction_fiber` returns for that one boundary — otherwise
+    /// the chain is a second implementation of the junction law rather than a composition of it.
+    #[test]
+    fn a_two_layer_stack_returns_what_the_single_interface_owner_returns() {
+        let incident = RatVec3::from_i64(3, 4, 0);
+        let normal = RatVec3::from_i64(0, 0, 1);
+        for transmitted in [41, 25, 20] {
+            let alone = exact_refraction_fiber(
+                incident.clone(),
+                normal.clone(),
+                Rat::from_integer(25.into()),
+                Rat::from_integer(transmitted.into()),
+                ExactRefractionHand::AlongNormal,
+            )
+            .unwrap();
+            let chained = exact_stratified_stack(
+                incident.clone(),
+                normal.clone(),
+                &[layer(25, 1), layer(transmitted, 2)],
+                ExactRefractionHand::AlongNormal,
+            )
+            .unwrap();
+            assert_eq!(chained.tangential_covector, alone.tangential_covector);
+            assert_eq!(
+                chained.crossings[0].regime, alone.transmitted_regime,
+                "k^2 = {transmitted}"
+            );
+        }
+    }
+
     use num_bigint::BigInt;
     use relational_geometry::integer;
 

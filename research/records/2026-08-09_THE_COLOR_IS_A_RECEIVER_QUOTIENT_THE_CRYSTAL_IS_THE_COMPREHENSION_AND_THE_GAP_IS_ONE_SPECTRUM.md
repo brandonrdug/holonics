@@ -188,8 +188,17 @@ independently.** Dispersion in a prism and the color of a dye are the same fact.
 > is the exact algebraic content of integration by reflection on a lattice. Reflecting the known face
 > **is** multiplying by the signature.
 
-**Measured 2026-08-09: `causal_reflection` has one library consumer and ZERO drivers.** The organ
-that carries why anything has a color has never been run against material.
+~~**Measured 2026-08-09: `causal_reflection` has one library consumer and ZERO drivers.**~~
+**WITHDRAWN 2026-08-14.** It was true when taken and false from 2026-08-10, when `27fc74d` added
+`crates/holonic-engine/examples/the_reflection_locks_the_faces.rs`. Re-measured: **18 declared
+controls, 0 failed**, the lock biconditional decided over **3,238 exhaustively enumerated responses**
+across three apertures with zero law failures, exactly 4 of 88 rational circle points returned as
+roots of unity, and 10 of 10 refusals firing by name. `derivation_integral` reaches it on **every
+route pair**, as one of three independently agreeing holonomy readings.
+
+**The claim propagated because the driver said it about itself** — its header and its printed output
+both read *"one library caller, no driver"*, in the file that is the driver. Repaired at the source
+2026-08-14. A module's reach is a measurement and decays like one.
 
 ## 6. Where Hodge sits, and it is not vague
 
