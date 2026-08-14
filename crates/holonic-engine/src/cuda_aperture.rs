@@ -1158,15 +1158,66 @@ pub struct DeclaredCarrierMetric {
     pub host_evaluation_cost: BigUint,
     pub device_evaluation_cost: BigUint,
     pub transfer_byte_cost: BigUint,
+    /// What one bit of retained width costs this receiver.
+    ///
+    /// **This is the description axis, and it was the one coordinate `CarrierWork` carried and this
+    /// metric did not price.** `intermediate_bits` is a width — how wide an exact intermediate had
+    /// to be — and a width is a description length: the octets a carrier must be able to hold are
+    /// the octets it must be able to write down.
+    ///
+    /// Pricing it here is what joins the two axes that this module's own comment named as
+    /// unjoinable — *"a host evaluation and a device evaluation are different units, and nothing in
+    /// the material says how many of one buys one of the other."* **Nothing in the material says
+    /// it, so a receiver declares it.** That is the whole content: the exchange is a declaration,
+    /// carried as a value at a call site, and where no receiver declares one the admission returns
+    /// `Open` and retains both carriers.
+    ///
+    /// Zero is the honest default for a receiver that does not price width at all, and it
+    /// reproduces this metric's behaviour before the coordinate existed.
+    #[serde(default)]
+    pub intermediate_bit_cost: BigUint,
 }
 
 impl DeclaredCarrierMetric {
+    /// A metric that prices the three traversal coordinates and not width — what this type carried
+    /// before the description axis was joined to it.
+    pub fn without_width(
+        host_evaluation_cost: BigUint,
+        device_evaluation_cost: BigUint,
+        transfer_byte_cost: BigUint,
+    ) -> Self {
+        Self {
+            host_evaluation_cost,
+            device_evaluation_cost,
+            transfer_byte_cost,
+            intermediate_bit_cost: BigUint::default(),
+        }
+    }
+
+    /// The same metric with a declared price on retained width.
+    pub fn pricing_width(&self, intermediate_bit_cost: BigUint) -> Self {
+        Self {
+            intermediate_bit_cost,
+            ..self.clone()
+        }
+    }
+
+    /// Whether this receiver prices the description axis at all.
+    pub fn prices_width(&self) -> bool {
+        !self.intermediate_bit_cost.is_zero()
+    }
+
     /// The exact cost this metric assigns to a work vector. Integer throughout; no rounding, no
     /// tolerance, and no comparison that is not exact.
+    ///
+    /// Four coordinates: three of traversal and one of **description**. A receiver that declares a
+    /// width price is stating what a bit of retained representation buys against an evaluation, and
+    /// that statement is the exchange — not an inference, and never a clock.
     pub fn cost_of(&self, work: &CarrierWork) -> BigUint {
         &work.host_evaluations * &self.host_evaluation_cost
             + &work.device_evaluations * &self.device_evaluation_cost
             + &work.transfer_bytes * &self.transfer_byte_cost
+            + &work.intermediate_bits * &self.intermediate_bit_cost
     }
 }
 
@@ -1933,12 +1984,72 @@ mod tests {
         }
     }
 
+    /// **The description axis is priced by declaration and by nothing else.**
+    ///
+    /// Two receivers see one work vector. One prices retained width and one does not, and they
+    /// return different costs — so the exchange is doing work rather than decorating the type. And
+    /// the unpriced receiver reproduces exactly what this metric returned before the coordinate
+    /// existed, so nothing that stood has moved.
+    #[test]
+    fn a_declared_width_price_changes_the_cost_and_no_price_reproduces_the_inherited_reading() {
+        let work = CarrierWork {
+            host_evaluations: BigUint::from(7u32),
+            device_evaluations: BigUint::from(11u32),
+            transfer_bytes: BigUint::from(13u32),
+            intermediate_bits: BigUint::from(384u32),
+        };
+        let traversal_only = metric(2, 3, 5);
+        let inherited = &work.host_evaluations * 2u32
+            + &work.device_evaluations * 3u32
+            + &work.transfer_bytes * 5u32;
+        assert_eq!(traversal_only.cost_of(&work), inherited);
+        assert!(!traversal_only.prices_width());
+
+        let prices_width = traversal_only.pricing_width(BigUint::from(1u32));
+        assert!(prices_width.prices_width());
+        assert_eq!(
+            prices_width.cost_of(&work),
+            inherited + BigUint::from(384u32)
+        );
+        assert_ne!(prices_width.cost_of(&work), traversal_only.cost_of(&work));
+    }
+
+    /// The width price can reverse an ordering the traversal coordinates alone give, which is the
+    /// orbit the declaration must have before its agreement means anything. A receiver that prices
+    /// description and one that does not are two frames, not one with a rounding difference.
+    #[test]
+    fn the_width_price_has_a_non_trivial_orbit_on_two_real_carriers() {
+        let narrow_but_busy = CarrierWork {
+            host_evaluations: BigUint::from(100u32),
+            device_evaluations: BigUint::default(),
+            transfer_bytes: BigUint::default(),
+            intermediate_bits: BigUint::from(8u32),
+        };
+        let quiet_but_wide = CarrierWork {
+            host_evaluations: BigUint::from(10u32),
+            device_evaluations: BigUint::default(),
+            transfer_bytes: BigUint::default(),
+            intermediate_bits: BigUint::from(4096u32),
+        };
+        let traversal_only = metric(1, 1, 1);
+        assert!(
+            traversal_only.cost_of(&narrow_but_busy) > traversal_only.cost_of(&quiet_but_wide),
+            "without a width price the busy carrier is dearer"
+        );
+        let prices_width = traversal_only.pricing_width(BigUint::from(1u32));
+        assert!(
+            prices_width.cost_of(&narrow_but_busy) < prices_width.cost_of(&quiet_but_wide),
+            "with one declared, the wide carrier is dearer -- the declaration REVERSES the reading, \
+             so it is a frame and not a decoration"
+        );
+    }
+
     fn metric(host: u32, device: u32, transfer: u32) -> DeclaredCarrierMetric {
-        DeclaredCarrierMetric {
-            host_evaluation_cost: BigUint::from(host),
-            device_evaluation_cost: BigUint::from(device),
-            transfer_byte_cost: BigUint::from(transfer),
-        }
+        DeclaredCarrierMetric::without_width(
+            BigUint::from(host),
+            BigUint::from(device),
+            BigUint::from(transfer),
+        )
     }
 
     #[test]

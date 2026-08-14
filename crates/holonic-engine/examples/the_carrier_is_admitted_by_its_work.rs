@@ -72,11 +72,11 @@ fn work(host: u32, device: u32, transfer: u32, bits: u32) -> CarrierWork {
 }
 
 fn metric(host: u32, device: u32, transfer: u32) -> DeclaredCarrierMetric {
-    DeclaredCarrierMetric {
-        host_evaluation_cost: BigUint::from(host),
-        device_evaluation_cost: BigUint::from(device),
-        transfer_byte_cost: BigUint::from(transfer),
-    }
+    DeclaredCarrierMetric::without_width(
+        BigUint::from(host),
+        BigUint::from(device),
+        BigUint::from(transfer),
+    )
 }
 
 fn render_work(carrier: &CarrierWork) -> String {

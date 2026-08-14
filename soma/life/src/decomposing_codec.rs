@@ -364,8 +364,45 @@ impl DecompositionPass {
     }
 
     /// The pooled parts, in the canonical order the part system indexes them by.
+    ///
+    /// This is the **set**. A population is a multiset, and the multiplicities are what an exact
+    /// code length is a form over — see [`DecompositionPass::part_population`].
     pub fn parts(&self) -> &BTreeSet<Vec<Symbol>> {
         self.system.parts()
+    }
+
+    /// The pooled parts **with their multiplicities** — the population this pass actually produced.
+    ///
+    /// [`read`] builds exactly this while pooling, and [`PartSystem::over_parts`] collapses it into
+    /// a set one line later. The set is the right carrier for a prefix machine, where a part either
+    /// is or is not reachable; it is the wrong carrier for a **population**, where how often a part
+    /// occurred is the whole content. Recomputed here from [`DecompositionPass::decomposed`], which
+    /// is the same walk `read` takes.
+    ///
+    /// Nothing is normalised, divided, or ranked: the return is exact occurrence counts keyed by
+    /// the part itself, so a receiver reads members by name and never by an index this module
+    /// minted.
+    pub fn part_population(&self) -> BTreeMap<Vec<Symbol>, usize> {
+        let mut counted: BTreeMap<Vec<Symbol>, usize> = BTreeMap::new();
+        for whole in &self.decomposed {
+            for part in &whole.parts {
+                *counted.entry(part.clone()).or_insert(0) += 1;
+            }
+        }
+        counted
+    }
+
+    /// How many parts this pass produced in total, counting repeats.
+    ///
+    /// The companion to `parts().len()`, which counts kinds. **The two move oppositely under a
+    /// finer grain and that is the two-part account**: measured on this repository's own records, a
+    /// revision took the population from 1,320 parts over 700 kinds to 8,380 parts over 105 kinds —
+    /// the parse got longer and the code got smaller.
+    pub fn part_count(&self) -> usize {
+        self.decomposed
+            .iter()
+            .map(|whole| whole.parts.len())
+            .sum()
     }
 
     /// The population the crossing is driven by. Never a count on its way anywhere.
@@ -492,6 +529,10 @@ pub struct DecompositionFace {
 pub enum DecompositionError {
     EmptyCutWord,
     EmptyGrain,
+    /// An aperture admitting a word no pair asked for is not an aperture on this population.
+    EmptyRevisionAperture,
+    /// The declared aperture admitted none of the words the collapsed population asked for.
+    ApertureAdmittedNothing { asked: usize, minimum: usize },
     EmptyWhole(usize),
     InputIsNotASymbol(InputId),
     NoOpenReflection,
@@ -604,6 +645,69 @@ pub struct FoundedRevision {
     pub pair: CollapsedPair,
 }
 
+/// How wide a revision cuts, declared by the caller and **decided by the material**.
+///
+/// ## Why this exists, measured
+///
+/// [`DecomposingBody::revise`] founds one codec version per collapsed pair. On this repository's
+/// own records, one pass returned **1,448,456** pairs and drove a one-word grain to **1,775** cut
+/// words. At that fineness the parts are short and near-universal, so *any* later material becomes
+/// supported — and a held-out body and a subject-**disjoint** body improved by the same amount.
+/// That is a global normalisation wearing the shape of changed terrain, and no held-out reading can
+/// separate the two while it holds.
+/// `research/records/2026-08-14_THE_CENSUS_DECAYED_THE_CYCLE_IS_BUILT_AND_THE_OPEN_GRADE_IS_THE_NONIDENTICAL_NEIGHBOURHOOD.md` §8.
+///
+/// ## What the material decides
+///
+/// A cut word is not founded because it appeared. It is founded because **several distinct
+/// collapsed pairs asked for it** — and how many asked is a property of the reading, never of this
+/// type. The aperture declares the threshold; the population decides which words clear it, and the
+/// words that do not are **returned by name** rather than dropped.
+///
+/// `every_pair()` is the inherited behaviour and is what [`DecomposingBody::revise`] uses, so
+/// nothing that stands moves.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct RevisionAperture {
+    minimum_asking_pairs: usize,
+}
+
+impl RevisionAperture {
+    /// Every pair founds its word. The inherited revision, and a saturating one.
+    pub const fn every_pair() -> Self {
+        Self {
+            minimum_asking_pairs: 1,
+        }
+    }
+
+    /// Found only words that at least `pairs` distinct collapsed pairs asked for.
+    ///
+    /// Refuses zero: an aperture admitting a word no pair asked for is not an aperture on this
+    /// population at all.
+    pub fn asked_by_at_least(pairs: usize) -> Result<Self, DecompositionError> {
+        if pairs == 0 {
+            return Err(DecompositionError::EmptyRevisionAperture);
+        }
+        Ok(Self {
+            minimum_asking_pairs: pairs,
+        })
+    }
+
+    pub fn minimum_asking_pairs(&self) -> usize {
+        self.minimum_asking_pairs
+    }
+}
+
+/// A word the collapsed population asked for and the aperture did not admit.
+///
+/// Returned rather than dropped: an aperture that reports what it excluded can be read, and one
+/// that silently narrows cannot.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ExcludedWord {
+    pub word: Vec<Symbol>,
+    /// How many distinct collapsed pairs asked for it.
+    pub asked_by: usize,
+}
+
 /// What one revision returned: the per-pair versions, their join, and the words.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Revision {
@@ -612,6 +716,10 @@ pub struct Revision {
     pub parent: CodecId,
     pub words: BTreeSet<Vec<Symbol>>,
     pub grain: DecompositionGrain,
+    /// The aperture this revision was taken under.
+    pub aperture: RevisionAperture,
+    /// Every word the collapsed population asked for that the aperture did not admit, by name.
+    pub excluded: Vec<ExcludedWord>,
 }
 
 /// What one pass returned at the runtime's level.
@@ -696,6 +804,19 @@ impl DecomposingBody {
     /// [`ReflectiveRuntimeError::MalformedStanding`], because that is a condition of the foreign
     /// carrier rather than a declared refusal of this organ.
     pub fn revise(&mut self) -> Result<Revision, DecompositionError> {
+        self.revise_within(RevisionAperture::every_pair())
+    }
+
+    /// Found one parented codec version per collapsed pair **whose word clears the aperture**, then
+    /// resume under their join.
+    ///
+    /// The aperture declares a threshold; the collapsed population decides which words clear it.
+    /// Words that do not are returned on [`Revision::excluded`], by name and with how many pairs
+    /// asked for them, so a narrowed revision can be read rather than merely trusted.
+    pub fn revise_within(
+        &mut self,
+        aperture: RevisionAperture,
+    ) -> Result<Revision, DecompositionError> {
         let Some(open) = self.open else {
             return Err(DecompositionError::NoOpenReflection);
         };
@@ -725,11 +846,40 @@ impl DecomposingBody {
         let collapsed: Vec<CollapsedPair> = pass.compression.collapsed.clone();
         let words: Vec<Vec<Symbol>> = pass.cut_words()?;
 
-        let mut founded = Vec::with_capacity(collapsed.len());
-        let mut population: BTreeSet<Vec<Symbol>> = BTreeSet::new();
-        for (pair, word) in collapsed.into_iter().zip(words) {
+        // How many distinct pairs asked for each word. Read off the population; nothing here
+        // authors a figure, and the aperture only compares against what the reading returned.
+        let mut asked_by: BTreeMap<Vec<Symbol>, usize> = BTreeMap::new();
+        for word in &words {
             if word.is_empty() {
                 return Err(DecompositionError::EmptyCutWord);
+            }
+            *asked_by.entry(word.clone()).or_insert(0) += 1;
+        }
+        let admitted: BTreeSet<Vec<Symbol>> = asked_by
+            .iter()
+            .filter(|(_, asked)| **asked >= aperture.minimum_asking_pairs())
+            .map(|(word, _)| word.clone())
+            .collect();
+        let excluded: Vec<ExcludedWord> = asked_by
+            .iter()
+            .filter(|(word, _)| !admitted.contains(*word))
+            .map(|(word, asked)| ExcludedWord {
+                word: word.clone(),
+                asked_by: *asked,
+            })
+            .collect();
+        if admitted.is_empty() {
+            return Err(DecompositionError::ApertureAdmittedNothing {
+                asked: asked_by.len(),
+                minimum: aperture.minimum_asking_pairs(),
+            });
+        }
+
+        let mut founded = Vec::with_capacity(admitted.len());
+        let mut population: BTreeSet<Vec<Symbol>> = BTreeSet::new();
+        for (pair, word) in collapsed.into_iter().zip(words) {
+            if !admitted.contains(&word) {
+                continue;
             }
             let grain = parent_grain.with(word.clone())?;
             let codec = self.runtime.mount_codec_with_lineage(
@@ -766,6 +916,8 @@ impl DecomposingBody {
             parent,
             words: population,
             grain,
+            aperture,
+            excluded,
         })
     }
 
@@ -2241,6 +2393,185 @@ mod tests {
             depth_first.len() > minimal.len(),
             "if both orders returned a word of the same length this material would prove nothing \
              about the search order and the minimality check above would be blind again"
+        );
+    }
+
+    // -------------------------------------------------------------------------------------------
+    // The revision aperture
+    //
+    // `revise` founds one version per collapsed pair, which on real material saturates: a single
+    // pass over three of this repository's records returned 1,448,456 pairs and took a one-word
+    // grain to 1,775 cut words, at which fineness a subject-DISJOINT held-out body improved as much
+    // as the held-out one. The aperture is what lets the material decide how wide the cut is, and
+    // these tests require its orbit to be non-trivial before its narrowing may be read as anything.
+    // -------------------------------------------------------------------------------------------
+
+    /// The inherited revision is the widest aperture, and it is exactly the old behaviour.
+    #[test]
+    fn the_inherited_revision_is_the_aperture_that_admits_every_pair() {
+        let mut wide = DecomposingBody::mount(origin_grain()).expect("a declared grain");
+        wide.receive(batch(BATCH_A)).expect("readable");
+        let inherited = wide.revise().expect("a collapsed population revises");
+
+        let mut declared = DecomposingBody::mount(origin_grain()).expect("a declared grain");
+        declared.receive(batch(BATCH_A)).expect("readable");
+        let explicit = declared
+            .revise_within(RevisionAperture::every_pair())
+            .expect("a collapsed population revises");
+
+        assert_eq!(inherited.aperture, RevisionAperture::every_pair());
+        assert_eq!(inherited.words, explicit.words);
+        assert_eq!(inherited.grain.cuts(), explicit.grain.cuts());
+        assert!(
+            inherited.excluded.is_empty(),
+            "the widest aperture excludes nothing"
+        );
+    }
+
+    /// **The orbit.** Two declared apertures must reach different grains on this material, or the
+    /// aperture is a parameter that changes nothing and its narrowing proves nothing.
+    #[test]
+    fn the_aperture_has_a_non_trivial_orbit_on_the_declared_material() {
+        let mut grains = Vec::new();
+        for asked in [1usize, 2, 3] {
+            let mut body = DecomposingBody::mount(origin_grain()).expect("a declared grain");
+            body.receive(batch(BATCH_A)).expect("readable");
+            let aperture = RevisionAperture::asked_by_at_least(asked).expect("a positive aperture");
+            let revision = body
+                .revise_within(aperture)
+                .expect("this material admits at every declared aperture");
+            assert_eq!(revision.aperture, aperture);
+            grains.push(revision.words.clone());
+        }
+        assert!(
+            grains[0] != grains[1] || grains[1] != grains[2],
+            "every declared aperture reached the same grain, so the aperture is vacuous here: \
+             {grains:?}"
+        );
+        // And the grains are monotone: a narrower aperture never admits more.
+        assert!(grains[1].is_subset(&grains[0]));
+        assert!(grains[2].is_subset(&grains[1]));
+    }
+
+    /// What the aperture excluded is returned BY NAME, with how many pairs asked for it — never
+    /// dropped, and never reduced to a count.
+    #[test]
+    fn the_excluded_words_are_returned_by_name_with_the_population_that_asked() {
+        let mut body = DecomposingBody::mount(origin_grain()).expect("a declared grain");
+        body.receive(batch(BATCH_A)).expect("readable");
+        let wide_words = {
+            let mut wide = DecomposingBody::mount(origin_grain()).expect("a declared grain");
+            wide.receive(batch(BATCH_A)).expect("readable");
+            wide.revise().expect("revises").words
+        };
+
+        let revision = body
+            .revise_within(RevisionAperture::asked_by_at_least(3).expect("positive"))
+            .expect("this material admits at three");
+        assert!(
+            !revision.excluded.is_empty(),
+            "an aperture that excluded nothing cannot exhibit what it cut"
+        );
+        for excluded in &revision.excluded {
+            assert!(
+                excluded.asked_by < 3,
+                "a word asked by three or more pairs must have been admitted"
+            );
+            assert!(!revision.words.contains(&excluded.word));
+            assert!(
+                wide_words.contains(&excluded.word),
+                "an excluded word must be one the population actually asked for"
+            );
+        }
+        // Admitted plus excluded is the whole population the pairs asked for.
+        let rebuilt: BTreeSet<Vec<Symbol>> = revision
+            .words
+            .iter()
+            .cloned()
+            .chain(revision.excluded.iter().map(|word| word.word.clone()))
+            .collect();
+        assert_eq!(rebuilt, wide_words);
+    }
+
+    /// An aperture no word clears refuses by name rather than resuming under the parent grain
+    /// while reporting a revision.
+    #[test]
+    fn an_aperture_nothing_clears_refuses_and_names_what_was_asked() {
+        let mut body = DecomposingBody::mount(origin_grain()).expect("a declared grain");
+        body.receive(batch(BATCH_A)).expect("readable");
+        let refusal = body
+            .revise_within(RevisionAperture::asked_by_at_least(1_000).expect("positive"))
+            .expect_err("no word on this material was asked by a thousand pairs");
+        let DecompositionError::ApertureAdmittedNothing { asked, minimum } = refusal else {
+            panic!("the refusal names the aperture: {refusal:?}");
+        };
+        assert_eq!(minimum, 1_000);
+        assert!(asked > 0, "the refusal reports what the population did ask for");
+    }
+
+    /// The multiset is the population; the set is its shadow. Both are returned, and on real
+    /// material they disagree — a set-only reading cannot see a part that occurred forty times.
+    #[test]
+    fn the_part_population_carries_multiplicity_the_part_set_discards() {
+        // Under the origin grain every whole ends at a `.` and no two chunks coincide, so the
+        // parse has no repeat at all and a multiset would be indistinguishable from a set. The
+        // repetition appears once the grain is finer, which is the case the crossing produces and
+        // the only case where multiplicity is a real property rather than a claim.
+        let mut body = DecomposingBody::mount(origin_grain()).expect("a declared grain");
+        body.receive(batch(BATCH_A)).expect("readable");
+        let revision = body.revise().expect("revises");
+        let pass = read(&revision.grain, &batch(BATCH_A)).expect("readable");
+        let population = pass.part_population();
+        assert_eq!(population.len(), pass.parts().len(), "same kinds");
+        assert_eq!(
+            population.values().sum::<usize>(),
+            pass.part_count(),
+            "the population sums to the parse length"
+        );
+        assert!(
+            pass.part_count() > pass.parts().len(),
+            "this material must repeat a part, or multiplicity is untested here"
+        );
+        assert!(
+            population.values().any(|count| *count > 1),
+            "at least one part must occur more than once"
+        );
+        for (part, count) in &population {
+            assert!(pass.parts().contains(part));
+            assert!(*count >= 1);
+        }
+    }
+
+    /// A finer grain lengthens the parse and shrinks the code. The two halves of the account move
+    /// in opposite directions, and a reading that carried only one of them would report the wrong
+    /// sign.
+    #[test]
+    fn a_finer_grain_lengthens_the_parse_and_shrinks_the_code() {
+        let mut body = DecomposingBody::mount(origin_grain()).expect("a declared grain");
+        body.receive(batch(BATCH_A)).expect("readable");
+        let revision = body.revise().expect("revises");
+
+        let before = read(&origin_grain(), &batch(BATCH_C)).expect("readable");
+        let after = read(&revision.grain, &batch(BATCH_C)).expect("readable");
+        assert!(
+            after.part_count() > before.part_count(),
+            "a finer grain cuts more: {} -> {}",
+            before.part_count(),
+            after.part_count()
+        );
+        assert!(
+            after.parts().len() <= before.parts().len(),
+            "and the kinds do not grow: {} -> {}",
+            before.parts().len(),
+            after.parts().len()
+        );
+    }
+
+    #[test]
+    fn an_aperture_of_zero_is_refused_because_it_admits_what_nothing_asked_for() {
+        assert_eq!(
+            RevisionAperture::asked_by_at_least(0),
+            Err(DecompositionError::EmptyRevisionAperture)
         );
     }
 }

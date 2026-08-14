@@ -409,32 +409,259 @@ pub fn read_population(
     Ok(read)
 }
 
-/// `H(P,Q) = Σ_a P(a) · S_Q(a)` — the depth incurred when one population is received through
-/// another's standing code.
+/// The complete reading of one population through another's standing code, with the
+/// unsupported half **exhibited** rather than collapsed.
 ///
-/// Returns `Unsupported` for the whole reading when any event `P` carries has no support in `Q`.
-/// That is not a failure: it is the case the law says FOUNDs, and collapsing it to a large finite
-/// number would be the smoothing constant this carrier refuses.
-pub fn cross_entropy(
+/// [`cross_entropy`] returns `Unsupported` for the whole reading the moment one event has no
+/// support, discarding the form it had already accumulated over every supported one. That is the
+/// correct *face* — a weighted sum has nowhere to put a refusal — and it is the wrong *fiber*,
+/// because held-out material almost always carries a novel event, so the aggregate refuses on
+/// exactly the material a compression reading must score. Measured 2026-08-14 on this repository's
+/// own records: three of four readings collapsed wholesale, one of them discarding 450 supported
+/// events out of 700 to report the 250 that were not.
+///
+/// **Nothing here smooths.** The unsupported events are returned by name, and their weight is
+/// returned beside the form rather than folded into it. That is the two-part account the law
+/// already implies: the supported half is what the standing code carries, the unsupported half is
+/// what must be **founded**, and founding is a real mutation of the standing —
+/// [`Support::found`] — not a constant.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub enum CrossEntropyFiber {
+    /// Every event the population carries has support in the code.
+    Supported(SymbolicSurprisal),
+    /// Some events have support and some do not.
+    ///
+    /// `form_over_supported` is `Σ_{a supported} P(a)·S_Q(a)` — weighted by the **whole**
+    /// population, so it is a genuine partial sum of the same quantity and never a renormalised
+    /// one. `supported_mass + unsupported_mass = 1` exactly.
+    Partial {
+        form_over_supported: SymbolicSurprisal,
+        supported_mass: Rat,
+        /// Every event the code cannot carry, by name, in canonical order.
+        unsupported: Vec<u64>,
+        unsupported_mass: Rat,
+    },
+    /// No event the population carries has support, or the population is empty.
+    Unsupported { unsupported: Vec<u64> },
+}
+
+impl CrossEntropyFiber {
+    /// The form over whatever was supported. `None` only when nothing was.
+    pub fn form(&self) -> Option<&SymbolicSurprisal> {
+        match self {
+            Self::Supported(form) => Some(form),
+            Self::Partial {
+                form_over_supported,
+                ..
+            } => Some(form_over_supported),
+            Self::Unsupported { .. } => None,
+        }
+    }
+
+    /// The events that must be founded before this reading is complete.
+    pub fn unsupported(&self) -> &[u64] {
+        match self {
+            Self::Supported(_) => &[],
+            Self::Partial { unsupported, .. } | Self::Unsupported { unsupported } => unsupported,
+        }
+    }
+
+    /// The coarse face: the reading [`cross_entropy`] returns.
+    ///
+    /// A `Partial` fiber has a real form and a real refusal, and the face keeps only the refusal —
+    /// which is why the face is lawful and the fiber is what a comparison needs.
+    pub fn face(&self) -> Support {
+        match self {
+            Self::Supported(form) => Support::Supported(form.clone()),
+            Self::Partial { .. } | Self::Unsupported { .. } => Support::Unsupported,
+        }
+    }
+}
+
+/// `H(P,Q) = Σ_a P(a) · S_Q(a)`, with the unsupported population retained.
+///
+/// This is the fiber; [`cross_entropy`] is its face.
+pub fn cross_entropy_fiber(
     population: &BTreeMap<u64, BigUint>,
     code: &BTreeMap<u64, BigUint>,
-) -> Result<Support, SurprisalError> {
+) -> Result<CrossEntropyFiber, SurprisalError> {
     let total: BigUint = population.values().sum();
     if total.is_zero() {
-        return Ok(Support::Unsupported);
+        return Ok(CrossEntropyFiber::Unsupported {
+            unsupported: Vec::new(),
+        });
     }
     let mut form = SymbolicSurprisal::zero();
+    let mut supported_mass = Rat::zero();
+    let mut unsupported_mass = Rat::zero();
+    let mut unsupported = Vec::new();
     for (event, count) in population {
         if count.is_zero() {
             continue;
         }
         let weight = Rat::new(BigInt::from(count.clone()), BigInt::from(total.clone()));
         match Support::read(code, *event)? {
-            Support::Unsupported => return Ok(Support::Unsupported),
-            Support::Supported(depth) => form = form.plus(&depth.scaled(&weight)),
+            Support::Unsupported => {
+                unsupported.push(*event);
+                unsupported_mass += &weight;
+            }
+            Support::Supported(depth) => {
+                form = form.plus(&depth.scaled(&weight));
+                supported_mass += &weight;
+            }
         }
     }
-    Ok(Support::Supported(form))
+    if unsupported.is_empty() {
+        return Ok(CrossEntropyFiber::Supported(form));
+    }
+    if supported_mass.is_zero() {
+        return Ok(CrossEntropyFiber::Unsupported { unsupported });
+    }
+    Ok(CrossEntropyFiber::Partial {
+        form_over_supported: form,
+        supported_mass,
+        unsupported,
+        unsupported_mass,
+    })
+}
+
+/// `H(P,Q) = Σ_a P(a) · S_Q(a)` — the depth incurred when one population is received through
+/// another's standing code.
+///
+/// Returns `Unsupported` for the whole reading when any event `P` carries has no support in `Q`.
+/// That is not a failure: it is the case the law says FOUNDs, and collapsing it to a large finite
+/// number would be the smoothing constant this carrier refuses.
+///
+/// **This is the coarse face of [`cross_entropy_fiber`]**, kept because a weighted sum genuinely
+/// has nowhere to put a refusal and callers who want that contract should have it. A caller who
+/// needs to know *what* was unsupported, or what the supported majority cost, takes the fiber.
+pub fn cross_entropy(
+    population: &BTreeMap<u64, BigUint>,
+    code: &BTreeMap<u64, BigUint>,
+) -> Result<Support, SurprisalError> {
+    Ok(cross_entropy_fiber(population, code)?.face())
+}
+
+#[cfg(test)]
+mod fiber_tests {
+    use super::*;
+
+    fn population(pairs: &[(u64, u32)]) -> BTreeMap<u64, BigUint> {
+        pairs
+            .iter()
+            .map(|(event, count)| (*event, BigUint::from(*count)))
+            .collect()
+    }
+
+    /// The fiber returns the supported form AND the unsupported names, where the
+    /// face returns only the refusal. Both are true of their own receiver.
+    #[test]
+    fn a_partial_reading_keeps_the_form_the_face_discards() {
+        let held_out = population(&[(2, 3), (3, 1), (5, 4)]);
+        let code = population(&[(2, 10), (3, 10)]);
+        let fiber = cross_entropy_fiber(&held_out, &code).expect("exact");
+        let CrossEntropyFiber::Partial {
+            form_over_supported,
+            supported_mass,
+            unsupported,
+            unsupported_mass,
+        } = &fiber
+        else {
+            panic!("event 5 has no support, so the reading is partial: {fiber:?}");
+        };
+        assert_eq!(unsupported, &vec![5]);
+        assert!(!form_over_supported.is_zero());
+        assert_eq!(supported_mass + unsupported_mass, Rat::one());
+        assert_eq!(unsupported_mass, &Rat::new(BigInt::from(4), BigInt::from(8)));
+        // The face keeps only the refusal, which is why it is a face.
+        assert_eq!(fiber.face(), Support::Unsupported);
+        assert_eq!(
+            cross_entropy(&held_out, &code).expect("exact"),
+            Support::Unsupported
+        );
+    }
+
+    /// The partial form is the SAME quantity restricted, never a renormalised
+    /// one: dropping the unsupported events from the population must return a
+    /// different form, because the weights would change.
+    #[test]
+    fn the_partial_form_is_weighted_by_the_whole_population_not_the_supported_part() {
+        let held_out = population(&[(2, 3), (3, 1), (5, 4)]);
+        let code = population(&[(2, 10), (3, 10)]);
+        let CrossEntropyFiber::Partial {
+            form_over_supported,
+            ..
+        } = cross_entropy_fiber(&held_out, &code).expect("exact")
+        else {
+            panic!("partial");
+        };
+        let restricted = population(&[(2, 3), (3, 1)]);
+        let CrossEntropyFiber::Supported(renormalised) =
+            cross_entropy_fiber(&restricted, &code).expect("exact")
+        else {
+            panic!("fully supported");
+        };
+        assert_ne!(
+            form_over_supported, renormalised,
+            "the partial form must carry the whole population's weights; if it equalled the \
+             renormalised reading it would have silently redistributed the unsupported mass"
+        );
+    }
+
+    /// Fully supported and fully unsupported both still return their own arm,
+    /// so the three arms are a partition rather than two arms and a fallback.
+    #[test]
+    fn all_three_arms_are_reachable_on_declared_material() {
+        let code = population(&[(2, 10), (3, 10)]);
+        assert!(matches!(
+            cross_entropy_fiber(&population(&[(2, 1), (3, 1)]), &code).expect("exact"),
+            CrossEntropyFiber::Supported(_)
+        ));
+        assert!(matches!(
+            cross_entropy_fiber(&population(&[(2, 1), (5, 1)]), &code).expect("exact"),
+            CrossEntropyFiber::Partial { .. }
+        ));
+        assert!(matches!(
+            cross_entropy_fiber(&population(&[(5, 1), (7, 1)]), &code).expect("exact"),
+            CrossEntropyFiber::Unsupported { .. }
+        ));
+    }
+
+    /// Founding an unsupported event moves the reading off the `Partial` arm,
+    /// which is the law's own alternative to smoothing exercised end to end.
+    #[test]
+    fn founding_the_unsupported_population_closes_the_partial_arm() {
+        let held_out = population(&[(2, 3), (5, 4)]);
+        let mut code = population(&[(2, 10)]);
+        let before = cross_entropy_fiber(&held_out, &code).expect("exact");
+        assert_eq!(before.unsupported(), &[5]);
+        for event in before.unsupported().to_vec() {
+            Support::found(&mut code, event);
+        }
+        let after = cross_entropy_fiber(&held_out, &code).expect("exact");
+        assert!(matches!(after, CrossEntropyFiber::Supported(_)));
+        assert!(after.unsupported().is_empty());
+        // And the founding moved every other event's depth, because the
+        // denominator moved. A smoothing constant would not have.
+        assert_ne!(before.form(), after.form());
+    }
+
+    /// The face is exactly the old contract, on every arm.
+    #[test]
+    fn the_face_reproduces_the_reading_the_coarse_entry_point_returns() {
+        let code = population(&[(2, 10), (3, 10)]);
+        for members in [
+            vec![(2u64, 1u32), (3, 1)],
+            vec![(2, 1), (5, 1)],
+            vec![(5, 1), (7, 1)],
+        ] {
+            let held_out = population(&members);
+            assert_eq!(
+                cross_entropy_fiber(&held_out, &code).expect("exact").face(),
+                cross_entropy(&held_out, &code).expect("exact")
+            );
+        }
+    }
 }
 
 /// `H(P) = Σ_a P(a) · S_P(a)` — the population received through its own code.
