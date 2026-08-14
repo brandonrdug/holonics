@@ -63,6 +63,7 @@ crates/holonic-engine/src/grown_cell.rs	.clone()=43	.collect()=52	.flat_map()=2	
 crates/holonic-engine/src/hardware_cover.rs	.clone()=4	.collect()=17	.flat_map()=1	.into_iter()=3	BTreeSet=2	Vec=50
 crates/holonic-engine/src/hermite_reduction.rs	.clone()=9	.collect()=7	Vec=8
 crates/holonic-engine/src/holonic_complex.rs	.clone()=8	.collect()=18	.flat_map()=1	.into_iter()=5	BTreeMap=31	BTreeSet=22	Vec=38
+crates/holonic-engine/src/hypergeometric_closure.rs	.clone()=8	.collect()=4	BTreeMap=3	Vec=6
 crates/holonic-engine/src/image.rs	Vec=2
 crates/holonic-engine/src/implicit.rs	.clone()=32	.collect()=8	.into_iter()=1	BTreeMap=3	BTreeSet=11	Vec=31
 crates/holonic-engine/src/inertia.rs	.clone()=15	.collect()=22	.into_iter()=2	Vec=42
