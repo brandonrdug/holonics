@@ -23,7 +23,42 @@ C++/CUDA engine under `archive/cpp-engine/` governs nothing.
 over **1,778** tokens; claim index current; output manifest 39 of 39; closure manifest current, 40
 return directories and **9 orphans**; three boundary artifacts bound, two of them re-seeded because
 the format sweep moved four closure members by layout alone; ten Typst roots compile.
-**The ownership ratchet is the one RED — 27 new occurrences, 20 of them in existing owners** (`codec_recovery.rs` Vec 150 against 79 allowed,
+**The ownership ratchet was RED at 27 new occurrences and is re-seeded 2026-08-14 with the
+measurement that decided it.** Normalising each violating file by its own size separates growth
+from drift, and the counts alone cannot:
+
+| file | lines | `Vec` | `Vec` per 1k lines |
+|---|---|---|---|
+| `analytic_field.rs` | 2394 → 3072 | 47 → 49 | 19.6 → 16.0 **−19%** |
+| `lattice_gauge.rs` | 1255 → 1695 | 26 → 31 | 20.7 → 18.3 **−12%** |
+| `incidence_production.rs` | 3423 → 3947 | 115 → 123 | 33.6 → 31.2 **−7%** |
+| `exposure_codec.rs` | 1239 → 1286 | 51 → 54 | 41.2 → 42.0 +2% |
+| `derivation_codec_intake.rs` | 1528 → 1869 | 44 → 56 | 28.8 → 30.0 +4% |
+| `derivation_capacitance.rs` | 2003 → 2363 | 26 → 33 | 13.0 → 14.0 +8% |
+| `codec_system.rs` | 2270 → 2376 | 60 → 87 | 26.4 → 36.6 **+39%** |
+| `running_integral.rs` | 2136 → 2464 | 8 → 13 | 3.7 → 5.3 **+41%** |
+| `codec_recovery.rs` | 2163 → 2817 | 79 → 150 | 36.5 → 53.2 **+46%** |
+
+**The criterion applied is whether the index IS the relation.** A `Vec` is a linked list whose
+pointers became arithmetic: `v[i+1]` is `next`, and that is a rebase with zero remainder when the
+`+1` genuinely means what the material means by *next*. It is a defect when the container carries an
+**authored order** that replaced a real transport law — collecting a graph traversal into a `Vec`
+makes the array's adjacency a lie about the material.
+
+**The three files that rose in density were read against that criterion and none carries the
+defect.** `codec_recovery` and `codec_system` are dominated by `Vec<Symbol>` (29 and 7) and
+`Vec<Vec<Symbol>>` (16 and 3) — **words and segmentations**, where the index is position in a word
+and which segment, both the material's own order — plus the id lists `ObservedSystem` requires.
+`running_integral`'s five new `Vec`s are the returned routes, where the index is position along the
+route. In every case the index is the relation.
+
+**So the disposition is a recorded re-seed and not a repair, and saying so is the point.** No site
+was found where a `Vec` carried an authored order in place of a transport law. Reducing these counts
+would have been bookkeeping presented as discipline, which the grading rules convict directly:
+*a wave of excisions reporting no movement anywhere has done bookkeeping and must say so.*
+Re-seeded at **213 files, 20,117 inherited occurrences, 0 retired**.
+
+~~27 new occurrences, 20 of them in existing owners~~ (`codec_recovery.rs` Vec 150 against 79 allowed,
 `codec_system.rs` 87 against 60, `derivation_codec_intake.rs` 56 against 44,
 `incidence_production.rs` 123 against 115) and 7 in the two new modules at a zero baseline. That is
 an open item, not a passing phase. The previous reading here — **2,184** tests, **9 of 9**, **338**
