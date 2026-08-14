@@ -876,6 +876,116 @@ transformation, phase and hand **before** the quotient, composite incidence and 
 the receiver pivot actually held, and the returned consequence with its residual. Mass **weighs and
 never gates** (`soma/body/src/arrow.rs:15-26`); the cohere face gates.
 
+---
+
+## 0j. The Holonic Interaction — the standard abstraction, ratified 2026-08-14
+
+The full derivation is
+`research/records/2026-08-14_THE_APERTURE_IS_AN_INTERACTION_HAMILTONIAN_AND_A_PHASE_OBJECT_IS_INVISIBLE_TO_THE_MAGNITUDE_FACE.md`.
+**This is the reasoning standard for interaction, not one more analogy**, and it is Brandon's:
+*"What you mean by the 'aperture' is an Interaction Hamiltonian."*
+
+### The aperture is the interaction term, and the perspective carries the lens
+
+```text
+   H  =  H_0      free propagation, the current with no interaction
+      +  H_int    the lattice — lenses, media, standing structure   <- the PERSPECTIVE'S IDENTITY
+      +  H_pert   the external modulating field, DYNAMIC            <- the third body
+```
+
+A perspective is not a viewpoint. It is a viewpoint **plus the standing structure through which it
+admits** — *"the lens itself is apart of the perspective's identity because it is an invariant
+constraint for the instants of the optical diagram being represented."* And the diaphragm is
+**discretely composed**: the far field is the transform of the aperture polygon, so an `n`-bladed
+aperture returns its spikes as that polygon's windings. The aperture's discreteness appears in the
+transform as winding, which is `winding_inertia`'s object.
+
+**The unit is four bodies, never two:** a source emanating current, the standing lattice, an external
+field modulating passage, and the perspective with its own aperture. One Holonic Interaction is
+*"a selected scope apart of an infinitely larger causal complex"* — a chain continues through it in
+both directions, derivable from potentials.
+
+**The selecting operator decides what the chains are.** Measured 2026-08-14 on 31 committed
+artifacts: **14 chains under `ByDeclaration`, 208 under `ByRoute`**, identical bytes. *"the scope you
+use as the operator to select the chain series as groups determines what the chain structures are
+even observed as."* **A chain length reported without its aperture is a receiver face presented as
+the object.**
+
+### The theorem that governs auditing: a phase object is invisible to the magnitude face
+
+A pure phase grating has `|t| = 1` everywhere, so an **intensity receiver measures nothing** while
+the whole structure sits in the phase. Zernike phase contrast exists to convert one into the other.
+
+Measured the same day, and it is the same theorem: flipping the reach 1-cell's boundary sign in
+`derivation_atlas` is a unimodular basis change — `rebase_invariants` **16/16** and
+`derivation_atlas` **39/39** unmoved, while **24 tests fail, every one in a reader that traverses**,
+and the route population moves `14 → 29` with the longest route `2 → 3`.
+
+> **The same operation is a rebase with zero remainder to one receiver and a total loss to another.**
+
+**Standing consequence.** Every invariant computed on an undirected complex — Betti, invariant
+factors, torsion, a chord residual — is *structurally blind* to orientation. **A defect that lives in
+the phase cannot be found by any number of magnitude checks.** When auditing a transport claim, ask
+what the reading would look like under a phase change, not only whether the magnitudes agree.
+
+### The conservation laws, at two symmetry grains
+
+**Snell is conservation of the tangential wavevector** — `analytic_field::exact_refraction_fiber`
+retains `tangential_covector` by name, from continuous translation symmetry along the interface.
+**Bragg is the same law under a discrete symmetry**, conserved only modulo a reciprocal lattice
+vector `G` — so **Bragg scattering is a compression with a certified remainder**, and `G` is what the
+discreteness costs. Phase matching is Fourier analysis literally: the coupling is the transform of
+the interaction region evaluated at the momentum mismatch.
+
+**Pockels is a parity selection rule** — the third-rank electro-optic tensor vanishes identically in
+any centrosymmetric crystal, so the linear response exists only where inversion symmetry is broken.
+Parity decides whether a term exists before any magnitude is computed.
+
+**Causality welds the lens to the perturbation.** Naming the external field imaginary is exact — a
+phase modulation is `e^{iφ}`, absorption is the imaginary index — **and the two faces are not
+independent**: `causal_reflection` carries the chain, response-cannot-precede-stimulus ⟹ holomorphy
+⟹ Kramers–Kronig. Refraction and absorption cannot be varied separately.
+
+### The ray diagram is a rendering, and this matters computationally
+
+*"we are attempting to draw light rays that are omnipresent along the paths that we are
+illustrating."* A cathode ray tube has **no image on its screen** — a beam paints a raster of arrival
+events and a picture exists only because persistence integrates over arrival times. Different paths
+through a lattice have different path lengths, so **what reaches a perspective in one frame departed
+at different ticks**. The limit is never one sample: *"there are always two things that must be
+sampled, and it is always a measurement and a ratio."*
+
+This body already carries it: `receiver_current`'s witnesses carry `arrival_chronology`,
+equal-arrival predecessors are retained in one factorized body, and later arrivals are kept as
+`deferred_arrivals`.
+
+### The whip is a chain of zero-remainder rebases
+
+`Γ = (Z₂ − Z₁)/(Z₂ + Z₁)` is Fresnel at normal incidence, the transmission-line reflection, and the
+Smith chart — **one law**, computed exactly over `Rat` by
+`analytic_field::exact_scalar_interface_coefficients` with the energy residual retained. A whip's
+taper is **adiabatic**, so the infinitesimal reflections cancel and every link transmits whole: each
+link is a rebase with zero remainder and the crack is the composed ratio. That is *"It doesn't
+amplify it. Gear ratios."* as a theorem. **An abrupt step is a compression, and the reflected wave is
+its remainder** — reflection is not loss, it is the retained fiber of a junction that did not match.
+
+### What reversibility is, and what it is not
+
+*"the reversed path can be reconstructed, but it is not certain… they can only reconstruct an
+analogous and sufficient path… No path across time is ever the same path as it once was either, to be
+interacted with and changed is to then be a different thing."*
+
+The perturbation is dynamic, so a second pass sees a different response. **Sufficiency is decided by
+the declared receiver family, never by identity.** Three conditions are required for any return, and
+each was independently absent here before 2026-08-14: the relation retained rather than collapsed to
+a count, the hand carried rather than deleted into a magnitude, and the orientation admitting the
+traversal.
+
+**And compression belongs at the interior of an interaction, not at its boundary** — *"these
+microscopic steps and rotations… contribute to the images of the Holonic Interaction's lightning
+patterns."* The interior micro-steps are the collapsed population, the exterior face is the lightning
+image, and the compression is lawful exactly when the separating word is retained.
+
 ## 1. The floor is a carrier, not a retired interface
 
 **The single most damaging defect in the inherited authority was an admission rule that made the
