@@ -17,11 +17,13 @@ paragraph this replaces (`28028c1`, rest `45084ed2…`, grade `8125caa2…`) are
 host-dependent seal and are retained on disk as the before-arm of that repair. **Body:** Rust. The
 C++/CUDA engine under `archive/cpp-engine/` governs nothing.
 
-**Gates re-taken 2026-08-13 after the audit and its repairs:** `cargo test --workspace`
-**2,209 passed, 0 failed, 19 ignored** over 42 result lines; authored levels 0 failures (**346**
-numeric levels counted), named paths 0 failures over **1,773** tokens, current claim index, output
-manifest 39 of 39, three boundary artifacts bound. **The ownership ratchet is RED — 27 new
-occurrences, 20 of them in existing owners** (`codec_recovery.rs` Vec 150 against 79 allowed,
+**Gates re-taken 2026-08-13 on a clean tree at `1f66e7a`, after the audit and its repairs:
+`bash tools/gates.sh` 8 of 9.** `cargo test --workspace` **2,209 passed, 0 failed, 19 ignored** over
+42 result lines; authored levels 0 failures (**346** numeric levels counted); named paths 0 failures
+over **1,778** tokens; claim index current; output manifest 39 of 39; closure manifest current, 40
+return directories and **9 orphans**; three boundary artifacts bound, two of them re-seeded because
+the format sweep moved four closure members by layout alone; ten Typst roots compile.
+**The ownership ratchet is the one RED — 27 new occurrences, 20 of them in existing owners** (`codec_recovery.rs` Vec 150 against 79 allowed,
 `codec_system.rs` 87 against 60, `derivation_codec_intake.rs` 56 against 44,
 `incidence_production.rs` 123 against 115) and 7 in the two new modules at a zero baseline. That is
 an open item, not a passing phase. The previous reading here — **2,184** tests, **9 of 9**, **338**
