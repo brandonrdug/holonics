@@ -80,8 +80,173 @@ use crate::structure_group::{
 
 /// Why a lattice, a representation, or a reading was refused. Every variant names the material that
 /// failed rather than reporting a position.
+
+// ---------------------------------------------------------------------------------------------
+// THE CROSSING: a rational current entering a plaquette
+//
+// `analytic_field` conducts a current as `ExactComplexWaveCurrent { real, imaginary }` over `Rat`;
+// this module holds a connection whose holonomy around a plaquette is a `GroupElement` of a FINITE
+// group. Until 2026-08-14 only `lib.rs` named both modules and no current crossed between them.
+//
+// **THE OBSTRUCTION IS ARITHMETIC AND IT IS ALREADY MEASURED.** A rational current's phase lives in
+// `SO(2, Q)`, which is infinite; a `StructureGroup` is finite; and the only elements of `SO(2, Q)`
+// of finite order are the four Niven points. `causal_reflection`'s driver returns exactly that,
+// measured rather than asserted: **4 of 88 distinct rational circle points are roots of unity, of
+// orders 1, 2, 4, 4.** So `Z/4` is the ENTIRE finite part an exact rational current can receive from
+// a gauge group, and anything richer needs `Q(zeta_N)`, which nothing in this tree supplies.
+//
+// That bound is not worked around here. It is made a checkable refusal: the caller declares which
+// quarter turn each group element hands a current, and the declaration is REFUSED unless it is a
+// homomorphism onto `Z/4`. A gauge group with no such quotient cannot act on a rational current,
+// and the crossing says so by name instead of fabricating a rotation.
+
+/// The quarter turn a group element hands a rational current. This is `Z/4` written as what it is.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub enum QuarterTurn {
+    Identity,
+    Quarter,
+    Half,
+    ThreeQuarter,
+}
+
+impl QuarterTurn {
+    /// The turn as a quarter count, which is the `Z/4` coordinate.
+    pub const fn quarters(self) -> u8 {
+        match self {
+            Self::Identity => 0,
+            Self::Quarter => 1,
+            Self::Half => 2,
+            Self::ThreeQuarter => 3,
+        }
+    }
+
+    pub const fn from_quarters(quarters: u8) -> Self {
+        match quarters % 4 {
+            0 => Self::Identity,
+            1 => Self::Quarter,
+            2 => Self::Half,
+            _ => Self::ThreeQuarter,
+        }
+    }
+
+    /// `(cosine, sine)` — one of the four Niven points, and the only rotations a rational current
+    /// can receive exactly.
+    pub fn as_rational_rotation(self) -> (Rat, Rat) {
+        match self {
+            Self::Identity => (Rat::one(), Rat::zero()),
+            Self::Quarter => (Rat::zero(), Rat::one()),
+            Self::Half => (-Rat::one(), Rat::zero()),
+            Self::ThreeQuarter => (Rat::zero(), -Rat::one()),
+        }
+    }
+
+    /// Apply the turn to a rational current, exactly.
+    pub fn turn(self, real: &Rat, imaginary: &Rat) -> (Rat, Rat) {
+        let (cosine, sine) = self.as_rational_rotation();
+        (
+            &cosine * real - &sine * imaginary,
+            &sine * real + &cosine * imaginary,
+        )
+    }
+}
+
+/// A declared homomorphism from a gauge group onto `Z/4`, verified over the whole group table.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DeclaredQuarterAction {
+    turns: BTreeMap<GroupElement, QuarterTurn>,
+}
+
+impl DeclaredQuarterAction {
+    /// Refuse unless the declaration is total on the group, sends the identity to the identity, and
+    /// is a homomorphism on **every** ordered pair — checked by exhaustion, not by sampling.
+    pub fn declare(
+        group: &StructureGroup,
+        turns: BTreeMap<GroupElement, QuarterTurn>,
+    ) -> Result<Self, LatticeGaugeRefusal> {
+        for element in group.elements() {
+            if !turns.contains_key(element) {
+                return Err(LatticeGaugeRefusal::QuarterActionIncomplete);
+            }
+        }
+        if turns.get(group.identity()) != Some(&QuarterTurn::Identity) {
+            return Err(LatticeGaugeRefusal::QuarterActionNotAHomomorphism);
+        }
+        for left in group.elements() {
+            for right in group.elements() {
+                let Some(product) = left.then(right) else {
+                    return Err(LatticeGaugeRefusal::QuarterActionNotAHomomorphism);
+                };
+                let (Some(a), Some(b), Some(c)) =
+                    (turns.get(left), turns.get(right), turns.get(&product))
+                else {
+                    return Err(LatticeGaugeRefusal::QuarterActionIncomplete);
+                };
+                if QuarterTurn::from_quarters(a.quarters() + b.quarters()) != *c {
+                    return Err(LatticeGaugeRefusal::QuarterActionNotAHomomorphism);
+                }
+            }
+        }
+        Ok(Self { turns })
+    }
+
+    pub fn turn_of(&self, element: &GroupElement) -> Option<QuarterTurn> {
+        self.turns.get(element).copied()
+    }
+}
+
+/// One current crossing one plaquette: what it met, what turn that handed it, and what it became.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PlaquetteCrossing {
+    pub plaquette: u64,
+    pub holonomy: GroupElement,
+    pub turn: QuarterTurn,
+    pub before: (Rat, Rat),
+    pub after: (Rat, Rat),
+}
+
+impl PlaquetteCrossing {
+    /// A flat plaquette leaves the current where it was. This is the falsifier's positive arm.
+    pub fn is_unmoved(&self) -> bool {
+        self.before == self.after
+    }
+}
+
+/// **Carry a rational current around a plaquette and let the holonomy turn it.**
+///
+/// The magnitude is untouched by construction — a quarter turn is an isometry of the rational
+/// plane — so what the plaquette hands the current is entirely phase. That is the same statement
+/// the phase-object theorem makes: a magnitude reading of this crossing sees nothing whatever.
+pub fn cross_plaquette(
+    connection: &StructureConnection,
+    plaquette: &Plaquette,
+    action: &DeclaredQuarterAction,
+    current: (Rat, Rat),
+) -> Result<PlaquetteCrossing, LatticeGaugeRefusal> {
+    let holonomy = connection.holonomy(&plaquette.walk)?;
+    let turn = action
+        .turn_of(&holonomy)
+        .ok_or(LatticeGaugeRefusal::QuarterActionIncomplete)?;
+    let after = turn.turn(&current.0, &current.1);
+    Ok(PlaquetteCrossing {
+        plaquette: plaquette.id,
+        holonomy,
+        turn,
+        before: current,
+        after,
+    })
+}
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum LatticeGaugeRefusal {
+    /// The declared quarter action does not cover every element of the group.
+    QuarterActionIncomplete,
+    /// The declared quarter action is not a homomorphism onto `Z/4`.
+    ///
+    /// **This is the arithmetic bound made checkable rather than assumed.** A rational current can
+    /// receive only the four Niven rotations, so a gauge group acts on one exactly through a `Z/4`
+    /// quotient and through nothing else. A declaration that is not such a quotient is refused
+    /// here rather than fabricating a rotation the rational carrier cannot hold.
+    QuarterActionNotAHomomorphism,
     /// The declared group did not close, or a walk left it.
     Group(StructureGroupRefusal),
     /// An exact linear operation failed on the representation's matrices.
@@ -119,6 +284,15 @@ pub enum LatticeGaugeRefusal {
 impl std::fmt::Display for LatticeGaugeRefusal {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            Self::QuarterActionIncomplete => write!(
+                formatter,
+                "the declared quarter action is not total on the gauge group"
+            ),
+            Self::QuarterActionNotAHomomorphism => write!(
+                formatter,
+                "the declared quarter action is not a homomorphism onto Z/4: a rational current \
+                 can receive only the four Niven rotations"
+            ),
             Self::Group(refusal) => write!(formatter, "{refusal}"),
             Self::Linear(error) => write!(formatter, "{error}"),
             Self::Polynomial(error) => write!(formatter, "{error}"),
@@ -962,6 +1136,119 @@ mod tests {
     fn cyclic_four() -> StructureGroup {
         StructureGroup::close([GroupElement::Quaternion([0, 1, 0, 0])], 4)
             .expect("<i> closes at order four")
+    }
+
+    /// `Z/4` acting on a rational current, declared as the identity homomorphism on `<i>`.
+    fn cyclic_quarter_action() -> DeclaredQuarterAction {
+        let group = cyclic_four();
+        let turns = BTreeMap::from([
+            (quaternion([1, 0, 0, 0]), QuarterTurn::Identity),
+            (quaternion([0, 1, 0, 0]), QuarterTurn::Quarter),
+            (quaternion([-1, 0, 0, 0]), QuarterTurn::Half),
+            (quaternion([0, -1, 0, 0]), QuarterTurn::ThreeQuarter),
+        ]);
+        DeclaredQuarterAction::declare(&group, turns).expect("<i> IS Z/4")
+    }
+
+    /// **The arithmetic bound, as a refusal rather than a remark.** `Q8` is non-abelian, so any
+    /// homomorphism onto the abelian `Z/4` must kill the commutator subgroup `{1, -1}` — and then
+    /// `i` and `-i` receive the same turn, so the map cannot be injective and cannot send `i` to a
+    /// quarter. Declaring the faithful-looking assignment must be REFUSED, because a rational
+    /// current can receive only the four Niven rotations and `Q8` has no faithful action among them.
+    #[test]
+    fn a_gauge_group_with_no_quarter_quotient_is_refused_by_name() {
+        let group = quaternion_group();
+        let mut turns = BTreeMap::new();
+        for element in group.elements() {
+            let turn = match element {
+                GroupElement::Quaternion([1, 0, 0, 0]) => QuarterTurn::Identity,
+                GroupElement::Quaternion([0, 1, 0, 0]) => QuarterTurn::Quarter,
+                GroupElement::Quaternion([-1, 0, 0, 0]) => QuarterTurn::Half,
+                GroupElement::Quaternion([0, -1, 0, 0]) => QuarterTurn::ThreeQuarter,
+                _ => QuarterTurn::Identity,
+            };
+            turns.insert(element.clone(), turn);
+        }
+        assert!(
+            matches!(
+                DeclaredQuarterAction::declare(&group, turns),
+                Err(LatticeGaugeRefusal::QuarterActionNotAHomomorphism)
+            ),
+            "Q8 has no faithful action on a rational current and the declaration must say so"
+        );
+
+        // A declaration that misses an element is a different refusal, named separately.
+        assert!(matches!(
+            DeclaredQuarterAction::declare(&group, BTreeMap::new()),
+            Err(LatticeGaugeRefusal::QuarterActionIncomplete)
+        ));
+    }
+
+    /// **The crossing.** A flat plaquette leaves the current exactly where it was; a plaquette
+    /// carrying a non-identity holonomy turns it, and the turn is the group element's image. The
+    /// magnitude is untouched either way, which is the phase-object theorem occurring here: a
+    /// magnitude reading of this crossing sees nothing whatever.
+    #[test]
+    fn a_plaquette_turns_a_rational_current_by_its_holonomy_and_a_flat_one_does_not() {
+        let lattice = torus(3);
+        let action = cyclic_quarter_action();
+        let current = (Rat::from_integer(3.into()), Rat::from_integer(4.into()));
+        let magnitude = |pair: &(Rat, Rat)| &pair.0 * &pair.0 + &pair.1 * &pair.1;
+
+        // Flat: every link carries the identity, so every plaquette's holonomy is the identity.
+        let flat = StructureConnection::declare(
+            cyclic_four(),
+            lattice
+                .links()
+                .map(|link| (link.id, quaternion([1, 0, 0, 0])))
+                .collect::<Vec<_>>(),
+        )
+        .expect("a flat connection is admissible");
+        let crossing = cross_plaquette(&flat, &lattice.plaquettes()[0], &action, current.clone())
+            .expect("the identity is in the declared action");
+        assert!(crossing.is_unmoved(), "a flat plaquette moved the current");
+        assert_eq!(crossing.turn, QuarterTurn::Identity);
+
+        // Curved: one link carries `i`, so the plaquettes touching it carry a non-identity holonomy.
+        let curved = StructureConnection::declare(
+            cyclic_four(),
+            lattice
+                .links()
+                .enumerate()
+                .map(|(at, link)| {
+                    (
+                        link.id,
+                        if at == 0 {
+                            quaternion([0, 1, 0, 0])
+                        } else {
+                            quaternion([1, 0, 0, 0])
+                        },
+                    )
+                })
+                .collect::<Vec<_>>(),
+        )
+        .expect("a curved connection is admissible");
+
+        let mut moved = 0usize;
+        for plaquette in lattice.plaquettes() {
+            let crossing = cross_plaquette(&curved, plaquette, &action, current.clone())
+                .expect("every holonomy lies in <i>");
+            assert_eq!(
+                magnitude(&crossing.after),
+                magnitude(&crossing.before),
+                "the crossing changed a MAGNITUDE; a quarter turn is an isometry"
+            );
+            if !crossing.is_unmoved() {
+                moved += 1;
+                assert_ne!(crossing.turn, QuarterTurn::Identity);
+                // The turn IS the holonomy's image, not something the crossing chose.
+                assert_eq!(crossing.turn, action.turn_of(&crossing.holonomy).unwrap());
+            }
+        }
+        assert!(
+            moved > 0,
+            "no plaquette turned the current, so the crossing cannot be shown to act"
+        );
     }
 
     fn quaternion(coefficients: [i8; 4]) -> GroupElement {
