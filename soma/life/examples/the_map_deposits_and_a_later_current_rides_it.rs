@@ -128,8 +128,7 @@ impl MapReader {
         let length = u64::from_le_bytes(length);
         let mut raw = vec![0u8; usize::try_from(length).map_err(|_| "header past the carrier")?];
         file.read_exact(&mut raw).map_err(|e| e.to_string())?;
-        let parsed: serde_json::Value =
-            serde_json::from_slice(&raw).map_err(|e| e.to_string())?;
+        let parsed: serde_json::Value = serde_json::from_slice(&raw).map_err(|e| e.to_string())?;
         let entry = parsed
             .get(READOUT)
             .ok_or("the readout is not in this map")?;
@@ -176,12 +175,19 @@ impl MapReader {
             .chunks_exact(2)
             .map(|p| u16::from_le_bytes([p[0], p[1]]))
             .collect();
-        let aligned = align_bfloat16(&words).map_err(|e| format!("the float mouth refused: {e}"))?;
+        let aligned =
+            align_bfloat16(&words).map_err(|e| format!("the float mouth refused: {e}"))?;
         let mut patches = Vec::new();
         for (slot, chunk) in aligned.entries.chunks(ENTRIES_PER_PATCH).enumerate() {
             let widest = chunk
                 .iter()
-                .map(|e| if *e == 0 { 0 } else { e.unsigned_abs().ilog2() + 1 })
+                .map(|e| {
+                    if *e == 0 {
+                        0
+                    } else {
+                        e.unsigned_abs().ilog2() + 1
+                    }
+                })
                 .max()
                 .unwrap_or(0);
             let negatives = chunk.iter().filter(|e| **e < 0).count();
@@ -377,7 +383,9 @@ fn run() -> Result<(), String> {
         a_reading.new_constituents,
         a_reading.new_contacts
     );
-    if with_reading.reached > without_reading.reached || with_reading.reopened > without_reading.reopened {
+    if with_reading.reached > without_reading.reached
+        || with_reading.reopened > without_reading.reopened
+    {
         println!(
             "\n  THE LATER CURRENT RODE THE DEPOSIT: it reached or reopened more with A standing \
              than without, and the withdrawal was exact."

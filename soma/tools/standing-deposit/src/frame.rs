@@ -140,10 +140,14 @@ mod tests {
 
     #[test]
     fn the_frame_refusals_are_structural() {
-        assert!(RelPath::parse("output/lean-proof-production/carrier-transport-00000.lean").is_ok());
+        assert!(
+            RelPath::parse("output/lean-proof-production/carrier-transport-00000.lean").is_ok()
+        );
         assert_eq!(
             RelPath::parse("/home/b/Workspaces/holonics/x.lean"),
-            Err(FrameRefusal::Absolute("/home/b/Workspaces/holonics/x.lean".into()))
+            Err(FrameRefusal::Absolute(
+                "/home/b/Workspaces/holonics/x.lean".into()
+            ))
         );
         assert_eq!(
             RelPath::parse("../laboratory/x.lean"),

@@ -36,12 +36,12 @@ use crate::deed::DEED_HEAD_OCTETS;
 use crate::plate::{self, PlateRefusal, SchemaTag, HEAD_OCTETS, SEAL_OCTETS};
 use crate::registry::{deposit, inspect, redeposit, resume};
 use crate::schema::{present_and_require_change, LitBody, PlateSchema, ResumeRefusal};
+use crate::schemas::conditioned::{CONDITIONED_SCHEMA_VERSION, CONDITIONED_TAG};
 use crate::schemas::current::{CurrentDeed, CURRENT_SCHEMA_VERSION, CURRENT_TAG};
 use crate::schemas::rebase::{
     decode_euler, encode_euler, BoundaryTerm, RebaseBody, RebaseDeed, REBASE_SCHEMA_VERSION,
     REBASE_TAG,
 };
-use crate::schemas::conditioned::{CONDITIONED_SCHEMA_VERSION, CONDITIONED_TAG};
 use crate::schemas::training::{TrainingDeed, TRAINING_SCHEMA_VERSION, TRAINING_TAG};
 
 // ---------------------------------------------------------------------------------------------
@@ -126,8 +126,16 @@ fn current_form() -> Vec<u8> {
     ];
     for value in [13i64, 29, 17] {
         let currents = [
-            CurrentEvent::continuing(lineages[0], CurrentGeometry::Cell(relation(value)), action()),
-            CurrentEvent::continuing(lineages[1], CurrentGeometry::Cell(relation(value)), action()),
+            CurrentEvent::continuing(
+                lineages[0],
+                CurrentGeometry::Cell(relation(value)),
+                action(),
+            ),
+            CurrentEvent::continuing(
+                lineages[1],
+                CurrentGeometry::Cell(relation(value)),
+                action(),
+            ),
         ];
         machine
             .receive(ContemporaryEvent::unrelated(&currents))
@@ -179,7 +187,9 @@ fn edge(
     let mut boundary = CausalChain::default();
     boundary.add_term(to, ComparativeMultiplicity::positive(1u32));
     boundary.add_term(from, ComparativeMultiplicity::negative(1u32));
-    complex.found_cell(name, source(), 1, boundary).expect("an edge")
+    complex
+        .found_cell(name, source(), 1, boundary)
+        .expect("an edge")
 }
 
 /// Three vertices, three edges, no filling. One piece, one loop, `chi = 0`.
@@ -207,7 +217,9 @@ fn filled_triangle() -> GradedCausalComplex {
     for edge in edges {
         boundary.add_term(edge, ComparativeMultiplicity::positive(1u32));
     }
-    complex.found_cell("disc", source(), 2, boundary).expect("a disc");
+    complex
+        .found_cell("disc", source(), 2, boundary)
+        .expect("a disc");
     complex
 }
 
@@ -266,7 +278,9 @@ fn doubled_attachment() -> GradedCausalComplex {
         .expect("a loop");
     let mut face = CausalChain::default();
     face.add_term(edge, ComparativeMultiplicity::positive(2u32));
-    complex.found_cell("twice", source(), 2, face).expect("a doubled attachment");
+    complex
+        .found_cell("twice", source(), 2, face)
+        .expect("a doubled attachment");
     complex
 }
 
@@ -382,7 +396,9 @@ fn the_plate_head_is_exactly_thirty_two_octets_and_the_seal_sixty_four() {
 fn a_corrupted_form_octet_refuses_and_names_the_form() {
     for (tag, form, _) in bodies() {
         let deposited = deposit(tag, &form).expect("a deposit");
-        let census_octets = inspect(&deposited.plate).expect("an inspection").census_octets;
+        let census_octets = inspect(&deposited.plate)
+            .expect("an inspection")
+            .census_octets;
         let form_start = HEAD_OCTETS + census_octets;
         let mut corrupted = deposited.plate.clone();
         corrupted[form_start + form.len() / 2] ^= 0x01;
@@ -412,7 +428,9 @@ fn a_corrupted_census_octet_refuses_and_names_the_binding() {
         let deposited = deposit(tag, &form).expect("a deposit");
         // The last octet of the census is the high octet of the last field's value; flipping a low
         // bit there changes what the plate declares without touching the form.
-        let census_octets = inspect(&deposited.plate).expect("an inspection").census_octets;
+        let census_octets = inspect(&deposited.plate)
+            .expect("an inspection")
+            .census_octets;
         let mut corrupted = deposited.plate.clone();
         corrupted[HEAD_OCTETS + census_octets - 8] ^= 0x01;
 
@@ -440,7 +458,9 @@ fn the_two_species_are_separable_and_one_corruption_fires_exactly_one() {
     // and could not name the side that moved. This asserts the separation directly.
     let form = training_form();
     let deposited = deposit(TRAINING_TAG, &form).expect("a deposit");
-    let census_octets = inspect(&deposited.plate).expect("an inspection").census_octets;
+    let census_octets = inspect(&deposited.plate)
+        .expect("an inspection")
+        .census_octets;
     let form_start = HEAD_OCTETS + census_octets;
     let seal_start = form_start + form.len();
     let recorded_form_digest = &deposited.plate[seal_start..seal_start + 32];
@@ -484,7 +504,9 @@ fn a_corrupted_seal_does_not_accuse_the_form() {
     // plate whose *recorded content digest* is what moved, with the form untouched.
     let form = training_form();
     let deposited = deposit(TRAINING_TAG, &form).expect("a deposit");
-    let census_octets = inspect(&deposited.plate).expect("an inspection").census_octets;
+    let census_octets = inspect(&deposited.plate)
+        .expect("an inspection")
+        .census_octets;
     let seal_start = HEAD_OCTETS + census_octets + form.len();
 
     let mut corrupted = deposited.plate.clone();
@@ -568,7 +590,9 @@ fn an_unheld_schema_refuses_rather_than_guessing() {
 
     // The form is a real, mountable HTEC form. A reader that guessed would succeed here, which is
     // exactly the failure being refused.
-    assert!(crate::schemas::training::TrainingSchema.relight(&form).is_ok());
+    assert!(crate::schemas::training::TrainingSchema
+        .relight(&form)
+        .is_ok());
 
     let refusal = resume(&plate).expect_err("an unheld schema must refuse");
     let ResumeRefusal::SchemaUnheld { tag, version, held } = &refusal else {
@@ -588,10 +612,7 @@ fn an_unheld_schema_refuses_rather_than_guessing() {
     let rendered = refusal.to_string();
     assert!(rendered.contains("ZZZZ/1"), "{rendered}");
     assert!(rendered.contains("HTEC/1"), "{rendered}");
-    assert!(
-        rendered.contains("not resumed by guessing"),
-        "{rendered}"
-    );
+    assert!(rendered.contains("not resumed by guessing"), "{rendered}");
 }
 
 #[test]
@@ -710,7 +731,11 @@ fn a_census_that_declares_less_than_the_body_holds_refuses() {
 fn the_census_wire_is_canonical_and_refuses_a_noncanonical_one() {
     let census = Census::found([("zulu", 1u64), ("alpha", 2), ("mike", 3)]).expect("a census");
     assert_eq!(
-        census.rows().iter().map(|(name, _)| name.as_str()).collect::<Vec<_>>(),
+        census
+            .rows()
+            .iter()
+            .map(|(name, _)| name.as_str())
+            .collect::<Vec<_>>(),
         vec!["alpha", "mike", "zulu"],
         "a census is stored ascending so that two censuses of one body are byte-identical"
     );
@@ -761,7 +786,8 @@ fn the_resumed_body_accepts_a_further_deed_and_changes() {
 fn the_named_census_fields_that_move_are_the_structural_ones() {
     // HTEC: a new occurrence founds new transduction fibers -- a structural population, not a tally
     let form = training_form();
-    let mut relit = resume(&deposit(TRAINING_TAG, &form).expect("a deposit").plate).expect("a re-light");
+    let mut relit =
+        resume(&deposit(TRAINING_TAG, &form).expect("a deposit").plate).expect("a re-light");
     let (before, after) =
         present_and_require_change(relit.body.as_mut(), &training_deed()).expect("a deed");
     assert!(
@@ -816,8 +842,8 @@ fn an_inert_body_that_changes_nothing_is_refused() {
     let mut inert = InertBody {
         form: b"a body that does not move".to_vec(),
     };
-    let refusal =
-        present_and_require_change(&mut inert, &training_deed()).expect_err("an inert body refuses");
+    let refusal = present_and_require_change(&mut inert, &training_deed())
+        .expect_err("an inert body refuses");
     let ResumeRefusal::DeedChangedNothing {
         deed_octets,
         form_octets,
@@ -838,7 +864,8 @@ fn an_inert_body_that_changes_nothing_is_refused() {
 #[test]
 fn a_deed_addressed_to_another_schema_refuses() {
     let form = current_form();
-    let mut relit = resume(&deposit(CURRENT_TAG, &form).expect("a deposit").plate).expect("a re-light");
+    let mut relit =
+        resume(&deposit(CURRENT_TAG, &form).expect("a deposit").plate).expect("a re-light");
     let refusal = present_and_require_change(relit.body.as_mut(), &training_deed())
         .expect_err("a deed addressed elsewhere must refuse");
     let ResumeRefusal::DeedRefused { detail } = &refusal else {
@@ -908,7 +935,9 @@ fn rebase_census(complex: &GradedCausalComplex) -> Census {
 }
 
 fn field(census: &Census, name: &str) -> u64 {
-    census.value(name).unwrap_or_else(|| panic!("`{name}` is declared"))
+    census
+        .value(name)
+        .unwrap_or_else(|| panic!("`{name}` is declared"))
 }
 
 /// The census is the reading, field for field, on four incidences whose readings genuinely differ.
@@ -931,7 +960,11 @@ fn the_rbin_census_is_the_reading_taken_over_the_incidence() {
     assert_eq!(field(&filled, "cells"), 7);
     assert_eq!(field(&filled, "grades"), 3);
     assert_eq!(field(&filled, "boundary_rank_total"), 3);
-    assert_eq!(field(&filled, "betti_total"), 1, "the filled loop is not a generator");
+    assert_eq!(
+        field(&filled, "betti_total"),
+        1,
+        "the filled loop is not a generator"
+    );
     assert_eq!(field(&filled, "torsion_factors"), 0);
 
     let theta = rebase_census(&theta_graph());
@@ -978,7 +1011,10 @@ fn the_torsion_reading_is_provably_nonzero_and_comes_back_whole() {
     // and the control's own control: an incidence with no doubled attachment returns none, so the
     // field above is reporting the material rather than the form.
     let flat = RebaseBody::mount(&rebase_form(&hollow_triangle())).expect("a mount");
-    assert_eq!(field(&flat.census().expect("a reading"), "torsion_factors"), 0);
+    assert_eq!(
+        field(&flat.census().expect("a reading"), "torsion_factors"),
+        0
+    );
     assert!(flat
         .reading()
         .expect("a reading")
@@ -1020,21 +1056,30 @@ fn the_euler_pair_is_a_total_bijection_and_a_cast_would_not_be() {
 fn three_incidences_place_the_euler_characteristic_on_both_sides_of_zero_and_at_it() {
     let filled = rebase_census(&filled_triangle());
     assert_eq!(
-        (field(&filled, "euler_positive"), field(&filled, "euler_negative")),
+        (
+            field(&filled, "euler_positive"),
+            field(&filled, "euler_negative")
+        ),
         (1, 0),
         "3 - 3 + 1 = +1"
     );
 
     let theta = rebase_census(&theta_graph());
     assert_eq!(
-        (field(&theta, "euler_positive"), field(&theta, "euler_negative")),
+        (
+            field(&theta, "euler_positive"),
+            field(&theta, "euler_negative")
+        ),
         (0, 1),
         "2 - 3 = -1, and a cast would have written 18446744073709551615 here"
     );
 
     let hollow = rebase_census(&hollow_triangle());
     assert_eq!(
-        (field(&hollow, "euler_positive"), field(&hollow, "euler_negative")),
+        (
+            field(&hollow, "euler_positive"),
+            field(&hollow, "euler_negative")
+        ),
         (0, 0),
         "3 - 3 = 0, the one value both halves share"
     );
@@ -1046,7 +1091,10 @@ fn three_incidences_place_the_euler_characteristic_on_both_sides_of_zero_and_at_
         ("hollow", &hollow, 0),
     ] {
         assert_eq!(
-            decode_euler(field(census, "euler_positive"), field(census, "euler_negative")),
+            decode_euler(
+                field(census, "euler_positive"),
+                field(census, "euler_negative")
+            ),
             Some(expected),
             "{label}: the declared pair does not decode to the characteristic it encodes"
         );
@@ -1068,9 +1116,14 @@ fn the_deed_moves_betti_total_in_the_direction_that_says_what_it_did() {
     let mut relit = resume(&deposited.plate).expect("a re-light");
 
     // the first edge joins the two pieces: the new column is independent, so a generator DIES
-    let (before, joined) = present_and_require_change(relit.body.as_mut(), &joining_deed("ab", 1, 2))
-        .expect("a joining deed");
-    assert_eq!(field(&before, "betti_total"), 2, "two disjoint vertices, two generators");
+    let (before, joined) =
+        present_and_require_change(relit.body.as_mut(), &joining_deed("ab", 1, 2))
+            .expect("a joining deed");
+    assert_eq!(
+        field(&before, "betti_total"),
+        2,
+        "two disjoint vertices, two generators"
+    );
     assert_eq!(
         field(&joined, "betti_total"),
         1,
@@ -1268,7 +1321,10 @@ fn a_deed_repeating_a_source_occurrence_is_refused_rather_than_absorbed() {
 fn a_forged_rbin_census_refuses_and_names_the_field() {
     let form = rebase_form(&doubled_attachment());
     let honest = deposit(REBASE_TAG, &form).expect("a deposit");
-    let truth = honest.census.value("torsion_factors").expect("torsion_factors");
+    let truth = honest
+        .census
+        .value("torsion_factors")
+        .expect("torsion_factors");
 
     let forged: Vec<(String, u64)> = honest
         .census
@@ -1364,7 +1420,11 @@ fn the_three_rule_cross_check_runs_over_three_genuinely_different_pivot_walks() 
     assert_eq!(field(&census, "cells"), 6);
     assert_eq!(field(&census, "grades"), 3);
     assert_eq!(field(&census, "boundary_rank_total"), 2);
-    assert_eq!(field(&census, "betti_total"), 2, "one piece, one unfilled loop");
+    assert_eq!(
+        field(&census, "betti_total"),
+        2,
+        "one piece, one unfilled loop"
+    );
     assert_eq!(field(&census, "torsion_factors"), 1);
 
     // the aperture of the gauge, declared: a simplicial body cannot gauge the rule at all
@@ -1481,7 +1541,12 @@ fn inspect_verifies_the_container_and_does_not_mount_the_form() {
         ("route_aperture", 8),
     ])
     .expect("a census");
-    let plate = plate::seal(TRAINING_TAG, TRAINING_SCHEMA_VERSION, &census, b"not a form");
+    let plate = plate::seal(
+        TRAINING_TAG,
+        TRAINING_SCHEMA_VERSION,
+        &census,
+        b"not a form",
+    );
     let report = inspect(&plate).expect("the container verifies");
     assert!(report.held);
     assert_eq!(report.form_octets, 10);

@@ -1456,8 +1456,16 @@ mod tests {
         let (straddling, _) =
             polygon_winding(&[corner(2, 1), corner(2, -1), corner(3, -1), corner(3, 1)])
                 .expect("an admissible ray");
-        assert_eq!(straddling.winding(), 0, "it encloses nothing and must say so");
-        assert_eq!(straddling.total(), 2, "and it met the ray twice getting there");
+        assert_eq!(
+            straddling.winding(),
+            0,
+            "it encloses nothing and must say so"
+        );
+        assert_eq!(
+            straddling.total(),
+            2,
+            "and it met the ray twice getting there"
+        );
         assert!(straddling.cancels());
         assert_eq!(straddling.with_the_turn.len(), 1);
         assert_eq!(straddling.against_the_turn.len(), 1);
@@ -1480,7 +1488,10 @@ mod tests {
             [away.winding(), straddling.winding(), enclosing.winding()],
             [0, 0, 1]
         );
-        assert_eq!([away.total(), straddling.total(), enclosing.total()], [0, 2, 1]);
+        assert_eq!(
+            [away.total(), straddling.total(), enclosing.total()],
+            [0, 2, 1]
+        );
     }
 
     /// Reversing a boundary swaps the hands and negates the winding, and moves nothing else.
@@ -1494,7 +1505,11 @@ mod tests {
         let (behind, _) = polygon_winding(&backward).expect("an admissible ray");
 
         assert_eq!(ahead.winding(), -behind.winding());
-        assert_eq!(ahead.total(), behind.total(), "the same passages, the other way");
+        assert_eq!(
+            ahead.total(),
+            behind.total(),
+            "the same passages, the other way"
+        );
         assert_eq!(ahead.with_the_turn.len(), behind.against_the_turn.len());
         assert_eq!(ahead.against_the_turn.len(), behind.with_the_turn.len());
     }

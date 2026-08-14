@@ -136,7 +136,10 @@ fn run() -> Result<(), String> {
         ));
     }
     if entry.shape.len() != 2 {
-        return Err(format!("the readout has shape {:?}, not a matrix", entry.shape));
+        return Err(format!(
+            "the readout has shape {:?}, not a matrix",
+            entry.shape
+        ));
     }
     let (vocabulary, dim) = (entry.shape[0], entry.shape[1]);
     let span = (entry.end - entry.start) as usize;
@@ -177,8 +180,8 @@ fn run() -> Result<(), String> {
          carrier BEFORE dispatch, refused rather than truncated"
     );
 
-    let resident = ResidentReadout::new()
-        .map_err(|e| format!("the resident chart refused the deed: {e}"))?;
+    let resident =
+        ResidentReadout::new().map_err(|e| format!("the resident chart refused the deed: {e}"))?;
     println!("\n  resident chart: {}", resident.device_name());
 
     // ---------------------------------------------------------------------------------------
@@ -220,7 +223,9 @@ fn run() -> Result<(), String> {
     println!("\n{}", "-".repeat(96));
     println!("THE FIBERS — every exact score, the band read off the material, nothing chosen");
     println!("{}", "-".repeat(96));
-    println!("  seed | work (MACs) | on card | octave span | band at max octave | exact ties at max");
+    println!(
+        "  seed | work (MACs) | on card | octave span | band at max octave | exact ties at max"
+    );
 
     // **The control this reading cannot be believed without.** A score scales with the scored row's
     // own magnitude, so a top-octave band could be measuring `|E[v]|` -- a property of v alone --
@@ -290,7 +295,9 @@ fn run() -> Result<(), String> {
                 "\n    seed {seed}'s own row scores {} — the self-score, present because the tie makes",
                 population.scores[seed as usize]
             );
-            println!("    the mouth and the readout one matrix. It is IN the population, not removed.");
+            println!(
+                "    the mouth and the readout one matrix. It is IN the population, not removed."
+            );
             println!("    the octave census, whole:");
             for (octave, count) in &census {
                 println!("      2^{octave:<3} {count:>8} rows");
@@ -305,7 +312,9 @@ fn run() -> Result<(), String> {
     println!("THE CONTROL — is the band a relation, or is it the scored row's own magnitude?");
     println!("{}", "-".repeat(96));
     println!("  A score scales with |E[v]|, so a band could be naming the widest rows and nothing");
-    println!("  about the seed. If so, every seed's band holds the SAME rows. It is a real reading");
+    println!(
+        "  about the seed. If so, every seed's band holds the SAME rows. It is a real reading"
+    );
     println!("  only where the bands differ.");
     println!("\n  seed pair | shared rows | left only | right only");
     let mut every_pair_disjoint = true;

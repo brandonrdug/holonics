@@ -32,10 +32,10 @@ pub mod material_shadow_cuda;
 pub mod morphological_condition_cuda;
 /// One morphological candidate/deposit attachment at the CUDA execution seam.
 pub mod morphological_conduct_cuda;
-/// Exact recurrent transformation-law founding and evaluation at the CUDA execution seam.
-pub mod recurrent_law_cuda;
 /// One world presentation without a world-specific object model.
 pub mod presentation;
+/// Exact recurrent transformation-law founding and evaluation at the CUDA execution seam.
+pub mod recurrent_law_cuda;
 /// Exact REGISTER status, lane, and entry rows.
 pub mod register;
 /// Exact returned-contact grouping at the CUDA execution seam.

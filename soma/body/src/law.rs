@@ -445,7 +445,10 @@ mod tests {
             "which the retired mask folded 2:1 onto the bottom half"
         );
         assert_ne!(low_lit, high_lit);
-        assert_ne!(low_grip, high_grip, "the two places ground to distinct grips");
+        assert_ne!(
+            low_grip, high_grip,
+            "the two places ground to distinct grips"
+        );
         assert_eq!(
             low_grip & RETIRED_POOL_MASK,
             high_grip & RETIRED_POOL_MASK,
@@ -462,7 +465,11 @@ mod tests {
         let mut pool = vec![0u32; (inside as usize) + 1];
         const Q: u32 = 20;
         feed(&mut pool, inside, 137, Q);
-        assert_eq!(well_of(&pool, inside), 137, "the reserved cell took the feed");
+        assert_eq!(
+            well_of(&pool, inside),
+            137,
+            "the reserved cell took the feed"
+        );
         assert_eq!(
             well_of(&pool, outside),
             0,

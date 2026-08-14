@@ -288,9 +288,7 @@ impl SymbolAlphabet {
     /// alphabet that decides whether that ambiguity exists at all.
     pub fn spell(&self, piece: &str) -> Option<Vec<Symbol>> {
         let mut order: Vec<Symbol> = self.symbols();
-        order.sort_by_key(|symbol| {
-            std::cmp::Reverse(self.identity(*symbol).map_or(0, str::len))
-        });
+        order.sort_by_key(|symbol| std::cmp::Reverse(self.identity(*symbol).map_or(0, str::len)));
         let mut word = Vec::new();
         let mut rest = piece;
         'next: while !rest.is_empty() {
@@ -513,7 +511,10 @@ impl RecoveredCodec {
     /// separating class word, which is written out with each class's least member. The absence of a
     /// path to `Diverged` is a proof of observational identity over **all** inputs, not a failure to
     /// find one.
-    pub fn shortest_separating_input(&self, other: &Self) -> Result<Option<Vec<Symbol>>, RecoveryError> {
+    pub fn shortest_separating_input(
+        &self,
+        other: &Self,
+    ) -> Result<Option<Vec<Symbol>>, RecoveryError> {
         if self.classes != other.classes || self.emission != other.emission {
             return Err(RecoveryError::IncomparableCodecs);
         }
@@ -1409,7 +1410,9 @@ mod tests {
 
     /// A word written over [`universe`], for comparing a return against a spelling.
     fn word(spelling: &str) -> Vec<Symbol> {
-        universe().spell(spelling).expect("fixture spellings are declared")
+        universe()
+            .spell(spelling)
+            .expect("fixture spellings are declared")
     }
 
     /// A segmentation written as spellings.
@@ -1420,7 +1423,10 @@ mod tests {
     /// Render a returned segmentation back to spellings, for assertions that read as text.
     fn spelled(segmentation: &[Vec<Symbol>]) -> Vec<String> {
         let alphabet = universe();
-        segmentation.iter().map(|piece| alphabet.render(piece)).collect()
+        segmentation
+            .iter()
+            .map(|piece| alphabet.render(piece))
+            .collect()
     }
 
     /// **What this test body declares as its host capacity.** A fixture is a caller and declares
@@ -1520,9 +1526,7 @@ mod tests {
             .map(|block| {
                 block
                     .iter()
-                    .filter_map(|member| {
-                        alphabet.identity(*member)?.chars().next()
-                    })
+                    .filter_map(|member| alphabet.identity(*member)?.chars().next())
                     .collect()
             })
             .unwrap_or_default()
@@ -1533,8 +1537,13 @@ mod tests {
     #[test]
     fn the_character_classes_of_a_tokenizer_are_recovered_from_testimony_alone() {
         let target = tokenizer();
-        let recovery = recover(&target, &chars_as_symbols(&TOKENIZER_ALPHABET), 3, TEST_APERTURES)
-            .expect("the family is admissible");
+        let recovery = recover(
+            &target,
+            &chars_as_symbols(&TOKENIZER_ALPHABET),
+            3,
+            TEST_APERTURES,
+        )
+        .expect("the family is admissible");
         assert!(
             recovery.obstructions.is_empty(),
             "unexpected obstructions: {:?}",
@@ -1566,12 +1575,30 @@ mod tests {
         }
 
         // The four boundary facts the fixture actually encodes, each read off the structure.
-        assert_eq!(codec.boundary_between(sym('a'), sym('q')), Some(Boundary::Join));
-        assert_eq!(codec.boundary_between(sym('0'), sym('1')), Some(Boundary::Join));
-        assert_eq!(codec.boundary_between(sym('.'), sym('-')), Some(Boundary::Join));
-        assert_eq!(codec.boundary_between(sym(','), sym(';')), Some(Boundary::Cut));
-        assert_eq!(codec.boundary_between(sym('a'), sym('0')), Some(Boundary::Cut));
-        assert_eq!(codec.boundary_between(sym('a'), sym('.')), Some(Boundary::Cut));
+        assert_eq!(
+            codec.boundary_between(sym('a'), sym('q')),
+            Some(Boundary::Join)
+        );
+        assert_eq!(
+            codec.boundary_between(sym('0'), sym('1')),
+            Some(Boundary::Join)
+        );
+        assert_eq!(
+            codec.boundary_between(sym('.'), sym('-')),
+            Some(Boundary::Join)
+        );
+        assert_eq!(
+            codec.boundary_between(sym(','), sym(';')),
+            Some(Boundary::Cut)
+        );
+        assert_eq!(
+            codec.boundary_between(sym('a'), sym('0')),
+            Some(Boundary::Cut)
+        );
+        assert_eq!(
+            codec.boundary_between(sym('a'), sym('.')),
+            Some(Boundary::Cut)
+        );
     }
 
     /// The recovered object runs on material the query family never reached. Every held-out input is
@@ -1579,8 +1606,13 @@ mod tests {
     #[test]
     fn the_recovered_codec_conforms_exactly_on_held_out_material_longer_than_the_family() {
         let target = tokenizer();
-        let recovery = recover(&target, &chars_as_symbols(&TOKENIZER_ALPHABET), 3, TEST_APERTURES)
-            .expect("the family is admissible");
+        let recovery = recover(
+            &target,
+            &chars_as_symbols(&TOKENIZER_ALPHABET),
+            3,
+            TEST_APERTURES,
+        )
+        .expect("the family is admissible");
         let codec = recovery.codec.as_ref().expect("the codec is recovered");
 
         let population = [
@@ -1612,7 +1644,12 @@ mod tests {
         // one token would conform under almost any table.
         let widest = population
             .iter()
-            .map(|input| codec.segment(&word(input)).expect("declared symbols only").len())
+            .map(|input| {
+                codec
+                    .segment(&word(input))
+                    .expect("declared symbols only")
+                    .len()
+            })
             .max()
             .expect("the population is not empty");
         assert!(
@@ -1626,8 +1663,13 @@ mod tests {
     #[test]
     fn conformance_exhibits_a_disagreement_against_a_target_the_codec_does_not_describe() {
         let target = tokenizer();
-        let recovery = recover(&target, &chars_as_symbols(&TOKENIZER_ALPHABET), 3, TEST_APERTURES)
-            .expect("the family is admissible");
+        let recovery = recover(
+            &target,
+            &chars_as_symbols(&TOKENIZER_ALPHABET),
+            3,
+            TEST_APERTURES,
+        )
+        .expect("the family is admissible");
         let codec = recovery.codec.as_ref().expect("the codec is recovered");
 
         // Same alphabet, different law: digits now agglutinate with letters.
@@ -1667,8 +1709,13 @@ mod tests {
     #[test]
     fn material_carrying_an_undeclared_symbol_is_refused_rather_than_guessed() {
         let target = tokenizer();
-        let recovery = recover(&target, &chars_as_symbols(&TOKENIZER_ALPHABET), 3, TEST_APERTURES)
-            .expect("the family is admissible");
+        let recovery = recover(
+            &target,
+            &chars_as_symbols(&TOKENIZER_ALPHABET),
+            3,
+            TEST_APERTURES,
+        )
+        .expect("the family is admissible");
         let codec = recovery.codec.as_ref().expect("the codec is recovered");
         let conformance = conform(codec, &target, &words(&["ab qq", "ab zz"]));
         assert!(conformance.disagreements.is_empty());
@@ -1687,8 +1734,13 @@ mod tests {
     #[test]
     fn a_separation_carries_the_shortest_context_that_produced_it() {
         let target = tokenizer();
-        let recovery = recover(&target, &chars_as_symbols(&TOKENIZER_ALPHABET), 3, TEST_APERTURES)
-            .expect("the family is admissible");
+        let recovery = recover(
+            &target,
+            &chars_as_symbols(&TOKENIZER_ALPHABET),
+            3,
+            TEST_APERTURES,
+        )
+        .expect("the family is admissible");
 
         let find = |left: Symbol, right: Symbol| {
             recovery
@@ -1745,8 +1797,13 @@ mod tests {
         let mut previous: Option<Vec<BTreeSet<Symbol>>> = None;
         for radius in 2..=4 {
             let target = tokenizer();
-            let recovery = recover(&target, &chars_as_symbols(&TOKENIZER_ALPHABET), radius, TEST_APERTURES)
-                .expect("the family is admissible");
+            let recovery = recover(
+                &target,
+                &chars_as_symbols(&TOKENIZER_ALPHABET),
+                radius,
+                TEST_APERTURES,
+            )
+            .expect("the family is admissible");
             sizes.push(recovery.classes.len());
             if let Some(coarser) = &previous {
                 for block in &recovery.classes {
@@ -1782,10 +1839,10 @@ mod tests {
             }
             tokens
         });
-        let coarse =
-            recover(&staged, &chars_as_symbols(&['a', 'b']), 2, TEST_APERTURES).expect("the family is admissible");
-        let fine =
-            recover(&staged, &chars_as_symbols(&['a', 'b']), 3, TEST_APERTURES).expect("the family is admissible");
+        let coarse = recover(&staged, &chars_as_symbols(&['a', 'b']), 2, TEST_APERTURES)
+            .expect("the family is admissible");
+        let fine = recover(&staged, &chars_as_symbols(&['a', 'b']), 3, TEST_APERTURES)
+            .expect("the family is admissible");
         assert_eq!(coarse.classes.len(), 1, "{:?}", coarse.classes);
         assert_eq!(fine.classes.len(), 2, "{:?}", fine.classes);
         for block in &fine.classes {
@@ -1800,8 +1857,13 @@ mod tests {
     #[test]
     fn a_family_that_cannot_see_through_a_dropped_symbol_names_the_word_it_could_not_ask() {
         let target = soft_join();
-        let recovery = recover(&target, &chars_as_symbols(&['a', 'b', '_']), 2, TEST_APERTURES)
-            .expect("the family is admissible");
+        let recovery = recover(
+            &target,
+            &chars_as_symbols(&['a', 'b', '_']),
+            2,
+            TEST_APERTURES,
+        )
+        .expect("the family is admissible");
 
         assert!(
             recovery.codec.is_none(),
@@ -1867,8 +1929,13 @@ mod tests {
         let mut named = Vec::new();
         for radius in 2..=3 {
             let target = soft_join();
-            let recovery = recover(&target, &chars_as_symbols(&['a', 'b', '_']), radius, TEST_APERTURES)
-                .expect("the family is admissible");
+            let recovery = recover(
+                &target,
+                &chars_as_symbols(&['a', 'b', '_']),
+                radius,
+                TEST_APERTURES,
+            )
+            .expect("the family is admissible");
             assert!(recovery.codec.is_none(), "radius {radius}");
             let Some(Obstruction::UndeterminedCodec {
                 separating_input, ..
@@ -1881,8 +1948,13 @@ mod tests {
         assert_eq!(named, vec![3, 4]);
 
         let target = soft_join();
-        let recovery = recover(&target, &chars_as_symbols(&['a', 'b', '_']), 4, TEST_APERTURES)
-            .expect("the family is admissible");
+        let recovery = recover(
+            &target,
+            &chars_as_symbols(&['a', 'b', '_']),
+            4,
+            TEST_APERTURES,
+        )
+        .expect("the family is admissible");
         assert!(
             recovery.obstructions.is_empty(),
             "{:?}",
@@ -1892,11 +1964,24 @@ mod tests {
         assert!(recovery.gauge_freedom.is_empty());
         let codec = recovery.codec.as_ref().expect("the codec is recovered");
         assert_eq!(codec.emission_of(sym('_')), Some(Emission::Drop));
-        assert_eq!(codec.boundary_between(sym('a'), sym('_')), Some(Boundary::Join));
-        assert_eq!(codec.boundary_between(sym('_'), sym('a')), Some(Boundary::Join));
-        assert_eq!(codec.boundary_between(sym('_'), sym('_')), Some(Boundary::Join));
+        assert_eq!(
+            codec.boundary_between(sym('a'), sym('_')),
+            Some(Boundary::Join)
+        );
+        assert_eq!(
+            codec.boundary_between(sym('_'), sym('a')),
+            Some(Boundary::Join)
+        );
+        assert_eq!(
+            codec.boundary_between(sym('_'), sym('_')),
+            Some(Boundary::Join)
+        );
 
-        let conformance = conform(codec, &target, &words(&["a_b_a", "__ab__", "a__b", "ab_ba_"]));
+        let conformance = conform(
+            codec,
+            &target,
+            &words(&["a_b_a", "__ab__", "a__b", "ab_ba_"]),
+        );
         assert!(conformance.is_exact(), "{:?}", conformance.disagreements);
     }
 
@@ -1906,8 +1991,13 @@ mod tests {
     #[test]
     fn a_retained_population_no_input_separates_is_reported_as_gauge_and_not_as_an_obstruction() {
         let target = tokenizer();
-        let recovery = recover(&target, &chars_as_symbols(&TOKENIZER_ALPHABET), 3, TEST_APERTURES)
-            .expect("the family is admissible");
+        let recovery = recover(
+            &target,
+            &chars_as_symbols(&TOKENIZER_ALPHABET),
+            3,
+            TEST_APERTURES,
+        )
+        .expect("the family is admissible");
         assert!(recovery.obstructions.is_empty());
         assert_eq!(recovery.inequivalent_codecs, 1);
 
@@ -1919,7 +2009,9 @@ mod tests {
         assert_eq!(recovery.gauge_freedom.len(), 9);
 
         let codec = recovery.codec.as_ref().expect("the codec is recovered");
-        let space = codec.class_of(sym(' ')).expect("the space class is recovered");
+        let space = codec
+            .class_of(sym(' '))
+            .expect("the space class is recovered");
         for (left, right) in &recovery.gauge_freedom {
             assert!(
                 *left == space || *right == space,
@@ -1939,8 +2031,13 @@ mod tests {
                 .map(str::to_uppercase)
                 .collect()
         });
-        let recovery = recover(&shouting, &chars_as_symbols(&['a', 'b', ' ']), 3, TEST_APERTURES)
-            .expect("the family is admissible");
+        let recovery = recover(
+            &shouting,
+            &chars_as_symbols(&['a', 'b', ' ']),
+            3,
+            TEST_APERTURES,
+        )
+        .expect("the family is admissible");
         assert!(recovery.codec.is_none());
         assert_eq!(
             recovery.obstructions,
@@ -1972,8 +2069,13 @@ mod tests {
                 vec![token]
             }
         });
-        let recovery =
-            recover(&swallowing, &chars_as_symbols(&['a', 'b']), 3, TEST_APERTURES).expect("the family is admissible");
+        let recovery = recover(
+            &swallowing,
+            &chars_as_symbols(&['a', 'b']),
+            3,
+            TEST_APERTURES,
+        )
+        .expect("the family is admissible");
         assert!(recovery.codec.is_none());
         assert_eq!(
             recovery.obstructions,
@@ -2005,8 +2107,8 @@ mod tests {
             }
             tokens
         });
-        let recovery =
-            recover(&capped, &chars_as_symbols(&['a', 'b']), 4, TEST_APERTURES).expect("the family is admissible");
+        let recovery = recover(&capped, &chars_as_symbols(&['a', 'b']), 4, TEST_APERTURES)
+            .expect("the family is admissible");
         assert!(recovery.codec.is_none());
         assert_eq!(recovery.classes.len(), 1, "{:?}", recovery.classes);
 
@@ -2083,7 +2185,10 @@ mod tests {
     fn the_separating_input_returned_is_the_shortest_one_and_not_merely_a_working_one() {
         let build = |joins: Boundary| RecoveredCodec {
             schema: CODEC_SCHEMA.to_owned(),
-            classes: vec![BTreeSet::from_iter(chars_as_symbols(&['_'])), BTreeSet::from_iter(chars_as_symbols(&['a', 'b']))],
+            classes: vec![
+                BTreeSet::from_iter(chars_as_symbols(&['_'])),
+                BTreeSet::from_iter(chars_as_symbols(&['a', 'b'])),
+            ],
             emission: vec![Emission::Drop, Emission::Emit],
             boundary: vec![vec![joins, joins], vec![joins, Boundary::Join]],
         };
@@ -2161,7 +2266,12 @@ mod tests {
             .shortest_separating_input(&far)
             .expect("the two codecs share their classes")
             .expect("some input separates them");
-        assert_eq!(separator, word("121"), "returned {:?}", universe().render(&separator));
+        assert_eq!(
+            separator,
+            word("121"),
+            "returned {:?}",
+            universe().render(&separator)
+        );
         assert_ne!(
             near.segment(&separator).unwrap(),
             far.segment(&separator).unwrap()
@@ -2220,7 +2330,10 @@ mod tests {
     fn a_boundary_that_is_not_square_over_the_classes_is_refused_by_both_runners() {
         let well_formed = RecoveredCodec {
             schema: CODEC_SCHEMA.to_owned(),
-            classes: vec![BTreeSet::from_iter(chars_as_symbols(&['a'])), BTreeSet::from_iter(chars_as_symbols(&['b']))],
+            classes: vec![
+                BTreeSet::from_iter(chars_as_symbols(&['a'])),
+                BTreeSet::from_iter(chars_as_symbols(&['b'])),
+            ],
             emission: vec![Emission::Emit, Emission::Emit],
             boundary: vec![
                 vec![Boundary::Join, Boundary::Cut],
@@ -2238,7 +2351,10 @@ mod tests {
 
         // The well-formed codec answers both, so the refusals below are about the shape and not
         // about the material being unanswerable.
-        assert_eq!(well_formed.segment(&word("ab")).unwrap(), words(&["a", "b"]));
+        assert_eq!(
+            well_formed.segment(&word("ab")).unwrap(),
+            words(&["a", "b"])
+        );
         assert_eq!(
             well_formed.shortest_separating_input(&short_row),
             Err(RecoveryError::MalformedBoundary {
@@ -2450,7 +2566,12 @@ mod tests {
             Err(RecoveryError::RadiusBelowAperture { radius: 1 })
         );
         assert!(matches!(
-            recover(&target, &chars_as_symbols(&TOKENIZER_ALPHABET), 6, TEST_APERTURES),
+            recover(
+                &target,
+                &chars_as_symbols(&TOKENIZER_ALPHABET),
+                6,
+                TEST_APERTURES
+            ),
             Err(RecoveryError::FamilyExceedsAperture { .. })
         ));
         assert_eq!(target.calls(), 0, "an aperture refusal costs no testimony");
@@ -2461,8 +2582,13 @@ mod tests {
     #[test]
     fn the_recovery_states_its_cost_and_never_returns_a_codec_beside_an_obstruction() {
         let target = tokenizer();
-        let recovery = recover(&target, &chars_as_symbols(&TOKENIZER_ALPHABET), 3, TEST_APERTURES)
-            .expect("the family is admissible");
+        let recovery = recover(
+            &target,
+            &chars_as_symbols(&TOKENIZER_ALPHABET),
+            3,
+            TEST_APERTURES,
+        )
+        .expect("the family is admissible");
         assert_eq!(recovery.work.declared_family_words, 11 + 121 + 1331);
         assert_eq!(
             recovery.work.target_calls,
@@ -2474,8 +2600,13 @@ mod tests {
         assert_eq!(recovery.is_recovered(), recovery.obstructions.is_empty());
 
         let blind = soft_join();
-        let obstructed =
-            recover(&blind, &chars_as_symbols(&['a', 'b', '_']), 2, TEST_APERTURES).expect("the family is admissible");
+        let obstructed = recover(
+            &blind,
+            &chars_as_symbols(&['a', 'b', '_']),
+            2,
+            TEST_APERTURES,
+        )
+        .expect("the family is admissible");
         assert_eq!(
             obstructed.is_recovered(),
             obstructed.obstructions.is_empty()
@@ -2486,10 +2617,20 @@ mod tests {
     /// hash seed, or an iteration accident.
     #[test]
     fn the_recovery_is_deterministic() {
-        let first =
-            recover(&tokenizer(), &chars_as_symbols(&TOKENIZER_ALPHABET), 3, TEST_APERTURES).expect("admissible");
-        let second =
-            recover(&tokenizer(), &chars_as_symbols(&TOKENIZER_ALPHABET), 3, TEST_APERTURES).expect("admissible");
+        let first = recover(
+            &tokenizer(),
+            &chars_as_symbols(&TOKENIZER_ALPHABET),
+            3,
+            TEST_APERTURES,
+        )
+        .expect("admissible");
+        let second = recover(
+            &tokenizer(),
+            &chars_as_symbols(&TOKENIZER_ALPHABET),
+            3,
+            TEST_APERTURES,
+        )
+        .expect("admissible");
         assert_eq!(first, second);
     }
 
@@ -2550,7 +2691,9 @@ mod tests {
             "obstructions {:?}",
             recovery.obstructions
         );
-        let codec = recovery.codec.expect("an unobstructed recovery carries a codec");
+        let codec = recovery
+            .codec
+            .expect("an unobstructed recovery carries a codec");
 
         // The frame opener and the continuation octet land in DIFFERENT classes, which is the whole
         // content: their difference is behavioural and nothing about their spelling says it.
@@ -2626,8 +2769,10 @@ mod tests {
             recovery
                 .separations
                 .iter()
-                .any(|separation| (separation.left, separation.right) == (cutting, joining)
-                    || (separation.left, separation.right) == (joining, cutting)),
+                .any(
+                    |separation| (separation.left, separation.right) == (cutting, joining)
+                        || (separation.left, separation.right) == (joining, cutting)
+                ),
             "the separating context was not exhibited: {:?}",
             recovery.separations
         );
@@ -2638,10 +2783,7 @@ mod tests {
     #[test]
     fn an_alphabet_declaring_one_identity_twice_is_refused_by_name() {
         assert_eq!(
-            SymbolAlphabet::declared(vec![
-                ("a".to_owned(), vec![1]),
-                ("a".to_owned(), vec![2]),
-            ]),
+            SymbolAlphabet::declared(vec![("a".to_owned(), vec![1]), ("a".to_owned(), vec![2]),]),
             Err(RecoveryError::RepeatedIdentity {
                 identity: "a".to_owned()
             })

@@ -134,11 +134,21 @@ pub const fn refusal_cause_name(cause: u32) -> &'static str {
         REFUSAL_CONTROL_KEY_ROW_TOTAL_WORDS => "the control block's key sheet extent disagrees",
         REFUSAL_CONTROL_OUTPUT_ROW_WORDS => "the control block's output row width disagrees",
         REFUSAL_CONTROL_OUTPUT_TOTAL_WORDS => "the control block's output extent disagrees",
-        REFUSAL_CANDIDATE_SHEET_EXTENT => "the candidate sheet the card received is not the declared extent",
-        REFUSAL_DEPOSIT_SHEET_EXTENT => "the deposit sheet the card received is not the declared extent",
-        REFUSAL_KEY_ROW_SHEET_EXTENT => "the key sheet the card received is not the declared extent",
-        REFUSAL_OUTPUT_SHEET_EXTENT => "the output sheet the card received is not the declared extent",
-        REFUSAL_DEPOSIT_ACTIVITY_WORD => "a deposit carries an activity word that is neither zero nor one",
+        REFUSAL_CANDIDATE_SHEET_EXTENT => {
+            "the candidate sheet the card received is not the declared extent"
+        }
+        REFUSAL_DEPOSIT_SHEET_EXTENT => {
+            "the deposit sheet the card received is not the declared extent"
+        }
+        REFUSAL_KEY_ROW_SHEET_EXTENT => {
+            "the key sheet the card received is not the declared extent"
+        }
+        REFUSAL_OUTPUT_SHEET_EXTENT => {
+            "the output sheet the card received is not the declared extent"
+        }
+        REFUSAL_DEPOSIT_ACTIVITY_WORD => {
+            "a deposit carries an activity word that is neither zero nor one"
+        }
         REFUSAL_DEPOSIT_SHEET_UNSORTED => "the deposit sheet is not strictly ascending by key",
         REFUSAL_CANDIDATE_FACE_OPEN => "a candidate carries the reserved open face",
         REFUSAL_ACTIVE_DEPOSIT_OVERFLOW => "the active deposit count overflowed",

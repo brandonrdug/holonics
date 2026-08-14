@@ -152,8 +152,8 @@ impl Manifest {
                 if !is_hex64(fields[1]) || !is_hex64(fields[2]) {
                     return Err(ManifestRefusal::CorruptDigest(line));
                 }
-                let path =
-                    RelPath::parse(fields[0]).map_err(|_| ManifestRefusal::MalformedDeposit(line))?;
+                let path = RelPath::parse(fields[0])
+                    .map_err(|_| ManifestRefusal::MalformedDeposit(line))?;
                 let founding = FoundingName::parse(fields[3])
                     .map_err(|_| ManifestRefusal::MalformedDeposit(line))?;
                 manifest.deposits.push(DepositRow {
@@ -274,7 +274,10 @@ mod tests {
             manifest.deposits[0].path.as_str(),
             "receipts/R1_EXACT_DEED.txt"
         );
-        assert_eq!(manifest.deposits[0].founding.as_str(), "r1.exact_device_deed");
+        assert_eq!(
+            manifest.deposits[0].founding.as_str(),
+            "r1.exact_device_deed"
+        );
     }
 
     #[test]
@@ -291,9 +294,15 @@ mod tests {
         assert_eq!(first.foundings, second.foundings);
         assert_eq!(first.deposits, second.deposits);
         assert_eq!(second.render(), first.render());
-        assert_eq!(second.headers.get("deposited_octets").map(String::as_str), Some("7"));
         assert_eq!(
-            second.headers.get("derived_returns_not_deposited").map(String::as_str),
+            second.headers.get("deposited_octets").map(String::as_str),
+            Some("7")
+        );
+        assert_eq!(
+            second
+                .headers
+                .get("derived_returns_not_deposited")
+                .map(String::as_str),
             Some("3")
         );
     }

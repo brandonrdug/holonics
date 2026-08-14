@@ -62,8 +62,8 @@ fn text(path: &Path) -> String {
 
 /// A training-ecology form, written by its own codec through the library surface.
 fn training_form(scratch: &Scratch) -> PathBuf {
-    use std::collections::BTreeMap;
     use life::holonic_training::{FaceAddress, SourceFace, TrainingEcology};
+    use std::collections::BTreeMap;
 
     let mut ecology = TrainingEcology::new(2, 8).expect("an ecology");
     let parameters = BTreeMap::from([("receiver".to_owned(), "alpha".to_owned())]);
@@ -82,8 +82,8 @@ fn training_form(scratch: &Scratch) -> PathBuf {
 }
 
 fn training_deed(scratch: &Scratch) -> PathBuf {
-    use std::collections::BTreeMap;
     use life::holonic_training::{FaceAddress, SourceFace};
+    use std::collections::BTreeMap;
 
     let deed = TrainingDeed {
         faces: vec![
@@ -127,13 +127,7 @@ fn deposit_resume_redeposit_through_the_binary_is_byte_identical() {
         "{report}"
     );
 
-    let resumed = holon_plate(&[
-        "resume",
-        "--plate",
-        &text(&first),
-        "--to",
-        &text(&second),
-    ]);
+    let resumed = holon_plate(&["resume", "--plate", &text(&first), "--to", &text(&second)]);
     assert!(
         resumed.status.success(),
         "{}{}",
@@ -185,7 +179,11 @@ fn a_corrupted_plate_refuses_through_the_binary_and_names_what_drifted() {
     fs::write(&plate, &octets).expect("write");
 
     let refused = holon_plate(&["resume", "--plate", &text(&plate)]);
-    assert_eq!(refused.status.code(), Some(1), "a corrupt plate must exit 1");
+    assert_eq!(
+        refused.status.code(),
+        Some(1),
+        "a corrupt plate must exit 1"
+    );
     let message = stderr(&refused);
     assert!(message.contains("REFUSED"), "{message}");
     assert!(message.contains("CONTENT drift"), "{message}");
@@ -285,7 +283,11 @@ fn a_further_deed_through_the_binary_changes_the_body_and_the_plate() {
     // and the moved plate resumes in its own right
     let again = holon_plate(&["resume", "--plate", &text(&second)]);
     assert!(again.status.success(), "{}", stderr(&again));
-    assert!(stdout(&again).contains("generation=5"), "{}", stdout(&again));
+    assert!(
+        stdout(&again).contains("generation=5"),
+        "{}",
+        stdout(&again)
+    );
 }
 
 #[test]
@@ -336,9 +338,11 @@ fn an_incidence_deposits_re_lights_and_is_founded_on_through_the_binary() {
 
     // two vertices joined by one edge: one piece, no loop
     let complex = {
-        use std::collections::BTreeSet;
-        use holonic_engine::algebraic::{CausalChain, ComparativeMultiplicity, GradedCausalComplex};
+        use holonic_engine::algebraic::{
+            CausalChain, ComparativeMultiplicity, GradedCausalComplex,
+        };
         use holonic_engine::causal::EventId;
+        use std::collections::BTreeSet;
 
         let source = BTreeSet::from([EventId(1)]);
         let mut complex = GradedCausalComplex::default();
@@ -351,7 +355,9 @@ fn an_incidence_deposits_re_lights_and_is_founded_on_through_the_binary() {
         let mut boundary = CausalChain::default();
         boundary.add_term(b, ComparativeMultiplicity::positive(1u32));
         boundary.add_term(a, ComparativeMultiplicity::negative(1u32));
-        complex.found_cell("ab", source, 1, boundary).expect("an edge");
+        complex
+            .found_cell("ab", source, 1, boundary)
+            .expect("an edge");
         complex
     };
     fs::write(
@@ -397,7 +403,10 @@ fn an_incidence_deposits_re_lights_and_is_founded_on_through_the_binary() {
     );
     let report = stdout(&deposited);
     assert!(report.contains("schema        RBIN/1"), "{report}");
-    assert!(report.contains("betti_total=1"), "one piece, no loop: {report}");
+    assert!(
+        report.contains("betti_total=1"),
+        "one piece, no loop: {report}"
+    );
     assert!(report.contains("torsion_factors=0"), "{report}");
     assert!(report.contains("euler_positive=1"), "2 - 1 = +1: {report}");
     assert!(report.contains("euler_negative=0"), "{report}");
@@ -444,7 +453,11 @@ fn an_incidence_deposits_re_lights_and_is_founded_on_through_the_binary() {
     // and the moved plate re-lights in its own right, with the moved reading
     let again = holon_plate(&["resume", "--plate", &text(&second)]);
     assert!(again.status.success(), "{}", stderr(&again));
-    assert!(stdout(&again).contains("betti_total=2"), "{}", stdout(&again));
+    assert!(
+        stdout(&again).contains("betti_total=2"),
+        "{}",
+        stdout(&again)
+    );
 }
 
 /// A form addressed to the wrong held schema must refuse at the mount, not be guessed at.
@@ -460,7 +473,11 @@ fn a_form_deposited_under_the_wrong_held_schema_refuses_through_the_binary() {
         "--to",
         &text(&plate),
     ]);
-    assert_eq!(refused.status.code(), Some(1), "a mis-filed form must exit 1");
+    assert_eq!(
+        refused.status.code(),
+        Some(1),
+        "a mis-filed form must exit 1"
+    );
     let message = stderr(&refused);
     assert!(message.contains("REFUSED"), "{message}");
     assert!(message.contains("RBIN"), "{message}");
@@ -479,10 +496,7 @@ fn the_help_states_what_the_plate_does_not_claim() {
         report.contains("is not comprehension"),
         "the help must state the boundary: {report}"
     );
-    assert!(
-        report.contains("freezing is not understanding"),
-        "{report}"
-    );
+    assert!(report.contains("freezing is not understanding"), "{report}");
     assert!(report.contains("applies no compression"), "{report}");
 }
 

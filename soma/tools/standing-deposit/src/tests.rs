@@ -77,7 +77,10 @@ return out/tiger.ppm
 /// A standing, freshly rested. Returns the scratch so the caller keeps it alive.
 fn rest() -> Scratch {
     let scratch = Scratch::new("rest");
-    scratch.write("bin/driver", "the deed binary, standing in for a build artifact\n");
+    scratch.write(
+        "bin/driver",
+        "the deed binary, standing in for a build artifact\n",
+    );
     scratch.write("corpus/one.lean", "theorem one : True := trivial\n");
     scratch.write("corpus/two.lean", "theorem two : True := trivial\n");
     scratch.write("out/theorem-a.lean", "theorem a : 1 + 1 = 2 := rfl\n");
@@ -90,7 +93,10 @@ fn rest() -> Scratch {
     assert_eq!(manifest.deposits.len(), 3);
     assert_eq!(manifest.foundings.len(), 2);
     assert_eq!(
-        manifest.headers.get("derived_returns_not_deposited").map(String::as_str),
+        manifest
+            .headers
+            .get("derived_returns_not_deposited")
+            .map(String::as_str),
         Some("1"),
         "the one declared-and-refused derived return is counted, not silently dropped"
     );
@@ -351,7 +357,10 @@ fn the_archived_manifest_declares_what_the_roadmap_reads_from_it() {
     }
     let manifest = Manifest::read(&manifest_path).expect("reads");
     assert_eq!(
-        manifest.headers.get("deposited_returns").map(String::as_str),
+        manifest
+            .headers
+            .get("deposited_returns")
+            .map(String::as_str),
         Some("123")
     );
     assert_eq!(
@@ -418,7 +427,11 @@ fn a_corrupted_recorded_digest_refuses_instead_of_dropping_the_row() {
     let corrupt_digest = format!("z{}", &fields[1][1..]);
     let corrupted = text.replace(fields[1], &corrupt_digest);
     assert_ne!(corrupted, text, "the corruption landed");
-    assert_eq!(corrupted.len(), text.len(), "width unchanged, so only hex-ness moved");
+    assert_eq!(
+        corrupted.len(),
+        text.len(),
+        "width unchanged, so only hex-ness moved"
+    );
     fs::write(&manifest_path, &corrupted).expect("write");
 
     match verify(&scratch.root(), &scratch.standing()) {
@@ -446,7 +459,11 @@ fn a_row_deleted_outright_refuses_on_the_declared_count() {
     fs::write(&manifest_path, format!("{}\n", kept.join("\n"))).expect("write");
 
     match verify(&scratch.root(), &scratch.standing()) {
-        Err(ManifestRefusal::CountDisagrees { header, recorded, read }) => {
+        Err(ManifestRefusal::CountDisagrees {
+            header,
+            recorded,
+            read,
+        }) => {
             assert_eq!(header, "deposited_returns");
             assert_eq!((recorded, read), (3, 2));
         }
@@ -472,7 +489,10 @@ fn a_file_no_row_binds_refuses_even_though_every_row_holds() {
     assert_eq!(verdict.closure_held, 3, "the closures are current");
     assert_eq!(verdict.unmanifested, 1);
     assert!(
-        verdict.lines.iter().any(|line| line == "unmanifested out/unbound.lean"),
+        verdict
+            .lines
+            .iter()
+            .any(|line| line == "unmanifested out/unbound.lean"),
         "the stray is named, not just counted: {:?}",
         verdict.lines
     );

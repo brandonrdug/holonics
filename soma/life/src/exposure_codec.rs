@@ -91,9 +91,7 @@
 use std::cell::Cell;
 use std::collections::{BTreeMap, BTreeSet, HashMap};
 
-use holonic_engine::codec_recovery::{
-    Boundary, Emission, RecoveredCodec, Symbol, SymbolAlphabet,
-};
+use holonic_engine::codec_recovery::{Boundary, Emission, RecoveredCodec, Symbol, SymbolAlphabet};
 use serde::{Deserialize, Serialize};
 
 const RECOVERY_SCHEMA: &str = "life.exposure-codec-recovery.v1";
@@ -949,7 +947,10 @@ fn assemble(
 /// numberings rather than a statement about the material. A [`Symbol`] is an opaque ordinal into a
 /// declared alphabet, so an octet is now simply one, and nothing is being reinterpreted.
 pub fn carried(octets: &[u8]) -> Vec<Symbol> {
-    octets.iter().map(|octet| Symbol(u32::from(*octet))).collect()
+    octets
+        .iter()
+        .map(|octet| Symbol(u32::from(*octet)))
+        .collect()
 }
 
 /// The inverse of [`carried`]. Returns `None` at the first ordinal outside octet range.

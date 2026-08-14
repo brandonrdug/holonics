@@ -63,7 +63,8 @@ impl PlateSchema for ConditionedSchema {
         // The codec's own decode re-founds the whole morphology through the engine's one public
         // seam and compares it field for field before returning; a form that does not close, and a
         // form whose founding order that seam cannot reproduce, does not become a body.
-        let rest = ConditionedRest::decode_native_bytes(form).map_err(|refusal| refusal.to_string())?;
+        let rest =
+            ConditionedRest::decode_native_bytes(form).map_err(|refusal| refusal.to_string())?;
         Ok(Box::new(ConditionedRestBody { rest }))
     }
 }

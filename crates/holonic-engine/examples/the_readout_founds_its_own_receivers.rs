@@ -38,7 +38,7 @@ use std::io::{Read, Seek, SeekFrom};
 
 use holonic_engine::embedding_fiber::{AlignedMaterial, ResidentReadout, align_bfloat16};
 use holonic_engine::founded_receiver::{
-    AxisSpecies, FoundingPressure, found_to_exhaustion, gyration_of, gyration_holonomy,
+    AxisSpecies, FoundingPressure, found_to_exhaustion, gyration_holonomy, gyration_of,
 };
 use holonic_engine::receiver_exact_compression::{
     InputId, ItemId, Observation, ObservedSystem, ReceiverId, compress,
@@ -87,7 +87,11 @@ fn header(file: &mut File) -> Result<(BTreeMap<String, Entry>, u64), String> {
         entries.insert(
             name.clone(),
             Entry {
-                dtype: value.get("dtype").and_then(serde_json::Value::as_str).ok_or("no dtype")?.to_owned(),
+                dtype: value
+                    .get("dtype")
+                    .and_then(serde_json::Value::as_str)
+                    .ok_or("no dtype")?
+                    .to_owned(),
                 shape: value
                     .get("shape")
                     .and_then(serde_json::Value::as_array)
@@ -137,24 +141,34 @@ fn run() -> Result<(), String> {
 
     let mut file = File::open(MAP).map_err(|e| format!("open {MAP}: {e}"))?;
     let (entries, base) = header(&mut file)?;
-    let entry = entries.get(READOUT).ok_or("the readout is not in this map")?;
+    let entry = entries
+        .get(READOUT)
+        .ok_or("the readout is not in this map")?;
     if entry.dtype != ADMITTED_DTYPE {
         return Err(format!("the readout is {} — refused by name", entry.dtype));
     }
     let (vocabulary, dim) = (entry.shape[0], entry.shape[1]);
     let rows = ROW_APERTURE.min(vocabulary);
     println!("\n  {READOUT}  {vocabulary} x {dim}  {ADMITTED_DTYPE}");
-    println!("  aperture {rows} rows; excluded and reported: {} rows", vocabulary - rows);
+    println!(
+        "  aperture {rows} rows; excluded and reported: {} rows",
+        vocabulary - rows
+    );
 
-    file.seek(SeekFrom::Start(base + entry.start)).map_err(|e| e.to_string())?;
+    file.seek(SeekFrom::Start(base + entry.start))
+        .map_err(|e| e.to_string())?;
     let mut raw = vec![0u8; rows * dim * 2];
     file.read_exact(&mut raw).map_err(|e| e.to_string())?;
-    let words: Vec<u16> = raw.chunks_exact(2).map(|p| u16::from_le_bytes([p[0], p[1]])).collect();
+    let words: Vec<u16> = raw
+        .chunks_exact(2)
+        .map(|p| u16::from_le_bytes([p[0], p[1]]))
+        .collect();
     drop(raw);
     let readout = align_bfloat16(&words).map_err(|e| format!("the float mouth refused: {e}"))?;
     drop(words);
 
-    let resident = ResidentReadout::new().map_err(|e| format!("the resident chart refused: {e}"))?;
+    let resident =
+        ResidentReadout::new().map_err(|e| format!("the resident chart refused: {e}"))?;
     println!("  resident chart: {}", resident.device_name());
 
     // ---------------------------------------------------------------------------------------
@@ -168,7 +182,11 @@ fn run() -> Result<(), String> {
         let base_at = item * dim;
         let entries_of = &readout.entries[base_at..base_at + dim];
         let query = AlignedMaterial {
-            entry_octaves: entries_of.iter().map(|e| e.unsigned_abs().max(1).ilog2() + 1).max().unwrap_or(0),
+            entry_octaves: entries_of
+                .iter()
+                .map(|e| e.unsigned_abs().max(1).ilog2() + 1)
+                .max()
+                .unwrap_or(0),
             negatives: entries_of.iter().filter(|e| **e < 0).count() as u64,
             entries: entries_of.to_vec(),
             exponent: readout.exponent,
@@ -178,7 +196,11 @@ fn run() -> Result<(), String> {
             .map_err(|e| format!("the card refused item {item}: {e}"))?;
         // The rank order, exact. Ties break by row so the relation is a function of the material.
         let mut order: Vec<usize> = (0..rows).collect();
-        order.sort_by(|a, b| population.scores[*b].cmp(&population.scores[*a]).then(a.cmp(b)));
+        order.sort_by(|a, b| {
+            population.scores[*b]
+                .cmp(&population.scores[*a])
+                .then(a.cmp(b))
+        });
         let region: Vec<usize> = order.into_iter().take(RANK_SLOTS).collect();
         self_in_region.push(u64::from(region.contains(&item)));
         successor.push(region.into_iter().map(Some).collect());
@@ -193,7 +215,10 @@ fn run() -> Result<(), String> {
         self_in_region.iter().filter(|v| **v == 1).count()
     );
 
-    let system = Readout { successor, self_in_region };
+    let system = Readout {
+        successor,
+        self_in_region,
+    };
 
     // ---------------------------------------------------------------------------------------
     // The panel is FOUNDED. One receiver declared; the organ grows the rest.
@@ -265,7 +290,10 @@ fn run() -> Result<(), String> {
             gyration.founded_agree,
             gyration.orbit_is_trivial()
         );
-        println!("  is a holonomy (same arrival, different route): {}", gyration.is_holonomy());
+        println!(
+            "  is a holonomy (same arrival, different route): {}",
+            gyration.is_holonomy()
+        );
         match gyration_holonomy(&gyration) {
             None => println!("  the two orders share no junction, so no walk is posed."),
             Some(holonomy) => {

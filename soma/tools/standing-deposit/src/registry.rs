@@ -173,9 +173,10 @@ pub fn deposit(root: &Path, plan: &Plan, standing: &Path) -> Result<Manifest, De
     manifest
         .headers
         .insert("deposited_octets".into(), octets_total.to_string());
-    manifest
-        .headers
-        .insert("derived_returns_not_deposited".into(), derived_total.to_string());
+    manifest.headers.insert(
+        "derived_returns_not_deposited".into(),
+        derived_total.to_string(),
+    );
 
     fs::create_dir_all(standing).map_err(|error| DepositRefusal::Io {
         path: standing.display().to_string(),

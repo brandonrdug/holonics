@@ -150,11 +150,7 @@ impl LitBody for CurrentBody {
             .lineages()
             .iter()
             .map(|lineage| {
-                CurrentEvent::continuing(
-                    lineage.lineage(),
-                    CurrentGeometry::Cell(relation),
-                    action,
-                )
+                CurrentEvent::continuing(lineage.lineage(), CurrentGeometry::Cell(relation), action)
             })
             .collect();
         self.machine

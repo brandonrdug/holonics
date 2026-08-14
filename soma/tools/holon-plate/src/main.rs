@@ -95,10 +95,14 @@ fn run() -> Result<ExitCode, Fault> {
             let to = to.ok_or_else(|| invocation(format!("--to is required\n{USAGE}")))?;
             let (tag, source) = split_from(&from)?;
             let form = read(&source)?;
-            let deposited = deposit(tag, &form).map_err(|refusal| Fault::Refused(refusal.to_string()))?;
+            let deposited =
+                deposit(tag, &form).map_err(|refusal| Fault::Refused(refusal.to_string()))?;
             write(&to, &deposited.plate)?;
             println!("DEPOSITED  {}", to.display());
-            println!("  schema        {}/{}", deposited.tag, deposited.schema_version);
+            println!(
+                "  schema        {}/{}",
+                deposited.tag, deposited.schema_version
+            );
             println!(
                 "  form          {} octets   form_sha256  {}",
                 deposited.form_octets, deposited.form_sha256
@@ -120,7 +124,8 @@ fn run() -> Result<ExitCode, Fault> {
             let plate_path =
                 plate_path.ok_or_else(|| invocation(format!("--plate is required\n{USAGE}")))?;
             let octets = read(&plate_path)?;
-            let mut relit = resume(&octets).map_err(|refusal| Fault::Refused(refusal.to_string()))?;
+            let mut relit =
+                resume(&octets).map_err(|refusal| Fault::Refused(refusal.to_string()))?;
             println!("RE-LIT  {}", plate_path.display());
             println!("  schema        {}/{}", relit.tag, relit.schema_version);
             println!(
@@ -138,7 +143,11 @@ fn run() -> Result<ExitCode, Fault> {
                 let deed = read(deed_path)?;
                 let (before, after) = present_and_require_change(relit.body.as_mut(), &deed)
                     .map_err(|refusal| Fault::Refused(refusal.to_string()))?;
-                println!("\n  deed          {} ({} octets)", deed_path.display(), deed.len());
+                println!(
+                    "\n  deed          {} ({} octets)",
+                    deed_path.display(),
+                    deed.len()
+                );
                 println!("  the re-lit body accepted it and CHANGED:");
                 for line in census_delta(&before, &after) {
                     println!("    {line}");
@@ -151,7 +160,11 @@ fn run() -> Result<ExitCode, Fault> {
                     .form()
                     .map_err(|detail| Fault::Refused(format!("REFUSED: {detail}")))?;
                 write(form_path, &form)?;
-                println!("\n  form written  {} ({} octets)", form_path.display(), form.len());
+                println!(
+                    "\n  form written  {} ({} octets)",
+                    form_path.display(),
+                    form.len()
+                );
             }
 
             if let Some(to) = &to {
@@ -272,7 +285,8 @@ fn warn_suffix(path: &Path) {
 }
 
 fn read(path: &Path) -> Result<Vec<u8>, Fault> {
-    std::fs::read(path).map_err(|error| invocation(format!("cannot read {}: {error}", path.display())))
+    std::fs::read(path)
+        .map_err(|error| invocation(format!("cannot read {}: {error}", path.display())))
 }
 
 fn write(path: &Path, octets: &[u8]) -> Result<(), Fault> {

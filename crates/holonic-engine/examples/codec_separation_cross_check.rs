@@ -125,7 +125,8 @@ fn flipped(codec: &RecoveredCodec, left: usize, right: usize) -> RecoveredCodec 
 /// The declared alphabet, once. `codec_recovery` speaks symbols; this driver's fixtures speak text,
 /// and this is the translation between them.
 fn alphabet() -> SymbolAlphabet {
-    SymbolAlphabet::from_chars(&TOKENIZER_ALPHABET).expect("the declared alphabet carries no repeat")
+    SymbolAlphabet::from_chars(&TOKENIZER_ALPHABET)
+        .expect("the declared alphabet carries no repeat")
 }
 
 fn symbols(characters: &[char]) -> Vec<Symbol> {
@@ -447,9 +448,15 @@ fn main() -> Result<(), Box<dyn Error>> {
         &cross_check(left, right)?,
     );
 
-    let word = codec.class_of(symbols(&['a'])[0]).ok_or("the word class is recovered")?;
-    let digit = codec.class_of(symbols(&['0'])[0]).ok_or("the digit class is recovered")?;
-    let space = codec.class_of(symbols(&[' '])[0]).ok_or("the space class is recovered")?;
+    let word = codec
+        .class_of(symbols(&['a'])[0])
+        .ok_or("the word class is recovered")?;
+    let digit = codec
+        .class_of(symbols(&['0'])[0])
+        .ok_or("the digit class is recovered")?;
+    let space = codec
+        .class_of(symbols(&[' '])[0])
+        .ok_or("the space class is recovered")?;
     let gauge = flipped(codec, word.0 as usize, space.0 as usize);
     let mut across = flipped(codec, word.0 as usize, space.0 as usize);
     across = flipped(&across, space.0 as usize, word.0 as usize);

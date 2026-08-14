@@ -201,11 +201,13 @@ pub fn align_bfloat16(words: &[u16]) -> Result<AlignedMaterial, FiberError> {
     let mut decoded = Vec::with_capacity(words.len());
     let mut lowest = i32::MAX;
     for word in words {
-        let datum = decode_bfloat16_bits(*word)
-            .map_err(|error| FiberError::MouthRefused { reason: format!("{error:?}") })?;
-        let significand = u64::try_from(&datum.significand).map_err(|_| FiberError::MouthRefused {
-            reason: "a BF16 significand exceeded the exact word carrier".to_owned(),
+        let datum = decode_bfloat16_bits(*word).map_err(|error| FiberError::MouthRefused {
+            reason: format!("{error:?}"),
         })?;
+        let significand =
+            u64::try_from(&datum.significand).map_err(|_| FiberError::MouthRefused {
+                reason: "a BF16 significand exceeded the exact word carrier".to_owned(),
+            })?;
         let signed = if datum.negative {
             -(significand as i64)
         } else {
@@ -227,9 +229,8 @@ pub fn align_bfloat16(words: &[u16]) -> Result<AlignedMaterial, FiberError> {
             entries.push(0);
             continue;
         }
-        let spread = u32::try_from(exponent - lowest).map_err(|_| FiberError::AlignmentSpread {
-            spread: u32::MAX,
-        })?;
+        let spread = u32::try_from(exponent - lowest)
+            .map_err(|_| FiberError::AlignmentSpread { spread: u32::MAX })?;
         if spread >= 63 {
             return Err(FiberError::AlignmentSpread { spread });
         }
@@ -337,9 +338,7 @@ impl ResidentReadout {
                 cuDeviceGetName(name.as_mut_ptr(), name.len() as i32, device),
                 "cuDeviceGetName",
             )?;
-            let device_name = CStr::from_ptr(name.as_ptr())
-                .to_string_lossy()
-                .into_owned();
+            let device_name = CStr::from_ptr(name.as_ptr()).to_string_lossy().into_owned();
 
             let mut max_threads = 0i32;
             checked(
@@ -406,7 +405,10 @@ impl ResidentReadout {
     /// octaves. Returned so a caller can read what it cost even when it fits.
     pub fn needed_octaves(entry_octaves: u32, dim: usize) -> u32 {
         let terms = u32::try_from(dim.max(1).next_power_of_two().ilog2()).unwrap_or(u32::MAX);
-        entry_octaves.saturating_mul(2).saturating_add(terms).saturating_add(1)
+        entry_octaves
+            .saturating_mul(2)
+            .saturating_add(terms)
+            .saturating_add(1)
     }
 
     /// **The deed.** Every exact score of one query against every declared row.
@@ -487,14 +489,30 @@ impl ResidentReadout {
             let mut device_octaves: CuDevicePtr = 0;
             let mut device_addresses: CuDevicePtr = 0;
 
-            checked(cuMemAlloc_v2(&mut device_readout, readout_bytes), "cuMemAlloc(readout)")?;
-            checked(cuMemAlloc_v2(&mut device_query, query_bytes), "cuMemAlloc(query)")?;
+            checked(
+                cuMemAlloc_v2(&mut device_readout, readout_bytes),
+                "cuMemAlloc(readout)",
+            )?;
+            checked(
+                cuMemAlloc_v2(&mut device_query, query_bytes),
+                "cuMemAlloc(query)",
+            )?;
             checked(cuMemAlloc_v2(&mut device_low, count * 8), "cuMemAlloc(low)")?;
-            checked(cuMemAlloc_v2(&mut device_high, count * 8), "cuMemAlloc(high)")?;
-            checked(cuMemAlloc_v2(&mut device_octaves, count * 4), "cuMemAlloc(octaves)")?;
+            checked(
+                cuMemAlloc_v2(&mut device_high, count * 8),
+                "cuMemAlloc(high)",
+            )?;
+            checked(
+                cuMemAlloc_v2(&mut device_octaves, count * 4),
+                "cuMemAlloc(octaves)",
+            )?;
 
             checked(
-                cuMemcpyHtoD_v2(device_readout, readout.entries.as_ptr().cast(), readout_bytes),
+                cuMemcpyHtoD_v2(
+                    device_readout,
+                    readout.entries.as_ptr().cast(),
+                    readout_bytes,
+                ),
                 "cuMemcpy(readout)",
             )?;
             checked(
@@ -526,8 +544,12 @@ impl ResidentReadout {
                 checked(
                     cuLaunchKernel(
                         self.scores_addressed,
-                        grid as u32, 1, 1,
-                        block, 1, 1,
+                        grid as u32,
+                        1,
+                        1,
+                        block,
+                        1,
+                        1,
                         0,
                         std::ptr::null_mut(),
                         parameters.as_mut_ptr(),
@@ -547,8 +569,12 @@ impl ResidentReadout {
                 checked(
                     cuLaunchKernel(
                         self.scores,
-                        grid as u32, 1, 1,
-                        block, 1, 1,
+                        grid as u32,
+                        1,
+                        1,
+                        block,
+                        1,
+                        1,
                         0,
                         std::ptr::null_mut(),
                         parameters.as_mut_ptr(),
@@ -568,8 +594,12 @@ impl ResidentReadout {
             checked(
                 cuLaunchKernel(
                     self.octaves,
-                    grid as u32, 1, 1,
-                    block, 1, 1,
+                    grid as u32,
+                    1,
+                    1,
+                    block,
+                    1,
+                    1,
                     0,
                     std::ptr::null_mut(),
                     octave_parameters.as_mut_ptr(),
@@ -703,7 +733,14 @@ mod tests {
         let (readout, query, dim) = material();
         let scores = score_serially(&readout, &query, dim, None).expect("well-formed");
         // Computed by hand: the point of an independent check is that it is independent.
-        assert_eq!(scores, vec![1 * 2 + 2 * -1 + 3 * 4, -1 * 2 + 0 + 5 * 4, 7 * 2 + -7 * -1 + 0]);
+        assert_eq!(
+            scores,
+            vec![
+                1 * 2 + 2 * -1 + 3 * 4,
+                -1 * 2 + 0 + 5 * 4,
+                7 * 2 + -7 * -1 + 0
+            ]
+        );
         assert_eq!(scores, vec![12, 18, 21]);
     }
 
@@ -745,7 +782,11 @@ mod tests {
         assert_eq!(aligned.negatives, 1);
         for (entry, expected) in aligned.entries.iter().zip([1.0f64, 2.0, 0.5, -1.5]) {
             let reproduced = *entry as f64 * 2f64.powi(aligned.exponent);
-            assert_eq!(reproduced, expected, "entry {entry} exponent {}", aligned.exponent);
+            assert_eq!(
+                reproduced, expected,
+                "entry {entry} exponent {}",
+                aligned.exponent
+            );
         }
     }
 
@@ -777,33 +818,49 @@ mod tests {
             .map(|at| ((at as i64 * 2_654_435_761) % 1021) - 510)
             .collect();
         let readout = AlignedMaterial {
-            entry_octaves: entries.iter().map(|e| e.unsigned_abs().max(1).ilog2() + 1).max().unwrap_or(0),
+            entry_octaves: entries
+                .iter()
+                .map(|e| e.unsigned_abs().max(1).ilog2() + 1)
+                .max()
+                .unwrap_or(0),
             negatives: entries.iter().filter(|e| **e < 0).count() as u64,
             entries,
             exponent: -7,
         };
         let query_entries: Vec<i64> = (0..dim).map(|at| ((at as i64 * 97) % 255) - 127).collect();
         let query = AlignedMaterial {
-            entry_octaves: query_entries.iter().map(|e| e.unsigned_abs().max(1).ilog2() + 1).max().unwrap_or(0),
+            entry_octaves: query_entries
+                .iter()
+                .map(|e| e.unsigned_abs().max(1).ilog2() + 1)
+                .max()
+                .unwrap_or(0),
             negatives: query_entries.iter().filter(|e| **e < 0).count() as u64,
             entries: query_entries,
             exponent: -3,
         };
 
-        let carried = resident.score(&readout, &query, dim, None).expect("the deed is admissible");
+        let carried = resident
+            .score(&readout, &query, dim, None)
+            .expect("the deed is admissible");
         let serial = score_serially(&readout, &query, dim, None).expect("well-formed");
         assert_eq!(carried.scores, serial, "the two charts disagree");
         assert_eq!(carried.exact_multiply_accumulates, (rows * dim) as u64);
 
         // The octave face agrees with the exact scores it was taken beside.
         for (score, octave) in carried.scores.iter().zip(&carried.octaves) {
-            let expected = if *score == 0 { 0 } else { 128 - score.unsigned_abs().leading_zeros() };
+            let expected = if *score == 0 {
+                0
+            } else {
+                128 - score.unsigned_abs().leading_zeros()
+            };
             assert_eq!(*octave, expected, "score {score}");
         }
 
         // And the addressed form agrees with the whole one on the rows it named.
         let named: Vec<u32> = vec![7, 0, 511, 256];
-        let addressed = resident.score(&readout, &query, dim, Some(&named)).expect("admissible");
+        let addressed = resident
+            .score(&readout, &query, dim, Some(&named))
+            .expect("admissible");
         for (slot, row) in named.iter().enumerate() {
             assert_eq!(addressed.scores[slot], carried.scores[*row as usize]);
         }
@@ -823,7 +880,10 @@ mod tests {
         };
         assert_eq!(population.exactly_equal_to(1), vec![1, 2, 4]);
         assert_eq!(population.exactly_equal_to(0), vec![0]);
-        assert_eq!(population.octave_census(), BTreeMap::from([(1, 1), (3, 1), (4, 3)]));
+        assert_eq!(
+            population.octave_census(),
+            BTreeMap::from([(1, 1), (3, 1), (4, 3)])
+        );
         assert_eq!(population.exact(2), Some(BigInt::from(9)));
     }
 }

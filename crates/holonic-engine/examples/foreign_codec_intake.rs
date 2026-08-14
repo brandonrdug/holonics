@@ -270,10 +270,7 @@ fn print_relations(carried: &CodecIntake) {
             .iter()
             .find(|block| block.contains(representative))
             .expect("every representative names a class");
-        let members: String = block
-            .iter()
-            .map(|symbol| spell(*symbol))
-            .collect();
+        let members: String = block.iter().map(|symbol| spell(*symbol)).collect();
         println!(
             "      class {:?}  {:<5}  {{{}}}",
             spell(*representative),
@@ -320,13 +317,7 @@ fn print_relations(carried: &CodecIntake) {
         );
         let pairs: Vec<String> = members
             .iter()
-            .map(|separation| {
-                format!(
-                    "{}|{}",
-                    spell(separation.left),
-                    spell(separation.right)
-                )
-            })
+            .map(|separation| format!("{}|{}", spell(separation.left), spell(separation.right)))
             .collect();
         for chunk in pairs.chunks(16) {
             println!("        {}", chunk.join(" "));
@@ -350,11 +341,7 @@ fn print_relations(carried: &CodecIntake) {
     } else {
         println!("\n    adjacency entries no input of any length decides -- a freedom, reported:");
         for (left, right) in &relations.gauge_freedom {
-            println!(
-                "      {:?} -> {:?}",
-                spell(*left),
-                spell(*right)
-            );
+            println!("      {:?} -> {:?}", spell(*left), spell(*right));
         }
     }
 
@@ -481,10 +468,7 @@ fn print_refusal(name: &str, refusal: &IntakeRefusal) {
     match refusal {
         IntakeRefusal::NoRelationRecovered { classes } => {
             for block in classes {
-                let members: String = block
-                    .iter()
-                    .map(|symbol| spell(*symbol))
-                    .collect();
+                let members: String = block.iter().map(|symbol| spell(*symbol)).collect();
                 println!("      the one class it returned: {{{members}}}");
             }
         }
@@ -993,11 +977,22 @@ fn main() {
             );
             println!(
                 "    word-runs  -> {:?}",
-                runs.codec.segment(input).expect("declared symbols only").iter().map(|token| spell_word(token)).collect::<Vec<_>>()
+                runs.codec
+                    .segment(input)
+                    .expect("declared symbols only")
+                    .iter()
+                    .map(|token| spell_word(token))
+                    .collect::<Vec<_>>()
             );
             println!(
                 "    characters -> {:?}",
-                chars.codec.segment(input).expect("declared symbols only").iter().map(|token| spell_word(token)).collect::<Vec<_>>()
+                chars
+                    .codec
+                    .segment(input)
+                    .expect("declared symbols only")
+                    .iter()
+                    .map(|token| spell_word(token))
+                    .collect::<Vec<_>>()
             );
         }
     }

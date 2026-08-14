@@ -105,7 +105,8 @@ impl ReadPlate {
 /// Seal one plate. The two digests are computed here and only here.
 pub fn seal(tag: SchemaTag, schema_version: u32, census: &Census, form: &[u8]) -> Vec<u8> {
     let census_octets = census.encode();
-    let mut plate = Vec::with_capacity(HEAD_OCTETS + census_octets.len() + form.len() + SEAL_OCTETS);
+    let mut plate =
+        Vec::with_capacity(HEAD_OCTETS + census_octets.len() + form.len() + SEAL_OCTETS);
     plate.extend_from_slice(&PLATE_MAGIC);
     plate.extend_from_slice(&PLATE_VERSION.to_le_bytes());
     plate.extend_from_slice(&tag.octets());
@@ -154,19 +155,19 @@ pub fn open(octets: &[u8]) -> Result<ReadPlate, PlateRefusal> {
     let tag_octets: [u8; 4] = octets[SCHEMA_TAG_AT..SCHEMA_TAG_AT + 4]
         .try_into()
         .expect("four");
-    let tag = SchemaTag::new(tag_octets).ok_or(PlateRefusal::SchemaTagMalformed {
-        found: tag_octets,
-    })?;
+    let tag =
+        SchemaTag::new(tag_octets).ok_or(PlateRefusal::SchemaTagMalformed { found: tag_octets })?;
     let schema_version = read_u32(octets, SCHEMA_VERSION_AT);
     let census_octets = read_u64(octets, CENSUS_OCTETS_AT);
     let form_octets = read_u64(octets, FORM_OCTETS_AT);
 
     let body = octets.len() - HEAD_OCTETS - SEAL_OCTETS;
-    let census_extent = usize::try_from(census_octets).map_err(|_| PlateRefusal::ExtentOverruns {
-        field: "census_octets",
-        declared: census_octets,
-        remaining: body as u64,
-    })?;
+    let census_extent =
+        usize::try_from(census_octets).map_err(|_| PlateRefusal::ExtentOverruns {
+            field: "census_octets",
+            declared: census_octets,
+            remaining: body as u64,
+        })?;
     if census_extent > body {
         return Err(PlateRefusal::ExtentOverruns {
             field: "census_octets",

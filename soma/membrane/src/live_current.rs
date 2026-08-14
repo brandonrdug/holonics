@@ -3523,7 +3523,10 @@ fn enact_host_population(
                                         (
                                             at,
                                             enact_host_current(
-                                                standing, currents[at], relations, regional,
+                                                standing,
+                                                currents[at],
+                                                relations,
+                                                regional,
                                             ),
                                         )
                                     })

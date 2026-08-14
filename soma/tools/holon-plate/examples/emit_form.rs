@@ -36,8 +36,8 @@ use holon_plate::schemas::current::CurrentDeed;
 use holon_plate::schemas::rebase::{BoundaryTerm, RebaseDeed};
 use holon_plate::schemas::training::TrainingDeed;
 use holonic_engine::algebraic::{CausalChain, ComparativeMultiplicity, GradedCausalComplex};
-use holonic_engine::conditioned_derivation::{expose, ConditionedBody};
 use holonic_engine::causal::EventId;
+use holonic_engine::conditioned_derivation::{expose, ConditionedBody};
 use holonic_engine::graded_complex_form::encode_native_bytes;
 use life::conditioned_rest::ConditionedRest;
 use life::holonic_training::{FaceAddress, SourceFace, TrainingEcology};
@@ -65,7 +65,8 @@ fn main() -> Result<(), String> {
         "CDER-DEED" => conditioned_deed(),
         other => return Err(format!("`{other}` is not a held schema\n{USAGE}")),
     };
-    std::fs::write(&out, &octets).map_err(|error| format!("cannot write {}: {error}", out.display()))?;
+    std::fs::write(&out, &octets)
+        .map_err(|error| format!("cannot write {}: {error}", out.display()))?;
     println!("{} octets -> {}", octets.len(), out.display());
     Ok(())
 }
@@ -191,7 +192,9 @@ fn rebase_form() -> Result<Vec<u8>, String> {
     let mut boundary = CausalChain::default();
     boundary.add_term(b, ComparativeMultiplicity::positive(1u32));
     boundary.add_term(a, ComparativeMultiplicity::negative(1u32));
-    complex.found_cell("ab", source, 1, boundary).map_err(debug)?;
+    complex
+        .found_cell("ab", source, 1, boundary)
+        .map_err(debug)?;
     encode_native_bytes(&complex).map_err(debug)
 }
 

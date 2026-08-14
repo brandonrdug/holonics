@@ -88,7 +88,10 @@ impl Plan {
             let path = RelPath::parse(operand)
                 .map_err(|refusal| PlanRefusal::at(line, PlanFault::Frame(refusal)))?;
             let Some(current) = foundings.last_mut() else {
-                return Err(PlanRefusal::at(line, PlanFault::BeforeAnyFounding(tag.into())));
+                return Err(PlanRefusal::at(
+                    line,
+                    PlanFault::BeforeAnyFounding(tag.into()),
+                ));
             };
             match tag {
                 "executable" => {
@@ -229,16 +232,13 @@ derived output/lean-proof-production/STDOUT.txt
     #[test]
     fn the_plan_refuses_an_absolute_mount() {
         let refusal = Plan::parse("founding f\nmount /etc/passwd\n").unwrap_err();
-        assert!(
-            refusal.to_string().contains("is absolute"),
-            "{refusal}"
-        );
+        assert!(refusal.to_string().contains("is absolute"), "{refusal}");
     }
 
     #[test]
     fn the_plan_refuses_one_path_returned_by_two_foundings() {
-        let refusal = Plan::parse("founding a\nreturn x.lean\nfounding b\nreturn x.lean\n")
-            .unwrap_err();
+        let refusal =
+            Plan::parse("founding a\nreturn x.lean\nfounding b\nreturn x.lean\n").unwrap_err();
         assert!(
             refusal.to_string().contains("returned by two foundings"),
             "{refusal}"

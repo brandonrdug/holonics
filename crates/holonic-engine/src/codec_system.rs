@@ -961,9 +961,10 @@ pub fn cross_check_over(
     };
     let joint_automaton = joint.shortest_separating_input(left, right)?;
 
-    let segmentations = |input: &[Symbol]| -> Result<(Vec<Vec<Symbol>>, Vec<Vec<Symbol>>), AdaptationError> {
-        Ok((left.segment(input)?, right.segment(input)?))
-    };
+    let segmentations =
+        |input: &[Symbol]| -> Result<(Vec<Vec<Symbol>>, Vec<Vec<Symbol>>), AdaptationError> {
+            Ok((left.segment(input)?, right.segment(input)?))
+        };
     let nerode_returns = match &nerode {
         Some((_, written)) => Some(segmentations(written)?),
         None => None,
@@ -1022,10 +1023,8 @@ mod tests {
     /// The fixture alphabet, declared once. `codec_recovery` speaks symbols; these fixtures speak
     /// text, and this is the translation — the same shape as that module's own test universe.
     fn universe() -> SymbolAlphabet {
-        SymbolAlphabet::from_chars(&[
-            ' ', ',', '-', '.', '0', '1', ';', '\t', '_', 'a', 'b', 'q',
-        ])
-        .expect("the fixture alphabet carries no repeat")
+        SymbolAlphabet::from_chars(&[' ', ',', '-', '.', '0', '1', ';', '\t', '_', 'a', 'b', 'q'])
+            .expect("the fixture alphabet carries no repeat")
     }
 
     fn text_codec(law: impl Fn(&str) -> Vec<String> + 'static) -> OpaqueSymbolCodec {
@@ -1131,8 +1130,13 @@ mod tests {
     }
 
     fn tokenizer_recovery() -> CodecRecovery {
-        recover(&tokenizer(), &chars_as_symbols(&TOKENIZER_ALPHABET), 3, TEST_APERTURES)
-            .expect("the family is admissible")
+        recover(
+            &tokenizer(),
+            &chars_as_symbols(&TOKENIZER_ALPHABET),
+            3,
+            TEST_APERTURES,
+        )
+        .expect("the family is admissible")
     }
 
     /// Real recovered codecs, from two different opaque targets, with materially different shapes:
@@ -1141,11 +1145,19 @@ mod tests {
     /// open across a dropped symbol, which is exactly the conduct the whole adaptation turns on.
     fn real_codecs() -> Vec<(&'static str, RecoveredCodec)> {
         let tokenizer_codec = tokenizer_recovery().codec.expect("the codec is recovered");
-        let soft = recover(&soft_join(), &chars_as_symbols(&['a', 'b', '_']), 4, TEST_APERTURES)
-            .expect("the family is admissible")
-            .codec
-            .expect("the codec is recovered");
-        assert_eq!(soft.boundary_between(sym('a'), sym('_')), Some(Boundary::Join));
+        let soft = recover(
+            &soft_join(),
+            &chars_as_symbols(&['a', 'b', '_']),
+            4,
+            TEST_APERTURES,
+        )
+        .expect("the family is admissible")
+        .codec
+        .expect("the codec is recovered");
+        assert_eq!(
+            soft.boundary_between(sym('a'), sym('_')),
+            Some(Boundary::Join)
+        );
         let (left, right, _) = undetermined(2);
         vec![
             ("tokenizer", tokenizer_codec),
@@ -1158,8 +1170,13 @@ mod tests {
     /// The two inequivalent codecs the `soft_join` recovery itself exhibits, and the input it named
     /// as separating them. Real recovered material, not hand-written tables.
     fn undetermined(radius: usize) -> (RecoveredCodec, RecoveredCodec, Vec<Symbol>) {
-        let recovery = recover(&soft_join(), &chars_as_symbols(&['a', 'b', '_']), radius, TEST_APERTURES)
-            .expect("the family is admissible");
+        let recovery = recover(
+            &soft_join(),
+            &chars_as_symbols(&['a', 'b', '_']),
+            radius,
+            TEST_APERTURES,
+        )
+        .expect("the family is admissible");
         let Some(Obstruction::UndeterminedCodec {
             left,
             right,
@@ -1640,9 +1657,15 @@ mod tests {
         // a token be held open across a dropped symbol, which no retained table does, and separate
         // at length three. A determined entry separates at length two. Without both the sweep
         // could not refute a length claim and could not distinguish the two implementations at all.
-        let word = codec.class_of(sym('a')).expect("the word class is recovered");
-        let digit = codec.class_of(sym('0')).expect("the digit class is recovered");
-        let space = codec.class_of(sym(' ')).expect("the space class is recovered");
+        let word = codec
+            .class_of(sym('a'))
+            .expect("the word class is recovered");
+        let digit = codec
+            .class_of(sym('0'))
+            .expect("the digit class is recovered");
+        let space = codec
+            .class_of(sym(' '))
+            .expect("the space class is recovered");
         for held in [word, digit] {
             let mut across = flipped(codec, held.0 as usize, space.0 as usize);
             across = flipped(&across, space.0 as usize, held.0 as usize);
@@ -1778,8 +1801,12 @@ mod tests {
     fn the_push_event_shadow_manufactures_a_separation_a_gauge_pair_does_not_have() {
         let recovery = tokenizer_recovery();
         let codec = recovery.codec.as_ref().expect("the codec is recovered");
-        let word = codec.class_of(sym('a')).expect("the word class is recovered");
-        let space = codec.class_of(sym(' ')).expect("the space class is recovered");
+        let word = codec
+            .class_of(sym('a'))
+            .expect("the word class is recovered");
+        let space = codec
+            .class_of(sym(' '))
+            .expect("the space class is recovered");
         let gauge = flipped(codec, word.0 as usize, space.0 as usize);
 
         // The production pair, on this exact material: nothing to report.
@@ -1837,8 +1864,12 @@ mod tests {
     fn the_push_event_shadow_disagrees_about_the_length_where_a_token_is_held_across_a_drop() {
         let recovery = tokenizer_recovery();
         let codec = recovery.codec.as_ref().expect("the codec is recovered");
-        let word = codec.class_of(sym('a')).expect("the word class is recovered");
-        let space = codec.class_of(sym(' ')).expect("the space class is recovered");
+        let word = codec
+            .class_of(sym('a'))
+            .expect("the word class is recovered");
+        let space = codec
+            .class_of(sym(' '))
+            .expect("the space class is recovered");
         let mut across = flipped(codec, word.0 as usize, space.0 as usize);
         across = flipped(&across, space.0 as usize, word.0 as usize);
 
@@ -1887,8 +1918,12 @@ mod tests {
     fn the_push_event_automaton_is_caught_by_the_refusal_that_guards_the_automaton_side() {
         let recovery = tokenizer_recovery();
         let codec = recovery.codec.as_ref().expect("the codec is recovered");
-        let word = codec.class_of(sym('a')).expect("the word class is recovered");
-        let space = codec.class_of(sym(' ')).expect("the space class is recovered");
+        let word = codec
+            .class_of(sym('a'))
+            .expect("the word class is recovered");
+        let space = codec
+            .class_of(sym(' '))
+            .expect("the space class is recovered");
         let gauge = flipped(codec, word.0 as usize, space.0 as usize);
 
         let system = CodecSystem::joint(&[codec, &gauge]).expect("comparable");
@@ -1936,8 +1971,12 @@ mod tests {
     fn a_reversed_input_order_names_a_different_equally_short_word_and_is_reported_as_a_tie() {
         let recovery = tokenizer_recovery();
         let codec = recovery.codec.as_ref().expect("the codec is recovered");
-        let word = codec.class_of(sym('a')).expect("the word class is recovered");
-        let digit = codec.class_of(sym('0')).expect("the digit class is recovered");
+        let word = codec
+            .class_of(sym('a'))
+            .expect("the word class is recovered");
+        let digit = codec
+            .class_of(sym('0'))
+            .expect("the digit class is recovered");
         let mut twice = flipped(codec, word.0 as usize, word.0 as usize);
         twice = flipped(&twice, digit.0 as usize, digit.0 as usize);
 
@@ -1958,11 +1997,7 @@ mod tests {
 
         let (_, written) = check.nerode.clone().expect("a separated pair");
         assert_ne!(written, named, "a tie needs two different words");
-        assert_eq!(
-            written.len(),
-            named.len(),
-            "a tie needs them equally short"
-        );
+        assert_eq!(written.len(), named.len(), "a tie needs them equally short");
         // Both really separate: this is a tie-break, not a wrong answer, and the return says so by
         // carrying neither `NerodeWordDoesNotSeparate` nor `LengthDisagreed`.
         for candidate in [&written, &named] {
@@ -2049,9 +2084,15 @@ mod tests {
     fn every_separation_species_is_produced_by_a_declared_control() {
         let recovery = tokenizer_recovery();
         let codec = recovery.codec.as_ref().expect("the codec is recovered");
-        let word = codec.class_of(sym('a')).expect("the word class is recovered");
-        let digit = codec.class_of(sym('0')).expect("the digit class is recovered");
-        let space = codec.class_of(sym(' ')).expect("the space class is recovered");
+        let word = codec
+            .class_of(sym('a'))
+            .expect("the word class is recovered");
+        let digit = codec
+            .class_of(sym('0'))
+            .expect("the digit class is recovered");
+        let space = codec
+            .class_of(sym(' '))
+            .expect("the space class is recovered");
         let gauge = flipped(codec, word.0 as usize, space.0 as usize);
         let mut across = flipped(codec, word.0 as usize, space.0 as usize);
         across = flipped(&across, space.0 as usize, word.0 as usize);

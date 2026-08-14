@@ -79,11 +79,12 @@ impl Census {
     /// malformed name each refuse; nothing is inferred and nothing is reordered on the way in.
     pub fn decode(octets: &[u8]) -> Result<Self, CensusRefusal> {
         let mut cursor = Cursor::new(octets);
-        let entries = usize::try_from(cursor.u64()?).map_err(|_| CensusRefusal::ExtentOverruns {
-            field: "entries",
-            declared: u64::MAX,
-            remaining: 0,
-        })?;
+        let entries =
+            usize::try_from(cursor.u64()?).map_err(|_| CensusRefusal::ExtentOverruns {
+                field: "entries",
+                declared: u64::MAX,
+                remaining: 0,
+            })?;
         let mut rows: Vec<(String, u64)> = Vec::new();
         for _ in 0..entries {
             let name_octets = cursor.u64()?;
@@ -175,13 +176,28 @@ pub enum CensusDisagreement {
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum CensusRefusal {
-    NameExtent { declared: u64 },
+    NameExtent {
+        declared: u64,
+    },
     NameNotAscii,
-    NameMalformed { name: String },
-    RepeatedName { name: String },
-    NotAscending { previous: String, found: String },
-    ExtentOverruns { field: &'static str, declared: u64, remaining: u64 },
-    TrailingOctets { octets: usize },
+    NameMalformed {
+        name: String,
+    },
+    RepeatedName {
+        name: String,
+    },
+    NotAscending {
+        previous: String,
+        found: String,
+    },
+    ExtentOverruns {
+        field: &'static str,
+        declared: u64,
+        remaining: u64,
+    },
+    TrailingOctets {
+        octets: usize,
+    },
 }
 
 impl fmt::Display for CensusRefusal {

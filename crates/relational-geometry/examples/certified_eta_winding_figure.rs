@@ -135,9 +135,12 @@ fn scan_bands(options: &WindingSurfaceOptions) -> Vec<BandOutcome> {
                         break;
                     };
                     let started = Instant::now();
-                    let receipt =
-                        eta_boundary_winding(&shared.receiver(band), &series, shared.boundary_depth)
-                            .map_err(|error| error.to_string());
+                    let receipt = eta_boundary_winding(
+                        &shared.receiver(band),
+                        &series,
+                        shared.boundary_depth,
+                    )
+                    .map_err(|error| error.to_string());
                     sender
                         .send(BandOutcome {
                             ordinal,

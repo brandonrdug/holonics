@@ -1738,18 +1738,14 @@ fn a_past_cone_that_wound_both_ways_is_not_a_past_cone_that_never_wound() {
     assert!(empty.standing_winding.is_zero() && !cancelled.standing_winding.is_zero());
 
     // The bounded restore witness takes the same branch for both and still represents.
-    assert!(
-        empty
-            .restore_meeting(&held)
-            .expect("the witness forms")
-            .represents(&meeting)
-    );
-    assert!(
-        cancelled
-            .restore_meeting(&held)
-            .expect("the witness forms")
-            .represents(&meeting)
-    );
+    assert!(empty
+        .restore_meeting(&held)
+        .expect("the witness forms")
+        .represents(&meeting));
+    assert!(cancelled
+        .restore_meeting(&held)
+        .expect("the witness forms")
+        .represents(&meeting));
 }
 
 #[test]

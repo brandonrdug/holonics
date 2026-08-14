@@ -329,9 +329,7 @@ fn run() -> Result<(), String> {
                             .nerode
                             .as_ref()
                             .zip(check.joint_automaton.as_ref())
-                            .is_none_or(|((_, left), right)| {
-                                left.len() == right.len()
-                            })
+                            .is_none_or(|((_, left), right)| left.len() == right.len())
                 }
                 _ => {
                     check.compression.collapsed.is_empty()

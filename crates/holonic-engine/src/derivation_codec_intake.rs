@@ -457,9 +457,7 @@ pub fn intake(
             // Text into symbols, at the one seam where the exterior codec meets the recovered one.
             let word: Vec<Symbol> = run
                 .chars()
-                .filter_map(|character| {
-                    alphabet.symbol_of(character.to_string().as_str())
-                })
+                .filter_map(|character| alphabet.symbol_of(character.to_string().as_str()))
                 .collect();
             for token in codec.segment(&word)? {
                 match order.get(&token).copied() {
@@ -801,13 +799,18 @@ mod tests {
 
     /// A word written over the declared alphabet.
     fn word(spelling: &str) -> Vec<Symbol> {
-        alphabet().spell(spelling).expect("fixture spellings are declared")
+        alphabet()
+            .spell(spelling)
+            .expect("fixture spellings are declared")
     }
 
     /// A segmentation, read back as spellings.
     fn spelled(segmentation: &[Vec<Symbol>]) -> Vec<String> {
         let declared = alphabet();
-        segmentation.iter().map(|token| declared.render(token)).collect()
+        segmentation
+            .iter()
+            .map(|token| declared.render(token))
+            .collect()
     }
 
     fn sym(character: char) -> Symbol {
@@ -969,7 +972,10 @@ mod tests {
         // the caller's statement rather than the encoding's. The classes are unchanged; only their
         // order is, and an index into a canonical order should never have been load-bearing.
         let spelled: Vec<BTreeSet<char>> = relations.classes.iter().map(spell_class).collect();
-        assert!(spelled.contains(&BTreeSet::from([' ', '.', '_'])), "{spelled:?}");
+        assert!(
+            spelled.contains(&BTreeSet::from([' ', '.', '_'])),
+            "{spelled:?}"
+        );
         assert!(
             spelled.contains(&('a'..='z').collect::<BTreeSet<char>>()),
             "{spelled:?}"
@@ -1009,7 +1015,10 @@ mod tests {
             .expect("a dropped symbol and an emitted one are separated");
         assert_eq!(separation.context_length(), 1);
         assert_eq!(
-            (alphabet().render(&separation.prefix).as_str(), alphabet().render(&separation.suffix).as_str()),
+            (
+                alphabet().render(&separation.prefix).as_str(),
+                alphabet().render(&separation.suffix).as_str()
+            ),
             ("", "")
         );
 
@@ -1022,7 +1031,15 @@ mod tests {
                 boundary: Boundary::Join
             }]
         );
-        assert_eq!(carried.retained.dropped.iter().filter_map(|s| alphabet().identity(*s)?.chars().next()).collect::<BTreeSet<char>>(), BTreeSet::from([' ', '.', '_']));
+        assert_eq!(
+            carried
+                .retained
+                .dropped
+                .iter()
+                .filter_map(|s| alphabet().identity(*s)?.chars().next())
+                .collect::<BTreeSet<char>>(),
+            BTreeSet::from([' ', '.', '_'])
+        );
     }
 
     /// **The declared control's refusal side.** Statistics that separate nothing supply no relation,
@@ -1257,18 +1274,15 @@ mod tests {
             accounted.foreign_lineage
         );
         assert!(
-            accounted
-                .foreign_lineage
-                .iter()
-                .any(|entry| {
-                    // Two things the rotation changed, both honest. The pair is written in class
-                    // order, which is now declaration order rather than ASCII collation, so either
-                    // hand may come first. And a symbol is named by its IDENTITY, which is a string
-                    // and renders with double quotes -- a `char` rendered `'a'` and could never have
-                    // named a multi-character symbol at all.
-                    entry == r#"class " " apart from "a" by context ""^"""#
-                        || entry == r#"class "a" apart from " " by context ""^"""#
-                }),
+            accounted.foreign_lineage.iter().any(|entry| {
+                // Two things the rotation changed, both honest. The pair is written in class
+                // order, which is now declaration order rather than ASCII collation, so either
+                // hand may come first. And a symbol is named by its IDENTITY, which is a string
+                // and renders with double quotes -- a `char` rendered `'a'` and could never have
+                // named a multi-character symbol at all.
+                entry == r#"class " " apart from "a" by context ""^"""#
+                    || entry == r#"class "a" apart from " " by context ""^"""#
+            }),
             "{:?}",
             accounted.foreign_lineage
         );
@@ -1587,7 +1601,10 @@ mod tests {
             runs.codec.segment(&separating).unwrap(),
             chars.codec.segment(&separating).unwrap()
         );
-        assert_eq!(spelled(&runs.codec.segment(&word("aa")).unwrap()), vec!["aa".to_owned()]);
+        assert_eq!(
+            spelled(&runs.codec.segment(&word("aa")).unwrap()),
+            vec!["aa".to_owned()]
+        );
         assert_eq!(
             spelled(&chars.codec.segment(&word("aa")).unwrap()),
             vec!["a".to_owned(), "a".to_owned()]

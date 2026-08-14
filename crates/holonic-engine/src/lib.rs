@@ -110,12 +110,12 @@ pub mod coupled_informant;
 pub mod cuda_aperture;
 #[cfg(target_os = "linux")]
 pub mod cuda_refine;
-pub mod embedding_fiber;
 #[cfg(target_os = "linux")]
 pub mod cuda_relation;
 pub mod derivation_atlas;
 pub mod device;
 pub mod diffusion;
+pub mod embedding_fiber;
 #[cfg(target_os = "linux")]
 pub mod hardware_cover;
 // The deposited derivation circuit conducted as an exact population current: `receiver_current`'s

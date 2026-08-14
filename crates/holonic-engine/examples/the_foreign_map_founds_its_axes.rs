@@ -495,7 +495,10 @@ fn sweep_on_the_card(
         widths
     );
 
-    let system = MapUnderObservation { transports, located };
+    let system = MapUnderObservation {
+        transports,
+        located,
+    };
 
     // **The card.** Refused by name if no device is present, rather than falling back to the host
     // and reporting a host figure as though the deed had been mounted.
