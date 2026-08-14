@@ -1163,6 +1163,12 @@ pub struct ExactStratifiedCrossing {
     pub at: usize,
     pub regime: ExactRefractionRegime,
     pub amplitude: ExactAnalyticInterfaceAmplitudeFiber,
+    /// The phase the current had accumulated when it arrived at this boundary.
+    ///
+    /// Carried per boundary and not only in total, because a reflection from here returns through
+    /// everything it came through: the round trip is this phase composed with itself, and that is
+    /// what decides whether two boundaries' reflections add or cancel.
+    pub phase_at: ExactWavePhaseTransport,
 }
 
 /// **A chain of interfaces, composed — and the conserved quantity is what carries it.**
@@ -1206,6 +1212,50 @@ impl ExactStratifiedStackReading {
     /// The stack transmitted to its far side without turning.
     pub fn transmits_whole(&self) -> bool {
         self.turning_point.is_none() && self.unreached_layers == 0
+    }
+
+    /// **The stack's composed reflection, coherently, as an exact rational pair.**
+    ///
+    /// Each boundary reflects `r_j`, and that reflection returns through everything it came
+    /// through, so it re-emerges carrying the **round trip** — this boundary's accumulated phase
+    /// composed with itself. The composed reflection is therefore
+    ///
+    /// ```text
+    ///   Gamma = sum_j  r_j * (phase_at_j)^2
+    /// ```
+    ///
+    /// returned as `(real, imaginary)` over `Rat`, because a rational rotation times a rational
+    /// coefficient is rational and nothing here needs a root.
+    ///
+    /// **This is first order: it sums each boundary's reflection once and does not re-reflect
+    /// between boundaries.** For a taper of small steps that is the regime the adiabatic claim
+    /// lives in; for large steps it is an approximation and must not be reported as the exact
+    /// scattering solution. `dimensional_wave::enact_wave` is the owner that resolves multiple
+    /// reflections, by conducting them.
+    ///
+    /// Boundaries that grazed or turned contribute nothing here: they returned no traveling
+    /// amplitude, and inventing one would be exactly the fabrication the fiber refuses.
+    pub fn composed_reflection(&self) -> (Rat, Rat) {
+        let mut real = Rat::zero();
+        let mut imaginary = Rat::zero();
+        for crossing in &self.crossings {
+            let ExactAnalyticInterfaceAmplitudeFiber::Traveling(coefficients) = &crossing.amplitude
+            else {
+                continue;
+            };
+            let round_trip = crossing.phase_at.compose(&crossing.phase_at);
+            real += &coefficients.reflection * &round_trip.cosine;
+            imaginary += &coefficients.reflection * &round_trip.sine;
+        }
+        (real, imaginary)
+    }
+
+    /// `|Gamma|^2` for the composed reflection — one exact rational, and the quantity the adiabatic
+    /// claim is about. It is a magnitude, so it is the face that cannot see the phase; the phase is
+    /// what produced it.
+    pub fn composed_reflection_square(&self) -> Rat {
+        let (real, imaginary) = self.composed_reflection();
+        &real * &real + &imaginary * &imaginary
     }
 }
 
@@ -1285,6 +1335,7 @@ pub fn exact_stratified_stack(
             at,
             regime,
             amplitude,
+            phase_at: accumulated_phase.clone(),
         });
         if turned {
             turning_point = Some(at);
@@ -2233,11 +2284,20 @@ mod tests {
             exact_stratified_stack(incident, normal, &phased, ExactRefractionHand::AlongNormal)
                 .unwrap();
 
-        // The magnitude face cannot tell them apart.
-        assert_eq!(
-            without.crossings, with.crossings,
-            "the intensity face MOVED"
-        );
+        // The magnitude face cannot tell them apart. It must be read FIELD BY FIELD, because the
+        // crossing carries both faces and comparing the whole struct would compare the phase too —
+        // the very coordinate this test says the magnitude cannot see.
+        assert_eq!(without.crossings.len(), with.crossings.len());
+        for (flat, phased) in without.crossings.iter().zip(&with.crossings) {
+            assert_eq!(flat.at, phased.at);
+            assert_eq!(flat.regime, phased.regime, "the regime MOVED");
+            assert_eq!(flat.amplitude, phased.amplitude, "the amplitude MOVED");
+            // And the phase face DOES move, boundary by boundary, which is what makes the
+            // agreement above a statement about faces rather than two identical readings.
+            if phased.at > 0 {
+                assert_ne!(flat.phase_at, phased.phase_at, "the phase did not move");
+            }
+        }
         assert_eq!(without.tangential_covector, with.tangential_covector);
         assert_eq!(without.turning_point, with.turning_point);
         assert_eq!(without.unreached_layers, with.unreached_layers);
