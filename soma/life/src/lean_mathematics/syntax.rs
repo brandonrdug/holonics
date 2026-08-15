@@ -198,6 +198,7 @@ pub(super) fn parse_declarations(
             .filter_map(tactic_species)
             .collect::<BTreeSet<_>>();
         let result_constructors = result_constructors(header);
+        let conclusion_relation = principal_relation(header);
         declarations.push(ParsedDeclaration {
             organ: LeanDeclarationOrgan {
                 source: document.path.clone(),
@@ -207,6 +208,7 @@ pub(super) fn parse_declarations(
                 tactic_species,
                 referenced_declarations: BTreeSet::new(),
                 result_constructors,
+                conclusion_relation,
             },
             proof,
         });
@@ -302,6 +304,86 @@ pub(super) fn first_top_level_colon(text: &str) -> Option<usize> {
         }
     }
     None
+}
+
+/// The relation symbols this reader recognises at depth zero in a conclusion.
+///
+/// The list is **the material's**, not a taxonomy: these are the symbols mathlib's own declarations
+/// put in that position, and one that never occurs costs nothing. What the list may not do is decide
+/// admissibility — that is [`principal_relation`]'s single-relation condition, and a conclusion the
+/// scan cannot resolve returns `None` and is counted rather than defaulted.
+const CONCLUSION_RELATIONS: [&str; 12] = [
+    "↔", "≠", "≤", "≥", "⊆", "∈", "∣", "∧", "∨", "=", "<", ">",
+];
+
+/// The **principal relation** of a declaration's conclusion, if the material exposes exactly one.
+///
+/// Two cuts before the scan, and both are structural rather than authored:
+///
+/// 1. the conclusion is the text after the first top-level `:`;
+/// 2. `→` is right-associative and binds loosest, so the text after the **last** top-level arrow is
+///    what the declaration actually concludes — everything before it is a hypothesis.
+///
+/// Then a conclusion carrying exactly one distinct depth-zero relation returns it. One carrying
+/// none, or several, returns `None`: **the reader does not guess a principal connective it cannot
+/// see.** That population is large and is meant to be reported, not absorbed — measured over
+/// mathlib, fewer than half of all declarations expose exactly one.
+pub(super) fn principal_relation(header: &str) -> Option<String> {
+    let colon = first_top_level_colon(header)?;
+    let conclusion = &header[colon + 1..];
+    let conclusion = match last_top_level_arrow(conclusion) {
+        Some(at) => &conclusion[at..],
+        None => conclusion,
+    };
+    let mut found: BTreeSet<String> = BTreeSet::new();
+    let bytes = conclusion.as_bytes();
+    let mut depth = 0i64;
+    for (byte, character) in conclusion.char_indices() {
+        match character {
+            '(' | '{' | '[' | '⟨' => depth += 1,
+            ')' | '}' | ']' | '⟩' => depth -= 1,
+            _ => {}
+        }
+        if depth != 0 {
+            continue;
+        }
+        // `:=` is not a relation, and neither is the `=` inside `≠` — which is one character here.
+        if character == '=' && byte > 0 && matches!(bytes.get(byte - 1), Some(b':' | b'=' | b'<' | b'>' | b'!')) {
+            continue;
+        }
+        if character == '=' && matches!(bytes.get(byte + 1), Some(b'=' | b'>')) {
+            continue;
+        }
+        for relation in CONCLUSION_RELATIONS {
+            if conclusion[byte..].starts_with(relation) {
+                found.insert(relation.to_owned());
+                break;
+            }
+        }
+    }
+    (found.len() == 1).then(|| found.into_iter().next().expect("exactly one"))
+}
+
+/// The byte offset just past the last top-level `→` or `->`.
+fn last_top_level_arrow(text: &str) -> Option<usize> {
+    let mut depth = 0i64;
+    let mut last = None;
+    for (byte, character) in text.char_indices() {
+        match character {
+            '(' | '{' | '[' | '⟨' => depth += 1,
+            ')' | '}' | ']' | '⟩' => depth -= 1,
+            _ => {}
+        }
+        if depth != 0 {
+            continue;
+        }
+        if character == '→' {
+            last = Some(byte + character.len_utf8());
+        } else if character == '-' && text[byte..].starts_with("->") {
+            last = Some(byte + 2);
+        }
+    }
+    last
 }
 
 pub(super) fn result_constructors(header: &str) -> BTreeSet<LeanResultConstructor> {

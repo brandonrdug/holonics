@@ -118,12 +118,44 @@ pub struct LeanDeclarationOrgan {
     /// statement itself departs; this exact structural chart is sufficient to induce lawful
     /// eliminations such as conjunction projection without mounting a target-specific proof.
     pub result_constructors: BTreeSet<LeanResultConstructor>,
+    /// The **principal relation** of this declaration's conclusion, when the material exposes
+    /// exactly one at depth zero after the last top-level arrow.
+    ///
+    /// `None` is a real return and not a missing measurement: the conclusion carried no depth-zero
+    /// relation, or it carried several and the reader will not guess which binds loosest. It is the
+    /// component `H.0362` calls `v`, and it is what decides whether a declaration can carry a
+    /// rewrite at all — [`LeanDeclarationOrgan::rewritable`].
+    #[serde(default)]
+    pub conclusion_relation: Option<String>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum LeanResultConstructor {
     Conjunction,
+}
+
+impl LeanDeclarationOrgan {
+    /// Whether this declaration can carry a **rewrite** at all.
+    ///
+    /// `rw [d]` demands that `d` conclude in an equality or an iff — Lean says so in as many words
+    /// when it refuses: *"Invalid rewrite argument: Expected an equality or iff proof."* It is
+    /// `H.0362`'s `v` deciding an edge species before any kernel runs, and it is the whole content
+    /// of the largest structural refusal this body has produced: on a seven-declaration corpus, five
+    /// of the seven conclude in something else and the emission offered each of them twenty-one
+    /// rewrites, for exactly the 105 refusals the kernel returned.
+    ///
+    /// `None` — the conclusion exposed no single depth-zero relation — is **not rewritable**. A
+    /// reader that cannot see what a declaration concludes may not license a transport by it.
+    pub fn rewritable(&self) -> bool {
+        matches!(self.conclusion_relation.as_deref(), Some("=") | Some("↔"))
+    }
+
+    /// The conclusion's principal relation, or `"?"` when the material exposed none the reader could
+    /// resolve. The placeholder is a **display** convenience and never enters a decision.
+    pub fn relation_label(&self) -> &str {
+        self.conclusion_relation.as_deref().unwrap_or("?")
+    }
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
@@ -140,6 +172,15 @@ pub struct LeanConditioningReceipt {
     pub mounted_codecs: BTreeSet<String>,
     pub tactic_species: BTreeSet<String>,
     pub result_constructors: BTreeSet<LeanResultConstructor>,
+    /// The **principal relation** of this declaration's conclusion, when the material exposes
+    /// exactly one at depth zero after the last top-level arrow.
+    ///
+    /// `None` is a real return and not a missing measurement: the conclusion carried no depth-zero
+    /// relation, or it carried several and the reader will not guess which binds loosest. It is the
+    /// component `H.0362` calls `v`, and it is what decides whether a declaration can carry a
+    /// rewrite at all — [`LeanDeclarationOrgan::rewritable`].
+    #[serde(default)]
+    pub conclusion_relation: Option<String>,
     /// Complete kernel-return events which changed the continuing proof morphology.
     pub kernel_return_events: u64,
     /// Crossed proof paths admitted by the exterior Lean kernel.

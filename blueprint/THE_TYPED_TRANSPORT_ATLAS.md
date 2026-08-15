@@ -161,9 +161,18 @@ lines that carry their own former.
 not load-bearing for the species reading, and the movement must say so rather than presenting a green
 suite as evidence.
 
-### THE CONCLUSION CARRIES ITS RELATION
+### THE CONCLUSION CARRIES ITS RELATION — **COMPLETE 2026-08-14**
 
 *`v`. Small, independent of the gate below it, and it alone decides 105 of the 213.*
+
+**Returned.** `LeanDeclarationOrgan::{conclusion_relation, rewritable}`, and **the kernel adjudicated
+it seven of seven with both disagreement arms live** — every corpus declaration submitted as a real
+`rw [d]` and graded against Lean's own refusal. Census over the library: `=` 58,040, **UNCLASSIFIED
+48,316 (37.8%)**, `↔` 5,480, rewritable **63,520 of 127,735**. Two bounds carried: the unclassified
+population is treated as not rewritable, which costs **missed edges** rather than correctness; and
+the emission's reader **refuses 622 of 7,516 documents outright**, which bounds what any emission
+built on it can see.
+[The record](../research/records/2026-08-14_THE_CONCLUSION_CARRIES_ITS_RELATION_AND_THE_KERNEL_AGREES_SEVEN_OF_SEVEN.md).
 
 **Build.** Widen `LeanResultConstructor` and the walk at `syntax.rs:307-331` to return the relation
 species the material actually exposes at depth zero. The species are read off the corpus, not

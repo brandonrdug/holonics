@@ -4,7 +4,7 @@
 # Regenerate: python3 tools/output_manifest.py
 # Verify:     python3 tools/output_manifest.py --check
 # Listing:    python3 tools/output_manifest.py --files
-# 44 drivers, 15147 returns, 9995517901 bytes.
+# 45 drivers, 15154 returns, 9995520720 bytes.
 sha256	returns	bytes	driver
 855279871852bffe08c83a0e50006b769da3b296934115faa809561b7cbdd304	7	1274	output/agentic-research-kernel
 b90b799580f0c51bd6ffe0009fc0fcd9eb9f20feb54972ca44ad4297b6252430	8	46304	output/analytic-field-transport
@@ -37,6 +37,7 @@ a7343ab3715a891e31bb757e414553c5cf0be9d5a28ce5dc9ae66ebe37903759	213	135074	outp
 7fc072a5966ce52c368c500496f4bf5bcd43b36892f5e2ec3102ff56b8be2a32	213	135074	output/lean-proof-production-mathlib-frame
 cf87fcb7ccdb9cd3649275a1731c3c011ab2fe8db8fd5ca161fd8c82d9331c55	3	5239843	output/reintegrating-elaboration
 d5d4be0ce4e0da0f152d1bc1008f91006fba3e355d75dde239af483f33487e88	58	1443881689	output/source-revival
+9700fc7e5670dcf65e49dcadfc042c574a16d345c89c9b552125bba401904887	7	2819	output/the-conclusion-carries-its-relation
 23cbda6a5d82bf44e4037f4cbcc09c9570be6b7eec27af0d6fb624c627be20fb	18	148356	output/the-kernel-decides-which-moves-are-load-bearing
 bcb7bd027c399a57a2f7acf8de054227fc251736109b2a9ec3b596712d424510	256	5229153	output/the-reading-returns
 b5a3ff8a8b0f6c0d9f8f51217e25f1d5ca1d55164b9abd79acd96d36c3d94474	258	175889	output/the-returned-difference-is-a-ratio

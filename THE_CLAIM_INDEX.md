@@ -107,7 +107,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (92 deposits of 384)
+## 4 · The 2026-08 record line (93 deposits of 385)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -199,6 +199,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-14_THE_BINDING_IS_READ_WHERE_IT_IS_WRITTEN_AND_THE_ARRIVAL_GRAPH_NEARLY_DOUBLED.md` | The binding is read where it is written, and the arrival graph nearly doubled |
 | `2026-08-14_THE_CENSUS_DECAYED_THE_CYCLE_IS_BUILT_AND_THE_OPEN_GRADE_IS_THE_NONIDENTICAL_NEIGHBOURHOOD.md` | The census decayed, the cycle is already built, and the open grade is the nonidentical neighbourhood |
 | `2026-08-14_THE_CENTRIFUGE_IS_BUILT_AND_IT_SEPARATES_BY_SPELLING.md` | The centrifuge is built, it runs on mathematics, and it separates by spelling |
+| `2026-08-14_THE_CONCLUSION_CARRIES_ITS_RELATION_AND_THE_KERNEL_AGREES_SEVEN_OF_SEVEN.md` | The conclusion carries its relation, and the kernel agrees seven of seven |
 | `2026-08-14_THE_CORRESPONDENCES_ARE_OWNED_AND_THE_ROTATIONAL_CHART_IS_AN_INSTANCE_NOT_AN_ORGAN.md` | The correspondences are owned, and the rotational chart is an instance rather than an organ |
 | `2026-08-14_THE_CYCLE_CLOSED_ON_REAL_MATHEMATICS_AND_THE_RATIO_IS_THE_ONLY_READING_THAT_CROSSES.md` | The cycle closed on real mathematics, and the ratio is the only reading that crosses |
 | `2026-08-14_THE_EMISSION_HAS_NO_CHART_TRANSITION_BETWEEN_THE_GOAL_FRAME_AND_THE_LEMMA_FRAME.md` | The emission has no chart transition between the goal's frame and the lemma's |
