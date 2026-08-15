@@ -84,6 +84,37 @@ deposited in one day for want of them.** These orient reasoning; none schedules 
 | `canon/TABLET_THE_COMPRESSION.md` | **what compression is, ratified 2026-08-14**: a codec pivot carrying a declared decoder, the three species by remainder, the linear ceiling and the four hypotheses it needs, and the cost as a second axis. **Its governing correction is that the invariance is ADDITIVE** — a difference against a declared machine, never a ratio — so a compression figure quoted without its decoder is the absolute-volume violation, and it names the 2024 result that is commonly quoted in violation of it. |
 | `canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md` | **the finger-trap correction, ratified 2026-08-12**: the machine already has the bounded organs; intelligence is circulation through the terrain those passages change; software nouns are receiver shadows; heat requires typed incidence and constitutive law; compression retains its ReconstructionFiber; and composition precedes new semantic owners. It is doctrine, not a construction schedule. |
 
+### The entry rule, and it is checkable — convicted 2026-08-15
+
+**Name the document that owns the subject, and quote the line you entered by, before diagnosing a
+behaviour or proposing a construction.** If you cannot name it, you have not entered; grep is not an
+entry point and a symbol search is not orientation.
+
+**This exists because the whole network above was ignored for nine hours by a session that had read
+its descriptions.** The engine's own termination condition — *the middle stroke terminates exactly
+when the reflection group is finite, and an engine that cannot say what regime its material is in is
+choosing strokes blind* — has been in `canon/THE_INFORMATION_ENGINE.md` §1.1 since 2026-08-13. The
+session diagnosing a driver that pinned one core and never returned never opened the file. It had
+read the row describing it in the table above and treated the description as the document.
+
+> **That is `§8`'s first rule turned on your own reading: grade the document, not its receipt.** A
+> one-line summary in this file is a pointer, and a pointer is not the thing. The same defect that
+> carries a capability claim forward without opening its owner carries a canon document forward
+> without opening it.
+
+Three entry points exist for exactly this and cost nothing:
+
+- **`THE_CLAIM_INDEX.md`** when you do not know which file owns a subject;
+- **`canon/THE_OWNER_ATLAS.md`** when you need who implements it and at what line — and note its own
+  occasion, that this question *"cost four full network sweeps in one evening"* on 2026-08-13;
+- **`canon/THE_TIMELINE.md`** when the subject is a *behaviour*, because it carries the corrections
+  that have been issued more than once and a symptom seen three days running is in it.
+
+**And the bias this rule is aimed at:** reading a canon document produces no commit, while a symbol
+search produces something to change immediately. A session optimising for its next action will skip
+orientation every time, and the observable signature is hotfixes, aperture changes in place of
+diagnoses, and counts offered as progress.
+
 **The one sentence that orders the rest**, held for ninety-two days across five model changes and
 every renamed organ, and measured from his own record on 2026-08-10:
 
