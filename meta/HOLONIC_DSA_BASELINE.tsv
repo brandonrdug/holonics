@@ -162,7 +162,7 @@ soma/life/src/laboratory_language.rs	.clone()=36	.collect()=46	.flat_map()=5	.in
 soma/life/src/laboratory_language/repository.rs	.clone()=7	.collect()=3	.into_iter()=1	BTreeMap=3	BTreeSet=8	Vec=22
 soma/life/src/lean_mathematics.rs	.clone()=1	.collect()=1	.into_iter()=1	BTreeSet=9	Vec=3
 soma/life/src/lean_mathematics/ecology.rs	.clone()=24	.collect()=5	.flat_map()=1	BTreeSet=6	Vec=5
-soma/life/src/lean_mathematics/syntax.rs	.clone()=6	.collect()=10	BTreeSet=10	Vec=17
+soma/life/src/lean_mathematics/syntax.rs	.clone()=6	.collect()=10	.into_iter()=1	BTreeSet=12	Vec=17
 soma/life/src/lean_mathematics/tests.rs	.collect()=1	BTreeSet=3	Vec=1
 soma/life/src/live_current_cuda.rs	BTreeMap=3
 soma/life/src/live_current_cuda/executor.rs	.clone()=1	.collect()=6	.flat_map()=3	.into_iter()=1	BTreeMap=3	Vec=44
