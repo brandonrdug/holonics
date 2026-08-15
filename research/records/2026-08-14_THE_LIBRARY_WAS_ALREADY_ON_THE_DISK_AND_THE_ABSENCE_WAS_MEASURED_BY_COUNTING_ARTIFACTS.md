@@ -227,9 +227,56 @@ with *"unknown module prefix"* has been refused by a path variable. Until today 
 ever produced the second kind on this corpus, and 16 of the 22 obstructions in the driver's own
 main deed are still of that kind.
 
-**What would sharpen this next:** pose a theorem whose statement is *not* in the corpus, so that no
-single recruitment can close it and a composition is required. The apparatus for that is now
-present; the material choice is the open question.
+### The emission is a template product, and that corrects the paragraph this replaces
+
+This section first proposed *"pose a theorem whose statement is not in the corpus, so no single
+recruitment can close it and a composition is required."* Brandon asked what that meant, and
+measuring it refuted the premise. **The generator already composes.** Over the 213 rendered files:
+
+```text
+    3 paths name ZERO corpus declarations   (bare closers: ring, nlinarith, assumption)
+   84 paths name ONE
+  126 paths name TWO      <- composition, and all 126 were refused
+```
+
+A composed path, verbatim from `proportional-flow-respects-capacity-00120.lean`:
+
+```lean
+rw [proportionalFlow_column_sum]
+have generated := total_demand_le_total_capacity demand capacity incident hc hcong
+assumption
+```
+
+**All four admissions name exactly one declaration.** So the split is not retrieval-versus-nothing;
+it is that the one-lemma applications landed and no two-lemma composition did.
+
+**And abstracting the declaration names leaves 58 distinct shapes, which are a product rather than a
+search:**
+
+```text
+  rw [D] ; have generated := D <args> ; {ring | nlinarith | assumption}
+  apply D ; apply D ; assumption          apply D ; apply D ; apply D ; assumption
+  exact D <args>                          simpa using D <args>
+  contrapose! h ; exact D <args>
+```
+
+× 7 recruited declarations × six argument spellings × three closing tactics. **Nothing in the loop is
+goal-directed** — the emission cannot ask what the goal became after a `rw` and choose the next step
+from it. A harder theorem would therefore return 213 obstructions and nothing else, which is
+information but weak information at 386 seconds of kernel occupancy.
+
+### What the measurement points at instead: the returns are dropped
+
+The kernel returned **209 specific mathematical diagnostics** and **nothing consumes them.** They are
+printed and discarded. In the spine's terms that is a leak — radiate happened, the world returned,
+reflect and deposit did not.
+
+**The organ exists.** `lean_mathematics/ecology.rs:1016 receive_kernel_deed_returns` turns a real
+kernel return into changed standing, validated by `validate_kernel_run:1074`, and
+`the_second_theorem_is_reachable_only_after_the_return.rs` drives it. It is simply not wired to this
+family. That is the composition to attempt before proposing any new organ, and it is the honest next
+edge: **209 exterior returns on real mathematics, unabsorbed, against an organ built to absorb
+them.**
 
 ---
 
