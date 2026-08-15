@@ -39,16 +39,22 @@
 //!   exactly the admitted proofs that named it. The conduct is removed *by removing structure*,
 //!   not by subtracting a constant from a counter.
 //!
-//! ## The corpus gap, stated once
+//! ## The corpus gap — CLOSED 2026-08-14, and the old text is carried
 //!
-//! Conditioning is text-level and reaches the whole tracked corpus. **Kernel checking does not.**
-//! `elementary-holonics` and `rh-source-transport` both `require mathlib`, whose package cache is
-//! not materialized under `soma/formal`, so no verdict is available for a theorem posed in their
-//! environment. The kernel loop below therefore runs in `soma/formal/kernel-witness`, the one
-//! project in the tree that Lean core alone can check. The driver still poses the laboratory's own
-//! held-out theorem against the mathlib corpus and returns the generated proof paths, so the reach
-//! of the generator over real material is visible up to the exact point where the missing
-//! environment stops it.
+//! Conditioning is text-level and reaches the whole tracked corpus. Kernel checking used not to.
+//! This read: *"`elementary-holonics` and `rh-source-transport` both `require mathlib`, whose
+//! package cache is not materialized under `soma/formal`, so no verdict is available for a theorem
+//! posed in their environment."* It was true when written and is no longer: the packages are
+//! vendored (7,516 mathlib modules at rev `a3a10db0`) and the library is built — 7,523 oleans
+//! including `Mathlib.olean`, recovered from the library's own published cache by
+//! `lake exe cache get` in two minutes with nothing downloaded.
+//!
+//! The kernel loop below still runs in `soma/formal/kernel-witness` because it is fast and offline,
+//! which suits an ablation that runs many times. **That is now a declared cost choice and no
+//! longer a constraint.** A deed wanting a verdict against real mathematics passes
+//! `soma/formal/elementary-holonics` to `LeanKernelWorld::new`, which has always taken the project
+//! root as a parameter, and declares the aperture: a file importing all of mathlib elaborates in
+//! 10.2 s against `kernel-witness`'s sub-second.
 //!
 //! Run:
 //!

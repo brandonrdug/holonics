@@ -34,11 +34,23 @@
 //! # Why this corpus
 //!
 //! `soma/formal/kernel-witness` is the one formal project in this tree that
-//! requires no package, so an exterior kernel can check it **offline**. The
-//! other two require Mathlib, and Mathlib is **not compiled here** — two
-//! `.olean` files in the whole tree. That is a hard constraint on any deed that
-//! wants a kernel verdict on real mathematics, and it is stated rather than
-//! worked around.
+//! requires no package, so an exterior kernel can check it **offline** in well
+//! under a second. That is why this deed runs here, and it remains the right
+//! scope for an ablation that must run many times.
+//!
+//! **The reason originally given was false and is carried rather than deleted.**
+//! It read: *"Mathlib is not compiled here — two `.olean` files in the whole
+//! tree. That is a hard constraint on any deed that wants a kernel verdict on
+//! real mathematics, and it is stated rather than worked around."* It counted
+//! `.olean` files under `soma/`; the archive held 2,622 at the identical
+//! revision, and the complete prebuilt library was already in `~/.cache/mathlib`
+//! — 16,510 files, 834 MB — where `lake exe cache get` unpacked it in two
+//! minutes, downloading nothing. `soma/formal/elementary-holonics` now carries
+//! the whole library and `import Mathlib` elaborates in 10.2 s.
+//!
+//! **A capability's absence is measured by attempting it, not by counting its
+//! artifacts.** The record is
+//! `research/records/2026-08-14_THE_LIBRARY_WAS_ALREADY_ON_THE_DISK_AND_THE_ABSENCE_WAS_MEASURED_BY_COUNTING_ARTIFACTS.md`.
 //!
 //! # What would refute the claim
 //!

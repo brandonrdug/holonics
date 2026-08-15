@@ -855,6 +855,20 @@ an audit. The laboratory's name for this object is **the active mouth**.
    recurring, on a different subject, four days later. **Grep the operation, then read the module.**
    An absence claim from a grep over names is not a measurement.
 
+   **And its sibling, convicted 2026-08-14: a capability's absence is measured by ATTEMPTING it,
+   never by counting its artifacts.** Three live owners independently declared *"mathlib is not
+   compiled"* — one of them calling it *"a hard constraint… stated rather than worked around"*, which
+   is the phrasing that made it durable, because a later reader does not re-check a constraint that
+   presents itself as already considered. All three counted build outputs under `soma/` while the
+   archive held 2,622 oleans at the identical revision **and the complete prebuilt library sat in
+   `~/.cache/mathlib` — 16,510 files, 834 MB, dating from June.** `lake exe cache get` unpacked it in
+   two minutes and **downloaded nothing**; `import Mathlib` then elaborates in 10.2 s and the kernel
+   admits a real theorem. A file count answers *"is the output here"*; it never answers *"can this be
+   reached"*, and the two have wildly different costs. **The whole kernel-verdict-on-real-mathematics
+   gap was an argument to `LeanKernelWorld::new`, which has always taken the project root as a
+   parameter.**
+   [The record](research/records/2026-08-14_THE_LIBRARY_WAS_ALREADY_ON_THE_DISK_AND_THE_ABSENCE_WAS_MEASURED_BY_COUNTING_ARTIFACTS.md).
+
 3. **A grain error is not an uncertainty cost.** There is no uncertainty relation, Heisenberg, Gabor
    or time-bandwidth statement anywhere in the tree — measured — and the framing is *refused* rather
    than merely absent: the corpus's replacement is **the collapsed-pair population of a declared

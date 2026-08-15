@@ -23,12 +23,26 @@
 
 set -uo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-LAKE="$ROOT/archive/cpp-engine/formal/elementary-holonics/.lake"
 
-if [ ! -d "$LAKE/packages/mathlib/.lake/build/lib/lean" ]; then
-  echo "the built mathlib is not where this script expects it:"
-  echo "  $LAKE/packages/mathlib/.lake/build/lib/lean"
-  echo "nothing here builds mathlib; if the archive moved, this path moves with it."
+# The LIVE tree is preferred and the archive is the fallback. Until 2026-08-14 only the archive
+# carried a build, and it was PARTIAL -- 2,622 oleans, the transitive closure of what these nine
+# files import, out of 7,516 mathlib source modules. `Mathlib.olean` did not exist, so `import
+# Mathlib` was unavailable and every kernel deed ran in `kernel-witness`, which imports nothing.
+# The live tree now carries the whole library, fetched from mathlib's own olean cache at the rev
+# the manifest already pinned. It is not a compile: `lake exe cache get`, ~2 minutes.
+LIVE="$ROOT/soma/formal/elementary-holonics/.lake"
+ARCHIVE="$ROOT/archive/cpp-engine/formal/elementary-holonics/.lake"
+
+if [ -f "$LIVE/packages/mathlib/.lake/build/lib/lean/Mathlib.olean" ]; then
+  LAKE="$LIVE"
+elif [ -d "$ARCHIVE/packages/mathlib/.lake/build/lib/lean" ]; then
+  LAKE="$ARCHIVE"
+  echo "note: falling back to the archived PARTIAL mathlib build; \`import Mathlib\` will fail."
+else
+  echo "no built mathlib in either location:"
+  echo "  $LIVE/packages/mathlib/.lake/build/lib/lean   (live, preferred)"
+  echo "  $ARCHIVE/packages/mathlib/.lake/build/lib/lean (archive, partial)"
+  echo "recover it with:  cd soma/formal/elementary-holonics && lake exe cache get"
   exit 2
 fi
 
@@ -67,7 +81,9 @@ for project in "$ROOT"/soma/formal/*/; do
       printf '%s' "$out" | sed 's/^/         /' | head -4
       issue=$((issue + 1))
     fi
-  done < <(cd "$project" && find . -name '*.lean' | sort)
+    # `.lake/packages/` holds vendored dependency SOURCE — mathlib alone is 7,516 files.
+    # Those are not this project's mathematics and checking them here does not terminate.
+  done < <(cd "$project" && find . -name '*.lean' -not -path './.lake/*' | sort)
 done
 
 echo
