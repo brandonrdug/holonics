@@ -547,6 +547,15 @@ impl LeanMathematicsEcology {
         &self,
         problem: &LeanProofProblem,
     ) -> Result<(LeanDeclarationNames, Vec<LeanProofCandidate>), LeanMathematicsError> {
+        self.generate_proof_candidates_at(problem, EmissionGrain::Inherited)
+    }
+
+    /// Generate at a declared emission grain. See [`EmissionGrain`].
+    pub fn generate_proof_candidates_at(
+        &self,
+        problem: &LeanProofProblem,
+        grain: EmissionGrain,
+    ) -> Result<(LeanDeclarationNames, Vec<LeanProofCandidate>), LeanMathematicsError> {
         problem.validate()?;
         let target_binders =
             parse_binder_charts(&format!("{}\n{}", problem.prefix, problem.theorem_header));
@@ -612,7 +621,10 @@ impl LeanMathematicsEcology {
             )?;
         }
         for (organ, organ_name) in organs.iter().zip(&organ_names) {
-            let application = declaration_application(organ, &target_names);
+            let application = match grain {
+                EmissionGrain::Inherited => declaration_application(organ, &target_names),
+                EmissionGrain::Typed => declaration_application_in_frame(organ, &target_names),
+            };
             for (prefix, motion) in [
                 (
                     "exact",
@@ -664,6 +676,11 @@ impl LeanMathematicsEcology {
                 }
             }
             for closer in &closers {
+                // **`rw` demands an equality or an iff.** At the typed grain the node's `v` decides
+                // this before the kernel is asked; at the inherited grain it was offered to every
+                // organ, which is the whole of the 105 structural refusals a seven-declaration
+                // corpus returned.
+                if grain == EmissionGrain::Inherited || organ.rewritable() {
                 push_candidate(
                     &mut candidates,
                     format!("by\n  rw [{}]\n  {closer}", organ.name),
@@ -677,6 +694,7 @@ impl LeanMathematicsEcology {
                     ],
                     LocalSet::from([Arc::clone(organ_name)]),
                 )?;
+                }
                 push_candidate(
                     &mut candidates,
                     format!("by\n  have generated := {application}\n  {closer}"),
@@ -723,10 +741,35 @@ impl LeanMathematicsEcology {
             .iter()
             .filter(|binder| binder.explicit && binder.name.starts_with('h'))
         {
+            // **`contrapose!` changes the TYPE of the hypothesis it names**, and the node does not
+            // model that. `ℋ` — `H.0362`'s hypotheses-and-branch-data — is the component, and it is
+            // not tracked across a tactic that rewrites a hypothesis in place: the emission feeds
+            // the post-contrapose `hc` into a slot typed for the pre-contrapose one, which is an
+            // `Application type mismatch` however correct the arity.
+            //
+            // The recognition arm found this rather than assuming it: with `rw` gated on `v` and
+            // every application built in frame, **every surviving structural refusal came from this
+            // family**. A typed emission may not offer an edge it cannot type, so the family is
+            // inadmissible at this grain — a declared **coverage** bound, like an unclassified
+            // conclusion, and not a correctness one.
+            if grain == EmissionGrain::Typed {
+                continue;
+            }
             let hypothesis_name = Arc::<str>::from(hypothesis.name.as_str());
             for (organ, organ_name) in organs.iter().zip(&organ_names) {
                 let application =
-                    declaration_application_with_substitute(organ, &target_names, &hypothesis.name);
+                    match grain {
+                        EmissionGrain::Inherited => declaration_application_with_substitute(
+                            organ,
+                            &target_names,
+                            &hypothesis.name,
+                        ),
+                        EmissionGrain::Typed => declaration_application_in_frame_with_substitute(
+                            organ,
+                            &target_names,
+                            &hypothesis.name,
+                        ),
+                    };
                 push_candidate(
                     &mut candidates,
                     format!(
@@ -742,11 +785,20 @@ impl LeanMathematicsEcology {
             }
         }
         for (rewrite, rewrite_name) in organs.iter().zip(&organ_names) {
+            // The composed family rewrites by one organ and introduces another. Its rewrite half is
+            // governed by the same `v`, and at the inherited grain it is the larger source of the
+            // structural refusals: `D(D-1)C` of them against the single family's `DC`.
+            if grain == EmissionGrain::Typed && !rewrite.rewritable() {
+                continue;
+            }
             for (fact, fact_name) in organs.iter().zip(&organ_names) {
                 if rewrite.name == fact.name {
                     continue;
                 }
-                let application = declaration_application(fact, &target_names);
+                let application = match grain {
+                    EmissionGrain::Inherited => declaration_application(fact, &target_names),
+                    EmissionGrain::Typed => declaration_application_in_frame(fact, &target_names),
+                };
                 for closer in &closers {
                     push_candidate(
                         &mut candidates,

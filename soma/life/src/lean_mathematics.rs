@@ -120,6 +120,27 @@ pub struct LeanBinderChart {
     pub type_text: String,
 }
 
+/// Whether an emission is typed by the node it recruits, or offers every family to every organ.
+///
+/// `Inherited` is what every caller got before 2026-08-14 and remains the default, so nothing that
+/// stands moves. `Typed` consults `H.0362`'s `(D, v)` before offering an edge:
+///
+/// - `rw [d]` is offered only where `d` concludes in an equality or an iff — that is
+///   [`LeanDeclarationOrgan::rewritable`], and the untyped emission offered it to every organ,
+///   producing exactly the 105 structural refusals a seven-declaration corpus returned;
+/// - an application is built **in the recruited declaration's own frame**, position by position,
+///   with `_` where the goal supplies no binder of that name — rather than by intersecting two
+///   frames' binder names and silently dropping the rest.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum EmissionGrain {
+    /// Every family offered to every organ, arguments by name intersection.
+    #[default]
+    Inherited,
+    /// Families gated by `v`, arguments positional in the organ's own domain.
+    Typed,
+}
+
 /// How a binder is written, which decides whether it occupies a positional argument slot.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]

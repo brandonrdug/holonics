@@ -1,7 +1,7 @@
 # The typed transport atlas
 
 **Date:** 2026-08-14
-**Status:** the active construction plan. Nothing in it is built. It supersedes the sequencing in
+**Status:** **COMPLETE 2026-08-14 — all six movements returned.** It supersedes the sequencing in
 `THE_ROADMAP.md` §"THE TRANSPORT ATLAS" and regrades what that section reports.
 **Occasion:** Brandon: *"this sounds like a malformed/failed implementation state and you're
 identifying the parts of our theories that were neglected. Review and audit, correct the design plan
@@ -225,9 +225,16 @@ recognition law over material it never read.
 **The instrument is already standing.** The kernel is the second instrument, and using Lean as the
 oracle for the reader is the same move as using it to grade a move's load.
 
-### RECOGNITION BEFORE THE RUN
+### RECOGNITION BEFORE THE RUN — **COMPLETE 2026-08-14**
 
 *Admissibility decided from `(D, v)` alone, graded exactly as `elementary_chart` grades its own.*
+
+**Returned.** `Contradicted` is empty, and it did its job twice before it was: it surfaced a third
+application builder the grain was never threaded into, and then **`ℋ`** — `contrapose!` changes the
+type of the hypothesis it names, so the emission fed a post-contrapose `hc` into a slot typed for the
+pre-contrapose one. **Neither defect was in `(D, v)`.** The family is inadmissible at the typed grain
+for that stated reason, which is a coverage bound.
+[The record](../research/records/2026-08-14_THE_RECOGNITION_PRECEDES_THE_RUN_AND_THE_STRUCTURAL_REFUSALS_WENT_TO_ZERO.md).
 
 **Build.** For each candidate edge, decide from the node types whether it is admissible, then grade
 what the kernel says:
@@ -253,9 +260,14 @@ component.
 **Falsifier.** `Contradicted` non-empty and unexplained means the node model is wrong, which is the
 outcome this arm exists to make reachable.
 
-### THE ADMITTED PATH IS AN EDGE
+### THE ADMITTED PATH IS AN EDGE — **COMPLETE 2026-08-14**
 
 *The atlas stops being a partition.*
+
+**Returned.** Four kernel-proved edges from one source node, three species named — conjugacy,
+substitution composed with an exterior normalisation, and deposit-then-close. The tactic family types
+itself against `H.0362`'s species, and **a closing tactic is a face, not an edge**. The graph is very
+small and that is stated rather than dressed.
 
 **Build.** Return the atlas as a graph: nodes are formulation nodes, edges are kernel-proved
 transformations with their species named. `H.0362`'s edge species map onto the tactic family and the
@@ -269,16 +281,27 @@ longer named as the atlas row.
 **Complete when** an edge population exists whose members each name their transformation species and
 the invariant they preserve.
 
-### THE ROW IS REGISTERED
+### THE ROW IS REGISTERED — **COMPLETE 2026-08-14**
 
-**Build.** A registry entry for the proof-transport atlas as a specialisation of `H.0362`, with its
-own boundary and falsifier.
-
-**Complete when** it renders and `validate-registry()` passes.
+**Returned.** `H.0481`, *Proof-transport atlas*, in `papers/source/holonics/computation-information.typ`,
+depending on `H.0362`. It carries both coverage bounds in its own boundary field, and it renders.
 
 ---
 
-## 3. The experiment, and what refutes the whole design
+## 3. The experiment — RUN 2026-08-14, and all four predictions held
+
+```text
+  inherited  emitted 213   admitted 4   structural 147   mathematical 62   placeholder  0
+  typed      emitted  94   admitted 4   structural   0   mathematical 60   placeholder 30
+```
+
+**Not refuted**: the structural population moved 147 → 0. **And the honest bound: the typed arm
+admits ZERO paths the inherited arm did not.** Typing removed noise; it did not find new proofs on
+this material. What changed is that a refusal now means the mathematics rather than the emission.
+
+The declaration as originally written follows.
+
+## 3b. The experiment as declared, and what refutes the whole design
 
 Two arms, one corpus, one theorem, one kernel, run together.
 

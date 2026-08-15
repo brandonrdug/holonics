@@ -4,7 +4,7 @@
 # Regenerate: python3 tools/output_manifest.py
 # Verify:     python3 tools/output_manifest.py --check
 # Listing:    python3 tools/output_manifest.py --files
-# 46 drivers, 15171 returns, 9995522151 bytes.
+# 47 drivers, 15384 returns, 9995659178 bytes.
 sha256	returns	bytes	driver
 855279871852bffe08c83a0e50006b769da3b296934115faa809561b7cbdd304	7	1274	output/agentic-research-kernel
 b90b799580f0c51bd6ffe0009fc0fcd9eb9f20feb54972ca44ad4297b6252430	8	46304	output/analytic-field-transport
@@ -41,6 +41,7 @@ d5d4be0ce4e0da0f152d1bc1008f91006fba3e355d75dde239af483f33487e88	58	1443881689	o
 b08d1a759f2d24f02c51ac1bc9509f77ff6c055498bf4a11d537b876e6142058	17	1431	output/the-declaration-is-a-formulation-node
 23cbda6a5d82bf44e4037f4cbcc09c9570be6b7eec27af0d6fb624c627be20fb	18	148356	output/the-kernel-decides-which-moves-are-load-bearing
 bcb7bd027c399a57a2f7acf8de054227fc251736109b2a9ec3b596712d424510	256	5229153	output/the-reading-returns
+9e438789887ed3c17b81aad2fe8300c9032fe4a8c38528c2bade4e5fecc1e21f	213	137027	output/the-recognition-precedes-the-run
 b5a3ff8a8b0f6c0d9f8f51217e25f1d5ca1d55164b9abd79acd96d36c3d94474	258	175889	output/the-returned-difference-is-a-ratio
 95223e6711842c604a3b411079eb0ebda82f5d2b3c0119f3fe95d5bf4e38ca19	17	2889	output/the-two-theorem-deed
 ac2db061771351762738a74fe2e3a21095d452838475314090b023d348673951	1	383027	output/the_ablated_body_rests_and_remounts

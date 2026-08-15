@@ -524,6 +524,38 @@ pub(super) fn merge_binders(target: &mut Vec<LeanBinderChart>, source: Vec<LeanB
     }
 }
 
+/// An application built **in the recruited declaration's own frame**.
+///
+/// [`declaration_application`] walks the organ's explicit binders, keeps those whose *name* the
+/// target also binds, and **silently drops the rest** — so an organ carrying one binder the target
+/// does not name is applied with its remaining arguments in the wrong positions, and an organ
+/// sharing no name at all is applied bare. It works only where corpus and goal happen to share a
+/// `variable` block, and it is a string intersection standing in for a chart transition.
+///
+/// This walks the same binders and emits `_` where the goal supplies no name, so the arity and the
+/// order are the organ's own and Lean infers what the goal cannot supply.
+pub(super) fn declaration_application_in_frame(
+    organ: &LeanDeclarationOrgan,
+    target_names: &BTreeSet<String>,
+) -> String {
+    let arguments = organ
+        .binders
+        .iter()
+        .filter(|binder| binder.kind.is_positional())
+        .map(|binder| {
+            if !binder.name.is_empty() && target_names.contains(&binder.name) {
+                binder.name.clone()
+            } else {
+                "_".to_owned()
+            }
+        })
+        .collect::<Vec<_>>();
+    if arguments.is_empty() {
+        return organ.name.clone();
+    }
+    format!("{} {}", organ.name, arguments.join(" "))
+}
+
 pub(super) fn declaration_application(
     organ: &LeanDeclarationOrgan,
     target_names: &BTreeSet<String>,
@@ -539,6 +571,42 @@ pub(super) fn declaration_application(
     } else {
         format!("{} {}", organ.name, arguments.join(" "))
     }
+}
+
+/// The in-frame application for the contrapose family: positional in the organ's own domain, with
+/// the contraposed hypothesis put in the **first position the goal cannot supply**.
+///
+/// The untyped twin replaces a single unmatched binder and drops every other unmatched one, so the
+/// application is short and misaligned. This one is the reason the recognition arm exists: with `rw`
+/// gated and the other two applications built in frame, **every surviving structural refusal came
+/// from this family** — ten of them, each an `Application type mismatch` on an organ whose domain is
+/// ten and which was being handed five arguments. The component read wrong was not `(D, v)`; it was
+/// a third emission site that still built in the goal's frame.
+pub(super) fn declaration_application_in_frame_with_substitute(
+    organ: &LeanDeclarationOrgan,
+    target_names: &BTreeSet<String>,
+    substitute: &str,
+) -> String {
+    let mut used_substitute = false;
+    let arguments = organ
+        .binders
+        .iter()
+        .filter(|binder| binder.kind.is_positional())
+        .map(|binder| {
+            if !binder.name.is_empty() && target_names.contains(&binder.name) {
+                return binder.name.clone();
+            }
+            if !used_substitute {
+                used_substitute = true;
+                return substitute.to_owned();
+            }
+            "_".to_owned()
+        })
+        .collect::<Vec<_>>();
+    if arguments.is_empty() {
+        return organ.name.clone();
+    }
+    format!("{} {}", organ.name, arguments.join(" "))
 }
 
 pub(super) fn declaration_application_with_substitute(

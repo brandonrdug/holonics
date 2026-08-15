@@ -569,4 +569,39 @@
     ],
     source: [Standard linear algebra and semigroup theory; the three-way split of parity, chronology, and reversibility is Brandon's, 2026-08-11, `canon/TABLET_THE_OPERATIONS.md`.],
   ),
+  entry(
+    id: "H.0481",
+    kind: "Definition",
+    grade: "definition",
+    title: [Proof-transport atlas],
+    depends: ("H.0362",),
+    statement: [
+      A proof-transport node is a declaration read as a formulation node
+      $(D,E,cal(H),v,rho)$: $D$ its parameter domain with binder kinds and
+      types, $E$ the term or tactic realising it, $cal(H)$ its hypotheses and
+      branch data, $v$ its conclusion's principal relation, and $rho$ the
+      declared receiver family. An edge is a tactic whose application a kernel
+      admits, carrying one node to another while preserving $v$. Admissibility
+      is decided from $(D,v)$ **before** the kernel runs, and the recognition is
+      graded against what the kernel then says.
+    ],
+    transformations: [
+      Substitution demands $v in {=, <->}$ and is realised by rewriting;
+      conjugacy applies the node in its own frame, positionally over $D$;
+      recurrence is realised by induction. A closing tactic that reads an
+      ordering or a normal form is a face, not an edge: it carries no node to
+      another. Measured on a seven-declaration corpus, gating substitution on
+      $v$ and building every application over $D$ took structurally refused
+      paths from 147 to 0 while the admitted family was unchanged.
+    ],
+    boundary: [
+      Shared output does not supply an edge, so a partition of nodes by equal
+      observation is a coarsening and never an atlas row. Admissibility is a
+      coverage claim and not a completeness one: a conclusion exposing no single
+      relation at depth zero is treated as carrying none, and an edge whose
+      tactic rewrites a hypothesis in place is inadmissible while $cal(H)$ is
+      untracked. Neither exclusion is evidence that no such edge exists.
+    ],
+    source: [Specialisation of H.0362 to proof transport; measured 2026-08-14 against a real Lean kernel.],
+  ),
 )
