@@ -53,7 +53,7 @@ and `compress` already returns the collapsed pairs with their shortest separatin
 
 ```text
   moves 78 · arrivals 25 · branch aperture 3 · founding tactics 7
-  isolated 45 · connected 33
+  isolated 45 · connected 33 · unconsumed 15
   focus  declaration 1 step 1, founded by `obtain`, downstream 1 upstream 0
   demand at horizon 1: roots 78 · slots 7 · items 546 · pair chart 148,785
 
@@ -86,7 +86,17 @@ axis that split it is exhibited rather than asserted.
 
 ## 2. The isolated population is a row, not a filter
 
-**45 of 78 moves in a real geometry file are founded and never used.** They neither feed a later
+**CORRECTED the same day, by an independent instrument.** This section read *"45 of 78 moves in a
+real geometry file are founded and never used."* The count is right and the reading of it was
+wrong. **`isolated` means no later STEP arrives — it never meant unused**, because a declaration's
+closing term is not a step. Measured after the correction: of the 45 isolated moves in that file,
+only **15 are unconsumed**; the other 30 are named by the final tactic. The instrument that caught
+it deleted each move of a real development and asked Lean —
+`the_kernel_decides_which_moves_are_load_bearing` — and `MoveComplex::{terminally_consumed,
+unconsumed}` now name the two populations apart.
+[The record](2026-08-14_THE_KERNEL_IS_THE_SECOND_INSTRUMENT_AND_ISOLATED_WAS_NOT_UNUSED.md).
+
+The original text follows. 45 of 78 moves neither feed a later
 step nor arrive from an earlier one, so at any horizon they present only the common exposed face and
 **no family can separate them**.
 
@@ -101,8 +111,8 @@ an identical species of 45, and the declared control *the causal panel is not th
 
 The repair is a stated rule, not a hand-pick: the focus is the first move **in the connected
 population**, and `MoveComplex::{connected, isolated, reach}` return both populations so the
-isolated one is exhibited rather than silently dropped. Its block is a genuine row — *the moves this
-body founds and never uses* — and it is the largest single class in the file.
+isolated one is exhibited rather than silently dropped. Its block is a genuine row — *the moves no
+later step arrives at* — and it is the largest single class in the file.
 
 ---
 

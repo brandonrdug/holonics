@@ -151,14 +151,23 @@ fn main() {
     }
     let isolated = complex.isolated();
     let connected = complex.connected();
+    let unconsumed = complex.unconsumed();
     println!(
-        "    candidates {} · isolated {} · connected {}",
+        "    candidates {} · isolated {} · connected {} · UNCONSUMED {}",
         candidates.len(),
         isolated.len(),
-        connected.len()
+        connected.len(),
+        unconsumed.len()
     );
     println!(
-        "    THE ISOLATED POPULATION IS ITSELF A ROW: the moves this body founds and never uses."
+        "    `isolated` means no later STEP arrives. `unconsumed` means nothing names it at all —"
+    );
+    println!(
+        "    the closing term is not a step, so the two differ by {} moves the final tactic uses.",
+        isolated.len() - unconsumed.len()
+    );
+    println!(
+        "    THE ISOLATED POPULATION IS ITSELF A ROW: the moves no later step arrives at."
     );
     println!(
         "    They present only the common exposed face, so no family can separate them and a focus"

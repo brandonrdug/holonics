@@ -103,11 +103,31 @@ applied to every species leaves every **ratio** exactly unmoved and moves a **ma
 Both arms are required, so the contrast cannot be vacuous. That is the horizon law measured on a
 real kernel return: *magnitudes do not cross a frame boundary, ratios do.*
 
-**Two bounds, both named in the record.** The later theorem is a **restatement** of the first, so the
-claim is about **reachability** and not about proving something new — the nonidentical-neighbourhood
-grade still wants a statement that is not the first's. And the ratio family is a **receiver face**
-that does not yet enter the deposit; declaring `decomposing_codec::revise_within`'s aperture as a
-**ratio** is the one composition that would make the deposit itself frame-independent.
+**Both bounds are now closed, 2026-08-14.**
+[The record](../research/records/2026-08-14_THE_KERNEL_IS_THE_SECOND_INSTRUMENT_AND_ISOLATED_WAS_NOT_UNUSED.md).
+
+- **`RevisionAperture::at_ratio`** makes the deposit frame-independent. On the real material a count
+  aperture moves across two extents (102 → 104) and the ratio aperture does not (5 → 5); the exact
+  gauge is in the owner's tests, where a fourfold rescaling moves the count admission and leaves the
+  ratio admission identical. It retires the consuming driver's own stride-normalisation workaround,
+  which existed *because* an absolute threshold is only comparable at one extent.
+- **Three later theorems now run**, each with a statement appearing nowhere in the corpus:
+  `restated` **4/15 admitted**, `transformed` **2/15** by `simpa using` with the kernel supplying
+  `not_lt`, `composed` **0/15** with fifteen distinct refusals. Closing this exposed the larger gap
+  first: **the deposit reached the body's standing and never reached the world**, so every path
+  naming the self-emanated theorem failed to elaborate and all three returned an identical 0/15.
+  Materialising the admitted proof into the later environment is what *the deposit becomes terrain*
+  means when the terrain is a kernel.
+
+**And the second instrument corrected the reading.**
+`crates/holonic-engine/examples/the_kernel_decides_which_moves_are_load_bearing.rs` deletes each move
+of a real development and asks Lean. The declared prediction returns **UNDETERMINED** — not one
+decided move is removable, so the material carries no variation in the property under test, and the
+driver refuses to state a verdict rather than call two zeroes equal. What it did return is sharper:
+**`isolated` is not `unused`** — the closing term is not a step, so a `have` the final tactic
+consumes has no outgoing arrival. Of 45 isolated moves in the geometry file only **15 are
+unconsumed**. `MoveComplex::{terminally_consumed, unconsumed}` now name the two apart, and the
+earlier record's "founded and never used" is corrected in place.
 
 ### THE TRANSPORT ATLAS — the deed's return, 2026-08-14
 

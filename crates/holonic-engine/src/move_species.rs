@@ -228,6 +228,9 @@ struct MoveRecord {
     downstream: Vec<usize>,
     /// Earlier steps this one arrives from, in canonical step order.
     upstream: Vec<usize>,
+    /// Something in the declaration consumes this binder that is **not a later step** — in practice
+    /// the closing term. See [`MoveComplex::terminally_consumed`].
+    terminal: bool,
 }
 
 /// The founded move material: every step of every admitted declaration, with the intra-declaration
@@ -280,6 +283,7 @@ impl MoveComplex {
                     focus_depth: step.focus.len() as u64,
                     downstream: Vec::new(),
                     upstream: Vec::new(),
+                    terminal: false,
                 });
             }
         }
@@ -301,6 +305,32 @@ impl MoveComplex {
             record.downstream.dedup();
             record.upstream.sort_unstable();
             record.upstream.dedup();
+        }
+
+        // A binder consumed by something that is not a later step. `local_bindings` counts every
+        // occurrence of a founded name in the body, its own founding line included, so subtracting
+        // that founding and the step-to-step arrivals leaves exactly the uses no step accounts for.
+        //
+        // **This exists because an independent instrument found the gap.**
+        // `the_kernel_decides_which_moves_are_load_bearing` deleted each move of a real development
+        // and asked Lean: 5 of 10 moves this reading called isolated had their binder named again
+        // later in the same body, and the kernel refused every one of them. A declaration's closing
+        // term is not a step, so a `have` the final tactic consumes has no outgoing arrival.
+        // `isolated` therefore means *no later STEP arrives here* and never *nothing uses this*.
+        for (declaration, form) in declarations.iter().enumerate() {
+            let base = base_of_declaration[declaration];
+            for (step_index, step) in form.steps.iter().enumerate() {
+                let index = base + step_index;
+                let Some(record) = records.get_mut(index) else {
+                    continue;
+                };
+                let named = form
+                    .local_bindings
+                    .get(&step.binder)
+                    .copied()
+                    .unwrap_or(0) as usize;
+                record.terminal = named.saturating_sub(1) > record.downstream.len();
+            }
         }
 
         let branch_aperture = records
@@ -371,8 +401,33 @@ impl MoveComplex {
             .collect()
     }
 
-    /// Moves conduct reaches nothing from. Their common block is a real atlas row — *the moves this
-    /// body founds and never uses* — and it is returned rather than filtered away silently.
+    /// Whether something that is **not a later step** consumes this move's binder — in practice the
+    /// declaration's closing term.
+    ///
+    /// A move can be [`MoveComplex::isolated`] and still terminally consumed, and on real material
+    /// half of them are. Reading `isolated` as *unused* is the error this accessor exists to make
+    /// impossible.
+    pub fn terminally_consumed(&self, occurrence: MoveOccurrence) -> Option<bool> {
+        Some(self.records.get(*self.index.get(&occurrence)?)?.terminal)
+    }
+
+    /// Moves nothing consumes at all: no later step arrives, and the closing term does not name
+    /// them either. **This is the population `isolated` was mistaken for.**
+    pub fn unconsumed(&self) -> Vec<MoveOccurrence> {
+        self.records
+            .iter()
+            .filter(|record| {
+                record.downstream.is_empty() && record.upstream.is_empty() && !record.terminal
+            })
+            .map(|record| record.occurrence)
+            .collect()
+    }
+
+    /// Moves conduct reaches nothing from, in the strict step-to-step sense.
+    ///
+    /// **This is not the unused population.** A `have` the closing term consumes lands here, because
+    /// the closing term is not a step — see [`MoveComplex::unconsumed`] for the population that is
+    /// genuinely unused, and [`MoveComplex::terminally_consumed`] for the difference.
     pub fn isolated(&self) -> Vec<MoveOccurrence> {
         self.records
             .iter()

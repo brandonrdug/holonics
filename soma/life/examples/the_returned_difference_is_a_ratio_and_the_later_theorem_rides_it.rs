@@ -111,27 +111,93 @@ variable (incident : Old → New → Prop) [DecidableRel incident]"#
     }
 }
 
-/// The SECOND theorem. Its scope names **only** the self-emanated file the first theorem's admitted
-/// family produces, so it is unreachable until that return has been deposited.
-fn second_problem() -> LeanProofProblem {
-    LeanProofProblem {
-        identity: "receiver_load_under_capacity_again".to_owned(),
-        source_scope: BTreeSet::from([
-            "self-emanated/receiver_load_under_capacity.lean".to_owned()
-        ]),
-        prefix: r#"import SomaRHSourceTransport.FiniteTransport
+/// The declared preamble every problem here is posed in.
+const PREAMBLE: &str = r#"import SomaRHSourceTransport.FiniteTransport
 namespace Soma.RHSourceTransport
 variable {Old New : Type*}
 variable [Fintype Old] [Fintype New]
 variable (demand : Old → ℝ) (capacity : New → ℝ)
-variable (incident : Old → New → Prop) [DecidableRel incident]"#
-            .to_owned(),
-        theorem_header: r#"theorem receiver_load_under_capacity_again
+variable (incident : Old → New → Prop) [DecidableRel incident]"#;
+
+/// The later theorems. **Every one has a statement that appears nowhere in the corpus**, and every
+/// one's scope names ONLY the self-emanated file, so none is reachable until the first theorem's
+/// return has been deposited.
+///
+/// The first run of this deed used a later theorem that was the first's statement under another
+/// name. That is retrieval, and the record said so. These three are graded separately because they
+/// sit at different distances from what was deposited:
+///
+/// - **restated** is the original, kept as the floor: if this one does not become reachable the
+///   apparatus is broken, and it is the only one whose admission proves nothing.
+/// - **transformed** is the same content under a different connective — `¬ (a < b)` for `b ≤ a`.
+///   No retrieval closes it; the kernel must supply `not_lt`. Equivalent, and **not identical**.
+/// - **composed** needs the deposited theorem AND a second corpus lemma the deposit does not
+///   carry. It is expected to be reachable and **obstructed**, and that is a real return: a
+///   population of refusals on a statement nothing in the tree states.
+fn later_problems(deposited: Option<&str>) -> Vec<(&'static str, LeanProofProblem)> {
+    let scope =
+        BTreeSet::from(["self-emanated/receiver_load_under_capacity.lean".to_owned()]);
+    // **The deposit must reach the world, not only the standing.** Before 2026-08-14 this driver
+    // posed the later theorems in a preamble that imports the corpus and nothing else, so the
+    // self-emanated declaration the deposit founded was in scope for the BODY and out of scope for
+    // the KERNEL. Every path naming it failed to elaborate, and all three later theorems returned
+    // an identical 0-of-15 — including the restated floor case, which the deposited theorem closes
+    // outright. That is the emit half of the loop left open: a body that founds a theorem and then
+    // submits into an environment which has never heard of it.
+    let preamble = match deposited {
+        None => PREAMBLE.to_owned(),
+        Some(source) => format!("{PREAMBLE}\n\n{source}"),
+    };
+    vec![
+        (
+            "restated",
+            LeanProofProblem {
+                identity: "receiver_load_under_capacity_again".to_owned(),
+                source_scope: scope.clone(),
+                prefix: preamble.clone(),
+                theorem_header: r#"theorem receiver_load_under_capacity_again
     (hc : ∀ m, 0 ≤ capacity m) (hcong : ∀ m, congestion demand capacity incident m ≤ 1) (m : New) :
     (∑ n : Old, proportionalFlow demand capacity incident n m) ≤ capacity m"#
-            .to_owned(),
-        suffix: "end Soma.RHSourceTransport".to_owned(),
-    }
+                    .to_owned(),
+                suffix: "end Soma.RHSourceTransport".to_owned(),
+            },
+        ),
+        (
+            "transformed",
+            LeanProofProblem {
+                identity: "receiver_load_never_exceeds_capacity".to_owned(),
+                source_scope: scope.clone(),
+                prefix: preamble.clone(),
+                theorem_header: r#"theorem receiver_load_never_exceeds_capacity
+    (hc : ∀ m, 0 ≤ capacity m) (hcong : ∀ m, congestion demand capacity incident m ≤ 1) (m : New) :
+    ¬ (capacity m < ∑ n : Old, proportionalFlow demand capacity incident n m)"#
+                    .to_owned(),
+                suffix: "end Soma.RHSourceTransport".to_owned(),
+            },
+        ),
+        (
+            "composed",
+            LeanProofProblem {
+                identity: "congestion_bounds_the_capacity_product".to_owned(),
+                source_scope: scope,
+                prefix: preamble.clone(),
+                theorem_header: r#"theorem congestion_bounds_the_capacity_product
+    (hc : ∀ m, 0 ≤ capacity m) (hcong : ∀ m, congestion demand capacity incident m ≤ 1) (m : New) :
+    capacity m * congestion demand capacity incident m ≤ capacity m"#
+                    .to_owned(),
+                suffix: "end Soma.RHSourceTransport".to_owned(),
+            },
+        ),
+    ]
+}
+
+/// The floor case, kept for the before/after reachability control.
+fn second_problem() -> LeanProofProblem {
+    later_problems(None)
+        .into_iter()
+        .next()
+        .expect("the later population is non-empty")
+        .1
 }
 
 fn diagnosis() -> LeanDiagnosisCurrentFace {
@@ -243,23 +309,26 @@ fn main() {
     println!("\n{}", "-".repeat(104));
     println!("BEFORE THE RETURN — the second theorem is unreachable");
     println!("{}", "-".repeat(104));
-    let before = ecology.generate_proof_candidates(&second_problem());
-    let unreachable_before = matches!(before, Err(LeanMathematicsError::NoLocalDeclarations));
-    println!(
-        "  asking for `{}`: {}",
-        second_problem().identity,
-        match &before {
-            Err(error) => format!("{error:?}"),
-            Ok((reached, candidates)) => format!(
-                "REACHED {} declarations, {} candidates",
-                reached.len(),
-                candidates.len()
-            ),
-        }
-    );
+    let mut unreachable_before = true;
+    for (distance, problem) in later_problems(None) {
+        let before = ecology.generate_proof_candidates(&problem);
+        unreachable_before &= matches!(before, Err(LeanMathematicsError::NoLocalDeclarations));
+        println!(
+            "  {distance:12} `{}`: {}",
+            problem.identity,
+            match &before {
+                Err(error) => format!("{error:?}"),
+                Ok((reached, candidates)) => format!(
+                    "REACHED {} declarations, {} candidates",
+                    reached.len(),
+                    candidates.len()
+                ),
+            }
+        );
+    }
     failures.require(
         unreachable_before,
-        "the second theorem is unreachable before the return",
+        "every later theorem is unreachable before the return",
     );
 
     // ------------------------------------------------------------------ the world
@@ -290,6 +359,16 @@ fn main() {
         .map(|member| member.observed_millis())
         .sum();
     println!("  kernel admitted {admitted}   obstructed {obstructed}   occupancy {occupancy} ms");
+
+    // The body's own admitted proof of the first theorem, kept so the deposit can be materialised
+    // into the environment the later current is submitted to.
+    let deposited_source: Option<String> = returns.kernel_admitted().next().map(|admitted| {
+        format!(
+            "{} :=\n{}",
+            first_problem().theorem_header,
+            admitted.candidate().proof
+        )
+    });
 
     // ------------------------------------------------------------------ the chart transition
     println!("\n{}", "-".repeat(104));
@@ -460,29 +539,83 @@ fn main() {
     println!("\n{}", "-".repeat(104));
     println!("AFTER THE RETURN — the later theorem rides the deposit");
     println!("{}", "-".repeat(104));
-    let after = ecology.generate_proof_candidates(&second_problem());
-    match &after {
-        Ok((reached, candidates)) => {
-            println!(
-                "  REACHED {} declarations, {} candidates",
-                reached.len(),
-                candidates.len()
-            );
-            for name in reached.iter().take(6) {
-                println!("      recruited {name}");
-            }
-            for candidate in candidates.iter().take(2) {
-                println!("      --- a generated path, verbatim");
-                for line in candidate.proof.lines() {
-                    println!("          {line}");
-                }
+    println!("  Each later theorem is generated AND graded by the same kernel. Admission is not a");
+    println!("  declared control for any of them — the deed is that the deposit changed what is");
+    println!("  reachable, and what the kernel then says about it is a return either way.");
+    let mut all_reachable = true;
+    let mut transformed_admitted = 0usize;
+    match deposited_source.as_deref() {
+        Some(source) => {
+            println!("  The deposit is materialised into the later environment — the body founded");
+            println!("  this theorem and the world it submits to now carries it:");
+            for line in source.lines() {
+                println!("      {line}");
             }
         }
-        Err(error) => println!("  still unreachable: {error:?}"),
+        None => println!("  nothing was admitted, so the world carries no new declaration"),
+    }
+    for (distance, problem) in later_problems(deposited_source.as_deref()) {
+        let after = ecology.generate_proof_candidates(&problem);
+        match &after {
+            Ok((reached, candidates)) => {
+                println!(
+                    "\n  {distance:12} `{}`  REACHED {} declarations, {} candidates",
+                    problem.identity,
+                    reached.len(),
+                    candidates.len()
+                );
+                for name in reached.iter().take(4) {
+                    println!("      recruited {name}");
+                }
+                let graded = kernel
+                    .grade_all(&problem, candidates)
+                    .expect("the kernel returns a verdict for every later candidate");
+                println!(
+                    "      kernel admitted {}   obstructed {}",
+                    graded.kernel_admitted_extent(),
+                    graded.obstruction_extent()
+                );
+                if distance == "transformed" {
+                    transformed_admitted = graded.kernel_admitted_extent();
+                }
+                for admitted in graded.kernel_admitted().take(1) {
+                    println!("      --- an ADMITTED path on a statement nothing in the corpus states");
+                    for line in admitted.candidate().proof.lines() {
+                        println!("          {line}");
+                    }
+                }
+                if graded.kernel_admitted_extent() == 0 {
+                    let mut heads: Vec<&str> = graded
+                        .obstructions()
+                        .filter_map(|returned| {
+                            returned.diagnostic().lines().find(|line| line.contains("error:"))
+                        })
+                        .collect();
+                    heads.sort_unstable();
+                    heads.dedup();
+                    println!(
+                        "      none admitted; {} distinct refusals, the first two:",
+                        heads.len()
+                    );
+                    for head in heads.iter().take(2) {
+                        let at = head.find("error:").unwrap_or(0);
+                        println!("        {}", &head[at..].chars().take(88).collect::<String>());
+                    }
+                }
+            }
+            Err(error) => {
+                println!("\n  {distance:12} still unreachable: {error:?}");
+                all_reachable = false;
+            }
+        }
     }
     failures.require(
-        after.is_ok(),
-        "the second theorem is reachable after the return, and it was not before",
+        all_reachable,
+        "every later theorem is reachable after the return, and none was before",
+    );
+    failures.require(
+        transformed_admitted > 0,
+        "the TRANSFORMED theorem is kernel-admitted — the deposit carried conduct, not a lookup",
     );
 
     // ------------------------------------------------------------------ the ablation

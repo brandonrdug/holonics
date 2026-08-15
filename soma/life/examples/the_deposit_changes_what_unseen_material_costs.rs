@@ -67,7 +67,8 @@ use life::decomposing_codec::{
     DecomposingBody, DecompositionGrain, DecompositionPass, RevisionAperture, Symbol, read,
     render_word,
 };
-use num_bigint::BigUint;
+use num_bigint::{BigInt, BigUint};
+use num_rational::BigRational as Rat;
 
 /// **The crossing.** Two conditioning bodies on different subjects and two later
 /// bodies, one near each.
@@ -326,8 +327,61 @@ fn main() {
         if orbit_is_nontrivial { "YES" } else { "NO -- vacuous" }
     );
 
+    // -----------------------------------------------------------------------------------------
+    // THE APERTURE'S OWN FRAME -- added 2026-08-14, and it retires this driver's own workaround.
+    //
+    // The stride sampling above exists because "the absolute aperture threshold is comparable"
+    // only when both bodies are read at one extent. That is the tell: a threshold needing its
+    // material normalised before it can be compared is a MAGNITUDE, and a magnitude does not
+    // cross a frame boundary. `RevisionAperture::at_ratio` compares two members of one population
+    // instead, so it needs no normalisation at all.
+    //
+    // The exact gauge -- a common rescaling moving the count admission and not the ratio one -- is
+    // proved in `decomposing_codec`'s own tests, where the population can be scaled without
+    // touching the material. What is reported HERE is the material comparison it licenses: the
+    // same body read at two extents, which changes the material and not only the frame, and is
+    // therefore a measurement rather than a gauge.
+    // -----------------------------------------------------------------------------------------
+    println!();
+    println!("  THE APERTURE'S OWN FRAME -- a count needs its material normalised; a ratio does not");
+    let natural: Vec<Vec<Symbol>> = CIRCULATION_BODY.iter().flat_map(|path| lines_of(path)).collect();
+    let extents: [(&str, Vec<Vec<Symbol>>); 2] = [
+        ("stride-sampled", circulation.clone()),
+        ("natural extent", natural),
+    ];
+    let ratio_floor = Rat::new(BigInt::from(1), BigInt::from(4));
+    let mut by_count: Vec<BTreeSet<Vec<Symbol>>> = Vec::new();
+    let mut by_ratio: Vec<BTreeSet<Vec<Symbol>>> = Vec::new();
+    for (label, body_lines) in &extents {
+        let mut counted = DecomposingBody::mount(origin.clone()).expect("mounts");
+        counted.receive(body_lines.clone()).expect("readable");
+        let counted = counted
+            .revise_within(RevisionAperture::asked_by_at_least(DECLARED_APERTURES[1]).expect("positive"))
+            .expect("admits");
+        let mut rationed = DecomposingBody::mount(origin.clone()).expect("mounts");
+        rationed.receive(body_lines.clone()).expect("readable");
+        let rationed = rationed
+            .revise_within(RevisionAperture::at_ratio(ratio_floor.clone()).expect("a ratio floor"))
+            .expect("admits");
+        println!(
+            "    {label:16} lines {:>5}   count aperture admits {:>5}   ratio aperture admits {:>5}",
+            body_lines.len(),
+            counted.words.len(),
+            rationed.words.len()
+        );
+        by_count.push(counted.words.iter().cloned().collect());
+        by_ratio.push(rationed.words.iter().cloned().collect());
+    }
+    let count_moved = by_count[0] != by_count[1];
+    let ratio_moved = by_ratio[0] != by_ratio[1];
+    println!(
+        "    across the two extents: count aperture {}   ratio aperture {}",
+        if count_moved { "MOVED" } else { "unmoved" },
+        if ratio_moved { "moved" } else { "UNMOVED" }
+    );
+
     let aperture = RevisionAperture::asked_by_at_least(DECLARED_APERTURES[1]).expect("positive");
-    let grain_a = derive_grain(&origin, &circulation, aperture);
+    let grain_a = derive_grain(&origin, &circulation, aperture.clone());
     let grain_c = derive_grain(&origin, &geometry, aperture);
 
     println!();

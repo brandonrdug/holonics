@@ -59,6 +59,8 @@
 use core::fmt;
 use std::collections::{BTreeMap, BTreeSet};
 
+use num_bigint::BigInt;
+use num_rational::BigRational as Rat;
 use serde::{Deserialize, Serialize};
 
 use holonic_engine::receiver_exact_compression::{
@@ -666,9 +668,15 @@ pub struct FoundedRevision {
 ///
 /// `every_pair()` is the inherited behaviour and is what [`DecomposingBody::revise`] uses, so
 /// nothing that stands moves.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct RevisionAperture {
     minimum_asking_pairs: usize,
+    /// A floor on the **ratio** of a word's asking population against the most-asked word.
+    ///
+    /// `None` is the inherited count aperture. Both are declared receiver coordinates; only one of
+    /// them survives a change of frame, and that is measured rather than argued — see
+    /// [`RevisionAperture::at_ratio`].
+    minimum_ratio: Option<Rat>,
 }
 
 impl RevisionAperture {
@@ -676,6 +684,7 @@ impl RevisionAperture {
     pub const fn every_pair() -> Self {
         Self {
             minimum_asking_pairs: 1,
+            minimum_ratio: None,
         }
     }
 
@@ -683,17 +692,63 @@ impl RevisionAperture {
     ///
     /// Refuses zero: an aperture admitting a word no pair asked for is not an aperture on this
     /// population at all.
+    ///
+    /// **This is a magnitude, and a magnitude does not cross a frame boundary.** Read the same
+    /// material at twice the extent and every count doubles, so a fixed floor admits strictly more
+    /// words while nothing about the material changed. [`RevisionAperture::at_ratio`] is the reading
+    /// that survives, and `DecomposedWhole::aperture_orbit` measures both under one scaling.
     pub fn asked_by_at_least(pairs: usize) -> Result<Self, DecompositionError> {
         if pairs == 0 {
             return Err(DecompositionError::EmptyRevisionAperture);
         }
         Ok(Self {
             minimum_asking_pairs: pairs,
+            minimum_ratio: None,
+        })
+    }
+
+    /// Found only words whose asking population, **as a ratio against the most-asked word**, is at
+    /// least `floor`.
+    ///
+    /// The floor is a `Rat` carried exactly and never divided into a float. Because it compares two
+    /// members of the same population rather than one member against an absolute level, it is
+    /// invariant under any common rescaling of the population — which is exactly softmax's
+    /// invariance under `x -> x + c` read in the multiplicative chart, and exactly the horizon law:
+    /// *magnitudes do not cross a frame boundary; ratios do.*
+    ///
+    /// Refuses a floor outside `(0, 1]`. Zero admits everything and is not an aperture; above one
+    /// admits nothing, since no word exceeds the most-asked.
+    pub fn at_ratio(floor: Rat) -> Result<Self, DecompositionError> {
+        if floor <= Rat::from_integer(BigInt::from(0)) || floor > Rat::from_integer(BigInt::from(1)) {
+            return Err(DecompositionError::EmptyRevisionAperture);
+        }
+        Ok(Self {
+            minimum_asking_pairs: 1,
+            minimum_ratio: Some(floor),
         })
     }
 
     pub fn minimum_asking_pairs(&self) -> usize {
         self.minimum_asking_pairs
+    }
+
+    pub fn minimum_ratio(&self) -> Option<&Rat> {
+        self.minimum_ratio.as_ref()
+    }
+
+    /// Whether a word asked for by `asked` pairs clears this aperture, in a population whose
+    /// most-asked word was asked for by `most`.
+    pub fn admits(&self, asked: usize, most: usize) -> bool {
+        match &self.minimum_ratio {
+            None => asked >= self.minimum_asking_pairs,
+            Some(floor) => {
+                if most == 0 {
+                    return false;
+                }
+                let ratio = Rat::new(BigInt::from(asked), BigInt::from(most));
+                ratio >= *floor
+            }
+        }
     }
 }
 
@@ -855,9 +910,12 @@ impl DecomposingBody {
             }
             *asked_by.entry(word.clone()).or_insert(0) += 1;
         }
+        // The most-asked word is the population's own reference. Nothing here is authored: the
+        // aperture only ever compares members of what the reading returned.
+        let most_asked = asked_by.values().copied().max().unwrap_or(0);
         let admitted: BTreeSet<Vec<Symbol>> = asked_by
             .iter()
-            .filter(|(_, asked)| **asked >= aperture.minimum_asking_pairs())
+            .filter(|(_, asked)| aperture.admits(**asked, most_asked))
             .map(|(word, _)| word.clone())
             .collect();
         let excluded: Vec<ExcludedWord> = asked_by
@@ -990,6 +1048,74 @@ impl DecomposingBody {
 
 #[cfg(test)]
 mod tests {
+
+    /// The aperture orbit, which is the whole reason the ratio form exists.
+    ///
+    /// Read the same material at a larger extent and every asking count scales by a common factor.
+    /// A **count** floor then admits strictly more words while nothing about the material changed —
+    /// the reader's own extent leaked into the verdict. A **ratio** floor admits exactly the same
+    /// words, because it compares two members of one population rather than one member against an
+    /// absolute level.
+    ///
+    /// Both arms are asserted. A test where neither moved would be a vacuous gauge wearing a pass.
+    #[test]
+    fn a_count_aperture_moves_under_rescaling_and_a_ratio_aperture_does_not() {
+        let population = [12usize, 6, 3, 1];
+        let scaled: Vec<usize> = population.iter().map(|asked| asked * 4).collect();
+        let most = *population.iter().max().expect("a maximum");
+        let scaled_most = *scaled.iter().max().expect("a maximum");
+
+        let by_count = RevisionAperture::asked_by_at_least(4).expect("a count aperture");
+        let admitted: Vec<bool> = population
+            .iter()
+            .map(|asked| by_count.admits(*asked, most))
+            .collect();
+        let admitted_scaled: Vec<bool> = scaled
+            .iter()
+            .map(|asked| by_count.admits(*asked, scaled_most))
+            .collect();
+        assert_ne!(
+            admitted, admitted_scaled,
+            "a count floor that survived a fourfold rescaling would make this contrast vacuous"
+        );
+
+        let floor = Rat::new(BigInt::from(1), BigInt::from(4));
+        let by_ratio = RevisionAperture::at_ratio(floor).expect("a ratio aperture");
+        let ratio_admitted: Vec<bool> = population
+            .iter()
+            .map(|asked| by_ratio.admits(*asked, most))
+            .collect();
+        let ratio_admitted_scaled: Vec<bool> = scaled
+            .iter()
+            .map(|asked| by_ratio.admits(*asked, scaled_most))
+            .collect();
+        assert_eq!(
+            ratio_admitted, ratio_admitted_scaled,
+            "the ratio aperture must be blind to a common rescaling"
+        );
+        assert_eq!(ratio_admitted, vec![true, true, true, false]);
+    }
+
+    /// A floor outside `(0, 1]` is refused. Zero admits everything and is not an aperture; above one
+    /// admits nothing, because no member exceeds its own population's maximum.
+    #[test]
+    fn a_ratio_floor_outside_the_unit_interval_is_refused() {
+        assert!(RevisionAperture::at_ratio(Rat::new(BigInt::from(0), BigInt::from(1))).is_err());
+        assert!(RevisionAperture::at_ratio(Rat::new(BigInt::from(3), BigInt::from(2))).is_err());
+        assert!(RevisionAperture::at_ratio(Rat::new(BigInt::from(1), BigInt::from(1))).is_ok());
+    }
+
+    /// The most-asked word always clears a ratio aperture, at any admissible floor: it is its own
+    /// reference and the ratio is one. An aperture that could exclude the whole population would be
+    /// a refusal wearing a threshold.
+    #[test]
+    fn the_reference_always_clears_the_ratio_aperture() {
+        for (numerator, denominator) in [(1, 100), (1, 2), (1, 1)] {
+            let floor = Rat::new(BigInt::from(numerator), BigInt::from(denominator));
+            let aperture = RevisionAperture::at_ratio(floor).expect("an aperture");
+            assert!(aperture.admits(9, 9));
+        }
+    }
     use super::*;
 
     use holonic_engine::receiver_exact_compression::AblatedSystem;
@@ -2438,7 +2564,7 @@ mod tests {
             body.receive(batch(BATCH_A)).expect("readable");
             let aperture = RevisionAperture::asked_by_at_least(asked).expect("a positive aperture");
             let revision = body
-                .revise_within(aperture)
+                .revise_within(aperture.clone())
                 .expect("this material admits at every declared aperture");
             assert_eq!(revision.aperture, aperture);
             grains.push(revision.words.clone());

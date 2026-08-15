@@ -383,3 +383,33 @@ fn an_absent_occurrence_is_named_rather_than_skipped() {
         Err(MoveSpeciesError::OccurrenceAbsent(absent))
     );
 }
+
+/// `isolated` and `unconsumed` are different populations, and conflating them is the error an
+/// independent instrument caught. In the fixture `flat`'s `alpha` is named by the closing `exact`
+/// and `beta` is named nowhere again: both are isolated, only one is unconsumed.
+#[test]
+fn the_isolated_population_is_not_the_unconsumed_one() {
+    let complex = complex();
+    let isolated: BTreeSet<MoveOccurrence> = complex.isolated().into_iter().collect();
+    let unconsumed: BTreeSet<MoveOccurrence> = complex.unconsumed().into_iter().collect();
+    for member in &unconsumed {
+        assert!(
+            isolated.contains(member),
+            "an unconsumed move must also be isolated: nothing arrives from it either"
+        );
+    }
+    assert!(
+        unconsumed.len() < isolated.len(),
+        "the fixture must contain an isolated move the closing term consumes, or this comparison \
+         cannot fail: isolated {} unconsumed {}",
+        isolated.len(),
+        unconsumed.len()
+    );
+    for member in isolated.difference(&unconsumed) {
+        assert_eq!(
+            complex.terminally_consumed(*member),
+            Some(true),
+            "the difference between the two populations is exactly terminal consumption"
+        );
+    }
+}
