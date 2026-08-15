@@ -1244,6 +1244,19 @@ interpolate between two pixels is to assume the two projected coordinates dictat
 between them; *that* is the information loss, not the sample count. A pixel array is a lattice and the
 sweep that updates it is a parametric traversal, so the CRT law of §0j governs the raster too.
 
+**The six correspondences to a contemporary language model are deposited** —
+`research/records/2026-08-14_THE_CORRESPONDENCES_ARE_OWNED_AND_THE_ROTATIONAL_CHART_IS_AN_INSTANCE_NOT_AN_ORGAN.md`.
+Each names an organ that **stands**; none is a gap. The nonlinearity is the `a ∧ a` curvature term;
+block normalisation is the horizon law with a learnable gain as a declared re-entry; `1/√d` is the
+half-density `1/2`; rotary position is the additive→multiplicative chart transition with relative
+attention as its gauge invariance; **induction heads are a suffix ecology**, exact rather than
+learned; and an adaptive optimiser **estimates** the metric that `grad_G L = G⁻¹ dL` says a receiver
+declares. **And the rotational chart is owed as three instances of standing machinery plus one
+second moment** — angular momentum is `RᵀJR = J`, which is `ExactTraversalQuadraticBalance` with an
+antisymmetric form it has never been handed; the gear ratio is its linear twin; and section modulus
+is already the placement law with no computed quantity behind it. **`inertia.rs` is Sylvester's law,
+a different object from rotational inertia — same word, two things.**
+
 **And curvature is attained, not fundamental** — *"it is attained from depth and interpolation… many
 arcs angling away from each other, but it is still discretely founded."* That is the Regge reading
 §0c already carries. **Do not write, under any framing, that this body lacks curvature or a
