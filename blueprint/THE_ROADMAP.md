@@ -129,6 +129,36 @@ consumes has no outgoing arrival. Of 45 isolated moves in the geometry file only
 unconsumed**. `MoveComplex::{terminally_consumed, unconsumed}` now name the two apart, and the
 earlier record's "founded and never used" is corrected in place.
 
+### WHAT THE ARTIFACTS SAY, READ RATHER THAN COUNTED — 2026-08-14
+
+**`4 admitted of 213` is a scalar dashboard and the object is elsewhere.**
+[The record](../research/records/2026-08-14_THE_EMISSION_HAS_NO_CHART_TRANSITION_BETWEEN_THE_GOAL_FRAME_AND_THE_LEMMA_FRAME.md)
+reads the rendered artifacts instead of the verdict counts, and three things come out.
+
+**The emission has no chart transition between the goal's binder frame and the lemma's.** It emits
+`rw [D]` twenty-one times for each of the seven recruited declarations regardless of what `D`
+concludes; five of the seven conclude in `≤`, so `21 × 5 = 105` paths rewrite by an inequality — and
+the kernel returned **exactly 105** `Invalid rewrite argument`. The argument lists are six prefixes
+of the **posed theorem's own binders**, sprayed at every lemma; exactly one declaration has that
+signature and exactly that one appears in all four admissions. **The emission is a cartesian product
+and the kernel is doing the selecting.** In the project's own terms it carries one chart's
+coordinates into another and takes no Jacobian — the absolute-frame defect, at the level of a
+hypothesis list. Owed, and small: derive the arguments from the recruited declaration's binders, and
+offer `rw` only where the conclusion is an equation. Both are already in `DeclaredForm::statement`.
+
+**The species class is nameable in words, and it is not a tactic.** The coarse class of ten is
+*a move that founds something exactly one later move uses, and that nothing founds* — holding
+`obtain`, `have`, `by_cases` and `intro` together across **eight different theorems** about angles,
+distances and norms. All ten roots are identical in their own coordinates, so the causal panel's
+departure of eight is entirely about **what they feed**: that is the common-exposed-face
+construction demonstrated rather than asserted.
+
+**Reading the members surfaced a reader defect no count could show.** `have h_sin (x y : V) (hx : …)
+(hy : …) : T := …` — `lean_development` cuts the binder pattern at the first `:`, so it founds three
+steps from one act (the fact *and its bound variables*) and records a fragment of the binder group
+as the statement. **8,934 of 107,502** binding-tactic lines in mathlib carry their own binders, and
+for `suffices` they are the majority.
+
 ### THE TRANSPORT ATLAS — the deed's return, 2026-08-14
 
 **The objective this serves is Brandon's and it is not a kernel verdict:** *"an atlas of
