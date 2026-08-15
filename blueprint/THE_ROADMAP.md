@@ -70,6 +70,50 @@ magnitude face, reported beside it.**
 | **3** | The declared exchange: `DeclaredCarrierMetric` (`cuda_aperture.rs:1157`) prices host, device and transfer and not `intermediate_bits`, which `CarrierWork:1068` carries. One coordinate, one term in `cost_of`, passed as a value. `:1112-1114` states the obstruction verbatim. |
 | **4** | The deed: material A revises the grain; material B is **nonidentical**, held out and named as held out before the run, and its events are **not** the ones the deposit founded. The return is the population B reaches under the revised grain that it did not reach under the parent, each member naming the deposit that licensed it. |
 
+### WHAT RETURNED — every step built and run, 2026-08-14
+
+`research/records/2026-08-14_THE_CENSUS_DECAYED_THE_CYCLE_IS_BUILT_AND_THE_OPEN_GRADE_IS_THE_NONIDENTICAL_NEIGHBOURHOOD.md`
+§§8–10 carry the measurements. Gates **9 of 9**, 2,276 tests, clean tree.
+
+| step | returned |
+|---|---|
+| **0** | Three readings. `cross_entropy` collapsed wholesale on three of four, which **promoted Step 2 from repair to precondition**. The keystone control **fired** — a subject-disjoint body improved as much as the held-out one — which named the deposit's aperture as the real object and produced Step 1b. |
+| **1** | `DecompositionPass::part_population` and `part_count`. Measured on real records: 1,320 parts over 700 kinds became 8,380 over 105 — **the parse lengthens and the code shrinks**, the two-part account out of the grain rather than out of a principle. |
+| **1b** | `RevisionAperture` / `revise_within`. Caller declares a threshold, the **material** decides which words clear it, excluded words return **by name** with how many pairs asked. Orbit required and exhibited; an aperture nothing clears refuses by name. |
+| **2** | `CrossEntropyFiber::{Supported, Partial, Unsupported}`. The `Partial` arm carries the form over the supported part weighted by the **whole** population, both masses summing to one exactly, and every unsupported event by name. `cross_entropy` retained as its **face**. |
+| **3** | `DeclaredCarrierMetric::intermediate_bit_cost` — the description axis, declared as a value at a call site. Orbit exhibited: a busy narrow carrier and a quiet wide one **order one way with no width price and the other way with one**. |
+| **4** | The deed. **Its first design was refuted by its own first run** and became a crossing. |
+
+**The deed's finding.** The one-sided control cannot reach grade three, because the words the most
+collapsed pairs ask for are `(` `)` `*` `,` `-` `.` `/` `:` `;` — **recurrence across pairs is
+generality**, so an aperture keyed on it selects against attribution. The question is not whether the
+later body improved, which any refinement causes; it is whether it improved **because of this
+conditioning body**, which is a difference between two *deposits*.
+
+Two conditioning bodies on different subjects, two later bodies one near each, under three balances:
+
+```text
+  natural sizes      B favours A +7     D favours C  +9    holds, confounded by size
+  head-truncated     B favours C  7     D favours C +26    does not hold
+  stride-sampled     B favours A +11    D favours C  +9    holds
+```
+
+Reading two's null was **diagnosed before reading three was run**: head truncation samples preambles,
+which are alike across tablets, so it equalises size and destroys subject in one operation — and the
+symptom is visible, since *both* later bodies favoured the same deposit. Under the stride balance the
+deposits are symmetric (9 words only to `A`, 41 only to `C`, against the natural sizes' 1 against
+181), the no-op moves **exactly zero**, and the **foil does not cross on either arm** (`B +8`,
+`D −4`).
+
+**What this supports:** a deposit derived from one body's own collapsed pairs changes what a later
+**nonidentical** body reaches, attributably to that body rather than to refinement in general.
+**What it does not:** anything about compression, intelligence, or a rate. The margins are small and
+exact and must be read as small and exact.
+
+**Owed next, and declared before it is run:** a fourth balance would count only if declared first;
+the two conditioning bodies remain a single pair rather than a family; and the sampling of a common
+extent is itself a declared receiver coordinate this record carries three of.
+
 ### The controls, decided before the run
 
 - **A second held-out body the deposit did not touch, whose reading must not move.** This is
