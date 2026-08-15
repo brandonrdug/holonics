@@ -181,7 +181,15 @@ fn main() {
     println!("  project        {}", project_root.display());
     println!("  lean-toolchain {pin}");
     println!("  lean --version {running}");
-    let reproducible = running.contains(pin.trim_start_matches("leanprover/lean4:"));
+    // `lean --version` writes `Lean (version 4.27.0, …)` and the pin writes `…:v4.27.0`, so the
+    // leading `v` must come off or a matching toolchain reports itself as non-reproducible. It did,
+    // on every run of this shape until 2026-08-14. `eros_lean_proof_production` already got this
+    // right; these two did not, and a verdict wrongly labelled unreproducible is a claim about the
+    // evidence rather than about the mathematics.
+    let reproducible = running.contains(
+        pin.trim_start_matches("leanprover/lean4:")
+            .trim_start_matches('v'),
+    );
     println!(
         "  the verdicts below are {}",
         if reproducible {

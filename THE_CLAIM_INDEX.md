@@ -106,7 +106,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (88 deposits of 380)
+## 4 · The 2026-08 record line (89 deposits of 381)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -198,6 +198,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-14_THE_CENSUS_DECAYED_THE_CYCLE_IS_BUILT_AND_THE_OPEN_GRADE_IS_THE_NONIDENTICAL_NEIGHBOURHOOD.md` | The census decayed, the cycle is already built, and the open grade is the nonidentical neighbourhood |
 | `2026-08-14_THE_CENTRIFUGE_IS_BUILT_AND_IT_SEPARATES_BY_SPELLING.md` | The centrifuge is built, it runs on mathematics, and it separates by spelling |
 | `2026-08-14_THE_CORRESPONDENCES_ARE_OWNED_AND_THE_ROTATIONAL_CHART_IS_AN_INSTANCE_NOT_AN_ORGAN.md` | The correspondences are owned, and the rotational chart is an instance rather than an organ |
+| `2026-08-14_THE_CYCLE_CLOSED_ON_REAL_MATHEMATICS_AND_THE_RATIO_IS_THE_ONLY_READING_THAT_CROSSES.md` | The cycle closed on real mathematics, and the ratio is the only reading that crosses |
 | `2026-08-14_THE_LIBRARY_WAS_ALREADY_ON_THE_DISK_AND_THE_ABSENCE_WAS_MEASURED_BY_COUNTING_ARTIFACTS.md` | The library was already on the disk, and the absence was measured by counting artifacts |
 | `2026-08-14_THE_MAP_IS_PRIOR_TO_THE_SHORTCUT_TOLERANCE_IS_WHERE_THE_ARC_STOPS_REACHING_AND_A_DIRECTION_COSTS_LOG_LOG.md` | The map is prior to the shortcut, tolerance is where the arc stops reaching, and a direction costs log log where a position costs log |
 | `2026-08-14_THE_METHOD_IS_A_CHART_TRANSITION_OR_A_COBOUNDARY_MOVE_AND_ONLY_THE_FINITE_STRATA_ARE_TABLES.md` | The method is a chart transition or a coboundary move, and only the finite strata are tables |

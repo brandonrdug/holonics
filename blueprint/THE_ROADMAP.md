@@ -75,6 +75,40 @@ a byte-popcount parity.
 | **3** | **Choose the families to avoid the authored partition.** **Forbidden:** `namespace_path` (3,477 blocks = the directory tree), `former` (a keyword), `line` (file layout, already convicted). **Contaminated:** `recruited` — `_` 158,691, `simp` 72,125, `only` 32,427, `rw` 11,204 in term position, over 10% not mathematical objects. **Use:** `statement_grammar`, which knows no Lean noun, and the internal chain. Reader: `lean_development` and never `derivation_atlas`, whose reading knows only `have` while mathlib carries `obtain` 15,264 and `intro` 13,017. | — |
 | **4** | **The two-theorem deed**, which **neither body has ever run** — the laboratory's `runs/eros-two-theorem-deed/` is an empty directory. Drive `receive_kernel_deed_returns` (eleven test sites, **zero drivers**) so a kernel return mounts a composite and a **second theorem becomes reachable only after it**, with an ablation removing it. Scope: `kernel-witness`, ~~because **mathlib is not compiled — 2 oleans**~~ — **that reason was withdrawn 2026-08-14 by attempting it**; the count was taken over `soma/` alone while the archive held 2,622 at the same revision, and the whole library was already in `~/.cache/mathlib` (16,510 files, 834 MB), unpacked by `lake exe cache get` in two minutes with **nothing downloaded**. `soma/formal/elementary-holonics` now carries **7,523 oleans including `Mathlib.olean`**, and `import Mathlib` elaborates through `lake env lean` in **10.2 s** with the kernel admitting `natDegree_mul` and refusing `(1:Nat)=2`. `kernel-witness` remains the right scope for a many-times ablation on **cost**, which is now a declared coordinate rather than a constraint. [The record](../research/records/2026-08-14_THE_LIBRARY_WAS_ALREADY_ON_THE_DISK_AND_THE_ABSENCE_WAS_MEASURED_BY_COUNTING_ARTIFACTS.md) | the return organ is strictly stronger than the laboratory's deleted `prove()`; only the driver is missing |
 
+### THE CYCLE IS CLOSED ON REAL MATHEMATICS — 2026-08-14
+
+**This is the live posture.** The answer to *what classical mechanism of a modern language model is
+unaccounted for* is **none**, and that is a release rather than a completed audit. The cycle now runs
+end to end on real mathematics with a real kernel:
+`soma/life/examples/the_returned_difference_is_a_ratio_and_the_later_theorem_rides_it.rs`.
+[The record](../research/records/2026-08-14_THE_CYCLE_CLOSED_ON_REAL_MATHEMATICS_AND_THE_RATIO_IS_THE_ONLY_READING_THAT_CROSSES.md).
+
+```text
+  before          NoLocalDeclarations — the later theorem is unreachable
+  the world       213 candidates · admitted 4 · obstructed 209 · 372,433 ms, mathlib in scope
+  the return      14 species, the KERNEL's own · cocycle exact · null orbit trivial · T→0 refused
+  the deposit     the WHOLE family · generation 2 → 3 · organs 7 → 8
+  after           REACHED 1 declaration, 15 candidates
+  the ablation    NoLocalDeclarations — the reach went with the structure
+```
+
+**The sharp result is the gauge, and it is the softmax work doing real work.** An additive shift
+applied to every species leaves every **ratio** exactly unmoved and moves a **magnitude** aperture:
+
+```text
+  ratio aperture      7 → 7   UNMOVED
+  magnitude aperture  2 → 1   MOVED — the receiver coordinate leaked into the verdict
+```
+
+Both arms are required, so the contrast cannot be vacuous. That is the horizon law measured on a
+real kernel return: *magnitudes do not cross a frame boundary, ratios do.*
+
+**Two bounds, both named in the record.** The later theorem is a **restatement** of the first, so the
+claim is about **reachability** and not about proving something new — the nonidentical-neighbourhood
+grade still wants a statement that is not the first's. And the ratio family is a **receiver face**
+that does not yet enter the deposit; declaring `decomposing_codec::revise_within`'s aperture as a
+**ratio** is the one composition that would make the deposit itself frame-independent.
+
 ### THE TRANSPORT ATLAS — the deed's return, 2026-08-14
 
 **The objective this serves is Brandon's and it is not a kernel verdict:** *"an atlas of
