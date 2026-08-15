@@ -4,7 +4,7 @@
 # Regenerate: python3 tools/output_manifest.py
 # Verify:     python3 tools/output_manifest.py --check
 # Listing:    python3 tools/output_manifest.py --files
-# 39 drivers, 14428 returns, 9994920619 bytes.
+# 40 drivers, 14445 returns, 9994923508 bytes.
 sha256	returns	bytes	driver
 855279871852bffe08c83a0e50006b769da3b296934115faa809561b7cbdd304	7	1274	output/agentic-research-kernel
 b90b799580f0c51bd6ffe0009fc0fcd9eb9f20feb54972ca44ad4297b6252430	8	46304	output/analytic-field-transport
@@ -36,6 +36,7 @@ d11c51399696ddf7756ae4eb49df5e70457458f7cb106e57ac7c28ef53f5487c	5	603	output/le
 cf87fcb7ccdb9cd3649275a1731c3c011ab2fe8db8fd5ca161fd8c82d9331c55	3	5239843	output/reintegrating-elaboration
 d5d4be0ce4e0da0f152d1bc1008f91006fba3e355d75dde239af483f33487e88	58	1443881689	output/source-revival
 bcb7bd027c399a57a2f7acf8de054227fc251736109b2a9ec3b596712d424510	256	5229153	output/the-reading-returns
+95223e6711842c604a3b411079eb0ebda82f5d2b3c0119f3fe95d5bf4e38ca19	17	2889	output/the-two-theorem-deed
 ac2db061771351762738a74fe2e3a21095d452838475314090b023d348673951	1	383027	output/the_ablated_body_rests_and_remounts
 c2b103d4e0827cf01d8f1598fd24c635277a58f89d44945e6991dbf86ba2ddb0	2	162371	output/the_code_material_returns_its_world_line
 f5334896fa342e21b7f669d011fab545c6fd4a7299cd358472a1594e2a944cc8	2	363732	output/the_conditioned_section_returns_after_detachment

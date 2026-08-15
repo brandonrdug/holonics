@@ -304,7 +304,11 @@ impl LeanDiagnosisCurrentFace {
         }
     }
 
-    pub(crate) fn from_closed_current(
+    /// **Made `pub` 2026-08-14**, for the same reason as
+    /// `select_and_open_kernel_deed`: a diagnosis current is a required part of
+    /// a target request, so a deed could not be opened from outside the crate
+    /// without it.
+    pub fn from_closed_current(
         target_episode: String,
         question: String,
         clause_identities: LocalSequence<String>,

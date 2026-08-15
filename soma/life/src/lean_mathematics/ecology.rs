@@ -787,7 +787,14 @@ impl LeanMathematicsEcology {
     /// Let the contemporary declaration morphology select one theorem face and open exactly one
     /// immutable kernel-return frontier. The caller supplies alternatives and caused witnesses;
     /// it cannot select the surviving target or manufacture candidate membership.
-    pub(crate) fn select_and_open_kernel_deed(
+    /// **Made `pub` 2026-08-14.** This is the entry point of the three-step deed
+    /// protocol, and it was `pub(crate)` — which is why
+    /// [`LeanMathematicsEcology::receive_kernel_deed_returns`] had eleven test
+    /// sites and zero drivers: no driver could open a deed to hand back. The
+    /// selection discipline is unchanged and is what makes widening safe — the
+    /// caller supplies alternatives and caused witnesses and **cannot select the
+    /// surviving target or manufacture candidate membership**.
+    pub fn select_and_open_kernel_deed(
         &mut self,
         request: LeanTheoremTargetRequest,
     ) -> Result<LeanTargetSelectionReceipt, LeanMathematicsError> {
