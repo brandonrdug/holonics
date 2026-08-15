@@ -118,3 +118,4 @@ canon/THE_CONTAMINANT_PROTOCOL.md :: tools/verify_quotes.py :: deleted 2026-08-0
 canon/THE_TIMELINE.md :: conditioning_law.hpp :: deleted at 2b562c8; §2 names that commit
 canon/THE_TIMELINE.md :: conditioning_schema.hpp :: deleted at 2b562c8; §2 names that commit
 canon/THE_TIMELINE.md :: returned_fiber_exclusion_law.hpp :: deleted at 2b562c8; §2 names that commit
+blueprint/THE_ROADMAP.md :: runs/eros-two-theorem-deed/ :: the laboratory's empty run directory for the two-theorem deed, named because its EMPTINESS is the evidence that neither body had run it. It does not resolve here because `runs/` is the laboratory's and is gitignored there.

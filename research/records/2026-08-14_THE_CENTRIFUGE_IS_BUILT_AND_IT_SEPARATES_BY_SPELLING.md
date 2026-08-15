@@ -194,3 +194,110 @@ and no analytic rank, and its substantive treatment is unreachable through a ven
 > centrifuge that recovered even one **recognition condition** from material — the way genus decides
 > the whole substitution row, or a simple pole decides elementarity — rather than from a person, is a
 > first-class return. Naming a Millennium problem beside it adds nothing and costs the ceiling.
+
+---
+
+## 7. THE PLAN, RUN. All four steps, with what each cost
+
+### Step 1 — the wire. The falsifier moved from 11 of 13 to **0 of 13**
+
+`Bond` gained `species_winding` and `species_sheet`, stamped in `assemble` — the one funnel every
+bond passes through and the only place the canonical species population is known.
+`PhaseChart::contact_transport` consults them; the octet `contact_winding`/`sheet` survive beside
+them as lineage. `contact_faces` said of itself *"It participates in no constitutive decision"*; it
+does now.
+
+- **magnitude** — the bond's rank in the complex's own canonical population of distinct declared
+  species sets. Relational, one-based, invariant under renaming because a source atlas declares a
+  face without consulting a name.
+- **sense** — `⪯` read as a sense rather than an order: `+1` when the arrival does not precede the
+  departure. **This keeps flat loops reachable by construction**, since a cycle must contain at
+  least one contact against the causal order or it would not close.
+
+An earlier form took the parity of the arrival's rank alone — local, invariant, species-independent,
+and it made the flat-boundary test fail because both endpoints shared a parity and every turn ran one
+way. *A chart whose generators all turn one way has no flat loops*, which the module already refuses.
+
+**Also repaired:** `with_reversed_bond` still read `surface.as_bytes()` where the other two
+construction sites moved to `.octets` on 2026-08-13. One site was missed, so a reversed bond carried
+a winding taken over a UTF-8 encoding of the constituent's identity — the exact defect `Site::octets`
+records as fixed.
+
+**And the four-codec falsifier still returns four distinct shapes**, readings unchanged at 98, 295,
+230 and 390 per mille.
+
+### What Step 1 cost, stated rather than hidden
+
+**Three fixtures were re-founded because their flatness was spelling, and each said so in its own
+comment.** `ab cc ab` was flat because `popcount('c')` is even and `popcount('a')` odd; the shared
+material because `popcount('s'⊕'t') = popcount('e'⊕'b')` and the sheets opposed. Under a reading that
+refuses spelling those sites are **isomorphic** — same rank, same degree, same single species — so
+nothing rename-invariant can separate them.
+
+They now use `structurally_flat_material`: four contacts, two sources, two sinks, one fundamental
+cycle, a traversal crossing two of them against its own hand — `+1 −1 +1 −1`. Measured: 4 sites,
+4 bonds, 1 compound, residual 0, flat. **And the test re-runs it under a bijection and requires the
+flatness to survive.**
+
+**Arithmetic's closed boundaries now all return one turn.** Measured: `6-2`, `8/2`, `2^2`, `8/2/1`
+and `9-2-3` every one returns `(5/13, −12/13)`. That is correct — every closed boundary in arithmetic
+is the **same triangle**, two operands and one operand-order, and nesting only makes more identical
+triangles. The variety the old assertion demanded came from `popcount('-')`, `popcount('/')` and
+`popcount('^')` differing. So the anti-tautology check moved to the level where the reading **can**
+vary: the species winding must take more than one value across the family, and the loop sums coincide
+because the loops are isomorphic — a statement about arithmetic rather than about the reading.
+
+### Steps 2 and 3 — banding, and families chosen against the authored partition
+
+`crates/holonic-engine/examples/the_material_stratifies_under_a_declared_field.rs`. Every count
+enters through `density_band` — `floor(log₂ n)` as a bit length, exact. Forbidden: `namespace_path`,
+`former`, `line`. Contaminated and stripped **with the count reported**, because a cleaning that is
+not counted is a declaration. Used: recruitment breadth, conduct breadth, chain depth, and the
+statement's own bracket shape.
+
+Measured on `soma/formal`, 66 declarations:
+
+```text
+  the material        one-shot 30  conduct 48  singletons 40  rounds 2  collapsed  98  order 2
+  the rewiring null   one-shot 30  conduct 49  singletons 40  rounds 2  collapsed 104  order 2
+  word lengths        material {1: 97, 2: 1}      null {1: 100, 2: 4}
+```
+
+The reading differs from a degree-preserving null, so the separation is not carried by the degree
+sequence alone — **and the margin is thin**, 48 against 49 blocks on 66 declarations. Every declared
+axis earns its place: withholding one moves the block count to 38, 47, 48 and 40 respectively, so the
+family is four receivers and not one wearing four names. `ChainDepth` is weakest, moving the block
+count by zero and the collapsed population by six.
+
+**Two bounds.** The strata are 40 singletons of 48 blocks, which is the monotonicity theorem doing
+what it must — conduct refines toward discreteness, so the object with content is the one-shot blocks
+and the collapsed population, not the final partition. And `compress` is `items^2.7` with 181,593
+declarations measured not returning in 300 s, so mathlib scale needs the resident path.
+
+### Step 4 — the two-theorem deed, run for the first time by either body
+
+`soma/life/examples/the_second_theorem_is_reachable_only_after_the_return.rs`.
+
+**And the reason it had zero drivers was not neglect: the protocol had no public entry.**
+`select_and_open_kernel_deed` and `LeanDiagnosisCurrentFace::from_closed_current` were both
+`pub(crate)`, so no driver could open a deed to hand back. Both are now `pub`; the selection
+discipline is untouched, and it is what makes widening safe — a caller supplies alternatives and
+caused witnesses and **cannot select the surviving target or manufacture candidate membership**.
+
+With `lake env lean` in the loop:
+
+```text
+  before      carry_thrice -> NoLocalDeclarations.  Unreachable.
+  the deed    17 candidates;  KERNEL ADMITTED 9,  OBSTRUCTED 8 with verbatim errors
+  the return  generation 2 -> 3,  organs 2 -> 3,  declaration admitted
+  after       REACHED 1 declaration, 8 candidates, among them `exact carry_twice h`
+  ablation    organ removed -> NoLocalDeclarations again
+  remount     source-detached, exact
+```
+
+**A genuine exterior verdict changed what a later construction could reach, and removing the
+structure removed the reach.** The ablation is what makes it a return rather than a coincidence.
+
+The corpus is `kernel-witness` — Lean core only, the one formal project here a kernel can check
+**offline**. **Mathlib is not compiled: two `.olean` files in the whole tree.** So this is a kernel
+verdict on a carrier and not on real mathematics, and the driver prints that bound itself.
