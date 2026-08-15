@@ -74,13 +74,13 @@ crates/holonic-engine/src/inverse_transport.rs	.clone()=34	.collect()=18	.flat_m
 crates/holonic-engine/src/kelvin.rs	.clone()=11	.collect()=11	.into_iter()=9	BTreeMap=11	BTreeSet=3	Vec=2
 crates/holonic-engine/src/lattice_gauge.rs	.clone()=21	.collect()=17	.flat_map()=1	.into_iter()=3	BTreeMap=19	BTreeSet=5	Vec=31
 crates/holonic-engine/src/leader_quadrature.rs	.clone()=33	.collect()=9	.into_iter()=1	BTreeSet=3	Vec=46
-crates/holonic-engine/src/lean_development.rs	.clone()=17	.collect()=20	.flat_map()=1	.into_iter()=3	BTreeMap=59	BTreeSet=19	Vec=68
+crates/holonic-engine/src/lean_development.rs	.clone()=17	.collect()=21	.flat_map()=1	.into_iter()=3	BTreeMap=59	BTreeSet=19	Vec=70
 crates/holonic-engine/src/live_presentation.rs	.clone()=2	.collect()=3	.into_iter()=2	BTreeMap=3	BTreeSet=7	Vec=7
 crates/holonic-engine/src/local_star.rs	.clone()=86	.collect()=48	.flat_map()=6	.into_iter()=17	BTreeMap=72	BTreeSet=26	Vec=138	VecDeque=3
 crates/holonic-engine/src/matroid_chow.rs	.clone()=30	.collect()=35	.into_iter()=7	BTreeMap=3	Vec=123
 crates/holonic-engine/src/mode.rs	.clone()=2	.collect()=2	BTreeMap=6	Vec=8
 crates/holonic-engine/src/model_surface.rs	.clone()=8	.collect()=4	BTreeMap=4	Vec=20
-crates/holonic-engine/src/move_species.rs	.clone()=5	.collect()=14	.flat_map()=1	.into_iter()=3	BTreeMap=5	BTreeSet=4	Vec=29
+crates/holonic-engine/src/move_species.rs	.clone()=5	.collect()=17	.flat_map()=1	.into_iter()=4	BTreeMap=5	BTreeSet=5	Vec=33
 crates/holonic-engine/src/move_species/tests.rs	.clone()=6	.collect()=4	.into_iter()=2	BTreeSet=3	Vec=2
 crates/holonic-engine/src/multiquadratic.rs	.clone()=18	.collect()=2	.into_iter()=1	Vec=11
 crates/holonic-engine/src/name_elaboration.rs	.clone()=29	.collect()=32	.into_iter()=3	BTreeMap=38	BTreeSet=75	Vec=54	VecDeque=3
