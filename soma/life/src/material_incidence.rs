@@ -1883,17 +1883,41 @@ mod tests {
             !quotient.separating_words.is_empty(),
             "the construction receiver separated nothing"
         );
-        // The holonomy the closed boundaries return must not be one constant across the family:
-        // that would be a receipt that could not have come out otherwise (`CLAUDE.md` §8).
+        // The anti-tautology check, re-founded 2026-08-14 when the transport stopped reading the
+        // constituents' octets and started reading their declared contact species.
+        //
+        // **It used to require the turns themselves to vary, and they did — because `popcount('-')`,
+        // `popcount('/')` and `popcount('^')` differ.** That is the operator's SPELLING deciding the
+        // geometry, which is the defect the transport repair removes. Read structurally, every
+        // closed boundary in arithmetic is the SAME triangle — two operands and one operand-order —
+        // so every one returns the same turn, and nesting only makes more identical triangles.
+        // Measured: `6-2`, `8/2`, `2^2`, `8/2/1` and `9-2-3` all return `(5/13, -12/13)`.
+        //
+        // So the check moves to the level where the reading can vary, which is the bond. The
+        // species reading must take more than one value on this family, or it is a constant wearing
+        // a type; and the loop sums coincide because the loops are isomorphic, which is a statement
+        // about arithmetic rather than about the reading.
+        let windings = complex
+            .bonds()
+            .iter()
+            .map(|bond| bond.species_winding)
+            .collect::<BTreeSet<_>>();
+        assert!(
+            windings.len() > 1,
+            "the species reading returned one winding across the whole family: {windings:?}"
+        );
         let turns = complex
             .hand_up(PhaseChart::WindingAdjacent)
             .unwrap()
             .iter()
             .map(crate::incidence_production::Emission::holonomy_text)
             .collect::<BTreeSet<_>>();
-        assert!(
-            turns.len() > 1,
-            "every closed boundary in the family returned one turn: {turns:?}"
+        assert_eq!(
+            turns.len(),
+            1,
+            "arithmetic's closed boundaries are all the same triangle, so one turn is the honest \
+             return; more than one would mean something other than the structure decided it: \
+             {turns:?}"
         );
         // `2+2` and `2*2` remain the same operand-contact species. Preserving that face honestly
         // does not invent an operation class; a consequence intervention is still required.

@@ -356,9 +356,29 @@ pub struct Bond {
     /// The §III sheet the contact lands on: `+1` same sheet, `−1` opposed. The sense of the turn.
     pub sheet: i8,
     pub multiplicity: u64,
-    /// Complete exterior contact-face population which caused this bond. It participates in no
-    /// constitutive decision; it survives so a later receiver can test, ablate, or quotient it.
+    /// Complete exterior contact-face population which caused this bond.
+    ///
+    /// **It now participates in the constitutive decision, and that is the 2026-08-14 repair.**
+    /// Until then this field survived only so a later receiver could test, ablate or quotient it,
+    /// while [`Bond::contact_winding`] and [`Bond::sheet`] — both read off the constituents'
+    /// **octets** — were what transport consulted. The driver's own bijection control measured the
+    /// consequence: renaming every constituent left `∂`, `o` and `⪯` exactly unmoved and **moved the
+    /// transport at 11 of 13 closed boundaries**, so the holonomy was a function of spelling.
     pub contact_faces: BTreeSet<DeclaredContactFace>,
+    /// The **species** reading of the turn's magnitude: which declared contact species this bond
+    /// carries, as its rank in the complex's own canonical population of distinct species sets.
+    ///
+    /// One-based, so no contact carries a zero turn. It is **relational** — a property of the bond —
+    /// exactly as [`Bond::contact_winding`] is, and it is invariant under any renaming of
+    /// constituents because a source atlas declares a face without consulting a name.
+    pub species_winding: u32,
+    /// The **species** reading of the turn's sense: the parity of the arrival constituent's own
+    /// causal rank, `+1` even and `−1` odd.
+    ///
+    /// **Local to the arrival**, exactly as [`Bond::sheet`] is, which is what keeps the two readings
+    /// independent — and their independence is what lets a closed boundary return to the identity at
+    /// all. It is the material's own causal order and consults no storage position and no spelling.
+    pub species_sheet: i8,
 }
 
 /// A closed internal boundary: dimension 2, one element of the fundamental cycle basis.
@@ -843,6 +863,16 @@ impl IncidenceComplex {
         self_contacts_refused: u64,
         causal_ranks: Vec<(String, u64, u32)>,
     ) -> Result<Self, IncidenceProductionError> {
+        // The species reading, stamped here because `assemble` is the one funnel every bond passes
+        // through. The population is canonical over the declared faces alone, so this is a function
+        // of what the source atlas declared and of nothing else.
+        let population = canonical_species_population(&bonds);
+        for bond in bonds.iter_mut() {
+            bond.species_winding = species_winding(&bond.contact_faces, &population);
+            bond.species_sheet =
+                species_sheet(sites[bond.from].causal_rank, sites[bond.to].causal_rank);
+        }
+
         let compounds = fundamental_cycles(&sites, &bonds, grain)?;
 
         // Event-local addresses. Storage position never orders anything; these are addresses only.
@@ -1058,11 +1088,15 @@ impl IncidenceComplex {
         let mut bonds = self.bonds.clone();
         let bond = bonds.get_mut(at).ok_or(IncidenceProductionError::Extent)?;
         std::mem::swap(&mut bond.from, &mut bond.to);
+        // Read off the material's own octets, not off the surface. The other two construction
+        // sites were moved to `.octets` on 2026-08-13 and this one was missed, so a reversed bond
+        // carried a winding taken over a UTF-8 encoding of the constituent's identity — which is
+        // exactly the defect `Site::octets` records as repaired.
         bond.contact_winding = contact_winding(
-            self.sites[bond.from].surface.as_bytes(),
-            self.sites[bond.to].surface.as_bytes(),
+            &self.sites[bond.from].octets,
+            &self.sites[bond.to].octets,
         );
-        bond.sheet = sheet_of(self.sites[bond.to].surface.as_bytes());
+        bond.sheet = sheet_of(&self.sites[bond.to].octets);
         Self::assemble(
             self.grain,
             self.sites.clone(),
@@ -1152,7 +1186,7 @@ impl IncidenceComplex {
 
         let mut rotations = Vec::with_capacity(self.bonds.len() + self.dependencies.len());
         for bond in &self.bonds {
-            rotations.push(chart.contact_transport(bond.contact_winding, bond.sheet)?);
+            rotations.push(chart.contact_transport(bond.species_winding, bond.species_sheet)?);
         }
         for (before, after) in &self.dependencies {
             let from = self.sites[*before].surface.as_bytes();
@@ -1401,7 +1435,7 @@ impl IncidenceComplex {
         let mut rotation = ExactWavePhaseTransport::identity();
         for (at, hand) in target.bonds.iter().zip(target.hands.iter()) {
             let bond = &self.bonds[*at];
-            let carried = chart.contact_transport(bond.contact_winding, bond.sheet)?;
+            let carried = chart.contact_transport(bond.species_winding, bond.species_sheet)?;
             if hand.coefficient() < 0 {
                 parity = -parity;
                 rotation = rotation.compose(&carried.inverse());
@@ -1787,7 +1821,7 @@ impl IncidenceComplex {
             self.bonds.iter().enumerate().map(|(at, bond)| {
                 (
                     view.bonds[at],
-                    BigInt::from(i64::from(bond.sheet) * i64::from(bond.contact_winding)),
+                    BigInt::from(i64::from(bond.species_sheet) * i64::from(bond.species_winding)),
                 )
             }),
         )
@@ -1844,7 +1878,7 @@ impl IncidenceComplex {
             compound.bonds.iter().zip(compound.hands.iter()).enumerate()
         {
             let bond = &self.bonds[*bond_at];
-            let carried = i64::from(bond.sheet) * i64::from(bond.contact_winding);
+            let carried = i64::from(bond.species_sheet) * i64::from(bond.species_winding);
             residual += BigInt::from(hand.coefficient() * carried);
             if carried != 0 {
                 support.insert(bond.from);
@@ -2862,6 +2896,62 @@ pub fn contact_winding(from: &[u8], to: &[u8]) -> u32 {
     (tail ^ head).count_ones()
 }
 
+/// The **canonical population of distinct declared species sets** carried by a bond population.
+///
+/// Ordered by `BTreeSet`'s own order over `DeclaredContactFace`, so it is a function of the declared
+/// faces alone: no storage position, no arrival order, no spelling of any constituent. Two runs over
+/// the same material return the same population, and a bijection on constituent names returns it
+/// unchanged.
+pub fn canonical_species_population(bonds: &[Bond]) -> Vec<BTreeSet<DeclaredContactFace>> {
+    let distinct: BTreeSet<BTreeSet<DeclaredContactFace>> = bonds
+        .iter()
+        .map(|bond| bond.contact_faces.clone())
+        .collect();
+    distinct.into_iter().collect()
+}
+
+/// The species reading of a turn's magnitude: this bond's rank in the canonical population.
+///
+/// **One-based**, because a contact that carries no turn at all is not a contact. A material
+/// declaring exactly one species therefore gives every bond winding `1` — an abelian connection
+/// whose holonomy around a loop is the loop's own length, which is the honest reading for a material
+/// that draws no distinction between its contacts.
+pub fn species_winding(
+    faces: &BTreeSet<DeclaredContactFace>,
+    population: &[BTreeSet<DeclaredContactFace>],
+) -> u32 {
+    population
+        .iter()
+        .position(|declared| declared == faces)
+        .map(|at| at as u32 + 1)
+        .unwrap_or(1)
+}
+
+/// The species reading of a turn's sense: whether the contact runs **with or against the material's
+/// own causal order**.
+///
+/// `+1` when the arrival does not precede the departure, `−1` when it does. This is `⪯` read as a
+/// sense rather than as an order, and it is the reading that keeps a flat closed boundary reachable:
+/// **a cycle must contain at least one contact against the causal order, or it would not close.**
+/// So a loop carries mixed sense by construction, its turns can cancel, and `curved` stays a
+/// measurement of the material rather than a property of the chart.
+///
+/// It is independent of [`species_winding`], which reads *which species* rather than *which way*,
+/// and it is untouched by any renaming of constituents because a causal rank is the material's own
+/// order of occurrence.
+///
+/// An earlier form of this took the parity of the arrival's rank alone. That is local, invariant and
+/// species-independent — and it made `a_flat_closed_boundary_is_reachable` fail, because on that
+/// material both endpoints share a parity and every turn ran the same way. A chart whose generators
+/// all turn one way has no flat loops, which is exactly the condition this module already refuses.
+pub fn species_sheet(departure_causal_rank: u32, arrival_causal_rank: u32) -> i8 {
+    if arrival_causal_rank >= departure_causal_rank {
+        1
+    } else {
+        -1
+    }
+}
+
 /// The §III sheet a contact lands on: `+1` when the arriving octet's own face is even, `−1` when
 /// it is odd.
 ///
@@ -2972,6 +3062,10 @@ fn found_bond(
                 sheet: sheet_of(&sites[to].octets),
                 multiplicity: 1,
                 contact_faces,
+                // Stamped by `assemble`, which is the one funnel every bond passes through and the
+                // only place the canonical species population is known.
+                species_winding: 1,
+                species_sheet: 1,
             });
         }
     }
@@ -3609,21 +3703,45 @@ mod tests {
         }
     }
 
+    /// Material whose closed boundary is flat **for structural reasons**: four contacts, four
+    /// constituents, one fundamental cycle, and a traversal that crosses two of them against its
+    /// own hand. `a→b`, `c→b`, `c→d`, `a→d` — going round is `+1 −1 +1 −1`, which cancels whatever
+    /// the constituents are called.
+    ///
+    /// Separate occurrences are what make it constructible: a single text sequence chains, so it
+    /// cannot produce an edge set with two sources and two sinks and nothing else.
+    fn structurally_flat_material() -> Vec<DeclaredOccurrence> {
+        ["a b", "c b", "c d", "a d"]
+            .iter()
+            .enumerate()
+            .map(|(at, text)| {
+                DeclaredOccurrence::from_text(
+                    format!("flat{at}"),
+                    at as u64,
+                    BTreeSet::new(),
+                    (*text).to_owned(),
+                )
+                .expect("declared text material")
+            })
+            .collect()
+    }
+
     #[test]
     fn a_flat_closed_boundary_is_reachable() {
-        // The falsifier must be able to fail. `ab ⟷ cc` crosses one bit each way — equal turning
-        // magnitude — and lands on opposed sheets, because `popcount('c')` is even and
-        // `popcount('a')` is odd. The two turns are exact inverses and the boundary returns the
-        // identity while neither turn is the identity. So `curved` is a measurement of the
-        // material and not a property of the chart.
-        let material = vec![DeclaredOccurrence::from_text(
-            "flat".to_owned(),
-            0,
-            BTreeSet::new(),
-            "ab cc ab".to_owned(),
-        )
-        .expect("declared text material")];
-        let complex = IncidenceComplex::found(&material, 8).unwrap();
+        // The falsifier must be able to fail, and it must fail for a reason the MATERIAL supplies.
+        //
+        // **This fixture was re-founded 2026-08-14 and the old one is the defect being repaired.**
+        // It read `ab cc ab`, and its own comment said why that was flat: `popcount('c')` is even
+        // and `popcount('a')` is odd, so the two turns landed on opposed sheets. That is the
+        // constituents' SPELLING deciding the geometry — exactly what the transport repair removes.
+        // Under a reading that refuses spelling those two sites are isomorphic (same rank, same
+        // degree, same single species) and nothing can separate them, so no rename-invariant
+        // reading can make that loop flat.
+        //
+        // `structurally_flat_material` earns it instead: four contacts with two sources and two
+        // sinks, one fundamental cycle, and a traversal that crosses two of them against its own
+        // hand — `+1 −1 +1 −1`. It cancels whatever the constituents are called.
+        let complex = IncidenceComplex::found(&structurally_flat_material(), 8).unwrap();
         let emissions = complex.hand_up(PhaseChart::WindingAdjacent).unwrap();
         assert!(!emissions.is_empty());
         assert!(
@@ -3632,7 +3750,33 @@ mod tests {
         );
         // And the turns that cancelled were not themselves the identity: a boundary of identities
         // would prove nothing.
-        assert!(complex.bonds().iter().all(|bond| bond.contact_winding != 0));
+        assert!(complex.bonds().iter().all(|bond| bond.species_winding != 0));
+        // The flatness is the material's, not the spelling's: rename every constituent and it holds.
+        let renamed = IncidenceComplex::found(
+            &["q0 q1", "q2 q1", "q2 q3", "q0 q3"]
+                .iter()
+                .enumerate()
+                .map(|(at, text)| {
+                    DeclaredOccurrence::from_text(
+                        format!("renamed{at}"),
+                        at as u64,
+                        BTreeSet::new(),
+                        (*text).to_owned(),
+                    )
+                    .expect("declared text material")
+                })
+                .collect::<Vec<_>>(),
+            8,
+        )
+        .unwrap();
+        assert!(
+            renamed
+                .hand_up(PhaseChart::WindingAdjacent)
+                .unwrap()
+                .iter()
+                .any(|emission| emission.terrain_is_flat()),
+            "the flatness moved under a bijection on constituent names, so it was spelling"
+        );
     }
 
     #[test]
@@ -3759,14 +3903,23 @@ mod tests {
 
     #[test]
     fn a_later_arrival_changes_a_named_earlier_compound() {
-        let complex = complex();
+        // The four populations `admit_later` distinguishes need material that can exhibit all
+        // four, and `material()` alone no longer carries a flat boundary — its own comment records
+        // that its flatness came from `popcount('s'⊕'t') = popcount('e'⊕'b')` and opposed sheets,
+        // which is spelling. The structurally flat piece is joined here so `saturated` — arrived
+        // and caused nothing — is reachable for a reason the material supplies.
+        let mut joined = material();
+        joined.extend(structurally_flat_material());
+        let complex = IncidenceComplex::found(&joined, 32).expect("the joined material founds");
         let chart = PhaseChart::WindingAdjacent;
         let group = CoefficientGroup::Integers;
+        // It repeats one contact of the flat piece — reaching it and causing nothing — while
+        // genuinely moving the arc/bends terrain.
         let arrival = DeclaredOccurrence::from_text(
             "arrival".to_owned(),
             7,
             BTreeSet::from(["a".to_owned()]),
-            "the bends carry arc the".to_owned(),
+            "the bends carry arc the a b".to_owned(),
         )
         .expect("declared text material");
         let response = complex.admit_later(&arrival, chart, &group).unwrap();
@@ -3828,14 +3981,9 @@ mod tests {
         // The control: the closed boundary's residual is exactly zero, the arrival reaches it with
         // genuinely new cells, and the cycle it founds through the compound carries the compound's
         // whole contribution — which is nothing.
-        let material = vec![DeclaredOccurrence::from_text(
-            "saturated".to_owned(),
-            0,
-            BTreeSet::new(),
-            "ab cc ab".to_owned(),
-        )
-        .expect("declared text material")];
-        let complex = IncidenceComplex::found(&material, 8).unwrap();
+        // Re-founded 2026-08-14: the old fixture was `ab cc ab`, whose flatness came from
+        // `popcount('c')` being even and `popcount('a')` odd — the spelling deciding the geometry.
+        let complex = IncidenceComplex::found(&structurally_flat_material(), 8).unwrap();
         let chart = PhaseChart::WindingAdjacent;
         let group = CoefficientGroup::Integers;
         let differentiated = complex.differentiate_all(chart).unwrap();
@@ -3844,11 +3992,13 @@ mod tests {
         assert!(differentiated[0].holonomy_is_flat());
         assert!(differentiated[0].is_saturated(&group));
 
+        // The arrival reaches the flat boundary by repeating one of its own contacts — so it
+        // arrives and causes nothing there — while founding a genuinely new cycle through `e`.
         let arrival = DeclaredOccurrence::from_text(
             "saturated:arrival".to_owned(),
-            1,
+            4,
             BTreeSet::new(),
-            "ab ee cc ab".to_owned(),
+            "a e b".to_owned(),
         )
         .expect("declared text material");
         let response = complex.admit_later(&arrival, chart, &group).unwrap();

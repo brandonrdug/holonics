@@ -1068,10 +1068,19 @@ fn orthographic_residue() -> Result<(), String> {
         }
     );
     println!(
-        "    THE ONE CHANGE THIS WORK WOULD ASK OF `incidence_production.rs`: a `species` field on \
-         `Bond`, carried into `PhaseChart::contact_transport`, so the turn a contact carries comes \
-         from the relation's kind rather than from the name's bytes. It was not made: that owner \
-         belongs to another agent this wave."
+        "    THE CHANGE THIS WORK ASKED FOR WAS MADE, 2026-08-14: `Bond` now carries \
+         `species_winding` and `species_sheet`, stamped in `assemble` from the canonical population \
+         of declared contact species and from `⪯` read as a sense, and \
+         `PhaseChart::contact_transport` consults those instead of the octet readings. The octet \
+         `contact_winding`/`sheet` survive beside them as lineage. This control moved from 11 of 13 \
+         to 0 of 13, and the four-codec falsifier above still returns four distinct shapes."
+    );
+    println!(
+        "    What it cost, stated rather than hidden: three fixtures whose flatness came from \
+         `popcount` of the constituents' own letters were re-founded on material that earns it \
+         structurally, and arithmetic's closed boundaries now all return ONE turn — because every \
+         one of them is the same triangle, and only the operator's spelling had been separating \
+         them."
     );
     Ok(())
 }
