@@ -159,6 +159,31 @@ steps from one act (the fact *and its bound variables*) and records a fragment o
 as the statement. **8,934 of 107,502** binding-tactic lines in mathlib carry their own binders, and
 for `suffices` they are the majority.
 
+## THE TYPED TRANSPORT ATLAS — the active construction plan, 2026-08-14
+
+**The plan is [`THE_TYPED_TRANSPORT_ATLAS.md`](THE_TYPED_TRANSPORT_ATLAS.md) and it is the present
+deed.** It carries six movements in dependency order, each named by its mechanism, each with the
+condition under which it is complete and the falsifier that could stop it:
+
+```text
+  THE BINDING IS READ WHERE IT IS WRITTEN    the reader repair -- the gate for every consumer
+  THE CONCLUSION CARRIES ITS RELATION        v; one match arm; decides 105 of the 213
+  THE DECLARATION IS A FORMULATION NODE      D; a typed reader; the plan's real gate
+  RECOGNITION BEFORE THE RUN                 admissibility from (D, v), graded four ways
+  THE ADMITTED PATH IS AN EDGE               the atlas stops being a partition
+  THE ROW IS REGISTERED                      the registry entry H.0362 specialises to
+```
+
+**The object is `H.0362`**, registered in this tree before today: a formulation node is
+`(D, E, ℋ, v, ρ)` and an atlas edge is a proved transformation preserving `v`, with the boundary
+*shared output does not supply an edge*. Neither the emission nor the species reading carries
+`(D, v)`, and the species blocks are identical observation vectors — so the atlas rows were built as
+the one construction that boundary excludes.
+
+**The experiment is two arms on one material** — the inherited untyped cartesian product against a
+typed emission — with four predictions declared before the run and an explicit refutation condition:
+if the typed arm admits nothing the untyped one did not, the node model is decoration.
+
 ### THE TRANSPORT ATLAS — REGRADED 2026-08-14 by two audits; the plan is `THE_TYPED_TRANSPORT_ATLAS.md`
 
 **Read [`THE_TYPED_TRANSPORT_ATLAS.md`](THE_TYPED_TRANSPORT_ATLAS.md) before this section.** Two
