@@ -69,7 +69,7 @@ use life::{
     agentic_research::{
         answer_causes, AgenticResearchAnswer, AgenticResearchSession, MountedResearchInformantWorld,
     },
-    laboratory_language::{LaboratoryResearchSpec, LaboratorySourceAtlas},
+    laboratory_language::{LaboratoryResearchSpec, LaboratorySourceAtlas, LaboratorySourceRoots},
     morphological_language::{MorphologicalGenerationSpec, MorphologicalLanguagePassage},
     text_material::{ExactTextMaterialAtlas, ExactTextMaterialCorpus, ParsedTextDocument},
 };
@@ -293,8 +293,18 @@ fn run() -> Result<(), String> {
     } else {
         build_declared_fixture(&root, &fixture, arguments.support_records)?
     };
-    let repository = LaboratorySourceAtlas::mount_repository_excluding(
+    // **The world declares the roots it built.** The default roots are this repository's own
+    // (`research/records`, `papers`, `crates`, `soma`); the fixture is a declared subset and carries
+    // two of them. Mounting the fixture at the defaults asked for `papers` and `crates`, found
+    // neither, and — before `DeclaredRootIsAbsent` existed — indexed **zero** sections in silence,
+    // so the first question failed with `NoClosedCurrent`: a diagnosis about the question for a
+    // defect in the mount.
+    let repository = LaboratorySourceAtlas::mount_repository_roots(
         &fixture,
+        &LaboratorySourceRoots {
+            theory: vec![PathBuf::from("research/records")],
+            code: vec![PathBuf::from("soma")],
+        },
         &BTreeSet::from([GRADING_RECORD.to_owned()]),
     )
     .map_err(|e| format!("mount repository research world: {e:?}"))?;
@@ -665,11 +675,11 @@ fn build_declared_fixture(
     for (named, at) in DECLARED_WORLD_THEORY
         .iter()
         .chain(DECLARED_WORLD_SUPPORT.iter().take(support_records))
-        .map(|named| (*named, "src/soma/RESEARCH"))
+        .map(|named| (*named, "research/records"))
         .chain(
             DECLARED_WORLD_RUST
                 .iter()
-                .map(|named| (*named, "src/soma/live")),
+                .map(|named| (*named, "soma/life/src")),
         )
     {
         let from = root.join(named);

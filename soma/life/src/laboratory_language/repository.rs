@@ -123,6 +123,17 @@ impl LaboratorySourceAtlas {
             ));
         }
         let mut theory_paths = Vec::new();
+        // Every declared root must resolve. A root that does not exist is a caller error and it is
+        // refused by name; silently indexing nothing is how a mount reports a path defect as a
+        // failure of the question.
+        for relative in roots.theory.iter().chain(roots.code.iter()) {
+            if !root.join(relative).exists() {
+                return Err(LaboratoryLanguageError::DeclaredRootIsAbsent {
+                    root: relative.display().to_string(),
+                    beneath: root.display().to_string(),
+                });
+            }
+        }
         for relative in &roots.theory {
             receive_paths(&root.join(relative), &["md", "typ"], &mut theory_paths)?;
         }

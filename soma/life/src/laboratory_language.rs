@@ -42,6 +42,17 @@ pub enum LaboratoryLanguageError {
         aperture: usize,
     },
     CarrierExtent,
+    /// A declared root resolves to nothing beneath the mounted repository.
+    ///
+    /// **This refusal exists because its absence made the whole agentic loop return nothing and say
+    /// nothing.** `receive_paths` returns `Ok(())` for a root that does not exist, so a mount whose
+    /// roots miss the material by one path component indexes zero sections, zero features, and the
+    /// first question fails with `NoClosedCurrent` — a diagnosis about the *question* for a defect
+    /// in the *mount*. A world that was handed a root and found nothing there must say so.
+    DeclaredRootIsAbsent {
+        root: String,
+        beneath: String,
+    },
     Relational(RelationalLanguageError),
 }
 
