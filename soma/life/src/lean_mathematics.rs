@@ -103,6 +103,43 @@ impl LeanSourceDocument {
 pub struct LeanBinderChart {
     pub name: String,
     pub explicit: bool,
+    /// How the source wrote this binder. `explicit` is the coarse face of it and is retained so
+    /// every existing reading still holds.
+    #[serde(default)]
+    pub kind: LeanBinderKind,
+    /// The binder's **type, as the source wrote it**, normalised to single spaces.
+    ///
+    /// This is `H.0362`'s `D` — the parameter domain — and it was discarded at the destructuring
+    /// `content.split_once(':')`, which bound the type to `_`. Without it an application cannot be
+    /// typed at all, and the emission filled argument positions by matching binder **names** across
+    /// two different declarations' frames.
+    ///
+    /// Empty when the source gave none: an instance binder is commonly written `[Fintype α]`, whose
+    /// whole content is the type and whose name Lean synthesises.
+    #[serde(default)]
+    pub type_text: String,
+}
+
+/// How a binder is written, which decides whether it occupies a positional argument slot.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum LeanBinderKind {
+    /// `(x : T)` — supplied positionally.
+    #[default]
+    Explicit,
+    /// `{x : T}` — inferred from later arguments.
+    Implicit,
+    /// `[Inst T]` — resolved by instance search, and commonly anonymous.
+    Instance,
+    /// `⦃x : T⦄` — strict implicit.
+    StrictImplicit,
+}
+
+impl LeanBinderKind {
+    /// Whether a binder of this kind is supplied in a positional application.
+    pub const fn is_positional(self) -> bool {
+        matches!(self, LeanBinderKind::Explicit)
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]

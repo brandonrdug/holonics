@@ -107,7 +107,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (93 deposits of 385)
+## 4 · The 2026-08 record line (94 deposits of 386)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -208,6 +208,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-14_THE_MAP_IS_PRIOR_TO_THE_SHORTCUT_TOLERANCE_IS_WHERE_THE_ARC_STOPS_REACHING_AND_A_DIRECTION_COSTS_LOG_LOG.md` | The map is prior to the shortcut, tolerance is where the arc stops reaching, and a direction costs log log where a position costs log |
 | `2026-08-14_THE_METHOD_IS_A_CHART_TRANSITION_OR_A_COBOUNDARY_MOVE_AND_ONLY_THE_FINITE_STRATA_ARE_TABLES.md` | The method is a chart transition or a coboundary move, and only the finite strata are tables |
 | `2026-08-14_THE_MOVE_SPECIES_IS_A_FIBER_AND_THE_ISOLATED_POPULATION_IS_ITS_OWN_ROW.md` | The move species is a fiber, and the isolated population is its own row |
+| `2026-08-14_THE_ORACLE_TAUGHT_THE_DOMAIN_AND_D_NOW_MATCHES_LEAN_SEVENTEEN_OF_SEVENTEEN.md` | The oracle taught the domain, and `D` now matches Lean seventeen of seventeen |
 
 ---
 

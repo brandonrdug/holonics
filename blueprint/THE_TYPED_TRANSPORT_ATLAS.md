@@ -189,9 +189,23 @@ absorbed.
 **Falsifier.** A conclusion classified as an equality that the kernel then refuses to rewrite by is a
 misread `v` and must be exhibited.
 
-### THE DECLARATION IS A FORMULATION NODE
+### THE DECLARATION IS A FORMULATION NODE — **COMPLETE 2026-08-14, and the plan proceeds**
 
 *`D`, and this is the plan's real gate. It was previously sequenced last.*
+
+**Returned. `D` matches Lean seventeen of seventeen** on a declared sample across four modules,
+graded against `#check @d`.
+[The record](../research/records/2026-08-14_THE_ORACLE_TAUGHT_THE_DOMAIN_AND_D_NOW_MATCHES_LEAN_SEVENTEEN_OF_SEVENTEEN.md).
+
+**§1.3 above is corrected by it.** The claim that a consumer cannot type an application was true of
+`lean_development`'s `statement` and **false of `LeanDeclarationOrgan.binders`**, which has tracked
+`variable` lines into a merged context since before today. The plan took one reader's limitation for
+a property of the material: `D` was three defects away, not a new reader.
+
+The oracle taught each correction, and it disagreed three times before agreeing — including once
+where the *instrument* was wrong (Lean prints an unmentioned hypothesis as an anonymous arrow) and
+once where a naive fix made agreement **worse**, 14 of 17 down to 11. The bound is the sample:
+seventeen declarations is not 232,037.
 
 **Build.** A `FormulationNode` carrying `(D, E, ℋ, v, ρ)` over a Lean declaration, where `D` is the
 binder list **with types**, including `variable`-inherited and instance binders. This needs a typed

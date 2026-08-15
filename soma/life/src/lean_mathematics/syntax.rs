@@ -139,6 +139,64 @@ pub(super) struct ParsedDeclaration {
     pub(super) proof: String,
 }
 
+/// The section variables a declaration actually takes, by Lean's rule: a variable is included when
+/// the declaration mentions it, and mentioning one drags in whatever its own type mentions.
+///
+/// Two conditions the oracle taught this function, each by disagreeing with it:
+///
+/// - **A mention can be a projection.** `#l.toFinset = l.dedup.length` mentions `l`, and the
+///   identifier scan returns the dotted token; taking the head segment as well is what lets the
+///   variable be seen at all. Without it `List.card_toFinset` came back with an empty domain where
+///   Lean prints one argument.
+/// - **A declaration's own binder shadows a section variable of the same name.**
+///   `theorem Multiset.dedup_card_eq_card_iff_nodup {m : Multiset α}` re-binds `m` *implicitly*
+///   under a `variable (m : Multiset α)`, so `m` is not a positional argument at all; admitting the
+///   section's explicit `m` beside it claimed an argument Lean does not take.
+fn admitted_context(
+    context: &[LeanBinderChart],
+    header: &str,
+    shadowed: &BTreeSet<String>,
+) -> Vec<LeanBinderChart> {
+    let mut wanted: BTreeSet<String> = BTreeSet::new();
+    for identifier in lean_identifiers(header) {
+        if let Some((head, _)) = identifier.split_once('.') {
+            wanted.insert(head.to_owned());
+        }
+        wanted.insert(identifier);
+    }
+    // Close over the admitted binders' own types until nothing new is dragged in.
+    loop {
+        let mut grew = false;
+        for binder in context {
+            if binder.name.is_empty() || !wanted.contains(&binder.name) {
+                continue;
+            }
+            for identifier in lean_identifiers(&binder.type_text) {
+                if let Some((head, _)) = identifier.split_once('.') {
+                    if wanted.insert(head.to_owned()) {
+                        grew = true;
+                    }
+                }
+                if wanted.insert(identifier) {
+                    grew = true;
+                }
+            }
+        }
+        if !grew {
+            break;
+        }
+    }
+    context
+        .iter()
+        .filter(|binder| {
+            !binder.name.is_empty()
+                && wanted.contains(&binder.name)
+                && !shadowed.contains(&binder.name)
+        })
+        .cloned()
+        .collect()
+}
+
 pub(super) fn parse_declarations(
     document: &LeanSourceDocument,
 ) -> Result<Vec<ParsedDeclaration>, LeanMathematicsError> {
@@ -162,8 +220,17 @@ pub(super) fn parse_declarations(
         while cursor < lines.len() {
             let line = lines[cursor];
             let next = line.trim_start();
+            // **A top-level `variable` ends a declaration's chunk.** The scan ran only to the next
+            // `theorem`/`lemma`, so every `variable` line appearing after the first declaration was
+            // swallowed into the preceding chunk and never reached the branch that merges it — and
+            // interleaving `variable` with declarations is mathlib's ordinary style. Measured
+            // against Lean itself: `variable [DecidableEq α] (m : Multiset α) (l : List α)` inside
+            // `section ToMultiset` contributed nothing, so `List.card_toFinset` came back with an
+            // empty parameter domain where the oracle prints one argument.
             if line.len() == next.len()
-                && (next.starts_with("theorem ") || next.starts_with("lemma "))
+                && (next.starts_with("theorem ")
+                    || next.starts_with("lemma ")
+                    || next.starts_with("variable "))
             {
                 break;
             }
@@ -182,8 +249,18 @@ pub(super) fn parse_declarations(
                 start + 1
             ))
         })?;
-        let mut binders = context.clone();
-        merge_binders(&mut binders, parse_binder_charts(header));
+        // **A section variable enters a declaration's domain only if the declaration mentions it.**
+        // That is Lean's own rule, and without it every declaration under a `variable` block would
+        // claim every variable in scope as a parameter. The mention is closed over the types of the
+        // binders already admitted, because `(m : Multiset α)` drags `α` in with it.
+        let own = parse_binder_charts(header);
+        let shadowed: BTreeSet<String> = own
+            .iter()
+            .filter(|binder| !binder.name.is_empty())
+            .map(|binder| binder.name.clone())
+            .collect();
+        let mut binders = admitted_context(&context, header, &shadowed);
+        merge_binders(&mut binders, own);
         let binder_names = binders
             .iter()
             .map(|binder| binder.name.clone())
@@ -242,14 +319,17 @@ pub(super) fn parse_binder_charts(text: &str) -> Vec<LeanBinderChart> {
     let mut cursor = 0usize;
     while cursor < characters.len() {
         let (byte, character) = characters[cursor];
-        let (close, explicit) = match character {
-            '(' => (')', true),
-            '{' => ('}', false),
+        let (close, kind) = match character {
+            '(' => (')', LeanBinderKind::Explicit),
+            '{' => ('}', LeanBinderKind::Implicit),
+            '[' => (']', LeanBinderKind::Instance),
+            '⦃' => ('⦄', LeanBinderKind::StrictImplicit),
             _ => {
                 cursor += 1;
                 continue;
             }
         };
+        let explicit = kind.is_positional();
         let start = byte + character.len_utf8();
         let mut depth = 1usize;
         let mut end = None;
@@ -271,13 +351,35 @@ pub(super) fn parse_binder_charts(text: &str) -> Vec<LeanBinderChart> {
             break;
         };
         let content = &text[start..end];
-        if let Some((names, _)) = content.split_once(':') {
+        // **The type is kept.** It was bound to `_` here, and it is `H.0362`'s `D`.
+        // An instance binder is commonly written with no name at all -- `[Fintype α]` -- in which
+        // case the whole content is the type and Lean synthesises the name; it is retained as an
+        // anonymous binder rather than dropped, because it still occupies a position in the
+        // declaration's domain.
+        let (names, type_text) = match content.split_once(':') {
+            Some((names, written)) => (
+                names,
+                written.split_whitespace().collect::<Vec<_>>().join(" "),
+            ),
+            None => ("", content.split_whitespace().collect::<Vec<_>>().join(" ")),
+        };
+        if !type_text.is_empty() && names.split_whitespace().next().is_none() {
+            binders.push(LeanBinderChart {
+                name: String::new(),
+                explicit,
+                kind,
+                type_text: type_text.clone(),
+            });
+        }
+        {
             for name in names.split_whitespace() {
                 let name = name.trim_matches(|character: char| !is_identifier_character(character));
                 if valid_binder_name(name) {
                     binders.push(LeanBinderChart {
                         name: name.to_owned(),
                         explicit,
+                        kind,
+                        type_text: type_text.clone(),
                     });
                 }
             }
