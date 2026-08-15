@@ -75,6 +75,39 @@ a byte-popcount parity.
 | **3** | **Choose the families to avoid the authored partition.** **Forbidden:** `namespace_path` (3,477 blocks = the directory tree), `former` (a keyword), `line` (file layout, already convicted). **Contaminated:** `recruited` — `_` 158,691, `simp` 72,125, `only` 32,427, `rw` 11,204 in term position, over 10% not mathematical objects. **Use:** `statement_grammar`, which knows no Lean noun, and the internal chain. Reader: `lean_development` and never `derivation_atlas`, whose reading knows only `have` while mathlib carries `obtain` 15,264 and `intro` 13,017. | — |
 | **4** | **The two-theorem deed**, which **neither body has ever run** — the laboratory's `runs/eros-two-theorem-deed/` is an empty directory. Drive `receive_kernel_deed_returns` (eleven test sites, **zero drivers**) so a kernel return mounts a composite and a **second theorem becomes reachable only after it**, with an ablation removing it. Scope: `kernel-witness`, ~~because **mathlib is not compiled — 2 oleans**~~ — **that reason was withdrawn 2026-08-14 by attempting it**; the count was taken over `soma/` alone while the archive held 2,622 at the same revision, and the whole library was already in `~/.cache/mathlib` (16,510 files, 834 MB), unpacked by `lake exe cache get` in two minutes with **nothing downloaded**. `soma/formal/elementary-holonics` now carries **7,523 oleans including `Mathlib.olean`**, and `import Mathlib` elaborates through `lake env lean` in **10.2 s** with the kernel admitting `natDegree_mul` and refusing `(1:Nat)=2`. `kernel-witness` remains the right scope for a many-times ablation on **cost**, which is now a declared coordinate rather than a constraint. [The record](../research/records/2026-08-14_THE_LIBRARY_WAS_ALREADY_ON_THE_DISK_AND_THE_ABSENCE_WAS_MEASURED_BY_COUNTING_ARTIFACTS.md) | the return organ is strictly stronger than the laboratory's deleted `prove()`; only the driver is missing |
 
+### THE TRANSPORT ATLAS — the deed's return, 2026-08-14
+
+**The objective this serves is Brandon's and it is not a kernel verdict:** *"an atlas of
+computational structures physically required for algorithms that enable mathematics proofs, so
+they'd be like invariant transport patterns… characteristic properties of group structures and
+transport dynamics between them, like chemistry."* Mathlib is the **encoded medium**; the atlas is
+the object.
+
+**The row is a fiber, and the machinery was already standing.**
+`crates/holonic-engine/src/move_species.rs` is a **sibling instance** of the same `ObservedSystem`
+`soma/life/src/reconstruction_fiber.rs` implements over tokens — one common exposed face per
+candidate, conduct reaching their actual situations, the stable block returned as the class. What
+changes is that a token's neighbours are stream offsets and a **move's are causal arrivals**. No
+engine was added; `receiver_exact_compression::compress` is unchanged.
+[The record](../research/records/2026-08-14_THE_MOVE_SPECIES_IS_A_FIBER_AND_THE_ISOLATED_POPULATION_IS_ITS_OWN_ROW.md).
+
+Measured on `Mathlib/Geometry/Euclidean/Triangle.lean`: 78 moves, 25 arrivals, 45 **isolated** and
+33 connected; species `{ascribed}` 10 → causal **2**, with **8 departed** founded by four different
+tactics and 1,997 witnesses. The declared control that can fail — *the causal panel is not the
+spelling panel* — holds, after **failing once** on a focus taken from the isolated population, which
+was the reading being right about an uninformative focus.
+
+**Two apertures came out of it, both now declared with measured orbits.** The isolated population is
+a row rather than a filter — *the moves a body founds and never uses*. And the single-character
+binder exclusion in `lean_development` is `BinderGrain`, which dropped **87,525 of 214,381** binders
+founded on mathlib's binding-tactic lines; `MultiCharacter` remains the default so nothing that
+stands moves.
+
+**Owed next, declared before it is run:** the three built atlas entries — the recognition test for
+closed-form integration, the residue-preserving move, the alternation test — are exact classes we
+already own, and the recovered fibers have **not** been compared against them. That comparison is
+the ground truth this atlas has not yet met.
+
 ### The controls, decided before the run
 
 - **The bijection falsifier** is the primary and it already fires. After step 1 the incidence must

@@ -80,6 +80,8 @@ crates/holonic-engine/src/local_star.rs	.clone()=86	.collect()=48	.flat_map()=6	
 crates/holonic-engine/src/matroid_chow.rs	.clone()=30	.collect()=35	.into_iter()=7	BTreeMap=3	Vec=123
 crates/holonic-engine/src/mode.rs	.clone()=2	.collect()=2	BTreeMap=6	Vec=8
 crates/holonic-engine/src/model_surface.rs	.clone()=8	.collect()=4	BTreeMap=4	Vec=20
+crates/holonic-engine/src/move_species.rs	.clone()=5	.collect()=13	.flat_map()=1	.into_iter()=3	BTreeMap=5	BTreeSet=4	Vec=28
+crates/holonic-engine/src/move_species/tests.rs	.clone()=6	.collect()=2	BTreeSet=1	Vec=2
 crates/holonic-engine/src/multiquadratic.rs	.clone()=18	.collect()=2	.into_iter()=1	Vec=11
 crates/holonic-engine/src/name_elaboration.rs	.clone()=29	.collect()=32	.into_iter()=3	BTreeMap=38	BTreeSet=75	Vec=54	VecDeque=3
 crates/holonic-engine/src/observation_ecology.rs	.clone()=49	.collect()=41	.flat_map()=1	.into_iter()=4	BTreeMap=38	BTreeSet=27	Vec=106
