@@ -1214,6 +1214,72 @@ non-Markovianity, exhibited by name with its depth. `None` is a genuine zero, no
 measurement. Measured: one chain read through two declared receiver families returns **different
 orders**, so the order speaks about the receiver.
 
+## 0m. Tolerance, and why compression is intelligence — ratified 2026-08-14
+
+Derivation:
+`research/records/2026-08-14_THE_MAP_IS_PRIOR_TO_THE_SHORTCUT_TOLERANCE_IS_WHERE_THE_ARC_STOPS_REACHING_AND_A_DIRECTION_COSTS_LOG_LOG.md`.
+
+**TOLERANCE IS THE SCALE BELOW WHICH NO ARC CAN REACH A RECEIVER-RELEVANT DIFFERENCE.** Brandon:
+*"when the receiver cannot change because the traversal pattern is referring to differentials that
+are physically negligible to the cells they pertain to, i.e. the lightning has no potential to
+arc/reflect anywhere relevant to the receiver anymore. This is 'tolerance'."* **It is an aperture
+condition and may never be implemented as a numerical threshold.**
+
+**And it is already computed.** Two constructions are within tolerance for a declared receiver family
+**exactly when no word in that family separates them** — which is the collapsed-pair relation, with
+`receiver_exact_compression.rs:143` `distinguishing_word` as **the arc that does reach**. The body's
+highest-degree organ has been computing tolerance under another name since it was written. **No organ
+is owed here; a reading is.**
+
+Three consequences that govern reports. **Convergence is an aperture property, not a numerical one** —
+"converged" means *no remaining difference reaches this receiver*, and a finer receiver may un-converge
+the same computation. **An epsilon is a receiver coordinate and must carry the family it is a
+tolerance for**, exactly as a grain is carried. And **the error does not shrink, it relocates** — the
+transport that always determined those values becomes discretely visible while the residue moves below
+what the receiver can encode, so reporting a tolerance as a quantity that got smaller is a magnitude
+face presented as the object.
+
+**Interpolation is transport, and the loss is in the assumption rather than in the sampling.** To
+interpolate between two pixels is to assume the two projected coordinates dictate the behaviour
+between them; *that* is the information loss, not the sample count. A pixel array is a lattice and the
+sweep that updates it is a parametric traversal, so the CRT law of §0j governs the raster too.
+
+**And curvature is attained, not fundamental** — *"it is attained from depth and interpolation… many
+arcs angling away from each other, but it is still discretely founded."* That is the Regge reading
+§0c already carries. **Do not write, under any framing, that this body lacks curvature or a
+nonlinearity**; `structure_group.rs:544` `curvature_commutator` is the `a ∧ a` term with a test that
+it is non-identity, and four other owners compute curvature. A claim of that shape was made on
+2026-08-14 by grepping for *names* — the convicted `fn without_stem` defect, on six subjects at
+once — and **"undocumented under that name" is not "unconstituted."**
+
+### The navigation joint: the two slogans are one statement
+
+> **The optimal-compression question is unanswerable without a map. Founding the map is induction;
+> reaching the shortcut across it is deduction. Having a map and navigating it IS intelligence. So
+> compression is intelligence — not by resemblance, but because the first is unreachable except
+> through the second.**
+
+Brandon: *"you cannot have such an algorithm without having had already mapped out the topology of
+how the digits compose, so the only physically possible way to approach any 'most efficient'
+algorithm is to then map out the topology of the potentials and then navigate deductively."*
+
+**This re-reads uncomputability.** `K` is uncomputable, and the usual reading is epistemic — *we
+cannot know*. The reading here is constructive and stronger: **there is no route that skips founding
+the terrain.** Same shape as §3's primality reading and as the 2026-08-09 finding that every exact
+formula for a prime is exhaustion in disguise or the answer precomputed.
+
+**And the question is relativistic in this project's own sense** — *"the digits of pi **after x digits
+have been depicted**"*. Sharper than the invariance theorem's machine-dependence: not only does the
+decoder matter, **what has already been founded matters**, and a shortcut is a shortcut *from
+somewhere*.
+
+**Measured, and it is the prime number theorem read as compression:** storing the traversal beats
+storing the digits by a factor of `log N / log log N`, growing without bound — 3.90 near `10^4` rising
+to 7.82 near `10^12`. **A direction costs `log₂ ln N` where a position costs `log₂ N`.** The
+*absolute* index saves only `log₂ ln N` bits in total and is nearly worthless; the **relative**
+direction saves a factor. That figure is an analysis by an outside sieve, not a machine return, and
+may not be cited as one until it runs through `interchange::order_price_bits`.
+
 ## 1. The floor is a carrier, not a retired interface
 
 **The single most damaging defect in the inherited authority was an admission rule that made the
