@@ -29,9 +29,97 @@ STATION". Everything between them is the returned ledger and its provenance.** B
 the standing revision directly: *"Regarding the roadmap document, you can authoritatively revise it
 once you have sufficient context post-analysis campaign."*
 
-## THE EROS CYCLE — ratified 2026-08-14
+## MATHEMATICS INTO THE INFORMATION CENTRIFUGE — ratified 2026-08-14
 
-**This is the present deed.** It composes entirely through the resident circulation's owners named
+**This is the present deed.** The Eros cycle below is complete and is its carrier. Findings and every
+re-run census:
+`research/records/2026-08-14_THE_CENTRIFUGE_IS_BUILT_AND_IT_SEPARATES_BY_SPELLING.md`.
+
+**The naming is load-bearing and is Brandon's.** The material is **mathematics**; Lean is a **codec**,
+good for this because it is *correctly written, completely derived and networked* mathematics. Never
+write the plan as though Lean or mathlib were the subject.
+
+**What a centrifuge is:** it does not analyse. It applies a **declared field** and lets the material
+separate **by its own response**. Nothing is classified from outside. And it does not destroy its
+material — the strata recombine — so **the centrifuge is a rebase with zero remainder, and anything
+lost is a defect rather than a result.** The reintegration check is `DecomposedWhole::reintegrate`.
+
+**No global axis.** A single centrifuge has a centre, and a centre is an absolute frame. The object is
+**many centrifuges chained along emerging axes** — each axis *founded by* the previous separation,
+which is the RIDE/FOUND primitive — bundled with no global coordinate. That is a fiber bundle, which
+is why `atlas` and `gluing` are the machinery and not one global frame. **And the cascade is a Markov
+chain over strata**: each stage's state is the previous stage's stratum, and the memory order is
+`receiver_exact_compression::memory_order`.
+
+### The finding that orders every step
+
+**The centrifuge is already built and already runs on mathematics.** On the full corpus it founds
+694,402 boundary edges over 226,412 constituents at 82 ranks, 233,093 closed boundaries, faithfulness
+verified, with exact rational holonomy per boundary. Reading all of mathlib costs **2.82 seconds**.
+
+**And its own falsifier already fails, in its own output.** A declared bijection renaming every
+constituent leaves the incidence exactly unmoved — *"the structure HELD, `∂`, `o` and `⪯` came from
+the material"* — and **moves the transport at 11 of 13 closed boundaries**, because
+`incidence_production.rs:2859` `contact_winding` is `popcount(tail ⊕ head)` and `:2873` `sheet_of` is
+a byte-popcount parity.
+
+> **The incidence is the material's. The transport is not. `2+2` and `2*2` are separated by the
+> operator's SPELLING and not by `∂`.**
+
+### The steps
+
+| step | what | why it is not an organ |
+|---|---|---|
+| **1** | **The wire.** `Bond.contact_faces` → `PhaseChart::contact_transport`. `incidence_production.rs:347/:361` already carries `contact_faces: BTreeSet<DeclaredContactFace>`, and `material_incidence::ContactSpecies:102` already distinguishes `Recruits` / `Conducts` / `OperandOrder` — **retained as lineage that decides nothing.** | the composition was attempted end to end and returned exactly this one absent path |
+| **2** | **Band every coordinate**, derived from the material. The one-shot partition on raw integers is **133,597 singletons of 232,037**; log₂-banded it is **7,354 blocks, 2,524 singletons**. `token_invariance`'s `Density = floor(log₂ N)` is the standing precedent. | a reading returning the identity partition has returned nothing |
+| **3** | **Choose the families to avoid the authored partition.** **Forbidden:** `namespace_path` (3,477 blocks = the directory tree), `former` (a keyword), `line` (file layout, already convicted). **Contaminated:** `recruited` — `_` 158,691, `simp` 72,125, `only` 32,427, `rw` 11,204 in term position, over 10% not mathematical objects. **Use:** `statement_grammar`, which knows no Lean noun, and the internal chain. Reader: `lean_development` and never `derivation_atlas`, whose reading knows only `have` while mathlib carries `obtain` 15,264 and `intro` 13,017. | — |
+| **4** | **The two-theorem deed**, which **neither body has ever run** — the laboratory's `runs/eros-two-theorem-deed/` is an empty directory. Drive `receive_kernel_deed_returns` (eleven test sites, **zero drivers**) so a kernel return mounts a composite and a **second theorem becomes reachable only after it**, with an ablation removing it. Scope: `kernel-witness`, because **mathlib is not compiled — 2 oleans.** | the return organ is strictly stronger than the laboratory's deleted `prove()`; only the driver is missing |
+
+### The controls, decided before the run
+
+- **The bijection falsifier** is the primary and it already fires. After step 1 the incidence must
+  stay unmoved **and the transport must too**; today it moves at 11 of 13.
+- **The degree-preserving rewiring null**, already implemented as `analytic_null` — same declarations,
+  same per-declaration cardinality, same in-degree, edges rewired. **If the partition, the
+  `memory_order` and the distinguishing-word length distribution all agree with the null, the
+  separation is carried by the degree sequence and not by the mathematics.**
+- **The crossing arms**, matching the Eros design: a subject-disjoint mathlib area must not reproduce
+  the strata; the repository's own prose with matched surface statistics must not either; the rewired
+  foil must move the reading by more than the between-area difference; and the no-op — the same area
+  under a different pivot schedule — must move **exactly zero**.
+- **Per-axis witnesses.** Every declared receiver axis must exhibit a named pair of declarations it
+  separates and no other axis does, or the family is one receiver wearing several names.
+- **Three integers gate the run before anything downstream**: `rounds ≥ 2` from a trial `compress`
+  (below that, conduct added nothing to the one-shot reading), the resolved/OPEN/unresolved split, and
+  the cross-file inside-import-closure rate **against the null**. `lean_development.rs:541-547`
+  already measured that **76% of short-name cross-file edges land on files the source cannot import.**
+
+### Standing bars
+
+**"Spin harder" is refuted by a theorem in the tree.** `token_invariance.rs:145-153` —
+`windows > 1 && blocks == 1` is unsatisfiable at every horizon on every material, so refinement is
+monotone and more field only makes singletons. **The collapse comes from COARSENING the family.** The
+stratum is the **maximal sub-family under which occurrences still fail to separate** — `constant_axes`
+— and the verdict object is `ConductInvariance`, never "separated".
+
+**No spectrum.** `TABLET_THE_REASONING_CYCLE.md:245-246` bars Fourier and Mellin until a causal
+operator and scale action are founded, and a token ordinal is not one.
+
+**Density is the magnitude and separation is the phase of one object.** A plan returning strata
+without the density face has returned a squared modulus.
+
+**And no Millennium row grades any deed here.** The honest diagnostic is narrow: P vs NP is the
+strongest, because `TABLET_THE_CHART.md` §3.7 names the owed object — *"no organ that returns 'is this
+solvable, and at what cost' as a typed answer"* — and the three method-atlas entries built today **are
+that organ**. Hodge has a live consuming organ and would return a fact about the atlas, never about
+the conjecture. Four rows return nothing and their preconditions are named. **The deliverable is the
+method atlas and it needs no Millennium row to be worth building.**
+
+---
+
+## THE EROS CYCLE — ratified 2026-08-14, COMPLETE
+
+**Complete, and the carrier for the deed above.** It composes entirely through the resident circulation's owners named
 directly below; it opens no second ecology. The full audit, every census figure re-taken, and the
 corrections it produced are
 `research/records/2026-08-14_THE_CENSUS_DECAYED_THE_CYCLE_IS_BUILT_AND_THE_OPEN_GRADE_IS_THE_NONIDENTICAL_NEIGHBOURHOOD.md`.
