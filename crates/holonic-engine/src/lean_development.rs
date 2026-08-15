@@ -1000,6 +1000,33 @@ pub const BINDING_TACTICS: [&str; 10] = [
     "by_cases", "cases", "have", "intro", "let", "obtain", "rcases", "rintro", "set", "suffices",
 ];
 
+/// Which binders a binding tactic is read as founding a [`ProofStep`] for.
+///
+/// This is an aperture, not a judgement about which names matter, and it is declared because it
+/// decides what the body's own causal order can contain. A name that is not a step can never be
+/// the source of an arrival, so a reading taken at one grain cannot be compared with one taken at
+/// the other without saying so.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Default, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum BinderGrain {
+    /// Binders of more than one character. **The inherited reading**, and the default, so every
+    /// figure taken before this aperture was declared still reproduces.
+    #[default]
+    MultiCharacter,
+    /// Every binder the pattern founds, single characters included. `intro n` founds `n`, and on
+    /// mathlib's `intro` lines the single-character binders are the majority.
+    EveryBinder,
+}
+
+impl BinderGrain {
+    pub fn admits(self, name: &str) -> bool {
+        match self {
+            BinderGrain::MultiCharacter => name.chars().count() > 1,
+            BinderGrain::EveryBinder => true,
+        }
+    }
+}
+
 /// Where a name stood when the reading met it, from the material's own grammar.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
@@ -1225,6 +1252,7 @@ fn classify(
     mut form: DeclaredForm,
     lines: &[String],
     file_scope: &BTreeSet<String>,
+    binders: BinderGrain,
 ) -> DeclaredForm {
     let mut founded = founded_names(lines);
     founded.extend(file_scope.iter().cloned());
@@ -1286,10 +1314,21 @@ fn classify(
                     // A destructuring pattern founds several names together; each becomes its own
                     // step over the one statement, because the material founds them together and
                     // choosing one would be a receiver decision this reading may not make.
-                    // Single-character binders are Lean's binder convention and are dropped from
-                    // every recruitment population, so a step for one could never be arrived at.
+                    //
+                    // **The binder aperture is declared and its orbit is measured.** This filter
+                    // was unconditional until 2026-08-14 and its stated reason was that
+                    // single-character binders *"are dropped from every recruitment population, so
+                    // a step for one could never be arrived at."* The conclusion holds — a name
+                    // that never becomes a step can never be the source of an arrival — but the
+                    // premise is not what the recruitment loop below does, which says of itself
+                    // that *"the length is not consulted at all."* What the filter really costs is
+                    // measurable: 87,525 of 214,381 binders founded on mathlib's binding-tactic
+                    // lines are one character, and for `intro` they are the majority. An arrival
+                    // that would run through `have h : P := …` is not lost to a rule about
+                    // recruitment; it is lost because `h` was never a move.
                     cohort += 1;
-                    for binder in identifier_tokens(pattern).filter(|name| name.chars().count() > 1)
+                    for binder in
+                        identifier_tokens(pattern).filter(|name| binders.admits(name))
                     {
                         form.steps.push(ProofStep {
                             former: name.to_owned(),
@@ -1591,8 +1630,20 @@ fn file_scope_bindings(split: &[SplitLine]) -> BTreeSet<String> {
 // The reading
 // -------------------------------------------------------------------------------------------------
 
-/// Read one development text at a declared grain.
+/// Read one development text at a declared grain, with the inherited binder aperture.
+///
+/// Equivalent to [`read_development_at`] with [`BinderGrain::MultiCharacter`], which is what every
+/// caller before 2026-08-14 got. Nothing that stands moves.
 pub fn read_development(text: &str, grain: DeclarationGrain) -> DevelopmentReading {
+    read_development_at(text, grain, BinderGrain::MultiCharacter)
+}
+
+/// Read one development text at a declared grain and a declared binder aperture.
+pub fn read_development_at(
+    text: &str,
+    grain: DeclarationGrain,
+    binders: BinderGrain,
+) -> DevelopmentReading {
     let split = split_comments(text);
 
     let mut commentary: BTreeMap<String, u32> = BTreeMap::new();
@@ -1634,7 +1685,7 @@ pub fn read_development(text: &str, grain: DeclarationGrain) -> DevelopmentReadi
                 if header_open {
                     form.statement = header;
                 }
-                $declarations.push(classify(form, &lines, &file_scope));
+                $declarations.push(classify(form, &lines, &file_scope, binders));
             }
         };
     }

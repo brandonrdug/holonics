@@ -221,6 +221,10 @@ pub mod live_presentation;
 // covector. Reached explicitly: `MaterialLoop` and `circulation` say nothing at the crate root
 // about which field they belong to.
 pub mod kelvin;
+// The species of a proof move, returned as a fiber rather than a label. A sibling of
+// `soma/life/src/reconstruction_fiber.rs`: the same common-exposed-face construction over
+// `receiver_exact_compression`, with causal arrivals where the token system has stream neighbours.
+pub mod move_species;
 // A lattice gauge configuration read through `structure_group`: an exact integral representation,
 // plaquette holonomy, the Wilson action in character form, and one transfer operator whose spectrum
 // is exact. Declared, never glob-exported: `Link`, `Lattice` and `Plaquette` are deliberately
