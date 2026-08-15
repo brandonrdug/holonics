@@ -1171,6 +1171,49 @@ overlapping it. The same build found a real defect: the geometry sum must be tak
 turn numbers, because the equation is symmetric in two dials while the turn at infinity is their
 difference, and a signed sum gave one equation two geometries.
 
+## 0l. Softmax is a chart transition, and Markov is a receiver property — ratified 2026-08-14
+
+Derivation: `research/records/2026-08-14_SOFTMAX_IS_A_CHART_TRANSITION_AND_MARKOV_IS_A_PROPERTY_OF_THE_RECEIVER.md`.
+Owners: `crates/holonic-engine/src/exponentiated_ratio.rs`, and `memory_order` / `is_markov_at` /
+`beyond_order` on `receiver_exact_compression`.
+
+**Brandon's ruling, and it corrects a framing that had the mechanism right and the species wrong:**
+*"softmax doesn't actually seem like a statistics function to me, it seems like it's merely
+associated with statistics and got grouped in… you're literally setting the invariant property to be
+that `f(x) = softmax(x) = (chart of Λ) / (infinitesimal discrete paths/arcs that compose Λ)`, because
+of the exponentiation… Like `C/r`. It's a rebasing thing, it's not a statistics thing."*
+
+**The exponential is the arc-to-whole map.** `e^x = lim(1 + x/n)^n` composes `n` infinitesimal arcs
+and returns the whole, so `x` is the **additive chart** and `e^x` the **multiplicative chart**, and
+`exp` is the transition — the Lie exponential `𝔤 → G`. **`C/r` is the same species**: for the circle
+the additive chart is the angle, and `2π` is the additive extent that closes the multiplicative loop.
+**π and `e` are the two constants of one chart transition** — how much extent closes it, and the base
+that makes it its own derivative.
+
+**Why it closes exactly here, which is not luck.** `ℚ⁺` is the **free abelian group on the primes** —
+the fundamental theorem of arithmetic as a group law — and `log₂` is the isomorphism onto its additive
+chart. **So `SymbolicSurprisal` is not a Shannon organ; it is the additive chart of `ℚ⁺`**, and
+`−log p` is one receiver's reading of it. The homomorphism law `exp(a+b) = exp(a)·exp(b)` is the whole
+content and is what distinguishes a chart transition from a statistic. A **fractional** coefficient
+does not fail — it lands in the **finer chart**, the algebraic extension, which is what a root is.
+
+**Softmax factors as a chart transition then a gauge fixing.** It is invariant under `x → x + c`, so
+absolute position is gauge; `p_i/p_j = e^{x_i − x_j}` is the transition applied to a difference; and
+`Z` is a **declared null** that enters no ratio and is the only division. Its statistical use is a
+receiver's face. **Temperature is a root on the ratio**, `r → r^{1/T}` — the same operation that
+enters the finer chart — and **`T → 0` is argmax, which is exactly where softmax becomes a governor.**
+That limit is what the ban on a privileged scalar chooser forbids, and the organ never takes it: every
+ratio is returned and none discarded. The return is a **cocycle**, not a distribution.
+
+**And "Markov" is a property of the pair `(material, receiver family)`, never of the material.**
+`receiver_exact_compression::compress` already computes the causal-state construction — the coarsest
+partition for which conduct is determined by the block — so **the machine already computes the minimal
+Markov model of its material.** The **memory order is the longest shortest-distinguishing-word** over
+the collapsed population: how far back the reading had to look. The collapsed population **is** the
+non-Markovianity, exhibited by name with its depth. `None` is a genuine zero, not a missing
+measurement. Measured: one chain read through two declared receiver families returns **different
+orders**, so the order speaks about the receiver.
+
 ## 1. The floor is a carrier, not a retired interface
 
 **The single most damaging defect in the inherited authority was an admission rule that made the

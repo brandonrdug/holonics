@@ -121,6 +121,12 @@ pub mod diffusion;
 // with an exhibited annihilating combination rather than as a search that gave up.
 pub mod elementary_chart;
 pub mod embedding_fiber;
+// Softmax with the division removed. The exponential carries an additive difference to a
+// multiplicative ratio, and that is its whole work; the partition function is a declared null.
+// Over `SymbolicSurprisal`'s prime-log carrier the exponential closes in the rationals exactly, so
+// this returns a COCYCLE of exact pairwise ratios and normalises only when a caller names a null.
+// Temperature is a root on the ratio, and the `T -> 0` limit -- argmax -- is never taken.
+pub mod exponentiated_ratio;
 #[cfg(target_os = "linux")]
 pub mod hardware_cover;
 // The coboundary move, as distinct from a chart transition. Hermite reduction changes the

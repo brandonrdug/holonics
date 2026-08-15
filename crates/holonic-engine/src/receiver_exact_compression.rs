@@ -169,6 +169,59 @@ impl ReceiverExactCompression {
     }
 
     /// How much the one-shot reading over-collapsed, as a block count rather than a ratio.
+    /// **The memory order this quotient needs, read off the collapsed population.**
+    ///
+    /// A one-shot reading merges two items; conduct separates them, and the
+    /// shortest word that does it is how far ahead the reading had to look. So
+    /// the longest such word over the whole collapsed population is the depth at
+    /// which every distinction this receiver family can make has been made.
+    ///
+    /// **That is a memory order, and it is the Markov order of the pair
+    /// `(material, receiver family)` rather than of the material.** A process is
+    /// not Markov or non-Markov by itself: it is Markov *relative to a declared
+    /// state map*, and the state map here is the one-shot partition. The
+    /// conduct partition is the coarsest map for which the future is determined
+    /// by the block — which is the causal-state construction — and this figure
+    /// says how much history that map had to absorb.
+    ///
+    /// `None` when nothing collapsed: the one-shot reading was already exact, so
+    /// no history was needed at all and the reading is memoryless for this
+    /// family. **That is a genuine zero and not a missing measurement**, which is
+    /// why it is `None` rather than `0`.
+    ///
+    /// The figure is a **face**. The population it summarises —
+    /// [`ReceiverExactCompression::collapsed`], every pair carrying its own word
+    /// and the receiver that saw the difference — is the object, and a caller
+    /// that reports this number without it has reported the shadow.
+    pub fn memory_order(&self) -> Option<usize> {
+        self.collapsed
+            .iter()
+            .map(|pair| pair.distinguishing_word.len())
+            .max()
+    }
+
+    /// Whether every distinction this family makes is reachable within `order`
+    /// symbols of history.
+    ///
+    /// The exact statement of *"is this Markov at order k"* for the declared
+    /// receiver family, and it is decided by the population rather than assumed.
+    pub fn is_markov_at(&self, order: usize) -> bool {
+        self.memory_order().is_none_or(|needed| needed <= order)
+    }
+
+    /// The collapsed pairs that need more than `order` symbols to separate —
+    /// **the non-Markovianity at that order, by name.**
+    ///
+    /// Exhibited rather than counted, because a pair that outruns the order is a
+    /// statement about which two histories the state map could not tell apart,
+    /// and that is the content.
+    pub fn beyond_order(&self, order: usize) -> Vec<&CollapsedPair> {
+        self.collapsed
+            .iter()
+            .filter(|pair| pair.distinguishing_word.len() > order)
+            .collect()
+    }
+
     pub fn refinement(&self) -> usize {
         self.conduct.len().saturating_sub(self.one_shot.len())
     }
@@ -555,6 +608,73 @@ mod tests {
         );
         let (_, left_seen, right_seen) = pair.witness.expect("a receiver sees the difference");
         assert_ne!(left_seen, right_seen);
+    }
+
+    /// **The memory order is the collapsed depth**, and it is a property of the
+    /// pair `(material, receiver family)` rather than of the material.
+    ///
+    /// One counter read two ways: modulo two it needs history, modulo itself it
+    /// needs none. The material is identical in both readings, so anything the
+    /// order says is said about the *receiver*.
+    #[test]
+    fn the_memory_order_is_a_property_of_the_receiver_family_and_not_of_the_material() {
+        let coarse = compress(&CyclicCounter {
+            n: 5,
+            moduli: vec![2],
+        });
+        let exact = compress(&CyclicCounter {
+            n: 5,
+            moduli: vec![5],
+        });
+
+        // The coarse family cannot tell the states apart at a glance and needs
+        // history to do it; the order is exactly how much.
+        assert!(!coarse.is_exact());
+        let order = coarse.memory_order().expect("something collapsed");
+        assert!(order >= 1);
+        assert!(coarse.is_markov_at(order));
+        assert!(!coarse.is_markov_at(order - 1));
+
+        // The exact family separates everything one-shot: no history at all.
+        assert!(exact.is_exact());
+        assert_eq!(
+            exact.memory_order(),
+            None,
+            "nothing collapsed, so no history was needed -- a genuine zero, returned as None \
+             rather than as a figure that could be confused with an unmeasured one"
+        );
+        assert!(exact.is_markov_at(0));
+    }
+
+    /// The non-Markovianity at an order is **exhibited by name**, never counted.
+    /// Every pair beyond the order carries the two histories the state map could
+    /// not tell apart and the word that does it.
+    #[test]
+    fn the_pairs_beyond_an_order_are_returned_by_name_and_partition_the_population() {
+        let compression = compress(&CyclicCounter {
+            n: 5,
+            moduli: vec![2],
+        });
+        let order = compression.memory_order().expect("something collapsed");
+        assert!(compression.beyond_order(order).is_empty());
+
+        let beyond = compression.beyond_order(0);
+        assert_eq!(
+            beyond.len(),
+            compression.collapsed.len(),
+            "every collapsed pair needs at least one symbol"
+        );
+        for pair in &beyond {
+            assert!(!pair.distinguishing_word.is_empty());
+            assert!(pair.witness.is_some(), "a pair beyond the order names its receiver");
+        }
+
+        // And the split at an intermediate order is a genuine partition of the
+        // population rather than all-or-nothing.
+        if order > 1 {
+            let split = compression.beyond_order(order - 1);
+            assert!(!split.is_empty() && split.len() < compression.collapsed.len());
+        }
     }
 
     #[test]
