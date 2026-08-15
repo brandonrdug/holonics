@@ -1,7 +1,10 @@
 # The typed transport atlas
 
 **Date:** 2026-08-14
-**Status:** **COMPLETE 2026-08-14 — all six movements returned.** It supersedes the sequencing in
+**Status:** **All six movements returned 2026-08-14. It is a FLOOR, not an endpoint** — the review
+that says so, with the four standing owners the deed bypassed, is
+[here](../research/records/2026-08-14_THE_TYPED_ATLAS_IS_A_FLOOR_AND_FOUR_STANDING_OWNERS_WERE_BYPASSED.md).
+It supersedes the sequencing in
 `THE_ROADMAP.md` §"THE TRANSPORT ATLAS" and regrades what that section reports.
 **Occasion:** Brandon: *"this sounds like a malformed/failed implementation state and you're
 identifying the parts of our theories that were neglected. Review and audit, correct the design plan
@@ -260,14 +263,20 @@ component.
 **Falsifier.** `Contradicted` non-empty and unexplained means the node model is wrong, which is the
 outcome this arm exists to make reachable.
 
-### THE ADMITTED PATH IS AN EDGE — **COMPLETE 2026-08-14**
+### THE ADMITTED PATH IS AN EDGE — **COMPLETE 2026-08-14, and its first return was a finger-trap**
 
 *The atlas stops being a partition.*
 
-**Returned.** Four kernel-proved edges from one source node, three species named — conjugacy,
-substitution composed with an exterior normalisation, and deposit-then-close. The tactic family types
-itself against `H.0362`'s species, and **a closing tactic is a face, not an edge**. The graph is very
-small and that is stated rather than dressed.
+**Returned twice.** The first return was a printed `Vec<Edge>` **beside `derivation_atlas`**, which
+already reads deposited derivations as a `GradedCausalComplex` with routes, spanning forest, cycle
+agreement and `invariant_movement`. A new organ beside a standing owner, in a movement declared
+complete.
+
+Repaired: `the_proved_edge_moves_the_circuit.rs` deposits the proved edge as a derivation and reads
+what it moved — **`invariants still false`, fields moved `{Cells, BoundaryRank, FillingRank}`**, one
+founded statement and one founded route, at both reach orientations. Four kernel-proved edges, three
+species named, and **a closing tactic is a face, not an edge**. The graph is very small and that is
+stated rather than dressed.
 
 **Build.** Return the atlas as a graph: nodes are formulation nodes, edges are kernel-proved
 transformations with their species named. `H.0362`'s edge species map onto the tactic family and the
