@@ -174,8 +174,7 @@ use thiserror::Error;
 
 use crate::algebraic::CausalCellId;
 use crate::derivation_atlas::{
-    CircuitAperture, Derivation, DerivationCircuit, DerivationIdentity, ReachOrientation,
-    statement_vertex_key,
+    CircuitAperture, Derivation, DerivationCircuit, DerivationIdentity, statement_vertex_key,
 };
 use crate::receiver_current::{
     ExactReceiverCurrentError, ExactReceiverCurrentLaw, ExactReceiverCurrentPassage,
@@ -1365,7 +1364,8 @@ pub fn disjoint_terrain(arms: usize) -> Vec<Derivation> {
 mod tests {
     use super::*;
     use crate::derivation_atlas::{
-        RecruitmentCoefficient, StatementIncidence, found_circuit, read_derivation,
+        ReachOrientation, RecruitmentCoefficient, StatementIncidence, found_circuit,
+        read_derivation,
     };
 
     /// `standing/output/lean-proof-production/carrier-transport-00000.lean`, byte for byte. The

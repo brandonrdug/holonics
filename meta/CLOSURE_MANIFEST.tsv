@@ -6,8 +6,8 @@
 # return the tree cannot reproduce, and it is reported rather than skipped.
 driver	producer	closure	sources
 agentic-research-kernel	ORPHAN	-	0
-analytic-field-transport	crates/holonic-engine/examples/analytic_field_transport.rs	d43cc8f075b4360a808325536554c3b02aa46311cd94db09c73e763c9f0ebbab	129
-arithmetic-dimensional-receiver	crates/holonic-engine/examples/arithmetic_dimensional_receiver.rs	d134ff0164d7095849011fb3446fc8288a189c33bf4c3258601490bdfbf76025	129
+analytic-field-transport	crates/holonic-engine/examples/analytic_field_transport.rs	318ab4482ebd54fbba2ba02d89fec65b809fd2ff9c1bc271dcfd59ffaee05327	129
+arithmetic-dimensional-receiver	crates/holonic-engine/examples/arithmetic_dimensional_receiver.rs	32a4543ab2891b2f594ce2d735c508249c59164f9be1f8e45d6e639f4d19d356	129
 eros_cohered_corpus	soma/life/examples/eros_cohered_corpus.rs	b03fff3c9feb7dc1a69550fb7be07c3c2d8c30dfdcb55e28163a1358dcb1f97c	77
 eros_contextual_retriangulation	soma/life/examples/eros_contextual_retriangulation.rs	c212c02e7f57b1d445a8fa743ce4ce6609873ee18dac085445930d6a7c6ba878	77
 eros_euclidean_worldline	soma/life/examples/eros_euclidean_worldline.rs	04b2169526d90fdb51e9af738a703fe89f6ef1dbda51d45e2b31131b174e1c49	77
@@ -32,10 +32,12 @@ holonic-eta-ratio-atlas	crates/relational-geometry/examples/holonic_eta_ratio_at
 lean-kernel-witness	ORPHAN	-	0
 lean-plural-route-control	ORPHAN	-	0
 lean-proof-production	ORPHAN	-	0
+lean-proof-production-mathlib-core-frame	ORPHAN	-	0
+lean-proof-production-mathlib-frame	ORPHAN	-	0
 mms-reconnection	ORPHAN	-	0
 reintegrating-elaboration	ORPHAN	-	0
 source-revival	ORPHAN	-	0
-the-reading-returns	crates/holonic-engine/examples/the_reading_returns.rs	d84da76e33b02f2ef32400094bb213291151ac080eb8c715eea74e3b690814af	129
+the-reading-returns	crates/holonic-engine/examples/the_reading_returns.rs	ec6d74d3dbbefca27beed8d6479b3bf24e5f979fb4bbb21ad8b55142cc05c33a	129
 the-two-theorem-deed	ORPHAN	-	0
 the_ablated_body_rests_and_remounts	soma/life/examples/the_ablated_body_rests_and_remounts.rs	f8093245a773bd8e625037b9709a606f7c15d57ddfe1beca6e17290d04b74ede	77
 the_code_material_returns_its_world_line	soma/life/examples/the_code_material_returns_its_world_line.rs	926dfc28d3cd5fa88023814f31ae43a09dcf78988477cf48f0f4f881cb9cccd8	77

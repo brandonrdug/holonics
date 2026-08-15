@@ -102,7 +102,12 @@ enum ObstructionSpecies {
 }
 
 fn obstruction_species(diagnostic: &str) -> ObstructionSpecies {
-    if diagnostic.contains("unknown tactic")
+    // `unknown module prefix` is the strongest environment refusal there is: the import itself did
+    // not resolve, so the kernel never read the term. It was absent from this list until
+    // 2026-08-14, when the same emission was first graded in two environments and the whole
+    // difference between them landed in exactly this diagnostic.
+    if diagnostic.contains("unknown module prefix")
+        || diagnostic.contains("unknown tactic")
         || diagnostic.contains("unknown identifier")
         || diagnostic.contains("unknown constant")
     {
@@ -351,7 +356,7 @@ fn main() {
     let mathlib_kernel_problem = ecology
         .materialize_kernel_problem(&mathlib)
         .expect("the mathlib problem materializes");
-    match ecology.generate_proof_candidates(&mathlib_kernel_problem) {
+    let mathlib_candidates = match ecology.generate_proof_candidates(&mathlib_kernel_problem) {
         Ok((reached, candidates)) => {
             println!(
                 "    theorem            {}",
@@ -380,17 +385,141 @@ fn main() {
                 !reached.is_empty() && candidates.len() > 1,
                 "the mathlib corpus reaches a declaration star and composes a plural path family",
             );
+            Some(candidates)
         }
         Err(error) => {
             println!("    generation refused: {error}");
             failures.require(false, "the mathlib corpus composes a proof path family");
+            None
+        }
+    };
+
+    // ------------------------------------ the emission, graded in TWO kernel environments
+    //
+    // Until 2026-08-14 this driver printed a GAP here: the paths above were generated and never
+    // graded, because mathlib was believed uncompiled. It was not — the library was already in
+    // `~/.cache/mathlib` and `lake exe cache get` unpacked it in two minutes. `LeanKernelWorld`
+    // has always taken its project root as a parameter, so the whole gap was an argument.
+    //
+    // ONE emission, TWO environments. An invariant is only visible across two frames, and this
+    // pair separates the environment from the mathematics exactly: `kernel-witness` cannot even
+    // resolve the import, so every verdict there is an environment fact; `rh-source-transport`
+    // carries the mathematics AND mathlib, so every verdict there is about the term. Admission
+    // is NOT required and must not be — requiring it would author the outcome.
+    if let Some(candidates) = mathlib_candidates.as_ref() {
+        // A declared receiver coordinate. Each mathlib elaboration holds a multi-gigabyte
+        // environment, so the aperture is bounded by memory rather than by cores.
+        let mathlib_worker_aperture = 6;
+        let mathlib_project = root.join("soma/formal/rh-source-transport");
+        println!("\n=== the SAME emission, graded in two kernel environments");
+        println!("    paths graded        {}", candidates.len());
+        println!("    worker aperture     {mathlib_worker_aperture}");
+        println!(
+            "    environment A       {} (Lean core alone)",
+            project_root.display()
+        );
+        println!(
+            "    environment B       {} (this repository's mathematics + mathlib)",
+            mathlib_project.display()
+        );
+
+        let core_frame = LeanKernelWorld::new(
+            &project_root,
+            root.join("output/lean-proof-production-mathlib-core-frame"),
+            mathlib_worker_aperture,
+        )
+        .expect("the core-frame kernel world constructs");
+        let mathlib_frame = LeanKernelWorld::new(
+            &mathlib_project,
+            root.join("output/lean-proof-production-mathlib-frame"),
+            mathlib_worker_aperture,
+        )
+        .expect("the mathlib-frame kernel world constructs");
+
+        let in_core = core_frame
+            .grade_all(&mathlib_kernel_problem, candidates)
+            .expect("every path receives a verdict in the core frame");
+        let in_mathlib = mathlib_frame
+            .grade_all(&mathlib_kernel_problem, candidates)
+            .expect("every path receives a verdict in the mathlib frame");
+
+        for (name, returns) in [("A core", &in_core), ("B mathlib", &in_mathlib)] {
+            let environment = returns
+                .obstructions()
+                .filter(|returned| {
+                    obstruction_species(returned.diagnostic())
+                        == ObstructionSpecies::EnvironmentAperture
+                })
+                .count();
+            let millis: u64 = returns
+                .members()
+                .iter()
+                .map(|returned| returned.observed_millis())
+                .sum();
+            println!(
+                "\n    {name}: admitted {} · obstructed {} — of which environment {environment}, \
+                 mathematical {}",
+                returns.kernel_admitted_extent(),
+                returns.obstruction_extent(),
+                returns.obstruction_extent() - environment,
+            );
+            println!("      summed kernel occupancy {millis} ms");
+            let mut heads: Vec<&str> = returns
+                .obstructions()
+                .filter_map(|returned| returned.diagnostic().lines().find(|line| !line.is_empty()))
+                .collect();
+            heads.sort_unstable();
+            heads.dedup();
+            println!("      distinct first diagnostic lines {}", heads.len());
+            for head in heads.iter().take(4) {
+                println!("        {head}");
+            }
+        }
+
+        let core_environment = in_core
+            .obstructions()
+            .filter(|returned| {
+                obstruction_species(returned.diagnostic()) == ObstructionSpecies::EnvironmentAperture
+            })
+            .count();
+        let mathlib_module_refusals = in_mathlib
+            .members()
+            .iter()
+            .filter(|returned| returned.diagnostic().contains("unknown module prefix"))
+            .count();
+        failures.require(
+            core_environment == candidates.len(),
+            "in the core frame EVERY path is refused by the environment, not by the mathematics",
+        );
+        failures.require(
+            mathlib_module_refusals == 0,
+            "in the mathlib frame NO path is refused for a module the environment lacks",
+        );
+
+        // Return the artifact. A count is a receipt; the source is the deed.
+        println!("\n    --- the artifact: every source the mathlib frame ADMITTED, verbatim");
+        if in_mathlib.kernel_admitted_extent() == 0 {
+            println!(
+                "      none. The emission reached this theorem's declaration star and composed \
+                 {} paths;\n      the kernel read every one and closed none. That is a returned \
+                 obstruction population\n      on real mathematics, which is what this frame \
+                 exists to produce.",
+                candidates.len()
+            );
+        }
+        for returned in in_mathlib.kernel_admitted() {
+            let source = mathlib_kernel_problem
+                .render(&returned.candidate().proof)
+                .expect("an admitted path renders");
+            println!(
+                "      --- ordinal {} lineage {:?} sha256 {}",
+                returned.candidate().ordinal,
+                lineage(returned.candidate()),
+                returned.source_sha256()
+            );
+            println!("{}", indent(&source, "          "));
         }
     }
-    println!(
-        "    GAP: no verdict is available for this theorem. Its environment requires mathlib,\n         \
-         whose package cache is not materialized under soma/formal. The kernel loop below runs\n         \
-         in soma/formal/kernel-witness, which Lean core alone can check."
-    );
 
     // ---------------------------------------------------------------- total ablation
     println!("\n=== control: total structural ablation");

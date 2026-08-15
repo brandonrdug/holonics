@@ -83,6 +83,11 @@ the tree named the command.
 
 ## 3. The result, with its control
 
+**Every Lean file in this section was written by hand.** They are apparatus probes and nothing more:
+they measure that the kernel can be reached with mathlib in scope. **No machine emission appears in
+this section**, and reading one into it would be the receipt-over-implementation defect in its purest
+form. What the machine emitted, and what the kernel said about it, is the section below this one.
+
 After `lake exe cache get`:
 
 ```text
@@ -159,7 +164,76 @@ and is reported rather than counted.
 
 ---
 
-## 4. What is owed, and it is not an organ
+## 4. The machine's own emission, graded in two environments
+
+Brandon asked the question that separates apparatus from deed: *"The machine output that lean?"* The
+probes above — no. **This section is what the machine emitted**, and it was produced by pointing the
+existing driver at the environment that section 2 unblocked.
+
+`eros_lean_proof_production` has always generated a proof-path family for a theorem the ecology was
+never shown, posed against the mathlib corpus, and then **printed a GAP where the verdict should
+be**. The paths were composed and thrown away. There are **213 of them**, over a declaration star of
+seven:
+
+```text
+  congestion_exceeds_one_of_subset_load  proportionalFlow_column_sum
+  proportionalFlow_nonnegative           proportionalFlow_respects_capacity
+  proportionalFlow_row_sum               subset_normalized_load_le_congestion
+  total_demand_le_total_capacity
+```
+
+**One emission, two kernel environments.** An invariant is only visible across two frames, and this
+pair separates the environment from the mathematics exactly — `kernel-witness` cannot resolve the
+import at all, `rh-source-transport` carries this repository's mathematics *and* mathlib. The
+identical 213 rendered files were submitted to both.
+
+```text
+  A  kernel-witness        admitted 0 · obstructed 213 — environment 213, mathematical   0
+                           17,881 ms summed kernel occupancy
+                           every diagnostic: unknown module prefix 'SomaRHSourceTransport'
+
+  B  rh-source-transport   admitted 4 · obstructed 209 — environment   0, mathematical 209
+                           386,301 ms summed kernel occupancy
+                           207 distinct diagnostics, among them
+                             Tactic `assumption` failed
+                             linarith failed to find a contradiction
+                             ring_nf made no progress on goal
+                             Application type mismatch
+```
+
+> **The same 213 emissions are refused for the environment 213 times in one frame and zero times in
+> the other.** What changed is not the machine and not the mathematics; it is which frame the return
+> came back through. In frame A the kernel never read a single term.
+
+**Admission was not required and must not have been** — requiring it would author the outcome. The
+driver's two declared conditions are about the *environment*: every path environment-refused in A,
+no path module-refused in B. Both hold, and the driver exits zero.
+
+### The bound on the four admissions, which is the part to carry
+
+The four admitted paths all recruit `proportionalFlow_respects_capacity`, in four distinct shapes —
+`exact …`, `simpa using …`, `have generated := …; assumption`, and one more. And
+`soma/formal/rh-source-transport/SomaRHSourceTransport/FiniteTransport.lean:132-138` carries that
+lemma with a statement **identical to the posed theorem** under a different name.
+
+> **So the four admissions are retrieval, not composition.** The machine selected the one lemma of
+> seven whose statement matches and applied it. That is a real return — the selection is out of a
+> star it recruited, and the corpus had departed — but it is not a proof it built, and calling it one
+> would be the receipt-over-implementation defect.
+
+**The 209 mathematical obstructions are the larger return.** A path that fails with *"linarith failed
+to find a contradiction"* has been read by a kernel and refused on its mathematics; a path that fails
+with *"unknown module prefix"* has been refused by a path variable. Until today this body had only
+ever produced the second kind on this corpus, and 16 of the 22 obstructions in the driver's own
+main deed are still of that kind.
+
+**What would sharpen this next:** pose a theorem whose statement is *not* in the corpus, so that no
+single recruitment can close it and a composition is required. The apparatus for that is now
+present; the material choice is the open question.
+
+---
+
+## 5. What is owed, and it is not an organ
 
 **Nothing.** `LeanKernelWorld::new(project_root, scratch_root, worker_aperture)` at
 `soma/life/src/lean_mathematics.rs:781-795` already takes the project root **as a parameter**, and
@@ -177,7 +251,7 @@ aperture is a declared receiver coordinate that a deed against this corpus must 
 
 ---
 
-## 5. Two defects found on the way, both repaired
+## 6. Two defects found on the way, both repaired
 
 ### `tools/lean_check.sh` no longer terminated
 
@@ -196,6 +270,20 @@ The script now prefers the **live** build and falls back to the archive with a p
 The layout note it already carried — Lean 4.27 puts oleans under `.lake/build/lib/lean/`, not
 `.lake/build/lib/` — stands and still costs an hour if missed.
 
+### `rh-source-transport` shares one package tree, and how to recreate it
+
+Its `lake-manifest.json` pins mathlib at the same rev `a3a10db0` as `elementary-holonics`, so a
+second 6.9 GB copy buys nothing. `soma/formal/rh-source-transport/.lake/packages/` is a directory of
+**per-package symlinks** into `../../../elementary-holonics/.lake/packages/`, after which
+`lake build` completes 986 jobs in about a second and the project's three oleans exist.
+
+**It must be a directory of symlinks and not a symlinked directory**, which is not fussiness — the
+first attempt made `packages` itself a symlink and `named-paths` immediately reddened. Two documents
+declare the token `.lake/` absent with an explicit rationale — *"its only contents are `build/` and
+`packages/`, both in this checker's own PRUNED set"* — and a symlink is a file entry rather than a
+pruned directory, so the token resolved live and contradicted its own declaration. **The gate caught
+a machine-local arrangement quietly breaking a stated invariant**, which is what it is for.
+
 ### The build is bound to no commit
 
 `.gitignore:27` is `**/.lake/build/`, so **6.9 GB of built library is untracked and binds to no
@@ -211,7 +299,7 @@ manifest pair is worth having and is not built.
 
 ---
 
-## 6. What this does not claim
+## 7. What this does not claim
 
 It does not claim a result in mathematics. It claims that the exterior kernel can now be handed a
 theorem posed against the whole of a real mathematical library, that it admits a true one and refuses
