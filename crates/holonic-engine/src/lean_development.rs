@@ -1125,9 +1125,7 @@ fn founded_names(lines: &[String]) -> BTreeSet<String> {
             continue;
         }
         let after = trimmed[head.len()..].trim_start();
-        // The pattern runs to the first `:`, `:=` or `with`, whichever comes first.
-        let pattern = split_before_with(after).split(":=").next().unwrap_or(after);
-        let pattern = pattern.split(':').next().unwrap_or(pattern);
+        let (pattern, _) = binding_pattern(after);
         for token in identifier_tokens(pattern).filter(|name| *name != "with") {
             founded.insert(token.to_owned());
         }
@@ -1206,16 +1204,104 @@ fn demands_continuation(trimmed: &str) -> bool {
         .any(|ending| trimmed.ends_with(ending))
 }
 
-/// The part of a tactic's argument before its `with` clause.
+/// The three cuts a binding tactic's argument can carry, each at **bracket depth zero**.
 ///
-/// `induction n with` ends the line, so a ` with ` split with a trailing space never fired and the
-/// binder came back as the literal string `with` — which then appeared as a **term** of `map`,
-/// `trans`, `faceEq_of_carrierEq` and `finite_telescoping`.
-fn split_before_with(after: &str) -> &str {
-    if let Some(rest) = after.strip_suffix(" with") {
-        return rest;
+/// Depth is counted over `()`, `{}`, `[]` and `⟨⟩`. Lean's anonymous-constructor brackets are
+/// included because `obtain ⟨a, b⟩ : T := e` puts a comma-separated pattern inside them and a
+/// colon-bearing type after them, and a scan that ignored `⟨⟩` would cut in the wrong place for
+/// exactly the destructuring forms this reader exists to found.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+struct BindingCuts {
+    /// The byte range of a top-level ` with ` (or a trailing ` with`).
+    with_clause: Option<(usize, usize)>,
+    /// The first top-level `:=`.
+    assignment: Option<usize>,
+    /// The first top-level `:` that is not the head of a `:=`.
+    ascription: Option<usize>,
+}
+
+fn binding_cuts(text: &str) -> BindingCuts {
+    let bytes = text.as_bytes();
+    let mut cuts = BindingCuts::default();
+    let mut depth = 0i64;
+    let mut at = 0usize;
+    for (offset, character) in text.char_indices() {
+        match character {
+            '(' | '{' | '[' | '⟨' => depth += 1,
+            ')' | '}' | ']' | '⟩' => depth -= 1,
+            _ => {}
+        }
+        if depth != 0 {
+            continue;
+        }
+        if character == ':' && cuts.ascription.is_none() && cuts.assignment.is_none() {
+            if bytes.get(offset + 1) == Some(&b'=') {
+                cuts.assignment.get_or_insert(offset);
+            } else {
+                cuts.ascription = Some(offset);
+            }
+        }
+        at = offset;
     }
-    after.split(" with ").next().unwrap_or(after)
+    let _ = at;
+    // ` with ` at depth zero. A `with` inside brackets is part of a term, not a cut.
+    let mut depth = 0i64;
+    for (offset, character) in text.char_indices() {
+        match character {
+            '(' | '{' | '[' | '⟨' => depth += 1,
+            ')' | '}' | ']' | '⟩' => depth -= 1,
+            _ => {}
+        }
+        if depth != 0 || character != 'w' {
+            continue;
+        }
+        let rest = &text[offset..];
+        let preceded = offset > 0 && text[..offset].ends_with(char::is_whitespace);
+        if !preceded {
+            continue;
+        }
+        if rest == "with" {
+            cuts.with_clause = Some((offset, text.len()));
+            break;
+        }
+        if let Some(after) = rest.strip_prefix("with") {
+            if after.starts_with(char::is_whitespace) {
+                cuts.with_clause = Some((offset, offset + "with".len()));
+                break;
+            }
+        }
+    }
+    cuts
+}
+
+/// What a binding tactic founds, and the ascription it carries.
+///
+/// **`with` is a CUT, not a pattern.** `rcases hxy with ⟨a, b⟩` founds `a` and `b`; `hxy` is the
+/// **scrutinee**, a term the step recruits and never a name it founds. Reading the scrutinee as the
+/// binder put its head symbol into `founded`, which sent every later use into `local_bindings`
+/// instead of `recruited` — deleting real declaration-to-declaration edges from the term
+/// population — and handed the `with` clause back as the step's "statement" on a tactic that
+/// carries no ascription at all.
+///
+/// The ascription colon is the first `:` **at depth zero**, so a binder carrying its own
+/// parameters — `have h (x y : V) (hx : x ≠ 0) : T := …` — keeps its colons inside the parameter
+/// group and the cut lands where the type actually begins.
+fn binding_pattern(after: &str) -> (&str, &str) {
+    let cuts = binding_cuts(after);
+    if let Some((_, end)) = cuts.with_clause {
+        // The names are what follows `with`; a with-form carries no ascription.
+        return (after[end..].trim(), "");
+    }
+    let body = match cuts.assignment {
+        Some(assignment) => &after[..assignment],
+        None => after,
+    };
+    match cuts.ascription {
+        Some(ascription) if ascription < body.len() => {
+            (after[..ascription].trim(), body[ascription..].trim())
+        }
+        _ => (body.trim(), ""),
+    }
 }
 
 /// Strip a focus dot, a `<;>` combinator, or a case bar from the head of a tactic line.
@@ -1251,6 +1337,7 @@ fn strip_step_marker(trimmed: &str) -> &str {
 fn classify(
     mut form: DeclaredForm,
     lines: &[String],
+    source_lines: &[usize],
     file_scope: &BTreeSet<String>,
     binders: BinderGrain,
 ) -> DeclaredForm {
@@ -1308,9 +1395,12 @@ fn classify(
 
                 if BINDING_TACTICS.contains(&name) {
                     let after = stripped[name.len()..].trim_start();
-                    let pattern = split_before_with(after).split(":=").next().unwrap_or(after);
-                    let pattern = pattern.split(':').next().unwrap_or(pattern);
-                    let statement = statement_of(after, pattern.trim());
+                    let (pattern, ascription) = binding_pattern(after);
+                    let statement = if ascription.is_empty() {
+                        String::new()
+                    } else {
+                        ascription.split_whitespace().collect::<Vec<_>>().join(" ")
+                    };
                     // A destructuring pattern founds several names together; each becomes its own
                     // step over the one statement, because the material founds them together and
                     // choosing one would be a receiver decision this reading may not make.
@@ -1338,7 +1428,13 @@ fn classify(
                             statement: statement.clone(),
                             recruited: BTreeMap::new(),
                             column,
-                            line: form.line + offset,
+                            // **The true source line, carried rather than derived.**
+                            // `form.line + offset` added an index into a vector that skips
+                            // blank, comment-only, preamble and scoping lines to the
+                            // declaration's own line, which assumes a contiguity the material
+                            // does not have. A consumer that deletes `line` to ablate a step
+                            // then deletes a different line.
+                            line: source_lines.get(offset).copied().unwrap_or(form.line + offset),
                         });
                         open_steps.push((column, form.steps.len() - 1));
                     }
@@ -1379,13 +1475,25 @@ fn classify(
             // grain, because a name local to the declaration is exactly what an earlier step
             // founded — `hcap` is not a recruitment of the environment and *is* the arrival
             // `hcap_pos` takes. A position is relative to a frame; this is the other frame.
-            if let Some((_, index)) = open_steps.last() {
-                if form.steps[*index].binder != token {
-                    let held = form.steps[*index]
-                        .recruited
-                        .entry(token.to_owned())
-                        .or_insert(0u32);
-                    *held = held.saturating_add(1);
+            // **The whole innermost cohort receives it, not just its last binder.**
+            // `ProofStep::binder`'s own doc says a destructuring pattern founds several names each
+            // "sharing one statement and one recruitment", and `open_steps.last()` gave the
+            // recruitment to the final push alone. A step with an empty `recruited` map can never
+            // be the TARGET of an arrival, so that single index left a large population
+            // structurally unreachable in `internal_arrivals`.
+            if let Some((_, last)) = open_steps.last().copied() {
+                let cohort = form.steps[last].cohort;
+                for (_, index) in open_steps.iter().copied().collect::<Vec<_>>() {
+                    if form.steps[index].cohort != cohort {
+                        continue;
+                    }
+                    if form.steps[index].binder != token {
+                        let held = form.steps[index]
+                            .recruited
+                            .entry(token.to_owned())
+                            .or_insert(0u32);
+                        *held = held.saturating_add(1);
+                    }
                 }
             }
             if founded.contains(token) {
@@ -1456,17 +1564,6 @@ fn recruit_line(line: &str, into: &mut BTreeMap<String, u32>) {
         let slot = into.entry(token.to_owned()).or_insert(0u32);
         *slot = slot.saturating_add(1);
     }
-}
-
-/// The statement of a declaration: its header up to `:=`, normalized to single spaces.
-fn statement_of(header: &str, name: &str) -> String {
-    let after_name = header
-        .split_once(name)
-        .map_or(header, |(_, right)| right)
-        .split(":=")
-        .next()
-        .unwrap_or_default();
-    after_name.split_whitespace().collect::<Vec<_>>().join(" ")
 }
 
 /// **A `where` ends a header exactly as `:=` does, and only one of the two was checked.**
@@ -1672,7 +1769,7 @@ pub fn read_development_at(
     // header text so far, and its own lines — collected whole so that position can be decided per
     // DECLARATION rather than per line. A header binder used far down a proof body is only
     // recognisable once the whole declaration is in hand.
-    let mut open: Option<(DeclaredForm, bool, String, Vec<String>)> = None;
+    let mut open: Option<(DeclaredForm, bool, String, Vec<String>, Vec<usize>)> = None;
 
     /// Close whatever declaration is open, flushing an unterminated header into its statement.
     ///
@@ -1681,11 +1778,11 @@ pub fn read_development_at(
     /// statement whenever it was closed by the next former, by a `namespace`, or by an `end`.
     macro_rules! close_open {
         ($open:expr, $declarations:expr) => {
-            if let Some((mut form, header_open, header, lines)) = $open.take() {
+            if let Some((mut form, header_open, header, lines, source_lines)) = $open.take() {
                 if header_open {
                     form.statement = header;
                 }
-                $declarations.push(classify(form, &lines, &file_scope, binders));
+                $declarations.push(classify(form, &lines, &source_lines, &file_scope, binders));
             }
         };
     }
@@ -1735,9 +1832,9 @@ pub fn read_development_at(
             let (header, closed) = cut_header(after);
             if closed {
                 form.statement = header;
-                open = Some((form, false, String::new(), vec![code.to_owned()]));
+                open = Some((form, false, String::new(), vec![code.to_owned()], vec![index + 1]));
             } else {
-                open = Some((form, true, header, vec![code.to_owned()]));
+                open = Some((form, true, header, vec![code.to_owned()], vec![index + 1]));
             }
             continue;
         }
@@ -1799,7 +1896,7 @@ pub fn read_development_at(
             continue;
         }
 
-        if let Some((form, header_open, header, lines)) = open.as_mut() {
+        if let Some((form, header_open, header, lines, source_lines)) = open.as_mut() {
             if *header_open {
                 let (piece, closed) = cut_header(trimmed);
                 let extended = format!("{header} {piece}");
@@ -1810,6 +1907,7 @@ pub fn read_development_at(
                 }
             }
             lines.push(code.to_owned());
+            source_lines.push(index + 1);
         }
     }
 

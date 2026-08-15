@@ -119,9 +119,27 @@ This is the reversal that reorders the plan.
 condition under which it is complete. A movement is complete when its condition holds and its return
 is deposited — not when its code compiles.
 
-### THE BINDING IS READ WHERE IT IS WRITTEN
+### THE BINDING IS READ WHERE IT IS WRITTEN — **COMPLETE 2026-08-14**
 
 *The gate for everything that reads through `lean_development`, which is every consumer.*
+
+**Returned.** All four repairs hold; the orbit is
+[the record](../research/records/2026-08-14_THE_BINDING_IS_READ_WHERE_IT_IS_WRITTEN_AND_THE_ARRIVAL_GRAPH_NEARLY_DOUBLED.md).
+
+```text
+                                                  before        after
+  empty recruitment — cannot be an arrival target  99,040        5,098
+  statement opens with `with`                      17,147            0
+  line does not carry its own former               17,283           26
+  statement is bracket-unbalanced                   5,234          192
+  arrivals on the geometry file                        25           48
+```
+
+**The falsifier passed**: the species populations moved — arrivals nearly doubled. Two consequences
+are carried in the record: the earlier species class of ten **does not exist** on the repaired reader
+(the canonical focus's species is now a singleton and the honest statement is the partition, 27
+blocks against 36), and a control in the species driver was itself malformed — it asked a partition
+question of one focus's fiber — and is repaired to compare partitions.
 
 **Build.** Four repairs, each with a measured population behind it:
 

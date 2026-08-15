@@ -107,7 +107,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (91 deposits of 383)
+## 4 · The 2026-08 record line (92 deposits of 384)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -196,6 +196,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-14_SOFTMAX_IS_A_CHART_TRANSITION_AND_MARKOV_IS_A_PROPERTY_OF_THE_RECEIVER.md` | Softmax is a chart transition, and "Markov" is a property of the receiver |
 | `2026-08-14_THE_APERTURE_IS_AN_INTERACTION_HAMILTONIAN_AND_A_PHASE_OBJECT_IS_INVISIBLE_TO_THE_MAGNITUDE_FACE.md` | The aperture is an interaction Hamiltonian, and a phase object is invisible to the magnitude face |
 | `2026-08-14_THE_ATLAS_IS_BUILT_THE_METHOD_IS_RECOGNISED_BEFORE_IT_RUNS_AND_THE_COBOUNDARY_KEEPS_THE_RESIDUE.md` | The atlas is built: the method is recognised before it runs, and the coboundary keeps the residue |
+| `2026-08-14_THE_BINDING_IS_READ_WHERE_IT_IS_WRITTEN_AND_THE_ARRIVAL_GRAPH_NEARLY_DOUBLED.md` | The binding is read where it is written, and the arrival graph nearly doubled |
 | `2026-08-14_THE_CENSUS_DECAYED_THE_CYCLE_IS_BUILT_AND_THE_OPEN_GRADE_IS_THE_NONIDENTICAL_NEIGHBOURHOOD.md` | The census decayed, the cycle is already built, and the open grade is the nonidentical neighbourhood |
 | `2026-08-14_THE_CENTRIFUGE_IS_BUILT_AND_IT_SEPARATES_BY_SPELLING.md` | The centrifuge is built, it runs on mathematics, and it separates by spelling |
 | `2026-08-14_THE_CORRESPONDENCES_ARE_OWNED_AND_THE_ROTATIONAL_CHART_IS_AN_INSTANCE_NOT_AN_ORGAN.md` | The correspondences are owned, and the rotational chart is an instance rather than an organ |

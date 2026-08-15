@@ -534,6 +534,12 @@ pub struct MoveSpeciesFiber {
     /// Refinement rounds to stability, which is also the longest shortest-distinguishing-word
     /// length: **how far back the reading had to look.**
     pub memory_order: usize,
+    /// The stable partition **over the candidate roots** — the whole reading, not one focus's block.
+    ///
+    /// A comparison between two receiver families must be made here. Comparing one focus's fiber
+    /// answers nothing when that fiber is a singleton under both, which is the same defect as a
+    /// focus no family can separate: the material cannot vary the property under test.
+    pub root_partition: Vec<Vec<MoveOccurrence>>,
     /// Pairs the one-shot reading identified that conduct separates, each carrying its witness.
     pub collapsed: Vec<CollapsedPair>,
     pub demand: MoveWorkDemand,
@@ -640,8 +646,25 @@ pub fn species_fiber(
         .into_iter()
         .collect();
 
+    let root_partition = compression
+        .conduct
+        .blocks
+        .iter()
+        .map(|block| {
+            block
+                .iter()
+                .filter_map(|item| system.root_index(*item))
+                .map(|root| declaration.candidates[root])
+                .collect::<BTreeSet<_>>()
+                .into_iter()
+                .collect::<Vec<_>>()
+        })
+        .filter(|block: &Vec<MoveOccurrence>| !block.is_empty())
+        .collect();
+
     Ok(MoveSpeciesFiber {
         family: declaration.family,
+        root_partition,
         horizon: declaration.horizon,
         focus,
         fiber,

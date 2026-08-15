@@ -293,19 +293,46 @@ fn main() {
         "relabelling every founding tactic moves no block",
     );
 
-    let by_spelling = readings
-        .iter()
-        .find(|(family, _)| *family == MoveFamily::SPELLING)
-        .map(|(_, fiber)| fiber.fiber.clone());
-    let by_cause = readings
-        .iter()
-        .find(|(family, _)| *family == MoveFamily::CAUSAL)
-        .map(|(_, fiber)| fiber.fiber.clone());
-    match (by_spelling, by_cause) {
-        (Some(spelling), Some(cause)) => failures.require(
-            spelling != cause,
-            "the causal panel is not the spelling panel",
-        ),
+    // **The panels are compared as PARTITIONS, not as one focus's fiber.**
+    // Until 2026-08-14 this compared `fiber` against `fiber`, and on a repaired reader the focus's
+    // fiber is a singleton under both panels — so the comparison returned "equal" and the control
+    // failed while the partitions plainly differed. A comparison whose material cannot vary the
+    // property under test is the defect this project convicts, and a fiber of one cannot vary it.
+    let panel = |wanted: MoveFamily| {
+        readings
+            .iter()
+            .find(|(family, _)| *family == wanted)
+            .map(|(_, fiber)| (fiber.root_partition.clone(), fiber.fiber.clone()))
+    };
+    match (panel(MoveFamily::SPELLING), panel(MoveFamily::CAUSAL)) {
+        (Some((spelling, spelling_fiber)), Some((cause, cause_fiber))) => {
+            println!(
+                "    partitions: spelling {} blocks · causal {} blocks",
+                spelling.len(),
+                cause.len()
+            );
+            failures.require(
+                spelling != cause,
+                "the causal panel is not the spelling panel, compared as PARTITIONS",
+            );
+            if spelling_fiber.len() == 1 && cause_fiber.len() == 1 {
+                println!(
+                    "    the focus's own fiber is a singleton under both panels, so it is \
+                     UNDETERMINED there and is reported rather than graded"
+                );
+            } else {
+                println!(
+                    "    the focus's fiber: spelling {} · causal {} · {}",
+                    spelling_fiber.len(),
+                    cause_fiber.len(),
+                    if spelling_fiber == cause_fiber {
+                        "AGREE"
+                    } else {
+                        "differ"
+                    }
+                );
+            }
+        }
         _ => failures.require(false, "both panels returned"),
     }
 
