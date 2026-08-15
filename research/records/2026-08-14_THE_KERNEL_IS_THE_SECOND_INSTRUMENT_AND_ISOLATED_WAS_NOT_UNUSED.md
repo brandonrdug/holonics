@@ -112,6 +112,14 @@ Declared before the run: *an isolated move should be removable more often than a
   isolated    removable 0   load-bearing  2   inconclusive 0
 ```
 
+**AND THE ABLATION ITSELF WAS PARTLY MISAIMED, found by audit the same day.**
+`ProofStep.line` is `form.line + offset` where `offset` indexes a line vector that skips blank,
+preamble and scoping lines, so it assumes a contiguity the material does not have: **10,261 of
+97,696 step lines across mathlib point at a line that does not carry the step's own former.** This
+driver deletes raw source line `step.line`, so roughly one ablation in ten deleted the wrong line.
+The verdict below is unchanged and its reason is now two reasons rather than one.
+`blueprint/THE_TYPED_TRANSPORT_ATLAS.md` §1.4 carries it.
+
 **UNDETERMINED, and that is the honest verdict rather than a failed prediction.** Not one decided
 move in either population is removable, so this material carries **no variation in the property
 under test**. Saying *"the two rates are equal"* would dress a degenerate material up as a finding —

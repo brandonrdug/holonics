@@ -159,6 +159,21 @@ steps from one act (the fact *and its bound variables*) and records a fragment o
 as the statement. **8,934 of 107,502** binding-tactic lines in mathlib carry their own binders, and
 for `suffices` they are the majority.
 
+### THE TRANSPORT ATLAS — REGRADED 2026-08-14 by two audits; the plan is `THE_TYPED_TRANSPORT_ATLAS.md`
+
+**Read [`THE_TYPED_TRANSPORT_ATLAS.md`](THE_TYPED_TRANSPORT_ATLAS.md) before this section.** Two
+audits found that the deed below ran on a contaminated reader and that its object was the one
+construction `H.0362`'s boundary excludes — *shared output does not supply an edge*, and the species
+blocks are identical observation vectors. The figures below stand as **what the code returned** and
+no longer as a reading of the material:
+
+- `MoveAxis::Ascribed` is **31.7% contaminated** — 10,543 of 33,222 `ascribed = true` records come
+  from `with`-form tactics that carry no ascription at all.
+- The `isolated`/`connected` split is **inflated by a reader defect**: a destructuring cohort's
+  recruitment goes to the last binder only, so 38,041 of 97,696 steps carry an empty `recruited` map
+  and can never be the target of an arrival.
+- The reader repairs were sequenced last in this plan and are the **gate**.
+
 ### THE TRANSPORT ATLAS — the deed's return, 2026-08-14
 
 **The objective this serves is Brandon's and it is not a kernel verdict:** *"an atlas of

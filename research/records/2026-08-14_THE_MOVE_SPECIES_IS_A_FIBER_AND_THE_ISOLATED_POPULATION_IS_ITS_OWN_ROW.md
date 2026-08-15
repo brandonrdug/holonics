@@ -86,7 +86,15 @@ axis that split it is exhibited rather than asserted.
 
 ## 2. The isolated population is a row, not a filter
 
-**CORRECTED the same day, by an independent instrument.** This section read *"45 of 78 moves in a
+**CORRECTED TWICE the same day.** The second correction is in
+`blueprint/THE_TYPED_TRANSPORT_ATLAS.md` §1.4 and it reaches the correction below: the
+`terminally_consumed` repair reads `local_bindings` for the binder, and for a `with`-form step the
+binder is the **scrutinee**, whose count reflects the hypothesis's uses rather than the step's. It is
+wrong for those records — 10,543 of 97,696 steps across mathlib. And the `isolated` population itself
+is inflated, because a destructuring cohort's recruitment reaches only its last binder, leaving
+38,041 steps that can never be the target of an arrival.
+
+**CORRECTED first, by an independent instrument.** This section read *"45 of 78 moves in a
 real geometry file are founded and never used."* The count is right and the reading of it was
 wrong. **`isolated` means no later STEP arrives — it never meant unused**, because a declaration's
 closing term is not a step. Measured after the correction: of the 45 isolated moves in that file,

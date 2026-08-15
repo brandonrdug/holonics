@@ -103,6 +103,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 | `blueprint/THE_ASSEMBLY.md` | **THE ASSEMBLY** — The parts exist. 28% of the library body — 51 modules, 59,914 lines — has no inbound edge. |
 | `blueprint/THE_MACHINE.md` | **The machine, whole — what conducts, what it returns, and where the seams are open** — **Evidence:** `measured` — `cargo test --workspace --no-fail-fast`, **1325 passed / 0 failed / 14 ignored**, summed across 42 `test result:` lines on a quiet tree. 80 drivers. 88 engine… |
 | `blueprint/THE_PRESENTATION_ORGAN.md` | **The presentation organ** — It states a contract the roadmap composes. |
+| `blueprint/THE_TYPED_TRANSPORT_ATLAS.md` | **The typed transport atlas — the corrected construction plan** — Two audits were run and both corrected the assistant. |
 
 ---
 
