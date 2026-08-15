@@ -91,7 +91,7 @@ changes is that a token's neighbours are stream offsets and a **move's are causa
 engine was added; `receiver_exact_compression::compress` is unchanged.
 [The record](../research/records/2026-08-14_THE_MOVE_SPECIES_IS_A_FIBER_AND_THE_ISOLATED_POPULATION_IS_ITS_OWN_ROW.md).
 
-Measured on `Mathlib/Geometry/Euclidean/Triangle.lean`: 78 moves, 25 arrivals, 45 **isolated** and
+Measured on mathlib’s `Geometry/Euclidean/Triangle` module: 78 moves, 25 arrivals, 45 **isolated** and
 33 connected; species `{ascribed}` 10 → causal **2**, with **8 departed** founded by four different
 tactics and 1,997 witnesses. The declared control that can fail — *the causal panel is not the
 spelling panel* — holds, after **failing once** on a focus taken from the isolated population, which
