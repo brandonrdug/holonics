@@ -1,7 +1,13 @@
 # The typed transport atlas
 
 **Date:** 2026-08-14
-**Status:** **All six movements returned 2026-08-14. It is a FLOOR, not an endpoint** — the review
+**Status: THIS IS AN INSTRUMENT PLAN, NOT THE ATLAS.** Superseded as the *object* by
+[`THE_METHOD_ATLAS.md`](THE_METHOD_ATLAS.md), which states what an atlas row actually is. Every
+movement below is about the **codec** — a Lean reader, a Lean conclusion relation, a Lean binder
+domain, a Lean emission, Lean tactic edges — and `rw` is substitution in a proof language, not in
+the mathematics. The floors it returned are real and are cited there as floors.
+
+**All six movements returned 2026-08-14. It is a FLOOR, not an endpoint** — the review
 that says so, with the four standing owners the deed bypassed, is
 [here](../research/records/2026-08-14_THE_TYPED_ATLAS_IS_A_FLOOR_AND_FOUR_STANDING_OWNERS_WERE_BYPASSED.md).
 It supersedes the sequencing in

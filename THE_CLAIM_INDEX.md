@@ -102,8 +102,9 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 | `blueprint/PURE_HOLONIC_ENGINE.md` | **Pure holonic engine** — This is the normative, language- and hardware-agnostic engine contract. |
 | `blueprint/THE_ASSEMBLY.md` | **THE ASSEMBLY** — The parts exist. 28% of the library body — 51 modules, 59,914 lines — has no inbound edge. |
 | `blueprint/THE_MACHINE.md` | **The machine, whole — what conducts, what it returns, and where the seams are open** — **Evidence:** `measured` — `cargo test --workspace --no-fail-fast`, **1325 passed / 0 failed / 14 ignored**, summed across 42 `test result:` lines on a quiet tree. 80 drivers. 88 engine… |
+| `blueprint/THE_METHOD_ATLAS.md` | **The method atlas** — It supersedes `THE_TYPED_TRANSPORT_ATLAS.md` as the *object*; that document remains in force as the plan for one **instrument**, and §3 says exactly what it is and is not. |
 | `blueprint/THE_PRESENTATION_ORGAN.md` | **The presentation organ** — It states a contract the roadmap composes. |
-| `blueprint/THE_TYPED_TRANSPORT_ATLAS.md` | **The typed transport atlas** — **The objective it serves is his, 2026-08-14:** *"an atlas of computational structures physically required for algorithms that enable mathematics proofs, so they'd be like invariant… |
+| `blueprint/THE_TYPED_TRANSPORT_ATLAS.md` | **The typed transport atlas** — **All six movements returned 2026-08-14. It is a FLOOR, not an endpoint** — the review that says so, with the four standing owners the deed bypassed, is… |
 
 ---
 

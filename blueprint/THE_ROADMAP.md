@@ -159,7 +159,22 @@ steps from one act (the fact *and its bound variables*) and records a fragment o
 as the statement. **8,934 of 107,502** binding-tactic lines in mathlib carry their own binders, and
 for `suffices` they are the majority.
 
-## THE TYPED TRANSPORT ATLAS — the active construction plan, 2026-08-14
+## THE METHOD ATLAS — the active construction plan, 2026-08-15
+
+**The plan is [`THE_METHOD_ATLAS.md`](THE_METHOD_ATLAS.md).** An atlas row is a **recognition
+condition computed exactly on a mathematical object**, which decides which transport applies and
+decides equally when none does. Three rows stand — the elementarity rank test, the coboundary move,
+the alternation test. Two are owed and both are named by the material: **genus, which recognises the
+entire substitution row and whose failure boundary is the same invariant**, and **Chebyshev's three
+cases, which are aperture-complete**. The edges between rows are the typed moves — chart transition
+carrying a Jacobian, coboundary move changing no class, local–global — and merging the first two
+destroys the invariant.
+
+**The drift it corrects.** `THE_TYPED_TRANSPORT_ATLAS.md` ran six movements and every one was about
+the **codec**. It is retained as an **instrument** plan: the kernel is an exterior returning port and
+its floors are real, but an atlas of tactic applications is an atlas of the medium.
+
+## THE TYPED TRANSPORT ATLAS — an instrument, complete 2026-08-14
 
 **The plan is [`THE_TYPED_TRANSPORT_ATLAS.md`](THE_TYPED_TRANSPORT_ATLAS.md) and it is the present
 deed.** It carries six movements in dependency order, each named by its mechanism, each with the
