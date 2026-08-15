@@ -80,8 +80,8 @@ crates/holonic-engine/src/local_star.rs	.clone()=86	.collect()=48	.flat_map()=6	
 crates/holonic-engine/src/matroid_chow.rs	.clone()=30	.collect()=35	.into_iter()=7	BTreeMap=3	Vec=123
 crates/holonic-engine/src/mode.rs	.clone()=2	.collect()=2	BTreeMap=6	Vec=8
 crates/holonic-engine/src/model_surface.rs	.clone()=8	.collect()=4	BTreeMap=4	Vec=20
-crates/holonic-engine/src/move_species.rs	.clone()=5	.collect()=13	.flat_map()=1	.into_iter()=3	BTreeMap=5	BTreeSet=4	Vec=28
-crates/holonic-engine/src/move_species/tests.rs	.clone()=6	.collect()=2	BTreeSet=1	Vec=2
+crates/holonic-engine/src/move_species.rs	.clone()=5	.collect()=14	.flat_map()=1	.into_iter()=3	BTreeMap=5	BTreeSet=4	Vec=29
+crates/holonic-engine/src/move_species/tests.rs	.clone()=6	.collect()=4	.into_iter()=2	BTreeSet=3	Vec=2
 crates/holonic-engine/src/multiquadratic.rs	.clone()=18	.collect()=2	.into_iter()=1	Vec=11
 crates/holonic-engine/src/name_elaboration.rs	.clone()=29	.collect()=32	.into_iter()=3	BTreeMap=38	BTreeSet=75	Vec=54	VecDeque=3
 crates/holonic-engine/src/observation_ecology.rs	.clone()=49	.collect()=41	.flat_map()=1	.into_iter()=4	BTreeMap=38	BTreeSet=27	Vec=106
@@ -152,7 +152,7 @@ soma/life/src/causal_section/tests.rs	.collect()=3	.into_iter()=1	BTreeMap=2	BTr
 soma/life/src/conditioned_rest.rs	.clone()=40	.collect()=7	BTreeMap=1	BTreeSet=3	Vec=32
 soma/life/src/coupled_informant_current.rs	.clone()=2	.collect()=2	.flat_map()=1	.into_iter()=2	BTreeMap=3	BTreeSet=2	Vec=12
 soma/life/src/current_world.rs	.clone()=6	.flat_map()=1	.into_iter()=2	Vec=21
-soma/life/src/decomposing_codec.rs	.clone()=27	.collect()=43	.into_iter()=7	BTreeMap=12	BTreeSet=36	Vec=109
+soma/life/src/decomposing_codec.rs	.clone()=28	.collect()=48	.into_iter()=7	BTreeMap=12	BTreeSet=36	Vec=114
 soma/life/src/dialogue_lineage.rs	.clone()=10	.collect()=2	BTreeSet=4	Vec=4
 soma/life/src/exposure_codec.rs	.clone()=2	.collect()=25	.into_iter()=3	BTreeMap=17	BTreeSet=28	HashMap=4	Vec=54
 soma/life/src/form_mouth.rs	.clone()=3	.collect()=3	Vec=4
