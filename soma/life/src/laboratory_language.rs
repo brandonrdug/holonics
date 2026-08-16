@@ -11,6 +11,30 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use holonic_engine::CpuExecutionReceipt;
+use holonic_engine::traversible_chain::CountedCrossing;
+
+/// The in-flight reading. **A phase that has not finished still has something to say.**
+///
+/// Every counter this emits was already computed and every one was trapped in a local until the
+/// loop containing it returned — so a run that did not return reported nothing at all, which is why
+/// three days of one-core hangs were diagnosed by guessing. `LaboratoryThoughtStep` is built per
+/// wave and handed to the caller only on completion; these lines are the same quantities, radiated
+/// as they are produced.
+///
+/// Enabled by `EROS_TRACE`, resolved once. It writes to stderr so a driver's own return stays clean.
+pub(crate) fn eros_trace(phase: &str, detail: &std::fmt::Arguments<'_>) {
+    use std::sync::OnceLock;
+    static ENABLED: OnceLock<bool> = OnceLock::new();
+    if *ENABLED.get_or_init(|| std::env::var_os("EROS_TRACE").is_some()) {
+        eprintln!("eros-trace {phase:<28} {detail}");
+    }
+}
+
+macro_rules! trace_phase {
+    ($phase:expr, $($argument:tt)*) => {
+        crate::laboratory_language::eros_trace($phase, &format_args!($($argument)*))
+    };
+}
 use holonic_structure::{LocalRelations, LocalSequence, LocalSet};
 use serde::{Deserialize, Serialize};
 
@@ -36,11 +60,6 @@ pub enum LaboratoryLanguageError {
     World(String),
     EmptyQuestion,
     NoQuestionRegions,
-    ReceiverAperture {
-        leader: String,
-        encountered_population: usize,
-        aperture: usize,
-    },
     CarrierExtent,
     /// A declared root resolves to nothing beneath the mounted repository.
     ///
@@ -79,11 +98,71 @@ pub struct LaboratoryResearchLeader {
     pub identity: String,
     pub question: String,
     pub region: BTreeSet<String>,
-    pub aperture: usize,
+    /// The chronology this leader's traversal is admitted through — **not a count of sections.**
+    ///
+    /// A site's cost is its own: a junction between what the leader carries and what the site
+    /// shares needs `⌈(R+M)²/(4RM)⌉` service rounds, one when they match and more as they separate.
+    /// A site whose rounds exceed this horizon **defers** — retained by name with its exact
+    /// reflection — rather than being refused.
+    ///
+    /// This replaced `aperture: usize` on 2026-08-15. The count had exactly two settings and both
+    /// were wrong: every finite value refused at `aperture + 1` on every material measured, and
+    /// `usize::MAX` never refused, which made `omitted_population = complete − selected` **zero by
+    /// construction**. A count is not a viscosity; a chronology with a congestion dilation is.
+    pub horizon: u64,
     /// Zero denotes a region emitted directly by the question.  Later generations are emitted by
     /// still-open thought currents after earlier world returns changed the body.
     pub generation: usize,
     pub caused_by_clauses: BTreeSet<String>,
+}
+
+/// What a junction between a leader and a site returned. **The one place the admission law is
+/// spelled**, so the three world ports cannot drift apart on it.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum LeaderAdmission {
+    /// The junction dilates within the leader's horizon; the current crosses.
+    Crosses { service_rounds: u128 },
+    /// The junction dilates past it. Retained, never refused.
+    Defers {
+        service_rounds: u128,
+        reflection: (i128, u128),
+    },
+    /// The site shares nothing. There is no traveling section to fabricate, and this is a terminus
+    /// by type rather than a comparison against a small number.
+    NoTravelingSection,
+}
+
+impl LaboratoryResearchLeader {
+    /// Cross a site that shares `shared` of this leader's region.
+    ///
+    /// The incident admittance is what the leader carries (`|region|`), the transmitted admittance
+    /// is what the site shares, and the cost is
+    /// `⌈(R + M)² / (4RM)⌉` — one round at a match, more as they separate. Both admittances are
+    /// populations of the material; the horizon is the caller's declared chronology.
+    ///
+    /// **Why one leader-level method rather than a filter in each port.** Before 2026-08-15 three
+    /// ports each spelled their own count truncation — `selected.len() > leader.aperture` returning
+    /// an error in the repository port, `sections.len() >= leader.aperture` silently `continue`ing
+    /// in the dialogue port, and an aperture clamp sizing device buffers in the card port. Two of
+    /// the three **dropped** what they excluded. A law that three callers spell three ways is three
+    /// laws.
+    pub fn admits(&self, shared: usize) -> LeaderAdmission {
+        let carried = self.region.len() as u64;
+        let Ok(shared) = u64::try_from(shared) else {
+            return LeaderAdmission::NoTravelingSection;
+        };
+        let Some(crossing) = CountedCrossing::meet(carried, shared) else {
+            return LeaderAdmission::NoTravelingSection;
+        };
+        let service_rounds = crossing.service_rounds();
+        if service_rounds > u128::from(self.horizon) {
+            return LeaderAdmission::Defers {
+                service_rounds,
+                reflection: crossing.reflection_pair(),
+            };
+        }
+        LeaderAdmission::Crosses { service_rounds }
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
@@ -123,6 +202,25 @@ pub struct LaboratoryWorldReturn {
     pub sections: Vec<LaboratoryReturnedSection>,
     pub complete_population: usize,
     pub omitted_population: usize,
+    /// What the traversal met and did not cross, **retained with its exact reflection**.
+    ///
+    /// Reflection is not loss; it is the retained fiber of a junction that did not match. A rank is
+    /// only meaningful against the population that did not connect, so dropping these would delete
+    /// the null every reading here is taken against.
+    pub deferred: Vec<LaboratoryDeferredSection>,
+}
+
+/// A site the leader met whose junction dilated past its horizon. Kept, not discarded.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct LaboratoryDeferredSection {
+    pub source_identity: String,
+    pub source: String,
+    pub matched_features: Vec<String>,
+    /// What the junction cost: `⌈(R+M)²/(4RM)⌉`, from the two populations and nothing else.
+    pub service_rounds: u128,
+    /// `Γ = (R − M) : (R + M)`, carried as a pair and never divided — the exact share that turned
+    /// back at this junction.
+    pub reflection: (i128, u128),
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
@@ -417,9 +515,14 @@ pub struct LaboratoryEmanatedCausalInformationReceipt {
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct LaboratoryResearchSpec {
-    /// Finite observer aperture per independently emitted leader. The atlas retains the omitted
-    /// alternatives and reports their exact population.
-    pub leader_aperture: usize,
+    /// The chronology each leader's traversal is admitted through. **Declared by the caller,
+    /// reported in the receipt, and never authored inside an organ.**
+    ///
+    /// What would derive it rather than declare it: the material's own service-round distribution,
+    /// which this spec does not yet consult. Until then it is an `APERTURE` in the sense of
+    /// `canon/THE_AUTHORED_LEVEL.md` — a declared receiver coordinate whose orbit must be exhibited
+    /// before any reading taken through it is evidence.
+    pub leader_horizon: u64,
     /// Apparatus aperture for independent receiver-local thought currents. Ordered Swing
     /// conditioning remains one lineage even when this aperture is plural.
     pub worker_threads: usize,
@@ -431,7 +534,7 @@ pub struct LaboratoryResearchSpec {
 impl Default for LaboratoryResearchSpec {
     fn default() -> Self {
         Self {
-            leader_aperture: 12,
+            leader_horizon: 8,
             worker_threads: 1,
             thought_receiver_horizon: 16,
         }
@@ -439,14 +542,23 @@ impl Default for LaboratoryResearchSpec {
 }
 
 impl LaboratoryResearchSpec {
-    /// Receive the complete finite local star founded by the contemporary world membrane.
+    /// Traverse at a declared chronology horizon.
     ///
-    /// This removes an authored answer/recruitment count. It does not mean an absolute corpus
-    /// scan: each world still restricts through the leader's caused receiver region before this
-    /// outer boundary is applied.
-    pub const fn complete_local_star() -> Self {
+    /// **This replaced `complete_local_star()` on 2026-08-15 and the replacement is the point.**
+    /// That constructor set `leader_aperture: usize::MAX` because every finite count refused — a
+    /// leader's caused region reaches more of a repository of this size than any authored count
+    /// admits, so a finite aperture there was a guaranteed refusal rather than a bound. The
+    /// unbounded form was the only remaining setting, and it made the omitted population zero by
+    /// construction: nothing was ever omitted, so nothing was ever retained or reported, and the
+    /// atlas's own promise to keep the alternatives could not be kept.
+    ///
+    /// A horizon is not that. A site's cost comes out of its own junction, congestion dilates it,
+    /// and what dilates past the horizon **defers rather than refusing.** As a leader's region grows
+    /// the same weak match becomes expensive on its own, which is the negative feedback a count
+    /// could not supply.
+    pub const fn at_horizon(leader_horizon: u64) -> Self {
         Self {
-            leader_aperture: usize::MAX,
+            leader_horizon,
             worker_threads: 1,
             thought_receiver_horizon: 16,
         }
@@ -968,6 +1080,15 @@ impl LaboratoryResearchEcology {
                     return Ok(());
                 }
                 let wave = std::mem::take(&mut open.pending);
+                trace_phase!(
+                    "wave.open",
+                    "leaders {} visited_regions {} clauses {} passages {} region_extents {:?}",
+                    wave.len(),
+                    open.visited_regions.len(),
+                    self.relational_clauses(),
+                    self.conditioned_passages,
+                    wave.iter().map(|l| l.region.len()).collect::<Vec<_>>()
+                );
                 let open_before_wave = open
                     .last_fiber
                     .as_ref()
@@ -990,7 +1111,15 @@ impl LaboratoryResearchEcology {
                 .ok_or(LaboratoryLanguageError::CarrierExtent)?
                 .unresolved();
             if !unresolved.is_empty() {
+                trace_phase!("wave.enact.begin", "requests {}", unresolved.len());
+                let began = std::time::Instant::now();
                 let attempt = enact(&unresolved);
+                trace_phase!(
+                    "wave.enact.end",
+                    "requests {} in {} ms",
+                    unresolved.len(),
+                    began.elapsed().as_millis()
+                );
                 open.contact
                     .as_mut()
                     .ok_or(LaboratoryLanguageError::CarrierExtent)?
@@ -1040,17 +1169,38 @@ impl LaboratoryResearchEcology {
                     .flat_map(|returned| returned.sections.iter())
                     .map(LaboratoryReturnedSection::passage)
                     .collect::<LocalSequence<_>>();
+                trace_phase!(
+                    "wave.condition.begin",
+                    "passages {} clauses_standing {}",
+                    wave_passages.len(),
+                    self.relational_clauses()
+                );
+                let began = std::time::Instant::now();
                 let newly_conditioned = if wave_passages.is_empty() {
                     0
                 } else {
                     self.receive_copresent(&wave_passages)?
                 };
+                trace_phase!(
+                    "wave.condition.end",
+                    "new {} clauses_standing {} in {} ms",
+                    newly_conditioned,
+                    self.relational_clauses(),
+                    began.elapsed().as_millis()
+                );
                 open.contact
                     .as_mut()
                     .ok_or(LaboratoryLanguageError::CarrierExtent)?
                     .newly_conditioned = Some(newly_conditioned);
             }
 
+            trace_phase!(
+                "wave.radiate.begin",
+                "clauses {} horizon {}",
+                self.relational_clauses(),
+                self.spec.thought_receiver_horizon
+            );
+            let radiate_began = std::time::Instant::now();
             let thought_execution = self
                 .relation
                 .as_ref()
@@ -1067,6 +1217,15 @@ impl LaboratoryResearchEcology {
                     fiber: None,
                     cpu: None,
                 });
+            trace_phase!(
+                "wave.radiate.end",
+                "currents {} in {} ms",
+                thought_execution
+                    .fiber
+                    .as_ref()
+                    .map_or(0, |fiber| fiber.currents.len()),
+                radiate_began.elapsed().as_millis()
+            );
             let fiber = thought_execution.fiber;
             let next_receiver_horizon = open
                 .receiver_horizon
@@ -1175,7 +1334,7 @@ impl LaboratoryResearchEcology {
                     identity: format!("laboratory-leader-{identity_ordinal}"),
                     question: format!("{}: {}", open.question_identity, open.question),
                     region: expanded.clone(),
-                    aperture: self.spec.leader_aperture.max(1),
+                    horizon: self.spec.leader_horizon.max(1),
                     generation: next_generation,
                     caused_by_clauses,
                 };
@@ -1204,7 +1363,7 @@ impl LaboratoryResearchEcology {
             identity,
             question: format!("{question}: {text}"),
             region: expand_features(region),
-            aperture: self.spec.leader_aperture.max(1),
+            horizon: self.spec.leader_horizon.max(1),
             generation,
             caused_by_clauses,
         })
@@ -1342,6 +1501,9 @@ fn receive_world_contact_front(
         let mut sections = Vec::new();
         let mut complete_population = 0usize;
         let mut omitted_population = 0usize;
+        // The deferred populations of both ports join here rather than being summed into a count.
+        // Merging them as a number would be the collapse this whole carrier exists to refuse.
+        let mut deferred = Vec::new();
         for port in [
             LaboratoryInformantPort::RepositorySource,
             LaboratoryInformantPort::ResidentTextCard,
@@ -1361,12 +1523,14 @@ fn receive_world_contact_front(
             omitted_population = omitted_population
                 .checked_add(returned.returned.omitted_population)
                 .ok_or(LaboratoryLanguageError::CarrierExtent)?;
+            deferred.extend(returned.returned.deferred.iter().cloned());
         }
         wave_returns.push(LaboratoryWorldReturn {
             leader: leader.identity.clone(),
             sections,
             complete_population,
             omitted_population,
+            deferred,
         });
     }
     Ok(wave_returns)

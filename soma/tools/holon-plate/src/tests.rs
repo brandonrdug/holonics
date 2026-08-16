@@ -812,6 +812,16 @@ fn the_named_census_fields_that_move_are_the_structural_ones() {
         before.value("lineages"),
         "continuing a lineage must not found one"
     );
+    // THE CARRIER EXTENT MUST NOT MOVE, and this assertion earned its keep on 2026-08-15.
+    //
+    // A composing entry was wired into the live `Cell` branch that hour, which made the carrier
+    // mount a further row on this deed — `720 -> 1272` — and **this line is what refused it.** The
+    // wiring was wrong (an atom face routed into the word-grain climb) and was reverted; the
+    // assertion was briefly inverted to accommodate it and is restored.
+    //
+    // Its reason is unchanged: a depth-one carrier holds its extent and advances within it, which
+    // is exactly why an extent alone cannot witness that a body received anything. The structural
+    // fields above carry the witness.
     assert_eq!(
         after.value("carrier_words"),
         before.value("carrier_words"),

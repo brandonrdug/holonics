@@ -20,6 +20,14 @@ impl ResonanceEcology {
         &self.machine
     }
 
+    /// Declare the chronology a standing factor must cross the seam closure's aperture within.
+    ///
+    /// Forwarded to the live machine, which rebuilds its aperture under the new declaration. The
+    /// inherited setting admits every factor whole; see `LiveCurrentMachine::declare_traversal_horizon`.
+    pub fn declare_traversal_horizon(&mut self, horizon: u64) {
+        self.machine.declare_traversal_horizon(horizon);
+    }
+
     pub fn rest_image(&self) -> Result<ResonanceEcologyRestImage, ResonanceEcologyError> {
         Ok(ResonanceEcologyRestImage {
             machine: self.machine.rest_image()?,

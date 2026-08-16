@@ -6,6 +6,41 @@
 //! invent another unchecked `Vec<Vec<Rat>>` implementation.  Construction may
 //! use dense elimination; a continuing law should retain the resulting
 //! operator or factorization rather than solve it again on every event.
+//!
+//! # The four laws that bypassed this carrier, and what the bypass cost
+//!
+//! The paragraph above named its consumers on the day it was written and none of them arrived.
+//! Measured 2026-08-15: `diffusion`, `sheaf_diffusion`, `inverse_transport` and
+//! `generative_transport` — the exact modules named — each carried a private `invert_exact`,
+//! and `inverse_transport`'s and `generative_transport`'s twenty-eight-line bodies differed
+//! by **one line**, the error variant. Two things were lost by re-invention rather than by
+//! decision:
+//!
+//! - **`inverse` verifies itself; none of the four functions did, and their callers each wrote
+//!   the check again.** This is the sharper half and it is worth stating exactly, because the
+//!   loose form — *"none of the four checked its inverse"* — is false of the modules. Every one
+//!   of the six call sites re-derived an identity residual by hand *downstream* of the
+//!   operation, in five different vocabularies (`TransferCertificateFailure` twice,
+//!   `InverseCertificateFailure`, `InverseResidualNonzero`). **The exception is the one that
+//!   matters**: `generative_transport::propagate` checks only `A x - b` for the single
+//!   right-hand side it happened to solve, which verifies the inverse against one vector rather
+//!   than against the identity. Moving the check inside the operation makes it unconditional —
+//!   a caller cannot forget it, and cannot substitute a weaker one.
+//!
+//!   What the certificate guards is the *elimination*, not the material: over `Rat` a completed
+//!   Gauss–Jordan is exact, so it cannot fire while the elimination is correct. That is what it
+//!   is for, and stating otherwise would claim a material property this carrier does not have.
+//!   The modules' own retained residuals are **not** made redundant by it and are untouched:
+//!   they travel in a serialized certificate for a later reader, where this refuses at the point
+//!   of construction.
+//! - **`diffusion` and `sheaf_diffusion` inverted in `O(n^4)`.** Both built the inverse one
+//!   column at a time, re-running a full `O(n^3)` forward solve per column, where the augmented
+//!   elimination below runs once.
+//!
+//! `to_rows` exists so a law whose own signatures and serialized certificates speak
+//! `Vec<Vec<Rat>>` can route its algebra through this carrier without changing either.
+
+use std::ops::Range;
 
 use num_traits::{One, Zero};
 use relational_geometry::Rat;
@@ -30,6 +65,33 @@ impl ExactRatMatrix {
             rows,
             columns,
             entries: entries.into_iter().flatten().collect(),
+        })
+    }
+
+    /// Construct from dense rows against a **declared** shape.
+    ///
+    /// `new` infers the column count from the first row, and a matrix with no rows therefore
+    /// loses it: an `0 x m` operator and an `0 x 0` operator are the same `Vec<Vec<Rat>>`. That
+    /// is not a nuisance — it is a real degeneracy the diffusion laws reach whenever a boundary
+    /// or an interior population is empty, and inferring there would silently turn a lawful
+    /// empty product into a shape refusal. A caller that knows its shape declares it here.
+    pub fn shaped(
+        rows: usize,
+        columns: usize,
+        entries: Vec<Vec<Rat>>,
+    ) -> Result<Self, ExactLinearError> {
+        if entries.len() != rows || entries.iter().any(|row| row.len() != columns) {
+            return Err(ExactLinearError::ShapeMismatch);
+        }
+        let extent = rows
+            .checked_mul(columns)
+            .ok_or(ExactLinearError::ExtentOverflow)?;
+        let flattened: Vec<Rat> = entries.into_iter().flatten().collect();
+        debug_assert_eq!(flattened.len(), extent);
+        Ok(Self {
+            rows,
+            columns,
+            entries: flattened,
         })
     }
 
@@ -89,6 +151,26 @@ impl ExactRatMatrix {
 
     pub fn entries(&self) -> &[Rat] {
         &self.entries
+    }
+
+    /// The entries as dense rows — the shape the physical laws' own signatures and serialized
+    /// certificates speak in.
+    ///
+    /// This is a presentation of the same operator and not a second carrier: it round-trips
+    /// through `new` exactly, including the degenerate `0 x 0` case, which is what lets a law
+    /// route one operation through this module without moving its public types.
+    pub fn to_rows(&self) -> Vec<Vec<Rat>> {
+        (0..self.rows)
+            .map(|row| {
+                let Range { start, end } = self.span(row);
+                self.entries[start..end].to_vec()
+            })
+            .collect()
+    }
+
+    fn span(&self, row: usize) -> Range<usize> {
+        let start = row * self.columns;
+        start..start + self.columns
     }
 
     pub fn transpose(&self) -> Result<Self, ExactLinearError> {
@@ -300,6 +382,50 @@ mod tests {
         assert_eq!(
             matrix.multiply(&inverse).unwrap(),
             ExactRatMatrix::identity(2).unwrap()
+        );
+    }
+
+    /// The dense-row presentation must round-trip, or a law routed through this carrier would
+    /// return a different operator than the one it handed over. The degenerate and the
+    /// rectangular shapes are both included because the four laws that now route through here
+    /// reach both: an empty interior gives `0 x 0`, and a boundary/interior section gives
+    /// `n x m`.
+    #[test]
+    fn the_dense_row_presentation_round_trips_at_every_shape_the_laws_reach() {
+        let shapes = [
+            Vec::new(),
+            vec![vec![Rat::zero(); 0]; 3],
+            vec![vec![Rat::one(), Rat::from_integer(2.into())]],
+            vec![
+                vec![Rat::one(), Rat::from_integer(2.into())],
+                vec![Rat::from_integer(3.into()), Rat::from_integer(4.into())],
+                vec![Rat::from_integer(5.into()), Rat::from_integer(6.into())],
+            ],
+        ];
+        for rows in shapes {
+            let carrier = ExactRatMatrix::new(rows.clone()).unwrap();
+            assert_eq!(carrier.to_rows(), rows);
+            assert_eq!(ExactRatMatrix::new(carrier.to_rows()).unwrap(), carrier);
+        }
+    }
+
+    /// A singular operator refuses by name rather than returning an unchecked inverse. This is
+    /// the one refusal of `inverse` the material can actually cause; the certificate below it
+    /// guards the elimination and cannot fire while the elimination is correct, which the doc
+    /// says rather than claiming otherwise.
+    #[test]
+    fn a_singular_operator_refuses_and_the_refusal_is_named() {
+        let singular = ExactRatMatrix::new(vec![
+            vec![Rat::one(), Rat::from_integer(2.into())],
+            vec![Rat::from_integer(2.into()), Rat::from_integer(4.into())],
+        ])
+        .unwrap();
+        assert_eq!(singular.inverse(), Err(ExactLinearError::SingularMatrix));
+        assert_eq!(
+            ExactRatMatrix::new(vec![vec![Rat::one(), Rat::zero()]])
+                .unwrap()
+                .inverse(),
+            Err(ExactLinearError::NonsquareMatrix)
         );
     }
 }

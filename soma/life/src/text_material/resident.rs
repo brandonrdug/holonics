@@ -272,7 +272,9 @@ impl CudaResidentTextMaterialAtlas {
         let (leader_features, query_transports) = self.host.restriction_coordinates(leader);
         let feature_mask_words = text_cuda::mask_words(leader_features.len());
         let transport_mask_words = text_cuda::mask_words(query_transports.len());
-        let aperture = leader.aperture.max(1).min(self.host.sections.len());
+        // An APPARATUS extent: how many rows the return buffer holds. Not an admission — the
+        // junction decides that, host-side, after the card returns what it found.
+        let aperture = self.host.sections.len().max(1);
         if leader_features.is_empty() || aperture == 0 {
             let resident_sync = self
                 .card
@@ -285,6 +287,7 @@ impl CudaResidentTextMaterialAtlas {
                     sections: Default::default(),
                     complete_population: 0,
                     omitted_population: 0,
+                    deferred: Vec::new(),
                 },
                 TextMaterialCudaRestrictionReceipt {
                     atlas_shape,

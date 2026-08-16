@@ -57,8 +57,51 @@ pub enum ExactReading {
     /// Im(z). Exact.
     ImaginaryPart,
     /// |z|^2 = Re^2 + Im^2. Exact — the squared modulus, NOT |z|, because sqrt is transcendental.
+    ///
+    /// `z * conj(z)`: the phase is **deleted**. Read this against `HarmonicReal` one line below,
+    /// which is `Re(z * z)` and **doubles** it. The two live four lines apart because they are
+    /// the two halves of one operation — the quotient by the phase circle, and the squaring that
+    /// the quotient's sign ambiguity is the erased half-turn of.
     SquaredModulus,
     /// Re(z)^2 - Im(z)^2, the harmonic conjugate pair's real part. Exact.
+    ///
+    /// # This is the exact carrier of the founding predicate's form
+    ///
+    /// `soma/body/src/arrow.rs` reads a relating from a pole as the pair `(aim, cross)` — the
+    /// cohere `W+` that STANDS and the gyration `W-` that FLOWS — and gates the founding on an
+    /// indefinite form of signature `(1,1)`. Identify the pair with one complex rational,
+    ///
+    /// ```text
+    ///     z = aim + i * cross
+    ///     Re(z * z) = aim^2 - cross^2 = HarmonicReal.read(aim, cross)
+    /// ```
+    ///
+    /// and the arrow's two readings fall out of this one scalar, exactly and with no threshold:
+    ///
+    /// ```text
+    ///     Arrow::founds()          cross^2 - aim^2 >= 0    <=>  HarmonicReal <= 0
+    ///     Causal::TransportDominant                        <=>  HarmonicReal <  0
+    ///     Causal::Balanced          the cone wall           <=>  HarmonicReal == 0
+    ///     Causal::StorageDominant                          <=>  HarmonicReal >  0
+    /// ```
+    ///
+    /// `Arrow::sense()` reads the sign of `aim = Re(z)`. Applied to `z * z` it reads the sign of
+    /// `Re(z^2)`, which is this reading — so **the causal class is the hand composed with
+    /// squaring**, and squaring is exactly what doubles the phase. That is why the arrow's wall
+    /// sits at a quarter turn (`|cross| = |aim|`) and this scalar's sign flips at a half turn:
+    /// they are one locus seen before and after the doubling.
+    ///
+    /// **Where it is strictly coarser, and this is the whole of the difference.** `z = 0` — the
+    /// arrow at its own horizon, both faces null — returns `HarmonicReal == 0`, the same value
+    /// the cone wall returns. `Arrow::causal_class` separates them as `Unread` because it
+    /// consults `at_horizon()` first, which is a reading of the *pair* and not of this scalar.
+    /// A single reading off `z^2` cannot recover it, because squaring sends `0` and nothing else
+    /// to `0` but sends the whole wall there too.
+    ///
+    /// **This is a citation, not a dependency.** `soma/body` has zero dependencies and cannot
+    /// import this crate; the test `the_harmonic_real_is_the_arrows_founding_form` below carries
+    /// the correspondence by re-deriving `(aim, cross)` from `arrow.rs`'s own declared points
+    /// over `Rat`, so the classes are computed from the material rather than declared.
     HarmonicReal,
     /// The quadrant index 0..3, an exact integer classification of sign pairs. This is the
     /// coarsest honest phase reading available without transcendentals.
@@ -740,6 +783,105 @@ mod tests {
             value,
             integer(2),
             "|1+i|^2 = 2, exactly; |1+i| is not rational"
+        );
+    }
+
+    /// THE JOIN. `HarmonicReal` is the exact carrier of the form `soma/body/src/arrow.rs` gates
+    /// the founding on, and this exhibits the correspondence rather than asserting it.
+    ///
+    /// `soma/body` has zero dependencies and cannot import this crate, so the arrow's own
+    /// `relate` arithmetic is re-derived here over `Rat` from the **same four declared points**
+    /// that `arrow.rs`'s `the_founding_band_is_a_cone_and_all_three_classes_are_reachable`
+    /// uses. The classes are therefore computed from the material; nothing here hands two
+    /// members of one class the same declared value.
+    ///
+    /// Both arms are required. The correspondence must hold at every point, **and** the material
+    /// must actually reach all three classes plus the horizon — a reading that returned one sign
+    /// everywhere would agree with anything and would have classified nothing.
+    #[test]
+    fn the_harmonic_real_is_the_arrows_founding_form() {
+        // arrow.rs::relate, over Rat: re-base both boundaries to the pole and read the pair.
+        //   aim   = W+ = (a-f) . (b-f)      the cohere that STANDS
+        //   cross = W- = (a-f) x (b-f)      the gyration that FLOWS
+        fn relate(a: (i64, i64), b: (i64, i64), f: (i64, i64)) -> (Rat, Rat) {
+            let (ar, ai) = (integer(a.0 - f.0), integer(a.1 - f.1));
+            let (br, bi) = (integer(b.0 - f.0), integer(b.1 - f.1));
+            (&ar * &br + &ai * &bi, &ai * &br - &ar * &bi)
+        }
+
+        // arrow.rs's own declared material: one inside the cone, one on the wall, one outside,
+        // and one at the pole's own horizon.
+        let material = [
+            ("inside the cone", (1, 0), (0, 1), (0, 0)),
+            ("on the wall", (2, 0), (1, 1), (0, 0)),
+            ("outside the cone", (2, 0), (3, 0), (0, 0)),
+            ("at the horizon", (1, 0), (0, 1), (1, 0)),
+        ];
+
+        let mut signs: std::collections::BTreeSet<i8> = std::collections::BTreeSet::new();
+        let mut horizons = 0usize;
+        for (name, a, b, f) in material {
+            let (aim, cross) = relate(a, b, f);
+            let harmonic = ExactReading::HarmonicReal
+                .read(&aim, &cross)
+                .expect("the harmonic reading is total");
+
+            // The identity, exactly: Re(z^2) for z = aim + i*cross.
+            assert_eq!(
+                harmonic,
+                &aim * &aim - &cross * &cross,
+                "{name}: the harmonic reading IS aim^2 - cross^2"
+            );
+            // And it is the negation of the form `founds()` tests, which is why the founding
+            // band is `HarmonicReal <= 0` rather than `>= 0`.
+            assert_eq!(
+                harmonic,
+                -(&cross * &cross - &aim * &aim),
+                "{name}: founds() tests cross^2 - aim^2, the same form with the hand reversed"
+            );
+            // The squared modulus deletes what this doubles: |z|^2 = aim^2 + cross^2 differs
+            // from Re(z^2) by exactly 2*cross^2, the phase term.
+            let modulus = ExactReading::SquaredModulus
+                .read(&aim, &cross)
+                .expect("the modulus reading is total");
+            assert_eq!(
+                &modulus - &harmonic,
+                integer(2) * &cross * &cross,
+                "{name}: the two readings differ by twice the gyration's square"
+            );
+
+            signs.insert(match harmonic {
+                ref value if value.is_zero() => 0,
+                ref value if value.is_negative() => -1,
+                _ => 1,
+            });
+            if aim.is_zero() && cross.is_zero() {
+                horizons += 1;
+            }
+        }
+
+        // THE ANTI-VACUITY ARM. All three signs must appear, or the reading is constant on this
+        // material and its agreement with the arrow is not evidence.
+        assert_eq!(
+            signs,
+            std::collections::BTreeSet::from([-1, 0, 1]),
+            "the declared material must reach all three causal classes"
+        );
+        // And the horizon must be present, because it is the one place this reading is strictly
+        // coarser than `Arrow::causal_class`: z = 0 returns the same zero the cone wall returns.
+        assert_eq!(horizons, 1, "the degenerate case must be in the material");
+        let wall = relate((2, 0), (1, 1), (0, 0));
+        let horizon = relate((1, 0), (0, 1), (1, 0));
+        assert_eq!(
+            ExactReading::HarmonicReal.read(&wall.0, &wall.1),
+            ExactReading::HarmonicReal.read(&horizon.0, &horizon.1),
+            "squaring sends the whole wall to zero, so one scalar cannot separate the horizon \
+             from it -- `at_horizon()` reads the PAIR, and that is the whole difference"
+        );
+        assert_ne!(
+            (&wall.0, &wall.1),
+            (&horizon.0, &horizon.1),
+            "and the pair does separate them"
         );
     }
 }

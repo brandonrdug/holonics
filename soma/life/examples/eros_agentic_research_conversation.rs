@@ -91,10 +91,19 @@ const SECOND_QUESTION: &str = "What cultivates contemporary relational morpholog
 /// `MorphologicalGenerationSpec` (`soma/life/src/morphological_language.rs:173-176`) has exactly one
 /// field and this is it.
 ///
-/// Cost, measured at `a91a84f` on a 23-passage corpus, release build: 1 token 57 ms · 2 tokens
-/// 403 ms · 4 tokens 55,098 ms · 8 tokens no return in 200,000 ms. The laboratory declared 128 here
-/// and that does not return on this implementation. A receiver parameter, not a law, and it is
-/// printed in the receipt.
+/// **THE COST TABLE THAT STOOD HERE IS WITHDRAWN, 2026-08-15.** It read *"1 token 57 ms · 2 tokens
+/// 403 ms · 4 tokens 55,098 ms · 8 tokens no return in 200,000 ms"*, measured at `a91a84f` on a
+/// **23-passage** corpus. On the shipped default world its first row is wrong by more than three
+/// orders of magnitude, and the value it justified — 24 — is three doublings past a row that claims
+/// no return. A stale receipt printed every run is a false statement the machine makes about itself.
+///
+/// It is withdrawn rather than re-measured, because the ratios were never a curve for one knob:
+/// `maximum_observed_tokens` is consumed as **four different things** — an admission gate on world
+/// sections and on episodes (`agentic_language/candidate.rs`), the depth bound of the generation
+/// walk (`morphological_language/ecology.rs`), and an extent cap on candidate composition. Raising
+/// it multiplies all four, so a single number against it is a magnitude wearing four jobs.
+///
+/// A receiver parameter, not a law, and it is printed in the receipt.
 ///
 /// **NOTHING BOUNDS THE NUMBER OF RETURNED BRANCHES.** Until 2026-08-10 this driver also carried a
 /// `MORPHOLOGICAL_OUTPUT_APERTURE = 3`, stored it, parsed `--output-aperture` into it, and printed
@@ -106,19 +115,31 @@ const SECOND_QUESTION: &str = "What cultivates contemporary relational morpholog
 /// driver does not decide it.
 const MORPHOLOGICAL_OBSERVATION_APERTURE: usize = 24;
 
-/// APERTURE — how many sections one leader may encounter before `LaboratoryResearchSpec` refuses.
+/// HORIZON — the chronology one leader's traversal is admitted through. **Zero takes the spec's
+/// declared default.**
 ///
-/// MEASURED 2026-08-09 against this repository's own 793-file source atlas: **every finite value
-/// refuses**, and refuses at exactly `aperture + 1` — 16 gave `encountered_population: 17`, 512
-/// gave `513`. The leader's caused region reaches more of a repository this size than any authored
-/// count admits, so a finite aperture here is not a bound, it is a guaranteed refusal.
+/// # What this replaced, and why the count could never have worked
 ///
-/// `LaboratoryResearchSpec::complete_local_star()` is the library's own answer and its doc comment
-/// says why: *"This removes an authored answer/recruitment count. It does not mean an absolute
-/// corpus scan: each world still restricts through the leader's caused receiver region before this
-/// outer boundary is applied."* That is the default here. `--leader-aperture N` still forces a
-/// finite one, so the refusal above can be reproduced.
-const DEFAULT_LEADER_APERTURE: usize = 0;
+/// This was `DEFAULT_LEADER_APERTURE`, a count of sections. MEASURED 2026-08-09 against this
+/// repository's own source atlas: **every finite value refused**, at exactly `aperture + 1` — 16
+/// gave `encountered_population: 17`, 512 gave `513`. So the only remaining setting was
+/// `complete_local_star()`'s `usize::MAX`, which never refused — and under it
+/// `omitted_population = complete − selected` was **zero by construction**, because the walk
+/// selected everything it met. The atlas's promise to retain and report the omitted alternatives
+/// could not be kept at any setting.
+///
+/// A count in that position is not a bound. It is a magnitude trying to cross a frame boundary, and
+/// the horizon law says only a ratio does. A site is now met as a **junction**: the leader carries
+/// `R` features, the site shares `M`, and the crossing costs `⌈(R+M)²/(4RM)⌉` service rounds — one
+/// at a match, more as they separate. What dilates past this horizon **defers**, retained by name
+/// with its exact reflection.
+///
+/// **And the viscosity is that `R` grows.** The wave loop extends a leader's region every
+/// generation, so the same one shared feature costs four rounds against a region of ten and
+/// twenty-six against a region of a hundred. The traversal tightens as the loop widens it. That is
+/// the negative feedback the count could not supply, and its absence is why the loop did not
+/// terminate.
+const DEFAULT_LEADER_HORIZON: u64 = 0;
 
 /// The inherited language body. Six records, named by the laboratory driver verbatim, each of
 /// which is present in this repository under `research/records/` with the same basename.
@@ -201,7 +222,7 @@ struct Arguments {
     /// minutes), so the smallest world that still closes the question is the honest default.
     support_records: usize,
     question: Option<String>,
-    leader_aperture: usize,
+    leader_horizon: u64,
     threads: usize,
     observation_aperture: usize,
     thought_receiver_horizon: u64,
@@ -215,7 +236,7 @@ impl Default for Arguments {
             whole_repository: false,
             support_records: 5,
             question: None,
-            leader_aperture: DEFAULT_LEADER_APERTURE,
+            leader_horizon: DEFAULT_LEADER_HORIZON,
             threads: 2,
             observation_aperture: MORPHOLOGICAL_OBSERVATION_APERTURE,
             thought_receiver_horizon: 90,
@@ -384,12 +405,11 @@ fn run() -> Result<(), String> {
     );
     println!("  capability           {RESEARCH_CAPABILITY} (open boundary)");
     println!(
-        "  leader aperture      {}",
-        if arguments.leader_aperture == 0 {
-            "complete_local_star (usize::MAX) — the library's own removal of the authored count"
-                .to_owned()
+        "  leader horizon       {}",
+        if arguments.leader_horizon == 0 {
+            "declared default — the junction decides, not a count".to_owned()
         } else {
-            format!("{} (forced finite)", arguments.leader_aperture)
+            format!("{} (declared)", arguments.leader_horizon)
         }
     );
 
@@ -500,7 +520,44 @@ fn run() -> Result<(), String> {
                 first.answer.operative_codec_versions, second.answer.operative_codec_versions
             );
         }
-        Err(error) => println!("  second question OBSTRUCTED: {error:?}"),
+        Err(error) => {
+            // AN OPEN CURRENT IS TESTIMONY, NOT A FAILED RETURN — and this branch discarded it
+            // until 2026-08-15.
+            //
+            // `LaboratoryResearchDeliberation` states the law: *"Complete internal testimony from a
+            // question even when no outward answer has yet closed. The outward answer mouth still
+            // refuses to project an open current as a settled answer. An autonomous ecology can
+            // instead receive this body, let its open currents cause further questions, and return
+            // only the consequences which later close."*
+            //
+            // So `NoClosedCurrent` is the mouth conducting correctly: a current closes only when it
+            // covers EVERY required region of the question, and refusing to project an uncovered one
+            // is the refusal working. What was wrong was printing the refusal and throwing away
+            // what the deliberation actually found.
+            //
+            // The session survives the obstruction — `converse_with_world_front` borrows it — so the
+            // deed's standing is still readable here, and the grade-three evidence does not depend
+            // on an answer having closed.
+            let millis = started.elapsed().as_millis();
+            println!("  second question OBSTRUCTED: {error:?}   ({millis} ms)");
+            println!("  the refusal is the mouth conducting: a current closes only when it covers");
+            println!("  every required region, and an open one may not be projected as settled.");
+            let standing = session.agent().standing();
+            println!("\n  WHAT THE DEED STILL CARRIES");
+            println!("    deed still open      {}", session.has_open_deed());
+            println!(
+                "    training events      {} (was 0 before the correction)",
+                standing.reflective_codec_training_events
+            );
+            println!(
+                "    reflective codecs    committed {}  versions {}",
+                standing.reflective_codec_commits, standing.reflective_codec_versions
+            );
+            println!(
+                "    generated answers    {}",
+                standing.generated_answers
+            );
+        }
     }
 
     // ── STATION 9 — the source-detached rest ────────────────────────────────────────────────
@@ -725,11 +782,11 @@ fn build_repository_fixture(root: &Path, fixture: &Path) -> Result<Vec<(String, 
 
 /// The complete local star unless the caller forces a finite aperture.
 fn research_spec(arguments: &Arguments) -> LaboratoryResearchSpec {
-    let mut spec = if arguments.leader_aperture == 0 {
-        LaboratoryResearchSpec::complete_local_star()
+    let mut spec = if arguments.leader_horizon == 0 {
+        LaboratoryResearchSpec::default()
     } else {
         LaboratoryResearchSpec {
-            leader_aperture: arguments.leader_aperture,
+            leader_horizon: arguments.leader_horizon,
             ..LaboratoryResearchSpec::default()
         }
     };
@@ -773,8 +830,8 @@ fn arguments() -> Result<Arguments, String> {
                     }
                 };
             }
-            "--leader-aperture" => {
-                arguments.leader_aperture = value()?.parse().map_err(|e| format!("{e}"))?
+            "--leader-horizon" => {
+                arguments.leader_horizon = value()?.parse().map_err(|e| format!("{e}"))?
             }
             "--threads" => arguments.threads = value()?.parse().map_err(|e| format!("{e}"))?,
             // `--output-aperture` is REMOVED, not deprecated. It parsed into a field that was

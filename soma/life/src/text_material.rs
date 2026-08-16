@@ -47,8 +47,8 @@ use sha2::{Digest, Sha256};
 use crate::{
     causal_language::lexical_tokens,
     laboratory_language::{
-        text_features, LaboratoryResearchLeader, LaboratoryReturnedSection, LaboratorySourceKind,
-        LaboratoryWorldReturn,
+        text_features, LaboratoryDeferredSection, LaboratoryResearchLeader,
+        LaboratoryReturnedSection, LaboratorySourceKind, LaboratoryWorldReturn, LeaderAdmission,
     },
     morphological_language::MorphologicalLanguagePassage,
     text_material_cuda::{
@@ -599,8 +599,12 @@ impl ExactTextMaterialAtlas {
     /// Return one exact local star of the already conditioned text body.
     pub fn enact(&self, leader: &LaboratoryResearchLeader) -> LaboratoryWorldReturn {
         let (leader_features, query_transports) = self.restriction_coordinates(leader);
+        // The handle population the card materializes is an APPARATUS extent — how many rows the
+        // return buffer holds — and never an admission. Admission is the junction, applied to the
+        // returned sections in `finish_restriction`. Before 2026-08-15 `leader.aperture` did both
+        // jobs at once, which is how a device buffer size came to decide what a leader could see.
         let (source_handles, complete_population) =
-            self.bounded_source_handles(&leader_features, leader.aperture);
+            self.bounded_source_handles(&leader_features, self.sections.len().max(1));
         let feature_mask_words = text_cuda::mask_words(leader_features.len());
         let transport_mask_words = text_cuda::mask_words(query_transports.len());
         let output_row_words = text_cuda::RETURN_MASK_AT
@@ -951,6 +955,7 @@ impl ExactTextMaterialAtlas {
                 sections: Vec::new(),
                 complete_population,
                 omitted_population: complete_population,
+                deferred: Vec::new(),
             };
         }
 
@@ -1016,12 +1021,38 @@ impl ExactTextMaterialAtlas {
                 })
             })
             .collect::<Vec<_>>();
+
+        // The junction, on the card port. The device found what shares features with the leader;
+        // the admission law decides which of those the current actually crosses to, and what
+        // dilates past the horizon is retained rather than dropped.
+        let mut deferred = Vec::new();
+        let sections = sections
+            .into_iter()
+            .filter(|section| match leader.admits(section.matched_features.len()) {
+                LeaderAdmission::Crosses { .. } => true,
+                LeaderAdmission::Defers {
+                    service_rounds,
+                    reflection,
+                } => {
+                    deferred.push(LaboratoryDeferredSection {
+                        source_identity: section.source_identity.clone(),
+                        source: section.source.clone(),
+                        matched_features: section.matched_features.iter().cloned().collect(),
+                        service_rounds,
+                        reflection,
+                    });
+                    false
+                }
+                LeaderAdmission::NoTravelingSection => false,
+            })
+            .collect::<Vec<_>>();
         let omitted_population = complete_population.saturating_sub(sections.len());
         LaboratoryWorldReturn {
             leader: leader.identity.clone(),
             sections,
             complete_population,
             omitted_population,
+            deferred,
         }
     }
 

@@ -1066,9 +1066,61 @@ impl AgenticLanguageEcology {
             .open
             .as_ref()
             .is_some_and(|open| open.relational_returned);
-        if !relational_returned {
+        // THE SAME MATERIAL WAS CONDITIONED TWICE UNTIL 2026-08-15, and the second time was
+        // unconditional while its only consumer was conditional.
+        //
+        // `laboratory_language` conditions these very sections into its own relational body during
+        // deliberation and returns the thought fibers that crossing produced. This body then
+        // conditioned them again — a second `ExactRelationalLanguageEcology`, a second
+        // `LiveCurrentMachine`, a second receptor atlas, over identical passages.
+        //
+        // **And the second conditioning has exactly one consumer**: the fallback at
+        // `think_fiber_in_passages` below, which its own comment scopes precisely — *"The relational
+        // owner may form the exact thought fiber only after the returned sections cross its
+        // continuing body"* — and which runs only `if returned.thought_fibers.is_empty()`. When
+        // deliberation already returned a fiber, nothing downstream reads what this crossing
+        // founded: the answer path's `relational_passages` come from **episodes**, never from world
+        // sections, and `passage_delivery_order` is asked about episode passages.
+        //
+        // So the crossing is taken only when its consumer will be. Deliberation's fiber IS the
+        // return; re-founding it here was the missing return edge at the scale of one question.
+        let fallback_will_be_taken = returned.thought_fibers.is_empty();
+        if !relational_returned && fallback_will_be_taken {
+            crate::laboratory_language::eros_trace(
+                "answer.relational.begin",
+                &format_args!(
+                    "sections {} clauses_standing {}",
+                    sections.len(),
+                    self.relational_body.clauses().len()
+                ),
+            );
+            let began = std::time::Instant::now();
             self.relational_body
                 .receive_copresent_with_workers(sections, self.worker_threads)?;
+            crate::laboratory_language::eros_trace(
+                "answer.relational.end",
+                &format_args!(
+                    "clauses_standing {} in {} ms",
+                    self.relational_body.clauses().len(),
+                    began.elapsed().as_millis()
+                ),
+            );
+            self.open
+                .as_mut()
+                .expect("the deed remains open across its relational return")
+                .relational_returned = true;
+        } else if !relational_returned {
+            // Deliberation's fiber already crossed. The flag is set so a retry does not reconsider
+            // the crossing, and the skip is RADIATED rather than silent: a stage that did nothing
+            // must say which of the two reasons applied.
+            crate::laboratory_language::eros_trace(
+                "answer.relational.rode",
+                &format_args!(
+                    "sections {} NOT conditioned — deliberation returned {} fibers",
+                    sections.len(),
+                    returned.thought_fibers.len()
+                ),
+            );
             self.open
                 .as_mut()
                 .expect("the deed remains open across its relational return")
@@ -1085,6 +1137,10 @@ impl AgenticLanguageEcology {
         // Action demonstrations condition the capability route. They do not enter the evidence
         // organ as prose. Each returned section first receives through its own local language
         // organ; unrelated alternatives therefore do not form one combinatorial branch product.
+        crate::laboratory_language::eros_trace(
+            "answer.dialogue.begin",
+            &format_args!("sections {}", sections.len()),
+        );
         for section in sections {
             self.return_dialogue(
                 section.identity.clone(),
@@ -1101,19 +1157,37 @@ impl AgenticLanguageEcology {
             .is_some_and(|open| open.prepared_answer.is_none())
         {
             let question = &open_deed.received_prompt;
+            crate::laboratory_language::eros_trace(
+                "answer.charge.begin",
+                &format_args!("sections {}", sections.len()),
+            );
+            let charge_began = std::time::Instant::now();
             let inherited_charge = self.inherited_body.charge(question)?;
+            crate::laboratory_language::eros_trace(
+                "answer.charge.end",
+                &format_args!("in {} ms", charge_began.elapsed().as_millis()),
+            );
+            let gate_began = std::time::Instant::now();
             let candidate_sections = maximal_return_section_indices(
                 question,
                 sections,
                 &inherited_charge.operator_features,
                 self.spec.generation.maximum_observed_tokens,
             );
+            crate::laboratory_language::eros_trace(
+                "answer.gate.end",
+                &format_args!("in {} ms", gate_began.elapsed().as_millis()),
+            );
             // The section order is receiver testimony. No owner certificate says these
             // continuing morphology changes commute, so each section crosses the morphology
             // owner in that order; its internal executor remains responsible for admitted local
             // parallelism.
+            crate::laboratory_language::eros_trace(
+                "answer.sections",
+                &format_args!("candidate sections {}", candidate_sections.len()),
+            );
             let mut candidates = Vec::new();
-            for section_at in candidate_sections {
+            for (ordinal, section_at) in candidate_sections.into_iter().enumerate() {
                 let section = sections
                     .get(section_at)
                     .ok_or(AgenticLanguageError::CarrierExtent)?;
@@ -1129,8 +1203,17 @@ impl AgenticLanguageEcology {
                     )) => continue,
                     Err(error) => return Err(error.into()),
                 };
+                let began = std::time::Instant::now();
                 let generation =
                     working_ecology.generate_currents(question, self.spec.generation)?;
+                crate::laboratory_language::eros_trace(
+                    "answer.generate",
+                    &format_args!(
+                        "section {ordinal} outputs {} in {} ms",
+                        generation.outputs.len(),
+                        began.elapsed().as_millis()
+                    ),
+                );
                 let evidence_sources = BTreeSet::from([section.source.clone()]);
                 match select_generated_answer(
                     &generation.outputs,
@@ -1153,6 +1236,10 @@ impl AgenticLanguageEcology {
                     Err(error) => return Err(error),
                 }
             }
+            crate::laboratory_language::eros_trace(
+                "answer.compose.begin",
+                &format_args!("candidates {}", candidates.len()),
+            );
             let mut candidates = if candidates.is_empty() {
                 Vec::new()
             } else {

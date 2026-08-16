@@ -68,6 +68,50 @@ release production deed on the RTX 4080 SUPER, and clean PTX assembly for `sm_89
 
 ---
 
+## GATES RE-TAKEN 2026-08-15 ON A DIRTY TREE — 6 of 9
+
+```text
+   PASS  tests               2,324 passed · 0 failed · 19 ignored · 42 result lines
+   PASS  authored-levels     0 failures; 350 numeric levels in DRIVERS
+   PASS  named-paths         0 failures; 1,965 tokens, 1,695 live
+   PASS  claim-index         current
+   PASS  output-manifest     47 drivers recorded, 47 present, 0 departed
+   FAIL  closure-manifest    34 closures moved · holonic-engine, life
+   FAIL  boundary-artifacts  8 disagreements, 1 bound
+   PASS  typst               10 of 10 roots compile
+   FAIL  architecture-lint   37 new ownership occurrences
+```
+
+**The first two red are red BY CONSTRUCTION on any dirty tree** and neither is a claim about the
+code: `closure-manifest` reddens when any `src/**.rs` in a driver-owning crate has been edited, and
+`boundary-artifacts` when a driver has run since the ledger was written. Both clear on a commit.
+
+### The ratchet's 37, read against the criterion before any disposition
+
+**The criterion is whether the index IS the relation.** A `Vec` is a linked list whose pointers
+became arithmetic; that is a rebase with zero remainder when `+1` genuinely means what the material
+means by *next*, and a defect when the container carries an **authored order** that replaced a
+transport law.
+
+**The baseline is emitted from a detached worktree of the commit**, so this cannot be re-seeded on a
+dirty tree and the red is expected. The reading is taken now so the disposition is not deferred:
+
+| owner | occurrences | what the index is |
+|---|---|---|
+| `approach_front.rs` | 9 `BTreeMap`, 2 `BTreeSet`, 2 `VecDeque`, 2 `Vec` | `BTreeMap<u64, BigUint>` keyed by **chronology** — the material's own order, and the whole point of the module is that deferrals at one chronology **add** rather than collapsing |
+| `chain.rs` | 7 `Vec` | `nodes`/`links` indexed by **position along the traversal**, which is the chain's own order and is exactly what `compose` folds over |
+| `gauge.rs` | 11 `Vec`, 3 `.collect()` | `before`/`after` compared **elementwise**, so index `i` on one side *is* the relation to index `i` on the other; `moved` is the exhibited witness |
+| `eros_rest.rs` | 27 `Vec` | the sealed carriers in their own layout order, which is what a byte-identical remount requires |
+| `traversible_chain.rs` | 12 `.clone()` | exact `Rat` arithmetic in the transfer matrix; not an ownership question |
+| `exact_linear.rs` | +6 `Vec` | rows and columns of an exact matrix — the index is position in the linear system |
+| the `soma/life` and `soma/membrane` rows | the remainder | **inherited drift, not this session's work.** These owners were not edited here; they are growth against a baseline last seeded 2026-08-14 |
+
+**In no case was a `Vec` found carrying an authored order in place of a transport law.** So the
+disposition at commit is a **recorded re-seed and not a repair**, and saying so is the point: a wave
+of excisions reporting no movement anywhere has done bookkeeping and must say so.
+
+---
+
 ## THE PRESENT CONSTRUCTION IS RESIDENT CIRCULATION, NOT SCHEDULE MORPHOLOGY
 
 **Truth status:** `open`. **Authority:** `blueprint/THE_ROADMAP.md` §“THE RESIDENT CIRCULATION”;
@@ -899,8 +943,22 @@ directory`.
 
 Both repaired in `crates/holonic-architecture-lint/src/lib.rs`. The baseline is
 `meta/HOLONIC_DSA_BASELINE.tsv`, emitted from a **detached worktree of the commit** rather than
-from the working tree, so it is a property of what is committed. **193 files, 18,203 inherited
-occurrences** at `d3dc9c3`. A missing protected root is now refused by name instead of surfacing as
+from the working tree, so it is a property of what is committed. ~~193 files, 18,203 inherited
+occurrences at `d3dc9c3`.~~ **Re-emitted 2026-08-15 at `09b55d9`: 225 files, 20,459 inherited
+occurrences over SIX protected roots.**
+
+**The aperture was widened the same day, and the old refusal was the right rule aimed at the wrong
+crate.** `crates/holonic-architecture-lint/src/lib.rs` had excluded `crates/holonic-structure/src`
+on the ground that *"adding them would author a scope the source never declared"* — but that crate's
+declared purpose **is** owning the substrate containers so a `BTreeMap` does not become ontology, so
+a ratchet that skipped it watched every consumer of the substrate and not the substrate. Its
+baseline carried **zero rows** for it while four new modules landed there on 2026-08-15.
+
+Widened to six roots and re-emitted; the diff is **purely additive** — every non-structure row is
+byte-identical, so no standing allowance moved. Six new rows (`branch_lineage`, `keyed_atlas`,
+`local_population`, `local_sequence`, `ordinal_atlas`, `relation_atlas`, 61 occurrences), and it
+**immediately caught one of the four new modules**: `chain.rs` at `Vec` 7 against an allowance of 0.
+`face.rs`, `junction.rs` and `relating.rs` carry no ownership constructs at all. A missing protected root is now refused by name instead of surfacing as
 an ordinary I/O error, and `every_protected_root_resolves_in_this_repository` is the test that
 would have caught the laboratory frame on the day it arrived.
 

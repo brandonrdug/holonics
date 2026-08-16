@@ -128,6 +128,12 @@ crates/holonic-engine/src/tube.rs	.clone()=59	.collect()=18	.flat_map()=3	.into_
 crates/holonic-engine/src/wave_propagation.rs	.clone()=24	.collect()=12	.flat_map()=1	.into_iter()=2	BTreeMap=11	BTreeSet=12	Vec=43
 crates/holonic-engine/src/winding_inertia.rs	.clone()=28	.collect()=22	Vec=57
 crates/holonic-engine/src/world.rs	Vec=2
+crates/holonic-structure/src/branch_lineage.rs	.collect()=2	Vec=3
+crates/holonic-structure/src/keyed_atlas.rs	.collect()=2	.into_iter()=1	BTreeMap=2	Vec=3
+crates/holonic-structure/src/local_population.rs	.collect()=4	.into_iter()=3	Vec=7
+crates/holonic-structure/src/local_sequence.rs	.into_iter()=1	Vec=7
+crates/holonic-structure/src/ordinal_atlas.rs	.collect()=2	.into_iter()=1	BTreeMap=2	Vec=6
+crates/holonic-structure/src/relation_atlas.rs	.clone()=2	.collect()=2	.into_iter()=2	BTreeMap=2	Vec=7
 soma/body/src/boundary.rs	.collect()=1	Vec=3
 soma/body/src/carriage.rs	.clone()=37	Vec=23
 soma/body/src/carriage/register_chart.rs	.clone()=1

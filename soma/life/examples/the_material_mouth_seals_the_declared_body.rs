@@ -367,12 +367,12 @@ fn detached(form: &Path, expectation: &DetachedExpectation) -> Result<(), String
             refusal.error()
         )
     })?;
-    let aperture = resident.receipt().conditioned_sections;
+    let horizon = u64::MAX;
     let leader = LaboratoryResearchLeader {
         identity: "material-mouth/source-detached-receiver".to_owned(),
         question: RECEIVER_FEATURE.to_owned(),
         region: BTreeSet::from([RECEIVER_FEATURE.to_owned()]),
-        aperture,
+        horizon,
         generation: 0,
         caused_by_clauses: BTreeSet::new(),
     };

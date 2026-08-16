@@ -101,14 +101,17 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 | `blueprint/CONTAMINATION_BANS.md` | **Contamination bans** — These are hard reconstruction invariants derived from repeated laboratory failures. |
 | `blueprint/PURE_HOLONIC_ENGINE.md` | **Pure holonic engine** — This is the normative, language- and hardware-agnostic engine contract. |
 | `blueprint/THE_ASSEMBLY.md` | **THE ASSEMBLY** — The parts exist. 28% of the library body — 51 modules, 59,914 lines — has no inbound edge. |
+| `blueprint/THE_ENGINE_REVISIONS.md` | **The engine revisions — what the 2026-08-15 findings oblige** — **Sources:** the six records of 2026-08-15, three Opus audits and one Sol (GPT-5.6, xhigh) mathematics audit. |
+| `blueprint/THE_EROS_INSTANTIATION.md` | **The Eros instantiation — what a model IS, what conditioning IS, what production IS** — It sits beside `THE_TRAVERSIBLE_CHAIN.md` — that plan states what a link is made of; this states what a **body** is, how it is stored, and how it runs. |
 | `blueprint/THE_MACHINE.md` | **The machine, whole — what conducts, what it returns, and where the seams are open** — **Evidence:** `measured` — `cargo test --workspace --no-fail-fast`, **1325 passed / 0 failed / 14 ignored**, summed across 42 `test result:` lines on a quiet tree. 80 drivers. 88 engine… |
 | `blueprint/THE_METHOD_ATLAS.md` | **The method atlas** — It supersedes `THE_TYPED_TRANSPORT_ATLAS.md` as the *object*; that document remains in force as the plan for one **instrument**, and §3 says exactly what it is and is not. |
 | `blueprint/THE_PRESENTATION_ORGAN.md` | **The presentation organ** — It states a contract the roadmap composes. |
+| `blueprint/THE_TRAVERSIBLE_CHAIN.md` | **The traversible chain** — It sits **under** `THE_METHOD_ATLAS.md` — the atlas states what a row is; this states what a row is *made of*. |
 | `blueprint/THE_TYPED_TRANSPORT_ATLAS.md` | **The typed transport atlas** — **All six movements returned 2026-08-14. It is a FLOOR, not an endpoint** — the review that says so, with the four standing owners the deed bypassed, is… |
 
 ---
 
-## 4 · The 2026-08 record line (96 deposits of 388)
+## 4 · The 2026-08 record line (103 deposits of 395)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -212,6 +215,13 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-14_THE_ORACLE_TAUGHT_THE_DOMAIN_AND_D_NOW_MATCHES_LEAN_SEVENTEEN_OF_SEVENTEEN.md` | The oracle taught the domain, and `D` now matches Lean seventeen of seventeen |
 | `2026-08-14_THE_RECOGNITION_PRECEDES_THE_RUN_AND_THE_STRUCTURAL_REFUSALS_WENT_TO_ZERO.md` | The recognition precedes the run, and the structural refusals went to zero |
 | `2026-08-14_THE_TYPED_ATLAS_IS_A_FLOOR_AND_FOUR_STANDING_OWNERS_WERE_BYPASSED.md` | The typed atlas is a floor, and four standing owners were bypassed |
+| `2026-08-15_A_LINEAGE_IS_A_STRING_AND_COMPACTIFICATION_IS_NODE_COMPRESSION.md` | A lineage is a string, and compactification is node compression |
+| `2026-08-15_FROZEN_IS_A_MEASURED_PROPERTY_AND_THE_SEAL_IS_THE_INSTRUMENT.md` | Frozen is a measured property, and the seal is the instrument |
+| `2026-08-15_THE_ECOLOGY_READS_FROM_A_FRAME_THAT_NO_LIVE_PATH_ADVANCES.md` | The ecology reads from a frame that no live path advances |
+| `2026-08-15_THE_FOURTH_BODY_IS_HELD_BY_A_STANCE_AND_NOTHING_STANDS_THERE.md` | The fourth body is held by a stance, and nothing stands there |
+| `2026-08-15_THE_FOURTH_REPAIR_WAS_BUILT_AND_REVERTED_AND_THE_SUB_COMPOSITION_IS_WHERE_IT_STOPS.md` | The fourth repair was built and reverted, and the sub-composition is where it stops |
+| `2026-08-15_THE_MATERIAL_ARMS_THE_FOUNDING_AND_THE_FOURTH_BODY_IS_NEVER_LIVE.md` | The material arms the founding, and the fourth body is never live |
+| `2026-08-15_THE_RELATING_IS_ONE_COMPLEX_PRODUCT_AND_THE_POLE_HAS_COLLAPSED_ONTO_A_RELATUM.md` | The relating is one complex product, and the pole has collapsed onto a relatum |
 
 ---
 

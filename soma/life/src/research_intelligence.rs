@@ -25,9 +25,9 @@ use crate::{
     causal_language::lexical_tokens,
     dialogue_lineage::{DialogueLineageOccurrence, DialogueSpeaker, ExactDialogueLineage},
     laboratory_language::{
-        text_features, LaboratoryLanguageError, LaboratoryResearchLeader,
-        LaboratoryReturnedSection, LaboratorySourceAtlas, LaboratorySourceKind,
-        LaboratoryWorldReturn,
+        text_features, LaboratoryDeferredSection, LaboratoryLanguageError,
+        LaboratoryResearchLeader, LaboratoryReturnedSection, LaboratorySourceAtlas,
+        LaboratorySourceKind, LaboratoryWorldReturn, LeaderAdmission,
     },
 };
 
@@ -197,6 +197,9 @@ struct DialogueSectionLookup {
     sections: Vec<LaboratoryReturnedSection>,
     complete_population: usize,
     omitted_population: usize,
+    /// What the junction dilated past the horizon, retained. Before 2026-08-15 this population was
+    /// dropped by a count truncation with no record of what it held.
+    deferred: Vec<LaboratoryDeferredSection>,
     feature_lookups: usize,
     feature_hits: usize,
     candidate_section_indices: BTreeSet<usize>,
@@ -306,9 +309,11 @@ impl<'a> ExactResearchWorld<'a> {
             mut sections,
             mut complete_population,
             mut omitted_population,
+            mut deferred,
             ..
         } = self.repository.enact(leader)?;
         let dialogue = self.dialogue_sections(leader);
+        deferred.extend(dialogue.deferred.iter().cloned());
         complete_population = complete_population
             .checked_add(dialogue.complete_population)
             .ok_or(LaboratoryLanguageError::CarrierExtent)?;
@@ -389,6 +394,7 @@ impl<'a> ExactResearchWorld<'a> {
             sections,
             complete_population,
             omitted_population,
+            deferred,
         })
     }
 
@@ -439,11 +445,13 @@ impl<'a> ExactResearchWorld<'a> {
         let candidate_section_indices = candidate_indices;
         let complete_population = candidate_section_indices.len();
         let mut returned_section_indices = BTreeSet::new();
-        let mut sections = Vec::with_capacity(complete_population.min(leader.aperture));
+        // The count truncation this loop carried until 2026-08-15 — `if sections.len() >=
+        // leader.aperture { continue }` — silently DROPPED everything past the count, with no
+        // record of what it was. The junction law replaces it and the excluded population is now
+        // retained by name; see `LaboratoryResearchLeader::admits`.
+        let mut sections = Vec::new();
+        let mut deferred = Vec::new();
         for section_at in &candidate_section_indices {
-            if sections.len() >= leader.aperture {
-                continue;
-            }
             let Some(section) = self.dialogue_sections.get(*section_at) else {
                 continue;
             };
@@ -452,6 +460,31 @@ impl<'a> ExactResearchWorld<'a> {
             };
             if section.features.is_disjoint(&leader.region) {
                 continue;
+            }
+            let matched_features: Vec<String> = section
+                .features
+                .intersection(&leader.region)
+                .cloned()
+                .collect();
+            match leader.admits(matched_features.len()) {
+                LeaderAdmission::Crosses { .. } => {}
+                LeaderAdmission::Defers {
+                    service_rounds,
+                    reflection,
+                } => {
+                    deferred.push(LaboratoryDeferredSection {
+                        source_identity: format!(
+                            "{}/surface-{}",
+                            occurrence.identity, section.local_at
+                        ),
+                        source: format!("codex-dialogue/{}", occurrence.turn),
+                        matched_features,
+                        service_rounds,
+                        reflection,
+                    });
+                    continue;
+                }
+                LeaderAdmission::NoTravelingSection => continue,
             }
             returned_section_indices.insert(*section_at);
             sections.push(LaboratoryReturnedSection {
@@ -480,6 +513,7 @@ impl<'a> ExactResearchWorld<'a> {
             sections,
             complete_population,
             omitted_population,
+            deferred,
             feature_lookups: leader.region.len(),
             feature_hits,
             candidate_section_indices,

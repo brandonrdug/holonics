@@ -29,6 +29,7 @@ pub mod exact_world;
 // recovers a tokenizer from an oracle it may call; this recovers one from octets that merely
 // happened, with `occurs` and `recurs` as the only contact. It lives here because it assembles
 // `holonic-engine`'s `RecoveredCodec` carrier around material that only `life` has a mouth for.
+pub mod eros_rest;
 pub mod exposure_codec;
 pub mod form_mouth;
 pub mod holonic_training;

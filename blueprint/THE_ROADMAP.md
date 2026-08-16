@@ -159,6 +159,57 @@ steps from one act (the fact *and its bound variables*) and records a fragment o
 as the statement. **8,934 of 107,502** binding-tactic lines in mathlib carry their own binders, and
 for `suffices` they are the majority.
 
+## THE ENGINE REVISIONS — posed 2026-08-15 after four audits
+
+**The plan is [`THE_ENGINE_REVISIONS.md`](THE_ENGINE_REVISIONS.md).** Three Opus audits and one Sol
+(GPT-5.6, xhigh) mathematics audit returned against the day's six records; **five claims were
+refuted and are named there so nothing builds on them**, including three Millennium rows that had
+been promoted to "acquired".
+
+**The findings unify into one statement:**
+
+> **The machine keeps dropping the half that came back** — the flywheel is the previous meeting
+> returning and was never held; the reflected amplitude is the wave returning and the chain's
+> transport dropped it; the founding quantum is the turn returning and shares a register with the
+> circuit crossing; the deferred population is the arrival returning later and is read by nothing.
+> **One law, four carriers, four grains** — the spine's missing return edge, found four times.
+
+**The gate is one measurement.** The return edge is not missing, it is unreachable by thirty lines:
+the directed contacts read `enclosure(source_grain − 1)` at `live_current.rs:3546-3590` while the
+stance founder writes at `:3607-3637`, both inside `enact_host_current`, with `perceive_grain` in the
+PTX. But the founder runs every event and `held_live` was still 0 of 21,070 — so **measure the
+founder's write depth against the contact's read depth before repairing anything**, or a reorder that
+changed nothing would look like a repair.
+
+**The largest revision is forced by mathematics:** the scalar transport neither composes nor retains
+the return, and the matrix `M(ρ) = ½[[1+ρ,1−ρ],[1−ρ,1+ρ]]` does both, with `M(ρ)ᵀJM(ρ) = ρJ` giving
+an exact rational isometry between admittance fibers and a genuine `O(1,1)` boost of rapidity
+`−½ log ρ` — on forward/returned amplitudes, **not** on the arrow's plane.
+
+## THE EROS INSTANTIATION — what a model is, ratified 2026-08-15
+
+**The plan is [`THE_EROS_INSTANTIATION.md`](THE_EROS_INSTANTIATION.md).** Brandon's occasion:
+*"instantiate models of Eros that are 'pretrained' in the sense that they are conditioned ecological
+neural networks stored and able to be recycled into active processes."*
+
+```text
+   A MODEL        a REST — the sealed bytes of a body's four substrate carriers ⊕ its organ rests
+   CONDITIONING   what RUNNING IS. No update rule, no loss, no optimizer, no step.
+   PRODUCTION     RADIATION of the cycle. Never selection.
+   "PRETRAINED"   was sealed after conditioning. Nothing more.
+```
+
+**Training and inference are the same passage; the only choice is whether you seal afterward.** The
+deposit happens on the passage — `e.fly = met`, `sweep += basis` — so there is no training mode to
+enter. Nothing is frozen, and the reason is structural rather than brave: **catastrophic forgetting
+requires shared coordinates, and this body reads by placement**, so a change at one grip is not
+consulted at a distant one. The falsifier is a distant-grip control that can fail.
+
+**The gap is a join, not a carrier.** Six per-organ rests exist and no object holds a whole body.
+`ErosRest` is that join, and its second control — *seal, run, seal, and require the bytes to
+differ* — is **predicted to fail on the agentic ecology**, whose frame was measured at genesis in
+21,070 of 21,070 contacts. A control that passes on its first material has not been tested.
+
 ## THE METHOD ATLAS — the active construction plan, 2026-08-15
 
 **The plan is [`THE_METHOD_ATLAS.md`](THE_METHOD_ATLAS.md).** An atlas row is a **recognition
@@ -2320,11 +2371,11 @@ against the whole tree:**
 | module | lines | at the census | now (re-measured 2026-08-13) |
 |---|---|---|---|
 | `crates/holonic-engine/src/kelvin.rs` | **644** | **0** | **driven** — `examples/the_loop_carries_its_circulation.rs:58`, committed `27fc74d` 2026-08-10 |
-| `crates/holonic-engine/src/communication.rs` | 400 | **0** | **0** — still the one true entry |
+| `crates/holonic-engine/src/communication.rs` | 400 | **0** | **JOINED 2026-08-15** — `examples/the_measure_is_situated.rs` builds a `Neighbourhood` from the three sections it already holds and reads `spread_from_each`: radius **1** from the union, **2** from either half, so each half reaches the other only *through* the union. Both control arms hold. |
 | `soma/life/src/research_intelligence.rs` | 772 | **0**, out-degree 8 | **driven 2026-08-10** |
 | ~~`soma/abi/src/cuda_execution.rs`~~ | ~~273~~ | ~~**0**~~ | **DELETED 2026-08-10** — `soma/abi/src/lib.rs:16` records the removal; the file does not exist |
 | `crates/holonic-engine/src/surprisal.rs` | 593 | **0** | **consumed** — `situated_residual.rs`, library path |
-| `crates/holonic-engine/src/temper.rs` | 597 | **0** | wired by the return join |
+| ~~`crates/holonic-engine/src/temper.rs`~~ | ~~597~~ | ~~**0**~~ | **STRUCK 2026-08-15 — reached on a LIBRARY path.** `returned_reading.rs:136` imports `temper::{TemperedFamily, Twist, found_on}`, and `examples/the_reading_returns.rs` drives the whole return: before the join the cut is **leak** (62 artifacts returned, production unmoved), after it **accumulation** (9 → 18 committed stems, second production differs, every movement naming its cause). The 2026-08-08 census figure had decayed. |
 
 **Two of those six rows were false for three days, and the census is why.** The "now" column was
 carried forward from a mechanical sweep taken 2026-08-08 and never re-run, so a module that acquired

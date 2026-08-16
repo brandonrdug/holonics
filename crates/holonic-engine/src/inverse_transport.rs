@@ -12,6 +12,19 @@
 //! affine version fiber, chooses unresolved edge queries itself, and admits a
 //! passive diffusion topology only after the world returns the complete
 //! operator basis.
+//!
+//! # Where the algebra lives
+//!
+//! The dense exact algebra is `exact_linear::ExactRatMatrix`. It was this module's own until
+//! 2026-08-15, and the 33-line elimination body of its private `invert_exact` differed from
+//! `generative_transport`'s by exactly one line — the error variant it named on a singular
+//! pivot. Neither function checked the inverse it returned; both callers did, separately. The
+//! carrier now checks inside the operation, and its refusals are renamed into this module's own
+//! vocabulary below so no foreign error variant reaches a caller.
+//!
+//! The `inverse_residual` this module computes and retains is untouched. It is not made
+//! redundant: it travels in the admission receipt for a later reader, where the carrier refuses
+//! at the point of construction.
 
 use std::collections::{BTreeMap, BTreeSet, VecDeque};
 
@@ -20,6 +33,7 @@ use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
 use crate::{
     CurrentBranchId, CurrentNodeId, DiffusionBranch, DiffusionComplex, DiffusionError,
     DiffusionNode, EventId, EventSuccessor, ExactEventLaw,
@@ -1148,7 +1162,7 @@ fn build_certificate(
     let transfer_operator = invert_exact(event_operator.clone())?;
     let inverse_residual = matrix_subtract(
         &matrix_multiply(&transfer_operator, &event_operator)?,
-        &identity_matrix(extent_usize),
+        &identity_matrix(extent_usize)?,
     )?;
     if inverse_residual
         .iter()
@@ -1295,107 +1309,74 @@ fn zero_matrix(rows: usize, columns: usize) -> Vec<Vec<Rat>> {
     vec![vec![Rat::zero(); columns]; rows]
 }
 
-fn identity_matrix(extent: usize) -> Vec<Vec<Rat>> {
-    let mut result = zero_matrix(extent, extent);
-    for (diagonal, row) in result.iter_mut().enumerate() {
-        row[diagonal] = Rat::one();
+/// Every refusal the shared exact carrier raises, named in this module's own vocabulary.
+///
+/// `SingularMatrix` is the one the declared material can cause — a reconstructed operator whose
+/// rows are dependent, which is a real fact about what the world returned.
+impl From<ExactLinearError> for InverseTransportError {
+    fn from(error: ExactLinearError) -> Self {
+        match error {
+            ExactLinearError::SingularMatrix => {
+                InverseTransportError::SingularReconstructedOperator
+            }
+            ExactLinearError::InverseCertificateFailure => {
+                InverseTransportError::InverseCertificateFailure
+            }
+            ExactLinearError::RaggedMatrix
+            | ExactLinearError::NonsquareMatrix
+            | ExactLinearError::AddressOutside
+            | ExactLinearError::ExtentOverflow
+            | ExactLinearError::ShapeMismatch => InverseTransportError::MalformedMatrix,
+        }
     }
-    result
+}
+
+/// Present dense rows to the shared carrier against a **declared** column count, because a
+/// matrix with no rows carries none of its own.
+fn carrier(matrix: &[Vec<Rat>], columns: usize) -> Result<ExactRatMatrix, InverseTransportError> {
+    Ok(ExactRatMatrix::shaped(
+        matrix.len(),
+        columns,
+        matrix.to_vec(),
+    )?)
+}
+
+fn identity_matrix(extent: usize) -> Result<Vec<Vec<Rat>>, InverseTransportError> {
+    Ok(ExactRatMatrix::identity(extent)?.to_rows())
 }
 
 fn matrix_vector(matrix: &[Vec<Rat>], vector: &[Rat]) -> Result<Vec<Rat>, InverseTransportError> {
-    if matrix.iter().any(|row| row.len() != vector.len()) {
-        return Err(InverseTransportError::MalformedMatrix);
-    }
-    matrix.iter().map(|row| dot(row, vector)).collect()
+    Ok(carrier(matrix, vector.len())?.apply(vector)?)
 }
 
 fn matrix_multiply(
     left: &[Vec<Rat>],
     right: &[Vec<Rat>],
 ) -> Result<Vec<Vec<Rat>>, InverseTransportError> {
-    let inner = left.first().map_or(0, Vec::len);
+    let inner = right.len();
     let columns = right.first().map_or(0, Vec::len);
-    if left.iter().any(|row| row.len() != inner)
-        || right.len() != inner
-        || right.iter().any(|row| row.len() != columns)
-    {
-        return Err(InverseTransportError::MalformedMatrix);
-    }
-    Ok((0..left.len())
-        .map(|row| {
-            (0..columns)
-                .map(|column| {
-                    (0..inner).fold(Rat::zero(), |sum, index| {
-                        sum + &left[row][index] * &right[index][column]
-                    })
-                })
-                .collect()
-        })
-        .collect())
+    Ok(carrier(left, inner)?
+        .multiply(&carrier(right, columns)?)?
+        .to_rows())
 }
 
 fn matrix_subtract(
     left: &[Vec<Rat>],
     right: &[Vec<Rat>],
 ) -> Result<Vec<Vec<Rat>>, InverseTransportError> {
-    if left.len() != right.len()
-        || left
-            .iter()
-            .zip(right)
-            .any(|(left, right)| left.len() != right.len())
-    {
-        return Err(InverseTransportError::MalformedMatrix);
-    }
-    Ok(left
-        .iter()
-        .zip(right)
-        .map(|(left, right)| {
-            left.iter()
-                .zip(right)
-                .map(|(left, right)| left - right)
-                .collect()
-        })
-        .collect())
+    let columns = left.first().or_else(|| right.first()).map_or(0, Vec::len);
+    Ok(carrier(left, columns)?
+        .subtract(&carrier(right, columns)?)?
+        .to_rows())
 }
 
-fn invert_exact(mut matrix: Vec<Vec<Rat>>) -> Result<Vec<Vec<Rat>>, InverseTransportError> {
+/// The exact inverse, **with the shared carrier's multiplication certificate in force**.
+///
+/// This was 33 lines of private Gauss-Jordan differing from `generative_transport`'s
+/// by one line, and it left the verification to its caller. The rationals are the same.
+fn invert_exact(matrix: Vec<Vec<Rat>>) -> Result<Vec<Vec<Rat>>, InverseTransportError> {
     let extent = matrix.len();
-    if matrix.iter().any(|row| row.len() != extent) {
-        return Err(InverseTransportError::MalformedMatrix);
-    }
-    let mut inverse = identity_matrix(extent);
-    for column in 0..extent {
-        let pivot = (column..extent)
-            .find(|row| !matrix[*row][column].is_zero())
-            .ok_or(InverseTransportError::SingularReconstructedOperator)?;
-        if pivot != column {
-            matrix.swap(pivot, column);
-            inverse.swap(pivot, column);
-        }
-        let divisor = matrix[column][column].clone();
-        for value in &mut matrix[column] {
-            *value /= &divisor;
-        }
-        for value in &mut inverse[column] {
-            *value /= &divisor;
-        }
-        let pivot_matrix = matrix[column].clone();
-        let pivot_inverse = inverse[column].clone();
-        for row in 0..extent {
-            if row == column || matrix[row][column].is_zero() {
-                continue;
-            }
-            let factor = matrix[row][column].clone();
-            for (value, pivot_value) in matrix[row].iter_mut().zip(&pivot_matrix) {
-                *value -= &factor * pivot_value;
-            }
-            for (value, pivot_value) in inverse[row].iter_mut().zip(&pivot_inverse) {
-                *value -= &factor * pivot_value;
-            }
-        }
-    }
-    Ok(inverse)
+    Ok(carrier(&matrix, extent)?.inverse()?.to_rows())
 }
 
 fn dot(left: &[Rat], right: &[Rat]) -> Result<Rat, InverseTransportError> {

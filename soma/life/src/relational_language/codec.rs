@@ -601,7 +601,25 @@ pub(super) fn extend_relation_incidence(
     debug_assert_eq!(adjacency.len(), first_new_clause);
     adjacency.resize_with(clauses.len(), LocalSet::new);
     let mut candidates_out = LocalSequence::new();
+    let mut candidate_total = 0usize;
+    let mut pair_total = 0usize;
+    let mut committed_total = 0usize;
+    let extend_began = std::time::Instant::now();
     for right in first_new_clause..clauses.len() {
+        if (right - first_new_clause) % 25 == 0 {
+            crate::laboratory_language::eros_trace(
+                "incidence.progress",
+                &format_args!(
+                    "clause {} of {} candidates {} pairs {} COMMITTED {} in {} ms",
+                    right - first_new_clause,
+                    clauses.len() - first_new_clause,
+                    candidate_total,
+                    pair_total,
+                    committed_total,
+                    extend_began.elapsed().as_millis()
+                ),
+            );
+        }
         let clause = &clauses[right];
         let received_faces = [&clause.subject.identity, &clause.object.identity];
         let output_face = clause_output_face(clause);
@@ -633,14 +651,17 @@ pub(super) fn extend_relation_incidence(
         if let Some(carriers) = face_incidence.get(&clause.relation) {
             candidates.extend(carriers.iter().copied());
         }
+        candidate_total += candidates.len();
         for left in candidates {
             if left >= right {
                 continue;
             }
+            pair_total += 1;
             let shared_contact = !clause_shared_entity_faces(&clauses[left], clause).is_empty();
             if passage_predecessor != Some(left) && !shared_contact {
                 continue;
             }
+            committed_total += 1;
             adjacency[left].insert(right);
             adjacency[right].insert(left);
             let phase = relational_junction_phase(&clauses[left], clause);
@@ -680,10 +701,26 @@ pub(super) fn ordered_clause_pair(left: usize, right: usize) -> (usize, usize) {
     }
 }
 
+/// APERTURE — the chronology a standing factor must cross the co-present seam closure within.
+///
+/// Declared here because this organ is the receiver over that standing, and reported in the drain
+/// trace. **What would derive it rather than declare it** is the material's own service-round
+/// distribution across a drain, which nothing yet reads; until then it is an `APERTURE` in the sense
+/// of `canon/THE_AUTHORED_LEVEL.md` and its orbit must be exhibited before any reading taken through
+/// it is evidence.
+///
+/// The junction is `⌈(R+M)²/(4RM)⌉` where `R` is how wide the arriving front is on an interface and
+/// `M` is the standing factor's multiplicity. At `8`, a front of two admits factors to roughly sixty
+/// and defers the more replicated ones — retained, never dropped. It matches the leader traversal's
+/// declared horizon, which is the same law one layer out.
+const SEAM_CLOSURE_HORIZON: u64 = 8;
+
 pub(super) fn empty_relational_association() -> Result<ResonanceEcology, RelationalLanguageError> {
     let standing =
         SparseStandingSurface::empty_rank(8).map_err(|_| RelationalLanguageError::CarrierExtent)?;
-    Ok(ResonanceEcology::new(LiveCurrentMachine::new(standing)))
+    let mut association = ResonanceEcology::new(LiveCurrentMachine::new(standing));
+    association.declare_traversal_horizon(SEAM_CLOSURE_HORIZON);
+    Ok(association)
 }
 
 pub(super) fn relational_junction_candidate_occurrence(
@@ -701,7 +738,25 @@ pub(super) fn relational_junction_candidate_occurrence(
     identity.push(3);
     encode_string(&mut identity, &left.identity)?;
     encode_string(&mut identity, &right.identity)?;
-    identity.extend_from_slice(&order.to_le_bytes());
+    // THE DRAIN ORDINAL IS NOT PART OF A JUNCTION'S IDENTITY, and it was until 2026-08-15.
+    //
+    // `identity.extend_from_slice(&order.to_le_bytes())` folded `configuration_order` into the
+    // causal identity of a junction. That ordinal counts DRAINS, not occurrences: every candidate
+    // in one drain shares it, and it advances by `RELATIONAL_SWING_OCCURRENCE_SPAN` when the queue
+    // is emptied. It is a batch position — an apparatus coordinate.
+    //
+    // **Measured before removing it: it distinguished nothing.** A candidate pair is founded exactly
+    // once, by `extend_relation_incidence`'s `for right in first_new_clause..clauses.len()`, so
+    // `(left, right)` is already unique across a whole run. Removing the ordinal moved the deferred
+    // population by zero (41 → 41), left the returned answer identical, and left every drain time
+    // within noise.
+    //
+    // So it is removed on the ground that decides it rather than on cost: `CLAUDE.md` §0's fourth
+    // archive lesson is *no absolute frame in a lineage*, and this crate's own header refuses
+    // exactly this — *"page size, directory position, and contiguous row offsets never become source
+    // identity, chronology, or receiver testimony."* A drain ordinal is a row offset wearing a
+    // clock. `order` still passes to the occurrence below as its declared configuration order,
+    // which is where a chronology belongs.
     relational_junction_occurrence_with_identity(&candidate.phase, &identity, order)
 }
 
@@ -715,6 +770,23 @@ pub(super) fn relational_junction_occurrence_with_identity(
     opposed_phase_bytes.push(1);
     let mut return_phase_bytes = phase_bytes;
     return_phase_bytes.push(2);
+    // A PLACEMENT WAS TRIED HERE ON 2026-08-15 AND MEASURED INERT. The note is the finding.
+    //
+    // These atoms are the constants `Cog::lit(1)` and `Cog::lit(2)` — the same pair for every
+    // junction in a run — and a relation atom is not a label: `manifold::atom_node` derives a germ's
+    // `Place` from its magnitude bits. So every junction lands at the same two positions. Deriving
+    // each atom from its own identity bytes instead moved **nothing**: `rode` stayed at 1,348,
+    // `both_null` at 161,642, `zero_reach` at 3,540, and the returned answer was identical.
+    //
+    // **Because these are not the pins being compared.** `LivePin::rebase_exposed` compares pins on
+    // standing `LiveConstituent`s, and those are produced by the regional/relational cell path, not
+    // by these junction germs. The producer of the null faces is elsewhere and is still open.
+    //
+    // What the failed attempt did establish, and it stands: of 162,990 temporal comparisons,
+    // **161,642 have both faces entirely null** and only **1,348 can RIDE**; `wound` and `hand` never
+    // fire; and with `reach` non-zero in 97.8% of them the arithmetic forces the pole to coincide
+    // with a relatum — a two-body contact, which `…/THEORY/33_THE_NECK.md` rules has no neck, so
+    // nothing passes and it only mirrors.
     let opposed = ResonanceGerm::new(
         fiber_from_bytes(RELATIONAL_JUNCTION_SCHEMA, &opposed_phase_bytes),
         RelationAtom::new(Cog::lit(1)).ok_or(RelationalLanguageError::CarrierExtent)?,

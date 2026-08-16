@@ -1545,9 +1545,23 @@ certificate against a Faddeev–LeVerrier characteristic polynomial.
 What remains true is the division of labour: `inertia.rs` returns the split, `winding_inertia.rs`
 names the passages, and a return that quotes the first without the second is still a state reading.
 
-And the audit this implies, which nobody has run: **every bare sign stored on a conduct path has done
-what a float does.** Find each `-` that is retained state rather than traversal and ask whether the
-turn that produced it was kept.
+And the audit this implies: **every bare sign stored on a conduct path has done what a float does.**
+Find each `-` that is retained state rather than traversal and ask whether the turn that produced it
+was kept.
+
+**CORRECTED 2026-08-15: "which nobody has run" was stale by a week and is withdrawn.** It ran on
+2026-08-08 —
+`research/records/2026-08-08_THE_BOUNDARY_KEPT_THE_MAGNITUDE_AND_DISCARDED_THE_TURN.md`,
+`established-bounded` — and it convicted `ComparativeMultiplicity::new` for reducing a retained
+`(positive, negative)` pair at construction, *"`OrientedWinding`'s anatomy and `i64`'s behaviour"*.
+**Eleven tests were asserting the defect**; every homology figure was unchanged after the repair and
+**the face relation was the thing that moved** — which is the phase-object theorem arriving before
+it was stated. **What is actually open is six named sites**, listed in that record's §7 and carried
+by `blueprint/THE_ROADMAP.md` under *THE FRICTION*, the highest being
+`exact_analysis::polygon_winding`, which nets `+1`/`−1`, deposits no crossing, and governs the
+η-zero bisection. Its falsifier is stated: *two different crossing populations producing the same
+net.* **Six sites is a work item; "nobody has run it" is an invitation to redo an audit that
+exists.**
 
 ## 3. The Millennium problems are on the path
 

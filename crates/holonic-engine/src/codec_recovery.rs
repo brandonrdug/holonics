@@ -1420,15 +1420,6 @@ mod tests {
         spellings.iter().map(|piece| word(piece)).collect()
     }
 
-    /// Render a returned segmentation back to spellings, for assertions that read as text.
-    fn spelled(segmentation: &[Vec<Symbol>]) -> Vec<String> {
-        let alphabet = universe();
-        segmentation
-            .iter()
-            .map(|piece| alphabet.render(piece))
-            .collect()
-    }
-
     /// **What this test body declares as its host capacity.** A fixture is a caller and declares
     /// its own apertures; the values that used to live in the organ as `FAMILY_APERTURE = 65_536`
     /// and `FREE_ENTRY_APERTURE = 12` are reproduced here so the fixtures' returns are unchanged by

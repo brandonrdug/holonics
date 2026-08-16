@@ -12,6 +12,20 @@
 //! constrained by exact testimony and remains predictive before it closes.
 //! Production selects observations at a second interval and grades the
 //! generated model against a complete, previously unseen third interval.
+//!
+//! # Where the algebra lives
+//!
+//! The dense exact algebra is `exact_linear::ExactRatMatrix`. It was this module's own until
+//! 2026-08-15, and the 33-line elimination body of its private `invert_exact` differed from
+//! `inverse_transport`'s by exactly one line — the error variant it named on a singular pivot.
+//! Neither function checked the inverse it returned, and this module has the **weakest** of the
+//! six call sites: `enact`'s complete-operator branch recomputes the full identity residual and
+//! refuses on it, but `propagate` checks only `A x - b` for the single right-hand side it solved,
+//! which verifies the inverse against one vector and not against the identity. Routing through
+//! the carrier puts the identity check inside the operation, so `propagate` now has it too.
+//!
+//! The carrier's refusals are renamed into this module's own vocabulary below, so no foreign
+//! error variant reaches a caller.
 
 use std::collections::BTreeSet;
 
@@ -20,6 +34,7 @@ use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
 use crate::{
     AffineAdmissionWork, EventId, EventSuccessor, ExactAffinePrediction, ExactAffineVersionFiber,
     ExactEventLaw, InverseTransportError, PotentialTransportEdge, TransportLineageId,
@@ -964,7 +979,7 @@ impl ExactEventLaw for GenerativeTransportLaw {
                         let inverse = invert_exact(predicted_operator.clone())?;
                         let inverse_residual = matrix_subtract(
                             &matrix_multiply(&inverse, &predicted_operator)?,
-                            &identity_matrix(extent),
+                            &identity_matrix(extent)?,
                         )?;
                         if inverse_residual
                             .iter()
@@ -1329,82 +1344,73 @@ fn zero_matrix(rows: usize, columns: usize) -> Vec<Vec<Rat>> {
     vec![vec![Rat::zero(); columns]; rows]
 }
 
-fn identity_matrix(extent: usize) -> Vec<Vec<Rat>> {
-    let mut matrix = zero_matrix(extent, extent);
-    for (diagonal, row) in matrix.iter_mut().enumerate() {
-        row[diagonal] = Rat::one();
+/// Every refusal the shared exact carrier raises, named in this module's own vocabulary.
+impl From<ExactLinearError> for GenerativeTransportError {
+    fn from(error: ExactLinearError) -> Self {
+        match error {
+            ExactLinearError::SingularMatrix => {
+                GenerativeTransportError::SingularGeneratedOperator
+            }
+            ExactLinearError::InverseCertificateFailure => {
+                GenerativeTransportError::InverseResidualNonzero
+            }
+            ExactLinearError::ExtentOverflow => GenerativeTransportError::CarrierOverflow,
+            ExactLinearError::RaggedMatrix
+            | ExactLinearError::NonsquareMatrix
+            | ExactLinearError::AddressOutside
+            | ExactLinearError::ShapeMismatch => GenerativeTransportError::MalformedMatrix,
+        }
     }
-    matrix
+}
+
+/// Present dense rows to the shared carrier against a **declared** column count, because a
+/// matrix with no rows carries none of its own.
+fn carrier(
+    matrix: &[Vec<Rat>],
+    columns: usize,
+) -> Result<ExactRatMatrix, GenerativeTransportError> {
+    Ok(ExactRatMatrix::shaped(
+        matrix.len(),
+        columns,
+        matrix.to_vec(),
+    )?)
+}
+
+fn identity_matrix(extent: usize) -> Result<Vec<Vec<Rat>>, GenerativeTransportError> {
+    Ok(ExactRatMatrix::identity(extent)?.to_rows())
 }
 
 fn transpose(matrix: &[Vec<Rat>]) -> Result<Vec<Vec<Rat>>, GenerativeTransportError> {
     let extent = validate_square(matrix)?;
-    Ok((0..extent)
-        .map(|row| {
-            (0..extent)
-                .map(|column| matrix[column][row].clone())
-                .collect()
-        })
-        .collect())
+    Ok(carrier(matrix, extent)?.transpose()?.to_rows())
 }
 
 fn matrix_vector(
     matrix: &[Vec<Rat>],
     vector: &[Rat],
 ) -> Result<Vec<Rat>, GenerativeTransportError> {
-    if matrix.iter().any(|row| row.len() != vector.len()) {
-        return Err(GenerativeTransportError::MalformedMatrix);
-    }
-    matrix.iter().map(|row| dot(row, vector)).collect()
+    Ok(carrier(matrix, vector.len())?.apply(vector)?)
 }
 
 fn matrix_multiply(
     left: &[Vec<Rat>],
     right: &[Vec<Rat>],
 ) -> Result<Vec<Vec<Rat>>, GenerativeTransportError> {
-    let inner = left.first().map_or(0, Vec::len);
+    let inner = right.len();
     let columns = right.first().map_or(0, Vec::len);
-    if left.iter().any(|row| row.len() != inner)
-        || right.len() != inner
-        || right.iter().any(|row| row.len() != columns)
-    {
-        return Err(GenerativeTransportError::MalformedMatrix);
-    }
-    Ok((0..left.len())
-        .map(|row| {
-            (0..columns)
-                .map(|column| {
-                    (0..inner).fold(Rat::zero(), |sum, index| {
-                        sum + &left[row][index] * &right[index][column]
-                    })
-                })
-                .collect()
-        })
-        .collect())
+    Ok(carrier(left, inner)?
+        .multiply(&carrier(right, columns)?)?
+        .to_rows())
 }
 
 fn matrix_subtract(
     left: &[Vec<Rat>],
     right: &[Vec<Rat>],
 ) -> Result<Vec<Vec<Rat>>, GenerativeTransportError> {
-    if left.len() != right.len()
-        || left
-            .iter()
-            .zip(right)
-            .any(|(left, right)| left.len() != right.len())
-    {
-        return Err(GenerativeTransportError::MalformedMatrix);
-    }
-    Ok(left
-        .iter()
-        .zip(right)
-        .map(|(left, right)| {
-            left.iter()
-                .zip(right)
-                .map(|(left, right)| left - right)
-                .collect()
-        })
-        .collect())
+    let columns = left.first().or_else(|| right.first()).map_or(0, Vec::len);
+    Ok(carrier(left, columns)?
+        .subtract(&carrier(right, columns)?)?
+        .to_rows())
 }
 
 fn vector_subtract(left: &[Rat], right: &[Rat]) -> Result<Vec<Rat>, GenerativeTransportError> {
@@ -1421,40 +1427,14 @@ fn vector_subtract(left: &[Rat], right: &[Rat]) -> Result<Vec<Rat>, GenerativeTr
         .collect())
 }
 
-fn invert_exact(mut matrix: Vec<Vec<Rat>>) -> Result<Vec<Vec<Rat>>, GenerativeTransportError> {
+/// The exact inverse, **with the shared carrier's multiplication certificate in force**.
+///
+/// This was 33 lines of private Gauss-Jordan differing from `inverse_transport`'s by
+/// one line, and it left the verification to its caller — which in `propagate` was a single
+/// solve residual rather than the identity. The rationals are the same.
+fn invert_exact(matrix: Vec<Vec<Rat>>) -> Result<Vec<Vec<Rat>>, GenerativeTransportError> {
     let extent = validate_square(&matrix)?;
-    let mut inverse = identity_matrix(extent);
-    for column in 0..extent {
-        let pivot = (column..extent)
-            .find(|row| !matrix[*row][column].is_zero())
-            .ok_or(GenerativeTransportError::SingularGeneratedOperator)?;
-        if pivot != column {
-            matrix.swap(pivot, column);
-            inverse.swap(pivot, column);
-        }
-        let divisor = matrix[column][column].clone();
-        for value in &mut matrix[column] {
-            *value /= &divisor;
-        }
-        for value in &mut inverse[column] {
-            *value /= &divisor;
-        }
-        let pivot_matrix = matrix[column].clone();
-        let pivot_inverse = inverse[column].clone();
-        for row in 0..extent {
-            if row == column || matrix[row][column].is_zero() {
-                continue;
-            }
-            let factor = matrix[row][column].clone();
-            for (value, pivot_value) in matrix[row].iter_mut().zip(&pivot_matrix) {
-                *value -= &factor * pivot_value;
-            }
-            for (value, pivot_value) in inverse[row].iter_mut().zip(&pivot_inverse) {
-                *value -= &factor * pivot_value;
-            }
-        }
-    }
-    Ok(inverse)
+    Ok(carrier(&matrix, extent)?.inverse()?.to_rows())
 }
 
 fn dot(left: &[Rat], right: &[Rat]) -> Result<Rat, GenerativeTransportError> {

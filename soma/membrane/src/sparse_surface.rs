@@ -1,8 +1,13 @@
 //! Sparse REGISTER-equivalent replay of accepted Soma deeds.
 //!
-//! The dense [`body::manifold::FeltEmissionSurface`] remains the parity oracle.  This production
-//! host surface carries only occupied grips and therefore breathes in proportion to live
-//! construction, never `axis²`.  Its storage is preflighted from the exact deed extent; no
+//! The dense [`body::manifold::FeltEmissionSurface`] remains the parity oracle.  This host surface
+//! carries only occupied grips and therefore breathes in proportion to live construction, never
+//! `axis²`.
+//!
+//! **BOUNDARY, 2026-08-15: "production" overstates it.** Every constructor of `SparseFeltSurface`
+//! is inside this file's own `#[cfg(test)]`, and the live emission path references no surface at
+//! all. It is a replay surface with a parity oracle and no live consumer — unjoined rather than
+//! dead, and joining it would be a construction needing a reason no measurement has yet supplied.  Its storage is preflighted from the exact deed extent; no
 //! allocation, semantic selection, or source re-execution occurs during replay.
 
 use std::vec::Vec;

@@ -62,16 +62,18 @@ use holonic_engine::{EulerReceiverId, QuinticProblemId};
 use life::{
     dialogue_lineage::{CodexDialogueImportSpec, ExactDialogueLineage},
     laboratory_language::{
-        LaboratoryLanguageError, LaboratoryResearchLeader, LaboratorySourceAtlas,
+        LaboratoryResearchLeader, LaboratorySourceAtlas,
         LaboratoryWorldReturn,
     },
     research_intelligence::{ExactQuinticResearchSpec, ExactResearchWorld, RustVerificationSpec},
 };
 use num_bigint::BigInt;
 
-/// The aperture ladder's first rung. It is 1 because the ladder DOUBLES off the material from
-/// here; no rung above it is authored. See `admitting_aperture`.
-const FIRST_APERTURE: usize = 1;
+/// The chronology horizon each leader traverses at, declared here rather than authored in an organ.
+///
+/// This was `FIRST_APERTURE: usize = 1`, the first rung of a doubling ladder that raised a count
+/// until the atlas stopped refusing. The ladder is superseded; see `admitting_horizon`.
+const FIRST_HORIZON: u64 = 8;
 
 fn rule(title: &str) {
     println!("\n{}", "=".repeat(96));
@@ -115,41 +117,30 @@ fn leader(
         identity: identity.to_owned(),
         question: question.to_owned(),
         region: region.iter().map(|word| (*word).to_owned()).collect(),
-        aperture: FIRST_APERTURE,
+        horizon: FIRST_HORIZON,
         generation,
         caused_by_clauses: BTreeSet::new(),
     }
 }
 
-/// The smallest aperture on a doubling ladder at which the repository atlas admits this leader,
-/// together with every rung that refused.
+/// SUPERSEDED 2026-08-15, and its obsolescence is the finding.
 ///
-/// The atlas **refuses** rather than truncating when a leader encounters more sections than its
-/// declared aperture, and its refusal names only `aperture + 1` — not the total — so no single
-/// probe can report the bound. The ladder is therefore how the caller reads its own aperture off
-/// the material instead of authoring one and raising it until the error stops, which is the level
-/// pinning `CLAUDE.md` §8 convicts.
+/// This was a doubling ladder that raised a count until the atlas stopped refusing. It existed
+/// because `enact` **refused** rather than truncating when a leader met more sections than its
+/// declared aperture, and because the refusal named only `aperture + 1` — never the total — so no
+/// single probe could report the bound.
 ///
-/// The probe runs against the atlas, which enacts through `&self`. Nothing in the world moves.
-fn admitting_aperture(
+/// The atlas no longer refuses. A site is met as a junction, costs `⌈(R+M)²/(4RM)⌉` service rounds,
+/// and what dilates past the leader's chronology horizon **defers** with its exact reflection kept.
+/// There is nothing to ladder toward: the probe returns on the first call, and what it would have
+/// laddered past is on the return by name.
+fn admitting_horizon(
     repository: &LaboratorySourceAtlas,
     leader: &LaboratoryResearchLeader,
-) -> Result<(usize, Vec<usize>), String> {
-    let mut probe = leader.clone();
-    let mut refused = Vec::new();
-    let mut aperture = FIRST_APERTURE;
-    loop {
-        probe.aperture = aperture;
-        match repository.enact(&probe) {
-            Ok(_) => return Ok((aperture, refused)),
-            Err(LaboratoryLanguageError::ReceiverAperture { .. }) => {
-                refused.push(aperture);
-                aperture = aperture
-                    .checked_mul(2)
-                    .ok_or_else(|| "aperture ladder extent".to_owned())?;
-            }
-            Err(other) => return Err(format!("aperture probe: {other:?}")),
-        }
+) -> Result<(u64, Vec<usize>), String> {
+    match repository.enact(leader) {
+        Ok(_) => Ok((leader.horizon, Vec::new())),
+        Err(other) => Err(format!("horizon probe: {other:?}")),
     }
 }
 
@@ -213,19 +204,18 @@ fn split_by_material(returned: &LaboratoryWorldReturn) -> MaterialSplit<'_> {
     split
 }
 
-/// Enact one leader at the aperture the material admits, reporting the ladder that found it.
-fn enact_at_admitting_aperture(
+/// Enact one leader at its declared horizon, reporting what the junction deferred.
+fn enact_at_admitting_horizon(
     world: &mut ExactResearchWorld<'_>,
     repository: &LaboratorySourceAtlas,
     leader: &LaboratoryResearchLeader,
-) -> Result<(LaboratoryWorldReturn, usize, Vec<usize>), String> {
-    let (aperture, refused) = admitting_aperture(repository, leader)?;
-    let mut admitted = leader.clone();
-    admitted.aperture = aperture;
+) -> Result<(LaboratoryWorldReturn, u64, Vec<usize>), String> {
+    let (horizon, refused) = admitting_horizon(repository, leader)?;
+    let admitted = leader.clone();
     let returned = world
         .enact(&admitted)
-        .map_err(|error| format!("{} at aperture {aperture}: {error:?}", leader.identity))?;
-    Ok((returned, aperture, refused))
+        .map_err(|error| format!("{} at horizon {horizon}: {error:?}", leader.identity))?;
+    Ok((returned, horizon, refused))
 }
 
 fn main() -> Result<(), String> {
@@ -395,13 +385,16 @@ fn main() -> Result<(), String> {
         &["retained", "section", "returned"],
         0,
     );
-    let (inert_return, inert_aperture, inert_refused) =
-        enact_at_admitting_aperture(&mut world, &repository, &inert)?;
+    let (inert_return, inert_aperture, _) =
+        enact_at_admitting_horizon(&mut world, &repository, &inert)?;
     println!(
         "  region                {:?}",
         inert.region.iter().collect::<Vec<_>>()
     );
-    println!("  aperture ladder       refused at {inert_refused:?}, admitted at {inert_aperture}");
+    println!(
+        "  traversal horizon     {inert_aperture}, deferred {} sites",
+        inert_return.deferred.len()
+    );
     println!("  sections returned     {:>6}", inert_return.sections.len());
     split_by_material(&inert_return).report("control/inert");
     println!(
@@ -434,10 +427,11 @@ fn main() -> Result<(), String> {
         1,
     );
     let began = Instant::now();
-    let (arithmetic_return, arithmetic_aperture, arithmetic_refused) =
-        enact_at_admitting_aperture(&mut world, &repository, &arithmetic)?;
+    let (arithmetic_return, arithmetic_aperture, _) =
+        enact_at_admitting_horizon(&mut world, &repository, &arithmetic)?;
     println!(
-        "  aperture ladder       refused at {arithmetic_refused:?}, admitted at {arithmetic_aperture}"
+        "  traversal horizon     {arithmetic_aperture}, deferred {} sites",
+        arithmetic_return.deferred.len()
     );
     println!(
         "  enacted in {:.2}s; sections {}",
@@ -506,10 +500,11 @@ fn main() -> Result<(), String> {
     );
     println!("  its region, verbatim  {region:?}");
     let dialogue_leader = leader("leader/dialogue", &user_occurrence.text, &region, 3);
-    let (dialogue_return, dialogue_aperture, dialogue_refused) =
-        enact_at_admitting_aperture(&mut world, &repository, &dialogue_leader)?;
+    let (dialogue_return, dialogue_aperture, _) =
+        enact_at_admitting_horizon(&mut world, &repository, &dialogue_leader)?;
     println!(
-        "  aperture ladder       refused at {dialogue_refused:?}, admitted at {dialogue_aperture}"
+        "  traversal horizon     {dialogue_aperture}, deferred {} sites",
+        dialogue_return.deferred.len()
     );
     let dialogue_split = split_by_material(&dialogue_return);
     dialogue_split.report("leader/dialogue");
@@ -542,10 +537,11 @@ fn main() -> Result<(), String> {
             2,
         );
         let began = Instant::now();
-        let (code_return, code_aperture, code_refused) =
-            enact_at_admitting_aperture(&mut world, &repository, &code)?;
+        let (code_return, code_aperture, _) =
+            enact_at_admitting_horizon(&mut world, &repository, &code)?;
         println!(
-            "  aperture ladder       refused at {code_refused:?}, admitted at {code_aperture}"
+            "  traversal horizon     {code_aperture}, deferred {} sites",
+            code_return.deferred.len()
         );
         println!(
             "  enacted in {:.1}s; sections {}",

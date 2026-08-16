@@ -263,7 +263,7 @@ fn build(corpus_form: &Path, source_roots: Vec<PathBuf>) -> Result<(), String> {
         identity: "conditioning-return/corpus-receiver".to_owned(),
         question: STATEMENT.to_owned(),
         region: receiver_features.clone(),
-        aperture: resident.receipt().conditioned_sections,
+        horizon: u64::MAX,
         generation: 0,
         caused_by_clauses: BTreeSet::new(),
     };

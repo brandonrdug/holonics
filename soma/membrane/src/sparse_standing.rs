@@ -12,7 +12,6 @@ use body::manifold::{SparseStandingCell as FlatStandingCell, StandingQuery};
 use body::medium::RegionalForm;
 use body::place::{Grip, Place};
 
-use crate::active_topology::FoldedCut;
 use crate::growing_ranked::ExactCount;
 use crate::live_constituent::StandingConstituentAccess;
 use crate::{ChartAddress, ChartAddressError, LiveConstituent};
@@ -710,68 +709,11 @@ impl SparseStandingSurface {
             .unwrap_or(RegionalForm::UNBORN)
     }
 
-    /// Materialize the already-integrated after-face without changing this receiver.  The entire
-    /// before-face and allocation boundary close before the first successor row is written.
-    pub(crate) fn prepare_successor(
-        &self,
-        folded: &FoldedCut,
-    ) -> Result<Self, SparseStandingError> {
-        if folded.standing_rank() < self.rank {
-            return Err(SparseStandingError::Geometry);
-        }
-        let base = if folded.standing_rank() == self.rank {
-            self.clone()
-        } else {
-            self.zero_extend(folded.standing_rank())?
-        };
-        let mut additional = 0usize;
-        for cell in folded.cells() {
-            if base.form_at_address(cell.address()) != cell.before() {
-                return Err(SparseStandingError::StandingChanged);
-            }
-            if !cell.after().occupied() {
-                return Err(SparseStandingError::Topology);
-            }
-            if base
-                .cells
-                .binary_search_by(|standing| standing.address.cmp(cell.address()))
-                .is_err()
-            {
-                additional = additional
-                    .checked_add(1)
-                    .ok_or(SparseStandingError::ResourceExtent)?;
-            }
-        }
-
-        let capacity = base
-            .cells
-            .len()
-            .checked_add(additional)
-            .ok_or(SparseStandingError::ResourceExtent)?;
-        let mut cells = Vec::new();
-        cells
-            .try_reserve_exact(capacity)
-            .map_err(|_| SparseStandingError::ResourceReservation)?;
-        cells.extend_from_slice(&base.cells);
-        for folded in folded.cells() {
-            match cells.binary_search_by(|standing| standing.address.cmp(folded.address())) {
-                Ok(at) => {
-                    cells[at] = StandingCell::new(folded.address().clone(), folded.after())
-                        .ok_or(SparseStandingError::Topology)?;
-                }
-                Err(at) => cells.insert(
-                    at,
-                    StandingCell::new(folded.address().clone(), folded.after())
-                        .ok_or(SparseStandingError::Topology)?,
-                ),
-            }
-        }
-        Self::from_ranked_cells_with_persistent_constituents(
-            folded.standing_rank(),
-            cells,
-            base.constituents,
-        )
-    }
+    // `prepare_successor(&FoldedCut)` stood here until 2026-08-15. It was this crate's single
+    // edge into the eleven-module `historical` island, and its own three callers —
+    // `contact_cycle`, `active_topology`, `live_holon` — were all inside that island, so it left
+    // with it. The live successor path is `prepare_contemporary_successor` below, which takes the
+    // arrived population directly and consults no folded cut.
 
     /// Integrate the complete population which actually arrived at one contemporary event.
     /// Every contribution is a current-local construction already enacted against this same

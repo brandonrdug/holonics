@@ -206,6 +206,39 @@ impl LivingFrame {
     }
 }
 
+/// ★ THE DEPOSIT CENSUS of a lineage: what it has laid down, and where its basis stands.
+///
+/// **RENAMED FROM `DepositCensus` 2026-08-15, because it is not an action and the name claimed it
+/// was.** An exact collision was exhibited: from `basis = 1`, a single `FoundThat(2+2i)` and the
+/// pair `Ride(−2−i); Ride(−1)` both return `deposits = (0,1)` and `basis = 2+i`, while their sweeps
+/// are `2+i` and `0`. The census cannot separate those two histories.
+///
+/// **The cause is one shared register.** `fold_formed_into` writes
+/// `winding.deposit(phase).deposit(founding)`, so an oriented circuit crossing `C` and a founding
+/// quantum `F` land in the same two hands and only `D = C + F` survives. A true action would need
+///
+/// ```text
+///     S / quantum  =  2·pi·(C₊ − C₋)  +  arg(basis)        with  C = D − F
+///     the exact undivided return being   (C₊, C₋, basis)  ⊕  (F₊, F₋)
+/// ```
+///
+/// and this carrier holds neither `C` nor `F` apart. Its signed phase error against a true action is
+/// exactly `2·pi·(F₊ − F₋)`.
+///
+/// **And forcing the separation is not obviously right.** An action is normally a **quotient of
+/// histories**; requiring one to identify every history is a stronger demand than physics makes.
+/// So this is renamed to what it is rather than repaired into what it was called: **an oriented,
+/// species-erased deposit census plus a terminal weighted rotor.** That is a real invariant. It is
+/// not an action, and no reading may quote it as one.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct DepositCensus {
+    /// deposited passages, both hands retained separately and never netted. **Two species share
+    /// this register** — circuit crossings and foundings — and it does not separate them.
+    pub deposits: OrientedWinding,
+    /// where the basis stands now — the undivided rotor pair `(aim, cross)`, weighted
+    pub basis: FormedRotor,
+}
+
 /// `C`, the HOW-WOUND read of `K`: its ordered sweep, present basis, and integer circuit. This is
 /// deliberately not a scalar turn count; two histories with the same circuit count can still have
 /// different sweep/basis constructions.
@@ -260,6 +293,47 @@ impl LineageChannel {
             sweep: place::origin(),
             basis: FormedRotor::identity(),
             winding: OrientedWinding::ZERO,
+        }
+    }
+
+    /// ★ THE DEPOSIT CENSUS — what this lineage has laid down. NOT an action; see `DepositCensus`.
+    ///
+    /// The fold is `basis_{k+1} = basis_k · deed_k` (phases ADD) and `sweep_{k+1} = sweep_k +
+    /// basis_{k+1}` (amplitudes SUM), so unrolling gives `basis_n = Π deed_j`, which is one path's
+    /// amplitude, and `sweep_n = Σ_k Π_{j<k} deed_j`, which is the sum over prefix paths. The
+    /// accumulated turn is therefore the accumulated ACTION:
+    ///
+    /// ```text
+    ///     S / quantum  =  (whole turns)  +  (the fractional remainder)
+    /// ```
+    ///
+    /// Both halves are returned and **neither is divided**. `quanta` keeps the two hands apart, as
+    /// `OrientedWinding` always does — a circuit followed by its opposite is two deposited passages,
+    /// never a return to zero — and `remainder` is the undivided rotor pair.
+    ///
+    /// There is no clock in it, no sensor, and no temperature — temperature is the receiver's
+    /// exchange rate between the count chart and the energy chart, and it may not enter an
+    /// invariant.
+    ///
+    /// **BOUNDARY, corrected 2026-08-15 and load-bearing.** `quanta` counts **deposited passages of
+    /// two species and does not separate them**: `fold_formed_into` writes
+    /// `winding.deposit(phase).deposit(founding)`, so an oriented circuit crossing and a founding
+    /// quantum land in the same two hands. The clean identity
+    ///
+    /// ```text
+    ///     S / quantum  =  2·pi·circuits  +  arg(basis)
+    /// ```
+    ///
+    /// therefore holds only for `circuits = quanta − foundings`, **and this carrier does not carry
+    /// the founding count separately.** So `quanta` is a floor on deposited passages, not on whole
+    /// turns of accumulated action, and a reading that treats it as the latter overcounts by one
+    /// turn per founding. Separating the registers is a change to the fold's own law and is not
+    /// made here; the boundary is stated instead.
+    #[inline]
+    pub fn deposit_census(self) -> DepositCensus {
+        DepositCensus {
+            deposits: self.winding,
+            basis: self.basis,
         }
     }
 
@@ -990,5 +1064,55 @@ mod tests {
                 basis: self.basis,
             }
         }
+    }
+
+    /// CONSTRUCTION 2 — the deposit census. Both hands returned, neither divided; and the control
+    /// that makes it a census rather than a magnitude: a circuit followed by its OPPOSITE must
+    /// remain two deposited passages, never a return to zero.
+    ///
+    /// **The falsifier arm below is the WEAKER of the two it should have.** It requires that two
+    /// different histories return different censuses, and that holds here. It does NOT establish the
+    /// converse, and the converse is false: an exhibited collision — `FoundThat(2+2i)` against
+    /// `Ride(−2−i); Ride(−1)` from `basis = 1` — returns the identical census from different sweeps.
+    /// That is why the carrier is a census and not an action, and the type now says so.
+    #[test]
+    fn the_deposit_census_keeps_the_two_hands_apart_and_never_nets_them() {
+        let genesis = LineageChannel::from_located_first_difference((Cog::lit(3), Cog::lit(1)));
+        let start = genesis.deposit_census();
+        assert_eq!(start.deposits.this_way(), Rung::ZERO);
+        assert_eq!(start.deposits.that_way(), Rung::ZERO);
+        assert_eq!(start.basis, FormedRotor::identity());
+
+        // one founding THIS way
+        let this = genesis.fold_formed_hand_or_self(Cog::lit(1), Cog::lit(2), true, false);
+        let after_this = this.deposit_census();
+        // then its OPPOSITE, THAT way
+        let both = this.fold_formed_hand_or_self(Cog::lit(1), Cog::lit(2), false, true);
+        let after_both = both.deposit_census();
+
+        // THE CONTROL. Depositing a passage and then its opposite must leave TWO passages standing.
+        // A netted counter would return to zero here and the ledger would be a magnitude in disguise.
+        assert_ne!(
+            after_both.deposits.this_way(),
+            Rung::ZERO,
+            "the first passage survives its opposite"
+        );
+        assert_ne!(
+            after_both.deposits.that_way(),
+            Rung::ZERO,
+            "the opposing passage is deposited, not subtracted"
+        );
+        assert_ne!(
+            after_both.deposits, start.deposits,
+            "a circuit and its opposite are not a return to zero"
+        );
+
+        // THE FALSIFIER'S ARM: two different histories must not return the same ledger, or the
+        // reading cannot separate lineages and is not a ledger.
+        assert_ne!(after_this.deposits, after_both.deposits);
+        assert_ne!(start, after_this);
+
+        // the remainder is the undivided rotor pair, and folding moved it off the identity
+        assert_ne!(after_this.basis, FormedRotor::identity());
     }
 }

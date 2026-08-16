@@ -572,6 +572,16 @@ impl ExactRelationalLanguageEcology {
                     occurrences.push(occurrence);
                 }
             }
+            crate::laboratory_language::eros_trace(
+                "junctions.drain",
+                &format_args!(
+                    "pending {} occurrences {} clauses {}",
+                    pending.len(),
+                    occurrences.len(),
+                    self.clauses.len()
+                ),
+            );
+            let drain_began = std::time::Instant::now();
             if !occurrences.is_empty() {
                 let next_association_order = configuration_order
                     .checked_add(RELATIONAL_SWING_OCCURRENCE_SPAN)
@@ -604,6 +614,10 @@ impl ExactRelationalLanguageEcology {
                     pending[member_at].swing_returned = Some(returned);
                 }
                 self.next_association_order = next_association_order;
+                crate::laboratory_language::eros_trace(
+                    "junctions.swing",
+                    &format_args!("in {} ms", drain_began.elapsed().as_millis()),
+                );
             }
 
             for member in &pending {
@@ -618,7 +632,15 @@ impl ExactRelationalLanguageEcology {
                 }
                 self.promote_conducting_pair(member.candidate.left, member.candidate.right)?;
             }
+            crate::laboratory_language::eros_trace(
+                "junctions.promoted",
+                &format_args!("in {} ms", drain_began.elapsed().as_millis()),
+            );
             self.settle_pending_morphology_capacities()?;
+            crate::laboratory_language::eros_trace(
+                "junctions.settled",
+                &format_args!("in {} ms", drain_began.elapsed().as_millis()),
+            );
             Ok(())
         })();
         if let Err(error) = returned {

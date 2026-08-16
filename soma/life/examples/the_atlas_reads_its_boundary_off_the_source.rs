@@ -396,7 +396,7 @@ fn main() {
         identity: "the-boundary-leader".to_owned(),
         question: "what decides a section boundary".to_owned(),
         region: region.clone(),
-        aperture: usize::MAX,
+        horizon: u64::MAX,
         generation: 0,
         caused_by_clauses: BTreeSet::new(),
     };
@@ -885,7 +885,7 @@ fn atlas_identities(
         identity: "the-whole-atlas".to_owned(),
         question: "every section".to_owned(),
         region,
-        aperture: usize::MAX,
+        horizon: u64::MAX,
         generation: 0,
         caused_by_clauses: BTreeSet::new(),
     };

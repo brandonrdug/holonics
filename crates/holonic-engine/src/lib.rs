@@ -55,6 +55,7 @@
 
 pub mod algebraic;
 pub mod analytic_field;
+pub mod approach_front;
 pub mod arithmetic_dimensional;
 pub mod arithmetic_fiber;
 pub mod arithmetic_monodromy;
@@ -330,6 +331,7 @@ pub mod surprisal;
 // never glob-exported: `ItemId`, `ReceiverId`, `Observation`, `Step`, `Verdict` and `window` reach
 // it from `receiver_exact_compression` and collide at the crate root.
 pub mod token_invariance;
+pub mod traversible_chain;
 pub mod tube;
 pub mod wave_propagation;
 // Inertia returned as windings rather than as a count of signs. Declared, never glob-exported:

@@ -11,6 +11,37 @@ use std::ops::Range;
 use std::sync::Arc;
 
 use body::channel::WindingQuantum;
+use holonic_structure::CountedCrossing;
+
+/// In-flight reading for the co-present seam closure, gated on `EROS_TRACE` and resolved once.
+///
+/// The closure is a fixpoint loop whose cost was attributed three different ways before anyone
+/// measured its rounds. A phase that has not finished still has something to say.
+pub(crate) static NO_PROJECTIVE_READ: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
+pub(crate) static WOUND_COMPARISON: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
+pub(crate) static HAND_RESIDUAL: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
+pub(crate) static RODE: core::sync::atomic::AtomicUsize = core::sync::atomic::AtomicUsize::new(0);
+pub(crate) static BOTH_NULL: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
+pub(crate) static ARRIVING_NULL: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
+pub(crate) static HELD_NULL: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
+/// Of the null comparisons, how many also have zero REACH — i.e. the two places coincide, rather
+/// than a place coinciding with the frame tip.
+pub(crate) static ZERO_REACH: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
+
+pub(crate) fn seam_trace(detail: &core::fmt::Arguments<'_>) {
+    use std::sync::OnceLock;
+    static ENABLED: OnceLock<bool> = OnceLock::new();
+    if *ENABLED.get_or_init(|| std::env::var_os("EROS_TRACE").is_some()) {
+        eprintln!("eros-trace seam.round                  {detail}");
+    }
+}
 use body::incidence::IncidenceHand;
 use body::manifold::{
     cast_position, face_packed_word, packed_face_is_canonical, unpack_face, DirectedEventContact,
@@ -567,6 +598,36 @@ impl LivePin {
     ) -> Option<Self> {
         let witness = Self::interface_witness(arriving, held)?;
         let projected_residual = witness.comparison.chi();
+        // WHY A SEAM DOES NOT RIDE. Three conditions block it and only one can be repaired by
+        // anything upstream; counted so the reading is measured rather than inferred.
+        match projected_residual {
+            None => {
+                // WHICH SIDE IS THE HORIZON. `chi_against` returns None only when a face's arrow has
+                // BOTH aim and cross zero — `arms_form` admits ORTHO, so this is not the eyes-only
+                // crime. It means the compared face carries no geometry at all.
+                let arriving_null = arriving.meeting.arrow.aim.mag == 0
+                    && arriving.meeting.arrow.cross.mag == 0;
+                let held_null =
+                    held.meeting.arrow.aim.mag == 0 && held.meeting.arrow.cross.mag == 0;
+                if arriving.meeting.arrow.reach.mag == 0 {
+                    ZERO_REACH.fetch_add(1, core::sync::atomic::Ordering::Relaxed);
+                }
+                match (arriving_null, held_null) {
+                    (true, true) => BOTH_NULL.fetch_add(1, core::sync::atomic::Ordering::Relaxed),
+                    (true, false) => {
+                        ARRIVING_NULL.fetch_add(1, core::sync::atomic::Ordering::Relaxed)
+                    }
+                    (false, true) => HELD_NULL.fetch_add(1, core::sync::atomic::Ordering::Relaxed),
+                    (false, false) => 0,
+                };
+                NO_PROJECTIVE_READ.fetch_add(1, core::sync::atomic::Ordering::Relaxed)
+            }
+            Some(chi) if chi.wound() => WOUND_COMPARISON.fetch_add(1, core::sync::atomic::Ordering::Relaxed),
+            Some(_) if hand_residual.is_some() => {
+                HAND_RESIDUAL.fetch_add(1, core::sync::atomic::Ordering::Relaxed)
+            }
+            Some(_) => RODE.fetch_add(1, core::sync::atomic::Ordering::Relaxed),
+        };
         // This is a comparison between already-exposed paths, not a fresh material contact.
         // Agreement can RIDE. A wound comparison, an oriented hand residual, or an unavailable
         // projective read remains OPEN with its complete pair; it cannot manufacture a FOUND.
@@ -905,14 +966,39 @@ struct IndexedExposedArms {
 ///
 /// This structure is deliberately absent from constituent identity and native rest wires.  A
 /// remounted machine rebuilds it from the exact standing face.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug)]
 pub(crate) struct StandingIncidenceAperture {
     by_interface: BTreeMap<InterfaceCapability, Vec<u64>>,
     identity_by_key: BTreeMap<Arc<[u32]>, u64>,
     factors: BTreeMap<u64, StandingApertureFactor>,
     next_identity: u64,
+    /// The chronology a candidate must cross this aperture within — **declared by whoever builds
+    /// the aperture, never authored here**, and deliberately absent from equality below because a
+    /// horizon is a receiver declaration over a standing rather than part of the caused body.
+    ///
+    /// `u64::MAX` is the inherited setting and admits everything, so nothing moves until a caller
+    /// declares one. See [`Self::declare_traversal_horizon`].
+    traversal_horizon: u64,
+    /// How many propagation hops a front may be informed across — its **vision**. `u32::MAX` is the
+    /// inherited setting and bounds nothing.
+    vision_horizon: u32,
     #[cfg(test)]
     exhaustive: bool,
+}
+
+impl Default for StandingIncidenceAperture {
+    fn default() -> Self {
+        Self {
+            by_interface: BTreeMap::new(),
+            identity_by_key: BTreeMap::new(),
+            factors: BTreeMap::new(),
+            next_identity: 0,
+            traversal_horizon: u64::MAX,
+            vision_horizon: u32::MAX,
+            #[cfg(test)]
+            exhaustive: false,
+        }
+    }
 }
 
 impl PartialEq for StandingIncidenceAperture {
@@ -940,6 +1026,64 @@ impl PartialEq for StandingIncidenceAperture {
 }
 
 impl Eq for StandingIncidenceAperture {}
+
+/// A standing factor the junction dilated past the aperture's declared horizon.
+///
+/// Retained rather than dropped. A rank is only meaningful against the population that did not
+/// connect, and a closure that silently declined half its candidates has deleted the null every
+/// reading over it is taken against.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub(crate) struct DeferredFactor {
+    pub(crate) identity: u64,
+    /// The factor's multiplicity — what standing offered.
+    pub(crate) offered: usize,
+    /// How wide the arriving front was on this factor's interfaces.
+    pub(crate) arriving: u64,
+    /// `⌈(R+M)²/(4RM)⌉` — what the crossing would have cost.
+    pub(crate) service_rounds: u128,
+}
+
+/// How far a front has already propagated, and how many co-present fronts are asking.
+///
+/// **Vision is physical, not declared.** `canon/THE_TRAFFIC_SYSTEM.md` §3b: a unit is informed only
+/// about what has reached it. `front_depth` — already carried on every active part and incremented
+/// each time a front reaches standing — is exactly that propagation depth, and until 2026-08-15
+/// nothing bounded it, so a front could be informed about material arbitrarily far from it.
+///
+/// `co_present` is the demand side of the traffic law: how many fronts are asking at once.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) struct FrontVision {
+    /// How many hops the front has already travelled.
+    pub(crate) depth: u32,
+    /// The declared horizon on that depth. `u32::MAX` is the inherited setting and bounds nothing.
+    pub(crate) horizon: u32,
+    /// How many co-present fronts are asking this round.
+    pub(crate) co_present: u64,
+}
+
+impl FrontVision {
+    /// The inherited reading: unbounded depth, one asking front. Nothing moves under it.
+    #[cfg(test)]
+    pub(crate) const fn unbounded() -> Self {
+        Self {
+            depth: 0,
+            horizon: u32::MAX,
+            co_present: 1,
+        }
+    }
+
+    /// Whether the front may be informed about anything one hop further out.
+    pub(crate) const fn admits_another_hop(self) -> bool {
+        self.depth < self.horizon
+    }
+}
+
+/// What an aperture admitted, and what it deferred. Both halves are returned; neither is a count.
+#[derive(Clone, Debug, PartialEq, Eq, Default)]
+pub(crate) struct AdmittedCandidates {
+    pub(crate) admitted: Vec<usize>,
+    pub(crate) deferred: Vec<DeferredFactor>,
+}
 
 /// One exact structural standing class behind a compact aperture-local identity. The identity is
 /// only a rebuildable address: the complete native key remains the grading authority.
@@ -1005,14 +1149,7 @@ impl StandingIncidenceAperture {
     where
         S: StandingConstituentAccess + ?Sized,
     {
-        let mut aperture = Self {
-            by_interface: BTreeMap::new(),
-            identity_by_key: BTreeMap::new(),
-            factors: BTreeMap::new(),
-            next_identity: 0,
-            #[cfg(test)]
-            exhaustive: false,
-        };
+        let mut aperture = Self::default();
         for ordinal in 0..standing.standing_len() {
             let body = standing
                 .standing_get(ordinal)
@@ -1058,13 +1195,16 @@ impl StandingIncidenceAperture {
     where
         S: StandingConstituentAccess + ?Sized,
     {
-        self.candidates_for_interfaces(
-            active
-                .iter()
-                .flat_map(|arms| arms.by_interface.keys().cloned()),
-            claimed,
-            standing,
-        )
+        Ok(self
+            .candidates_for_interfaces(
+                active
+                    .iter()
+                    .flat_map(|arms| arms.by_interface.keys().cloned()),
+                claimed,
+                standing,
+                FrontVision::unbounded(),
+            )?
+            .admitted)
     }
 
     fn candidates_for_interfaces<S>(
@@ -1072,25 +1212,48 @@ impl StandingIncidenceAperture {
         interfaces: impl IntoIterator<Item = InterfaceCapability>,
         claimed: &[usize],
         standing: &S,
-    ) -> Result<Vec<usize>, LiveConstituentError>
+        vision: FrontVision,
+    ) -> Result<AdmittedCandidates, LiveConstituentError>
     where
         S: StandingConstituentAccess + ?Sized,
     {
         #[cfg(test)]
         if self.exhaustive {
-            return Ok((0..standing.standing_len())
-                .filter(|at| claimed.binary_search(at).is_err())
-                .collect());
+            return Ok(AdmittedCandidates {
+                admitted: (0..standing.standing_len())
+                    .filter(|at| claimed.binary_search(at).is_err())
+                    .collect(),
+                deferred: Vec::new(),
+            });
         }
 
+        // How wide the arriving front is on each interface. The incident population of the junction
+        // below, and it comes from the material rather than from a declaration.
+        let mut arriving_width = BTreeMap::<InterfaceCapability, usize>::new();
         let mut identities = BTreeSet::new();
         for interface in interfaces {
+            *arriving_width.entry(interface.clone()).or_insert(0) += 1;
             if let Some(exposed) = self.by_interface.get(&interface) {
                 identities.extend(exposed.iter().copied());
             }
         }
 
+        // THE JUNCTION, 2026-08-15. Every standing factor exposing any shared interface used to be
+        // admitted WHOLE, at full multiplicity, every round of the closure below — and because each
+        // admitted factor exposes further interfaces, the next round pulled more. That cascade is
+        // what a three-junction drain costing 12.9 s over a 477-clause standing actually was.
+        //
+        // A factor is a junction. What arrives carries a width on an interface; what the factor
+        // offers is its multiplicity; the crossing costs `⌈(R+M)²/(4RM)⌉` passes, one at a match and
+        // more as they separate. What dilates past the declared horizon **defers** — retained by
+        // name with its exact cost — and is never dropped.
+        //
+        // A factor replicated five hundred times meeting a front of two is an impedance mismatch,
+        // and admitting it whole is the same defect as a leader star with no aperture. The law is
+        // `holonic_structure::CountedCrossing`, shared with the transport carrier that computes it
+        // over exact rationals.
         let mut candidates = Vec::new();
+        let mut deferred = Vec::new();
         for identity in identities {
             let factor = self
                 .factors
@@ -1100,6 +1263,75 @@ impl StandingIncidenceAperture {
             if range.end - range.start != factor.multiplicity {
                 return Err(LiveConstituentError::Topology);
             }
+            // CONSTRUCTION 3 — VISION. A front is informed only about what has propagated to it,
+            // and `front_depth` is exactly how many hops from the arriving current a part already
+            // sits. A front that has already reached its declared depth admits nothing further: it
+            // cannot be informed about what is beyond it, which is the traffic law's own clause —
+            // *"they physically cannot be informed about vehicles not within their vision."*
+            if !vision.admits_another_hop() {
+                deferred.push(DeferredFactor {
+                    identity,
+                    offered: factor.multiplicity,
+                    arriving: 0,
+                    service_rounds: 0,
+                });
+                continue;
+            }
+            // CONSTRUCTION 2 — PREDICTED CONTENTION. How many co-present fronts want this factor,
+            // against what it offers. This is `receiver_current`'s congestion law at the seam:
+            // demand over capacity, dilating rather than refusing, with the overflow retained.
+            let contending = u64::try_from(
+                factor
+                    .interfaces
+                    .iter()
+                    .filter(|interface| arriving_width.contains_key(*interface))
+                    .count(),
+            )
+            .map_err(|_| LiveConstituentError::Extent)?;
+            if let Some(contention) = CountedCrossing::meet(
+                contending.saturating_mul(vision.co_present),
+                u64::try_from(factor.multiplicity).map_err(|_| LiveConstituentError::Extent)?,
+            ) {
+                if !contention.crosses_within(self.traversal_horizon) {
+                    deferred.push(DeferredFactor {
+                        identity,
+                        offered: factor.multiplicity,
+                        arriving: contending,
+                        service_rounds: contention.service_rounds(),
+                    });
+                    continue;
+                }
+            }
+            let arriving = u64::try_from(
+                factor
+                    .interfaces
+                    .iter()
+                    .filter_map(|interface| arriving_width.get(interface))
+                    .copied()
+                    .max()
+                    .unwrap_or(0),
+            )
+            .map_err(|_| LiveConstituentError::Extent)?;
+            let offered =
+                u64::try_from(factor.multiplicity).map_err(|_| LiveConstituentError::Extent)?;
+            match CountedCrossing::meet(arriving, offered) {
+                Some(crossing) if !crossing.crosses_within(self.traversal_horizon) => {
+                    deferred.push(DeferredFactor {
+                        identity,
+                        offered: factor.multiplicity,
+                        arriving,
+                        service_rounds: crossing.service_rounds(),
+                    });
+                    continue;
+                }
+                // Matched or within the horizon: the current crosses whole.
+                Some(_) => {}
+                // Nothing arrives on any of this factor's interfaces. There is no traveling
+                // section, which is a terminus by type rather than a comparison — and it cannot
+                // arise here, because the factor was reached through an interface that something
+                // exposed. Kept as a branch so the impossibility is stated rather than assumed.
+                None => continue,
+            }
             candidates
                 .try_reserve(range.end - range.start)
                 .map_err(|_| LiveConstituentError::Extent)?;
@@ -1108,7 +1340,35 @@ impl StandingIncidenceAperture {
         candidates.sort_unstable();
         candidates.dedup();
         candidates.retain(|at| claimed.binary_search(at).is_err());
-        Ok(candidates)
+        Ok(AdmittedCandidates {
+            admitted: candidates,
+            deferred,
+        })
+    }
+
+    /// The chronology declared over this aperture.
+    pub(crate) const fn traversal_horizon(&self) -> u64 {
+        self.traversal_horizon
+    }
+
+    /// How many propagation hops a front may be informed across. `u32::MAX` bounds nothing.
+    pub(crate) const fn vision_horizon(&self) -> u32 {
+        self.vision_horizon
+    }
+
+    /// Declare the front's vision — how far a signal may have propagated and still inform it.
+    ///
+    /// Strictly additive: the inherited setting is `u32::MAX`, under which nothing moves.
+    pub(crate) const fn declare_vision_horizon(&mut self, horizon: u32) {
+        self.vision_horizon = horizon;
+    }
+
+    /// Declare the chronology a candidate must cross this aperture within.
+    ///
+    /// The inherited setting is `u64::MAX`, which admits everything — so this is strictly additive
+    /// and nothing moves until a caller declares a finite horizon.
+    pub(crate) const fn declare_traversal_horizon(&mut self, horizon: u64) {
+        self.traversal_horizon = horizon;
     }
 
     fn insert(&mut self, body: &LiveConstituent) -> Result<(), LiveConstituentError> {
@@ -1207,11 +1467,8 @@ impl StandingIncidenceAperture {
     #[cfg(test)]
     fn exhaustive() -> Self {
         Self {
-            by_interface: BTreeMap::new(),
-            identity_by_key: BTreeMap::new(),
-            factors: BTreeMap::new(),
-            next_identity: 0,
             exhaustive: true,
+            ..Self::default()
         }
     }
 }
@@ -2149,7 +2406,10 @@ impl LiveConstituent {
             });
         }
 
+        let mut closure_round = 0usize;
+        let closure_began = std::time::Instant::now();
         loop {
+            closure_round += 1;
             let mut claimed = Vec::new();
             for part in &active {
                 claimed.extend_from_slice(&part.touched);
@@ -2166,11 +2426,29 @@ impl LiveConstituent {
                 .map(|part| part.body.exposed_interfaces())
                 .collect::<Result<Vec<_>, _>>()?;
             let copresent_pairs = copresent_interface_pairs(&active_interfaces);
-            let candidates = aperture.candidates_for_interfaces(
+            // The front's own propagation depth and its co-present demand, both read off the
+            // active population rather than declared here.
+            let vision = FrontVision {
+                depth: active.iter().map(|part| part.front_depth).max().unwrap_or(0),
+                horizon: aperture.vision_horizon(),
+                co_present: u64::try_from(active.len()).unwrap_or(u64::MAX),
+            };
+            let admitted = aperture.candidates_for_interfaces(
                 active_interfaces.iter().flatten().cloned(),
                 &claimed,
                 standing,
+                vision,
             )?;
+            let candidates = admitted.admitted;
+            seam_trace(&format_args!(
+                "{closure_round:>4} active {:>5} candidates {:>6} deferred {:>5} copresent_pairs {:>7} standing {:>6} at {} ms",
+                active.len(),
+                candidates.len(),
+                admitted.deferred.len(),
+                copresent_pairs.len(),
+                standing.standing_len(),
+                closure_began.elapsed().as_millis()
+            ));
             if candidates.is_empty() && copresent_pairs.is_empty() {
                 break;
             }
@@ -2201,17 +2479,83 @@ impl LiveConstituent {
             indexed_arms
                 .try_reserve(candidates.len())
                 .map_err(|_| LiveConstituentError::Extent)?;
+            // THE JUNCTION, on the quantity that actually costs: the ARM POPULATION.
+            //
+            // Measured 2026-08-15: one round of this closure built **80,689 seams from 80,756 arms
+            // over four parts** and took 12.9 s, between rounds that took 0 ms at 27 arms.
+            // `append_temporal_seams` pairs arms, so it is quadratic in them — and a standing
+            // constituent that has accreted eighty thousand exposed arms is a far population that
+            // was never condensed. `CLAUDE.md` §11's open item, live: the boundary operator has no
+            // compact representative, so every seam construction pays its full density.
+            //
+            // A front carrying twenty-seven arms meeting a site offering eighty thousand is an
+            // impedance mismatch of about 748 service rounds. It defers — retained by name with its
+            // exact cost — instead of being composed whole.
+            //
+            // **The multiplicity was the wrong admittance.** A factor at multiplicity one may still
+            // expose eighty thousand arms; what a site offers the arriving current is its ARMS.
+            //
+            // # Two bounds on this reading, both measured and neither hidden
+            //
+            // **The incident admittance here is an AGGREGATE, not a junction.** It sums the arms of
+            // every active part, because candidates are admitted once per round rather than per
+            // active part. A per-pair junction would be the law applied properly and would need the
+            // admission restructured; this is the law applied to the round. It is stated so nobody
+            // reads the aggregate as the junction.
+            //
+            // **And the residual is the front, not the candidates.** Measured after this landed: a
+            // round deferring 36 candidates whose widest offer was 11 arms still carried a front of
+            // **105,754 arms** and built 80,664 seams. A body that has composed enormously and
+            // retained every residual arm is a far population that was never condensed into a
+            // compact representative — which is `CLAUDE.md` §11's named missing organ, live and
+            // costing, not a defect of this admission. Deferring candidates cannot reach it; only
+            // condensing the front can.
+            let arriving_arms = u64::try_from(
+                indexed_arms
+                    .iter()
+                    .map(|arms| arms.by_section.iter().map(Vec::len).sum::<usize>())
+                    .sum::<usize>(),
+            )
+            .map_err(|_| LiveConstituentError::Extent)?;
+            let mut deferred_arms = Vec::new();
             for standing_at in candidates {
                 let body = standing
                     .standing_get(standing_at)
                     .ok_or(LiveConstituentError::Topology)?
                     .support_cover_factor()?;
-                indexed_arms.push(body.indexed_exposed_arms()?);
+                let candidate_arms = body.indexed_exposed_arms()?;
+                let offered = u64::try_from(
+                    candidate_arms
+                        .by_section
+                        .iter()
+                        .map(Vec::len)
+                        .sum::<usize>(),
+                )
+                .map_err(|_| LiveConstituentError::Extent)?;
+                if let Some(crossing) = CountedCrossing::meet(arriving_arms, offered) {
+                    if !crossing.crosses_within(aperture.traversal_horizon()) {
+                        deferred_arms.push((standing_at, offered, crossing.service_rounds()));
+                        continue;
+                    }
+                }
+                indexed_arms.push(candidate_arms);
                 parts.push(PopulationPart {
                     origin: PopulationPartOrigin::Standing(standing_at),
                     section_lineages: vec![BTreeSet::new(); body.support.factor_count()],
                     body,
                 });
+            }
+            if !deferred_arms.is_empty() {
+                seam_trace(&format_args!(
+                    "  DEFERRED {} sites on arm mismatch; front {} arms; widest offered {}",
+                    deferred_arms.len(),
+                    arriving_arms,
+                    deferred_arms
+                        .iter()
+                        .map(|(_, offered, _)| *offered)
+                        .max()
+                        .unwrap_or(0)
+                ));
             }
 
             let mut seams = Vec::new();
@@ -2243,6 +2587,16 @@ impl LiveConstituent {
                 )?;
             }
 
+            seam_trace(&format_args!(
+                "  seams {:>7} arms {:>8} parts {:>4} at {} ms",
+                seams.len(),
+                indexed_arms
+                    .iter()
+                    .map(|arms| arms.by_section.iter().map(Vec::len).sum::<usize>())
+                    .sum::<usize>(),
+                parts.len(),
+                closure_began.elapsed().as_millis()
+            ));
             if seams.is_empty() {
                 for (at, part) in active.iter_mut().enumerate() {
                     part.body = parts[at].body.clone();
@@ -3542,6 +3896,21 @@ fn append_temporal_seams(
             }
         }
 
+        // A VALENCE LAW WAS TRIED HERE ON 2026-08-15 AND REFUTED BY THE SUITE. Kept as a note
+        // because the refutation is the finding.
+        //
+        // `matches` is the complete bipartite product of compatible arms, and the hypothesis was
+        // that an arm bonds once, so the product should have been a matching. The suite refused it:
+        // `only_the_declared_interface_admits_a_seam_across_projection_and_grain` closes ONE
+        // arriving arm against two standing bodies and asserts `touched == vec![0, 1]`, and
+        // `shared_cofaces_condition_the_support_fan_and_recur_after_rest` is named for the same
+        // geometry. **An arm is a face, and a face may be shared by several cofaces.** Constraining
+        // it to one bond deletes the support fan.
+        //
+        // So the amplification is NOT the seam count. Measured: 40,381 member arms produced 80,664
+        // seams — about two per arm, which a shared coface admits — while the composed body exposed
+        // **80,685** arms, tracking the SEAM count. Composition doubles the arm population, and the
+        // doubling is in the exposure rule below, not here.
         let covers = minimal_temporal_covers(&required, &candidates)?;
         for cover in covers {
             let group = *next_section_group;
@@ -3809,6 +4178,7 @@ fn compose_population_component(
     cells.push(LiveCell::new(apex_rank, apex_dimension, grain));
 
     let mut consumed = Vec::new();
+    let (mut found_pins, mut open_pins) = (0usize, 0usize);
     let mut joined_sections: BTreeMap<usize, (Vec<(usize, usize)>, Vec<u32>)> = BTreeMap::new();
     let factor_expressions = parts
         .iter()
@@ -3911,6 +4281,31 @@ fn compose_population_component(
             joined.0.push((seam.right, link.right));
             joined.1.push(seam_boundary);
         }
+        if seam.pin.is_found() {
+            found_pins += 1;
+        }
+        if seam.pin.is_open() {
+            open_pins += 1;
+        }
+        // NOT EXPOSING INTERIOR SEAMS WAS TRIED ON 2026-08-15 AND THE SUITE REFUTED IT — the
+        // third refutation of construction 1, and the sharpest.
+        //
+        // Every seam reaching this function is interior by construction (the caller filters
+        // `component_seams` to both-endpoints-in-component), so it looked like `∂∂ = 0`: a region
+        // should not publish its own interior as boundary. Restricting the exposure to FOUND seams
+        // broke three tests, and their names are the law:
+        // `opposed_copresent_leaders_close_while_equal_hands_remain_open_residual`,
+        // `a_later_exact_boundary_rides_the_opening_without_rewriting_its_earlier_scope`, and
+        // `regional_exposed_well_rebases_triangles_and_open_foil_changes_the_later_probe`.
+        //
+        // **An OPEN bond is not interior. It is unresolved — and an unresolved bond is still a port,
+        // because a later arrival rides exactly that opening.** The region genuinely advertises its
+        // unresolved bonds; that is what makes it able to keep relating.
+        //
+        // So the port doubling is not a defect of this rule. It is a consequence of **how many seams
+        // stay open**, which is the null-face finding: nothing rides, so nothing closes, so
+        // everything is exposed. Construction 1's real content is upstream — give the faces geometry
+        // so a seam can ride and close.
         if seam.pin.is_found() || seam.pin.is_open() {
             exposed.push(pin_at);
         }
@@ -3982,6 +4377,82 @@ fn compose_population_component(
         grain, next_axis, cells, incidences, pins, boundaries, exposed, support,
     )?
     .compressed()?;
+    {
+        // Does composition conserve arms? A seam consumes two, so the composite's exposed arm
+        // population should be at most the members' total minus twice the seams. Measured rather
+        // than assumed.
+        let member_arms: usize = component
+            .iter()
+            .copied()
+            .filter_map(|at| parts[at].body.indexed_exposed_arms().ok())
+            .map(|arms| arms.by_section.iter().map(Vec::len).sum::<usize>())
+            .sum();
+        let composed_arms = body
+            .indexed_exposed_arms()
+            .map(|arms| arms.by_section.iter().map(Vec::len).sum::<usize>())
+            .unwrap_or(0);
+        seam_trace(&format_args!(
+            "  COMPOSE members {} member_arms {} seams {} found {} open {} -> composed_arms {} | rode {} no_read {} wound {} hand {} | both_null {} arriving_null {} held_null {} zero_reach {} | pole_on_from {} pole_on_to {} pole_distinct {} sweep_idle {} relata_coincide {} basis_identity {} distinct_place_words {} | CENSUS places {} triples {} triangle {} area {} collinear {} would_found {} arrow_horizon {} | dark {} f_cell {} f_cplx {} folded {} k_moved {} k_still {} | grain1 {} deeper {} after_live {} after_dead {} | held_live_any {} ARMED {} held_not_live {} no_emission {} ride {} found {} | BPRIME supplied {} chi_forms {} chi_none {} wound {} flat {}",
+            component.len(),
+            member_arms,
+            seams.len(),
+            found_pins,
+            open_pins,
+            composed_arms,
+            RODE.load(core::sync::atomic::Ordering::Relaxed),
+            NO_PROJECTIVE_READ.load(core::sync::atomic::Ordering::Relaxed),
+            WOUND_COMPARISON.load(core::sync::atomic::Ordering::Relaxed),
+            HAND_RESIDUAL.load(core::sync::atomic::Ordering::Relaxed),
+            BOTH_NULL.load(core::sync::atomic::Ordering::Relaxed),
+            ARRIVING_NULL.load(core::sync::atomic::Ordering::Relaxed),
+            HELD_NULL.load(core::sync::atomic::Ordering::Relaxed),
+            ZERO_REACH.load(core::sync::atomic::Ordering::Relaxed),
+            crate::live_current::POLE_ON_FROM.load(core::sync::atomic::Ordering::Relaxed),
+            crate::live_current::POLE_ON_TO.load(core::sync::atomic::Ordering::Relaxed),
+            crate::live_current::POLE_DISTINCT.load(core::sync::atomic::Ordering::Relaxed),
+            crate::live_current::POLE_SWEEP_IDLE.load(core::sync::atomic::Ordering::Relaxed),
+            crate::live_current::RELATA_COINCIDE.load(core::sync::atomic::Ordering::Relaxed),
+            crate::live_current::BASIS_IDENTITY.load(core::sync::atomic::Ordering::Relaxed),
+            crate::live_current::DISTINCT_PLACES
+                .get()
+                .and_then(|m| m.lock().ok().map(|s| s.len()))
+                .unwrap_or(0),
+            crate::live_current::CENSUS_PLACES
+                .get()
+                .and_then(|m| m.lock().ok().map(|s| s.len()))
+                .unwrap_or(0),
+            crate::live_current::CENSUS_TRIPLES
+                .get()
+                .and_then(|m| m.lock().ok().map(|s| s.len()))
+                .unwrap_or(0),
+            crate::live_current::TRIANGLE.load(core::sync::atomic::Ordering::Relaxed),
+            crate::live_current::TRIANGLE_WITH_AREA.load(core::sync::atomic::Ordering::Relaxed),
+            crate::live_current::TRIANGLE_COLLINEAR.load(core::sync::atomic::Ordering::Relaxed),
+            crate::live_current::WOULD_FOUND.load(core::sync::atomic::Ordering::Relaxed),
+            crate::live_current::ARROW_AT_HORIZON.load(core::sync::atomic::Ordering::Relaxed),
+            crate::live_current::EVENT_WHOLLY_DARK.load(core::sync::atomic::Ordering::Relaxed),
+            crate::live_current::FOUNDER_CELL.load(core::sync::atomic::Ordering::Relaxed),
+            crate::live_current::FOUNDER_COMPLEX.load(core::sync::atomic::Ordering::Relaxed),
+            crate::live_current::FOUNDER_FOLDED.load(core::sync::atomic::Ordering::Relaxed),
+            crate::live_current::CHANNEL_MOVED.load(core::sync::atomic::Ordering::Relaxed),
+            crate::live_current::CHANNEL_STILL.load(core::sync::atomic::Ordering::Relaxed),
+            crate::live_current::GRAIN_ONE.load(core::sync::atomic::Ordering::Relaxed),
+            crate::live_current::GRAIN_DEEPER.load(core::sync::atomic::Ordering::Relaxed),
+            crate::live_current::HELD_LIVE_AFTER_FOUNDER.load(core::sync::atomic::Ordering::Relaxed),
+            crate::live_current::HELD_DEAD_AFTER_FOUNDER.load(core::sync::atomic::Ordering::Relaxed),
+            crate::live_current::HELD_LIVE_ANY.load(core::sync::atomic::Ordering::Relaxed),
+            crate::live_current::ARMED.load(core::sync::atomic::Ordering::Relaxed),
+            crate::live_current::ARMED_HELD_NOT_LIVE.load(core::sync::atomic::Ordering::Relaxed),
+            crate::live_current::ARMED_NO_EMISSION.load(core::sync::atomic::Ordering::Relaxed),
+            crate::live_current::ARMED_RIDE.load(core::sync::atomic::Ordering::Relaxed),
+            crate::live_current::ARMED_FOUND.load(core::sync::atomic::Ordering::Relaxed),
+            crate::live_current::BPRIME_HELD_SUPPLIED.load(core::sync::atomic::Ordering::Relaxed),
+            crate::live_current::BPRIME_CHI_FORMS.load(core::sync::atomic::Ordering::Relaxed),
+            crate::live_current::BPRIME_CHI_NONE.load(core::sync::atomic::Ordering::Relaxed),
+            crate::live_current::BPRIME_WOUND.load(core::sync::atomic::Ordering::Relaxed),
+            crate::live_current::BPRIME_FLAT.load(core::sync::atomic::Ordering::Relaxed)
+        ));
+    }
     let section_lineages = body
         .support
         .root_expressions()?
@@ -4685,6 +5156,57 @@ mod tests {
         assert!(!unclosed_context
             .has_same_exposed_boundary(&completed)
             .unwrap());
+    }
+
+    #[test]
+    fn a_front_is_informed_only_within_its_vision_and_the_excluded_are_retained() {
+        // CONSTRUCTION 3 — vision, and both arms must fire or the bound proves nothing.
+        //
+        // A front that has not reached its declared depth is informed; one that has is not, and what
+        // it could not be informed about is RETAINED rather than dropped. That is the traffic law's
+        // clause — a unit physically cannot be informed about what is not within its vision — and
+        // the population it could not see is the null its reading is taken against.
+        let inside = FrontVision {
+            depth: 2,
+            horizon: 4,
+            co_present: 1,
+        };
+        assert!(inside.admits_another_hop());
+
+        let at_the_edge = FrontVision {
+            depth: 4,
+            horizon: 4,
+            co_present: 1,
+        };
+        assert!(!at_the_edge.admits_another_hop());
+
+        // The inherited setting bounds nothing, so a machine that never declares a vision behaves
+        // exactly as before.
+        assert!(FrontVision::unbounded().admits_another_hop());
+    }
+
+    #[test]
+    fn co_present_demand_dilates_a_contended_factor_and_a_quiet_one_crosses() {
+        // CONSTRUCTION 2 — predicted contention at the seam, through the same junction law the
+        // transport carrier uses: demand over capacity.
+        //
+        // One front asking a factor of multiplicity one is matched and crosses in a single round.
+        let quiet = CountedCrossing::meet(1, 1).expect("positive");
+        assert_eq!(quiet.service_rounds(), 1);
+        assert!(quiet.crosses_within(8));
+
+        // Sixty co-present fronts asking the same single-multiplicity factor is a mismatch, and it
+        // dilates past a declared horizon of eight rather than admitting all sixty whole.
+        let contended = CountedCrossing::meet(60, 1).expect("positive");
+        assert!(contended.service_rounds() > 8);
+        assert!(!contended.crosses_within(8));
+
+        // And the dilation is a function of the RATIO, so it is invariant under a common rescaling
+        // — a count in this position could not be.
+        assert_eq!(
+            CountedCrossing::meet(60, 1).expect("positive").service_rounds(),
+            CountedCrossing::meet(600, 10).expect("positive").service_rounds()
+        );
     }
 
     #[test]

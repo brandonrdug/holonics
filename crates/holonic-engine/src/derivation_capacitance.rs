@@ -172,6 +172,7 @@ use num_bigint::BigUint;
 use num_traits::{One, Zero};
 use thiserror::Error;
 
+use crate::approach_front::ApproachFront;
 use crate::algebraic::CausalCellId;
 use crate::derivation_atlas::{
     CircuitAperture, Derivation, DerivationCircuit, DerivationIdentity, statement_vertex_key,
@@ -364,7 +365,25 @@ pub struct CapacitanceReading {
     pub sites: Vec<SiteDelayReading>,
     /// Later arrivals the earliest section could not overwrite: retained testimony, never discarded
     /// failed paths.
+    ///
+    /// **THIS FACE DELETES THE POPULATION, and the field below is why it is kept beside it.** A
+    /// `BTreeSet<u64>` records only *which chronologies* a site deferred at, so **two deferrals at
+    /// one site and one chronology collapse into a single member.** That is a count face of a
+    /// population, and it cannot be un-collapsed from here.
     pub deferred: BTreeMap<String, BTreeSet<u64>>,
+    /// ★ THE DEFERRED POPULATION, SUPERPOSED — the same arrivals with nothing collapsed.
+    ///
+    /// `ApproachFront` carries `BTreeMap<u64, BigUint>`, so two deferrals at one chronology **add**
+    /// rather than becoming "two". Joined 2026-08-15: the deferrals had been retained since they
+    /// were built and read by nothing, while the map above was the only reading of them and dropped
+    /// exactly what a front is for.
+    ///
+    /// It is added **beside** the map rather than replacing it — the per-site naming is a different
+    /// and lawful face — so nothing that stands moves. With `grow_to_fixed_point` walking successive
+    /// radiations at growing horizons, `FrontClosing::between` on consecutive steps and
+    /// `ApproachReading::across` on triples are now readable over a growth the module already
+    /// performs; neither is taken here.
+    pub front: ApproachFront,
 }
 
 impl CapacitanceReading {
@@ -1197,7 +1216,9 @@ impl CapacitanceMapping {
                 .insert(arrival.chronology);
         }
 
+        let front = ApproachFront::of(&radiation);
         Ok(CapacitanceReading {
+            front,
             capacity_law: self.capacity_law,
             delay_law: self.delay_law,
             horizon,
@@ -1362,6 +1383,7 @@ pub fn disjoint_terrain(arms: usize) -> Vec<Derivation> {
 
 #[cfg(test)]
 mod tests {
+
     use super::*;
     use crate::derivation_atlas::{
         ReachOrientation, RecruitmentCoefficient, StatementIncidence, found_circuit,
@@ -2015,6 +2037,22 @@ mod tests {
         assert!(relay_situated.service_rounds < relay_uniform.service_rounds);
         // And the branch that no longer superposes is retained rather than lost.
         assert!(situated.deferred.contains_key("relay"));
+
+        // ★ THE JOIN, with both arms. The per-site map names WHICH chronologies a site deferred at;
+        // the front SUPERPOSES the population at each. Superposing can never return fewer than
+        // naming distinct chronologies — and the second arm is what makes this a test rather than a
+        // restatement: the front must be non-empty here, or the comparison is `0 >= 0`.
+        let named: usize = situated.deferred.values().map(|at| at.len()).sum();
+        let superposed = num_traits::ToPrimitive::to_usize(&situated.front.population())
+            .expect("a bounded population");
+        assert!(
+            superposed >= named,
+            "superposed {superposed} < named {named}: the front lost a deferral the map kept"
+        );
+        assert!(
+            superposed > 0,
+            "the front is empty, so the comparison above holds vacuously"
+        );
     }
 
     // ------------------------------------------------------------ deposited material

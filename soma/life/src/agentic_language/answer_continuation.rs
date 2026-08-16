@@ -408,11 +408,45 @@ impl AgenticLanguageEcology {
             let ecology = if let Some(ecology) = episode.ecology.as_ref() {
                 ecology
             } else {
-                realized = MorphologicalLanguageEcology::condition(
+                realized = match MorphologicalLanguageEcology::condition(
                     &episode.passages,
                     self.action,
                     self.worker_threads,
-                )?;
+                ) {
+                    Ok(ecology) => ecology,
+                    // AN EPISODE THAT CONDUCTS NOTHING IS UNTOUCHED, NOT AN ERROR — and until
+                    // 2026-08-15 it aborted the whole question.
+                    //
+                    // Measured: `episode-0/world/73`, role `WorldObservation`, **one** passage,
+                    // yielding zero germ paths — a returned world section whose text conducts
+                    // nothing. `EmptyEcology` is raised by `condition_internal` exactly when
+                    // `paths.is_empty()`, so it says *this material reached nothing*, which the
+                    // corpus rules is the law rather than a defect: perception is landing, and an
+                    // arrival that reaches nothing is not a defect to engineer away.
+                    //
+                    // The sibling site conditioning per-section material
+                    // (`agentic_language/ecology.rs`) already `continue`s on this exact error. The
+                    // same refusal meant *skip this one* there and *abort the question* here.
+                    //
+                    // The skip is RADIATED rather than swallowed: a stage that did nothing must say
+                    // which of the two reasons applied, which is the distinction
+                    // `ArrivalResponse` draws between `untouched` and `saturated`.
+                    Err(MorphologicalLanguageError::Suffix(
+                        crate::suffix_ecology::ExactSuffixEcologyError::EmptyEcology,
+                    )) => {
+                        crate::laboratory_language::eros_trace(
+                            "episode.untouched",
+                            &format_args!(
+                                "episode {} passages {} role {:?} conducts nothing",
+                                episode.identity,
+                                episode.passages.len(),
+                                episode.role
+                            ),
+                        );
+                        continue;
+                    }
+                    Err(error) => return Err(error.into()),
+                };
                 &realized
             };
             let charge = ecology.charge(received_prompt)?;

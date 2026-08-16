@@ -11,6 +11,25 @@
 //!
 //! The solve is exact rational elimination. No continuous PDE, floating point,
 //! pixel adjacency, authored probability, or convergence tolerance enters.
+//!
+//! # Where the algebra lives
+//!
+//! The dense exact algebra is `exact_linear::ExactRatMatrix` and not this module's own. It was
+//! this module's own until 2026-08-15, which cost one measured thing: `invert_exact` built the
+//! inverse **one column at a time**, running a full forward solve per column — `O(n^4)`, where
+//! the shared carrier's augmented elimination runs once. Routing through the carrier closes it;
+//! the Schur elimination below is unchanged and returns the same rationals it always did.
+//!
+//! It also puts the carrier's multiplication certificate in force inside the operation. That is
+//! a smaller change here than elsewhere and the record should say so: `compile_diffusion_transfer`
+//! has always computed `interior_inverse_residual` and `boundary_inverse_residual` and refused on
+//! either, so this inverse was **already** checked — downstream, by the caller, rather than at
+//! construction. Those residuals stay; they are what a later reader of the retained certificate
+//! has, and the carrier's check is what a future caller who forgets to write one will have.
+//!
+//! What did **not** move is `solve_exact`, which now stands only as this module's independent
+//! forward solve for the cross-check in `tests`. Routing that through the same carrier would
+//! have left the Schur path compared against itself.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::sync::{Arc, RwLock};
@@ -20,6 +39,7 @@ use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
 use crate::{CurrentBranchId, CurrentNodeId};
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -476,20 +496,20 @@ fn compile_diffusion_transfer(
         vec![vec![Rat::zero(); boundary_ordinals.len()]; boundary_ordinals.len()]
     } else {
         matrix_multiply(
-            &matrix_multiply(&boundary_interior, &interior_inverse),
+            &matrix_multiply(&boundary_interior, &interior_inverse)?,
             &interior_boundary,
-        )
+        )?
     };
-    let schur_boundary_operator = matrix_subtract(&boundary_boundary, &schur_correction);
+    let schur_boundary_operator = matrix_subtract(&boundary_boundary, &schur_correction)?;
     let boundary_inverse = invert_exact(schur_boundary_operator.clone())?;
     let interior_inverse_residual = matrix_subtract(
-        &matrix_multiply(&interior_inverse, &interior_interior),
-        &identity_matrix(interior_ordinals.len()),
-    );
+        &matrix_multiply(&interior_inverse, &interior_interior)?,
+        &identity_matrix(interior_ordinals.len())?,
+    )?;
     let boundary_inverse_residual = matrix_subtract(
-        &matrix_multiply(&boundary_inverse, &schur_boundary_operator),
-        &identity_matrix(boundary_ordinals.len()),
-    );
+        &matrix_multiply(&boundary_inverse, &schur_boundary_operator)?,
+        &identity_matrix(boundary_ordinals.len())?,
+    )?;
     if interior_inverse_residual
         .iter()
         .flatten()
@@ -554,19 +574,19 @@ fn solve_with_transfer(
         .iter()
         .map(|ordinal| right[*ordinal].clone())
         .collect::<Vec<_>>();
-    let interior_free = matrix_vector(&transfer.certificate.interior_inverse, &interior_right);
+    let interior_free = matrix_vector(&transfer.certificate.interior_inverse, &interior_right)?;
     let reduced_boundary = vector_subtract(
         &boundary_right,
-        &matrix_vector(&transfer.boundary_interior, &interior_free),
+        &matrix_vector(&transfer.boundary_interior, &interior_free)?,
     );
     let boundary_potential =
-        matrix_vector(&transfer.certificate.boundary_inverse, &reduced_boundary);
+        matrix_vector(&transfer.certificate.boundary_inverse, &reduced_boundary)?;
     let interior_potential = vector_subtract(
         &interior_free,
         &matrix_vector(
             &transfer.certificate.interior_inverse,
-            &matrix_vector(&transfer.interior_boundary, &boundary_potential),
-        ),
+            &matrix_vector(&transfer.interior_boundary, &boundary_potential)?,
+        )?,
     );
     let mut solved = vec![Rat::zero(); right.len()];
     for (ordinal, value) in transfer.boundary_ordinals.iter().zip(boundary_potential) {
@@ -589,83 +609,76 @@ fn matrix_section(matrix: &[Vec<Rat>], rows: &[usize], columns: &[usize]) -> Vec
         .collect()
 }
 
-fn identity_matrix(extent: usize) -> Vec<Vec<Rat>> {
-    (0..extent)
-        .map(|row| {
-            (0..extent)
-                .map(|column| {
-                    if row == column {
-                        Rat::from_integer(1.into())
-                    } else {
-                        Rat::zero()
-                    }
-                })
-                .collect()
-        })
-        .collect()
-}
-
-fn invert_exact(matrix: Vec<Vec<Rat>>) -> Result<Vec<Vec<Rat>>, DiffusionError> {
-    let extent = matrix.len();
-    if extent == 0 {
-        return Ok(Vec::new());
-    }
-    let mut inverse = vec![vec![Rat::zero(); extent]; extent];
-    for column in 0..extent {
-        let mut basis = vec![Rat::zero(); extent];
-        basis[column] = Rat::from_integer(1.into());
-        let solution = solve_exact(matrix.clone(), basis)?;
-        for (row, value) in solution.into_iter().enumerate() {
-            inverse[row][column] = value;
+/// Every shape refusal the shared carrier raises, named in this law's own vocabulary.
+///
+/// The error type does not cross the boundary: a caller of this module never sees an
+/// `ExactLinearError`. `SingularMatrix` is the one refusal the declared material can cause —
+/// a diffusion operator with a dependent row — and it lands on the variant that already meant
+/// exactly that.
+impl From<ExactLinearError> for DiffusionError {
+    fn from(error: ExactLinearError) -> Self {
+        match error {
+            ExactLinearError::SingularMatrix => DiffusionError::SingularLaw,
+            ExactLinearError::InverseCertificateFailure => DiffusionError::TransferCertificateFailure,
+            ExactLinearError::RaggedMatrix
+            | ExactLinearError::AddressOutside
+            | ExactLinearError::ExtentOverflow
+            | ExactLinearError::ShapeMismatch
+            | ExactLinearError::NonsquareMatrix => DiffusionError::MalformedOperator,
         }
     }
-    Ok(inverse)
 }
 
-fn matrix_multiply(left: &[Vec<Rat>], right: &[Vec<Rat>]) -> Vec<Vec<Rat>> {
-    let inner = left.first().map_or(0, Vec::len);
+/// Present dense rows to the shared carrier against a **declared** column count.
+///
+/// The column count is declared rather than inferred because a boundary transfer reaches
+/// genuinely empty populations — the default law puts every node on the boundary, so the
+/// interior is empty and `interior_boundary` is a lawful `0 x |boundary|` operator whose rows
+/// carry no column count at all. Inferring there would turn a lawful empty product into a
+/// refusal.
+fn carrier(matrix: &[Vec<Rat>], columns: usize) -> Result<ExactRatMatrix, DiffusionError> {
+    Ok(ExactRatMatrix::shaped(matrix.len(), columns, matrix.to_vec())?)
+}
+
+fn identity_matrix(extent: usize) -> Result<Vec<Vec<Rat>>, DiffusionError> {
+    Ok(ExactRatMatrix::identity(extent)?.to_rows())
+}
+
+/// The exact inverse, **with the shared carrier's multiplication certificate in force**.
+///
+/// Before 2026-08-15 this ran a full forward solve per column — `O(n^4)` — and left the
+/// verification to its caller. The rationals are the same; the cost is one elimination rather
+/// than `n`, and the identity check now happens before the value is returned rather than after.
+fn invert_exact(matrix: Vec<Vec<Rat>>) -> Result<Vec<Vec<Rat>>, DiffusionError> {
+    let extent = matrix.len();
+    Ok(carrier(&matrix, extent)?.inverse()?.to_rows())
+}
+
+fn matrix_multiply(
+    left: &[Vec<Rat>],
+    right: &[Vec<Rat>],
+) -> Result<Vec<Vec<Rat>>, DiffusionError> {
+    // The inner dimension is the right operand's row count, which is carried even when the left
+    // operand has no rows to read it off.
+    let inner = right.len();
     let columns = right.first().map_or(0, Vec::len);
-    debug_assert!(left.iter().all(|row| row.len() == inner));
-    debug_assert_eq!(right.len(), inner);
-    (0..left.len())
-        .map(|row| {
-            (0..columns)
-                .map(|column| {
-                    (0..inner).fold(Rat::zero(), |sum, index| {
-                        sum + &left[row][index] * &right[index][column]
-                    })
-                })
-                .collect()
-        })
-        .collect()
+    Ok(carrier(left, inner)?
+        .multiply(&carrier(right, columns)?)?
+        .to_rows())
 }
 
-fn matrix_vector(matrix: &[Vec<Rat>], vector: &[Rat]) -> Vec<Rat> {
-    matrix
-        .iter()
-        .map(|row| {
-            debug_assert_eq!(row.len(), vector.len());
-            row.iter()
-                .zip(vector)
-                .fold(Rat::zero(), |sum, (coefficient, value)| {
-                    sum + coefficient * value
-                })
-        })
-        .collect()
+fn matrix_vector(matrix: &[Vec<Rat>], vector: &[Rat]) -> Result<Vec<Rat>, DiffusionError> {
+    Ok(carrier(matrix, vector.len())?.apply(vector)?)
 }
 
-fn matrix_subtract(left: &[Vec<Rat>], right: &[Vec<Rat>]) -> Vec<Vec<Rat>> {
-    debug_assert_eq!(left.len(), right.len());
-    left.iter()
-        .zip(right)
-        .map(|(left, right)| {
-            debug_assert_eq!(left.len(), right.len());
-            left.iter()
-                .zip(right)
-                .map(|(left, right)| left - right)
-                .collect()
-        })
-        .collect()
+fn matrix_subtract(
+    left: &[Vec<Rat>],
+    right: &[Vec<Rat>],
+) -> Result<Vec<Vec<Rat>>, DiffusionError> {
+    let columns = left.first().or_else(|| right.first()).map_or(0, Vec::len);
+    Ok(carrier(left, columns)?
+        .subtract(&carrier(right, columns)?)?
+        .to_rows())
 }
 
 fn vector_subtract(left: &[Rat], right: &[Rat]) -> Vec<Rat> {
@@ -691,6 +704,14 @@ fn validate_population(
     Ok(())
 }
 
+/// This module's own forward elimination, retained **only** as the independent oracle the
+/// Schur-complement path is cross-checked against.
+///
+/// It solved the inverse column by column until 2026-08-15. It no longer does, and that is what
+/// keeps the cross-check in `tests` honest: the boundary-transfer path now runs through
+/// `exact_linear`, so comparing it against this is comparing two implementations rather than one
+/// implementation against itself.
+#[cfg(test)]
 fn solve_exact(mut matrix: Vec<Vec<Rat>>, mut right: Vec<Rat>) -> Result<Vec<Rat>, DiffusionError> {
     let extent = right.len();
     for column in 0..extent {
@@ -759,6 +780,15 @@ pub enum DiffusionError {
     NonpositiveInterval,
     #[error("the declared diffusion relation is singular")]
     SingularLaw,
+    /// A shape refusal from the shared exact carrier, reported in this law's own vocabulary.
+    ///
+    /// Unreachable from the declared material: every operator this module hands the carrier is
+    /// built by `matrix_section` over ordinal populations and is rectangular and square by
+    /// construction. It is named rather than unwrapped because a caller must never receive a
+    /// panic where a refusal is available, and because silently mapping a shape fault onto
+    /// `SingularLaw` would report a property of the material that the material does not have.
+    #[error("an exact diffusion operator did not compose in the shared exact carrier")]
+    MalformedOperator,
     #[error("the exact diffusion boundary-transfer atlas was poisoned")]
     TransferAtlasPoisoned,
     #[error("an exact diffusion boundary-transfer certificate failed its inverse identity")]

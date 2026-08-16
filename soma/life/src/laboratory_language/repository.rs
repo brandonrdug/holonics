@@ -12,10 +12,10 @@ use serde::Serialize;
 use crate::causal_language::{lexical_tokens, render_tokens};
 
 use super::{
-    text_features, LaboratoryInformantPort, LaboratoryLanguageError, LaboratoryResearchLeader,
-    LaboratoryReturnedSection, LaboratorySourceKind, LaboratoryWorldContactAttempt,
-    LaboratoryWorldContactOutcome, LaboratoryWorldContactRequest, LaboratoryWorldContactReturn,
-    LaboratoryWorldReturn,
+    text_features, LaboratoryDeferredSection, LaboratoryInformantPort, LaboratoryLanguageError,
+    LaboratoryResearchLeader, LaboratoryReturnedSection, LaboratorySourceKind,
+    LaboratoryWorldContactAttempt, LaboratoryWorldContactOutcome, LaboratoryWorldContactRequest,
+    LaboratoryWorldContactReturn, LaboratoryWorldReturn, LeaderAdmission,
 };
 
 const THEORY_RECEIVER_BASE: u64 = 10_000;
@@ -248,13 +248,38 @@ impl LaboratorySourceAtlas {
         })
     }
 
+    /// Traverse the leader's local star, crossing each site it meets as a junction.
+    ///
+    /// # What changed on 2026-08-15, and why it is not a tuning
+    ///
+    /// This walk previously *selected everything it met* and then errored past a count:
+    /// `selected.push(...)` was unconditional and the only exit was
+    /// `selected.len() > leader.aperture`. So `omitted_population = complete − selected` was
+    /// **zero by construction on every run**, and the atlas's own doc promise — *"the atlas retains
+    /// the omitted alternatives and reports their exact population"* — could not be kept by any
+    /// setting of the aperture. Measured: every finite value refused at exactly `aperture + 1`,
+    /// and `usize::MAX` never refused.
+    ///
+    /// A site is now met as a **junction**. The leader carries `R` features; the site shares `M` of
+    /// them; the crossing costs `⌈(R + M)² / (4RM)⌉` service rounds, which is one when they match
+    /// and grows as they separate. What dilates past the leader's chronology horizon **defers** —
+    /// retained by name with its exact reflection — rather than being refused.
+    ///
+    /// **The viscosity is that `R` grows.** A leader's region is extended every wave, so the same
+    /// one shared feature costs four rounds against a region of ten and twenty-six against a region
+    /// of a hundred. The traversal tightens on its own as the wave loop widens it, which is the
+    /// negative feedback the count could not supply and the reason the loop did not terminate.
+    ///
+    /// The junction law is `holonic_engine::traversible_chain::CountedCrossing` — the integer face
+    /// of `Γ = (Y_i − Y_t)/(Y_i + Y_t)`, checked against the exact rational face over a swept
+    /// material in that module's own tests.
     pub fn enact(
         &self,
         leader: &LaboratoryResearchLeader,
     ) -> Result<LaboratoryWorldReturn, LaboratoryLanguageError> {
         // Merge the already-sorted local feature incidences without constructing a candidate
-        // population.  The retained frontier is bounded by the receiver aperture plus one cursor
-        // per requested feature; source population and query result remain distinct.
+        // population.  One cursor per requested feature; source population and query result remain
+        // distinct.
         let mut cursors = LocalSequence::<(String, Option<usize>)>::new();
         for feature in &leader.region {
             if self.feature_incidence.contains_key(feature) {
@@ -262,7 +287,12 @@ impl LaboratorySourceAtlas {
             }
         }
         let mut selected = LocalSequence::<(usize, LocalSet<String>)>::new();
+        let mut deferred = Vec::<LaboratoryDeferredSection>::new();
         let mut complete_population = 0usize;
+        // What the current arrives carrying. The incident admittance is the leader's own region,
+        // and it is a population of the material rather than a declared level.
+        let carried = u64::try_from(leader.region.len())
+            .map_err(|_| LaboratoryLanguageError::CarrierExtent)?;
         loop {
             let mut next_section = None;
             for (feature, prior) in &cursors {
@@ -298,13 +328,29 @@ impl LaboratorySourceAtlas {
                     matched.insert(feature.to_owned());
                 }
             }
-            selected.push((section_at, matched));
-            if selected.len() > leader.aperture {
-                return Err(LaboratoryLanguageError::ReceiverAperture {
-                    leader: leader.identity.clone(),
-                    encountered_population: selected.len(),
-                    aperture: leader.aperture,
-                });
+            // The junction, through the leader's own admission law. Both admittances are
+            // populations of the material: what the leader carries, and what this site shares.
+            match leader.admits(matched.len()) {
+                LeaderAdmission::Crosses { .. } => selected.push((section_at, matched)),
+                LeaderAdmission::Defers {
+                    service_rounds,
+                    reflection,
+                } => deferred.push(LaboratoryDeferredSection {
+                    source_identity: section.identity.to_owned(),
+                    source: section.source.to_owned(),
+                    matched_features: matched.into_iter().collect(),
+                    service_rounds,
+                    reflection,
+                }),
+                // A site sharing nothing admits no traveling section — and it is still retained,
+                // because the population that did not connect is what a rank is read against.
+                LeaderAdmission::NoTravelingSection => deferred.push(LaboratoryDeferredSection {
+                    source_identity: section.identity.to_owned(),
+                    source: section.source.to_owned(),
+                    matched_features: Vec::new(),
+                    service_rounds: 0,
+                    reflection: (i128::from(carried), u128::from(carried)),
+                }),
             }
             for (feature, prior) in &mut cursors {
                 let incidence = self
@@ -346,6 +392,7 @@ impl LaboratorySourceAtlas {
             sections,
             complete_population,
             omitted_population: complete_population.saturating_sub(selected_population),
+            deferred,
         })
     }
 

@@ -13,6 +13,24 @@
 //! selected grade.  The operator inverse and its exact identity residual are
 //! retained as a reusable certificate.  No tolerance, random walk, display
 //! adjacency, or floating-point convergence criterion enters the law.
+//!
+//! # Two carriers, and which one owns what
+//!
+//! `ExactLinearMap` below is this law's own **typed and serialized** carrier: it names its source
+//! and target coordinates, it is what a certificate is written in, and it stays. What does not
+//! stay is the private dense algebra that sat underneath it. Until 2026-08-15 this module carried
+//! its own `invert_exact`, which built the inverse **one column at a time** — `O(n^4)` — through a
+//! `solve_exact` that shared 26 lines verbatim with `diffusion`'s (32 lines against 36; the rest
+//! is a squareness guard, the error variant, and two rebindings). Both are gone: the inverse runs
+//! through `exact_linear::ExactRatMatrix`, whose multiplication certificate is in force, and the
+//! duplicated forward solve had no caller but that inverse. `then`, `plus` and `apply` route
+//! through the same carrier, so this module contains no dense elimination or product of its own.
+//!
+//! The `inverse_residual` this module has always computed and retained is untouched, and it is
+//! worth being exact about why it is not redundant: `compile_certificate` already refused a
+//! nonzero residual, so this inverse was verified — downstream, by the caller. The residual is
+//! what a later reader of the serialized certificate has; the carrier's check is what a future
+//! caller who does not write one will have.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::sync::{Arc, RwLock};
@@ -22,6 +40,7 @@ use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
 use crate::{
     CausalAlgebraicError, CausalCellId, EventSuccessor, ExactEventLaw, GradedCausalComplex,
 };
@@ -82,6 +101,25 @@ impl ExactLinearMap {
         &self.entries
     }
 
+    /// This map's entries presented to the shared exact carrier, against the shape this map
+    /// **declares** rather than one inferred from its rows. A map with no rows still has a
+    /// column count and a zero-dimensional stalk is lawful, so inference would lose it.
+    fn carrier(&self) -> Result<ExactRatMatrix, SheafDiffusionError> {
+        Ok(ExactRatMatrix::shaped(
+            self.rows,
+            self.columns,
+            self.entries.clone(),
+        )?)
+    }
+
+    fn from_carrier(carrier: &ExactRatMatrix) -> Self {
+        Self {
+            rows: carrier.rows(),
+            columns: carrier.columns(),
+            entries: carrier.to_rows(),
+        }
+    }
+
     pub fn transpose(&self) -> Self {
         let mut entries = vec![vec![Rat::zero(); self.rows]; self.columns];
         for (row, values) in self.entries.iter().enumerate() {
@@ -97,6 +135,9 @@ impl ExactLinearMap {
     }
 
     /// Compose `self: A -> B` followed by `next: B -> C`.
+    ///
+    /// The dimension refusal is this law's own and is raised before the carrier is reached, so a
+    /// caller sees `LinearCompositionDimension` and never a foreign shape error.
     pub fn then(&self, next: &Self) -> Result<Self, SheafDiffusionError> {
         if self.rows != next.columns {
             return Err(SheafDiffusionError::LinearCompositionDimension {
@@ -104,30 +145,16 @@ impl ExactLinearMap {
                 next_columns: next.columns,
             });
         }
-        let mut entries = vec![vec![Rat::zero(); self.columns]; next.rows];
-        for (row, target) in entries.iter_mut().enumerate() {
-            for (column, value) in target.iter_mut().enumerate() {
-                *value = (0..self.rows).fold(Rat::zero(), |sum, index| {
-                    sum + &next.entries[row][index] * &self.entries[index][column]
-                });
-            }
-        }
-        Ok(Self {
-            rows: next.rows,
-            columns: self.columns,
-            entries,
-        })
+        Ok(Self::from_carrier(
+            &next.carrier()?.multiply(&self.carrier()?)?,
+        ))
     }
 
     pub fn plus(&self, other: &Self) -> Result<Self, SheafDiffusionError> {
         if self.rows != other.rows || self.columns != other.columns {
             return Err(SheafDiffusionError::LinearAdditionDimension);
         }
-        Ok(Self {
-            rows: self.rows,
-            columns: self.columns,
-            entries: matrix_add(&self.entries, &other.entries),
-        })
+        Ok(Self::from_carrier(&self.carrier()?.add(&other.carrier()?)?))
     }
 
     pub fn apply(&self, source: &[Rat]) -> Result<Vec<Rat>, SheafDiffusionError> {
@@ -137,7 +164,7 @@ impl ExactLinearMap {
                 supplied: source.len(),
             });
         }
-        Ok(matrix_vector(&self.entries, source))
+        Ok(self.carrier()?.apply(source)?)
     }
 
     fn validate(&self) -> Result<(), SheafDiffusionError> {
@@ -926,86 +953,36 @@ fn scaled_identity(extent: usize, scale: Rat) -> ExactLinearMap {
     result
 }
 
-fn matrix_vector(matrix: &[Vec<Rat>], vector: &[Rat]) -> Vec<Rat> {
-    matrix
-        .iter()
-        .map(|row| {
-            row.iter()
-                .zip(vector)
-                .fold(Rat::zero(), |sum, (coefficient, value)| {
-                    sum + coefficient * value
-                })
-        })
-        .collect()
+/// Every refusal the shared exact carrier raises, named in this law's own vocabulary, so no
+/// foreign error variant reaches a caller of this module.
+impl From<ExactLinearError> for SheafDiffusionError {
+    fn from(error: ExactLinearError) -> Self {
+        match error {
+            ExactLinearError::SingularMatrix => SheafDiffusionError::SingularLaw,
+            ExactLinearError::InverseCertificateFailure => {
+                SheafDiffusionError::TransferCertificateFailure
+            }
+            ExactLinearError::RaggedMatrix
+            | ExactLinearError::NonsquareMatrix
+            | ExactLinearError::AddressOutside
+            | ExactLinearError::ExtentOverflow
+            | ExactLinearError::ShapeMismatch => SheafDiffusionError::NonsquareOperator,
+        }
+    }
 }
 
-fn matrix_add(left: &[Vec<Rat>], right: &[Vec<Rat>]) -> Vec<Vec<Rat>> {
-    left.iter()
-        .zip(right)
-        .map(|(left, right)| {
-            left.iter()
-                .zip(right)
-                .map(|(left, right)| left + right)
-                .collect()
-        })
-        .collect()
-}
-
+/// The exact inverse, **with the shared carrier's multiplication certificate in force**.
+///
+/// Before 2026-08-15 this built the inverse one column at a time through a private forward solve
+/// — `O(n^4)` — and left the verification to its caller. The rationals are the same.
+///
+/// The declared extent is passed rather than inferred: a grade with no coordinates is a lawful
+/// `0 x 0` operator, and `Vec<Vec<Rat>>` carries no column count when it has no rows.
 fn invert_exact(matrix: Vec<Vec<Rat>>) -> Result<Vec<Vec<Rat>>, SheafDiffusionError> {
     let extent = matrix.len();
-    if matrix.iter().any(|row| row.len() != extent) {
-        return Err(SheafDiffusionError::NonsquareOperator);
-    }
-    if extent == 0 {
-        return Ok(Vec::new());
-    }
-    let mut inverse = vec![vec![Rat::zero(); extent]; extent];
-    for column in 0..extent {
-        let mut basis = vec![Rat::zero(); extent];
-        basis[column] = Rat::one();
-        let solution = solve_exact(matrix.clone(), basis)?;
-        for (row, value) in solution.into_iter().enumerate() {
-            inverse[row][column] = value;
-        }
-    }
-    Ok(inverse)
-}
-
-fn solve_exact(
-    mut matrix: Vec<Vec<Rat>>,
-    mut right: Vec<Rat>,
-) -> Result<Vec<Rat>, SheafDiffusionError> {
-    let extent = right.len();
-    if matrix.len() != extent || matrix.iter().any(|row| row.len() != extent) {
-        return Err(SheafDiffusionError::NonsquareOperator);
-    }
-    for column in 0..extent {
-        let pivot = (column..extent)
-            .find(|row| !matrix[*row][column].is_zero())
-            .ok_or(SheafDiffusionError::SingularLaw)?;
-        if pivot != column {
-            matrix.swap(pivot, column);
-            right.swap(pivot, column);
-        }
-        let divisor = matrix[column][column].clone();
-        for entry in &mut matrix[column][column..] {
-            *entry /= &divisor;
-        }
-        right[column] /= divisor;
-        let pivot_row = matrix[column].clone();
-        let pivot_right = right[column].clone();
-        for row in 0..extent {
-            if row == column || matrix[row][column].is_zero() {
-                continue;
-            }
-            let factor = matrix[row][column].clone();
-            for (entry, pivot_entry) in matrix[row][column..].iter_mut().zip(&pivot_row[column..]) {
-                *entry -= &factor * pivot_entry;
-            }
-            right[row] -= factor * &pivot_right;
-        }
-    }
-    Ok(right)
+    Ok(ExactRatMatrix::shaped(extent, extent, matrix)?
+        .inverse()?
+        .to_rows())
 }
 
 fn exact_rank(mut matrix: Vec<Vec<Rat>>) -> usize {

@@ -125,7 +125,7 @@ fn main() {
 
 fn run() -> Result<(), String> {
     let mut whole_repository = false;
-    let mut leader_aperture = 0usize;
+    let mut leader_horizon = 0u64;
     let mut fixture = std::env::temp_dir().join("holonics-laboratory-interlocutor-fixture");
     let mut input = std::env::args().skip(1);
     while let Some(argument) = input.next() {
@@ -136,7 +136,7 @@ fn run() -> Result<(), String> {
                 other => return Err(format!("--world takes declared|repository, not {other:?}")),
             },
             "--leader-aperture" => {
-                leader_aperture = input
+                leader_horizon = input
                     .next()
                     .ok_or("--leader-aperture needs a value")?
                     .parse()
@@ -186,13 +186,10 @@ fn run() -> Result<(), String> {
     println!("  mount                {mount_millis} ms");
     println!("  excluded             {GRADING_RECORD}");
 
-    let mut spec = if leader_aperture == 0 {
-        LaboratoryResearchSpec::complete_local_star()
+    let mut spec = if leader_horizon == 0 {
+        LaboratoryResearchSpec::default()
     } else {
-        LaboratoryResearchSpec {
-            leader_aperture,
-            ..LaboratoryResearchSpec::default()
-        }
+        LaboratoryResearchSpec::at_horizon(leader_horizon)
     };
     spec.worker_threads = 2;
     let mut ecology = LaboratoryResearchEcology::new(spec);
@@ -297,8 +294,8 @@ fn print_deliberation(deliberation: &LaboratoryResearchDeliberation, millis: u12
     println!("    leaders            {}", deliberation.leaders.len());
     for leader in deliberation.leaders.iter().take(6) {
         println!(
-            "      {} generation {} aperture {} region {:?}",
-            leader.identity, leader.generation, leader.aperture, leader.region
+            "      {} generation {} horizon {} region {:?}",
+            leader.identity, leader.generation, leader.horizon, leader.region
         );
     }
     println!("    world returns      {}", deliberation.returns.len());

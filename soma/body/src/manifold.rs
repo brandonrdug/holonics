@@ -4829,9 +4829,24 @@ impl<'a> ErosBody<'a> {
 
     /// Form one source-supplied directed A2 contact against a previously captured target receiver.
     /// The target's complete past cone drags the meeting through the same `complete_cast` law as
-    /// ordinary conduct. The resulting felt relation is returned to the cut configuration fold;
-    /// this probe neither deposits into current-local OWN nor folds the lineage channel a second
-    /// time. An unborn fourth contact or horizon remains an unresolved meeting with no emission.
+    /// ordinary conduct.
+    ///
+    /// **CORRECTED 2026-08-15.** This doc read *"this probe neither deposits into current-local OWN
+    /// nor folds the lineage channel a second time"*, which described what the path happened to do
+    /// and was then read as a law about what it could do. It was neither. Measured: over 1,199
+    /// passages this path moved **no word of any carrier** and the ecology's frame stood at genesis
+    /// in 21,070 of 21,070 contacts.
+    ///
+    /// **THIS PATH STILL DEPOSITS NOTHING, and an earlier form of this doc said otherwise.** The
+    /// deposit was wired on 2026-08-15, moved 12 frame words and 7 carrier words, and was **reverted
+    /// whole** after the carrier refused it: `soma/membrane/src/live_carrier.rs:357-368` requires a
+    /// **born stance** before a flywheel may be live, and this path founds no stance. The doc was
+    /// left behind describing the repair as landed — *grade the implementation, not the receipt*,
+    /// committed on a doc comment, which is the same defect the paragraph above convicts. Corrected
+    /// the same day it was written.
+    ///
+    /// What is true: nothing here prevents a deposit, the stance law is the obstruction, and
+    /// `directed_event_contact_over_standing` is the read-only twin for queries.
     pub fn directed_event_contact(
         &mut self,
         receiver: EventReceiver,
@@ -4857,9 +4872,25 @@ impl<'a> ErosBody<'a> {
         // component-walk frame.  Reversing the supplied hand therefore reverses the actual A2
         // construction rather than merely changing listener testimony.
         let meeting = face(to, from, receiver.channel.frame().tip());
-        if self.event_receiver_at_source_grain(source_grain) != Some(receiver)
-            || !receiver.held_live
-        {
+        if self.event_receiver_at_source_grain(source_grain) != Some(receiver) {
+            // The receiver is not this body's at this grain, so nothing happened here and nothing
+            // is deposited. This is the one branch that is genuinely a refusal rather than a stage.
+            return DirectedEventContact {
+                receiver,
+                meeting,
+                emission: None,
+            };
+        }
+        if !receiver.held_live {
+            // A three-body triangle is frame-local and is not yet a soul; the held flywheel supplies
+            // the fourth contact. On a first contact there is none, so no invariant exists and no
+            // emission may be manufactured.
+            //
+            // **NO DEPOSIT HAPPENS HERE, and an earlier comment claimed one did.** Holding this
+            // meeting as the fourth body would need a born stance at this depth
+            // (`live_carrier.rs:357-368`), and this path founds none — so `held_live` stays false
+            // for every contact and the path reads a frame nothing advances. That is the open
+            // construction, not a line that is present.
             return DirectedEventContact {
                 receiver,
                 meeting,
@@ -4869,6 +4900,7 @@ impl<'a> ErosBody<'a> {
         let (_grip, _regional_form, met, standing_read) =
             self.complete_cast(meeting, &receiver.held, true);
         if met.arrow.at_horizon() {
+            // The drag took the meeting behind this pole's horizon. No deed, and nothing to hold.
             return DirectedEventContact {
                 receiver,
                 meeting,

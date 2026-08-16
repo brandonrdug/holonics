@@ -22,20 +22,32 @@ use std::{
 /// material for a body with a different layout.
 pub const BASELINE_PATH: &str = "meta/HOLONIC_DSA_BASELINE.tsv";
 
-/// The aperture, INHERITED UNCHANGED from the laboratory and rebased onto this tree's layout.
+/// The aperture: five roots inherited from the laboratory, plus `crates/holonic-structure/src`
+/// added 2026-08-15.
 ///
-/// Five roots, the same five: the engine, the reflective runtime, and soma's body, membrane and
-/// life. The laboratory kept soma under `src/soma/`; this repository keeps it at `soma/`, and
-/// three of these five entries still carried the laboratory prefix. That is `CLAUDE.md` §0
-/// lesson 2 — *no absolute frame in a lineage* — and it was invisible because the missing
-/// baseline aborted [`check_repository`] one statement earlier.
+/// The inherited five are the engine, the reflective runtime, and soma's body, membrane and life.
+/// The laboratory kept soma under `src/soma/`; this repository keeps it at `soma/`, and three of
+/// those five entries still carried the laboratory prefix. That is `CLAUDE.md` §0 lesson 2 — *no
+/// absolute frame in a lineage* — and it was invisible because the missing baseline aborted
+/// [`check_repository`] one statement earlier.
 ///
-/// Widening the aperture is a separate decision and is not taken here. `soma/{abi,surface,mount}`,
-/// `crates/holonic-structure/src` and `crates/relational-geometry/src` are outside it, and adding
-/// them would author a scope the source never declared.
+/// **`crates/holonic-structure/src` is the sixth, and the earlier refusal to add it was wrong on
+/// its own terms.** This comment read *"adding them would author a scope the source never
+/// declared"*, which is the correct rule applied to the wrong crate: `holonic-structure` is the
+/// substrate-container owner, the crate whose declared purpose is holding the ordinal and relation
+/// atlases *so that a `BTreeMap` does not become ontology*. A ratchet on ownership constructs that
+/// does not watch the ownership crate is watching every consumer of the substrate and not the
+/// substrate. The scope was declared by the crate, not authored here. It went unwatched long
+/// enough for four modules — `chain.rs`, `face.rs`, `junction.rs`, `relating.rs` — to land there
+/// on 2026-08-15 outside the ratchet's view, and `meta/HOLONIC_DSA_BASELINE.tsv` carried zero rows
+/// for the crate.
+///
+/// Still outside, and still for the original reason: `soma/{abi,surface,mount}` and
+/// `crates/relational-geometry/src`.
 const PROTECTED_ROOTS: &[&str] = &[
     "crates/holonic-engine/src",
     "crates/holonic-language/src",
+    "crates/holonic-structure/src",
     "soma/body/src",
     "soma/membrane/src",
     "soma/life/src",
@@ -428,7 +440,8 @@ mod tests {
     /// baseline read aborted `check_repository` before the census ever ran.
     ///
     /// What would make it fail: renaming or moving any of `crates/holonic-engine/src`,
-    /// `crates/holonic-language/src`, `soma/body/src`, `soma/membrane/src`, `soma/life/src`.
+    /// `crates/holonic-language/src`, `crates/holonic-structure/src`, `soma/body/src`,
+    /// `soma/membrane/src`, `soma/life/src`.
     #[test]
     fn every_protected_root_resolves_in_this_repository() {
         let root = Path::new(env!("CARGO_MANIFEST_DIR"))

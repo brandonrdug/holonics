@@ -505,7 +505,7 @@ fn main() {
     let mut foil_words: Vec<Vec<Symbol>> = Vec::new();
     let mut at = 0usize;
     for word in grain_a.cuts() {
-        let mut candidate: Vec<Symbol> = Vec::new();
+        let mut candidate: Vec<Symbol>;
         loop {
             candidate = (0..word.len().max(1))
                 .map(|k| Symbol(alphabet[(at + k * 7) % alphabet.len()]))

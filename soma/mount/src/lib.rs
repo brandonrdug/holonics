@@ -76,49 +76,106 @@ mod tests {
         );
     }
 
+    /// Entries compiled into the artifact AND resolved by a Rust launcher.
+    ///
+    /// Each name here is reachable: some caller resolves it through `Module::function`, either by
+    /// a literal in a `soma/mount/src/bin/mount-*-gate.rs`, by a `soma_abi::*::ENTRY_SYMBOL`
+    /// constant, or through `soma_abi::register::Entry::symbol`.
+    const LAUNCHED_ENTRIES: &[&str] = &[
+        "link_grain",
+        "link_sum",
+        "link_finish",
+        "link_founded_grain",
+        "link_founded_sum",
+        "chart_mark",
+        "chart_count",
+        "chart_recast",
+        "register_own_recast",
+        "register_own_recast_finish",
+        "register_carrier_rebase",
+        "scope_felt",
+        "scope_founded",
+        "scope_register",
+        "scope_register_surface",
+        "regional_contacts",
+        "lineage_event",
+        "lineage_event_population",
+        "material_shadow_read",
+        "text_incidence_select",
+        "text_section_restrict",
+        "returned_contact_group",
+        "morphological_suffix_condition",
+        "morphological_prefix_condition",
+        "morphological_conduct_group",
+        "recurrent_law_found",
+        "recurrent_law_evaluate",
+        "recurrent_law_fold",
+    ];
+
+    /// Entries compiled into the artifact and reachable by NOTHING. Measured 2026-08-15.
+    ///
+    /// These four are defined as `extern "ptx-kernel"` in `soma-kernel-cuda/src/lib.rs`, listed in
+    /// `soma-kernel-cuda/build-ptx.sh`, and emitted into the PTX. They have **no `soma_abi` entry
+    /// symbol, no `Module::function` resolution, and no launcher** anywhere in `soma/` or
+    /// `crates/` — `soma_abi::register::Entry` names five register entries and none of these is
+    /// among them. The `link` family has three host gates (`mount-link-gate` for
+    /// `link_{grain,sum,finish}`, `mount-founded-gate` for the founded pair); the *registered*
+    /// third arm was compiled but its gate was never built, and `mount-chart-gate` resolves
+    /// `chart_{mark,count,recast}` without `chart_register_mark`. The same four are orphaned
+    /// identically at `reference/engine-a07ff376/`, so this was inherited rather than introduced.
+    ///
+    /// They are NOT deleted: the PTX is a committed boundary artifact bound to its closure and
+    /// guarded by the `boundary-artifacts` gate, and orphanhood is a missing join, not evidence
+    /// the kernel is wrong. Wiring a launcher retires a name from this list into
+    /// `LAUNCHED_ENTRIES`; the completeness assertion below forces that move to be deliberate.
+    const UNLAUNCHED_ENTRIES: &[&str] = &[
+        "link_register_grain",
+        "link_register_sum",
+        "link_register_finish",
+        "chart_register_mark",
+    ];
+
     #[test]
     fn soma_ptx_artifact_is_sm89_with_all_thirty_two_entries_and_required_atomics() {
         let text = std::str::from_utf8(SOMA_PTX).expect("the soma PTX artifact is text");
         assert!(text.contains(".target sm_89"), "soma PTX must target sm_89");
-        for entry in [
-            "link_grain",
-            "link_sum",
-            "link_finish",
-            "link_founded_grain",
-            "link_founded_sum",
-            "link_register_grain",
-            "link_register_sum",
-            "link_register_finish",
-            "chart_mark",
-            "chart_register_mark",
-            "chart_count",
-            "chart_recast",
-            "register_own_recast",
-            "register_own_recast_finish",
-            "register_carrier_rebase",
-            "scope_felt",
-            "scope_founded",
-            "scope_register",
-            "scope_register_surface",
-            "regional_contacts",
-            "lineage_event",
-            "lineage_event_population",
-            "material_shadow_read",
-            "text_incidence_select",
-            "text_section_restrict",
-            "returned_contact_group",
-            "morphological_suffix_condition",
-            "morphological_prefix_condition",
-            "morphological_conduct_group",
-            "recurrent_law_found",
-            "recurrent_law_evaluate",
-            "recurrent_law_fold",
-        ] {
+
+        // PRESENCE ONLY. `.entry <name>` proves the symbol was compiled in. It says nothing
+        // whatever about whether any Rust code can reach it, and this assertion cannot fail once
+        // the kernel compiles — which is exactly why the population is split above and closed
+        // below. Reachability is carried by `LAUNCHED_ENTRIES`/`UNLAUNCHED_ENTRIES`, not by this
+        // loop.
+        for entry in LAUNCHED_ENTRIES.iter().chain(UNLAUNCHED_ENTRIES) {
             assert!(
                 text.contains(&format!(".entry {entry}")),
                 "soma PTX must expose {entry}"
             );
         }
+
+        // The closure that makes the split load-bearing: the two declared populations must be
+        // exactly the artifact's own `.entry` population. Without this the lists could drift from
+        // the PTX in either direction — a new kernel could be compiled in and go unnamed, or a
+        // name could persist here after its entry was dropped — and nothing would notice.
+        let declared = LAUNCHED_ENTRIES
+            .iter()
+            .chain(UNLAUNCHED_ENTRIES)
+            .copied()
+            .collect::<std::collections::BTreeSet<_>>();
+        assert_eq!(
+            declared.len(),
+            LAUNCHED_ENTRIES.len() + UNLAUNCHED_ENTRIES.len(),
+            "an entry is named twice across the launched/unlaunched split"
+        );
+        let compiled = text
+            .lines()
+            .filter_map(|line| line.strip_prefix(".visible .entry "))
+            .map(|rest| rest.trim_end_matches(['(', ' ']))
+            .collect::<std::collections::BTreeSet<_>>();
+        assert_eq!(
+            compiled, declared,
+            "the PTX entry population and the declared launched/unlaunched split disagree; \
+             a kernel was added or removed without recording whether anything can reach it"
+        );
         assert!(
             text.contains("atom.global.add.u64"),
             "soma PTX must carry the exact wide-hand add"

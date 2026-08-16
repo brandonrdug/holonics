@@ -1,8 +1,21 @@
 //! Ceiling-free replay of already-enacted Soma deeds.
 //!
-//! This is the carried current-span surface used by the active membrane. It applies the same
-//! body-owned ranked OWN law as live conduct, without re-running source action or interpreting the
-//! organ which produced the deeds.
+//! It applies the same body-owned ranked OWN law as live conduct, without re-running source action
+//! or interpreting the organ which produced the deeds.
+//!
+//! **CORRECTED 2026-08-15. This read "the carried current-span surface used by the active
+//! membrane", and the active membrane does not use it** — `live_current.rs` carries no reference to
+//! any surface at all, and the only constructor of `RankedFeltSurface` is inside this file's own
+//! `#[cfg(test)]`. A doc claiming a role the code does not have, which is the fourth instance of
+//! that shape found in one day and the only one that was inherited rather than authored.
+//!
+//! **What it is:** a replay surface whose parity oracle is the dense
+//! `body::manifold::FeltEmissionSurface`, driven by its own tests and by nothing else.
+//!
+//! **And joining it is a CONSTRUCTION, not a repair.** Wiring it into the live emission path would
+//! be *adding* a consumer rather than connecting an existing one, and the operating contract admits
+//! a new edge only when an attempted composition returns an exact absent type, port, or
+//! consequence. No measurement here has supplied one. Left standing and unjoined, deliberately.
 
 use body::manifold::{FeltEmission, RankedFeltDeposit, RankedOwnState};
 

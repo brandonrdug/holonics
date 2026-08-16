@@ -916,6 +916,7 @@ mod tests {
                         }],
                         complete_population: 1,
                         omitted_population: 0,
+                        deferred: Vec::new(),
                     },
                 },
             ));
@@ -950,6 +951,7 @@ mod tests {
                         }],
                         complete_population: 1,
                         omitted_population: 0,
+                        deferred: Vec::new(),
                     },
                 },
             ));
@@ -985,6 +987,7 @@ mod tests {
                         }],
                         complete_population: 1,
                         omitted_population: 0,
+                        deferred: Vec::new(),
                     },
                 },
             ));
@@ -1015,7 +1018,7 @@ mod tests {
             agent,
             "research-world",
             LaboratoryResearchSpec {
-                leader_aperture: 8,
+                leader_horizon: 8,
                 worker_threads: 1,
                 thought_receiver_horizon: 16,
             },
@@ -1055,7 +1058,7 @@ mod tests {
             agent,
             "research-world",
             LaboratoryResearchSpec {
-                leader_aperture: 8,
+                leader_horizon: 8,
                 worker_threads: 1,
                 thought_receiver_horizon: 16,
             },
@@ -1115,7 +1118,7 @@ mod tests {
             agent,
             "research-world",
             LaboratoryResearchSpec {
-                leader_aperture: 8,
+                leader_horizon: 8,
                 worker_threads: 1,
                 thought_receiver_horizon: 16,
             },
@@ -1174,7 +1177,7 @@ mod tests {
             agent,
             "research-world",
             LaboratoryResearchSpec {
-                leader_aperture: 8,
+                leader_horizon: 8,
                 worker_threads: 1,
                 thought_receiver_horizon: 16,
             },
@@ -1256,7 +1259,7 @@ mod tests {
             agent,
             "research-world",
             LaboratoryResearchSpec {
-                leader_aperture: 8,
+                leader_horizon: 8,
                 worker_threads: 1,
                 thought_receiver_horizon: 16,
             },

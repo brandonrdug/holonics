@@ -29,6 +29,7 @@ use holonic_engine::conditioned_derivation::{
 };
 use holonic_engine::derivation_atlas::CircuitAperture;
 use holonic_engine::exact_value::ExactOrdering;
+use holonic_engine::communication::{Neighbourhood, spread_from_each};
 use holonic_engine::gluing::{Cover, read_cover};
 use holonic_engine::rebase_invariants::PivotRule;
 use holonic_engine::situated_residual::{
@@ -818,9 +819,10 @@ fn main() {
         Err(refusal) => println!("\n  the two-body cover was refused: {refusal}"),
     }
 
+    let standing_cells_kept = standing_cells.clone();
     let seam = Cover {
         left: standing_cells,
-        right: derived_cells,
+        right: derived_cells.clone(),
     };
     match read_cover(circuit.circuit.complex(), &seam, PivotRule::FirstNonzero) {
         Ok(reading) => println!(
@@ -840,6 +842,85 @@ fn main() {
          and what they share is the sentence: an invariant lives in a disagreement — of two\n  \
          RECEIVERS over one source there, of two BODIES over one material here."
     );
+
+    // ---------------------------------------------------------------------------------------------
+    // THE ITERATED FORM. Both covers above are ONE PAIR each, read once and discarded. `gluing`
+    // decides agreement for two receivers; `communication` iterates it along contact and returns
+    // **how far a local truth reached, at what degrees of separation, and what stopped it** —
+    // which is the question two disconnected obstruction vectors cannot answer.
+    //
+    // Its author's occasion is Brandon's: *"localized truth is real, and that is the entire point
+    // of communication and adaptation within ecosystems"*. It had ZERO callers tree-wide until
+    // this join, which made it the leak cut in its own right — a built organ that reaches nothing.
+    //
+    // Nothing new is constructed here. The three sections are the ones already in hand.
+    rule("THE NEIGHBOURHOOD — the same sections, iterated along contact");
+
+    let neighbourhood = Neighbourhood {
+        sections: vec![all_cells.clone(), standing_cells_kept.clone(), derived_cells.clone()],
+    };
+    match spread_from_each(
+        circuit.circuit.complex(),
+        &neighbourhood,
+        PivotRule::FirstNonzero,
+    ) {
+        Ok(spreads) => {
+            for reading in &spreads {
+                println!(
+                    "  origin {}   reach {}   radius {}   frontiers {}   out of contact {:?}   \
+                     unobstructed {}",
+                    reading.origin,
+                    reading.reach(),
+                    reading.radius(),
+                    reading.frontier.len(),
+                    reading.out_of_contact,
+                    reading.unobstructed()
+                );
+                for stop in &reading.frontier {
+                    println!(
+                        "      frontier {} -> {}   overlap {} cells   obstruction {:?}",
+                        stop.from, stop.to, stop.overlap_extent, stop.obstruction
+                    );
+                }
+            }
+
+            // THE CONTROL, and both arms are required. The three sections are nested and
+            // overlapping by construction — `all ⊇ standing` and `all ⊇ derived` — so every origin
+            // must reach every receiver that shares any cell with it. A reading where some origin
+            // reached nothing would mean the sections do not overlap at all and the whole
+            // neighbourhood is silence rather than agreement.
+            let reached_everything = spreads.iter().all(|reading| reading.reach() > 1);
+            let anyone_isolated = spreads.iter().any(|reading| reading.reach() == 1);
+            println!(
+                "\n  CONTROL  every origin reaches beyond itself      {}",
+                if reached_everything { "HELD" } else { "FAILED" }
+            );
+            println!(
+                "  CONTROL  no origin is isolated (anti-vacuity)   {}",
+                if anyone_isolated { "FAILED" } else { "HELD" }
+            );
+            controls.check(
+                "communication-spread-reaches",
+                reached_everything && !anyone_isolated,
+                "every origin reaches beyond itself along contact, and none is isolated -- \
+                 both arms, so agreement is not read off a neighbourhood that never met",
+            );
+
+            println!(
+                "\n  The pairwise readings above return an obstruction VECTOR and stop. This returns\n  \
+                 a REACH and a RADIUS: how far the local truth survived by contact alone, with the\n  \
+                 contact that stopped it named. A local truth that cannot glue globally still glues\n  \
+                 on its own neighbourhood, and the size of that neighbourhood is the claim."
+            );
+        }
+        Err(refusal) => {
+            controls.check(
+                "communication-spread-reaches",
+                false,
+                &format!("the neighbourhood was refused: {refusal}"),
+            );
+        }
+    }
 
     // ---------------------------------------------------------------------------------------------
 

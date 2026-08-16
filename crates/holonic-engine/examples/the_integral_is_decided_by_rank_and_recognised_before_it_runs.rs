@@ -64,7 +64,7 @@
 
 use holonic_engine::elementary_chart::{
     read_elementary_chart, ElementaryChartError, ElementaryReading, ExponentialIntegrand,
-    Recognition, RecognitionOutcome,
+    RecognitionOutcome,
 };
 use holonic_engine::rational_polynomial::RationalPolynomial;
 use relational_geometry::exact::rat;

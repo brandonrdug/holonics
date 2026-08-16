@@ -10,6 +10,304 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::sync::Arc;
 
 use body::channel::LineageChannel;
+
+/// WHERE THE POLE STANDS RELATIVE TO THE PAIR IT RELATES. `arrow::relate` reads `a, b` from the
+/// pole `f = receiver.channel.frame().tip()`, and `at_horizon` (both faces null) holds exactly when
+/// `f` coincides with `a` or with `b` — a two-body contact wearing three-body arithmetic. These
+/// separate the three ways that can happen, so the producer is measured rather than inferred.
+///
+/// `SWEEP_IDLE` is the one that names a cause: `LivingFrame::tip` returns the **anchor** whenever
+/// `sweep == place::origin()`, so a lineage channel that has never swept reads every relating from
+/// its own starting place.
+pub(crate) static POLE_SWEEP_IDLE: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
+pub(crate) static POLE_ON_FROM: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
+pub(crate) static POLE_ON_TO: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
+pub(crate) static POLE_DISTINCT: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
+pub(crate) static RELATA_COINCIDE: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
+
+/// THE STANDING LATTICE. `LivingFrame::basis` is the perspective's own interaction term — the lens
+/// that is invariant across an instant. Genesis sets it to `FormedRotor::identity()`, and it
+/// advances in the same fold as the sweep. Counting it separates two different diagnoses that look
+/// identical from outside: free propagation through a *static lattice* against free propagation
+/// through *no lattice at all*.
+pub(crate) static BASIS_IDENTITY: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
+
+/// THE DISTINGUISHABLE POPULATION. Every distinct `Place` ever handed to a relating, as a set. An
+/// upper bound on the block count of any receiver family's partition of the material, so a small
+/// number here bounds how many irreducible axes the body could ever found.
+pub(crate) static DISTINCT_PLACES: std::sync::OnceLock<
+    std::sync::Mutex<std::collections::BTreeSet<(u32, u32, i32, bool, u32)>>,
+> = std::sync::OnceLock::new();
+
+type Word = (u32, u32, i32, bool, u32);
+type PlaceKey = (Word, Word);
+
+/// THE VALENCE CENSUS. The distinct places, the distinct `(from, to, pole)` triples, and the
+/// triangle classification of every contact. A contact is a *triangle* only when its three places
+/// are pairwise distinct, and it has *area* only when `cross != 0` — and `|cross| = 2·Area(f,a,b)`,
+/// so the area population is exactly the population that can deposit a founding.
+pub(crate) static CENSUS_PLACES: std::sync::OnceLock<
+    std::sync::Mutex<std::collections::BTreeSet<PlaceKey>>,
+> = std::sync::OnceLock::new();
+pub(crate) static CENSUS_TRIPLES: std::sync::OnceLock<
+    std::sync::Mutex<std::collections::BTreeSet<(PlaceKey, PlaceKey, PlaceKey)>>,
+> = std::sync::OnceLock::new();
+/// three pairwise-distinct places
+pub(crate) static TRIANGLE: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
+/// a triangle whose `cross` is non-zero — non-collinear, with area
+pub(crate) static TRIANGLE_WITH_AREA: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
+/// a triangle that is collinear — `cross == 0` with `aim != 0`: a lawful RIDE, never a FOUND
+pub(crate) static TRIANGLE_COLLINEAR: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
+/// the arrow the producer would form, entirely null
+pub(crate) static ARROW_AT_HORIZON: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
+/// of the area population, how many pass the founding band `cross² >= aim²`
+pub(crate) static WOULD_FOUND: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
+
+/// THE REFUSAL FIBER of the emission, read from the returned contact rather than inferred. Every
+/// counter is conditioned on the meeting ALREADY having area and passing the founding band, so this
+/// is predicted-versus-happened at the one boundary where a founding could have been deposited.
+pub(crate) static ARMED: core::sync::atomic::AtomicUsize = core::sync::atomic::AtomicUsize::new(0);
+/// THE FOURTH BODY, over EVERY contact rather than only the armed ones. `soul.rs` states the law:
+/// the three-body triangle is frame-local and is not yet a soul; the held flywheel supplies the
+/// fourth contact, and the rotor of those two rotors is the first invariant content which may
+/// cross. If this is zero across a whole run, the body never formed an invariant at all.
+pub(crate) static HELD_LIVE_ANY: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
+pub(crate) static ARMED_HELD_NOT_LIVE: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
+pub(crate) static ARMED_NO_EMISSION: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
+pub(crate) static ARMED_RIDE: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
+pub(crate) static ARMED_FOUND: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
+
+/// EXPERIMENT B-PRIME — THE FLYWHEEL SUPPLIED. `perceive_grain` sets `e.fly = met` on the
+/// continuing thought, so the flywheel IS the previously formed meeting; holding the previous armed
+/// meeting is the mechanism's own assignment rather than an authored value. With that held face
+/// supplied, ask the two questions the producer would ask: does `chi_against` return an invariant,
+/// and does it wind? This decides whether the missing fourth body would yield RIDES or FOUNDINGS,
+/// which are materially different outcomes. Nothing here reaches conduct.
+pub(crate) static BPRIME_HELD_SUPPLIED: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
+pub(crate) static BPRIME_CHI_FORMS: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
+pub(crate) static BPRIME_CHI_NONE: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
+pub(crate) static BPRIME_WOUND: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
+pub(crate) static BPRIME_FLAT: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
+static BPRIME_PREVIOUS: std::sync::Mutex<Option<body::manifold::Face>> =
+    std::sync::Mutex::new(None);
+
+#[inline]
+fn observe_supplied_flywheel(meeting: body::manifold::Face) {
+    use core::sync::atomic::Ordering::Relaxed;
+    let Ok(mut previous) = BPRIME_PREVIOUS.lock() else {
+        return;
+    };
+    if let Some(held) = *previous {
+        BPRIME_HELD_SUPPLIED.fetch_add(1, Relaxed);
+        match meeting.chi_against(&held) {
+            None => {
+                BPRIME_CHI_NONE.fetch_add(1, Relaxed);
+            }
+            Some(_) => {
+                BPRIME_CHI_FORMS.fetch_add(1, Relaxed);
+                if meeting.wound_against(&held) {
+                    BPRIME_WOUND.fetch_add(1, Relaxed);
+                } else {
+                    BPRIME_FLAT.fetch_add(1, Relaxed);
+                }
+            }
+        }
+    }
+    *previous = Some(meeting);
+}
+
+/// Read what the producer actually returned for a contact whose meeting was founding-capable.
+#[inline]
+pub(crate) fn observe_contact_outcome(contact: &body::manifold::DirectedEventContact) {
+    use core::sync::atomic::Ordering::Relaxed;
+    let arrow = contact.meeting.arrow;
+    if arrow.cross.mag == 0 || !arrow.founds() {
+        return;
+    }
+    ARMED.fetch_add(1, Relaxed);
+    observe_supplied_flywheel(contact.meeting);
+    if !contact.receiver.held_live {
+        ARMED_HELD_NOT_LIVE.fetch_add(1, Relaxed);
+    }
+    match contact.emission {
+        None => ARMED_NO_EMISSION.fetch_add(1, Relaxed),
+        Some(emission) => match emission.deed {
+            body::manifold::FeltDeed::Ride => ARMED_RIDE.fetch_add(1, Relaxed),
+            _ => ARMED_FOUND.fetch_add(1, Relaxed),
+        },
+    };
+}
+
+#[inline]
+fn word_of(c: body::num::Cog) -> Word {
+    (c.mag, c.rank.mag, c.rank.rank, c.rank.neg, c.turn)
+}
+
+#[inline]
+fn place_key(p: Place) -> [Word; 2] {
+    [word_of(p.0), word_of(p.1)]
+}
+
+#[inline]
+fn key_of(p: Place) -> PlaceKey {
+    (word_of(p.0), word_of(p.1))
+}
+
+/// ★ REVISION 0 — THE GATE MEASUREMENT. Does the stance founder write at the depth the directed
+/// contacts read?
+///
+/// The contacts read `enclosure(source_grain − 1)` and run at `:3546-3590`; the founder writes
+/// through `perceive_grain` and runs at `:3607-3637`, both inside `enact_host_current`. The
+/// Cell-branch founder calls `perceive_grain(0, …)` (`manifold.rs:5125`) — **depth 0** — while
+/// `thicken_branch` calls `perceive_grain(k, …)` at a growing depth (`:5183`). So the two agree
+/// exactly when `source_grain == 1` and not otherwise, and reasoning is not enough to say which.
+///
+/// These read `held_live` at the SAME depth twice: once as the contacts saw it, and once after the
+/// founder has run. The pair decides between two very different repairs.
+///
+/// ```text
+///   before false, after TRUE    the founder writes where the contact reads — it is an ORDERING
+///   before false, after false   the founder writes elsewhere — it is the DEPTH MAP
+/// ```
+pub(crate) static GRAIN_ONE: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
+pub(crate) static GRAIN_DEEPER: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
+pub(crate) static HELD_LIVE_AFTER_FOUNDER: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
+pub(crate) static HELD_DEAD_AFTER_FOUNDER: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
+
+/// Does the founder run at all, and does it fold? The whole `else` arm at `:3654` is gated on
+/// `request.wholly_dark`, so a wholly-dark event skips the founder entirely.
+pub(crate) static EVENT_WHOLLY_DARK: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
+pub(crate) static FOUNDER_CELL: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
+pub(crate) static FOUNDER_COMPLEX: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
+pub(crate) static FOUNDER_FOLDED: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
+/// Did the LINEAGE CHANNEL move across the founder, in the same event? `AtomEvent.fold` is a
+/// completed node handing up, NOT the channel fold — `fold_channel` runs separately at
+/// `manifold.rs:5736`. Reading the frame either side of the founder is the only direct answer.
+pub(crate) static CHANNEL_MOVED: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
+pub(crate) static CHANNEL_STILL: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
+
+/// Read the depth the contacts will use, before they run.
+#[inline]
+pub(crate) fn observe_read_depth(source_grain: u32) {
+    use core::sync::atomic::Ordering::Relaxed;
+    if source_grain == 1 {
+        GRAIN_ONE.fetch_add(1, Relaxed);
+    } else {
+        GRAIN_DEEPER.fetch_add(1, Relaxed);
+    }
+}
+
+/// Read `held_live` at the contacts' own depth AFTER the founder has run in the same event.
+#[inline]
+pub(crate) fn observe_after_founder(receiver: &body::manifold::EventReceiver) {
+    use core::sync::atomic::Ordering::Relaxed;
+    if receiver.held_live {
+        HELD_LIVE_AFTER_FOUNDER.fetch_add(1, Relaxed);
+    } else {
+        HELD_DEAD_AFTER_FOUNDER.fetch_add(1, Relaxed);
+    }
+}
+
+/// Read the pole's placement against the pair, once per formed contact. No verdict, no threshold —
+/// four disjoint tallies and one overlapping one, exactly as `ArrivalResponse` reports.
+#[inline]
+pub(crate) fn observe_pole_placement(receiver: &body::manifold::EventReceiver, from: Place, to: Place) {
+    use core::sync::atomic::Ordering::Relaxed;
+    let frame = receiver.channel.frame();
+    if frame.sweep == body::place::origin() {
+        POLE_SWEEP_IDLE.fetch_add(1, Relaxed);
+    }
+    if frame.basis == body::soul::FormedRotor::identity() {
+        BASIS_IDENTITY.fetch_add(1, Relaxed);
+    }
+    if receiver.held_live {
+        HELD_LIVE_ANY.fetch_add(1, Relaxed);
+    }
+    let pole = frame.tip();
+    if let Ok(mut set) = DISTINCT_PLACES
+        .get_or_init(|| std::sync::Mutex::new(std::collections::BTreeSet::new()))
+        .lock()
+    {
+        for p in [from, to, pole] {
+            for word in place_key(p) {
+                set.insert(word);
+            }
+        }
+    }
+    // THE VALENCE CENSUS. Population first, classification second — no verdict is formed here and
+    // nothing read here reaches conduct.
+    let (kf, kt, kp) = (key_of(from), key_of(to), key_of(pole));
+    if let Ok(mut set) = CENSUS_PLACES
+        .get_or_init(|| std::sync::Mutex::new(std::collections::BTreeSet::new()))
+        .lock()
+    {
+        set.insert(kf);
+        set.insert(kt);
+        set.insert(kp);
+    }
+    if let Ok(mut set) = CENSUS_TRIPLES
+        .get_or_init(|| std::sync::Mutex::new(std::collections::BTreeSet::new()))
+        .lock()
+    {
+        set.insert((kf, kt, kp));
+    }
+    // The producer's own argument order, so this reads the arrow that will actually be formed.
+    let arrow = body::manifold::face(to, from, pole).arrow;
+    if arrow.aim.mag == 0 && arrow.cross.mag == 0 {
+        ARROW_AT_HORIZON.fetch_add(1, Relaxed);
+    }
+    if kf != kt && kf != kp && kt != kp {
+        TRIANGLE.fetch_add(1, Relaxed);
+        if arrow.cross.mag == 0 {
+            TRIANGLE_COLLINEAR.fetch_add(1, Relaxed);
+        } else {
+            TRIANGLE_WITH_AREA.fetch_add(1, Relaxed);
+            if arrow.founds() {
+                WOULD_FOUND.fetch_add(1, Relaxed);
+            }
+        }
+    }
+    let pole = frame.tip();
+    if from == to {
+        RELATA_COINCIDE.fetch_add(1, Relaxed);
+    }
+    match (pole == from, pole == to) {
+        (true, _) => POLE_ON_FROM.fetch_add(1, Relaxed),
+        (false, true) => POLE_ON_TO.fetch_add(1, Relaxed),
+        (false, false) => POLE_DISTINCT.fetch_add(1, Relaxed),
+    };
+}
 use body::incidence::{
     EventCellId, EventComplex, EventComplexError, EventPortKind, IncidenceHand, IncidenceKind,
     OrientedIncidence,
@@ -3298,6 +3596,7 @@ fn enact_host_current(
         };
         let mut body = body.ok_or(LiveCurrentError::BodyRefused(request.lineage()))?;
         let source_grain = request.event.geometry.source_grain()?;
+        observe_read_depth(source_grain);
         let receiver = body
             .event_receiver_at_source_grain(source_grain)
             .ok_or(LiveCurrentError::ExecutionMismatch(request.lineage()))?;
@@ -3324,12 +3623,14 @@ fn enact_host_current(
             if relation.relation.to != request.lineage() {
                 continue;
             }
+            observe_pole_placement(&receiver, relation.from, relation.to);
             let contact = body.directed_event_contact_at_source_grain(
                 receiver,
                 source_grain,
                 relation.from,
                 relation.to,
             );
+            observe_contact_outcome(&contact);
             directed.push((
                 at,
                 ExecutedDirectedRelation::new(relation.relation, contact),
@@ -3342,16 +3643,20 @@ fn enact_host_current(
             regional_results.push((
                 at,
                 form_executed_regional_relation(source_grain, regional, |from, to| {
-                    Ok(body.directed_event_contact_at_source_grain(
+                    observe_pole_placement(&receiver, from, to);
+                    let contact = body.directed_event_contact_at_source_grain(
                         receiver,
                         source_grain,
                         from,
                         to,
-                    ))
+                    );
+                    observe_contact_outcome(&contact);
+                    Ok(contact)
                 })?,
             ));
         }
         let mut consequence = if request.wholly_dark {
+            EVENT_WHOLLY_DARK.fetch_add(1, core::sync::atomic::Ordering::Relaxed);
             pending_dark = pending_dark.add(request.event.action.cog());
             EventEmanation {
                 cells: request.event.geometry.cells(),
@@ -3370,18 +3675,58 @@ fn enact_host_current(
                 body.resolve_dark_action_emitting(pending_dark, &mut output);
                 pending_dark = Cog::ZERO;
             }
+            let frame_before = body.channel().frame();
             let folded = match request.event.geometry {
-                CurrentGeometry::Cell(_) => body
-                    .live_event_node_emitting(request.face, request.event.action.cog(), &mut output)
+                // A CELL FACE IS AN ATOM — `geometry_face_with_atlas` returns
+                // `atom_node(relation.cog())` — so it belongs in the sub-illicium, and this mouth
+                // is the right one for it.
+                //
+                // **A composing entry was wired here on 2026-08-15 and REVERTED the same hour.**
+                // The reasoning was that a `Cell` has no interior to have been composed, so the
+                // declared grain carries nothing; the error was that the correction pointed the
+                // wrong way. Routing an atom straight into `perceive_grain(0)` skips the
+                // sub-composition and declares a grain *above* what the material founded, which is
+                // the same absolute-frame defect inverted. The supporting measurement was also
+                // taken past the mouth's aperture: it fed whole word nodes to an entry built for
+                // atoms, so its "zero climbs" was an artifact of the probe.
+                //
+                // `holon-plate`'s carrier-extent assertion is what caught it, by refusing to let
+                // the carrier grow a row on a deed that founds no lineage.
+                //
+                // **What survives is the real reading, and it is upstream of both mouths:** this
+                // mouth reaches `perceive_node_emitting` — the only path in the body from a raw
+                // arrival into `thicken` — through its own `match fold { Some(f) => .. }` gate, so
+                // the word grain forms exactly when the sub-illicium folds. `FOUNDER_FOLDED` is
+                // the counter that answers it, and it is measured by
+                // `soma/life/examples/the_grain_is_declared_or_it_is_founded.rs`.
+                CurrentGeometry::Cell(_) => {
+                    FOUNDER_CELL.fetch_add(1, core::sync::atomic::Ordering::Relaxed);
+                    body.live_event_node_emitting(
+                        request.face,
+                        request.event.action.cog(),
+                        &mut output,
+                    )
                     .fold
-                    .is_some(),
-                CurrentGeometry::Complex(_) => body.live_completed_event_node_at_grain_emitting(
-                    request.face,
-                    source_grain,
-                    request.event.action.cog(),
-                    &mut output,
-                ),
+                    .is_some()
+                }
+                CurrentGeometry::Complex(_) => {
+                    FOUNDER_COMPLEX.fetch_add(1, core::sync::atomic::Ordering::Relaxed);
+                    body.live_completed_event_node_at_grain_emitting(
+                        request.face,
+                        source_grain,
+                        request.event.action.cog(),
+                        &mut output,
+                    )
+                }
             };
+            if folded {
+                FOUNDER_FOLDED.fetch_add(1, core::sync::atomic::Ordering::Relaxed);
+            }
+            if body.channel().frame() == frame_before {
+                CHANNEL_STILL.fetch_add(1, core::sync::atomic::Ordering::Relaxed);
+            } else {
+                CHANNEL_MOVED.fetch_add(1, core::sync::atomic::Ordering::Relaxed);
+            }
             EventEmanation {
                 cells: request.event.geometry.cells(),
                 incidences: request.event.geometry.incidences(),
@@ -3404,6 +3749,7 @@ fn enact_host_current(
         consequence.receiver = body
             .event_receiver_at_source_grain(source_grain)
             .ok_or(LiveCurrentError::ExecutionMismatch(request.lineage()))?;
+        observe_after_founder(&consequence.receiver);
         if body.resource_refused() || output.refused {
             return Err(LiveCurrentError::BodyRefused(request.lineage()));
         }
@@ -3677,17 +4023,52 @@ pub struct LiveCurrentMachine {
     // Rebuildable standing-incidence aperture. It exposes possible local meetings but never
     // supplies a Swing result, and is absent from rest, radiation, and causal identity.
     standing_aperture: Option<Arc<StandingIncidenceAperture>>,
+    /// The chronology a standing factor must cross the aperture within, **declared by whoever
+    /// mounts this machine**. `u64::MAX` is the inherited setting and admits every factor whole,
+    /// which is what the closure did before 2026-08-15.
+    ///
+    /// It is a receiver declaration over a standing, not part of the caused body, so it is absent
+    /// from rest, radiation and identity exactly as the aperture itself is.
+    traversal_horizon: u64,
+    /// How many propagation hops a front may be informed across — its **vision**. Declared by
+    /// whoever mounts this machine; `u32::MAX` is the inherited setting and bounds nothing.
+    vision_horizon: u32,
     // Substrate-cache coherence only. It is deliberately absent from rest, radiation, and every
     // causal or geometric identity.
     physical_revision: u64,
 }
 
 impl LiveCurrentMachine {
+    /// Declare the chronology a standing factor must cross the aperture within.
+    ///
+    /// **Strictly additive**: the inherited setting is `u64::MAX` and admits every factor whole, so
+    /// a machine that never calls this behaves exactly as before. A finite horizon defers the
+    /// mismatched factors instead — retained, never dropped — which is what stops the co-present
+    /// seam closure from pulling a replicated factor in whole on every round.
+    /// Declare how far a signal may have propagated and still inform a front — its **vision**.
+    ///
+    /// Strictly additive: `u32::MAX` is inherited and bounds nothing. A finite depth means a front
+    /// is informed only about what has reached it within that many hops, which is the traffic law's
+    /// clause that a unit *"physically cannot be informed about vehicles not within their vision."*
+    pub fn declare_vision_horizon(&mut self, horizon: u32) {
+        self.vision_horizon = horizon;
+        self.standing_aperture = None;
+    }
+
+    pub fn declare_traversal_horizon(&mut self, horizon: u64) {
+        self.traversal_horizon = horizon;
+        // The aperture is rebuilt on the next regional closure; drop any built under the prior
+        // declaration rather than letting a stale horizon ride.
+        self.standing_aperture = None;
+    }
+
     pub fn new(standing: SparseStandingSurface) -> Self {
         Self {
             standing,
             lineages: SparseOrdinalAtlas::new(),
             standing_aperture: None,
+            traversal_horizon: u64::MAX,
+            vision_horizon: u32::MAX,
             physical_revision: 0,
         }
     }
@@ -3879,6 +4260,10 @@ impl LiveCurrentMachine {
             standing,
             lineages,
             standing_aperture: None,
+            // A remount inherits the admit-everything setting; the horizons are live receiver
+            // declarations and are not carried in the rest image.
+            traversal_horizon: u64::MAX,
+            vision_horizon: u32::MAX,
             physical_revision: 0,
         })
     }
@@ -4090,9 +4475,11 @@ impl LiveCurrentMachine {
             return Err(LiveCurrentError::ExecutionMismatch(currents[0].lineage));
         }
         if !executed_regional.is_empty() && self.standing_aperture.is_none() {
-            self.standing_aperture = Some(Arc::new(StandingIncidenceAperture::from_standing(
-                self.standing.constituent_standing(),
-            )?));
+            let mut aperture =
+                StandingIncidenceAperture::from_standing(self.standing.constituent_standing())?;
+            aperture.declare_traversal_horizon(self.traversal_horizon);
+            aperture.declare_vision_horizon(self.vision_horizon);
+            self.standing_aperture = Some(Arc::new(aperture));
         }
         let executed_regional = if executed_regional.is_empty() {
             executed_regional

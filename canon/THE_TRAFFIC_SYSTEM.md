@@ -101,6 +101,132 @@ and 2026-06-20:
 | the current takes the cheapest route, and the routes are cheap *by prior conduct* | **owned for founded axes** — `capacity := \|residue\| + 1` makes a route cheap exactly because it carried what nothing else carried. Still owed for **declared** passages: `characteristic_delay` is pinned at `1` by its only caller. |
 | an axis with empty residue is redundant, and its capacity says so | `founded_receiver.rs` — `residue`, `FoundedPanel::redundant`, `FoundedPanel::capacities`. `Res(r) = (⋂_{s≠r} ≡_s) ∖ ≡_r`; `capacity := \|Res(r)\| + 1`, so a redundant axis takes the **minimum** capacity and dilates maximally rather than being deleted. |
 
+## 3b. How far things interact — the mechanism, ratified 2026-08-15
+
+**Occasion.** The assistant read `CLAUDE.md` §11's *"condensing a far field into a compact realizer"*
+as **reach the far population, then summarise it**, and named a 105,754-arm interaction front as a
+far population owed condensation. Brandon corrected the ontology directly, and every quotation below
+is his, verbatim, from that correction:
+
+> *"It is not that one holon in the traffic system directly interacts with any far away things, if it
+> is literally physically distant from another holon's emanations, then it is that the distant holons
+> will only interact through propagating waves; this is how refraction works."*
+
+### The two channels, and only one of them is an interaction
+
+> *"that is how far away particles interact, it's quantum entanglement; like atomic clocks."*
+
+**Concurred invariants.** Far units agree with no signal passing, because each is locked to the same
+standing invariant — §2's *"the Earth is a set of concurred invariants that bind the trajectories
+almost globally."* Correlation without communication.
+
+**Propagating waves.** Influence crossing a medium through a chain of local interactions, with delay.
+
+**These have opposite consequences for founding an edge.** Agreement of the first kind is not
+coupling and must found no edge; agreement of the second kind is coupling and carries a delay. The
+discriminator is checkable rather than interpretive: **a concurred-invariant agreement has zero
+propagation delay and is insensitive to the intervening medium; a propagated coupling has a delay and
+moves when the medium changes.** That is the returned-partition rule — *which declared input, varied,
+would move them apart* — pointed at edges instead of classes.
+
+### The interaction is a predicted crossing, not a contact
+
+> *"Cars do not physically intersect in order to cause changes in motion about each other, but the
+> predicted motion of cars relative to one driver is weighed, the operators do indeed predict
+> collisions ahead of time, those intersections are physically modeled and that is what the
+> intelligent units are responding to."*
+
+The causal primitive is **a crossing in the forward cone that may never occur** — and the response is
+often what prevents it. `receiver_current` already computes predicted contention:
+`co_present_branch_population` is what is *about to* be co-present at a site.
+
+**So `deferred_arrivals` is not an overflow bucket.** It is the population of predicted-but-unrealised
+arrivals — the virtual crossings units actually respond to. It is retained and never *read*, which is
+the same shape as `H.0466`'s unconnected leaders.
+
+### Vision is physical, and it is the arrival set
+
+> *"they have absolutely no consideration of the cars well-ahead of them because they physically
+> cannot be informed about vehicles not within their vision"*
+
+An aperture here is not a declaration; it is what has reached you. In this body that has an exact
+referent: **vision is the arrival set of a radiation**, horizon-bounded, with what has not arrived
+retained separately. A candidate set formed as the transitive closure of shared structure is not
+vision; it is omniscience.
+
+### Superposition is not fusion — and this is the convicted defect
+
+Twelve cars constraining each other along one section are **still twelve cars**. Their influence
+superposes; their bodies do not fuse, and none acquires the others' doors.
+
+**Measured 2026-08-15**, `soma/membrane/src/live_constituent.rs`: the co-present seam closure
+union-finds its parts and then calls `compose_population_component`, which **fuses the component's
+bodies**. The roster (`members`) survives; the geometry is quotiented into one body carrying every
+member's support factors and residual arms. Across one round, **parts fell 80 → 79 while exposed arms
+rose 65,450 → 105,754**, and the fused body then interacts as a single unit — so material at other
+places is now "at" one site.
+
+> **That is action at a distance, manufactured by a quotient**, and
+> `…/THEORY/36_THE_WATER.md` §5 refuses it: *"every relating is a LANDING — contact; there is no
+> action at a distance anywhere in the physics."*
+
+### Modulation is receiver-determined and carries no sign
+
+> *"an extremely fast driver can either scare other drivers into caution within their radius or urge
+> other drivers that want to speed to also speed… the local ecology modulates behaviors for
+> independent units deterministically."*
+
+One field, opposite responses, decided by the receiving unit's own standing. **A deposit that moves
+every receiver the same way is a governor** — the ban on a privileged scalar chooser arriving from
+this side, and stronger, because it says why: a signed weight is a field with the receiver deleted.
+
+And *"the 'deposits' in traffic systems are the differences between how the traffic flows in any local
+regions"* — the modulating structure is the **local flow difference**, which is a gradient, not a
+level. It agrees with `MENO_FORMULA §VII`'s ruling that the flow is primary and pressure is only its
+reading.
+
+### Density is a threshold, and the rate is the signal
+
+> *"If there is a traffic jam very far ahead it can be perceivable before you can directly witness
+> stopped cars if there are enough vehicles ahead of the bottleneck that begin refracting in the sense
+> that the medium's surface area to pass through is coming to a more narrow neck, and you can then
+> witness the propagation of the slow-down through the cars driving toward the bottleneck; this is
+> like the Doppler effect because we are talking about literally propagating signals."*
+
+Two readings, neither taken today.
+
+**Below a density there is no wave**, so far structure is not merely hard to perceive — it is not in
+the world. That is the frozen laboratory's measured species law arriving independently: *at one lane
+the machine founds NOTHING — mute, a different species, not a slower one.*
+
+**And the rate carries the closing speed.** The machine computes `passage_delay` and discards its
+derivative. The second difference of arrival chronology across waves is this body's Doppler, and it is
+what would let it perceive a bottleneck before reaching one.
+
+### Locality is scale-free, so a region is a fixed point
+
+> *"I could be referring to a section of a highway or a group of 12 cars constraining each other's
+> speed along one section of the highway."*
+
+A region is **a maximal set whose predicted crossings are with each other** — a closure condition, not
+a radius and not a count.
+
+### What this does to `CLAUDE.md` §11, and it is an inversion rather than a contradiction
+
+§11's *"condense a far field into a compact realizer with an exact retained remainder"* was read as an
+operation applied to a population one has reached. **A multipole or exterior expansion is not that.**
+It is the statement that **propagation has already filtered the far field's high-order structure
+before it arrives.** Compactness at distance is a consequence of the wave, not an operation on the
+source.
+
+> **The compact representative is never constructed. It is received, and the medium is what compressed
+> it.**
+
+So what §11 asks for is the **propagation law**, and its certified remainder is what the medium
+filtered — `deferred_arrivals` and the reflected population, both already carriers here and neither
+read as a filtered far field. In the compression tablet's own species: the medium is the codec,
+propagation is the pivot, and the traffic law is the declared decoder that says what the delay means.
+
 ## 4. Bounds
 
 - **The analogy motivates; it does not grade.** `papers/source/synopsis/AUDIT.md` governs: physics
